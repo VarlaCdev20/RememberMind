@@ -1,0 +1,61 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\Activitylog\Traits\LogsActivity;
+
+class AtencionAdulto extends Model
+{
+    use SoftDeletes, LogsActivity;
+    protected $table = 'atenciones_adulto';
+    protected $primaryKey = 'cod_aten_adul';
+
+    public $incrementing = true;
+    protected $keyType = 'int';
+
+    // Timestamps habilitados — columnas existen desde strengthen_administrative_tables migration
+    public $timestamps = true;
+
+    protected $fillable = [
+        'fecha',
+        'hora',
+        'obs',
+        'estado',
+        'cod_tipo_aten',
+        'cod_am'
+    ];
+
+    protected $casts = [
+        'fecha' => 'date',
+    ];
+
+    public function getActivitylogOptions(): \Spatie\Activitylog\LogOptions
+    {
+        return \Spatie\Activitylog\LogOptions::defaults()
+            ->logFillable()
+            ->logOnlyDirty()
+            ->useLogName('Atenciones')
+            ->setDescriptionForEvent(function (string $eventName) {
+                if ($eventName === 'created') return "Se registró una nueva atención para el adulto mayor {$this->cod_am}.";
+                if ($eventName === 'updated') return "Se actualizó la información de la atención #{$this->cod_aten_adul}.";
+                if ($eventName === 'deleted') return "Se eliminó el registro de atención del adulto mayor {$this->cod_am}.";
+                return "Atención {$this->cod_aten_adul} modificada ({$eventName}).";
+            });
+    }
+
+    /**
+     * Relaciones
+     */
+
+    public function tipoAtencion()
+    {
+        return $this->belongsTo(TipoAtencionAdulto::class, 'cod_tipo_aten', 'cod_tipo_aten');
+    }
+
+    public function adultoMayor()
+    {
+        return $this->belongsTo(AdultoMayor::class, 'cod_am', 'cod_am');
+    }
+}

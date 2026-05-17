@@ -1,0 +1,2717 @@
+@use('Carbon\Carbon')
+@use('Illuminate\Support\Facades\Storage')
+
+<x-app-layout>
+    @php
+    $adultoObj = is_object($adulto ?? null) ? $adulto : null;
+
+    $idAdulto = optional($adultoObj)->cod_am;
+
+    $nombreCompleto = trim(
+        (optional($adultoObj)->nombres ?? '') . ' ' .
+        (optional($adultoObj)->ap_paterno ?? '') . ' ' .
+        (optional($adultoObj)->ap_materno ?? '')
+    );
+
+    $fechaNacimiento = optional($adultoObj)->fecha_nac;
+    $fechaIngreso = optional($adultoObj)->fecha_ing;
+
+    $edad = $fechaNacimiento
+        ? Carbon::parse($fechaNacimiento)->age
+        : null;
+
+    $fechaNacimientoFormateada = $fechaNacimiento
+        ? Carbon::parse($fechaNacimiento)->format('d/m/Y')
+        : 'No registrada';
+
+    $fechaIngresoFormateada = $fechaIngreso
+        ? Carbon::parse($fechaIngreso)->format('d/m/Y')
+        : 'No registrada';
+
+    /*
+    |--------------------------------------------------------------------------
+    | Normalización del estado
+    |--------------------------------------------------------------------------
+    | Evita que salga JSON como en la captura.
+    */
+    $estadoFuente = optional($adultoObj)->estado_adulto ?? optional($adultoObj)->estado ?? null;
+
+    if (is_object($estadoFuente)) {
+        $estadoTexto = $estadoFuente->estado ?? 'Activo';
+    } elseif (is_array($estadoFuente)) {
+        $estadoTexto = $estadoFuente['estado'] ?? 'Activo';
+    } else {
+        $estadoTexto = $estadoFuente ?: 'Activo';
+    }
+
+    $estadoTexto = strtoupper((string) $estadoTexto);
+
+    $fotoAdulto = optional($adultoObj)->foto ?? optional($adultoObj)->imagen ?? null;
+
+    $fotoUrl = $fotoAdulto
+        ? Storage::url($fotoAdulto)
+        : null;
+
+    $iniciales = strtoupper(
+        substr(optional($adultoObj)->nombres ?? 'A', 0, 1) .
+        substr(optional($adultoObj)->ap_paterno ?? '', 0, 1)
+    );
+
+    $ci = optional($adultoObj)->ci ?? 'No registrado';
+    $genero = optional($adultoObj)->genero ?? 'No registrado';
+    $tieneCelular = optional($adultoObj)->tiene_celular ?? true;
+    $celular = optional($adultoObj)->celular ?? 'No registrado';
+    $sabeUsarWhatsapp = optional($adultoObj)->sabe_usar_whatsapp ?? false;
+    $telefonoFijo = optional($adultoObj)->telefono_fijo ?? 'No registrado';
+    $zona = optional($adultoObj)->zona ?? 'No registrada';
+    $calle = optional($adultoObj)->calle ?? 'No registrada';
+
+    // Listas para los forelse inferiores (Datos Activos)
+    $familiaresLista = is_iterable($familiaresActivos ?? null) ? collect($familiaresActivos) : collect();
+    $observacionesLista = is_iterable($observacionesActivas ?? null) ? collect($observacionesActivas) : collect();
+    $atencionesLista = is_iterable($atencionesActivas ?? null) ? collect($atencionesActivas) : collect();
+    $actividadesLista = is_iterable($actividadesActivas ?? null) ? collect($actividadesActivas) : collect();
+    $documentosLista = is_iterable($documentosActivos ?? null) ? collect($documentosActivos) : collect();
+    $evaluacionesLista = is_iterable($evaluacionesActivas ?? null) ? collect($evaluacionesActivas) : collect();
+    $asignacionesLista = is_iterable($asignaciones ?? null) ? collect($asignaciones) : collect();
+    $bitacoraLista = is_iterable($bitacora ?? null) ? collect($bitacora) : collect();
+    $eventosFiltroLista = is_iterable($eventosFiltro ?? null) ? collect($eventosFiltro) : collect();
+
+    // Conteos para indicadores
+    $totalFamiliares = count($familiaresLista);
+    $totalObservaciones = count($observacionesLista);
+    $totalAtenciones = count($atencionesLista);
+    $totalActividades = count($actividadesLista);
+    $totalDocumentos = count($documentosLista);
+    $totalEvaluaciones = count($evaluacionesLista);
+    $totalAsignaciones = count($asignacionesLista);
+
+    $tabInicial = request('tab', 'resumen');
+@endphp
+
+    <div
+        x-data="{
+            tab: @js($tabInicial),
+            modal: null,
+            isEditing: false,
+            isViewing: false,
+            recordData: {},
+            abrir(nombre, data = null, edit = false, view = false) { 
+                this.modal = nombre;
+                this.recordData = data || {};
+                this.isEditing = edit;
+                this.isViewing = view;
+            },
+            cerrar() { 
+                this.modal = null;
+                this.recordData = {};
+                this.isEditing = false;
+                this.isViewing = false;
+            }
+        }"
+        class="relative min-h-screen overflow-hidden bg-[#D5C7B9] px-4 py-5 font-outfit text-[#2F3E5C] sm:px-6"
+    >
+        {{-- Fondo con trama --}}
+        <div class="pointer-events-none fixed inset-0 opacity-[0.045]"
+             style="background-image: radial-gradient(#2F3E5C 1.2px, transparent 1.2px); background-size: 28px 28px;">
+        </div>
+
+        <div class="relative mx-auto max-w-7xl space-y-4">
+
+            {{-- HEADER COMPACTO (Para pestañas secundarias) --}}
+            <section x-cloak x-show="tab !== 'resumen'" class="overflow-hidden rounded-[24px] border border-[#CBBBAA] bg-[#E7DDD2]/95 shadow-[0_10px_25px_rgba(47,62,92,0.08)] backdrop-blur-xl transition-all duration-300">
+                <div class="h-1.5 w-full bg-gradient-to-r from-[#E27D60] via-[#D9A27C] to-[#8EA17D]"></div>
+                <div class="p-4 sm:px-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div class="flex items-center gap-4">
+                        @if($fotoUrl)
+                            <img src="{{ $fotoUrl }}" alt="Foto de {{ $nombreCompleto }}" class="h-14 w-14 rounded-[14px] border-2 border-[#F8F2EC] object-cover shadow-sm">
+                        @else
+                            <div class="flex h-14 w-14 items-center justify-center rounded-[14px] bg-gradient-to-br from-[#4E5D8A] to-[#6873A6] text-xl font-black text-white shadow-sm">
+                                {{ $iniciales ?: 'AM' }}
+                            </div>
+                        @endif
+                        <div>
+                            <h2 class="text-lg font-black text-[#2F3E5C] leading-tight">{{ $nombreCompleto ?: 'Adulto Mayor' }}</h2>
+                            <div class="flex flex-wrap gap-2 items-center mt-1">
+                                <span class="text-[10px] font-black uppercase tracking-widest text-[#2F3E5C]/60 bg-white/50 px-2 py-0.5 rounded-md border border-[#D5C7B9]"># {{ $idAdulto }}</span>
+                                <span class="text-[9px] font-black uppercase px-2 py-0.5 rounded-md {{ $estadoTexto === 'ACTIVO' ? 'bg-[#8EA17D]/18 text-[#617453]' : 'bg-[#A37C62]/18 text-[#7A5C49]' }}">{{ ucfirst(strtolower($estadoTexto)) }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex gap-2">
+                        <button type="button" @click="tab = 'resumen'" class="rounded-xl border border-[#C7B5A3] bg-[#F2EBE3] px-5 py-2.5 text-xs font-black transition hover:bg-[#E7DDD2] active:scale-95">
+                            Cerrar edición
+                        </button>
+
+                        <a href="{{ route('admin.adultos-mayores.reporte-individual', $idAdulto) }}" target="_blank" class="inline-flex items-center justify-center gap-2 rounded-xl bg-[#2F3E5C] px-5 py-2.5 text-xs font-black text-white shadow-lg transition hover:-translate-y-0.5 hover:bg-[#1F2E4C] active:scale-95">
+                            <i class="ph-bold ph-file-pdf"></i> Imprimir Expediente
+                        </a>
+                    </div>
+                </div>
+            </section>
+
+            {{-- HEADER PRINCIPAL COMPLETO (Solo en Resumen) --}}
+            <section x-show="tab === 'resumen'" class="overflow-hidden rounded-[24px] border border-[#CBBBAA] bg-[#E7DDD2]/95 shadow-[0_16px_40px_rgba(47,62,92,0.10)] backdrop-blur-xl transition-all duration-300">
+    {{-- Barra superior decorativa --}}
+    <div class="h-1.5 w-full bg-gradient-to-r from-[#E27D60] via-[#D9A27C] to-[#8EA17D]"></div>
+
+    <div class="p-5 sm:p-6 lg:p-7">
+        <div class="grid gap-5 xl:grid-cols-[220px_minmax(0,1fr)]">
+
+            {{-- COLUMNA IZQUIERDA --}}
+            <aside class="rounded-[22px] border border-[#D5C7B9] bg-[#F2EBE3]/85 p-4 shadow-sm">
+                <div class="mb-4 flex items-center justify-between gap-2">
+                    <span class="inline-flex items-center rounded-full bg-[#2F3E5C]/10 px-3 py-1 text-[11px] font-extrabold uppercase tracking-[0.18em] text-[#2F3E5C]">
+                        Ficha {{ $idAdulto ?? 'N/D' }}
+                    </span>
+
+                    <span class="inline-flex items-center rounded-full px-3 py-1 text-[11px] font-extrabold uppercase tracking-wide
+                        {{ $estadoTexto === 'ACTIVO'
+                            ? 'bg-[#8EA17D]/18 text-[#617453]'
+                            : 'bg-[#A37C62]/18 text-[#7A5C49]' }}">
+                        {{ ucfirst(strtolower($estadoTexto)) }}
+                    </span>
+                </div>
+
+                <div class="flex flex-col items-center text-center">
+                    @if($fotoUrl)
+                        <img
+                            src="{{ $fotoUrl }}"
+                            alt="Foto de {{ $nombreCompleto }}"
+                            class="h-28 w-28 rounded-[22px] border-4 border-[#F8F2EC] object-cover shadow-[0_14px_28px_rgba(47,62,92,0.14)]"
+                        >
+                    @else
+                        <div class="flex h-28 w-28 items-center justify-center rounded-[22px] bg-gradient-to-br from-[#4E5D8A] to-[#6873A6] text-4xl font-black text-white shadow-[0_14px_28px_rgba(47,62,92,0.18)]">
+                            {{ $iniciales ?: 'AM' }}
+                        </div>
+                    @endif
+
+                    <h1 class="mt-4 text-[1.45rem] font-black leading-tight text-[#2F3E5C]">
+                        {{ $nombreCompleto ?: 'Adulto mayor sin nombre registrado' }}
+                    </h1>
+
+                    <p class="mt-1 text-sm font-semibold text-[#2F3E5C]/65">
+                        Perfil institucional del residente
+                    </p>
+                </div>
+
+                <div class="mt-5 space-y-2.5">
+                    <div class="rounded-2xl bg-[#E7DDD2] px-3.5 py-3">
+                        <p class="text-[10px] font-extrabold uppercase tracking-[0.18em] text-[#2F3E5C]/45">CI</p>
+                        <p class="mt-1 text-sm font-bold text-[#2F3E5C]">{{ $ci }}</p>
+                    </div>
+
+                    <div class="rounded-2xl bg-[#E7DDD2] px-3.5 py-3">
+                        <p class="text-[10px] font-extrabold uppercase tracking-[0.18em] text-[#2F3E5C]/45">Edad / Género</p>
+                        <p class="mt-1 text-sm font-bold text-[#2F3E5C]">
+                            {{ $edad ? $edad . ' años' : 'Edad no disponible' }} · {{ $genero }}
+                        </p>
+                    </div>
+                </div>
+            </aside>
+
+            {{-- COLUMNA DERECHA --}}
+            <div class="space-y-4">
+                {{-- RESUMEN SUPERIOR --}}
+                <div class="rounded-[22px] border border-[#D5C7B9] bg-[#F2EBE3]/85 p-4 sm:p-5 shadow-sm">
+                    <div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+                        <div class="space-y-3">
+                            <div class="flex flex-wrap items-center gap-2">
+                                <span class="rounded-full bg-[#E27D60]/14 px-3 py-1 text-[11px] font-extrabold uppercase tracking-[0.16em] text-[#D96F58]">
+                                    Adulto mayor
+                                </span>
+
+                                <span class="rounded-full bg-[#8EA17D]/16 px-3 py-1 text-[11px] font-extrabold uppercase tracking-[0.16em] text-[#617453]">
+                                    Seguimiento institucional
+                                </span>
+                            </div>
+
+                            <div>
+                                <h2 class="text-[1.75rem] font-black leading-tight text-[#2F3E5C]">
+                                    Resumen general del residente
+                                </h2>
+                                <p class="mt-1 max-w-3xl text-sm font-semibold leading-6 text-[#2F3E5C]/62">
+                                    Información administrativa y de control del adulto mayor, con acceso rápido a edición,
+                                    observaciones, documentos y seguimiento integral.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="grid gap-2 sm:grid-cols-2 lg:min-w-[310px]">
+                            <a href="{{ route('admin.adultos-mayores.index') }}"
+                               class="inline-flex items-center justify-center gap-2 rounded-2xl border border-[#CDBDAF] bg-[#E3D6C8] px-4 py-3 text-sm font-extrabold text-[#2F3E5C] transition duration-200 hover:-translate-y-0.5 hover:bg-[#D8C9B9] active:scale-[0.98]">
+                                <i class="ph-bold ph-arrow-left"></i>
+                                Volver al panel
+                            </a>
+
+                            @if($idAdulto)
+                                <a href="{{ route('admin.adultos-mayores.edit', $idAdulto) }}"
+                                   class="inline-flex items-center justify-center gap-2 rounded-2xl bg-[#E27D60] px-4 py-3 text-sm font-extrabold text-white shadow-[0_10px_20px_rgba(226,125,96,0.22)] transition duration-200 hover:-translate-y-0.5 hover:bg-[#D96F58] active:scale-[0.98]">
+                                    <i class="ph-bold ph-pencil-simple"></i>
+                                    Editar ficha completa
+                                </a>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+
+                {{-- GRID DE DATOS RESUMEN --}}
+                <div class="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+                    <div class="rounded-[20px] border border-[#D5C7B9] bg-[#F2EBE3]/85 p-4 shadow-sm transition duration-200 hover:-translate-y-0.5">
+                        <div class="mb-2 flex items-center gap-2">
+                            <div class="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#E27D60]/14 text-[#E27D60]">
+                                <i class="ph-bold ph-identification-card text-lg"></i>
+                            </div>
+                            <p class="text-[11px] font-extrabold uppercase tracking-[0.16em] text-[#2F3E5C]/48">Identificación</p>
+                        </div>
+                        <p class="text-sm font-bold text-[#2F3E5C]">CI {{ $ci }}</p>
+                        <p class="mt-1 text-xs font-semibold text-[#2F3E5C]/55">Registro personal institucional</p>
+                    </div>
+
+                    <div class="rounded-[20px] border border-[#D5C7B9] bg-[#F2EBE3]/85 p-4 shadow-sm transition duration-200 hover:-translate-y-0.5">
+                        <div class="mb-2 flex items-center gap-2">
+                            <div class="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#8EA17D]/16 text-[#617453]">
+                                <i class="ph-bold ph-user-check text-lg"></i>
+                            </div>
+                            <p class="text-[11px] font-extrabold uppercase tracking-[0.16em] text-[#2F3E5C]/48">Estado</p>
+                        </div>
+                        <p class="text-sm font-bold text-[#2F3E5C]">{{ ucfirst(strtolower($estadoTexto)) }}</p>
+                        <p class="mt-1 text-xs font-semibold text-[#2F3E5C]/55">Situación institucional actual</p>
+                    </div>
+
+                    <div class="rounded-[20px] border border-[#D5C7B9] bg-[#F2EBE3]/85 p-4 shadow-sm transition duration-200 hover:-translate-y-0.5">
+                        <div class="mb-2 flex items-center gap-2">
+                            <div class="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#D9A27C]/18 text-[#9B6D4C]">
+                                <i class="ph-bold ph-calendar text-lg"></i>
+                            </div>
+                            <p class="text-[11px] font-extrabold uppercase tracking-[0.16em] text-[#2F3E5C]/48">Nacimiento</p>
+                        </div>
+                        <p class="text-sm font-bold text-[#2F3E5C]">{{ $fechaNacimientoFormateada }}</p>
+                        <p class="mt-1 text-xs font-semibold text-[#2F3E5C]/55">
+                            {{ $edad ? $edad . ' años' : 'Edad no disponible' }}
+                        </p>
+                    </div>
+
+                    <div class="rounded-[20px] border border-[#D5C7B9] bg-[#F2EBE3]/85 p-4 shadow-sm transition duration-200 hover:-translate-y-0.5">
+                        <div class="mb-2 flex items-center gap-2">
+                            <div class="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#6873A6]/16 text-[#566189]">
+                                <i class="ph-bold ph-buildings text-lg"></i>
+                            </div>
+                            <p class="text-[11px] font-extrabold uppercase tracking-[0.16em] text-[#2F3E5C]/48">Ingreso</p>
+                        </div>
+                        <p class="text-sm font-bold text-[#2F3E5C]">{{ $fechaIngresoFormateada }}</p>
+                        <p class="mt-1 text-xs font-semibold text-[#2F3E5C]/55">Fecha de ingreso institucional</p>
+                    </div>
+                </div>
+
+                {{-- BLOQUE EXTRA --}}
+                <div class="grid gap-3 md:grid-cols-2">
+                    <div class="rounded-[20px] border border-[#D5C7B9] bg-[#F2EBE3]/85 p-4 shadow-sm">
+                        <p class="text-[11px] font-extrabold uppercase tracking-[0.16em] text-[#2F3E5C]/45">Contacto</p>
+                        @if($tieneCelular && $celular !== 'No registrado')
+                            <div class="mt-2 flex items-center gap-2">
+                                <p class="text-sm font-bold text-[#2F3E5C]">{{ $celular }}</p>
+                                @if($sabeUsarWhatsapp)
+                                    <a href="https://wa.me/591{{ $celular }}" target="_blank" title="Contactar por WhatsApp"
+                                       class="flex h-6 w-6 items-center justify-center rounded-full bg-[#25D366]/10 text-[#25D366] transition hover:bg-[#25D366] hover:text-white">
+                                        <i class="ph-fill ph-whatsapp-logo text-sm"></i>
+                                    </a>
+                                @endif
+                            </div>
+                            <p class="mt-1 text-xs font-semibold text-[#2F3E5C]/55">Celular del residente</p>
+                        @else
+                            <p class="mt-2 text-sm font-bold text-[#2F3E5C]">{{ $telefonoFijo !== 'No registrado' ? $telefonoFijo : 'Sin celular' }}</p>
+                            <p class="mt-1 text-xs font-semibold text-[#2F3E5C]/55">Teléfono fijo</p>
+                        @endif
+                    </div>
+
+                    <div class="rounded-[20px] border border-[#D5C7B9] bg-[#F2EBE3]/85 p-4 shadow-sm">
+                        <p class="text-[11px] font-extrabold uppercase tracking-[0.16em] text-[#2F3E5C]/45">Dirección referencial</p>
+                        <p class="mt-2 text-sm font-bold text-[#2F3E5C]">{{ $zona }}</p>
+                        <p class="mt-1 text-xs font-semibold text-[#2F3E5C]/55">{{ $calle }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+            {{-- INDICADORES --}}
+            <section class="grid gap-3 sm:grid-cols-2 lg:grid-cols-6">
+                <div class="rounded-2xl border border-[#C7B5A3] bg-[#E6DDD3]/90 p-4 shadow-sm transition hover:-translate-y-0.5">
+                    <p class="text-[10px] font-black uppercase tracking-widest text-[#2F3E5C]/45">Familiares</p>
+                    <h3 class="mt-1 text-2xl font-black text-[#5F7357]">{{ $totalFamiliares }}</h3>
+                    <p class="text-xs font-bold text-[#2F3E5C]/50">Vinculados</p>
+                </div>
+
+                <div class="rounded-2xl border border-[#C7B5A3] bg-[#E6DDD3]/90 p-4 shadow-sm transition hover:-translate-y-0.5">
+                    <p class="text-[10px] font-black uppercase tracking-widest text-[#2F3E5C]/45">Observaciones</p>
+                    <h3 class="mt-1 text-2xl font-black text-[#5B5F97]">{{ $totalObservaciones }}</h3>
+                    <p class="text-xs font-bold text-[#2F3E5C]/50">Seguimiento</p>
+                </div>
+
+                <div class="rounded-2xl border border-[#C7B5A3] bg-[#E6DDD3]/90 p-4 shadow-sm transition hover:-translate-y-0.5">
+                    <p class="text-[10px] font-black uppercase tracking-widest text-[#2F3E5C]/45">Atenciones</p>
+                    <h3 class="mt-1 text-2xl font-black text-[#7A604B]">{{ $totalAtenciones }}</h3>
+                    <p class="text-xs font-bold text-[#2F3E5C]/50">Historial</p>
+                </div>
+
+                <div class="rounded-2xl border border-[#C7B5A3] bg-[#E6DDD3]/90 p-4 shadow-sm transition hover:-translate-y-0.5">
+                    <p class="text-[10px] font-black uppercase tracking-widest text-[#2F3E5C]/45">Actividades</p>
+                    <h3 class="mt-1 text-2xl font-black text-[#A86B3C]">{{ $totalActividades }}</h3>
+                    <p class="text-xs font-bold text-[#2F3E5C]/50">Participación</p>
+                </div>
+
+                <div class="rounded-2xl border border-[#C7B5A3] bg-[#E6DDD3]/90 p-4 shadow-sm transition hover:-translate-y-0.5">
+                    <p class="text-[10px] font-black uppercase tracking-widest text-[#2F3E5C]/45">Documentos</p>
+                    <h3 class="mt-1 text-2xl font-black text-[#2F3E5C]">{{ $totalDocumentos }}</h3>
+                    <p class="text-xs font-bold text-[#2F3E5C]/50">Archivos</p>
+                </div>
+
+                <div class="rounded-2xl border border-[#C7B5A3] bg-[#E6DDD3]/90 p-4 shadow-sm transition hover:-translate-y-0.5">
+                    <p class="text-[10px] font-black uppercase tracking-widest text-[#2F3E5C]/45">Asignaciones</p>
+                    <h3 class="mt-1 text-2xl font-black text-[#E27D60]">{{ $totalAsignaciones }}</h3>
+                    <p class="text-xs font-bold text-[#2F3E5C]/50">Responsables</p>
+                </div>
+            </section>
+
+<section class="rounded-[24px] border border-[#CBBBAA] bg-[#E7DDD2]/95 p-3 shadow-[0_12px_28px_rgba(47,62,92,0.08)] backdrop-blur-xl">
+    <div class="grid gap-2 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-7">
+        @php
+            $tabs = [
+                [
+                    'key' => 'resumen',
+                    'icon' => 'ph-user-circle',
+                    'label' => 'Resumen',
+                    'desc' => 'Datos base',
+                    'color' => '#E27D60'
+                ],
+                [
+                    'key' => 'familiares',
+                    'icon' => 'ph-heart',
+                    'label' => 'Familiares',
+                    'desc' => 'Red de apoyo',
+                    'color' => '#8EA17D'
+                ],
+                [
+                    'key' => 'seguimiento',
+                    'icon' => 'ph-clipboard-text',
+                    'label' => 'Seguimiento',
+                    'desc' => 'Seguimiento',
+                    'color' => '#6873A6'
+                ],
+                [
+                    'key' => 'salud',
+                    'icon' => 'ph-heartbeat',
+                    'label' => 'Salud Médica',
+                    'desc' => 'Control médico',
+                    'color' => '#C45F4B'
+                ],
+                [
+                    'key' => 'evaluaciones',
+                    'icon' => 'ph-brain',
+                    'label' => 'Evaluaciones',
+                    'desc' => 'Cognitivas',
+                    'color' => '#5B5F97'
+                ],
+                [
+                    'key' => 'actividades',
+                    'icon' => 'ph-calendar-check',
+                    'label' => 'Actividades',
+                    'desc' => 'Participación',
+                    'color' => '#D9A27C'
+                ],
+                [
+                    'key' => 'documentos',
+                    'icon' => 'ph-folder-open',
+                    'label' => 'Documentos',
+                    'desc' => 'Expediente',
+                    'color' => '#2F3E5C'
+                ],
+                [
+                    'key' => 'historial',
+                    'icon' => 'ph-clock-counter-clockwise',
+                    'label' => 'Historial',
+                    'desc' => 'Trazabilidad',
+                    'color' => '#9A7B60'
+                ],
+            ];
+        @endphp
+
+        @foreach($tabs as $item)
+            <button
+                type="button"
+                @click="tab = '{{ $item['key'] }}'"
+                class="group relative overflow-hidden rounded-[18px] border px-3 py-3 text-left transition-all duration-200 active:scale-[0.98]"
+                :class="tab === '{{ $item['key'] }}'
+                    ? 'border-[#E27D60]/40 bg-[#F2EBE3] shadow-[0_10px_22px_rgba(47,62,92,0.10)] -translate-y-0.5'
+                    : 'border-[#D5C7B9] bg-[#D5C7B9]/55 hover:bg-[#F2EBE3] hover:-translate-y-0.5'"
+            >
+                <div
+                    class="absolute left-0 top-0 h-full w-1 transition-all duration-200"
+                    :class="tab === '{{ $item['key'] }}' ? 'opacity-100' : 'opacity-0 group-hover:opacity-60'"
+                    style="background-color: {{ $item['color'] }};">
+                </div>
+
+                <div class="flex items-center gap-3">
+                    <div
+                        class="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl transition"
+                        :class="tab === '{{ $item['key'] }}'
+                            ? 'bg-[#E27D60]/14 text-[#E27D60]'
+                            : 'bg-[#2F3E5C]/8 text-[#2F3E5C]/70 group-hover:bg-[#E27D60]/12 group-hover:text-[#E27D60]'"
+                    >
+                        <i class="ph-bold {{ $item['icon'] }} text-lg"></i>
+                    </div>
+
+                    <div class="min-w-0">
+                        <p
+                            class="truncate text-xs font-black"
+                            :class="tab === '{{ $item['key'] }}' ? 'text-[#2F3E5C]' : 'text-[#2F3E5C]/70'"
+                        >
+                            {{ $item['label'] }}
+                        </p>
+
+                        <p class="truncate text-[10px] font-bold text-[#2F3E5C]/45">
+                            {{ $item['desc'] }}
+                        </p>
+                    </div>
+                </div>
+            </button>
+        @endforeach
+    </div>
+</section>
+
+            {{-- TAB RESUMEN --}}
+          
+<section
+    x-show="tab === 'resumen'"
+    x-transition.opacity.duration.250ms
+    class="grid gap-4 xl:grid-cols-[minmax(0,1fr)_360px]"
+>
+    {{-- PANEL PRINCIPAL --}}
+    <div class="space-y-4">
+        {{-- Datos personales --}}
+        <section class="overflow-hidden rounded-[24px] border border-[#CBBBAA] bg-[#E7DDD2]/95 shadow-[0_12px_28px_rgba(47,62,92,0.08)] backdrop-blur-xl">
+            <div class="flex items-center justify-between gap-3 border-b border-[#D5C7B9] px-5 py-4">
+                <div>
+                    <span class="text-[11px] font-black uppercase tracking-[0.18em] text-[#E27D60]">
+                        Información base
+                    </span>
+                    <h2 class="mt-1 text-lg font-black text-[#2F3E5C]">
+                        Datos personales del adulto mayor
+                    </h2>
+                </div>
+
+                <div class="hidden h-11 w-11 items-center justify-center rounded-2xl bg-[#E27D60]/12 text-[#E27D60] sm:flex">
+                    <i class="ph-bold ph-identification-card text-xl"></i>
+                </div>
+            </div>
+
+            <div class="grid gap-3 p-5 md:grid-cols-2 xl:grid-cols-3">
+                <div class="rounded-[18px] border border-[#D5C7B9] bg-[#F2EBE3]/80 p-4 transition hover:-translate-y-0.5">
+                    <p class="text-[10px] font-black uppercase tracking-[0.18em] text-[#2F3E5C]/45">
+                        Nombre completo
+                    </p>
+                    <p class="mt-2 text-sm font-black text-[#2F3E5C]">
+                        {{ $nombreCompleto ?: 'No registrado' }}
+                    </p>
+                </div>
+
+                <div class="rounded-[18px] border border-[#D5C7B9] bg-[#F2EBE3]/80 p-4 transition hover:-translate-y-0.5">
+                    <p class="text-[10px] font-black uppercase tracking-[0.18em] text-[#2F3E5C]/45">
+                        Carnet de identidad
+                    </p>
+                    <p class="mt-2 text-sm font-black text-[#2F3E5C]">
+                        {{ optional($adultoObj)->ci ?? 'No registrado' }}
+                    </p>
+                </div>
+
+                <div class="rounded-[18px] border border-[#D5C7B9] bg-[#F2EBE3]/80 p-4 transition hover:-translate-y-0.5">
+                    <p class="text-[10px] font-black uppercase tracking-[0.18em] text-[#2F3E5C]/45">
+                        Edad
+                    </p>
+                    <p class="mt-2 text-sm font-black text-[#2F3E5C]">
+                        {{ $edad ? $edad . ' años' : 'No disponible' }}
+                    </p>
+                </div>
+
+                <div class="rounded-[18px] border border-[#D5C7B9] bg-[#F2EBE3]/80 p-4 transition hover:-translate-y-0.5">
+                    <p class="text-[10px] font-black uppercase tracking-[0.18em] text-[#2F3E5C]/45">
+                        Fecha de nacimiento
+                    </p>
+                    <p class="mt-2 text-sm font-black text-[#2F3E5C]">
+                        {{ $fechaNacimientoFormateada ?? optional($adultoObj)->fecha_nac ?? 'No registrada' }}
+                    </p>
+                </div>
+
+                <div class="rounded-[18px] border border-[#D5C7B9] bg-[#F2EBE3]/80 p-4 transition hover:-translate-y-0.5">
+                    <p class="text-[10px] font-black uppercase tracking-[0.18em] text-[#2F3E5C]/45">
+                        Género
+                    </p>
+                    <p class="mt-2 text-sm font-black text-[#2F3E5C]">
+                        {{ optional($adultoObj)->genero ?? 'No registrado' }}
+                    </p>
+                </div>
+
+                <div class="rounded-[18px] border border-[#D5C7B9] bg-[#F2EBE3]/80 p-4 transition hover:-translate-y-0.5">
+                    <p class="text-[10px] font-black uppercase tracking-[0.18em] text-[#2F3E5C]/45">
+                        Estado civil
+                    </p>
+                    <p class="mt-2 text-sm font-black text-[#2F3E5C]">
+                        {{ optional($adultoObj)->estado_civil ?? 'No registrado' }}
+                    </p>
+                </div>
+
+                <div class="rounded-[18px] border border-[#D5C7B9] bg-[#F2EBE3]/80 p-4 transition hover:-translate-y-0.5">
+                    <p class="text-[10px] font-black uppercase tracking-[0.18em] text-[#2F3E5C]/45">
+                        Nivel educativo
+                    </p>
+                    <p class="mt-2 text-sm font-black text-[#2F3E5C]">
+                        {{ optional($adultoObj)->nivel_educat ?? 'No registrado' }}
+                    </p>
+                </div>
+
+                <div class="rounded-[18px] border border-[#D5C7B9] bg-[#F2EBE3]/80 p-4 transition hover:-translate-y-0.5">
+                    <p class="text-[10px] font-black uppercase tracking-[0.18em] text-[#2F3E5C]/45">
+                        Teléfono
+                    </p>
+                    <p class="mt-2 text-sm font-black text-[#2F3E5C]">
+                        {{ optional($adultoObj)->telefono ?? 'No registrado' }}
+                    </p>
+                </div>
+
+                <div class="rounded-[18px] border border-[#D5C7B9] bg-[#F2EBE3]/80 p-4 transition hover:-translate-y-0.5">
+                    <p class="text-[10px] font-black uppercase tracking-[0.18em] text-[#2F3E5C]/45">
+                        Estado institucional
+                    </p>
+                    <p class="mt-2 text-sm font-black
+                        {{ ($estadoTexto ?? 'ACTIVO') === 'ACTIVO' ? 'text-[#617453]' : 'text-[#7A5C49]' }}">
+                        {{ ucfirst(strtolower($estadoTexto ?? 'activo')) }}
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        {{-- Información institucional --}}
+        <section class="overflow-hidden rounded-[24px] border border-[#CBBBAA] bg-[#E7DDD2]/95 shadow-[0_12px_28px_rgba(47,62,92,0.08)] backdrop-blur-xl">
+            <div class="flex items-center justify-between gap-3 border-b border-[#D5C7B9] px-5 py-4">
+                <div>
+                    <span class="text-[11px] font-black uppercase tracking-[0.18em] text-[#D9A27C]">
+                        Administración
+                    </span>
+                    <h2 class="mt-1 text-lg font-black text-[#2F3E5C]">
+                        Ingreso y permanencia institucional
+                    </h2>
+                </div>
+
+                <div class="hidden h-11 w-11 items-center justify-center rounded-2xl bg-[#D9A27C]/16 text-[#9B6D4C] sm:flex">
+                    <i class="ph-bold ph-buildings text-xl"></i>
+                </div>
+            </div>
+
+            <div class="grid gap-3 p-5 md:grid-cols-3">
+                <div class="rounded-[18px] border border-[#D5C7B9] bg-[#F2EBE3]/80 p-4 transition hover:-translate-y-0.5">
+                    <p class="text-[10px] font-black uppercase tracking-[0.18em] text-[#2F3E5C]/45">
+                        Fecha de ingreso
+                    </p>
+                    <p class="mt-2 text-sm font-black text-[#2F3E5C]">
+                        {{ $fechaIngresoFormateada ?? optional($adultoObj)->fecha_ing ?? 'No registrada' }}
+                    </p>
+                </div>
+
+                <div class="rounded-[18px] border border-[#D5C7B9] bg-[#F2EBE3]/80 p-4 transition hover:-translate-y-0.5">
+                    <p class="text-[10px] font-black uppercase tracking-[0.18em] text-[#2F3E5C]/45">
+                        Tipo de ingreso
+                    </p>
+                    <p class="mt-2 text-sm font-black text-[#2F3E5C]">
+                        {{ optional($adultoObj)->tipo_ing ?? 'No registrado' }}
+                    </p>
+                </div>
+
+                <div class="rounded-[18px] border border-[#D5C7B9] bg-[#F2EBE3]/80 p-4 transition hover:-translate-y-0.5">
+                    <p class="text-[10px] font-black uppercase tracking-[0.18em] text-[#2F3E5C]/45">
+                        Permanencia
+                    </p>
+                    <p class="mt-2 text-sm font-black text-[#2F3E5C]">
+                        {{ optional($adultoObj)->permanencia ?? 'No registrada' }}
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        {{-- Observaciones iniciales --}}
+        <section class="overflow-hidden rounded-[24px] border border-[#CBBBAA] bg-[#E7DDD2]/95 shadow-[0_12px_28px_rgba(47,62,92,0.08)] backdrop-blur-xl">
+            <div class="flex flex-col gap-3 border-b border-[#D5C7B9] px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                    <span class="text-[11px] font-black uppercase tracking-[0.18em] text-[#9A7B60]">
+                        Notas generales
+                    </span>
+                    <h2 class="mt-1 text-lg font-black text-[#2F3E5C]">
+                        Observaciones iniciales
+                    </h2>
+                </div>
+
+                <button type="button"
+                        @click="abrir('observacion')"
+                        class="inline-flex items-center justify-center gap-2 rounded-2xl bg-[#6873A6] px-4 py-2.5 text-xs font-black text-white transition hover:-translate-y-0.5 hover:bg-[#586393] active:scale-[0.98]">
+                    <i class="ph-bold ph-note-pencil"></i>
+                    Agregar observación
+                </button>
+            </div>
+
+            <div class="p-5">
+                <div class="rounded-[20px] border border-[#D5C7B9] bg-[#F2EBE3]/85 p-5">
+                    <p class="text-sm font-semibold leading-7 text-[#2F3E5C]/70">
+                        {{ optional($adultoObj)->observaciones ?? 'No existen observaciones generales registradas para este adulto mayor.' }}
+                    </p>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    {{-- PANEL LATERAL --}}
+    <aside class="space-y-4">
+        {{-- Dirección --}}
+        <section class="overflow-hidden rounded-[24px] border border-[#CBBBAA] bg-[#E7DDD2]/95 shadow-[0_12px_28px_rgba(47,62,92,0.08)] backdrop-blur-xl">
+            <div class="border-b border-[#D5C7B9] px-5 py-4">
+                <span class="text-[11px] font-black uppercase tracking-[0.18em] text-[#8EA17D]">
+                    Ubicación
+                </span>
+                <h2 class="mt-1 text-lg font-black text-[#2F3E5C]">
+                    Dirección referencial
+                </h2>
+            </div>
+
+            <div class="space-y-3 p-5">
+                <div class="rounded-[18px] border border-[#D5C7B9] bg-[#F2EBE3]/80 p-4">
+                    <div class="mb-2 flex h-10 w-10 items-center justify-center rounded-2xl bg-[#8EA17D]/16 text-[#617453]">
+                        <i class="ph-bold ph-map-pin text-lg"></i>
+                    </div>
+
+                    <p class="text-[10px] font-black uppercase tracking-[0.18em] text-[#2F3E5C]/45">
+                        Zona
+                    </p>
+                    <p class="mt-2 text-sm font-black text-[#2F3E5C]">
+                        {{ optional($adultoObj)->zona ?? 'No registrada' }}
+                    </p>
+                </div>
+
+                <div class="rounded-[18px] border border-[#D5C7B9] bg-[#F2EBE3]/80 p-4">
+                    <div class="mb-2 flex h-10 w-10 items-center justify-center rounded-2xl bg-[#D9A27C]/18 text-[#9B6D4C]">
+                        <i class="ph-bold ph-road-horizon text-lg"></i>
+                    </div>
+
+                    <p class="text-[10px] font-black uppercase tracking-[0.18em] text-[#2F3E5C]/45">
+                        Calle / Avenida
+                    </p>
+                    <p class="mt-2 text-sm font-black text-[#2F3E5C]">
+                        {{ optional($adultoObj)->calle ?? 'No registrada' }}
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        {{-- Estado de completitud --}}
+        <section class="overflow-hidden rounded-[24px] border border-[#CBBBAA] bg-[#E7DDD2]/95 shadow-[0_12px_28px_rgba(47,62,92,0.08)] backdrop-blur-xl">
+            <div class="border-b border-[#D5C7B9] px-5 py-4">
+                <span class="text-[11px] font-black uppercase tracking-[0.18em] text-[#6873A6]">
+                    Control
+                </span>
+                <h2 class="mt-1 text-lg font-black text-[#2F3E5C]">
+                    Estado de ficha
+                </h2>
+            </div>
+
+            <div class="space-y-3 p-5">
+                @php
+                    $camposBase = [
+                        optional($adultoObj)->nombres,
+                        optional($adultoObj)->ap_paterno,
+                        optional($adultoObj)->ci,
+                        optional($adultoObj)->fecha_nac,
+                        optional($adultoObj)->genero,
+                        optional($adultoObj)->fecha_ing,
+                        optional($adultoObj)->cod_est_adul,
+                    ];
+
+                    $camposCompletos = collect($camposBase)->filter(fn($valor) => filled($valor))->count();
+                    $porcentajeFicha = round(($camposCompletos / count($camposBase)) * 100);
+                @endphp
+
+                <div class="rounded-[20px] border border-[#D5C7B9] bg-[#F2EBE3]/85 p-4">
+                    <div class="mb-2 flex items-center justify-between">
+                        <p class="text-xs font-black text-[#2F3E5C]">
+                            Completitud del registro
+                        </p>
+
+                        <span class="text-xs font-black text-[#E27D60]">
+                            {{ $porcentajeFicha }}%
+                        </span>
+                    </div>
+
+                    <div class="h-2 overflow-hidden rounded-full bg-[#D5C7B9]">
+                        <div class="h-full rounded-full bg-gradient-to-r from-[#E27D60] via-[#D9A27C] to-[#8EA17D]"
+                             style="width: {{ $porcentajeFicha }}%;">
+                        </div>
+                    </div>
+
+                    <p class="mt-3 text-xs font-semibold leading-5 text-[#2F3E5C]/58">
+                        Este indicador ayuda a verificar si la ficha cuenta con la información mínima necesaria para seguimiento institucional.
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2">
+                    <button type="button"
+                            @click="tab = 'familiares'"
+                            class="rounded-2xl bg-[#8EA17D]/16 px-3 py-3 text-xs font-black text-[#617453] transition hover:-translate-y-0.5 hover:bg-[#8EA17D] hover:text-white active:scale-[0.98]">
+                        Familiares
+                    </button>
+
+                    <button type="button"
+                            @click="tab = 'seguimiento'"
+                            class="rounded-2xl bg-[#6873A6]/16 px-3 py-3 text-xs font-black text-[#566189] transition hover:-translate-y-0.5 hover:bg-[#6873A6] hover:text-white active:scale-[0.98]">
+                        Seguimiento
+                    </button>
+                </div>
+            </div>
+        </section>
+    </aside>
+</section>
+            {{-- TAB FAMILIARES --}}
+            
+<section
+    x-show="tab === 'familiares'"
+    x-transition.opacity.duration.250ms
+    class="space-y-4"
+>
+    {{-- Encabezado de sección --}}
+    <section class="overflow-hidden rounded-[24px] border border-[#CBBBAA] bg-[#E7DDD2]/95 shadow-[0_12px_28px_rgba(47,62,92,0.08)] backdrop-blur-xl">
+        <div class="flex flex-col gap-4 border-b border-[#D5C7B9] px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+                <span class="text-[11px] font-black uppercase tracking-[0.18em] text-[#8EA17D]">
+                    Red de apoyo
+                </span>
+
+                <h2 class="mt-1 text-lg font-black text-[#2F3E5C]">
+                    Familiares vinculados
+                </h2>
+
+                <p class="mt-1 text-xs font-bold leading-5 text-[#2F3E5C]/55">
+                    Administra los contactos responsables, familiares de referencia y vínculos importantes del adulto mayor.
+                </p>
+            </div>
+
+            <button type="button"
+                    @click="abrir('familiar')"
+                    class="inline-flex items-center justify-center gap-2 rounded-2xl bg-[#8EA17D] px-4 py-2.5 text-xs font-black text-white shadow-[0_10px_20px_rgba(142,161,125,0.18)] transition hover:-translate-y-0.5 hover:bg-[#7C916A] active:scale-[0.98]">
+                <i class="ph-bold ph-user-plus"></i>
+                Vincular familiar
+            </button>
+        </div>
+
+        {{-- Métricas rápidas --}}
+        <div class="grid gap-3 p-5 sm:grid-cols-2 lg:grid-cols-4">
+            <div class="rounded-[18px] border border-[#D5C7B9] bg-[#F2EBE3]/80 p-4">
+                <p class="text-[10px] font-black uppercase tracking-[0.18em] text-[#2F3E5C]/45">
+                    Total vinculados
+                </p>
+                <p class="mt-2 text-2xl font-black text-[#617453]">
+                    {{ $totalFamiliares }}
+                </p>
+            </div>
+
+            <div class="rounded-[18px] border border-[#D5C7B9] bg-[#F2EBE3]/80 p-4">
+                <p class="text-[10px] font-black uppercase tracking-[0.18em] text-[#2F3E5C]/45">
+                    Responsable
+                </p>
+                <p class="mt-2 text-sm font-black text-[#2F3E5C]">
+                    {{ $totalFamiliares > 0 ? 'Por verificar' : 'No asignado' }}
+                </p>
+            </div>
+
+            <div class="rounded-[18px] border border-[#D5C7B9] bg-[#F2EBE3]/80 p-4">
+                <p class="text-[10px] font-black uppercase tracking-[0.18em] text-[#2F3E5C]/45">
+                    Estado de red
+                </p>
+                <p class="mt-2 text-sm font-black {{ $totalFamiliares > 0 ? 'text-[#617453]' : 'text-[#D96F58]' }}">
+                    {{ $totalFamiliares > 0 ? 'Con apoyo registrado' : 'Sin red registrada' }}
+                </p>
+            </div>
+
+            <div class="rounded-[18px] border border-[#D5C7B9] bg-[#F2EBE3]/80 p-4">
+                <p class="text-[10px] font-black uppercase tracking-[0.18em] text-[#2F3E5C]/45">
+                    Acción sugerida
+                </p>
+                <p class="mt-2 text-sm font-black text-[#2F3E5C]">
+                    {{ $totalFamiliares > 0 ? 'Actualizar contactos' : 'Vincular familiar' }}
+                </p>
+            </div>
+        </div>
+    </section>
+
+    {{-- Tabla de familiares --}}
+    <section class="overflow-hidden rounded-[24px] border border-[#CBBBAA] bg-[#E7DDD2]/95 shadow-[0_12px_28px_rgba(47,62,92,0.08)]">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm text-[#2F3E5C]">
+                <thead class="bg-[#D5C7B9]/50 text-[10px] uppercase tracking-widest text-[#2F3E5C]/70">
+                    <tr>
+                        <th class="px-6 py-4">Familiar / Contacto</th>
+                        <th class="px-6 py-4">Parentesco</th>
+                        <th class="px-6 py-4">Contacto</th>
+                        <th class="px-6 py-4">Responsable</th>
+                        <th class="px-6 py-4">Estado</th>
+                        <th class="px-6 py-4 text-right">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-[#D5C7B9]/40">
+                    @forelse($familiaresActivos as $familiar)
+                        @php
+                            $familiarObj = is_object($familiar) ? $familiar : null;
+                            $codFamiliar = optional($familiarObj)->cod_fam;
+                            $nombreFamiliar = trim(
+                                (optional($familiarObj)->nombres ?? optional($familiarObj)->nombre ?? '') . ' ' .
+                                (optional($familiarObj)->ap_paterno ?? '') . ' ' .
+                                (optional($familiarObj)->ap_materno ?? '')
+                            );
+                            $parentescoFamiliar = optional($familiarObj)->parentesco
+                                ?? optional($familiarObj)->parentesco_vinculo
+                                ?? optional(optional($familiarObj)->pivot)->parentesco_vinculo
+                                ?? 'No definido';
+                            $telefonoFamiliar = optional($familiarObj)->telefono
+                                ?? optional($familiarObj)->celular
+                                ?? 'No registrado';
+                            $esResponsable = optional($familiarObj)->es_responsable
+                                ?? optional(optional($familiarObj)->pivot)->es_responsable
+                                ?? false;
+                            $estadoVinc = strtoupper(optional(optional($familiarObj)->pivot)->estado ?? 'ACTIVO');
+                        @endphp
+                        <tr class="group transition hover:bg-[#F2EBE3]/50">
+                            <td class="px-6 py-4">
+                                <div class="flex items-center gap-3">
+                                    <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#8EA17D]/15 text-sm font-black text-[#617453]">
+                                        {{ strtoupper(substr($nombreFamiliar ?: 'F', 0, 1)) }}
+                                    </div>
+                                    <div class="min-w-0">
+                                        <p class="truncate font-black text-[#2F3E5C]">{{ $nombreFamiliar ?: 'Familiar' }}</p>
+                                        <p class="text-[10px] font-bold text-[#2F3E5C]/50 uppercase">ID: {{ $codFamiliar }}</p>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4">
+                                <span class="text-xs font-bold text-[#2F3E5C]/70">{{ $parentescoFamiliar }}</span>
+                            </td>
+                            <td class="px-6 py-4">
+                                <span class="text-xs font-black text-[#2F3E5C]">{{ $telefonoFamiliar }}</span>
+                            </td>
+                            <td class="px-6 py-4">
+                                @if($esResponsable)
+                                    <span class="inline-flex items-center rounded-full bg-[#E27D60]/15 px-2.5 py-0.5 text-[9px] font-black uppercase text-[#D96F58]">
+                                        Sí
+                                    </span>
+                                @else
+                                    <span class="text-[9px] font-bold text-[#2F3E5C]/30 uppercase">No</span>
+                                @endif
+                            </td>
+                            <td class="px-6 py-4">
+                                <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-[9px] font-black uppercase {{ $estadoVinc === 'ACTIVO' ? 'bg-[#8EA17D]/15 text-[#617453]' : 'bg-[#9A7B60]/15 text-[#7A604B]' }}">
+                                    {{ $estadoVinc }}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 text-right">
+                                <div class="flex justify-end gap-1.5">
+                                    <button type="button" @click="abrir('familiar', @js($familiar), false, true)" title="Ver detalle" class="rounded-lg bg-[#2F3E5C]/10 p-2 text-[#2F3E5C] transition hover:bg-[#2F3E5C] hover:text-white">
+                                        <i class="ph-bold ph-eye"></i>
+                                    </button>
+                                    <button type="button" @click="abrir('familiar', @js($familiar), true, false)" title="Editar" class="rounded-lg bg-[#2F3E5C]/10 p-2 text-[#2F3E5C] transition hover:bg-[#2F3E5C] hover:text-white">
+                                        <i class="ph-bold ph-pencil-simple"></i>
+                                    </button>
+                                    @if($estadoVinc === 'ACTIVO')
+                                        <form action="{{ route('admin.adultos-mayores.familiares.destroy', [$idAdulto, $codFamiliar]) }}" method="POST" onsubmit="confirmarAccion(event, 'Desactivar vínculo familiar', 'El vínculo con este familiar se marcará como inactivo. Se conservará el registro histórico.')">
+                                            @csrf @method('DELETE')
+                                            <button type="submit" title="Desactivar vínculo" class="rounded-lg bg-terracota/10 p-2 text-terracota transition hover:bg-terracota hover:text-white">
+                                                <i class="ph-bold ph-user-minus"></i>
+                                            </button>
+                                        </form>
+                                    @else
+                                        <form action="{{ route('admin.adultos-mayores.familiares.restore', [$idAdulto, $codFamiliar]) }}" method="POST" onsubmit="confirmarAccion(event, 'Restaurar vínculo', 'El familiar volverá a estar vinculado activamente al expediente.')">
+                                            @csrf @method('PATCH')
+                                            <button type="submit" title="Restaurar vínculo" class="rounded-lg bg-[#8EA17D]/10 p-2 text-[#8EA17D] transition hover:bg-[#8EA17D] hover:text-white">
+                                                <i class="ph-bold ph-arrow-counter-clockwise"></i>
+                                            </button>
+                                        </form>
+                                    @endif
+                                </div>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="6" class="px-6 py-12 text-center">
+                                <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-[#8EA17D]/10 text-[#617453]">
+                                    <i class="ph-bold ph-heart text-2xl"></i>
+                                </div>
+                                <h4 class="mt-4 text-sm font-black text-[#2F3E5C]">Sin familiares vinculados</h4>
+                                <p class="mx-auto mt-2 max-w-xs text-xs font-bold text-[#2F3E5C]/50">
+                                    Registra los contactos responsables para fortalecer el seguimiento institucional.
+                                </p>
+                                <button type="button" @click="abrir('familiar')" class="mt-4 inline-flex items-center gap-2 rounded-xl bg-[#8EA17D] px-4 py-2 text-xs font-black text-white transition hover:bg-[#7C916A]">
+                                    <i class="ph-bold ph-plus"></i> Vincular primer familiar
+                                </button>
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+
+        {{-- Vínculos Familiares Desactivados --}}
+        @if(count($familiaresInactivos) > 0)
+        <div class="mt-8 border-t border-[#D5C7B9]/30 pt-6">
+            <div class="mb-4 flex items-center justify-between">
+                <h4 class="text-xs font-black uppercase tracking-widest text-terracota/60 flex items-center gap-2">
+                    <i class="ph-bold ph-user-minus"></i> Vínculos Familiares Desactivados
+                </h4>
+                <span class="rounded-full bg-terracota/10 px-2 py-0.5 text-[9px] font-black text-terracota uppercase tracking-tighter">Historial Institucional</span>
+            </div>
+            <div class="overflow-hidden rounded-2xl border border-[#D5C7B9]/50 opacity-60 grayscale-[50%] transition-all hover:grayscale-0 hover:opacity-100 bg-white/30 backdrop-blur-sm shadow-sm">
+                <table class="w-full text-left text-sm text-[#2F3E5C]">
+                    <thead class="bg-[#D5C7B9]/20 text-[9px] uppercase tracking-widest text-[#2F3E5C]/50">
+                        <tr>
+                            <th class="px-6 py-3">Familiar</th>
+                            <th class="px-6 py-3">Parentesco</th>
+                            <th class="px-6 py-3 text-right">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-[#D5C7B9]/20">
+                        @foreach($familiaresInactivos as $finac)
+                            @php
+                                $nombreFinac = (optional($finac)->nombres ?? optional($finac)->nombre ?? '') . ' ' . (optional($finac)->ap_paterno ?? '');
+                            @endphp
+                            <tr class="hover:bg-[#F2EBE3]/40 transition">
+                                <td class="px-6 py-3 font-bold text-[#2F3E5C]/70 text-xs">{{ $nombreFinac }}</td>
+                                <td class="px-6 py-3 text-xs text-[#2F3E5C]/60">{{ optional($finac->pivot)->parentesco_vinculo }}</td>
+                                <td class="px-6 py-3 text-right">
+                                    <form action="{{ route('admin.adultos-mayores.familiares.restore', [$adulto->cod_am, $finac->cod_fam]) }}" method="POST" onsubmit="confirmarAccion(event, 'Restaurar vínculo', 'El familiar volverá a estar vinculado activamente al expediente.')">
+                                        @csrf @method('PATCH')
+                                        <button type="submit" title="Restaurar vínculo" class="rounded-lg bg-[#8EA17D]/10 p-1.5 text-[#8EA17D] hover:bg-[#8EA17D] hover:text-white transition">
+                                            <i class="ph-bold ph-arrow-counter-clockwise"></i>
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        @endif
+    </section>
+</section>
+
+           {{-- TAB SEGUIMIENTO MEJORADO --}}
+<section
+    x-show="tab === 'seguimiento'"
+    x-transition.opacity.duration.250ms
+    class="space-y-4"
+>
+    {{-- Encabezado --}}
+    <section class="overflow-hidden rounded-[24px] border border-[#CBBBAA] bg-[#E7DDD2]/95 shadow-[0_12px_28px_rgba(47,62,92,0.08)] backdrop-blur-xl">
+        <div class="flex flex-col gap-4 border-b border-[#D5C7B9] px-5 py-4 lg:flex-row lg:items-center lg:justify-between">
+            <div>
+                <span class="text-[11px] font-black uppercase tracking-[0.18em] text-[#6873A6]">
+                    Seguimiento institucional
+                </span>
+
+                <h2 class="mt-1 text-lg font-black text-[#2F3E5C]">
+                    Observaciones y atenciones recientes
+                </h2>
+
+                <p class="mt-1 text-xs font-bold leading-5 text-[#2F3E5C]/55">
+                    Registra cambios relevantes, atenciones realizadas y eventos importantes del adulto mayor.
+                </p>
+            </div>
+
+            <div class="flex flex-col gap-2 sm:flex-row">
+                <button type="button"
+                        @click="abrir('observacion')"
+                        class="inline-flex items-center justify-center gap-2 rounded-2xl bg-[#6873A6] px-4 py-2.5 text-xs font-black text-white shadow-[0_10px_20px_rgba(104,115,166,0.18)] transition hover:-translate-y-0.5 hover:bg-[#586393] active:scale-[0.98]">
+                    <i class="ph-bold ph-note-pencil"></i>
+                    Nueva observación
+                </button>
+
+                <button type="button"
+                        @click="abrir('atencion')"
+                        class="inline-flex items-center justify-center gap-2 rounded-2xl bg-[#9A7B60] px-4 py-2.5 text-xs font-black text-white shadow-[0_10px_20px_rgba(154,123,96,0.18)] transition hover:-translate-y-0.5 hover:bg-[#7A5C49] active:scale-[0.98]">
+                    <i class="ph-bold ph-stethoscope"></i>
+                    Nueva atención
+                </button>
+            </div>
+        </div>
+
+        {{-- Métricas --}}
+        <div class="grid gap-3 p-5 sm:grid-cols-2 lg:grid-cols-4">
+            <div class="rounded-[18px] border border-[#D5C7B9] bg-[#F2EBE3]/80 p-4">
+                <p class="text-[10px] font-black uppercase tracking-[0.18em] text-[#2F3E5C]/45">
+                    Observaciones
+                </p>
+                <p class="mt-2 text-2xl font-black text-[#6873A6]">
+                    {{ $totalObservaciones }}
+                </p>
+            </div>
+
+            <div class="rounded-[18px] border border-[#D5C7B9] bg-[#F2EBE3]/80 p-4">
+                <p class="text-[10px] font-black uppercase tracking-[0.18em] text-[#2F3E5C]/45">
+                    Atenciones
+                </p>
+                <p class="mt-2 text-2xl font-black text-[#7A5C49]">
+                    {{ $totalAtenciones }}
+                </p>
+            </div>
+
+            <div class="rounded-[18px] border border-[#D5C7B9] bg-[#F2EBE3]/80 p-4">
+                <p class="text-[10px] font-black uppercase tracking-[0.18em] text-[#2F3E5C]/45">
+                    Estado seguimiento
+                </p>
+                <p class="mt-2 text-sm font-black {{ ($totalObservaciones + $totalAtenciones) > 0 ? 'text-[#617453]' : 'text-[#D96F58]' }}">
+                    {{ ($totalObservaciones + $totalAtenciones) > 0 ? 'Activo' : 'Sin registros' }}
+                </p>
+            </div>
+
+            <div class="rounded-[18px] border border-[#D5C7B9] bg-[#F2EBE3]/80 p-4">
+                <p class="text-[10px] font-black uppercase tracking-[0.18em] text-[#2F3E5C]/45">
+                    Acción sugerida
+                </p>
+                <p class="mt-2 text-sm font-black text-[#2F3E5C]">
+                    {{ ($totalObservaciones + $totalAtenciones) > 0 ? 'Revisar evolución' : 'Registrar observación' }}
+                </p>
+            </div>
+        </div>
+    </section>
+
+    {{-- Contenido principal --}}
+    <div class="grid gap-6">
+        {{-- Tabla de Observaciones --}}
+        <section class="overflow-hidden rounded-[24px] border border-[#CBBBAA] bg-[#E7DDD2]/95 shadow-[0_12px_28px_rgba(47,62,92,0.08)]">
+            <div class="flex items-center justify-between gap-3 border-b border-[#D5C7B9] px-6 py-4 bg-[#F2EBE3]/30">
+                <div class="flex items-center gap-3">
+                    <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-[#6873A6]/15 text-[#566189]">
+                        <i class="ph-bold ph-note-pencil text-xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-base font-black text-[#2F3E5C]">Historial de Observaciones</h3>
+                        <p class="text-[10px] font-bold text-[#2F3E5C]/50 uppercase tracking-widest">Seguimiento diario y cambios relevantes</p>
+                    </div>
+                </div>
+                <button type="button" @click="abrir('observacion')" class="rounded-xl bg-[#6873A6] px-4 py-2 text-xs font-black text-white hover:bg-[#586393] transition">
+                    <i class="ph-bold ph-plus mr-1"></i> Nueva
+                </button>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-sm text-[#2F3E5C]">
+                    <thead class="bg-[#D5C7B9]/40 text-[10px] uppercase tracking-widest text-[#2F3E5C]/60">
+                        <tr>
+                            <th class="px-6 py-3">Fecha</th>
+                            <th class="px-6 py-3">Tipo / Descripción</th>
+                            <th class="px-6 py-3">Importancia</th>
+                            <th class="px-6 py-3 text-right">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-[#D5C7B9]/30">
+                        @forelse($observacionesActivas as $obs)
+                            @php
+                                $obsObj = is_object($obs) ? $obs : null;
+                                $nivelImp = strtoupper(optional($obsObj)->nivel_importancia ?? 'NORMAL');
+                                $colorImp = match($nivelImp) {
+                                    'URGENTE' => 'bg-terracota/15 text-terracota',
+                                    'ALTA' => 'bg-[#D9A27C]/15 text-[#9B6D4C]',
+                                    default => 'bg-[#6873A6]/15 text-[#566189]',
+                                };
+                            @endphp
+                            <tr class="group transition hover:bg-[#F2EBE3]/40">
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="text-xs font-black text-[#2F3E5C]">{{ optional($obsObj)->fecha ? Carbon::parse($obsObj->fecha)->format('d/m/Y') : 'N/D' }}</span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <p class="text-xs font-black text-[#2F3E5C]">{{ optional($obsObj)->tipo_obs }}</p>
+                                    <p class="text-[11px] font-semibold text-[#2F3E5C]/60 line-clamp-1">{{ optional($obsObj)->descripcion }}</p>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-[9px] font-black uppercase {{ $colorImp }}">
+                                        {{ $nivelImp }}
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 text-right">
+                                    <div class="flex justify-end gap-1.5">
+                                        <button type="button" @click="abrir('observacion', @js($obs), false, true)" class="rounded-lg bg-[#2F3E5C]/5 p-2 text-[#2F3E5C] hover:bg-[#2F3E5C] hover:text-white transition">
+                                            <i class="ph-bold ph-eye"></i>
+                                        </button>
+                                        <button type="button" @click="abrir('observacion', @js($obs), true, false)" class="rounded-lg bg-[#2F3E5C]/5 p-2 text-[#2F3E5C] hover:bg-[#2F3E5C] hover:text-white transition">
+                                            <i class="ph-bold ph-pencil-simple"></i>
+                                        </button>
+                                        <form action="{{ route('admin.adultos-mayores.observaciones.destroy', [$idAdulto, $obsObj->cod_obs_adul]) }}" method="POST" onsubmit="confirmarAccion(event, 'Anular observación', 'Esta observación será anulada del registro activo. No se eliminará la información original.')">
+                                            @csrf @method('DELETE')
+                                            <button type="submit" title="Anular observación" class="rounded-lg bg-terracota/5 p-2 text-terracota hover:bg-terracota hover:text-white transition">
+                                                <i class="ph-bold ph-x-circle"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="4" class="px-6 py-10 text-center text-xs font-bold text-[#2F3E5C]/40">Sin observaciones registradas.</td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        {{-- Observaciones Anuladas --}}
+        @if(count($observacionesAnuladas) > 0)
+        <div class="mt-8 border-t border-[#D5C7B9]/30 pt-6">
+            <h4 class="mb-4 text-xs font-black uppercase tracking-widest text-terracota/60 flex items-center gap-2">
+                <i class="ph-bold ph-x-circle"></i> Historial de Observaciones Anuladas
+            </h4>
+            <div class="overflow-hidden rounded-[24px] border border-[#D5C7B9]/50 opacity-60 grayscale-[50%] transition-all hover:grayscale-0 hover:opacity-100 bg-[#E7DDD2]/40 backdrop-blur-sm shadow-sm">
+                <table class="w-full text-left text-sm text-[#2F3E5C]">
+                    <thead class="bg-[#D5C7B9]/30 text-[9px] uppercase tracking-widest text-[#2F3E5C]/50">
+                        <tr>
+                            <th class="px-6 py-3">Fecha Anul.</th>
+                            <th class="px-6 py-3">Tipo / Descripción Original</th>
+                            <th class="px-6 py-3 text-right">Trazabilidad</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-[#D5C7B9]/20">
+                        @foreach($observacionesAnuladas as $obsAnu)
+                            <tr class="hover:bg-white/10 transition">
+                                <td class="px-6 py-3 text-xs font-black text-[#2F3E5C]/60">
+                                    {{ $obsAnu->deleted_at->format('d/m/Y') }}
+                                </td>
+                                <td class="px-6 py-3">
+                                    <p class="text-[11px] font-black text-[#2F3E5C]/70 uppercase">{{ $obsAnu->tipo_obs }}</p>
+                                    <p class="text-[10px] font-semibold text-[#2F3E5C]/50 line-clamp-1">{{ $obsAnu->descripcion }}</p>
+                                </td>
+                                <td class="px-6 py-3 text-right">
+                                    <form action="{{ route('admin.adultos-mayores.observaciones.restore', [$adulto->cod_am, $obsAnu->cod_obs_adul]) }}" method="POST" onsubmit="confirmarAccion(event, 'Restaurar observación', 'La observación volverá a estar visible en el expediente activo.')">
+                                        @csrf @method('PATCH')
+                                        <button type="submit" title="Restaurar" class="rounded-lg bg-[#8EA17D]/10 p-1.5 text-[#8EA17D] hover:bg-[#8EA17D] hover:text-white transition">
+                                            <i class="ph-bold ph-arrow-counter-clockwise"></i>
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        @endif
+
+        {{-- Tabla de Atenciones --}}
+        <section class="overflow-hidden rounded-[24px] border border-[#CBBBAA] bg-[#E7DDD2]/95 shadow-[0_12px_28px_rgba(47,62,92,0.08)]">
+            <div class="flex items-center justify-between gap-3 border-b border-[#D5C7B9] px-6 py-4 bg-[#F2EBE3]/30">
+                <div class="flex items-center gap-3">
+                    <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-[#9A7B60]/15 text-[#7A5C49]">
+                        <i class="ph-bold ph-stethoscope text-xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-base font-black text-[#2F3E5C]">Atenciones / Citas Médicas</h3>
+                        <p class="text-[10px] font-bold text-[#2F3E5C]/50 uppercase tracking-widest">Historial médico e intervenciones</p>
+                    </div>
+                </div>
+                <button type="button" @click="abrir('atencion')" class="rounded-xl bg-[#9A7B60] px-4 py-2 text-xs font-black text-white hover:bg-[#7A5C49] transition">
+                    <i class="ph-bold ph-plus mr-1"></i> Nueva
+                </button>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-sm text-[#2F3E5C]">
+                    <thead class="bg-[#D5C7B9]/40 text-[10px] uppercase tracking-widest text-[#2F3E5C]/60">
+                        <tr>
+                            <th class="px-6 py-3">Fecha / Hora</th>
+                            <th class="px-6 py-3">Tipo Atención</th>
+                            <th class="px-6 py-3">Observación / Motivo</th>
+                            <th class="px-6 py-3">Estado</th>
+                            <th class="px-6 py-3 text-right">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-[#D5C7B9]/30">
+                        @forelse($atencionesActivas as $atencion)
+                            @php
+                                $atencionObj = is_object($atencion) ? $atencion : null;
+                                $estadoAten = strtoupper(optional($atencionObj)->estado ?? 'PENDIENTE');
+                                $colorEstado = match($estadoAten) {
+                                    'FINALIZADA', 'REALIZADA' => 'bg-[#8EA17D]/15 text-[#617453]',
+                                    'CANCELADA' => 'bg-terracota/15 text-terracota',
+                                    default => 'bg-[#D9A27C]/15 text-[#9B6D4C]',
+                                };
+                            @endphp
+                            <tr class="group transition hover:bg-[#F2EBE3]/40">
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <p class="text-xs font-black text-[#2F3E5C]">{{ optional($atencionObj)->fecha ? Carbon::parse($atencionObj->fecha)->format('d/m/Y') : 'N/D' }}</p>
+                                    <p class="text-[10px] font-bold text-[#2F3E5C]/50">{{ optional($atencionObj)->hora ? substr($atencionObj->hora, 0, 5) : '--:--' }}</p>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="text-xs font-black text-[#2F3E5C]">{{ optional($atencionObj)->tipoAtencion->tipo ?? 'Atención' }}</span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <p class="text-[11px] font-semibold text-[#2F3E5C]/65 line-clamp-1">{{ optional($atencionObj)->obs ?? 'Sin detalle' }}</p>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-[9px] font-black uppercase {{ $colorEstado }}">
+                                        {{ $estadoAten }}
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 text-right">
+                                    <div class="flex justify-end gap-1.5">
+                                        <button type="button" @click="abrir('atencion', @js($atencion), false, true)" class="rounded-lg bg-[#2F3E5C]/5 p-2 text-[#2F3E5C] hover:bg-[#2F3E5C] hover:text-white transition">
+                                            <i class="ph-bold ph-eye"></i>
+                                        </button>
+                                        <button type="button" @click="abrir('atencion', @js($atencion), true, false)" class="rounded-lg bg-[#2F3E5C]/5 p-2 text-[#2F3E5C] hover:bg-[#2F3E5C] hover:text-white transition">
+                                            <i class="ph-bold ph-pencil-simple"></i>
+                                        </button>
+                                        <form action="{{ route('admin.adultos-mayores.atenciones.destroy', [$idAdulto, $atencionObj->cod_aten_adul ?? '0']) }}" method="POST" onsubmit="confirmarAccion(event, 'Anular atención médica', 'La atención se marcará como anulada para fines de trazabilidad y auditoría.')">
+                                            @csrf @method('DELETE')
+                                            <button type="submit" title="Anular atención" class="rounded-lg bg-terracota/5 p-2 text-terracota hover:bg-terracota hover:text-white transition">
+                                                <i class="ph-bold ph-x-circle"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="5" class="px-6 py-12 text-center text-xs font-bold text-[#2F3E5C]/40">Sin atenciones registradas.</td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        {{-- Atenciones Anuladas --}}
+        @if(count($atencionesAnuladas) > 0)
+        <div class="mt-8 border-t border-[#D5C7B9]/30 pt-6">
+            <h4 class="mb-4 text-xs font-black uppercase tracking-widest text-terracota/60 flex items-center gap-2">
+                <i class="ph-bold ph-x-circle"></i> Historial de Atenciones Anuladas
+            </h4>
+            <div class="overflow-hidden rounded-[24px] border border-[#D5C7B9]/50 opacity-60 grayscale-[50%] transition-all hover:grayscale-0 hover:opacity-100 bg-[#E7DDD2]/40 backdrop-blur-sm shadow-sm">
+                <table class="w-full text-left text-sm text-[#2F3E5C]">
+                    <thead class="bg-[#D5C7B9]/30 text-[9px] uppercase tracking-widest text-[#2F3E5C]/50">
+                        <tr>
+                            <th class="px-6 py-3">Fecha Anul.</th>
+                            <th class="px-6 py-3">Tipo / Motivo Original</th>
+                            <th class="px-6 py-3 text-right">Trazabilidad</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-[#D5C7B9]/20">
+                        @foreach($atencionesAnuladas as $ateAnu)
+                            <tr class="hover:bg-white/10 transition">
+                                <td class="px-6 py-3 text-xs font-black text-[#2F3E5C]/60">
+                                    {{ $ateAnu->deleted_at->format('d/m/Y') }}
+                                </td>
+                                <td class="px-6 py-3">
+                                    <p class="text-[11px] font-black text-[#2F3E5C]/70 uppercase">{{ $ateAnu->tipoAtencion->nombre ?? 'Atención' }}</p>
+                                    <p class="text-[10px] font-semibold text-[#2F3E5C]/50 line-clamp-1">{{ $ateAnu->motivo_consulta }}</p>
+                                </td>
+                                <td class="px-6 py-3 text-right">
+                                    <form action="{{ route('admin.adultos-mayores.atenciones.restore', [$adulto->cod_am, $ateAnu->cod_aten_adul]) }}" method="POST" onsubmit="confirmarAccion(event, 'Restaurar atención', 'El registro de atención volverá al historial activo del paciente.')">
+                                        @csrf @method('PATCH')
+                                        <button type="submit" title="Restaurar" class="rounded-lg bg-[#8EA17D]/10 p-1.5 text-[#8EA17D] hover:bg-[#8EA17D] hover:text-white transition">
+                                            <i class="ph-bold ph-arrow-counter-clockwise"></i>
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        @endif
+    </div>
+</section>
+
+            {{-- TAB SALUD MÉDICA --}}
+<section
+    x-show="tab === 'salud'"
+    style="display: none;"
+    x-transition.opacity.duration.250ms
+    class="space-y-6"
+>
+    <!-- Los componentes Livewire renderizan sus propias tarjetas (listas) y sus modales -->
+    <livewire:admin.adultos-mayores.salud.ficha-medica-adulto-modal :cod_am="$adulto->cod_am" />
+    <livewire:admin.adultos-mayores.salud.medicacion-adulto-modal :cod_am="$adulto->cod_am" />
+    <livewire:admin.adultos-mayores.salud.signos-vitales-adulto-modal :cod_am="$adulto->cod_am" />
+    <livewire:admin.adultos-mayores.salud.valoracion-funcional-adulto-modal :cod_am="$adulto->cod_am" />
+    <livewire:admin.adultos-mayores.salud.historial-estado-adulto-panel :cod_am="$adulto->cod_am" />
+    
+    <!-- Este modal es llamado globalmente -->
+    <livewire:admin.adultos-mayores.salud.administracion-medicacion-modal :cod_am="$adulto->cod_am" />
+</section>
+
+            {{-- TAB EVALUACIONES COGNITIVAS --}}
+<section
+    x-show="tab === 'evaluaciones'"
+    x-transition.opacity.duration.250ms
+    class="space-y-4"
+>
+    {{-- Encabezado --}}
+    <section class="overflow-hidden rounded-[24px] border border-[#CBBBAA] bg-[#E7DDD2]/95 shadow-[0_12px_28px_rgba(47,62,92,0.08)] backdrop-blur-xl">
+        <div class="flex flex-col gap-4 border-b border-[#D5C7B9] px-5 py-4 lg:flex-row lg:items-center lg:justify-between">
+            <div>
+                <span class="text-[11px] font-black uppercase tracking-[0.18em] text-[#5B5F97]">
+                    Salud Mental y Cognitiva
+                </span>
+
+                <h2 class="mt-1 text-lg font-black text-[#2F3E5C]">
+                    Evaluaciones Cognitivas (MoCA / MMSE)
+                </h2>
+
+                <p class="mt-1 text-xs font-bold leading-5 text-[#2F3E5C]/55">
+                    Historial de evaluaciones de tamizaje para la detección temprana de deterioro cognitivo.
+                </p>
+            </div>
+
+            <button type="button"
+                    @click="abrir('evaluacion')"
+                    class="inline-flex items-center justify-center gap-2 rounded-2xl bg-[#5B5F97] px-4 py-2.5 text-xs font-black text-white shadow-[0_10px_20px_rgba(91,95,151,0.18)] transition hover:-translate-y-0.5 hover:bg-[#4A4E80] active:scale-[0.98]">
+                <i class="ph-bold ph-brain"></i>
+                Nueva evaluación
+            </button>
+        </div>
+
+        {{-- Métricas Evaluaciones --}}
+        <div class="grid gap-3 p-5 sm:grid-cols-2 lg:grid-cols-4">
+            <div class="rounded-[18px] border border-[#D5C7B9] bg-[#F2EBE3]/80 p-4">
+                <p class="text-[10px] font-black uppercase tracking-[0.18em] text-[#2F3E5C]/45">
+                    Evaluaciones Realizadas
+                </p>
+                <p class="mt-2 text-2xl font-black text-[#5B5F97]">
+                    {{ $evaluacionesLista->count() }}
+                </p>
+            </div>
+
+            @php
+                $ultimaEval = $evaluacionesLista->first();
+            @endphp
+            <div class="rounded-[18px] border border-[#D5C7B9] bg-[#F2EBE3]/80 p-4">
+                <p class="text-[10px] font-black uppercase tracking-[0.18em] text-[#2F3E5C]/45">
+                    Último Puntaje
+                </p>
+                <p class="mt-2 text-2xl font-black {{ optional($ultimaEval)->nivel_riesgo === 'BAJO' ? 'text-[#617453]' : 'text-[#D96F58]' }}">
+                    {{ optional($ultimaEval)->puntaje_total ?? '--' }} / {{ optional($ultimaEval)->puntaje_maximo ?? '30' }}
+                </p>
+            </div>
+
+            <div class="rounded-[18px] border border-[#D5C7B9] bg-[#F2EBE3]/80 p-4">
+                <p class="text-[10px] font-black uppercase tracking-[0.18em] text-[#2F3E5C]/45">
+                    Estado Cognitivo
+                </p>
+                <p class="mt-2 text-sm font-black text-[#2F3E5C]">
+                    {{ optional($ultimaEval)->resultado_interpretacion ?? 'Sin datos' }}
+                </p>
+            </div>
+
+            <div class="rounded-[18px] border border-[#D5C7B9] bg-[#F2EBE3]/80 p-4">
+                <p class="text-[10px] font-black uppercase tracking-[0.18em] text-[#2F3E5C]/45">
+                    Riesgo Detectado
+                </p>
+                <p class="mt-2 text-sm font-black {{ optional($ultimaEval)->nivel_riesgo === 'BAJO' ? 'text-[#617453]' : (optional($ultimaEval)->nivel_riesgo === 'MEDIO' ? 'text-[#D9A27C]' : 'text-[#D96F58]') }}">
+                    {{ optional($ultimaEval)->nivel_riesgo ?? 'No evaluado' }}
+                </p>
+            </div>
+        </div>
+    </section>
+
+    {{-- Lista de Evaluaciones --}}
+    <section class="grid gap-4">
+        <div class="overflow-hidden rounded-[24px] border border-[#CBBBAA] bg-[#E7DDD2]/95 shadow-[0_12px_28px_rgba(47,62,92,0.08)]">
+    {{-- Tabla de Evaluaciones --}}
+    <section class="overflow-hidden rounded-[24px] border border-[#CBBBAA] bg-[#E7DDD2]/95 shadow-[0_12px_28px_rgba(47,62,92,0.08)]">
+        <div class="flex items-center justify-between gap-3 border-b border-[#D5C7B9] px-6 py-4 bg-[#F2EBE3]/30">
+            <div class="flex items-center gap-3">
+                <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-[#5B5F97]/15 text-[#5B5F97]">
+                    <i class="ph-bold ph-brain text-xl"></i>
+                </div>
+                <div>
+                    <h3 class="text-base font-black text-[#2F3E5C]">Evaluaciones Cognitivas</h3>
+                    <p class="text-[10px] font-bold text-[#2F3E5C]/50 uppercase tracking-widest">Estado mental y seguimiento cognitivo</p>
+                </div>
+            </div>
+            <button type="button" @click="abrir('evaluacion')" class="rounded-xl bg-[#5B5F97] px-4 py-2 text-xs font-black text-white hover:bg-[#4A4E80] transition">
+                <i class="ph-bold ph-plus mr-1"></i> Nueva Evaluación
+            </button>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm text-[#2F3E5C]">
+                <thead class="bg-[#D5C7B9]/40 text-[10px] uppercase tracking-widest text-[#2F3E5C]/60">
+                    <tr>
+                        <th class="px-6 py-3">Fecha</th>
+                        <th class="px-6 py-3">Tipo Evaluación</th>
+                        <th class="px-6 py-3">Resultado / Riesgo</th>
+                        <th class="px-6 py-3">Interpretación</th>
+                        <th class="px-6 py-3 text-right">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-[#D5C7B9]/30">
+                    @forelse($evaluacionesActivas as $eval)
+                        @php
+                            $riesgo = strtoupper($eval->nivel_riesgo ?? 'NORMAL');
+                            $colorRiesgo = match($riesgo) {
+                                'ALTO' => 'bg-terracota/15 text-terracota',
+                                'MODERADO' => 'bg-[#D9A27C]/15 text-[#9B6D4C]',
+                                default => 'bg-[#8EA17D]/15 text-[#617453]',
+                            };
+                        @endphp
+                        <tr class="group transition hover:bg-[#F2EBE3]/40">
+                            <td class="px-6 py-4 whitespace-nowrap text-xs font-black">
+                                {{ $eval->fecha_eval->format('d/m/Y') }}
+                            </td>
+                            <td class="px-6 py-4">
+                                <p class="text-xs font-black">{{ $eval->tipoEvaluacion->nombre }}</p>
+                                <p class="text-[10px] font-bold text-[#2F3E5C]/50">{{ $eval->personalSalud->nombre ?? 'Especialista' }}</p>
+                            </td>
+                            <td class="px-6 py-4">
+                                <div class="flex flex-col gap-1">
+                                    <span class="text-[11px] font-black">{{ $eval->puntaje_total }} / {{ $eval->puntaje_maximo }} pts</span>
+                                    <span class="inline-flex w-fit items-center rounded-full px-2 py-0.5 text-[9px] font-black {{ $colorRiesgo }}">
+                                        RIESGO {{ $riesgo }}
+                                    </span>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4">
+                                <p class="text-[11px] font-semibold text-[#2F3E5C]/65 line-clamp-1" title="{{ $eval->resultado_interpretacion }}">
+                                    {{ $eval->resultado_interpretacion }}
+                                </p>
+                            </td>
+                            <td class="px-6 py-4 text-right">
+                                <div class="flex justify-end gap-1.5">
+                                    <button type="button" @click="abrir('evaluacion', @js($eval), false, true)" class="rounded-lg bg-[#2F3E5C]/5 p-2 text-[#2F3E5C] hover:bg-[#2F3E5C] hover:text-white transition">
+                                        <i class="ph-bold ph-eye"></i>
+                                    </button>
+                                    @can('adulto_mayor.eliminar')
+                                    <form action="{{ route('admin.adultos-mayores.evaluaciones.destroy', [$idAdulto, $eval->cod_eval_cog]) }}" method="POST" onsubmit="confirmarAccion(event, 'Anular evaluación cognitiva', 'La evaluación dejará de ser parte del seguimiento activo, pero el puntaje histórico se conserva.')">
+                                        @csrf @method('DELETE')
+                                        <button type="submit" title="Anular evaluación" class="rounded-lg bg-terracota/5 p-2 text-terracota hover:bg-terracota hover:text-white transition">
+                                            <i class="ph-bold ph-x-circle"></i>
+                                        </button>
+                                    </form>
+                                    @endcan
+                                </div>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="5" class="px-6 py-12 text-center text-xs font-bold text-[#2F3E5C]/40">Sin evaluaciones registradas.</td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    {{-- Evaluaciones Anuladas --}}
+    @if(count($evaluacionesAnuladas) > 0)
+    <div class="mt-8 border-t border-[#D5C7B9]/30 pt-6">
+        <h4 class="mb-4 text-xs font-black uppercase tracking-widest text-terracota/60 flex items-center gap-2">
+            <i class="ph-bold ph-x-circle"></i> Historial de Evaluaciones Anuladas
+        </h4>
+        <div class="overflow-hidden rounded-[24px] border border-[#D5C7B9]/50 opacity-60 grayscale-[50%] transition-all hover:grayscale-0 hover:opacity-100 bg-[#E7DDD2]/40 backdrop-blur-sm shadow-sm">
+            <table class="w-full text-left text-sm text-[#2F3E5C]">
+                <thead class="bg-[#D5C7B9]/30 text-[9px] uppercase tracking-widest text-[#2F3E5C]/50">
+                    <tr>
+                        <th class="px-6 py-3">Fecha Anul.</th>
+                        <th class="px-6 py-3">Evaluación / Puntaje</th>
+                        <th class="px-6 py-3 text-right">Trazabilidad</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-[#D5C7B9]/20">
+                    @foreach($evaluacionesAnuladas as $evalAnu)
+                        <tr class="hover:bg-white/10 transition">
+                            <td class="px-6 py-3 text-xs font-black text-[#2F3E5C]/60">
+                                {{ $evalAnu->deleted_at->format('d/m/Y') }}
+                            </td>
+                            <td class="px-6 py-3">
+                                <p class="text-[11px] font-black text-[#2F3E5C]/70 uppercase">{{ $evalAnu->tipoEvaluacion->nombre }}</p>
+                                <p class="text-[10px] font-semibold text-[#2F3E5C]/50">Puntaje: {{ $evalAnu->puntaje_total }} pts</p>
+                            </td>
+                            <td class="px-6 py-3 text-right">
+                                <form action="{{ route('admin.adultos-mayores.evaluaciones.restore', [$adulto->cod_am, $evalAnu->cod_eval_cog]) }}" method="POST" onsubmit="confirmarAccion(event, 'Restaurar evaluación', 'La evaluación cognitiva volverá a formar parte de las métricas activas.')">
+                                    @csrf @method('PATCH')
+                                    <button type="submit" title="Restaurar" class="rounded-lg bg-[#8EA17D]/10 p-1.5 text-[#8EA17D] hover:bg-[#8EA17D] hover:text-white transition">
+                                        <i class="ph-bold ph-arrow-counter-clockwise"></i>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+        <p class="mt-2 text-[10px] font-bold text-[#2F3E5C]/40 italic">* Estos registros no se consideran en las métricas activas del paciente.</p>
+    </div>
+    @endif
+    </div>
+</section>
+</section>
+
+            {{-- TAB ACTIVIDADES MEJORADO --}}
+<section
+    x-show="tab === 'actividades'"
+    x-transition.opacity.duration.250ms
+    class="space-y-4"
+>
+    {{-- Encabezado --}}
+    <section class="overflow-hidden rounded-[24px] border border-[#CBBBAA] bg-[#E7DDD2]/95 shadow-[0_12px_28px_rgba(47,62,92,0.08)] backdrop-blur-xl">
+        <div class="flex flex-col gap-4 border-b border-[#D5C7B9] px-5 py-4 lg:flex-row lg:items-center lg:justify-between">
+            <div>
+                <span class="text-[11px] font-black uppercase tracking-[0.18em] text-[#D9A27C]">
+                    Participación institucional
+                </span>
+
+                <h2 class="mt-1 text-lg font-black text-[#2F3E5C]">
+                    Actividades y apoyo voluntario
+                </h2>
+
+                <p class="mt-1 text-xs font-bold leading-5 text-[#2F3E5C]/55">
+                    Controla actividades realizadas, participación del adulto mayor y asignaciones de apoyo.
+                </p>
+            </div>
+
+            <div class="flex flex-col gap-2 sm:flex-row">
+                <button type="button"
+                        @click="abrir('actividad')"
+                        class="inline-flex items-center justify-center gap-2 rounded-2xl bg-[#D9A27C] px-4 py-2.5 text-xs font-black text-white shadow-[0_10px_20px_rgba(217,162,124,0.20)] transition hover:-translate-y-0.5 hover:bg-[#C98F67] active:scale-[0.98]">
+                    <i class="ph-bold ph-calendar-plus"></i>
+                    Registrar actividad
+                </button>
+
+                <button type="button"
+                        @click="abrir('voluntario')"
+                        class="inline-flex items-center justify-center gap-2 rounded-2xl bg-[#8EA17D] px-4 py-2.5 text-xs font-black text-white shadow-[0_10px_20px_rgba(142,161,125,0.18)] transition hover:-translate-y-0.5 hover:bg-[#7C916A] active:scale-[0.98]">
+                    <i class="ph-bold ph-hand-heart"></i>
+                    Asignar voluntario
+                </button>
+            </div>
+        </div>
+
+        {{-- Métricas --}}
+        <div class="grid gap-3 p-5 sm:grid-cols-2 lg:grid-cols-4">
+            <div class="rounded-[18px] border border-[#D5C7B9] bg-[#F2EBE3]/80 p-4">
+                <p class="text-[10px] font-black uppercase tracking-[0.18em] text-[#2F3E5C]/45">
+                    Actividades
+                </p>
+                <p class="mt-2 text-2xl font-black text-[#9B6D4C]">
+                    {{ $totalActividades }}
+                </p>
+            </div>
+
+            <div class="rounded-[18px] border border-[#D5C7B9] bg-[#F2EBE3]/80 p-4">
+                <p class="text-[10px] font-black uppercase tracking-[0.18em] text-[#2F3E5C]/45">
+                    Voluntarios
+                </p>
+                <p class="mt-2 text-2xl font-black text-[#617453]">
+                    {{ $totalAsignaciones }}
+                </p>
+            </div>
+
+            <div class="rounded-[18px] border border-[#D5C7B9] bg-[#F2EBE3]/80 p-4">
+                <p class="text-[10px] font-black uppercase tracking-[0.18em] text-[#2F3E5C]/45">
+                    Estado de participación
+                </p>
+                <p class="mt-2 text-sm font-black {{ $totalActividades > 0 ? 'text-[#617453]' : 'text-[#D96F58]' }}">
+                    {{ $totalActividades > 0 ? 'Con actividad registrada' : 'Sin actividad' }}
+                </p>
+            </div>
+
+            <div class="rounded-[18px] border border-[#D5C7B9] bg-[#F2EBE3]/80 p-4">
+                <p class="text-[10px] font-black uppercase tracking-[0.18em] text-[#2F3E5C]/45">
+                    Acción sugerida
+                </p>
+                <p class="mt-2 text-sm font-black text-[#2F3E5C]">
+                    {{ $totalActividades > 0 ? 'Revisar participación' : 'Registrar actividad' }}
+                </p>
+            </div>
+        </div>
+    </section>
+
+    {{-- Contenido --}}
+    <div class="grid gap-6">
+        {{-- Tabla de Actividades --}}
+        <section class="overflow-hidden rounded-[24px] border border-[#CBBBAA] bg-[#E7DDD2]/95 shadow-[0_12px_28px_rgba(47,62,92,0.08)]">
+            <div class="flex items-center justify-between gap-3 border-b border-[#D5C7B9] px-6 py-4 bg-[#F2EBE3]/30">
+                <div class="flex items-center gap-3">
+                    <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-[#D9A27C]/15 text-[#9B6D4C]">
+                        <i class="ph-bold ph-calendar-check text-xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-base font-black text-[#2F3E5C]">Registro de Actividades</h3>
+                        <p class="text-[10px] font-bold text-[#2F3E5C]/50 uppercase tracking-widest">Participación y eventos institucionales</p>
+                    </div>
+                </div>
+                <button type="button" @click="abrir('actividad')" class="rounded-xl bg-[#D9A27C] px-4 py-2 text-xs font-black text-white hover:bg-[#C98F67] transition">
+                    <i class="ph-bold ph-plus mr-1"></i> Nueva
+                </button>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-sm text-[#2F3E5C]">
+                    <thead class="bg-[#D5C7B9]/40 text-[10px] uppercase tracking-widest text-[#2F3E5C]/60">
+                        <tr>
+                            <th class="px-6 py-3">Fecha / Hora</th>
+                            <th class="px-6 py-3">Tipo Actividad</th>
+                            <th class="px-6 py-3">Observación</th>
+                            <th class="px-6 py-3">Estado</th>
+                            <th class="px-6 py-3 text-right">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-[#D5C7B9]/30">
+                        @forelse($actividadesActivas as $actividad)
+                            @php
+                                $actividadObj = is_object($actividad) ? $actividad : null;
+                                $estadoAct = strtoupper(optional($actividadObj)->estado ?? 'PROGRAMADA');
+                                $colorAct = match($estadoAct) {
+                                    'COMPLETADA', 'REALIZADA' => 'bg-[#8EA17D]/15 text-[#617453]',
+                                    'CANCELADA' => 'bg-terracota/15 text-terracota',
+                                    default => 'bg-[#D9A27C]/15 text-[#9B6D4C]',
+                                };
+                            @endphp
+                            <tr class="group transition hover:bg-[#F2EBE3]/40">
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <p class="text-xs font-black text-[#2F3E5C]">{{ optional($actividadObj)->fecha ? Carbon::parse($actividadObj->fecha)->format('d/m/Y') : 'N/D' }}</p>
+                                    <p class="text-[10px] font-bold text-[#2F3E5C]/50">{{ optional($actividadObj)->hora ? substr($actividadObj->hora, 0, 5) : '--:--' }}</p>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="text-xs font-black text-[#2F3E5C]">{{ optional($actividadObj)->tipoActividad->tipo ?? 'Actividad' }}</span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <p class="text-[11px] font-semibold text-[#2F3E5C]/65 line-clamp-1">{{ optional($actividadObj)->obs ?? 'Sin detalle' }}</p>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-[9px] font-black uppercase {{ $colorAct }}">
+                                        {{ $estadoAct }}
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 text-right">
+                                    <div class="flex justify-end gap-1.5">
+                                        <button type="button" @click="abrir('actividad', @js($actividad), false, true)" class="rounded-lg bg-[#2F3E5C]/5 p-2 text-[#2F3E5C] hover:bg-[#2F3E5C] hover:text-white transition">
+                                            <i class="ph-bold ph-eye"></i>
+                                        </button>
+                                        <button type="button" @click="abrir('actividad', @js($actividad), true, false)" class="rounded-lg bg-[#2F3E5C]/5 p-2 text-[#2F3E5C] hover:bg-[#2F3E5C] hover:text-white transition">
+                                            <i class="ph-bold ph-pencil-simple"></i>
+                                        </button>
+                                        <form action="{{ route('admin.adultos-mayores.actividades.destroy', [$idAdulto, $actividadObj->cod_act_adul ?? '0']) }}" method="POST" onsubmit="confirmarAccion(event, 'Anular registro de actividad', 'La participación en esta actividad será anulada del expediente activo.')">
+                                            @csrf @method('DELETE')
+                                            <button type="submit" title="Anular actividad" class="rounded-lg bg-terracota/5 p-2 text-terracota hover:bg-terracota hover:text-white transition">
+                                                <i class="ph-bold ph-x-circle"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="5" class="px-6 py-10 text-center text-xs font-bold text-[#2F3E5C]/40">Sin actividades registradas.</td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        {{-- Actividades Anuladas --}}
+        @if(count($actividadesAnuladas) > 0)
+        <div class="mt-8 border-t border-[#D5C7B9]/30 pt-6">
+            <h4 class="mb-4 text-xs font-black uppercase tracking-widest text-terracota/60 flex items-center gap-2 px-4">
+                <i class="ph-bold ph-x-circle"></i> Historial de Actividades Anuladas
+            </h4>
+            <div class="overflow-hidden rounded-[24px] border border-[#D5C7B9]/50 opacity-60 grayscale-[50%] transition-all hover:grayscale-0 hover:opacity-100 bg-[#E7DDD2]/40 backdrop-blur-sm shadow-sm mx-4">
+                <table class="w-full text-left text-sm text-[#2F3E5C]">
+                    <thead class="bg-[#D5C7B9]/30 text-[9px] uppercase tracking-widest text-[#2F3E5C]/50">
+                        <tr>
+                            <th class="px-6 py-3">Fecha Anul.</th>
+                            <th class="px-6 py-3">Actividad / Estado Prev.</th>
+                            <th class="px-6 py-3 text-right">Trazabilidad</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-[#D5C7B9]/20">
+                        @foreach($actividadesAnuladas as $actAnu)
+                            <tr class="hover:bg-white/10 transition">
+                                <td class="px-6 py-3 text-xs font-black text-[#2F3E5C]/60">
+                                    {{ $actAnu->deleted_at->format('d/m/Y') }}
+                                </td>
+                                <td class="px-6 py-3">
+                                    <p class="text-[11px] font-black text-[#2F3E5C]/70 uppercase">{{ $actAnu->tipoActividad->tipo ?? 'Actividad' }}</p>
+                                    <p class="text-[10px] font-semibold text-[#2F3E5C]/50">Estado anterior: {{ $actAnu->estado }}</p>
+                                </td>
+                                <td class="px-6 py-3 text-right">
+                                    <form action="{{ route('admin.adultos-mayores.actividades.restore', [$adulto->cod_am, $actAnu->cod_act_adul]) }}" method="POST" onsubmit="confirmarAccion(event, 'Restaurar actividad', 'El registro de participación volverá a la vista activa del expediente.')">
+                                        @csrf @method('PATCH')
+                                        <button type="submit" title="Restaurar" class="rounded-lg bg-[#8EA17D]/10 p-1.5 text-[#8EA17D] hover:bg-[#8EA17D] hover:text-white transition">
+                                            <i class="ph-bold ph-arrow-counter-clockwise"></i>
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        @endif
+
+        {{-- Tabla de Voluntarios --}}
+        <section class="overflow-hidden rounded-[24px] border border-[#CBBBAA] bg-[#E7DDD2]/95 shadow-[0_12px_28px_rgba(47,62,92,0.08)]">
+            <div class="flex items-center justify-between gap-3 border-b border-[#D5C7B9] px-6 py-4 bg-[#F2EBE3]/30">
+                <div class="flex items-center gap-3">
+                    <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-[#8EA17D]/15 text-[#617453]">
+                        <i class="ph-bold ph-hand-heart text-xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-base font-black text-[#2F3E5C]">Voluntarios Asignados</h3>
+                        <p class="text-[10px] font-bold text-[#2F3E5C]/50 uppercase tracking-widest">Apoyo y acompañamiento externo</p>
+                    </div>
+                </div>
+                <button type="button" @click="abrir('voluntario')" class="rounded-xl bg-[#8EA17D] px-4 py-2 text-xs font-black text-white hover:bg-[#7C916A] transition">
+                    <i class="ph-bold ph-user-plus mr-1"></i> Asignar
+                </button>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-sm text-[#2F3E5C]">
+                    <thead class="bg-[#D5C7B9]/40 text-[10px] uppercase tracking-widest text-[#2F3E5C]/60">
+                        <tr>
+                            <th class="px-6 py-3">Voluntario</th>
+                            <th class="px-6 py-3">Periodo</th>
+                            <th class="px-6 py-3">Observación</th>
+                            <th class="px-6 py-3">Estado</th>
+                            <th class="px-6 py-3 text-right">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-[#D5C7B9]/30">
+                        @forelse($asignacionesLista ?? collect() as $asignacion)
+                            @php
+                                $asignacionObj = is_object($asignacion) ? $asignacion : null;
+                                $nombreVol = optional($asignacionObj)->voluntario->persona->nombre_completo 
+                                    ?? optional($asignacionObj)->voluntario->name 
+                                    ?? 'Voluntario';
+                                $estadoAsig = strtoupper(optional($asignacionObj)->estado ?? 'ACTIVO');
+                                $colorAsig = match($estadoAsig) {
+                                    'ACTIVO' => 'bg-[#8EA17D]/15 text-[#617453]',
+                                    'FINALIZADO' => 'bg-[#2F3E5C]/15 text-[#2F3E5C]',
+                                    default => 'bg-[#D9A27C]/15 text-[#9B6D4C]',
+                                };
+                            @endphp
+                            <tr class="group transition hover:bg-[#F2EBE3]/40">
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex items-center gap-2">
+                                        <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-[#8EA17D]/10 text-xs font-black text-[#617453]">
+                                            {{ strtoupper(substr($nombreVol, 0, 1)) }}
+                                        </div>
+                                        <span class="text-xs font-black text-[#2F3E5C]">{{ $nombreVol }}</span>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <p class="text-[10px] font-black text-[#2F3E5C]/60 uppercase tracking-tighter">
+                                        {{ optional($asignacionObj)->fecha_asig ? Carbon::parse($asignacionObj->fecha_asig)->format('d/m/Y') : 'INICIO N/D' }}
+                                        —
+                                        {{ optional($asignacionObj)->fecha_fin ? Carbon::parse($asignacionObj->fecha_fin)->format('d/m/Y') : 'PRESENTE' }}
+                                    </p>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <p class="text-[11px] font-semibold text-[#2F3E5C]/65 line-clamp-1">{{ optional($asignacionObj)->obser ?? 'Sin observación' }}</p>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-[9px] font-black uppercase {{ $colorAsig }}">
+                                        {{ $estadoAsig }}
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 text-right">
+                                    <div class="flex justify-end gap-1.5">
+                                        <button type="button" @click="abrir('voluntario', @js($asignacion), false, true)" class="rounded-lg bg-[#2F3E5C]/5 p-2 text-[#2F3E5C] hover:bg-[#2F3E5C] hover:text-white transition">
+                                            <i class="ph-bold ph-eye"></i>
+                                        </button>
+                                        <button type="button" @click="abrir('voluntario', @js($asignacion), true, false)" class="rounded-lg bg-[#2F3E5C]/5 p-2 text-[#2F3E5C] hover:bg-[#2F3E5C] hover:text-white transition">
+                                            <i class="ph-bold ph-pencil-simple"></i>
+                                        </button>
+                                        <button type="button" class="rounded-lg bg-terracota/5 p-2 text-terracota hover:bg-terracota hover:text-white transition">
+                                            <i class="ph-bold ph-trash-simple"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="5" class="px-6 py-12 text-center text-xs font-bold text-[#2F3E5C]/40">Sin voluntarios asignados.</td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+</section>
+
+            {{-- TAB DOCUMENTOS --}}
+  {{-- TAB DOCUMENTOS MEJORADO --}}
+<section
+    x-show="tab === 'documentos'"
+    x-transition.opacity.duration.250ms
+    class="space-y-4"
+>
+    {{-- Encabezado --}}
+    <section class="overflow-hidden rounded-[24px] border border-[#CBBBAA] bg-[#E7DDD2]/95 shadow-[0_12px_28px_rgba(47,62,92,0.08)] backdrop-blur-xl">
+        <div class="flex flex-col gap-4 border-b border-[#D5C7B9] px-5 py-4 lg:flex-row lg:items-center lg:justify-between">
+            <div>
+                <span class="text-[11px] font-black uppercase tracking-[0.18em] text-[#2F3E5C]">
+                    Expediente institucional
+                </span>
+
+                <h2 class="mt-1 text-lg font-black text-[#2F3E5C]">
+                    Documentos asociados
+                </h2>
+
+                <p class="mt-1 text-xs font-bold leading-5 text-[#2F3E5C]/55">
+                    Consulta y registra documentos administrativos, personales o médicos vinculados al adulto mayor.
+                </p>
+            </div>
+
+            <button type="button"
+                    @click="abrir('documento')"
+                    class="inline-flex items-center justify-center gap-2 rounded-2xl bg-[#2F3E5C] px-4 py-2.5 text-xs font-black text-white shadow-[0_10px_20px_rgba(47,62,92,0.18)] transition hover:-translate-y-0.5 hover:bg-[#566189] active:scale-[0.98]">
+                <i class="ph-bold ph-upload-simple"></i>
+                Subir documento
+            </button>
+        </div>
+
+        {{-- Métricas --}}
+        <div class="grid gap-3 p-5 sm:grid-cols-2 lg:grid-cols-4">
+            <div class="rounded-[18px] border border-[#D5C7B9] bg-[#F2EBE3]/80 p-4">
+                <p class="text-[10px] font-black uppercase tracking-[0.18em] text-[#2F3E5C]/45">
+                    Documentos
+                </p>
+                <p class="mt-2 text-2xl font-black text-[#2F3E5C]">
+                    {{ $totalDocumentos }}
+                </p>
+            </div>
+
+            <div class="rounded-[18px] border border-[#D5C7B9] bg-[#F2EBE3]/80 p-4">
+                <p class="text-[10px] font-black uppercase tracking-[0.18em] text-[#2F3E5C]/45">
+                    Estado expediente
+                </p>
+                <p class="mt-2 text-sm font-black {{ $totalDocumentos > 0 ? 'text-[#617453]' : 'text-[#D96F58]' }}">
+                    {{ $totalDocumentos > 0 ? 'Con respaldo' : 'Sin documentos' }}
+                </p>
+            </div>
+
+            <div class="rounded-[18px] border border-[#D5C7B9] bg-[#F2EBE3]/80 p-4">
+                <p class="text-[10px] font-black uppercase tracking-[0.18em] text-[#2F3E5C]/45">
+                    Tipo principal
+                </p>
+                <p class="mt-2 text-sm font-black text-[#2F3E5C]">
+                    Administrativo / médico
+                </p>
+            </div>
+
+            <div class="rounded-[18px] border border-[#D5C7B9] bg-[#F2EBE3]/80 p-4">
+                <p class="text-[10px] font-black uppercase tracking-[0.18em] text-[#2F3E5C]/45">
+                    Acción sugerida
+                </p>
+                <p class="mt-2 text-sm font-black text-[#2F3E5C]">
+                    {{ $totalDocumentos > 0 ? 'Verificar vigencia' : 'Subir documento' }}
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <section class="overflow-hidden rounded-[24px] border border-[#CBBBAA] bg-[#E7DDD2]/95 shadow-[0_12px_28px_rgba(47,62,92,0.08)]">
+        <div class="flex items-center justify-between gap-3 border-b border-[#D5C7B9] px-6 py-4 bg-[#F2EBE3]/30">
+            <div class="flex items-center gap-3">
+                <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-[#2F3E5C]/15 text-[#2F3E5C]">
+                    <i class="ph-bold ph-folder-open text-xl"></i>
+                </div>
+                <div>
+                    <h3 class="text-base font-black text-[#2F3E5C]">Expediente Digital</h3>
+                    <p class="text-[10px] font-bold text-[#2F3E5C]/50 uppercase tracking-widest">Documentos y respaldos legales</p>
+                </div>
+            </div>
+            <button type="button" @click="abrir('documento')" class="rounded-xl bg-[#2F3E5C] px-4 py-2 text-xs font-black text-white hover:bg-[#566189] transition">
+                <i class="ph-bold ph-upload-simple mr-1"></i> Subir
+            </button>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm text-[#2F3E5C]">
+                <thead class="bg-[#D5C7B9]/40 text-[10px] uppercase tracking-widest text-[#2F3E5C]/60">
+                    <tr>
+                        <th class="px-6 py-3">Documento</th>
+                        <th class="px-6 py-3">Tipo</th>
+                        <th class="px-6 py-3">Fecha</th>
+                        <th class="px-6 py-3">Observaciones</th>
+                        <th class="px-6 py-3 text-right">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-[#D5C7B9]/30">
+                    @forelse($documentosActivos as $documento)
+                        @php
+                            $documentoObj = is_object($documento) ? $documento : null;
+                            $nombreDoc = optional($documentoObj)->nom_doc ?? 'Documento';
+                            $tipoDoc = strtoupper(optional($documentoObj)->tipo_doc ?? 'GENERAL');
+                            $fechaDoc = optional($documentoObj)->fecha_doc;
+                        @endphp
+                        <tr class="group transition hover:bg-[#F2EBE3]/40">
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="flex items-center gap-3">
+                                    <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-[#2F3E5C]/10 text-[#2F3E5C]">
+                                        <i class="ph-bold ph-file-text text-lg"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-xs font-black">{{ $nombreDoc }}</p>
+                                        <p class="text-[10px] font-bold text-[#2F3E5C]/45">{{ optional($documentoObj)->extension ?? 'PDF' }}</p>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4">
+                                <span class="rounded-full bg-[#2F3E5C]/10 px-2.5 py-1 text-[9px] font-black">{{ $tipoDoc }}</span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-xs font-black text-[#2F3E5C]/60">
+                                {{ $fechaDoc ? Carbon::parse($fechaDoc)->format('d/m/Y') : 'N/D' }}
+                            </td>
+                            <td class="px-6 py-4">
+                                <p class="text-[11px] font-semibold text-[#2F3E5C]/65 line-clamp-1">{{ optional($documentoObj)->observaciones ?? 'Sin notas' }}</p>
+                            </td>
+                            <td class="px-6 py-4 text-right">
+                                <div class="flex justify-end gap-1.5">
+                                    @if(optional($documentoObj)->ruta_archivo)
+                                        <a href="{{ Storage::url($documentoObj->ruta_archivo) }}" target="_blank" class="rounded-lg bg-[#2F3E5C]/5 p-2 text-[#2F3E5C] hover:bg-[#2F3E5C] hover:text-white transition">
+                                            <i class="ph-bold ph-eye"></i>
+                                        </a>
+                                    @endif
+                                    <form action="{{ route('admin.adultos-mayores.documentos.destroy', [$idAdulto, $documentoObj->cod_doc_am ?? '0']) }}" method="POST" onsubmit="confirmarAccion(event, 'Archivar documento', 'El documento y su archivo físico se conservarán en el servidor, marcados como anulados.')">
+                                        @csrf @method('DELETE')
+                                        <button type="submit" title="Archivar documento" class="rounded-lg bg-terracota/5 p-2 text-terracota hover:bg-terracota hover:text-white transition">
+                                            <i class="ph-bold ph-archive-box"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="5" class="px-6 py-12 text-center text-xs font-bold text-[#2F3E5C]/40">Sin documentos registrados.</td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+
+        {{-- Documentos Archivados --}}
+        @if(count($documentosArchivados) > 0)
+        <div class="mt-8 border-t border-[#D5C7B9]/30 pt-6 px-4">
+            <h4 class="mb-4 text-xs font-black uppercase tracking-widest text-terracota/60 flex items-center gap-2">
+                <i class="ph-bold ph-archive-box"></i> Repositorio de Documentos Archivados
+            </h4>
+            <div class="overflow-hidden rounded-[24px] border border-[#D5C7B9]/50 opacity-60 grayscale-[50%] transition-all hover:grayscale-0 hover:opacity-100 bg-[#E7DDD2]/40 backdrop-blur-sm shadow-sm">
+                <table class="w-full text-left text-sm text-[#2F3E5C]">
+                    <thead class="bg-[#D5C7B9]/30 text-[9px] uppercase tracking-widest text-[#2F3E5C]/50">
+                        <tr>
+                            <th class="px-6 py-3">Fecha Arch.</th>
+                            <th class="px-6 py-3">Documento / Tipo</th>
+                            <th class="px-6 py-3 text-right">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-[#D5C7B9]/20">
+                        @foreach($documentosArchivados as $docAnu)
+                            <tr class="hover:bg-white/10 transition">
+                                <td class="px-6 py-3 text-xs font-black text-[#2F3E5C]/60">
+                                    {{ $docAnu->deleted_at->format('d/m/Y') }}
+                                </td>
+                                <td class="px-6 py-3">
+                                    <p class="text-[11px] font-black text-[#2F3E5C]/70 uppercase">{{ $docAnu->nom_doc }}</p>
+                                    <p class="text-[10px] font-semibold text-[#2F3E5C]/50">Tipo: {{ $docAnu->tipo_doc }}</p>
+                                </td>
+                                <td class="px-6 py-3 text-right">
+                                    <div class="flex justify-end gap-1.5">
+                                        @if($docAnu->ruta_archivo)
+                                            <a href="{{ Storage::url($docAnu->ruta_archivo) }}" target="_blank" class="rounded-lg bg-[#2F3E5C]/10 p-1.5 text-[#2F3E5C] hover:bg-[#2F3E5C] hover:text-white transition" title="Ver archivo">
+                                                <i class="ph-bold ph-eye"></i>
+                                            </a>
+                                        @endif
+                                        <form action="{{ route('admin.adultos-mayores.documentos.restore', [$adulto->cod_am, $docAnu->cod_doc_am]) }}" method="POST" onsubmit="confirmarAccion(event, 'Restaurar documento', 'El documento volverá a estar visible en el expediente activo.')">
+                                            @csrf @method('PATCH')
+                                            <button type="submit" title="Restaurar" class="rounded-lg bg-[#8EA17D]/10 p-1.5 text-[#8EA17D] hover:bg-[#8EA17D] hover:text-white transition">
+                                                <i class="ph-bold ph-arrow-counter-clockwise"></i>
+                                            </button>
+                                        </form>
+                                        <span class="rounded-full bg-white/20 px-2 py-0.5 text-[8px] font-black uppercase text-[#2F3E5C]/40">ARCHIVADO</span>
+                                    </div>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        @endif
+    </section>
+</section>
+
+                        
+                 
+            {{-- TAB HISTORIAL — Bitácora Institucional Real --}}
+
+<section
+    x-show="tab === 'historial'"
+    x-transition.opacity.duration.250ms
+    x-data="{
+        filtroEvento: 'todos',
+        buscarBitacora: '',
+        mostrarDetalles: {},
+        toggleDetalle(id) { this.mostrarDetalles[id] = !this.mostrarDetalles[id]; }
+    }"
+    class="space-y-4"
+>
+    {{-- PHP: preparar bitácora defensivamente --}}
+    @php
+        $bitacoraLista = isset($bitacora) && is_iterable($bitacora) ? collect($bitacora) : collect();
+        $eventosFiltroLista = isset($eventosFiltro) && is_iterable($eventosFiltro) ? collect($eventosFiltro) : collect();
+    @endphp
+
+    {{-- Encabezado del tab --}}
+    <section class="overflow-hidden rounded-[24px] border border-[#CBBBAA] bg-[#E7DDD2]/95 shadow-[0_12px_28px_rgba(47,62,92,0.08)] backdrop-blur-xl">
+        <div class="h-1 w-full bg-gradient-to-r from-[#E27D60] via-[#D9A27C] to-[#8DA280]"></div>
+        <div class="border-b border-[#D5C7B9] px-5 py-4">
+            <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                    <span class="text-[11px] font-black uppercase tracking-[0.18em] text-[#9A7B60]">
+                        Trazabilidad institucional
+                    </span>
+                    <h2 class="mt-1 text-lg font-black text-[#2F3E5C]">
+                        Bitácora del expediente
+                    </h2>
+                    <p class="mt-1 text-xs font-bold leading-5 text-[#2F3E5C]/55">
+                        Registro cronológico de todas las acciones sobre la ficha, observaciones, atenciones, actividades y documentos.
+                    </p>
+                </div>
+                <div class="flex shrink-0 items-center gap-2">
+                    <span class="rounded-full border border-[#C7B5A3] bg-[#D5C7B9]/50 px-3 py-1 text-[10px] font-black text-[#2F3E5C]/60">
+                        {{ $bitacoraLista->count() }} {{ $bitacoraLista->count() === 1 ? 'registro' : 'registros' }}
+                    </span>
+                    <span class="rounded-full border border-[#8DA280]/30 bg-[#8DA280]/10 px-3 py-1 text-[10px] font-black text-[#617453]">
+                        Activa
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        {{-- Indicadores de resumen --}}
+        <div class="grid gap-3 p-5 sm:grid-cols-2 xl:grid-cols-5">
+            @foreach([
+                ['label' => 'Familiares',    'count' => $totalFamiliares,    'color' => 'text-[#617453]'],
+                ['label' => 'Observaciones', 'count' => $totalObservaciones, 'color' => 'text-[#566189]'],
+                ['label' => 'Atenciones',    'count' => $totalAtenciones,    'color' => 'text-[#7A5C49]'],
+                ['label' => 'Actividades',   'count' => $totalActividades,   'color' => 'text-[#9B6D4C]'],
+                ['label' => 'Documentos',    'count' => $totalDocumentos,    'color' => 'text-[#2F3E5C]'],
+            ] as $ind)
+                <div class="rounded-[18px] border border-[#D5C7B9] bg-[#F2EBE3]/80 p-4">
+                    <p class="text-[10px] font-black uppercase tracking-[0.18em] text-[#2F3E5C]/45">{{ $ind['label'] }}</p>
+                    <p class="mt-2 text-2xl font-black {{ $ind['color'] }}">{{ $ind['count'] }}</p>
+                </div>
+            @endforeach
+        </div>
+
+        {{-- Filtros --}}
+        <div class="flex flex-wrap items-center gap-2 border-t border-[#D5C7B9] px-5 py-3">
+            <span class="text-[10px] font-black uppercase tracking-widest text-[#2F3E5C]/45 mr-1">Filtrar:</span>
+
+            <button
+                type="button"
+                @click="filtroEvento = 'todos'"
+                :class="filtroEvento === 'todos' ? 'bg-[#2F3E5C] text-white' : 'bg-[#D5C7B9]/70 text-[#2F3E5C]/60 hover:bg-[#C7B5A3]'"
+                class="rounded-full px-3 py-1 text-[10px] font-black transition"
+            >
+                Todos
+            </button>
+
+            @foreach($eventosFiltroLista as $ev)
+                <button
+                    type="button"
+                    @click="filtroEvento = '{{ $ev['valor'] }}'"
+                    :class="filtroEvento === '{{ $ev['valor'] }}' ? 'bg-[#2F3E5C] text-white' : 'bg-[#D5C7B9]/70 text-[#2F3E5C]/60 hover:bg-[#C7B5A3]'"
+                    class="rounded-full px-3 py-1 text-[10px] font-black transition"
+                >
+                    {{ $ev['etiqueta'] }}
+                </button>
+            @endforeach
+
+            {{-- Buscador --}}
+            <div class="ml-auto flex items-center gap-2 rounded-xl border border-[#C7B5A3] bg-[#D5C7B9]/60 px-3 py-1.5">
+                <i class="ph-bold ph-magnifying-glass text-xs text-[#2F3E5C]/45"></i>
+                <input
+                    type="text"
+                    x-model="buscarBitacora"
+                    placeholder="Buscar en bitácora..."
+                    class="bg-transparent text-xs font-bold text-[#2F3E5C] outline-none placeholder:text-[#2F3E5C]/35 w-40"
+                >
+            </div>
+        </div>
+    </section>
+
+    {{-- Línea de tiempo real --}}
+    <section class="overflow-hidden rounded-[24px] border border-[#CBBBAA] bg-[#E7DDD2]/95 p-5 shadow-[0_12px_28px_rgba(47,62,92,0.08)]">
+
+        @if($bitacoraLista->isEmpty())
+            {{-- Estado vacío --}}
+            <div class="flex flex-col items-center justify-center py-16 text-center">
+                <div class="flex h-16 w-16 items-center justify-center rounded-2xl bg-[#D5C7B9]/50 text-[#2F3E5C]/30">
+                    <i class="ph-bold ph-clock-clockwise text-3xl"></i>
+                </div>
+                <p class="mt-4 text-sm font-black text-[#2F3E5C]/50">Sin eventos registrados aún</p>
+                <p class="mt-1 text-xs font-bold text-[#2F3E5C]/35">
+                    Los eventos aparecerán aquí a medida que se registren observaciones, atenciones y actualizaciones.
+                </p>
+            </div>
+        @else
+            <div class="relative space-y-3">
+                {{-- Línea vertical --}}
+                <div class="absolute left-5 top-2 hidden h-[calc(100%-16px)] w-px bg-[#CBBBAA] sm:block"></div>
+
+                @foreach($bitacoraLista as $log)
+                    @php
+                        $logArr        = is_array($log) ? $log : (array) $log;
+                        $logId         = $logArr['id'] ?? 'log_' . $loop->index;
+                        $evento        = $logArr['evento'] ?? 'updated';
+                        $etiqueta      = $logArr['etiqueta'] ?? 'Evento';
+                        $descripcion   = $logArr['descripcion'] ?? '';
+                        $modulo        = $logArr['modulo'] ?? 'General';
+                        $causer        = $logArr['causer'] ?? 'Sistema';
+                        $fechaRelativa = $logArr['fecha_relativa'] ?? '-';
+                        $fechaExacta   = $logArr['fecha_exacta'] ?? '-';
+                        $icono         = $logArr['icono'] ?? 'ph-bold ph-clock';
+                        $colorBg       = $logArr['color_bg'] ?? 'bg-[#6873A6]/12';
+                        $colorText     = $logArr['color_text'] ?? 'text-[#566189]';
+                        $colorBadge    = $logArr['color_badge'] ?? 'bg-[#566189]/10 text-[#566189]';
+                        $properties    = $logArr['properties'] ?? [];
+                    @endphp
+
+                    <article
+                        class="relative rounded-[20px] border border-[#D5C7B9] bg-[#F2EBE3]/80 p-4 sm:ml-10 transition hover:shadow-[0_4px_14px_rgba(47,62,92,0.08)]"
+                        x-show="
+                            (filtroEvento === 'todos' || filtroEvento === '{{ $evento }}') &&
+                            (buscarBitacora === '' || {{ json_encode(strtolower(strip_tags($descripcion . ' ' . $etiqueta . ' ' . $causer . ' ' . $modulo))) }}.includes(buscarBitacora.toLowerCase()))
+                        "
+                    >
+                        {{-- Ícono lateral --}}
+                        <div class="absolute -left-[38px] top-4 hidden h-10 w-10 items-center justify-center rounded-2xl {{ $colorBg }} {{ $colorText }} sm:flex">
+                            <i class="{{ $icono }}"></i>
+                        </div>
+
+                        <div class="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                            <div class="flex-1 min-w-0">
+                                {{-- Badges --}}
+                                <div class="flex flex-wrap items-center gap-1.5 mb-1.5">
+                                    <span class="rounded-full px-2 py-0.5 text-[10px] font-black {{ $colorBadge }}">
+                                        {{ $etiqueta }}
+                                    </span>
+                                    <span class="rounded-full bg-[#2F3E5C]/8 px-2 py-0.5 text-[10px] font-black text-[#2F3E5C]/55">
+                                        {{ $modulo }}
+                                    </span>
+                                </div>
+
+                                {{-- Descripción --}}
+                                <p class="text-sm font-bold leading-5 text-[#2F3E5C]">
+                                    {{ $descripcion ?: 'Sin descripción.' }}
+                                </p>
+
+                                {{-- Meta --}}
+                                <p class="mt-1.5 text-[11px] font-bold text-[#2F3E5C]/45">
+                                    <i class="ph-bold ph-user-circle mr-0.5"></i> {{ $causer }}
+                                    <span class="mx-1.5 opacity-40">·</span>
+                                    <i class="ph-bold ph-clock mr-0.5"></i>
+                                    <span title="{{ $fechaExacta }}">{{ $fechaRelativa }}</span>
+                                </p>
+                            </div>
+
+                            {{-- Botón detalles --}}
+                            @if(!empty($properties))
+                                <button
+                                    type="button"
+                                    @click="toggleDetalle('{{ $logId }}')"
+                                    class="shrink-0 rounded-xl bg-[#D5C7B9]/60 px-2.5 py-1.5 text-[10px] font-black text-[#2F3E5C]/55 transition hover:bg-[#C7B5A3]"
+                                >
+                                    <i class="ph-bold ph-caret-down transition-transform" :class="mostrarDetalles['{{ $logId }}'] ? 'rotate-180' : ''"></i>
+                                    Detalles
+                                </button>
+                            @endif
+                        </div>
+
+                        {{-- Panel de detalles expandible --}}
+                        @if(!empty($properties))
+                            <div
+                                x-show="mostrarDetalles['{{ $logId }}']"
+                                x-transition
+                                class="mt-3 rounded-xl border border-[#C7B5A3]/50 bg-[#D5C7B9]/40 p-3"
+                            >
+                                <p class="mb-2 text-[10px] font-black uppercase tracking-widest text-[#2F3E5C]/45">
+                                    Datos del evento
+                                </p>
+                                <dl class="space-y-1 text-xs font-bold text-[#2F3E5C]/70">
+                                    @foreach($properties as $key => $value)
+                                        @if(!is_array($value) && !is_null($value) && $value !== '')
+                                            <div class="flex gap-2">
+                                                <dt class="text-[#2F3E5C]/40 capitalize min-w-[80px]">{{ str_replace('_', ' ', $key) }}:</dt>
+                                                <dd>{{ is_bool($value) ? ($value ? 'Sí' : 'No') : $value }}</dd>
+                                            </div>
+                                        @endif
+                                    @endforeach
+                                </dl>
+                            </div>
+                        @endif
+                    </article>
+                @endforeach
+
+                {{-- Mensaje cuando no hay resultados del filtro --}}
+                <p
+                    x-show="!document.querySelector('article[x-show]:not([style*=\'display: none\'])')"
+                    class="py-8 text-center text-xs font-bold text-[#2F3E5C]/40"
+                >
+                    No hay registros que coincidan con el filtro seleccionado.
+                </p>
+            </div>
+
+            {{-- Nota de capacidad --}}
+            @if($bitacoraLista->count() >= 60)
+                <p class="mt-4 text-center text-[10px] font-bold text-[#2F3E5C]/40">
+                    <i class="ph-bold ph-info mr-0.5"></i>
+                    Mostrando los 60 registros más recientes. El historial completo está preservado en la base de datos.
+                </p>
+            @endif
+        @endif
+    </section>
+</section>
+            
+
+        {{-- MODALES FULL SCREEN PREPARADOS --}}
+        <template x-if="modal">
+            <div class="fixed inset-0 z-50 flex items-center justify-center bg-[#2F3E5C]/45 p-4 backdrop-blur-sm" x-transition.opacity>
+                <div class="relative w-full max-w-4xl rounded-2xl border border-[#C7B5A3] bg-[#E6DDD3] shadow-[0_24px_60px_rgba(47,62,92,0.35)]">
+                    <div class="flex items-center justify-between border-b border-[#C7B5A3] p-5">
+                        <div>
+                            <p class="text-[11px] font-black uppercase tracking-widest text-[#E27D60]">
+                                Acción rápida · {{ $nombreCompleto ?: 'Adulto mayor' }}
+                            </p>
+                            <h2 class="text-xl font-black text-[#2F3E5C]"
+                                x-text="{
+                                    familiar: (isViewing ? 'Ver ' : (isEditing ? 'Editar ' : 'Vincular ')) + 'familiar',
+                                    observacion: (isViewing ? 'Ver ' : (isEditing ? 'Editar ' : 'Registrar ')) + 'observación',
+                                    atencion: (isViewing ? 'Ver ' : (isEditing ? 'Editar ' : 'Registrar ')) + 'atención',
+                                    evaluacion: (isViewing ? 'Ver ' : (isEditing ? 'Editar ' : 'Registrar ')) + 'evaluación cognitiva',
+                                    actividad: (isViewing ? 'Ver ' : (isEditing ? 'Editar ' : 'Registrar ')) + 'actividad',
+                                    documento: (isViewing ? 'Ver ' : (isEditing ? 'Editar ' : 'Subir ')) + 'documento',
+                                    voluntario: (isViewing ? 'Ver ' : (isEditing ? 'Editar ' : 'Asignar ')) + 'voluntario'
+                                }[modal]">
+                            </h2>
+                        </div>
+
+                        <button type="button"
+                                @click="cerrar()"
+                                class="flex h-10 w-10 items-center justify-center rounded-xl bg-[#D5C7B9] text-[#2F3E5C] transition hover:bg-[#2F3E5C] hover:text-white active:scale-95">
+                            <i class="ph-bold ph-x"></i>
+                        </button>
+                    </div>
+
+                    <div class="max-h-[72vh] overflow-y-auto p-5">
+                        {{-- Mensajes de Error de Validación --}}
+                        @if($errors->any())
+                            <div class="mb-4 rounded-xl border border-terracota/30 bg-terracota/10 p-4">
+                                <p class="mb-2 text-xs font-black uppercase tracking-widest text-terracota">
+                                    <i class="ph-bold ph-warning-circle mr-1"></i> Errores de validación
+                                </p>
+                                <ul class="list-inside list-disc text-xs font-bold text-terracota/80">
+                                    @foreach($errors->all() as $error)
+                                        <li>{{ $error }}</li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        @endif
+
+
+                        {{-- Familiar --}}
+                        <form id="form-familiar" method="POST" :action="isEditing ? `{{ route('admin.adultos-mayores.familiares.update', [$idAdulto, 'ID']) }}`.replace('ID', recordData.cod_fam) : `{{ route('admin.adultos-mayores.familiares.store', $idAdulto) }}`" x-show="modal === 'familiar'" class="grid gap-4 md:grid-cols-2" onsubmit="procesarFormulario(event)">
+                            @csrf
+                            <input type="hidden" name="_method" :value="isEditing ? 'PATCH' : 'POST'">
+                            <input type="hidden" name="estado" value="ACTIVO">
+                            <div class="md:col-span-2">
+                                <label class="mb-1 block text-[10px] font-black uppercase text-[#2F3E5C]/60">Nombre completo del Familiar</label>
+                                <input name="nombre_nuevo" :value="recordData.usuario?.name || recordData.nombres || ''" :disabled="isViewing" required class="w-full rounded-xl border {{ $errors->has('nombre_nuevo') ? 'border-terracota bg-terracota/5' : 'border-[#C7B5A3] bg-[#D5C7B9]/70' }} px-4 py-3 text-sm font-bold outline-none focus:border-[#E27D60]" placeholder="Ej. Juan Pérez">
+                                @error('nombre_nuevo') <span class="mt-1 block text-xs font-black text-terracota">{{ $message }}</span> @enderror
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="mb-1 block text-[10px] font-black uppercase text-[#2F3E5C]/60">Correo Electrónico (Opcional)</label>
+                                <input name="email_nuevo" type="email" :value="recordData.usuario?.email || recordData.email || ''" :disabled="isViewing" class="w-full rounded-xl border {{ $errors->has('email_nuevo') ? 'border-terracota bg-terracota/5' : 'border-[#C7B5A3] bg-[#D5C7B9]/70' }} px-4 py-3 text-sm font-bold outline-none focus:border-[#E27D60]" placeholder="ejemplo@correo.com">
+                                @error('email_nuevo') <span class="mt-1 block text-xs font-black text-terracota">{{ $message }}</span> @enderror
+                            </div>
+                            <div>
+                                <label class="mb-1 block text-[10px] font-black uppercase text-[#2F3E5C]/60">Parentesco</label>
+                                <select name="parentesco_vinculo" :value="recordData.pivot?.parentesco_vinculo || recordData.parentesco_vinculo || ''" :disabled="isViewing" required class="w-full rounded-xl border {{ $errors->has('parentesco_vinculo') ? 'border-terracota bg-terracota/5' : 'border-[#C7B5A3] bg-[#D5C7B9]/70' }} px-4 py-3 text-sm font-bold outline-none focus:border-[#E27D60]">
+                                    <option value="">Seleccione parentesco</option>
+                                    <option value="Hijo/a">Hijo/a</option>
+                                    <option value="Conyuge">Cónyuge</option>
+                                    <option value="Hermano/a">Hermano/a</option>
+                                    <option value="Nieto/a">Nieto/a</option>
+                                    <option value="Sobrino/a">Sobrino/a</option>
+                                    <option value="Tutor Legal">Tutor Legal</option>
+                                    <option value="Otro">Otro</option>
+                                </select>
+                                @error('parentesco_vinculo') <span class="mt-1 block text-xs font-black text-terracota">{{ $message }}</span> @enderror
+                            </div>
+                            <div>
+                                <label class="mb-1 block text-[10px] font-black uppercase text-[#2F3E5C]/60">Nivel de Responsabilidad</label>
+                                <select name="es_responsable" :value="recordData.pivot?.es_responsable ? '1' : '0'" :disabled="isViewing" required class="w-full rounded-xl border {{ $errors->has('es_responsable') ? 'border-terracota bg-terracota/5' : 'border-[#C7B5A3] bg-[#D5C7B9]/70' }} px-4 py-3 text-sm font-bold outline-none focus:border-[#E27D60]">
+                                    <option value="0">Contacto referencial</option>
+                                    <option value="1">Responsable principal (Firma autorizado)</option>
+                                </select>
+                                @error('es_responsable') <span class="mt-1 block text-xs font-black text-terracota">{{ $message }}</span> @enderror
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="mb-1 block text-[10px] font-black uppercase text-[#2F3E5C]/60">Observaciones del vínculo / Horarios de visita</label>
+                                <textarea name="observaciones" :value="recordData.pivot?.observaciones || recordData.observaciones || ''" :disabled="isViewing" class="w-full rounded-xl border {{ $errors->has('observaciones') ? 'border-terracota bg-terracota/5' : 'border-[#C7B5A3] bg-[#D5C7B9]/70' }} px-4 py-3 text-sm font-bold outline-none focus:border-[#E27D60]" rows="3" placeholder="Restricciones de visita, observaciones médicas que el familiar deba conocer, etc."></textarea>
+                                @error('observaciones') <span class="mt-1 block text-xs font-black text-terracota">{{ $message }}</span> @enderror
+                            </div>
+                            <!-- Botón removido por estar duplicado en el footer del modal -->
+                        </form>
+
+                        {{-- Observación --}}
+                        <form id="form-observacion" method="POST" :action="isEditing ? `{{ route('admin.adultos-mayores.observaciones.update', [$idAdulto, 'ID']) }}`.replace('ID', recordData.cod_obs_adul) : `{{ route('admin.adultos-mayores.observaciones.store', $idAdulto) }}`" x-show="modal === 'observacion'" class="grid gap-4 md:grid-cols-2" onsubmit="procesarFormulario(event)">
+                            @csrf
+                            <input type="hidden" name="_method" :value="isEditing ? 'PATCH' : 'POST'">
+                            <div>
+                                <label class="mb-1 block text-[10px] font-black uppercase text-[#2F3E5C]/60">Fecha de Observación</label>
+                                <input type="date" name="fecha" :value="recordData.fecha?.split(' ')[0] || '{{ now()->format('Y-m-d') }}'" :disabled="isViewing" required class="w-full rounded-xl border border-[#C7B5A3] bg-[#D5C7B9]/70 px-4 py-3 text-sm font-bold outline-none focus:border-[#E27D60]">
+                            </div>
+                            <div>
+                                <label class="mb-1 block text-[10px] font-black uppercase text-[#2F3E5C]/60">Tipo de Seguimiento</label>
+                                <select name="tipo_obs" :value="recordData.tipo_obs || ''" :disabled="isViewing" required class="w-full rounded-xl border border-[#C7B5A3] bg-[#D5C7B9]/70 px-4 py-3 text-sm font-bold outline-none focus:border-[#E27D60]">
+                                    <option value="">Clasificación</option>
+                                    <option value="Conductual">Comportamiento / Conductual</option>
+                                    <option value="Emocional">Estado de ánimo / Emocional</option>
+                                    <option value="Cognitiva">Estado Cognitivo</option>
+                                    <option value="Salud General">Salud General / Física</option>
+                                    <option value="Alimentación">Nutrición / Alimentación</option>
+                                    <option value="Administrativa">Administrativa / Pagos</option>
+                                </select>
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="mb-1 block text-[10px] font-black uppercase text-[#2F3E5C]/60">Estado Institucional (Se actualizará en la ficha)</label>
+                                <select name="cod_est_adul" :value="recordData.cod_est_adul || '{{ $adulto->cod_est_adul }}'" :disabled="isViewing" required class="w-full rounded-xl border border-[#C7B5A3] bg-[#D5C7B9]/70 px-4 py-3 text-sm font-bold outline-none focus:border-[#E27D60]">
+                                    <option value="">Confirmar Estado Actual</option>
+                                    @php /** @var object $estadoObj */ @endphp
+                                    @foreach($estadosAdulto ?? [] as $estadoObj)
+                                        <option value="{{ $estadoObj->cod_est_adul }}" @selected($adulto->cod_est_adul == $estadoObj->cod_est_adul)>{{ $estadoObj->estado }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="mb-1 block text-[10px] font-black uppercase text-[#2F3E5C]/60">Descripción Detallada</label>
+                                <textarea name="descripcion" :value="recordData.descripcion || ''" :disabled="isViewing" required class="w-full rounded-xl border border-[#C7B5A3] bg-[#D5C7B9]/70 px-4 py-3 text-sm font-bold outline-none focus:border-[#E27D60]" rows="4" placeholder="Describa de manera profesional el incidente, síntoma o evento observado en el turno..."></textarea>
+                            </div>
+                            <!-- Botón removido por estar duplicado en el footer del modal -->
+                        </form>
+
+                        {{-- Atención --}}
+                        <form
+                            id="form-atencion"
+                            method="POST"
+                            :action="isEditing ? `{{ route('admin.adultos-mayores.atenciones.update', [$idAdulto, 'ID']) }}`.replace('ID', recordData.cod_aten_adul) : `{{ route('admin.adultos-mayores.atenciones.store', $idAdulto) }}`"
+                            x-show="modal === 'atencion'"
+                            class="space-y-4"
+                            onsubmit="procesarFormulario(event)"
+                        >
+                            @csrf
+                            <input type="hidden" name="_method" :value="isEditing ? 'PATCH' : 'POST'">
+
+                            {{-- Descripción del formulario --}}
+                            <div class="rounded-xl bg-[#D5C7B9]/60 border border-[#C7B5A3] p-3 text-xs font-bold leading-5 text-azul-profundo/70">
+                                <i class="ph-fill ph-stethoscope mr-1 text-terracota"></i>
+                                Registra una atención institucional realizada al adulto mayor. Este registro forma parte del seguimiento histórico clínico y administrativo.
+                            </div>
+
+                            <div class="grid gap-4 md:grid-cols-2">
+                                {{-- Fecha --}}
+                                <div>
+                                    <label class="mb-1 block text-[10px] font-black uppercase tracking-widest text-[#2F3E5C]/60">
+                                        Fecha de Atención *
+                                    </label>
+                                    <input
+                                        type="date"
+                                        name="fecha"
+                                        :value="recordData.fecha?.split(' ')[0] || '{{ now()->format('Y-m-d') }}'"
+                                        :disabled="isViewing"
+                                        class="w-full rounded-xl border {{ $errors->has('fecha') ? 'border-terracota bg-terracota/5' : 'border-[#C7B5A3]' }} bg-[#D5C7B9]/70 px-4 py-2.5 text-sm font-bold text-[#2F3E5C] outline-none transition focus:border-[#E27D60] focus:bg-[#E6DDD3] focus:ring-4 focus:ring-[#E27D60]/10"
+                                    >
+                                    @error('fecha')
+                                        <span class="mt-1 flex items-center gap-1 text-xs font-black text-terracota">
+                                            <i class="ph-bold ph-warning-circle"></i> {{ $message }}
+                                        </span>
+                                    @enderror
+                                </div>
+
+                                {{-- Hora --}}
+                                <div>
+                                    <label class="mb-1 block text-[10px] font-black uppercase tracking-widest text-[#2F3E5C]/60">
+                                        Hora de Atención *
+                                    </label>
+                                    <input
+                                        type="time"
+                                        name="hora"
+                                        :value="recordData.hora || '{{ now()->format('H:i') }}'"
+                                        :disabled="isViewing"
+                                        class="w-full rounded-xl border {{ $errors->has('hora') ? 'border-terracota bg-terracota/5' : 'border-[#C7B5A3]' }} bg-[#D5C7B9]/70 px-4 py-2.5 text-sm font-bold text-[#2F3E5C] outline-none transition focus:border-[#E27D60] focus:bg-[#E6DDD3] focus:ring-4 focus:ring-[#E27D60]/10"
+                                    >
+                                    @error('hora')
+                                        <span class="mt-1 flex items-center gap-1 text-xs font-black text-terracota">
+                                            <i class="ph-bold ph-warning-circle"></i> {{ $message }}
+                                        </span>
+                                    @enderror
+                                </div>
+
+                                {{-- Tipo de Atención --}}
+                                <div>
+                                    <label class="mb-1 block text-[10px] font-black uppercase tracking-widest text-[#2F3E5C]/60">
+                                        Tipo de Atención *
+                                    </label>
+                                    @php
+                                        $tiposAtencionesLista = isset($tiposAtenciones) && is_iterable($tiposAtenciones)
+                                            ? collect($tiposAtenciones)
+                                            : collect();
+                                    @endphp
+
+                                    @if($tiposAtencionesLista->isEmpty())
+                                        <div class="rounded-xl border border-[#D9A27C]/40 bg-[#D9A27C]/10 p-3 text-xs font-bold text-[#B07446]">
+                                            <i class="ph-bold ph-warning-circle mr-1"></i>
+                                            No existen tipos de atención registrados. Contacte al administrador del sistema.
+                                        </div>
+                                    @else
+                                        <select
+                                            name="cod_tipo_aten"
+                                            :value="recordData.cod_tipo_aten || ''"
+                                            :disabled="isViewing"
+                                            class="w-full rounded-xl border {{ $errors->has('cod_tipo_aten') ? 'border-terracota bg-terracota/5' : 'border-[#C7B5A3]' }} bg-[#D5C7B9]/70 px-4 py-2.5 text-sm font-bold text-[#2F3E5C] outline-none transition focus:border-[#E27D60] focus:bg-[#E6DDD3] focus:ring-4 focus:ring-[#E27D60]/10"
+                                        >
+                                            <option value="">Seleccionar tipo...</option>
+                                            @foreach($tiposAtencionesLista as $tipo)
+                                                <option
+                                                    value="{{ $tipo->cod_tipo_aten }}"
+                                                    @selected(old('cod_tipo_aten') == $tipo->cod_tipo_aten)
+                                                >
+                                                    {{ $tipo->tipo }}
+                                                    @if($tipo->descripcion) — {{ Str::limit($tipo->descripcion, 40) }} @endif
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    @endif
+                                    @error('cod_tipo_aten')
+                                        <span class="mt-1 flex items-center gap-1 text-xs font-black text-terracota">
+                                            <i class="ph-bold ph-warning-circle"></i> {{ $message }}
+                                        </span>
+                                    @enderror
+                                </div>
+
+                                {{-- Estado --}}
+                                <div>
+                                    <label class="mb-1 block text-[10px] font-black uppercase tracking-widest text-[#2F3E5C]/60">
+                                        Estado *
+                                    </label>
+                                    <select
+                                        name="estado"
+                                        :value="recordData.estado || ''"
+                                        :disabled="isViewing"
+                                        class="w-full rounded-xl border {{ $errors->has('estado') ? 'border-terracota bg-terracota/5' : 'border-[#C7B5A3]' }} bg-[#D5C7B9]/70 px-4 py-2.5 text-sm font-bold text-[#2F3E5C] outline-none transition focus:border-[#E27D60] focus:bg-[#E6DDD3] focus:ring-4 focus:ring-[#E27D60]/10"
+                                    >
+                                        <option value="">Seleccionar estado...</option>
+                                        <option value="PENDIENTE"  @selected(old('estado') === 'PENDIENTE')>Pendiente</option>
+                                        <option value="REALIZADA"  @selected(old('estado') === 'REALIZADA')>Realizada</option>
+                                        <option value="FINALIZADA" @selected(old('estado') === 'FINALIZADA')>Finalizada</option>
+                                        <option value="CANCELADA"  @selected(old('estado') === 'CANCELADA')>Cancelada</option>
+                                    </select>
+                                    @error('estado')
+                                        <span class="mt-1 flex items-center gap-1 text-xs font-black text-terracota">
+                                            <i class="ph-bold ph-warning-circle"></i> {{ $message }}
+                                        </span>
+                                    @enderror
+                                </div>
+
+                                {{-- Observaciones / Notas --}}
+                                <div
+                                    class="md:col-span-2"
+                                    x-data="{ obs: '{{ old('obs') }}' }"
+                                >
+                                    <div class="mb-1 flex items-center justify-between">
+                                        <label class="block text-[10px] font-black uppercase tracking-widest text-[#2F3E5C]/60">
+                                            Observaciones Clínicas
+                                        </label>
+                                        <span class="text-[10px] font-bold text-[#2F3E5C]/45" x-text="obs.length + '/1000'"></span>
+                                    </div>
+                                    <textarea
+                                        name="obs"
+                                        rows="4"
+                                        x-model="obs"
+                                        :value="recordData.obs || ''"
+                                        :disabled="isViewing"
+                                        maxlength="1000"
+                                        placeholder="Diagnóstico preventivo, tratamiento indicado, medicación administrada, próximos controles..."
+                                        class="w-full resize-none rounded-xl border {{ $errors->has('obs') ? 'border-terracota bg-terracota/5' : 'border-[#C7B5A3]' }} bg-[#D5C7B9]/70 px-4 py-2.5 text-sm font-bold text-[#2F3E5C] outline-none transition placeholder:text-[#2F3E5C]/35 focus:border-[#E27D60] focus:bg-[#E6DDD3] focus:ring-4 focus:ring-[#E27D60]/10"
+                                    ></textarea>
+                                    @error('obs')
+                                        <span class="mt-1 flex items-center gap-1 text-xs font-black text-terracota">
+                                            <i class="ph-bold ph-warning-circle"></i> {{ $message }}
+                                        </span>
+                                    @enderror
+                                    <p class="mt-1 text-[10px] font-bold text-[#2F3E5C]/45">
+                                        Campo opcional. Use vocabulario clínico claro y objetivo.
+                                    </p>
+                                </div>
+                            </div>
+
+                            {{-- Botones de acción --}}
+                            <!-- Footer interno removido por estar duplicado con el footer principal del modal -->
+                        </form>
+
+                        {{-- Evaluación Cognitiva --}}
+                        <form id="form-evaluacion" method="POST" action="{{ route('admin.adultos-mayores.evaluaciones.store', $idAdulto) }}" x-show="modal === 'evaluacion'" class="grid gap-4 md:grid-cols-2" onsubmit="procesarFormulario(event)">
+                            @csrf
+                            <input type="hidden" name="_method" :value="isEditing ? 'PATCH' : 'POST'">
+                            <div>
+                                <label class="mb-1 block text-[10px] font-black uppercase text-[#2F3E5C]/60">Tipo de Evaluación</label>
+                                <select name="cod_tipo_eval" :value="recordData.cod_tipo_eval || ''" :disabled="isViewing || isEditing" required class="w-full rounded-xl border border-[#C7B5A3] bg-[#D5C7B9]/70 px-4 py-3 text-sm font-bold outline-none focus:border-[#E27D60]">
+                                    <option value="">Seleccione prueba</option>
+                                    @foreach($tiposEvaluaciones as $tipo)
+                                        <option value="{{ $tipo->cod_tipo_eval }}">{{ $tipo->nombre }} (Máx: {{ $tipo->puntaje_maximo }})</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div>
+                                <label class="mb-1 block text-[10px] font-black uppercase text-[#2F3E5C]/60">Puntaje Obtenido (0-30)</label>
+                                <input type="number" name="puntaje_total" :value="recordData.puntaje_total || ''" :disabled="isViewing || isEditing" min="0" max="30" step="1" required class="w-full rounded-xl border border-[#C7B5A3] bg-[#D5C7B9]/70 px-4 py-3 text-sm font-bold outline-none focus:border-[#E27D60]" placeholder="Ej. 26">
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="mb-1 block text-[10px] font-black uppercase text-[#2F3E5C]/60">Fecha de Aplicación</label>
+                                <input type="date" name="fecha_eval" :value="recordData.fecha_eval?.split(' ')[0] || '{{ now()->format('Y-m-d') }}'" :disabled="isViewing || isEditing" required class="w-full rounded-xl border border-[#C7B5A3] bg-[#D5C7B9]/70 px-4 py-3 text-sm font-bold outline-none focus:border-[#E27D60]">
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="mb-1 block text-[10px] font-black uppercase text-[#2F3E5C]/60">Observaciones y Hallazgos</label>
+                                <textarea name="observaciones" :value="recordData.observaciones || ''" :disabled="isViewing || isEditing" class="w-full rounded-xl border border-[#C7B5A3] bg-[#D5C7B9]/70 px-4 py-3 text-sm font-bold outline-none focus:border-[#E27D60]" rows="4" placeholder="Detalle fallos en subpruebas específicas (ej. memoria, orientación, dibujo)..."></textarea>
+                            </div>
+                        </form>
+
+                        {{-- Actividad --}}
+                        <form id="form-actividad" method="POST" :action="isEditing ? `{{ route('admin.adultos-mayores.actividades.update', [$idAdulto, 'ID']) }}`.replace('ID', recordData.cod_act_adul) : `{{ route('admin.adultos-mayores.actividades.store', $idAdulto) }}`" x-show="modal === 'actividad'" class="grid gap-4 md:grid-cols-2" onsubmit="procesarFormulario(event)">
+                            @csrf
+                            <input type="hidden" name="_method" :value="isEditing ? 'PATCH' : 'POST'">
+                            <div>
+                                <label class="mb-1 block text-[10px] font-black uppercase text-[#2F3E5C]/60">Fecha y Hora</label>
+                                <div class="flex gap-2">
+                                    <input type="date" name="fecha" :value="recordData.fecha?.split(' ')[0] || '{{ now()->format('Y-m-d') }}'" :disabled="isViewing || isEditing" required class="w-2/3 rounded-xl border border-[#C7B5A3] bg-[#D5C7B9]/70 px-4 py-3 text-sm font-bold outline-none focus:border-[#E27D60]">
+                                    <input type="time" name="hora" :value="recordData.hora || '{{ now()->format('H:i') }}'" :disabled="isViewing || isEditing" required class="w-1/3 rounded-xl border border-[#C7B5A3] bg-[#D5C7B9]/70 px-4 py-3 text-sm font-bold outline-none focus:border-[#E27D60]">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="mb-1 block text-[10px] font-black uppercase text-[#2F3E5C]/60">Área Terapéutica / Actividad</label>
+                                <select name="cod_tipo_act" :value="recordData.cod_tipo_act || ''" :disabled="isViewing || isEditing" required class="w-full rounded-xl border border-[#C7B5A3] bg-[#D5C7B9]/70 px-4 py-3 text-sm font-bold outline-none focus:border-[#E27D60]">
+                                    <option value="">Seleccione terapia</option>
+                                    @foreach($tiposActividades as $tipoAct)
+                                        <option value="{{ $tipoAct->cod_tipo_act }}">{{ $tipoAct->tipo }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div>
+                                <label class="mb-1 block text-[10px] font-black uppercase text-[#2F3E5C]/60">Estado de Participación</label>
+                                <select name="estado" :value="recordData.estado || 'REALIZADA'" :disabled="isViewing" required class="w-full rounded-xl border border-[#C7B5A3] bg-[#D5C7B9]/70 px-4 py-3 text-sm font-bold outline-none focus:border-[#E27D60]">
+                                    <option value="REALIZADA">Realizada</option>
+                                    <option value="PENDIENTE">Pendiente</option>
+                                    <option value="CANCELADA">Cancelada</option>
+                                </select>
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="mb-1 block text-[10px] font-black uppercase text-[#2F3E5C]/60">Desempeño y Logros (Observaciones)</label>
+                                <textarea name="obs" :value="recordData.obs || ''" :disabled="isViewing" class="w-full rounded-xl border border-[#C7B5A3] bg-[#D5C7B9]/70 px-4 py-3 text-sm font-bold outline-none focus:border-[#E27D60]" rows="3" placeholder="Describa el comportamiento durante la sesión, avances cognitivos o motores..."></textarea>
+                            </div>
+                        </form>
+
+                        {{-- Documento --}}
+                        <form id="form-documento" method="POST" :action="isEditing ? `{{ route('admin.adultos-mayores.documentos.update', [$idAdulto, 'ID']) }}`.replace('ID', recordData.cod_doc_am) : `{{ route('admin.adultos-mayores.documentos.store', $idAdulto) }}`" enctype="multipart/form-data" x-show="modal === 'documento'" class="grid gap-4 md:grid-cols-2" onsubmit="procesarFormulario(event)">
+                            @csrf
+                            <input type="hidden" name="_method" :value="isEditing ? 'PATCH' : 'POST'">
+                            <div class="md:col-span-2">
+                                <label class="mb-1 block text-[10px] font-black uppercase text-[#2F3E5C]/60">Título del Documento</label>
+                                <input name="nom_doc" :value="recordData.nom_doc || ''" :disabled="isViewing" required class="w-full rounded-xl border border-[#C7B5A3] bg-[#D5C7B9]/70 px-4 py-3 text-sm font-bold outline-none focus:border-[#E27D60]" placeholder="Ej. Resultados de laboratorio completo">
+                            </div>
+                            <div>
+                                <label class="mb-1 block text-[10px] font-black uppercase text-[#2F3E5C]/60">Categoría del Expediente</label>
+                                <select name="tipo_doc" :value="recordData.tipo_doc || ''" :disabled="isViewing" required class="w-full rounded-xl border border-[#C7B5A3] bg-[#D5C7B9]/70 px-4 py-3 text-sm font-bold outline-none focus:border-[#E27D60]">
+                                    <option value="">Seleccione categoría</option>
+                                    <option value="Historial Médico">Historial Médico / Epicrisis</option>
+                                    <option value="Exámenes">Exámenes y Laboratorios</option>
+                                    <option value="Recetas">Recetas Médicas</option>
+                                    <option value="Administrativo">Contrato Administrativo</option>
+                                    <option value="Legal">Documentación Legal / CI</option>
+                                    <option value="Consentimiento">Consentimiento Informado</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="mb-1 block text-[10px] font-black uppercase text-[#2F3E5C]/60">Fecha del Documento</label>
+                                <input type="date" name="fecha_doc" :value="recordData.fecha_doc?.split(' ')[0] || '{{ now()->format('Y-m-d') }}'" :disabled="isViewing" required class="w-full rounded-xl border border-[#C7B5A3] bg-[#D5C7B9]/70 px-4 py-3 text-sm font-bold outline-none focus:border-[#E27D60]">
+                            </div>
+                            <div class="md:col-span-2" x-show="!isEditing && !isViewing">
+                                <label class="mb-1 block text-[10px] font-black uppercase text-[#2F3E5C]/60">Archivo (PDF, JPG, PNG)</label>
+                                <input type="file" name="archivo" :required="!isEditing && !isViewing" class="w-full rounded-xl border border-[#C7B5A3] bg-[#D5C7B9]/70 px-4 py-2.5 text-sm font-bold text-[#2F3E5C] outline-none file:mr-4 file:rounded-lg file:border-0 file:bg-[#2F3E5C] file:px-3 file:py-1.5 file:text-xs file:font-black file:text-white hover:file:bg-[#5B5F97]">
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="mb-1 block text-[10px] font-black uppercase text-[#2F3E5C]/60">Observaciones adicionales (Opcional)</label>
+                                <textarea name="observaciones" :value="recordData.observaciones || ''" :disabled="isViewing" class="w-full rounded-xl border border-[#C7B5A3] bg-[#D5C7B9]/70 px-4 py-3 text-sm font-bold outline-none focus:border-[#E27D60]" rows="2" placeholder="Ej. El familiar entregó los originales al administrador..."></textarea>
+                            </div>
+                            <!-- Botón removido por estar duplicado en el footer del modal -->
+                        </form>
+
+                        {{-- Voluntario --}}
+                        <form method="POST" action="#" x-show="modal === 'voluntario'" class="grid gap-4 md:grid-cols-2">
+                            @csrf
+                            <div class="md:col-span-2">
+                                <p class="text-xs text-red-500 font-bold mb-2"><i class="ph-bold ph-warning"></i> En desarrollo: Módulo de voluntarios no conectado.</p>
+                            </div>
+                            <div>
+                                <label class="mb-1 block text-[10px] font-black uppercase text-[#2F3E5C]/60">Seleccionar Voluntario / Padrino</label>
+                                <select name="voluntario_id" disabled class="w-full rounded-xl border border-[#C7B5A3] bg-[#D5C7B9]/70 px-4 py-3 text-sm font-bold outline-none opacity-50">
+                                    <option>Sin voluntarios registrados</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="mb-1 block text-[10px] font-black uppercase text-[#2F3E5C]/60">Tipo de Asignación</label>
+                                <select name="tipo_asignacion" disabled class="w-full rounded-xl border border-[#C7B5A3] bg-[#D5C7B9]/70 px-4 py-3 text-sm font-bold outline-none opacity-50">
+                                    <option>Acompañamiento</option>
+                                    <option>Apoyo Económico</option>
+                                </select>
+                            </div>
+                            <div class="md:col-span-2 mt-2">
+                                <button type="button" disabled class="w-full rounded-xl bg-[#C7B5A3] px-4 py-3 text-sm font-black text-white cursor-not-allowed">Asignar Próximamente</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="flex flex-col-reverse gap-2 border-t border-[#C7B5A3] p-5 sm:flex-row sm:justify-end">
+                        <button type="button"
+                                @click="cerrar()"
+                                class="rounded-xl bg-[#D5C7B9] px-4 py-2.5 text-xs font-black text-[#2F3E5C] transition hover:bg-[#9A7B60] hover:text-white active:scale-95">
+                            Cancelar
+                        </button>
+
+                        {{-- Botones Dinámicos de Guardado --}}
+                        <button type="submit" form="form-familiar" x-show="modal === 'familiar' && !isViewing" class="rounded-xl bg-[#E27D60] px-4 py-2.5 text-xs font-black text-white transition hover:bg-[#D96F58] active:scale-95" x-text="isEditing ? 'Actualizar Familiar' : 'Vincular Familiar'"></button>
+                        <button type="submit" form="form-observacion" x-show="modal === 'observacion' && !isViewing" class="rounded-xl bg-[#E27D60] px-4 py-2.5 text-xs font-black text-white transition hover:bg-[#D96F58] active:scale-95" x-text="isEditing ? 'Actualizar Observación' : 'Guardar Observación'"></button>
+                        <button type="submit" form="form-atencion" x-show="modal === 'atencion' && !isViewing" class="rounded-xl bg-[#E27D60] px-4 py-2.5 text-xs font-black text-white transition hover:bg-[#D96F58] active:scale-95" x-text="isEditing ? 'Actualizar Atención' : 'Guardar Atención'"></button>
+                        <button type="submit" form="form-evaluacion" x-show="modal === 'evaluacion' && !isViewing" class="rounded-xl bg-[#E27D60] px-4 py-2.5 text-xs font-black text-white transition hover:bg-[#D96F58] active:scale-95">Guardar Evaluación</button>
+                        <button type="submit" form="form-actividad" x-show="modal === 'actividad' && !isViewing" class="rounded-xl bg-[#E27D60] px-4 py-2.5 text-xs font-black text-white transition hover:bg-[#D96F58] active:scale-95" x-text="isEditing ? 'Actualizar Actividad' : 'Guardar Actividad'"></button>
+                        <button type="submit" form="form-documento" x-show="modal === 'documento' && !isViewing" class="rounded-xl bg-[#E27D60] px-4 py-2.5 text-xs font-black text-white transition hover:bg-[#D96F58] active:scale-95" x-text="isEditing ? 'Actualizar Metadatos' : 'Subir Documento'"></button>
+                    </div>
+                </div>
+            </div>
+        </template>
+    </div>
+</x-app-layout>

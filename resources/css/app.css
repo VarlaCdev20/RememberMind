@@ -1,0 +1,56 @@
+@import '@fontsource/inter/400.css';
+@import '@fontsource/inter/500.css';
+@import '@fontsource/inter/700.css';
+@import '@fontsource/outfit/400.css';
+@import '@fontsource/outfit/700.css';
+@import '@fontsource/outfit/800.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+    scroll-behavior: smooth;
+}
+
+[x-cloak] {
+    display: none !important;
+}
+
+@layer utilities {
+    .glow-terracota {
+        box-shadow: 0 0 15px rgba(233, 122, 95, 0.4);
+    }
+    .glow-terracota:hover {
+        box-shadow: 0 0 25px rgba(233, 122, 95, 0.6);
+    }
+    
+    /* Efecto de Luz de Mouse - Más elegante y sutil */
+    .mouse-light {
+        pointer-events: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        z-index: 40;
+        background: radial-gradient(
+            200px circle at var(--mouse-x) var(--mouse-y),
+            rgba(233, 122, 95, 0.12),
+            transparent 60%
+        );
+        mix-blend-mode: multiply;
+        will-change: background;
+    }
+}
+
+@layer components {
+    .nav-welcome-link {
+        @apply relative inline-flex items-center gap-2 rounded-full px-4 py-2.5 text-sm font-extrabold text-azul-profundo/85 transition-all duration-300 hover:-translate-y-0.5 hover:bg-white/65 hover:text-terracota;
+    }
+
+    .mobile-welcome-link {
+        @apply flex items-center gap-4 rounded-2xl bg-[#E6DDD3] px-4 py-3.5 text-lg font-extrabold text-azul-profundo transition-all duration-300 hover:bg-white hover:text-terracota hover:shadow-lg active:scale-[0.98];
+    }
+}
+

@@ -1,0 +1,76 @@
+<?php
+
+namespace App\Http\Controllers\Admin\AdultosMayores;
+
+use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\AdultosMayores\StoreDocumentoAdultoRequest;
+use App\Models\AdultoMayor;
+use App\Models\DocumentoAdultoMayor;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+
+class AdultoMayorDocumentoController extends Controller
+{
+    public function store(StoreDocumentoAdultoRequest $request, AdultoMayor $adulto_mayor)
+    {
+        $data = $request->validated();
+
+        if ($request->hasFile('archivo')) {
+            $file = $request->file('archivo');
+            $path = $file->store('documentos/adultos-mayores', 'public');
+            $data['ruta_archivo'] = $path;
+            $data['extension'] = $file->getClientOriginalExtension();
+        }
+
+        $adulto_mayor->documentos()->create($data);
+
+        activity('Adulto Mayor')
+            ->performedOn($adulto_mayor)
+            ->log("Se subió un documento para el adulto mayor: {$adulto_mayor->nombres}");
+
+        return redirect()->route('admin.adultos-mayores.show', ['adulto_mayor' => $adulto_mayor->cod_am, 'tab' => 'documentos'])->with('success', 'Documento subido correctamente.');
+    }
+
+    public function update(Request $request, AdultoMayor $adulto_mayor, $documento)
+    {
+        $doc = $adulto_mayor->documentos()->findOrFail($documento);
+        
+        $request->validate([
+            'nom_doc' => 'required|string|max:255',
+            'tipo_doc' => 'required|string',
+            'observaciones' => 'nullable|string',
+        ]);
+
+        $doc->update($request->only(['nom_doc', 'tipo_doc', 'observaciones']));
+
+        return redirect()->route('admin.adultos-mayores.show', ['adulto_mayor' => $adulto_mayor->cod_am, 'tab' => 'documentos'])->with('success', 'Metadatos del documento actualizados.');
+    }
+
+    public function destroy(AdultoMayor $adulto_mayor, $documento)
+    {
+        $doc = $adulto_mayor->documentos()->findOrFail($documento);
+        
+        // No eliminamos el archivo físico para permitir restauración (Soft Delete)
+        $doc->delete();
+
+        activity('Adulto Mayor')
+            ->performedOn($adulto_mayor)
+            ->log("Se archivó un documento (baja lógica) de la ficha {$adulto_mayor->cod_am}. Se conserva archivo físico.");
+
+        return redirect()->route('admin.adultos-mayores.show', ['adulto_mayor' => $adulto_mayor->cod_am, 'tab' => 'documentos'])->with('success', 'Documento archivado correctamente.');
+    }
+
+    public function restore(AdultoMayor $adulto_mayor, $id)
+    {
+        $doc = DocumentoAdultoMayor::withTrashed()->findOrFail($id);
+        $doc->restore();
+
+        activity('Adulto Mayor')
+            ->performedOn($adulto_mayor)
+            ->withProperties(['cod_doc' => $id])
+            ->log("Se restauró un documento previamente archivado.");
+
+        return redirect()->route('admin.adultos-mayores.show', ['adulto_mayor' => $adulto_mayor->cod_am, 'tab' => 'documentos'])
+            ->with('success', 'Documento restaurado correctamente.');
+    }
+}
