@@ -27,6 +27,7 @@ class RolesAndPermissionsSeeder extends Seeder
             'areas.crear',
             'areas.editar',
             'areas.cambiar_estado',
+            'areas.reportes',
             'turnos.ver',
             'turnos.crear',
             'turnos.editar',
@@ -124,6 +125,8 @@ class RolesAndPermissionsSeeder extends Seeder
         // PERSONAL ADMIN
         $rolePersonalAdmin->syncPermissions([
             'usuarios.ver',
+            'areas.ver',
+            'areas.reportes',
             'adultos.ver',
             'adultos.crear',
             'adultos.editar',
@@ -155,6 +158,7 @@ class RolesAndPermissionsSeeder extends Seeder
 
         // PERSONAL SALUD
         $rolePersonalSalud->syncPermissions([
+            'areas.ver',
             'adultos.ver',
             'adultos.ver_expediente',
             'salud.ver',

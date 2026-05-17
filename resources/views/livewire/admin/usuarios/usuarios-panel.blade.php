@@ -116,7 +116,7 @@
     {{-- FILTROS COMPACTOS --}}
 <section class="mb-5 rounded-[1.35rem] bg-[#E6DDD3]/55 px-4 py-3 shadow-[0_12px_28px_rgba(47,62,92,0.11)] backdrop-blur-md">
     <div class="grid items-end gap-3 xl:grid-cols-12">
-        <div class="xl:col-span-4">
+        <div class="xl:col-span-3">
             <label class="mb-1 block text-[9px] font-black uppercase tracking-[0.18em] text-[#2F3E5C]/45">
                 Buscar
             </label>
@@ -133,7 +133,7 @@
             </div>
         </div>
 
-        <div class="xl:col-span-3">
+        <div class="xl:col-span-2">
             <label class="mb-1 block text-[9px] font-black uppercase tracking-[0.18em] text-[#2F3E5C]/45">
                 Rol
             </label>
@@ -143,6 +143,20 @@
                 <option value="">Todos los roles</option>
                 @foreach($roles as $r)
                     <option value="{{ $r->name }}">{{ strtoupper(str_replace('_', ' ', $r->name)) }}</option>
+                @endforeach
+            </select>
+        </div>
+
+        <div class="xl:col-span-2">
+            <label class="mb-1 block text-[9px] font-black uppercase tracking-[0.18em] text-[#2F3E5C]/45">
+                Área
+            </label>
+
+            <select wire:model.defer="filtroArea"
+                    class="h-10 w-full rounded-xl border-0 bg-[#F4EEE7]/80 px-3 text-xs font-black text-[#2F3E5C] shadow-[inset_0_1px_0_rgba(255,255,255,0.45),0_4px_12px_rgba(47,62,92,0.04)] outline-none transition-all focus:bg-white focus:ring-2 focus:ring-[#E27D60]/18">
+                <option value="">Todas las áreas</option>
+                @foreach($areas as $ar)
+                    <option value="{{ $ar->cod_area }}">{{ $ar->nombre }}</option>
                 @endforeach
             </select>
         </div>
@@ -217,7 +231,7 @@
 
                         $inicial = mb_substr(trim($u->nombres ?? $nombreCompleto), 0, 1);
 
-                        $areaDisplay = match($roleKey) {
+                        $areaDisplay = $u->areaInstitucional?->nombre ?? match($roleKey) {
                             'super_admin', 'superadministrador', 'admin', 'administrador' => 'Administración del sistema',
                             'personal_salud' => 'Área de salud',
                             'personal_admin' => 'Área administrativa',
@@ -455,7 +469,7 @@
 
                                 $inicial = mb_substr(trim($u->nombres ?? $nombreCompleto), 0, 1);
 
-                                $areaDisplay = match($roleKey) {
+                                $areaDisplay = $u->areaInstitucional?->nombre ?? match($roleKey) {
                                     'super_admin', 'superadministrador', 'admin', 'administrador' => 'Administración del sistema',
                                     'personal_salud' => 'Área de salud',
                                     'personal_admin' => 'Área administrativa',
@@ -829,6 +843,45 @@
                             @error('rol') <span class="mt-1 block text-[9px] font-black text-[#E27D60] uppercase">{{ $message }}</span> @enderror
                         </div>
 
+                        <div class="md:col-span-2">
+                            <label class="mb-1 block text-[9px] font-black uppercase tracking-widest text-[#2F3E5C]/60">Área Institucional Operativa</label>
+                            <select wire:model="cod_area" class="w-full h-10 rounded-xl border {{ $errors->has('cod_area') ? 'border-[#E27D60]' : 'border-[#C7B5A3]' }} bg-white px-4 py-2 text-sm font-black text-[#2F3E5C] outline-none transition focus:border-[#2F3E5C]">
+                                <option value="">SELECCIONE ÁREA...</option>
+                                @foreach($areas as $ar)
+                                    @php
+                                        $esSugerida = false;
+                                        if ($rol === 'personal_salud' && str_contains(strtolower($ar->nombre), 'salud')) $esSugerida = true;
+                                        elseif ($rol === 'personal_admin' && str_contains(strtolower($ar->nombre), 'admin')) $esSugerida = true;
+                                        elseif (($rol === 'admin' || $rol === 'super_admin') && str_contains(strtolower($ar->nombre), 'admin')) $esSugerida = true;
+                                        elseif ($rol === 'voluntario' && str_contains(strtolower($ar->nombre), 'voluntariado')) $esSugerida = true;
+                                        elseif ($rol === 'familiar' && str_contains(strtolower($ar->nombre), 'social')) $esSugerida = true;
+                                    @endphp
+                                    <option value="{{ $ar->cod_area }}">
+                                        {{ $ar->nombre }} {{ $esSugerida ? '⭐ (Recomendada)' : '' }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            @error('cod_area') <span class="mt-1 block text-[9px] font-black text-[#E27D60] uppercase">{{ $message }}</span> @enderror
+
+                            @if($rol)
+                                @php
+                                    $sugeridaTxt = match($rol) {
+                                        'super_admin', 'admin' => 'Administración y Finanzas',
+                                        'personal_salud' => 'Salud y Bienestar',
+                                        'personal_admin' => 'Administración y Finanzas',
+                                        'voluntario' => 'Voluntariado y Actividades',
+                                        'familiar' => 'Trabajo Social y Familias',
+                                        default => null
+                                    };
+                                @endphp
+                                @if($sugeridaTxt)
+                                    <p class="mt-1 text-[9px] font-black uppercase text-[#E27D60] tracking-wider flex items-center gap-1 animate-pulse">
+                                        <i class="ph-bold ph-sparkle"></i> Recomendación: se sugiere vincular a <span class="underline font-extrabold">{{ $sugeridaTxt }}</span>
+                                    </p>
+                                @endif
+                            @endif
+                        </div>
+
                         @if($rol === 'personal_salud')
                         <div class="md:col-span-2 animate-in fade-in duration-300">
                             <label class="mb-1 block text-[9px] font-black uppercase tracking-widest text-[#E27D60]">Especialidad Médica *</label>
@@ -1048,7 +1101,7 @@
                     $vistaNombreCompleto = trim(($usuarioVista->nombres ?? '') . ' ' . ($usuarioVista->ap_paterno ?? '') . ' ' . ($usuarioVista->ap_materno ?? ''));
                     $vistaInicial = mb_substr(trim($usuarioVista->nombres ?? 'U'), 0, 1);
 
-                    $vistaAreaDisplay = match($vistaRoleKey) {
+                    $vistaAreaDisplay = $usuarioVista->areaInstitucional?->nombre ?? match($vistaRoleKey) {
                         'super_admin', 'superadministrador', 'admin', 'administrador' => 'Administración del sistema',
                         'personal_salud' => 'Área de salud',
                         'personal_admin' => 'Área administrativa',
@@ -1291,7 +1344,7 @@
                     $fichaNombreCompleto = trim(($usuarioFicha->nombres ?? '') . ' ' . ($usuarioFicha->ap_paterno ?? '') . ' ' . ($usuarioFicha->ap_materno ?? ''));
                     $fichaInicial = mb_substr(trim($usuarioFicha->nombres ?? 'U'), 0, 1);
 
-                    $fichaAreaDisplay = match($fichaRoleKey) {
+                    $fichaAreaDisplay = $usuarioFicha->areaInstitucional?->nombre ?? match($fichaRoleKey) {
                         'super_admin', 'superadministrador', 'admin', 'administrador' => 'Administración del sistema',
                         'personal_salud' => 'Área de salud',
                         'personal_admin' => 'Área administrativa',

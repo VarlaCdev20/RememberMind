@@ -43,6 +43,7 @@ class User extends Authenticatable
         'ultimo_acceso',
         'observaciones',
         'current_team_id',
+        'cod_area',
     ];
 
     protected $hidden = [
@@ -106,7 +107,7 @@ class User extends Authenticatable
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
-            ->logOnly(['nombres', 'ap_paterno', 'correo', 'estado', 'observaciones'])
+            ->logOnly(['nombres', 'ap_paterno', 'correo', 'estado', 'observaciones', 'cod_area'])
             ->logOnlyDirty()
             ->useLogName('Usuarios')
             ->setDescriptionForEvent(function (string $eventName) {
@@ -130,6 +131,11 @@ class User extends Authenticatable
 
                 return "Usuario {$this->cod_usu} fue modificado ({$eventName}).";
             });
+    }
+
+    public function areaInstitucional()
+    {
+        return $this->belongsTo(AreaInstitucional::class, 'cod_area', 'cod_area');
     }
 
     public function documentos()

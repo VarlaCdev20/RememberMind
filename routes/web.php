@@ -41,6 +41,11 @@ Route::middleware([
                 ->middleware('permission:roles.ver')
                 ->name('roles-permisos.index');
 
+            // ── Áreas Institucionales ─────────────
+            Route::view('/areas-institucionales', 'admin.areas-institucionales.index')
+                ->middleware('permission:areas.ver')
+                ->name('areas-institucionales.index');
+
             // ── Adultos Mayores ──────────────────
             Route::resource('adultos-mayores', AdultoMayorController::class)
                 ->middleware('permission:adultos.ver')

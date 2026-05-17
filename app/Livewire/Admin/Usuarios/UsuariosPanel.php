@@ -18,6 +18,7 @@ class UsuariosPanel extends Component
     public $filtroRol = '';
     public $filtroEstado = '';
     public $filtroGenero = '';
+    public $filtroArea = '';
 
     // ── Modal Formulario Crear/Editar ──
     public bool $mostrarFormulario = false;
@@ -41,6 +42,7 @@ class UsuariosPanel extends Component
     public $pais_telefono = 'Bolivia';
     public $codigo_telefono = '+591';
     public $rol;
+    public $cod_area;
     public $estado = 'ACTIVO';
     public $acceso_sistema = 'HABILITADO';
     public $observaciones;
@@ -81,6 +83,7 @@ class UsuariosPanel extends Component
             'correo' => ['required', 'string', 'email', 'max:255', Rule::unique('users', 'correo')->ignore($this->usuarioId, 'cod_usu')],
             'telefono' => ['required', 'string', 'max:20'],
             'rol' => ['required', 'exists:roles,name'],
+            'cod_area' => ['nullable', 'exists:areas_institucionales,cod_area'],
             'acceso_sistema' => ['required', 'in:HABILITADO,BLOQUEADO'],
         ];
 
@@ -128,7 +131,7 @@ class UsuariosPanel extends Component
         $this->reset([
             'cod_usu', 'nombres', 'ap_paterno', 'ap_materno', 'fecha_nacimiento', 'genero',
             'pais_documento', 'tipo_documento', 'numero_documento', 'expedido', 'correo',
-            'telefono', 'pais_telefono', 'codigo_telefono', 'rol', 'password', 'password_confirmation',
+            'telefono', 'pais_telefono', 'codigo_telefono', 'rol', 'cod_area', 'password', 'password_confirmation',
             'usuarioId', 'fecha_ingreso', 'especialidad_salud', 'cargo_administrativo', 'observaciones'
         ]);
         $this->isEdit = false;
@@ -200,6 +203,7 @@ class UsuariosPanel extends Component
         $this->telefono = $usuario->telefono;
         $this->pais_telefono = $usuario->pais_telefono ?? 'Bolivia';
         $this->codigo_telefono = $usuario->codigo_telefono ?? '+591';
+        $this->cod_area = $usuario->cod_area;
         $this->estado = $usuario->estado;
         $this->acceso_sistema = $usuario->acceso_sistema;
         $this->observaciones = $usuario->observaciones;
@@ -325,6 +329,7 @@ class UsuariosPanel extends Component
             'telefono' => $this->telefono,
             'pais_telefono' => $this->pais_telefono,
             'codigo_telefono' => $this->codigo_telefono,
+            'cod_area' => $this->cod_area ?: null,
             'acceso_sistema' => $this->acceso_sistema,
             'observaciones' => $this->observaciones,
         ];
@@ -435,6 +440,7 @@ class UsuariosPanel extends Component
             'personalAdmin.cargoAdmin',
             'voluntarios',
             'familiares',
+            'areaInstitucional',
         ])->where('cod_usu', $codUsu)->firstOrFail();
 
         $this->mostrarVistaCompleta = true;
@@ -457,6 +463,7 @@ class UsuariosPanel extends Component
             'roles',
             'personalSalud.especialidad',
             'personalAdmin.cargoAdmin',
+            'areaInstitucional',
         ])->where('cod_usu', $codUsu)->firstOrFail();
         $this->mostrarFichaRapida = true;
     }
@@ -479,7 +486,7 @@ class UsuariosPanel extends Component
 
     public function limpiarFiltros(): void
     {
-        $this->reset(['search', 'filtroRol', 'filtroEstado', 'filtroGenero']);
+        $this->reset(['search', 'filtroRol', 'filtroEstado', 'filtroGenero', 'filtroArea']);
         $this->resetPage();
     }
 
@@ -519,6 +526,11 @@ class UsuariosPanel extends Component
     }
 
     public function updatingFiltroEstado()
+    {
+        $this->resetPage();
+    }
+
+    public function updatingFiltroArea()
     {
         $this->resetPage();
     }
@@ -592,6 +604,7 @@ class UsuariosPanel extends Component
             'roles',
             'personalSalud.especialidad',
             'personalAdmin.cargoAdmin',
+            'areaInstitucional',
         ]);
 
         if (!empty($this->search)) {
@@ -616,6 +629,10 @@ class UsuariosPanel extends Component
             $query->where('genero', $this->filtroGenero);
         }
 
+        if (!empty($this->filtroArea)) {
+            $query->where('cod_area', $this->filtroArea);
+        }
+
         // Ordenamiento: ACTIVOS primero, luego alfabético
         $query->orderByRaw("CASE WHEN estado = 'ACTIVO' THEN 0 ELSE 1 END")
               ->orderBy('nombres')
@@ -626,7 +643,8 @@ class UsuariosPanel extends Component
             'usuarios' => $query->paginate(12),
             'roles' => Role::all(),
             'especialidades' => \App\Models\Especialidad::all(),
-            'cargosAdmin' => \App\Models\CargoAdministrativo::all()
+            'cargosAdmin' => \App\Models\CargoAdministrativo::all(),
+            'areas' => \App\Models\AreaInstitucional::activas()->orderBy('orden')->get(),
         ]);
     }
 }
