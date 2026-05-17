@@ -49,6 +49,11 @@ class UsuariosPanel extends Component
     public $especialidad_salud;
     public $cargo_administrativo;
 
+    // ── Ficha Rápida Flotante ──
+    public bool $mostrarFichaRapida = false;
+    public ?string $usuarioFichaId = null;
+    public $usuarioFicha = null;
+
     protected $listeners = ['usuario-guardado' => '$refresh'];
 
     public function rules()
@@ -219,11 +224,11 @@ class UsuariosPanel extends Component
         $this->rol = $usuario->roles->first()?->name ?? '';
         
         if ($this->rol === 'personal_salud') {
-            $ps = $usuario->personalSalud->first();
+            $ps = $usuario->personalSalud;
             $this->fecha_ingreso = $ps?->fecha_ing ? $ps->fecha_ing->format('Y-m-d') : '';
             $this->especialidad_salud = $ps?->cod_esp;
         } elseif ($this->rol === 'personal_admin') {
-            $pa = $usuario->personalAdmin->first();
+            $pa = $usuario->personalAdmin;
             $this->fecha_ingreso = $pa?->fecha_ingreso ? $pa->fecha_ingreso->format('Y-m-d') : '';
             $this->cargo_administrativo = $pa?->cod_cargo_admin;
         }
@@ -352,6 +357,39 @@ class UsuariosPanel extends Component
         ]);
     }
 
+    // ── Ficha Rápida Flotante ──
+
+    public function abrirFichaRapida($codUsu): void
+    {
+        $this->usuarioFichaId = $codUsu;
+        $this->usuarioFicha = User::with([
+            'roles',
+            'personalSalud.especialidad',
+            'personalAdmin.cargoAdmin',
+        ])->where('cod_usu', $codUsu)->firstOrFail();
+        $this->mostrarFichaRapida = true;
+    }
+
+    public function cerrarFichaRapida(): void
+    {
+        $this->mostrarFichaRapida = false;
+        $this->usuarioFichaId = null;
+        $this->usuarioFicha = null;
+    }
+
+    // ── Filtros ──
+
+    public function aplicarFiltros(): void
+    {
+        $this->resetPage();
+    }
+
+    public function limpiarFiltros(): void
+    {
+        $this->reset(['search', 'filtroRol', 'filtroEstado']);
+        $this->resetPage();
+    }
+
     public function updatedPaisTelefono($value)
     {
         $codigos = [
@@ -391,6 +429,16 @@ class UsuariosPanel extends Component
     public function toggleEstado($id)
     {
         $usuario = User::findOrFail($id);
+
+        // No permitir autoinactivación
+        if ($usuario->cod_usu === auth()->id()) {
+            $this->dispatch('swal', [
+                'icon' => 'error',
+                'title' => 'Acción denegada',
+                'text' => 'No puedes cambiar tu propio estado.'
+            ]);
+            return;
+        }
         
         if ($usuario->estado === 'ACTIVO' && $usuario->hasRole('super_admin')) {
             $superadmins = User::role('super_admin')->where('estado', 'ACTIVO')->count();
@@ -416,12 +464,17 @@ class UsuariosPanel extends Component
 
     public function render()
     {
-        $query = User::query()->with('roles');
+        $query = User::query()->with([
+            'roles',
+            'personalSalud.especialidad',
+            'personalAdmin.cargoAdmin',
+        ]);
 
         if (!empty($this->search)) {
             $query->where(function ($q) {
                 $q->where('nombres', 'ilike', '%' . $this->search . '%')
                   ->orWhere('ap_paterno', 'ilike', '%' . $this->search . '%')
+                  ->orWhere('ap_materno', 'ilike', '%' . $this->search . '%')
                   ->orWhere('correo', 'ilike', '%' . $this->search . '%')
                   ->orWhere('cod_usu', 'ilike', '%' . $this->search . '%');
             });
@@ -435,8 +488,14 @@ class UsuariosPanel extends Component
             $query->role($this->filtroRol);
         }
 
+        // Ordenamiento: ACTIVOS primero, luego alfabético
+        $query->orderByRaw("CASE WHEN estado = 'ACTIVO' THEN 0 ELSE 1 END")
+              ->orderBy('nombres')
+              ->orderBy('ap_paterno')
+              ->orderBy('ap_materno');
+
         return view('livewire.admin.usuarios.usuarios-panel', [
-            'usuarios' => $query->orderBy('created_at', 'desc')->paginate(10),
+            'usuarios' => $query->paginate(12),
             'roles' => \Spatie\Permission\Models\Role::all(),
             'especialidades' => \App\Models\Especialidad::all(),
             'cargosAdmin' => \App\Models\CargoAdministrativo::all()

@@ -19,11 +19,6 @@
                             <i class="ph-bold ph-arrow-left"></i>
                             Volver
                         </a>
-                        <a href="{{ route('admin.usuarios.edit', $usuario->cod_usu) }}" 
-                           class="inline-flex items-center gap-2 rounded-full bg-azul-profundo px-6 py-2 text-xs font-black text-white transition hover:bg-terracota active:scale-95 shadow-lg">
-                            <i class="ph-bold ph-pencil-simple"></i>
-                            Editar Perfil
-                        </a>
                     </div>
                 </div>
             </header>
@@ -132,23 +127,23 @@
                                 @if($usuario->hasRole('personal_salud'))
                                     <div>
                                         <p class="text-[9px] font-black uppercase tracking-tighter text-azul-profundo/40">Especialidad Médica</p>
-                                        <p class="text-sm font-black text-azul-profundo uppercase">{{ $usuario->personalSalud->first()?->especialidad?->nombre ?? 'Sin especialidad' }}</p>
+                                        <p class="text-sm font-black text-azul-profundo uppercase">{{ $usuario->personalSalud?->especialidad?->nombre ?? 'Sin especialidad' }}</p>
                                     </div>
-                                    @if($usuario->personalSalud->first()?->fecha_ing)
+                                    @if($usuario->personalSalud?->fecha_ing)
                                     <div>
                                         <p class="text-[9px] font-black uppercase tracking-tighter text-azul-profundo/40">Fecha de Ingreso</p>
-                                        <p class="text-sm font-bold text-azul-profundo">{{ \Carbon\Carbon::parse($usuario->personalSalud->first()->fecha_ing)->format('d/m/Y') }}</p>
+                                        <p class="text-sm font-bold text-azul-profundo">{{ \Carbon\Carbon::parse($usuario->personalSalud->fecha_ing)->format('d/m/Y') }}</p>
                                     </div>
                                     @endif
                                 @elseif($usuario->hasRole('personal_admin'))
                                     <div>
                                         <p class="text-[9px] font-black uppercase tracking-tighter text-azul-profundo/40">Función Administrativa</p>
-                                        <p class="text-sm font-black text-azul-profundo uppercase">{{ $usuario->personalAdmin->first()?->cargoAdmin?->nombre ?? ($usuario->personalAdmin->first()?->cargo ?? 'Sin cargo') }}</p>
+                                        <p class="text-sm font-black text-azul-profundo uppercase">{{ $usuario->personalAdmin?->cargoAdmin?->nombre ?? ($usuario->personalAdmin?->cargo ?? 'Sin cargo') }}</p>
                                     </div>
-                                    @if($usuario->personalAdmin->first()?->fecha_ingreso)
+                                    @if($usuario->personalAdmin?->fecha_ingreso)
                                     <div>
                                         <p class="text-[9px] font-black uppercase tracking-tighter text-azul-profundo/40">Fecha de Ingreso</p>
-                                        <p class="text-sm font-bold text-azul-profundo">{{ \Carbon\Carbon::parse($usuario->personalAdmin->first()->fecha_ingreso)->format('d/m/Y') }}</p>
+                                        <p class="text-sm font-bold text-azul-profundo">{{ \Carbon\Carbon::parse($usuario->personalAdmin->fecha_ingreso)->format('d/m/Y') }}</p>
                                     </div>
                                     @endif
                                 @else

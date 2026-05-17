@@ -149,12 +149,12 @@ class User extends Authenticatable
 
     public function personalSalud()
     {
-        return $this->hasMany(PersonalSalud::class, 'cod_usu', 'cod_usu');
+        return $this->hasOne(PersonalSalud::class, 'cod_usu', 'cod_usu');
     }
 
     public function personalAdmin()
     {
-        return $this->hasMany(PersonalAdmin::class, 'cod_usu', 'cod_usu');
+        return $this->hasOne(PersonalAdmin::class, 'cod_usu', 'cod_usu');
     }
 
     // ── Relaciones FASE 2: Registros médicos/administrativos realizados por este usuario ──
