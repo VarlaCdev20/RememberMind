@@ -20,22 +20,25 @@
         }
 
         /* Marca de Agua */
-        #watermark {
+        .watermark {
             position: fixed;
-            top: 35%;
-            left: 10%;
-            width: 80%;
+            top: 40%;
+            left: 0;
+            width: 100%;
             text-align: center;
-            opacity: 0.05;
-            z-index: -1000;
-            font-size: 72px;
-            font-weight: 900;
-            color: #2F3E5C;
-            transform: rotate(-25deg);
-            text-transform: uppercase;
-            letter-spacing: 0.15em;
             pointer-events: none;
-            user-select: none;
+            z-index: -1000;
+        }
+
+        .watermark span {
+            font-size: 68px;
+            font-weight: 900;
+            letter-spacing: 0.08em;
+            color: #2F3E5C;
+            opacity: 0.045;
+            transform: rotate(-15deg);
+            text-transform: uppercase;
+            display: inline-block;
         }
 
         /* Encabezado */
@@ -249,7 +252,7 @@
 <body>
 
     <!-- Marca de Agua de Fondo -->
-    <div id="watermark">Casa Amandita</div>
+    <div class="watermark"><span>Casa Amandita</span></div>
 
     <!-- Encabezado Fijo -->
     <header>

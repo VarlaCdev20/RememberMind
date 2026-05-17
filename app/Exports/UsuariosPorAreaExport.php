@@ -2,7 +2,7 @@
 
 namespace App\Exports;
 
-use App\Models\AreaInstitucional;
+use App\Models\User;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
@@ -11,14 +11,24 @@ use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithTitle;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
-class AreasInstitucionalesExport implements FromCollection, WithHeadings, WithMapping, WithStyles, ShouldAutoSize, WithTitle
+class UsuariosPorAreaExport implements FromCollection, WithHeadings, WithMapping, WithStyles, ShouldAutoSize, WithTitle
 {
+    protected $codArea;
+
+    public function __construct($codArea)
+    {
+        $this->codArea = $codArea;
+    }
+
     /**
      * @return \Illuminate\Support\Collection
      */
     public function collection()
     {
-        return AreaInstitucional::with(['responsable', 'usuarios'])->orderBy('nombre')->get();
+        return User::with(['personalSalud.especialidad', 'personalAdmin.cargoAdmin', 'roles'])
+            ->where('cod_area', $this->codArea)
+            ->orderBy('nombres')
+            ->get();
     }
 
     /**
@@ -26,7 +36,7 @@ class AreasInstitucionalesExport implements FromCollection, WithHeadings, WithMa
      */
     public function title(): string
     {
-        return 'Áreas Institucionales';
+        return 'Usuarios del área';
     }
 
     /**
@@ -35,34 +45,40 @@ class AreasInstitucionalesExport implements FromCollection, WithHeadings, WithMa
     public function headings(): array
     {
         return [
-            'Área',
-            'Tipo de área',
-            'Responsable',
+            'Usuario',
+            'Rol',
+            'Cargo o especialidad',
             'Estado',
-            'Total usuarios',
-            'Usuarios activos',
-            'Usuarios inactivos',
-            'Última actualización',
-            'Observaciones'
+            'Correo',
+            'Teléfono',
+            'Último acceso'
         ];
     }
 
     /**
-     * @param mixed $area
+     * @param mixed $user
      * @return array
      */
-    public function map($area): array
+    public function map($user): array
     {
+        $cargoEspecialidad = 'Sin Asignar';
+        if ($user->personalSalud && $user->personalSalud->especialidad) {
+            $cargoEspecialidad = $user->personalSalud->especialidad->nombre;
+        } elseif ($user->personalAdmin) {
+            $cargoEspecialidad = $user->personalAdmin->cargoAdmin?->nombre ?? $user->personalAdmin->cargo ?? 'Personal Administrativo';
+        }
+
+        $rolName = $user->getRoleNames()->first() ?? 'Sin Rol';
+        $rolLimpio = strtoupper(str_replace('_', ' ', $rolName));
+
         return [
-            $area->nombre,
-            $area->tipo_area,
-            $area->responsable ? $area->responsable->name : 'Sin Responsable',
-            $area->estado,
-            $area->usuarios->count(),
-            $area->usuarios->filter(fn($u) => in_array($u->estado, ['ACTIVO', 1, '1']))->count(),
-            $area->usuarios->filter(fn($u) => !in_array($u->estado, ['ACTIVO', 1, '1']))->count(),
-            $area->updated_at ? \Carbon\Carbon::parse($area->updated_at)->format('d/m/Y H:i') : 'Sin registro',
-            $area->observaciones ?: 'Sin observaciones',
+            $user->name,
+            $rolLimpio,
+            $cargoEspecialidad,
+            in_array($user->estado, ['ACTIVO', 1, '1']) ? 'Activo' : 'Inactivo',
+            $user->correo ?: 'Sin registrar',
+            ($user->codigo_telefono ? $user->codigo_telefono . ' ' : '') . ($user->telefono ?: 'Sin registrar'),
+            $user->ultimo_acceso ? \Carbon\Carbon::parse($user->ultimo_acceso)->format('d/m/Y H:i') : 'Nunca',
         ];
     }
 
@@ -73,7 +89,7 @@ class AreasInstitucionalesExport implements FromCollection, WithHeadings, WithMa
     public function styles(Worksheet $sheet)
     {
         // Activar autofiltros para todas las columnas de la cabecera
-        $sheet->setAutoFilter('A1:I1');
+        $sheet->setAutoFilter('A1:G1');
 
         return [
             // Cabecera: Negrita, texto blanco, fondo azul profundo (#2F3E5C)

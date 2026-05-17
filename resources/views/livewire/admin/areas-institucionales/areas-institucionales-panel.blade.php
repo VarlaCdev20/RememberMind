@@ -71,6 +71,16 @@
         </div>
     </header>
 
+    {{-- AVISO TEMPORAL DE PERMISOS --}}
+    @if(!auth()->user()->can('areas.reportes'))
+        <div class="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-xs font-bold text-amber-800 shadow-sm flex items-center gap-2.5 no-print">
+            <i class="ph-bold ph-warning-octagon text-lg text-amber-600 shrink-0"></i>
+            <div>
+                No tienes el permiso <code class="bg-amber-100 px-1 py-0.5 rounded text-amber-900 font-mono">areas.reportes</code> asignado en la sesión de base de datos actual. Por esta razón, los botones y secciones de reportes estarán ocultos. Contacta al administrador o ejecuta el Seeder de Permisos.
+            </div>
+        </div>
+    @endif
+
     {{-- MÉTRICAS E INDICADORES ORGANIZACIONALES --}}
     <section class="grid grid-cols-2 md:grid-cols-6 gap-4 no-print">
         {{-- Total Áreas --}}
@@ -271,9 +281,10 @@
                             @can('areas.reportes')
                                 <button type="button"
                                         wire:click="abrirReporteArea('{{ $area->cod_area }}')"
-                                        class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-[#E6DDD3]/40 text-[#7C7168] hover:bg-[#E6DDD3] transition duration-200"
+                                        class="inline-flex h-8 items-center gap-1.5 rounded-full bg-[#8DA280]/10 px-3 text-[10px] font-black text-[#63775B] hover:bg-[#8DA280] hover:text-white transition duration-200"
                                         title="Reporte del Área">
                                     <i class="ph-bold ph-file-chart"></i>
+                                    Reporte
                                 </button>
                             @endcan
                         </div>
@@ -352,8 +363,8 @@
 
                             @php
                                 $totalUsuarios = count($areaSeleccionada->usuarios);
-                                $activosUsuarios = $areaSeleccionada->usuarios->where('estado', 1)->count();
-                                $inactivosUsuarios = $areaSeleccionada->usuarios->where('estado', '!=', 1)->count();
+                                $activosUsuarios = $areaSeleccionada->usuarios->filter(fn($u) => in_array($u->estado, ['ACTIVO', 1, '1']))->count();
+                                $inactivosUsuarios = $areaSeleccionada->usuarios->filter(fn($u) => !in_array($u->estado, ['ACTIVO', 1, '1']))->count();
                                 $porcActivos = $totalUsuarios > 0 ? round(($activosUsuarios / $totalUsuarios) * 100, 1) : 0;
                             @endphp
 
@@ -503,8 +514,8 @@
                                                             </div>
                                                         </div>
 
-                                                        <span class="rounded-full px-2 py-0.5 text-[8px] font-black uppercase tracking-wider border {{ $u->estado == 1 ? 'bg-[#8DA280]/20 text-[#63775B] border-[#8DA280]/30' : 'bg-red-50 text-red-600 border-red-100' }}">
-                                                            {{ $u->estado == 1 ? 'Activo' : 'Inactivo' }}
+                                                        <span class="rounded-full px-2 py-0.5 text-[8px] font-black uppercase tracking-wider border {{ in_array($u->estado, ['ACTIVO', 1, '1']) ? 'bg-[#8DA280]/20 text-[#63775B] border-[#8DA280]/30' : 'bg-red-50 text-red-600 border-red-100' }}">
+                                                            {{ in_array($u->estado, ['ACTIVO', 1, '1']) ? 'Activo' : 'Inactivo' }}
                                                         </span>
                                                     </div>
                                                 @empty
@@ -612,6 +623,38 @@
                                     </div>
                                     
                                 </div>
+
+                                {{-- REPORTES DEL ÁREA --}}
+                                @can('areas.reportes')
+                                    <div class="mt-6 border-t border-[#C7B5A3]/20 pt-4 space-y-2">
+                                        <h4 class="text-[11px] font-black uppercase tracking-[0.18em] text-[#2F3E5C]/60">REPORTES DEL ÁREA</h4>
+                                        <div class="bg-[#F8F3ED]/50 p-4 rounded-2xl border border-[#C7B5A3]/30 space-y-3">
+                                            <p class="text-[11px] font-semibold text-[#7C7168] leading-relaxed">
+                                                Genere informes del área o exporte el listado completo de personal adscrito.
+                                            </p>
+                                            <div class="flex flex-wrap gap-2">
+                                                <button type="button"
+                                                        wire:click="abrirReporteArea('{{ $areaSeleccionada->cod_area }}')"
+                                                        class="inline-flex items-center gap-1.5 rounded-full bg-[#2F3E5C] px-3.5 py-2 text-[10px] font-black text-white hover:bg-[#2F3E5C]/90 shadow-md transition duration-200">
+                                                    <i class="ph-bold ph-file-chart text-xs"></i>
+                                                    Generar reporte del área
+                                                </button>
+                                                <button type="button"
+                                                        wire:click="exportarReporteAreaPdf('{{ $areaSeleccionada->cod_area }}')"
+                                                        class="inline-flex items-center gap-1.5 rounded-full bg-[#E27D60]/10 px-3.5 py-2 text-[10px] font-black text-[#E27D60] hover:bg-[#E27D60] hover:text-white transition duration-200">
+                                                    <i class="ph-bold ph-file-pdf text-xs"></i>
+                                                    Exportar PDF
+                                                </button>
+                                                <button type="button"
+                                                        wire:click="exportarUsuariosAreaExcel('{{ $areaSeleccionada->cod_area }}')"
+                                                        class="inline-flex items-center gap-1.5 rounded-full bg-[#8DA280]/10 px-3.5 py-2 text-[10px] font-black text-[#63775B] hover:bg-[#8DA280] hover:text-white transition duration-200">
+                                                    <i class="ph-bold ph-file-xls text-xs"></i>
+                                                    Exportar Excel
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endcan
 
                                 {{-- TRAZABILIDAD --}}
                                 <div class="mt-6 border-t border-[#C7B5A3]/20 pt-4 space-y-2">
@@ -873,7 +916,7 @@
                                 Exportar PDF
                             </button>
                             <button type="button"
-                                    wire:click="exportarReporteGeneralExcel"
+                                    wire:click="exportarAreasExcel"
                                     class="flex h-8 items-center gap-2 rounded-lg bg-[#8DA280] px-3 text-xs font-black text-white hover:bg-[#7b8e6f] transition duration-200">
                                 <i class="ph-bold ph-file-xls"></i>
                                 Exportar Excel
@@ -898,6 +941,12 @@
                                 Exportar PDF
                             </button>
                             <button type="button"
+                                    wire:click="exportarUsuariosAreaExcel('{{ $reporteData['area']['cod_area'] }}')"
+                                    class="flex h-8 items-center gap-2 rounded-lg bg-[#8DA280] px-3 text-xs font-black text-white hover:bg-[#7b8e6f] transition duration-200">
+                                <i class="ph-bold ph-file-xls"></i>
+                                Exportar Excel
+                            </button>
+                            <button type="button"
                                     wire:click="imprimirReporteArea('{{ $reporteData['area']['cod_area'] }}')"
                                     class="flex h-8 items-center gap-2 rounded-lg bg-[#63775B] px-3 text-xs font-black text-white hover:bg-[#52624b] transition duration-200">
                                 <i class="ph-bold ph-printer"></i>
@@ -919,6 +968,7 @@
                         generalChartType: null,
                         generalChartActInact: null,
                         generalChartEv: null,
+                        generalChartRanking: null,
                         areaActiveChart: null,
                         areaRolChart: null,
                         areaLineChart: null,
@@ -930,6 +980,7 @@
                             if (this.generalChartType) this.generalChartType.destroy();
                             if (this.generalChartActInact) this.generalChartActInact.destroy();
                             if (this.generalChartEv) this.generalChartEv.destroy();
+                            if (this.generalChartRanking) this.generalChartRanking.destroy();
                             if (this.areaActiveChart) this.areaActiveChart.destroy();
                             if (this.areaRolChart) this.areaRolChart.destroy();
                             if (this.areaLineChart) this.areaLineChart.destroy();
@@ -1035,6 +1086,32 @@
                                         }
                                     });
                                 }
+                                 // Chart: Ranking Top 5
+                                 const rankData = @js($this->obtenerDatosGraficoRankingAreas());
+                                 const ctxRank = this.$refs.canvasRank;
+                                 if (ctxRank && rankData.labels && rankData.labels.length > 0) {
+                                     this.generalChartRanking = new Chart(ctxRank, {
+                                         type: 'bar',
+                                         data: {
+                                             labels: rankData.labels,
+                                             datasets: [{
+                                                 data: rankData.data,
+                                                 backgroundColor: '#E27D60',
+                                                 borderRadius: 6
+                                             }]
+                                         },
+                                         options: {
+                                             indexAxis: 'y',
+                                             responsive: true,
+                                             maintainAspectRatio: false,
+                                             plugins: { legend: { display: false } },
+                                             scales: {
+                                                 x: { beginAtZero: true, grid: { color: 'rgba(47,62,92,0.05)' } },
+                                                 y: { grid: { display: false } }
+                                             }
+                                         }
+                                     });
+                                 }
                             } else if (type === 'especifico') {
                                 const total = {{ $reporteData['totalUsuarios'] ?? 0 }};
                                 const activos = {{ $reporteData['usuariosActivos'] ?? 0 }};
@@ -1130,31 +1207,27 @@
 
                             {{-- Resumen Ejecutivo en Reporte --}}
                             <div class="space-y-2">
-                                <h4 class="text-[11px] font-black uppercase tracking-[0.18em] text-[#2F3E5C]/60">RESUMEN ESTADÍSTICO</h4>
-                                <div class="grid grid-cols-2 md:grid-cols-6 gap-3">
-                                    <div class="bg-[#F8F3ED] p-3 rounded-xl border border-[#C7B5A3]/30 text-center">
-                                        <p class="text-[16px] font-black text-[#E27D60]">{{ $reporteData['totalAreas'] }}</p>
-                                        <p class="text-[8px] font-black text-[#967B66] uppercase tracking-wider">Total Áreas</p>
+                                <h4 class="text-[11px] font-black uppercase tracking-[0.18em] text-[#2F3E5C]/60">RESUMEN EJECUTIVO ORGANIZACIONAL</h4>
+                                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                    <div class="bg-[#F8F3ED]/60 p-4 rounded-2xl border border-[#C7B5A3]/35 text-center shadow-sm">
+                                        <p class="text-2xl font-black text-[#E27D60]">{{ $reporteData['totalAreas'] }}</p>
+                                        <p class="text-[9px] font-black text-[#967B66] uppercase tracking-wider mt-1">Total Áreas</p>
+                                        <p class="text-[8px] font-semibold text-[#7C7168] mt-0.5">Activas: {{ $reporteData['areasActivas'] }} | Inactivas: {{ $reporteData['areasInactivas'] }}</p>
                                     </div>
-                                    <div class="bg-[#F8F3ED] p-3 rounded-xl border border-[#C7B5A3]/30 text-center">
-                                        <p class="text-[16px] font-black text-[#63775B]">{{ $reporteData['areasActivas'] }}</p>
-                                        <p class="text-[8px] font-black text-[#967B66] uppercase tracking-wider">Activas</p>
+                                    <div class="bg-[#F8F3ED]/60 p-4 rounded-2xl border border-[#C7B5A3]/35 text-center shadow-sm">
+                                        <p class="text-2xl font-black text-[#63775B]">{{ $reporteData['usuariosVinculados'] }}</p>
+                                        <p class="text-[9px] font-black text-[#967B66] uppercase tracking-wider mt-1">Personal Asignado</p>
+                                        <p class="text-[8px] font-semibold text-[#7C7168] mt-0.5">Activos: {{ $reporteData['usuariosActivosVinculados'] }} | Inactivos: {{ $reporteData['usuariosInactivosVinculados'] }}</p>
                                     </div>
-                                    <div class="bg-[#F8F3ED] p-3 rounded-xl border border-[#C7B5A3]/30 text-center">
-                                        <p class="text-[16px] font-black text-red-600">{{ $reporteData['areasInactivas'] }}</p>
-                                        <p class="text-[8px] font-black text-[#967B66] uppercase tracking-wider">Inactivas</p>
+                                    <div class="bg-[#F8F3ED]/60 p-4 rounded-2xl border border-[#C7B5A3]/35 text-center shadow-sm">
+                                        <p class="text-2xl font-black text-[#2F3E5C] truncate">{{ $reporteData['areaMasUsuariosNombre'] }}</p>
+                                        <p class="text-[9px] font-black text-[#967B66] uppercase tracking-wider mt-1">Área con Más Usuarios</p>
+                                        <p class="text-[8px] font-semibold text-[#7C7168] mt-0.5">Total personal adscrito: {{ $reporteData['areaMasUsuariosCount'] }}</p>
                                     </div>
-                                    <div class="bg-[#F8F3ED] p-3 rounded-xl border border-[#C7B5A3]/30 text-center">
-                                        <p class="text-[16px] font-black text-[#2F3E5C]">{{ $reporteData['usuariosVinculados'] }}</p>
-                                        <p class="text-[8px] font-black text-[#967B66] uppercase tracking-wider">Personal</p>
-                                    </div>
-                                    <div class="bg-[#F8F3ED] p-3 rounded-xl border border-[#C7B5A3]/30 text-center">
-                                        <p class="text-[16px] font-black text-yellow-600">{{ $reporteData['areasSinResponsable'] }}</p>
-                                        <p class="text-[8px] font-black text-[#967B66] uppercase tracking-wider">Sin Resp.</p>
-                                    </div>
-                                    <div class="bg-[#F8F3ED] p-3 rounded-xl border border-[#C7B5A3]/30 text-center">
-                                        <p class="text-[16px] font-black text-gray-600">{{ $reporteData['areasSinUsuarios'] }}</p>
-                                        <p class="text-[8px] font-black text-[#967B66] uppercase tracking-wider">Sin Personal</p>
+                                    <div class="bg-[#F8F3ED]/60 p-4 rounded-2xl border border-[#C7B5A3]/35 text-center shadow-sm">
+                                        <p class="text-2xl font-black text-[#63775B]">{{ $reporteData['porcentajeAreasResponsable'] }}%</p>
+                                        <p class="text-[9px] font-black text-[#967B66] uppercase tracking-wider mt-1">Cobertura Liderazgo</p>
+                                        <p class="text-[8px] font-semibold text-[#7C7168] mt-0.5">Sin responsable: {{ $reporteData['areasSinResponsable'] }} áreas</p>
                                     </div>
                                 </div>
                             </div>
@@ -1200,6 +1273,14 @@
                                                 No hay datos históricos suficientes para mostrar evolución.
                                             </div>
                                         @endif
+                                    </div>
+
+                                    {{-- Ranking Top 5 --}}
+                                    <div class="bg-white p-4 rounded-xl border border-[#C7B5A3]/30 shadow-sm col-span-1 md:col-span-2">
+                                        <h5 class="text-[10px] font-black text-[#2F3E5C] mb-2 uppercase tracking-wide">Top 5 Áreas con Mayor Número de Personal</h5>
+                                        <div class="relative h-56 w-full">
+                                            <canvas x-ref="canvasRank"></canvas>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -1354,22 +1435,38 @@
                             <div class="space-y-2">
                                 <h4 class="text-[11px] font-black uppercase tracking-[0.18em] text-[#2F3E5C]/60">PERSONAL VINCULADO</h4>
                                 @if(count($reporteData['area']['usuarios']) > 0)
-                                    <table class="w-full text-left text-xs border border-[#C7B5A3]/40 rounded-xl overflow-hidden bg-white">
+                                    <table class="w-full text-left text-xs border border-[#C7B5A3]/40 rounded-xl overflow-hidden bg-white font-sans">
                                         <thead>
                                             <tr class="bg-[#F8F3ED] text-[#2F3E5C] font-black border-b border-[#C7B5A3]/40">
-                                                <th class="p-3">Nombre Completo</th>
-                                                <th class="p-3">Rol Asignado</th>
-                                                <th class="p-3 text-center">Estado</th>
+                                                <th class="p-3" style="width: 30%;">Nombre Completo</th>
+                                                <th class="p-3" style="width: 15%;">Rol</th>
+                                                <th class="p-3" style="width: 25%;">Cargo/Especialidad</th>
+                                                <th class="p-3 text-center" style="width: 15%;">Estado</th>
+                                                <th class="p-3 text-center" style="width: 15%;">Último Acceso</th>
                                             </tr>
                                         </thead>
                                         <tbody class="divide-y divide-[#C7B5A3]/30">
                                             @foreach($reporteData['area']['usuarios'] as $u)
+                                                @php
+                                                    $cargoEspecialidad = 'Sin Asignar';
+                                                    if ($u->personalSalud && $u->personalSalud->especialidad) {
+                                                        $cargoEspecialidad = $u->personalSalud->especialidad->nombre;
+                                                    } elseif ($u->personalAdmin) {
+                                                        $cargoEspecialidad = $u->personalAdmin->cargoAdmin??->nombre ?? $u->personalAdmin->cargo ?? 'Personal Administrativo';
+                                                    }
+                                                    $rolName = $u->getRoleNames()->first() ?? 'Sin Rol';
+                                                    $rolLimpio = strtoupper(str_replace('_', ' ', $rolName));
+                                                @endphp
                                                 <tr class="hover:bg-[#F8F3ED]/30">
                                                     <td class="p-3 font-black text-[#2F3E5C]">{{ $u['name'] }}</td>
-                                                    <td class="p-3">{{ $u->getRoleNames()->first() ?? 'Sin Rol' }}</td>
-                                                    <td class="p-3 text-center font-black text-[10px] {{ $u['estado'] == 1 ? 'text-[#63775B]' : 'text-red-600' }}">
-                                                        {{ $u['estado'] == 1 ? 'ACTIVO' : 'INACTIVO' }}
+                                                    <td class="p-3 text-[#967B66] font-bold">{{ $rolLimpio }}</td>
+                                                    <td class="p-3 text-[#2F3E5C]">{{ $cargoEspecialidad }}</td>
+                                                    <td class="p-3 text-center font-black text-[10px]">
+                                                        <span class="rounded-full px-2.5 py-0.5 border {{ in_array($u->estado, ['ACTIVO', 1, '1']) ? 'bg-[#8DA280]/20 text-[#63775B] border-[#8DA280]/30' : 'bg-red-50 text-red-600 border-red-100' }}">
+                                                            {{ in_array($u->estado, ['ACTIVO', 1, '1']) ? 'ACTIVO' : 'INACTIVO' }}
+                                                        </span>
                                                     </td>
+                                                    <td class="p-3 text-center text-[#7C7168]">{{ $u['ultimo_acceso'] ? \Carbon\Carbon::parse($u['ultimo_acceso'])->format('d/m/Y H:i') : 'Nunca' }}</td>
                                                 </tr>
                                             @endforeach
                                         </tbody>

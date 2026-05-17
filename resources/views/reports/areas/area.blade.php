@@ -1,10 +1,10 @@
 @extends('reports.layouts.report-layout')
 
-@section('title', 'Ficha Técnica de Área Institucional')
-@section('report_title', 'Ficha Técnica del Área')
+@section('title', 'Reporte Administrativo del Área')
+@section('report_title', 'Reporte del Área')
 
 @section('content')
-    <div class="section-title">Detalle del Registro</div>
+    <div class="section-title">Ficha Técnica del Área</div>
     
     <div class="details-box">
         <table class="details-table">
@@ -17,23 +17,54 @@
                 <td class="value-detail">{{ $area->tipo_area }}</td>
             </tr>
             <tr>
-                <td class="label-detail">Responsable del Área:</td>
+                <td class="label-detail">Responsable Asignado:</td>
                 <td class="value-detail"><strong>{{ $area->responsable ? $area->responsable->name : 'Sin Responsable Asignado' }}</strong></td>
             </tr>
             <tr>
-                <td class="label-detail">Estado Administrativo:</td>
+                <td class="label-detail">Estado Operativo:</td>
                 <td class="value-detail">
-                    <span class="badge-status {{ strtoupper($area->estado) === 'ACTIVO' ? 'badge-active' : 'badge-inactive' }}">
+                    <span class="badge-status {{ strtoupper($area->estado) === 'ACTIVA' ? 'badge-active' : 'badge-inactive' }}">
                         {{ $area->estado }}
                     </span>
                 </td>
             </tr>
             <tr>
                 <td class="label-detail">Descripción Operativa:</td>
-                <td class="value-detail">{{ $area->descripcion ?? 'Sin observaciones ni descripción provista.' }}</td>
+                <td class="value-detail">{{ $area->descripcion ?? 'Sin descripción provista.' }}</td>
             </tr>
+            @if($area->observaciones)
+            <tr>
+                <td class="label-detail">Observaciones del Área:</td>
+                <td class="value-detail" style="color: #E27D60; font-weight: bold;">{{ $area->observaciones }}</td>
+            </tr>
+            @endif
         </table>
     </div>
+
+    <div class="section-title">Resumen Estadístico</div>
+    
+    <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+        <tr>
+            <td style="width: 33%; padding-right: 10px;">
+                <div class="summary-card">
+                    <div class="summary-number">{{ $totalUsuarios }}</div>
+                    <div class="summary-label">Total Usuarios</div>
+                </div>
+            </td>
+            <td style="width: 33%; padding-right: 10px; padding-left: 10px;">
+                <div class="summary-card">
+                    <div class="summary-number" style="color: #63775B;">{{ $usuariosActivos }}</div>
+                    <div class="summary-label">Usuarios Activos</div>
+                </div>
+            </td>
+            <td style="width: 34%; padding-left: 10px;">
+                <div class="summary-card">
+                    <div class="summary-number" style="color: #E27D60;">{{ $usuariosInactivos }}</div>
+                    <div class="summary-label">Usuarios Inactivos</div>
+                </div>
+            </td>
+        </tr>
+    </table>
 
     <div class="section-title">Personal Vinculado al Área</div>
     
@@ -41,21 +72,35 @@
         <table class="table-institutional">
             <thead>
                 <tr>
-                    <th style="width: 40%;">Nombre Completo</th>
-                    <th style="width: 35%;">Correo Electrónico</th>
-                    <th style="width: 25%;">Estado de Usuario</th>
+                    <th style="width: 30%;">Nombre Completo</th>
+                    <th style="width: 20%;">Rol</th>
+                    <th style="width: 25%;">Cargo/Especialidad</th>
+                    <th style="width: 10%;">Estado</th>
+                    <th style="width: 15%;">Último acceso</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach ($area->usuarios as $u)
+                    @php
+                        $cargoEspecialidad = 'Sin Asignar';
+                        if ($u->personalSalud && $u->personalSalud->especialidad) {
+                            $cargoEspecialidad = $u->personalSalud->especialidad->nombre;
+                        } elseif ($u->personalAdmin) {
+                            $cargoEspecialidad = $u->personalAdmin->cargoAdmin?->nombre ?? $u->personalAdmin->cargo ?? 'Personal Administrativo';
+                        }
+                        $rolName = $u->getRoleNames()->first() ?? 'Sin Rol';
+                        $rolLimpio = strtoupper(str_replace('_', ' ', $rolName));
+                    @endphp
                     <tr>
                         <td><strong>{{ $u->name }}</strong></td>
-                        <td>{{ $u->email }}</td>
+                        <td>{{ $rolLimpio }}</td>
+                        <td>{{ $cargoEspecialidad }}</td>
                         <td>
-                            <span class="badge-status {{ $u->estado == 1 ? 'badge-active' : 'badge-inactive' }}">
-                                {{ $u->estado == 1 ? 'ACTIVO' : 'INACTIVO' }}
+                            <span class="badge-status {{ in_array($u->estado, ['ACTIVO', 1, '1']) ? 'badge-active' : 'badge-inactive' }}">
+                                {{ in_array($u->estado, ['ACTIVO', 1, '1']) ? 'ACTIVO' : 'INACTIVO' }}
                             </span>
                         </td>
+                        <td>{{ $u->ultimo_acceso ? \Carbon\Carbon::parse($u->ultimo_acceso)->format('d/m/Y H:i') : 'Nunca' }}</td>
                     </tr>
                 @endforeach
             </tbody>

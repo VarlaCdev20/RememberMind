@@ -1227,13 +1227,17 @@
                                 @if($vistaRoleKey === 'personal_salud' && $usuarioVista->personalSalud?->fecha_ing)
                                     <div>
                                         <p class="text-[9px] font-black uppercase tracking-widest text-[#2F3E5C]/40">Fecha de Ingreso</p>
-                                        <p class="mt-1 text-sm font-black text-[#2F3E5C]">{{ $usuarioVista->personalSalud->fecha_ing->format('d/m/Y') }}</p>
+                                        <p class="mt-1 text-sm font-black text-[#2F3E5C]">
+                                            {{ $usuarioVista->personalSalud->fecha_ing instanceof \Carbon\Carbon ? $usuarioVista->personalSalud->fecha_ing->format('d/m/Y') : \Carbon\Carbon::parse($usuarioVista->personalSalud->fecha_ing)->format('d/m/Y') }}
+                                        </p>
                                     </div>
                                 @endif
                                 @if($vistaRoleKey === 'personal_admin' && $usuarioVista->personalAdmin?->fecha_ingreso)
                                     <div>
                                         <p class="text-[9px] font-black uppercase tracking-widest text-[#2F3E5C]/40">Fecha de Ingreso</p>
-                                        <p class="mt-1 text-sm font-black text-[#2F3E5C]">{{ $usuarioVista->personalAdmin->fecha_ingreso->format('d/m/Y') }}</p>
+                                        <p class="mt-1 text-sm font-black text-[#2F3E5C]">
+                                            {{ $usuarioVista->personalAdmin->fecha_ingreso instanceof \Carbon\Carbon ? $usuarioVista->personalAdmin->fecha_ingreso->format('d/m/Y') : \Carbon\Carbon::parse($usuarioVista->personalAdmin->fecha_ingreso)->format('d/m/Y') }}
+                                        </p>
                                     </div>
                                 @endif
                             </div>

@@ -24,6 +24,10 @@ class PersonalAdmin extends Model
         'cod_usu',
     ];
 
+    protected $casts = [
+        'fecha_ingreso' => 'date',
+    ];
+
     /**
      * Relaciones
      */

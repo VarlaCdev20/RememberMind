@@ -24,12 +24,15 @@ class ReportExportService
             $data['fecha'] = $data['fecha'] ?? now()->format('d/m/Y H:i');
             $data['usuario'] = $data['usuario'] ?? (auth()->check() ? auth()->user()->name : 'Sistema');
 
-            // Intentamos generar el PDF usando Spatie Laravel PDF
-            return SpatiePdf::view($view, $data)
-                ->name($filename);
+            // Intentamos generar el PDF usando Spatie Laravel PDF de forma inmediata para atrapar errores de Browsershot
+            $pdfContent = SpatiePdf::view($view, $data)->output();
+            
+            return response()->streamDownload(function () use ($pdfContent) {
+                echo $pdfContent;
+            }, $filename);
 
         } catch (\Throwable $e) {
-            Log::warning("Spatie PDF falló: {$e->getMessage()}. Utilizando fallback de DomPDF.");
+            Log::warning("Spatie PDF falló (Browsershot/Puppeteer): {$e->getMessage()}. Iniciando fallback automático a DomPDF.");
 
             // Fallback a DomPDF
             $pdf = DomPdf::loadView($view, $data)
