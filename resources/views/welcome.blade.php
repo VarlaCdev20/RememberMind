@@ -149,38 +149,38 @@
             @scroll.window="scrolled = (window.pageYOffset > 20)" 
             class="fixed inset-x-0 top-4 z-50 w-full transition-all duration-300 pointer-events-none flex items-center">
         <div :class="scrolled 
-                ? 'bg-[#F4EBDD]/75 backdrop-blur-xl shadow-[0_14px_35px_rgba(47,62,92,0.22)] border border-[#C7B5A3]/45 h-20 md:h-22' 
-                : 'bg-[#F4EBDD]/45 backdrop-blur-md shadow-[0_8px_24px_rgba(47,62,92,0.06)] border border-[#C7B5A3]/20 h-24 md:h-28'" 
+                ? 'bg-[#F4EBDD]/55 backdrop-blur-xl shadow-[0_14px_35px_rgba(47,62,92,0.22)] border border-[#C7B5A3]/45 h-16 md:h-18' 
+                : 'bg-[#F4EBDD]/25 backdrop-blur-md shadow-[0_8px_24px_rgba(47,62,92,0.06)] border border-[#C7B5A3]/20 h-20 md:h-22'" 
              class="max-w-7xl mx-auto px-8 sm:px-10 lg:px-12 w-[calc(100%-1rem)] sm:w-[calc(100%-2rem)] rounded-[2rem] transition-all duration-300 flex items-center pointer-events-auto"
              style="backdrop-filter: blur(20px) !important; -webkit-backdrop-filter: blur(20px) !important;">
             <div class="flex justify-between items-center w-full">
                 {{-- Logo Orgánico --}}
-                <div class="flex-shrink-0 flex items-center gap-3 group cursor-pointer z-[60]">
-                    <div class="flex h-10 w-10 items-center justify-center rounded-full bg-terracota text-white shadow-lg transition-transform duration-500 group-hover:rotate-12 group-hover:scale-110">
-                        <span class="text-lg font-outfit font-bold">C</span>
+                <div class="flex-shrink-0 flex items-center gap-2.5 group cursor-pointer z-[60]">
+                    <div class="flex h-8 w-8 items-center justify-center rounded-full bg-terracota text-white shadow-md transition-transform duration-500 group-hover:rotate-12 group-hover:scale-110">
+                        <span class="text-sm font-outfit font-bold">C</span>
                     </div>
-                    <a href="#" class="font-outfit text-xl sm:text-2xl font-extrabold tracking-tight text-azul-profundo group-hover:text-terracota transition-colors">Casa Amandita</a>
+                    <a href="#" class="font-outfit text-lg sm:text-xl font-extrabold tracking-tight text-azul-profundo group-hover:text-terracota transition-colors">Casa Amandita</a>
                 </div>
 
                 {{-- Menú Escritorio --}}
-                <div class="hidden md:flex items-center space-x-8">
-                    <a href="#inicio" class="relative flex items-center gap-2 text-lg font-extrabold text-azul-profundo hover:text-terracota transition-colors hover-underline group"><i class="ph-bold ph-house text-xl group-hover:scale-110 transition-transform"></i>Inicio</a>
-                    <a href="#problema" class="relative flex items-center gap-2 text-lg font-extrabold text-azul-profundo hover:text-terracota transition-colors hover-underline group"><i class="ph-bold ph-stethoscope text-xl group-hover:scale-110 transition-transform"></i>Servicios</a>
-                    <a href="#experiencia" class="relative flex items-center gap-2 text-lg font-extrabold text-azul-profundo hover:text-terracota transition-colors hover-underline group"><i class="ph-bold ph-heart text-xl group-hover:scale-110 transition-transform"></i>Experiencia</a>
-                    <a href="#servicios" class="relative flex items-center gap-2 text-lg font-extrabold text-azul-profundo hover:text-terracota transition-colors hover-underline group"><i class="ph-bold ph-star text-xl group-hover:scale-110 transition-transform"></i>Actividades</a>
-                    <a href="#impacto" class="relative flex items-center gap-2 text-lg font-extrabold text-azul-profundo hover:text-terracota transition-colors hover-underline group"><i class="ph-bold ph-chart-line-up text-xl group-hover:scale-110 transition-transform"></i>Impacto</a>
+                <div class="hidden md:flex items-center space-x-6 lg:space-x-8">
+                    <a href="#inicio" class="relative flex items-center gap-1.5 text-base font-extrabold text-azul-profundo hover:text-terracota transition-colors hover-underline group"><i class="ph-bold ph-house text-lg group-hover:scale-110 transition-transform"></i>Inicio</a>
+                    <a href="#problema" class="relative flex items-center gap-1.5 text-base font-extrabold text-azul-profundo hover:text-terracota transition-colors hover-underline group"><i class="ph-bold ph-stethoscope text-lg group-hover:scale-110 transition-transform"></i>Servicios</a>
+                    <a href="#experiencia" class="relative flex items-center gap-1.5 text-base font-extrabold text-azul-profundo hover:text-terracota transition-colors hover-underline group"><i class="ph-bold ph-heart text-lg group-hover:scale-110 transition-transform"></i>Experiencia</a>
+                    <a href="#servicios" class="relative flex items-center gap-1.5 text-base font-extrabold text-azul-profundo hover:text-terracota transition-colors hover-underline group"><i class="ph-bold ph-star text-lg group-hover:scale-110 transition-transform"></i>Actividades</a>
+                    <a href="#impacto" class="relative flex items-center gap-1.5 text-base font-extrabold text-azul-profundo hover:text-terracota transition-colors hover-underline group"><i class="ph-bold ph-chart-line-up text-lg group-hover:scale-110 transition-transform"></i>Impacto</a>
                 </div>
 
                 {{-- Botón de Acceso --}}
                 <div class="hidden md:flex items-center">
                     @if (Route::has('login'))
                         @auth
-                            <a href="{{ url('/dashboard') }}" class="relative group px-6 py-2.5 bg-azul-profundo text-white font-black rounded-full text-base transition-all duration-200 hover:shadow-[0_8px_20px_rgba(47,62,92,0.4)] active:scale-90 active:translate-y-1 overflow-hidden">
+                            <a href="{{ url('/dashboard') }}" class="relative group px-5 py-2 bg-azul-profundo text-white font-black rounded-full text-sm transition-all duration-200 hover:shadow-[0_8px_20px_rgba(47,62,92,0.4)] active:scale-90 active:translate-y-1 overflow-hidden">
                                 <span class="relative z-10">Dashboard</span>
                                 <div class="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-in-out"></div>
                             </a>
                         @else
-                            <a href="{{ route('login') }}" class="relative group px-6 py-2.5 bg-terracota text-white font-black rounded-full text-base transition-all duration-200 hover:shadow-[0_8px_25px_rgba(233,122,95,0.6)] active:scale-90 active:translate-y-1 overflow-hidden">
+                            <a href="{{ route('login') }}" class="relative group px-5 py-2 bg-terracota text-white font-black rounded-full text-sm transition-all duration-200 hover:shadow-[0_8px_25px_rgba(233,122,95,0.6)] active:scale-90 active:translate-y-1 overflow-hidden">
                                 <span class="relative z-10">Acceder al Portal</span>
                                 <div class="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-in-out"></div>
                             </a>
@@ -190,8 +190,8 @@
 
                 {{-- Botón Menú Móvil --}}
                 <div class="md:hidden flex items-center z-[60]">
-                    <button @click.stop="open = true" type="button" class="text-azul-profundo bg-[#E6DDD3] p-2 rounded-full hover:bg-terracota hover:text-white focus:outline-none transition-all duration-300 shadow-md" aria-label="Abrir menú">
-                        <i class="ph-bold ph-list text-2xl"></i>
+                    <button @click.stop="open = true" type="button" class="text-azul-profundo bg-[#E6DDD3] p-1.5 rounded-full hover:bg-terracota hover:text-white focus:outline-none transition-all duration-300 shadow-sm" aria-label="Abrir menú">
+                        <i class="ph-bold ph-list text-xl"></i>
                     </button>
                 </div>
             </div>
