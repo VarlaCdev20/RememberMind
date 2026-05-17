@@ -190,7 +190,7 @@
 
                 {{-- Botón Menú Móvil --}}
                 <div class="md:hidden flex items-center z-[60]">
-                    <button @click="open = true" type="button" class="text-azul-profundo bg-[#E6DDD3] p-2 rounded-full hover:bg-terracota hover:text-white focus:outline-none transition-all duration-300 shadow-md">
+                    <button @click.stop="open = true" type="button" class="text-azul-profundo bg-[#E6DDD3] p-2 rounded-full hover:bg-terracota hover:text-white focus:outline-none transition-all duration-300 shadow-md" aria-label="Abrir menú">
                         <i class="ph-bold ph-list text-2xl"></i>
                     </button>
                 </div>
@@ -198,25 +198,25 @@
         </div>
 
         {{-- Fondo Oscuro Overlay para Móvil --}}
-        <div x-show="open" style="display: none;"
+        <div x-show="open" x-cloak
              x-transition.opacity.duration.300ms
-             class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[65] md:hidden" 
+             class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[80] md:hidden pointer-events-auto" 
              @click="open = false">
         </div>
 
         {{-- SIDEBAR LATERAL (Totalmente Responsivo) --}}
-        <div x-show="open" style="display: none;"
+        <aside x-show="open" x-cloak
              x-transition:enter="transition ease-out duration-300 transform"
-             x-transition:enter-start="translate-x-full"
-             x-transition:enter-end="translate-x-0"
+             x-transition:enter-start="translate-x-full opacity-70"
+             x-transition:enter-end="translate-x-0 opacity-100"
              x-transition:leave="transition ease-in duration-200 transform"
-             x-transition:leave-start="translate-x-0"
-             x-transition:leave-end="translate-x-full"
-             class="fixed top-0 right-0 h-screen w-[85%] max-w-sm bg-[#D5C7B9] shadow-[0_0_50px_rgba(0,0,0,0.5)] z-[70] md:hidden flex flex-col border-l border-[#C7B5A3]">
+             x-transition:leave-start="translate-x-0 opacity-100"
+             x-transition:leave-end="translate-x-full opacity-70"
+             class="fixed top-0 right-0 h-screen w-[85%] max-w-sm bg-[#D5C7B9] shadow-[0_0_50px_rgba(0,0,0,0.5)] z-[90] md:hidden flex flex-col border-l border-[#C7B5A3] pointer-events-auto">
              
             <div class="p-6 flex justify-between items-center border-b border-[#C7B5A3]/50">
                 <span class="font-outfit text-2xl font-extrabold text-azul-profundo">Menú</span>
-                <button @click="open = false" class="text-azul-profundo p-2 bg-[#E6DDD3] rounded-full hover:bg-terracota hover:text-white transition-all shadow-md active:scale-90">
+                <button @click="open = false" class="text-azul-profundo p-2 bg-[#E6DDD3] rounded-full hover:bg-terracota hover:text-white transition-all shadow-md active:scale-90" aria-label="Cerrar menú">
                     <i class="ph-bold ph-x text-xl"></i>
                 </button>
             </div>
@@ -238,7 +238,7 @@
                     @endif
                 </div>
             </div>
-        </div>
+        </aside>
     </header>
 
     {{-- 2. HERO PRINCIPAL --}}
