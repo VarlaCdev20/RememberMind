@@ -1,6 +1,50 @@
-<div class="p-6 md:p-8 space-y-8 relative min-h-screen bg-[#F8F3ED]/40">
+<div class="p-6 md:p-8 space-y-8 relative min-h-screen bg-[#F8F3ED]/40 print:bg-white print:p-0 print:space-y-4" 
+     x-data="{ printListenerAdded: false }" 
+     x-init="if(!printListenerAdded) { window.addEventListener('print-window', () => window.print()); printListenerAdded = true; }">
+
+    {{-- CSS Estilos para Impresión y Marca de Agua en Pantalla/Impresora --}}
+    <style>
+        @media print {
+            .no-print {
+                display: none !important;
+            }
+            .print-area {
+                background: white !important;
+                box-shadow: none !important;
+                color: #2F3E5C !important;
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+            .print-break {
+                page-break-before: always;
+            }
+            body {
+                background: white !important;
+            }
+        }
+        
+        .watermark-container {
+            position: relative;
+        }
+        .watermark-bg {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-30deg);
+            font-size: 5rem;
+            font-weight: 900;
+            color: rgba(47, 62, 92, 0.05);
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            pointer-events: none;
+            z-index: 0;
+            white-space: nowrap;
+            user-select: none;
+        }
+    </style>
+
     {{-- ENCABEZADO PREMIUM --}}
-    <header class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+    <header class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between no-print">
         <div>
             <h1 class="text-3xl font-black tracking-tight text-[#2F3E5C]">Áreas Institucionales</h1>
             <p class="text-sm font-semibold text-[#967B66]">Estructura y organigrama funcional operativo de Casa Amandita</p>
@@ -11,7 +55,7 @@
                 <button type="button"
                         wire:click="abrirReportes"
                         class="inline-flex items-center justify-center gap-2 rounded-full border-2 border-[#C7B5A3] bg-white px-5 py-2.5 text-xs font-black text-[#7C7168] shadow-md transition-all duration-300 hover:bg-[#F3EEE8] active:scale-95">
-                    <i class="ph-bold ph-printer text-base"></i>
+                    <i class="ph-bold ph-chart-line-up text-base"></i>
                     Reportes
                 </button>
             @endcan
@@ -27,12 +71,12 @@
         </div>
     </header>
 
-    {{-- MÉTRICAS E INDICADORES --}}
-    <section class="grid grid-cols-2 md:grid-cols-5 gap-4">
+    {{-- MÉTRICAS E INDICADORES ORGANIZACIONALES --}}
+    <section class="grid grid-cols-2 md:grid-cols-6 gap-4 no-print">
         {{-- Total Áreas --}}
         <div class="rounded-2xl border-none bg-white p-4 shadow-[0_12px_24px_rgba(47,62,92,0.05)] transition duration-300 hover:shadow-lg">
             <div class="flex items-center justify-between">
-                <span class="text-xs font-black uppercase tracking-wider text-[#967B66]">Total Áreas</span>
+                <span class="text-[10px] font-black uppercase tracking-wider text-[#967B66]">Total Áreas</span>
                 <span class="flex h-8 w-8 items-center justify-center rounded-xl bg-[#2F3E5C]/10 text-[#2F3E5C]">
                     <i class="ph-bold ph-layout text-lg"></i>
                 </span>
@@ -43,7 +87,7 @@
         {{-- Áreas Activas --}}
         <div class="rounded-2xl border-none bg-white p-4 shadow-[0_12px_24px_rgba(47,62,92,0.05)] transition duration-300 hover:shadow-lg">
             <div class="flex items-center justify-between">
-                <span class="text-xs font-black uppercase tracking-wider text-[#967B66]">Activas</span>
+                <span class="text-[10px] font-black uppercase tracking-wider text-[#967B66]">Activas</span>
                 <span class="flex h-8 w-8 items-center justify-center rounded-xl bg-[#8DA280]/20 text-[#63775B]">
                     <i class="ph-bold ph-check-circle text-lg"></i>
                 </span>
@@ -51,10 +95,21 @@
             <p class="mt-2 text-2xl font-black text-[#63775B]">{{ $areasActivas }}</p>
         </div>
 
+        {{-- Áreas Inactivas --}}
+        <div class="rounded-2xl border-none bg-white p-4 shadow-[0_12px_24px_rgba(47,62,92,0.05)] transition duration-300 hover:shadow-lg">
+            <div class="flex items-center justify-between">
+                <span class="text-[10px] font-black uppercase tracking-wider text-[#967B66]">Inactivas</span>
+                <span class="flex h-8 w-8 items-center justify-center rounded-xl bg-[#E27D60]/10 text-[#E27D60]">
+                    <i class="ph-bold ph-eye-slash text-lg"></i>
+                </span>
+            </div>
+            <p class="mt-2 text-2xl font-black text-[#E27D60]">{{ $areasInactivas }}</p>
+        </div>
+
         {{-- Usuarios Vinculados --}}
         <div class="rounded-2xl border-none bg-white p-4 shadow-[0_12px_24px_rgba(47,62,92,0.05)] transition duration-300 hover:shadow-lg">
             <div class="flex items-center justify-between">
-                <span class="text-xs font-black uppercase tracking-wider text-[#967B66]">Personal</span>
+                <span class="text-[10px] font-black uppercase tracking-wider text-[#967B66]">Personal</span>
                 <span class="flex h-8 w-8 items-center justify-center rounded-xl bg-[#E27D60]/10 text-[#E27D60]">
                     <i class="ph-bold ph-users-three text-lg"></i>
                 </span>
@@ -65,29 +120,29 @@
         {{-- Áreas Sin Responsable --}}
         <div class="rounded-2xl border-none bg-white p-4 shadow-[0_12px_24px_rgba(47,62,92,0.05)] transition duration-300 hover:shadow-lg">
             <div class="flex items-center justify-between">
-                <span class="text-xs font-black uppercase tracking-wider text-[#967B66]">Sin Responsable</span>
-                <span class="flex h-8 w-8 items-center justify-center rounded-xl bg-red-100 text-red-700">
+                <span class="text-[10px] font-black uppercase tracking-wider text-[#967B66]">Sin Responsable</span>
+                <span class="flex h-8 w-8 items-center justify-center rounded-xl bg-red-50 text-red-700">
                     <i class="ph-bold ph-warning-circle text-lg"></i>
                 </span>
             </div>
             <p class="mt-2 text-2xl font-black text-red-600">{{ $areasSinResponsable }}</p>
         </div>
 
-        {{-- Módulos Vinculados --}}
+        {{-- Áreas Sin Usuarios --}}
         <div class="rounded-2xl border-none bg-white p-4 shadow-[0_12px_24px_rgba(47,62,92,0.05)] transition duration-300 hover:shadow-lg">
             <div class="flex items-center justify-between">
-                <span class="text-xs font-black uppercase tracking-wider text-[#967B66]">Módulos en Uso</span>
-                <span class="flex h-8 w-8 items-center justify-center rounded-xl bg-purple-100 text-purple-700">
-                    <i class="ph-bold ph-square-half text-lg"></i>
+                <span class="text-[10px] font-black uppercase tracking-wider text-[#967B66]">Sin Personal</span>
+                <span class="flex h-8 w-8 items-center justify-center rounded-xl bg-gray-100 text-gray-700">
+                    <i class="ph-bold ph-user-minus text-lg"></i>
                 </span>
             </div>
-            <p class="mt-2 text-2xl font-black text-purple-700">{{ $modulosUtilizadosCount }}</p>
+            <p class="mt-2 text-2xl font-black text-gray-700">{{ $areasSinUsuarios }}</p>
         </div>
     </section>
 
     {{-- FILTROS DE BÚSQUEDA Y VISTA --}}
-    <section class="rounded-2xl bg-white/70 backdrop-blur-md p-4 shadow-[0_8px_30px_rgba(47,62,92,0.04)] border border-[#C7B5A3]/30">
-        <div class="grid grid-cols-1 gap-4 md:grid-cols-5">
+    <section class="rounded-2xl bg-white/70 backdrop-blur-md p-4 shadow-[0_8px_30px_rgba(47,62,92,0.04)] border border-[#C7B5A3]/30 no-print">
+        <div class="grid grid-cols-1 gap-4 md:grid-cols-4">
             {{-- Búsqueda --}}
             <div class="relative md:col-span-2">
                 <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-[#967B66]">
@@ -95,7 +150,7 @@
                 </span>
                 <input type="text"
                        wire:model.live.debounce.300ms="search"
-                       placeholder="Buscar por nombre, código o tipo..."
+                       placeholder="Buscar por nombre o tipo..."
                        class="w-full rounded-xl border-[#C7B5A3]/50 bg-white/80 py-2.5 pl-10 pr-4 text-xs font-semibold text-[#2F3E5C] placeholder-[#967B66]/60 shadow-sm transition focus:border-[#E27D60] focus:ring-1 focus:ring-[#E27D60]">
             </div>
 
@@ -120,136 +175,129 @@
                     <option value="INACTIVA">Áreas Inactivas</option>
                 </select>
             </div>
-
-            {{-- Botón limpiar --}}
-            <div class="flex gap-2">
-                <button type="button"
-                        wire:click="limpiarFiltros"
-                        class="flex w-full items-center justify-center gap-2 rounded-xl border border-[#C7B5A3] bg-white py-2.5 text-xs font-black text-[#7C7168] shadow-sm transition hover:bg-[#F3EEE8] active:scale-95">
-                    <i class="ph-bold ph-funnel-simple-x"></i>
-                    Limpiar
-                </button>
-            </div>
         </div>
     </section>
 
-    {{-- GRID PRINCIPAL DE CARDS (EL MAPA INSTITUCIONAL) --}}
-    <section class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    {{-- GRID PRINCIPAL DE CARDS --}}
+    <section class="grid grid-cols-1 md:grid-cols-3 gap-6 no-print">
         @forelse($areas as $area)
             @php
                 $esInactiva = $area->estado === 'INACTIVA';
                 $colorAccent = $area->color ?? '#2F3E5C';
             @endphp
-            <div class="group relative rounded-3xl border-transparent transition-all duration-300 hover:-translate-y-1 bg-[#FDFBF9] shadow-[0_14px_30px_rgba(47,62,92,0.06)] hover:shadow-[0_20px_40px_rgba(47,62,92,0.12)] p-6 overflow-hidden border-2 border-transparent hover:border-[#C7B5A3]/40 {{ $esInactiva ? 'opacity-70 grayscale bg-[#E6DDD3]/20' : '' }}">
+            <div class="group relative rounded-3xl transition-all duration-300 hover:-translate-y-1 bg-[#FDFBF9] shadow-[0_14px_30px_rgba(47,62,92,0.06)] hover:shadow-[0_20px_40px_rgba(47,62,92,0.12)] overflow-hidden border-2 border-transparent hover:border-[#C7B5A3]/40 flex flex-col {{ $esInactiva ? 'opacity-70 grayscale bg-[#E6DDD3]/20' : '' }}">
                 
-                {{-- DETALLE DE COLOR EN BARRA SUPERIOR --}}
-                <div class="absolute top-0 left-0 w-full h-1.5" style="background-color: {{ $colorAccent }}"></div>
-
-                {{-- ENCABEZADO CARD --}}
-                <div class="flex items-start justify-between">
-                    {{-- Icono y Título --}}
-                    <div class="flex items-center gap-3.5">
-                        <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl shadow-inner text-white" style="background-color: {{ $esInactiva ? '#9B8B7E' : $colorAccent }}">
-                            <i class="ph-bold {{ $area->icono ?? 'ph-buildings' }} text-xl"></i>
+                {{-- PORTADA BORDE A BORDE --}}
+                <div class="relative h-36 w-full shrink-0 overflow-hidden bg-slate-100">
+                    @if($area->imagen_area)
+                        <img src="{{ \Illuminate\Support\Facades\Storage::url($area->imagen_area) }}" 
+                             alt="{{ $area->nombre }}" 
+                             class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105">
+                    @else
+                        {{-- Fallback degradado --}}
+                        <div class="h-full w-full flex items-center justify-center transition-transform duration-500 group-hover:scale-105" 
+                             style="background: linear-gradient(135deg, {{ $colorAccent }} 0%, #D5C7B9 100%)">
+                            <i class="ph-bold {{ $this->obtenerIconoTipo($area->tipo_area) }} text-white text-5xl opacity-40"></i>
                         </div>
-                        <div>
-                            <span class="inline-block rounded-full px-2.5 py-0.5 text-[9px] font-black border uppercase {{ $this->obtenerColorTipo($area->tipo_area) }}">
-                                {{ $area->tipo_area }}
-                            </span>
-                            <h3 class="mt-1 text-base font-black text-[#2F3E5C] leading-snug group-hover:text-[#E27D60] transition-colors duration-200">
-                                {{ $area->nombre }}
-                            </h3>
-                        </div>
-                    </div>
-
-                    {{-- Badge de Estado Inactivo --}}
-                    @if($esInactiva)
-                        <span class="rounded-full bg-red-100 px-2 py-0.5 text-[8px] font-black text-red-700 uppercase tracking-widest border border-red-200">
-                            Inactiva
-                        </span>
                     @endif
-                </div>
-
-                {{-- DESCRIPCIÓN --}}
-                <p class="mt-4 text-xs font-semibold text-[#7C7168] line-clamp-3 leading-relaxed">
-                    {{ $area->descripcion }}
-                </p>
-
-                {{-- RESPONSABLE --}}
-                <div class="mt-5 rounded-2xl bg-[#F4EFEA]/60 p-3 flex items-center justify-between border border-[#C7B5A3]/30">
-                    <div class="flex items-center gap-2">
-                        <div class="flex h-7 w-7 items-center justify-center rounded-full bg-[#2F3E5C] text-[10px] font-black text-white">
-                            {{ $area->responsable ? substr($area->responsable->nombres, 0, 1) . substr($area->responsable->ap_paterno, 0, 1) : '?' }}
-                        </div>
-                        <div>
-                            <p class="text-[9px] font-black text-[#967B66] uppercase tracking-wider">Responsable</p>
-                            <p class="text-[10px] font-black text-[#2F3E5C] truncate max-w-[140px]">
-                                {{ $area->responsable ? $area->responsable->name : 'Sin Responsable' }}
-                            </p>
-                        </div>
-                    </div>
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/55 via-black/10 to-transparent"></div>
                     
-                    {{-- Contador Personal --}}
-                    <div class="text-right">
-                        <p class="text-[9px] font-black text-[#967B66] uppercase tracking-wider">Personal</p>
-                        <span class="inline-flex items-center gap-1 text-[11px] font-black text-[#E27D60]">
-                            <i class="ph-bold ph-users-three"></i>
-                            {{ $area->usuarios_count }}
+                    {{-- Badge Tipo y Estado encima de la imagen --}}
+                    <div class="absolute top-4 left-4 flex flex-wrap gap-2">
+                        <span class="inline-block rounded-full bg-white/95 px-2.5 py-0.5 text-[8px] font-black uppercase tracking-wider text-[#2F3E5C] shadow-sm">
+                            {{ $area->tipo_area }}
                         </span>
+                        @if($esInactiva)
+                            <span class="rounded-full bg-red-600 px-2.5 py-0.5 text-[8px] font-black text-white uppercase tracking-widest shadow-sm">
+                                Inactiva
+                            </span>
+                        @else
+                            <span class="rounded-full bg-[#8DA280] px-2.5 py-0.5 text-[8px] font-black text-white uppercase tracking-widest shadow-sm">
+                                Activa
+                            </span>
+                        @endif
+                    </div>
+
+                    {{-- Nombre del área encima de la imagen --}}
+                    <div class="absolute bottom-4 left-4 right-4">
+                        <h3 class="text-base font-black text-white leading-snug drop-shadow-sm truncate">
+                            {{ $area->nombre }}
+                        </h3>
                     </div>
                 </div>
 
-                {{-- LISTA DE ROLES SUGERIDOS --}}
-                @if($area->roles_sugeridos)
-                    <div class="mt-4 flex flex-wrap gap-1.5">
-                        @foreach($area->roles_sugeridos as $rol)
-                            <span class="rounded-full bg-[#E6DDD3]/50 px-2.5 py-0.5 text-[9px] font-black text-[#7C7168] border border-[#C7B5A3]/40">
-                                {{ $rol }}
+                {{-- CONTENIDO CARD --}}
+                <div class="p-5 flex-1 flex flex-col justify-between space-y-4">
+                    {{-- DESCRIPCIÓN --}}
+                    <p class="text-xs font-semibold text-[#7C7168] line-clamp-3 leading-relaxed">
+                        {{ $area->descripcion }}
+                    </p>
+
+                    {{-- RESPONSABLE --}}
+                    <div class="rounded-2xl bg-[#F4EFEA]/60 p-3 flex items-center justify-between border border-[#C7B5A3]/30">
+                        <div class="flex items-center gap-2">
+                            <div class="flex h-7 w-7 items-center justify-center rounded-full text-[10px] font-black text-white shadow-sm" style="background-color: {{ $colorAccent }}">
+                                {{ $area->responsable ? substr($area->responsable->nombres, 0, 1) . substr($area->responsable->ap_paterno, 0, 1) : '?' }}
+                            </div>
+                            <div>
+                                <p class="text-[9px] font-black text-[#967B66] uppercase tracking-wider">Responsable</p>
+                                <p class="text-[10px] font-black text-[#2F3E5C] truncate max-w-[140px]">
+                                    {{ $area->responsable ? $area->responsable->name : 'Sin Responsable' }}
+                                </p>
+                            </div>
+                        </div>
+                        
+                        {{-- Contador Personal --}}
+                        <div class="text-right">
+                            <p class="text-[9px] font-black text-[#967B66] uppercase tracking-wider">Personal</p>
+                            <span class="inline-flex items-center gap-1 text-[11px] font-black text-[#E27D60]">
+                                <i class="ph-bold ph-users-three"></i>
+                                {{ $area->usuarios_count }}
                             </span>
-                        @endforeach
-                    </div>
-                @endif
-
-                {{-- ACCIONES DE CARD --}}
-                <div class="mt-6 pt-4 border-t border-[#C7B5A3]/30 flex items-center justify-between">
-                    <div class="flex items-center gap-2">
-                        <button type="button"
-                                wire:click="verArea('{{ $area->cod_area }}')"
-                                class="inline-flex h-8 items-center gap-1.5 rounded-full bg-[#2F3E5C]/10 px-3 text-[10px] font-black text-[#2F3E5C] hover:bg-[#2F3E5C] hover:text-white transition duration-200"
-                                title="Ver Ficha Completa">
-                            <i class="ph-bold ph-eye"></i>
-                            Ver ficha
-                        </button>
-
-                        @can('areas.reportes')
-                            <button type="button"
-                                    wire:click="generarReporteEspecifico('{{ $area->cod_area }}')"
-                                    class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-[#E6DDD3]/40 text-[#7C7168] hover:bg-[#E6DDD3] transition duration-200"
-                                    title="Imprimir Reporte">
-                                <i class="ph-bold ph-printer"></i>
-                            </button>
-                        @endcan
+                        </div>
                     </div>
 
-                    <div class="flex items-center gap-1.5">
-                        @can('areas.editar')
+                    {{-- ACCIONES DE CARD --}}
+                    <div class="pt-4 border-t border-[#C7B5A3]/30 flex items-center justify-between">
+                        <div class="flex items-center gap-2">
                             <button type="button"
-                                    wire:click="editarArea('{{ $area->cod_area }}')"
-                                    class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-[#E27D60]/10 text-[#E27D60] hover:bg-[#E27D60] hover:text-white transition duration-200"
-                                    title="Editar Área">
-                                <i class="ph-bold ph-pencil-simple"></i>
+                                    wire:click="verArea('{{ $area->cod_area }}')"
+                                    class="inline-flex h-8 items-center gap-1.5 rounded-full bg-[#2F3E5C]/10 px-3 text-[10px] font-black text-[#2F3E5C] hover:bg-[#2F3E5C] hover:text-white transition duration-200"
+                                    title="Ver Ficha Completa">
+                                <i class="ph-bold ph-eye"></i>
+                                Ver ficha
                             </button>
-                        @endcan
 
-                        @can('areas.cambiar_estado')
-                            <button type="button"
-                                    wire:click="toggleEstado('{{ $area->cod_area }}')"
-                                    wire:confirm="¿Está seguro de cambiar el estado de este área institucional?"
-                                    class="inline-flex h-8 w-8 items-center justify-center rounded-full transition duration-200 {{ $esInactiva ? 'bg-[#8DA280]/20 text-[#63775B] hover:bg-[#8DA280] hover:text-white' : 'bg-red-50 text-red-600 hover:bg-red-600 hover:text-white' }}"
-                                    title="{{ $esInactiva ? 'Activar Área' : 'Desactivar Área' }}">
-                                <i class="ph-bold {{ $esInactiva ? 'ph-power' : 'ph-x-circle' }}"></i>
-                            </button>
-                        @endcan
+                            @can('areas.reportes')
+                                <button type="button"
+                                        wire:click="abrirReporteArea('{{ $area->cod_area }}')"
+                                        class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-[#E6DDD3]/40 text-[#7C7168] hover:bg-[#E6DDD3] transition duration-200"
+                                        title="Reporte del Área">
+                                    <i class="ph-bold ph-file-chart"></i>
+                                </button>
+                            @endcan
+                        </div>
+
+                        <div class="flex items-center gap-1.5">
+                            @can('areas.editar')
+                                <button type="button"
+                                        wire:click="editarArea('{{ $area->cod_area }}')"
+                                        class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-[#E27D60]/10 text-[#E27D60] hover:bg-[#E27D60] hover:text-white transition duration-200"
+                                        title="Editar Área">
+                                    <i class="ph-bold ph-pencil-simple"></i>
+                                </button>
+                            @endcan
+
+                            @can('areas.cambiar_estado')
+                                <button type="button"
+                                        wire:click="toggleEstado('{{ $area->cod_area }}')"
+                                        wire:confirm="¿Está seguro de cambiar el estado de este área institucional?"
+                                        class="inline-flex h-8 w-8 items-center justify-center rounded-full transition duration-200 {{ $esInactiva ? 'bg-[#8DA280]/20 text-[#63775B] hover:bg-[#8DA280] hover:text-white' : 'bg-red-50 text-red-600 hover:bg-red-600 hover:text-white' }}"
+                                        title="{{ $esInactiva ? 'Activar Área' : 'Desactivar Área' }}">
+                                    <i class="ph-bold {{ $esInactiva ? 'ph-power' : 'ph-x-circle' }}"></i>
+                                </button>
+                            @endcan
+                        </div>
                     </div>
                 </div>
             </div>
@@ -264,151 +312,339 @@
         @endforelse
     </section>
 
-    {{-- FICHA LATERAL DETALLE DEL ÁREA --}}
+    {{-- FICHA LATERAL DETALLE DEL ÁREA (SLIDE-OVER PANEL EN MAYÚSCULAS Y DOBLE COLUMNA) --}}
     @if($mostrarFicha && $areaSeleccionada)
-        <div class="fixed inset-0 z-50 overflow-hidden" aria-labelledby="slide-over-title" role="dialog" aria-modal="true">
+        <div class="fixed inset-0 z-50 overflow-hidden no-print" aria-labelledby="slide-over-title" role="dialog" aria-modal="true">
             <div class="absolute inset-0 overflow-hidden">
-                {{-- Fondo oscuro --}}
                 <div class="absolute inset-0 bg-[#2F3E5C]/40 backdrop-blur-sm transition-opacity" wire:click="cerrarFicha"></div>
 
                 <div class="pointer-events-none fixed inset-y-0 right-0 flex max-w-full pl-10">
-                    <div class="pointer-events-auto w-screen max-w-md transform bg-[#FDFBF9] shadow-[0_20px_60px_rgba(47,62,92,0.25)] transition duration-500 ease-in-out">
-                        <div class="flex h-full flex-col overflow-y-scroll bg-white">
+                    <div class="pointer-events-auto w-screen max-w-5xl transform bg-[#FDFBF9] shadow-[0_20px_60px_rgba(47,62,92,0.25)] transition duration-500 ease-in-out">
+                        <div class="flex h-full flex-col bg-white">
                             
-                            {{-- Cabecera Ficha --}}
-                            <div class="relative p-6 text-white" style="background-color: {{ $areaSeleccionada->color ?? '#2F3E5C' }}">
+                            {{-- Portada Ficha Borde a Borde --}}
+                            <div class="relative h-48 shrink-0 overflow-hidden bg-slate-100">
+                                @if($areaSeleccionada->imagen_area)
+                                    <img src="{{ \Illuminate\Support\Facades\Storage::url($areaSeleccionada->imagen_area) }}" 
+                                         alt="{{ $areaSeleccionada->nombre }}" 
+                                         class="h-full w-full object-cover">
+                                @else
+                                    <div class="h-full w-full flex items-center justify-center" 
+                                         style="background: linear-gradient(135deg, {{ $areaSeleccionada->color ?? '#2F3E5C' }} 0%, #D5C7B9 100%)">
+                                        <i class="ph-bold {{ $this->obtenerIconoTipo($areaSeleccionada->tipo_area) }} text-white text-6xl opacity-30"></i>
+                                    </div>
+                                @endif
+                                <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent"></div>
+                                
                                 <button type="button"
                                         wire:click="cerrarFicha"
-                                        class="absolute top-6 right-6 flex h-8 w-8 items-center justify-center rounded-full bg-white/20 text-white hover:bg-white hover:text-[#2F3E5C] transition duration-200">
+                                        class="absolute top-4 right-4 flex h-8 w-8 items-center justify-center rounded-full bg-black/40 text-white hover:bg-white hover:text-[#2F3E5C] transition duration-200">
                                     <i class="ph-bold ph-x text-sm"></i>
                                 </button>
 
-                                <div class="flex items-center gap-3">
-                                    <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-white/10 text-white border border-white/20">
-                                        <i class="ph-bold {{ $areaSeleccionada->icono ?? 'ph-buildings' }} text-lg"></i>
-                                    </div>
-                                    <div>
-                                        <span class="inline-block rounded-full bg-white/20 px-2 py-0.5 text-[8px] font-black uppercase tracking-wider text-white">
-                                            {{ $areaSeleccionada->tipo_area }}
-                                        </span>
-                                        <h2 class="text-lg font-black mt-0.5 leading-tight">{{ $areaSeleccionada->nombre }}</h2>
-                                    </div>
+                                <div class="absolute bottom-4 left-6 right-6">
+                                    <span class="inline-block rounded-full bg-white/20 px-2.5 py-0.5 text-[8px] font-black uppercase tracking-wider text-white backdrop-blur-sm">
+                                        {{ $areaSeleccionada->tipo_area }}
+                                    </span>
+                                    <h2 class="text-2xl font-black text-white mt-1 leading-tight drop-shadow">{{ $areaSeleccionada->nombre }}</h2>
                                 </div>
                             </div>
 
-                            {{-- Cuerpo Ficha --}}
-                            <div class="flex-1 p-6 space-y-6 overflow-y-auto bg-[#F8F3ED]/30">
-                                {{-- Descripción --}}
-                                <div class="space-y-1.5">
-                                    <h4 class="text-[10px] font-black text-[#967B66] uppercase tracking-wider">Descripción del Área</h4>
-                                    <p class="text-xs font-semibold text-[#7C7168] bg-white p-3 rounded-2xl shadow-sm border border-[#C7B5A3]/20 leading-relaxed">
-                                        {{ $areaSeleccionada->descripcion }}
-                                    </p>
-                                </div>
+                            @php
+                                $totalUsuarios = count($areaSeleccionada->usuarios);
+                                $activosUsuarios = $areaSeleccionada->usuarios->where('estado', 1)->count();
+                                $inactivosUsuarios = $areaSeleccionada->usuarios->where('estado', '!=', 1)->count();
+                                $porcActivos = $totalUsuarios > 0 ? round(($activosUsuarios / $totalUsuarios) * 100, 1) : 0;
+                            @endphp
 
-                                {{-- Responsable --}}
-                                <div class="space-y-1.5">
-                                    <h4 class="text-[10px] font-black text-[#967B66] uppercase tracking-wider">Responsable Asignado</h4>
-                                    <div class="flex items-center gap-3 bg-white p-3 rounded-2xl shadow-sm border border-[#C7B5A3]/20">
-                                        <div class="flex h-9 w-9 items-center justify-center rounded-full bg-[#E27D60] text-xs font-black text-white shadow-sm">
-                                            {{ $areaSeleccionada->responsable ? substr($areaSeleccionada->responsable->nombres, 0, 1) . substr($areaSeleccionada->responsable->ap_paterno, 0, 1) : '?' }}
-                                        </div>
-                                        <div>
-                                            <p class="text-xs font-black text-[#2F3E5C]">
-                                                {{ $areaSeleccionada->responsable ? $areaSeleccionada->responsable->name : 'Sin Responsable' }}
-                                            </p>
-                                            <p class="text-[9px] font-black text-[#967B66] uppercase tracking-wider">
-                                                {{ $areaSeleccionada->responsable ? ($areaSeleccionada->responsable->getRoleNames()->first() ?? 'Sin Rol') : 'Área Operativa Húerfana' }}
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
+                            {{-- Cuerpo Ficha - Distribuido en Grid de 2 Columnas en Desktop --}}
+                            <div class="flex-1 overflow-y-auto bg-[#F8F3ED]/30 p-6 space-y-6" 
+                                 x-data="{
+                                    activeChart: null,
+                                    rolChart: null,
+                                    lineChart: null,
+                                    initAreaCharts() {
+                                        if (this.activeChart) this.activeChart.destroy();
+                                        if (this.rolChart) this.rolChart.destroy();
+                                        if (this.lineChart) this.lineChart.destroy();
 
-                                {{-- Sugerencias Institucionales --}}
-                                <div class="grid grid-cols-2 gap-4">
-                                    <div>
-                                        <h4 class="text-[10px] font-black text-[#967B66] uppercase tracking-wider mb-1.5">Roles Sugeridos</h4>
-                                        <div class="flex flex-wrap gap-1">
-                                            @forelse($areaSeleccionada->roles_sugeridos ?? [] as $rol)
-                                                <span class="rounded-full bg-[#2F3E5C]/5 px-2 py-0.5 text-[9px] font-black text-[#2F3E5C] border border-[#2F3E5C]/10">
-                                                    {{ $rol }}
-                                                </span>
-                                            @empty
-                                                <span class="text-[10px] font-semibold text-[#967B66] italic">Ninguno</span>
-                                            @endforelse
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <h4 class="text-[10px] font-black text-[#967B66] uppercase tracking-wider mb-1.5">Módulos Clave</h4>
-                                        <div class="flex flex-wrap gap-1">
-                                            @forelse($areaSeleccionada->modulos_relacionados ?? [] as $mod)
-                                                <span class="rounded-full bg-purple-50 px-2 py-0.5 text-[9px] font-black text-purple-700 border border-purple-100">
-                                                    {{ $mod }}
-                                                </span>
-                                            @empty
-                                                <span class="text-[10px] font-semibold text-[#967B66] italic">Ninguno</span>
-                                            @endforelse
-                                        </div>
-                                    </div>
-                                </div>
+                                        const total = {{ $totalUsuarios }};
+                                        const activos = {{ $activosUsuarios }};
+                                        const inactivos = {{ $inactivosUsuarios }};
 
-                                {{-- Usuarios Vinculados --}}
-                                <div class="space-y-2">
-                                    <div class="flex items-center justify-between">
-                                        <h4 class="text-[10px] font-black text-[#967B66] uppercase tracking-wider">Personal Vinculado ({{ count($areaSeleccionada->usuarios) }})</h4>
-                                    </div>
+                                        if (total > 0) {
+                                            const ctxActive = this.$refs.canvasActive;
+                                            if (ctxActive) {
+                                                this.activeChart = new Chart(ctxActive, {
+                                                    type: 'doughnut',
+                                                    data: {
+                                                        labels: ['Activos', 'Inactivos'],
+                                                        datasets: [{
+                                                            data: [activos, inactivos],
+                                                            backgroundColor: ['#8DA280', '#E27D60'],
+                                                            borderWidth: 0
+                                                        }]
+                                                    },
+                                                    options: {
+                                                        responsive: true,
+                                                        maintainAspectRatio: false,
+                                                        cutout: '70%',
+                                                        plugins: {
+                                                            legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10, weight: 'bold' } } }
+                                                        }
+                                                    }
+                                                });
+                                            }
+
+                                            const rolesLabels = @js(array_keys($this->obtenerDatosGraficoUsuariosPorRolArea($areaSeleccionada->cod_area)));
+                                            const rolesValues = @js(array_values($this->obtenerDatosGraficoUsuariosPorRolArea($areaSeleccionada->cod_area)));
+                                            const ctxRol = this.$refs.canvasRol;
+                                            if (ctxRol && rolesLabels.length > 0) {
+                                                this.rolChart = new Chart(ctxRol, {
+                                                    type: 'bar',
+                                                    data: {
+                                                        labels: rolesLabels,
+                                                        datasets: [{
+                                                            data: rolesValues,
+                                                            backgroundColor: '#2F3E5C',
+                                                            borderRadius: 6
+                                                        }]
+                                                    },
+                                                    options: {
+                                                        responsive: true,
+                                                        maintainAspectRatio: false,
+                                                        plugins: { legend: { display: false } },
+                                                        scales: {
+                                                            y: { beginAtZero: true, grid: { color: 'rgba(47,62,92,0.05)' } },
+                                                            x: { grid: { display: false } }
+                                                        }
+                                                    }
+                                                });
+                                            }
+                                        }
+
+                                        const evLabels = @js(array_keys($this->obtenerDatosGraficoEvolucionArea($areaSeleccionada->cod_area)));
+                                        const evValues = @js(array_values($this->obtenerDatosGraficoEvolucionArea($areaSeleccionada->cod_area)));
+                                        const ctxLine = this.$refs.canvasLine;
+                                        if (ctxLine && evLabels.length >= 2) {
+                                            this.lineChart = new Chart(ctxLine, {
+                                                type: 'line',
+                                                data: {
+                                                    labels: evLabels,
+                                                    datasets: [{
+                                                        data: evValues,
+                                                        borderColor: '#E27D60',
+                                                        backgroundColor: 'rgba(226,125,96,0.1)',
+                                                        borderWidth: 3,
+                                                        fill: true,
+                                                        tension: 0.3
+                                                    }]
+                                                },
+                                                options: {
+                                                    responsive: true,
+                                                    maintainAspectRatio: false,
+                                                    plugins: { legend: { display: false } },
+                                                    scales: {
+                                                        y: { beginAtZero: true, grid: { color: 'rgba(47,62,92,0.05)' } },
+                                                        x: { grid: { display: false } }
+                                                    }
+                                                }
+                                            });
+                                        }
+                                    }
+                                 }" 
+                                 x-init="$nextTick(() => initAreaCharts())">
+                                
+                                <div class="grid grid-cols-1 lg:grid-cols-[1.1fr_0.9fr] gap-8">
                                     
-                                    <div class="space-y-2 max-h-60 overflow-y-auto pr-1">
-                                        @forelse($areaSeleccionada->usuarios as $u)
-                                            <div class="flex items-center justify-between bg-white p-2.5 rounded-xl border border-[#C7B5A3]/25 shadow-sm transition hover:border-[#E27D60]/55">
-                                                <div class="flex items-center gap-2.5">
-                                                    <div class="flex h-8 w-8 items-center justify-center rounded-full bg-[#E6DDD3] text-[10px] font-black text-[#7C7168]">
-                                                        {{ substr($u->nombres, 0, 1) . substr($u->ap_paterno, 0, 1) }}
+                                    {{-- COLUMNA IZQUIERDA: INFORMACIÓN Y PERSONAL --}}
+                                    <div class="space-y-6">
+                                        {{-- INFORMACIÓN DEL ÁREA --}}
+                                        <div class="space-y-2">
+                                            <h4 class="text-[11px] font-black uppercase tracking-[0.18em] text-[#2F3E5C]/60">INFORMACIÓN DEL ÁREA</h4>
+                                            <p class="text-xs font-semibold text-[#7C7168] bg-white p-3.5 rounded-2xl shadow-sm border border-[#C7B5A3]/20 leading-relaxed">
+                                                {{ $areaSeleccionada->descripcion }}
+                                            </p>
+                                        </div>
+
+                                        {{-- RESPONSABLE DEL ÁREA --}}
+                                        <div class="space-y-2">
+                                            <h4 class="text-[11px] font-black uppercase tracking-[0.18em] text-[#2F3E5C]/60">RESPONSABLE DEL ÁREA</h4>
+                                            <div class="flex items-center gap-3 bg-white p-3.5 rounded-2xl shadow-sm border border-[#C7B5A3]/20">
+                                                <div class="flex h-9 w-9 items-center justify-center rounded-full text-xs font-black text-white shadow-sm" style="background-color: {{ $areaSeleccionada->color ?? '#E27D60' }}">
+                                                    {{ $areaSeleccionada->responsable ? substr($areaSeleccionada->responsable->nombres, 0, 1) . substr($areaSeleccionada->responsable->ap_paterno, 0, 1) : '?' }}
+                                                </div>
+                                                <div class="flex-1">
+                                                    <p class="text-xs font-black text-[#2F3E5C]">
+                                                        {{ $areaSeleccionada->responsable ? $areaSeleccionada->responsable->name : 'Sin Responsable Asignado' }}
+                                                    </p>
+                                                    <p class="text-[9px] font-black text-[#967B66] uppercase tracking-wider">
+                                                        {{ $areaSeleccionada->responsable ? ($areaSeleccionada->responsable->getRoleNames()->first() ?? 'Personal') : 'Esta área aún no tiene responsable' }}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {{-- USUARIOS VINCULADOS --}}
+                                        <div class="space-y-2">
+                                            <h4 class="text-[11px] font-black uppercase tracking-[0.18em] text-[#2F3E5C]/60">USUARIOS VINCULADOS</h4>
+                                            <div class="space-y-2 max-h-60 overflow-y-auto pr-1 [scrollbar-width:thin]">
+                                                @forelse($areaSeleccionada->usuarios as $u)
+                                                    <div class="flex items-center justify-between bg-white p-2.5 rounded-xl border border-[#C7B5A3]/25 shadow-sm transition hover:border-[#E27D60]/55">
+                                                        <div class="flex items-center gap-2.5">
+                                                            <div class="flex h-8 w-8 items-center justify-center rounded-full bg-[#E6DDD3] text-[10px] font-black text-[#7C7168]">
+                                                                {{ substr($u->nombres, 0, 1) . substr($u->ap_paterno, 0, 1) }}
+                                                            </div>
+                                                            <div>
+                                                                <h5 class="text-xs font-black text-[#2F3E5C] leading-snug">{{ $u->name }}</h5>
+                                                                <p class="text-[9px] font-black text-[#967B66] uppercase tracking-wider">
+                                                                    {{ $u->getRoleNames()->first() ?? 'Sin Rol' }}
+                                                                </p>
+                                                            </div>
+                                                        </div>
+
+                                                        <span class="rounded-full px-2 py-0.5 text-[8px] font-black uppercase tracking-wider border {{ $u->estado == 1 ? 'bg-[#8DA280]/20 text-[#63775B] border-[#8DA280]/30' : 'bg-red-50 text-red-600 border-red-100' }}">
+                                                            {{ $u->estado == 1 ? 'Activo' : 'Inactivo' }}
+                                                        </span>
                                                     </div>
-                                                    <div>
-                                                        <h5 class="text-xs font-black text-[#2F3E5C] leading-snug">{{ $u->name }}</h5>
-                                                        <p class="text-[9px] font-black text-[#967B66] uppercase tracking-wider">
-                                                            {{ $u->getRoleNames()->first() ?? 'Sin Rol asignado' }}
-                                                        </p>
+                                                @empty
+                                                    <div class="rounded-xl border border-dashed border-[#C7B5A3] p-6 text-center text-xs font-semibold text-[#967B66] bg-white/40">
+                                                        Esta área aún no tiene usuarios asignados.
+                                                    </div>
+                                                @endforelse
+                                            </div>
+                                        </div>
+
+                                        {{-- OBSERVACIONES --}}
+                                        @if($areaSeleccionada->observaciones)
+                                            <div class="space-y-2">
+                                                <h4 class="text-[11px] font-black uppercase tracking-[0.18em] text-[#2F3E5C]/60">OBSERVACIONES</h4>
+                                                <p class="text-xs font-semibold text-[#7C7168] bg-[#FDFBF9] p-3 rounded-2xl border border-orange-200/50 leading-relaxed italic">
+                                                    "{{ $areaSeleccionada->observaciones }}"
+                                                </p>
+                                            </div>
+                                        @endif
+                                    </div>
+
+                                    {{-- COLUMNA DERECHA: ESTADÍSTICAS Y GRÁFICAS --}}
+                                    <div class="space-y-6">
+                                        {{-- ESTADÍSTICAS DEL ÁREA --}}
+                                        <div class="space-y-2">
+                                            <h4 class="text-[11px] font-black uppercase tracking-[0.18em] text-[#2F3E5C]/60">ESTADÍSTICAS DEL ÁREA</h4>
+                                            <div class="grid grid-cols-2 gap-3">
+                                                {{-- Total Vinculados --}}
+                                                <div class="bg-white p-3 rounded-xl border border-[#C7B5A3]/20 shadow-sm">
+                                                    <p class="text-[9px] font-black text-[#967B66] uppercase tracking-wider">Total Personal</p>
+                                                    <p class="text-lg font-black text-[#2F3E5C] mt-0.5">{{ $totalUsuarios }}</p>
+                                                </div>
+                                                {{-- Activos --}}
+                                                <div class="bg-white p-3 rounded-xl border border-[#C7B5A3]/20 shadow-sm">
+                                                    <p class="text-[9px] font-black text-[#967B66] uppercase tracking-wider">Activos</p>
+                                                    <p class="text-lg font-black text-[#63775B] mt-0.5">{{ $activosUsuarios }}</p>
+                                                </div>
+                                                {{-- Inactivos --}}
+                                                <div class="bg-white p-3 rounded-xl border border-[#C7B5A3]/20 shadow-sm">
+                                                    <p class="text-[9px] font-black text-[#967B66] uppercase tracking-wider">Inactivos</p>
+                                                    <p class="text-lg font-black text-red-600 mt-0.5">{{ $inactivosUsuarios }}</p>
+                                                </div>
+                                                {{-- Porcentaje --}}
+                                                <div class="bg-white p-3 rounded-xl border border-[#C7B5A3]/20 shadow-sm">
+                                                    <p class="text-[9px] font-black text-[#967B66] uppercase tracking-wider">% Activos</p>
+                                                    <p class="text-lg font-black text-[#E27D60] mt-0.5">{{ $porcActivos }}%</p>
+                                                </div>
+                                                {{-- Estado del Área --}}
+                                                <div class="bg-white p-3 rounded-xl border border-[#C7B5A3]/20 shadow-sm">
+                                                    <p class="text-[9px] font-black text-[#967B66] uppercase tracking-wider">Estado Área</p>
+                                                    <p class="text-xs font-black mt-1 {{ $areaSeleccionada->estado === 'ACTIVA' ? 'text-[#63775B]' : 'text-red-600' }}">{{ $areaSeleccionada->estado }}</p>
+                                                </div>
+                                                {{-- Responsable Status --}}
+                                                <div class="bg-white p-3 rounded-xl border border-[#C7B5A3]/20 shadow-sm">
+                                                    <p class="text-[9px] font-black text-[#967B66] uppercase tracking-wider">Responsable</p>
+                                                    <p class="text-xs font-black mt-1 {{ $areaSeleccionada->responsable_id ? 'text-[#63775B]' : 'text-red-600' }}">
+                                                        {{ $areaSeleccionada->responsable_id ? 'Asignado' : 'Sin asignar' }}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {{-- GRÁFICAS DE EVOLUCIÓN --}}
+                                        <div class="space-y-4">
+                                            <h4 class="text-[11px] font-black uppercase tracking-[0.18em] text-[#2F3E5C]/60">GRÁFICAS DEL ÁREA</h4>
+                                            
+                                            @if($totalUsuarios > 0)
+                                                {{-- Gráfico Dona Activos vs Inactivos --}}
+                                                <div class="bg-white p-4 rounded-2xl border border-[#C7B5A3]/25 shadow-sm">
+                                                    <h5 class="text-[10px] font-black text-[#2F3E5C] mb-2 uppercase tracking-wide">Usuarios Activos vs Inactivos</h5>
+                                                    <div class="relative h-40 w-full">
+                                                        <canvas x-ref="canvasActive"></canvas>
                                                     </div>
                                                 </div>
 
-                                                <span class="rounded-full px-2 py-0.5 text-[8px] font-black uppercase tracking-wider border {{ $u->estado == 1 ? 'bg-[#8DA280]/20 text-[#63775B] border-[#8DA280]/30' : 'bg-red-50 text-red-600 border-red-100' }}">
-                                                    {{ $u->estado == 1 ? 'Activo' : 'Inactivo' }}
-                                                </span>
-                                            </div>
-                                        @empty
-                                            <div class="rounded-xl border border-dashed border-[#C7B5A3] p-6 text-center text-xs font-semibold text-[#967B66] bg-white/40">
-                                                No hay personal vinculado a este área en este momento.
-                                            </div>
-                                        @endforelse
+                                                {{-- Gráfico Barras Roles --}}
+                                                <div class="bg-white p-4 rounded-2xl border border-[#C7B5A3]/25 shadow-sm">
+                                                    <h5 class="text-[10px] font-black text-[#2F3E5C] mb-2 uppercase tracking-wide">Usuarios por Rol</h5>
+                                                    <div class="relative h-44 w-full">
+                                                        <canvas x-ref="canvasRol"></canvas>
+                                                    </div>
+                                                </div>
+                                            @else
+                                                <div class="bg-white p-6 rounded-2xl border border-[#C7B5A3]/25 shadow-sm text-center text-xs font-semibold text-[#967B66]">
+                                                    <i class="ph-bold ph-chart-pie text-2xl mb-1.5 text-[#C7B5A3] block"></i>
+                                                    Esta área aún no tiene usuarios asignados.
+                                                </div>
+                                            @endif
+
+                                            {{-- Gráfico Evolución Mensual --}}
+                                            @if(count($this->obtenerDatosGraficoEvolucionArea($areaSeleccionada->cod_area)) >= 2)
+                                                <div class="bg-white p-4 rounded-2xl border border-[#C7B5A3]/25 shadow-sm">
+                                                    <h5 class="text-[10px] font-black text-[#2F3E5C] mb-2 uppercase tracking-wide">Evolución Asignación Personal</h5>
+                                                    <div class="relative h-44 w-full">
+                                                        <canvas x-ref="canvasLine"></canvas>
+                                                    </div>
+                                                </div>
+                                            @else
+                                                <div class="bg-white p-6 rounded-2xl border border-[#C7B5A3]/25 shadow-sm text-center text-xs font-semibold text-[#967B66]">
+                                                    <i class="ph-bold ph-trend-up text-2xl mb-1.5 text-[#C7B5A3] block"></i>
+                                                    No hay datos históricos suficientes para graficar evolución.
+                                                </div>
+                                            @endif
+                                        </div>
                                     </div>
+                                    
                                 </div>
 
-                                {{-- Observaciones --}}
-                                @if($areaSeleccionada->observaciones)
-                                    <div class="space-y-1.5">
-                                        <h4 class="text-[10px] font-black text-[#967B66] uppercase tracking-wider">Observaciones Técnicas</h4>
-                                        <p class="text-xs font-semibold text-[#7C7168] bg-[#FDFBF9] p-3 rounded-2xl border border-orange-200/50 leading-relaxed italic">
-                                            "{{ $areaSeleccionada->observaciones }}"
-                                        </p>
+                                {{-- TRAZABILIDAD --}}
+                                <div class="mt-6 border-t border-[#C7B5A3]/20 pt-4 space-y-2">
+                                    <h4 class="text-[11px] font-black uppercase tracking-[0.18em] text-[#2F3E5C]/60">TRAZABILIDAD</h4>
+                                    <div class="bg-white p-3 rounded-2xl border border-[#C7B5A3]/20 text-[10px] font-semibold text-[#7C7168] space-y-1">
+                                        <p><strong>Última actualización:</strong> {{ $areaSeleccionada->updated_at->format('d/m/Y H:i') }}</p>
                                     </div>
-                                @endif
+                                </div>
                             </div>
 
                             {{-- Acciones Ficha --}}
-                            <div class="border-t border-[#C7B5A3]/30 p-4 bg-white flex items-center justify-between">
-                                <span class="text-[10px] font-bold text-[#967B66]">ID: {{ $areaSeleccionada->cod_area }}</span>
-                                <div class="flex items-center gap-2">
-                                    @can('areas.editar')
-                                        <button type="button"
-                                                wire:click="editarArea('{{ $areaSeleccionada->cod_area }}')"
-                                                class="inline-flex items-center gap-1.5 rounded-full bg-[#E27D60] px-4 py-2 text-xs font-black text-white hover:bg-[#d86c50] shadow transition duration-200">
-                                            <i class="ph-bold ph-pencil-simple"></i>
-                                            Editar
-                                        </button>
-                                    @endcan
-                                </div>
+                            <div class="border-t border-[#C7B5A3]/30 p-4 bg-white flex items-center justify-end gap-2">
+                                @can('areas.reportes')
+                                    <button type="button"
+                                            wire:click="abrirReporteArea('{{ $areaSeleccionada->cod_area }}')"
+                                            class="inline-flex items-center gap-1.5 rounded-full border border-[#C7B5A3] bg-white px-4 py-2 text-xs font-black text-[#7C7168] hover:bg-[#F3EEE8] transition duration-200">
+                                        <i class="ph-bold ph-file-chart"></i>
+                                        Generar reporte del área
+                                    </button>
+                                @endcan
+                                @can('areas.editar')
+                                    <button type="button"
+                                            wire:click="editarArea('{{ $areaSeleccionada->cod_area }}')"
+                                            class="inline-flex items-center gap-1.5 rounded-full bg-[#E27D60] px-4 py-2 text-xs font-black text-white hover:bg-[#d86c50] shadow transition duration-200">
+                                        <i class="ph-bold ph-pencil-simple"></i>
+                                        Editar
+                                    </button>
+                                @endcan
+                                <button type="button"
+                                        wire:click="cerrarFicha"
+                                        class="inline-flex items-center gap-1.5 rounded-full border border-gray-300 bg-white px-4 py-2 text-xs font-black text-gray-700 hover:bg-gray-50 transition duration-200">
+                                    Cerrar
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -417,13 +653,11 @@
         </div>
     @endif
 
-    {{-- MODAL DE CREACIÓN / EDICIÓN --}}
+    {{-- MODAL DE CREACIÓN / EDICIÓN LIMPIO --}}
     @if($mostrarFormulario)
-        <div class="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-x-hidden overflow-y-auto" role="dialog" aria-modal="true">
-            {{-- Fondo Oscuro --}}
+        <div class="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-x-hidden overflow-y-auto no-print" role="dialog" aria-modal="true">
             <div class="fixed inset-0 bg-[#2F3E5C]/40 backdrop-blur-sm transition-opacity" wire:click="cerrarFormulario"></div>
 
-            {{-- Contenedor del Modal --}}
             <div class="relative w-full max-w-2xl rounded-[2.2rem] bg-white p-6 shadow-[0_20px_50px_rgba(47,62,92,0.2)] border border-[#C7B5A3]/40 transform transition-all duration-300">
                 
                 {{-- Encabezado Modal --}}
@@ -443,9 +677,9 @@
                 <form wire:submit.prevent="guardarArea" class="mt-4 space-y-4">
                     <div class="grid grid-cols-1 gap-4 md:grid-cols-2 max-h-[60vh] overflow-y-auto p-1 pr-2 [scrollbar-width:thin] [scrollbar-color:#C7B5A3_transparent]">
                         
-                        {{-- ── SECCIÓN 1: DATOS BÁSICOS ── --}}
+                        {{-- ── SECCIÓN 1: IDENTIDAD DEL ÁREA ── --}}
                         <div class="space-y-4 md:col-span-2">
-                            <h4 class="text-[10px] font-black text-[#E27D60] uppercase tracking-widest border-b border-[#E27D60]/20 pb-1">1. Datos Básicos</h4>
+                            <h4 class="text-[10px] font-black text-[#E27D60] uppercase tracking-widest border-b border-[#E27D60]/20 pb-1">1. Identidad del Área</h4>
                         </div>
 
                         {{-- Nombre --}}
@@ -453,7 +687,7 @@
                             <label class="block text-xs font-black text-[#2F3E5C] mb-1">Nombre de la Área</label>
                             <input type="text"
                                    wire:model="nombre"
-                                   placeholder="Ej: Área de Fisioterapia y Rehabilitación"
+                                   placeholder="Ej: Área de Atención Médica"
                                    class="w-full rounded-xl border-[#C7B5A3]/50 py-2 text-xs font-semibold text-[#2F3E5C] shadow-sm focus:border-[#E27D60] focus:ring-[#E27D60]">
                             @error('nombre') <span class="text-[10px] font-bold text-red-600">{{ $message }}</span> @enderror
                         </div>
@@ -471,98 +705,6 @@
                             @error('tipo_area') <span class="text-[10px] font-bold text-red-600">{{ $message }}</span> @enderror
                         </div>
 
-                        {{-- Responsable --}}
-                        <div>
-                            <label class="block text-xs font-black text-[#2F3E5C] mb-1">Responsable del Área</label>
-                            <select wire:model="responsable_id"
-                                    class="w-full rounded-xl border-[#C7B5A3]/50 py-2 text-xs font-semibold text-[#2F3E5C] shadow-sm focus:border-[#E27D60] focus:ring-[#E27D60]">
-                                <option value="">-- Sin asignar responsable --</option>
-                                @foreach($responsablesDisponibles as $resp)
-                                    <option value="{{ $resp->cod_usu }}">{{ $resp->name }}</option>
-                                @endforeach
-                            </select>
-                            @error('responsable_id') <span class="text-[10px] font-bold text-red-600">{{ $message }}</span> @enderror
-                        </div>
-
-                        {{-- Descripción --}}
-                        <div class="md:col-span-2">
-                            <label class="block text-xs font-black text-[#2F3E5C] mb-1">Descripción Funcional</label>
-                            <textarea wire:model="descripcion"
-                                      rows="3"
-                                      placeholder="Describa el rol operativo, alcances y responsabilidades institucionales del área..."
-                                      class="w-full rounded-xl border-[#C7B5A3]/50 py-2 text-xs font-semibold text-[#2F3E5C] shadow-sm focus:border-[#E27D60] focus:ring-[#E27D60]"></textarea>
-                            @error('descripcion') <span class="text-[10px] font-bold text-red-600">{{ $message }}</span> @enderror
-                        </div>
-
-                        {{-- ── SECCIÓN 2: PRIVILEGIOS Y SUGERENCIAS ── --}}
-                        <div class="space-y-4 md:col-span-2 mt-2">
-                            <h4 class="text-[10px] font-black text-[#E27D60] uppercase tracking-widest border-b border-[#E27D60]/20 pb-1">2. Privilegios e Interacciones</h4>
-                        </div>
-
-                        {{-- Roles Sugeridos --}}
-                        <div>
-                            <label class="block text-xs font-black text-[#2F3E5C] mb-1">Roles Sugeridos</label>
-                            <div class="rounded-xl border border-[#C7B5A3]/50 p-3 bg-[#F8F3ED]/20 max-h-36 overflow-y-auto space-y-1.5">
-                                @foreach($rolesDisponibles as $rol)
-                                    <label class="flex items-center gap-2">
-                                        <input type="checkbox"
-                                               wire:model="roles_sugeridos"
-                                               value="{{ $rol }}"
-                                               class="rounded border-[#C7B5A3]/80 text-[#E27D60] focus:ring-[#E27D60]">
-                                        <span class="text-xs font-semibold text-[#7C7168]">{{ $rol }}</span>
-                                    </label>
-                                @endforeach
-                            </div>
-                            @error('roles_sugeridos') <span class="text-[10px] font-bold text-red-600">{{ $message }}</span> @enderror
-                        </div>
-
-                        {{-- Módulos Relacionados --}}
-                        <div>
-                            <label class="block text-xs font-black text-[#2F3E5C] mb-1">Módulos del Sistema Vinculados</label>
-                            <div class="rounded-xl border border-[#C7B5A3]/50 p-3 bg-[#F8F3ED]/20 max-h-36 overflow-y-auto space-y-1.5">
-                                @foreach($modulosDisponibles as $key => $val)
-                                    <label class="flex items-center gap-2">
-                                        <input type="checkbox"
-                                               wire:model="modulos_relacionados"
-                                               value="{{ $key }}"
-                                               class="rounded border-[#C7B5A3]/80 text-[#E27D60] focus:ring-[#E27D60]">
-                                        <span class="text-xs font-semibold text-[#7C7168]">{{ $val }}</span>
-                                    </label>
-                                @endforeach
-                            </div>
-                            @error('modulos_relacionados') <span class="text-[10px] font-bold text-red-600">{{ $message }}</span> @enderror
-                        </div>
-
-                        {{-- ── SECCIÓN 3: DISEÑO Y ORDEN ── --}}
-                        <div class="space-y-4 md:col-span-2 mt-2">
-                            <h4 class="text-[10px] font-black text-[#E27D60] uppercase tracking-widest border-b border-[#E27D60]/20 pb-1">3. Configuración de Diseño y Orden</h4>
-                        </div>
-
-                        {{-- Color --}}
-                        <div>
-                            <label class="block text-xs font-black text-[#2F3E5C] mb-1">Color Representativo (Hexadecimal)</label>
-                            <div class="flex gap-2">
-                                <input type="color"
-                                       wire:model="color"
-                                       class="h-9 w-12 rounded-xl border border-[#C7B5A3]/50 bg-transparent p-0 cursor-pointer">
-                                <input type="text"
-                                       wire:model="color"
-                                       placeholder="#FFFFFF"
-                                       class="w-full rounded-xl border-[#C7B5A3]/50 py-2 text-xs font-semibold text-[#2F3E5C] shadow-sm focus:border-[#E27D60]">
-                            </div>
-                            @error('color') <span class="text-[10px] font-bold text-red-600">{{ $message }}</span> @enderror
-                        </div>
-
-                        {{-- Icono --}}
-                        <div>
-                            <label class="block text-xs font-black text-[#2F3E5C] mb-1">Icono Phosphor (Ej: ph-brain)</label>
-                            <input type="text"
-                                   wire:model="icono"
-                                   placeholder="ph-stethoscope, ph-buildings..."
-                                   class="w-full rounded-xl border-[#C7B5A3]/50 py-2 text-xs font-semibold text-[#2F3E5C] shadow-sm focus:border-[#E27D60]">
-                            @error('icono') <span class="text-[10px] font-bold text-red-600">{{ $message }}</span> @enderror
-                        </div>
-
                         {{-- Orden --}}
                         <div>
                             <label class="block text-xs font-black text-[#2F3E5C] mb-1">Orden de Visualización</label>
@@ -571,6 +713,16 @@
                                    min="0"
                                    class="w-full rounded-xl border-[#C7B5A3]/50 py-2 text-xs font-semibold text-[#2F3E5C] shadow-sm focus:border-[#E27D60]">
                             @error('orden') <span class="text-[10px] font-bold text-red-600">{{ $message }}</span> @enderror
+                        </div>
+
+                        {{-- Descripción --}}
+                        <div class="md:col-span-2">
+                            <label class="block text-xs font-black text-[#2F3E5C] mb-1">Descripción Funcional</label>
+                            <textarea wire:model="descripcion"
+                                      rows="3"
+                                      placeholder="Describa el rol operativo y responsabilidades institucionales del área..."
+                                      class="w-full rounded-xl border-[#C7B5A3]/50 py-2 text-xs font-semibold text-[#2F3E5C] shadow-sm focus:border-[#E27D60] focus:ring-[#E27D60]"></textarea>
+                            @error('descripcion') <span class="text-[10px] font-bold text-red-600">{{ $message }}</span> @enderror
                         </div>
 
                         {{-- Estado --}}
@@ -584,12 +736,95 @@
                             @error('estado') <span class="text-[10px] font-bold text-red-600">{{ $message }}</span> @enderror
                         </div>
 
+                        {{-- ── SECCIÓN 2: PRESENTACIÓN VISUAL ── --}}
+                        <div class="space-y-4 md:col-span-2 mt-2">
+                            <h4 class="text-[10px] font-black text-[#E27D60] uppercase tracking-widest border-b border-[#E27D60]/20 pb-1">2. Presentación Visual</h4>
+                        </div>
+
+                        {{-- Portada Upload --}}
+                        <div class="md:col-span-2">
+                            <label class="block text-xs font-black text-[#2F3E5C] mb-1">Imagen de Portada</label>
+                            <div class="flex items-center gap-4">
+                                <div class="h-20 w-32 shrink-0 rounded-2xl border border-dashed border-[#C7B5A3] bg-[#F8F3ED]/40 overflow-hidden relative flex items-center justify-center">
+                                    @if($nuevaImagen)
+                                        <img src="{{ $nuevaImagen->temporaryUrl() }}" class="h-full w-full object-cover">
+                                    @elseif($areaId && ($area = \App\Models\AreaInstitucional::find($areaId)) && $area->imagen_area)
+                                        <img src="{{ \Illuminate\Support\Facades\Storage::url($area->imagen_area) }}" class="h-full w-full object-cover">
+                                    @else
+                                        <span class="text-[10px] font-bold text-[#967B66]/60">Sin Portada</span>
+                                    @endif
+                                </div>
+                                <div class="flex-1">
+                                    <input type="file"
+                                           wire:model="nuevaImagen"
+                                           accept="image/*"
+                                           class="w-full text-xs text-[#7C7168] file:mr-3 file:py-1.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-black file:bg-[#2F3E5C]/10 file:text-[#2F3E5C] file:hover:bg-[#2F3E5C]/20 file:cursor-pointer">
+                                    <p class="text-[9px] text-[#967B66] mt-1">Formatos soportados: JPG, PNG, WEBP. Tamaño máx. 4MB.</p>
+                                    @error('nuevaImagen') <span class="text-[10px] font-bold text-red-600">{{ $message }}</span> @enderror
+                                </div>
+                            </div>
+                        </div>
+
+                        {{-- Color --}}
+                        <div>
+                            <label class="block text-xs font-black text-[#2F3E5C] mb-1">Color Institucional</label>
+                            <div class="flex gap-2">
+                                <input type="color"
+                                       wire:model="color"
+                                       class="h-9 w-12 rounded-xl border border-[#C7B5A3]/50 bg-transparent p-0 cursor-pointer">
+                                <input type="text"
+                                       wire:model="color"
+                                       placeholder="#2F3E5C"
+                                       class="w-full rounded-xl border-[#C7B5A3]/50 py-2 text-xs font-semibold text-[#2F3E5C] shadow-sm focus:border-[#E27D60]">
+                            </div>
+                            @error('color') <span class="text-[10px] font-bold text-red-600">{{ $message }}</span> @enderror
+                        </div>
+
+                        {{-- ── SECCIÓN 3: RESPONSABLE DEL ÁREA ── --}}
+                        <div class="space-y-4 md:col-span-2 mt-2">
+                            <h4 class="text-[10px] font-black text-[#E27D60] uppercase tracking-widest border-b border-[#E27D60]/20 pb-1">3. Responsable del Área</h4>
+                        </div>
+
+                        {{-- Responsable (Limitado a usuarios del área en edición; deshabilitado en creación) --}}
+                        <div class="md:col-span-2">
+                            <label class="block text-xs font-black text-[#2F3E5C] mb-1">Asignar Responsable</label>
+                            @if(!$isEdit)
+                                <select disabled class="w-full rounded-xl border-gray-200 bg-gray-50 py-2 text-xs font-semibold text-gray-400 cursor-not-allowed">
+                                    <option>-- No disponible en creación (El área aún no tiene personal asignado) --</option>
+                                </select>
+                                <p class="text-[9px] text-[#967B66] mt-1.5">
+                                    <i class="ph-bold ph-info mr-0.5"></i> Primero debe crear el área, luego vincular personal en el módulo Usuarios, y finalmente podrá asignarle un responsable.
+                                </p>
+                            @elseif(count($responsablesDisponibles) == 0)
+                                <select disabled class="w-full rounded-xl border-gray-200 bg-gray-50 py-2 text-xs font-semibold text-gray-400 cursor-not-allowed">
+                                    <option>-- Sin personal vinculado disponible --</option>
+                                </select>
+                                <p class="text-[9px] text-[#967B66] mt-1.5">
+                                    <i class="ph-bold ph-info mr-0.5"></i> Esta área no cuenta con personal vinculado. Asigne personal a este área desde el panel de Usuarios antes de asignarle un responsable.
+                                </p>
+                            @else
+                                <select wire:model="responsable_id"
+                                        class="w-full rounded-xl border-[#C7B5A3]/50 py-2 text-xs font-semibold text-[#2F3E5C] shadow-sm focus:border-[#E27D60] focus:ring-[#E27D60]">
+                                    <option value="">-- Sin responsable asignado --</option>
+                                    @foreach($responsablesDisponibles as $resp)
+                                        <option value="{{ $resp->cod_usu }}">{{ $resp->name }}</option>
+                                    @endforeach
+                                </select>
+                            @endif
+                            @error('responsable_id') <span class="text-[10px] font-bold text-red-600">{{ $message }}</span> @enderror
+                        </div>
+
+                        {{-- ── SECCIÓN 4: OBSERVACIONES ── --}}
+                        <div class="space-y-4 md:col-span-2 mt-2">
+                            <h4 class="text-[10px] font-black text-[#E27D60] uppercase tracking-widest border-b border-[#E27D60]/20 pb-1">4. Observaciones</h4>
+                        </div>
+
                         {{-- Observaciones internas --}}
                         <div class="md:col-span-2">
-                            <label class="block text-xs font-black text-[#2F3E5C] mb-1">Observaciones Técnicas Internas</label>
+                            <label class="block text-xs font-black text-[#2F3E5C] mb-1">Observaciones Internas</label>
                             <textarea wire:model="observaciones"
                                       rows="2"
-                                      placeholder="Solo visible para administradores..."
+                                      placeholder="Observaciones de administración interna..."
                                       class="w-full rounded-xl border-[#C7B5A3]/50 py-2 text-xs font-semibold text-[#2F3E5C] shadow-sm focus:border-[#E27D60]"></textarea>
                             @error('observaciones') <span class="text-[10px] font-bold text-red-600">{{ $message }}</span> @enderror
                         </div>
@@ -613,27 +848,60 @@
     @endif
 
     {{-- MODAL / PANEL DE REPORTES INTERACTIVOS --}}
-    @if($mostrarReportes)
-        <div class="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-x-hidden overflow-y-auto" role="dialog" aria-modal="true">
-            {{-- Fondo Oscuro --}}
-            <div class="fixed inset-0 bg-[#2F3E5C]/40 backdrop-blur-sm transition-opacity" wire:click="cerrarReportes"></div>
+    @if($mostrarReportes && $reporteData)
+        <div class="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-x-hidden overflow-y-auto print:relative print:z-auto print:p-0" role="dialog" aria-modal="true">
+            {{-- Fondo Oscuro no imprimible --}}
+            <div class="fixed inset-0 bg-[#2F3E5C]/40 backdrop-blur-sm transition-opacity no-print" wire:click="cerrarReportes"></div>
 
             {{-- Contenedor del Modal --}}
-            <div class="relative w-full max-w-4xl rounded-[2.2rem] bg-white p-6 shadow-[0_20px_50px_rgba(47,62,92,0.2)] border border-[#C7B5A3]/40 transform transition-all duration-300">
+            <div class="relative w-full max-w-4xl rounded-[2.2rem] bg-white p-6 shadow-[0_20px_50px_rgba(47,62,92,0.2)] border border-[#C7B5A3]/40 transform transition-all duration-300 print:shadow-none print:border-none print:p-0 print:m-0 print:max-w-none">
                 
                 {{-- Encabezado Modal --}}
-                <header class="flex items-center justify-between pb-4 border-b border-[#C7B5A3]/30 print:hidden">
+                <header class="flex items-center justify-between pb-4 border-b border-[#C7B5A3]/30 no-print">
                     <div>
-                        <h3 class="text-xl font-black text-[#2F3E5C]">Reportes del Módulo</h3>
-                        <p class="text-xs font-semibold text-[#967B66] mt-0.5">Genere y consulte reportes técnicos estructurados de Casa Amandita.</p>
+                        <h3 class="text-xl font-black text-[#2F3E5C]">
+                            {{ $reporteTipo === 'general' ? 'REPORTES DE ÁREAS INSTITUCIONALES' : 'REPORTE ESPECÍFICO DEL ÁREA' }}
+                        </h3>
+                        <p class="text-xs font-semibold text-[#967B66] mt-0.5">Genere y exporte reportes técnicos estructurados de Casa Amandita.</p>
                     </div>
                     <div class="flex gap-2">
-                        @if($reporteTipo)
+                        @if($reporteTipo === 'general')
                             <button type="button"
-                                    onclick="window.print()"
+                                    wire:click="exportarReporteGeneralPdf"
+                                    class="flex h-8 items-center gap-2 rounded-lg bg-[#E27D60] px-3 text-xs font-black text-white hover:bg-[#d86c50] transition duration-200">
+                                <i class="ph-bold ph-file-pdf"></i>
+                                Exportar PDF
+                            </button>
+                            <button type="button"
+                                    wire:click="exportarReporteGeneralExcel"
+                                    class="flex h-8 items-center gap-2 rounded-lg bg-[#8DA280] px-3 text-xs font-black text-white hover:bg-[#7b8e6f] transition duration-200">
+                                <i class="ph-bold ph-file-xls"></i>
+                                Exportar Excel
+                            </button>
+                            <button type="button"
+                                    wire:click="exportarReporteGeneralCsv"
+                                    class="flex h-8 items-center gap-2 rounded-lg bg-[#967B66] px-3 text-xs font-black text-white hover:bg-[#836c59] transition duration-200">
+                                <i class="ph-bold ph-file-csv"></i>
+                                Exportar CSV
+                            </button>
+                            <button type="button"
+                                    wire:click="imprimirReporteGeneral"
                                     class="flex h-8 items-center gap-2 rounded-lg bg-[#63775B] px-3 text-xs font-black text-white hover:bg-[#52624b] transition duration-200">
                                 <i class="ph-bold ph-printer"></i>
-                                Imprimir / PDF
+                                Imprimir
+                            </button>
+                        @elseif($reporteTipo === 'especifico' && isset($reporteData['area']))
+                            <button type="button"
+                                    wire:click="exportarReporteAreaPdf('{{ $reporteData['area']['cod_area'] }}')"
+                                    class="flex h-8 items-center gap-2 rounded-lg bg-[#E27D60] px-3 text-xs font-black text-white hover:bg-[#d86c50] transition duration-200">
+                                <i class="ph-bold ph-file-pdf"></i>
+                                Exportar PDF
+                            </button>
+                            <button type="button"
+                                    wire:click="imprimirReporteArea('{{ $reporteData['area']['cod_area'] }}')"
+                                    class="flex h-8 items-center gap-2 rounded-lg bg-[#63775B] px-3 text-xs font-black text-white hover:bg-[#52624b] transition duration-200">
+                                <i class="ph-bold ph-printer"></i>
+                                Imprimir
                             </button>
                         @endif
                         <button type="button"
@@ -644,242 +912,497 @@
                     </div>
                 </header>
 
-                {{-- Menú de Reportes --}}
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mt-4 print:hidden">
-                    <button type="button"
-                            wire:click="generarReporteGeneral"
-                            class="flex flex-col items-center justify-center p-4 rounded-2xl border text-center transition {{ $reporteTipo === 'general' ? 'border-[#E27D60] bg-[#E27D60]/5 text-[#E27D60]' : 'border-[#C7B5A3]/40 bg-[#F8F3ED]/10 text-[#7C7168] hover:bg-[#F3EEE8]' }}">
-                        <i class="ph-bold ph-newspaper text-2xl mb-1"></i>
-                        <span class="text-xs font-black">Reporte General</span>
-                        <span class="text-[9px] font-medium text-[#967B66] mt-1">Estructura global de áreas</span>
-                    </button>
+                {{-- Area visual imprimible --}}
+                <div class="mt-6 p-6 rounded-2xl border border-[#C7B5A3]/40 max-h-[65vh] overflow-y-auto bg-white watermark-container print:max-h-none print:border-none print:p-0 print:m-0"
+                     x-data="{
+                        generalChartUsr: null,
+                        generalChartType: null,
+                        generalChartActInact: null,
+                        generalChartEv: null,
+                        areaActiveChart: null,
+                        areaRolChart: null,
+                        areaLineChart: null,
+                        initReportCharts() {
+                            const type = '{{ $reporteTipo }}';
+                            
+                            // Destroy everything first
+                            if (this.generalChartUsr) this.generalChartUsr.destroy();
+                            if (this.generalChartType) this.generalChartType.destroy();
+                            if (this.generalChartActInact) this.generalChartActInact.destroy();
+                            if (this.generalChartEv) this.generalChartEv.destroy();
+                            if (this.areaActiveChart) this.areaActiveChart.destroy();
+                            if (this.areaRolChart) this.areaRolChart.destroy();
+                            if (this.areaLineChart) this.areaLineChart.destroy();
 
-                    <button type="button"
-                            wire:click="generarReporteUsuarios"
-                            class="flex flex-col items-center justify-center p-4 rounded-2xl border text-center transition {{ $reporteTipo === 'usuarios' ? 'border-[#E27D60] bg-[#E27D60]/5 text-[#E27D60]' : 'border-[#C7B5A3]/40 bg-[#F8F3ED]/10 text-[#7C7168] hover:bg-[#F3EEE8]' }}">
-                        <i class="ph-bold ph-users-three text-2xl mb-1"></i>
-                        <span class="text-xs font-black">Personal por Área</span>
-                        <span class="text-[9px] font-medium text-[#967B66] mt-1">Distribución del personal</span>
-                    </button>
+                            if (type === 'general') {
+                                // Chart: Usuarios por area
+                                const usrLabels = @js(array_keys($this->obtenerDatosGraficoUsuariosPorArea()));
+                                const usrValues = @js(array_values($this->obtenerDatosGraficoUsuariosPorArea()));
+                                const ctxUsr = this.$refs.canvasUsr;
+                                if (ctxUsr && usrLabels.length > 0) {
+                                    this.generalChartUsr = new Chart(ctxUsr, {
+                                        type: 'bar',
+                                        data: {
+                                            labels: usrLabels,
+                                            datasets: [{
+                                                data: usrValues,
+                                                backgroundColor: '#2F3E5C',
+                                                borderRadius: 6
+                                            }]
+                                        },
+                                        options: {
+                                            responsive: true,
+                                            maintainAspectRatio: false,
+                                            plugins: { legend: { display: false } },
+                                            scales: {
+                                                y: { beginAtZero: true, grid: { color: 'rgba(47,62,92,0.05)' } },
+                                                x: { grid: { display: false } }
+                                            }
+                                        }
+                                    });
+                                }
 
-                    <button type="button"
-                            wire:click="generarReporteDistribucion"
-                            class="flex flex-col items-center justify-center p-4 rounded-2xl border text-center transition {{ $reporteTipo === 'distribucion' ? 'border-[#E27D60] bg-[#E27D60]/5 text-[#E27D60]' : 'border-[#C7B5A3]/40 bg-[#F8F3ED]/10 text-[#7C7168] hover:bg-[#F3EEE8]' }}">
-                        <i class="ph-bold ph-chart-pie text-2xl mb-1"></i>
-                        <span class="text-xs font-black">Distribución Operativa</span>
-                        <span class="text-[9px] font-medium text-[#967B66] mt-1">Indicadores e impacto</span>
-                    </button>
+                                // Chart: Areas por tipo
+                                const typeLabels = @js(array_keys($this->obtenerDatosGraficoAreasPorTipo()));
+                                const typeValues = @js(array_values($this->obtenerDatosGraficoAreasPorTipo()));
+                                const ctxType = this.$refs.canvasType;
+                                if (ctxType && typeLabels.length > 0) {
+                                    this.generalChartType = new Chart(ctxType, {
+                                        type: 'doughnut',
+                                        data: {
+                                            labels: typeLabels,
+                                            datasets: [{
+                                                data: typeValues,
+                                                backgroundColor: ['#2F3E5C', '#E27D60', '#8DA280', '#967B66', '#5E6599'],
+                                                borderWidth: 0
+                                            }]
+                                        },
+                                        options: {
+                                            responsive: true,
+                                            maintainAspectRatio: false,
+                                            plugins: {
+                                                legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10, weight: 'bold' } } }
+                                            }
+                                        }
+                                    });
+                                }
 
-                    <button type="button"
-                            wire:click="generarReporteSinResponsable"
-                            class="flex flex-col items-center justify-center p-4 rounded-2xl border text-center transition {{ $reporteTipo === 'sin_responsable' ? 'border-[#E27D60] bg-[#E27D60]/5 text-[#E27D60]' : 'border-[#C7B5A3]/40 bg-[#F8F3ED]/10 text-[#7C7168] hover:bg-[#F3EEE8]' }}">
-                        <i class="ph-bold ph-warning-circle text-2xl mb-1"></i>
-                        <span class="text-xs font-black">Alertas del Organigrama</span>
-                        <span class="text-[9px] font-medium text-[#967B66] mt-1">Áreas sin responsable</span>
-                    </button>
-                </div>
+                                // Chart: Activos vs Inactivos stacked
+                                const actInact = @js($this->obtenerDatosGraficoActivosInactivosPorArea());
+                                const ctxActInact = this.$refs.canvasActInact;
+                                if (ctxActInact && actInact.labels && actInact.labels.length > 0) {
+                                    this.generalChartActInact = new Chart(ctxActInact, {
+                                        type: 'bar',
+                                        data: {
+                                            labels: actInact.labels,
+                                            datasets: [
+                                                { label: 'Activos', data: actInact.activos, backgroundColor: '#8DA280' },
+                                                { label: 'Inactivos', data: actInact.inactivos, backgroundColor: '#E27D60' }
+                                            ]
+                                        },
+                                        options: {
+                                            responsive: true,
+                                            maintainAspectRatio: false,
+                                            scales: {
+                                                x: { stacked: true, grid: { display: false } },
+                                                y: { stacked: true }
+                                            }
+                                        }
+                                    });
+                                }
 
-                {{-- Contenedor del Reporte Imprimible --}}
-                <div class="mt-6 p-6 rounded-2xl border border-[#C7B5A3]/40 max-h-[50vh] overflow-y-auto bg-white print:max-h-none print:border-none print:p-0 print:m-0">
+                                // Chart: Evolucion mensual global
+                                const ev = @js($this->obtenerDatosGraficoEvolucionMensual());
+                                const ctxEv = this.$refs.canvasEv;
+                                if (ctxEv && ev.labels && ev.labels.length >= 2) {
+                                    this.generalChartEv = new Chart(ctxEv, {
+                                        type: 'line',
+                                        data: {
+                                            labels: ev.labels,
+                                            datasets: [{
+                                                data: ev.data,
+                                                borderColor: '#E27D60',
+                                                backgroundColor: 'rgba(226,125,96,0.1)',
+                                                borderWidth: 3,
+                                                fill: true,
+                                                tension: 0.3
+                                            }]
+                                        },
+                                        options: {
+                                            responsive: true,
+                                            maintainAspectRatio: false,
+                                            plugins: { legend: { display: false } }
+                                        }
+                                    });
+                                }
+                            } else if (type === 'especifico') {
+                                const total = {{ $reporteData['totalUsuarios'] ?? 0 }};
+                                const activos = {{ $reporteData['usuariosActivos'] ?? 0 }};
+                                const inactivos = {{ $reporteData['usuariosInactivos'] ?? 0 }};
+                                const codArea = '{{ $reporteData['area']['cod_area'] ?? '' }}';
+
+                                if (total > 0) {
+                                    const ctxAreaActive = this.$refs.canvasAreaActive;
+                                    if (ctxAreaActive) {
+                                        this.areaActiveChart = new Chart(ctxAreaActive, {
+                                            type: 'doughnut',
+                                            data: {
+                                                labels: ['Activos', 'Inactivos'],
+                                                datasets: [{
+                                                    data: [activos, inactivos],
+                                                    backgroundColor: ['#8DA280', '#E27D60'],
+                                                    borderWidth: 0
+                                                }]
+                                            },
+                                            options: {
+                                                responsive: true,
+                                                maintainAspectRatio: false,
+                                                cutout: '70%',
+                                                plugins: { legend: { position: 'bottom', labels: { boxWidth: 10 } } }
+                                            }
+                                        });
+                                    }
+
+                                    const rolesLabels = @js(isset($reporteData['roles']) ? array_keys($reporteData['roles']) : []);
+                                    const rolesValues = @js(isset($reporteData['roles']) ? array_values($reporteData['roles']) : []);
+                                    const ctxAreaRol = this.$refs.canvasAreaRol;
+                                    if (ctxAreaRol && rolesLabels.length > 0) {
+                                        this.areaRolChart = new Chart(ctxAreaRol, {
+                                            type: 'bar',
+                                            data: {
+                                                labels: rolesLabels,
+                                                datasets: [{
+                                                    data: rolesValues,
+                                                    backgroundColor: '#2F3E5C',
+                                                    borderRadius: 6
+                                                }]
+                                            },
+                                            options: {
+                                                responsive: true,
+                                                maintainAspectRatio: false,
+                                                plugins: { legend: { display: false } }
+                                            }
+                                        });
+                                    }
+                                }
+
+                                const evAreaLabels = @js(isset($reporteData['area']['cod_area']) ? array_keys($this->obtenerDatosGraficoEvolucionArea($reporteData['area']['cod_area'])) : []);
+                                const evAreaValues = @js(isset($reporteData['area']['cod_area']) ? array_values($this->obtenerDatosGraficoEvolucionArea($reporteData['area']['cod_area'])) : []);
+                                const ctxAreaLine = this.$refs.canvasAreaLine;
+                                if (ctxAreaLine && evAreaLabels.length >= 2) {
+                                    this.areaLineChart = new Chart(ctxAreaLine, {
+                                        type: 'line',
+                                        data: {
+                                            labels: evAreaLabels,
+                                            datasets: [{
+                                                data: evAreaValues,
+                                                borderColor: '#E27D60',
+                                                backgroundColor: 'rgba(226,125,96,0.1)',
+                                                borderWidth: 3,
+                                                fill: true,
+                                                tension: 0.3
+                                            }]
+                                        },
+                                        options: {
+                                            responsive: true,
+                                            maintainAspectRatio: false,
+                                            plugins: { legend: { display: false } }
+                                        }
+                                    });
+                                }
+                            }
+                        }
+                     }"
+                     x-init="$nextTick(() => initReportCharts())">
+
+                    {{-- Marca de Agua --}}
+                    <div class="watermark-bg">Casa Amandita</div>
+
                     @if($reporteTipo === 'general')
-                        <div class="space-y-4">
-                            <div class="text-center pb-4 border-b border-[#C7B5A3]/50">
-                                <h2 class="text-lg font-black text-[#2F3E5C]">REPORTE GENERAL DE ÁREAS INSTITUCIONALES</h2>
-                                <p class="text-xs text-[#967B66]">CASA AMANDITA - REMEMBERMIND</p>
-                                <p class="text-[10px] text-[#967B66] mt-1">Fecha: {{ date('d/m/Y H:i') }} | Generado por: {{ Auth::user()->name }}</p>
-                            </div>
-
-                            <table class="w-full text-left text-xs">
-                                <thead>
-                                    <tr class="bg-[#F8F3ED] text-[#2F3E5C] font-black border-b border-[#C7B5A3]/50">
-                                        <th class="p-3">Código</th>
-                                        <th class="p-3">Área</th>
-                                        <th class="p-3">Tipo</th>
-                                        <th class="p-3">Responsable</th>
-                                        <th class="p-3 text-center">Personal</th>
-                                        <th class="p-3">Estado</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="divide-y divide-[#C7B5A3]/30">
-                                    @foreach($reporteData as $rep)
-                                        <tr class="hover:bg-[#F8F3ED]/30">
-                                            <td class="p-3 font-bold">{{ $rep['cod_area'] }}</td>
-                                            <td class="p-3 font-black text-[#2F3E5C]">{{ $rep['nombre'] }}</td>
-                                            <td class="p-3">{{ $rep['tipo_area'] }}</td>
-                                            <td class="p-3">{{ $rep['responsable']['nombres'] ?? 'Sin Responsable' }} {{ $rep['responsable']['ap_paterno'] ?? '' }}</td>
-                                            <td class="p-3 text-center font-bold text-[#E27D60]">{{ $rep['usuarios_count'] }}</td>
-                                            <td class="p-3 font-black text-[10px] {{ $rep['estado'] === 'ACTIVA' ? 'text-[#63775B]' : 'text-red-600' }}">{{ $rep['estado'] }}</td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        </div>
-                    @elseif($reporteTipo === 'usuarios')
-                        <div class="space-y-4">
-                            <div class="text-center pb-4 border-b border-[#C7B5A3]/50">
-                                <h2 class="text-lg font-black text-[#2F3E5C]">REPORTE DE PERSONAL POR ÁREA INSTITUCIONAL</h2>
-                                <p class="text-xs text-[#967B66]">CASA AMANDITA - REMEMBERMIND</p>
-                                <p class="text-[10px] text-[#967B66] mt-1">Fecha: {{ date('d/m/Y H:i') }} | Generado por: {{ Auth::user()->name }}</p>
-                            </div>
-
-                            <table class="w-full text-left text-xs">
-                                <thead>
-                                    <tr class="bg-[#F8F3ED] text-[#2F3E5C] font-black border-b border-[#C7B5A3]/50">
-                                        <th class="p-3">Personal</th>
-                                        <th class="p-3">Área Vinculada</th>
-                                        <th class="p-3">Rol</th>
-                                        <th class="p-3">Estado</th>
-                                        <th class="p-3">Último Acceso</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="divide-y divide-[#C7B5A3]/30">
-                                    @foreach($reporteData as $rep)
-                                        <tr class="hover:bg-[#F8F3ED]/30">
-                                            <td class="p-3 font-black text-[#2F3E5C]">{{ $rep['nombre_completo'] }}</td>
-                                            <td class="p-3 font-bold text-[#967B66]">{{ $rep['area'] }}</td>
-                                            <td class="p-3 font-semibold">{{ $rep['rol'] }}</td>
-                                            <td class="p-3 font-black text-[10px] {{ $rep['estado'] === 'ACTIVO' ? 'text-[#63775B]' : 'text-red-600' }}">{{ $rep['estado'] }}</td>
-                                            <td class="p-3 text-gray-500">{{ $rep['ultimo_acceso'] }}</td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        </div>
-                    @elseif($reporteTipo === 'distribucion')
+                        {{-- ── REPORTE GENERAL ── --}}
                         <div class="space-y-6">
+                            {{-- Membrete --}}
                             <div class="text-center pb-4 border-b border-[#C7B5A3]/50">
-                                <h2 class="text-lg font-black text-[#2F3E5C]">REPORTE DE DISTRIBUCIÓN Y MÉTRICAS INSTITUCIONALES</h2>
-                                <p class="text-xs text-[#967B66]">CASA AMANDITA - REMEMBERMIND</p>
-                                <p class="text-[10px] text-[#967B66] mt-1">Fecha: {{ date('d/m/Y H:i') }} | Generado por: {{ Auth::user()->name }}</p>
+                                <h2 class="text-2xl font-black text-[#2F3E5C] tracking-wide">REPORTE GENERAL DE ÁREAS INSTITUCIONALES</h2>
+                                <p class="text-xs font-black text-[#967B66] uppercase tracking-widest mt-1">Casa Amandita • Sistema RememberMind</p>
+                                <p class="text-[10px] text-[#967B66] mt-2 font-bold">Fecha: {{ $reporteData['fecha'] }} | Generado por: {{ $reporteData['usuario'] }}</p>
                             </div>
 
-                            <div class="grid grid-cols-2 gap-4">
-                                <div class="bg-[#F8F3ED]/50 p-4 rounded-xl border border-[#C7B5A3]/30 space-y-2">
-                                    <h4 class="text-xs font-black text-[#2F3E5C] uppercase tracking-wider">Métricas del Organigrama</h4>
-                                    <ul class="space-y-1 text-xs">
-                                        <li class="flex justify-between"><span>Total Áreas:</span> <strong>{{ $reporteData['total_areas'] }}</strong></li>
-                                        <li class="flex justify-between"><span>Áreas Activas:</span> <strong class="text-[#63775B]">{{ $reporteData['activas'] }}</strong></li>
-                                        <li class="flex justify-between"><span>Áreas Inactivas:</span> <strong class="text-red-600">{{ $reporteData['inactivas'] }}</strong></li>
-                                        <li class="flex justify-between"><span>Áreas sin Responsable:</span> <strong class="text-yellow-600">{{ $reporteData['sin_responsable'] }}</strong></li>
-                                    </ul>
-                                </div>
-
-                                <div class="bg-[#F8F3ED]/50 p-4 rounded-xl border border-[#C7B5A3]/30 space-y-2">
-                                    <h4 class="text-xs font-black text-[#2F3E5C] uppercase tracking-wider">Líderes de Operación</h4>
-                                    <p class="text-xs font-semibold">Área con mayor dotación de personal:</p>
-                                    <p class="text-sm font-black text-[#E27D60]">{{ $reporteData['mas_usuarios'] }}</p>
-                                </div>
-                            </div>
-
+                            {{-- Resumen Ejecutivo en Reporte --}}
                             <div class="space-y-2">
-                                <h4 class="text-xs font-black text-[#2F3E5C] uppercase tracking-wider">Distribución por Tipo de Área</h4>
-                                <table class="w-full text-left text-xs border border-[#C7B5A3]/30">
+                                <h4 class="text-[11px] font-black uppercase tracking-[0.18em] text-[#2F3E5C]/60">RESUMEN ESTADÍSTICO</h4>
+                                <div class="grid grid-cols-2 md:grid-cols-6 gap-3">
+                                    <div class="bg-[#F8F3ED] p-3 rounded-xl border border-[#C7B5A3]/30 text-center">
+                                        <p class="text-[16px] font-black text-[#E27D60]">{{ $reporteData['totalAreas'] }}</p>
+                                        <p class="text-[8px] font-black text-[#967B66] uppercase tracking-wider">Total Áreas</p>
+                                    </div>
+                                    <div class="bg-[#F8F3ED] p-3 rounded-xl border border-[#C7B5A3]/30 text-center">
+                                        <p class="text-[16px] font-black text-[#63775B]">{{ $reporteData['areasActivas'] }}</p>
+                                        <p class="text-[8px] font-black text-[#967B66] uppercase tracking-wider">Activas</p>
+                                    </div>
+                                    <div class="bg-[#F8F3ED] p-3 rounded-xl border border-[#C7B5A3]/30 text-center">
+                                        <p class="text-[16px] font-black text-red-600">{{ $reporteData['areasInactivas'] }}</p>
+                                        <p class="text-[8px] font-black text-[#967B66] uppercase tracking-wider">Inactivas</p>
+                                    </div>
+                                    <div class="bg-[#F8F3ED] p-3 rounded-xl border border-[#C7B5A3]/30 text-center">
+                                        <p class="text-[16px] font-black text-[#2F3E5C]">{{ $reporteData['usuariosVinculados'] }}</p>
+                                        <p class="text-[8px] font-black text-[#967B66] uppercase tracking-wider">Personal</p>
+                                    </div>
+                                    <div class="bg-[#F8F3ED] p-3 rounded-xl border border-[#C7B5A3]/30 text-center">
+                                        <p class="text-[16px] font-black text-yellow-600">{{ $reporteData['areasSinResponsable'] }}</p>
+                                        <p class="text-[8px] font-black text-[#967B66] uppercase tracking-wider">Sin Resp.</p>
+                                    </div>
+                                    <div class="bg-[#F8F3ED] p-3 rounded-xl border border-[#C7B5A3]/30 text-center">
+                                        <p class="text-[16px] font-black text-gray-600">{{ $reporteData['areasSinUsuarios'] }}</p>
+                                        <p class="text-[8px] font-black text-[#967B66] uppercase tracking-wider">Sin Personal</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {{-- GRÁFICAS GENERALES --}}
+                            <div class="space-y-4 no-print">
+                                <h4 class="text-[11px] font-black uppercase tracking-[0.18em] text-[#2F3E5C]/60">GRÁFICAS ANALÍTICAS GENERALES</h4>
+                                
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    {{-- Barras: usuarios por area --}}
+                                    <div class="bg-white p-4 rounded-xl border border-[#C7B5A3]/30 shadow-sm">
+                                        <h5 class="text-[10px] font-black text-[#2F3E5C] mb-2 uppercase tracking-wide">Personal por Área Institucional</h5>
+                                        <div class="relative h-44 w-full">
+                                            <canvas x-ref="canvasUsr"></canvas>
+                                        </div>
+                                    </div>
+
+                                    {{-- Dona: areas por tipo --}}
+                                    <div class="bg-white p-4 rounded-xl border border-[#C7B5A3]/30 shadow-sm">
+                                        <h5 class="text-[10px] font-black text-[#2F3E5C] mb-2 uppercase tracking-wide">Distribución de Áreas por Tipo</h5>
+                                        <div class="relative h-44 w-full">
+                                            <canvas x-ref="canvasType"></canvas>
+                                        </div>
+                                    </div>
+
+                                    {{-- Barras apiladas: activos vs inactivos por area --}}
+                                    <div class="bg-white p-4 rounded-xl border border-[#C7B5A3]/30 shadow-sm">
+                                        <h5 class="text-[10px] font-black text-[#2F3E5C] mb-2 uppercase tracking-wide">Personal Activo vs Inactivo por Área</h5>
+                                        <div class="relative h-44 w-full">
+                                            <canvas x-ref="canvasActInact"></canvas>
+                                        </div>
+                                    </div>
+
+                                    {{-- Evolucion mensual --}}
+                                    <div class="bg-white p-4 rounded-xl border border-[#C7B5A3]/30 shadow-sm">
+                                        <h5 class="text-[10px] font-black text-[#2F3E5C] mb-2 uppercase tracking-wide">Evolución Mensual Asignación General</h5>
+                                        @if(count($this->obtenerDatosGraficoEvolucionMensual()['labels']) >= 2)
+                                            <div class="relative h-44 w-full">
+                                                <canvas x-ref="canvasEv"></canvas>
+                                            </div>
+                                        @else
+                                            <div class="h-44 w-full flex items-center justify-center text-xs font-semibold text-[#967B66] bg-gray-50 rounded-xl">
+                                                No hay datos históricos suficientes para mostrar evolución.
+                                            </div>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+
+                            {{-- Tabla de Áreas --}}
+                            <div class="space-y-2">
+                                <h4 class="text-[11px] font-black uppercase tracking-[0.18em] text-[#2F3E5C]/60">INFORMACIÓN GENERAL</h4>
+                                <table class="w-full text-left text-xs border border-[#C7B5A3]/40 rounded-xl overflow-hidden bg-white">
                                     <thead>
-                                        <tr class="bg-[#F8F3ED] border-b border-[#C7B5A3]/30 font-black text-[#2F3E5C]">
-                                            <th class="p-2">Tipo de Área</th>
-                                            <th class="p-2 text-center">Cantidad de Áreas</th>
+                                        <tr class="bg-[#F8F3ED] text-[#2F3E5C] font-black border-b border-[#C7B5A3]/40">
+                                            <th class="p-3">Área Institucional</th>
+                                            <th class="p-3">Tipo</th>
+                                            <th class="p-3">Responsable del Área</th>
+                                            <th class="p-3 text-center">Personal</th>
+                                            <th class="p-3 text-center">Estado</th>
                                         </tr>
                                     </thead>
                                     <tbody class="divide-y divide-[#C7B5A3]/30">
-                                        @foreach($reporteData['tipos'] as $tipo)
-                                            <tr>
-                                                <td class="p-2 font-bold">{{ $tipo['tipo_area'] }}</td>
-                                                <td class="p-2 text-center font-bold text-[#E27D60]">{{ $tipo['total'] }}</td>
+                                        @foreach($reporteData['areas'] as $rep)
+                                            <tr class="hover:bg-[#F8F3ED]/30">
+                                                <td class="p-3 font-black text-[#2F3E5C]">{{ $rep['nombre'] }}</td>
+                                                <td class="p-3">{{ $rep['tipo_area'] }}</td>
+                                                <td class="p-3">
+                                                    @if($rep['responsable'])
+                                                        {{ $rep['responsable']['nombres'] }} {{ $rep['responsable']['ap_paterno'] }}
+                                                    @else
+                                                        <span class="text-red-500 font-bold italic">Sin Responsable</span>
+                                                    @endif
+                                                </td>
+                                                <td class="p-3 text-center font-bold text-[#E27D60]">{{ $rep['usuarios_count'] }}</td>
+                                                <td class="p-3 text-center font-black text-[10px] {{ $rep['estado'] === 'ACTIVA' ? 'text-[#63775B]' : 'text-red-600' }}">{{ $rep['estado'] }}</td>
                                             </tr>
                                         @endforeach
                                     </tbody>
                                 </table>
                             </div>
-                        </div>
-                    @elseif($reporteTipo === 'sin_responsable')
-                        <div class="space-y-4">
-                            <div class="text-center pb-4 border-b border-[#C7B5A3]/50">
-                                <h2 class="text-lg font-black text-[#2F3E5C]">ÁREAS ACTIVAS SIN LIDERAZGO REGISTRADO</h2>
-                                <p class="text-xs text-[#967B66]">CASA AMANDITA - REMEMBERMIND</p>
-                                <p class="text-[10px] text-[#967B66] mt-1">Fecha: {{ date('d/m/Y H:i') }} | Generado por: {{ Auth::user()->name }}</p>
-                            </div>
 
-                            <table class="w-full text-left text-xs">
-                                <thead>
-                                    <tr class="bg-[#F8F3ED] text-[#2F3E5C] font-black border-b border-[#C7B5A3]/50">
-                                        <th class="p-3">Código</th>
-                                        <th class="p-3">Área sin Responsable</th>
-                                        <th class="p-3">Tipo</th>
-                                        <th class="p-3 text-center">Personal</th>
-                                        <th class="p-3">Estado</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="divide-y divide-[#C7B5A3]/30">
-                                    @forelse($reporteData as $rep)
-                                        <tr class="hover:bg-yellow-50/55">
-                                            <td class="p-3 font-bold text-yellow-700">{{ $rep['cod_area'] }}</td>
-                                            <td class="p-3 font-black text-[#2F3E5C]">{{ $rep['nombre'] }}</td>
-                                            <td class="p-3">{{ $rep['tipo_area'] }}</td>
-                                            <td class="p-3 text-center font-bold text-[#E27D60]">{{ $rep['usuarios_count'] }}</td>
-                                            <td class="p-3 font-black text-[10px] text-yellow-600">{{ $rep['estado'] }}</td>
-                                        </tr>
-                                    @empty
-                                        <tr>
-                                            <td colspan="5" class="p-6 text-center text-xs font-bold text-[#63775B] bg-[#8DA280]/10">
-                                                🎉 Excelente: Todas las áreas activas cuentan con un líder o responsable registrado.
-                                            </td>
-                                        </tr>
-                                    @endforelse
-                                </tbody>
-                            </table>
-                        </div>
-                    @elseif($reporteTipo === 'especifico')
-                        <div class="space-y-4">
-                            <div class="text-center pb-4 border-b border-[#C7B5A3]/50">
-                                <h2 class="text-lg font-black text-[#2F3E5C] uppercase">REPORTE DETALLADO: {{ $reporteData['nombre'] }}</h2>
-                                <p class="text-xs text-[#967B66]">CASA AMANDITA - REMEMBERMIND</p>
-                                <p class="text-[10px] text-[#967B66] mt-1">Fecha: {{ date('d/m/Y H:i') }} | Generado por: {{ Auth::user()->name }}</p>
-                            </div>
-
-                            <div class="bg-[#F8F3ED]/40 p-4 rounded-xl border border-[#C7B5A3]/30 space-y-2 text-xs">
-                                <p><strong>Código de Área:</strong> {{ $reporteData['cod_area'] }}</p>
-                                <p><strong>Tipo de Área:</strong> {{ $reporteData['tipo_area'] }}</p>
-                                <p><strong>Responsable:</strong> {{ $reporteData['responsable'] }}</p>
-                                <p><strong>Estado:</strong> {{ $reporteData['estado'] }}</p>
-                                <p class="mt-2 leading-relaxed"><strong>Descripción Operativa:</strong> {{ $reporteData['descripcion'] }}</p>
-                            </div>
-
+                            {{-- Alertas y Observaciones --}}
                             <div class="space-y-2">
-                                <h4 class="text-xs font-black text-[#2F3E5C] uppercase tracking-wider">Personal Vinculado</h4>
-                                <table class="w-full text-left text-xs">
-                                    <thead>
-                                        <tr class="bg-[#F8F3ED] border-b border-[#C7B5A3]/30 font-black text-[#2F3E5C]">
-                                            <th class="p-2">Personal</th>
-                                            <th class="p-2">Rol Asignado</th>
-                                            <th class="p-2">Estado</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody class="divide-y divide-[#C7B5A3]/30">
-                                        @forelse($reporteData['usuarios'] as $u)
-                                            <tr>
-                                                <td class="p-2 font-bold">{{ $u['nombre'] }}</td>
-                                                <td class="p-2">{{ $u['rol'] }}</td>
-                                                <td class="p-2 text-[10px] font-black {{ $u['estado'] === 'ACTIVO' ? 'text-[#63775B]' : 'text-red-600' }}">{{ $u['estado'] }}</td>
-                                            </tr>
-                                        @empty
-                                            <tr>
-                                                <td colspan="3" class="p-4 text-center text-[#967B66] italic">No hay personal vinculado a este área en este momento.</td>
-                                            </tr>
-                                        @endforelse
-                                    </tbody>
-                                </table>
+                                <h4 class="text-[11px] font-black uppercase tracking-[0.18em] text-[#2F3E5C]/60">OBSERVACIONES</h4>
+                                <div class="bg-gray-50 border-l-4 border-[#E27D60] p-4 rounded-r-xl text-xs font-semibold text-[#7C7168] space-y-2 leading-relaxed">
+                                    <p><strong>Estatus de Liderazgo:</strong> 
+                                        @php $sinResp = collect($reporteData['areas'])->where('responsable_id', null); @endphp
+                                        @if($sinResp->count() > 0)
+                                            Se detectan {{ $sinResp->count() }} áreas sin un responsable asignado ({{ implode(', ', $sinResp->pluck('nombre')->toArray()) }}). Se sugiere regularizar la asignación a la brevedad.
+                                        @else
+                                            Todas las áreas operativas activas disponen de un responsable adscrito correctamente.
+                                        @endif
+                                    </p>
+                                    <p><strong>Estatus de Personal:</strong>
+                                        @php $sinPers = collect($reporteData['areas'])->where('usuarios_count', 0); @endphp
+                                        @if($sinPers->count() > 0)
+                                            Se registran {{ $sinPers->count() }} áreas sin personal vinculado ({{ implode(', ', $sinPers->pluck('nombre')->toArray()) }}).
+                                        @else
+                                            Todas las áreas disponen de al menos un miembro del personal vinculado.
+                                        @endif
+                                    </p>
+                                </div>
                             </div>
                         </div>
-                    @else
-                        <div class="text-center py-12 text-[#967B66] italic text-xs">
-                            <i class="ph-bold ph-arrow-circle-up text-3xl mb-2 block"></i>
-                            Seleccione un tipo de reporte de la barra superior para procesar la información.
+                    @elseif($reporteTipo === 'especifico' && isset($reporteData['area']))
+                        {{-- ── REPORTE ESPECÍFICO DEL ÁREA ── --}}
+                        <div class="space-y-6">
+                            {{-- Membrete --}}
+                            <div class="text-center pb-4 border-b border-[#C7B5A3]/50">
+                                <h2 class="text-2xl font-black text-[#2F3E5C] uppercase tracking-wide">REPORTE DEL ÁREA</h2>
+                                <h3 class="text-lg font-black text-[#E27D60] mt-1">{{ $reporteData['area']['nombre'] }}</h3>
+                                <p class="text-xs font-black text-[#967B66] uppercase tracking-widest mt-0.5">Casa Amandita • Sistema RememberMind</p>
+                                <p class="text-[10px] text-[#967B66] mt-2 font-bold">Fecha: {{ $reporteData['fecha'] }} | Generado por: {{ $reporteData['usuario'] }}</p>
+                            </div>
+
+                            {{-- Datos Generales del Área --}}
+                            <div class="space-y-2">
+                                <h4 class="text-[11px] font-black uppercase tracking-[0.18em] text-[#2F3E5C]/60">INFORMACIÓN GENERAL</h4>
+                                <div class="bg-[#F8F3ED]/40 p-4 rounded-xl border border-[#C7B5A3]/30 space-y-2 text-xs font-semibold text-[#2F3E5C]">
+                                    <p><strong>Tipo de Área:</strong> {{ $reporteData['area']['tipo_area'] }}</p>
+                                    <p><strong>Estado:</strong> {{ $reporteData['area']['estado'] }}</p>
+                                    <p><strong>Responsable:</strong> 
+                                        @if($reporteData['area']['responsable'])
+                                            {{ $reporteData['area']['responsable']['name'] }}
+                                        @else
+                                            <span class="text-red-500 font-bold italic">Sin responsable asignado</span>
+                                        @endif
+                                    </p>
+                                    <p class="leading-relaxed"><strong>Descripción Operativa:</strong> {{ $reporteData['area']['descripcion'] }}</p>
+                                    @if($reporteData['area']['observaciones'])
+                                        <p class="italic text-[#967B66]"><strong>Observaciones Internas:</strong> "{{ $reporteData['area']['observaciones'] }}"</p>
+                                    @endif
+                                    <p><strong>Última actualización:</strong> {{ \Carbon\Carbon::parse($reporteData['area']['updated_at'])->format('d/m/Y H:i') }}</p>
+                                </div>
+                            </div>
+
+                            {{-- Resumen Estadístico --}}
+                            <div class="space-y-2">
+                                <h4 class="text-[11px] font-black uppercase tracking-[0.18em] text-[#2F3E5C]/60">RESUMEN ESTADÍSTICO</h4>
+                                <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-center">
+                                    <div class="bg-[#F8F3ED] p-3 rounded-xl border border-[#C7B5A3]/30">
+                                        <p class="text-xl font-black text-[#2F3E5C]">{{ $reporteData['totalUsuarios'] }}</p>
+                                        <p class="text-[8px] font-black text-[#967B66] uppercase tracking-wider">Total Personal</p>
+                                    </div>
+                                    <div class="bg-[#F8F3ED] p-3 rounded-xl border border-[#C7B5A3]/30">
+                                        <p class="text-xl font-black text-[#63775B]">{{ $reporteData['usuariosActivos'] }}</p>
+                                        <p class="text-[8px] font-black text-[#967B66] uppercase tracking-wider">Personal Activo</p>
+                                    </div>
+                                    <div class="bg-[#F8F3ED] p-3 rounded-xl border border-[#C7B5A3]/30">
+                                        <p class="text-xl font-black text-red-600">{{ $reporteData['usuariosInactivos'] }}</p>
+                                        <p class="text-[8px] font-black text-[#967B66] uppercase tracking-wider">Personal Inactivo</p>
+                                    </div>
+                                    <div class="bg-[#F8F3ED] p-3 rounded-xl border border-[#C7B5A3]/30">
+                                        <p class="text-xl font-black text-[#E27D60]">{{ $reporteData['porcentajeActivos'] }}%</p>
+                                        <p class="text-[8px] font-black text-[#967B66] uppercase tracking-wider">% Activos</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {{-- GRÁFICAS DE ÁREA EN REPORTE --}}
+                            <div class="space-y-4 no-print">
+                                <h4 class="text-[11px] font-black uppercase tracking-[0.18em] text-[#2F3E5C]/60">GRÁFICAS DEL ÁREA</h4>
+                                
+                                @if($reporteData['totalUsuarios'] > 0)
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        {{-- Dona activos vs inactivos --}}
+                                        <div class="bg-white p-4 rounded-xl border border-[#C7B5A3]/30 shadow-sm">
+                                            <h5 class="text-[10px] font-black text-[#2F3E5C] mb-2 uppercase tracking-wide">Usuarios Activos vs Inactivos</h5>
+                                            <div class="relative h-44 w-full">
+                                                <canvas x-ref="canvasAreaActive"></canvas>
+                                            </div>
+                                        </div>
+
+                                        {{-- Barras usuarios por rol --}}
+                                        <div class="bg-white p-4 rounded-xl border border-[#C7B5A3]/30 shadow-sm">
+                                            <h5 class="text-[10px] font-black text-[#2F3E5C] mb-2 uppercase tracking-wide">Usuarios por Rol</h5>
+                                            <div class="relative h-44 w-full">
+                                                <canvas x-ref="canvasAreaRol"></canvas>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endif
+
+                                {{-- Evolución asignación --}}
+                                @if(count($this->obtenerDatosGraficoEvolucionArea($reporteData['area']['cod_area'])) >= 2)
+                                    <div class="bg-white p-4 rounded-xl border border-[#C7B5A3]/30 shadow-sm">
+                                        <h5 class="text-[10px] font-black text-[#2F3E5C] mb-2 uppercase tracking-wide">Evolución Mensual Asignación</h5>
+                                        <div class="relative h-44 w-full">
+                                            <canvas x-ref="canvasAreaLine"></canvas>
+                                        </div>
+                                    </div>
+                                @endif
+                            </div>
+
+                            {{-- Lista de Usuarios Vinculados --}}
+                            <div class="space-y-2">
+                                <h4 class="text-[11px] font-black uppercase tracking-[0.18em] text-[#2F3E5C]/60">PERSONAL VINCULADO</h4>
+                                @if(count($reporteData['area']['usuarios']) > 0)
+                                    <table class="w-full text-left text-xs border border-[#C7B5A3]/40 rounded-xl overflow-hidden bg-white">
+                                        <thead>
+                                            <tr class="bg-[#F8F3ED] text-[#2F3E5C] font-black border-b border-[#C7B5A3]/40">
+                                                <th class="p-3">Nombre Completo</th>
+                                                <th class="p-3">Rol Asignado</th>
+                                                <th class="p-3 text-center">Estado</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="divide-y divide-[#C7B5A3]/30">
+                                            @foreach($reporteData['area']['usuarios'] as $u)
+                                                <tr class="hover:bg-[#F8F3ED]/30">
+                                                    <td class="p-3 font-black text-[#2F3E5C]">{{ $u['name'] }}</td>
+                                                    <td class="p-3">{{ $u->getRoleNames()->first() ?? 'Sin Rol' }}</td>
+                                                    <td class="p-3 text-center font-black text-[10px] {{ $u['estado'] == 1 ? 'text-[#63775B]' : 'text-red-600' }}">
+                                                        {{ $u['estado'] == 1 ? 'ACTIVO' : 'INACTIVO' }}
+                                                    </td>
+                                                </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                @else
+                                    <div class="rounded-xl border border-dashed border-[#C7B5A3] p-6 text-center text-xs font-semibold text-[#967B66] bg-gray-50/50">
+                                        Esta área aún no tiene usuarios asignados.
+                                    </div>
+                                @endif
+                            </div>
+
+                            {{-- Observaciones del área --}}
+                            <div class="space-y-2">
+                                <h4 class="text-[11px] font-black uppercase tracking-[0.18em] text-[#2F3E5C]/60">OBSERVACIONES</h4>
+                                <div class="bg-gray-50 border-l-4 border-[#E27D60] p-4 rounded-r-xl text-xs font-semibold text-[#7C7168] leading-relaxed">
+                                    @if(count($reporteData['area']['usuarios']) == 0)
+                                        <p class="mb-1"><strong>Alerta del Personal:</strong> Esta área aún no tiene usuarios asignados.</p>
+                                    @endif
+                                    @if(!$reporteData['area']['responsable_id'])
+                                        <p class="mb-1"><strong>Alerta de Responsabilidad:</strong> Esta área no cuenta con responsable asignado.</p>
+                                    @endif
+                                    @if(count($this->obtenerDatosGraficoEvolucionArea($reporteData['area']['cod_area'])) < 2)
+                                        <p class="mb-1"><strong>Alerta Histórica:</strong> No hay datos históricos suficientes para graficar evolución.</p>
+                                    @endif
+                                    <p class="mt-2 text-[10px] text-[#967B66]">El personal listado está plenamente adscrito a las operaciones funcionales del área descrita en este documento.</p>
+                                </div>
+                            </div>
                         </div>
                     @endif
                 </div>
 
                 {{-- Botón Cerrar Modal Reportes --}}
-                <footer class="flex items-center justify-end mt-4 pt-4 border-t border-[#C7B5A3]/30 print:hidden">
+                <footer class="flex items-center justify-end mt-4 pt-4 border-t border-[#C7B5A3]/30 no-print">
                     <button type="button"
                             wire:click="cerrarReportes"
                             class="rounded-full bg-[#2F3E5C] px-6 py-2 text-xs font-black text-white shadow-lg transition hover:bg-[#1f293d]">

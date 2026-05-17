@@ -23,6 +23,7 @@ class AreaInstitucional extends Model
         'tipo_area',
         'descripcion',
         'responsable_id',
+        'imagen_area',
         'roles_sugeridos',
         'modulos_relacionados',
         'color',

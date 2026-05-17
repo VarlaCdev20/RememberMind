@@ -3,14 +3,20 @@
 namespace App\Livewire\Admin\AreasInstitucionales;
 
 use Livewire\Component;
+use Livewire\WithFileUploads;
 use App\Models\AreaInstitucional;
 use App\Models\User;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
-use Spatie\Permission\Models\Role;
+use Illuminate\Support\Facades\Storage;
+use App\Services\Reports\ReportExportService;
+use App\Services\Reports\ReportFileNameService;
+use App\Exports\AreasInstitucionalesExport;
 
 class AreasInstitucionalesPanel extends Component
 {
+    use WithFileUploads;
+
     // Filtros de búsqueda
     public $search = '';
     public $filtroEstado = '';
@@ -33,44 +39,23 @@ class AreasInstitucionalesPanel extends Component
     public $tipo_area = 'Administrativa';
     public $descripcion;
     public $responsable_id;
-    public $roles_sugeridos = [];
-    public $modulos_relacionados = [];
     public $color = '#2F3E5C';
-    public $icono = 'ph-buildings';
     public $estado = 'ACTIVA';
     public $orden = 0;
     public $observaciones;
+    public $nuevaImagen; // Para la carga de portadas
+
+    // Conservar en BD pero ocultar en UI
+    public $roles_sugeridos = [];
+    public $modulos_relacionados = [];
+    public $icono = 'ph-buildings';
 
     // Ficha de detalle de área
     public $areaSeleccionada = null;
 
-    // Opciones del sistema para el formulario
-    public $rolesDisponibles = [];
-    public $modulosDisponibles = [
-        'usuarios' => 'Gestión de Usuarios',
-        'roles_permisos' => 'Roles y Permisos',
-        'areas' => 'Áreas Institucionales',
-        'adultos_mayores' => 'Adultos Mayores',
-        'familiares' => 'Familiares',
-        'documentos' => 'Documentación',
-        'ficha_medica' => 'Ficha Médica',
-        'signos_vitales' => 'Signos Vitales',
-        'medicacion' => 'Medicación y Alertas',
-        'atenciones' => 'Atenciones e Incidentes',
-        'evaluaciones' => 'Evaluaciones Cognitivas',
-        'observaciones' => 'Observaciones Diarias',
-        'actividades' => 'Actividades Recreativas',
-        'voluntariado' => 'Gestión de Voluntarios',
-        'asistencia' => 'Control de Asistencia',
-        'bitacora' => 'Bitácora y Seguridad',
-        'reportes' => 'Módulo de Reportes',
-        'configuracion' => 'Configuración de Sistema',
-    ];
-
     public function mount()
     {
-        // Cargar roles del sistema
-        $this->rolesDisponibles = Role::pluck('name')->toArray();
+        // No se requiere precargar roles ya que no se editan aquí
     }
 
     public function render()
@@ -79,11 +64,13 @@ class AreasInstitucionalesPanel extends Component
         $query = AreaInstitucional::with(['responsable', 'usuarios'])
             ->withCount('usuarios');
 
-        // Búsqueda por nombre
+        // Búsqueda reactiva por nombre, código o tipo
         if ($this->search) {
-            $query->where('nombre', 'like', '%' . $this->search . '%')
+            $query->where(function($q) {
+                $q->where('nombre', 'like', '%' . $this->search . '%')
                   ->orWhere('cod_area', 'like', '%' . $this->search . '%')
                   ->orWhere('tipo_area', 'like', '%' . $this->search . '%');
+            });
         }
 
         // Filtro por Estado
@@ -103,40 +90,37 @@ class AreasInstitucionalesPanel extends Component
 
         $areas = $query->orderBy('orden')->orderBy('nombre')->get();
 
-        // Cargar usuarios con privilegios institucionales para ser elegidos como responsables
-        $responsablesDisponibles = User::where('estado', 'ACTIVO')
-            ->whereHas('roles', function($q) {
-                $q->whereIn('name', ['admin', 'personal_admin', 'personal_salud']);
-            })
+        // Si estamos en edición, cargamos solo los usuarios de esta área
+        $responsablesDisponibles = [];
+        if ($this->isEdit && $this->areaId) {
+            $responsablesDisponibles = User::where('cod_area', $this->areaId)
+                ->where('estado', 'ACTIVO')
+                ->get();
+        }
+
+        // Todos los usuarios activos para filtro en cabecera
+        $todosResponsables = User::where('estado', 'ACTIVO')
+            ->whereHas('areaInstitucional')
             ->get();
 
-        // Calcular métricas generales para las tarjetas
+        // Calcular métricas organizacionales reales
         $totalAreas = AreaInstitucional::count();
         $areasActivas = AreaInstitucional::activas()->count();
+        $areasInactivas = AreaInstitucional::inactivas()->count();
         $usuariosVinculados = User::whereNotNull('cod_area')->count();
         $areasSinResponsable = AreaInstitucional::whereNull('responsable_id')->count();
-        
-        // Contar todos los módulos únicos utilizados
-        $modulosUtilizadosCount = 0;
-        $todasLasAreas = AreaInstitucional::select('modulos_relacionados')->get();
-        $modulosUnicos = [];
-        foreach ($todasLasAreas as $a) {
-            if ($a->modulos_relacionados) {
-                foreach ($a->modulos_relacionados as $mod) {
-                    $modulosUnicos[$mod] = true;
-                }
-            }
-        }
-        $modulosUtilizadosCount = count($modulosUnicos);
+        $areasSinUsuarios = AreaInstitucional::doesntHave('usuarios')->count();
 
         return view('livewire.admin.areas-institucionales.areas-institucionales-panel', [
             'areas' => $areas,
             'responsablesDisponibles' => $responsablesDisponibles,
+            'todosResponsables' => $todosResponsables,
             'totalAreas' => $totalAreas,
             'areasActivas' => $areasActivas,
+            'areasInactivas' => $areasInactivas,
             'usuariosVinculados' => $usuariosVinculados,
             'areasSinResponsable' => $areasSinResponsable,
-            'modulosUtilizadosCount' => $modulosUtilizadosCount,
+            'areasSinUsuarios' => $areasSinUsuarios,
         ]);
     }
 
@@ -184,22 +168,51 @@ class AreasInstitucionalesPanel extends Component
         $this->resetErrorBag();
         $area = AreaInstitucional::findOrFail($codArea);
 
+        // Validar si el responsable actual ya no pertenece a la misma o está inactivo
+        $responsableActualValido = false;
+        if ($area->responsable_id) {
+            $responsableActualValido = User::where('cod_usu', $area->responsable_id)
+                ->where('cod_area', $area->cod_area)
+                ->where('estado', 'ACTIVO')
+                ->exists();
+        }
+
+        if ($area->responsable_id && !$responsableActualValido) {
+            // Limpiar responsable_id
+            $area->responsable_id = null;
+            $area->save();
+
+            activity('AreasInstitucionales')
+                ->performedOn($area)
+                ->causedBy(Auth::user())
+                ->log("Se retiró al responsable del área '{$area->nombre}' porque ya no pertenece a la misma o está inactivo.");
+
+            $this->dispatch('swal:modal', [
+                'type' => 'warning',
+                'title' => 'Responsable desvinculado',
+                'text' => 'El responsable anterior ya no pertenece a esta área o está inactivo y fue retirado.',
+            ]);
+        }
+
         $this->areaId = $area->cod_area;
         $this->nombre = $area->nombre;
         $this->tipo_area = $area->tipo_area;
         $this->descripcion = $area->descripcion;
         $this->responsable_id = $area->responsable_id;
-        $this->roles_sugeridos = $area->roles_sugeridos ?? [];
-        $this->modulos_relacionados = $area->modulos_relacionados ?? [];
         $this->color = $area->color ?? '#2F3E5C';
-        $this->icono = $area->icono ?? 'ph-buildings';
         $this->estado = $area->estado;
         $this->orden = $area->orden;
         $this->observaciones = $area->observaciones;
 
+        // Conservar campos ocultos de BD
+        $this->roles_sugeridos = $area->roles_sugeridos ?? [];
+        $this->modulos_relacionados = $area->modulos_relacionados ?? [];
+        $this->icono = $area->icono ?? 'ph-buildings';
+
         $this->isEdit = true;
         $this->mostrarFormulario = true;
         $this->mostrarFicha = false;
+        $this->nuevaImagen = null;
     }
 
     public function guardarArea()
@@ -221,24 +234,65 @@ class AreasInstitucionalesPanel extends Component
             'tipo_area' => 'required|string|max:50',
             'descripcion' => 'required|string',
             'responsable_id' => 'nullable|exists:users,cod_usu',
-            'roles_sugeridos' => 'nullable|array',
-            'modulos_relacionados' => 'nullable|array',
             'color' => 'required|string|max:20',
-            'icono' => 'required|string|max:50',
             'estado' => 'required|in:ACTIVA,INACTIVA',
             'orden' => 'required|integer|min:0',
             'observaciones' => 'nullable|string',
+            'nuevaImagen' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:4096',
         ];
 
         $validated = $this->validate($rules);
+        unset($validated['nuevaImagen']);
+
         $validated['slug'] = Str::slug($this->nombre);
+        $validated['icono'] = $this->obtenerIconoTipo($this->tipo_area);
+
+        // Si se seleccionó una nueva imagen
+        if ($this->nuevaImagen) {
+            // Eliminar imagen anterior si existe
+            if ($this->isEdit && $this->areaId) {
+                $areaAnt = AreaInstitucional::find($this->areaId);
+                if ($areaAnt && $areaAnt->imagen_area) {
+                    Storage::disk('public')->delete($areaAnt->imagen_area);
+                }
+            }
+
+            // Guardar en storage/app/public/areas
+            $path = $this->nuevaImagen->store('areas', 'public');
+            $validated['imagen_area'] = $path;
+        }
+
+        // Validar backend de responsabilidad de área
+        if ($this->isEdit && $this->responsable_id) {
+            $usuarioValido = User::where('cod_usu', $this->responsable_id)
+                ->where('cod_area', $this->areaId)
+                ->where('estado', 'ACTIVO')
+                ->exists();
+
+            if (!$usuarioValido) {
+                $this->dispatch('swal:modal', [
+                    'type' => 'error',
+                    'title' => 'Responsable inválido',
+                    'text' => 'El usuario seleccionado no pertenece a esta área institucional o no está activo.',
+                ]);
+                return;
+            }
+        } elseif (!$this->isEdit) {
+            // En creación, el responsable se fuerza a NULL
+            $validated['responsable_id'] = null;
+        }
 
         if ($this->isEdit) {
             $area = AreaInstitucional::findOrFail($this->areaId);
             $validated['actualizado_por'] = Auth::id();
+            
+            // Conservar campos ocultos de BD
+            $validated['roles_sugeridos'] = $this->roles_sugeridos;
+            $validated['modulos_relacionados'] = $this->modulos_relacionados;
+
             $area->update($validated);
 
-            // Registrar acción en log de actividad
+            // Log de actividad
             activity('AreasInstitucionales')
                 ->performedOn($area)
                 ->causedBy(Auth::user())
@@ -247,13 +301,18 @@ class AreasInstitucionalesPanel extends Component
             $mensaje = 'Área institucional actualizada correctamente.';
         } else {
             $validated['creado_por'] = Auth::id();
+            
+            // Conservar campos ocultos con defaults
+            $validated['roles_sugeridos'] = [];
+            $validated['modulos_relacionados'] = [];
+
             $area = AreaInstitucional::create($validated);
 
-            // Registrar acción en log de actividad
+            // Log de actividad
             activity('AreasInstitucionales')
                 ->performedOn($area)
                 ->causedBy(Auth::user())
-                ->log("El usuario creó una nueva área institucional llamada {$area->nombre}.");
+                ->log("El usuario creó la área institucional {$area->nombre}.");
 
             $mensaje = 'Área institucional registrada correctamente.';
         }
@@ -335,14 +394,14 @@ class AreasInstitucionalesPanel extends Component
             $this->dispatch('swal:modal', [
                 'type' => 'error',
                 'title' => 'Acceso denegado',
-                'text' => 'No tienes permiso para consultar reportes de áreas.',
+                'text' => 'No tienes permiso para generar reportes de áreas institucionales.',
             ]);
             return;
         }
 
         $this->mostrarReportes = true;
-        $this->reporteTipo = null;
-        $this->reporteData = [];
+        $this->reporteTipo = 'general';
+        $this->reporteData = $this->obtenerDatosReporteGeneral();
     }
 
     public function cerrarReportes()
@@ -352,129 +411,359 @@ class AreasInstitucionalesPanel extends Component
         $this->reporteData = [];
     }
 
-    public function generarReporteGeneral()
-    {
-        $this->reporteTipo = 'general';
-        $this->reporteData = AreaInstitucional::with('responsable')
-            ->withCount('usuarios')
-            ->orderBy('orden')
-            ->get()
-            ->toArray();
-        
-        activity('AreasInstitucionales')
-            ->causedBy(Auth::user())
-            ->log('Se generó el reporte general de áreas institucionales.');
-    }
-
-    public function generarReporteUsuarios()
-    {
-        $this->reporteTipo = 'usuarios';
-        $this->reporteData = User::with('areaInstitucional')
-            ->whereNotNull('cod_area')
-            ->orderBy('cod_area')
-            ->get()
-            ->map(function($user) {
-                return [
-                    'nombre_completo' => $user->name,
-                    'area' => $user->areaInstitucional->nombre ?? 'N/A',
-                    'rol' => $user->getRoleNames()->first() ?? 'Sin Rol',
-                    'estado' => $user->estado == 1 ? 'ACTIVO' : 'INACTIVO',
-                    'ultimo_acceso' => $user->ultimo_acceso ? $user->ultimo_acceso->format('d/m/Y H:i') : 'Nunca',
-                ];
-            })
-            ->toArray();
-
-        activity('AreasInstitucionales')
-            ->causedBy(Auth::user())
-            ->log('Se generó el reporte de usuarios por área institucional.');
-    }
-
-    public function generarReporteDistribucion()
-    {
-        $this->reporteTipo = 'distribucion';
-        
-        $totalAreas = AreaInstitucional::count();
-        $totalActivas = AreaInstitucional::activas()->count();
-        $totalInactivas = AreaInstitucional::inactivas()->count();
-        
-        $areaConMasUsuarios = AreaInstitucional::withCount('usuarios')
-            ->orderByDesc('usuarios_count')
-            ->first();
-
-        $areasSinResponsableCount = AreaInstitucional::whereNull('responsable_id')->count();
-
-        // Distribución por tipos de áreas
-        $tipos = AreaInstitucional::selectRaw('tipo_area, count(*) as total')
-            ->groupBy('tipo_area')
-            ->get()
-            ->toArray();
-
-        $this->reporteData = [
-            'total_areas' => $totalAreas,
-            'activas' => $totalActivas,
-            'inactivas' => $totalInactivas,
-            'mas_usuarios' => $areaConMasUsuarios ? "{$areaConMasUsuarios->nombre} ({$areaConMasUsuarios->usuarios_count} usuarios)" : 'Ninguna',
-            'sin_responsable' => $areasSinResponsableCount,
-            'tipos' => $tipos,
-        ];
-
-        activity('AreasInstitucionales')
-            ->causedBy(Auth::user())
-            ->log('Se generó el reporte de distribución institucional.');
-    }
-
-    public function generarReporteSinResponsable()
-    {
-        $this->reporteTipo = 'sin_responsable';
-        $this->reporteData = AreaInstitucional::whereNull('responsable_id')
-            ->withCount('usuarios')
-            ->orderBy('nombre')
-            ->get()
-            ->toArray();
-
-        activity('AreasInstitucionales')
-            ->causedBy(Auth::user())
-            ->log('Se generó el reporte de áreas sin responsable.');
-    }
-
-    public function generarReporteEspecifico($codArea)
+    public function abrirReporteArea($codArea)
     {
         if (!Auth::user()->can('areas.reportes')) {
             $this->dispatch('swal:modal', [
                 'type' => 'error',
                 'title' => 'Acceso denegado',
-                'text' => 'No tienes permiso para consultar reportes de áreas.',
+                'text' => 'No tienes permiso para generar reportes de áreas institucionales.',
             ]);
             return;
         }
 
-        $area = AreaInstitucional::with(['responsable', 'usuarios'])->findOrFail($codArea);
-        
         $this->mostrarReportes = true;
         $this->reporteTipo = 'especifico';
+        $this->reporteData = $this->obtenerDatosReporteArea($codArea);
         
-        $this->reporteData = [
-            'nombre' => $area->nombre,
-            'cod_area' => $area->cod_area,
-            'tipo_area' => $area->tipo_area,
-            'descripcion' => $area->descripcion,
-            'responsable' => $area->responsable->name ?? 'Sin asignar',
-            'estado' => $area->estado,
-            'color' => $area->color,
-            'icono' => $area->icono,
-            'usuarios' => $area->usuarios->map(function($u) {
-                return [
-                    'nombre' => $u->name,
-                    'rol' => $u->getRoleNames()->first() ?? 'Sin Rol',
-                    'estado' => $u->estado == 1 ? 'ACTIVO' : 'INACTIVO',
-                ];
-            })->toArray()
-        ];
+        activity('AreasInstitucionales')
+            ->causedBy(Auth::user())
+            ->log("Se abrió el reporte específico del área: {$this->reporteData['area']['nombre']}.");
+    }
+
+    public function cerrarReporteArea()
+    {
+        $this->reporteTipo = null;
+        $this->reporteData = [];
+    }
+
+    public function generarReporteGeneral()
+    {
+        if (!Auth::user()->can('areas.reportes')) {
+            $this->dispatch('swal:modal', [
+                'type' => 'error',
+                'title' => 'Acceso denegado',
+                'text' => 'No tienes permiso para generar reportes de áreas institucionales.',
+            ]);
+            return;
+        }
+
+        $this->reporteTipo = 'general';
+        $this->reporteData = $this->obtenerDatosReporteGeneral();
 
         activity('AreasInstitucionales')
-            ->performedOn($area)
             ->causedBy(Auth::user())
-            ->log("Se generó el reporte institucional específico para el área {$area->nombre}.");
+            ->log('Se generó el reporte general de áreas institucionales.');
+    }
+
+    public function generarReporteArea($codArea)
+    {
+        $this->abrirReporteArea($codArea);
+    }
+
+    public function imprimirReporteGeneral()
+    {
+        $this->dispatch('print-window');
+    }
+
+    public function exportarReporteGeneralPdf()
+    {
+        if (!Auth::user()->can('areas.reportes')) {
+            $this->dispatch('swal:modal', [
+                'type' => 'error',
+                'title' => 'Acceso denegado',
+                'text' => 'No tienes permiso para generar reportes de áreas institucionales.',
+            ]);
+            return;
+        }
+
+        try {
+            $data = $this->obtenerDatosReporteGeneral();
+            
+            $mappedAreas = [];
+            foreach ($data['areas'] as $area) {
+                $mappedAreas[] = [
+                    'nombre' => $area->nombre,
+                    'tipo_area' => $area->tipo_area,
+                    'responsable_nombre' => $area->responsable ? $area->responsable->name : 'Sin asignar',
+                    'usuarios_activos_count' => $area->usuarios->where('estado', 1)->count(),
+                    'usuarios_inactivos_count' => $area->usuarios->where('estado', '!=', 1)->count(),
+                    'estado' => $area->estado,
+                ];
+            }
+
+            $viewData = [
+                'areas' => $mappedAreas,
+                'totales' => [
+                    'total_areas' => $data['totalAreas'],
+                    'personal_activo' => $data['usuariosVinculados'],
+                    'sin_responsable' => $data['areasSinResponsable'],
+                    'total_usuarios' => User::count(),
+                ],
+                'fecha' => $data['fecha'],
+                'usuario' => $data['usuario'],
+            ];
+            
+            $fileNameService = app(ReportFileNameService::class);
+            $filename = $fileNameService->generate('areas_institucionales', 'pdf');
+
+            $exportService = app(ReportExportService::class);
+
+            activity('AreasInstitucionales')
+                ->causedBy(Auth::user())
+                ->log('Se exportó el reporte general de áreas en formato PDF con la nueva arquitectura.');
+
+            return $exportService->exportPdf('reports.areas.general', $viewData, $filename);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error("Error exportar PDF general: " . $e->getMessage());
+            $this->dispatch('swal:modal', [
+                'type' => 'error',
+                'title' => 'Error de Exportación',
+                'text' => 'No se pudo generar el reporte en PDF: ' . $e->getMessage(),
+            ]);
+        }
+    }
+
+    public function imprimirReporteArea($codArea)
+    {
+        $this->dispatch('print-window');
+    }
+
+    public function exportarReporteAreaPdf($codArea)
+    {
+        if (!Auth::user()->can('areas.reportes')) {
+            $this->dispatch('swal:modal', [
+                'type' => 'error',
+                'title' => 'Acceso denegado',
+                'text' => 'No tienes permiso para generar reportes de áreas institucionales.',
+            ]);
+            return;
+        }
+
+        try {
+            $area = AreaInstitucional::with(['responsable', 'usuarios'])->findOrFail($codArea);
+            $data = $this->obtenerDatosReporteArea($codArea);
+            
+            $fileNameService = app(ReportFileNameService::class);
+            $filename = $fileNameService->generate("area_{$area->nombre}", 'pdf');
+
+            $exportService = app(ReportExportService::class);
+
+            activity('AreasInstitucionales')
+                ->performedOn($area)
+                ->causedBy(Auth::user())
+                ->log("Se exportó el reporte del área '{$area->nombre}' en formato PDF.");
+
+            return $exportService->exportPdf('reports.areas.area', $data, $filename);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error("Error exportar PDF área: " . $e->getMessage());
+            $this->dispatch('swal:modal', [
+                'type' => 'error',
+                'title' => 'Error de Exportación',
+                'text' => 'No se pudo generar el reporte en PDF del área: ' . $e->getMessage(),
+            ]);
+        }
+    }
+
+    public function exportarReporteGeneralExcel()
+    {
+        if (!Auth::user()->can('areas.reportes')) {
+            $this->dispatch('swal:modal', [
+                'type' => 'error',
+                'title' => 'Acceso denegado',
+                'text' => 'No tienes permiso para generar reportes de áreas institucionales.',
+            ]);
+            return;
+        }
+
+        try {
+            $fileNameService = app(ReportFileNameService::class);
+            $filename = $fileNameService->generate('areas_institucionales', 'xlsx');
+
+            $exportService = app(ReportExportService::class);
+
+            activity('AreasInstitucionales')
+                ->causedBy(Auth::user())
+                ->log('Se exportó el reporte general de áreas en formato Excel.');
+
+            return $exportService->exportExcel(new AreasInstitucionalesExport, $filename);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error("Error exportar Excel general: " . $e->getMessage());
+            $this->dispatch('swal:modal', [
+                'type' => 'error',
+                'title' => 'Error de Exportación',
+                'text' => 'No se pudo generar el reporte en Excel: ' . $e->getMessage(),
+            ]);
+        }
+    }
+
+    public function exportarReporteGeneralCsv()
+    {
+        if (!Auth::user()->can('areas.reportes')) {
+            $this->dispatch('swal:modal', [
+                'type' => 'error',
+                'title' => 'Acceso denegado',
+                'text' => 'No tienes permiso para generar reportes de áreas institucionales.',
+            ]);
+            return;
+        }
+
+        try {
+            $fileNameService = app(ReportFileNameService::class);
+            $filename = $fileNameService->generate('areas_institucionales', 'csv');
+
+            $exportService = app(ReportExportService::class);
+
+            activity('AreasInstitucionales')
+                ->causedBy(Auth::user())
+                ->log('Se exportó el reporte general de áreas en formato CSV.');
+
+            return $exportService->exportCsv(new AreasInstitucionalesExport, $filename);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error("Error exportar CSV general: " . $e->getMessage());
+            $this->dispatch('swal:modal', [
+                'type' => 'error',
+                'title' => 'Error de Exportación',
+                'text' => 'No se pudo generar el reporte en CSV: ' . $e->getMessage(),
+            ]);
+        }
+    }
+
+    public function obtenerDatosReporteGeneral()
+    {
+        $totalAreas = AreaInstitucional::count();
+        $areasActivas = AreaInstitucional::activas()->count();
+        $areasInactivas = AreaInstitucional::inactivas()->count();
+        $usuariosVinculados = User::whereNotNull('cod_area')->count();
+        $areasSinResponsable = AreaInstitucional::whereNull('responsable_id')->count();
+        $areasSinUsuarios = AreaInstitucional::doesntHave('usuarios')->count();
+
+        $areas = AreaInstitucional::with(['responsable', 'usuarios'])
+            ->withCount('usuarios')
+            ->orderBy('orden')
+            ->orderBy('nombre')
+            ->get();
+
+        return [
+            'totalAreas' => $totalAreas,
+            'areasActivas' => $areasActivas,
+            'areasInactivas' => $areasInactivas,
+            'usuariosVinculados' => $usuariosVinculados,
+            'areasSinResponsable' => $areasSinResponsable,
+            'areasSinUsuarios' => $areasSinUsuarios,
+            'areas' => $areas,
+            'fecha' => date('d/m/Y H:i'),
+            'usuario' => Auth::user()->name,
+        ];
+    }
+
+    public function obtenerDatosReporteArea($codArea)
+    {
+        $area = AreaInstitucional::with(['responsable', 'usuarios' => function($q) {
+            $q->orderBy('nombres');
+        }])->findOrFail($codArea);
+
+        $totalUsuarios = $area->usuarios->count();
+        $usuariosActivos = $area->usuarios->where('estado', 1)->count();
+        $usuariosInactivos = $area->usuarios->where('estado', '!=', 1)->count();
+        $porcentajeActivos = $totalUsuarios > 0 ? round(($usuariosActivos / $totalUsuarios) * 100, 1) : 0;
+
+        $roles = $this->obtenerDatosGraficoUsuariosPorRolArea($codArea);
+
+        return [
+            'area' => $area,
+            'totalUsuarios' => $totalUsuarios,
+            'usuariosActivos' => $usuariosActivos,
+            'usuariosInactivos' => $usuariosInactivos,
+            'porcentajeActivos' => $porcentajeActivos,
+            'roles' => $roles,
+            'fecha' => date('d/m/Y H:i'),
+            'usuario' => Auth::user()->name,
+        ];
+    }
+
+    public function obtenerDatosGraficoUsuariosPorArea()
+    {
+        $areas = AreaInstitucional::withCount('usuarios')->orderBy('nombre')->get();
+        return [
+            'labels' => $areas->pluck('nombre')->toArray(),
+            'data' => $areas->pluck('usuarios_count')->toArray(),
+        ];
+    }
+
+    public function obtenerDatosGraficoAreasPorTipo()
+    {
+        $tipos = AreaInstitucional::selectRaw('tipo_area, count(*) as total')
+            ->groupBy('tipo_area')
+            ->orderBy('tipo_area')
+            ->get();
+        return [
+            'labels' => $tipos->pluck('tipo_area')->toArray(),
+            'data' => $tipos->pluck('total')->toArray(),
+        ];
+    }
+
+    public function obtenerDatosGraficoActivosInactivosPorArea()
+    {
+        $areas = AreaInstitucional::with(['usuarios'])->orderBy('nombre')->get();
+        $labels = [];
+        $activos = [];
+        $inactivos = [];
+        foreach ($areas as $area) {
+            $labels[] = $area->nombre;
+            $activos[] = $area->usuarios->where('estado', 1)->count();
+            $inactivos[] = $area->usuarios->where('estado', '!=', 1)->count();
+        }
+        return [
+            'labels' => $labels,
+            'activos' => $activos,
+            'inactivos' => $inactivos,
+        ];
+    }
+
+    public function obtenerDatosGraficoEvolucionMensual()
+    {
+        $evolucion = User::whereNotNull('cod_area')
+            ->selectRaw("to_char(created_at, 'YYYY-MM') as mes, count(*) as total")
+            ->groupBy('mes')
+            ->orderBy('mes')
+            ->get();
+        return [
+            'labels' => $evolucion->pluck('mes')->toArray(),
+            'data' => $evolucion->pluck('total')->toArray(),
+        ];
+    }
+
+    public function obtenerDatosGraficoActivosInactivosArea($codArea)
+    {
+        $activos = User::where('cod_area', $codArea)->where('estado', 1)->count();
+        $inactivos = User::where('cod_area', $codArea)->where('estado', '!=', 1)->count();
+        return [
+            'activos' => $activos,
+            'inactivos' => $inactivos,
+        ];
+    }
+
+    public function obtenerDatosGraficoUsuariosPorRolArea($codArea)
+    {
+        $usuarios = User::where('cod_area', $codArea)->with('roles')->get();
+        $rolesDist = [];
+        foreach ($usuarios as $u) {
+            /** @var \App\Models\User $u */
+            $rol = $u->getRoleNames()->first() ?? 'Sin Rol';
+            $rolesDist[$rol] = ($rolesDist[$rol] ?? 0) + 1;
+        }
+        return $rolesDist;
+    }
+
+    public function obtenerDatosGraficoEvolucionArea($codArea)
+    {
+        $evolucion = User::where('cod_area', $codArea)
+            ->selectRaw("to_char(created_at, 'YYYY-MM') as mes, count(*) as total")
+            ->groupBy('mes')
+            ->orderBy('mes')
+            ->get();
+        return $evolucion->pluck('total', 'mes')->toArray();
     }
 
     // ── AUXILIARES Y FORMATO DE UI ──
@@ -508,12 +797,14 @@ class AreasInstitucionalesPanel extends Component
         $this->tipo_area = 'Administrativa';
         $this->descripcion = '';
         $this->responsable_id = null;
-        $this->roles_sugeridos = [];
-        $this->modulos_relacionados = [];
         $this->color = '#2F3E5C';
-        $this->icono = 'ph-buildings';
         $this->estado = 'ACTIVA';
         $this->orden = 0;
         $this->observaciones = '';
+        $this->nuevaImagen = null;
+        
+        $this->roles_sugeridos = [];
+        $this->modulos_relacionados = [];
+        $this->icono = 'ph-buildings';
     }
 }

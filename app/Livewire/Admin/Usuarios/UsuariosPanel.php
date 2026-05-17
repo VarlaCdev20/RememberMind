@@ -594,6 +594,135 @@ class UsuariosPanel extends Component
         ]);
     }
 
+    // ── REPORTES Y EXPORTACIÓN ──
+
+    public function exportarUsuariosPdf()
+    {
+        if (!auth()->user()->can('reportes.exportar_pdf')) {
+            $this->dispatch('swal', [
+                'icon' => 'error',
+                'title' => 'Acceso denegado',
+                'text' => 'No tienes permiso para exportar PDF.'
+            ]);
+            return;
+        }
+
+        try {
+            $query = User::query()->with(['area', 'roles']);
+
+            if (!empty($this->search)) {
+                $query->where(function ($q) {
+                    $q->where('nombres', 'ilike', '%' . $this->search . '%')
+                      ->orWhere('ap_paterno', 'ilike', '%' . $this->search . '%')
+                      ->orWhere('ap_materno', 'ilike', '%' . $this->search . '%')
+                      ->orWhere('correo', 'ilike', '%' . $this->search . '%');
+                });
+            }
+
+            if (!empty($this->filtroEstado)) {
+                $query->where('estado', $this->filtroEstado);
+            }
+
+            if (!empty($this->filtroRol)) {
+                $query->role($this->filtroRol);
+            }
+
+            if (!empty($this->filtroArea)) {
+                $query->where('cod_area', $this->filtroArea);
+            }
+
+            $usuarios = $query->orderBy('ap_paterno')->orderBy('nombres')->get();
+
+            $viewData = [
+                'usuarios' => $usuarios,
+                'fecha' => date('d/m/Y H:i'),
+                'usuario' => auth()->user()->name,
+            ];
+
+            $fileNameService = app(\App\Services\Reports\ReportFileNameService::class);
+            $filename = $fileNameService->generate('usuarios_remembermind', 'pdf');
+
+            $exportService = app(\App\Services\Reports\ReportExportService::class);
+
+            activity('Usuarios')
+                ->causedBy(auth()->user())
+                ->log('Se exportó el reporte general de usuarios en formato PDF.');
+
+            return $exportService->exportPdf('reports.usuarios.general', $viewData, $filename);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error("Error al exportar PDF de usuarios: " . $e->getMessage());
+            $this->dispatch('swal', [
+                'icon' => 'error',
+                'title' => 'Error de Exportación',
+                'text' => 'No se pudo generar el reporte en PDF: ' . $e->getMessage()
+            ]);
+        }
+    }
+
+    public function exportarUsuariosExcel()
+    {
+        if (!auth()->user()->can('reportes.exportar_excel')) {
+            $this->dispatch('swal', [
+                'icon' => 'error',
+                'title' => 'Acceso denegado',
+                'text' => 'No tienes permiso para exportar Excel.'
+            ]);
+            return;
+        }
+
+        try {
+            $fileNameService = app(\App\Services\Reports\ReportFileNameService::class);
+            $filename = $fileNameService->generate('usuarios_remembermind', 'xlsx');
+
+            $exportService = app(\App\Services\Reports\ReportExportService::class);
+
+            activity('Usuarios')
+                ->causedBy(auth()->user())
+                ->log('Se exportó el listado de usuarios en formato Excel.');
+
+            return $exportService->exportExcel(new \App\Exports\UsuariosExport, $filename);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error("Error al exportar Excel de usuarios: " . $e->getMessage());
+            $this->dispatch('swal', [
+                'icon' => 'error',
+                'title' => 'Error de Exportación',
+                'text' => 'No se pudo generar el reporte en Excel: ' . $e->getMessage()
+            ]);
+        }
+    }
+
+    public function exportarUsuariosCsv()
+    {
+        if (!auth()->user()->can('reportes.exportar_excel')) {
+            $this->dispatch('swal', [
+                'icon' => 'error',
+                'title' => 'Acceso denegado',
+                'text' => 'No tienes permiso para exportar CSV.'
+            ]);
+            return;
+        }
+
+        try {
+            $fileNameService = app(\App\Services\Reports\ReportFileNameService::class);
+            $filename = $fileNameService->generate('usuarios_remembermind', 'csv');
+
+            $exportService = app(\App\Services\Reports\ReportExportService::class);
+
+            activity('Usuarios')
+                ->causedBy(auth()->user())
+                ->log('Se exportó el listado de usuarios en formato CSV.');
+
+            return $exportService->exportCsv(new \App\Exports\UsuariosExport, $filename);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error("Error al exportar CSV de usuarios: " . $e->getMessage());
+            $this->dispatch('swal', [
+                'icon' => 'error',
+                'title' => 'Error de Exportación',
+                'text' => 'No se pudo generar el reporte en CSV: ' . $e->getMessage()
+            ]);
+        }
+    }
+
     // ══════════════════════════════════════════════
     // RENDER
     // ══════════════════════════════════════════════
