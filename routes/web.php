@@ -21,36 +21,50 @@ Route::middleware([
     Route::get('/dashboard', [DashboardController::class, 'index'])
         ->name('dashboard');
 
-    Route::middleware(['role:admin|superadmin'])
-        ->prefix('admin')
+    Route::prefix('admin')
         ->name('admin.')
         ->group(function () {
 
             // ── Usuarios ─────────────────────────
-            Route::resource('usuarios', UsuarioController::class);
+            Route::resource('usuarios', UsuarioController::class)->middleware('permission:usuarios.ver');
 
             Route::patch('usuarios/{usuario}/desactivar', [UsuarioController::class, 'desactivar'])
+                ->middleware('permission:usuarios.cambiar_estado')
                 ->name('usuarios.desactivar');
 
             Route::patch('usuarios/{usuario}/activar', [UsuarioController::class, 'activar'])
+                ->middleware('permission:usuarios.cambiar_estado')
                 ->name('usuarios.activar');
 
+            // ── Roles y Permisos ─────────────────
+            Route::view('/roles-permisos', 'admin.roles-permisos.index')
+                ->middleware('permission:roles.ver')
+                ->name('roles-permisos.index');
+
             // ── Adultos Mayores ──────────────────
-            Route::resource('adultos-mayores', AdultoMayorController::class)->parameters([
-                'adultos-mayores' => 'adulto_mayor'
-            ]);
+            Route::resource('adultos-mayores', AdultoMayorController::class)
+                ->middleware('permission:adultos.ver')
+                ->parameters([
+                    'adultos-mayores' => 'adulto_mayor'
+                ]);
 
             Route::patch('adultos-mayores/{adulto_mayor}/archivar', [AdultoMayorController::class, 'archivar'])
+                ->middleware('permission:adultos.archivar')
                 ->name('adultos-mayores.archivar');
 
             Route::patch('adultos-mayores/{adulto_mayor}/restaurar', [AdultoMayorController::class, 'restaurar'])
+                ->middleware('permission:adultos.restaurar')
                 ->name('adultos-mayores.restaurar');
 
             Route::patch('adultos-mayores/{adulto_mayor}/estado', [AdultoMayorController::class, 'cambiarEstado'])
+                ->middleware('permission:adultos.cambiar_estado')
                 ->name('adultos-mayores.estado');
 
             // ── Submódulos Adultos Mayores ────────
-            Route::prefix('adultos-mayores/{adulto_mayor}')->name('adultos-mayores.')->group(function () {
+            Route::prefix('adultos-mayores/{adulto_mayor}')
+                ->middleware('permission:adultos.ver')
+                ->name('adultos-mayores.')
+                ->group(function () {
                 // Familiares
                 Route::get('familiares', [\App\Http\Controllers\Admin\AdultosMayores\AdultoMayorFamiliarController::class, 'index'])->name('familiares.index');
                 Route::post('familiares', [\App\Http\Controllers\Admin\AdultosMayores\AdultoMayorFamiliarController::class, 'store'])->name('familiares.store');
@@ -125,12 +139,19 @@ Route::middleware([
             });
 
             // ── Reportes protegidos ──────────────
-            Route::get('reporte-general', [AdultoMayorController::class, 'reporteGeneral'])->name('adultos-mayores.reporte-general');
-            Route::get('reporte-institucional', [AdultoMayorController::class, 'reporteInstitucional'])->name('adultos-mayores.reporte-institucional');
-            Route::get('reporte-bienestar', [AdultoMayorController::class, 'reporteBienestar'])->name('adultos-mayores.reporte-bienestar');
+            Route::get('reporte-general', [AdultoMayorController::class, 'reporteGeneral'])
+                ->middleware('permission:reportes.ver')
+                ->name('adultos-mayores.reporte-general');
+            Route::get('reporte-institucional', [AdultoMayorController::class, 'reporteInstitucional'])
+                ->middleware('permission:reportes.ver')
+                ->name('adultos-mayores.reporte-institucional');
+            Route::get('reporte-bienestar', [AdultoMayorController::class, 'reporteBienestar'])
+                ->middleware('permission:reportes.ver')
+                ->name('adultos-mayores.reporte-bienestar');
 
             // ── Bitácora ─────────────────────────
             Route::get('bitacora', [\App\Http\Controllers\Admin\BitacoraController::class, 'index'])
+                ->middleware('permission:bitacora.ver')
                 ->name('bitacora.index');
         });
 });

@@ -23,12 +23,14 @@
                 </div>
             </div>
 
+            @can('usuarios.crear')
             <button type="button"
                     wire:click="crearUsuario"
                     class="inline-flex items-center justify-center gap-2 rounded-full bg-[#E27D60] px-6 py-3 text-sm font-black text-white shadow-lg shadow-[#E27D60]/20 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl active:translate-y-0 active:scale-95">
                 <i class="ph-bold ph-plus-circle text-lg"></i>
                 Nuevo usuario
             </button>
+            @endcan
         </div>
     </header>
 
@@ -362,6 +364,7 @@
                                     Ver
                                 </button>
 
+                                @can('usuarios.editar')
                                 @if($estaInactivo)
                                     <button type="button"
                                             disabled
@@ -378,7 +381,9 @@
                                         Editar
                                     </button>
                                 @endif
+                                @endcan
 
+                                @can('usuarios.cambiar_estado')
                                 @if($u->cod_usu !== auth()->id())
                                     <button type="button"
                                             wire:click="toggleEstado('{{ $u->cod_usu }}')"
@@ -387,10 +392,11 @@
                                             {{ $u->estado === 'ACTIVO'
                                                 ? 'bg-[#D9CCBD] text-[#2F3E5C] hover:bg-[#967B66] hover:text-white'
                                                 : 'bg-[#8DA280]/20 text-[#63775B] hover:bg-[#8DA280] hover:text-white' }}">
-                                        <i class="ph-bold {{ $u->estado === 'ACTIVO' ? 'ph-user-minus' : 'ph-user-plus' }}"></i>
+                                         <i class="ph-bold {{ $u->estado === 'ACTIVO' ? 'ph-user-minus' : 'ph-user-plus' }}"></i>
                                         {{ $u->estado === 'ACTIVO' ? 'Inactivar' : 'Activar' }}
                                     </button>
                                 @endif
+                                @endcan
 
                                 {{-- Separador + Ficha rápida --}}
                                 <span class="mx-0.5 h-5 w-px bg-[#C7B5A3]/50"></span>
@@ -552,6 +558,7 @@
                                             <i class="ph-bold ph-eye"></i>
                                         </button>
 
+                                        @can('usuarios.editar')
                                         @if($estaInactivo)
                                             <button type="button"
                                                     disabled
@@ -567,7 +574,9 @@
                                                 <i class="ph-bold ph-pencil-simple"></i>
                                             </button>
                                         @endif
+                                        @endcan
 
+                                        @can('usuarios.cambiar_estado')
                                         @if($u->cod_usu !== auth()->id())
                                             <button type="button"
                                                     wire:click="toggleEstado('{{ $u->cod_usu }}')"
@@ -580,6 +589,7 @@
                                                 <i class="ph-bold {{ $u->estado === 'ACTIVO' ? 'ph-user-minus' : 'ph-user-plus' }}"></i>
                                             </button>
                                         @endif
+                                        @endcan
 
                                         {{-- Separador + Ficha --}}
                                         <span class="mx-0.5 h-5 w-px bg-[#C7B5A3]/40"></span>
@@ -1404,6 +1414,7 @@
                         <i class="ph-bold ph-eye"></i> Ver completo
                     </button>
 
+                    @can('usuarios.editar')
                     @if($usuarioFicha->estado === 'ACTIVO')
                         <button type="button"
                                 wire:click="editarUsuario('{{ $usuarioFicha->cod_usu }}')"
@@ -1412,7 +1423,9 @@
                             <i class="ph-bold ph-pencil-simple"></i> Editar
                         </button>
                     @endif
+                    @endcan
 
+                    @can('usuarios.cambiar_estado')
                     @if($usuarioFicha->cod_usu !== auth()->id())
                         <button wire:click="toggleEstado('{{ $usuarioFicha->cod_usu }}')"
                                 wire:confirm="¿Desea cambiar el estado de este usuario?"
@@ -1424,6 +1437,7 @@
                             {{ $usuarioFicha->estado === 'ACTIVO' ? 'Inactivar' : 'Activar' }}
                         </button>
                     @endif
+                    @endcan
                 </div>
             </footer>
         </aside>

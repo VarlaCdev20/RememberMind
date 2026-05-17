@@ -138,6 +138,15 @@ class UsuariosPanel extends Component
 
     public function crearUsuario()
     {
+        if (!auth()->user()->can('usuarios.crear')) {
+            $this->dispatch('swal', [
+                'icon' => 'error',
+                'title' => 'Acceso denegado',
+                'text' => 'No tienes permiso para registrar usuarios.'
+            ]);
+            return;
+        }
+
         $this->resetFormulario();
         $this->pais_documento = 'Bolivia';
         $this->tipo_documento = 'CI';
@@ -151,6 +160,15 @@ class UsuariosPanel extends Component
 
     public function editarUsuario($cod_usu)
     {
+        if (!auth()->user()->can('usuarios.editar')) {
+            $this->dispatch('swal', [
+                'icon' => 'error',
+                'title' => 'Acceso denegado',
+                'text' => 'No tienes permiso para editar usuarios.'
+            ]);
+            return;
+        }
+
         // ── Guardia: no editar usuarios inactivos ──
         $usuario = User::with(['personalSalud', 'personalAdmin'])->findOrFail($cod_usu);
 
@@ -280,6 +298,16 @@ class UsuariosPanel extends Component
 
     public function guardarUsuario()
     {
+        $permisoRequerido = $this->isEdit ? 'usuarios.editar' : 'usuarios.crear';
+        if (!auth()->user()->can($permisoRequerido)) {
+            $this->dispatch('swal', [
+                'icon' => 'error',
+                'title' => 'Acceso denegado',
+                'text' => 'No tienes permiso para realizar esta acción.'
+            ]);
+            return;
+        }
+
         $rules = $this->rules();
         $this->validate($rules);
 
@@ -501,6 +529,15 @@ class UsuariosPanel extends Component
 
     public function toggleEstado($id)
     {
+        if (!auth()->user()->can('usuarios.cambiar_estado')) {
+            $this->dispatch('swal', [
+                'icon' => 'error',
+                'title' => 'Acceso denegado',
+                'text' => 'No tienes permiso para cambiar el estado de usuarios.'
+            ]);
+            return;
+        }
+
         $usuario = User::findOrFail($id);
 
         // No permitir autoinactivación
