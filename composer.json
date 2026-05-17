@@ -16,6 +16,7 @@
         "laravel/tinker": "^3.0",
         "livewire/livewire": "^4.3",
         "maatwebsite/excel": "^3.1",
+        "spatie/browsershot": "^5.3",
         "spatie/laravel-activitylog": "^4.12",
         "spatie/laravel-pdf": "^2.8",
         "spatie/laravel-permission": "^7.3"
