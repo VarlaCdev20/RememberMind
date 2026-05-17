@@ -1,8 +1,10 @@
 import './bootstrap';
-import Alpine from 'alpinejs';
 
-window.Alpine = Alpine;
-Alpine.start();
+// Alpine no se inicia aquí porque Livewire v3 ya lo carga automáticamente.
+// Esto evita el warning: "Detected multiple instances of Alpine running."
+// import Alpine from 'alpinejs';
+// window.Alpine = Alpine;
+// Alpine.start();
 
 // GSAP
 import { gsap } from 'gsap';

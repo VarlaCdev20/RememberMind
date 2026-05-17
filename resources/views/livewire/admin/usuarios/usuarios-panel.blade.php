@@ -112,9 +112,9 @@
 </section>
 
     {{-- FILTROS COMPACTOS --}}
-<section class="mb-5 rounded-[1.35rem] bg-[#E6DDD3]/50 px-4 py-3 shadow-[0_12px_28px_rgba(47,62,92,0.11)] backdrop-blur-md">
+<section class="mb-5 rounded-[1.35rem] bg-[#E6DDD3]/55 px-4 py-3 shadow-[0_12px_28px_rgba(47,62,92,0.11)] backdrop-blur-md">
     <div class="grid items-end gap-3 xl:grid-cols-12">
-        <div class="xl:col-span-5">
+        <div class="xl:col-span-4">
             <label class="mb-1 block text-[9px] font-black uppercase tracking-[0.18em] text-[#2F3E5C]/45">
                 Buscar
             </label>
@@ -158,17 +158,31 @@
             </select>
         </div>
 
-        <div class="flex gap-2 xl:col-span-2">
+        <div class="xl:col-span-2">
+            <label class="mb-1 block text-[9px] font-black uppercase tracking-[0.18em] text-[#2F3E5C]/45">
+                Género
+            </label>
+
+            <select wire:model.defer="filtroGenero"
+                    class="h-10 w-full rounded-xl border-0 bg-[#F4EEE7]/80 px-3 text-xs font-black text-[#2F3E5C] shadow-[inset_0_1px_0_rgba(255,255,255,0.45),0_4px_12px_rgba(47,62,92,0.04)] outline-none transition-all focus:bg-white focus:ring-2 focus:ring-[#E27D60]/18">
+                <option value="">Todos</option>
+                <option value="FEMENINO">Femenino</option>
+                <option value="MASCULINO">Masculino</option>
+                <option value="OTRO">Otro</option>
+            </select>
+        </div>
+
+        <div class="flex gap-2 xl:col-span-1">
             <button type="button"
                     wire:click="aplicarFiltros"
-                    class="inline-flex h-10 flex-1 items-center justify-center gap-1.5 rounded-xl bg-[#2F3E5C] px-3 text-[10px] font-black uppercase tracking-wide text-white shadow-[0_8px_16px_rgba(47,62,92,0.18)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_10px_20px_rgba(47,62,92,0.24)] active:scale-95">
+                    class="inline-flex h-10 flex-1 items-center justify-center gap-1.5 rounded-xl bg-[#2F3E5C] px-3 text-[10px] font-black uppercase tracking-wide text-white shadow-[0_8px_16px_rgba(47,62,92,0.18)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_10px_20px_rgba(47,62,92,0.24)] active:scale-95"
+                    title="Buscar">
                 <i class="ph-bold ph-funnel"></i>
-                Buscar
             </button>
 
             <button type="button"
                     wire:click="limpiarFiltros"
-                    class="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-[#D5C7B9]/80 text-[#2F3E5C] shadow-[0_6px_14px_rgba(47,62,92,0.08)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#E27D60] hover:text-white active:scale-95"
+                    class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#D5C7B9]/80 text-[#2F3E5C] shadow-[0_6px_14px_rgba(47,62,92,0.08)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#E27D60] hover:text-white active:scale-95"
                     title="Limpiar filtros">
                 <i class="ph-bold ph-x"></i>
             </button>
@@ -178,7 +192,7 @@
 
     {{-- CONTENIDO PRINCIPAL --}}
     <section class="relative">
-        <div wire:loading.delay class="absolute inset-0 z-20 flex items-center justify-center rounded-[2rem] bg-white/45 backdrop-blur-sm">
+        <div wire:loading.delay wire:target="aplicarFiltros,limpiarFiltros,toggleEstado,abrirFichaRapida,abrirVistaCompleta,editarUsuario" class="absolute inset-0 z-[60] flex items-center justify-center rounded-[2rem] bg-white/45 backdrop-blur-sm">
             <div class="flex items-center gap-3 rounded-full bg-white px-5 py-3 shadow-lg">
                 <i class="ph-bold ph-spinner animate-spin text-2xl text-[#E27D60]"></i>
                 <span class="text-xs font-black uppercase tracking-widest text-[#2F3E5C]">
@@ -254,13 +268,13 @@
                     @endphp
 
                     <article wire:key="card-user-{{ $u->cod_usu }}"
-                             class="group overflow-hidden rounded-[1.6rem] border border-[#C7B5A3]/50 bg-white/72 shadow-[0_8px_22px_rgba(47,62,92,0.08)] transition-all duration-300 {{ $estaInactivo ? 'grayscale opacity-70' : 'hover:-translate-y-0.5 hover:shadow-[0_14px_30px_rgba(47,62,92,0.14)]' }}">
+                             class="group overflow-hidden rounded-[1.45rem] border border-transparent bg-[#F8F3ED]/90 shadow-[0_14px_30px_rgba(47,62,92,0.13)] transition-all duration-300 {{ $estaInactivo ? 'grayscale opacity-70 bg-[#E6DED5]/80' : 'hover:-translate-y-1 hover:shadow-[0_20px_38px_rgba(47,62,92,0.17)]' }}">
 
-                        <div class="h-1.5 w-full {{ $estaInactivo ? 'bg-[#9B8B7E]/45' : 'bg-gradient-to-r from-[#E27D60] via-[#F2A08D] to-[#2F3E5C]/25' }}"></div>
+                        <div class="h-1 w-full {{ $estaInactivo ? 'bg-[#9B8B7E]/45' : 'bg-gradient-to-r from-[#E27D60] via-[#F2A08D] to-[#2F3E5C]/25' }}"></div>
 
-                        <div class="p-3.5">
+                        <div class="p-3">
                             {{-- Estado --}}
-                            <div class="mb-2.5 flex justify-end">
+                            <div class="mb-2 flex justify-end">
                                 @if($u->estado === 'ACTIVO')
                                     <span class="inline-flex items-center gap-1.5 rounded-full bg-[#8DA280]/18 px-2.5 py-1 text-[9px] font-black uppercase text-[#63775B]">
                                         <span class="h-1.5 w-1.5 rounded-full bg-[#8DA280]"></span>
@@ -274,22 +288,22 @@
                                 @endif
                             </div>
 
-                            {{-- Foto centrada compacta, pero visible --}}
+                            {{-- Foto centrada cuadrada --}}
                             <div class="flex flex-col items-center text-center">
                                 <div class="relative">
                                     @if($fotoUsuario)
                                         <img
                                             src="{{ $fotoUsuario }}"
                                             alt="Foto de {{ $nombreCompleto }}"
-                                            class="h-24 w-24 rounded-[1.45rem] object-cover ring-[3px] ring-white shadow-[0_10px_20px_rgba(47,62,92,0.12)] transition-all duration-300 {{ $estaInactivo ? '' : 'group-hover:scale-[1.03]' }}"
+                                            class="h-24 w-24 rounded-[1.35rem] object-cover ring-[3px] ring-[#E6DDD3]/80 shadow-[0_10px_22px_rgba(47,62,92,0.16)] transition-all duration-300 {{ $estaInactivo ? '' : 'group-hover:scale-105' }}"
                                         >
                                     @else
-                                        <div class="flex h-24 w-24 items-center justify-center rounded-[1.45rem] bg-[#2F3E5C] text-3xl font-black text-white ring-[3px] ring-white shadow-[0_10px_20px_rgba(47,62,92,0.12)]">
+                                        <div class="flex h-24 w-24 items-center justify-center rounded-[1.35rem] bg-[#2F3E5C] text-3xl font-black text-white ring-[3px] ring-[#E6DDD3]/80 shadow-[0_10px_22px_rgba(47,62,92,0.16)]">
                                             {{ strtoupper($inicial) }}
                                         </div>
                                     @endif
 
-                                    <span class="absolute -bottom-1 -right-1 h-4 w-4 rounded-full border-[3px] border-white {{ $u->estado === 'ACTIVO' ? 'bg-[#8DA280]' : 'bg-[#9B8B7E]' }}"></span>
+                                    <span class="absolute -bottom-1 -right-1 h-4 w-4 rounded-full border-[3px] border-[#F8F3ED] {{ $u->estado === 'ACTIVO' ? 'bg-[#8DA280]' : 'bg-[#9B8B7E]' }}"></span>
                                 </div>
 
                                 <h3 class="mt-2.5 line-clamp-2 text-sm font-black uppercase leading-5 text-[#2F3E5C]">
@@ -339,18 +353,13 @@
 
                             {{-- Acciones --}}
                             <div class="mt-3 flex items-center justify-center gap-1.5">
-                                <a href="{{ route('admin.usuarios.show', $u->cod_usu) }}"
-                                   class="inline-flex h-8 items-center gap-1.5 rounded-full bg-[#2F3E5C] px-2.5 text-[9px] font-black text-white shadow-sm transition hover:bg-[#24314A] active:scale-95">
+                                {{-- Grupo principal --}}
+                                <button type="button"
+                                        wire:click="abrirVistaCompleta('{{ $u->cod_usu }}')"
+                                        class="inline-flex h-8 items-center gap-1.5 rounded-full bg-[#2F3E5C] px-2.5 text-[9px] font-black text-white shadow-sm transition hover:bg-[#24314A] active:scale-95"
+                                        title="Ver expediente completo">
                                     <i class="ph-bold ph-eye"></i>
                                     Ver
-                                </a>
-
-                                <button type="button"
-                                        wire:click="abrirFichaRapida('{{ $u->cod_usu }}')"
-                                        class="inline-flex h-8 items-center gap-1.5 rounded-full bg-[#7C83B8]/18 px-2.5 text-[9px] font-black text-[#5E6599] shadow-sm transition hover:bg-[#5E6599] hover:text-white active:scale-95"
-                                        title="Ficha rápida">
-                                    <i class="ph-bold ph-book-open"></i>
-                                    Ficha
                                 </button>
 
                                 @if($estaInactivo)
@@ -371,7 +380,8 @@
                                 @endif
 
                                 @if($u->cod_usu !== auth()->id())
-                                    <button wire:click="toggleEstado('{{ $u->cod_usu }}')"
+                                    <button type="button"
+                                            wire:click="toggleEstado('{{ $u->cod_usu }}')"
                                             wire:confirm="¿Desea cambiar el estado de este usuario?"
                                             class="inline-flex h-8 items-center gap-1.5 rounded-full px-2.5 text-[9px] font-black shadow-sm transition active:scale-95
                                             {{ $u->estado === 'ACTIVO'
@@ -381,6 +391,17 @@
                                         {{ $u->estado === 'ACTIVO' ? 'Inactivar' : 'Activar' }}
                                     </button>
                                 @endif
+
+                                {{-- Separador + Ficha rápida --}}
+                                <span class="mx-0.5 h-5 w-px bg-[#C7B5A3]/50"></span>
+
+                                <button type="button"
+                                        wire:click="abrirFichaRapida('{{ $u->cod_usu }}')"
+                                        class="inline-flex h-8 items-center gap-1.5 rounded-full bg-[#7C83B8]/12 px-2.5 text-[9px] font-black text-[#5E6599] shadow-sm transition hover:bg-[#5E6599] hover:text-white active:scale-95"
+                                        title="Ficha rápida">
+                                    <i class="ph-bold ph-clipboard-text"></i>
+                                    Ficha
+                                </button>
                             </div>
                         </div>
                     </article>
@@ -523,17 +544,12 @@
 
                                 <td class="px-5 py-4">
                                     <div class="flex items-center justify-center gap-1.5">
-                                        <a href="{{ route('admin.usuarios.show', $u->cod_usu) }}"
-                                           class="flex h-9 w-9 items-center justify-center rounded-xl bg-[#F6F2EC] text-[#2F3E5C] shadow-sm transition hover:bg-[#2F3E5C] hover:text-white active:scale-90"
-                                           title="Ver detalle">
-                                            <i class="ph-bold ph-eye"></i>
-                                        </a>
-
+                                        {{-- Grupo principal --}}
                                         <button type="button"
-                                                wire:click="abrirFichaRapida('{{ $u->cod_usu }}')"
-                                                class="flex h-9 w-9 items-center justify-center rounded-xl bg-[#7C83B8]/15 text-[#5E6599] shadow-sm transition hover:bg-[#5E6599] hover:text-white active:scale-90"
-                                                title="Ficha rápida">
-                                            <i class="ph-bold ph-book-open"></i>
+                                                wire:click="abrirVistaCompleta('{{ $u->cod_usu }}')"
+                                                class="flex h-9 w-9 items-center justify-center rounded-xl bg-[#F6F2EC] text-[#2F3E5C] shadow-sm transition hover:bg-[#2F3E5C] hover:text-white active:scale-90"
+                                                title="Ver expediente completo">
+                                            <i class="ph-bold ph-eye"></i>
                                         </button>
 
                                         @if($estaInactivo)
@@ -553,7 +569,8 @@
                                         @endif
 
                                         @if($u->cod_usu !== auth()->id())
-                                            <button wire:click="toggleEstado('{{ $u->cod_usu }}')"
+                                            <button type="button"
+                                                    wire:click="toggleEstado('{{ $u->cod_usu }}')"
                                                     wire:confirm="¿Desea cambiar el estado de este usuario?"
                                                     class="flex h-9 w-9 items-center justify-center rounded-xl shadow-sm transition active:scale-90
                                                     {{ $u->estado === 'ACTIVO'
@@ -563,6 +580,16 @@
                                                 <i class="ph-bold {{ $u->estado === 'ACTIVO' ? 'ph-user-minus' : 'ph-user-plus' }}"></i>
                                             </button>
                                         @endif
+
+                                        {{-- Separador + Ficha --}}
+                                        <span class="mx-0.5 h-5 w-px bg-[#C7B5A3]/40"></span>
+
+                                        <button type="button"
+                                                wire:click="abrirFichaRapida('{{ $u->cod_usu }}')"
+                                                class="flex h-9 w-9 items-center justify-center rounded-xl bg-[#7C83B8]/12 text-[#5E6599] shadow-sm transition hover:bg-[#5E6599] hover:text-white active:scale-90"
+                                                title="Ficha rápida">
+                                            <i class="ph-bold ph-clipboard-text"></i>
+                                        </button>
                                     </div>
                                 </td>
                             </tr>
@@ -605,7 +632,7 @@
                             </h2>
                         </div>
                     </div>
-                    <button wire:click="cerrarFormulario" class="group flex h-8 w-8 items-center justify-center rounded-xl bg-[#D5C7B9] text-[#2F3E5C] transition-all hover:bg-[#E27D60] hover:text-white active:scale-90 shadow-sm">
+                    <button type="button" wire:click="cerrarFormulario" class="group flex h-8 w-8 items-center justify-center rounded-xl bg-[#D5C7B9] text-[#2F3E5C] transition-all hover:bg-[#E27D60] hover:text-white active:scale-90 shadow-sm">
                         <i class="ph-bold ph-x text-base transition group-hover:rotate-90"></i>
                     </button>
                 </div>
@@ -981,6 +1008,242 @@
     </div>
     @endif
 
+    {{-- VISTA COMPLETA FLOTANTE (Modal Amplio) --}}
+    @if($mostrarVistaCompleta && $usuarioVista)
+    <div class="fixed inset-0 z-[2147483648] flex items-center justify-center bg-slate-900/60 backdrop-blur-md px-4 py-6 transition-all duration-300" x-data x-transition>
+        <div class="relative w-full max-w-5xl max-h-full overflow-hidden rounded-[2rem] border border-[#C7B5A3]/30 bg-[#E6DDD3] shadow-[0_25px_65px_rgba(0,0,0,0.6)] flex flex-col"
+             style="animation: zoomIn 0.3s ease-out">
+            
+            {{-- Header --}}
+            <header class="relative flex items-center justify-between border-b border-[#C7B5A3]/40 bg-[#D5C7B9]/60 px-6 py-4 backdrop-blur-xl shrink-0">
+                <div class="flex items-center gap-4">
+                    <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#2F3E5C] text-white shadow-lg">
+                        <i class="ph-bold ph-user-focus text-2xl"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-xl font-black tracking-tight text-[#2F3E5C]">Expediente de <span class="text-[#E27D60]">Usuario</span></h2>
+                        <p class="text-[10px] font-black uppercase tracking-widest text-[#2F3E5C]/50">Código: {{ $usuarioVista->cod_usu }}</p>
+                    </div>
+                </div>
+                <button type="button" wire:click="cerrarVistaCompleta" class="group flex h-10 w-10 items-center justify-center rounded-xl bg-[#D5C7B9] text-[#2F3E5C] transition-all hover:bg-[#E27D60] hover:text-white active:scale-90 shadow-sm">
+                    <i class="ph-bold ph-x text-xl transition group-hover:rotate-90"></i>
+                </button>
+            </header>
+
+            {{-- Contenido Scrollable --}}
+            <div class="flex-1 overflow-y-auto custom-scrollbar p-6 lg:p-8">
+                @php
+                    $vistaRoleName = $usuarioVista->getRoleNames()->first() ?? 'sin_rol';
+                    $vistaRoleKey = strtolower($vistaRoleName);
+                    $vistaNombreCompleto = trim(($usuarioVista->nombres ?? '') . ' ' . ($usuarioVista->ap_paterno ?? '') . ' ' . ($usuarioVista->ap_materno ?? ''));
+                    $vistaInicial = mb_substr(trim($usuarioVista->nombres ?? 'U'), 0, 1);
+
+                    $vistaAreaDisplay = match($vistaRoleKey) {
+                        'super_admin', 'superadministrador', 'admin', 'administrador' => 'Administración del sistema',
+                        'personal_salud' => 'Área de salud',
+                        'personal_admin' => 'Área administrativa',
+                        'familiar' => 'Familiar / Responsable',
+                        'voluntario' => 'Voluntariado',
+                        default => 'Sin área asignada'
+                    };
+
+                    $vistaPerfilDetalle = match($vistaRoleKey) {
+                        'personal_salud' => $usuarioVista->personalSalud?->especialidad?->nombre ?? 'Personal de salud',
+                        'personal_admin' => $usuarioVista->personalAdmin?->cargoAdmin?->nombre ?? $usuarioVista->personalAdmin?->cargo ?? 'Personal administrativo',
+                        'super_admin', 'superadministrador', 'admin', 'administrador' => 'Administrador del sistema',
+                        'voluntario' => 'Voluntario institucional',
+                        'familiar' => 'Familiar / Responsable',
+                        default => strtoupper(str_replace('_', ' ', $vistaRoleName))
+                    };
+
+                    $vistaFoto = null;
+                    if (!empty($usuarioVista->foto_de_perfil)) {
+                        $vistaFoto = \Illuminate\Support\Facades\Storage::url($usuarioVista->foto_de_perfil);
+                    } elseif (!empty($usuarioVista->profile_photo_url)) {
+                        $vistaFoto = $usuarioVista->profile_photo_url;
+                    }
+                @endphp
+
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                    {{-- Columna Izquierda: Perfil Principal --}}
+                    <div class="lg:col-span-4 flex flex-col items-center space-y-6">
+                        <div class="relative">
+                            @if($vistaFoto)
+                                <img src="{{ $vistaFoto }}" alt="{{ $vistaNombreCompleto }}"
+                                     class="h-44 w-44 rounded-[2.5rem] object-cover ring-[6px] ring-white shadow-[0_15px_35px_rgba(47,62,92,0.2)]">
+                            @else
+                                <div class="flex h-44 w-44 items-center justify-center rounded-[2.5rem] bg-[#2F3E5C] text-6xl font-black text-white ring-[6px] ring-white shadow-[0_15px_35px_rgba(47,62,92,0.2)]">
+                                    {{ strtoupper($vistaInicial) }}
+                                </div>
+                            @endif
+                            <span class="absolute bottom-2 right-2 h-7 w-7 rounded-full border-4 border-white {{ $usuarioVista->estado === 'ACTIVO' ? 'bg-[#8DA280]' : 'bg-[#9B8B7E]' }}"></span>
+                        </div>
+
+                        <div class="text-center w-full">
+                            <h3 class="text-2xl font-black uppercase text-[#2F3E5C] leading-tight">{{ $vistaNombreCompleto }}</h3>
+                            <p class="mt-1 text-sm font-bold text-[#2F3E5C]/60 lowercase">{{ $usuarioVista->correo ?: 'Sin correo' }}</p>
+                            
+                            <div class="mt-4 flex flex-wrap justify-center gap-2">
+                                <span class="rounded-full {{ $usuarioVista->estado === 'ACTIVO' ? 'bg-[#8DA280]/20 text-[#63775B]' : 'bg-[#9B8B7E]/20 text-[#7C7168]' }} px-4 py-1.5 text-xs font-black uppercase">
+                                    <i class="ph-bold {{ $usuarioVista->estado === 'ACTIVO' ? 'ph-check-circle' : 'ph-minus-circle' }} mr-1"></i>
+                                    {{ $usuarioVista->estado }}
+                                </span>
+                                <span class="rounded-full bg-[#2F3E5C]/10 px-4 py-1.5 text-xs font-black uppercase text-[#2F3E5C]">
+                                    <i class="ph-bold ph-shield mr-1"></i>
+                                    {{ strtoupper(str_replace('_', ' ', $vistaRoleName)) }}
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="w-full rounded-2xl bg-white/40 border border-[#C7B5A3]/40 p-5 space-y-4 shadow-sm">
+                            <div>
+                                <p class="text-[9px] font-black uppercase tracking-widest text-[#2F3E5C]/50">Acceso al Sistema</p>
+                                <p class="mt-1 font-black {{ $usuarioVista->acceso_sistema === 'HABILITADO' ? 'text-[#63775B]' : 'text-[#E27D60]' }}">
+                                    {{ $usuarioVista->acceso_sistema ?? 'NO DEFINIDO' }}
+                                </p>
+                            </div>
+                            <div>
+                                <p class="text-[9px] font-black uppercase tracking-widest text-[#2F3E5C]/50">Último Acceso</p>
+                                <p class="mt-1 font-black text-[#2F3E5C]">
+                                    {{ $usuarioVista->ultimo_acceso ? $usuarioVista->ultimo_acceso->format('d/m/Y H:i') : 'Sin registro' }}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- Columna Derecha: Detalles Completos --}}
+                    <div class="lg:col-span-8 space-y-6">
+                        
+                        {{-- Identidad --}}
+                        <div class="rounded-[1.5rem] bg-white/60 border border-[#C7B5A3]/40 p-6 shadow-sm">
+                            <h4 class="mb-4 flex items-center gap-2 text-[11px] font-black uppercase tracking-widest text-[#E27D60]">
+                                <i class="ph-bold ph-identification-card text-lg"></i> Datos de Identidad
+                            </h4>
+                            <div class="grid grid-cols-2 md:grid-cols-3 gap-y-5 gap-x-4">
+                                <div>
+                                    <p class="text-[9px] font-black uppercase tracking-widest text-[#2F3E5C]/40">Documento</p>
+                                    <p class="mt-1 text-sm font-black text-[#2F3E5C]">
+                                        {{ $usuarioVista->tipo_documento ?? 'CI' }} {{ $usuarioVista->numero_documento }}
+                                        @if($usuarioVista->expedido) <span class="text-xs text-[#2F3E5C]/60">{{ $usuarioVista->expedido }}</span> @endif
+                                    </p>
+                                </div>
+                                <div>
+                                    <p class="text-[9px] font-black uppercase tracking-widest text-[#2F3E5C]/40">Nacionalidad</p>
+                                    <p class="mt-1 text-sm font-black text-[#2F3E5C]">{{ $usuarioVista->pais_documento ?? 'Bolivia' }}</p>
+                                </div>
+                                <div>
+                                    <p class="text-[9px] font-black uppercase tracking-widest text-[#2F3E5C]/40">Género</p>
+                                    <p class="mt-1 text-sm font-black text-[#2F3E5C]">{{ $usuarioVista->genero ?? 'No especificado' }}</p>
+                                </div>
+                                <div>
+                                    <p class="text-[9px] font-black uppercase tracking-widest text-[#2F3E5C]/40">Nacimiento</p>
+                                    <p class="mt-1 text-sm font-black text-[#2F3E5C]">
+                                        {{ $usuarioVista->fecha_nacimiento ? $usuarioVista->fecha_nacimiento->format('d/m/Y') : 'Sin registro' }}
+                                        @if($usuarioVista->fecha_nacimiento)
+                                            <span class="text-xs text-[#2F3E5C]/60">({{ $usuarioVista->fecha_nacimiento->age }} años)</span>
+                                        @endif
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        {{-- Perfil Institucional --}}
+                        <div class="rounded-[1.5rem] bg-white/60 border border-[#C7B5A3]/40 p-6 shadow-sm">
+                            <h4 class="mb-4 flex items-center gap-2 text-[11px] font-black uppercase tracking-widest text-[#E27D60]">
+                                <i class="ph-bold ph-buildings text-lg"></i> Perfil Institucional
+                            </h4>
+                            <div class="grid grid-cols-2 gap-y-5 gap-x-4">
+                                <div>
+                                    <p class="text-[9px] font-black uppercase tracking-widest text-[#2F3E5C]/40">Área Asignada</p>
+                                    <p class="mt-1 text-sm font-black text-[#2F3E5C]">{{ $vistaAreaDisplay }}</p>
+                                </div>
+                                <div>
+                                    <p class="text-[9px] font-black uppercase tracking-widest text-[#2F3E5C]/40">Cargo / Especialidad</p>
+                                    <p class="mt-1 text-sm font-black text-[#2F3E5C] uppercase">{{ $vistaPerfilDetalle }}</p>
+                                </div>
+                                @if($vistaRoleKey === 'personal_salud' && $usuarioVista->personalSalud?->fecha_ing)
+                                    <div>
+                                        <p class="text-[9px] font-black uppercase tracking-widest text-[#2F3E5C]/40">Fecha de Ingreso</p>
+                                        <p class="mt-1 text-sm font-black text-[#2F3E5C]">{{ $usuarioVista->personalSalud->fecha_ing->format('d/m/Y') }}</p>
+                                    </div>
+                                @endif
+                                @if($vistaRoleKey === 'personal_admin' && $usuarioVista->personalAdmin?->fecha_ingreso)
+                                    <div>
+                                        <p class="text-[9px] font-black uppercase tracking-widest text-[#2F3E5C]/40">Fecha de Ingreso</p>
+                                        <p class="mt-1 text-sm font-black text-[#2F3E5C]">{{ $usuarioVista->personalAdmin->fecha_ingreso->format('d/m/Y') }}</p>
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+
+                        {{-- Contacto e Info Extra --}}
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="rounded-[1.5rem] bg-white/60 border border-[#C7B5A3]/40 p-6 shadow-sm">
+                                <h4 class="mb-4 flex items-center gap-2 text-[11px] font-black uppercase tracking-widest text-[#E27D60]">
+                                    <i class="ph-bold ph-phone-call text-lg"></i> Contacto
+                                </h4>
+                                <div class="space-y-4">
+                                    <div>
+                                        <p class="text-[9px] font-black uppercase tracking-widest text-[#2F3E5C]/40">Teléfono</p>
+                                        <p class="mt-1 text-sm font-black text-[#2F3E5C]">{{ $usuarioVista->codigo_telefono }} {{ $usuarioVista->telefono ?? 'Sin registrar' }}</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-[9px] font-black uppercase tracking-widest text-[#2F3E5C]/40">Correo Electrónico</p>
+                                        <p class="mt-1 text-sm font-bold text-[#2F3E5C] lowercase break-all">{{ $usuarioVista->correo ?: 'Sin registrar' }}</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="rounded-[1.5rem] bg-white/60 border border-[#C7B5A3]/40 p-6 shadow-sm">
+                                <h4 class="mb-4 flex items-center gap-2 text-[11px] font-black uppercase tracking-widest text-[#E27D60]">
+                                    <i class="ph-bold ph-info text-lg"></i> Registro
+                                </h4>
+                                <div class="space-y-4">
+                                    <div>
+                                        <p class="text-[9px] font-black uppercase tracking-widest text-[#2F3E5C]/40">Creado en el sistema</p>
+                                        <p class="mt-1 text-sm font-black text-[#2F3E5C]">
+                                            {{ $usuarioVista->created_at ? $usuarioVista->created_at->format('d/m/Y H:i') : 'Sin dato' }}
+                                        </p>
+                                    </div>
+                                    <div>
+                                        <p class="text-[9px] font-black uppercase tracking-widest text-[#2F3E5C]/40">Última actualización</p>
+                                        <p class="mt-1 text-sm font-black text-[#2F3E5C]">
+                                            {{ $usuarioVista->updated_at ? $usuarioVista->updated_at->format('d/m/Y H:i') : 'Sin dato' }}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        @if($usuarioVista->observaciones)
+                            <div class="rounded-[1.5rem] bg-[#FDF1ED]/80 border border-[#E27D60]/20 p-6 shadow-sm">
+                                <h4 class="mb-2 flex items-center gap-2 text-[11px] font-black uppercase tracking-widest text-[#E27D60]">
+                                    <i class="ph-bold ph-warning-circle text-lg"></i> Observaciones
+                                </h4>
+                                <p class="text-sm font-semibold text-[#2F3E5C]/80 leading-relaxed">
+                                    {{ $usuarioVista->observaciones }}
+                                </p>
+                            </div>
+                        @endif
+                    </div>
+                </div>
+            </div>
+
+            {{-- Footer Acciones --}}
+            <footer class="flex items-center justify-end gap-3 border-t border-[#C7B5A3]/40 bg-[#D5C7B9]/60 px-6 py-4 backdrop-blur-xl shrink-0">
+                <button type="button" wire:click="cerrarVistaCompleta" class="rounded-full bg-white/50 px-6 py-2.5 text-xs font-black text-[#2F3E5C] transition hover:bg-white active:scale-95 shadow-sm">
+                    Cerrar
+                </button>
+                @if($usuarioVista->estado === 'ACTIVO')
+                    <button type="button" wire:click="editarUsuario('{{ $usuarioVista->cod_usu }}')" class="flex items-center gap-2 rounded-full bg-[#E27D60] px-6 py-2.5 text-xs font-black text-white transition hover:bg-[#d86c50] active:scale-95 shadow-lg">
+                        <i class="ph-bold ph-pencil-simple text-sm"></i> Editar
+                    </button>
+                @endif
+            </footer>
+        </div>
+    </div>
+    @endif
+
     {{-- FICHA RÁPIDA FLOTANTE --}}
     @if($mostrarFichaRapida && $usuarioFicha)
     <div class="fixed inset-0 z-[2147483640] flex justify-end" x-data x-transition>
@@ -995,14 +1258,14 @@
             <header class="flex shrink-0 items-center justify-between border-b border-[#C7B5A3]/40 bg-[#D5C7B9]/50 px-6 py-4 backdrop-blur-xl">
                 <div class="flex items-center gap-3">
                     <div class="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#2F3E5C] text-white shadow-lg">
-                        <i class="ph-bold ph-book-open text-lg"></i>
+                        <i class="ph-bold ph-clipboard-text text-lg"></i>
                     </div>
                     <div>
                         <h2 class="text-base font-black text-[#2F3E5C]">Ficha <span class="text-[#E27D60]">Rápida</span></h2>
                         <p class="text-[9px] font-black uppercase tracking-widest text-[#2F3E5C]/40">{{ $usuarioFicha->cod_usu }}</p>
                     </div>
                 </div>
-                <button wire:click="cerrarFichaRapida"
+                <button type="button" wire:click="cerrarFichaRapida"
                         class="group flex h-9 w-9 items-center justify-center rounded-xl bg-[#D5C7B9] text-[#2F3E5C] transition-all hover:bg-[#E27D60] hover:text-white active:scale-90 shadow-sm">
                     <i class="ph-bold ph-x text-base transition group-hover:rotate-90"></i>
                 </button>
@@ -1135,10 +1398,11 @@
             {{-- Footer acciones rápidas --}}
             <footer class="shrink-0 border-t border-[#C7B5A3]/40 bg-[#D5C7B9]/50 px-6 py-4 backdrop-blur-xl">
                 <div class="flex flex-wrap items-center justify-center gap-2">
-                    <a href="{{ route('admin.usuarios.show', $usuarioFicha->cod_usu) }}"
-                       class="inline-flex items-center gap-2 rounded-full bg-[#2F3E5C] px-5 py-2.5 text-[10px] font-black text-white shadow-lg transition hover:bg-[#24314A] active:scale-95">
+                    <button type="button"
+                            wire:click="abrirVistaCompleta('{{ $usuarioFicha->cod_usu }}')"
+                            class="inline-flex items-center gap-2 rounded-full bg-[#2F3E5C] px-5 py-2.5 text-[10px] font-black text-white shadow-lg transition hover:bg-[#24314A] active:scale-95">
                         <i class="ph-bold ph-eye"></i> Ver completo
-                    </a>
+                    </button>
 
                     @if($usuarioFicha->estado === 'ACTIVO')
                         <button type="button"

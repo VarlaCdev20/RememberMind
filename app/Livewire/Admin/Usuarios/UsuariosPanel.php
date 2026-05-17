@@ -13,16 +13,19 @@ class UsuariosPanel extends Component
 {
     use WithPagination;
 
+    // ── Filtros ──
     public $search = '';
     public $filtroRol = '';
     public $filtroEstado = '';
+    public $filtroGenero = '';
 
+    // ── Modal Formulario Crear/Editar ──
     public bool $mostrarFormulario = false;
     public int $pasoFormulario = 1;
     public ?string $usuarioId = null;
     public $isEdit = false;
-    
-    // Campos del Usuario
+
+    // ── Campos del Usuario ──
     public $cod_usu;
     public $nombres;
     public $ap_paterno;
@@ -44,41 +47,43 @@ class UsuariosPanel extends Component
     public $password;
     public $password_confirmation;
 
-    // Campos condicionales (Personal Salud/Admin)
+    // ── Campos condicionales (Personal Salud/Admin) ──
     public $fecha_ingreso;
     public $especialidad_salud;
     public $cargo_administrativo;
 
-    // ── Ficha Rápida Flotante ──
+    // ── Ficha Rápida Flotante (panel lateral derecho) ──
     public bool $mostrarFichaRapida = false;
     public ?string $usuarioFichaId = null;
     public $usuarioFicha = null;
 
+    // ── Vista Completa (modal/panel expandido) ──
+    public bool $mostrarVistaCompleta = false;
+    public $usuarioVista = null;
+
     protected $listeners = ['usuario-guardado' => '$refresh'];
+
+    // ══════════════════════════════════════════════
+    // VALIDACIÓN
+    // ══════════════════════════════════════════════
 
     public function rules()
     {
         $rules = [
-            // Paso 1: Identidad
             'nombres' => ['required', 'string', 'max:255'],
-            'ap_paterno' => ['required', 'string', 'max:255'], // Requerido para password
+            'ap_paterno' => ['required', 'string', 'max:255'],
             'ap_materno' => ['nullable', 'string', 'max:255'],
             'fecha_nacimiento' => ['required', 'date', 'before:today'],
             'genero' => ['required', 'string'],
             'pais_documento' => ['required', 'string'],
             'tipo_documento' => ['required', 'string'],
             'numero_documento' => ['required', 'string', 'max:50'],
-            
-            // Paso 2: Contacto
             'correo' => ['required', 'string', 'email', 'max:255', Rule::unique('users', 'correo')->ignore($this->usuarioId, 'cod_usu')],
             'telefono' => ['required', 'string', 'max:20'],
-            
-            // Paso 3: Perfil
             'rol' => ['required', 'exists:roles,name'],
             'acceso_sistema' => ['required', 'in:HABILITADO,BLOQUEADO'],
         ];
 
-        // Estado y Password solo se validan en edición
         if ($this->isEdit) {
             $rules['estado'] = ['required', 'in:ACTIVO,INACTIVO,ARCHIVADO'];
             $rules['password'] = ['nullable', 'string', 'min:8', 'confirmed'];
@@ -93,19 +98,6 @@ class UsuariosPanel extends Component
         }
 
         return $rules;
-    }
-
-    public function resetFormulario()
-    {
-        $this->reset([
-            'cod_usu', 'nombres', 'ap_paterno', 'ap_materno', 'fecha_nacimiento', 'genero',
-            'pais_documento', 'tipo_documento', 'numero_documento', 'expedido', 'correo',
-            'telefono', 'pais_telefono', 'codigo_telefono', 'rol', 'password', 'password_confirmation',
-            'usuarioId', 'fecha_ingreso', 'especialidad_salud', 'cargo_administrativo', 'observaciones'
-        ]);
-        $this->isEdit = false;
-        $this->pasoFormulario = 1;
-        $this->resetValidation();
     }
 
     public function messages()
@@ -125,6 +117,102 @@ class UsuariosPanel extends Component
             'especialidad_salud.required' => 'Seleccione una especialidad.',
             'cargo_administrativo.required' => 'Seleccione un cargo administrativo.',
         ];
+    }
+
+    // ══════════════════════════════════════════════
+    // FORMULARIO: CREAR / EDITAR
+    // ══════════════════════════════════════════════
+
+    public function resetFormulario()
+    {
+        $this->reset([
+            'cod_usu', 'nombres', 'ap_paterno', 'ap_materno', 'fecha_nacimiento', 'genero',
+            'pais_documento', 'tipo_documento', 'numero_documento', 'expedido', 'correo',
+            'telefono', 'pais_telefono', 'codigo_telefono', 'rol', 'password', 'password_confirmation',
+            'usuarioId', 'fecha_ingreso', 'especialidad_salud', 'cargo_administrativo', 'observaciones'
+        ]);
+        $this->isEdit = false;
+        $this->pasoFormulario = 1;
+        $this->resetValidation();
+    }
+
+    public function crearUsuario()
+    {
+        $this->resetFormulario();
+        $this->pais_documento = 'Bolivia';
+        $this->tipo_documento = 'CI';
+        $this->pais_telefono = 'Bolivia';
+        $this->codigo_telefono = '+591';
+        $this->estado = 'ACTIVO';
+        $this->acceso_sistema = 'HABILITADO';
+        $this->isEdit = false;
+        $this->mostrarFormulario = true;
+    }
+
+    public function editarUsuario($cod_usu)
+    {
+        // ── Guardia: no editar usuarios inactivos ──
+        $usuario = User::with(['personalSalud', 'personalAdmin'])->findOrFail($cod_usu);
+
+        if ($usuario->estado !== 'ACTIVO') {
+            $this->dispatch('swal', [
+                'icon' => 'warning',
+                'title' => 'Acción no permitida',
+                'text' => 'El usuario está inactivo. Debe activarlo antes de editar.'
+            ]);
+            return;
+        }
+
+        $this->resetValidation();
+        $this->usuarioId = $cod_usu;
+        $this->pasoFormulario = 1;
+        $this->isEdit = true;
+
+        $this->cod_usu = $usuario->cod_usu;
+        $this->nombres = $usuario->nombres;
+        $this->ap_paterno = $usuario->ap_paterno;
+        $this->ap_materno = $usuario->ap_materno;
+        $this->fecha_nacimiento = $usuario->fecha_nacimiento ? $usuario->fecha_nacimiento->format('Y-m-d') : '';
+        $this->genero = $usuario->genero;
+        $this->pais_documento = $usuario->pais_documento ?? 'Bolivia';
+        $this->tipo_documento = $usuario->tipo_documento ?? 'CI';
+        $this->numero_documento = $usuario->numero_documento;
+        $this->expedido = $usuario->expedido;
+        $this->correo = $usuario->correo;
+        $this->telefono = $usuario->telefono;
+        $this->pais_telefono = $usuario->pais_telefono ?? 'Bolivia';
+        $this->codigo_telefono = $usuario->codigo_telefono ?? '+591';
+        $this->estado = $usuario->estado;
+        $this->acceso_sistema = $usuario->acceso_sistema;
+        $this->observaciones = $usuario->observaciones;
+
+        $this->rol = $usuario->roles->first()?->name ?? '';
+
+        if ($this->rol === 'personal_salud') {
+            $ps = $usuario->personalSalud;
+            $this->fecha_ingreso = $ps?->fecha_ing ? $ps->fecha_ing->format('Y-m-d') : '';
+            $this->especialidad_salud = $ps?->cod_esp;
+        } elseif ($this->rol === 'personal_admin') {
+            $pa = $usuario->personalAdmin;
+            $this->fecha_ingreso = $pa?->fecha_ingreso ? $pa->fecha_ingreso->format('Y-m-d') : '';
+            $this->cargo_administrativo = $pa?->cod_cargo_admin;
+        }
+
+        $this->password = '';
+        $this->password_confirmation = '';
+
+        // Cerrar paneles flotantes si estaban abiertos
+        $this->cerrarFichaRapida();
+        $this->cerrarVistaCompleta();
+
+        $this->mostrarFormulario = true;
+    }
+
+    public function cerrarFormulario()
+    {
+        $this->resetValidation();
+        $this->mostrarFormulario = false;
+        $this->pasoFormulario = 1;
     }
 
     public function siguientePaso()
@@ -158,8 +246,6 @@ class UsuariosPanel extends Component
         } elseif ($this->pasoFormulario === 4) {
             if ($this->isEdit) {
                 $this->validate(['password' => ['nullable', 'string', 'min:8', 'confirmed']]);
-            } else {
-                // En creación no se valida password porque es autogenerado
             }
         }
 
@@ -175,75 +261,9 @@ class UsuariosPanel extends Component
 
     public function irPaso($paso)
     {
-        // Solo permite ir a pasos anteriores o al inmediatamente siguiente si es válido
         if ($paso < $this->pasoFormulario) {
             $this->pasoFormulario = $paso;
         }
-    }
-
-    public function crearUsuario()
-    {
-        $this->resetFormulario();
-        $this->pais_documento = 'Bolivia';
-        $this->tipo_documento = 'CI';
-        $this->pais_telefono = 'Bolivia';
-        $this->codigo_telefono = '+591';
-        $this->estado = 'ACTIVO';
-        $this->acceso_sistema = 'HABILITADO';
-        $this->isEdit = false;
-        $this->mostrarFormulario = true;
-    }
-
-    public function editarUsuario($cod_usu)
-    {
-        $this->resetValidation();
-        $this->usuarioId = $cod_usu;
-        $this->pasoFormulario = 1;
-        $this->isEdit = true;
-        
-        $usuario = User::with(['personalSalud', 'personalAdmin'])->findOrFail($cod_usu);
-        
-        $this->cod_usu = $usuario->cod_usu;
-        $this->nombres = $usuario->nombres;
-        $this->ap_paterno = $usuario->ap_paterno;
-        $this->ap_materno = $usuario->ap_materno;
-        $this->fecha_nacimiento = $usuario->fecha_nacimiento ? $usuario->fecha_nacimiento->format('Y-m-d') : '';
-        $this->genero = $usuario->genero;
-        $this->pais_documento = $usuario->pais_documento ?? 'Bolivia';
-        $this->tipo_documento = $usuario->tipo_documento ?? 'CI';
-        $this->numero_documento = $usuario->numero_documento;
-        $this->expedido = $usuario->expedido;
-        $this->correo = $usuario->correo;
-        $this->telefono = $usuario->telefono;
-        $this->pais_telefono = $usuario->pais_telefono ?? 'Bolivia';
-        $this->codigo_telefono = $usuario->codigo_telefono ?? '+591';
-        $this->estado = $usuario->estado;
-        $this->acceso_sistema = $usuario->acceso_sistema;
-        $this->observaciones = $usuario->observaciones;
-        
-        $this->rol = $usuario->roles->first()?->name ?? '';
-        
-        if ($this->rol === 'personal_salud') {
-            $ps = $usuario->personalSalud;
-            $this->fecha_ingreso = $ps?->fecha_ing ? $ps->fecha_ing->format('Y-m-d') : '';
-            $this->especialidad_salud = $ps?->cod_esp;
-        } elseif ($this->rol === 'personal_admin') {
-            $pa = $usuario->personalAdmin;
-            $this->fecha_ingreso = $pa?->fecha_ingreso ? $pa->fecha_ingreso->format('Y-m-d') : '';
-            $this->cargo_administrativo = $pa?->cod_cargo_admin;
-        }
-
-        $this->password = '';
-        $this->password_confirmation = '';
-
-        $this->mostrarFormulario = true;
-    }
-
-    public function cerrarFormulario()
-    {
-        $this->resetValidation();
-        $this->mostrarFormulario = false;
-        $this->pasoFormulario = 1;
     }
 
     private function generarPasswordTemporal(): string
@@ -288,9 +308,9 @@ class UsuariosPanel extends Component
             if (!empty($this->password)) {
                 $userData['password'] = Hash::make($this->password);
             }
-            
+
             $usuario = User::findOrFail($this->usuarioId);
-            
+
             if ($usuario->hasRole('super_admin') && $this->rol !== 'super_admin') {
                 $superadmins = User::role('super_admin')->where('estado', 'ACTIVO')->count();
                 if ($superadmins <= 1) {
@@ -320,9 +340,18 @@ class UsuariosPanel extends Component
                 \App\Models\PersonalAdmin::where('cod_usu', $usuario->cod_usu)->delete();
             }
 
+            // Registrar en bitácora
+            if (function_exists('activity')) {
+                activity('Usuarios')
+                    ->causedBy(auth()->user())
+                    ->performedOn($usuario)
+                    ->event('edicion')
+                    ->log("Se actualizó la información del usuario {$usuario->name}.");
+            }
+
             $mensaje = 'Usuario actualizado correctamente.';
         } else {
-            $userData['estado'] = 'ACTIVO'; // Forzado en backend
+            $userData['estado'] = 'ACTIVO';
             $passwordTemporal = $this->generarPasswordTemporal();
             $userData['password'] = Hash::make($passwordTemporal);
 
@@ -343,8 +372,17 @@ class UsuariosPanel extends Component
                 ]);
             }
 
+            // Registrar en bitácora
+            if (function_exists('activity')) {
+                activity('Usuarios')
+                    ->causedBy(auth()->user())
+                    ->performedOn($usuario)
+                    ->event('registro')
+                    ->log("Se registró un nuevo usuario: {$usuario->name} con rol {$this->rol}.");
+            }
+
             $mensaje = "Usuario registrado correctamente. Contraseña temporal: {$passwordTemporal}";
-            $this->resetPage(); // Refrescar tabla
+            $this->resetPage();
         }
 
         $this->resetFormulario();
@@ -357,7 +395,32 @@ class UsuariosPanel extends Component
         ]);
     }
 
-    // ── Ficha Rápida Flotante ──
+    // ══════════════════════════════════════════════
+    // VISTA COMPLETA (modal/panel expandido)
+    // ══════════════════════════════════════════════
+
+    public function abrirVistaCompleta($codUsu): void
+    {
+        $this->usuarioVista = User::with([
+            'roles',
+            'personalSalud.especialidad',
+            'personalAdmin.cargoAdmin',
+            'voluntarios',
+            'familiares',
+        ])->where('cod_usu', $codUsu)->firstOrFail();
+
+        $this->mostrarVistaCompleta = true;
+    }
+
+    public function cerrarVistaCompleta(): void
+    {
+        $this->mostrarVistaCompleta = false;
+        $this->usuarioVista = null;
+    }
+
+    // ══════════════════════════════════════════════
+    // FICHA RÁPIDA FLOTANTE (panel lateral derecho)
+    // ══════════════════════════════════════════════
 
     public function abrirFichaRapida($codUsu): void
     {
@@ -377,7 +440,9 @@ class UsuariosPanel extends Component
         $this->usuarioFicha = null;
     }
 
-    // ── Filtros ──
+    // ══════════════════════════════════════════════
+    // FILTROS
+    // ══════════════════════════════════════════════
 
     public function aplicarFiltros(): void
     {
@@ -386,9 +451,13 @@ class UsuariosPanel extends Component
 
     public function limpiarFiltros(): void
     {
-        $this->reset(['search', 'filtroRol', 'filtroEstado']);
+        $this->reset(['search', 'filtroRol', 'filtroEstado', 'filtroGenero']);
         $this->resetPage();
     }
+
+    // ══════════════════════════════════════════════
+    // HOOKS DE ACTUALIZACIÓN
+    // ══════════════════════════════════════════════
 
     public function updatedPaisTelefono($value)
     {
@@ -426,6 +495,10 @@ class UsuariosPanel extends Component
         $this->resetPage();
     }
 
+    // ══════════════════════════════════════════════
+    // TOGGLE ESTADO (ACTIVAR / INACTIVAR)
+    // ══════════════════════════════════════════════
+
     public function toggleEstado($id)
     {
         $usuario = User::findOrFail($id);
@@ -439,7 +512,8 @@ class UsuariosPanel extends Component
             ]);
             return;
         }
-        
+
+        // Proteger último super_admin
         if ($usuario->estado === 'ACTIVO' && $usuario->hasRole('super_admin')) {
             $superadmins = User::role('super_admin')->where('estado', 'ACTIVO')->count();
             if ($superadmins <= 1) {
@@ -455,12 +529,25 @@ class UsuariosPanel extends Component
         $nuevoEstado = $usuario->estado === 'ACTIVO' ? 'INACTIVO' : 'ACTIVO';
         $usuario->update(['estado' => $nuevoEstado]);
 
+        // Registrar en bitácora
+        if (function_exists('activity')) {
+            activity('Usuarios')
+                ->causedBy(auth()->user())
+                ->performedOn($usuario)
+                ->event($nuevoEstado === 'ACTIVO' ? 'activacion' : 'inactivacion')
+                ->log("Se cambió el estado de {$usuario->name} a {$nuevoEstado}.");
+        }
+
         $this->dispatch('swal', [
             'icon' => 'success',
             'title' => 'Estado actualizado',
             'text' => "El usuario ahora está {$nuevoEstado}."
         ]);
     }
+
+    // ══════════════════════════════════════════════
+    // RENDER
+    // ══════════════════════════════════════════════
 
     public function render()
     {
@@ -488,6 +575,10 @@ class UsuariosPanel extends Component
             $query->role($this->filtroRol);
         }
 
+        if (!empty($this->filtroGenero)) {
+            $query->where('genero', $this->filtroGenero);
+        }
+
         // Ordenamiento: ACTIVOS primero, luego alfabético
         $query->orderByRaw("CASE WHEN estado = 'ACTIVO' THEN 0 ELSE 1 END")
               ->orderBy('nombres')
@@ -496,7 +587,7 @@ class UsuariosPanel extends Component
 
         return view('livewire.admin.usuarios.usuarios-panel', [
             'usuarios' => $query->paginate(12),
-            'roles' => \Spatie\Permission\Models\Role::all(),
+            'roles' => Role::all(),
             'especialidades' => \App\Models\Especialidad::all(),
             'cargosAdmin' => \App\Models\CargoAdministrativo::all()
         ]);
