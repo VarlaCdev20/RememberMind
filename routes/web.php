@@ -36,6 +36,22 @@ Route::middleware([
                 ->middleware('permission:usuarios.cambiar_estado')
                 ->name('usuarios.activar');
 
+            Route::get('usuarios/{usuario}/ficha/pdf', [UsuarioController::class, 'fichaPdf'])
+                ->middleware('permission:usuarios.reportes.pdf')
+                ->name('usuarios.ficha.pdf');
+
+            Route::get('usuarios/{usuario}/documentacion/pdf', [UsuarioController::class, 'documentacionPdf'])
+                ->middleware('permission:usuarios.reportes.pdf')
+                ->name('usuarios.documentacion.pdf');
+
+            Route::get('usuarios/{usuario}/horarios/pdf', [UsuarioController::class, 'horariosPdf'])
+                ->middleware('permission:usuarios.reportes.pdf')
+                ->name('usuarios.horarios.pdf');
+
+            Route::post('usuarios/{usuario}/ficha/enviar-correo', [UsuarioController::class, 'enviarFichaCorreo'])
+                ->middleware('permission:usuarios.ver')
+                ->name('usuarios.ficha.enviar-correo');
+
             // ── Roles y Permisos ─────────────────
             Route::view('/roles-permisos', 'admin.roles-permisos.index')
                 ->middleware('permission:roles.ver')
@@ -45,6 +61,28 @@ Route::middleware([
             Route::view('/areas-institucionales', 'admin.areas-institucionales.index')
                 ->middleware('permission:areas.ver')
                 ->name('areas-institucionales.index');
+
+            // ── Turnos y Asignaciones ─────────────
+            Route::view('/turnos-asignaciones', 'admin.turnos-asignaciones.index')
+                ->middleware('permission:turnos.ver')
+                ->name('turnos-asignaciones.index');
+
+            // ── Reportes de Áreas Institucionales ─
+            Route::prefix('areas-institucionales/reportes')
+                ->name('areas-institucionales.reportes.')
+                ->middleware('permission:areas.reportes')
+                ->group(function () {
+                    Route::get('general/pdf', [\App\Http\Controllers\Admin\AreasInstitucionales\AreaReporteController::class, 'generalPdf'])
+                        ->name('general.pdf');
+                    Route::get('general/excel', [\App\Http\Controllers\Admin\AreasInstitucionales\AreaReporteController::class, 'generalExcel'])
+                        ->name('general.excel');
+                    Route::get('general/csv', [\App\Http\Controllers\Admin\AreasInstitucionales\AreaReporteController::class, 'generalCsv'])
+                        ->name('general.csv');
+                    Route::get('{area}/pdf', [\App\Http\Controllers\Admin\AreasInstitucionales\AreaReporteController::class, 'areaPdf'])
+                        ->name('area.pdf');
+                    Route::get('{area}/excel', [\App\Http\Controllers\Admin\AreasInstitucionales\AreaReporteController::class, 'areaExcel'])
+                        ->name('area.excel');
+                });
 
             // ── Adultos Mayores ──────────────────
             Route::resource('adultos-mayores', AdultoMayorController::class)

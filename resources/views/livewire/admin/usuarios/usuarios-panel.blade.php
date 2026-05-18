@@ -184,7 +184,6 @@
                 <option value="">Todos</option>
                 <option value="FEMENINO">Femenino</option>
                 <option value="MASCULINO">Masculino</option>
-                <option value="OTRO">Otro</option>
             </select>
         </div>
 
@@ -641,7 +640,7 @@
     {{-- MODAL FUERA DEL CONTENEDOR DEL PANEL --}}
     @if($mostrarFormulario)
     <div class="fixed inset-0 z-[2147483646] flex items-center justify-center bg-slate-900/40 backdrop-blur-sm px-3 sm:px-4 transition-all duration-300">
-        <div class="relative z-[2147483647] w-full max-w-3xl max-h-[92vh] overflow-hidden rounded-[24px] border border-[#C7B5A3]/30 bg-[#E6DDD3] shadow-[0_20px_50px_rgba(0,0,0,0.5)] animate-in fade-in zoom-in duration-300 flex flex-col">
+        <div class="relative z-[2147483647] w-full max-w-4xl max-h-[92vh] overflow-hidden rounded-[24px] border border-[#C7B5A3]/30 bg-[#E6DDD3] shadow-[0_20px_50px_rgba(0,0,0,0.5)] animate-in fade-in zoom-in duration-300 flex flex-col">
             
             {{-- HEADER CON PROGRESO --}}
             <header class="relative border-b border-[#C7B5A3]/30 bg-[#E6DDD3]/50 px-4 py-3 backdrop-blur-xl shrink-0">
@@ -715,6 +714,40 @@
                         <i class="ph-fill ph-identification-card text-xl text-[#E27D60]"></i>
                         <h3 class="text-xs font-black text-[#2F3E5C] uppercase tracking-widest">Información Personal</h3>
                     </div>
+                    
+                    {{-- Contenedor de Fotografía y Carga --}}
+                    <div class="flex flex-col sm:flex-row items-center gap-5 bg-white/40 p-4 rounded-2xl border border-[#C7B5A3]/30">
+                        <div class="relative group">
+                            @if($foto_de_perfil_upload)
+                                <img src="{{ $foto_de_perfil_upload->temporaryUrl() }}" 
+                                     class="h-24 w-24 rounded-[1.35rem] object-cover ring-4 ring-[#E27D60] shadow-md">
+                            @elseif($isEdit && $cod_usu && \App\Models\User::find($cod_usu)?->foto_de_perfil)
+                                <img src="{{ asset('storage/' . \App\Models\User::find($cod_usu)->foto_de_perfil) }}" 
+                                     class="h-24 w-24 rounded-[1.35rem] object-cover ring-4 ring-[#2F3E5C]/30 shadow-md">
+                            @else
+                                <div class="flex h-24 w-24 items-center justify-center rounded-[1.35rem] bg-[#2F3E5C] text-3xl font-black text-white ring-4 ring-[#2F3E5C]/10 shadow-md uppercase">
+                                    {{ mb_substr($nombres ?? 'U', 0, 1) }}{{ mb_substr($ap_paterno ?? 'I', 0, 1) }}
+                                </div>
+                            @endif
+                            <div wire:loading wire:target="foto_de_perfil_upload" class="absolute inset-0 flex items-center justify-center bg-slate-900/60 rounded-[1.35rem]">
+                                <i class="ph-bold ph-circle-notch animate-spin text-white text-xl"></i>
+                            </div>
+                        </div>
+                        <div class="flex-1 text-center sm:text-left space-y-1">
+                            <h4 class="text-xs font-black text-[#2F3E5C] uppercase tracking-wider">Fotografía Institucional</h4>
+                            <p class="text-[10px] text-[#2F3E5C]/60 font-semibold leading-relaxed">
+                                Formatos permitidos: JPG, JPEG, PNG, WEBP. Tamaño máximo: 4MB.
+                            </p>
+                            <label class="inline-flex items-center gap-2 px-3 py-1.5 bg-[#2F3E5C] hover:bg-[#E27D60] text-white rounded-lg text-[9px] font-black uppercase tracking-wider cursor-pointer shadow transition active:scale-95">
+                                <i class="ph-bold ph-upload-simple"></i> Seleccionar foto
+                                <input type="file" wire:model="foto_de_perfil_upload" class="hidden" accept="image/*">
+                            </label>
+                            @error('foto_de_perfil_upload') 
+                                <span class="block text-[9px] font-black text-[#E27D60] uppercase mt-1">{{ $message }}</span> 
+                            @enderror
+                        </div>
+                    </div>
+
                     <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                         <div class="md:col-span-2 lg:col-span-3">
                             <label class="mb-1 block text-[9px] font-black uppercase tracking-widest text-[#2F3E5C]/60">Nombres *</label>
@@ -739,86 +772,203 @@
                                 <option value="">SELECCIONE...</option>
                                 <option value="FEMENINO">FEMENINO</option>
                                 <option value="MASCULINO">MASCULINO</option>
-                                <option value="OTRO">OTRO</option>
                             </select>
                             @error('genero') <span class="mt-1 block text-[9px] font-black text-[#E27D60] uppercase">{{ $message }}</span> @enderror
                         </div>
                         <div>
-                            <label class="mb-1 block text-[9px] font-black uppercase tracking-widest text-[#2F3E5C]/60">Fecha Nacimiento *</label>
-                            <input type="date" wire:model="fecha_nacimiento"
+                            <div class="flex justify-between items-center mb-1">
+                                <label class="block text-[9px] font-black uppercase tracking-widest text-[#2F3E5C]/60">Fecha Nacimiento *</label>
+                                @if($edad !== null)
+                                    <span class="text-[9px] font-black text-[#E27D60] uppercase tracking-wider">Edad: {{ $edad }} años</span>
+                                @endif
+                            </div>
+                            <input type="date" wire:model.live="fecha_nacimiento"
                                    class="w-full h-10 rounded-xl border {{ $errors->has('fecha_nacimiento') ? 'border-[#E27D60]' : 'border-[#C7B5A3]' }} bg-white px-4 py-2 text-sm font-bold text-[#2F3E5C] outline-none transition">
                             @error('fecha_nacimiento') <span class="mt-1 block text-[9px] font-black text-[#E27D60] uppercase">{{ $message }}</span> @enderror
                         </div>
                         <div>
                             <label class="mb-1 block text-[9px] font-black uppercase tracking-widest text-[#2F3E5C]/60">País Emisor *</label>
                             <select wire:model.live="pais_documento" class="w-full h-10 rounded-xl border border-[#C7B5A3] bg-white px-4 py-2 text-sm font-bold text-[#2F3E5C] outline-none transition">
-                                <option value="Bolivia">Bolivia</option>
-                                <option value="Brasil">Brasil</option>
-                                <option value="Argentina">Argentina</option>
-                                <option value="Perú">Perú</option>
-                                <option value="Chile">Chile</option>
-                                <option value="Otro">Otro</option>
+                                @foreach(array_keys($paisesConfig) as $pName)
+                                    <option value="{{ $pName }}">{{ $pName }}</option>
+                                @endforeach
                             </select>
                         </div>
-                        <div class="grid grid-cols-3 gap-2">
-                            <div class="col-span-1">
+                        <div class="md:col-span-2 lg:col-span-3 grid gap-3 {{ ($pais_documento === 'Bolivia' && $tipo_documento === 'CI') ? 'grid-cols-12' : 'grid-cols-3' }}">
+                            <div class="{{ ($pais_documento === 'Bolivia' && $tipo_documento === 'CI') ? 'col-span-3' : 'col-span-1' }} {{ $pais_documento !== 'Otro' ? 'pointer-events-none opacity-60' : '' }}">
                                 <label class="mb-1 block text-[9px] font-black uppercase tracking-widest text-[#2F3E5C]/60">Tipo *</label>
-                                <select wire:model.live="tipo_documento" class="w-full h-10 rounded-xl border border-[#C7B5A3] bg-white px-1 py-2 text-[10px] font-black text-[#2F3E5C] outline-none">
+                                <select wire:model.live="tipo_documento" tabindex="-1" class="w-full h-10 rounded-xl border border-[#C7B5A3] bg-white px-3 py-2 text-xs font-black text-[#2F3E5C] outline-none transition focus:border-[#2F3E5C]">
                                     <option value="CI">CI</option>
-                                    <option value="PAS">PAS</option>
                                     <option value="DNI">DNI</option>
+                                    <option value="PAS">PAS</option>
+                                    <option value="CPF">CPF</option>
+                                    <option value="RUT">RUT</option>
+                                    <option value="Cédula">Cédula</option>
+                                    <option value="INE">INE</option>
+                                    <option value="SSN">SSN</option>
+                                    <option value="Pasaporte">Pasaporte</option>
                                 </select>
                             </div>
-                            <div class="col-span-2 relative">
+                            <div class="{{ ($pais_documento === 'Bolivia' && $tipo_documento === 'CI') ? 'col-span-6' : 'col-span-2' }}">
                                 <label class="mb-1 block text-[9px] font-black uppercase tracking-widest text-[#2F3E5C]/60">Número Doc *</label>
                                 <input type="text" wire:model="numero_documento" placeholder="Ej. 1234567"
-                                       class="w-full h-10 rounded-xl border {{ $errors->has('numero_documento') ? 'border-[#E27D60]' : 'border-[#C7B5A3]' }} bg-white px-4 py-2 text-sm font-bold uppercase text-[#2F3E5C] outline-none transition">
-                                @if($pais_documento === 'Bolivia' && $tipo_documento === 'CI')
-                                <div class="absolute right-1 top-6">
-                                    <select wire:model="expedido" class="h-7 rounded-lg bg-[#D5C7B9]/50 border-none text-[8px] font-black text-[#2F3E5C] outline-none focus:ring-0">
-                                        <option value="">EXP</option>
-                                        @foreach(['LP','CB','SC','OR','PT','CH','TJ','BN','PD'] as $e)
-                                            <option value="{{ $e }}">{{ $e }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                                @endif
+                                       class="w-full h-10 rounded-xl border {{ $errors->has('numero_documento') ? 'border-[#E27D60] ring-4 ring-[#E27D60]/10' : 'border-[#C7B5A3] focus:border-[#2F3E5C]' }} bg-white px-4 py-2 text-sm font-bold uppercase text-[#2F3E5C] outline-none transition">
                             </div>
-                            @error('numero_documento') <div class="col-span-3"><span class="mt-1 text-[9px] font-black text-[#E27D60] uppercase">{{ $message }}</span></div> @enderror
+                            @if($pais_documento === 'Bolivia' && $tipo_documento === 'CI')
+                            <div class="col-span-3">
+                                <label class="mb-1 block text-[9px] font-black uppercase tracking-widest text-[#E27D60]">Expedido (EXP) *</label>
+                                <select wire:model="expedido" class="w-full h-10 rounded-xl border {{ $errors->has('expedido') ? 'border-[#E27D60]' : 'border-[#C7B5A3]' }} bg-white px-3 py-2 text-xs font-black text-[#2F3E5C] outline-none transition focus:border-[#2F3E5C]">
+                                    <option value="">SELECCIONE...</option>
+                                    @foreach(['LP','CB','SC','OR','PT','CH','TJ','BN','PD'] as $e)
+                                        <option value="{{ $e }}">{{ $e }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            @endif
+                            @error('numero_documento') <div class="col-span-full"><span class="mt-1 block text-[9px] font-black text-[#E27D60] uppercase">{{ $message }}</span></div> @enderror
+                            @error('expedido') <div class="col-span-full"><span class="mt-1 block text-[9px] font-black text-[#E27D60] uppercase">{{ $message }}</span></div> @enderror
+                            @if($pais_documento !== 'Otro')
+                                <div class="col-span-full mt-1">
+                                    <p class="text-[9px] font-semibold text-[#2F3E5C]/50 italic">
+                                        * El tipo de documento se bloquea y pre-asigna automáticamente según el país emisor seleccionado.
+                                    </p>
+                                </div>
+                            @endif
                         </div>
                     </div>
                 </div>
                 @endif
 
-                {{-- PASO 2: CONTACTO --}}
+                {{-- PASO 2: CONTACTO Y DOMICILIO --}}
                 @if($pasoFormulario === 2)
                 <div class="space-y-4 animate-in slide-in-from-right-4 duration-300">
                     <div class="flex items-center gap-3 border-b border-[#C7B5A3]/30 pb-2">
                         <i class="ph-fill ph-phone-call text-xl text-[#E27D60]"></i>
-                        <h3 class="text-xs font-black text-[#2F3E5C] uppercase tracking-widest">Canales de Contacto</h3>
+                        <h3 class="text-xs font-black text-[#2F3E5C] uppercase tracking-widest">Contacto y Domicilio</h3>
                     </div>
-                    <div class="grid gap-4 md:grid-cols-2 max-w-2xl">
-                        <div class="md:col-span-2">
+                    <div class="grid gap-4 md:grid-cols-2">
+                        <div>
                             <label class="mb-1 block text-[9px] font-black uppercase tracking-widest text-[#2F3E5C]/60">Correo Institucional *</label>
-                            <input type="email" wire:model="correo" placeholder="ejemplo@casaamandita.com"
-                                   class="w-full h-10 rounded-xl border {{ $errors->has('correo') ? 'border-[#E27D60]' : 'border-[#C7B5A3]' }} bg-white px-4 py-2 text-sm font-bold text-[#2F3E5C] outline-none transition focus:border-[#2F3E5C]">
+                            <input type="email" wire:model.live="correo" placeholder="ejemplo@casaamandita.com"
+                                   class="w-full h-10 rounded-xl border {{ $errors->has('correo') ? 'border-[#E27D60] ring-4 ring-[#E27D60]/10' : 'border-[#C7B5A3] focus:border-[#2F3E5C]' }} bg-white px-4 py-2 text-sm font-bold text-[#2F3E5C] outline-none transition">
                             @error('correo') <span class="mt-1 block text-[9px] font-black text-[#E27D60] uppercase">{{ $message }}</span> @enderror
                         </div>
-                        <div class="grid grid-cols-3 gap-2">
-                            <div class="col-span-1">
-                                <label class="mb-1 block text-[9px] font-black uppercase tracking-widest text-[#2F3E5C]/60">País</label>
+
+                        <div class="grid grid-cols-12 gap-2">
+                            <div class="col-span-5">
+                                <label class="mb-1 block text-[9px] font-black uppercase tracking-widest text-[#2F3E5C]/60">País Celular</label>
                                 <select wire:model.live="pais_telefono" class="w-full h-10 rounded-xl border border-[#C7B5A3] bg-white px-1 py-2 text-[9px] font-black text-[#2F3E5C] outline-none transition">
-                                    <option value="Bolivia">BOL (+591)</option>
-                                    <option value="Brasil">BRA (+55)</option>
-                                    <option value="Argentina">ARG (+54)</option>
+                                    <option value="">-- Seleccionar --</option>
+                                    @foreach($paisesConfig as $pName => $pData)
+                                        <option value="{{ $pName }}">{{ $pName }} ({{ $pData['codigo'] }})</option>
+                                    @endforeach
                                 </select>
                             </div>
-                            <div class="col-span-2">
+                            <div class="col-span-7">
                                 <label class="mb-1 block text-[9px] font-black uppercase tracking-widest text-[#2F3E5C]/60">Celular *</label>
-                                <input type="text" wire:model="telefono" placeholder="70012345"
-                                       class="w-full h-10 rounded-xl border {{ $errors->has('telefono') ? 'border-[#E27D60]' : 'border-[#C7B5A3]' }} bg-white px-4 py-2 text-sm font-bold text-[#2F3E5C] outline-none transition focus:border-[#2F3E5C]">
+                                <div class="flex gap-2">
+                                    <span class="inline-flex items-center justify-center h-10 px-2 rounded-xl bg-[#C7B5A3]/20 border border-[#C7B5A3] text-xs font-black text-[#2F3E5C]">
+                                        {{ $codigo_telefono ?: '+??' }}
+                                    </span>
+                                    <input type="text" wire:model="telefono" 
+                                           placeholder="{{ $pais_telefono && isset($paisesConfig[$pais_telefono]) ? $paisesConfig[$pais_telefono]['placeholder'] : 'Seleccione país...' }}"
+                                           class="flex-1 h-10 rounded-xl border {{ $errors->has('telefono') ? 'border-[#E27D60] ring-4 ring-[#E27D60]/10' : 'border-[#C7B5A3] focus:border-[#2F3E5C]' }} bg-white px-4 py-2 text-sm font-bold text-[#2F3E5C] outline-none transition">
+                                </div>
                                 @error('telefono') <span class="mt-1 block text-[9px] font-black text-[#E27D60] uppercase">{{ $message }}</span> @enderror
                             </div>
+                        </div>
+
+                        {{-- Domicilio --}}
+                        <div class="md:col-span-2 border-t border-[#C7B5A3]/20 pt-3">
+                            <h4 class="text-[10px] font-black text-[#2F3E5C] uppercase tracking-widest mb-3">Dirección de Domicilio</h4>
+                        </div>
+
+                        <div class="md:col-span-2 grid grid-cols-12 gap-3">
+                            <div class="col-span-8">
+                                <label class="mb-1 block text-[9px] font-black uppercase tracking-widest text-[#2F3E5C]/60">Calle / Avenida *</label>
+                                <input type="text" wire:model="calle" placeholder="Ej. Av. Arce o Calle Murillo"
+                                       class="w-full h-10 rounded-xl border {{ $errors->has('calle') ? 'border-[#E27D60]' : 'border-[#C7B5A3]' }} bg-white px-4 py-2 text-sm font-bold text-[#2F3E5C] outline-none transition focus:border-[#2F3E5C]">
+                                @error('calle') <span class="mt-1 block text-[9px] font-black text-[#E27D60] uppercase">{{ $message }}</span> @enderror
+                            </div>
+                            <div class="col-span-4">
+                                <label class="mb-1 block text-[9px] font-black uppercase tracking-widest text-[#2F3E5C]/60">Nro. Domicilio *</label>
+                                <input type="text" wire:model="nro_domicilio" placeholder="Ej. 1234 o S/N"
+                                       class="w-full h-10 rounded-xl border {{ $errors->has('nro_domicilio') ? 'border-[#E27D60]' : 'border-[#C7B5A3]' }} bg-white px-4 py-2 text-sm font-bold text-[#2F3E5C] outline-none transition focus:border-[#2F3E5C]">
+                                @error('nro_domicilio') <span class="mt-1 block text-[9px] font-black text-[#E27D60] uppercase">{{ $message }}</span> @enderror
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="mb-1 block text-[9px] font-black uppercase tracking-widest text-[#2F3E5C]/60">Zona / Barrio *</label>
+                            <input type="text" wire:model="zona" placeholder="Ej. Sopocachi"
+                                   class="w-full h-10 rounded-xl border {{ $errors->has('zona') ? 'border-[#E27D60]' : 'border-[#C7B5A3]' }} bg-white px-4 py-2 text-sm font-bold text-[#2F3E5C] outline-none transition focus:border-[#2F3E5C]">
+                            @error('zona') <span class="mt-1 block text-[9px] font-black text-[#E27D60] uppercase">{{ $message }}</span> @enderror
+                        </div>
+
+                        <div>
+                            <label class="mb-1 block text-[9px] font-black uppercase tracking-widest text-[#2F3E5C]/60">Ciudad / Localidad *</label>
+                            <select wire:model="ciudad"
+                                    class="w-full h-10 rounded-xl border {{ $errors->has('ciudad') ? 'border-[#E27D60] ring-4 ring-[#E27D60]/10' : 'border-[#C7B5A3] focus:border-[#2F3E5C]' }} bg-white px-4 py-2 text-sm font-bold text-[#2F3E5C] outline-none transition">
+                                <option value="">Seleccione una ciudad</option>
+                                <option value="La Paz">La Paz</option>
+                                <option value="El Alto">El Alto</option>
+                                <option value="Cochabamba">Cochabamba</option>
+                                <option value="Santa Cruz">Santa Cruz</option>
+                                <option value="Oruro">Oruro</option>
+                                <option value="Potosí">Potosí</option>
+                                <option value="Sucre">Sucre</option>
+                                <option value="Tarija">Tarija</option>
+                                <option value="Trinidad">Trinidad</option>
+                                <option value="Cobija">Cobija</option>
+                            </select>
+                            @error('ciudad') <span class="mt-1 block text-[9px] font-black text-[#E27D60] uppercase">{{ $message }}</span> @enderror
+                        </div>
+
+                        {{-- Emergencia --}}
+                        <div class="md:col-span-2 border-t border-[#C7B5A3]/20 pt-3">
+                            <h4 class="text-[10px] font-black text-[#2F3E5C] uppercase tracking-widest mb-3">Contacto de Emergencia</h4>
+                        </div>
+
+                        <div class="md:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-3">
+                            <div>
+                                <label class="mb-1 block text-[9px] font-black uppercase tracking-widest text-[#2F3E5C]/60">Nombres Emergencia *</label>
+                                <input type="text" wire:model="contacto_emergencia" placeholder="Ej. María Teresa"
+                                       class="w-full h-10 rounded-xl border {{ $errors->has('contacto_emergencia') ? 'border-[#E27D60]' : 'border-[#C7B5A3]' }} bg-white px-4 py-2 text-sm font-bold text-[#2F3E5C] outline-none transition focus:border-[#2F3E5C]">
+                                @error('contacto_emergencia') <span class="mt-1 block text-[9px] font-black text-[#E27D60] uppercase">{{ $message }}</span> @enderror
+                            </div>
+                            <div>
+                                <label class="mb-1 block text-[9px] font-black uppercase tracking-widest text-[#2F3E5C]/60">Apellido Paterno *</label>
+                                <input type="text" wire:model="ap_paterno_emergencia" placeholder="Ej. López"
+                                       class="w-full h-10 rounded-xl border {{ $errors->has('ap_paterno_emergencia') ? 'border-[#E27D60]' : 'border-[#C7B5A3]' }} bg-white px-4 py-2 text-sm font-bold text-[#2F3E5C] outline-none transition focus:border-[#2F3E5C]">
+                                @error('ap_paterno_emergencia') <span class="mt-1 block text-[9px] font-black text-[#E27D60] uppercase">{{ $message }}</span> @enderror
+                            </div>
+                            <div>
+                                <label class="mb-1 block text-[9px] font-black uppercase tracking-widest text-[#2F3E5C]/60">Apellido Materno</label>
+                                <input type="text" wire:model="ap_materno_emergencia" placeholder="Ej. Quispe"
+                                       class="w-full h-10 rounded-xl border border-[#C7B5A3] bg-white px-4 py-2 text-sm font-bold text-[#2F3E5C] outline-none transition focus:border-[#2F3E5C]">
+                                @error('ap_materno_emergencia') <span class="mt-1 block text-[9px] font-black text-[#E27D60] uppercase">{{ $message }}</span> @enderror
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="mb-1 block text-[9px] font-black uppercase tracking-widest text-[#2F3E5C]/60">Parentesco / Relación</label>
+                            <select wire:model="parentesco_emergencia" class="w-full h-10 rounded-xl border border-[#C7B5A3] bg-white px-4 py-2 text-sm font-bold text-[#2F3E5C] outline-none transition">
+                                <option value="">SELECCIONE...</option>
+                                <option value="PADRE">PADRE</option>
+                                <option value="MADRE">MADRE</option>
+                                <option value="CONYUGUE">CONYUGUE</option>
+                                <option value="HIJO/A">HIJO/A</option>
+                                <option value="HERMANO/A">HERMANO/A</option>
+                                <option value="OTRO">OTRO</option>
+                            </select>
+                            @error('parentesco_emergencia') <span class="mt-1 block text-[9px] font-black text-[#E27D60] uppercase">{{ $message }}</span> @enderror
+                        </div>
+
+                        <div>
+                            <label class="mb-1 block text-[9px] font-black uppercase tracking-widest text-[#2F3E5C]/60">Celular de Emergencia</label>
+                            <input type="text" wire:model="celular_emergencia" placeholder="Ej. 70098765"
+                                   class="w-full h-10 rounded-xl border border-[#C7B5A3] bg-white px-4 py-2 text-sm font-bold text-[#2F3E5C] outline-none transition focus:border-[#2F3E5C]">
+                            @error('celular_emergencia') <span class="mt-1 block text-[9px] font-black text-[#E27D60] uppercase">{{ $message }}</span> @enderror
                         </div>
                     </div>
                 </div>
@@ -832,33 +982,36 @@
                         <h3 class="text-xs font-black text-[#2F3E5C] uppercase tracking-widest">Vinculación y Rol</h3>
                     </div>
                     <div class="grid gap-4 md:grid-cols-2 max-w-3xl">
-                        <div class="md:col-span-2">
+                        <div>
                             <label class="mb-1 block text-[9px] font-black uppercase tracking-widest text-[#2F3E5C]/60">Rol en el Sistema *</label>
-                            <select wire:model.live="rol" class="w-full h-10 rounded-xl border {{ $errors->has('rol') ? 'border-[#E27D60]' : 'border-[#C7B5A3]' }} bg-white px-4 py-2 text-sm font-black text-[#2F3E5C] outline-none transition focus:border-[#2F3E5C]">
+                            <select wire:model.live="rol" class="w-full h-10 rounded-xl border {{ $errors->has('rol') ? 'border-[#E27D60] ring-4 ring-[#E27D60]/10' : 'border-[#C7B5A3] focus:border-[#2F3E5C]' }} bg-white px-4 py-2 text-sm font-black text-[#2F3E5C] outline-none transition">
                                 <option value="">SELECCIONE ROL...</option>
-                                @foreach($roles as $r)
-                                    <option value="{{ $r->name }}">{{ strtoupper(str_replace('_', ' ', $r->name)) }}</option>
-                                @endforeach
+                                <option value="personal_salud">PERSONAL DE SALUD</option>
+                                <option value="personal_admin">PERSONAL ADMINISTRATIVO</option>
+                                <option value="voluntario">VOLUNTARIO INSTITUCIONAL</option>
+                                <option value="familiar">FAMILIAR / RESPONSABLE</option>
                             </select>
                             @error('rol') <span class="mt-1 block text-[9px] font-black text-[#E27D60] uppercase">{{ $message }}</span> @enderror
                         </div>
 
-                        <div class="md:col-span-2">
+                        <div>
                             <label class="mb-1 block text-[9px] font-black uppercase tracking-widest text-[#2F3E5C]/60">Área Institucional Operativa</label>
-                            <select wire:model="cod_area" class="w-full h-10 rounded-xl border {{ $errors->has('cod_area') ? 'border-[#E27D60]' : 'border-[#C7B5A3]' }} bg-white px-4 py-2 text-sm font-black text-[#2F3E5C] outline-none transition focus:border-[#2F3E5C]">
+                            <select wire:model="cod_area" class="w-full h-10 rounded-xl border {{ $errors->has('cod_area') ? 'border-[#E27D60] ring-4 ring-[#E27D60]/10' : 'border-[#C7B5A3] focus:border-[#2F3E5C]' }} bg-white px-4 py-2 text-sm font-black text-[#2F3E5C] outline-none transition">
                                 <option value="">SELECCIONE ÁREA...</option>
                                 @foreach($areas as $ar)
-                                    @php
-                                        $esSugerida = false;
-                                        if ($rol === 'personal_salud' && str_contains(strtolower($ar->nombre), 'salud')) $esSugerida = true;
-                                        elseif ($rol === 'personal_admin' && str_contains(strtolower($ar->nombre), 'admin')) $esSugerida = true;
-                                        elseif (($rol === 'admin' || $rol === 'super_admin') && str_contains(strtolower($ar->nombre), 'admin')) $esSugerida = true;
-                                        elseif ($rol === 'voluntario' && str_contains(strtolower($ar->nombre), 'voluntariado')) $esSugerida = true;
-                                        elseif ($rol === 'familiar' && str_contains(strtolower($ar->nombre), 'social')) $esSugerida = true;
-                                    @endphp
-                                    <option value="{{ $ar->cod_area }}">
-                                        {{ $ar->nombre }} {{ $esSugerida ? '⭐ (Recomendada)' : '' }}
-                                    </option>
+                                    @if($ar->cod_area !== 'ARE_0009') {{-- Ocultar Admin del Sistema --}}
+                                        @php
+                                            $esSugerida = false;
+                                            if ($rol === 'personal_salud' && str_contains(strtolower($ar->nombre), 'salud')) $esSugerida = true;
+                                            elseif ($rol === 'personal_salud' && str_contains(strtolower($ar->nombre), 'atención médica')) $esSugerida = true;
+                                            elseif ($rol === 'personal_salud' && str_contains(strtolower($ar->nombre), 'psicología')) $esSugerida = true;
+                                            elseif ($rol === 'personal_admin' && str_contains(strtolower($ar->nombre), 'admin')) $esSugerida = true;
+                                            elseif ($rol === 'voluntario' && str_contains(strtolower($ar->nombre), 'voluntariado')) $esSugerida = true;
+                                        @endphp
+                                        <option value="{{ $ar->cod_area }}">
+                                            {{ $ar->nombre }} {{ $esSugerida ? '⭐ (Recomendada)' : '' }}
+                                        </option>
+                                    @endif
                                 @endforeach
                             </select>
                             @error('cod_area') <span class="mt-1 block text-[9px] font-black text-[#E27D60] uppercase">{{ $message }}</span> @enderror
@@ -866,11 +1019,10 @@
                             @if($rol)
                                 @php
                                     $sugeridaTxt = match($rol) {
-                                        'super_admin', 'admin' => 'Administración y Finanzas',
-                                        'personal_salud' => 'Salud y Bienestar',
-                                        'personal_admin' => 'Administración y Finanzas',
-                                        'voluntario' => 'Voluntariado y Actividades',
-                                        'familiar' => 'Trabajo Social y Familias',
+                                        'personal_salud' => 'Área de Atención Médica o Área de Psicología',
+                                        'personal_admin' => 'Área Administrativa y Registro Institucional',
+                                        'voluntario' => 'Voluntariado y Relaciones Institucionales',
+                                        'familiar' => 'No requiere vinculación a áreas internas',
                                         default => null
                                     };
                                 @endphp
@@ -882,56 +1034,115 @@
                             @endif
                         </div>
 
+                        {{-- Perfil de Salud --}}
                         @if($rol === 'personal_salud')
-                        <div class="md:col-span-2 animate-in fade-in duration-300">
-                            <label class="mb-1 block text-[9px] font-black uppercase tracking-widest text-[#E27D60]">Especialidad Médica *</label>
-                            <select wire:model="especialidad_salud" class="w-full h-10 rounded-xl border border-[#C7B5A3] bg-white px-4 py-2 text-sm font-bold text-[#2F3E5C] outline-none transition focus:border-[#E27D60]">
-                                <option value="">SELECCIONE ESPECIALIDAD...</option>
-                                @foreach($especialidades as $esp)
-                                    <option value="{{ $esp->cod_esp }}">{{ $esp->nombre }}</option>
-                                @endforeach
-                            </select>
-                            @error('especialidad_salud') <span class="mt-1 block text-[9px] font-black text-[#E27D60] uppercase">{{ $message }}</span> @enderror
+                        <div class="md:col-span-2 grid gap-4 md:grid-cols-2 border-t border-[#C7B5A3]/20 pt-3 animate-in fade-in duration-300">
+                            <div class="md:col-span-2">
+                                <h4 class="text-[10px] font-black text-[#2F3E5C] uppercase tracking-widest">Información Profesional Médica</h4>
+                            </div>
+                            <div>
+                                <label class="mb-1 block text-[9px] font-black uppercase tracking-widest text-[#E27D60]">Especialidad Médica *</label>
+                                <select wire:model.live="especialidad_salud" class="w-full h-10 rounded-xl border border-[#C7B5A3] bg-white px-4 py-2 text-sm font-bold text-[#2F3E5C] outline-none transition focus:border-[#E27D60]">
+                                    <option value="">SELECCIONE ESPECIALIDAD...</option>
+                                    @foreach($especialidades as $esp)
+                                        <option value="{{ $esp->cod_esp }}">{{ $esp->nombre }}</option>
+                                    @endforeach
+                                </select>
+                                @error('especialidad_salud') <span class="mt-1 block text-[9px] font-black text-[#E27D60] uppercase">{{ $message }}</span> @enderror
+                            </div>
+                            <div>
+                                <label class="mb-1 block text-[9px] font-black uppercase tracking-widest text-[#E27D60]">Matrícula Profesional *</label>
+                                <input type="text" wire:model="matricula_prof" placeholder="Ej. MP-12345-BOL" class="w-full h-10 rounded-xl border border-[#C7B5A3] bg-white px-4 py-2 text-sm font-bold text-[#2F3E5C] outline-none transition focus:border-[#2F3E5C]">
+                                @error('matricula_prof') <span class="mt-1 block text-[9px] font-black text-[#E27D60] uppercase">{{ $message }}</span> @enderror
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="mb-1 block text-[9px] font-black uppercase tracking-widest text-[#2F3E5C]">Institución de Formación</label>
+                                <input type="text" wire:model="institucion_formacion" placeholder="Ej. Universidad Mayor de San Andrés" class="w-full h-10 rounded-xl border border-[#C7B5A3] bg-white px-4 py-2 text-sm font-bold text-[#2F3E5C] outline-none transition focus:border-[#2F3E5C]">
+                                @error('institucion_formacion') <span class="mt-1 block text-[9px] font-black text-[#E27D60] uppercase">{{ $message }}</span> @enderror
+                            </div>
+                            <div>
+                                <label class="mb-1 block text-[9px] font-black uppercase tracking-widest text-[#2F3E5C]">Fecha de Ingreso *</label>
+                                <input type="date" wire:model="fecha_ingreso" {{ !$isEdit ? 'readonly tabindex="-1"' : '' }} class="w-full h-10 rounded-xl border border-[#C7B5A3] bg-[#F4EEE7] {{ !$isEdit ? 'opacity-70 pointer-events-none' : '' }} px-4 py-2 text-sm font-bold text-[#2F3E5C] outline-none transition focus:border-[#2F3E5C]">
+                                @error('fecha_ingreso') <span class="mt-1 block text-[9px] font-black text-[#E27D60] uppercase">{{ $message }}</span> @enderror
+                            </div>
                         </div>
                         @endif
 
+                        {{-- Perfil Admin --}}
                         @if($rol === 'personal_admin')
-                        <div class="md:col-span-2 animate-in fade-in duration-300">
-                            <label class="mb-1 block text-[9px] font-black uppercase tracking-widest text-[#2F3E5C]">Cargo Administrativo *</label>
-                            <select wire:model="cargo_administrativo" class="w-full h-10 rounded-xl border border-[#C7B5A3] bg-white px-4 py-2 text-sm font-bold text-[#2F3E5C] outline-none transition focus:border-[#2F3E5C]">
-                                <option value="">SELECCIONE CARGO...</option>
-                                @foreach($cargosAdmin as $cargo)
-                                    <option value="{{ $cargo->cod_cargo_admin }}">{{ $cargo->nombre }}</option>
-                                @endforeach
-                            </select>
-                            @error('cargo_administrativo') <span class="mt-1 block text-[9px] font-black text-[#E27D60] uppercase">{{ $message }}</span> @enderror
+                        <div class="md:col-span-2 grid gap-4 md:grid-cols-2 border-t border-[#C7B5A3]/20 pt-3 animate-in fade-in duration-300">
+                            <div class="md:col-span-2">
+                                <h4 class="text-[10px] font-black text-[#2F3E5C] uppercase tracking-widest">Información de Cargo Administrativo</h4>
+                            </div>
+                            <div>
+                                <label class="mb-1 block text-[9px] font-black uppercase tracking-widest text-[#2F3E5C]">Cargo Administrativo *</label>
+                                @if($cargosAdmin->isEmpty())
+                                    <div class="bg-[#E27D60]/10 border border-[#E27D60]/20 rounded-xl p-3 text-[10px] font-semibold text-[#E27D60] leading-normal">
+                                        ⚠️ No hay cargos administrativos registrados. Por favor, registre cargos administrativos primero o contacte con soporte técnico.
+                                    </div>
+                                @else
+                                    <select wire:model.live="cargo_administrativo" class="w-full h-10 rounded-xl border border-[#C7B5A3] bg-white px-4 py-2 text-sm font-bold text-[#2F3E5C] outline-none transition focus:border-[#2F3E5C]">
+                                        <option value="">SELECCIONE CARGO...</option>
+                                        @foreach($cargosAdmin as $cargo)
+                                            <option value="{{ $cargo->cod_cargo_admin }}">{{ $cargo->nombre }}</option>
+                                        @endforeach
+                                    </select>
+                                    @error('cargo_administrativo') <span class="mt-1 block text-[9px] font-black text-[#E27D60] uppercase">{{ $message }}</span> @enderror
+                                @endif
+                            </div>
+                            <div>
+                                <label class="mb-1 block text-[9px] font-black uppercase tracking-widest text-[#2F3E5C]">Fecha de Ingreso *</label>
+                                <input type="date" wire:model="fecha_ingreso" {{ !$isEdit ? 'readonly tabindex="-1"' : '' }} class="w-full h-10 rounded-xl border border-[#C7B5A3] bg-[#F4EEE7] {{ !$isEdit ? 'opacity-70 pointer-events-none' : '' }} px-4 py-2 text-sm font-bold text-[#2F3E5C] outline-none transition focus:border-[#2F3E5C]">
+                                @error('fecha_ingreso') <span class="mt-1 block text-[9px] font-black text-[#E27D60] uppercase">{{ $message }}</span> @enderror
+                            </div>
                         </div>
                         @endif
 
-                        @if($usuarioId)
-                        <div>
-                            <label class="mb-1 block text-[9px] font-black uppercase tracking-widest text-[#2F3E5C]/60">Estado Perfil *</label>
-                            <select wire:model="estado" class="w-full h-10 rounded-xl border border-[#C7B5A3] bg-white px-4 py-2 text-sm font-bold text-[#2F3E5C] outline-none transition focus:border-[#2F3E5C]">
-                                <option value="ACTIVO">ACTIVO</option>
-                                <option value="INACTIVO">INACTIVO</option>
-                                <option value="ARCHIVADO">ARCHIVADO</option>
-                            </select>
+                        {{-- Perfil Voluntario --}}
+                        @if($rol === 'voluntario')
+                        <div class="md:col-span-2 grid gap-4 md:grid-cols-2 border-t border-[#C7B5A3]/20 pt-3 animate-in fade-in duration-300">
+                            <div class="md:col-span-2">
+                                <h4 class="text-[10px] font-black text-[#2F3E5C] uppercase tracking-widest">Perfil de Voluntariado</h4>
+                            </div>
+                            <div>
+                                <label class="mb-1 block text-[9px] font-black uppercase tracking-widest text-[#2F3E5C]">Disponibilidad Inicial</label>
+                                <input type="text" wire:model="disponibilidad_inicial" placeholder="Ej. Fines de semana / Tardes" class="w-full h-10 rounded-xl border border-[#C7B5A3] bg-white px-4 py-2 text-sm font-bold text-[#2F3E5C] outline-none transition focus:border-[#2F3E5C]">
+                                @error('disponibilidad_inicial') <span class="mt-1 block text-[9px] font-black text-[#E27D60] uppercase">{{ $message }}</span> @enderror
+                            </div>
+                            <div>
+                                <label class="mb-1 block text-[9px] font-black uppercase tracking-widest text-[#2F3E5C]">Área de Apoyo Preferente</label>
+                                <input type="text" wire:model="area_apoyo_preferente" placeholder="Ej. Recreación / Terapia" class="w-full h-10 rounded-xl border border-[#C7B5A3] bg-white px-4 py-2 text-sm font-bold text-[#2F3E5C] outline-none transition focus:border-[#2F3E5C]">
+                                @error('area_apoyo_preferente') <span class="mt-1 block text-[9px] font-black text-[#E27D60] uppercase">{{ $message }}</span> @enderror
+                            </div>
+                            <div>
+                                <label class="mb-1 block text-[9px] font-black uppercase tracking-widest text-[#2F3E5C]">Fecha de Ingreso *</label>
+                                <input type="date" wire:model="fecha_ingreso" {{ !$isEdit ? 'readonly tabindex="-1"' : '' }} class="w-full h-10 rounded-xl border border-[#C7B5A3] bg-[#F4EEE7] {{ !$isEdit ? 'opacity-70 pointer-events-none' : '' }} px-4 py-2 text-sm font-bold text-[#2F3E5C] outline-none transition focus:border-[#2F3E5C]">
+                                @error('fecha_ingreso') <span class="mt-1 block text-[9px] font-black text-[#E27D60] uppercase">{{ $message }}</span> @enderror
+                            </div>
                         </div>
                         @endif
-                        <div>
-                            <label class="mb-1 block text-[9px] font-black uppercase tracking-widest text-[#2F3E5C]/60">Acceso Sistema *</label>
-                            <select wire:model="acceso_sistema" class="w-full h-10 rounded-xl border border-[#C7B5A3] bg-white px-4 py-2 text-sm font-bold text-[#2F3E5C] outline-none transition focus:border-[#2F3E5C]">
-                                <option value="HABILITADO">HABILITADO</option>
-                                <option value="BLOQUEADO">BLOQUEADO</option>
-                            </select>
+
+                        {{-- Perfil Familiar --}}
+                        @if($rol === 'familiar')
+                        <div class="md:col-span-2 grid gap-4 border-t border-[#C7B5A3]/20 pt-3 animate-in fade-in duration-300">
+                            <div>
+                                <h4 class="text-[10px] font-black text-[#2F3E5C] uppercase tracking-widest">Detalle de Vínculo Familiar</h4>
+                            </div>
+                            <div>
+                                <label class="mb-1 block text-[9px] font-black uppercase tracking-widest text-[#2F3E5C]">Observación del Vínculo</label>
+                                <input type="text" wire:model="observacion_vinculo" placeholder="Ej. Hijo tutor legal de adulto mayor" class="w-full h-10 rounded-xl border border-[#C7B5A3] bg-white px-4 py-2 text-sm font-bold text-[#2F3E5C] outline-none transition focus:border-[#2F3E5C]">
+                                @error('observacion_vinculo') <span class="mt-1 block text-[9px] font-black text-[#E27D60] uppercase">{{ $message }}</span> @enderror
+                            </div>
                         </div>
+                        @endif
+
                     </div>
                 </div>
                 @endif
 
                 {{-- PASO 4: SEGURIDAD --}}
                 @if($pasoFormulario === 4)
-                <div class="space-y-4 animate-in slide-in-from-right-4 duration-300">
+                <div class="space-y-4 animate-in slide-in-from-right-4 duration-300" x-data="{ showPass: false, showConfirm: false }">
                     <div class="flex items-center gap-3 border-b border-[#C7B5A3]/30 pb-2">
                         <i class="ph-fill ph-shield-check text-xl text-[#E27D60]"></i>
                         <h3 class="text-xs font-black text-[#2F3E5C] uppercase tracking-widest">Seguridad de Acceso</h3>
@@ -939,36 +1150,146 @@
                     <div class="grid gap-4 md:grid-cols-2 max-w-2xl">
                         <div class="md:col-span-2">
                             @if(!$isEdit)
-                                <div class="bg-[#2F3E5C]/5 border-l-4 border-[#2F3E5C] p-4 rounded-r-xl">
-                                    <div class="flex items-center gap-2 mb-1">
-                                        <i class="ph-bold ph-magic-wand text-[#2F3E5C] text-lg"></i>
-                                        <h4 class="text-[10px] font-black text-[#2F3E5C] uppercase tracking-widest">Generación Automática</h4>
+                                @if(false) {{-- Ocultar el texto estático antiguo --}}
+                                <div class="bg-[#2F3E5C]/5 border-l-4 border-[#2F3E5C] p-4 rounded-r-xl space-y-2">
+                                    <div class="flex items-center gap-2">
+                                        <i class="ph-bold ph-key text-[#2F3E5C] text-lg"></i>
+                                        <h4 class="text-[10px] font-black text-[#2F3E5C] uppercase tracking-widest">Contraseña Temporal y Notificación</h4>
                                     </div>
-                                    <p class="text-[10px] font-bold text-[#2F3E5C]/70 leading-relaxed">
-                                        La contraseña temporal se generará automáticamente con los datos del usuario y su documento.
+                                    <p class="text-[10px] font-bold text-[#2F3E5C]/75 leading-relaxed">
+                                        Se generará una contraseña temporal de alta seguridad compleja (11 caracteres aleatorios, incluyendo mayúsculas, minúsculas, números y símbolos especiales) de manera totalmente automática al confirmar el registro.
+                                    </p>
+                                    <p class="text-[10px] font-black text-[#E27D60] uppercase leading-relaxed">
+                                        ⚠️ Se le enviará automáticamente un correo electrónico de bienvenida con sus credenciales de acceso inicial y una directiva obligatoria de cambio de contraseña al ingresar por primera vez.
                                     </p>
                                 </div>
+                                @endif
+
+                                <div class="space-y-4">
+                                     <div class="bg-[#2F3E5C]/5 border-l-4 border-[#2F3E5C] p-4 rounded-r-xl space-y-2">
+                                         <div class="flex items-center gap-2">
+                                             <i class="ph-bold ph-key text-[#2F3E5C] text-lg"></i>
+                                             <h4 class="text-[10px] font-black text-[#2F3E5C] uppercase tracking-widest">Contraseña Temporal de Acceso</h4>
+                                         </div>
+                                         <p class="text-[10px] font-bold text-[#2F3E5C]/75 leading-relaxed">
+                                             Esta es la contraseña temporal de alta seguridad generada por el sistema para el nuevo usuario. Puede copiarla o regenerar una nueva si lo desea.
+                                         </p>
+                                     </div>
+
+                                     <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 bg-[#FAF7F3] border border-[#C7B5A3]/40 p-4 rounded-2xl" x-data="{ showGenPass: false }">
+                                         <div class="relative flex-1">
+                                             <input :type="showGenPass ? 'text' : 'password'" 
+                                                    value="{{ $passwordTemporalVisual }}" 
+                                                    readonly
+                                                    class="w-full h-11 rounded-xl border border-[#C7B5A3] bg-white/70 pl-4 pr-24 py-2 text-sm font-mono font-black tracking-widest text-[#2F3E5C] outline-none">
+                                             
+                                             <div class="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
+                                                 <!-- Toggle eye button -->
+                                                 <button type="button" 
+                                                         @click="showGenPass = !showGenPass" 
+                                                         class="h-8 w-8 flex items-center justify-center rounded-lg text-[#2F3E5C]/60 hover:text-[#2F3E5C] hover:bg-[#2F3E5C]/5 transition"
+                                                         title="Mostrar/Ocultar contraseña">
+                                                     <i class="ph-bold text-base" :class="showGenPass ? 'ph-eye-slash' : 'ph-eye'"></i>
+                                                 </button>
+
+                                                 <!-- Clipboard copy button -->
+                                                 <button type="button" 
+                                                         onclick="navigator.clipboard.writeText('{{ $passwordTemporalVisual }}'); Swal.fire({ icon: 'success', title: 'Copiado', text: 'Contraseña temporal copiada al portapapeles.', timer: 2000, showConfirmButton: false, customClass: { popup: 'rounded-[1.5rem]' } })"
+                                                         class="h-8 w-8 flex items-center justify-center rounded-lg text-[#2F3E5C]/60 hover:text-[#2F3E5C] hover:bg-[#2F3E5C]/5 transition"
+                                                         title="Copiar al portapapeles">
+                                                     <i class="ph-bold ph-copy text-base"></i>
+                                                 </button>
+                                             </div>
+                                         </div>
+
+                                         <!-- Regenerate button -->
+                                         <button type="button" 
+                                                 wire:click="regenerarPasswordTemporal"
+                                                 class="h-11 px-5 inline-flex items-center justify-center gap-2 rounded-xl bg-[#E27D60] text-[10px] font-black uppercase text-white shadow-md shadow-[#E27D60]/20 hover:bg-[#d86c50] active:scale-95 transition">
+                                             <i class="ph-bold ph-arrows-clockwise text-sm"></i>
+                                             Regenerar contraseña temporal
+                                         </button>
+                                     </div>
+
+                                     <div class="bg-[#E27D60]/5 border-l-4 border-[#E27D60] p-4 rounded-r-xl">
+                                         <p class="text-[10px] font-black text-[#E27D60] uppercase leading-relaxed">
+                                             ⚠️ NOTA INSTITUCIONAL: Se le enviará automáticamente un correo electrónico de bienvenida con sus credenciales de acceso inicial y una directiva obligatoria de cambio de contraseña al ingresar por primera vez.
+                                         </p>
+                                     </div>
+                                 </div>
                             @else
-                                <div class="bg-[#E27D60]/5 border-l-4 border-[#E27D60] p-4 rounded-r-xl">
-                                    <p class="text-[10px] font-bold text-[#E27D60] leading-relaxed">
-                                        Deje en blanco si no desea cambiar la contraseña actual.
-                                    </p>
-                                </div>
+                                @if($usuarioId === auth()->id())
+                                    <div class="bg-[#E27D60]/5 border-l-4 border-[#E27D60] p-4 rounded-r-xl">
+                                        <p class="text-[10px] font-bold text-[#E27D60] leading-relaxed">
+                                            Deje en blanco la contraseña si no desea cambiar su contraseña actual. Al registrar una nueva contraseña, se actualizará su acceso de forma inmediata.
+                                        </p>
+                                    </div>
+                                @else
+                                    <div class="bg-[#2F3E5C]/5 border-l-4 border-[#2F3E5C] p-4 rounded-r-xl">
+                                        <p class="text-[10px] font-bold text-[#2F3E5C] leading-relaxed">
+                                            No se puede editar directamente la contraseña de otro usuario para mantener el cumplimiento de las políticas de privacidad y seguridad institucional.
+                                        </p>
+                                    </div>
+                                @endif
                             @endif
                         </div>
 
                         @if($isEdit)
-                        <div>
-                            <label class="mb-1 block text-[9px] font-black uppercase tracking-widest text-[#2F3E5C]/60">Nueva Contraseña</label>
-                            <input type="password" wire:model="password" placeholder="••••••••"
-                                   class="w-full h-10 rounded-xl border {{ $errors->has('password') ? 'border-[#E27D60]' : 'border-[#C7B5A3]' }} bg-white px-4 py-2 text-sm font-bold text-[#2F3E5C] outline-none transition focus:border-[#2F3E5C]">
-                            @error('password') <span class="mt-1 block text-[9px] font-black text-[#E27D60] uppercase">{{ $message }}</span> @enderror
-                        </div>
-                        <div>
-                            <label class="mb-1 block text-[9px] font-black uppercase tracking-widest text-[#2F3E5C]/60">Confirmar</label>
-                            <input type="password" wire:model="password_confirmation" placeholder="••••••••"
-                                   class="w-full h-10 rounded-xl border border-[#C7B5A3] bg-white px-4 py-2 text-sm font-bold text-[#2F3E5C] outline-none transition focus:border-[#2F3E5C]">
-                        </div>
+                            @if($usuarioId === auth()->id())
+                                <div class="md:col-span-2 grid gap-4 md:grid-cols-3">
+                                    <div x-data="{ showActual: false }">
+                                        <label class="mb-1 block text-[9px] font-black uppercase tracking-widest text-[#E27D60]">Contraseña Actual *</label>
+                                        <div class="relative">
+                                            <input :type="showActual ? 'text' : 'password'" wire:model="password_actual" placeholder="••••••••"
+                                                   class="w-full h-10 rounded-xl border {{ $errors->has('password_actual') ? 'border-[#E27D60]' : 'border-[#C7B5A3]' }} bg-white pl-4 pr-10 py-2 text-sm font-bold text-[#2F3E5C] outline-none transition focus:border-[#2F3E5C]">
+                                            <button type="button" @click="showActual = !showActual" class="absolute right-3 top-1/2 -translate-y-1/2 text-[#2F3E5C]/40 hover:text-[#2F3E5C] transition focus:outline-none">
+                                                <i class="ph-bold text-base" :class="showActual ? 'ph-eye-slash' : 'ph-eye'"></i>
+                                            </button>
+                                        </div>
+                                        @error('password_actual') <span class="mt-1 block text-[9px] font-black text-[#E27D60] uppercase">{{ $message }}</span> @enderror
+                                    </div>
+                                    <div>
+                                        <label class="mb-1 block text-[9px] font-black uppercase tracking-widest text-[#2F3E5C]/60">Nueva Contraseña</label>
+                                        <div class="relative">
+                                            <input :type="showPass ? 'text' : 'password'" wire:model="password" placeholder="••••••••"
+                                                   class="w-full h-10 rounded-xl border {{ $errors->has('password') ? 'border-[#E27D60]' : 'border-[#C7B5A3]' }} bg-white pl-4 pr-10 py-2 text-sm font-bold text-[#2F3E5C] outline-none transition focus:border-[#2F3E5C]">
+                                            <button type="button" @click="showPass = !showPass" class="absolute right-3 top-1/2 -translate-y-1/2 text-[#2F3E5C]/40 hover:text-[#2F3E5C] transition focus:outline-none">
+                                                <i class="ph-bold text-base" :class="showPass ? 'ph-eye-slash' : 'ph-eye'"></i>
+                                            </button>
+                                        </div>
+                                        @error('password') <span class="mt-1 block text-[9px] font-black text-[#E27D60] uppercase">{{ $message }}</span> @enderror
+                                    </div>
+                                    <div>
+                                        <label class="mb-1 block text-[9px] font-black uppercase tracking-widest text-[#2F3E5C]/60">Confirmar Contraseña</label>
+                                        <div class="relative">
+                                            <input :type="showConfirm ? 'text' : 'password'" wire:model="password_confirmation" placeholder="••••••••"
+                                                   class="w-full h-10 rounded-xl border border-[#C7B5A3] bg-white pl-4 pr-10 py-2 text-sm font-bold text-[#2F3E5C] outline-none transition focus:border-[#2F3E5C]">
+                                            <button type="button" @click="showConfirm = !showConfirm" class="absolute right-3 top-1/2 -translate-y-1/2 text-[#2F3E5C]/40 hover:text-[#2F3E5C] transition focus:outline-none">
+                                                <i class="ph-bold text-base" :class="showConfirm ? 'ph-eye-slash' : 'ph-eye'"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            @else
+                                <div class="md:col-span-2 flex flex-col items-center justify-center p-6 bg-[#2F3E5C]/5 border border-[#2F3E5C]/15 rounded-2xl space-y-3">
+                                    <div class="flex h-12 w-12 items-center justify-center rounded-full bg-[#E27D60]/20 text-[#E27D60] shadow-sm">
+                                        <i class="ph-bold ph-key text-xl animate-bounce"></i>
+                                    </div>
+                                    <div class="text-center max-w-md">
+                                        <h4 class="text-xs font-black text-[#2F3E5C] uppercase tracking-wider">Restablecimiento de Credenciales</h4>
+                                        <p class="mt-1 text-[10px] font-semibold text-[#2F3E5C]/65 leading-relaxed">
+                                            Para mantener altos estándares de seguridad, no se puede ver ni editar directamente la contraseña actual de otro usuario.
+                                            Presione el botón para generar una clave temporal de 11 caracteres que se notificará de forma automatizada por correo electrónico.
+                                        </p>
+                                    </div>
+                                    <button type="button"
+                                            wire:click="restablecerPasswordUsuario('{{ $usuarioId }}')"
+                                            wire:confirm="¿Está seguro de que desea restablecer la contraseña de este usuario? Se generará una clave temporal y se le enviará por correo."
+                                            class="inline-flex items-center gap-2 rounded-xl bg-[#2F3E5C] px-5 py-2.5 text-[9px] font-black uppercase tracking-wider text-white shadow-md hover:bg-[#E27D60] active:scale-95 transition-all duration-300">
+                                        <i class="ph-bold ph-arrow-counter-clockwise text-xs"></i> Restablecer Contraseña Temporal
+                                    </button>
+                                </div>
+                            @endif
                         @endif
                     </div>
                 </div>
@@ -976,61 +1297,97 @@
 
                 {{-- PASO 5: CONFIRMACIÓN --}}
                 @if($pasoFormulario === 5)
-                <div class="space-y-4 animate-in zoom-in duration-300">
+                <div class="space-y-4 animate-in zoom-in duration-300" x-data="{ showPassSummary: false }">
                     <div class="flex items-center gap-3 border-b border-[#C7B5A3]/30 pb-2">
                         <i class="ph-fill ph-check-square text-xl text-[#E27D60]"></i>
-                        <h3 class="text-xs font-black text-[#2F3E5C] uppercase tracking-widest">Resumen Final</h3>
+                        <h3 class="text-xs font-black text-[#2F3E5C] uppercase tracking-widest">Resumen de Registro</h3>
                     </div>
                     <div class="grid gap-4 lg:grid-cols-2">
-                        <div class="rounded-xl bg-white/50 p-4 border border-[#C7B5A3]/40">
-                            <div class="flex items-center gap-3 mb-4">
-                                <div class="h-10 w-10 rounded-xl bg-[#2F3E5C] flex items-center justify-center text-white text-lg font-black shadow-lg">
-                                    {{ mb_substr($nombres, 0, 1) }}{{ mb_substr($ap_paterno ?? 'U', 0, 1) }}
-                                </div>
+                        <div class="rounded-xl bg-white/50 p-5 border border-[#C7B5A3]/40 space-y-4">
+                            <div class="flex items-center gap-4">
+                                @if($foto_de_perfil_upload)
+                                    <img src="{{ $foto_de_perfil_upload->temporaryUrl() }}" 
+                                         class="h-16 w-16 rounded-[1.1rem] object-cover ring-2 ring-[#E27D60] shadow">
+                                @elseif($isEdit && $cod_usu && \App\Models\User::find($cod_usu)?->foto_de_perfil)
+                                    <img src="{{ asset('storage/' . \App\Models\User::find($cod_usu)->foto_de_perfil) }}" 
+                                         class="h-16 w-16 rounded-[1.1rem] object-cover ring-2 ring-[#2F3E5C]/30 shadow">
+                                @else
+                                    <div class="flex h-16 w-16 items-center justify-center rounded-[1.1rem] bg-[#2F3E5C] text-xl font-black text-white shadow uppercase">
+                                        {{ mb_substr($nombres ?? 'U', 0, 1) }}{{ mb_substr($ap_paterno ?? 'I', 0, 1) }}
+                                    </div>
+                                @endif
                                 <div>
-                                    <h4 class="text-sm font-black text-[#2F3E5C] uppercase leading-tight">{{ $nombres }} {{ $ap_paterno }}</h4>
-                                    <p class="text-[8px] font-black text-[#E27D60] uppercase tracking-widest">{{ str_replace('_', ' ', $rol) }}</p>
+                                    <h4 class="text-sm font-black text-[#2F3E5C] uppercase leading-tight">{{ $nombres }} {{ $ap_paterno }} {{ $ap_materno }}</h4>
+                                    <span class="inline-block mt-1 px-2.5 py-0.5 rounded-full bg-[#E27D60]/10 text-[#E27D60] text-[8px] font-black uppercase tracking-widest border border-[#E27D60]/15">
+                                        {{ str_replace('_', ' ', $rol) }}
+                                    </span>
                                 </div>
                             </div>
-                            <div class="grid grid-cols-2 gap-3">
-                                <div class="space-y-0.5">
-                                    <p class="text-[8px] font-black text-[#2F3E5C]/40 uppercase">Documento</p>
-                                    <p class="text-[10px] font-black text-[#2F3E5C] uppercase">{{ $numero_documento }} {{ $expedido }}</p>
+                            <div class="grid grid-cols-2 gap-3 border-t border-[#C7B5A3]/20 pt-3">
+                                <div>
+                                    <p class="text-[8px] font-black text-[#2F3E5C]/40 uppercase tracking-wider">Documento Identidad</p>
+                                    <p class="text-[10px] font-black text-[#2F3E5C] uppercase mt-0.5">{{ $numero_documento }} {{ $expedido }}</p>
                                 </div>
-                                <div class="space-y-0.5">
-                                    <p class="text-[8px] font-black text-[#2F3E5C]/40 uppercase">Celular</p>
-                                    <p class="text-[10px] font-black text-[#2F3E5C]">{{ $codigo_telefono }} {{ $telefono }}</p>
+                                <div>
+                                    <p class="text-[8px] font-black text-[#2F3E5C]/40 uppercase tracking-wider">Nacionalidad / Emisor</p>
+                                    <p class="text-[10px] font-black text-[#2F3E5C] uppercase mt-0.5">{{ $pais_documento }}</p>
                                 </div>
-                                <div class="col-span-2 space-y-0.5">
-                                    <p class="text-[8px] font-black text-[#2F3E5C]/40 uppercase">Correo</p>
-                                    <p class="text-[10px] font-black text-[#2F3E5C] lowercase">{{ $correo }}</p>
+                                <div>
+                                    <p class="text-[8px] font-black text-[#2F3E5C]/40 uppercase tracking-wider">Celular de Contacto</p>
+                                    <p class="text-[10px] font-black text-[#2F3E5C] mt-0.5">{{ $codigo_telefono }} {{ $telefono }}</p>
+                                </div>
+                                <div>
+                                    <p class="text-[8px] font-black text-[#2F3E5C]/40 uppercase tracking-wider">Correo Institucional</p>
+                                    <p class="text-[10px] font-black text-[#2F3E5C] lowercase mt-0.5 truncate">{{ $correo }}</p>
+                                </div>
+                                <div class="col-span-2 border-t border-[#C7B5A3]/10 pt-2">
+                                    <p class="text-[8px] font-black text-[#2F3E5C]/40 uppercase tracking-wider">Dirección Domicilio</p>
+                                    <p class="text-[10px] font-black text-[#2F3E5C] mt-0.5 leading-tight">
+                                        {{ $direccion ?: 'No registrada' }} {{ $zona ? '('.$zona.')' : '' }} {{ $ciudad ? '- '.$ciudad : '' }}
+                                    </p>
                                 </div>
                             </div>
                         </div>
-                        <div class="rounded-xl bg-white/50 p-4 border border-[#C7B5A3]/40 flex flex-col justify-between">
+
+                        <div class="rounded-xl bg-white/50 p-5 border border-[#C7B5A3]/40 flex flex-col justify-between space-y-4">
                             <div class="space-y-3">
-                                <div class="flex justify-between items-center text-[9px] font-black uppercase tracking-widest">
-                                    <span class="text-[#2F3E5C]/50">Estado Inicial:</span>
-                                    <span class="text-[#63775B] font-black bg-[#63775B]/10 px-2 py-0.5 rounded">{{ $usuarioId ? $estado : 'ACTIVO' }}</span>
-                                </div>
-                                <div class="flex justify-between items-center text-[9px] font-black uppercase tracking-widest">
-                                    <span class="text-[#2F3E5C]/50">Acceso Sistema:</span>
-                                    <span class="text-[#2F3E5C]">{{ $acceso_sistema }}</span>
-                                </div>
-                                @if(!$usuarioId)
-                                <div class="mt-2 p-3 bg-[#2F3E5C] rounded-xl">
-                                    <div class="flex items-center gap-2 mb-1">
-                                        <i class="ph-bold ph-lock-key text-white text-base"></i>
-                                        <span class="text-[8px] font-black text-white/70 uppercase">Credenciales</span>
+                                @if(!$isEdit && $passwordTemporalVisual)
+                                <div class="p-3 bg-[#E27D60]/10 border border-[#E27D60]/20 rounded-xl space-y-1 text-center">
+                                    <span class="text-[8px] font-black text-[#E27D60] uppercase tracking-widest block">Contraseña Temporal Generada:</span>
+                                    <div class="flex items-center justify-center gap-2 mt-1">
+                                        <div class="text-sm font-mono font-black text-[#2F3E5C] bg-white border border-[#C7B5A3]/30 px-3 py-1.5 rounded-lg select-all cursor-pointer inline-flex items-center gap-2" title="Click para copiar">
+                                            <span x-text="showPassSummary ? '{{ $passwordTemporalVisual }}' : '••••••••••••'"></span>
+                                        </div>
+                                        <button type="button" @click="showPassSummary = !showPassSummary" class="flex h-9 w-9 items-center justify-center rounded-xl bg-white border border-[#C7B5A3]/30 text-[#2F3E5C]/50 hover:text-[#2F3E5C] transition shadow-sm active:scale-95">
+                                            <i class="ph-bold" :class="showPassSummary ? 'ph-eye-slash' : 'ph-eye'"></i>
+                                        </button>
                                     </div>
-                                    <p class="text-[9px] font-bold text-white leading-relaxed">
-                                        Se generará una contraseña temporal institucional.
+                                    <p class="text-[8px] text-[#2F3E5C]/50 font-bold leading-normal">
+                                        Esta clave se enviará al correo y no se volverá a mostrar en el panel por razones de seguridad.
                                     </p>
                                 </div>
                                 @endif
+
+                                <div class="space-y-1">
+                                    <span class="text-[8px] font-black text-[#2F3E5C]/40 uppercase tracking-widest block">Próximos Pasos de Cumplimiento:</span>
+                                    <div class="bg-white/80 p-3 rounded-xl border border-[#C7B5A3]/20 text-[9px] font-bold text-[#2F3E5C]/75 space-y-2">
+                                        <div class="flex items-center gap-2">
+                                            <i class="ph-bold ph-square text-[#E27D60]"></i>
+                                            <span>Asignar Turnos y Horarios Semanales</span>
+                                        </div>
+                                        <div class="flex items-center gap-2">
+                                            <i class="ph-bold ph-square text-[#E27D60]"></i>
+                                            <span>Validación de Carpeta de Documentación Obligatoria</span>
+                                        </div>
+                                        <div class="flex items-center gap-2">
+                                            <i class="ph-bold ph-square text-[#E27D60]"></i>
+                                            <span>Primer Acceso con Cambio de Clave Obligatorio</span>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                            <p class="mt-3 text-[9px] font-bold text-[#2F3E5C]/40 text-center leading-relaxed italic">
-                                Al confirmar, se {{ $usuarioId ? 'actualizarán los datos' : 'creará el registro' }} institucional.
+                            <p class="text-[9px] font-bold text-[#2F3E5C]/45 text-center leading-relaxed italic">
+                                Al confirmar, se guardará de manera definitiva este expediente de personal institucional.
                             </p>
                         </div>
                     </div>

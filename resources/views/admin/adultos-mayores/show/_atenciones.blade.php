@@ -38,7 +38,7 @@
                             @endphp
                             <tr class="group transition hover:bg-[#F2EBE3]/40">
                                 <td class="px-6 py-4 whitespace-nowrap">
-                                    <p class="text-xs font-black text-[#2F3E5C]">{{ optional($atencionObj)->fecha ? Carbon::parse($atencionObj->fecha)->format('d/m/Y') : 'N/D' }}</p>
+                                    <p class="text-xs font-black text-[#2F3E5C]">{{ optional($atencionObj)->fecha ? \Carbon\Carbon::parse($atencionObj->fecha)->format('d/m/Y') : 'N/D' }}</p>
                                     <p class="text-[10px] font-bold text-[#2F3E5C]/50">{{ optional($atencionObj)->hora ? substr($atencionObj->hora, 0, 5) : '--:--' }}</p>
                                 </td>
                                 <td class="px-6 py-4">

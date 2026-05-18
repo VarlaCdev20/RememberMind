@@ -93,9 +93,8 @@
                     'items' => array_filter([
                         auth()->user()->can('usuarios.ver') ? ['label' => 'Usuarios', 'route' => 'admin.usuarios.index'] : null,
                         auth()->user()->can('roles.ver') ? ['label' => 'Roles y permisos', 'route' => 'admin.roles-permisos.index'] : null,
-                        ['label' => 'Personal institucional', 'route' => null],
                         auth()->user()->can('areas.ver') ? ['label' => 'Áreas institucionales', 'route' => 'admin.areas-institucionales.index'] : null,
-                        ['label' => 'Turnos y asignaciones', 'route' => null],
+                        auth()->user()->can('turnos.ver') ? ['label' => 'Horarios y asignaciones', 'route' => 'admin.turnos-asignaciones.index'] : null,
                         auth()->user()->can('bitacora.ver') ? ['label' => 'Bitácora y auditoría', 'route' => 'admin.bitacora.index'] : null,
                     ]),
                 ],

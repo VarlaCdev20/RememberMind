@@ -909,24 +909,24 @@
                     </div>
                     <div class="flex gap-2">
                         @if($reporteTipo === 'general')
-                            <button type="button"
-                                    wire:click="exportarReporteGeneralPdf"
-                                    class="flex h-8 items-center gap-2 rounded-lg bg-[#E27D60] px-3 text-xs font-black text-white hover:bg-[#d86c50] transition duration-200">
+                            <a href="{{ route('admin.areas-institucionales.reportes.general.pdf') }}"
+                               target="_blank"
+                               class="flex h-8 items-center gap-2 rounded-lg bg-[#E27D60] px-3 text-xs font-black text-white hover:bg-[#d86c50] transition duration-200">
                                 <i class="ph-bold ph-file-pdf"></i>
                                 Exportar PDF
-                            </button>
-                            <button type="button"
-                                    wire:click="exportarAreasExcel"
-                                    class="flex h-8 items-center gap-2 rounded-lg bg-[#8DA280] px-3 text-xs font-black text-white hover:bg-[#7b8e6f] transition duration-200">
+                            </a>
+                            <a href="{{ route('admin.areas-institucionales.reportes.general.excel') }}"
+                               target="_blank"
+                               class="flex h-8 items-center gap-2 rounded-lg bg-[#8DA280] px-3 text-xs font-black text-white hover:bg-[#7b8e6f] transition duration-200">
                                 <i class="ph-bold ph-file-xls"></i>
                                 Exportar Excel
-                            </button>
-                            <button type="button"
-                                    wire:click="exportarReporteGeneralCsv"
-                                    class="flex h-8 items-center gap-2 rounded-lg bg-[#967B66] px-3 text-xs font-black text-white hover:bg-[#836c59] transition duration-200">
+                            </a>
+                            <a href="{{ route('admin.areas-institucionales.reportes.general.csv') }}"
+                               target="_blank"
+                               class="flex h-8 items-center gap-2 rounded-lg bg-[#967B66] px-3 text-xs font-black text-white hover:bg-[#836c59] transition duration-200">
                                 <i class="ph-bold ph-file-csv"></i>
                                 Exportar CSV
-                            </button>
+                            </a>
                             <button type="button"
                                     wire:click="imprimirReporteGeneral"
                                     class="flex h-8 items-center gap-2 rounded-lg bg-[#63775B] px-3 text-xs font-black text-white hover:bg-[#52624b] transition duration-200">
@@ -934,18 +934,18 @@
                                 Imprimir
                             </button>
                         @elseif($reporteTipo === 'especifico' && isset($reporteData['area']))
-                            <button type="button"
-                                    wire:click="exportarReporteAreaPdf('{{ $reporteData['area']['cod_area'] }}')"
-                                    class="flex h-8 items-center gap-2 rounded-lg bg-[#E27D60] px-3 text-xs font-black text-white hover:bg-[#d86c50] transition duration-200">
+                            <a href="{{ route('admin.areas-institucionales.reportes.area.pdf', $reporteData['area']['cod_area']) }}"
+                               target="_blank"
+                               class="flex h-8 items-center gap-2 rounded-lg bg-[#E27D60] px-3 text-xs font-black text-white hover:bg-[#d86c50] transition duration-200">
                                 <i class="ph-bold ph-file-pdf"></i>
                                 Exportar PDF
-                            </button>
-                            <button type="button"
-                                    wire:click="exportarUsuariosAreaExcel('{{ $reporteData['area']['cod_area'] }}')"
-                                    class="flex h-8 items-center gap-2 rounded-lg bg-[#8DA280] px-3 text-xs font-black text-white hover:bg-[#7b8e6f] transition duration-200">
+                            </a>
+                            <a href="{{ route('admin.areas-institucionales.reportes.area.excel', $reporteData['area']['cod_area']) }}"
+                               target="_blank"
+                               class="flex h-8 items-center gap-2 rounded-lg bg-[#8DA280] px-3 text-xs font-black text-white hover:bg-[#7b8e6f] transition duration-200">
                                 <i class="ph-bold ph-file-xls"></i>
                                 Exportar Excel
-                            </button>
+                            </a>
                             <button type="button"
                                     wire:click="imprimirReporteArea('{{ $reporteData['area']['cod_area'] }}')"
                                     class="flex h-8 items-center gap-2 rounded-lg bg-[#63775B] px-3 text-xs font-black text-white hover:bg-[#52624b] transition duration-200">
@@ -1452,7 +1452,7 @@
                                                     if ($u->personalSalud && $u->personalSalud->especialidad) {
                                                         $cargoEspecialidad = $u->personalSalud->especialidad->nombre;
                                                     } elseif ($u->personalAdmin) {
-                                                        $cargoEspecialidad = $u->personalAdmin->cargoAdmin??->nombre ?? $u->personalAdmin->cargo ?? 'Personal Administrativo';
+                                                        $cargoEspecialidad = $u->personalAdmin->cargoAdmin?->nombre ?? $u->personalAdmin->cargo ?? 'Personal Administrativo';
                                                     }
                                                     $rolName = $u->getRoleNames()->first() ?? 'Sin Rol';
                                                     $rolLimpio = strtoupper(str_replace('_', ' ', $rolName));

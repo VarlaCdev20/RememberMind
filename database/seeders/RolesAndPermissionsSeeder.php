@@ -32,7 +32,34 @@ class RolesAndPermissionsSeeder extends Seeder
             'turnos.crear',
             'turnos.editar',
             'turnos.cambiar_estado',
+            'turnos.asignar',
+            'turnos.finalizar',
+            'turnos.reportes',
             'bitacora.ver',
+
+            // Nuevos permisos de Ficha de Usuario
+            'documentos_usuarios.ver',
+            'documentos_usuarios.subir',
+            'documentos_usuarios.validar',
+            'documentos_usuarios.observar',
+            'documentos_usuarios.reemplazar',
+            'documentos_usuarios.anular',
+            'documentos_usuarios.descargar',
+            'documentos_usuarios.reportes',
+            
+            'usuarios.acceso.ver',
+            'usuarios.acceso.bloquear',
+            'usuarios.acceso.restablecer_password',
+            
+            'usuarios.historial.ver',
+            
+            'usuarios.reportes',
+            'usuarios.reportes.pdf',
+            'usuarios.reportes.excel',
+            
+            'usuarios.horarios.ver',
+            'usuarios.horarios.asignar',
+            'usuarios.horarios.finalizar',
 
             // Adultos mayores
             'adultos.ver',
@@ -119,7 +146,6 @@ class RolesAndPermissionsSeeder extends Seeder
         // 4. Asignar permisos
 
         // ADMIN: Todos los permisos creados arriba.
-        // Usar $permisos en lugar de Permission::all() previene re-asignar permisos obsoletos como adulto_mayor.eliminar
         $roleAdmin->syncPermissions($permisos);
 
         // PERSONAL ADMIN
@@ -127,6 +153,32 @@ class RolesAndPermissionsSeeder extends Seeder
             'usuarios.ver',
             'areas.ver',
             'areas.reportes',
+            'turnos.ver',
+            'turnos.crear',
+            'turnos.editar',
+            'turnos.asignar',
+            'turnos.finalizar',
+            'turnos.reportes',
+            
+            // Permisos de Ficha del Usuario
+            'documentos_usuarios.ver',
+            'documentos_usuarios.subir',
+            'documentos_usuarios.validar',
+            'documentos_usuarios.observar',
+            'documentos_usuarios.reemplazar',
+            'documentos_usuarios.descargar',
+            'documentos_usuarios.reportes',
+            'usuarios.acceso.ver',
+            'usuarios.acceso.bloquear',
+            'usuarios.acceso.restablecer_password',
+            'usuarios.historial.ver',
+            'usuarios.reportes',
+            'usuarios.reportes.pdf',
+            'usuarios.reportes.excel',
+            'usuarios.horarios.ver',
+            'usuarios.horarios.asignar',
+            'usuarios.horarios.finalizar',
+
             'adultos.ver',
             'adultos.crear',
             'adultos.editar',
@@ -159,6 +211,8 @@ class RolesAndPermissionsSeeder extends Seeder
         // PERSONAL SALUD
         $rolePersonalSalud->syncPermissions([
             'areas.ver',
+            'turnos.ver',
+            'turnos.reportes',
             'adultos.ver',
             'adultos.ver_expediente',
             'salud.ver',
@@ -199,6 +253,7 @@ class RolesAndPermissionsSeeder extends Seeder
             'asistencia.registrar',
             'observaciones.ver',
             'observaciones.crear',
+            'turnos.ver',
         ]);
 
         // FAMILIAR

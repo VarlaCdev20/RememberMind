@@ -6,12 +6,13 @@ use App\Models\User;
 use Spatie\Permission\Models\Role;
 use Livewire\Component;
 use Livewire\WithPagination;
+use Livewire\WithFileUploads;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 
 class UsuariosPanel extends Component
 {
-    use WithPagination;
+    use WithPagination, WithFileUploads;
 
     // ── Filtros ──
     public $search = '';
@@ -39,20 +40,64 @@ class UsuariosPanel extends Component
     public $expedido;
     public $correo;
     public $telefono;
-    public $pais_telefono = 'Bolivia';
-    public $codigo_telefono = '+591';
+    public $pais_telefono = '';
+    public $codigo_telefono = '';
     public $rol;
     public $cod_area;
     public $estado = 'ACTIVO';
     public $acceso_sistema = 'HABILITADO';
     public $observaciones;
     public $password;
+    public $password_actual;
     public $password_confirmation;
 
     // ── Campos condicionales (Personal Salud/Admin) ──
     public $fecha_ingreso;
     public $especialidad_salud;
     public $cargo_administrativo;
+
+    // ── Campos adicionales ──
+    public $direccion;
+    public $zona;
+    public $ciudad;
+    public $contacto_emergencia;
+    public $parentesco_emergencia;
+    public $celular_emergencia;
+    public $tipo_vinculacion = 'CONTRATO';
+    public $matricula_prof;
+    public $institucion_formacion;
+    public $disponibilidad_inicial;
+    public $area_apoyo_preferente;
+    public $observacion_vinculo;
+
+    // ── Nuevas propiedades de Domicilio y Emergencia ──
+    public $calle;
+    public $nro_domicilio;
+    public $ap_paterno_emergencia;
+    public $ap_materno_emergencia;
+
+    // ── Foto de perfil upload y datos auxiliares ──
+    public $foto_de_perfil_upload;
+    public $edad = null;
+    public $passwordTemporalVisual = null;
+
+    // ── Paises y codigos ──
+    public array $paisesConfig = [
+        'Bolivia' => ['codigo' => '+591', 'doc' => 'CI', 'placeholder' => 'Ej. 70012345'],
+        'Argentina' => ['codigo' => '+54', 'doc' => 'DNI', 'placeholder' => 'Ej. 1112345678'],
+        'Brasil' => ['codigo' => '+55', 'doc' => 'CPF', 'placeholder' => 'Ej. 11912345678'],
+        'Chile' => ['codigo' => '+56', 'doc' => 'RUT', 'placeholder' => 'Ej. 912345678'],
+        'Perú' => ['codigo' => '+51', 'doc' => 'DNI', 'placeholder' => 'Ej. 912345678'],
+        'Paraguay' => ['codigo' => '+595', 'doc' => 'Cédula de Identidad', 'placeholder' => 'Ej. 971123456'],
+        'Uruguay' => ['codigo' => '+598', 'doc' => 'Cédula de Identidad', 'placeholder' => 'Ej. 99123456'],
+        'Colombia' => ['codigo' => '+57', 'doc' => 'Cédula de Ciudadanía', 'placeholder' => 'Ej. 3001234567'],
+        'Ecuador' => ['codigo' => '+593', 'doc' => 'Cédula', 'placeholder' => 'Ej. 991234567'],
+        'Venezuela' => ['codigo' => '+58', 'doc' => 'Cédula', 'placeholder' => 'Ej. 4121234567'],
+        'México' => ['codigo' => '+52', 'doc' => 'CURP', 'placeholder' => 'Ej. 5512345678'],
+        'España' => ['codigo' => '+34', 'doc' => 'DNI', 'placeholder' => 'Ej. 612345678'],
+        'Estados Unidos' => ['codigo' => '+1', 'doc' => 'SSN', 'placeholder' => 'Ej. 2025550199'],
+        'Otro' => ['codigo' => '', 'doc' => 'Pasaporte', 'placeholder' => 'Ej. 123456789']
+    ];
 
     // ── Ficha Rápida Flotante (panel lateral derecho) ──
     public bool $mostrarFichaRapida = false;
@@ -66,38 +111,204 @@ class UsuariosPanel extends Component
     protected $listeners = ['usuario-guardado' => '$refresh'];
 
     // ══════════════════════════════════════════════
+    // REACTIVE LIFECYCLE HOOKS
+    // ══════════════════════════════════════════════
+
+    public function updatedPaisTelefono($val)
+    {
+        if (empty($val)) {
+            $this->codigo_telefono = '';
+            return;
+        }
+        if (isset($this->paisesConfig[$val])) {
+            $this->codigo_telefono = $this->paisesConfig[$val]['codigo'];
+        }
+    }
+
+    public function updatedPaisDocumento($val)
+    {
+        if (empty($val)) {
+            $this->tipo_documento = '';
+            $this->pais_telefono = '';
+            $this->codigo_telefono = '';
+            return;
+        }
+        if (isset($this->paisesConfig[$val])) {
+            $this->tipo_documento = $this->paisesConfig[$val]['doc'];
+            $this->pais_telefono = $val;
+            $this->codigo_telefono = $this->paisesConfig[$val]['codigo'];
+        }
+        if ($val !== 'Bolivia') {
+            $this->expedido = null;
+        }
+    }
+
+    public function updatedFechaNacimiento($val)
+    {
+        if (empty($val)) {
+            $this->edad = null;
+            return;
+        }
+        try {
+            $nac = \Carbon\Carbon::parse($val);
+            $this->edad = $nac->age;
+        } catch (\Exception $e) {
+            $this->edad = null;
+        }
+    }
+
+    public function updatedRol($val)
+    {
+        if ($val === 'voluntario') {
+            $this->cod_area = 'ARE_0008'; // Voluntariado y Relaciones Institucionales
+            $this->especialidad_salud = null;
+            $this->cargo_administrativo = null;
+        } elseif ($val === 'familiar') {
+            $this->cod_area = null;
+            $this->especialidad_salud = null;
+            $this->cargo_administrativo = null;
+        } elseif ($val === 'personal_salud') {
+            $this->cargo_administrativo = null;
+            $this->cod_area = 'ARE_0004'; // Sugerencia inicial
+        } elseif ($val === 'personal_admin') {
+            $this->especialidad_salud = null;
+            $this->cod_area = 'ARE_0003'; // Sugerencia inicial
+        }
+    }
+
+    public function updatedEspecialidadSalud($val)
+    {
+        if ($this->rol !== 'personal_salud') return;
+        
+        $esp = \App\Models\Especialidad::find($val);
+        if ($esp) {
+            $nombre = strtoupper($esp->nombre);
+            if (in_array($nombre, ['ENFERMERÍA', 'GERIATRÍA', 'NUTRICIÓN', 'FISIOTERAPIA'])) {
+                $this->cod_area = 'ARE_0004'; // Área de Atención Médica
+            } elseif (in_array($nombre, ['PSICOLOGÍA', 'PEDAGOGÍA'])) {
+                $this->cod_area = 'ARE_0005'; // Área de Psicología y Seguimiento Cognitivo
+            }
+        }
+    }
+
+    public function updatedCargoAdministrativo($val)
+    {
+        if ($this->rol !== 'personal_admin') return;
+        
+        $cargo = \App\Models\CargoAdministrativo::find($val);
+        if ($cargo) {
+            $nombre = strtoupper($cargo->nombre);
+            if (str_contains($nombre, 'COORDINACIÓN DE PROGRAMAS') || str_contains($nombre, 'PROGRAMAS')) {
+                $this->cod_area = 'ARE_0002'; // Coordinación de Programas y Servicios
+            } elseif (str_contains($nombre, 'DIRECCIÓN')) {
+                $this->cod_area = 'ARE_0001'; // Dirección General
+            } else {
+                $this->cod_area = 'ARE_0003'; // Área Administrativa y Registro Institucional
+            }
+        }
+    }
+
+
+    public function updatedCorreo($val)
+    {
+        $this->correo = strtolower(trim($val));
+    }
+
+    // ══════════════════════════════════════════════
     // VALIDACIÓN
     // ══════════════════════════════════════════════
 
     public function rules()
     {
         $rules = [
-            'nombres' => ['required', 'string', 'max:255'],
-            'ap_paterno' => ['required', 'string', 'max:255'],
-            'ap_materno' => ['nullable', 'string', 'max:255'],
-            'fecha_nacimiento' => ['required', 'date', 'before:today'],
-            'genero' => ['required', 'string'],
+            'nombres' => ['required', 'string', 'max:255', 'regex:/^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s\-]+$/u'],
+            'ap_paterno' => ['required_without:ap_materno', 'nullable', 'string', 'max:100', 'regex:/^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s\-]+$/u'],
+            'ap_materno' => ['required_without:ap_paterno', 'nullable', 'string', 'max:100', 'regex:/^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s\-]+$/u'],
+            'fecha_nacimiento' => [
+                'required', 
+                'date', 
+                function ($attribute, $value, $fail) {
+                    try {
+                        $nac = \Carbon\Carbon::parse($value);
+                        if ($nac->isFuture()) {
+                            $fail('La fecha de nacimiento no puede ser una fecha futura.');
+                            return;
+                        }
+                        $edad = $nac->age;
+                        if ($edad < 16) {
+                            $fail('El usuario registrado debe tener al menos 16 años.');
+                        }
+                        if ($edad > 60) {
+                            $fail('El usuario registrado no puede superar los 60 años.');
+                        }
+                    } catch (\Exception $e) {
+                        $fail('La fecha de nacimiento no es válida.');
+                    }
+                }
+            ],
+            'genero' => ['required', 'string', 'in:FEMENINO,MASCULINO'],
             'pais_documento' => ['required', 'string'],
             'tipo_documento' => ['required', 'string'],
             'numero_documento' => ['required', 'string', 'max:50'],
-            'correo' => ['required', 'string', 'email', 'max:255', Rule::unique('users', 'correo')->ignore($this->usuarioId, 'cod_usu')],
+            'correo' => [
+                'required',
+                'string',
+                'email',
+                'max:255',
+                Rule::unique('users', 'correo')->ignore($this->usuarioId, 'cod_usu'),
+                function ($attribute, $value, $fail) {
+                    $dominio = env('INSTITUTIONAL_EMAIL_DOMAIN');
+                    if (!empty($dominio)) {
+                        $dominio = strtolower(trim($dominio));
+                        if (!str_ends_with(strtolower($value), '@' . $dominio)) {
+                            $fail("El correo debe pertenecer al dominio institucional (@{$dominio}).");
+                        }
+                    }
+                }
+            ],
             'telefono' => ['required', 'string', 'max:20'],
+            'calle' => ['required', 'string', 'min:2', 'max:150'],
+            'nro_domicilio' => ['required', 'string', 'max:20'],
+            'zona' => ['required', 'string', 'min:2', 'max:100'],
+            'ciudad' => ['required', 'string', 'min:2', 'max:100'],
+            'contacto_emergencia' => ['required', 'string', 'min:2', 'max:150', 'regex:/^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s\-]+$/u'],
+            'ap_paterno_emergencia' => ['required_without:ap_materno_emergencia', 'nullable', 'string', 'max:100', 'regex:/^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s\-]+$/u'],
+            'ap_materno_emergencia' => ['required_without:ap_paterno_emergencia', 'nullable', 'string', 'max:100', 'regex:/^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s\-]+$/u'],
+            'parentesco_emergencia' => ['required', 'string', 'max:100'],
+            'celular_emergencia' => ['required', 'string', 'max:20', 'different:telefono', 'regex:/^\d+$/'],
             'rol' => ['required', 'exists:roles,name'],
             'cod_area' => ['nullable', 'exists:areas_institucionales,cod_area'],
-            'acceso_sistema' => ['required', 'in:HABILITADO,BLOQUEADO'],
         ];
 
         if ($this->isEdit) {
             $rules['estado'] = ['required', 'in:ACTIVO,INACTIVO,ARCHIVADO'];
-            $rules['password'] = ['nullable', 'string', 'min:8', 'confirmed'];
+            $rules['acceso_sistema'] = ['required', 'in:HABILITADO,BLOQUEADO'];
+            if ($this->usuarioId === auth()->id()) {
+                $rules['password_actual'] = ['required_with:password', 'current_password'];
+                $rules['password'] = ['nullable', 'string', 'min:8', 'confirmed'];
+            }
         }
 
         if ($this->rol === 'personal_salud') {
             $rules['especialidad_salud'] = ['required', 'exists:especialidades,cod_esp'];
+            $rules['matricula_prof'] = ['required', 'string', 'max:50'];
+            $rules['institucion_formacion'] = ['nullable', 'string', 'max:255'];
+            $rules['fecha_ingreso'] = ['required', 'date'];
         }
 
         if ($this->rol === 'personal_admin') {
             $rules['cargo_administrativo'] = ['required', 'exists:cargos_administrativos,cod_cargo_admin'];
+            $rules['fecha_ingreso'] = ['required', 'date'];
+        }
+
+        if ($this->rol === 'voluntario') {
+            $rules['disponibilidad_inicial'] = ['nullable', 'string', 'max:150'];
+            $rules['area_apoyo_preferente'] = ['nullable', 'string', 'max:150'];
+            $rules['fecha_ingreso'] = ['required', 'date'];
+        }
+
+        if ($this->rol === 'familiar') {
+            $rules['observacion_vinculo'] = ['nullable', 'string', 'max:255'];
         }
 
         return $rules;
@@ -106,20 +317,150 @@ class UsuariosPanel extends Component
     public function messages()
     {
         return [
-            'nombres.required' => 'El nombre es obligatorio.',
-            'fecha_nacimiento.required' => 'La fecha de nacimiento es obligatoria.',
-            'genero.required' => 'Seleccione el sexo.',
-            'numero_documento.required' => 'El número de documento es obligatorio.',
-            'correo.required' => 'El correo es obligatorio.',
-            'correo.email' => 'El correo debe ser válido.',
-            'correo.unique' => 'Este correo ya está registrado.',
-            'telefono.required' => 'El teléfono es obligatorio.',
-            'rol.required' => 'Debe seleccionar un rol.',
+            'nombres.required' => 'Por favor, escriba los nombres del usuario.',
+            'nombres.regex' => 'El nombre solo puede contener letras y espacios.',
+            'ap_paterno.required_without' => 'Falta registrar al menos un apellido (paterno o materno) para el usuario.',
+            'ap_materno.required_without' => 'Falta registrar al menos un apellido (paterno o materno) para el usuario.',
+            'fecha_nacimiento.required' => 'Debe ingresar la fecha de nacimiento del usuario.',
+            'fecha_nacimiento.date' => 'Debe ingresar una fecha de nacimiento válida.',
+            'genero.required' => 'Debe seleccionar el género del usuario.',
+            'numero_documento.required' => 'Falta registrar el número de documento de identidad.',
+            'correo.required' => 'Por favor, ingrese la dirección de correo electrónico del usuario.',
+            'correo.email' => 'La dirección de correo electrónico debe ser una cuenta válida.',
+            'correo.unique' => 'Esta dirección de correo electrónico ya está registrada para otro usuario.',
+            'telefono.required' => 'Debe registrar el número de teléfono celular de contacto.',
+            'rol.required' => 'Debe seleccionar el rol correspondiente para este usuario.',
             'password.min' => 'La contraseña debe tener al menos 8 caracteres.',
-            'password.confirmed' => 'Las contraseñas no coinciden.',
-            'especialidad_salud.required' => 'Seleccione una especialidad.',
-            'cargo_administrativo.required' => 'Seleccione un cargo administrativo.',
+            'password.confirmed' => 'Las contraseñas ingresadas no coinciden.',
+            'password_actual.current_password' => 'La contraseña actual ingresada no es correcta.',
+            'especialidad_salud.required' => 'Debe seleccionar la especialidad médica del profesional.',
+            'cargo_administrativo.required' => 'Debe seleccionar el cargo administrativo del funcionario.',
+            'fecha_ingreso.required' => 'Debe registrar la fecha de ingreso del trabajador.',
+            'fecha_ingreso.date' => 'La fecha de ingreso registrada debe ser una fecha válida.',
+            'matricula_prof.required' => 'Por favor, ingrese el número de matrícula profesional del personal de salud.',
+            'contacto_emergencia.required' => 'Debe ingresar el nombre del contacto de emergencia.',
+            'contacto_emergencia.min' => 'El nombre del contacto de emergencia debe tener al menos 2 caracteres.',
+            'contacto_emergencia.regex' => 'El nombre del contacto solo puede contener letras y espacios.',
+            'ap_paterno_emergencia.required_without' => 'Debe registrar al menos un apellido (paterno o materno) para el contacto de emergencia.',
+            'ap_materno_emergencia.required_without' => 'Debe registrar al menos un apellido (paterno o materno) para el contacto de emergencia.',
+            'ap_paterno_emergencia.regex' => 'El apellido paterno del contacto de emergencia solo puede contener letras.',
+            'ap_materno_emergencia.regex' => 'El apellido materno del contacto de emergencia solo puede contener letras.',
+            'parentesco_emergencia.required' => 'Debe seleccionar la relación o parentesco con el contacto de emergencia.',
+            'celular_emergencia.required' => 'Debe registrar el número de celular del contacto de emergencia.',
+            'celular_emergencia.different' => 'El celular del contacto de emergencia no puede ser igual al del propio usuario.',
+            'celular_emergencia.regex' => 'El celular del contacto de emergencia solo puede contener números.',
+            'calle.required' => 'Debe ingresar la calle o avenida del domicilio.',
+            'calle.min' => 'La calle debe tener al menos 2 caracteres.',
+            'nro_domicilio.required' => 'Falta ingresar el número de casa/departamento, o escriba S/N.',
+            'zona.required' => 'Debe registrar la zona o barrio del domicilio.',
+            'zona.min' => 'La zona debe tener al menos 2 caracteres.',
+            'ciudad.required' => 'Debe seleccionar una ciudad.',
+            'ciudad.min' => 'La ciudad debe tener al menos 2 caracteres.',
         ];
+    }
+
+    private function validarUnicidadDocumento($fail)
+    {
+        $query = User::where('pais_documento', $this->pais_documento)
+            ->where('tipo_documento', $this->tipo_documento)
+            ->where('numero_documento', $this->numero_documento);
+        if ($this->pais_documento === 'Bolivia') {
+            $query->where('expedido', $this->expedido);
+        }
+        if ($this->isEdit) {
+            $query->where('cod_usu', '!=', $this->usuarioId);
+        }
+        if ($query->exists()) {
+            $fail('El documento de identidad ya está registrado en el sistema.');
+        }
+    }
+
+    private function validarTelefono($fail)
+    {
+        if (empty($this->pais_telefono)) {
+            $fail('Debe seleccionar el país para el celular.');
+            return;
+        }
+
+        if (empty($this->telefono)) {
+            $fail('Debe registrar el número de teléfono celular.');
+            return;
+        }
+
+        // 1. Unicidad del teléfono completo
+        $query = User::where('codigo_telefono', $this->codigo_telefono)
+            ->where('telefono', $this->telefono);
+        if ($this->isEdit) {
+            $query->where('cod_usu', '!=', $this->usuarioId);
+        }
+        if ($query->exists()) {
+            $fail('El celular ya está registrado.');
+            return;
+        }
+
+        // 2. Sin letras o símbolos
+        if (!preg_match('/^\d+$/', $this->telefono)) {
+            $fail('Debe ingresar un número de celular válido sin espacios, letras ni caracteres especiales.');
+            return;
+        }
+
+        $longitud = strlen($this->telefono);
+        $primerDigito = substr($this->telefono, 0, 1);
+
+        switch ($this->pais_telefono) {
+            case 'Bolivia':
+                if ($longitud !== 8 || !in_array($primerDigito, ['6', '7'])) {
+                    $fail('En Bolivia el celular debe tener exactamente 8 dígitos y comenzar con 6 o 7.');
+                }
+                break;
+            case 'Chile':
+                if ($longitud !== 9 || $primerDigito !== '9') {
+                    $fail('En Chile el celular debe tener exactamente 9 dígitos y comenzar con 9.');
+                }
+                break;
+            case 'Perú':
+                if ($longitud !== 9 || $primerDigito !== '9') {
+                    $fail('En Perú el celular debe tener exactamente 9 dígitos y comenzar con 9.');
+                }
+                break;
+            case 'Colombia':
+                if ($longitud !== 10 || $primerDigito !== '3') {
+                    $fail('En Colombia el celular debe tener exactamente 10 dígitos y comenzar con 3.');
+                }
+                break;
+            case 'México':
+                if ($longitud !== 10) {
+                    $fail('En México el celular debe tener exactamente 10 dígitos.');
+                }
+                break;
+            case 'España':
+                if ($longitud !== 9 || !in_array($primerDigito, ['6', '7'])) {
+                    $fail('En España el celular debe tener exactamente 9 dígitos y comenzar con 6 o 7.');
+                }
+                break;
+            case 'Estados Unidos':
+                if ($longitud !== 10) {
+                    $fail('En Estados Unidos el celular debe tener exactamente 10 dígitos.');
+                }
+                break;
+            case 'Brasil':
+                if ($longitud < 10 || $longitud > 11) {
+                    $fail('En Brasil el celular debe tener entre 10 y 11 dígitos.');
+                }
+                break;
+            default:
+                if ($longitud < 6 || $longitud > 15) {
+                    $fail('El celular debe tener entre 6 y 15 dígitos.');
+                }
+                break;
+        }
+    }
+
+    private function normalizarTexto($texto)
+    {
+        if (empty($texto)) return null;
+        $texto = preg_replace('/\s+/', ' ', trim($texto));
+        return mb_convert_case($texto, MB_CASE_TITLE, "UTF-8");
     }
 
     // ══════════════════════════════════════════════
@@ -131,8 +472,13 @@ class UsuariosPanel extends Component
         $this->reset([
             'cod_usu', 'nombres', 'ap_paterno', 'ap_materno', 'fecha_nacimiento', 'genero',
             'pais_documento', 'tipo_documento', 'numero_documento', 'expedido', 'correo',
-            'telefono', 'pais_telefono', 'codigo_telefono', 'rol', 'cod_area', 'password', 'password_confirmation',
-            'usuarioId', 'fecha_ingreso', 'especialidad_salud', 'cargo_administrativo', 'observaciones'
+            'telefono', 'pais_telefono', 'codigo_telefono', 'rol', 'cod_area', 'password', 'password_actual', 'password_confirmation',
+            'usuarioId', 'fecha_ingreso', 'especialidad_salud', 'cargo_administrativo', 'observaciones',
+            'foto_de_perfil_upload', 'edad', 'passwordTemporalVisual',
+            'direccion', 'zona', 'ciudad', 'contacto_emergencia', 'parentesco_emergencia', 'celular_emergencia',
+            'tipo_vinculacion', 'matricula_prof', 'institucion_formacion', 'disponibilidad_inicial',
+            'area_apoyo_preferente', 'observacion_vinculo',
+            'calle', 'nro_domicilio', 'ap_paterno_emergencia', 'ap_materno_emergencia'
         ]);
         $this->isEdit = false;
         $this->pasoFormulario = 1;
@@ -153,10 +499,12 @@ class UsuariosPanel extends Component
         $this->resetFormulario();
         $this->pais_documento = 'Bolivia';
         $this->tipo_documento = 'CI';
-        $this->pais_telefono = 'Bolivia';
-        $this->codigo_telefono = '+591';
+        $this->pais_telefono = '';
+        $this->codigo_telefono = '';
+        $this->fecha_ingreso = now()->format('Y-m-d');
         $this->estado = 'ACTIVO';
         $this->acceso_sistema = 'HABILITADO';
+        $this->passwordTemporalVisual = $this->generarPasswordTemporal();
         $this->isEdit = false;
         $this->mostrarFormulario = true;
     }
@@ -172,7 +520,16 @@ class UsuariosPanel extends Component
             return;
         }
 
-        // ── Guardia: no editar usuarios inactivos ──
+        // Protección absoluta de USU_0001
+        if ($cod_usu === 'USU_0001' && auth()->id() !== 'USU_0001') {
+            $this->dispatch('swal', [
+                'icon' => 'error',
+                'title' => 'Acceso denegado',
+                'text' => 'No tienes permisos para modificar al Administrador Principal.'
+            ]);
+            return;
+        }
+
         $usuario = User::with(['personalSalud', 'personalAdmin'])->findOrFail($cod_usu);
 
         if ($usuario->estado !== 'ACTIVO') {
@@ -193,7 +550,10 @@ class UsuariosPanel extends Component
         $this->nombres = $usuario->nombres;
         $this->ap_paterno = $usuario->ap_paterno;
         $this->ap_materno = $usuario->ap_materno;
-        $this->fecha_nacimiento = $usuario->fecha_nacimiento ? $usuario->fecha_nacimiento->format('Y-m-d') : '';
+        $this->fecha_nacimiento = $usuario->fecha_nacimiento ? \Carbon\Carbon::parse($usuario->fecha_nacimiento)->format('Y-m-d') : '';
+        if ($this->fecha_nacimiento) {
+            $this->updatedFechaNacimiento($this->fecha_nacimiento);
+        }
         $this->genero = $usuario->genero;
         $this->pais_documento = $usuario->pais_documento ?? 'Bolivia';
         $this->tipo_documento = $usuario->tipo_documento ?? 'CI';
@@ -208,20 +568,50 @@ class UsuariosPanel extends Component
         $this->acceso_sistema = $usuario->acceso_sistema;
         $this->observaciones = $usuario->observaciones;
 
+        $this->direccion = $usuario->direccion;
+        $this->calle = $usuario->calle;
+        $this->nro_domicilio = $usuario->nro_domicilio;
+        $this->zona = $usuario->zona;
+        $this->ciudad = $usuario->ciudad;
+        
+        $this->contacto_emergencia = $usuario->contacto_emergencia;
+        $this->ap_paterno_emergencia = $usuario->ap_paterno_emergencia;
+        $this->ap_materno_emergencia = $usuario->ap_materno_emergencia;
+        $this->parentesco_emergencia = $usuario->parentesco_emergencia;
+        $this->celular_emergencia = $usuario->celular_emergencia;
+        $this->tipo_vinculacion = $usuario->tipo_vinculacion ?? 'CONTRATO';
+
         $this->rol = $usuario->roles->first()?->name ?? '';
 
         if ($this->rol === 'personal_salud') {
             $ps = $usuario->personalSalud;
-            $this->fecha_ingreso = $ps?->fecha_ing ? $ps->fecha_ing->format('Y-m-d') : '';
+            $this->fecha_ingreso = $ps?->fecha_ing ? \Carbon\Carbon::parse($ps->fecha_ing)->format('Y-m-d') : '';
             $this->especialidad_salud = $ps?->cod_esp;
+            $this->matricula_prof = $ps?->matricula_prof;
+            $this->institucion_formacion = $ps?->institucion_formacion;
         } elseif ($this->rol === 'personal_admin') {
             $pa = $usuario->personalAdmin;
-            $this->fecha_ingreso = $pa?->fecha_ingreso ? $pa->fecha_ingreso->format('Y-m-d') : '';
+            $this->fecha_ingreso = $pa?->fecha_ingreso ? \Carbon\Carbon::parse($pa->fecha_ingreso)->format('Y-m-d') : '';
             $this->cargo_administrativo = $pa?->cod_cargo_admin;
+        } elseif ($this->rol === 'voluntario') {
+            $vol = \App\Models\Voluntario::where('cod_usu', $usuario->cod_usu)->first();
+            if ($vol) {
+                $this->fecha_ingreso = $vol->fecha_ing ? \Carbon\Carbon::parse($vol->fecha_ing)->format('Y-m-d') : '';
+                $this->disponibilidad_inicial = $vol->disponibilidad_inicial;
+                $this->area_apoyo_preferente = $vol->area_apoyo_preferente;
+            }
+        } elseif ($this->rol === 'familiar') {
+            $fam = \App\Models\Familiar::where('cod_usu', $usuario->cod_usu)->first();
+            if ($fam) {
+                $this->parentesco_emergencia = $fam->parentesco;
+                $this->observacion_vinculo = $fam->observacion_vinculo;
+            }
         }
 
         $this->password = '';
         $this->password_confirmation = '';
+        $this->foto_de_perfil_upload = null;
+        $this->passwordTemporalVisual = null;
 
         // Cerrar paneles flotantes si estaban abiertos
         $this->cerrarFichaRapida();
@@ -232,42 +622,186 @@ class UsuariosPanel extends Component
 
     public function cerrarFormulario()
     {
-        $this->resetValidation();
+        $this->resetFormulario();
         $this->mostrarFormulario = false;
-        $this->pasoFormulario = 1;
     }
 
     public function siguientePaso()
     {
         if ($this->pasoFormulario === 1) {
+            $this->nombres = $this->normalizarTexto($this->nombres);
+            $this->ap_paterno = $this->normalizarTexto($this->ap_paterno);
+            $this->ap_materno = $this->normalizarTexto($this->ap_materno);
+
             $this->validate([
-                'nombres' => ['required', 'string', 'max:255'],
-                'ap_paterno' => ['required', 'string', 'max:255'],
-                'fecha_nacimiento' => ['required', 'date', 'before:today'],
-                'genero' => ['required', 'string'],
+                'nombres' => ['required', 'string', 'max:255', 'regex:/^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s\-]+$/u'],
+                'fecha_nacimiento' => [
+                    'required', 
+                    'date', 
+                    function ($attribute, $value, $fail) {
+                        try {
+                            $nac = \Carbon\Carbon::parse($value);
+                            if ($nac->isFuture()) {
+                                $fail('La fecha de nacimiento no puede ser una fecha futura.');
+                                return;
+                            }
+                            $edad = $nac->age;
+                            if ($edad < 16) {
+                                $fail('El usuario registrado debe tener al menos 16 años.');
+                            }
+                            if ($edad > 60) {
+                                $fail('El usuario registrado no puede superar los 60 años.');
+                            }
+                        } catch (\Exception $e) {
+                            $fail('La fecha de nacimiento no es válida.');
+                        }
+                    }
+                ],
+                'genero' => ['required', 'string', 'in:FEMENINO,MASCULINO'],
                 'pais_documento' => ['required', 'string'],
                 'tipo_documento' => ['required', 'string'],
                 'numero_documento' => ['required', 'string', 'max:50'],
-            ]);
+            ], $this->messages());
+
+            if (empty($this->ap_paterno) && empty($this->ap_materno)) {
+                $this->addError('ap_paterno', 'Debe registrar al menos un apellido (paterno o materno).');
+                $this->addError('ap_materno', 'Debe registrar al menos un apellido (paterno o materno).');
+                return;
+            }
+
+            if ($this->pais_documento === 'Bolivia' && $this->tipo_documento === 'CI') {
+                if (!preg_match('/^\d+$/', $this->numero_documento) || strlen($this->numero_documento) < 5 || strlen($this->numero_documento) > 10) {
+                    $this->addError('numero_documento', 'Para Bolivia el CI debe ser numérico y tener entre 5 y 10 dígitos.');
+                    return;
+                }
+                if (empty($this->expedido)) {
+                    $this->addError('expedido', 'El departamento de expedición es obligatorio para Bolivia.');
+                    return;
+                }
+            }
+
+            $this->validarUnicidadDocumento(function($err) {
+                $this->addError('numero_documento', $err);
+            });
+            if ($this->getErrorBag()->has('numero_documento')) {
+                return;
+            }
+
+            if ($this->foto_de_perfil_upload) {
+                $this->validate([
+                    'foto_de_perfil_upload' => ['image', 'mimes:jpg,jpeg,png,webp', 'max:4096']
+                ]);
+            }
         } elseif ($this->pasoFormulario === 2) {
+            $this->correo = strtolower(trim($this->correo));
+            $this->contacto_emergencia = $this->normalizarTexto($this->contacto_emergencia);
+            $this->ap_paterno_emergencia = $this->normalizarTexto($this->ap_paterno_emergencia);
+            $this->ap_materno_emergencia = $this->normalizarTexto($this->ap_materno_emergencia);
+            $this->calle = $this->normalizarTexto($this->calle);
+            $this->zona = $this->normalizarTexto($this->zona);
+            $this->ciudad = $this->normalizarTexto($this->ciudad);
+
             $this->validate([
-                'correo' => ['required', 'string', 'email', 'max:255', Rule::unique('users', 'correo')->ignore($this->usuarioId, 'cod_usu')],
+                'correo' => [
+                    'required',
+                    'string',
+                    'email',
+                    'max:255',
+                    Rule::unique('users', 'correo')->ignore($this->usuarioId, 'cod_usu'),
+                    function ($attribute, $value, $fail) {
+                        $dominio = env('INSTITUTIONAL_EMAIL_DOMAIN');
+                        if (!empty($dominio)) {
+                            $dominio = strtolower(trim($dominio));
+                            if (!str_ends_with(strtolower($value), '@' . $dominio)) {
+                                $fail("El correo debe pertenecer al dominio institucional (@{$dominio}).");
+                            }
+                        }
+                    }
+                ],
                 'telefono' => ['required', 'string', 'max:20'],
-            ]);
+                'calle' => ['required', 'string', 'min:2', 'max:150'],
+                'nro_domicilio' => ['required', 'string', 'max:20'],
+                'zona' => ['required', 'string', 'min:2', 'max:100'],
+                'ciudad' => ['required', 'string', 'min:2', 'max:100'],
+                'contacto_emergencia' => ['required', 'string', 'min:2', 'max:150', 'regex:/^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s\-]+$/u'],
+                'ap_paterno_emergencia' => ['required_without:ap_materno_emergencia', 'nullable', 'string', 'max:100', 'regex:/^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s\-]+$/u'],
+                'ap_materno_emergencia' => ['required_without:ap_paterno_emergencia', 'nullable', 'string', 'max:100', 'regex:/^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s\-]+$/u'],
+                'parentesco_emergencia' => ['required', 'string', 'max:100'],
+                'celular_emergencia' => ['required', 'string', 'max:20', 'different:telefono', 'regex:/^\d+$/'],
+            ], array_merge($this->messages(), [
+                'contacto_emergencia.regex' => 'El nombre del contacto solo puede contener letras.',
+                'ap_paterno_emergencia.regex' => 'El apellido del contacto solo puede contener letras.',
+                'ap_materno_emergencia.regex' => 'El apellido del contacto solo puede contener letras.',
+                'celular_emergencia.different' => 'El celular de emergencia no puede ser igual al celular del usuario.',
+                'celular_emergencia.regex' => 'El celular de emergencia solo puede contener números.'
+            ]));
+
+            $this->validarTelefono(function($err) {
+                $this->addError('telefono', $err);
+            });
+            if ($this->getErrorBag()->has('telefono')) {
+                return;
+            }
         } elseif ($this->pasoFormulario === 3) {
+            $this->tipo_vinculacion = match($this->rol) {
+                'personal_salud' => 'CONTRATO',
+                'personal_admin' => 'CONTRATO',
+                'voluntario' => 'VOLUNTARIADO',
+                'familiar' => 'FAMILIAR',
+                default => 'OTRO'
+            };
+
+            if (!$this->isEdit) {
+                $this->fecha_ingreso = now()->format('Y-m-d');
+                $this->estado = 'ACTIVO';
+                $this->acceso_sistema = 'HABILITADO';
+            }
+
             $rules = [
                 'rol' => ['required', 'exists:roles,name'],
-                'acceso_sistema' => ['required', 'in:HABILITADO,BLOQUEADO'],
             ];
+
             if ($this->isEdit) {
                 $rules['estado'] = ['required', 'in:ACTIVO,INACTIVO,ARCHIVADO'];
+                $rules['acceso_sistema'] = ['required', 'in:HABILITADO,BLOQUEADO'];
             }
-            if ($this->rol === 'personal_salud') $rules['especialidad_salud'] = ['required', 'exists:especialidades,cod_esp'];
-            if ($this->rol === 'personal_admin') $rules['cargo_administrativo'] = ['required', 'exists:cargos_administrativos,cod_cargo_admin'];
-            $this->validate($rules);
+
+            if ($this->rol === 'personal_salud') {
+                $rules['especialidad_salud'] = ['required', 'exists:especialidades,cod_esp'];
+                $rules['matricula_prof'] = ['required', 'string', 'max:50'];
+                $rules['institucion_formacion'] = ['nullable', 'string', 'max:255'];
+                $rules['fecha_ingreso'] = ['required', 'date'];
+            }
+
+            if ($this->rol === 'personal_admin') {
+                $rules['cargo_administrativo'] = ['required', 'exists:cargos_administrativos,cod_cargo_admin'];
+                $rules['fecha_ingreso'] = ['required', 'date'];
+            }
+
+            if ($this->rol === 'voluntario') {
+                $rules['disponibilidad_inicial'] = ['nullable', 'string', 'max:150'];
+                $rules['area_apoyo_preferente'] = ['nullable', 'string', 'max:150'];
+                $rules['fecha_ingreso'] = ['required', 'date'];
+            }
+
+            if ($this->rol === 'familiar') {
+                $rules['observacion_vinculo'] = ['nullable', 'string', 'max:255'];
+            }
+
+            $this->validate($rules, array_merge($this->messages(), [
+                'matricula_prof.required' => 'Por favor, ingrese el número de matrícula profesional del personal de salud.',
+                'fecha_ingreso.required' => 'Debe registrar la fecha de ingreso institucional.',
+            ]));
+
+            if (!$this->isEdit && empty($this->passwordTemporalVisual)) {
+                $this->passwordTemporalVisual = $this->generarPasswordTemporal();
+            }
         } elseif ($this->pasoFormulario === 4) {
-            if ($this->isEdit) {
-                $this->validate(['password' => ['nullable', 'string', 'min:8', 'confirmed']]);
+            if ($this->isEdit && $this->usuarioId === auth()->id()) {
+                $this->validate([
+                    'password_actual' => ['required_with:password', 'current_password'],
+                    'password' => ['nullable', 'string', 'min:8', 'confirmed']
+                ]);
             }
         }
 
@@ -290,14 +824,32 @@ class UsuariosPanel extends Component
 
     private function generarPasswordTemporal(): string
     {
-        $nombres = strtoupper(preg_replace('/\s+/', '', $this->nombres ?? 'USU'));
-        $apPaterno = strtoupper(preg_replace('/\s+/', '', $this->ap_paterno ?? 'RM'));
-        $documento = preg_replace('/\D/', '', $this->numero_documento ?? '');
+        $letras = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        $numeros = '0123456789';
+        $simbolos = '@#$*!';
+        
+        $pass = '';
+        $pass .= $letras[rand(0, strlen($letras) - 1)];
+        $pass .= $letras[rand(0, strlen($letras) - 1)];
+        $pass .= $numeros[rand(0, strlen($numeros) - 1)];
+        $pass .= $simbolos[rand(0, strlen($simbolos) - 1)];
+        
+        $todos = $letras . $numeros . $simbolos;
+        for ($i = 0; $i < 7; $i++) {
+            $pass .= $todos[rand(0, strlen($todos) - 1)];
+        }
+        
+        return str_shuffle($pass);
+    }
 
-        $parteNombre = substr($nombres, 0, 3);
-        $parteApellido = substr($apPaterno, 0, 3);
-
-        return $parteNombre . $parteApellido . ($documento ?: now()->format('His'));
+    public function regenerarPasswordTemporal()
+    {
+        $this->passwordTemporalVisual = $this->generarPasswordTemporal();
+        $this->dispatch('swal', [
+            'icon' => 'success',
+            'title' => 'Contraseña regenerada',
+            'text' => 'Se ha generado una nueva contraseña temporal.'
+        ]);
     }
 
     public function guardarUsuario()
@@ -312,8 +864,61 @@ class UsuariosPanel extends Component
             return;
         }
 
+        $this->nombres = $this->normalizarTexto($this->nombres);
+        $this->ap_paterno = $this->normalizarTexto($this->ap_paterno);
+        $this->ap_materno = $this->normalizarTexto($this->ap_materno);
+
         $rules = $this->rules();
         $this->validate($rules);
+
+        if (empty($this->ap_paterno) && empty($this->ap_materno)) {
+            $this->addError('ap_paterno', 'Debe registrar al menos un apellido (paterno o materno).');
+            $this->addError('ap_materno', 'Debe registrar al menos un apellido (paterno o materno).');
+            return;
+        }
+
+        if ($this->pais_documento === 'Bolivia' && $this->tipo_documento === 'CI') {
+            if (!preg_match('/^\d+$/', $this->numero_documento) || strlen($this->numero_documento) < 5 || strlen($this->numero_documento) > 10) {
+                $this->addError('numero_documento', 'Para Bolivia el CI debe ser numérico y tener entre 5 y 10 dígitos.');
+                return;
+            }
+            if (empty($this->expedido)) {
+                $this->addError('expedido', 'El departamento de expedición es obligatorio para Bolivia.');
+                return;
+            }
+        }
+
+        $this->validarUnicidadDocumento(function($err) {
+            $this->addError('numero_documento', $err);
+        });
+        if ($this->getErrorBag()->has('numero_documento')) {
+            return;
+        }
+
+        $this->validarTelefono(function($err) {
+            $this->addError('telefono', $err);
+        });
+        if ($this->getErrorBag()->has('telefono')) {
+            return;
+        }
+
+        // Determinar estado y acceso por defecto en modo creación, protegiendo a USU_0001
+        $estadoGuardado = $this->estado;
+        $accesoGuardado = $this->acceso_sistema;
+
+        if (!$this->isEdit) {
+            $estadoGuardado = 'ACTIVO';
+            $accesoGuardado = 'HABILITADO';
+        }
+
+        if ($this->isEdit && $this->usuarioId === 'USU_0001') {
+            $estadoGuardado = 'ACTIVO';
+            $accesoGuardado = 'HABILITADO';
+            $this->rol = 'super_admin';
+            $this->correo = 'admincasaamandita@gmail.com';
+        }
+
+        $this->direccion = 'Calle ' . $this->calle . ' Nº ' . $this->nro_domicilio . ', ' . $this->zona . ', ' . $this->ciudad;
 
         $userData = [
             'nombres' => $this->nombres,
@@ -330,19 +935,51 @@ class UsuariosPanel extends Component
             'pais_telefono' => $this->pais_telefono,
             'codigo_telefono' => $this->codigo_telefono,
             'cod_area' => $this->cod_area ?: null,
-            'acceso_sistema' => $this->acceso_sistema,
+            'acceso_sistema' => $accesoGuardado,
             'observaciones' => $this->observaciones,
+            'calle' => $this->calle,
+            'nro_domicilio' => $this->nro_domicilio,
+            'zona' => $this->zona,
+            'ciudad' => $this->ciudad,
+            'direccion' => $this->direccion,
+            'contacto_emergencia' => $this->contacto_emergencia,
+            'ap_paterno_emergencia' => $this->ap_paterno_emergencia,
+            'ap_materno_emergencia' => $this->ap_materno_emergencia,
+            'parentesco_emergencia' => $this->parentesco_emergencia,
+            'celular_emergencia' => $this->celular_emergencia,
+            'tipo_vinculacion' => $this->tipo_vinculacion,
         ];
 
+        if ($this->foto_de_perfil_upload) {
+            if ($this->isEdit && $this->usuarioId) {
+                $oldUser = User::find($this->usuarioId);
+                if ($oldUser && $oldUser->foto_de_perfil && \Storage::disk('public')->exists($oldUser->foto_de_perfil)) {
+                    \Storage::disk('public')->delete($oldUser->foto_de_perfil);
+                }
+            }
+            $path = $this->foto_de_perfil_upload->store('usuarios/fotos', 'public');
+            $userData['foto_de_perfil'] = $path;
+        }
+
         $mensaje = '';
+        $correoEnviado = false;
+        $passwordTemporal = null;
 
         if ($this->isEdit) {
-            $userData['estado'] = $this->estado;
-            if (!empty($this->password)) {
-                $userData['password'] = Hash::make($this->password);
-            }
+            $userData['estado'] = $estadoGuardado;
+            $userData['acceso_sistema'] = $accesoGuardado;
 
             $usuario = User::findOrFail($this->usuarioId);
+
+            if ($usuario->cod_usu === auth()->id()) {
+                if (!empty($this->password)) {
+                    $userData['password'] = Hash::make($this->password);
+                    $userData['debe_cambiar_password'] = false;
+                }
+            } else {
+                // For other users, password changes are NOT allowed via general edit form
+                unset($userData['password']);
+            }
 
             if ($usuario->hasRole('super_admin') && $this->rol !== 'super_admin') {
                 $superadmins = User::role('super_admin')->where('estado', 'ACTIVO')->count();
@@ -355,95 +992,232 @@ class UsuariosPanel extends Component
             $usuario->update($userData);
             $usuario->syncRoles([$this->rol]);
 
-            // Actualizar sub-modelos
+            // Guardar sub-modelos de forma unificada
             if ($this->rol === 'personal_salud') {
                 \App\Models\PersonalSalud::updateOrCreate(
                     ['cod_usu' => $usuario->cod_usu],
-                    ['fecha_ing' => $this->fecha_ingreso, 'cod_esp' => $this->especialidad_salud]
+                    [
+                        'fecha_ing' => $this->fecha_ingreso ?: now()->format('Y-m-d'), 
+                        'cod_esp' => $this->especialidad_salud,
+                        'matricula_prof' => $this->matricula_prof,
+                        'institucion_formacion' => $this->institucion_formacion,
+                        'estado_laboral' => 'ACTIVO'
+                    ]
                 );
                 \App\Models\PersonalAdmin::where('cod_usu', $usuario->cod_usu)->delete();
+                \App\Models\Voluntario::where('cod_usu', $usuario->cod_usu)->delete();
+                \App\Models\Familiar::where('cod_usu', $usuario->cod_usu)->delete();
             } elseif ($this->rol === 'personal_admin') {
                 \App\Models\PersonalAdmin::updateOrCreate(
                     ['cod_usu' => $usuario->cod_usu],
-                    ['fecha_ingreso' => $this->fecha_ingreso, 'cod_cargo_admin' => $this->cargo_administrativo]
+                    [
+                        'fecha_ingreso' => $this->fecha_ingreso ?: now()->format('Y-m-d'), 
+                        'cod_cargo_admin' => $this->cargo_administrativo,
+                        'cargo' => \App\Models\CargoAdministrativo::find($this->cargo_administrativo)?->nombre ?? 'Administrativo',
+                        'area_admin' => $this->cod_area ? (\App\Models\AreaInstitucional::find($this->cod_area)?->nombre ?? 'Administración') : 'Administración',
+                        'estado_laboral' => 'ACTIVO'
+                    ]
                 );
                 \App\Models\PersonalSalud::where('cod_usu', $usuario->cod_usu)->delete();
-            } else {
+                \App\Models\Voluntario::where('cod_usu', $usuario->cod_usu)->delete();
+                \App\Models\Familiar::where('cod_usu', $usuario->cod_usu)->delete();
+            } elseif ($this->rol === 'voluntario') {
+                \App\Models\Voluntario::updateOrCreate(
+                    ['cod_usu' => $usuario->cod_usu],
+                    [
+                        'fecha_ing' => $this->fecha_ingreso ?: now()->format('Y-m-d'),
+                        'area_apoyo' => $this->area_apoyo_preferente ?? 'General',
+                        'disponibilidad_inicial' => $this->disponibilidad_inicial,
+                        'area_apoyo_preferente' => $this->area_apoyo_preferente,
+                        'estado' => 'ACTIVO'
+                    ]
+                );
                 \App\Models\PersonalSalud::where('cod_usu', $usuario->cod_usu)->delete();
                 \App\Models\PersonalAdmin::where('cod_usu', $usuario->cod_usu)->delete();
+                \App\Models\Familiar::where('cod_usu', $usuario->cod_usu)->delete();
+            } elseif ($this->rol === 'familiar') {
+                \App\Models\Familiar::updateOrCreate(
+                    ['cod_usu' => $usuario->cod_usu],
+                    [
+                        'parentesco' => $this->parentesco_emergencia ?? 'Familiar',
+                        'direccion' => $this->direccion,
+                        'es_responsable' => 'SI',
+                        'observacion_vinculo' => $this->observacion_vinculo
+                    ]
+                );
+                \App\Models\PersonalSalud::where('cod_usu', $usuario->cod_usu)->delete();
+                \App\Models\PersonalAdmin::where('cod_usu', $usuario->cod_usu)->delete();
+                \App\Models\Voluntario::where('cod_usu', $usuario->cod_usu)->delete();
             }
 
-            // Registrar en bitácora
+            // Notificación por correo de clave actualizada
+            $correoNotifEnviado = false;
+            $passwordModificada = ($usuario->cod_usu === auth()->id() && !empty($this->password));
+            if ($passwordModificada) {
+                try {
+                    \Mail::to($usuario->correo)->send(new \App\Mail\UsuarioPasswordActualizadaMail($usuario, $this->password));
+                    $correoNotifEnviado = true;
+                } catch (\Exception $e) {
+                    \Log::error("Error al enviar correo de actualización de clave a {$usuario->correo}: " . $e->getMessage());
+                }
+            }
+
             if (function_exists('activity')) {
+                $actMsg = "Se actualizaron los datos del usuario: {$usuario->name}.";
+                if ($passwordModificada) {
+                    $actMsg .= $correoNotifEnviado ? " Contraseña actualizada y notificada por correo." : " Contraseña actualizada, pero falló envío de notificación.";
+                }
                 activity('Usuarios')
                     ->causedBy(auth()->user())
                     ->performedOn($usuario)
                     ->event('edicion')
-                    ->log("Se actualizó la información del usuario {$usuario->name}.");
+                    ->log($actMsg);
             }
 
             $mensaje = 'Usuario actualizado correctamente.';
+            if ($passwordModificada && !$correoNotifEnviado) {
+                $mensaje .= " ADVERTENCIA: No se pudo enviar el correo de notificación. La nueva contraseña es: {$this->password}";
+                $swalData = [
+                    'icon' => 'warning',
+                    'title' => 'Usuario actualizado con advertencia',
+                    'text' => $mensaje
+                ];
+            } else {
+                $swalData = [
+                    'icon' => 'success',
+                    'title' => 'Éxito',
+                    'text' => $mensaje
+                ];
+            }
+
+            $this->resetFormulario();
+            $this->mostrarFormulario = false;
+            $this->dispatch('swal', $swalData);
+
         } else {
             $userData['estado'] = 'ACTIVO';
-            $passwordTemporal = $this->generarPasswordTemporal();
+            $userData['acceso_sistema'] = 'HABILITADO';
+            $passwordTemporal = $this->passwordTemporalVisual ?: $this->generarPasswordTemporal();
             $userData['password'] = Hash::make($passwordTemporal);
+            $userData['debe_cambiar_password'] = true;
 
             $usuario = User::create($userData);
             $usuario->assignRole($this->rol);
 
+            // Guardar sub-modelos de forma unificada
             if ($this->rol === 'personal_salud') {
-                \App\Models\PersonalSalud::create([
-                    'cod_usu' => $usuario->cod_usu,
-                    'fecha_ing' => $this->fecha_ingreso,
-                    'cod_esp' => $this->especialidad_salud
-                ]);
+                \App\Models\PersonalSalud::updateOrCreate(
+                    ['cod_usu' => $usuario->cod_usu],
+                    [
+                        'fecha_ing' => $this->fecha_ingreso ?: now()->format('Y-m-d'), 
+                        'cod_esp' => $this->especialidad_salud,
+                        'matricula_prof' => $this->matricula_prof,
+                        'institucion_formacion' => $this->institucion_formacion,
+                        'estado_laboral' => 'ACTIVO'
+                    ]
+                );
+                \App\Models\PersonalAdmin::where('cod_usu', $usuario->cod_usu)->delete();
+                \App\Models\Voluntario::where('cod_usu', $usuario->cod_usu)->delete();
+                \App\Models\Familiar::where('cod_usu', $usuario->cod_usu)->delete();
             } elseif ($this->rol === 'personal_admin') {
-                \App\Models\PersonalAdmin::create([
-                    'cod_usu' => $usuario->cod_usu,
-                    'fecha_ingreso' => $this->fecha_ingreso,
-                    'cod_cargo_admin' => $this->cargo_administrativo
-                ]);
+                \App\Models\PersonalAdmin::updateOrCreate(
+                    ['cod_usu' => $usuario->cod_usu],
+                    [
+                        'fecha_ingreso' => $this->fecha_ingreso ?: now()->format('Y-m-d'), 
+                        'cod_cargo_admin' => $this->cargo_administrativo,
+                        'cargo' => \App\Models\CargoAdministrativo::find($this->cargo_administrativo)?->nombre ?? 'Administrativo',
+                        'area_admin' => $this->cod_area ? (\App\Models\AreaInstitucional::find($this->cod_area)?->nombre ?? 'Administración') : 'Administración',
+                        'estado_laboral' => 'ACTIVO'
+                    ]
+                );
+                \App\Models\PersonalSalud::where('cod_usu', $usuario->cod_usu)->delete();
+                \App\Models\Voluntario::where('cod_usu', $usuario->cod_usu)->delete();
+                \App\Models\Familiar::where('cod_usu', $usuario->cod_usu)->delete();
+            } elseif ($this->rol === 'voluntario') {
+                \App\Models\Voluntario::updateOrCreate(
+                    ['cod_usu' => $usuario->cod_usu],
+                    [
+                        'fecha_ing' => $this->fecha_ingreso ?: now()->format('Y-m-d'),
+                        'area_apoyo' => $this->area_apoyo_preferente ?? 'General',
+                        'disponibilidad_inicial' => $this->disponibilidad_inicial,
+                        'area_apoyo_preferente' => $this->area_apoyo_preferente,
+                        'estado' => 'ACTIVO'
+                    ]
+                );
+                \App\Models\PersonalSalud::where('cod_usu', $usuario->cod_usu)->delete();
+                \App\Models\PersonalAdmin::where('cod_usu', $usuario->cod_usu)->delete();
+                \App\Models\Familiar::where('cod_usu', $usuario->cod_usu)->delete();
+            } elseif ($this->rol === 'familiar') {
+                \App\Models\Familiar::updateOrCreate(
+                    ['cod_usu' => $usuario->cod_usu],
+                    [
+                        'parentesco' => $this->parentesco_emergencia ?? 'Familiar',
+                        'direccion' => $this->direccion,
+                        'es_responsable' => 'SI',
+                        'observacion_vinculo' => $this->observacion_vinculo
+                    ]
+                );
+                \App\Models\PersonalSalud::where('cod_usu', $usuario->cod_usu)->delete();
+                \App\Models\PersonalAdmin::where('cod_usu', $usuario->cod_usu)->delete();
+                \App\Models\Voluntario::where('cod_usu', $usuario->cod_usu)->delete();
             }
 
-            // Registrar en bitácora
+            // Enviar bienvenida
+            $bienvenidaEnviada = false;
+            try {
+                $rolDisplay = strtoupper(str_replace('_', ' ', $this->rol));
+                $areaDisplay = 'Sin área';
+                if ($this->cod_area) {
+                    $areaObj = \App\Models\AreaInstitucional::find($this->cod_area);
+                    if ($areaObj) {
+                        $areaDisplay = $areaObj->nombre;
+                    }
+                }
+                \Mail::to($usuario->correo)->send(new \App\Mail\UsuarioBienvenidaMail($usuario, $rolDisplay, $areaDisplay));
+                $bienvenidaEnviada = true;
+            } catch (\Exception $e) {
+                \Log::error("Error al enviar correo de bienvenida a {$usuario->correo}: " . $e->getMessage());
+            }
+
+            // Enviar credenciales
+            $credencialesEnviadas = false;
+            try {
+                \Mail::to($usuario->correo)->send(new \App\Mail\UsuarioCredencialesInicialesMail($usuario, $passwordTemporal));
+                $credencialesEnviadas = true;
+            } catch (\Exception $e) {
+                \Log::error("Error al enviar credenciales a {$usuario->correo}: " . $e->getMessage());
+            }
+
             if (function_exists('activity')) {
+                $logMsg = "Se registró un nuevo usuario: {$usuario->name} con rol {$this->rol}. " . ($credencialesEnviadas ? "Correo de credenciales enviado con éxito." : "Error al enviar correo de credenciales.");
                 activity('Usuarios')
                     ->causedBy(auth()->user())
                     ->performedOn($usuario)
                     ->event('registro')
-                    ->log("Se registró un nuevo usuario: {$usuario->name} con rol {$this->rol}.");
+                    ->log($logMsg);
             }
 
-            $mensaje = "Usuario registrado correctamente. Contraseña temporal: {$passwordTemporal}";
+            $this->resetFormulario();
+            $this->mostrarFormulario = false;
             $this->resetPage();
+
+            $this->dispatch('mostrar-post-registro', [
+                'usuario_id' => $usuario->cod_usu,
+                'nombre' => $usuario->nombres . ' ' . $usuario->ap_paterno . ' ' . $usuario->ap_materno,
+                'email' => $usuario->correo,
+                'credenciales_enviadas' => $credencialesEnviadas,
+                'password_temporal' => $passwordTemporal,
+            ]);
         }
-
-        $this->resetFormulario();
-        $this->mostrarFormulario = false;
-
-        $this->dispatch('swal', [
-            'icon' => 'success',
-            'title' => 'Éxito',
-            'text' => $mensaje
-        ]);
     }
 
     // ══════════════════════════════════════════════
     // VISTA COMPLETA (modal/panel expandido)
     // ══════════════════════════════════════════════
 
-    public function abrirVistaCompleta($codUsu): void
+    public function abrirVistaCompleta($codUsu)
     {
-        $this->usuarioVista = User::with([
-            'roles',
-            'personalSalud.especialidad',
-            'personalAdmin.cargoAdmin',
-            'voluntarios',
-            'familiares',
-            'areaInstitucional',
-        ])->where('cod_usu', $codUsu)->firstOrFail();
-
-        $this->mostrarVistaCompleta = true;
+        return redirect()->route('admin.usuarios.show', $codUsu);
     }
 
     public function cerrarVistaCompleta(): void
@@ -490,30 +1264,7 @@ class UsuariosPanel extends Component
         $this->resetPage();
     }
 
-    // ══════════════════════════════════════════════
-    // HOOKS DE ACTUALIZACIÓN
-    // ══════════════════════════════════════════════
 
-    public function updatedPaisTelefono($value)
-    {
-        $codigos = [
-            'Bolivia' => '+591',
-            'Brasil' => '+55',
-            'Argentina' => '+54',
-            'Perú' => '+51',
-            'Chile' => '+56',
-            'Colombia' => '+57',
-            'México' => '+52'
-        ];
-        $this->codigo_telefono = $codigos[$value] ?? '+591';
-    }
-
-    public function updatedPaisDocumento()
-    {
-        if ($this->pais_documento !== 'Bolivia') {
-            $this->expedido = null;
-        }
-    }
 
     public function updatingSearch()
     {
@@ -551,6 +1302,16 @@ class UsuariosPanel extends Component
         }
 
         $usuario = User::findOrFail($id);
+
+        // Protección absoluta del Administrador Principal
+        if ($usuario->cod_usu === 'USU_0001' || $usuario->correo === 'admincasaamandita@gmail.com') {
+            $this->dispatch('swal', [
+                'icon' => 'error',
+                'title' => 'Acción denegada',
+                'text' => 'No puedes cambiar el estado del Administrador Principal.'
+            ]);
+            return;
+        }
 
         // No permitir autoinactivación
         if ($usuario->cod_usu === auth()->id()) {
@@ -592,6 +1353,72 @@ class UsuariosPanel extends Component
             'title' => 'Estado actualizado',
             'text' => "El usuario ahora está {$nuevoEstado}."
         ]);
+    }
+
+    public function restablecerPasswordUsuario($cod_usu)
+    {
+        if (!auth()->user()->can('usuarios.editar')) {
+            $this->dispatch('swal', [
+                'icon' => 'error',
+                'title' => 'Acceso denegado',
+                'text' => 'No tienes permiso para restablecer contraseñas.'
+            ]);
+            return;
+        }
+
+        $usuario = User::findOrFail($cod_usu);
+
+        // Protección absoluta de USU_0001
+        if ($usuario->cod_usu === 'USU_0001' && auth()->id() !== 'USU_0001') {
+            $this->dispatch('swal', [
+                'icon' => 'error',
+                'title' => 'Acción no permitida',
+                'text' => 'No tienes permisos para restablecer la contraseña del Administrador Principal.'
+            ]);
+            return;
+        }
+
+        $passwordTemporal = $this->generarPasswordTemporal();
+        $usuario->update([
+            'password' => Hash::make($passwordTemporal),
+            'debe_cambiar_password' => true
+        ]);
+
+        $correoNotifEnviado = false;
+        try {
+            \Mail::to($usuario->correo)->send(new \App\Mail\UsuarioPasswordActualizadaMail($usuario, $passwordTemporal));
+            $correoNotifEnviado = true;
+        } catch (\Exception $e) {
+            \Log::error("Error al enviar correo de restablecimiento a {$usuario->correo}: " . $e->getMessage());
+        }
+
+        if (function_exists('activity')) {
+            $actMsg = "Se restableció la contraseña del usuario: {$usuario->name}.";
+            if ($correoNotifEnviado) {
+                $actMsg .= " Notificación enviada con éxito.";
+            } else {
+                $actMsg .= " Error al enviar notificación por correo.";
+            }
+            activity('Usuarios')
+                ->causedBy(auth()->user())
+                ->performedOn($usuario)
+                ->event('restablecer_password')
+                ->log($actMsg);
+        }
+
+        if ($correoNotifEnviado) {
+            $this->dispatch('swal', [
+                'icon' => 'success',
+                'title' => 'Contraseña restablecida',
+                'text' => 'Se ha generado una nueva contraseña temporal y se ha enviado al correo del usuario.'
+            ]);
+        } else {
+            $this->dispatch('swal', [
+                'icon' => 'warning',
+                'title' => 'Restablecida con advertencia',
+                'text' => "Se ha generado una nueva contraseña, pero no se pudo enviar el correo de notificación. La contraseña temporal es: {$passwordTemporal}"
+            ]);
+        }
     }
 
     // ── REPORTES Y EXPORTACIÓN ──

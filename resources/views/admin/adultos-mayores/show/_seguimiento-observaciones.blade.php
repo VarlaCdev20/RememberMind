@@ -119,7 +119,7 @@
                             @endphp
                             <tr class="group transition hover:bg-[#F2EBE3]/40">
                                 <td class="px-6 py-4 whitespace-nowrap">
-                                    <span class="text-xs font-black text-[#2F3E5C]">{{ optional($obsObj)->fecha ? Carbon::parse($obsObj->fecha)->format('d/m/Y') : 'N/D' }}</span>
+                                    <span class="text-xs font-black text-[#2F3E5C]">{{ optional($obsObj)->fecha ? \Carbon\Carbon::parse($obsObj->fecha)->format('d/m/Y') : 'N/D' }}</span>
                                 </td>
                                 <td class="px-6 py-4">
                                     <p class="text-xs font-black text-[#2F3E5C]">{{ optional($obsObj)->tipo_obs }}</p>

@@ -17,15 +17,15 @@
     $fechaIngreso = optional($adultoObj)->fecha_ing;
 
     $edad = $fechaNacimiento
-        ? Carbon::parse($fechaNacimiento)->age
+        ? \Carbon\Carbon::parse($fechaNacimiento)->age
         : null;
 
     $fechaNacimientoFormateada = $fechaNacimiento
-        ? Carbon::parse($fechaNacimiento)->format('d/m/Y')
+        ? \Carbon\Carbon::parse($fechaNacimiento)->format('d/m/Y')
         : 'No registrada';
 
     $fechaIngresoFormateada = $fechaIngreso
-        ? Carbon::parse($fechaIngreso)->format('d/m/Y')
+        ? \Carbon\Carbon::parse($fechaIngreso)->format('d/m/Y')
         : 'No registrada';
 
     /*

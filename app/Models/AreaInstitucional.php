@@ -124,4 +124,14 @@ class AreaInstitucional extends Model
     {
         return $query->where('estado', 'INACTIVA');
     }
+
+    public function asignacionesTurno()
+    {
+        return $this->hasMany(AsignacionTurno::class, 'cod_area', 'cod_area');
+    }
+
+    public function usuariosAsignados()
+    {
+        return $this->hasManyThrough(User::class, AsignacionTurno::class, 'cod_area', 'cod_usu', 'cod_area', 'cod_usu');
+    }
 }

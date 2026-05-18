@@ -120,7 +120,7 @@
                                 <span class="rounded-full bg-[#2F3E5C]/10 px-2.5 py-1 text-[9px] font-black">{{ $tipoDoc }}</span>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-xs font-black text-[#2F3E5C]/60">
-                                {{ $fechaDoc ? Carbon::parse($fechaDoc)->format('d/m/Y') : 'N/D' }}
+                                {{ $fechaDoc ? \Carbon\Carbon::parse($fechaDoc)->format('d/m/Y') : 'N/D' }}
                             </td>
                             <td class="px-6 py-4">
                                 <p class="text-[11px] font-semibold text-[#2F3E5C]/65 line-clamp-1">{{ optional($documentoObj)->observaciones ?? 'Sin notas' }}</p>

@@ -19,10 +19,12 @@ class DatabaseSeeder extends Seeder
             RolesAndPermissionsSeeder::class,
             AreasInstitucionalesSeeder::class,
             AdminSeeder::class,
+            TurnoInstitucionalSeeder::class,
             AdultoMayorSeeder::class,
             TipoEvaluacionCognitivaSeeder::class,
             CargoAdministrativoSeeder::class,
             EspecialidadSeeder::class,
+            TipoDocumentoUsuarioSeeder::class,
         ]);
     }
 
