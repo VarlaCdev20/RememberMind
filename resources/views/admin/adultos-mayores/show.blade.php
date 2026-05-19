@@ -117,16 +117,43 @@
 
             {{-- Contenido de pestañas --}}
             <div class="px-5 py-6 sm:px-6">
+                <!-- 1. Resumen -->
                 @include('admin.adultos-mayores.show._resumen')
-                @include('admin.adultos-mayores.show._familiares')
-                @include('admin.adultos-mayores.show._seguimiento-observaciones')
-                @include('admin.adultos-mayores.show._atenciones')
+
+                <!-- 2. Datos y Red de Apoyo -->
+                <div x-show="tab === 'datos'">
+                    <div x-data="{ tab: 'familiares' }">
+                        @include('admin.adultos-mayores.show._familiares')
+                    </div>
+                </div>
+
+                <!-- 3. Salud y Cuidados -->
                 @include('admin.adultos-mayores.show._salud-medica')
+
+                <!-- 4. Seguimiento -->
+                <div x-show="tab === 'seguimiento'" class="space-y-6">
+                    @include('admin.adultos-mayores.show._seguimiento-observaciones')
+                    
+                    {{-- Atenciones (renderizado directo) --}}
+                    @include('admin.adultos-mayores.show._atenciones')
+                    
+                    {{-- Actividades (shadowing tab a actividades) --}}
+                    <div x-data="{ tab: 'actividades' }">
+                        @include('admin.adultos-mayores.show._actividades')
+                    </div>
+                </div>
+
+                <!-- 5. Evaluaciones -->
                 @include('admin.adultos-mayores.show._evaluaciones-cognitivas')
-                @include('admin.adultos-mayores.show._actividades')
+
+                <!-- 6. Documentos -->
                 @include('admin.adultos-mayores.show._documentos')
-                @include('admin.adultos-mayores.show._reportes')
+
+                <!-- 7. Historial -->
                 @include('admin.adultos-mayores.show._historial-estados')
+
+                <!-- 8. Reportes -->
+                @include('admin.adultos-mayores.show._reportes')
             </div>
 
             {{-- Modales Antiguos --}}
