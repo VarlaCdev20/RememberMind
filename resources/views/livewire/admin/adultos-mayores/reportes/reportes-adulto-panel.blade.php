@@ -1,125 +1,258 @@
 <div>
-    <div class="mb-6 rounded-[24px] border border-[#CBBBAA] bg-[#F2EBE3]/85 p-5 shadow-sm flex flex-col md:flex-row gap-4 items-end justify-between">
+    {{-- Selector de Periodo y Filtros --}}
+    <div class="mb-6 rounded-[24px] border border-[#CBBBAA] bg-[#F2EBE3]/90 p-5 shadow-[0_12px_28px_rgba(47,62,92,0.05)] backdrop-blur-xl flex flex-col md:flex-row gap-4 items-end justify-between">
         <div class="flex-1">
-            <h3 class="text-lg font-black text-[#2F3E5C] mb-1">Centro de Reportes y Evolución</h3>
-            <p class="text-xs font-semibold text-[#2F3E5C]/60">Selecciona el periodo para filtrar los gráficos y la información de los reportes.</p>
+            <span class="text-[11px] font-black uppercase tracking-[0.18em] text-[#9A7B60]">
+                Análisis y Reportes
+            </span>
+            <h3 class="text-base font-black text-[#2F3E5C] mt-1 mb-1">
+                Ficha y Reportes de Evolución
+            </h3>
+            <p class="text-[11px] font-bold text-[#2F3E5C]/60 leading-relaxed">
+                Seleccione el rango de fechas para actualizar en tiempo real los análisis gráficos y registros de evolución.
+            </p>
         </div>
-        <div class="flex items-center gap-3 w-full md:w-auto">
-            <div>
-                <label class="block text-[10px] font-black uppercase text-[#2F3E5C]/60 mb-1">Desde</label>
-                <input type="date" wire:model.live="fecha_inicio" class="rounded-xl border border-[#C7B5A3] bg-[#D5C7B9]/70 px-4 py-2 text-sm font-bold text-[#2F3E5C] outline-none">
+        <div class="flex flex-wrap items-center gap-3 w-full md:w-auto shrink-0">
+            <div class="w-[140px]">
+                <label class="block text-[9px] font-black uppercase text-[#2F3E5C]/60 mb-1 tracking-wider">Desde</label>
+                <input type="date" wire:model.live="fecha_inicio" class="w-full rounded-xl border border-[#C7B5A3] bg-white/45 px-3 py-1.5 text-xs font-bold text-[#2F3E5C] outline-none hover:bg-white transition">
             </div>
-            <div>
-                <label class="block text-[10px] font-black uppercase text-[#2F3E5C]/60 mb-1">Hasta</label>
-                <input type="date" wire:model.live="fecha_fin" class="rounded-xl border border-[#C7B5A3] bg-[#D5C7B9]/70 px-4 py-2 text-sm font-bold text-[#2F3E5C] outline-none">
+            <div class="w-[140px]">
+                <label class="block text-[9px] font-black uppercase text-[#2F3E5C]/60 mb-1 tracking-wider">Hasta</label>
+                <input type="date" wire:model.live="fecha_fin" class="w-full rounded-xl border border-[#C7B5A3] bg-white/45 px-3 py-1.5 text-xs font-bold text-[#2F3E5C] outline-none hover:bg-white transition">
             </div>
         </div>
     </div>
 
-    {{-- Error de fechas --}}
+    {{-- Alerta de fecha inconsistente --}}
     @if($fecha_inicio && $fecha_fin && $fecha_inicio > $fecha_fin)
-        <div class="mb-4 rounded-xl border border-red-200 bg-red-50 p-3 text-xs font-bold text-red-600">
-            <i class="ph-bold ph-warning-circle"></i> La fecha de inicio no puede ser mayor a la fecha de fin.
+        <div class="mb-5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-xs font-bold text-red-700 flex items-center gap-2 shadow-xs">
+            <i class="ph-bold ph-warning-circle text-base"></i>
+            <span>La fecha de inicio no puede ser posterior a la fecha de fin del periodo seleccionado.</span>
         </div>
     @endif
 
-    {{-- Cards de Reportes --}}
+    {{-- Indicadores rápidos en el rango --}}
+    <div class="grid gap-3 mb-6 sm:grid-cols-2 lg:grid-cols-4">
+        <div class="rounded-[18px] border border-[#D5C7B9] bg-[#E7DDD2]/45 p-4 shadow-xs">
+            <p class="text-[9px] font-black uppercase tracking-[0.15em] text-[#2F3E5C]/45">Reportes Disponibles</p>
+            <p class="mt-1 text-xl font-black text-[#2F3E5C]">6</p>
+        </div>
+        <div class="rounded-[18px] border border-[#D5C7B9] bg-[#E7DDD2]/45 p-4 shadow-xs">
+            <p class="text-[9px] font-black uppercase tracking-[0.15em] text-[#2F3E5C]/45">Registros Signos Vitales</p>
+            <p class="mt-1 text-xl font-black text-[#C45F4B]">
+                {{ count($chartSignos['fc'] ?? []) }}
+            </p>
+        </div>
+        <div class="rounded-[18px] border border-[#D5C7B9] bg-[#E7DDD2]/45 p-4 shadow-xs">
+            <p class="text-[9px] font-black uppercase tracking-[0.15em] text-[#2F3E5C]/45">Evaluaciones Registradas</p>
+            <p class="mt-1 text-xl font-black text-[#5B5F97]">
+                {{ count($chartCognitivo['puntajes'] ?? []) }}
+            </p>
+        </div>
+        <div class="rounded-[18px] border border-[#D5C7B9] bg-[#E7DDD2]/45 p-4 shadow-xs">
+            <p class="text-[9px] font-black uppercase tracking-[0.15em] text-[#2F3E5C]/45">Anexo de Trazabilidad</p>
+            <span class="mt-1.5 inline-flex items-center rounded-md bg-[#8EA17D]/15 border border-[#8EA17D]/35 px-2 py-0.5 text-[10px] font-black text-[#617453]">
+                ACTIVO
+            </span>
+        </div>
+    </div>
+
+    {{-- Cards de Reportes Individuales --}}
+    <h3 class="text-xs font-black uppercase tracking-widest text-[#2F3E5C]/60 mb-4 border-b border-[#D5C7B9]/50 pb-2 flex items-center gap-2">
+        <i class="ph-bold ph-file-text"></i> Catálogo de Reportes Individuales
+    </h3>
+
     <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3 mb-8">
         @php
             $q = "?start_date={$fecha_inicio}&end_date={$fecha_fin}";
             $reportes = [
-                ['icono' => 'ph-files', 'titulo' => 'Reporte Individual Integral', 'desc' => 'Consolidado administrativo, social y médico', 'color' => '#2F3E5C', 'bg' => 'bg-[#2F3E5C]/10', 'url' => route('admin.adultos-mayores.reporte-individual', $adultoMayor->cod_am)],
-                ['icono' => 'ph-stethoscope', 'titulo' => 'Reporte Médico', 'desc' => 'Historial de atenciones, ficha médica', 'color' => '#E27D60', 'bg' => 'bg-[#E27D60]/10', 'url' => route('admin.adultos-mayores.reportes.especifico', [$adultoMayor->cod_am, 'medico']) . $q],
-                ['icono' => 'ph-pill', 'titulo' => 'Reporte de Medicación', 'desc' => 'Tratamientos y tomas registradas', 'color' => '#D9A27C', 'bg' => 'bg-[#D9A27C]/20', 'url' => route('admin.adultos-mayores.reportes.especifico', [$adultoMayor->cod_am, 'medicacion']) . $q],
-                ['icono' => 'ph-heartbeat', 'titulo' => 'Reporte Signos Vitales', 'desc' => 'Registro y evolución de SV', 'color' => '#C45F4B', 'bg' => 'bg-[#C45F4B]/10', 'url' => route('admin.adultos-mayores.reportes.especifico', [$adultoMayor->cod_am, 'signos']) . $q],
-                ['icono' => 'ph-person-arms-spread', 'titulo' => 'Valoración Funcional Institucional', 'desc' => 'Niveles de dependencia registrados', 'color' => '#8EA17D', 'bg' => 'bg-[#8EA17D]/15', 'url' => route('admin.adultos-mayores.reportes.especifico', [$adultoMayor->cod_am, 'funcional']) . $q],
-                ['icono' => 'ph-brain', 'titulo' => 'Evaluaciones Cognitivas', 'desc' => 'Puntajes de tamizaje e interpretación', 'color' => '#5B5F97', 'bg' => 'bg-[#5B5F97]/15', 'url' => route('admin.adultos-mayores.reportes.especifico', [$adultoMayor->cod_am, 'cognitivo']) . $q],
+                [
+                    'icono' => 'ph-files',
+                    'titulo' => 'Ficha Integral del Adulto Mayor',
+                    'desc' => 'Consolidado general administrativo, red de apoyo y evolución.',
+                    'color' => '#2F3E5C',
+                    'bg' => 'bg-[#2F3E5C]/10',
+                    'url' => route('admin.adultos-mayores.reporte-individual', $adultoMayor->cod_am)
+                ],
+                [
+                    'icono' => 'ph-hand-pointing',
+                    'titulo' => 'Reporte de Atenciones',
+                    'desc' => 'Historial de atenciones institucionales registradas en el periodo.',
+                    'color' => '#E27D60',
+                    'bg' => 'bg-[#E27D60]/10',
+                    'url' => route('admin.adultos-mayores.reportes.especifico', [$adultoMayor->cod_am, 'medico']) . $q
+                ],
+                [
+                    'icono' => 'ph-pill',
+                    'titulo' => 'Reporte de Medicación',
+                    'desc' => 'Tratamientos y bitácora de tomas registradas en el periodo.',
+                    'color' => '#D9A27C',
+                    'bg' => 'bg-[#D9A27C]/20',
+                    'url' => route('admin.adultos-mayores.reportes.especifico', [$adultoMayor->cod_am, 'medicacion']) . $q
+                ],
+                [
+                    'icono' => 'ph-heartbeat',
+                    'titulo' => 'Reporte Signos Vitales',
+                    'desc' => 'Evolución registrada e historial de constantes vitales.',
+                    'color' => '#C45F4B',
+                    'bg' => 'bg-[#C45F4B]/10',
+                    'url' => route('admin.adultos-mayores.reportes.especifico', [$adultoMayor->cod_am, 'signos']) . $q
+                ],
+                [
+                    'icono' => 'ph-person-arms-spread',
+                    'titulo' => 'Valoración Funcional',
+                    'desc' => 'Nivel de autonomía e indicadores funcionales institucionales.',
+                    'color' => '#8EA17D',
+                    'bg' => 'bg-[#8EA17D]/15',
+                    'url' => route('admin.adultos-mayores.reportes.especifico', [$adultoMayor->cod_am, 'funcional']) . $q
+                ],
+                [
+                    'icono' => 'ph-brain',
+                    'titulo' => 'Reporte de Evaluaciones',
+                    'desc' => 'Puntajes de tamizaje cognitivo y resultados interpretativos.',
+                    'color' => '#5B5F97',
+                    'bg' => 'bg-[#5B5F97]/15',
+                    'url' => route('admin.adultos-mayores.reportes.especifico', [$adultoMayor->cod_am, 'cognitivo']) . $q
+                ],
             ];
         @endphp
 
         @foreach($reportes as $rep)
-            <div class="rounded-2xl border border-[#CBBBAA] bg-[#E7DDD2]/90 p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
+            <div class="rounded-2xl border border-[#CBBBAA] bg-[#E7DDD2]/95 p-4 shadow-xs transition duration-200 hover:-translate-y-0.5 hover:shadow-md flex flex-col justify-between">
                 <div class="flex items-start gap-3">
-                    <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl {{ $rep['bg'] }}" style="color: {{ $rep['color'] }}">
-                        <i class="ph-fill {{ $rep['icono'] }} text-2xl"></i>
+                    <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl {{ $rep['bg'] }}" style="color: {{ $rep['color'] }}">
+                        <i class="ph-bold {{ $rep['icono'] }} text-xl"></i>
                     </div>
                     <div>
-                        <h4 class="text-sm font-black text-[#2F3E5C]">{{ $rep['titulo'] }}</h4>
-                        <p class="text-[10px] font-bold text-[#2F3E5C]/60 mb-3">{{ $rep['desc'] }}</p>
-                        <div class="flex gap-2">
-                            <a href="{{ $rep['url'] }}" target="_blank" class="inline-flex items-center gap-1 rounded-lg bg-white/50 px-3 py-1.5 text-[10px] font-black uppercase tracking-wider text-[#2F3E5C] transition hover:bg-white border border-[#D5C7B9]">
-                                <i class="ph-bold ph-eye"></i> Visualizar
-                            </a>
-                            <a href="{{ $rep['url'] }}&format=pdf" class="inline-flex items-center gap-1 rounded-lg bg-[#2F3E5C] px-3 py-1.5 text-[10px] font-black uppercase tracking-wider text-white transition hover:bg-[#1F2E4C]">
-                                <i class="ph-bold ph-file-pdf"></i> PDF
-                            </a>
-                        </div>
+                        <h4 class="text-xs font-black text-[#2F3E5C] leading-snug">{{ $rep['titulo'] }}</h4>
+                        <p class="text-[10px] font-bold text-[#2F3E5C]/60 mt-1 mb-3 leading-relaxed">{{ $rep['desc'] }}</p>
                     </div>
+                </div>
+                <div class="flex gap-2 border-t border-[#D5C7B9]/20 pt-3">
+                    <a href="{{ $rep['url'] }}" target="_blank" class="flex-1 inline-flex items-center justify-center gap-1 rounded-lg bg-white/55 px-2.5 py-1.5 text-[9px] font-black uppercase tracking-wider text-[#2F3E5C] transition hover:bg-white border border-[#D5C7B9] active:scale-95">
+                        <i class="ph-bold ph-eye"></i> Ver
+                    </a>
+                    <a href="{{ $rep['url'] }}&format=pdf" class="flex-1 inline-flex items-center justify-center gap-1 rounded-lg bg-[#2F3E5C] px-2.5 py-1.5 text-[9px] font-black uppercase tracking-wider text-white transition hover:bg-[#1F2E4C] active:scale-95">
+                        <i class="ph-bold ph-file-pdf"></i> PDF
+                    </a>
                 </div>
             </div>
         @endforeach
     </div>
 
     {{-- Gráficos de Evolución --}}
-    <h3 class="text-sm font-black uppercase tracking-widest text-[#2F3E5C]/60 mb-4 border-b border-[#D5C7B9]/50 pb-2">
-        <i class="ph-bold ph-trend-up"></i> Gráficos de Evolución Histórica
+    <h3 class="text-xs font-black uppercase tracking-widest text-[#2F3E5C]/60 mb-4 border-b border-[#D5C7B9]/50 pb-2 flex items-center gap-2">
+        <i class="ph-bold ph-trend-up"></i> Gráficos de Evolución Institucional
     </h3>
 
     <div class="grid gap-6 lg:grid-cols-2">
-        <div class="rounded-2xl border border-[#CBBBAA] bg-[#E7DDD2]/90 p-4 shadow-sm"
-             x-data="{ chart: null }"
-             x-init="
-                chart = new Chart($refs.canvasSignos, {
-                    type: 'line',
-                    data: {
-                        labels: @js($chartSignos['labels']),
-                        datasets: [
-                            { label: 'Frecuencia Cardíaca', data: @js($chartSignos['fc']), borderColor: '#D96F58', backgroundColor: 'rgba(217,111,88,0.1)', tension: 0.3, fill: true },
-                            { label: 'Saturación O2', data: @js($chartSignos['sat']), borderColor: '#5B5F97', backgroundColor: 'transparent', tension: 0.3 },
-                            { label: 'Temperatura', data: @js($chartSignos['temp']), borderColor: '#8EA17D', backgroundColor: 'transparent', tension: 0.3 }
-                        ]
-                    },
-                    options: { responsive: true, plugins: { legend: { position: 'bottom', labels: { font: { size: 10, family: 'Outfit' } } } } }
-                });
-                $watch('$wire.chartSignos', value => {
-                    chart.data.labels = value.labels;
-                    chart.data.datasets[0].data = value.fc;
-                    chart.data.datasets[1].data = value.sat;
-                    chart.data.datasets[2].data = value.temp;
-                    chart.update();
-                });
-             "
-        >
-            <h4 class="text-xs font-black text-[#2F3E5C] mb-3">Evolución de Signos Vitales</h4>
-            <div class="relative h-64 w-full">
-                <canvas x-ref="canvasSignos"></canvas>
-            </div>
+        {{-- Gráfico Signos Vitales --}}
+        <div class="rounded-2xl border border-[#CBBBAA] bg-[#E7DDD2]/95 p-5 shadow-xs flex flex-col justify-between">
+            <h4 class="text-xs font-black text-[#2F3E5C] mb-3 flex items-center gap-1.5">
+                <span class="h-2 w-2 rounded-full bg-[#C45F4B]"></span>
+                Evolución de Signos Vitales
+            </h4>
+            
+            @if(empty($chartSignos['fc'] ?? []))
+                <div class="flex flex-col items-center justify-center py-16 text-center border-2 border-dashed border-[#D5C7B9] rounded-xl bg-[#F2EBE3]/45 min-h-[260px]">
+                    <i class="ph-bold ph-heartbeat text-3xl text-[#2F3E5C]/30 mb-2"></i>
+                    <p class="text-xs font-black text-[#2F3E5C]/50">Sin datos suficientes para generar esta gráfica.</p>
+                    <p class="text-[10px] font-bold text-[#2F3E5C]/35 mt-0.5">Registre constantes vitales en el rango de fechas seleccionado.</p>
+                </div>
+            @else
+                <div class="relative h-64 w-full"
+                     x-data="{ chart: null }"
+                     x-init="
+                        chart = new Chart($refs.canvasSignos, {
+                            type: 'line',
+                            data: {
+                                labels: @js($chartSignos['labels']),
+                                datasets: [
+                                    { label: 'Frecuencia Cardíaca', data: @js($chartSignos['fc']), borderColor: '#D96F58', backgroundColor: 'rgba(217,111,88,0.08)', tension: 0.3, fill: true },
+                                    { label: 'Saturación O2', data: @js($chartSignos['sat']), borderColor: '#5B5F97', backgroundColor: 'transparent', tension: 0.3 },
+                                    { label: 'Temperatura', data: @js($chartSignos['temp']), borderColor: '#8EA17D', backgroundColor: 'transparent', tension: 0.3 }
+                                ]
+                            },
+                            options: { 
+                                responsive: true, 
+                                maintainAspectRatio: false,
+                                plugins: { 
+                                    legend: { 
+                                        position: 'bottom', 
+                                        labels: { font: { size: 9, family: 'Outfit', weight: 'bold' }, color: '#2F3E5C' } 
+                                    } 
+                                } 
+                            }
+                        });
+                        $watch('$wire.chartSignos', value => {
+                            if (value && value.labels && value.labels.length > 0) {
+                                chart.data.labels = value.labels;
+                                chart.data.datasets[0].data = value.fc;
+                                chart.data.datasets[1].data = value.sat;
+                                chart.data.datasets[2].data = value.temp;
+                                chart.update();
+                            }
+                        });
+                     "
+                >
+                    <canvas x-ref="canvasSignos"></canvas>
+                </div>
+            @endif
         </div>
 
-        <div class="rounded-2xl border border-[#CBBBAA] bg-[#E7DDD2]/90 p-4 shadow-sm"
-             x-data="{ chart: null }"
-             x-init="
-                chart = new Chart($refs.canvasCognitivo, {
-                    type: 'bar',
-                    data: {
-                        labels: @js($chartCognitivo['labels']),
-                        datasets: [
-                            { label: 'Puntaje Obtenido', data: @js($chartCognitivo['puntajes']), backgroundColor: '#5B5F97', borderRadius: 6 }
-                        ]
-                    },
-                    options: { responsive: true, plugins: { legend: { position: 'bottom', labels: { font: { size: 10, family: 'Outfit' } } } }, scales: { y: { beginAtZero: true } } }
-                });
-                $watch('$wire.chartCognitivo', value => {
-                    chart.data.labels = value.labels;
-                    chart.data.datasets[0].data = value.puntajes;
-                    chart.update();
-                });
-             "
-        >
-            <h4 class="text-xs font-black text-[#2F3E5C] mb-3">Evolución de Evaluaciones Cognitivas</h4>
-            <div class="relative h-64 w-full">
-                <canvas x-ref="canvasCognitivo"></canvas>
-            </div>
+        {{-- Gráfico Evaluaciones --}}
+        <div class="rounded-2xl border border-[#CBBBAA] bg-[#E7DDD2]/95 p-5 shadow-xs flex flex-col justify-between">
+            <h4 class="text-xs font-black text-[#2F3E5C] mb-3 flex items-center gap-1.5">
+                <span class="h-2 w-2 rounded-full bg-[#5B5F97]"></span>
+                Evolución de Evaluaciones Cognitivas
+            </h4>
+
+            @if(empty($chartCognitivo['puntajes'] ?? []))
+                <div class="flex flex-col items-center justify-center py-16 text-center border-2 border-dashed border-[#D5C7B9] rounded-xl bg-[#F2EBE3]/45 min-h-[260px]">
+                    <i class="ph-bold ph-brain text-3xl text-[#2F3E5C]/30 mb-2"></i>
+                    <p class="text-xs font-black text-[#2F3E5C]/50">Sin datos suficientes para generar esta gráfica.</p>
+                    <p class="text-[10px] font-bold text-[#2F3E5C]/35 mt-0.5">Registre valoraciones de tamizaje cognitivo en el rango seleccionado.</p>
+                </div>
+            @else
+                <div class="relative h-64 w-full"
+                     x-data="{ chart: null }"
+                     x-init="
+                        chart = new Chart($refs.canvasCognitivo, {
+                            type: 'bar',
+                            data: {
+                                labels: @js($chartCognitivo['labels']),
+                                datasets: [
+                                    { label: 'Puntaje Obtenido', data: @js($chartCognitivo['puntajes']), backgroundColor: '#5B5F97', borderRadius: 6 }
+                                ]
+                            },
+                            options: { 
+                                responsive: true, 
+                                maintainAspectRatio: false,
+                                plugins: { 
+                                    legend: { 
+                                        position: 'bottom', 
+                                        labels: { font: { size: 9, family: 'Outfit', weight: 'bold' }, color: '#2F3E5C' } 
+                                    } 
+                                },
+                                scales: { 
+                                    y: { beginAtZero: true, ticks: { color: '#2F3E5C', font: { size: 9 } } },
+                                    x: { ticks: { color: '#2F3E5C', font: { size: 9 } } }
+                                } 
+                            }
+                        });
+                        $watch('$wire.chartCognitivo', value => {
+                            if (value && value.labels && value.labels.length > 0) {
+                                chart.data.labels = value.labels;
+                                chart.data.datasets[0].data = value.puntajes;
+                                chart.update();
+                            }
+                        });
+                     "
+                >
+                    <canvas x-ref="canvasCognitivo"></canvas>
+                </div>
+            @endif
         </div>
     </div>
 </div>

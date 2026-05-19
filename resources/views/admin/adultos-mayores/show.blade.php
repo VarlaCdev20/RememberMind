@@ -17,15 +17,15 @@
     $fechaIngreso = optional($adultoObj)->fecha_ing;
 
     $edad = $fechaNacimiento
-        ? \Carbon\Carbon::parse($fechaNacimiento)->age
+        ? Carbon::parse($fechaNacimiento)->age
         : null;
 
     $fechaNacimientoFormateada = $fechaNacimiento
-        ? \Carbon\Carbon::parse($fechaNacimiento)->format('d/m/Y')
+        ? Carbon::parse($fechaNacimiento)->format('d/m/Y')
         : 'No registrada';
 
     $fechaIngresoFormateada = $fechaIngreso
-        ? \Carbon\Carbon::parse($fechaIngreso)->format('d/m/Y')
+        ? Carbon::parse($fechaIngreso)->format('d/m/Y')
         : 'No registrada';
 
     /*
@@ -133,14 +133,6 @@
                 <!-- 4. Seguimiento -->
                 <div x-show="tab === 'seguimiento'" class="space-y-6">
                     @include('admin.adultos-mayores.show._seguimiento-observaciones')
-                    
-                    {{-- Atenciones (renderizado directo) --}}
-                    @include('admin.adultos-mayores.show._atenciones')
-                    
-                    {{-- Actividades (shadowing tab a actividades) --}}
-                    <div x-data="{ tab: 'actividades' }">
-                        @include('admin.adultos-mayores.show._actividades')
-                    </div>
                 </div>
 
                 <!-- 5. Evaluaciones -->
