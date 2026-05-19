@@ -81,6 +81,22 @@ class UsuariosPanel extends Component
     public $edad = null;
     public $passwordTemporalVisual = null;
 
+    // ── Vinculación de Adultos Mayores (Rol Familiar) ──
+    public array $vinculosFamiliar = [];
+    public $selected_cod_am = '';
+    public $selected_parentesco = 'Hijo/a';
+    public $selected_es_responsable = false;
+    public $selected_observaciones = '';
+
+    // Quick registration for Adulto Mayor
+    public $mostrarQuickRegAdulto = false;
+    public $quick_nombres = '';
+    public $quick_ap_paterno = '';
+    public $quick_ap_materno = '';
+    public $quick_ci = '';
+    public $quick_genero = 'MASCULINO';
+    public $quick_fecha_nac = '';
+
     // ── Paises y codigos ──
     public array $paisesConfig = [
         'Bolivia' => ['codigo' => '+591', 'doc' => 'CI', 'placeholder' => 'Ej. 70012345'],
@@ -102,7 +118,6 @@ class UsuariosPanel extends Component
     // ── Ficha Rápida Flotante (panel lateral derecho) ──
     public bool $mostrarFichaRapida = false;
     public ?string $usuarioFichaId = null;
-    public $usuarioFicha = null;
 
     // ── Vista Completa (modal/panel expandido) ──
     public bool $mostrarVistaCompleta = false;
@@ -478,7 +493,9 @@ class UsuariosPanel extends Component
             'direccion', 'zona', 'ciudad', 'contacto_emergencia', 'parentesco_emergencia', 'celular_emergencia',
             'tipo_vinculacion', 'matricula_prof', 'institucion_formacion', 'disponibilidad_inicial',
             'area_apoyo_preferente', 'observacion_vinculo',
-            'calle', 'nro_domicilio', 'ap_paterno_emergencia', 'ap_materno_emergencia'
+            'calle', 'nro_domicilio', 'ap_paterno_emergencia', 'ap_materno_emergencia',
+            'vinculosFamiliar', 'selected_cod_am', 'selected_parentesco', 'selected_es_responsable', 'selected_observaciones',
+            'mostrarQuickRegAdulto', 'quick_nombres', 'quick_ap_paterno', 'quick_ap_materno', 'quick_ci', 'quick_genero', 'quick_fecha_nac'
         ]);
         $this->isEdit = false;
         $this->pasoFormulario = 1;
@@ -507,6 +524,135 @@ class UsuariosPanel extends Component
         $this->passwordTemporalVisual = $this->generarPasswordTemporal();
         $this->isEdit = false;
         $this->mostrarFormulario = true;
+    }
+
+    // ════════════════════════════════════════════════════════════════════════
+    // MÉTODOS DE VINCULACIÓN Y REGISTRO DE ADULTOS MAYORES (ROL FAMILIAR)
+    // ════════════════════════════════════════════════════════════════════════
+
+    public function vincularAdultoMayor()
+    {
+        $this->validate([
+            'selected_cod_am' => 'required',
+            'selected_parentesco' => 'required|string|max:100',
+        ], [
+            'selected_cod_am.required' => 'Debe seleccionar un adulto mayor de la lista.',
+            'selected_parentesco.required' => 'Debe ingresar o seleccionar el parentesco.',
+        ]);
+
+        $am = \App\Models\AdultoMayor::find($this->selected_cod_am);
+        if (!$am) {
+            $this->dispatch('swal', [
+                'icon' => 'error',
+                'title' => 'Error',
+                'text' => 'El adulto mayor seleccionado no existe.'
+            ]);
+            return;
+        }
+
+        // Verificar si ya está en la lista de vinculación
+        foreach ($this->vinculosFamiliar as $vinculo) {
+            if ($vinculo['cod_am'] === $this->selected_cod_am) {
+                $this->dispatch('swal', [
+                    'icon' => 'warning',
+                    'title' => 'Ya vinculado',
+                    'text' => 'Este adulto mayor ya está en la lista de vinculación.'
+                ]);
+                return;
+            }
+        }
+
+        $nombreCompleto = trim("{$am->nombres} {$am->ap_paterno} {$am->ap_materno}");
+        $this->vinculosFamiliar[] = [
+            'cod_am' => $this->selected_cod_am,
+            'nombres_completos' => $nombreCompleto,
+            'parentesco_vinculo' => $this->selected_parentesco,
+            'es_responsable' => $this->selected_es_responsable ? 'SI' : 'NO',
+            'observaciones' => $this->selected_observaciones ?? '',
+        ];
+
+        // Limpiar campos de vinculación
+        $this->selected_cod_am = '';
+        $this->selected_parentesco = 'Hijo/a';
+        $this->selected_es_responsable = false;
+        $this->selected_observaciones = '';
+
+        $this->dispatch('swal', [
+            'icon' => 'success',
+            'title' => 'Adulto Mayor Vinculado',
+            'text' => "Se ha agregado a {$nombreCompleto} a la lista de vinculación."
+        ]);
+    }
+
+    public function desvincularAdultoMayor($index)
+    {
+        if (isset($this->vinculosFamiliar[$index])) {
+            $nombre = $this->vinculosFamiliar[$index]['nombres_completos'];
+            unset($this->vinculosFamiliar[$index]);
+            $this->vinculosFamiliar = array_values($this->vinculosFamiliar);
+            
+            $this->dispatch('swal', [
+                'icon' => 'info',
+                'title' => 'Vínculo removido',
+                'text' => "Se quitó a {$nombre} de la lista de vinculación."
+            ]);
+        }
+    }
+
+    public function registrarYVincularAdulto()
+    {
+        $this->validate([
+            'quick_nombres' => 'required|string|max:100',
+            'quick_ap_paterno' => 'required|string|max:100',
+            'quick_ap_materno' => 'nullable|string|max:100',
+            'quick_ci' => 'required|string|max:20|unique:adulto_mayor,ci',
+            'quick_genero' => 'required|in:MASCULINO,FEMENINO,OTRO',
+            'quick_fecha_nac' => 'required|date|before:today',
+        ], [
+            'quick_nombres.required' => 'El nombre es obligatorio.',
+            'quick_ap_paterno.required' => 'El apellido paterno es obligatorio.',
+            'quick_ci.required' => 'El CI/Documento es obligatorio.',
+            'quick_ci.unique' => 'Ya existe un adulto mayor registrado con este número de CI/Documento.',
+            'quick_fecha_nac.required' => 'La fecha de nacimiento es obligatoria.',
+            'quick_fecha_nac.before' => 'La fecha de nacimiento debe ser anterior a hoy.',
+        ]);
+
+        // Registrar Adulto Mayor
+        $am = new \App\Models\AdultoMayor();
+        $am->nombres = $this->normalizarTexto($this->quick_nombres);
+        $am->ap_paterno = $this->normalizarTexto($this->quick_ap_paterno);
+        $am->ap_materno = $this->normalizarTexto($this->quick_ap_materno);
+        $am->ci = $this->quick_ci;
+        $am->genero = $this->quick_genero;
+        $am->fecha_nac = $this->quick_fecha_nac;
+        $am->cod_est_adul = 1; // ACTIVO
+        $am->fecha_ing = now()->format('Y-m-d');
+        $am->save();
+
+        $nombreCompleto = trim("{$am->nombres} {$am->ap_paterno} {$am->ap_materno}");
+        
+        // Agregar automáticamente a la lista de vinculación
+        $this->vinculosFamiliar[] = [
+            'cod_am' => $am->cod_am,
+            'nombres_completos' => $nombreCompleto,
+            'parentesco_vinculo' => $this->selected_parentesco,
+            'es_responsable' => $this->selected_es_responsable ? 'SI' : 'NO',
+            'observaciones' => $this->selected_observaciones ?? '',
+        ];
+
+        // Resetear campos quick reg
+        $this->quick_nombres = '';
+        $this->quick_ap_paterno = '';
+        $this->quick_ap_materno = '';
+        $this->quick_ci = '';
+        $this->quick_fecha_nac = '';
+        $this->mostrarQuickRegAdulto = false;
+
+        $this->dispatch('swal', [
+            'icon' => 'success',
+            'title' => 'Registro Exitoso',
+            'text' => "Se registró a {$nombreCompleto} y se vinculó automáticamente al familiar."
+        ]);
     }
 
     public function editarUsuario($cod_usu)
@@ -605,6 +751,18 @@ class UsuariosPanel extends Component
             if ($fam) {
                 $this->parentesco_emergencia = $fam->parentesco;
                 $this->observacion_vinculo = $fam->observacion_vinculo;
+                
+                // Cargar adultos mayores vinculados existentes
+                $this->vinculosFamiliar = [];
+                foreach ($fam->adultosMayores as $am) {
+                    $this->vinculosFamiliar[] = [
+                        'cod_am' => $am->cod_am,
+                        'nombres_completos' => trim("{$am->nombres} {$am->ap_paterno} {$am->ap_materno}"),
+                        'parentesco_vinculo' => $am->pivot->parentesco_vinculo ?? 'Familiar',
+                        'es_responsable' => $am->pivot->es_responsable ? 'SI' : 'NO',
+                        'observaciones' => $am->pivot->observaciones ?? '',
+                    ];
+                }
             }
         }
 
@@ -1036,7 +1194,7 @@ class UsuariosPanel extends Component
                 \App\Models\PersonalAdmin::where('cod_usu', $usuario->cod_usu)->delete();
                 \App\Models\Familiar::where('cod_usu', $usuario->cod_usu)->delete();
             } elseif ($this->rol === 'familiar') {
-                \App\Models\Familiar::updateOrCreate(
+                $fam = \App\Models\Familiar::updateOrCreate(
                     ['cod_usu' => $usuario->cod_usu],
                     [
                         'parentesco' => $this->parentesco_emergencia ?? 'Familiar',
@@ -1045,6 +1203,18 @@ class UsuariosPanel extends Component
                         'observacion_vinculo' => $this->observacion_vinculo
                     ]
                 );
+                
+                // Sincronizar vínculos de adultos mayores
+                $fam->adultosMayores()->detach();
+                foreach ($this->vinculosFamiliar as $vinculo) {
+                    $fam->adultosMayores()->attach($vinculo['cod_am'], [
+                        'parentesco_vinculo' => $vinculo['parentesco_vinculo'],
+                        'es_responsable' => $vinculo['es_responsable'] === 'SI',
+                        'estado' => 'ACTIVO',
+                        'observaciones' => $vinculo['observaciones'],
+                    ]);
+                }
+                
                 \App\Models\PersonalSalud::where('cod_usu', $usuario->cod_usu)->delete();
                 \App\Models\PersonalAdmin::where('cod_usu', $usuario->cod_usu)->delete();
                 \App\Models\Voluntario::where('cod_usu', $usuario->cod_usu)->delete();
@@ -1148,7 +1318,7 @@ class UsuariosPanel extends Component
                 \App\Models\PersonalAdmin::where('cod_usu', $usuario->cod_usu)->delete();
                 \App\Models\Familiar::where('cod_usu', $usuario->cod_usu)->delete();
             } elseif ($this->rol === 'familiar') {
-                \App\Models\Familiar::updateOrCreate(
+                $fam = \App\Models\Familiar::updateOrCreate(
                     ['cod_usu' => $usuario->cod_usu],
                     [
                         'parentesco' => $this->parentesco_emergencia ?? 'Familiar',
@@ -1157,6 +1327,18 @@ class UsuariosPanel extends Component
                         'observacion_vinculo' => $this->observacion_vinculo
                     ]
                 );
+                
+                // Sincronizar vínculos de adultos mayores
+                $fam->adultosMayores()->detach();
+                foreach ($this->vinculosFamiliar as $vinculo) {
+                    $fam->adultosMayores()->attach($vinculo['cod_am'], [
+                        'parentesco_vinculo' => $vinculo['parentesco_vinculo'],
+                        'es_responsable' => $vinculo['es_responsable'] === 'SI',
+                        'estado' => 'ACTIVO',
+                        'observaciones' => $vinculo['observaciones'],
+                    ]);
+                }
+                
                 \App\Models\PersonalSalud::where('cod_usu', $usuario->cod_usu)->delete();
                 \App\Models\PersonalAdmin::where('cod_usu', $usuario->cod_usu)->delete();
                 \App\Models\Voluntario::where('cod_usu', $usuario->cod_usu)->delete();
@@ -1233,12 +1415,6 @@ class UsuariosPanel extends Component
     public function abrirFichaRapida($codUsu): void
     {
         $this->usuarioFichaId = $codUsu;
-        $this->usuarioFicha = User::with([
-            'roles',
-            'personalSalud.especialidad',
-            'personalAdmin.cargoAdmin',
-            'areaInstitucional',
-        ])->where('cod_usu', $codUsu)->firstOrFail();
         $this->mostrarFichaRapida = true;
     }
 
@@ -1246,7 +1422,6 @@ class UsuariosPanel extends Component
     {
         $this->mostrarFichaRapida = false;
         $this->usuarioFichaId = null;
-        $this->usuarioFicha = null;
     }
 
     // ══════════════════════════════════════════════
@@ -1595,12 +1770,23 @@ class UsuariosPanel extends Component
               ->orderBy('ap_paterno')
               ->orderBy('ap_materno');
 
+        $usuarioFichaModel = null;
+        if ($this->mostrarFichaRapida && $this->usuarioFichaId) {
+            $usuarioFichaModel = User::with([
+                'roles',
+                'personalSalud.especialidad',
+                'personalAdmin.cargoAdmin',
+                'areaInstitucional',
+            ])->where('cod_usu', $this->usuarioFichaId)->first();
+        }
+
         return view('livewire.admin.usuarios.usuarios-panel', [
             'usuarios' => $query->paginate(12),
             'roles' => Role::all(),
             'especialidades' => \App\Models\Especialidad::all(),
             'cargosAdmin' => \App\Models\CargoAdministrativo::all(),
             'areas' => \App\Models\AreaInstitucional::activas()->orderBy('orden')->get(),
+            'usuarioFicha' => $usuarioFichaModel,
         ]);
     }
 }

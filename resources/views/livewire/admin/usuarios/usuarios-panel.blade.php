@@ -1124,12 +1124,183 @@
 
                         {{-- Perfil Familiar --}}
                         @if($rol === 'familiar')
-                        <div class="md:col-span-2 grid gap-4 border-t border-[#C7B5A3]/20 pt-3 animate-in fade-in duration-300">
-                            <div>
-                                <h4 class="text-[10px] font-black text-[#2F3E5C] uppercase tracking-widest">Detalle de Vínculo Familiar</h4>
+                        <div class="md:col-span-2 grid gap-6 border-t border-[#C7B5A3]/30 pt-4 animate-in fade-in duration-300">
+                            
+                            {{-- Encabezado de la Sección --}}
+                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#C7B5A3]/20 pb-2">
+                                <div class="flex items-center gap-2">
+                                    <i class="ph-fill ph-users-three text-lg text-[#E27D60]"></i>
+                                    <h4 class="text-[10px] font-black text-[#2F3E5C] uppercase tracking-widest">Vinculación de Adulto(s) Mayor(es)</h4>
+                                </div>
+                                <button type="button" wire:click="$toggle('mostrarQuickRegAdulto')"
+                                        class="px-3 py-1 rounded-lg border border-[#E27D60] text-[#E27D60] text-[8px] font-black uppercase tracking-wider transition hover:bg-[#E27D60] hover:text-white active:scale-95 inline-flex items-center gap-1 shadow-sm">
+                                    <i class="ph-bold {{ $mostrarQuickRegAdulto ? 'ph-caret-left' : 'ph-user-plus' }} text-xs"></i>
+                                    {{ $mostrarQuickRegAdulto ? 'Volver a Selección' : 'Registrar Nuevo Adulto Mayor' }}
+                                </button>
                             </div>
+
+                            {{-- 1. FORMULARIO DE REGISTRO RÁPIDO (INLINE) --}}
+                            @if($mostrarQuickRegAdulto)
+                            <div class="p-4 rounded-2xl bg-[#F4EEE7]/60 border border-[#C7B5A3]/40 space-y-4 animate-in slide-in-from-top-4 duration-300">
+                                <div class="flex items-center gap-2 border-b border-[#C7B5A3]/20 pb-1.5">
+                                    <i class="ph-bold ph-plus-circle text-[#E27D60] text-sm"></i>
+                                    <h5 class="text-[9px] font-black uppercase tracking-widest text-[#2F3E5C]">Registro Rápido de Adulto Mayor</h5>
+                                </div>
+                                
+                                <div class="grid gap-3 sm:grid-cols-2 md:grid-cols-3">
+                                    <div>
+                                        <label class="mb-1 block text-[8px] font-black uppercase tracking-widest text-[#2F3E5C]/60">Nombres *</label>
+                                        <input type="text" wire:model="quick_nombres" placeholder="Nombres" class="w-full h-8 rounded-lg border border-[#C7B5A3] bg-white px-3 py-1 text-xs font-bold text-[#2F3E5C] outline-none transition focus:border-[#E27D60]">
+                                        @error('quick_nombres') <span class="mt-1 block text-[8px] font-black text-[#E27D60] uppercase">{{ $message }}</span> @enderror
+                                    </div>
+                                    <div>
+                                        <label class="mb-1 block text-[8px] font-black uppercase tracking-widest text-[#2F3E5C]/60">Apellido Paterno *</label>
+                                        <input type="text" wire:model="quick_ap_paterno" placeholder="Paterno" class="w-full h-8 rounded-lg border border-[#C7B5A3] bg-white px-3 py-1 text-xs font-bold text-[#2F3E5C] outline-none transition focus:border-[#E27D60]">
+                                        @error('quick_ap_paterno') <span class="mt-1 block text-[8px] font-black text-[#E27D60] uppercase">{{ $message }}</span> @enderror
+                                    </div>
+                                    <div>
+                                        <label class="mb-1 block text-[8px] font-black uppercase tracking-widest text-[#2F3E5C]/60">Apellido Materno</label>
+                                        <input type="text" wire:model="quick_ap_materno" placeholder="Materno" class="w-full h-8 rounded-lg border border-[#C7B5A3] bg-white px-3 py-1 text-xs font-bold text-[#2F3E5C] outline-none transition focus:border-[#E27D60]">
+                                        @error('quick_ap_materno') <span class="mt-1 block text-[8px] font-black text-[#E27D60] uppercase">{{ $message }}</span> @enderror
+                                    </div>
+                                    <div>
+                                        <label class="mb-1 block text-[8px] font-black uppercase tracking-widest text-[#2F3E5C]/60">CI / Documento *</label>
+                                        <input type="text" wire:model="quick_ci" placeholder="Ej. 1234567" class="w-full h-8 rounded-lg border border-[#C7B5A3] bg-white px-3 py-1 text-xs font-bold text-[#2F3E5C] outline-none transition focus:border-[#E27D60]">
+                                        @error('quick_ci') <span class="mt-1 block text-[8px] font-black text-[#E27D60] uppercase">{{ $message }}</span> @enderror
+                                    </div>
+                                    <div>
+                                        <label class="mb-1 block text-[8px] font-black uppercase tracking-widest text-[#2F3E5C]/60">Género *</label>
+                                        <select wire:model="quick_genero" class="w-full h-8 rounded-lg border border-[#C7B5A3] bg-white px-2 py-1 text-xs font-bold text-[#2F3E5C] outline-none transition focus:border-[#E27D60]">
+                                            <option value="MASCULINO">MASCULINO</option>
+                                            <option value="FEMENINO">FEMENINO</option>
+                                            <option value="OTRO">OTRO</option>
+                                        </select>
+                                        @error('quick_genero') <span class="mt-1 block text-[8px] font-black text-[#E27D60] uppercase">{{ $message }}</span> @enderror
+                                    </div>
+                                    <div>
+                                        <label class="mb-1 block text-[8px] font-black uppercase tracking-widest text-[#2F3E5C]/60">Fecha Nacimiento *</label>
+                                        <input type="date" wire:model="quick_fecha_nac" class="w-full h-8 rounded-lg border border-[#C7B5A3] bg-white px-3 py-1 text-xs font-bold text-[#2F3E5C] outline-none transition focus:border-[#E27D60]">
+                                        @error('quick_fecha_nac') <span class="mt-1 block text-[8px] font-black text-[#E27D60] uppercase">{{ $message }}</span> @enderror
+                                    </div>
+                                </div>
+                                <div class="flex justify-end gap-2 border-t border-[#C7B5A3]/10 pt-2">
+                                    <button type="button" wire:click="$set('mostrarQuickRegAdulto', false)" class="px-4 py-1.5 rounded-lg bg-[#C7B5A3]/30 text-[#2F3E5C] text-[8px] font-black uppercase tracking-widest transition hover:bg-[#C7B5A3]/50">Cancelar</button>
+                                    <button type="button" wire:click="registrarYVincularAdulto" class="px-5 py-1.5 rounded-lg bg-[#E27D60] text-white text-[8px] font-black uppercase tracking-widest transition hover:bg-[#2F3E5C] shadow-sm">Registrar y Vincular</button>
+                                </div>
+                            </div>
+
+                            {{-- 2. SELECCIÓN DE ADULTO MAYOR EXISTENTE --}}
+                            @else
+                            <div class="p-4 rounded-2xl bg-[#D5C7B9]/20 border border-[#C7B5A3]/30 space-y-4">
+                                <div class="grid gap-4 sm:grid-cols-2 md:grid-cols-4 items-end">
+                                    <div class="sm:col-span-2">
+                                        <label class="mb-1 block text-[8px] font-black uppercase tracking-widest text-[#2F3E5C]/60">Seleccionar Adulto Mayor *</label>
+                                        <select wire:model="selected_cod_am" class="w-full h-10 rounded-xl border border-[#C7B5A3] bg-white px-3 py-2 text-xs font-bold text-[#2F3E5C] outline-none transition focus:border-[#E27D60]">
+                                            <option value="">-- Seleccionar Adulto Mayor Disponible --</option>
+                                            @foreach(\App\Models\AdultoMayor::where('cod_est_adul', 1)->orderBy('ap_paterno')->orderBy('nombres')->get() as $am)
+                                                <option value="{{ $am->cod_am }}">{{ $am->ap_paterno }} {{ $am->ap_materno }} {{ $am->nombres }} ({{ $am->cod_am }} - CI: {{ $am->ci }})</option>
+                                            @endforeach
+                                        </select>
+                                        @error('selected_cod_am') <span class="mt-1 block text-[8px] font-black text-[#E27D60] uppercase">{{ $message }}</span> @enderror
+                                    </div>
+                                    <div>
+                                        <label class="mb-1 block text-[8px] font-black uppercase tracking-widest text-[#2F3E5C]/60">Parentesco / Vínculo *</label>
+                                        <select wire:model="selected_parentesco" class="w-full h-10 rounded-xl border border-[#C7B5A3] bg-white px-3 py-2 text-xs font-bold text-[#2F3E5C] outline-none transition focus:border-[#E27D60]">
+                                            <option value="Hijo/a">Hijo/a</option>
+                                            <option value="Cónyuge">Cónyuge</option>
+                                            <option value="Nieto/a">Nieto/a</option>
+                                            <option value="Hermano/a">Hermano/a</option>
+                                            <option value="Sobrino/a">Sobrino/a</option>
+                                            <option value="Tutor">Tutor</option>
+                                            <option value="Otro">Otro</option>
+                                        </select>
+                                        @error('selected_parentesco') <span class="mt-1 block text-[8px] font-black text-[#E27D60] uppercase">{{ $message }}</span> @enderror
+                                    </div>
+                                    <div class="flex items-center h-10 pb-2 pl-2">
+                                        <label class="relative inline-flex items-center cursor-pointer select-none">
+                                            <input type="checkbox" wire:model="selected_es_responsable" class="sr-only peer">
+                                            <div class="w-9 h-5 bg-[#C7B5A3]/50 rounded-full peer peer-focus:ring-2 peer-focus:ring-[#E27D60]/20 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#8DA280]"></div>
+                                            <span class="ml-2 text-[8px] font-black uppercase tracking-wider text-[#2F3E5C]">¿Es Responsable?</span>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="grid gap-3 sm:grid-cols-4 items-end">
+                                    <div class="sm:col-span-3">
+                                        <label class="mb-1 block text-[8px] font-black uppercase tracking-widest text-[#2F3E5C]/60">Notas / Observaciones del Vínculo</label>
+                                        <input type="text" wire:model="selected_observaciones" placeholder="Ej. A cargo del seguimiento médico semanal" class="w-full h-10 rounded-xl border border-[#C7B5A3] bg-white px-4 py-2 text-xs font-bold text-[#2F3E5C] outline-none transition focus:border-[#E27D60]">
+                                    </div>
+                                    <button type="button" wire:click="vincularAdultoMayor" 
+                                            class="w-full h-10 rounded-xl bg-[#2F3E5C] text-white text-[8px] font-black uppercase tracking-widest transition hover:bg-[#E27D60] shadow-md flex items-center justify-center gap-1.5 active:scale-95">
+                                        <i class="ph-bold ph-plus-circle text-xs"></i> Vincular Adulto
+                                    </button>
+                                </div>
+                            </div>
+                            @endif
+
+                            {{-- 3. LISTADO DE ADULTOS MAYORES VINCULADOS --}}
+                            <div class="space-y-2">
+                                <h5 class="text-[9px] font-black uppercase tracking-widest text-[#2F3E5C]/80 flex items-center gap-1.5">
+                                    <i class="ph-bold ph-link text-[#E27D60]"></i> Adultos Mayores Vinculados a este Familiar 
+                                    <span class="px-2 py-0.5 rounded-full bg-[#E27D60]/10 text-[#E27D60] text-[8px] font-black">
+                                        {{ count($vinculosFamiliar) }}
+                                    </span>
+                                </h5>
+
+                                @if(count($vinculosFamiliar) === 0)
+                                <div class="flex flex-col items-center justify-center p-6 border-2 border-dashed border-[#C7B5A3]/40 rounded-2xl bg-[#F4EEE7]/30 text-center">
+                                    <i class="ph-bold ph-link-break text-xl text-[#C7B5A3] mb-1"></i>
+                                    <p class="text-[9px] font-bold text-[#2F3E5C]/60">Sin vinculaciones. Agrega al menos un adulto mayor de la lista superior.</p>
+                                </div>
+                                @else
+                                <div class="overflow-x-auto rounded-xl border border-[#C7B5A3]/40 bg-white">
+                                    <table class="w-full border-collapse text-left">
+                                        <thead>
+                                            <tr class="bg-[#F4EEE7] text-[8px] font-black uppercase tracking-widest text-[#2F3E5C]/75 border-b border-[#C7B5A3]/30">
+                                                <th class="px-3 py-2">Adulto Mayor</th>
+                                                <th class="px-3 py-2">Vínculo/Parentesco</th>
+                                                <th class="px-3 py-2 text-center">Responsable</th>
+                                                <th class="px-3 py-2">Observaciones</th>
+                                                <th class="px-3 py-2 text-center">Acciones</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="divide-y divide-[#C7B5A3]/20">
+                                            @foreach($vinculosFamiliar as $i => $v)
+                                            <tr class="text-[9px] font-bold text-[#2F3E5C]/85 hover:bg-[#F4EEE7]/35 transition">
+                                                <td class="px-3 py-2">
+                                                    <span class="font-black text-[#2F3E5C]">{{ $v['nombres_completos'] }}</span>
+                                                    <span class="block text-[8px] font-semibold text-[#2F3E5C]/50">{{ $v['cod_am'] }}</span>
+                                                </td>
+                                                <td class="px-3 py-2">
+                                                    <span class="px-2 py-0.5 rounded bg-[#C7B5A3]/20 text-[#2F3E5C] text-[8px] font-black uppercase">{{ $v['parentesco_vinculo'] }}</span>
+                                                </td>
+                                                <td class="px-3 py-2 text-center">
+                                                    @if($v['es_responsable'] === 'SI')
+                                                        <span class="px-1.5 py-0.5 rounded bg-[#8DA280]/20 text-[#8DA280] text-[8px] font-black uppercase">SÍ</span>
+                                                    @else
+                                                        <span class="px-1.5 py-0.5 rounded bg-[#C7B5A3]/20 text-[#2F3E5C]/60 text-[8px] font-black uppercase">NO</span>
+                                                    @endif
+                                                </td>
+                                                <td class="px-3 py-2 text-[#2F3E5C]/70">
+                                                    {{ $v['observaciones'] ?: 'Sin observaciones adicionales' }}
+                                                </td>
+                                                <td class="px-3 py-2 text-center">
+                                                    <button type="button" wire:click="desvincularAdultoMayor({{ $i }})"
+                                                            class="h-6 w-6 rounded-lg bg-red-50 text-red-500 hover:bg-red-500 hover:text-white transition inline-flex items-center justify-center active:scale-90 shadow-sm"
+                                                            title="Eliminar vinculación">
+                                                        <i class="ph-bold ph-trash text-xs"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
+                                @endif
+                            </div>
+
+                            {{-- Campo General de Observaciones --}}
                             <div>
-                                <label class="mb-1 block text-[9px] font-black uppercase tracking-widest text-[#2F3E5C]">Observación del Vínculo</label>
+                                <label class="mb-1 block text-[9px] font-black uppercase tracking-widest text-[#2F3E5C]">Observación General del Expediente Familiar</label>
                                 <input type="text" wire:model="observacion_vinculo" placeholder="Ej. Hijo tutor legal de adulto mayor" class="w-full h-10 rounded-xl border border-[#C7B5A3] bg-white px-4 py-2 text-sm font-bold text-[#2F3E5C] outline-none transition focus:border-[#2F3E5C]">
                                 @error('observacion_vinculo') <span class="mt-1 block text-[9px] font-black text-[#E27D60] uppercase">{{ $message }}</span> @enderror
                             </div>
@@ -1416,10 +1587,25 @@
                         Continuar <i class="ph-bold ph-arrow-right ml-1"></i>
                     </button>
                     @else
-                    <button type="button" wire:click="guardarUsuario" wire:loading.attr="disabled"
-                            class="flex-1 sm:flex-none px-12 py-2.5 rounded-xl bg-[#E27D60] text-white text-[9px] font-black uppercase tracking-widest shadow-xl shadow-[#E27D60]/20 transition hover:bg-[#2F3E5C] active:scale-95 disabled:opacity-50">
-                        <span wire:loading.remove>{{ $usuarioId ? 'Actualizar' : 'Confirmar' }}</span>
-                        <span wire:loading><i class="ph-bold ph-circle-notch animate-spin mr-1"></i>...</span>
+                    <button type="button" wire:click="guardarUsuario" 
+                            wire:loading.attr="disabled" 
+                            wire:target="guardarUsuario"
+                            class="flex-1 sm:flex-none px-12 py-2.5 rounded-xl bg-[#E27D60] text-white text-[9px] font-black uppercase tracking-widest shadow-xl shadow-[#E27D60]/20 transition hover:bg-[#2F3E5C] active:scale-95 disabled:opacity-70 inline-flex items-center justify-center gap-2 min-w-[140px]">
+                        
+                        <!-- Spinner de Carga SVG Premium -->
+                        <span wire:loading wire:target="guardarUsuario" class="animate-spin h-3.5 w-3.5 text-white">
+                            <svg class="h-full w-full" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                        </span>
+
+                        <!-- Icono de Confirmación Normal (oculto al cargar) -->
+                        <span wire:loading.remove wire:target="guardarUsuario">
+                            <i class="ph-bold {{ $usuarioId ? 'ph-floppy-disk' : 'ph-check' }} text-xs"></i>
+                        </span>
+
+                        <span>{{ $usuarioId ? 'Actualizar' : 'Confirmar' }}</span>
                     </button>
                     @endif
                 </div>

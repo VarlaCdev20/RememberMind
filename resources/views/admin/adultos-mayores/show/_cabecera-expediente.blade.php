@@ -283,15 +283,15 @@
                 [
                     'key' => 'salud',
                     'icon' => 'ph-heartbeat',
-                    'label' => 'Salud Médica',
-                    'desc' => 'Control médico',
+                    'label' => 'Salud y Cuidados',
+                    'desc' => 'Ficha básica y cuidados',
                     'color' => '#C45F4B'
                 ],
                 [
                     'key' => 'evaluaciones',
                     'icon' => 'ph-brain',
                     'label' => 'Evaluaciones',
-                    'desc' => 'Cognitivas',
+                    'desc' => 'Geriátricas integrales',
                     'color' => '#5B5F97'
                 ],
                 [

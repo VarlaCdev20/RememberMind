@@ -136,6 +136,10 @@ Route::middleware([
                 Route::delete('evaluaciones/{evaluacion}', [\App\Http\Controllers\Admin\AdultosMayores\AdultoMayorEvaluacionController::class, 'destroy'])->name('evaluaciones.destroy');
                 Route::patch('evaluaciones/{evaluacion}/restaurar', [\App\Http\Controllers\Admin\AdultosMayores\AdultoMayorEvaluacionController::class, 'restore'])->name('evaluaciones.restore');
 
+                // Evaluaciones Geriátricas Integrales (Fase 2)
+                Route::delete('evaluaciones-geriatricas/{evaluacion}/anular', [AdultoMayorController::class, 'anularEvaluacionGeriatrica'])->name('evaluaciones-geriatricas.anular');
+                Route::get('evaluaciones-geriatricas/{evaluacion}/pdf', [AdultoMayorController::class, 'pdfEvaluacionGeriatrica'])->name('evaluaciones-geriatricas.pdf');
+
                 // Actividades
                 Route::post('actividades', [\App\Http\Controllers\Admin\AdultosMayores\AdultoMayorActividadController::class, 'store'])->name('actividades.store');
                 Route::patch('actividades/{actividad}', [\App\Http\Controllers\Admin\AdultosMayores\AdultoMayorActividadController::class, 'update'])->name('actividades.update');
@@ -191,6 +195,9 @@ Route::middleware([
             Route::get('reporte-bienestar', [AdultoMayorController::class, 'reporteBienestar'])
                 ->middleware('permission:reportes.ver')
                 ->name('adultos-mayores.reporte-bienestar');
+            Route::get('adultos-mayores/alertas-pendientes', function () {
+                return view('admin.adultos-mayores.alertas-pendientes-placeholder');
+            })->middleware('permission:adultos.ver')->name('adultos-mayores.alertas-pendientes');
 
             // ── Bitácora ─────────────────────────
             Route::get('bitacora', [\App\Http\Controllers\Admin\BitacoraController::class, 'index'])

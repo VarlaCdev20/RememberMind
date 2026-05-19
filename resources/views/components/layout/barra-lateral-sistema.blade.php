@@ -102,12 +102,9 @@
                     'title' => 'Adultos Mayores',
                     'icon' => 'ph-users-four',
                     'items' => array_filter([
-                        auth()->user()->can('adultos.ver') ? ['label' => 'Lista general', 'route' => 'admin.adultos-mayores.index'] : null,
-                        ['label' => 'Registro', 'route' => null],
-                        ['label' => 'Expedientes', 'route' => null],
-                        ['label' => 'Estados institucionales', 'route' => null],
-                        ['label' => 'Documentación', 'route' => null],
-                        auth()->user()->can('reportes.ver') ? ['label' => 'Reportes', 'route' => null] : null,
+                        auth()->user()->can('adultos.ver') ? ['label' => 'Centro de Adultos Mayores', 'route' => 'admin.adultos-mayores.index'] : null,
+                        auth()->user()->can('adultos.ver') ? ['label' => 'Alertas y Pendientes', 'route' => 'admin.adultos-mayores.alertas-pendientes'] : null,
+                        auth()->user()->can('reportes.ver') ? ['label' => 'Reportes Institucionales', 'route' => 'admin.adultos-mayores.reporte-institucional'] : null,
                     ]),
                 ],
                 [

@@ -364,16 +364,6 @@
                             @error('permanencia') <span class="text-[10px] font-black text-terracota uppercase tracking-tighter">{{ $message }}</span> @enderror
                         </div>
                         <div class="col-span-full space-y-2">
-                            <label class="text-[11px] font-black uppercase tracking-widest text-azul-profundo/50">Estado Inicial en el Centro *</label>
-                            <select wire:model="cod_est_adul" class="w-full rounded-2xl border-2 border-transparent bg-white px-5 py-3.5 text-sm font-bold text-azul-profundo shadow-sm outline-none transition focus:border-terracota/30 focus:ring-4 focus:ring-terracota/10">
-                                <option value="">Seleccionar estado institucional</option>
-                                @foreach($estadosAdulto as $estado)
-                                    <option value="{{ $estado->cod_est_adul }}">{{ $estado->estado }}</option>
-                                @endforeach
-                            </select>
-                            @error('cod_est_adul') <span class="text-[10px] font-black text-terracota uppercase tracking-tighter">{{ $message }}</span> @enderror
-                        </div>
-                        <div class="col-span-full space-y-2">
                             <label class="text-[11px] font-black uppercase tracking-widest text-azul-profundo/50">Observaciones de Ingreso</label>
                             <textarea wire:model="observaciones" rows="3" placeholder="Anotaciones administrativas o clínicas preliminares..." class="w-full resize-none rounded-3xl border-2 border-transparent bg-white px-6 py-4 text-sm font-bold text-azul-profundo shadow-sm outline-none transition focus:border-terracota/30 focus:ring-4 focus:ring-terracota/10"></textarea>
                         </div>

@@ -252,6 +252,70 @@
                     </div>
                 </div>
             </section>
+
+            {{-- Sección de Adultos Mayores Vinculados para el Rol Familiar --}}
+            @if($usuario->hasRole('familiar'))
+            <section class="md:col-span-2 rounded-[2rem] border border-[#C7B5A3]/45 bg-white/70 p-6 shadow-sm space-y-5">
+                <h3 class="flex items-center gap-2 text-xs font-black uppercase tracking-widest text-[#E27D60]">
+                    <i class="ph-bold ph-link text-lg"></i> Adulto(s) Mayor(es) Vinculado(s)
+                </h3>
+                
+                @php
+                    $familiar = $usuario->familiares->first();
+                    $vinculos = $familiar ? $familiar->adultosMayores : collect();
+                @endphp
+
+                @if($vinculos->isEmpty())
+                    <div class="rounded-2xl border border-dashed border-[#C7B5A3] bg-white/40 p-10 text-center">
+                        <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-[#2F3E5C]/10 text-[#2F3E5C]">
+                            <i class="ph-bold ph-link-break text-2xl"></i>
+                        </div>
+                        <h4 class="mt-4 text-sm font-black text-[#2F3E5C]">Sin vinculaciones activas</h4>
+                        <p class="mt-1 text-xs font-bold text-[#2F3E5C]/45">
+                            Este familiar no tiene adultos mayores vinculados en el expediente digital.
+                        </p>
+                    </div>
+                @else
+                    <div class="overflow-hidden rounded-2xl border border-[#C7B5A3]/40 bg-white shadow-sm">
+                        <table class="w-full text-left text-xs">
+                            <thead class="bg-[#F4EEE7] text-[9px] uppercase tracking-widest text-[#2F3E5C]/50 border-b border-[#C7B5A3]/45">
+                                <tr>
+                                    <th class="px-5 py-3.5 font-black">Adulto Mayor</th>
+                                    <th class="px-5 py-3.5 font-black">Parentesco / Vínculo</th>
+                                    <th class="px-5 py-3.5 text-center font-black">Responsable Principal</th>
+                                    <th class="px-5 py-3.5 font-black">Observaciones</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-[#E7DDD1]">
+                                @foreach($vinculos as $v)
+                                    <tr class="hover:bg-[#FAF7F3]">
+                                        <td class="px-5 py-4">
+                                            <p class="font-black text-[#2F3E5C] uppercase">{{ $v->ap_paterno }} {{ $v->ap_materno }} {{ $v->nombres }}</p>
+                                            <p class="text-[10px] text-[#2F3E5C]/50 font-bold mt-0.5">{{ $v->cod_am }}</p>
+                                        </td>
+                                        <td class="px-5 py-4 font-black">
+                                            <span class="px-2.5 py-0.5 rounded bg-[#C7B5A3]/25 text-[#2F3E5C] text-[9px] font-black uppercase">
+                                                {{ $v->pivot->parentesco_vinculo ?? 'Familiar' }}
+                                            </span>
+                                        </td>
+                                        <td class="px-5 py-4 text-center">
+                                            @if($v->pivot->es_responsable)
+                                                <span class="rounded bg-[#8DA280]/20 text-[#63775B] px-2.5 py-0.5 text-[9px] font-black uppercase tracking-wider">SÍ</span>
+                                            @else
+                                                <span class="rounded bg-[#C7B5A3]/20 text-[#2F3E5C]/60 px-2.5 py-0.5 text-[9px] font-black uppercase tracking-wider">NO</span>
+                                            @endif
+                                        </td>
+                                        <td class="px-5 py-4 font-bold text-[#2F3E5C]/60 leading-relaxed max-w-xs truncate">
+                                            {{ $v->pivot->observaciones ?: 'Sin observaciones específicas' }}
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                @endif
+            </section>
+            @endif
         </div>
         @endif
 
