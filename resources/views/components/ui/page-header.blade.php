@@ -12,9 +12,9 @@
 ])
 
 <div class="rm-page-header">
-    <div class="flex items-center gap-4">
-        <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-full {{ $color }} shadow-sm">
-            <i class="ph-bold {{ $icono }} text-2xl text-white"></i>
+    <div class="flex items-center gap-3">
+        <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full {{ $color }} shadow-sm">
+            <i class="ph-bold {{ $icono }} text-lg text-white"></i>
         </div>
         <div>
             <h1 class="rm-section-title">{{ $titulo }}</h1>

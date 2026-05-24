@@ -425,7 +425,7 @@
                         </div>
                     </article>
                 @empty
-                    <div class="col-span-full py-16 text-center">
+                    <div class="col-span-full py-8 text-center">
                         <div class="mx-auto flex max-w-md flex-col items-center">
                             <div class="flex h-16 w-16 items-center justify-center rounded-3xl bg-[#2F3E5C]/8 text-[#2F3E5C]/35">
                                 <i class="ph-bold ph-users-three text-3xl"></i>
@@ -639,7 +639,7 @@
 
     {{-- MODAL FUERA DEL CONTENEDOR DEL PANEL --}}
     @if($mostrarFormulario)
-    <div class="fixed inset-0 z-[2147483646] flex items-center justify-center bg-slate-900/40 backdrop-blur-sm px-3 sm:px-4 transition-all duration-300">
+    <div class="fixed inset-0 z-[2147483646] flex items-center justify-center bg-azul-profundo/50 backdrop-blur-sm px-3 sm:px-4 transition-all duration-300">
         <div class="relative z-[2147483647] w-full max-w-4xl max-h-[92vh] overflow-hidden rounded-[24px] border border-[#C7B5A3]/30 bg-[#E6DDD3] shadow-[0_20px_50px_rgba(0,0,0,0.5)] animate-in fade-in zoom-in duration-300 flex flex-col">
             
             {{-- HEADER CON PROGRESO --}}
@@ -729,7 +729,7 @@
                                     {{ mb_substr($nombres ?? 'U', 0, 1) }}{{ mb_substr($ap_paterno ?? 'I', 0, 1) }}
                                 </div>
                             @endif
-                            <div wire:loading wire:target="foto_de_perfil_upload" class="absolute inset-0 flex items-center justify-center bg-slate-900/60 rounded-[1.35rem]">
+                            <div wire:loading wire:target="foto_de_perfil_upload" class="absolute inset-0 flex items-center justify-center bg-azul-profundo/60 rounded-[1.35rem]">
                                 <i class="ph-bold ph-circle-notch animate-spin text-white text-xl"></i>
                             </div>
                         </div>
@@ -1616,7 +1616,7 @@
 
     {{-- VISTA COMPLETA FLOTANTE (Modal Amplio) --}}
     @if($mostrarVistaCompleta && $usuarioVista)
-    <div class="fixed inset-0 z-[2147483648] flex items-center justify-center bg-slate-900/60 backdrop-blur-md px-4 py-6 transition-all duration-300" x-data x-transition>
+    <div class="fixed inset-0 z-[2147483648] flex items-center justify-center bg-azul-profundo/60 backdrop-blur-md px-4 py-6 transition-all duration-300" x-data x-transition>
         <div class="relative w-full max-w-5xl max-h-full overflow-hidden rounded-[2rem] border border-[#C7B5A3]/30 bg-[#E6DDD3] shadow-[0_25px_65px_rgba(0,0,0,0.6)] flex flex-col"
              style="animation: zoomIn 0.3s ease-out">
             
@@ -1676,9 +1676,9 @@
                         <div class="relative">
                             @if($vistaFoto)
                                 <img src="{{ $vistaFoto }}" alt="{{ $vistaNombreCompleto }}"
-                                     class="h-44 w-44 rounded-[2.5rem] object-cover ring-[6px] ring-white shadow-[0_15px_35px_rgba(47,62,92,0.2)]">
+                                     class="h-24 w-24 rounded-[1.5rem] object-cover ring-4 ring-white shadow-[0_8px_20px_rgba(47,62,92,0.18)]">
                             @else
-                                <div class="flex h-44 w-44 items-center justify-center rounded-[2.5rem] bg-[#2F3E5C] text-6xl font-black text-white ring-[6px] ring-white shadow-[0_15px_35px_rgba(47,62,92,0.2)]">
+                                <div class="flex h-24 w-24 items-center justify-center rounded-[1.5rem] bg-[#2F3E5C] text-3xl font-black text-white ring-4 ring-white shadow-[0_8px_20px_rgba(47,62,92,0.18)]">
                                     {{ strtoupper($vistaInicial) }}
                                 </div>
                             @endif
@@ -1921,9 +1921,9 @@
                     <div class="relative">
                         @if($fichaFoto)
                             <img src="{{ $fichaFoto }}" alt="{{ $fichaNombreCompleto }}"
-                                 class="h-28 w-28 rounded-[2rem] object-cover ring-4 ring-white shadow-[0_12px_28px_rgba(47,62,92,0.15)]">
+                                 class="h-16 w-16 rounded-2xl object-cover ring-2 ring-white shadow-[0_6px_16px_rgba(47,62,92,0.15)]">
                         @else
-                            <div class="flex h-28 w-28 items-center justify-center rounded-[2rem] bg-[#2F3E5C] text-4xl font-black text-white ring-4 ring-white shadow-[0_12px_28px_rgba(47,62,92,0.15)]">
+                            <div class="flex h-16 w-16 items-center justify-center rounded-2xl bg-[#2F3E5C] text-2xl font-black text-white ring-2 ring-white shadow-[0_6px_16px_rgba(47,62,92,0.15)]">
                                 {{ strtoupper($fichaInicial) }}
                             </div>
                         @endif

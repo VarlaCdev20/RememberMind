@@ -26,7 +26,7 @@
             @endcan
 
             @can('turnos.reportes')
-                <button wire:click="$set('mostrarReportes', true)" class="inline-flex items-center gap-2 px-4 py-2 bg-slate-200 text-azul-profundo rounded-xl hover:bg-slate-300 transition duration-150 font-semibold text-xs tracking-wider uppercase">
+                <button wire:click="$set('mostrarReportes', true)" class="inline-flex items-center gap-2 px-4 py-2 bg-[#E6DDD3] text-azul-profundo rounded-xl hover:bg-[#C7B5A3]/60 transition duration-150 font-semibold text-xs tracking-wider uppercase">
                     <i class="ph-bold ph-file-text text-base"></i>
                     Reportes
                 </button>
@@ -102,7 +102,7 @@
 
             <!-- Filtro Área -->
             <div>
-                <select wire:model.live="filtroArea" class="w-full py-2 px-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-slate-400 text-azul-profundo/70 font-medium">
+                <select wire:model.live="filtroArea" class="w-full py-2 px-3 bg-crema/30 border border-[#C7B5A3]/30 rounded-xl text-sm focus:outline-none focus:border-azul-profundo/50 text-azul-profundo/70 font-medium">
                     <option value="">Todas las Áreas</option>
                     @foreach($areasDisponibles as $area)
                         <option value="{{ $area->cod_area }}">{{ $area->nombre }}</option>
@@ -112,7 +112,7 @@
 
             <!-- Filtro Turno -->
             <div>
-                <select wire:model.live="filtroTurno" class="w-full py-2 px-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-slate-400 text-azul-profundo/70 font-medium">
+                <select wire:model.live="filtroTurno" class="w-full py-2 px-3 bg-crema/30 border border-[#C7B5A3]/30 rounded-xl text-sm focus:outline-none focus:border-azul-profundo/50 text-azul-profundo/70 font-medium">
                     <option value="">Todos los Turnos</option>
                     @foreach($turnosDisponibles as $t)
                         <option value="{{ $t->cod_turno }}">{{ $t->nombre }}</option>
@@ -122,7 +122,7 @@
 
             <!-- Filtro Día -->
             <div>
-                <select wire:model.live="filtroDia" class="w-full py-2 px-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-slate-400 text-azul-profundo/70 font-medium">
+                <select wire:model.live="filtroDia" class="w-full py-2 px-3 bg-crema/30 border border-[#C7B5A3]/30 rounded-xl text-sm focus:outline-none focus:border-azul-profundo/50 text-azul-profundo/70 font-medium">
                     <option value="">Cualquier Día</option>
                     <option value="LUNES">Lunes</option>
                     <option value="MARTES">Martes</option>
@@ -136,7 +136,7 @@
 
             <!-- Filtro Tipo -->
             <div>
-                <select wire:model.live="filtroTipo" class="w-full py-2 px-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-slate-400 text-azul-profundo/70 font-medium">
+                <select wire:model.live="filtroTipo" class="w-full py-2 px-3 bg-crema/30 border border-[#C7B5A3]/30 rounded-xl text-sm focus:outline-none focus:border-azul-profundo/50 text-azul-profundo/70 font-medium">
                     <option value="">Tipo de Asignación</option>
                     <option value="REGULAR">Regular</option>
                     <option value="APOYO">Apoyo Temporal</option>
@@ -147,7 +147,7 @@
 
             <!-- Limpiar Filtros -->
             <div class="flex gap-1 justify-end">
-                <button wire:click="limpiarFiltros" class="w-full py-2 bg-slate-100 hover:bg-slate-200 text-azul-profundo/70 text-xs font-bold rounded-xl transition uppercase tracking-wider">
+                <button wire:click="limpiarFiltros" class="w-full py-2 bg-[#E6DDD3]/50 hover:bg-[#E6DDD3] text-azul-profundo/70 text-xs font-bold rounded-xl transition uppercase tracking-wider">
                     Limpiar
                 </button>
             </div>
@@ -195,7 +195,7 @@
 
                 @foreach($diasSemana as $dia)
                     <div class="bg-crema/30 border border-[#C7B5A3]/20 rounded-2xl p-3 min-h-[300px] flex flex-col">
-                        <div class="text-center pb-2 mb-2 border-b border-slate-200/50">
+                        <div class="text-center pb-2 mb-2 border-b border-[#C7B5A3]/30/50">
                             <span class="text-xs font-black text-azul-profundo uppercase tracking-wider block">{{ $nombresDias[$dia] }}</span>
                         </div>
 
@@ -207,11 +207,11 @@
                             @endphp
 
                             @forelse($asigsDelDia as $asig)
-                                <div wire:click="verFichaAsignacion('{{ $asig->cod_asignacion }}')" class="bg-white border border-[#C7B5A3]/20 hover:border-slate-300 rounded-xl p-2.5 shadow-sm transition duration-150 cursor-pointer relative overflow-hidden group">
+                                <div wire:click="verFichaAsignacion('{{ $asig->cod_asignacion }}')" class="bg-white border border-[#C7B5A3]/20 hover:border-[#C7B5A3]/60 rounded-xl p-2.5 shadow-sm transition duration-150 cursor-pointer relative overflow-hidden group">
                                     <div class="absolute left-0 top-0 bottom-0 w-1" style="background-color: {{ $asig->turno->color ?? '#3B82F6' }}"></div>
                                     <h4 class="text-xs font-bold text-azul-profundo line-clamp-1 group-hover:text-terracota transition">{{ $asig->usuario ? $asig->usuario->name : 'N/D' }}</h4>
                                     <span class="text-[9px] text-azul-profundo/50 font-semibold block mt-0.5 line-clamp-1">{{ $asig->area ? $asig->area->nombre : 'N/D' }}</span>
-                                    <div class="flex items-center justify-between mt-1 pt-1 border-t border-slate-50">
+                                    <div class="flex items-center justify-between mt-1 pt-1 border-t border-[#C7B5A3]/10">
                                         <span class="text-[8px] font-black uppercase tracking-wider text-azul-profundo/40">{{ $asig->turno ? $asig->turno->nombre : 'N/D' }}</span>
                                         @if($asig->tipo_asignacion === 'APOYO')
                                             <span class="px-1 py-0.5 bg-rose-50 text-rose-600 rounded text-[7px] font-bold">APOYO</span>
@@ -244,10 +244,10 @@
                     <div>
                         <div class="flex items-start justify-between mb-3">
                             <div>
-                                <span class="px-2 py-0.5 bg-slate-100 text-azul-profundo/70 rounded text-[9px] font-bold uppercase tracking-wider">{{ $area->tipo_area }}</span>
+                                <span class="px-2 py-0.5 bg-[#E6DDD3]/60 text-azul-profundo/70 rounded text-[9px] font-bold uppercase tracking-wider">{{ $area->tipo_area }}</span>
                                 <h3 class="text-base font-bold text-azul-profundo mt-1">{{ $area->nombre }}</h3>
                             </div>
-                            <span class="h-8 w-8 rounded-xl bg-slate-100 flex items-center justify-center text-azul-profundo/50">
+                            <span class="h-8 w-8 rounded-xl bg-[#E6DDD3]/60 flex items-center justify-center text-azul-profundo/50">
                                 <i class="ph-bold {{ $area->icono ?: 'ph-buildings' }} text-lg"></i>
                             </span>
                         </div>
@@ -260,7 +260,7 @@
                         <div class="space-y-2 mb-6">
                             <h4 class="text-[10px] font-black text-azul-profundo/40 uppercase tracking-widest">Colaboradores en Cobertura ({{ $asigsArea->count() }})</h4>
                             @forelse($asigsArea as $asig)
-                                <div wire:click="verFichaAsignacion('{{ $asig->cod_asignacion }}')" class="flex items-center justify-between p-2 bg-slate-50 hover:bg-slate-100/70 border border-slate-100 hover:border-slate-200 rounded-xl transition duration-150 cursor-pointer">
+                                <div wire:click="verFichaAsignacion('{{ $asig->cod_asignacion }}')" class="flex items-center justify-between p-2 bg-crema/30 hover:bg-[#E6DDD3]/50 border border-[#C7B5A3]/20 hover:border-[#C7B5A3]/30 rounded-xl transition duration-150 cursor-pointer">
                                     <div>
                                         <h5 class="text-xs font-bold text-azul-profundo">{{ $asig->usuario ? $asig->usuario->name : 'N/D' }}</h5>
                                         <p class="text-[9px] text-azul-profundo/50 font-semibold">{{ $asig->turno ? $asig->turno->nombre : 'N/D' }}</p>
@@ -273,7 +273,7 @@
                                     </div>
                                 </div>
                             @empty
-                                <div class="text-center py-6 bg-slate-50 rounded-2xl border border-dashed border-slate-200 text-azul-profundo/40">
+                                <div class="text-center py-6 bg-crema/30 rounded-2xl border border-dashed border-[#C7B5A3]/30 text-azul-profundo/40">
                                     <i class="ph ph-warning-circle text-lg mb-1"></i>
                                     <p class="text-[10px] font-bold">Sin cobertura activa</p>
                                 </div>
@@ -281,7 +281,7 @@
                         </div>
                     </div>
 
-                    <div class="pt-3 border-t border-slate-100 flex items-center justify-between">
+                    <div class="pt-3 border-t border-[#C7B5A3]/20 flex items-center justify-between">
                         <button wire:click="exportarReporteAreaPdf('{{ $area->cod_area }}')" class="inline-flex items-center gap-1 text-[10px] font-bold text-azul-profundo/50 hover:text-azul-profundo transition">
                             <i class="ph ph-file-pdf"></i>
                             Exportar PDF
@@ -304,7 +304,7 @@
             <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse">
                     <thead>
-                        <tr class="bg-slate-50 border-b border-slate-100">
+                        <tr class="bg-crema/30 border-b border-[#C7B5A3]/20">
                             <th class="p-4 text-xs font-bold text-azul-profundo/50 uppercase tracking-wider">Colaborador</th>
                             <th class="p-4 text-xs font-bold text-azul-profundo/50 uppercase tracking-wider">Área Operativa</th>
                             <th class="p-4 text-xs font-bold text-azul-profundo/50 uppercase tracking-wider">Turno / Horario</th>
@@ -314,12 +314,12 @@
                             <th class="p-4 text-xs font-bold text-azul-profundo/50 uppercase tracking-wider text-right">Acciones</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-slate-50">
+                    <tbody class="divide-y divide-[#C7B5A3]/10">
                         @forelse($asignaciones as $asig)
-                            <tr class="hover:bg-slate-50/50 transition">
+                            <tr class="hover:bg-crema/30 transition">
                                 <td class="p-4">
                                     <div class="flex items-center gap-3">
-                                        <div class="h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center text-azul-profundo/70 font-bold text-xs uppercase shadow-sm">
+                                        <div class="h-8 w-8 rounded-full bg-[#E6DDD3]/60 flex items-center justify-center text-azul-profundo/70 font-bold text-xs uppercase shadow-sm">
                                             {{ substr($asig->usuario ? $asig->usuario->nombres : 'N', 0, 2) }}
                                         </div>
                                         <div>
@@ -346,7 +346,7 @@
                                 <td class="p-4">
                                     <div class="flex flex-wrap gap-1">
                                         @foreach($asig->dias_semana as $dia)
-                                            <span class="px-1 py-0.5 bg-slate-100 text-azul-profundo/70 rounded text-[8px] font-bold">{{ substr($dia, 0, 3) }}</span>
+                                            <span class="px-1 py-0.5 bg-[#E6DDD3]/60 text-azul-profundo/70 rounded text-[8px] font-bold">{{ substr($dia, 0, 3) }}</span>
                                         @endforeach
                                     </div>
                                 </td>
@@ -355,19 +355,19 @@
                                     <span class="block text-[9px] text-azul-profundo/40 font-semibold">al {{ $asig->fecha_fin ? \Carbon\Carbon::parse($asig->fecha_fin)->format('d/m/Y') : 'Presente' }}</span>
                                 </td>
                                 <td class="p-4">
-                                    <span class="px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider {{ $asig->estado === 'ACTIVA' ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : ($asig->estado === 'FINALIZADA' ? 'bg-slate-100 text-azul-profundo/50' : 'bg-rose-50 text-rose-600 border border-rose-100') }}">
+                                    <span class="px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider {{ $asig->estado === 'ACTIVA' ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : ($asig->estado === 'FINALIZADA' ? 'bg-[#E6DDD3]/60 text-azul-profundo/50' : 'bg-rose-50 text-rose-600 border border-rose-100') }}">
                                         {{ $asig->estado }}
                                     </span>
                                 </td>
                                 <td class="p-4 text-right">
                                     <div class="flex justify-end gap-1.5">
-                                        <button wire:click="verFichaAsignacion('{{ $asig->cod_asignacion }}')" class="p-1.5 text-azul-profundo/50 hover:text-azul-profundo hover:bg-slate-100 rounded-lg transition" title="Ver Detalle">
+                                        <button wire:click="verFichaAsignacion('{{ $asig->cod_asignacion }}')" class="p-1.5 text-azul-profundo/50 hover:text-azul-profundo hover:bg-[#E6DDD3]/60 rounded-lg transition" title="Ver Detalle">
                                             <i class="ph-bold ph-eye text-base"></i>
                                         </button>
                                         
                                         @can('turnos.asignar')
                                             @if($asig->estado === 'ACTIVA')
-                                                <button wire:click="cargarAsignacion('{{ $asig->cod_asignacion }}')" class="p-1.5 text-azul-profundo/50 hover:text-azul-profundo hover:bg-slate-100 rounded-lg transition" title="Editar">
+                                                <button wire:click="cargarAsignacion('{{ $asig->cod_asignacion }}')" class="p-1.5 text-azul-profundo/50 hover:text-azul-profundo hover:bg-[#E6DDD3]/60 rounded-lg transition" title="Editar">
                                                     <i class="ph-bold ph-pencil-simple text-base"></i>
                                                 </button>
                                             @endif
@@ -451,7 +451,7 @@
          ────────────────────────────────────────────── -->
     @if($mostrarFormularioTurno)
         <div class="fixed inset-0 bg-azul-profundo/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-            <div class="bg-white rounded-3xl shadow-xl w-full max-w-lg overflow-hidden border border-slate-100 animate-in fade-in zoom-in-95 duration-150">
+            <div class="bg-white rounded-3xl shadow-xl w-full max-w-lg overflow-hidden border border-[#C7B5A3]/20 animate-in fade-in zoom-in-95 duration-150">
                 <!-- Header -->
                 <div class="bg-crema px-6 py-4 border-b border-[#C7B5A3]/30 flex items-center justify-between">
                     <div>
@@ -460,7 +460,7 @@
                         </h3>
                         <p class="text-[10px] text-azul-profundo/40 font-semibold mt-0.5">Gestione las especificaciones horarias base del centro.</p>
                     </div>
-                    <button wire:click="$set('mostrarFormularioTurno', false)" class="h-7 w-7 rounded-full bg-slate-200/50 hover:bg-slate-200 flex items-center justify-center text-azul-profundo/50 transition">
+                    <button wire:click="$set('mostrarFormularioTurno', false)" class="h-7 w-7 rounded-full bg-[#E6DDD3]/50 hover:bg-[#E6DDD3] flex items-center justify-center text-azul-profundo/50 transition">
                         <i class="ph ph-x"></i>
                     </button>
                 </div>
@@ -470,7 +470,7 @@
                     <!-- Nombre del Turno -->
                     <div>
                         <label class="block text-xs font-black text-azul-profundo/50 uppercase tracking-wider mb-1">Nombre del Turno *</label>
-                        <input wire:model="turno_nombre" type="text" placeholder="Ej. Turno Mañana" class="w-full px-3 py-2 bg-slate-50 border {{ $errors->has('turno_nombre') ? 'border-rose-400' : 'border-slate-200' }} rounded-xl text-sm focus:outline-none focus:border-slate-400 text-azul-profundo font-medium">
+                        <input wire:model="turno_nombre" type="text" placeholder="Ej. Turno Mañana" class="w-full px-3 py-2 bg-crema/30 border {{ $errors->has('turno_nombre') ? 'border-rose-400' : 'border-[#C7B5A3]/30' }} rounded-xl text-sm focus:outline-none focus:border-azul-profundo/50 text-azul-profundo font-medium">
                         @error('turno_nombre') <span class="text-[10px] text-rose-500 font-bold mt-1 block">{{ $message }}</span> @enderror
                     </div>
 
@@ -496,7 +496,7 @@
                     <div class="grid grid-cols-2 gap-4">
                         <div>
                             <label class="block text-xs font-black text-azul-profundo/50 uppercase tracking-wider mb-1">Color de Marcador</label>
-                            <input wire:model="turno_color" type="color" class="w-full h-10 p-1 bg-slate-50 border border-slate-200 rounded-xl cursor-pointer">
+                            <input wire:model="turno_color" type="color" class="w-full h-10 p-1 bg-crema/30 border border-[#C7B5A3]/30 rounded-xl cursor-pointer">
                         </div>
                         <div>
                             <label class="block text-xs font-black text-azul-profundo/50 uppercase tracking-wider mb-1">Estado</label>
@@ -514,8 +514,8 @@
                     </div>
 
                     <!-- Footer Buttons -->
-                    <div class="pt-4 border-t border-slate-100 flex justify-end gap-2">
-                        <button type="button" wire:click="$set('mostrarFormularioTurno', false)" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-azul-profundo font-bold text-xs rounded-xl tracking-wider uppercase transition">
+                    <div class="pt-4 border-t border-[#C7B5A3]/20 flex justify-end gap-2">
+                        <button type="button" wire:click="$set('mostrarFormularioTurno', false)" class="px-4 py-2 bg-[#E6DDD3]/50 hover:bg-[#E6DDD3] text-azul-profundo font-bold text-xs rounded-xl tracking-wider uppercase transition">
                             Cancelar
                         </button>
                         <button type="submit" class="px-4 py-2 bg-azul-profundo hover:bg-azul-profundo/80 text-white font-bold text-xs rounded-xl tracking-wider uppercase transition">
@@ -532,7 +532,7 @@
          ────────────────────────────────────────────── -->
     @if($mostrarFormularioAsignacion)
         <div class="fixed inset-0 bg-azul-profundo/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-            <div class="bg-white rounded-3xl shadow-xl w-full max-w-lg overflow-hidden border border-slate-100 animate-in fade-in zoom-in-95 duration-150">
+            <div class="bg-white rounded-3xl shadow-xl w-full max-w-lg overflow-hidden border border-[#C7B5A3]/20 animate-in fade-in zoom-in-95 duration-150">
                 <!-- Header -->
                 <div class="bg-crema px-6 py-4 border-b border-[#C7B5A3]/30 flex items-center justify-between">
                     <div>
@@ -541,7 +541,7 @@
                         </h3>
                         <p class="text-[10px] text-azul-profundo/40 font-semibold mt-0.5">Establezca los horarios de cobertura para el personal.</p>
                     </div>
-                    <button wire:click="$set('mostrarFormularioAsignacion', false)" class="h-7 w-7 rounded-full bg-slate-200/50 hover:bg-slate-200 flex items-center justify-center text-azul-profundo/50 transition">
+                    <button wire:click="$set('mostrarFormularioAsignacion', false)" class="h-7 w-7 rounded-full bg-[#E6DDD3]/50 hover:bg-[#E6DDD3] flex items-center justify-center text-azul-profundo/50 transition">
                         <i class="ph ph-x"></i>
                     </button>
                 </div>
@@ -551,7 +551,7 @@
                     <!-- Colaborador -->
                     <div>
                         <label class="block text-xs font-black text-azul-profundo/50 uppercase tracking-wider mb-1">Colaborador / Personal *</label>
-                        <select wire:model="asig_cod_usu" class="w-full px-3 py-2 bg-slate-50 border {{ $errors->has('asig_cod_usu') ? 'border-rose-400' : 'border-slate-200' }} rounded-xl text-sm focus:outline-none focus:border-slate-400 text-azul-profundo font-medium">
+                        <select wire:model="asig_cod_usu" class="w-full px-3 py-2 bg-crema/30 border {{ $errors->has('asig_cod_usu') ? 'border-rose-400' : 'border-[#C7B5A3]/30' }} rounded-xl text-sm focus:outline-none focus:border-azul-profundo/50 text-azul-profundo font-medium">
                             <option value="">Seleccione un colaborador...</option>
                             @foreach($usuariosDisponibles as $usu)
                                 <option value="{{ $usu->cod_usu }}">{{ $usu->name }} (Area: {{ $usu->areaInstitucional ? $usu->areaInstitucional->nombre : 'Ninguna' }})</option>
@@ -563,7 +563,7 @@
                     <!-- Área Operativa -->
                     <div>
                         <label class="block text-xs font-black text-azul-profundo/50 uppercase tracking-wider mb-1">Área de Cobertura / Destino *</label>
-                        <select wire:model="asig_cod_area" class="w-full px-3 py-2 bg-slate-50 border {{ $errors->has('asig_cod_area') ? 'border-rose-400' : 'border-slate-200' }} rounded-xl text-sm focus:outline-none focus:border-slate-400 text-azul-profundo font-medium">
+                        <select wire:model="asig_cod_area" class="w-full px-3 py-2 bg-crema/30 border {{ $errors->has('asig_cod_area') ? 'border-rose-400' : 'border-[#C7B5A3]/30' }} rounded-xl text-sm focus:outline-none focus:border-azul-profundo/50 text-azul-profundo font-medium">
                             <option value="">Seleccione área operativa de destino...</option>
                             @foreach($areasDisponibles as $area)
                                 <option value="{{ $area->cod_area }}">{{ $area->nombre }}</option>
@@ -599,7 +599,7 @@
                     <!-- Turno -->
                     <div>
                         <label class="block text-xs font-black text-azul-profundo/50 uppercase tracking-wider mb-1">Turno Asignado *</label>
-                        <select wire:model="asig_cod_turno" class="w-full px-3 py-2 bg-slate-50 border {{ $errors->has('asig_cod_turno') ? 'border-rose-400' : 'border-slate-200' }} rounded-xl text-sm focus:outline-none focus:border-slate-400 text-azul-profundo font-medium">
+                        <select wire:model="asig_cod_turno" class="w-full px-3 py-2 bg-crema/30 border {{ $errors->has('asig_cod_turno') ? 'border-rose-400' : 'border-[#C7B5A3]/30' }} rounded-xl text-sm focus:outline-none focus:border-azul-profundo/50 text-azul-profundo font-medium">
                             <option value="">Seleccione el turno...</option>
                             @foreach($turnosDisponibles as $t)
                                 <option value="{{ $t->cod_turno }}">{{ $t->nombre }} @if($t->hora_inicio) ({{ substr($t->hora_inicio,0,5) }} - {{ substr($t->hora_fin,0,5) }}) @endif</option>
@@ -613,8 +613,8 @@
                         <label class="block text-xs font-black text-azul-profundo/50 uppercase tracking-wider mb-1">Días de Trabajo Semanal *</label>
                         <div class="grid grid-cols-4 gap-2 pt-1">
                             @foreach(['LUNES', 'MARTES', 'MIERCOLES', 'JUEVES', 'VIERNES', 'SABADO', 'DOMINGO'] as $dia)
-                                <label class="flex items-center gap-1.5 p-2 bg-crema/30 border border-[#C7B5A3]/20 rounded-xl cursor-pointer hover:bg-slate-100/50 transition">
-                                    <input type="checkbox" wire:model="asig_dias_semana" value="{{ $dia }}" class="rounded border-slate-200 text-azul-profundo focus:ring-slate-500">
+                                <label class="flex items-center gap-1.5 p-2 bg-crema/30 border border-[#C7B5A3]/20 rounded-xl cursor-pointer hover:bg-[#E6DDD3]/40 transition">
+                                    <input type="checkbox" wire:model="asig_dias_semana" value="{{ $dia }}" class="rounded border-[#C7B5A3]/30 text-azul-profundo focus:ring-azul-profundo/30">
                                     <span class="text-[10px] font-bold text-azul-profundo/70">{{ substr($dia, 0, 3) }}</span>
                                 </label>
                             @endforeach
@@ -626,7 +626,7 @@
                     <div class="grid grid-cols-2 gap-4">
                         <div>
                             <label class="block text-xs font-black text-azul-profundo/50 uppercase tracking-wider mb-1">Fecha de Inicio *</label>
-                            <input wire:model="asig_fecha_inicio" type="date" class="w-full px-3 py-2 bg-slate-50 border {{ $errors->has('asig_fecha_inicio') ? 'border-rose-400' : 'border-slate-200' }} rounded-xl text-sm focus:outline-none focus:border-slate-400 text-azul-profundo font-medium">
+                            <input wire:model="asig_fecha_inicio" type="date" class="w-full px-3 py-2 bg-crema/30 border {{ $errors->has('asig_fecha_inicio') ? 'border-rose-400' : 'border-[#C7B5A3]/30' }} rounded-xl text-sm focus:outline-none focus:border-azul-profundo/50 text-azul-profundo font-medium">
                             @error('asig_fecha_inicio') <span class="text-[10px] text-rose-500 font-bold mt-1 block">{{ $message }}</span> @enderror
                         </div>
                         <div>
@@ -663,8 +663,8 @@
                     </div>
 
                     <!-- Footer Buttons -->
-                    <div class="pt-4 border-t border-slate-100 flex justify-end gap-2">
-                        <button type="button" wire:click="$set('mostrarFormularioAsignacion', false)" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-azul-profundo font-bold text-xs rounded-xl tracking-wider uppercase transition">
+                    <div class="pt-4 border-t border-[#C7B5A3]/20 flex justify-end gap-2">
+                        <button type="button" wire:click="$set('mostrarFormularioAsignacion', false)" class="px-4 py-2 bg-[#E6DDD3]/50 hover:bg-[#E6DDD3] text-azul-profundo font-bold text-xs rounded-xl tracking-wider uppercase transition">
                             Cancelar
                         </button>
                         <button type="submit" class="px-4 py-2 bg-azul-profundo hover:bg-azul-profundo/80 text-white font-bold text-xs rounded-xl tracking-wider uppercase transition">
@@ -681,14 +681,14 @@
          ────────────────────────────────────────────── -->
     @if($mostrarFichaAsignacion && $asignacionSeleccionada)
         <div class="fixed inset-0 bg-azul-profundo/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-            <div class="bg-white rounded-3xl shadow-xl w-full max-w-md overflow-hidden border border-slate-100 animate-in fade-in zoom-in-95 duration-150">
+            <div class="bg-white rounded-3xl shadow-xl w-full max-w-md overflow-hidden border border-[#C7B5A3]/20 animate-in fade-in zoom-in-95 duration-150">
                 <!-- Header -->
                 <div class="bg-crema px-6 py-4 border-b border-[#C7B5A3]/30 flex items-center justify-between">
                     <div>
                         <h3 class="text-xs font-black text-azul-profundo/40 uppercase tracking-widest">Ficha de Asignación</h3>
                         <h4 class="text-sm font-bold text-azul-profundo mt-0.5">ID: {{ $asignacionSeleccionada->cod_asignacion }}</h4>
                     </div>
-                    <button wire:click="$set('mostrarFichaAsignacion', false)" class="h-7 w-7 rounded-full bg-slate-200/50 hover:bg-slate-200 flex items-center justify-center text-azul-profundo/50 transition">
+                    <button wire:click="$set('mostrarFichaAsignacion', false)" class="h-7 w-7 rounded-full bg-[#E6DDD3]/50 hover:bg-[#E6DDD3] flex items-center justify-center text-azul-profundo/50 transition">
                         <i class="ph ph-x"></i>
                     </button>
                 </div>
@@ -696,8 +696,8 @@
                 <!-- Detalle -->
                 <div class="p-6 space-y-4">
                     <!-- Colaborador -->
-                    <div class="flex items-center gap-3 pb-3 border-b border-slate-50">
-                        <div class="h-10 w-10 rounded-full bg-slate-100 flex items-center justify-center text-azul-profundo/70 font-black text-sm uppercase">
+                    <div class="flex items-center gap-3 pb-3 border-b border-[#C7B5A3]/10">
+                        <div class="h-10 w-10 rounded-full bg-[#E6DDD3]/60 flex items-center justify-center text-azul-profundo/70 font-black text-sm uppercase">
                             {{ substr($asignacionSeleccionada->usuario ? $asignacionSeleccionada->usuario->nombres : 'N', 0, 2) }}
                         </div>
                         <div>
@@ -732,7 +732,7 @@
                         </div>
                         <div>
                             <span class="text-[9px] font-black text-azul-profundo/40 uppercase tracking-wider block">Tipo de Asignación</span>
-                            <span class="inline-block px-2 py-0.5 bg-slate-100 text-azul-profundo rounded text-[9px] font-bold uppercase mt-1">
+                            <span class="inline-block px-2 py-0.5 bg-[#E6DDD3]/60 text-azul-profundo rounded text-[9px] font-bold uppercase mt-1">
                                 {{ $asignacionSeleccionada->tipo_asignacion ?: 'REGULAR' }}
                             </span>
                         </div>
@@ -743,7 +743,7 @@
                         <span class="text-[9px] font-black text-azul-profundo/40 uppercase tracking-wider block mb-1">Días de Trabajo Semanal</span>
                         <div class="flex flex-wrap gap-1">
                             @foreach($asignacionSeleccionada->dias_semana as $dia)
-                                <span class="px-2 py-0.5 bg-slate-100 text-azul-profundo/70 rounded text-[9px] font-bold">{{ $dia }}</span>
+                                <span class="px-2 py-0.5 bg-[#E6DDD3]/60 text-azul-profundo/70 rounded text-[9px] font-bold">{{ $dia }}</span>
                             @endforeach
                         </div>
                     </div>
@@ -751,19 +751,19 @@
                     <!-- Observaciones -->
                     <div>
                         <span class="text-[9px] font-black text-azul-profundo/40 uppercase tracking-wider block">Observaciones</span>
-                        <p class="text-xs text-azul-profundo/70 font-medium mt-1 bg-slate-50 p-2.5 rounded-xl border border-slate-100/50">
+                        <p class="text-xs text-azul-profundo/70 font-medium mt-1 bg-crema/30 p-2.5 rounded-xl border border-[#C7B5A3]/20/50">
                             {{ $asignacionSeleccionada->observaciones ?: 'Sin observaciones administrativas.' }}
                         </p>
                     </div>
 
                     <!-- Auditoría básica -->
-                    <div class="pt-3 border-t border-slate-50 flex items-center justify-between text-[8px] text-azul-profundo/40 uppercase tracking-wider font-semibold">
+                    <div class="pt-3 border-t border-[#C7B5A3]/10 flex items-center justify-between text-[8px] text-azul-profundo/40 uppercase tracking-wider font-semibold">
                         <span>Creado por: {{ $asignacionSeleccionada->creador ? $asignacionSeleccionada->creador->name : 'Sistema' }}</span>
                         <span>Actualizado: {{ $asignacionSeleccionada->updated_at->diffForHumans() }}</span>
                     </div>
 
                     <!-- Footer Buttons -->
-                    <div class="pt-4 border-t border-slate-100 flex justify-end gap-2">
+                    <div class="pt-4 border-t border-[#C7B5A3]/20 flex justify-end gap-2">
                         @can('turnos.finalizar')
                             @if($asignacionSeleccionada->estado === 'ACTIVA')
                                 <button wire:click="finalizarAsignacion('{{ $asignacionSeleccionada->cod_asignacion }}')" class="px-3 py-2 bg-rose-50 hover:bg-rose-100 text-rose-600 font-bold text-xs rounded-xl tracking-wider uppercase transition">
@@ -788,14 +788,14 @@
          ────────────────────────────────────────────── -->
     @if($mostrarReportes)
         <div class="fixed inset-0 bg-azul-profundo/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-            <div class="bg-white rounded-3xl shadow-xl w-full max-w-lg overflow-hidden border border-slate-100 animate-in fade-in zoom-in-95 duration-150">
+            <div class="bg-white rounded-3xl shadow-xl w-full max-w-lg overflow-hidden border border-[#C7B5A3]/20 animate-in fade-in zoom-in-95 duration-150">
                 <!-- Header -->
                 <div class="bg-crema px-6 py-4 border-b border-[#C7B5A3]/30 flex items-center justify-between">
                     <div>
                         <h3 class="text-sm font-black text-azul-profundo uppercase tracking-wider">Centro de Reportes de Planificación</h3>
                         <p class="text-[10px] text-azul-profundo/40 font-semibold mt-0.5">Exportación de datos de turnos y personal.</p>
                     </div>
-                    <button wire:click="$set('mostrarReportes', false)" class="h-7 w-7 rounded-full bg-slate-200/50 hover:bg-slate-200 flex items-center justify-center text-azul-profundo/50 transition">
+                    <button wire:click="$set('mostrarReportes', false)" class="h-7 w-7 rounded-full bg-[#E6DDD3]/50 hover:bg-[#E6DDD3] flex items-center justify-center text-azul-profundo/50 transition">
                         <i class="ph ph-x"></i>
                     </button>
                 </div>
@@ -806,7 +806,7 @@
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <!-- Card PDF 1 -->
-                        <div wire:click="exportarReporteGeneralPdf" class="p-4 border border-slate-100 hover:border-slate-300 bg-slate-50 rounded-2xl cursor-pointer transition flex items-center gap-3">
+                        <div wire:click="exportarReporteGeneralPdf" class="p-4 border border-[#C7B5A3]/20 hover:border-[#C7B5A3]/60 bg-crema/30 rounded-2xl cursor-pointer transition flex items-center gap-3">
                             <span class="h-10 w-10 bg-rose-50 text-rose-600 rounded-xl flex items-center justify-center text-xl">
                                 <i class="ph ph-file-pdf"></i>
                             </span>
@@ -817,7 +817,7 @@
                         </div>
 
                         <!-- Card Excel 1 -->
-                        <div wire:click="exportarReporteGeneralExcel" class="p-4 border border-slate-100 hover:border-slate-300 bg-slate-50 rounded-2xl cursor-pointer transition flex items-center gap-3">
+                        <div wire:click="exportarReporteGeneralExcel" class="p-4 border border-[#C7B5A3]/20 hover:border-[#C7B5A3]/60 bg-crema/30 rounded-2xl cursor-pointer transition flex items-center gap-3">
                             <span class="h-10 w-10 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center text-xl">
                                 <i class="ph ph-file-xls"></i>
                             </span>
@@ -828,7 +828,7 @@
                         </div>
 
                         <!-- Card PDF 2 -->
-                        <div wire:click="exportarCoberturaSemanalPdf" class="p-4 border border-slate-100 hover:border-slate-300 bg-slate-50 rounded-2xl cursor-pointer transition flex items-center gap-3">
+                        <div wire:click="exportarCoberturaSemanalPdf" class="p-4 border border-[#C7B5A3]/20 hover:border-[#C7B5A3]/60 bg-crema/30 rounded-2xl cursor-pointer transition flex items-center gap-3">
                             <span class="h-10 w-10 bg-rose-50 text-rose-600 rounded-xl flex items-center justify-center text-xl">
                                 <i class="ph ph-calendar"></i>
                             </span>
@@ -839,7 +839,7 @@
                         </div>
 
                         <!-- Card Excel 2 -->
-                        <div wire:click="exportarPersonalSinTurnoExcel" class="p-4 border border-slate-100 hover:border-slate-300 bg-slate-50 rounded-2xl cursor-pointer transition flex items-center gap-3">
+                        <div wire:click="exportarPersonalSinTurnoExcel" class="p-4 border border-[#C7B5A3]/20 hover:border-[#C7B5A3]/60 bg-crema/30 rounded-2xl cursor-pointer transition flex items-center gap-3">
                             <span class="h-10 w-10 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center text-xl">
                                 <i class="ph ph-users-three"></i>
                             </span>
@@ -852,7 +852,7 @@
                 </div>
 
                 <!-- Footer -->
-                <div class="px-6 py-4 bg-slate-50 border-t border-slate-100 flex justify-end">
+                <div class="px-6 py-4 bg-crema/30 border-t border-[#C7B5A3]/20 flex justify-end">
                     <button wire:click="$set('mostrarReportes', false)" class="px-4 py-2 bg-azul-profundo hover:bg-azul-profundo/80 text-white font-bold text-xs rounded-xl tracking-wider uppercase transition">
                         Cerrar
                     </button>

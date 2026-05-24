@@ -7,7 +7,7 @@
                     <i class="ph-bold ph-chart-pie-slice text-2xl text-white"></i>
                 </div>
                 <div>
-                    <h1 class="text-3xl font-black uppercase tracking-tight text-azul-profundo sm:text-4xl">
+                    <h1 class="text-xl font-black uppercase tracking-tight text-azul-profundo sm:text-2xl">
                         Reportes de salud
                     </h1>
                     <p class="mt-1 text-sm font-bold text-azul-profundo/60">
@@ -80,8 +80,8 @@
                 <p class="text-sm font-bold text-azul-profundo/60">Reporte Institucional de Salud y Seguimiento</p>
             </div>
             
-            <div class="flex flex-col items-center justify-center py-20 text-center">
-                <i class="ph-fill ph-file-text text-5xl text-[#C7B5A3]/40 mb-4"></i>
+            <div class="flex flex-col items-center justify-center py-10 text-center">
+                <i class="ph-fill ph-file-text text-3xl text-[#C7B5A3]/40 mb-4"></i>
                 <h3 class="text-lg font-black text-azul-profundo">Generación de Datos en Espera</h3>
                 <p class="text-sm text-azul-profundo/60 mt-1">Selecciona los parámetros y presiona Generar Vista Previa o Imprimir.</p>
             </div>

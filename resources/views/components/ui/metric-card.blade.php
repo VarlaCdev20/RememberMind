@@ -21,7 +21,7 @@
     @else
         <p class="rm-metric-label">{{ $etiqueta }}</p>
     @endif
-    <p class="mt-1 text-2xl font-black {{ $colorValor }}">{{ $valor }}</p>
+    <p class="mt-1 text-xl font-black {{ $colorValor }}">{{ $valor }}</p>
 
     @if($slot->isNotEmpty())
         <div class="mt-2 text-xs font-bold text-azul-profundo/50">

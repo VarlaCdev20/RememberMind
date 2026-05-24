@@ -72,8 +72,8 @@
                 </div>
             </div>
         @else
-            <div class="flex flex-col items-center justify-center rounded-3xl border border-dashed border-[#C7B5A3]/60 bg-white py-16 text-center shadow-sm mb-8">
-                <i class="ph-fill ph-file-dashed text-5xl text-[#C7B5A3]/60 mb-4"></i>
+            <div class="flex flex-col items-center justify-center rounded-3xl border border-dashed border-[#C7B5A3]/60 bg-white py-8 text-center shadow-sm mb-8">
+                <i class="ph-fill ph-file-dashed text-3xl text-[#C7B5A3]/60 mb-4"></i>
                 <h3 class="text-lg font-black text-azul-profundo">No hay ficha médica activa</h3>
                 <p class="mt-1 text-sm font-bold text-[#2F3E5C]/50 mb-6">Debes registrar la ficha para habilitar el seguimiento clínico.</p>
                 @can('salud.ficha.crear')

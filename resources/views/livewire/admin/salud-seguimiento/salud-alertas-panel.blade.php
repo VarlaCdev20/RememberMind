@@ -7,7 +7,7 @@
                     <i class="ph-bold ph-warning-circle text-2xl text-rose-500"></i>
                 </div>
                 <div>
-                    <h1 class="text-3xl font-black uppercase tracking-tight text-azul-profundo sm:text-4xl">
+                    <h1 class="text-xl font-black uppercase tracking-tight text-azul-profundo sm:text-2xl">
                         Alertas de seguimiento
                     </h1>
                     <p class="mt-1 text-sm font-bold text-azul-profundo/60">
@@ -64,7 +64,7 @@
                     </a>
                 </div>
             @empty
-                <div class="col-span-full flex flex-col items-center justify-center rounded-3xl border border-dashed border-[#C7B5A3]/60 bg-white py-20 text-center shadow-sm">
+                <div class="col-span-full flex flex-col items-center justify-center rounded-3xl border border-dashed border-[#C7B5A3]/60 bg-white py-10 text-center shadow-sm">
                     <div class="flex h-20 w-20 items-center justify-center rounded-full bg-emerald-50">
                         <i class="ph-bold ph-check-circle text-4xl text-emerald-500"></i>
                     </div>

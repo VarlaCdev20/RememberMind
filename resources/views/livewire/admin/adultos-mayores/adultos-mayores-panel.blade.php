@@ -268,8 +268,8 @@
                     @endif
                 @endforeach
                 @if(!$hayTarjetasActivas)
-                    <div class="col-span-full rounded-2xl border border-[#C7B5A3] bg-[#E6DDD3]/40 p-10 text-center">
-                        <i class="ph-bold ph-users-three text-4xl text-[#2F3E5C]/30 mb-2"></i>
+                    <div class="col-span-full rounded-2xl border border-[#C7B5A3] bg-[#E6DDD3]/40 p-5 text-center">
+                        <i class="ph-bold ph-users-three text-3xl text-[#2F3E5C]/30 mb-2"></i>
                         <p class="text-sm font-black text-[#2F3E5C]/60">No se encontraron adultos mayores activos con los filtros aplicados.</p>
                     </div>
                 @endif
@@ -403,8 +403,8 @@
                     @endif
                 @endforeach
                 @if(!$hayArchivados)
-                    <div class="col-span-full rounded-2xl border border-[#C7B5A3] bg-[#E6DDD3]/40 p-10 text-center">
-                        <i class="ph-bold ph-archive text-4xl text-[#2F3E5C]/30 mb-2"></i>
+                    <div class="col-span-full rounded-2xl border border-[#C7B5A3] bg-[#E6DDD3]/40 p-5 text-center">
+                        <i class="ph-bold ph-archive text-3xl text-[#2F3E5C]/30 mb-2"></i>
                         <p class="text-sm font-black text-[#2F3E5C]/60">No existen expedientes archivados en este censo.</p>
                     </div>
                 @endif
@@ -453,7 +453,7 @@
                     @endif
                 @endforeach
                 @if(!$hayAlertas)
-                    <div class="col-span-full rounded-2xl border border-[#C7B5A3] bg-white p-10 text-center flex flex-col items-center">
+                    <div class="col-span-full rounded-2xl border border-[#C7B5A3] bg-white p-5 text-center flex flex-col items-center">
                         <div class="h-14 w-14 rounded-full bg-[#8DA280]/15 text-[#8DA280] border border-[#8DA280]/30 shadow-inner flex items-center justify-center mb-3">
                             <i class="ph-bold ph-check-circle text-3xl"></i>
                         </div>

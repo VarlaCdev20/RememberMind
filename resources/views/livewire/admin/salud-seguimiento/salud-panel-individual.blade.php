@@ -17,8 +17,8 @@
             </div>
         </div>
 
-        <div class="flex flex-col items-center justify-center rounded-3xl border border-dashed border-[#C7B5A3]/60 bg-white py-20 text-center shadow-sm">
-            <i class="ph-fill {{ $icono }} text-6xl text-[#C7B5A3]/60 mb-6"></i>
+        <div class="flex flex-col items-center justify-center rounded-3xl border border-dashed border-[#C7B5A3]/60 bg-white py-10 text-center shadow-sm">
+            <i class="ph-fill {{ $icono }} text-3xl text-[#C7B5A3]/60 mb-6"></i>
             <h3 class="text-xl font-black text-azul-profundo">Gestión de {{ $titulo }}</h3>
             <p class="mt-2 text-sm font-bold text-[#2F3E5C]/60 max-w-md mx-auto">
                 Espacio preparado para la administración de registros de {{ strtolower($titulo) }} del paciente seleccionado.

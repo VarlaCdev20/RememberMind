@@ -15,7 +15,7 @@
                     </span>
                 </div>
 
-                <h1 class="max-w-4xl text-2xl font-black leading-tight text-azul-profundo md:text-4xl">
+                <h1 class="max-w-4xl text-xl font-black leading-tight text-azul-profundo md:text-2xl">
                     Panel administrativo de <span class="text-terracota">Casa Amandita</span>
                 </h1>
 
@@ -26,7 +26,7 @@
 
             <div class="mt-5 flex flex-wrap gap-3">
                 <a href="{{ route('admin.adultos-mayores.create') }}" 
-                   class="rounded-full bg-terracota px-5 py-3 text-sm font-black text-white shadow-[0_10px_22px_rgba(233,122,95,0.28)] transition-all duration-200 hover:scale-95 active:scale-90">
+                   class="rounded-full bg-terracota px-4 py-2 text-xs font-black text-white shadow-[0_6px_14px_rgba(233,122,95,0.28)] transition-all duration-200 hover:scale-95 active:scale-90">
                     <i class="ph-bold ph-plus-circle mr-1"></i>
                     Nuevo registro
                 </a>
@@ -34,7 +34,7 @@
                 <button 
                     disabled
                     title="Próximamente"
-                    class="rounded-full bg-azul-profundo px-5 py-3 text-sm font-black text-white shadow-[0_10px_22px_rgba(47,62,92,0.24)] opacity-50 cursor-not-allowed transition-all duration-200">
+                    class="rounded-full bg-azul-profundo px-4 py-2 text-xs font-black text-white shadow-[0_6px_14px_rgba(47,62,92,0.24)] opacity-50 cursor-not-allowed transition-all duration-200">
                     <i class="ph-bold ph-file-arrow-down mr-1"></i>
                     Exportar reporte
                 </button>

@@ -31,7 +31,7 @@
         scrollbar-width: thin;
         scrollbar-color: #C7B5A3 transparent;
     }
-    *::-webkit-scrollbar        { width: 6px; height: 6px; }
+    *::-webkit-scrollbar        { width: 5px; height: 5px; }
     *::-webkit-scrollbar-track  { background: transparent; }
     *::-webkit-scrollbar-thumb  { background-color: #C7B5A3; border-radius: 9999px; }
 }
@@ -45,36 +45,36 @@
        Cards
        ---------------------------------------------------------- */
     .rm-card {
-        @apply rounded-3xl border border-[#C7B5A3]/40 bg-white shadow-sm;
+        @apply rounded-2xl border border-[#C7B5A3]/40 bg-white shadow-sm;
     }
     .rm-card-soft {
-        @apply rounded-3xl border border-[#C7B5A3]/40 bg-white/90 shadow-sm backdrop-blur-sm;
+        @apply rounded-2xl border border-[#C7B5A3]/40 bg-white/90 shadow-sm backdrop-blur-sm;
     }
     .rm-card-warm {
-        @apply rounded-3xl border border-[#CBBBAA] bg-[#E7DDD2]/95 shadow-sm;
+        @apply rounded-2xl border border-[#CBBBAA] bg-[#E7DDD2]/95 shadow-sm;
     }
     .rm-card-section {
-        @apply rm-card p-6;
+        @apply rm-card p-5;
     }
 
     /* ----------------------------------------------------------
        Cabeceras de página
        ---------------------------------------------------------- */
     .rm-page-header {
-        @apply mb-8 flex flex-col justify-between gap-4 border-b border-[#C7B5A3]/50 pb-6 sm:flex-row sm:items-center;
+        @apply mb-5 flex flex-col justify-between gap-3 border-b border-[#C7B5A3]/50 pb-4 sm:flex-row sm:items-center;
     }
     .rm-section-title {
-        @apply text-3xl font-black uppercase tracking-tight text-azul-profundo sm:text-4xl;
+        @apply text-xl font-black uppercase tracking-tight text-azul-profundo sm:text-2xl;
     }
     .rm-section-subtitle {
-        @apply mt-1 text-sm font-bold text-azul-profundo/60;
+        @apply mt-0.5 text-xs font-semibold text-azul-profundo/60;
     }
 
     /* ----------------------------------------------------------
        Botones
        ---------------------------------------------------------- */
     .rm-btn {
-        @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-xs font-black uppercase tracking-wider shadow-sm transition-all active:scale-95 disabled:cursor-not-allowed disabled:opacity-60;
+        @apply inline-flex items-center justify-center gap-1.5 rounded-xl px-3 py-2 text-xs font-black uppercase tracking-wider shadow-sm transition-all active:scale-95 disabled:cursor-not-allowed disabled:opacity-60;
     }
     .rm-btn-primary {
         @apply rm-btn bg-azul-profundo text-white hover:bg-azul-profundo/85;
@@ -98,14 +98,14 @@
         @apply rm-btn border border-[#C7B5A3]/60 bg-transparent text-azul-profundo hover:bg-[#E6DDD3];
     }
     .rm-btn-icon {
-        @apply flex h-9 w-9 items-center justify-center rounded-full border border-[#C7B5A3]/40 bg-white text-azul-profundo shadow-sm transition hover:bg-terracota hover:text-white active:scale-90;
+        @apply flex h-8 w-8 items-center justify-center rounded-full border border-[#C7B5A3]/40 bg-white text-azul-profundo shadow-sm transition hover:bg-terracota hover:text-white active:scale-90;
     }
 
     /* ----------------------------------------------------------
        Badges / etiquetas de estado
        ---------------------------------------------------------- */
     .rm-badge {
-        @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider;
+        @apply inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-black uppercase tracking-wider;
     }
     .rm-badge-success {
         @apply rm-badge bg-emerald-100 text-emerald-700 border border-emerald-200;
@@ -130,7 +130,7 @@
        Inputs / formularios
        ---------------------------------------------------------- */
     .rm-input {
-        @apply w-full rounded-2xl border border-[#C7B5A3]/40 bg-[#F7F5F2] px-4 py-3 text-sm font-bold text-azul-profundo shadow-inner transition placeholder:text-azul-profundo/40 focus:border-terracota focus:outline-none focus:ring-1 focus:ring-terracota;
+        @apply w-full rounded-xl border border-[#C7B5A3]/40 bg-[#F7F5F2] px-3 py-2 text-sm text-azul-profundo transition placeholder:text-azul-profundo/40 focus:border-terracota focus:outline-none focus:ring-1 focus:ring-terracota;
     }
     .rm-select {
         @apply rm-input appearance-none;
@@ -139,7 +139,7 @@
         @apply rm-input resize-none;
     }
     .rm-label {
-        @apply block text-xs font-black uppercase tracking-wider text-azul-profundo mb-1.5;
+        @apply block text-xs font-black uppercase tracking-wider text-azul-profundo mb-1;
     }
     .rm-label-soft {
         @apply block text-[10px] font-black uppercase tracking-widest text-azul-profundo/60 mb-1;
@@ -155,13 +155,13 @@
         @apply text-[10px] font-black uppercase tracking-widest text-azul-profundo/50 border-b border-[#C7B5A3]/30 bg-[#F7F5F2]/60;
     }
     .rm-table-header th {
-        @apply px-4 py-3;
+        @apply px-4 py-2;
     }
     .rm-table-row {
         @apply border-b border-[#C7B5A3]/20 transition hover:bg-[#F7F5F2]/60;
     }
     .rm-table-row td {
-        @apply px-4 py-3.5;
+        @apply px-4 py-2.5;
     }
     .rm-table-cell-label {
         @apply text-xs font-black text-azul-profundo;
@@ -174,51 +174,51 @@
        Empty states
        ---------------------------------------------------------- */
     .rm-empty-state {
-        @apply flex flex-col items-center justify-center rounded-3xl border border-dashed border-[#C7B5A3]/60 bg-white py-20 text-center shadow-sm;
+        @apply flex flex-col items-center justify-center rounded-2xl border border-dashed border-[#C7B5A3]/60 bg-white py-10 text-center shadow-sm;
     }
     .rm-empty-state-icon {
-        @apply flex h-20 w-20 items-center justify-center rounded-full bg-[#E6DDD3]/50 text-[#C7B5A3];
+        @apply flex h-14 w-14 items-center justify-center rounded-full bg-[#E6DDD3]/50 text-[#C7B5A3];
     }
     .rm-empty-state-title {
-        @apply mt-4 text-lg font-black text-azul-profundo;
+        @apply mt-3 text-base font-black text-azul-profundo;
     }
     .rm-empty-state-text {
-        @apply mt-1 text-sm font-bold text-azul-profundo/50 max-w-sm mx-auto;
+        @apply mt-1 text-xs font-semibold text-azul-profundo/50 max-w-sm mx-auto;
     }
 
     /* ----------------------------------------------------------
        Modales
        ---------------------------------------------------------- */
     .rm-modal-overlay {
-        @apply fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4;
+        @apply fixed inset-0 z-50 flex items-center justify-center bg-azul-profundo/50 backdrop-blur-sm p-4;
     }
     .rm-modal-panel {
-        @apply relative w-full max-w-2xl rounded-3xl border border-[#C7B5A3]/40 bg-white shadow-2xl;
+        @apply relative w-full max-w-2xl rounded-2xl border border-[#C7B5A3]/40 bg-white shadow-2xl;
     }
     .rm-modal-header {
-        @apply flex items-center justify-between border-b border-[#C7B5A3]/30 px-6 py-5;
+        @apply flex items-center justify-between border-b border-[#C7B5A3]/30 px-5 py-3.5;
     }
     .rm-modal-title {
-        @apply text-base font-black uppercase tracking-wider text-azul-profundo;
+        @apply text-sm font-black uppercase tracking-wider text-azul-profundo;
     }
     .rm-modal-body {
-        @apply p-6;
+        @apply p-5;
     }
     .rm-modal-footer {
-        @apply flex justify-end gap-3 border-t border-[#C7B5A3]/20 px-6 py-4;
+        @apply flex justify-end gap-2 border-t border-[#C7B5A3]/20 px-5 py-3;
     }
 
     /* ----------------------------------------------------------
        Sidebar
        ---------------------------------------------------------- */
     .rm-sidebar-item {
-        @apply flex items-center gap-2.5 rounded-lg py-2 text-sm font-black transition-all duration-300 text-azul-profundo/60 hover:text-terracota hover:translate-x-1;
+        @apply flex items-center gap-2 rounded-lg py-1.5 text-xs font-black transition-all duration-300 text-azul-profundo/60 hover:text-terracota hover:translate-x-1;
     }
     .rm-sidebar-item-active {
         @apply text-terracota;
     }
     .rm-sidebar-section {
-        @apply flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-sm font-black transition-all duration-300 text-azul-profundo/80 hover:bg-[#D5C7B9]/50 hover:text-terracota;
+        @apply flex w-full items-center justify-between rounded-xl px-3 py-2 text-xs font-black transition-all duration-300 text-azul-profundo/80 hover:bg-[#D5C7B9]/50 hover:text-terracota;
     }
     .rm-sidebar-section-active {
         @apply bg-[#D5C7B9] text-terracota shadow-sm;
@@ -228,16 +228,16 @@
        Metric cards
        ---------------------------------------------------------- */
     .rm-metric-card {
-        @apply rounded-[18px] border border-[#D5C7B9] bg-[#F2EBE3]/80 p-4 shadow-sm;
+        @apply rounded-xl border border-[#D5C7B9] bg-[#F2EBE3]/80 p-3.5 shadow-sm;
     }
     .rm-metric-label {
         @apply text-[9px] font-black uppercase tracking-[0.15em] text-azul-profundo/45;
     }
     .rm-metric-value {
-        @apply mt-1.5 text-2xl font-black text-terracota;
+        @apply mt-1 text-xl font-black text-terracota;
     }
     .rm-metric-value-neutral {
-        @apply mt-1.5 text-2xl font-black text-azul-profundo;
+        @apply mt-1 text-xl font-black text-azul-profundo;
     }
 
     /* ----------------------------------------------------------
@@ -279,10 +279,10 @@
 
     /* Utilidades de la landing */
     .nav-welcome-link {
-        @apply relative inline-flex items-center gap-2 rounded-full px-4 py-2.5 text-sm font-extrabold text-azul-profundo/85 transition-all duration-300 hover:-translate-y-0.5 hover:bg-white/65 hover:text-terracota;
+        @apply relative inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-extrabold text-azul-profundo/85 transition-all duration-300 hover:-translate-y-0.5 hover:bg-white/65 hover:text-terracota;
     }
     .mobile-welcome-link {
-        @apply flex items-center gap-4 rounded-2xl bg-[#E6DDD3] px-4 py-3.5 text-lg font-extrabold text-azul-profundo transition-all duration-300 hover:bg-white hover:text-terracota hover:shadow-lg active:scale-[0.98];
+        @apply flex items-center gap-3 rounded-2xl bg-[#E6DDD3] px-4 py-3 text-base font-extrabold text-azul-profundo transition-all duration-300 hover:bg-white hover:text-terracota hover:shadow-lg active:scale-[0.98];
     }
 }
 
