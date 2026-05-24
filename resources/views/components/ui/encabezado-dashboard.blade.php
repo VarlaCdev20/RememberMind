@@ -52,7 +52,7 @@
                 <p class="text-xs font-bold text-azul-profundo/55">Registrados</p>
             </a>
 
-            @role('admin|superadmin')
+            @can('usuarios.ver')
             <a href="{{ route('admin.usuarios.index') }}"
                class="group rounded-[1.6rem] border border-[#C7B5A3] bg-[#D5C7B9]/75 p-4 shadow-sm transition-all duration-200 hover:scale-95 hover:bg-[#E6DDD3] hover:shadow-lg active:scale-90">
                 <div class="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-azul-profundo/10 text-azul-profundo transition-colors group-hover:bg-azul-profundo group-hover:text-white">
@@ -71,7 +71,7 @@
                 <p class="mt-1 text-2xl font-black text-azul-profundo">--</p>
                 <p class="text-xs font-bold text-azul-profundo/55">Solo administradores</p>
             </div>
-            @endrole
+            @endcan
 
             <div class="group rounded-[1.6rem] border border-[#C7B5A3] bg-[#D5C7B9]/75 p-4 shadow-sm transition-all duration-200 hover:scale-95 hover:bg-[#E6DDD3] hover:shadow-lg sm:col-span-2 xl:col-span-1 active:scale-90">
                 <div class="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-[#8DA280]/15 text-[#8DA280] transition-colors group-hover:bg-[#8DA280] group-hover:text-white">

@@ -79,9 +79,10 @@ class SaludSeguimientoPermissionsSeeder extends Seeder
             'salud.reportes.generar',
         ]);
 
-        // Asignar al rol 'personal_administrativo'
-        $administrativo = Role::firstOrCreate(['name' => 'personal_administrativo']);
-        $administrativo->givePermissionTo([
+        // Asignar lectura de salud al rol 'personal_admin'
+        // (personal_administrativo era un duplicado de este rol — eliminado)
+        $personalAdmin = Role::firstOrCreate(['name' => 'personal_admin']);
+        $personalAdmin->givePermissionTo([
             'salud.ver',
             'salud.resumen.ver',
             'salud.ficha.ver',
@@ -92,5 +93,11 @@ class SaludSeguimientoPermissionsSeeder extends Seeder
             'salud.alertas.ver',
             'salud.reportes.ver',
         ]);
+
+        // Eliminar rol huérfano 'personal_administrativo' si no tiene usuarios
+        $rolHuerfano = Role::where('name', 'personal_administrativo')->first();
+        if ($rolHuerfano && $rolHuerfano->users()->count() === 0) {
+            $rolHuerfano->delete();
+        }
     }
 }
