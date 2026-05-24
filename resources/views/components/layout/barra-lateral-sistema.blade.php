@@ -110,16 +110,16 @@
                 [
                     'title' => 'Salud y Seguimiento',
                     'icon' => 'ph-heartbeat',
-                    'items' => [
-                        ['label' => 'Ficha médica', 'route' => null],
-                        ['label' => 'Medicación', 'route' => null],
-                        ['label' => 'Adm. de Medicación', 'route' => null],
-                        ['label' => 'Signos vitales', 'route' => null],
-                        ['label' => 'Valoración funcional', 'route' => null],
-                        ['label' => 'Observación diaria', 'route' => null],
-                        ['label' => 'Atenciones e incidentes', 'route' => null],
-                        ['label' => 'Evaluación cognitiva', 'route' => null],
-                    ],
+                    'items' => array_filter([
+                        auth()->user()->can('salud.ver') ? ['label' => 'Resumen de salud', 'route' => 'admin.salud-seguimiento.index'] : null,
+                        auth()->user()->can('salud.ficha.ver') ? ['label' => 'Ficha médica', 'route' => 'admin.salud-seguimiento.ficha.index'] : null,
+                        auth()->user()->can('salud.medicacion.ver') ? ['label' => 'Medicación', 'route' => 'admin.salud-seguimiento.medicacion.index'] : null,
+                        auth()->user()->can('salud.administracion.ver') ? ['label' => 'Adm. de Medicación', 'route' => 'admin.salud-seguimiento.administracion.index'] : null,
+                        auth()->user()->can('salud.signos.ver') ? ['label' => 'Signos vitales', 'route' => 'admin.salud-seguimiento.signos.index'] : null,
+                        auth()->user()->can('salud.valoracion.ver') ? ['label' => 'Valoración funcional', 'route' => 'admin.salud-seguimiento.valoracion.index'] : null,
+                        auth()->user()->can('salud.alertas.ver') ? ['label' => 'Alertas de seguimiento', 'route' => 'admin.salud-seguimiento.alertas'] : null,
+                        auth()->user()->can('salud.reportes.ver') ? ['label' => 'Reportes de salud', 'route' => 'admin.salud-seguimiento.reportes'] : null,
+                    ]),
                 ],
                 [
                     'title' => 'Familia y Social',

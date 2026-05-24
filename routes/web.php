@@ -84,6 +84,11 @@ Route::middleware([
                         ->name('area.excel');
                 });
 
+            // ── Alertas y Pendientes (Debe definirse antes del resource para evitar colisiones) ──
+            Route::get('adultos-mayores/alertas-pendientes', \App\Livewire\Admin\AdultosMayores\AlertasPendientesPanel::class)
+                ->middleware('permission:adultos.ver')
+                ->name('adultos-mayores.alertas-pendientes');
+
             // ── Adultos Mayores ──────────────────
             Route::resource('adultos-mayores', AdultoMayorController::class)
                 ->middleware('permission:adultos.ver')
@@ -189,15 +194,38 @@ Route::middleware([
             Route::get('reporte-general', [AdultoMayorController::class, 'reporteGeneral'])
                 ->middleware('permission:reportes.ver')
                 ->name('adultos-mayores.reporte-general');
-            Route::get('reporte-institucional', [AdultoMayorController::class, 'reporteInstitucional'])
+            Route::get('reporte-institucional', \App\Livewire\Admin\AdultosMayores\ReportesInstitucionalesPanel::class)
                 ->middleware('permission:reportes.ver')
                 ->name('adultos-mayores.reporte-institucional');
             Route::get('reporte-bienestar', [AdultoMayorController::class, 'reporteBienestar'])
                 ->middleware('permission:reportes.ver')
                 ->name('adultos-mayores.reporte-bienestar');
-            Route::get('adultos-mayores/alertas-pendientes', function () {
-                return view('admin.adultos-mayores.alertas-pendientes-placeholder');
-            })->middleware('permission:adultos.ver')->name('adultos-mayores.alertas-pendientes');
+
+
+            // ── Salud y Seguimiento ──────────────────
+            Route::prefix('salud-seguimiento')
+                ->name('salud-seguimiento.')
+                ->middleware('permission:salud.ver')
+                ->group(function () {
+                    // Global Indexes for Sidebar
+                    Route::get('/', \App\Livewire\Admin\SaludSeguimiento\SaludSeguimientoListPanel::class)->name('index');
+                    Route::get('/resumenes', \App\Livewire\Admin\SaludSeguimiento\SaludSeguimientoListPanel::class)->name('resumen.index');
+                    Route::get('/fichas', \App\Livewire\Admin\SaludSeguimiento\SaludSeguimientoListPanel::class)->name('ficha.index');
+                    Route::get('/medicaciones', \App\Livewire\Admin\SaludSeguimiento\SaludSeguimientoListPanel::class)->name('medicacion.index');
+                    Route::get('/administraciones', \App\Livewire\Admin\SaludSeguimiento\SaludSeguimientoListPanel::class)->name('administracion.index');
+                    Route::get('/signos-vitales', \App\Livewire\Admin\SaludSeguimiento\SaludSeguimientoListPanel::class)->name('signos.index');
+                    Route::get('/valoraciones', \App\Livewire\Admin\SaludSeguimiento\SaludSeguimientoListPanel::class)->name('valoracion.index');
+                    Route::get('/alertas', \App\Livewire\Admin\SaludSeguimiento\SaludAlertasPanel::class)->name('alertas');
+                    Route::get('/reportes', \App\Livewire\Admin\SaludSeguimiento\SaludReportesPanel::class)->name('reportes');
+
+                    // Individual Panels
+                    Route::get('/{adulto}/resumen', \App\Livewire\Admin\SaludSeguimiento\SaludResumenPanel::class)->name('resumen');
+                    Route::get('/{adulto}/ficha', \App\Livewire\Admin\SaludSeguimiento\SaludFichaPanel::class)->name('ficha');
+                    Route::get('/{adulto}/medicacion', \App\Livewire\Admin\SaludSeguimiento\SaludMedicacionPanel::class)->name('medicacion');
+                    Route::get('/{adulto}/administracion', \App\Livewire\Admin\SaludSeguimiento\SaludAdministracionMedicacionPanel::class)->name('administracion');
+                    Route::get('/{adulto}/signos', \App\Livewire\Admin\SaludSeguimiento\SaludSignosPanel::class)->name('signos');
+                    Route::get('/{adulto}/valoracion', \App\Livewire\Admin\SaludSeguimiento\SaludValoracionPanel::class)->name('valoracion');
+                });
 
             // ── Bitácora ─────────────────────────
             Route::get('bitacora', [\App\Http\Controllers\Admin\BitacoraController::class, 'index'])
