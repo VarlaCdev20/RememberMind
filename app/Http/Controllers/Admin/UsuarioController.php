@@ -365,4 +365,44 @@ class UsuarioController extends Controller
             ], 500);
         }
     }
+
+    public function solicitudDocumentalPdf(User $usuario)
+    {
+        try {
+            $rol = $usuario->roles->first()?->name;
+            
+            $usuariosPanel = new \App\Livewire\Admin\Usuarios\UsuariosPanel();
+            $documentos = $usuariosPanel->obtenerDocumentosRequeridosPorRol($rol);
+            $rolLegible = $usuariosPanel->obtenerNombreRolLegible($rol);
+            
+            $fechaRegistro = $usuario->created_at ? $usuario->created_at->format('d/m/Y H:i') : now()->format('d/m/Y H:i');
+            $fechaLimite = $usuario->created_at ? $usuario->created_at->addHours(48)->format('d/m/Y H:i') : now()->addHours(48)->format('d/m/Y H:i');
+
+            $viewData = [
+                'usuario_reg' => $usuario,
+                'rol_legible' => $rolLegible,
+                'fecha_registro' => $fechaRegistro,
+                'fecha_limite' => $fechaLimite,
+                'documentos' => $documentos,
+                'fecha' => now()->format('d/m/Y H:i'),
+                'usuario' => auth()->check() ? auth()->user()->name : 'Sistema',
+            ];
+
+            $fileNameService = app(\App\Services\Reports\ReportFileNameService::class);
+            $filename = $fileNameService->generate('solicitud_documental_' . $usuario->cod_usu, 'pdf');
+
+            $exportService = app(\App\Services\Reports\ReportExportService::class);
+
+            activity('Usuarios')
+                ->causedBy(auth()->user())
+                ->performedOn($usuario)
+                ->event('reportes')
+                ->log("Descargó la solicitud de documentación institucional en PDF para el usuario: {$usuario->name}.");
+
+            return $exportService->exportPdf('reports.usuarios.solicitud_documental_pdf', $viewData, $filename);
+        } catch (\Exception $e) {
+            return back()->with('error', 'Error al generar la solicitud de documentación en PDF: ' . $e->getMessage());
+        }
+    }
 }
+

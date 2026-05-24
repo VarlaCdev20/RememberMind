@@ -3,7 +3,13 @@
     "allow": [
       "PowerShell($bytes = [System.IO.File]::ReadAllBytes\\(\"c:\\\\laragon\\\\www\\\\RememberMind_F1\\\\app\\\\Livewire\\\\Admin\\\\Usuarios\\\\UsuariosPanel.php\"\\); \"Primeros 6 bytes ahora: $\\(\\($bytes[0..5] | ForEach-Object { $_.ToString\\('X2'\\) }\\) -join ' '\\) \\(debe iniciar con 3C 3F = <?\\)\")",
       "PowerShell(New-Item -ItemType Directory -Force -Path \"c:\\\\laragon\\\\www\\\\RememberMind_F1\\\\app\\\\Exports\\\\Reportes\\\\Sheets\")",
-      "PowerShell(\"OK\")"
+      "PowerShell(\"OK\")",
+      "PowerShell(php artisan route:list --path=admin/reportes 2>&1)",
+      "PowerShell(php -l app/Services/Reportes/ReporteDataService.php 2>&1)",
+      "PowerShell(php -l app/Http/Controllers/Admin/Reportes/ReporteAdultosController.php 2>&1)",
+      "PowerShell(php -l app/Exports/Reportes/Sheets/Adultos/AdultosResumenSheet.php 2>&1)",
+      "PowerShell(php -l app/Exports/Reportes/Sheets/Adultos/AdultosListaSheet.php 2>&1)",
+      "PowerShell(php artisan view:cache 2>&1)"
     ],
     "additionalDirectories": [
       "c:\\laragon\\www\\RememberMind_F1\\app\\Http\\Controllers\\Admin"

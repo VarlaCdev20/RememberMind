@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class DisponibilidadVoluntarios extends Model
+class DisponibilidadVoluntario extends Model
 {
     protected $table = 'disponibilidad_voluntarios';
     protected $primaryKey = 'cod_hor_vol';
@@ -24,8 +24,8 @@ class DisponibilidadVoluntarios extends Model
 
     protected static function boot(): void
     {
-        static::creating(function ($DisponibilidadVoluntarios) {
-            if (!$DisponibilidadVoluntarios->cod_hor_vol) {
+        static::creating(function ($DisponibilidadVoluntario) {
+            if (!$DisponibilidadVoluntario->cod_hor_vol) {
                 $ultimo = self::where('cod_hor_vol', 'like', 'HDV_%')
                     ->orderByDesc('cod_hor_vol')
                     ->value('cod_hor_vol');
@@ -34,7 +34,7 @@ class DisponibilidadVoluntarios extends Model
                     ? ((int) substr($ultimo, 3)) + 1
                     : 1;
 
-                $DisponibilidadVoluntarios->cod_hor_vol = 'HDV_' . str_pad($numero, 4, '0', STR_PAD_LEFT);
+                $DisponibilidadVoluntario->cod_hor_vol = 'HDV_' . str_pad($numero, 4, '0', STR_PAD_LEFT);
             }
         });
     }

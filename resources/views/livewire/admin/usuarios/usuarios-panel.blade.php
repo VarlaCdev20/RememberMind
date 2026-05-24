@@ -1,4 +1,650 @@
 <div x-data="{ vista: 'cards' }">
+    @if($modoVista === 'detalle' && $usuarioDetalle)
+        @php
+            $rolKey = $usuarioDetalle->roles->first()?->name;
+            $rolDisplay = '';
+            if ($rolKey === 'personal_admin') {
+                $rolDisplay = 'PERSONAL ADMINISTRATIVO';
+            } elseif ($rolKey === 'personal_salud') {
+                $rolDisplay = 'PERSONAL DE SALUD';
+            } elseif ($rolKey === 'voluntario') {
+                $rolDisplay = 'VOLUNTARIO';
+            } elseif ($rolKey === 'familiar') {
+                $rolDisplay = 'FAMILIAR AUTORIZADO';
+            } else {
+                $rolDisplay = mb_strtoupper(str_replace('_', ' ', $rolKey), 'UTF-8');
+            }
+
+            // Documentación
+            $documentacionService = app(\App\Services\Usuarios\DocumentacionUsuarioService::class);
+            $checklist = $documentacionService->obtenerChecklistUsuario($usuarioDetalle);
+            $avance = $documentacionService->calcularAvanceDocumental($usuarioDetalle);
+
+            // Dirección
+            $partesDireccion = [];
+            if (!empty($usuarioDetalle->departamento_domicilio)) {
+                $partesDireccion[] = "DEPARTAMENTO: " . mb_strtoupper($usuarioDetalle->departamento_domicilio, 'UTF-8');
+            }
+            if (!empty($usuarioDetalle->municipio_domicilio)) {
+                $partesDireccion[] = "MUNICIPIO: " . mb_strtoupper($usuarioDetalle->municipio_domicilio, 'UTF-8');
+            }
+            if (!empty($usuarioDetalle->zona_domicilio)) {
+                $partesDireccion[] = "ZONA: " . mb_strtoupper($usuarioDetalle->zona_domicilio, 'UTF-8');
+            }
+            if (!empty($usuarioDetalle->calle)) {
+                $partesDireccion[] = "CALLE/AV.: " . mb_strtoupper($usuarioDetalle->calle, 'UTF-8');
+            }
+            if (!empty($usuarioDetalle->nro_domicilio)) {
+                $partesDireccion[] = "NRO.: " . mb_strtoupper($usuarioDetalle->nro_domicilio, 'UTF-8');
+            }
+            if (!empty($usuarioDetalle->referencia_domicilio)) {
+                $partesDireccion[] = "REF.: " . mb_strtoupper($usuarioDetalle->referencia_domicilio, 'UTF-8');
+            }
+            
+            if (empty($partesDireccion)) {
+                $direccionCompleta = !empty($usuarioDetalle->direccion) ? mb_strtoupper($usuarioDetalle->direccion, 'UTF-8') : 'SIN DIRECCIÓN REGISTRADA';
+            } else {
+                $direccionCompleta = implode('; ', $partesDireccion);
+            }
+        @endphp
+
+        {{-- DETALLE DE FICHA INSTITUCIONAL --}}
+        <div class="space-y-6 animate-in fade-in duration-300">
+            {{-- CABECERA CON ACCIÓN DE RETORNO --}}
+            <header class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between rounded-[1.6rem] border border-[#C7B5A3]/55 bg-[#E6DDD3]/72 px-6 py-5 shadow-sm backdrop-blur-xl">
+                <div class="flex items-center gap-3">
+                    <button type="button" 
+                            wire:click="volverAlListadoUsuarios" 
+                            class="flex h-10 w-10 items-center justify-center rounded-xl bg-white/80 border border-[#C7B5A3]/30 text-[#2F3E5C] transition hover:bg-[#2F3E5C] hover:text-white active:scale-95">
+                        <i class="ph-bold ph-arrow-left text-lg"></i>
+                    </button>
+                    <div>
+                        <p class="text-[10px] font-black uppercase tracking-[0.25em] text-[#E27D60]">Ficha de Personal & Familiares</p>
+                        <h2 class="text-2xl font-black text-[#2F3E5C] uppercase">Ficha institucional del usuario</h2>
+                    </div>
+                </div>
+                <div class="flex flex-wrap items-center gap-2">
+                    @can('usuarios.editar')
+                        <button type="button" 
+                                wire:click="abrirEdicionDesdeDetalle"
+                                class="inline-flex h-10 items-center gap-2 rounded-full bg-[#E27D60] px-5 text-xs font-black text-white shadow-sm transition hover:bg-[#d86c50] active:scale-95">
+                            <i class="ph-bold ph-pencil-simple"></i>
+                            Editar Usuario
+                        </button>
+                    @endcan
+                    <button type="button" 
+                            wire:click="volverAlListadoUsuarios"
+                            class="inline-flex h-10 items-center gap-2 rounded-full bg-white/60 border border-[#C7B5A3]/50 px-5 text-xs font-black text-[#2F3E5C] transition hover:bg-white active:scale-95">
+                        <i class="ph-bold ph-list"></i>
+                        Volver al Listado
+                    </button>
+                </div>
+            </header>
+
+            {{-- TARJETA PRINCIPAL DEL USUARIO --}}
+            <div class="rounded-[1.8rem] border border-[#C7B5A3]/45 bg-[#E6DDD3]/30 p-6 shadow-sm backdrop-blur-md">
+                <div class="flex flex-col md:flex-row items-center gap-6">
+                    <div class="relative flex h-24 w-24 shrink-0 items-center justify-center rounded-full bg-[#2F3E5C]/10 border-2 border-[#C7B5A3]/30">
+                        @if($usuarioDetalle->foto_de_perfil)
+                            <img src="{{ asset('storage/' . $usuarioDetalle->foto_de_perfil) }}" alt="Foto de perfil" class="h-full w-full rounded-full object-cover">
+                        @else
+                            <i class="ph-bold ph-user text-4xl text-[#2F3E5C]/35"></i>
+                        @endif
+                    </div>
+                    
+                    <div class="flex-1 text-center md:text-left space-y-2">
+                        <div class="flex flex-wrap items-center justify-center md:justify-start gap-2">
+                            <h3 class="text-xl font-black text-[#2F3E5C] uppercase">{{ $usuarioDetalle->nombres }} {{ $usuarioDetalle->ap_paterno }} {{ $usuarioDetalle->ap_materno }}</h3>
+                            <span class="inline-block rounded-full bg-[#2F3E5C] px-2.5 py-0.5 text-[9px] font-black tracking-widest text-white uppercase">
+                                {{ $rolDisplay }}
+                            </span>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs pt-2">
+                            <div>
+                                <span class="font-black text-[#2F3E5C]/40 uppercase tracking-wide block">Estado del Perfil:</span>
+                                <span class="mt-1 inline-block rounded-full px-2 py-0.5 text-[9px] font-black uppercase {{ $usuarioDetalle->estado === 'ACTIVO' ? 'bg-[#8DA280]/20 text-[#63775B]' : 'bg-[#E27D60]/20 text-[#E27D60]' }}">
+                                    {{ $usuarioDetalle->estado }}
+                                </span>
+                            </div>
+                            <div>
+                                <span class="font-black text-[#2F3E5C]/40 uppercase tracking-wide block">Acceso al Sistema:</span>
+                                <span class="mt-1 inline-block rounded-full px-2 py-0.5 text-[9px] font-black uppercase {{ $usuarioDetalle->acceso_sistema === 'HABILITADO' ? 'bg-[#8DA280]/20 text-[#63775B]' : 'bg-[#E27D60]/20 text-[#E27D60]' }}">
+                                    {{ $usuarioDetalle->acceso_sistema }}
+                                </span>
+                            </div>
+                            <div>
+                                <span class="font-black text-[#2F3E5C]/40 uppercase tracking-wide block">Estado Documental:</span>
+                                <span class="mt-1 inline-block rounded-full px-2 py-0.5 text-[9px] font-black uppercase {{ $avance['porcentaje_avance'] == 100 ? 'bg-[#8DA280]/20 text-[#63775B]' : 'bg-[#E27D60]/20 text-[#E27D60]' }}">
+                                    {{ $avance['porcentaje_avance'] == 100 ? 'COMPLETA' : 'PENDIENTE' }} ({{ $avance['porcentaje_avance'] }}%)
+                                </span>
+                            </div>
+                            @if($usuarioDetalle->created_at)
+                            <div>
+                                <span class="font-black text-[#2F3E5C]/40 uppercase tracking-wide block">Plazo Documental:</span>
+                                <span class="font-bold text-[#E27D60] block mt-1">LÍMITE 48 HORAS</span>
+                            </div>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {{-- BARRA SUPERIOR DE SECCIONES --}}
+            <nav class="sticky top-[72px] z-20 -mx-4 px-4 py-3 bg-[#FAF7F2] border-b border-[#C7B5A3]/30 backdrop-blur-md overflow-x-auto custom-scrollbar flex gap-2">
+                <a href="#seccion-resumen"
+                   @click.prevent="document.getElementById('seccion-resumen').scrollIntoView({ behavior: 'smooth', block: 'center' })"
+                   class="inline-flex h-9 shrink-0 items-center justify-center rounded-xl bg-white border border-[#C7B5A3]/40 text-[#2F3E5C] hover:bg-[#2F3E5C] hover:text-white px-4 text-xs font-black uppercase transition active:scale-95 shadow-sm">
+                    Resumen
+                </a>
+                <a href="#seccion-identidad"
+                   @click.prevent="document.getElementById('seccion-identidad').scrollIntoView({ behavior: 'smooth', block: 'center' })"
+                   class="inline-flex h-9 shrink-0 items-center justify-center rounded-xl bg-white border border-[#C7B5A3]/40 text-[#2F3E5C] hover:bg-[#2F3E5C] hover:text-white px-4 text-xs font-black uppercase transition active:scale-95 shadow-sm">
+                    Identidad
+                </a>
+                <a href="#seccion-contacto"
+                   @click.prevent="document.getElementById('seccion-contacto').scrollIntoView({ behavior: 'smooth', block: 'center' })"
+                   class="inline-flex h-9 shrink-0 items-center justify-center rounded-xl bg-white border border-[#C7B5A3]/40 text-[#2F3E5C] hover:bg-[#2F3E5C] hover:text-white px-4 text-xs font-black uppercase transition active:scale-95 shadow-sm">
+                    Contacto y dirección
+                </a>
+                <a href="#seccion-perfil"
+                   @click.prevent="document.getElementById('seccion-perfil').scrollIntoView({ behavior: 'smooth', block: 'center' })"
+                   class="inline-flex h-9 shrink-0 items-center justify-center rounded-xl bg-white border border-[#C7B5A3]/40 text-[#2F3E5C] hover:bg-[#2F3E5C] hover:text-white px-4 text-xs font-black uppercase transition active:scale-95 shadow-sm">
+                    Perfil Institucional
+                </a>
+                <a href="#seccion-documentacion"
+                   @click.prevent="document.getElementById('seccion-documentacion').scrollIntoView({ behavior: 'smooth', block: 'center' })"
+                   class="inline-flex h-9 shrink-0 items-center justify-center rounded-xl bg-white border border-[#C7B5A3]/40 text-[#2F3E5C] hover:bg-[#2F3E5C] hover:text-white px-4 text-xs font-black uppercase transition active:scale-95 shadow-sm">
+                    Documentación
+                </a>
+                <a href="#seccion-seguridad"
+                   @click.prevent="document.getElementById('seccion-seguridad').scrollIntoView({ behavior: 'smooth', block: 'center' })"
+                   class="inline-flex h-9 shrink-0 items-center justify-center rounded-xl bg-white border border-[#C7B5A3]/40 text-[#2F3E5C] hover:bg-[#2F3E5C] hover:text-white px-4 text-xs font-black uppercase transition active:scale-95 shadow-sm">
+                    Seguridad y acceso
+                </a>
+                @if($rolKey === 'familiar')
+                <a href="#seccion-vinculacion"
+                   @click.prevent="document.getElementById('seccion-vinculacion').scrollIntoView({ behavior: 'smooth', block: 'center' })"
+                   class="inline-flex h-9 shrink-0 items-center justify-center rounded-xl bg-white border border-[#C7B5A3]/40 text-[#2F3E5C] hover:bg-[#2F3E5C] hover:text-white px-4 text-xs font-black uppercase transition active:scale-95 shadow-sm">
+                    Vinculación Familiar
+                </a>
+                @endif
+            </nav>
+
+            {{-- SECCIONES DE INFORMACIÓN --}}
+            <div class="space-y-6">
+                {{-- SECCION RESUMEN --}}
+                <section id="seccion-resumen" class="scroll-mt-32 rounded-[1.8rem] border border-[#C7B5A3]/40 bg-white/70 p-6 shadow-sm backdrop-blur-md space-y-4">
+                    <h4 class="flex items-center gap-2 border-b border-[#C7B5A3]/20 pb-2 text-xs font-black uppercase tracking-widest text-[#E27D60]">
+                        <i class="ph-bold ph-list-bullets text-lg"></i> Resumen del Usuario
+                    </h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-3 text-xs">
+                        <div>
+                            <span class="font-black text-[#2F3E5C]/50 uppercase tracking-wider block">Nombre completo:</span>
+                            <span class="font-bold text-[#2F3E5C] uppercase text-sm">{{ $usuarioDetalle->nombres }} {{ $usuarioDetalle->ap_paterno }} {{ $usuarioDetalle->ap_materno }}</span>
+                        </div>
+                        <div>
+                            <span class="font-black text-[#2F3E5C]/50 uppercase tracking-wider block">Tipo de usuario:</span>
+                            <span class="font-bold text-[#2F3E5C] uppercase text-sm">{{ $rolDisplay }}</span>
+                        </div>
+                        <div>
+                            <span class="font-black text-[#2F3E5C]/50 uppercase tracking-wider block">Correo Electrónico:</span>
+                            <span class="font-bold text-[#2F3E5C] text-sm lowercase">{{ $usuarioDetalle->correo ?: 'No registrado' }}</span>
+                        </div>
+                        <div>
+                            <span class="font-black text-[#2F3E5C]/50 uppercase tracking-wider block">Celular / Teléfono:</span>
+                            <span class="font-bold text-[#2F3E5C] text-sm">{{ $usuarioDetalle->codigo_telefono }} {{ $usuarioDetalle->telefono ?: 'No registrado' }}</span>
+                        </div>
+                        <div class="md:col-span-2">
+                            <span class="font-black text-[#2F3E5C]/50 uppercase tracking-wider block">Dirección completa:</span>
+                            <span class="font-bold text-[#2F3E5C] text-sm uppercase leading-relaxed">{{ $direccionCompleta }}</span>
+                        </div>
+                        <div>
+                            <span class="font-black text-[#2F3E5C]/50 uppercase tracking-wider block">Estado del Perfil:</span>
+                            <span class="mt-1 inline-block rounded-full px-2.5 py-0.5 text-[10px] font-black uppercase {{ $usuarioDetalle->estado === 'ACTIVO' ? 'bg-[#8DA280]/20 text-[#63775B]' : 'bg-[#E27D60]/20 text-[#E27D60]' }}">
+                                {{ $usuarioDetalle->estado }}
+                            </span>
+                        </div>
+                        <div>
+                            <span class="font-black text-[#2F3E5C]/50 uppercase tracking-wider block">Acceso al Sistema:</span>
+                            <span class="mt-1 inline-block rounded-full px-2.5 py-0.5 text-[10px] font-black uppercase {{ $usuarioDetalle->acceso_sistema === 'HABILITADO' ? 'bg-[#8DA280]/20 text-[#63775B]' : 'bg-[#E27D60]/20 text-[#E27D60]' }}">
+                                {{ $usuarioDetalle->acceso_sistema }}
+                            </span>
+                        </div>
+                        <div>
+                            <span class="font-black text-[#2F3E5C]/50 uppercase tracking-wider block">Estado Documental:</span>
+                            <span class="mt-1 inline-block rounded-full px-2.5 py-0.5 text-[10px] font-black uppercase {{ $avance['porcentaje_avance'] == 100 ? 'bg-[#8DA280]/20 text-[#63775B]' : 'bg-[#E27D60]/20 text-[#E27D60]' }}">
+                                {{ $avance['porcentaje_avance'] == 100 ? 'COMPLETA' : 'PENDIENTE' }} ({{ $avance['porcentaje_avance'] }}%)
+                            </span>
+                        </div>
+                        @if($usuarioDetalle->created_at)
+                        <div>
+                            <span class="font-black text-[#2F3E5C]/50 uppercase tracking-wider block">Fecha Límite Presentación:</span>
+                            <span class="font-bold text-[#E27D60] text-sm">
+                                {{ $usuarioDetalle->created_at->addHours(48)->format('d/m/Y H:i') }} (Límite 48 Horas)
+                            </span>
+                        </div>
+                        @endif
+                    </div>
+                </section>
+
+                {{-- SECCION IDENTIDAD --}}
+                <section id="seccion-identidad" class="scroll-mt-32 rounded-[1.8rem] border border-[#C7B5A3]/40 bg-white/70 p-6 shadow-sm backdrop-blur-md space-y-4">
+                    <h4 class="flex items-center gap-2 border-b border-[#C7B5A3]/20 pb-2 text-xs font-black uppercase tracking-widest text-[#E27D60]">
+                        <i class="ph-bold ph-identification-card text-lg"></i> Datos de Identidad
+                    </h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 text-xs">
+                        <div>
+                            <span class="font-black text-[#2F3E5C]/50 uppercase tracking-wider block">Nombres:</span>
+                            <span class="font-bold text-[#2F3E5C] uppercase">{{ $usuarioDetalle->nombres }}</span>
+                        </div>
+                        <div>
+                            <span class="font-black text-[#2F3E5C]/50 uppercase tracking-wider block">Apellido Paterno:</span>
+                            <span class="font-bold text-[#2F3E5C] uppercase">{{ $usuarioDetalle->ap_paterno ?: 'No registrado' }}</span>
+                        </div>
+                        <div>
+                            <span class="font-black text-[#2F3E5C]/50 uppercase tracking-wider block">Apellido Materno:</span>
+                            <span class="font-bold text-[#2F3E5C] uppercase">{{ $usuarioDetalle->ap_materno ?: 'No registrado' }}</span>
+                        </div>
+                        <div>
+                            <span class="font-black text-[#2F3E5C]/50 uppercase tracking-wider block">Género:</span>
+                            <span class="font-bold text-[#2F3E5C] uppercase">{{ $usuarioDetalle->genero ?: 'No registrado' }}</span>
+                        </div>
+                        <div>
+                            <span class="font-black text-[#2F3E5C]/50 uppercase tracking-wider block">Fecha de Nacimiento:</span>
+                            <span class="font-bold text-[#2F3E5C]">
+                                {{ $usuarioDetalle->fecha_nacimiento ? $usuarioDetalle->fecha_nacimiento->format('d/m/Y') : 'No registrado' }}
+                            </span>
+                        </div>
+                        <div>
+                            <span class="font-black text-[#2F3E5C]/50 uppercase tracking-wider block">Edad:</span>
+                            <span class="font-bold text-[#2F3E5C]">
+                                {{ $usuarioDetalle->fecha_nacimiento ? $usuarioDetalle->fecha_nacimiento->age . ' años' : 'No registrado' }}
+                            </span>
+                        </div>
+                        <div>
+                            <span class="font-black text-[#2F3E5C]/50 uppercase tracking-wider block">Tipo de Documento:</span>
+                            <span class="font-bold text-[#2F3E5C] uppercase">{{ $usuarioDetalle->tipo_documento ?: 'No registrado' }}</span>
+                        </div>
+                        <div>
+                            <span class="font-black text-[#2F3E5C]/50 uppercase tracking-wider block">Número de Documento:</span>
+                            <span class="font-bold text-[#2F3E5C] uppercase">{{ $usuarioDetalle->numero_documento ?: 'No registrado' }}</span>
+                        </div>
+                        <div>
+                            <span class="font-black text-[#2F3E5C]/50 uppercase tracking-wider block">País de Emisión:</span>
+                            <span class="font-bold text-[#2F3E5C] uppercase">{{ $usuarioDetalle->pais_documento ?: 'No registrado' }}</span>
+                        </div>
+                        @if($usuarioDetalle->expedido)
+                        <div>
+                            <span class="font-black text-[#2F3E5C]/50 uppercase tracking-wider block">Expedido en:</span>
+                            <span class="font-bold text-[#2F3E5C] uppercase">{{ $usuarioDetalle->expedido }}</span>
+                        </div>
+                        @endif
+                    </div>
+                </section>
+
+                {{-- SECCION CONTACTO Y DIRECCION --}}
+                <section id="seccion-contacto" class="scroll-mt-32 rounded-[1.8rem] border border-[#C7B5A3]/40 bg-white/70 p-6 shadow-sm backdrop-blur-md space-y-4">
+                    <h4 class="flex items-center gap-2 border-b border-[#C7B5A3]/20 pb-2 text-xs font-black uppercase tracking-widest text-[#E27D60]">
+                        <i class="ph-bold ph-phone text-lg"></i> Información de Contacto y Dirección
+                    </h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 text-xs">
+                        <div>
+                            <span class="font-black text-[#2F3E5C]/50 uppercase tracking-wider block">Correo Electrónico:</span>
+                            <span class="font-bold text-[#2F3E5C] lowercase break-all">{{ $usuarioDetalle->correo ?: 'No registrado' }}</span>
+                        </div>
+                        <div>
+                            <span class="font-black text-[#2F3E5C]/50 uppercase tracking-wider block">Celular / Teléfono:</span>
+                            <span class="font-bold text-[#2F3E5C]">
+                                {{ $usuarioDetalle->codigo_telefono }} {{ $usuarioDetalle->telefono ?: 'No registrado' }}
+                            </span>
+                        </div>
+                        <div>
+                            <span class="font-black text-[#2F3E5C]/50 uppercase tracking-wider block">Contacto de Emergencia:</span>
+                            <span class="font-bold text-[#2F3E5C] uppercase">
+                                {{ $usuarioDetalle->contacto_emergencia ?: 'No registrado' }} 
+                                @if($usuarioDetalle->ap_paterno_emergencia || $usuarioDetalle->ap_materno_emergencia)
+                                    {{ $usuarioDetalle->ap_paterno_emergencia }} {{ $usuarioDetalle->ap_materno_emergencia }}
+                                @endif
+                            </span>
+                        </div>
+                        <div>
+                            <span class="font-black text-[#2F3E5C]/50 uppercase tracking-wider block">Vínculo de Emergencia:</span>
+                            <span class="font-bold text-[#2F3E5C] uppercase">{{ $usuarioDetalle->parentesco_emergencia ?: 'No registrado' }}</span>
+                        </div>
+                        <div>
+                            <span class="font-black text-[#2F3E5C]/50 uppercase tracking-wider block">Celular de Emergencia:</span>
+                            <span class="font-bold text-[#2F3E5C]">{{ $usuarioDetalle->celular_emergencia ?: 'No registrado' }}</span>
+                        </div>
+                        <div class="md:col-span-3 border-t border-[#C7B5A3]/10 pt-3">
+                            <span class="font-black text-[#2F3E5C]/50 uppercase tracking-wider block">Dirección Domiciliaria Completa:</span>
+                            <span class="font-bold text-[#2F3E5C] uppercase leading-relaxed block mt-1">{{ $direccionCompleta }}</span>
+                        </div>
+                    </div>
+                </section>
+
+                {{-- SECCION PERFIL INSTITUCIONAL --}}
+                <section id="seccion-perfil" class="scroll-mt-32 rounded-[1.8rem] border border-[#C7B5A3]/40 bg-white/70 p-6 shadow-sm backdrop-blur-md space-y-4">
+                    <h4 class="flex items-center gap-2 border-b border-[#C7B5A3]/20 pb-2 text-xs font-black uppercase tracking-widest text-[#E27D60]">
+                        <i class="ph-bold ph-user-gear text-lg"></i> Perfil Institucional
+                    </h4>
+                    
+                    @if($rolKey === 'personal_admin')
+                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 text-xs">
+                            <div>
+                                <span class="font-black text-[#2F3E5C]/50 uppercase tracking-wider block">Área Institucional:</span>
+                                <span class="font-bold text-[#2F3E5C] uppercase">{{ $usuarioDetalle->areaInstitucional?->nombre ?: 'No asignada' }}</span>
+                            </div>
+                            <div>
+                                <span class="font-black text-[#2F3E5C]/50 uppercase tracking-wider block">Cargo Administrativo:</span>
+                                <span class="font-bold text-[#2F3E5C] uppercase">{{ $usuarioDetalle->personalAdmin?->cargoAdmin?->nombre ?: 'No registrado' }}</span>
+                            </div>
+                            <div>
+                                <span class="font-black text-[#2F3E5C]/50 uppercase tracking-wider block">Fecha de Ingreso:</span>
+                                <span class="font-bold text-[#2F3E5C]">
+                                    {{ $usuarioDetalle->personalAdmin?->fecha_ingreso ? \Carbon\Carbon::parse($usuarioDetalle->personalAdmin->fecha_ingreso)->format('d/m/Y') : 'No registrada' }}
+                                </span>
+                            </div>
+                        </div>
+                    @elseif($rolKey === 'personal_salud')
+                        <div class="space-y-4">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 text-xs">
+                                <div>
+                                    <span class="font-black text-[#2F3E5C]/50 uppercase tracking-wider block">Área Institucional:</span>
+                                    <span class="font-bold text-[#2F3E5C] uppercase">{{ $usuarioDetalle->areaInstitucional?->nombre ?: 'No asignada' }}</span>
+                                </div>
+                                <div>
+                                    <span class="font-black text-[#2F3E5C]/50 uppercase tracking-wider block">Especialidad de Salud:</span>
+                                    <span class="font-bold text-[#2F3E5C] uppercase">{{ $usuarioDetalle->personalSalud?->especialidad?->nombre ?: 'No asignada' }}</span>
+                                </div>
+                                <div>
+                                    <span class="font-black text-[#2F3E5C]/50 uppercase tracking-wider block">Institución de Formación:</span>
+                                    <span class="font-bold text-[#2F3E5C] uppercase">{{ $usuarioDetalle->personalSalud?->institucion_formacion ?: 'No especificada' }}</span>
+                                </div>
+                                <div>
+                                    <span class="font-black text-[#2F3E5C]/50 uppercase tracking-wider block">Fecha de Ingreso:</span>
+                                    <span class="font-bold text-[#2F3E5C]">
+                                        {{ $usuarioDetalle->personalSalud?->fecha_ingreso ? \Carbon\Carbon::parse($usuarioDetalle->personalSalud->fecha_ingreso)->format('d/m/Y') : 'No registrada' }}
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="rounded-xl bg-[#FDF1ED]/80 border border-[#E27D60]/20 p-4">
+                                <p class="text-xs font-semibold text-[#E27D60] flex items-center gap-1.5 leading-normal">
+                                    <i class="ph-bold ph-info text-base shrink-0"></i>
+                                    Aviso: La matrícula profesional y documentos de respaldo se gestionan en la sección de documentación.
+                                </p>
+                            </div>
+                        </div>
+                    @elseif($rolKey === 'voluntario')
+                        @php
+                            $volDetalle = $usuarioDetalle->voluntarios->first();
+                        @endphp
+                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 text-xs">
+                            <div>
+                                <span class="font-black text-[#2F3E5C]/50 uppercase tracking-wider block">Área de Apoyo:</span>
+                                <span class="font-bold text-[#2F3E5C] uppercase">{{ $volDetalle?->area_apoyo_preferente ?: 'No especificada' }}</span>
+                            </div>
+                            <div>
+                                <span class="font-black text-[#2F3E5C]/50 uppercase tracking-wider block">Disponibilidad Inicial:</span>
+                                <span class="font-bold text-[#2F3E5C] uppercase">{{ $volDetalle?->disponibilidad_inicial ?: 'No registrada' }}</span>
+                            </div>
+                            <div>
+                                <span class="font-black text-[#2F3E5C]/50 uppercase tracking-wider block">Fecha de Ingreso:</span>
+                                <span class="font-bold text-[#2F3E5C]">
+                                    {{ $volDetalle?->fecha_ingreso ? \Carbon\Carbon::parse($volDetalle->fecha_ingreso)->format('d/m/Y') : 'No registrada' }}
+                                </span>
+                            </div>
+                        </div>
+                    @elseif($rolKey === 'familiar')
+                        <div class="space-y-2 text-xs font-bold text-[#2F3E5C]/70">
+                            <p class="text-sm font-bold text-[#2F3E5C] uppercase flex items-center gap-1.5">
+                                <i class="ph-bold ph-info text-base text-[#E27D60]"></i>
+                                Usuario externo autorizado para consulta limitada de información.
+                            </p>
+                            <p class="text-xs font-semibold text-[#2F3E5C]/50">
+                                La relación con el adulto mayor debe mostrarse en la sección Vinculación familiar a continuación.
+                            </p>
+                        </div>
+                    @else
+                        <div class="py-4 text-center">
+                            <span class="text-xs font-black text-[#2F3E5C]/40 uppercase tracking-widest">Sin datos adicionales de rol</span>
+                        </div>
+                    @endif
+                </section>
+
+                {{-- SECCION DOCUMENTACION --}}
+                <section id="seccion-documentacion" class="scroll-mt-32 rounded-[1.8rem] border border-[#C7B5A3]/40 bg-white/70 p-6 shadow-sm backdrop-blur-md space-y-4">
+                    <h4 class="flex items-center gap-2 border-b border-[#C7B5A3]/20 pb-2 text-xs font-black uppercase tracking-widest text-[#E27D60]">
+                        <i class="ph-bold ph-files text-lg"></i> Estado de Documentación
+                    </h4>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-xs">
+                        <div class="space-y-3">
+                            <div>
+                                <span class="font-black text-[#2F3E5C]/50 uppercase tracking-wider block">Estado Documental:</span>
+                                <span class="mt-1 inline-block rounded-full px-2.5 py-0.5 text-[10px] font-black uppercase {{ $avance['porcentaje_avance'] == 100 ? 'bg-[#8DA280]/20 text-[#63775B]' : 'bg-[#E27D60]/20 text-[#E27D60]' }}">
+                                    {{ $avance['porcentaje_avance'] == 100 ? 'COMPLETA' : 'PENDIENTE' }}
+                                </span>
+                            </div>
+                            <div>
+                                <span class="font-black text-[#2F3E5C]/50 uppercase tracking-wider block">Plazo de Presentación:</span>
+                                <span class="font-bold text-[#2F3E5C]">48 HORAS</span>
+                            </div>
+                            @if($usuarioDetalle->created_at)
+                            <div>
+                                <span class="font-black text-[#2F3E5C]/50 uppercase tracking-wider block">Fecha Límite de Recepción:</span>
+                                <span class="font-bold text-[#E27D60]">{{ $usuarioDetalle->created_at->addHours(48)->format('d/m/Y H:i') }}</span>
+                            </div>
+                            @endif
+                            
+                            <div class="pt-2 flex flex-col gap-2">
+                                <a href="{{ route('admin.usuarios.solicitud-documental.pdf', $usuarioDetalle->cod_usu) }}"
+                                   target="_blank"
+                                   class="w-full inline-flex h-9 items-center justify-center gap-1.5 rounded-xl bg-[#2F3E5C] text-white text-xs font-black uppercase tracking-wider transition hover:bg-[#E27D60] active:scale-95 shadow-sm">
+                                    <i class="ph-bold ph-download-simple"></i>
+                                    Descargar Solicitud PDF
+                                </a>
+                                <button type="button"
+                                        wire:click="enviarCorreoRequisitosAction('{{ $usuarioDetalle->cod_usu }}')"
+                                        class="w-full inline-flex h-9 items-center justify-center gap-1.5 rounded-xl bg-[#2F3E5C]/10 text-xs font-black text-[#2F3E5C] border border-[#2F3E5C]/20 transition hover:bg-[#2F3E5C] hover:text-white active:scale-95">
+                                    <i class="ph-bold ph-paper-plane-tilt"></i>
+                                    Reenviar Correo de Requisitos
+                                </button>
+                                <button type="button"
+                                        @click="Swal.fire({ icon: 'info', title: 'Módulo en desarrollo', text: 'Módulo de documentación en desarrollo.', confirmButtonColor: '#2F3E5C', customClass: { popup: 'rounded-[1.5rem]' } })"
+                                        class="w-full inline-flex h-9 items-center justify-center gap-1.5 rounded-xl bg-[#C7B5A3]/35 text-xs font-black text-[#7C7168]/60 border border-[#C7B5A3]/40 transition hover:bg-[#C7B5A3]/50">
+                                    <i class="ph-bold ph-upload-simple"></i>
+                                    Registrar Documentación
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="md:col-span-2">
+                            <span class="font-black text-[#2F3E5C]/50 uppercase tracking-wider block mb-2">Lista de Requisitos Obligatorios:</span>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                @foreach($checklist as $item)
+                                    <div class="flex items-center justify-between gap-3 p-3 rounded-xl border border-[#C7B5A3]/25 bg-white/40">
+                                        <div class="min-w-0">
+                                            <p class="font-black text-[#2F3E5C] truncate uppercase leading-tight">{{ $item['nombre'] }}</p>
+                                            <p class="text-[8px] text-[#2F3E5C]/50 font-black uppercase tracking-wider mt-0.5">
+                                                {{ $item['obligatorio'] ? 'Obligatorio' : 'Opcional' }}
+                                            </p>
+                                        </div>
+                                        <div>
+                                            @if($item['cargado'])
+                                                @if($item['estado'] === 'VALIDADO')
+                                                    <span class="inline-flex items-center gap-1 text-[8px] font-black text-[#63775B] bg-[#8DA280]/20 px-2 py-0.5 rounded-full uppercase">
+                                                        <i class="ph-bold ph-check-circle text-[10px]"></i> Validado
+                                                    </span>
+                                                @elseif($item['estado'] === 'OBSERVADO')
+                                                    <span class="inline-flex items-center gap-1 text-[8px] font-black text-[#E27D60] bg-[#E27D60]/20 px-2 py-0.5 rounded-full uppercase">
+                                                        <i class="ph-bold ph-warning-circle text-[10px]"></i> Observado
+                                                    </span>
+                                                @else
+                                                    <span class="inline-flex items-center gap-1 text-[8px] font-black text-[#2F3E5C]/75 bg-[#C7B5A3]/45 px-2 py-0.5 rounded-full uppercase">
+                                                        <i class="ph-bold ph-clock text-[10px]"></i> Pendiente
+                                                    </span>
+                                                @endif
+                                            @else
+                                                <span class="inline-flex items-center gap-1 text-[8px] font-black text-[#7C7168]/80 bg-[#9B8B7E]/10 px-2 py-0.5 rounded-full uppercase">
+                                                    <i class="ph-bold ph-minus-circle text-[10px]"></i> Faltante
+                                                </span>
+                                            @endif
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                {{-- SECCION SEGURIDAD Y ACCESO --}}
+                <section id="seccion-seguridad" class="scroll-mt-32 rounded-[1.8rem] border border-[#C7B5A3]/40 bg-white/70 p-6 shadow-sm backdrop-blur-md space-y-4">
+                    <h4 class="flex items-center gap-2 border-b border-[#C7B5A3]/20 pb-2 text-xs font-black uppercase tracking-widest text-[#E27D60]">
+                        <i class="ph-bold ph-shield-check text-lg"></i> Seguridad y Acceso
+                    </h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 text-xs">
+                        <div>
+                            <span class="font-black text-[#2F3E5C]/50 uppercase tracking-wider block">Rol Asignado:</span>
+                            <span class="font-bold text-[#2F3E5C] uppercase">{{ $rolDisplay }}</span>
+                        </div>
+                        <div>
+                            <span class="font-black text-[#2F3E5C]/50 uppercase tracking-wider block">Estado del Perfil:</span>
+                            <span class="font-bold text-[#2F3E5C] uppercase">{{ $usuarioDetalle->estado }}</span>
+                        </div>
+                        <div>
+                            <span class="font-black text-[#2F3E5C]/50 uppercase tracking-wider block">Acceso al Sistema:</span>
+                            <span class="font-bold text-[#2F3E5C] uppercase">{{ $usuarioDetalle->acceso_sistema }}</span>
+                        </div>
+                        <div>
+                            <span class="font-black text-[#2F3E5C]/50 uppercase tracking-wider block">Último Acceso al Sistema:</span>
+                            <span class="font-bold text-[#2F3E5C]">
+                                {{ $usuarioDetalle->ultimo_acceso ? $usuarioDetalle->ultimo_acceso->format('d/m/Y H:i') : 'No registrado' }}
+                            </span>
+                        </div>
+                        <div>
+                            <span class="font-black text-[#2F3E5C]/50 uppercase tracking-wider block">Fecha de Registro:</span>
+                            <span class="font-bold text-[#2F3E5C]">
+                                {{ $usuarioDetalle->created_at ? $usuarioDetalle->created_at->format('d/m/Y H:i') : 'No registrada' }}
+                            </span>
+                        </div>
+                        @if($usuarioDetalle->updated_at)
+                        <div>
+                            <span class="font-black text-[#2F3E5C]/50 uppercase tracking-wider block">Última Actualización:</span>
+                            <span class="font-bold text-[#2F3E5C]">
+                                {{ $usuarioDetalle->updated_at->format('d/m/Y H:i') }}
+                            </span>
+                        </div>
+                        @endif
+                    </div>
+                </section>
+
+                {{-- SECCION VINCULACION FAMILIAR --}}
+                @if($rolKey === 'familiar')
+                    @php
+                        $famDetalle = $usuarioDetalle->familiares->first();
+                    @endphp
+                    <section id="seccion-vinculacion" class="scroll-mt-32 rounded-[1.8rem] border border-[#C7B5A3]/40 bg-white/70 p-6 shadow-sm backdrop-blur-md space-y-4">
+                        <h4 class="flex items-center gap-2 border-b border-[#C7B5A3]/20 pb-2 text-xs font-black uppercase tracking-widest text-[#E27D60]">
+                            <i class="ph-bold ph-users-three text-lg"></i> Vinculación Familiar
+                        </h4>
+                        
+                        @if($famDetalle && $famDetalle->adultosMayores->isNotEmpty())
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                @foreach($famDetalle->adultosMayores as $am)
+                                    @php
+                                        // Parse observations for salud/economico
+                                        $obs = $am->pivot->observaciones;
+                                        $salud = 'NO';
+                                        $economico = 'NO';
+                                        $obsLimpia = $obs;
+                                        if ($obs) {
+                                            if (preg_match('/Salud:\s*(SI|NO)/i', $obs, $m)) {
+                                                $salud = strtoupper($m[1]) === 'SI' ? 'SÍ' : 'NO';
+                                            }
+                                            if (preg_match('/Económico:\s*(SI|NO)/i', $obs, $m)) {
+                                                $economico = strtoupper($m[1]) === 'SI' ? 'SÍ' : 'NO';
+                                            }
+                                            if (preg_match('/Obs:\s*(.*)/i', $obs, $m)) {
+                                                $obsLimpia = trim($m[1]);
+                                            }
+                                        }
+
+                                        // Format Adulto Mayor CI and Age
+                                        $nombreAm = trim("{$am->nombres} {$am->ap_paterno} {$am->ap_materno}");
+                                        $documentoAm = !empty($am->ci) 
+                                            ? "CI " . $am->ci . " " . ($am->expedicion_ci ?: '') 
+                                            : "SIN DOCUMENTO REGISTRADO";
+                                        $edadAm = $am->fecha_nac 
+                                            ? \Carbon\Carbon::parse($am->fecha_nac)->age . " AÑOS" 
+                                            : "EDAD NO REGISTRADA";
+                                        $amLabel = "{$nombreAm} — {$documentoAm} — {$edadAm}";
+                                    @endphp
+                                    <div class="rounded-xl border border-[#C7B5A3]/30 bg-white/50 p-4 space-y-3 text-xs">
+                                        <div>
+                                            <span class="font-black text-[#2F3E5C]/40 uppercase tracking-wider block">Adulto Mayor Vinculado:</span>
+                                            <span class="font-bold text-[#2F3E5C] uppercase text-sm block mt-0.5 leading-snug">{{ $amLabel }}</span>
+                                        </div>
+                                        <div>
+                                            <span class="font-black text-[#2F3E5C]/40 uppercase tracking-wider block">Parentesco / Vínculo:</span>
+                                            <span class="font-bold text-[#2F3E5C] uppercase">{{ $am->pivot->parentesco_vinculo ?: 'No especificado' }}</span>
+                                        </div>
+                                        <div class="grid grid-cols-3 gap-2 text-center text-[10px] pt-1">
+                                            <div class="bg-white/70 p-2 rounded-xl border border-[#C7B5A3]/10">
+                                                <p class="font-black text-[#2F3E5C]/40 uppercase tracking-tight">Principal</p>
+                                                <p class="font-bold uppercase mt-0.5 {{ $am->pivot->es_responsable ? 'text-[#63775B]' : 'text-[#2F3E5C]/40' }}">
+                                                    {{ $am->pivot->es_responsable ? 'SÍ' : 'NO' }}
+                                                </p>
+                                            </div>
+                                            <div class="bg-white/70 p-2 rounded-xl border border-[#C7B5A3]/10">
+                                                <p class="font-black text-[#2F3E5C]/40 uppercase tracking-tight">Salud</p>
+                                                <p class="font-bold uppercase mt-0.5 {{ $salud === 'SÍ' ? 'text-[#63775B]' : 'text-[#2F3E5C]/40' }}">
+                                                    {{ $salud }}
+                                                </p>
+                                            </div>
+                                            <div class="bg-white/70 p-2 rounded-xl border border-[#C7B5A3]/10">
+                                                <p class="font-black text-[#2F3E5C]/40 uppercase tracking-tight">Económico</p>
+                                                <p class="font-bold uppercase mt-0.5 {{ $economico === 'SÍ' ? 'text-[#63775B]' : 'text-[#2F3E5C]/40' }}">
+                                                    {{ $economico }}
+                                                </p>
+                                            </div>
+                                        </div>
+                                        @if($obsLimpia)
+                                            <div class="bg-white/30 p-2.5 rounded-xl text-[11px] text-[#2F3E5C]/80">
+                                                <span class="font-black uppercase text-[8px] text-[#2F3E5C]/55 block">Observación del Vínculo:</span>
+                                                <p class="font-semibold leading-snug mt-0.5">{{ $obsLimpia }}</p>
+                                            </div>
+                                        @endif
+                                    </div>
+                                @endforeach
+                            </div>
+                        @else
+                            <div class="py-4 text-center">
+                                <span class="text-xs font-black text-[#2F3E5C]/40 uppercase tracking-widest">Sin adultos mayores vinculados</span>
+                            </div>
+                        @endif
+                    </section>
+                @endif
+            </div>
+
+            {{-- BOTÓN VOLVER ARRIBA / ACCIONES PIE --}}
+            <div class="flex items-center justify-between border-t border-[#C7B5A3]/30 pt-4">
+                <button type="button" 
+                        wire:click="volverAlListadoUsuarios" 
+                        class="inline-flex h-9 items-center gap-2 rounded-xl bg-[#2F3E5C]/10 px-4 text-xs font-black text-[#2F3E5C] transition hover:bg-[#2F3E5C] hover:text-white active:scale-95">
+                    <i class="ph-bold ph-arrow-left"></i>
+                    Volver al Listado
+                </button>
+                <button type="button" 
+                        onclick="window.scrollTo({top: 0, behavior: 'smooth'})" 
+                        class="inline-flex h-9 items-center gap-2 rounded-xl bg-white/60 border border-[#C7B5A3]/30 px-4 text-xs font-black text-[#2F3E5C] transition hover:bg-white active:scale-95">
+                    <i class="ph-bold ph-arrow-up"></i>
+                    Ir arriba
+                </button>
+            </div>
+        </div>
+
+    @else
 
     {{-- ENCABEZADO LIMPIO Y MÁS DELGADO --}}
     <header class="mb-5 rounded-[1.6rem] border border-[#C7B5A3]/55 bg-[#E6DDD3]/72 px-6 py-5 shadow-[0_10px_26px_rgba(47,62,92,0.07)] backdrop-blur-xl">
@@ -234,7 +880,7 @@
                             'super_admin', 'superadministrador', 'admin', 'administrador' => 'Administración del sistema',
                             'personal_salud' => 'Área de salud',
                             'personal_admin' => 'Área administrativa',
-                            'familiar' => 'Familiar / Responsable',
+                            'familiar' => 'Familiar autorizado',
                             'voluntario' => 'Voluntariado',
                             default => 'Sin área asignada'
                         };
@@ -248,7 +894,7 @@
                                 ?? 'Personal administrativo',
                             'super_admin', 'superadministrador', 'admin', 'administrador' => 'Administrador del sistema',
                             'voluntario' => 'Voluntario institucional',
-                            'familiar' => 'Familiar / Responsable',
+                            'familiar' => 'Familiar autorizado',
                             default => strtoupper(str_replace('_', ' ', $roleName))
                         };
 
@@ -372,7 +1018,7 @@
                                 <button type="button"
                                         wire:click="abrirVistaCompleta('{{ $u->cod_usu }}')"
                                         class="inline-flex h-8 items-center gap-1.5 rounded-full bg-[#2F3E5C] px-2.5 text-[9px] font-black text-white shadow-sm transition hover:bg-[#24314A] active:scale-95"
-                                        title="Ver expediente completo">
+                                        title="Ver ficha institucional">
                                     <i class="ph-bold ph-eye"></i>
                                     Ver
                                 </button>
@@ -472,7 +1118,7 @@
                                     'super_admin', 'superadministrador', 'admin', 'administrador' => 'Administración del sistema',
                                     'personal_salud' => 'Área de salud',
                                     'personal_admin' => 'Área administrativa',
-                                    'familiar' => 'Familiar / Responsable',
+                                    'familiar' => 'Familiar autorizado',
                                     'voluntario' => 'Voluntariado',
                                     default => 'Sin área asignada'
                                 };
@@ -486,7 +1132,7 @@
                                         ?? 'Personal administrativo',
                                     'super_admin', 'superadministrador', 'admin', 'administrador' => 'Administrador del sistema',
                                     'voluntario' => 'Voluntario institucional',
-                                    'familiar' => 'Familiar / Responsable',
+                                    'familiar' => 'Familiar autorizado',
                                     default => strtoupper(str_replace('_', ' ', $roleName))
                                 };
 
@@ -567,7 +1213,7 @@
                                         <button type="button"
                                                 wire:click="abrirVistaCompleta('{{ $u->cod_usu }}')"
                                                 class="flex h-9 w-9 items-center justify-center rounded-xl bg-[#F6F2EC] text-[#2F3E5C] shadow-sm transition hover:bg-[#2F3E5C] hover:text-white active:scale-90"
-                                                title="Ver expediente completo">
+                                                title="Ver ficha institucional">
                                             <i class="ph-bold ph-eye"></i>
                                         </button>
 
@@ -636,6 +1282,7 @@
             </div>
         @endif
     </section>
+    @endif
 
     {{-- MODAL FUERA DEL CONTENEDOR DEL PANEL --}}
     @if($mostrarFormulario)
@@ -790,12 +1437,12 @@
                             <label class="mb-1 block text-[9px] font-black uppercase tracking-widest text-[#2F3E5C]/60">País Emisor *</label>
                             <select wire:model.live="pais_documento" class="w-full h-10 rounded-xl border border-[#C7B5A3] bg-white px-4 py-2 text-sm font-bold text-[#2F3E5C] outline-none transition">
                                 @foreach(array_keys($paisesConfig) as $pName)
-                                    <option value="{{ $pName }}">{{ $pName }}</option>
+                                    <option value="{{ mb_strtoupper($pName, 'UTF-8') }}">{{ mb_strtoupper($pName, 'UTF-8') }}</option>
                                 @endforeach
                             </select>
                         </div>
-                        <div class="md:col-span-2 lg:col-span-3 grid gap-3 {{ ($pais_documento === 'Bolivia' && $tipo_documento === 'CI') ? 'grid-cols-12' : 'grid-cols-3' }}">
-                            <div class="{{ ($pais_documento === 'Bolivia' && $tipo_documento === 'CI') ? 'col-span-3' : 'col-span-1' }} {{ $pais_documento !== 'Otro' ? 'pointer-events-none opacity-60' : '' }}">
+                        <div class="md:col-span-2 lg:col-span-3 grid gap-3 {{ (mb_strtoupper((string) $pais_documento, 'UTF-8') === 'BOLIVIA' && $tipo_documento === 'CI') ? 'grid-cols-12' : 'grid-cols-3' }}">
+                            <div class="{{ (mb_strtoupper((string) $pais_documento, 'UTF-8') === 'BOLIVIA' && $tipo_documento === 'CI') ? 'col-span-3' : 'col-span-1' }} {{ mb_strtoupper((string) $pais_documento, 'UTF-8') !== 'OTRO' ? 'pointer-events-none opacity-60' : '' }}">
                                 <label class="mb-1 block text-[9px] font-black uppercase tracking-widest text-[#2F3E5C]/60">Tipo *</label>
                                 <select wire:model.live="tipo_documento" tabindex="-1" class="w-full h-10 rounded-xl border border-[#C7B5A3] bg-white px-3 py-2 text-xs font-black text-[#2F3E5C] outline-none transition focus:border-[#2F3E5C]">
                                     <option value="CI">CI</option>
@@ -809,12 +1456,12 @@
                                     <option value="Pasaporte">Pasaporte</option>
                                 </select>
                             </div>
-                            <div class="{{ ($pais_documento === 'Bolivia' && $tipo_documento === 'CI') ? 'col-span-6' : 'col-span-2' }}">
+                            <div class="{{ (mb_strtoupper((string) $pais_documento, 'UTF-8') === 'BOLIVIA' && $tipo_documento === 'CI') ? 'col-span-6' : 'col-span-2' }}">
                                 <label class="mb-1 block text-[9px] font-black uppercase tracking-widest text-[#2F3E5C]/60">Número Doc *</label>
                                 <input type="text" wire:model="numero_documento" placeholder="Ej. 1234567"
                                        class="w-full h-10 rounded-xl border {{ $errors->has('numero_documento') ? 'border-[#E27D60] ring-4 ring-[#E27D60]/10' : 'border-[#C7B5A3] focus:border-[#2F3E5C]' }} bg-white px-4 py-2 text-sm font-bold uppercase text-[#2F3E5C] outline-none transition">
                             </div>
-                            @if($pais_documento === 'Bolivia' && $tipo_documento === 'CI')
+                            @if(mb_strtoupper((string) $pais_documento, 'UTF-8') === 'BOLIVIA' && $tipo_documento === 'CI')
                             <div class="col-span-3">
                                 <label class="mb-1 block text-[9px] font-black uppercase tracking-widest text-[#E27D60]">Expedido (EXP) *</label>
                                 <select wire:model="expedido" class="w-full h-10 rounded-xl border {{ $errors->has('expedido') ? 'border-[#E27D60]' : 'border-[#C7B5A3]' }} bg-white px-3 py-2 text-xs font-black text-[#2F3E5C] outline-none transition focus:border-[#2F3E5C]">
@@ -827,7 +1474,7 @@
                             @endif
                             @error('numero_documento') <div class="col-span-full"><span class="mt-1 block text-[9px] font-black text-[#E27D60] uppercase">{{ $message }}</span></div> @enderror
                             @error('expedido') <div class="col-span-full"><span class="mt-1 block text-[9px] font-black text-[#E27D60] uppercase">{{ $message }}</span></div> @enderror
-                            @if($pais_documento !== 'Otro')
+                            @if(mb_strtoupper((string) $pais_documento, 'UTF-8') !== 'OTRO')
                                 <div class="col-span-full mt-1">
                                     <p class="text-[9px] font-semibold text-[#2F3E5C]/50 italic">
                                         * El tipo de documento se bloquea y pre-asigna automáticamente según el país emisor seleccionado.
@@ -887,13 +1534,13 @@
                             <div class="col-span-8">
                                 <label class="mb-1 block text-[9px] font-black uppercase tracking-widest text-[#2F3E5C]/60">Calle / Avenida *</label>
                                 <input type="text" wire:model="calle" placeholder="Ej. Av. Arce o Calle Murillo"
-                                       class="w-full h-10 rounded-xl border {{ $errors->has('calle') ? 'border-[#E27D60]' : 'border-[#C7B5A3]' }} bg-white px-4 py-2 text-sm font-bold text-[#2F3E5C] outline-none transition focus:border-[#2F3E5C]">
+                                       class="uppercase w-full h-10 rounded-xl border {{ $errors->has('calle') ? 'border-[#E27D60]' : 'border-[#C7B5A3]' }} bg-white px-4 py-2 text-sm font-bold text-[#2F3E5C] outline-none transition focus:border-[#2F3E5C]">
                                 @error('calle') <span class="mt-1 block text-[9px] font-black text-[#E27D60] uppercase">{{ $message }}</span> @enderror
                             </div>
                             <div class="col-span-4">
                                 <label class="mb-1 block text-[9px] font-black uppercase tracking-widest text-[#2F3E5C]/60">Nro. Domicilio *</label>
                                 <input type="text" wire:model="nro_domicilio" placeholder="Ej. 1234 o S/N"
-                                       class="w-full h-10 rounded-xl border {{ $errors->has('nro_domicilio') ? 'border-[#E27D60]' : 'border-[#C7B5A3]' }} bg-white px-4 py-2 text-sm font-bold text-[#2F3E5C] outline-none transition focus:border-[#2F3E5C]">
+                                       class="uppercase w-full h-10 rounded-xl border {{ $errors->has('nro_domicilio') ? 'border-[#E27D60]' : 'border-[#C7B5A3]' }} bg-white px-4 py-2 text-sm font-bold text-[#2F3E5C] outline-none transition focus:border-[#2F3E5C]">
                                 @error('nro_domicilio') <span class="mt-1 block text-[9px] font-black text-[#E27D60] uppercase">{{ $message }}</span> @enderror
                             </div>
                         </div>
@@ -914,7 +1561,7 @@
                             <label class="mb-1 block text-[9px] font-black uppercase tracking-widest text-[#2F3E5C]/60">Municipio / Localidad *</label>
                             @if($departamento_domicilio === 'OTRO')
                                 <input type="text" wire:model="otro_municipio" placeholder="Especifique Municipio..."
-                                       class="w-full h-10 rounded-xl border {{ $errors->has('otro_municipio') ? 'border-[#E27D60]' : 'border-[#C7B5A3]' }} bg-white px-4 py-2 text-sm font-bold text-[#2F3E5C] outline-none transition focus:border-[#2F3E5C]">
+                                       class="uppercase w-full h-10 rounded-xl border {{ $errors->has('otro_municipio') ? 'border-[#E27D60]' : 'border-[#C7B5A3]' }} bg-white px-4 py-2 text-sm font-bold text-[#2F3E5C] outline-none transition focus:border-[#2F3E5C]">
                                 @error('otro_municipio') <span class="mt-1 block text-[9px] font-black text-[#E27D60] uppercase">{{ $message }}</span> @enderror
                             @else
                                 <select wire:model.live="municipio_domicilio"
@@ -934,7 +1581,7 @@
                             <div class="md:col-span-2">
                                 <label class="mb-1 block text-[9px] font-black uppercase tracking-widest text-[#2F3E5C]/60">Especifique Departamento *</label>
                                 <input type="text" wire:model="otro_departamento" placeholder="Especifique el Departamento..."
-                                       class="w-full h-10 rounded-xl border {{ $errors->has('otro_departamento') ? 'border-[#E27D60]' : 'border-[#C7B5A3]' }} bg-white px-4 py-2 text-sm font-bold text-[#2F3E5C] outline-none transition focus:border-[#2F3E5C]">
+                                       class="uppercase w-full h-10 rounded-xl border {{ $errors->has('otro_departamento') ? 'border-[#E27D60]' : 'border-[#C7B5A3]' }} bg-white px-4 py-2 text-sm font-bold text-[#2F3E5C] outline-none transition focus:border-[#2F3E5C]">
                                 @error('otro_departamento') <span class="mt-1 block text-[9px] font-black text-[#E27D60] uppercase">{{ $message }}</span> @enderror
                             </div>
                         @endif
@@ -943,7 +1590,7 @@
                             <div>
                                 <label class="mb-1 block text-[9px] font-black uppercase tracking-widest text-[#2F3E5C]/60">Especifique Municipio *</label>
                                 <input type="text" wire:model="otro_municipio" placeholder="Especifique el Municipio..."
-                                       class="w-full h-10 rounded-xl border {{ $errors->has('otro_municipio') ? 'border-[#E27D60]' : 'border-[#C7B5A3]' }} bg-white px-4 py-2 text-sm font-bold text-[#2F3E5C] outline-none transition focus:border-[#2F3E5C]">
+                                       class="uppercase w-full h-10 rounded-xl border {{ $errors->has('otro_municipio') ? 'border-[#E27D60]' : 'border-[#C7B5A3]' }} bg-white px-4 py-2 text-sm font-bold text-[#2F3E5C] outline-none transition focus:border-[#2F3E5C]">
                                 @error('otro_municipio') <span class="mt-1 block text-[9px] font-black text-[#E27D60] uppercase">{{ $message }}</span> @enderror
                             </div>
                         @endif
@@ -965,14 +1612,14 @@
                                     @if($zona_domicilio === 'OTRO')
                                         <div>
                                             <input type="text" wire:model="otra_zona" placeholder="Especifique la Zona / Barrio..."
-                                                   class="w-full h-10 rounded-xl border {{ $errors->has('otra_zona') ? 'border-[#E27D60]' : 'border-[#C7B5A3]' }} bg-white px-4 py-2 text-sm font-bold text-[#2F3E5C] outline-none transition focus:border-[#2F3E5C]">
+                                                   class="uppercase w-full h-10 rounded-xl border {{ $errors->has('otra_zona') ? 'border-[#E27D60]' : 'border-[#C7B5A3]' }} bg-white px-4 py-2 text-sm font-bold text-[#2F3E5C] outline-none transition focus:border-[#2F3E5C]">
                                             @error('otra_zona') <span class="mt-1 block text-[9px] font-black text-[#E27D60] uppercase">{{ $message }}</span> @enderror
                                         </div>
                                     @endif
                                 </div>
                             @else
                                 <input type="text" wire:model="otra_zona" placeholder="Ej. Sopocachi"
-                                       class="w-full h-10 rounded-xl border {{ $errors->has('otra_zona') ? 'border-[#E27D60]' : 'border-[#C7B5A3]' }} bg-white px-4 py-2 text-sm font-bold text-[#2F3E5C] outline-none transition focus:border-[#2F3E5C]">
+                                       class="uppercase w-full h-10 rounded-xl border {{ $errors->has('otra_zona') ? 'border-[#E27D60]' : 'border-[#C7B5A3]' }} bg-white px-4 py-2 text-sm font-bold text-[#2F3E5C] outline-none transition focus:border-[#2F3E5C]">
                                 @error('otra_zona') <span class="mt-1 block text-[9px] font-black text-[#E27D60] uppercase">{{ $message }}</span> @enderror
                             @endif
                         </div>
@@ -993,19 +1640,19 @@
                             <div>
                                 <label class="mb-1 block text-[9px] font-black uppercase tracking-widest text-[#2F3E5C]/60">Nombres Emergencia *</label>
                                 <input type="text" wire:model="contacto_emergencia" placeholder="Ej. María Teresa"
-                                       class="w-full h-10 rounded-xl border {{ $errors->has('contacto_emergencia') ? 'border-[#E27D60]' : 'border-[#C7B5A3]' }} bg-white px-4 py-2 text-sm font-bold text-[#2F3E5C] outline-none transition focus:border-[#2F3E5C]">
+                                       class="uppercase w-full h-10 rounded-xl border {{ $errors->has('contacto_emergencia') ? 'border-[#E27D60]' : 'border-[#C7B5A3]' }} bg-white px-4 py-2 text-sm font-bold text-[#2F3E5C] outline-none transition focus:border-[#2F3E5C]">
                                 @error('contacto_emergencia') <span class="mt-1 block text-[9px] font-black text-[#E27D60] uppercase">{{ $message }}</span> @enderror
                             </div>
                             <div>
                                 <label class="mb-1 block text-[9px] font-black uppercase tracking-widest text-[#2F3E5C]/60">Apellido Paterno *</label>
                                 <input type="text" wire:model="ap_paterno_emergencia" placeholder="Ej. López"
-                                       class="w-full h-10 rounded-xl border {{ $errors->has('ap_paterno_emergencia') ? 'border-[#E27D60]' : 'border-[#C7B5A3]' }} bg-white px-4 py-2 text-sm font-bold text-[#2F3E5C] outline-none transition focus:border-[#2F3E5C]">
+                                       class="uppercase w-full h-10 rounded-xl border {{ $errors->has('ap_paterno_emergencia') ? 'border-[#E27D60]' : 'border-[#C7B5A3]' }} bg-white px-4 py-2 text-sm font-bold text-[#2F3E5C] outline-none transition focus:border-[#2F3E5C]">
                                 @error('ap_paterno_emergencia') <span class="mt-1 block text-[9px] font-black text-[#E27D60] uppercase">{{ $message }}</span> @enderror
                             </div>
                             <div>
                                 <label class="mb-1 block text-[9px] font-black uppercase tracking-widest text-[#2F3E5C]/60">Apellido Materno</label>
                                 <input type="text" wire:model="ap_materno_emergencia" placeholder="Ej. Quispe"
-                                       class="w-full h-10 rounded-xl border border-[#C7B5A3] bg-white px-4 py-2 text-sm font-bold text-[#2F3E5C] outline-none transition focus:border-[#2F3E5C]">
+                                       class="uppercase w-full h-10 rounded-xl border border-[#C7B5A3] bg-white px-4 py-2 text-sm font-bold text-[#2F3E5C] outline-none transition focus:border-[#2F3E5C]">
                                 @error('ap_materno_emergencia') <span class="mt-1 block text-[9px] font-black text-[#E27D60] uppercase">{{ $message }}</span> @enderror
                             </div>
                         </div>
@@ -1039,17 +1686,24 @@
                 <div class="space-y-4 animate-in slide-in-from-right-4 duration-300">
                     <div class="flex items-center gap-3 border-b border-[#C7B5A3]/30 pb-2">
                         <i class="ph-fill ph-briefcase text-xl text-[#E27D60]"></i>
-                        <h3 class="text-xs font-black text-[#2F3E5C] uppercase tracking-widest">Vinculación y Rol</h3>
+                        <h3 class="text-xs font-black text-[#2F3E5C] uppercase tracking-widest">Tipo de usuario / rol institucional</h3>
                     </div>
                     <div class="grid gap-4 md:grid-cols-2 max-w-3xl">
                         <div>
-                            <label class="mb-1 block text-[9px] font-black uppercase tracking-widest text-[#2F3E5C]/60">Rol en el Sistema *</label>
+                            <label class="mb-1 block text-[9px] font-black uppercase tracking-widest text-[#2F3E5C]/60">Tipo de usuario / rol institucional *</label>
                             <select wire:model.live="rol" class="w-full h-10 rounded-xl border {{ $errors->has('rol') ? 'border-[#E27D60] ring-4 ring-[#E27D60]/10' : 'border-[#C7B5A3] focus:border-[#2F3E5C]' }} bg-white px-4 py-2 text-sm font-black text-[#2F3E5C] outline-none transition">
-                                <option value="">SELECCIONE ROL...</option>
-                                <option value="personal_salud">PERSONAL DE SALUD</option>
-                                <option value="personal_admin">PERSONAL ADMINISTRATIVO</option>
-                                <option value="voluntario">VOLUNTARIO INSTITUCIONAL</option>
-                                <option value="familiar">FAMILIAR / RESPONSABLE</option>
+                                <option value="">SELECCIONE TIPO DE USUARIO...</option>
+                                @php
+                                    $rolesFormulario = [
+                                        'personal_admin' => 'PERSONAL ADMINISTRATIVO',
+                                        'personal_salud' => 'PERSONAL DE SALUD',
+                                        'voluntario' => 'VOLUNTARIO',
+                                        'familiar' => 'FAMILIAR AUTORIZADO',
+                                    ];
+                                @endphp
+                                @foreach($roles->whereIn('name', array_keys($rolesFormulario)) as $rolDisponible)
+                                    <option value="{{ $rolDisponible->name }}">{{ $rolesFormulario[$rolDisponible->name] }}</option>
+                                @endforeach
                             </select>
                             @error('rol') <span class="mt-1 block text-[9px] font-black text-[#E27D60] uppercase">{{ $message }}</span> @enderror
                         </div>
@@ -1117,7 +1771,7 @@
                             </div>
                             <div class="md:col-span-2">
                                 <label class="mb-1 block text-[9px] font-black uppercase tracking-widest text-[#2F3E5C]">Institución de Formación</label>
-                                <input type="text" wire:model="institucion_formacion" placeholder="Ej. Universidad Mayor de San Andrés" class="w-full h-10 rounded-xl border border-[#C7B5A3] bg-white px-4 py-2 text-sm font-bold text-[#2F3E5C] outline-none transition focus:border-[#2F3E5C]">
+                                <input type="text" wire:model="institucion_formacion" placeholder="Ej. Universidad Mayor de San Andrés" class="uppercase w-full h-10 rounded-xl border border-[#C7B5A3] bg-white px-4 py-2 text-sm font-bold text-[#2F3E5C] outline-none transition focus:border-[#2F3E5C]">
                                 @error('institucion_formacion') <span class="mt-1 block text-[9px] font-black text-[#E27D60] uppercase">{{ $message }}</span> @enderror
                             </div>
                             <div class="md:col-span-2 rounded-xl border border-[#C7B5A3]/50 bg-[#F4EEE7]/70 px-4 py-3 text-[10px] font-bold leading-relaxed text-[#2F3E5C]">
@@ -1164,12 +1818,12 @@
                             </div>
                             <div>
                                 <label class="mb-1 block text-[9px] font-black uppercase tracking-widest text-[#2F3E5C]">Disponibilidad Inicial</label>
-                                <input type="text" wire:model="disponibilidad_inicial" placeholder="Ej. Fines de semana / Tardes" class="w-full h-10 rounded-xl border border-[#C7B5A3] bg-white px-4 py-2 text-sm font-bold text-[#2F3E5C] outline-none transition focus:border-[#2F3E5C]">
+                                <input type="text" wire:model="disponibilidad_inicial" placeholder="Ej. Fines de semana / Tardes" class="uppercase w-full h-10 rounded-xl border border-[#C7B5A3] bg-white px-4 py-2 text-sm font-bold text-[#2F3E5C] outline-none transition focus:border-[#2F3E5C]">
                                 @error('disponibilidad_inicial') <span class="mt-1 block text-[9px] font-black text-[#E27D60] uppercase">{{ $message }}</span> @enderror
                             </div>
                             <div>
                                 <label class="mb-1 block text-[9px] font-black uppercase tracking-widest text-[#2F3E5C]">Área de Apoyo Preferente</label>
-                                <input type="text" wire:model="area_apoyo_preferente" placeholder="Ej. Recreación / Terapia" class="w-full h-10 rounded-xl border border-[#C7B5A3] bg-white px-4 py-2 text-sm font-bold text-[#2F3E5C] outline-none transition focus:border-[#2F3E5C]">
+                                <input type="text" wire:model="area_apoyo_preferente" placeholder="Ej. Recreación / Terapia" class="uppercase w-full h-10 rounded-xl border border-[#C7B5A3] bg-white px-4 py-2 text-sm font-bold text-[#2F3E5C] outline-none transition focus:border-[#2F3E5C]">
                                 @error('area_apoyo_preferente') <span class="mt-1 block text-[9px] font-black text-[#E27D60] uppercase">{{ $message }}</span> @enderror
                             </div>
                             <div>
@@ -1208,22 +1862,22 @@
                                 <div class="grid gap-3 sm:grid-cols-2 md:grid-cols-3">
                                     <div>
                                         <label class="mb-1 block text-[8px] font-black uppercase tracking-widest text-[#2F3E5C]/60">Nombres *</label>
-                                        <input type="text" wire:model="quick_nombres" placeholder="Nombres" class="w-full h-8 rounded-lg border border-[#C7B5A3] bg-white px-3 py-1 text-xs font-bold text-[#2F3E5C] outline-none transition focus:border-[#E27D60]">
+                                        <input type="text" wire:model="quick_nombres" placeholder="Nombres" class="uppercase w-full h-8 rounded-lg border border-[#C7B5A3] bg-white px-3 py-1 text-xs font-bold text-[#2F3E5C] outline-none transition focus:border-[#E27D60]">
                                         @error('quick_nombres') <span class="mt-1 block text-[8px] font-black text-[#E27D60] uppercase">{{ $message }}</span> @enderror
                                     </div>
                                     <div>
                                         <label class="mb-1 block text-[8px] font-black uppercase tracking-widest text-[#2F3E5C]/60">Apellido Paterno *</label>
-                                        <input type="text" wire:model="quick_ap_paterno" placeholder="Paterno" class="w-full h-8 rounded-lg border border-[#C7B5A3] bg-white px-3 py-1 text-xs font-bold text-[#2F3E5C] outline-none transition focus:border-[#E27D60]">
+                                        <input type="text" wire:model="quick_ap_paterno" placeholder="Paterno" class="uppercase w-full h-8 rounded-lg border border-[#C7B5A3] bg-white px-3 py-1 text-xs font-bold text-[#2F3E5C] outline-none transition focus:border-[#E27D60]">
                                         @error('quick_ap_paterno') <span class="mt-1 block text-[8px] font-black text-[#E27D60] uppercase">{{ $message }}</span> @enderror
                                     </div>
                                     <div>
                                         <label class="mb-1 block text-[8px] font-black uppercase tracking-widest text-[#2F3E5C]/60">Apellido Materno</label>
-                                        <input type="text" wire:model="quick_ap_materno" placeholder="Materno" class="w-full h-8 rounded-lg border border-[#C7B5A3] bg-white px-3 py-1 text-xs font-bold text-[#2F3E5C] outline-none transition focus:border-[#E27D60]">
+                                        <input type="text" wire:model="quick_ap_materno" placeholder="Materno" class="uppercase w-full h-8 rounded-lg border border-[#C7B5A3] bg-white px-3 py-1 text-xs font-bold text-[#2F3E5C] outline-none transition focus:border-[#E27D60]">
                                         @error('quick_ap_materno') <span class="mt-1 block text-[8px] font-black text-[#E27D60] uppercase">{{ $message }}</span> @enderror
                                     </div>
                                     <div>
                                         <label class="mb-1 block text-[8px] font-black uppercase tracking-widest text-[#2F3E5C]/60">CI / Documento *</label>
-                                        <input type="text" wire:model="quick_ci" placeholder="Ej. 1234567" class="w-full h-8 rounded-lg border border-[#C7B5A3] bg-white px-3 py-1 text-xs font-bold text-[#2F3E5C] outline-none transition focus:border-[#E27D60]">
+                                        <input type="text" wire:model="quick_ci" placeholder="Ej. 1234567" class="uppercase w-full h-8 rounded-lg border border-[#C7B5A3] bg-white px-3 py-1 text-xs font-bold text-[#2F3E5C] outline-none transition focus:border-[#E27D60]">
                                         @error('quick_ci') <span class="mt-1 block text-[8px] font-black text-[#E27D60] uppercase">{{ $message }}</span> @enderror
                                     </div>
                                     <div>
@@ -1256,7 +1910,12 @@
                                         <select wire:model="selected_cod_am" class="w-full h-10 rounded-xl border border-[#C7B5A3] bg-white px-3 py-2 text-xs font-bold text-[#2F3E5C] outline-none transition focus:border-[#E27D60]">
                                             <option value="">-- Seleccionar Adulto Mayor Disponible --</option>
                                             @foreach(\App\Models\AdultoMayor::where('cod_est_adul', 1)->orderBy('ap_paterno')->orderBy('nombres')->get() as $am)
-                                                <option value="{{ $am->cod_am }}">{{ $am->ap_paterno }} {{ $am->ap_materno }} {{ $am->nombres }} ({{ $am->cod_am }} - CI: {{ $am->ci }})</option>
+                                                @php
+                                                    $adultoNombre = trim(($am->nombres ?? '') . ' ' . ($am->ap_paterno ?? '') . ' ' . ($am->ap_materno ?? ''));
+                                                    $adultoDocumento = $am->ci ? 'CI ' . trim(($am->ci ?? '') . ' ' . ($am->expedicion_ci ?? '')) : 'SIN DOCUMENTO REGISTRADO';
+                                                    $adultoEdad = $am->fecha_nac ? ' — ' . \Carbon\Carbon::parse($am->fecha_nac)->age . ' AÑOS' : '';
+                                                @endphp
+                                                <option value="{{ $am->cod_am }}">{{ mb_strtoupper($adultoNombre . ' — ' . $adultoDocumento . $adultoEdad, 'UTF-8') }}</option>
                                             @endforeach
                                         </select>
                                         @error('selected_cod_am') <span class="mt-1 block text-[8px] font-black text-[#E27D60] uppercase">{{ $message }}</span> @enderror
@@ -1295,7 +1954,7 @@
                                 <div class="grid gap-3 sm:grid-cols-4 items-end">
                                     <div class="sm:col-span-3">
                                         <label class="mb-1 block text-[8px] font-black uppercase tracking-widest text-[#2F3E5C]/60">Notas / Observaciones del Vínculo</label>
-                                        <input type="text" wire:model="selected_observaciones" placeholder="Ej. A cargo del seguimiento médico semanal" class="w-full h-10 rounded-xl border border-[#C7B5A3] bg-white px-4 py-2 text-xs font-bold text-[#2F3E5C] outline-none transition focus:border-[#E27D60]">
+                                        <input type="text" wire:model="selected_observaciones" placeholder="Ej. A cargo del seguimiento médico semanal" class="uppercase w-full h-10 rounded-xl border border-[#C7B5A3] bg-white px-4 py-2 text-xs font-bold text-[#2F3E5C] outline-none transition focus:border-[#E27D60]">
                                     </div>
                                     <button type="button" wire:click="vincularAdultoMayor" 
                                             class="w-full h-10 rounded-xl bg-[#2F3E5C] text-white text-[8px] font-black uppercase tracking-widest transition hover:bg-[#E27D60] shadow-md flex items-center justify-center gap-1.5 active:scale-95">
@@ -1336,7 +1995,6 @@
                                             <tr class="text-[9px] font-bold text-[#2F3E5C]/85 hover:bg-[#F4EEE7]/35 transition">
                                                 <td class="px-3 py-2">
                                                     <span class="font-black text-[#2F3E5C]">{{ $v['nombres_completos'] }}</span>
-                                                    <span class="block text-[8px] font-semibold text-[#2F3E5C]/50">{{ $v['cod_am'] }}</span>
                                                 </td>
                                                 <td class="px-3 py-2">
                                                     <span class="px-2 py-0.5 rounded bg-[#C7B5A3]/20 text-[#2F3E5C] text-[8px] font-black uppercase">{{ $v['parentesco_vinculo'] }}</span>
@@ -1377,8 +2035,8 @@
 
                             {{-- Campo General de Observaciones --}}
                             <div>
-                                <label class="mb-1 block text-[9px] font-black uppercase tracking-widest text-[#2F3E5C]">Observación General del Expediente Familiar</label>
-                                <input type="text" wire:model="observacion_vinculo" placeholder="Ej. Hijo tutor legal de adulto mayor" class="w-full h-10 rounded-xl border border-[#C7B5A3] bg-white px-4 py-2 text-sm font-bold text-[#2F3E5C] outline-none transition focus:border-[#2F3E5C]">
+                                <label class="mb-1 block text-[9px] font-black uppercase tracking-widest text-[#2F3E5C]">Observación General de Vinculación Familiar</label>
+                                <input type="text" wire:model="observacion_vinculo" placeholder="Ej. Hijo tutor legal de adulto mayor" class="uppercase w-full h-10 rounded-xl border border-[#C7B5A3] bg-white px-4 py-2 text-sm font-bold text-[#2F3E5C] outline-none transition focus:border-[#2F3E5C]">
                                 @error('observacion_vinculo') <span class="mt-1 block text-[9px] font-black text-[#E27D60] uppercase">{{ $message }}</span> @enderror
                             </div>
                         </div>
@@ -1635,7 +2293,7 @@
                                 </div>
                             </div>
                             <p class="text-[9px] font-bold text-[#2F3E5C]/45 text-center leading-relaxed italic">
-                                Al confirmar, se guardará de manera definitiva este expediente de personal institucional.
+                                Al confirmar, se guardará de manera definitiva esta ficha de personal institucional.
                             </p>
                         </div>
                     </div>
@@ -1704,8 +2362,8 @@
                         <i class="ph-bold ph-user-focus text-2xl"></i>
                     </div>
                     <div>
-                        <h2 class="text-xl font-black tracking-tight text-[#2F3E5C]">Expediente de <span class="text-[#E27D60]">Usuario</span></h2>
-                        <p class="text-[10px] font-black uppercase tracking-widest text-[#2F3E5C]/50">Código: {{ $usuarioVista->cod_usu }}</p>
+                        <h2 class="text-xl font-black tracking-tight text-[#2F3E5C]">Ficha de <span class="text-[#E27D60]">Usuario</span></h2>
+                        <p class="text-[10px] font-black uppercase tracking-widest text-[#2F3E5C]/50">Ficha institucional</p>
                     </div>
                 </div>
                 <button type="button" wire:click="cerrarVistaCompleta" class="group flex h-10 w-10 items-center justify-center rounded-xl bg-[#D5C7B9] text-[#2F3E5C] transition-all hover:bg-[#E27D60] hover:text-white active:scale-90 shadow-sm">
@@ -1725,7 +2383,7 @@
                         'super_admin', 'superadministrador', 'admin', 'administrador' => 'Administración del sistema',
                         'personal_salud' => 'Área de salud',
                         'personal_admin' => 'Área administrativa',
-                        'familiar' => 'Familiar / Responsable',
+                        'familiar' => 'Familiar autorizado',
                         'voluntario' => 'Voluntariado',
                         default => 'Sin área asignada'
                     };
@@ -1735,7 +2393,7 @@
                         'personal_admin' => $usuarioVista->personalAdmin?->cargoAdmin?->nombre ?? $usuarioVista->personalAdmin?->cargo ?? 'Personal administrativo',
                         'super_admin', 'superadministrador', 'admin', 'administrador' => 'Administrador del sistema',
                         'voluntario' => 'Voluntario institucional',
-                        'familiar' => 'Familiar / Responsable',
+                        'familiar' => 'Familiar autorizado',
                         default => strtoupper(str_replace('_', ' ', $vistaRoleName))
                     };
 
@@ -1773,7 +2431,13 @@
                                 </span>
                                 <span class="rounded-full bg-[#2F3E5C]/10 px-4 py-1.5 text-xs font-black uppercase text-[#2F3E5C]">
                                     <i class="ph-bold ph-shield mr-1"></i>
-                                    {{ strtoupper(str_replace('_', ' ', $vistaRoleName)) }}
+                                    {{ match($vistaRoleKey) {
+                                        'personal_admin' => 'PERSONAL ADMINISTRATIVO',
+                                        'personal_salud' => 'PERSONAL DE SALUD',
+                                        'voluntario' => 'VOLUNTARIO',
+                                        'familiar' => 'FAMILIAR AUTORIZADO',
+                                        default => strtoupper(str_replace('_', ' ', $vistaRoleName)),
+                                    } }}
                                 </span>
                             </div>
                         </div>
@@ -1949,7 +2613,7 @@
                     </div>
                     <div>
                         <h2 class="text-base font-black text-[#2F3E5C]">Ficha <span class="text-[#E27D60]">Rápida</span></h2>
-                        <p class="text-[9px] font-black uppercase tracking-widest text-[#2F3E5C]/40">{{ $usuarioFicha->cod_usu }}</p>
+                        <p class="text-[9px] font-black uppercase tracking-widest text-[#2F3E5C]/40">Resumen institucional</p>
                     </div>
                 </div>
                 <button type="button" wire:click="cerrarFichaRapida"
@@ -1972,7 +2636,7 @@
                         'super_admin', 'superadministrador', 'admin', 'administrador' => 'Administración del sistema',
                         'personal_salud' => 'Área de salud',
                         'personal_admin' => 'Área administrativa',
-                        'familiar' => 'Familiar / Responsable',
+                        'familiar' => 'Familiar autorizado',
                         'voluntario' => 'Voluntariado',
                         default => 'Sin área asignada'
                     };
@@ -1982,7 +2646,7 @@
                         'personal_admin' => $usuarioFicha->personalAdmin?->cargoAdmin?->nombre ?? $usuarioFicha->personalAdmin?->cargo ?? 'Personal administrativo',
                         'super_admin', 'superadministrador', 'admin', 'administrador' => 'Administrador del sistema',
                         'voluntario' => 'Voluntario institucional',
-                        'familiar' => 'Familiar / Responsable',
+                        'familiar' => 'Familiar autorizado',
                         default => strtoupper(str_replace('_', ' ', $fichaRoleName))
                     };
 
@@ -2015,7 +2679,13 @@
                             {{ $usuarioFicha->estado }}
                         </span>
                         <span class="rounded-full bg-[#2F3E5C]/10 px-3 py-1 text-[10px] font-black uppercase text-[#2F3E5C]">
-                            {{ strtoupper(str_replace('_', ' ', $fichaRoleName)) }}
+                            {{ match($fichaRoleKey) {
+                                'personal_admin' => 'PERSONAL ADMINISTRATIVO',
+                                'personal_salud' => 'PERSONAL DE SALUD',
+                                'voluntario' => 'VOLUNTARIO',
+                                'familiar' => 'FAMILIAR AUTORIZADO',
+                                default => strtoupper(str_replace('_', ' ', $fichaRoleName)),
+                            } }}
                         </span>
                     </div>
                 </div>

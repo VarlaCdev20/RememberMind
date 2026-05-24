@@ -282,10 +282,12 @@
             .page { padding: 20px; }
         }
     </style>
+    @stack('head-scripts')
 </head>
 <body>
     <div class="page">
         @yield('contenido')
     </div>
+    @stack('scripts')
 </body>
 </html>

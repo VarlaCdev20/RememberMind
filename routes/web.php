@@ -5,6 +5,12 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Admin\UsuarioController;
 use App\Http\Controllers\Admin\AdultoMayorController;
 use App\Http\Controllers\Admin\Reportes\ReporteInstitucionalController;
+use App\Http\Controllers\Admin\Reportes\ReporteAdultosController;
+use App\Http\Controllers\Admin\Reportes\ReporteSaludController;
+use App\Http\Controllers\Admin\Reportes\ReporteFamiliaresController;
+use App\Http\Controllers\Admin\Reportes\ReporteEquipoController;
+use App\Http\Controllers\Admin\Reportes\ReporteActividadesController;
+use App\Http\Controllers\Admin\Reportes\ReporteBitacoraController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -44,6 +50,10 @@ Route::middleware([
             Route::get('usuarios/{usuario}/documentacion/pdf', [UsuarioController::class, 'documentacionPdf'])
                 ->middleware('permission:usuarios.reportes.pdf')
                 ->name('usuarios.documentacion.pdf');
+
+            Route::get('usuarios/{usuario}/solicitud-documental/pdf', [UsuarioController::class, 'solicitudDocumentalPdf'])
+                ->middleware('permission:usuarios.ver')
+                ->name('usuarios.solicitud-documental.pdf');
 
             Route::get('usuarios/{usuario}/horarios/pdf', [UsuarioController::class, 'horariosPdf'])
                 ->middleware('permission:usuarios.reportes.pdf')
@@ -243,6 +253,69 @@ Route::middleware([
                     Route::get('institucional/excel', [ReporteInstitucionalController::class, 'excel'])
                         ->middleware('permission:reportes.institucional')
                         ->name('institucional.excel');
+
+                    // ── Adultos Mayores ──────────────
+                    Route::get('adultos', [ReporteAdultosController::class, 'preview'])
+                        ->middleware('permission:reportes.ver')
+                        ->name('adultos.preview');
+                    Route::get('adultos/pdf', [ReporteAdultosController::class, 'pdf'])
+                        ->middleware('permission:reportes.exportar_pdf')
+                        ->name('adultos.pdf');
+                    Route::get('adultos/excel', [ReporteAdultosController::class, 'excel'])
+                        ->middleware('permission:reportes.exportar_pdf')
+                        ->name('adultos.excel');
+
+                    // ── Salud y Seguimiento ──────────
+                    Route::get('salud', [ReporteSaludController::class, 'preview'])
+                        ->middleware('permission:reportes.ver')
+                        ->name('salud.preview');
+                    Route::get('salud/pdf', [ReporteSaludController::class, 'pdf'])
+                        ->middleware('permission:reportes.exportar_pdf')
+                        ->name('salud.pdf');
+                    Route::get('salud/excel', [ReporteSaludController::class, 'excel'])
+                        ->middleware('permission:reportes.exportar_pdf')
+                        ->name('salud.excel');
+
+                    // ── Familiares ───────────────────
+                    Route::get('familiares', [ReporteFamiliaresController::class, 'preview'])
+                        ->middleware('permission:reportes.ver')
+                        ->name('familiares.preview');
+                    Route::get('familiares/pdf', [ReporteFamiliaresController::class, 'pdf'])
+                        ->middleware('permission:reportes.exportar_pdf')
+                        ->name('familiares.pdf');
+                    Route::get('familiares/excel', [ReporteFamiliaresController::class, 'excel'])
+                        ->middleware('permission:reportes.exportar_pdf')
+                        ->name('familiares.excel');
+
+                    // ── Equipo Institucional ─────────
+                    Route::get('equipo', [ReporteEquipoController::class, 'preview'])
+                        ->middleware('permission:reportes.ver')
+                        ->name('equipo.preview');
+                    Route::get('equipo/pdf', [ReporteEquipoController::class, 'pdf'])
+                        ->middleware('permission:reportes.exportar_pdf')
+                        ->name('equipo.pdf');
+                    Route::get('equipo/excel', [ReporteEquipoController::class, 'excel'])
+                        ->middleware('permission:reportes.exportar_pdf')
+                        ->name('equipo.excel');
+
+                    // ── Actividades ──────────────────
+                    Route::get('actividades', [ReporteActividadesController::class, 'preview'])
+                        ->middleware('permission:reportes.ver')
+                        ->name('actividades.preview');
+                    Route::get('actividades/pdf', [ReporteActividadesController::class, 'pdf'])
+                        ->middleware('permission:reportes.exportar_pdf')
+                        ->name('actividades.pdf');
+                    Route::get('actividades/excel', [ReporteActividadesController::class, 'excel'])
+                        ->middleware('permission:reportes.exportar_pdf')
+                        ->name('actividades.excel');
+
+                    // ── Bitácora (sin Excel por seguridad) ──
+                    Route::get('bitacora', [ReporteBitacoraController::class, 'preview'])
+                        ->middleware('permission:reportes.ver')
+                        ->name('bitacora.preview');
+                    Route::get('bitacora/pdf', [ReporteBitacoraController::class, 'pdf'])
+                        ->middleware('permission:reportes.exportar_pdf')
+                        ->name('bitacora.pdf');
                 });
 
             // ── Bitácora ─────────────────────────

@@ -36,7 +36,7 @@ class UsuariosPanel extends Component
     public $ap_materno;
     public $fecha_nacimiento;
     public $genero;
-    public $pais_documento = 'Bolivia';
+    public $pais_documento = 'BOLIVIA';
     public $tipo_documento = 'CI';
     public $numero_documento;
     public $expedido;
@@ -120,6 +120,10 @@ class UsuariosPanel extends Component
     public $selected_responsable_salud = false;
     public $selected_responsable_economico = false;
     public $selected_observaciones = '';
+    public $busquedaAdultoMayor = '';
+    public array $adultosMayoresFiltrados = [];
+    public bool $mostrarDropdownAdultosMayores = false;
+    public $adultoMayorSeleccionadoLabel = '';
 
     // Quick registration for Adulto Mayor
     public $mostrarQuickRegAdulto = false;
@@ -156,6 +160,19 @@ class UsuariosPanel extends Component
     public bool $mostrarVistaCompleta = false;
     public $usuarioVista = null;
 
+    // ── Navegación Detalle Interno ──
+    public string $modoVista = 'listado'; // 'listado' o 'detalle'
+    public $usuarioDetalle = null;
+
+    // ── Post-Registro Flow ──
+    public bool $mostrarPostRegistro = false;
+    public $usuarioPostRegistro = null;
+    public array $documentosRequeridos = [];
+    public $fechaLimiteDocumentacion = null;
+    public $passwordTemporalPostRegistro = null;
+    public bool $correoRequisitosEnviado = false;
+    public ?string $mensajeCorreoRequisitos = null;
+
     protected $listeners = ['usuario-guardado' => '$refresh'];
 
     // ══════════════════════════════════════════════
@@ -181,12 +198,15 @@ class UsuariosPanel extends Component
             $this->codigo_telefono = '';
             return;
         }
-        if (isset($this->paisesConfig[$val])) {
-            $this->tipo_documento = $this->paisesConfig[$val]['doc'];
-            $this->pais_telefono = $val;
-            $this->codigo_telefono = $this->paisesConfig[$val]['codigo'];
+        $paisKey = collect(array_keys($this->paisesConfig))
+            ->first(fn ($pais) => mb_strtoupper($pais, 'UTF-8') === mb_strtoupper($val, 'UTF-8'));
+
+        if ($paisKey && isset($this->paisesConfig[$paisKey])) {
+            $this->tipo_documento = $this->normalizarMayusculas($this->paisesConfig[$paisKey]['doc']);
+            $this->pais_telefono = $paisKey;
+            $this->codigo_telefono = $this->paisesConfig[$paisKey]['codigo'];
         }
-        if ($val !== 'Bolivia') {
+        if (mb_strtoupper($val, 'UTF-8') !== 'BOLIVIA') {
             $this->expedido = null;
         }
     }
@@ -230,16 +250,14 @@ class UsuariosPanel extends Component
             $this->cod_area = 'ARE_0003'; // Sugerencia inicial
             $this->fecha_ingreso = now()->format('Y-m-d');
         }
+
+        $this->limpiarCamposDependientesDelRol();
     }
 
     public function updatedDepartamentoDomicilio($val)
     {
-        if ($val && $val !== 'OTRO') {
-            $muniList = $this->catalogDepartamentos[$val] ?? [];
-            $this->municipio_domicilio = $muniList[0] ?? '';
-        } else {
-            $this->municipio_domicilio = 'OTRO';
-        }
+        $this->municipio_domicilio = $val === 'OTRO' ? 'OTRO' : '';
+        $this->otro_municipio = '';
         $this->zona_domicilio = '';
         $this->otra_zona = '';
     }
@@ -248,6 +266,113 @@ class UsuariosPanel extends Component
     {
         $this->zona_domicilio = '';
         $this->otra_zona = '';
+    }
+
+    private function resolverDepartamentoDomicilio(): ?string
+    {
+        return $this->departamento_domicilio === 'OTRO'
+            ? $this->normalizarMayusculas($this->otro_departamento)
+            : $this->normalizarMayusculas($this->departamento_domicilio);
+    }
+
+    private function resolverMunicipioDomicilio(): ?string
+    {
+        return $this->municipio_domicilio === 'OTRO'
+            ? $this->normalizarMayusculas($this->otro_municipio)
+            : $this->normalizarMayusculas($this->municipio_domicilio);
+    }
+
+    private function resolverZonaDomicilio(): ?string
+    {
+        if (isset($this->catalogZonas[$this->municipio_domicilio]) && $this->zona_domicilio !== 'OTRO') {
+            return $this->normalizarMayusculas($this->zona_domicilio);
+        }
+
+        return $this->normalizarMayusculas($this->otra_zona);
+    }
+
+    private function armarDireccionCompleta(): ?string
+    {
+        $departamento = $this->resolverDepartamentoDomicilio();
+        $municipio = $this->resolverMunicipioDomicilio();
+        $zona = $this->resolverZonaDomicilio();
+
+        $this->ciudad = $municipio;
+        $this->zona = $zona;
+
+        $partes = [];
+        if (!empty($departamento)) {
+            $partes[] = "DEPARTAMENTO: {$departamento}";
+        }
+        if (!empty($municipio)) {
+            $partes[] = "MUNICIPIO: {$municipio}";
+        }
+        if (!empty($zona)) {
+            $partes[] = "ZONA: {$zona}";
+        }
+        if (!empty($this->calle)) {
+            $partes[] = "CALLE/AV.: {$this->calle}";
+        }
+        if (!empty($this->nro_domicilio)) {
+            $partes[] = "NRO.: {$this->nro_domicilio}";
+        }
+        if (!empty($this->referencia_domicilio)) {
+            $partes[] = "REF.: {$this->referencia_domicilio}";
+        }
+
+        $this->direccion = $partes ? implode('; ', $partes) : $this->normalizarMayusculas($this->direccion);
+
+        return $this->direccion;
+    }
+
+    private function reglasDireccion(): array
+    {
+        $rules = [
+            'departamento_domicilio' => ['required', 'string'],
+            'municipio_domicilio' => ['required', 'string'],
+            'calle' => ['required', 'string', 'min:2', 'max:150'],
+            'nro_domicilio' => ['required', 'string', 'max:20', 'regex:/^(S\/N|[0-9A-Z\-\/]+)$/u'],
+            'referencia_domicilio' => ['nullable', 'string', 'max:255'],
+        ];
+
+        $rules['otro_departamento'] = $this->departamento_domicilio === 'OTRO'
+            ? ['required', 'string', 'min:2', 'max:100']
+            : ['nullable', 'string', 'max:100'];
+
+        $rules['otro_municipio'] = $this->municipio_domicilio === 'OTRO'
+            ? ['required', 'string', 'min:2', 'max:100']
+            : ['nullable', 'string', 'max:100'];
+
+        if (empty($this->municipio_domicilio)) {
+            $rules['zona_domicilio'] = ['required', 'string'];
+            $rules['otra_zona'] = ['nullable', 'string', 'max:100'];
+        } elseif (isset($this->catalogZonas[$this->municipio_domicilio])) {
+            $rules['zona_domicilio'] = ['required', 'string'];
+            $rules['otra_zona'] = $this->zona_domicilio === 'OTRO'
+                ? ['required', 'string', 'min:2', 'max:100']
+                : ['nullable', 'string', 'max:100'];
+        } else {
+            $rules['zona_domicilio'] = ['nullable', 'string'];
+            $rules['otra_zona'] = ['required', 'string', 'min:2', 'max:100'];
+        }
+
+        return $rules;
+    }
+
+    private function mensajesDireccion(): array
+    {
+        return [
+            'departamento_domicilio.required' => 'Seleccione el departamento.',
+            'municipio_domicilio.required' => 'Seleccione el municipio o ciudad.',
+            'zona_domicilio.required' => 'Seleccione la zona o barrio.',
+            'otro_departamento.required' => 'Especifique el departamento.',
+            'otro_municipio.required' => 'Especifique el municipio o ciudad.',
+            'otra_zona.required' => 'Especifique la zona o barrio.',
+            'calle.required' => 'Ingrese la calle o avenida.',
+            'calle.min' => 'La calle o avenida debe tener al menos 2 caracteres.',
+            'nro_domicilio.required' => 'Ingrese el número de domicilio o S/N.',
+            'nro_domicilio.regex' => 'Ingrese un número de domicilio válido o S/N.',
+        ];
     }
 
     /**
@@ -263,12 +388,14 @@ class UsuariosPanel extends Component
             })->first();
     }
 
-    public function normalizarDatosFormulario()
+    private function normalizarDatosFormulario()
     {
         $this->nombres = $this->normalizarMayusculas($this->nombres);
         $this->ap_paterno = $this->normalizarMayusculas($this->ap_paterno);
         $this->ap_materno = $this->normalizarMayusculas($this->ap_materno);
         $this->genero = $this->normalizarMayusculas($this->genero);
+        $this->pais_documento = $this->normalizarMayusculas($this->pais_documento);
+        $this->tipo_documento = $this->normalizarMayusculas($this->tipo_documento);
         $this->numero_documento = $this->normalizarMayusculas($this->numero_documento);
         $this->expedido = $this->normalizarMayusculas($this->expedido);
         $this->departamento_domicilio = $this->normalizarMayusculas($this->departamento_domicilio);
@@ -280,21 +407,6 @@ class UsuariosPanel extends Component
         $this->calle = $this->normalizarMayusculas($this->calle);
         $this->nro_domicilio = $this->normalizarMayusculas($this->nro_domicilio);
         
-        $finalDept = $this->departamento_domicilio === 'OTRO' 
-            ? $this->normalizarMayusculas($this->otro_departamento) 
-            : $this->departamento_domicilio;
-
-        $finalMuni = $this->municipio_domicilio === 'OTRO'
-            ? $this->normalizarMayusculas($this->otro_municipio)
-            : $this->municipio_domicilio;
-            
-        $finalZona = (isset($this->catalogZonas[$this->municipio_domicilio]) && $this->zona_domicilio !== 'OTRO')
-            ? $this->zona_domicilio
-            : $this->normalizarMayusculas($this->otra_zona);
-            
-        $this->ciudad = $this->normalizarMayusculas($finalMuni ?: $finalDept);
-        $this->zona = $this->normalizarMayusculas($finalZona);
-        
         $this->contacto_emergencia = $this->normalizarMayusculas($this->contacto_emergencia);
         $this->ap_paterno_emergencia = $this->normalizarMayusculas($this->ap_paterno_emergencia);
         $this->ap_materno_emergencia = $this->normalizarMayusculas($this->ap_materno_emergencia);
@@ -303,7 +415,10 @@ class UsuariosPanel extends Component
         $this->disponibilidad_inicial = $this->normalizarMayusculas($this->disponibilidad_inicial);
         $this->area_apoyo_preferente = $this->normalizarMayusculas($this->area_apoyo_preferente);
         $this->observacion_vinculo = $this->normalizarMayusculas($this->observacion_vinculo);
+        $this->observaciones = $this->normalizarMayusculas($this->observaciones);
         $this->referencia_domicilio = $this->normalizarMayusculas($this->referencia_domicilio);
+        $this->direccion = $this->normalizarMayusculas($this->direccion);
+        $this->armarDireccionCompleta();
         $this->selected_parentesco = $this->normalizarMayusculas($this->selected_parentesco);
         $this->selected_observaciones = $this->normalizarMayusculas($this->selected_observaciones);
 
@@ -312,7 +427,7 @@ class UsuariosPanel extends Component
             $this->vinculosFamiliar[$index]['observaciones'] = $this->normalizarMayusculas($vinculo['observaciones'] ?? null);
         }
         
-        $this->correo = $this->correo ? strtolower(trim($this->correo)) : null;
+        $this->correo = $this->correo ? mb_strtolower(trim($this->correo), 'UTF-8') : null;
         
         if ($this->telefono) {
             $this->telefono = preg_replace('/\D+/', '', $this->telefono);
@@ -321,10 +436,10 @@ class UsuariosPanel extends Component
             $this->celular_emergencia = preg_replace('/\D+/', '', $this->celular_emergencia);
         }
 
-        $this->limpiarCamposPorRol();
+        $this->limpiarCamposDependientesDelRol();
     }
 
-    private function limpiarCamposPorRol(): void
+    private function limpiarCamposDependientesDelRol(): void
     {
         if ($this->rol === 'personal_admin') {
             $this->especialidad_salud = null;
@@ -369,6 +484,170 @@ class UsuariosPanel extends Component
         }
     }
 
+    private function guardarVinculosFamiliar(\App\Models\Familiar $fam): void
+    {
+        foreach ($this->vinculosFamiliar as $vinculo) {
+            $obsSerialized = "Salud: " . ($vinculo['responsable_salud'] ?? 'NO')
+                . " | Económico: " . ($vinculo['responsable_economico'] ?? 'NO')
+                . " | Obs: " . ($vinculo['observaciones'] ?? '');
+
+            $relacion = \App\Models\FamiliarAdulto::withTrashed()->updateOrCreate(
+                [
+                    'cod_fam' => $fam->cod_fam,
+                    'cod_am' => $vinculo['cod_am'],
+                ],
+                [
+                    'parentesco_vinculo' => $vinculo['parentesco_vinculo'],
+                    'es_responsable' => ($vinculo['es_responsable'] ?? 'NO') === 'SI',
+                    'estado' => 'ACTIVO',
+                    'observaciones' => $obsSerialized,
+                ]
+            );
+
+            if ($relacion->trashed()) {
+                $relacion->restore();
+            }
+        }
+    }
+
+    private function adultoMayorLabel(\App\Models\AdultoMayor $adultoMayor): string
+    {
+        $nombre = trim("{$adultoMayor->nombres} {$adultoMayor->ap_paterno} {$adultoMayor->ap_materno}");
+        $documento = $adultoMayor->ci
+            ? trim(($adultoMayor->ci ?? '') . ' ' . ($adultoMayor->expedicion_ci ?? ''))
+            : 'SIN DOCUMENTO REGISTRADO';
+        $edad = $adultoMayor->fecha_nac ? ' — ' . \Carbon\Carbon::parse($adultoMayor->fecha_nac)->age . ' AÑOS' : '';
+
+        return $this->normalizarMayusculas("{$nombre} — {$documento}{$edad}");
+    }
+
+    public function obtenerEtiquetaAdultoMayor($adultoMayor): string
+    {
+        if (!$adultoMayor) {
+            return '';
+        }
+
+        $nombre = trim("{$adultoMayor->nombres} {$adultoMayor->ap_paterno} {$adultoMayor->ap_materno}");
+        $documento = $adultoMayor->ci
+            ? 'CI ' . trim(($adultoMayor->ci ?? '') . ' ' . ($adultoMayor->expedicion_ci ?? ''))
+            : 'SIN DOCUMENTO REGISTRADO';
+        $edad = $adultoMayor->fecha_nac ? ' - ' . \Carbon\Carbon::parse($adultoMayor->fecha_nac)->age . ' AÑOS' : '';
+
+        return $this->normalizarMayusculas("{$nombre} - {$documento}{$edad}");
+    }
+
+    private function filtrarAdultosMayoresActivos(?string $criterio): array
+    {
+        $criterio = trim((string) $criterio);
+        if ($criterio === '') {
+            return [];
+        }
+
+        $termino = '%' . $criterio . '%';
+
+        return \App\Models\AdultoMayor::query()
+            ->where('cod_est_adul', 1)
+            ->where(function ($q) use ($termino) {
+                $q->where('nombres', 'ilike', $termino)
+                    ->orWhere('ap_paterno', 'ilike', $termino)
+                    ->orWhere('ap_materno', 'ilike', $termino)
+                    ->orWhere('ci', 'ilike', $termino)
+                    ->orWhereRaw("CONCAT_WS(' ', nombres, ap_paterno, ap_materno) ILIKE ?", [$termino]);
+            })
+            ->orderBy('ap_paterno')
+            ->orderBy('ap_materno')
+            ->orderBy('nombres')
+            ->limit(8)
+            ->get()
+            ->map(fn ($adultoMayor) => [
+                'cod_am' => $adultoMayor->cod_am,
+                'label' => $this->obtenerEtiquetaAdultoMayor($adultoMayor),
+            ])
+            ->values()
+            ->all();
+    }
+
+    public function updatedBusquedaAdultoMayor($value): void
+    {
+        $texto = trim((string) $value);
+
+        if ($this->selected_cod_am && $texto !== $this->adultoMayorSeleccionadoLabel) {
+            $this->selected_cod_am = '';
+            $this->adultoMayorSeleccionadoLabel = '';
+        }
+
+        $this->adultosMayoresFiltrados = $this->filtrarAdultosMayoresActivos($texto);
+        $this->mostrarDropdownAdultosMayores = $texto !== '';
+    }
+
+    public function seleccionarAdultoMayor($codAm): void
+    {
+        $adultoMayor = \App\Models\AdultoMayor::where('cod_est_adul', 1)->where('cod_am', $codAm)->first();
+
+        if (!$adultoMayor) {
+            $this->addError('selected_cod_am', 'Seleccione un adulto mayor válido de la lista.');
+            $this->limpiarSeleccionAdultoMayor();
+            return;
+        }
+
+        $label = $this->obtenerEtiquetaAdultoMayor($adultoMayor);
+        $this->selected_cod_am = $adultoMayor->cod_am;
+        $this->busquedaAdultoMayor = $label;
+        $this->adultoMayorSeleccionadoLabel = $label;
+        $this->adultosMayoresFiltrados = [];
+        $this->mostrarDropdownAdultosMayores = false;
+        $this->resetErrorBag('selected_cod_am');
+    }
+
+    public function limpiarSeleccionAdultoMayor(): void
+    {
+        $this->selected_cod_am = '';
+        $this->busquedaAdultoMayor = '';
+        $this->adultoMayorSeleccionadoLabel = '';
+        $this->adultosMayoresFiltrados = [];
+        $this->mostrarDropdownAdultosMayores = false;
+    }
+
+    public function obtenerAdultoMayorSeleccionado()
+    {
+        return $this->selected_cod_am
+            ? \App\Models\AdultoMayor::where('cod_est_adul', 1)->where('cod_am', $this->selected_cod_am)->first()
+            : null;
+    }
+
+    public function obtenerDireccionResumen(): string
+    {
+        $departamento = $this->resolverDepartamentoDomicilio();
+        $municipio = $this->resolverMunicipioDomicilio();
+        $zona = $this->resolverZonaDomicilio();
+
+        $partes = [];
+        if (!empty($departamento)) {
+            $partes[] = "DEPARTAMENTO: {$departamento}";
+        }
+        if (!empty($municipio)) {
+            $partes[] = "MUNICIPIO: {$municipio}";
+        }
+        if (!empty($zona)) {
+            $partes[] = "ZONA: {$zona}";
+        }
+        if (!empty($this->calle)) {
+            $partes[] = "CALLE/AV.: {$this->normalizarMayusculas($this->calle)}";
+        }
+        if (!empty($this->nro_domicilio)) {
+            $partes[] = "NRO.: {$this->normalizarMayusculas($this->nro_domicilio)}";
+        }
+        if (!empty($this->referencia_domicilio)) {
+            $partes[] = "REF.: {$this->normalizarMayusculas($this->referencia_domicilio)}";
+        }
+
+        if ($partes) {
+            return implode('; ', $partes);
+        }
+
+        return $this->direccion ? $this->normalizarMayusculas($this->direccion) : 'DIRECCIÓN NO REGISTRADA';
+    }
+
     public function updatedEspecialidadSalud($val)
     {
         if ($this->rol !== 'personal_salud') return;
@@ -404,7 +683,7 @@ class UsuariosPanel extends Component
 
     public function updatedCorreo($val)
     {
-        $this->correo = strtolower(trim($val));
+        $this->correo = mb_strtolower(trim($val), 'UTF-8');
     }
 
     // ══════════════════════════════════════════════
@@ -474,21 +753,7 @@ class UsuariosPanel extends Component
             'cod_area' => ['nullable', 'exists:areas_institucionales,cod_area'],
         ];
 
-        if ($this->departamento_domicilio === 'OTRO') {
-            $rules['otro_departamento'] = ['required', 'string', 'min:2', 'max:100'];
-        }
-        if ($this->municipio_domicilio === 'OTRO') {
-            $rules['otro_municipio'] = ['required', 'string', 'min:2', 'max:100'];
-        }
-
-        if (isset($this->catalogZonas[$this->municipio_domicilio])) {
-            $rules['zona_domicilio'] = ['required', 'string'];
-            if ($this->zona_domicilio === 'OTRO') {
-                $rules['otra_zona'] = ['required', 'string', 'min:2', 'max:100'];
-            }
-        } else {
-            $rules['otra_zona'] = ['required', 'string', 'min:2', 'max:100'];
-        }
+        $rules = array_merge($rules, $this->reglasDireccion());
 
         if ($this->isEdit) {
             $rules['estado'] = ['required', 'in:ACTIVO,INACTIVO,ARCHIVADO'];
@@ -527,7 +792,7 @@ class UsuariosPanel extends Component
 
     public function messages()
     {
-        return [
+        return array_merge([
             'nombres.required' => 'Por favor, escriba los nombres del usuario.',
             'nombres.regex' => 'El nombre solo puede contener letras y espacios.',
             'ap_paterno.required_without' => 'Falta registrar al menos un apellido (paterno o materno) para el usuario.',
@@ -569,16 +834,16 @@ class UsuariosPanel extends Component
             'vinculosFamiliar.required' => 'Debe vincular al menos un adulto mayor al familiar.',
             'vinculosFamiliar.min' => 'Debe vincular al menos un adulto mayor al familiar.',
             'vinculosFamiliar.*.parentesco_vinculo.required' => 'Debe registrar el parentesco del vinculo familiar.',
-        ];
+        ], $this->mensajesDireccion());
     }
 
     private function validarUnicidadDocumento($fail)
     {
-        $query = User::where('pais_documento', $this->pais_documento)
-            ->where('tipo_documento', $this->tipo_documento)
-            ->where('numero_documento', $this->numero_documento);
-        if ($this->pais_documento === 'Bolivia') {
-            $query->where('expedido', $this->expedido);
+        $query = User::whereRaw('UPPER(pais_documento) = ?', [mb_strtoupper((string) $this->pais_documento, 'UTF-8')])
+            ->whereRaw('UPPER(tipo_documento) = ?', [mb_strtoupper((string) $this->tipo_documento, 'UTF-8')])
+            ->whereRaw('UPPER(numero_documento) = ?', [mb_strtoupper((string) $this->numero_documento, 'UTF-8')]);
+        if (mb_strtoupper((string) $this->pais_documento, 'UTF-8') === 'BOLIVIA') {
+            $query->whereRaw('UPPER(expedido) = ?', [mb_strtoupper((string) $this->expedido, 'UTF-8')]);
         }
         if ($this->isEdit) {
             $query->where('cod_usu', '!=', $this->usuarioId);
@@ -698,6 +963,7 @@ class UsuariosPanel extends Component
             'area_apoyo_preferente', 'observacion_vinculo',
             'calle', 'nro_domicilio', 'ap_paterno_emergencia', 'ap_materno_emergencia',
             'vinculosFamiliar', 'selected_cod_am', 'selected_parentesco', 'selected_es_responsable', 'selected_observaciones',
+            'busquedaAdultoMayor', 'adultosMayoresFiltrados', 'mostrarDropdownAdultosMayores', 'adultoMayorSeleccionadoLabel',
             'mostrarQuickRegAdulto', 'quick_nombres', 'quick_ap_paterno', 'quick_ap_materno', 'quick_ci', 'quick_genero', 'quick_fecha_nac',
             'departamento_domicilio', 'municipio_domicilio', 'zona_domicilio',
             'otro_departamento', 'otro_municipio', 'otra_zona',
@@ -722,7 +988,7 @@ class UsuariosPanel extends Component
         }
 
         $this->resetFormulario();
-        $this->pais_documento = 'Bolivia';
+        $this->pais_documento = 'BOLIVIA';
         $this->tipo_documento = 'CI';
         $this->pais_telefono = '';
         $this->codigo_telefono = '';
@@ -747,7 +1013,7 @@ class UsuariosPanel extends Component
             'selected_cod_am' => 'required',
             'selected_parentesco' => 'required|string|max:100',
         ], [
-            'selected_cod_am.required' => 'Debe seleccionar un adulto mayor de la lista.',
+            'selected_cod_am.required' => 'Seleccione un adulto mayor válido de la lista.',
             'selected_parentesco.required' => 'Debe ingresar o seleccionar el parentesco.',
         ]);
 
@@ -773,7 +1039,7 @@ class UsuariosPanel extends Component
             }
         }
 
-        $nombreCompleto = trim("{$am->nombres} {$am->ap_paterno} {$am->ap_materno}");
+        $nombreCompleto = $this->obtenerEtiquetaAdultoMayor($am);
         $this->vinculosFamiliar[] = [
             'cod_am' => $this->selected_cod_am,
             'nombres_completos' => $nombreCompleto,
@@ -791,6 +1057,7 @@ class UsuariosPanel extends Component
         $this->selected_responsable_salud = false;
         $this->selected_responsable_economico = false;
         $this->selected_observaciones = '';
+        $this->limpiarSeleccionAdultoMayor();
 
         $this->dispatch('swal', [
             'icon' => 'success',
@@ -839,12 +1106,12 @@ class UsuariosPanel extends Component
         $am->ap_materno = $this->normalizarMayusculas($this->quick_ap_materno);
         $am->ci = $this->normalizarMayusculas($this->quick_ci);
         $am->genero = $this->normalizarMayusculas($this->quick_genero);
-        $am->fecha_nac = $this->quick_fecha_nac;
+        $am->fecha_nac = !empty($this->quick_fecha_nac) ? \Carbon\Carbon::parse($this->quick_fecha_nac) : null;
         $am->cod_est_adul = 1; // ACTIVO
-        $am->fecha_ing = now()->format('Y-m-d');
+        $am->fecha_ing = \Carbon\Carbon::today();
         $am->save();
 
-        $nombreCompleto = trim("{$am->nombres} {$am->ap_paterno} {$am->ap_materno}");
+        $nombreCompleto = $this->obtenerEtiquetaAdultoMayor($am);
         
         // Agregar automáticamente a la lista de vinculación
         $this->vinculosFamiliar[] = [
@@ -918,7 +1185,7 @@ class UsuariosPanel extends Component
             $this->updatedFechaNacimiento($this->fecha_nacimiento);
         }
         $this->genero = $usuario->genero;
-        $this->pais_documento = $usuario->pais_documento ?? 'Bolivia';
+        $this->pais_documento = $this->normalizarMayusculas($usuario->pais_documento ?? 'BOLIVIA');
         $this->tipo_documento = $usuario->tipo_documento ?? 'CI';
         $this->numero_documento = $usuario->numero_documento;
         $this->expedido = $usuario->expedido;
@@ -1037,7 +1304,7 @@ class UsuariosPanel extends Component
 
                     $this->vinculosFamiliar[] = [
                         'cod_am' => $am->cod_am,
-                        'nombres_completos' => trim("{$am->nombres} {$am->ap_paterno} {$am->ap_materno}"),
+                        'nombres_completos' => $this->obtenerEtiquetaAdultoMayor($am),
                         'parentesco_vinculo' => $am->pivot->parentesco_vinculo ?? 'Familiar',
                         'es_responsable' => $am->pivot->es_responsable ? 'SI' : 'NO',
                         'responsable_salud' => $salud,
@@ -1072,6 +1339,11 @@ class UsuariosPanel extends Component
             $this->nombres = $this->normalizarMayusculas($this->nombres);
             $this->ap_paterno = $this->normalizarMayusculas($this->ap_paterno);
             $this->ap_materno = $this->normalizarMayusculas($this->ap_materno);
+            $this->genero = $this->normalizarMayusculas($this->genero);
+            $this->pais_documento = $this->normalizarMayusculas($this->pais_documento);
+            $this->tipo_documento = $this->normalizarMayusculas($this->tipo_documento);
+            $this->numero_documento = $this->normalizarMayusculas($this->numero_documento);
+            $this->expedido = $this->normalizarMayusculas($this->expedido);
 
             $this->validate([
                 'nombres' => ['required', 'string', 'max:255', 'regex:/^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s\-]+$/u'],
@@ -1109,7 +1381,7 @@ class UsuariosPanel extends Component
                 return;
             }
 
-            if ($this->pais_documento === 'Bolivia' && $this->tipo_documento === 'CI') {
+            if (mb_strtoupper((string) $this->pais_documento, 'UTF-8') === 'BOLIVIA' && $this->tipo_documento === 'CI') {
                 if (!preg_match('/^\d+$/', $this->numero_documento) || strlen($this->numero_documento) < 5 || strlen($this->numero_documento) > 10) {
                     $this->addError('numero_documento', 'Para Bolivia el CI debe ser numérico y tener entre 5 y 10 dígitos.');
                     return;
@@ -1165,21 +1437,7 @@ class UsuariosPanel extends Component
                 'celular_emergencia' => ['required', 'string', 'max:20', 'different:telefono', 'regex:/^\d+$/'],
             ];
 
-            if ($this->departamento_domicilio === 'OTRO') {
-                $rulesPaso2['otro_departamento'] = ['required', 'string', 'min:2', 'max:100'];
-            }
-            if ($this->municipio_domicilio === 'OTRO') {
-                $rulesPaso2['otro_municipio'] = ['required', 'string', 'min:2', 'max:100'];
-            }
-
-            if (isset($this->catalogZonas[$this->municipio_domicilio])) {
-                $rulesPaso2['zona_domicilio'] = ['required', 'string'];
-                if ($this->zona_domicilio === 'OTRO') {
-                    $rulesPaso2['otra_zona'] = ['required', 'string', 'min:2', 'max:100'];
-                }
-            } else {
-                $rulesPaso2['otra_zona'] = ['required', 'string', 'min:2', 'max:100'];
-            }
+            $rulesPaso2 = array_merge($rulesPaso2, $this->reglasDireccion());
 
             $this->validate($rulesPaso2, array_merge($this->messages(), [
                 'contacto_emergencia.regex' => 'El nombre del contacto solo puede contener letras.',
@@ -1187,13 +1445,7 @@ class UsuariosPanel extends Component
                 'ap_materno_emergencia.regex' => 'El apellido del contacto solo puede contener letras.',
                 'celular_emergencia.different' => 'El celular de emergencia no puede ser igual al celular del usuario.',
                 'celular_emergencia.regex' => 'El celular de emergencia solo puede contener números.',
-                'departamento_domicilio.required' => 'Debe seleccionar un departamento.',
-                'municipio_domicilio.required' => 'Debe seleccionar un municipio.',
-                'zona_domicilio.required' => 'Debe seleccionar una zona o barrio.',
-                'otro_departamento.required' => 'Debe especificar el departamento.',
-                'otro_municipio.required' => 'Debe especificar el municipio.',
-                'otra_zona.required' => 'Debe ingresar la zona o barrio.',
-            ]));
+            ], $this->mensajesDireccion()));
 
             $this->validarTelefono(function($err) {
                 $this->addError('telefono', $err);
@@ -1245,6 +1497,18 @@ class UsuariosPanel extends Component
             }
 
             if ($this->rol === 'familiar') {
+                if (!empty($this->busquedaAdultoMayor) && empty($this->selected_cod_am) && count($this->vinculosFamiliar) === 0) {
+                    $this->addError('selected_cod_am', 'Seleccione un adulto mayor válido de la lista.');
+                    return;
+                }
+
+                if (!empty($this->selected_cod_am) && !collect($this->vinculosFamiliar)->contains(fn ($v) => ($v['cod_am'] ?? null) === $this->selected_cod_am)) {
+                    $this->vincularAdultoMayor();
+                    if ($this->getErrorBag()->has('selected_cod_am') || $this->getErrorBag()->has('selected_parentesco')) {
+                        return;
+                    }
+                }
+
                 $rules['observacion_vinculo'] = ['nullable', 'string', 'max:255'];
                 $rules['vinculosFamiliar'] = ['required', 'array', 'min:1'];
                 $rules['vinculosFamiliar.*.parentesco_vinculo'] = ['required', 'string', 'max:100'];
@@ -1328,6 +1592,20 @@ class UsuariosPanel extends Component
         // Ejecutar normalización completa
         $this->normalizarDatosFormulario();
 
+        if ($this->rol === 'familiar') {
+            if (!empty($this->busquedaAdultoMayor) && empty($this->selected_cod_am) && count($this->vinculosFamiliar) === 0) {
+                $this->addError('selected_cod_am', 'Seleccione un adulto mayor válido de la lista.');
+                return;
+            }
+
+            if (!empty($this->selected_cod_am) && !collect($this->vinculosFamiliar)->contains(fn ($v) => ($v['cod_am'] ?? null) === $this->selected_cod_am)) {
+                $this->vincularAdultoMayor();
+                if ($this->getErrorBag()->has('selected_cod_am') || $this->getErrorBag()->has('selected_parentesco')) {
+                    return;
+                }
+            }
+        }
+
         $rules = $this->rules();
         $this->validate($rules);
 
@@ -1337,7 +1615,7 @@ class UsuariosPanel extends Component
             return;
         }
 
-        if ($this->pais_documento === 'Bolivia' && $this->tipo_documento === 'CI') {
+        if (mb_strtoupper((string) $this->pais_documento, 'UTF-8') === 'BOLIVIA' && $this->tipo_documento === 'CI') {
             if (!preg_match('/^\d+$/', $this->numero_documento) || strlen($this->numero_documento) < 5 || strlen($this->numero_documento) > 10) {
                 $this->addError('numero_documento', 'Para Bolivia el CI debe ser numérico y tener entre 5 y 10 dígitos.');
                 return;
@@ -1378,10 +1656,7 @@ class UsuariosPanel extends Component
             $this->correo = 'admincasaamandita@gmail.com';
         }
 
-        $this->direccion = 'CALLE/AV. ' . $this->calle . ' NRO. ' . $this->nro_domicilio . ', ZONA ' . $this->zona . ', ' . $this->ciudad;
-        if (!empty($this->referencia_domicilio)) {
-            $this->direccion .= ', REF: ' . $this->referencia_domicilio;
-        }
+        $this->armarDireccionCompleta();
 
         $userData = [
             'nombres' => $this->nombres,
@@ -1472,9 +1747,7 @@ class UsuariosPanel extends Component
                             'estado_laboral' => 'ACTIVO'
                         ]
                     );
-                    \App\Models\PersonalAdmin::where('cod_usu', $usuario->cod_usu)->delete();
-                    \App\Models\Voluntario::where('cod_usu', $usuario->cod_usu)->delete();
-                    \App\Models\Familiar::where('cod_usu', $usuario->cod_usu)->delete();
+                    // TODO: definir flujo administrativo para archivar perfiles previos al cambiar de rol.
                 } elseif ($this->rol === 'personal_admin') {
                     \App\Models\PersonalAdmin::updateOrCreate(
                         ['cod_usu' => $usuario->cod_usu],
@@ -1486,9 +1759,7 @@ class UsuariosPanel extends Component
                             'estado_laboral' => 'ACTIVO'
                         ]
                     );
-                    \App\Models\PersonalSalud::where('cod_usu', $usuario->cod_usu)->delete();
-                    \App\Models\Voluntario::where('cod_usu', $usuario->cod_usu)->delete();
-                    \App\Models\Familiar::where('cod_usu', $usuario->cod_usu)->delete();
+                    // TODO: definir flujo administrativo para archivar perfiles previos al cambiar de rol.
                 } elseif ($this->rol === 'voluntario') {
                     \App\Models\Voluntario::updateOrCreate(
                         ['cod_usu' => $usuario->cod_usu],
@@ -1500,9 +1771,7 @@ class UsuariosPanel extends Component
                             'estado' => 'ACTIVO'
                         ]
                     );
-                    \App\Models\PersonalSalud::where('cod_usu', $usuario->cod_usu)->delete();
-                    \App\Models\PersonalAdmin::where('cod_usu', $usuario->cod_usu)->delete();
-                    \App\Models\Familiar::where('cod_usu', $usuario->cod_usu)->delete();
+                    // TODO: definir flujo administrativo para archivar perfiles previos al cambiar de rol.
                 } elseif ($this->rol === 'familiar') {
                     $hayResponsable = collect($this->vinculosFamiliar)->contains(fn($v) => $v['es_responsable'] === 'SI');
                     $fam = \App\Models\Familiar::updateOrCreate(
@@ -1515,21 +1784,8 @@ class UsuariosPanel extends Component
                         ]
                     );
                     
-                    // Sincronizar vínculos de adultos mayores
-                    \App\Models\FamiliarAdulto::where('cod_fam', $fam->cod_fam)->forceDelete();
-                    foreach ($this->vinculosFamiliar as $vinculo) {
-                        $obsSerialized = "Salud: " . ($vinculo['responsable_salud'] ?? 'NO') . " | Económico: " . ($vinculo['responsable_economico'] ?? 'NO') . " | Obs: " . ($vinculo['observaciones'] ?? '');
-                        $fam->adultosMayores()->attach($vinculo['cod_am'], [
-                            'parentesco_vinculo' => $vinculo['parentesco_vinculo'],
-                            'es_responsable' => $vinculo['es_responsable'] === 'SI',
-                            'estado' => 'ACTIVO',
-                            'observaciones' => $obsSerialized,
-                        ]);
-                    }
-                    
-                    \App\Models\PersonalSalud::where('cod_usu', $usuario->cod_usu)->delete();
-                    \App\Models\PersonalAdmin::where('cod_usu', $usuario->cod_usu)->delete();
-                    \App\Models\Voluntario::where('cod_usu', $usuario->cod_usu)->delete();
+                    $this->guardarVinculosFamiliar($fam);
+                    // TODO: definir flujo administrativo para archivar perfiles previos al cambiar de rol.
                 }
 
             } else {
@@ -1554,9 +1810,6 @@ class UsuariosPanel extends Component
                             'estado_laboral' => 'ACTIVO'
                         ]
                     );
-                    \App\Models\PersonalAdmin::where('cod_usu', $usuario->cod_usu)->delete();
-                    \App\Models\Voluntario::where('cod_usu', $usuario->cod_usu)->delete();
-                    \App\Models\Familiar::where('cod_usu', $usuario->cod_usu)->delete();
                 } elseif ($this->rol === 'personal_admin') {
                     \App\Models\PersonalAdmin::updateOrCreate(
                         ['cod_usu' => $usuario->cod_usu],
@@ -1568,9 +1821,6 @@ class UsuariosPanel extends Component
                             'estado_laboral' => 'ACTIVO'
                         ]
                     );
-                    \App\Models\PersonalSalud::where('cod_usu', $usuario->cod_usu)->delete();
-                    \App\Models\Voluntario::where('cod_usu', $usuario->cod_usu)->delete();
-                    \App\Models\Familiar::where('cod_usu', $usuario->cod_usu)->delete();
                 } elseif ($this->rol === 'voluntario') {
                     \App\Models\Voluntario::updateOrCreate(
                         ['cod_usu' => $usuario->cod_usu],
@@ -1582,9 +1832,6 @@ class UsuariosPanel extends Component
                             'estado' => 'ACTIVO'
                         ]
                     );
-                    \App\Models\PersonalSalud::where('cod_usu', $usuario->cod_usu)->delete();
-                    \App\Models\PersonalAdmin::where('cod_usu', $usuario->cod_usu)->delete();
-                    \App\Models\Familiar::where('cod_usu', $usuario->cod_usu)->delete();
                 } elseif ($this->rol === 'familiar') {
                     $hayResponsable = collect($this->vinculosFamiliar)->contains(fn($v) => $v['es_responsable'] === 'SI');
                     $fam = \App\Models\Familiar::updateOrCreate(
@@ -1597,20 +1844,7 @@ class UsuariosPanel extends Component
                         ]
                     );
                     
-                    // Sincronizar vínculos de adultos mayores
-                    \App\Models\FamiliarAdulto::where('cod_fam', $fam->cod_fam)->forceDelete();
-                    foreach ($this->vinculosFamiliar as $vinculo) {
-                        $obsSerialized = "Salud: " . ($vinculo['responsable_salud'] ?? 'NO') . " | Económico: " . ($vinculo['responsable_economico'] ?? 'NO') . " | Obs: " . ($vinculo['observaciones'] ?? '');
-                        $fam->adultosMayores()->attach($vinculo['cod_am'], [
-                            'parentesco_vinculo' => $vinculo['parentesco_vinculo'],
-                            'es_responsable' => $vinculo['es_responsable'] === 'SI',
-                            'estado' => 'ACTIVO',
-                            'observaciones' => $obsSerialized,
-                        ]);
-                    }
-                    \App\Models\PersonalSalud::where('cod_usu', $usuario->cod_usu)->delete();
-                    \App\Models\PersonalAdmin::where('cod_usu', $usuario->cod_usu)->delete();
-                    \App\Models\Voluntario::where('cod_usu', $usuario->cod_usu)->delete();
+                    $this->guardarVinculosFamiliar($fam);
                 }
             }
 
@@ -1731,17 +1965,19 @@ class UsuariosPanel extends Component
                     ->log($logMsg);
             }
 
+            $rolGuardado = $this->rol;
             $this->resetFormulario();
             $this->mostrarFormulario = false;
             $this->resetPage();
 
-            $this->dispatch('mostrar-post-registro', [
-                'usuario_id' => $usuario->cod_usu,
-                'nombre' => $usuario->nombres . ' ' . $usuario->ap_paterno . ' ' . $usuario->ap_materno,
-                'email' => $usuario->correo,
-                'credenciales_enviadas' => $credencialesEnviadas,
-                'password_temporal' => $passwordTemporal,
-            ]);
+            $this->usuarioPostRegistro = $usuario;
+            $this->documentosRequeridos = $this->obtenerDocumentosRequeridosPorRol($rolGuardado);
+            $this->fechaLimiteDocumentacion = $usuario->created_at ? $usuario->created_at->addHours(48)->format('d/m/Y H:i') : now()->addHours(48)->format('d/m/Y H:i');
+            $this->passwordTemporalPostRegistro = $passwordTemporal;
+            $this->mostrarPostRegistro = true;
+
+            // Enviar correo de requisitos de forma automática
+            $this->enviarCorreoRequisitosAction();
         }
     }
 
@@ -1751,7 +1987,7 @@ class UsuariosPanel extends Component
 
     public function abrirVistaCompleta($codUsu)
     {
-        return redirect()->route('admin.usuarios.show', $codUsu);
+        $this->verUsuario($codUsu);
     }
 
     public function cerrarVistaCompleta(): void
@@ -1766,8 +2002,7 @@ class UsuariosPanel extends Component
 
     public function abrirFichaRapida($codUsu): void
     {
-        $this->usuarioFichaId = $codUsu;
-        $this->mostrarFichaRapida = true;
+        $this->verUsuario($codUsu);
     }
 
     public function cerrarFichaRapida(): void
@@ -1775,6 +2010,37 @@ class UsuariosPanel extends Component
         $this->mostrarFichaRapida = false;
         $this->usuarioFichaId = null;
     }
+
+    public function verUsuario($codUsu)
+    {
+        $this->usuarioDetalle = User::with([
+            'roles',
+            'personalSalud.especialidad',
+            'personalAdmin.cargoAdmin',
+            'areaInstitucional',
+            'documentos',
+            'familiares.adultosMayores',
+            'voluntarios'
+        ])->findOrFail($codUsu);
+        $this->modoVista = 'detalle';
+        $this->mostrarVistaCompleta = false;
+        $this->mostrarFichaRapida = false;
+    }
+
+    public function volverAlListadoUsuarios()
+    {
+        $this->modoVista = 'listado';
+        $this->usuarioDetalle = null;
+    }
+
+    public function abrirEdicionDesdeDetalle()
+    {
+        if ($this->usuarioDetalle) {
+            $this->editarUsuario($this->usuarioDetalle->cod_usu);
+        }
+    }
+
+
 
     // ══════════════════════════════════════════════
     // FILTROS
@@ -2004,7 +2270,7 @@ class UsuariosPanel extends Component
 
             return $exportService->exportPdf('reports.usuarios.general', $viewData, $filename);
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error("Error al exportar PDF de usuarios: " . $e->getMessage());
+            Log::error("Error al exportar PDF de usuarios: " . $e->getMessage());
             $this->dispatch('swal', [
                 'icon' => 'error',
                 'title' => 'Error de Exportación',
@@ -2036,7 +2302,7 @@ class UsuariosPanel extends Component
 
             return $exportService->exportExcel(new \App\Exports\UsuariosExport, $filename);
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error("Error al exportar Excel de usuarios: " . $e->getMessage());
+            Log::error("Error al exportar Excel de usuarios: " . $e->getMessage());
             $this->dispatch('swal', [
                 'icon' => 'error',
                 'title' => 'Error de Exportación',
@@ -2068,12 +2334,184 @@ class UsuariosPanel extends Component
 
             return $exportService->exportCsv(new \App\Exports\UsuariosExport, $filename);
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error("Error al exportar CSV de usuarios: " . $e->getMessage());
+            Log::error("Error al exportar CSV de usuarios: " . $e->getMessage());
             $this->dispatch('swal', [
                 'icon' => 'error',
                 'title' => 'Error de Exportación',
                 'text' => 'No se pudo generar el reporte en CSV: ' . $e->getMessage()
             ]);
+        }
+    }
+
+    public function obtenerDocumentosRequeridosPorRol($rol): array
+    {
+        switch ($rol) {
+            case 'personal_admin':
+                return [
+                    'Cédula de identidad vigente',
+                    'Currículum vitae',
+                    'Contrato o memorándum de incorporación',
+                    'Comprobante de domicilio',
+                    'Fotografía institucional',
+                    'Formulario de datos personales firmado',
+                    'Documento de confidencialidad institucional',
+                ];
+            case 'personal_salud':
+                return [
+                    'Cédula de identidad vigente',
+                    'Currículum vitae',
+                    'Título profesional',
+                    'Matrícula profesional',
+                    'Certificado de especialidad, si corresponde',
+                    'Certificados de experiencia laboral',
+                    'Contrato o memorándum de incorporación',
+                    'Formulario de datos personales firmado',
+                    'Documento de confidencialidad institucional',
+                    'Fotografía institucional',
+                ];
+            case 'voluntario':
+                return [
+                    'Cédula de identidad vigente',
+                    'Formulario de voluntariado firmado',
+                    'Carta de compromiso',
+                    'Comprobante de domicilio',
+                    'Referencia personal o institucional',
+                    'Fotografía institucional',
+                    'Documento de confidencialidad institucional',
+                ];
+            case 'familiar':
+                return [
+                    'Cédula de identidad vigente',
+                    'Documento que respalde parentesco o vínculo',
+                    'Formulario de autorización familiar',
+                    'Número de contacto actualizado',
+                    'Documento de compromiso de responsabilidad, si corresponde',
+                    'Autorización para consulta de información del adulto mayor',
+                ];
+            default:
+                return [];
+        }
+    }
+
+    public function obtenerNombreRolLegible($rol): string
+    {
+        switch ($rol) {
+            case 'personal_admin':
+                return 'Personal Administrativo';
+            case 'personal_salud':
+                return 'Personal de Salud';
+            case 'voluntario':
+                return 'Voluntario';
+            case 'familiar':
+                return 'Familiar';
+            case 'admin':
+                return 'Administrador';
+            case 'super_admin':
+                return 'Super Administrador';
+            default:
+                return ucfirst(str_replace('_', ' ', $rol));
+        }
+    }
+
+    public function enviarCorreoRequisitosAction($usuarioId = null)
+    {
+        try {
+            $usuario = $usuarioId ? User::find($usuarioId) : $this->usuarioPostRegistro;
+            if (!$usuario) {
+                throw new \Exception("Usuario no encontrado.");
+            }
+
+            $rol = $usuario->roles->first()?->name;
+            $documentos = $this->obtenerDocumentosRequeridosPorRol($rol);
+            $rolLegible = $this->obtenerNombreRolLegible($rol);
+            $fechaLimite = $usuario->created_at ? $usuario->created_at->addHours(48)->format('d/m/Y H:i') : now()->addHours(48)->format('d/m/Y H:i');
+            $fechaRegistro = $usuario->created_at ? $usuario->created_at->format('d/m/Y H:i') : now()->format('d/m/Y H:i');
+
+            // Generar PDF para adjuntarlo
+            $viewData = [
+                'usuario_reg' => $usuario,
+                'rol_legible' => $rolLegible,
+                'fecha_registro' => $fechaRegistro,
+                'fecha_limite' => $fechaLimite,
+                'documentos' => $documentos,
+                'fecha' => now()->format('d/m/Y H:i'),
+                'usuario' => auth()->check() ? auth()->user()->name : 'Sistema',
+            ];
+
+            $pdfContent = null;
+            try {
+                $pdfContent = \Spatie\LaravelPdf\Facades\Pdf::view('reports.usuarios.solicitud_documental_pdf', $viewData)->output();
+            } catch (\Throwable $e) {
+                Log::warning("Spatie PDF falló al generar adjunto en panel: {$e->getMessage()}. Usando DomPDF.");
+                $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('reports.usuarios.solicitud_documental_pdf', $viewData)
+                    ->setPaper('a4', 'portrait')
+                    ->setWarnings(false);
+                $pdfContent = $pdf->output();
+            }
+
+            $filename = 'solicitud_documental_' . $usuario->cod_usu . '.pdf';
+            $tempPath = 'temp/' . uniqid() . '_' . $filename;
+            \Illuminate\Support\Facades\Storage::disk('public')->put($tempPath, $pdfContent);
+            $fullPath = storage_path('app/public/' . $tempPath);
+
+            \Illuminate\Support\Facades\Mail::to($usuario->correo)
+                ->send(new \App\Mail\UsuarioRequisitosDocumentalesMail($usuario, $rolLegible, $documentos, $fechaLimite, $fullPath, $filename));
+
+            if (file_exists($fullPath)) {
+                unlink($fullPath);
+            }
+
+            $this->correoRequisitosEnviado = true;
+            $this->mensajeCorreoRequisitos = 'Correo enviado correctamente al correo registrado.';
+            
+            $this->dispatch('swal', [
+                'icon' => 'success',
+                'title' => 'Correo Enviado',
+                'text' => 'El correo de requisitos documentales ha sido enviado a ' . $usuario->correo
+            ]);
+        } catch (\Exception $e) {
+            Log::error("Error al enviar correo de requisitos para usuario " . ($usuario->cod_usu ?? 'unknown') . ": " . $e->getMessage());
+            $this->correoRequisitosEnviado = false;
+            $this->mensajeCorreoRequisitos = 'Usuario registrado, pero no se pudo enviar el correo de requisitos.';
+            
+            $this->dispatch('swal', [
+                'icon' => 'warning',
+                'title' => 'Advertencia de Correo',
+                'text' => $this->mensajeCorreoRequisitos
+            ]);
+        }
+    }
+
+    public function reenviarCorreoRequisitos()
+    {
+        if ($this->usuarioPostRegistro) {
+            $this->enviarCorreoRequisitosAction($this->usuarioPostRegistro->cod_usu);
+        }
+    }
+
+    public function cerrarPostRegistro()
+    {
+        $this->mostrarPostRegistro = false;
+        $this->usuarioPostRegistro = null;
+        $this->documentosRequeridos = [];
+        $this->fechaLimiteDocumentacion = null;
+        $this->passwordTemporalPostRegistro = null;
+        $this->correoRequisitosEnviado = false;
+        $this->mensajeCorreoRequisitos = null;
+    }
+
+    public function registrarOtroUsuario()
+    {
+        $this->cerrarPostRegistro();
+        $this->crearUsuario();
+    }
+
+    public function verFichaPostRegistro()
+    {
+        if ($this->usuarioPostRegistro) {
+            $codUsu = $this->usuarioPostRegistro->cod_usu;
+            $this->cerrarPostRegistro();
+            $this->verUsuario($codUsu);
         }
     }
 
@@ -2129,6 +2567,9 @@ class UsuariosPanel extends Component
                 'personalSalud.especialidad',
                 'personalAdmin.cargoAdmin',
                 'areaInstitucional',
+                'documentos',
+                'familiares.adultosMayores',
+                'voluntarios'
             ])->where('cod_usu', $this->usuarioFichaId)->first();
         }
 
