@@ -16,9 +16,7 @@ class SaludValoracionPanel extends Component
 
     public function render()
     {
-        return view('livewire.admin.salud-seguimiento.salud-panel-individual', [
-            'titulo' => 'Valoración Funcional',
-            'icono' => 'ph-person-simple-walk'
-        ])->layout('layouts.sistema');
+        return view('livewire.admin.salud-seguimiento.salud-valoracion-funcional')
+            ->layout('layouts.sistema');
     }
 }

@@ -11,13 +11,23 @@ class SaludAlertasPanel extends Component
 
     public function render()
     {
-        $adultos = AdultoMayor::with(['fichasMedicas', 'medicaciones', 'administracionesMedicacion', 'signosVitales', 'valoracionesFuncionales'])->get();
+        // Cargamos solo adultos activos con relaciones acotadas para evitar timeout
+        $adultos = AdultoMayor::with([
+            'fichasMedicas'           => fn ($q) => $q->where('estado', 'ACTIVA')->latest()->limit(1),
+            'medicaciones'            => fn ($q) => $q->where('estado', 'ACTIVA'),
+            'administracionesMedicacion' => fn ($q) => $q->latest('fecha')->limit(3),
+            'signosVitales'           => fn ($q) => $q->where('estado', 'VIGENTE')->latest('fecha')->limit(1),
+            'valoracionesFuncionales' => fn ($q) => $q->latest('fecha_valoracion')->limit(1),
+        ])
+            ->whereHas('estado', fn ($q) => $q->whereIn('estado', ['ACTIVO', 'SEGUIMIENTO_ESPECIAL']))
+            ->orderBy('ap_paterno')
+            ->get();
         $alertas = collect();
 
         foreach ($adultos as $adulto) {
             $fichaMedica = $adulto->fichasMedicas->where('estado', 'ACTIVA')->first();
             $medicacionesActivas = $adulto->medicaciones->where('estado', 'ACTIVA');
-            $valFuncional = $adulto->valoracionesFuncionales->where('estado', 'VIGENTE')->sortByDesc('fecha')->first();
+            $valFuncional = $adulto->valoracionesFuncionales->sortByDesc('fecha_valoracion')->first();
             $ultimosSignos = $adulto->signosVitales->where('estado', 'VIGENTE')->sortByDesc('fecha')->first();
             
             if (!$fichaMedica) {
@@ -59,7 +69,7 @@ class SaludAlertasPanel extends Component
             }
 
             if ($valFuncional) {
-                if (in_array(strtoupper($valFuncional->riesgo_caida), ['ALTO', 'CRÍTICO'])) {
+                if (\in_array(strtoupper($valFuncional->riesgo_caida), ['ALTO', 'CRÍTICO'])) {
                     $alertas->push([
                         'adulto' => $adulto,
                         'tipo' => 'Valoración',
@@ -69,7 +79,7 @@ class SaludAlertasPanel extends Component
                         'ruta' => route('admin.salud-seguimiento.valoracion', $adulto->cod_am)
                     ]);
                 }
-                if (in_array(strtoupper($valFuncional->nivel_dependencia), ['ALTO', 'TOTAL', 'SEVERA'])) {
+                if (\in_array(strtoupper($valFuncional->nivel_dependencia), ['ALTO', 'TOTAL', 'SEVERA'])) {
                     $alertas->push([
                         'adulto' => $adulto,
                         'tipo' => 'Valoración',

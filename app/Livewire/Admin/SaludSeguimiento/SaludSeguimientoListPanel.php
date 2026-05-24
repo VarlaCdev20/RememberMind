@@ -83,7 +83,7 @@ class SaludSeguimientoListPanel extends Component
                 'estado', 
                 'fichasMedicas' => function($q) { $q->latest()->limit(1); },
                 'medicaciones' => function($q) { $q->where('estado', 'ACTIVA'); },
-                'valoracionesFuncionales' => function($q) { $q->latest('fecha')->limit(1); }
+                'valoracionesFuncionales' => function($q) { $q->latest('fecha_valoracion')->limit(1); }
             ])
             ->where(function ($q) {
                 $q->where('nombres', 'ilike', '%' . $this->search . '%')

@@ -16,9 +16,7 @@ class SaludMedicacionPanel extends Component
 
     public function render()
     {
-        return view('livewire.admin.salud-seguimiento.salud-panel-individual', [
-            'titulo' => 'Medicación',
-            'icono' => 'ph-pill'
-        ])->layout('layouts.sistema');
+        return view('livewire.admin.salud-seguimiento.salud-medicacion')
+            ->layout('layouts.sistema');
     }
 }

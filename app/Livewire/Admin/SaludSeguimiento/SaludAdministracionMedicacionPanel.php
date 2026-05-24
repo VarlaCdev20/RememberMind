@@ -16,9 +16,7 @@ class SaludAdministracionMedicacionPanel extends Component
 
     public function render()
     {
-        return view('livewire.admin.salud-seguimiento.salud-panel-individual', [
-            'titulo' => 'Administración de Medicación',
-            'icono' => 'ph-prescription'
-        ])->layout('layouts.sistema');
+        return view('livewire.admin.salud-seguimiento.salud-administracion-medicacion')
+            ->layout('layouts.sistema');
     }
 }

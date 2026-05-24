@@ -47,8 +47,8 @@
                     {{-- Foto del adulto mayor --}}
                     <div class="absolute left-1/2 top-8 -translate-x-1/2">
                         <div class="h-24 w-24 overflow-hidden rounded-full border-4 border-white bg-white shadow-md">
-                            @if($adulto->foto_perfil)
-                                <img src="{{ Storage::url($adulto->foto_perfil) }}" alt="{{ $adulto->nombres }}" class="h-full w-full object-cover">
+                            @if($adulto->foto)
+                                <img src="{{ Storage::url($adulto->foto) }}" alt="{{ $adulto->nombres }}" class="h-full w-full object-cover">
                             @else
                                 <div class="flex h-full w-full items-center justify-center bg-gradient-to-br from-[#E6DDD3] to-[#C7B5A3]">
                                     <span class="text-3xl font-black text-azul-profundo/40">{{ substr($adulto->nombres, 0, 1) }}</span>

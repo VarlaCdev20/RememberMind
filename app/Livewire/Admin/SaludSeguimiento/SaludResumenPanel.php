@@ -32,7 +32,7 @@ class SaludResumenPanel extends Component
         $ultimosSignos = $this->adulto->signosVitales()->where('estado', 'VIGENTE')->latest('fecha')->latest('hora')->take(3)->get();
 
         // Valoración Funcional vigente
-        $valoracionFuncional = $this->adulto->valoracionesFuncionales()->where('estado', 'VIGENTE')->latest('fecha')->first();
+        $valoracionFuncional = $this->adulto->valoracionesFuncionales()->latest('fecha_valoracion')->first();
 
         // Alertas Dinámicas (Cálculo al vuelo)
         $alertas = collect();
