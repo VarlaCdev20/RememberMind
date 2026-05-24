@@ -34,8 +34,7 @@
                 </h2>
                 @can('salud.administracion.crear')
                     <button type="button" disabled
-                        class="rm-btn-terracota opacity-60 cursor-not-allowed"
-                        title="Disponible en la próxima versión">
+                        class="rm-btn-terracota opacity-50 cursor-not-allowed">
                         <i class="ph-bold ph-plus"></i> Registrar toma
                     </button>
                 @endcan
@@ -58,8 +57,8 @@
                             <td colspan="6" class="py-16 text-center">
                                 <x-ui.empty-state
                                     icono="ph-clipboard-text"
-                                    titulo="Módulo en preparación"
-                                    texto="El registro de administraciones diarias de medicación estará disponible próximamente."
+                                    titulo="Sin administraciones registradas"
+                                    texto="No se han registrado tomas de medicación para este paciente en el período seleccionado."
                                     class="border-0 py-0 bg-transparent shadow-none"
                                 />
                             </td>

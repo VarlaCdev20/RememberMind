@@ -69,7 +69,7 @@ class SaludAlertasPanel extends Component
             }
 
             if ($valFuncional) {
-                if (\in_array(strtoupper($valFuncional->riesgo_caida), ['ALTO', 'CRÍTICO'])) {
+                if ($valFuncional->riesgo_caida === 'ALTO') {
                     $alertas->push([
                         'adulto' => $adulto,
                         'tipo' => 'Valoración',
@@ -79,7 +79,7 @@ class SaludAlertasPanel extends Component
                         'ruta' => route('admin.salud-seguimiento.valoracion', $adulto->cod_am)
                     ]);
                 }
-                if (\in_array(strtoupper($valFuncional->nivel_dependencia), ['ALTO', 'TOTAL', 'SEVERA'])) {
+                if (\in_array($valFuncional->nivel_dependencia, ['ALTA_DEPENDENCIA', 'SUPERVISION_PERMANENTE'])) {
                     $alertas->push([
                         'adulto' => $adulto,
                         'tipo' => 'Valoración',

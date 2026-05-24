@@ -34,8 +34,7 @@
                 </h2>
                 @can('salud.medicacion.crear')
                     <button type="button" disabled
-                        class="rm-btn-terracota opacity-60 cursor-not-allowed"
-                        title="Disponible en la próxima versión">
+                        class="rm-btn-terracota opacity-50 cursor-not-allowed">
                         <i class="ph-bold ph-plus"></i> Nueva medicación
                     </button>
                 @endcan
@@ -59,8 +58,8 @@
                             <td colspan="6" class="py-16 text-center">
                                 <x-ui.empty-state
                                     icono="ph-pill"
-                                    titulo="Módulo en preparación"
-                                    texto="La gestión de medicación estará disponible próximamente. Las tablas y relaciones ya están listas."
+                                    titulo="Sin medicaciones registradas"
+                                    texto="No se han registrado tratamientos farmacológicos activos para este paciente."
                                     class="border-0 py-0 bg-transparent shadow-none"
                                 />
                             </td>

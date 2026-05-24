@@ -72,14 +72,14 @@ class SaludResumenPanel extends Component
         }
 
         if ($valoracionFuncional) {
-            if (in_array(strtoupper($valoracionFuncional->riesgo_caida), ['ALTO', 'CRÍTICO'])) {
+            if ($valoracionFuncional->riesgo_caida === 'ALTO') {
                 $alertas->push([
                     'tipo' => 'Riesgo de Caída Alto',
                     'nivel' => 'critica',
                     'mensaje' => 'El paciente presenta alto riesgo de caída según su última valoración.',
                 ]);
             }
-            if (in_array(strtoupper($valoracionFuncional->nivel_dependencia), ['ALTO', 'TOTAL', 'SEVERA'])) {
+            if (\in_array($valoracionFuncional->nivel_dependencia, ['ALTA_DEPENDENCIA', 'SUPERVISION_PERMANENTE'])) {
                 $alertas->push([
                     'tipo' => 'Alta Dependencia',
                     'nivel' => 'atencion',

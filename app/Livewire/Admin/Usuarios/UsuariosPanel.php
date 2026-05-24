@@ -478,6 +478,11 @@ class UsuariosPanel extends Component
         return mb_convert_case($texto, MB_CASE_TITLE, "UTF-8");
     }
 
+    private function normalizarMayusculas(?string $valor): ?string
+    {
+        return $valor ? mb_strtoupper(preg_replace('/\s+/', ' ', trim($valor)), 'UTF-8') : null;
+    }
+
     // ══════════════════════════════════════════════
     // FORMULARIO: CREAR / EDITAR
     // ══════════════════════════════════════════════
@@ -787,9 +792,9 @@ class UsuariosPanel extends Component
     public function siguientePaso()
     {
         if ($this->pasoFormulario === 1) {
-            $this->nombres = $this->normalizarTexto($this->nombres);
-            $this->ap_paterno = $this->normalizarTexto($this->ap_paterno);
-            $this->ap_materno = $this->normalizarTexto($this->ap_materno);
+            $this->nombres = $this->normalizarMayusculas($this->nombres);
+            $this->ap_paterno = $this->normalizarMayusculas($this->ap_paterno);
+            $this->ap_materno = $this->normalizarMayusculas($this->ap_materno);
 
             $this->validate([
                 'nombres' => ['required', 'string', 'max:255', 'regex:/^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s\-]+$/u'],
@@ -852,12 +857,13 @@ class UsuariosPanel extends Component
             }
         } elseif ($this->pasoFormulario === 2) {
             $this->correo = strtolower(trim($this->correo));
-            $this->contacto_emergencia = $this->normalizarTexto($this->contacto_emergencia);
-            $this->ap_paterno_emergencia = $this->normalizarTexto($this->ap_paterno_emergencia);
-            $this->ap_materno_emergencia = $this->normalizarTexto($this->ap_materno_emergencia);
-            $this->calle = $this->normalizarTexto($this->calle);
-            $this->zona = $this->normalizarTexto($this->zona);
-            $this->ciudad = $this->normalizarTexto($this->ciudad);
+            $this->contacto_emergencia = $this->normalizarMayusculas($this->contacto_emergencia);
+            $this->ap_paterno_emergencia = $this->normalizarMayusculas($this->ap_paterno_emergencia);
+            $this->ap_materno_emergencia = $this->normalizarMayusculas($this->ap_materno_emergencia);
+            $this->calle = $this->normalizarMayusculas($this->calle);
+            $this->nro_domicilio = $this->nro_domicilio ? mb_strtoupper(trim($this->nro_domicilio), 'UTF-8') : $this->nro_domicilio;
+            $this->zona = $this->normalizarMayusculas($this->zona);
+            $this->ciudad = $this->normalizarMayusculas($this->ciudad);
 
             $this->validate([
                 'correo' => [
@@ -1022,9 +1028,9 @@ class UsuariosPanel extends Component
             return;
         }
 
-        $this->nombres = $this->normalizarTexto($this->nombres);
-        $this->ap_paterno = $this->normalizarTexto($this->ap_paterno);
-        $this->ap_materno = $this->normalizarTexto($this->ap_materno);
+        $this->nombres = $this->normalizarMayusculas($this->nombres);
+        $this->ap_paterno = $this->normalizarMayusculas($this->ap_paterno);
+        $this->ap_materno = $this->normalizarMayusculas($this->ap_materno);
 
         $rules = $this->rules();
         $this->validate($rules);
