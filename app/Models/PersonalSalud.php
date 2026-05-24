@@ -34,6 +34,7 @@ class PersonalSalud extends Model
         'observaciones',
         'cod_usu',
         'cod_esp',
+        'institucion_formacion',
     ];
 
     protected $casts = [

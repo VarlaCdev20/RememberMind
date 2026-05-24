@@ -899,29 +899,89 @@
                         </div>
 
                         <div>
-                            <label class="mb-1 block text-[9px] font-black uppercase tracking-widest text-[#2F3E5C]/60">Zona / Barrio *</label>
-                            <input type="text" wire:model="zona" placeholder="Ej. Sopocachi"
-                                   class="w-full h-10 rounded-xl border {{ $errors->has('zona') ? 'border-[#E27D60]' : 'border-[#C7B5A3]' }} bg-white px-4 py-2 text-sm font-bold text-[#2F3E5C] outline-none transition focus:border-[#2F3E5C]">
-                            @error('zona') <span class="mt-1 block text-[9px] font-black text-[#E27D60] uppercase">{{ $message }}</span> @enderror
+                            <label class="mb-1 block text-[9px] font-black uppercase tracking-widest text-[#2F3E5C]/60">Departamento de Domicilio *</label>
+                            <select wire:model.live="departamento_domicilio"
+                                    class="w-full h-10 rounded-xl border {{ $errors->has('departamento_domicilio') ? 'border-[#E27D60] ring-4 ring-[#E27D60]/10' : 'border-[#C7B5A3] focus:border-[#2F3E5C]' }} bg-white px-4 py-2 text-sm font-bold text-[#2F3E5C] outline-none transition">
+                                <option value="">SELECCIONE DEPARTAMENTO...</option>
+                                @foreach(array_keys($catalogDepartamentos) as $dept)
+                                    <option value="{{ $dept }}">{{ $dept }}</option>
+                                @endforeach
+                            </select>
+                            @error('departamento_domicilio') <span class="mt-1 block text-[9px] font-black text-[#E27D60] uppercase">{{ $message }}</span> @enderror
                         </div>
 
                         <div>
-                            <label class="mb-1 block text-[9px] font-black uppercase tracking-widest text-[#2F3E5C]/60">Ciudad / Localidad *</label>
-                            <select wire:model="ciudad"
-                                    class="w-full h-10 rounded-xl border {{ $errors->has('ciudad') ? 'border-[#E27D60] ring-4 ring-[#E27D60]/10' : 'border-[#C7B5A3] focus:border-[#2F3E5C]' }} bg-white px-4 py-2 text-sm font-bold text-[#2F3E5C] outline-none transition">
-                                <option value="">Seleccione una ciudad</option>
-                                <option value="La Paz">La Paz</option>
-                                <option value="El Alto">El Alto</option>
-                                <option value="Cochabamba">Cochabamba</option>
-                                <option value="Santa Cruz">Santa Cruz</option>
-                                <option value="Oruro">Oruro</option>
-                                <option value="Potosí">Potosí</option>
-                                <option value="Sucre">Sucre</option>
-                                <option value="Tarija">Tarija</option>
-                                <option value="Trinidad">Trinidad</option>
-                                <option value="Cobija">Cobija</option>
-                            </select>
-                            @error('ciudad') <span class="mt-1 block text-[9px] font-black text-[#E27D60] uppercase">{{ $message }}</span> @enderror
+                            <label class="mb-1 block text-[9px] font-black uppercase tracking-widest text-[#2F3E5C]/60">Municipio / Localidad *</label>
+                            @if($departamento_domicilio === 'OTRO')
+                                <input type="text" wire:model="otro_municipio" placeholder="Especifique Municipio..."
+                                       class="w-full h-10 rounded-xl border {{ $errors->has('otro_municipio') ? 'border-[#E27D60]' : 'border-[#C7B5A3]' }} bg-white px-4 py-2 text-sm font-bold text-[#2F3E5C] outline-none transition focus:border-[#2F3E5C]">
+                                @error('otro_municipio') <span class="mt-1 block text-[9px] font-black text-[#E27D60] uppercase">{{ $message }}</span> @enderror
+                            @else
+                                <select wire:model.live="municipio_domicilio"
+                                        class="w-full h-10 rounded-xl border {{ $errors->has('municipio_domicilio') ? 'border-[#E27D60] ring-4 ring-[#E27D60]/10' : 'border-[#C7B5A3] focus:border-[#2F3E5C]' }} bg-white px-4 py-2 text-sm font-bold text-[#2F3E5C] outline-none transition">
+                                    <option value="">SELECCIONE MUNICIPIO...</option>
+                                    @if($departamento_domicilio && isset($catalogDepartamentos[$departamento_domicilio]))
+                                        @foreach($catalogDepartamentos[$departamento_domicilio] as $muni)
+                                            <option value="{{ $muni }}">{{ $muni }}</option>
+                                        @endforeach
+                                    @endif
+                                </select>
+                                @error('municipio_domicilio') <span class="mt-1 block text-[9px] font-black text-[#E27D60] uppercase">{{ $message }}</span> @enderror
+                            @endif
+                        </div>
+
+                        @if($departamento_domicilio === 'OTRO')
+                            <div class="md:col-span-2">
+                                <label class="mb-1 block text-[9px] font-black uppercase tracking-widest text-[#2F3E5C]/60">Especifique Departamento *</label>
+                                <input type="text" wire:model="otro_departamento" placeholder="Especifique el Departamento..."
+                                       class="w-full h-10 rounded-xl border {{ $errors->has('otro_departamento') ? 'border-[#E27D60]' : 'border-[#C7B5A3]' }} bg-white px-4 py-2 text-sm font-bold text-[#2F3E5C] outline-none transition focus:border-[#2F3E5C]">
+                                @error('otro_departamento') <span class="mt-1 block text-[9px] font-black text-[#E27D60] uppercase">{{ $message }}</span> @enderror
+                            </div>
+                        @endif
+
+                        @if($municipio_domicilio === 'OTRO' && $departamento_domicilio !== 'OTRO')
+                            <div>
+                                <label class="mb-1 block text-[9px] font-black uppercase tracking-widest text-[#2F3E5C]/60">Especifique Municipio *</label>
+                                <input type="text" wire:model="otro_municipio" placeholder="Especifique el Municipio..."
+                                       class="w-full h-10 rounded-xl border {{ $errors->has('otro_municipio') ? 'border-[#E27D60]' : 'border-[#C7B5A3]' }} bg-white px-4 py-2 text-sm font-bold text-[#2F3E5C] outline-none transition focus:border-[#2F3E5C]">
+                                @error('otro_municipio') <span class="mt-1 block text-[9px] font-black text-[#E27D60] uppercase">{{ $message }}</span> @enderror
+                            </div>
+                        @endif
+
+                        <div class="md:col-span-2">
+                            <label class="mb-1 block text-[9px] font-black uppercase tracking-widest text-[#2F3E5C]/60">Zona / Barrio *</label>
+                            @if(isset($catalogZonas[$municipio_domicilio]))
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                    <div>
+                                        <select wire:model.live="zona_domicilio"
+                                                class="w-full h-10 rounded-xl border {{ $errors->has('zona_domicilio') ? 'border-[#E27D60] ring-4 ring-[#E27D60]/10' : 'border-[#C7B5A3] focus:border-[#2F3E5C]' }} bg-white px-4 py-2 text-sm font-bold text-[#2F3E5C] outline-none transition">
+                                            <option value="">SELECCIONE ZONA...</option>
+                                            @foreach($catalogZonas[$municipio_domicilio] as $z)
+                                                <option value="{{ $z }}">{{ $z }}</option>
+                                            @endforeach
+                                        </select>
+                                        @error('zona_domicilio') <span class="mt-1 block text-[9px] font-black text-[#E27D60] uppercase">{{ $message }}</span> @enderror
+                                    </div>
+                                    @if($zona_domicilio === 'OTRO')
+                                        <div>
+                                            <input type="text" wire:model="otra_zona" placeholder="Especifique la Zona / Barrio..."
+                                                   class="w-full h-10 rounded-xl border {{ $errors->has('otra_zona') ? 'border-[#E27D60]' : 'border-[#C7B5A3]' }} bg-white px-4 py-2 text-sm font-bold text-[#2F3E5C] outline-none transition focus:border-[#2F3E5C]">
+                                            @error('otra_zona') <span class="mt-1 block text-[9px] font-black text-[#E27D60] uppercase">{{ $message }}</span> @enderror
+                                        </div>
+                                    @endif
+                                </div>
+                            @else
+                                <input type="text" wire:model="otra_zona" placeholder="Ej. Sopocachi"
+                                       class="w-full h-10 rounded-xl border {{ $errors->has('otra_zona') ? 'border-[#E27D60]' : 'border-[#C7B5A3]' }} bg-white px-4 py-2 text-sm font-bold text-[#2F3E5C] outline-none transition focus:border-[#2F3E5C]">
+                                @error('otra_zona') <span class="mt-1 block text-[9px] font-black text-[#E27D60] uppercase">{{ $message }}</span> @enderror
+                            @endif
+                        </div>
+
+                        <div class="md:col-span-2">
+                            <label class="mb-1 block text-[9px] font-black uppercase tracking-widest text-[#2F3E5C]/60">Referencia de Domicilio</label>
+                            <input type="text" wire:model="referencia_domicilio" placeholder="Ej. Frente al centro de salud"
+                                   class="uppercase w-full h-10 rounded-xl border {{ $errors->has('referencia_domicilio') ? 'border-[#E27D60]' : 'border-[#C7B5A3]' }} bg-white px-4 py-2 text-sm font-bold text-[#2F3E5C] outline-none transition focus:border-[#2F3E5C]">
+                            @error('referencia_domicilio') <span class="mt-1 block text-[9px] font-black text-[#E27D60] uppercase">{{ $message }}</span> @enderror
                         </div>
 
                         {{-- Emergencia --}}
@@ -1051,19 +1111,17 @@
                                 @error('especialidad_salud') <span class="mt-1 block text-[9px] font-black text-[#E27D60] uppercase">{{ $message }}</span> @enderror
                             </div>
                             <div>
-                                <label class="mb-1 block text-[9px] font-black uppercase tracking-widest text-[#E27D60]">Matrícula Profesional *</label>
-                                <input type="text" wire:model="matricula_prof" placeholder="Ej. MP-12345-BOL" class="w-full h-10 rounded-xl border border-[#C7B5A3] bg-white px-4 py-2 text-sm font-bold text-[#2F3E5C] outline-none transition focus:border-[#2F3E5C]">
-                                @error('matricula_prof') <span class="mt-1 block text-[9px] font-black text-[#E27D60] uppercase">{{ $message }}</span> @enderror
+                                <label class="mb-1 block text-[9px] font-black uppercase tracking-widest text-[#2F3E5C]">Fecha de Ingreso *</label>
+                                <input type="date" wire:model="fecha_ingreso" {{ !$isEdit ? 'readonly tabindex="-1"' : '' }} class="w-full h-10 rounded-xl border border-[#C7B5A3] bg-[#F4EEE7] {{ !$isEdit ? 'opacity-70 pointer-events-none' : '' }} px-4 py-2 text-sm font-bold text-[#2F3E5C] outline-none transition focus:border-[#2F3E5C]">
+                                @error('fecha_ingreso') <span class="mt-1 block text-[9px] font-black text-[#E27D60] uppercase">{{ $message }}</span> @enderror
                             </div>
                             <div class="md:col-span-2">
                                 <label class="mb-1 block text-[9px] font-black uppercase tracking-widest text-[#2F3E5C]">Institución de Formación</label>
                                 <input type="text" wire:model="institucion_formacion" placeholder="Ej. Universidad Mayor de San Andrés" class="w-full h-10 rounded-xl border border-[#C7B5A3] bg-white px-4 py-2 text-sm font-bold text-[#2F3E5C] outline-none transition focus:border-[#2F3E5C]">
                                 @error('institucion_formacion') <span class="mt-1 block text-[9px] font-black text-[#E27D60] uppercase">{{ $message }}</span> @enderror
                             </div>
-                            <div>
-                                <label class="mb-1 block text-[9px] font-black uppercase tracking-widest text-[#2F3E5C]">Fecha de Ingreso *</label>
-                                <input type="date" wire:model="fecha_ingreso" {{ !$isEdit ? 'readonly tabindex="-1"' : '' }} class="w-full h-10 rounded-xl border border-[#C7B5A3] bg-[#F4EEE7] {{ !$isEdit ? 'opacity-70 pointer-events-none' : '' }} px-4 py-2 text-sm font-bold text-[#2F3E5C] outline-none transition focus:border-[#2F3E5C]">
-                                @error('fecha_ingreso') <span class="mt-1 block text-[9px] font-black text-[#E27D60] uppercase">{{ $message }}</span> @enderror
+                            <div class="md:col-span-2 rounded-xl border border-[#C7B5A3]/50 bg-[#F4EEE7]/70 px-4 py-3 text-[10px] font-bold leading-relaxed text-[#2F3E5C]">
+                                La matricula profesional y documentos de respaldo se gestionaran desde el modulo de documentacion del usuario.
                             </div>
                         </div>
                         @endif
@@ -1130,7 +1188,7 @@
                             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#C7B5A3]/20 pb-2">
                                 <div class="flex items-center gap-2">
                                     <i class="ph-fill ph-users-three text-lg text-[#E27D60]"></i>
-                                    <h4 class="text-[10px] font-black text-[#2F3E5C] uppercase tracking-widest">Vinculación de Adulto(s) Mayor(es)</h4>
+                                    <h4 class="text-[10px] font-black text-[#2F3E5C] uppercase tracking-widest">Vinculacion con adulto mayor</h4>
                                 </div>
                                 <button type="button" wire:click="$toggle('mostrarQuickRegAdulto')"
                                         class="px-3 py-1 rounded-lg border border-[#E27D60] text-[#E27D60] text-[8px] font-black uppercase tracking-wider transition hover:bg-[#E27D60] hover:text-white active:scale-95 inline-flex items-center gap-1 shadow-sm">
@@ -1206,21 +1264,31 @@
                                     <div>
                                         <label class="mb-1 block text-[8px] font-black uppercase tracking-widest text-[#2F3E5C]/60">Parentesco / Vínculo *</label>
                                         <select wire:model="selected_parentesco" class="w-full h-10 rounded-xl border border-[#C7B5A3] bg-white px-3 py-2 text-xs font-bold text-[#2F3E5C] outline-none transition focus:border-[#E27D60]">
-                                            <option value="Hijo/a">Hijo/a</option>
-                                            <option value="Cónyuge">Cónyuge</option>
-                                            <option value="Nieto/a">Nieto/a</option>
-                                            <option value="Hermano/a">Hermano/a</option>
-                                            <option value="Sobrino/a">Sobrino/a</option>
-                                            <option value="Tutor">Tutor</option>
-                                            <option value="Otro">Otro</option>
+                                            <option value="HIJO/A">HIJO/A</option>
+                                            <option value="CONYUGE">CONYUGE</option>
+                                            <option value="NIETO/A">NIETO/A</option>
+                                            <option value="HERMANO/A">HERMANO/A</option>
+                                            <option value="SOBRINO/A">SOBRINO/A</option>
+                                            <option value="TUTOR">TUTOR</option>
+                                            <option value="OTRO">OTRO</option>
                                         </select>
                                         @error('selected_parentesco') <span class="mt-1 block text-[8px] font-black text-[#E27D60] uppercase">{{ $message }}</span> @enderror
                                     </div>
-                                    <div class="flex items-center h-10 pb-2 pl-2">
+                                    <div class="flex flex-col gap-1.5 justify-center pl-2 pt-1">
                                         <label class="relative inline-flex items-center cursor-pointer select-none">
                                             <input type="checkbox" wire:model="selected_es_responsable" class="sr-only peer">
-                                            <div class="w-9 h-5 bg-[#C7B5A3]/50 rounded-full peer peer-focus:ring-2 peer-focus:ring-[#E27D60]/20 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#8DA280]"></div>
-                                            <span class="ml-2 text-[8px] font-black uppercase tracking-wider text-[#2F3E5C]">¿Es Responsable?</span>
+                                            <div class="w-7 h-4 bg-[#C7B5A3]/50 rounded-full peer peer-focus:ring-2 peer-focus:ring-[#E27D60]/20 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-[#8DA280]"></div>
+                                            <span class="ml-2 text-[8px] font-black uppercase tracking-wider text-[#2F3E5C]">Resp. Principal</span>
+                                        </label>
+                                        <label class="relative inline-flex items-center cursor-pointer select-none">
+                                            <input type="checkbox" wire:model="selected_responsable_salud" class="sr-only peer">
+                                            <div class="w-7 h-4 bg-[#C7B5A3]/50 rounded-full peer peer-focus:ring-2 peer-focus:ring-[#E27D60]/20 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-[#3B82F6]"></div>
+                                            <span class="ml-2 text-[8px] font-black uppercase tracking-wider text-[#2F3E5C]">Resp. Salud</span>
+                                        </label>
+                                        <label class="relative inline-flex items-center cursor-pointer select-none">
+                                            <input type="checkbox" wire:model="selected_responsable_economico" class="sr-only peer">
+                                            <div class="w-7 h-4 bg-[#C7B5A3]/50 rounded-full peer peer-focus:ring-2 peer-focus:ring-[#E27D60]/20 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-[#F59E0B]"></div>
+                                            <span class="ml-2 text-[8px] font-black uppercase tracking-wider text-[#2F3E5C]">Resp. Económico</span>
                                         </label>
                                     </div>
                                 </div>
@@ -1258,7 +1326,7 @@
                                             <tr class="bg-[#F4EEE7] text-[8px] font-black uppercase tracking-widest text-[#2F3E5C]/75 border-b border-[#C7B5A3]/30">
                                                 <th class="px-3 py-2">Adulto Mayor</th>
                                                 <th class="px-3 py-2">Vínculo/Parentesco</th>
-                                                <th class="px-3 py-2 text-center">Responsable</th>
+                                                <th class="px-3 py-2 text-center">Responsabilidades</th>
                                                 <th class="px-3 py-2">Observaciones</th>
                                                 <th class="px-3 py-2 text-center">Acciones</th>
                                             </tr>
@@ -1273,12 +1341,21 @@
                                                 <td class="px-3 py-2">
                                                     <span class="px-2 py-0.5 rounded bg-[#C7B5A3]/20 text-[#2F3E5C] text-[8px] font-black uppercase">{{ $v['parentesco_vinculo'] }}</span>
                                                 </td>
-                                                <td class="px-3 py-2 text-center">
-                                                    @if($v['es_responsable'] === 'SI')
-                                                        <span class="px-1.5 py-0.5 rounded bg-[#8DA280]/20 text-[#8DA280] text-[8px] font-black uppercase">SÍ</span>
-                                                    @else
-                                                        <span class="px-1.5 py-0.5 rounded bg-[#C7B5A3]/20 text-[#2F3E5C]/60 text-[8px] font-black uppercase">NO</span>
-                                                    @endif
+                                                <td class="px-3 py-2 text-center space-y-1">
+                                                    <div class="flex flex-col gap-1 items-center">
+                                                        @if($v['es_responsable'] === 'SI')
+                                                            <span class="px-1.5 py-0.5 rounded bg-[#8DA280]/20 text-[#8DA280] text-[8px] font-black uppercase block">PRINCIPAL</span>
+                                                        @endif
+                                                        @if(($v['responsable_salud'] ?? 'NO') === 'SI')
+                                                            <span class="px-1.5 py-0.5 rounded bg-blue-50 text-blue-600 text-[8px] font-black uppercase block">SALUD</span>
+                                                        @endif
+                                                        @if(($v['responsable_economico'] ?? 'NO') === 'SI')
+                                                            <span class="px-1.5 py-0.5 rounded bg-yellow-50 text-yellow-600 text-[8px] font-black uppercase block">ECONÓMICO</span>
+                                                        @endif
+                                                        @if($v['es_responsable'] !== 'SI' && ($v['responsable_salud'] ?? 'NO') !== 'SI' && ($v['responsable_economico'] ?? 'NO') !== 'SI')
+                                                            <span class="px-1.5 py-0.5 rounded bg-[#C7B5A3]/20 text-[#2F3E5C]/60 text-[8px] font-black uppercase block">NINGUNO</span>
+                                                        @endif
+                                                    </div>
                                                 </td>
                                                 <td class="px-3 py-2 text-[#2F3E5C]/70">
                                                     {{ $v['observaciones'] ?: 'Sin observaciones adicionales' }}

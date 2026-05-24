@@ -20,6 +20,8 @@ class Voluntario extends Model
         'estado',
         'observaciones',
         'cod_usu',
+        'disponibilidad_inicial',
+        'area_apoyo_preferente',
     ];
 
     /**

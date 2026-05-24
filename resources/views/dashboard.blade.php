@@ -1,127 +1,111 @@
 <x-sistema-layout>
 
-                <x-ui.encabezado-dashboard :estadisticas="$estadisticas ?? []" />
+    {{-- Zona 1: Encabezado personalizado --}}
+    <x-ui.encabezado-dashboard :saludo="$saludo ?? []" />
 
-                <x-ui.seccion-graficos-dashboard />
+    {{-- Zona 2: KPIs institucionales --}}
+    <x-ui.kpis-dashboard :kpis="$kpisInstitucionales ?? []" />
 
-                <x-ui.tabla-usuarios-dashboard :usuarios="$usuariosDashboard ?? []" />
+    {{-- Zona 3: Resumen de salud + Equipo institucional --}}
+    <div class="grid gap-4 xl:grid-cols-2">
+        <x-ui.panel-salud-dashboard :resumen="$resumenSalud ?? []" />
+        <x-ui.panel-equipo-institucional :equipo="$equipoInstitucional ?? []" :redFamiliar="$redFamiliar ?? []" />
+    </div>
 
-                <div class="grid gap-4 xl:grid-cols-3">
-                    <x-ui.panel-actividades-dashboard :actividades="$actividadesDashboard ?? $operacionHoy ?? []" />
-                    <x-ui.panel-alertas-dashboard :alertas="$alertasAdministrativas ?? []" />
-                    <x-ui.panel-modulos-dashboard :modulos="$modulos ?? []" />
-                </div>
+    {{-- Zona 4: Gráficas --}}
+    <x-ui.seccion-graficos-dashboard />
 
-                <x-ui.tabla-bitacora-dashboard :registros="$bitacoraDashboard ?? []" />
+    {{-- Zona 5: Alertas + Actividades --}}
+    <div class="grid gap-4 xl:grid-cols-[1fr_1.35fr]">
+        <x-ui.panel-alertas-dashboard :alertas="$alertasEstructuradas ?? []" />
+        <x-ui.panel-actividades-dashboard :actividades="$actividadesDashboard ?? []" />
+    </div>
 
-        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    {{-- Zona 6: Bitácora --}}
+    <x-ui.tabla-bitacora-dashboard :registros="$bitacoraDashboard ?? []" />
 
-        <script>
-            window.dashboardData = {
-                usuariosPorRol: @json($usuariosPorRol ?? ['labels' => [], 'data' => []]),
-                actividadMensual: @json($actividadMensual ?? ['labels' => [], 'data' => []]),
-                estadisticas: @json($estadisticas ?? []),
-            };
+    <script>
+        window.dashboardData = {
+            adultosPorEstado: @json($adultosPorEstado ?? ['labels' => [], 'data' => [], 'colores' => []]),
+            distribucionEquipo: @json($distribucionEquipoInstitucional ?? ['labels' => [], 'data' => [], 'colores' => []]),
+        };
 
-            document.addEventListener('DOMContentLoaded', () => {
-                const light = document.querySelector('.mouse-light');
+        document.addEventListener('DOMContentLoaded', () => {
 
-                if (light) {
-                    document.addEventListener('mousemove', (e) => {
-                        light.style.opacity = '1';
-                        light.style.transform = `translate(${e.clientX - 85}px, ${e.clientY - 85}px)`;
-                    });
-
-                    document.addEventListener('mouseleave', () => {
-                        light.style.opacity = '0';
-                    });
-                }
-
-                const colores = ['#E97A5F', '#2F3E5C', '#8DA280', '#967B66', '#F4A261'];
-
-                function crearGrafico(id, tipo, labels, data) {
-                    const ctx = document.getElementById(id);
-                    if (!ctx || typeof Chart === 'undefined') return;
-
-                    new Chart(ctx, {
-                        type: tipo,
-                        data: {
-                            labels: labels,
-                            datasets: [{
-                                data: data,
-                                backgroundColor: tipo === 'line' ? 'rgba(233,122,95,0.16)' : colores,
-                                borderColor: '#E97A5F',
-                                borderWidth: tipo === 'line' ? 3 : 0,
-                                fill: tipo === 'line',
-                                tension: 0.4,
-                                borderRadius: tipo === 'bar' ? 10 : 0,
-                            }]
-                        },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            cutout: tipo === 'doughnut' ? '65%' : undefined,
-                            plugins: {
-                                legend: {
-                                    display: tipo !== 'bar',
-                                    position: 'bottom',
-                                    labels: {
-                                        color: '#2F3E5C',
-                                        boxWidth: 10,
-                                        font: { size: 11, weight: 'bold' }
-                                    }
+            // Gráfico 1: Adultos por estado (doughnut)
+            (function () {
+                const ctx = document.getElementById('graficoAdultosPorEstado');
+                if (!ctx || typeof Chart === 'undefined') return;
+                const d = window.dashboardData.adultosPorEstado;
+                new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: d.labels ?? [],
+                        datasets: [{
+                            data: d.data ?? [],
+                            backgroundColor: d.colores ?? ['#2F3E5C', '#F4A261', '#C7B5A3'],
+                            borderWidth: 0,
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        cutout: '68%',
+                        plugins: {
+                            datalabels: { display: false },
+                            legend: {
+                                display: true,
+                                position: 'bottom',
+                                labels: {
+                                    color: '#2F3E5C',
+                                    boxWidth: 10,
+                                    font: { size: 11, weight: 'bold' }
                                 }
-                            },
-                            scales: tipo === 'bar' || tipo === 'line' ? {
-                                y: {
-                                    grid: { color: 'rgba(47,62,92,0.08)' },
-                                    ticks: {
-                                        color: '#2F3E5C',
-                                        font: { size: 11, weight: 'bold' }
-                                    }
-                                },
-                                x: {
-                                    grid: { display: false },
-                                    ticks: {
-                                        color: '#2F3E5C',
-                                        font: { size: 11, weight: 'bold' }
-                                    }
-                                }
-                            } : {}
+                            }
                         }
-                    });
-                }
+                    }
+                });
+            })();
 
-                crearGrafico(
-                    'graficoUsuariosRol',
-                    'bar',
-                    window.dashboardData.usuariosPorRol.labels ?? [],
-                    window.dashboardData.usuariosPorRol.data ?? []
-                );
+            // Gráfico 2: Distribución equipo institucional (barra horizontal)
+            (function () {
+                const ctx = document.getElementById('graficoEquipoInstitucional');
+                if (!ctx || typeof Chart === 'undefined') return;
+                const d = window.dashboardData.distribucionEquipo;
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: d.labels ?? [],
+                        datasets: [{
+                            data: d.data ?? [],
+                            backgroundColor: d.colores ?? ['#9B8AC7', '#E97A5F', '#8DA280'],
+                            borderWidth: 0,
+                            borderRadius: 8,
+                        }]
+                    },
+                    options: {
+                        indexAxis: 'y',
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            datalabels: { display: false },
+                            legend: { display: false }
+                        },
+                        scales: {
+                            x: {
+                                grid: { color: 'rgba(47,62,92,0.08)' },
+                                ticks: { color: '#2F3E5C', font: { size: 11, weight: 'bold' } }
+                            },
+                            y: {
+                                grid: { display: false },
+                                ticks: { color: '#2F3E5C', font: { size: 11, weight: 'bold' } }
+                            }
+                        }
+                    }
+                });
+            })();
 
-                crearGrafico(
-                    'graficoActividadMensual',
-                    'line',
-                    window.dashboardData.actividadMensual.labels ?? [],
-                    window.dashboardData.actividadMensual.data ?? []
-                );
+        });
+    </script>
 
-                crearGrafico(
-    'graficoCumplimientoAdmin',
-    'bar',
-    [
-        'Usuarios con rol',
-        'Adultos vinculados',
-        'Voluntarios asignados',
-        'Actividades programadas'
-    ],
-    [
-        window.dashboardData.estadisticas.usuarios_con_rol ?? 0,
-        window.dashboardData.estadisticas.adultos_con_familiar ?? 0,
-        window.dashboardData.estadisticas.voluntarios_asignados ?? 0,
-        window.dashboardData.estadisticas.actividades_programadas ?? 0
-    ]
-);
-            });
-        </script>
 </x-sistema-layout>

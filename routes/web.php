@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Admin\UsuarioController;
 use App\Http\Controllers\Admin\AdultoMayorController;
+use App\Http\Controllers\Admin\Reportes\ReporteInstitucionalController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -225,6 +226,23 @@ Route::middleware([
                     Route::get('/{adulto}/administracion', \App\Livewire\Admin\SaludSeguimiento\SaludAdministracionMedicacionPanel::class)->name('administracion');
                     Route::get('/{adulto}/signos', \App\Livewire\Admin\SaludSeguimiento\SaludSignosPanel::class)->name('signos');
                     Route::get('/{adulto}/valoracion', \App\Livewire\Admin\SaludSeguimiento\SaludValoracionPanel::class)->name('valoracion');
+                });
+
+            // ── Reportes Institucionales ─────────
+            Route::prefix('reportes')
+                ->name('reportes.')
+                ->group(function () {
+                    Route::get('institucional', [ReporteInstitucionalController::class, 'preview'])
+                        ->middleware('permission:reportes.institucional')
+                        ->name('institucional.preview');
+
+                    Route::get('institucional/pdf', [ReporteInstitucionalController::class, 'pdf'])
+                        ->middleware('permission:reportes.institucional')
+                        ->name('institucional.pdf');
+
+                    Route::get('institucional/excel', [ReporteInstitucionalController::class, 'excel'])
+                        ->middleware('permission:reportes.institucional')
+                        ->name('institucional.excel');
                 });
 
             // ── Bitácora ─────────────────────────

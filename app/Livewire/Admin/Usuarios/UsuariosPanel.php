@@ -9,6 +9,8 @@ use Livewire\WithPagination;
 use Livewire\WithFileUploads;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class UsuariosPanel extends Component
 {
@@ -58,6 +60,7 @@ class UsuariosPanel extends Component
 
     // ── Campos adicionales ──
     public $direccion;
+    public $referencia_domicilio;
     public $zona;
     public $ciudad;
     public $contacto_emergencia;
@@ -69,6 +72,34 @@ class UsuariosPanel extends Component
     public $disponibilidad_inicial;
     public $area_apoyo_preferente;
     public $observacion_vinculo;
+
+    // Catalogos internos para domicilio hasta contar con tablas territoriales.
+    public array $catalogDepartamentos = [
+        'LA PAZ' => ['LA PAZ', 'EL ALTO', 'OTRO'],
+        'SANTA CRUZ' => ['SANTA CRUZ DE LA SIERRA', 'MONTERO', 'WARNES', 'LA GUARDIA', 'EL TORNO', 'OTRO'],
+        'COCHABAMBA' => ['COCHABAMBA', 'SACABA', 'QUILLACOLLO', 'COLCAPIRHUA', 'TIRAQUE', 'OTRO'],
+        'ORURO' => ['ORURO', 'CHALLAPATA', 'HUANUNI', 'OTRO'],
+        'POTOSI' => ['POTOSI', 'TUPIZA', 'VILLAZON', 'UYUNI', 'OTRO'],
+        'CHUQUISACA' => ['SUCRE', 'MONTEAGUDO', 'YOTALA', 'OTRO'],
+        'TARIJA' => ['TARIJA', 'YACUIBA', 'BERMEJO', 'VILLAMONTES', 'OTRO'],
+        'BENI' => ['TRINIDAD', 'RIBERALTA', 'GUAYARAMERIN', 'OTRO'],
+        'PANDO' => ['COBIJA', 'SENA', 'PORVENIR', 'OTRO'],
+        'OTRO' => ['OTRO'],
+    ];
+
+    public array $catalogZonas = [
+        'LA PAZ' => ['CENTRO', 'SOPOCACHI', 'MIRAFLORES', 'SAN PEDRO', 'OBRAJES', 'CALACOTO', 'IRPAVI', 'ACHUMANI', 'VILLA FÁTIMA', 'VILLA COPACABANA', 'MAX PAREDES', 'COTAHUMA', 'MUNAYPATA', 'PAMPAHASI', 'ALTO OBRAJES', 'OTRO'],
+        'EL ALTO' => ['CIUDAD SATÉLITE', 'VILLA DOLORES', '16 DE JULIO', 'RÍO SECO', 'VILLA ADELA', 'SENKATA', 'CEJA', 'LOS ANDES', 'OTRO'],
+        'COCHABAMBA' => ['CALA CALA', 'QUERU QUERU', 'SARCO', 'LAS CUADRAS', 'CENTRO', 'OTRO'],
+        'SANTA CRUZ DE LA SIERRA' => ['EQUIPETROL', 'URBARI', 'LAS PALMAS', 'CENTRO', 'VILLA PRIMERO DE MAYO', 'PLAN TRES MIL', 'OTRO'],
+    ];
+
+    public $departamento_domicilio = 'LA PAZ';
+    public $municipio_domicilio = 'LA PAZ';
+    public $zona_domicilio = '';
+    public $otro_departamento = '';
+    public $otro_municipio = '';
+    public $otra_zona = '';
 
     // ── Nuevas propiedades de Domicilio y Emergencia ──
     public $calle;
@@ -84,8 +115,10 @@ class UsuariosPanel extends Component
     // ── Vinculación de Adultos Mayores (Rol Familiar) ──
     public array $vinculosFamiliar = [];
     public $selected_cod_am = '';
-    public $selected_parentesco = 'Hijo/a';
+    public $selected_parentesco = 'HIJO/A';
     public $selected_es_responsable = false;
+    public $selected_responsable_salud = false;
+    public $selected_responsable_economico = false;
     public $selected_observaciones = '';
 
     // Quick registration for Adulto Mayor
@@ -174,20 +207,165 @@ class UsuariosPanel extends Component
 
     public function updatedRol($val)
     {
+        // Limpieza por rol: resetear campos específicos del rol anterior para no dejar datos huérfanos
+        $this->especialidad_salud = null;
+        $this->matricula_prof = null;
+        $this->institucion_formacion = null;
+        $this->cargo_administrativo = null;
+        $this->disponibilidad_inicial = null;
+        $this->area_apoyo_preferente = null;
+        $this->observacion_vinculo = null;
+        $this->vinculosFamiliar = [];
+
         if ($val === 'voluntario') {
             $this->cod_area = 'ARE_0008'; // Voluntariado y Relaciones Institucionales
-            $this->especialidad_salud = null;
-            $this->cargo_administrativo = null;
+            $this->fecha_ingreso = now()->format('Y-m-d');
         } elseif ($val === 'familiar') {
             $this->cod_area = null;
-            $this->especialidad_salud = null;
-            $this->cargo_administrativo = null;
+            $this->fecha_ingreso = null;
         } elseif ($val === 'personal_salud') {
-            $this->cargo_administrativo = null;
             $this->cod_area = 'ARE_0004'; // Sugerencia inicial
+            $this->fecha_ingreso = now()->format('Y-m-d');
         } elseif ($val === 'personal_admin') {
-            $this->especialidad_salud = null;
             $this->cod_area = 'ARE_0003'; // Sugerencia inicial
+            $this->fecha_ingreso = now()->format('Y-m-d');
+        }
+    }
+
+    public function updatedDepartamentoDomicilio($val)
+    {
+        if ($val && $val !== 'OTRO') {
+            $muniList = $this->catalogDepartamentos[$val] ?? [];
+            $this->municipio_domicilio = $muniList[0] ?? '';
+        } else {
+            $this->municipio_domicilio = 'OTRO';
+        }
+        $this->zona_domicilio = '';
+        $this->otra_zona = '';
+    }
+
+    public function updatedMunicipioDomicilio($val)
+    {
+        $this->zona_domicilio = '';
+        $this->otra_zona = '';
+    }
+
+    /**
+     * Método preparado para buscar un familiar existente por documento o correo
+     * y permitir su reutilización en futuros flujos sin duplicar el registro.
+     */
+    public function buscarFamiliarExistente($numeroDocumento, $correo)
+    {
+        return User::where('correo', $correo)
+            ->orWhere('numero_documento', $numeroDocumento)
+            ->whereHas('roles', function($q) {
+                $q->where('name', 'familiar');
+            })->first();
+    }
+
+    public function normalizarDatosFormulario()
+    {
+        $this->nombres = $this->normalizarMayusculas($this->nombres);
+        $this->ap_paterno = $this->normalizarMayusculas($this->ap_paterno);
+        $this->ap_materno = $this->normalizarMayusculas($this->ap_materno);
+        $this->genero = $this->normalizarMayusculas($this->genero);
+        $this->numero_documento = $this->normalizarMayusculas($this->numero_documento);
+        $this->expedido = $this->normalizarMayusculas($this->expedido);
+        $this->departamento_domicilio = $this->normalizarMayusculas($this->departamento_domicilio);
+        $this->municipio_domicilio = $this->normalizarMayusculas($this->municipio_domicilio);
+        $this->zona_domicilio = $this->normalizarMayusculas($this->zona_domicilio);
+        $this->otro_departamento = $this->normalizarMayusculas($this->otro_departamento);
+        $this->otro_municipio = $this->normalizarMayusculas($this->otro_municipio);
+        $this->otra_zona = $this->normalizarMayusculas($this->otra_zona);
+        $this->calle = $this->normalizarMayusculas($this->calle);
+        $this->nro_domicilio = $this->normalizarMayusculas($this->nro_domicilio);
+        
+        $finalDept = $this->departamento_domicilio === 'OTRO' 
+            ? $this->normalizarMayusculas($this->otro_departamento) 
+            : $this->departamento_domicilio;
+
+        $finalMuni = $this->municipio_domicilio === 'OTRO'
+            ? $this->normalizarMayusculas($this->otro_municipio)
+            : $this->municipio_domicilio;
+            
+        $finalZona = (isset($this->catalogZonas[$this->municipio_domicilio]) && $this->zona_domicilio !== 'OTRO')
+            ? $this->zona_domicilio
+            : $this->normalizarMayusculas($this->otra_zona);
+            
+        $this->ciudad = $this->normalizarMayusculas($finalMuni ?: $finalDept);
+        $this->zona = $this->normalizarMayusculas($finalZona);
+        
+        $this->contacto_emergencia = $this->normalizarMayusculas($this->contacto_emergencia);
+        $this->ap_paterno_emergencia = $this->normalizarMayusculas($this->ap_paterno_emergencia);
+        $this->ap_materno_emergencia = $this->normalizarMayusculas($this->ap_materno_emergencia);
+        $this->parentesco_emergencia = $this->normalizarMayusculas($this->parentesco_emergencia);
+        $this->institucion_formacion = $this->normalizarMayusculas($this->institucion_formacion);
+        $this->disponibilidad_inicial = $this->normalizarMayusculas($this->disponibilidad_inicial);
+        $this->area_apoyo_preferente = $this->normalizarMayusculas($this->area_apoyo_preferente);
+        $this->observacion_vinculo = $this->normalizarMayusculas($this->observacion_vinculo);
+        $this->referencia_domicilio = $this->normalizarMayusculas($this->referencia_domicilio);
+        $this->selected_parentesco = $this->normalizarMayusculas($this->selected_parentesco);
+        $this->selected_observaciones = $this->normalizarMayusculas($this->selected_observaciones);
+
+        foreach ($this->vinculosFamiliar as $index => $vinculo) {
+            $this->vinculosFamiliar[$index]['parentesco_vinculo'] = $this->normalizarMayusculas($vinculo['parentesco_vinculo'] ?? null);
+            $this->vinculosFamiliar[$index]['observaciones'] = $this->normalizarMayusculas($vinculo['observaciones'] ?? null);
+        }
+        
+        $this->correo = $this->correo ? strtolower(trim($this->correo)) : null;
+        
+        if ($this->telefono) {
+            $this->telefono = preg_replace('/\D+/', '', $this->telefono);
+        }
+        if ($this->celular_emergencia) {
+            $this->celular_emergencia = preg_replace('/\D+/', '', $this->celular_emergencia);
+        }
+
+        $this->limpiarCamposPorRol();
+    }
+
+    private function limpiarCamposPorRol(): void
+    {
+        if ($this->rol === 'personal_admin') {
+            $this->especialidad_salud = null;
+            $this->matricula_prof = null;
+            $this->institucion_formacion = null;
+            $this->disponibilidad_inicial = null;
+            $this->area_apoyo_preferente = null;
+            $this->observacion_vinculo = null;
+            $this->vinculosFamiliar = [];
+            return;
+        }
+
+        if ($this->rol === 'personal_salud') {
+            $this->cargo_administrativo = null;
+            $this->matricula_prof = null;
+            $this->disponibilidad_inicial = null;
+            $this->area_apoyo_preferente = null;
+            $this->observacion_vinculo = null;
+            $this->vinculosFamiliar = [];
+            return;
+        }
+
+        if ($this->rol === 'voluntario') {
+            $this->cargo_administrativo = null;
+            $this->especialidad_salud = null;
+            $this->matricula_prof = null;
+            $this->institucion_formacion = null;
+            $this->observacion_vinculo = null;
+            $this->vinculosFamiliar = [];
+            return;
+        }
+
+        if ($this->rol === 'familiar') {
+            $this->cod_area = null;
+            $this->cargo_administrativo = null;
+            $this->especialidad_salud = null;
+            $this->matricula_prof = null;
+            $this->institucion_formacion = null;
+            $this->disponibilidad_inicial = null;
+            $this->area_apoyo_preferente = null;
+            $this->fecha_ingreso = null;
         }
     }
 
@@ -284,8 +462,9 @@ class UsuariosPanel extends Component
             'telefono' => ['required', 'string', 'max:20'],
             'calle' => ['required', 'string', 'min:2', 'max:150'],
             'nro_domicilio' => ['required', 'string', 'max:20'],
-            'zona' => ['required', 'string', 'min:2', 'max:100'],
-            'ciudad' => ['required', 'string', 'min:2', 'max:100'],
+            'departamento_domicilio' => ['required', 'string'],
+            'municipio_domicilio' => ['required', 'string'],
+            'referencia_domicilio' => ['nullable', 'string', 'max:255'],
             'contacto_emergencia' => ['required', 'string', 'min:2', 'max:150', 'regex:/^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s\-]+$/u'],
             'ap_paterno_emergencia' => ['required_without:ap_materno_emergencia', 'nullable', 'string', 'max:100', 'regex:/^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s\-]+$/u'],
             'ap_materno_emergencia' => ['required_without:ap_paterno_emergencia', 'nullable', 'string', 'max:100', 'regex:/^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s\-]+$/u'],
@@ -294,6 +473,22 @@ class UsuariosPanel extends Component
             'rol' => ['required', 'exists:roles,name'],
             'cod_area' => ['nullable', 'exists:areas_institucionales,cod_area'],
         ];
+
+        if ($this->departamento_domicilio === 'OTRO') {
+            $rules['otro_departamento'] = ['required', 'string', 'min:2', 'max:100'];
+        }
+        if ($this->municipio_domicilio === 'OTRO') {
+            $rules['otro_municipio'] = ['required', 'string', 'min:2', 'max:100'];
+        }
+
+        if (isset($this->catalogZonas[$this->municipio_domicilio])) {
+            $rules['zona_domicilio'] = ['required', 'string'];
+            if ($this->zona_domicilio === 'OTRO') {
+                $rules['otra_zona'] = ['required', 'string', 'min:2', 'max:100'];
+            }
+        } else {
+            $rules['otra_zona'] = ['required', 'string', 'min:2', 'max:100'];
+        }
 
         if ($this->isEdit) {
             $rules['estado'] = ['required', 'in:ACTIVO,INACTIVO,ARCHIVADO'];
@@ -306,7 +501,6 @@ class UsuariosPanel extends Component
 
         if ($this->rol === 'personal_salud') {
             $rules['especialidad_salud'] = ['required', 'exists:especialidades,cod_esp'];
-            $rules['matricula_prof'] = ['required', 'string', 'max:50'];
             $rules['institucion_formacion'] = ['nullable', 'string', 'max:255'];
             $rules['fecha_ingreso'] = ['required', 'date'];
         }
@@ -324,6 +518,8 @@ class UsuariosPanel extends Component
 
         if ($this->rol === 'familiar') {
             $rules['observacion_vinculo'] = ['nullable', 'string', 'max:255'];
+            $rules['vinculosFamiliar'] = ['required', 'array', 'min:1'];
+            $rules['vinculosFamiliar.*.parentesco_vinculo'] = ['required', 'string', 'max:100'];
         }
 
         return $rules;
@@ -352,7 +548,6 @@ class UsuariosPanel extends Component
             'cargo_administrativo.required' => 'Debe seleccionar el cargo administrativo del funcionario.',
             'fecha_ingreso.required' => 'Debe registrar la fecha de ingreso del trabajador.',
             'fecha_ingreso.date' => 'La fecha de ingreso registrada debe ser una fecha válida.',
-            'matricula_prof.required' => 'Por favor, ingrese el número de matrícula profesional del personal de salud.',
             'contacto_emergencia.required' => 'Debe ingresar el nombre del contacto de emergencia.',
             'contacto_emergencia.min' => 'El nombre del contacto de emergencia debe tener al menos 2 caracteres.',
             'contacto_emergencia.regex' => 'El nombre del contacto solo puede contener letras y espacios.',
@@ -371,6 +566,9 @@ class UsuariosPanel extends Component
             'zona.min' => 'La zona debe tener al menos 2 caracteres.',
             'ciudad.required' => 'Debe seleccionar una ciudad.',
             'ciudad.min' => 'La ciudad debe tener al menos 2 caracteres.',
+            'vinculosFamiliar.required' => 'Debe vincular al menos un adulto mayor al familiar.',
+            'vinculosFamiliar.min' => 'Debe vincular al menos un adulto mayor al familiar.',
+            'vinculosFamiliar.*.parentesco_vinculo.required' => 'Debe registrar el parentesco del vinculo familiar.',
         ];
     }
 
@@ -495,13 +693,18 @@ class UsuariosPanel extends Component
             'telefono', 'pais_telefono', 'codigo_telefono', 'rol', 'cod_area', 'password', 'password_actual', 'password_confirmation',
             'usuarioId', 'fecha_ingreso', 'especialidad_salud', 'cargo_administrativo', 'observaciones',
             'foto_de_perfil_upload', 'edad', 'passwordTemporalVisual',
-            'direccion', 'zona', 'ciudad', 'contacto_emergencia', 'parentesco_emergencia', 'celular_emergencia',
+            'direccion', 'referencia_domicilio', 'zona', 'ciudad', 'contacto_emergencia', 'parentesco_emergencia', 'celular_emergencia',
             'tipo_vinculacion', 'matricula_prof', 'institucion_formacion', 'disponibilidad_inicial',
             'area_apoyo_preferente', 'observacion_vinculo',
             'calle', 'nro_domicilio', 'ap_paterno_emergencia', 'ap_materno_emergencia',
             'vinculosFamiliar', 'selected_cod_am', 'selected_parentesco', 'selected_es_responsable', 'selected_observaciones',
-            'mostrarQuickRegAdulto', 'quick_nombres', 'quick_ap_paterno', 'quick_ap_materno', 'quick_ci', 'quick_genero', 'quick_fecha_nac'
+            'mostrarQuickRegAdulto', 'quick_nombres', 'quick_ap_paterno', 'quick_ap_materno', 'quick_ci', 'quick_genero', 'quick_fecha_nac',
+            'departamento_domicilio', 'municipio_domicilio', 'zona_domicilio',
+            'otro_departamento', 'otro_municipio', 'otra_zona',
+            'selected_responsable_salud', 'selected_responsable_economico'
         ]);
+        $this->departamento_domicilio = 'LA PAZ';
+        $this->municipio_domicilio = 'LA PAZ';
         $this->isEdit = false;
         $this->pasoFormulario = 1;
         $this->resetValidation();
@@ -537,6 +740,9 @@ class UsuariosPanel extends Component
 
     public function vincularAdultoMayor()
     {
+        $this->selected_parentesco = $this->normalizarMayusculas($this->selected_parentesco);
+        $this->selected_observaciones = $this->normalizarMayusculas($this->selected_observaciones);
+
         $this->validate([
             'selected_cod_am' => 'required',
             'selected_parentesco' => 'required|string|max:100',
@@ -573,13 +779,17 @@ class UsuariosPanel extends Component
             'nombres_completos' => $nombreCompleto,
             'parentesco_vinculo' => $this->selected_parentesco,
             'es_responsable' => $this->selected_es_responsable ? 'SI' : 'NO',
+            'responsable_salud' => $this->selected_responsable_salud ? 'SI' : 'NO',
+            'responsable_economico' => $this->selected_responsable_economico ? 'SI' : 'NO',
             'observaciones' => $this->selected_observaciones ?? '',
         ];
 
         // Limpiar campos de vinculación
         $this->selected_cod_am = '';
-        $this->selected_parentesco = 'Hijo/a';
+        $this->selected_parentesco = 'HIJO/A';
         $this->selected_es_responsable = false;
+        $this->selected_responsable_salud = false;
+        $this->selected_responsable_economico = false;
         $this->selected_observaciones = '';
 
         $this->dispatch('swal', [
@@ -624,11 +834,11 @@ class UsuariosPanel extends Component
 
         // Registrar Adulto Mayor
         $am = new \App\Models\AdultoMayor();
-        $am->nombres = $this->normalizarTexto($this->quick_nombres);
-        $am->ap_paterno = $this->normalizarTexto($this->quick_ap_paterno);
-        $am->ap_materno = $this->normalizarTexto($this->quick_ap_materno);
-        $am->ci = $this->quick_ci;
-        $am->genero = $this->quick_genero;
+        $am->nombres = $this->normalizarMayusculas($this->quick_nombres);
+        $am->ap_paterno = $this->normalizarMayusculas($this->quick_ap_paterno);
+        $am->ap_materno = $this->normalizarMayusculas($this->quick_ap_materno);
+        $am->ci = $this->normalizarMayusculas($this->quick_ci);
+        $am->genero = $this->normalizarMayusculas($this->quick_genero);
         $am->fecha_nac = $this->quick_fecha_nac;
         $am->cod_est_adul = 1; // ACTIVO
         $am->fecha_ing = now()->format('Y-m-d');
@@ -642,6 +852,8 @@ class UsuariosPanel extends Component
             'nombres_completos' => $nombreCompleto,
             'parentesco_vinculo' => $this->selected_parentesco,
             'es_responsable' => $this->selected_es_responsable ? 'SI' : 'NO',
+            'responsable_salud' => $this->selected_responsable_salud ? 'SI' : 'NO',
+            'responsable_economico' => $this->selected_responsable_economico ? 'SI' : 'NO',
             'observaciones' => $this->selected_observaciones ?? '',
         ];
 
@@ -720,10 +932,58 @@ class UsuariosPanel extends Component
         $this->observaciones = $usuario->observaciones;
 
         $this->direccion = $usuario->direccion;
+        $this->referencia_domicilio = null;
+        if (preg_match('/REF:\s*(.+)$/u', (string) $usuario->direccion, $match)) {
+            $this->referencia_domicilio = trim($match[1]);
+        }
         $this->calle = $usuario->calle;
         $this->nro_domicilio = $usuario->nro_domicilio;
         $this->zona = $usuario->zona;
         $this->ciudad = $usuario->ciudad;
+
+        // Cargar selects dependientes de dirección
+        $ciudadUpper = mb_strtoupper(trim($usuario->ciudad ?? ''), 'UTF-8');
+        $zonaUpper = mb_strtoupper(trim($usuario->zona ?? ''), 'UTF-8');
+        
+        $foundCity = false;
+        foreach ($this->catalogDepartamentos as $dept => $muniList) {
+            if (in_array($ciudadUpper, $muniList) && $dept !== 'OTRO' && $ciudadUpper !== 'OTRO') {
+                $this->departamento_domicilio = $dept;
+                $this->municipio_domicilio = $ciudadUpper;
+                $foundCity = true;
+                break;
+            }
+        }
+        
+        if (!$foundCity) {
+            if (array_key_exists($ciudadUpper, $this->catalogDepartamentos) && $ciudadUpper !== 'OTRO') {
+                $this->departamento_domicilio = $ciudadUpper;
+                $this->municipio_domicilio = 'OTRO';
+                $this->otro_municipio = $ciudadUpper;
+            } else {
+                $this->departamento_domicilio = 'OTRO';
+                $this->otro_departamento = $ciudadUpper;
+                $this->municipio_domicilio = 'OTRO';
+                $this->otro_municipio = $ciudadUpper;
+            }
+        } else {
+            $this->otro_departamento = '';
+            $this->otro_municipio = '';
+        }
+
+        // Cargar zonas dependientes
+        if (isset($this->catalogZonas[$this->municipio_domicilio])) {
+            if (in_array($zonaUpper, $this->catalogZonas[$this->municipio_domicilio])) {
+                $this->zona_domicilio = $zonaUpper;
+                $this->otra_zona = '';
+            } else {
+                $this->zona_domicilio = 'OTRO';
+                $this->otra_zona = $zonaUpper;
+            }
+        } else {
+            $this->zona_domicilio = 'OTRO';
+            $this->otra_zona = $zonaUpper;
+        }
         
         $this->contacto_emergencia = $usuario->contacto_emergencia;
         $this->ap_paterno_emergencia = $usuario->ap_paterno_emergencia;
@@ -738,7 +998,7 @@ class UsuariosPanel extends Component
             $ps = $usuario->personalSalud;
             $this->fecha_ingreso = $ps?->fecha_ing ? \Carbon\Carbon::parse($ps->fecha_ing)->format('Y-m-d') : '';
             $this->especialidad_salud = $ps?->cod_esp;
-            $this->matricula_prof = $ps?->matricula_prof;
+            $this->matricula_prof = null;
             $this->institucion_formacion = $ps?->institucion_formacion;
         } elseif ($this->rol === 'personal_admin') {
             $pa = $usuario->personalAdmin;
@@ -755,17 +1015,34 @@ class UsuariosPanel extends Component
             $fam = \App\Models\Familiar::where('cod_usu', $usuario->cod_usu)->first();
             if ($fam) {
                 $this->parentesco_emergencia = $fam->parentesco;
-                $this->observacion_vinculo = $fam->observacion_vinculo;
+                $this->observacion_vinculo = $fam->observaciones;
                 
                 // Cargar adultos mayores vinculados existentes
                 $this->vinculosFamiliar = [];
                 foreach ($fam->adultosMayores as $am) {
+                    $obs = $am->pivot->observaciones ?? '';
+                    $salud = 'NO';
+                    $economico = 'NO';
+                    $cleanObs = $obs;
+                    // Deserializar responsabilidades (acepta SI sin acento)
+                    if (preg_match('/Salud:\s*(\w+)/u', $obs, $m)) {
+                        $salud = in_array(mb_strtoupper($m[1], 'UTF-8'), ['SI']) ? 'SI' : 'NO';
+                    }
+                    if (preg_match('/Econ.mico:\s*(\w+)/u', $obs, $m)) {
+                        $economico = in_array(mb_strtoupper($m[1], 'UTF-8'), ['SI']) ? 'SI' : 'NO';
+                    }
+                    if (preg_match('/Obs:\s*(.+)$/u', $obs, $m)) {
+                        $cleanObs = trim($m[1]);
+                    }
+
                     $this->vinculosFamiliar[] = [
                         'cod_am' => $am->cod_am,
                         'nombres_completos' => trim("{$am->nombres} {$am->ap_paterno} {$am->ap_materno}"),
                         'parentesco_vinculo' => $am->pivot->parentesco_vinculo ?? 'Familiar',
                         'es_responsable' => $am->pivot->es_responsable ? 'SI' : 'NO',
-                        'observaciones' => $am->pivot->observaciones ?? '',
+                        'responsable_salud' => $salud,
+                        'responsable_economico' => $economico,
+                        'observaciones' => $cleanObs,
                     ];
                 }
             }
@@ -856,16 +1133,9 @@ class UsuariosPanel extends Component
                 ]);
             }
         } elseif ($this->pasoFormulario === 2) {
-            $this->correo = strtolower(trim($this->correo));
-            $this->contacto_emergencia = $this->normalizarMayusculas($this->contacto_emergencia);
-            $this->ap_paterno_emergencia = $this->normalizarMayusculas($this->ap_paterno_emergencia);
-            $this->ap_materno_emergencia = $this->normalizarMayusculas($this->ap_materno_emergencia);
-            $this->calle = $this->normalizarMayusculas($this->calle);
-            $this->nro_domicilio = $this->nro_domicilio ? mb_strtoupper(trim($this->nro_domicilio), 'UTF-8') : $this->nro_domicilio;
-            $this->zona = $this->normalizarMayusculas($this->zona);
-            $this->ciudad = $this->normalizarMayusculas($this->ciudad);
+            $this->normalizarDatosFormulario();
 
-            $this->validate([
+            $rulesPaso2 = [
                 'correo' => [
                     'required',
                     'string',
@@ -885,19 +1155,44 @@ class UsuariosPanel extends Component
                 'telefono' => ['required', 'string', 'max:20'],
                 'calle' => ['required', 'string', 'min:2', 'max:150'],
                 'nro_domicilio' => ['required', 'string', 'max:20'],
-                'zona' => ['required', 'string', 'min:2', 'max:100'],
-                'ciudad' => ['required', 'string', 'min:2', 'max:100'],
+                'departamento_domicilio' => ['required', 'string'],
+                'municipio_domicilio' => ['required', 'string'],
+                'referencia_domicilio' => ['nullable', 'string', 'max:255'],
                 'contacto_emergencia' => ['required', 'string', 'min:2', 'max:150', 'regex:/^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s\-]+$/u'],
                 'ap_paterno_emergencia' => ['required_without:ap_materno_emergencia', 'nullable', 'string', 'max:100', 'regex:/^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s\-]+$/u'],
                 'ap_materno_emergencia' => ['required_without:ap_paterno_emergencia', 'nullable', 'string', 'max:100', 'regex:/^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s\-]+$/u'],
                 'parentesco_emergencia' => ['required', 'string', 'max:100'],
                 'celular_emergencia' => ['required', 'string', 'max:20', 'different:telefono', 'regex:/^\d+$/'],
-            ], array_merge($this->messages(), [
+            ];
+
+            if ($this->departamento_domicilio === 'OTRO') {
+                $rulesPaso2['otro_departamento'] = ['required', 'string', 'min:2', 'max:100'];
+            }
+            if ($this->municipio_domicilio === 'OTRO') {
+                $rulesPaso2['otro_municipio'] = ['required', 'string', 'min:2', 'max:100'];
+            }
+
+            if (isset($this->catalogZonas[$this->municipio_domicilio])) {
+                $rulesPaso2['zona_domicilio'] = ['required', 'string'];
+                if ($this->zona_domicilio === 'OTRO') {
+                    $rulesPaso2['otra_zona'] = ['required', 'string', 'min:2', 'max:100'];
+                }
+            } else {
+                $rulesPaso2['otra_zona'] = ['required', 'string', 'min:2', 'max:100'];
+            }
+
+            $this->validate($rulesPaso2, array_merge($this->messages(), [
                 'contacto_emergencia.regex' => 'El nombre del contacto solo puede contener letras.',
                 'ap_paterno_emergencia.regex' => 'El apellido del contacto solo puede contener letras.',
                 'ap_materno_emergencia.regex' => 'El apellido del contacto solo puede contener letras.',
                 'celular_emergencia.different' => 'El celular de emergencia no puede ser igual al celular del usuario.',
-                'celular_emergencia.regex' => 'El celular de emergencia solo puede contener números.'
+                'celular_emergencia.regex' => 'El celular de emergencia solo puede contener números.',
+                'departamento_domicilio.required' => 'Debe seleccionar un departamento.',
+                'municipio_domicilio.required' => 'Debe seleccionar un municipio.',
+                'zona_domicilio.required' => 'Debe seleccionar una zona o barrio.',
+                'otro_departamento.required' => 'Debe especificar el departamento.',
+                'otro_municipio.required' => 'Debe especificar el municipio.',
+                'otra_zona.required' => 'Debe ingresar la zona o barrio.',
             ]));
 
             $this->validarTelefono(function($err) {
@@ -921,6 +1216,8 @@ class UsuariosPanel extends Component
                 $this->acceso_sistema = 'HABILITADO';
             }
 
+            $this->normalizarDatosFormulario();
+
             $rules = [
                 'rol' => ['required', 'exists:roles,name'],
             ];
@@ -932,7 +1229,6 @@ class UsuariosPanel extends Component
 
             if ($this->rol === 'personal_salud') {
                 $rules['especialidad_salud'] = ['required', 'exists:especialidades,cod_esp'];
-                $rules['matricula_prof'] = ['required', 'string', 'max:50'];
                 $rules['institucion_formacion'] = ['nullable', 'string', 'max:255'];
                 $rules['fecha_ingreso'] = ['required', 'date'];
             }
@@ -950,10 +1246,11 @@ class UsuariosPanel extends Component
 
             if ($this->rol === 'familiar') {
                 $rules['observacion_vinculo'] = ['nullable', 'string', 'max:255'];
+                $rules['vinculosFamiliar'] = ['required', 'array', 'min:1'];
+                $rules['vinculosFamiliar.*.parentesco_vinculo'] = ['required', 'string', 'max:100'];
             }
 
             $this->validate($rules, array_merge($this->messages(), [
-                'matricula_prof.required' => 'Por favor, ingrese el número de matrícula profesional del personal de salud.',
                 'fecha_ingreso.required' => 'Debe registrar la fecha de ingreso institucional.',
             ]));
 
@@ -1028,9 +1325,8 @@ class UsuariosPanel extends Component
             return;
         }
 
-        $this->nombres = $this->normalizarMayusculas($this->nombres);
-        $this->ap_paterno = $this->normalizarMayusculas($this->ap_paterno);
-        $this->ap_materno = $this->normalizarMayusculas($this->ap_materno);
+        // Ejecutar normalización completa
+        $this->normalizarDatosFormulario();
 
         $rules = $this->rules();
         $this->validate($rules);
@@ -1082,7 +1378,10 @@ class UsuariosPanel extends Component
             $this->correo = 'admincasaamandita@gmail.com';
         }
 
-        $this->direccion = 'Calle ' . $this->calle . ' Nº ' . $this->nro_domicilio . ', ' . $this->zona . ', ' . $this->ciudad;
+        $this->direccion = 'CALLE/AV. ' . $this->calle . ' NRO. ' . $this->nro_domicilio . ', ZONA ' . $this->zona . ', ' . $this->ciudad;
+        if (!empty($this->referencia_domicilio)) {
+            $this->direccion .= ', REF: ' . $this->referencia_domicilio;
+        }
 
         $userData = [
             'nombres' => $this->nombres,
@@ -1114,118 +1413,244 @@ class UsuariosPanel extends Component
             'tipo_vinculacion' => $this->tipo_vinculacion,
         ];
 
+        // Manejar archivo cargado fuera de la transacción
+        $oldPhotoToDelete = null;
+        $newPhotoPath = null;
         if ($this->foto_de_perfil_upload) {
             if ($this->isEdit && $this->usuarioId) {
                 $oldUser = User::find($this->usuarioId);
                 if ($oldUser && $oldUser->foto_de_perfil && \Storage::disk('public')->exists($oldUser->foto_de_perfil)) {
-                    \Storage::disk('public')->delete($oldUser->foto_de_perfil);
+                    $oldPhotoToDelete = $oldUser->foto_de_perfil;
                 }
             }
-            $path = $this->foto_de_perfil_upload->store('usuarios/fotos', 'public');
-            $userData['foto_de_perfil'] = $path;
+            $newPhotoPath = $this->foto_de_perfil_upload->store('usuarios/fotos', 'public');
+            $userData['foto_de_perfil'] = $newPhotoPath;
         }
 
         $mensaje = '';
-        $correoEnviado = false;
         $passwordTemporal = null;
+        $usuario = null;
+
+        try {
+            DB::beginTransaction();
+
+            if ($this->isEdit) {
+                $userData['estado'] = $estadoGuardado;
+                $userData['acceso_sistema'] = $accesoGuardado;
+
+                $usuario = User::findOrFail($this->usuarioId);
+
+                if ($usuario->cod_usu === auth()->id()) {
+                    if (!empty($this->password)) {
+                        $userData['password'] = Hash::make($this->password);
+                        $userData['debe_cambiar_password'] = false;
+                    }
+                } else {
+                    // Para otros usuarios, la contraseña no se cambia mediante el formulario general
+                    unset($userData['password']);
+                }
+
+                if ($usuario->hasRole('admin') && $this->rol !== 'admin') {
+                    $superadmins = User::role('admin')->where('estado', 'ACTIVO')->count();
+                    if ($superadmins <= 1) {
+                        throw new \Exception('No puedes quitar el rol de superadministrador al único superadministrador activo.');
+                    }
+                }
+
+                $usuario->update($userData);
+                $usuario->syncRoles([$this->rol]);
+
+                // Guardar sub-modelos de forma unificada en edición
+                if ($this->rol === 'personal_salud') {
+                    \App\Models\PersonalSalud::updateOrCreate(
+                        ['cod_usu' => $usuario->cod_usu],
+                        [
+                            'fecha_ing' => $this->fecha_ingreso ?: now()->format('Y-m-d'), 
+                            'cod_esp' => $this->especialidad_salud,
+                            'matricula_prof' => null,
+                            'institucion_formacion' => $this->institucion_formacion,
+                            'estado_laboral' => 'ACTIVO'
+                        ]
+                    );
+                    \App\Models\PersonalAdmin::where('cod_usu', $usuario->cod_usu)->delete();
+                    \App\Models\Voluntario::where('cod_usu', $usuario->cod_usu)->delete();
+                    \App\Models\Familiar::where('cod_usu', $usuario->cod_usu)->delete();
+                } elseif ($this->rol === 'personal_admin') {
+                    \App\Models\PersonalAdmin::updateOrCreate(
+                        ['cod_usu' => $usuario->cod_usu],
+                        [
+                            'fecha_ingreso' => $this->fecha_ingreso ?: now()->format('Y-m-d'), 
+                            'cod_cargo_admin' => $this->cargo_administrativo,
+                            'cargo' => \App\Models\CargoAdministrativo::find($this->cargo_administrativo)?->nombre ?? 'Administrativo',
+                            'area_admin' => $this->cod_area ? (\App\Models\AreaInstitucional::find($this->cod_area)?->nombre ?? 'Administración') : 'Administración',
+                            'estado_laboral' => 'ACTIVO'
+                        ]
+                    );
+                    \App\Models\PersonalSalud::where('cod_usu', $usuario->cod_usu)->delete();
+                    \App\Models\Voluntario::where('cod_usu', $usuario->cod_usu)->delete();
+                    \App\Models\Familiar::where('cod_usu', $usuario->cod_usu)->delete();
+                } elseif ($this->rol === 'voluntario') {
+                    \App\Models\Voluntario::updateOrCreate(
+                        ['cod_usu' => $usuario->cod_usu],
+                        [
+                            'fecha_ing' => $this->fecha_ingreso ?: now()->format('Y-m-d'),
+                            'area_apoyo' => $this->area_apoyo_preferente ?? 'General',
+                            'disponibilidad_inicial' => $this->disponibilidad_inicial,
+                            'area_apoyo_preferente' => $this->area_apoyo_preferente,
+                            'estado' => 'ACTIVO'
+                        ]
+                    );
+                    \App\Models\PersonalSalud::where('cod_usu', $usuario->cod_usu)->delete();
+                    \App\Models\PersonalAdmin::where('cod_usu', $usuario->cod_usu)->delete();
+                    \App\Models\Familiar::where('cod_usu', $usuario->cod_usu)->delete();
+                } elseif ($this->rol === 'familiar') {
+                    $hayResponsable = collect($this->vinculosFamiliar)->contains(fn($v) => $v['es_responsable'] === 'SI');
+                    $fam = \App\Models\Familiar::updateOrCreate(
+                        ['cod_usu' => $usuario->cod_usu],
+                        [
+                            'parentesco' => $this->parentesco_emergencia ?? 'Familiar',
+                            'direccion' => $this->direccion,
+                            'es_responsable' => $hayResponsable ? 'SI' : 'NO',
+                            'observaciones' => $this->observacion_vinculo,
+                        ]
+                    );
+                    
+                    // Sincronizar vínculos de adultos mayores
+                    \App\Models\FamiliarAdulto::where('cod_fam', $fam->cod_fam)->forceDelete();
+                    foreach ($this->vinculosFamiliar as $vinculo) {
+                        $obsSerialized = "Salud: " . ($vinculo['responsable_salud'] ?? 'NO') . " | Económico: " . ($vinculo['responsable_economico'] ?? 'NO') . " | Obs: " . ($vinculo['observaciones'] ?? '');
+                        $fam->adultosMayores()->attach($vinculo['cod_am'], [
+                            'parentesco_vinculo' => $vinculo['parentesco_vinculo'],
+                            'es_responsable' => $vinculo['es_responsable'] === 'SI',
+                            'estado' => 'ACTIVO',
+                            'observaciones' => $obsSerialized,
+                        ]);
+                    }
+                    
+                    \App\Models\PersonalSalud::where('cod_usu', $usuario->cod_usu)->delete();
+                    \App\Models\PersonalAdmin::where('cod_usu', $usuario->cod_usu)->delete();
+                    \App\Models\Voluntario::where('cod_usu', $usuario->cod_usu)->delete();
+                }
+
+            } else {
+                $userData['estado'] = 'ACTIVO';
+                $userData['acceso_sistema'] = 'HABILITADO';
+                $passwordTemporal = $this->passwordTemporalVisual ?: $this->generarPasswordTemporal();
+                $userData['password'] = Hash::make($passwordTemporal);
+                $userData['debe_cambiar_password'] = true;
+
+                $usuario = User::create($userData);
+                $usuario->assignRole($this->rol);
+
+                // Guardar sub-modelos de forma unificada en creación
+                if ($this->rol === 'personal_salud') {
+                    \App\Models\PersonalSalud::updateOrCreate(
+                        ['cod_usu' => $usuario->cod_usu],
+                        [
+                            'fecha_ing' => $this->fecha_ingreso ?: now()->format('Y-m-d'), 
+                            'cod_esp' => $this->especialidad_salud,
+                            'matricula_prof' => null,
+                            'institucion_formacion' => $this->institucion_formacion,
+                            'estado_laboral' => 'ACTIVO'
+                        ]
+                    );
+                    \App\Models\PersonalAdmin::where('cod_usu', $usuario->cod_usu)->delete();
+                    \App\Models\Voluntario::where('cod_usu', $usuario->cod_usu)->delete();
+                    \App\Models\Familiar::where('cod_usu', $usuario->cod_usu)->delete();
+                } elseif ($this->rol === 'personal_admin') {
+                    \App\Models\PersonalAdmin::updateOrCreate(
+                        ['cod_usu' => $usuario->cod_usu],
+                        [
+                            'fecha_ingreso' => $this->fecha_ingreso ?: now()->format('Y-m-d'), 
+                            'cod_cargo_admin' => $this->cargo_administrativo,
+                            'cargo' => \App\Models\CargoAdministrativo::find($this->cargo_administrativo)?->nombre ?? 'Administrativo',
+                            'area_admin' => $this->cod_area ? (\App\Models\AreaInstitucional::find($this->cod_area)?->nombre ?? 'Administración') : 'Administración',
+                            'estado_laboral' => 'ACTIVO'
+                        ]
+                    );
+                    \App\Models\PersonalSalud::where('cod_usu', $usuario->cod_usu)->delete();
+                    \App\Models\Voluntario::where('cod_usu', $usuario->cod_usu)->delete();
+                    \App\Models\Familiar::where('cod_usu', $usuario->cod_usu)->delete();
+                } elseif ($this->rol === 'voluntario') {
+                    \App\Models\Voluntario::updateOrCreate(
+                        ['cod_usu' => $usuario->cod_usu],
+                        [
+                            'fecha_ing' => $this->fecha_ingreso ?: now()->format('Y-m-d'),
+                            'area_apoyo' => $this->area_apoyo_preferente ?? 'General',
+                            'disponibilidad_inicial' => $this->disponibilidad_inicial,
+                            'area_apoyo_preferente' => $this->area_apoyo_preferente,
+                            'estado' => 'ACTIVO'
+                        ]
+                    );
+                    \App\Models\PersonalSalud::where('cod_usu', $usuario->cod_usu)->delete();
+                    \App\Models\PersonalAdmin::where('cod_usu', $usuario->cod_usu)->delete();
+                    \App\Models\Familiar::where('cod_usu', $usuario->cod_usu)->delete();
+                } elseif ($this->rol === 'familiar') {
+                    $hayResponsable = collect($this->vinculosFamiliar)->contains(fn($v) => $v['es_responsable'] === 'SI');
+                    $fam = \App\Models\Familiar::updateOrCreate(
+                        ['cod_usu' => $usuario->cod_usu],
+                        [
+                            'parentesco' => $this->parentesco_emergencia ?? 'Familiar',
+                            'direccion' => $this->direccion,
+                            'es_responsable' => $hayResponsable ? 'SI' : 'NO',
+                            'observaciones' => $this->observacion_vinculo,
+                        ]
+                    );
+                    
+                    // Sincronizar vínculos de adultos mayores
+                    \App\Models\FamiliarAdulto::where('cod_fam', $fam->cod_fam)->forceDelete();
+                    foreach ($this->vinculosFamiliar as $vinculo) {
+                        $obsSerialized = "Salud: " . ($vinculo['responsable_salud'] ?? 'NO') . " | Económico: " . ($vinculo['responsable_economico'] ?? 'NO') . " | Obs: " . ($vinculo['observaciones'] ?? '');
+                        $fam->adultosMayores()->attach($vinculo['cod_am'], [
+                            'parentesco_vinculo' => $vinculo['parentesco_vinculo'],
+                            'es_responsable' => $vinculo['es_responsable'] === 'SI',
+                            'estado' => 'ACTIVO',
+                            'observaciones' => $obsSerialized,
+                        ]);
+                    }
+                    \App\Models\PersonalSalud::where('cod_usu', $usuario->cod_usu)->delete();
+                    \App\Models\PersonalAdmin::where('cod_usu', $usuario->cod_usu)->delete();
+                    \App\Models\Voluntario::where('cod_usu', $usuario->cod_usu)->delete();
+                }
+            }
+
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            // Revertir físicamente el nuevo archivo en caso de fallo
+            if ($newPhotoPath && \Storage::disk('public')->exists($newPhotoPath)) {
+                \Storage::disk('public')->delete($newPhotoPath);
+            }
+
+            Log::error("Error crítico durante el guardado de usuario: " . $e->getMessage(), [
+                'exception' => $e,
+                'user_id' => $this->usuarioId ?? 'nuevo',
+                'rol' => $this->rol
+            ]);
+
+            $this->dispatch('swal', [
+                'icon' => 'error',
+                'title' => 'Error al guardar',
+                'text' => $e->getMessage() === 'No puedes quitar el rol de superadministrador al único superadministrador activo.'
+                    ? $e->getMessage()
+                    : 'Ocurrió un error inesperado al procesar los datos en el servidor.'
+            ]);
+            return;
+        }
+
+        // --- OPERACIONES DE ESCRITURA EN DISCO / MAILING / LOGGING FUERA DE LA TRANSACCIÓN (POST-COMMIT EXITOSO) ---
+
+        // 1. Eliminar la foto antigua físicamente de forma segura
+        if ($oldPhotoToDelete) {
+            try {
+                \Storage::disk('public')->delete($oldPhotoToDelete);
+            } catch (\Exception $ex) {
+                Log::error("No se pudo eliminar la foto antigua del storage: " . $ex->getMessage());
+            }
+        }
 
         if ($this->isEdit) {
-            $userData['estado'] = $estadoGuardado;
-            $userData['acceso_sistema'] = $accesoGuardado;
-
-            $usuario = User::findOrFail($this->usuarioId);
-
-            if ($usuario->cod_usu === auth()->id()) {
-                if (!empty($this->password)) {
-                    $userData['password'] = Hash::make($this->password);
-                    $userData['debe_cambiar_password'] = false;
-                }
-            } else {
-                // For other users, password changes are NOT allowed via general edit form
-                unset($userData['password']);
-            }
-
-            if ($usuario->hasRole('admin') && $this->rol !== 'admin') {
-                $superadmins = User::role('admin')->where('estado', 'ACTIVO')->count();
-                if ($superadmins <= 1) {
-                    $this->addError('rol', 'No puedes quitar el rol de superadministrador al único superadministrador activo.');
-                    return;
-                }
-            }
-
-            $usuario->update($userData);
-            $usuario->syncRoles([$this->rol]);
-
-            // Guardar sub-modelos de forma unificada
-            if ($this->rol === 'personal_salud') {
-                \App\Models\PersonalSalud::updateOrCreate(
-                    ['cod_usu' => $usuario->cod_usu],
-                    [
-                        'fecha_ing' => $this->fecha_ingreso ?: now()->format('Y-m-d'), 
-                        'cod_esp' => $this->especialidad_salud,
-                        'matricula_prof' => $this->matricula_prof,
-                        'institucion_formacion' => $this->institucion_formacion,
-                        'estado_laboral' => 'ACTIVO'
-                    ]
-                );
-                \App\Models\PersonalAdmin::where('cod_usu', $usuario->cod_usu)->delete();
-                \App\Models\Voluntario::where('cod_usu', $usuario->cod_usu)->delete();
-                \App\Models\Familiar::where('cod_usu', $usuario->cod_usu)->delete();
-            } elseif ($this->rol === 'personal_admin') {
-                \App\Models\PersonalAdmin::updateOrCreate(
-                    ['cod_usu' => $usuario->cod_usu],
-                    [
-                        'fecha_ingreso' => $this->fecha_ingreso ?: now()->format('Y-m-d'), 
-                        'cod_cargo_admin' => $this->cargo_administrativo,
-                        'cargo' => \App\Models\CargoAdministrativo::find($this->cargo_administrativo)?->nombre ?? 'Administrativo',
-                        'area_admin' => $this->cod_area ? (\App\Models\AreaInstitucional::find($this->cod_area)?->nombre ?? 'Administración') : 'Administración',
-                        'estado_laboral' => 'ACTIVO'
-                    ]
-                );
-                \App\Models\PersonalSalud::where('cod_usu', $usuario->cod_usu)->delete();
-                \App\Models\Voluntario::where('cod_usu', $usuario->cod_usu)->delete();
-                \App\Models\Familiar::where('cod_usu', $usuario->cod_usu)->delete();
-            } elseif ($this->rol === 'voluntario') {
-                \App\Models\Voluntario::updateOrCreate(
-                    ['cod_usu' => $usuario->cod_usu],
-                    [
-                        'fecha_ing' => $this->fecha_ingreso ?: now()->format('Y-m-d'),
-                        'area_apoyo' => $this->area_apoyo_preferente ?? 'General',
-                        'disponibilidad_inicial' => $this->disponibilidad_inicial,
-                        'area_apoyo_preferente' => $this->area_apoyo_preferente,
-                        'estado' => 'ACTIVO'
-                    ]
-                );
-                \App\Models\PersonalSalud::where('cod_usu', $usuario->cod_usu)->delete();
-                \App\Models\PersonalAdmin::where('cod_usu', $usuario->cod_usu)->delete();
-                \App\Models\Familiar::where('cod_usu', $usuario->cod_usu)->delete();
-            } elseif ($this->rol === 'familiar') {
-                $fam = \App\Models\Familiar::updateOrCreate(
-                    ['cod_usu' => $usuario->cod_usu],
-                    [
-                        'parentesco' => $this->parentesco_emergencia ?? 'Familiar',
-                        'direccion' => $this->direccion,
-                        'es_responsable' => 'SI',
-                        'observacion_vinculo' => $this->observacion_vinculo
-                    ]
-                );
-                
-                // Sincronizar vínculos de adultos mayores
-                $fam->adultosMayores()->detach();
-                foreach ($this->vinculosFamiliar as $vinculo) {
-                    $fam->adultosMayores()->attach($vinculo['cod_am'], [
-                        'parentesco_vinculo' => $vinculo['parentesco_vinculo'],
-                        'es_responsable' => $vinculo['es_responsable'] === 'SI',
-                        'estado' => 'ACTIVO',
-                        'observaciones' => $vinculo['observaciones'],
-                    ]);
-                }
-                
-                \App\Models\PersonalSalud::where('cod_usu', $usuario->cod_usu)->delete();
-                \App\Models\PersonalAdmin::where('cod_usu', $usuario->cod_usu)->delete();
-                \App\Models\Voluntario::where('cod_usu', $usuario->cod_usu)->delete();
-            }
-
             // Notificación por correo de clave actualizada
             $correoNotifEnviado = false;
             $passwordModificada = ($usuario->cod_usu === auth()->id() && !empty($this->password));
@@ -1234,7 +1659,7 @@ class UsuariosPanel extends Component
                     \Mail::to($usuario->correo)->send(new \App\Mail\UsuarioPasswordActualizadaMail($usuario, $this->password));
                     $correoNotifEnviado = true;
                 } catch (\Exception $e) {
-                    \Log::error("Error al enviar correo de actualización de clave a {$usuario->correo}: " . $e->getMessage());
+                    Log::error("Error al enviar correo de actualización de clave a {$usuario->correo}: " . $e->getMessage());
                 }
             }
 
@@ -1271,85 +1696,6 @@ class UsuariosPanel extends Component
             $this->dispatch('swal', $swalData);
 
         } else {
-            $userData['estado'] = 'ACTIVO';
-            $userData['acceso_sistema'] = 'HABILITADO';
-            $passwordTemporal = $this->passwordTemporalVisual ?: $this->generarPasswordTemporal();
-            $userData['password'] = Hash::make($passwordTemporal);
-            $userData['debe_cambiar_password'] = true;
-
-            $usuario = User::create($userData);
-            $usuario->assignRole($this->rol);
-
-            // Guardar sub-modelos de forma unificada
-            if ($this->rol === 'personal_salud') {
-                \App\Models\PersonalSalud::updateOrCreate(
-                    ['cod_usu' => $usuario->cod_usu],
-                    [
-                        'fecha_ing' => $this->fecha_ingreso ?: now()->format('Y-m-d'), 
-                        'cod_esp' => $this->especialidad_salud,
-                        'matricula_prof' => $this->matricula_prof,
-                        'institucion_formacion' => $this->institucion_formacion,
-                        'estado_laboral' => 'ACTIVO'
-                    ]
-                );
-                \App\Models\PersonalAdmin::where('cod_usu', $usuario->cod_usu)->delete();
-                \App\Models\Voluntario::where('cod_usu', $usuario->cod_usu)->delete();
-                \App\Models\Familiar::where('cod_usu', $usuario->cod_usu)->delete();
-            } elseif ($this->rol === 'personal_admin') {
-                \App\Models\PersonalAdmin::updateOrCreate(
-                    ['cod_usu' => $usuario->cod_usu],
-                    [
-                        'fecha_ingreso' => $this->fecha_ingreso ?: now()->format('Y-m-d'), 
-                        'cod_cargo_admin' => $this->cargo_administrativo,
-                        'cargo' => \App\Models\CargoAdministrativo::find($this->cargo_administrativo)?->nombre ?? 'Administrativo',
-                        'area_admin' => $this->cod_area ? (\App\Models\AreaInstitucional::find($this->cod_area)?->nombre ?? 'Administración') : 'Administración',
-                        'estado_laboral' => 'ACTIVO'
-                    ]
-                );
-                \App\Models\PersonalSalud::where('cod_usu', $usuario->cod_usu)->delete();
-                \App\Models\Voluntario::where('cod_usu', $usuario->cod_usu)->delete();
-                \App\Models\Familiar::where('cod_usu', $usuario->cod_usu)->delete();
-            } elseif ($this->rol === 'voluntario') {
-                \App\Models\Voluntario::updateOrCreate(
-                    ['cod_usu' => $usuario->cod_usu],
-                    [
-                        'fecha_ing' => $this->fecha_ingreso ?: now()->format('Y-m-d'),
-                        'area_apoyo' => $this->area_apoyo_preferente ?? 'General',
-                        'disponibilidad_inicial' => $this->disponibilidad_inicial,
-                        'area_apoyo_preferente' => $this->area_apoyo_preferente,
-                        'estado' => 'ACTIVO'
-                    ]
-                );
-                \App\Models\PersonalSalud::where('cod_usu', $usuario->cod_usu)->delete();
-                \App\Models\PersonalAdmin::where('cod_usu', $usuario->cod_usu)->delete();
-                \App\Models\Familiar::where('cod_usu', $usuario->cod_usu)->delete();
-            } elseif ($this->rol === 'familiar') {
-                $fam = \App\Models\Familiar::updateOrCreate(
-                    ['cod_usu' => $usuario->cod_usu],
-                    [
-                        'parentesco' => $this->parentesco_emergencia ?? 'Familiar',
-                        'direccion' => $this->direccion,
-                        'es_responsable' => 'SI',
-                        'observacion_vinculo' => $this->observacion_vinculo
-                    ]
-                );
-                
-                // Sincronizar vínculos de adultos mayores
-                $fam->adultosMayores()->detach();
-                foreach ($this->vinculosFamiliar as $vinculo) {
-                    $fam->adultosMayores()->attach($vinculo['cod_am'], [
-                        'parentesco_vinculo' => $vinculo['parentesco_vinculo'],
-                        'es_responsable' => $vinculo['es_responsable'] === 'SI',
-                        'estado' => 'ACTIVO',
-                        'observaciones' => $vinculo['observaciones'],
-                    ]);
-                }
-                
-                \App\Models\PersonalSalud::where('cod_usu', $usuario->cod_usu)->delete();
-                \App\Models\PersonalAdmin::where('cod_usu', $usuario->cod_usu)->delete();
-                \App\Models\Voluntario::where('cod_usu', $usuario->cod_usu)->delete();
-            }
-
             // Enviar bienvenida
             $bienvenidaEnviada = false;
             try {
@@ -1364,7 +1710,7 @@ class UsuariosPanel extends Component
                 \Mail::to($usuario->correo)->send(new \App\Mail\UsuarioBienvenidaMail($usuario, $rolDisplay, $areaDisplay));
                 $bienvenidaEnviada = true;
             } catch (\Exception $e) {
-                \Log::error("Error al enviar correo de bienvenida a {$usuario->correo}: " . $e->getMessage());
+                Log::error("Error al enviar correo de bienvenida a {$usuario->correo}: " . $e->getMessage());
             }
 
             // Enviar credenciales
@@ -1373,7 +1719,7 @@ class UsuariosPanel extends Component
                 \Mail::to($usuario->correo)->send(new \App\Mail\UsuarioCredencialesInicialesMail($usuario, $passwordTemporal));
                 $credencialesEnviadas = true;
             } catch (\Exception $e) {
-                \Log::error("Error al enviar credenciales a {$usuario->correo}: " . $e->getMessage());
+                Log::error("Error al enviar credenciales a {$usuario->correo}: " . $e->getMessage());
             }
 
             if (function_exists('activity')) {

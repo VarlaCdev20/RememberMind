@@ -34,7 +34,7 @@ $estilo = $colores[$color] ?? $colores['terracota'];
         </div>
     </div>
 
-    <div class="h-56 rounded-[1.4rem] bg-[#D5C7B9]/70 p-3 shadow-inner">
+    <div class="h-44 rounded-[1.4rem] bg-[#D5C7B9]/70 p-3 shadow-inner">
         <canvas id="{{ $id }}"></canvas>
     </div>
 </div>
