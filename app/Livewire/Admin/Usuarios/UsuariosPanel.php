@@ -163,6 +163,7 @@ class UsuariosPanel extends Component
     // ── Navegación Detalle Interno ──
     public string $modoVista = 'listado'; // 'listado' o 'detalle'
     public $usuarioDetalle = null;
+    public string $seccionActivaDetalle = 'resumen';
 
     // ── Post-Registro Flow ──
     public bool $mostrarPostRegistro = false;
@@ -172,6 +173,15 @@ class UsuariosPanel extends Component
     public $passwordTemporalPostRegistro = null;
     public bool $correoRequisitosEnviado = false;
     public ?string $mensajeCorreoRequisitos = null;
+
+    // ── Document Upload Properties ──
+    public $archivoTemporal;
+    public $tipoDocSeleccionado;
+    public $tipoDocNombre;
+    public $fechaEmisionDoc;
+    public $fechaVencimientoDoc;
+    public $observacionesDoc;
+    public bool $mostrarModalSubirDoc = false;
 
     protected $listeners = ['usuario-guardado' => '$refresh'];
 
@@ -1106,9 +1116,9 @@ class UsuariosPanel extends Component
         $am->ap_materno = $this->normalizarMayusculas($this->quick_ap_materno);
         $am->ci = $this->normalizarMayusculas($this->quick_ci);
         $am->genero = $this->normalizarMayusculas($this->quick_genero);
-        $am->fecha_nac = !empty($this->quick_fecha_nac) ? \Carbon\Carbon::parse($this->quick_fecha_nac) : null;
+        $am->fecha_nac = !empty($this->quick_fecha_nac) ? \Carbon\Carbon::parse($this->quick_fecha_nac)->toDateString() : null;
         $am->cod_est_adul = 1; // ACTIVO
-        $am->fecha_ing = \Carbon\Carbon::today();
+        $am->fecha_ing = \Carbon\Carbon::today()->toDateString();
         $am->save();
 
         $nombreCompleto = $this->obtenerEtiquetaAdultoMayor($am);
@@ -2025,6 +2035,12 @@ class UsuariosPanel extends Component
         $this->modoVista = 'detalle';
         $this->mostrarVistaCompleta = false;
         $this->mostrarFichaRapida = false;
+        $this->seccionActivaDetalle = 'resumen';
+    }
+
+    public function cambiarSeccionDetalle(string $seccion): void
+    {
+        $this->seccionActivaDetalle = $seccion;
     }
 
     public function volverAlListadoUsuarios()
@@ -2512,6 +2528,93 @@ class UsuariosPanel extends Component
             $codUsu = $this->usuarioPostRegistro->cod_usu;
             $this->cerrarPostRegistro();
             $this->verUsuario($codUsu);
+        }
+    }
+
+    // ══════════════════════════════════════════════
+    // GESTIÓN DOCUMENTAL (SUBIDA DE ARCHIVOS)
+    // ══════════════════════════════════════════════
+
+    public function abrirModalSubirDoc($codTipoDoc)
+    {
+        $tipo = \App\Models\TipoDocumentoUsuario::findOrFail($codTipoDoc);
+        $this->tipoDocSeleccionado = $codTipoDoc;
+        $this->tipoDocNombre = $tipo->nombre;
+        $this->archivoTemporal = null;
+        $this->fechaEmisionDoc = null;
+        $this->fechaVencimientoDoc = null;
+        $this->observacionesDoc = '';
+        $this->mostrarModalSubirDoc = true;
+    }
+
+    public function cerrarModalSubirDoc()
+    {
+        $this->mostrarModalSubirDoc = false;
+        $this->tipoDocSeleccionado = null;
+        $this->tipoDocNombre = null;
+        $this->archivoTemporal = null;
+        $this->fechaEmisionDoc = null;
+        $this->fechaVencimientoDoc = null;
+        $this->observacionesDoc = '';
+    }
+
+    public function guardarDocumento()
+    {
+        $this->validate([
+            'archivoTemporal' => 'required|file|mimes:pdf,jpg,jpeg,png|max:10240', // 10MB max
+            'fechaEmisionDoc' => 'nullable|date',
+            'fechaVencimientoDoc' => 'nullable|date|after_or_equal:fechaEmisionDoc',
+            'observacionesDoc' => 'nullable|string|max:1000',
+        ], [
+            'archivoTemporal.required' => 'Debe seleccionar un archivo.',
+            'archivoTemporal.file' => 'El archivo no es válido.',
+            'archivoTemporal.mimes' => 'Solo se permiten archivos PDF, JPG, JPEG o PNG.',
+            'archivoTemporal.max' => 'El tamaño máximo del archivo es de 10 MB.',
+            'fechaVencimientoDoc.after_or_equal' => 'La fecha de vencimiento debe ser posterior o igual a la de emisión.',
+        ]);
+
+        $usuario = $this->usuarioDetalle;
+        if (!$usuario) {
+            $this->cerrarModalSubirDoc();
+            return;
+        }
+
+        $service = app(\App\Services\Usuarios\DocumentacionUsuarioService::class);
+        
+        try {
+            $service->subirDocumento(
+                $usuario,
+                $this->tipoDocSeleccionado,
+                $this->archivoTemporal,
+                $this->fechaEmisionDoc,
+                $this->fechaVencimientoDoc,
+                $this->observacionesDoc
+            );
+
+            // Refrescar el usuario para reflejar el estado cargado
+            $this->usuarioDetalle = User::with([
+                'roles',
+                'personalSalud.especialidad',
+                'personalAdmin.cargoAdmin',
+                'areaInstitucional',
+                'documentos',
+                'familiares.adultosMayores',
+                'voluntarios'
+            ])->findOrFail($usuario->cod_usu);
+
+            $this->cerrarModalSubirDoc();
+
+            $this->dispatch('swal', [
+                'icon' => 'success',
+                'title' => 'Documento cargado',
+                'text' => 'El archivo ha sido registrado correctamente.',
+            ]);
+        } catch (\Exception $e) {
+            $this->dispatch('swal', [
+                'icon' => 'error',
+                'title' => 'Error al subir',
+                'text' => $e->getMessage(),
+            ]);
         }
     }
 

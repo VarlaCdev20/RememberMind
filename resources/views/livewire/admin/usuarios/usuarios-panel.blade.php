@@ -130,51 +130,59 @@
                 </div>
             </div>
 
-            {{-- BARRA SUPERIOR DE SECCIONES --}}
-            <nav class="sticky top-[72px] z-20 -mx-4 px-4 py-3 bg-[#FAF7F2] border-b border-[#C7B5A3]/30 backdrop-blur-md overflow-x-auto custom-scrollbar flex gap-2">
-                <a href="#seccion-resumen"
-                   @click.prevent="document.getElementById('seccion-resumen').scrollIntoView({ behavior: 'smooth', block: 'center' })"
-                   class="inline-flex h-9 shrink-0 items-center justify-center rounded-xl bg-white border border-[#C7B5A3]/40 text-[#2F3E5C] hover:bg-[#2F3E5C] hover:text-white px-4 text-xs font-black uppercase transition active:scale-95 shadow-sm">
+                        {{-- BARRA SUPERIOR DE SECCIONES --}}
+            <nav class="sticky top-[72px] z-20 -mx-4 px-4 py-3 bg-[#FAF7F2]/80 border-b border-[#C7B5A3]/30 backdrop-blur-md overflow-x-auto custom-scrollbar flex gap-2">
+                <button type="button"
+                   wire:click="cambiarSeccionDetalle('resumen')"
+                   class="inline-flex h-9 shrink-0 items-center justify-center rounded-xl px-4 text-xs font-black uppercase transition active:scale-95 shadow-sm border-2 {{ $seccionActivaDetalle === 'resumen' ? 'bg-[#E27D60]/8 border-[#E27D60] text-[#E27D60]' : 'bg-white/60 border-[#C7B5A3]/30 text-[#2F3E5C]/70 hover:bg-white' }}">
+                    <i class="ph-bold ph-list-bullets mr-1.5 text-sm"></i>
                     Resumen
-                </a>
-                <a href="#seccion-identidad"
-                   @click.prevent="document.getElementById('seccion-identidad').scrollIntoView({ behavior: 'smooth', block: 'center' })"
-                   class="inline-flex h-9 shrink-0 items-center justify-center rounded-xl bg-white border border-[#C7B5A3]/40 text-[#2F3E5C] hover:bg-[#2F3E5C] hover:text-white px-4 text-xs font-black uppercase transition active:scale-95 shadow-sm">
+                </button>
+                <button type="button"
+                   wire:click="cambiarSeccionDetalle('identidad')"
+                   class="inline-flex h-9 shrink-0 items-center justify-center rounded-xl px-4 text-xs font-black uppercase transition active:scale-95 shadow-sm border-2 {{ $seccionActivaDetalle === 'identidad' ? 'bg-[#E27D60]/8 border-[#E27D60] text-[#E27D60]' : 'bg-white/60 border-[#C7B5A3]/30 text-[#2F3E5C]/70 hover:bg-white' }}">
+                    <i class="ph-bold ph-identification-card mr-1.5 text-sm"></i>
                     Identidad
-                </a>
-                <a href="#seccion-contacto"
-                   @click.prevent="document.getElementById('seccion-contacto').scrollIntoView({ behavior: 'smooth', block: 'center' })"
-                   class="inline-flex h-9 shrink-0 items-center justify-center rounded-xl bg-white border border-[#C7B5A3]/40 text-[#2F3E5C] hover:bg-[#2F3E5C] hover:text-white px-4 text-xs font-black uppercase transition active:scale-95 shadow-sm">
-                    Contacto y dirección
-                </a>
-                <a href="#seccion-perfil"
-                   @click.prevent="document.getElementById('seccion-perfil').scrollIntoView({ behavior: 'smooth', block: 'center' })"
-                   class="inline-flex h-9 shrink-0 items-center justify-center rounded-xl bg-white border border-[#C7B5A3]/40 text-[#2F3E5C] hover:bg-[#2F3E5C] hover:text-white px-4 text-xs font-black uppercase transition active:scale-95 shadow-sm">
-                    Perfil Institucional
-                </a>
-                <a href="#seccion-documentacion"
-                   @click.prevent="document.getElementById('seccion-documentacion').scrollIntoView({ behavior: 'smooth', block: 'center' })"
-                   class="inline-flex h-9 shrink-0 items-center justify-center rounded-xl bg-white border border-[#C7B5A3]/40 text-[#2F3E5C] hover:bg-[#2F3E5C] hover:text-white px-4 text-xs font-black uppercase transition active:scale-95 shadow-sm">
-                    Documentación
-                </a>
-                <a href="#seccion-seguridad"
-                   @click.prevent="document.getElementById('seccion-seguridad').scrollIntoView({ behavior: 'smooth', block: 'center' })"
-                   class="inline-flex h-9 shrink-0 items-center justify-center rounded-xl bg-white border border-[#C7B5A3]/40 text-[#2F3E5C] hover:bg-[#2F3E5C] hover:text-white px-4 text-xs font-black uppercase transition active:scale-95 shadow-sm">
-                    Seguridad y acceso
-                </a>
+                </button>
+                <button type="button"
+                   wire:click="cambiarSeccionDetalle('contacto')"
+                   class="inline-flex h-9 shrink-0 items-center justify-center rounded-xl px-4 text-xs font-black uppercase transition active:scale-95 shadow-sm border-2 {{ $seccionActivaDetalle === 'contacto' ? 'bg-[#E27D60]/8 border-[#E27D60] text-[#E27D60]' : 'bg-white/60 border-[#C7B5A3]/30 text-[#2F3E5C]/70 hover:bg-white' }}">
+                    <i class="ph-bold ph-phone mr-1.5 text-sm"></i>
+                    Contacto
+                </button>
+                <button type="button"
+                   wire:click="cambiarSeccionDetalle('perfil')"
+                   class="inline-flex h-9 shrink-0 items-center justify-center rounded-xl px-4 text-xs font-black uppercase transition active:scale-95 shadow-sm border-2 {{ $seccionActivaDetalle === 'perfil' ? 'bg-[#E27D60]/8 border-[#E27D60] text-[#E27D60]' : 'bg-white/60 border-[#C7B5A3]/30 text-[#2F3E5C]/70 hover:bg-white' }}">
+                    <i class="ph-bold ph-user-gear mr-1.5 text-sm"></i>
+                    Perfil
+                </button>
+                <button type="button"
+                   wire:click="cambiarSeccionDetalle('documentos')"
+                   class="inline-flex h-9 shrink-0 items-center justify-center rounded-xl px-4 text-xs font-black uppercase transition active:scale-95 shadow-sm border-2 {{ $seccionActivaDetalle === 'documentos' ? 'bg-[#E27D60]/8 border-[#E27D60] text-[#E27D60]' : 'bg-white/60 border-[#C7B5A3]/30 text-[#2F3E5C]/70 hover:bg-white' }}">
+                    <i class="ph-bold ph-files mr-1.5 text-sm"></i>
+                    Documentos
+                </button>
+                <button type="button"
+                   wire:click="cambiarSeccionDetalle('acceso')"
+                   class="inline-flex h-9 shrink-0 items-center justify-center rounded-xl px-4 text-xs font-black uppercase transition active:scale-95 shadow-sm border-2 {{ $seccionActivaDetalle === 'acceso' ? 'bg-[#E27D60]/8 border-[#E27D60] text-[#E27D60]' : 'bg-white/60 border-[#C7B5A3]/30 text-[#2F3E5C]/70 hover:bg-white' }}">
+                    <i class="ph-bold ph-shield-check mr-1.5 text-sm"></i>
+                    Acceso
+                </button>
                 @if($rolKey === 'familiar')
-                <a href="#seccion-vinculacion"
-                   @click.prevent="document.getElementById('seccion-vinculacion').scrollIntoView({ behavior: 'smooth', block: 'center' })"
-                   class="inline-flex h-9 shrink-0 items-center justify-center rounded-xl bg-white border border-[#C7B5A3]/40 text-[#2F3E5C] hover:bg-[#2F3E5C] hover:text-white px-4 text-xs font-black uppercase transition active:scale-95 shadow-sm">
-                    Vinculación Familiar
-                </a>
+                <button type="button"
+                   wire:click="cambiarSeccionDetalle('vinculo')"
+                   class="inline-flex h-9 shrink-0 items-center justify-center rounded-xl px-4 text-xs font-black uppercase transition active:scale-95 shadow-sm border-2 {{ $seccionActivaDetalle === 'vinculo' ? 'bg-[#E27D60]/8 border-[#E27D60] text-[#E27D60]' : 'bg-white/60 border-[#C7B5A3]/30 text-[#2F3E5C]/70 hover:bg-white' }}">
+                    <i class="ph-bold ph-users-three mr-1.5 text-sm"></i>
+                    Vínculo
+                </button>
                 @endif
             </nav>
 
-            {{-- SECCIONES DE INFORMACIÓN --}}
+                        {{-- SECCIONES DE INFORMACIÓN --}}
             <div class="space-y-6">
                 {{-- SECCION RESUMEN --}}
-                <section id="seccion-resumen" class="scroll-mt-32 rounded-[1.8rem] border border-[#C7B5A3]/40 bg-white/70 p-6 shadow-sm backdrop-blur-md space-y-4">
+                @if($seccionActivaDetalle === 'resumen')
+                <section id="seccion-resumen" class="animate-in fade-in duration-200 rounded-[1.8rem] border border-[#C7B5A3]/40 bg-white/70 p-6 shadow-sm backdrop-blur-md space-y-4">
                     <h4 class="flex items-center gap-2 border-b border-[#C7B5A3]/20 pb-2 text-xs font-black uppercase tracking-widest text-[#E27D60]">
                         <i class="ph-bold ph-list-bullets text-lg"></i> Resumen del Usuario
                     </h4>
@@ -227,9 +235,11 @@
                         @endif
                     </div>
                 </section>
+                @endif
 
                 {{-- SECCION IDENTIDAD --}}
-                <section id="seccion-identidad" class="scroll-mt-32 rounded-[1.8rem] border border-[#C7B5A3]/40 bg-white/70 p-6 shadow-sm backdrop-blur-md space-y-4">
+                @if($seccionActivaDetalle === 'identidad')
+                <section id="seccion-identidad" class="animate-in fade-in duration-200 rounded-[1.8rem] border border-[#C7B5A3]/40 bg-white/70 p-6 shadow-sm backdrop-blur-md space-y-4">
                     <h4 class="flex items-center gap-2 border-b border-[#C7B5A3]/20 pb-2 text-xs font-black uppercase tracking-widest text-[#E27D60]">
                         <i class="ph-bold ph-identification-card text-lg"></i> Datos de Identidad
                     </h4>
@@ -282,11 +292,13 @@
                         @endif
                     </div>
                 </section>
+                @endif
 
-                {{-- SECCION CONTACTO Y DIRECCION --}}
-                <section id="seccion-contacto" class="scroll-mt-32 rounded-[1.8rem] border border-[#C7B5A3]/40 bg-white/70 p-6 shadow-sm backdrop-blur-md space-y-4">
+                {{-- SECCION CONTACTO --}}
+                @if($seccionActivaDetalle === 'contacto')
+                <section id="seccion-contacto" class="animate-in fade-in duration-200 rounded-[1.8rem] border border-[#C7B5A3]/40 bg-white/70 p-6 shadow-sm backdrop-blur-md space-y-4">
                     <h4 class="flex items-center gap-2 border-b border-[#C7B5A3]/20 pb-2 text-xs font-black uppercase tracking-widest text-[#E27D60]">
-                        <i class="ph-bold ph-phone text-lg"></i> Información de Contacto y Dirección
+                        <i class="ph-bold ph-phone text-lg"></i> Contacto y Dirección
                     </h4>
                     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 text-xs">
                         <div>
@@ -322,9 +334,11 @@
                         </div>
                     </div>
                 </section>
+                @endif
 
-                {{-- SECCION PERFIL INSTITUCIONAL --}}
-                <section id="seccion-perfil" class="scroll-mt-32 rounded-[1.8rem] border border-[#C7B5A3]/40 bg-white/70 p-6 shadow-sm backdrop-blur-md space-y-4">
+                {{-- SECCION PERFIL --}}
+                @if($seccionActivaDetalle === 'perfil')
+                <section id="seccion-perfil" class="animate-in fade-in duration-200 rounded-[1.8rem] border border-[#C7B5A3]/40 bg-white/70 p-6 shadow-sm backdrop-blur-md space-y-4">
                     <h4 class="flex items-center gap-2 border-b border-[#C7B5A3]/20 pb-2 text-xs font-black uppercase tracking-widest text-[#E27D60]">
                         <i class="ph-bold ph-user-gear text-lg"></i> Perfil Institucional
                     </h4>
@@ -402,7 +416,7 @@
                                 Usuario externo autorizado para consulta limitada de información.
                             </p>
                             <p class="text-xs font-semibold text-[#2F3E5C]/50">
-                                La relación con el adulto mayor debe mostrarse en la sección Vinculación familiar a continuación.
+                                La relación con el adulto mayor se gestiona en la pestaña Vínculo.
                             </p>
                         </div>
                     @else
@@ -411,11 +425,13 @@
                         </div>
                     @endif
                 </section>
+                @endif
 
-                {{-- SECCION DOCUMENTACION --}}
-                <section id="seccion-documentacion" class="scroll-mt-32 rounded-[1.8rem] border border-[#C7B5A3]/40 bg-white/70 p-6 shadow-sm backdrop-blur-md space-y-4">
+                {{-- SECCION DOCUMENTOS --}}
+                @if($seccionActivaDetalle === 'documentos')
+                <section id="seccion-documentacion" class="animate-in fade-in duration-200 rounded-[1.8rem] border border-[#C7B5A3]/40 bg-white/70 p-6 shadow-sm backdrop-blur-md space-y-4">
                     <h4 class="flex items-center gap-2 border-b border-[#C7B5A3]/20 pb-2 text-xs font-black uppercase tracking-widest text-[#E27D60]">
-                        <i class="ph-bold ph-files text-lg"></i> Estado de Documentación
+                        <i class="ph-bold ph-files text-lg"></i> Documentación del Usuario
                     </h4>
                     
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-xs">
@@ -451,8 +467,8 @@
                                     Reenviar Correo de Requisitos
                                 </button>
                                 <button type="button"
-                                        @click="Swal.fire({ icon: 'info', title: 'Módulo en desarrollo', text: 'Módulo de documentación en desarrollo.', confirmButtonColor: '#2F3E5C', customClass: { popup: 'rounded-[1.5rem]' } })"
-                                        class="w-full inline-flex h-9 items-center justify-center gap-1.5 rounded-xl bg-[#C7B5A3]/35 text-xs font-black text-[#7C7168]/60 border border-[#C7B5A3]/40 transition hover:bg-[#C7B5A3]/50">
+                                        @click="Swal.fire({ icon: 'info', title: '¿Cómo subir?', text: 'Seleccione el ícono de subida en la lista de requisitos a la derecha para cargar el archivo correspondiente.', confirmButtonColor: '#2F3E5C', customClass: { popup: 'rounded-[1.5rem]' } })"
+                                        class="w-full inline-flex h-9 items-center justify-center gap-1.5 rounded-xl bg-[#2F3E5C] text-xs font-black text-white transition hover:bg-[#E27D60] active:scale-95 shadow-md">
                                     <i class="ph-bold ph-upload-simple"></i>
                                     Registrar Documentación
                                 </button>
@@ -463,33 +479,65 @@
                             <span class="font-black text-[#2F3E5C]/50 uppercase tracking-wider block mb-2">Lista de Requisitos Obligatorios:</span>
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
                                 @foreach($checklist as $item)
-                                    <div class="flex items-center justify-between gap-3 p-3 rounded-xl border border-[#C7B5A3]/25 bg-white/40">
-                                        <div class="min-w-0">
-                                            <p class="font-black text-[#2F3E5C] truncate uppercase leading-tight">{{ $item['nombre'] }}</p>
-                                            <p class="text-[8px] text-[#2F3E5C]/50 font-black uppercase tracking-wider mt-0.5">
-                                                {{ $item['obligatorio'] ? 'Obligatorio' : 'Opcional' }}
+                                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 rounded-xl border border-[#C7B5A3]/25 bg-white/40 transition hover:bg-white/60">
+                                        <div class="min-w-0 flex-1">
+                                            <p class="font-black text-[#2F3E5C] truncate uppercase leading-tight" title="{{ $item['nombre'] }}">{{ $item['nombre'] }}</p>
+                                            <p class="text-[8px] text-[#2F3E5C]/50 font-black uppercase tracking-wider mt-0.5 flex items-center gap-1.5">
+                                                <span>{{ $item['obligatorio'] ? 'Obligatorio' : 'Opcional' }}</span>
+                                                @if($item['requiere_vencimiento'] && $item['cargado'] && $item['documento']->fecha_vencimiento)
+                                                    <span class="text-[#E27D60]">| Vence: {{ \Carbon\Carbon::parse($item['documento']->fecha_vencimiento)->format('d/m/Y') }}</span>
+                                                @endif
                                             </p>
                                         </div>
-                                        <div>
-                                            @if($item['cargado'])
-                                                @if($item['estado'] === 'VALIDADO')
-                                                    <span class="inline-flex items-center gap-1 text-[8px] font-black text-[#63775B] bg-[#8DA280]/20 px-2 py-0.5 rounded-full uppercase">
-                                                        <i class="ph-bold ph-check-circle text-[10px]"></i> Validado
-                                                    </span>
-                                                @elseif($item['estado'] === 'OBSERVADO')
-                                                    <span class="inline-flex items-center gap-1 text-[8px] font-black text-[#E27D60] bg-[#E27D60]/20 px-2 py-0.5 rounded-full uppercase">
-                                                        <i class="ph-bold ph-warning-circle text-[10px]"></i> Observado
-                                                    </span>
+                                        <div class="flex items-center gap-2 shrink-0">
+                                            <!-- Badge de estado -->
+                                            <div>
+                                                @if($item['cargado'])
+                                                    @if($item['estado'] === 'VALIDADO')
+                                                        <span class="inline-flex items-center gap-1 text-[8px] font-black text-[#63775B] bg-[#8DA280]/20 px-2 py-0.5 rounded-full uppercase">
+                                                            <i class="ph-bold ph-check-circle text-[10px]"></i> Validado
+                                                        </span>
+                                                    @elseif($item['estado'] === 'OBSERVADO')
+                                                        <span class="inline-flex items-center gap-1 text-[8px] font-black text-[#E27D60] bg-[#E27D60]/20 px-2 py-0.5 rounded-full uppercase" title="Motivo: {{ $item['documento']->motivo_observacion }}">
+                                                            <i class="ph-bold ph-warning-circle text-[10px]"></i> Observado
+                                                        </span>
+                                                    @else
+                                                        <span class="inline-flex items-center gap-1 text-[8px] font-black text-[#2F3E5C]/75 bg-[#C7B5A3]/45 px-2 py-0.5 rounded-full uppercase">
+                                                            <i class="ph-bold ph-clock text-[10px]"></i> Cargado
+                                                        </span>
+                                                    @endif
                                                 @else
-                                                    <span class="inline-flex items-center gap-1 text-[8px] font-black text-[#2F3E5C]/75 bg-[#C7B5A3]/45 px-2 py-0.5 rounded-full uppercase">
-                                                        <i class="ph-bold ph-clock text-[10px]"></i> Pendiente
+                                                    <span class="inline-flex items-center gap-1 text-[8px] font-black text-[#7C7168]/80 bg-[#9B8B7E]/10 px-2 py-0.5 rounded-full uppercase">
+                                                        <i class="ph-bold ph-minus-circle text-[10px]"></i> Faltante
                                                     </span>
                                                 @endif
-                                            @else
-                                                <span class="inline-flex items-center gap-1 text-[8px] font-black text-[#7C7168]/80 bg-[#9B8B7E]/10 px-2 py-0.5 rounded-full uppercase">
-                                                    <i class="ph-bold ph-minus-circle text-[10px]"></i> Faltante
-                                                </span>
-                                            @endif
+                                            </div>
+
+                                            <!-- Acciones de archivo -->
+                                            <div class="flex items-center gap-1">
+                                                @if($item['cargado'])
+                                                    <!-- Ver documento -->
+                                                    <a href="{{ Storage::url($item['documento']->archivo) }}" target="_blank"
+                                                       class="flex h-7 w-7 items-center justify-center rounded-lg bg-[#2F3E5C]/10 text-[#2F3E5C] transition hover:bg-[#2F3E5C] hover:text-white"
+                                                       title="Ver Documento">
+                                                        <i class="ph-bold ph-eye text-xs"></i>
+                                                    </a>
+                                                    
+                                                    <!-- Reemplazar documento -->
+                                                    <button type="button" wire:click="abrirModalSubirDoc('{{ $item['cod_tipo_doc'] }}')"
+                                                            class="flex h-7 w-7 items-center justify-center rounded-lg bg-[#E27D60]/10 text-[#E27D60] transition hover:bg-[#E27D60] hover:text-white"
+                                                            title="Reemplazar Archivo">
+                                                        <i class="ph-bold ph-arrow-counter-clockwise text-xs"></i>
+                                                    </button>
+                                                @else
+                                                    <!-- Subir por primera vez -->
+                                                    <button type="button" wire:click="abrirModalSubirDoc('{{ $item['cod_tipo_doc'] }}')"
+                                                            class="flex h-7 w-7 items-center justify-center rounded-lg bg-[#8DA280]/20 text-[#63775B] transition hover:bg-[#8DA280] hover:text-white font-black"
+                                                            title="Subir Documento">
+                                                        <i class="ph-bold ph-upload-simple text-xs"></i>
+                                                    </button>
+                                                @endif
+                                            </div>
                                         </div>
                                     </div>
                                 @endforeach
@@ -497,9 +545,11 @@
                         </div>
                     </div>
                 </section>
+                @endif
 
-                {{-- SECCION SEGURIDAD Y ACCESO --}}
-                <section id="seccion-seguridad" class="scroll-mt-32 rounded-[1.8rem] border border-[#C7B5A3]/40 bg-white/70 p-6 shadow-sm backdrop-blur-md space-y-4">
+                {{-- SECCION ACCESO --}}
+                @if($seccionActivaDetalle === 'acceso')
+                <section id="seccion-seguridad" class="animate-in fade-in duration-200 rounded-[1.8rem] border border-[#C7B5A3]/40 bg-white/70 p-6 shadow-sm backdrop-blur-md space-y-4">
                     <h4 class="flex items-center gap-2 border-b border-[#C7B5A3]/20 pb-2 text-xs font-black uppercase tracking-widest text-[#E27D60]">
                         <i class="ph-bold ph-shield-check text-lg"></i> Seguridad y Acceso
                     </h4>
@@ -538,13 +588,14 @@
                         @endif
                     </div>
                 </section>
+                @endif
 
-                {{-- SECCION VINCULACION FAMILIAR --}}
-                @if($rolKey === 'familiar')
+                {{-- SECCION VINCULACION --}}
+                @if($seccionActivaDetalle === 'vinculo' && $rolKey === 'familiar')
                     @php
                         $famDetalle = $usuarioDetalle->familiares->first();
                     @endphp
-                    <section id="seccion-vinculacion" class="scroll-mt-32 rounded-[1.8rem] border border-[#C7B5A3]/40 bg-white/70 p-6 shadow-sm backdrop-blur-md space-y-4">
+                    <section id="seccion-vinculacion" class="animate-in fade-in duration-200 rounded-[1.8rem] border border-[#C7B5A3]/40 bg-white/70 p-6 shadow-sm backdrop-blur-md space-y-4">
                         <h4 class="flex items-center gap-2 border-b border-[#C7B5A3]/20 pb-2 text-xs font-black uppercase tracking-widest text-[#E27D60]">
                             <i class="ph-bold ph-users-three text-lg"></i> Vinculación Familiar
                         </h4>
@@ -625,9 +676,7 @@
                         @endif
                     </section>
                 @endif
-            </div>
-
-            {{-- BOTÓN VOLVER ARRIBA / ACCIONES PIE --}}
+            </div>\n\n            {{-- BOTÓN VOLVER ARRIBA / ACCIONES PIE --}}
             <div class="flex items-center justify-between border-t border-[#C7B5A3]/30 pt-4">
                 <button type="button" 
                         wire:click="volverAlListadoUsuarios" 
@@ -1090,7 +1139,7 @@
 
         {{-- VISTA TABLA COMPACTA --}}
         <div x-show="vista === 'table'" x-transition.opacity.duration.200ms>
-<div class="overflow-hidden rounded-[1.8rem] bg-white/78 shadow-[0_14px_30px_rgba(47,62,92,0.12)]">
+            <div class="overflow-hidden rounded-[1.8rem] bg-[#FAF7F2]/88 border border-[#C7B5A3]/45 shadow-[0_14px_30px_rgba(47,62,92,0.12)] backdrop-blur-md">
                 <table class="w-full table-fixed text-left text-sm">
                     <thead class="bg-[#F4EEE7] text-[10px] uppercase tracking-[0.18em] text-[#2F3E5C]/55">
                         <tr>
@@ -1102,7 +1151,7 @@
                         </tr>
                     </thead>
 
-                    <tbody class="divide-y divide-[#E7DDD1] bg-white/85">
+                    <tbody class="divide-y divide-[#E7DDD1] bg-white/50">
                         @forelse($usuarios as $u)
                             @php
                                 $roleName = $u->getRoleNames()->first() ?? 'sin_rol';
@@ -1530,21 +1579,7 @@
                             <h4 class="text-[10px] font-black text-[#2F3E5C] uppercase tracking-widest mb-3">Dirección de Domicilio</h4>
                         </div>
 
-                        <div class="md:col-span-2 grid grid-cols-12 gap-3">
-                            <div class="col-span-8">
-                                <label class="mb-1 block text-[9px] font-black uppercase tracking-widest text-[#2F3E5C]/60">Calle / Avenida *</label>
-                                <input type="text" wire:model="calle" placeholder="Ej. Av. Arce o Calle Murillo"
-                                       class="uppercase w-full h-10 rounded-xl border {{ $errors->has('calle') ? 'border-[#E27D60]' : 'border-[#C7B5A3]' }} bg-white px-4 py-2 text-sm font-bold text-[#2F3E5C] outline-none transition focus:border-[#2F3E5C]">
-                                @error('calle') <span class="mt-1 block text-[9px] font-black text-[#E27D60] uppercase">{{ $message }}</span> @enderror
-                            </div>
-                            <div class="col-span-4">
-                                <label class="mb-1 block text-[9px] font-black uppercase tracking-widest text-[#2F3E5C]/60">Nro. Domicilio *</label>
-                                <input type="text" wire:model="nro_domicilio" placeholder="Ej. 1234 o S/N"
-                                       class="uppercase w-full h-10 rounded-xl border {{ $errors->has('nro_domicilio') ? 'border-[#E27D60]' : 'border-[#C7B5A3]' }} bg-white px-4 py-2 text-sm font-bold text-[#2F3E5C] outline-none transition focus:border-[#2F3E5C]">
-                                @error('nro_domicilio') <span class="mt-1 block text-[9px] font-black text-[#E27D60] uppercase">{{ $message }}</span> @enderror
-                            </div>
-                        </div>
-
+                        <!-- 1. Departamento -->
                         <div>
                             <label class="mb-1 block text-[9px] font-black uppercase tracking-widest text-[#2F3E5C]/60">Departamento de Domicilio *</label>
                             <select wire:model.live="departamento_domicilio"
@@ -1557,6 +1592,19 @@
                             @error('departamento_domicilio') <span class="mt-1 block text-[9px] font-black text-[#E27D60] uppercase">{{ $message }}</span> @enderror
                         </div>
 
+                        <!-- Especifique Departamento (si aplica) -->
+                        @if($departamento_domicilio === 'OTRO')
+                            <div>
+                                <label class="mb-1 block text-[9px] font-black uppercase tracking-widest text-[#2F3E5C]/60">Especifique Departamento *</label>
+                                <input type="text" wire:model="otro_departamento" placeholder="Especifique el Departamento..."
+                                       class="uppercase w-full h-10 rounded-xl border {{ $errors->has('otro_departamento') ? 'border-[#E27D60]' : 'border-[#C7B5A3]' }} bg-white px-4 py-2 text-sm font-bold text-[#2F3E5C] outline-none transition focus:border-[#2F3E5C]">
+                                @error('otro_departamento') <span class="mt-1 block text-[9px] font-black text-[#E27D60] uppercase">{{ $message }}</span> @enderror
+                            </div>
+                        @else
+                            <div></div> <!-- Mantiene alineado el grid si no se muestra -->
+                        @endif
+
+                        <!-- 2. Municipio / Ciudad -->
                         <div>
                             <label class="mb-1 block text-[9px] font-black uppercase tracking-widest text-[#2F3E5C]/60">Municipio / Localidad *</label>
                             @if($departamento_domicilio === 'OTRO')
@@ -1577,46 +1625,18 @@
                             @endif
                         </div>
 
-                        @if($departamento_domicilio === 'OTRO')
-                            <div class="md:col-span-2">
-                                <label class="mb-1 block text-[9px] font-black uppercase tracking-widest text-[#2F3E5C]/60">Especifique Departamento *</label>
-                                <input type="text" wire:model="otro_departamento" placeholder="Especifique el Departamento..."
-                                       class="uppercase w-full h-10 rounded-xl border {{ $errors->has('otro_departamento') ? 'border-[#E27D60]' : 'border-[#C7B5A3]' }} bg-white px-4 py-2 text-sm font-bold text-[#2F3E5C] outline-none transition focus:border-[#2F3E5C]">
-                                @error('otro_departamento') <span class="mt-1 block text-[9px] font-black text-[#E27D60] uppercase">{{ $message }}</span> @enderror
-                            </div>
-                        @endif
-
-                        @if($municipio_domicilio === 'OTRO' && $departamento_domicilio !== 'OTRO')
-                            <div>
-                                <label class="mb-1 block text-[9px] font-black uppercase tracking-widest text-[#2F3E5C]/60">Especifique Municipio *</label>
-                                <input type="text" wire:model="otro_municipio" placeholder="Especifique el Municipio..."
-                                       class="uppercase w-full h-10 rounded-xl border {{ $errors->has('otro_municipio') ? 'border-[#E27D60]' : 'border-[#C7B5A3]' }} bg-white px-4 py-2 text-sm font-bold text-[#2F3E5C] outline-none transition focus:border-[#2F3E5C]">
-                                @error('otro_municipio') <span class="mt-1 block text-[9px] font-black text-[#E27D60] uppercase">{{ $message }}</span> @enderror
-                            </div>
-                        @endif
-
-                        <div class="md:col-span-2">
+                        <!-- 3. Zona / Barrio -->
+                        <div>
                             <label class="mb-1 block text-[9px] font-black uppercase tracking-widest text-[#2F3E5C]/60">Zona / Barrio *</label>
                             @if(isset($catalogZonas[$municipio_domicilio]))
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                    <div>
-                                        <select wire:model.live="zona_domicilio"
-                                                class="w-full h-10 rounded-xl border {{ $errors->has('zona_domicilio') ? 'border-[#E27D60] ring-4 ring-[#E27D60]/10' : 'border-[#C7B5A3] focus:border-[#2F3E5C]' }} bg-white px-4 py-2 text-sm font-bold text-[#2F3E5C] outline-none transition">
-                                            <option value="">SELECCIONE ZONA...</option>
-                                            @foreach($catalogZonas[$municipio_domicilio] as $z)
-                                                <option value="{{ $z }}">{{ $z }}</option>
-                                            @endforeach
-                                        </select>
-                                        @error('zona_domicilio') <span class="mt-1 block text-[9px] font-black text-[#E27D60] uppercase">{{ $message }}</span> @enderror
-                                    </div>
-                                    @if($zona_domicilio === 'OTRO')
-                                        <div>
-                                            <input type="text" wire:model="otra_zona" placeholder="Especifique la Zona / Barrio..."
-                                                   class="uppercase w-full h-10 rounded-xl border {{ $errors->has('otra_zona') ? 'border-[#E27D60]' : 'border-[#C7B5A3]' }} bg-white px-4 py-2 text-sm font-bold text-[#2F3E5C] outline-none transition focus:border-[#2F3E5C]">
-                                            @error('otra_zona') <span class="mt-1 block text-[9px] font-black text-[#E27D60] uppercase">{{ $message }}</span> @enderror
-                                        </div>
-                                    @endif
-                                </div>
+                                <select wire:model.live="zona_domicilio"
+                                        class="w-full h-10 rounded-xl border {{ $errors->has('zona_domicilio') ? 'border-[#E27D60] ring-4 ring-[#E27D60]/10' : 'border-[#C7B5A3] focus:border-[#2F3E5C]' }} bg-white px-4 py-2 text-sm font-bold text-[#2F3E5C] outline-none transition">
+                                    <option value="">SELECCIONE ZONA...</option>
+                                    @foreach($catalogZonas[$municipio_domicilio] as $z)
+                                        <option value="{{ $z }}">{{ $z }}</option>
+                                    @endforeach
+                                </select>
+                                @error('zona_domicilio') <span class="mt-1 block text-[9px] font-black text-[#E27D60] uppercase">{{ $message }}</span> @enderror
                             @else
                                 <input type="text" wire:model="otra_zona" placeholder="Ej. Sopocachi"
                                        class="uppercase w-full h-10 rounded-xl border {{ $errors->has('otra_zona') ? 'border-[#E27D60]' : 'border-[#C7B5A3]' }} bg-white px-4 py-2 text-sm font-bold text-[#2F3E5C] outline-none transition focus:border-[#2F3E5C]">
@@ -1624,6 +1644,47 @@
                             @endif
                         </div>
 
+                        <!-- 4. Especifique municipio/ciudad (si aplica) -->
+                        @if($municipio_domicilio === 'OTRO' && $departamento_domicilio !== 'OTRO')
+                            <div>
+                                <label class="mb-1 block text-[9px] font-black uppercase tracking-widest text-[#2F3E5C]/60">Especifique Municipio *</label>
+                                <input type="text" wire:model="otro_municipio" placeholder="Especifique el Municipio..."
+                                       class="uppercase w-full h-10 rounded-xl border {{ $errors->has('otro_municipio') ? 'border-[#E27D60]' : 'border-[#C7B5A3]' }} bg-white px-4 py-2 text-sm font-bold text-[#2F3E5C] outline-none transition focus:border-[#2F3E5C]">
+                                @error('otro_municipio') <span class="mt-1 block text-[9px] font-black text-[#E27D60] uppercase">{{ $message }}</span> @enderror
+                            </div>
+                        @else
+                            <div></div> <!-- Mantiene alineado el grid -->
+                        @endif
+
+                        <!-- 5. Especifique zona/barrio (si aplica) -->
+                        @if(isset($catalogZonas[$municipio_domicilio]) && $zona_domicilio === 'OTRO')
+                            <div>
+                                <label class="mb-1 block text-[9px] font-black uppercase tracking-widest text-[#2F3E5C]/60">Especifique Zona / Barrio *</label>
+                                <input type="text" wire:model="otra_zona" placeholder="Especifique la Zona / Barrio..."
+                                       class="uppercase w-full h-10 rounded-xl border {{ $errors->has('otra_zona') ? 'border-[#E27D60]' : 'border-[#C7B5A3]' }} bg-white px-4 py-2 text-sm font-bold text-[#2F3E5C] outline-none transition focus:border-[#2F3E5C]">
+                                @error('otra_zona') <span class="mt-1 block text-[9px] font-black text-[#E27D60] uppercase">{{ $message }}</span> @enderror
+                            </div>
+                        @else
+                            <div></div> <!-- Mantiene alineado el grid -->
+                        @endif
+
+                        <!-- 6 & 7. Calle / Avenida y Número de domicilio -->
+                        <div class="md:col-span-2 grid grid-cols-12 gap-3">
+                            <div class="col-span-8">
+                                <label class="mb-1 block text-[9px] font-black uppercase tracking-widest text-[#2F3E5C]/60">Calle / Avenida *</label>
+                                <input type="text" wire:model="calle" placeholder="Ej. Av. Arce o Calle Murillo"
+                                       class="uppercase w-full h-10 rounded-xl border {{ $errors->has('calle') ? 'border-[#E27D60]' : 'border-[#C7B5A3]' }} bg-white px-4 py-2 text-sm font-bold text-[#2F3E5C] outline-none transition focus:border-[#2F3E5C]">
+                                @error('calle') <span class="mt-1 block text-[9px] font-black text-[#E27D60] uppercase">{{ $message }}</span> @enderror
+                            </div>
+                            <div class="col-span-4">
+                                <label class="mb-1 block text-[9px] font-black uppercase tracking-widest text-[#2F3E5C]/60">Nro. Domicilio *</label>
+                                <input type="text" wire:model="nro_domicilio" placeholder="Ej. 1234 o S/N"
+                                       class="uppercase w-full h-10 rounded-xl border {{ $errors->has('nro_domicilio') ? 'border-[#E27D60]' : 'border-[#C7B5A3]' }} bg-white px-4 py-2 text-sm font-bold text-[#2F3E5C] outline-none transition focus:border-[#2F3E5C]">
+                                @error('nro_domicilio') <span class="mt-1 block text-[9px] font-black text-[#E27D60] uppercase">{{ $message }}</span> @enderror
+                            </div>
+                        </div>
+
+                        <!-- 8. Referencia de domicilio -->
                         <div class="md:col-span-2">
                             <label class="mb-1 block text-[9px] font-black uppercase tracking-widest text-[#2F3E5C]/60">Referencia de Domicilio</label>
                             <input type="text" wire:model="referencia_domicilio" placeholder="Ej. Frente al centro de salud"
@@ -2788,6 +2849,161 @@
                 </div>
             </footer>
         </aside>
+    </div>
+    @endif
+
+    {{-- MODAL DE ÉXITO POST-REGISTRO --}}
+    @if($mostrarPostRegistro && $usuarioPostRegistro)
+    <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300">
+        <div class="relative w-full max-w-lg rounded-[2rem] border border-[#C7B5A3]/50 bg-[#E6DDD3] shadow-2xl p-6 md:p-8 space-y-6">
+            <div class="text-center space-y-2">
+                <div class="inline-flex h-16 w-16 items-center justify-center rounded-full bg-[#8DA280]/20 text-[#63775B]">
+                    <i class="ph-bold ph-check-circle text-4xl animate-bounce"></i>
+                </div>
+                <h3 class="text-2xl font-black text-[#2F3E5C] uppercase tracking-wide">¡Usuario Registrado!</h3>
+                <p class="text-xs font-bold text-[#2F3E5C]/75">El usuario institucional ha sido registrado en el sistema.</p>
+            </div>
+
+            {{-- Estado del correo --}}
+            <div class="rounded-2xl border border-[#C7B5A3]/40 bg-white/40 p-4 space-y-2">
+                <div class="flex items-center gap-2">
+                    @if($correoRequisitosEnviado)
+                        <i class="ph-bold ph-paper-plane-tilt text-lg text-[#63775B]"></i>
+                        <span class="text-xs font-black uppercase text-[#63775B]">Correo de requisitos enviado</span>
+                    @else
+                        <i class="ph-bold ph-warning text-lg text-[#E27D60]"></i>
+                        <span class="text-xs font-black uppercase text-[#E27D60]">Advertencia de correo</span>
+                    @endif
+                </div>
+                <p class="text-xs font-bold text-[#2F3E5C]/80">
+                    {{ $mensajeCorreoRequisitos ?: 'Enviando correo con la solicitud documental obligatoria...' }}
+                </p>
+            </div>
+
+            {{-- Resumen de credenciales --}}
+            <div class="rounded-2xl border border-[#C7B5A3]/40 bg-white/40 p-4 space-y-2">
+                <span class="text-[9px] font-black uppercase tracking-widest text-[#2F3E5C]/60 block">Credenciales de Acceso</span>
+                <div class="grid grid-cols-2 gap-3 text-xs">
+                    <div>
+                        <span class="font-bold text-[#2F3E5C]/50 block">Usuario / Correo:</span>
+                        <span class="font-black text-[#2F3E5C] break-all">{{ $usuarioPostRegistro->correo ?: 'Sin correo' }}</span>
+                    </div>
+                    <div>
+                        <span class="font-bold text-[#2F3E5C]/50 block">Contraseña Temporal:</span>
+                        <span class="font-mono font-black text-[#2F3E5C] bg-white border border-[#C7B5A3]/20 px-2 py-0.5 rounded select-all cursor-pointer" title="Haga clic para copiar">{{ $passwordTemporalPostRegistro ?: 'Autogenerada' }}</span>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Documentación pendiente --}}
+            <div class="rounded-2xl border border-[#C7B5A3]/40 bg-[#FAF7F2]/50 p-4 space-y-3">
+                <div class="flex justify-between items-center border-b border-[#C7B5A3]/25 pb-1">
+                    <span class="text-[9px] font-black uppercase tracking-widest text-[#E27D60]">Requisitos Documentales Obligatorios</span>
+                    <span class="text-[8px] font-black uppercase tracking-widest text-[#E27D60] bg-[#E27D60]/10 px-2 py-0.5 rounded-full">Límite 48 horas</span>
+                </div>
+                @if(!empty($documentosRequeridos))
+                    <ul class="space-y-1.5 max-h-[120px] overflow-y-auto custom-scrollbar text-xs font-bold text-[#2F3E5C]/80">
+                        @foreach($documentosRequeridos as $docReq)
+                            <li class="flex items-center gap-2">
+                                <i class="ph-bold ph-file-text text-sm text-[#2F3E5C]/60"></i>
+                                <span class="uppercase">{{ $docReq }}</span>
+                            </li>
+                        @endforeach
+                    </ul>
+                @else
+                    <p class="text-xs font-bold text-[#2F3E5C]/60">Ningún requisito documental obligatorio para este rol.</p>
+                @endif
+            </div>
+
+            {{-- Acciones --}}
+            <div class="flex flex-col sm:flex-row gap-2 pt-2">
+                <button type="button"
+                        wire:click="verFichaPostRegistro"
+                        class="flex-1 inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-[#2F3E5C] px-5 text-xs font-black text-white shadow-lg transition hover:bg-[#E27D60] active:scale-95">
+                    <i class="ph-bold ph-eye text-sm"></i>
+                    Ver Ficha
+                </button>
+                <button type="button"
+                        wire:click="cerrarPostRegistro"
+                        class="flex-1 inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-white border border-[#C7B5A3]/50 px-5 text-xs font-black text-[#2F3E5C] transition hover:bg-white/80 active:scale-95">
+                    <i class="ph-bold ph-x text-sm"></i>
+                    Cerrar y Volver
+                </button>
+            </div>
+        </div>
+    </div>
+    @endif
+
+    {{-- MODAL SUBIR DOCUMENTACIÓN --}}
+    @if($mostrarModalSubirDoc && $tipoDocSeleccionado)
+    <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+        <div class="relative w-full max-w-md rounded-[2rem] border border-[#C7B5A3]/50 bg-[#E6DDD3] shadow-2xl p-6 space-y-5">
+            <header class="flex items-center justify-between border-b border-[#C7B5A3]/30 pb-3">
+                <div>
+                    <span class="text-[9px] font-black uppercase tracking-[0.2em] text-[#E27D60]">Gestión Documental</span>
+                    <h3 class="text-base font-black text-[#2F3E5C] uppercase leading-tight">{{ $tipoDocNombre }}</h3>
+                </div>
+                <button type="button" wire:click="cerrarModalSubirDoc" class="flex h-8 w-8 items-center justify-center rounded-full bg-white/60 hover:bg-white text-[#2F3E5C] transition active:scale-95">
+                    <i class="ph-bold ph-x text-lg"></i>
+                </button>
+            </header>
+
+            <form wire:submit.prevent="guardarDocumento" class="space-y-4">
+                {{-- Archivo Temporal --}}
+                <div class="space-y-1">
+                    <label class="block text-[9px] font-black uppercase tracking-widest text-[#2F3E5C]/60">Archivo (PDF, JPG, JPEG, PNG - Max 10MB) *</label>
+                    <div class="relative flex flex-col items-center justify-center border-2 border-dashed border-[#C7B5A3]/60 rounded-xl bg-white/40 p-4 transition hover:bg-white/60">
+                        <input type="file" wire:model="archivoTemporal" id="archivoDoc" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" accept=".pdf,.jpg,.jpeg,.png">
+                        
+                        <div class="text-center space-y-1 pointer-events-none">
+                            <i class="ph-bold ph-cloud-arrow-up text-3xl text-[#2F3E5C]/45"></i>
+                            <p class="text-xs font-black text-[#2F3E5C]/80">
+                                @if($archivoTemporal)
+                                    Archivo seleccionado: <span class="text-[#E27D60] font-black">{{ $archivoTemporal->getClientOriginalName() }}</span>
+                                @else
+                                    Seleccionar o arrastrar archivo
+                                @endif
+                            </p>
+                            <p class="text-[9px] text-[#2F3E5C]/50">Formatos: PDF, JPG, PNG de hasta 10 MB</p>
+                        </div>
+                    </div>
+                    @error('archivoTemporal') <span class="mt-1 block text-[9px] font-black text-[#E27D60] uppercase">{{ $message }}</span> @enderror
+                </div>
+
+                {{-- Fechas --}}
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="mb-1 block text-[9px] font-black uppercase tracking-widest text-[#2F3E5C]/60">Fecha de Emisión</label>
+                        <input type="date" wire:model="fechaEmisionDoc" class="w-full h-10 rounded-xl border border-[#C7B5A3] bg-white px-3 py-2 text-xs font-bold text-[#2F3E5C] outline-none transition focus:border-[#E27D60]">
+                        @error('fechaEmisionDoc') <span class="mt-1 block text-[9px] font-black text-[#E27D60] uppercase">{{ $message }}</span> @enderror
+                    </div>
+                    <div>
+                        <label class="mb-1 block text-[9px] font-black uppercase tracking-widest text-[#2F3E5C]/60">Fecha de Vencimiento</label>
+                        <input type="date" wire:model="fechaVencimientoDoc" class="w-full h-10 rounded-xl border border-[#C7B5A3] bg-white px-3 py-2 text-xs font-bold text-[#2F3E5C] outline-none transition focus:border-[#E27D60]">
+                        @error('fechaVencimientoDoc') <span class="mt-1 block text-[9px] font-black text-[#E27D60] uppercase">{{ $message }}</span> @enderror
+                    </div>
+                </div>
+
+                {{-- Observaciones --}}
+                <div>
+                    <label class="mb-1 block text-[9px] font-black uppercase tracking-widest text-[#2F3E5C]/60">Observaciones / Detalles</label>
+                    <textarea wire:model="observacionesDoc" placeholder="Opcional. Escriba algún comentario relevante..." rows="3"
+                              class="uppercase w-full rounded-xl border border-[#C7B5A3] bg-white px-3 py-2 text-xs font-bold text-[#2F3E5C] outline-none transition focus:border-[#E27D60] resize-none"></textarea>
+                    @error('observacionesDoc') <span class="mt-1 block text-[9px] font-black text-[#E27D60] uppercase">{{ $message }}</span> @enderror
+                </div>
+
+                {{-- Botones --}}
+                <div class="flex items-center gap-2 pt-2">
+                    <button type="button" wire:click="cerrarModalSubirDoc" class="flex-1 inline-flex h-10 items-center justify-center rounded-xl bg-white border border-[#C7B5A3]/50 text-xs font-black text-[#2F3E5C] transition hover:bg-white/80 active:scale-95">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="flex-1 inline-flex h-10 items-center justify-center gap-2 rounded-xl bg-[#2F3E5C] text-xs font-black text-white shadow-lg transition hover:bg-[#8DA280] active:scale-95">
+                        <i class="ph-bold ph-check"></i>
+                        Guardar Documento
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
     @endif
 

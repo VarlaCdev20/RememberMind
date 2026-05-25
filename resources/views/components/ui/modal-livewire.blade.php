@@ -20,7 +20,7 @@ $maxWidthClass = match ($maxWidth) {
     x-data="{ show: @entangle($attributes->wire('model')) }"
     x-show="show"
     x-on:keydown.escape.window="$wire.{{ $closeMethod }}()"
-    class="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto overflow-x-hidden p-4 sm:p-0"
+    class="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto overflow-x-hidden pt-16 px-4 pb-10 sm:pt-20"
     style="display: none;"
 >
     <!-- Overlay -->
@@ -47,7 +47,7 @@ $maxWidthClass = match ($maxWidth) {
         x-transition:leave="ease-in duration-200"
         x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
         x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-        class="relative mx-auto w-full transform overflow-hidden rounded-[24px] border border-[#C7B5A3] bg-[#F8F2EC] shadow-[0_20px_50px_rgba(47,62,92,0.2)] transition-all sm:my-8 {{ $maxWidthClass }}"
+        class="relative w-full flex flex-col max-h-[82vh] transform overflow-hidden rounded-[24px] border border-[#C7B5A3] bg-[#F8F2EC] shadow-[0_20px_50px_rgba(47,62,92,0.2)] transition-all {{ $maxWidthClass }}"
     >
         <!-- Header -->
         <div class="border-b border-[#D5C7B9] bg-[#E6DDD3]/50 px-6 py-4 flex items-center justify-between">
@@ -63,7 +63,7 @@ $maxWidthClass = match ($maxWidth) {
         </div>
 
         <!-- Body (con scroll) -->
-        <div class="max-h-[70vh] overflow-y-auto px-6 py-5">
+        <div class="overflow-y-auto px-6 py-5">
             {{ $slot }}
         </div>
 

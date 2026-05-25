@@ -268,31 +268,10 @@
                 ],
                 [
                     'key' => 'datos',
-                    'icon' => 'ph-heart',
+                    'icon' => 'ph-identification-card',
                     'label' => 'Datos y Apoyo',
                     'desc' => 'Filiación y familia',
                     'color' => '#8EA17D'
-                ],
-                [
-                    'key' => 'salud',
-                    'icon' => 'ph-heartbeat',
-                    'label' => 'Salud y Cuidados',
-                    'desc' => 'Ficha de salud y cuidados',
-                    'color' => '#C45F4B'
-                ],
-                [
-                    'key' => 'seguimiento',
-                    'icon' => 'ph-clipboard-text',
-                    'label' => 'Seguimiento',
-                    'desc' => 'Notas y atenciones',
-                    'color' => '#6873A6'
-                ],
-                [
-                    'key' => 'evaluaciones',
-                    'icon' => 'ph-brain',
-                    'label' => 'Evaluaciones',
-                    'desc' => 'Geriátricas integrales',
-                    'color' => '#5B5F97'
                 ],
                 [
                     'key' => 'documentos',
@@ -300,6 +279,27 @@
                     'label' => 'Documentos',
                     'desc' => 'Expediente físico',
                     'color' => '#2F3E5C'
+                ],
+                [
+                    'key' => 'salud',
+                    'icon' => 'ph-heartbeat',
+                    'label' => 'Salud y Seguimiento',
+                    'desc' => 'Resumen médico clínico',
+                    'color' => '#C45F4B'
+                ],
+                [
+                    'key' => 'evaluaciones',
+                    'icon' => 'ph-brain',
+                    'label' => 'Cognitivas',
+                    'desc' => 'MoCA, MMSE y reportes',
+                    'color' => '#5B5F97'
+                ],
+                [
+                    'key' => 'seguimiento',
+                    'icon' => 'ph-users-three',
+                    'label' => 'Actividades y Atención',
+                    'desc' => 'Seguimiento institucional',
+                    'color' => '#6873A6'
                 ],
                 [
                     'key' => 'historial',

@@ -14,7 +14,7 @@ class SaludAlertasPanel extends Component
         // Cargamos solo adultos activos con relaciones acotadas para evitar timeout
         $adultos = AdultoMayor::with([
             'fichasMedicas'           => fn ($q) => $q->where('estado', 'ACTIVA')->latest()->limit(1),
-            'medicaciones'            => fn ($q) => $q->where('estado', 'ACTIVA'),
+            'medicaciones'            => fn ($q) => $q->whereIn('estado', ['ACTIVA', 'ACTIVO']),
             'administracionesMedicacion' => fn ($q) => $q->latest('fecha')->limit(3),
             'signosVitales'           => fn ($q) => $q->where('estado', 'VIGENTE')->latest('fecha')->limit(1),
             'valoracionesFuncionales' => fn ($q) => $q->latest('fecha_valoracion')->limit(1),
@@ -26,7 +26,7 @@ class SaludAlertasPanel extends Component
 
         foreach ($adultos as $adulto) {
             $fichaMedica = $adulto->fichasMedicas->where('estado', 'ACTIVA')->first();
-            $medicacionesActivas = $adulto->medicaciones->where('estado', 'ACTIVA');
+            $medicacionesActivas = $adulto->medicaciones->whereIn('estado', ['ACTIVA', 'ACTIVO']);
             $valFuncional = $adulto->valoracionesFuncionales->sortByDesc('fecha_valoracion')->first();
             $ultimosSignos = $adulto->signosVitales->where('estado', 'VIGENTE')->sortByDesc('fecha')->first();
             
@@ -56,7 +56,7 @@ class SaludAlertasPanel extends Component
             }
 
             if ($ultimosSignos) {
-                if ($ultimosSignos->temperatura > 37.8 || $ultimosSignos->saturacion_oxigeno < 92) {
+                if ($ultimosSignos->temperatura > 37.8 || ($ultimosSignos->saturacion !== null && $ultimosSignos->saturacion < 92)) {
                     $alertas->push([
                         'adulto' => $adulto,
                         'tipo' => 'Signos Vitales',
@@ -106,7 +106,13 @@ class SaludAlertasPanel extends Component
         }
 
         return view('livewire.admin.salud-seguimiento.salud-alertas-panel', [
-            'alertas' => $alertas
-        ])->layout('layouts.sistema');
+            'alertas' => $alertas,
+            'conteos' => [
+                'total' => $alertas->count(),
+                'criticas' => $alertas->where('nivel', 'critica')->count(),
+                'preventivas' => $alertas->where('nivel', 'atencion')->count(),
+                'tipos' => $alertas->groupBy('tipo')->map->count(),
+            ],
+        ]);
     }
 }

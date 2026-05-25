@@ -3,6 +3,7 @@
 namespace App\Livewire\Admin\SaludSeguimiento;
 
 use Livewire\Component;
+use Livewire\WithPagination;
 use App\Models\AdultoMayor;
 use App\Models\FichaMedicaAdulto;
 use Carbon\Carbon;
@@ -10,8 +11,14 @@ use Illuminate\Support\Facades\DB;
 
 class SaludFichaPanel extends Component
 {
-    public AdultoMayor $adulto;
-    public $fichaActiva;
+    use WithPagination;
+
+    public ?AdultoMayor $adulto = null;
+    public string $adultoSeleccionado = '';
+    public string $buscarPaciente = '';
+    public string $searchGeneral = '';
+    public string $filtroEstado = 'todas';
+    public ?FichaMedicaAdulto $fichaActiva = null;
     public $historialFichas = [];
 
     // Form fields
@@ -35,33 +42,142 @@ class SaludFichaPanel extends Component
     public $cirugias = '';
     public $observacion_medica = '';
 
-    public $modalOpen = false;
+    public $modalGeneral = false;
+    public $modalAlergias = false;
+    public $modalCondiciones = false;
+    public $modalAntecedentes = false;
+    public $modalObservaciones = false;
 
-    public function mount(AdultoMayor $adulto)
+    public function mount(?AdultoMayor $adulto = null)
     {
-        $this->adulto = $adulto;
+        if ($adulto && $adulto->exists) {
+            $this->cargarAdulto($adulto->cod_am);
+        }
+    }
+
+    public function updatingSearchGeneral()
+    {
+        $this->resetPage();
+    }
+
+    public function updatingFiltroEstado()
+    {
+        $this->resetPage();
+    }
+
+    private function cargarAdulto(string $codAm): void
+    {
+        $this->adulto = AdultoMayor::with('estado')->findOrFail($codAm);
+        $this->adultoSeleccionado = $this->adulto->cod_am;
         $this->loadData();
     }
 
     public function loadData()
     {
-        $this->fichaActiva = $this->adulto->fichasMedicas()->where('estado', 'ACTIVA')->latest()->first();
-        $this->historialFichas = $this->adulto->fichasMedicas()->whereIn('estado', ['ARCHIVADA', 'ANULADA'])->latest()->get();
+        if ($this->adulto) {
+            $this->fichaActiva = $this->adulto->fichasMedicas()->where('estado', 'ACTIVA')->latest()->first();
+            $this->historialFichas = $this->adulto->fichasMedicas()->whereIn('estado', ['ARCHIVADA', 'ANULADA'])->latest()->get();
+        } else {
+            $this->fichaActiva = null;
+            $this->historialFichas = [];
+        }
     }
 
-    public function openModal()
+    public function buscarPacienteAction(): void
     {
-        if ($this->fichaActiva) {
-            $this->fillForm($this->fichaActiva);
-        } else {
-            $this->resetForm();
+        if (trim($this->adultoSeleccionado) === '') {
+            $this->dispatch('swal', [
+                'icon' => 'warning',
+                'title' => 'Seleccione un paciente',
+                'text' => 'Seleccione un adulto mayor antes de buscar.',
+            ]);
+            return;
         }
-        $this->modalOpen = true;
+
+        $adultoExistente = AdultoMayor::find($this->adultoSeleccionado);
+        if (!$adultoExistente) {
+            $this->dispatch('swal', [
+                'icon' => 'error',
+                'title' => 'No encontrado',
+                'text' => 'El adulto mayor seleccionado no existe.',
+            ]);
+            return;
+        }
+
+        $this->cargarAdulto($this->adultoSeleccionado);
+        
+        if (!$this->fichaActiva) {
+            $this->dispatch('swal', [
+                'icon' => 'info',
+                'title' => 'Sin ficha médica',
+                'text' => 'No existe ficha médica registrada para este adulto mayor.',
+            ]);
+        }
+    }
+
+    public function getPacientesSelectorProperty()
+    {
+        $query = AdultoMayor::query()
+            ->with('estado')
+            ->orderBy('nombres')
+            ->orderBy('ap_paterno');
+
+        if (trim($this->buscarPaciente) !== '') {
+            $busqueda = '%' . trim($this->buscarPaciente) . '%';
+            $query->where(function ($subQuery) use ($busqueda) {
+                $subQuery->where('cod_am', 'like', $busqueda)
+                    ->orWhere('nombres', 'like', $busqueda)
+                    ->orWhere('ap_paterno', 'like', $busqueda)
+                    ->orWhere('ap_materno', 'like', $busqueda)
+                    ->orWhere('ci', 'like', $busqueda);
+            });
+        }
+
+        return $query->limit(12)->get();
+    }
+
+    public function openModalGeneral()
+    {
+        if ($this->fichaActiva) $this->fillForm($this->fichaActiva);
+        else $this->resetForm();
+        $this->modalGeneral = true;
+    }
+
+    public function openModalAlergias()
+    {
+        if ($this->fichaActiva) $this->fillForm($this->fichaActiva);
+        else $this->resetForm();
+        $this->modalAlergias = true;
+    }
+
+    public function openModalCondiciones()
+    {
+        if ($this->fichaActiva) $this->fillForm($this->fichaActiva);
+        else $this->resetForm();
+        $this->modalCondiciones = true;
+    }
+
+    public function openModalAntecedentes()
+    {
+        if ($this->fichaActiva) $this->fillForm($this->fichaActiva);
+        else $this->resetForm();
+        $this->modalAntecedentes = true;
+    }
+
+    public function openModalObservaciones()
+    {
+        if ($this->fichaActiva) $this->fillForm($this->fichaActiva);
+        else $this->resetForm();
+        $this->modalObservaciones = true;
     }
 
     public function closeModal()
     {
-        $this->modalOpen = false;
+        $this->modalGeneral = false;
+        $this->modalAlergias = false;
+        $this->modalCondiciones = false;
+        $this->modalAntecedentes = false;
+        $this->modalObservaciones = false;
     }
 
     public function resetForm()
@@ -172,6 +288,60 @@ class SaludFichaPanel extends Component
 
     public function render()
     {
-        return view('livewire.admin.salud-seguimiento.salud-ficha-panel')->layout('layouts.sistema');
+        if (!$this->adulto) {
+            // RENDERING GENERAL DASHBOARD
+            $query = AdultoMayor::with(['estado', 'fichasMedicas' => function($q) {
+                $q->where('estado', 'ACTIVA');
+            }]);
+
+            if (trim($this->searchGeneral) !== '') {
+                $busqueda = '%' . trim($this->searchGeneral) . '%';
+                $query->where(function ($subQuery) use ($busqueda) {
+                    $subQuery->where('nombres', 'like', $busqueda)
+                        ->orWhere('ap_paterno', 'like', $busqueda)
+                        ->orWhere('ap_materno', 'like', $busqueda)
+                        ->orWhere('ci', 'like', $busqueda);
+                });
+            }
+
+            if ($this->filtroEstado === 'con_ficha') {
+                $query->whereHas('fichasMedicas', function($q) {
+                    $q->where('estado', 'ACTIVA');
+                });
+            } elseif ($this->filtroEstado === 'sin_ficha') {
+                $query->whereDoesntHave('fichasMedicas', function($q) {
+                    $q->where('estado', 'ACTIVA');
+                });
+            }
+
+            $pacientesGeneral = $query->paginate(12);
+
+            // Calculate stats efficiently
+            $totalAdultos = AdultoMayor::count();
+            $conFicha = FichaMedicaAdulto::where('estado', 'ACTIVA')->distinct('cod_am')->count('cod_am');
+            $sinFicha = $totalAdultos - $conFicha;
+            
+            // Just for UI cards (approximation or specific)
+            $alergiasCount = FichaMedicaAdulto::where('estado', 'ACTIVA')->whereNotNull('alergias')->where('alergias', '!=', '')->count();
+            $cuidadosCount = FichaMedicaAdulto::where('estado', 'ACTIVA')->whereNotNull('restricciones_alimentarias')->where('restricciones_alimentarias', '!=', '')->count();
+            
+            $stats = [
+                'total' => $totalAdultos,
+                'con_ficha' => $conFicha,
+                'sin_ficha' => $sinFicha,
+                'alergias' => $alergiasCount,
+                'cuidados' => $cuidadosCount,
+            ];
+
+            return view('livewire.admin.salud-seguimiento.salud-ficha-general', [
+                'pacientes' => $pacientesGeneral,
+                'stats' => $stats
+            ]);
+        }
+
+        // RENDERING INDIVIDUAL FICHA
+        return view('livewire.admin.salud-seguimiento.salud-ficha-panel', [
+            'pacientesSelector' => $this->pacientesSelector,
+        ])->layout('layouts.sistema');
     }
 }

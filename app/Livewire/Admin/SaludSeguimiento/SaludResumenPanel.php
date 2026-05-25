@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Admin\SaludSeguimiento;
 
+use Carbon\Carbon;
 use Livewire\Component;
 use App\Models\AdultoMayor;
 
@@ -9,101 +10,152 @@ class SaludResumenPanel extends Component
 {
     public AdultoMayor $adulto;
 
-    public function mount(AdultoMayor $adulto)
+    public function mount(AdultoMayor $adulto): void
     {
         $this->adulto = $adulto;
     }
 
     public function render()
     {
-        // Ficha Médica Activa
-        $fichaMedica = $this->adulto->fichasMedicas()->where('estado', 'ACTIVA')->latest()->first();
+        // 1. Ficha médica activa
+        $fichaMedica = $this->adulto->fichasMedicas()
+            ->where('estado', 'ACTIVO')
+            ->latest()
+            ->first();
 
-        // Medicación Activa
-        $medicacionActiva = $this->adulto->medicaciones()->where('estado', 'ACTIVA')->latest()->get();
+        // 2. Medicaciones activas (enum correcto: ACTIVO)
+        $medicacionActiva = $this->adulto->medicaciones()
+            ->where('estado', 'ACTIVO')
+            ->latest()
+            ->get();
 
-        // Últimas Administraciones
-        $ultimasAdministraciones = $this->adulto->administracionesMedicacion()->latest('fecha')->latest('hora_programada')->take(5)->get();
+        // 3. Última administración (sin filtro estado: columna no existe en administracion_medicacion)
+        $ultimaAdministracion = $this->adulto->administracionesMedicacion()
+            ->latest('fecha')
+            ->first();
 
-        // Dosis omitidas recientes
-        $dosisOmitidas = $this->adulto->administracionesMedicacion()->where('estado', 'OMITIDA')->latest('fecha')->take(3)->get();
+        // 4. Tomas no administradas recientes (columna boolean: administrado)
+        $dosisOmitidas = $this->adulto->administracionesMedicacion()
+            ->where('administrado', false)
+            ->latest('fecha')
+            ->take(3)
+            ->get();
 
-        // Últimos signos vitales
-        $ultimosSignos = $this->adulto->signosVitales()->where('estado', 'VIGENTE')->latest('fecha')->latest('hora')->take(3)->get();
+        // 5. Último registro de signos vitales (tabla no tiene columna estado)
+        $ultimoSigno = $this->adulto->signosVitales()
+            ->latest('fecha')
+            ->latest('hora')
+            ->first();
 
-        // Valoración Funcional vigente
-        $valoracionFuncional = $this->adulto->valoracionesFuncionales()->latest('fecha_valoracion')->first();
+        // 6. Valoración funcional vigente (tabla sí tiene columna estado)
+        $valoracionFuncional = $this->adulto->valoracionesFuncionales()
+            ->where('estado', 'VIGENTE')
+            ->latest('fecha_valoracion')
+            ->first();
 
-        // Alertas Dinámicas (Cálculo al vuelo)
+        // 7. Observaciones recientes
+        $observaciones = $this->adulto->observaciones()
+            ->latest('fecha')
+            ->take(3)
+            ->get();
+
+        // 8. Atenciones recientes
+        $atenciones = $this->adulto->atenciones()
+            ->latest('fecha')
+            ->take(3)
+            ->get();
+
+        // 9. Evaluación cognitiva más reciente (columna real: fecha_eval)
+        $evaluacionCognitiva = $this->adulto->evaluacionesCognitivas()
+            ->latest('fecha_eval')
+            ->first();
+
+        // ── Alertas orientativas ─────────────────────────────────
         $alertas = collect();
 
         if (!$fichaMedica) {
             $alertas->push([
-                'tipo' => 'Ficha Médica Pendiente',
-                'nivel' => 'atencion',
-                'mensaje' => 'No hay una ficha médica activa registrada para este adulto mayor.',
+                'tipo'    => 'Ficha Médica',
+                'nivel'   => 'atencion',
+                'mensaje' => 'No se ha registrado una ficha médica activa. Seguimiento pendiente.',
             ]);
         }
 
-        if ($medicacionActiva->isEmpty()) {
-            $alertas->push([
-                'tipo' => 'Sin Medicación',
-                'nivel' => 'informativa',
-                'mensaje' => 'El paciente no tiene medicación activa registrada actualmente.',
-            ]);
-        } else {
-            // Verificar si hay medicación activa sin administración reciente (ej. hace 24h)
-            $ultimaToma = $this->adulto->administracionesMedicacion()->latest('fecha')->first();
-            if (!$ultimaToma || \Carbon\Carbon::parse($ultimaToma->fecha)->diffInDays(now()) >= 1) {
+        if ($medicacionActiva->isNotEmpty()) {
+            $ultimaToma = $this->adulto->administracionesMedicacion()
+                ->where('administrado', true)
+                ->latest('fecha')
+                ->first();
+            if (!$ultimaToma || Carbon::parse($ultimaToma->fecha)->diffInDays(now()) >= 1) {
                 $alertas->push([
-                    'tipo' => 'Posible Omisión',
-                    'nivel' => 'atencion',
-                    'mensaje' => 'Hay medicación activa pero no se registran administraciones en las últimas 24 horas.',
+                    'tipo'    => 'Administración Pendiente',
+                    'nivel'   => 'atencion',
+                    'mensaje' => 'Alerta orientativa: hay medicación activa sin registro de administración confirmada en las últimas 24 horas. Requiere revisión.',
                 ]);
             }
         }
 
         if ($dosisOmitidas->isNotEmpty()) {
             $alertas->push([
-                'tipo' => 'Medicación Omitida',
-                'nivel' => 'critica',
-                'mensaje' => 'Se han registrado dosis omitidas o rechazadas recientemente. Requiere revisión.',
+                'tipo'    => 'Tomas No Administradas',
+                'nivel'   => 'requiere_revision',
+                'mensaje' => 'Se registran tomas sin administrar recientemente. Requiere revisión.',
             ]);
         }
 
         if ($valoracionFuncional) {
-            if ($valoracionFuncional->riesgo_caida === 'ALTO') {
+            if (strtoupper((string) $valoracionFuncional->riesgo_caida) === 'ALTO') {
                 $alertas->push([
-                    'tipo' => 'Riesgo de Caída Alto',
-                    'nivel' => 'critica',
-                    'mensaje' => 'El paciente presenta alto riesgo de caída según su última valoración.',
+                    'tipo'    => 'Riesgo de Caída',
+                    'nivel'   => 'requiere_revision',
+                    'mensaje' => 'Alerta orientativa: la valoración funcional registra riesgo de caída alto. Requiere seguimiento.',
                 ]);
             }
-            if (\in_array($valoracionFuncional->nivel_dependencia, ['ALTA_DEPENDENCIA', 'SUPERVISION_PERMANENTE'])) {
+
+            if (in_array($valoracionFuncional->nivel_dependencia, ['ALTA_DEPENDENCIA', 'SUPERVISION_PERMANENTE'])) {
                 $alertas->push([
-                    'tipo' => 'Alta Dependencia',
-                    'nivel' => 'atencion',
-                    'mensaje' => 'El paciente requiere asistencia significativa para sus actividades funcionales.',
+                    'tipo'    => 'Dependencia Elevada',
+                    'nivel'   => 'atencion',
+                    'mensaje' => 'Se registra nivel de dependencia elevado en la valoración funcional. Seguimiento pendiente.',
+                ]);
+            }
+
+            if ($valoracionFuncional->indice_barthel !== null && (int) $valoracionFuncional->indice_barthel < 40) {
+                $alertas->push([
+                    'tipo'    => 'Índice de Barthel',
+                    'nivel'   => 'seguimiento',
+                    'mensaje' => 'Alerta orientativa: el índice de Barthel registrado es menor a 40. Requiere revisión.',
                 ]);
             }
         }
 
-        // Secciones integradas sin duplicación (Solo Lectura)
-        $observaciones = $this->adulto->observaciones()->latest('fecha')->take(3)->get();
-        $atenciones = $this->adulto->atenciones()->latest('fecha')->take(3)->get();
-        $evaluacionCognitiva = $this->adulto->evaluacionesCognitivas()->latest('fecha_evaluacion')->first();
+        if (!$ultimoSigno || Carbon::parse($ultimoSigno->fecha)->diffInDays(now()) > 7) {
+            $alertas->push([
+                'tipo'    => 'Signos Vitales',
+                'nivel'   => 'seguimiento',
+                'mensaje' => 'No se han registrado signos vitales en los últimos 7 días. Seguimiento pendiente.',
+            ]);
+        }
+
+        if ($evaluacionCognitiva && Carbon::parse($evaluacionCognitiva->fecha_eval)->diffInMonths(now()) >= 6) {
+            $alertas->push([
+                'tipo'    => 'Evaluación Cognitiva',
+                'nivel'   => 'seguimiento',
+                'mensaje' => 'Alerta orientativa: la última evaluación cognitiva tiene más de 6 meses. Seguimiento pendiente.',
+            ]);
+        }
 
         return view('livewire.admin.salud-seguimiento.salud-resumen-panel', [
-            'fichaMedica' => $fichaMedica,
-            'medicacionActiva' => $medicacionActiva,
-            'ultimasAdministraciones' => $ultimasAdministraciones,
-            'dosisOmitidas' => $dosisOmitidas,
-            'ultimosSignos' => $ultimosSignos,
-            'valoracionFuncional' => $valoracionFuncional,
-            'alertas' => $alertas,
-            'observaciones' => $observaciones,
-            'atenciones' => $atenciones,
-            'evaluacionCognitiva' => $evaluacionCognitiva,
+            'fichaMedica'          => $fichaMedica,
+            'medicacionActiva'     => $medicacionActiva,
+            'ultimaAdministracion' => $ultimaAdministracion,
+            'dosisOmitidas'        => $dosisOmitidas,
+            'ultimoSigno'          => $ultimoSigno,
+            'valoracionFuncional'  => $valoracionFuncional,
+            'alertas'              => $alertas,
+            'observaciones'        => $observaciones,
+            'atenciones'           => $atenciones,
+            'evaluacionCognitiva'  => $evaluacionCognitiva,
         ])->layout('layouts.sistema');
     }
 }

@@ -18,7 +18,7 @@ class SaludReportesPanel extends Component
 
         return view('livewire.admin.salud-seguimiento.salud-reportes-panel', [
             'adultos' => $adultos
-        ])->layout('layouts.sistema');
+        ]);
     }
 
     public function generarVistaPrevia()

@@ -131,9 +131,7 @@
                 @include('admin.adultos-mayores.show._salud-medica')
 
                 <!-- 4. Seguimiento -->
-                <div x-show="tab === 'seguimiento'" class="space-y-6">
-                    @include('admin.adultos-mayores.show._seguimiento-observaciones')
-                </div>
+                @include('admin.adultos-mayores.show._seguimiento-observaciones')
 
                 <!-- 5. Evaluaciones -->
                 @include('admin.adultos-mayores.show._evaluaciones-cognitivas')

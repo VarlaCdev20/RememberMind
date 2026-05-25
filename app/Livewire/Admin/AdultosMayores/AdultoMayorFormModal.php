@@ -134,7 +134,7 @@ class AdultoMayorFormModal extends Component
         $this->expedicion_ci = $adulto->expedicion_ci;
         $this->estado_civil = $adulto->estado_civil;
         
-        $this->fecha_nac = $adulto->fecha_nac ? $adulto->fecha_nac->format('Y-m-d') : null;
+        $this->fecha_nac = $adulto->fecha_nac ? Carbon::parse($adulto->fecha_nac)->format('Y-m-d') : null;
         $this->genero = $adulto->genero;
         $this->grupo_sanguineo = $adulto->grupo_sanguineo;
         $this->alergias = $adulto->alergias ?? 'Ninguna';
@@ -157,7 +157,7 @@ class AdultoMayorFormModal extends Component
         $this->responsable_principal = (bool)$adulto->responsable_principal;
         $this->autorizado_informacion_medica = (bool)$adulto->autorizado_informacion_medica;
         
-        $this->fecha_ing = $adulto->fecha_ing ? $adulto->fecha_ing->format('Y-m-d') : date('Y-m-d');
+        $this->fecha_ing = $adulto->fecha_ing ? Carbon::parse($adulto->fecha_ing)->format('Y-m-d') : date('Y-m-d');
         $this->hora_ing = $adulto->hora_ing ? substr($adulto->hora_ing, 0, 5) : date('H:i');
         $this->tipo_ing = $adulto->tipo_ing;
         $this->permanencia = $adulto->permanencia;

@@ -5,6 +5,11 @@ namespace App\Livewire\Admin\SaludSeguimiento;
 use Livewire\Component;
 use Livewire\WithPagination;
 use App\Models\AdultoMayor;
+use App\Models\AdministracionMedicacion;
+use App\Models\FichaMedicaAdulto;
+use App\Models\MedicacionAdulto;
+use App\Models\ValoracionFuncionalAdulto;
+use App\Models\SignosVitalesAdulto;
 
 class SaludSeguimientoListPanel extends Component
 {
@@ -16,8 +21,48 @@ class SaludSeguimientoListPanel extends Component
         'search' => ['except' => '']
     ];
 
+    public string $seccionActiva = 'resumen';
+    public ?AdultoMayor $adultoSeleccionadoParaModal = null;
+
     public function updatingSearch()
     {
+        $this->resetPage();
+    }
+
+    public function abrirExpediente(string $cod_am)
+    {
+        $this->adultoSeleccionadoParaModal = AdultoMayor::where('cod_am', $cod_am)->firstOrFail();
+    }
+
+    public function cerrarExpediente()
+    {
+        $this->adultoSeleccionadoParaModal = null;
+    }
+
+    public function mount()
+    {
+        if (request()->routeIs('*.ficha.index')) {
+            $this->seccionActiva = 'ficha';
+        } elseif (request()->routeIs('*.medicacion.index')) {
+            $this->seccionActiva = 'medicacion';
+        } elseif (request()->routeIs('*.administracion.index')) {
+            $this->seccionActiva = 'administracion';
+        } elseif (request()->routeIs('*.signos.index')) {
+            $this->seccionActiva = 'signos';
+        } elseif (request()->routeIs('*.valoracion.index')) {
+            $this->seccionActiva = 'valoracion';
+        } elseif (request()->routeIs('*.alertas')) {
+            $this->seccionActiva = 'alertas';
+        } elseif (request()->routeIs('*.reportes')) {
+            $this->seccionActiva = 'reportes';
+        } else {
+            $this->seccionActiva = 'resumen';
+        }
+    }
+
+    public function cambiarSeccion(string $seccion): void
+    {
+        $this->seccionActiva = $seccion;
         $this->resetPage();
     }
 
@@ -31,7 +76,7 @@ class SaludSeguimientoListPanel extends Component
             'icono' => 'ph-heartbeat',
         ];
 
-        if (request()->routeIs('admin.salud-seguimiento.ficha.index')) {
+        if ($this->seccionActiva === 'ficha') {
             $context = [
                 'titulo' => 'Ficha médica',
                 'descripcion' => 'Seleccione un adulto mayor para registrar, actualizar o consultar su ficha médica.',
@@ -39,7 +84,7 @@ class SaludSeguimientoListPanel extends Component
                 'ruta_destino' => 'admin.salud-seguimiento.ficha',
                 'icono' => 'ph-file-text',
             ];
-        } elseif (request()->routeIs('admin.salud-seguimiento.medicacion.index')) {
+        } elseif ($this->seccionActiva === 'medicacion') {
             $context = [
                 'titulo' => 'Medicación',
                 'descripcion' => 'Seleccione un adulto mayor para gestionar su medicación registrada.',
@@ -47,7 +92,7 @@ class SaludSeguimientoListPanel extends Component
                 'ruta_destino' => 'admin.salud-seguimiento.medicacion',
                 'icono' => 'ph-pill',
             ];
-        } elseif (request()->routeIs('admin.salud-seguimiento.administracion.index')) {
+        } elseif ($this->seccionActiva === 'administracion') {
             $context = [
                 'titulo' => 'Administración de medicación',
                 'descripcion' => 'Seleccione un adulto mayor para registrar o consultar administraciones de medicación.',
@@ -55,7 +100,7 @@ class SaludSeguimientoListPanel extends Component
                 'ruta_destino' => 'admin.salud-seguimiento.administracion',
                 'icono' => 'ph-prescription',
             ];
-        } elseif (request()->routeIs('admin.salud-seguimiento.signos.index')) {
+        } elseif ($this->seccionActiva === 'signos') {
             $context = [
                 'titulo' => 'Signos vitales',
                 'descripcion' => 'Seleccione un adulto mayor para registrar o revisar controles de signos vitales.',
@@ -63,7 +108,7 @@ class SaludSeguimientoListPanel extends Component
                 'ruta_destino' => 'admin.salud-seguimiento.signos',
                 'icono' => 'ph-activity',
             ];
-        } elseif (request()->routeIs('admin.salud-seguimiento.valoracion.index')) {
+        } elseif ($this->seccionActiva === 'valoracion') {
             $context = [
                 'titulo' => 'Valoración funcional',
                 'descripcion' => 'Seleccione un adulto mayor para registrar o consultar su autonomía, dependencia y riesgo funcional.',
@@ -76,14 +121,129 @@ class SaludSeguimientoListPanel extends Component
         return $context;
     }
 
+    public function getGlobalStats()
+    {
+        $adultosActivos = AdultoMayor::whereHas('estado', function ($query) {
+            $query->whereNotIn('estado', ['ARCHIVADO', 'INACTIVO']);
+        })->count();
+
+        $adultosSinFicha = AdultoMayor::whereHas('estado', function ($query) {
+            $query->whereNotIn('estado', ['ARCHIVADO', 'INACTIVO']);
+        })->whereDoesntHave('fichasMedicas', function ($query) {
+            $query->whereIn('estado', ['ACTIVA', 'ACTIVO']);
+        })->count();
+
+        $signosConAlerta = SignosVitalesAdulto::where('estado', 'VIGENTE')
+            ->where(function ($query) {
+                $query->where('fecha', '>=', now()->subDays(7)->toDateString())
+                    ->where(function ($subQuery) {
+                        $subQuery->where('saturacion', '<', 92)
+                            ->orWhere('temperatura', '>=', 38)
+                            ->orWhere('presion_sistolica', '>=', 140)
+                            ->orWhere('presion_sistolica', '<=', 90);
+                    });
+            })
+            ->count();
+
+        return [
+            'seguimientos_activos' => $adultosActivos,
+            'total_fichas' => FichaMedicaAdulto::whereIn('estado', ['ACTIVA', 'ACTIVO'])->count(),
+            'signos_recientes' => SignosVitalesAdulto::where('estado', 'VIGENTE')
+                ->where('fecha', '>=', now()->subDays(7)->toDateString())
+                ->count(),
+            'medicaciones_activas' => MedicacionAdulto::where('estado', 'ACTIVO')->count(),
+            'controles_hoy' => SignosVitalesAdulto::where('estado', 'VIGENTE')
+                ->whereDate('fecha', today())
+                ->count(),
+            'valoraciones' => ValoracionFuncionalAdulto::where('fecha_valoracion', '>=', now()->subDays(30)->toDateString())->count(),
+            'alertas_pendientes' => $adultosSinFicha + $signosConAlerta,
+            'adultos_sin_ficha' => $adultosSinFicha,
+        ];
+    }
+
+    public function getResumenDashboard(): array
+    {
+        $controlesRecientes = SignosVitalesAdulto::with('adultoMayor')
+            ->where('estado', 'VIGENTE')
+            ->orderByDesc('fecha')
+            ->orderByDesc('hora')
+            ->take(5)
+            ->get();
+
+        $medicaciones = MedicacionAdulto::with('adultoMayor')
+            ->where('estado', 'ACTIVO')
+            ->latest()
+            ->take(5)
+            ->get();
+
+        $valoraciones = ValoracionFuncionalAdulto::with('adultoMayor')
+            ->latest('fecha_valoracion')
+            ->take(4)
+            ->get();
+
+        $alertasFicha = AdultoMayor::with('estado')
+            ->whereHas('estado', function ($query) {
+                $query->whereNotIn('estado', ['ARCHIVADO', 'INACTIVO']);
+            })
+            ->whereDoesntHave('fichasMedicas', function ($query) {
+                $query->whereIn('estado', ['ACTIVA', 'ACTIVO']);
+            })
+            ->orderBy('ap_paterno')
+            ->take(3)
+            ->get()
+            ->map(fn ($adulto) => [
+                'tipo' => 'Ficha médica',
+                'nivel' => 'preventiva',
+                'icono' => 'ph-file-dashed',
+                'titulo' => trim("{$adulto->nombres} {$adulto->ap_paterno}"),
+                'detalle' => 'Expediente clínico base pendiente.',
+                'adulto_id' => $adulto->cod_am,
+            ]);
+
+        $alertasSignos = SignosVitalesAdulto::with('adultoMayor')
+            ->where('estado', 'VIGENTE')
+            ->where('fecha', '>=', now()->subDays(7)->toDateString())
+            ->where(function ($query) {
+                $query->where('saturacion', '<', 92)
+                    ->orWhere('temperatura', '>=', 38)
+                    ->orWhere('presion_sistolica', '>=', 140)
+                    ->orWhere('presion_sistolica', '<=', 90);
+            })
+            ->orderByDesc('fecha')
+            ->take(3)
+            ->get()
+            ->map(fn ($signo) => [
+                'tipo' => 'Signos vitales',
+                'nivel' => 'importante',
+                'icono' => 'ph-warning-circle',
+                'titulo' => trim(($signo->adultoMayor?->nombres ?? 'Adulto mayor') . ' ' . ($signo->adultoMayor?->ap_paterno ?? '')),
+                'detalle' => 'Control reciente con valor fuera del rango orientativo.',
+                'adulto_id' => $signo->cod_am,
+            ]);
+
+        return [
+            'controlesRecientes' => $controlesRecientes,
+            'medicaciones' => $medicaciones,
+            'valoraciones' => $valoraciones,
+            'alertas' => $alertasFicha->concat($alertasSignos)->take(5),
+            'administracionesHoy' => AdministracionMedicacion::with(['adultoMayor', 'medicacion'])
+                ->whereDate('fecha', today())
+                ->latest()
+                ->take(5)
+                ->get(),
+        ];
+    }
+
     public function render()
     {
         $query = AdultoMayor::query()
             ->with([
                 'estado', 
                 'fichasMedicas' => function($q) { $q->latest()->limit(1); },
-                'medicaciones' => function($q) { $q->where('estado', 'ACTIVA'); },
-                'valoracionesFuncionales' => function($q) { $q->latest('fecha_valoracion')->limit(1); }
+                'medicaciones' => function($q) { $q->where('estado', 'ACTIVO'); },
+                'valoracionesFuncionales' => function($q) { $q->latest('fecha_valoracion')->limit(1); },
+                'signosVitales' => function($q) { $q->where('estado', 'VIGENTE')->latest('fecha')->limit(1); },
+                'administracionesMedicacion' => function($q) { $q->latest('fecha')->limit(3); },
             ])
             ->where(function ($q) {
                 $q->where('nombres', 'ilike', '%' . $this->search . '%')
@@ -95,7 +255,9 @@ class SaludSeguimientoListPanel extends Component
         
         return view('livewire.admin.salud-seguimiento.salud-seguimiento-list-panel', [
             'adultos' => $adultos,
-            'contexto' => $this->getContext()
+            'contexto' => $this->getContext(),
+            'stats' => $this->getGlobalStats(),
+            'resumenData' => $this->getResumenDashboard(),
         ])->layout('layouts.sistema');
     }
 }

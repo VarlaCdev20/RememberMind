@@ -89,7 +89,7 @@ class ReporteDataService
                 'am.tipo_ing',
                 'am.fecha_ing',
                 'am.permanencia',
-                DB::raw("COALESCE(ea.nombre_estado, 'Sin estado') AS nombre_estado"),
+                DB::raw("COALESCE(ea.estado, 'Sin estado') AS nombre_estado"),
                 'am.archivado_en',
                 'am.created_at',
                 DB::raw("({$tieneFamiliarSql}) AS tiene_familiar"),
@@ -116,7 +116,7 @@ class ReporteDataService
                 'am.fecha_nac',
                 'am.fecha_ing',
                 'am.permanencia',
-                'ea.nombre_estado',
+                DB::raw("ea.estado AS nombre_estado"),
                 'am.archivado_en'
             )
             ->orderBy('am.ap_paterno')
@@ -132,8 +132,8 @@ class ReporteDataService
 
         $resultados = DB::table('adulto_mayor as am')
             ->leftJoin('estado_adulto as ea', 'am.cod_est_adul', '=', 'ea.cod_est_adul')
-            ->select('ea.nombre_estado', DB::raw('COUNT(*) as total'))
-            ->groupBy('ea.nombre_estado', 'ea.cod_est_adul')
+            ->select(DB::raw("ea.estado AS nombre_estado"), DB::raw('COUNT(*) as total'))
+            ->groupBy('ea.estado', 'ea.cod_est_adul')
             ->orderByDesc('total')
             ->get();
 

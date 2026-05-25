@@ -1,16 +1,90 @@
-<div class="min-h-screen py-8 font-sans antialiased text-azul-profundo">
-    <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 space-y-6">
+<div class="salud-valoracion-scope space-y-6">
+    <style>
+        .salud-valoracion-scope .rm-card,
+        .salud-valoracion-scope .rm-card-soft,
+        .salud-valoracion-scope .rm-card-warm {
+            border-color: rgba(199, 181, 163, 0.65) !important;
+            background: rgba(243, 236, 228, 0.74) !important;
+            box-shadow: 0 12px 32px rgba(47, 62, 92, 0.08) !important;
+            backdrop-filter: blur(14px);
+        }
+        .salud-valoracion-scope .rm-table-header {
+            background: rgba(230, 221, 211, 0.78) !important;
+            color: rgba(47, 62, 92, 0.62) !important;
+        }
+        .salud-valoracion-scope .rm-table-row:hover {
+            background: rgba(230, 221, 211, 0.58) !important;
+        }
+        .salud-valoracion-scope .rm-input,
+        .salud-valoracion-scope .rm-select,
+        .salud-valoracion-scope .rm-textarea {
+            border-color: rgba(199, 181, 163, 0.62) !important;
+            background: rgba(243, 236, 228, 0.82) !important;
+            color: #2F3E5C !important;
+        }
+        .salud-valoracion-scope .rm-modal-overlay {
+            background: rgba(47, 62, 92, 0.62) !important;
+            backdrop-filter: blur(10px);
+            z-index: 120 !important;
+        }
+        .salud-valoracion-scope .rm-modal-panel {
+            border-radius: 1.8rem !important;
+            border-color: rgba(199, 181, 163, 0.72) !important;
+            background: #E6DDD3 !important;
+            box-shadow: 0 24px 70px rgba(47, 62, 92, 0.32) !important;
+            overflow: hidden;
+        }
+        .salud-valoracion-scope .rm-modal-header {
+            background: rgba(243, 236, 228, 0.86) !important;
+            border-color: rgba(199, 181, 163, 0.45) !important;
+        }
+        .salud-valoracion-scope .rm-modal-body {
+            background: rgba(230, 221, 211, 0.32) !important;
+        }
+        .salud-valoracion-scope .rm-modal-footer {
+            background: rgba(213, 199, 185, 0.42) !important;
+            border-color: rgba(199, 181, 163, 0.4) !important;
+        }
+        .salud-valoracion-scope .rm-empty-state {
+            background: rgba(230, 221, 211, 0.42) !important;
+            border-color: rgba(199, 181, 163, 0.72) !important;
+        }
+    </style>
+    <section class="overflow-hidden rounded-[1.6rem] border border-[#C7B5A3]/65 bg-[#F3ECE4]/78 shadow-sm backdrop-blur-xl">
+        <div class="h-1.5 w-full bg-gradient-to-r from-[#E27D60] via-[#D9A05B] to-[#8DA280]"></div>
+        <div class="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between">
+            <div class="flex items-center gap-3">
+                <span class="flex h-12 w-12 items-center justify-center rounded-2xl border border-[#C7B5A3]/55 bg-[#E6DDD3]/70 text-[#E27D60] shadow-sm">
+                    <i class="ph-bold ph-person-simple-walk text-2xl"></i>
+                </span>
+                <div>
+                    <span class="text-[10px] font-black uppercase tracking-[0.2em] text-[#E27D60]">Autonomía y dependencia</span>
+                    <h2 class="text-xl font-black tracking-tight text-[#2F3E5C]">Valoración funcional</h2>
+                    <p class="mt-1 text-xs font-bold leading-relaxed text-[#2F3E5C]/62">
+                        Seguimiento de autonomía, nivel de dependencia funcional, riesgo de caída y apoyos requeridos.
+                    </p>
+                </div>
+            </div>
 
-        {{-- ═══════════════════════════════════════════════════
-             CABECERA DEL PANEL
-        ════════════════════════════════════════════════════ --}}
-        @include('livewire.admin.salud-seguimiento._parciales.cabecera-panel', [
-            'titulo'     => 'Valoración Funcional',
-            'subtitulo'  => 'Autonomía, nivel de dependencia y riesgo de caída del paciente.',
-            'icono'      => 'ph-person-simple-walk',
-            'rutaVolver' => route('admin.salud-seguimiento.resumen', $adulto->cod_am),
-            'adulto'     => $adulto,
-        ])
+            @can('salud.valoracion.crear')
+                <button wire:click="abrirFormNuevo" type="button" class="inline-flex items-center justify-center gap-2 rounded-xl bg-[#E27D60] px-5 py-2.5 text-xs font-black uppercase tracking-wider text-white shadow-[0_10px_22px_rgba(226,125,96,0.24)] transition hover:-translate-y-0.5 hover:bg-[#D96F58] active:scale-95">
+                    <i class="ph-bold ph-plus-circle text-sm"></i>
+                    Registrar valoración
+                </button>
+            @endcan
+        </div>
+    </section>
+    {{-- ENCABEZADO DE SECCIÓN --}}
+    <div class="hidden">
+        <div>
+            <h2 class="text-xl font-black uppercase tracking-tight text-[#2F3E5C] flex items-center gap-2">
+                <i class="ph-bold ph-person-simple-walk text-[#E27D60]"></i> Valoración Funcional
+            </h2>
+            <p class="mt-1 text-xs font-bold text-[#2F3E5C]/60">
+                Seguimiento de autonomía, nivel de dependencia funcional y riesgo de caída.
+            </p>
+        </div>
+    </div>
 
         {{-- ═══════════════════════════════════════════════════
              ALERTAS DINÁMICAS
@@ -287,8 +361,7 @@
             @endif
         </div>
 
-    </div>{{-- /container --}}
-
+    {{-- /container --}}
 
     {{-- ═══════════════════════════════════════════════════════════════════════
          MODAL CREAR / EDITAR

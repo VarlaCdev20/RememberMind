@@ -171,11 +171,11 @@ Route::middleware([
                 Route::patch('documentos/{documento}/restaurar', [\App\Http\Controllers\Admin\AdultosMayores\AdultoMayorDocumentoController::class, 'restore'])->middleware('permission:documentos.archivar')->name('documentos.restore');
 
                 // FASE 3: Módulos Médicos y Administrativos
-                // Ficha Médica — permisos específicos pendientes en seeder: ficha_medica.crear, ficha_medica.editar
-                Route::post('ficha-medica', [\App\Http\Controllers\Admin\AdultosMayores\Salud\AdultoMayorFichaMedicaController::class, 'store'])->middleware('permission:salud.ver')->name('ficha-medica.store');
-                Route::put('ficha-medica/{ficha}', [\App\Http\Controllers\Admin\AdultosMayores\Salud\AdultoMayorFichaMedicaController::class, 'update'])->middleware('permission:salud.ver')->name('ficha-medica.update');
-                Route::patch('ficha-medica/{ficha}/archivar', [\App\Http\Controllers\Admin\AdultosMayores\Salud\AdultoMayorFichaMedicaController::class, 'archivar'])->middleware('permission:salud.ver')->name('ficha-medica.archivar');
-                Route::patch('ficha-medica/{ficha}/restaurar', [\App\Http\Controllers\Admin\AdultosMayores\Salud\AdultoMayorFichaMedicaController::class, 'restore'])->middleware('permission:salud.ver')->name('ficha-medica.restore');
+                // Ficha Médica
+                Route::post('ficha-medica', [\App\Http\Controllers\Admin\AdultosMayores\Salud\AdultoMayorFichaMedicaController::class, 'store'])->middleware('permission:ficha_medica.crear')->name('ficha-medica.store');
+                Route::put('ficha-medica/{ficha}', [\App\Http\Controllers\Admin\AdultosMayores\Salud\AdultoMayorFichaMedicaController::class, 'update'])->middleware('permission:ficha_medica.editar')->name('ficha-medica.update');
+                Route::patch('ficha-medica/{ficha}/archivar', [\App\Http\Controllers\Admin\AdultosMayores\Salud\AdultoMayorFichaMedicaController::class, 'archivar'])->middleware('permission:ficha_medica.archivar')->name('ficha-medica.archivar');
+                Route::patch('ficha-medica/{ficha}/restaurar', [\App\Http\Controllers\Admin\AdultosMayores\Salud\AdultoMayorFichaMedicaController::class, 'restore'])->middleware('permission:ficha_medica.archivar')->name('ficha-medica.restore');
 
                 // Medicación
                 Route::post('medicacion', [\App\Http\Controllers\Admin\AdultosMayores\Salud\AdultoMayorMedicacionController::class, 'store'])->middleware('permission:medicacion.crear')->name('medicacion.store');
@@ -185,16 +185,16 @@ Route::middleware([
                 Route::patch('medicacion/{medicacion}/archivar', [\App\Http\Controllers\Admin\AdultosMayores\Salud\AdultoMayorMedicacionController::class, 'archivar'])->middleware('permission:medicacion.editar')->name('medicacion.archivar');
                 Route::patch('medicacion/{medicacion}/restaurar', [\App\Http\Controllers\Admin\AdultosMayores\Salud\AdultoMayorMedicacionController::class, 'restore'])->middleware('permission:medicacion.editar')->name('medicacion.restore');
 
-                // Administración de Medicación — permiso pendiente en seeder: administracion_medicacion.registrar
-                Route::post('administracion-medicacion', [\App\Http\Controllers\Admin\AdultosMayores\Salud\AdultoMayorAdministracionMedicacionController::class, 'store'])->middleware('permission:medicacion.crear')->name('administracion-medicacion.store');
+                // Administración de Medicación
+                Route::post('administracion-medicacion', [\App\Http\Controllers\Admin\AdultosMayores\Salud\AdultoMayorAdministracionMedicacionController::class, 'store'])->middleware('permission:administracion_medicacion.registrar')->name('administracion-medicacion.store');
 
                 // Signos Vitales
                 Route::post('signos-vitales', [\App\Http\Controllers\Admin\AdultosMayores\Salud\AdultoMayorSignosVitalesController::class, 'store'])->middleware('permission:signos_vitales.crear')->name('signos-vitales.store');
                 Route::put('signos-vitales/{signo}', [\App\Http\Controllers\Admin\AdultosMayores\Salud\AdultoMayorSignosVitalesController::class, 'update'])->middleware('permission:signos_vitales.editar')->name('signos-vitales.update');
 
-                // Valoración Funcional — permisos pendientes en seeder: valoracion_funcional.crear, valoracion_funcional.editar
-                Route::post('valoracion-funcional', [\App\Http\Controllers\Admin\AdultosMayores\Salud\AdultoMayorValoracionFuncionalController::class, 'store'])->middleware('permission:salud.ver')->name('valoracion-funcional.store');
-                Route::put('valoracion-funcional/{valoracion}', [\App\Http\Controllers\Admin\AdultosMayores\Salud\AdultoMayorValoracionFuncionalController::class, 'update'])->middleware('permission:salud.ver')->name('valoracion-funcional.update');
+                // Valoración Funcional
+                Route::post('valoracion-funcional', [\App\Http\Controllers\Admin\AdultosMayores\Salud\AdultoMayorValoracionFuncionalController::class, 'store'])->middleware('permission:valoracion_funcional.crear')->name('valoracion-funcional.store');
+                Route::put('valoracion-funcional/{valoracion}', [\App\Http\Controllers\Admin\AdultosMayores\Salud\AdultoMayorValoracionFuncionalController::class, 'update'])->middleware('permission:valoracion_funcional.editar')->name('valoracion-funcional.update');
 
                 // Reporte individual (anidado bajo adulto_mayor)
                 Route::get('reporte-individual', [AdultoMayorController::class, 'reporteIndividual'])->middleware('permission:reportes.individual')->name('reporte-individual');
