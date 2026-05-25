@@ -160,7 +160,7 @@ class FichaMedicaAdultoModal extends Component
             $ficha->update($datos);
             $mensaje = 'Ficha médica actualizada correctamente.';
         } else {
-            $datos['registrado_por'] = Auth::id() ?? \App\Models\User::first()->cod_usu;
+            $datos['registrado_por'] = Auth::user()->cod_usu;
             FichaMedicaAdulto::create($datos);
             $mensaje = 'Ficha médica registrada correctamente.';
         }

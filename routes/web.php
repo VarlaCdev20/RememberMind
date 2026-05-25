@@ -120,85 +120,87 @@ Route::middleware([
                 ->name('adultos-mayores.estado');
 
             // ── Submódulos Adultos Mayores ────────
+            // El grupo exige adultos.ver. Cada ruta de mutación agrega su permiso específico.
+            // Permisos sin seeder (pendientes): ficha_medica.crear/editar, valoracion_funcional.crear/editar, administracion_medicacion.registrar
             Route::prefix('adultos-mayores/{adulto_mayor}')
                 ->middleware('permission:adultos.ver')
                 ->name('adultos-mayores.')
                 ->group(function () {
                 // Familiares
                 Route::get('familiares', [\App\Http\Controllers\Admin\AdultosMayores\AdultoMayorFamiliarController::class, 'index'])->name('familiares.index');
-                Route::post('familiares', [\App\Http\Controllers\Admin\AdultosMayores\AdultoMayorFamiliarController::class, 'store'])->name('familiares.store');
-                Route::patch('familiares/{familiar}', [\App\Http\Controllers\Admin\AdultosMayores\AdultoMayorFamiliarController::class, 'update'])->name('familiares.update');
-                Route::delete('familiares/{familiar}', [\App\Http\Controllers\Admin\AdultosMayores\AdultoMayorFamiliarController::class, 'destroy'])->name('familiares.destroy');
-                Route::patch('familiares/{familiar}/restaurar', [\App\Http\Controllers\Admin\AdultosMayores\AdultoMayorFamiliarController::class, 'restore'])->name('familiares.restore');
+                Route::post('familiares', [\App\Http\Controllers\Admin\AdultosMayores\AdultoMayorFamiliarController::class, 'store'])->middleware('permission:familiares.crear')->name('familiares.store');
+                Route::patch('familiares/{familiar}', [\App\Http\Controllers\Admin\AdultosMayores\AdultoMayorFamiliarController::class, 'update'])->middleware('permission:familiares.editar')->name('familiares.update');
+                Route::delete('familiares/{familiar}', [\App\Http\Controllers\Admin\AdultosMayores\AdultoMayorFamiliarController::class, 'destroy'])->middleware('permission:familiares.anular')->name('familiares.destroy');
+                Route::patch('familiares/{familiar}/restaurar', [\App\Http\Controllers\Admin\AdultosMayores\AdultoMayorFamiliarController::class, 'restore'])->middleware('permission:familiares.editar')->name('familiares.restore');
 
                 // Observaciones
                 Route::get('observaciones', [\App\Http\Controllers\Admin\AdultosMayores\AdultoMayorObservacionController::class, 'index'])->name('observaciones.index');
-                Route::post('observaciones', [\App\Http\Controllers\Admin\AdultosMayores\AdultoMayorObservacionController::class, 'store'])->name('observaciones.store');
-                Route::patch('observaciones/{observacion}', [\App\Http\Controllers\Admin\AdultosMayores\AdultoMayorObservacionController::class, 'update'])->name('observaciones.update');
-                Route::delete('observaciones/{observacion}', [\App\Http\Controllers\Admin\AdultosMayores\AdultoMayorObservacionController::class, 'destroy'])->name('observaciones.destroy');
-                Route::patch('observaciones/{observacion}/restaurar', [\App\Http\Controllers\Admin\AdultosMayores\AdultoMayorObservacionController::class, 'restore'])->name('observaciones.restore');
+                Route::post('observaciones', [\App\Http\Controllers\Admin\AdultosMayores\AdultoMayorObservacionController::class, 'store'])->middleware('permission:observaciones.crear')->name('observaciones.store');
+                Route::patch('observaciones/{observacion}', [\App\Http\Controllers\Admin\AdultosMayores\AdultoMayorObservacionController::class, 'update'])->middleware('permission:observaciones.editar')->name('observaciones.update');
+                Route::delete('observaciones/{observacion}', [\App\Http\Controllers\Admin\AdultosMayores\AdultoMayorObservacionController::class, 'destroy'])->middleware('permission:observaciones.anular')->name('observaciones.destroy');
+                Route::patch('observaciones/{observacion}/restaurar', [\App\Http\Controllers\Admin\AdultosMayores\AdultoMayorObservacionController::class, 'restore'])->middleware('permission:observaciones.editar')->name('observaciones.restore');
 
                 // Atenciones
                 Route::get('atenciones', [\App\Http\Controllers\Admin\AdultosMayores\AdultoMayorAtencionController::class, 'index'])->name('atenciones.index');
-                Route::post('atenciones', [\App\Http\Controllers\Admin\AdultosMayores\AdultoMayorAtencionController::class, 'store'])->name('atenciones.store');
-                Route::patch('atenciones/{atencion}', [\App\Http\Controllers\Admin\AdultosMayores\AdultoMayorAtencionController::class, 'update'])->name('atenciones.update');
-                Route::delete('atenciones/{atencion}', [\App\Http\Controllers\Admin\AdultosMayores\AdultoMayorAtencionController::class, 'destroy'])->name('atenciones.destroy');
-                Route::patch('atenciones/{atencion}/restaurar', [\App\Http\Controllers\Admin\AdultosMayores\AdultoMayorAtencionController::class, 'restore'])->name('atenciones.restore');
+                Route::post('atenciones', [\App\Http\Controllers\Admin\AdultosMayores\AdultoMayorAtencionController::class, 'store'])->middleware('permission:atenciones.crear')->name('atenciones.store');
+                Route::patch('atenciones/{atencion}', [\App\Http\Controllers\Admin\AdultosMayores\AdultoMayorAtencionController::class, 'update'])->middleware('permission:atenciones.editar')->name('atenciones.update');
+                Route::delete('atenciones/{atencion}', [\App\Http\Controllers\Admin\AdultosMayores\AdultoMayorAtencionController::class, 'destroy'])->middleware('permission:atenciones.anular')->name('atenciones.destroy');
+                Route::patch('atenciones/{atencion}/restaurar', [\App\Http\Controllers\Admin\AdultosMayores\AdultoMayorAtencionController::class, 'restore'])->middleware('permission:atenciones.editar')->name('atenciones.restore');
 
                 // Evaluaciones Cognitivas
                 Route::get('evaluaciones', [\App\Http\Controllers\Admin\AdultosMayores\AdultoMayorEvaluacionController::class, 'index'])->name('evaluaciones.index');
-                Route::post('evaluaciones', [\App\Http\Controllers\Admin\AdultosMayores\AdultoMayorEvaluacionController::class, 'store'])->name('evaluaciones.store');
+                Route::post('evaluaciones', [\App\Http\Controllers\Admin\AdultosMayores\AdultoMayorEvaluacionController::class, 'store'])->middleware('permission:evaluaciones.crear')->name('evaluaciones.store');
                 Route::get('evaluaciones/{evaluacion}', [\App\Http\Controllers\Admin\AdultosMayores\AdultoMayorEvaluacionController::class, 'show'])->name('evaluaciones.show');
-                Route::delete('evaluaciones/{evaluacion}', [\App\Http\Controllers\Admin\AdultosMayores\AdultoMayorEvaluacionController::class, 'destroy'])->name('evaluaciones.destroy');
-                Route::patch('evaluaciones/{evaluacion}/restaurar', [\App\Http\Controllers\Admin\AdultosMayores\AdultoMayorEvaluacionController::class, 'restore'])->name('evaluaciones.restore');
+                Route::delete('evaluaciones/{evaluacion}', [\App\Http\Controllers\Admin\AdultosMayores\AdultoMayorEvaluacionController::class, 'destroy'])->middleware('permission:evaluaciones.anular')->name('evaluaciones.destroy');
+                Route::patch('evaluaciones/{evaluacion}/restaurar', [\App\Http\Controllers\Admin\AdultosMayores\AdultoMayorEvaluacionController::class, 'restore'])->middleware('permission:evaluaciones.editar')->name('evaluaciones.restore');
 
                 // Evaluaciones Geriátricas Integrales (Fase 2)
-                Route::delete('evaluaciones-geriatricas/{evaluacion}/anular', [AdultoMayorController::class, 'anularEvaluacionGeriatrica'])->name('evaluaciones-geriatricas.anular');
-                Route::get('evaluaciones-geriatricas/{evaluacion}/pdf', [AdultoMayorController::class, 'pdfEvaluacionGeriatrica'])->name('evaluaciones-geriatricas.pdf');
+                Route::delete('evaluaciones-geriatricas/{evaluacion}/anular', [AdultoMayorController::class, 'anularEvaluacionGeriatrica'])->middleware('permission:evaluaciones.anular')->name('evaluaciones-geriatricas.anular');
+                Route::get('evaluaciones-geriatricas/{evaluacion}/pdf', [AdultoMayorController::class, 'pdfEvaluacionGeriatrica'])->middleware('permission:reportes.individual')->name('evaluaciones-geriatricas.pdf');
 
                 // Actividades
-                Route::post('actividades', [\App\Http\Controllers\Admin\AdultosMayores\AdultoMayorActividadController::class, 'store'])->name('actividades.store');
-                Route::patch('actividades/{actividad}', [\App\Http\Controllers\Admin\AdultosMayores\AdultoMayorActividadController::class, 'update'])->name('actividades.update');
-                Route::delete('actividades/{actividad}', [\App\Http\Controllers\Admin\AdultosMayores\AdultoMayorActividadController::class, 'destroy'])->name('actividades.destroy');
-                Route::patch('actividades/{actividad}/restaurar', [\App\Http\Controllers\Admin\AdultosMayores\AdultoMayorActividadController::class, 'restore'])->name('actividades.restore');
+                Route::post('actividades', [\App\Http\Controllers\Admin\AdultosMayores\AdultoMayorActividadController::class, 'store'])->middleware('permission:actividades.crear')->name('actividades.store');
+                Route::patch('actividades/{actividad}', [\App\Http\Controllers\Admin\AdultosMayores\AdultoMayorActividadController::class, 'update'])->middleware('permission:actividades.editar')->name('actividades.update');
+                Route::delete('actividades/{actividad}', [\App\Http\Controllers\Admin\AdultosMayores\AdultoMayorActividadController::class, 'destroy'])->middleware('permission:actividades.anular')->name('actividades.destroy');
+                Route::patch('actividades/{actividad}/restaurar', [\App\Http\Controllers\Admin\AdultosMayores\AdultoMayorActividadController::class, 'restore'])->middleware('permission:actividades.editar')->name('actividades.restore');
 
                 // Documentos
-                Route::post('documentos', [\App\Http\Controllers\Admin\AdultosMayores\AdultoMayorDocumentoController::class, 'store'])->name('documentos.store');
-                Route::patch('documentos/{documento}', [\App\Http\Controllers\Admin\AdultosMayores\AdultoMayorDocumentoController::class, 'update'])->name('documentos.update');
-                Route::delete('documentos/{documento}', [\App\Http\Controllers\Admin\AdultosMayores\AdultoMayorDocumentoController::class, 'destroy'])->name('documentos.destroy');
-                Route::patch('documentos/{documento}/restaurar', [\App\Http\Controllers\Admin\AdultosMayores\AdultoMayorDocumentoController::class, 'restore'])->name('documentos.restore');
+                Route::post('documentos', [\App\Http\Controllers\Admin\AdultosMayores\AdultoMayorDocumentoController::class, 'store'])->middleware('permission:documentos.subir')->name('documentos.store');
+                Route::patch('documentos/{documento}', [\App\Http\Controllers\Admin\AdultosMayores\AdultoMayorDocumentoController::class, 'update'])->middleware('permission:documentos.subir')->name('documentos.update');
+                Route::delete('documentos/{documento}', [\App\Http\Controllers\Admin\AdultosMayores\AdultoMayorDocumentoController::class, 'destroy'])->middleware('permission:documentos.archivar')->name('documentos.destroy');
+                Route::patch('documentos/{documento}/restaurar', [\App\Http\Controllers\Admin\AdultosMayores\AdultoMayorDocumentoController::class, 'restore'])->middleware('permission:documentos.archivar')->name('documentos.restore');
 
                 // FASE 3: Módulos Médicos y Administrativos
-                // Ficha Médica
-                Route::post('ficha-medica', [\App\Http\Controllers\Admin\AdultosMayores\Salud\AdultoMayorFichaMedicaController::class, 'store'])->name('ficha-medica.store');
-                Route::put('ficha-medica/{ficha}', [\App\Http\Controllers\Admin\AdultosMayores\Salud\AdultoMayorFichaMedicaController::class, 'update'])->name('ficha-medica.update');
-                Route::patch('ficha-medica/{ficha}/archivar', [\App\Http\Controllers\Admin\AdultosMayores\Salud\AdultoMayorFichaMedicaController::class, 'archivar'])->name('ficha-medica.archivar');
-                Route::patch('ficha-medica/{ficha}/restaurar', [\App\Http\Controllers\Admin\AdultosMayores\Salud\AdultoMayorFichaMedicaController::class, 'restore'])->name('ficha-medica.restore');
+                // Ficha Médica — permisos específicos pendientes en seeder: ficha_medica.crear, ficha_medica.editar
+                Route::post('ficha-medica', [\App\Http\Controllers\Admin\AdultosMayores\Salud\AdultoMayorFichaMedicaController::class, 'store'])->middleware('permission:salud.ver')->name('ficha-medica.store');
+                Route::put('ficha-medica/{ficha}', [\App\Http\Controllers\Admin\AdultosMayores\Salud\AdultoMayorFichaMedicaController::class, 'update'])->middleware('permission:salud.ver')->name('ficha-medica.update');
+                Route::patch('ficha-medica/{ficha}/archivar', [\App\Http\Controllers\Admin\AdultosMayores\Salud\AdultoMayorFichaMedicaController::class, 'archivar'])->middleware('permission:salud.ver')->name('ficha-medica.archivar');
+                Route::patch('ficha-medica/{ficha}/restaurar', [\App\Http\Controllers\Admin\AdultosMayores\Salud\AdultoMayorFichaMedicaController::class, 'restore'])->middleware('permission:salud.ver')->name('ficha-medica.restore');
 
                 // Medicación
-                Route::post('medicacion', [\App\Http\Controllers\Admin\AdultosMayores\Salud\AdultoMayorMedicacionController::class, 'store'])->name('medicacion.store');
-                Route::put('medicacion/{medicacion}', [\App\Http\Controllers\Admin\AdultosMayores\Salud\AdultoMayorMedicacionController::class, 'update'])->name('medicacion.update');
-                Route::patch('medicacion/{medicacion}/suspender', [\App\Http\Controllers\Admin\AdultosMayores\Salud\AdultoMayorMedicacionController::class, 'suspender'])->name('medicacion.suspender');
-                Route::patch('medicacion/{medicacion}/finalizar', [\App\Http\Controllers\Admin\AdultosMayores\Salud\AdultoMayorMedicacionController::class, 'finalizar'])->name('medicacion.finalizar');
-                Route::patch('medicacion/{medicacion}/archivar', [\App\Http\Controllers\Admin\AdultosMayores\Salud\AdultoMayorMedicacionController::class, 'archivar'])->name('medicacion.archivar');
-                Route::patch('medicacion/{medicacion}/restaurar', [\App\Http\Controllers\Admin\AdultosMayores\Salud\AdultoMayorMedicacionController::class, 'restore'])->name('medicacion.restore');
+                Route::post('medicacion', [\App\Http\Controllers\Admin\AdultosMayores\Salud\AdultoMayorMedicacionController::class, 'store'])->middleware('permission:medicacion.crear')->name('medicacion.store');
+                Route::put('medicacion/{medicacion}', [\App\Http\Controllers\Admin\AdultosMayores\Salud\AdultoMayorMedicacionController::class, 'update'])->middleware('permission:medicacion.editar')->name('medicacion.update');
+                Route::patch('medicacion/{medicacion}/suspender', [\App\Http\Controllers\Admin\AdultosMayores\Salud\AdultoMayorMedicacionController::class, 'suspender'])->middleware('permission:medicacion.suspender')->name('medicacion.suspender');
+                Route::patch('medicacion/{medicacion}/finalizar', [\App\Http\Controllers\Admin\AdultosMayores\Salud\AdultoMayorMedicacionController::class, 'finalizar'])->middleware('permission:medicacion.editar')->name('medicacion.finalizar');
+                Route::patch('medicacion/{medicacion}/archivar', [\App\Http\Controllers\Admin\AdultosMayores\Salud\AdultoMayorMedicacionController::class, 'archivar'])->middleware('permission:medicacion.editar')->name('medicacion.archivar');
+                Route::patch('medicacion/{medicacion}/restaurar', [\App\Http\Controllers\Admin\AdultosMayores\Salud\AdultoMayorMedicacionController::class, 'restore'])->middleware('permission:medicacion.editar')->name('medicacion.restore');
 
-                // Administración de Medicación
-                Route::post('administracion-medicacion', [\App\Http\Controllers\Admin\AdultosMayores\Salud\AdultoMayorAdministracionMedicacionController::class, 'store'])->name('administracion-medicacion.store');
+                // Administración de Medicación — permiso pendiente en seeder: administracion_medicacion.registrar
+                Route::post('administracion-medicacion', [\App\Http\Controllers\Admin\AdultosMayores\Salud\AdultoMayorAdministracionMedicacionController::class, 'store'])->middleware('permission:medicacion.crear')->name('administracion-medicacion.store');
 
                 // Signos Vitales
-                Route::post('signos-vitales', [\App\Http\Controllers\Admin\AdultosMayores\Salud\AdultoMayorSignosVitalesController::class, 'store'])->name('signos-vitales.store');
-                Route::put('signos-vitales/{signo}', [\App\Http\Controllers\Admin\AdultosMayores\Salud\AdultoMayorSignosVitalesController::class, 'update'])->name('signos-vitales.update');
+                Route::post('signos-vitales', [\App\Http\Controllers\Admin\AdultosMayores\Salud\AdultoMayorSignosVitalesController::class, 'store'])->middleware('permission:signos_vitales.crear')->name('signos-vitales.store');
+                Route::put('signos-vitales/{signo}', [\App\Http\Controllers\Admin\AdultosMayores\Salud\AdultoMayorSignosVitalesController::class, 'update'])->middleware('permission:signos_vitales.editar')->name('signos-vitales.update');
 
-                // Valoración Funcional
-                Route::post('valoracion-funcional', [\App\Http\Controllers\Admin\AdultosMayores\Salud\AdultoMayorValoracionFuncionalController::class, 'store'])->name('valoracion-funcional.store');
-                Route::put('valoracion-funcional/{valoracion}', [\App\Http\Controllers\Admin\AdultosMayores\Salud\AdultoMayorValoracionFuncionalController::class, 'update'])->name('valoracion-funcional.update');
+                // Valoración Funcional — permisos pendientes en seeder: valoracion_funcional.crear, valoracion_funcional.editar
+                Route::post('valoracion-funcional', [\App\Http\Controllers\Admin\AdultosMayores\Salud\AdultoMayorValoracionFuncionalController::class, 'store'])->middleware('permission:salud.ver')->name('valoracion-funcional.store');
+                Route::put('valoracion-funcional/{valoracion}', [\App\Http\Controllers\Admin\AdultosMayores\Salud\AdultoMayorValoracionFuncionalController::class, 'update'])->middleware('permission:salud.ver')->name('valoracion-funcional.update');
 
                 // Reporte individual (anidado bajo adulto_mayor)
-                Route::get('reporte-individual', [AdultoMayorController::class, 'reporteIndividual'])->name('reporte-individual');
-                
+                Route::get('reporte-individual', [AdultoMayorController::class, 'reporteIndividual'])->middleware('permission:reportes.individual')->name('reporte-individual');
+
                 // Reportes específicos (médico, medicación, vitales, etc.)
-                Route::get('reportes/{tipo}', [AdultoMayorController::class, 'reporteEspecifico'])->name('reportes.especifico');
+                Route::get('reportes/{tipo}', [AdultoMayorController::class, 'reporteEspecifico'])->middleware('permission:reportes.individual')->name('reportes.especifico');
             });
 
             // ── Reportes protegidos ──────────────
@@ -226,8 +228,8 @@ Route::middleware([
                     Route::get('/administraciones', \App\Livewire\Admin\SaludSeguimiento\SaludSeguimientoListPanel::class)->name('administracion.index');
                     Route::get('/signos-vitales', \App\Livewire\Admin\SaludSeguimiento\SaludSeguimientoListPanel::class)->name('signos.index');
                     Route::get('/valoraciones', \App\Livewire\Admin\SaludSeguimiento\SaludSeguimientoListPanel::class)->name('valoracion.index');
-                    Route::get('/alertas', \App\Livewire\Admin\SaludSeguimiento\SaludAlertasPanel::class)->name('alertas');
-                    Route::get('/reportes', \App\Livewire\Admin\SaludSeguimiento\SaludReportesPanel::class)->name('reportes');
+                    Route::get('/alertas', \App\Livewire\Admin\SaludSeguimiento\SaludSeguimientoListPanel::class)->name('alertas');
+                    Route::get('/reportes', \App\Livewire\Admin\SaludSeguimiento\SaludSeguimientoListPanel::class)->name('reportes');
 
                     // Individual Panels
                     Route::get('/{adulto}/resumen', \App\Livewire\Admin\SaludSeguimiento\SaludResumenPanel::class)->name('resumen');

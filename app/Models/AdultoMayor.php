@@ -126,6 +126,11 @@ class AdultoMayor extends Model
         return $this->belongsTo(EstadoAdulto::class, 'cod_est_adul', 'cod_est_adul');
     }
 
+    public function getEstadoTextoAttribute(): string
+    {
+        return $this->estado?->estado ?? 'SIN ESTADO';
+    }
+
     public function observaciones()
     {
         return $this->hasMany(ObsAdulto::class, 'cod_am', 'cod_am');

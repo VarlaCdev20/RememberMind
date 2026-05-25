@@ -98,6 +98,14 @@ class RolesAndPermissionsSeeder extends Seeder
             'medicacion.editar',
             'medicacion.suspender',
 
+            // Salud — permisos específicos de escritura médica
+            'ficha_medica.crear',
+            'ficha_medica.editar',
+            'ficha_medica.archivar',
+            'valoracion_funcional.crear',
+            'valoracion_funcional.editar',
+            'administracion_medicacion.registrar',
+
             // Evaluaciones cognitivas
             'evaluaciones.ver',
             'evaluaciones.crear',
@@ -231,6 +239,12 @@ class RolesAndPermissionsSeeder extends Seeder
             'medicacion.crear',
             'medicacion.editar',
             'medicacion.suspender',
+            'ficha_medica.crear',
+            'ficha_medica.editar',
+            'ficha_medica.archivar',
+            'valoracion_funcional.crear',
+            'valoracion_funcional.editar',
+            'administracion_medicacion.registrar',
             'evaluaciones.ver',
             'evaluaciones.crear',
             'evaluaciones.editar',
