@@ -120,7 +120,7 @@
                             @endphp
                             <tr class="group transition hover:bg-[#F2EBE3]/40">
                                 <td class="px-6 py-4 whitespace-nowrap">
-                                    <p class="text-xs font-black text-[#2F3E5C]">{{ optional($actividadObj)->fecha ? Carbon::parse($actividadObj->fecha)->format('d/m/Y') : 'N/D' }}</p>
+                                    <p class="text-xs font-black text-[#2F3E5C]">{{ optional($actividadObj)->fecha ? \Carbon\Carbon::parse($actividadObj->fecha)->format('d/m/Y') : 'N/D' }}</p>
                                     <p class="text-[10px] font-bold text-[#2F3E5C]/50">{{ optional($actividadObj)->hora ? substr($actividadObj->hora, 0, 5) : '--:--' }}</p>
                                 </td>
                                 <td class="px-6 py-4">
@@ -254,9 +254,9 @@
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <p class="text-[10px] font-black text-[#2F3E5C]/60 uppercase tracking-tighter">
-                                        {{ optional($asignacionObj)->fecha_asig ? Carbon::parse($asignacionObj->fecha_asig)->format('d/m/Y') : 'INICIO N/D' }}
+                                        {{ optional($asignacionObj)->fecha_asig ? \Carbon\Carbon::parse($asignacionObj->fecha_asig)->format('d/m/Y') : 'INICIO N/D' }}
                                         —
-                                        {{ optional($asignacionObj)->fecha_fin ? Carbon::parse($asignacionObj->fecha_fin)->format('d/m/Y') : 'PRESENTE' }}
+                                        {{ optional($asignacionObj)->fecha_fin ? \Carbon\Carbon::parse($asignacionObj->fecha_fin)->format('d/m/Y') : 'PRESENTE' }}
                                     </p>
                                 </td>
                                 <td class="px-6 py-4">

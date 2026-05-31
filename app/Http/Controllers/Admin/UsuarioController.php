@@ -230,4 +230,139 @@ class UsuarioController extends Controller
     {
         return abort(403, 'No se permite la eliminación física de usuarios.');
     }
+
+    public function fichaPdf(User $usuario)
+    {
+        try {
+            $fichaService = app(\App\Services\Usuarios\UsuarioFichaService::class);
+            $docService = app(\App\Services\Usuarios\DocumentacionUsuarioService::class);
+
+            $expediente = $fichaService->obtenerExpedienteCompleto($usuario);
+            $checklist = $docService->obtenerChecklistUsuario($usuario);
+
+            $viewData = [
+                'usuario' => $usuario,
+                'rol' => $expediente['rol'],
+                'nombre_rol' => $expediente['nombre_rol'],
+                'area' => $expediente['area'],
+                'horarios' => $expediente['horarios'],
+                'avance_documental' => $expediente['avance_documental'],
+                'checklist' => $checklist,
+                'fecha' => now()->format('d/m/Y H:i'),
+                'usuario_solicitante' => auth()->user()->name,
+            ];
+
+            $fileNameService = app(\App\Services\Reports\ReportFileNameService::class);
+            $filename = $fileNameService->generate('expediente_' . $usuario->cod_usu, 'pdf');
+
+            $exportService = app(\App\Services\Reports\ReportExportService::class);
+
+            activity('Usuarios')
+                ->causedBy(auth()->user())
+                ->performedOn($usuario)
+                ->event('reportes')
+                ->log("Descargó la ficha institucional completa en PDF para el usuario: {$usuario->name}.");
+
+            return $exportService->exportPdf('reports.usuarios.expediente_ficha', $viewData, $filename);
+        } catch (\Exception $e) {
+            return back()->with('error', 'Error al generar la ficha PDF: ' . $e->getMessage());
+        }
+    }
+
+    public function documentacionPdf(User $usuario)
+    {
+        try {
+            $fichaService = app(\App\Services\Usuarios\UsuarioFichaService::class);
+            $docService = app(\App\Services\Usuarios\DocumentacionUsuarioService::class);
+
+            $expediente = $fichaService->obtenerExpedienteCompleto($usuario);
+            $checklist = $docService->obtenerChecklistUsuario($usuario);
+
+            $viewData = [
+                'usuario' => $usuario,
+                'rol' => $expediente['rol'],
+                'nombre_rol' => $expediente['nombre_rol'],
+                'area' => $expediente['area'],
+                'avance_documental' => $expediente['avance_documental'],
+                'checklist' => $checklist,
+                'fecha' => now()->format('d/m/Y H:i'),
+                'usuario_solicitante' => auth()->user()->name,
+            ];
+
+            $fileNameService = app(\App\Services\Reports\ReportFileNameService::class);
+            $filename = $fileNameService->generate('checklist_documentacion_' . $usuario->cod_usu, 'pdf');
+
+            $exportService = app(\App\Services\Reports\ReportExportService::class);
+
+            activity('Usuarios')
+                ->causedBy(auth()->user())
+                ->performedOn($usuario)
+                ->event('reportes')
+                ->log("Descargó el expediente documental en PDF para el usuario: {$usuario->name}.");
+
+            return $exportService->exportPdf('reports.usuarios.documentacion_pdf', $viewData, $filename);
+        } catch (\Exception $e) {
+            return back()->with('error', 'Error al generar la documentación en PDF: ' . $e->getMessage());
+        }
+    }
+
+    public function horariosPdf(User $usuario)
+    {
+        try {
+            $fichaService = app(\App\Services\Usuarios\UsuarioFichaService::class);
+
+            $expediente = $fichaService->obtenerExpedienteCompleto($usuario);
+
+            $viewData = [
+                'usuario' => $usuario,
+                'rol' => $expediente['rol'],
+                'nombre_rol' => $expediente['nombre_rol'],
+                'area' => $expediente['area'],
+                'horarios' => $expediente['horarios'],
+                'historial_horarios' => $expediente['historial_horarios'],
+                'fecha' => now()->format('d/m/Y H:i'),
+                'usuario_solicitante' => auth()->user()->name,
+            ];
+
+            $fileNameService = app(\App\Services\Reports\ReportFileNameService::class);
+            $filename = $fileNameService->generate('control_horarios_' . $usuario->cod_usu, 'pdf');
+
+            $exportService = app(\App\Services\Reports\ReportExportService::class);
+
+            activity('Usuarios')
+                ->causedBy(auth()->user())
+                ->performedOn($usuario)
+                ->event('reportes')
+                ->log("Descargó el reporte de horarios y turnos en PDF para el usuario: {$usuario->name}.");
+
+            return $exportService->exportPdf('reports.usuarios.horarios_pdf', $viewData, $filename);
+        } catch (\Exception $e) {
+            return back()->with('error', 'Error al generar los horarios en PDF: ' . $e->getMessage());
+        }
+    }
+
+    public function enviarFichaCorreo(User $usuario)
+    {
+        try {
+            if (empty($usuario->correo)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'El usuario no tiene un correo electrónico institucional configurado.'
+                ], 422);
+            }
+
+            // Despachar el Job en segundo plano para no congelar la interfaz
+            \App\Jobs\EnviarFichaUsuarioJob::dispatch($usuario, auth()->user());
+
+            return response()->json([
+                'success' => true,
+                'message' => 'La solicitud de envío de ficha ha sido encolada correctamente. Se enviará a ' . $usuario->correo
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al despachar el envío de ficha: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 }

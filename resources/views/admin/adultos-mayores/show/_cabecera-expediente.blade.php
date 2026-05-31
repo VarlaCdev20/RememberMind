@@ -256,71 +256,64 @@
             </section>
 
 <section class="rounded-[24px] border border-[#CBBBAA] bg-[#E7DDD2]/95 p-3 shadow-[0_12px_28px_rgba(47,62,92,0.08)] backdrop-blur-xl">
-    <div class="grid gap-2 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-9">
+    <div class="grid gap-2 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-8">
         @php
             $tabs = [
                 [
                     'key' => 'resumen',
                     'icon' => 'ph-user-circle',
                     'label' => 'Resumen',
-                    'desc' => 'Datos base',
+                    'desc' => 'Panel general',
                     'color' => '#E27D60'
                 ],
                 [
-                    'key' => 'familiares',
+                    'key' => 'datos',
                     'icon' => 'ph-heart',
-                    'label' => 'Familiares',
-                    'desc' => 'Red de apoyo',
+                    'label' => 'Datos y Apoyo',
+                    'desc' => 'Filiación y familia',
                     'color' => '#8EA17D'
+                ],
+                [
+                    'key' => 'salud',
+                    'icon' => 'ph-heartbeat',
+                    'label' => 'Salud y Cuidados',
+                    'desc' => 'Ficha de salud y cuidados',
+                    'color' => '#C45F4B'
                 ],
                 [
                     'key' => 'seguimiento',
                     'icon' => 'ph-clipboard-text',
                     'label' => 'Seguimiento',
-                    'desc' => 'Seguimiento',
+                    'desc' => 'Notas y atenciones',
                     'color' => '#6873A6'
-                ],
-                [
-                    'key' => 'salud',
-                    'icon' => 'ph-heartbeat',
-                    'label' => 'Salud Médica',
-                    'desc' => 'Control médico',
-                    'color' => '#C45F4B'
                 ],
                 [
                     'key' => 'evaluaciones',
                     'icon' => 'ph-brain',
                     'label' => 'Evaluaciones',
-                    'desc' => 'Cognitivas',
+                    'desc' => 'Geriátricas integrales',
                     'color' => '#5B5F97'
-                ],
-                [
-                    'key' => 'actividades',
-                    'icon' => 'ph-calendar-check',
-                    'label' => 'Actividades',
-                    'desc' => 'Participación',
-                    'color' => '#D9A27C'
                 ],
                 [
                     'key' => 'documentos',
                     'icon' => 'ph-folder-open',
                     'label' => 'Documentos',
-                    'desc' => 'Expediente',
+                    'desc' => 'Expediente físico',
                     'color' => '#2F3E5C'
-                ],
-                [
-                    'key' => 'reportes',
-                    'icon' => 'ph-chart-line-up',
-                    'label' => 'Reportes',
-                    'desc' => 'Evolución',
-                    'color' => '#5F7357'
                 ],
                 [
                     'key' => 'historial',
                     'icon' => 'ph-clock-counter-clockwise',
                     'label' => 'Historial',
-                    'desc' => 'Trazabilidad',
+                    'desc' => 'Estados e institucional',
                     'color' => '#9A7B60'
+                ],
+                [
+                    'key' => 'reportes',
+                    'icon' => 'ph-chart-line-up',
+                    'label' => 'Reportes',
+                    'desc' => 'Evolución analítica',
+                    'color' => '#5F7357'
                 ],
             ];
         @endphp

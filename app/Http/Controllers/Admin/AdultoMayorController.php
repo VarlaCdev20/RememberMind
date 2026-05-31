@@ -113,6 +113,19 @@ public function show(AdultoMayor $adulto_mayor)
     $evaluacionesActivas = $adulto->evaluacionesCognitivas()->with(['tipoEvaluacion', 'personalSalud'])->latest()->get();
     $evaluacionesAnuladas = $adulto->evaluacionesCognitivas()->onlyTrashed()->with(['tipoEvaluacion', 'personalSalud'])->latest('deleted_at')->get();
 
+    // Evaluaciones Geriátricas Integrales (Fase 2)
+    $evaluacionesGeriatricasActivas = \App\Models\EvaluacionGeriatrica::where('cod_am', $adulto_mayor->cod_am)
+        ->where('estado_eval', 'ACTIVO')
+        ->with(['instrumento.area', 'registrador'])
+        ->latest('fecha_eval')
+        ->get();
+    $evaluacionesGeriatricasAnuladas = \App\Models\EvaluacionGeriatrica::where('cod_am', $adulto_mayor->cod_am)
+        ->where('estado_eval', 'ANULADO')
+        ->with(['instrumento.area', 'registrador'])
+        ->latest('fecha_eval')
+        ->get();
+    $areasGeriatricas = \App\Models\AreaGeriatrica::where('estado', 'ACTIVO')->get();
+
     // FASE 3: Módulos médicos (Pre-cargados para uso futuro en vistas)
     $fichasMedicas = $adulto->fichasMedicas()->latest()->get();
     $medicaciones = $adulto->medicaciones()->with('receta')->latest()->get();
@@ -145,6 +158,9 @@ public function show(AdultoMayor $adulto_mayor)
         'asignaciones',
         'evaluacionesActivas',
         'evaluacionesAnuladas',
+        'evaluacionesGeriatricasActivas',
+        'evaluacionesGeriatricasAnuladas',
+        'areasGeriatricas',
         'fichasMedicas',
         'medicaciones',
         'administracionesMedicacion',
@@ -516,5 +532,51 @@ public function show(AdultoMayor $adulto_mayor)
     {
         // No eliminar físicamente según reglas.
         return redirect()->back()->with('error', 'La eliminación física no está permitida. Use archivar.');
+    }
+
+    public function anularEvaluacionGeriatrica(Request $request, AdultoMayor $adulto_mayor, $evaluacionId)
+    {
+        $request->validate([
+            'motivo_anulacion' => 'required|string|min:10',
+        ], [
+            'motivo_anulacion.required' => 'El motivo de anulación es obligatorio.',
+            'motivo_anulacion.min' => 'El motivo de anulación debe tener al menos 10 caracteres.',
+        ]);
+
+        try {
+            \DB::transaction(function () use ($request, $adulto_mayor, $evaluacionId) {
+                $eval = \App\Models\EvaluacionGeriatrica::where('cod_am', $adulto_mayor->cod_am)
+                    ->where('cod_eval_ger', $evaluacionId)
+                    ->firstOrFail();
+
+                $eval->update([
+                    'estado_eval' => 'ANULADO',
+                    'motivo_anulacion' => $request->input('motivo_anulacion'),
+                    'anulado_por' => auth()->user()->cod_usu,
+                    'anulado_en' => now(),
+                ]);
+            });
+
+            return redirect()->back()
+                ->with('success', 'Evaluación geriátrica anulada correctamente.');
+
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->with('error', 'Error al anular la evaluación: ' . $e->getMessage());
+        }
+    }
+
+    public function pdfEvaluacionGeriatrica(AdultoMayor $adulto_mayor, $evaluacionId)
+    {
+        $adulto = $this->adultoMayorService->obtenerDetalle($adulto_mayor->cod_am);
+        $adulto->edad = $this->adultoMayorService->calcularEdad($adulto->fecha_nac);
+
+        $evaluacion = \App\Models\EvaluacionGeriatrica::where('cod_am', $adulto_mayor->cod_am)
+            ->where('cod_eval_ger', $evaluacionId)
+            ->with(['instrumento.area', 'registrador'])
+            ->firstOrFail();
+
+        $pdf = Pdf::loadView('admin.adultos-mayores.reportes.pdf_evaluacion_individual', compact('adulto', 'evaluacion'));
+        return $pdf->stream("evaluacion_{$evaluacion->cod_eval_ger}.pdf");
     }
 }

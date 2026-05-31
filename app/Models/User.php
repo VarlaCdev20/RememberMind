@@ -43,6 +43,20 @@ class User extends Authenticatable
         'ultimo_acceso',
         'observaciones',
         'current_team_id',
+        'cod_area',
+        'debe_cambiar_password',
+        'password_changed_at',
+        'direccion',
+        'zona',
+        'ciudad',
+        'contacto_emergencia',
+        'parentesco_emergencia',
+        'celular_emergencia',
+        'tipo_vinculacion',
+        'calle',
+        'nro_domicilio',
+        'ap_paterno_emergencia',
+        'ap_materno_emergencia',
     ];
 
     protected $hidden = [
@@ -73,6 +87,8 @@ class User extends Authenticatable
             'ultimo_acceso' => 'datetime',
             'fecha_nacimiento' => 'date',
             'password' => 'hashed',
+            'debe_cambiar_password' => 'boolean',
+            'password_changed_at' => 'datetime',
         ];
     }
 
@@ -88,7 +104,7 @@ class User extends Authenticatable
 
     public function getNameAttribute(): string
     {
-        return trim($this->nombres . ' ' . $this->ap_paterno . ' ' . ($this->ap_materno ?? ''));
+        return trim($this->nombres . ' ' . ($this->ap_paterno ?? '') . ' ' . ($this->ap_materno ?? ''));
     }
 
     public function getEmailAttribute(): string
@@ -106,11 +122,11 @@ class User extends Authenticatable
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
-            ->logOnly(['nombres', 'ap_paterno', 'correo', 'estado', 'observaciones'])
+            ->logOnly(['nombres', 'ap_paterno', 'correo', 'estado', 'observaciones', 'cod_area'])
             ->logOnlyDirty()
             ->useLogName('Usuarios')
             ->setDescriptionForEvent(function (string $eventName) {
-                $nombre = $this->nombres . ' ' . $this->ap_paterno;
+                $nombre = trim($this->nombres . ' ' . ($this->ap_paterno ?? ''));
                 
                 if ($eventName === 'created') {
                     return "Se registró al nuevo usuario institucional: {$nombre}.";
@@ -132,9 +148,24 @@ class User extends Authenticatable
             });
     }
 
+    public function areaInstitucional()
+    {
+        return $this->belongsTo(AreaInstitucional::class, 'cod_area', 'cod_area');
+    }
+
     public function documentos()
     {
         return $this->hasMany(DocumentoUsuario::class, 'cod_usu', 'cod_usu');
+    }
+
+    public function documentosPendientes()
+    {
+        return $this->hasMany(DocumentoUsuario::class, 'cod_usu', 'cod_usu')->whereIn('estado', ['PENDIENTE', 'CARGADO']);
+    }
+
+    public function documentosValidados()
+    {
+        return $this->hasMany(DocumentoUsuario::class, 'cod_usu', 'cod_usu')->where('estado', 'VALIDADO');
     }
 
     public function familiares()
@@ -149,12 +180,12 @@ class User extends Authenticatable
 
     public function personalSalud()
     {
-        return $this->hasMany(PersonalSalud::class, 'cod_usu', 'cod_usu');
+        return $this->hasOne(PersonalSalud::class, 'cod_usu', 'cod_usu');
     }
 
     public function personalAdmin()
     {
-        return $this->hasMany(PersonalAdmin::class, 'cod_usu', 'cod_usu');
+        return $this->hasOne(PersonalAdmin::class, 'cod_usu', 'cod_usu');
     }
 
     // ── Relaciones FASE 2: Registros médicos/administrativos realizados por este usuario ──
@@ -187,5 +218,15 @@ class User extends Authenticatable
     public function cambiosEstadoAdultoRealizados()
     {
         return $this->hasMany(HistorialEstadoAdulto::class, 'cambiado_por', 'cod_usu');
+    }
+
+    public function asignacionesTurno()
+    {
+        return $this->hasMany(AsignacionTurno::class, 'cod_usu', 'cod_usu');
+    }
+
+    public function turnosInstitucionales()
+    {
+        return $this->hasManyThrough(TurnoInstitucional::class, AsignacionTurno::class, 'cod_usu', 'cod_turno', 'cod_usu', 'cod_turno');
     }
 }

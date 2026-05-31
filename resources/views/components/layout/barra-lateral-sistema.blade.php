@@ -22,12 +22,12 @@
     {{-- HEADER --}}
     <div class="shrink-0 px-3 pt-4">
         <div
-            class="flex items-center rounded-[1.35rem] bg-[#D5C7B9]/40 px-3 py-3 shadow-inner transition-all duration-300"
+            class="flex items-center rounded-xl bg-[#D5C7B9]/40 px-2.5 py-2 shadow-inner transition-all duration-300"
             :class="sidebarCollapsed ? 'justify-center' : 'justify-between'"
         >
             <div class="flex min-w-0 items-center gap-3">
-                <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-terracota text-white font-black shadow-md transition-all duration-500 hover:rotate-6">
-                    <span class="text-xl">C</span>
+                <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-terracota text-white font-black shadow-sm transition-all duration-500 hover:rotate-6">
+                    <span class="text-sm">C</span>
                 </div>
 
                 <div
@@ -35,10 +35,10 @@
                     x-transition.opacity.duration.300ms
                     class="min-w-0"
                 >
-                    <h2 class="truncate text-lg font-black text-azul-profundo leading-tight">
+                    <h2 class="truncate text-sm font-black text-azul-profundo leading-tight">
                         Casa Amandita
                     </h2>
-                    <p class="truncate text-[11px] font-black uppercase tracking-widest text-terracota">
+                    <p class="truncate text-[10px] font-black uppercase tracking-widest text-terracota">
                         RememberMind
                     </p>
                 </div>
@@ -55,7 +55,7 @@
     </div>
 
     {{-- MENÚ --}}
-    <div class="mt-5 flex-1 overflow-y-auto px-3 pb-6 [scrollbar-width:thin] [scrollbar-color:#C7B5A3_transparent]">
+    <div class="mt-3 flex-1 overflow-y-auto px-3 pb-4 [scrollbar-width:thin] [scrollbar-color:#C7B5A3_transparent]">
         @php
             $safeUrl = function (?string $route, string $fallback = '#') {
                 return $route && Route::has($route) ? route($route) : $fallback;
@@ -90,40 +90,36 @@
                 [
                     'title' => 'Administración',
                     'icon' => 'ph-gear-six',
-                    'items' => [
-                        ['label' => 'Usuarios', 'route' => 'admin.usuarios.index'],
-                        ['label' => 'Roles y permisos', 'route' => null],
-                        ['label' => 'Personal institucional', 'route' => null],
-                        ['label' => 'Áreas institucionales', 'route' => null],
-                        ['label' => 'Turnos y asignaciones', 'route' => null],
-                        ['label' => 'Bitácora y auditoría', 'route' => 'admin.bitacora.index'],
-                    ],
+                    'items' => array_filter([
+                        auth()->user()->can('usuarios.ver') ? ['label' => 'Usuarios', 'route' => 'admin.usuarios.index'] : null,
+                        auth()->user()->can('roles.ver') ? ['label' => 'Roles y permisos', 'route' => 'admin.roles-permisos.index'] : null,
+                        auth()->user()->can('areas.ver') ? ['label' => 'Áreas institucionales', 'route' => 'admin.areas-institucionales.index'] : null,
+                        auth()->user()->can('turnos.ver') ? ['label' => 'Horarios y asignaciones', 'route' => 'admin.turnos-asignaciones.index'] : null,
+                        auth()->user()->can('bitacora.ver') ? ['label' => 'Bitácora y auditoría', 'route' => 'admin.bitacora.index'] : null,
+                    ]),
                 ],
                 [
                     'title' => 'Adultos Mayores',
                     'icon' => 'ph-users-four',
-                    'items' => [
-                        ['label' => 'Lista general', 'route' => 'admin.adultos-mayores.index'],
-                        ['label' => 'Registro', 'route' => null],
-                        ['label' => 'Expedientes', 'route' => null],
-                        ['label' => 'Estados institucionales', 'route' => null],
-                        ['label' => 'Documentación', 'route' => null],
-                        ['label' => 'Reportes', 'route' => null],
-                    ],
+                    'items' => array_filter([
+                        auth()->user()->can('adultos.ver') ? ['label' => 'Centro de Adultos Mayores', 'route' => 'admin.adultos-mayores.index'] : null,
+                        auth()->user()->can('adultos.ver') ? ['label' => 'Alertas y Pendientes', 'route' => 'admin.adultos-mayores.alertas-pendientes'] : null,
+                        auth()->user()->can('reportes.ver') ? ['label' => 'Reportes Institucionales', 'route' => 'admin.adultos-mayores.reporte-institucional'] : null,
+                    ]),
                 ],
                 [
                     'title' => 'Salud y Seguimiento',
                     'icon' => 'ph-heartbeat',
-                    'items' => [
-                        ['label' => 'Ficha médica', 'route' => null],
-                        ['label' => 'Medicación', 'route' => null],
-                        ['label' => 'Adm. de Medicación', 'route' => null],
-                        ['label' => 'Signos vitales', 'route' => null],
-                        ['label' => 'Valoración funcional', 'route' => null],
-                        ['label' => 'Observación diaria', 'route' => null],
-                        ['label' => 'Atenciones e incidentes', 'route' => null],
-                        ['label' => 'Evaluación cognitiva', 'route' => null],
-                    ],
+                    'items' => array_filter([
+                        auth()->user()->can('salud.ver') ? ['label' => 'Resumen de salud', 'route' => 'admin.salud-seguimiento.index'] : null,
+                        auth()->user()->can('salud.ficha.ver') ? ['label' => 'Ficha médica', 'route' => 'admin.salud-seguimiento.ficha.index'] : null,
+                        auth()->user()->can('salud.medicacion.ver') ? ['label' => 'Medicación', 'route' => 'admin.salud-seguimiento.medicacion.index'] : null,
+                        auth()->user()->can('salud.administracion.ver') ? ['label' => 'Adm. de Medicación', 'route' => 'admin.salud-seguimiento.administracion.index'] : null,
+                        auth()->user()->can('salud.signos.ver') ? ['label' => 'Signos vitales', 'route' => 'admin.salud-seguimiento.signos.index'] : null,
+                        auth()->user()->can('salud.valoracion.ver') ? ['label' => 'Valoración funcional', 'route' => 'admin.salud-seguimiento.valoracion.index'] : null,
+                        auth()->user()->can('salud.alertas.ver') ? ['label' => 'Alertas de seguimiento', 'route' => 'admin.salud-seguimiento.alertas'] : null,
+                        auth()->user()->can('salud.reportes.ver') ? ['label' => 'Reportes de salud', 'route' => 'admin.salud-seguimiento.reportes'] : null,
+                    ]),
                 ],
                 [
                     'title' => 'Familia y Social',
@@ -161,6 +157,14 @@
                     ],
                 ],
             ];
+
+            // Filtrar secciones que tienen menú items y todos fueron ocultados
+            $sections = array_filter($sections, function ($section) {
+                if (isset($section['items'])) {
+                    return count($section['items']) > 0;
+                }
+                return true;
+            });
         @endphp
 
         <nav class="space-y-2">

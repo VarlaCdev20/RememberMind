@@ -72,6 +72,11 @@ class AdultoMayorFormModal extends Component
     {
         $this->fecha_ing = date('Y-m-d');
         $this->hora_ing = date('H:i');
+        
+        $estadoActivo = DB::table('estado_adulto')
+            ->whereRaw('UPPER(estado) = ?', ['ACTIVO'])
+            ->first();
+        $this->cod_est_adul = $estadoActivo ? $estadoActivo->cod_est_adul : 1;
     }
 
     public function abrir($adultoId = null)
@@ -108,6 +113,12 @@ class AdultoMayorFormModal extends Component
         $this->fecha_ing = date('Y-m-d');
         $this->hora_ing = date('H:i');
         $this->tiene_celular = true;
+        
+        $estadoActivo = DB::table('estado_adulto')
+            ->whereRaw('UPPER(estado) = ?', ['ACTIVO'])
+            ->first();
+        $this->cod_est_adul = $estadoActivo ? $estadoActivo->cod_est_adul : 1;
+        
         $this->resetErrorBag();
         $this->resetValidation();
     }
@@ -256,10 +267,9 @@ class AdultoMayorFormModal extends Component
             case 5:
                 $rules = [
                     'fecha_ing' => ['required', 'date', 'after_or_equal:fecha_nac', 'before_or_equal:today'],
-                    'hora_ing' => ['nullable', 'date_format:H:i'],
+                    'hora_ing' => ['nullable'],
                     'tipo_ing' => ['required', 'string', 'in:REGULAR,DERIVADO,VOLUNTARIO,EMERGENCIA,OTRO'],
                     'permanencia' => ['required', 'string', 'in:PERMANENTE,TEMPORAL,EVENTUAL'],
-                    'cod_est_adul' => ['required', 'exists:estado_adulto,cod_est_adul'],
                     'observaciones' => ['nullable', 'string', 'max:1500'],
                 ];
                 break;
@@ -276,6 +286,23 @@ class AdultoMayorFormModal extends Component
     public function guardar()
     {
         $this->validarPaso(); // Validar el último paso
+
+        $codEst = $this->cod_est_adul;
+        if (!$this->isEdit) {
+            $estadoActivo = DB::table('estado_adulto')
+                ->whereRaw('UPPER(estado) = ?', ['ACTIVO'])
+                ->first();
+            if (!$estadoActivo) {
+                $id = DB::table('estado_adulto')->insertGetId([
+                    'estado' => 'ACTIVO',
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ], 'cod_est_adul');
+                $codEst = $id;
+            } else {
+                $codEst = $estadoActivo->cod_est_adul;
+            }
+        }
 
         $data = [
             'nombres' => trim(ucwords(strtolower($this->nombres))),
@@ -313,7 +340,7 @@ class AdultoMayorFormModal extends Component
             'hora_ing' => $this->hora_ing,
             'tipo_ing' => strtoupper($this->tipo_ing),
             'permanencia' => strtoupper($this->permanencia),
-            'cod_est_adul' => $this->cod_est_adul,
+            'cod_est_adul' => $codEst,
             'observaciones' => trim($this->observaciones),
             'consentimiento_datos' => (bool)$this->consentimiento_datos,
         ];
