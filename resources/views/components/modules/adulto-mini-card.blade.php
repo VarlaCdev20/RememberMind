@@ -22,7 +22,7 @@
     $estado  = $adulto->estado?->estado ?? 'ACTIVO';
 @endphp
 
-<div class="group relative flex flex-col overflow-hidden rounded-3xl border border-[#C7B5A3]/40 bg-white shadow-sm transition-all hover:-translate-y-1 hover:shadow-xl hover:shadow-terracota/10">
+<div class="group relative flex flex-col overflow-hidden rounded-3xl border border-borde-suave bg-fondo-card shadow-sm transition-all hover:-translate-y-1 hover:shadow-xl hover:shadow-terracota/10">
 
     {{-- Banner superior --}}
     <div class="relative h-20 w-full overflow-hidden bg-gradient-to-br from-[#E6DDD3] to-[#D5C7B9]">
@@ -34,12 +34,12 @@
 
     {{-- Avatar --}}
     <div class="absolute left-1/2 top-6 -translate-x-1/2">
-        <div class="h-20 w-20 overflow-hidden rounded-full border-4 border-white bg-white shadow-md">
+        <div class="h-20 w-20 overflow-hidden rounded-full border-4 border-white bg-fondo-card shadow-md">
             @if($foto)
                 <img src="{{ Storage::url($foto) }}" alt="{{ $adulto->nombres }}" class="h-full w-full object-cover">
             @else
                 <div class="flex h-full w-full items-center justify-center bg-gradient-to-br from-[#E6DDD3] to-[#C7B5A3]">
-                    <span class="text-2xl font-black text-azul-profundo/50">{{ $inicial }}</span>
+                    <span class="text-2xl font-black text-meta">{{ $inicial }}</span>
                 </div>
             @endif
         </div>
@@ -47,18 +47,18 @@
 
     {{-- Datos --}}
     <div class="flex flex-1 flex-col items-center px-5 pb-5 pt-10">
-        <h3 class="line-clamp-1 text-center text-base font-black leading-tight text-azul-profundo">
+        <h3 class="line-clamp-1 text-center text-base font-black leading-tight text-titulo">
             {{ $adulto->nombres }} {{ $adulto->ap_paterno }}
         </h3>
-        <p class="mt-0.5 text-[11px] font-bold text-terracota">{{ $adulto->cod_am }}</p>
+        <p class="mt-0.5 text-[11px] font-bold text-boton-acento">{{ $adulto->cod_am }}</p>
 
         {{-- Slot de datos contextuales --}}
-        <div class="mt-3 w-full flex-1 rounded-2xl bg-[#F7F5F2] px-4 py-3 text-xs">
+        <div class="mt-3 w-full flex-1 rounded-2xl bg-fondo-panel px-4 py-3 text-xs">
             {{ $slot }}
         </div>
 
         <a href="{{ $ruta }}"
-           class="mt-4 w-full rounded-xl bg-terracota py-2.5 text-center text-[11px] font-black uppercase tracking-wider text-white shadow-sm transition-all hover:bg-terracota-dark active:scale-95 group-hover:shadow-md group-hover:shadow-terracota/25">
+           class="mt-4 w-full rounded-xl bg-boton-acento py-2.5 text-center text-[11px] font-black uppercase tracking-wider text-inverso shadow-sm transition-all hover:bg-boton-acento-dark active:scale-95 group-hover:shadow-md group-hover:shadow-terracota/25">
             {{ $boton }}
         </a>
     </div>

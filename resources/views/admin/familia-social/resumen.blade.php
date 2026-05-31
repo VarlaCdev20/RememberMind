@@ -3,9 +3,9 @@
         $colorClasses = [
             'emerald' => ['card' => 'border-emerald-200/70 bg-emerald-50/70', 'icon' => 'bg-emerald-100 text-emerald-700', 'badge' => 'bg-emerald-100 text-emerald-700'],
             'amber' => ['card' => 'border-amber-200/70 bg-amber-50/70', 'icon' => 'bg-amber-100 text-amber-700', 'badge' => 'bg-amber-100 text-amber-700'],
-            'salmon' => ['card' => 'border-[#E27D60]/25 bg-[#E27D60]/10', 'icon' => 'bg-[#E27D60]/15 text-[#C75F46]', 'badge' => 'bg-[#E27D60]/15 text-[#C75F46]'],
+            'salmon' => ['card' => 'border-borde-focus bg-estado-peligroBg', 'icon' => 'bg-estado-peligroBg text-parrafo', 'badge' => 'bg-estado-peligroBg text-parrafo'],
             'blue' => ['card' => 'border-sky-200/70 bg-sky-50/70', 'icon' => 'bg-sky-100 text-sky-700', 'badge' => 'bg-sky-100 text-sky-700'],
-            'green' => ['card' => 'border-[#8DA280]/35 bg-[#8DA280]/12', 'icon' => 'bg-[#8DA280]/18 text-[#5F7E55]', 'badge' => 'bg-[#8DA280]/18 text-[#5F7E55]'],
+            'green' => ['card' => 'border-estado-exitoBorde bg-estado-exitoBg', 'icon' => 'bg-estado-exitoBg text-parrafo', 'badge' => 'bg-estado-exitoBg text-parrafo'],
             'violet' => ['card' => 'border-violet-200/70 bg-violet-50/70', 'icon' => 'bg-violet-100 text-violet-700', 'badge' => 'bg-violet-100 text-violet-700'],
             'rose' => ['card' => 'border-rose-200/70 bg-rose-50/70', 'icon' => 'bg-rose-100 text-rose-700', 'badge' => 'bg-rose-100 text-rose-700'],
             'indigo' => ['card' => 'border-indigo-200/70 bg-indigo-50/70', 'icon' => 'bg-indigo-100 text-indigo-700', 'badge' => 'bg-indigo-100 text-indigo-700'],
@@ -21,26 +21,26 @@
             'emerald' => 'bg-emerald-100 text-emerald-700 border-emerald-200',
             'amber' => 'bg-amber-100 text-amber-700 border-amber-200',
             'rose' => 'bg-rose-100 text-rose-700 border-rose-200',
-        ][$estadoSocial['nivel']['color']] ?? 'bg-[#F3ECE4] text-[#2F3E5C] border-[#C7B5A3]';
+        ][$estadoSocial['nivel']['color']] ?? 'bg-fondo-app text-titulo border-borde-suave';
 
         $hasRedChart = array_sum($chartData['red']['data']) > 0;
         $hasVisitasChart = ($chartData['visitas']['available'] ?? false) && array_sum($chartData['visitas']['data'] ?? []) > 0;
         $hasFichaChart = ($chartData['ficha']['available'] ?? false) && array_sum($chartData['ficha']['data'] ?? []) > 0;
     @endphp
 
-    <section class="min-h-[calc(100vh-7rem)] bg-[#F8F3ED]/45 px-3 py-4 text-[#2F3E5C] sm:px-4 lg:px-5">
+    <section class="min-h-[calc(100vh-7rem)] bg-fondo-panel px-3 py-4 text-titulo sm:px-4 lg:px-5">
         <div class="mx-auto max-w-[1480px] space-y-4">
-            <div class="overflow-hidden rounded-2xl border border-[#C7B5A3]/70 bg-[#E6DDD3]/75 shadow-[0_16px_42px_rgba(47,62,92,0.12)] backdrop-blur-xl">
+            <div class="overflow-hidden rounded-2xl border border-borde-suave bg-fondo-panel shadow-[0_16px_42px_rgba(47,62,92,0.12)] backdrop-blur-xl">
                 <div class="h-1.5 bg-gradient-to-r from-[#E27D60] via-[#D9A05B] to-[#8DA280]"></div>
                 <div class="flex flex-col gap-4 p-5 lg:flex-row lg:items-center lg:justify-between">
                     <div class="flex min-w-0 items-start gap-4">
-                        <span class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[#F3ECE4]/85 text-[#E27D60] shadow-sm">
+                        <span class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-fondo-panel text-boton-acento shadow-sm">
                             <i class="ph-bold ph-users-three text-2xl"></i>
                         </span>
                         <div class="min-w-0">
-                            <span class="text-xs font-black uppercase text-[#E27D60]">Familia y Social</span>
-                            <h1 class="mt-1 text-2xl font-black text-[#2F3E5C] sm:text-3xl">Resumen familiar y social</h1>
-                            <p class="mt-1 max-w-3xl text-sm font-bold leading-relaxed text-[#2F3E5C]/70">
+                            <span class="text-xs font-black uppercase text-boton-acento">Familia y Social</span>
+                            <h1 class="mt-1 text-2xl font-black text-titulo sm:text-3xl">Resumen familiar y social</h1>
+                            <p class="mt-1 max-w-3xl text-sm font-bold leading-relaxed text-apoyo">
                                 Panel de seguimiento de red de apoyo, visitas, ficha social y estado social de los adultos mayores.
                             </p>
                         </div>
@@ -49,20 +49,20 @@
                     @can('familiares.ver')
                         <div class="flex flex-wrap gap-2">
                             @if($rutasSubmodulos['red_apoyo'])
-                                <a href="{{ $rutasSubmodulos['red_apoyo'] }}" class="inline-flex items-center gap-2 rounded-xl border border-[#C7B5A3]/70 bg-[#F3ECE4]/85 px-3 py-2 text-xs font-black text-[#2F3E5C] shadow-sm transition hover:-translate-y-0.5 hover:border-[#E27D60]/45">
-                                    <i class="ph-bold ph-hand-heart text-base text-[#E27D60]"></i>
+                                <a href="{{ $rutasSubmodulos['red_apoyo'] }}" class="inline-flex items-center gap-2 rounded-xl border border-borde-suave bg-fondo-panel px-3 py-2 text-xs font-black text-titulo shadow-sm transition hover:-translate-y-0.5 hover:border-borde-focus">
+                                    <i class="ph-bold ph-hand-heart text-base text-boton-acento"></i>
                                     Ver red de apoyo
                                 </a>
                             @endif
                             @if($rutasSubmodulos['visitas'])
-                                <a href="{{ $rutasSubmodulos['visitas'] }}" class="inline-flex items-center gap-2 rounded-xl border border-[#C7B5A3]/70 bg-[#F3ECE4]/85 px-3 py-2 text-xs font-black text-[#2F3E5C] shadow-sm transition hover:-translate-y-0.5 hover:border-[#E27D60]/45">
-                                    <i class="ph-bold ph-calendar-check text-base text-[#8DA280]"></i>
+                                <a href="{{ $rutasSubmodulos['visitas'] }}" class="inline-flex items-center gap-2 rounded-xl border border-borde-suave bg-fondo-panel px-3 py-2 text-xs font-black text-titulo shadow-sm transition hover:-translate-y-0.5 hover:border-borde-focus">
+                                    <i class="ph-bold ph-calendar-check text-base text-estado-exito"></i>
                                     Ver visitas
                                 </a>
                             @endif
                             @if($rutasSubmodulos['ficha_social'])
-                                <a href="{{ $rutasSubmodulos['ficha_social'] }}" class="inline-flex items-center gap-2 rounded-xl border border-[#C7B5A3]/70 bg-[#F3ECE4]/85 px-3 py-2 text-xs font-black text-[#2F3E5C] shadow-sm transition hover:-translate-y-0.5 hover:border-[#E27D60]/45">
-                                    <i class="ph-bold ph-clipboard-text text-base text-[#2F3E5C]"></i>
+                                <a href="{{ $rutasSubmodulos['ficha_social'] }}" class="inline-flex items-center gap-2 rounded-xl border border-borde-suave bg-fondo-panel px-3 py-2 text-xs font-black text-titulo shadow-sm transition hover:-translate-y-0.5 hover:border-borde-focus">
+                                    <i class="ph-bold ph-clipboard-text text-base text-titulo"></i>
                                     Ver ficha social
                                 </a>
                             @endif
@@ -82,20 +82,20 @@
                             <span class="rounded-full px-2.5 py-1 text-[11px] font-black {{ $classes['badge'] }}">{{ $metrica['badge'] }}</span>
                         </div>
                         <div class="mt-3">
-                            <p class="text-2xl font-black leading-none text-[#2F3E5C]">{{ number_format($metrica['valor']) }}</p>
-                            <h2 class="mt-1 text-sm font-black text-[#2F3E5C]">{{ $metrica['label'] }}</h2>
-                            <p class="mt-1 text-xs font-bold leading-snug text-[#2F3E5C]/62">{{ $metrica['subtitulo'] }}</p>
+                            <p class="text-2xl font-black leading-none text-titulo">{{ number_format($metrica['valor']) }}</p>
+                            <h2 class="mt-1 text-sm font-black text-titulo">{{ $metrica['label'] }}</h2>
+                            <p class="mt-1 text-xs font-bold leading-snug text-apoyo">{{ $metrica['subtitulo'] }}</p>
                         </div>
                     </article>
                 @endforeach
             </div>
 
             <div class="grid gap-4 lg:grid-cols-[0.95fr_1.05fr]">
-                <section class="rounded-2xl border border-[#C7B5A3]/70 bg-[#F3ECE4]/80 p-4 shadow-sm backdrop-blur-xl">
+                <section class="rounded-2xl border border-borde-suave bg-fondo-panel p-4 shadow-sm backdrop-blur-xl">
                     <div class="flex items-start justify-between gap-3">
                         <div>
-                            <h2 class="text-base font-black text-[#2F3E5C]">Estado social general</h2>
-                            <p class="mt-1 text-xs font-bold text-[#2F3E5C]/60">Lectura rapida del acompanamiento familiar y social.</p>
+                            <h2 class="text-base font-black text-titulo">Estado social general</h2>
+                            <p class="mt-1 text-xs font-bold text-apoyo">Lectura rapida del acompanamiento familiar y social.</p>
                         </div>
                         <span class="rounded-full border px-3 py-1 text-xs font-black {{ $nivelColor }}">
                             {{ $estadoSocial['nivel']['texto'] }}
@@ -104,48 +104,48 @@
 
                     <div class="mt-4 space-y-3">
                         @foreach([
-                            ['label' => 'Red de apoyo registrada', 'value' => $estadoSocial['red_apoyo'], 'color' => 'bg-[#8DA280]'],
-                            ['label' => 'Adultos sin red de apoyo', 'value' => $estadoSocial['sin_red'], 'color' => 'bg-[#D9A05B]'],
-                            ['label' => 'Ficha social completada', 'value' => $estadoSocial['ficha_social'], 'color' => 'bg-[#E27D60]'],
-                            ['label' => 'Visitas recientes', 'value' => $estadoSocial['visitas_recientes'], 'color' => 'bg-[#2F3E5C]'],
+                            ['label' => 'Red de apoyo registrada', 'value' => $estadoSocial['red_apoyo'], 'color' => 'bg-estado-exitoBg'],
+                            ['label' => 'Adultos sin red de apoyo', 'value' => $estadoSocial['sin_red'], 'color' => 'bg-estado-advertenciaBg'],
+                            ['label' => 'Ficha social completada', 'value' => $estadoSocial['ficha_social'], 'color' => 'bg-boton-acento'],
+                            ['label' => 'Visitas recientes', 'value' => $estadoSocial['visitas_recientes'], 'color' => 'bg-boton-principal'],
                         ] as $item)
                             <div>
-                                <div class="mb-1 flex items-center justify-between gap-3 text-xs font-black text-[#2F3E5C]">
+                                <div class="mb-1 flex items-center justify-between gap-3 text-xs font-black text-titulo">
                                     <span>{{ $item['label'] }}</span>
                                     <span>{{ $item['value'] }}%</span>
                                 </div>
-                                <div class="h-2 overflow-hidden rounded-full bg-[#D5C7B9]/80">
+                                <div class="h-2 overflow-hidden rounded-full bg-fondo-panel">
                                     <div class="h-full rounded-full {{ $item['color'] }}" style="width: {{ $item['value'] }}%"></div>
                                 </div>
                             </div>
                         @endforeach
                     </div>
 
-                    <div class="mt-4 rounded-xl border border-[#C7B5A3]/55 bg-white/35 p-3">
+                    <div class="mt-4 rounded-xl border border-borde-suave bg-fondo-card/35 p-3">
                         <div class="flex items-center justify-between gap-3">
-                            <span class="text-xs font-black text-[#2F3E5C]/65">Indice social consolidado</span>
-                            <span class="text-lg font-black text-[#2F3E5C]">{{ $estadoSocial['nivel']['score'] }}%</span>
+                            <span class="text-xs font-black text-apoyo">Indice social consolidado</span>
+                            <span class="text-lg font-black text-titulo">{{ $estadoSocial['nivel']['score'] }}%</span>
                         </div>
                     </div>
                 </section>
 
-                <section class="rounded-2xl border border-[#C7B5A3]/70 bg-[#F3ECE4]/80 p-4 shadow-sm backdrop-blur-xl">
+                <section class="rounded-2xl border border-borde-suave bg-fondo-panel p-4 shadow-sm backdrop-blur-xl">
                     <div class="mb-3 flex items-start justify-between gap-3">
                         <div>
-                            <h2 class="text-base font-black text-[#2F3E5C]">Cobertura de red de apoyo</h2>
-                            <p class="mt-1 text-xs font-bold text-[#2F3E5C]/60">Adultos mayores con y sin vinculo familiar activo.</p>
+                            <h2 class="text-base font-black text-titulo">Cobertura de red de apoyo</h2>
+                            <p class="mt-1 text-xs font-bold text-apoyo">Adultos mayores con y sin vinculo familiar activo.</p>
                         </div>
-                        <i class="ph-bold ph-chart-donut text-2xl text-[#E27D60]"></i>
+                        <i class="ph-bold ph-chart-donut text-2xl text-boton-acento"></i>
                     </div>
                     @if($hasRedChart)
                         <div class="h-56">
                             <canvas id="familiaRedChart" class="max-h-56"></canvas>
                         </div>
                     @else
-                        <div class="flex h-56 items-center justify-center rounded-xl border border-dashed border-[#C7B5A3]/70 bg-[#E6DDD3]/45 text-center">
+                        <div class="flex h-56 items-center justify-center rounded-xl border border-dashed border-borde-suave bg-fondo-panel text-center">
                             <div>
-                                <i class="ph-bold ph-chart-pie-slice text-3xl text-[#2F3E5C]/25"></i>
-                                <p class="mt-2 text-sm font-black text-[#2F3E5C]">No hay datos suficientes para generar este grafico.</p>
+                                <i class="ph-bold ph-chart-pie-slice text-3xl text-apoyo"></i>
+                                <p class="mt-2 text-sm font-black text-titulo">No hay datos suficientes para generar este grafico.</p>
                             </div>
                         </div>
                     @endif
@@ -153,47 +153,47 @@
             </div>
 
             <div class="grid gap-4 lg:grid-cols-2">
-                <section class="rounded-2xl border border-[#C7B5A3]/70 bg-[#F3ECE4]/80 p-4 shadow-sm backdrop-blur-xl">
+                <section class="rounded-2xl border border-borde-suave bg-fondo-panel p-4 shadow-sm backdrop-blur-xl">
                     <div class="mb-3 flex items-start justify-between gap-3">
                         <div>
-                            <h2 class="text-base font-black text-[#2F3E5C]">Visitas registradas</h2>
-                            <p class="mt-1 text-xs font-bold text-[#2F3E5C]/60">Evolucion mensual de visitas familiares o sociales.</p>
+                            <h2 class="text-base font-black text-titulo">Visitas registradas</h2>
+                            <p class="mt-1 text-xs font-bold text-apoyo">Evolucion mensual de visitas familiares o sociales.</p>
                         </div>
-                        <i class="ph-bold ph-chart-bar text-2xl text-[#8DA280]"></i>
+                        <i class="ph-bold ph-chart-bar text-2xl text-estado-exito"></i>
                     </div>
                     @if($hasVisitasChart)
                         <div class="h-56">
                             <canvas id="familiaVisitasChart" class="max-h-56"></canvas>
                         </div>
                     @else
-                        <div class="flex h-56 items-center justify-center rounded-xl border border-dashed border-[#C7B5A3]/70 bg-[#E6DDD3]/45 text-center">
+                        <div class="flex h-56 items-center justify-center rounded-xl border border-dashed border-borde-suave bg-fondo-panel text-center">
                             <div>
-                                <i class="ph-bold ph-calendar-x text-3xl text-[#2F3E5C]/25"></i>
-                                <p class="mt-2 text-sm font-black text-[#2F3E5C]">No existen datos suficientes para generar este grafico.</p>
-                                <p class="mt-1 text-xs font-bold text-[#2F3E5C]/55">El panel queda preparado para el submodulo de visitas.</p>
+                                <i class="ph-bold ph-calendar-x text-3xl text-apoyo"></i>
+                                <p class="mt-2 text-sm font-black text-titulo">No existen datos suficientes para generar este grafico.</p>
+                                <p class="mt-1 text-xs font-bold text-apoyo">El panel queda preparado para el submodulo de visitas.</p>
                             </div>
                         </div>
                     @endif
                 </section>
 
-                <section class="rounded-2xl border border-[#C7B5A3]/70 bg-[#F3ECE4]/80 p-4 shadow-sm backdrop-blur-xl">
+                <section class="rounded-2xl border border-borde-suave bg-fondo-panel p-4 shadow-sm backdrop-blur-xl">
                     <div class="mb-3 flex items-start justify-between gap-3">
                         <div>
-                            <h2 class="text-base font-black text-[#2F3E5C]">Estado de ficha social</h2>
-                            <p class="mt-1 text-xs font-bold text-[#2F3E5C]/60">Fichas completas, pendientes y sin registro.</p>
+                            <h2 class="text-base font-black text-titulo">Estado de ficha social</h2>
+                            <p class="mt-1 text-xs font-bold text-apoyo">Fichas completas, pendientes y sin registro.</p>
                         </div>
-                        <i class="ph-bold ph-chart-pie text-2xl text-[#E27D60]"></i>
+                        <i class="ph-bold ph-chart-pie text-2xl text-boton-acento"></i>
                     </div>
                     @if($hasFichaChart)
                         <div class="h-56">
                             <canvas id="familiaFichaChart" class="max-h-56"></canvas>
                         </div>
                     @else
-                        <div class="flex h-56 items-center justify-center rounded-xl border border-dashed border-[#C7B5A3]/70 bg-[#E6DDD3]/45 text-center">
+                        <div class="flex h-56 items-center justify-center rounded-xl border border-dashed border-borde-suave bg-fondo-panel text-center">
                             <div>
-                                <i class="ph-bold ph-clipboard-text text-3xl text-[#2F3E5C]/25"></i>
-                                <p class="mt-2 text-sm font-black text-[#2F3E5C]">La ficha social aun no tiene registros disponibles.</p>
-                                <p class="mt-1 text-xs font-bold text-[#2F3E5C]/55">No se creo ninguna migracion ni dato temporal.</p>
+                                <i class="ph-bold ph-clipboard-text text-3xl text-apoyo"></i>
+                                <p class="mt-2 text-sm font-black text-titulo">La ficha social aun no tiene registros disponibles.</p>
+                                <p class="mt-1 text-xs font-bold text-apoyo">No se creo ninguna migracion ni dato temporal.</p>
                             </div>
                         </div>
                     @endif
@@ -201,65 +201,65 @@
             </div>
 
             <div class="grid gap-4 xl:grid-cols-2">
-                <section class="rounded-2xl border border-[#C7B5A3]/70 bg-[#F3ECE4]/80 p-4 shadow-sm backdrop-blur-xl">
+                <section class="rounded-2xl border border-borde-suave bg-fondo-panel p-4 shadow-sm backdrop-blur-xl">
                     <div class="mb-3 flex items-start justify-between gap-3">
                         <div>
-                            <h2 class="text-base font-black text-[#2F3E5C]">Alertas sociales</h2>
-                            <p class="mt-1 text-xs font-bold text-[#2F3E5C]/60">Casos que requieren atencion administrativa o social.</p>
+                            <h2 class="text-base font-black text-titulo">Alertas sociales</h2>
+                            <p class="mt-1 text-xs font-bold text-apoyo">Casos que requieren atencion administrativa o social.</p>
                         </div>
                         <span class="rounded-full bg-rose-100 px-2.5 py-1 text-xs font-black text-rose-700">{{ $alertas->count() }} alertas</span>
                     </div>
 
                     <div class="space-y-2">
                         @forelse($alertas as $alerta)
-                            <div class="rounded-xl border border-[#C7B5A3]/55 bg-white/35 p-3">
+                            <div class="rounded-xl border border-borde-suave bg-fondo-card/35 p-3">
                                 <div class="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
                                     <div class="min-w-0">
-                                        <p class="truncate text-sm font-black text-[#2F3E5C]">{{ $alerta['adulto'] }}</p>
-                                        <p class="mt-0.5 text-xs font-bold leading-snug text-[#2F3E5C]/62">{{ $alerta['motivo'] }}</p>
+                                        <p class="truncate text-sm font-black text-titulo">{{ $alerta['adulto'] }}</p>
+                                        <p class="mt-0.5 text-xs font-bold leading-snug text-apoyo">{{ $alerta['motivo'] }}</p>
                                     </div>
                                     <div class="flex shrink-0 items-center gap-2">
                                         <span class="rounded-full border px-2.5 py-1 text-[11px] font-black {{ $priorityClasses[$alerta['prioridad']] ?? $priorityClasses['Media'] }}">{{ $alerta['prioridad'] }}</span>
-                                        <span class="text-[11px] font-bold text-[#2F3E5C]/48">{{ $alerta['fecha'] }}</span>
+                                        <span class="text-[11px] font-bold text-apoyo">{{ $alerta['fecha'] }}</span>
                                     </div>
                                 </div>
                             </div>
                         @empty
-                            <div class="rounded-xl border border-dashed border-[#C7B5A3]/70 bg-[#E6DDD3]/45 p-6 text-center">
+                            <div class="rounded-xl border border-dashed border-borde-suave bg-fondo-panel p-6 text-center">
                                 <i class="ph-bold ph-check-circle text-3xl text-emerald-600/45"></i>
-                                <p class="mt-2 text-sm font-black text-[#2F3E5C]">No existen alertas sociales pendientes.</p>
+                                <p class="mt-2 text-sm font-black text-titulo">No existen alertas sociales pendientes.</p>
                             </div>
                         @endforelse
                     </div>
                 </section>
 
-                <section class="rounded-2xl border border-[#C7B5A3]/70 bg-[#F3ECE4]/80 p-4 shadow-sm backdrop-blur-xl">
+                <section class="rounded-2xl border border-borde-suave bg-fondo-panel p-4 shadow-sm backdrop-blur-xl">
                     <div class="mb-3 flex items-start justify-between gap-3">
                         <div>
-                            <h2 class="text-base font-black text-[#2F3E5C]">Visitas recientes</h2>
-                            <p class="mt-1 text-xs font-bold text-[#2F3E5C]/60">Ultimos registros de acompanamiento familiar o social.</p>
+                            <h2 class="text-base font-black text-titulo">Visitas recientes</h2>
+                            <p class="mt-1 text-xs font-bold text-apoyo">Ultimos registros de acompanamiento familiar o social.</p>
                         </div>
-                        <i class="ph-bold ph-door-open text-2xl text-[#8DA280]"></i>
+                        <i class="ph-bold ph-door-open text-2xl text-estado-exito"></i>
                     </div>
 
                     <div class="space-y-2">
                         @forelse($visitasRecientes as $visita)
-                            <div class="rounded-xl border border-[#C7B5A3]/55 bg-white/35 p-3">
+                            <div class="rounded-xl border border-borde-suave bg-fondo-card/35 p-3">
                                 <div class="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
                                     <div class="min-w-0">
-                                        <p class="truncate text-sm font-black text-[#2F3E5C]">{{ $visita['adulto'] }}</p>
-                                        <p class="mt-0.5 text-xs font-bold text-[#2F3E5C]/62">{{ $visita['visitante'] }} · {{ $visita['motivo'] }}</p>
+                                        <p class="truncate text-sm font-black text-titulo">{{ $visita['adulto'] }}</p>
+                                        <p class="mt-0.5 text-xs font-bold text-apoyo">{{ $visita['visitante'] }} · {{ $visita['motivo'] }}</p>
                                     </div>
                                     <div class="shrink-0 text-left sm:text-right">
-                                        <p class="text-xs font-black text-[#2F3E5C]">{{ $visita['fecha'] }}</p>
-                                        <p class="text-[11px] font-bold text-[#2F3E5C]/50">{{ $visita['hora'] ?? 'Sin hora' }} · {{ $visita['estado'] }}</p>
+                                        <p class="text-xs font-black text-titulo">{{ $visita['fecha'] }}</p>
+                                        <p class="text-[11px] font-bold text-apoyo">{{ $visita['hora'] ?? 'Sin hora' }} · {{ $visita['estado'] }}</p>
                                     </div>
                                 </div>
                             </div>
                         @empty
-                            <div class="rounded-xl border border-dashed border-[#C7B5A3]/70 bg-[#E6DDD3]/45 p-6 text-center">
-                                <i class="ph-bold ph-calendar-x text-3xl text-[#2F3E5C]/25"></i>
-                                <p class="mt-2 text-sm font-black text-[#2F3E5C]">No hay visitas registradas recientemente.</p>
+                            <div class="rounded-xl border border-dashed border-borde-suave bg-fondo-panel p-6 text-center">
+                                <i class="ph-bold ph-calendar-x text-3xl text-apoyo"></i>
+                                <p class="mt-2 text-sm font-black text-titulo">No hay visitas registradas recientemente.</p>
                             </div>
                         @endforelse
                     </div>
@@ -267,27 +267,27 @@
             </div>
 
             <div class="grid gap-4 xl:grid-cols-[1.05fr_0.95fr]">
-                <section class="rounded-2xl border border-[#C7B5A3]/70 bg-[#F3ECE4]/80 p-4 shadow-sm backdrop-blur-xl">
+                <section class="rounded-2xl border border-borde-suave bg-fondo-panel p-4 shadow-sm backdrop-blur-xl">
                     <div class="mb-3 flex items-start justify-between gap-3">
                         <div>
-                            <h2 class="text-base font-black text-[#2F3E5C]">Red de apoyo por completar</h2>
-                            <p class="mt-1 text-xs font-bold text-[#2F3E5C]/60">Adultos mayores con vinculos, responsables o contactos pendientes.</p>
+                            <h2 class="text-base font-black text-titulo">Red de apoyo por completar</h2>
+                            <p class="mt-1 text-xs font-bold text-apoyo">Adultos mayores con vinculos, responsables o contactos pendientes.</p>
                         </div>
                         <span class="rounded-full bg-amber-100 px-2.5 py-1 text-xs font-black text-amber-700">{{ $redIncompleta->count() }} casos</span>
                     </div>
 
-                    <div class="overflow-hidden rounded-xl border border-[#C7B5A3]/55">
+                    <div class="overflow-hidden rounded-xl border border-borde-suave">
                         @forelse($redIncompleta as $item)
-                            <div class="flex flex-col gap-3 border-b border-[#C7B5A3]/45 bg-white/30 p-3 last:border-b-0 sm:flex-row sm:items-center sm:justify-between">
+                            <div class="flex flex-col gap-3 border-b border-borde-suave bg-fondo-card/30 p-3 last:border-b-0 sm:flex-row sm:items-center sm:justify-between">
                                 <div class="min-w-0">
-                                    <p class="truncate text-sm font-black text-[#2F3E5C]">{{ $item['adulto'] }}</p>
-                                    <p class="mt-0.5 text-xs font-bold text-[#2F3E5C]/62">{{ $item['faltante'] }}</p>
+                                    <p class="truncate text-sm font-black text-titulo">{{ $item['adulto'] }}</p>
+                                    <p class="mt-0.5 text-xs font-bold text-apoyo">{{ $item['faltante'] }}</p>
                                 </div>
                                 <div class="flex shrink-0 items-center gap-2">
-                                    <span class="rounded-full bg-[#E6DDD3] px-2.5 py-1 text-[11px] font-black text-[#2F3E5C]/70">{{ $item['estado'] }}</span>
+                                    <span class="rounded-full bg-fondo-app px-2.5 py-1 text-[11px] font-black text-apoyo">{{ $item['estado'] }}</span>
                                     @can('adultos.ver')
                                         @if($item['url'])
-                                            <a href="{{ $item['url'] }}" class="rounded-lg bg-[#2F3E5C] px-3 py-1.5 text-xs font-black text-white transition hover:bg-[#E27D60]">
+                                            <a href="{{ $item['url'] }}" class="rounded-lg bg-boton-principal px-3 py-1.5 text-xs font-black text-inverso transition hover:bg-boton-acento">
                                                 Revisar red
                                             </a>
                                         @endif
@@ -295,56 +295,56 @@
                                 </div>
                             </div>
                         @empty
-                            <div class="bg-[#E6DDD3]/45 p-6 text-center">
+                            <div class="bg-fondo-panel p-6 text-center">
                                 <i class="ph-bold ph-check-circle text-3xl text-emerald-600/45"></i>
-                                <p class="mt-2 text-sm font-black text-[#2F3E5C]">No se encontraron adultos mayores con red de apoyo incompleta.</p>
+                                <p class="mt-2 text-sm font-black text-titulo">No se encontraron adultos mayores con red de apoyo incompleta.</p>
                             </div>
                         @endforelse
                     </div>
                 </section>
 
-                <section class="rounded-2xl border border-[#C7B5A3]/70 bg-[#F3ECE4]/80 p-4 shadow-sm backdrop-blur-xl">
+                <section class="rounded-2xl border border-borde-suave bg-fondo-panel p-4 shadow-sm backdrop-blur-xl">
                     <div class="mb-3 flex items-start justify-between gap-3">
                         <div>
-                            <h2 class="text-base font-black text-[#2F3E5C]">Ficha social</h2>
-                            <p class="mt-1 text-xs font-bold text-[#2F3E5C]/60">Estado de fichas y ultimas actualizaciones sociales.</p>
+                            <h2 class="text-base font-black text-titulo">Ficha social</h2>
+                            <p class="mt-1 text-xs font-bold text-apoyo">Estado de fichas y ultimas actualizaciones sociales.</p>
                         </div>
-                        <i class="ph-bold ph-clipboard-text text-2xl text-[#E27D60]"></i>
+                        <i class="ph-bold ph-clipboard-text text-2xl text-boton-acento"></i>
                     </div>
 
                     <div class="grid gap-2 sm:grid-cols-3">
-                        <div class="rounded-xl border border-[#C7B5A3]/55 bg-white/35 p-3">
-                            <p class="text-lg font-black text-[#2F3E5C]">{{ $fichaSocial['completas'] }}</p>
-                            <p class="text-[11px] font-black text-[#2F3E5C]/58">Completas</p>
+                        <div class="rounded-xl border border-borde-suave bg-fondo-card/35 p-3">
+                            <p class="text-lg font-black text-titulo">{{ $fichaSocial['completas'] }}</p>
+                            <p class="text-[11px] font-black text-apoyo">Completas</p>
                         </div>
-                        <div class="rounded-xl border border-[#C7B5A3]/55 bg-white/35 p-3">
-                            <p class="text-lg font-black text-[#2F3E5C]">{{ $fichaSocial['pendientes'] }}</p>
-                            <p class="text-[11px] font-black text-[#2F3E5C]/58">Pendientes</p>
+                        <div class="rounded-xl border border-borde-suave bg-fondo-card/35 p-3">
+                            <p class="text-lg font-black text-titulo">{{ $fichaSocial['pendientes'] }}</p>
+                            <p class="text-[11px] font-black text-apoyo">Pendientes</p>
                         </div>
-                        <div class="rounded-xl border border-[#C7B5A3]/55 bg-white/35 p-3">
-                            <p class="text-lg font-black text-[#2F3E5C]">{{ $fichaSocial['sin_registro'] }}</p>
-                            <p class="text-[11px] font-black text-[#2F3E5C]/58">Sin registro</p>
+                        <div class="rounded-xl border border-borde-suave bg-fondo-card/35 p-3">
+                            <p class="text-lg font-black text-titulo">{{ $fichaSocial['sin_registro'] }}</p>
+                            <p class="text-[11px] font-black text-apoyo">Sin registro</p>
                         </div>
                     </div>
 
                     <div class="mt-3 space-y-2">
                         @forelse($fichaSocial['ultimas'] as $ficha)
-                            <div class="rounded-xl border border-[#C7B5A3]/55 bg-white/35 p-3">
+                            <div class="rounded-xl border border-borde-suave bg-fondo-card/35 p-3">
                                 <div class="flex items-start justify-between gap-3">
                                     <div class="min-w-0">
-                                        <p class="truncate text-sm font-black text-[#2F3E5C]">{{ $ficha['adulto'] }}</p>
-                                        <p class="mt-0.5 line-clamp-2 text-xs font-bold text-[#2F3E5C]/62">{{ $ficha['observacion'] }}</p>
+                                        <p class="truncate text-sm font-black text-titulo">{{ $ficha['adulto'] }}</p>
+                                        <p class="mt-0.5 line-clamp-2 text-xs font-bold text-apoyo">{{ $ficha['observacion'] }}</p>
                                     </div>
                                     <div class="shrink-0 text-right">
-                                        <p class="text-xs font-black text-[#2F3E5C]">{{ $ficha['estado'] }}</p>
-                                        <p class="text-[11px] font-bold text-[#2F3E5C]/50">{{ $ficha['fecha'] }}</p>
+                                        <p class="text-xs font-black text-titulo">{{ $ficha['estado'] }}</p>
+                                        <p class="text-[11px] font-bold text-apoyo">{{ $ficha['fecha'] }}</p>
                                     </div>
                                 </div>
                             </div>
                         @empty
-                            <div class="rounded-xl border border-dashed border-[#C7B5A3]/70 bg-[#E6DDD3]/45 p-5 text-center">
-                                <i class="ph-bold ph-folder-simple-dashed text-3xl text-[#2F3E5C]/25"></i>
-                                <p class="mt-2 text-sm font-black text-[#2F3E5C]">No existen fichas sociales registradas.</p>
+                            <div class="rounded-xl border border-dashed border-borde-suave bg-fondo-panel p-5 text-center">
+                                <i class="ph-bold ph-folder-simple-dashed text-3xl text-apoyo"></i>
+                                <p class="mt-2 text-sm font-black text-titulo">No existen fichas sociales registradas.</p>
                             </div>
                         @endforelse
                     </div>
@@ -352,31 +352,31 @@
             </div>
 
             <div class="grid gap-4 xl:grid-cols-[1fr_0.9fr]">
-                <section class="rounded-2xl border border-[#C7B5A3]/70 bg-[#F3ECE4]/80 p-4 shadow-sm backdrop-blur-xl">
+                <section class="rounded-2xl border border-borde-suave bg-fondo-panel p-4 shadow-sm backdrop-blur-xl">
                     <div class="mb-3 flex items-start justify-between gap-3">
                         <div>
-                            <h2 class="text-base font-black text-[#2F3E5C]">Reportes sociales</h2>
-                            <p class="mt-1 text-xs font-bold text-[#2F3E5C]/60">Reportes disponibles o preparados para evidencia institucional.</p>
+                            <h2 class="text-base font-black text-titulo">Reportes sociales</h2>
+                            <p class="mt-1 text-xs font-bold text-apoyo">Reportes disponibles o preparados para evidencia institucional.</p>
                         </div>
-                        <i class="ph-bold ph-file-chart text-2xl text-[#2F3E5C]"></i>
+                        <i class="ph-bold ph-file-chart text-2xl text-titulo"></i>
                     </div>
 
                     <div class="grid gap-2 md:grid-cols-2">
                         @foreach($reportesSociales as $reporte)
-                            <div class="rounded-xl border border-[#C7B5A3]/55 bg-white/35 p-3">
+                            <div class="rounded-xl border border-borde-suave bg-fondo-card/35 p-3">
                                 <div class="flex items-start gap-3">
-                                    <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#E6DDD3] text-[#E27D60]">
+                                    <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-fondo-app text-boton-acento">
                                         <i class="ph-bold {{ $reporte['icono'] }} text-lg"></i>
                                     </span>
                                     <div class="min-w-0 flex-1">
                                         <div class="flex items-start justify-between gap-2">
-                                            <h3 class="text-sm font-black text-[#2F3E5C]">{{ $reporte['titulo'] }}</h3>
-                                            <span class="shrink-0 rounded-full bg-[#E6DDD3] px-2 py-0.5 text-[10px] font-black text-[#2F3E5C]/65">{{ $reporte['estado'] }}</span>
+                                            <h3 class="text-sm font-black text-titulo">{{ $reporte['titulo'] }}</h3>
+                                            <span class="shrink-0 rounded-full bg-fondo-app px-2 py-0.5 text-[10px] font-black text-apoyo">{{ $reporte['estado'] }}</span>
                                         </div>
-                                        <p class="mt-1 text-xs font-bold leading-snug text-[#2F3E5C]/60">{{ $reporte['descripcion'] }}</p>
+                                        <p class="mt-1 text-xs font-bold leading-snug text-apoyo">{{ $reporte['descripcion'] }}</p>
                                         @can($reporte['permiso'])
                                             @if($reporte['url'])
-                                                <a href="{{ $reporte['url'] }}" class="mt-2 inline-flex items-center gap-1 text-xs font-black text-[#E27D60] transition hover:text-[#2F3E5C]">
+                                                <a href="{{ $reporte['url'] }}" class="mt-2 inline-flex items-center gap-1 text-xs font-black text-boton-acento transition hover:text-titulo">
                                                     Ver reporte
                                                     <i class="ph-bold ph-arrow-right"></i>
                                                 </a>
@@ -389,10 +389,10 @@
                     </div>
                 </section>
 
-                <section class="rounded-2xl border border-[#C7B5A3]/70 bg-[#F3ECE4]/80 p-4 shadow-sm backdrop-blur-xl">
+                <section class="rounded-2xl border border-borde-suave bg-fondo-panel p-4 shadow-sm backdrop-blur-xl">
                     <div class="mb-3">
-                        <h2 class="text-base font-black text-[#2F3E5C]">Accesos a submodulos</h2>
-                        <p class="mt-1 text-xs font-bold text-[#2F3E5C]/60">Continuidad operativa del modulo Familia y Social.</p>
+                        <h2 class="text-base font-black text-titulo">Accesos a submodulos</h2>
+                        <p class="mt-1 text-xs font-bold text-apoyo">Continuidad operativa del modulo Familia y Social.</p>
                     </div>
 
                     <div class="space-y-2">
@@ -401,15 +401,15 @@
                             ['titulo' => 'Visitas', 'descripcion' => 'Registro y seguimiento de visitas familiares/sociales.', 'url' => $rutasSubmodulos['visitas'], 'icono' => 'ph-calendar-check'],
                             ['titulo' => 'Ficha social', 'descripcion' => 'Informacion social, familiar y de contexto del adulto mayor.', 'url' => $rutasSubmodulos['ficha_social'], 'icono' => 'ph-clipboard-text'],
                         ] as $acceso)
-                            <a href="{{ $acceso['url'] ?? '#' }}" class="flex items-center gap-3 rounded-xl border border-[#C7B5A3]/55 bg-white/35 p-3 transition hover:-translate-y-0.5 hover:border-[#E27D60]/45 hover:bg-white/55">
-                                <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#E6DDD3] text-[#E27D60]">
+                            <a href="{{ $acceso['url'] ?? '#' }}" class="flex items-center gap-3 rounded-xl border border-borde-suave bg-fondo-card/35 p-3 transition hover:-translate-y-0.5 hover:border-borde-focus hover:bg-fondo-card/55">
+                                <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-fondo-app text-boton-acento">
                                     <i class="ph-bold {{ $acceso['icono'] }} text-xl"></i>
                                 </span>
                                 <span class="min-w-0 flex-1">
-                                    <span class="block text-sm font-black text-[#2F3E5C]">{{ $acceso['titulo'] }}</span>
-                                    <span class="block text-xs font-bold leading-snug text-[#2F3E5C]/60">{{ $acceso['descripcion'] }}</span>
+                                    <span class="block text-sm font-black text-titulo">{{ $acceso['titulo'] }}</span>
+                                    <span class="block text-xs font-bold leading-snug text-apoyo">{{ $acceso['descripcion'] }}</span>
                                 </span>
-                                <i class="ph-bold ph-caret-right shrink-0 text-[#2F3E5C]/45"></i>
+                                <i class="ph-bold ph-caret-right shrink-0 text-apoyo"></i>
                             </a>
                         @endforeach
                     </div>

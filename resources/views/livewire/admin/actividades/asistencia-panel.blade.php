@@ -7,27 +7,27 @@
         return match (strtoupper(trim($estado))) {
             'REALIZADA', 'COMPLETADA', 'FINALIZADA' => [
                 'texto' => 'Asistió / cumplida',
-                'clase' => 'border-[#8DA280]/30 bg-[#8DA280]/14 text-[#63775B]',
+                'clase' => 'border-estado-exitoBorde bg-estado-exitoBg text-estado-exito',
                 'icon'  => 'ph-check-circle',
             ],
             'PROGRAMADA', 'PENDIENTE' => [
                 'texto' => 'Pendiente',
-                'clase' => 'border-[#D9A05B]/30 bg-[#D9A05B]/12 text-[#9A6B2E]',
+                'clase' => 'border-estado-advertenciaBorde bg-estado-advertenciaBg text-estado-advertencia',
                 'icon'  => 'ph-clock',
             ],
             'CANCELADA', 'ANULADA' => [
                 'texto' => 'No realizada',
-                'clase' => 'border-[#E27D60]/25 bg-[#E27D60]/10 text-[#E27D60]',
+                'clase' => 'border-borde-focus bg-estado-peligroBg text-boton-acento',
                 'icon'  => 'ph-x-circle',
             ],
             'REPROGRAMADA' => [
                 'texto' => 'Reprogramada',
-                'clase' => 'border-[#7A68B0]/30 bg-[#7A68B0]/10 text-[#5A4E8A]',
+                'clase' => 'border-borde bg-fondo-panel text-parrafo',
                 'icon'  => 'ph-arrows-clockwise',
             ],
             default => [
                 'texto' => 'Sin resultado',
-                'clase' => 'border-[#C7B5A3]/40 bg-[#D5C7B9]/40 text-[#7C7168]',
+                'clase' => 'border-borde-suave bg-fondo-panel text-meta',
                 'icon'  => 'ph-minus',
             ],
         };
@@ -35,7 +35,7 @@
 @endphp
 
 <div
-    class="min-h-screen bg-[#F8F3ED]/45 px-4 py-5 text-[#2F3E5C] sm:px-6 lg:px-8"
+    class="min-h-screen bg-fondo-panel px-4 py-5 text-titulo sm:px-6 lg:px-8"
     x-data
     @keydown.window.escape="$wire.cerrarModales()"
 >
@@ -44,23 +44,23 @@
         {{-- ══════════════════════════════════════════════════════════════════ --}}
         {{-- CABECERA                                                           --}}
         {{-- ══════════════════════════════════════════════════════════════════ --}}
-        <section class="overflow-hidden rounded-[1.65rem] border border-[#C7B5A3]/70 bg-[#E6DDD3]/70 shadow-[0_20px_58px_rgba(47,62,92,0.13)] backdrop-blur-xl">
+        <section class="overflow-hidden rounded-[1.65rem] border border-borde-suave bg-fondo-panel shadow-[0_20px_58px_rgba(47,62,92,0.13)] backdrop-blur-xl">
             <div class="h-1.5 bg-gradient-to-r from-[#E27D60] via-[#D9A05B] to-[#8DA280]"></div>
             <div class="p-5 sm:p-7">
                 <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
 
                     <div class="min-w-0">
-                        <span class="inline-flex items-center gap-2 rounded-full border border-[#E27D60]/25 bg-[#E27D60]/10 px-3 py-1 text-[10px] font-black uppercase tracking-[0.2em] text-[#E27D60]">
+                        <span class="inline-flex items-center gap-2 rounded-full border border-borde-focus bg-estado-peligroBg px-3 py-1 text-[10px] font-black uppercase tracking-[0.2em] text-boton-acento">
                             <i class="ph-bold ph-clipboard-text text-sm"></i>
                             CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS — Asistencia
                         </span>
-                        <h1 class="mt-3 text-3xl font-black tracking-tight text-[#2F3E5C] sm:text-4xl">
+                        <h1 class="mt-3 text-3xl font-black tracking-tight text-titulo sm:text-4xl">
                             Asistencia a actividades
                         </h1>
-                        <p class="mt-1.5 max-w-2xl text-sm font-bold leading-relaxed text-[#2F3E5C]/70">
+                        <p class="mt-1.5 max-w-2xl text-sm font-bold leading-relaxed text-apoyo">
                             Control institucional del cumplimiento de actividades programadas para adultos mayores.
                         </p>
-                        <p class="mt-1.5 inline-flex items-center gap-1.5 text-[11px] font-bold text-[#2F3E5C]/45">
+                        <p class="mt-1.5 inline-flex items-center gap-1.5 text-[11px] font-bold text-apoyo">
                             <i class="ph-bold ph-info text-xs"></i>
                             La asistencia se consolida actualmente desde el estado de cada actividad registrada.
                         </p>
@@ -70,21 +70,21 @@
                         <button
                             type="button"
                             wire:click="$refresh"
-                            class="inline-flex items-center gap-2 rounded-xl border border-[#C7B5A3]/55 bg-[#F8F3ED]/80 px-3.5 py-2 text-xs font-black text-[#2F3E5C]/70 transition hover:bg-[#E6DDD3] hover:text-[#2F3E5C]"
+                            class="inline-flex items-center gap-2 rounded-xl border border-borde-suave bg-fondo-panel px-3.5 py-2 text-xs font-black text-apoyo transition hover:bg-fondo-app hover:text-titulo"
                         >
                             <i class="ph-bold ph-arrows-clockwise text-sm"></i>
                             Actualizar
                         </button>
                         <a
                             href="{{ route('admin.actividades.participacion') }}"
-                            class="inline-flex items-center gap-2 rounded-xl border border-[#D9A05B]/40 bg-[#D9A05B]/10 px-3.5 py-2 text-xs font-black text-[#9A6B2E] transition hover:bg-[#D9A05B]/20"
+                            class="inline-flex items-center gap-2 rounded-xl border border-estado-advertenciaBorde bg-estado-advertenciaBg px-3.5 py-2 text-xs font-black text-estado-advertencia transition hover:bg-estado-advertenciaBg"
                         >
                             <i class="ph-bold ph-users text-sm"></i>
                             Ver participación
                         </a>
                         <a
                             href="{{ route('admin.actividades.reportes') }}"
-                            class="inline-flex items-center gap-2 rounded-xl border border-[#7A68B0]/35 bg-[#7A68B0]/10 px-3.5 py-2 text-xs font-black text-[#5A4E8A] transition hover:bg-[#7A68B0]/18"
+                            class="inline-flex items-center gap-2 rounded-xl border border-borde bg-fondo-panel px-3.5 py-2 text-xs font-black text-parrafo transition hover:bg-fondo-panel"
                         >
                             <i class="ph-bold ph-chart-bar text-sm"></i>
                             Ver reportes
@@ -101,99 +101,99 @@
         <div class="grid gap-3.5 sm:grid-cols-2 lg:grid-cols-4">
 
             {{-- Total --}}
-            <div class="flex flex-col justify-between overflow-hidden rounded-2xl border border-[#2F3E5C]/18 bg-[#E6DDD3]/70 p-4 shadow-sm backdrop-blur-sm">
+            <div class="flex flex-col justify-between overflow-hidden rounded-2xl border border-borde-fuerte bg-fondo-panel p-4 shadow-sm backdrop-blur-sm">
                 <div class="flex items-start justify-between gap-2">
-                    <p class="text-[10px] font-black uppercase tracking-[0.12em] text-[#2F3E5C]/60">Total registros</p>
-                    <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-xl bg-[#2F3E5C]/10">
-                        <i class="ph-bold ph-clipboard-text text-xs text-[#2F3E5C]"></i>
+                    <p class="text-[10px] font-black uppercase tracking-[0.12em] text-apoyo">Total registros</p>
+                    <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-xl bg-fondo-panel">
+                        <i class="ph-bold ph-clipboard-text text-xs text-titulo"></i>
                     </span>
                 </div>
-                <p class="mt-2 text-3xl font-black tracking-tight text-[#2F3E5C]">{{ number_format($stats['total']) }}</p>
-                <p class="mt-0.5 text-[10px] font-bold text-[#2F3E5C]/50">Actividades en el sistema</p>
+                <p class="mt-2 text-3xl font-black tracking-tight text-titulo">{{ number_format($stats['total']) }}</p>
+                <p class="mt-0.5 text-[10px] font-bold text-apoyo">Actividades en el sistema</p>
             </div>
 
             {{-- Pendientes --}}
-            <div class="flex flex-col justify-between overflow-hidden rounded-2xl border border-[#D9A05B]/28 bg-[#D9A05B]/8 p-4 shadow-sm">
+            <div class="flex flex-col justify-between overflow-hidden rounded-2xl border border-estado-advertenciaBorde bg-estado-advertenciaBg p-4 shadow-sm">
                 <div class="flex items-start justify-between gap-2">
-                    <p class="text-[10px] font-black uppercase tracking-[0.12em] text-[#9A6B2E]/80">Pendientes</p>
-                    <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-xl bg-[#D9A05B]/20">
-                        <i class="ph-bold ph-clock text-xs text-[#9A6B2E]"></i>
+                    <p class="text-[10px] font-black uppercase tracking-[0.12em] text-estado-advertencia">Pendientes</p>
+                    <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-xl bg-estado-advertenciaBg">
+                        <i class="ph-bold ph-clock text-xs text-estado-advertencia"></i>
                     </span>
                 </div>
-                <p class="mt-2 text-3xl font-black tracking-tight text-[#9A6B2E]">{{ number_format($stats['pendientes']) }}</p>
-                <p class="mt-0.5 text-[10px] font-bold text-[#9A6B2E]/65">Programadas / sin resultado</p>
+                <p class="mt-2 text-3xl font-black tracking-tight text-estado-advertencia">{{ number_format($stats['pendientes']) }}</p>
+                <p class="mt-0.5 text-[10px] font-bold text-estado-advertencia">Programadas / sin resultado</p>
             </div>
 
             {{-- Realizadas --}}
-            <div class="flex flex-col justify-between overflow-hidden rounded-2xl border border-[#8DA280]/28 bg-[#8DA280]/10 p-4 shadow-sm">
+            <div class="flex flex-col justify-between overflow-hidden rounded-2xl border border-estado-exitoBorde bg-estado-exitoBg p-4 shadow-sm">
                 <div class="flex items-start justify-between gap-2">
-                    <p class="text-[10px] font-black uppercase tracking-[0.12em] text-[#63775B]/80">Realizadas</p>
-                    <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-xl bg-[#8DA280]/20">
-                        <i class="ph-bold ph-check-circle text-xs text-[#63775B]"></i>
+                    <p class="text-[10px] font-black uppercase tracking-[0.12em] text-estado-exito">Realizadas</p>
+                    <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-xl bg-estado-exitoBg">
+                        <i class="ph-bold ph-check-circle text-xs text-estado-exito"></i>
                     </span>
                 </div>
-                <p class="mt-2 text-3xl font-black tracking-tight text-[#63775B]">{{ number_format($stats['realizadas']) }}</p>
-                <p class="mt-0.5 text-[10px] font-bold text-[#63775B]/65">Completadas / cumplidas</p>
+                <p class="mt-2 text-3xl font-black tracking-tight text-estado-exito">{{ number_format($stats['realizadas']) }}</p>
+                <p class="mt-0.5 text-[10px] font-bold text-estado-exito">Completadas / cumplidas</p>
             </div>
 
             {{-- Canceladas --}}
-            <div class="flex flex-col justify-between overflow-hidden rounded-2xl border border-[#E27D60]/22 bg-[#E27D60]/8 p-4 shadow-sm">
+            <div class="flex flex-col justify-between overflow-hidden rounded-2xl border border-borde-focus bg-estado-peligroBg p-4 shadow-sm">
                 <div class="flex items-start justify-between gap-2">
-                    <p class="text-[10px] font-black uppercase tracking-[0.12em] text-[#E27D60]/80">Canceladas</p>
-                    <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-xl bg-[#E27D60]/16">
-                        <i class="ph-bold ph-x-circle text-xs text-[#E27D60]"></i>
+                    <p class="text-[10px] font-black uppercase tracking-[0.12em] text-boton-acento">Canceladas</p>
+                    <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-xl bg-estado-peligroBg">
+                        <i class="ph-bold ph-x-circle text-xs text-boton-acento"></i>
                     </span>
                 </div>
-                <p class="mt-2 text-3xl font-black tracking-tight text-[#E27D60]">{{ number_format($stats['canceladas']) }}</p>
-                <p class="mt-0.5 text-[10px] font-bold text-[#E27D60]/65">No realizadas / anuladas</p>
+                <p class="mt-2 text-3xl font-black tracking-tight text-boton-acento">{{ number_format($stats['canceladas']) }}</p>
+                <p class="mt-0.5 text-[10px] font-bold text-boton-acento">No realizadas / anuladas</p>
             </div>
 
             {{-- Reprogramadas --}}
-            <div class="flex flex-col justify-between overflow-hidden rounded-2xl border border-[#7A68B0]/22 bg-[#7A68B0]/8 p-4 shadow-sm">
+            <div class="flex flex-col justify-between overflow-hidden rounded-2xl border border-borde bg-fondo-panel p-4 shadow-sm">
                 <div class="flex items-start justify-between gap-2">
-                    <p class="text-[10px] font-black uppercase tracking-[0.12em] text-[#5A4E8A]/80">Reprogramadas</p>
-                    <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-xl bg-[#7A68B0]/16">
-                        <i class="ph-bold ph-arrows-clockwise text-xs text-[#5A4E8A]"></i>
+                    <p class="text-[10px] font-black uppercase tracking-[0.12em] text-apoyo">Reprogramadas</p>
+                    <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-xl bg-fondo-panel">
+                        <i class="ph-bold ph-arrows-clockwise text-xs text-parrafo"></i>
                     </span>
                 </div>
-                <p class="mt-2 text-3xl font-black tracking-tight text-[#5A4E8A]">{{ number_format($stats['reprogramadas']) }}</p>
-                <p class="mt-0.5 text-[10px] font-bold text-[#5A4E8A]/65">Pendientes de nueva fecha</p>
+                <p class="mt-2 text-3xl font-black tracking-tight text-parrafo">{{ number_format($stats['reprogramadas']) }}</p>
+                <p class="mt-0.5 text-[10px] font-bold text-apoyo">Pendientes de nueva fecha</p>
             </div>
 
             {{-- Hoy --}}
-            <div class="flex flex-col justify-between overflow-hidden rounded-2xl border border-[#D9A05B]/28 bg-[#D9A05B]/8 p-4 shadow-sm">
+            <div class="flex flex-col justify-between overflow-hidden rounded-2xl border border-estado-advertenciaBorde bg-estado-advertenciaBg p-4 shadow-sm">
                 <div class="flex items-start justify-between gap-2">
-                    <p class="text-[10px] font-black uppercase tracking-[0.12em] text-[#9A6B2E]/80">Actividades hoy</p>
-                    <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-xl bg-[#D9A05B]/20">
-                        <i class="ph-bold ph-calendar-check text-xs text-[#9A6B2E]"></i>
+                    <p class="text-[10px] font-black uppercase tracking-[0.12em] text-estado-advertencia">Actividades hoy</p>
+                    <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-xl bg-estado-advertenciaBg">
+                        <i class="ph-bold ph-calendar-check text-xs text-estado-advertencia"></i>
                     </span>
                 </div>
-                <p class="mt-2 text-3xl font-black tracking-tight text-[#9A6B2E]">{{ number_format($stats['hoy']) }}</p>
-                <p class="mt-0.5 text-[10px] font-bold text-[#9A6B2E]/65">Programadas para hoy</p>
+                <p class="mt-2 text-3xl font-black tracking-tight text-estado-advertencia">{{ number_format($stats['hoy']) }}</p>
+                <p class="mt-0.5 text-[10px] font-bold text-estado-advertencia">Programadas para hoy</p>
             </div>
 
             {{-- Adultos con realizadas --}}
-            <div class="flex flex-col justify-between overflow-hidden rounded-2xl border border-[#8DA280]/28 bg-[#8DA280]/10 p-4 shadow-sm">
+            <div class="flex flex-col justify-between overflow-hidden rounded-2xl border border-estado-exitoBorde bg-estado-exitoBg p-4 shadow-sm">
                 <div class="flex items-start justify-between gap-2">
-                    <p class="text-[10px] font-black uppercase tracking-[0.12em] text-[#63775B]/80">Adultos activos</p>
-                    <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-xl bg-[#8DA280]/20">
-                        <i class="ph-bold ph-users text-xs text-[#63775B]"></i>
+                    <p class="text-[10px] font-black uppercase tracking-[0.12em] text-estado-exito">Adultos activos</p>
+                    <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-xl bg-estado-exitoBg">
+                        <i class="ph-bold ph-users text-xs text-estado-exito"></i>
                     </span>
                 </div>
-                <p class="mt-2 text-3xl font-black tracking-tight text-[#63775B]">{{ number_format($stats['adultos_realizados']) }}</p>
-                <p class="mt-0.5 text-[10px] font-bold text-[#63775B]/65">Con actividades realizadas</p>
+                <p class="mt-2 text-3xl font-black tracking-tight text-estado-exito">{{ number_format($stats['adultos_realizados']) }}</p>
+                <p class="mt-0.5 text-[10px] font-bold text-estado-exito">Con actividades realizadas</p>
             </div>
 
             {{-- Tipos con cumplimiento --}}
-            <div class="flex flex-col justify-between overflow-hidden rounded-2xl border border-[#7A68B0]/22 bg-[#7A68B0]/8 p-4 shadow-sm">
+            <div class="flex flex-col justify-between overflow-hidden rounded-2xl border border-borde bg-fondo-panel p-4 shadow-sm">
                 <div class="flex items-start justify-between gap-2">
-                    <p class="text-[10px] font-black uppercase tracking-[0.12em] text-[#5A4E8A]/80">Tipos cumplidos</p>
-                    <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-xl bg-[#7A68B0]/16">
-                        <i class="ph-bold ph-star text-xs text-[#5A4E8A]"></i>
+                    <p class="text-[10px] font-black uppercase tracking-[0.12em] text-apoyo">Tipos cumplidos</p>
+                    <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-xl bg-fondo-panel">
+                        <i class="ph-bold ph-star text-xs text-parrafo"></i>
                     </span>
                 </div>
-                <p class="mt-2 text-3xl font-black tracking-tight text-[#5A4E8A]">{{ number_format($stats['tipos_cumplidos']) }}</p>
-                <p class="mt-0.5 text-[10px] font-bold text-[#5A4E8A]/65">Tipos con al menos una realizada</p>
+                <p class="mt-2 text-3xl font-black tracking-tight text-parrafo">{{ number_format($stats['tipos_cumplidos']) }}</p>
+                <p class="mt-0.5 text-[10px] font-bold text-apoyo">Tipos con al menos una realizada</p>
             </div>
 
         </div>
@@ -201,32 +201,32 @@
         {{-- ══════════════════════════════════════════════════════════════════ --}}
         {{-- TABLA + FILTROS                                                    --}}
         {{-- ══════════════════════════════════════════════════════════════════ --}}
-        <section class="overflow-hidden rounded-[1.45rem] border border-[#C7B5A3]/65 bg-[#E6DDD3]/65 shadow-md backdrop-blur-xl">
+        <section class="overflow-hidden rounded-[1.45rem] border border-borde-suave bg-fondo-panel shadow-md backdrop-blur-xl">
 
             {{-- Barra de filtros --}}
-            <div class="border-b border-[#C7B5A3]/35 bg-[#D5C7B9]/40 px-5 py-4">
+            <div class="border-b border-borde-suave bg-fondo-panel px-5 py-4">
                 <div class="flex flex-wrap items-end gap-3">
 
                     {{-- Buscar adulto --}}
                     <div class="min-w-0 flex-1 basis-48">
-                        <label class="mb-1 block text-[10px] font-black uppercase tracking-[0.1em] text-[#2F3E5C]/60">Adulto mayor</label>
+                        <label class="mb-1 block text-[10px] font-black uppercase tracking-[0.1em] text-apoyo">Adulto mayor</label>
                         <div class="relative">
-                            <i class="ph-bold ph-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-sm text-[#2F3E5C]/35"></i>
+                            <i class="ph-bold ph-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-sm text-apoyo"></i>
                             <input
                                 type="text"
                                 wire:model.live.debounce.300ms="search"
                                 placeholder="Buscar por nombre..."
-                                class="w-full rounded-xl border border-[#C7B5A3]/55 bg-[#F8F3ED]/80 py-2 pl-8 pr-3 text-xs font-bold text-[#2F3E5C] placeholder-[#2F3E5C]/35 focus:border-[#D9A05B]/60 focus:outline-none focus:ring-2 focus:ring-[#D9A05B]/20"
+                                class="w-full rounded-xl border border-borde-suave bg-fondo-panel py-2 pl-8 pr-3 text-xs font-bold text-titulo placeholder-[#2F3E5C]/35 focus:border-estado-advertenciaBorde focus:outline-none focus:ring-2 focus:ring-[#D9A05B]/20"
                             >
                         </div>
                     </div>
 
                     {{-- Tipo --}}
                     <div class="basis-40">
-                        <label class="mb-1 block text-[10px] font-black uppercase tracking-[0.1em] text-[#2F3E5C]/60">Tipo</label>
+                        <label class="mb-1 block text-[10px] font-black uppercase tracking-[0.1em] text-apoyo">Tipo</label>
                         <select
                             wire:model.live="filtroTipo"
-                            class="w-full rounded-xl border border-[#C7B5A3]/55 bg-[#F8F3ED]/80 py-2 px-3 text-xs font-bold text-[#2F3E5C] focus:border-[#D9A05B]/60 focus:outline-none focus:ring-2 focus:ring-[#D9A05B]/20"
+                            class="w-full rounded-xl border border-borde-suave bg-fondo-panel py-2 px-3 text-xs font-bold text-titulo focus:border-estado-advertenciaBorde focus:outline-none focus:ring-2 focus:ring-[#D9A05B]/20"
                         >
                             <option value="">Todos los tipos</option>
                             @foreach($tipos as $t)
@@ -237,10 +237,10 @@
 
                     {{-- Estado --}}
                     <div class="basis-36">
-                        <label class="mb-1 block text-[10px] font-black uppercase tracking-[0.1em] text-[#2F3E5C]/60">Estado</label>
+                        <label class="mb-1 block text-[10px] font-black uppercase tracking-[0.1em] text-apoyo">Estado</label>
                         <select
                             wire:model.live="filtroEstado"
-                            class="w-full rounded-xl border border-[#C7B5A3]/55 bg-[#F8F3ED]/80 py-2 px-3 text-xs font-bold text-[#2F3E5C] focus:border-[#D9A05B]/60 focus:outline-none focus:ring-2 focus:ring-[#D9A05B]/20"
+                            class="w-full rounded-xl border border-borde-suave bg-fondo-panel py-2 px-3 text-xs font-bold text-titulo focus:border-estado-advertenciaBorde focus:outline-none focus:ring-2 focus:ring-[#D9A05B]/20"
                         >
                             <option value="">Todos los estados</option>
                             <option value="PROGRAMADA">Programada / Pendiente</option>
@@ -252,21 +252,21 @@
 
                     {{-- Fecha desde --}}
                     <div class="basis-36">
-                        <label class="mb-1 block text-[10px] font-black uppercase tracking-[0.1em] text-[#2F3E5C]/60">Desde</label>
+                        <label class="mb-1 block text-[10px] font-black uppercase tracking-[0.1em] text-apoyo">Desde</label>
                         <input
                             type="date"
                             wire:model.live="filtroFechaDesde"
-                            class="w-full rounded-xl border border-[#C7B5A3]/55 bg-[#F8F3ED]/80 py-2 px-3 text-xs font-bold text-[#2F3E5C] focus:border-[#D9A05B]/60 focus:outline-none focus:ring-2 focus:ring-[#D9A05B]/20"
+                            class="w-full rounded-xl border border-borde-suave bg-fondo-panel py-2 px-3 text-xs font-bold text-titulo focus:border-estado-advertenciaBorde focus:outline-none focus:ring-2 focus:ring-[#D9A05B]/20"
                         >
                     </div>
 
                     {{-- Fecha hasta --}}
                     <div class="basis-36">
-                        <label class="mb-1 block text-[10px] font-black uppercase tracking-[0.1em] text-[#2F3E5C]/60">Hasta</label>
+                        <label class="mb-1 block text-[10px] font-black uppercase tracking-[0.1em] text-apoyo">Hasta</label>
                         <input
                             type="date"
                             wire:model.live="filtroFechaHasta"
-                            class="w-full rounded-xl border border-[#C7B5A3]/55 bg-[#F8F3ED]/80 py-2 px-3 text-xs font-bold text-[#2F3E5C] focus:border-[#D9A05B]/60 focus:outline-none focus:ring-2 focus:ring-[#D9A05B]/20"
+                            class="w-full rounded-xl border border-borde-suave bg-fondo-panel py-2 px-3 text-xs font-bold text-titulo focus:border-estado-advertenciaBorde focus:outline-none focus:ring-2 focus:ring-[#D9A05B]/20"
                         >
                     </div>
 
@@ -275,7 +275,7 @@
                         <button
                             type="button"
                             wire:click="limpiarFiltros"
-                            class="inline-flex items-center gap-1.5 rounded-xl border border-[#C7B5A3]/55 bg-[#F8F3ED]/80 px-3.5 py-2 text-xs font-black text-[#2F3E5C]/60 transition hover:bg-[#E6DDD3] hover:text-[#2F3E5C]"
+                            class="inline-flex items-center gap-1.5 rounded-xl border border-borde-suave bg-fondo-panel px-3.5 py-2 text-xs font-black text-apoyo transition hover:bg-fondo-app hover:text-titulo"
                         >
                             <i class="ph-bold ph-x text-xs"></i>
                             Limpiar
@@ -289,15 +289,15 @@
             <div class="w-full overflow-x-auto" wire:loading.class="opacity-50">
                 <table class="min-w-[900px] w-full border-collapse text-sm">
                     <thead>
-                        <tr class="border-b border-[#C7B5A3]/35 bg-[#D5C7B9]/30">
-                            <th class="px-4 py-3 text-left text-[10px] font-black uppercase tracking-[0.12em] text-[#2F3E5C]/55">Adulto mayor</th>
-                            <th class="px-4 py-3 text-left text-[10px] font-black uppercase tracking-[0.12em] text-[#2F3E5C]/55">Tipo de actividad</th>
-                            <th class="px-4 py-3 text-left text-[10px] font-black uppercase tracking-[0.12em] text-[#2F3E5C]/55">Fecha</th>
-                            <th class="px-4 py-3 text-left text-[10px] font-black uppercase tracking-[0.12em] text-[#2F3E5C]/55">Hora</th>
-                            <th class="px-4 py-3 text-left text-[10px] font-black uppercase tracking-[0.12em] text-[#2F3E5C]/55">Estado</th>
-                            <th class="px-4 py-3 text-left text-[10px] font-black uppercase tracking-[0.12em] text-[#2F3E5C]/55">Resultado</th>
-                            <th class="px-4 py-3 text-left text-[10px] font-black uppercase tracking-[0.12em] text-[#2F3E5C]/55">Observación</th>
-                            <th class="px-4 py-3 text-left text-[10px] font-black uppercase tracking-[0.12em] text-[#2F3E5C]/55">Acciones</th>
+                        <tr class="border-b border-borde-suave bg-fondo-panel">
+                            <th class="px-4 py-3 text-left text-[10px] font-black uppercase tracking-[0.12em] text-apoyo">Adulto mayor</th>
+                            <th class="px-4 py-3 text-left text-[10px] font-black uppercase tracking-[0.12em] text-apoyo">Tipo de actividad</th>
+                            <th class="px-4 py-3 text-left text-[10px] font-black uppercase tracking-[0.12em] text-apoyo">Fecha</th>
+                            <th class="px-4 py-3 text-left text-[10px] font-black uppercase tracking-[0.12em] text-apoyo">Hora</th>
+                            <th class="px-4 py-3 text-left text-[10px] font-black uppercase tracking-[0.12em] text-apoyo">Estado</th>
+                            <th class="px-4 py-3 text-left text-[10px] font-black uppercase tracking-[0.12em] text-apoyo">Resultado</th>
+                            <th class="px-4 py-3 text-left text-[10px] font-black uppercase tracking-[0.12em] text-apoyo">Observación</th>
+                            <th class="px-4 py-3 text-left text-[10px] font-black uppercase tracking-[0.12em] text-apoyo">Acciones</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-[#C7B5A3]/22">
@@ -306,14 +306,14 @@
                             <tr>
                                 <td colspan="8" class="py-16 text-center">
                                     <div class="flex flex-col items-center gap-3">
-                                        <span class="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#D5C7B9]/50">
-                                            <i class="ph-bold ph-clipboard-text text-2xl text-[#2F3E5C]/30"></i>
+                                        <span class="flex h-14 w-14 items-center justify-center rounded-2xl bg-fondo-panel">
+                                            <i class="ph-bold ph-clipboard-text text-2xl text-apoyo"></i>
                                         </span>
                                         @if($search || $filtroTipo || $filtroEstado || $filtroFechaDesde || $filtroFechaHasta)
-                                            <p class="text-sm font-black text-[#2F3E5C]/55">No se encontraron registros con los filtros seleccionados.</p>
-                                            <button wire:click="limpiarFiltros" class="text-xs font-black text-[#D9A05B] hover:underline">Limpiar filtros</button>
+                                            <p class="text-sm font-black text-apoyo">No se encontraron registros con los filtros seleccionados.</p>
+                                            <button wire:click="limpiarFiltros" class="text-xs font-black text-estado-advertencia hover:underline">Limpiar filtros</button>
                                         @else
-                                            <p class="text-sm font-black text-[#2F3E5C]/55">No hay actividades registradas para controlar asistencia.</p>
+                                            <p class="text-sm font-black text-apoyo">No hay actividades registradas para controlar asistencia.</p>
                                         @endif
                                     </div>
                                 </td>
@@ -329,30 +329,30 @@
                                     $am          = optional($r->adultoMayor);
                                     $tipo        = optional($r->tipoActividad);
                                 @endphp
-                                <tr wire:key="row-{{ $r->cod_act_adul }}" class="bg-[#F8F3ED]/40 transition hover:bg-[#E6DDD3]/50">
+                                <tr wire:key="row-{{ $r->cod_act_adul }}" class="bg-fondo-panel transition hover:bg-fondo-panel">
 
                                     {{-- Adulto mayor --}}
                                     <td class="px-4 py-3">
-                                        <p class="max-w-[160px] truncate text-xs font-black text-[#2F3E5C]">
+                                        <p class="max-w-[160px] truncate text-xs font-black text-titulo">
                                             {{ $am->ap_paterno }} {{ $am->ap_materno }}, {{ $am->nombres }}
                                         </p>
-                                        <p class="text-[10px] font-bold text-[#2F3E5C]/45">{{ $r->cod_am }}</p>
+                                        <p class="text-[10px] font-bold text-apoyo">{{ $r->cod_am }}</p>
                                     </td>
 
                                     {{-- Tipo --}}
                                     <td class="px-4 py-3">
-                                        <p class="max-w-[130px] truncate text-xs font-bold text-[#2F3E5C]/80">
+                                        <p class="max-w-[130px] truncate text-xs font-bold text-apoyo">
                                             {{ $tipo->tipo ?? '—' }}
                                         </p>
                                     </td>
 
                                     {{-- Fecha --}}
-                                    <td class="px-4 py-3 text-xs font-bold text-[#2F3E5C]/70">
+                                    <td class="px-4 py-3 text-xs font-bold text-apoyo">
                                         {{ $r->fecha?->format('d/m/Y') ?? '—' }}
                                     </td>
 
                                     {{-- Hora --}}
-                                    <td class="px-4 py-3 text-xs font-bold text-[#2F3E5C]/70">
+                                    <td class="px-4 py-3 text-xs font-bold text-apoyo">
                                         {{ $r->hora ? substr($r->hora, 0, 5) : '—' }}
                                     </td>
 
@@ -373,7 +373,7 @@
 
                                     {{-- Observación --}}
                                     <td class="px-4 py-3">
-                                        <p class="max-w-[140px] truncate text-[11px] font-bold text-[#2F3E5C]/55" title="{{ $r->obs }}">
+                                        <p class="max-w-[140px] truncate text-[11px] font-bold text-apoyo" title="{{ $r->obs }}">
                                             {{ $r->obs ? \Illuminate\Support\Str::limit($r->obs, 40) : '—' }}
                                         </p>
                                     </td>
@@ -387,7 +387,7 @@
                                                 type="button"
                                                 wire:click="abrirDetalle({{ $r->cod_act_adul }})"
                                                 title="Ver detalle"
-                                                class="flex h-7 w-7 items-center justify-center rounded-lg border border-[#2F3E5C]/18 bg-[#2F3E5C]/6 text-[#2F3E5C]/60 transition hover:bg-[#2F3E5C]/14 hover:text-[#2F3E5C]"
+                                                class="flex h-7 w-7 items-center justify-center rounded-lg border border-borde-fuerte bg-fondo-panel text-apoyo transition hover:bg-fondo-panel hover:text-titulo"
                                             >
                                                 <i class="ph-bold ph-eye text-xs"></i>
                                             </button>
@@ -407,7 +407,7 @@
                                                             confirmButtonText: 'Sí, realizada',
                                                             cancelButtonText: 'Cancelar',
                                                         }).then(r => r.isConfirmed && $wire.marcarRealizada({{ $r->cod_act_adul }}))"
-                                                        class="flex h-7 w-7 items-center justify-center rounded-lg border border-[#8DA280]/30 bg-[#8DA280]/12 text-[#63775B] transition hover:bg-[#8DA280]/25"
+                                                        class="flex h-7 w-7 items-center justify-center rounded-lg border border-estado-exitoBorde bg-estado-exitoBg text-estado-exito transition hover:bg-estado-exitoBg"
                                                     >
                                                         <i class="ph-bold ph-check text-xs"></i>
                                                     </button>
@@ -429,7 +429,7 @@
                                                             confirmButtonText: 'Sí, cancelar',
                                                             cancelButtonText: 'No',
                                                         }).then(r => r.isConfirmed && $wire.marcarCancelada({{ $r->cod_act_adul }}))"
-                                                        class="flex h-7 w-7 items-center justify-center rounded-lg border border-[#E27D60]/25 bg-[#E27D60]/8 text-[#E27D60] transition hover:bg-[#E27D60]/18"
+                                                        class="flex h-7 w-7 items-center justify-center rounded-lg border border-borde-focus bg-estado-peligroBg text-boton-acento transition hover:bg-estado-peligroBg"
                                                     >
                                                         <i class="ph-bold ph-x text-xs"></i>
                                                     </button>
@@ -442,7 +442,7 @@
                                                     type="button"
                                                     wire:click="abrirResultado({{ $r->cod_act_adul }})"
                                                     title="Registrar resultado"
-                                                    class="flex h-7 w-7 items-center justify-center rounded-lg border border-[#D9A05B]/35 bg-[#D9A05B]/10 text-[#9A6B2E] transition hover:bg-[#D9A05B]/22"
+                                                    class="flex h-7 w-7 items-center justify-center rounded-lg border border-estado-advertenciaBorde bg-estado-advertenciaBg text-estado-advertencia transition hover:bg-estado-advertenciaBg"
                                                 >
                                                     <i class="ph-bold ph-pencil-simple text-xs"></i>
                                                 </button>
@@ -461,7 +461,7 @@
 
             {{-- Paginación --}}
             @if($registros->hasPages())
-                <div class="border-t border-[#C7B5A3]/30 bg-[#D5C7B9]/30 px-5 py-3.5">
+                <div class="border-t border-borde-suave bg-fondo-panel px-5 py-3.5">
                     {{ $registros->links() }}
                 </div>
             @endif
@@ -471,11 +471,11 @@
         {{-- ══════════════════════════════════════════════════════════════════ --}}
         {{-- BLOQUE INFORMATIVO — ALCANCE DE ASISTENCIA                         --}}
         {{-- ══════════════════════════════════════════════════════════════════ --}}
-        <div class="flex items-start gap-3 rounded-2xl border border-[#D9A05B]/30 bg-[#D9A05B]/6 p-4">
-            <i class="ph-bold ph-info mt-0.5 shrink-0 text-base text-[#9A6B2E]"></i>
+        <div class="flex items-start gap-3 rounded-2xl border border-estado-advertenciaBorde bg-estado-advertenciaBg p-4">
+            <i class="ph-bold ph-info mt-0.5 shrink-0 text-base text-estado-advertencia"></i>
             <div class="min-w-0">
-                <p class="text-[11px] font-black text-[#9A6B2E]">Alcance de asistencia — control institucional actual</p>
-                <p class="mt-0.5 text-[11px] font-bold leading-relaxed text-[#2F3E5C]/55">
+                <p class="text-[11px] font-black text-estado-advertencia">Alcance de asistencia — control institucional actual</p>
+                <p class="mt-0.5 text-[11px] font-bold leading-relaxed text-apoyo">
                     Actualmente el sistema registra el cumplimiento de actividades mediante el estado de la actividad.
                     Para un control más detallado de asistencia individual —asistió, no asistió, tarde o justificado—
                     se recomienda incorporar una tabla específica de asistencia de adultos mayores a actividades en una fase posterior.
@@ -504,8 +504,8 @@
             role="dialog" aria-modal="true"
             wire:click.self="cerrarModales"
         >
-            <div class="absolute inset-0 bg-[#2F3E5C]/40 backdrop-blur-sm"></div>
-            <div class="relative w-full max-w-2xl max-h-[85vh] overflow-y-auto overflow-x-hidden rounded-[1.45rem] border border-[#C7B5A3]/70 bg-[#F8F3ED] shadow-2xl">
+            <div class="absolute inset-0 bg-fondo-panel backdrop-blur-sm"></div>
+            <div class="relative w-full max-w-2xl max-h-[85vh] overflow-y-auto overflow-x-hidden rounded-[1.45rem] border border-borde-suave bg-fondo-app shadow-2xl">
 
                 {{-- Gradiente superior --}}
                 <div class="h-1.5 bg-gradient-to-r from-[#E27D60] via-[#D9A05B] to-[#8DA280]"></div>
@@ -513,22 +513,22 @@
                 {{-- Encabezado modal --}}
                 <div class="flex items-start justify-between p-5 sm:p-6">
                     <div>
-                        <span class="inline-flex items-center gap-1.5 rounded-full border border-[#2F3E5C]/18 bg-[#2F3E5C]/8 px-2.5 py-0.5 text-[10px] font-black uppercase tracking-[0.15em] text-[#2F3E5C]/60">
+                        <span class="inline-flex items-center gap-1.5 rounded-full border border-borde-fuerte bg-fondo-panel px-2.5 py-0.5 text-[10px] font-black uppercase tracking-[0.15em] text-apoyo">
                             <i class="ph-bold ph-clipboard-text text-xs"></i>
                             Detalle de actividad
                         </span>
-                        <h2 class="mt-2 text-xl font-black text-[#2F3E5C]">
+                        <h2 class="mt-2 text-xl font-black text-titulo">
                             {{ $dAm->ap_paterno }} {{ $dAm->ap_materno }}
                             @if($dAm->nombres), {{ $dAm->nombres }}@endif
                         </h2>
-                        <p class="text-xs font-bold text-[#2F3E5C]/50">
+                        <p class="text-xs font-bold text-apoyo">
                             {{ $detalle->cod_am }} · {{ $dEdad }}
                         </p>
                     </div>
                     <button
                         type="button"
                         wire:click="cerrarModales"
-                        class="ml-4 flex h-8 w-8 shrink-0 items-center justify-center rounded-xl border border-[#C7B5A3]/55 bg-[#E6DDD3]/60 text-[#2F3E5C]/55 transition hover:bg-[#D5C7B9]"
+                        class="ml-4 flex h-8 w-8 shrink-0 items-center justify-center rounded-xl border border-borde-suave bg-fondo-panel text-apoyo transition hover:bg-fondo-app"
                     >
                         <i class="ph-bold ph-x text-sm"></i>
                     </button>
@@ -538,20 +538,20 @@
 
                     {{-- Tipo + Estado + Resultado --}}
                     <div class="grid gap-4 sm:grid-cols-3">
-                        <div class="rounded-xl border border-[#C7B5A3]/45 bg-[#E6DDD3]/50 p-3">
-                            <p class="text-[10px] font-black uppercase tracking-[0.1em] text-[#2F3E5C]/50">Tipo de actividad</p>
-                            <p class="mt-1 text-sm font-black text-[#2F3E5C]">{{ $dTipo->tipo ?? '—' }}</p>
+                        <div class="rounded-xl border border-borde-suave bg-fondo-panel p-3">
+                            <p class="text-[10px] font-black uppercase tracking-[0.1em] text-apoyo">Tipo de actividad</p>
+                            <p class="mt-1 text-sm font-black text-titulo">{{ $dTipo->tipo ?? '—' }}</p>
                         </div>
-                        <div class="rounded-xl border border-[#C7B5A3]/45 bg-[#E6DDD3]/50 p-3">
-                            <p class="text-[10px] font-black uppercase tracking-[0.1em] text-[#2F3E5C]/50">Estado actual</p>
+                        <div class="rounded-xl border border-borde-suave bg-fondo-panel p-3">
+                            <p class="text-[10px] font-black uppercase tracking-[0.1em] text-apoyo">Estado actual</p>
                             <p class="mt-1.5">
                                 <span class="inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-black {{ $dNorm['clase'] }}">
                                     {{ $dNorm['etiqueta'] }}
                                 </span>
                             </p>
                         </div>
-                        <div class="rounded-xl border border-[#C7B5A3]/45 bg-[#E6DDD3]/50 p-3">
-                            <p class="text-[10px] font-black uppercase tracking-[0.1em] text-[#2F3E5C]/50">Resultado institucional</p>
+                        <div class="rounded-xl border border-borde-suave bg-fondo-panel p-3">
+                            <p class="text-[10px] font-black uppercase tracking-[0.1em] text-apoyo">Resultado institucional</p>
                             <p class="mt-1.5">
                                 <span class="inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-[10px] font-black {{ $dRes['clase'] }}">
                                     <i class="ph-bold {{ $dRes['icon'] }} text-[10px]"></i>
@@ -563,50 +563,50 @@
 
                     {{-- Fecha + Hora --}}
                     <div class="grid gap-4 sm:grid-cols-2">
-                        <div class="rounded-xl border border-[#C7B5A3]/45 bg-[#E6DDD3]/50 p-3">
-                            <p class="text-[10px] font-black uppercase tracking-[0.1em] text-[#2F3E5C]/50">Fecha</p>
-                            <p class="mt-1 text-sm font-black text-[#2F3E5C]">
+                        <div class="rounded-xl border border-borde-suave bg-fondo-panel p-3">
+                            <p class="text-[10px] font-black uppercase tracking-[0.1em] text-apoyo">Fecha</p>
+                            <p class="mt-1 text-sm font-black text-titulo">
                                 {{ $detalle->fecha?->format('d/m/Y') ?? '—' }}
                             </p>
                         </div>
-                        <div class="rounded-xl border border-[#C7B5A3]/45 bg-[#E6DDD3]/50 p-3">
-                            <p class="text-[10px] font-black uppercase tracking-[0.1em] text-[#2F3E5C]/50">Hora</p>
-                            <p class="mt-1 text-sm font-black text-[#2F3E5C]">
+                        <div class="rounded-xl border border-borde-suave bg-fondo-panel p-3">
+                            <p class="text-[10px] font-black uppercase tracking-[0.1em] text-apoyo">Hora</p>
+                            <p class="mt-1 text-sm font-black text-titulo">
                                 {{ $detalle->hora ? substr($detalle->hora, 0, 5) : '—' }}
                             </p>
                         </div>
                     </div>
 
                     {{-- Observación --}}
-                    <div class="rounded-xl border border-[#C7B5A3]/45 bg-[#E6DDD3]/50 p-3">
-                        <p class="text-[10px] font-black uppercase tracking-[0.1em] text-[#2F3E5C]/50">Observación</p>
-                        <p class="mt-1 text-sm font-bold leading-relaxed text-[#2F3E5C]/80">
+                    <div class="rounded-xl border border-borde-suave bg-fondo-panel p-3">
+                        <p class="text-[10px] font-black uppercase tracking-[0.1em] text-apoyo">Observación</p>
+                        <p class="mt-1 text-sm font-bold leading-relaxed text-apoyo">
                             {{ $detalle->obs ?: 'Sin observaciones registradas.' }}
                         </p>
                     </div>
 
                     {{-- Metadatos --}}
                     <div class="grid gap-4 sm:grid-cols-2">
-                        <div class="rounded-xl border border-[#C7B5A3]/40 bg-[#D5C7B9]/30 p-3">
-                            <p class="text-[10px] font-black uppercase tracking-[0.1em] text-[#2F3E5C]/45">Fecha de registro</p>
-                            <p class="mt-1 text-xs font-bold text-[#2F3E5C]/65">
+                        <div class="rounded-xl border border-borde-suave bg-fondo-panel p-3">
+                            <p class="text-[10px] font-black uppercase tracking-[0.1em] text-apoyo">Fecha de registro</p>
+                            <p class="mt-1 text-xs font-bold text-apoyo">
                                 {{ $detalle->created_at?->format('d/m/Y H:i') ?? '—' }}
                             </p>
                         </div>
-                        <div class="rounded-xl border border-[#C7B5A3]/40 bg-[#D5C7B9]/30 p-3">
-                            <p class="text-[10px] font-black uppercase tracking-[0.1em] text-[#2F3E5C]/45">Última actualización</p>
-                            <p class="mt-1 text-xs font-bold text-[#2F3E5C]/65">
+                        <div class="rounded-xl border border-borde-suave bg-fondo-panel p-3">
+                            <p class="text-[10px] font-black uppercase tracking-[0.1em] text-apoyo">Última actualización</p>
+                            <p class="mt-1 text-xs font-bold text-apoyo">
                                 {{ $detalle->updated_at?->format('d/m/Y H:i') ?? '—' }}
                             </p>
                         </div>
                     </div>
 
                     {{-- Acciones del modal --}}
-                    <div class="flex items-center justify-between border-t border-[#C7B5A3]/30 pt-4">
+                    <div class="flex items-center justify-between border-t border-borde-suave pt-4">
                         <button
                             type="button"
                             wire:click="cerrarModales"
-                            class="rounded-xl border border-[#C7B5A3]/55 bg-[#E6DDD3]/70 px-4 py-2 text-xs font-black text-[#2F3E5C]/65 transition hover:bg-[#D5C7B9]"
+                            class="rounded-xl border border-borde-suave bg-fondo-panel px-4 py-2 text-xs font-black text-apoyo transition hover:bg-fondo-app"
                         >
                             Cerrar
                         </button>
@@ -614,7 +614,7 @@
                             <button
                                 type="button"
                                 wire:click="abrirResultado({{ $detalle->cod_act_adul }})"
-                                class="inline-flex items-center gap-2 rounded-xl border border-[#D9A05B]/45 bg-[#D9A05B]/15 px-4 py-2 text-xs font-black text-[#9A6B2E] transition hover:bg-[#D9A05B]/25"
+                                class="inline-flex items-center gap-2 rounded-xl border border-estado-advertenciaBorde bg-estado-advertenciaBg px-4 py-2 text-xs font-black text-estado-advertencia transition hover:bg-estado-advertenciaBg"
                             >
                                 <i class="ph-bold ph-pencil-simple text-xs"></i>
                                 Registrar resultado
@@ -637,26 +637,26 @@
             role="dialog" aria-modal="true"
             wire:click.self="cerrarModales"
         >
-            <div class="absolute inset-0 bg-[#2F3E5C]/40 backdrop-blur-sm"></div>
-            <div class="relative w-full max-w-lg max-h-[85vh] overflow-y-auto overflow-x-hidden rounded-[1.45rem] border border-[#C7B5A3]/70 bg-[#F8F3ED] shadow-2xl">
+            <div class="absolute inset-0 bg-fondo-panel backdrop-blur-sm"></div>
+            <div class="relative w-full max-w-lg max-h-[85vh] overflow-y-auto overflow-x-hidden rounded-[1.45rem] border border-borde-suave bg-fondo-app shadow-2xl">
 
                 <div class="h-1.5 bg-gradient-to-r from-[#E27D60] via-[#D9A05B] to-[#8DA280]"></div>
 
                 <div class="flex items-start justify-between p-5 sm:p-6">
                     <div>
-                        <span class="inline-flex items-center gap-1.5 rounded-full border border-[#D9A05B]/35 bg-[#D9A05B]/12 px-2.5 py-0.5 text-[10px] font-black uppercase tracking-[0.15em] text-[#9A6B2E]">
+                        <span class="inline-flex items-center gap-1.5 rounded-full border border-estado-advertenciaBorde bg-estado-advertenciaBg px-2.5 py-0.5 text-[10px] font-black uppercase tracking-[0.15em] text-estado-advertencia">
                             <i class="ph-bold ph-pencil-simple text-xs"></i>
                             Registrar resultado
                         </span>
-                        <h2 class="mt-2 text-xl font-black text-[#2F3E5C]">Registrar resultado de actividad</h2>
-                        <p class="mt-0.5 text-xs font-bold text-[#2F3E5C]/50">
+                        <h2 class="mt-2 text-xl font-black text-titulo">Registrar resultado de actividad</h2>
+                        <p class="mt-0.5 text-xs font-bold text-apoyo">
                             Actualice el estado y la observación del registro de actividad.
                         </p>
                     </div>
                     <button
                         type="button"
                         wire:click="cerrarModales"
-                        class="ml-4 flex h-8 w-8 shrink-0 items-center justify-center rounded-xl border border-[#C7B5A3]/55 bg-[#E6DDD3]/60 text-[#2F3E5C]/55 transition hover:bg-[#D5C7B9]"
+                        class="ml-4 flex h-8 w-8 shrink-0 items-center justify-center rounded-xl border border-borde-suave bg-fondo-panel text-apoyo transition hover:bg-fondo-app"
                     >
                         <i class="ph-bold ph-x text-sm"></i>
                     </button>
@@ -666,16 +666,16 @@
 
                     {{-- Estado --}}
                     <div>
-                        <label class="mb-1.5 block text-xs font-black text-[#2F3E5C]">
-                            Estado <span class="text-[#E27D60]">*</span>
+                        <label class="mb-1.5 block text-xs font-black text-titulo">
+                            Estado <span class="text-boton-acento">*</span>
                         </label>
                         <select
                             wire:model="estado"
                             @class([
-                                'w-full rounded-xl border bg-[#F8F3ED]/80 px-3 py-2.5 text-sm font-bold text-[#2F3E5C]',
-                                'focus:border-[#D9A05B]/60 focus:outline-none focus:ring-2 focus:ring-[#D9A05B]/20',
-                                'border-[#E27D60]/60' => $errors->has('estado'),
-                                'border-[#C7B5A3]/55' => !$errors->has('estado'),
+                                'w-full rounded-xl border bg-fondo-panel px-3 py-2.5 text-sm font-bold text-titulo',
+                                'focus:border-estado-advertenciaBorde focus:outline-none focus:ring-2 focus:ring-[#D9A05B]/20',
+                                'border-borde-focus' => $errors->has('estado'),
+                                'border-borde-suave' => !$errors->has('estado'),
                             ])
                         >
                             <option value="PROGRAMADA">Programada — pendiente de realizarse</option>
@@ -684,51 +684,51 @@
                             <option value="REPROGRAMADA">Reprogramada — nueva fecha pendiente</option>
                         </select>
                         @error('estado')
-                            <p class="mt-1 text-[11px] font-bold text-[#E27D60]">{{ $message }}</p>
+                            <p class="mt-1 text-[11px] font-bold text-boton-acento">{{ $message }}</p>
                         @enderror
                     </div>
 
                     {{-- Observación --}}
                     <div>
-                        <label class="mb-1.5 block text-xs font-black text-[#2F3E5C]">
+                        <label class="mb-1.5 block text-xs font-black text-titulo">
                             Observación
-                            <span class="ml-1 text-[10px] font-bold text-[#2F3E5C]/45">(opcional)</span>
+                            <span class="ml-1 text-[10px] font-bold text-apoyo">(opcional)</span>
                         </label>
                         <textarea
                             wire:model="obs"
                             rows="4"
                             placeholder="Notas adicionales sobre el resultado de la actividad..."
                             @class([
-                                'w-full resize-none rounded-xl border bg-[#F8F3ED]/80 px-3 py-2.5 text-sm font-bold text-[#2F3E5C]',
-                                'placeholder-[#2F3E5C]/35 focus:border-[#D9A05B]/60 focus:outline-none focus:ring-2 focus:ring-[#D9A05B]/20',
-                                'border-[#E27D60]/60' => $errors->has('obs'),
-                                'border-[#C7B5A3]/55' => !$errors->has('obs'),
+                                'w-full resize-none rounded-xl border bg-fondo-panel px-3 py-2.5 text-sm font-bold text-titulo',
+                                'placeholder-[#2F3E5C]/35 focus:border-estado-advertenciaBorde focus:outline-none focus:ring-2 focus:ring-[#D9A05B]/20',
+                                'border-borde-focus' => $errors->has('obs'),
+                                'border-borde-suave' => !$errors->has('obs'),
                             ])
                         ></textarea>
                         @error('obs')
-                            <p class="mt-1 text-[11px] font-bold text-[#E27D60]">{{ $message }}</p>
+                            <p class="mt-1 text-[11px] font-bold text-boton-acento">{{ $message }}</p>
                         @enderror
                     </div>
 
                     {{-- Nota: sin campos inventados --}}
-                    <p class="text-[10px] font-bold leading-relaxed text-[#2F3E5C]/40">
+                    <p class="text-[10px] font-bold leading-relaxed text-apoyo">
                         <i class="ph-bold ph-info mr-1"></i>
                         Solo se pueden modificar el estado y la observación. La asistencia individual detallada
                         (asistió, tarde, justificado) requiere una tabla específica futura.
                     </p>
 
                     {{-- Botones --}}
-                    <div class="flex items-center justify-between border-t border-[#C7B5A3]/30 pt-4">
+                    <div class="flex items-center justify-between border-t border-borde-suave pt-4">
                         <button
                             type="button"
                             wire:click="cerrarModales"
-                            class="rounded-xl border border-[#C7B5A3]/55 bg-[#E6DDD3]/70 px-5 py-2 text-xs font-black text-[#2F3E5C]/65 transition hover:bg-[#D5C7B9]"
+                            class="rounded-xl border border-borde-suave bg-fondo-panel px-5 py-2 text-xs font-black text-apoyo transition hover:bg-fondo-app"
                         >
                             Cancelar
                         </button>
                         <button
                             type="submit"
-                            class="inline-flex items-center gap-2 rounded-xl border border-[#D9A05B]/55 bg-[#D9A05B]/20 px-5 py-2 text-xs font-black text-[#9A6B2E] transition hover:bg-[#D9A05B]/35"
+                            class="inline-flex items-center gap-2 rounded-xl border border-estado-advertenciaBorde bg-estado-advertenciaBg px-5 py-2 text-xs font-black text-estado-advertencia transition hover:bg-estado-advertenciaBg"
                             wire:loading.attr="disabled"
                             wire:loading.class="opacity-70"
                         >

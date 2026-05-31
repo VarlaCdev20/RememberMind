@@ -19,19 +19,19 @@
         </a>
 
         {{-- Ícono del módulo --}}
-        <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-azul-profundo shadow-sm">
-            <i class="ph-bold {{ $icono }} text-xl text-white"></i>
+        <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-boton-principal shadow-sm">
+            <i class="ph-bold {{ $icono }} text-xl text-inverso"></i>
         </div>
 
         <div>
             <h1 class="rm-section-title">{{ $titulo }}</h1>
             <p class="rm-section-subtitle">
                 {{ $adulto->nombres }} {{ $adulto->ap_paterno }}
-                <span class="mx-1.5 text-terracota">•</span>
-                <span class="font-black text-terracota">{{ $adulto->cod_am }}</span>
+                <span class="mx-1.5 text-boton-acento">•</span>
+                <span class="font-black text-boton-acento">{{ $adulto->cod_am }}</span>
             </p>
             @if(!empty($subtitulo))
-                <p class="mt-0.5 text-xs font-bold text-azul-profundo/45">{{ $subtitulo }}</p>
+                <p class="mt-0.5 text-xs font-bold text-titulo/45">{{ $subtitulo }}</p>
             @endif
         </div>
     </div>

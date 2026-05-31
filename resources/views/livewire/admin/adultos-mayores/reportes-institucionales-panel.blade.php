@@ -1,4 +1,4 @@
-<div class="min-h-screen bg-[#F7F5F2] py-8 font-sans antialiased text-[#2F3E5C] print:bg-white print:py-0"
+<div class="min-h-screen bg-fondo-panel py-8 font-sans antialiased text-parrafo print:bg-white print:py-0"
      x-data="reporteGraficas()"
      x-init="initCharts()"
 >
@@ -15,12 +15,12 @@
 
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 print:max-w-full print:px-0">
         <!-- ── ENCABEZADO ────────────────────────────────────────── -->
-        <div class="mb-8 flex flex-col justify-between gap-4 border-b border-[#C7B5A3]/50 pb-6 sm:flex-row sm:items-center print:mb-6 print:border-b-2 print:border-slate-800 print:pb-4">
+        <div class="mb-8 flex flex-col justify-between gap-4 border-b border-borde-suave pb-6 sm:flex-row sm:items-center print:mb-6 print:border-b-2 print:border-slate-800 print:pb-4">
             <div>
-                <h1 class="text-3xl font-black uppercase tracking-tight text-azul-profundo sm:text-4xl print:text-2xl print:text-black">
+                <h1 class="text-3xl font-black uppercase tracking-tight text-titulo sm:text-4xl print:text-2xl print:text-black">
                     Reportes Institucionales
                 </h1>
-                <p class="mt-1 text-sm font-bold text-azul-profundo/60 print:text-xs print:text-slate-600">
+                <p class="mt-1 text-sm font-bold text-apoyo print:text-xs print:text-slate-600">
                     Indicadores generales, exportaciones y análisis institucional del módulo Adultos Mayores.
                 </p>
             </div>
@@ -30,7 +30,7 @@
                 <button
                     type="button"
                     onclick="window.print()"
-                    class="inline-flex items-center gap-2 rounded-xl bg-terracota px-5 py-3 text-xs font-black uppercase tracking-wider text-white shadow-md transition-all duration-300 hover:bg-terracota-dark hover:scale-105 active:scale-95"
+                    class="inline-flex items-center gap-2 rounded-xl bg-boton-acento px-5 py-3 text-xs font-black uppercase tracking-wider text-inverso shadow-md transition-all duration-300 hover:bg-boton-acento-dark hover:scale-105 active:scale-95"
                 >
                     <i class="ph-bold ph-printer text-base"></i>
                     Vista de Impresión / PDF
@@ -39,47 +39,47 @@
         </div>
 
         <!-- ── SECCIÓN DE FILTROS ─────────────────────────────────── -->
-        <div class="mb-8 rounded-3xl border border-[#C7B5A3]/40 bg-white p-6 shadow-sm print:hidden">
-            <h2 class="mb-4 text-xs font-black uppercase tracking-widest text-azul-profundo/70 flex items-center gap-2">
-                <i class="ph-bold ph-funnel text-terracota"></i>
+        <div class="mb-8 rounded-3xl border border-borde-suave bg-fondo-card p-6 shadow-sm print:hidden">
+            <h2 class="mb-4 text-xs font-black uppercase tracking-widest text-apoyo flex items-center gap-2">
+                <i class="ph-bold ph-funnel text-boton-acento"></i>
                 Filtros de Análisis Institucional
             </h2>
             <div class="grid gap-4 sm:grid-cols-2 md:grid-cols-4">
                 <!-- Rango de Fecha: Desde -->
                 <div class="flex flex-col gap-1.5">
-                    <label for="fechaDesde" class="text-[10px] font-black uppercase tracking-wider text-[#2F3E5C]/60">
+                    <label for="fechaDesde" class="text-[10px] font-black uppercase tracking-wider text-apoyo">
                         Fecha Ingreso Desde
                     </label>
                     <input
                         type="date"
                         id="fechaDesde"
                         wire:model.live="fechaDesde"
-                        class="rounded-xl border border-[#C7B5A3]/60 bg-[#F7F5F2] px-3.5 py-2.5 text-xs font-bold text-azul-profundo focus:border-terracota focus:outline-none focus:ring-1 focus:ring-terracota"
+                        class="rounded-xl border border-borde bg-fondo-panel px-3.5 py-2.5 text-xs font-bold text-titulo focus:border-borde-focus focus:outline-none focus:ring-1 focus:ring-borde-focus"
                     />
                 </div>
 
                 <!-- Rango de Fecha: Hasta -->
                 <div class="flex flex-col gap-1.5">
-                    <label for="fechaHasta" class="text-[10px] font-black uppercase tracking-wider text-[#2F3E5C]/60">
+                    <label for="fechaHasta" class="text-[10px] font-black uppercase tracking-wider text-apoyo">
                         Fecha Ingreso Hasta
                     </label>
                     <input
                         type="date"
                         id="fechaHasta"
                         wire:model.live="fechaHasta"
-                        class="rounded-xl border border-[#C7B5A3]/60 bg-[#F7F5F2] px-3.5 py-2.5 text-xs font-bold text-azul-profundo focus:border-terracota focus:outline-none focus:ring-1 focus:ring-terracota"
+                        class="rounded-xl border border-borde bg-fondo-panel px-3.5 py-2.5 text-xs font-bold text-titulo focus:border-borde-focus focus:outline-none focus:ring-1 focus:ring-borde-focus"
                     />
                 </div>
 
                 <!-- Estado Institucional -->
                 <div class="flex flex-col gap-1.5">
-                    <label for="filtroEstado" class="text-[10px] font-black uppercase tracking-wider text-[#2F3E5C]/60">
+                    <label for="filtroEstado" class="text-[10px] font-black uppercase tracking-wider text-apoyo">
                         Estado Institucional
                     </label>
                     <select
                         id="filtroEstado"
                         wire:model.live="filtroEstado"
-                        class="rounded-xl border border-[#C7B5A3]/60 bg-[#F7F5F2] px-3.5 py-2.5 text-xs font-bold text-azul-profundo focus:border-terracota focus:outline-none focus:ring-1 focus:ring-terracota"
+                        class="rounded-xl border border-borde bg-fondo-panel px-3.5 py-2.5 text-xs font-bold text-titulo focus:border-borde-focus focus:outline-none focus:ring-1 focus:ring-borde-focus"
                     >
                         <option value="todos">Todos los estados</option>
                         @foreach($estadosList as $est)
@@ -90,13 +90,13 @@
 
                 <!-- Tipo de Reporte Específico -->
                 <div class="flex flex-col gap-1.5">
-                    <label for="tipoReporte" class="text-[10px] font-black uppercase tracking-wider text-[#2F3E5C]/60">
+                    <label for="tipoReporte" class="text-[10px] font-black uppercase tracking-wider text-apoyo">
                         Sección / Categoría
                     </label>
                     <select
                         id="tipoReporte"
                         wire:model.live="tipoReporte"
-                        class="rounded-xl border border-[#C7B5A3]/60 bg-[#F7F5F2] px-3.5 py-2.5 text-xs font-bold text-azul-profundo focus:border-terracota focus:outline-none focus:ring-1 focus:ring-terracota"
+                        class="rounded-xl border border-borde bg-fondo-panel px-3.5 py-2.5 text-xs font-bold text-titulo focus:border-borde-focus focus:outline-none focus:ring-1 focus:ring-borde-focus"
                     >
                         <option value="general">1. Reporte General</option>
                         <option value="documental">2. Reporte Documental</option>
@@ -113,39 +113,39 @@
         <!-- ── TARJETAS DE INDICADORES SUPERIORES ───────────────── -->
         <div class="mb-8 grid gap-4 grid-cols-2 md:grid-cols-6 print:grid-cols-3 print:gap-2">
             <!-- Total -->
-            <div class="rounded-2xl border border-[#C7B5A3]/30 bg-white p-4 shadow-sm">
-                <p class="text-[9px] font-black uppercase tracking-wider text-azul-profundo/50">Total Adultos</p>
-                <p class="mt-2 text-2xl font-black text-azul-profundo">{{ $indicadores['total'] }}</p>
+            <div class="rounded-2xl border border-borde-suave bg-fondo-card p-4 shadow-sm">
+                <p class="text-[9px] font-black uppercase tracking-wider text-meta">Total Adultos</p>
+                <p class="mt-2 text-2xl font-black text-titulo">{{ $indicadores['total'] }}</p>
             </div>
 
             <!-- Activos -->
-            <div class="rounded-2xl border border-[#C7B5A3]/30 bg-white p-4 shadow-sm">
-                <p class="text-[9px] font-black uppercase tracking-wider text-azul-profundo/50">Activos</p>
-                <p class="mt-2 text-2xl font-black text-emerald-600">{{ $indicadores['activos'] }}</p>
+            <div class="rounded-2xl border border-borde-suave bg-fondo-card p-4 shadow-sm">
+                <p class="text-[9px] font-black uppercase tracking-wider text-meta">Activos</p>
+                <p class="mt-2 text-2xl font-black text-estado-exito">{{ $indicadores['activos'] }}</p>
             </div>
 
             <!-- Sin Documentos -->
-            <div class="rounded-2xl border border-[#C7B5A3]/30 bg-white p-4 shadow-sm">
-                <p class="text-[9px] font-black uppercase tracking-wider text-azul-profundo/50">Sin Expediente</p>
-                <p class="mt-2 text-2xl font-black text-amber-600">{{ $indicadores['sin_documentos'] }}</p>
+            <div class="rounded-2xl border border-borde-suave bg-fondo-card p-4 shadow-sm">
+                <p class="text-[9px] font-black uppercase tracking-wider text-meta">Sin Expediente</p>
+                <p class="mt-2 text-2xl font-black text-estado-advertencia">{{ $indicadores['sin_documentos'] }}</p>
             </div>
 
             <!-- Sin Evaluación Geriátrica -->
-            <div class="rounded-2xl border border-[#C7B5A3]/30 bg-white p-4 shadow-sm">
-                <p class="text-[9px] font-black uppercase tracking-wider text-azul-profundo/50">Sin Evaluación</p>
-                <p class="mt-2 text-2xl font-black text-rose-600">{{ $indicadores['sin_evaluacion'] }}</p>
+            <div class="rounded-2xl border border-borde-suave bg-fondo-card p-4 shadow-sm">
+                <p class="text-[9px] font-black uppercase tracking-wider text-meta">Sin Evaluación</p>
+                <p class="mt-2 text-2xl font-black text-estado-peligro">{{ $indicadores['sin_evaluacion'] }}</p>
             </div>
 
             <!-- Seguimiento Prioritario -->
-            <div class="rounded-2xl border border-[#C7B5A3]/30 bg-white p-4 shadow-sm">
-                <p class="text-[9px] font-black uppercase tracking-wider text-azul-profundo/50">Urgentes / Alta</p>
-                <p class="mt-2 text-2xl font-black text-rose-700">{{ $indicadores['urgentes'] }}</p>
+            <div class="rounded-2xl border border-borde-suave bg-fondo-card p-4 shadow-sm">
+                <p class="text-[9px] font-black uppercase tracking-wider text-meta">Urgentes / Alta</p>
+                <p class="mt-2 text-2xl font-black text-estado-peligro">{{ $indicadores['urgentes'] }}</p>
             </div>
 
             <!-- Pendientes -->
-            <div class="rounded-2xl border border-[#C7B5A3]/30 bg-white p-4 shadow-sm">
-                <p class="text-[9px] font-black uppercase tracking-wider text-azul-profundo/50">Pendientes</p>
-                <p class="mt-2 text-2xl font-black text-amber-700">{{ $indicadores['pendientes'] }}</p>
+            <div class="rounded-2xl border border-borde-suave bg-fondo-card p-4 shadow-sm">
+                <p class="text-[9px] font-black uppercase tracking-wider text-meta">Pendientes</p>
+                <p class="mt-2 text-2xl font-black text-estado-advertencia">{{ $indicadores['pendientes'] }}</p>
             </div>
         </div>
 
@@ -154,69 +154,69 @@
             
             <!-- SECCIÓN DE MÉTRICAS DETALLADAS (Izquierda/Centro) -->
             <div class="lg:col-span-2 space-y-6 print:lg:col-span-3">
-                <div class="rounded-3xl border border-[#C7B5A3]/40 bg-white p-6 shadow-sm print:border-none print:shadow-none print:p-0">
+                <div class="rounded-3xl border border-borde-suave bg-fondo-card p-6 shadow-sm print:border-none print:shadow-none print:p-0">
                     
                     @if($stats['total'] === 0)
                         <!-- ESTADO VACÍO -->
                         <div class="py-12 text-center">
-                            <i class="ph ph-files text-6xl text-[#C7B5A3]/60 mb-4"></i>
-                            <h3 class="text-base font-black text-azul-profundo">Sin datos suficientes para generar este reporte.</h3>
-                            <p class="text-xs text-azul-profundo/50 mt-1">Intente ampliando el rango de fechas o seleccionando otro filtro de estado.</p>
+                            <i class="ph ph-files text-6xl text-meta mb-4"></i>
+                            <h3 class="text-base font-black text-titulo">Sin datos suficientes para generar este reporte.</h3>
+                            <p class="text-xs text-meta mt-1">Intente ampliando el rango de fechas o seleccionando otro filtro de estado.</p>
                         </div>
                     @else
                         <!-- CATEGORÍA 1: REPORTE GENERAL -->
                         @if($tipoReporte === 'general')
                             <div>
-                                <h3 class="text-lg font-black uppercase tracking-wider text-azul-profundo border-b border-[#C7B5A3]/40 pb-3 mb-6">
+                                <h3 class="text-lg font-black uppercase tracking-wider text-titulo border-b border-borde-suave pb-3 mb-6">
                                     1. Reporte General de Población
                                 </h3>
                                 <div class="grid gap-6 sm:grid-cols-2">
-                                    <div class="rounded-2xl bg-[#F7F5F2] p-5">
-                                        <h4 class="text-xs font-black uppercase tracking-widest text-[#2F3E5C]/60">Distribución de Estados</h4>
+                                    <div class="rounded-2xl bg-fondo-panel p-5">
+                                        <h4 class="text-xs font-black uppercase tracking-widest text-apoyo">Distribución de Estados</h4>
                                         <ul class="mt-4 space-y-3">
                                             <li class="flex justify-between text-xs font-bold">
                                                 <span>Activos:</span>
-                                                <span class="font-black text-emerald-700">{{ $stats['activos'] }}</span>
+                                                <span class="font-black text-estado-exito">{{ $stats['activos'] }}</span>
                                             </li>
                                             <li class="flex justify-between text-xs font-bold">
                                                 <span>Inactivos / Archivados:</span>
-                                                <span class="font-black text-rose-700">{{ $stats['archivados'] }}</span>
+                                                <span class="font-black text-estado-peligro">{{ $stats['archivados'] }}</span>
                                             </li>
                                         </ul>
                                     </div>
 
-                                    <div class="rounded-2xl bg-[#F7F5F2] p-5">
-                                        <h4 class="text-xs font-black uppercase tracking-widest text-[#2F3E5C]/60">Distribución por Género</h4>
+                                    <div class="rounded-2xl bg-fondo-panel p-5">
+                                        <h4 class="text-xs font-black uppercase tracking-widest text-apoyo">Distribución por Género</h4>
                                         <ul class="mt-4 space-y-3">
                                             <li class="flex justify-between text-xs font-bold">
                                                 <span>Femenino:</span>
-                                                <span class="font-black text-azul-profundo">{{ $stats['mujeres'] }}</span>
+                                                <span class="font-black text-titulo">{{ $stats['mujeres'] }}</span>
                                             </li>
                                             <li class="flex justify-between text-xs font-bold">
                                                 <span>Masculino:</span>
-                                                <span class="font-black text-azul-profundo">{{ $stats['hombres'] }}</span>
+                                                <span class="font-black text-titulo">{{ $stats['hombres'] }}</span>
                                             </li>
                                         </ul>
                                     </div>
 
-                                    <div class="rounded-2xl bg-[#F7F5F2] p-5 sm:col-span-2">
-                                        <h4 class="text-xs font-black uppercase tracking-widest text-[#2F3E5C]/60">Distribución por Rangos de Edad</h4>
+                                    <div class="rounded-2xl bg-fondo-panel p-5 sm:col-span-2">
+                                        <h4 class="text-xs font-black uppercase tracking-widest text-apoyo">Distribución por Rangos de Edad</h4>
                                         <div class="grid grid-cols-2 gap-4 mt-4">
                                             <div class="flex justify-between text-xs font-bold">
                                                 <span>Menores de 65:</span>
-                                                <span class="font-black text-azul-profundo">{{ $stats['menores65'] }}</span>
+                                                <span class="font-black text-titulo">{{ $stats['menores65'] }}</span>
                                             </div>
                                             <div class="flex justify-between text-xs font-bold">
                                                 <span>65 a 75 años:</span>
-                                                <span class="font-black text-azul-profundo">{{ $stats['de65a75'] }}</span>
+                                                <span class="font-black text-titulo">{{ $stats['de65a75'] }}</span>
                                             </div>
                                             <div class="flex justify-between text-xs font-bold">
                                                 <span>76 a 85 años:</span>
-                                                <span class="font-black text-azul-profundo">{{ $stats['de76a85'] }}</span>
+                                                <span class="font-black text-titulo">{{ $stats['de76a85'] }}</span>
                                             </div>
                                             <div class="flex justify-between text-xs font-bold">
                                                 <span>Mayores de 85:</span>
-                                                <span class="font-black text-azul-profundo">{{ $stats['mayores85'] }}</span>
+                                                <span class="font-black text-titulo">{{ $stats['mayores85'] }}</span>
                                             </div>
                                         </div>
                                     </div>
@@ -226,34 +226,34 @@
                         <!-- CATEGORÍA 2: REPORTE DOCUMENTAL -->
                         @elseif($tipoReporte === 'documental')
                             <div>
-                                <h3 class="text-lg font-black uppercase tracking-wider text-azul-profundo border-b border-[#C7B5A3]/40 pb-3 mb-6">
+                                <h3 class="text-lg font-black uppercase tracking-wider text-titulo border-b border-borde-suave pb-3 mb-6">
                                     2. Reporte Documental e Historial
                                 </h3>
                                 <div class="grid gap-6 sm:grid-cols-2">
-                                    <div class="rounded-2xl bg-[#F7F5F2] p-5">
-                                        <h4 class="text-xs font-black uppercase tracking-widest text-[#2F3E5C]/60">Expediente Digital</h4>
+                                    <div class="rounded-2xl bg-fondo-panel p-5">
+                                        <h4 class="text-xs font-black uppercase tracking-widest text-apoyo">Expediente Digital</h4>
                                         <ul class="mt-4 space-y-3">
                                             <li class="flex justify-between text-xs font-bold">
                                                 <span>Con documentos:</span>
-                                                <span class="font-black text-emerald-700">{{ $stats['conDocumentos'] }}</span>
+                                                <span class="font-black text-estado-exito">{{ $stats['conDocumentos'] }}</span>
                                             </li>
                                             <li class="flex justify-between text-xs font-bold">
                                                 <span>Sin documentos registrados:</span>
-                                                <span class="font-black text-rose-700">{{ $stats['sinDocumentos'] }}</span>
+                                                <span class="font-black text-estado-peligro">{{ $stats['sinDocumentos'] }}</span>
                                             </li>
                                         </ul>
                                     </div>
 
-                                    <div class="rounded-2xl bg-[#F7F5F2] p-5">
-                                        <h4 class="text-xs font-black uppercase tracking-widest text-[#2F3E5C]/60">Archivos Digitalizados</h4>
+                                    <div class="rounded-2xl bg-fondo-panel p-5">
+                                        <h4 class="text-xs font-black uppercase tracking-widest text-apoyo">Archivos Digitalizados</h4>
                                         <ul class="mt-4 space-y-3">
                                             <li class="flex justify-between text-xs font-bold">
                                                 <span>Documentos Activos:</span>
-                                                <span class="font-black text-emerald-700">{{ $stats['documentosActivos'] }}</span>
+                                                <span class="font-black text-estado-exito">{{ $stats['documentosActivos'] }}</span>
                                             </li>
                                             <li class="flex justify-between text-xs font-bold">
                                                 <span>Anulados / Archivados:</span>
-                                                <span class="font-black text-rose-700">{{ $stats['documentosAnulados'] }}</span>
+                                                <span class="font-black text-estado-peligro">{{ $stats['documentosAnulados'] }}</span>
                                             </li>
                                         </ul>
                                     </div>
@@ -263,34 +263,34 @@
                         <!-- CATEGORÍA 3: REPORTE RED DE APOYO -->
                         @elseif($tipoReporte === 'red_de_apoyo')
                             <div>
-                                <h3 class="text-lg font-black uppercase tracking-wider text-azul-profundo border-b border-[#C7B5A3]/40 pb-3 mb-6">
+                                <h3 class="text-lg font-black uppercase tracking-wider text-titulo border-b border-borde-suave pb-3 mb-6">
                                     3. Red de Apoyo Familiar
                                 </h3>
                                 <div class="grid gap-6 sm:grid-cols-2">
-                                    <div class="rounded-2xl bg-[#F7F5F2] p-5">
-                                        <h4 class="text-xs font-black uppercase tracking-widest text-[#2F3E5C]/60">Vínculos de Apoyo</h4>
+                                    <div class="rounded-2xl bg-fondo-panel p-5">
+                                        <h4 class="text-xs font-black uppercase tracking-widest text-apoyo">Vínculos de Apoyo</h4>
                                         <ul class="mt-4 space-y-3">
                                             <li class="flex justify-between text-xs font-bold">
                                                 <span>Con familiares asociados:</span>
-                                                <span class="font-black text-emerald-700">{{ $stats['conFamiliar'] }}</span>
+                                                <span class="font-black text-estado-exito">{{ $stats['conFamiliar'] }}</span>
                                             </li>
                                             <li class="flex justify-between text-xs font-bold">
                                                 <span>Sin familiar registrado:</span>
-                                                <span class="font-black text-rose-700">{{ $stats['sinFamiliar'] }}</span>
+                                                <span class="font-black text-estado-peligro">{{ $stats['sinFamiliar'] }}</span>
                                             </li>
                                         </ul>
                                     </div>
 
-                                    <div class="rounded-2xl bg-[#F7F5F2] p-5">
-                                        <h4 class="text-xs font-black uppercase tracking-widest text-[#2F3E5C]/60">Críticos y Responsabilidad</h4>
+                                    <div class="rounded-2xl bg-fondo-panel p-5">
+                                        <h4 class="text-xs font-black uppercase tracking-widest text-apoyo">Críticos y Responsabilidad</h4>
                                         <ul class="mt-4 space-y-3">
                                             <li class="flex justify-between text-xs font-bold">
                                                 <span>Sin responsable principal:</span>
-                                                <span class="font-black text-amber-700">{{ $stats['sinResponsable'] }}</span>
+                                                <span class="font-black text-estado-advertencia">{{ $stats['sinResponsable'] }}</span>
                                             </li>
                                             <li class="flex justify-between text-xs font-bold">
                                                 <span>Sin contacto de emergencia:</span>
-                                                <span class="font-black text-rose-700">{{ $stats['sinContacto'] }}</span>
+                                                <span class="font-black text-estado-peligro">{{ $stats['sinContacto'] }}</span>
                                             </li>
                                         </ul>
                                     </div>
@@ -300,34 +300,34 @@
                         <!-- CATEGORÍA 4: REPORTE SALUD Y CUIDADOS -->
                         @elseif($tipoReporte === 'salud')
                             <div>
-                                <h3 class="text-lg font-black uppercase tracking-wider text-azul-profundo border-b border-[#C7B5A3]/40 pb-3 mb-6">
+                                <h3 class="text-lg font-black uppercase tracking-wider text-titulo border-b border-borde-suave pb-3 mb-6">
                                     4. Salud y Cuidados
                                 </h3>
                                 <div class="grid gap-6 sm:grid-cols-2">
-                                    <div class="rounded-2xl bg-[#F7F5F2] p-5">
-                                        <h4 class="text-xs font-black uppercase tracking-widest text-[#2F3E5C]/60">Ficha Médica Básica</h4>
+                                    <div class="rounded-2xl bg-fondo-panel p-5">
+                                        <h4 class="text-xs font-black uppercase tracking-widest text-apoyo">Ficha Médica Básica</h4>
                                         <ul class="mt-4 space-y-3">
                                             <li class="flex justify-between text-xs font-bold">
                                                 <span>Con ficha registrada:</span>
-                                                <span class="font-black text-emerald-700">{{ $stats['conFicha'] }}</span>
+                                                <span class="font-black text-estado-exito">{{ $stats['conFicha'] }}</span>
                                             </li>
                                             <li class="flex justify-between text-xs font-bold">
                                                 <span>Sin ficha registrada:</span>
-                                                <span class="font-black text-rose-700">{{ $stats['sinFicha'] }}</span>
+                                                <span class="font-black text-estado-peligro">{{ $stats['sinFicha'] }}</span>
                                             </li>
                                         </ul>
                                     </div>
 
-                                    <div class="rounded-2xl bg-[#F7F5F2] p-5">
-                                        <h4 class="text-xs font-black uppercase tracking-widest text-[#2F3E5C]/60">Monitoreo Clínico</h4>
+                                    <div class="rounded-2xl bg-fondo-panel p-5">
+                                        <h4 class="text-xs font-black uppercase tracking-widest text-apoyo">Monitoreo Clínico</h4>
                                         <ul class="mt-4 space-y-3">
                                             <li class="flex justify-between text-xs font-bold">
                                                 <span>Con signos vitales registrados:</span>
-                                                <span class="font-black text-emerald-700">{{ $stats['conSignos'] }}</span>
+                                                <span class="font-black text-estado-exito">{{ $stats['conSignos'] }}</span>
                                             </li>
                                             <li class="flex justify-between text-xs font-bold">
                                                 <span>Con valoración funcional registrada:</span>
-                                                <span class="font-black text-[#5B5F97]">{{ $stats['conValoracion'] }}</span>
+                                                <span class="font-black text-estado-info">{{ $stats['conValoracion'] }}</span>
                                             </li>
                                         </ul>
                                     </div>
@@ -337,50 +337,50 @@
                         <!-- CATEGORÍA 5: REPORTE EVALUACIONES GERIÁTRICAS -->
                         @elseif($tipoReporte === 'evaluaciones')
                             <div>
-                                <h3 class="text-lg font-black uppercase tracking-wider text-azul-profundo border-b border-[#C7B5A3]/40 pb-3 mb-6">
+                                <h3 class="text-lg font-black uppercase tracking-wider text-titulo border-b border-borde-suave pb-3 mb-6">
                                     5. Evaluaciones Geriátricas Integrales
                                 </h3>
                                 <div class="grid gap-6 sm:grid-cols-2">
-                                    <div class="rounded-2xl bg-[#F7F5F2] p-5 sm:col-span-2 flex justify-between items-center">
+                                    <div class="rounded-2xl bg-fondo-panel p-5 sm:col-span-2 flex justify-between items-center">
                                         <div>
-                                            <h4 class="text-xs font-black uppercase tracking-widest text-[#2F3E5C]/60">Evaluaciones Totales</h4>
-                                            <p class="mt-1 text-2xl font-black text-azul-profundo">{{ $stats['totalEvaluaciones'] }} realizadas</p>
+                                            <h4 class="text-xs font-black uppercase tracking-widest text-apoyo">Evaluaciones Totales</h4>
+                                            <p class="mt-1 text-2xl font-black text-titulo">{{ $stats['totalEvaluaciones'] }} realizadas</p>
                                         </div>
                                         <div class="text-right">
-                                            <span class="text-xs font-bold text-rose-700">Sin evaluación: {{ $stats['sinEvaluacion'] }}</span>
+                                            <span class="text-xs font-bold text-estado-peligro">Sin evaluación: {{ $stats['sinEvaluacion'] }}</span>
                                         </div>
                                     </div>
 
                                     <!-- Por Área -->
-                                    <div class="rounded-2xl bg-[#F7F5F2] p-5">
-                                        <h4 class="text-xs font-black uppercase tracking-widest text-[#2F3E5C]/60">Por Área Geriátrica</h4>
+                                    <div class="rounded-2xl bg-fondo-panel p-5">
+                                        <h4 class="text-xs font-black uppercase tracking-widest text-apoyo">Por Área Geriátrica</h4>
                                         <ul class="mt-4 space-y-2">
                                             @forelse($stats['evaluacionesPorArea'] as $area => $total)
-                                                <li class="flex justify-between text-xs font-bold border-b border-[#C7B5A3]/20 pb-1.5">
+                                                <li class="flex justify-between text-xs font-bold border-b border-borde-suave pb-1.5">
                                                     <span>{{ $area }}:</span>
-                                                    <span class="font-black text-azul-profundo">{{ $total }}</span>
+                                                    <span class="font-black text-titulo">{{ $total }}</span>
                                                 </li>
                                             @empty
-                                                <li class="text-xs font-bold text-azul-profundo/50 py-2">Sin registros.</li>
+                                                <li class="text-xs font-bold text-meta py-2">Sin registros.</li>
                                             @endforelse
                                         </ul>
                                     </div>
 
                                     <!-- Por Alerta -->
-                                    <div class="rounded-2xl bg-[#F7F5F2] p-5">
-                                        <h4 class="text-xs font-black uppercase tracking-widest text-[#2F3E5C]/60">Por Nivel de Alerta</h4>
+                                    <div class="rounded-2xl bg-fondo-panel p-5">
+                                        <h4 class="text-xs font-black uppercase tracking-widest text-apoyo">Por Nivel de Alerta</h4>
                                         <ul class="mt-4 space-y-2">
-                                            <li class="flex justify-between text-xs font-bold border-b border-[#C7B5A3]/20 pb-1.5">
+                                            <li class="flex justify-between text-xs font-bold border-b border-borde-suave pb-1.5">
                                                 <span>NORMAL:</span>
-                                                <span class="font-black text-emerald-700">{{ $stats['evaluacionesPorNivel']['NORMAL'] ?? 0 }}</span>
+                                                <span class="font-black text-estado-exito">{{ $stats['evaluacionesPorNivel']['NORMAL'] ?? 0 }}</span>
                                             </li>
-                                            <li class="flex justify-between text-xs font-bold border-b border-[#C7B5A3]/20 pb-1.5">
+                                            <li class="flex justify-between text-xs font-bold border-b border-borde-suave pb-1.5">
                                                 <span>PREVENTIVO:</span>
-                                                <span class="font-black text-amber-700">{{ $stats['evaluacionesPorNivel']['PREVENTIVO'] ?? 0 }}</span>
+                                                <span class="font-black text-estado-advertencia">{{ $stats['evaluacionesPorNivel']['PREVENTIVO'] ?? 0 }}</span>
                                             </li>
                                             <li class="flex justify-between text-xs font-bold pb-1.5">
                                                 <span>CRÍTICO:</span>
-                                                <span class="font-black text-rose-700">{{ $stats['evaluacionesPorNivel']['CRITICO'] ?? 0 }}</span>
+                                                <span class="font-black text-estado-peligro">{{ $stats['evaluacionesPorNivel']['CRITICO'] ?? 0 }}</span>
                                             </li>
                                         </ul>
                                     </div>
@@ -390,19 +390,19 @@
                         <!-- CATEGORÍA 6: REPORTE DE SEGUIMIENTO -->
                         @elseif($tipoReporte === 'seguimiento')
                             <div>
-                                <h3 class="text-lg font-black uppercase tracking-wider text-azul-profundo border-b border-[#C7B5A3]/40 pb-3 mb-6">
+                                <h3 class="text-lg font-black uppercase tracking-wider text-titulo border-b border-borde-suave pb-3 mb-6">
                                     6. Seguimiento Institucional
                                 </h3>
                                 <div class="grid gap-6 sm:grid-cols-2">
                                     <!-- Eventos de seguimiento -->
-                                    <div class="rounded-2xl bg-[#F7F5F2] p-5">
-                                        <h4 class="text-xs font-black uppercase tracking-widest text-[#2F3E5C]/60">Eventos de Seguimiento</h4>
+                                    <div class="rounded-2xl bg-fondo-panel p-5">
+                                        <h4 class="text-xs font-black uppercase tracking-widest text-apoyo">Eventos de Seguimiento</h4>
                                         <ul class="mt-4 space-y-3">
                                             <li class="flex justify-between text-xs font-bold">
                                                 <span>Observaciones registradas:</span>
-                                                <span class="font-black text-azul-profundo">{{ $stats['observaciones'] }}</span>
+                                                <span class="font-black text-titulo">{{ $stats['observaciones'] }}</span>
                                             </li>
-                                            <li class="flex justify-between text-xs font-bold text-rose-700 font-black">
+                                            <li class="flex justify-between text-xs font-bold text-estado-peligro font-black">
                                                 <span>Importancia Alta / Urgente:</span>
                                                 <span>{{ $stats['observacionesAlta'] }}</span>
                                             </li>
@@ -410,18 +410,18 @@
                                     </div>
 
                                     <!-- Agenda -->
-                                    <div class="rounded-2xl bg-[#F7F5F2] p-5">
-                                        <h4 class="text-xs font-black uppercase tracking-widest text-[#2F3E5C]/60">Agenda y Pendientes</h4>
+                                    <div class="rounded-2xl bg-fondo-panel p-5">
+                                        <h4 class="text-xs font-black uppercase tracking-widest text-apoyo">Agenda y Pendientes</h4>
                                         <ul class="mt-4 space-y-3">
                                             <li class="flex justify-between text-xs font-bold">
                                                 <span>Atenciones registradas:</span>
-                                                <span class="font-black text-[#5B5F97]">{{ $stats['atenciones'] }}</span>
+                                                <span class="font-black text-estado-info">{{ $stats['atenciones'] }}</span>
                                             </li>
                                             <li class="flex justify-between text-xs font-bold">
                                                 <span>Actividades registradas:</span>
-                                                <span class="font-black text-azul-profundo">{{ $stats['actividades'] }}</span>
+                                                <span class="font-black text-titulo">{{ $stats['actividades'] }}</span>
                                             </li>
-                                            <li class="flex justify-between text-xs font-black text-amber-700">
+                                            <li class="flex justify-between text-xs font-black text-estado-advertencia">
                                                 <span>Acciones Pendientes:</span>
                                                 <span>{{ $stats['pendientesSeguimiento'] }}</span>
                                             </li>
@@ -433,20 +433,20 @@
                         <!-- CATEGORÍA 7: REPORTE DE TRAZABILIDAD -->
                         @elseif($tipoReporte === 'trazabilidad')
                             <div>
-                                <h3 class="text-lg font-black uppercase tracking-wider text-azul-profundo border-b border-[#C7B5A3]/40 pb-3 mb-6">
+                                <h3 class="text-lg font-black uppercase tracking-wider text-titulo border-b border-borde-suave pb-3 mb-6">
                                     7. Trazabilidad y Auditoría
                                 </h3>
                                 <div class="grid gap-6 sm:grid-cols-2">
-                                    <div class="rounded-2xl bg-[#F7F5F2] p-5">
-                                        <h4 class="text-xs font-black uppercase tracking-widest text-[#2F3E5C]/60">Historial de Estados</h4>
-                                        <p class="mt-2 text-3xl font-black text-azul-profundo">{{ $stats['cambiosEstado'] }}</p>
-                                        <p class="text-[10px] font-bold text-[#2F3E5C]/50 mt-1">Cambios en el estado institucional del adulto mayor.</p>
+                                    <div class="rounded-2xl bg-fondo-panel p-5">
+                                        <h4 class="text-xs font-black uppercase tracking-widest text-apoyo">Historial de Estados</h4>
+                                        <p class="mt-2 text-3xl font-black text-titulo">{{ $stats['cambiosEstado'] }}</p>
+                                        <p class="text-[10px] font-bold text-meta mt-1">Cambios en el estado institucional del adulto mayor.</p>
                                     </div>
 
-                                    <div class="rounded-2xl bg-[#F7F5F2] p-5">
-                                        <h4 class="text-xs font-black uppercase tracking-widest text-[#2F3E5C]/60">Actividad de Bitácora</h4>
-                                        <p class="mt-2 text-3xl font-black text-[#5B5F97]">{{ $stats['actividadBitacora'] }}</p>
-                                        <p class="text-[10px] font-bold text-[#2F3E5C]/50 mt-1">Registros de acciones auditados en el sistema.</p>
+                                    <div class="rounded-2xl bg-fondo-panel p-5">
+                                        <h4 class="text-xs font-black uppercase tracking-widest text-apoyo">Actividad de Bitácora</h4>
+                                        <p class="mt-2 text-3xl font-black text-estado-info">{{ $stats['actividadBitacora'] }}</p>
+                                        <p class="text-[10px] font-bold text-meta mt-1">Registros de acciones auditados en el sistema.</p>
                                     </div>
                                 </div>
                             </div>
@@ -457,13 +457,13 @@
 
             <!-- COLUMNA DE GRÁFICAS (Derecha) -->
             <div class="space-y-6">
-                <div class="rounded-3xl border border-[#C7B5A3]/40 bg-white p-6 shadow-sm print:break-before-page">
-                    <h3 class="text-xs font-black uppercase tracking-widest text-azul-profundo border-b border-[#C7B5A3]/30 pb-3 mb-6">
+                <div class="rounded-3xl border border-borde-suave bg-fondo-card p-6 shadow-sm print:break-before-page">
+                    <h3 class="text-xs font-black uppercase tracking-widest text-titulo border-b border-borde-suave pb-3 mb-6">
                         Análisis Visual Real
                     </h3>
 
                     @if($stats['total'] === 0)
-                        <div class="py-8 text-center text-xs font-bold text-azul-profundo/40">
+                        <div class="py-8 text-center text-xs font-bold text-meta">
                             Sin datos suficientes para generar esta gráfica.
                         </div>
                     @else
@@ -471,13 +471,13 @@
                         @if($tipoReporte === 'general')
                             <div class="space-y-8">
                                 <div class="flex flex-col gap-2">
-                                    <span class="text-[10px] font-black uppercase tracking-wider text-azul-profundo/60">Estado Institucional</span>
+                                    <span class="text-[10px] font-black uppercase tracking-wider text-apoyo">Estado Institucional</span>
                                     <div class="relative h-48 w-full">
                                         <canvas id="chartEstados"></canvas>
                                     </div>
                                 </div>
                                 <div class="flex flex-col gap-2">
-                                    <span class="text-[10px] font-black uppercase tracking-wider text-azul-profundo/60">Rangos de Edad</span>
+                                    <span class="text-[10px] font-black uppercase tracking-wider text-apoyo">Rangos de Edad</span>
                                     <div class="relative h-48 w-full">
                                         <canvas id="chartEdades"></canvas>
                                     </div>
@@ -487,7 +487,7 @@
                         <!-- Gráficas del Reporte Documental -->
                         @elseif($tipoReporte === 'documental')
                             <div class="flex flex-col gap-2">
-                                <span class="text-[10px] font-black uppercase tracking-wider text-azul-profundo/60">Expedientes Digitalizados</span>
+                                <span class="text-[10px] font-black uppercase tracking-wider text-apoyo">Expedientes Digitalizados</span>
                                 <div class="relative h-56 w-full">
                                     <canvas id="chartDocumentos"></canvas>
                                 </div>
@@ -495,13 +495,13 @@
 
                         <!-- Gráficas del Reporte de Red de Apoyo -->
                         @elseif($tipoReporte === 'red_de_apoyo')
-                            <div class="py-12 text-center text-xs font-bold text-[#2F3E5C]/50">
+                            <div class="py-12 text-center text-xs font-bold text-meta">
                                 Sin datos suficientes para generar esta gráfica.
                             </div>
 
                         <!-- Gráficas del Reporte de Salud -->
                         @elseif($tipoReporte === 'salud')
-                            <div class="py-12 text-center text-xs font-bold text-[#2F3E5C]/50">
+                            <div class="py-12 text-center text-xs font-bold text-meta">
                                 Sin datos suficientes para generar esta gráfica.
                             </div>
 
@@ -509,13 +509,13 @@
                         @elseif($tipoReporte === 'evaluaciones')
                             <div class="space-y-8">
                                 <div class="flex flex-col gap-2">
-                                    <span class="text-[10px] font-black uppercase tracking-wider text-azul-profundo/60">Niveles de Alerta</span>
+                                    <span class="text-[10px] font-black uppercase tracking-wider text-apoyo">Niveles de Alerta</span>
                                     <div class="relative h-48 w-full">
                                         <canvas id="chartNiveles"></canvas>
                                     </div>
                                 </div>
                                 <div class="flex flex-col gap-2">
-                                    <span class="text-[10px] font-black uppercase tracking-wider text-azul-profundo/60">Áreas Geriátricas Evaluadas</span>
+                                    <span class="text-[10px] font-black uppercase tracking-wider text-apoyo">Áreas Geriátricas Evaluadas</span>
                                     <div class="relative h-48 w-full">
                                         <canvas id="chartAreas"></canvas>
                                     </div>
@@ -525,7 +525,7 @@
                         <!-- Gráficas de Seguimiento -->
                         @elseif($tipoReporte === 'seguimiento')
                             <div class="flex flex-col gap-2">
-                                <span class="text-[10px] font-black uppercase tracking-wider text-azul-profundo/60">Eventos de Seguimiento</span>
+                                <span class="text-[10px] font-black uppercase tracking-wider text-apoyo">Eventos de Seguimiento</span>
                                 <div class="relative h-56 w-full">
                                     <canvas id="chartSeguimiento"></canvas>
                                 </div>
@@ -533,7 +533,7 @@
 
                         <!-- Gráficas de Trazabilidad -->
                         @elseif($tipoReporte === 'trazabilidad')
-                            <div class="py-12 text-center text-xs font-bold text-[#2F3E5C]/50">
+                            <div class="py-12 text-center text-xs font-bold text-meta">
                                 Sin datos suficientes para generar esta gráfica.
                             </div>
                         @endif

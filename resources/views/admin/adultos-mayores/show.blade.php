@@ -116,32 +116,32 @@
         @include('admin.adultos-mayores.show._cabecera-expediente')
 
         {{-- 2. Estado del Expediente --}}
-        <div class="mb-6 rounded-[24px] border border-[#CBBBAA] bg-white p-5 shadow-sm">
-            <h3 class="mb-4 text-xs font-black uppercase tracking-widest text-[#2F3E5C]/50">Estado de completitud del expediente</h3>
+        <div class="mb-6 rounded-[24px] border border-borde bg-fondo-card p-5 shadow-sm">
+            <h3 class="mb-4 text-xs font-black uppercase tracking-widest text-apoyo">Estado de completitud del expediente</h3>
             <div class="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-6">
-                <div class="flex flex-col gap-1 rounded-xl bg-[#F2EBE3]/50 p-3 border border-[#CBBBAA]/30">
-                    <span class="text-xs font-black uppercase tracking-wide text-[#2F3E5C]/60">Identificación</span>
-                    <span class="text-xs font-black text-[#617453]">Completo</span>
+                <div class="flex flex-col gap-1 rounded-xl bg-fondo-panel p-3 border border-borde">
+                    <span class="text-xs font-black uppercase tracking-wide text-apoyo">Identificación</span>
+                    <span class="text-xs font-black text-parrafo">Completo</span>
                 </div>
-                <div class="flex flex-col gap-1 rounded-xl bg-[#F2EBE3]/50 p-3 border border-[#CBBBAA]/30">
-                    <span class="text-xs font-black uppercase tracking-wide text-[#2F3E5C]/60">Red de Apoyo</span>
-                    <span class="text-xs font-black {{ $totalFamiliares > 0 ? 'text-[#617453]' : 'text-amber-600' }}">{{ $totalFamiliares > 0 ? 'Registrada' : 'Pendiente' }}</span>
+                <div class="flex flex-col gap-1 rounded-xl bg-fondo-panel p-3 border border-borde">
+                    <span class="text-xs font-black uppercase tracking-wide text-apoyo">Red de Apoyo</span>
+                    <span class="text-xs font-black {{ $totalFamiliares > 0 ? 'text-parrafo' : 'text-amber-600' }}">{{ $totalFamiliares > 0 ? 'Registrada' : 'Pendiente' }}</span>
                 </div>
-                <div class="flex flex-col gap-1 rounded-xl bg-[#F2EBE3]/50 p-3 border border-[#CBBBAA]/30">
-                    <span class="text-xs font-black uppercase tracking-wide text-[#2F3E5C]/60">Documentos</span>
-                    <span class="text-xs font-black {{ $totalDocumentos > 0 ? 'text-[#617453]' : 'text-amber-600' }}">{{ $totalDocumentos > 0 ? 'Registrados' : 'Pendientes' }}</span>
+                <div class="flex flex-col gap-1 rounded-xl bg-fondo-panel p-3 border border-borde">
+                    <span class="text-xs font-black uppercase tracking-wide text-apoyo">Documentos</span>
+                    <span class="text-xs font-black {{ $totalDocumentos > 0 ? 'text-parrafo' : 'text-amber-600' }}">{{ $totalDocumentos > 0 ? 'Registrados' : 'Pendientes' }}</span>
                 </div>
-                <div class="flex flex-col gap-1 rounded-xl bg-[#F2EBE3]/50 p-3 border border-[#CBBBAA]/30">
-                    <span class="text-xs font-black uppercase tracking-wide text-[#2F3E5C]/60">Salud</span>
-                    <span class="text-xs font-black {{ $fichasMedicas->isNotEmpty() ? 'text-[#617453]' : 'text-amber-600' }}">{{ $fichasMedicas->isNotEmpty() ? 'Con datos' : 'Sin datos' }}</span>
+                <div class="flex flex-col gap-1 rounded-xl bg-fondo-panel p-3 border border-borde">
+                    <span class="text-xs font-black uppercase tracking-wide text-apoyo">Salud</span>
+                    <span class="text-xs font-black {{ $fichasMedicas->isNotEmpty() ? 'text-parrafo' : 'text-amber-600' }}">{{ $fichasMedicas->isNotEmpty() ? 'Con datos' : 'Sin datos' }}</span>
                 </div>
-                <div class="flex flex-col gap-1 rounded-xl bg-[#F2EBE3]/50 p-3 border border-[#CBBBAA]/30">
-                    <span class="text-xs font-black uppercase tracking-wide text-[#2F3E5C]/60">Cognitivo</span>
-                    <span class="text-xs font-black {{ $totalEvaluaciones > 0 ? 'text-[#617453]' : 'text-[#2F3E5C]/50' }}">{{ $totalEvaluaciones > 0 ? 'Con datos' : 'Sin datos' }}</span>
+                <div class="flex flex-col gap-1 rounded-xl bg-fondo-panel p-3 border border-borde">
+                    <span class="text-xs font-black uppercase tracking-wide text-apoyo">Cognitivo</span>
+                    <span class="text-xs font-black {{ $totalEvaluaciones > 0 ? 'text-parrafo' : 'text-apoyo' }}">{{ $totalEvaluaciones > 0 ? 'Con datos' : 'Sin datos' }}</span>
                 </div>
-                <div class="flex flex-col gap-1 rounded-xl bg-[#F2EBE3]/50 p-3 border border-[#CBBBAA]/30">
-                    <span class="text-xs font-black uppercase tracking-wide text-[#2F3E5C]/60">Participación</span>
-                    <span class="text-xs font-black {{ $totalActividades > 0 ? 'text-[#617453]' : 'text-[#2F3E5C]/50' }}">{{ $totalActividades > 0 ? 'Con datos' : 'Sin datos' }}</span>
+                <div class="flex flex-col gap-1 rounded-xl bg-fondo-panel p-3 border border-borde">
+                    <span class="text-xs font-black uppercase tracking-wide text-apoyo">Participación</span>
+                    <span class="text-xs font-black {{ $totalActividades > 0 ? 'text-parrafo' : 'text-apoyo' }}">{{ $totalActividades > 0 ? 'Con datos' : 'Sin datos' }}</span>
                 </div>
             </div>
         </div>
@@ -151,8 +151,8 @@
             
             {{-- Columna Izquierda: Menú de Carpetas --}}
             <div class="w-full lg:w-[280px] shrink-0">
-                <div class="rounded-[24px] border border-[#CBBBAA] bg-white p-3 shadow-sm flex flex-col gap-1">
-                    <h3 class="px-3 py-2 text-xs font-black uppercase tracking-wide text-[#2F3E5C]/50">Índice del Expediente</h3>
+                <div class="rounded-[24px] border border-borde bg-fondo-card p-3 shadow-sm flex flex-col gap-1">
+                    <h3 class="px-3 py-2 text-xs font-black uppercase tracking-wide text-apoyo">Índice del Expediente</h3>
                     
                     @php
                         $carpetas = [
@@ -170,12 +170,12 @@
                     @foreach($carpetas as $carpeta)
                     <button type="button" @click="carpetaActiva = '{{ $carpeta['id'] }}'" 
                             class="flex items-center justify-between rounded-xl px-4 py-3 text-left transition"
-                            :class="carpetaActiva === '{{ $carpeta['id'] }}' ? 'bg-[#F2EBE3] shadow-sm border border-[#D5C7B9] text-[#2F3E5C]' : 'text-[#2F3E5C]/70 hover:bg-[#F2EBE3]/50 border border-transparent'">
+                            :class="carpetaActiva === '{{ $carpeta['id'] }}' ? 'bg-fondo-panel shadow-sm border border-borde-suave text-titulo' : 'text-apoyo hover:bg-fondo-panel border border-transparent'">
                         <div class="flex items-center gap-3">
-                            <i class="ph-bold {{ $carpeta['icon'] }} text-lg" :class="carpetaActiva === '{{ $carpeta['id'] }}' ? 'text-[#E27D60]' : ''"></i>
+                            <i class="ph-bold {{ $carpeta['icon'] }} text-lg" :class="carpetaActiva === '{{ $carpeta['id'] }}' ? 'text-boton-acento' : ''"></i>
                             <span class="text-xs font-black">{{ $carpeta['label'] }}</span>
                         </div>
-                        <span class="text-[10px] font-bold text-[#2F3E5C]/40">{{ $carpeta['status'] }}</span>
+                        <span class="text-[10px] font-bold text-apoyo">{{ $carpeta['status'] }}</span>
                     </button>
                     @endforeach
                 </div>

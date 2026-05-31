@@ -95,14 +95,14 @@
                 addToast(@js(session('status')), 'success');
             @endif
         "
-        class="relative min-h-screen overflow-hidden bg-[#D5C7B9] font-outfit text-azul-profundo"
+        class="relative min-h-screen overflow-hidden bg-fondo-app font-outfit text-titulo"
     >
         <div class="auth-noise pointer-events-none fixed inset-0 z-[60] opacity-[0.25] mix-blend-overlay"></div>
         <div class="auth-dots pointer-events-none fixed inset-0 z-0 opacity-[0.035]"></div>
 
-        <div class="absolute left-[-12rem] top-[-14rem] h-[42rem] w-[42rem] rounded-full bg-[#967B66]/25 blur-[130px]"></div>
-        <div class="absolute right-[-14rem] bottom-[-14rem] h-[44rem] w-[44rem] rounded-full bg-[#E97A5F]/20 blur-[130px]"></div>
-        <div class="absolute right-[22%] top-[10%] h-[32rem] w-[32rem] rounded-full bg-[#8DA280]/18 blur-[120px]"></div>
+        <div class="absolute left-[-12rem] top-[-14rem] h-[42rem] w-[42rem] rounded-full bg-fondo-panel blur-[130px]"></div>
+        <div class="absolute right-[-14rem] bottom-[-14rem] h-[44rem] w-[44rem] rounded-full bg-fondo-panel blur-[130px]"></div>
+        <div class="absolute right-[22%] top-[10%] h-[32rem] w-[32rem] rounded-full bg-estado-exitoBg blur-[120px]"></div>
 
         {{-- Mensajes emergentes --}}
         <div class="fixed right-4 top-5 z-[9999] flex w-[calc(100%-2rem)] max-w-sm flex-col gap-3 sm:right-6">
@@ -116,19 +116,19 @@
                     x-transition:leave-end="translate-x-8 opacity-0 scale-95"
                     class="flex items-start gap-3 rounded-[2rem] border p-4 shadow-2xl backdrop-blur-xl"
                     :class="{
-                        'border-terracota/30 bg-[#E6DDD3]/95 text-terracota': toast.type === 'error',
-                        'border-[#8DA280]/40 bg-[#E6DDD3]/95 text-[#5F7555]': toast.type === 'success'
+                        'border-terracota/30 bg-fondo-panel text-terracota': toast.type === 'error',
+                        'border-estado-exitoBorde bg-fondo-panel text-parrafo': toast.type === 'success'
                     }"
                 >
                     <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl"
-                         :class="toast.type === 'success' ? 'bg-[#8DA280]/15' : 'bg-terracota/10'">
+                         :class="toast.type === 'success' ? 'bg-estado-exitoBg' : 'bg-boton-acento/10'">
                         <i class="ph-bold text-2xl"
                            :class="toast.type === 'success' ? 'ph-check-circle' : 'ph-warning-circle'"></i>
                     </div>
 
                     <p class="pt-1 text-sm font-black leading-5" x-text="toast.message"></p>
 
-                    <button type="button" @click="removeToast(toast.id)" class="ml-auto rounded-full p-1 opacity-60 transition hover:bg-white/50 hover:opacity-100">
+                    <button type="button" @click="removeToast(toast.id)" class="ml-auto rounded-full p-1 opacity-60 transition hover:bg-fondo-card/50 hover:opacity-100">
                         <i class="ph-bold ph-x"></i>
                     </button>
                 </div>
@@ -136,56 +136,56 @@
         </div>
 
         <main class="relative z-10 flex min-h-screen items-start justify-center px-4 pt-8 pb-8 lg:pt-10">
-            <section class="relative grid w-full max-w-7xl overflow-hidden rounded-[3.8rem] border border-[#C7B5A3] bg-[#D5C7B9]/75 shadow-[0_45px_100px_rgba(47,62,92,0.28)] backdrop-blur-xl lg:grid-cols-[1.08fr_0.92fr]">
+            <section class="relative grid w-full max-w-7xl overflow-hidden rounded-[3.8rem] border border-borde-suave bg-fondo-panel shadow-[0_45px_100px_rgba(47,62,92,0.28)] backdrop-blur-xl lg:grid-cols-[1.08fr_0.92fr]">
 
                 {{-- Lado visual --}}
-                <aside class="relative hidden min-h-[680px] overflow-hidden bg-[#C7B5A3] p-10 lg:block">
-                    <div class="absolute -left-32 top-20 h-[36rem] w-[36rem] rounded-full bg-[#E6DDD3]/70 blur-[80px]"></div>
-                    <div class="absolute -right-52 top-0 h-full w-[75%] rounded-l-[60%] bg-[#E6DDD3]"></div>
-                    <div class="absolute bottom-[-8rem] right-16 h-[26rem] w-[26rem] rounded-full bg-[#8DA280]/25 blur-[90px]"></div>
+                <aside class="relative hidden min-h-[680px] overflow-hidden bg-fondo-panel p-10 lg:block">
+                    <div class="absolute -left-32 top-20 h-[36rem] w-[36rem] rounded-full bg-fondo-panel blur-[80px]"></div>
+                    <div class="absolute -right-52 top-0 h-full w-[75%] rounded-l-[60%] bg-fondo-app"></div>
+                    <div class="absolute bottom-[-8rem] right-16 h-[26rem] w-[26rem] rounded-full bg-estado-exitoBg blur-[90px]"></div>
 
                     <div class="relative z-10 flex items-center gap-4">
                         <img src="{{ asset('storage/images/LOGO.png') }}"
                              alt="CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS"
                              class="h-16 w-auto object-contain drop-shadow-lg">
                         <div>
-                            <h1 class="text-xl font-black leading-tight text-azul-profundo">CENTRO GERIÁTRICO<br>JARDÍN DE LOS RECUERDOS</h1>
-                            <p class="mt-1 text-xs font-black uppercase tracking-[0.25em] text-[#3F7D5A]">Portal Institucional</p>
+                            <h1 class="text-xl font-black leading-tight text-titulo">CENTRO GERIÁTRICO<br>JARDÍN DE LOS RECUERDOS</h1>
+                            <p class="mt-1 text-xs font-black uppercase tracking-[0.25em] text-parrafo">Portal Institucional</p>
                         </div>
                     </div>
 
                     <div class="relative z-10 mt-14">
-                        <span class="inline-flex items-center gap-2 rounded-full border border-terracota/25 bg-[#D5C7B9]/80 px-4 py-2 text-xs font-black uppercase tracking-wider text-terracota">
-                            <span class="h-2 w-2 rounded-full bg-terracota"></span>
+                        <span class="inline-flex items-center gap-2 rounded-full border border-terracota/25 bg-fondo-panel px-4 py-2 text-xs font-black uppercase tracking-wider text-terracota">
+                            <span class="h-2 w-2 rounded-full bg-boton-acento"></span>
                             Portal institucional
                         </span>
 
-                        <h2 class="mt-7 max-w-2xl text-6xl font-black leading-[1.02] tracking-tight text-azul-profundo text-shadow-deep">
+                        <h2 class="mt-7 max-w-2xl text-6xl font-black leading-[1.02] tracking-tight text-titulo text-shadow-deep">
                             Cuidado,
                             <span class="text-terracota">memoria</span>
                             y dignidad.
                         </h2>
 
-                        <p class="mt-6 max-w-xl text-xl font-bold leading-8 text-azul-profundo/75">
+                        <p class="mt-6 max-w-xl text-xl font-bold leading-8 text-titulo/75">
                             Un espacio seguro para acompañar el bienestar, registrar el seguimiento y proteger la memoria de nuestros adultos mayores.
                         </p>
                     </div>
 
                     <div class="relative z-10 mt-12 grid grid-cols-2 gap-5">
-                        <div class="rounded-[2.4rem] border border-[#C7B5A3] bg-[#D5C7B9]/85 p-6 shadow-lg transition duration-500 hover:-translate-y-2 hover:shadow-2xl">
+                        <div class="rounded-[2.4rem] border border-borde-suave bg-fondo-panel p-6 shadow-lg transition duration-500 hover:-translate-y-2 hover:shadow-2xl">
                             <i class="ph-fill ph-heartbeat mb-4 block text-4xl text-terracota"></i>
-                            <h3 class="text-xl font-black text-azul-profundo">Bienestar</h3>
-                            <p class="mt-2 text-sm font-bold leading-6 text-azul-profundo/65">Atención cálida, cercana y humana.</p>
+                            <h3 class="text-xl font-black text-titulo">Bienestar</h3>
+                            <p class="mt-2 text-sm font-bold leading-6 text-titulo/65">Atención cálida, cercana y humana.</p>
                         </div>
 
-                        <div class="rounded-[2.4rem] border border-[#C7B5A3] bg-[#D5C7B9]/85 p-6 shadow-lg transition duration-500 hover:-translate-y-2 hover:shadow-2xl">
-                            <i class="ph-fill ph-brain mb-4 block text-4xl text-[#8DA280]"></i>
-                            <h3 class="text-xl font-black text-azul-profundo">Memoria</h3>
-                            <p class="mt-2 text-sm font-bold leading-6 text-azul-profundo/65">Seguimiento cognitivo preventivo.</p>
+                        <div class="rounded-[2.4rem] border border-borde-suave bg-fondo-panel p-6 shadow-lg transition duration-500 hover:-translate-y-2 hover:shadow-2xl">
+                            <i class="ph-fill ph-brain mb-4 block text-4xl text-estado-exito"></i>
+                            <h3 class="text-xl font-black text-titulo">Memoria</h3>
+                            <p class="mt-2 text-sm font-bold leading-6 text-titulo/65">Seguimiento cognitivo preventivo.</p>
                         </div>
                     </div>
 
-                    <div class="relative z-10 mt-8 h-60 overflow-hidden rounded-[3rem] border-8 border-[#D5C7B9] shadow-[0_28px_60px_rgba(47,62,92,0.25)] group">
+                    <div class="relative z-10 mt-8 h-60 overflow-hidden rounded-[3rem] border-8 border-borde-suave shadow-[0_28px_60px_rgba(47,62,92,0.25)] group">
                         <img
                             src="{{ asset('storage/images/adultos-mayores.jpg') }}"
                             onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1581579438747-104c53d7fbc4?auto=format&fit=crop&w=1200&q=80';"
@@ -195,15 +195,15 @@
                         <div class="absolute inset-0 bg-gradient-to-t from-azul-profundo/35 to-transparent"></div>
                     </div>
 
-                    <i class="ph-fill ph-leaf float-auth absolute bottom-10 left-10 text-7xl text-[#8DA280]/30"></i>
+                    <i class="ph-fill ph-leaf float-auth absolute bottom-10 left-10 text-7xl text-estado-exito"></i>
                     <i class="ph-fill ph-heart float-auth absolute right-24 top-[42%] text-5xl text-terracota/30"></i>
-                    <i class="ph-fill ph-flower float-auth absolute bottom-28 right-32 text-6xl text-[#967B66]/25"></i>
+                    <i class="ph-fill ph-flower float-auth absolute bottom-28 right-32 text-6xl text-apoyo"></i>
                 </aside>
 
                 {{-- Lado formulario --}}
-                <section class="relative min-h-[680px] overflow-hidden bg-[#D5C7B9] px-6 py-8 sm:px-10 lg:px-14">
-                    <div class="absolute -right-28 -top-28 h-72 w-72 rounded-full bg-terracota/15 blur-[85px]"></div>
-                    <div class="absolute -bottom-28 left-0 h-72 w-72 rounded-full bg-[#8DA280]/20 blur-[85px]"></div>
+                <section class="relative min-h-[680px] overflow-hidden bg-fondo-app px-6 py-8 sm:px-10 lg:px-14">
+                    <div class="absolute -right-28 -top-28 h-72 w-72 rounded-full bg-boton-acento/15 blur-[85px]"></div>
+                    <div class="absolute -bottom-28 left-0 h-72 w-72 rounded-full bg-estado-exitoBg blur-[85px]"></div>
 
                     <div class="relative z-10 flex h-full min-h-[610px] items-start pt-8 lg:pt-10">
                         <div class="relative w-full">
@@ -220,27 +220,27 @@
                                 class="w-full"
                             >
                                 <div class="mb-8">
-                                    <div class="mb-5 flex h-16 w-16 items-center justify-center rounded-[1.6rem] bg-terracota text-white shadow-[0_18px_35px_rgba(233,122,95,0.35)]">
+                                    <div class="mb-5 flex h-16 w-16 items-center justify-center rounded-[1.6rem] bg-boton-acento text-inverso shadow-[0_18px_35px_rgba(233,122,95,0.35)]">
                                         <i class="ph-bold ph-lock-key text-4xl"></i>
                                     </div>
 
-                                    <h2 class="text-5xl font-black tracking-tight text-azul-profundo text-shadow-title">
+                                    <h2 class="text-5xl font-black tracking-tight text-titulo text-shadow-title">
                                         Iniciar sesión
                                     </h2>
 
-                                    <p class="mt-3 max-w-md text-base font-bold leading-7 text-azul-profundo/65">
+                                    <p class="mt-3 max-w-md text-base font-bold leading-7 text-titulo/65">
                                         Accede al portal institucional de seguimiento y cuidado.
                                     </p>
                                 </div>
 
                                 @if ($errors->any())
-                                    <div class="mb-5 rounded-[2rem] border border-terracota/30 bg-terracota/10 p-4 text-sm font-black text-terracota">
+                                    <div class="mb-5 rounded-[2rem] border border-terracota/30 bg-boton-acento/10 p-4 text-sm font-black text-terracota">
                                         Verifica tu correo o contraseña e inténtalo nuevamente.
                                     </div>
                                 @endif
 
                                 @if (session('status'))
-                                    <div class="mb-5 rounded-[2rem] border border-[#8DA280]/40 bg-[#8DA280]/10 p-4 text-sm font-black text-[#5F7555]">
+                                    <div class="mb-5 rounded-[2rem] border border-estado-exitoBorde bg-estado-exitoBg p-4 text-sm font-black text-parrafo">
                                         {{ session('status') }}
                                     </div>
                                 @endif
@@ -249,7 +249,7 @@
                                     @csrf
 
                                     <div>
-                                        <label for="correo" class="mb-2 block text-lg font-black text-azul-profundo">Correo institucional</label>
+                                        <label for="correo" class="mb-2 block text-lg font-black text-titulo">Correo institucional</label>
 
                                         <div class="relative">
                                             <input
@@ -264,16 +264,16 @@
                                                 autofocus
                                                 autocomplete="username"
                                                 placeholder="admin@jardindelosrecuerdos.org"
-                                                class="w-full rounded-full border-2 bg-[#E6DDD3] px-6 py-4 pr-14 text-base font-extrabold text-azul-profundo placeholder:text-azul-profundo/35 outline-none shadow-inner transition duration-300 focus:ring-4"
+                                                class="w-full rounded-full border-2 bg-fondo-app px-6 py-4 pr-14 text-base font-extrabold text-titulo placeholder:text-titulo/35 outline-none shadow-inner transition duration-300 focus:ring-4"
                                                 :class="{
-                                                    'border-terracota focus:ring-terracota/20': correoError,
-                                                    'border-[#8DA280] focus:ring-[#8DA280]/25': correoTouched && correo && !correoError,
+                                                    'border-terracota focus:ring-borde-focus/20': correoError,
+                                                    'border-estado-exitoBorde focus:ring-[#8DA280]/25': correoTouched && correo && !correoError,
                                                     'border-transparent focus:border-azul-clinico focus:ring-azul-clinico/20': !correoTouched || (!correo && !correoError)
                                                 }"
                                             >
 
                                             <span class="absolute inset-y-0 right-5 flex items-center" x-show="correoTouched && correo">
-                                                <i class="ph-bold text-xl" :class="correoError ? 'ph-x-circle text-terracota' : 'ph-check-circle text-[#8DA280]'"></i>
+                                                <i class="ph-bold text-xl" :class="correoError ? 'ph-x-circle text-terracota' : 'ph-check-circle text-estado-exito'"></i>
                                             </span>
                                         </div>
 
@@ -281,7 +281,7 @@
                                     </div>
 
                                     <div>
-                                        <label for="password" class="mb-2 block text-lg font-black text-azul-profundo">Contraseña</label>
+                                        <label for="password" class="mb-2 block text-lg font-black text-titulo">Contraseña</label>
 
                                         <div class="relative">
                                             <input
@@ -296,20 +296,20 @@
                                                 maxlength="255"
                                                 autocomplete="current-password"
                                                 placeholder="Ingresa tu contraseña"
-                                                class="w-full rounded-full border-2 bg-[#E6DDD3] px-6 py-4 pr-24 text-base font-extrabold text-azul-profundo placeholder:text-azul-profundo/35 outline-none shadow-inner transition duration-300 focus:ring-4"
+                                                class="w-full rounded-full border-2 bg-fondo-app px-6 py-4 pr-24 text-base font-extrabold text-titulo placeholder:text-titulo/35 outline-none shadow-inner transition duration-300 focus:ring-4"
                                                 :class="{
-                                                    'border-terracota focus:ring-terracota/20': passwordError,
-                                                    'border-[#8DA280] focus:ring-[#8DA280]/25': passwordTouched && password && !passwordError,
+                                                    'border-terracota focus:ring-borde-focus/20': passwordError,
+                                                    'border-estado-exitoBorde focus:ring-[#8DA280]/25': passwordTouched && password && !passwordError,
                                                     'border-transparent focus:border-azul-clinico focus:ring-azul-clinico/20': !passwordTouched || (!password && !passwordError)
                                                 }"
                                             >
 
                                             <div class="absolute inset-y-0 right-5 flex items-center gap-2">
                                                 <span x-show="passwordTouched && password">
-                                                    <i class="ph-bold text-xl" :class="passwordError ? 'ph-x-circle text-terracota' : 'ph-check-circle text-[#8DA280]'"></i>
+                                                    <i class="ph-bold text-xl" :class="passwordError ? 'ph-x-circle text-terracota' : 'ph-check-circle text-estado-exito'"></i>
                                                 </span>
 
-                                                <button type="button" @click="showPassword = !showPassword" class="rounded-full p-1 text-azul-profundo/45 transition hover:bg-[#D5C7B9]/70 hover:text-terracota">
+                                                <button type="button" @click="showPassword = !showPassword" class="rounded-full p-1 text-titulo/45 transition hover:bg-fondo-panel hover:text-terracota">
                                                     <i class="ph-bold text-xl" :class="showPassword ? 'ph-eye-closed' : 'ph-eye'"></i>
                                                 </button>
                                             </div>
@@ -320,11 +320,11 @@
 
                                     <div class="flex items-center justify-between">
                                         <label class="flex cursor-pointer items-center gap-2">
-                                            <input id="remember_me" type="checkbox" name="remember" class="h-5 w-5 rounded border-[#C7B5A3] bg-[#E6DDD3] text-terracota focus:ring-terracota/30">
-                                            <span class="text-sm font-black text-azul-profundo/65">Recordarme</span>
+                                            <input id="remember_me" type="checkbox" name="remember" class="h-5 w-5 rounded border-borde-suave bg-fondo-app text-terracota focus:ring-borde-focus/30">
+                                            <span class="text-sm font-black text-titulo/65">Recordarme</span>
                                         </label>
 
-                                        <button type="button" @click="panel = 'recover'" class="text-sm font-black text-terracota transition hover:text-azul-profundo hover:underline">
+                                        <button type="button" @click="panel = 'recover'" class="text-sm font-black text-terracota transition hover:text-titulo hover:underline">
                                             ¿Olvidaste tu contraseña?
                                         </button>
                                     </div>
@@ -332,7 +332,7 @@
                                     <button
                                         type="submit"
                                         :disabled="isSubmitting"
-                                        class="group relative w-full overflow-hidden rounded-full bg-terracota px-6 py-4 text-lg font-black text-white shadow-[0_15px_35px_rgba(233,122,95,0.35)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_18px_40px_rgba(233,122,95,0.45)] active:scale-[0.98] disabled:opacity-70"
+                                        class="group relative w-full overflow-hidden rounded-full bg-boton-acento px-6 py-4 text-lg font-black text-inverso shadow-[0_15px_35px_rgba(233,122,95,0.35)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_18px_40px_rgba(233,122,95,0.45)] active:scale-[0.98] disabled:opacity-70"
                                     >
                                         <span class="relative z-10 flex items-center justify-center gap-3" x-show="!isSubmitting">
                                             Entrar al Portal
@@ -344,7 +344,7 @@
                                             Ingresando...
                                         </span>
 
-                                        <div class="absolute inset-0 translate-y-full bg-azul-profundo transition duration-500 group-hover:translate-y-0"></div>
+                                        <div class="absolute inset-0 translate-y-full bg-boton-principal transition duration-500 group-hover:translate-y-0"></div>
                                     </button>
                                 </form>
                             </div>
@@ -365,33 +365,33 @@
                                     <button
                                         type="button"
                                         @click="panel = 'login'"
-                                        class="mb-7 inline-flex items-center gap-2 rounded-full bg-[#E6DDD3] px-4 py-2 text-sm font-black text-azul-profundo shadow-md transition hover:-translate-x-1 hover:text-terracota"
+                                        class="mb-7 inline-flex items-center gap-2 rounded-full bg-fondo-app px-4 py-2 text-sm font-black text-titulo shadow-md transition hover:-translate-x-1 hover:text-terracota"
                                     >
                                         <i class="ph-bold ph-arrow-left"></i>
                                         Volver
                                     </button>
 
-                                    <div class="mb-5 flex h-16 w-16 items-center justify-center rounded-[1.6rem] bg-azul-profundo text-white shadow-[0_18px_35px_rgba(47,62,92,0.25)]">
+                                    <div class="mb-5 flex h-16 w-16 items-center justify-center rounded-[1.6rem] bg-boton-principal text-inverso shadow-[0_18px_35px_rgba(47,62,92,0.25)]">
                                         <i class="ph-bold ph-key-return text-4xl"></i>
                                     </div>
 
-                                    <h2 class="text-5xl font-black tracking-tight text-azul-profundo text-shadow-title">
+                                    <h2 class="text-5xl font-black tracking-tight text-titulo text-shadow-title">
                                         Recuperar acceso
                                     </h2>
 
-                                    <p class="mt-3 max-w-md text-base font-bold leading-7 text-azul-profundo/65">
+                                    <p class="mt-3 max-w-md text-base font-bold leading-7 text-titulo/65">
                                         Te enviaremos instrucciones para restablecer tu contraseña institucional.
                                     </p>
                                 </div>
 
-                                <div class="mb-6 rounded-[2rem] border border-[#C7B5A3] bg-[#E6DDD3]/70 p-5 shadow-md">
+                                <div class="mb-6 rounded-[2rem] border border-borde-suave bg-fondo-panel p-5 shadow-md">
                                     <div class="flex gap-4">
-                                        <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[#8DA280]/15 text-[#8DA280]">
+                                        <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-estado-exitoBg text-estado-exito">
                                             <i class="ph-bold ph-shield-check text-2xl"></i>
                                         </div>
                                         <div>
-                                            <h3 class="font-black text-azul-profundo">Recuperación segura</h3>
-                                            <p class="mt-1 text-sm font-bold leading-6 text-azul-profundo/60">
+                                            <h3 class="font-black text-titulo">Recuperación segura</h3>
+                                            <p class="mt-1 text-sm font-bold leading-6 text-titulo/60">
                                                 Usa el correo registrado por administración. Si no recuerdas tu correo, comunícate con el administrador.
                                             </p>
                                         </div>
@@ -402,7 +402,7 @@
                                     @csrf
 
                                     <div>
-                                        <label for="recover_correo" class="mb-2 block text-lg font-black text-azul-profundo">
+                                        <label for="recover_correo" class="mb-2 block text-lg font-black text-titulo">
                                             Correo institucional
                                         </label>
 
@@ -415,19 +415,19 @@
                                             maxlength="120"
                                             autocomplete="username"
                                             placeholder="Ingresa tu correo"
-                                            class="w-full rounded-full border-2 border-transparent bg-[#E6DDD3] px-6 py-4 text-base font-extrabold text-azul-profundo placeholder:text-azul-profundo/35 outline-none shadow-inner transition duration-300 focus:border-azul-clinico focus:ring-4 focus:ring-azul-clinico/20"
+                                            class="w-full rounded-full border-2 border-transparent bg-fondo-app px-6 py-4 text-base font-extrabold text-titulo placeholder:text-titulo/35 outline-none shadow-inner transition duration-300 focus:border-azul-clinico focus:ring-4 focus:ring-azul-clinico/20"
                                         >
                                     </div>
 
                                     <button
                                         type="submit"
-                                        class="w-full rounded-full bg-azul-profundo px-6 py-4 text-lg font-black text-white shadow-[0_15px_35px_rgba(47,62,92,0.28)] transition duration-300 hover:-translate-y-1 hover:bg-terracota active:scale-[0.98]"
+                                        class="w-full rounded-full bg-boton-principal px-6 py-4 text-lg font-black text-inverso shadow-[0_15px_35px_rgba(47,62,92,0.28)] transition duration-300 hover:-translate-y-1 hover:bg-boton-acento active:scale-[0.98]"
                                     >
                                         Enviar instrucciones
                                     </button>
                                 </form>
 
-                                <p class="mt-7 text-center text-sm font-bold leading-6 text-azul-profundo/60">
+                                <p class="mt-7 text-center text-sm font-bold leading-6 text-titulo/60">
                                     Por seguridad, no confirmaremos si el correo existe. Revisa tu bandeja principal y spam.
                                 </p>
                             </div>

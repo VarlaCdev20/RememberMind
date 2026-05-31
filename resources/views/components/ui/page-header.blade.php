@@ -8,13 +8,13 @@
     'titulo'    => '',
     'subtitulo' => '',
     'icono'     => 'ph-squares-four',
-    'color'     => 'bg-azul-profundo',   // clase bg para el ícono
+    'color'     => 'bg-boton-principal',   // clase bg para el ícono
 ])
 
 <div class="rm-page-header">
     <div class="flex items-center gap-3">
         <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full {{ $color }} shadow-sm">
-            <i class="ph-bold {{ $icono }} text-lg text-white"></i>
+            <i class="ph-bold {{ $icono }} text-lg text-inverso"></i>
         </div>
         <div>
             <h1 class="rm-section-title">{{ $titulo }}</h1>

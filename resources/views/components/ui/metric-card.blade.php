@@ -1,13 +1,13 @@
 {{--
     Componente: ui/metric-card
     Uso: <x-ui.metric-card etiqueta="Total Adultos" :valor="$total" icono="ph-users" />
-         <x-ui.metric-card etiqueta="Alertas" :valor="$alertas" icono="ph-warning" color-valor="text-rose-600" />
+         <x-ui.metric-card etiqueta="Alertas" :valor="$alertas" icono="ph-warning" color-valor="text-estado-peligro" />
 --}}
 @props([
     'etiqueta'    => '',
     'valor'       => '—',
     'icono'       => null,
-    'colorValor'  => 'text-terracota',
+    'colorValor'  => 'text-boton-acento',
     'colorFondo'  => 'bg-fondo-card',
     'colorBorde'  => 'border-borde',
 ])

@@ -1,28 +1,28 @@
-<div class="min-h-screen bg-[#F8F3ED]/45 px-4 py-5 text-[#2F3E5C] sm:px-6 lg:px-8">
+<div class="min-h-screen bg-fondo-panel px-4 py-5 text-titulo sm:px-6 lg:px-8">
     <div class="mx-auto max-w-7xl space-y-6">
-        <section class="overflow-hidden rounded-[1.65rem] border border-[#C7B5A3]/70 bg-[#E6DDD3]/70 shadow-[0_20px_58px_rgba(47,62,92,0.13)] backdrop-blur-xl">
+        <section class="overflow-hidden rounded-[1.65rem] border border-borde-suave bg-fondo-panel shadow-[0_20px_58px_rgba(47,62,92,0.13)] backdrop-blur-xl">
             <div class="h-1.5 bg-gradient-to-r from-[#E27D60] via-[#D9A05B] to-[#8DA280]"></div>
             <div class="flex flex-col gap-4 p-5 sm:p-7 lg:flex-row lg:items-end lg:justify-between">
                 <div class="max-w-3xl">
-                    <span class="inline-flex items-center gap-2 rounded-full border border-[#E27D60]/25 bg-[#E27D60]/10 px-3 py-1 text-[10px] font-black uppercase tracking-[0.2em] text-[#E27D60]">
+                    <span class="inline-flex items-center gap-2 rounded-full border border-borde-focus bg-estado-peligroBg px-3 py-1 text-[10px] font-black uppercase tracking-[0.2em] text-boton-acento">
                         <i class="ph-bold ph-hand-heart text-sm"></i>
                         CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS
                     </span>
-                    <h1 class="mt-3 text-3xl font-black tracking-tight text-[#2F3E5C] sm:text-4xl">
+                    <h1 class="mt-3 text-3xl font-black tracking-tight text-titulo sm:text-4xl">
                         Voluntariado
                     </h1>
-                    <p class="mt-2 max-w-2xl text-sm font-bold leading-relaxed text-[#2F3E5C]/72">
+                    <p class="mt-2 max-w-2xl text-sm font-bold leading-relaxed text-apoyo">
                         Gestión de voluntarios, disponibilidad, asignaciones, asistencia y reportes institucionales.
                     </p>
                 </div>
 
-                <div class="flex items-center gap-3 rounded-2xl border border-[#C7B5A3]/55 bg-[#F3ECE4]/68 px-4 py-3">
-                    <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#2F3E5C] text-white shadow-sm">
+                <div class="flex items-center gap-3 rounded-2xl border border-borde-suave bg-fondo-panel px-4 py-3">
+                    <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-boton-principal text-inverso shadow-sm">
                         <i class="ph-bold ph-users-three text-xl"></i>
                     </span>
                     <div>
-                        <p class="text-[10px] font-black uppercase tracking-[0.16em] text-[#2F3E5C]/52">Equipo activo</p>
-                        <p class="text-2xl font-black leading-none text-[#2F3E5C]">{{ number_format($stats['voluntarios_activos']) }}</p>
+                        <p class="text-[10px] font-black uppercase tracking-[0.16em] text-apoyo">Equipo activo</p>
+                        <p class="text-2xl font-black leading-none text-titulo">{{ number_format($stats['voluntarios_activos']) }}</p>
                     </div>
                 </div>
             </div>
@@ -31,20 +31,20 @@
         <section class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             @php
                 $tonoClases = [
-                    'azul' => ['icono' => 'bg-[#2F3E5C]/10 text-[#2F3E5C]', 'valor' => 'text-[#2F3E5C]', 'linea' => 'bg-[#2F3E5C]'],
-                    'verde' => ['icono' => 'bg-[#8DA280]/18 text-[#63775B]', 'valor' => 'text-[#63775B]', 'linea' => 'bg-[#8DA280]'],
-                    'terracota' => ['icono' => 'bg-[#E27D60]/12 text-[#E27D60]', 'valor' => 'text-[#E27D60]', 'linea' => 'bg-[#E27D60]'],
-                    'dorado' => ['icono' => 'bg-[#D9A05B]/16 text-[#9A6B2E]', 'valor' => 'text-[#9A6B2E]', 'linea' => 'bg-[#D9A05B]'],
-                    'neutro' => ['icono' => 'bg-[#D5C7B9]/60 text-[#7C7168]', 'valor' => 'text-[#7C7168]', 'linea' => 'bg-[#C7B5A3]'],
+                    'azul' => ['icono' => 'bg-fondo-panel text-titulo', 'valor' => 'text-titulo', 'linea' => 'bg-boton-principal'],
+                    'verde' => ['icono' => 'bg-estado-exitoBg text-estado-exito', 'valor' => 'text-estado-exito', 'linea' => 'bg-estado-exitoBg'],
+                    'terracota' => ['icono' => 'bg-estado-peligroBg text-boton-acento', 'valor' => 'text-boton-acento', 'linea' => 'bg-boton-acento'],
+                    'dorado' => ['icono' => 'bg-estado-advertenciaBg text-estado-advertencia', 'valor' => 'text-estado-advertencia', 'linea' => 'bg-estado-advertenciaBg'],
+                    'neutro' => ['icono' => 'bg-fondo-panel text-meta', 'valor' => 'text-meta', 'linea' => 'bg-fondo-panel'],
                 ];
             @endphp
 
             @foreach($metricas as $metrica)
                 @php($tono = $tonoClases[$metrica['tono']] ?? $tonoClases['azul'])
-                <article class="relative min-h-[128px] overflow-hidden rounded-2xl border border-[#C7B5A3]/55 bg-[#F3ECE4]/78 p-4 shadow-sm backdrop-blur-xl transition duration-300 hover:-translate-y-0.5 hover:border-[#E27D60]/35 hover:shadow-[0_16px_34px_rgba(47,62,92,0.11)]">
+                <article class="relative min-h-[128px] overflow-hidden rounded-2xl border border-borde-suave bg-fondo-panel p-4 shadow-sm backdrop-blur-xl transition duration-300 hover:-translate-y-0.5 hover:border-borde-focus hover:shadow-[0_16px_34px_rgba(47,62,92,0.11)]">
                     <div class="absolute inset-x-0 top-0 h-1 {{ $tono['linea'] }}"></div>
                     <div class="flex items-start justify-between gap-3">
-                        <p class="max-w-[11rem] text-[10px] font-black uppercase leading-snug tracking-[0.15em] text-[#2F3E5C]/55">
+                        <p class="max-w-[11rem] text-[10px] font-black uppercase leading-snug tracking-[0.15em] text-apoyo">
                             {{ $metrica['label'] }}
                         </p>
                         <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl {{ $tono['icono'] }}">
@@ -59,36 +59,36 @@
         </section>
 
         @if($sinDatos)
-            <section class="rounded-[1.5rem] border border-dashed border-[#C7B5A3]/80 bg-[#E6DDD3]/45 p-8 text-center shadow-inner">
-                <i class="ph-bold ph-hand-heart text-4xl text-[#2F3E5C]/25"></i>
-                <h2 class="mt-3 text-base font-black text-[#2F3E5C]">Resumen sin registros operativos</h2>
-                <p class="mx-auto mt-1 max-w-xl text-xs font-bold leading-relaxed text-[#2F3E5C]/58">
+            <section class="rounded-[1.5rem] border border-dashed border-borde-suave bg-fondo-panel p-8 text-center shadow-inner">
+                <i class="ph-bold ph-hand-heart text-4xl text-apoyo"></i>
+                <h2 class="mt-3 text-base font-black text-titulo">Resumen sin registros operativos</h2>
+                <p class="mx-auto mt-1 max-w-xl text-xs font-bold leading-relaxed text-apoyo">
                     Cuando existan voluntarios, disponibilidades, asignaciones o asistencias, este panel consolidará los indicadores principales.
                 </p>
             </section>
         @endif
 
-        <section class="rounded-[1.5rem] border border-[#C7B5A3]/65 bg-[#F3ECE4]/75 p-5 shadow-sm backdrop-blur-xl">
+        <section class="rounded-[1.5rem] border border-borde-suave bg-fondo-panel p-5 shadow-sm backdrop-blur-xl">
             <div class="mb-5 flex items-center justify-between gap-3">
                 <div>
-                    <span class="text-[10px] font-black uppercase tracking-[0.18em] text-[#E27D60]">Flujo operativo</span>
-                    <h2 class="mt-1 text-lg font-black text-[#2F3E5C]">Secuencia institucional de voluntariado</h2>
+                    <span class="text-[10px] font-black uppercase tracking-[0.18em] text-boton-acento">Flujo operativo</span>
+                    <h2 class="mt-1 text-lg font-black text-titulo">Secuencia institucional de voluntariado</h2>
                 </div>
-                <i class="ph-bold ph-flow-arrow text-2xl text-[#E27D60]"></i>
+                <i class="ph-bold ph-flow-arrow text-2xl text-boton-acento"></i>
             </div>
 
             <div class="grid gap-3 md:grid-cols-5">
                 @foreach($flujoOperativo as $paso)
-                    <div class="relative rounded-2xl border border-[#C7B5A3]/45 bg-[#E6DDD3]/58 px-4 py-4">
+                    <div class="relative rounded-2xl border border-borde-suave bg-fondo-panel px-4 py-4">
                         <div class="flex items-center gap-3">
-                            <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#2F3E5C]/10 text-[#2F3E5C]">
+                            <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-fondo-panel text-titulo">
                                 <i class="ph-bold {{ $paso['icono'] }} text-lg"></i>
                             </span>
-                            <p class="text-xs font-black leading-snug text-[#2F3E5C]">{{ $paso['label'] }}</p>
+                            <p class="text-xs font-black leading-snug text-titulo">{{ $paso['label'] }}</p>
                         </div>
 
                         @if(! $loop->last)
-                            <span class="absolute -right-2 top-1/2 z-10 hidden h-6 w-6 -translate-y-1/2 items-center justify-center rounded-full border border-[#C7B5A3]/65 bg-[#F3ECE4] text-[#E27D60] md:flex">
+                            <span class="absolute -right-2 top-1/2 z-10 hidden h-6 w-6 -translate-y-1/2 items-center justify-center rounded-full border border-borde-suave bg-fondo-app text-boton-acento md:flex">
                                 <i class="ph-bold ph-caret-right text-xs"></i>
                             </span>
                         @endif
@@ -99,98 +99,98 @@
 
         <section class="space-y-4">
             <div>
-                <span class="text-[10px] font-black uppercase tracking-[0.18em] text-[#E27D60]">Submódulos</span>
-                <h2 class="mt-1 text-lg font-black text-[#2F3E5C]">Acceso organizado</h2>
+                <span class="text-[10px] font-black uppercase tracking-[0.18em] text-boton-acento">Submódulos</span>
+                <h2 class="mt-1 text-lg font-black text-titulo">Acceso organizado</h2>
             </div>
 
             <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
                 @foreach($submodulos ?? [] as $item)
                     <a href="{{ $item['url'] }}"
-                       class="group min-h-[160px] rounded-2xl border p-4 shadow-sm transition duration-300 hover:-translate-y-0.5 hover:shadow-[0_16px_34px_rgba(47,62,92,0.11)] {{ $item['activo'] ? 'border-[#E27D60]/70 bg-[#E27D60]/10' : 'border-[#C7B5A3]/55 bg-[#F3ECE4]/78 hover:border-[#E27D60]/35' }}"
+                       class="group min-h-[160px] rounded-2xl border p-4 shadow-sm transition duration-300 hover:-translate-y-0.5 hover:shadow-[0_16px_34px_rgba(47,62,92,0.11)] {{ $item['activo'] ? 'border-borde-focus bg-estado-peligroBg' : 'border-borde-suave bg-fondo-panel hover:border-borde-focus' }}"
                        title="{{ $item['label'] }}">
                         <div class="flex items-start justify-between gap-3">
-                            <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl {{ $item['activo'] ? 'bg-[#E27D60] text-white' : 'bg-[#2F3E5C]/10 text-[#2F3E5C] group-hover:bg-[#E27D60]/12 group-hover:text-[#E27D60]' }}">
+                            <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl {{ $item['activo'] ? 'bg-boton-acento text-inverso' : 'bg-fondo-panel text-titulo group-hover:bg-estado-peligroBg group-hover:text-boton-acento' }}">
                                 <i class="ph-bold {{ $item['icono'] }} text-xl"></i>
                             </span>
-                            <span class="rounded-full bg-[#D5C7B9]/70 px-2.5 py-1 text-xs font-black uppercase tracking-wide text-[#2F3E5C]/62">
+                            <span class="rounded-full bg-fondo-panel px-2.5 py-1 text-xs font-black uppercase tracking-wide text-apoyo">
                                 {{ $item['dato'] }}
                             </span>
                         </div>
-                        <h3 class="mt-4 text-sm font-black text-[#2F3E5C]">{{ $item['label'] }}</h3>
-                        <p class="mt-2 text-xs font-bold leading-relaxed text-[#2F3E5C]/62">{{ $item['descripcion'] }}</p>
+                        <h3 class="mt-4 text-sm font-black text-titulo">{{ $item['label'] }}</h3>
+                        <p class="mt-2 text-xs font-bold leading-relaxed text-apoyo">{{ $item['descripcion'] }}</p>
                     </a>
                 @endforeach
             </div>
         </section>
 
         <section class="grid gap-5 lg:grid-cols-[1.15fr_0.85fr]">
-            <div class="rounded-[1.5rem] border border-[#C7B5A3]/65 bg-[#F3ECE4]/75 p-5 shadow-sm backdrop-blur-xl">
+            <div class="rounded-[1.5rem] border border-borde-suave bg-fondo-panel p-5 shadow-sm backdrop-blur-xl">
                 <div class="mb-4 flex items-center justify-between gap-3">
                     <div>
-                        <span class="text-[10px] font-black uppercase tracking-[0.18em] text-[#E27D60]">Agenda</span>
-                        <h2 class="mt-1 text-lg font-black text-[#2F3E5C]">Próximas asignaciones</h2>
+                        <span class="text-[10px] font-black uppercase tracking-[0.18em] text-boton-acento">Agenda</span>
+                        <h2 class="mt-1 text-lg font-black text-titulo">Próximas asignaciones</h2>
                     </div>
-                    <i class="ph-bold ph-calendar-check text-2xl text-[#63775B]"></i>
+                    <i class="ph-bold ph-calendar-check text-2xl text-estado-exito"></i>
                 </div>
 
                 <div class="space-y-3">
                     @forelse($proximasAsignaciones as $asignacion)
-                        <div class="flex flex-col gap-3 rounded-2xl border border-[#C7B5A3]/40 bg-[#E6DDD3]/50 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+                        <div class="flex flex-col gap-3 rounded-2xl border border-borde-suave bg-fondo-panel px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
                             <div class="min-w-0">
                                 <div class="flex flex-wrap items-center gap-2">
-                                    <span class="rounded-full bg-[#2F3E5C]/10 px-2.5 py-1 text-xs font-black uppercase tracking-wide text-[#2F3E5C]">
+                                    <span class="rounded-full bg-fondo-panel px-2.5 py-1 text-xs font-black uppercase tracking-wide text-titulo">
                                         {{ $asignacion['relativa'] }} · {{ $asignacion['fecha'] }}
                                     </span>
-                                    <span class="rounded-full bg-[#8DA280]/18 px-2.5 py-1 text-xs font-black uppercase tracking-wide text-[#63775B]">
+                                    <span class="rounded-full bg-estado-exitoBg px-2.5 py-1 text-xs font-black uppercase tracking-wide text-estado-exito">
                                         {{ $asignacion['estado'] }}
                                     </span>
                                 </div>
-                                <p class="mt-2 truncate text-sm font-black text-[#2F3E5C]">{{ $asignacion['voluntario'] }}</p>
-                                <p class="mt-1 text-xs font-bold leading-relaxed text-[#2F3E5C]/60">
+                                <p class="mt-2 truncate text-sm font-black text-titulo">{{ $asignacion['voluntario'] }}</p>
+                                <p class="mt-1 text-xs font-bold leading-relaxed text-apoyo">
                                     {{ $asignacion['adulto'] }} · {{ $asignacion['area'] }}
                                 </p>
                             </div>
-                            <span class="shrink-0 rounded-xl border border-[#C7B5A3]/45 bg-[#F3ECE4]/70 px-3 py-2 text-[10px] font-black uppercase tracking-wider text-[#2F3E5C]/55">
+                            <span class="shrink-0 rounded-xl border border-borde-suave bg-fondo-panel px-3 py-2 text-[10px] font-black uppercase tracking-wider text-apoyo">
                                 {{ $asignacion['codigo'] }}
                             </span>
                         </div>
                     @empty
-                        <div class="rounded-2xl border border-dashed border-[#C7B5A3]/70 bg-[#E6DDD3]/38 p-8 text-center">
-                            <i class="ph-bold ph-calendar-blank text-4xl text-[#2F3E5C]/25"></i>
-                            <h3 class="mt-3 text-sm font-black text-[#2F3E5C]">Sin próximas asignaciones</h3>
-                            <p class="mt-1 text-xs font-bold text-[#2F3E5C]/55">No hay asignaciones vigentes o programadas para mostrar.</p>
+                        <div class="rounded-2xl border border-dashed border-borde-suave bg-fondo-panel p-8 text-center">
+                            <i class="ph-bold ph-calendar-blank text-4xl text-apoyo"></i>
+                            <h3 class="mt-3 text-sm font-black text-titulo">Sin próximas asignaciones</h3>
+                            <p class="mt-1 text-xs font-bold text-apoyo">No hay asignaciones vigentes o programadas para mostrar.</p>
                         </div>
                     @endforelse
                 </div>
             </div>
 
-            <div class="rounded-[1.5rem] border border-[#C7B5A3]/65 bg-[#F3ECE4]/75 p-5 shadow-sm backdrop-blur-xl">
+            <div class="rounded-[1.5rem] border border-borde-suave bg-fondo-panel p-5 shadow-sm backdrop-blur-xl">
                 <div class="mb-4 flex items-center justify-between gap-3">
                     <div>
-                        <span class="text-[10px] font-black uppercase tracking-[0.18em] text-[#E27D60]">Seguimiento</span>
-                        <h2 class="mt-1 text-lg font-black text-[#2F3E5C]">Alertas operativas</h2>
+                        <span class="text-[10px] font-black uppercase tracking-[0.18em] text-boton-acento">Seguimiento</span>
+                        <h2 class="mt-1 text-lg font-black text-titulo">Alertas operativas</h2>
                     </div>
-                    <i class="ph-bold ph-warning-circle text-2xl text-[#E27D60]"></i>
+                    <i class="ph-bold ph-warning-circle text-2xl text-boton-acento"></i>
                 </div>
 
                 <div class="space-y-3">
                     @forelse($alertasOperativas as $alerta)
-                        <div class="rounded-2xl border border-[#C7B5A3]/40 bg-[#E6DDD3]/50 p-4">
+                        <div class="rounded-2xl border border-borde-suave bg-fondo-panel p-4">
                             <div class="flex gap-3">
-                                <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl {{ $alerta['tono'] === 'terracota' ? 'bg-[#E27D60]/12 text-[#E27D60]' : ($alerta['tono'] === 'dorado' ? 'bg-[#D9A05B]/16 text-[#9A6B2E]' : 'bg-[#2F3E5C]/10 text-[#2F3E5C]') }}">
+                                <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl {{ $alerta['tono'] === 'terracota' ? 'bg-estado-peligroBg text-boton-acento' : ($alerta['tono'] === 'dorado' ? 'bg-estado-advertenciaBg text-estado-advertencia' : 'bg-fondo-panel text-titulo') }}">
                                     <i class="ph-bold {{ $alerta['icono'] }} text-lg"></i>
                                 </span>
                                 <div class="min-w-0">
-                                    <h3 class="text-sm font-black text-[#2F3E5C]">{{ $alerta['titulo'] }}</h3>
-                                    <p class="mt-1 text-xs font-bold leading-relaxed text-[#2F3E5C]/62">{{ $alerta['detalle'] }}</p>
+                                    <h3 class="text-sm font-black text-titulo">{{ $alerta['titulo'] }}</h3>
+                                    <p class="mt-1 text-xs font-bold leading-relaxed text-apoyo">{{ $alerta['detalle'] }}</p>
                                 </div>
                             </div>
                         </div>
                     @empty
-                        <div class="rounded-2xl border border-[#8DA280]/35 bg-[#8DA280]/12 p-8 text-center">
-                            <i class="ph-bold ph-check-circle text-4xl text-[#63775B]"></i>
-                            <h3 class="mt-3 text-sm font-black text-[#2F3E5C]">Sin alertas operativas</h3>
-                            <p class="mt-1 text-xs font-bold text-[#2F3E5C]/55">Los indicadores del resumen no requieren seguimiento inmediato.</p>
+                        <div class="rounded-2xl border border-estado-exitoBorde bg-estado-exitoBg p-8 text-center">
+                            <i class="ph-bold ph-check-circle text-4xl text-estado-exito"></i>
+                            <h3 class="mt-3 text-sm font-black text-titulo">Sin alertas operativas</h3>
+                            <p class="mt-1 text-xs font-bold text-apoyo">Los indicadores del resumen no requieren seguimiento inmediato.</p>
                         </div>
                     @endforelse
                 </div>

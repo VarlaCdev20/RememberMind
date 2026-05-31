@@ -25,7 +25,7 @@
     <x-banner />
 
     <div x-data="{ sidebarOpen: false, sidebarCollapsed: false }"
-        class="rm-bg-app relative min-h-screen overflow-x-hidden font-outfit text-titulo selection:bg-boton-acento selection:text-white">
+        class="rm-bg-app relative min-h-screen overflow-x-hidden font-outfit text-titulo selection:bg-boton-acento selection:text-inverso">
         {{-- Fondos estéticos --}}
         <div class="rm-texture-dots pointer-events-none fixed inset-0 z-0 opacity-40"></div>
         <div class="rm-mouse-light pointer-events-none fixed inset-0 z-40"></div>

@@ -105,16 +105,16 @@
         {{-- CABECERA GESTIÓN DOCUMENTAL --}}
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
-                <h1 class="text-2xl font-black text-[#2F3E5C]">Gestión Documental</h1>
-                <p class="text-sm font-bold text-[#2F3E5C]/60 uppercase tracking-widest mt-1">
-                    Expediente de: <span class="text-[#E27D60]">{{ $nombreCompleto }}</span>
+                <h1 class="text-2xl font-black text-titulo">Gestión Documental</h1>
+                <p class="text-sm font-bold text-apoyo uppercase tracking-widest mt-1">
+                    Expediente de: <span class="text-boton-acento">{{ $nombreCompleto }}</span>
                 </p>
             </div>
             <div class="flex items-center gap-2">
-                <a href="{{ route('admin.adultos-mayores.show', ['adulto_mayor' => $adulto_mayor->cod_am, 'tab' => 'documentos']) }}" class="inline-flex items-center gap-2 rounded-xl border border-[#CBBBAA] bg-white px-4 py-2 text-xs font-black text-[#2F3E5C] transition hover:bg-[#F2EBE3]">
+                <a href="{{ route('admin.adultos-mayores.show', ['adulto_mayor' => $adulto_mayor->cod_am, 'tab' => 'documentos']) }}" class="inline-flex items-center gap-2 rounded-xl border border-borde bg-fondo-card px-4 py-2 text-xs font-black text-titulo transition hover:bg-fondo-panel">
                     <i class="ph-bold ph-arrow-left"></i> Volver a Ficha
                 </a>
-                <button type="button" @click="abrirRegistro()" class="inline-flex items-center gap-2 rounded-xl bg-[#2F3E5C] px-4 py-2 text-xs font-black text-white shadow-sm transition hover:bg-[#1F2E4C]">
+                <button type="button" @click="abrirRegistro()" class="inline-flex items-center gap-2 rounded-xl bg-boton-principal px-4 py-2 text-xs font-black text-inverso shadow-sm transition hover:bg-fondo-panel">
                     <i class="ph-bold ph-upload-simple text-base"></i> Registrar Documento
                 </button>
             </div>
@@ -122,29 +122,29 @@
 
         {{-- MÉTRICAS RESUMEN --}}
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div class="rounded-[24px] border border-[#CBBBAA]/60 bg-white p-5 shadow-sm">
-                <p class="text-xs font-black uppercase tracking-wide text-[#2F3E5C]/50">Total Documentos</p>
-                <p class="text-2xl font-black text-[#2F3E5C] mt-1">{{ $adulto_mayor->documentos->count() }}</p>
+            <div class="rounded-[24px] border border-borde bg-fondo-card p-5 shadow-sm">
+                <p class="text-xs font-black uppercase tracking-wide text-apoyo">Total Documentos</p>
+                <p class="text-2xl font-black text-titulo mt-1">{{ $adulto_mayor->documentos->count() }}</p>
             </div>
-            <div class="rounded-[24px] border border-[#CBBBAA]/60 bg-white p-5 shadow-sm">
-                <p class="text-xs font-black uppercase tracking-wide text-[#2F3E5C]/50">Archivos Activos</p>
-                <p class="text-2xl font-black text-[#617453] mt-1">{{ $documentosActivos->count() }}</p>
+            <div class="rounded-[24px] border border-borde bg-fondo-card p-5 shadow-sm">
+                <p class="text-xs font-black uppercase tracking-wide text-apoyo">Archivos Activos</p>
+                <p class="text-2xl font-black text-parrafo mt-1">{{ $documentosActivos->count() }}</p>
             </div>
-            <div class="rounded-[24px] border border-[#CBBBAA]/60 bg-white p-5 shadow-sm">
-                <p class="text-xs font-black uppercase tracking-wide text-[#2F3E5C]/50">Archivados</p>
+            <div class="rounded-[24px] border border-borde bg-fondo-card p-5 shadow-sm">
+                <p class="text-xs font-black uppercase tracking-wide text-apoyo">Archivados</p>
                 <p class="text-2xl font-black text-amber-600 mt-1">{{ $documentosArchivados->count() }}</p>
             </div>
         </div>
 
         {{-- TABLA DE DOCUMENTOS ACTIVOS --}}
-        <div class="rounded-[24px] border border-[#CBBBAA]/60 bg-white shadow-sm overflow-hidden">
-            <div class="px-6 py-4 border-b border-[#CBBBAA]/30 bg-[#F2EBE3]/30">
-                <h2 class="text-sm font-black text-[#2F3E5C] uppercase tracking-widest">Documentos del Expediente</h2>
+        <div class="rounded-[24px] border border-borde bg-fondo-card shadow-sm overflow-hidden">
+            <div class="px-6 py-4 border-b border-borde bg-fondo-panel">
+                <h2 class="text-sm font-black text-titulo uppercase tracking-widest">Documentos del Expediente</h2>
             </div>
             
             <div class="overflow-x-auto">
-                <table class="w-full text-left text-sm text-[#2F3E5C]">
-                    <thead class="bg-[#F2EBE3]/50 text-xs font-black uppercase tracking-wide text-[#2F3E5C]/60">
+                <table class="w-full text-left text-sm text-titulo">
+                    <thead class="bg-fondo-panel text-xs font-black uppercase tracking-wide text-apoyo">
                         <tr>
                             <th class="px-6 py-4">Documento</th>
                             <th class="px-6 py-4">Tipo</th>
@@ -155,10 +155,10 @@
                     </thead>
                     <tbody class="divide-y divide-[#CBBBAA]/20">
                         @forelse($adulto_mayor->documentos as $doc)
-                            <tr class="transition hover:bg-[#F2EBE3]/20 {{ $doc->trashed() ? 'opacity-60 bg-gray-50' : '' }}">
+                            <tr class="transition hover:bg-fondo-panel {{ $doc->trashed() ? 'opacity-60 bg-fondo-panel' : '' }}">
                                 <td class="px-6 py-4">
                                     <div class="flex items-center gap-3">
-                                        <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[#2F3E5C]/10 text-[#2F3E5C]">
+                                        <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-fondo-panel text-titulo">
                                             @if(in_array(strtolower(pathinfo($doc->ruta_archivo, PATHINFO_EXTENSION)), ['jpg', 'jpeg', 'png', 'webp']))
                                                 <i class="ph-bold ph-image text-xl"></i>
                                             @else
@@ -166,13 +166,13 @@
                                             @endif
                                         </div>
                                         <div>
-                                            <p class="font-black text-[#2F3E5C]">{{ $doc->titulo ?? $doc->nom_doc }}</p>
-                                            <p class="text-xs text-[#2F3E5C]/60 truncate max-w-xs">{{ $doc->observaciones ?? 'Sin observación' }}</p>
+                                            <p class="font-black text-titulo">{{ $doc->titulo ?? $doc->nom_doc }}</p>
+                                            <p class="text-xs text-apoyo truncate max-w-xs">{{ $doc->observaciones ?? 'Sin observación' }}</p>
                                         </div>
                                     </div>
                                 </td>
                                 <td class="px-6 py-4">
-                                    <span class="inline-flex rounded-md bg-[#F2EBE3] px-2 py-1 text-xs font-black uppercase tracking-wide text-[#2F3E5C]">
+                                    <span class="inline-flex rounded-md bg-fondo-panel px-2 py-1 text-xs font-black uppercase tracking-wide text-titulo">
                                         {{ $doc->tipo_documento ?? $doc->tipo_doc ?? 'Documento' }}
                                     </span>
                                 </td>
@@ -183,7 +183,7 @@
                                     @if($doc->trashed())
                                         <span class="text-xs font-black text-amber-600">ARCHIVADO</span>
                                     @else
-                                        <span class="text-xs font-black text-[#617453]">ACTIVO</span>
+                                        <span class="text-xs font-black text-parrafo">ACTIVO</span>
                                     @endif
                                 </td>
                                 <td class="px-6 py-4 text-right">
@@ -196,10 +196,10 @@
                                                 </button>
                                             </form>
                                         @else
-                                            <a href="{{ Storage::url($doc->ruta_archivo) }}" target="_blank" class="rounded-lg p-2 text-[#2F3E5C]/60 hover:bg-[#F2EBE3] hover:text-[#2F3E5C]" title="Ver/Descargar">
+                                            <a href="{{ Storage::url($doc->ruta_archivo) }}" target="_blank" class="rounded-lg p-2 text-apoyo hover:bg-fondo-panel hover:text-titulo" title="Ver/Descargar">
                                                 <i class="ph-bold ph-download-simple text-lg"></i>
                                             </a>
-                                            <button type="button" @click='abrirEdicion(@json($doc))' class="rounded-lg p-2 text-[#2F3E5C]/60 hover:bg-[#F2EBE3] hover:text-[#2F3E5C]" title="Editar Información">
+                                            <button type="button" @click='abrirEdicion(@json($doc))' class="rounded-lg p-2 text-apoyo hover:bg-fondo-panel hover:text-titulo" title="Editar Información">
                                                 <i class="ph-bold ph-pencil-simple text-lg"></i>
                                             </button>
                                             <form action="{{ route('admin.adultos-mayores.documentos.destroy', ['adulto_mayor' => $adulto_mayor->cod_am, 'documento' => $doc->cod_doc ?? $doc->id]) }}" method="POST" class="inline" onsubmit="return confirm('¿Archivar este documento?');">
@@ -215,10 +215,10 @@
                         @empty
                             <tr>
                                 <td colspan="5" class="px-6 py-12 text-center">
-                                    <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-[#F2EBE3]/50 text-[#2F3E5C]/30 mb-3">
+                                    <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-fondo-panel text-apoyo mb-3">
                                         <i class="ph-bold ph-folder-open text-3xl"></i>
                                     </div>
-                                    <p class="text-sm font-bold text-[#2F3E5C]/60">No hay documentos registrados para este adulto mayor.</p>
+                                    <p class="text-sm font-bold text-apoyo">No hay documentos registrados para este adulto mayor.</p>
                                 </td>
                             </tr>
                         @endforelse
@@ -229,18 +229,18 @@
 
         {{-- MODAL DE REGISTRO / EDICIÓN --}}
         <template x-if="modalDocumento">
-            <div class="fixed inset-0 z-50 flex items-center justify-center bg-[#2F3E5C]/45 p-4 backdrop-blur-sm" x-transition.opacity>
-                <div class="relative w-full max-w-md scale-100 rounded-[24px] bg-[#E7DDD2] shadow-2xl overflow-hidden" @click.stop x-transition>
-                    <div class="h-1.5 w-full bg-[#2F3E5C]"></div>
+            <div class="fixed inset-0 z-50 flex items-center justify-center bg-fondo-panel p-4 backdrop-blur-sm" x-transition.opacity>
+                <div class="relative w-full max-w-md scale-100 rounded-[24px] bg-fondo-panel shadow-2xl overflow-hidden" @click.stop x-transition>
+                    <div class="h-1.5 w-full bg-boton-principal"></div>
                     
-                    <div class="px-6 py-5 border-b border-[#CBBBAA]/30 flex justify-between items-center bg-white/50">
-                        <h3 class="text-lg font-black text-[#2F3E5C]" x-text="isEditingDoc ? 'Editar Metadatos del Documento' : 'Subir Nuevo Documento'"></h3>
-                        <button @click="cerrarModal()" class="text-[#2F3E5C]/50 hover:text-red-500 transition">
+                    <div class="px-6 py-5 border-b border-borde flex justify-between items-center bg-fondo-card/50">
+                        <h3 class="text-lg font-black text-titulo" x-text="isEditingDoc ? 'Editar Metadatos del Documento' : 'Subir Nuevo Documento'"></h3>
+                        <button @click="cerrarModal()" class="text-apoyo hover:text-red-500 transition">
                             <i class="ph-bold ph-x text-xl"></i>
                         </button>
                     </div>
 
-                    <div class="p-6 bg-white">
+                    <div class="p-6 bg-fondo-card">
                         <form :action="isEditingDoc ? '{{ url('admin/adultos-mayores/'.$adulto_mayor->cod_am.'/documentos') }}/' + docData.id : '{{ route('admin.adultos-mayores.documentos.store', $adulto_mayor->cod_am) }}'" method="POST" enctype="multipart/form-data" @submit="validarDocumento">
                             @csrf
                             <template x-if="isEditingDoc">
@@ -252,14 +252,14 @@
 
                             <div class="space-y-4">
                                 <div>
-                                    <label class="block text-xs font-black uppercase tracking-wide text-[#2F3E5C]/60 mb-1.5">Título / Nombre del Documento *</label>
-                                    <input type="text" name="nom_doc" x-model="docData.nom_doc" class="w-full rounded-xl border border-[#CBBBAA]/60 bg-white px-4 py-2.5 text-sm font-bold text-[#2F3E5C] focus:border-[#2F3E5C] focus:ring-0">
+                                    <label class="block text-xs font-black uppercase tracking-wide text-apoyo mb-1.5">Título / Nombre del Documento *</label>
+                                    <input type="text" name="nom_doc" x-model="docData.nom_doc" class="w-full rounded-xl border border-borde bg-fondo-card px-4 py-2.5 text-sm font-bold text-titulo focus:border-borde-fuerte focus:ring-0">
                                     <p x-show="errors.nom_doc" x-text="errors.nom_doc" class="mt-1 text-xs font-bold text-red-500"></p>
                                 </div>
 
                                 <div>
-                                    <label class="block text-xs font-black uppercase tracking-wide text-[#2F3E5C]/60 mb-1.5">Clasificación *</label>
-                                    <select name="tipo_doc" x-model="docData.tipo_doc" class="w-full rounded-xl border border-[#CBBBAA]/60 bg-white px-4 py-2.5 text-sm font-bold text-[#2F3E5C] focus:border-[#2F3E5C] focus:ring-0">
+                                    <label class="block text-xs font-black uppercase tracking-wide text-apoyo mb-1.5">Clasificación *</label>
+                                    <select name="tipo_doc" x-model="docData.tipo_doc" class="w-full rounded-xl border border-borde bg-fondo-card px-4 py-2.5 text-sm font-bold text-titulo focus:border-borde-fuerte focus:ring-0">
                                         <option value="">Seleccione tipo de documento</option>
                                         <option value="IDENTIDAD">Documento de Identidad (CI, Pasaporte)</option>
                                         <option value="MEDICO">Reporte Médico Ext.</option>
@@ -272,21 +272,21 @@
                                 </div>
 
                                 <div x-show="!isEditingDoc">
-                                    <label class="block text-xs font-black uppercase tracking-wide text-[#2F3E5C]/60 mb-1.5">Archivo a subir *</label>
-                                    <input type="file" name="archivo" accept=".pdf,image/jpeg,image/png,image/webp" class="block w-full text-sm text-[#2F3E5C]/70 file:mr-4 file:rounded-xl file:border-0 file:bg-[#2F3E5C]/10 file:px-4 file:py-2.5 file:text-xs file:font-black file:text-[#2F3E5C] hover:file:bg-[#2F3E5C]/20 cursor-pointer">
-                                    <p class="mt-1 text-xs font-bold text-[#2F3E5C]/40">Formatos permitidos: PDF, JPG, PNG (Max. 5MB)</p>
+                                    <label class="block text-xs font-black uppercase tracking-wide text-apoyo mb-1.5">Archivo a subir *</label>
+                                    <input type="file" name="archivo" accept=".pdf,image/jpeg,image/png,image/webp" class="block w-full text-sm text-apoyo file:mr-4 file:rounded-xl file:border-0 file:bg-fondo-panel file:px-4 file:py-2.5 file:text-xs file:font-black file:text-titulo hover:file:bg-fondo-panel cursor-pointer">
+                                    <p class="mt-1 text-xs font-bold text-apoyo">Formatos permitidos: PDF, JPG, PNG (Max. 5MB)</p>
                                     <p x-show="errors.archivo" x-text="errors.archivo" class="mt-1 text-xs font-bold text-red-500"></p>
                                 </div>
 
                                 <div>
-                                    <label class="block text-xs font-black uppercase tracking-wide text-[#2F3E5C]/60 mb-1.5">Observaciones adicionales</label>
-                                    <textarea name="observaciones" x-model="docData.observaciones" rows="2" class="w-full rounded-xl border border-[#CBBBAA]/60 bg-white px-4 py-2.5 text-sm font-bold text-[#2F3E5C] focus:border-[#2F3E5C] focus:ring-0" placeholder="Opcional..."></textarea>
+                                    <label class="block text-xs font-black uppercase tracking-wide text-apoyo mb-1.5">Observaciones adicionales</label>
+                                    <textarea name="observaciones" x-model="docData.observaciones" rows="2" class="w-full rounded-xl border border-borde bg-fondo-card px-4 py-2.5 text-sm font-bold text-titulo focus:border-borde-fuerte focus:ring-0" placeholder="Opcional..."></textarea>
                                 </div>
                             </div>
 
-                            <div class="mt-6 flex justify-end gap-3 border-t border-[#CBBBAA]/30 pt-5">
-                                <button type="button" @click="cerrarModal()" class="rounded-xl px-4 py-2.5 text-xs font-black text-[#2F3E5C]/60 hover:bg-[#F2EBE3] transition">Cancelar</button>
-                                <button type="submit" class="inline-flex items-center gap-2 rounded-xl bg-[#2F3E5C] px-5 py-2.5 text-xs font-black text-white shadow-sm hover:bg-[#1F2E4C] transition" :disabled="cargando">
+                            <div class="mt-6 flex justify-end gap-3 border-t border-borde pt-5">
+                                <button type="button" @click="cerrarModal()" class="rounded-xl px-4 py-2.5 text-xs font-black text-apoyo hover:bg-fondo-panel transition">Cancelar</button>
+                                <button type="submit" class="inline-flex items-center gap-2 rounded-xl bg-boton-principal px-5 py-2.5 text-xs font-black text-inverso shadow-sm hover:bg-fondo-panel transition" :disabled="cargando">
                                     <span x-show="!cargando" x-text="isEditingDoc ? 'Guardar Cambios' : 'Subir Documento'"></span>
                                     <span x-show="cargando">Procesando...</span>
                                 </button>

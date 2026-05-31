@@ -1,5 +1,5 @@
 <div
-    class="w-full max-w-full min-w-0 overflow-x-hidden min-h-[calc(100vh-8rem)] bg-[#F8F3ED]/45 px-4 py-5 text-[#2F3E5C] sm:px-6 lg:px-8"
+    class="w-full max-w-full min-w-0 overflow-x-hidden min-h-[calc(100vh-8rem)] bg-fondo-panel px-4 py-5 text-titulo sm:px-6 lg:px-8"
     x-data="{
         hoveredNode: null,
         selectedNode: null,
@@ -140,16 +140,16 @@
     @endonce
 
     <div class="mx-auto w-full max-w-[1480px] min-w-0 space-y-5">
-        <section class="overflow-hidden rounded-[1.45rem] border border-[#C7B5A3]/70 bg-[#E6DDD3]/75 shadow-[0_16px_46px_rgba(47,62,92,0.12)] backdrop-blur-xl">
+        <section class="overflow-hidden rounded-[1.45rem] border border-borde-suave bg-fondo-panel shadow-[0_16px_46px_rgba(47,62,92,0.12)] backdrop-blur-xl">
             <div class="h-1.5 bg-gradient-to-r from-[#E27D60] via-[#D9A05B] to-[#8DA280]"></div>
             <div class="flex flex-col gap-4 p-5 xl:flex-row xl:items-end xl:justify-between">
                 <div class="max-w-3xl">
-                    <span class="inline-flex items-center gap-2 rounded-full border border-[#E27D60]/25 bg-[#E27D60]/10 px-3 py-1 text-[10px] font-black uppercase tracking-[0.2em] text-[#E27D60]">
+                    <span class="inline-flex items-center gap-2 rounded-full border border-borde-focus bg-estado-peligroBg px-3 py-1 text-[10px] font-black uppercase tracking-[0.2em] text-boton-acento">
                         <i class="ph-bold ph-graph text-sm"></i>
                         Familia y Social
                     </span>
-                    <h1 class="mt-2 text-2xl font-black tracking-tight text-[#2F3E5C] sm:text-3xl">Red de apoyo</h1>
-                    <p class="mt-1 max-w-3xl text-sm font-bold leading-relaxed text-[#2F3E5C]/70">
+                    <h1 class="mt-2 text-2xl font-black tracking-tight text-titulo sm:text-3xl">Red de apoyo</h1>
+                    <p class="mt-1 max-w-3xl text-sm font-bold leading-relaxed text-apoyo">
                         Mapa interactivo de familiares, responsables, contactos de apoyo y voluntarios relacionados al adulto mayor.
                     </p>
                 </div>
@@ -159,7 +159,7 @@
                         <button
                             type="button"
                             wire:click="abrirVincular"
-                            class="inline-flex h-10 items-center justify-center gap-2 rounded-xl bg-[#E27D60] px-4 text-[11px] font-black uppercase tracking-wider text-white shadow-[0_8px_18px_rgba(226,125,96,0.22)] transition hover:-translate-y-0.5 hover:bg-[#D96F58] active:scale-95"
+                            class="inline-flex h-10 items-center justify-center gap-2 rounded-xl bg-boton-acento px-4 text-[11px] font-black uppercase tracking-wider text-inverso shadow-[0_8px_18px_rgba(226,125,96,0.22)] transition hover:-translate-y-0.5 hover:bg-fondo-panel active:scale-95"
                         >
                             <i class="ph-bold ph-plus-circle text-sm"></i>
                             Vincular familiar
@@ -169,7 +169,7 @@
                     <button
                         type="button"
                         wire:click="actualizarRed"
-                        class="inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-[#C7B5A3]/70 bg-[#F3ECE4]/85 px-4 text-[11px] font-black uppercase tracking-wider text-[#2F3E5C] shadow-sm transition hover:-translate-y-0.5 hover:border-[#8DA280]/60"
+                        class="inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-borde-suave bg-fondo-panel px-4 text-[11px] font-black uppercase tracking-wider text-titulo shadow-sm transition hover:-translate-y-0.5 hover:border-estado-exitoBorde"
                     >
                         <i class="ph-bold ph-arrows-clockwise text-sm"></i>
                         Actualizar red
@@ -178,7 +178,7 @@
                     @if($rutas['resumen'])
                         <a
                             href="{{ $rutas['resumen'] }}"
-                            class="inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-[#C7B5A3]/70 bg-[#F3ECE4]/65 px-4 text-[11px] font-black uppercase tracking-wider text-[#2F3E5C]/65 transition hover:-translate-y-0.5 hover:border-[#E27D60]/45"
+                            class="inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-borde-suave bg-fondo-panel px-4 text-[11px] font-black uppercase tracking-wider text-apoyo transition hover:-translate-y-0.5 hover:border-borde-focus"
                         >
                             <i class="ph-bold ph-arrow-u-up-left text-sm"></i>
                             Volver al resumen
@@ -188,25 +188,25 @@
             </div>
         </section>
 
-        <section class="grid gap-3 rounded-2xl border border-[#C7B5A3]/70 bg-[#F3ECE4]/80 p-4 shadow-sm backdrop-blur-xl lg:grid-cols-[1.1fr_1fr_auto] lg:items-end w-full max-w-full min-w-0">
+        <section class="grid gap-3 rounded-2xl border border-borde-suave bg-fondo-panel p-4 shadow-sm backdrop-blur-xl lg:grid-cols-[1.1fr_1fr_auto] lg:items-end w-full max-w-full min-w-0">
             <div>
-                <label class="mb-1 block text-[10px] font-black uppercase tracking-wider text-[#2F3E5C]/55">Buscar adulto mayor</label>
+                <label class="mb-1 block text-[10px] font-black uppercase tracking-wider text-apoyo">Buscar adulto mayor</label>
                 <div class="relative">
-                    <i class="ph-bold ph-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-[#2F3E5C]/40"></i>
+                    <i class="ph-bold ph-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-apoyo"></i>
                     <input
                         type="search"
                         wire:model.live.debounce.350ms="buscarAdulto"
-                        class="h-11 w-full rounded-xl border border-[#C7B5A3]/70 bg-[#E6DDD3]/70 pl-10 pr-3 text-sm font-bold text-[#2F3E5C] outline-none transition placeholder:text-[#2F3E5C]/40 focus:border-[#E27D60]"
+                        class="h-11 w-full rounded-xl border border-borde-suave bg-fondo-panel pl-10 pr-3 text-sm font-bold text-titulo outline-none transition placeholder:text-apoyo focus:border-borde-focus"
                         placeholder="Buscar por nombre o apellido"
                     >
                 </div>
             </div>
 
             <div>
-                <label class="mb-1 block text-[10px] font-black uppercase tracking-wider text-[#2F3E5C]/55">Seleccionar adulto mayor</label>
+                <label class="mb-1 block text-[10px] font-black uppercase tracking-wider text-apoyo">Seleccionar adulto mayor</label>
                 <select
                     wire:model.live="adultoSeleccionado"
-                    class="h-11 w-full rounded-xl border border-[#C7B5A3]/70 bg-[#E6DDD3]/70 px-3 text-sm font-bold text-[#2F3E5C] outline-none transition focus:border-[#E27D60]"
+                    class="h-11 w-full rounded-xl border border-borde-suave bg-fondo-panel px-3 text-sm font-bold text-titulo outline-none transition focus:border-borde-focus"
                 >
                     <option value="">Seleccione un adulto mayor</option>
                     @foreach($adultos as $opcion)
@@ -218,7 +218,7 @@
             <button
                 type="button"
                 wire:click="limpiarSeleccion"
-                class="inline-flex h-11 items-center justify-center gap-2 rounded-xl border border-[#C7B5A3]/70 bg-white/35 px-4 text-xs font-black text-[#2F3E5C] transition hover:border-[#E27D60]/45"
+                class="inline-flex h-11 items-center justify-center gap-2 rounded-xl border border-borde-suave bg-fondo-card/35 px-4 text-xs font-black text-titulo transition hover:border-borde-focus"
             >
                 <i class="ph-bold ph-broom"></i>
                 Limpiar
@@ -228,16 +228,16 @@
 
 
         <div class="w-full min-w-0">
-            <section class="w-full max-w-full min-w-0 overflow-hidden rounded-2xl border border-[#C7B5A3]/70 bg-[#F3ECE4]/80 shadow-sm backdrop-blur-xl">
-                <div class="flex flex-col gap-3 border-b border-[#C7B5A3]/55 px-4 py-3 xl:flex-row xl:items-center xl:justify-between">
+            <section class="w-full max-w-full min-w-0 overflow-hidden rounded-2xl border border-borde-suave bg-fondo-panel shadow-sm backdrop-blur-xl">
+                <div class="flex flex-col gap-3 border-b border-borde-suave px-4 py-3 xl:flex-row xl:items-center xl:justify-between">
                     <div>
-                        <h2 class="text-base font-black text-[#2F3E5C]">Árbol genealógico y social</h2>
-                        <p class="mt-1 text-xs font-bold text-[#2F3E5C]/58">Adulto mayor en la raíz, familiares directos y secundarios en ramas, apoyo institucional separado. Haga clic para detalles.</p>
+                        <h2 class="text-base font-black text-titulo">Árbol genealógico y social</h2>
+                        <p class="mt-1 text-xs font-bold text-apoyo">Adulto mayor en la raíz, familiares directos y secundarios en ramas, apoyo institucional separado. Haga clic para detalles.</p>
                     </div>
                     <div class="flex flex-wrap gap-2">
-                        <span class="rounded-full bg-[#2F3E5C] px-3 py-1 text-[11px] font-black text-white">Adulto mayor</span>
-                        <span class="rounded-full bg-[#E27D60]/15 px-3 py-1 text-[11px] font-black text-[#C75F46]">Responsable</span>
-                        <span class="rounded-full bg-[#8DA280]/15 px-3 py-1 text-[11px] font-black text-[#5F7E55]">Familia</span>
+                        <span class="rounded-full bg-boton-principal px-3 py-1 text-[11px] font-black text-inverso">Adulto mayor</span>
+                        <span class="rounded-full bg-estado-peligroBg px-3 py-1 text-[11px] font-black text-parrafo">Responsable</span>
+                        <span class="rounded-full bg-estado-exitoBg px-3 py-1 text-[11px] font-black text-parrafo">Familia</span>
                         <span class="rounded-full bg-sky-100 px-3 py-1 text-[11px] font-black text-sky-700">Apoyo institucional</span>
                     </div>
                 </div>
@@ -245,18 +245,18 @@
                 @if(!$adulto)
                     <div class="flex min-h-[360px] items-center justify-center p-6 text-center">
                         <div>
-                            <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-[#E6DDD3] text-[#2F3E5C]/35">
+                            <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-fondo-app text-apoyo">
                                 <i class="ph-bold ph-tree-structure text-3xl"></i>
                             </div>
-                            <h3 class="mt-4 text-base font-black text-[#2F3E5C]">Seleccione un adulto mayor para visualizar su árbol de red de apoyo.</h3>
-                            <p class="mx-auto mt-1 max-w-md text-sm font-bold text-[#2F3E5C]/55">El árbol jerárquico cargará familiares y voluntarios vinculados.</p>
+                            <h3 class="mt-4 text-base font-black text-titulo">Seleccione un adulto mayor para visualizar su árbol de red de apoyo.</h3>
+                            <p class="mx-auto mt-1 max-w-md text-sm font-bold text-apoyo">El árbol jerárquico cargará familiares y voluntarios vinculados.</p>
                         </div>
                     </div>
                 @else
                         <div x-data="window.redApoyoTree()" 
                              x-init="init()"
                              x-ref="container"
-                             class="relative w-full min-h-[420px] max-h-[520px] rounded-2xl border border-slate-200/70 bg-[#F8FAFC]/50 shadow-sm overflow-y-auto overflow-x-hidden px-2 py-6 md:p-6 flex flex-col items-center justify-start"
+                             class="relative w-full min-h-[420px] max-h-[520px] rounded-2xl border border-slate-200/70 bg-fondo-panel shadow-sm overflow-y-auto overflow-x-hidden px-2 py-6 md:p-6 flex flex-col items-center justify-start"
                         >
                             <!-- Capa SVG para líneas conectadas -->
                             <svg class="absolute inset-0 w-full h-full pointer-events-none z-0">
@@ -282,12 +282,12 @@
                                      class="flex flex-col items-center group cursor-pointer transition-transform hover:scale-105 border-none bg-transparent"
                                      :class="{ 'opacity-100 scale-105': nodoActivo === 'adulto-{{ $adulto->cod_am }}', 'opacity-50': nodoActivo && nodoActivo !== 'adulto-{{ $adulto->cod_am }}' }"
                                 >
-                                    <div class="flex h-16 w-16 items-center justify-center rounded-full bg-[#2F3E5C] border-[3px] border-[#475E88] text-white shadow-md">
+                                    <div class="flex h-16 w-16 items-center justify-center rounded-full bg-boton-principal border-[3px] border-borde text-inverso shadow-md">
                                         <span class="text-xl font-black">{{ $adultoIniciales }}</span>
                                     </div>
-                                    <div class="mt-2 text-center bg-white/80 px-2 py-1 rounded-lg backdrop-blur-sm">
-                                        <p class="text-sm font-black text-[#2F3E5C]">{{ Str::limit($adultoNombre, 20) }}</p>
-                                        <span class="mt-1 inline-block rounded-full bg-[#2F3E5C]/10 px-2.5 py-0.5 text-[10px] font-bold text-[#2F3E5C]">Adulto Mayor</span>
+                                    <div class="mt-2 text-center bg-fondo-card/80 px-2 py-1 rounded-lg backdrop-blur-sm">
+                                        <p class="text-sm font-black text-titulo">{{ Str::limit($adultoNombre, 20) }}</p>
+                                        <span class="mt-1 inline-block rounded-full bg-fondo-panel px-2.5 py-0.5 text-[10px] font-bold text-titulo">Adulto Mayor</span>
                                     </div>
                                 </button>
 
@@ -296,7 +296,7 @@
                                 @endphp
 
                                 @if($sinFamiliares)
-                                    <div class="text-center rounded-xl bg-white/80 p-4 border border-slate-200 shadow-sm max-w-sm mt-8 mx-auto relative z-10">
+                                    <div class="text-center rounded-xl bg-fondo-card/80 p-4 border border-slate-200 shadow-sm max-w-sm mt-8 mx-auto relative z-10">
                                         <i class="ph-bold ph-users text-2xl text-slate-400 mb-2"></i>
                                         <p class="text-xs font-bold text-slate-500">Este adulto mayor aún no tiene familiares o contactos vinculados en su red de apoyo.</p>
                                     </div>
@@ -306,20 +306,20 @@
                                         
                                         <!-- Grupo 1: Familia Directa (Cónyuge, Hijos -> Nietos) -->
                                         <div class="flex flex-col items-center justify-start gap-4 border-t-[3px] border-slate-300/60 pt-6 relative mt-4 md:mt-0 min-w-0 w-full">
-                                            <span class="absolute -top-3 bg-[#F8FAFC]/90 px-3 py-0.5 text-[9px] font-black text-slate-500 rounded-full border border-slate-200/60 shadow-sm">FAMILIA DIRECTA</span>
+                                            <span class="absolute -top-3 bg-fondo-panel px-3 py-0.5 text-[9px] font-black text-slate-500 rounded-full border border-slate-200/60 shadow-sm">FAMILIA DIRECTA</span>
                                             
                                             <div class="flex flex-wrap justify-center gap-3 max-w-full w-full">
                                                 @foreach(array_merge($gruposFamiliares['conyuge'], $gruposFamiliares['hijos']) as $fam)
                                                     @include('livewire.admin.familia-social._nodo-familiar', ['fam' => $fam])
                                                 @endforeach
                                                 @if(empty($gruposFamiliares['conyuge']) && empty($gruposFamiliares['hijos']))
-                                                    <p class="text-[9px] font-bold text-slate-400 bg-white/60 px-3 py-1 rounded-full border border-slate-100">Sin familia directa</p>
+                                                    <p class="text-[9px] font-bold text-slate-400 bg-fondo-card/60 px-3 py-1 rounded-full border border-slate-100">Sin familia directa</p>
                                                 @endif
                                             </div>
 
                                             @if(!empty($gruposFamiliares['nietos']))
                                                 <div class="w-full flex flex-col items-center mt-3 pt-4 border-t border-dashed border-slate-200/80 relative">
-                                                    <span class="text-[8px] font-black text-slate-400 mb-3 absolute -top-2 bg-[#F8FAFC]/90 px-2 rounded-full">NIETOS/AS</span>
+                                                    <span class="text-[8px] font-black text-slate-400 mb-3 absolute -top-2 bg-fondo-panel px-2 rounded-full">NIETOS/AS</span>
                                                     <div class="flex flex-wrap justify-center gap-3 max-w-full w-full">
                                                         @foreach($gruposFamiliares['nietos'] as $fam)
                                                             @include('livewire.admin.familia-social._nodo-familiar', ['fam' => $fam])
@@ -331,20 +331,20 @@
 
                                         <!-- Grupo 2: Hermanos -> Sobrinos -->
                                         <div class="flex flex-col items-center justify-start gap-4 border-t-[3px] border-slate-300/60 pt-6 relative mt-6 md:mt-0 min-w-0 w-full">
-                                            <span class="absolute -top-3 bg-[#F8FAFC]/90 px-3 py-0.5 text-[9px] font-black text-slate-500 rounded-full border border-slate-200/60 shadow-sm">HERMANOS/AS</span>
+                                            <span class="absolute -top-3 bg-fondo-panel px-3 py-0.5 text-[9px] font-black text-slate-500 rounded-full border border-slate-200/60 shadow-sm">HERMANOS/AS</span>
                                             
                                             <div class="flex flex-wrap justify-center gap-3 max-w-full w-full">
                                                 @foreach($gruposFamiliares['hermanos'] as $fam)
                                                     @include('livewire.admin.familia-social._nodo-familiar', ['fam' => $fam])
                                                 @endforeach
                                                 @if(empty($gruposFamiliares['hermanos']))
-                                                    <p class="text-[9px] font-bold text-slate-400 bg-white/60 px-3 py-1 rounded-full border border-slate-100">Sin hermanos/as</p>
+                                                    <p class="text-[9px] font-bold text-slate-400 bg-fondo-card/60 px-3 py-1 rounded-full border border-slate-100">Sin hermanos/as</p>
                                                 @endif
                                             </div>
 
                                             @if(!empty($gruposFamiliares['sobrinos']))
                                                 <div class="w-full flex flex-col items-center mt-3 pt-4 border-t border-dashed border-slate-200/80 relative">
-                                                    <span class="text-[8px] font-black text-slate-400 mb-3 absolute -top-2 bg-[#F8FAFC]/90 px-2 rounded-full">SOBRINOS/AS</span>
+                                                    <span class="text-[8px] font-black text-slate-400 mb-3 absolute -top-2 bg-fondo-panel px-2 rounded-full">SOBRINOS/AS</span>
                                                     <div class="flex flex-wrap justify-center gap-3 max-w-full w-full">
                                                         @foreach($gruposFamiliares['sobrinos'] as $fam)
                                                             @include('livewire.admin.familia-social._nodo-familiar', ['fam' => $fam])
@@ -356,14 +356,14 @@
 
                                         <!-- Grupo 3: Otros Contactos -->
                                         <div class="flex flex-col items-center justify-start gap-4 border-t-[3px] border-slate-300/60 pt-6 relative mt-6 md:mt-0 min-w-0 w-full">
-                                            <span class="absolute -top-3 bg-[#F8FAFC]/90 px-3 py-0.5 text-[9px] font-black text-slate-500 rounded-full border border-slate-200/60 shadow-sm">OTROS / CONTACTOS</span>
+                                            <span class="absolute -top-3 bg-fondo-panel px-3 py-0.5 text-[9px] font-black text-slate-500 rounded-full border border-slate-200/60 shadow-sm">OTROS / CONTACTOS</span>
                                             
                                             <div class="flex flex-wrap justify-center gap-3 max-w-full w-full">
                                                 @foreach($gruposFamiliares['otros'] as $fam)
                                                     @include('livewire.admin.familia-social._nodo-familiar', ['fam' => $fam])
                                                 @endforeach
                                                 @if(empty($gruposFamiliares['otros']))
-                                                    <p class="text-[9px] font-bold text-slate-400 bg-white/60 px-3 py-1 rounded-full border border-slate-100">Sin otros contactos</p>
+                                                    <p class="text-[9px] font-bold text-slate-400 bg-fondo-card/60 px-3 py-1 rounded-full border border-slate-100">Sin otros contactos</p>
                                                 @endif
                                             </div>
                                         </div>
@@ -374,10 +374,10 @@
                                 <!-- Nivel 2: Rama Institucional -->
                                 @if($voluntariosMapa->isNotEmpty() || $familiares->isNotEmpty())
                                     <div class="flex flex-col items-center mt-6 w-full">
-                                        <div id="nodo-inst" class="flex flex-col items-center bg-[#F5F3FF]/90 border-2 border-[#8B7BB8] rounded-xl px-4 py-1.5 shadow-sm z-10 backdrop-blur-sm">
+                                        <div id="nodo-inst" class="flex flex-col items-center bg-fondo-panel border-2 border-borde rounded-xl px-4 py-1.5 shadow-sm z-10 backdrop-blur-sm">
                                             <div class="flex items-center gap-1.5">
-                                                <i class="ph-bold ph-hand-heart text-[#5B21B6] text-base"></i>
-                                                <p class="text-[11px] font-black text-[#5B21B6]">Apoyo Institucional</p>
+                                                <i class="ph-bold ph-hand-heart text-parrafo text-base"></i>
+                                                <p class="text-[11px] font-black text-parrafo">Apoyo Institucional</p>
                                             </div>
                                         </div>
 
@@ -388,12 +388,12 @@
                                                          @click="seleccionarNodo('voluntario', '{{ $vol['cod_vol'] }}'); $wire.verDetalle('voluntario', '{{ $vol['cod_vol'] }}')"
                                                          :class="{ 'opacity-100 scale-105': nodoActivo === 'voluntario-{{ $vol['cod_vol'] }}', 'opacity-50': nodoActivo && nodoActivo !== 'voluntario-{{ $vol['cod_vol'] }}' }"
                                                     >
-                                                        <div class="flex h-10 w-10 items-center justify-center rounded-full bg-[#F0F9FF] border-2 border-[#5BA7C8] text-[#0369A1] shadow-sm">
+                                                        <div class="flex h-10 w-10 items-center justify-center rounded-full bg-fondo-panel border-2 border-borde text-parrafo shadow-sm">
                                                             <span class="text-sm font-black">{{ $vol['iniciales'] }}</span>
                                                         </div>
-                                                        <div class="mt-1.5 text-center bg-white/80 px-2 py-1 rounded-lg backdrop-blur-sm max-w-[100px]">
+                                                        <div class="mt-1.5 text-center bg-fondo-card/80 px-2 py-1 rounded-lg backdrop-blur-sm max-w-[100px]">
                                                             <p class="text-[11px] font-black text-slate-700 leading-tight">{{ Str::limit($vol['nombre'], 15) }}</p>
-                                                            <span class="mt-1 inline-block rounded-full bg-[#5BA7C8]/10 px-1.5 py-0.5 text-[8.5px] font-bold text-[#0369A1]">Voluntariado</span>
+                                                            <span class="mt-1 inline-block rounded-full bg-fondo-panel px-1.5 py-0.5 text-[8.5px] font-bold text-parrafo">Voluntariado</span>
                                                         </div>
                                                     </div>
                                                 @endforeach
@@ -414,19 +414,19 @@
             </section>
         </div>
 
-        <section class="w-full max-w-full min-w-0 overflow-hidden rounded-2xl border border-[#C7B5A3]/70 bg-[#F3ECE4]/80 p-4 shadow-sm backdrop-blur-xl">
+        <section class="w-full max-w-full min-w-0 overflow-hidden rounded-2xl border border-borde-suave bg-fondo-panel p-4 shadow-sm backdrop-blur-xl">
             <div class="mb-4 flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
                 <div>
-                    <h2 class="text-base font-black text-[#2F3E5C]">Vista administrativa de vínculos</h2>
-                    <p class="mt-1 text-xs font-bold text-[#2F3E5C]/58">Consulta, filtros y acciones seguras sobre la red seleccionada.</p>
+                    <h2 class="text-base font-black text-titulo">Vista administrativa de vínculos</h2>
+                    <p class="mt-1 text-xs font-bold text-apoyo">Consulta, filtros y acciones seguras sobre la red seleccionada.</p>
                 </div>
 
                 <div class="grid gap-2 sm:grid-cols-3 w-full max-w-full min-w-0">
                     <div class="relative">
-                        <i class="ph-bold ph-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-[#2F3E5C]/40"></i>
-                        <input type="search" wire:model.live.debounce.300ms="buscarPersona" class="h-10 w-full rounded-xl border border-[#C7B5A3]/70 bg-[#E6DDD3]/70 pl-9 pr-3 text-xs font-bold outline-none focus:border-[#E27D60]" placeholder="Buscar persona">
+                        <i class="ph-bold ph-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-apoyo"></i>
+                        <input type="search" wire:model.live.debounce.300ms="buscarPersona" class="h-10 w-full rounded-xl border border-borde-suave bg-fondo-panel pl-9 pr-3 text-xs font-bold outline-none focus:border-borde-focus" placeholder="Buscar persona">
                     </div>
-                    <select wire:model.live="filtroTipo" class="h-10 rounded-xl border border-[#C7B5A3]/70 bg-[#E6DDD3]/70 px-3 text-xs font-bold outline-none focus:border-[#E27D60]">
+                    <select wire:model.live="filtroTipo" class="h-10 rounded-xl border border-borde-suave bg-fondo-panel px-3 text-xs font-bold outline-none focus:border-borde-focus">
                         <option value="">Todos los vínculos</option>
                         <option value="familiar">Familiares</option>
                         <option value="responsable">Responsables</option>
@@ -434,7 +434,7 @@
                         <option value="voluntario">Voluntarios</option>
                         <option value="incompleto">Incompletos</option>
                     </select>
-                    <select wire:model.live="filtroEstado" class="h-10 rounded-xl border border-[#C7B5A3]/70 bg-[#E6DDD3]/70 px-3 text-xs font-bold outline-none focus:border-[#E27D60]">
+                    <select wire:model.live="filtroEstado" class="h-10 rounded-xl border border-borde-suave bg-fondo-panel px-3 text-xs font-bold outline-none focus:border-borde-focus">
                         <option value="">Todos los estados</option>
                         <option value="ACTIVO">Activos</option>
                         <option value="INACTIVO">Inactivos</option>
@@ -443,14 +443,14 @@
             </div>
 
             @if(!$adulto)
-                <div class="rounded-2xl border border-dashed border-[#C7B5A3]/70 bg-[#E6DDD3]/45 p-8 text-center">
-                    <i class="ph-bold ph-list-magnifying-glass text-3xl text-[#2F3E5C]/25"></i>
-                    <p class="mt-2 text-sm font-black text-[#2F3E5C]">Seleccione un adulto mayor para consultar vínculos.</p>
+                <div class="rounded-2xl border border-dashed border-borde-suave bg-fondo-panel p-8 text-center">
+                    <i class="ph-bold ph-list-magnifying-glass text-3xl text-apoyo"></i>
+                    <p class="mt-2 text-sm font-black text-titulo">Seleccione un adulto mayor para consultar vínculos.</p>
                 </div>
             @else
-                <div class="w-full overflow-x-auto rounded-2xl border border-[#C7B5A3]/55">
+                <div class="w-full overflow-x-auto rounded-2xl border border-borde-suave">
                     <table class="min-w-[1060px] w-full text-left text-sm table-fixed">
-                        <thead class="bg-[#E6DDD3]/80 text-[10px] font-black uppercase tracking-wider text-[#2F3E5C]/60">
+                        <thead class="bg-fondo-panel text-[10px] font-black uppercase tracking-wider text-apoyo">
                             <tr>
                                 <th class="px-4 py-3">Persona vinculada</th>
                                 <th class="px-4 py-3">Tipo</th>
@@ -463,52 +463,52 @@
                                 <th class="px-4 py-3 text-right">Acciones</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-[#C7B5A3]/45 bg-white/25">
+                        <tbody class="divide-y divide-[#C7B5A3]/45 bg-fondo-card/25">
                             @forelse($personasListado as $persona)
                                 <?php $personaNodeKey = $persona['tipo'] === 'familiar' ? 'familiar-' . $persona['cod_fam'] : 'voluntario-' . $persona['cod_vol']; ?>
-                                <tr class="transition hover:bg-white/45">
+                                <tr class="transition hover:bg-fondo-card/45">
                                     <td class="px-4 py-3">
                                         <div class="flex items-center gap-3">
-                                            <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl {{ $persona['tipo'] === 'voluntario' ? 'bg-sky-100 text-sky-700' : 'bg-[#8DA280]/15 text-[#5F7E55]' }} text-xs font-black">
+                                            <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl {{ $persona['tipo'] === 'voluntario' ? 'bg-sky-100 text-sky-700' : 'bg-estado-exitoBg text-parrafo' }} text-xs font-black">
                                                 {{ $persona['iniciales'] }}
                                             </span>
                                             <div class="min-w-0">
-                                                <p class="truncate text-sm font-black text-[#2F3E5C]">{{ $persona['nombre'] }}</p>
-                                                <p class="truncate text-[11px] font-bold text-[#2F3E5C]/50">{{ $persona['correo'] }}</p>
+                                                <p class="truncate text-sm font-black text-titulo">{{ $persona['nombre'] }}</p>
+                                                <p class="truncate text-[11px] font-bold text-apoyo">{{ $persona['correo'] }}</p>
                                             </div>
                                         </div>
                                     </td>
-                                    <td class="px-4 py-3 text-xs font-bold text-[#2F3E5C]/70">{{ $persona['tipo'] === 'voluntario' ? 'Voluntario' : 'Familiar' }}</td>
-                                    <td class="px-4 py-3 text-xs font-bold text-[#2F3E5C]/70">{{ $persona['parentesco'] }}</td>
-                                    <td class="px-4 py-3 text-xs font-bold text-[#2F3E5C]/70">{{ $persona['celular'] }}</td>
+                                    <td class="px-4 py-3 text-xs font-bold text-apoyo">{{ $persona['tipo'] === 'voluntario' ? 'Voluntario' : 'Familiar' }}</td>
+                                    <td class="px-4 py-3 text-xs font-bold text-apoyo">{{ $persona['parentesco'] }}</td>
+                                    <td class="px-4 py-3 text-xs font-bold text-apoyo">{{ $persona['celular'] }}</td>
                                     <td class="px-4 py-3">
-                                        <span class="rounded-full px-2.5 py-1 text-[10px] font-black {{ $persona['responsable'] ? 'bg-[#E27D60]/15 text-[#C75F46]' : 'bg-[#E6DDD3] text-[#2F3E5C]/55' }}">{{ $persona['responsable'] ? 'Sí' : 'No' }}</span>
+                                        <span class="rounded-full px-2.5 py-1 text-[10px] font-black {{ $persona['responsable'] ? 'bg-estado-peligroBg text-parrafo' : 'bg-fondo-app text-apoyo' }}">{{ $persona['responsable'] ? 'Sí' : 'No' }}</span>
                                     </td>
                                     <td class="px-4 py-3">
-                                        <span class="rounded-full px-2.5 py-1 text-[10px] font-black {{ $persona['emergencia'] ? 'bg-amber-100 text-amber-700' : 'bg-[#E6DDD3] text-[#2F3E5C]/55' }}">{{ $persona['emergencia'] ? 'Sí' : 'No' }}</span>
+                                        <span class="rounded-full px-2.5 py-1 text-[10px] font-black {{ $persona['emergencia'] ? 'bg-amber-100 text-amber-700' : 'bg-fondo-app text-apoyo' }}">{{ $persona['emergencia'] ? 'Sí' : 'No' }}</span>
                                     </td>
                                     <td class="px-4 py-3">
                                         <span class="rounded-full px-2.5 py-1 text-[10px] font-black {{ $persona['estado'] === 'ACTIVO' ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-600' }}">{{ $persona['estado_badge'] }}</span>
                                     </td>
-                                    <td class="px-4 py-3 text-xs font-bold text-[#2F3E5C]/60">{{ $persona['actualizado'] }}</td>
+                                    <td class="px-4 py-3 text-xs font-bold text-apoyo">{{ $persona['actualizado'] }}</td>
                                     <td class="px-4 py-3">
                                         <div class="flex justify-end gap-1.5">
-                                            <button type="button" wire:click.stop="abrirDetalleVinculo('{{ $persona['tipo'] }}', {{ $persona['tipo'] === 'familiar' ? $persona['cod_fam'] : $persona['cod_vol'] }})" @click="selectNode('{{ $personaNodeKey }}')" class="flex h-8 w-8 items-center justify-center rounded-lg bg-[#2F3E5C]/10 text-[#2F3E5C] transition hover:bg-[#2F3E5C] hover:text-white" title="Ver detalle">
+                                            <button type="button" wire:click.stop="abrirDetalleVinculo('{{ $persona['tipo'] }}', {{ $persona['tipo'] === 'familiar' ? $persona['cod_fam'] : $persona['cod_vol'] }})" @click="selectNode('{{ $personaNodeKey }}')" class="flex h-8 w-8 items-center justify-center rounded-lg bg-fondo-panel text-titulo transition hover:bg-boton-principal hover:text-inverso" title="Ver detalle">
                                                 <i class="ph-bold ph-eye"></i>
                                             </button>
 
                                             @if($persona['tipo'] === 'familiar')
                                                 @can('familiares.editar')
-                                                    <button type="button" wire:click="editarVinculo({{ $persona['vinculo_id'] }})" class="flex h-8 w-8 items-center justify-center rounded-lg bg-[#2F3E5C]/10 text-[#2F3E5C] transition hover:bg-[#2F3E5C] hover:text-white" title="Editar vínculo">
+                                                    <button type="button" wire:click="editarVinculo({{ $persona['vinculo_id'] }})" class="flex h-8 w-8 items-center justify-center rounded-lg bg-fondo-panel text-titulo transition hover:bg-boton-principal hover:text-inverso" title="Editar vínculo">
                                                         <i class="ph-bold ph-pencil-simple"></i>
                                                     </button>
                                                     @if(!$persona['responsable'])
-                                                        <button type="button" @click="confirmarRed({{ $persona['vinculo_id'] }}, 'responsable')" class="flex h-8 w-8 items-center justify-center rounded-lg bg-[#E27D60]/12 text-[#C75F46] transition hover:bg-[#E27D60] hover:text-white" title="Marcar responsable">
+                                                        <button type="button" @click="confirmarRed({{ $persona['vinculo_id'] }}, 'responsable')" class="flex h-8 w-8 items-center justify-center rounded-lg bg-estado-peligroBg text-parrafo transition hover:bg-boton-acento hover:text-inverso" title="Marcar responsable">
                                                             <i class="ph-bold ph-user-focus"></i>
                                                         </button>
                                                     @endif
                                                     @if(!$persona['emergencia'])
-                                                        <button type="button" @click="confirmarRed({{ $persona['vinculo_id'] }}, 'emergencia')" class="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-100 text-amber-700 transition hover:bg-amber-500 hover:text-white" title="Marcar emergencia">
+                                                        <button type="button" @click="confirmarRed({{ $persona['vinculo_id'] }}, 'emergencia')" class="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-100 text-amber-700 transition hover:bg-amber-500 hover:text-inverso" title="Marcar emergencia">
                                                             <i class="ph-bold ph-phone-call"></i>
                                                         </button>
                                                     @endif
@@ -516,13 +516,13 @@
 
                                                 @if($persona['estado'] === 'ACTIVO')
                                                     @can('familiares.anular')
-                                                        <button type="button" @click="confirmarRed({{ $persona['vinculo_id'] }}, 'desactivar')" class="flex h-8 w-8 items-center justify-center rounded-lg bg-rose-100 text-rose-700 transition hover:bg-rose-600 hover:text-white" title="Desactivar vínculo">
+                                                        <button type="button" @click="confirmarRed({{ $persona['vinculo_id'] }}, 'desactivar')" class="flex h-8 w-8 items-center justify-center rounded-lg bg-rose-100 text-rose-700 transition hover:bg-rose-600 hover:text-inverso" title="Desactivar vínculo">
                                                             <i class="ph-bold ph-user-minus"></i>
                                                         </button>
                                                     @endcan
                                                 @else
                                                     @can('familiares.editar')
-                                                        <button type="button" @click="confirmarRed({{ $persona['vinculo_id'] }}, 'activar')" class="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-100 text-emerald-700 transition hover:bg-emerald-600 hover:text-white" title="Reactivar vínculo">
+                                                        <button type="button" @click="confirmarRed({{ $persona['vinculo_id'] }}, 'activar')" class="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-100 text-emerald-700 transition hover:bg-emerald-600 hover:text-inverso" title="Reactivar vínculo">
                                                             <i class="ph-bold ph-user-plus"></i>
                                                         </button>
                                                     @endcan
@@ -534,9 +534,9 @@
                             @empty
                                 <tr>
                                     <td colspan="9" class="px-4 py-10 text-center">
-                                        <i class="ph-bold ph-users-three text-3xl text-[#2F3E5C]/25"></i>
-                                        <p class="mt-2 text-sm font-black text-[#2F3E5C]">No se encontraron vínculos con los filtros seleccionados.</p>
-                                        <p class="mt-1 text-xs font-bold text-[#2F3E5C]/55">Ajuste los filtros o vincule una persona a la red de apoyo.</p>
+                                        <i class="ph-bold ph-users-three text-3xl text-apoyo"></i>
+                                        <p class="mt-2 text-sm font-black text-titulo">No se encontraron vínculos con los filtros seleccionados.</p>
+                                        <p class="mt-1 text-xs font-bold text-apoyo">Ajuste los filtros o vincule una persona a la red de apoyo.</p>
                                     </td>
                                 </tr>
                             @endforelse
@@ -548,31 +548,31 @@
     </div>
 
     @if($mostrarFormulario)
-        <div class="fixed inset-0 z-[70] flex items-center justify-center bg-[#2F3E5C]/55 p-4 backdrop-blur-sm" wire:key="red-apoyo-modal">
-            <div class="flex max-h-[92vh] w-full max-w-3xl flex-col overflow-hidden rounded-[1.5rem] border border-[#C7B5A3]/70 bg-[#F3ECE4] shadow-2xl">
-                <div class="flex items-start justify-between gap-3 border-b border-[#C7B5A3]/60 p-5">
+        <div class="fixed inset-0 z-[70] flex items-center justify-center bg-fondo-panel p-4 backdrop-blur-sm" wire:key="red-apoyo-modal">
+            <div class="flex max-h-[92vh] w-full max-w-3xl flex-col overflow-hidden rounded-[1.5rem] border border-borde-suave bg-fondo-app shadow-2xl">
+                <div class="flex items-start justify-between gap-3 border-b border-borde-suave p-5">
                     <div>
-                        <h2 class="text-lg font-black text-[#2F3E5C]">{{ $modoEdicion ? 'Editar vínculo' : 'Vincular familiar o contacto de apoyo' }}</h2>
-                        <p class="mt-1 text-xs font-bold text-[#2F3E5C]/58">Gestione parentesco, contacto, responsable y estado del vínculo.</p>
+                        <h2 class="text-lg font-black text-titulo">{{ $modoEdicion ? 'Editar vínculo' : 'Vincular familiar o contacto de apoyo' }}</h2>
+                        <p class="mt-1 text-xs font-bold text-apoyo">Gestione parentesco, contacto, responsable y estado del vínculo.</p>
                     </div>
-                    <button type="button" wire:click="cerrarFormulario" class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#E6DDD3] text-[#2F3E5C] transition hover:bg-[#E27D60] hover:text-white">
+                    <button type="button" wire:click="cerrarFormulario" class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-fondo-app text-titulo transition hover:bg-boton-acento hover:text-inverso">
                         <i class="ph-bold ph-x"></i>
                     </button>
                 </div>
 
                 <form wire:submit.prevent="guardarVinculo" class="overflow-y-auto p-5">
                     @if($adulto)
-                        <div class="mb-4 rounded-2xl border border-[#C7B5A3]/60 bg-white/35 p-3">
-                            <p class="text-[10px] font-black uppercase tracking-wider text-[#2F3E5C]/50">Adulto mayor seleccionado</p>
-                            <p class="mt-1 text-sm font-black text-[#2F3E5C]">{{ $adultoNombre }}</p>
+                        <div class="mb-4 rounded-2xl border border-borde-suave bg-fondo-card/35 p-3">
+                            <p class="text-[10px] font-black uppercase tracking-wider text-apoyo">Adulto mayor seleccionado</p>
+                            <p class="mt-1 text-sm font-black text-titulo">{{ $adultoNombre }}</p>
                         </div>
                     @endif
 
                     <div class="grid gap-4 md:grid-cols-2">
                         @if(!$modoEdicion)
                             <div class="md:col-span-2">
-                                <label class="mb-1 block text-[10px] font-black uppercase text-[#2F3E5C]/60">Familiar registrado existente</label>
-                                <select wire:model.live="form.cod_fam" class="w-full rounded-xl border border-[#C7B5A3] bg-[#D5C7B9]/70 px-4 py-3 text-sm font-bold outline-none focus:border-[#E27D60]">
+                                <label class="mb-1 block text-[10px] font-black uppercase text-apoyo">Familiar registrado existente</label>
+                                <select wire:model.live="form.cod_fam" class="w-full rounded-xl border border-borde-suave bg-fondo-panel px-4 py-3 text-sm font-bold outline-none focus:border-borde-focus">
                                     <option value="">Crear nuevo familiar/contacto</option>
                                     @foreach($familiaresDisponibles as $familiarDisponible)
                                         <option value="{{ $familiarDisponible['cod_fam'] }}">{{ $familiarDisponible['nombre'] }} · {{ $familiarDisponible['parentesco'] }}</option>
@@ -583,26 +583,26 @@
                         @endif
 
                         <div>
-                            <label class="mb-1 block text-[10px] font-black uppercase text-[#2F3E5C]/60">Nombres</label>
-                            <input wire:model="form.nombres" type="text" class="w-full rounded-xl border {{ $errors->has('form.nombres') ? 'border-rose-500 bg-rose-50' : 'border-[#C7B5A3] bg-[#D5C7B9]/70' }} px-4 py-3 text-sm font-bold outline-none focus:border-[#E27D60]" placeholder="Ej. María Elena">
+                            <label class="mb-1 block text-[10px] font-black uppercase text-apoyo">Nombres</label>
+                            <input wire:model="form.nombres" type="text" class="w-full rounded-xl border {{ $errors->has('form.nombres') ? 'border-rose-500 bg-rose-50' : 'border-borde-suave bg-fondo-panel' }} px-4 py-3 text-sm font-bold outline-none focus:border-borde-focus" placeholder="Ej. María Elena">
                             @error('form.nombres') <span class="mt-1 block text-xs font-black text-rose-600">{{ $message }}</span> @enderror
                         </div>
 
                         <div>
-                            <label class="mb-1 block text-[10px] font-black uppercase text-[#2F3E5C]/60">Apellido paterno</label>
-                            <input wire:model="form.ap_paterno" type="text" class="w-full rounded-xl border {{ $errors->has('form.ap_paterno') ? 'border-rose-500 bg-rose-50' : 'border-[#C7B5A3] bg-[#D5C7B9]/70' }} px-4 py-3 text-sm font-bold outline-none focus:border-[#E27D60]" placeholder="Ej. Pérez">
+                            <label class="mb-1 block text-[10px] font-black uppercase text-apoyo">Apellido paterno</label>
+                            <input wire:model="form.ap_paterno" type="text" class="w-full rounded-xl border {{ $errors->has('form.ap_paterno') ? 'border-rose-500 bg-rose-50' : 'border-borde-suave bg-fondo-panel' }} px-4 py-3 text-sm font-bold outline-none focus:border-borde-focus" placeholder="Ej. Pérez">
                             @error('form.ap_paterno') <span class="mt-1 block text-xs font-black text-rose-600">{{ $message }}</span> @enderror
                         </div>
 
                         <div>
-                            <label class="mb-1 block text-[10px] font-black uppercase text-[#2F3E5C]/60">Apellido materno</label>
-                            <input wire:model="form.ap_materno" type="text" class="w-full rounded-xl border border-[#C7B5A3] bg-[#D5C7B9]/70 px-4 py-3 text-sm font-bold outline-none focus:border-[#E27D60]" placeholder="Opcional">
+                            <label class="mb-1 block text-[10px] font-black uppercase text-apoyo">Apellido materno</label>
+                            <input wire:model="form.ap_materno" type="text" class="w-full rounded-xl border border-borde-suave bg-fondo-panel px-4 py-3 text-sm font-bold outline-none focus:border-borde-focus" placeholder="Opcional">
                             @error('form.ap_materno') <span class="mt-1 block text-xs font-black text-rose-600">{{ $message }}</span> @enderror
                         </div>
 
                         <div>
-                            <label class="mb-1 block text-[10px] font-black uppercase text-[#2F3E5C]/60">Parentesco / rol</label>
-                            <select wire:model="form.parentesco_vinculo" class="w-full rounded-xl border {{ $errors->has('form.parentesco_vinculo') ? 'border-rose-500 bg-rose-50' : 'border-[#C7B5A3] bg-[#D5C7B9]/70' }} px-4 py-3 text-sm font-bold outline-none focus:border-[#E27D60]">
+                            <label class="mb-1 block text-[10px] font-black uppercase text-apoyo">Parentesco / rol</label>
+                            <select wire:model="form.parentesco_vinculo" class="w-full rounded-xl border {{ $errors->has('form.parentesco_vinculo') ? 'border-rose-500 bg-rose-50' : 'border-borde-suave bg-fondo-panel' }} px-4 py-3 text-sm font-bold outline-none focus:border-borde-focus">
                                 <option value="">Seleccione parentesco</option>
                                 <option value="Hijo/a">Hijo/a</option>
                                 <option value="Cónyuge">Cónyuge</option>
@@ -617,26 +617,26 @@
                         </div>
 
                         <div>
-                            <label class="mb-1 block text-[10px] font-black uppercase text-[#2F3E5C]/60">Celular</label>
-                            <input wire:model="form.telefono" type="text" class="w-full rounded-xl border {{ $errors->has('form.telefono') ? 'border-rose-500 bg-rose-50' : 'border-[#C7B5A3] bg-[#D5C7B9]/70' }} px-4 py-3 text-sm font-bold outline-none focus:border-[#E27D60]" placeholder="Ej. 70000000">
+                            <label class="mb-1 block text-[10px] font-black uppercase text-apoyo">Celular</label>
+                            <input wire:model="form.telefono" type="text" class="w-full rounded-xl border {{ $errors->has('form.telefono') ? 'border-rose-500 bg-rose-50' : 'border-borde-suave bg-fondo-panel' }} px-4 py-3 text-sm font-bold outline-none focus:border-borde-focus" placeholder="Ej. 70000000">
                             @error('form.telefono') <span class="mt-1 block text-xs font-black text-rose-600">{{ $message }}</span> @enderror
                         </div>
 
                         <div>
-                            <label class="mb-1 block text-[10px] font-black uppercase text-[#2F3E5C]/60">Correo</label>
-                            <input wire:model="form.correo" type="email" class="w-full rounded-xl border {{ $errors->has('form.correo') ? 'border-rose-500 bg-rose-50' : 'border-[#C7B5A3] bg-[#D5C7B9]/70' }} px-4 py-3 text-sm font-bold outline-none focus:border-[#E27D60]" placeholder="Opcional">
+                            <label class="mb-1 block text-[10px] font-black uppercase text-apoyo">Correo</label>
+                            <input wire:model="form.correo" type="email" class="w-full rounded-xl border {{ $errors->has('form.correo') ? 'border-rose-500 bg-rose-50' : 'border-borde-suave bg-fondo-panel' }} px-4 py-3 text-sm font-bold outline-none focus:border-borde-focus" placeholder="Opcional">
                             @error('form.correo') <span class="mt-1 block text-xs font-black text-rose-600">{{ $message }}</span> @enderror
                         </div>
 
                         <div class="md:col-span-2">
-                            <label class="mb-1 block text-[10px] font-black uppercase text-[#2F3E5C]/60">Dirección</label>
-                            <input wire:model="form.direccion" type="text" class="w-full rounded-xl border {{ $errors->has('form.direccion') ? 'border-rose-500 bg-rose-50' : 'border-[#C7B5A3] bg-[#D5C7B9]/70' }} px-4 py-3 text-sm font-bold outline-none focus:border-[#E27D60]" placeholder="Zona, calle o referencia">
+                            <label class="mb-1 block text-[10px] font-black uppercase text-apoyo">Dirección</label>
+                            <input wire:model="form.direccion" type="text" class="w-full rounded-xl border {{ $errors->has('form.direccion') ? 'border-rose-500 bg-rose-50' : 'border-borde-suave bg-fondo-panel' }} px-4 py-3 text-sm font-bold outline-none focus:border-borde-focus" placeholder="Zona, calle o referencia">
                             @error('form.direccion') <span class="mt-1 block text-xs font-black text-rose-600">{{ $message }}</span> @enderror
                         </div>
 
                         <div>
-                            <label class="mb-1 block text-[10px] font-black uppercase text-[#2F3E5C]/60">Estado del vínculo</label>
-                            <select wire:model="form.estado" class="w-full rounded-xl border {{ $errors->has('form.estado') ? 'border-rose-500 bg-rose-50' : 'border-[#C7B5A3] bg-[#D5C7B9]/70' }} px-4 py-3 text-sm font-bold outline-none focus:border-[#E27D60]">
+                            <label class="mb-1 block text-[10px] font-black uppercase text-apoyo">Estado del vínculo</label>
+                            <select wire:model="form.estado" class="w-full rounded-xl border {{ $errors->has('form.estado') ? 'border-rose-500 bg-rose-50' : 'border-borde-suave bg-fondo-panel' }} px-4 py-3 text-sm font-bold outline-none focus:border-borde-focus">
                                 <option value="ACTIVO">Activo</option>
                                 <option value="INACTIVO">Inactivo</option>
                             </select>
@@ -644,28 +644,28 @@
                         </div>
 
                         <div class="grid gap-2">
-                            <label class="flex items-center justify-between rounded-xl border border-[#C7B5A3]/60 bg-white/35 px-4 py-3 text-sm font-black text-[#2F3E5C]">
+                            <label class="flex items-center justify-between rounded-xl border border-borde-suave bg-fondo-card/35 px-4 py-3 text-sm font-black text-titulo">
                                 Responsable principal
-                                <input wire:model="form.es_responsable" type="checkbox" class="h-5 w-5 rounded border-[#C7B5A3] text-[#E27D60] focus:ring-[#E27D60]">
+                                <input wire:model="form.es_responsable" type="checkbox" class="h-5 w-5 rounded border-borde-suave text-boton-acento focus:ring-[#E27D60]">
                             </label>
-                            <label class="flex items-center justify-between rounded-xl border border-[#C7B5A3]/60 bg-white/35 px-4 py-3 text-sm font-black text-[#2F3E5C]">
+                            <label class="flex items-center justify-between rounded-xl border border-borde-suave bg-fondo-card/35 px-4 py-3 text-sm font-black text-titulo">
                                 Contacto de emergencia
-                                <input wire:model="form.es_contacto_emergencia" type="checkbox" class="h-5 w-5 rounded border-[#C7B5A3] text-[#E27D60] focus:ring-[#E27D60]">
+                                <input wire:model="form.es_contacto_emergencia" type="checkbox" class="h-5 w-5 rounded border-borde-suave text-boton-acento focus:ring-[#E27D60]">
                             </label>
                         </div>
 
                         <div class="md:col-span-2">
-                            <label class="mb-1 block text-[10px] font-black uppercase text-[#2F3E5C]/60">Observación administrativa</label>
-                            <textarea wire:model="form.observaciones" rows="3" class="w-full rounded-xl border {{ $errors->has('form.observaciones') ? 'border-rose-500 bg-rose-50' : 'border-[#C7B5A3] bg-[#D5C7B9]/70' }} px-4 py-3 text-sm font-bold outline-none focus:border-[#E27D60]" placeholder="Restricciones de visita, referencia familiar, horarios de contacto u observaciones relevantes."></textarea>
+                            <label class="mb-1 block text-[10px] font-black uppercase text-apoyo">Observación administrativa</label>
+                            <textarea wire:model="form.observaciones" rows="3" class="w-full rounded-xl border {{ $errors->has('form.observaciones') ? 'border-rose-500 bg-rose-50' : 'border-borde-suave bg-fondo-panel' }} px-4 py-3 text-sm font-bold outline-none focus:border-borde-focus" placeholder="Restricciones de visita, referencia familiar, horarios de contacto u observaciones relevantes."></textarea>
                             @error('form.observaciones') <span class="mt-1 block text-xs font-black text-rose-600">{{ $message }}</span> @enderror
                         </div>
                     </div>
 
-                    <div class="mt-5 flex flex-col-reverse gap-2 border-t border-[#C7B5A3]/60 pt-4 sm:flex-row sm:justify-end">
-                        <button type="button" wire:click="cerrarFormulario" class="inline-flex h-10 items-center justify-center rounded-xl border border-[#C7B5A3]/70 bg-white/35 px-4 text-xs font-black text-[#2F3E5C] transition hover:bg-white/60">
+                    <div class="mt-5 flex flex-col-reverse gap-2 border-t border-borde-suave pt-4 sm:flex-row sm:justify-end">
+                        <button type="button" wire:click="cerrarFormulario" class="inline-flex h-10 items-center justify-center rounded-xl border border-borde-suave bg-fondo-card/35 px-4 text-xs font-black text-titulo transition hover:bg-fondo-card/60">
                             Cancelar
                         </button>
-                        <button type="submit" class="inline-flex h-10 items-center justify-center gap-2 rounded-xl bg-[#E27D60] px-5 text-xs font-black text-white shadow-[0_8px_18px_rgba(226,125,96,0.22)] transition hover:bg-[#D96F58]">
+                        <button type="submit" class="inline-flex h-10 items-center justify-center gap-2 rounded-xl bg-boton-acento px-5 text-xs font-black text-inverso shadow-[0_8px_18px_rgba(226,125,96,0.22)] transition hover:bg-fondo-panel">
                             <i class="ph-bold ph-floppy-disk"></i>
                             {{ $modoEdicion ? 'Guardar cambios' : 'Vincular persona' }}
                         </button>
@@ -678,30 +678,30 @@
     <!-- MODAL DE CONSULTA DE DETALLE DEL VÍNCULO -->
     @if($modalDetalleVinculo && $detalleVinculo)
         <div class="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4">
-            <div class="w-full max-w-3xl max-h-[85vh] overflow-hidden rounded-2xl bg-[#F8FAFC] shadow-2xl flex flex-col border border-slate-200/60" @click.away="$wire.cerrarDetalleVinculo()">
-                <div class="flex items-center justify-between border-b border-slate-200/70 bg-white px-5 py-4">
+            <div class="w-full max-w-3xl max-h-[85vh] overflow-hidden rounded-2xl bg-fondo-panel shadow-2xl flex flex-col border border-slate-200/60" @click.away="$wire.cerrarDetalleVinculo()">
+                <div class="flex items-center justify-between border-b border-slate-200/70 bg-fondo-card px-5 py-4">
                     <div class="flex items-center gap-2">
-                        <i class="ph-bold ph-identification-card text-xl text-[#2F3E5C]"></i>
-                        <h2 class="text-base font-black text-[#2F3E5C]">Detalle de Persona</h2>
+                        <i class="ph-bold ph-identification-card text-xl text-titulo"></i>
+                        <h2 class="text-base font-black text-titulo">Detalle de Persona</h2>
                     </div>
                     <button type="button" wire:click="cerrarDetalleVinculo" class="rounded-lg p-1.5 text-slate-400 hover:bg-rose-50 hover:text-rose-500 transition focus:outline-none">
                         <i class="ph-bold ph-x text-lg"></i>
                     </button>
                 </div>
                 
-                <div class="overflow-y-auto p-5 sm:p-6 bg-[#F8FAFC]">
+                <div class="overflow-y-auto p-5 sm:p-6 bg-fondo-panel">
                     <div class="flex flex-col sm:flex-row items-center sm:items-start gap-5">
                         <div class="flex h-20 w-20 shrink-0 items-center justify-center rounded-[1.25rem] shadow-sm text-2xl font-black 
                             {{ $detalleVinculo['tipo'] === 'voluntario' ? 'bg-sky-100 text-sky-700 border-2 border-sky-200' : 
-                              ($detalleVinculo['tipo'] === 'adulto' ? 'bg-[#2F3E5C] text-white border-2 border-[#475E88]' : 
-                              'bg-[#E27D60]/15 text-[#C75F46] border-2 border-[#E27D60]/30') }}">
+                              ($detalleVinculo['tipo'] === 'adulto' ? 'bg-boton-principal text-inverso border-2 border-borde' : 
+                              'bg-estado-peligroBg text-parrafo border-2 border-borde-focus') }}">
                             {{ strtoupper(mb_substr($detalleVinculo['nombre_completo'], 0, 1)) }}
                         </div>
                         
                         <div class="flex-1 text-center sm:text-left min-w-0">
-                            <h3 class="text-lg font-black text-[#2F3E5C] truncate max-w-full">{{ $detalleVinculo['nombre_completo'] }}</h3>
+                            <h3 class="text-lg font-black text-titulo truncate max-w-full">{{ $detalleVinculo['nombre_completo'] }}</h3>
                             <div class="mt-1 flex flex-wrap items-center justify-center sm:justify-start gap-2">
-                                <span class="rounded-full bg-white border border-slate-200 px-2.5 py-0.5 text-[11px] font-black text-slate-600 shadow-sm">
+                                <span class="rounded-full bg-fondo-card border border-slate-200 px-2.5 py-0.5 text-[11px] font-black text-slate-600 shadow-sm">
                                     {{ $detalleVinculo['parentesco'] ?? ($detalleVinculo['tipo'] === 'adulto' ? 'Adulto Mayor' : 'Voluntariado') }}
                                 </span>
                                 @if($detalleVinculo['tipo'] === 'adulto' && isset($detalleVinculo['edad']))
@@ -718,100 +718,100 @@
 
                     <div class="mt-6 space-y-4">
                         @if($detalleVinculo['tipo'] === 'adulto')
-                            <div class="rounded-xl border border-slate-200/70 bg-white p-4 shadow-sm">
+                            <div class="rounded-xl border border-slate-200/70 bg-fondo-card p-4 shadow-sm">
                                 <h4 class="mb-3 text-[10px] font-black uppercase tracking-widest text-slate-400 border-b border-slate-100 pb-2">Sección 3: Rol dentro de la red</h4>
                                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-y-4 gap-x-6 text-sm">
                                     <div>
                                         <p class="text-[10px] font-bold uppercase text-slate-400">Responsable Principal</p>
-                                        <p class="mt-0.5 font-black text-[#2F3E5C]">{{ $metricas['responsable'] ?? 'No definido' }}</p>
+                                        <p class="mt-0.5 font-black text-titulo">{{ $metricas['responsable'] ?? 'No definido' }}</p>
                                     </div>
                                     <div>
                                         <p class="text-[10px] font-bold uppercase text-slate-400">Contacto de Emergencia</p>
-                                        <p class="mt-0.5 font-black text-[#2F3E5C]">{{ ($metricas['emergencias'] ?? 0) > 0 ? 'Sí' : 'No definido' }}</p>
+                                        <p class="mt-0.5 font-black text-titulo">{{ ($metricas['emergencias'] ?? 0) > 0 ? 'Sí' : 'No definido' }}</p>
                                     </div>
                                     <div>
                                         <p class="text-[10px] font-bold uppercase text-slate-400">Familiares Vinculados</p>
-                                        <p class="mt-0.5 font-black text-[#2F3E5C]">{{ $metricas['familiares'] ?? 0 }} personas</p>
+                                        <p class="mt-0.5 font-black text-titulo">{{ $metricas['familiares'] ?? 0 }} personas</p>
                                     </div>
                                     <div>
                                         <p class="text-[10px] font-bold uppercase text-slate-400">Voluntarios Relacionados</p>
-                                        <p class="mt-0.5 font-black text-[#2F3E5C]">{{ $metricas['voluntarios'] ?? 0 }} personas</p>
+                                        <p class="mt-0.5 font-black text-titulo">{{ $metricas['voluntarios'] ?? 0 }} personas</p>
                                     </div>
                                 </div>
                             </div>
                         @else
                             <!-- Sección 2: Contacto -->
-                            <div class="rounded-xl border border-slate-200/70 bg-white p-4 shadow-sm">
+                            <div class="rounded-xl border border-slate-200/70 bg-fondo-card p-4 shadow-sm">
                                 <h4 class="mb-3 text-[10px] font-black uppercase tracking-widest text-slate-400 border-b border-slate-100 pb-2">Sección 2: Contacto</h4>
                                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-y-4 gap-x-6 text-sm">
                                     <div class="col-span-1 sm:col-span-2 lg:col-span-3">
                                         <p class="text-[10px] font-bold uppercase text-slate-400">Dirección</p>
-                                        <p class="mt-0.5 font-black text-[#2F3E5C]">{{ $detalleVinculo['direccion'] ?? 'No registrada' }}</p>
+                                        <p class="mt-0.5 font-black text-titulo">{{ $detalleVinculo['direccion'] ?? 'No registrada' }}</p>
                                     </div>
                                     <div>
                                         <p class="text-[10px] font-bold uppercase text-slate-400">Celular</p>
-                                        <p class="mt-0.5 font-black text-[#2F3E5C]">{{ $detalleVinculo['celular'] ?? 'No registrado' }}</p>
+                                        <p class="mt-0.5 font-black text-titulo">{{ $detalleVinculo['celular'] ?? 'No registrado' }}</p>
                                     </div>
                                     <div class="min-w-0 sm:col-span-2">
                                         <p class="text-[10px] font-bold uppercase text-slate-400">Correo Electrónico</p>
-                                        <p class="mt-0.5 font-black text-[#2F3E5C] truncate max-w-full" title="{{ $detalleVinculo['correo'] ?? 'No registrado' }}">{{ $detalleVinculo['correo'] ?? 'No registrado' }}</p>
+                                        <p class="mt-0.5 font-black text-titulo truncate max-w-full" title="{{ $detalleVinculo['correo'] ?? 'No registrado' }}">{{ $detalleVinculo['correo'] ?? 'No registrado' }}</p>
                                     </div>
                                 </div>
                             </div>
 
                             <!-- Sección 3: Rol dentro de la red -->
-                            <div class="rounded-xl border border-slate-200/70 bg-white p-4 shadow-sm">
+                            <div class="rounded-xl border border-slate-200/70 bg-fondo-card p-4 shadow-sm">
                                 <h4 class="mb-3 text-[10px] font-black uppercase tracking-widest text-slate-400 border-b border-slate-100 pb-2">Sección 3: Rol dentro de la red</h4>
                                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-y-4 gap-x-6 text-sm">
                                     @if($detalleVinculo['tipo'] === 'voluntario')
                                         <div>
                                             <p class="text-[10px] font-bold uppercase text-slate-400">Asignaciones / Horas</p>
-                                            <p class="mt-0.5 font-black text-[#2F3E5C]">{{ $detalleVinculo['asignaciones'] ?? 0 }} turnos</p>
+                                            <p class="mt-0.5 font-black text-titulo">{{ $detalleVinculo['asignaciones'] ?? 0 }} turnos</p>
                                         </div>
                                         <div>
                                             <p class="text-[10px] font-bold uppercase text-slate-400">Última Participación</p>
-                                            <p class="mt-0.5 font-black text-[#2F3E5C]">{{ $detalleVinculo['ultima_participacion'] ?? 'Sin registro' }}</p>
+                                            <p class="mt-0.5 font-black text-titulo">{{ $detalleVinculo['ultima_participacion'] ?? 'Sin registro' }}</p>
                                         </div>
                                     @else
                                         <div>
                                             <p class="text-[10px] font-bold uppercase text-slate-400">Responsable Principal</p>
-                                            <p class="mt-0.5 font-black text-[#2F3E5C]">{{ $detalleVinculo['responsable_principal'] ? 'Sí' : 'No' }}</p>
+                                            <p class="mt-0.5 font-black text-titulo">{{ $detalleVinculo['responsable_principal'] ? 'Sí' : 'No' }}</p>
                                         </div>
                                         <div>
                                             <p class="text-[10px] font-bold uppercase text-slate-400">Contacto de Emergencia</p>
-                                            <p class="mt-0.5 font-black text-[#2F3E5C]">{{ $detalleVinculo['contacto_emergencia'] ? 'Sí' : 'No' }}</p>
+                                            <p class="mt-0.5 font-black text-titulo">{{ $detalleVinculo['contacto_emergencia'] ? 'Sí' : 'No' }}</p>
                                         </div>
                                         <div>
                                             <p class="text-[10px] font-bold uppercase text-slate-400">Prioridad de contacto</p>
-                                            <p class="mt-0.5 font-black text-[#2F3E5C]">{{ $detalleVinculo['responsable_principal'] ? 'Alta (Responsable)' : ($detalleVinculo['contacto_emergencia'] ? 'Media (Emergencia)' : 'Baja (Regular)') }}</p>
+                                            <p class="mt-0.5 font-black text-titulo">{{ $detalleVinculo['responsable_principal'] ? 'Alta (Responsable)' : ($detalleVinculo['contacto_emergencia'] ? 'Media (Emergencia)' : 'Baja (Regular)') }}</p>
                                         </div>
                                         <div>
                                             <p class="text-[10px] font-bold uppercase text-slate-400">Autorizado / Informativo</p>
-                                            <p class="mt-0.5 font-black text-[#2F3E5C]">Sí, perfil activo</p>
+                                            <p class="mt-0.5 font-black text-titulo">Sí, perfil activo</p>
                                         </div>
                                     @endif
                                 </div>
                             </div>
 
                             <!-- Sección 4: Relación con el adulto mayor -->
-                            <div class="rounded-xl border border-slate-200/70 bg-white p-4 shadow-sm">
+                            <div class="rounded-xl border border-slate-200/70 bg-fondo-card p-4 shadow-sm">
                                 <h4 class="mb-3 text-[10px] font-black uppercase tracking-widest text-slate-400 border-b border-slate-100 pb-2">Sección 4: Relación con el adulto mayor</h4>
                                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-y-4 gap-x-6 text-sm">
                                     <div class="col-span-1 sm:col-span-2">
                                         <p class="text-[10px] font-bold uppercase text-slate-400">Adulto mayor vinculado</p>
-                                        <p class="mt-0.5 font-black text-[#2F3E5C]">{{ $detalleVinculo['adulto_mayor'] }}</p>
+                                        <p class="mt-0.5 font-black text-titulo">{{ $detalleVinculo['adulto_mayor'] }}</p>
                                     </div>
                                     <div>
                                         <p class="text-[10px] font-bold uppercase text-slate-400">Fecha de registro / actualización</p>
-                                        <p class="mt-0.5 font-black text-[#2F3E5C]">{{ $detalleVinculo['ultima_actualizacion'] }}</p>
+                                        <p class="mt-0.5 font-black text-titulo">{{ $detalleVinculo['ultima_actualizacion'] }}</p>
                                     </div>
                                     <div>
                                         <p class="text-[10px] font-bold uppercase text-slate-400">Registrado por</p>
-                                        <p class="mt-0.5 font-black text-[#2F3E5C]">Administración institucional</p>
+                                        <p class="mt-0.5 font-black text-titulo">Administración institucional</p>
                                     </div>
                                     <div class="col-span-1 sm:col-span-2 mt-2">
                                         <p class="text-[10px] font-bold uppercase text-slate-400">Observación del vínculo</p>
-                                        <p class="mt-1 rounded-xl bg-slate-50 border border-slate-100 p-3 text-sm font-bold leading-relaxed text-[#2F3E5C]">
+                                        <p class="mt-1 rounded-xl bg-slate-50 border border-slate-100 p-3 text-sm font-bold leading-relaxed text-titulo">
                                             {{ $detalleVinculo['observacion'] }}
                                         </p>
                                     </div>
@@ -820,7 +820,7 @@
                         @endif
 
                         <!-- Sección 5: Estado institucional -->
-                        <div class="rounded-xl border border-slate-200/70 bg-[#F8FAFC] p-4 shadow-sm text-center">
+                        <div class="rounded-xl border border-slate-200/70 bg-fondo-panel p-4 shadow-sm text-center">
                             <h4 class="mb-2 text-[10px] font-black uppercase tracking-widest text-slate-400">Sección 5: Estado institucional</h4>
                             @if(($detalleVinculo['estado'] ?? '') === 'ACTIVO')
                                 @if(($detalleVinculo['responsable_principal'] ?? false) || ($detalleVinculo['tipo'] === 'adulto' && ($metricas['responsable'] ?? 'No') === 'Sí'))
@@ -839,7 +839,7 @@
                     </div>
                 </div>
                 
-                <div class="bg-white border-t border-slate-200/70 p-4 flex justify-between gap-3 items-center">
+                <div class="bg-fondo-card border-t border-slate-200/70 p-4 flex justify-between gap-3 items-center">
                     <div>
                         @if($detalleVinculo['tipo'] === 'familiar' && auth()->user()->can('familiares.editar'))
                             <button type="button" wire:click="editarVinculo({{ $detalleVinculo['vinculo_id'] }})" class="inline-flex h-10 items-center justify-center gap-2 rounded-xl bg-slate-100 border border-slate-200 px-4 text-xs font-black text-slate-700 transition hover:bg-slate-200">
@@ -848,7 +848,7 @@
                             </button>
                         @endif
                     </div>
-                    <button type="button" wire:click="cerrarDetalleVinculo" class="inline-flex h-10 items-center justify-center rounded-xl bg-[#2F3E5C] px-6 text-xs font-black text-white shadow-sm transition hover:bg-[#1F2E4C]">
+                    <button type="button" wire:click="cerrarDetalleVinculo" class="inline-flex h-10 items-center justify-center rounded-xl bg-boton-principal px-6 text-xs font-black text-inverso shadow-sm transition hover:bg-fondo-panel">
                         Cerrar consulta
                     </button>
                 </div>

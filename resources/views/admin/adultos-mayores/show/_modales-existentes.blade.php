@@ -1,5 +1,5 @@
 <template x-if="modal">
-            <div class="fixed inset-0 z-50 flex items-center justify-center bg-[#2F3E5C]/45 p-4 backdrop-blur-sm" x-transition.opacity>
+            <div class="fixed inset-0 z-50 flex items-center justify-center bg-fondo-panel p-4 backdrop-blur-sm" x-transition.opacity>
                 <div 
                     x-data="{
                         errors: {},
@@ -187,14 +187,14 @@
                             });
                         }
                     }"
-                    class="relative w-full max-w-4xl rounded-2xl border border-[#C7B5A3] bg-[#E6DDD3] shadow-[0_24px_60px_rgba(47,62,92,0.35)]"
+                    class="relative w-full max-w-4xl rounded-2xl border border-borde-suave bg-fondo-app shadow-[0_24px_60px_rgba(47,62,92,0.35)]"
                 >
-                    <div class="flex items-center justify-between border-b border-[#C7B5A3] p-5">
+                    <div class="flex items-center justify-between border-b border-borde-suave p-5">
                         <div>
-                            <p class="text-[11px] font-black uppercase tracking-widest text-[#E27D60]">
+                            <p class="text-[11px] font-black uppercase tracking-widest text-boton-acento">
                                 Acción rápida · {{ $nombreCompleto ?: 'Adulto mayor' }}
                             </p>
-                            <h2 class="text-xl font-black text-[#2F3E5C]"
+                            <h2 class="text-xl font-black text-titulo"
                                 x-text="{
                                     familiar: (isViewing ? 'Ver ' : (isEditing ? 'Editar ' : 'Vincular ')) + 'familiar',
                                     observacion: (isViewing ? 'Ver ' : (isEditing ? 'Editar ' : 'Registrar ')) + 'observación',
@@ -210,7 +210,7 @@
                         <button type="button"
                                 @click="cerrar()"
                                 :disabled="cargando"
-                                class="flex h-10 w-10 items-center justify-center rounded-xl bg-[#D5C7B9] text-[#2F3E5C] transition hover:bg-[#2F3E5C] hover:text-white active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed">
+                                class="flex h-10 w-10 items-center justify-center rounded-xl bg-fondo-app text-titulo transition hover:bg-boton-principal hover:text-inverso active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed">
                             <i class="ph-bold ph-x"></i>
                         </button>
                     </div>
@@ -218,7 +218,7 @@
                     <div class="max-h-[72vh] overflow-y-auto p-5">
                         {{-- Mensajes de Error de Validación --}}
                         @if($errors->any())
-                            <div class="mb-4 rounded-xl border border-terracota/30 bg-terracota/10 p-4">
+                            <div class="mb-4 rounded-xl border border-terracota/30 bg-boton-acento/10 p-4">
                                 <p class="mb-2 text-xs font-black uppercase tracking-widest text-terracota">
                                     <i class="ph-bold ph-warning-circle mr-1"></i> Errores de validación
                                 </p>
@@ -237,18 +237,18 @@
                             <input type="hidden" name="_method" :value="isEditing ? 'PATCH' : 'POST'">
                             <input type="hidden" name="estado" value="ACTIVO">
                             <div class="md:col-span-2">
-                                <label class="mb-1 block text-[10px] font-black uppercase text-[#2F3E5C]/60">Nombre completo del Familiar</label>
-                                <input name="nombre_nuevo" :value="recordData.usuario?.name || recordData.nombres || ''" :disabled="isViewing" required class="w-full rounded-xl border {{ $errors->has('nombre_nuevo') ? 'border-terracota bg-terracota/5' : 'border-[#C7B5A3] bg-[#D5C7B9]/70' }} px-4 py-3 text-sm font-bold outline-none focus:border-[#E27D60]" placeholder="Ej. Juan Pérez">
+                                <label class="mb-1 block text-[10px] font-black uppercase text-apoyo">Nombre completo del Familiar</label>
+                                <input name="nombre_nuevo" :value="recordData.usuario?.name || recordData.nombres || ''" :disabled="isViewing" required class="w-full rounded-xl border {{ $errors->has('nombre_nuevo') ? 'border-terracota bg-boton-acento/5' : 'border-borde-suave bg-fondo-panel' }} px-4 py-3 text-sm font-bold outline-none focus:border-borde-focus" placeholder="Ej. Juan Pérez">
                                 @error('nombre_nuevo') <span class="mt-1 block text-xs font-black text-terracota">{{ $message }}</span> @enderror
                             </div>
                             <div class="md:col-span-2">
-                                <label class="mb-1 block text-[10px] font-black uppercase text-[#2F3E5C]/60">Correo Electrónico (Opcional)</label>
-                                <input name="email_nuevo" type="email" :value="recordData.usuario?.email || recordData.email || ''" :disabled="isViewing" class="w-full rounded-xl border {{ $errors->has('email_nuevo') ? 'border-terracota bg-terracota/5' : 'border-[#C7B5A3] bg-[#D5C7B9]/70' }} px-4 py-3 text-sm font-bold outline-none focus:border-[#E27D60]" placeholder="ejemplo@correo.com">
+                                <label class="mb-1 block text-[10px] font-black uppercase text-apoyo">Correo Electrónico (Opcional)</label>
+                                <input name="email_nuevo" type="email" :value="recordData.usuario?.email || recordData.email || ''" :disabled="isViewing" class="w-full rounded-xl border {{ $errors->has('email_nuevo') ? 'border-terracota bg-boton-acento/5' : 'border-borde-suave bg-fondo-panel' }} px-4 py-3 text-sm font-bold outline-none focus:border-borde-focus" placeholder="ejemplo@correo.com">
                                 @error('email_nuevo') <span class="mt-1 block text-xs font-black text-terracota">{{ $message }}</span> @enderror
                             </div>
                             <div>
-                                <label class="mb-1 block text-[10px] font-black uppercase text-[#2F3E5C]/60">Parentesco</label>
-                                <select name="parentesco_vinculo" :value="recordData.pivot?.parentesco_vinculo || recordData.parentesco_vinculo || ''" :disabled="isViewing" required class="w-full rounded-xl border {{ $errors->has('parentesco_vinculo') ? 'border-terracota bg-terracota/5' : 'border-[#C7B5A3] bg-[#D5C7B9]/70' }} px-4 py-3 text-sm font-bold outline-none focus:border-[#E27D60]">
+                                <label class="mb-1 block text-[10px] font-black uppercase text-apoyo">Parentesco</label>
+                                <select name="parentesco_vinculo" :value="recordData.pivot?.parentesco_vinculo || recordData.parentesco_vinculo || ''" :disabled="isViewing" required class="w-full rounded-xl border {{ $errors->has('parentesco_vinculo') ? 'border-terracota bg-boton-acento/5' : 'border-borde-suave bg-fondo-panel' }} px-4 py-3 text-sm font-bold outline-none focus:border-borde-focus">
                                     <option value="">Seleccione parentesco</option>
                                     <option value="Hijo/a">Hijo/a</option>
                                     <option value="Conyuge">Cónyuge</option>
@@ -261,16 +261,16 @@
                                 @error('parentesco_vinculo') <span class="mt-1 block text-xs font-black text-terracota">{{ $message }}</span> @enderror
                             </div>
                             <div>
-                                <label class="mb-1 block text-[10px] font-black uppercase text-[#2F3E5C]/60">Nivel de Responsabilidad</label>
-                                <select name="es_responsable" :value="recordData.pivot?.es_responsable ? '1' : '0'" :disabled="isViewing" required class="w-full rounded-xl border {{ $errors->has('es_responsable') ? 'border-terracota bg-terracota/5' : 'border-[#C7B5A3] bg-[#D5C7B9]/70' }} px-4 py-3 text-sm font-bold outline-none focus:border-[#E27D60]">
+                                <label class="mb-1 block text-[10px] font-black uppercase text-apoyo">Nivel de Responsabilidad</label>
+                                <select name="es_responsable" :value="recordData.pivot?.es_responsable ? '1' : '0'" :disabled="isViewing" required class="w-full rounded-xl border {{ $errors->has('es_responsable') ? 'border-terracota bg-boton-acento/5' : 'border-borde-suave bg-fondo-panel' }} px-4 py-3 text-sm font-bold outline-none focus:border-borde-focus">
                                     <option value="0">Contacto referencial</option>
                                     <option value="1">Responsable principal (Firma autorizado)</option>
                                 </select>
                                 @error('es_responsable') <span class="mt-1 block text-xs font-black text-terracota">{{ $message }}</span> @enderror
                             </div>
                             <div class="md:col-span-2">
-                                <label class="mb-1 block text-[10px] font-black uppercase text-[#2F3E5C]/60">Observaciones del vínculo / Horarios de visita</label>
-                                <textarea name="observaciones" :value="recordData.pivot?.observaciones || recordData.observaciones || ''" :disabled="isViewing" class="w-full rounded-xl border {{ $errors->has('observaciones') ? 'border-terracota bg-terracota/5' : 'border-[#C7B5A3] bg-[#D5C7B9]/70' }} px-4 py-3 text-sm font-bold outline-none focus:border-[#E27D60]" rows="3" placeholder="Restricciones de visita, observaciones médicas que el familiar deba conocer, etc."></textarea>
+                                <label class="mb-1 block text-[10px] font-black uppercase text-apoyo">Observaciones del vínculo / Horarios de visita</label>
+                                <textarea name="observaciones" :value="recordData.pivot?.observaciones || recordData.observaciones || ''" :disabled="isViewing" class="w-full rounded-xl border {{ $errors->has('observaciones') ? 'border-terracota bg-boton-acento/5' : 'border-borde-suave bg-fondo-panel' }} px-4 py-3 text-sm font-bold outline-none focus:border-borde-focus" rows="3" placeholder="Restricciones de visita, observaciones médicas que el familiar deba conocer, etc."></textarea>
                                 @error('observaciones') <span class="mt-1 block text-xs font-black text-terracota">{{ $message }}</span> @enderror
                             </div>
                         </form>
@@ -287,15 +287,15 @@
                             @csrf
                             <input type="hidden" name="_method" :value="isEditing ? 'PATCH' : 'POST'">
                             <div>
-                                <label class="mb-1 block text-[10px] font-black uppercase text-[#2F3E5C]/60">Fecha de Observación</label>
-                                <input type="date" name="fecha" :value="recordData.fecha?.split(' ')[0] || '{{ now()->format('Y-m-d') }}'" :disabled="isViewing" class="w-full rounded-xl border bg-[#D5C7B9]/70 px-4 py-3 text-sm font-bold outline-none focus:border-[#E27D60]" :class="errors.fecha ? 'border-rose-500 ring-4 ring-rose-500/10' : 'border-[#C7B5A3]'">
+                                <label class="mb-1 block text-[10px] font-black uppercase text-apoyo">Fecha de Observación</label>
+                                <input type="date" name="fecha" :value="recordData.fecha?.split(' ')[0] || '{{ now()->format('Y-m-d') }}'" :disabled="isViewing" class="w-full rounded-xl border bg-fondo-panel px-4 py-3 text-sm font-bold outline-none focus:border-borde-focus" :class="errors.fecha ? 'border-rose-500 ring-4 ring-rose-500/10' : 'border-borde-suave'">
                                 <template x-if="errors.fecha">
                                     <span class="mt-1 block text-xs font-black text-rose-500" x-text="errors.fecha"></span>
                                 </template>
                             </div>
                             <div>
-                                <label class="mb-1 block text-[10px] font-black uppercase text-[#2F3E5C]/60">Tipo de Seguimiento</label>
-                                <select name="tipo_obs" :value="recordData.tipo_obs || ''" :disabled="isViewing" class="w-full rounded-xl border bg-[#D5C7B9]/70 px-4 py-3 text-sm font-bold outline-none focus:border-[#E27D60]" :class="errors.tipo_obs ? 'border-rose-500 ring-4 ring-rose-500/10' : 'border-[#C7B5A3]'">
+                                <label class="mb-1 block text-[10px] font-black uppercase text-apoyo">Tipo de Seguimiento</label>
+                                <select name="tipo_obs" :value="recordData.tipo_obs || ''" :disabled="isViewing" class="w-full rounded-xl border bg-fondo-panel px-4 py-3 text-sm font-bold outline-none focus:border-borde-focus" :class="errors.tipo_obs ? 'border-rose-500 ring-4 ring-rose-500/10' : 'border-borde-suave'">
                                     <option value="">Clasificación</option>
                                     <option value="Conductual">Comportamiento / Conductual</option>
                                     <option value="Emocional">Estado de ánimo / Emocional</option>
@@ -309,8 +309,8 @@
                                 </template>
                             </div>
                             <div class="md:col-span-2">
-                                <label class="mb-1 block text-[10px] font-black uppercase text-[#2F3E5C]/60">Estado Institucional (Se actualizará en la ficha)</label>
-                                <select name="cod_est_adul" :value="recordData.cod_est_adul || '{{ $adulto->cod_est_adul }}'" :disabled="isViewing" class="w-full rounded-xl border bg-[#D5C7B9]/70 px-4 py-3 text-sm font-bold outline-none focus:border-[#E27D60]" :class="errors.cod_est_adul ? 'border-rose-500 ring-4 ring-rose-500/10' : 'border-[#C7B5A3]'">
+                                <label class="mb-1 block text-[10px] font-black uppercase text-apoyo">Estado Institucional (Se actualizará en la ficha)</label>
+                                <select name="cod_est_adul" :value="recordData.cod_est_adul || '{{ $adulto->cod_est_adul }}'" :disabled="isViewing" class="w-full rounded-xl border bg-fondo-panel px-4 py-3 text-sm font-bold outline-none focus:border-borde-focus" :class="errors.cod_est_adul ? 'border-rose-500 ring-4 ring-rose-500/10' : 'border-borde-suave'">
                                     <option value="">Confirmar Estado Actual</option>
                                     @php /** @var object $estadoObj */ @endphp
                                     @foreach($estadosAdulto ?? [] as $estadoObj)
@@ -322,8 +322,8 @@
                                 </template>
                             </div>
                             <div class="md:col-span-2">
-                                <label class="mb-1 block text-[10px] font-black uppercase text-[#2F3E5C]/60">Descripción Detallada</label>
-                                <textarea name="descripcion" :value="recordData.descripcion || ''" :disabled="isViewing" class="w-full rounded-xl border bg-[#D5C7B9]/70 px-4 py-3 text-sm font-bold outline-none focus:border-[#E27D60]" :class="errors.descripcion ? 'border-rose-500 ring-4 ring-rose-500/10' : 'border-[#C7B5A3]'" rows="4" placeholder="Describa de manera profesional el incidente, síntoma o evento observado en el turno..."></textarea>
+                                <label class="mb-1 block text-[10px] font-black uppercase text-apoyo">Descripción Detallada</label>
+                                <textarea name="descripcion" :value="recordData.descripcion || ''" :disabled="isViewing" class="w-full rounded-xl border bg-fondo-panel px-4 py-3 text-sm font-bold outline-none focus:border-borde-focus" :class="errors.descripcion ? 'border-rose-500 ring-4 ring-rose-500/10' : 'border-borde-suave'" rows="4" placeholder="Describa de manera profesional el incidente, síntoma o evento observado en el turno..."></textarea>
                                 <template x-if="errors.descripcion">
                                     <span class="mt-1 block text-xs font-black text-rose-500" x-text="errors.descripcion"></span>
                                 </template>
@@ -343,7 +343,7 @@
                             <input type="hidden" name="_method" :value="isEditing ? 'PATCH' : 'POST'">
 
                             {{-- Descripción del formulario --}}
-                            <div class="rounded-xl bg-[#D5C7B9]/60 border border-[#C7B5A3] p-3 text-xs font-bold leading-5 text-azul-profundo/70">
+                            <div class="rounded-xl bg-fondo-panel border border-borde-suave p-3 text-xs font-bold leading-5 text-titulo/70">
                                 <i class="ph-fill ph-stethoscope mr-1 text-terracota"></i>
                                 Registra una atención registrada al adulto mayor. Este registro forma parte del seguimiento histórico de salud y cuidados.
                             </div>
@@ -351,7 +351,7 @@
                             <div class="grid gap-4 md:grid-cols-2">
                                 {{-- Fecha --}}
                                 <div>
-                                    <label class="mb-1 block text-[10px] font-black uppercase tracking-widest text-[#2F3E5C]/60">
+                                    <label class="mb-1 block text-[10px] font-black uppercase tracking-widest text-apoyo">
                                         Fecha de Atención *
                                     </label>
                                     <input
@@ -359,8 +359,8 @@
                                         name="fecha"
                                         :value="recordData.fecha?.split(' ')[0] || '{{ now()->format('Y-m-d') }}'"
                                         :disabled="isViewing"
-                                        class="w-full rounded-xl border bg-[#D5C7B9]/70 px-4 py-2.5 text-sm font-bold text-[#2F3E5C] outline-none transition focus:border-[#E27D60] focus:bg-[#E6DDD3]"
-                                        :class="errors.fecha ? 'border-rose-500 ring-4 ring-rose-500/10' : 'border-[#C7B5A3]'"
+                                        class="w-full rounded-xl border bg-fondo-panel px-4 py-2.5 text-sm font-bold text-titulo outline-none transition focus:border-borde-focus focus:bg-fondo-app"
+                                        :class="errors.fecha ? 'border-rose-500 ring-4 ring-rose-500/10' : 'border-borde-suave'"
                                     >
                                     <template x-if="errors.fecha">
                                         <span class="mt-1 block text-xs font-black text-rose-500" x-text="errors.fecha"></span>
@@ -369,7 +369,7 @@
 
                                 {{-- Hora --}}
                                 <div>
-                                    <label class="mb-1 block text-[10px] font-black uppercase tracking-widest text-[#2F3E5C]/60">
+                                    <label class="mb-1 block text-[10px] font-black uppercase tracking-widest text-apoyo">
                                         Hora de Atención *
                                     </label>
                                     <input
@@ -377,8 +377,8 @@
                                         name="hora"
                                         :value="recordData.hora || '{{ now()->format('H:i') }}'"
                                         :disabled="isViewing"
-                                        class="w-full rounded-xl border bg-[#D5C7B9]/70 px-4 py-2.5 text-sm font-bold text-[#2F3E5C] outline-none transition focus:border-[#E27D60] focus:bg-[#E6DDD3]"
-                                        :class="errors.hora ? 'border-rose-500 ring-4 ring-rose-500/10' : 'border-[#C7B5A3]'"
+                                        class="w-full rounded-xl border bg-fondo-panel px-4 py-2.5 text-sm font-bold text-titulo outline-none transition focus:border-borde-focus focus:bg-fondo-app"
+                                        :class="errors.hora ? 'border-rose-500 ring-4 ring-rose-500/10' : 'border-borde-suave'"
                                     >
                                     <template x-if="errors.hora">
                                         <span class="mt-1 block text-xs font-black text-rose-500" x-text="errors.hora"></span>
@@ -387,7 +387,7 @@
 
                                 {{-- Tipo de Atención --}}
                                 <div>
-                                    <label class="mb-1 block text-[10px] font-black uppercase tracking-widest text-[#2F3E5C]/60">
+                                    <label class="mb-1 block text-[10px] font-black uppercase tracking-widest text-apoyo">
                                         Tipo de Atención *
                                     </label>
                                     @php
@@ -397,7 +397,7 @@
                                     @endphp
 
                                     @if($tiposAtencionesLista->isEmpty())
-                                        <div class="rounded-xl border border-[#D9A27C]/40 bg-[#D9A27C]/10 p-3 text-xs font-bold text-[#B07446]">
+                                        <div class="rounded-xl border border-borde bg-fondo-panel p-3 text-xs font-bold text-parrafo">
                                             <i class="ph-bold ph-warning-circle mr-1"></i>
                                             No existen tipos de atención registrados. Contacte al administrador del sistema.
                                         </div>
@@ -406,8 +406,8 @@
                                             name="cod_tipo_aten"
                                             :value="recordData.cod_tipo_aten || ''"
                                             :disabled="isViewing"
-                                            class="w-full rounded-xl border bg-[#D5C7B9]/70 px-4 py-2.5 text-sm font-bold text-[#2F3E5C] outline-none transition focus:border-[#E27D60] focus:bg-[#E6DDD3]"
-                                            :class="errors.cod_tipo_aten ? 'border-rose-500 ring-4 ring-rose-500/10' : 'border-[#C7B5A3]'"
+                                            class="w-full rounded-xl border bg-fondo-panel px-4 py-2.5 text-sm font-bold text-titulo outline-none transition focus:border-borde-focus focus:bg-fondo-app"
+                                            :class="errors.cod_tipo_aten ? 'border-rose-500 ring-4 ring-rose-500/10' : 'border-borde-suave'"
                                         >
                                             <option value="">Seleccionar tipo...</option>
                                             @foreach($tiposAtencionesLista as $tipo)
@@ -428,15 +428,15 @@
 
                                 {{-- Estado --}}
                                 <div>
-                                    <label class="mb-1 block text-[10px] font-black uppercase tracking-widest text-[#2F3E5C]/60">
+                                    <label class="mb-1 block text-[10px] font-black uppercase tracking-widest text-apoyo">
                                         Estado *
                                     </label>
                                     <select
                                         name="estado"
                                         :value="recordData.estado || ''"
                                         :disabled="isViewing"
-                                        class="w-full rounded-xl border bg-[#D5C7B9]/70 px-4 py-2.5 text-sm font-bold text-[#2F3E5C] outline-none transition focus:border-[#E27D60] focus:bg-[#E6DDD3]"
-                                        :class="errors.estado ? 'border-rose-500 ring-4 ring-rose-500/10' : 'border-[#C7B5A3]'"
+                                        class="w-full rounded-xl border bg-fondo-panel px-4 py-2.5 text-sm font-bold text-titulo outline-none transition focus:border-borde-focus focus:bg-fondo-app"
+                                        :class="errors.estado ? 'border-rose-500 ring-4 ring-rose-500/10' : 'border-borde-suave'"
                                     >
                                         <option value="">Seleccionar estado...</option>
                                         <option value="PENDIENTE"  @selected(old('estado') === 'PENDIENTE')>Pendiente</option>
@@ -456,10 +456,10 @@
                                     x-init="obs = recordData.obs || ''"
                                 >
                                     <div class="mb-1 flex items-center justify-between">
-                                        <label class="block text-[10px] font-black uppercase tracking-widest text-[#2F3E5C]/60">
+                                        <label class="block text-[10px] font-black uppercase tracking-widest text-apoyo">
                                             Observaciones de Seguimiento
                                         </label>
-                                        <span class="text-[10px] font-bold text-[#2F3E5C]/45" x-text="obs.length + '/1000'"></span>
+                                        <span class="text-[10px] font-bold text-apoyo" x-text="obs.length + '/1000'"></span>
                                     </div>
                                     <textarea
                                         name="obs"
@@ -467,13 +467,13 @@
                                         x-model="obs"
                                         :disabled="isViewing"
                                         placeholder="Descripción detallada de la atención registrada..."
-                                        class="w-full resize-none rounded-xl border bg-[#D5C7B9]/70 px-4 py-2.5 text-sm font-bold text-[#2F3E5C] outline-none transition placeholder:text-[#2F3E5C]/35 focus:border-[#E27D60] focus:bg-[#E6DDD3]"
-                                        :class="errors.obs ? 'border-rose-500 ring-4 ring-rose-500/10' : 'border-[#C7B5A3]'"
+                                        class="w-full resize-none rounded-xl border bg-fondo-panel px-4 py-2.5 text-sm font-bold text-titulo outline-none transition placeholder:text-apoyo focus:border-borde-focus focus:bg-fondo-app"
+                                        :class="errors.obs ? 'border-rose-500 ring-4 ring-rose-500/10' : 'border-borde-suave'"
                                     ></textarea>
                                     <template x-if="errors.obs">
                                         <span class="mt-1 block text-xs font-black text-rose-500" x-text="errors.obs"></span>
                                     </template>
-                                    <p class="mt-1 text-[10px] font-bold text-[#2F3E5C]/45">
+                                    <p class="mt-1 text-[10px] font-bold text-apoyo">
                                         Campo opcional. Escriba las observaciones del seguimiento y bienestar.
                                     </p>
                                 </div>
@@ -485,8 +485,8 @@
                             @csrf
                             <input type="hidden" name="_method" :value="isEditing ? 'PATCH' : 'POST'">
                             <div>
-                                <label class="mb-1 block text-[10px] font-black uppercase text-[#2F3E5C]/60">Tipo de Evaluación</label>
-                                <select name="cod_tipo_eval" :value="recordData.cod_tipo_eval || ''" :disabled="isViewing || isEditing" required class="w-full rounded-xl border border-[#C7B5A3] bg-[#D5C7B9]/70 px-4 py-3 text-sm font-bold outline-none focus:border-[#E27D60]">
+                                <label class="mb-1 block text-[10px] font-black uppercase text-apoyo">Tipo de Evaluación</label>
+                                <select name="cod_tipo_eval" :value="recordData.cod_tipo_eval || ''" :disabled="isViewing || isEditing" required class="w-full rounded-xl border border-borde-suave bg-fondo-panel px-4 py-3 text-sm font-bold outline-none focus:border-borde-focus">
                                     <option value="">Seleccione prueba</option>
                                     @foreach($tiposEvaluaciones as $tipo)
                                         <option value="{{ $tipo->cod_tipo_eval }}">{{ $tipo->nombre }} (Máx: {{ $tipo->puntaje_maximo }})</option>
@@ -494,16 +494,16 @@
                                 </select>
                             </div>
                             <div>
-                                <label class="mb-1 block text-[10px] font-black uppercase text-[#2F3E5C]/60">Puntaje Obtenido (0-30)</label>
-                                <input type="number" name="puntaje_total" :value="recordData.puntaje_total || ''" :disabled="isViewing || isEditing" min="0" max="30" step="1" required class="w-full rounded-xl border border-[#C7B5A3] bg-[#D5C7B9]/70 px-4 py-3 text-sm font-bold outline-none focus:border-[#E27D60]" placeholder="Ej. 26">
+                                <label class="mb-1 block text-[10px] font-black uppercase text-apoyo">Puntaje Obtenido (0-30)</label>
+                                <input type="number" name="puntaje_total" :value="recordData.puntaje_total || ''" :disabled="isViewing || isEditing" min="0" max="30" step="1" required class="w-full rounded-xl border border-borde-suave bg-fondo-panel px-4 py-3 text-sm font-bold outline-none focus:border-borde-focus" placeholder="Ej. 26">
                             </div>
                             <div class="md:col-span-2">
-                                <label class="mb-1 block text-[10px] font-black uppercase text-[#2F3E5C]/60">Fecha de Aplicación</label>
-                                <input type="date" name="fecha_eval" :value="recordData.fecha_eval?.split(' ')[0] || '{{ now()->format('Y-m-d') }}'" :disabled="isViewing || isEditing" required class="w-full rounded-xl border border-[#C7B5A3] bg-[#D5C7B9]/70 px-4 py-3 text-sm font-bold outline-none focus:border-[#E27D60]">
+                                <label class="mb-1 block text-[10px] font-black uppercase text-apoyo">Fecha de Aplicación</label>
+                                <input type="date" name="fecha_eval" :value="recordData.fecha_eval?.split(' ')[0] || '{{ now()->format('Y-m-d') }}'" :disabled="isViewing || isEditing" required class="w-full rounded-xl border border-borde-suave bg-fondo-panel px-4 py-3 text-sm font-bold outline-none focus:border-borde-focus">
                             </div>
                             <div class="md:col-span-2">
-                                <label class="mb-1 block text-[10px] font-black uppercase text-[#2F3E5C]/60">Observaciones y Hallazgos</label>
-                                <textarea name="observaciones" :value="recordData.observaciones || ''" :disabled="isViewing || isEditing" class="w-full rounded-xl border border-[#C7B5A3] bg-[#D5C7B9]/70 px-4 py-3 text-sm font-bold outline-none focus:border-[#E27D60]" rows="4" placeholder="Detalle fallos en subpruebas específicas (ej. memoria, orientación, dibujo)..."></textarea>
+                                <label class="mb-1 block text-[10px] font-black uppercase text-apoyo">Observaciones y Hallazgos</label>
+                                <textarea name="observaciones" :value="recordData.observaciones || ''" :disabled="isViewing || isEditing" class="w-full rounded-xl border border-borde-suave bg-fondo-panel px-4 py-3 text-sm font-bold outline-none focus:border-borde-focus" rows="4" placeholder="Detalle fallos en subpruebas específicas (ej. memoria, orientación, dibujo)..."></textarea>
                             </div>
                         </form>
 
@@ -519,16 +519,16 @@
                             @csrf
                             <input type="hidden" name="_method" :value="isEditing ? 'PATCH' : 'POST'">
                             <div>
-                                <label class="mb-1 block text-[10px] font-black uppercase text-[#2F3E5C]/60">Fecha y Hora</label>
+                                <label class="mb-1 block text-[10px] font-black uppercase text-apoyo">Fecha y Hora</label>
                                 <div class="flex gap-2">
                                     <div class="w-2/3">
-                                        <input type="date" name="fecha" :value="recordData.fecha?.split(' ')[0] || '{{ now()->format('Y-m-d') }}'" :disabled="isViewing || isEditing" class="w-full rounded-xl border bg-[#D5C7B9]/70 px-4 py-3 text-sm font-bold outline-none focus:border-[#E27D60]" :class="errors.fecha ? 'border-rose-500 ring-4 ring-rose-500/10' : 'border-[#C7B5A3]'">
+                                        <input type="date" name="fecha" :value="recordData.fecha?.split(' ')[0] || '{{ now()->format('Y-m-d') }}'" :disabled="isViewing || isEditing" class="w-full rounded-xl border bg-fondo-panel px-4 py-3 text-sm font-bold outline-none focus:border-borde-focus" :class="errors.fecha ? 'border-rose-500 ring-4 ring-rose-500/10' : 'border-borde-suave'">
                                         <template x-if="errors.fecha">
                                             <span class="mt-1 block text-xs font-black text-rose-500" x-text="errors.fecha"></span>
                                         </template>
                                     </div>
                                     <div class="w-1/3">
-                                        <input type="time" name="hora" :value="recordData.hora || '{{ now()->format('H:i') }}'" :disabled="isViewing || isEditing" class="w-full rounded-xl border bg-[#D5C7B9]/70 px-4 py-3 text-sm font-bold outline-none focus:border-[#E27D60]" :class="errors.hora ? 'border-rose-500 ring-4 ring-rose-500/10' : 'border-[#C7B5A3]'">
+                                        <input type="time" name="hora" :value="recordData.hora || '{{ now()->format('H:i') }}'" :disabled="isViewing || isEditing" class="w-full rounded-xl border bg-fondo-panel px-4 py-3 text-sm font-bold outline-none focus:border-borde-focus" :class="errors.hora ? 'border-rose-500 ring-4 ring-rose-500/10' : 'border-borde-suave'">
                                         <template x-if="errors.hora">
                                             <span class="mt-1 block text-xs font-black text-rose-500" x-text="errors.hora"></span>
                                         </template>
@@ -536,8 +536,8 @@
                                 </div>
                             </div>
                             <div>
-                                <label class="mb-1 block text-[10px] font-black uppercase text-[#2F3E5C]/60">Actividad</label>
-                                <select name="cod_tipo_act" :value="recordData.cod_tipo_act || ''" :disabled="isViewing || isEditing" class="w-full rounded-xl border bg-[#D5C7B9]/70 px-4 py-3 text-sm font-bold outline-none focus:border-[#E27D60]" :class="errors.cod_tipo_act ? 'border-rose-500 ring-4 ring-rose-500/10' : 'border-[#C7B5A3]'">
+                                <label class="mb-1 block text-[10px] font-black uppercase text-apoyo">Actividad</label>
+                                <select name="cod_tipo_act" :value="recordData.cod_tipo_act || ''" :disabled="isViewing || isEditing" class="w-full rounded-xl border bg-fondo-panel px-4 py-3 text-sm font-bold outline-none focus:border-borde-focus" :class="errors.cod_tipo_act ? 'border-rose-500 ring-4 ring-rose-500/10' : 'border-borde-suave'">
                                     <option value="">Seleccione actividad</option>
                                     @foreach($tiposActividades as $tipoAct)
                                         <option value="{{ $tipoAct->cod_tipo_act }}">{{ $tipoAct->tipo }}</option>
@@ -548,8 +548,8 @@
                                 </template>
                             </div>
                             <div>
-                                <label class="mb-1 block text-[10px] font-black uppercase text-[#2F3E5C]/60">Estado de Participación</label>
-                                <select name="estado" :value="recordData.estado || 'REALIZADA'" :disabled="isViewing" class="w-full rounded-xl border bg-[#D5C7B9]/70 px-4 py-3 text-sm font-bold outline-none focus:border-[#E27D60]" :class="errors.estado ? 'border-rose-500 ring-4 ring-rose-500/10' : 'border-[#C7B5A3]'">
+                                <label class="mb-1 block text-[10px] font-black uppercase text-apoyo">Estado de Participación</label>
+                                <select name="estado" :value="recordData.estado || 'REALIZADA'" :disabled="isViewing" class="w-full rounded-xl border bg-fondo-panel px-4 py-3 text-sm font-bold outline-none focus:border-borde-focus" :class="errors.estado ? 'border-rose-500 ring-4 ring-rose-500/10' : 'border-borde-suave'">
                                     <option value="REALIZADA">Realizada</option>
                                     <option value="PENDIENTE">Pendiente</option>
                                     <option value="CANCELADA">Cancelada</option>
@@ -559,8 +559,8 @@
                                 </template>
                             </div>
                             <div class="md:col-span-2">
-                                <label class="mb-1 block text-[10px] font-black uppercase text-[#2F3E5C]/60">Desempeño y Logros (Observaciones)</label>
-                                <textarea name="obs" :value="recordData.obs || ''" :disabled="isViewing" class="w-full rounded-xl border bg-[#D5C7B9]/70 px-4 py-3 text-sm font-bold outline-none focus:border-[#E27D60]" :class="errors.obs ? 'border-rose-500 ring-4 ring-rose-500/10' : 'border-[#C7B5A3]'" rows="3" placeholder="Describa el comportamiento durante la sesión, avances de participación, etc..."></textarea>
+                                <label class="mb-1 block text-[10px] font-black uppercase text-apoyo">Desempeño y Logros (Observaciones)</label>
+                                <textarea name="obs" :value="recordData.obs || ''" :disabled="isViewing" class="w-full rounded-xl border bg-fondo-panel px-4 py-3 text-sm font-bold outline-none focus:border-borde-focus" :class="errors.obs ? 'border-rose-500 ring-4 ring-rose-500/10' : 'border-borde-suave'" rows="3" placeholder="Describa el comportamiento durante la sesión, avances de participación, etc..."></textarea>
                                 <template x-if="errors.obs">
                                     <span class="mt-1 block text-xs font-black text-rose-500" x-text="errors.obs"></span>
                                 </template>
@@ -580,13 +580,13 @@
                             @csrf
                             <input type="hidden" name="_method" :value="isEditing ? 'PATCH' : 'POST'">
                             <div class="md:col-span-2">
-                                <label class="mb-1 block text-[10px] font-black uppercase text-[#2F3E5C]/60">Título del Documento *</label>
+                                <label class="mb-1 block text-[10px] font-black uppercase text-apoyo">Título del Documento *</label>
                                 <input 
                                     name="nom_doc" 
                                     :value="recordData.nom_doc || ''" 
                                     :disabled="isViewing" 
-                                    class="w-full rounded-xl border bg-[#D5C7B9]/70 px-4 py-3 text-sm font-bold outline-none focus:border-[#E27D60]" 
-                                    :class="errors.nom_doc ? 'border-rose-500 ring-4 ring-rose-500/10' : 'border-[#C7B5A3]'"
+                                    class="w-full rounded-xl border bg-fondo-panel px-4 py-3 text-sm font-bold outline-none focus:border-borde-focus" 
+                                    :class="errors.nom_doc ? 'border-rose-500 ring-4 ring-rose-500/10' : 'border-borde-suave'"
                                     placeholder="Ej. Resultados de laboratorio completo"
                                 >
                                 <template x-if="errors.nom_doc">
@@ -594,13 +594,13 @@
                                 </template>
                             </div>
                             <div>
-                                <label class="mb-1 block text-[10px] font-black uppercase text-[#2F3E5C]/60">Categoría del Expediente *</label>
+                                <label class="mb-1 block text-[10px] font-black uppercase text-apoyo">Categoría del Expediente *</label>
                                 <select 
                                     name="tipo_doc" 
                                     :value="recordData.tipo_doc || ''" 
                                     :disabled="isViewing" 
-                                    class="w-full rounded-xl border bg-[#D5C7B9]/70 px-4 py-3 text-sm font-bold outline-none focus:border-[#E27D60]"
-                                    :class="errors.tipo_doc ? 'border-rose-500 ring-4 ring-rose-500/10' : 'border-[#C7B5A3]'"
+                                    class="w-full rounded-xl border bg-fondo-panel px-4 py-3 text-sm font-bold outline-none focus:border-borde-focus"
+                                    :class="errors.tipo_doc ? 'border-rose-500 ring-4 ring-rose-500/10' : 'border-borde-suave'"
                                 >
                                     <option value="">Seleccione categoría</option>
                                     <option value="Historial Médico">Historial Médico / Epicrisis</option>
@@ -615,41 +615,41 @@
                                 </template>
                             </div>
                             <div>
-                                <label class="mb-1 block text-[10px] font-black uppercase text-[#2F3E5C]/60">Fecha del Documento *</label>
+                                <label class="mb-1 block text-[10px] font-black uppercase text-apoyo">Fecha del Documento *</label>
                                 <input 
                                     type="date" 
                                     name="fecha_doc" 
                                     :value="recordData.fecha_doc?.split(' ')[0] || '{{ now()->format('Y-m-d') }}'" 
                                     :disabled="isViewing" 
-                                    class="w-full rounded-xl border bg-[#D5C7B9]/70 px-4 py-3 text-sm font-bold outline-none focus:border-[#E27D60]"
-                                    :class="errors.fecha_doc ? 'border-rose-500 ring-4 ring-rose-500/10' : 'border-[#C7B5A3]'"
+                                    class="w-full rounded-xl border bg-fondo-panel px-4 py-3 text-sm font-bold outline-none focus:border-borde-focus"
+                                    :class="errors.fecha_doc ? 'border-rose-500 ring-4 ring-rose-500/10' : 'border-borde-suave'"
                                 >
                                 <template x-if="errors.fecha_doc">
                                     <span class="mt-1 block text-xs font-black text-rose-500" x-text="errors.fecha_doc"></span>
                                 </template>
                             </div>
                             <div class="md:col-span-2" x-show="!isViewing">
-                                <label class="mb-1 block text-[10px] font-black uppercase text-[#2F3E5C]/60">
+                                <label class="mb-1 block text-[10px] font-black uppercase text-apoyo">
                                     Archivo (PDF, JPG, JPEG, PNG) <span x-show="!isEditing">*</span>
                                 </label>
                                 <input 
                                     type="file" 
                                     name="archivo" 
-                                    class="w-full rounded-xl border bg-[#D5C7B9]/70 px-4 py-2.5 text-sm font-bold text-[#2F3E5C] outline-none file:mr-4 file:rounded-lg file:border-0 file:bg-[#2F3E5C] file:px-3 file:py-1.5 file:text-xs file:font-black file:text-white hover:file:bg-[#5B5F97]"
-                                    :class="errors.archivo ? 'border-rose-500 ring-4 ring-rose-500/10' : 'border-[#C7B5A3]'"
+                                    class="w-full rounded-xl border bg-fondo-panel px-4 py-2.5 text-sm font-bold text-titulo outline-none file:mr-4 file:rounded-lg file:border-0 file:bg-boton-principal file:px-3 file:py-1.5 file:text-xs file:font-black file:text-inverso hover:file:bg-fondo-panel"
+                                    :class="errors.archivo ? 'border-rose-500 ring-4 ring-rose-500/10' : 'border-borde-suave'"
                                 >
                                 <template x-if="errors.archivo">
                                     <span class="mt-1 block text-xs font-black text-rose-500" x-text="errors.archivo"></span>
                                 </template>
                             </div>
                             <div class="md:col-span-2">
-                                <label class="mb-1 block text-[10px] font-black uppercase text-[#2F3E5C]/60">Observaciones adicionales (Opcional)</label>
+                                <label class="mb-1 block text-[10px] font-black uppercase text-apoyo">Observaciones adicionales (Opcional)</label>
                                 <textarea 
                                     name="observaciones" 
                                     :value="recordData.observaciones || ''" 
                                     :disabled="isViewing" 
-                                    class="w-full rounded-xl border bg-[#D5C7B9]/70 px-4 py-3 text-sm font-bold outline-none focus:border-[#E27D60]" 
-                                    :class="errors.observaciones ? 'border-rose-500 ring-4 ring-rose-500/10' : 'border-[#C7B5A3]'"
+                                    class="w-full rounded-xl border bg-fondo-panel px-4 py-3 text-sm font-bold outline-none focus:border-borde-focus" 
+                                    :class="errors.observaciones ? 'border-rose-500 ring-4 ring-rose-500/10' : 'border-borde-suave'"
                                     rows="2" 
                                     placeholder="Ej. El familiar entregó los originales al administrador..."
                                 ></textarea>
@@ -666,39 +666,39 @@
                                 <p class="text-xs text-red-500 font-bold mb-2"><i class="ph-bold ph-warning"></i> En desarrollo: Módulo de voluntarios no conectado.</p>
                             </div>
                             <div>
-                                <label class="mb-1 block text-[10px] font-black uppercase text-[#2F3E5C]/60">Seleccionar Voluntario / Padrino</label>
-                                <select name="voluntario_id" disabled class="w-full rounded-xl border border-[#C7B5A3] bg-[#D5C7B9]/70 px-4 py-3 text-sm font-bold outline-none opacity-50">
+                                <label class="mb-1 block text-[10px] font-black uppercase text-apoyo">Seleccionar Voluntario / Padrino</label>
+                                <select name="voluntario_id" disabled class="w-full rounded-xl border border-borde-suave bg-fondo-panel px-4 py-3 text-sm font-bold outline-none opacity-50">
                                     <option>Sin voluntarios registrados</option>
                                 </select>
                             </div>
                             <div>
-                                <label class="mb-1 block text-[10px] font-black uppercase text-[#2F3E5C]/60">Tipo de Asignación</label>
-                                <select name="tipo_asignacion" disabled class="w-full rounded-xl border border-[#C7B5A3] bg-[#D5C7B9]/70 px-4 py-3 text-sm font-bold outline-none opacity-50">
+                                <label class="mb-1 block text-[10px] font-black uppercase text-apoyo">Tipo de Asignación</label>
+                                <select name="tipo_asignacion" disabled class="w-full rounded-xl border border-borde-suave bg-fondo-panel px-4 py-3 text-sm font-bold outline-none opacity-50">
                                     <option>Acompañamiento</option>
                                     <option>Apoyo Económico</option>
                                 </select>
                             </div>
                             <div class="md:col-span-2 mt-2">
-                                <button type="button" disabled class="w-full rounded-xl bg-[#C7B5A3] px-4 py-3 text-sm font-black text-white cursor-not-allowed">Asignar Próximamente</button>
+                                <button type="button" disabled class="w-full rounded-xl bg-fondo-panel px-4 py-3 text-sm font-black text-inverso cursor-not-allowed">Asignar Próximamente</button>
                             </div>
                         </form>
                     </div>
 
-                    <div class="flex flex-col-reverse gap-2 border-t border-[#C7B5A3] p-5 sm:flex-row sm:justify-end">
+                    <div class="flex flex-col-reverse gap-2 border-t border-borde-suave p-5 sm:flex-row sm:justify-end">
                         <button type="button"
                                 @click="cerrar()"
                                 :disabled="cargando"
-                                class="rounded-xl bg-[#D5C7B9] px-4 py-2.5 text-xs font-black text-[#2F3E5C] transition hover:bg-[#9A7B60] hover:text-white active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed">
+                                class="rounded-xl bg-fondo-app px-4 py-2.5 text-xs font-black text-titulo transition hover:bg-fondo-panel hover:text-inverso active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed">
                             Cancelar
                         </button>
 
                         {{-- Botones Dinámicos de Guardado --}}
-                        <button type="submit" form="form-familiar" x-show="modal === 'familiar' && !isViewing" class="rounded-xl bg-[#E27D60] px-4 py-2.5 text-xs font-black text-white transition hover:bg-[#D96F58] active:scale-95" x-text="isEditing ? 'Actualizar Familiar' : 'Vincular Familiar'"></button>
-                        <button type="submit" form="form-observacion" x-show="modal === 'observacion' && !isViewing" :disabled="cargando" class="rounded-xl bg-[#E27D60] px-4 py-2.5 text-xs font-black text-white transition hover:bg-[#D96F58] active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed" x-text="cargando ? 'Guardando...' : (isEditing ? 'Actualizar Observación' : 'Guardar Observación')"></button>
-                        <button type="submit" form="form-atencion" x-show="modal === 'atencion' && !isViewing" :disabled="cargando" class="rounded-xl bg-[#E27D60] px-4 py-2.5 text-xs font-black text-white transition hover:bg-[#D96F58] active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed" x-text="cargando ? 'Guardando...' : (isEditing ? 'Actualizar Atención' : 'Guardar Atención')"></button>
-                        <button type="submit" form="form-evaluacion" x-show="modal === 'evaluacion' && !isViewing" class="rounded-xl bg-[#E27D60] px-4 py-2.5 text-xs font-black text-white transition hover:bg-[#D96F58] active:scale-95">Guardar Evaluación</button>
-                        <button type="submit" form="form-actividad" x-show="modal === 'actividad' && !isViewing" :disabled="cargando" class="rounded-xl bg-[#E27D60] px-4 py-2.5 text-xs font-black text-white transition hover:bg-[#D96F58] active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed" x-text="cargando ? 'Guardando...' : (isEditing ? 'Actualizar Actividad' : 'Guardar Actividad')"></button>
-                        <button type="submit" form="form-documento" x-show="modal === 'documento' && !isViewing" :disabled="cargando" class="rounded-xl bg-[#E27D60] px-4 py-2.5 text-xs font-black text-white transition hover:bg-[#D96F58] active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed" x-text="cargando ? 'Guardando...' : (isEditing ? 'Actualizar Metadatos' : 'Subir Documento')"></button>
+                        <button type="submit" form="form-familiar" x-show="modal === 'familiar' && !isViewing" class="rounded-xl bg-boton-acento px-4 py-2.5 text-xs font-black text-inverso transition hover:bg-fondo-panel active:scale-95" x-text="isEditing ? 'Actualizar Familiar' : 'Vincular Familiar'"></button>
+                        <button type="submit" form="form-observacion" x-show="modal === 'observacion' && !isViewing" :disabled="cargando" class="rounded-xl bg-boton-acento px-4 py-2.5 text-xs font-black text-inverso transition hover:bg-fondo-panel active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed" x-text="cargando ? 'Guardando...' : (isEditing ? 'Actualizar Observación' : 'Guardar Observación')"></button>
+                        <button type="submit" form="form-atencion" x-show="modal === 'atencion' && !isViewing" :disabled="cargando" class="rounded-xl bg-boton-acento px-4 py-2.5 text-xs font-black text-inverso transition hover:bg-fondo-panel active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed" x-text="cargando ? 'Guardando...' : (isEditing ? 'Actualizar Atención' : 'Guardar Atención')"></button>
+                        <button type="submit" form="form-evaluacion" x-show="modal === 'evaluacion' && !isViewing" class="rounded-xl bg-boton-acento px-4 py-2.5 text-xs font-black text-inverso transition hover:bg-fondo-panel active:scale-95">Guardar Evaluación</button>
+                        <button type="submit" form="form-actividad" x-show="modal === 'actividad' && !isViewing" :disabled="cargando" class="rounded-xl bg-boton-acento px-4 py-2.5 text-xs font-black text-inverso transition hover:bg-fondo-panel active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed" x-text="cargando ? 'Guardando...' : (isEditing ? 'Actualizar Actividad' : 'Guardar Actividad')"></button>
+                        <button type="submit" form="form-documento" x-show="modal === 'documento' && !isViewing" :disabled="cargando" class="rounded-xl bg-boton-acento px-4 py-2.5 text-xs font-black text-inverso transition hover:bg-fondo-panel active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed" x-text="cargando ? 'Guardando...' : (isEditing ? 'Actualizar Metadatos' : 'Subir Documento')"></button>
                     </div>
                 </div>
             </div>

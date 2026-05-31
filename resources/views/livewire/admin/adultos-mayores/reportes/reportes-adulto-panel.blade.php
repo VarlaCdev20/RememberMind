@@ -1,25 +1,25 @@
 <div>
     {{-- Selector de Periodo y Filtros --}}
-    <div class="mb-6 rounded-[24px] border border-[#CBBBAA] bg-[#F2EBE3]/90 p-5 shadow-[0_12px_28px_rgba(47,62,92,0.05)] backdrop-blur-xl flex flex-col md:flex-row gap-4 items-end justify-between">
+    <div class="mb-6 rounded-[24px] border border-borde bg-fondo-panel p-5 shadow-[0_12px_28px_rgba(47,62,92,0.05)] backdrop-blur-xl flex flex-col md:flex-row gap-4 items-end justify-between">
         <div class="flex-1">
-            <span class="text-[11px] font-black uppercase tracking-[0.18em] text-[#9A7B60]">
+            <span class="text-[11px] font-black uppercase tracking-[0.18em] text-parrafo">
                 Análisis y Reportes
             </span>
-            <h3 class="text-base font-black text-[#2F3E5C] mt-1 mb-1">
+            <h3 class="text-base font-black text-titulo mt-1 mb-1">
                 Ficha y Reportes de Evolución
             </h3>
-            <p class="text-[11px] font-bold text-[#2F3E5C]/60 leading-relaxed">
+            <p class="text-[11px] font-bold text-apoyo leading-relaxed">
                 Seleccione el rango de fechas para actualizar en tiempo real los análisis gráficos y registros de evolución.
             </p>
         </div>
         <div class="flex flex-wrap items-center gap-3 w-full md:w-auto shrink-0">
             <div class="w-[140px]">
-                <label class="block text-[9px] font-black uppercase text-[#2F3E5C]/60 mb-1 tracking-wider">Desde</label>
-                <input type="date" wire:model.live="fecha_inicio" class="w-full rounded-xl border border-[#C7B5A3] bg-white/45 px-3 py-1.5 text-xs font-bold text-[#2F3E5C] outline-none hover:bg-white transition">
+                <label class="block text-[9px] font-black uppercase text-apoyo mb-1 tracking-wider">Desde</label>
+                <input type="date" wire:model.live="fecha_inicio" class="w-full rounded-xl border border-borde-suave bg-fondo-card/45 px-3 py-1.5 text-xs font-bold text-titulo outline-none hover:bg-fondo-card transition">
             </div>
             <div class="w-[140px]">
-                <label class="block text-[9px] font-black uppercase text-[#2F3E5C]/60 mb-1 tracking-wider">Hasta</label>
-                <input type="date" wire:model.live="fecha_fin" class="w-full rounded-xl border border-[#C7B5A3] bg-white/45 px-3 py-1.5 text-xs font-bold text-[#2F3E5C] outline-none hover:bg-white transition">
+                <label class="block text-[9px] font-black uppercase text-apoyo mb-1 tracking-wider">Hasta</label>
+                <input type="date" wire:model.live="fecha_fin" class="w-full rounded-xl border border-borde-suave bg-fondo-card/45 px-3 py-1.5 text-xs font-bold text-titulo outline-none hover:bg-fondo-card transition">
             </div>
         </div>
     </div>
@@ -34,32 +34,32 @@
 
     {{-- Indicadores rápidos en el rango --}}
     <div class="grid gap-3 mb-6 sm:grid-cols-2 lg:grid-cols-4">
-        <div class="rounded-[18px] border border-[#D5C7B9] bg-[#E7DDD2]/45 p-4 shadow-xs">
-            <p class="text-[9px] font-black uppercase tracking-[0.15em] text-[#2F3E5C]/45">Reportes Disponibles</p>
-            <p class="mt-1 text-xl font-black text-[#2F3E5C]">6</p>
+        <div class="rounded-[18px] border border-borde-suave bg-fondo-panel p-4 shadow-xs">
+            <p class="text-[9px] font-black uppercase tracking-[0.15em] text-apoyo">Reportes Disponibles</p>
+            <p class="mt-1 text-xl font-black text-titulo">6</p>
         </div>
-        <div class="rounded-[18px] border border-[#D5C7B9] bg-[#E7DDD2]/45 p-4 shadow-xs">
-            <p class="text-[9px] font-black uppercase tracking-[0.15em] text-[#2F3E5C]/45">Registros Signos Vitales</p>
-            <p class="mt-1 text-xl font-black text-[#C45F4B]">
+        <div class="rounded-[18px] border border-borde-suave bg-fondo-panel p-4 shadow-xs">
+            <p class="text-[9px] font-black uppercase tracking-[0.15em] text-apoyo">Registros Signos Vitales</p>
+            <p class="mt-1 text-xl font-black text-parrafo">
                 {{ count($chartSignos['fc'] ?? []) }}
             </p>
         </div>
-        <div class="rounded-[18px] border border-[#D5C7B9] bg-[#E7DDD2]/45 p-4 shadow-xs">
-            <p class="text-[9px] font-black uppercase tracking-[0.15em] text-[#2F3E5C]/45">Evaluaciones Registradas</p>
-            <p class="mt-1 text-xl font-black text-[#5B5F97]">
+        <div class="rounded-[18px] border border-borde-suave bg-fondo-panel p-4 shadow-xs">
+            <p class="text-[9px] font-black uppercase tracking-[0.15em] text-apoyo">Evaluaciones Registradas</p>
+            <p class="mt-1 text-xl font-black text-parrafo">
                 {{ count($chartCognitivo['puntajes'] ?? []) }}
             </p>
         </div>
-        <div class="rounded-[18px] border border-[#D5C7B9] bg-[#E7DDD2]/45 p-4 shadow-xs">
-            <p class="text-[9px] font-black uppercase tracking-[0.15em] text-[#2F3E5C]/45">Anexo de Trazabilidad</p>
-            <span class="mt-1.5 inline-flex items-center rounded-md bg-[#8EA17D]/15 border border-[#8EA17D]/35 px-2 py-0.5 text-[10px] font-black text-[#617453]">
+        <div class="rounded-[18px] border border-borde-suave bg-fondo-panel p-4 shadow-xs">
+            <p class="text-[9px] font-black uppercase tracking-[0.15em] text-apoyo">Anexo de Trazabilidad</p>
+            <span class="mt-1.5 inline-flex items-center rounded-md bg-fondo-panel border border-borde px-2 py-0.5 text-[10px] font-black text-parrafo">
                 ACTIVO
             </span>
         </div>
     </div>
 
     {{-- Cards de Reportes Individuales --}}
-    <h3 class="text-xs font-black uppercase tracking-widest text-[#2F3E5C]/60 mb-4 border-b border-[#D5C7B9]/50 pb-2 flex items-center gap-2">
+    <h3 class="text-xs font-black uppercase tracking-widest text-apoyo mb-4 border-b border-borde-suave pb-2 flex items-center gap-2">
         <i class="ph-bold ph-file-text"></i> Catálogo de Reportes Individuales
     </h3>
 
@@ -72,7 +72,7 @@
                     'titulo' => 'Ficha Integral del Adulto Mayor',
                     'desc' => 'Consolidado general administrativo, red de apoyo y evolución.',
                     'color' => '#2F3E5C',
-                    'bg' => 'bg-[#2F3E5C]/10',
+                    'bg' => 'bg-fondo-panel',
                     'url' => route('admin.adultos-mayores.reporte-individual', $adultoMayor->cod_am)
                 ],
                 [
@@ -80,7 +80,7 @@
                     'titulo' => 'Reporte de Atenciones',
                     'desc' => 'Historial de atenciones institucionales registradas en el periodo.',
                     'color' => '#E27D60',
-                    'bg' => 'bg-[#E27D60]/10',
+                    'bg' => 'bg-estado-peligroBg',
                     'url' => route('admin.adultos-mayores.reportes.especifico', [$adultoMayor->cod_am, 'medico']) . $q
                 ],
                 [
@@ -88,7 +88,7 @@
                     'titulo' => 'Reporte de Medicación',
                     'desc' => 'Tratamientos y bitácora de tomas registradas en el periodo.',
                     'color' => '#D9A27C',
-                    'bg' => 'bg-[#D9A27C]/20',
+                    'bg' => 'bg-fondo-panel',
                     'url' => route('admin.adultos-mayores.reportes.especifico', [$adultoMayor->cod_am, 'medicacion']) . $q
                 ],
                 [
@@ -96,7 +96,7 @@
                     'titulo' => 'Reporte Signos Vitales',
                     'desc' => 'Evolución registrada e historial de constantes vitales.',
                     'color' => '#C45F4B',
-                    'bg' => 'bg-[#C45F4B]/10',
+                    'bg' => 'bg-fondo-panel',
                     'url' => route('admin.adultos-mayores.reportes.especifico', [$adultoMayor->cod_am, 'signos']) . $q
                 ],
                 [
@@ -104,7 +104,7 @@
                     'titulo' => 'Valoración Funcional',
                     'desc' => 'Nivel de autonomía e indicadores funcionales institucionales.',
                     'color' => '#8EA17D',
-                    'bg' => 'bg-[#8EA17D]/15',
+                    'bg' => 'bg-fondo-panel',
                     'url' => route('admin.adultos-mayores.reportes.especifico', [$adultoMayor->cod_am, 'funcional']) . $q
                 ],
                 [
@@ -112,28 +112,28 @@
                     'titulo' => 'Reporte de Evaluaciones',
                     'desc' => 'Puntajes de tamizaje cognitivo y resultados interpretativos.',
                     'color' => '#5B5F97',
-                    'bg' => 'bg-[#5B5F97]/15',
+                    'bg' => 'bg-fondo-panel',
                     'url' => route('admin.adultos-mayores.reportes.especifico', [$adultoMayor->cod_am, 'cognitivo']) . $q
                 ],
             ];
         @endphp
 
         @foreach($reportes as $rep)
-            <div class="rounded-2xl border border-[#CBBBAA] bg-[#E7DDD2]/95 p-4 shadow-xs transition duration-200 hover:-translate-y-0.5 hover:shadow-md flex flex-col justify-between">
+            <div class="rounded-2xl border border-borde bg-fondo-panel p-4 shadow-xs transition duration-200 hover:-translate-y-0.5 hover:shadow-md flex flex-col justify-between">
                 <div class="flex items-start gap-3">
                     <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl {{ $rep['bg'] }}" style="color: {{ $rep['color'] }}">
                         <i class="ph-bold {{ $rep['icono'] }} text-xl"></i>
                     </div>
                     <div>
-                        <h4 class="text-xs font-black text-[#2F3E5C] leading-snug">{{ $rep['titulo'] }}</h4>
-                        <p class="text-[10px] font-bold text-[#2F3E5C]/60 mt-1 mb-3 leading-relaxed">{{ $rep['desc'] }}</p>
+                        <h4 class="text-xs font-black text-titulo leading-snug">{{ $rep['titulo'] }}</h4>
+                        <p class="text-[10px] font-bold text-apoyo mt-1 mb-3 leading-relaxed">{{ $rep['desc'] }}</p>
                     </div>
                 </div>
-                <div class="flex gap-2 border-t border-[#D5C7B9]/20 pt-3">
-                    <a href="{{ $rep['url'] }}" target="_blank" class="flex-1 inline-flex items-center justify-center gap-1 rounded-lg bg-white/55 px-2.5 py-1.5 text-[9px] font-black uppercase tracking-wider text-[#2F3E5C] transition hover:bg-white border border-[#D5C7B9] active:scale-95">
+                <div class="flex gap-2 border-t border-borde-suave pt-3">
+                    <a href="{{ $rep['url'] }}" target="_blank" class="flex-1 inline-flex items-center justify-center gap-1 rounded-lg bg-fondo-card/55 px-2.5 py-1.5 text-[9px] font-black uppercase tracking-wider text-titulo transition hover:bg-fondo-card border border-borde-suave active:scale-95">
                         <i class="ph-bold ph-eye"></i> Ver
                     </a>
-                    <a href="{{ $rep['url'] }}&format=pdf" class="flex-1 inline-flex items-center justify-center gap-1 rounded-lg bg-[#2F3E5C] px-2.5 py-1.5 text-[9px] font-black uppercase tracking-wider text-white transition hover:bg-[#1F2E4C] active:scale-95">
+                    <a href="{{ $rep['url'] }}&format=pdf" class="flex-1 inline-flex items-center justify-center gap-1 rounded-lg bg-boton-principal px-2.5 py-1.5 text-[9px] font-black uppercase tracking-wider text-inverso transition hover:bg-fondo-panel active:scale-95">
                         <i class="ph-bold ph-file-pdf"></i> PDF
                     </a>
                 </div>
@@ -142,23 +142,23 @@
     </div>
 
     {{-- Gráficos de Evolución --}}
-    <h3 class="text-xs font-black uppercase tracking-widest text-[#2F3E5C]/60 mb-4 border-b border-[#D5C7B9]/50 pb-2 flex items-center gap-2">
+    <h3 class="text-xs font-black uppercase tracking-widest text-apoyo mb-4 border-b border-borde-suave pb-2 flex items-center gap-2">
         <i class="ph-bold ph-trend-up"></i> Gráficos de Evolución Institucional
     </h3>
 
     <div class="grid gap-6 lg:grid-cols-2">
         {{-- Gráfico Signos Vitales --}}
-        <div class="rounded-2xl border border-[#CBBBAA] bg-[#E7DDD2]/95 p-5 shadow-xs flex flex-col justify-between">
-            <h4 class="text-xs font-black text-[#2F3E5C] mb-3 flex items-center gap-1.5">
-                <span class="h-2 w-2 rounded-full bg-[#C45F4B]"></span>
+        <div class="rounded-2xl border border-borde bg-fondo-panel p-5 shadow-xs flex flex-col justify-between">
+            <h4 class="text-xs font-black text-titulo mb-3 flex items-center gap-1.5">
+                <span class="h-2 w-2 rounded-full bg-fondo-panel"></span>
                 Evolución de Signos Vitales
             </h4>
             
             @if(empty($chartSignos['fc'] ?? []))
-                <div class="flex flex-col items-center justify-center py-16 text-center border-2 border-dashed border-[#D5C7B9] rounded-xl bg-[#F2EBE3]/45 min-h-[260px]">
-                    <i class="ph-bold ph-heartbeat text-3xl text-[#2F3E5C]/30 mb-2"></i>
-                    <p class="text-xs font-black text-[#2F3E5C]/50">Sin datos suficientes para generar esta gráfica.</p>
-                    <p class="text-[10px] font-bold text-[#2F3E5C]/35 mt-0.5">Registre constantes vitales en el rango de fechas seleccionado.</p>
+                <div class="flex flex-col items-center justify-center py-16 text-center border-2 border-dashed border-borde-suave rounded-xl bg-fondo-panel min-h-[260px]">
+                    <i class="ph-bold ph-heartbeat text-3xl text-apoyo mb-2"></i>
+                    <p class="text-xs font-black text-apoyo">Sin datos suficientes para generar esta gráfica.</p>
+                    <p class="text-[10px] font-bold text-apoyo mt-0.5">Registre constantes vitales en el rango de fechas seleccionado.</p>
                 </div>
             @else
                 <div class="relative h-64 w-full"
@@ -202,17 +202,17 @@
         </div>
 
         {{-- Gráfico Evaluaciones --}}
-        <div class="rounded-2xl border border-[#CBBBAA] bg-[#E7DDD2]/95 p-5 shadow-xs flex flex-col justify-between">
-            <h4 class="text-xs font-black text-[#2F3E5C] mb-3 flex items-center gap-1.5">
-                <span class="h-2 w-2 rounded-full bg-[#5B5F97]"></span>
+        <div class="rounded-2xl border border-borde bg-fondo-panel p-5 shadow-xs flex flex-col justify-between">
+            <h4 class="text-xs font-black text-titulo mb-3 flex items-center gap-1.5">
+                <span class="h-2 w-2 rounded-full bg-fondo-panel"></span>
                 Evolución de Evaluaciones Cognitivas
             </h4>
 
             @if(empty($chartCognitivo['puntajes'] ?? []))
-                <div class="flex flex-col items-center justify-center py-16 text-center border-2 border-dashed border-[#D5C7B9] rounded-xl bg-[#F2EBE3]/45 min-h-[260px]">
-                    <i class="ph-bold ph-brain text-3xl text-[#2F3E5C]/30 mb-2"></i>
-                    <p class="text-xs font-black text-[#2F3E5C]/50">Sin datos suficientes para generar esta gráfica.</p>
-                    <p class="text-[10px] font-bold text-[#2F3E5C]/35 mt-0.5">Registre valoraciones de tamizaje cognitivo en el rango seleccionado.</p>
+                <div class="flex flex-col items-center justify-center py-16 text-center border-2 border-dashed border-borde-suave rounded-xl bg-fondo-panel min-h-[260px]">
+                    <i class="ph-bold ph-brain text-3xl text-apoyo mb-2"></i>
+                    <p class="text-xs font-black text-apoyo">Sin datos suficientes para generar esta gráfica.</p>
+                    <p class="text-[10px] font-bold text-apoyo mt-0.5">Registre valoraciones de tamizaje cognitivo en el rango seleccionado.</p>
                 </div>
             @else
                 <div class="relative h-64 w-full"
