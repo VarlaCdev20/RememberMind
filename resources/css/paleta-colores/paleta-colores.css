@@ -1,0 +1,280 @@
+/* ====================================================================
+   RememberMind / Casa Amandita — Paleta de Colores Completa
+   Archivo de referencia: documenta TODOS los colores del sistema.
+   Solo define variables CSS. No genera clases ni altera estilos.
+
+   Uso: @import '../paleta-colores/paleta-colores.css'; (si se necesita)
+   Los tokens de Tailwind viven en tailwind.config.js y los consumen
+   las clases bg-*, text-*, border-*. Este archivo centraliza los
+   valores hex para consulta rápida y posible uso con var(--*).
+   ==================================================================== */
+
+:root {
+
+    /* ==================================================================
+       SECCIÓN 1 — IDENTIDAD DE MARCA (Tokens Tailwind registrados)
+       Fuente: tailwind.config.js → theme.extend.colors
+       Uso principal: botones de acción, encabezados, acentos primarios
+       ================================================================== */
+
+    /* Color de acción principal — botones primarios, highlight activo */
+    --color-terracota:          #E97A5F;
+    /* Hover del botón terracota */
+    --color-terracota-dark:     #D96B52;
+    /* Glow de cursor sobre dashboard (12% opacidad) */
+    --color-terracota-glow:     rgba(233, 122, 95, 0.12);
+    /* Sombra glow de ítem activo en sidebar */
+    --color-terracota-shadow:   rgba(233, 122, 95, 0.60);
+
+    /* Texto principal, headers, íconos de menú, títulos de sección */
+    --color-azul-profundo:      #2F3E5C;
+    /* Overlay de modal y sombras de paneles */
+    --color-azul-profundo-sombra: rgba(47, 62, 92, 0.12);
+
+    /* Acento naranja — alertas, advertencias, KPI de seguimiento */
+    --color-naranja:            #F4A261;
+    /* Variante oscura del naranja para texto sobre fondo claro */
+    --color-naranja-dark:       #D4843A;
+
+    /* Acento melocotón suave — decorativo */
+    --color-durazno:            #F7B7A3;
+    /* Variante más clara — fondos de sección cálida */
+    --color-rosa-crema:         #FADCD3;
+    /* Fondo muy cálido — páginas de bienvenida, landing */
+    --color-fondo-calido:       #FDF2EC;
+
+
+    /* ==================================================================
+       SECCIÓN 2 — MÓDULO DE SALUD (Verdes)
+       Uso: métricas de salud, pastillas, signos vitales, fichas médicas,
+            evaluaciones funcionales, ítems "OK" / estado positivo
+       ================================================================== */
+
+    /* Verde médico principal — medicaciones, signos, estado saludable */
+    --color-verde-salud:        #2A9D8F;
+    /* Verde suave para íconos secundarios */
+    --color-verde-suave:        #6FBFB3;
+    /* Fondo de sección de salud — muy claro */
+    --color-fondo-salud:        #D8F3EE;
+
+
+    /* ==================================================================
+       SECCIÓN 3 — MÓDULO COGNITIVO / EVALUACIONES (Azules y Púrpuras)
+       Uso: evaluaciones cognitivas, instrumentos geriátricos,
+            panel de área clínica, íconos de brain
+       ================================================================== */
+
+    /* Azul clínico — indicadores médicos, datos técnicos */
+    --color-azul-clinico:       #8FB7D9;
+    /* Azul técnico más saturado — gráficos, datos analíticos */
+    --color-azul-tec:           #5E81AC;
+
+    /* Púrpura cognitivo — evaluaciones cognitivas, MMSE, Mini-Mental */
+    --color-morado-cog:         #9B8AC7;
+    /* Variante oscura púrpura — texto sobre fondo claro cognitivo */
+    --color-morado-cog-dark:    #7A68B0;
+    /* Púrpura técnico — acento adicional */
+    --color-morado-tec:         #7B6FB3;
+    /* Fondo sección cognitiva — muy claro */
+    --color-fondo-cog:          #E6E1F5;
+
+
+    /* ==================================================================
+       SECCIÓN 4 — NEUTROS CÁLIDOS BASE (Escala completa del sistema)
+       Uso: la "espina dorsal" visual del sistema. Todos los fondos,
+            bordes, tarjetas y superficies se construyen con esta escala.
+       Orden: de más oscuro → más claro
+       ================================================================== */
+
+    /* Marrón cálido — fondo del body (color base de toda la app) */
+    --color-neutro-900:         #D5C7B9;
+
+    /* Borde universal — el color de borde más usado en todo el sistema */
+    --color-neutro-800:         #C7B5A3;
+    /* Variante de borde ligeramente más oscura */
+    --color-neutro-borde-alt:   #CBBBAA;
+
+    /* Fondo de tarjetas y secciones — usado en panels, modales, sidebar */
+    --color-neutro-700:         #E6DDD3;
+    /* Variante de tarjeta cálida con tono ligeramente más naranja */
+    --color-neutro-card-alt:    #E7DDD2;
+
+    /* Fondo de métricas secundarias, tiras de estadísticas */
+    --color-neutro-600:         #F2EBE3;
+
+    /* Fondo de inputs, tablas, áreas de contenido muy sutil */
+    --color-neutro-500:         #F7F5F2;
+
+    /* Crema base — el fondo más claro del sistema */
+    --color-neutro-100:         #F8F6F3;
+    /* Gris cálido — alternativa de crema base */
+    --color-gris-calido:        #EAE7E3;
+
+    /* Fondo header del sidebar colapsado */
+    --color-sidebar-header:     rgba(213, 199, 185, 0.40);  /* #D5C7B9 al 40% */
+
+
+    /* ==================================================================
+       SECCIÓN 5 — TIPOGRAFÍA Y TEXTO
+       Uso: jerarquía de textos en todo el sistema
+       ================================================================== */
+
+    /* Texto principal — body, celdas, párrafos */
+    --color-texto-principal:    #2C2C2C;
+    /* Texto secundario — metadatos, etiquetas de apoyo */
+    --color-texto-secundario:   #6B7280;
+    /* Texto deshabilitado / placeholder — azul-profundo al 40% */
+    --color-texto-placeholder:  rgba(47, 62, 92, 0.40);
+    /* Texto de metadatos — azul-profundo al 50% */
+    --color-texto-meta:         rgba(47, 62, 92, 0.50);
+    /* Texto de labels en métricas — azul-profundo al 45% */
+    --color-texto-label:        rgba(47, 62, 92, 0.45);
+    /* Subtítulos de sección — azul-profundo al 55-60% */
+    --color-texto-subtitulo:    rgba(47, 62, 92, 0.55);
+
+
+    /* ==================================================================
+       SECCIÓN 6 — ESTADOS SEMÁNTICOS (Tailwind estándar extendido)
+       Uso: badges de estado, alertas del sistema, mensajes de feedback
+       ================================================================== */
+
+    /* Éxito — ACTIVO, VIGENTE, DISPONIBLE, ACTIVA */
+    --color-estado-success-bg:  #D1FAE5;   /* emerald-100 */
+    --color-estado-success:     #059669;   /* emerald-600 */
+    --color-estado-success-borde: #A7F3D0; /* emerald-200 */
+
+    /* Advertencia — SUSPENDIDO, PENDIENTE, EN_REVISION */
+    --color-estado-warning-bg:  #FEF3C7;   /* amber-100 */
+    --color-estado-warning:     #D97706;   /* amber-600 */
+    --color-estado-warning-borde: #FDE68A; /* amber-200 */
+
+    /* Peligro — CRÍTICO, FALLECIDO, RETIRADO, urgente */
+    --color-estado-danger-bg:   #FFE4E6;   /* rose-100 */
+    --color-estado-danger:      #E11D48;   /* rose-600 */
+    --color-estado-danger-borde: #FECDD3;  /* rose-200 */
+
+    /* Información — TRASLADADO, SEGUIMIENTO_ESPECIAL */
+    --color-estado-info-bg:     #DBEAFE;   /* blue-100 */
+    --color-estado-info:        #1D4ED8;   /* blue-700 */
+    --color-estado-info-borde:  #BFDBFE;   /* blue-200 */
+
+    /* Neutro — ARCHIVADO, FINALIZADO, INACTIVO, ANULADO */
+    --color-estado-neutral-bg:  #E6DDD3;   /* --color-neutro-700 */
+    --color-estado-neutral:     rgba(47, 62, 92, 0.70);
+
+    /* Restaurado / especial — RESTAURADO */
+    --color-estado-purple-bg:   #F3E8FF;   /* purple-100 */
+    --color-estado-purple:      #7C3AED;   /* purple-700 */
+    --color-estado-purple-borde: #E9D5FF;  /* purple-200 */
+
+
+    /* ==================================================================
+       SECCIÓN 7 — KPI CARDS — TEMAS DE COLOR
+       Uso: tarjetas de métricas en el dashboard principal
+       Cada tema define: fondo de ícono, color de ícono y color de valor
+       ================================================================== */
+
+    /* KPI Tema 1 — Residentes totales */
+    --kpi-azul-profundo-bg:     rgba(47, 62, 92, 0.10);
+    --kpi-azul-profundo-text:   #2F3E5C;
+
+    /* KPI Tema 2 — Alertas / seguimiento activo */
+    --kpi-naranja-bg:           rgba(244, 162, 97, 0.15);
+    --kpi-naranja-text:         #D4843A;
+
+    /* KPI Tema 3 — Atención médica / salud */
+    --kpi-verde-salud-bg:       rgba(42, 157, 143, 0.10);
+    --kpi-verde-salud-text:     #2A9D8F;
+
+    /* KPI Tema 4 — Evaluaciones cognitivas */
+    --kpi-morado-cog-bg:        rgba(155, 138, 199, 0.15);
+    --kpi-morado-cog-text:      #7A68B0;
+
+    /* KPI Tema 5 — Actividades / participación */
+    --kpi-terracota-bg:         rgba(233, 122, 95, 0.10);
+    --kpi-terracota-text:       #E97A5F;
+
+    /* KPI Tema 6 — Voluntarios / red de apoyo */
+    --kpi-verde-olivo-bg:       rgba(141, 162, 128, 0.15);
+    --kpi-verde-olivo-text:     #63775B;
+    --kpi-verde-olivo:          #8DA280;
+
+
+    /* ==================================================================
+       SECCIÓN 8 — BADGES DE NIVEL (KPI, alertas, estados de alerta)
+       Uso: indicadores de urgencia en KPIs y sistema de alertas
+       ================================================================== */
+
+    /* Normal / sin alerta */
+    --badge-normal-bg:          rgba(47, 62, 92, 0.08);
+    --badge-normal-text:        rgba(47, 62, 92, 0.60);
+
+    /* Ok / en buen estado */
+    --badge-ok-bg:              rgba(42, 157, 143, 0.10);
+    --badge-ok-text:            #2A9D8F;
+
+    /* Alerta / requiere atención */
+    --badge-alerta-bg:          rgba(244, 162, 97, 0.20);
+    --badge-alerta-text:        #D4843A;
+
+    /* Advertencia / acción inmediata */
+    --badge-advertencia-bg:     rgba(233, 122, 95, 0.10);
+    --badge-advertencia-text:   #E97A5F;
+
+
+    /* ==================================================================
+       SECCIÓN 9 — SOMBRAS Y EFECTOS ESPECIALES
+       Uso: elevación de paneles, brillo de botones activos,
+            overlay de modales, efectos de profundidad del dashboard
+       ================================================================== */
+
+    /* Sombra principal de paneles del dashboard */
+    --sombra-panel:             0 16px 38px rgba(47, 62, 92, 0.12);
+    /* Sombra interna del header de sidebar */
+    --sombra-sidebar-header:    inset 0 1px 3px rgba(47, 62, 92, 0.08);
+    /* Sombra lateral del sidebar */
+    --sombra-sidebar:           18px 0 55px rgba(47, 62, 92, 0.12);
+
+    /* Glow de botón / elemento activo terracota */
+    --glow-terracota-normal:    0 0 15px rgba(233, 122, 95, 0.40);
+    --glow-terracota-hover:     0 0 25px rgba(233, 122, 95, 0.60);
+    /* Glow de ítem activo en sidebar */
+    --glow-sidebar-activo:      0 0 8px rgba(233, 122, 95, 0.60);
+
+    /* Overlay de modal — azul-profundo al 50% */
+    --overlay-modal:            rgba(47, 62, 92, 0.50);
+
+
+    /* ==================================================================
+       SECCIÓN 10 — GRADIENTES
+       Uso: barras de progreso, indicadores visuales de porcentaje
+       ================================================================== */
+
+    /* Gradiente cálido — barras de progreso y completitud */
+    --gradiente-progress-inicio: #D9A27C;
+    --gradiente-progress-fin:    #E97A5F;   /* = terracota */
+
+    /* Punto de inicio del gradiente como color independiente */
+    --color-progress-warm:       #D9A27C;
+
+
+    /* ==================================================================
+       SECCIÓN 11 — FONDOS DE TEXTURA / EFECTOS DASHBOARD
+       Uso: capas decorativas sobre el fondo del dashboard principal
+       ================================================================== */
+
+    /* Color de puntos de la cuadrícula (.dash-dots) */
+    --dash-dots-color:           #2F3E5C;   /* = azul-profundo */
+    /* Opacidad de los puntos */
+    --dash-dots-opacity:         0.03;
+    /* Tamaño de la cuadrícula de puntos */
+    --dash-dots-size:            30px;
+
+    /* Opacidad de la capa de ruido fractal (.dash-noise) */
+    --dash-noise-opacity:        0.14;
+
+    /* Luz del cursor — radio y color (.mouse-light) */
+    --mouse-light-radio:         200px;
+    --mouse-light-color:         rgba(233, 122, 95, 0.12);
+
+}

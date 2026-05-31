@@ -1,0 +1,444 @@
+/* ====================================================================
+   RememberMind / Casa Amandita — Texturas, Tramas y Efectos Visuales
+   Archivo de referencia: documenta TODAS las texturas, patrones de
+   fondo, efectos de sombra, bordes decorativos, animaciones y capas
+   visuales usadas en el sistema.
+   Solo define variables CSS. No genera clases ni altera estilos.
+
+   Las clases reales (.dash-noise, .dash-dots, .mouse-light, etc.)
+   están declaradas en:
+     - resources/css/app.css (@layer components)
+     - resources/views/layouts/sistema.blade.php (<style>)
+     - resources/views/auth/login.blade.php (<style>)
+     - resources/views/welcome.blade.php (inline styles)
+   ==================================================================== */
+
+:root {
+
+    /* ==================================================================
+       SECCIÓN 1 — TEXTURA DE RUIDO FRACTAL (Grain / Noise Overlay)
+       Clase real: .dash-noise (dashboard) / .auth-noise (login)
+       Fuente: sistema.blade.php y login.blade.php
+       Propósito: capa decorativa sobre el fondo que aporta sensación
+                  de papel / textura orgánica cálida
+       ================================================================== */
+
+    /* Opacidad de la capa de ruido sobre el dashboard */
+    --noise-opacity-dashboard:   0.14;
+    /* Opacidad sobre la pantalla de login (más intensa) */
+    --noise-opacity-login:       0.25;
+    /* Opacidad en la landing (welcome.blade.php) */
+    --noise-opacity-welcome:     0.25;
+
+    /* Modo de mezcla de la capa de ruido */
+    --noise-blend-mode:          overlay;     /* dashboard y welcome */
+    --noise-blend-mode-app:      multiply;    /* app.css .dash-noise */
+
+    /* Parámetros del SVG fractalNoise:
+       baseFrequency="0.85" — frecuencia de grano (más alto = grano más fino)
+       numOctaves="3"        — octavas (más octavas = más detalle)
+       stitchTiles="stitch"  — el patrón se empalma sin costuras */
+    --noise-base-frequency:      0.85;
+    --noise-num-octaves:         3;
+
+    /* Posición: fixed, inset-0, z-[60] (encima de contenido, debajo de modales) */
+    --noise-z-index-dashboard:   60;
+    --noise-z-index-login:       60;
+
+
+    /* ==================================================================
+       SECCIÓN 2 — TRAMA DE PUNTOS (Dot Grid)
+       Clase real: .dash-dots (dashboard) / .auth-dots (login)
+       Fuente: sistema.blade.php y login.blade.php
+       Propósito: cuadrícula de puntos que aporta profundidad y estructura
+                  geométrica sutil en fondos de pantalla
+       ================================================================== */
+
+    /* Color del punto — azul-profundo */
+    --dots-color:                #2F3E5C;
+
+    /* Diámetro del punto en el dashboard */
+    --dots-size-dashboard:       1.2px;
+    /* Diámetro del punto en el login (ligeramente mayor) */
+    --dots-size-login:           2px;
+    /* Diámetro del punto en la landing (welcome) */
+    --dots-size-welcome:         2px;
+
+    /* Espaciado de la cuadrícula en el dashboard */
+    --dots-spacing-dashboard:    30px;
+    /* Espaciado en el login y la landing */
+    --dots-spacing-login:        32px;
+
+    /* Opacidad de la capa de puntos — mínima para no distraer */
+    --dots-opacity-dashboard:    0.03;
+    --dots-opacity-login:        0.035;
+    --dots-opacity-welcome:      0.03;
+
+    /* Posición: fixed, inset-0, z-0 (debajo de todo el contenido) */
+    --dots-z-index:              0;
+
+
+    /* ==================================================================
+       SECCIÓN 3 — TRAMA DE PUNTOS SECUNDARIA (Parallax / landing)
+       Fuente: welcome.blade.php (sección de estadísticas, inline style)
+       Propósito: fondo de sección de estadísticas con patrón de puntos
+                  en morado cognitivo para diferenciar visualmente
+       ================================================================== */
+
+    /* Color alternativo del punto — morado cognitivo */
+    --dots-alt-color:            #9B8AC7;   /* morado-cog */
+    /* Tamaño del punto en la sección de estadísticas */
+    --dots-alt-size:             1px;
+    /* Espaciado de la cuadrícula alternativa */
+    --dots-alt-spacing:          30px;
+    /* Opacidad — solo decorativa */
+    --dots-alt-opacity:          0.10;
+
+
+    /* ==================================================================
+       SECCIÓN 4 — LUZ DEL CURSOR (Mouse Light)
+       Clase real: .mouse-light
+       Fuente: sistema.blade.php (<style>) + app.css (@layer components)
+       Propósito: círculo de luz cálida que sigue al cursor, creando
+                  sensación de calor y dinamismo en el dashboard
+       ================================================================== */
+
+    /* Tamaño del círculo luminoso (diámetro en sistema.blade.php) */
+    --mouse-light-size:          170px;
+    /* Radio en la definición de app.css */
+    --mouse-light-radio-css:     200px;
+
+    /* Centro del gradiente radial */
+    --mouse-light-center-color:  rgba(233, 122, 95, 0.14);  /* terracota 14% */
+    /* Color intermedio del gradiente */
+    --mouse-light-mid-color:     rgba(233, 122, 95, 0.04);  /* terracota 4%  */
+    /* Borde del gradiente (transparente a 80%) */
+    --mouse-light-edge:          transparent;
+    --mouse-light-edge-stop:     80%;
+
+    /* Versión landing/welcome (mismo color, radio ajustado) */
+    --mouse-light-welcome-color: rgba(233, 122, 95, 0.12);  /* terracota 12% */
+
+    /* Transición de opacidad (aparece/desaparece con el cursor) */
+    --mouse-light-transition:    opacity 0.25s ease;
+    /* Posición: fixed, pointer-events-none, z-40 */
+    --mouse-light-z-index:       40;
+
+
+    /* ==================================================================
+       SECCIÓN 5 — BLOBS DECORATIVOS (Hero de la Landing)
+       Fuente: welcome.blade.php (sección hero)
+       Propósito: manchas de color con blur extremo que crean profundidad
+                  y ambiente cálido detrás del contenido del hero
+       ================================================================== */
+
+    /* Blob 1 — cálido marrón (superior izquierdo) */
+    --blob-1-color:              rgba(150, 123, 102, 0.20);  /* #967B66 20% */
+    --blob-1-size:               40rem;   /* 640px */
+    --blob-1-blur:               120px;
+    --blob-1-blend:              multiply;
+
+    /* Blob 2 — verde olivo (superior derecho) */
+    --blob-2-color:              rgba(141, 162, 128, 0.20);  /* #8DA280 20% */
+    --blob-2-size:               35rem;   /* 560px */
+    --blob-2-blur:               120px;
+    --blob-2-delay:              2s;
+
+    /* Blob 3 — terracota (inferior centro) */
+    --blob-3-color:              rgba(233, 122, 95, 0.15);   /* terracota 15% */
+    --blob-3-size-w:             45rem;   /* 720px */
+    --blob-3-size-h:             35rem;   /* 560px */
+    --blob-3-blur:               120px;
+    --blob-3-delay:              4s;
+
+
+    /* ==================================================================
+       SECCIÓN 6 — GLOW / RESPLANDOR DE ELEMENTOS ACTIVOS
+       Fuente: app.css (.glow-terracota), sidebar items activos, botones
+       Propósito: indica el elemento activo o con foco con un halo cálido
+       ================================================================== */
+
+    /* Glow de elemento terracota — estado normal */
+    --glow-terracota-normal:     0 0 15px rgba(233, 122, 95, 0.40);
+    /* Glow de elemento terracota — hover */
+    --glow-terracota-hover:      0 0 25px rgba(233, 122, 95, 0.60);
+    /* Glow del ítem activo en el sidebar */
+    --glow-sidebar-active:       0 0 8px rgba(233, 122, 95, 0.60);
+
+    /* Glow del botón de login (terracota) */
+    --glow-btn-login-normal:     0 15px 35px rgba(233, 122, 95, 0.35);
+    --glow-btn-login-hover:      0 18px 40px rgba(233, 122, 95, 0.45);
+
+    /* Glow del botón azul-profundo (landing, barra nav) */
+    --glow-btn-azul-normal:      0  8px 20px rgba(47, 62, 92, 0.40);
+    --glow-btn-azul-hover:       0 15px 35px rgba(47, 62, 92, 0.28);
+
+    /* Glow del color de error/acción secundaria (#E27D60) */
+    --glow-btn-e27d60:           0 0 0 rgba(226, 125, 96, 0.20);
+
+
+    /* ==================================================================
+       SECCIÓN 7 — SOMBRAS PERSONALIZADAS (custom box-shadow)
+       Fuente: clases shadow-[...] en blade views y app.css
+       Propósito: sistema de elevación de capas y paneles del dashboard
+       ================================================================== */
+
+    /* Sombra estándar de paneles del dashboard (la más usada) */
+    --shadow-panel:              0 16px 38px rgba(47, 62, 92, 0.12);
+    /* Sombra de gráficos en el dashboard */
+    --shadow-chart:              0 14px 32px rgba(47, 62, 92, 0.11);
+    /* Sombra de paneles hover */
+    --shadow-panel-hover:        0 18px 42px rgba(47, 62, 92, 0.16);
+
+    /* Sombra del sidebar (lateral) */
+    --shadow-sidebar:            18px 0 55px rgba(47, 62, 92, 0.12);
+
+    /* Sombra de modal */
+    --shadow-modal:              0 20px 50px rgba(47, 62, 92, 0.20);
+
+    /* Sombra del toast de notificación */
+    --shadow-toast:              0  8px 30px rgba(0, 0, 0, 0.12);
+
+    /* Sombra de imagen de la landing */
+    --shadow-landing-img:        0 30px 60px rgba(47, 62, 92, 0.25);
+    --shadow-landing-img-hover:  0 25px 50px rgba(47, 62, 92, 0.25);
+
+    /* Sombra de tarjeta de la landing (hover profundo) */
+    --shadow-landing-card-hover: 0 30px 60px rgba(47, 62, 92, 0.25);
+    /* Sombra del menú sticky de la landing (scrolled) */
+    --shadow-nav-scrolled:       0 14px 35px rgba(47, 62, 92, 0.22);
+    --shadow-nav-default:        0  8px 24px rgba(47, 62, 92, 0.06);
+
+    /* Sombra interior de inputs (panel de usuarios) */
+    --shadow-input-inset:        inset 0 1px 0 rgba(255, 255, 255, 0.45),
+                                 0 4px 12px rgba(47, 62, 92, 0.04);
+
+    /* Sombra de botón de acción principal en panel de estadísticas */
+    --shadow-stats-section:      0 30px 60px rgba(0, 0, 0, 0.40);
+    --shadow-stats-section-hover: 0 40px 80px rgba(0, 0, 0, 0.60);
+
+    /* Badge de usuario en tablas */
+    --shadow-badge-panel:        0 8px 18px rgba(47, 62, 92, 0.20);
+
+
+    /* ==================================================================
+       SECCIÓN 8 — SOMBRAS DE TEXTO (text-shadow)
+       Fuente: login.blade.php, welcome.blade.php (<style>)
+       Clases reales: .text-shadow-deep / .text-shadow-title / .text-shadow-light
+       Propósito: dar profundidad y legibilidad a headlines sobre fondos
+                  con texturas o imágenes
+       ================================================================== */
+
+    /* Deep — h1 principal del hero (login y welcome) */
+    --text-shadow-deep:     4px 8px 24px rgba(0, 0, 0, 0.35),
+                            2px 4px  8px rgba(0, 0, 0, 0.20);
+
+    /* Title — h2 de secciones de la landing */
+    --text-shadow-title:    2px 4px 12px rgba(0, 0, 0, 0.20);
+
+    /* Light — texto decorativo de apoyo en la landing */
+    --text-shadow-light:    1px 2px  6px rgba(0, 0, 0, 0.15);
+
+
+    /* ==================================================================
+       SECCIÓN 9 — BORDES DECORATIVOS
+       Fuente: app.css, blade views
+       ================================================================== */
+
+    /* Borde discontinuo — empty states (.rm-empty-state) */
+    --border-dashed-color:       #C7B5A3;   /* neutro-800 */
+    --border-dashed-opacity:     0.60;
+
+    /* Borde de alerta en tarjetas con condición adversa */
+    --border-alerta-terracota:   rgba(233, 122, 95, 0.40);  /* terracota/40 */
+    --border-alerta-naranja:     rgba(244, 162, 97, 0.50);  /* naranja/50 */
+    --border-alerta-verde:       rgba(141, 162, 128, 0.40); /* verde-olivo/40 */
+
+    /* Borde de imagen de la landing */
+    --border-img-landing:        #D5C7B9;   /* neutro-900 */
+    --border-img-landing-size:   4px;
+    --border-img-landing-size-lg: 8px;
+
+    /* Borde del panel de recuperación en login */
+    --border-recovery-card:      rgba(141, 162, 128, 0.40); /* #8DA280/40 */
+
+    /* Borde de error / validación */
+    --border-error-color:        rgba(226, 125, 96, 0.30);  /* #E27D60/30 */
+
+    /* Borde de SweetAlert de confirmación con acción */
+    --border-swal-hover:         #E27D60;
+
+
+    /* ==================================================================
+       SECCIÓN 10 — BACKDROP BLUR (efecto de desenfoque de fondo)
+       Fuente: sidebar, navbar, modales, encabezados, panels
+       Propósito: crear profundidad y separación entre capas mediante
+                  el desenfoque del contenido detrás del elemento
+       ================================================================== */
+
+    /* backdrop-blur-sm  (4px)  — overlay móvil, algunos modales */
+    --blur-sm:    4px;
+    /* backdrop-blur-md  (12px) — secciones de contenido, headers sticky */
+    --blur-md:   12px;
+    /* backdrop-blur-xl  (24px) — sidebar, navbar, encabezados, paneles
+                                   es el más usado en el sistema */
+    --blur-xl:   24px;
+    /* backdrop-blur-2xl (40px) — modales de mayor prioridad */
+    --blur-2xl:  40px;
+
+    /* Overlay de modal sobre contenido — azul-profundo al 60% */
+    --overlay-modal-color:       rgba(47, 62, 92, 0.60);
+    /* Overlay móvil del sidebar — negro al 40% */
+    --overlay-mobile-sidebar:    rgba(0, 0, 0, 0.40);
+    /* Overlay del menú móvil de la landing */
+    --overlay-mobile-menu:       rgba(0, 0, 0, 0.60);
+
+
+    /* ==================================================================
+       SECCIÓN 11 — GRADIENTES DE MÁSCARA (fade edges)
+       Fuente: welcome.blade.php (carrusel de logos / marquee)
+       Propósito: desvanece los bordes del carrusel de forma fluida
+       ================================================================== */
+
+    /* Gradiente de máscara izquierda del carrusel */
+    --gradient-mask-left:   linear-gradient(to right, #D5C7B9, transparent);
+
+    /* Gradiente de máscara derecha del carrusel */
+    --gradient-mask-right:  linear-gradient(to left, #D5C7B9, transparent);
+
+    /* Línea separadora vertical (entre secciones del hero) */
+    --gradient-divider:     linear-gradient(to bottom, rgba(47,62,92,0.40), transparent);
+
+    /* Color base del carrusel */
+    --marquee-bg:            #D5C7B9;   /* neutro-900 */
+
+
+    /* ==================================================================
+       SECCIÓN 12 — GRADIENTE DE BARRAS DE PROGRESO
+       Fuente: blade views / app.css (from-[#D9A27C] to-terracota)
+       ================================================================== */
+
+    /* Inicio — naranja cálido suave */
+    --progress-from:  #D9A27C;
+    /* Fin — terracota (color de acción) */
+    --progress-to:    #E97A5F;
+
+
+    /* ==================================================================
+       SECCIÓN 13 — RADIOS DE BORDE (border-radius)
+       Documentados como tokens porque el sistema usa valores
+       arbitrarios repetidos que definen la identidad visual redondeada
+       ================================================================== */
+
+    /* Panel principal del dashboard, encabezados — 2rem (32px) */
+    --radius-panel:       2rem;     /* rounded-[2rem]   */
+    /* Tarjetas KPI y listas de items — 1.8rem (28.8px) */
+    --radius-card-kpi:    1.8rem;   /* rounded-[1.8rem] */
+    /* Cards de alert y actividad — 1.4rem (22.4px) */
+    --radius-card-item:   1.4rem;   /* rounded-[1.4rem] */
+    /* Cards de subpaneles, equipos — 1.5rem (24px) */
+    --radius-card-sub:    1.5rem;   /* rounded-[1.5rem] */
+    /* Chips de navegación de tab — 1.35rem (21.6px) */
+    --radius-tab-chip:    1.35rem;  /* rounded-[1.35rem] */
+    /* Panel del modal principal — 24px */
+    --radius-modal:       24px;     /* rounded-[24px]   */
+    /* Tarjetas grandes de la landing — 3rem (48px) */
+    --radius-landing-card: 3rem;    /* rounded-[3rem]   */
+    /* Imagen de la landing — 2.5rem (40px) */
+    --radius-landing-img: 2.5rem;   /* rounded-[2.5rem] */
+    /* Cards rm-card, modales rm-modal-panel — 2xl = 1rem (16px) */
+    --radius-card:        1rem;     /* rounded-2xl      */
+    /* Botones y KPI íconos — xl = 0.75rem (12px) */
+    --radius-button:      0.75rem;  /* rounded-xl       */
+    /* Sidebar items — lg = 0.5rem (8px) */
+    --radius-sidebar:     0.5rem;   /* rounded-lg       */
+    /* Badges y píldoras — 9999px (totalmente redondo) */
+    --radius-pill:        9999px;   /* rounded-full     */
+    /* Métricas pequeñas — 18px */
+    --radius-metric:      18px;     /* rounded-[18px]   */
+
+
+    /* ==================================================================
+       SECCIÓN 14 — ANIMACIONES Y TRANSICIONES
+       Fuente: welcome.blade.php y login.blade.php (<style>)
+       Propósito: dotan al sistema de vida y dinamismo sin ser intrusivos
+       ================================================================== */
+
+    /* float — ícono flotante en el hero de login y welcome */
+    --anim-float-duration:       6s;
+    --anim-float-delay:          3s;     /* versión con retraso */
+    --anim-float-easing:         ease-in-out;
+    --anim-float-y-offset:      -16px;   /* desplazamiento vertical */
+    --anim-float-rotation:       5deg;   /* rotación sutil */
+
+    /* floatAuth — íconos decorativos del panel lateral del login */
+    --anim-float-auth-duration:  7s;
+    --anim-float-auth-easing:    ease-in-out;
+    --anim-float-auth-y-offset: -16px;
+
+    /* scrollHint — indicador de scroll del hero de la landing */
+    --anim-scroll-hint-duration: 2s;
+    --anim-scroll-hint-easing:   ease-in-out;
+
+    /* iconPulse — pulso de íconos destacados */
+    --anim-pulse-duration:       1s;
+    --anim-pulse-easing:         ease-in-out;
+
+    /* marquee — carrusel de logos de la landing */
+    --anim-marquee-duration:     10s;
+    --anim-marquee-easing:       linear;
+
+    /* Duración de transiciones de hover estándar */
+    --transition-fast:           200ms;
+    --transition-normal:         300ms;
+    --transition-slow:           500ms;
+
+    /* Timing de aparición/desaparición de la luz del cursor */
+    --transition-mouse-light:    opacity 0.25s ease;
+
+    /* Escala de botón en estado active (feedback táctil) */
+    --scale-active-btn:          0.95;   /* active:scale-95  */
+    --scale-active-icon:         0.90;   /* active:scale-90  */
+    --scale-active-module:       0.90;   /* active:scale-90  */
+    --scale-hover-card:          1.01;   /* hover:scale-[1.01] */
+
+    /* Desplazamiento vertical en hover de tarjetas */
+    --translate-hover-card:      -0.125rem;  /* hover:-translate-y-0.5 */
+    --translate-hover-card-lg:   -0.25rem;   /* hover:-translate-y-1   */
+    --translate-hover-card-xl:   -0.75rem;   /* hover:-translate-y-3   */
+
+    /* Desplazamiento horizontal en hover de sidebar items */
+    --translate-hover-sidebar:    0.25rem;   /* hover:translate-x-1    */
+
+
+    /* ==================================================================
+       SECCIÓN 15 — COLORES ADICIONALES DE ACCIÓN (SweetAlert / errores)
+       Fuente: sweetalert.blade.php + panel de usuarios
+       ================================================================== */
+
+    /* Color de confirmación de SweetAlert (btn confirm) */
+    --color-swal-confirm:        #BC6C25;
+    /* Color de cancelación de SweetAlert */
+    --color-swal-cancel:         #6B7280;
+
+    /* Color de error/acción de alerta institucional (usuarios panel) */
+    --color-accion-alerta:       #E27D60;
+    /* Fondo de mensaje de error en paneles */
+    --color-error-bg:            rgba(226, 125, 96, 0.10);
+    --color-error-borde:         rgba(226, 125, 96, 0.20);
+    /* Fondo de mensaje de confirmación en paneles */
+    --color-exito-bg:            rgba(141, 162, 128, 0.15);  /* #8DA280/15 */
+    --color-exito-borde:         rgba(141, 162, 128, 0.30);
+
+    /* Fondo crema de SweetAlert y panel de acciones */
+    --color-swal-bg:             #FAF7F3;
+    /* Fondo de input del panel de usuario */
+    --color-input-usuario:       rgba(244, 238, 231, 0.80);  /* #F4EEE7/80 */
+
+    /* Verde olivo / acción exitosa en login y landing */
+    --color-verde-olivo:         #8DA280;
+    --color-verde-olivo-dark:    #5F7555;
+    --color-verde-olivo-bg:      rgba(141, 162, 128, 0.10);
+    --color-marrón-calido:       #967B66;   /* Blob y decoración cálida */
+
+}

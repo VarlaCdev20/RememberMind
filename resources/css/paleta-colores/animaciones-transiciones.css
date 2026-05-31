@@ -1,0 +1,747 @@
+/* ====================================================================
+   RememberMind / Casa Amandita — Animaciones, Transiciones y Efectos
+   Archivo de referencia: documenta TODAS las animaciones (@keyframes),
+   transiciones CSS, efectos de hover, interacciones Alpine (x-transition),
+   efectos parallax (GSAP), scroll animations (AOS) y efectos especiales
+   usados en el sistema.
+   Solo define variables CSS. No genera clases ni altera estilos.
+
+   Archivos fuente donde viven las implementaciones reales:
+     - resources/views/welcome.blade.php          → AOS, GSAP parallax, @keyframes
+     - resources/views/auth/login.blade.php        → @keyframes floatAuth, x-transitions login
+     - resources/views/layouts/sistema.blade.php   → mouse-light JS, sidebar JS
+     - resources/css/app.css                       → .glow-terracota, .mouse-light
+     - resources/views/components/**/*.blade.php   → x-transitions de modales/toasts/sidebar
+     - resources/views/admin/**/*.blade.php         → hover states de módulos admin
+   ==================================================================== */
+
+:root {
+
+    /* ==================================================================
+       SECCIÓN 1 — @KEYFRAMES (animaciones definidas en el proyecto)
+       Fuente: welcome.blade.php + login.blade.php
+       ================================================================== */
+
+    /*
+     *  float — Íconos flotantes del hero (welcome) y panel lateral (login)
+     *  ─────────────────────────────────────────────────────────────────
+     *  Uso: .float-welcome (ícono 1: ph-heartbeat), .float-welcome-delayed
+     *       (ícono 2: ph-leaf con delay 3s), .float-large (ícono ph-users 8s)
+     *  Efecto: desplazamiento vertical suave + rotación sutil en loop
+     *
+     *  @keyframes float {
+     *      0%, 100% { transform: translateY(0)     rotate(0deg);  }
+     *      50%       { transform: translateY(-16px) rotate(5deg);  }
+     *  }
+     */
+    --anim-float-keyframes-y:         -16px;
+    --anim-float-keyframes-rotation:   5deg;
+    --anim-float-duration:             6s;
+    --anim-float-duration-large:       8s;     /* ph-users, más pesado */
+    --anim-float-delay-secondary:      3s;     /* segundo ícono del hero */
+    --anim-float-easing:               ease-in-out;
+    --anim-float-iteration:            infinite;
+
+    /*
+     *  floatAuth — Íconos decorativos del panel izquierdo del login
+     *  ──────────────────────────────────────────────────────────────
+     *  Uso: .float-auth (ph-leaf, ph-flower)
+     *  Similar a float pero 7s y más lento para fondo decorativo
+     *
+     *  @keyframes floatAuth {
+     *      0%, 100% { transform: translateY(0)     rotate(0deg);  }
+     *      50%       { transform: translateY(-16px) rotate(5deg);  }
+     *  }
+     */
+    --anim-float-auth-duration:        7s;
+    --anim-float-auth-y:              -16px;
+    --anim-float-auth-rotation:        5deg;
+
+    /*
+     *  scrollHint — Indicador de scroll del hero (welcome)
+     *  ─────────────────────────────────────────────────────
+     *  Uso: .scroll-indicator (punto terracota que baja y sube en loop)
+     *
+     *  @keyframes scrollHint {
+     *      0%, 100% { transform: translateY(0);    opacity: 1;   }
+     *      50%       { transform: translateY(8px);  opacity: 0.3; }
+     *  }
+     */
+    --anim-scroll-hint-duration:       2s;
+    --anim-scroll-hint-y:              8px;
+    --anim-scroll-hint-opacity-mid:    0.3;
+    --anim-scroll-hint-easing:         ease-in-out;
+
+    /*
+     *  iconPulse — Pulso de íconos destacados (welcome)
+     *  ─────────────────────────────────────────────────
+     *  Uso: elementos icon-pulse
+     *
+     *  @keyframes iconPulse {
+     *      0%, 100% { transform: scale(1);    }
+     *      50%       { transform: scale(1.12); }
+     *  }
+     */
+    --anim-icon-pulse-duration:        1s;
+    --anim-icon-pulse-scale:           1.12;
+    --anim-icon-pulse-easing:          ease-in-out;
+
+    /*
+     *  marquee — Carrusel horizontal de logos institucionales (welcome)
+     *  ─────────────────────────────────────────────────────────────────
+     *  Uso: .marquee-track (banda horizontal de logos que se mueve)
+     *
+     *  @keyframes marquee {
+     *      from { transform: translateX(0);     }
+     *      to   { transform: translateX(-50%);  }
+     *  }
+     */
+    --anim-marquee-duration:           10s;
+    --anim-marquee-easing:             linear;
+    --anim-marquee-iteration:          infinite;
+
+    /*
+     *  animate-pulse-slow — Pulso lento de blobs del hero (welcome)
+     *  ──────────────────────────────────────────────────────────────
+     *  Uso: .bg-blob-1, .bg-blob-2, .bg-blob-3
+     *  Clase de Tailwind `animate-pulse-slow` (plugin tailwindcss-animated)
+     */
+    --anim-blob-duration:              4s;     /* pulso suave de blobs radiales */
+
+
+    /* ==================================================================
+       SECCIÓN 2 — DURACIONES DE TRANSICIÓN (CSS transition-duration)
+       Fuente: clases duration-* en todo el sistema
+       ================================================================== */
+
+    /* Ultrarrápida — feedback táctil inmediato (Jetstream base components) */
+    --duration-75:    75ms;   /* duration-75  */
+    /* Rápida estándar de Jetstream (nav-link, dropdown, secondary-button) */
+    --duration-150:   150ms;  /* duration-150 */
+    /* Media — hover estándar de tarjetas KPI, módulos del dashboard */
+    --duration-200:   200ms;  /* duration-200 */
+    /* Estándar — la más usada: botones, sidebar items, inputs, alertas */
+    --duration-300:   300ms;  /* duration-300 */
+    /* Media-larga — cambio de panel en login, sidebar collapse */
+    --duration-500:   500ms;  /* duration-500 */
+    /* Larga — tarjetas landing, stat-card, dashboard-card, íconos circulares */
+    --duration-500-cards: 500ms; /* transition-all duration-500 en tarjetas */
+    /* Extra larga — zoom de imágenes al hover (group-hover:scale-110) */
+    --duration-1000:  1000ms; /* duration-1000 (imágenes de galería) */
+    /* Abandono — salida del action-message (x-transition:leave) */
+    --duration-1500:  1500ms; /* duration-1500 */
+    /* Email — transición de colores en botones de correo */
+    --duration-email: 300ms;  /* transition: background-color 0.3s */
+
+    /* Curva especial de la navbar de la landing al hacer scroll */
+    --easing-nav-landing: cubic-bezier(0.4, 0, 0.2, 1);
+
+
+    /* ==================================================================
+       SECCIÓN 3 — FUNCIONES DE EASING (timing-function)
+       Fuente: ease-*, cubic-bezier en blade files
+       ================================================================== */
+
+    /* ease-out — entrada suave (modales, sidebars, dropdowns, submenus) */
+    --ease-out:         ease-out;
+    /* ease-in — salida rápida (leave de modales, sidebars, dropdowns) */
+    --ease-in:          ease-in;
+    /* ease-in-out — animaciones en loop (float, scrollHint, iconPulse) */
+    --ease-in-out:      ease-in-out;
+    /* ease-out-cubic — AOS scroll animations (más suave que ease-out) */
+    --ease-aos:         ease-out-cubic;
+    /* linear — marquee continuo sin aceleración */
+    --ease-linear:      linear;
+    /* cubic-bezier landing — navbar scroll shrink (Material Design) */
+    --ease-material:    cubic-bezier(0.4, 0, 0.2, 1);
+
+
+    /* ==================================================================
+       SECCIÓN 4 — X-TRANSITION (Alpine.js — transiciones de componentes)
+       Fuente: modal-livewire, login, sidebar, toast, bitácora, dropdown,
+               modal genérico (components/modal.blade.php)
+       Cada bloque documenta enter-start → enter-end → leave-start → leave-end
+       ================================================================== */
+
+    /*
+     *  OVERLAY DE MODAL (modal-livewire.blade.php / modal.blade.php)
+     *  ─────────────────────────────────────────────────────────────
+     *  enter: ease-out 300ms → opacity-0 → opacity-100
+     *  leave: ease-in  200ms → opacity-100 → opacity-0
+     */
+    --xt-overlay-enter-duration:  300ms;
+    --xt-overlay-leave-duration:  200ms;
+    --xt-overlay-enter-start:     opacity 0;
+    --xt-overlay-enter-end:       opacity 1;
+
+    /*
+     *  PANEL DE MODAL (modal-livewire.blade.php / modal.blade.php)
+     *  ─────────────────────────────────────────────────────────────
+     *  enter: ease-out 300ms
+     *    start: opacity-0  translate-y-4  sm:scale-95
+     *    end:   opacity-100 translate-y-0  sm:scale-100
+     *  leave: ease-in 200ms (inverso)
+     */
+    --xt-modal-enter-duration:  300ms;
+    --xt-modal-leave-duration:  200ms;
+    --xt-modal-start-translate: translateY(1rem);    /* translate-y-4 */
+    --xt-modal-start-scale:     scale(0.95);         /* sm:scale-95  */
+
+    /*
+     *  MENÚ LATERAL MÓVIL (welcome.blade.php — slideout desde derecha)
+     *  ─────────────────────────────────────────────────────────────────
+     *  enter: ease-out duration-300
+     *    start: translateX(100%) opacity-70
+     *    end:   translateX(0)    opacity-100
+     *  leave: ease-in duration-200 (inverso)
+     */
+    --xt-sidebar-mobile-enter-duration: 300ms;
+    --xt-sidebar-mobile-leave-duration: 200ms;
+    --xt-sidebar-mobile-start:  translateX(100%);
+    --xt-sidebar-mobile-end:    translateX(0);
+
+    /*
+     *  PANEL DE LOGIN (login.blade.php — login ↔ recuperar contraseña)
+     *  ─────────────────────────────────────────────────────────────────
+     *  enter: ease-out duration-500
+     *    start: opacity-0  translateX(2.5rem)  scale(0.98)
+     *    end:   opacity-100 translateX(0)       scale(1)
+     *  leave: ease-in duration-300
+     *    start: opacity-100 translateX(0)       scale(1)
+     *    end:   opacity-0  translateX(-2.5rem) scale(0.98)
+     *  — Note: sale hacia la IZQUIERDA, entra desde la DERECHA
+     */
+    --xt-login-panel-enter-duration: 500ms;
+    --xt-login-panel-leave-duration: 300ms;
+    --xt-login-panel-start-x:  translateX(2.5rem);   /* translate-x-10 = 40px */
+    --xt-login-panel-leave-x: translateX(-2.5rem);   /* -translate-x-10 */
+    --xt-login-panel-scale:    scale(0.98);
+
+    /*
+     *  SUBMENÚ DEL SIDEBAR ADMIN (barra-lateral-sistema.blade.php)
+     *  ─────────────────────────────────────────────────────────────
+     *  enter: ease-out duration-300
+     *    start: opacity-0  translateY(-0.5rem)   (-translate-y-2)
+     *    end:   opacity-100 translateY(0)
+     *  leave: (no definido explícitamente — x-show lo oculta directo)
+     */
+    --xt-submenu-enter-duration: 300ms;
+    --xt-submenu-start-y:  translateY(-0.5rem);   /* -translate-y-2 */
+
+    /*
+     *  TOAST DE NOTIFICACIÓN (toast.blade.php — esquina superior derecha)
+     *  ─────────────────────────────────────────────────────────────────
+     *  enter: ease-out duration-300
+     *    start: translateY(0.5rem) opacity-0 | sm: translateX(0.5rem)
+     *    end:   translateY(0)      opacity-1 | sm: translateX(0)
+     *  leave: ease-in duration-100
+     *    start: opacity-100
+     *    end:   opacity-0
+     */
+    --xt-toast-enter-duration: 300ms;
+    --xt-toast-leave-duration: 100ms;
+    --xt-toast-start-y:  translateY(0.5rem);    /* translate-y-2 */
+    --xt-toast-start-x:  translateX(0.5rem);    /* sm:translate-x-2 */
+
+    /*
+     *  SECCIONES DE LA BITÁCORA (bitacora/index.blade.php — vista timeline/tabla)
+     *  ─────────────────────────────────────────────────────────────────────────
+     *  enter: ease-out duration-300
+     *    start: opacity-0 translateY(1rem)    (translate-y-4)
+     *    end:   opacity-100 translateY(0)
+     */
+    --xt-bitacora-enter-duration: 300ms;
+    --xt-bitacora-start-y:  translateY(1rem);
+
+    /*
+     *  DROPDOWN GENÉRICO (components/dropdown.blade.php)
+     *  ──────────────────────────────────────────────────
+     *  enter: ease-out duration-200
+     *    start: opacity-0 scale(0.95)
+     *    end:   opacity-100 scale(1)
+     *  leave: ease-in duration-75
+     */
+    --xt-dropdown-enter-duration: 200ms;
+    --xt-dropdown-leave-duration: 75ms;
+    --xt-dropdown-start-scale:    scale(0.95);
+
+    /*
+     *  ACTION MESSAGE de Jetstream (components/action-message.blade.php)
+     *  ──────────────────────────────────────────────────────────────────
+     *  leave: opacity duration-1500ms (desaparece muy lentamente)
+     */
+    --xt-action-msg-leave-duration: 1500ms;
+
+    /*
+     *  SECCIÓN DE REPORTES (show/_reportes.blade.php)
+     *  ─────────────────────────────────────────────────
+     *  enter: ease-out duration-300
+     *    start: opacity-0 translateY(1rem)
+     *    end:   opacity-100 translateY(0)
+     */
+    --xt-reportes-enter-duration: 300ms;
+
+
+    /* ==================================================================
+       SECCIÓN 5 — EFECTOS DE HOVER (Tailwind hover:* / group-hover:*)
+       Categorías: traslación, escala, rotación, color, forma, especiales
+       ================================================================== */
+
+    /* ─── 5a. TRASLACIÓN VERTICAL (hover:-translate-y-*) ─────────────────
+       Cada valor describe cuánto sube el elemento al hacer hover.
+       Indica interactividad y eleva visualmente el elemento.         */
+
+    /* Micro — 2px: items de lista, alertas, cards pequeños del dashboard */
+    --hover-y-micro:   -0.125rem;   /* -translate-y-0.5 */
+    /* Pequeño — 4px: botones de acción, ítems de módulo, mini-cards */
+    --hover-y-sm:      -0.25rem;    /* -translate-y-1   */
+    /* Medio — 8px: tarjetas de login, imágenes de landing, cards de expediente */
+    --hover-y-md:      -0.5rem;     /* -translate-y-2   */
+    /* Grande — 12px: tarjetas de características de la landing */
+    --hover-y-lg:      -0.75rem;    /* -translate-y-3   */
+
+    /* ─── 5b. TRASLACIÓN HORIZONTAL (hover:translate-x-*) ──────────────── */
+
+    /* Sidebar items — desplaza levemente a la derecha al hover */
+    --hover-x-sidebar:  0.25rem;    /* hover:translate-x-1  */
+    /* Footer links — mismo efecto en links del footer */
+    --hover-x-footer:   0.25rem;    /* hover:translate-x-1  */
+    /* Botón volver — se desliza a la izquierda (feedback de "atrás") */
+    --hover-x-back:    -0.25rem;    /* hover:-translate-x-1 */
+    /* Flecha de CTA — el ícono arrow-right avanza al hover */
+    --hover-x-arrow:    0.25rem;    /* group-hover:translate-x-1 */
+    /* Pin de contacto — sube levemente (footer landing) */
+    --hover-y-pin:     -0.25rem;    /* group-hover:-translate-y-1 */
+
+    /* ─── 5c. ESCALA (hover:scale-* / active:scale-*) ────────────────────── */
+
+    /* active:scale-[0.98] — botones principales de login/formularios */
+    --scale-active-subtle:    0.98;
+    /* active:scale-95       — botones estándar del sistema */
+    --scale-active-standard:  0.95;
+    /* active:scale-90       — botones icono, navbar, sidebar collapse btn */
+    --scale-active-icon:      0.90;
+    /* hover:scale-95        — botón de módulo al hover (panel-modulos) */
+    --scale-hover-module:     0.95;
+    /* hover:scale-[1.01]    — tarjeta de error 403 (scale suave) */
+    --scale-hover-error-card: 1.01;
+    /* hover:scale-105       — stats de impacto (group-hover:scale-105) */
+    --scale-hover-stats:      1.05;
+    /* group-hover:scale-105 — íconos de sección (group-hover) */
+    --scale-hover-icon:       1.05;
+    /* group-hover:scale-110 — imágenes de galería, ph-phone-call, logo */
+    --scale-hover-img:        1.10;
+    /* hover:scale-110       — label de foto de perfil */
+    --scale-hover-upload:     1.10;
+
+    /* ─── 5d. ROTACIÓN (hover:rotate-* / group-hover:rotate-*) ──────────── */
+
+    /* sidebar logo "C" — rota 6° al hover (efecto lúdico) */
+    --rotate-hover-logo-sidebar:   6deg;
+    /* íconos cuadrados de sección — rotan 6° con group-hover */
+    --rotate-hover-icon-card:      6deg;
+    /* sidebar icon de sección — rota 3° en hover (sutil) */
+    --rotate-hover-sidebar-icon:   3deg;
+    /* landing service cards — 12° rota el ícono (más dramático) */
+    --rotate-hover-service:        12deg;
+    /* logo Casa Amandita footer — 12° hover */
+    --rotate-hover-logo-footer:    12deg;
+    /* botón help en sidebar — 12° group-hover */
+    --rotate-hover-help:           12deg;
+    /* estrella del botón secundario landing — gira 180° (completo) */
+    --rotate-hover-star:           180deg;
+    /* caret / chevron indicador — 180° cuando activo (abrir/cerrar) */
+    --rotate-caret-active:         180deg;
+    /* caret del sidebar colapsado — 180° cuando expanded */
+    --rotate-sidebar-caret:        180deg;
+
+    /* ─── 5e. CAMBIOS DE FORMA (group-hover:rounded-full) ─────────────────
+       Efecto de transformar un cuadrado (rounded-2xl) en círculo al hover  */
+
+    /* Íconos de tarjetas landing — pasan de rounded-2xl a rounded-full */
+    --shape-hover-to-circle:   9999px;   /* group-hover:rounded-full */
+    /* Íconos de stat-card/dashboard-card — mismo efecto */
+    --shape-hover-icon-circle: 9999px;
+
+    /* ─── 5f. EFECTOS DE SHIMMER / FILL (translate-y-full → translate-y-0)
+       Capa blanca que sube desde abajo al hover (buttons de landing y login) */
+
+    /* Capa interna de brillo — parte desde abajo (translate-y-full) */
+    --shimmer-start:   translateY(100%);   /* translate-y-full */
+    /* Capa de brillo al hover — sube hasta cubrir el botón */
+    --shimmer-end:     translateY(0);
+    /* Color de la capa de brillo */
+    --shimmer-color:   rgba(255, 255, 255, 0.20);   /* bg-white/20 */
+    /* Duración del shimmer en botones landing */
+    --shimmer-duration-fast:  300ms;
+    /* Duración del shimmer en botón CTA hero */
+    --shimmer-duration-slow:  500ms;
+    /* Shimmer azul-profundo — capa del botón de login al hover */
+    --shimmer-login-color:    #2F3E5C;   /* bg-azul-profundo */
+
+    /* ─── 5g. BARRA INFERIOR ANIMADA (group-hover:w-full)
+       Línea horizontal que se expande de w-8 a w-full en tarjetas landing  */
+
+    /* Ancho inicial de la barra decorativa */
+    --bar-initial-width:   2rem;     /* w-8   */
+    /* Ancho final al hover */
+    --bar-hover-width:     100%;     /* w-full */
+    /* Color inicial de la barra */
+    --bar-initial-color:   rgba(150, 123, 102, 0.30);   /* #967B66/30 */
+    /* Color al hover (varía por tarjeta — toma el color del tema) */
+    --bar-hover-color-1:   #E97A5F;   /* terracota */
+    --bar-hover-color-2:   #967B66;   /* marrón cálido */
+
+    /* ─── 5h. SOCIAL BUTTON EXPAND (group-hover:gap-3 group-hover:px-5)
+       Botón de red social que empieza compacto y se expande con label */
+
+    /* Estado inicial — solo ícono (sin gap, sin padding horizontal) */
+    --social-initial-gap:     0;
+    --social-initial-px:      0.75rem;  /* p-3 */
+    /* Estado hover — expande mostrando el label */
+    --social-hover-gap:       0.75rem;  /* gap-3 */
+    --social-hover-px:        1.25rem;  /* px-5 */
+
+    /* ─── 5i. GRAYSCALE ANIMADO (secciones archivadas)
+       Elementos archivados aparecen desaturados y se revelan al hover  */
+
+    /* Estado normal de sección archivada */
+    --archived-opacity:        0.60;
+    --archived-grayscale:      50%;    /* grayscale-[50%] */
+    /* Variante suave (observaciones archivadas) */
+    --archived-opacity-soft:   0.70;
+    --archived-grayscale-soft: 30%;    /* grayscale-[30%] */
+    /* Estado hover — revela completo */
+    --archived-hover-opacity:  1.0;
+    --archived-hover-grayscale: 0%;   /* hover:grayscale-0 */
+
+
+    /* ==================================================================
+       SECCIÓN 6 — PARALLAX (GSAP + ScrollTrigger)
+       Fuente: welcome.blade.php (sección <script> al final)
+       Librería: GSAP con plugin ScrollTrigger (CDN)
+       Propósito: movimiento de capas a distintas velocidades en scroll
+       ================================================================== */
+
+    /*
+     *  Blob 1 — fondo del hero (bg-blob-1: marrón cálido)
+     *  ─────────────────────────────────────────────────────
+     *  gsap.to('.bg-blob-1', { y: 150, ease: "none",
+     *    scrollTrigger: { trigger: "#inicio", scrub: 0.5 } })
+     */
+    --parallax-blob-1-y:      150px;
+    --parallax-blob-1-scrub:  0.5;
+    --parallax-blob-1-trigger: "#inicio";
+
+    /*
+     *  Blob 2 — fondo del hero (bg-blob-2: verde olivo)
+     *  ─────────────────────────────────────────────────────
+     *  gsap.to('.bg-blob-2', { y: 250, ease: "none",
+     *    scrollTrigger: { trigger: "#inicio", scrub: 0.8 } })
+     */
+    --parallax-blob-2-y:      250px;
+    --parallax-blob-2-scrub:  0.8;
+    --parallax-blob-2-trigger: "#inicio";
+
+    /*
+     *  Imagen superior derecha (parallax-img-1: foto de acompañamiento)
+     *  ─────────────────────────────────────────────────────────────────
+     *  gsap.to('.parallax-img-1', { y: -40,
+     *    scrollTrigger: { trigger: "#experiencia",
+     *                     start: "top bottom", end: "bottom top", scrub: 1 } })
+     *  Efecto: la imagen sube 40px mientras el contenido pasa (más rápido)
+     */
+    --parallax-img-1-y:      -40px;
+    --parallax-img-1-scrub:   1;
+    --parallax-img-1-trigger: "#experiencia";
+    --parallax-img-1-start:   "top bottom";
+    --parallax-img-1-end:     "bottom top";
+
+    /*
+     *  Imagen inferior izquierda (parallax-img-2: foto de terapia)
+     *  ─────────────────────────────────────────────────────────────
+     *  gsap.to('.parallax-img-2', { y: 60,
+     *    scrollTrigger: { trigger: "#experiencia",
+     *                     start: "top bottom", end: "bottom top", scrub: 1.5 } })
+     *  Efecto: la imagen BAJA 60px (más lento que img-1 → más profundidad)
+     */
+    --parallax-img-2-y:       60px;
+    --parallax-img-2-scrub:   1.5;
+
+    /*
+     *  Fondo de puntos (parallax-bg: puntos morado-cog en sección impacto)
+     *  ────────────────────────────────────────────────────────────────────
+     *  gsap.to('.parallax-bg', { y: -50,
+     *    scrollTrigger: { trigger: "#impacto",
+     *                     start: "top bottom", end: "bottom top", scrub: 0.5 } })
+     *  Efecto: la trama de puntos sube más lento que el contenido
+     */
+    --parallax-bg-y:         -50px;
+    --parallax-bg-scrub:      0.5;
+    --parallax-bg-trigger:    "#impacto";
+
+
+    /* ==================================================================
+       SECCIÓN 7 — AOS (Animate On Scroll)
+       Fuente: welcome.blade.php (AOS.init + data-aos en elementos)
+       Librería: AOS.js (CDN — animate on scroll library)
+       Propósito: animar elementos cuando entran en el viewport al scrollear
+       ================================================================== */
+
+    /*
+     *  Configuración global (AOS.init)
+     *  ────────────────────────────────
+     *  AOS.init({
+     *      duration: 700,
+     *      once: true,            — solo anima una vez, no en scroll inverso
+     *      offset: 80,            — dispara 80px antes de que el elemento entre
+     *      easing: 'ease-out-cubic'
+     *  })
+     */
+    --aos-duration:    700ms;
+    --aos-easing:      ease-out-cubic;
+    --aos-offset:      80px;
+    --aos-once:        true;         /* se anima solo la primera vez */
+
+    /*
+     *  Tipos de animación usados (data-aos="...")
+     *  ─────────────────────────────────────────── */
+    /* fade-up     — sube desde abajo apareciendo (hero, secciones, cards) */
+    /* fade-down   — baja desde arriba apareciendo (badge del hero) */
+    /* fade-in     — aparece en fade sin movimiento (carrusel hero) */
+    /* fade-right  — entra desde la izquierda (sección experiencia lista) */
+    /* fade-left   — entra desde la derecha (tarjeta de login en desktop) */
+    /* zoom-in     — aparece escalando desde más pequeño (botones CTA) */
+
+    /*
+     *  Delays de data-aos-delay (en ms)
+     *  ────────────────────────────────── */
+    --aos-delay-1:    100ms;   /* data-aos-delay="100" — primera tarjeta */
+    --aos-delay-2:    200ms;   /* data-aos-delay="200" — segunda tarjeta */
+    --aos-delay-3:    300ms;   /* data-aos-delay="300" — tercera tarjeta */
+    --aos-delay-4:    400ms;   /* data-aos-delay="400" — CTA hero */
+    --aos-delay-6:    600ms;   /* data-aos-delay="600" — galería hero */
+    --aos-delay-10:  1000ms;   /* data-aos-delay="1000" — scroll indicator */
+    /* Dinámica — data-aos-delay="{{ $index * 100 }}" para listas de servicios */
+
+
+    /* ==================================================================
+       SECCIÓN 8 — SCROLL SUAVE (scroll-behavior)
+       Fuente: welcome.blade.php (html class) + create.blade.php / edit.blade.php
+       ================================================================== */
+
+    /*
+     *  scroll-smooth en <html> (welcome.blade.php)
+     *  ─────────────────────────────────────────────
+     *  Activa scroll suave en toda la landing para los anchor links
+     *  (#inicio, #problema, #experiencia, #servicios, #impacto)
+     */
+    --scroll-behavior:         smooth;
+
+    /*
+     *  scrollIntoView (create.blade.php / edit.blade.php)
+     *  ────────────────────────────────────────────────────
+     *  Usado en formularios multipaso para llevar el foco al primer campo
+     *  con error al hacer submit: scrollIntoView({ behavior: 'smooth', block: 'center' })
+     */
+    --scroll-into-view-behavior: smooth;
+    --scroll-into-view-block:    center;
+    --scroll-into-view-delay:    250ms;  /* setTimeout antes de focus() */
+
+    /*
+     *  window.scrollTo (create/edit adultos/usuarios)
+     *  ────────────────────────────────────────────────
+     *  Al cambiar de paso en formularios multipaso vuelve al top
+     *  window.scrollTo({ top: 0, behavior: 'smooth' })
+     */
+    --scroll-to-top-behavior:  smooth;
+
+
+    /* ==================================================================
+       SECCIÓN 9 — EFECTOS DE ACTIVE (feedback táctil de pulsación)
+       Fuente: active:* en toda la app (botones, sidebar, navbar)
+       ================================================================== */
+
+    /* Escala + translate simultáneos en botones CTA de la landing */
+    --active-cta-scale:     scale(0.95);
+    --active-cta-translate: translateY(4px);  /* active:translate-y-1 */
+
+    /* Botones del sistema admin — solo escala */
+    --active-btn-scale:     scale(0.95);      /* active:scale-95 */
+    /* Botones ícono navbar — escala + shadow inner */
+    --active-icon-scale:    scale(0.90);      /* active:scale-90 */
+    --active-icon-translate: translateY(4px); /* active:translate-y-1 */
+
+    /* Módulos del dashboard — escala hacia abajo (efecto "hundido") */
+    --active-module-scale:  scale(0.90);      /* active:scale-90 */
+
+
+    /* ==================================================================
+       SECCIÓN 10 — TRANSICIÓN DEL SIDEBAR ADMIN
+       Fuente: barra-lateral-sistema.blade.php + sistema.blade.php
+       ================================================================== */
+
+    /*
+     *  Sidebar collapse/expand (ancho: 240px ↔ 82px)
+     *  ─────────────────────────────────────────────── */
+    --sidebar-width-expanded:    240px;
+    --sidebar-width-collapsed:    82px;
+    --sidebar-transition:        transition-all duration-300 ease-in-out;
+    --sidebar-transition-duration: 300ms;
+
+    /*
+     *  Sidebar slide-in móvil
+     *  ──────────────────────── */
+    --sidebar-mobile-enter:  translateX(0);        /* translate-x-0 */
+    --sidebar-mobile-exit:   translateX(-100%);    /* -translate-x-full */
+
+    /*
+     *  Botón colapsar (caret-left) — rota 180° cuando colapsado
+     *  ─────────────────────────────────────────────────────────── */
+    --sidebar-caret-collapsed: rotate(180deg);
+    --sidebar-caret-duration:  300ms;
+
+    /*
+     *  Íconos de sección en sidebar — rotan 3° en group-hover
+     *  ─────────────────────────────────────────────────────────── */
+    --sidebar-icon-hover-rotate: rotate(3deg);
+
+    /*
+     *  Punto indicador del ítem activo en sidebar
+     *  ─────────────────────────────────────────────── */
+    --sidebar-active-dot-glow:   0 0 8px rgba(233, 122, 95, 0.60);
+
+    /*
+     *  Área de contenido principal — desplazamiento al colapsar sidebar
+     *  ─────────────────────────────────────────────────────────────────
+     *  :class="sidebarCollapsed ? 'lg:ml-[82px]' : 'lg:ml-[240px]'"
+     */
+    --main-ml-expanded:   240px;
+    --main-ml-collapsed:   82px;
+    --main-transition:    transition-all duration-300 ease-in-out;
+
+
+    /* ==================================================================
+       SECCIÓN 11 — TRANSICIÓN DE LA BARRA DE PROGRESO MULTIPASO
+       Fuente: create.blade.php + edit.blade.php (formularios de adultos/usuarios)
+       ================================================================== */
+
+    /*
+     *  Barra de progreso del formulario (paso actual / total pasos)
+     *  ─────────────────────────────────────────────────────────────
+     *  <div class="h-full rounded-full bg-gradient-to-r from-[#D9A27C] to-terracota
+     *              transition-all duration-500 ease-out"
+     *       :style="'width: ' + ((paso / total) * 100) + '%'">
+     */
+    --progress-bar-transition-duration:  500ms;
+    --progress-bar-transition-easing:    ease-out;
+    --progress-bar-gradient-from:        #D9A27C;
+    --progress-bar-gradient-to:          #E97A5F;  /* terracota */
+
+    /*
+     *  Indicadores de paso (círculos numerados)
+     *  ──────────────────────────────────────────
+     *  transition-all duration-300 en el borde y color del círculo
+     *  transition-all duration-500 en la línea conectora entre pasos
+     */
+    --step-circle-transition:    300ms;
+    --step-connector-transition: 500ms;
+
+
+    /* ==================================================================
+       SECCIÓN 12 — TRANSICIÓN DE LA NAVBAR DE LA LANDING (scroll shrink)
+       Fuente: welcome.blade.php (<header x-data>)
+       ================================================================== */
+
+    /*
+     *  La navbar cambia de apariencia cuando scrolled > 20px
+     *  Estado normal: fondo muy transparente (25% opacidad)
+     *  Estado scrolled: fondo semi-opaco (55% opacidad) + sombra + h menor
+     *
+     *  :class="scrolled
+     *    ? 'bg-[#F4EBDD]/55 backdrop-blur-xl shadow-[0_14px_35px_rgba(47,62,92,0.22)]
+     *        border border-[#C7B5A3]/45 h-16'
+     *    : 'bg-[#F4EBDD]/25 backdrop-blur-md shadow-[0_8px_24px_rgba(47,62,92,0.06)]
+     *        border border-[#C7B5A3]/20 h-20'"
+     */
+    --navbar-transition:                  transition-all duration-300;
+    --navbar-transition-duration:         300ms;
+    --navbar-scroll-threshold:            20px;     /* scrollY > 20 */
+    --navbar-bg-default:                  rgba(244, 235, 221, 0.25);  /* /25 */
+    --navbar-bg-scrolled:                 rgba(244, 235, 221, 0.55);  /* /55 */
+    --navbar-height-default:              5rem;     /* h-20 */
+    --navbar-height-scrolled:             4rem;     /* h-16 */
+    --navbar-blur-default:                12px;     /* backdrop-blur-md */
+    --navbar-blur-scrolled:               24px;     /* backdrop-blur-xl */
+    --navbar-shadow-default:  0 8px 24px rgba(47, 62, 92, 0.06);
+    --navbar-shadow-scrolled: 0 14px 35px rgba(47, 62, 92, 0.22);
+
+    /* Íconos de nav — escalan 110% al hover */
+    --navbar-icon-hover-scale: scale(1.10);
+
+
+    /* ==================================================================
+       SECCIÓN 13 — EFECTOS ESPECIALES DE INTERACCIÓN
+       Efectos únicos que no encajan en categorías anteriores
+       ================================================================== */
+
+    /*
+     *  animate-in fade-in (tailwindcss-animated)
+     *  ─────────────────────────────────────────
+     *  Uso: <section class="animate-in fade-in duration-500"> (usuarios/show)
+     *  Anima la entrada de la sección al cargar la página
+     */
+    --anim-in-fade-duration:  500ms;
+
+    /*
+     *  Tooltip del sidebar (colapsado) — aparece al hover de la sección
+     *  ─────────────────────────────────────────────────────────────────
+     *  .pointer-events-none.absolute.left-full.z-50.hidden
+     *   group-hover/section:block
+     *  (No usa transición — aparece/desaparece instantáneamente con block/hidden)
+     */
+    --sidebar-tooltip-z:  50;
+
+    /*
+     *  Underline animado de nav links (hover-underline)
+     *  ─────────────────────────────────────────────────
+     *  Clase .hover-underline en links de la navbar landing
+     *  Crea una línea inferior que se expande desde el centro al hover
+     *  (implementada con ::after en CSS personalizado de welcome.blade.php)
+     *  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1)
+     */
+    --underline-anim-duration: 300ms;
+    --underline-anim-easing:   cubic-bezier(0.4, 0, 0.2, 1);
+
+    /*
+     *  Parallax underline del h1 hero (SVG path animado)
+     *  ──────────────────────────────────────────────────
+     *  .parallax-underline — línea decorativa SVG debajo del h1 "Bienestar"
+     *  Color: terracota/40 (rgba(233, 122, 95, 0.40))
+     *  No tiene animación propia — se mueve con el parallax de la página
+     */
+    --parallax-underline-color: rgba(233, 122, 95, 0.40);
+
+    /*
+     *  Efectos de opacidad en tarjetas de tab/expediente (show.blade.php)
+     *  ────────────────────────────────────────────────────────────────────
+     *  Las tabs del expediente del adulto mayor tienen barra lateral de color
+     *  que pasa de opacity-0 a opacity-100 cuando la tab está activa,
+     *  con group-hover:opacity-60 como estado intermedio
+     */
+    --tab-bar-inactive-opacity:     0;
+    --tab-bar-hover-opacity:        0.60;
+    --tab-bar-active-opacity:       1.0;
+    --tab-bar-transition-duration:  200ms;
+
+    /*
+     *  focus:ring en inputs de login y recuperación
+     *  ──────────────────────────────────────────────
+     *  focus:ring-4 (4px) — los inputs de login tienen ring más grueso
+     *  focus:ring-azul-clinico/20 — en el campo de recuperación
+     *  focus:ring-terracota    — en campos estándar del sistema
+     */
+    --focus-ring-login:   4px;    /* focus:ring-4 */
+    --focus-ring-system:  1px;    /* focus:ring-1 */
+
+}

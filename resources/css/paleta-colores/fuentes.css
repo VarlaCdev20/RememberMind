@@ -1,0 +1,250 @@
+/* ====================================================================
+   RememberMind / Casa Amandita — Sistema Tipográfico Completo
+   Archivo de referencia: documenta TODAS las fuentes, pesos, escalas
+   de tamaño, interletraje y alturas de línea usados en el sistema.
+   Solo define variables CSS. No genera clases ni altera estilos.
+
+   Carga real de fuentes:
+     - @fontsource vía resources/css/app.css (Inter, Outfit)
+     - Google Fonts / Bunny.net vía resources/views/layouts/sistema.blade.php
+       (Figtree y Outfit como respaldo web)
+   ==================================================================== */
+
+:root {
+
+    /* ==================================================================
+       SECCIÓN 1 — FAMILIAS TIPOGRÁFICAS
+       Fuente: tailwind.config.js → fontFamily + layouts/sistema.blade.php
+       ================================================================== */
+
+    /* Fuente del sistema (body, formularios, tablas, etiquetas) */
+    --font-sans:    'Inter', ui-sans-serif, system-ui, -apple-system,
+                    BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue',
+                    Arial, sans-serif;
+
+    /* Fuente de marca (headlines, títulos de sección, landing, sidebar brand) */
+    --font-outfit:  'Outfit', 'Figtree', sans-serif;
+
+    /* Fuente de apoyo web (disponible desde fonts.bunny.net en sistema.blade.php) */
+    --font-figtree: 'Figtree', sans-serif;
+
+
+    /* ==================================================================
+       SECCIÓN 2 — PESOS TIPOGRÁFICOS USADOS EN EL SISTEMA
+       Fuente: @fontsource carga Inter 400/500/700 y Outfit 400/700/800
+               Google Fonts carga Outfit 300–900 y Figtree 400–900
+       ================================================================== */
+
+    /* 300 — Outfit light (landing, texto decorativo) */
+    --font-weight-light:      300;
+    /* 400 — Texto de apoyo, párrafos de contenido */
+    --font-weight-normal:     400;
+    /* 500 — Texto medio, etiquetas de formulario */
+    --font-weight-medium:     500;
+    /* 600 — Semibold, subtítulos secundarios, .rm-section-subtitle */
+    --font-weight-semibold:   600;
+    /* 700 — Bold, metadatos, párrafos de énfasis (.rm-empty-state-text) */
+    --font-weight-bold:       700;
+    /* 800 — Extrabold, nav links de la landing, inputs de login */
+    --font-weight-extrabold:  800;
+    /* 900 — Black, el peso dominante del sistema: botones (.rm-btn),
+             badges (.rm-badge), títulos de sección (.rm-section-title),
+             labels (.rm-label), métricas (.rm-metric-value), tablas header */
+    --font-weight-black:      900;
+
+
+    /* ==================================================================
+       SECCIÓN 3 — ESCALA DE TAMAÑOS (valores en px + rem equivalentes)
+       Fuente: clases Tailwind text-* y valores arbitrarios text-[Xpx]
+       ================================================================== */
+
+    /* Micro — métrica label, tracking de KPIs, badges de nivel */
+    --font-size-micro:      9px;   /* text-[9px]  */
+    /* Nano — badge texto, header de tabla, label-soft de formularios */
+    --font-size-nano:      10px;   /* text-[10px] */
+    /* Mini — subtítulo de sección, metadatos de tarjeta secundaria */
+    --font-size-mini:      11px;   /* text-[11px] */
+    /* XS — el tamaño más frecuente: botones, badges, inputs, sidebar */
+    --font-size-xs:        12px;   /* text-xs     */
+    /* SM — texto de celdas, párrafos de panel, inputs de login */
+    --font-size-sm:        14px;   /* text-sm     */
+    /* Base — texto de cuerpo, dropdowns, items de lista */
+    --font-size-base:      16px;   /* text-base   */
+    /* LG — subtítulos de panel, métricas secundarias */
+    --font-size-lg:        18px;   /* text-lg     */
+    /* XL — labels de formulario de login, títulos de modal */
+    --font-size-xl:        20px;   /* text-xl     */
+    /* 2XL — .rm-section-title, h2 de paneles del dashboard */
+    --font-size-2xl:       24px;   /* text-2xl    */
+    /* 3XL — valores de métricas grandes */
+    --font-size-3xl:       30px;   /* text-3xl    */
+    /* 4XL — títulos de panel de la landing */
+    --font-size-4xl:       36px;   /* text-4xl    */
+    /* 5XL — h1 hero de la landing, h2 secciones */
+    --font-size-5xl:       48px;   /* text-5xl    */
+    /* 6XL — hero principal login y sección estadísticas */
+    --font-size-6xl:       60px;   /* text-6xl    */
+    /* 9XL — display hero de la landing (text-9xl) */
+    --font-size-display:  128px;   /* text-9xl    */
+
+
+    /* ==================================================================
+       SECCIÓN 4 — INTERLETRAJE (letter-spacing)
+       Fuente: clases tracking-* y valores arbitrarios tracking-[Xem]
+       Uso: identificado en .rm-label, .rm-badge, .rm-section-title,
+            sidebar items, encabezados de KPI, login hero
+       ================================================================== */
+
+    /* tight — heading principal del sistema (.rm-section-title) */
+    --tracking-tight:      -0.025em;  /* tracking-tight    */
+    /* tighter — display hero de la landing */
+    --tracking-tighter:    -0.05em;   /* tracking-tighter  */
+    /* normal — texto de cuerpo sin espaciado especial */
+    --tracking-normal:      0em;      /* tracking-normal   */
+    /* wide — botones (.rm-btn), sidebar items, badges */
+    --tracking-wide:        0.025em;  /* tracking-wider    */
+    /* widest — labels de tabla, encabezados de métricas,
+                sección de módulo de salud, items de sidebar */
+    --tracking-widest:      0.1em;    /* tracking-widest   */
+    /* brand — "RememberMind" en el sidebar, tagline del sistema */
+    --tracking-brand:       0.15em;   /* tracking-[0.15em] */
+    /* marketing — subtítulo de sección landing */
+    --tracking-marketing:   0.18em;   /* tracking-[0.18em] */
+    /* hero — "Del Adulto Mayor" en login, pills de categoría */
+    --tracking-hero:        0.25em;   /* tracking-[0.25em] */
+
+
+    /* ==================================================================
+       SECCIÓN 5 — ALTURAS DE LÍNEA (line-height)
+       Fuente: clases leading-* y valores numéricos
+       ================================================================== */
+
+    /* none — heading display sin espacio entre líneas (hero login) */
+    --leading-none:     1;       /* leading-none   */
+    /* tight — headings grandes de la landing */
+    --leading-tight:    1.25;    /* leading-tight  */
+    /* hero — h1 principal landing (leading-[1.02]) */
+    --leading-hero:     1.02;    /* leading-[1.02] */
+    /* display — landing secciones de beneficios (leading-[1.05]) */
+    --leading-display:  1.05;    /* leading-[1.05] */
+    /* feature — landing tarjetas de características (leading-[1.1]) */
+    --leading-feature:  1.1;     /* leading-[1.1]  */
+    /* snug — compacto, headers de cards del sistema */
+    --leading-snug:     1.375;   /* leading-snug   */
+    /* normal — texto de cuerpo por defecto */
+    --leading-normal:   1.5;     /* leading-normal */
+    /* relaxed — párrafos de contenido institucional */
+    --leading-relaxed:  1.625;   /* leading-relaxed */
+    /* 4 — pequeños bloques de texto en alertas del panel */
+    --leading-4:        1rem;    /* leading-4      */
+    /* 5 — toasts, mensajes de alerta compactos */
+    --leading-5:        1.25rem; /* leading-5      */
+    /* 6 — texto secundario de listas y formularios */
+    --leading-6:        1.5rem;  /* leading-6      */
+    /* 7 — párrafos de apoyo en paneles de la landing */
+    --leading-7:        1.75rem; /* leading-7      */
+    /* 8 — párrafos de descripción del hero */
+    --leading-8:        2rem;    /* leading-8      */
+
+
+    /* ==================================================================
+       SECCIÓN 6 — ROLES SEMÁNTICOS DE FUENTE EN EL SISTEMA
+       Describe qué fuente + peso + tamaño usa cada elemento clave.
+       ================================================================== */
+
+    /* Título de sección de módulo admin (MAYÚSCULAS, .rm-section-title) */
+    --type-seccion-titulo-font:    var(--font-sans);
+    --type-seccion-titulo-weight:  var(--font-weight-black);    /* 900 */
+    --type-seccion-titulo-size:    var(--font-size-xl);         /* 20px */
+    --type-seccion-titulo-spacing: var(--tracking-tight);
+
+    /* Subtítulo de sección (.rm-section-subtitle) */
+    --type-seccion-sub-weight:     var(--font-weight-semibold); /* 600 */
+    --type-seccion-sub-size:       var(--font-size-xs);         /* 12px */
+
+    /* Label de formulario (MAYÚSCULAS, .rm-label) */
+    --type-label-weight:           var(--font-weight-black);    /* 900 */
+    --type-label-size:             var(--font-size-xs);         /* 12px */
+    --type-label-spacing:          var(--tracking-wide);
+
+    /* Label soft de formulario (.rm-label-soft) */
+    --type-label-soft-weight:      var(--font-weight-black);    /* 900 */
+    --type-label-soft-size:        var(--font-size-nano);       /* 10px */
+    --type-label-soft-spacing:     var(--tracking-widest);
+
+    /* Botones del sistema (.rm-btn) */
+    --type-btn-weight:             var(--font-weight-black);    /* 900 */
+    --type-btn-size:               var(--font-size-xs);         /* 12px */
+    --type-btn-spacing:            var(--tracking-wide);
+
+    /* Badges de estado (.rm-badge) */
+    --type-badge-weight:           var(--font-weight-black);    /* 900 */
+    --type-badge-size:             var(--font-size-nano);       /* 10px */
+    --type-badge-spacing:          var(--tracking-wide);
+
+    /* Header de tabla (.rm-table-header) */
+    --type-tabla-header-weight:    var(--font-weight-black);    /* 900 */
+    --type-tabla-header-size:      var(--font-size-nano);       /* 10px */
+    --type-tabla-header-spacing:   var(--tracking-widest);
+
+    /* Valor de métrica grande (.rm-metric-value) */
+    --type-metric-weight:          var(--font-weight-black);    /* 900 */
+    --type-metric-size:            var(--font-size-xl);         /* 20px */
+
+    /* Label de métrica (.rm-metric-label) */
+    --type-metric-label-weight:    var(--font-weight-black);    /* 900 */
+    --type-metric-label-size:      var(--font-size-micro);      /* 9px  */
+    --type-metric-label-spacing:   var(--tracking-brand);       /* 0.15em */
+
+    /* Título modal (.rm-modal-title) */
+    --type-modal-titulo-weight:    var(--font-weight-black);    /* 900 */
+    --type-modal-titulo-size:      var(--font-size-sm);         /* 14px */
+    --type-modal-titulo-spacing:   var(--tracking-wide);
+
+    /* Sidebar — sección y items (.rm-sidebar-section / .rm-sidebar-item) */
+    --type-sidebar-weight:         var(--font-weight-black);    /* 900 */
+    --type-sidebar-size:           var(--font-size-xs);         /* 12px */
+
+    /* Hero de landing / login — headline principal */
+    --type-hero-font:              var(--font-outfit);
+    --type-hero-weight:            var(--font-weight-black);    /* 900 */
+    --type-hero-spacing:           var(--tracking-tighter);
+    --type-hero-leading:           var(--leading-hero);         /* 1.02 */
+
+    /* Tagline / pill de categoría institucional */
+    --type-tagline-weight:         var(--font-weight-black);    /* 900 */
+    --type-tagline-size:           var(--font-size-xs);         /* 12px */
+    --type-tagline-spacing:        var(--tracking-hero);        /* 0.25em */
+
+
+    /* ==================================================================
+       SECCIÓN 7 — CONFIGURACIÓN DE ANTIALIASING
+       Aplicado sobre body (.antialiased en sistema.blade.php)
+       ================================================================== */
+
+    /* Suavizado subpixel — activo en todo el sistema */
+    --font-antialiasing:            antialiased;
+
+
+    /* ==================================================================
+       SECCIÓN 8 — FUENTES EXTERNAS CARGADAS (resumen de URLs)
+       Fuente: sistema.blade.php + app.css @import
+       ================================================================== */
+
+    /*
+     *  @fontsource (bundled via npm — app.css):
+     *    @fontsource/inter       → pesos 400, 500, 700
+     *    @fontsource/outfit      → pesos 400, 700, 800
+     *
+     *  Bunny.net CDN (sistema.blade.php):
+     *    family=figtree          → pesos 400, 500, 600, 700, 800, 900
+     *
+     *  Google Fonts CDN (sistema.blade.php):
+     *    family=Outfit           → pesos 300, 400, 500, 600, 700, 800, 900
+     *    display=swap            → font-display: swap activado
+     *
+     *  Phosphor Icons (sistema.blade.php + guest.blade.php):
+     *    @phosphor-icons/web     → iconografía SVG / web font del sistema
+     */
+
+}
