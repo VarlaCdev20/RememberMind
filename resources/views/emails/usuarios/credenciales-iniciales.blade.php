@@ -131,12 +131,12 @@
     <div style="padding: 20px 0;">
         <div class="container">
             <div class="header">
-                <h1>Casa Amandita</h1>
+                <h1>CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS</h1>
                 <p>RememberMind • Gestión Residencial Integral</p>
             </div>
             <div class="content">
                 <h2>Hola, {{ $usuario->nombres }}</h2>
-                <p>Se ha registrado tu expediente digital en el portal de personal médico-administrativo de <strong>Casa Amandita</strong>. A continuación, te proporcionamos las credenciales de acceso iniciales para ingresar al sistema:</p>
+                <p>Se ha registrado tu expediente digital en el portal de personal médico-administrativo de <strong>CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS</strong>. A continuación, te proporcionamos las credenciales de acceso iniciales para ingresar al sistema:</p>
                 
                 <div class="credentials-box">
                     <div class="credentials-row">
@@ -161,7 +161,7 @@
                 <p>Si tienes alguna duda o inconveniente para acceder a la plataforma, por favor ponte en contacto directo con la Dirección de Sistemas o el Responsable Administrativo del centro.</p>
             </div>
             <div class="footer">
-                Casa Amandita • Tel: +56 9 1234 5678 • Sistema de Gestión Médica RememberMind © {{ date('Y') }}
+                CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS • Tel: +56 9 1234 5678 • Sistema de Gestión Médica RememberMind © {{ date('Y') }}
             </div>
         </div>
     </div>

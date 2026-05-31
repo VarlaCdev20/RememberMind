@@ -35,12 +35,12 @@
                         {{-- Pasos --}}
                         @php
                             $pasosInfo = [
-                                1 => ['icon' => 'ph-user-focus', 'label' => 'Identidad'],
-                                2 => ['icon' => 'ph-first-aid', 'label' => 'Médicos'],
-                                3 => ['icon' => 'ph-map-pin-line', 'label' => 'Ubicación'],
-                                4 => ['icon' => 'ph-users-three', 'label' => 'Familiar'],
-                                5 => ['icon' => 'ph-hospital', 'label' => 'Ingreso'],
-                                6 => ['icon' => 'ph-check-circle', 'label' => 'Fin'],
+                                1 => ['icon' => 'ph-user-focus', 'label' => 'Identificación'],
+                                2 => ['icon' => 'ph-first-aid', 'label' => 'Datos personales'],
+                                3 => ['icon' => 'ph-map-pin-line', 'label' => 'Contacto y dirección'],
+                                4 => ['icon' => 'ph-users-three', 'label' => 'Familiar responsable'],
+                                5 => ['icon' => 'ph-hospital', 'label' => 'Ingreso institucional'],
+                                6 => ['icon' => 'ph-check-circle', 'label' => 'Consentimiento'],
                             ];
                         @endphp
 
@@ -63,7 +63,7 @@
                                 </div>
                                 
                                 {{-- Etiqueta --}}
-                                <span class="absolute -bottom-6 whitespace-nowrap text-[7px] sm:text-[9px] font-black uppercase tracking-tighter transition-all duration-500 
+                                <span class="absolute -bottom-6 whitespace-nowrap text-[9px] sm:text-[10px] font-black uppercase tracking-tight transition-all duration-500
                                     {{ $paso >= $idx ? 'text-azul-profundo opacity-100' : 'text-azul-profundo/30 opacity-60' }} {{ $paso == $idx ? 'scale-110 -translate-y-0.5 text-terracota' : '' }}">
                                     {{ $info['label'] }}
                                 </span>
@@ -76,6 +76,16 @@
 
                 {{-- Contenido Scrollable --}}
                 <div class="flex-1 overflow-y-auto p-5 sm:px-8 sm:py-6 custom-scrollbar">
+                    <div class="mb-5 rounded-2xl border border-azul-profundo/10 bg-azul-profundo/5 px-4 py-3">
+                        <div class="flex items-start gap-3">
+                            <div class="mt-0.5 flex h-6 w-6 items-center justify-center rounded-lg bg-white text-azul-profundo">
+                                <i class="ph-bold ph-info text-sm"></i>
+                            </div>
+                            <p class="text-xs font-bold leading-relaxed text-azul-profundo/80">
+                                Los textos del formulario se normalizan automáticamente a MAYÚSCULAS. Los campos de C.I. y teléfonos aceptan solo dígitos.
+                            </p>
+                        </div>
+                    </div>
                     
                     {{-- Paso 1: Identidad --}}
                     @if($paso == 1)
@@ -108,49 +118,50 @@
                             <div class="flex-1 space-y-6 w-full">
                                 <div class="grid gap-4 md:grid-cols-2">
                                     <div class="space-y-1.5">
-                                        <label class="text-[10px] font-black uppercase tracking-widest text-azul-profundo/50">Nombres *</label>
-                                        <input type="text" wire:model="nombres" placeholder="Ej. María Elena" class="w-full rounded-xl border-2 border-transparent bg-white px-4 py-2.5 text-sm font-bold text-azul-profundo shadow-sm outline-none transition focus:border-terracota/30 focus:ring-4 focus:ring-terracota/10">
-                                        @error('nombres') <span class="text-[9px] font-black text-terracota uppercase tracking-tighter">{{ $message }}</span> @enderror
+                                        <label class="text-xs font-black uppercase tracking-widest text-azul-profundo/50">Nombres *</label>
+                                        <input type="text" wire:model.live.debounce.250ms="nombres" placeholder="Ej. María Elena" class="w-full rounded-xl border-2 {{ $errors->has('nombres') ? 'border-terracota/50 bg-terracota/5' : 'border-transparent bg-white' }} px-4 py-2.5 text-sm font-bold text-azul-profundo shadow-sm outline-none transition focus:border-terracota/30 focus:ring-4 focus:ring-terracota/10">
+                                        <p class="text-xs font-bold text-azul-profundo/45">Se guardará en MAYÚSCULAS.</p>
+                                        @error('nombres') <span class="text-xs font-black text-terracota uppercase tracking-tight">{{ $message }}</span> @enderror
                                     </div>
                                     <div class="space-y-1.5">
-                                        <label class="text-[10px] font-black uppercase tracking-widest text-azul-profundo/50">Apellido Paterno *</label>
-                                        <input type="text" wire:model="ap_paterno" placeholder="Ej. Mamani" class="w-full rounded-xl border-2 border-transparent bg-white px-4 py-2.5 text-sm font-bold text-azul-profundo shadow-sm outline-none transition focus:border-terracota/30 focus:ring-4 focus:ring-terracota/10">
-                                        @error('ap_paterno') <span class="text-[9px] font-black text-terracota uppercase tracking-tighter">{{ $message }}</span> @enderror
+                                        <label class="text-xs font-black uppercase tracking-widest text-azul-profundo/50">Apellido Paterno *</label>
+                                        <input type="text" wire:model.live.debounce.250ms="ap_paterno" placeholder="Ej. Mamani" class="w-full rounded-xl border-2 {{ $errors->has('ap_paterno') ? 'border-terracota/50 bg-terracota/5' : 'border-transparent bg-white' }} px-4 py-2.5 text-sm font-bold text-azul-profundo shadow-sm outline-none transition focus:border-terracota/30 focus:ring-4 focus:ring-terracota/10">
+                                        @error('ap_paterno') <span class="text-xs font-black text-terracota uppercase tracking-tight">{{ $message }}</span> @enderror
                                     </div>
                                     <div class="space-y-1.5">
-                                        <label class="text-[10px] font-black uppercase tracking-widest text-azul-profundo/50">Apellido Materno</label>
-                                        <input type="text" wire:model="ap_materno" placeholder="Ej. Quispe" class="w-full rounded-xl border-2 border-transparent bg-white px-4 py-2.5 text-sm font-bold text-azul-profundo shadow-sm outline-none transition focus:border-terracota/30 focus:ring-4 focus:ring-terracota/10">
-                                        @error('ap_materno') <span class="text-[9px] font-black text-terracota uppercase tracking-tighter">{{ $message }}</span> @enderror
+                                        <label class="text-xs font-black uppercase tracking-widest text-azul-profundo/50">Apellido Materno</label>
+                                        <input type="text" wire:model.live.debounce.250ms="ap_materno" placeholder="Ej. Quispe" class="w-full rounded-xl border-2 {{ $errors->has('ap_materno') ? 'border-terracota/50 bg-terracota/5' : 'border-transparent bg-white' }} px-4 py-2.5 text-sm font-bold text-azul-profundo shadow-sm outline-none transition focus:border-terracota/30 focus:ring-4 focus:ring-terracota/10">
+                                        @error('ap_materno') <span class="text-xs font-black text-terracota uppercase tracking-tight">{{ $message }}</span> @enderror
                                     </div>
                                     <div class="grid grid-cols-3 gap-2">
                                         <div class="col-span-2 space-y-1.5">
-                                            <label class="text-[10px] font-black uppercase tracking-widest text-azul-profundo/50">C.I. *</label>
-                                            <input type="text" wire:model="ci" placeholder="1234567" class="w-full rounded-xl border-2 border-transparent bg-white px-4 py-2.5 text-sm font-bold text-azul-profundo shadow-sm outline-none transition focus:border-terracota/30 focus:ring-4 focus:ring-terracota/10">
+                                            <label class="text-xs font-black uppercase tracking-widest text-azul-profundo/50">C.I. *</label>
+                                            <input type="text" wire:model.live.debounce.250ms="ci" inputmode="numeric" maxlength="9" placeholder="1234567" class="w-full rounded-xl border-2 {{ $errors->has('ci') ? 'border-terracota/50 bg-terracota/5' : 'border-transparent bg-white' }} px-4 py-2.5 text-sm font-bold text-azul-profundo shadow-sm outline-none transition focus:border-terracota/30 focus:ring-4 focus:ring-terracota/10">
                                         </div>
                                         <div class="space-y-1.5">
-                                            <label class="text-[10px] font-black uppercase tracking-widest text-azul-profundo/50">Comp.</label>
-                                            <input type="text" wire:model="complemento_ci" placeholder="1A" class="w-full rounded-xl border-2 border-transparent bg-white px-4 py-2.5 text-sm font-bold text-azul-profundo shadow-sm outline-none transition focus:border-terracota/30 focus:ring-4 focus:ring-terracota/10">
+                                            <label class="text-xs font-black uppercase tracking-widest text-azul-profundo/50">Comp.</label>
+                                            <input type="text" wire:model.live.debounce.250ms="complemento_ci" maxlength="2" placeholder="1A" class="w-full rounded-xl border-2 {{ $errors->has('complemento_ci') ? 'border-terracota/50 bg-terracota/5' : 'border-transparent bg-white' }} px-4 py-2.5 text-sm font-bold text-azul-profundo shadow-sm outline-none transition focus:border-terracota/30 focus:ring-4 focus:ring-terracota/10">
                                         </div>
                                     </div>
-                                    @error('ci') <div class="col-span-full"><span class="text-[9px] font-black text-terracota uppercase tracking-tighter">{{ $message }}</span></div> @enderror
+                                    @error('ci') <div class="col-span-full"><span class="text-xs font-black text-terracota uppercase tracking-tight">{{ $message }}</span></div> @enderror
                                 </div>
                             </div>
                         </div>
 
                         <div class="grid gap-4 md:grid-cols-2">
                             <div class="space-y-1.5">
-                                <label class="text-[10px] font-black uppercase tracking-widest text-azul-profundo/50">Expedición *</label>
-                                <select wire:model="expedicion_ci" class="w-full rounded-xl border-2 border-transparent bg-white px-4 py-2.5 text-sm font-bold text-azul-profundo shadow-sm outline-none transition focus:border-terracota/30 focus:ring-4 focus:ring-terracota/10">
+                                <label class="text-xs font-black uppercase tracking-widest text-azul-profundo/50">Expedición *</label>
+                                <select wire:model="expedicion_ci" class="w-full rounded-xl border-2 {{ $errors->has('expedicion_ci') ? 'border-terracota/50 bg-terracota/5' : 'border-transparent bg-white' }} px-4 py-2.5 text-sm font-bold text-azul-profundo shadow-sm outline-none transition focus:border-terracota/30 focus:ring-4 focus:ring-terracota/10">
                                     <option value="">Seleccionar</option>
                                     @foreach(['LP'=>'La Paz', 'SC'=>'Santa Cruz', 'CB'=>'Cochabamba', 'OR'=>'Oruro', 'PT'=>'Potosí', 'CH'=>'Chuquisaca', 'TJ'=>'Tarija', 'BE'=>'Beni', 'PA'=>'Pando'] as $val => $text)
                                         <option value="{{ $val }}">{{ $text }} ({{ $val }})</option>
                                     @endforeach
                                 </select>
-                                @error('expedicion_ci') <span class="text-[9px] font-black text-terracota uppercase tracking-tighter">{{ $message }}</span> @enderror
+                                @error('expedicion_ci') <span class="text-xs font-black text-terracota uppercase tracking-tight">{{ $message }}</span> @enderror
                             </div>
                             <div class="space-y-1.5">
-                                <label class="text-[10px] font-black uppercase tracking-widest text-azul-profundo/50">Estado Civil *</label>
-                                <select wire:model="estado_civil" class="w-full rounded-xl border-2 border-transparent bg-white px-4 py-2.5 text-sm font-bold text-azul-profundo shadow-sm outline-none transition focus:border-terracota/30 focus:ring-4 focus:ring-terracota/10">
+                                <label class="text-xs font-black uppercase tracking-widest text-azul-profundo/50">Estado Civil *</label>
+                                <select wire:model="estado_civil" class="w-full rounded-xl border-2 {{ $errors->has('estado_civil') ? 'border-terracota/50 bg-terracota/5' : 'border-transparent bg-white' }} px-4 py-2.5 text-sm font-bold text-azul-profundo shadow-sm outline-none transition focus:border-terracota/30 focus:ring-4 focus:ring-terracota/10">
                                     <option value="">Seleccionar</option>
                                     <option value="SOLTERO/A">Soltero/a</option>
                                     <option value="CASADO/A">Casado/a</option>
@@ -159,77 +170,88 @@
                                     <option value="UNIÓN LIBRE">Unión Libre</option>
                                     <option value="NO ESPECIFICADO">No especificado</option>
                                 </select>
-                                @error('estado_civil') <span class="text-[9px] font-black text-terracota uppercase tracking-tighter">{{ $message }}</span> @enderror
+                                @error('estado_civil') <span class="text-xs font-black text-terracota uppercase tracking-tight">{{ $message }}</span> @enderror
                             </div>
                         </div>
                     </div>
                     @endif
 
-                    {{-- Paso 2: Médicos --}}
+                    {{-- Paso 2: Datos personales --}}
                     @if($paso == 2)
                     <div class="grid gap-8 md:grid-cols-3 animate-fade-in">
                         <div class="space-y-2">
-                            <label class="text-[11px] font-black uppercase tracking-widest text-azul-profundo/50">Fecha Nacimiento *</label>
-                            <input type="date" wire:model.live="fecha_nac" class="w-full rounded-2xl border-2 border-transparent bg-white px-5 py-3.5 text-sm font-bold text-azul-profundo shadow-sm outline-none transition focus:border-terracota/30 focus:ring-4 focus:ring-terracota/10">
-                            @error('fecha_nac') <span class="text-[10px] font-black text-terracota uppercase tracking-tighter">{{ $message }}</span> @enderror
+                            <label class="text-xs font-black uppercase tracking-widest text-azul-profundo/50">Fecha Nacimiento *</label>
+                            <input type="date" wire:model.live="fecha_nac"
+                                   max="{{ now()->format('Y-m-d') }}"
+                                   min="{{ now()->subYears(120)->format('Y-m-d') }}"
+                                   class="w-full rounded-2xl border-2 {{ $errors->has('fecha_nac') ? 'border-terracota/50 bg-terracota/5' : 'border-transparent bg-white' }} px-5 py-3.5 text-sm font-bold text-azul-profundo shadow-sm outline-none transition focus:border-terracota/30 focus:ring-4 focus:ring-terracota/10">
+                            <p class="text-xs font-bold text-azul-profundo/45">Edad mínima para admisión inicial: 60 años.</p>
+                            @error('fecha_nac') <span class="text-xs font-black text-terracota uppercase tracking-tight">{{ $message }}</span> @enderror
                         </div>
                         <div class="space-y-2">
-                            <label class="text-[11px] font-black uppercase tracking-widest text-azul-profundo/50">Edad Estimada</label>
+                            <label class="text-xs font-black uppercase tracking-widest text-azul-profundo/50">Edad Estimada</label>
+                            @if($this->edad !== null && $this->edad < 60)
+                            <div class="flex h-[48px] w-full items-center gap-2 rounded-2xl border-2 border-terracota/30 bg-terracota/5 px-5 text-sm font-black text-terracota">
+                                <i class="ph-fill ph-warning text-base"></i>
+                                {{ $this->edad }} años — menor de 60
+                            </div>
+                            @else
                             <div class="flex h-[48px] w-full items-center rounded-2xl border-2 border-dashed border-[#C7B5A3]/50 bg-white/30 px-5 text-sm font-black text-azul-profundo/40">
                                 {{ $this->edad ? $this->edad . ' años' : '--' }}
                             </div>
+                            @endif
                         </div>
                         <div class="space-y-2">
-                            <label class="text-[11px] font-black uppercase tracking-widest text-azul-profundo/50">Género *</label>
-                            <select wire:model="genero" class="w-full rounded-2xl border-2 border-transparent bg-white px-5 py-3.5 text-sm font-bold text-azul-profundo shadow-sm outline-none transition focus:border-terracota/30 focus:ring-4 focus:ring-terracota/10">
+                            <label class="text-xs font-black uppercase tracking-widest text-azul-profundo/50">Género *</label>
+                            <select wire:model="genero" class="w-full rounded-2xl border-2 {{ $errors->has('genero') ? 'border-terracota/50 bg-terracota/5' : 'border-transparent bg-white' }} px-5 py-3.5 text-sm font-bold text-azul-profundo shadow-sm outline-none transition focus:border-terracota/30 focus:ring-4 focus:ring-terracota/10">
                                 <option value="">Seleccionar</option>
                                 <option value="MASCULINO">Masculino</option>
                                 <option value="FEMENINO">Femenino</option>
                                 <option value="OTRO">Otro</option>
                             </select>
-                            @error('genero') <span class="text-[10px] font-black text-terracota uppercase tracking-tighter">{{ $message }}</span> @enderror
+                            @error('genero') <span class="text-xs font-black text-terracota uppercase tracking-tight">{{ $message }}</span> @enderror
                         </div>
 
                         <div class="space-y-2">
-                            <label class="text-[11px] font-black uppercase tracking-widest text-azul-profundo/50">Grupo Sanguíneo *</label>
-                            <select wire:model="grupo_sanguineo" class="w-full rounded-2xl border-2 border-transparent bg-white px-5 py-3.5 text-sm font-bold text-azul-profundo shadow-sm outline-none transition focus:border-terracota/30 focus:ring-4 focus:ring-terracota/10">
+                            <label class="text-xs font-black uppercase tracking-widest text-azul-profundo/50">Grupo Sanguíneo *</label>
+                            <select wire:model="grupo_sanguineo" class="w-full rounded-2xl border-2 {{ $errors->has('grupo_sanguineo') ? 'border-terracota/50 bg-terracota/5' : 'border-transparent bg-white' }} px-5 py-3.5 text-sm font-bold text-azul-profundo shadow-sm outline-none transition focus:border-terracota/30 focus:ring-4 focus:ring-terracota/10">
                                 <option value="">Seleccionar</option>
                                 @foreach(['A+','A-','B+','B-','AB+','AB-','O+','O-'] as $gs)
                                     <option value="{{ $gs }}">{{ $gs }}</option>
                                 @endforeach
                             </select>
-                            @error('grupo_sanguineo') <span class="text-[10px] font-black text-terracota uppercase tracking-tighter">{{ $message }}</span> @enderror
+                            @error('grupo_sanguineo') <span class="text-xs font-black text-terracota uppercase tracking-tight">{{ $message }}</span> @enderror
                         </div>
                         <div class="space-y-2">
-                            <label class="text-[11px] font-black uppercase tracking-widest text-azul-profundo/50">Seguro de Salud *</label>
-                            <select wire:model="seguro_salud" class="w-full rounded-2xl border-2 border-transparent bg-white px-5 py-3.5 text-sm font-bold text-azul-profundo shadow-sm outline-none transition focus:border-terracota/30 focus:ring-4 focus:ring-terracota/10">
+                            <label class="text-xs font-black uppercase tracking-widest text-azul-profundo/50">Seguro de Salud *</label>
+                            <select wire:model="seguro_salud" class="w-full rounded-2xl border-2 {{ $errors->has('seguro_salud') ? 'border-terracota/50 bg-terracota/5' : 'border-transparent bg-white' }} px-5 py-3.5 text-sm font-bold text-azul-profundo shadow-sm outline-none transition focus:border-terracota/30 focus:ring-4 focus:ring-terracota/10">
                                 <option value="">Seleccionar</option>
                                 @foreach(['SUS','CAJA NACIONAL CNS','CAJA PETROLERA','SEGURO PRIVADO','NINGUNO','OTRO'] as $seguro)
                                     <option value="{{ $seguro }}">{{ $seguro }}</option>
                                 @endforeach
                             </select>
-                            @error('seguro_salud') <span class="text-[10px] font-black text-terracota uppercase tracking-tighter">{{ $message }}</span> @enderror
+                            @error('seguro_salud') <span class="text-xs font-black text-terracota uppercase tracking-tight">{{ $message }}</span> @enderror
                         </div>
                         <div class="space-y-2">
-                            <label class="text-[11px] font-black uppercase tracking-widest text-azul-profundo/50">Nivel Educativo *</label>
-                            <select wire:model="nivel_educat" class="w-full rounded-2xl border-2 border-transparent bg-white px-5 py-3.5 text-sm font-bold text-azul-profundo shadow-sm outline-none transition focus:border-terracota/30 focus:ring-4 focus:ring-terracota/10">
+                            <label class="text-xs font-black uppercase tracking-widest text-azul-profundo/50">Nivel Educativo *</label>
+                            <select wire:model="nivel_educat" class="w-full rounded-2xl border-2 {{ $errors->has('nivel_educat') ? 'border-terracota/50 bg-terracota/5' : 'border-transparent bg-white' }} px-5 py-3.5 text-sm font-bold text-azul-profundo shadow-sm outline-none transition focus:border-terracota/30 focus:ring-4 focus:ring-terracota/10">
                                 <option value="">Seleccionar</option>
                                 @foreach(['ANALFABETO','PRIMARIA','SECUNDARIA','TÉCNICO','UNIVERSITARIO','POSTGRADO','NO ESPECIFICADO'] as $nivel)
                                     <option value="{{ $nivel }}">{{ ucfirst(strtolower($nivel)) }}</option>
                                 @endforeach
                             </select>
-                            @error('nivel_educat') <span class="text-[10px] font-black text-terracota uppercase tracking-tighter">{{ $message }}</span> @enderror
+                            @error('nivel_educat') <span class="text-xs font-black text-terracota uppercase tracking-tight">{{ $message }}</span> @enderror
                         </div>
 
                         <div class="col-span-full space-y-2">
-                            <label class="text-[11px] font-black uppercase tracking-widest text-azul-profundo/50">Alergias Conocidas *</label>
-                            <textarea wire:model="alergias" rows="3" placeholder="Especifique o deje 'Ninguna'..." class="w-full resize-none rounded-3xl border-2 border-transparent bg-white px-6 py-4 text-sm font-bold text-azul-profundo shadow-sm outline-none transition focus:border-terracota/30 focus:ring-4 focus:ring-terracota/10"></textarea>
-                            @error('alergias') <span class="text-[10px] font-black text-terracota uppercase tracking-tighter">{{ $message }}</span> @enderror
+                            <label class="text-xs font-black uppercase tracking-widest text-azul-profundo/50">Alergias Conocidas *</label>
+                            <textarea wire:model="alergias" rows="3" placeholder="Especifique o deje 'Ninguna'..." class="w-full resize-none rounded-3xl border-2 {{ $errors->has('alergias') ? 'border-terracota/50 bg-terracota/5' : 'border-transparent bg-white' }} px-6 py-4 text-sm font-bold text-azul-profundo shadow-sm outline-none transition focus:border-terracota/30 focus:ring-4 focus:ring-terracota/10"></textarea>
+                            @error('alergias') <span class="text-xs font-black text-terracota uppercase tracking-tight">{{ $message }}</span> @enderror
                         </div>
                     </div>
                     @endif
 
-                    {{-- Paso 3: Ubicación --}}
+                    {{-- Paso 3: Contacto y dirección --}}
                     @if($paso == 3)
                     <div class="grid gap-8 md:grid-cols-2 animate-fade-in">
                         <div class="col-span-full flex items-center gap-4 rounded-[28px] bg-azul-profundo/5 p-6 border-2 border-azul-profundo/10 shadow-inner">
@@ -245,9 +267,9 @@
 
                         @if($tiene_celular)
                         <div class="space-y-2">
-                            <label class="text-[11px] font-black uppercase tracking-widest text-azul-profundo/50">Número de Celular *</label>
-                            <input type="text" wire:model="celular" placeholder="70012345" class="w-full rounded-2xl border-2 border-transparent bg-white px-5 py-3.5 text-sm font-bold text-azul-profundo shadow-sm outline-none transition focus:border-terracota/30 focus:ring-4 focus:ring-terracota/10">
-                            @error('celular') <span class="text-[10px] font-black text-terracota uppercase tracking-tighter">{{ $message }}</span> @enderror
+                            <label class="text-xs font-black uppercase tracking-widest text-azul-profundo/50">Número de Celular *</label>
+                            <input type="text" wire:model.live.debounce.250ms="celular" inputmode="numeric" maxlength="8" placeholder="70012345" class="w-full rounded-2xl border-2 {{ $errors->has('celular') ? 'border-terracota/50 bg-terracota/5' : 'border-transparent bg-white' }} px-5 py-3.5 text-sm font-bold text-azul-profundo shadow-sm outline-none transition focus:border-terracota/30 focus:ring-4 focus:ring-terracota/10">
+                            @error('celular') <span class="text-xs font-black text-terracota uppercase tracking-tight">{{ $message }}</span> @enderror
                         </div>
                         <div class="flex items-center gap-3 pt-6">
                             <input type="checkbox" wire:model="sabe_usar_whatsapp" id="ws_check" class="h-6 w-6 rounded-lg border-2 border-[#C7B5A3] bg-white text-terracota transition focus:ring-terracota/30">
@@ -256,60 +278,60 @@
                         @endif
 
                         <div class="space-y-2">
-                            <label class="text-[11px] font-black uppercase tracking-widest text-azul-profundo/50">Teléfono Fijo / Referencia</label>
-                            <input type="text" wire:model="telefono_fijo" placeholder="2223344" class="w-full rounded-2xl border-2 border-transparent bg-white px-5 py-3.5 text-sm font-bold text-azul-profundo shadow-sm outline-none transition focus:border-terracota/30 focus:ring-4 focus:ring-terracota/10">
-                            @error('telefono_fijo') <span class="text-[10px] font-black text-terracota uppercase tracking-tighter">{{ $message }}</span> @enderror
+                            <label class="text-xs font-black uppercase tracking-widest text-azul-profundo/50">Teléfono Fijo / Referencia</label>
+                            <input type="text" wire:model.live.debounce.250ms="telefono_fijo" inputmode="numeric" maxlength="8" placeholder="2223344" class="w-full rounded-2xl border-2 {{ $errors->has('telefono_fijo') ? 'border-terracota/50 bg-terracota/5' : 'border-transparent bg-white' }} px-5 py-3.5 text-sm font-bold text-azul-profundo shadow-sm outline-none transition focus:border-terracota/30 focus:ring-4 focus:ring-terracota/10">
+                            @error('telefono_fijo') <span class="text-xs font-black text-terracota uppercase tracking-tight">{{ $message }}</span> @enderror
                         </div>
                         <div class="space-y-2">
-                            <label class="text-[11px] font-black uppercase tracking-widest text-azul-profundo/50">Dpto. Residencia *</label>
-                            <select wire:model="departamento_residencia" class="w-full rounded-2xl border-2 border-transparent bg-white px-5 py-3.5 text-sm font-bold text-azul-profundo shadow-sm outline-none transition focus:border-terracota/30 focus:ring-4 focus:ring-terracota/10">
+                            <label class="text-xs font-black uppercase tracking-widest text-azul-profundo/50">Dpto. Residencia *</label>
+                            <select wire:model="departamento_residencia" class="w-full rounded-2xl border-2 {{ $errors->has('departamento_residencia') ? 'border-terracota/50 bg-terracota/5' : 'border-transparent bg-white' }} px-5 py-3.5 text-sm font-bold text-azul-profundo shadow-sm outline-none transition focus:border-terracota/30 focus:ring-4 focus:ring-terracota/10">
                                 <option value="">Seleccionar</option>
                                 @foreach(['LA PAZ', 'SANTA CRUZ', 'COCHABAMBA', 'ORURO', 'POTOSÍ', 'CHUQUISACA', 'TARIJA', 'BENI', 'PANDO'] as $dep)
                                     <option value="{{ $dep }}">{{ $dep }}</option>
                                 @endforeach
                             </select>
-                            @error('departamento_residencia') <span class="text-[10px] font-black text-terracota uppercase tracking-tighter">{{ $message }}</span> @enderror
+                            @error('departamento_residencia') <span class="text-xs font-black text-terracota uppercase tracking-tight">{{ $message }}</span> @enderror
                         </div>
                         <div class="space-y-2">
-                            <label class="text-[11px] font-black uppercase tracking-widest text-azul-profundo/50">Ciudad / Municipio *</label>
-                            <input type="text" wire:model="ciudad_municipio" placeholder="Ej. El Alto" class="w-full rounded-2xl border-2 border-transparent bg-white px-5 py-3.5 text-sm font-bold text-azul-profundo shadow-sm outline-none transition focus:border-terracota/30 focus:ring-4 focus:ring-terracota/10">
-                            @error('ciudad_municipio') <span class="text-[10px] font-black text-terracota uppercase tracking-tighter">{{ $message }}</span> @enderror
+                            <label class="text-xs font-black uppercase tracking-widest text-azul-profundo/50">Ciudad / Municipio *</label>
+                            <input type="text" wire:model="ciudad_municipio" placeholder="Ej. El Alto" class="w-full rounded-2xl border-2 {{ $errors->has('ciudad_municipio') ? 'border-terracota/50 bg-terracota/5' : 'border-transparent bg-white' }} px-5 py-3.5 text-sm font-bold text-azul-profundo shadow-sm outline-none transition focus:border-terracota/30 focus:ring-4 focus:ring-terracota/10">
+                            @error('ciudad_municipio') <span class="text-xs font-black text-terracota uppercase tracking-tight">{{ $message }}</span> @enderror
                         </div>
                         <div class="space-y-2">
-                            <label class="text-[11px] font-black uppercase tracking-widest text-azul-profundo/50">Zona / Barrio *</label>
-                            <input type="text" wire:model="zona" placeholder="Ej. Miraflores" class="w-full rounded-2xl border-2 border-transparent bg-white px-5 py-3.5 text-sm font-bold text-azul-profundo shadow-sm outline-none transition focus:border-terracota/30 focus:ring-4 focus:ring-terracota/10">
-                            @error('zona') <span class="text-[10px] font-black text-terracota uppercase tracking-tighter">{{ $message }}</span> @enderror
+                            <label class="text-xs font-black uppercase tracking-widest text-azul-profundo/50">Zona / Barrio *</label>
+                            <input type="text" wire:model="zona" placeholder="Ej. Miraflores" class="w-full rounded-2xl border-2 {{ $errors->has('zona') ? 'border-terracota/50 bg-terracota/5' : 'border-transparent bg-white' }} px-5 py-3.5 text-sm font-bold text-azul-profundo shadow-sm outline-none transition focus:border-terracota/30 focus:ring-4 focus:ring-terracota/10">
+                            @error('zona') <span class="text-xs font-black text-terracota uppercase tracking-tight">{{ $message }}</span> @enderror
                         </div>
                         <div class="space-y-2 md:col-span-2">
-                            <label class="text-[11px] font-black uppercase tracking-widest text-azul-profundo/50">Calle / Avenida / Referencia Visual *</label>
-                            <input type="text" wire:model="calle" placeholder="Ej. Av. Saavedra esq. Villalobos, edificio blanco..." class="w-full rounded-2xl border-2 border-transparent bg-white px-5 py-3.5 text-sm font-bold text-azul-profundo shadow-sm outline-none transition focus:border-terracota/30 focus:ring-4 focus:ring-terracota/10">
-                            @error('calle') <span class="text-[10px] font-black text-terracota uppercase tracking-tighter">{{ $message }}</span> @enderror
+                            <label class="text-xs font-black uppercase tracking-widest text-azul-profundo/50">Calle / Avenida / Referencia Visual *</label>
+                            <input type="text" wire:model="calle" placeholder="Ej. Av. Saavedra esq. Villalobos, edificio blanco..." class="w-full rounded-2xl border-2 {{ $errors->has('calle') ? 'border-terracota/50 bg-terracota/5' : 'border-transparent bg-white' }} px-5 py-3.5 text-sm font-bold text-azul-profundo shadow-sm outline-none transition focus:border-terracota/30 focus:ring-4 focus:ring-terracota/10">
+                            @error('calle') <span class="text-xs font-black text-terracota uppercase tracking-tight">{{ $message }}</span> @enderror
                         </div>
                     </div>
                     @endif
 
-                    {{-- Paso 4: Familiar --}}
+                    {{-- Paso 4: Familiar responsable --}}
                     @if($paso == 4)
                     <div class="grid gap-8 md:grid-cols-2 animate-fade-in">
                         <div class="space-y-2">
-                            <label class="text-[11px] font-black uppercase tracking-widest text-azul-profundo/50">Nombre Completo del Responsable *</label>
-                            <input type="text" wire:model="contacto_emergencia_nombre" placeholder="Nombre de un familiar directo" class="w-full rounded-2xl border-2 border-transparent bg-white px-5 py-3.5 text-sm font-bold text-azul-profundo shadow-sm outline-none transition focus:border-terracota/30 focus:ring-4 focus:ring-terracota/10">
-                            @error('contacto_emergencia_nombre') <span class="text-[10px] font-black text-terracota uppercase tracking-tighter">{{ $message }}</span> @enderror
+                            <label class="text-xs font-black uppercase tracking-widest text-azul-profundo/50">Nombre Completo del Responsable *</label>
+                            <input type="text" wire:model="contacto_emergencia_nombre" placeholder="Nombre de un familiar directo" class="w-full rounded-2xl border-2 {{ $errors->has('contacto_emergencia_nombre') ? 'border-terracota/50 bg-terracota/5' : 'border-transparent bg-white' }} px-5 py-3.5 text-sm font-bold text-azul-profundo shadow-sm outline-none transition focus:border-terracota/30 focus:ring-4 focus:ring-terracota/10">
+                            @error('contacto_emergencia_nombre') <span class="text-xs font-black text-terracota uppercase tracking-tight">{{ $message }}</span> @enderror
                         </div>
                         <div class="space-y-2">
-                            <label class="text-[11px] font-black uppercase tracking-widest text-azul-profundo/50">Parentesco *</label>
-                            <select wire:model="contacto_emergencia_parentesco" class="w-full rounded-2xl border-2 border-transparent bg-white px-5 py-3.5 text-sm font-bold text-azul-profundo shadow-sm outline-none transition focus:border-terracota/30 focus:ring-4 focus:ring-terracota/10">
+                            <label class="text-xs font-black uppercase tracking-widest text-azul-profundo/50">Parentesco *</label>
+                            <select wire:model="contacto_emergencia_parentesco" class="w-full rounded-2xl border-2 {{ $errors->has('contacto_emergencia_parentesco') ? 'border-terracota/50 bg-terracota/5' : 'border-transparent bg-white' }} px-5 py-3.5 text-sm font-bold text-azul-profundo shadow-sm outline-none transition focus:border-terracota/30 focus:ring-4 focus:ring-terracota/10">
                                 <option value="">Seleccionar</option>
                                 @foreach(['HIJO/A','CÓNYUGE','NIETO/A','SOBRINO/A','HERMANO/A','TUTOR LEGAL','OTRO'] as $par)
                                     <option value="{{ $par }}">{{ ucfirst(strtolower($par)) }}</option>
                                 @endforeach
                             </select>
-                            @error('contacto_emergencia_parentesco') <span class="text-[10px] font-black text-terracota uppercase tracking-tighter">{{ $message }}</span> @enderror
+                            @error('contacto_emergencia_parentesco') <span class="text-xs font-black text-terracota uppercase tracking-tight">{{ $message }}</span> @enderror
                         </div>
                         <div class="space-y-2">
-                            <label class="text-[11px] font-black uppercase tracking-widest text-azul-profundo/50">Celular de Contacto *</label>
-                            <input type="text" wire:model="contacto_emergencia_celular" placeholder="70098765" class="w-full rounded-2xl border-2 border-transparent bg-white px-5 py-3.5 text-sm font-bold text-azul-profundo shadow-sm outline-none transition focus:border-terracota/30 focus:ring-4 focus:ring-terracota/10">
-                            @error('contacto_emergencia_celular') <span class="text-[10px] font-black text-terracota uppercase tracking-tighter">{{ $message }}</span> @enderror
+                            <label class="text-xs font-black uppercase tracking-widest text-azul-profundo/50">Celular de Contacto *</label>
+                            <input type="text" wire:model.live.debounce.250ms="contacto_emergencia_celular" inputmode="numeric" maxlength="8" placeholder="70098765" class="w-full rounded-2xl border-2 {{ $errors->has('contacto_emergencia_celular') ? 'border-terracota/50 bg-terracota/5' : 'border-transparent bg-white' }} px-5 py-3.5 text-sm font-bold text-azul-profundo shadow-sm outline-none transition focus:border-terracota/30 focus:ring-4 focus:ring-terracota/10">
+                            @error('contacto_emergencia_celular') <span class="text-xs font-black text-terracota uppercase tracking-tight">{{ $message }}</span> @enderror
                         </div>
                         <div class="space-y-6 pt-6">
                             <div class="flex items-center gap-3">
@@ -322,28 +344,28 @@
                             </div>
                         </div>
                         <div class="col-span-full space-y-2">
-                            <label class="text-[11px] font-black uppercase tracking-widest text-azul-profundo/50">Dirección del Contacto</label>
-                            <textarea wire:model="contacto_emergencia_direccion" rows="2" placeholder="Opcional. Si vive en otro domicilio..." class="w-full resize-none rounded-2xl border-2 border-transparent bg-white px-5 py-3.5 text-sm font-bold text-azul-profundo shadow-sm outline-none transition focus:border-terracota/30 focus:ring-4 focus:ring-terracota/10"></textarea>
+                            <label class="text-xs font-black uppercase tracking-widest text-azul-profundo/50">Dirección del Contacto</label>
+                            <textarea wire:model="contacto_emergencia_direccion" rows="2" placeholder="Opcional. Si vive en otro domicilio..." class="w-full resize-none rounded-2xl border-2 {{ $errors->has('contacto_emergencia_direccion') ? 'border-terracota/50 bg-terracota/5' : 'border-transparent bg-white' }} px-5 py-3.5 text-sm font-bold text-azul-profundo shadow-sm outline-none transition focus:border-terracota/30 focus:ring-4 focus:ring-terracota/10"></textarea>
+                            @error('contacto_emergencia_direccion') <span class="text-xs font-black text-terracota uppercase tracking-tight">{{ $message }}</span> @enderror
                         </div>
                     </div>
                     @endif
 
-                    {{-- Paso 5: Ingreso --}}
+                    {{-- Paso 5: Ingreso institucional --}}
                     @if($paso == 5)
                     <div class="grid gap-8 md:grid-cols-4 animate-fade-in">
                         <div class="md:col-span-2 space-y-2">
-                            <label class="text-[11px] font-black uppercase tracking-widest text-azul-profundo/50">Fecha de Ingreso Institucional *</label>
-                            <input type="date" wire:model="fecha_ing" class="w-full rounded-2xl border-2 border-transparent bg-white px-5 py-3.5 text-sm font-bold text-azul-profundo shadow-sm outline-none transition focus:border-terracota/30 focus:ring-4 focus:ring-terracota/10">
-                            @error('fecha_ing') <span class="text-[10px] font-black text-terracota uppercase tracking-tighter">{{ $message }}</span> @enderror
+                            <label class="text-xs font-black uppercase tracking-widest text-azul-profundo/50">Fecha de Ingreso Institucional *</label>
+                            <input type="date" wire:model="fecha_ing" class="w-full rounded-2xl border-2 {{ $errors->has('fecha_ing') ? 'border-terracota/50 bg-terracota/5' : 'border-transparent bg-white' }} px-5 py-3.5 text-sm font-bold text-azul-profundo shadow-sm outline-none transition focus:border-terracota/30 focus:ring-4 focus:ring-terracota/10">
+                            @error('fecha_ing') <span class="text-xs font-black text-terracota uppercase tracking-tight">{{ $message }}</span> @enderror
                         </div>
                         <div class="md:col-span-2 space-y-2">
-                            <label class="text-[11px] font-black uppercase tracking-widest text-azul-profundo/50">Hora de Ingreso</label>
+                            <label class="text-xs font-black uppercase tracking-widest text-azul-profundo/50">Hora de Ingreso</label>
                             <input type="time" wire:model="hora_ing" class="w-full rounded-2xl border-2 border-transparent bg-white px-5 py-3.5 text-sm font-bold text-azul-profundo shadow-sm outline-none transition focus:border-terracota/30 focus:ring-4 focus:ring-terracota/10">
-                            @error('hora_ing') <span class="text-[10px] font-black text-terracota uppercase tracking-tighter">{{ $message }}</span> @enderror
                         </div>
                         <div class="md:col-span-2 space-y-2">
-                            <label class="text-[11px] font-black uppercase tracking-widest text-azul-profundo/50">Tipo de Ingreso *</label>
-                            <select wire:model="tipo_ing" class="w-full rounded-2xl border-2 border-transparent bg-white px-5 py-3.5 text-sm font-bold text-azul-profundo shadow-sm outline-none transition focus:border-terracota/30 focus:ring-4 focus:ring-terracota/10">
+                            <label class="text-xs font-black uppercase tracking-widest text-azul-profundo/50">Tipo de Ingreso *</label>
+                            <select wire:model="tipo_ing" class="w-full rounded-2xl border-2 {{ $errors->has('tipo_ing') ? 'border-terracota/50 bg-terracota/5' : 'border-transparent bg-white' }} px-5 py-3.5 text-sm font-bold text-azul-profundo shadow-sm outline-none transition focus:border-terracota/30 focus:ring-4 focus:ring-terracota/10">
                                 <option value="">Seleccionar</option>
                                 <option value="REGULAR">Regular</option>
                                 <option value="DERIVADO">Derivado</option>
@@ -351,26 +373,26 @@
                                 <option value="EMERGENCIA">Emergencia</option>
                                 <option value="OTRO">Otro</option>
                             </select>
-                            @error('tipo_ing') <span class="text-[10px] font-black text-terracota uppercase tracking-tighter">{{ $message }}</span> @enderror
+                            @error('tipo_ing') <span class="text-xs font-black text-terracota uppercase tracking-tight">{{ $message }}</span> @enderror
                         </div>
                         <div class="md:col-span-2 space-y-2">
-                            <label class="text-[11px] font-black uppercase tracking-widest text-azul-profundo/50">Permanencia *</label>
-                            <select wire:model="permanencia" class="w-full rounded-2xl border-2 border-transparent bg-white px-5 py-3.5 text-sm font-bold text-azul-profundo shadow-sm outline-none transition focus:border-terracota/30 focus:ring-4 focus:ring-terracota/10">
+                            <label class="text-xs font-black uppercase tracking-widest text-azul-profundo/50">Permanencia *</label>
+                            <select wire:model="permanencia" class="w-full rounded-2xl border-2 {{ $errors->has('permanencia') ? 'border-terracota/50 bg-terracota/5' : 'border-transparent bg-white' }} px-5 py-3.5 text-sm font-bold text-azul-profundo shadow-sm outline-none transition focus:border-terracota/30 focus:ring-4 focus:ring-terracota/10">
                                 <option value="">Seleccionar</option>
                                 <option value="PERMANENTE">Permanente</option>
                                 <option value="TEMPORAL">Temporal</option>
                                 <option value="EVENTUAL">Eventual</option>
                             </select>
-                            @error('permanencia') <span class="text-[10px] font-black text-terracota uppercase tracking-tighter">{{ $message }}</span> @enderror
+                            @error('permanencia') <span class="text-xs font-black text-terracota uppercase tracking-tight">{{ $message }}</span> @enderror
                         </div>
                         <div class="col-span-full space-y-2">
-                            <label class="text-[11px] font-black uppercase tracking-widest text-azul-profundo/50">Observaciones de Ingreso</label>
+                            <label class="text-xs font-black uppercase tracking-widest text-azul-profundo/50">Observaciones de Ingreso</label>
                             <textarea wire:model="observaciones" rows="3" placeholder="Anotaciones administrativas o clínicas preliminares..." class="w-full resize-none rounded-3xl border-2 border-transparent bg-white px-6 py-4 text-sm font-bold text-azul-profundo shadow-sm outline-none transition focus:border-terracota/30 focus:ring-4 focus:ring-terracota/10"></textarea>
                         </div>
                     </div>
                     @endif
 
-                    {{-- Paso 6: Confirmación --}}
+                    {{-- Paso 6: Consentimiento y confirmación --}}
                     @if($paso == 6)
                     <div class="max-w-2xl mx-auto space-y-10 animate-fade-in text-center py-4">
                         <div class="flex flex-col items-center">
@@ -408,7 +430,7 @@
                                     Confirmo que el adulto mayor (o su responsable) otorga su consentimiento para el registro, almacenamiento y tratamiento de sus datos personales y clínicos en RememberMind conforme a las leyes de protección de datos vigentes. *
                                 </label>
                             </div>
-                            @error('consentimiento_datos') <div class="text-left"><span class="text-[10px] font-black text-terracota uppercase tracking-tighter">{{ $message }}</span></div> @enderror
+                            @error('consentimiento_datos') <div class="text-left"><span class="text-xs font-black text-terracota uppercase tracking-tight">{{ $message }}</span></div> @enderror
                         </div>
                     </div>
                     @endif
@@ -417,23 +439,35 @@
 
                 {{-- Footer con Botones --}}
                 <div class="border-t border-[#C7B5A3]/30 p-4 sm:px-8 flex flex-col-reverse sm:flex-row sm:items-center sm:justify-between gap-4">
-                    <button type="button" wire:click="anterior" @if($paso == 1) disabled @endif 
+                    <button type="button" wire:click="anterior" wire:loading.attr="disabled" @if($paso == 1) disabled @endif
                             class="flex h-11 items-center justify-center gap-2 rounded-xl bg-white px-6 text-xs font-black text-azul-profundo shadow-sm transition hover:bg-azul-profundo hover:text-white disabled:opacity-30 disabled:cursor-not-allowed active:scale-95">
                         <i class="ph-bold ph-arrow-left"></i> Anterior
                     </button>
 
                     <div class="flex gap-3">
-                        <button type="button" wire:click="cerrar" class="h-11 items-center justify-center rounded-xl bg-[#D5C7B9] px-5 text-xs font-black text-azul-profundo transition hover:bg-terracota hover:text-white active:scale-95 hidden sm:flex">
+                        <button type="button" wire:click="cerrar" wire:loading.attr="disabled" class="h-11 items-center justify-center rounded-xl bg-[#D5C7B9] px-5 text-xs font-black text-azul-profundo transition hover:bg-terracota hover:text-white active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed hidden sm:flex">
                             Cancelar
                         </button>
 
                         @if($paso < $totalPasos)
-                            <button type="button" wire:click="siguiente" class="flex h-11 items-center justify-center gap-2 rounded-xl bg-azul-profundo px-8 text-xs font-black text-white shadow-[0_12px_24px_-8px_rgba(47,62,92,0.4)] transition hover:-translate-y-1 hover:bg-[#25324d] active:scale-95">
-                                Siguiente paso <i class="ph-bold ph-arrow-right"></i>
+                            @php
+                                $bloquearSiguiente = $paso === 2 && $this->edad !== null && $this->edad < 60;
+                            @endphp
+                            <button type="button" wire:click="siguiente" wire:loading.attr="disabled" wire:target="siguiente"
+                                    @disabled($bloquearSiguiente)
+                                    class="flex h-11 items-center justify-center gap-2 rounded-xl bg-azul-profundo px-8 text-xs font-black text-white shadow-[0_12px_24px_-8px_rgba(47,62,92,0.4)] transition hover:-translate-y-1 hover:bg-[#25324d] active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed">
+                                <i wire:loading wire:target="siguiente" class="ph-bold ph-circle-notch animate-spin"></i>
+                                <i wire:loading.remove wire:target="siguiente" class="ph-bold ph-arrow-right"></i>
+                                <span wire:loading.remove wire:target="siguiente">{{ $bloquearSiguiente ? 'Corrija fecha de nacimiento' : 'Siguiente paso' }}</span>
+                                <span wire:loading wire:target="siguiente">Verificando...</span>
                             </button>
                         @else
-                            <button type="button" wire:click="guardar" class="flex h-11 items-center justify-center gap-2 rounded-xl bg-terracota px-8 text-xs font-black text-white shadow-[0_12px_24px_-8px_rgba(226,125,96,0.4)] transition hover:-translate-y-1 hover:bg-[#d46a4d] active:scale-95">
-                                <i class="ph-bold ph-floppy-disk"></i> {{ $isEdit ? 'Actualizar' : 'Finalizar' }}
+                            <button type="button" wire:click="guardar" wire:loading.attr="disabled" wire:target="guardar"
+                                    class="flex h-11 items-center justify-center gap-2 rounded-xl bg-terracota px-8 text-xs font-black text-white shadow-[0_12px_24px_-8px_rgba(226,125,96,0.4)] transition hover:-translate-y-1 hover:bg-[#d46a4d] active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed">
+                                <i wire:loading wire:target="guardar" class="ph-bold ph-circle-notch animate-spin"></i>
+                                <i wire:loading.remove wire:target="guardar" class="ph-bold ph-floppy-disk"></i>
+                                <span wire:loading.remove wire:target="guardar">{{ $isEdit ? 'Actualizar' : 'Finalizar' }}</span>
+                                <span wire:loading wire:target="guardar">Guardando...</span>
                             </button>
                         @endif
                     </div>

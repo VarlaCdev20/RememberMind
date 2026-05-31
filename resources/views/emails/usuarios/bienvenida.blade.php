@@ -132,12 +132,12 @@
     <div style="padding: 20px 0;">
         <div class="container">
             <div class="header">
-                <h1>Casa Amandita</h1>
+                <h1>CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS</h1>
                 <p>RememberMind • Gestión Residencial Integral</p>
             </div>
             <div class="content">
                 <h2>¡Hola, {{ $usuario->nombres }}!</h2>
-                <p>Es un verdadero placer darte la bienvenida al equipo humano y asistencial de <strong>Casa Amandita</strong>. Hemos habilitado formalmente tu perfil y vinculación en nuestra plataforma médica y administrativa de control:</p>
+                <p>Es un verdadero placer darte la bienvenida al equipo humano y asistencial de <strong>CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS</strong>. Hemos habilitado formalmente tu perfil y vinculación en nuestra plataforma médica y administrativa de control:</p>
                 
                 <div class="profile-summary">
                     <div class="profile-row">
@@ -166,10 +166,10 @@
                     <a href="{{ $enlaceSistema }}/login" class="btn" target="_blank">Comenzar en el Portal</a>
                 </div>
 
-                <p>En Casa Amandita tenemos un compromiso absoluto con el bienestar y el cuidado geriátrico de excelencia de cada uno de nuestros adultos mayores. Agradecemos profundamente tu profesionalismo, vocación y dedicación diaria.</p>
+                <p>En CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS tenemos un compromiso absoluto con el bienestar y el cuidado geriátrico de excelencia de cada uno de nuestros adultos mayores. Agradecemos profundamente tu profesionalismo, vocación y dedicación diaria.</p>
             </div>
             <div class="footer">
-                Casa Amandita • Sistema de Gestión Médica RememberMind © {{ date('Y') }}
+                CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS • Sistema de Gestión Médica RememberMind © {{ date('Y') }}
             </div>
         </div>
     </div>

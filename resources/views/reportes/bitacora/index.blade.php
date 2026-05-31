@@ -13,7 +13,7 @@
 {{-- Encabezado --}}
 <div class="rm-header">
     <div class="rm-header-logo">RememberMind</div>
-    <div class="rm-header-sub">Casa Amandita — {{ $metadata['titulo'] }}</div>
+    <div class="rm-header-sub">CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS — {{ $metadata['titulo'] }}</div>
     <span class="rm-header-badge">Bitácora de Auditoría</span>
     <div class="rm-header-meta">
         Generado el {{ $metadata['generado_en'] }} por {{ $metadata['generado_por'] }}
@@ -89,7 +89,7 @@
 @endif
 
 <div class="rm-footer">
-    Casa Amandita · RememberMind · {{ $metadata['generado_en'] }}
+    CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS · RememberMind · {{ $metadata['generado_en'] }}
 </div>
 
 @if(!$esPdf)

@@ -24,23 +24,6 @@ class AsistenciaVoluntarios extends Model
         'cod_vol'
     ];
 
-    protected static function boot(): void
-    {
-        static::creating(function ($AsistenciaVoluntarios) {
-            if (!$AsistenciaVoluntarios->cod_asig_vol) {
-                $ultimo = self::where('cod_asig_vol', 'like', 'ASV_%')
-                    ->orderByDesc('cod_asig_vol')
-                    ->value('cod_asig_vol');
-
-                $numero = $ultimo
-                    ? ((int) substr($ultimo, 3)) + 1
-                    : 1;
-
-                $AsistenciaVoluntarios->cod_asig_vol = 'ASV_' . str_pad($numero, 4, '0', STR_PAD_LEFT);
-            }
-        });
-    }
-
     /**
      * Relaciones
      */

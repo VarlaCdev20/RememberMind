@@ -50,7 +50,7 @@
             <tr>
                 <td width="60%">
                     <span class="logo-text">RememberMind</span><br>
-                    <span class="sub-logo">Casa Amandita - Gestión Gerontológica</span>
+                    <span class="sub-logo">CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS - Gestión Gerontológica</span>
                 </td>
                 <td class="title">
                     <h2>Ficha Técnica Individual</h2>
@@ -208,6 +208,220 @@
             </td>
         </tr>
     </table>
+
+    {{-- ====== PÁGINA 2: RESUMEN VISUAL DE INDICADORES ====== --}}
+    @php
+        $svChart      = $signosVitales->where('estado', 'VIGENTE')->sortBy('fecha')->take(10)->values();
+        $barthelChart = $valoracionesFuncionales->filter(fn($v) => $v->indice_barthel !== null)->sortBy('fecha_valoracion')->take(8)->values();
+        $evalChart    = $evaluaciones->sortBy('fecha_eval')->take(8)->values();
+        $medEstados   = $medicaciones->groupBy('estado')->map(fn($group) => $group->count());
+        $hasCharts    = $svChart->isNotEmpty() || $barthelChart->isNotEmpty() || $evalChart->isNotEmpty() || $medEstados->isNotEmpty();
+    @endphp
+
+    @if($hasCharts)
+    <div style="page-break-before: always;"></div>
+    <table width="100%" style="border-bottom: 2px solid #2F3E5C; margin-bottom: 15px;">
+        <tr>
+            <td><span style="font-size:18px;font-weight:bold;text-transform:uppercase;color:#2F3E5C;">RememberMind</span><br>
+                <span style="font-size:9px;color:#666;text-transform:uppercase;letter-spacing:1px;">CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS · Resumen Visual de Indicadores</span></td>
+            <td style="text-align:right;">
+                <span style="font-size:15px;font-weight:bold;text-transform:uppercase;color:#2F3E5C;">Análisis Gráfico</span><br>
+                <span style="color:#666;font-weight:bold;font-size:10px;">Expediente: {{ $adulto->cod_am }}</span>
+                <span style="color:#999;font-size:9px;"> · {{ now()->format('d/m/Y') }}</span>
+            </td>
+        </tr>
+    </table>
+
+    <table width="100%" style="border-collapse:collapse;">
+    <tr>
+      {{-- GRÁFICO 1: SIGNOS VITALES --}}
+      <td width="50%" style="vertical-align:top;padding:0 8px 18px 0;">
+        <div style="font-size:10px;font-weight:bold;text-transform:uppercase;border-bottom:1px solid #DDD;padding-bottom:4px;margin-bottom:8px;color:#E27D60;">Evolución Presión / Pulso</div>
+        @if($svChart->isNotEmpty())
+        @php
+            $cW=240;$cH=110;$pL=30;$pR=8;$pT=10;$pB=22;
+            $iW=$cW-$pL-$pR;$iH=$cH-$pT-$pB;
+            $n=$svChart->count();$yLo=40;$yHi=200;$yRange=$yHi-$yLo;
+            $sistPts=[];$diasPts=[];$pulsPts=[];
+            foreach ($svChart as $si => $sv_i) {
+                $bx = $n>1 ? $pL+($iW/($n-1))*$si : $pL+$iW/2;
+                if ($sv_i->presion_sistolica !== null) {
+                    $y=$pT+$iH*(1-($sv_i->presion_sistolica-$yLo)/$yRange);
+                    $sistPts[]=round($bx,1).','.round(max($pT,min($pT+$iH,$y)),1);
+                }
+                if ($sv_i->presion_diastolica !== null) {
+                    $y=$pT+$iH*(1-($sv_i->presion_diastolica-$yLo)/$yRange);
+                    $diasPts[]=round($bx,1).','.round(max($pT,min($pT+$iH,$y)),1);
+                }
+                if ($sv_i->frecuencia_cardiaca !== null) {
+                    $y=$pT+$iH*(1-($sv_i->frecuencia_cardiaca-$yLo)/$yRange);
+                    $pulsPts[]=round($bx,1).','.round(max($pT,min($pT+$iH,$y)),1);
+                }
+            }
+            $svFechas=$svChart->map(fn($s)=>$s->fecha?$s->fecha->format('d/m'):'')->values()->toArray();
+        @endphp
+        <svg xmlns="http://www.w3.org/2000/svg" width="{{ $cW }}" height="{{ $cH }}">
+          <rect x="{{ $pL }}" y="{{ $pT }}" width="{{ $iW }}" height="{{ $iH }}" fill="#FDFBFA" stroke="#DDD" stroke-width="0.5"/>
+          @foreach([80,120,160] as $gl)
+            @php $glY=round($pT+$iH*(1-($gl-$yLo)/$yRange),1); @endphp
+            @if($glY>=$pT && $glY<=$pT+$iH)
+            <line x1="{{ $pL }}" y1="{{ $glY }}" x2="{{ $pL+$iW }}" y2="{{ $glY }}" stroke="#E8E0D8" stroke-width="0.5"/>
+            <text x="{{ $pL-2 }}" y="{{ $glY+2.5 }}" text-anchor="end" font-size="6" fill="#AAA">{{ $gl }}</text>
+            @endif
+          @endforeach
+          @if(count($sistPts)>=2)<polyline points="{{ implode(' ',$sistPts) }}" fill="none" stroke="#E27D60" stroke-width="1.5"/>@endif
+          @if(count($diasPts)>=2)<polyline points="{{ implode(' ',$diasPts) }}" fill="none" stroke="#5B5F97" stroke-width="1.5"/>@endif
+          @if(count($pulsPts)>=2)<polyline points="{{ implode(' ',$pulsPts) }}" fill="none" stroke="#617453" stroke-width="1.5"/>@endif
+          @foreach($svFechas as $fi => $fl)
+            @if($fi%2==0 || $fi==$n-1)
+            @php $flx=round($n>1?$pL+($iW/($n-1))*$fi:$pL+$iW/2,1); @endphp
+            <text x="{{ $flx }}" y="{{ $pT+$iH+10 }}" text-anchor="middle" font-size="6" fill="#999">{{ $fl }}</text>
+            @endif
+          @endforeach
+          <rect x="{{ $pL }}" y="{{ $cH-8 }}" width="5" height="5" fill="#E27D60"/>
+          <text x="{{ $pL+7 }}" y="{{ $cH-3 }}" font-size="6" fill="#666">Sistólica</text>
+          <rect x="{{ $pL+46 }}" y="{{ $cH-8 }}" width="5" height="5" fill="#5B5F97"/>
+          <text x="{{ $pL+53 }}" y="{{ $cH-3 }}" font-size="6" fill="#666">Diastólica</text>
+          <rect x="{{ $pL+95 }}" y="{{ $cH-8 }}" width="5" height="5" fill="#617453"/>
+          <text x="{{ $pL+102 }}" y="{{ $cH-3 }}" font-size="6" fill="#666">Pulso</text>
+        </svg>
+        @else
+        <div style="font-size:9px;color:#999;font-style:italic;padding:20px 0;text-align:center;">Sin signos vitales vigentes.</div>
+        @endif
+      </td>
+
+      {{-- GRÁFICO 2: ÍNDICE BARTHEL --}}
+      <td width="50%" style="vertical-align:top;padding:0 0 18px 8px;">
+        <div style="font-size:10px;font-weight:bold;text-transform:uppercase;border-bottom:1px solid #DDD;padding-bottom:4px;margin-bottom:8px;color:#2F3E5C;">Evolución Índice Barthel</div>
+        @if($barthelChart->isNotEmpty())
+        @php
+            $cW=240;$cH=110;$pL=28;$pR=8;$pT=10;$pB=22;
+            $iW=$cW-$pL-$pR;$iH=$cH-$pT-$pB;
+            $nb=$barthelChart->count();
+            $bPts=[];
+            foreach ($barthelChart as $bi => $bv_i) {
+                $bx=$nb>1?$pL+($iW/($nb-1))*$bi:$pL+$iW/2;
+                $by=$pT+$iH*(1-($bv_i->indice_barthel/100));
+                $bPts[]=round($bx,1).','.round(max($pT,min($pT+$iH,$by)),1);
+            }
+            $bLabels=$barthelChart->map(fn($v)=>$v->fecha_valoracion?$v->fecha_valoracion->format('d/m'):'')->values()->toArray();
+            $lastBV=$barthelChart->last()->indice_barthel;
+            $lastNiv=$barthelChart->last()->nivel_dependencia??'';
+        @endphp
+        <svg xmlns="http://www.w3.org/2000/svg" width="{{ $cW }}" height="{{ $cH }}">
+          <rect x="{{ $pL }}" y="{{ $pT }}" width="{{ $iW }}" height="{{ $iH }}" fill="#FDFBFA" stroke="#DDD" stroke-width="0.5"/>
+          @foreach([0,25,50,75,100] as $bg)
+            @php $bgY=round($pT+$iH*(1-$bg/100),1); @endphp
+            <line x1="{{ $pL }}" y1="{{ $bgY }}" x2="{{ $pL+$iW }}" y2="{{ $bgY }}" stroke="#E8E0D8" stroke-width="0.5"/>
+            <text x="{{ $pL-2 }}" y="{{ $bgY+2.5 }}" text-anchor="end" font-size="6" fill="#AAA">{{ $bg }}</text>
+          @endforeach
+          @if(count($bPts)>=2)<polyline points="{{ implode(' ',$bPts) }}" fill="none" stroke="#2F3E5C" stroke-width="2"/>@endif
+          @foreach($bPts as $bpi => $bpp)
+            @php $bc=explode(',',$bpp); @endphp
+            <circle cx="{{ $bc[0] }}" cy="{{ $bc[1] }}" r="2.5" fill="#2F3E5C"/>
+          @endforeach
+          @if(count($bPts)>0)
+            @php $lastC=explode(',',$bPts[count($bPts)-1]); @endphp
+            <text x="{{ $lastC[0] }}" y="{{ max($pT+7,$lastC[1]-4) }}" text-anchor="middle" font-size="6.5" fill="#2F3E5C" font-weight="bold">{{ $lastBV }}</text>
+          @endif
+          @foreach($bLabels as $bli => $bll)
+            @if($bli%2==0 || $bli==$nb-1)
+            @php $blx=round($nb>1?$pL+($iW/($nb-1))*$bli:$pL+$iW/2,1); @endphp
+            <text x="{{ $blx }}" y="{{ $pT+$iH+10 }}" text-anchor="middle" font-size="6" fill="#999">{{ $bll }}</text>
+            @endif
+          @endforeach
+          <text x="{{ $pL+$iW/2 }}" y="{{ $cH-3 }}" text-anchor="middle" font-size="7" fill="#2F3E5C">Último: {{ $lastBV }}/100{{ $lastNiv ? ' · ' . $lastNiv : '' }}</text>
+        </svg>
+        @else
+        <div style="font-size:9px;color:#999;font-style:italic;padding:20px 0;text-align:center;">Sin datos de valoración funcional.</div>
+        @endif
+      </td>
+    </tr>
+    <tr>
+      {{-- GRÁFICO 3: EVALUACIONES COGNITIVAS --}}
+      <td width="50%" style="vertical-align:top;padding:0 8px 10px 0;">
+        <div style="font-size:10px;font-weight:bold;text-transform:uppercase;border-bottom:1px solid #DDD;padding-bottom:4px;margin-bottom:8px;color:#5B5F97;">Evaluaciones Cognitivas</div>
+        @if($evalChart->isNotEmpty())
+        @php
+            $cW=240;$cH=110;$pL=28;$pR=8;$pT=10;$pB=22;
+            $iW=$cW-$pL-$pR;$iH=$cH-$pT-$pB;
+            $ne=$evalChart->count();
+            $maxPuntaje=max((float)($evalChart->max('puntaje_maximo')??100),1);
+            $groupW=$iW/$ne;
+            $bw=min(12,$groupW*0.35);
+        @endphp
+        <svg xmlns="http://www.w3.org/2000/svg" width="{{ $cW }}" height="{{ $cH }}">
+          <rect x="{{ $pL }}" y="{{ $pT }}" width="{{ $iW }}" height="{{ $iH }}" fill="#FDFBFA" stroke="#DDD" stroke-width="0.5"/>
+          @foreach([25,50,75,100] as $eg)
+            @php $egY=round($pT+$iH*(1-$eg/100),1); @endphp
+            <line x1="{{ $pL }}" y1="{{ $egY }}" x2="{{ $pL+$iW }}" y2="{{ $egY }}" stroke="#E8E0D8" stroke-width="0.5"/>
+            <text x="{{ $pL-2 }}" y="{{ $egY+2.5 }}" text-anchor="end" font-size="6" fill="#AAA">{{ $eg }}</text>
+          @endforeach
+          @foreach($evalChart as $ei => $ev_i)
+            @php
+                $gx=$pL+$groupW*$ei+$groupW/2;
+                $eMax=(float)($ev_i->puntaje_maximo??100);
+                $eObt=(float)($ev_i->puntaje_total??0);
+                $maxH=$iH*min(1,$eMax/$maxPuntaje);
+                $obtH=$iH*min(1,$eObt/$maxPuntaje);
+                $ratio=$eMax>0?$eObt/$eMax:0;
+                $bColor=$ratio>=0.7?'#617453':($ratio>=0.4?'#E2A45F':'#E27D60');
+                $eName=substr($ev_i->tipoEvaluacion?->nombre??'Eval',0,6);
+            @endphp
+            <rect x="{{ round($gx-$bw,1) }}" y="{{ round($pT+$iH-$maxH,1) }}" width="{{ round($bw*0.9,1) }}" height="{{ round($maxH,1) }}" fill="#E8EDF4" stroke="#C0C8D8" stroke-width="0.5"/>
+            <rect x="{{ round($gx+0.5,1) }}" y="{{ round($pT+$iH-$obtH,1) }}" width="{{ round($bw*0.9,1) }}" height="{{ round($obtH,1) }}" fill="{{ $bColor }}"/>
+            <text x="{{ round($gx,1) }}" y="{{ $pT+$iH+10 }}" text-anchor="middle" font-size="5.5" fill="#888">{{ $eName }}</text>
+            @if($obtH>10)
+            <text x="{{ round($gx+$bw/2+0.5,1) }}" y="{{ round($pT+$iH-$obtH+8,1) }}" text-anchor="middle" font-size="6" fill="#FFF" font-weight="bold">{{ $ev_i->puntaje_total }}</text>
+            @endif
+          @endforeach
+          <rect x="{{ $pL }}" y="{{ $cH-8 }}" width="5" height="5" fill="#E8EDF4" stroke="#C0C8D8" stroke-width="0.5"/>
+          <text x="{{ $pL+7 }}" y="{{ $cH-3 }}" font-size="6" fill="#666">Máximo</text>
+          <rect x="{{ $pL+45 }}" y="{{ $cH-8 }}" width="5" height="5" fill="#617453"/>
+          <text x="{{ $pL+52 }}" y="{{ $cH-3 }}" font-size="6" fill="#666">Obtenido</text>
+        </svg>
+        @else
+        <div style="font-size:9px;color:#999;font-style:italic;padding:20px 0;text-align:center;">Sin evaluaciones cognitivas registradas.</div>
+        @endif
+      </td>
+
+      {{-- GRÁFICO 4: MEDICACIÓN POR ESTADO --}}
+      <td width="50%" style="vertical-align:top;padding:0 0 10px 8px;">
+        <div style="font-size:10px;font-weight:bold;text-transform:uppercase;border-bottom:1px solid #DDD;padding-bottom:4px;margin-bottom:8px;color:#617453;">Medicación por Estado</div>
+        @if($medEstados->isNotEmpty())
+        @php
+            $cW=240;$cH=110;$pL=62;$pR=30;$pT=10;$pB=20;
+            $iW=$cW-$pL-$pR;$iH=$cH-$pT-$pB;
+            $medTotal=$medEstados->sum();
+            $medColorMap=['ACTIVO'=>'#617453','SUSPENDIDO'=>'#E2A45F','FINALIZADO'=>'#5B5F97',
+                          'ANULADO'=>'#E27D60','PENDIENTE'=>'#2F3E5C','INACTIVO'=>'#CBBBAA'];
+            $medKeys=$medEstados->keys()->toArray();
+            $nm=count($medKeys);
+            $barMaxH=min($iH/max(1,$nm)*0.65,16);
+            $barGapH=$iH/max(1,$nm);
+        @endphp
+        <svg xmlns="http://www.w3.org/2000/svg" width="{{ $cW }}" height="{{ $cH }}">
+          <rect x="{{ $pL }}" y="{{ $pT }}" width="{{ $iW }}" height="{{ $iH }}" fill="#FDFBFA" stroke="#DDD" stroke-width="0.5"/>
+          @foreach($medKeys as $mki => $mk)
+            @php
+                $cnt=$medEstados[$mk];
+                $barY=$pT+$barGapH*$mki+($barGapH-$barMaxH)/2;
+                $barW=$iW*($cnt/max(1,$medTotal));
+                $mColor=$medColorMap[$mk]??'#AAAAAA';
+            @endphp
+            <rect x="{{ $pL }}" y="{{ round($barY,1) }}" width="{{ round($barW,1) }}" height="{{ round($barMaxH,1) }}" fill="{{ $mColor }}"/>
+            <text x="{{ $pL-3 }}" y="{{ round($barY+$barMaxH*0.72,1) }}" text-anchor="end" font-size="6.5" fill="#444">{{ $mk }}</text>
+            <text x="{{ $pL+round($barW,1)+3 }}" y="{{ round($barY+$barMaxH*0.72,1) }}" font-size="7" fill="#333" font-weight="bold">{{ $cnt }}</text>
+          @endforeach
+          <text x="{{ $pL+$iW/2 }}" y="{{ $pT+$iH+13 }}" text-anchor="middle" font-size="7" fill="#555">Total: {{ $medTotal }} registros</text>
+        </svg>
+        @else
+        <div style="font-size:9px;color:#999;font-style:italic;padding:20px 0;text-align:center;">Sin medicación registrada.</div>
+        @endif
+      </td>
+    </tr>
+    </table>
+    @endif
 
     <div class="footer">
         <div class="signature-box">

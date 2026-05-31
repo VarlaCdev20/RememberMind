@@ -175,6 +175,6 @@
 
     <div class="alert-box" style="margin-top: 30px;">
         <strong>Declaración de Autenticidad:</strong><br>
-        El presente expediente digital consolida la información técnica, laboral y legal del usuario registrado en RememberMind. Cualquier inconsistencia o adulteración de los documentos aquí validados dará lugar a las acciones administrativas internas estipuladas por la dirección de Casa Amandita.
+        El presente expediente digital consolida la información técnica, laboral y legal del usuario registrado en RememberMind. Cualquier inconsistencia o adulteración de los documentos aquí validados dará lugar a las acciones administrativas internas estipuladas por la dirección de CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS.
     </div>
 @endsection

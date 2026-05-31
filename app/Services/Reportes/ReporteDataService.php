@@ -614,9 +614,12 @@ class ReporteDataService
         }
 
         $total       = DB::table('actividades_adulto')->whereNull('deleted_at')->count();
-        $completadas = DB::table('actividades_adulto')->whereNull('deleted_at')->where('estado', 'completada')->count();
-        $pendientes  = DB::table('actividades_adulto')->whereNull('deleted_at')->where('estado', 'pendiente')->count();
-        $canceladas  = DB::table('actividades_adulto')->whereNull('deleted_at')->where('estado', 'cancelada')->count();
+        $completadas = DB::table('actividades_adulto')->whereNull('deleted_at')
+            ->whereIn('estado', ['COMPLETADA', 'REALIZADA', 'FINALIZADA'])->count();
+        $pendientes  = DB::table('actividades_adulto')->whereNull('deleted_at')
+            ->whereIn('estado', ['PROGRAMADA', 'PENDIENTE'])->count();
+        $canceladas  = DB::table('actividades_adulto')->whereNull('deleted_at')
+            ->whereIn('estado', ['CANCELADA', 'ANULADA'])->count();
 
         return [
             'total'       => $total,
@@ -634,12 +637,12 @@ class ReporteDataService
 
         return DB::table('actividades_adulto as aa')
             ->join('adulto_mayor as am', 'aa.cod_am', '=', 'am.cod_am')
-            ->leftJoin('tipo_actividad_adulto as ta', 'aa.cod_tipo_act', '=', 'ta.cod_tipo_act')
+            ->leftJoin('tipo_actividades_adulto as ta', 'aa.cod_tipo_act', '=', 'ta.cod_tipo_act')
             ->whereNull('aa.deleted_at')
             ->select(
                 'aa.cod_act_adul',
                 DB::raw("CONCAT(am.nombres, ' ', am.ap_paterno) AS adulto"),
-                'ta.nombre_tipo_act',
+                'ta.tipo as tipo_actividad',
                 'aa.fecha',
                 'aa.hora',
                 'aa.estado',
@@ -689,12 +692,26 @@ class ReporteDataService
             ->orderByDesc('total')
             ->get();
 
-        $mapaColores = ['completada' => '#2A9D8F', 'pendiente' => '#D4843A', 'cancelada' => '#E97A5F'];
+        $mapaColores = [
+            'COMPLETADA'   => '#2A9D8F', 'REALIZADA'    => '#2A9D8F', 'FINALIZADA' => '#2A9D8F',
+            'PROGRAMADA'   => '#D4843A', 'PENDIENTE'    => '#D4843A',
+            'CANCELADA'    => '#E97A5F', 'ANULADA'      => '#E97A5F',
+            'REPROGRAMADA' => '#7A68B0',
+        ];
+
+        $mapaEtiquetas = [
+            'COMPLETADA'   => 'Realizada',    'REALIZADA'    => 'Realizada',   'FINALIZADA' => 'Realizada',
+            'PROGRAMADA'   => 'Programada',   'PENDIENTE'    => 'Programada',
+            'CANCELADA'    => 'Cancelada',    'ANULADA'      => 'Cancelada',
+            'REPROGRAMADA' => 'Reprogramada',
+        ];
 
         return [
-            'labels'  => $resultados->pluck('estado')->toArray(),
+            'labels'  => $resultados->pluck('estado')->map(
+                fn($e) => $mapaEtiquetas[strtoupper($e ?? '')] ?? ucfirst(strtolower($e ?? 'Sin estado'))
+            )->toArray(),
             'data'    => $resultados->pluck('total')->map(fn($v) => (int) $v)->toArray(),
-            'colores' => $resultados->map(fn($r) => $mapaColores[$r->estado] ?? '#7A68B0')->toArray(),
+            'colores' => $resultados->map(fn($r) => $mapaColores[strtoupper($r->estado ?? '')] ?? '#7A68B0')->toArray(),
         ];
     }
 

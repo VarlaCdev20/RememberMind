@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title', 'Reporte Casa Amandita')</title>
+    <title>@yield('title', 'Reporte CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS')</title>
     <style>
         @page {
             margin: 100px 50px 80px 50px;
@@ -252,14 +252,14 @@
 <body>
 
     <!-- Marca de Agua de Fondo -->
-    <div class="watermark"><span>Casa Amandita</span></div>
+    <div class="watermark"><span>CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS</span></div>
 
     <!-- Encabezado Fijo -->
     <header>
         <table class="header-table">
             <tr>
                 <td>
-                    <div class="header-logo-text">Casa Amandita</div>
+                    <div class="header-logo-text">CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS</div>
                     <div class="header-logo-sub">RememberMind • Gestión Residencial Integral</div>
                 </td>
                 <td class="header-meta">
@@ -273,7 +273,7 @@
 
     <!-- Pie de Página Fijo -->
     <footer>
-        Casa Amandita • Av. Falsa 123 • Tel: +56 9 1234 5678 • Sistema RememberMind © {{ date('Y') }}
+        CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS • Av. Falsa 123 • Tel: +56 9 1234 5678 • Sistema RememberMind © {{ date('Y') }}
     </footer>
 
     <!-- Contenido Principal -->

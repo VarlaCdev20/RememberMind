@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Acceso Restringido - Casa Amandita</title>
+    <title>Acceso Restringido - CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS</title>
     
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -75,7 +75,7 @@
 
         {{-- PIE DE PÁGINA --}}
         <div class="mt-12 pt-6 border-t border-[#C7B5A3]/30 text-[10px] font-black uppercase tracking-widest text-[#2F3E5C]/40">
-            Casa Amandita - RememberMind
+            CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS - RememberMind
         </div>
 
     </div>

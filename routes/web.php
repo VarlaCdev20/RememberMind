@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\Reportes\ReporteFamiliaresController;
 use App\Http\Controllers\Admin\Reportes\ReporteEquipoController;
 use App\Http\Controllers\Admin\Reportes\ReporteActividadesController;
 use App\Http\Controllers\Admin\Reportes\ReporteBitacoraController;
+use App\Http\Controllers\Admin\FamiliaSocial\ResumenFamiliaSocialController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -50,6 +51,17 @@ Route::middleware([
             Route::get('usuarios/{usuario}/documentacion/pdf', [UsuarioController::class, 'documentacionPdf'])
                 ->middleware('permission:usuarios.reportes.pdf')
                 ->name('usuarios.documentacion.pdf');
+
+            Route::prefix('usuarios/{user}/documentos')
+                ->name('usuarios.documentos.')
+                ->group(function () {
+                    Route::get('/', [\App\Http\Controllers\Admin\Usuarios\DocumentosUsuarioController::class, 'preview'])->name('preview');
+                    Route::get('/pdf', [\App\Http\Controllers\Admin\Usuarios\DocumentosUsuarioController::class, 'paquetePdf'])->name('pdf');
+                    Route::post('/enviar', [\App\Http\Controllers\Admin\Usuarios\DocumentosUsuarioController::class, 'enviarPaqueteCorreo'])->name('enviar');
+                    Route::get('/{documento}/ver', [\App\Http\Controllers\Admin\Usuarios\DocumentosUsuarioController::class, 'verDocumento'])->name('ver');
+                    Route::get('/{documento}/pdf', [\App\Http\Controllers\Admin\Usuarios\DocumentosUsuarioController::class, 'pdfDocumento'])->name('documento-pdf');
+                    Route::get('/{documento}/imprimir', [\App\Http\Controllers\Admin\Usuarios\DocumentosUsuarioController::class, 'imprimirDocumento'])->name('imprimir');
+                });
 
             Route::get('usuarios/{usuario}/solicitud-documental/pdf', [UsuarioController::class, 'solicitudDocumentalPdf'])
                 ->middleware('permission:usuarios.ver')
@@ -165,6 +177,7 @@ Route::middleware([
                 Route::patch('actividades/{actividad}/restaurar', [\App\Http\Controllers\Admin\AdultosMayores\AdultoMayorActividadController::class, 'restore'])->middleware('permission:actividades.editar')->name('actividades.restore');
 
                 // Documentos
+                Route::get('documentos', [\App\Http\Controllers\Admin\AdultosMayores\AdultoMayorDocumentoController::class, 'index'])->name('documentos.index');
                 Route::post('documentos', [\App\Http\Controllers\Admin\AdultosMayores\AdultoMayorDocumentoController::class, 'store'])->middleware('permission:documentos.subir')->name('documentos.store');
                 Route::patch('documentos/{documento}', [\App\Http\Controllers\Admin\AdultosMayores\AdultoMayorDocumentoController::class, 'update'])->middleware('permission:documentos.subir')->name('documentos.update');
                 Route::delete('documentos/{documento}', [\App\Http\Controllers\Admin\AdultosMayores\AdultoMayorDocumentoController::class, 'destroy'])->middleware('permission:documentos.archivar')->name('documentos.destroy');
@@ -228,6 +241,7 @@ Route::middleware([
                     Route::get('/administraciones', \App\Livewire\Admin\SaludSeguimiento\SaludSeguimientoListPanel::class)->name('administracion.index');
                     Route::get('/signos-vitales', \App\Livewire\Admin\SaludSeguimiento\SaludSeguimientoListPanel::class)->name('signos.index');
                     Route::get('/valoraciones', \App\Livewire\Admin\SaludSeguimiento\SaludSeguimientoListPanel::class)->name('valoracion.index');
+                    Route::get('/evaluaciones-geriatricas', \App\Livewire\Admin\SaludSeguimiento\SaludSeguimientoListPanel::class)->name('evaluaciones-geriatricas.index');
                     Route::get('/alertas', \App\Livewire\Admin\SaludSeguimiento\SaludSeguimientoListPanel::class)->name('alertas');
                     Route::get('/reportes', \App\Livewire\Admin\SaludSeguimiento\SaludSeguimientoListPanel::class)->name('reportes');
 
@@ -238,6 +252,52 @@ Route::middleware([
                     Route::get('/{adulto}/administracion', \App\Livewire\Admin\SaludSeguimiento\SaludAdministracionMedicacionPanel::class)->name('administracion');
                     Route::get('/{adulto}/signos', \App\Livewire\Admin\SaludSeguimiento\SaludSignosPanel::class)->name('signos');
                     Route::get('/{adulto}/valoracion', \App\Livewire\Admin\SaludSeguimiento\SaludValoracionPanel::class)->name('valoracion');
+                    Route::get('/{adulto}/evaluaciones-geriatricas', \App\Livewire\Admin\SaludSeguimiento\SaludEvaluacionesGeriatricasPanel::class)->name('evaluaciones-geriatricas');
+                });
+
+            // Familia y Social
+            Route::prefix('familia-social')
+                ->name('familia-social.')
+                ->middleware('permission:familiares.ver')
+                ->group(function () {
+                    Route::redirect('/', '/admin/familia-social/resumen')->name('index');
+                    Route::get('/resumen', ResumenFamiliaSocialController::class)->name('resumen');
+                    Route::get('/red-apoyo', \App\Livewire\Admin\FamiliaSocial\RedApoyoPanel::class)->name('red-apoyo');
+                    Route::view('/visitas', 'admin.familia-social.base', [
+                        'titulo' => 'Visitas',
+                        'descripcion' => 'Visitas familiares, sociales y acompañamiento presencial.',
+                        'icono' => 'ph-hand-heart',
+                    ])->name('visitas');
+                    Route::view('/ficha-social', 'admin.familia-social.base', [
+                        'titulo' => 'Ficha social',
+                        'descripcion' => 'Situacion social, convivencia, red de apoyo real y observaciones sociales.',
+                        'icono' => 'ph-clipboard-text',
+                    ])->name('ficha-social');
+                });
+
+            // ── Actividades ─────────────────────────
+            Route::prefix('actividades')
+                ->name('actividades.')
+                ->middleware('permission:actividades.ver')
+                ->group(function () {
+                    Route::get('/', \App\Livewire\Admin\Actividades\ActividadesPanel::class)->name('index');
+                    Route::get('/tipos', \App\Livewire\Admin\Actividades\TiposActividadPanel::class)->name('tipos');
+                    Route::get('/participacion', \App\Livewire\Admin\Actividades\ParticipacionPanel::class)->name('participacion');
+                    Route::get('/asistencia', \App\Livewire\Admin\Actividades\AsistenciaPanel::class)->name('asistencia');
+                    Route::get('/reportes', \App\Livewire\Admin\Actividades\ReportesActividadesPanel::class)->name('reportes');
+                });
+
+            // Voluntariado
+            Route::prefix('voluntariado')
+                ->name('voluntariado.')
+                ->middleware('permission:voluntarios.ver')
+                ->group(function () {
+                    Route::view('/', 'admin.voluntarios.index')->name('index');
+                    Route::view('/voluntarios', 'admin.voluntarios.voluntarios')->name('voluntarios.index');
+                    Route::view('/disponibilidad', 'admin.voluntarios.disponibilidad')->name('disponibilidad.index');
+                    Route::view('/asignaciones', 'admin.voluntarios.asignaciones')->name('asignaciones.index');
+                    Route::view('/asistencia', 'admin.voluntarios.asistencia')->name('asistencia.index');
+                    Route::view('/reportes', 'admin.voluntarios.index')->name('reportes.index');
                 });
 
             // ── Reportes Institucionales ─────────

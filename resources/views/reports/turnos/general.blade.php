@@ -186,7 +186,7 @@
 <body>
 
     <!-- Marca de Agua -->
-    <div id="watermark">Casa Amandita</div>
+    <div id="watermark">CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS</div>
 
     <!-- Encabezado de Página -->
     <header>
@@ -194,7 +194,7 @@
             <tr>
                 <td>
                     <div class="header-title">RememberMind</div>
-                    <div class="header-subtitle">Casa Amandita • Administración General</div>
+                    <div class="header-subtitle">CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS • Administración General</div>
                 </td>
                 <td class="header-meta">
                     <strong>General de Turnos y Asignaciones</strong><br>
@@ -207,7 +207,7 @@
 
     <!-- Footer de Página -->
     <footer>
-        Sistema RememberMind © {{ date('Y') }} Casa Amandita. Todos los derechos reservados.
+        Sistema RememberMind © {{ date('Y') }} CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS. Todos los derechos reservados.
     </footer>
 
     <!-- RESUMEN ESTADÍSTICO -->

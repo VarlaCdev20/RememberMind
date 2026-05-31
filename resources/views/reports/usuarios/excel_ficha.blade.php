@@ -1,7 +1,7 @@
 <table>
     <!-- Cabecera Principal -->
     <tr>
-        <td colspan="4" style="font-size: 16px; font-weight: bold; text-align: center; color: #2F3E5C;">CASA AMANDITA</td>
+        <td colspan="4" style="font-size: 16px; font-weight: bold; text-align: center; color: #2F3E5C;">CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS</td>
     </tr>
     <tr>
         <td colspan="4" style="font-size: 12px; font-weight: bold; text-align: center; color: #967B66;">EXPEDIENTE DIGITAL DE USUARIO</td>

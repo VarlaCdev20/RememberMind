@@ -264,7 +264,7 @@
                                 <label class="mb-1.5 block text-[10px] font-black uppercase tracking-widest text-azul-profundo/60">Correo Electrónico *</label>
                                 <input type="email" name="correo" x-model="correo" @input="clearError('correo'); correo = correo.toLowerCase();"
                                        class="w-full rounded-2xl border border-[#C7B5A3] bg-white/50 px-5 py-3 text-sm font-bold lowercase outline-none transition focus:border-terracota"
-                                       placeholder="ejemplo@casaamandita.com" :class="{'border-red-400 bg-red-50/50': errors.correo}">
+                                       placeholder="ejemplo@jardindelosrecuerdos.org" :class="{'border-red-400 bg-red-50/50': errors.correo}">
                                 <p x-show="errors.correo" class="mt-1.5 text-[10px] font-bold text-red-500" x-text="errors.correo"></p>
                             </div>
 

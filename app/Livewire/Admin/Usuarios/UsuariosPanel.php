@@ -1116,9 +1116,13 @@ class UsuariosPanel extends Component
         $am->ap_materno = $this->normalizarMayusculas($this->quick_ap_materno);
         $am->ci = $this->normalizarMayusculas($this->quick_ci);
         $am->genero = $this->normalizarMayusculas($this->quick_genero);
-        $am->fecha_nac = !empty($this->quick_fecha_nac) ? \Carbon\Carbon::parse($this->quick_fecha_nac)->toDateString() : null;
+        if (!empty($this->quick_fecha_nac)) {
+            $am->setAttribute('fecha_nac', \Carbon\Carbon::parse($this->quick_fecha_nac)->toDateString());
+        } else {
+            $am->setAttribute('fecha_nac', null);
+        }
         $am->cod_est_adul = 1; // ACTIVO
-        $am->fecha_ing = \Carbon\Carbon::today()->toDateString();
+        $am->setAttribute('fecha_ing', \Carbon\Carbon::today()->toDateString());
         $am->save();
 
         $nombreCompleto = $this->obtenerEtiquetaAdultoMayor($am);
@@ -1746,57 +1750,7 @@ class UsuariosPanel extends Component
                 $usuario->syncRoles([$this->rol]);
 
                 // Guardar sub-modelos de forma unificada en edición
-                if ($this->rol === 'personal_salud') {
-                    \App\Models\PersonalSalud::updateOrCreate(
-                        ['cod_usu' => $usuario->cod_usu],
-                        [
-                            'fecha_ing' => $this->fecha_ingreso ?: now()->format('Y-m-d'), 
-                            'cod_esp' => $this->especialidad_salud,
-                            'matricula_prof' => null,
-                            'institucion_formacion' => $this->institucion_formacion,
-                            'estado_laboral' => 'ACTIVO'
-                        ]
-                    );
-                    // TODO: definir flujo administrativo para archivar perfiles previos al cambiar de rol.
-                } elseif ($this->rol === 'personal_admin') {
-                    \App\Models\PersonalAdmin::updateOrCreate(
-                        ['cod_usu' => $usuario->cod_usu],
-                        [
-                            'fecha_ingreso' => $this->fecha_ingreso ?: now()->format('Y-m-d'), 
-                            'cod_cargo_admin' => $this->cargo_administrativo,
-                            'cargo' => \App\Models\CargoAdministrativo::find($this->cargo_administrativo)?->nombre ?? 'Administrativo',
-                            'area_admin' => $this->cod_area ? (\App\Models\AreaInstitucional::find($this->cod_area)?->nombre ?? 'Administración') : 'Administración',
-                            'estado_laboral' => 'ACTIVO'
-                        ]
-                    );
-                    // TODO: definir flujo administrativo para archivar perfiles previos al cambiar de rol.
-                } elseif ($this->rol === 'voluntario') {
-                    \App\Models\Voluntario::updateOrCreate(
-                        ['cod_usu' => $usuario->cod_usu],
-                        [
-                            'fecha_ing' => $this->fecha_ingreso ?: now()->format('Y-m-d'),
-                            'area_apoyo' => $this->area_apoyo_preferente ?? 'General',
-                            'disponibilidad_inicial' => $this->disponibilidad_inicial,
-                            'area_apoyo_preferente' => $this->area_apoyo_preferente,
-                            'estado' => 'ACTIVO'
-                        ]
-                    );
-                    // TODO: definir flujo administrativo para archivar perfiles previos al cambiar de rol.
-                } elseif ($this->rol === 'familiar') {
-                    $hayResponsable = collect($this->vinculosFamiliar)->contains(fn($v) => $v['es_responsable'] === 'SI');
-                    $fam = \App\Models\Familiar::updateOrCreate(
-                        ['cod_usu' => $usuario->cod_usu],
-                        [
-                            'parentesco' => $this->parentesco_emergencia ?? 'Familiar',
-                            'direccion' => $this->direccion,
-                            'es_responsable' => $hayResponsable ? 'SI' : 'NO',
-                            'observaciones' => $this->observacion_vinculo,
-                        ]
-                    );
-                    
-                    $this->guardarVinculosFamiliar($fam);
-                    // TODO: definir flujo administrativo para archivar perfiles previos al cambiar de rol.
-                }
+                $this->guardarSubModelos($usuario);
 
             } else {
                 $userData['estado'] = 'ACTIVO';
@@ -1809,53 +1763,7 @@ class UsuariosPanel extends Component
                 $usuario->assignRole($this->rol);
 
                 // Guardar sub-modelos de forma unificada en creación
-                if ($this->rol === 'personal_salud') {
-                    \App\Models\PersonalSalud::updateOrCreate(
-                        ['cod_usu' => $usuario->cod_usu],
-                        [
-                            'fecha_ing' => $this->fecha_ingreso ?: now()->format('Y-m-d'), 
-                            'cod_esp' => $this->especialidad_salud,
-                            'matricula_prof' => null,
-                            'institucion_formacion' => $this->institucion_formacion,
-                            'estado_laboral' => 'ACTIVO'
-                        ]
-                    );
-                } elseif ($this->rol === 'personal_admin') {
-                    \App\Models\PersonalAdmin::updateOrCreate(
-                        ['cod_usu' => $usuario->cod_usu],
-                        [
-                            'fecha_ingreso' => $this->fecha_ingreso ?: now()->format('Y-m-d'), 
-                            'cod_cargo_admin' => $this->cargo_administrativo,
-                            'cargo' => \App\Models\CargoAdministrativo::find($this->cargo_administrativo)?->nombre ?? 'Administrativo',
-                            'area_admin' => $this->cod_area ? (\App\Models\AreaInstitucional::find($this->cod_area)?->nombre ?? 'Administración') : 'Administración',
-                            'estado_laboral' => 'ACTIVO'
-                        ]
-                    );
-                } elseif ($this->rol === 'voluntario') {
-                    \App\Models\Voluntario::updateOrCreate(
-                        ['cod_usu' => $usuario->cod_usu],
-                        [
-                            'fecha_ing' => $this->fecha_ingreso ?: now()->format('Y-m-d'),
-                            'area_apoyo' => $this->area_apoyo_preferente ?? 'General',
-                            'disponibilidad_inicial' => $this->disponibilidad_inicial,
-                            'area_apoyo_preferente' => $this->area_apoyo_preferente,
-                            'estado' => 'ACTIVO'
-                        ]
-                    );
-                } elseif ($this->rol === 'familiar') {
-                    $hayResponsable = collect($this->vinculosFamiliar)->contains(fn($v) => $v['es_responsable'] === 'SI');
-                    $fam = \App\Models\Familiar::updateOrCreate(
-                        ['cod_usu' => $usuario->cod_usu],
-                        [
-                            'parentesco' => $this->parentesco_emergencia ?? 'Familiar',
-                            'direccion' => $this->direccion,
-                            'es_responsable' => $hayResponsable ? 'SI' : 'NO',
-                            'observaciones' => $this->observacion_vinculo,
-                        ]
-                    );
-                    
-                    $this->guardarVinculosFamiliar($fam);
-                }
+                $this->guardarSubModelos($usuario);
             }
 
             DB::commit();
@@ -1885,6 +1793,70 @@ class UsuariosPanel extends Component
 
         // --- OPERACIONES DE ESCRITURA EN DISCO / MAILING / LOGGING FUERA DE LA TRANSACCIÓN (POST-COMMIT EXITOSO) ---
 
+        $this->procesarPostGuardado($usuario, $passwordTemporal, $oldPhotoToDelete);
+    }
+
+    private function guardarSubModelos(User $usuario)
+    {
+        if ($this->rol === 'personal_salud') {
+            \App\Models\PersonalSalud::updateOrCreate(
+                ['cod_usu' => $usuario->cod_usu],
+                [
+                    'fecha_ing' => $this->fecha_ingreso ?: now()->format('Y-m-d'), 
+                    'cod_esp' => $this->especialidad_salud,
+                    'matricula_prof' => null,
+                    'institucion_formacion' => $this->institucion_formacion,
+                    'estado_laboral' => 'ACTIVO'
+                ]
+            );
+            // TODO: definir flujo administrativo para archivar perfiles previos al cambiar de rol.
+        } elseif ($this->rol === 'personal_admin') {
+            \App\Models\PersonalAdmin::updateOrCreate(
+                ['cod_usu' => $usuario->cod_usu],
+                [
+                    'fecha_ingreso' => $this->fecha_ingreso ?: now()->format('Y-m-d'), 
+                    'cod_cargo_admin' => $this->cargo_administrativo,
+                    'cargo' => \App\Models\CargoAdministrativo::find($this->cargo_administrativo)?->nombre ?? 'Administrativo',
+                    'area_admin' => $this->cod_area ? (\App\Models\AreaInstitucional::find($this->cod_area)?->nombre ?? 'Administración') : 'Administración',
+                    'estado_laboral' => 'ACTIVO'
+                ]
+            );
+            // TODO: definir flujo administrativo para archivar perfiles previos al cambiar de rol.
+        } elseif ($this->rol === 'voluntario') {
+            \App\Models\Voluntario::updateOrCreate(
+                ['cod_usu' => $usuario->cod_usu],
+                [
+                    'fecha_ing' => $this->fecha_ingreso ?: now()->format('Y-m-d'),
+                    'area_apoyo' => $this->area_apoyo_preferente ?? 'General',
+                    'disponibilidad_inicial' => $this->disponibilidad_inicial,
+                    'area_apoyo_preferente' => $this->area_apoyo_preferente,
+                    'estado' => 'ACTIVO'
+                ]
+            );
+            // TODO: definir flujo administrativo para archivar perfiles previos al cambiar de rol.
+        } elseif ($this->rol === 'familiar') {
+            $hayResponsable = collect($this->vinculosFamiliar)->contains(fn($v) => $v['es_responsable'] === 'SI');
+            $fam = \App\Models\Familiar::updateOrCreate(
+                ['cod_usu' => $usuario->cod_usu],
+                [
+                    'parentesco' => $this->parentesco_emergencia ?? 'Familiar',
+                    'direccion' => $this->direccion,
+                    'es_responsable' => $hayResponsable ? 'SI' : 'NO',
+                    'observaciones' => $this->observacion_vinculo,
+                ]
+            );
+            
+            $this->guardarVinculosFamiliar($fam);
+            // TODO: definir flujo administrativo para archivar perfiles previos al cambiar de rol.
+        }
+    }
+
+    // ══════════════════════════════════════════════
+    // VISTA COMPLETA (modal/panel expandido)
+    // ══════════════════════════════════════════════
+
+    private function procesarPostGuardado(User $usuario, ?string $passwordTemporal, ?string $oldPhotoToDelete)
+    {
         // 1. Eliminar la foto antigua físicamente de forma segura
         if ($oldPhotoToDelete) {
             try {
@@ -1981,7 +1953,7 @@ class UsuariosPanel extends Component
             $this->resetPage();
 
             $this->usuarioPostRegistro = $usuario;
-            $this->documentosRequeridos = $this->obtenerDocumentosRequeridosPorRol($rolGuardado);
+            $this->documentosRequeridos = app(\App\Services\Usuarios\DocumentosUsuarioService::class)->documentosRequeridosPorRol($rolGuardado);
             $this->fechaLimiteDocumentacion = $usuario->created_at ? $usuario->created_at->addHours(48)->format('d/m/Y H:i') : now()->addHours(48)->format('d/m/Y H:i');
             $this->passwordTemporalPostRegistro = $passwordTemporal;
             $this->mostrarPostRegistro = true;
@@ -1990,10 +1962,6 @@ class UsuariosPanel extends Component
             $this->enviarCorreoRequisitosAction();
         }
     }
-
-    // ══════════════════════════════════════════════
-    // VISTA COMPLETA (modal/panel expandido)
-    // ══════════════════════════════════════════════
 
     public function abrirVistaCompleta($codUsu)
     {
@@ -2359,55 +2327,7 @@ class UsuariosPanel extends Component
         }
     }
 
-    public function obtenerDocumentosRequeridosPorRol($rol): array
-    {
-        switch ($rol) {
-            case 'personal_admin':
-                return [
-                    'Cédula de identidad vigente',
-                    'Currículum vitae',
-                    'Contrato o memorándum de incorporación',
-                    'Comprobante de domicilio',
-                    'Fotografía institucional',
-                    'Formulario de datos personales firmado',
-                    'Documento de confidencialidad institucional',
-                ];
-            case 'personal_salud':
-                return [
-                    'Cédula de identidad vigente',
-                    'Currículum vitae',
-                    'Título profesional',
-                    'Matrícula profesional',
-                    'Certificado de especialidad, si corresponde',
-                    'Certificados de experiencia laboral',
-                    'Contrato o memorándum de incorporación',
-                    'Formulario de datos personales firmado',
-                    'Documento de confidencialidad institucional',
-                    'Fotografía institucional',
-                ];
-            case 'voluntario':
-                return [
-                    'Cédula de identidad vigente',
-                    'Formulario de voluntariado firmado',
-                    'Carta de compromiso',
-                    'Comprobante de domicilio',
-                    'Referencia personal o institucional',
-                    'Fotografía institucional',
-                    'Documento de confidencialidad institucional',
-                ];
-            case 'familiar':
-                return [
-                    'Cédula de identidad vigente',
-                    'Documento que respalde parentesco o vínculo',
-                    'Formulario de autorización familiar',
-                    'Número de contacto actualizado',
-                    'Documento de compromiso de responsabilidad, si corresponde',
-                    'Autorización para consulta de información del adulto mayor',
-                ];
-            default:
-                return [];
-        }
-    }
+
 
     public function obtenerNombreRolLegible($rol): string
     {
@@ -2438,7 +2358,7 @@ class UsuariosPanel extends Component
             }
 
             $rol = $usuario->roles->first()?->name;
-            $documentos = $this->obtenerDocumentosRequeridosPorRol($rol);
+            $documentos = app(\App\Services\Usuarios\DocumentosUsuarioService::class)->documentosRequeridosPorRol($rol);
             $rolLegible = $this->obtenerNombreRolLegible($rol);
             $fechaLimite = $usuario->created_at ? $usuario->created_at->addHours(48)->format('d/m/Y H:i') : now()->addHours(48)->format('d/m/Y H:i');
             $fechaRegistro = $usuario->created_at ? $usuario->created_at->format('d/m/Y H:i') : now()->format('d/m/Y H:i');

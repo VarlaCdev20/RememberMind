@@ -104,7 +104,7 @@
 
     <section class="hidden print:block rounded-2xl border border-[#C7B5A3]/40 bg-white p-8 shadow-sm">
         <div class="mb-8 border-b border-[#C7B5A3]/40 pb-5 text-center">
-            <h2 class="text-2xl font-black uppercase tracking-tight text-[#2F3E5C]">Casa Amandita</h2>
+            <h2 class="text-2xl font-black uppercase tracking-tight text-[#2F3E5C]">CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS</h2>
             <p class="mt-1 text-[10px] font-black uppercase tracking-widest text-[#E27D60]">Reporte institucional de salud</p>
         </div>
         <div class="flex flex-col items-center justify-center rounded-xl border border-dashed border-[#C7B5A3]/60 bg-[#F7F5F2] py-12 text-center">

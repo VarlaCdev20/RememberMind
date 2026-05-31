@@ -11,7 +11,7 @@ class ReportWatermarkService
      */
     public function getText(): string
     {
-        return 'Casa Amandita';
+        return 'CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS';
     }
 
     /**

@@ -206,7 +206,7 @@
 <body>
 
     <!-- Marca de Agua -->
-    <div id="watermark">Casa Amandita</div>
+    <div id="watermark">CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS</div>
 
     <!-- Encabezado de Página -->
     <header>
@@ -214,7 +214,7 @@
             <tr>
                 <td>
                     <div class="header-title">Reporte de Área Institucional</div>
-                    <div class="header-subtitle">Casa Amandita • Gestión Organizacional</div>
+                    <div class="header-subtitle">CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS • Gestión Organizacional</div>
                 </td>
                 <td class="header-meta">
                     <strong>{{ $area->nombre }}</strong><br>
@@ -227,7 +227,7 @@
 
     <!-- Footer de Página -->
     <footer>
-        Sistema RememberMind © {{ date('Y') }} Casa Amandita. Todos los derechos reservados.
+        Sistema RememberMind © {{ date('Y') }} CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS. Todos los derechos reservados.
     </footer>
 
     <!-- INFORMACIÓN GENERAL -->
@@ -344,7 +344,7 @@
         @endif
         
         <strong>Lineamiento Organizacional:</strong><br>
-        El personal registrado en este reporte se encuentra plenamente adscrito a las funciones operativas descritas. Cualquier cambio de área o reasignación de rol de un miembro debe ser reportada y procesada a través del departamento de administración general del Sistema RememberMind de Casa Amandita.
+        El personal registrado en este reporte se encuentra plenamente adscrito a las funciones operativas descritas. Cualquier cambio de área o reasignación de rol de un miembro debe ser reportada y procesada a través del departamento de administración general del Sistema RememberMind de CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS.
     </div>
 
 </body>

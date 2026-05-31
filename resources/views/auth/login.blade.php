@@ -145,12 +145,12 @@
                     <div class="absolute bottom-[-8rem] right-16 h-[26rem] w-[26rem] rounded-full bg-[#8DA280]/25 blur-[90px]"></div>
 
                     <div class="relative z-10 flex items-center gap-4">
-                        <div class="flex h-16 w-16 items-center justify-center rounded-[1.6rem] bg-terracota text-white shadow-xl">
-                            <span class="text-3xl font-black">C</span>
-                        </div>
+                        <img src="{{ asset('storage/images/LOGO.png') }}"
+                             alt="CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS"
+                             class="h-16 w-auto object-contain drop-shadow-lg">
                         <div>
-                            <h1 class="text-2xl font-black leading-none text-azul-profundo">Casa Amandita</h1>
-                            <p class="mt-1 text-xs font-black uppercase tracking-[0.25em] text-terracota">Del Adulto Mayor</p>
+                            <h1 class="text-xl font-black leading-tight text-azul-profundo">CENTRO GERIÁTRICO<br>JARDÍN DE LOS RECUERDOS</h1>
+                            <p class="mt-1 text-xs font-black uppercase tracking-[0.25em] text-[#3F7D5A]">Portal Institucional</p>
                         </div>
                     </div>
 
@@ -263,7 +263,7 @@
                                                 maxlength="120"
                                                 autofocus
                                                 autocomplete="username"
-                                                placeholder="admincasaamandita@gmail.com"
+                                                placeholder="admin@jardindelosrecuerdos.org"
                                                 class="w-full rounded-full border-2 bg-[#E6DDD3] px-6 py-4 pr-14 text-base font-extrabold text-azul-profundo placeholder:text-azul-profundo/35 outline-none shadow-inner transition duration-300 focus:ring-4"
                                                 :class="{
                                                     'border-terracota focus:ring-terracota/20': correoError,

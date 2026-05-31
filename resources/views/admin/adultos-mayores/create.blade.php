@@ -424,7 +424,7 @@
                         </div>
                         <div>
                             <h2 class="text-lg font-black text-azul-profundo">Paso 5: Ingreso Institucional</h2>
-                            <p class="text-xs font-bold text-azul-profundo/55">Detalles administrativos del ingreso a Casa Amandita.</p>
+                            <p class="text-xs font-bold text-azul-profundo/55">Detalles administrativos del ingreso a CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS.</p>
                         </div>
                     </div>
 
@@ -527,7 +527,7 @@
                             </div>
                             <div>
                                 <span class="text-sm font-black text-azul-profundo">Acepto la política de tratamiento de datos *</span>
-                                <p class="text-xs font-bold text-azul-profundo/60 mt-0.5">Confirmo que la información suministrada es verdadera y autorizo a Casa Amandita a usar estos datos exclusivamente para fines asistenciales y administrativos de acuerdo a la ley.</p>
+                                <p class="text-xs font-bold text-azul-profundo/60 mt-0.5">Confirmo que la información suministrada es verdadera y autorizo a CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS a usar estos datos exclusivamente para fines asistenciales y administrativos de acuerdo a la ley.</p>
                             </div>
                         </label>
                         @error('consentimiento_datos') <span class="mt-2 block text-xs font-black text-terracota"><i class="ph-bold ph-warning-circle"></i> {{ $message }}</span> @enderror

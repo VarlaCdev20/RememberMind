@@ -84,6 +84,6 @@
 
     <div class="alert-box" style="margin-top: 30px;">
         <strong>Nota de Auditoría de Control:</strong><br>
-        Este informe refleja el estado de la documentación requerida por Casa Amandita para el cumplimiento de las normativas de salud y administración. Todos los archivos cargados están protegidos por estrictas políticas de confidencialidad institucional.
+        Este informe refleja el estado de la documentación requerida por CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS para el cumplimiento de las normativas de salud y administración. Todos los archivos cargados están protegidos por estrictas políticas de confidencialidad institucional.
     </div>
 @endsection

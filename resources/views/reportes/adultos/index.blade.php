@@ -29,7 +29,7 @@
      ENCABEZADO INSTITUCIONAL
      ══════════════════════════════════════════════════════════ --}}
 <div class="rm-header">
-    <div class="rm-header-logo">Casa Amandita</div>
+    <div class="rm-header-logo">CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS</div>
     <div class="rm-header-sub">RememberMind &nbsp;&#183;&nbsp; Reporte por Sección</div>
     <span class="rm-header-badge">Adultos Mayores</span>
     <div class="rm-header-meta">
@@ -324,7 +324,7 @@
      NOTA INSTITUCIONAL
      ══════════════════════════════════════════════════════════ --}}
 <div class="rm-nota-legal">
-    Este reporte es de uso exclusivo interno de Casa Amandita. Los datos son confidenciales y
+    Este reporte es de uso exclusivo interno de CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS. Los datos son confidenciales y
     están sujetos a las políticas institucionales de protección de datos. Generado por RememberMind.
 </div>
 
@@ -332,7 +332,7 @@
      FOOTER
      ══════════════════════════════════════════════════════════ --}}
 <div class="rm-footer">
-    Casa Amandita &nbsp;&#183;&nbsp; RememberMind &nbsp;&#183;&nbsp; {{ $metadata['generado_en'] }}
+    CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS &nbsp;&#183;&nbsp; RememberMind &nbsp;&#183;&nbsp; {{ $metadata['generado_en'] }}
     &nbsp;&#183;&nbsp; Reporte de Adultos Mayores
 </div>
 

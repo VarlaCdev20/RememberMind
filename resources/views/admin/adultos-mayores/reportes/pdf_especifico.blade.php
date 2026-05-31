@@ -31,7 +31,7 @@
             <tr>
                 <td width="60%">
                     <span class="logo-text">RememberMind</span><br>
-                    <span class="sub-logo">Casa Amandita - Gestión Gerontológica</span>
+                    <span class="sub-logo">CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS - Gestión Gerontológica</span>
                 </td>
                 <td class="title">
                     <h2>{{ $titulo }}</h2>

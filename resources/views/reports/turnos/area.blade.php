@@ -190,7 +190,7 @@
             <tr>
                 <td>
                     <div class="header-title">RememberMind</div>
-                    <div class="header-subtitle">Casa Amandita • Cobertura Sectorial</div>
+                    <div class="header-subtitle">CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS • Cobertura Sectorial</div>
                 </td>
                 <td class="header-meta">
                     <strong>Asignaciones por Área Operativa</strong><br>
@@ -203,7 +203,7 @@
 
     <!-- Footer de Página -->
     <footer>
-        Sistema RememberMind © {{ date('Y') }} Casa Amandita. Todos los derechos reservados.
+        Sistema RememberMind © {{ date('Y') }} CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS. Todos los derechos reservados.
     </footer>
 
     <!-- FICHA DEL ÁREA -->

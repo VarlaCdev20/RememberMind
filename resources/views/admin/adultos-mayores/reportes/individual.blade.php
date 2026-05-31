@@ -9,7 +9,7 @@
                 </div>
                 <div>
                     <h1 class="text-3xl font-black uppercase tracking-tighter">RememberMind</h1>
-                    <p class="text-xs font-bold uppercase tracking-[0.2em] text-[#2F3E5C]/60">Casa del Adulto Mayor "Casa Amandita"</p>
+                    <p class="text-xs font-bold uppercase tracking-[0.2em] text-[#2F3E5C]/60">CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS</p>
                 </div>
             </div>
             <div class="text-right mt-4 sm:mt-0">

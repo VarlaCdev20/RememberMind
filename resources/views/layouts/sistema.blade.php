@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -9,7 +10,8 @@
 
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700,800,900&display=swap" rel="stylesheet" />
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
 
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -24,8 +26,11 @@
         }
 
         .dash-dots {
-            background-image: radial-gradient(#2F3E5C 1.2px, transparent 1.2px);
-            background-size: 30px 30px;
+            background-image:
+                radial-gradient(rgba(217, 108, 51, 0.45) 1.5px, transparent 1.5px),
+                linear-gradient(90deg, rgba(198, 93, 41, 0.20) 1px, transparent 1px),
+                linear-gradient(0deg, rgba(217, 108, 51, 0.20) 1px, transparent 1px);
+            background-size: 20px 20px, 60px 60px, 60px 60px;
         }
 
         .mouse-light {
@@ -38,34 +43,29 @@
             pointer-events: none;
             z-index: 40;
             opacity: 0;
-            background: radial-gradient(circle, rgba(233,122,95,0.14), rgba(233,122,95,0.04), transparent 80%);
+            background: radial-gradient(circle, rgba(217, 108, 51, 0.22), rgba(242, 139, 84, 0.08), transparent 80%);
             transition: opacity .25s ease;
         }
-        
-        [x-cloak] { display: none !important; }
+
+        [x-cloak] {
+            display: none !important;
+        }
     </style>
 </head>
 
-<body class="font-sans antialiased bg-[#D5C7B9]">
+<body class="font-sans antialiased bg-[var(--color-fondo-app)]">
     <x-banner />
 
-    <div
-        x-data="{ sidebarOpen: false, sidebarCollapsed: false }"
-        class="relative min-h-screen overflow-x-hidden bg-[#D5C7B9] font-outfit text-azul-profundo"
-    >
+    <div x-data="{ sidebarOpen: false, sidebarCollapsed: false }"
+        class="bg-app-institucional relative min-h-screen overflow-x-hidden font-outfit text-azul-profundo selection:bg-[#E27D60] selection:text-white">
         {{-- Fondos estéticos --}}
-        <div class="dash-noise pointer-events-none fixed inset-0 z-[60] opacity-[0.14] mix-blend-overlay"></div>
-        <div class="dash-dots pointer-events-none fixed inset-0 z-0 opacity-[0.03]"></div>
+        <div class="dash-noise pointer-events-none fixed inset-0 z-[60] opacity-[0.15] mix-blend-overlay"></div>
+        <div class="dash-dots pointer-events-none fixed inset-0 z-0 opacity-[0.40]"></div>
         <div class="mouse-light pointer-events-none"></div>
 
         {{-- Overlay para móvil --}}
-        <div
-            x-show="sidebarOpen"
-            x-transition.opacity
-            @click="sidebarOpen = false"
-            class="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm lg:hidden"
-            style="display:none;"
-        ></div>
+        <div x-show="sidebarOpen" x-transition.opacity @click="sidebarOpen = false"
+            class="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm lg:hidden" style="display:none;"></div>
 
         {{-- Sidebar Fijo --}}
         <x-layout.barra-lateral-sistema />
@@ -74,10 +74,8 @@
         <x-layout.navbar-sistema />
 
         {{-- Área Principal de Contenido --}}
-        <main
-            class="relative min-h-screen pb-8 pt-6 transition-all duration-300 ease-in-out"
-            :class="sidebarCollapsed ? 'lg:ml-[82px]' : 'lg:ml-[240px]'"
-        >
+        <main class="relative min-h-screen pb-8 pt-6 transition-all duration-300 ease-in-out"
+            :class="sidebarCollapsed ? 'lg:ml-[82px]' : 'lg:ml-[240px]'">
             <div class="mx-auto max-w-[1540px] space-y-4 px-4 pb-8 sm:px-5 lg:px-6">
                 {{ $slot }}
             </div>
@@ -105,4 +103,5 @@
         });
     </script>
 </body>
+
 </html>

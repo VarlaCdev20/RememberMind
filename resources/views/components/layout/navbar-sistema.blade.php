@@ -1,5 +1,5 @@
 <nav
-    class="sticky top-0 z-30 border-b border-[#C7B5A3]/50 bg-[#E6DDD3]/95 px-5 py-2.5 shadow-[0_4px_16px_rgba(47,62,92,0.08)] backdrop-blur-xl transition-all duration-300 ease-in-out"
+    class="header-institucional sticky top-0 z-30 px-5 py-2.5 backdrop-blur-xl transition-all duration-300 ease-in-out"
     :class="sidebarCollapsed ? 'lg:ml-[82px]' : 'lg:ml-[240px]'"
 >
     <div class="flex items-center justify-between gap-4">
@@ -7,22 +7,22 @@
             <button
                 type="button"
                 @click="$dispatch('toggle-sidebar')"
-                class="flex h-9 w-9 items-center justify-center rounded-full bg-[#D5C7B9] text-azul-profundo shadow-md transition-all hover:bg-terracota hover:text-white active:translate-y-1 active:scale-90 active:shadow-inner lg:hidden"
+                class="flex h-9 w-9 items-center justify-center rounded-full bg-[#CBEFE8] text-[#0B4F46] shadow-md transition-all hover:bg-[#006B5E] hover:text-white active:translate-y-1 active:scale-90 active:shadow-inner lg:hidden"
                 aria-label="Abrir menú lateral"
             >
                 <i class="ph-bold ph-list text-lg"></i>
             </button>
 
-            <div class="hidden h-8 w-8 items-center justify-center rounded-full bg-terracota text-white shadow-sm sm:flex">
-                <span class="font-black">C</span>
-            </div>
+            <img src="{{ asset('storage/images/LOGO.png') }}"
+                 alt="CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS"
+                 class="hidden sm:block h-9 w-auto object-contain shrink-0">
 
-            <div>
-                <p class="text-xs font-black uppercase tracking-[0.22em] text-terracota">
+            <div class="min-w-0">
+                <p class="text-xs font-black uppercase tracking-[0.22em] text-[#006B5E]">
                     RememberMind
                 </p>
-                <h1 class="text-sm font-black leading-tight text-azul-profundo sm:text-base">
-                    Panel institucional
+                <h1 class="max-w-[230px] text-[11px] font-black uppercase leading-[1.05] text-azul-profundo sm:text-xs">
+                    CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS
                 </h1>
             </div>
         </div>
@@ -33,19 +33,29 @@
                 <input
                     type="search"
                     placeholder="Buscar módulo, usuario, adulto mayor..."
-                    class="w-full rounded-full border border-[#C7B5A3] bg-white/70 py-2 pl-10 pr-4 text-sm text-azul-profundo outline-none placeholder:text-azul-profundo/60 transition-all focus:border-terracota focus:bg-white focus:ring-2 focus:ring-terracota/10 shadow-sm"
+                    class="w-full rounded-full border border-[var(--color-borde-suave)] bg-[#FFFDF9]/85 py-2 pl-10 pr-4 text-sm text-azul-profundo outline-none placeholder:text-azul-profundo/60 shadow-sm transition-all focus:border-[#006B5E] focus:bg-white focus:ring-2 focus:ring-[#006B5E]/15"
                 >
             </div>
         </div>
 
         <div class="flex items-center gap-2">
+            {{-- Botón modo oscuro --}}
             <button
                 type="button"
-                class="relative flex h-9 w-9 items-center justify-center rounded-full bg-[#D5C7B9] text-azul-profundo shadow-sm transition-all hover:bg-terracota hover:text-white active:translate-y-1 active:scale-90 active:shadow-inner"
+                data-theme-toggle
+                aria-label="Cambiar modo claro u oscuro"
+                class="relative flex h-9 w-9 items-center justify-center rounded-full bg-[#CBEFE8] text-[#0B4F46] shadow-sm transition-all hover:bg-[#006B5E] hover:text-white active:translate-y-1 active:scale-90 active:shadow-inner"
+            >
+                <i class="ph-bold ph-moon text-base" data-theme-icon data-icon-dark="ph-bold ph-moon text-base" data-icon-light="ph-bold ph-sun text-base"></i>
+            </button>
+
+            <button
+                type="button"
+                class="relative flex h-9 w-9 items-center justify-center rounded-full bg-[#F1E7DA] text-[#0B4F46] shadow-sm transition-all hover:bg-[#006B5E] hover:text-white active:translate-y-1 active:scale-90 active:shadow-inner"
                 aria-label="Notificaciones"
             >
                 <i class="ph-bold ph-bell text-base"></i>
-                <span class="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-terracota ring-2 ring-[#E6DDD3]"></span>
+                <span class="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-[#F28B54] ring-2 ring-[#FAF6EF]"></span>
             </button>
 
             <div x-data="{ abierto:false }" class="relative">
@@ -53,10 +63,10 @@
                     type="button"
                     @click="abierto = !abierto"
                     @click.outside="abierto = false"
-                    class="flex items-center gap-2 rounded-full bg-[#D5C7B9] py-1.5 pl-1.5 pr-2.5 shadow-sm transition-all hover:bg-[#E6DDD3] active:translate-y-1 active:scale-95 active:shadow-inner"
+                    class="flex items-center gap-2 rounded-full bg-[#CBEFE8] py-1.5 pl-1.5 pr-2.5 shadow-sm transition-all hover:bg-[#97E3D5]/65 active:translate-y-1 active:scale-95 active:shadow-inner"
                     aria-label="Abrir menú de usuario"
                 >
-                    <div class="flex h-7 w-7 items-center justify-center rounded-full bg-azul-profundo text-xs font-black text-white">
+                    <div class="flex h-7 w-7 items-center justify-center rounded-full bg-[#006B5E] text-xs font-black text-white shadow-sm shadow-[#006B5E]/20">
                         {{ strtoupper(substr(auth()->user()->nombres ?? auth()->user()->name ?? 'U', 0, 1)) }}
                     </div>
 
@@ -76,10 +86,10 @@
                     x-show="abierto"
                     x-transition
                     style="display:none;"
-                    class="absolute right-0 mt-3 w-64 rounded-[2rem] border border-[#C7B5A3] bg-[#E6DDD3]/95 p-3 shadow-[0_25px_60px_rgba(47,62,92,0.25)] backdrop-blur-xl"
+                    class="dropdown-institucional absolute right-0 mt-3 w-64 rounded-[2rem] p-3 backdrop-blur-xl"
                 >
                     <a href="{{ route('profile.show') }}"
-                       class="flex items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-black text-azul-profundo transition hover:bg-[#D5C7B9] hover:text-terracota active:scale-95">
+                       class="flex items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-black text-azul-profundo transition hover:bg-[#CBEFE8] hover:text-[#006B5E] active:scale-95">
                         <i class="ph-bold ph-user-circle text-base"></i>
                         Mi perfil
                     </a>
@@ -87,7 +97,7 @@
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
                         <button type="submit"
-                                class="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-black text-terracota transition hover:bg-terracota hover:text-white active:scale-95">
+                                class="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-black text-[#F28B54] transition hover:bg-[#F28B54] hover:text-white active:scale-95">
                             <i class="ph-bold ph-sign-out text-base"></i>
                             Cerrar sesión
                         </button>
@@ -103,7 +113,7 @@
             <input
                 type="search"
                 placeholder="Buscar..."
-                class="w-full rounded-full border border-[#C7B5A3] bg-white/70 py-2 pl-10 pr-4 text-sm text-azul-profundo outline-none placeholder:text-azul-profundo/60 focus:border-terracota focus:ring-2 focus:ring-terracota/10 shadow-sm"
+                class="w-full rounded-full border border-[var(--color-borde-suave)] bg-[#FFFDF9]/85 py-2 pl-10 pr-4 text-sm text-azul-profundo outline-none placeholder:text-azul-profundo/60 shadow-sm focus:border-[#006B5E] focus:ring-2 focus:ring-[#006B5E]/15"
             >
         </div>
     </div>

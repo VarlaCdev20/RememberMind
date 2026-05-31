@@ -454,24 +454,25 @@
                             @endif
                             
                             <div class="pt-2 flex flex-col gap-2">
-                                <a href="{{ route('admin.usuarios.solicitud-documental.pdf', $usuarioDetalle->cod_usu) }}"
+                            <div class="pt-2 flex flex-col gap-2">
+                                <a href="{{ route('admin.usuarios.documentos.pdf', $usuarioDetalle->cod_usu) }}"
                                    target="_blank"
-                                   class="w-full inline-flex h-9 items-center justify-center gap-1.5 rounded-xl bg-[#2F3E5C] text-white text-xs font-black uppercase tracking-wider transition hover:bg-[#E27D60] active:scale-95 shadow-sm">
-                                    <i class="ph-bold ph-download-simple"></i>
-                                    Descargar Solicitud PDF
+                                   class="w-full inline-flex h-9 items-center justify-center gap-1.5 rounded-xl bg-[#2F3E5C] text-white text-[10px] font-black uppercase tracking-wider transition hover:bg-[#E27D60] active:scale-95 shadow-sm">
+                                    <i class="ph-bold ph-printer"></i>
+                                    Paquete Documental
                                 </a>
-                                <button type="button"
-                                        wire:click="enviarCorreoRequisitosAction('{{ $usuarioDetalle->cod_usu }}')"
-                                        class="w-full inline-flex h-9 items-center justify-center gap-1.5 rounded-xl bg-[#2F3E5C]/10 text-xs font-black text-[#2F3E5C] border border-[#2F3E5C]/20 transition hover:bg-[#2F3E5C] hover:text-white active:scale-95">
-                                    <i class="ph-bold ph-paper-plane-tilt"></i>
-                                    Reenviar Correo de Requisitos
+                                <button type="button" 
+                                        onclick="enviarPaqueteCorreo('{{ $usuarioDetalle->cod_usu }}', '{{ $usuarioDetalle->correo }}')"
+                                        class="w-full inline-flex h-9 items-center justify-center gap-1.5 rounded-xl bg-[#2F3E5C]/10 text-[10px] font-black text-[#2F3E5C] border border-[#2F3E5C]/20 transition hover:bg-[#2F3E5C] hover:text-white active:scale-95 shadow-sm">
+                                    <i class="ph-bold ph-envelope"></i> Enviar Correo
                                 </button>
                                 <button type="button"
                                         @click="Swal.fire({ icon: 'info', title: '¿Cómo subir?', text: 'Seleccione el ícono de subida en la lista de requisitos a la derecha para cargar el archivo correspondiente.', confirmButtonColor: '#2F3E5C', customClass: { popup: 'rounded-[1.5rem]' } })"
-                                        class="w-full inline-flex h-9 items-center justify-center gap-1.5 rounded-xl bg-[#2F3E5C] text-xs font-black text-white transition hover:bg-[#E27D60] active:scale-95 shadow-md">
+                                        class="w-full inline-flex h-9 items-center justify-center gap-1.5 rounded-xl bg-white text-xs font-black text-[#E27D60] border border-[#E27D60]/20 transition hover:bg-[#E27D60] hover:text-white active:scale-95 shadow-md mt-2">
                                     <i class="ph-bold ph-upload-simple"></i>
-                                    Registrar Documentación
+                                    Subir Requisitos
                                 </button>
+                            </div>
                             </div>
                         </div>
                         
@@ -542,6 +543,46 @@
                                     </div>
                                 @endforeach
                             </div>
+                        </div>
+                    </div>
+
+                    @php
+                        $docService = app(\App\Services\Usuarios\DocumentosUsuarioService::class);
+                        $docsInstitucionales = $docService->documentosGeneradosPorRol($rolKey);
+                    @endphp
+
+                    <div class="mt-8 border-t border-[#C7B5A3]/30 pt-6">
+                        <h4 class="flex items-center gap-2 mb-4 text-xs font-black uppercase tracking-widest text-[#E27D60]">
+                            <i class="ph-bold ph-folder-open text-lg"></i> Documentos Generados
+                        </h4>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                            @foreach($docsInstitucionales as $docInst)
+                                <div class="flex flex-col p-4 rounded-[1.2rem] border border-[#C7B5A3]/30 bg-white shadow-sm hover:shadow-md transition">
+                                    <div class="flex items-start gap-3">
+                                        <div class="flex-shrink-0 h-10 w-10 bg-[#E27D60]/10 text-[#E27D60] flex items-center justify-center rounded-xl">
+                                            <i class="ph-fill ph-file-pdf text-xl"></i>
+                                        </div>
+                                        <div class="flex-1 min-w-0">
+                                            <p class="text-xs font-black text-[#2F3E5C] uppercase truncate" title="{{ $docInst['nombre'] }}">{{ $docInst['nombre'] }}</p>
+                                            <p class="text-[9px] font-semibold text-[#2F3E5C]/60 mt-0.5 line-clamp-2">{{ $docInst['descripcion'] }}</p>
+                                        </div>
+                                    </div>
+                                    <div class="mt-auto pt-4 flex items-center gap-2">
+                                        <a href="{{ route('admin.usuarios.documentos.ver', ['user' => $usuarioDetalle->cod_usu, 'documento' => $docInst['slug']]) }}" target="_blank"
+                                           class="flex-1 h-8 bg-[#2F3E5C]/10 hover:bg-[#2F3E5C] text-[#2F3E5C] hover:text-white text-[10px] font-black uppercase rounded-lg flex items-center justify-center gap-1 transition">
+                                            <i class="ph-bold ph-eye"></i> Ver
+                                        </a>
+                                        <a href="{{ route('admin.usuarios.documentos.imprimir', ['user' => $usuarioDetalle->cod_usu, 'documento' => $docInst['slug']]) }}" target="_blank"
+                                           class="flex-1 h-8 bg-white border border-[#C7B5A3]/30 hover:border-[#E27D60] text-[#2F3E5C] hover:text-[#E27D60] text-[10px] font-black uppercase rounded-lg flex items-center justify-center gap-1 transition">
+                                            <i class="ph-bold ph-printer"></i> Imprimir
+                                        </a>
+                                        <a href="{{ route('admin.usuarios.documentos.documento-pdf', ['user' => $usuarioDetalle->cod_usu, 'documento' => $docInst['slug']]) }}" target="_blank" download
+                                           class="h-8 w-8 bg-[#2F3E5C] hover:bg-[#E27D60] text-white rounded-lg flex items-center justify-center transition">
+                                            <i class="ph-bold ph-download-simple"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            @endforeach
                         </div>
                     </div>
                 </section>
@@ -713,7 +754,7 @@
                     </h1>
 
                     <p class="mt-1 max-w-2xl text-sm font-semibold leading-6 text-[#2F3E5C]/58">
-                        Administra cuentas, accesos y perfiles autorizados dentro de Casa Amandita.
+                        Administra cuentas, accesos y perfiles autorizados dentro de CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS.
                     </p>
                 </div>
             </div>
@@ -1545,7 +1586,7 @@
                     <div class="grid gap-4 md:grid-cols-2">
                         <div>
                             <label class="mb-1 block text-[9px] font-black uppercase tracking-widest text-[#2F3E5C]/60">Correo Institucional *</label>
-                            <input type="email" wire:model.live="correo" placeholder="ejemplo@casaamandita.com"
+                            <input type="email" wire:model.live="correo" placeholder="ejemplo@jardindelosrecuerdos.org"
                                    class="w-full h-10 rounded-xl border {{ $errors->has('correo') ? 'border-[#E27D60] ring-4 ring-[#E27D60]/10' : 'border-[#C7B5A3] focus:border-[#2F3E5C]' }} bg-white px-4 py-2 text-sm font-bold text-[#2F3E5C] outline-none transition">
                             @error('correo') <span class="mt-1 block text-[9px] font-black text-[#E27D60] uppercase">{{ $message }}</span> @enderror
                         </div>
@@ -2914,6 +2955,62 @@
                     <p class="text-xs font-bold text-[#2F3E5C]/60">Ningún requisito documental obligatorio para este rol.</p>
                 @endif
             </div>
+            </div>
+
+            {{-- Paquete Documental Institucional --}}
+            <div class="rounded-2xl border border-[#C7B5A3]/40 bg-[#FAF7F2]/80 p-4 space-y-3 shadow-inner">
+                <span class="text-[9px] font-black uppercase tracking-widest text-[#2F3E5C]/60 block text-center">Gestión de Paquete Documental Institucional</span>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                    <a href="{{ route('admin.usuarios.documentos.pdf', $usuarioPostRegistro->cod_usu) }}" target="_blank"
+                       class="inline-flex h-9 items-center justify-center gap-1.5 rounded-xl bg-[#2F3E5C]/10 text-xs font-black text-[#2F3E5C] border border-[#2F3E5C]/20 transition hover:bg-[#2F3E5C] hover:text-white active:scale-95 shadow-sm">
+                        <i class="ph-bold ph-printer"></i> Imprimir
+                    </a>
+                    <a href="{{ route('admin.usuarios.documentos.pdf', $usuarioPostRegistro->cod_usu) }}" target="_blank" download="Paquete_Documental.pdf"
+                       class="inline-flex h-9 items-center justify-center gap-1.5 rounded-xl bg-[#2F3E5C]/10 text-xs font-black text-[#2F3E5C] border border-[#2F3E5C]/20 transition hover:bg-[#2F3E5C] hover:text-white active:scale-95 shadow-sm">
+                        <i class="ph-bold ph-download-simple"></i> Descargar PDF
+                    </a>
+                    <button type="button" 
+                            onclick="enviarPaqueteCorreo('{{ $usuarioPostRegistro->cod_usu }}', '{{ $usuarioPostRegistro->correo }}')"
+                            class="inline-flex h-9 items-center justify-center gap-1.5 rounded-xl bg-[#E27D60]/10 text-xs font-black text-[#E27D60] border border-[#E27D60]/20 transition hover:bg-[#E27D60] hover:text-white active:scale-95 shadow-sm">
+                        <i class="ph-bold ph-envelope"></i> Enviar Correo
+                    </button>
+                </div>
+            </div>
+
+            @php
+                if($usuarioPostRegistro) {
+                    $docServicePR = app(\App\Services\Usuarios\DocumentosUsuarioService::class);
+                    $rolKeyPR = $usuarioPostRegistro->roles->first()?->name ?? 'sin_rol';
+                    $docsInstitucionalesPR = $docServicePR->documentosGeneradosPorRol($rolKeyPR);
+                } else {
+                    $docsInstitucionalesPR = [];
+                }
+            @endphp
+            @if(!empty($docsInstitucionalesPR))
+            <div class="rounded-2xl border border-[#C7B5A3]/40 bg-[#FAF7F2]/80 p-4 space-y-3 shadow-inner max-h-48 overflow-y-auto custom-scrollbar">
+                <span class="text-[9px] font-black uppercase tracking-widest text-[#2F3E5C]/60 block">Documentos Individuales Generados</span>
+                <div class="grid grid-cols-1 gap-2">
+                    @foreach($docsInstitucionalesPR as $docInst)
+                        <div class="flex items-center justify-between p-2 rounded-xl border border-[#C7B5A3]/30 bg-white">
+                            <div class="flex items-center gap-2">
+                                <i class="ph-fill ph-file-pdf text-[#E27D60] text-lg"></i>
+                                <span class="text-[10px] font-black text-[#2F3E5C] uppercase">{{ $docInst['nombre'] }}</span>
+                            </div>
+                            <div class="flex gap-1">
+                                <a href="{{ route('admin.usuarios.documentos.ver', ['user' => $usuarioPostRegistro->cod_usu, 'documento' => $docInst['slug']]) }}" target="_blank"
+                                   class="h-7 w-7 flex items-center justify-center rounded-lg bg-[#2F3E5C]/10 text-[#2F3E5C] hover:bg-[#2F3E5C] hover:text-white transition">
+                                    <i class="ph-bold ph-eye"></i>
+                                </a>
+                                <a href="{{ route('admin.usuarios.documentos.documento-pdf', ['user' => $usuarioPostRegistro->cod_usu, 'documento' => $docInst['slug']]) }}" target="_blank" download
+                                   class="h-7 w-7 flex items-center justify-center rounded-lg bg-[#E27D60]/10 text-[#E27D60] hover:bg-[#E27D60] hover:text-white transition">
+                                    <i class="ph-bold ph-download-simple"></i>
+                                </a>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+            @endif
 
             {{-- Acciones --}}
             <div class="flex flex-col sm:flex-row gap-2 pt-2">
@@ -3027,4 +3124,79 @@
             to { transform: translateX(0); opacity: 1; }
         }
     </style>
+    <script>
+        function enviarPaqueteCorreo(codUsu, correo) {
+            if(!correo) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Sin correo',
+                    text: 'Este usuario no tiene un correo electrónico registrado.',
+                    confirmButtonColor: '#2F3E5C',
+                    customClass: { popup: 'rounded-[1.5rem]' }
+                });
+                return;
+            }
+
+            Swal.fire({
+                title: '¿Enviar Paquete Documental?',
+                text: "Se enviará el documento adjunto al correo: " + correo,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#8DA280',
+                cancelButtonColor: '#E27D60',
+                confirmButtonText: 'Sí, enviar',
+                cancelButtonText: 'Cancelar',
+                customClass: { popup: 'rounded-[1.5rem]' }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Swal.fire({
+                        title: 'Enviando...',
+                        text: 'Por favor espere un momento',
+                        allowOutsideClick: false,
+                        didOpen: () => {
+                            Swal.showLoading();
+                        },
+                        customClass: { popup: 'rounded-[1.5rem]' }
+                    });
+
+                    fetch(`/admin/usuarios/${codUsu}/documentos/enviar`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: '¡Enviado!',
+                                text: data.message,
+                                confirmButtonColor: '#2F3E5C',
+                                customClass: { popup: 'rounded-[1.5rem]' }
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: data.message,
+                                confirmButtonColor: '#2F3E5C',
+                                customClass: { popup: 'rounded-[1.5rem]' }
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error de red',
+                            text: 'No se pudo completar la solicitud',
+                            confirmButtonColor: '#2F3E5C',
+                            customClass: { popup: 'rounded-[1.5rem]' }
+                        });
+                    });
+                }
+            });
+        }
+    </script>
 </div>

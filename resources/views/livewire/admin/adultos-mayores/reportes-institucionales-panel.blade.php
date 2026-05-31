@@ -547,7 +547,7 @@
     <!-- ── FOOTER DE FIRMA INSTITUCIONAL PARA IMPRESIÓN ──────── -->
     <div class="hidden print:block mt-20 text-center border-t border-slate-300 pt-8">
         <p class="text-xs font-black uppercase tracking-widest text-slate-800">
-            RememberMind — Suite de Gestión "Casa Amandita"
+            RememberMind — Suite de Gestión "CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS"
         </p>
         <p class="text-[10px] text-slate-500 mt-1">
             Generado el {{ date('d/m/Y H:i:s') }} por el personal institucional autorizado.

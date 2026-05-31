@@ -28,7 +28,7 @@ class ActividadesListaSheet implements FromCollection, WithTitle, WithHeadings, 
         return $this->service->actividadesLista(500)->map(fn($r) => [
             $r->cod_act_adul,
             $r->adulto,
-            $r->nombre_tipo_act ?? '—',
+            $r->tipo_actividad ?? '—',
             $r->fecha,
             $r->hora,
             $r->estado,

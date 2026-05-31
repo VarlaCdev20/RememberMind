@@ -197,7 +197,7 @@
             <tr>
                 <td>
                     <div class="header-title">RememberMind</div>
-                    <div class="header-subtitle">Casa Amandita • Planificación Semanal</div>
+                    <div class="header-subtitle">CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS • Planificación Semanal</div>
                 </td>
                 <td class="header-meta">
                     <strong>Reporte de Cobertura Semanal</strong><br>
@@ -210,7 +210,7 @@
 
     <!-- Footer de Página -->
     <footer>
-        Sistema RememberMind © {{ date('Y') }} Casa Amandita. Todos los derechos reservados.
+        Sistema RememberMind © {{ date('Y') }} CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS. Todos los derechos reservados.
     </footer>
 
     <!-- RESUMEN ESTADÍSTICO -->
@@ -316,7 +316,7 @@
     <div class="section-title">Trazabilidad y Cobertura Futura</div>
     <div class="alert-box">
         <strong>Conexión con el Expediente Médico de Adulto Mayor:</strong><br>
-        Esta planificación semanal sirve como base de disponibilidad para las asignaciones profesionales personalizadas que se realicen en el módulo de Salud y Seguimiento. Solo el personal de salud con turnos activos en esta grilla estará disponible para ser asignado como profesional tratante de cabecera de los adultos mayores de Casa Amandita, garantizando que haya cobertura real y sin solapamiento de horarios.
+        Esta planificación semanal sirve como base de disponibilidad para las asignaciones profesionales personalizadas que se realicen en el módulo de Salud y Seguimiento. Solo el personal de salud con turnos activos en esta grilla estará disponible para ser asignado como profesional tratante de cabecera de los adultos mayores de CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS, garantizando que haya cobertura real y sin solapamiento de horarios.
     </div>
 
 </body>

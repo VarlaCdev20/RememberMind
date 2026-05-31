@@ -49,7 +49,7 @@
         <table width="100%">
             <tr>
                 <td width="55%">
-                    <span class="logo-text">Casa Amandita</span><br>
+                    <span class="logo-text">CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS</span><br>
                     <span class="sub-logo">Gestión Gerontológica e Integral</span>
                 </td>
                 <td class="title">
@@ -180,13 +180,13 @@
             <div style="font-size: 9px; font-weight: bold; color: #2F3E5C; margin-top: 3px;">
                 {{ $evaluacion->registrador->nombre }}
             </div>
-            <div style="font-size: 7.5px; color: #777;">Especialista Casa Amandita</div>
+            <div style="font-size: 7.5px; color: #777;">Especialista CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS</div>
         </div>
         <div class="signature-box">
             <div class="signature-line"></div>
             <div class="signature-text">Firma Dirección Médica</div>
             <div style="font-size: 9px; font-weight: bold; color: #2F3E5C; margin-top: 3px;">
-                Casa Amandita
+                CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS
             </div>
             <div style="font-size: 7.5px; color: #777;">Control de Calidad Clínico</div>
         </div>

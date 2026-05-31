@@ -13,7 +13,7 @@
             }
         });
 
-        // Tema de Casa Amandita para alertas (botones color #BC6C25)
+        // Tema de CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS para alertas (botones color #BC6C25)
         const swalAmandita = Swal.mixin({
             confirmButtonColor: '#BC6C25',
             cancelButtonColor: '#6B7280',
@@ -103,48 +103,48 @@
             const htmlContent = `
                 <div class="text-left font-sans">
                     <div class="bg-[#FAF7F3] border border-[#C7B5A3]/40 rounded-xl p-3.5 mb-3 text-left">
-                        <span class="text-[9px] text-[#967B66] font-black uppercase tracking-wider block mb-0.5">Colaborador</span>
+                        <span class="text-xs text-[#967B66] font-black uppercase tracking-wide block mb-0.5">Colaborador</span>
                         <strong class="text-sm text-[#2F3E5C]">${data.nombre}</strong>
                     </div>
 
                     ${credentialsHtml}
 
                     <div class="mt-4 border-t border-[#E6DDD3] pt-3">
-                        <span class="text-[9px] text-[#967B66] font-black uppercase tracking-wider block mb-2">Acciones Sugeridas Post-Registro</span>
+                        <span class="text-xs text-[#967B66] font-black uppercase tracking-wide block mb-2">Acciones Sugeridas Post-Registro</span>
                         <div class="grid grid-cols-2 gap-2">
                             <a href="/admin/usuarios/${data.usuario_id}?tab=documentacion" class="flex flex-col justify-between gap-1.5 rounded-xl border border-[#C7B5A3]/50 bg-white p-2.5 text-left transition hover:border-[#E27D60] hover:bg-[#FAF7F3] group">
-                                <span class="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-wider text-[#2F3E5C]">
+                                <span class="flex items-center gap-1.5 text-xs font-black uppercase tracking-wide text-[#2F3E5C]">
                                     <i class="ph-bold ph-folder-lock text-[#E27D60] text-sm"></i> Documentos
                                 </span>
-                                <span class="text-[9px] text-[#2F3E5C]/60 font-bold leading-tight">Expediente y requisitos del rol</span>
+                                <span class="text-xs text-[#2F3E5C]/60 font-bold leading-tight">Expediente y requisitos del rol</span>
                             </a>
 
                             <a href="/admin/usuarios/${data.usuario_id}?tab=horarios" class="flex flex-col justify-between gap-1.5 rounded-xl border border-[#C7B5A3]/50 bg-white p-2.5 text-left transition hover:border-[#E27D60] hover:bg-[#FAF7F3] group">
-                                <span class="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-wider text-[#2F3E5C]">
+                                <span class="flex items-center gap-1.5 text-xs font-black uppercase tracking-wide text-[#2F3E5C]">
                                     <i class="ph-bold ph-calendar-check text-[#E27D60] text-sm"></i> Horarios
                                 </span>
-                                <span class="text-[9px] text-[#2F3E5C]/60 font-bold leading-tight">Planificar turnos y jornada</span>
+                                <span class="text-xs text-[#2F3E5C]/60 font-bold leading-tight">Planificar turnos y jornada</span>
                             </a>
 
                             <a href="/admin/usuarios/${data.usuario_id}" class="flex flex-col justify-between gap-1.5 rounded-xl border border-[#C7B5A3]/50 bg-white p-2.5 text-left transition hover:border-[#E27D60] hover:bg-[#FAF7F3] group">
-                                <span class="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-wider text-[#2F3E5C]">
+                                <span class="flex items-center gap-1.5 text-xs font-black uppercase tracking-wide text-[#2F3E5C]">
                                     <i class="ph-bold ph-user-focus text-[#E27D60] text-sm"></i> Ver Ficha
                                 </span>
-                                <span class="text-[9px] text-[#2F3E5C]/60 font-bold leading-tight">Perfil general e institucional</span>
+                                <span class="text-xs text-[#2F3E5C]/60 font-bold leading-tight">Perfil general e institucional</span>
                             </a>
 
                             <a href="/admin/usuarios/${data.usuario_id}/ficha/pdf" target="_blank" class="flex flex-col justify-between gap-1.5 rounded-xl border border-[#C7B5A3]/50 bg-white p-2.5 text-left transition hover:border-[#E27D60] hover:bg-[#FAF7F3] group">
-                                <span class="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-wider text-[#2F3E5C]">
+                                <span class="flex items-center gap-1.5 text-xs font-black uppercase tracking-wide text-[#2F3E5C]">
                                     <i class="ph-bold ph-file-pdf text-[#E27D60] text-sm"></i> Imprimir Ficha
                                 </span>
-                                <span class="text-[9px] text-[#2F3E5C]/60 font-bold leading-tight">Descargar PDF del expediente</span>
+                                <span class="text-xs text-[#2F3E5C]/60 font-bold leading-tight">Descargar PDF del expediente</span>
                             </a>
 
                             <button onclick="window.enviarFichaEmail('${data.usuario_id}')" class="col-span-2 flex items-center justify-center gap-2 rounded-xl border border-[#C7B5A3]/50 bg-white p-2.5 text-center transition hover:border-[#E27D60] hover:bg-[#FAF7F3] group">
                                 <i class="ph-bold ph-paper-plane-tilt text-[#E27D60] text-base group-hover:scale-110 transition-transform"></i>
                                 <div class="text-left">
-                                    <span class="block text-[10px] font-black uppercase tracking-wider text-[#2F3E5C]">Enviar Ficha por Correo</span>
-                                    <span class="block text-[9px] text-[#2F3E5C]/60 font-bold leading-none">Envía expediente firmado en PDF al colaborador</span>
+                                    <span class="block text-xs font-black uppercase tracking-wide text-[#2F3E5C]">Enviar Ficha por Correo</span>
+                                    <span class="block text-xs text-[#2F3E5C]/60 font-bold leading-none">Envía expediente firmado en PDF al colaborador</span>
                                 </div>
                             </button>
                         </div>

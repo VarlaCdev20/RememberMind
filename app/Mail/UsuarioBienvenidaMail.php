@@ -29,7 +29,7 @@ class UsuarioBienvenidaMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: '¡Te damos la Bienvenida a RememberMind - Casa Amandita!',
+            subject: '¡Te damos la Bienvenida a RememberMind - CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS!',
         );
     }
 

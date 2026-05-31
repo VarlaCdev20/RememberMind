@@ -246,7 +246,7 @@
                         @else
                             <p class="mt-1 text-base font-black text-[#2F3E5C] uppercase">{{ $nombre_rol }}</p>
                             <p class="mt-1 text-[10px] font-bold text-[#2F3E5C]/45 leading-relaxed">
-                                Vinculado institucionalmente bajo el rol correspondiente en Casa Amandita.
+                                Vinculado institucionalmente bajo el rol correspondiente en CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS.
                             </p>
                         @endif
                     </div>
@@ -329,7 +329,7 @@
                             <i class="ph-bold ph-folder-lock text-lg"></i> Expediente Documental Requerido
                         </h3>
                         <p class="mt-1 text-xs text-[#2F3E5C]/55 font-bold">
-                            Listado completo de requisitos y credenciales obligatorias para su rol en Casa Amandita.
+                            Listado completo de requisitos y credenciales obligatorias para su rol en CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS.
                         </p>
                     </div>
 

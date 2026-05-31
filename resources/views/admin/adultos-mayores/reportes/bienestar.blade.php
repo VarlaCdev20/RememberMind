@@ -2,7 +2,7 @@
     <div class="p-6">
         <div class="mb-10 text-center">
             <h1 class="text-4xl font-black text-[#2F3E5C] uppercase tracking-tighter">Reporte de Bienestar y Salud Cognitiva</h1>
-            <p class="mt-2 text-lg font-bold text-[#2F3E5C]/60">Análisis Poblacional Casa Amandita</p>
+            <p class="mt-2 text-lg font-bold text-[#2F3E5C]/60">Análisis Poblacional CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS</p>
         </div>
 
         <div class="grid gap-8 lg:grid-cols-3">

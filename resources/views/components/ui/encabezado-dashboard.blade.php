@@ -34,13 +34,13 @@ if (auth()->user()?->can('reportes.institucional')) {
 $acciones = array_slice($acciones, 0, 3);
 @endphp
 
-<section class="rounded-[2rem] border border-[#C7B5A3] bg-[#E6DDD3]/88 p-5 shadow-[0_16px_38px_rgba(47,62,92,0.12)] backdrop-blur-xl">
+<section class="card-interactiva borde-verde-suave rounded-[2rem] border p-5 backdrop-blur-xl">
     <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
 
         <div>
             <div class="mb-2 flex flex-wrap items-center gap-2">
-                <span class="rounded-full bg-terracota/10 px-3 py-1 text-[11px] font-black uppercase tracking-widest text-terracota">
-                    Casa Amandita
+                <span class="badge-mint">
+                    CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS
                 </span>
                 <span class="rounded-full bg-azul-profundo/10 px-3 py-1 text-[11px] font-black text-azul-profundo">
                     {{ $rolLegible }}
@@ -48,7 +48,7 @@ $acciones = array_slice($acciones, 0, 3);
             </div>
 
             <h1 class="text-xl font-black leading-tight text-azul-profundo md:text-2xl">
-                {{ $saludoTexto }}, <span class="text-terracota">{{ $nombre }}</span>
+                {{ $saludoTexto }}, <span class="text-[#F28B54]">{{ $nombre }}</span>
             </h1>
 
             @if($fecha)
@@ -60,7 +60,7 @@ $acciones = array_slice($acciones, 0, 3);
             <div class="flex flex-wrap gap-3">
                 @foreach($acciones as $accion)
                     @if($accion['estilo'] === 'terracota')
-                        <a href="{{ $accion['href'] }}" class="rm-btn-terracota text-xs">
+                        <a href="{{ $accion['href'] }}" class="rm-btn-primary text-xs">
                             <i class="ph-bold {{ $accion['icono'] }} mr-1"></i>{{ $accion['label'] }}
                         </a>
                     @else

@@ -434,7 +434,7 @@
                         </div>
                         <div>
                             <h2 class="text-lg font-black text-azul-profundo">Paso 5: Ingreso Institucional</h2>
-                            <p class="text-xs font-bold text-azul-profundo/55">Detalles administrativos del ingreso a Casa Amandita.</p>
+                            <p class="text-xs font-bold text-azul-profundo/55">Detalles administrativos del ingreso a CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS.</p>
                         </div>
                     </div>
 

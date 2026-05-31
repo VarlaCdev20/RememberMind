@@ -28,25 +28,27 @@
     <table class="table-institutional">
         <thead>
             <tr>
-                <th style="width: 30%;">Nombre de la Actividad</th>
-                <th style="width: 25%;">Tipo / Categoría</th>
-                <th style="width: 25%;">Lugar / Ubicación</th>
-                <th style="width: 20%;">Fecha</th>
+                <th style="width: 30%;">Tipo de Actividad</th>
+                <th style="width: 25%;">Adulto Mayor</th>
+                <th style="width: 25%;">Observación</th>
+                <th style="width: 10%;">Fecha</th>
+                <th style="width: 10%;">Estado</th>
             </tr>
         </thead>
         <tbody>
-            @foreach (\App\Models\ActividadAdulto::with('tipoActividad')->orderBy('fecha', 'desc')->take(15)->get() as $act)
+            @foreach (\App\Models\ActividadAdulto::with(['tipoActividad', 'adultoMayor'])->orderBy('fecha', 'desc')->take(15)->get() as $act)
                 <tr>
-                    <td><strong>{{ $act->titulo ?? 'Taller Sin Título' }}</strong></td>
-                    <td>{{ $act->tipoActividad ? $act->tipoActividad->nombre : 'Recreativo' }}</td>
-                    <td>{{ $act->lugar ?? 'Salón Principal' }}</td>
+                    <td><strong>{{ optional($act->tipoActividad)->tipo ?? 'Sin tipo' }}</strong></td>
+                    <td>{{ trim((optional($act->adultoMayor)->nombres ?? '') . ' ' . (optional($act->adultoMayor)->ap_paterno ?? '')) ?: 'Sin registro' }}</td>
+                    <td>{{ $act->obs ? \Illuminate\Support\Str::limit($act->obs, 60) : '—' }}</td>
                     <td>{{ $act->fecha ? \Carbon\Carbon::parse($act->fecha)->format('d/m/Y') : 'Sin fecha' }}</td>
+                    <td>{{ $act->estado ?? '—' }}</td>
                 </tr>
             @endforeach
         </tbody>
     </table>
 
     <div class="alert-box">
-        <strong>Nota del Área Social:</strong> Los talleres de terapia física y estimulación psicomotriz son vitales para combatir el aislamiento social y mejorar el bienestar neurocognitivo general de los residentes de Casa Amandita.
+        <strong>Nota del Área Social:</strong> Los talleres de terapia física y estimulación psicomotriz son vitales para combatir el aislamiento social y mejorar el bienestar neurocognitivo general de los residentes de CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS.
     </div>
 @endsection

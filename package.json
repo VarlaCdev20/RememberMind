@@ -26,6 +26,7 @@
         "chartjs-plugin-datalabels": "^2.2.0",
         "gsap": "^3.15.0",
         "puppeteer": "^24.43.1",
-        "tailwindcss-animated": "^2.0.0"
+        "tailwindcss-animated": "^2.0.0",
+        "three": "^0.184.0"
     }
 }

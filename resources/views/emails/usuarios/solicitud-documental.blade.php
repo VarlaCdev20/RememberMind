@@ -124,7 +124,7 @@
     <div style="background-color: #F8F3ED; padding: 40px 0;">
         <div class="container">
             <div class="header">
-                <h1>Casa Amandita</h1>
+                <h1>CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS</h1>
                 <p>RememberMind &bull; Registro y Seguimiento de Personal</p>
             </div>
             
@@ -134,7 +134,7 @@
                 <p>Estimado(a) <strong>{{ $nombre_completo }}</strong>,</p>
                 
                 <p>
-                    Le informamos que su registro inicial en el sistema de Casa Amandita ha sido completado con éxito. Para completar de manera definitiva su incorporación y habilitar la totalidad de sus funciones en la plataforma, es necesario que presente la documentación obligatoria correspondiente a su perfil.
+                    Le informamos que su registro inicial en el sistema de CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS ha sido completado con éxito. Para completar de manera definitiva su incorporación y habilitar la totalidad de sus funciones en la plataforma, es necesario que presente la documentación obligatoria correspondiente a su perfil.
                 </p>
                 
                 <div class="profile-summary">
@@ -175,7 +175,7 @@
             
             <div class="footer">
                 Atentamente,<br>
-                <strong>Firma Institucional Casa Amandita</strong><br>
+                <strong>Firma Institucional CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS</strong><br>
                 RememberMind - Gestión Residencial Integral
             </div>
         </div>

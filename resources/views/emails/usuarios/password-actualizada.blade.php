@@ -131,7 +131,7 @@
     <div style="padding: 20px 0;">
         <div class="container">
             <div class="header">
-                <h1>Casa Amandita</h1>
+                <h1>CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS</h1>
                 <p>RememberMind • Gestión Residencial Integral</p>
             </div>
             <div class="content">
@@ -178,7 +178,7 @@
                 <p>Por tu seguridad, nunca compartas tus credenciales de acceso con terceros. Recuerda que cada interacción en el expediente de salud e historial de pacientes queda registrada permanentemente en la bitácora de auditoría.</p>
             </div>
             <div class="footer">
-                Casa Amandita • Sistema de Gestión Médica RememberMind © {{ date('Y') }}
+                CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS • Sistema de Gestión Médica RememberMind © {{ date('Y') }}
             </div>
         </div>
     </div>

@@ -19,7 +19,7 @@ $parentescos = $redFamiliar['parentescos']        ?? [];
             Estructura operativa
         </span>
         <h2 class="text-lg font-black text-azul-profundo">Equipo institucional</h2>
-        <p class="text-xs font-bold text-azul-profundo/55">Distribución del capital humano de Casa Amandita.</p>
+        <p class="text-xs font-bold text-azul-profundo/55">Distribución del capital humano de CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS.</p>
     </div>
 
     <div class="grid gap-3 sm:grid-cols-3">
@@ -137,32 +137,32 @@ $parentescos = $redFamiliar['parentescos']        ?? [];
             <div class="flex h-7 w-7 items-center justify-center rounded-lg bg-[#F4A261]/15 text-[#D4843A]">
                 <i class="ph-fill ph-house-line text-sm"></i>
             </div>
-            <span class="text-[11px] font-black uppercase tracking-wide text-azul-profundo/60">Red familiar</span>
+            <span class="text-xs font-black uppercase tracking-wide text-azul-profundo/60">Red familiar</span>
         </div>
 
         <div class="grid grid-cols-2 gap-2 sm:grid-cols-4">
             <div class="rounded-xl bg-[#E6DDD3]/70 px-3 py-2 text-center">
                 <p class="text-lg font-black text-azul-profundo">{{ $totalFam }}</p>
-                <p class="text-[9px] font-black uppercase tracking-wide text-azul-profundo/45">Familiares</p>
+                <p class="text-[10px] font-black uppercase tracking-wide text-azul-profundo/50">Familiares</p>
             </div>
             <div class="rounded-xl bg-[#E6DDD3]/70 px-3 py-2 text-center">
                 <p class="text-lg font-black text-[#2A9D8F]">{{ $conFam }}</p>
-                <p class="text-[9px] font-black uppercase tracking-wide text-azul-profundo/45">Con familiar</p>
+                <p class="text-[10px] font-black uppercase tracking-wide text-azul-profundo/50">Con familiar</p>
             </div>
             <div class="rounded-xl bg-[#E6DDD3]/70 px-3 py-2 text-center {{ $sinFam > 0 ? 'border border-terracota/30' : '' }}">
                 <p class="text-lg font-black {{ $sinFam > 0 ? 'text-terracota' : 'text-azul-profundo' }}">{{ $sinFam }}</p>
-                <p class="text-[9px] font-black uppercase tracking-wide text-azul-profundo/45">Sin familiar</p>
+                <p class="text-[10px] font-black uppercase tracking-wide text-azul-profundo/50">Sin familiar</p>
             </div>
             <div class="rounded-xl bg-[#E6DDD3]/70 px-3 py-2 text-center">
                 <p class="text-lg font-black text-azul-profundo">{{ $responsables }}</p>
-                <p class="text-[9px] font-black uppercase tracking-wide text-azul-profundo/45">Responsables</p>
+                <p class="text-[10px] font-black uppercase tracking-wide text-azul-profundo/50">Responsables</p>
             </div>
         </div>
 
         @if(!empty($parentescos))
             <div class="mt-2 flex flex-wrap gap-1.5">
                 @foreach($parentescos as $p)
-                    <span class="rm-badge-neutral text-[9px]">
+                    <span class="rm-badge-neutral text-xs">
                         {{ $p['parentesco'] }} ({{ $p['total'] }})
                     </span>
                 @endforeach

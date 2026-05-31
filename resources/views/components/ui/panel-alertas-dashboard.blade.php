@@ -3,12 +3,12 @@
 @php
 $estilosNivel = [
     'URGENTE'     => ['badge' => 'rm-badge-danger',   'icono_color' => 'text-rose-600'],
-    'INFORMATIVA' => ['badge' => 'rm-badge-info',     'icono_color' => 'text-blue-600'],
-    'OK'          => ['badge' => 'rm-badge-success',  'icono_color' => 'text-emerald-600'],
+    'INFORMATIVA' => ['badge' => 'rm-badge-info',     'icono_color' => 'text-[#2EA9C0]'],
+    'OK'          => ['badge' => 'rm-badge-success',  'icono_color' => 'text-[#006B5E]'],
 ];
 @endphp
 
-<div class="rounded-[2rem] border border-[#C7B5A3] bg-[#E6DDD3]/88 p-5 shadow-[0_16px_38px_rgba(47,62,92,0.12)]">
+<div class="card-interactiva borde-verde-suave rounded-[2rem] border p-5">
     <h2 class="text-lg font-black text-azul-profundo">Alertas administrativas</h2>
     <p class="mb-4 text-xs font-bold text-azul-profundo/55">Pendientes de revisión institucional</p>
 
@@ -19,7 +19,7 @@ $estilosNivel = [
                 $estilo = $estilosNivel[$nivel] ?? $estilosNivel['INFORMATIVA'];
             @endphp
 
-            <li class="rounded-[1.4rem] bg-[#D5C7B9]/75 p-3 transition hover:-translate-y-0.5 hover:bg-[#D5C7B9]">
+            <li class="card-interactiva rounded-[1.4rem] border border-transparent p-3 transition hover:-translate-y-0.5 hover:bg-[#CBEFE8]/65">
                 <div class="flex items-start gap-2">
                     <i class="ph-bold {{ $alerta['icono'] ?? 'ph-info' }} mt-0.5 shrink-0 text-base {{ $estilo['icono_color'] }}"></i>
                     <div class="min-w-0 flex-1">
@@ -38,7 +38,7 @@ $estilosNivel = [
                 </div>
             </li>
         @empty
-            <li class="rounded-[1.4rem] bg-[#D5C7B9]/70 p-4 text-sm font-bold text-azul-profundo/55">
+            <li class="rounded-[1.4rem] bg-[#FFFDF9]/75 p-4 text-sm font-bold text-azul-profundo/60">
                 Sin alertas pendientes.
             </li>
         @endforelse

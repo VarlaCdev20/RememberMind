@@ -455,7 +455,7 @@
                                     <span class="truncate">{{ $telefonoFamiliar }}</span>
                                     
                                     @if($telefonoFamiliar !== 'No registrado' && (strlen($telefonoFamiliar) >= 7))
-                                        <a href="https://wa.me/591{{ preg_replace('/\D/', '', $telefonoFamiliar) }}" target="_blank" title="Contactar por WhatsApp"
+                                        <a href="https://wa.me/591{{ preg_replace('/\D/', '', $telefonoFamiliar) }}" title="Contactar por WhatsApp"
                                            class="ml-auto flex h-6 w-6 items-center justify-center rounded-full bg-[#25D366]/10 text-[#25D366] transition hover:bg-[#25D366] hover:text-white">
                                             <i class="ph-fill ph-whatsapp-logo text-xs"></i>
                                         </a>

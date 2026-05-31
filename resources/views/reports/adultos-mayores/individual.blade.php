@@ -163,6 +163,6 @@
     @endif
 
     <div class="alert-box">
-        <strong>Aviso Legal y Confidencialidad:</strong> Toda la información clínica contenida en este expediente está sujeta a secreto profesional. Prohibida su copia o distribución física y digital por fuera de la dirección médica de Casa Amandita.
+        <strong>Aviso Legal y Confidencialidad:</strong> Toda la información clínica contenida en este expediente está sujeta a secreto profesional. Prohibida su copia o distribución física y digital por fuera de la dirección médica de CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS.
     </div>
 @endsection

@@ -27,7 +27,7 @@ class UsuarioCredencialesInicialesMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'RememberMind - Credenciales de Acceso de Casa Amandita',
+            subject: 'RememberMind - Credenciales de Acceso de CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS',
         );
     }
 

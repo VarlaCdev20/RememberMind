@@ -14,6 +14,8 @@ use App\Models\TipoAtencionAdulto;
 use App\Models\Familiar;
 use App\Models\AdultoMayor;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\AdultoIndividualExport;
 
 class AdultoMayorController extends Controller
 {
@@ -266,17 +268,22 @@ public function show(AdultoMayor $adulto_mayor)
             return $pdf->download("Expediente_Integral_{$adulto->cod_am}.pdf");
         }
 
+        if ($format === 'excel') {
+            activity()->causedBy(auth()->user())->performedOn($adulto)->event('reporte_generado')
+                ->log("Se descargó el expediente completo en formato Excel.");
+            return Excel::download(new AdultoIndividualExport($adulto), "Expediente_{$adulto->cod_am}.xlsx");
+        }
+
         if ($format === 'word') {
             $headers = [
-                "Content-type" => "application/vnd.ms-word",
-                "Content-Disposition" => "attachment;Filename=Ficha_{$adulto->cod_am}.doc"
+                'Content-Type'        => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                'Content-Disposition' => "attachment; filename=\"Ficha_{$adulto->cod_am}.doc\"",
             ];
-            
-            $content = view('admin.adultos-mayores.reportes.individual', $viewData)->render();
+            $content = view('admin.adultos-mayores.reportes.word_individual', $viewData)->render();
             return response($content, 200, $headers);
         }
 
-        // Si hay una vista previa web
+        // Vista previa HTML
         return view('admin.adultos-mayores.reportes.pdf_individual', $viewData);
     }
 

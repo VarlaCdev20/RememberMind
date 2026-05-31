@@ -4,13 +4,13 @@
         sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0',
         sidebarCollapsed ? 'lg:w-[82px]' : 'lg:w-[240px]'
     ]"
-    class="fixed left-0 top-0 z-50 flex h-screen w-[240px] flex-col border-r border-[#C7B5A3]/70 bg-[#E6DDD3]/95 shadow-[18px_0_55px_rgba(47,62,92,0.12)] backdrop-blur-xl transition-all duration-300 ease-in-out"
+    class="sidebar-institucional fixed left-0 top-0 z-50 flex h-screen w-[240px] flex-col shadow-[18px_0_55px_rgba(0,107,94,0.14)] backdrop-blur-xl transition-all duration-300 ease-in-out"
 >
     {{-- BOTÓN COLAPSAR --}}
     <button
         type="button"
         @click="sidebarCollapsed = !sidebarCollapsed"
-        class="absolute -right-4 top-8 hidden h-8 w-8 items-center justify-center rounded-full border border-[#C7B5A3] bg-[#E6DDD3] text-azul-profundo shadow-md transition-all duration-300 hover:bg-terracota hover:text-white active:scale-90 lg:flex"
+        class="absolute -right-4 top-8 hidden h-8 w-8 items-center justify-center rounded-full border border-[var(--color-borde-suave)] bg-[#FFFDF9] text-[#0B4F46] shadow-md transition-all duration-300 hover:bg-[#006B5E] hover:text-white active:scale-90 lg:flex"
         aria-label="Contraer o expandir menú lateral"
     >
         <i
@@ -22,23 +22,23 @@
     {{-- HEADER --}}
     <div class="shrink-0 px-3 pt-4">
         <div
-            class="flex items-center rounded-xl bg-[#D5C7B9]/40 px-2.5 py-2 shadow-inner transition-all duration-300"
+            class="flex items-center rounded-xl border border-[var(--color-borde-suave)] bg-[#CBEFE8]/55 px-2.5 py-2 shadow-inner transition-all duration-300"
             :class="sidebarCollapsed ? 'justify-center' : 'justify-between'"
         >
             <div class="flex min-w-0 items-center gap-3">
-                <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-terracota text-white font-black shadow-sm transition-all duration-500 hover:rotate-6">
-                    <span class="text-sm">C</span>
-                </div>
+                <img src="{{ asset('storage/images/LOGO.png') }}"
+                     alt="CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS"
+                     class="h-8 w-8 shrink-0 object-contain rounded-lg transition-all duration-500 hover:scale-110">
 
                 <div
                     x-show="!sidebarCollapsed"
                     x-transition.opacity.duration.300ms
                     class="min-w-0"
                 >
-                    <h2 class="truncate text-sm font-black text-azul-profundo leading-tight">
-                        Casa Amandita
+                    <h2 class="max-w-[150px] text-[10px] font-black uppercase leading-[1.05] text-azul-profundo">
+                        CENTRO GERIÁTRICO<br>JARDÍN DE LOS RECUERDOS
                     </h2>
-                    <p class="truncate text-[10px] font-black uppercase tracking-widest text-terracota">
+                <p class="truncate text-[10px] font-black uppercase tracking-widest text-[#006B5E]">
                         RememberMind
                     </p>
                 </div>
@@ -46,7 +46,7 @@
 
             <button
                 @click="sidebarOpen = false"
-                class="flex h-8 w-8 items-center justify-center rounded-full bg-[#E6DDD3] text-azul-profundo transition hover:bg-terracota hover:text-white lg:hidden"
+                class="flex h-8 w-8 items-center justify-center rounded-full bg-[#FFFDF9] text-azul-profundo transition hover:bg-[#006B5E] hover:text-white lg:hidden"
                 aria-label="Cerrar menú lateral"
             >
                 <i class="ph-bold ph-x"></i>
@@ -55,7 +55,7 @@
     </div>
 
     {{-- MENÚ --}}
-    <div class="mt-3 flex-1 overflow-y-auto px-3 pb-4 [scrollbar-width:thin] [scrollbar-color:#C7B5A3_transparent]">
+    <div class="mt-3 flex-1 overflow-y-auto px-3 pb-4 [scrollbar-width:thin] [scrollbar-color:#97E3D5_transparent]">
         @php
             $safeUrl = function (?string $route, string $fallback = '#') {
                 return $route && Route::has($route) ? route($route) : $fallback;
@@ -115,6 +115,9 @@
                         auth()->user()->can('salud.ficha.ver') ? ['label' => 'Ficha médica', 'route' => 'admin.salud-seguimiento.ficha.index'] : null,
                         auth()->user()->can('salud.signos.ver') ? ['label' => 'Signos vitales', 'route' => 'admin.salud-seguimiento.signos.index'] : null,
                         auth()->user()->can('salud.medicacion.ver') ? ['label' => 'Medicación', 'route' => 'admin.salud-seguimiento.medicacion.index'] : null,
+                        auth()->user()->can('salud.medicacion.ver') ? ['label' => 'Administración', 'route' => 'admin.salud-seguimiento.administracion.index'] : null,
+                        auth()->user()->can('salud.ver') ? ['label' => 'Valoración funcional', 'route' => 'admin.salud-seguimiento.valoracion.index'] : null,
+                        auth()->user()->can('salud.ver') ? ['label' => 'Evaluaciones geriátricas', 'route' => 'admin.salud-seguimiento.evaluaciones-geriatricas.index'] : null,
                         auth()->user()->can('salud.alertas.ver') ? ['label' => 'Alertas', 'route' => 'admin.salud-seguimiento.alertas'] : null,
                         auth()->user()->can('salud.reportes.ver') ? ['label' => 'Reportes', 'route' => 'admin.salud-seguimiento.reportes'] : null,
                     ]),
@@ -122,36 +125,34 @@
                 [
                     'title' => 'Familia y Social',
                     'icon' => 'ph-house-line',
-                    'items' => [
-                        ['label' => 'Familiares', 'route' => null],
-                        ['label' => 'Responsables', 'route' => null],
-                        ['label' => 'Contactos de emergencia', 'route' => null],
-                        ['label' => 'Autorizaciones', 'route' => null],
-                        ['label' => 'Visitas', 'route' => null],
-                        ['label' => 'Comunicaciones', 'route' => null],
-                        ['label' => 'Ficha social', 'route' => null],
-                    ],
+                    'items' => array_filter([
+                        auth()->user()->can('familiares.ver') ? ['label' => 'Resumen', 'route' => 'admin.familia-social.resumen'] : null,
+                        auth()->user()->can('familiares.ver') ? ['label' => 'Red de apoyo', 'route' => 'admin.familia-social.red-apoyo'] : null,
+                        auth()->user()->can('familiares.ver') ? ['label' => 'Visitas', 'route' => 'admin.familia-social.visitas'] : null,
+                        auth()->user()->can('familiares.ver') ? ['label' => 'Ficha social', 'route' => 'admin.familia-social.ficha-social'] : null,
+                    ]),
                 ],
                 [
                     'title' => 'Actividades',
                     'icon' => 'ph-calendar-check',
                     'items' => [
-                        ['label' => 'Actividades', 'route' => null],
-                        ['label' => 'Tipos de actividades', 'route' => null],
-                        ['label' => 'Participación', 'route' => null],
-                        ['label' => 'Asistencia', 'route' => null],
-                        ['label' => 'Reportes', 'route' => null],
+                        ['label' => 'Actividades', 'route' => 'admin.actividades.index'],
+                        ['label' => 'Tipos de actividades', 'route' => 'admin.actividades.tipos'],
+                        ['label' => 'Participación', 'route' => 'admin.actividades.participacion'],
+                        ['label' => 'Asistencia', 'route' => 'admin.actividades.asistencia'],
+                        ['label' => 'Reportes', 'route' => 'admin.actividades.reportes'],
                     ],
                 ],
                 [
                     'title' => 'Voluntariado',
                     'icon' => 'ph-hand-heart',
                     'items' => [
-                        ['label' => 'Voluntarios', 'route' => null],
-                        ['label' => 'Disponibilidad', 'route' => null],
-                        ['label' => 'Asignaciones', 'route' => null],
-                        ['label' => 'Asistencia', 'route' => null],
-                        ['label' => 'Reportes', 'route' => null],
+                        ['label' => 'Resumen', 'route' => 'admin.voluntariado.index'],
+                        ['label' => 'Voluntarios', 'route' => 'admin.voluntariado.voluntarios.index'],
+                        ['label' => 'Disponibilidad', 'route' => 'admin.voluntariado.disponibilidad.index'],
+                        ['label' => 'Asignaciones', 'route' => 'admin.voluntariado.asignaciones.index'],
+                        ['label' => 'Asistencia', 'route' => 'admin.voluntariado.asistencia.index'],
+                        ['label' => 'Reportes', 'route' => 'admin.voluntariado.reportes.index'],
                     ],
                 ],
             ];
@@ -184,12 +185,12 @@
                             href="{{ $url }}"
                             @if($disabled) title="Próximamente" @else title="{{ $section['title'] }}" @endif
                             class="flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-sm font-black transition-all duration-300
-                            {{ $isSectionActive ? 'bg-[#D5C7B9] text-terracota shadow-sm' : 'text-azul-profundo/80 hover:bg-[#D5C7B9]/50 hover:text-terracota' }}"
+                            {{ $isSectionActive ? 'bg-[#97E3D5]/25 text-[#0B4F46] shadow-sm ring-1 ring-[#006B5E]/18 border-l-4 border-[#F28B54]' : 'text-azul-profundo/80 hover:bg-[#5ED3E6]/10 hover:text-[#006B5E]' }}"
                             :class="sidebarCollapsed ? 'justify-center px-0' : ''"
                         >
                             <div class="flex items-center gap-3">
                                 <i class="ph-bold {{ $section['icon'] }} text-xl shrink-0 transition-all duration-300
-                                    {{ $isSectionActive ? 'text-terracota' : 'text-azul-profundo/60 group-hover/section:text-terracota group-hover/section:rotate-3' }}"></i>
+                                    {{ $isSectionActive ? 'text-[#006B5E]' : 'text-azul-profundo/60 group-hover/section:text-[#006B5E] group-hover/section:rotate-3' }}"></i>
                                 <span
                                     x-show="!sidebarCollapsed"
                                     x-transition.opacity.duration.300ms
@@ -201,12 +202,12 @@
                         </a>
                         
                         {{-- DIVISOR EN MODO COLAPSADO --}}
-                        <div class="mx-auto h-px w-8 bg-[#C7B5A3]/40 my-2" x-show="sidebarCollapsed"></div>
+                        <div class="mx-auto h-px w-8 bg-[#97E3D5]/45 my-2" x-show="sidebarCollapsed"></div>
 
                         {{-- TOOLTIP CUANDO ESTÁ COLAPSADO --}}
                         <div
                             x-show="sidebarCollapsed"
-                            class="pointer-events-none absolute left-full z-50 ml-4 hidden whitespace-nowrap rounded-lg bg-azul-profundo px-3 py-2 text-[11px] font-black text-white shadow-2xl transition-all group-hover/section:block"
+                            class="pointer-events-none absolute left-full z-50 ml-4 hidden whitespace-nowrap rounded-lg bg-[#0B4F46] px-3 py-2 text-[11px] font-black text-white shadow-2xl transition-all group-hover/section:block"
                         >
                             {{ $section['title'] }}
                         </div>
@@ -217,12 +218,12 @@
                         <button
                             @click="expanded = !expanded"
                             class="flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-sm font-black transition-all duration-300
-                            {{ $isSectionActive ? 'bg-[#D5C7B9] text-terracota shadow-sm' : 'text-azul-profundo/80 hover:bg-[#D5C7B9]/50 hover:text-terracota' }}"
+                            {{ $isSectionActive ? 'bg-[#97E3D5]/25 text-[#0B4F46] shadow-sm ring-1 ring-[#006B5E]/18 border-l-4 border-[#F28B54]' : 'text-azul-profundo/80 hover:bg-[#5ED3E6]/10 hover:text-[#006B5E]' }}"
                             :class="sidebarCollapsed ? 'justify-center px-0' : ''"
                         >
                             <div class="flex items-center gap-3">
                                 <i class="ph-bold {{ $section['icon'] }} text-xl shrink-0 transition-all duration-300
-                                    {{ $isSectionActive ? 'text-terracota' : 'text-azul-profundo/60 group-hover/section:text-terracota group-hover/section:rotate-3' }}"></i>
+                                    {{ $isSectionActive ? 'text-[#006B5E]' : 'text-azul-profundo/60 group-hover/section:text-[#006B5E] group-hover/section:rotate-3' }}"></i>
                                 <span
                                     x-show="!sidebarCollapsed"
                                     x-transition.opacity.duration.300ms
@@ -235,7 +236,7 @@
                             <i
                                 x-show="!sidebarCollapsed"
                                 class="ph-bold ph-caret-down text-[10px] transition-transform duration-500"
-                                :class="expanded ? 'rotate-180 text-terracota' : 'text-azul-profundo/40'"
+                                :class="expanded ? 'rotate-180 text-[#F28B54]' : 'text-azul-profundo/40'"
                             ></i>
                         </button>
 
@@ -259,14 +260,14 @@
                                     @if($disabled) title="Próximamente" @else title="{{ $item['label'] }}" @endif
                                     class="group/item relative flex items-center gap-2.5 rounded-lg py-2 text-sm font-black transition-all duration-300
                                     {{ $active
-                                        ? 'text-terracota'
-                                        : 'text-azul-profundo/60 hover:text-terracota hover:translate-x-1'
+                                        ? 'text-[#006B5E]'
+                                        : 'text-azul-profundo/60 hover:text-[#006B5E] hover:translate-x-1'
                                     }}
                                     {{ $disabled ? 'opacity-40 cursor-not-allowed grayscale' : '' }}
                                     "
                                 >
                                     @if($active)
-                                        <span class="absolute -left-4 top-1/2 -translate-y-1/2 h-1.5 w-1.5 rounded-full bg-terracota shadow-[0_0_8px_rgba(233,122,95,0.6)]"></span>
+                                        <span class="absolute -left-4 top-1/2 -translate-y-1/2 h-2 w-2 rounded-full bg-[#F28B54] shadow-[0_0_10px_rgba(242,139,84,0.55)]"></span>
                                     @endif
 
                                     <span class="truncate">{{ $item['label'] }}</span>
@@ -275,12 +276,12 @@
                         </div>
                         
                         {{-- DIVISOR EN MODO COLAPSADO --}}
-                        <div class="mx-auto h-px w-8 bg-[#C7B5A3]/40 my-2" x-show="sidebarCollapsed"></div>
+                        <div class="mx-auto h-px w-8 bg-[#97E3D5]/45 my-2" x-show="sidebarCollapsed"></div>
 
                         {{-- TOOLTIP CUANDO ESTÁ COLAPSADO --}}
                         <div
                             x-show="sidebarCollapsed"
-                            class="pointer-events-none absolute left-full z-50 ml-4 hidden whitespace-nowrap rounded-lg bg-azul-profundo px-3 py-2 text-[11px] font-black text-white shadow-2xl transition-all group-hover/section:block"
+                            class="pointer-events-none absolute left-full z-50 ml-4 hidden whitespace-nowrap rounded-lg bg-[#0B4F46] px-3 py-2 text-[11px] font-black text-white shadow-2xl transition-all group-hover/section:block"
                         >
                             {{ $section['title'] }}
                         </div>
@@ -291,10 +292,10 @@
     </div>
 
     {{-- FOOTER --}}
-    <div class="shrink-0 border-t border-[#C7B5A3]/40 p-3">
+    <div class="shrink-0 border-t border-[var(--color-borde-suave)] p-3">
         <a
             href="#"
-            class="group flex items-center gap-3 rounded-xl px-3 py-3 text-[15px] font-black text-azul-profundo/70 transition-all duration-300 hover:bg-terracota hover:text-white active:scale-95"
+            class="group flex items-center gap-3 rounded-xl px-3 py-3 text-[15px] font-black text-azul-profundo/70 transition-all duration-300 hover:bg-[#006B5E] hover:text-white active:scale-95"
             :class="sidebarCollapsed ? 'justify-center px-0' : ''"
         >
             <i class="ph-bold ph-question text-xl shrink-0 group-hover:rotate-12 transition-transform"></i>

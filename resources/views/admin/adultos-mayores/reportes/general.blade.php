@@ -161,7 +161,7 @@
         <div class="mt-20 flex flex-col items-center gap-4 text-center">
             <div class="h-1 w-20 bg-[#2F3E5C]/10 rounded-full"></div>
             <p class="text-[10px] font-black text-[#2F3E5C]/40 uppercase tracking-[0.4em]">Reporte Consolidado por RememberMind System</p>
-            <p class="text-[9px] font-bold text-[#2F3E5C]/20 italic">Fecha de Generación: {{ now()->format('d/m/Y H:i:s') }} · Casa Amandita Administración</p>
+            <p class="text-[9px] font-bold text-[#2F3E5C]/20 italic">Fecha de Generación: {{ now()->format('d/m/Y H:i:s') }} · CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS Administración</p>
         </div>
     </div>
 

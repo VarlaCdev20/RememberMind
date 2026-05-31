@@ -18,7 +18,7 @@
                         >
 
                         <div class="-mt-36 ml-6 max-w-md rounded-[2rem] bg-[#5a3e36]/80 p-6 text-white backdrop-blur-md">
-                            <p class="text-sm font-bold uppercase tracking-[0.18em] text-[#e9c7bc]">Casa Amandita</p>
+                            <p class="text-sm font-bold uppercase tracking-[0.18em] text-[#e9c7bc]">CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS</p>
                             <h2 class="mt-3 text-4xl font-extrabold leading-tight">
                                 Registro institucional para un cuidado más organizado
                             </h2>

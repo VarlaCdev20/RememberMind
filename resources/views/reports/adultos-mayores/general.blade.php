@@ -61,6 +61,6 @@
     </table>
 
     <div class="alert-box">
-        <strong>Aviso de Confidencialidad y Privacidad:</strong> La información contenida en esta ficha está resguardada bajo la ley de derechos y deberes de los pacientes. Su copia o difusión no autorizada constituye una falta grave al protocolo institucional de Casa Amandita.
+        <strong>Aviso de Confidencialidad y Privacidad:</strong> La información contenida en esta ficha está resguardada bajo la ley de derechos y deberes de los pacientes. Su copia o difusión no autorizada constituye una falta grave al protocolo institucional de CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS.
     </div>
 @endsection

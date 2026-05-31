@@ -56,6 +56,6 @@
     </table>
 
     <div class="alert-box">
-        <strong>Aviso del Departamento de Enfermería:</strong> Los signos vitales y alarmas de saturación de oxígeno inferiores a 90% deben ser informados de inmediato al médico de turno para el protocolo de emergencia de Casa Amandita.
+        <strong>Aviso del Departamento de Enfermería:</strong> Los signos vitales y alarmas de saturación de oxígeno inferiores a 90% deben ser informados de inmediato al médico de turno para el protocolo de emergencia de CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS.
     </div>
 @endsection

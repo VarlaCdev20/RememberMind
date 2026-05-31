@@ -1,6 +1,6 @@
 @extends('reportes.layouts.reporte-base')
 
-@section('titulo', 'Reporte General Institucional — Casa Amandita')
+@section('titulo', 'Reporte General Institucional — CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS')
 
 @section('contenido')
 
@@ -15,7 +15,7 @@
 
 {{-- ── 1. Encabezado institucional ───────────────────────────────────────── --}}
 <div class="rm-header">
-    <div class="rm-header-logo">Casa Amandita</div>
+    <div class="rm-header-logo">CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS</div>
     <div class="rm-header-sub">RememberMind &nbsp;&middot;&nbsp; Sistema de Gestión Institucional</div>
     <div class="rm-header-badge">Reporte General Institucional</div>
     <div class="rm-header-meta">
@@ -302,12 +302,12 @@
 {{-- ── Nota legal ──────────────────────────────────────────────────────────── --}}
 <div class="rm-nota-legal">
     Las alertas y métricas de salud son orientativas y no constituyen diagnóstico médico.
-    Este reporte es de uso institucional exclusivo de Casa Amandita.
+    Este reporte es de uso institucional exclusivo de CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS.
 </div>
 
 {{-- ── Footer ──────────────────────────────────────────────────────────────── --}}
 <div class="rm-footer">
-    RememberMind &nbsp;&middot;&nbsp; Casa Amandita &nbsp;&middot;&nbsp;
+    RememberMind &nbsp;&middot;&nbsp; CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS &nbsp;&middot;&nbsp;
     Generado el {{ $generadoEn }} &nbsp;&middot;&nbsp;
     Confidencial &mdash; solo para uso institucional
 </div>

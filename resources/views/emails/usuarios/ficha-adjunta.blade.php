@@ -101,13 +101,13 @@
     <div style="padding: 20px 0;">
         <div class="container">
             <div class="header">
-                <h1>Casa Amandita</h1>
+                <h1>CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS</h1>
                 <p>RememberMind • Gestión Residencial Integral</p>
             </div>
             <div class="content">
                 <h2>Ficha Administrativa Oficial</h2>
                 <p>Estimado/a <strong>{{ $usuario->nombres }} {{ $usuario->ap_paterno }}</strong>,</p>
-                <p>Adjunto a este correo encontrará la <strong>Ficha Institucional / Expediente Digital</strong> oficial correspondiente a su registro en la plataforma RememberMind de Casa Amandita.</p>
+                <p>Adjunto a este correo encontrará la <strong>Ficha Institucional / Expediente Digital</strong> oficial correspondiente a su registro en la plataforma RememberMind de CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS.</p>
                 
                 <div class="info-box">
                     <p><span class="info-label">Código Interno:</span> <span class="info-value">{{ $usuario->cod_usu }}</span></p>
@@ -120,7 +120,7 @@
                 <p>Si detecta algún error en sus datos, por favor contacte de inmediato a la dirección administrativa del centro.</p>
             </div>
             <div class="footer">
-                Casa Amandita • Sistema de Gestión Médica RememberMind © {{ date('Y') }}
+                CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS • Sistema de Gestión Médica RememberMind © {{ date('Y') }}
             </div>
         </div>
     </div>

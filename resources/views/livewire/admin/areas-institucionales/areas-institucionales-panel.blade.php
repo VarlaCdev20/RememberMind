@@ -47,7 +47,7 @@
     <header class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between no-print">
         <div>
             <h1 class="text-3xl font-black tracking-tight text-[#2F3E5C]">Áreas Institucionales</h1>
-            <p class="text-sm font-semibold text-[#967B66]">Estructura y organigrama funcional operativo de Casa Amandita</p>
+            <p class="text-sm font-semibold text-[#967B66]">Estructura y organigrama funcional operativo de CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS</p>
         </div>
 
         <div class="flex items-center gap-3">
@@ -905,7 +905,7 @@
                         <h3 class="text-xl font-black text-[#2F3E5C]">
                             {{ $reporteTipo === 'general' ? 'REPORTES DE ÁREAS INSTITUCIONALES' : 'REPORTE ESPECÍFICO DEL ÁREA' }}
                         </h3>
-                        <p class="text-xs font-semibold text-[#967B66] mt-0.5">Genere y exporte reportes técnicos estructurados de Casa Amandita.</p>
+                        <p class="text-xs font-semibold text-[#967B66] mt-0.5">Genere y exporte reportes técnicos estructurados de CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS.</p>
                     </div>
                     <div class="flex gap-2">
                         @if($reporteTipo === 'general')
@@ -1193,7 +1193,7 @@
                      x-init="$nextTick(() => initReportCharts())">
 
                     {{-- Marca de Agua --}}
-                    <div class="watermark-bg">Casa Amandita</div>
+                    <div class="watermark-bg">CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS</div>
 
                     @if($reporteTipo === 'general')
                         {{-- ── REPORTE GENERAL ── --}}
@@ -1201,7 +1201,7 @@
                             {{-- Membrete --}}
                             <div class="text-center pb-4 border-b border-[#C7B5A3]/50">
                                 <h2 class="text-2xl font-black text-[#2F3E5C] tracking-wide">REPORTE GENERAL DE ÁREAS INSTITUCIONALES</h2>
-                                <p class="text-xs font-black text-[#967B66] uppercase tracking-widest mt-1">Casa Amandita • Sistema RememberMind</p>
+                                <p class="text-xs font-black text-[#967B66] uppercase tracking-widest mt-1">CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS • Sistema RememberMind</p>
                                 <p class="text-[10px] text-[#967B66] mt-2 font-bold">Fecha: {{ $reporteData['fecha'] }} | Generado por: {{ $reporteData['usuario'] }}</p>
                             </div>
 
@@ -1348,7 +1348,7 @@
                             <div class="text-center pb-4 border-b border-[#C7B5A3]/50">
                                 <h2 class="text-2xl font-black text-[#2F3E5C] uppercase tracking-wide">REPORTE DEL ÁREA</h2>
                                 <h3 class="text-lg font-black text-[#E27D60] mt-1">{{ $reporteData['area']['nombre'] }}</h3>
-                                <p class="text-xs font-black text-[#967B66] uppercase tracking-widest mt-0.5">Casa Amandita • Sistema RememberMind</p>
+                                <p class="text-xs font-black text-[#967B66] uppercase tracking-widest mt-0.5">CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS • Sistema RememberMind</p>
                                 <p class="text-[10px] text-[#967B66] mt-2 font-bold">Fecha: {{ $reporteData['fecha'] }} | Generado por: {{ $reporteData['usuario'] }}</p>
                             </div>
 

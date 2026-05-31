@@ -51,6 +51,8 @@ class SaludSeguimientoListPanel extends Component
             $this->seccionActiva = 'signos';
         } elseif (request()->routeIs('*.valoracion.index')) {
             $this->seccionActiva = 'valoracion';
+        } elseif (request()->routeIs('*.evaluaciones-geriatricas.index')) {
+            $this->seccionActiva = 'evaluaciones';
         } elseif (request()->routeIs('*.alertas')) {
             $this->seccionActiva = 'alertas';
         } elseif (request()->routeIs('*.reportes')) {
@@ -115,6 +117,14 @@ class SaludSeguimientoListPanel extends Component
                 'boton' => 'Gestionar valoración funcional',
                 'ruta_destino' => 'admin.salud-seguimiento.valoracion',
                 'icono' => 'ph-person-simple-walk',
+            ];
+        } elseif ($this->seccionActiva === 'evaluaciones') {
+            $context = [
+                'titulo' => 'Evaluaciones geriátricas',
+                'descripcion' => 'Seleccione un adulto mayor para registrar o consultar su evaluación multidimensional geriátrica.',
+                'boton' => 'Gestionar evaluaciones',
+                'ruta_destino' => 'admin.salud-seguimiento.evaluaciones-geriatricas',
+                'icono' => 'ph-list-magnifying-glass',
             ];
         }
 

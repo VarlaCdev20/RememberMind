@@ -1,861 +1,724 @@
-<div class="p-6 bg-crema/50 min-h-screen">
-    <!-- Encabezado Principal -->
-    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
-        <div>
-            <h1 class="text-2xl font-black text-azul-profundo tracking-tight uppercase">
-                Planificación y Asignaciones
-            </h1>
-            <p class="text-sm text-azul-profundo/50 font-medium">
-                Organización de turnos, horarios y cobertura de personal por área operativa en Casa Amandita.
-            </p>
-        </div>
-        
-        <div class="flex flex-wrap gap-2">
-            @can('turnos.crear')
-                <button wire:click="abrirModalTurno" class="inline-flex items-center gap-2 px-4 py-2 bg-azul-profundo text-white rounded-xl hover:bg-azul-profundo/80 transition duration-150 shadow-sm font-semibold text-xs tracking-wider uppercase">
-                    <i class="ph-bold ph-plus-circle text-base"></i>
-                    Nuevo Turno
-                </button>
-            @endcan
+<div class="min-h-[calc(100vh-8rem)] overflow-x-hidden bg-[#F8F3ED]/45 px-4 py-5 text-[#2F3E5C] sm:px-6 lg:px-8">
+    <div class="mx-auto max-w-[1480px] space-y-5">
+        <section class="overflow-hidden rounded-2xl border border-[#C7B5A3]/70 bg-[#E6DDD3]/75 shadow-[0_16px_44px_rgba(47,62,92,0.11)] backdrop-blur-xl">
+            <div class="h-1.5 bg-gradient-to-r from-[#E27D60] via-[#D9A05B] to-[#8DA280]"></div>
+            <div class="flex flex-col gap-4 p-5 xl:flex-row xl:items-end xl:justify-between">
+                <div class="max-w-4xl">
+                    <span class="inline-flex items-center gap-2 rounded-full border border-[#E27D60]/25 bg-[#E27D60]/10 px-3 py-1 text-[10px] font-black uppercase tracking-[0.18em] text-[#E27D60]">
+                        <i class="ph-bold ph-calendar-check text-sm"></i>
+                        Administracion
+                    </span>
+                    <h1 class="mt-2 text-2xl font-black tracking-tight text-[#2F3E5C] sm:text-3xl">Horarios y asignaciones</h1>
+                    <p class="mt-1 max-w-3xl text-sm font-bold leading-relaxed text-[#2F3E5C]/70">
+                        Planificacion administrativa de turnos, horarios, asignaciones y cobertura institucional.
+                    </p>
+                </div>
 
-            @can('turnos.asignar')
-                <button wire:click="abrirModalAsignacion" class="inline-flex items-center gap-2 px-4 py-2 bg-terracota text-white rounded-xl hover:bg-terracota/80 transition duration-150 shadow-sm font-semibold text-xs tracking-wider uppercase">
-                    <i class="ph-bold ph-user-plus text-base"></i>
-                    Asignar Turno
-                </button>
-            @endcan
+                <div class="flex flex-wrap gap-2">
+                    @can('turnos.asignar')
+                        <button type="button" wire:click="abrirModalHorario" class="inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-[#8DA280]/35 bg-[#8DA280]/15 px-4 text-[11px] font-black uppercase tracking-wider text-[#5F7E55] transition hover:-translate-y-0.5 hover:bg-[#8DA280]/22">
+                            <i class="ph-bold ph-clock-afternoon text-sm"></i>
+                            Registrar horario
+                        </button>
+                        <button type="button" wire:click="abrirModalAsignacion" class="inline-flex h-10 items-center justify-center gap-2 rounded-xl bg-[#E27D60] px-4 text-[11px] font-black uppercase tracking-wider text-white shadow-[0_8px_18px_rgba(226,125,96,0.22)] transition hover:-translate-y-0.5 hover:bg-[#D96F58]">
+                            <i class="ph-bold ph-user-plus text-sm"></i>
+                            Registrar asignacion
+                        </button>
+                    @endcan
 
-            @can('turnos.reportes')
-                <button wire:click="$set('mostrarReportes', true)" class="inline-flex items-center gap-2 px-4 py-2 bg-[#E6DDD3] text-azul-profundo rounded-xl hover:bg-[#C7B5A3]/60 transition duration-150 font-semibold text-xs tracking-wider uppercase">
-                    <i class="ph-bold ph-file-text text-base"></i>
-                    Reportes
-                </button>
-            @endcan
-        </div>
-    </div>
-
-    <!-- Métrica de Resumen Ejecutivo -->
-    <div class="grid grid-cols-2 md:grid-cols-6 gap-4 mb-6">
-        <!-- Card 1 -->
-        <div class="bg-white border border-[#C7B5A3]/20 rounded-2xl p-4 shadow-sm flex flex-col justify-between">
-            <span class="text-[10px] font-bold text-azul-profundo/40 uppercase tracking-widest">Total Turnos</span>
-            <div class="flex items-baseline gap-1 mt-2">
-                <span class="text-2xl font-black text-azul-profundo">{{ $totalTurnos }}</span>
-                <span class="text-xs text-azul-profundo/40 font-semibold">tipos</span>
+                    @can('turnos.crear')
+                        <button type="button" wire:click="abrirModalTurno" class="inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-[#2F3E5C]/15 bg-[#F3ECE4]/90 px-4 text-[11px] font-black uppercase tracking-wider text-[#2F3E5C] transition hover:-translate-y-0.5 hover:border-[#2F3E5C]/35">
+                            <i class="ph-bold ph-plus-circle text-sm"></i>
+                            Nuevo turno
+                        </button>
+                    @endcan
+                </div>
             </div>
-        </div>
+        </section>
 
-        <!-- Card 2 -->
-        <div class="bg-white border border-[#C7B5A3]/20 rounded-2xl p-4 shadow-sm flex flex-col justify-between">
-            <span class="text-[10px] font-bold text-azul-profundo/40 uppercase tracking-widest">Colaboradores</span>
-            <div class="flex items-baseline gap-1 mt-2">
-                <span class="text-2xl font-black text-emerald-600">{{ $totalAsignados }}</span>
-                <span class="text-xs text-azul-profundo/40 font-semibold">activos</span>
-            </div>
-        </div>
-
-        <!-- Card 3 -->
-        <div class="bg-white border border-[#C7B5A3]/20 rounded-2xl p-4 shadow-sm flex flex-col justify-between">
-            <span class="text-[10px] font-bold text-azul-profundo/40 uppercase tracking-widest">Áreas Activas</span>
-            <div class="flex items-baseline gap-1 mt-2">
-                <span class="text-2xl font-black text-azul-profundo">{{ $areasCubiertas }}</span>
-                <span class="text-xs text-azul-profundo/40 font-semibold">cubiertas</span>
-            </div>
-        </div>
-
-        <!-- Card 4 -->
-        <div class="bg-white border border-[#C7B5A3]/20 rounded-2xl p-4 shadow-sm flex flex-col justify-between">
-            <span class="text-[10px] font-bold text-azul-profundo/40 uppercase tracking-widest">Sin Cobertura</span>
-            <div class="flex items-baseline gap-1 mt-2">
-                <span class="text-2xl font-black {{ $areasSinCobertura > 0 ? 'text-rose-500' : 'text-azul-profundo/50' }}">{{ $areasSinCobertura }}</span>
-                <span class="text-xs text-azul-profundo/40 font-semibold">áreas</span>
-            </div>
-        </div>
-
-        <!-- Card 5 -->
-        <div class="bg-white border border-[#C7B5A3]/20 rounded-2xl p-4 shadow-sm flex flex-col justify-between">
-            <span class="text-[10px] font-bold text-azul-profundo/40 uppercase tracking-widest">Asignaciones</span>
-            <div class="flex items-baseline gap-1 mt-2">
-                <span class="text-2xl font-black text-azul-profundo">{{ $asignacionesActivas }}</span>
-                <span class="text-xs text-azul-profundo/40 font-semibold">vigentes</span>
-            </div>
-        </div>
-
-        <!-- Card 6 -->
-        <div class="bg-white border border-[#C7B5A3]/20 rounded-2xl p-4 shadow-sm flex flex-col justify-between">
-            <span class="text-[10px] font-bold text-azul-profundo/40 uppercase tracking-widest">Sin Turno</span>
-            <div class="flex items-baseline gap-1 mt-2">
-                <span class="text-2xl font-black {{ $usuariosSinTurno > 0 ? 'text-amber-500 font-black' : 'text-azul-profundo/40' }}">{{ $usuariosSinTurno }}</span>
-                <span class="text-xs text-azul-profundo/40 font-semibold">usuarios</span>
-            </div>
-        </div>
-    </div>
-
-    <!-- Barra de Búsqueda y Filtros -->
-    <div class="bg-white border border-[#C7B5A3]/20 rounded-2xl p-4 shadow-sm mb-6">
-        <div class="grid grid-cols-1 md:grid-cols-7 gap-3">
-            <!-- Buscar Colaborador -->
-            <div class="md:col-span-2 relative">
-                <input wire:model.live.debounce.300ms="search" type="text" placeholder="Buscar colaborador..." class="w-full pl-9 pr-4 py-2 rm-input">
-                <i class="ph ph-magnifying-glass absolute left-3 top-3 text-azul-profundo/40"></i>
-            </div>
-
-            <!-- Filtro Área -->
-            <div>
-                <select wire:model.live="filtroArea" class="w-full py-2 px-3 bg-crema/30 border border-[#C7B5A3]/30 rounded-xl text-sm focus:outline-none focus:border-azul-profundo/50 text-azul-profundo/70 font-medium">
-                    <option value="">Todas las Áreas</option>
-                    @foreach($areasDisponibles as $area)
-                        <option value="{{ $area->cod_area }}">{{ $area->nombre }}</option>
-                    @endforeach
-                </select>
-            </div>
-
-            <!-- Filtro Turno -->
-            <div>
-                <select wire:model.live="filtroTurno" class="w-full py-2 px-3 bg-crema/30 border border-[#C7B5A3]/30 rounded-xl text-sm focus:outline-none focus:border-azul-profundo/50 text-azul-profundo/70 font-medium">
-                    <option value="">Todos los Turnos</option>
-                    @foreach($turnosDisponibles as $t)
-                        <option value="{{ $t->cod_turno }}">{{ $t->nombre }}</option>
-                    @endforeach
-                </select>
-            </div>
-
-            <!-- Filtro Día -->
-            <div>
-                <select wire:model.live="filtroDia" class="w-full py-2 px-3 bg-crema/30 border border-[#C7B5A3]/30 rounded-xl text-sm focus:outline-none focus:border-azul-profundo/50 text-azul-profundo/70 font-medium">
-                    <option value="">Cualquier Día</option>
-                    <option value="LUNES">Lunes</option>
-                    <option value="MARTES">Martes</option>
-                    <option value="MIERCOLES">Miércoles</option>
-                    <option value="JUEVES">Jueves</option>
-                    <option value="VIERNES">Viernes</option>
-                    <option value="SABADO">Sábado</option>
-                    <option value="DOMINGO">Domingo</option>
-                </select>
-            </div>
-
-            <!-- Filtro Tipo -->
-            <div>
-                <select wire:model.live="filtroTipo" class="w-full py-2 px-3 bg-crema/30 border border-[#C7B5A3]/30 rounded-xl text-sm focus:outline-none focus:border-azul-profundo/50 text-azul-profundo/70 font-medium">
-                    <option value="">Tipo de Asignación</option>
-                    <option value="REGULAR">Regular</option>
-                    <option value="APOYO">Apoyo Temporal</option>
-                    <option value="COBERTURA">Cobertura Especial</option>
-                    <option value="VOLUNTARIADO">Voluntariado</option>
-                </select>
-            </div>
-
-            <!-- Limpiar Filtros -->
-            <div class="flex gap-1 justify-end">
-                <button wire:click="limpiarFiltros" class="w-full py-2 bg-[#E6DDD3]/50 hover:bg-[#E6DDD3] text-azul-profundo/70 text-xs font-bold rounded-xl transition uppercase tracking-wider">
-                    Limpiar
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Conmutador de Vistas -->
-    <div class="flex items-center justify-between mb-4">
-        <h2 class="text-sm font-bold text-azul-profundo uppercase tracking-widest">Listado de Asignaciones</h2>
-        <div class="inline-flex bg-[#E6DDD3]/70 p-0.5 rounded-xl">
-            <button wire:click="cambiarVista('calendario')" class="px-3 py-1.5 rounded-lg text-xs font-bold transition {{ $vistaActual === 'calendario' ? 'bg-white text-azul-profundo shadow-sm' : 'text-azul-profundo/50 hover:text-azul-profundo' }} flex items-center gap-1">
-                <i class="ph ph-calendar"></i>
-                Calendario
-            </button>
-            <button wire:click="cambiarVista('cards')" class="px-3 py-1.5 rounded-lg text-xs font-bold transition {{ $vistaActual === 'cards' ? 'bg-white text-azul-profundo shadow-sm' : 'text-azul-profundo/50 hover:text-azul-profundo' }} flex items-center gap-1">
-                <i class="ph ph-squares-four"></i>
-                Por Áreas
-            </button>
-            <button wire:click="cambiarVista('tabla')" class="px-3 py-1.5 rounded-lg text-xs font-bold transition {{ $vistaActual === 'tabla' ? 'bg-white text-azul-profundo shadow-sm' : 'text-azul-profundo/50 hover:text-azul-profundo' }} flex items-center gap-1">
-                <i class="ph ph-list-bullets"></i>
-                Detallada
-            </button>
-        </div>
-    </div>
-
-    <!-- ──────────────────────────────────────────────
-         VISTA 1: CALENDARIO (PLANNER SEMANAL)
-         ────────────────────────────────────────────── -->
-    @if($vistaActual === 'calendario')
-        <div class="bg-white border border-[#C7B5A3]/20 rounded-3xl p-5 shadow-sm mb-6">
-            <h3 class="text-xs font-black text-azul-profundo/40 uppercase tracking-widest mb-4">Planificador Semanal de Cobertura</h3>
-            <div class="grid grid-cols-1 md:grid-cols-7 gap-4">
-                @php
-                    $diasSemana = ['LUNES', 'MARTES', 'MIERCOLES', 'JUEVES', 'VIERNES', 'SABADO', 'DOMINGO'];
-                    $nombresDias = [
-                        'LUNES' => 'Lunes',
-                        'MARTES' => 'Martes',
-                        'MIERCOLES' => 'Miércoles',
-                        'JUEVES' => 'Jueves',
-                        'VIERNES' => 'Viernes',
-                        'SABADO' => 'Sábado',
-                        'DOMINGO' => 'Domingo'
-                    ];
-                @endphp
-
-                @foreach($diasSemana as $dia)
-                    <div class="bg-crema/30 border border-[#C7B5A3]/20 rounded-2xl p-3 min-h-[300px] flex flex-col">
-                        <div class="text-center pb-2 mb-2 border-b border-[#C7B5A3]/30/50">
-                            <span class="text-xs font-black text-azul-profundo uppercase tracking-wider block">{{ $nombresDias[$dia] }}</span>
-                        </div>
-
-                        <div class="space-y-2 flex-grow overflow-y-auto max-h-[400px]">
-                            @php
-                                $asigsDelDia = $asignaciones->filter(function($a) use ($dia) {
-                                    return $a->estado === 'ACTIVA' && is_array($a->dias_semana) && in_array($dia, $a->dias_semana);
-                                });
-                            @endphp
-
-                            @forelse($asigsDelDia as $asig)
-                                <div wire:click="verFichaAsignacion('{{ $asig->cod_asignacion }}')" class="bg-white border border-[#C7B5A3]/20 hover:border-[#C7B5A3]/60 rounded-xl p-2.5 shadow-sm transition duration-150 cursor-pointer relative overflow-hidden group">
-                                    <div class="absolute left-0 top-0 bottom-0 w-1" style="background-color: {{ $asig->turno->color ?? '#3B82F6' }}"></div>
-                                    <h4 class="text-xs font-bold text-azul-profundo line-clamp-1 group-hover:text-terracota transition">{{ $asig->usuario ? $asig->usuario->name : 'N/D' }}</h4>
-                                    <span class="text-[9px] text-azul-profundo/50 font-semibold block mt-0.5 line-clamp-1">{{ $asig->area ? $asig->area->nombre : 'N/D' }}</span>
-                                    <div class="flex items-center justify-between mt-1 pt-1 border-t border-[#C7B5A3]/10">
-                                        <span class="text-[8px] font-black uppercase tracking-wider text-azul-profundo/40">{{ $asig->turno ? $asig->turno->nombre : 'N/D' }}</span>
-                                        @if($asig->tipo_asignacion === 'APOYO')
-                                            <span class="px-1 py-0.5 bg-rose-50 text-rose-600 rounded text-[7px] font-bold">APOYO</span>
-                                        @endif
-                                    </div>
-                                </div>
-                            @empty
-                                <div class="text-center py-8 text-azul-profundo/30 flex flex-col items-center justify-center h-full">
-                                    <i class="ph ph-calendar-x text-xl mb-1"></i>
-                                    <span class="text-[9px] font-semibold">Sin personal</span>
-                                </div>
-                            @endforelse
-                        </div>
-                    </div>
+        <nav class="overflow-x-auto rounded-2xl border border-[#C7B5A3]/70 bg-[#F3ECE4]/80 p-2 shadow-sm">
+            <div class="flex min-w-max gap-1">
+                @foreach([
+                    'resumen' => ['Resumen', 'ph-chart-pie-slice'],
+                    'horarios' => ['Horarios', 'ph-clock'],
+                    'turnos' => ['Turnos', 'ph-clock-countdown'],
+                    'asignaciones' => ['Asignaciones', 'ph-users-three'],
+                    'calendario' => ['Calendario', 'ph-calendar-dots'],
+                    'alertas' => ['Alertas', 'ph-warning-diamond'],
+                    'reportes' => ['Reportes', 'ph-file-text'],
+                ] as $tab => [$label, $icon])
+                    <button
+                        type="button"
+                        wire:click="cambiarTab('{{ $tab }}')"
+                        class="inline-flex h-10 items-center gap-2 rounded-xl px-3 text-xs font-black transition {{ $tabActiva === $tab ? 'bg-[#2F3E5C] text-white shadow-sm' : 'text-[#2F3E5C]/62 hover:bg-white/45 hover:text-[#2F3E5C]' }}"
+                    >
+                        <i class="ph-bold {{ $icon }}"></i>
+                        {{ $label }}
+                    </button>
                 @endforeach
             </div>
-        </div>
-    @endif
+        </nav>
 
-    <!-- ──────────────────────────────────────────────
-         VISTA 2: CARDS (POR ÁREAS INSTITUCIONALES)
-         ────────────────────────────────────────────── -->
-    @if($vistaActual === 'cards')
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-            @foreach($areasDisponibles as $area)
-                @php
-                    $asigsArea = $asignaciones->filter(fn($a) => $a->cod_area === $area->cod_area && $a->estado === 'ACTIVA');
-                @endphp
-                <div class="bg-white border border-[#C7B5A3]/20 rounded-3xl p-5 shadow-sm flex flex-col justify-between relative overflow-hidden">
-                    <div>
-                        <div class="flex items-start justify-between mb-3">
-                            <div>
-                                <span class="px-2 py-0.5 bg-[#E6DDD3]/60 text-azul-profundo/70 rounded text-[9px] font-bold uppercase tracking-wider">{{ $area->tipo_area }}</span>
-                                <h3 class="text-base font-bold text-azul-profundo mt-1">{{ $area->nombre }}</h3>
+        <section class="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+            @foreach([
+                ['icon' => 'ph-identification-card', 'label' => 'Personal activo', 'value' => $metricas['personal_activo'], 'note' => 'Usuarios institucionales activos', 'class' => 'bg-[#2F3E5C]/8 text-[#2F3E5C] border-[#2F3E5C]/15'],
+                ['icon' => 'ph-clock', 'label' => 'Horarios registrados', 'value' => $metricas['horarios_registrados'], 'note' => $metricas['horarios_activos'] . ' activos', 'class' => 'bg-sky-100/75 text-sky-700 border-sky-200'],
+                ['icon' => 'ph-timer', 'label' => 'Turnos activos', 'value' => $metricas['turnos_activos'], 'note' => 'Bloques institucionales', 'class' => 'bg-indigo-100/75 text-indigo-700 border-indigo-200'],
+                ['icon' => 'ph-calendar-check', 'label' => 'Asignaciones de hoy', 'value' => $metricas['asignaciones_hoy'], 'note' => 'Cobertura del dia', 'class' => 'bg-[#8DA280]/15 text-[#5F7E55] border-[#8DA280]/30'],
+                ['icon' => 'ph-calendar-x', 'label' => 'Turnos sin cubrir', 'value' => $metricas['turnos_sin_cubrir'], 'note' => 'Areas sin asignacion activa', 'class' => 'bg-amber-100/75 text-amber-700 border-amber-200'],
+                ['icon' => 'ph-warning-diamond', 'label' => 'Conflictos detectados', 'value' => $metricas['conflictos_detectados'], 'note' => 'Alertas operativas', 'class' => 'bg-rose-100/75 text-rose-700 border-rose-200'],
+                ['icon' => 'ph-gauge', 'label' => 'Personal con sobrecarga', 'value' => $metricas['personal_sobrecarga'], 'note' => '4 o mas asignaciones activas', 'class' => 'bg-violet-100/75 text-violet-700 border-violet-200'],
+                ['icon' => 'ph-arrow-fat-lines-right', 'label' => 'Proximas asignaciones', 'value' => $metricas['proximas_asignaciones'], 'note' => 'Vigentes o por iniciar', 'class' => 'bg-[#E27D60]/12 text-[#C75F46] border-[#E27D60]/25'],
+            ] as $card)
+                <article class="rounded-2xl border {{ $card['class'] }} p-3 shadow-sm">
+                    <div class="flex items-center gap-3">
+                        <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/55">
+                            <i class="ph-bold {{ $card['icon'] }} text-lg"></i>
+                        </span>
+                        <div class="min-w-0">
+                            <p class="text-xl font-black leading-none">{{ $card['value'] }}</p>
+                            <p class="mt-1 truncate text-[11px] font-black text-[#2F3E5C]">{{ $card['label'] }}</p>
+                        </div>
+                    </div>
+                    <p class="mt-2 truncate text-[11px] font-bold text-[#2F3E5C]/55">{{ $card['note'] }}</p>
+                </article>
+            @endforeach
+        </section>
+
+        @if($tabActiva === 'resumen')
+            <section class="grid gap-4 xl:grid-cols-[1.05fr_0.95fr]">
+                <div class="rounded-2xl border border-[#C7B5A3]/70 bg-[#F3ECE4]/80 p-4 shadow-sm">
+                    <div class="mb-3 flex items-center justify-between gap-3">
+                        <div>
+                            <h2 class="text-base font-black text-[#2F3E5C]">Resumen operativo</h2>
+                            <p class="mt-1 text-xs font-bold text-[#2F3E5C]/58">Lectura rapida de cobertura, turnos y carga semanal.</p>
+                        </div>
+                        <button type="button" wire:click="cambiarTab('calendario')" class="rounded-xl bg-[#2F3E5C] px-3 py-2 text-[11px] font-black uppercase text-white">Ver calendario</button>
+                    </div>
+
+                    <div class="grid gap-3 lg:grid-cols-2">
+                        <div class="rounded-2xl border border-[#C7B5A3]/55 bg-white/35 p-3">
+                            <h3 class="text-xs font-black uppercase tracking-wider text-[#2F3E5C]/55">Asignaciones de hoy</h3>
+                            <div class="mt-3 space-y-2">
+                                @forelse($asignacionesHoyLista as $asig)
+                                    <button type="button" wire:click="verFichaAsignacion('{{ $asig->cod_asignacion }}')" class="w-full rounded-xl border border-[#C7B5A3]/45 bg-[#F8F3ED]/70 p-3 text-left transition hover:border-[#E27D60]/45">
+                                        <span class="block truncate text-sm font-black text-[#2F3E5C]">{{ $asig->usuario?->name ?? 'Sin usuario' }}</span>
+                                        <span class="block truncate text-xs font-bold text-[#2F3E5C]/58">{{ $asig->area?->nombre ?? 'Sin area' }} · {{ $asig->turno?->nombre ?? 'Sin turno' }}</span>
+                                    </button>
+                                @empty
+                                    <p class="rounded-xl border border-dashed border-[#C7B5A3]/70 p-4 text-center text-xs font-bold text-[#2F3E5C]/55">No existen asignaciones programadas para hoy.</p>
+                                @endforelse
                             </div>
-                            <span class="h-8 w-8 rounded-xl bg-[#E6DDD3]/60 flex items-center justify-center text-azul-profundo/50">
-                                <i class="ph-bold {{ $area->icono ?: 'ph-buildings' }} text-lg"></i>
-                            </span>
                         </div>
 
-                        <div class="flex items-center gap-2 mb-4 text-xs text-azul-profundo/50">
-                            <i class="ph ph-crown"></i>
-                            <span>Responsable: <strong>{{ $area->responsable ? $area->responsable->name : 'Sin Responsable' }}</strong></span>
+                        <div class="rounded-2xl border border-[#C7B5A3]/55 bg-white/35 p-3">
+                            <h3 class="text-xs font-black uppercase tracking-wider text-[#2F3E5C]/55">Proximos turnos</h3>
+                            <div class="mt-3 space-y-2">
+                                @forelse($proximasAsignaciones as $asig)
+                                    <button type="button" wire:click="verFichaAsignacion('{{ $asig->cod_asignacion }}')" class="w-full rounded-xl bg-[#F8F3ED]/70 p-3 text-left transition hover:bg-white/60">
+                                        <span class="flex items-center justify-between gap-2">
+                                            <span class="truncate text-sm font-black text-[#2F3E5C]">{{ $asig->usuario?->name ?? 'Sin usuario' }}</span>
+                                            <span class="shrink-0 rounded-full bg-[#E6DDD3] px-2 py-0.5 text-[9px] font-black text-[#2F3E5C]/60">{{ $asig->fecha_inicio?->format('d/m') ?? 'S/F' }}</span>
+                                        </span>
+                                        <span class="mt-1 block truncate text-xs font-bold text-[#2F3E5C]/58">{{ $asig->turno?->nombre ?? 'Sin turno' }} · {{ implode(', ', $asig->dias_semana ?: []) }}</span>
+                                    </button>
+                                @empty
+                                    <p class="rounded-xl border border-dashed border-[#C7B5A3]/70 p-4 text-center text-xs font-bold text-[#2F3E5C]/55">No hay proximas asignaciones registradas.</p>
+                                @endforelse
+                            </div>
                         </div>
+                    </div>
 
-                        <div class="space-y-2 mb-6">
-                            <h4 class="text-[10px] font-black text-azul-profundo/40 uppercase tracking-widest">Colaboradores en Cobertura ({{ $asigsArea->count() }})</h4>
-                            @forelse($asigsArea as $asig)
-                                <div wire:click="verFichaAsignacion('{{ $asig->cod_asignacion }}')" class="flex items-center justify-between p-2 bg-crema/30 hover:bg-[#E6DDD3]/50 border border-[#C7B5A3]/20 hover:border-[#C7B5A3]/30 rounded-xl transition duration-150 cursor-pointer">
-                                    <div>
-                                        <h5 class="text-xs font-bold text-azul-profundo">{{ $asig->usuario ? $asig->usuario->name : 'N/D' }}</h5>
-                                        <p class="text-[9px] text-azul-profundo/50 font-semibold">{{ $asig->turno ? $asig->turno->nombre : 'N/D' }}</p>
-                                    </div>
-                                    <div class="flex items-center gap-1.5">
-                                        @if($asig->tipo_asignacion === 'APOYO')
-                                            <span class="px-1.5 py-0.5 bg-rose-50 text-rose-600 border border-rose-100 rounded text-[8px] font-black uppercase">Apoyo</span>
-                                        @endif
-                                        <span class="w-2 h-2 rounded-full" style="background-color: {{ $asig->turno->color ?? '#3B82F6' }}"></span>
+                    <div class="mt-4 rounded-2xl border border-[#C7B5A3]/55 bg-white/35 p-3">
+                        <h3 class="text-xs font-black uppercase tracking-wider text-[#2F3E5C]/55">Resumen semanal</h3>
+                        <div class="mt-3 grid gap-2 md:grid-cols-7">
+                            @foreach($resumenSemanal as $dia => $info)
+                                <div class="rounded-xl bg-[#F8F3ED]/70 p-3 text-center">
+                                    <p class="text-[10px] font-black uppercase text-[#2F3E5C]/50">{{ substr($info['label'], 0, 3) }}</p>
+                                    <p class="mt-1 text-lg font-black text-[#2F3E5C]">{{ $info['asignaciones'] }}</p>
+                                    <p class="text-[10px] font-bold text-[#2F3E5C]/50">{{ $info['horarios'] }} horarios</p>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
+
+                <div class="space-y-4">
+                    <section class="rounded-2xl border border-[#C7B5A3]/70 bg-[#F3ECE4]/80 p-4 shadow-sm">
+                        <h2 class="text-base font-black text-[#2F3E5C]">Alertas operativas</h2>
+                        <div class="mt-3 space-y-2">
+                            @forelse($alertas->take(6) as $alerta)
+                                <div class="rounded-xl border {{ $alerta['prioridad'] === 'Alta' ? 'border-rose-200 bg-rose-50/70' : 'border-amber-200 bg-amber-50/70' }} p-3">
+                                    <div class="flex items-start justify-between gap-3">
+                                        <div class="min-w-0">
+                                            <p class="truncate text-xs font-black text-[#2F3E5C]">{{ $alerta['tipo'] }} · {{ $alerta['persona'] }}</p>
+                                            <p class="mt-1 text-[11px] font-bold text-[#2F3E5C]/60">{{ $alerta['descripcion'] }}</p>
+                                        </div>
+                                        <span class="shrink-0 rounded-full bg-white/65 px-2 py-0.5 text-[9px] font-black text-[#2F3E5C]/60">{{ $alerta['prioridad'] }}</span>
                                     </div>
                                 </div>
                             @empty
-                                <div class="text-center py-6 bg-crema/30 rounded-2xl border border-dashed border-[#C7B5A3]/30 text-azul-profundo/40">
-                                    <i class="ph ph-warning-circle text-lg mb-1"></i>
-                                    <p class="text-[10px] font-bold">Sin cobertura activa</p>
-                                </div>
+                                <p class="rounded-xl border border-dashed border-[#C7B5A3]/70 p-4 text-center text-xs font-bold text-[#2F3E5C]/55">No hay alertas operativas pendientes.</p>
                             @endforelse
                         </div>
-                    </div>
+                    </section>
 
-                    <div class="pt-3 border-t border-[#C7B5A3]/20 flex items-center justify-between">
-                        <button wire:click="exportarReporteAreaPdf('{{ $area->cod_area }}')" class="inline-flex items-center gap-1 text-[10px] font-bold text-azul-profundo/50 hover:text-azul-profundo transition">
-                            <i class="ph ph-file-pdf"></i>
-                            Exportar PDF
-                        </button>
-                        <button wire:click="exportarReporteAreaExcel('{{ $area->cod_area }}')" class="inline-flex items-center gap-1 text-[10px] font-bold text-azul-profundo/50 hover:text-azul-profundo transition">
-                            <i class="ph ph-file-xls"></i>
-                            Exportar Excel
-                        </button>
-                    </div>
-                </div>
-            @endforeach
-        </div>
-    @endif
-
-    <!-- ──────────────────────────────────────────────
-         VISTA 3: TABLA DE DETALLES GENERALES
-         ────────────────────────────────────────────── -->
-    @if($vistaActual === 'tabla')
-        <div class="bg-white border border-[#C7B5A3]/20 rounded-3xl shadow-sm overflow-hidden mb-6">
-            <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse">
-                    <thead>
-                        <tr class="bg-crema/30 border-b border-[#C7B5A3]/20">
-                            <th class="p-4 text-xs font-bold text-azul-profundo/50 uppercase tracking-wider">Colaborador</th>
-                            <th class="p-4 text-xs font-bold text-azul-profundo/50 uppercase tracking-wider">Área Operativa</th>
-                            <th class="p-4 text-xs font-bold text-azul-profundo/50 uppercase tracking-wider">Turno / Horario</th>
-                            <th class="p-4 text-xs font-bold text-azul-profundo/50 uppercase tracking-wider">Días Semanales</th>
-                            <th class="p-4 text-xs font-bold text-azul-profundo/50 uppercase tracking-wider">Periodo</th>
-                            <th class="p-4 text-xs font-bold text-azul-profundo/50 uppercase tracking-wider">Estado</th>
-                            <th class="p-4 text-xs font-bold text-azul-profundo/50 uppercase tracking-wider text-right">Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-[#C7B5A3]/10">
-                        @forelse($asignaciones as $asig)
-                            <tr class="hover:bg-crema/30 transition">
-                                <td class="p-4">
-                                    <div class="flex items-center gap-3">
-                                        <div class="h-8 w-8 rounded-full bg-[#E6DDD3]/60 flex items-center justify-center text-azul-profundo/70 font-bold text-xs uppercase shadow-sm">
-                                            {{ substr($asig->usuario ? $asig->usuario->nombres : 'N', 0, 2) }}
-                                        </div>
-                                        <div>
-                                            <h4 class="text-xs font-bold text-azul-profundo">{{ $asig->usuario ? $asig->usuario->name : 'N/D' }}</h4>
-                                            <p class="text-[9px] text-azul-profundo/40 font-semibold">ID: {{ $asig->cod_usu }}</p>
-                                        </div>
+                    <section class="rounded-2xl border border-[#C7B5A3]/70 bg-[#F3ECE4]/80 p-4 shadow-sm">
+                        <h2 class="text-base font-black text-[#2F3E5C]">Carga por areas y turnos</h2>
+                        <div class="mt-3 grid gap-4 md:grid-cols-2">
+                            <div class="space-y-2">
+                                @forelse($distribucionAreas as $area => $count)
+                                    <div>
+                                        <div class="mb-1 flex justify-between text-[11px] font-bold text-[#2F3E5C]/65"><span class="truncate">{{ $area }}</span><span>{{ $count }}</span></div>
+                                        <div class="h-2 overflow-hidden rounded-full bg-[#E6DDD3]"><div class="h-full rounded-full bg-[#2F3E5C]" style="width: {{ min(($count / max($metricas['personal_activo'], 1)) * 100, 100) }}%"></div></div>
                                     </div>
-                                </td>
-                                <td class="p-4">
-                                    <span class="text-xs font-bold text-azul-profundo">{{ $asig->area ? $asig->area->nombre : 'N/D' }}</span>
-                                    <span class="block text-[9px] text-azul-profundo/40 font-semibold">{{ $asig->area ? $asig->area->tipo_area : '' }}</span>
-                                </td>
-                                <td class="p-4">
-                                    <div class="flex items-center gap-2">
-                                        <span class="w-2.5 h-2.5 rounded-full" style="background-color: {{ $asig->turno->color ?? '#3B82F6' }}"></span>
-                                        <span class="text-xs font-bold text-azul-profundo">{{ $asig->turno ? $asig->turno->nombre : 'N/D' }}</span>
-                                    </div>
-                                    @if($asig->turno && $asig->turno->hora_inicio)
-                                        <span class="block text-[9px] text-azul-profundo/40 font-semibold ml-4">
-                                            {{ substr($asig->turno->hora_inicio, 0, 5) }} - {{ substr($asig->turno->hora_fin, 0, 5) }}
-                                        </span>
-                                    @endif
-                                </td>
-                                <td class="p-4">
-                                    <div class="flex flex-wrap gap-1">
-                                        @foreach($asig->dias_semana as $dia)
-                                            <span class="px-1 py-0.5 bg-[#E6DDD3]/60 text-azul-profundo/70 rounded text-[8px] font-bold">{{ substr($dia, 0, 3) }}</span>
-                                        @endforeach
-                                    </div>
-                                </td>
-                                <td class="p-4">
-                                    <span class="text-xs font-bold text-azul-profundo">{{ $asig->fecha_inicio ? \Carbon\Carbon::parse($asig->fecha_inicio)->format('d/m/Y') : '' }}</span>
-                                    <span class="block text-[9px] text-azul-profundo/40 font-semibold">al {{ $asig->fecha_fin ? \Carbon\Carbon::parse($asig->fecha_fin)->format('d/m/Y') : 'Presente' }}</span>
-                                </td>
-                                <td class="p-4">
-                                    <span class="px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider {{ $asig->estado === 'ACTIVA' ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : ($asig->estado === 'FINALIZADA' ? 'bg-[#E6DDD3]/60 text-azul-profundo/50' : 'bg-rose-50 text-rose-600 border border-rose-100') }}">
-                                        {{ $asig->estado }}
-                                    </span>
-                                </td>
-                                <td class="p-4 text-right">
-                                    <div class="flex justify-end gap-1.5">
-                                        <button wire:click="verFichaAsignacion('{{ $asig->cod_asignacion }}')" class="p-1.5 text-azul-profundo/50 hover:text-azul-profundo hover:bg-[#E6DDD3]/60 rounded-lg transition" title="Ver Detalle">
-                                            <i class="ph-bold ph-eye text-base"></i>
-                                        </button>
-                                        
-                                        @can('turnos.asignar')
-                                            @if($asig->estado === 'ACTIVA')
-                                                <button wire:click="cargarAsignacion('{{ $asig->cod_asignacion }}')" class="p-1.5 text-azul-profundo/50 hover:text-azul-profundo hover:bg-[#E6DDD3]/60 rounded-lg transition" title="Editar">
-                                                    <i class="ph-bold ph-pencil-simple text-base"></i>
-                                                </button>
-                                            @endif
-                                        @endcan
-
-                                        @can('turnos.finalizar')
-                                            @if($asig->estado === 'ACTIVA')
-                                                <button wire:confirm="¿Está seguro de finalizar esta asignación con fecha de hoy?" wire:click="finalizarAsignacion('{{ $asig->cod_asignacion }}')" class="p-1.5 text-rose-500 hover:text-rose-700 hover:bg-rose-50 rounded-lg transition" title="Finalizar Asignación">
-                                                    <i class="ph-bold ph-x-circle text-base"></i>
-                                                </button>
-                                            @endif
-                                        @endcan
-                                    </div>
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="7" class="p-8 text-center text-azul-profundo/40">
-                                    <i class="ph ph-warning text-3xl mb-1"></i>
-                                    <p class="text-sm font-bold">No se encontraron asignaciones que coincidan con los filtros.</p>
-                                </td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    @endif
-
-    <!-- Gráficos Estadísticos -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-        <div class="bg-white border border-[#C7B5A3]/20 rounded-3xl p-5 shadow-sm">
-            <h3 class="text-xs font-black text-azul-profundo/40 uppercase tracking-widest mb-4">Distribución del Personal por Áreas</h3>
-            <div class="h-64 flex items-center justify-center">
-                @if(count($distribucionAreas) > 0)
-                    <div class="w-full flex flex-col gap-2">
-                        @foreach($distribucionAreas as $area => $count)
-                            <div>
-                                <div class="flex justify-between text-xs font-semibold text-azul-profundo/70 mb-1">
-                                    <span>{{ $area }}</span>
-                                    <span>{{ $count }} asignados</span>
-                                </div>
-                                <div class="w-full bg-[#E6DDD3]/60 h-2.5 rounded-full overflow-hidden">
-                                    <div class="bg-azul-profundo h-full rounded-full" style="width: {{ ($count / max($totalAsignados, 1)) * 100 }}%"></div>
-                                </div>
+                                @empty
+                                    <p class="text-xs font-bold text-[#2F3E5C]/50">Sin asignaciones por area.</p>
+                                @endforelse
                             </div>
-                        @endforeach
-                    </div>
-                @else
-                    <span class="text-azul-profundo/40 text-xs">Sin datos estadísticos suficientes.</span>
-                @endif
-            </div>
-        </div>
-
-        <div class="bg-white border border-[#C7B5A3]/20 rounded-3xl p-5 shadow-sm">
-            <h3 class="text-xs font-black text-azul-profundo/40 uppercase tracking-widest mb-4">Carga de Trabajo por Turnos</h3>
-            <div class="h-64 flex items-center justify-center">
-                @if(count($distribucionTurnos) > 0)
-                    <div class="w-full flex flex-col gap-2">
-                        @foreach($distribucionTurnos as $turno => $count)
-                            <div>
-                                <div class="flex justify-between text-xs font-semibold text-azul-profundo/70 mb-1">
-                                    <span>{{ $turno }}</span>
-                                    <span>{{ $count }} colaboradores</span>
-                                </div>
-                                <div class="w-full bg-[#E6DDD3]/60 h-2.5 rounded-full overflow-hidden">
-                                    <div class="bg-terracota h-full rounded-full" style="width: {{ ($count / max($totalAsignados, 1)) * 100 }}%"></div>
-                                </div>
-                            </div>
-                        @endforeach
-                    </div>
-                @else
-                    <span class="text-azul-profundo/40 text-xs">Sin datos estadísticos suficientes.</span>
-                @endif
-            </div>
-        </div>
-    </div>
-
-    <!-- ──────────────────────────────────────────────
-         MODAL 1: FORMULARIO TURNO (CREACIÓN/EDICIÓN)
-         ────────────────────────────────────────────── -->
-    @if($mostrarFormularioTurno)
-        <div class="fixed inset-0 bg-azul-profundo/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-            <div class="bg-white rounded-3xl shadow-xl w-full max-w-lg overflow-hidden border border-[#C7B5A3]/20 animate-in fade-in zoom-in-95 duration-150">
-                <!-- Header -->
-                <div class="bg-crema px-6 py-4 border-b border-[#C7B5A3]/30 flex items-center justify-between">
-                    <div>
-                        <h3 class="text-sm font-black text-azul-profundo uppercase tracking-wider">
-                            {{ $isEdit ? 'Editar Turno Institucional' : 'Nuevo Turno Institucional' }}
-                        </h3>
-                        <p class="text-[10px] text-azul-profundo/40 font-semibold mt-0.5">Gestione las especificaciones horarias base del centro.</p>
-                    </div>
-                    <button wire:click="$set('mostrarFormularioTurno', false)" class="h-7 w-7 rounded-full bg-[#E6DDD3]/50 hover:bg-[#E6DDD3] flex items-center justify-center text-azul-profundo/50 transition">
-                        <i class="ph ph-x"></i>
-                    </button>
-                </div>
-
-                <!-- Form -->
-                <form wire:submit.prevent="guardarTurno" class="p-6 space-y-4">
-                    <!-- Nombre del Turno -->
-                    <div>
-                        <label class="block text-xs font-black text-azul-profundo/50 uppercase tracking-wider mb-1">Nombre del Turno *</label>
-                        <input wire:model="turno_nombre" type="text" placeholder="Ej. Turno Mañana" class="w-full px-3 py-2 bg-crema/30 border {{ $errors->has('turno_nombre') ? 'border-rose-400' : 'border-[#C7B5A3]/30' }} rounded-xl text-sm focus:outline-none focus:border-azul-profundo/50 text-azul-profundo font-medium">
-                        @error('turno_nombre') <span class="text-[10px] text-rose-500 font-bold mt-1 block">{{ $message }}</span> @enderror
-                    </div>
-
-                    <!-- Horas -->
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-xs font-black text-azul-profundo/50 uppercase tracking-wider mb-1">Hora Inicio</label>
-                            <input wire:model="turno_hora_inicio" type="time" class="w-full px-3 py-2 rm-input">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-black text-azul-profundo/50 uppercase tracking-wider mb-1">Hora Fin</label>
-                            <input wire:model="turno_hora_fin" type="time" class="w-full px-3 py-2 rm-input">
-                        </div>
-                    </div>
-
-                    <!-- Descripción -->
-                    <div>
-                        <label class="block text-xs font-black text-azul-profundo/50 uppercase tracking-wider mb-1">Descripción</label>
-                        <textarea wire:model="turno_descripcion" rows="2" placeholder="Describa el alcance u objetivo de este turno..." class="w-full px-3 py-2 rm-input"></textarea>
-                    </div>
-
-                    <!-- Color & Estado -->
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-xs font-black text-azul-profundo/50 uppercase tracking-wider mb-1">Color de Marcador</label>
-                            <input wire:model="turno_color" type="color" class="w-full h-10 p-1 bg-crema/30 border border-[#C7B5A3]/30 rounded-xl cursor-pointer">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-black text-azul-profundo/50 uppercase tracking-wider mb-1">Estado</label>
-                            <select wire:model="turno_estado" class="w-full px-3 py-2 rm-input">
-                                <option value="ACTIVO">ACTIVO</option>
-                                <option value="INACTIVO">INACTIVO</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <!-- Observaciones -->
-                    <div>
-                        <label class="block text-xs font-black text-azul-profundo/50 uppercase tracking-wider mb-1">Observaciones</label>
-                        <textarea wire:model="turno_observaciones" rows="2" placeholder="Cualquier anotación administrativa adicional..." class="w-full px-3 py-2 rm-input"></textarea>
-                    </div>
-
-                    <!-- Footer Buttons -->
-                    <div class="pt-4 border-t border-[#C7B5A3]/20 flex justify-end gap-2">
-                        <button type="button" wire:click="$set('mostrarFormularioTurno', false)" class="px-4 py-2 bg-[#E6DDD3]/50 hover:bg-[#E6DDD3] text-azul-profundo font-bold text-xs rounded-xl tracking-wider uppercase transition">
-                            Cancelar
-                        </button>
-                        <button type="submit" class="px-4 py-2 bg-azul-profundo hover:bg-azul-profundo/80 text-white font-bold text-xs rounded-xl tracking-wider uppercase transition">
-                            {{ $isEdit ? 'Actualizar' : 'Registrar' }}
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    @endif
-
-    <!-- ──────────────────────────────────────────────
-         MODAL 2: FORMULARIO ASIGNACIÓN (CREACIÓN/EDICIÓN)
-         ────────────────────────────────────────────── -->
-    @if($mostrarFormularioAsignacion)
-        <div class="fixed inset-0 bg-azul-profundo/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-            <div class="bg-white rounded-3xl shadow-xl w-full max-w-lg overflow-hidden border border-[#C7B5A3]/20 animate-in fade-in zoom-in-95 duration-150">
-                <!-- Header -->
-                <div class="bg-crema px-6 py-4 border-b border-[#C7B5A3]/30 flex items-center justify-between">
-                    <div>
-                        <h3 class="text-sm font-black text-azul-profundo uppercase tracking-wider">
-                            {{ $isEdit ? 'Editar Asignación de Turno' : 'Asignar Turno a Colaborador' }}
-                        </h3>
-                        <p class="text-[10px] text-azul-profundo/40 font-semibold mt-0.5">Establezca los horarios de cobertura para el personal.</p>
-                    </div>
-                    <button wire:click="$set('mostrarFormularioAsignacion', false)" class="h-7 w-7 rounded-full bg-[#E6DDD3]/50 hover:bg-[#E6DDD3] flex items-center justify-center text-azul-profundo/50 transition">
-                        <i class="ph ph-x"></i>
-                    </button>
-                </div>
-
-                <!-- Form -->
-                <form wire:submit.prevent="guardarAsignacion" class="p-6 space-y-4">
-                    <!-- Colaborador -->
-                    <div>
-                        <label class="block text-xs font-black text-azul-profundo/50 uppercase tracking-wider mb-1">Colaborador / Personal *</label>
-                        <select wire:model="asig_cod_usu" class="w-full px-3 py-2 bg-crema/30 border {{ $errors->has('asig_cod_usu') ? 'border-rose-400' : 'border-[#C7B5A3]/30' }} rounded-xl text-sm focus:outline-none focus:border-azul-profundo/50 text-azul-profundo font-medium">
-                            <option value="">Seleccione un colaborador...</option>
-                            @foreach($usuariosDisponibles as $usu)
-                                <option value="{{ $usu->cod_usu }}">{{ $usu->name }} (Area: {{ $usu->areaInstitucional ? $usu->areaInstitucional->nombre : 'Ninguna' }})</option>
-                            @endforeach
-                        </select>
-                        @error('asig_cod_usu') <span class="text-[10px] text-rose-500 font-bold mt-1 block">{{ $message }}</span> @enderror
-                    </div>
-
-                    <!-- Área Operativa -->
-                    <div>
-                        <label class="block text-xs font-black text-azul-profundo/50 uppercase tracking-wider mb-1">Área de Cobertura / Destino *</label>
-                        <select wire:model="asig_cod_area" class="w-full px-3 py-2 bg-crema/30 border {{ $errors->has('asig_cod_area') ? 'border-rose-400' : 'border-[#C7B5A3]/30' }} rounded-xl text-sm focus:outline-none focus:border-azul-profundo/50 text-azul-profundo font-medium">
-                            <option value="">Seleccione área operativa de destino...</option>
-                            @foreach($areasDisponibles as $area)
-                                <option value="{{ $area->cod_area }}">{{ $area->nombre }}</option>
-                            @endforeach
-                        </select>
-                        @error('asig_cod_area') <span class="text-[10px] text-rose-500 font-bold mt-1 block">{{ $message }}</span> @enderror
-                    </div>
-
-                    <!-- REGLA DE NEGOCIO: SweetAlert Advertencia Apoyo Temporal Checkbox -->
-                    @if($asig_cod_usu && $asig_cod_area)
-                        @php
-                            $usuSel = $usuariosDisponibles->firstWhere('cod_usu', $asig_cod_usu);
-                            $cruzarArea = $usuSel && ($usuSel->cod_area !== $asig_cod_area);
-                        @endphp
-                        
-                        @if($cruzarArea)
-                            <div class="p-3.5 bg-amber-50 border border-amber-100 rounded-2xl flex items-start gap-2.5">
-                                <i class="ph-bold ph-warning text-amber-600 text-lg mt-0.5"></i>
-                                <div>
-                                    <p class="text-[10px] font-bold text-amber-800 uppercase tracking-wider">Cruce de Área Detectado</p>
-                                    <p class="text-[9px] text-amber-700 font-medium mt-0.5">
-                                        El usuario pertenece al área: <strong>{{ $usuSel->areaInstitucional ? $usuSel->areaInstitucional->nombre : 'Ninguna' }}</strong>. Para asignarlo a <strong>{{ $areasDisponibles->firstWhere('cod_area', $asig_cod_area)->nombre ?? '' }}</strong> debe marcarlo como Apoyo Temporal.
-                                    </p>
-                                    <label class="inline-flex items-center gap-2 mt-2 cursor-pointer">
-                                        <input type="checkbox" wire:model="asig_apoyo_temporal" class="rounded border-amber-300 text-amber-600 focus:ring-amber-500">
-                                        <span class="text-[10px] font-bold text-amber-800 uppercase tracking-wider">Permitir Apoyo Temporal</span>
-                                    </label>
-                                </div>
-                            </div>
-                        @endif
-                    @endif
-
-                    <!-- Turno -->
-                    <div>
-                        <label class="block text-xs font-black text-azul-profundo/50 uppercase tracking-wider mb-1">Turno Asignado *</label>
-                        <select wire:model="asig_cod_turno" class="w-full px-3 py-2 bg-crema/30 border {{ $errors->has('asig_cod_turno') ? 'border-rose-400' : 'border-[#C7B5A3]/30' }} rounded-xl text-sm focus:outline-none focus:border-azul-profundo/50 text-azul-profundo font-medium">
-                            <option value="">Seleccione el turno...</option>
-                            @foreach($turnosDisponibles as $t)
-                                <option value="{{ $t->cod_turno }}">{{ $t->nombre }} @if($t->hora_inicio) ({{ substr($t->hora_inicio,0,5) }} - {{ substr($t->hora_fin,0,5) }}) @endif</option>
-                            @endforeach
-                        </select>
-                        @error('asig_cod_turno') <span class="text-[10px] text-rose-500 font-bold mt-1 block">{{ $message }}</span> @enderror
-                    </div>
-
-                    <!-- Días de la Semana -->
-                    <div>
-                        <label class="block text-xs font-black text-azul-profundo/50 uppercase tracking-wider mb-1">Días de Trabajo Semanal *</label>
-                        <div class="grid grid-cols-4 gap-2 pt-1">
-                            @foreach(['LUNES', 'MARTES', 'MIERCOLES', 'JUEVES', 'VIERNES', 'SABADO', 'DOMINGO'] as $dia)
-                                <label class="flex items-center gap-1.5 p-2 bg-crema/30 border border-[#C7B5A3]/20 rounded-xl cursor-pointer hover:bg-[#E6DDD3]/40 transition">
-                                    <input type="checkbox" wire:model="asig_dias_semana" value="{{ $dia }}" class="rounded border-[#C7B5A3]/30 text-azul-profundo focus:ring-azul-profundo/30">
-                                    <span class="text-[10px] font-bold text-azul-profundo/70">{{ substr($dia, 0, 3) }}</span>
-                                </label>
-                            @endforeach
-                        </div>
-                        @error('asig_dias_semana') <span class="text-[10px] text-rose-500 font-bold mt-1 block">{{ $message }}</span> @enderror
-                    </div>
-
-                    <!-- Periodo -->
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-xs font-black text-azul-profundo/50 uppercase tracking-wider mb-1">Fecha de Inicio *</label>
-                            <input wire:model="asig_fecha_inicio" type="date" class="w-full px-3 py-2 bg-crema/30 border {{ $errors->has('asig_fecha_inicio') ? 'border-rose-400' : 'border-[#C7B5A3]/30' }} rounded-xl text-sm focus:outline-none focus:border-azul-profundo/50 text-azul-profundo font-medium">
-                            @error('asig_fecha_inicio') <span class="text-[10px] text-rose-500 font-bold mt-1 block">{{ $message }}</span> @enderror
-                        </div>
-                        <div>
-                            <label class="block text-xs font-black text-azul-profundo/50 uppercase tracking-wider mb-1">Fecha de Fin (Opcional)</label>
-                            <input wire:model="asig_fecha_fin" type="date" class="w-full px-3 py-2 rm-input">
-                        </div>
-                    </div>
-
-                    <!-- Tipo y Estado -->
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-xs font-black text-azul-profundo/50 uppercase tracking-wider mb-1">Tipo de Asignación</label>
-                            <select wire:model="asig_tipo_asignacion" class="w-full px-3 py-2 rm-input">
-                                <option value="REGULAR">REGULAR</option>
-                                <option value="APOYO">APOYO TEMPORAL</option>
-                                <option value="COBERTURA">COBERTURA ESPECIAL</option>
-                                <option value="VOLUNTARIADO">VOLUNTARIADO</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-xs font-black text-azul-profundo/50 uppercase tracking-wider mb-1">Estado</label>
-                            <select wire:model="asig_estado" class="w-full px-3 py-2 rm-input">
-                                <option value="ACTIVA">ACTIVA</option>
-                                <option value="INACTIVA">INACTIVA</option>
-                                <option value="FINALIZADA">FINALIZADA</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <!-- Observaciones -->
-                    <div>
-                        <label class="block text-xs font-black text-azul-profundo/50 uppercase tracking-wider mb-1">Observaciones</label>
-                        <textarea wire:model="asig_observaciones" rows="2" placeholder="Especificaciones especiales para esta cobertura..." class="w-full px-3 py-2 rm-input"></textarea>
-                    </div>
-
-                    <!-- Footer Buttons -->
-                    <div class="pt-4 border-t border-[#C7B5A3]/20 flex justify-end gap-2">
-                        <button type="button" wire:click="$set('mostrarFormularioAsignacion', false)" class="px-4 py-2 bg-[#E6DDD3]/50 hover:bg-[#E6DDD3] text-azul-profundo font-bold text-xs rounded-xl tracking-wider uppercase transition">
-                            Cancelar
-                        </button>
-                        <button type="submit" class="px-4 py-2 bg-azul-profundo hover:bg-azul-profundo/80 text-white font-bold text-xs rounded-xl tracking-wider uppercase transition">
-                            {{ $isEdit ? 'Guardar Cambios' : 'Confirmar Asignación' }}
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    @endif
-
-    <!-- ──────────────────────────────────────────────
-         MODAL 3: FICHA DE DETALLE DE ASIGNACIÓN (PREVIEW)
-         ────────────────────────────────────────────── -->
-    @if($mostrarFichaAsignacion && $asignacionSeleccionada)
-        <div class="fixed inset-0 bg-azul-profundo/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-            <div class="bg-white rounded-3xl shadow-xl w-full max-w-md overflow-hidden border border-[#C7B5A3]/20 animate-in fade-in zoom-in-95 duration-150">
-                <!-- Header -->
-                <div class="bg-crema px-6 py-4 border-b border-[#C7B5A3]/30 flex items-center justify-between">
-                    <div>
-                        <h3 class="text-xs font-black text-azul-profundo/40 uppercase tracking-widest">Ficha de Asignación</h3>
-                        <h4 class="text-sm font-bold text-azul-profundo mt-0.5">ID: {{ $asignacionSeleccionada->cod_asignacion }}</h4>
-                    </div>
-                    <button wire:click="$set('mostrarFichaAsignacion', false)" class="h-7 w-7 rounded-full bg-[#E6DDD3]/50 hover:bg-[#E6DDD3] flex items-center justify-center text-azul-profundo/50 transition">
-                        <i class="ph ph-x"></i>
-                    </button>
-                </div>
-
-                <!-- Detalle -->
-                <div class="p-6 space-y-4">
-                    <!-- Colaborador -->
-                    <div class="flex items-center gap-3 pb-3 border-b border-[#C7B5A3]/10">
-                        <div class="h-10 w-10 rounded-full bg-[#E6DDD3]/60 flex items-center justify-center text-azul-profundo/70 font-black text-sm uppercase">
-                            {{ substr($asignacionSeleccionada->usuario ? $asignacionSeleccionada->usuario->nombres : 'N', 0, 2) }}
-                        </div>
-                        <div>
-                            <h4 class="text-sm font-black text-azul-profundo">{{ $asignacionSeleccionada->usuario ? $asignacionSeleccionada->usuario->name : 'N/D' }}</h4>
-                            <p class="text-[10px] text-azul-profundo/40 font-semibold">Área Principal: <strong>{{ $asignacionSeleccionada->usuario->areaInstitucional ? $asignacionSeleccionada->usuario->areaInstitucional->nombre : 'Ninguna' }}</strong></p>
-                        </div>
-                    </div>
-
-                    <!-- Datos Generales -->
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <span class="text-[9px] font-black text-azul-profundo/40 uppercase tracking-wider block">Área de Trabajo</span>
-                            <span class="text-xs font-bold text-azul-profundo block mt-0.5">{{ $asignacionSeleccionada->area ? $asignacionSeleccionada->area->nombre : 'N/D' }}</span>
-                        </div>
-                        <div>
-                            <span class="text-[9px] font-black text-azul-profundo/40 uppercase tracking-wider block">Turno Asignado</span>
-                            <div class="flex items-center gap-1.5 mt-0.5">
-                                <span class="w-2.5 h-2.5 rounded-full" style="background-color: {{ $asignacionSeleccionada->turno->color ?? '#3B82F6' }}"></span>
-                                <span class="text-xs font-bold text-azul-profundo">{{ $asignacionSeleccionada->turno ? $asignacionSeleccionada->turno->nombre : 'N/D' }}</span>
+                            <div class="space-y-2">
+                                @forelse($distribucionTurnos as $turno => $count)
+                                    <div>
+                                        <div class="mb-1 flex justify-between text-[11px] font-bold text-[#2F3E5C]/65"><span class="truncate">{{ $turno }}</span><span>{{ $count }}</span></div>
+                                        <div class="h-2 overflow-hidden rounded-full bg-[#E6DDD3]"><div class="h-full rounded-full bg-[#E27D60]" style="width: {{ min(($count / max($metricas['personal_activo'], 1)) * 100, 100) }}%"></div></div>
+                                    </div>
+                                @empty
+                                    <p class="text-xs font-bold text-[#2F3E5C]/50">Sin carga por turno.</p>
+                                @endforelse
                             </div>
                         </div>
-                    </div>
+                    </section>
+                </div>
+            </section>
+        @endif
 
-                    <!-- Periodo y Tipo -->
-                    <div class="grid grid-cols-2 gap-4">
+        @if($tabActiva === 'horarios')
+            <section class="space-y-4">
+                <div class="rounded-2xl border border-[#C7B5A3]/70 bg-[#F3ECE4]/80 p-4 shadow-sm">
+                    <div class="mb-4 flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
                         <div>
-                            <span class="text-[9px] font-black text-azul-profundo/40 uppercase tracking-wider block">Periodo Asignado</span>
-                            <span class="text-xs font-bold text-azul-profundo block mt-0.5">
-                                {{ $asignacionSeleccionada->fecha_inicio ? \Carbon\Carbon::parse($asignacionSeleccionada->fecha_inicio)->format('d/m/Y') : '' }}
-                                <span class="block text-[10px] text-azul-profundo/40 font-medium">al {{ $asignacionSeleccionada->fecha_fin ? \Carbon\Carbon::parse($asignacionSeleccionada->fecha_fin)->format('d/m/Y') : 'Presente' }}</span>
-                            </span>
+                            <h2 class="text-base font-black text-[#2F3E5C]">Horarios del personal</h2>
+                            <p class="mt-1 text-xs font-bold text-[#2F3E5C]/58">Disponibilidad y jornada semanal del personal administrativo y de salud.</p>
                         </div>
-                        <div>
-                            <span class="text-[9px] font-black text-azul-profundo/40 uppercase tracking-wider block">Tipo de Asignación</span>
-                            <span class="inline-block px-2 py-0.5 bg-[#E6DDD3]/60 text-azul-profundo rounded text-[9px] font-bold uppercase mt-1">
-                                {{ $asignacionSeleccionada->tipo_asignacion ?: 'REGULAR' }}
-                            </span>
-                        </div>
-                    </div>
-
-                    <!-- Días de Trabajo -->
-                    <div>
-                        <span class="text-[9px] font-black text-azul-profundo/40 uppercase tracking-wider block mb-1">Días de Trabajo Semanal</span>
-                        <div class="flex flex-wrap gap-1">
-                            @foreach($asignacionSeleccionada->dias_semana as $dia)
-                                <span class="px-2 py-0.5 bg-[#E6DDD3]/60 text-azul-profundo/70 rounded text-[9px] font-bold">{{ $dia }}</span>
-                            @endforeach
-                        </div>
-                    </div>
-
-                    <!-- Observaciones -->
-                    <div>
-                        <span class="text-[9px] font-black text-azul-profundo/40 uppercase tracking-wider block">Observaciones</span>
-                        <p class="text-xs text-azul-profundo/70 font-medium mt-1 bg-crema/30 p-2.5 rounded-xl border border-[#C7B5A3]/20/50">
-                            {{ $asignacionSeleccionada->observaciones ?: 'Sin observaciones administrativas.' }}
-                        </p>
-                    </div>
-
-                    <!-- Auditoría básica -->
-                    <div class="pt-3 border-t border-[#C7B5A3]/10 flex items-center justify-between text-[8px] text-azul-profundo/40 uppercase tracking-wider font-semibold">
-                        <span>Creado por: {{ $asignacionSeleccionada->creador ? $asignacionSeleccionada->creador->name : 'Sistema' }}</span>
-                        <span>Actualizado: {{ $asignacionSeleccionada->updated_at->diffForHumans() }}</span>
-                    </div>
-
-                    <!-- Footer Buttons -->
-                    <div class="pt-4 border-t border-[#C7B5A3]/20 flex justify-end gap-2">
-                        @can('turnos.finalizar')
-                            @if($asignacionSeleccionada->estado === 'ACTIVA')
-                                <button wire:click="finalizarAsignacion('{{ $asignacionSeleccionada->cod_asignacion }}')" class="px-3 py-2 bg-rose-50 hover:bg-rose-100 text-rose-600 font-bold text-xs rounded-xl tracking-wider uppercase transition">
-                                    Finalizar
-                                </button>
-                            @endif
-                            <button wire:confirm="¿Está seguro de archivar esta asignación?" wire:click="eliminarAsignacion('{{ $asignacionSeleccionada->cod_asignacion }}')" class="px-3 py-2 bg-[#E6DDD3]/50 hover:bg-[#E6DDD3] text-azul-profundo/70 font-bold text-xs rounded-xl tracking-wider uppercase transition">
-                                Archivar
+                        @can('turnos.asignar')
+                            <button type="button" wire:click="abrirModalHorario" class="inline-flex h-10 items-center justify-center gap-2 rounded-xl bg-[#8DA280] px-4 text-xs font-black uppercase text-white">
+                                <i class="ph-bold ph-plus"></i>
+                                Registrar horario
                             </button>
                         @endcan
-                        <button wire:click="$set('mostrarFichaAsignacion', false)" class="px-4 py-2 bg-azul-profundo hover:bg-azul-profundo/80 text-white font-bold text-xs rounded-xl tracking-wider uppercase transition">
-                            Cerrar
-                        </button>
+                    </div>
+
+                    <div class="grid gap-2 md:grid-cols-6">
+                        <input type="search" wire:model.live.debounce.300ms="horarioSearch" class="h-10 rounded-xl border border-[#C7B5A3]/70 bg-[#E6DDD3]/70 px-3 text-xs font-bold outline-none focus:border-[#E27D60] md:col-span-2" placeholder="Buscar personal">
+                        <select wire:model.live="horarioTipoPersonal" class="h-10 rounded-xl border border-[#C7B5A3]/70 bg-[#E6DDD3]/70 px-3 text-xs font-bold outline-none focus:border-[#E27D60]">
+                            <option value="">Tipo</option>
+                            <option value="admin">Administrativo</option>
+                            <option value="salud">Salud</option>
+                        </select>
+                        <select wire:model.live="horarioDia" class="h-10 rounded-xl border border-[#C7B5A3]/70 bg-[#E6DDD3]/70 px-3 text-xs font-bold outline-none focus:border-[#E27D60]">
+                            <option value="">Dia</option>
+                            @foreach($diasSemana as $dia)
+                                <option value="{{ $dia }}">{{ $diaLabels[$dia] }}</option>
+                            @endforeach
+                        </select>
+                        <select wire:model.live="horarioTurno" class="h-10 rounded-xl border border-[#C7B5A3]/70 bg-[#E6DDD3]/70 px-3 text-xs font-bold outline-none focus:border-[#E27D60]">
+                            <option value="">Turno</option>
+                            <option value="Mañana">Mañana</option>
+                            <option value="Tarde">Tarde</option>
+                            <option value="Noche">Noche</option>
+                            <option value="Guardia">Guardia</option>
+                        </select>
+                        <button type="button" wire:click="limpiarFiltrosHorario" class="h-10 rounded-xl border border-[#C7B5A3]/70 bg-white/35 px-3 text-xs font-black text-[#2F3E5C]">Limpiar</button>
                     </div>
                 </div>
+
+                <div class="grid gap-3 md:grid-cols-6">
+                    @foreach($diasSemana as $dia)
+                        <div class="rounded-2xl border border-[#C7B5A3]/60 bg-[#F3ECE4]/80 p-3 shadow-sm">
+                            <h3 class="mb-2 text-center text-[11px] font-black uppercase text-[#2F3E5C]/55">{{ $diaLabels[$dia] }}</h3>
+                            <div class="space-y-2">
+                                @forelse($horarios->where('dia', $dia)->take(4) as $horario)
+                                    <button type="button" wire:click="verDetalleHorario('{{ $horario['tipo'] }}', {{ $horario['id'] }})" class="w-full rounded-xl border border-white/50 bg-white/45 p-2 text-left transition hover:border-[#E27D60]/45">
+                                        <span class="block truncate text-[11px] font-black text-[#2F3E5C]">{{ $horario['persona'] }}</span>
+                                        <span class="block text-[10px] font-bold text-[#2F3E5C]/55">{{ $horario['hora_inicio'] }} - {{ $horario['hora_fin'] }}</span>
+                                    </button>
+                                @empty
+                                    <p class="rounded-xl border border-dashed border-[#C7B5A3]/70 p-3 text-center text-[10px] font-bold text-[#2F3E5C]/45">Sin horarios</p>
+                                @endforelse
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+
+                <div class="overflow-hidden rounded-2xl border border-[#C7B5A3]/70 bg-[#F3ECE4]/80 shadow-sm">
+                    <div class="overflow-x-auto">
+                        <table class="min-w-[1060px] w-full text-left text-sm">
+                            <thead class="bg-[#E6DDD3]/80 text-[10px] font-black uppercase tracking-wider text-[#2F3E5C]/60">
+                                <tr>
+                                    <th class="px-4 py-3">Personal</th>
+                                    <th class="px-4 py-3">Tipo</th>
+                                    <th class="px-4 py-3">Cargo / especialidad</th>
+                                    <th class="px-4 py-3">Dia</th>
+                                    <th class="px-4 py-3">Horario</th>
+                                    <th class="px-4 py-3">Turno</th>
+                                    <th class="px-4 py-3">Estado</th>
+                                    <th class="px-4 py-3 text-right">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-[#C7B5A3]/45 bg-white/25">
+                                @forelse($horarios as $horario)
+                                    <tr class="transition hover:bg-white/45">
+                                        <td class="px-4 py-3 font-black text-[#2F3E5C]">{{ $horario['persona'] }}</td>
+                                        <td class="px-4 py-3 text-xs font-bold text-[#2F3E5C]/65">{{ $horario['tipo_label'] }}</td>
+                                        <td class="px-4 py-3 text-xs font-bold text-[#2F3E5C]/65">{{ $horario['cargo'] }}</td>
+                                        <td class="px-4 py-3 text-xs font-black text-[#2F3E5C]">{{ $horario['dia_label'] }}</td>
+                                        <td class="px-4 py-3 text-xs font-bold text-[#2F3E5C]/65">{{ $horario['hora_inicio'] }} - {{ $horario['hora_fin'] }}</td>
+                                        <td class="px-4 py-3"><span class="rounded-full px-2.5 py-1 text-[10px] font-black text-white" style="background-color: {{ $horario['color'] }}">{{ $horario['turno'] }}</span></td>
+                                        <td class="px-4 py-3"><span class="rounded-full px-2.5 py-1 text-[10px] font-black {{ $horario['estado'] === 'ACTIVO' ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-600' }}">{{ $horario['estado'] }}</span></td>
+                                        <td class="px-4 py-3">
+                                            <div class="flex justify-end gap-1.5">
+                                                <button type="button" wire:click="verDetalleHorario('{{ $horario['tipo'] }}', {{ $horario['id'] }})" class="flex h-8 w-8 items-center justify-center rounded-lg bg-[#2F3E5C]/10 text-[#2F3E5C] transition hover:bg-[#2F3E5C] hover:text-white" title="Ver detalle"><i class="ph-bold ph-eye"></i></button>
+                                                @can('turnos.asignar')
+                                                    <button type="button" wire:click="cargarHorario('{{ $horario['tipo'] }}', {{ $horario['id'] }})" class="flex h-8 w-8 items-center justify-center rounded-lg bg-[#E27D60]/12 text-[#C75F46] transition hover:bg-[#E27D60] hover:text-white" title="Editar horario"><i class="ph-bold ph-pencil-simple"></i></button>
+                                                @endcan
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr><td colspan="8" class="px-4 py-10 text-center text-sm font-black text-[#2F3E5C]/55">No se encontraron horarios con los filtros seleccionados.</td></tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+        @endif
+
+        @if($tabActiva === 'turnos')
+            <section class="space-y-4">
+                <div class="flex flex-col gap-3 rounded-2xl border border-[#C7B5A3]/70 bg-[#F3ECE4]/80 p-4 shadow-sm md:flex-row md:items-center md:justify-between">
+                    <div>
+                        <h2 class="text-base font-black text-[#2F3E5C]">Turnos institucionales</h2>
+                        <p class="mt-1 text-xs font-bold text-[#2F3E5C]/58">Bloques de tiempo con color y estado operativo.</p>
+                    </div>
+                    @can('turnos.crear')
+                        <button type="button" wire:click="abrirModalTurno" class="inline-flex h-10 items-center justify-center gap-2 rounded-xl bg-[#2F3E5C] px-4 text-xs font-black uppercase text-white"><i class="ph-bold ph-plus"></i>Nuevo turno</button>
+                    @endcan
+                </div>
+
+                <div class="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+                    @forelse($turnosLista as $turno)
+                        <article class="rounded-2xl border border-[#C7B5A3]/70 bg-[#F3ECE4]/80 p-4 shadow-sm">
+                            <div class="flex items-start justify-between gap-3">
+                                <span class="flex h-11 w-11 items-center justify-center rounded-2xl text-white shadow-sm" style="background-color: {{ $turno->color ?: '#2F3E5C' }}"><i class="ph-bold ph-clock-countdown text-xl"></i></span>
+                                <span class="rounded-full px-2.5 py-1 text-[10px] font-black {{ $turno->estado === 'ACTIVO' ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-600' }}">{{ $turno->estado }}</span>
+                            </div>
+                            <h3 class="mt-3 text-base font-black text-[#2F3E5C]">{{ $turno->nombre }}</h3>
+                            <p class="mt-1 text-xs font-bold text-[#2F3E5C]/58">{{ substr($turno->hora_inicio ?? '--:--', 0, 5) }} - {{ substr($turno->hora_fin ?? '--:--', 0, 5) }}</p>
+                            <p class="mt-3 line-clamp-2 min-h-[2.5rem] text-xs font-bold text-[#2F3E5C]/58">{{ $turno->descripcion ?: 'Sin descripcion registrada.' }}</p>
+                            <div class="mt-4 flex justify-end gap-1.5">
+                                @can('turnos.editar')
+                                    <button type="button" wire:click="cargarTurno('{{ $turno->cod_turno }}')" class="flex h-8 w-8 items-center justify-center rounded-lg bg-[#2F3E5C]/10 text-[#2F3E5C] transition hover:bg-[#2F3E5C] hover:text-white"><i class="ph-bold ph-pencil-simple"></i></button>
+                                @endcan
+                                @can('turnos.cambiar_estado')
+                                    <button type="button" wire:click="eliminarTurno('{{ $turno->cod_turno }}')" wire:confirm="¿Archivar este turno institucional?" class="flex h-8 w-8 items-center justify-center rounded-lg bg-rose-100 text-rose-700 transition hover:bg-rose-600 hover:text-white"><i class="ph-bold ph-archive"></i></button>
+                                @endcan
+                            </div>
+                        </article>
+                    @empty
+                        <div class="rounded-2xl border border-dashed border-[#C7B5A3]/70 bg-[#F3ECE4]/80 p-8 text-center text-sm font-black text-[#2F3E5C]/55 md:col-span-2 xl:col-span-4">No hay turnos institucionales registrados.</div>
+                    @endforelse
+                </div>
+            </section>
+        @endif
+
+        @if($tabActiva === 'asignaciones')
+            <section class="space-y-4">
+                <div class="rounded-2xl border border-[#C7B5A3]/70 bg-[#F3ECE4]/80 p-4 shadow-sm">
+                    <div class="mb-4 flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
+                        <div>
+                            <h2 class="text-base font-black text-[#2F3E5C]">Asignaciones de personal</h2>
+                            <p class="mt-1 text-xs font-bold text-[#2F3E5C]/58">Relaciona personal, area, turno, dias de cobertura y vigencia.</p>
+                        </div>
+                        @can('turnos.asignar')
+                            <button type="button" wire:click="abrirModalAsignacion" class="inline-flex h-10 items-center justify-center gap-2 rounded-xl bg-[#E27D60] px-4 text-xs font-black uppercase text-white"><i class="ph-bold ph-user-plus"></i>Registrar asignacion</button>
+                        @endcan
+                    </div>
+
+                    <div class="grid gap-2 md:grid-cols-7">
+                        <input type="search" wire:model.live.debounce.300ms="search" class="h-10 rounded-xl border border-[#C7B5A3]/70 bg-[#E6DDD3]/70 px-3 text-xs font-bold outline-none focus:border-[#E27D60] md:col-span-2" placeholder="Buscar personal">
+                        <select wire:model.live="filtroArea" class="h-10 rounded-xl border border-[#C7B5A3]/70 bg-[#E6DDD3]/70 px-3 text-xs font-bold outline-none focus:border-[#E27D60]"><option value="">Area</option>@foreach($areasDisponibles as $area)<option value="{{ $area->cod_area }}">{{ $area->nombre }}</option>@endforeach</select>
+                        <select wire:model.live="filtroTurno" class="h-10 rounded-xl border border-[#C7B5A3]/70 bg-[#E6DDD3]/70 px-3 text-xs font-bold outline-none focus:border-[#E27D60]"><option value="">Turno</option>@foreach($turnosDisponibles as $turno)<option value="{{ $turno->cod_turno }}">{{ $turno->nombre }}</option>@endforeach</select>
+                        <select wire:model.live="filtroEstado" class="h-10 rounded-xl border border-[#C7B5A3]/70 bg-[#E6DDD3]/70 px-3 text-xs font-bold outline-none focus:border-[#E27D60]"><option value="">Estado</option><option value="ACTIVA">Activa</option><option value="INACTIVA">Inactiva</option><option value="FINALIZADA">Finalizada</option></select>
+                        <select wire:model.live="filtroDia" class="h-10 rounded-xl border border-[#C7B5A3]/70 bg-[#E6DDD3]/70 px-3 text-xs font-bold outline-none focus:border-[#E27D60]"><option value="">Dia</option>@foreach($diasSemana as $dia)<option value="{{ $dia }}">{{ $diaLabels[$dia] }}</option>@endforeach</select>
+                        <button type="button" wire:click="limpiarFiltros" class="h-10 rounded-xl border border-[#C7B5A3]/70 bg-white/35 px-3 text-xs font-black text-[#2F3E5C]">Limpiar</button>
+                    </div>
+                </div>
+
+                <div class="overflow-hidden rounded-2xl border border-[#C7B5A3]/70 bg-[#F3ECE4]/80 shadow-sm">
+                    <div class="overflow-x-auto">
+                        <table class="min-w-[1120px] w-full text-left text-sm">
+                            <thead class="bg-[#E6DDD3]/80 text-[10px] font-black uppercase tracking-wider text-[#2F3E5C]/60">
+                                <tr>
+                                    <th class="px-4 py-3">Personal</th>
+                                    <th class="px-4 py-3">Tipo</th>
+                                    <th class="px-4 py-3">Area</th>
+                                    <th class="px-4 py-3">Turno</th>
+                                    <th class="px-4 py-3">Dias</th>
+                                    <th class="px-4 py-3">Vigencia</th>
+                                    <th class="px-4 py-3">Estado</th>
+                                    <th class="px-4 py-3 text-right">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-[#C7B5A3]/45 bg-white/25">
+                                @forelse($asignaciones as $asig)
+                                    <tr class="transition hover:bg-white/45">
+                                        <td class="px-4 py-3">
+                                            <p class="truncate font-black text-[#2F3E5C]">{{ $asig->usuario?->name ?? 'Sin usuario' }}</p>
+                                            <p class="text-[11px] font-bold text-[#2F3E5C]/50">{{ $asig->usuario?->personalSalud ? 'Salud' : ($asig->usuario?->personalAdmin ? 'Administrativo' : 'Institucional') }}</p>
+                                        </td>
+                                        <td class="px-4 py-3 text-xs font-bold text-[#2F3E5C]/65">{{ $asig->tipo_asignacion }}</td>
+                                        <td class="px-4 py-3 text-xs font-bold text-[#2F3E5C]/65">{{ $asig->area?->nombre ?? 'Sin area' }}</td>
+                                        <td class="px-4 py-3"><span class="rounded-full px-2.5 py-1 text-[10px] font-black text-white" style="background-color: {{ $asig->turno?->color ?: '#2F3E5C' }}">{{ $asig->turno?->nombre ?? 'Sin turno' }}</span></td>
+                                        <td class="px-4 py-3"><div class="flex flex-wrap gap-1">@foreach($asig->dias_semana ?: [] as $dia)<span class="rounded bg-[#E6DDD3] px-1.5 py-0.5 text-[9px] font-black text-[#2F3E5C]/65">{{ substr($dia, 0, 3) }}</span>@endforeach</div></td>
+                                        <td class="px-4 py-3 text-xs font-bold text-[#2F3E5C]/65">{{ $asig->fecha_inicio?->format('d/m/Y') ?? 'S/F' }} - {{ $asig->fecha_fin?->format('d/m/Y') ?? 'Vigente' }}</td>
+                                        <td class="px-4 py-3"><span class="rounded-full px-2.5 py-1 text-[10px] font-black {{ $asig->estado === 'ACTIVA' ? 'bg-emerald-100 text-emerald-700' : ($asig->estado === 'FINALIZADA' ? 'bg-slate-100 text-slate-600' : 'bg-rose-100 text-rose-700') }}">{{ $asig->estado }}</span></td>
+                                        <td class="px-4 py-3">
+                                            <div class="flex justify-end gap-1.5">
+                                                <button type="button" wire:click="verFichaAsignacion('{{ $asig->cod_asignacion }}')" class="flex h-8 w-8 items-center justify-center rounded-lg bg-[#2F3E5C]/10 text-[#2F3E5C] transition hover:bg-[#2F3E5C] hover:text-white" title="Ver detalle"><i class="ph-bold ph-eye"></i></button>
+                                                @can('turnos.asignar')
+                                                    @if($asig->estado === 'ACTIVA')
+                                                        <button type="button" wire:click="cargarAsignacion('{{ $asig->cod_asignacion }}')" class="flex h-8 w-8 items-center justify-center rounded-lg bg-[#E27D60]/12 text-[#C75F46] transition hover:bg-[#E27D60] hover:text-white" title="Editar"><i class="ph-bold ph-pencil-simple"></i></button>
+                                                    @endif
+                                                @endcan
+                                                @can('turnos.finalizar')
+                                                    @if($asig->estado === 'ACTIVA')
+                                                        <button type="button" wire:click="finalizarAsignacion('{{ $asig->cod_asignacion }}')" wire:confirm="¿Finalizar esta asignacion?" class="flex h-8 w-8 items-center justify-center rounded-lg bg-rose-100 text-rose-700 transition hover:bg-rose-600 hover:text-white" title="Finalizar"><i class="ph-bold ph-check-circle"></i></button>
+                                                    @endif
+                                                @endcan
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr><td colspan="8" class="px-4 py-10 text-center text-sm font-black text-[#2F3E5C]/55">No se encontraron asignaciones con los filtros aplicados.</td></tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+        @endif
+
+        @if($tabActiva === 'calendario')
+            <section class="grid gap-4 xl:grid-cols-[1fr_320px]">
+                <div class="rounded-2xl border border-[#C7B5A3]/70 bg-[#F3ECE4]/80 p-4 shadow-sm">
+                    <div class="mb-4 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+                        <div>
+                            <h2 class="text-base font-black text-[#2F3E5C]">Calendario institucional</h2>
+                            <p class="mt-1 text-xs font-bold text-[#2F3E5C]/58">{{ $calendario['titulo'] }}</p>
+                        </div>
+                        <div class="flex flex-wrap gap-2">
+                            <div class="inline-flex rounded-xl bg-[#E6DDD3]/80 p-1">
+                                @foreach(['dia' => 'Dia', 'semana' => 'Semana', 'mes' => 'Mes'] as $modo => $label)
+                                    <button type="button" wire:click="cambiarModoCalendario('{{ $modo }}')" class="rounded-lg px-3 py-1.5 text-[11px] font-black {{ $modoCalendario === $modo ? 'bg-white text-[#2F3E5C] shadow-sm' : 'text-[#2F3E5C]/55' }}">{{ $label }}</button>
+                                @endforeach
+                            </div>
+                            <button type="button" wire:click="calendarioAnterior" class="h-9 rounded-xl border border-[#C7B5A3]/70 bg-white/35 px-3 text-xs font-black"><i class="ph-bold ph-caret-left"></i></button>
+                            <button type="button" wire:click="calendarioHoy" class="h-9 rounded-xl bg-[#2F3E5C] px-3 text-xs font-black text-white">Hoy</button>
+                            <button type="button" wire:click="calendarioSiguiente" class="h-9 rounded-xl border border-[#C7B5A3]/70 bg-white/35 px-3 text-xs font-black"><i class="ph-bold ph-caret-right"></i></button>
+                        </div>
+                    </div>
+
+                    <div class="grid gap-2 {{ $modoCalendario === 'dia' ? 'grid-cols-1' : ($modoCalendario === 'mes' ? 'grid-cols-2 md:grid-cols-7' : 'grid-cols-1 md:grid-cols-7') }}">
+                        @foreach($calendario['dias'] as $dia)
+                            <div class="rounded-2xl border {{ $dia['es_hoy'] ? 'border-[#E27D60]/60 bg-[#E27D60]/8' : 'border-[#C7B5A3]/55 bg-white/30' }} p-2" style="min-height: {{ $modoCalendario === 'mes' ? '128px' : '260px' }};">
+                                <div class="mb-2 flex items-center justify-between">
+                                    <div>
+                                        <p class="text-[10px] font-black uppercase text-[#2F3E5C]/50">{{ $dia['dia_label'] }}</p>
+                                        <p class="text-sm font-black {{ $dia['es_mes_actual'] ? 'text-[#2F3E5C]' : 'text-[#2F3E5C]/35' }}">{{ $dia['numero'] }} {{ $modoCalendario === 'mes' ? '' : $dia['mes'] }}</p>
+                                    </div>
+                                    @if($dia['total_eventos'] > 0)
+                                        <span class="rounded-full bg-[#2F3E5C]/10 px-2 py-0.5 text-[10px] font-black text-[#2F3E5C]">{{ $dia['total_eventos'] }}</span>
+                                    @endif
+                                </div>
+
+                                <div class="space-y-1.5 overflow-y-auto {{ $modoCalendario === 'mes' ? 'max-h-[84px]' : 'max-h-[210px]' }}">
+                                    @forelse($dia['eventos'] as $evento)
+                                        @if($evento['tipo'] === 'asignacion')
+                                            <button type="button" wire:click="verFichaAsignacion('{{ $evento['id'] }}')" class="w-full rounded-xl border border-white/50 bg-white/55 p-2 text-left shadow-sm transition hover:border-[#E27D60]/45">
+                                                <span class="block truncate text-[11px] font-black text-[#2F3E5C]">{{ $evento['titulo'] }}</span>
+                                                <span class="block truncate text-[10px] font-bold text-[#2F3E5C]/55">{{ $evento['hora'] }}</span>
+                                                <span class="mt-1 block h-1 rounded-full" style="background-color: {{ $evento['color'] }}"></span>
+                                            </button>
+                                        @else
+                                            <button type="button" wire:click="verDetalleHorario('{{ $evento['tipo_horario'] }}', {{ $evento['id'] }})" class="w-full rounded-xl border border-sky-100 bg-sky-50/75 p-2 text-left transition hover:border-sky-300">
+                                                <span class="block truncate text-[11px] font-black text-[#2F3E5C]">{{ $evento['titulo'] }}</span>
+                                                <span class="block truncate text-[10px] font-bold text-[#2F3E5C]/55">{{ $evento['hora'] }}</span>
+                                            </button>
+                                        @endif
+                                    @empty
+                                        <p class="rounded-xl border border-dashed border-[#C7B5A3]/70 p-3 text-center text-[10px] font-bold text-[#2F3E5C]/45">Sin eventos</p>
+                                    @endforelse
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+
+                <aside class="rounded-2xl border border-[#C7B5A3]/70 bg-[#F3ECE4]/80 p-4 shadow-sm">
+                    <h3 class="text-base font-black text-[#2F3E5C]">Detalle del evento</h3>
+                    @if($detalleEvento)
+                        <div class="mt-3 rounded-2xl border border-[#C7B5A3]/55 bg-white/35 p-4">
+                            <span class="rounded-full px-2.5 py-1 text-[10px] font-black text-white" style="background-color: {{ $detalleEvento['color'] }}">{{ $detalleEvento['tipo'] }}</span>
+                            <h4 class="mt-3 text-sm font-black text-[#2F3E5C]">{{ $detalleEvento['titulo'] }}</h4>
+                            <p class="mt-1 text-xs font-bold text-[#2F3E5C]/58">{{ $detalleEvento['subtitulo'] }}</p>
+                            <div class="mt-3 space-y-2 text-xs font-bold text-[#2F3E5C]/70">
+                                <p><span class="font-black text-[#2F3E5C]">Fecha:</span> {{ $detalleEvento['fecha'] }}</p>
+                                <p><span class="font-black text-[#2F3E5C]">Horario:</span> {{ $detalleEvento['horario'] }}</p>
+                                <p><span class="font-black text-[#2F3E5C]">Estado:</span> {{ $detalleEvento['estado'] }}</p>
+                                <p class="rounded-xl bg-[#E6DDD3]/60 p-3">{{ $detalleEvento['descripcion'] }}</p>
+                            </div>
+                            @can('turnos.asignar')
+                                <button type="button" wire:click="cargarHorario('{{ $detalleEvento['tipo_horario'] }}', {{ $detalleEvento['id'] }})" class="mt-4 w-full rounded-xl bg-[#2F3E5C] px-4 py-2 text-xs font-black uppercase text-white">Editar horario</button>
+                            @endcan
+                        </div>
+                    @else
+                        <p class="mt-3 rounded-2xl border border-dashed border-[#C7B5A3]/70 p-5 text-center text-xs font-bold text-[#2F3E5C]/55">Seleccione un horario del calendario para ver su detalle. Las asignaciones abren su ficha emergente.</p>
+                    @endif
+                    <div class="mt-4 space-y-2 text-[11px] font-bold text-[#2F3E5C]/65">
+                        <p><span class="inline-block h-2 w-2 rounded-full bg-sky-400"></span> Horario regular</p>
+                        <p><span class="inline-block h-2 w-2 rounded-full bg-[#8DA280]"></span> Asignacion activa</p>
+                        <p><span class="inline-block h-2 w-2 rounded-full bg-[#E27D60]"></span> Turno especial / apoyo</p>
+                    </div>
+                </aside>
+            </section>
+        @endif
+
+        @if($tabActiva === 'alertas')
+            <section class="rounded-2xl border border-[#C7B5A3]/70 bg-[#F3ECE4]/80 p-4 shadow-sm">
+                <h2 class="text-base font-black text-[#2F3E5C]">Conflictos y alertas</h2>
+                <p class="mt-1 text-xs font-bold text-[#2F3E5C]/58">Incidencias calculadas desde horarios, turnos y asignaciones vigentes.</p>
+                <div class="mt-4 overflow-x-auto rounded-2xl border border-[#C7B5A3]/55">
+                    <table class="min-w-[980px] w-full text-left text-sm">
+                        <thead class="bg-[#E6DDD3]/80 text-[10px] font-black uppercase tracking-wider text-[#2F3E5C]/60">
+                            <tr><th class="px-4 py-3">Tipo</th><th class="px-4 py-3">Persona / area</th><th class="px-4 py-3">Fecha</th><th class="px-4 py-3">Horario</th><th class="px-4 py-3">Descripcion</th><th class="px-4 py-3">Prioridad</th><th class="px-4 py-3">Accion sugerida</th></tr>
+                        </thead>
+                        <tbody class="divide-y divide-[#C7B5A3]/45 bg-white/25">
+                            @forelse($alertas as $alerta)
+                                <tr class="transition hover:bg-white/45">
+                                    <td class="px-4 py-3 font-black text-[#2F3E5C]">{{ $alerta['tipo'] }}</td>
+                                    <td class="px-4 py-3 text-xs font-bold text-[#2F3E5C]/70">{{ $alerta['persona'] }}</td>
+                                    <td class="px-4 py-3 text-xs font-bold text-[#2F3E5C]/70">{{ $alerta['fecha'] }}</td>
+                                    <td class="px-4 py-3 text-xs font-bold text-[#2F3E5C]/70">{{ $alerta['horario'] }}</td>
+                                    <td class="px-4 py-3 text-xs font-bold text-[#2F3E5C]/70">{{ $alerta['descripcion'] }}</td>
+                                    <td class="px-4 py-3"><span class="rounded-full px-2.5 py-1 text-[10px] font-black {{ $alerta['prioridad'] === 'Alta' ? 'bg-rose-100 text-rose-700' : 'bg-amber-100 text-amber-700' }}">{{ $alerta['prioridad'] }}</span></td>
+                                    <td class="px-4 py-3 text-xs font-black text-[#2F3E5C]">{{ $alerta['accion'] }}</td>
+                                </tr>
+                            @empty
+                                <tr><td colspan="7" class="px-4 py-10 text-center text-sm font-black text-[#2F3E5C]/55">No existen alertas operativas pendientes.</td></tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        @endif
+
+        @if($tabActiva === 'reportes')
+            <section class="rounded-2xl border border-[#C7B5A3]/70 bg-[#F3ECE4]/80 p-4 shadow-sm">
+                <h2 class="text-base font-black text-[#2F3E5C]">Reportes administrativos</h2>
+                <p class="mt-1 text-xs font-bold text-[#2F3E5C]/58">Evidencia institucional disponible para horarios, cobertura y asignaciones.</p>
+                <div class="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+                    @can('turnos.reportes')
+                        <button type="button" wire:click="exportarReporteGeneralPdf" class="rounded-2xl border border-[#C7B5A3]/60 bg-white/35 p-4 text-left transition hover:border-[#E27D60]/45">
+                            <i class="ph-bold ph-file-pdf text-2xl text-rose-600"></i>
+                            <span class="mt-3 block text-sm font-black text-[#2F3E5C]">Reporte mensual de asignaciones</span>
+                            <span class="mt-1 block text-xs font-bold text-[#2F3E5C]/55">PDF general operativo</span>
+                        </button>
+                        <button type="button" wire:click="exportarReporteGeneralExcel" class="rounded-2xl border border-[#C7B5A3]/60 bg-white/35 p-4 text-left transition hover:border-[#8DA280]/45">
+                            <i class="ph-bold ph-file-xls text-2xl text-emerald-700"></i>
+                            <span class="mt-3 block text-sm font-black text-[#2F3E5C]">Base de asignaciones</span>
+                            <span class="mt-1 block text-xs font-bold text-[#2F3E5C]/55">Exportacion Excel</span>
+                        </button>
+                        <button type="button" wire:click="exportarCoberturaSemanalPdf" class="rounded-2xl border border-[#C7B5A3]/60 bg-white/35 p-4 text-left transition hover:border-[#2F3E5C]/35">
+                            <i class="ph-bold ph-calendar-check text-2xl text-[#2F3E5C]"></i>
+                            <span class="mt-3 block text-sm font-black text-[#2F3E5C]">Cobertura semanal</span>
+                            <span class="mt-1 block text-xs font-bold text-[#2F3E5C]/55">PDF de turnos</span>
+                        </button>
+                        <button type="button" wire:click="exportarPersonalSinTurnoExcel" class="rounded-2xl border border-[#C7B5A3]/60 bg-white/35 p-4 text-left transition hover:border-amber-300">
+                            <i class="ph-bold ph-user-warning text-2xl text-amber-700"></i>
+                            <span class="mt-3 block text-sm font-black text-[#2F3E5C]">Personal sin horario/turno</span>
+                            <span class="mt-1 block text-xs font-bold text-[#2F3E5C]/55">Excel de seguimiento</span>
+                        </button>
+                    @else
+                        <p class="rounded-2xl border border-dashed border-[#C7B5A3]/70 p-8 text-center text-sm font-black text-[#2F3E5C]/55 md:col-span-2 xl:col-span-4">No tiene permiso para generar reportes.</p>
+                    @endcan
+                    <article class="rounded-2xl border border-dashed border-[#C7B5A3]/70 bg-white/20 p-4">
+                        <i class="ph-bold ph-hourglass-medium text-2xl text-[#2F3E5C]/35"></i>
+                        <span class="mt-3 block text-sm font-black text-[#2F3E5C]">Reporte individual de personal</span>
+                        <span class="mt-1 block text-xs font-bold text-[#2F3E5C]/55">Preparado para siguiente fase</span>
+                    </article>
+                    <article class="rounded-2xl border border-dashed border-[#C7B5A3]/70 bg-white/20 p-4">
+                        <i class="ph-bold ph-hourglass-medium text-2xl text-[#2F3E5C]/35"></i>
+                        <span class="mt-3 block text-sm font-black text-[#2F3E5C]">Reporte de conflictos</span>
+                        <span class="mt-1 block text-xs font-bold text-[#2F3E5C]/55">Estructura visible sin boton roto</span>
+                    </article>
+                </div>
+            </section>
+        @endif
+    </div>
+
+    @if($mostrarFormularioHorario)
+        <div class="fixed inset-0 z-[70] flex items-center justify-center bg-[#2F3E5C]/55 p-4 backdrop-blur-sm">
+            <div class="flex max-h-[85vh] w-full max-w-4xl flex-col overflow-hidden rounded-[1.5rem] border border-[#C7B5A3]/70 bg-[#F3ECE4] shadow-2xl">
+                <div class="flex items-start justify-between gap-3 border-b border-[#C7B5A3]/60 p-5">
+                    <div>
+                        <h2 class="text-lg font-black text-[#2F3E5C]">{{ $isEdit ? 'Editar horario' : 'Registrar horario' }}</h2>
+                        <p class="mt-1 text-xs font-bold text-[#2F3E5C]/58">Defina dias, turno y rango horario del personal.</p>
+                    </div>
+                    <button type="button" wire:click="$set('mostrarFormularioHorario', false)" class="flex h-9 w-9 items-center justify-center rounded-xl bg-[#E6DDD3] text-[#2F3E5C] transition hover:bg-[#E27D60] hover:text-white"><i class="ph-bold ph-x"></i></button>
+                </div>
+                <form wire:submit.prevent="guardarHorario" class="overflow-y-auto p-5">
+                    <div class="grid gap-4 md:grid-cols-2">
+                        <div>
+                            <label class="mb-1 block text-[10px] font-black uppercase text-[#2F3E5C]/60">Tipo de personal</label>
+                            <select wire:model.live="horario_tipo_personal" class="w-full rounded-xl border border-[#C7B5A3] bg-[#D5C7B9]/70 px-4 py-3 text-sm font-bold outline-none focus:border-[#E27D60]" @disabled($isEdit)>
+                                <option value="admin">Administrativo</option>
+                                <option value="salud">Salud</option>
+                            </select>
+                            @error('horario_tipo_personal') <span class="mt-1 block text-xs font-black text-rose-600">{{ $message }}</span> @enderror
+                        </div>
+                        <div>
+                            <label class="mb-1 block text-[10px] font-black uppercase text-[#2F3E5C]/60">Personal</label>
+                            <select wire:model="horario_personal_id" class="w-full rounded-xl border border-[#C7B5A3] bg-[#D5C7B9]/70 px-4 py-3 text-sm font-bold outline-none focus:border-[#E27D60]" @disabled($isEdit)>
+                                <option value="">Seleccione personal</option>
+                                @foreach($personalHorarioOpciones as $persona)
+                                    <option value="{{ $persona['id'] }}">{{ $persona['nombre'] }} · {{ $persona['cargo'] }}</option>
+                                @endforeach
+                            </select>
+                            @error('horario_personal_id') <span class="mt-1 block text-xs font-black text-rose-600">{{ $message }}</span> @enderror
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="mb-2 block text-[10px] font-black uppercase text-[#2F3E5C]/60">Dias de la semana</label>
+                            <div class="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+                                @foreach($diasSemana as $dia)
+                                    <label class="flex items-center justify-between rounded-xl border border-[#C7B5A3]/60 bg-white/35 px-4 py-3 text-sm font-black text-[#2F3E5C]">
+                                        {{ $diaLabels[$dia] }}
+                                        <input wire:model="horario_dias_semana" type="checkbox" value="{{ $dia }}" class="h-5 w-5 rounded border-[#C7B5A3] text-[#E27D60] focus:ring-[#E27D60]" @disabled($isEdit && !in_array($dia, $horario_dias_semana ?? []))>
+                                    </label>
+                                @endforeach
+                            </div>
+                            @error('horario_dias_semana') <span class="mt-1 block text-xs font-black text-rose-600">{{ $message }}</span> @enderror
+                        </div>
+                        <div>
+                            <label class="mb-1 block text-[10px] font-black uppercase text-[#2F3E5C]/60">Hora inicio</label>
+                            <input wire:model="horario_hora_inicio" type="time" class="w-full rounded-xl border border-[#C7B5A3] bg-[#D5C7B9]/70 px-4 py-3 text-sm font-bold outline-none focus:border-[#E27D60]">
+                            @error('horario_hora_inicio') <span class="mt-1 block text-xs font-black text-rose-600">{{ $message }}</span> @enderror
+                        </div>
+                        <div>
+                            <label class="mb-1 block text-[10px] font-black uppercase text-[#2F3E5C]/60">Hora fin</label>
+                            <input wire:model="horario_hora_fin" type="time" class="w-full rounded-xl border border-[#C7B5A3] bg-[#D5C7B9]/70 px-4 py-3 text-sm font-bold outline-none focus:border-[#E27D60]">
+                            @error('horario_hora_fin') <span class="mt-1 block text-xs font-black text-rose-600">{{ $message }}</span> @enderror
+                        </div>
+                        <div>
+                            <label class="mb-1 block text-[10px] font-black uppercase text-[#2F3E5C]/60">Turno</label>
+                            <select wire:model="horario_turno" class="w-full rounded-xl border border-[#C7B5A3] bg-[#D5C7B9]/70 px-4 py-3 text-sm font-bold outline-none focus:border-[#E27D60]">
+                                <option value="Mañana">Mañana</option><option value="Tarde">Tarde</option><option value="Noche">Noche</option><option value="Guardia">Guardia</option><option value="Evento especial">Evento especial</option><option value="Apoyo">Apoyo</option>
+                            </select>
+                            @error('horario_turno') <span class="mt-1 block text-xs font-black text-rose-600">{{ $message }}</span> @enderror
+                        </div>
+                        <div>
+                            <label class="mb-1 block text-[10px] font-black uppercase text-[#2F3E5C]/60">Estado</label>
+                            <select wire:model="horario_estado" class="w-full rounded-xl border border-[#C7B5A3] bg-[#D5C7B9]/70 px-4 py-3 text-sm font-bold outline-none focus:border-[#E27D60]"><option value="ACTIVO">Activo</option><option value="INACTIVO">Inactivo</option></select>
+                            @error('horario_estado') <span class="mt-1 block text-xs font-black text-rose-600">{{ $message }}</span> @enderror
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="mb-1 block text-[10px] font-black uppercase text-[#2F3E5C]/60">Observacion</label>
+                            <textarea wire:model="horario_observaciones" rows="3" class="w-full rounded-xl border border-[#C7B5A3] bg-[#D5C7B9]/70 px-4 py-3 text-sm font-bold outline-none focus:border-[#E27D60]"></textarea>
+                            @error('horario_observaciones') <span class="mt-1 block text-xs font-black text-rose-600">{{ $message }}</span> @enderror
+                        </div>
+                    </div>
+                    <div class="mt-5 flex flex-col-reverse gap-2 border-t border-[#C7B5A3]/60 pt-4 sm:flex-row sm:justify-end">
+                        <button type="button" wire:click="$set('mostrarFormularioHorario', false)" class="h-10 rounded-xl border border-[#C7B5A3]/70 bg-white/35 px-4 text-xs font-black text-[#2F3E5C]">Cancelar</button>
+                        <button type="submit" class="h-10 rounded-xl bg-[#8DA280] px-5 text-xs font-black uppercase text-white">Guardar horario</button>
+                    </div>
+                </form>
             </div>
         </div>
     @endif
 
-    <!-- ──────────────────────────────────────────────
-         MODAL 4: PANEL DE REPORTES INTERACTIVOS
-         ────────────────────────────────────────────── -->
-    @if($mostrarReportes)
-        <div class="fixed inset-0 bg-azul-profundo/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-            <div class="bg-white rounded-3xl shadow-xl w-full max-w-lg overflow-hidden border border-[#C7B5A3]/20 animate-in fade-in zoom-in-95 duration-150">
-                <!-- Header -->
-                <div class="bg-crema px-6 py-4 border-b border-[#C7B5A3]/30 flex items-center justify-between">
-                    <div>
-                        <h3 class="text-sm font-black text-azul-profundo uppercase tracking-wider">Centro de Reportes de Planificación</h3>
-                        <p class="text-[10px] text-azul-profundo/40 font-semibold mt-0.5">Exportación de datos de turnos y personal.</p>
-                    </div>
-                    <button wire:click="$set('mostrarReportes', false)" class="h-7 w-7 rounded-full bg-[#E6DDD3]/50 hover:bg-[#E6DDD3] flex items-center justify-center text-azul-profundo/50 transition">
-                        <i class="ph ph-x"></i>
-                    </button>
+    @if($mostrarFormularioTurno)
+        <div class="fixed inset-0 z-[70] flex items-center justify-center bg-[#2F3E5C]/55 p-4 backdrop-blur-sm">
+            <div class="flex max-h-[85vh] w-full max-w-3xl flex-col overflow-hidden rounded-[1.5rem] border border-[#C7B5A3]/70 bg-[#F3ECE4] shadow-2xl">
+                <div class="flex items-start justify-between gap-3 border-b border-[#C7B5A3]/60 p-5">
+                    <div><h2 class="text-lg font-black text-[#2F3E5C]">{{ $isEdit ? 'Editar turno institucional' : 'Registrar turno institucional' }}</h2><p class="mt-1 text-xs font-bold text-[#2F3E5C]/58">Identificacion, horario, color y estado del turno.</p></div>
+                    <button type="button" wire:click="$set('mostrarFormularioTurno', false)" class="flex h-9 w-9 items-center justify-center rounded-xl bg-[#E6DDD3] text-[#2F3E5C] transition hover:bg-[#E27D60] hover:text-white"><i class="ph-bold ph-x"></i></button>
                 </div>
-
-                <!-- Content -->
-                <div class="p-6 space-y-4">
-                    <p class="text-xs text-azul-profundo/50 font-medium">Seleccione el formato y tipo de reporte que desea exportar del sistema de turnos:</p>
-                    
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <!-- Card PDF 1 -->
-                        <div wire:click="exportarReporteGeneralPdf" class="p-4 border border-[#C7B5A3]/20 hover:border-[#C7B5A3]/60 bg-crema/30 rounded-2xl cursor-pointer transition flex items-center gap-3">
-                            <span class="h-10 w-10 bg-rose-50 text-rose-600 rounded-xl flex items-center justify-center text-xl">
-                                <i class="ph ph-file-pdf"></i>
-                            </span>
-                            <div>
-                                <h4 class="text-xs font-bold text-azul-profundo uppercase tracking-wider">General As asignaciones PDF</h4>
-                                <p class="text-[9px] text-azul-profundo/40 font-medium">Formato oficial impreso.</p>
-                            </div>
-                        </div>
-
-                        <!-- Card Excel 1 -->
-                        <div wire:click="exportarReporteGeneralExcel" class="p-4 border border-[#C7B5A3]/20 hover:border-[#C7B5A3]/60 bg-crema/30 rounded-2xl cursor-pointer transition flex items-center gap-3">
-                            <span class="h-10 w-10 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center text-xl">
-                                <i class="ph ph-file-xls"></i>
-                            </span>
-                            <div>
-                                <h4 class="text-xs font-bold text-azul-profundo uppercase tracking-wider">General As asignaciones XLS</h4>
-                                <p class="text-[9px] text-azul-profundo/40 font-medium">Planilla interactiva Excel.</p>
-                            </div>
-                        </div>
-
-                        <!-- Card PDF 2 -->
-                        <div wire:click="exportarCoberturaSemanalPdf" class="p-4 border border-[#C7B5A3]/20 hover:border-[#C7B5A3]/60 bg-crema/30 rounded-2xl cursor-pointer transition flex items-center gap-3">
-                            <span class="h-10 w-10 bg-rose-50 text-rose-600 rounded-xl flex items-center justify-center text-xl">
-                                <i class="ph ph-calendar"></i>
-                            </span>
-                            <div>
-                                <h4 class="text-xs font-bold text-azul-profundo uppercase tracking-wider">Grilla Semanal PDF</h4>
-                                <p class="text-[9px] text-azul-profundo/40 font-medium">Matriz de cobertura semanal.</p>
-                            </div>
-                        </div>
-
-                        <!-- Card Excel 2 -->
-                        <div wire:click="exportarPersonalSinTurnoExcel" class="p-4 border border-[#C7B5A3]/20 hover:border-[#C7B5A3]/60 bg-crema/30 rounded-2xl cursor-pointer transition flex items-center gap-3">
-                            <span class="h-10 w-10 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center text-xl">
-                                <i class="ph ph-users-three"></i>
-                            </span>
-                            <div>
-                                <h4 class="text-xs font-bold text-azul-profundo uppercase tracking-wider">Personal Sin Turno XLS</h4>
-                                <p class="text-[9px] text-azul-profundo/40 font-medium">Colaboradores sin programar.</p>
-                            </div>
-                        </div>
+                <form wire:submit.prevent="guardarTurno" class="overflow-y-auto p-5">
+                    <div class="grid gap-4 md:grid-cols-2">
+                        <div class="md:col-span-2"><label class="mb-1 block text-[10px] font-black uppercase text-[#2F3E5C]/60">Nombre del turno</label><input wire:model="turno_nombre" type="text" class="w-full rounded-xl border border-[#C7B5A3] bg-[#D5C7B9]/70 px-4 py-3 text-sm font-bold outline-none focus:border-[#E27D60]" placeholder="Ej. Turno mañana">@error('turno_nombre') <span class="mt-1 block text-xs font-black text-rose-600">{{ $message }}</span> @enderror</div>
+                        <div><label class="mb-1 block text-[10px] font-black uppercase text-[#2F3E5C]/60">Hora inicio</label><input wire:model="turno_hora_inicio" type="time" class="w-full rounded-xl border border-[#C7B5A3] bg-[#D5C7B9]/70 px-4 py-3 text-sm font-bold outline-none focus:border-[#E27D60]">@error('turno_hora_inicio') <span class="mt-1 block text-xs font-black text-rose-600">{{ $message }}</span> @enderror</div>
+                        <div><label class="mb-1 block text-[10px] font-black uppercase text-[#2F3E5C]/60">Hora fin</label><input wire:model="turno_hora_fin" type="time" class="w-full rounded-xl border border-[#C7B5A3] bg-[#D5C7B9]/70 px-4 py-3 text-sm font-bold outline-none focus:border-[#E27D60]">@error('turno_hora_fin') <span class="mt-1 block text-xs font-black text-rose-600">{{ $message }}</span> @enderror</div>
+                        <div><label class="mb-1 block text-[10px] font-black uppercase text-[#2F3E5C]/60">Color</label><input wire:model="turno_color" type="color" class="h-12 w-full rounded-xl border border-[#C7B5A3] bg-[#D5C7B9]/70 px-3 py-2">@error('turno_color') <span class="mt-1 block text-xs font-black text-rose-600">{{ $message }}</span> @enderror</div>
+                        <div><label class="mb-1 block text-[10px] font-black uppercase text-[#2F3E5C]/60">Estado</label><select wire:model="turno_estado" class="w-full rounded-xl border border-[#C7B5A3] bg-[#D5C7B9]/70 px-4 py-3 text-sm font-bold outline-none focus:border-[#E27D60]"><option value="ACTIVO">Activo</option><option value="INACTIVO">Inactivo</option></select>@error('turno_estado') <span class="mt-1 block text-xs font-black text-rose-600">{{ $message }}</span> @enderror</div>
+                        <div class="md:col-span-2"><label class="mb-1 block text-[10px] font-black uppercase text-[#2F3E5C]/60">Descripcion</label><textarea wire:model="turno_descripcion" rows="2" class="w-full rounded-xl border border-[#C7B5A3] bg-[#D5C7B9]/70 px-4 py-3 text-sm font-bold outline-none focus:border-[#E27D60]"></textarea>@error('turno_descripcion') <span class="mt-1 block text-xs font-black text-rose-600">{{ $message }}</span> @enderror</div>
+                        <div class="md:col-span-2"><label class="mb-1 block text-[10px] font-black uppercase text-[#2F3E5C]/60">Observacion</label><textarea wire:model="turno_observaciones" rows="2" class="w-full rounded-xl border border-[#C7B5A3] bg-[#D5C7B9]/70 px-4 py-3 text-sm font-bold outline-none focus:border-[#E27D60]"></textarea>@error('turno_observaciones') <span class="mt-1 block text-xs font-black text-rose-600">{{ $message }}</span> @enderror</div>
                     </div>
-                </div>
+                    <div class="mt-5 flex flex-col-reverse gap-2 border-t border-[#C7B5A3]/60 pt-4 sm:flex-row sm:justify-end"><button type="button" wire:click="$set('mostrarFormularioTurno', false)" class="h-10 rounded-xl border border-[#C7B5A3]/70 bg-white/35 px-4 text-xs font-black text-[#2F3E5C]">Cancelar</button><button type="submit" class="h-10 rounded-xl bg-[#2F3E5C] px-5 text-xs font-black uppercase text-white">Guardar turno</button></div>
+                </form>
+            </div>
+        </div>
+    @endif
 
-                <!-- Footer -->
-                <div class="px-6 py-4 bg-crema/30 border-t border-[#C7B5A3]/20 flex justify-end">
-                    <button wire:click="$set('mostrarReportes', false)" class="px-4 py-2 bg-azul-profundo hover:bg-azul-profundo/80 text-white font-bold text-xs rounded-xl tracking-wider uppercase transition">
-                        Cerrar
-                    </button>
+    @if($mostrarFormularioAsignacion)
+        <div class="fixed inset-0 z-[70] flex items-center justify-center bg-[#2F3E5C]/55 p-4 backdrop-blur-sm">
+            <div class="flex max-h-[85vh] w-full max-w-4xl flex-col overflow-hidden rounded-[1.5rem] border border-[#C7B5A3]/70 bg-[#F3ECE4] shadow-2xl">
+                <div class="flex items-start justify-between gap-3 border-b border-[#C7B5A3]/60 p-5">
+                    <div><h2 class="text-lg font-black text-[#2F3E5C]">{{ $isEdit ? 'Editar asignacion' : 'Registrar asignacion' }}</h2><p class="mt-1 text-xs font-bold text-[#2F3E5C]/58">Se validara compatibilidad con horarios y conflictos activos.</p></div>
+                    <button type="button" wire:click="$set('mostrarFormularioAsignacion', false)" class="flex h-9 w-9 items-center justify-center rounded-xl bg-[#E6DDD3] text-[#2F3E5C] transition hover:bg-[#E27D60] hover:text-white"><i class="ph-bold ph-x"></i></button>
+                </div>
+                <form wire:submit.prevent="guardarAsignacion" class="overflow-y-auto p-5">
+                    <div class="grid gap-4 md:grid-cols-2">
+                        <div><label class="mb-1 block text-[10px] font-black uppercase text-[#2F3E5C]/60">Personal asignado</label><select wire:model="asig_cod_usu" class="w-full rounded-xl border border-[#C7B5A3] bg-[#D5C7B9]/70 px-4 py-3 text-sm font-bold outline-none focus:border-[#E27D60]"><option value="">Seleccione personal</option>@foreach($usuariosDisponibles as $usuario)<option value="{{ $usuario->cod_usu }}">{{ $usuario->name }} · {{ $usuario->areaInstitucional?->nombre ?? 'Sin area' }}</option>@endforeach</select>@error('asig_cod_usu') <span class="mt-1 block text-xs font-black text-rose-600">{{ $message }}</span> @enderror</div>
+                        <div><label class="mb-1 block text-[10px] font-black uppercase text-[#2F3E5C]/60">Area institucional</label><select wire:model="asig_cod_area" class="w-full rounded-xl border border-[#C7B5A3] bg-[#D5C7B9]/70 px-4 py-3 text-sm font-bold outline-none focus:border-[#E27D60]"><option value="">Seleccione area</option>@foreach($areasDisponibles as $area)<option value="{{ $area->cod_area }}">{{ $area->nombre }}</option>@endforeach</select>@error('asig_cod_area') <span class="mt-1 block text-xs font-black text-rose-600">{{ $message }}</span> @enderror</div>
+                        <div><label class="mb-1 block text-[10px] font-black uppercase text-[#2F3E5C]/60">Turno</label><select wire:model="asig_cod_turno" class="w-full rounded-xl border border-[#C7B5A3] bg-[#D5C7B9]/70 px-4 py-3 text-sm font-bold outline-none focus:border-[#E27D60]"><option value="">Seleccione turno</option>@foreach($turnosDisponibles as $turno)<option value="{{ $turno->cod_turno }}">{{ $turno->nombre }} · {{ substr($turno->hora_inicio ?? '--:--', 0, 5) }}-{{ substr($turno->hora_fin ?? '--:--', 0, 5) }}</option>@endforeach</select>@error('asig_cod_turno') <span class="mt-1 block text-xs font-black text-rose-600">{{ $message }}</span> @enderror</div>
+                        <div><label class="mb-1 block text-[10px] font-black uppercase text-[#2F3E5C]/60">Tipo de asignacion</label><select wire:model="asig_tipo_asignacion" class="w-full rounded-xl border border-[#C7B5A3] bg-[#D5C7B9]/70 px-4 py-3 text-sm font-bold outline-none focus:border-[#E27D60]"><option value="REGULAR">Regular</option><option value="APOYO">Apoyo temporal</option><option value="COBERTURA">Cobertura especial</option><option value="VOLUNTARIADO">Voluntariado</option></select>@error('asig_tipo_asignacion') <span class="mt-1 block text-xs font-black text-rose-600">{{ $message }}</span> @enderror</div>
+                        <div><label class="mb-1 block text-[10px] font-black uppercase text-[#2F3E5C]/60">Fecha inicio</label><input wire:model="asig_fecha_inicio" type="date" class="w-full rounded-xl border border-[#C7B5A3] bg-[#D5C7B9]/70 px-4 py-3 text-sm font-bold outline-none focus:border-[#E27D60]">@error('asig_fecha_inicio') <span class="mt-1 block text-xs font-black text-rose-600">{{ $message }}</span> @enderror</div>
+                        <div><label class="mb-1 block text-[10px] font-black uppercase text-[#2F3E5C]/60">Fecha fin</label><input wire:model="asig_fecha_fin" type="date" class="w-full rounded-xl border border-[#C7B5A3] bg-[#D5C7B9]/70 px-4 py-3 text-sm font-bold outline-none focus:border-[#E27D60]">@error('asig_fecha_fin') <span class="mt-1 block text-xs font-black text-rose-600">{{ $message }}</span> @enderror</div>
+                        <div class="md:col-span-2"><label class="mb-2 block text-[10px] font-black uppercase text-[#2F3E5C]/60">Dias asignados</label><div class="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">@foreach($diasSemana as $dia)<label class="flex items-center justify-between rounded-xl border border-[#C7B5A3]/60 bg-white/35 px-4 py-3 text-sm font-black text-[#2F3E5C]">{{ $diaLabels[$dia] }}<input wire:model="asig_dias_semana" type="checkbox" value="{{ $dia }}" class="h-5 w-5 rounded border-[#C7B5A3] text-[#E27D60] focus:ring-[#E27D60]"></label>@endforeach</div>@error('asig_dias_semana') <span class="mt-1 block text-xs font-black text-rose-600">{{ $message }}</span> @enderror</div>
+                        <div><label class="mb-1 block text-[10px] font-black uppercase text-[#2F3E5C]/60">Estado</label><select wire:model="asig_estado" class="w-full rounded-xl border border-[#C7B5A3] bg-[#D5C7B9]/70 px-4 py-3 text-sm font-bold outline-none focus:border-[#E27D60]"><option value="ACTIVA">Activa</option><option value="INACTIVA">Inactiva</option><option value="FINALIZADA">Finalizada</option></select>@error('asig_estado') <span class="mt-1 block text-xs font-black text-rose-600">{{ $message }}</span> @enderror</div>
+                        <label class="flex items-center justify-between rounded-xl border border-[#C7B5A3]/60 bg-white/35 px-4 py-3 text-sm font-black text-[#2F3E5C]">Apoyo temporal en otra area<input wire:model="asig_apoyo_temporal" type="checkbox" class="h-5 w-5 rounded border-[#C7B5A3] text-[#E27D60] focus:ring-[#E27D60]"></label>
+                        <div class="md:col-span-2"><label class="mb-1 block text-[10px] font-black uppercase text-[#2F3E5C]/60">Observacion</label><textarea wire:model="asig_observaciones" rows="3" class="w-full rounded-xl border border-[#C7B5A3] bg-[#D5C7B9]/70 px-4 py-3 text-sm font-bold outline-none focus:border-[#E27D60]"></textarea>@error('asig_observaciones') <span class="mt-1 block text-xs font-black text-rose-600">{{ $message }}</span> @enderror</div>
+                    </div>
+                    <div class="mt-5 flex flex-col-reverse gap-2 border-t border-[#C7B5A3]/60 pt-4 sm:flex-row sm:justify-end"><button type="button" wire:click="$set('mostrarFormularioAsignacion', false)" class="h-10 rounded-xl border border-[#C7B5A3]/70 bg-white/35 px-4 text-xs font-black text-[#2F3E5C]">Cancelar</button><button type="submit" class="h-10 rounded-xl bg-[#E27D60] px-5 text-xs font-black uppercase text-white">Guardar asignacion</button></div>
+                </form>
+            </div>
+        </div>
+    @endif
+
+    @if($mostrarFichaAsignacion && $asignacionSeleccionada)
+        <div class="fixed inset-0 z-[70] flex items-center justify-center bg-[#2F3E5C]/55 p-4 backdrop-blur-sm">
+            <div class="w-full max-w-2xl overflow-hidden rounded-[1.5rem] border border-[#C7B5A3]/70 bg-[#F3ECE4] shadow-2xl">
+                <div class="flex items-start justify-between gap-3 border-b border-[#C7B5A3]/60 p-5">
+                    <div><h2 class="text-lg font-black text-[#2F3E5C]">Detalle de asignacion</h2><p class="mt-1 text-xs font-bold text-[#2F3E5C]/58">Consulta operativa sin salir del modulo.</p></div>
+                    <button type="button" wire:click="$set('mostrarFichaAsignacion', false)" class="flex h-9 w-9 items-center justify-center rounded-xl bg-[#E6DDD3] text-[#2F3E5C] transition hover:bg-[#E27D60] hover:text-white"><i class="ph-bold ph-x"></i></button>
+                </div>
+                <div class="p-5">
+                    <div class="grid gap-3 sm:grid-cols-2">
+                        <div class="rounded-2xl bg-white/35 p-3"><p class="text-[10px] font-black uppercase text-[#2F3E5C]/50">Personal</p><p class="mt-1 text-sm font-black text-[#2F3E5C]">{{ $asignacionSeleccionada->usuario?->name ?? 'Sin usuario' }}</p></div>
+                        <div class="rounded-2xl bg-white/35 p-3"><p class="text-[10px] font-black uppercase text-[#2F3E5C]/50">Area</p><p class="mt-1 text-sm font-black text-[#2F3E5C]">{{ $asignacionSeleccionada->area?->nombre ?? 'Sin area' }}</p></div>
+                        <div class="rounded-2xl bg-white/35 p-3"><p class="text-[10px] font-black uppercase text-[#2F3E5C]/50">Turno</p><p class="mt-1 text-sm font-black text-[#2F3E5C]">{{ $asignacionSeleccionada->turno?->nombre ?? 'Sin turno' }}</p><p class="text-xs font-bold text-[#2F3E5C]/55">{{ substr($asignacionSeleccionada->turno?->hora_inicio ?? '--:--', 0, 5) }} - {{ substr($asignacionSeleccionada->turno?->hora_fin ?? '--:--', 0, 5) }}</p></div>
+                        <div class="rounded-2xl bg-white/35 p-3"><p class="text-[10px] font-black uppercase text-[#2F3E5C]/50">Estado</p><p class="mt-1 text-sm font-black text-[#2F3E5C]">{{ $asignacionSeleccionada->estado }}</p></div>
+                        <div class="rounded-2xl bg-white/35 p-3 sm:col-span-2"><p class="text-[10px] font-black uppercase text-[#2F3E5C]/50">Dias y vigencia</p><p class="mt-1 text-sm font-black text-[#2F3E5C]">{{ implode(', ', $asignacionSeleccionada->dias_semana ?: []) }}</p><p class="text-xs font-bold text-[#2F3E5C]/55">{{ $asignacionSeleccionada->fecha_inicio?->format('d/m/Y') ?? 'S/F' }} - {{ $asignacionSeleccionada->fecha_fin?->format('d/m/Y') ?? 'Vigente' }}</p></div>
+                        <div class="rounded-2xl bg-white/35 p-3 sm:col-span-2"><p class="text-[10px] font-black uppercase text-[#2F3E5C]/50">Observacion</p><p class="mt-1 text-sm font-bold text-[#2F3E5C]/70">{{ $asignacionSeleccionada->observaciones ?: 'Sin observaciones.' }}</p></div>
+                    </div>
+                    <div class="mt-5 flex flex-col-reverse gap-2 border-t border-[#C7B5A3]/60 pt-4 sm:flex-row sm:justify-end">
+                        @can('turnos.asignar')
+                            @if($asignacionSeleccionada->estado === 'ACTIVA')
+                                <button type="button" wire:click="cargarAsignacion('{{ $asignacionSeleccionada->cod_asignacion }}')" class="h-10 rounded-xl border border-[#C7B5A3]/70 bg-white/35 px-4 text-xs font-black text-[#2F3E5C]">Editar</button>
+                            @endif
+                        @endcan
+                        <button type="button" wire:click="$set('mostrarFichaAsignacion', false)" class="h-10 rounded-xl bg-[#2F3E5C] px-4 text-xs font-black uppercase text-white">Cerrar</button>
+                    </div>
                 </div>
             </div>
         </div>

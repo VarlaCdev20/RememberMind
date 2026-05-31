@@ -9,11 +9,11 @@
         <div class="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between relative z-10">
             <div>
                 <span class="text-[10px] font-black uppercase tracking-[0.2em] text-[#E27D60]">
-                    Casa Amandita • Gestión Operativa
+                    CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS • Gestión Operativa
                 </span>
                 <h1 class="mt-1.5 text-3xl font-black text-[#2F3E5C] tracking-tight">Centro de Adultos Mayores</h1>
                 <p class="mt-2 max-w-3xl text-sm font-semibold leading-relaxed text-[#2F3E5C]/75">
-                    Gestión integral, seguimiento y consulta de adultos mayores registrados en Casa Amandita.
+                    Gestión integral, seguimiento y consulta de adultos mayores registrados en CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS.
                 </p>
             </div>
 

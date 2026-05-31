@@ -47,6 +47,6 @@
     </table>
 
     <div class="alert-box">
-        <strong>Nota Administrativa:</strong> Todo voluntario debe someterse a la inducción de seguridad y confidencialidad antes de interactuar directamente con los residentes, firmando la cláusula de resguardo de datos de Casa Amandita.
+        <strong>Nota Administrativa:</strong> Todo voluntario debe someterse a la inducción de seguridad y confidencialidad antes de interactuar directamente con los residentes, firmando la cláusula de resguardo de datos de CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS.
     </div>
 @endsection

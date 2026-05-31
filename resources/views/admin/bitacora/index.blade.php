@@ -8,7 +8,7 @@
                     Centro de Auditoría
                 </h1>
                 <p class="mt-1 text-sm font-medium text-azul-profundo/60">
-                    Trazabilidad institucional y registro de eventos críticos — Casa Amandita
+                    Trazabilidad institucional y registro de eventos críticos — CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS
                 </p>
             </div>
             <div class="flex items-center gap-2 p-1 bg-[#D5C7B9]/30 rounded-xl">

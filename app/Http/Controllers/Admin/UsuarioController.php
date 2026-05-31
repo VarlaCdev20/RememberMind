@@ -372,7 +372,7 @@ class UsuarioController extends Controller
             $rol = $usuario->roles->first()?->name;
             
             $usuariosPanel = new \App\Livewire\Admin\Usuarios\UsuariosPanel();
-            $documentos = $usuariosPanel->obtenerDocumentosRequeridosPorRol($rol);
+            $documentos = app(\App\Services\Usuarios\DocumentosUsuarioService::class)->documentosRequeridosPorRol($rol);
             $rolLegible = $usuariosPanel->obtenerNombreRolLegible($rol);
             
             $fechaRegistro = $usuario->created_at ? $usuario->created_at->format('d/m/Y H:i') : now()->format('d/m/Y H:i');
@@ -404,5 +404,5 @@ class UsuarioController extends Controller
             return back()->with('error', 'Error al generar la solicitud de documentación en PDF: ' . $e->getMessage());
         }
     }
-}
 
+}

@@ -6,7 +6,7 @@
             <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
                 <div>
                     <span class="text-[11px] font-black uppercase tracking-[0.2em] text-[#9A7B60]">
-                        Casa Amandita • Monitoreo Activo
+                        CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS • Monitoreo Activo
                     </span>
                     <h1 class="mt-1 text-2xl font-black text-[#2F3E5C]">Alertas y Pendientes</h1>
                     <p class="mt-1 text-xs font-bold text-[#2F3E5C]/60">

@@ -11,6 +11,14 @@ use Illuminate\Support\Facades\Storage;
 
 class AdultoMayorDocumentoController extends Controller
 {
+    public function index(AdultoMayor $adulto_mayor)
+    {
+        $adulto_mayor->load(['documentos' => function($q) {
+            $q->withTrashed()->latest();
+        }]);
+        return view('admin.adultos-mayores.documentos.index', compact('adulto_mayor'));
+    }
+
     public function store(StoreDocumentoAdultoRequest $request, AdultoMayor $adulto_mayor)
     {
         $data = $request->validated();
@@ -28,7 +36,7 @@ class AdultoMayorDocumentoController extends Controller
             ->performedOn($adulto_mayor)
             ->log("Se subió un documento para el adulto mayor: {$adulto_mayor->nombres}");
 
-        return redirect()->route('admin.adultos-mayores.show', ['adulto_mayor' => $adulto_mayor->cod_am, 'tab' => 'documentos'])->with('success', 'Documento subido correctamente.');
+        return redirect()->route('admin.adultos-mayores.documentos.index', $adulto_mayor->cod_am)->with('success', 'Documento subido correctamente.');
     }
 
     public function update(Request $request, AdultoMayor $adulto_mayor, $documento)
@@ -43,7 +51,7 @@ class AdultoMayorDocumentoController extends Controller
 
         $doc->update($request->only(['nom_doc', 'tipo_doc', 'observaciones']));
 
-        return redirect()->route('admin.adultos-mayores.show', ['adulto_mayor' => $adulto_mayor->cod_am, 'tab' => 'documentos'])->with('success', 'Metadatos del documento actualizados.');
+        return redirect()->route('admin.adultos-mayores.documentos.index', $adulto_mayor->cod_am)->with('success', 'Metadatos del documento actualizados.');
     }
 
     public function destroy(AdultoMayor $adulto_mayor, $documento)
@@ -57,7 +65,7 @@ class AdultoMayorDocumentoController extends Controller
             ->performedOn($adulto_mayor)
             ->log("Se archivó un documento (baja lógica) de la ficha {$adulto_mayor->cod_am}. Se conserva archivo físico.");
 
-        return redirect()->route('admin.adultos-mayores.show', ['adulto_mayor' => $adulto_mayor->cod_am, 'tab' => 'documentos'])->with('success', 'Documento archivado correctamente.');
+        return redirect()->route('admin.adultos-mayores.documentos.index', $adulto_mayor->cod_am)->with('success', 'Documento archivado correctamente.');
     }
 
     public function restore(AdultoMayor $adulto_mayor, $id)
@@ -70,7 +78,7 @@ class AdultoMayorDocumentoController extends Controller
             ->withProperties(['cod_doc' => $id])
             ->log("Se restauró un documento previamente archivado.");
 
-        return redirect()->route('admin.adultos-mayores.show', ['adulto_mayor' => $adulto_mayor->cod_am, 'tab' => 'documentos'])
+        return redirect()->route('admin.adultos-mayores.documentos.index', $adulto_mayor->cod_am)
             ->with('success', 'Documento restaurado correctamente.');
     }
 }

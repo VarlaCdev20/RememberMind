@@ -112,6 +112,6 @@
 
     <div class="alert-box" style="margin-top: 30px;">
         <strong>Control de Asistencia e Incidencias:</strong><br>
-        Esta grilla horaria determina la planificación formal del colaborador. Cualquier desvío de la jornada debe informarse por los canales oficiales del centro Casa Amandita.
+        Esta grilla horaria determina la planificación formal del colaborador. Cualquier desvío de la jornada debe informarse por los canales oficiales de CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS.
     </div>
 @endsection

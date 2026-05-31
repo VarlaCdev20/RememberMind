@@ -14,9 +14,9 @@
                     <div class="max-w-3xl">
                         <span class="inline-flex items-center gap-2 rounded-full border border-[#E27D60]/20 bg-[#E27D60]/10 px-3 py-1 text-[10px] font-black uppercase tracking-[0.22em] text-[#E27D60]">
                             <i class="ph-bold ph-heartbeat text-sm"></i>
-                            Casa Amandita - Area clinico asistencial
+                            CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS - Area clinico asistencial
                         </span>
-                        <h1 class="mt-3 text-3xl font-black tracking-tight text-[#2F3E5C] sm:text-4xl">
+                        <h1 class="mt-3 text-2xl font-black tracking-tight text-[#2F3E5C] sm:text-3xl">
                             Salud y Seguimiento
                         </h1>
                         <p class="mt-2 max-w-2xl text-sm font-bold leading-relaxed text-[#2F3E5C]/72">
@@ -51,7 +51,7 @@
                         @foreach($metricasHeader as $metrica)
                             <div class="relative overflow-hidden rounded-2xl border border-[#C7B5A3]/55 {{ $metrica['bg'] }} p-3.5 shadow-sm backdrop-blur-md">
                                 <i class="ph-bold {{ $metrica['icono'] }} absolute right-3 top-3 text-2xl text-[#2F3E5C]/10"></i>
-                                <p class="pr-7 text-[8px] font-black uppercase leading-tight tracking-[0.16em] text-[#2F3E5C]/50">{{ $metrica['label'] }}</p>
+                                <p class="pr-7 text-[10px] font-black uppercase leading-tight tracking-[0.12em] text-[#2F3E5C]/60">{{ $metrica['label'] }}</p>
                                 <p class="mt-2 text-2xl font-black leading-none {{ $metrica['color'] }}">{{ $metrica['valor'] }}</p>
                             </div>
                         @endforeach
@@ -119,7 +119,7 @@
                             ] as $barra)
                                 <div class="rounded-2xl border border-[#C7B5A3]/45 bg-[#E6DDD3]/62 p-4">
                                     <div class="mb-3 flex items-center justify-between gap-2">
-                                        <p class="text-[9px] font-black uppercase tracking-[0.15em] text-[#2F3E5C]/52">{{ $barra['label'] }}</p>
+                                        <p class="text-[10px] font-black uppercase tracking-[0.12em] text-[#2F3E5C]/60">{{ $barra['label'] }}</p>
                                         <i class="ph-bold {{ $barra['icono'] }} text-lg" style="color: {{ $barra['color'] }}"></i>
                                     </div>
                                     <div class="h-2 overflow-hidden rounded-full bg-[#D5C7B9]/75">
@@ -142,7 +142,7 @@
                                     <div class="flex items-center justify-between gap-3 rounded-2xl border border-[#C7B5A3]/35 bg-[#E6DDD3]/55 px-3 py-3">
                                         <div class="min-w-0">
                                             <p class="truncate text-xs font-black text-[#2F3E5C]">{{ $control->adultoMayor?->nombres }} {{ $control->adultoMayor?->ap_paterno }}</p>
-                                            <p class="mt-0.5 text-[10px] font-bold text-[#2F3E5C]/50">{{ $control->fecha?->format('d/m/Y') }} - {{ $control->hora_formateada }}</p>
+                                            <p class="mt-0.5 text-xs font-bold text-[#2F3E5C]/55">{{ $control->fecha?->format('d/m/Y') }} - {{ $control->hora_formateada }}</p>
                                         </div>
                                         <div class="flex shrink-0 gap-1.5 text-[10px] font-black">
                                             <span class="rounded-full bg-[#2F3E5C]/8 px-2 py-1 text-[#2F3E5C]">{{ $control->presion_formateada ?? 'S/D' }}</span>
@@ -170,9 +170,9 @@
                                                 <p class="truncate text-xs font-black text-[#2F3E5C]">{{ $med->nombre_medicamento }}</p>
                                                 <p class="mt-0.5 text-[10px] font-bold text-[#2F3E5C]/55">{{ $med->adultoMayor?->nombres }} {{ $med->adultoMayor?->ap_paterno }}</p>
                                             </div>
-                                            <span class="rounded-full bg-[#8DA280]/18 px-2 py-1 text-[9px] font-black uppercase text-[#63775B]">Activo</span>
+                                            <span class="rounded-full bg-[#8DA280]/18 px-2 py-1 text-xs font-black uppercase text-[#63775B]">Activo</span>
                                         </div>
-                                        <p class="mt-2 text-[10px] font-bold text-[#2F3E5C]/65">{{ $med->dosis }} - {{ $med->frecuencia }} - {{ $med->via_administracion }}</p>
+                                        <p class="mt-2 text-xs font-bold text-[#2F3E5C]/65">{{ $med->dosis }} - {{ $med->frecuencia }} - {{ $med->via_administracion }}</p>
                                     </div>
                                 @empty
                                     <div class="rounded-2xl border border-dashed border-[#C7B5A3]/60 bg-[#E6DDD3]/35 p-6 text-center">
@@ -203,7 +203,7 @@
                                         <div class="min-w-0 flex-1">
                                             <div class="flex flex-wrap items-center gap-2">
                                                 <p class="truncate text-xs font-black text-[#2F3E5C]">{{ $alerta['titulo'] }}</p>
-                                                <span class="rounded-full bg-[#D5C7B9]/70 px-2 py-0.5 text-[8px] font-black uppercase tracking-wider text-[#2F3E5C]/60">{{ $alerta['tipo'] }}</span>
+                                                <span class="rounded-full bg-[#D5C7B9]/70 px-2 py-0.5 text-[10px] font-black uppercase tracking-wide text-[#2F3E5C]/60">{{ $alerta['tipo'] }}</span>
                                             </div>
                                             <p class="mt-1 text-[11px] font-bold leading-relaxed text-[#2F3E5C]/65">{{ $alerta['detalle'] }}</p>
                                         </div>
@@ -229,7 +229,7 @@
                             ] as $atajo)
                                 <button wire:click="cambiarSeccion('{{ $atajo['key'] }}')" type="button" class="group rounded-2xl border border-[#C7B5A3]/45 bg-[#E6DDD3]/62 px-3 py-3 text-left transition hover:-translate-y-0.5 hover:border-[#E27D60]/45 hover:bg-[#F8F3ED]/70">
                                     <i class="ph-bold {{ $atajo['icon'] }} text-lg text-[#E27D60] transition group-hover:scale-110"></i>
-                                    <p class="mt-2 text-[10px] font-black uppercase leading-tight tracking-wider text-[#2F3E5C]">{{ $atajo['label'] }}</p>
+                                    <p class="mt-2 text-xs font-black uppercase leading-tight tracking-wide text-[#2F3E5C]">{{ $atajo['label'] }}</p>
                                 </button>
                             @endforeach
                         </div>
@@ -239,7 +239,7 @@
         @else
             {{-- BOTÓN GLOBAL "VOLVER AL RESUMEN" PARA LOS DEMÁS SUBMÓDULOS --}}
             <div class="mb-2">
-                <button wire:click="cambiarSeccion('resumen')" class="inline-flex items-center gap-2 rounded-xl bg-[#E6DDD3]/60 px-4 py-2.5 text-[10px] font-black uppercase tracking-wider text-[#2F3E5C] transition-all hover:bg-[#C7B5A3]/70 hover:shadow-sm">
+                <button wire:click="cambiarSeccion('resumen')" class="inline-flex items-center gap-2 rounded-xl bg-[#E6DDD3]/60 px-4 py-2.5 text-xs font-black uppercase tracking-wider text-[#2F3E5C] transition-all hover:bg-[#C7B5A3]/70 hover:shadow-sm">
                     <i class="ph-bold ph-arrow-left text-sm"></i>
                     Volver al resumen
                 </button>
@@ -270,13 +270,13 @@
                 <div class="rounded-[1.6rem] border border-[#C7B5A3]/65 bg-[#F3ECE4]/72 p-4 shadow-sm backdrop-blur-xl sm:p-5">
                     <div class="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
                         <div class="max-w-2xl">
-                            <span class="text-[10px] font-black uppercase tracking-[0.2em] text-[#E27D60]">{{ $contexto['titulo'] }}</span>
+                            <span class="text-xs font-black uppercase tracking-[0.15em] text-[#E27D60]">{{ $contexto['titulo'] }}</span>
                             <h2 class="mt-1 text-xl font-black text-[#2F3E5C]">Seleccionar expediente</h2>
                             <p class="mt-1 text-xs font-bold leading-relaxed text-[#2F3E5C]/62">{{ $contexto['descripcion'] }}</p>
                         </div>
                         <div class="grid w-full gap-3 sm:grid-cols-[1fr_auto] lg:max-w-xl">
                             <label class="relative block">
-                                <span class="mb-1.5 block text-[9px] font-black uppercase tracking-widest text-[#2F3E5C]/55">Buscar adulto mayor</span>
+                                <span class="mb-1.5 block text-[10px] font-black uppercase tracking-widest text-[#2F3E5C]/55">Buscar adulto mayor</span>
                                 <i class="ph-bold ph-magnifying-glass absolute bottom-3 left-3.5 text-[#2F3E5C]/40"></i>
                                 <input type="text" wire:model.live.debounce.300ms="search" placeholder="Nombre, apellido o codigo..." class="w-full rounded-xl border border-[#C7B5A3]/70 bg-[#E6DDD3]/70 py-2.5 pl-10 pr-4 text-xs font-bold text-[#2F3E5C] outline-none transition placeholder:text-[#2F3E5C]/40 focus:border-[#E27D60] focus:ring-2 focus:ring-[#E27D60]/15">
                             </label>
@@ -306,8 +306,8 @@
                             <div class="h-1.5 w-full bg-gradient-to-r from-[#E27D60] via-[#D9A05B] to-[#8DA280]"></div>
                             <div class="relative bg-gradient-to-b from-[#D5C7B9]/72 to-[#E6DDD3]/30 px-5 pb-5 pt-4 text-center">
                                 <div class="mb-3 flex items-center justify-between gap-2">
-                                    <span class="rounded-full border px-2.5 py-1 text-[8px] font-black uppercase tracking-wider {{ $estadoClase }}">{{ $estadoTexto }}</span>
-                                    <span class="rounded-full border border-[#C7B5A3]/45 bg-[#F8F3ED]/62 px-2.5 py-1 text-[8px] font-black uppercase tracking-wider text-[#2F3E5C]/55">{{ $adulto->cod_am }}</span>
+                                    <span class="rounded-full border px-2.5 py-1 text-xs font-black uppercase tracking-wide {{ $estadoClase }}">{{ $estadoTexto }}</span>
+                                    <span class="rounded-full border border-[#C7B5A3]/45 bg-[#F8F3ED]/62 px-2.5 py-1 text-xs font-black uppercase tracking-wide text-[#2F3E5C]/55">{{ $adulto->cod_am }}</span>
                                 </div>
 
                                 <div class="mx-auto h-20 w-20 overflow-hidden rounded-2xl border-[4px] border-[#F8F3ED]/75 bg-[#2F3E5C] shadow-md transition group-hover:scale-105">
@@ -326,11 +326,11 @@
                             <div class="space-y-3 px-5 py-4">
                                 <div class="grid grid-cols-2 gap-2">
                                     <div class="rounded-xl border border-[#C7B5A3]/35 bg-[#E6DDD3]/48 px-3 py-2">
-                                        <p class="text-[8px] font-black uppercase tracking-wider text-[#2F3E5C]/42">Edad</p>
+                                        <p class="text-[10px] font-black uppercase tracking-wide text-[#2F3E5C]/55">Edad</p>
                                         <p class="mt-0.5 text-xs font-black text-[#2F3E5C]">{{ $edad }}</p>
                                     </div>
                                     <div class="rounded-xl border border-[#C7B5A3]/35 bg-[#E6DDD3]/48 px-3 py-2">
-                                        <p class="text-[8px] font-black uppercase tracking-wider text-[#2F3E5C]/42">C.I.</p>
+                                        <p class="text-[10px] font-black uppercase tracking-wide text-[#2F3E5C]/55">C.I.</p>
                                         <p class="mt-0.5 truncate text-xs font-black text-[#2F3E5C]">{{ $adulto->ci ?: 'S/D' }}</p>
                                     </div>
                                 </div>
@@ -338,47 +338,47 @@
                                 @if($seccionActiva === 'ficha')
                                     <div class="rounded-2xl border border-[#C7B5A3]/35 bg-[#E6DDD3]/48 p-3">
                                         <div class="flex items-center justify-between gap-2">
-                                            <span class="text-[9px] font-black uppercase tracking-wider text-[#2F3E5C]/52">Estado de ficha</span>
-                                            <span class="rounded-full px-2.5 py-0.5 text-[9px] font-black uppercase {{ $ficha ? 'bg-[#8DA280]/18 text-[#63775B]' : 'bg-[#E27D60]/12 text-[#E27D60]' }}">{{ $ficha ? 'Registrada' : 'Pendiente' }}</span>
+                                            <span class="text-[10px] font-black uppercase tracking-wide text-[#2F3E5C]/60">Estado de ficha</span>
+                                            <span class="rounded-full px-2.5 py-0.5 text-xs font-black uppercase {{ $ficha ? 'bg-[#8DA280]/18 text-[#63775B]' : 'bg-[#E27D60]/12 text-[#E27D60]' }}">{{ $ficha ? 'Registrada' : 'Pendiente' }}</span>
                                         </div>
-                                        <p class="mt-2 text-[11px] font-bold text-[#2F3E5C]/62">{{ $ficha ? 'Actualizada ' . $ficha->updated_at->format('d/m/Y') : 'Requiere apertura de expediente medico base.' }}</p>
+                                        <p class="mt-2 text-xs font-bold text-[#2F3E5C]/62">{{ $ficha ? 'Actualizada ' . $ficha->updated_at->format('d/m/Y') : 'Requiere apertura de expediente medico base.' }}</p>
                                     </div>
                                 @elseif($seccionActiva === 'signos')
                                     <div class="grid grid-cols-3 gap-2 text-center">
                                         <div class="rounded-xl bg-[#E6DDD3]/55 px-2 py-2">
-                                            <p class="text-[8px] font-black uppercase text-[#2F3E5C]/45">P.A.</p>
-                                            <p class="text-[10px] font-black text-[#2F3E5C]">{{ $signo?->presion_formateada ?? 'S/D' }}</p>
+                                            <p class="text-[10px] font-black uppercase text-[#2F3E5C]/55">P.A.</p>
+                                            <p class="text-xs font-black text-[#2F3E5C]">{{ $signo?->presion_formateada ?? 'S/D' }}</p>
                                         </div>
                                         <div class="rounded-xl bg-[#E6DDD3]/55 px-2 py-2">
-                                            <p class="text-[8px] font-black uppercase text-[#2F3E5C]/45">Temp.</p>
-                                            <p class="text-[10px] font-black text-[#E27D60]">{{ $signo?->temperatura ? number_format($signo->temperatura, 1) . 'C' : 'S/D' }}</p>
+                                            <p class="text-[10px] font-black uppercase text-[#2F3E5C]/55">Temp.</p>
+                                            <p class="text-xs font-black text-[#E27D60]">{{ $signo?->temperatura ? number_format($signo->temperatura, 1) . 'C' : 'S/D' }}</p>
                                         </div>
                                         <div class="rounded-xl bg-[#E6DDD3]/55 px-2 py-2">
-                                            <p class="text-[8px] font-black uppercase text-[#2F3E5C]/45">SpO2</p>
-                                            <p class="text-[10px] font-black text-[#63775B]">{{ $signo?->saturacion !== null ? $signo->saturacion . '%' : 'S/D' }}</p>
+                                            <p class="text-[10px] font-black uppercase text-[#2F3E5C]/55">SpO2</p>
+                                            <p class="text-xs font-black text-[#63775B]">{{ $signo?->saturacion !== null ? $signo->saturacion . '%' : 'S/D' }}</p>
                                         </div>
                                     </div>
                                 @elseif($seccionActiva === 'valoracion')
                                     <div class="rounded-2xl border border-[#C7B5A3]/35 bg-[#E6DDD3]/48 p-3">
                                         <div class="flex items-center justify-between gap-2">
-                                            <span class="text-[9px] font-black uppercase tracking-wider text-[#2F3E5C]/52">Dependencia</span>
-                                            <span class="rounded-full bg-[#2F3E5C]/8 px-2.5 py-0.5 text-[9px] font-black uppercase text-[#2F3E5C]">{{ $valoracion?->nivel_dependencia ?? 'Sin dato' }}</span>
+                                            <span class="text-[10px] font-black uppercase tracking-wide text-[#2F3E5C]/60">Dependencia</span>
+                                            <span class="rounded-full bg-[#2F3E5C]/8 px-2.5 py-0.5 text-xs font-black uppercase text-[#2F3E5C]">{{ $valoracion?->nivel_dependencia ?? 'Sin dato' }}</span>
                                         </div>
-                                        <p class="mt-2 text-[11px] font-bold text-[#2F3E5C]/62">Riesgo de caida: <span class="font-black text-[#E27D60]">{{ $valoracion?->riesgo_caida ?? 'Sin valorar' }}</span></p>
+                                        <p class="mt-2 text-xs font-bold text-[#2F3E5C]/62">Riesgo de caida: <span class="font-black text-[#E27D60]">{{ $valoracion?->riesgo_caida ?? 'Sin valorar' }}</span></p>
                                     </div>
                                 @else
                                     <div class="rounded-2xl border border-[#C7B5A3]/35 bg-[#E6DDD3]/48 p-3">
                                         <div class="flex items-center justify-between gap-2">
-                                            <span class="text-[9px] font-black uppercase tracking-wider text-[#2F3E5C]/52">Tratamientos activos</span>
-                                            <span class="rounded-full bg-[#8DA280]/18 px-2.5 py-0.5 text-[9px] font-black uppercase text-[#63775B]">{{ $medicacionesActivas }}</span>
+                                            <span class="text-[10px] font-black uppercase tracking-wide text-[#2F3E5C]/60">Tratamientos activos</span>
+                                            <span class="rounded-full bg-[#8DA280]/18 px-2.5 py-0.5 text-xs font-black uppercase text-[#63775B]">{{ $medicacionesActivas }}</span>
                                         </div>
-                                        <p class="mt-2 text-[11px] font-bold text-[#2F3E5C]/62">{{ $medicacionesActivas > 0 ? 'Listo para revisar prescripciones y administraciones.' : 'Sin medicacion activa registrada.' }}</p>
+                                        <p class="mt-2 text-xs font-bold text-[#2F3E5C]/62">{{ $medicacionesActivas > 0 ? 'Listo para revisar prescripciones y administraciones.' : 'Sin medicacion activa registrada.' }}</p>
                                     </div>
                                 @endif
                             </div>
 
                             <div class="border-t border-[#C7B5A3]/35 bg-[#D5C7B9]/32 p-4">
-                                <button wire:click="abrirExpediente('{{ $adulto->cod_am }}')" type="button" class="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#2F3E5C] px-4 py-2.5 text-[10px] font-black uppercase tracking-wider text-white shadow-[0_8px_18px_rgba(47,62,92,0.18)] transition hover:bg-[#5B5F97] active:scale-95">
+                                <button wire:click="abrirExpediente('{{ $adulto->cod_am }}')" type="button" class="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#2F3E5C] px-4 py-2.5 text-xs font-black uppercase tracking-wider text-white shadow-[0_8px_18px_rgba(47,62,92,0.18)] transition hover:bg-[#5B5F97] active:scale-95">
                                     <i class="ph-bold {{ $contexto['icono'] }}"></i>
                                     {{ $contexto['boton'] }}
                                 </button>

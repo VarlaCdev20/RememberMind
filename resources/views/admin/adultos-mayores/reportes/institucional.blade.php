@@ -2,7 +2,7 @@
     <div class="p-6">
         <div class="mb-10 text-center">
             <h1 class="text-4xl font-black text-[#2F3E5C] uppercase tracking-tighter">Reporte de Gestión e Impacto Institucional</h1>
-            <p class="mt-2 text-lg font-bold text-[#2F3E5C]/60">Casa del Adulto Mayor "Casa Amandita" — RememberMind System</p>
+            <p class="mt-2 text-lg font-bold text-[#2F3E5C]/60">CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS — RememberMind System</p>
             <div class="mx-auto mt-4 h-1.5 w-32 rounded-full bg-gradient-to-r from-[#E27D60] to-[#5B5F97]"></div>
         </div>
 
@@ -56,7 +56,7 @@
                     <div class="rounded-2xl bg-white/5 p-5 border border-white/10">
                         <h4 class="text-sm font-black mb-3">Misión Cumplida</h4>
                         <p class="text-sm font-medium text-white/70 leading-relaxed">
-                            "Casa Amandita" se consolida como el referente en cuidado cognitivo regional, utilizando RememberMind para garantizar que ningún adulto mayor pierda su identidad sin un acompañamiento profesional.
+                            "CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS" se consolida como el referente en cuidado cognitivo regional, utilizando RememberMind para garantizar que ningún adulto mayor pierda su identidad sin un acompañamiento profesional.
                         </p>
                     </div>
                 </div>
