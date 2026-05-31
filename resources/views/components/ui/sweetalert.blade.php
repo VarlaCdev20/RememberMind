@@ -76,7 +76,7 @@
             let credentialsHtml = '';
             if (data.credenciales_enviadas) {
                 credentialsHtml = `
-                    <div class="mt-2 text-xs text-[#63775B] bg-[#8DA280]/15 rounded-xl p-3 border border-[#8DA280]/30 text-left flex items-start gap-2">
+                    <div class="mt-2 text-xs rm-badge-success text-left flex items-start gap-2 p-3 rounded-xl border border-borde-suave">
                         <i class="ph-bold ph-check-circle text-base mt-0.5 flex-shrink-0"></i>
                         <div>
                             <strong>Credenciales enviadas:</strong> Las credenciales de acceso se enviaron correctamente a <span class="font-black">${data.email}</span>.
@@ -85,16 +85,16 @@
                 `;
             } else {
                 credentialsHtml = `
-                    <div class="mt-2 text-xs text-[#E27D60] bg-[#E27D60]/10 rounded-xl p-3 border border-[#E27D60]/20 text-left flex flex-col gap-2">
+                    <div class="mt-2 text-xs rm-badge-danger text-left flex flex-col gap-2 p-3 rounded-xl border border-borde-suave">
                         <div class="flex items-start gap-2">
                             <i class="ph-bold ph-warning-circle text-base mt-0.5 flex-shrink-0"></i>
                             <div>
                                 <strong>Error de entrega:</strong> No se pudo enviar el correo de credenciales.
                             </div>
                         </div>
-                        <div class="bg-[#FAF7F3] border border-[#C7B5A3]/40 rounded-lg p-2 flex items-center justify-between">
-                            <span class="font-bold text-[#2F3E5C]">Clave Temporal:</span>
-                            <code class="bg-white border border-[#C7B5A3]/30 px-2 py-0.5 rounded text-xs font-black select-all text-[#E27D60]">${data.password_temporal}</code>
+                        <div class="bg-fondo-panel border border-borde-suave rounded-lg p-2 flex items-center justify-between">
+                            <span class="font-bold text-titulo">Clave Temporal:</span>
+                            <code class="bg-fondo-input border border-borde-suave px-2 py-0.5 rounded text-xs font-black select-all text-boton-acento">${data.password_temporal}</code>
                         </div>
                     </div>
                 `;
@@ -102,49 +102,49 @@
 
             const htmlContent = `
                 <div class="text-left font-sans">
-                    <div class="bg-[#FAF7F3] border border-[#C7B5A3]/40 rounded-xl p-3.5 mb-3 text-left">
-                        <span class="text-xs text-[#967B66] font-black uppercase tracking-wide block mb-0.5">Colaborador</span>
-                        <strong class="text-sm text-[#2F3E5C]">${data.nombre}</strong>
+                    <div class="bg-fondo-panel border border-borde-suave rounded-xl p-3.5 mb-3 text-left">
+                        <span class="text-xs text-meta font-black uppercase tracking-wide block mb-0.5">Colaborador</span>
+                        <strong class="text-sm text-titulo">${data.nombre}</strong>
                     </div>
 
                     ${credentialsHtml}
 
-                    <div class="mt-4 border-t border-[#E6DDD3] pt-3">
-                        <span class="text-xs text-[#967B66] font-black uppercase tracking-wide block mb-2">Acciones Sugeridas Post-Registro</span>
+                    <div class="mt-4 border-t border-borde pt-3">
+                        <span class="text-xs text-meta font-black uppercase tracking-wide block mb-2">Acciones Sugeridas Post-Registro</span>
                         <div class="grid grid-cols-2 gap-2">
-                            <a href="/admin/usuarios/${data.usuario_id}?tab=documentacion" class="flex flex-col justify-between gap-1.5 rounded-xl border border-[#C7B5A3]/50 bg-white p-2.5 text-left transition hover:border-[#E27D60] hover:bg-[#FAF7F3] group">
-                                <span class="flex items-center gap-1.5 text-xs font-black uppercase tracking-wide text-[#2F3E5C]">
-                                    <i class="ph-bold ph-folder-lock text-[#E27D60] text-sm"></i> Documentos
+                            <a href="/admin/usuarios/${data.usuario_id}?tab=documentacion" class="flex flex-col justify-between gap-1.5 rounded-xl border border-borde-suave bg-fondo-card p-2.5 text-left transition hover:border-borde-focus hover:bg-fondo-hover group">
+                                <span class="flex items-center gap-1.5 text-xs font-black uppercase tracking-wide text-titulo">
+                                    <i class="ph-bold ph-folder-lock text-boton-acento text-sm"></i> Documentos
                                 </span>
-                                <span class="text-xs text-[#2F3E5C]/60 font-bold leading-tight">Expediente y requisitos del rol</span>
+                                <span class="text-xs text-apoyo font-bold leading-tight">Expediente y requisitos del rol</span>
                             </a>
 
-                            <a href="/admin/usuarios/${data.usuario_id}?tab=horarios" class="flex flex-col justify-between gap-1.5 rounded-xl border border-[#C7B5A3]/50 bg-white p-2.5 text-left transition hover:border-[#E27D60] hover:bg-[#FAF7F3] group">
-                                <span class="flex items-center gap-1.5 text-xs font-black uppercase tracking-wide text-[#2F3E5C]">
-                                    <i class="ph-bold ph-calendar-check text-[#E27D60] text-sm"></i> Horarios
+                            <a href="/admin/usuarios/${data.usuario_id}?tab=horarios" class="flex flex-col justify-between gap-1.5 rounded-xl border border-borde-suave bg-fondo-card p-2.5 text-left transition hover:border-borde-focus hover:bg-fondo-hover group">
+                                <span class="flex items-center gap-1.5 text-xs font-black uppercase tracking-wide text-titulo">
+                                    <i class="ph-bold ph-calendar-check text-boton-acento text-sm"></i> Horarios
                                 </span>
-                                <span class="text-xs text-[#2F3E5C]/60 font-bold leading-tight">Planificar turnos y jornada</span>
+                                <span class="text-xs text-apoyo font-bold leading-tight">Planificar turnos y jornada</span>
                             </a>
 
-                            <a href="/admin/usuarios/${data.usuario_id}" class="flex flex-col justify-between gap-1.5 rounded-xl border border-[#C7B5A3]/50 bg-white p-2.5 text-left transition hover:border-[#E27D60] hover:bg-[#FAF7F3] group">
-                                <span class="flex items-center gap-1.5 text-xs font-black uppercase tracking-wide text-[#2F3E5C]">
-                                    <i class="ph-bold ph-user-focus text-[#E27D60] text-sm"></i> Ver Ficha
+                            <a href="/admin/usuarios/${data.usuario_id}" class="flex flex-col justify-between gap-1.5 rounded-xl border border-borde-suave bg-fondo-card p-2.5 text-left transition hover:border-borde-focus hover:bg-fondo-hover group">
+                                <span class="flex items-center gap-1.5 text-xs font-black uppercase tracking-wide text-titulo">
+                                    <i class="ph-bold ph-user-focus text-boton-acento text-sm"></i> Ver Ficha
                                 </span>
-                                <span class="text-xs text-[#2F3E5C]/60 font-bold leading-tight">Perfil general e institucional</span>
+                                <span class="text-xs text-apoyo font-bold leading-tight">Perfil general e institucional</span>
                             </a>
 
-                            <a href="/admin/usuarios/${data.usuario_id}/ficha/pdf" target="_blank" class="flex flex-col justify-between gap-1.5 rounded-xl border border-[#C7B5A3]/50 bg-white p-2.5 text-left transition hover:border-[#E27D60] hover:bg-[#FAF7F3] group">
-                                <span class="flex items-center gap-1.5 text-xs font-black uppercase tracking-wide text-[#2F3E5C]">
-                                    <i class="ph-bold ph-file-pdf text-[#E27D60] text-sm"></i> Imprimir Ficha
+                            <a href="/admin/usuarios/${data.usuario_id}/ficha/pdf" target="_blank" class="flex flex-col justify-between gap-1.5 rounded-xl border border-borde-suave bg-fondo-card p-2.5 text-left transition hover:border-borde-focus hover:bg-fondo-hover group">
+                                <span class="flex items-center gap-1.5 text-xs font-black uppercase tracking-wide text-titulo">
+                                    <i class="ph-bold ph-file-pdf text-boton-acento text-sm"></i> Imprimir Ficha
                                 </span>
-                                <span class="text-xs text-[#2F3E5C]/60 font-bold leading-tight">Descargar PDF del expediente</span>
+                                <span class="text-xs text-apoyo font-bold leading-tight">Descargar PDF del expediente</span>
                             </a>
 
-                            <button onclick="window.enviarFichaEmail('${data.usuario_id}')" class="col-span-2 flex items-center justify-center gap-2 rounded-xl border border-[#C7B5A3]/50 bg-white p-2.5 text-center transition hover:border-[#E27D60] hover:bg-[#FAF7F3] group">
-                                <i class="ph-bold ph-paper-plane-tilt text-[#E27D60] text-base group-hover:scale-110 transition-transform"></i>
+                            <button onclick="window.enviarFichaEmail('${data.usuario_id}')" class="col-span-2 flex items-center justify-center gap-2 rounded-xl border border-borde-suave bg-fondo-card p-2.5 text-center transition hover:border-borde-focus hover:bg-fondo-hover group">
+                                <i class="ph-bold ph-paper-plane-tilt text-boton-acento text-base group-hover:scale-110 transition-transform"></i>
                                 <div class="text-left">
-                                    <span class="block text-xs font-black uppercase tracking-wide text-[#2F3E5C]">Enviar Ficha por Correo</span>
-                                    <span class="block text-xs text-[#2F3E5C]/60 font-bold leading-none">Envía expediente firmado en PDF al colaborador</span>
+                                    <span class="block text-xs font-black uppercase tracking-wide text-titulo">Enviar Ficha por Correo</span>
+                                    <span class="block text-xs text-apoyo font-bold leading-none">Envía expediente firmado en PDF al colaborador</span>
                                 </div>
                             </button>
                         </div>
@@ -160,8 +160,8 @@
                 confirmButtonText: '<i class="ph-bold ph-arrow-left mr-1"></i> Volver a Usuarios',
                 confirmButtonColor: '#2F3E5C',
                 customClass: {
-                    title: 'text-lg font-black text-[#2F3E5C] font-sans pt-4',
-                    popup: 'rounded-2xl border border-[#C7B5A3]/60 shadow-xl'
+                    title: 'text-lg font-black text-titulo font-sans pt-4',
+                    popup: 'rounded-2xl border border-borde-suave bg-fondo-panel shadow-modal'
                 }
             });
         });

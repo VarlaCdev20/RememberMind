@@ -62,5 +62,5 @@ import redApoyoTree from './modules/red-apoyo-svg.js';
 window.redApoyoTree = redApoyoTree;
 
 // Tema institucional — Geriátrico Jardín de los Recuerdos
-import './gama-de-colores/cambio';
+import './gama-de-colores/modo-oscuro.js';
 

@@ -11,7 +11,7 @@
     'icono'  => 'ph-folder-open',
     'titulo' => 'Sin resultados',
     'texto'  => 'No hay registros que mostrar en este momento.',
-    'color'  => 'text-[#C7B5A3]',
+    'color'  => 'text-meta',
 ])
 
 <div class="rm-empty-state {{ $attributes->get('class') }}">

@@ -1,0 +1,510 @@
+/* ============================================================
+   REMEMBERMIND / CASA AMANDITA
+   MODO OSCURO DEL SISTEMA
+   ------------------------------------------------------------
+   Archivo: resources/css/paleta-colores/modo-oscuro.css
+
+   Objetivo:
+   Definir la versión oscura del sistema usando únicamente
+   sobrescritura de variables semánticas.
+
+   Regla principal:
+   NO modificar componentes uno por uno.
+   NO crear parches por clase.
+   El modo oscuro debe funcionar cambiando variables como:
+   --color-fondo-app
+   --color-titulo
+   --color-boton-principal
+   --color-fondo-card
+   --color-borde-general
+
+   Paleta base clara conservada:
+   - Terracota: #E97A5F
+   - Azul profundo: #2F3E5C
+   - Naranja: #F4A261
+   - Verde salud: #2A9D8F
+   - Morado cognitivo: #9B8AC7
+   - Neutros cálidos
+
+   Paleta oscura propuesta:
+   - Azul noche profundo
+   - Azul grisáceo institucional
+   - Crema cálido para textos
+   - Azul clínico para acciones principales
+   - Naranja cálido para acentos
+   - Verde menta para salud
+   - Lila claro para cognitivo
+   ============================================================ */
+
+
+/* ============================================================
+   1. ACTIVACIÓN DEL MODO OSCURO
+   ------------------------------------------------------------
+   Se contemplan dos formas:
+   - .dark                 → compatible con Tailwind darkMode: 'class'
+   - [data-theme="dark"]   → compatible con cambio dinámico por atributo
+   ============================================================ */
+
+.dark,
+[data-theme="dark"] {
+    color-scheme: dark;
+
+
+    /* ========================================================
+       2. FONDOS GENERALES
+       --------------------------------------------------------
+       Equivalencias:
+       Claro:
+       --rm-neutro-900     #D5C7B9
+       --rm-neutro-100     #F8F6F3
+       --rm-neutro-700     #E6DDD3
+       --rm-neutro-500     #F7F5F2
+
+       Oscuro:
+       Azul noche profundo, azul grisáceo y grafito suave.
+       ======================================================== */
+
+    --color-fondo-app: #161B22;
+    --color-fondo-layout: #1E2630;
+    --color-fondo-panel: #24303A;
+    --color-fondo-panel-alt: #273440;
+    --color-fondo-panel-fuerte: #202A35;
+
+    --color-fondo-card: #2B3642;
+    --color-fondo-card-suave: rgba(43, 54, 66, 0.88);
+    --color-fondo-card-calido: #302F35;
+
+    --color-fondo-input: #303B46;
+    --color-fondo-tabla: rgba(48, 59, 70, 0.72);
+    --color-fondo-hover: rgba(143, 183, 217, 0.10);
+
+    --color-fondo-empty: #24303A;
+    --color-fondo-empty-icon: rgba(143, 183, 217, 0.12);
+
+
+    /* ========================================================
+       3. TEXTOS
+       --------------------------------------------------------
+       Evitamos blanco puro para reducir fatiga visual.
+       Usamos crema cálido y grises azulados claros.
+       ======================================================== */
+
+    --color-titulo: #F4EFE8;
+    --color-subtitulo: #B8C0CC;
+    --color-parrafo: #EAE6DF;
+
+    --color-texto-principal: #EAE6DF;
+    --color-texto-secundario: #B8C0CC;
+    --color-texto-apoyo: #9EA8B5;
+    --color-texto-suave: #B8C0CC;
+    --color-texto-muted: #9EA8B5;
+
+    --color-label: #D8D2CA;
+    --color-label-suave: #B8C0CC;
+    --color-meta: #9EA8B5;
+    --color-placeholder: #8D97A5;
+
+    --color-texto-inverso: #15202B;
+
+
+    /* ========================================================
+       4. BORDES Y DIVISORES
+       --------------------------------------------------------
+       Los bordes en modo oscuro deben separar sin brillar.
+       ======================================================== */
+
+    --color-borde-general: #43505D;
+    --color-borde-suave: rgba(255, 255, 255, 0.10);
+    --color-borde-medio: rgba(255, 255, 255, 0.14);
+    --color-borde-fuerte: #526170;
+    --color-borde-dashed: rgba(255, 255, 255, 0.18);
+
+    --color-borde-focus: #F4A261;
+    --color-borde-error: #FB7185;
+    --color-borde-success: #7ED6CB;
+    --color-borde-warning: #F4A261;
+    --color-borde-info: #8FB7D9;
+
+
+    /* ========================================================
+       5. ACCIONES PRINCIPALES / BOTONES
+       --------------------------------------------------------
+       En modo claro:
+       principal: azul profundo #2F3E5C
+       acento: terracota #E97A5F
+
+       En modo oscuro:
+       principal: azul clínico claro #8FB7D9
+       acento: naranja cálido #F4A261
+       ======================================================== */
+
+    --color-boton-principal: #8FB7D9;
+    --color-boton-principal-hover: #A7C8E6;
+    --color-boton-principal-texto: #15202B;
+
+    --color-boton-acento: #F4A261;
+    --color-boton-acento-hover: #F7B7A3;
+    --color-boton-acento-texto: #231A16;
+
+    --color-boton-secundario: #303B46;
+    --color-boton-secundario-hover: #3A4652;
+    --color-boton-secundario-texto: #F4EFE8;
+    --color-boton-secundario-borde: #43505D;
+
+    --color-boton-fantasma-bg: transparent;
+    --color-boton-fantasma-hover: rgba(143, 183, 217, 0.10);
+    --color-boton-fantasma-texto: #EAE6DF;
+    --color-boton-fantasma-borde: rgba(255, 255, 255, 0.14);
+
+    --color-boton-icono-bg: #303B46;
+    --color-boton-icono-hover: #F4A261;
+    --color-boton-icono-texto: #EAE6DF;
+    --color-boton-icono-texto-hover: #231A16;
+
+
+    /* ========================================================
+       6. SIDEBAR / HEADER / NAVEGACIÓN
+       --------------------------------------------------------
+       El sidebar debe diferenciarse del fondo app sin parecer
+       totalmente separado.
+       ======================================================== */
+
+    --color-sidebar-bg: #24303A;
+    --color-sidebar-header-bg: rgba(143, 183, 217, 0.08);
+
+    --color-sidebar-texto: #B8C0CC;
+    --color-sidebar-texto-hover: #F4A261;
+    --color-sidebar-texto-muted: #9EA8B5;
+
+    --color-sidebar-seccion-texto: #D8D2CA;
+    --color-sidebar-seccion-hover-bg: rgba(143, 183, 217, 0.10);
+
+    --color-sidebar-seccion-activa-bg: rgba(244, 162, 97, 0.14);
+    --color-sidebar-seccion-activa-texto: #F4A261;
+
+    --color-sidebar-item-activo: #F4A261;
+    --color-sidebar-item-activo-bg: rgba(244, 162, 97, 0.12);
+    --color-sidebar-item-activo-borde: rgba(244, 162, 97, 0.30);
+
+    --color-header-bg: #1E2630;
+    --color-header-texto: #F4EFE8;
+    --color-header-borde: #43505D;
+
+
+    /* ========================================================
+       7. MÓDULOS DEL SISTEMA
+       --------------------------------------------------------
+       Cada módulo conserva su identidad:
+       - Salud: verde menta clínico
+       - Cognitivo: lila claro
+       - Alertas: naranja cálido
+       - Reportes: azul clínico
+       ======================================================== */
+
+    --color-modulo-adulto-mayor: #F4A261;
+    --color-modulo-adulto-mayor-hover: #F7B7A3;
+    --color-modulo-adulto-mayor-fondo: rgba(244, 162, 97, 0.14);
+
+    --color-modulo-salud: #7ED6CB;
+    --color-modulo-salud-suave: #9BE3DA;
+    --color-modulo-salud-fondo: #1D3B35;
+    --color-modulo-salud-kpi: rgba(126, 214, 203, 0.14);
+
+    --color-modulo-cognitivo: #C8B8F2;
+    --color-modulo-cognitivo-hover: #D8CCFF;
+    --color-modulo-cognitivo-texto: #C8B8F2;
+    --color-modulo-cognitivo-fondo: #2A2740;
+    --color-modulo-cognitivo-kpi: rgba(200, 184, 242, 0.14);
+
+    --color-modulo-reportes: #9EC5E8;
+    --color-modulo-reportes-fondo: rgba(158, 197, 232, 0.14);
+
+    --color-modulo-alertas: #F4A261;
+    --color-modulo-alertas-texto: #F4A261;
+    --color-modulo-alertas-fondo: #3A2A1E;
+
+    --color-modulo-bitacora: #B8C0CC;
+    --color-modulo-bitacora-fondo: rgba(184, 192, 204, 0.12);
+
+    --color-modulo-voluntarios: #A8C090;
+    --color-modulo-voluntarios-texto: #BBD5A4;
+    --color-modulo-voluntarios-fondo: rgba(168, 192, 144, 0.14);
+
+
+    /* ========================================================
+       8. ESTADOS GENERALES
+       --------------------------------------------------------
+       Estados reutilizables para badges, alertas, tablas y cards.
+       ======================================================== */
+
+    --color-estado-exito-bg: rgba(126, 214, 203, 0.14);
+    --color-estado-exito-texto: #7ED6CB;
+    --color-estado-exito-borde: rgba(126, 214, 203, 0.30);
+
+    --color-estado-advertencia-bg: rgba(244, 162, 97, 0.14);
+    --color-estado-advertencia-texto: #F4A261;
+    --color-estado-advertencia-borde: rgba(244, 162, 97, 0.30);
+
+    --color-estado-peligro-bg: rgba(251, 113, 133, 0.14);
+    --color-estado-peligro-texto: #FB7185;
+    --color-estado-peligro-borde: rgba(251, 113, 133, 0.30);
+
+    --color-estado-info-bg: rgba(143, 183, 217, 0.14);
+    --color-estado-info-texto: #8FB7D9;
+    --color-estado-info-borde: rgba(143, 183, 217, 0.30);
+
+    --color-estado-neutral-bg: #303B46;
+    --color-estado-neutral-texto: #B8C0CC;
+    --color-estado-neutral-borde: #43505D;
+
+    --color-estado-restaurado-bg: rgba(200, 184, 242, 0.14);
+    --color-estado-restaurado-texto: #C8B8F2;
+    --color-estado-restaurado-borde: rgba(200, 184, 242, 0.30);
+
+
+    /* ========================================================
+       9. ESTADOS ESPECÍFICOS DE SALUD / SIGNOS VITALES
+       --------------------------------------------------------
+       Para normal, observación, fuera de rango, sin datos.
+       ======================================================== */
+
+    --color-signo-normal-bg: rgba(126, 214, 203, 0.14);
+    --color-signo-normal-texto: #7ED6CB;
+    --color-signo-normal-borde: rgba(126, 214, 203, 0.30);
+
+    --color-signo-observacion-bg: rgba(244, 162, 97, 0.14);
+    --color-signo-observacion-texto: #F4A261;
+    --color-signo-observacion-borde: rgba(244, 162, 97, 0.30);
+
+    --color-signo-critico-bg: rgba(251, 113, 133, 0.14);
+    --color-signo-critico-texto: #FB7185;
+    --color-signo-critico-borde: rgba(251, 113, 133, 0.30);
+
+    --color-signo-sin-datos-bg: #303B46;
+    --color-signo-sin-datos-texto: #9EA8B5;
+    --color-signo-sin-datos-borde: #43505D;
+
+
+    /* ========================================================
+       10. KPI / DASHBOARD
+       --------------------------------------------------------
+       Para tarjetas de estadísticas, resumen institucional
+       y métricas principales.
+       ======================================================== */
+
+    --color-kpi-residentes-bg: rgba(143, 183, 217, 0.14);
+    --color-kpi-residentes-texto: #8FB7D9;
+
+    --color-kpi-salud-bg: rgba(126, 214, 203, 0.14);
+    --color-kpi-salud-texto: #7ED6CB;
+
+    --color-kpi-cognitivo-bg: rgba(200, 184, 242, 0.14);
+    --color-kpi-cognitivo-texto: #C8B8F2;
+
+    --color-kpi-alertas-bg: rgba(244, 162, 97, 0.14);
+    --color-kpi-alertas-texto: #F4A261;
+
+    --color-kpi-actividades-bg: rgba(244, 162, 97, 0.12);
+    --color-kpi-actividades-texto: #F7B7A3;
+
+    --color-kpi-voluntarios-bg: rgba(168, 192, 144, 0.14);
+    --color-kpi-voluntarios-texto: #BBD5A4;
+
+
+    /* ========================================================
+       11. TABLAS
+       ======================================================== */
+
+    --color-tabla-header-bg: rgba(143, 183, 217, 0.10);
+    --color-tabla-header-texto: #B8C0CC;
+    --color-tabla-header-borde: rgba(255, 255, 255, 0.10);
+
+    --color-tabla-row-borde: rgba(255, 255, 255, 0.08);
+    --color-tabla-row-hover: rgba(143, 183, 217, 0.08);
+
+    --color-tabla-cell-label: #F4EFE8;
+    --color-tabla-cell-meta: #9EA8B5;
+
+
+    /* ========================================================
+       12. FORMULARIOS
+       ======================================================== */
+
+    --color-input-bg: #303B46;
+    --color-input-bg-disabled: rgba(48, 59, 70, 0.55);
+    --color-input-texto: #EAE6DF;
+    --color-input-placeholder: #8D97A5;
+    --color-input-borde: #43505D;
+    --color-input-borde-hover: #526170;
+    --color-input-borde-focus: #F4A261;
+    --color-input-ring-focus: rgba(244, 162, 97, 0.16);
+
+    --color-select-bg: #303B46;
+    --color-textarea-bg: #303B46;
+
+
+    /* ========================================================
+       13. MODALES
+       ======================================================== */
+
+    --color-modal-overlay: rgba(7, 12, 18, 0.72);
+    --color-modal-bg: #2B3642;
+    --color-modal-borde: #43505D;
+
+    --color-modal-header-borde: rgba(255, 255, 255, 0.10);
+    --color-modal-footer-borde: rgba(255, 255, 255, 0.08);
+
+    --color-modal-titulo: #F4EFE8;
+    --color-modal-texto: #EAE6DF;
+
+
+    /* ========================================================
+       14. SCROLLBAR
+       ======================================================== */
+
+    --color-scrollbar-thumb: #526170;
+    --color-scrollbar-thumb-hover: #F4A261;
+    --color-scrollbar-track: transparent;
+
+
+    /* ========================================================
+       15. SOMBRAS / GLOW / OVERLAY
+       --------------------------------------------------------
+       En modo oscuro las sombras son más profundas y menos
+       visibles, evitando halos excesivos.
+       ======================================================== */
+
+    --sombra-card: 0 1px 3px rgba(0, 0, 0, 0.28);
+    --sombra-card-hover: 0 8px 22px rgba(0, 0, 0, 0.36);
+    --sombra-panel: 0 16px 38px rgba(0, 0, 0, 0.38);
+    --sombra-sidebar: 18px 0 55px rgba(0, 0, 0, 0.34);
+    --sombra-modal: 0 24px 70px rgba(0, 0, 0, 0.48);
+
+    --glow-acento: 0 0 15px rgba(244, 162, 97, 0.28);
+    --glow-acento-hover: 0 0 25px rgba(244, 162, 97, 0.42);
+    --glow-sidebar-activo: 0 0 10px rgba(244, 162, 97, 0.34);
+
+    --glow-dashboard-cursor: rgba(143, 183, 217, 0.10);
+
+    --overlay-modal: rgba(7, 12, 18, 0.72);
+
+
+    /* ========================================================
+       16. GRADIENTES
+       ======================================================== */
+
+    --gradiente-progreso: linear-gradient(135deg, #F4A261 0%, #F7B7A3 100%);
+    --gradiente-salud: linear-gradient(135deg, #7ED6CB 0%, #9BE3DA 100%);
+    --gradiente-cognitivo: linear-gradient(135deg, #C8B8F2 0%, #B7A4EA 100%);
+    --gradiente-acento: linear-gradient(135deg, #F4A261 0%, #F7B7A3 100%);
+
+    --gradiente-panel: linear-gradient(135deg, #24303A 0%, #2B3642 100%);
+    --gradiente-card: linear-gradient(135deg, rgba(43, 54, 66, 0.96), rgba(36, 48, 58, 0.94));
+    --gradiente-input: linear-gradient(135deg, #303B46 0%, #2B3642 100%);
+
+
+    /* ========================================================
+       17. TEXTURAS EN OSCURO
+       --------------------------------------------------------
+       Estas variables son usadas por texturas-tramas.css.
+       ======================================================== */
+
+    --rm-textura-linea: rgba(255, 255, 255, 0.055);
+    --rm-textura-linea-suave: rgba(255, 255, 255, 0.035);
+    --rm-textura-punto: rgba(244, 162, 97, 0.14);
+    --rm-textura-punto-suave: rgba(255, 255, 255, 0.08);
+
+    --rm-textura-radial-terracota: rgba(244, 162, 97, 0.12);
+    --rm-textura-radial-salud: rgba(126, 214, 203, 0.10);
+    --rm-textura-radial-cognitivo: rgba(200, 184, 242, 0.10);
+    --rm-textura-radial-azul: rgba(143, 183, 217, 0.08);
+
+    --rm-textura-noise-opacity: 0.025;
+}
+
+
+/* ============================================================
+   18. COMPATIBILIDAD VISUAL GENERAL
+   ------------------------------------------------------------
+   No se crean parches específicos por vista.
+   Solo se ajustan elementos base que dependen del color-scheme.
+   ============================================================ */
+
+.dark body,
+[data-theme="dark"] body {
+    background: var(--color-fondo-app);
+    color: var(--color-parrafo);
+}
+
+.dark input,
+.dark textarea,
+.dark select,
+[data-theme="dark"] input,
+[data-theme="dark"] textarea,
+[data-theme="dark"] select {
+    color-scheme: dark;
+}
+
+.dark ::selection,
+[data-theme="dark"] ::selection {
+    background: rgba(244, 162, 97, 0.34);
+    color: #F4EFE8;
+}
+
+
+/* ============================================================
+   19. SCROLLBAR EN MODO OSCURO
+   ============================================================ */
+
+.dark *,
+[data-theme="dark"] * {
+    scrollbar-color: var(--color-scrollbar-thumb) var(--color-scrollbar-track);
+}
+
+.dark *::-webkit-scrollbar-track,
+[data-theme="dark"] *::-webkit-scrollbar-track {
+    background: var(--color-scrollbar-track);
+}
+
+.dark *::-webkit-scrollbar-thumb,
+[data-theme="dark"] *::-webkit-scrollbar-thumb {
+    background-color: var(--color-scrollbar-thumb);
+}
+
+.dark *::-webkit-scrollbar-thumb:hover,
+[data-theme="dark"] *::-webkit-scrollbar-thumb:hover {
+    background-color: var(--color-scrollbar-thumb-hover);
+}
+
+
+/* ============================================================
+   20. SOPORTE PARA ELEMENTOS NATIVOS
+   ============================================================ */
+
+.dark option,
+[data-theme="dark"] option {
+    background: var(--color-fondo-input);
+    color: var(--color-input-texto);
+}
+
+.dark hr,
+[data-theme="dark"] hr {
+    border-color: var(--color-borde-suave);
+}
+
+
+/* ============================================================
+   21. REDUCCIÓN DE TRANSPARENCIAS EN DISPOSITIVOS LIMITADOS
+   ------------------------------------------------------------
+   Si el navegador no soporta blur/backdrop-filter, se mantiene
+   un fondo sólido legible.
+   ============================================================ */
+
+@supports not ((backdrop-filter: blur(10px)) or (-webkit-backdrop-filter: blur(10px))) {
+    .dark,
+    [data-theme="dark"] {
+        --color-fondo-card-suave: #2B3642;
+        --color-fondo-panel: #24303A;
+        --color-modal-bg: #2B3642;
+    }
+}

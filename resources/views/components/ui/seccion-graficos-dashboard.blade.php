@@ -1,14 +1,14 @@
-<section class="rounded-[2rem] border border-[#C7B5A3] bg-[#E6DDD3]/88 p-5 shadow-[0_16px_38px_rgba(47,62,92,0.12)] backdrop-blur-xl">
+<section class="rm-card rounded-[2rem] p-5 backdrop-blur-xl">
     <div class="mb-4 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
         <div>
-            <span class="text-[11px] font-black uppercase tracking-widest text-terracota">
+            <span class="text-[11px] font-black uppercase tracking-widest text-boton-acento">
                 Estadísticas generales
             </span>
-            <h2 class="text-xl font-black text-azul-profundo md:text-2xl">
+            <h2 class="text-xl font-black text-titulo md:text-2xl">
                 Indicadores institucionales
             </h2>
         </div>
-        <p class="max-w-md text-xs font-bold leading-5 text-azul-profundo/55">
+        <p class="max-w-md text-xs font-bold leading-5 text-meta">
             Distribución de residentes por estado y composición del equipo institucional.
         </p>
     </div>

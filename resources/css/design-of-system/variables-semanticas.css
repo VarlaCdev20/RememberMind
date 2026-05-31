@@ -1,0 +1,201 @@
+:root {
+    /* Textos */
+    --color-titulo: var(--rm-azul-profundo);
+    --color-subtitulo: var(--rm-azul-profundo);
+    --color-parrafo: var(--rm-texto-principal);
+    --color-texto-apoyo: var(--rm-texto-secundario);
+    --color-label: var(--rm-azul-profundo);
+    --color-meta: var(--rm-texto-secundario);
+    --color-placeholder: var(--rm-texto-secundario);
+    --color-texto-inverso: #FFFFFF;
+
+    /* Fondos */
+    --color-fondo-app: var(--rm-neutro-900);
+    --color-fondo-layout: var(--rm-neutro-100);
+    --color-fondo-panel: var(--rm-neutro-700);
+    --color-fondo-panel-alt: var(--rm-neutro-card-alt);
+    --color-fondo-card: #FFFFFF;
+    --color-fondo-card-suave: rgba(255, 255, 255, 0.90);
+    --color-fondo-card-calido: var(--rm-neutro-card-alt);
+    --color-fondo-input: var(--rm-neutro-500);
+    --color-fondo-tabla: rgba(247, 245, 242, 0.60);
+    --color-fondo-hover: rgba(242, 235, 227, 0.75);
+
+    /* Bordes */
+    --color-borde-general: rgba(199, 181, 163, 0.40);
+    --color-borde-suave: rgba(199, 181, 163, 0.30);
+    --color-borde-medio: rgba(199, 181, 163, 0.50);
+    --color-borde-fuerte: var(--rm-neutro-borde-alt);
+    --color-borde-focus: var(--rm-terracota);
+
+    /* Botones */
+    --color-boton-principal: var(--rm-azul-profundo);
+    --color-boton-principal-hover: rgba(47, 62, 92, 0.88);
+    --color-boton-principal-texto: #FFFFFF;
+
+    --color-boton-acento: var(--rm-terracota);
+    --color-boton-acento-hover: var(--rm-terracota-hover);
+    --color-boton-acento-texto: #FFFFFF;
+
+    --color-boton-secundario: var(--rm-neutro-700);
+    --color-boton-secundario-hover: var(--rm-neutro-900);
+    --color-boton-secundario-texto: var(--rm-azul-profundo);
+
+    --color-boton-fantasma-bg: transparent;
+    --color-boton-fantasma-hover: var(--rm-neutro-700);
+    --color-boton-fantasma-texto: var(--rm-azul-profundo);
+    --color-boton-fantasma-borde: rgba(199, 181, 163, 0.60);
+    --color-boton-icono-bg: var(--color-fondo-card);
+    --color-boton-icono-hover: var(--color-boton-acento);
+    --color-boton-icono-texto: var(--rm-azul-profundo);
+    --color-boton-icono-texto-hover: var(--color-boton-acento-texto);
+
+    /* Módulos */
+    --color-modulo-adulto-mayor: var(--rm-terracota);
+    --color-modulo-adulto-mayor-fondo: rgba(233, 122, 95, 0.10);
+
+    --color-modulo-salud: var(--rm-verde-salud);
+    --color-modulo-salud-suave: var(--rm-verde-suave);
+    --color-modulo-salud-fondo: var(--rm-fondo-salud);
+
+    --color-modulo-cognitivo: var(--rm-morado-cognitivo);
+    --color-modulo-cognitivo-texto: var(--rm-morado-cognitivo-dark);
+    --color-modulo-cognitivo-fondo: var(--rm-fondo-cognitivo);
+
+    --color-modulo-reportes: var(--rm-azul-tecnico);
+    --color-modulo-alertas: var(--rm-naranja);
+    --color-modulo-alertas-texto: var(--rm-naranja-dark);
+    --color-modulo-bitacora: var(--rm-azul-profundo);
+    --color-modulo-voluntarios: var(--rm-verde-suave);
+    --color-modulo-voluntarios-texto: var(--rm-verde-salud);
+    --color-modulo-voluntarios-fondo: var(--rm-fondo-salud);
+
+    /* Estados */
+    --estado-normal-bg: rgba(42, 157, 143, 0.10);
+    --estado-normal-borde: rgba(42, 157, 143, 0.25);
+    --estado-normal-texto: var(--rm-verde-salud);
+
+    --estado-observacion-bg: rgba(244, 162, 97, 0.15);
+    --estado-observacion-borde: rgba(244, 162, 97, 0.35);
+    --estado-observacion-texto: var(--rm-naranja-dark);
+
+    --estado-critico-bg: rgba(225, 29, 72, 0.10);
+    --estado-critico-borde: rgba(225, 29, 72, 0.25);
+    --estado-critico-texto: #E11D48;
+
+    --estado-info-bg: var(--rm-info-bg);
+    --estado-info-borde: var(--rm-info-border);
+    --estado-info-texto: var(--rm-info);
+
+    --estado-neutral-bg: var(--rm-neutro-700);
+    --estado-neutral-borde: rgba(199, 181, 163, 0.40);
+    --estado-neutral-texto: rgba(47, 62, 92, 0.70);
+
+    --color-estado-exito-bg: var(--estado-normal-bg);
+    --color-estado-exito-borde: var(--estado-normal-borde);
+    --color-estado-exito-texto: var(--estado-normal-texto);
+
+    --color-estado-advertencia-bg: var(--estado-observacion-bg);
+    --color-estado-advertencia-borde: var(--estado-observacion-borde);
+    --color-estado-advertencia-texto: var(--estado-observacion-texto);
+
+    --color-estado-peligro-bg: var(--estado-critico-bg);
+    --color-estado-peligro-borde: var(--estado-critico-borde);
+    --color-estado-peligro-texto: var(--estado-critico-texto);
+
+    --color-estado-info-bg: var(--estado-info-bg);
+    --color-estado-info-borde: var(--estado-info-borde);
+    --color-estado-info-texto: var(--estado-info-texto);
+
+    --color-estado-neutral-bg: var(--estado-neutral-bg);
+    --color-estado-neutral-borde: var(--estado-neutral-borde);
+    --color-estado-neutral-texto: var(--estado-neutral-texto);
+
+    --color-estado-restaurado-bg: var(--color-modulo-cognitivo-fondo);
+    --color-estado-restaurado-borde: var(--color-borde-suave);
+    --color-estado-restaurado-texto: var(--color-modulo-cognitivo-texto);
+
+    /* Navegacion global */
+    --color-sidebar-bg: var(--color-fondo-panel);
+    --color-sidebar-header-bg: var(--color-fondo-panel-alt);
+    --color-sidebar-texto: var(--color-texto-apoyo);
+    --color-sidebar-texto-hover: var(--color-boton-acento);
+    --color-sidebar-texto-muted: var(--color-meta);
+    --color-sidebar-seccion-texto: var(--color-titulo);
+    --color-sidebar-seccion-hover-bg: var(--color-fondo-hover);
+    --color-sidebar-seccion-activa-bg: var(--color-fondo-card-calido);
+    --color-sidebar-seccion-activa-texto: var(--color-boton-acento);
+    --color-sidebar-item-activo: var(--color-boton-acento);
+    --color-sidebar-item-activo-bg: var(--color-modulo-adulto-mayor-fondo);
+    --color-sidebar-item-activo-borde: var(--color-boton-acento);
+
+    --color-header-bg: var(--color-fondo-card-suave);
+    --color-header-texto: var(--color-titulo);
+    --color-header-borde: var(--color-borde-suave);
+
+    --color-tabla-header-bg: var(--color-fondo-tabla);
+    --color-tabla-header-texto: var(--color-label);
+    --color-tabla-header-borde: var(--color-borde-suave);
+    --color-tabla-row-borde: var(--color-borde-suave);
+    --color-tabla-row-hover: var(--color-fondo-hover);
+    --color-tabla-cell-label: var(--color-titulo);
+    --color-tabla-cell-meta: var(--color-meta);
+
+    --color-input-bg: var(--color-fondo-input);
+    --color-input-bg-disabled: var(--color-fondo-panel-alt);
+    --color-input-texto: var(--color-parrafo);
+    --color-input-placeholder: var(--color-placeholder);
+    --color-input-borde: var(--color-borde-general);
+    --color-input-borde-hover: var(--color-borde-medio);
+    --color-input-borde-focus: var(--color-borde-focus);
+    --color-input-ring-focus: var(--color-modulo-adulto-mayor-fondo);
+    --color-select-bg: var(--color-fondo-input);
+    --color-textarea-bg: var(--color-fondo-input);
+
+    --color-modal-overlay: var(--overlay-modal);
+    --color-modal-bg: var(--color-fondo-panel);
+    --color-modal-borde: var(--color-borde-suave);
+    --color-modal-header-borde: var(--color-borde-suave);
+    --color-modal-footer-borde: var(--color-borde-suave);
+    --color-modal-titulo: var(--color-titulo);
+    --color-modal-texto: var(--color-parrafo);
+
+    /* KPI */
+    --color-kpi-residentes-bg: rgba(47, 62, 92, 0.10);
+    --color-kpi-residentes-texto: var(--rm-azul-profundo);
+
+    --color-kpi-salud-bg: rgba(42, 157, 143, 0.10);
+    --color-kpi-salud-texto: var(--rm-verde-salud);
+
+    --color-kpi-cognitivo-bg: rgba(155, 138, 199, 0.15);
+    --color-kpi-cognitivo-texto: var(--rm-morado-cognitivo-dark);
+
+    --color-kpi-alertas-bg: rgba(244, 162, 97, 0.15);
+    --color-kpi-alertas-texto: var(--rm-naranja-dark);
+
+    --color-kpi-actividades-bg: rgba(233, 122, 95, 0.10);
+    --color-kpi-actividades-texto: var(--rm-terracota);
+
+    /* Sombras */
+    --sombra-card: 0 1px 3px rgba(47, 62, 92, 0.08);
+    --sombra-card-hover: 0 8px 22px rgba(47, 62, 92, 0.12);
+    --sombra-panel: 0 16px 38px rgba(47, 62, 92, 0.12);
+    --sombra-sidebar: 18px 0 55px rgba(47, 62, 92, 0.12);
+    --sombra-modal: 0 24px 70px rgba(47, 62, 92, 0.22);
+
+    --glow-acento: 0 0 15px rgba(233, 122, 95, 0.40);
+    --glow-acento-hover: 0 0 25px rgba(233, 122, 95, 0.60);
+
+    /* Overlay */
+    --overlay-modal: rgba(47, 62, 92, 0.50);
+
+    /* Gradientes */
+    --gradiente-progreso: linear-gradient(135deg, #D9A27C 0%, #E97A5F 100%);
+    --gradiente-salud: linear-gradient(135deg, #6FBFB3 0%, #2A9D8F 100%);
+    --gradiente-cognitivo: linear-gradient(135deg, #9B8AC7 0%, #7A68B0 100%);
+    --gradiente-acento: linear-gradient(135deg, #F4A261 0%, #E97A5F 100%);
+
+    --color-scrollbar-thumb: var(--rm-neutro-borde-alt);
+    --color-scrollbar-thumb-hover: var(--rm-terracota);
+    --color-scrollbar-track: transparent;
+}

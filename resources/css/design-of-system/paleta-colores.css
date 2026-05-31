@@ -1,0 +1,57 @@
+:root {
+    /* Identidad principal anterior */
+    --rm-terracota: #E97A5F;
+    --rm-terracota-hover: #D96B52;
+    --rm-naranja: #F4A261;
+    --rm-naranja-dark: #D4843A;
+    --rm-durazno: #F7B7A3;
+    --rm-rosa-crema: #FADCD3;
+    --rm-fondo-calido: #FDF2EC;
+
+    --rm-azul-profundo: #2F3E5C;
+
+    /* Salud */
+    --rm-verde-salud: #2A9D8F;
+    --rm-verde-suave: #6FBFB3;
+    --rm-fondo-salud: #D8F3EE;
+
+    /* Cognitivo */
+    --rm-azul-clinico: #8FB7D9;
+    --rm-azul-tecnico: #5E81AC;
+    --rm-morado-cognitivo: #9B8AC7;
+    --rm-morado-cognitivo-dark: #7A68B0;
+    --rm-morado-tecnico: #7B6FB3;
+    --rm-fondo-cognitivo: #E6E1F5;
+
+    /* Neutros cálidos */
+    --rm-neutro-900: #D5C7B9;
+    --rm-neutro-800: #C7B5A3;
+    --rm-neutro-borde-alt: #CBBBAA;
+    --rm-neutro-700: #E6DDD3;
+    --rm-neutro-card-alt: #E7DDD2;
+    --rm-neutro-600: #F2EBE3;
+    --rm-neutro-500: #F7F5F2;
+    --rm-neutro-100: #F8F6F3;
+    --rm-gris-calido: #EAE7E3;
+
+    /* Texto */
+    --rm-texto-principal: #2C2C2C;
+    --rm-texto-secundario: #6B7280;
+
+    /* Estados base */
+    --rm-success-bg: #D1FAE5;
+    --rm-success: #059669;
+    --rm-success-border: #A7F3D0;
+
+    --rm-warning-bg: #FEF3C7;
+    --rm-warning: #D97706;
+    --rm-warning-border: #FDE68A;
+
+    --rm-danger-bg: #FFE4E6;
+    --rm-danger: #E11D48;
+    --rm-danger-border: #FECDD3;
+
+    --rm-info-bg: #DBEAFE;
+    --rm-info: #1D4ED8;
+    --rm-info-border: #BFDBFE;
+}

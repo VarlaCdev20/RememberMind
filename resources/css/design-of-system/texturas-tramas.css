@@ -1,0 +1,474 @@
+/* ============================================================
+   REMEMBERMIND / CASA AMANDITA
+   TEXTURAS, TRAMAS Y FONDOS VISUALES
+   ------------------------------------------------------------
+   Archivo: resources/css/paleta-colores/texturas-tramas.css
+
+   Objetivo:
+   Centralizar patrones visuales, fondos decorativos, tramas,
+   overlays y recursos de ambiente para mantener una estética
+   médico-administrativa cálida, profesional y acogedora.
+
+   Nota:
+   Este archivo NO define colores principales.
+   Usa variables creadas en:
+   - paleta-colores.css
+   - variables-semanticas.css
+   - modo-oscuro.css
+   ============================================================ */
+
+
+/* ============================================================
+   1. VARIABLES DE TEXTURAS
+   ============================================================ */
+
+:root {
+    /* Intensidad general */
+    --rm-textura-opacity-suave: 0.18;
+    --rm-textura-opacity-media: 0.28;
+    --rm-textura-opacity-fuerte: 0.38;
+
+    /* Tamaños de tramas */
+    --rm-textura-grid-size-sm: 18px;
+    --rm-textura-grid-size-md: 26px;
+    --rm-textura-grid-size-lg: 42px;
+
+    --rm-textura-dot-size: 18px;
+    --rm-textura-dot-radius: 1px;
+
+    /* Colores de trama basados en variables semánticas */
+    --rm-textura-linea: rgba(47, 62, 92, 0.055);
+    --rm-textura-linea-suave: rgba(47, 62, 92, 0.035);
+    --rm-textura-punto: rgba(233, 122, 95, 0.16);
+    --rm-textura-punto-suave: rgba(47, 62, 92, 0.08);
+
+    /* Fondos radiales decorativos */
+    --rm-textura-radial-terracota: rgba(233, 122, 95, 0.18);
+    --rm-textura-radial-salud: rgba(42, 157, 143, 0.12);
+    --rm-textura-radial-cognitivo: rgba(155, 138, 199, 0.12);
+    --rm-textura-radial-azul: rgba(47, 62, 92, 0.10);
+
+    /* Noise visual muy sutil */
+    --rm-textura-noise-opacity: 0.035;
+}
+
+
+/* ============================================================
+   2. FONDO GENERAL DEL SISTEMA
+   ------------------------------------------------------------
+   Para body, layouts principales o wrappers de módulos.
+   ============================================================ */
+
+.rm-bg-app {
+    background:
+        radial-gradient(circle at top left, var(--rm-textura-radial-terracota), transparent 34rem),
+        radial-gradient(circle at top right, var(--rm-textura-radial-salud), transparent 32rem),
+        linear-gradient(135deg, var(--color-fondo-app), var(--color-fondo-layout));
+}
+
+.rm-bg-layout {
+    background:
+        radial-gradient(circle at 12% 18%, rgba(233, 122, 95, 0.12), transparent 24rem),
+        radial-gradient(circle at 88% 12%, rgba(42, 157, 143, 0.10), transparent 26rem),
+        radial-gradient(circle at 80% 88%, rgba(155, 138, 199, 0.08), transparent 24rem),
+        var(--color-fondo-layout);
+}
+
+.rm-bg-module {
+    background:
+        linear-gradient(135deg, rgba(248, 246, 243, 0.92), rgba(242, 235, 227, 0.88)),
+        radial-gradient(circle at top right, rgba(233, 122, 95, 0.10), transparent 28rem);
+}
+
+
+/* ============================================================
+   3. TRAMA DE PUNTOS
+   ------------------------------------------------------------
+   Ideal para fondos de dashboard, cards vacías o secciones suaves.
+   ============================================================ */
+
+.rm-texture-dots {
+    background-image:
+        radial-gradient(circle, var(--rm-textura-punto) var(--rm-textura-dot-radius), transparent var(--rm-textura-dot-radius));
+    background-size: var(--rm-textura-dot-size) var(--rm-textura-dot-size);
+}
+
+.rm-texture-dots-soft {
+    background-image:
+        radial-gradient(circle, var(--rm-textura-punto-suave) 1px, transparent 1px);
+    background-size: 20px 20px;
+}
+
+.rm-texture-dots-warm {
+    background:
+        radial-gradient(circle, rgba(233, 122, 95, 0.14) 1px, transparent 1px),
+        var(--color-fondo-card-calido);
+    background-size: 22px 22px;
+}
+
+
+/* ============================================================
+   4. TRAMA DE CUADRÍCULA SUAVE
+   ------------------------------------------------------------
+   Útil para dashboard, páginas administrativas y fondos técnicos.
+   ============================================================ */
+
+.rm-texture-grid {
+    background-image:
+        linear-gradient(var(--rm-textura-linea) 1px, transparent 1px),
+        linear-gradient(90deg, var(--rm-textura-linea) 1px, transparent 1px);
+    background-size: var(--rm-textura-grid-size-md) var(--rm-textura-grid-size-md);
+}
+
+.rm-texture-grid-soft {
+    background-image:
+        linear-gradient(var(--rm-textura-linea-suave) 1px, transparent 1px),
+        linear-gradient(90deg, var(--rm-textura-linea-suave) 1px, transparent 1px);
+    background-size: var(--rm-textura-grid-size-lg) var(--rm-textura-grid-size-lg);
+}
+
+.rm-texture-grid-compact {
+    background-image:
+        linear-gradient(var(--rm-textura-linea-suave) 1px, transparent 1px),
+        linear-gradient(90deg, var(--rm-textura-linea-suave) 1px, transparent 1px);
+    background-size: var(--rm-textura-grid-size-sm) var(--rm-textura-grid-size-sm);
+}
+
+
+/* ============================================================
+   5. TRAMA MÉDICA SUTIL
+   ------------------------------------------------------------
+   Pensada para módulos de salud, signos vitales, ficha médica,
+   medicación y valoración funcional.
+   ============================================================ */
+
+.rm-texture-health {
+    background:
+        radial-gradient(circle at 12% 18%, rgba(42, 157, 143, 0.12), transparent 22rem),
+        radial-gradient(circle at 90% 8%, rgba(111, 191, 179, 0.12), transparent 24rem),
+        linear-gradient(135deg, rgba(216, 243, 238, 0.42), rgba(248, 246, 243, 0.86));
+}
+
+.rm-texture-health-grid {
+    background-image:
+        linear-gradient(rgba(42, 157, 143, 0.07) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(42, 157, 143, 0.07) 1px, transparent 1px);
+    background-size: 28px 28px;
+}
+
+.rm-texture-health-dots {
+    background-image:
+        radial-gradient(circle, rgba(42, 157, 143, 0.16) 1px, transparent 1px);
+    background-size: 22px 22px;
+}
+
+
+/* ============================================================
+   6. TRAMA COGNITIVA SUTIL
+   ------------------------------------------------------------
+   Para evaluaciones cognitivas, MoCA, MMSE, historial cognitivo,
+   análisis predictivo y seguimiento longitudinal.
+   ============================================================ */
+
+.rm-texture-cognitive {
+    background:
+        radial-gradient(circle at 10% 20%, rgba(155, 138, 199, 0.14), transparent 22rem),
+        radial-gradient(circle at 88% 12%, rgba(143, 183, 217, 0.12), transparent 24rem),
+        linear-gradient(135deg, rgba(230, 225, 245, 0.45), rgba(248, 246, 243, 0.88));
+}
+
+.rm-texture-cognitive-grid {
+    background-image:
+        linear-gradient(rgba(155, 138, 199, 0.07) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(155, 138, 199, 0.07) 1px, transparent 1px);
+    background-size: 30px 30px;
+}
+
+.rm-texture-cognitive-dots {
+    background-image:
+        radial-gradient(circle, rgba(155, 138, 199, 0.16) 1px, transparent 1px);
+    background-size: 24px 24px;
+}
+
+
+/* ============================================================
+   7. TRAMA DE ALERTAS / SEGUIMIENTO
+   ------------------------------------------------------------
+   Para paneles de alerta, advertencia, seguimiento pendiente
+   o indicadores preventivos.
+   ============================================================ */
+
+.rm-texture-alert {
+    background:
+        radial-gradient(circle at 10% 18%, rgba(244, 162, 97, 0.16), transparent 22rem),
+        radial-gradient(circle at 90% 12%, rgba(233, 122, 95, 0.10), transparent 24rem),
+        linear-gradient(135deg, rgba(253, 242, 236, 0.72), rgba(248, 246, 243, 0.92));
+}
+
+.rm-texture-alert-lines {
+    background-image:
+        repeating-linear-gradient(
+            135deg,
+            rgba(244, 162, 97, 0.08) 0,
+            rgba(244, 162, 97, 0.08) 1px,
+            transparent 1px,
+            transparent 14px
+        );
+}
+
+
+/* ============================================================
+   8. PANELES CON PROFUNDIDAD
+   ------------------------------------------------------------
+   Fondos para cards grandes, contenedores de dashboard,
+   paneles de módulos y resumen institucional.
+   ============================================================ */
+
+.rm-surface-glass {
+    background:
+        linear-gradient(135deg, rgba(255, 255, 255, 0.88), rgba(248, 246, 243, 0.76));
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+}
+
+.rm-surface-warm {
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(242, 235, 227, 0.86));
+}
+
+.rm-surface-panel {
+    background:
+        linear-gradient(135deg, rgba(255, 255, 255, 0.90), rgba(248, 246, 243, 0.88)),
+        radial-gradient(circle at top right, rgba(233, 122, 95, 0.08), transparent 18rem);
+}
+
+.rm-surface-institutional {
+    background:
+        radial-gradient(circle at top left, rgba(47, 62, 92, 0.08), transparent 20rem),
+        radial-gradient(circle at bottom right, rgba(233, 122, 95, 0.10), transparent 18rem),
+        linear-gradient(135deg, rgba(248, 246, 243, 0.96), rgba(230, 221, 211, 0.86));
+}
+
+
+/* ============================================================
+   9. OVERLAYS DECORATIVOS
+   ------------------------------------------------------------
+   Para usar con ::before o elementos absolutos.
+   ============================================================ */
+
+.rm-overlay-soft {
+    background:
+        linear-gradient(180deg, rgba(47, 62, 92, 0.06), transparent),
+        radial-gradient(circle at 18% 22%, rgba(233, 122, 95, 0.10), transparent 18rem);
+}
+
+.rm-overlay-warm {
+    background:
+        radial-gradient(circle at 18% 18%, rgba(233, 122, 95, 0.14), transparent 18rem),
+        radial-gradient(circle at 82% 16%, rgba(244, 162, 97, 0.12), transparent 20rem);
+}
+
+.rm-overlay-health {
+    background:
+        radial-gradient(circle at 20% 18%, rgba(42, 157, 143, 0.12), transparent 18rem),
+        radial-gradient(circle at 82% 14%, rgba(111, 191, 179, 0.10), transparent 20rem);
+}
+
+.rm-overlay-cognitive {
+    background:
+        radial-gradient(circle at 20% 18%, rgba(155, 138, 199, 0.12), transparent 18rem),
+        radial-gradient(circle at 82% 14%, rgba(143, 183, 217, 0.10), transparent 20rem);
+}
+
+
+/* ============================================================
+   10. TRAMAS PARA EMPTY STATES
+   ------------------------------------------------------------
+   Estados vacíos, tarjetas sin registros, paneles de ayuda.
+   ============================================================ */
+
+.rm-empty-pattern {
+    background:
+        radial-gradient(circle, rgba(199, 181, 163, 0.20) 1px, transparent 1px),
+        linear-gradient(135deg, rgba(255, 255, 255, 0.88), rgba(247, 245, 242, 0.88));
+    background-size: 18px 18px, 100% 100%;
+}
+
+.rm-empty-pattern-health {
+    background:
+        radial-gradient(circle, rgba(42, 157, 143, 0.16) 1px, transparent 1px),
+        linear-gradient(135deg, rgba(216, 243, 238, 0.46), rgba(255, 255, 255, 0.86));
+    background-size: 20px 20px, 100% 100%;
+}
+
+.rm-empty-pattern-cognitive {
+    background:
+        radial-gradient(circle, rgba(155, 138, 199, 0.16) 1px, transparent 1px),
+        linear-gradient(135deg, rgba(230, 225, 245, 0.46), rgba(255, 255, 255, 0.86));
+    background-size: 20px 20px, 100% 100%;
+}
+
+
+/* ============================================================
+   11. FONDOS PARA SIDEBAR / HEADER
+   ============================================================ */
+
+.rm-sidebar-texture {
+    background:
+        radial-gradient(circle at top left, rgba(233, 122, 95, 0.10), transparent 18rem),
+        linear-gradient(180deg, rgba(230, 221, 211, 0.98), rgba(213, 199, 185, 0.92));
+}
+
+.rm-header-texture {
+    background:
+        linear-gradient(135deg, rgba(248, 246, 243, 0.96), rgba(242, 235, 227, 0.92)),
+        radial-gradient(circle at 90% 10%, rgba(233, 122, 95, 0.08), transparent 16rem);
+}
+
+
+/* ============================================================
+   12. FONDO TIPO PAPEL SUAVE
+   ------------------------------------------------------------
+   Útil para reportes, fichas, formularios extensos.
+   ============================================================ */
+
+.rm-paper-texture {
+    background:
+        linear-gradient(135deg, rgba(255, 255, 255, 0.90), rgba(248, 246, 243, 0.92)),
+        repeating-linear-gradient(
+            0deg,
+            rgba(47, 62, 92, 0.025) 0,
+            rgba(47, 62, 92, 0.025) 1px,
+            transparent 1px,
+            transparent 24px
+        );
+}
+
+.rm-paper-texture-warm {
+    background:
+        radial-gradient(circle at top left, rgba(233, 122, 95, 0.08), transparent 18rem),
+        linear-gradient(135deg, rgba(255, 255, 255, 0.94), rgba(242, 235, 227, 0.90));
+}
+
+
+/* ============================================================
+   13. EFECTO DE LUZ SIGUIENDO EL CURSOR
+   ------------------------------------------------------------
+   Debe usarse en contenedores donde JavaScript actualiza:
+   --mouse-x y --mouse-y.
+   ============================================================ */
+
+.rm-mouse-light {
+    background:
+        radial-gradient(
+            circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+            rgba(233, 122, 95, 0.12),
+            transparent 28rem
+        );
+}
+
+.rm-mouse-light-health {
+    background:
+        radial-gradient(
+            circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+            rgba(42, 157, 143, 0.11),
+            transparent 28rem
+        );
+}
+
+.rm-mouse-light-cognitive {
+    background:
+        radial-gradient(
+            circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+            rgba(155, 138, 199, 0.11),
+            transparent 28rem
+        );
+}
+
+
+/* ============================================================
+   14. DECORACIÓN DE ESQUINAS
+   ------------------------------------------------------------
+   Usar como pseudo-elemento ::before o clase en elementos absolutos.
+   ============================================================ */
+
+.rm-corner-glow {
+    position: absolute;
+    pointer-events: none;
+    inset: 0;
+    overflow: hidden;
+    border-radius: inherit;
+}
+
+.rm-corner-glow::before {
+    content: "";
+    position: absolute;
+    top: -5rem;
+    right: -5rem;
+    width: 12rem;
+    height: 12rem;
+    border-radius: 9999px;
+    background: rgba(233, 122, 95, 0.16);
+    filter: blur(18px);
+}
+
+.rm-corner-glow-health::before {
+    background: rgba(42, 157, 143, 0.14);
+}
+
+.rm-corner-glow-cognitive::before {
+    background: rgba(155, 138, 199, 0.14);
+}
+
+
+/* ============================================================
+   15. MODO OSCURO FUTURO
+   ------------------------------------------------------------
+   Este archivo NO implementa el modo oscuro completo.
+   Solo adapta texturas para que respondan mejor cuando modo-oscuro.css
+   sobrescriba las variables semánticas.
+   ============================================================ */
+
+.dark,
+[data-theme="dark"] {
+    --rm-textura-linea: rgba(255, 255, 255, 0.055);
+    --rm-textura-linea-suave: rgba(255, 255, 255, 0.035);
+    --rm-textura-punto: rgba(244, 162, 97, 0.14);
+    --rm-textura-punto-suave: rgba(255, 255, 255, 0.08);
+
+    --rm-textura-radial-terracota: rgba(233, 122, 95, 0.12);
+    --rm-textura-radial-salud: rgba(42, 157, 143, 0.10);
+    --rm-textura-radial-cognitivo: rgba(155, 138, 199, 0.10);
+    --rm-textura-radial-azul: rgba(143, 183, 217, 0.08);
+}
+
+
+/* ============================================================
+   16. ACCESIBILIDAD / RENDIMIENTO
+   ------------------------------------------------------------
+   Reducir efectos decorativos si el usuario prefiere menos movimiento
+   o en dispositivos de bajo rendimiento.
+   ============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+    .rm-mouse-light,
+    .rm-mouse-light-health,
+    .rm-mouse-light-cognitive {
+        background: transparent;
+    }
+}
+
+@media (max-width: 640px) {
+    .rm-bg-layout,
+    .rm-bg-app,
+    .rm-bg-module {
+        background:
+            linear-gradient(135deg, var(--color-fondo-app), var(--color-fondo-layout));
+    }
+
+    .rm-texture-grid,
+    .rm-texture-grid-soft,
+    .rm-texture-grid-compact {
+        background-size: 32px 32px;
+    }
+}

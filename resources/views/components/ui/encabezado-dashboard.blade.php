@@ -42,17 +42,17 @@ $acciones = array_slice($acciones, 0, 3);
                 <span class="badge-mint">
                     CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS
                 </span>
-                <span class="rounded-full bg-azul-profundo/10 px-3 py-1 text-[11px] font-black text-azul-profundo">
+                <span class="rm-badge-neutral">
                     {{ $rolLegible }}
                 </span>
             </div>
 
-            <h1 class="text-xl font-black leading-tight text-azul-profundo md:text-2xl">
-                {{ $saludoTexto }}, <span class="text-[#F28B54]">{{ $nombre }}</span>
+            <h1 class="text-xl font-black leading-tight text-titulo md:text-2xl">
+                {{ $saludoTexto }}, <span class="text-boton-acento">{{ $nombre }}</span>
             </h1>
 
             @if($fecha)
-                <p class="mt-1 text-xs font-bold text-azul-profundo/55">{{ $fecha }}</p>
+                <p class="mt-1 text-xs font-bold text-meta">{{ $fecha }}</p>
             @endif
         </div>
 
@@ -60,7 +60,7 @@ $acciones = array_slice($acciones, 0, 3);
             <div class="flex flex-wrap gap-3">
                 @foreach($acciones as $accion)
                     @if($accion['estilo'] === 'terracota')
-                        <a href="{{ $accion['href'] }}" class="rm-btn-primary text-xs">
+                        <a href="{{ $accion['href'] }}" class="rm-btn-accent text-xs">
                             <i class="ph-bold {{ $accion['icono'] }} mr-1"></i>{{ $accion['label'] }}
                         </a>
                     @else

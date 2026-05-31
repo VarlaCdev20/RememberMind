@@ -18,12 +18,12 @@
          style="display: none;">
          
         <div class="flex w-full flex-col items-center space-y-4 sm:items-end">
-            <div class="pointer-events-auto w-full max-w-sm overflow-hidden rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] backdrop-blur-xl ring-1 ring-black ring-opacity-5"
+            <div class="pointer-events-auto w-full max-w-sm overflow-hidden rounded-2xl shadow-modal backdrop-blur-xl ring-1 ring-borde"
                  :class="{
-                    'bg-[#8DA280]/90 text-white': tipo === 'success',
-                    'bg-terracota/90 text-white': tipo === 'error',
-                    'bg-[#D9A27C]/90 text-white': tipo === 'warning',
-                    'bg-[#6873A6]/90 text-white': tipo === 'info'
+                    'bg-estado-exito-bg text-estado-exito-texto border border-estado-exito-borde': tipo === 'success',
+                    'bg-estado-peligro-bg text-estado-peligro-texto border border-estado-peligro-borde': tipo === 'error',
+                    'bg-estado-advertencia-bg text-estado-advertencia-texto border border-estado-advertencia-borde': tipo === 'warning',
+                    'bg-estado-info-bg text-estado-info-texto border border-estado-info-borde': tipo === 'info'
                  }">
                 <div class="p-4">
                     <div class="flex items-start">
@@ -45,7 +45,7 @@
                             <p class="text-sm font-black" x-text="mensaje"></p>
                         </div>
                         <div class="ml-4 flex flex-shrink-0">
-                            <button @click="show = false" type="button" class="inline-flex rounded-md text-white/70 hover:text-white focus:outline-none">
+                            <button @click="show = false" type="button" class="inline-flex rounded-md text-current opacity-70 hover:opacity-100 focus:outline-none">
                                 <span class="sr-only">Cerrar</span>
                                 <i class="ph-bold ph-x text-lg"></i>
                             </button>

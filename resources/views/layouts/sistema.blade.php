@@ -19,49 +19,16 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     @livewireStyles
-
-    <style>
-        .dash-noise {
-            background-image: url('data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noise%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.85%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noise)%22/%3E%3C/svg%3E');
-        }
-
-        .dash-dots {
-            background-image:
-                radial-gradient(rgba(217, 108, 51, 0.45) 1.5px, transparent 1.5px),
-                linear-gradient(90deg, rgba(198, 93, 41, 0.20) 1px, transparent 1px),
-                linear-gradient(0deg, rgba(217, 108, 51, 0.20) 1px, transparent 1px);
-            background-size: 20px 20px, 60px 60px, 60px 60px;
-        }
-
-        .mouse-light {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 170px;
-            height: 170px;
-            border-radius: 9999px;
-            pointer-events: none;
-            z-index: 40;
-            opacity: 0;
-            background: radial-gradient(circle, rgba(217, 108, 51, 0.22), rgba(242, 139, 84, 0.08), transparent 80%);
-            transition: opacity .25s ease;
-        }
-
-        [x-cloak] {
-            display: none !important;
-        }
-    </style>
 </head>
 
-<body class="font-sans antialiased bg-[var(--color-fondo-app)]">
+<body class="font-sans antialiased bg-fondo-app">
     <x-banner />
 
     <div x-data="{ sidebarOpen: false, sidebarCollapsed: false }"
-        class="bg-app-institucional relative min-h-screen overflow-x-hidden font-outfit text-azul-profundo selection:bg-[#E27D60] selection:text-white">
+        class="rm-bg-app relative min-h-screen overflow-x-hidden font-outfit text-titulo selection:bg-boton-acento selection:text-white">
         {{-- Fondos estéticos --}}
-        <div class="dash-noise pointer-events-none fixed inset-0 z-[60] opacity-[0.15] mix-blend-overlay"></div>
-        <div class="dash-dots pointer-events-none fixed inset-0 z-0 opacity-[0.40]"></div>
-        <div class="mouse-light pointer-events-none"></div>
+        <div class="rm-texture-dots pointer-events-none fixed inset-0 z-0 opacity-40"></div>
+        <div class="rm-mouse-light pointer-events-none fixed inset-0 z-40"></div>
 
         {{-- Overlay para móvil --}}
         <div x-show="sidebarOpen" x-transition.opacity @click="sidebarOpen = false"
@@ -87,21 +54,6 @@
     @stack('modals')
 
     @livewireScripts
-
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const light = document.querySelector('.mouse-light');
-            if (light) {
-                document.addEventListener('mousemove', (e) => {
-                    light.style.opacity = '1';
-                    light.style.transform = `translate(${e.clientX - 85}px, ${e.clientY - 85}px)`;
-                });
-                document.addEventListener('mouseleave', () => {
-                    light.style.opacity = '0';
-                });
-            }
-        });
-    </script>
 </body>
 
 </html>

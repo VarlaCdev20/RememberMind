@@ -2,16 +2,16 @@
 
 @php
 $estilosColor = [
-    'azul-profundo' => ['bg' => 'bg-azul-profundo/10', 'text' => 'text-azul-profundo', 'val' => 'text-azul-profundo'],
-    'naranja'       => ['bg' => 'bg-[#F6B08A]/25',     'text' => 'text-[#A6532B]',     'val' => 'text-[#A6532B]'],
-    'verde-salud'   => ['bg' => 'bg-[#CBEFE8]/75',     'text' => 'text-[#006B5E]',     'val' => 'text-[#006B5E]'],
-    'morado-cog'    => ['bg' => 'bg-[#9B8AC7]/15',     'text' => 'text-[#7A68B0]',     'val' => 'text-[#7A68B0]'],
-    'terracota'     => ['bg' => 'bg-[#F28B54]/14',      'text' => 'text-[#F28B54]',     'val' => 'text-[#F28B54]'],
-    'verde-olivo'   => ['bg' => 'bg-[#97E3D5]/28',     'text' => 'text-[#0B4F46]',     'val' => 'text-[#0B4F46]'],
+    'azul-profundo' => ['bg' => 'bg-fondo-hover',           'text' => 'text-titulo',                  'val' => 'text-titulo'],
+    'naranja'       => ['bg' => 'bg-estado-advertencia-bg', 'text' => 'text-estado-advertencia-texto', 'val' => 'text-estado-advertencia-texto'],
+    'verde-salud'   => ['bg' => 'bg-estado-exito-bg',       'text' => 'text-estado-exito-texto',       'val' => 'text-estado-exito-texto'],
+    'morado-cog'    => ['bg' => 'bg-modulo-cognitivoFondo', 'text' => 'text-modulo-cognitivoTexto',    'val' => 'text-modulo-cognitivoTexto'],
+    'terracota'     => ['bg' => 'bg-estado-advertencia-bg', 'text' => 'text-boton-acento',             'val' => 'text-boton-acento'],
+    'verde-olivo'   => ['bg' => 'bg-modulo-voluntariosFondo', 'text' => 'text-modulo-voluntariosTexto', 'val' => 'text-modulo-voluntariosTexto'],
 ];
 
 $badgeNivel = [
-    'normal'      => 'bg-azul-profundo/8 text-azul-profundo/60',
+    'normal'      => 'rm-badge-neutral',
     'ok'          => 'badge-green-ash',
     'alerta'      => 'badge-coral',
     'advertencia' => 'badge-coral',
@@ -36,8 +36,8 @@ $badgeNivel = [
             </div>
 
             <p class="text-2xl font-black {{ $estilo['val'] }}">{{ $kpi['valor'] }}</p>
-            <p class="mt-0.5 text-[11px] font-black text-azul-profundo">{{ $kpi['titulo'] }}</p>
-            <p class="text-[10px] font-bold text-azul-profundo/50">{{ $kpi['subtitulo'] }}</p>
+            <p class="mt-0.5 text-[11px] font-black text-titulo">{{ $kpi['titulo'] }}</p>
+            <p class="text-[10px] font-bold text-meta">{{ $kpi['subtitulo'] }}</p>
         </div>
     @endforeach
 </div>
