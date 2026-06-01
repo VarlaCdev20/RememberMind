@@ -157,6 +157,19 @@
         box-shadow: 0 0 0 2px rgba(244, 162, 97, 0.18);
     }
 
+    .rm-chart-panel {
+        border: 1px solid var(--chart-border);
+        border-radius: 1rem;
+        background: var(--chart-panel);
+        box-shadow: var(--sombra-card);
+    }
+
+    .dark .rm-chart-panel,
+    [data-theme="dark"] .rm-chart-panel {
+        background: var(--chart-panel);
+        border-color: var(--chart-border);
+    }
+
     .modal-institucional {
         border: 1px solid var(--color-modal-borde);
         background: var(--color-modal-bg);

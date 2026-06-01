@@ -32,16 +32,16 @@
        2. FONDOS GENERALES
        ======================================================== */
 
-    --color-fondo-app: #16202A;
-    --color-fondo-layout: #1B2732;
+    --color-fondo-app: #131D24;
+    --color-fondo-layout: #18242C;
 
-    --color-fondo-panel: rgba(36, 48, 58, 0.58);
-    --color-fondo-panel-alt: rgba(43, 54, 66, 0.46);
-    --color-fondo-panel-fuerte: rgba(43, 54, 66, 0.68);
+    --color-fondo-panel: rgba(28, 40, 48, 0.84);
+    --color-fondo-panel-alt: rgba(30, 42, 51, 0.80);
+    --color-fondo-panel-fuerte: rgba(26, 38, 46, 0.90);
 
-    --color-fondo-card: rgba(43, 54, 66, 0.48);
-    --color-fondo-card-suave: rgba(43, 54, 66, 0.38);
-    --color-fondo-card-calido: rgba(58, 48, 43, 0.42);
+    --color-fondo-card: rgba(34, 47, 56, 0.88);
+    --color-fondo-card-suave: rgba(36, 50, 60, 0.82);
+    --color-fondo-card-calido: rgba(38, 50, 56, 0.84);
 
     --color-fondo-input: rgba(244, 239, 232, 0.94);
     --color-fondo-tabla: rgba(43, 54, 66, 0.36);
@@ -55,39 +55,39 @@
        3. SUPERFICIES TRANSLÚCIDAS
        ======================================================== */
 
-    --surface-card: rgba(43, 54, 66, 0.40);
-    --surface-card-soft: rgba(43, 54, 66, 0.30);
-    --surface-card-warm: rgba(58, 48, 43, 0.34);
+    --surface-card: rgba(34, 47, 56, 0.86);
+    --surface-card-soft: rgba(36, 50, 60, 0.82);
+    --surface-card-warm: rgba(38, 50, 56, 0.84);
 
-    --surface-panel: rgba(36, 48, 58, 0.46);
-    --surface-panel-strong: rgba(43, 54, 66, 0.58);
+    --surface-panel: rgba(28, 40, 48, 0.88);
+    --surface-panel-strong: rgba(26, 38, 46, 0.92);
 
-    --surface-metric-card: rgba(43, 54, 66, 0.34);
-    --surface-empty-state: rgba(43, 54, 66, 0.28);
-    --surface-filter-panel: rgba(43, 54, 66, 0.36);
+    --surface-metric-card: rgba(34, 47, 56, 0.82);
+    --surface-empty-state: rgba(28, 40, 48, 0.70);
+    --surface-filter-panel: rgba(30, 42, 51, 0.84);
 
-    --surface-header: rgba(30, 38, 48, 0.72);
-    --surface-sidebar: rgba(27, 39, 50, 0.82);
+    --surface-header: rgba(24, 36, 44, 0.92);
+    --surface-sidebar: rgba(22, 32, 40, 0.96);
 
 
     /* ========================================================
        4. TEXTOS
        ======================================================== */
 
-    --color-titulo: #F4EFE8;
-    --color-subtitulo: #C7CED8;
-    --color-parrafo: #EAE6DF;
+    --color-titulo: #F3EEE6;
+    --color-subtitulo: #C9D0C4;
+    --color-parrafo: #E7E2D8;
 
-    --color-texto-principal: #EAE6DF;
-    --color-texto-secundario: #C7CED8;
-    --color-texto-apoyo: #AAB4C0;
-    --color-texto-suave: #B8C0CC;
-    --color-texto-muted: #96A1AF;
+    --color-texto-principal: #F3EEE6;
+    --color-texto-secundario: #C9D0C4;
+    --color-texto-apoyo: #AEB8AA;
+    --color-texto-suave: #9EA895;
+    --color-texto-muted: #8E9885;
 
-    --color-label: #EAE6DF;
-    --color-label-suave: #C7CED8;
-    --color-meta: #AAB4C0;
-    --color-placeholder: #8D97A5;
+    --color-label: #E7E2D8;
+    --color-label-suave: #C9D0C4;
+    --color-meta: #9EA895;
+    --color-placeholder: #8E9885;
 
     --color-texto-inverso: #FFF8F1;
 
@@ -102,7 +102,7 @@
     --color-borde-fuerte: rgba(255, 248, 241, 0.24);
     --color-borde-dashed: rgba(255, 248, 241, 0.18);
 
-    --color-borde-focus: #F4A261;
+    --color-borde-focus: #A8A96A;
     --color-borde-error: #FB7185;
     --color-borde-success: #7ED6CB;
     --color-borde-warning: #F4A261;
@@ -113,61 +113,61 @@
        6. BOTONES
        ======================================================== */
 
-    --color-boton-principal: #F4A261;
-    --color-boton-principal-hover: #F7B7A3;
-    --color-boton-principal-texto: #231A16;
+    --color-boton-principal: #A8A96A;
+    --color-boton-principal-hover: #C0C577;
+    --color-boton-principal-texto: #141A16;
 
-    --color-boton-acento: #D9795F;
-    --color-boton-acento-hover: #F2B49F;
-    --color-boton-acento-texto: #231A16;
+    --color-boton-acento: #A8A96A;
+    --color-boton-acento-hover: #C0C577;
+    --color-boton-acento-texto: #141A16;
 
-    --color-boton-secundario: rgba(43, 54, 66, 0.42);
-    --color-boton-secundario-hover: rgba(58, 70, 82, 0.56);
-    --color-boton-secundario-texto: #F4EFE8;
+    --color-boton-secundario: rgba(44, 63, 53, 0.42);
+    --color-boton-secundario-hover: rgba(62, 85, 73, 0.56);
+    --color-boton-secundario-texto: #F3EEE6;
     --color-boton-secundario-borde: rgba(255, 248, 241, 0.14);
 
     --color-boton-exito: #7ED6CB;
     --color-boton-exito-hover: #9BE3DA;
-    --color-boton-exito-texto: #15202B;
+    --color-boton-exito-texto: #141A16;
 
-    --color-boton-neutral: rgba(43, 54, 66, 0.42);
-    --color-boton-neutral-hover: rgba(58, 70, 82, 0.56);
-    --color-boton-neutral-texto: #F4EFE8;
+    --color-boton-neutral: rgba(44, 63, 53, 0.42);
+    --color-boton-neutral-hover: rgba(62, 85, 73, 0.56);
+    --color-boton-neutral-texto: #F3EEE6;
 
     --color-boton-fantasma-bg: transparent;
-    --color-boton-fantasma-hover: rgba(244, 162, 97, 0.10);
-    --color-boton-fantasma-texto: #EAE6DF;
+    --color-boton-fantasma-hover: rgba(168, 169, 106, 0.10);
+    --color-boton-fantasma-texto: #E7E2D8;
     --color-boton-fantasma-borde: rgba(255, 248, 241, 0.14);
 
-    --color-boton-icono-bg: rgba(43, 54, 66, 0.42);
-    --color-boton-icono-hover: #F4A261;
-    --color-boton-icono-texto: #EAE6DF;
-    --color-boton-icono-texto-hover: #231A16;
+    --color-boton-icono-bg: rgba(44, 63, 53, 0.42);
+    --color-boton-icono-hover: #A8A96A;
+    --color-boton-icono-texto: #E7E2D8;
+    --color-boton-icono-texto-hover: #141A16;
 
 
     /* ========================================================
        7. SIDEBAR / HEADER / NAVEGACIÓN
        ======================================================== */
 
-    --color-sidebar-bg: rgba(27, 39, 50, 0.82);
-    --color-sidebar-header-bg: rgba(43, 54, 66, 0.42);
+    --color-sidebar-bg: rgba(22, 32, 40, 0.96);
+    --color-sidebar-header-bg: rgba(28, 40, 48, 0.84);
 
-    --color-sidebar-texto: #B8C0CC;
-    --color-sidebar-texto-hover: #F4A261;
-    --color-sidebar-texto-muted: #96A1AF;
+    --color-sidebar-texto: #C9D0C4;
+    --color-sidebar-texto-hover: #C0C577;
+    --color-sidebar-texto-muted: #9EA895;
 
     --color-sidebar-seccion-texto: #D8D2CA;
-    --color-sidebar-seccion-hover-bg: rgba(244, 162, 97, 0.10);
+    --color-sidebar-seccion-hover-bg: rgba(168, 169, 106, 0.10);
 
-    --color-sidebar-seccion-activa-bg: rgba(244, 162, 97, 0.14);
-    --color-sidebar-seccion-activa-texto: #F4A261;
+    --color-sidebar-seccion-activa-bg: rgba(168, 169, 106, 0.14);
+    --color-sidebar-seccion-activa-texto: #C0C577;
 
-    --color-sidebar-item-activo: #F4A261;
-    --color-sidebar-item-activo-bg: rgba(244, 162, 97, 0.12);
-    --color-sidebar-item-activo-borde: rgba(244, 162, 97, 0.34);
+    --color-sidebar-item-activo: #C0C577;
+    --color-sidebar-item-activo-bg: rgba(168, 169, 106, 0.12);
+    --color-sidebar-item-activo-borde: rgba(168, 169, 106, 0.40);
 
-    --color-header-bg: rgba(30, 38, 48, 0.72);
-    --color-header-texto: #F4EFE8;
+    --color-header-bg: rgba(24, 36, 44, 0.92);
+    --color-header-texto: #F3EEE6;
     --color-header-borde: rgba(255, 248, 241, 0.10);
 
 
@@ -175,9 +175,9 @@
        8. MÓDULOS DEL SISTEMA
        ======================================================== */
 
-    --color-modulo-adulto-mayor: #F4A261;
-    --color-modulo-adulto-mayor-hover: #F7B7A3;
-    --color-modulo-adulto-mayor-fondo: rgba(244, 162, 97, 0.14);
+    --color-modulo-adulto-mayor: #A8A96A;
+    --color-modulo-adulto-mayor-hover: #C0C577;
+    --color-modulo-adulto-mayor-fondo: rgba(168, 169, 106, 0.14);
 
     --color-modulo-salud: #7ED6CB;
     --color-modulo-salud-hover: #9BE3DA;
@@ -358,10 +358,10 @@
     --sombra-sidebar: 18px 0 55px rgba(0, 0, 0, 0.30);
     --sombra-modal: 0 24px 70px rgba(0, 0, 0, 0.46);
 
-    --glow-acento: 0 8px 22px rgba(244, 162, 97, 0.16);
-    --glow-acento-hover: 0 12px 30px rgba(244, 162, 97, 0.24);
-    --glow-sidebar-activo: 0 8px 18px rgba(244, 162, 97, 0.18);
-    --glow-dashboard-cursor: rgba(244, 162, 97, 0.08);
+    --glow-acento: 0 8px 22px rgba(168, 169, 106, 0.16);
+    --glow-acento-hover: 0 12px 30px rgba(168, 169, 106, 0.24);
+    --glow-sidebar-activo: 0 8px 18px rgba(168, 169, 106, 0.18);
+    --glow-dashboard-cursor: rgba(168, 169, 106, 0.08);
 
 
     /* ========================================================
@@ -370,7 +370,7 @@
 
     --rm-textura-linea: rgba(255, 255, 255, 0.055);
     --rm-textura-linea-suave: rgba(255, 255, 255, 0.035);
-    --rm-textura-punto: rgba(244, 162, 97, 0.14);
+    --rm-textura-punto: rgba(168, 169, 106, 0.14);
     --rm-textura-punto-suave: rgba(255, 255, 255, 0.08);
 
     --rm-textura-radial-terracota: rgba(244, 162, 97, 0.12);
@@ -378,7 +378,7 @@
     --rm-textura-radial-cognitivo: rgba(200, 184, 242, 0.10);
     --rm-textura-radial-azul: rgba(143, 183, 217, 0.08);
 
-    --rm-textura-luz-calida: rgba(244, 162, 97, 0.08);
+    --rm-textura-luz-calida: rgba(168, 169, 106, 0.08);
     --rm-textura-luz-suave: rgba(143, 183, 217, 0.07);
     --rm-textura-sombra-suave: rgba(0, 0, 0, 0.18);
     --rm-textura-noise-opacity: 0.024;
@@ -391,14 +391,29 @@
        existentes, pero sin generar bloques visuales pesados.
        ======================================================== */
 
-    --gradiente-progreso: #F4A261;
+    --gradiente-progreso: #A8A96A;
     --gradiente-salud: #7ED6CB;
     --gradiente-cognitivo: #C8B8F2;
-    --gradiente-acento: #F4A261;
+    --gradiente-acento: #A8A96A;
 
     --gradiente-panel: var(--color-fondo-panel);
     --gradiente-card: var(--color-fondo-card);
     --gradiente-input: var(--color-input-bg);
+
+    /* ========================================================
+       19. GRÁFICOS (CHART.JS)
+       ======================================================== */
+
+    --chart-primary: #A8A96A;
+    --chart-secondary: #9FB58A;
+    --chart-accent: #7ED6CB;
+    --chart-warning: #DDA15E;
+    --chart-danger: #FB7185;
+    --chart-muted: #AEB8AA;
+    --chart-text: #F3EEE6;
+    --chart-grid: rgba(255, 248, 241, 0.10);
+    --chart-panel: rgba(20, 28, 36, 0.72);
+    --chart-border: rgba(255, 248, 241, 0.12);
 }
 
 

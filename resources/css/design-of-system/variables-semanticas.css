@@ -436,3 +436,20 @@
     --color-info-text: var(--color-estado-info-texto);
     --color-info-border: var(--color-estado-info-borde);
 }
+
+/* ============================================================
+   19. GRÁFICOS (CHART.JS)
+   ============================================================ */
+
+:root {
+    --chart-primary: #2F3E5C;
+    --chart-secondary: #7FA587;
+    --chart-accent: #D9795F;
+    --chart-warning: #DDA15E;
+    --chart-danger: #D96C75;
+    --chart-muted: #6B7280;
+    --chart-text: #293A59;
+    --chart-grid: rgba(41, 58, 89, 0.10);
+    --chart-panel: rgba(244, 238, 231, 0.78);
+    --chart-border: rgba(41, 58, 89, 0.14);
+}
