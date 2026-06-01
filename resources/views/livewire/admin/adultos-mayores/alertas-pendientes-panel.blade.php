@@ -117,57 +117,57 @@
  </p>
  </div>
  @else
- <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
- @foreach($alertas as $alerta)
- <article class="rounded-2xl p-5 transition flex flex-col justify-between rm-alert-card {{ $alerta['nivel'] === 'prioritaria' ? 'rm-alert-card-prioritaria' : ($alerta['nivel'] === 'preventiva' ? 'rm-alert-card-preventiva' : '') }}">
- <div class="space-y-3">
- {{-- Fila superior: ID y Nivel --}}
- <div class="flex items-center justify-between gap-2">
- <span class="text-[10px] font-bold uppercase tracking-wider text-apoyo">
- {{ $alerta['adulto_id'] }}
- </span>
- <span class="rounded-full px-2.5 py-0.5 text-[9px] font-bold uppercase tracking-wider border {{ $alerta['nivel'] === 'prioritaria' ? 'bg-estado-peligroBg text-estado-peligro border-estado-peligroBorde' : ($alerta['nivel'] === 'preventiva' ? 'bg-estado-advertenciaBg text-estado-advertencia border-estado-advertenciaBorde' : 'bg-fondo-card text-apoyo border-borde-suave') }}">
- {{ $alerta['nivel'] }}
- </span>
- </div>
+ 	<div class="rm-alert-grid">
+		@foreach($alertas as $alerta)
+		<article class="rounded-[1rem] transition flex flex-col justify-between rm-alert-card rm-alert-card-compact {{ $alerta['nivel'] === 'prioritaria' ? 'rm-alert-card-prioritaria' : ($alerta['nivel'] === 'preventiva' ? 'rm-alert-card-preventiva' : '') }}">
+			<div class="rm-alert-card-body">
+				{{-- Fila superior: ID y Nivel --}}
+				<div class="flex items-center justify-between gap-2">
+					<span class="rm-alert-meta uppercase">
+						{{ $alerta['adulto_id'] }}
+					</span>
+					<span class="rm-alert-pill {{ $alerta['nivel'] === 'prioritaria' ? 'bg-estado-peligroBg text-estado-peligro border-estado-peligroBorde' : ($alerta['nivel'] === 'preventiva' ? 'bg-estado-advertenciaBg text-estado-advertencia border-estado-advertenciaBorde' : 'bg-fondo-card text-apoyo border-borde-suave') }}">
+						{{ $alerta['nivel'] }}
+					</span>
+				</div>
 
- {{-- Nombre del adulto mayor --}}
- <div>
- <h3 class="text-sm font-bold text-titulo leading-snug">
- {{ $alerta['nombre'] }}
- </h3>
- <div class="flex items-center gap-1.5 mt-1">
- <span class="inline-flex items-center rounded-md bg-fondo-app border border-borde px-2 py-0.5 text-[9px] font-bold text-meta uppercase tracking-wide">
- <i class="ph-bold {{ $alerta['icono'] }} mr-1"></i>
- {{ $alerta['categoria_label'] }}
- </span>
- </div>
- </div>
+ 				{{-- Nombre del adulto mayor --}}
+				<div>
+					<h3 class="rm-alert-title">
+						{{ $alerta['nombre'] }}
+					</h3>
+					<div class="flex items-center gap-1 mt-0.5">
+						<span class="inline-flex items-center rm-alert-category">
+							<i class="ph-bold {{ $alerta['icono'] }} mr-1"></i>
+							{{ $alerta['categoria_label'] }}
+						</span>
+					</div>
+				</div>
 
- {{-- Descripción de la alerta --}}
- <p class="text-xs font-bold leading-relaxed text-parrafo">
- {{ $alerta['descripcion'] }}
- </p>
+ 				{{-- Descripción de la alerta --}}
+				<p class="rm-alert-description">
+					{{ $alerta['descripcion'] }}
+				</p>
 
- {{-- Fecha relacionada si existe --}}
- @if($alerta['fecha'])
- <p class="text-[10px] font-semibold text-meta flex items-center gap-1">
- <i class="ph-bold ph-calendar"></i>
- Fecha registrada: <strong>{{ $alerta['fecha'] }}</strong>
- </p>
- @endif
- </div>
+ 				{{-- Fecha relacionada si existe --}}
+				@if($alerta['fecha'])
+					<p class="rm-alert-meta flex items-center gap-1">
+						<i class="ph-bold ph-calendar"></i>
+						Fecha registrada: <strong>{{ $alerta['fecha'] }}</strong>
+					</p>
+				@endif
+			</div>
 
- {{-- Botón para revisar ficha --}}
- <div class="mt-4 border-t border-borde pt-3 flex justify-end">
- <a
- href="{{ route('admin.adultos-mayores.show', $alerta['adulto_id']) }}"
- class="inline-flex items-center gap-1.5 rounded-lg bg-transparent px-3.5 py-2 text-[10px] uppercase tracking-wider border border-borde-suave transition hover:bg-fondo-card active:scale-95 rm-alert-action"
- >
- <i class="ph-bold ph-eye"></i> Revisar en ficha
- </a>
- </div>
- </article>
+ 			{{-- Botón para revisar ficha --}}
+			<div class="mt-3 border-t border-borde pt-2.5 flex justify-end">
+				<a
+					href="{{ route('admin.adultos-mayores.show', $alerta['adulto_id']) }}"
+					class="inline-flex items-center gap-1 rm-alert-action"
+				>
+					<i class="ph-bold ph-eye"></i> Revisar en ficha
+				</a>
+			</div>
+		</article>
  @endforeach
  </div>
  @endif
