@@ -28,14 +28,7 @@
  </div>
 
  <div class="hidden w-full max-w-lg md:block">
- <div class="relative">
- <i class="ph-bold ph-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-meta"></i>
- <input
- type="search"
- placeholder="Buscar módulo, usuario, adulto mayor..."
- class="rm-input rounded-full py-2 pl-10 pr-4 text-sm shadow-sm focus:ring-[var(--color-input-ring-focus)]"
- >
- </div>
+ <livewire:layout.busqueda-global />
  </div>
 
  <div class="flex items-center gap-2">
@@ -108,13 +101,6 @@
  </div>
 
  <div class="mt-3 md:hidden">
- <div class="relative">
- <i class="ph-bold ph-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-meta"></i>
- <input
- type="search"
- placeholder="Buscar..."
- class="rm-input rounded-full py-2 pl-10 pr-4 text-sm shadow-sm focus:ring-[var(--color-input-ring-focus)]"
- >
- </div>
+ <livewire:layout.busqueda-global />
  </div>
 </nav>
