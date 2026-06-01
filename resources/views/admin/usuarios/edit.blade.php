@@ -24,7 +24,7 @@
  </div>
  </header>
 
- <form action="{{ route('admin.usuarios.update', $usuario->cod_usu) }}" method="POST" enctype="multipart/form-data"
+ <form action="{{ route('admin.usuarios.update', $usuario) }}" method="POST" enctype="multipart/form-data"
  x-data="{
  paisDoc: @js(old('pais_documento', $usuario->pais_documento ?? 'Bolivia')),
  tipoDoc: @js(old('tipo_documento', $usuario->tipo_documento ?? 'CI')),

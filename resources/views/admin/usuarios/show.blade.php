@@ -1,9 +1,8 @@
-<x-app-layout>
- <div class="relative min-h-screen bg-fondo-app font-outfit text-titulo">
- <div class="dash-noise pointer-events-none fixed inset-0 z-[60] opacity-[0.14] mix-blend-overlay"></div>
+<x-sistema-layout>
+ <div class="relative w-full font-outfit text-titulo">
  
- <main class="relative z-10 mx-auto max-w-5xl px-4 pb-12 pt-8 sm:px-6 lg:px-8">
- <header class="mb-8">
+ <main class="relative z-10 w-full pb-8">
+ <header class="mb-6">
  <nav class="mb-2 flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-terracota">
  <a href="{{ route('admin.usuarios.index') }}" class="transition hover:text-titulo">Usuarios</a>
  <i class="ph-bold ph-caret-right text-[10px]"></i>
@@ -28,4 +27,4 @@
  </section>
  </main>
  </div>
-</x-app-layout>
+</x-sistema-layout>

@@ -65,6 +65,98 @@
         -webkit-backdrop-filter: blur(12px);
     }
 
+    .rm-global-search-dropdown {
+        border: 1px solid var(--color-borde-general);
+        border-radius: 1.25rem;
+        background: rgba(244, 238, 231, 0.98);
+        color: var(--color-parrafo);
+        box-shadow: var(--sombra-panel);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+    }
+
+    .dark .rm-global-search-dropdown,
+    [data-theme="dark"] .rm-global-search-dropdown {
+        background:
+            radial-gradient(circle at top right, rgba(244, 162, 97, 0.035), transparent 14rem),
+            rgba(20, 28, 36, 0.99);
+        border-color: rgba(255, 248, 241, 0.16);
+        color: #EAE6DF;
+        box-shadow: 0 24px 58px rgba(0, 0, 0, 0.58);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+    }
+
+    .rm-global-search-item {
+        border: 1px solid transparent;
+        border-radius: 0.95rem;
+        transition:
+            background-color 160ms ease,
+            border-color 160ms ease,
+            transform 160ms ease;
+    }
+
+    .rm-global-search-item:hover {
+        background: var(--color-fondo-hover);
+        border-color: var(--color-borde-suave);
+        transform: translateY(-1px);
+    }
+
+    .dark .rm-global-search-item,
+    [data-theme="dark"] .rm-global-search-item {
+        color: var(--color-parrafo);
+    }
+
+    .dark .rm-global-search-item:hover,
+    [data-theme="dark"] .rm-global-search-item:hover {
+        background: rgba(244, 162, 97, 0.12);
+        border-color: rgba(244, 162, 97, 0.20);
+    }
+
+    .rm-global-search-title {
+        color: var(--color-titulo);
+        font-weight: 850;
+    }
+
+    .rm-global-search-detail {
+        color: var(--color-texto-apoyo);
+    }
+
+    .dark .rm-global-search-title,
+    [data-theme="dark"] .rm-global-search-title {
+        color: #F4EFE8;
+    }
+
+    .dark .rm-global-search-detail,
+    [data-theme="dark"] .rm-global-search-detail {
+        color: #B8C0CC;
+    }
+
+    .rm-global-search-input {
+        background: rgba(244, 238, 231, 0.94);
+        color: var(--color-input-texto);
+        border: 1px solid var(--color-input-borde);
+    }
+
+    .rm-global-search-input:focus {
+        border-color: var(--color-input-borde-focus);
+        box-shadow: 0 0 0 2px var(--color-input-ring-focus);
+        outline: none;
+    }
+
+    .dark .rm-global-search-input,
+    [data-theme="dark"] .rm-global-search-input {
+        background: rgba(20, 28, 36, 0.96);
+        color: #F4EFE8;
+        border-color: rgba(255, 248, 241, 0.18);
+    }
+    
+    .dark .rm-global-search-input:focus,
+    [data-theme="dark"] .rm-global-search-input:focus {
+        border-color: #F4A261;
+        box-shadow: 0 0 0 2px rgba(244, 162, 97, 0.18);
+    }
+
     .modal-institucional {
         border: 1px solid var(--color-modal-borde);
         background: var(--color-modal-bg);

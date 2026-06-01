@@ -455,7 +455,7 @@
  
  <div class="pt-2 flex flex-col gap-2">
  <div class="pt-2 flex flex-col gap-2">
- <a href="{{ route('admin.usuarios.documentos.pdf', $usuarioDetalle->cod_usu) }}"
+ <a href="{{ route('admin.usuarios.documentos.pdf', $usuarioDetalle) }}"
  target="_blank"
  class="w-full inline-flex h-9 items-center justify-center gap-1.5 rounded-xl bg-boton-principal text-inverso text-[10px] font-bold uppercase tracking-wider transition hover:bg-boton-acento active:scale-95 shadow-sm">
  <i class="ph-bold ph-printer"></i>
@@ -568,15 +568,15 @@
  </div>
  </div>
  <div class="mt-auto pt-4 flex items-center gap-2">
- <a href="{{ route('admin.usuarios.documentos.ver', ['user' => $usuarioDetalle->cod_usu, 'documento' => $docInst['slug']]) }}" target="_blank"
+ <a href="{{ route('admin.usuarios.documentos.ver', ['user' => $usuarioDetalle, 'documento' => $docInst['slug']]) }}" target="_blank"
  class="flex-1 h-8 bg-fondo-panel hover:bg-boton-principal text-parrafo hover:text-inverso text-[10px] font-bold uppercase rounded-lg flex items-center justify-center gap-1 transition">
  <i class="ph-bold ph-eye"></i> Ver
  </a>
- <a href="{{ route('admin.usuarios.documentos.imprimir', ['user' => $usuarioDetalle->cod_usu, 'documento' => $docInst['slug']]) }}" target="_blank"
+ <a href="{{ route('admin.usuarios.documentos.imprimir', ['user' => $usuarioDetalle, 'documento' => $docInst['slug']]) }}" target="_blank"
  class="flex-1 h-8 bg-fondo-card border border-borde-suave hover:border-borde-focus text-parrafo hover:text-boton-acento text-[10px] font-bold uppercase rounded-lg flex items-center justify-center gap-1 transition">
  <i class="ph-bold ph-printer"></i> Imprimir
  </a>
- <a href="{{ route('admin.usuarios.documentos.documento-pdf', ['user' => $usuarioDetalle->cod_usu, 'documento' => $docInst['slug']]) }}" target="_blank" download
+ <a href="{{ route('admin.usuarios.documentos.documento-pdf', ['user' => $usuarioDetalle, 'documento' => $docInst['slug']]) }}" target="_blank" download
  class="h-8 w-8 bg-boton-principal hover:bg-boton-acento text-inverso rounded-lg flex items-center justify-center transition">
  <i class="ph-bold ph-download-simple"></i>
  </a>
@@ -2961,11 +2961,11 @@
  <div class="rounded-2xl border border-borde-suave bg-fondo-panel p-4 space-y-3 shadow-inner">
  <span class="text-[9px] font-bold uppercase tracking-widest text-apoyo block text-center">Gestión de Paquete Documental Institucional</span>
  <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
- <a href="{{ route('admin.usuarios.documentos.pdf', $usuarioPostRegistro->cod_usu) }}" target="_blank"
+ <a href="{{ route('admin.usuarios.documentos.pdf', $usuarioPostRegistro) }}" target="_blank"
  class="inline-flex h-9 items-center justify-center gap-1.5 rounded-xl bg-fondo-panel text-xs font-bold text-parrafo border border-borde-fuerte transition hover:bg-boton-principal hover:text-inverso active:scale-95 shadow-sm">
  <i class="ph-bold ph-printer"></i> Imprimir
  </a>
- <a href="{{ route('admin.usuarios.documentos.pdf', $usuarioPostRegistro->cod_usu) }}" target="_blank" download="Paquete_Documental.pdf"
+ <a href="{{ route('admin.usuarios.documentos.pdf', $usuarioPostRegistro) }}" target="_blank" download="Paquete_Documental.pdf"
  class="inline-flex h-9 items-center justify-center gap-1.5 rounded-xl bg-fondo-panel text-xs font-bold text-parrafo border border-borde-fuerte transition hover:bg-boton-principal hover:text-inverso active:scale-95 shadow-sm">
  <i class="ph-bold ph-download-simple"></i> Descargar PDF
  </a>
@@ -2997,11 +2997,11 @@
  <span class="text-[10px] font-bold text-parrafo uppercase">{{ $docInst['nombre'] }}</span>
  </div>
  <div class="flex gap-1">
- <a href="{{ route('admin.usuarios.documentos.ver', ['user' => $usuarioPostRegistro->cod_usu, 'documento' => $docInst['slug']]) }}" target="_blank"
+ <a href="{{ route('admin.usuarios.documentos.ver', ['user' => $usuarioPostRegistro, 'documento' => $docInst['slug']]) }}" target="_blank"
  class="h-7 w-7 flex items-center justify-center rounded-lg bg-fondo-panel text-parrafo hover:bg-boton-principal hover:text-inverso transition">
  <i class="ph-bold ph-eye"></i>
  </a>
- <a href="{{ route('admin.usuarios.documentos.documento-pdf', ['user' => $usuarioPostRegistro->cod_usu, 'documento' => $docInst['slug']]) }}" target="_blank" download
+ <a href="{{ route('admin.usuarios.documentos.documento-pdf', ['user' => $usuarioPostRegistro, 'documento' => $docInst['slug']]) }}" target="_blank" download
  class="h-7 w-7 flex items-center justify-center rounded-lg bg-estado-peligroBg text-boton-acento hover:bg-boton-acento hover:text-inverso transition">
  <i class="ph-bold ph-download-simple"></i>
  </a>

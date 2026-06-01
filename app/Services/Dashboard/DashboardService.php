@@ -754,13 +754,13 @@ class DashboardService
     {
         if (!Schema::hasTable('users')) return [];
 
-        return DB::table('users')
+        return \App\Models\User::query()
             ->select('nombres', 'ap_paterno', 'correo', 'estado', 'cod_usu')
             ->orderByRaw('cod_usu DESC')
             ->limit(10)
             ->get()
             ->map(fn($u) => [
-                'cod_usu' => $u->cod_usu,
+                'cod_usu' => $u->getRouteKey(),
                 'nombre'  => trim($u->nombres . ' ' . $u->ap_paterno),
                 'correo'  => $u->correo,
                 'estado'  => $u->estado ?? 'ACTIVO',
