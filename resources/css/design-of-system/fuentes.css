@@ -68,13 +68,13 @@
     --text-5xl: 3rem;         /* 48px */
 
     /* Tamaños funcionales del sistema */
-    --text-label: 0.72rem;
-    --text-table-header: 0.68rem;
+    --text-label: 0.75rem;
+    --text-table-header: 0.72rem;
     --text-table-cell: 0.875rem;
-    --text-badge: 0.68rem;
+    --text-badge: 0.72rem;
     --text-button: 0.75rem;
     --text-sidebar: 0.82rem;
-    --text-caption: 0.72rem;
+    --text-caption: 0.75rem;
 
     /* Interlineado */
     --leading-tight: 1.15;
@@ -86,8 +86,8 @@
     --tracking-tight: -0.025em;
     --tracking-normal: 0;
     --tracking-wide: 0.025em;
-    --tracking-wider: 0.05em;
-    --tracking-widest: 0.08em;
+    --tracking-wider: 0.045em;
+    --tracking-widest: 0.065em;
 
     /* Jerarquía tipográfica institucional */
     --font-page-title: var(--font-titulos);
@@ -142,7 +142,7 @@ select {
 .rm-title-page {
     font-family: var(--font-page-title);
     font-size: clamp(1.75rem, 2.5vw, 2.75rem);
-    font-weight: var(--font-black);
+    font-weight: var(--font-extrabold);
     line-height: var(--leading-title);
     letter-spacing: var(--tracking-tight);
 }
@@ -150,7 +150,7 @@ select {
 .rm-title-section {
     font-family: var(--font-section-title);
     font-size: clamp(1.25rem, 1.7vw, 1.75rem);
-    font-weight: var(--font-black);
+    font-weight: var(--font-extrabold);
     line-height: var(--leading-title);
     letter-spacing: var(--tracking-tight);
 }
@@ -179,7 +179,7 @@ select {
 .rm-text-label {
     font-family: var(--font-principal);
     font-size: var(--text-label);
-    font-weight: var(--font-black);
+    font-weight: var(--font-bold);
     line-height: var(--leading-tight);
     letter-spacing: var(--tracking-wider);
     text-transform: uppercase;
@@ -188,7 +188,7 @@ select {
 .rm-text-button {
     font-family: var(--font-principal);
     font-size: var(--text-button);
-    font-weight: var(--font-black);
+    font-weight: var(--font-extrabold);
     line-height: var(--leading-tight);
     letter-spacing: var(--tracking-wider);
     text-transform: uppercase;
@@ -197,7 +197,7 @@ select {
 .rm-text-badge {
     font-family: var(--font-principal);
     font-size: var(--text-badge);
-    font-weight: var(--font-black);
+    font-weight: var(--font-bold);
     line-height: var(--leading-tight);
     letter-spacing: var(--tracking-wider);
     text-transform: uppercase;
@@ -206,7 +206,7 @@ select {
 .rm-text-table-header {
     font-family: var(--font-principal);
     font-size: var(--text-table-header);
-    font-weight: var(--font-black);
+    font-weight: var(--font-bold);
     line-height: var(--leading-tight);
     letter-spacing: var(--tracking-widest);
     text-transform: uppercase;

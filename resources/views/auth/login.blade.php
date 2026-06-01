@@ -1,25 +1,28 @@
 <x-guest-layout>
     <style>
         .auth-noise {
-            background-image: url('data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noise%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.85%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noise)%22/%3E%3C/svg%3E');
+            background-image: url('data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noise%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.85%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noise%22/%3E%3C/svg%3E');
         }
 
         .auth-dots {
-            background-image: radial-gradient(#2F3E5C 2px, transparent 2px);
-            background-size: 32px 32px;
+            background-image: radial-gradient(rgba(47, 62, 92, 0.16) 1.4px, transparent 1.4px);
+            background-size: 30px 30px;
         }
 
-        .text-shadow-deep {
-            text-shadow: 4px 8px 24px rgba(0,0,0,0.35), 2px 4px 8px rgba(0,0,0,0.20);
-        }
-
-        .text-shadow-title {
-            text-shadow: 2px 4px 12px rgba(0,0,0,0.20);
+        .text-shadow-soft {
+            text-shadow: 0 10px 26px rgba(47, 62, 92, 0.18);
         }
 
         @keyframes floatAuth {
-            0%, 100% { transform: translateY(0) rotate(0deg); }
-            50% { transform: translateY(-16px) rotate(5deg); }
+
+            0%,
+            100% {
+                transform: translateY(0) rotate(0deg);
+            }
+
+            50% {
+                transform: translateY(-12px) rotate(4deg);
+            }
         }
 
         .float-auth {
@@ -27,8 +30,7 @@
         }
     </style>
 
-    <div
-        x-data="{
+    <div x-data="{
             panel: 'login',
             showPassword: false,
             isSubmitting: false,
@@ -41,7 +43,7 @@
             addToast(message, type = 'error') {
                 const id = Date.now();
                 this.toasts.push({ id, message, type });
-                setTimeout(() => this.removeToast(id), 4800);
+                setTimeout(() => this.removeToast(id), 4500);
             },
 
             removeToast(id) {
@@ -72,21 +74,15 @@
                 if (this.correoError || this.passwordError) {
                     event.preventDefault();
 
-                    if (this.correoError) {
-                        this.addToast(this.correoError, 'error');
-                    }
-
-                    if (this.passwordError) {
-                        this.addToast(this.passwordError, 'error');
-                    }
+                    if (this.correoError) this.addToast(this.correoError, 'error');
+                    if (this.passwordError) this.addToast(this.passwordError, 'error');
 
                     return;
                 }
 
                 this.isSubmitting = true;
             }
-        }"
-        x-init="
+        }" x-init="
             @if ($errors->any())
                 addToast('Verifica tu correo o contraseña e inténtalo nuevamente.', 'error');
             @endif
@@ -94,344 +90,337 @@
             @if (session('status'))
                 addToast(@js(session('status')), 'success');
             @endif
-        "
-        class="relative min-h-screen overflow-hidden bg-fondo-app font-outfit text-titulo"
-    >
-        <div class="auth-noise pointer-events-none fixed inset-0 z-[60] opacity-[0.25] mix-blend-overlay"></div>
-        <div class="auth-dots pointer-events-none fixed inset-0 z-0 opacity-[0.035]"></div>
+        " class="relative min-h-screen overflow-hidden bg-fondo-app font-sans text-titulo">
+        <div class="auth-noise pointer-events-none fixed inset-0 z-[60] opacity-[0.16] mix-blend-overlay"></div>
+        <div class="auth-dots pointer-events-none fixed inset-0 z-0 opacity-[0.10]"></div>
 
-        <div class="absolute left-[-12rem] top-[-14rem] h-[42rem] w-[42rem] rounded-full bg-fondo-panel blur-[130px]"></div>
-        <div class="absolute right-[-14rem] bottom-[-14rem] h-[44rem] w-[44rem] rounded-full bg-fondo-panel blur-[130px]"></div>
-        <div class="absolute right-[22%] top-[10%] h-[32rem] w-[32rem] rounded-full bg-estado-exitoBg blur-[120px]"></div>
+        <div
+            class="pointer-events-none absolute left-[-14rem] top-[-16rem] h-[36rem] w-[36rem] rounded-full bg-boton-acento/10 blur-[110px]">
+        </div>
+        <div
+            class="pointer-events-none absolute right-[-16rem] bottom-[-16rem] h-[38rem] w-[38rem] rounded-full bg-modulo-salud/10 blur-[120px]">
+        </div>
+        <div
+            class="pointer-events-none absolute right-[24%] top-[10%] h-[28rem] w-[28rem] rounded-full bg-modulo-cognitivo/10 blur-[120px]">
+        </div>
 
-        {{-- Mensajes emergentes --}}
         <div class="fixed right-4 top-5 z-[9999] flex w-[calc(100%-2rem)] max-w-sm flex-col gap-3 sm:right-6">
             <template x-for="toast in toasts" :key="toast.id">
-                <div
-                    x-transition:enter="transition ease-out duration-300"
+                <div x-transition:enter="transition ease-out duration-300"
                     x-transition:enter-start="translate-x-8 opacity-0 scale-95"
                     x-transition:enter-end="translate-x-0 opacity-100 scale-100"
                     x-transition:leave="transition ease-in duration-200"
                     x-transition:leave-start="translate-x-0 opacity-100 scale-100"
                     x-transition:leave-end="translate-x-8 opacity-0 scale-95"
-                    class="flex items-start gap-3 rounded-[2rem] border p-4 shadow-2xl backdrop-blur-xl"
-                    :class="{
-                        'border-terracota/30 bg-fondo-panel text-terracota': toast.type === 'error',
-                        'border-estado-exitoBorde bg-fondo-panel text-parrafo': toast.type === 'success'
-                    }"
-                >
-                    <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl"
-                         :class="toast.type === 'success' ? 'bg-estado-exitoBg' : 'bg-boton-acento/10'">
-                        <i class="ph-bold text-2xl"
-                           :class="toast.type === 'success' ? 'ph-check-circle' : 'ph-warning-circle'"></i>
+                    class="flex items-start gap-3 rounded-2xl border p-3 shadow-panel backdrop-blur-xl" :class="toast.type === 'success'
+                        ? 'border-estado-exitoBorde bg-estado-exitoBg text-estado-exito'
+                        : 'border-estado-peligroBorde bg-estado-peligroBg text-estado-peligro'">
+                    <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl"
+                        :class="toast.type === 'success' ? 'bg-estado-exitoBg' : 'bg-estado-peligroBg'">
+                        <i class="ph-bold text-xl"
+                            :class="toast.type === 'success' ? 'ph-check-circle' : 'ph-warning-circle'"></i>
                     </div>
 
-                    <p class="pt-1 text-sm font-black leading-5" x-text="toast.message"></p>
+                    <p class="pt-1 text-sm font-semibold leading-5" x-text="toast.message"></p>
 
-                    <button type="button" @click="removeToast(toast.id)" class="ml-auto rounded-full p-1 opacity-60 transition hover:bg-fondo-card/50 hover:opacity-100">
+                    <button type="button" @click="removeToast(toast.id)"
+                        class="ml-auto rounded-xl p-1 opacity-60 transition hover:bg-fondo-card/50 hover:opacity-100">
                         <i class="ph-bold ph-x"></i>
                     </button>
                 </div>
             </template>
         </div>
 
-        <main class="relative z-10 flex min-h-screen items-start justify-center px-4 pt-8 pb-8 lg:pt-10">
-            <section class="relative grid w-full max-w-7xl overflow-hidden rounded-[3.8rem] border border-borde-suave bg-fondo-panel shadow-[0_45px_100px_rgba(47,62,92,0.28)] backdrop-blur-xl lg:grid-cols-[1.08fr_0.92fr]">
-
-                {{-- Lado visual --}}
-                <aside class="relative hidden min-h-[680px] overflow-hidden bg-fondo-panel p-10 lg:block">
-                    <div class="absolute -left-32 top-20 h-[36rem] w-[36rem] rounded-full bg-fondo-panel blur-[80px]"></div>
-                    <div class="absolute -right-52 top-0 h-full w-[75%] rounded-l-[60%] bg-fondo-app"></div>
-                    <div class="absolute bottom-[-8rem] right-16 h-[26rem] w-[26rem] rounded-full bg-estado-exitoBg blur-[90px]"></div>
+        <main class="relative z-10 flex min-h-screen items-center justify-center px-4 py-6 sm:py-8">
+            <section
+                class="relative grid w-full max-w-4xl overflow-hidden rounded-[2rem] border border-borde-suave bg-[var(--surface-card-soft)] shadow-panel backdrop-blur-xl lg:grid-cols-[1.02fr_0.98fr]">
+                <aside
+                    class="relative hidden min-h-[470px] overflow-hidden border-r border-borde-suave bg-[var(--surface-card-warm)] p-6 lg:block">
+                    <div
+                        class="pointer-events-none absolute -left-32 top-16 h-[30rem] w-[30rem] rounded-full bg-boton-acento/10 blur-[90px]">
+                    </div>
+                    <div
+                        class="pointer-events-none absolute -right-44 top-0 h-full w-[72%] rounded-l-[60%] bg-fondo-app/55">
+                    </div>
+                    <div
+                        class="pointer-events-none absolute bottom-[-8rem] right-12 h-[24rem] w-[24rem] rounded-full bg-modulo-salud/10 blur-[90px]">
+                    </div>
 
                     <div class="relative z-10 flex items-center gap-4">
                         <img src="{{ asset('storage/images/LOGO.png') }}"
-                             alt="CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS"
-                             class="h-16 w-auto object-contain drop-shadow-lg">
+                            alt="Centro Geriátrico Jardín de los Recuerdos"
+                            class="h-12 w-auto object-contain drop-shadow-md">
+
                         <div>
-                            <h1 class="text-xl font-black leading-tight text-titulo">CENTRO GERIÁTRICO<br>JARDÍN DE LOS RECUERDOS</h1>
-                            <p class="mt-1 text-xs font-black uppercase tracking-[0.25em] text-parrafo">Portal Institucional</p>
+                            <h1 class="font-outfit text-lg font-extrabold leading-tight text-titulo">
+                                CENTRO GERIÁTRICO<br>JARDÍN DE LOS RECUERDOS
+                            </h1>
+                            <p class="mt-1 text-[0.68rem] font-bold uppercase tracking-[0.22em] text-meta">
+                                Portal institucional
+                            </p>
                         </div>
                     </div>
 
-                    <div class="relative z-10 mt-14">
-                        <span class="inline-flex items-center gap-2 rounded-full border border-terracota/25 bg-fondo-panel px-4 py-2 text-xs font-black uppercase tracking-wider text-terracota">
+                    <div class="relative z-10 mt-10">
+                        <span
+                            class="inline-flex items-center gap-2 rounded-xl border border-boton-acento/25 bg-[var(--surface-card)] px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-boton-acento">
                             <span class="h-2 w-2 rounded-full bg-boton-acento"></span>
                             Portal institucional
                         </span>
 
-                        <h2 class="mt-7 max-w-2xl text-6xl font-black leading-[1.02] tracking-tight text-titulo text-shadow-deep">
+                        <h2
+                            class="mt-5 max-w-xl font-outfit text-4xl font-bold leading-tight tracking-tight text-titulo text-shadow-soft">
                             Cuidado,
-                            <span class="text-terracota">memoria</span>
+                            <span class="text-boton-acento">memoria</span>
                             y dignidad.
                         </h2>
 
-                        <p class="mt-6 max-w-xl text-xl font-bold leading-8 text-titulo/75">
-                            Un espacio seguro para acompañar el bienestar, registrar el seguimiento y proteger la memoria de nuestros adultos mayores.
+                        <p class="mt-5 max-w-lg text-base font-semibold leading-7 text-apoyo">
+                            Un espacio seguro para acompañar el bienestar, registrar el seguimiento y proteger la
+                            memoria de nuestros adultos mayores.
                         </p>
                     </div>
 
-                    <div class="relative z-10 mt-12 grid grid-cols-2 gap-5">
-                        <div class="rounded-[2.4rem] border border-borde-suave bg-fondo-panel p-6 shadow-lg transition duration-500 hover:-translate-y-2 hover:shadow-2xl">
-                            <i class="ph-fill ph-heartbeat mb-4 block text-4xl text-terracota"></i>
-                            <h3 class="text-xl font-black text-titulo">Bienestar</h3>
-                            <p class="mt-2 text-sm font-bold leading-6 text-titulo/65">Atención cálida, cercana y humana.</p>
+                    <div class="relative z-10 mt-8 grid grid-cols-2 gap-4">
+                        <div
+                            class="rounded-2xl border border-borde-suave bg-[var(--surface-card)] p-4 shadow-card backdrop-blur-md transition duration-300 hover:-translate-y-1 hover:shadow-cardHover">
+                            <i class="ph-fill ph-heartbeat mb-3 block text-3xl text-boton-acento"></i>
+                            <h3 class="font-outfit text-lg font-bold text-titulo">Bienestar</h3>
+                            <p class="mt-1 text-sm font-semibold leading-5 text-meta">
+                                Atención cálida, cercana y humana.
+                            </p>
                         </div>
 
-                        <div class="rounded-[2.4rem] border border-borde-suave bg-fondo-panel p-6 shadow-lg transition duration-500 hover:-translate-y-2 hover:shadow-2xl">
-                            <i class="ph-fill ph-brain mb-4 block text-4xl text-estado-exito"></i>
-                            <h3 class="text-xl font-black text-titulo">Memoria</h3>
-                            <p class="mt-2 text-sm font-bold leading-6 text-titulo/65">Seguimiento cognitivo preventivo.</p>
+                        <div
+                            class="rounded-2xl border border-borde-suave bg-[var(--surface-card)] p-4 shadow-card backdrop-blur-md transition duration-300 hover:-translate-y-1 hover:shadow-cardHover">
+                            <i class="ph-fill ph-brain mb-3 block text-3xl text-modulo-salud"></i>
+                            <h3 class="font-outfit text-lg font-bold text-titulo">Memoria</h3>
+                            <p class="mt-1 text-sm font-semibold leading-5 text-meta">
+                                Seguimiento cognitivo preventivo.
+                            </p>
                         </div>
                     </div>
 
-                    <div class="relative z-10 mt-8 h-60 overflow-hidden rounded-[3rem] border-8 border-borde-suave shadow-[0_28px_60px_rgba(47,62,92,0.25)] group">
-                        <img
-                            src="{{ asset('storage/images/adultos-mayores.jpg') }}"
-                            onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1581579438747-104c53d7fbc4?auto=format&fit=crop&w=1200&q=80';"
-                            alt="Adultos mayores"
-                            class="h-full w-full object-cover transition duration-1000 group-hover:scale-110"
-                        >
-                        <div class="absolute inset-0 bg-gradient-to-t from-azul-profundo/35 to-transparent"></div>
-                    </div>
-
-                    <i class="ph-fill ph-leaf float-auth absolute bottom-10 left-10 text-7xl text-estado-exito"></i>
-                    <i class="ph-fill ph-heart float-auth absolute right-24 top-[42%] text-5xl text-terracota/30"></i>
-                    <i class="ph-fill ph-flower float-auth absolute bottom-28 right-32 text-6xl text-apoyo"></i>
+                    <i class="ph-fill ph-leaf float-auth absolute bottom-8 left-8 text-5xl text-modulo-salud/45"></i>
+                    <i
+                        class="ph-fill ph-heart float-auth absolute right-20 top-[42%] text-3xl text-boton-acento/30"></i>
+                    <i
+                        class="ph-fill ph-flower float-auth absolute bottom-24 right-28 text-5xl text-modulo-cognitivo/35"></i>
                 </aside>
 
-                {{-- Lado formulario --}}
-                <section class="relative min-h-[680px] overflow-hidden bg-fondo-app px-6 py-8 sm:px-10 lg:px-14">
-                    <div class="absolute -right-28 -top-28 h-72 w-72 rounded-full bg-boton-acento/15 blur-[85px]"></div>
-                    <div class="absolute -bottom-28 left-0 h-72 w-72 rounded-full bg-estado-exitoBg blur-[85px]"></div>
+                <section
+                    class="relative min-h-[470px] overflow-hidden bg-[var(--surface-card-soft)] px-6 py-6 sm:px-7 lg:px-8">
+                    <div
+                        class="pointer-events-none absolute -right-24 -top-24 h-64 w-64 rounded-full bg-boton-acento/12 blur-[80px]">
+                    </div>
+                    <div
+                        class="pointer-events-none absolute -bottom-24 left-0 h-64 w-64 rounded-full bg-modulo-salud/10 blur-[80px]">
+                    </div>
 
-                    <div class="relative z-10 flex h-full min-h-[610px] items-start pt-8 lg:pt-10">
+                    <div class="relative z-10 flex h-full min-h-[430px] items-start pt-2 lg:pt-4">
                         <div class="relative w-full">
-
-                            {{-- Login --}}
-                            <div
-                                x-show="panel === 'login'"
-                                x-transition:enter="transition ease-out duration-500"
-                                x-transition:enter-start="opacity-0 translate-x-10 scale-[0.98]"
+                            <div x-show="panel === 'login'" x-transition:enter="transition ease-out duration-500"
+                                x-transition:enter-start="opacity-0 translate-x-8 scale-[0.98]"
                                 x-transition:enter-end="opacity-100 translate-x-0 scale-100"
                                 x-transition:leave="transition ease-in duration-300 absolute inset-0"
                                 x-transition:leave-start="opacity-100 translate-x-0 scale-100"
-                                x-transition:leave-end="opacity-0 -translate-x-10 scale-[0.98]"
-                                class="w-full"
-                            >
-                                <div class="mb-8">
-                                    <div class="mb-5 flex h-16 w-16 items-center justify-center rounded-[1.6rem] bg-boton-acento text-inverso shadow-[0_18px_35px_rgba(233,122,95,0.35)]">
-                                        <i class="ph-bold ph-lock-key text-4xl"></i>
+                                x-transition:leave-end="opacity-0 -translate-x-8 scale-[0.98]" class="w-full">
+                                <div class="mb-6">
+                                    <div
+                                        class="mb-4 flex h-14 w-14 items-center justify-center rounded-[1.4rem] bg-boton-acento text-inverso shadow-[0_14px_30px_rgba(233,122,95,0.30)]">
+                                        <i class="ph-bold ph-lock-key text-3xl"></i>
                                     </div>
 
-                                    <h2 class="text-5xl font-black tracking-tight text-titulo text-shadow-title">
+                                    <h2
+                                        class="font-outfit text-3xl font-bold tracking-tight text-titulo text-shadow-soft">
                                         Iniciar sesión
                                     </h2>
 
-                                    <p class="mt-3 max-w-md text-base font-bold leading-7 text-titulo/65">
+                                    <p class="mt-2 max-w-md text-sm font-semibold leading-6 text-apoyo">
                                         Accede al portal institucional de seguimiento y cuidado.
                                     </p>
                                 </div>
 
                                 @if ($errors->any())
-                                    <div class="mb-5 rounded-[2rem] border border-terracota/30 bg-boton-acento/10 p-4 text-sm font-black text-terracota">
+                                    <div
+                                        class="mb-4 rounded-2xl border border-estado-peligroBorde bg-estado-peligroBg p-3 text-sm font-semibold text-estado-peligro">
                                         Verifica tu correo o contraseña e inténtalo nuevamente.
                                     </div>
                                 @endif
 
                                 @if (session('status'))
-                                    <div class="mb-5 rounded-[2rem] border border-estado-exitoBorde bg-estado-exitoBg p-4 text-sm font-black text-parrafo">
+                                    <div
+                                        class="mb-4 rounded-2xl border border-estado-exitoBorde bg-estado-exitoBg p-3 text-sm font-semibold text-estado-exito">
                                         {{ session('status') }}
                                     </div>
                                 @endif
 
-                                <form method="POST" action="{{ route('login') }}" class="space-y-5" @submit="submitLogin($event)">
+                                <form method="POST" action="{{ route('login') }}" class="space-y-4"
+                                    @submit="submitLogin($event)">
                                     @csrf
 
                                     <div>
-                                        <label for="correo" class="mb-2 block text-lg font-black text-titulo">Correo institucional</label>
+                                        <label for="correo" class="mb-2 block text-sm font-bold text-titulo">
+                                            Correo institucional
+                                        </label>
 
                                         <div class="relative">
-                                            <input
-                                                id="correo"
-                                                type="email"
-                                                name="correo"
-                                                x-model="correo"
+                                            <input id="correo" type="email" name="correo" x-model="correo"
                                                 @input="correoTouched = true; correo = correo.trimStart()"
-                                                @blur="correoTouched = true"
-                                                required
-                                                maxlength="120"
-                                                autofocus
-                                                autocomplete="username"
-                                                placeholder="admin@jardindelosrecuerdos.org"
-                                                class="w-full rounded-full border-2 bg-fondo-app px-6 py-4 pr-14 text-base font-extrabold text-titulo placeholder:text-titulo/35 outline-none shadow-inner transition duration-300 focus:ring-4"
+                                                @blur="correoTouched = true" required maxlength="120" autofocus
+                                                autocomplete="username" placeholder="admin@jardindelosrecuerdos.org"
+                                                class="w-full rounded-2xl border border-borde-suave bg-fondo-input px-4 py-2.5 pr-12 text-sm font-semibold text-titulo placeholder:text-placeholder outline-none shadow-inner transition duration-300 focus:border-borde-focus focus:ring-2 focus:ring-[var(--color-input-ring-focus)]"
                                                 :class="{
-                                                    'border-terracota focus:ring-borde-focus/20': correoError,
-                                                    'border-estado-exitoBorde focus:ring-[#8DA280]/25': correoTouched && correo && !correoError,
-                                                    'border-transparent focus:border-azul-clinico focus:ring-azul-clinico/20': !correoTouched || (!correo && !correoError)
-                                                }"
-                                            >
+                                                    'border-estado-peligro focus:border-estado-peligro': correoError,
+                                                    'border-estado-exito': correoTouched && correo && !correoError
+                                                }">
 
-                                            <span class="absolute inset-y-0 right-5 flex items-center" x-show="correoTouched && correo">
-                                                <i class="ph-bold text-xl" :class="correoError ? 'ph-x-circle text-terracota' : 'ph-check-circle text-estado-exito'"></i>
+                                            <span class="absolute inset-y-0 right-4 flex items-center"
+                                                x-show="correoTouched && correo">
+                                                <i class="ph-bold text-xl"
+                                                    :class="correoError ? 'ph-x-circle text-estado-peligro' : 'ph-check-circle text-estado-exito'"></i>
                                             </span>
                                         </div>
 
-                                        <p class="mt-2 text-sm font-black text-terracota" x-show="correoError" x-text="correoError"></p>
+                                        <p class="mt-2 text-sm font-semibold text-estado-peligro" x-show="correoError"
+                                            x-text="correoError"></p>
                                     </div>
 
                                     <div>
-                                        <label for="password" class="mb-2 block text-lg font-black text-titulo">Contraseña</label>
+                                        <label for="password" class="mb-2 block text-sm font-bold text-titulo">
+                                            Contraseña
+                                        </label>
 
                                         <div class="relative">
-                                            <input
-                                                id="password"
-                                                :type="showPassword ? 'text' : 'password'"
-                                                name="password"
-                                                x-model="password"
-                                                @input="passwordTouched = true"
-                                                @blur="passwordTouched = true"
-                                                required
-                                                minlength="8"
-                                                maxlength="255"
-                                                autocomplete="current-password"
-                                                placeholder="Ingresa tu contraseña"
-                                                class="w-full rounded-full border-2 bg-fondo-app px-6 py-4 pr-24 text-base font-extrabold text-titulo placeholder:text-titulo/35 outline-none shadow-inner transition duration-300 focus:ring-4"
+                                            <input id="password" :type="showPassword ? 'text' : 'password'"
+                                                name="password" x-model="password" @input="passwordTouched = true"
+                                                @blur="passwordTouched = true" required minlength="8" maxlength="255"
+                                                autocomplete="current-password" placeholder="Ingresa tu contraseña"
+                                                class="w-full rounded-2xl border border-borde-suave bg-fondo-input px-4 py-2.5 pr-20 text-sm font-semibold text-titulo placeholder:text-placeholder outline-none shadow-inner transition duration-300 focus:border-borde-focus focus:ring-2 focus:ring-[var(--color-input-ring-focus)]"
                                                 :class="{
-                                                    'border-terracota focus:ring-borde-focus/20': passwordError,
-                                                    'border-estado-exitoBorde focus:ring-[#8DA280]/25': passwordTouched && password && !passwordError,
-                                                    'border-transparent focus:border-azul-clinico focus:ring-azul-clinico/20': !passwordTouched || (!password && !passwordError)
-                                                }"
-                                            >
+                                                    'border-estado-peligro focus:border-estado-peligro': passwordError,
+                                                    'border-estado-exito': passwordTouched && password && !passwordError
+                                                }">
 
-                                            <div class="absolute inset-y-0 right-5 flex items-center gap-2">
+                                            <div class="absolute inset-y-0 right-4 flex items-center gap-2">
                                                 <span x-show="passwordTouched && password">
-                                                    <i class="ph-bold text-xl" :class="passwordError ? 'ph-x-circle text-terracota' : 'ph-check-circle text-estado-exito'"></i>
+                                                    <i class="ph-bold text-xl"
+                                                        :class="passwordError ? 'ph-x-circle text-estado-peligro' : 'ph-check-circle text-estado-exito'"></i>
                                                 </span>
 
-                                                <button type="button" @click="showPassword = !showPassword" class="rounded-full p-1 text-titulo/45 transition hover:bg-fondo-panel hover:text-terracota">
-                                                    <i class="ph-bold text-xl" :class="showPassword ? 'ph-eye-closed' : 'ph-eye'"></i>
+                                                <button type="button" @click="showPassword = !showPassword"
+                                                    class="rounded-xl p-1 text-meta transition hover:bg-fondo-hover hover:text-boton-acento">
+                                                    <i class="ph-bold text-xl"
+                                                        :class="showPassword ? 'ph-eye-closed' : 'ph-eye'"></i>
                                                 </button>
                                             </div>
                                         </div>
 
-                                        <p class="mt-2 text-sm font-black text-terracota" x-show="passwordError" x-text="passwordError"></p>
+                                        <p class="mt-2 text-sm font-semibold text-estado-peligro" x-show="passwordError"
+                                            x-text="passwordError"></p>
                                     </div>
 
-                                    <div class="flex items-center justify-between">
+                                    <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                                         <label class="flex cursor-pointer items-center gap-2">
-                                            <input id="remember_me" type="checkbox" name="remember" class="h-5 w-5 rounded border-borde-suave bg-fondo-app text-terracota focus:ring-borde-focus/30">
-                                            <span class="text-sm font-black text-titulo/65">Recordarme</span>
+                                            <input id="remember_me" type="checkbox" name="remember"
+                                                class="h-4 w-4 rounded border-borde-suave bg-fondo-input text-boton-acento focus:ring-borde-focus/30">
+                                            <span class="text-sm font-semibold text-apoyo">Recordarme</span>
                                         </label>
 
-                                        <button type="button" @click="panel = 'recover'" class="text-sm font-black text-terracota transition hover:text-titulo hover:underline">
+                                        <button type="button" @click="panel = 'recover'"
+                                            class="text-left text-sm font-bold text-boton-acento transition hover:text-titulo hover:underline sm:text-right">
                                             ¿Olvidaste tu contraseña?
                                         </button>
                                     </div>
 
-                                    <button
-                                        type="submit"
-                                        :disabled="isSubmitting"
-                                        class="group relative w-full overflow-hidden rounded-full bg-boton-acento px-6 py-4 text-lg font-black text-inverso shadow-[0_15px_35px_rgba(233,122,95,0.35)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_18px_40px_rgba(233,122,95,0.45)] active:scale-[0.98] disabled:opacity-70"
-                                    >
-                                        <span class="relative z-10 flex items-center justify-center gap-3" x-show="!isSubmitting">
+                                    <button type="submit" :disabled="isSubmitting"
+                                        class="group relative w-full overflow-hidden rounded-2xl bg-boton-acento px-4 py-2.5 text-sm font-extrabold text-inverso shadow-[0_15px_35px_rgba(233,122,95,0.30)] transition duration-300 hover:-translate-y-0.5 hover:bg-boton-acentoHover hover:shadow-[0_18px_40px_rgba(233,122,95,0.38)] active:scale-[0.98] disabled:opacity-70">
+                                        <span class="relative z-10 flex items-center justify-center gap-3"
+                                            x-show="!isSubmitting">
                                             Entrar al Portal
                                             <i class="ph-bold ph-arrow-right transition group-hover:translate-x-1"></i>
                                         </span>
 
-                                        <span class="relative z-10 flex items-center justify-center gap-3" x-show="isSubmitting">
+                                        <span class="relative z-10 flex items-center justify-center gap-3"
+                                            x-show="isSubmitting">
                                             <i class="ph-bold ph-circle-notch animate-spin"></i>
                                             Ingresando...
                                         </span>
-
-                                        <div class="absolute inset-0 translate-y-full bg-boton-principal transition duration-500 group-hover:translate-y-0"></div>
                                     </button>
                                 </form>
                             </div>
 
-                            {{-- Recuperación --}}
-                            <div
-                                x-show="panel === 'recover'"
+                            <div x-show="panel === 'recover'" x-cloak
                                 x-transition:enter="transition ease-out duration-500"
-                                x-transition:enter-start="opacity-0 translate-x-10 scale-[0.98]"
+                                x-transition:enter-start="opacity-0 translate-x-8 scale-[0.98]"
                                 x-transition:enter-end="opacity-100 translate-x-0 scale-100"
                                 x-transition:leave="transition ease-in duration-300 absolute inset-0"
                                 x-transition:leave-start="opacity-100 translate-x-0 scale-100"
-                                x-transition:leave-end="opacity-0 -translate-x-10 scale-[0.98]"
-                                style="display:none;"
-                                class="w-full"
-                            >
-                                <div class="mb-8">
-                                    <button
-                                        type="button"
-                                        @click="panel = 'login'"
-                                        class="mb-7 inline-flex items-center gap-2 rounded-full bg-fondo-app px-4 py-2 text-sm font-black text-titulo shadow-md transition hover:-translate-x-1 hover:text-terracota"
-                                    >
+                                x-transition:leave-end="opacity-0 -translate-x-8 scale-[0.98]" class="w-full">
+                                <div class="mb-6">
+                                    <button type="button" @click="panel = 'login'"
+                                        class="mb-5 inline-flex items-center gap-2 rounded-xl border border-borde-suave bg-fondo-input px-3 py-2 text-sm font-bold text-titulo shadow-card transition hover:-translate-x-0.5 hover:text-boton-acento">
                                         <i class="ph-bold ph-arrow-left"></i>
                                         Volver
                                     </button>
 
-                                    <div class="mb-5 flex h-16 w-16 items-center justify-center rounded-[1.6rem] bg-boton-principal text-inverso shadow-[0_18px_35px_rgba(47,62,92,0.25)]">
-                                        <i class="ph-bold ph-key-return text-4xl"></i>
+                                    <div
+                                        class="mb-4 flex h-14 w-14 items-center justify-center rounded-[1.4rem] bg-boton-acento text-inverso shadow-[0_14px_30px_rgba(233,122,95,0.30)]">
+                                        <i class="ph-bold ph-key-return text-3xl"></i>
                                     </div>
 
-                                    <h2 class="text-5xl font-black tracking-tight text-titulo text-shadow-title">
+                                    <h2
+                                        class="font-outfit text-3xl font-bold tracking-tight text-titulo text-shadow-soft">
                                         Recuperar acceso
                                     </h2>
 
-                                    <p class="mt-3 max-w-md text-base font-bold leading-7 text-titulo/65">
+                                    <p class="mt-2 max-w-md text-sm font-semibold leading-6 text-apoyo">
                                         Te enviaremos instrucciones para restablecer tu contraseña institucional.
                                     </p>
                                 </div>
 
-                                <div class="mb-6 rounded-[2rem] border border-borde-suave bg-fondo-panel p-5 shadow-md">
-                                    <div class="flex gap-4">
-                                        <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-estado-exitoBg text-estado-exito">
+                                <div
+                                    class="mb-5 rounded-2xl border border-borde-suave bg-[var(--surface-card)] p-4 shadow-card backdrop-blur-md">
+                                    <div class="flex gap-3">
+                                        <div
+                                            class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-estado-exitoBg text-estado-exito">
                                             <i class="ph-bold ph-shield-check text-2xl"></i>
                                         </div>
+
                                         <div>
-                                            <h3 class="font-black text-titulo">Recuperación segura</h3>
-                                            <p class="mt-1 text-sm font-bold leading-6 text-titulo/60">
-                                                Usa el correo registrado por administración. Si no recuerdas tu correo, comunícate con el administrador.
+                                            <h3 class="font-bold text-titulo">Recuperación segura</h3>
+                                            <p class="mt-1 text-sm font-semibold leading-5 text-meta">
+                                                Usa el correo registrado por administración. Si no recuerdas tu correo,
+                                                comunícate con el administrador.
                                             </p>
                                         </div>
                                     </div>
                                 </div>
 
-                                <form method="POST" action="{{ route('password.email') }}" class="space-y-6">
+                                <form method="POST" action="{{ route('password.email') }}" class="space-y-4">
                                     @csrf
 
                                     <div>
-                                        <label for="recover_correo" class="mb-2 block text-lg font-black text-titulo">
+                                        <label for="recover_correo" class="mb-2 block text-sm font-bold text-titulo">
                                             Correo institucional
                                         </label>
 
-                                        <input
-                                            id="recover_correo"
-                                            type="email"
-                                            name="correo"
-                                            :value="correo"
-                                            required
-                                            maxlength="120"
-                                            autocomplete="username"
-                                            placeholder="Ingresa tu correo"
-                                            class="w-full rounded-full border-2 border-transparent bg-fondo-app px-6 py-4 text-base font-extrabold text-titulo placeholder:text-titulo/35 outline-none shadow-inner transition duration-300 focus:border-azul-clinico focus:ring-4 focus:ring-azul-clinico/20"
-                                        >
+                                        <input id="recover_correo" type="email" name="correo" :value="correo" required
+                                            maxlength="120" autocomplete="username" placeholder="Ingresa tu correo"
+                                            class="w-full rounded-2xl border border-borde-suave bg-fondo-input px-4 py-2.5 text-sm font-semibold text-titulo placeholder:text-placeholder outline-none shadow-inner transition duration-300 focus:border-borde-focus focus:ring-2 focus:ring-[var(--color-input-ring-focus)]">
                                     </div>
 
-                                    <button
-                                        type="submit"
-                                        class="w-full rounded-full bg-boton-principal px-6 py-4 text-lg font-black text-inverso shadow-[0_15px_35px_rgba(47,62,92,0.28)] transition duration-300 hover:-translate-y-1 hover:bg-boton-acento active:scale-[0.98]"
-                                    >
+                                    <button type="submit"
+                                        class="w-full rounded-2xl bg-boton-principal px-4 py-2.5 text-sm font-extrabold text-boton-principalTexto shadow-[0_15px_35px_rgba(47,62,92,0.24)] transition duration-300 hover:-translate-y-0.5 hover:bg-boton-principalHover active:scale-[0.98]">
                                         Enviar instrucciones
                                     </button>
                                 </form>
 
-                                <p class="mt-7 text-center text-sm font-bold leading-6 text-titulo/60">
-                                    Por seguridad, no confirmaremos si el correo existe. Revisa tu bandeja principal y spam.
+                                <p class="mt-5 text-center text-sm font-semibold leading-6 text-meta">
+                                    Por seguridad, no confirmaremos si el correo existe. Revisa tu bandeja principal y
+                                    spam.
                                 </p>
                             </div>
-
                         </div>
                     </div>
                 </section>

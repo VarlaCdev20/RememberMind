@@ -1,3 +1,3 @@
 <x-sistema-layout>
-    <livewire:admin.voluntariado.voluntariado-resumen-panel />
+ <livewire:admin.voluntariado.voluntariado-resumen-panel />
 </x-sistema-layout>
