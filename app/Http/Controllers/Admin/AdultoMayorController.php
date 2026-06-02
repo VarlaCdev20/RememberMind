@@ -16,6 +16,7 @@ use App\Models\AdultoMayor;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\AdultoIndividualExport;
+use Illuminate\Support\Facades\Gate;
 
 class AdultoMayorController extends Controller
 {
@@ -37,12 +38,13 @@ class AdultoMayorController extends Controller
     {
         $filtros = $request->all();
         $adultos = $this->adultoMayorService->obtenerListado($filtros);
+        $adultosBase = AdultoMayor::query()->visiblesClinicamentePara($request->user());
         
         $totales = [
-            'total' => AdultoMayor::count(),
-            'activos' => AdultoMayor::whereHas('estado', fn($q) => $q->whereRaw('UPPER(estado) = ?', ['ACTIVO']))->count(),
-            'archivados' => AdultoMayor::whereHas('estado', fn($q) => $q->whereRaw('UPPER(estado) IN (?, ?)', ['ARCHIVADO', 'INACTIVO']))->count(),
-            'sin_seguimiento' => AdultoMayor::doesntHave('observaciones')->doesntHave('atenciones')->count(),
+            'total' => (clone $adultosBase)->count(),
+            'activos' => (clone $adultosBase)->whereHas('estado', fn($q) => $q->whereRaw('UPPER(estado) = ?', ['ACTIVO']))->count(),
+            'archivados' => (clone $adultosBase)->whereHas('estado', fn($q) => $q->whereRaw('UPPER(estado) IN (?, ?)', ['ARCHIVADO', 'INACTIVO']))->count(),
+            'sin_seguimiento' => (clone $adultosBase)->doesntHave('observaciones')->doesntHave('atenciones')->count(),
         ];
 
         // Datos para modales
@@ -87,6 +89,8 @@ class AdultoMayorController extends Controller
     
 public function show(AdultoMayor $adulto_mayor)
 {
+    Gate::authorize('viewClinicalData', $adulto_mayor);
+
     $adulto = $this->adultoMayorService->obtenerDetalle($adulto_mayor->cod_am);
 
     // Familiares - Divididos por estado del vínculo
@@ -180,6 +184,8 @@ public function show(AdultoMayor $adulto_mayor)
 
     public function reporteIndividual(Request $request, AdultoMayor $adulto_mayor)
     {
+        Gate::authorize('viewClinicalData', $adulto_mayor);
+
         $format = $request->query('format', 'pdf');
 
         $adulto = $this->adultoMayorService->obtenerDetalle($adulto_mayor->cod_am);
@@ -289,6 +295,8 @@ public function show(AdultoMayor $adulto_mayor)
 
     public function reporteEspecifico(Request $request, AdultoMayor $adulto_mayor, $tipo)
     {
+        Gate::authorize('viewClinicalData', $adulto_mayor);
+
         $format = $request->query('format', 'html');
         $startDate = $request->query('start_date');
         $endDate = $request->query('end_date');
@@ -436,6 +444,8 @@ public function show(AdultoMayor $adulto_mayor)
      */
     public function edit(AdultoMayor $adulto_mayor)
     {
+        Gate::authorize('viewClinicalData', $adulto_mayor);
+
         $adulto = $this->adultoMayorService->obtenerDetalle($adulto_mayor->cod_am);
         $estadosAdulto = $this->adultoMayorService->obtenerEstados();
         
@@ -447,6 +457,8 @@ public function show(AdultoMayor $adulto_mayor)
      */
     public function update(UpdateAdultoMayorRequest $request, AdultoMayor $adulto_mayor)
     {
+        Gate::authorize('viewClinicalData', $adulto_mayor);
+
         $this->adultoMayorService->actualizarAdultoMayor($adulto_mayor->cod_am, $request->validated(), $request->file('foto'));
 
         return redirect()->route('admin.adultos-mayores.show', $adulto_mayor->cod_am)
@@ -480,6 +492,8 @@ public function show(AdultoMayor $adulto_mayor)
      */
     public function cambiarEstado(\App\Http\Requests\Admin\AdultosMayores\Salud\StoreCambioEstadoRequest $request, AdultoMayor $adulto_mayor)
     {
+        Gate::authorize('viewClinicalData', $adulto_mayor);
+
         try {
             \DB::beginTransaction();
 
@@ -543,6 +557,8 @@ public function show(AdultoMayor $adulto_mayor)
 
     public function anularEvaluacionGeriatrica(Request $request, AdultoMayor $adulto_mayor, $evaluacionId)
     {
+        Gate::authorize('viewClinicalData', $adulto_mayor);
+
         $request->validate([
             'motivo_anulacion' => 'required|string|min:10',
         ], [
@@ -575,6 +591,8 @@ public function show(AdultoMayor $adulto_mayor)
 
     public function pdfEvaluacionGeriatrica(AdultoMayor $adulto_mayor, $evaluacionId)
     {
+        Gate::authorize('viewClinicalData', $adulto_mayor);
+
         $adulto = $this->adultoMayorService->obtenerDetalle($adulto_mayor->cod_am);
         $adulto->edad = $this->adultoMayorService->calcularEdad($adulto->fecha_nac);
 

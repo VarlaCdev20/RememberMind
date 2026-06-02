@@ -25,7 +25,7 @@ if (auth()->user()?->can('usuarios.ver')) {
 }
 if (auth()->user()?->can('reportes.institucional')) {
  $acciones[] = [
- 'href' => route('admin.reportes.institucional.preview'),
+ 'href' => Route::has('admin.reportes.institucional') ? route('admin.reportes.institucional') : '#',
  'icono' => 'ph-file-text',
  'label' => 'Reporte institucional',
  'estilo' => 'secondary',

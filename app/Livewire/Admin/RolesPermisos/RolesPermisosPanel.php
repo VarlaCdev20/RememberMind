@@ -74,7 +74,7 @@ class RolesPermisosPanel extends Component
             'Administración' => ['usuarios.', 'roles.', 'areas.', 'turnos.', 'bitacora.'],
             'Adultos mayores' => ['adultos.'],
             'Familiares y documentos' => ['familiares.', 'documentos.'],
-            'Salud y seguimiento' => ['salud.', 'atenciones.', 'observaciones.', 'signos_vitales.', 'medicacion.'],
+            'Salud y seguimiento' => ['salud.', 'asignaciones_clinicas.', 'atenciones.', 'observaciones.', 'signos_vitales.', 'medicacion.'],
             'Evaluaciones cognitivas' => ['evaluaciones.'],
             'Actividades y voluntariado' => ['actividades.', 'voluntarios.', 'asignaciones.', 'asistencia.'],
             'Reportes y alertas' => ['reportes.', 'alertas.']
@@ -317,6 +317,12 @@ class RolesPermisosPanel extends Component
             
             'alertas.ver' => 'Ver alertas médicas',
             'alertas.gestionar' => 'Gestionar alertas',
+            'asignaciones_clinicas.ver' => 'Ver asignaciones clínicas',
+            'asignaciones_clinicas.crear' => 'Crear asignaciones clínicas',
+            'asignaciones_clinicas.finalizar' => 'Finalizar asignaciones clínicas',
+            'asignaciones_clinicas.suspender' => 'Suspender asignaciones clínicas',
+            'asignaciones_clinicas.gestionar' => 'Gestionar asignaciones clínicas',
+            'asignaciones_clinicas.mis_pacientes' => 'Ver mis pacientes asignados',
         ];
 
         return $diccionario[$permiso] ?? ucfirst(str_replace(['.', '_'], ' ', $permiso));

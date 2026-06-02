@@ -1,8 +1,8 @@
 {{-- TAB RESUMEN DOCUMENTAL --}}
 <section
- x-show="tab === 'documentos'"
- style="display: none;"
- x-transition.opacity.duration.250ms
+ 
+ 
+ 
  class="space-y-6"
 >
  <!-- HEADER BLOCK -->
@@ -32,13 +32,13 @@
  <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
  <div class="rounded-[24px] border border-borde bg-fondo-card/95 p-6 shadow-sm flex flex-col justify-center text-center">
  <p class="text-[10px] font-bold uppercase tracking-[0.18em] text-apoyo">Total Documentos</p>
- <p class="mt-2 text-3xl font-black text-titulo">{{ collect($documentosActivos)->count() }}</p>
+ <p class="mt-2 text-3xl font-black text-titulo">{{ collect(($documentosLista ?? collect()))->count() }}</p>
  </div>
 
  <div class="rounded-[24px] border border-borde bg-fondo-card/95 p-6 shadow-sm flex flex-col justify-center text-center">
  <p class="text-[10px] font-bold uppercase tracking-[0.18em] text-apoyo">Archivos Activos</p>
  <p class="mt-2 text-3xl font-black text-emerald-600">
- {{ collect($documentosActivos)->count() }}
+ {{ collect(($documentosLista ?? collect()))->count() }}
  </p>
  </div>
 
@@ -50,8 +50,8 @@
  <div class="rounded-[24px] border border-borde bg-fondo-card/95 p-6 shadow-sm flex flex-col justify-center text-center">
  <p class="text-[10px] font-bold uppercase tracking-[0.18em] text-apoyo">Último Cargado</p>
  <p class="mt-2 text-sm font-bold text-titulo">
- @if(collect($documentosActivos)->count() > 0)
- @php $ultimoDoc = collect($documentosActivos)->sortByDesc('fecha_subida')->first(); @endphp
+ @if(collect(($documentosLista ?? collect()))->count() > 0)
+ @php $ultimoDoc = collect(($documentosLista ?? collect()))->sortByDesc('fecha_subida')->first(); @endphp
  <span class="block truncate max-w-[150px] mx-auto" title="{{ $ultimoDoc->titulo }}">{{ $ultimoDoc->titulo }}</span>
  <span class="block mt-1 text-xs text-apoyo font-normal">{{ \Carbon\Carbon::parse($ultimoDoc->fecha_subida)->format('d/m/Y') }}</span>
  @else
@@ -65,9 +65,9 @@
  <div class="rounded-[24px] border border-borde bg-fondo-card/95 p-6 shadow-sm">
  <h3 class="text-lg font-extrabold text-titulo border-b border-borde pb-4 mb-4">Documentos Recientes</h3>
  
- @if(collect($documentosActivos)->count() > 0)
+ @if(collect(($documentosLista ?? collect()))->count() > 0)
  <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
- @foreach(collect($documentosActivos)->sortByDesc('fecha_subida')->take(3) as $doc)
+ @foreach(collect(($documentosLista ?? collect()))->sortByDesc('fecha_subida')->take(3) as $doc)
  <div class="rounded-xl border border-borde bg-fondo-panel p-4 flex items-start gap-3 transition hover:border-borde-fuerte hover:bg-fondo-panel">
  <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-fondo-panel text-titulo shrink-0">
  @if(in_array(strtolower(pathinfo($doc->ruta_archivo, PATHINFO_EXTENSION)), ['jpg', 'jpeg', 'png', 'webp']))

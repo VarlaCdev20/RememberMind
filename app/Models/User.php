@@ -226,6 +226,23 @@ class User extends Authenticatable
         return $this->hasMany(AsignacionTurno::class, 'cod_usu', 'cod_usu');
     }
 
+    public function asignacionesClinicasRealizadas()
+    {
+        return $this->hasMany(AsignacionSaludAdulto::class, 'asignado_por', 'cod_usu');
+    }
+
+    public function asignacionesClinicasComoPersonal()
+    {
+        return $this->hasManyThrough(
+            AsignacionSaludAdulto::class,
+            PersonalSalud::class,
+            'cod_usu',
+            'cod_per_sal',
+            'cod_usu',
+            'cod_per_sal'
+        );
+    }
+
     public function turnosInstitucionales()
     {
         return $this->hasManyThrough(TurnoInstitucional::class, AsignacionTurno::class, 'cod_usu', 'cod_turno', 'cod_usu', 'cod_turno');

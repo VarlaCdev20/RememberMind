@@ -9,6 +9,8 @@ use Livewire\Component;
 use Livewire\WithPagination;
 use App\Models\AdultoMayor;
 use App\Models\SignosVitalesAdulto;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 
 class SaludSignosPanel extends Component
 {
@@ -181,7 +183,11 @@ class SaludSignosPanel extends Component
 
     private function cargarAdulto(string $codAm): void
     {
-        $this->adulto = AdultoMayor::with('estado')->findOrFail($codAm);
+        $this->adulto = AdultoMayor::query()
+            ->visiblesClinicamentePara(Auth::user())
+            ->with('estado')
+            ->findOrFail($codAm);
+        Gate::authorize('viewClinicalData', $this->adulto);
         $this->adultoSeleccionado = $this->adulto->cod_am;
         $this->signoDetalleId = null;
         $this->limpiarFiltros();
@@ -190,6 +196,7 @@ class SaludSignosPanel extends Component
     private function obtenerPacientesSelector()
     {
         $query = AdultoMayor::query()
+            ->visiblesClinicamentePara(Auth::user())
             ->with('estado')
             ->withCount('signosVitales')
             ->orderBy('nombres')
@@ -261,6 +268,7 @@ class SaludSignosPanel extends Component
     public function abrirFormularioNuevo(): void
     {
         abort_if(!$this->adulto, 403, 'Debe seleccionar un paciente antes de registrar signos vitales.');
+        Gate::authorize('viewClinicalData', $this->adulto);
         abort_if(!auth()->user()->can('salud.signos.crear'), 403);
         $this->limpiarFormulario();
         $this->modalFormulario = true;
@@ -269,6 +277,7 @@ class SaludSignosPanel extends Component
     public function abrirFormularioEditar(int $id): void
     {
         abort_if(!auth()->user()->can('salud.signos.editar'), 403);
+        Gate::authorize('viewClinicalData', $this->adulto);
 
         $signo = SignosVitalesAdulto::findOrFail($id);
         abort_if(!$this->adulto || $signo->cod_am !== $this->adulto->cod_am, 403);
@@ -310,6 +319,7 @@ class SaludSignosPanel extends Component
     public function guardar(): void
     {
         abort_if(!$this->adulto, 403, 'Paciente no seleccionado.');
+        Gate::authorize('viewClinicalData', $this->adulto);
         $esEdicion = $this->signoId !== null;
         abort_if(!auth()->user()->can($esEdicion ? 'salud.signos.editar' : 'salud.signos.crear'), 403);
 
@@ -413,6 +423,7 @@ class SaludSignosPanel extends Component
     public function confirmarGuardarConAlertas(): void
     {
         abort_if(!$this->adulto, 403, 'Paciente no seleccionado.');
+        Gate::authorize('viewClinicalData', $this->adulto);
         $this->guardarConfirmado = true;
         $this->guardar();
     }
@@ -426,6 +437,7 @@ class SaludSignosPanel extends Component
     public function anularConMotivo(int $id, string $motivo): void
     {
         abort_if(!$this->adulto, 403, 'Paciente no seleccionado.');
+        Gate::authorize('viewClinicalData', $this->adulto);
         abort_if(!auth()->user()->can('salud.signos.anular'), 403);
 
         $motivo = trim($motivo);

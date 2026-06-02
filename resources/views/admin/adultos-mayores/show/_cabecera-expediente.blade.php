@@ -24,7 +24,7 @@
  @endif
  <span>&bull;</span>
  @php
- $isExpedienteCompleto = $fichasMedicas->isNotEmpty() && $totalEvaluaciones > 0 && $totalDocumentos > 0 && $totalFamiliares > 0;
+ $isExpedienteCompleto = ($fichasMedicasLista ?? collect())->isNotEmpty() && $totalEvaluaciones > 0 && $totalDocumentos > 0 && $totalFamiliares > 0;
  @endphp
  <span class="inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs font-bold uppercase tracking-wide {{ $isExpedienteCompleto ? 'bg-fondo-panel text-parrafo' : 'bg-amber-600/20 text-amber-700' }}">
  Expediente {{ $isExpedienteCompleto ? 'Completo' : 'Pendiente' }}
@@ -41,7 +41,7 @@
  <i class="ph-bold ph-pencil-simple"></i> Editar datos
  </a>
  @endif
- <a href="{{ route('admin.adultos-mayores.reporte-individual', $idAdulto) }}" class="rounded-xl bg-boton-principal px-4 py-2 text-xs font-bold text-inverso shadow-sm transition hover:bg-fondo-panel">
+ <a href="{{ (Route::has('admin.adultos-mayores.reporte-individual') ? route('admin.adultos-mayores.reporte-individual', $idAdulto) : '#') }}" class="rounded-xl bg-boton-principal px-4 py-2 text-xs font-bold text-inverso shadow-sm transition hover:bg-fondo-panel">
  <i class="ph-bold ph-printer"></i> Imprimir
  </a>
  </div>

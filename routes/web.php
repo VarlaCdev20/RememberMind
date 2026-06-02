@@ -244,6 +244,7 @@ Route::middleware([
                     Route::get('/evaluaciones-geriatricas', \App\Livewire\Admin\SaludSeguimiento\SaludSeguimientoListPanel::class)->name('evaluaciones-geriatricas.index');
                     Route::get('/alertas', \App\Livewire\Admin\SaludSeguimiento\SaludSeguimientoListPanel::class)->name('alertas');
                     Route::get('/reportes', \App\Livewire\Admin\SaludSeguimiento\SaludSeguimientoListPanel::class)->name('reportes');
+                    Route::get('/asignaciones-clinicas', \App\Livewire\Admin\SaludSeguimiento\AsignacionesClinicasPanel::class)->name('asignaciones-clinicas');
 
                     // Individual Panels
                     Route::get('/{adulto}/resumen', \App\Livewire\Admin\SaludSeguimiento\SaludResumenPanel::class)->name('resumen');
@@ -384,5 +385,44 @@ Route::middleware([
             Route::get('bitacora', [\App\Http\Controllers\Admin\BitacoraController::class, 'index'])
                 ->middleware('permission:bitacora.ver')
                 ->name('bitacora.index');
-        });
+        
+            // ── NUEVAS RUTAS PLACEHOLDER (FASE INTEGRACIÓN SIDEBAR) ──
+            Route::prefix('salud-seguimiento')->name('salud-seguimiento.')->group(function () {
+                Route::view('resumen-clinico', 'admin.salud-seguimiento.resumen-clinico')->name('resumen-clinico');
+                Route::view('seguimiento-institucional', 'admin.salud-seguimiento.seguimiento-institucional')->name('seguimiento-institucional');
+                Route::view('evaluaciones-geriatricas', 'admin.salud-seguimiento.evaluaciones-geriatricas')->name('evaluaciones-geriatricas');
+                Route::view('resultados-preventivos', 'admin.salud-seguimiento.resultados-preventivos')->name('resultados-preventivos');
+            });
+            Route::prefix('familia-social')->name('familia-social.')->group(function () {
+                Route::view('ficha-social', 'admin.familia-social.ficha-social')->name('ficha-social');
+                Route::view('red-apoyo', 'admin.familia-social.red-apoyo')->name('red-apoyo');
+                Route::view('visitas', 'admin.familia-social.visitas')->name('visitas');
+            });
+            Route::prefix('actividades')->name('actividades.')->group(function () {
+                Route::view('programacion-placeholder', 'admin.actividades.programacion')->name('programacion-placeholder');
+                // Comentados porque ya existen rutas Livewire con estos nombres:
+                // Route::view('participacion', 'admin.actividades.participacion')->name('participacion');
+                // Route::view('reportes', 'admin.actividades.reportes')->name('reportes');
+            });
+            Route::prefix('voluntariado')->name('voluntariado.')->group(function () {
+                // Renombrados a -placeholder para que no choquen con admin.voluntarios
+                Route::view('voluntarios-placeholder', 'admin.voluntariado.voluntarios')->name('voluntarios-placeholder');
+                Route::view('asignaciones-placeholder', 'admin.voluntariado.asignaciones')->name('asignaciones-placeholder');
+                Route::view('seguimiento-placeholder', 'admin.voluntariado.seguimiento')->name('seguimiento-placeholder');
+            });
+            Route::prefix('reportes')->name('reportes.')->group(function () {
+                Route::view('individual', 'admin.reportes.individual')->name('individual');
+                Route::view('institucional', 'admin.reportes.institucional')->name('institucional');
+                Route::view('exportaciones', 'admin.reportes.exportaciones')->name('exportaciones');
+            });
+
+
+            // ── NUEVAS RUTAS ADMINISTRACION GLOBAL ──
+            Route::view('roles-permisos', 'admin.roles-permisos.index')->name('roles-permisos.index');
+            Route::view('gestion-institucional', 'admin.gestion-institucional.index')->name('gestion-institucional.index');
+            Route::prefix('adultos-mayores')->name('adultos-mayores.')->group(function () {
+                Route::view('historial-individual', 'admin.adultos-mayores.historial-global')->name('historial-global');
+            });
+
+});
 });

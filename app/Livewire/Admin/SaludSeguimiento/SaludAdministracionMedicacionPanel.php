@@ -6,6 +6,7 @@ use Livewire\Component;
 use App\Models\AdultoMayor;
 use App\Models\AdministracionMedicacion;
 use App\Models\MedicacionAdulto;
+use Illuminate\Support\Facades\Gate;
 
 class SaludAdministracionMedicacionPanel extends Component
 {
@@ -18,6 +19,7 @@ class SaludAdministracionMedicacionPanel extends Component
 
     public function mount(AdultoMayor $adulto)
     {
+        Gate::authorize('viewClinicalData', $adulto);
         $this->adulto = $adulto;
     }
 

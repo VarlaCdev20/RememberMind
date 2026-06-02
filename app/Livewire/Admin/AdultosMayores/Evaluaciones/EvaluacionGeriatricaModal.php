@@ -3,11 +3,13 @@
 namespace App\Livewire\Admin\AdultosMayores\Evaluaciones;
 
 use Livewire\Component;
+use App\Models\AdultoMayor;
 use App\Models\AreaGeriatrica;
 use App\Models\InstrumentoGeriatrico;
 use App\Models\EvaluacionGeriatrica;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 
 class EvaluacionGeriatricaModal extends Component
 {
@@ -41,10 +43,14 @@ class EvaluacionGeriatricaModal extends Component
         $this->areas = AreaGeriatrica::where('estado', 'ACTIVO')->get();
     }
 
-    public function abrir($cod_am)
+    public function abrir($payload)
     {
+        $codAm = is_array($payload) ? ($payload['cod_am'] ?? null) : $payload;
+        $adulto = AdultoMayor::findOrFail($codAm);
+        Gate::authorize('viewClinicalData', $adulto);
+
         $this->resetForm();
-        $this->cod_am = $cod_am;
+        $this->cod_am = $adulto->cod_am;
         $this->fecha_eval = date('Y-m-d');
         $this->hora_eval = date('H:i');
         $this->mostrar = true;
@@ -131,6 +137,8 @@ class EvaluacionGeriatricaModal extends Component
     public function guardar()
     {
         $this->validate();
+        $adulto = AdultoMayor::findOrFail($this->cod_am);
+        Gate::authorize('viewClinicalData', $adulto);
 
         try {
             DB::transaction(function () {

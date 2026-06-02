@@ -232,7 +232,7 @@
 
 
  {{-- Familiar --}}
- <form id="form-familiar" method="POST" :action="isEditing ? `{{ route('admin.adultos-mayores.familiares.update', [$idAdulto, 'ID']) }}`.replace('ID', recordData.cod_fam) : `{{ route('admin.adultos-mayores.familiares.store', $idAdulto) }}`" x-show="modal === 'familiar'" class="grid gap-4 md:grid-cols-2" onsubmit="procesarFormulario(event)">
+ <form id="form-familiar" method="POST" :action="isEditing ? `{{ route('admin.adultos-mayores.familiares.update', [$idAdulto, 'ID']) }}`.replace('ID', recordData.cod_fam) : `{{ (Route::has('admin.adultos-mayores.familiares.store') ? route('admin.adultos-mayores.familiares.store', $idAdulto) : '#') }}`" x-show="modal === 'familiar'" class="grid gap-4 md:grid-cols-2" onsubmit="procesarFormulario(event)">
  @csrf
  <input type="hidden" name="_method" :value="isEditing ? 'PATCH' : 'POST'">
  <input type="hidden" name="estado" value="ACTIVO">
@@ -279,7 +279,7 @@
  <form 
  id="form-observacion" 
  method="POST" 
- :action="isEditing ? `{{ route('admin.adultos-mayores.observaciones.update', [$idAdulto, 'ID']) }}`.replace('ID', recordData.cod_obs_adul) : `{{ route('admin.adultos-mayores.observaciones.store', $idAdulto) }}`" 
+ :action="isEditing ? `{{ route('admin.adultos-mayores.observaciones.update', [$idAdulto, 'ID']) }}`.replace('ID', recordData.cod_obs_adul) : `{{ (Route::has('admin.adultos-mayores.observaciones.store') ? route('admin.adultos-mayores.observaciones.store', $idAdulto) : '#') }}`" 
  x-show="modal === 'observacion'" 
  class="grid gap-4 md:grid-cols-2" 
  @submit="validarObservacion"
@@ -334,7 +334,7 @@
  <form
  id="form-atencion"
  method="POST"
- :action="isEditing ? `{{ route('admin.adultos-mayores.atenciones.update', [$idAdulto, 'ID']) }}`.replace('ID', recordData.cod_aten_adul) : `{{ route('admin.adultos-mayores.atenciones.store', $idAdulto) }}`"
+ :action="isEditing ? `{{ route('admin.adultos-mayores.atenciones.update', [$idAdulto, 'ID']) }}`.replace('ID', recordData.cod_aten_adul) : `{{ (Route::has('admin.adultos-mayores.atenciones.store') ? route('admin.adultos-mayores.atenciones.store', $idAdulto) : '#') }}`"
  x-show="modal === 'atencion'"
  class="space-y-4"
  @submit="validarAtencion"
@@ -481,7 +481,7 @@
  </form>
 
  {{-- Evaluación Cognitiva --}}
- <form id="form-evaluacion" method="POST" action="{{ route('admin.adultos-mayores.evaluaciones.store', $idAdulto) }}" x-show="modal === 'evaluacion'" class="grid gap-4 md:grid-cols-2" onsubmit="procesarFormulario(event)">
+ <form id="form-evaluacion" method="POST" action="{{ (Route::has('admin.adultos-mayores.evaluaciones.store') ? route('admin.adultos-mayores.evaluaciones.store', $idAdulto) : '#') }}" x-show="modal === 'evaluacion'" class="grid gap-4 md:grid-cols-2" onsubmit="procesarFormulario(event)">
  @csrf
  <input type="hidden" name="_method" :value="isEditing ? 'PATCH' : 'POST'">
  <div>
@@ -511,7 +511,7 @@
  <form 
  id="form-actividad" 
  method="POST" 
- :action="isEditing ? `{{ route('admin.adultos-mayores.actividades.update', [$idAdulto, 'ID']) }}`.replace('ID', recordData.cod_act_adul) : `{{ route('admin.adultos-mayores.actividades.store', $idAdulto) }}`" 
+ :action="isEditing ? `{{ route('admin.adultos-mayores.actividades.update', [$idAdulto, 'ID']) }}`.replace('ID', recordData.cod_act_adul) : `{{ (Route::has('admin.adultos-mayores.actividades.store') ? route('admin.adultos-mayores.actividades.store', $idAdulto) : '#') }}`" 
  x-show="modal === 'actividad'" 
  class="grid gap-4 md:grid-cols-2" 
  @submit="validarActividad"
@@ -571,7 +571,7 @@
  <form 
  id="form-documento" 
  method="POST" 
- :action="isEditing ? `{{ route('admin.adultos-mayores.documentos.update', [$idAdulto, 'ID']) }}`.replace('ID', recordData.cod_doc_am) : `{{ route('admin.adultos-mayores.documentos.store', $idAdulto) }}`" 
+ :action="isEditing ? `{{ route('admin.adultos-mayores.documentos.update', [$idAdulto, 'ID']) }}`.replace('ID', recordData.cod_doc_am) : `{{ (Route::has('admin.adultos-mayores.documentos.store') ? route('admin.adultos-mayores.documentos.store', $idAdulto) : '#') }}`" 
  enctype="multipart/form-data" 
  x-show="modal === 'documento'" 
  class="grid gap-4 md:grid-cols-2" 

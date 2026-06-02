@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Support\ClinicalAccess;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Spatie\Activitylog\Traits\LogsActivity;
@@ -216,5 +218,40 @@ class AdultoMayor extends Model
     public function historialEstados()
     {
         return $this->hasMany(HistorialEstadoAdulto::class, 'cod_am', 'cod_am');
+    }
+
+    public function asignacionesSalud()
+    {
+        return $this->hasMany(AsignacionSaludAdulto::class, 'cod_am', 'cod_am');
+    }
+
+    public function asignacionesSaludActivas()
+    {
+        return $this->asignacionesSalud()->activa();
+    }
+
+    public function personalSaludAsignado()
+    {
+        return $this->belongsToMany(
+            PersonalSalud::class,
+            'asignaciones_salud_adulto',
+            'cod_am',
+            'cod_per_sal',
+            'cod_am',
+            'cod_per_sal'
+        )->withPivot([
+            'id',
+            'tipo_asignacion',
+            'fecha_inicio',
+            'fecha_fin',
+            'estado',
+            'motivo',
+            'asignado_por',
+        ])->withTimestamps();
+    }
+
+    public function scopeVisiblesClinicamentePara(Builder $query, ?User $user): Builder
+    {
+        return ClinicalAccess::scopeAdultos($query, $user);
     }
 }

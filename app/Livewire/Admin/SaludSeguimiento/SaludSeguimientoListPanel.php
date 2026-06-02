@@ -10,6 +10,10 @@ use App\Models\FichaMedicaAdulto;
 use App\Models\MedicacionAdulto;
 use App\Models\ValoracionFuncionalAdulto;
 use App\Models\SignosVitalesAdulto;
+use App\Support\ClinicalAccess;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 
 class SaludSeguimientoListPanel extends Component
 {
@@ -31,7 +35,13 @@ class SaludSeguimientoListPanel extends Component
 
     public function abrirExpediente(string $cod_am)
     {
-        $this->adultoSeleccionadoParaModal = AdultoMayor::where('cod_am', $cod_am)->firstOrFail();
+        $adulto = AdultoMayor::query()
+            ->visiblesClinicamentePara(Auth::user())
+            ->where('cod_am', $cod_am)
+            ->firstOrFail();
+
+        Gate::authorize('viewClinicalData', $adulto);
+        $this->adultoSeleccionadoParaModal = $adulto;
     }
 
     public function cerrarExpediente()
@@ -133,17 +143,20 @@ class SaludSeguimientoListPanel extends Component
 
     public function getGlobalStats()
     {
-        $adultosActivos = AdultoMayor::whereHas('estado', function ($query) {
+        $adultosBase = AdultoMayor::query()->visiblesClinicamentePara(Auth::user());
+
+        $adultosActivos = (clone $adultosBase)->whereHas('estado', function ($query) {
             $query->whereNotIn('estado', ['ARCHIVADO', 'INACTIVO']);
         })->count();
 
-        $adultosSinFicha = AdultoMayor::whereHas('estado', function ($query) {
+        $adultosSinFicha = (clone $adultosBase)->whereHas('estado', function ($query) {
             $query->whereNotIn('estado', ['ARCHIVADO', 'INACTIVO']);
         })->whereDoesntHave('fichasMedicas', function ($query) {
             $query->whereIn('estado', ['ACTIVA', 'ACTIVO']);
         })->count();
 
-        $signosConAlerta = SignosVitalesAdulto::where('estado', 'VIGENTE')
+        $signosConAlerta = $this->aplicarAlcanceCodAm(SignosVitalesAdulto::query(), 'cod_am')
+            ->where('estado', 'VIGENTE')
             ->where(function ($query) {
                 $query->where('fecha', '>=', now()->subDays(7)->toDateString())
                     ->where(function ($subQuery) {
@@ -157,15 +170,17 @@ class SaludSeguimientoListPanel extends Component
 
         return [
             'seguimientos_activos' => $adultosActivos,
-            'total_fichas' => FichaMedicaAdulto::whereIn('estado', ['ACTIVA', 'ACTIVO'])->count(),
-            'signos_recientes' => SignosVitalesAdulto::where('estado', 'VIGENTE')
+            'total_fichas' => $this->aplicarAlcanceCodAm(FichaMedicaAdulto::query(), 'cod_am')->whereIn('estado', ['ACTIVA', 'ACTIVO'])->count(),
+            'signos_recientes' => $this->aplicarAlcanceCodAm(SignosVitalesAdulto::query(), 'cod_am')
+                ->where('estado', 'VIGENTE')
                 ->where('fecha', '>=', now()->subDays(7)->toDateString())
                 ->count(),
-            'medicaciones_activas' => MedicacionAdulto::where('estado', 'ACTIVO')->count(),
-            'controles_hoy' => SignosVitalesAdulto::where('estado', 'VIGENTE')
+            'medicaciones_activas' => $this->aplicarAlcanceCodAm(MedicacionAdulto::query(), 'cod_am')->where('estado', 'ACTIVO')->count(),
+            'controles_hoy' => $this->aplicarAlcanceCodAm(SignosVitalesAdulto::query(), 'cod_am')
+                ->where('estado', 'VIGENTE')
                 ->whereDate('fecha', today())
                 ->count(),
-            'valoraciones' => ValoracionFuncionalAdulto::where('fecha_valoracion', '>=', now()->subDays(30)->toDateString())->count(),
+            'valoraciones' => $this->aplicarAlcanceCodAm(ValoracionFuncionalAdulto::query(), 'cod_am')->where('fecha_valoracion', '>=', now()->subDays(30)->toDateString())->count(),
             'alertas_pendientes' => $adultosSinFicha + $signosConAlerta,
             'adultos_sin_ficha' => $adultosSinFicha,
         ];
@@ -173,25 +188,27 @@ class SaludSeguimientoListPanel extends Component
 
     public function getResumenDashboard(): array
     {
-        $controlesRecientes = SignosVitalesAdulto::with('adultoMayor')
+        $controlesRecientes = $this->aplicarAlcanceCodAm(SignosVitalesAdulto::with('adultoMayor'), 'cod_am')
             ->where('estado', 'VIGENTE')
             ->orderByDesc('fecha')
             ->orderByDesc('hora')
             ->take(5)
             ->get();
 
-        $medicaciones = MedicacionAdulto::with('adultoMayor')
+        $medicaciones = $this->aplicarAlcanceCodAm(MedicacionAdulto::with('adultoMayor'), 'cod_am')
             ->where('estado', 'ACTIVO')
             ->latest()
             ->take(5)
             ->get();
 
-        $valoraciones = ValoracionFuncionalAdulto::with('adultoMayor')
+        $valoraciones = $this->aplicarAlcanceCodAm(ValoracionFuncionalAdulto::with('adultoMayor'), 'cod_am')
             ->latest('fecha_valoracion')
             ->take(4)
             ->get();
 
-        $alertasFicha = AdultoMayor::with('estado')
+        $alertasFicha = AdultoMayor::query()
+            ->visiblesClinicamentePara(Auth::user())
+            ->with('estado')
             ->whereHas('estado', function ($query) {
                 $query->whereNotIn('estado', ['ARCHIVADO', 'INACTIVO']);
             })
@@ -210,7 +227,7 @@ class SaludSeguimientoListPanel extends Component
                 'adulto_id' => $adulto->cod_am,
             ]);
 
-        $alertasSignos = SignosVitalesAdulto::with('adultoMayor')
+        $alertasSignos = $this->aplicarAlcanceCodAm(SignosVitalesAdulto::with('adultoMayor'), 'cod_am')
             ->where('estado', 'VIGENTE')
             ->where('fecha', '>=', now()->subDays(7)->toDateString())
             ->where(function ($query) {
@@ -237,6 +254,7 @@ class SaludSeguimientoListPanel extends Component
             'valoraciones' => $valoraciones,
             'alertas' => $alertasFicha->concat($alertasSignos)->take(5),
             'administracionesHoy' => AdministracionMedicacion::with(['adultoMayor', 'medicacion'])
+                ->when($this->codigosAdultosVisibles() !== null, fn ($query) => $query->whereIn('cod_am', $this->codigosAdultosVisibles()))
                 ->whereDate('fecha', today())
                 ->latest()
                 ->take(5)
@@ -247,6 +265,7 @@ class SaludSeguimientoListPanel extends Component
     public function render()
     {
         $query = AdultoMayor::query()
+            ->visiblesClinicamentePara(Auth::user())
             ->with([
                 'estado', 
                 'fichasMedicas' => function($q) { $q->latest()->limit(1); },
@@ -269,5 +288,21 @@ class SaludSeguimientoListPanel extends Component
             'stats' => $this->getGlobalStats(),
             'resumenData' => $this->getResumenDashboard(),
         ])->layout('layouts.sistema');
+    }
+
+    private function codigosAdultosVisibles(): ?array
+    {
+        return ClinicalAccess::visibleAdultCodes(Auth::user());
+    }
+
+    private function aplicarAlcanceCodAm(Builder $query, string $column): Builder
+    {
+        $codigos = $this->codigosAdultosVisibles();
+
+        if ($codigos === null) {
+            return $query;
+        }
+
+        return $query->whereIn($column, $codigos);
     }
 }

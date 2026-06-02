@@ -63,4 +63,29 @@ class PersonalSalud extends Model
 {
     return $this->hasMany(EvaluacionCognitiva::class, 'cod_per_sal', 'cod_per_sal');
 }
+
+    public function asignacionesSalud()
+    {
+        return $this->hasMany(AsignacionSaludAdulto::class, 'cod_per_sal', 'cod_per_sal');
+    }
+
+    public function adultosMayoresAsignados()
+    {
+        return $this->belongsToMany(
+            AdultoMayor::class,
+            'asignaciones_salud_adulto',
+            'cod_per_sal',
+            'cod_am',
+            'cod_per_sal',
+            'cod_am'
+        )->withPivot([
+            'id',
+            'tipo_asignacion',
+            'fecha_inicio',
+            'fecha_fin',
+            'estado',
+            'motivo',
+            'asignado_por',
+        ])->withTimestamps();
+    }
 }

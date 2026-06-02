@@ -7,6 +7,7 @@ use Livewire\WithPagination;
 use App\Models\AdultoMayor;
 use App\Models\ValoracionFuncionalAdulto;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 
 class SaludValoracionPanel extends Component
 {
@@ -82,6 +83,7 @@ class SaludValoracionPanel extends Component
     // ── Ciclo de vida ─────────────────────────────────────────────────────────
     public function mount(AdultoMayor $adulto): void
     {
+        Gate::authorize('viewClinicalData', $adulto);
         $this->adulto           = $adulto;
         $this->fecha_valoracion = today()->format('Y-m-d');
     }

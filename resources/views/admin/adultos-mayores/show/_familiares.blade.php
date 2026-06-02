@@ -7,7 +7,7 @@
  $alertas = [];
  
  // Alerta: Sin familiares
- if ($familiaresActivos->isEmpty()) {
+ if (($familiaresLista ?? collect())->isEmpty()) {
  $alertas[] = [
  'tipo' => 'warning',
  'titulo' => 'Sin familiares vinculados',
@@ -18,14 +18,14 @@
  
  // Alerta: Sin responsable principal
  $tieneResponsable = false;
- foreach ($familiaresActivos as $fam) {
+ foreach (($familiaresLista ?? collect()) as $fam) {
  $esResp = optional($fam)->es_responsable ?? optional(optional($fam)->pivot)->es_responsable ?? false;
  if ($esResp) {
  $tieneResponsable = true;
  break;
  }
  }
- if ($familiaresActivos->isNotEmpty() && !$tieneResponsable) {
+ if (($familiaresLista ?? collect())->isNotEmpty() && !$tieneResponsable) {
  $alertas[] = [
  'tipo' => 'info',
  'titulo' => 'Sin responsable principal',
@@ -69,8 +69,8 @@
 @endphp
 
 <section
- x-show="tab === 'familiares'"
- x-transition.opacity.duration.250ms
+ 
+ 
  class="space-y-6"
 >
  
@@ -380,7 +380,7 @@
  <div class="p-6">
  {{-- Forelse de Familiares Activos en Formato de Tarjetas Premium --}}
  <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
- @forelse($familiaresActivos as $familiar)
+ @forelse(($familiaresLista ?? collect()) as $familiar)
  @php
  $familiarObj = is_object($familiar) ? $familiar : null;
  $codFamiliar = optional($familiarObj)->cod_fam;
@@ -492,7 +492,7 @@
  <i class="ph-bold ph-pencil-simple text-sm"></i>
  </button>
 
- <form action="{{ route('admin.adultos-mayores.familiares.destroy', [$idAdulto, $codFamiliar]) }}" method="POST" onsubmit="confirmarAccion(event, 'Desactivar vínculo familiar', 'El vínculo con este familiar se marcará como inactivo. Se conservará el registro histórico.')">
+ <form action="{{ (Route::has('admin.adultos-mayores.familiares.destroy') ? route('admin.adultos-mayores.familiares.destroy', [$idAdulto, $codFamiliar]) : '#') }}" method="POST" onsubmit="confirmarAccion(event, 'Desactivar vínculo familiar', 'El vínculo con este familiar se marcará como inactivo. Se conservará el registro histórico.')">
  @csrf @method('DELETE')
  <button type="submit" title="Desactivar vínculo" class="flex h-8 w-8 items-center justify-center rounded-lg bg-boton-acento/10 text-terracota transition hover:bg-boton-acento hover:text-inverso">
  <i class="ph-bold ph-user-minus text-sm"></i>
@@ -517,7 +517,7 @@
  </div>
 
  {{-- Vínculos Familiares Desactivados (Historial de Red de Apoyo) --}}
- @if(count($familiaresInactivos) > 0)
+ @if(count(($familiaresInactivosLista ?? collect())) > 0)
  <div class="mt-8 border-t border-borde-suave pt-6">
  <div class="mb-4 flex items-center justify-between">
  <h4 class="text-xs font-bold uppercase tracking-widest text-parrafo flex items-center gap-2">
@@ -536,7 +536,7 @@
  </tr>
  </thead>
  <tbody class="divide-y divide-[#D5C7B9]/30">
- @foreach($familiaresInactivos as $finac)
+ @foreach(($familiaresInactivosLista ?? collect()) as $finac)
  @php
  $finacObj = is_object($finac) ? $finac : null;
  $codFinac = optional($finacObj)->cod_fam;
@@ -559,7 +559,7 @@
  {{ optional($finacObj->pivot)->parentesco_vinculo ?: 'No definido' }}
  </td>
  <td class="px-6 py-3 text-right">
- <form action="{{ route('admin.adultos-mayores.familiares.restore', [$idAdulto, $codFinac]) }}" method="POST" onsubmit="confirmarAccion(event, 'Restaurar vínculo', 'El familiar volverá a estar vinculado activamente al expediente.')">
+ <form action="{{ (Route::has('admin.adultos-mayores.familiares.restore') ? route('admin.adultos-mayores.familiares.restore', [$idAdulto, $codFinac]) : '#') }}" method="POST" onsubmit="confirmarAccion(event, 'Restaurar vínculo', 'El familiar volverá a estar vinculado activamente al expediente.')">
  @csrf @method('PATCH')
  <button type="submit" title="Restaurar vínculo activo" class="rounded-lg bg-fondo-panel p-1.5 text-parrafo hover:bg-fondo-panel hover:text-inverso transition">
  <i class="ph-bold ph-arrow-counter-clockwise text-sm"></i>
@@ -605,7 +605,7 @@
  </tr>
  </thead>
  <tbody class="divide-y divide-[#D5C7B9]/30">
- @forelse($asignacionesLista ?? collect() as $asignacion)
+ @forelse(($asignacionesLista ?? collect())Lista ?? collect() as $asignacion)
  @php
  $asignacionObj = is_object($asignacion) ? $asignacion : null;
  $nombreVol = optional($asignacionObj)->voluntario->persona->nombre_completo 

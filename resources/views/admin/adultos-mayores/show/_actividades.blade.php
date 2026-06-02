@@ -1,7 +1,7 @@
 {{-- TAB ACTIVIDADES MEJORADO --}}
 <section
- x-show="tab === 'actividades'"
- x-transition.opacity.duration.250ms
+ 
+ 
  class="space-y-4"
 >
  {{-- Encabezado --}}
@@ -108,7 +108,7 @@
  </tr>
  </thead>
  <tbody class="divide-y divide-[#D5C7B9]/30">
- @forelse($actividadesActivas as $actividad)
+ @forelse(($actividadesLista ?? collect()) as $actividad)
  @php
  $actividadObj = is_object($actividad) ? $actividad : null;
  $estadoAct = strtoupper(optional($actividadObj)->estado ?? 'PROGRAMADA');
@@ -142,7 +142,7 @@
  <button type="button" @click="abrir('actividad', @js($actividad), true, false)" class="rounded-lg bg-fondo-panel p-2 text-titulo hover:bg-boton-principal hover:text-inverso transition">
  <i class="ph-bold ph-pencil-simple"></i>
  </button>
- <form action="{{ route('admin.adultos-mayores.actividades.destroy', [$idAdulto, $actividadObj->cod_act_adul ?? '0']) }}" method="POST" onsubmit="confirmarAccion(event, 'Anular registro de actividad', 'La participación en esta actividad será anulada del expediente activo.')">
+ <form action="{{ (Route::has('admin.adultos-mayores.actividades.destroy') ? route('admin.adultos-mayores.actividades.destroy', [$idAdulto, $actividadObj->cod_act_adul ?? '0']) : '#') }}" method="POST" onsubmit="confirmarAccion(event, 'Anular registro de actividad', 'La participación en esta actividad será anulada del expediente activo.')">
  @csrf @method('DELETE')
  <button type="submit" title="Anular actividad" class="rounded-lg bg-boton-acento/5 p-2 text-terracota hover:bg-boton-acento hover:text-inverso transition">
  <i class="ph-bold ph-x-circle"></i>
@@ -162,7 +162,7 @@
  </section>
 
  {{-- Actividades Anuladas --}}
- @if(count($actividadesAnuladas) > 0)
+ @if(count(($actividadesAnuladasLista ?? collect())) > 0)
  <div class="mt-8 border-t border-borde-suave pt-6">
  <h4 class="mb-4 text-xs font-bold uppercase tracking-widest text-terracota/60 flex items-center gap-2 px-4">
  <i class="ph-bold ph-x-circle"></i> Historial de Actividades Anuladas
@@ -177,7 +177,7 @@
  </tr>
  </thead>
  <tbody class="divide-y divide-[#D5C7B9]/20">
- @foreach($actividadesAnuladas as $actAnu)
+ @foreach(($actividadesAnuladasLista ?? collect()) as $actAnu)
  <tr class="hover:bg-fondo-card/10 transition">
  <td class="px-6 py-3 text-xs font-bold text-apoyo">
  {{ $actAnu->deleted_at->format('d/m/Y') }}
@@ -187,7 +187,7 @@
  <p class="text-[10px] font-semibold text-apoyo">Estado anterior: {{ $actAnu->estado }}</p>
  </td>
  <td class="px-6 py-3 text-right">
- <form action="{{ route('admin.adultos-mayores.actividades.restore', [$adulto->cod_am, $actAnu->cod_act_adul]) }}" method="POST" onsubmit="confirmarAccion(event, 'Restaurar actividad', 'El registro de participación volverá a la vista activa del expediente.')">
+ <form action="{{ (Route::has('admin.adultos-mayores.actividades.restore') ? route('admin.adultos-mayores.actividades.restore', [$adulto->cod_am, $actAnu->cod_act_adul]) : '#') }}" method="POST" onsubmit="confirmarAccion(event, 'Restaurar actividad', 'El registro de participación volverá a la vista activa del expediente.')">
  @csrf @method('PATCH')
  <button type="submit" title="Restaurar" class="rounded-lg bg-fondo-panel p-1.5 text-parrafo hover:bg-fondo-panel hover:text-inverso transition">
  <i class="ph-bold ph-arrow-counter-clockwise"></i>
@@ -230,7 +230,7 @@
  </tr>
  </thead>
  <tbody class="divide-y divide-[#D5C7B9]/30">
- @forelse($asignacionesLista ?? collect() as $asignacion)
+ @forelse(($asignacionesLista ?? collect())Lista ?? collect() as $asignacion)
  @php
  $asignacionObj = is_object($asignacion) ? $asignacion : null;
  $nombreVol = optional($asignacionObj)->voluntario->persona->nombre_completo 

@@ -1,8 +1,8 @@
 {{-- TAB PARTICIPACIÓN Y ACTIVIDADES (RESUMEN) --}}
 <section
- x-show="tab === 'seguimiento'"
- style="display: none;"
- x-transition.opacity.duration.250ms
+ 
+ 
+ 
  class="space-y-6"
 >
  <!-- HEADER BLOCK -->
@@ -23,19 +23,19 @@
  <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
  <div class="rounded-[24px] border border-borde bg-fondo-card/95 p-6 shadow-sm flex flex-col justify-center text-center">
  <p class="text-[10px] font-bold uppercase tracking-[0.18em] text-apoyo">Total Notas Generadas</p>
- <p class="mt-2 text-3xl font-black text-parrafo">{{ $observacionesActivas->count() }}</p>
+ <p class="mt-2 text-3xl font-black text-parrafo">{{ ($observacionesLista ?? collect())->count() }}</p>
  </div>
 
  <div class="rounded-[24px] border border-borde bg-fondo-card/95 p-6 shadow-sm flex flex-col justify-center text-center">
  <p class="text-[10px] font-bold uppercase tracking-[0.18em] text-apoyo">Atenciones Médicas</p>
- <p class="mt-2 text-3xl font-black text-parrafo">{{ $atencionesActivas->count() }}</p>
+ <p class="mt-2 text-3xl font-black text-parrafo">{{ ($atencionesLista ?? collect())->count() }}</p>
  </div>
 
  <div class="rounded-[24px] border border-borde bg-fondo-card/95 p-6 shadow-sm flex flex-col justify-center text-center">
  <p class="text-[10px] font-bold uppercase tracking-[0.18em] text-apoyo">Última Nota / Registro</p>
  <p class="mt-2 text-sm font-bold text-titulo">
- @if($observacionesActivas->count() > 0)
- @php $ultimaObs = $observacionesActivas->first(); @endphp
+ @if(($observacionesLista ?? collect())->count() > 0)
+ @php $ultimaObs = ($observacionesLista ?? collect())->first(); @endphp
  {{ $ultimaObs->tipo_obs ?? 'Nota' }}
  <span class="block mt-1 text-xs text-apoyo font-normal">{{ \Carbon\Carbon::parse($ultimaObs->fecha)->format('d/m/Y') }}</span>
  @else
@@ -49,9 +49,9 @@
  <div class="rounded-[24px] border border-borde bg-fondo-card/95 p-6 shadow-sm">
  <h3 class="text-lg font-extrabold text-titulo border-b border-borde pb-4 mb-4">Notas Observacionales Recientes</h3>
  
- @if($observacionesActivas->count() > 0)
+ @if(($observacionesLista ?? collect())->count() > 0)
  <div class="space-y-4">
- @foreach($observacionesActivas->take(3) as $obs)
+ @foreach(($observacionesLista ?? collect())->take(3) as $obs)
  <div class="flex items-start gap-3 pb-3 border-b border-borde last:border-0 last:pb-0">
  <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-fondo-panel text-parrafo shrink-0">
  <i class="ph-bold ph-notebook"></i>

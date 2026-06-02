@@ -6,7 +6,11 @@ use Livewire\Component;
 use Livewire\WithPagination;
 use App\Models\AdultoMayor;
 use App\Models\MedicacionAdulto;
+use App\Support\ClinicalAccess;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 
 class SaludMedicacionPanel extends Component
 {
@@ -25,15 +29,25 @@ class SaludMedicacionPanel extends Component
         'administracion-actualizada' => '$refresh',
     ];
 
-    public function mount()
+    public function mount(?AdultoMayor $adulto = null)
     {
-        // Se monta sin adulto por defecto para forzar la selección
+        if ($adulto && $adulto->exists) {
+            Gate::authorize('viewClinicalData', $adulto);
+            $this->adulto = $adulto;
+            $this->cod_am = $adulto->cod_am;
+        }
     }
 
     public function updatedCodAm($value)
     {
         if ($value) {
-            $this->adulto = AdultoMayor::where('cod_am', $value)->first();
+            $this->adulto = AdultoMayor::query()
+                ->visiblesClinicamentePara(Auth::user())
+                ->where('cod_am', $value)
+                ->first();
+            if ($this->adulto) {
+                Gate::authorize('viewClinicalData', $this->adulto);
+            }
             $this->resetPage();
         } else {
             $this->adulto = null;
@@ -64,7 +78,9 @@ class SaludMedicacionPanel extends Component
     public function render()
     {
         // Lista de adultos mayores para el selector
-        $adultosDisponibles = AdultoMayor::whereHas('estado', function ($q) {
+        $adultosDisponibles = AdultoMayor::query()
+            ->visiblesClinicamentePara(Auth::user())
+            ->whereHas('estado', function ($q) {
             $q->whereIn('estado', ['ACTIVO', 'ACTIVA']);
         })->orderBy('nombres')->get();
 
@@ -116,7 +132,7 @@ class SaludMedicacionPanel extends Component
                 ->pluck('via_administracion');
         } else {
             // Si no hay adulto, pero queremos mostrar estadísticas generales de TODO el módulo
-            $allGlobal = MedicacionAdulto::all();
+            $allGlobal = $this->aplicarAlcanceCodAm(MedicacionAdulto::query(), 'cod_am')->get();
             $stats = [
                 'activas' => $allGlobal->where('estado', 'ACTIVO')->count(),
                 'suspendidas' => $allGlobal->where('estado', 'SUSPENDIDO')->count(),
@@ -125,7 +141,7 @@ class SaludMedicacionPanel extends Component
             ];
             
             // Para la tabla general sin adulto seleccionado, se muestran todos los medicamentos activos por defecto
-            $query = MedicacionAdulto::with(['registrador', 'adultoMayor']);
+            $query = $this->aplicarAlcanceCodAm(MedicacionAdulto::with(['registrador', 'adultoMayor']), 'cod_am');
             
             if (!empty($this->search)) {
                 $query->where('nombre_medicamento', 'like', '%' . $this->search . '%');
@@ -141,7 +157,8 @@ class SaludMedicacionPanel extends Component
             
             $medicaciones = $query->latest()->paginate(10);
             
-            $viasDisponibles = MedicacionAdulto::whereNotNull('via_administracion')
+            $viasDisponibles = $this->aplicarAlcanceCodAm(MedicacionAdulto::query(), 'cod_am')
+                ->whereNotNull('via_administracion')
                 ->select('via_administracion')
                 ->distinct()
                 ->pluck('via_administracion');
@@ -153,5 +170,16 @@ class SaludMedicacionPanel extends Component
             'stats' => $stats,
             'viasDisponibles' => $viasDisponibles,
         ]);
+    }
+
+    private function aplicarAlcanceCodAm(Builder $query, string $column): Builder
+    {
+        $codigos = ClinicalAccess::visibleAdultCodes(Auth::user());
+
+        if ($codigos === null) {
+            return $query;
+        }
+
+        return $query->whereIn($column, $codigos);
     }
 }

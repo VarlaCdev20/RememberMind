@@ -26,7 +26,7 @@
  </tr>
  </thead>
  <tbody class="divide-y divide-[#D5C7B9]/30">
- @forelse($atencionesActivas as $atencion)
+ @forelse(($atencionesLista ?? collect()) as $atencion)
  @php
  $atencionObj = is_object($atencion) ? $atencion : null;
  $estadoAten = strtoupper(optional($atencionObj)->estado ?? 'PENDIENTE');
@@ -60,7 +60,7 @@
  <button type="button" @click="abrir('atencion', @js($atencion), true, false)" class="rounded-lg bg-fondo-panel p-2 text-titulo hover:bg-boton-principal hover:text-inverso transition">
  <i class="ph-bold ph-pencil-simple"></i>
  </button>
- <form action="{{ route('admin.adultos-mayores.atenciones.destroy', [$idAdulto, $atencionObj->cod_aten_adul ?? '0']) }}" method="POST" onsubmit="confirmarAccion(event, 'Anular atención médica', 'La atención se marcará como anulada para fines de trazabilidad y auditoría.')">
+ <form action="{{ (Route::has('admin.adultos-mayores.atenciones.destroy') ? route('admin.adultos-mayores.atenciones.destroy', [$idAdulto, $atencionObj->cod_aten_adul ?? '0']) : '#') }}" method="POST" onsubmit="confirmarAccion(event, 'Anular atención médica', 'La atención se marcará como anulada para fines de trazabilidad y auditoría.')">
  @csrf @method('DELETE')
  <button type="submit" title="Anular atención" class="rounded-lg bg-boton-acento/5 p-2 text-terracota hover:bg-boton-acento hover:text-inverso transition">
  <i class="ph-bold ph-x-circle"></i>
@@ -80,7 +80,7 @@
  </section>
 
  {{-- Atenciones Anuladas --}}
- @if(count($atencionesAnuladas) > 0)
+ @if(count(($atencionesAnuladasLista ?? collect())) > 0)
  <div class="mt-8 border-t border-borde-suave pt-6">
  <h4 class="mb-4 text-xs font-bold uppercase tracking-widest text-terracota/60 flex items-center gap-2">
  <i class="ph-bold ph-x-circle"></i> Historial de Atenciones Anuladas
@@ -95,7 +95,7 @@
  </tr>
  </thead>
  <tbody class="divide-y divide-[#D5C7B9]/20">
- @foreach($atencionesAnuladas as $ateAnu)
+ @foreach(($atencionesAnuladasLista ?? collect()) as $ateAnu)
  <tr class="hover:bg-fondo-card/10 transition">
  <td class="px-6 py-3 text-xs font-bold text-apoyo">
  {{ $ateAnu->deleted_at->format('d/m/Y') }}
@@ -105,7 +105,7 @@
  <p class="text-[10px] font-semibold text-apoyo line-clamp-1">{{ $ateAnu->motivo_consulta }}</p>
  </td>
  <td class="px-6 py-3 text-right">
- <form action="{{ route('admin.adultos-mayores.atenciones.restore', [$adulto->cod_am, $ateAnu->cod_aten_adul]) }}" method="POST" onsubmit="confirmarAccion(event, 'Restaurar atención', 'El registro de atención volverá al historial activo del paciente.')">
+ <form action="{{ (Route::has('admin.adultos-mayores.atenciones.restore') ? route('admin.adultos-mayores.atenciones.restore', [$adulto->cod_am, $ateAnu->cod_aten_adul]) : '#') }}" method="POST" onsubmit="confirmarAccion(event, 'Restaurar atención', 'El registro de atención volverá al historial activo del paciente.')">
  @csrf @method('PATCH')
  <button type="submit" title="Restaurar" class="rounded-lg bg-fondo-panel p-1.5 text-parrafo hover:bg-fondo-panel hover:text-inverso transition">
  <i class="ph-bold ph-arrow-counter-clockwise"></i>

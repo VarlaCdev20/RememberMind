@@ -4,6 +4,7 @@ namespace App\Livewire\Admin\SaludSeguimiento;
 
 use Livewire\Component;
 use App\Models\AdultoMayor;
+use Illuminate\Support\Facades\Auth;
 
 class SaludAlertasPanel extends Component
 {
@@ -12,7 +13,9 @@ class SaludAlertasPanel extends Component
     public function render()
     {
         // Cargamos solo adultos activos con relaciones acotadas para evitar timeout
-        $adultos = AdultoMayor::with([
+        $adultos = AdultoMayor::query()
+            ->visiblesClinicamentePara(Auth::user())
+            ->with([
             'fichasMedicas'           => fn ($q) => $q->where('estado', 'ACTIVA')->latest()->limit(1),
             'medicaciones'            => fn ($q) => $q->whereIn('estado', ['ACTIVA', 'ACTIVO']),
             'administracionesMedicacion' => fn ($q) => $q->latest('fecha')->limit(3),

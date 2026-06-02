@@ -23,15 +23,15 @@
 
  // 2. Extracción de Familiar / Contacto Principal Responsable
  $familiarPrincipal = null;
- foreach ($familiaresActivos as $fam) {
+ foreach (($familiaresLista ?? collect()) as $fam) {
  $esResp = optional($fam)->es_responsable ?? optional(optional($fam)->pivot)->es_responsable ?? false;
  if ($esResp) {
  $familiarPrincipal = $fam;
  break;
  }
  }
- if (!$familiarPrincipal && $familiaresActivos->isNotEmpty()) {
- $familiarPrincipal = $familiaresActivos->first();
+ if (!$familiarPrincipal && ($familiaresLista ?? collect())->isNotEmpty()) {
+ $familiarPrincipal = ($familiaresLista ?? collect())->first();
  }
 
  $nombrePrincipal = $familiarPrincipal ? trim(
@@ -54,10 +54,10 @@
  ) : null;
 
  // 3. Obtener últimos movimientos reales
- $ultimaObs = $observacionesActivas->first();
- $ultimaAten = $atencionesActivas->first();
- $ultimaAct = $actividadesActivas->first();
- $ultimaEval = $evaluacionesGeriatricasActivas->first();
+ $ultimaObs = ($observacionesLista ?? collect())->first();
+ $ultimaAten = ($atencionesLista ?? collect())->first();
+ $ultimaAct = ($actividadesLista ?? collect())->first();
+ $ultimaEval = ($evaluacionesGeriatricasActivas ?? collect())->first();
 
  // 4. Estados de Alerta y Estilo de Estado
  $esActivo = ($estadoTexto ?? 'ACTIVO') === 'ACTIVO';
@@ -66,9 +66,9 @@
  : 'bg-boton-acento/15 text-terracota border border-terracota/30';
 
  // 5. Pendientes reales
- $tieneFichaMedica = $fichasMedicas->isNotEmpty();
- $tieneEvaluaciones = $evaluacionesGeriatricasActivas->isNotEmpty();
- $tieneDocumentos = $documentosActivos->isNotEmpty();
+ $tieneFichaMedica = ($fichasMedicasLista ?? collect())->isNotEmpty();
+ $tieneEvaluaciones = ($evaluacionesGeriatricasActivas ?? collect())->isNotEmpty();
+ $tieneDocumentos = ($documentosLista ?? collect())->isNotEmpty();
  $expedienteCompleto = $tieneFichaMedica && $tieneEvaluaciones && $tieneDocumentos;
 
  // 6. Cálculo de Completitud de la Ficha
@@ -86,8 +86,8 @@
 @endphp
 
 <section
- x-show="tab === 'resumen'"
- x-transition.opacity.duration.250ms
+ 
+ 
  class="grid gap-6 lg:grid-cols-3"
 >
  {{-- COLUMNA IZQUIERDA Y CENTRAL (2/3 de ancho) --}}
@@ -638,12 +638,13 @@
 
  <div class="p-6 grid grid-cols-2 gap-3">
  
- {{-- 1. Editar Datos --}}
- <a href="{{ route('admin.adultos-mayores.edit', $idAdulto) }}"
+ {{-- 1. Agregar Familiar --}}
+ <button type="button"
+ @click="abrir('familiar')"
  class="flex flex-col items-center justify-center gap-2 rounded-2xl border border-borde-suave bg-fondo-panel p-3.5 text-center text-xs font-bold text-titulo transition hover:-translate-y-0.5 hover:bg-boton-principal hover:text-inverso hover:border-transparent active:scale-[0.98]">
- <i class="ph-bold ph-note-pencil text-xl text-boton-acento group-hover:text-inverso"></i>
- Editar Datos
- </a>
+ <i class="ph-bold ph-users-three text-xl text-boton-acento group-hover:text-inverso"></i>
+ Agregar Familiar
+ </button>
 
  {{-- 2. Registrar Observación --}}
  <button type="button"
@@ -653,17 +654,17 @@
  Registrar Notas
  </button>
 
- {{-- 3. Registrar Atención --}}
+ {{-- 3. Registrar Signos Vitales --}}
  <button type="button"
- @click="abrir('atencion')"
+ @click="abrir('signos-vitales')"
  class="flex flex-col items-center justify-center gap-2 rounded-2xl border border-borde-suave bg-fondo-panel p-3.5 text-center text-xs font-bold text-titulo transition hover:-translate-y-0.5 hover:bg-boton-principal hover:text-inverso hover:border-transparent active:scale-[0.98]">
- <i class="ph-bold ph-stethoscope text-xl text-emerald-700 group-hover:text-inverso"></i>
- Registrar Atención
+ <i class="ph-bold ph-heartbeat text-xl text-emerald-700 group-hover:text-inverso"></i>
+ Signos Vitales
  </button>
 
  {{-- 4. Registrar Evaluación Geriátrica --}}
  <button type="button"
- @click="$dispatch('evaluacion-geriatrica-abrir', { cod_am: '{{ $idAdulto }}' })"
+ @click="abrir('evaluacion')"
  class="flex flex-col items-center justify-center gap-2 rounded-2xl border border-borde-suave bg-fondo-panel p-3.5 text-center text-xs font-bold text-titulo transition hover:-translate-y-0.5 hover:bg-boton-principal hover:text-inverso hover:border-transparent active:scale-[0.98]">
  <i class="ph-bold ph-brain text-xl text-blue-600 group-hover:text-inverso"></i>
  Evaluación Geriátrica
@@ -678,7 +679,7 @@
  </button>
 
  {{-- 6. Generar Reporte PDF --}}
- <a href="{{ route('admin.adultos-mayores.reporte-individual', $idAdulto) }}"
+ <a href="{{ (Route::has('admin.adultos-mayores.reporte-individual') ? route('admin.adultos-mayores.reporte-individual', $idAdulto) : '#') }}"
  target="_blank"
  class="flex flex-col items-center justify-center gap-2 rounded-2xl border border-borde-suave bg-fondo-panel p-3.5 text-center text-xs font-bold text-titulo transition hover:-translate-y-0.5 hover:bg-boton-principal hover:text-inverso hover:border-transparent active:scale-[0.98]">
  <i class="ph-bold ph-file-pdf text-xl text-red-600 group-hover:text-inverso"></i>

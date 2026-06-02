@@ -6,8 +6,12 @@ use Livewire\Component;
 use Livewire\WithPagination;
 use App\Models\AdultoMayor;
 use App\Models\FichaMedicaAdulto;
+use App\Support\ClinicalAccess;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 
 class SaludFichaPanel extends Component
 {
@@ -67,7 +71,12 @@ class SaludFichaPanel extends Component
 
     private function cargarAdulto(string $codAm): void
     {
-        $this->adulto = AdultoMayor::with('estado')->findOrFail($codAm);
+        $this->adulto = AdultoMayor::query()
+            ->visiblesClinicamentePara(Auth::user())
+            ->with('estado')
+            ->findOrFail($codAm);
+
+        Gate::authorize('viewClinicalData', $this->adulto);
         $this->adultoSeleccionado = $this->adulto->cod_am;
         $this->loadData();
     }
@@ -118,6 +127,7 @@ class SaludFichaPanel extends Component
     public function getPacientesSelectorProperty()
     {
         $query = AdultoMayor::query()
+            ->visiblesClinicamentePara(Auth::user())
             ->with('estado')
             ->orderBy('nombres')
             ->orderBy('ap_paterno');
@@ -218,6 +228,7 @@ class SaludFichaPanel extends Component
         if (!auth()->user()->can('salud.ficha.crear') && !auth()->user()->can('salud.ficha.editar')) {
             abort(403);
         }
+        Gate::authorize('viewClinicalData', $this->adulto);
 
         DB::beginTransaction();
         try {
@@ -275,6 +286,7 @@ class SaludFichaPanel extends Component
     public function archivarFicha()
     {
         if (!auth()->user()->can('salud.ficha.archivar')) abort(403);
+        Gate::authorize('viewClinicalData', $this->adulto);
 
         if ($this->fichaActiva) {
             $this->fichaActiva->update(['estado' => 'ARCHIVADA']);
@@ -290,7 +302,9 @@ class SaludFichaPanel extends Component
     {
         if (!$this->adulto) {
             // RENDERING GENERAL DASHBOARD
-            $query = AdultoMayor::with(['estado', 'fichasMedicas' => function($q) {
+            $query = AdultoMayor::query()
+                ->visiblesClinicamentePara(Auth::user())
+                ->with(['estado', 'fichasMedicas' => function($q) {
                 $q->where('estado', 'ACTIVA');
             }]);
 
@@ -317,13 +331,14 @@ class SaludFichaPanel extends Component
             $pacientesGeneral = $query->paginate(12);
 
             // Calculate stats efficiently
-            $totalAdultos = AdultoMayor::count();
-            $conFicha = FichaMedicaAdulto::where('estado', 'ACTIVA')->distinct('cod_am')->count('cod_am');
+            $adultosBase = AdultoMayor::query()->visiblesClinicamentePara(Auth::user());
+            $totalAdultos = (clone $adultosBase)->count();
+            $conFicha = (clone $adultosBase)->whereHas('fichasMedicas', fn ($q) => $q->where('estado', 'ACTIVA'))->count();
             $sinFicha = $totalAdultos - $conFicha;
             
             // Just for UI cards (approximation or specific)
-            $alergiasCount = FichaMedicaAdulto::where('estado', 'ACTIVA')->whereNotNull('alergias')->where('alergias', '!=', '')->count();
-            $cuidadosCount = FichaMedicaAdulto::where('estado', 'ACTIVA')->whereNotNull('restricciones_alimentarias')->where('restricciones_alimentarias', '!=', '')->count();
+            $alergiasCount = $this->aplicarAlcanceCodAm(FichaMedicaAdulto::query(), 'cod_am')->where('estado', 'ACTIVA')->whereNotNull('alergias')->where('alergias', '!=', '')->count();
+            $cuidadosCount = $this->aplicarAlcanceCodAm(FichaMedicaAdulto::query(), 'cod_am')->where('estado', 'ACTIVA')->whereNotNull('restricciones_alimentarias')->where('restricciones_alimentarias', '!=', '')->count();
             
             $stats = [
                 'total' => $totalAdultos,
@@ -343,5 +358,16 @@ class SaludFichaPanel extends Component
         return view('livewire.admin.salud-seguimiento.salud-ficha-panel', [
             'pacientesSelector' => $this->pacientesSelector,
         ])->layout('layouts.sistema');
+    }
+
+    private function aplicarAlcanceCodAm(Builder $query, string $column): Builder
+    {
+        $codigos = ClinicalAccess::visibleAdultCodes(Auth::user());
+
+        if ($codigos === null) {
+            return $query;
+        }
+
+        return $query->whereIn($column, $codigos);
     }
 }

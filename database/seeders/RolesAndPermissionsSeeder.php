@@ -82,6 +82,12 @@ class RolesAndPermissionsSeeder extends Seeder
 
             // Salud y seguimiento
             'salud.ver',
+            'asignaciones_clinicas.ver',
+            'asignaciones_clinicas.crear',
+            'asignaciones_clinicas.finalizar',
+            'asignaciones_clinicas.suspender',
+            'asignaciones_clinicas.gestionar',
+            'asignaciones_clinicas.mis_pacientes',
             'atenciones.ver',
             'atenciones.crear',
             'atenciones.editar',
@@ -224,6 +230,7 @@ class RolesAndPermissionsSeeder extends Seeder
             'adultos.ver',
             'adultos.ver_expediente',
             'salud.ver',
+            'asignaciones_clinicas.mis_pacientes',
             'atenciones.ver',
             'atenciones.crear',
             'atenciones.editar',

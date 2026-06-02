@@ -16,6 +16,7 @@ class AdultoMayorService
     public function obtenerListado(array $filtros = [])
     {
         $query = AdultoMayor::with(['estado', 'familiares', 'atenciones', 'evaluacionesCognitivas'])
+            ->visiblesClinicamentePara(auth()->user())
             ->withCount([
                 'familiares as fam_total',
                 'observaciones as obs_total',
@@ -99,7 +100,7 @@ class AdultoMayorService
             'atenciones',
             'documentos',
             'voluntarios'
-        ])->findOrFail($codAm);
+        ])->visiblesClinicamentePara(auth()->user())->findOrFail($codAm);
     }
 
     /**

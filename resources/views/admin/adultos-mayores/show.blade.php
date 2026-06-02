@@ -66,14 +66,34 @@
  $zona = optional($adultoObj)->zona ?? 'No registrada';
  $calle = optional($adultoObj)->calle ?? 'No registrada';
 
- // Listas para los forelse inferiores (Datos Activos)
+ // Listas para los forelse inferiores (Datos Activos e Inactivos)
  $familiaresLista = is_iterable($familiaresActivos ?? null) ? collect($familiaresActivos) : collect();
+ $familiaresInactivosLista = is_iterable($familiaresInactivos ?? null) ? collect($familiaresInactivos) : collect();
+
  $observacionesLista = is_iterable($observacionesActivas ?? null) ? collect($observacionesActivas) : collect();
+ $observacionesAnuladasLista = is_iterable($observacionesAnuladas ?? null) ? collect($observacionesAnuladas) : collect();
+
  $atencionesLista = is_iterable($atencionesActivas ?? null) ? collect($atencionesActivas) : collect();
+ $atencionesAnuladasLista = is_iterable($atencionesAnuladas ?? null) ? collect($atencionesAnuladas) : collect();
+
  $actividadesLista = is_iterable($actividadesActivas ?? null) ? collect($actividadesActivas) : collect();
+ $actividadesAnuladasLista = is_iterable($actividadesAnuladas ?? null) ? collect($actividadesAnuladas) : collect();
+
  $documentosLista = is_iterable($documentosActivos ?? null) ? collect($documentosActivos) : collect();
+ $documentosArchivadosLista = is_iterable($documentosArchivados ?? null) ? collect($documentosArchivados) : collect();
+
  $evaluacionesLista = is_iterable($evaluacionesActivas ?? null) ? collect($evaluacionesActivas) : collect();
+ $evaluacionesAnuladasLista = is_iterable($evaluacionesAnuladas ?? null) ? collect($evaluacionesAnuladas) : collect();
+
  $asignacionesLista = is_iterable($asignaciones ?? null) ? collect($asignaciones) : collect();
+
+ $fichasMedicasLista = is_iterable($fichasMedicas ?? null) ? collect($fichasMedicas) : collect();
+ $medicacionesLista = is_iterable($medicaciones ?? null) ? collect($medicaciones) : collect();
+ $administracionesMedicacionLista = is_iterable($administracionesMedicacion ?? null) ? collect($administracionesMedicacion) : collect();
+ $signosVitalesLista = is_iterable($signosVitales ?? null) ? collect($signosVitales) : collect();
+ $valoracionesFuncionalesLista = is_iterable($valoracionesFuncionales ?? null) ? collect($valoracionesFuncionales) : collect();
+
+ $historialEstadosLista = is_iterable($historialEstados ?? null) ? collect($historialEstados) : collect();
  $bitacoraLista = is_iterable($bitacora ?? null) ? collect($bitacora) : collect();
  $eventosFiltroLista = is_iterable($eventosFiltro ?? null) ? collect($eventosFiltro) : collect();
 
@@ -92,7 +112,7 @@
 
  <div
  x-data="{
- carpetaActiva: 'identificacion',
+ tab: 'resumen',
  modal: null,
  isEditing: false,
  isViewing: false,
@@ -154,25 +174,26 @@
  <div class="rounded-[24px] border border-borde bg-fondo-card p-3 shadow-sm flex flex-col gap-1">
  <h3 class="px-3 py-2 text-xs font-bold uppercase tracking-wide text-apoyo">Índice del Expediente</h3>
  
- @php
+  @php
  $carpetas = [
- ['id' => 'identificacion', 'icon' => 'ph-identification-card', 'label' => 'Identificación', 'status' => 'Completa'],
- ['id' => 'red_apoyo', 'icon' => 'ph-users-three', 'label' => 'Red de apoyo', 'status' => $totalFamiliares.' vinculados'],
+ ['id' => 'resumen', 'icon' => 'ph-identification-card', 'label' => 'Resumen', 'status' => 'Completo'],
+ ['id' => 'familiares', 'icon' => 'ph-users-three', 'label' => 'Familia y red de apoyo', 'status' => $totalFamiliares.' vinculados'],
+ ['id' => 'seguimiento', 'icon' => 'ph-clipboard-text', 'label' => 'Seguimiento institucional', 'status' => ($totalObservaciones + $totalAtenciones).' registros'],
+ ['id' => 'salud', 'icon' => 'ph-heartbeat', 'label' => 'Resumen clínico', 'status' => $fichasMedicas->isNotEmpty() ? 'Con datos' : 'Sin datos'],
+ ['id' => 'evaluaciones', 'icon' => 'ph-brain', 'label' => 'Evaluaciones geriátricas', 'status' => $totalEvaluaciones > 0 ? $totalEvaluaciones.' pruebas' : 'Sin pruebas'],
+ ['id' => 'historial', 'icon' => 'ph-clock-counter-clockwise', 'label' => 'Historial individual', 'status' => 'Disponible'],
+ ['id' => 'preventivo', 'icon' => 'ph-shield-check', 'label' => 'Resultados preventivos', 'status' => 'Pendiente'],
  ['id' => 'documentos', 'icon' => 'ph-folder-open', 'label' => 'Documentos', 'status' => $totalDocumentos.' archivos'],
- ['id' => 'salud', 'icon' => 'ph-heartbeat', 'label' => 'Salud resumida', 'status' => $fichasMedicas->isNotEmpty() ? 'Ficha registrada' : 'Sin datos'],
- ['id' => 'cognitivo', 'icon' => 'ph-brain', 'label' => 'Cognitivo resumido', 'status' => $totalEvaluaciones > 0 ? $totalEvaluaciones.' pruebas' : 'Sin pruebas'],
- ['id' => 'participacion', 'icon' => 'ph-handshake', 'label' => 'Participación', 'status' => $totalActividades > 0 ? $totalActividades.' actividades' : 'Sin actividad'],
- ['id' => 'historial', 'icon' => 'ph-clock-counter-clockwise', 'label' => 'Historial inst.', 'status' => $totalObservaciones.' movimientos'],
  ['id' => 'reportes', 'icon' => 'ph-file-pdf', 'label' => 'Reportes', 'status' => 'Disponibles'],
  ];
  @endphp
 
  @foreach($carpetas as $carpeta)
- <button type="button" @click="carpetaActiva = '{{ $carpeta['id'] }}'" 
+ <button type="button" @click="tab = '{{ $carpeta['id'] }}'" 
  class="flex items-center justify-between rounded-xl px-4 py-3 text-left transition"
- :class="carpetaActiva === '{{ $carpeta['id'] }}' ? 'bg-fondo-panel shadow-sm border border-borde-suave text-titulo' : 'text-apoyo hover:bg-fondo-panel border border-transparent'">
+ :class="tab === '{{ $carpeta['id'] }}' ? 'bg-fondo-panel shadow-sm border border-borde-suave text-titulo' : 'text-apoyo hover:bg-fondo-panel border border-transparent'">
  <div class="flex items-center gap-3">
- <i class="ph-bold {{ $carpeta['icon'] }} text-lg" :class="carpetaActiva === '{{ $carpeta['id'] }}' ? 'text-boton-acento' : ''"></i>
+ <i class="ph-bold {{ $carpeta['icon'] }} text-lg" :class="tab === '{{ $carpeta['id'] }}' ? 'text-boton-acento' : ''"></i>
  <span class="text-xs font-bold">{{ $carpeta['label'] }}</span>
  </div>
  <span class="text-[10px] font-bold text-apoyo">{{ $carpeta['status'] }}</span>
@@ -182,37 +203,44 @@
  </div>
 
  {{-- Columna Derecha: Contenido de la Carpeta Activa --}}
- <div class="flex-1 min-w-0">
- <div x-show="carpetaActiva === 'identificacion'" x-transition style="display: none;">
- @include('admin.adultos-mayores.show.carpetas._identificacion')
+  <div class="flex-1 min-w-0">
+ <div x-show="tab === 'resumen'" x-transition style="display: none;">
+ @include('admin.adultos-mayores.show._resumen')
  </div>
  
- <div x-show="carpetaActiva === 'red_apoyo'" x-transition style="display: none;">
- @include('admin.adultos-mayores.show.carpetas._red-apoyo')
+ <div x-show="tab === 'familiares'" x-transition style="display: none;">
+ @include('admin.adultos-mayores.show._familiares')
  </div>
 
- <div x-show="carpetaActiva === 'documentos'" x-transition style="display: none;">
- @include('admin.adultos-mayores.show.carpetas._documentos')
+  <div x-show="tab === 'seguimiento'" x-transition style="display: none;" class="space-y-6">
+ @include('admin.adultos-mayores.show._seguimiento-observaciones')
+ @include('admin.adultos-mayores.show._atenciones')
+ @include('admin.adultos-mayores.show._actividades')
  </div>
 
- <div x-show="carpetaActiva === 'salud'" x-transition style="display: none;">
- @include('admin.adultos-mayores.show.carpetas._salud')
+ <div x-show="tab === 'salud'" x-transition style="display: none;">
+ @include('admin.adultos-mayores.show._salud-medica')
  </div>
 
- <div x-show="carpetaActiva === 'cognitivo'" x-transition style="display: none;">
- @include('admin.adultos-mayores.show.carpetas._cognitivo')
+ <div x-show="tab === 'evaluaciones'" x-transition style="display: none;">
+ @include('admin.adultos-mayores.show._evaluaciones-cognitivas')
  </div>
 
- <div x-show="carpetaActiva === 'participacion'" x-transition style="display: none;">
- @include('admin.adultos-mayores.show.carpetas._participacion')
+ <div x-show="tab === 'historial'" x-transition style="display: none;">
+ @include('admin.adultos-mayores.show._historial-individual')
  </div>
 
- <div x-show="carpetaActiva === 'historial'" x-transition style="display: none;">
- @include('admin.adultos-mayores.show.carpetas._historial')
+ <div x-show="tab === 'preventivo'" x-transition style="display: none;">
+ @include('admin.adultos-mayores.show._resultados-preventivos')
  </div>
 
- <div x-show="carpetaActiva === 'reportes'" x-transition style="display: none;">
- @include('admin.adultos-mayores.show.carpetas._reportes')
+ <div x-show="tab === 'documentos'" x-transition style="display: none;">
+ @include('admin.adultos-mayores.show._documentos')
+ </div>
+
+ <div x-show="tab === 'reportes'" x-transition style="display: none;">
+ @include('admin.adultos-mayores.show._reportes')
+ </div>
  </div>
  </div>
  </div>

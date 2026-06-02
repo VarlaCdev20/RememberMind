@@ -38,15 +38,15 @@
  <div class="rounded-[24px] border border-borde bg-fondo-card/95 p-6 shadow-sm flex flex-col justify-center text-center">
  <p class="text-[10px] font-bold uppercase tracking-[0.18em] text-apoyo">Movimientos Registrados</p>
  <p class="mt-2 text-3xl font-black text-parrafo">
- {{ collect($bitacoraLista)->count() }}
+ {{ collect(($bitacoraLista ?? collect())Lista)->count() }}
  </p>
  </div>
 
  <div class="rounded-[24px] border border-borde bg-fondo-card/95 p-6 shadow-sm flex flex-col justify-center text-center">
  <p class="text-[10px] font-bold uppercase tracking-[0.18em] text-apoyo">Última Modificación</p>
  <p class="mt-2 text-sm font-bold text-titulo">
- @if(collect($bitacoraLista)->count() > 0)
- @php $ultimoMov = collect($bitacoraLista)->first(); @endphp
+ @if(collect(($bitacoraLista ?? collect())Lista)->count() > 0)
+ @php $ultimoMov = collect(($bitacoraLista ?? collect())Lista)->first(); @endphp
  <span class="block text-xs text-apoyo">Por: {{ $ultimoMov['causer'] ?? 'Sistema' }}</span>
  <span class="block mt-1 text-xs font-normal text-apoyo">{{ $ultimoMov['fecha_exacta'] ?? '--' }}</span>
  @else
@@ -60,9 +60,9 @@
  <div class="rounded-[24px] border border-borde bg-fondo-card/95 p-6 shadow-sm">
  <h3 class="text-lg font-extrabold text-titulo border-b border-borde pb-4 mb-4">Últimos Registros Relevantes</h3>
  
- @if(collect($bitacoraLista)->count() > 0)
+ @if(collect(($bitacoraLista ?? collect())Lista)->count() > 0)
  <div class="relative border-l-2 border-borde ml-3 space-y-6 pb-4">
- @foreach(collect($bitacoraLista)->take(5) as $log)
+ @foreach(collect(($bitacoraLista ?? collect())Lista)->take(5) as $log)
  <div class="relative pl-6">
  <!-- Nodo del timeline -->
  <div class="absolute -left-[9px] top-1 h-4 w-4 rounded-full border-2 border-white {{ $log['color_bg'] }} shadow-sm"></div>

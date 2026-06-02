@@ -1,8 +1,8 @@
 {{-- TAB SALUD Y SEGUIMIENTO (RESUMEN NAVEGACIONAL INTERNO) --}}
 <section
- x-show="tab === 'salud'"
- style="display: none;"
- x-transition.opacity.duration.250ms
+ 
+ 
+ 
  x-data="{ vistaSaludActiva: 'resumen' }"
  class="space-y-6"
 >
@@ -14,7 +14,7 @@
  <i class="ph-fill ph-heartbeat text-3xl"></i>
  </div>
  <div>
- <h2 class="text-2xl font-black tracking-tight text-titulo">Resumen de Salud y Seguimiento</h2>
+ <h2 class="text-2xl font-black tracking-tight text-titulo">Resumen clínico</h2>
  <p class="text-sm font-semibold text-apoyo">Vistas resumidas de la condición clínica y operativa.</p>
  </div>
  </div>
@@ -68,17 +68,17 @@
  <i class="ph-bold ph-folder-user text-xl"></i>
  </div>
  <div>
- <h3 class="text-lg font-extrabold text-titulo">Resumen de Ficha Médica</h3>
+ <h3 class="text-lg font-extrabold text-titulo">Ficha Médica</h3>
  <p class="text-xs text-apoyo">Antecedentes, alergias y condiciones</p>
  </div>
  </div>
- <span class="px-2.5 py-1 rounded-full text-xs font-bold uppercase tracking-wide {{ $fichasMedicas->isNotEmpty() ? 'bg-estado-exitoBg text-estado-exito' : 'bg-fondo-panel text-parrafo' }}">
- {{ $fichasMedicas->isNotEmpty() ? 'Registrada' : 'Incompleta' }}
+ <span class="px-2.5 py-1 rounded-full text-xs font-bold uppercase tracking-wide {{ ($fichasMedicasLista ?? collect())->isNotEmpty() ? 'bg-estado-exitoBg text-estado-exito' : 'bg-fondo-panel text-parrafo' }}">
+ {{ ($fichasMedicasLista ?? collect())->isNotEmpty() ? 'Registrada' : 'Incompleta' }}
  </span>
  </div>
 
- @if($fichasMedicas->isNotEmpty())
- @php $latestFicha = $fichasMedicas->first(); @endphp
+ @if(($fichasMedicasLista ?? collect())->isNotEmpty())
+ @php $latestFicha = ($fichasMedicasLista ?? collect())->first(); @endphp
  <div class="grid grid-cols-2 gap-3 text-sm">
  <div class="rounded-xl bg-fondo-app p-3 border border-borde-suave">
  <span class="block text-[10px] font-bold uppercase tracking-wide text-apoyo mb-1">Alergias</span>
@@ -113,13 +113,13 @@
  <i class="ph-bold ph-activity text-xl"></i>
  </div>
  <div>
- <h3 class="text-lg font-extrabold text-titulo">Resumen de Signos Vitales</h3>
+ <h3 class="text-lg font-extrabold text-titulo">Signos Vitales y Mediciones</h3>
  <p class="text-xs text-apoyo">Monitoreo de parámetros y medidas</p>
  </div>
  </div>
  </div>
- @if($signosVitales->isNotEmpty())
- @php $latestSigno = $signosVitales->first(); @endphp
+ @if(($signosVitalesLista ?? collect())->isNotEmpty())
+ @php $latestSigno = ($signosVitalesLista ?? collect())->first(); @endphp
  <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 mt-2">
  <div class="bg-blue-50/70 text-blue-900 rounded-xl p-3 border border-blue-100/50 text-center">
  <p class="text-[10px] font-bold uppercase tracking-wide text-blue-700/70 mb-1">P. Arterial</p>
@@ -159,19 +159,19 @@
  <i class="ph-bold ph-pill text-xl"></i>
  </div>
  <div>
- <h3 class="text-lg font-extrabold text-titulo">Resumen de Medicación</h3>
+ <h3 class="text-lg font-extrabold text-titulo">Medicación</h3>
  <p class="text-xs text-apoyo">Tratamiento activo</p>
  </div>
  </div>
  <span class="px-2.5 py-1 rounded-full text-xs font-bold uppercase tracking-wide bg-estado-exitoBg text-estado-exito">
- {{ $medicaciones->where('estado', 'ACTIVO')->count() }} Activas
+ {{ ($medicacionesLista ?? collect())->where('estado', 'ACTIVO')->count() }} Activas
  </span>
  </div>
- @if($medicaciones->where('estado', 'ACTIVO')->count() > 0)
+ @if(($medicacionesLista ?? collect())->where('estado', 'ACTIVO')->count() > 0)
  <div class="flex items-center justify-between rounded-xl bg-fondo-app p-3 border border-borde-suave">
  <div>
  <span class="block text-[10px] font-bold uppercase tracking-wide text-apoyo mb-1">Tomas Recientes</span>
- <span class="text-xs font-bold text-titulo">{{ $administracionesMedicacion->take(5)->where('estado_administracion', 'ADMINISTRADO')->count() }} Completadas</span>
+ <span class="text-xs font-bold text-titulo">{{ ($administracionesMedicacionLista ?? collect())->take(5)->where('estado_administracion', 'ADMINISTRADO')->count() }} Completadas</span>
  </div>
  <i class="ph-bold ph-check-square text-xl text-emerald-600/50"></i>
  </div>
@@ -198,7 +198,7 @@
  <i class="ph-bold ph-wheelchair text-xl"></i>
  </div>
  <div>
- <h3 class="text-lg font-extrabold text-titulo">Resumen Geriátrico</h3>
+ <h3 class="text-lg font-extrabold text-titulo">Valoración Funcional</h3>
  <p class="text-xs text-apoyo">Dependencia y funcionalidad</p>
  </div>
  </div>
@@ -206,11 +206,11 @@
  <div class="grid grid-cols-2 gap-2 text-center">
  <div class="rounded-xl bg-fondo-app p-3 border border-borde-suave">
  <p class="text-[10px] font-bold uppercase tracking-wide text-apoyo mb-1">Autonomía</p>
- <p class="text-xs font-bold text-titulo">{{ $valoracionesFuncionales->first()?->nivel_dependencia ?? 'N/D' }}</p>
+ <p class="text-xs font-bold text-titulo">{{ ($valoracionesFuncionalesLista ?? collect())->first()?->nivel_dependencia ?? 'N/D' }}</p>
  </div>
  <div class="rounded-xl bg-fondo-app p-3 border border-borde-suave">
  <p class="text-[10px] font-bold uppercase tracking-wide text-apoyo mb-1">Riesgo Caídas</p>
- <p class="text-xs font-bold {{ ($valoracionesFuncionales->first()?->riesgo_caida ?? 'N/D') !== 'N/D' ? 'text-amber-600' : 'text-titulo' }}">{{ $valoracionesFuncionales->first()?->riesgo_caida ?? 'N/D' }}</p>
+ <p class="text-xs font-bold {{ (($valoracionesFuncionalesLista ?? collect())->first()?->riesgo_caida ?? 'N/D') !== 'N/D' ? 'text-amber-600' : 'text-titulo' }}">{{ ($valoracionesFuncionalesLista ?? collect())->first()?->riesgo_caida ?? 'N/D' }}</p>
  </div>
  </div>
  </div>
@@ -247,9 +247,9 @@
 
  <!-- CONTENIDO INTERNO: FICHA MÉDICA -->
  <div x-show="vistaSaludActiva === 'ficha_medica'" style="display: none;" x-transition.opacity class="rounded-[24px] border border-borde bg-fondo-card/95 p-6 shadow-sm">
- <h3 class="text-lg font-extrabold text-titulo mb-4 border-b border-borde pb-3">Resumen de Ficha Médica</h3>
- @if($fichasMedicas->isNotEmpty())
- @php $ficha = $fichasMedicas->first(); @endphp
+ <h3 class="text-lg font-extrabold text-titulo mb-4 border-b border-borde pb-3">Ficha Médica</h3>
+ @if(($fichasMedicasLista ?? collect())->isNotEmpty())
+ @php $ficha = ($fichasMedicasLista ?? collect())->first(); @endphp
  <div class="space-y-4">
  <div>
  <span class="block text-xs font-bold uppercase tracking-wide text-apoyo">Estado de ficha</span>
@@ -292,8 +292,8 @@
 
  <!-- CONTENIDO INTERNO: SIGNOS VITALES -->
  <div x-show="vistaSaludActiva === 'signos_vitales'" style="display: none;" x-transition.opacity class="rounded-[24px] border border-borde bg-fondo-card/95 p-6 shadow-sm">
- <h3 class="text-lg font-extrabold text-titulo mb-4 border-b border-borde pb-3">Resumen de Signos Vitales</h3>
- @if($signosVitales->isNotEmpty())
+ <h3 class="text-lg font-extrabold text-titulo mb-4 border-b border-borde pb-3">Signos Vitales y Mediciones</h3>
+ @if(($signosVitalesLista ?? collect())->isNotEmpty())
  <div class="space-y-4">
  <div class="overflow-x-auto">
  <table class="w-full text-left text-sm text-titulo">
@@ -307,7 +307,7 @@
  </tr>
  </thead>
  <tbody class="divide-y divide-[#CBBBAA]/30">
- @foreach($signosVitales->take(4) as $sv)
+ @foreach(($signosVitalesLista ?? collect())->take(4) as $sv)
  <tr>
  <td class="px-4 py-2 text-xs font-bold">{{ $sv->fecha->format('d/m') }} {{ $sv->hora ? substr($sv->hora,0,5) : '' }}</td>
  <td class="px-4 py-2 text-xs">{{ $sv->presion_arterial ?: '-' }}</td>
@@ -337,17 +337,17 @@
 
  <!-- CONTENIDO INTERNO: MEDICACIÓN -->
  <div x-show="vistaSaludActiva === 'medicacion'" style="display: none;" x-transition.opacity class="rounded-[24px] border border-borde bg-fondo-card/95 p-6 shadow-sm">
- <h3 class="text-lg font-extrabold text-titulo mb-4 border-b border-borde pb-3">Resumen de Medicación</h3>
- @if($medicaciones->isNotEmpty())
+ <h3 class="text-lg font-extrabold text-titulo mb-4 border-b border-borde pb-3">Medicación</h3>
+ @if(($medicacionesLista ?? collect())->isNotEmpty())
  <div class="space-y-4">
  <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
  <div class="bg-fondo-panel p-3 rounded-xl border border-borde text-center">
  <p class="text-xs font-bold uppercase tracking-wide text-apoyo">Activos</p>
- <p class="text-xl font-extrabold text-estado-exito">{{ $medicaciones->where('estado', 'ACTIVO')->count() }}</p>
+ <p class="text-xl font-extrabold text-estado-exito">{{ ($medicacionesLista ?? collect())->where('estado', 'ACTIVO')->count() }}</p>
  </div>
  <div class="bg-fondo-panel p-3 rounded-xl border border-borde text-center">
  <p class="text-xs font-bold uppercase tracking-wide text-apoyo">Suspendidos</p>
- <p class="text-xl font-extrabold text-apoyo">{{ $medicaciones->where('estado', 'SUSPENDIDO')->count() }}</p>
+ <p class="text-xl font-extrabold text-apoyo">{{ ($medicacionesLista ?? collect())->where('estado', 'SUSPENDIDO')->count() }}</p>
  </div>
  </div>
  <div class="flex items-center gap-2 pt-4">
@@ -368,21 +368,21 @@
 
  <!-- CONTENIDO INTERNO: ADMINISTRACIÓN -->
  <div x-show="vistaSaludActiva === 'administracion'" style="display: none;" x-transition.opacity class="rounded-[24px] border border-borde bg-fondo-card/95 p-6 shadow-sm">
- <h3 class="text-lg font-extrabold text-titulo mb-4 border-b border-borde pb-3">Resumen de Administración de Medicación</h3>
- @if($administracionesMedicacion->isNotEmpty())
+ <h3 class="text-lg font-extrabold text-titulo mb-4 border-b border-borde pb-3">Administración de medicación</h3>
+ @if(($administracionesMedicacionLista ?? collect())->isNotEmpty())
  <div class="space-y-4">
  <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
  <div class="bg-fondo-panel p-3 rounded-xl border border-borde text-center">
  <p class="text-xs font-bold uppercase tracking-wide text-apoyo">Administradas hoy</p>
- <p class="text-xl font-extrabold text-emerald-600">{{ $administracionesMedicacion->where('estado_administracion', 'ADMINISTRADO')->where('fecha', '>=', now()->startOfDay())->count() }}</p>
+ <p class="text-xl font-extrabold text-emerald-600">{{ ($administracionesMedicacionLista ?? collect())->where('estado_administracion', 'ADMINISTRADO')->where('fecha', '>=', now()->startOfDay())->count() }}</p>
  </div>
  <div class="bg-fondo-panel p-3 rounded-xl border border-borde text-center">
  <p class="text-xs font-bold uppercase tracking-wide text-apoyo">Pendientes</p>
- <p class="text-xl font-extrabold text-amber-600">{{ $administracionesMedicacion->where('estado_administracion', 'PENDIENTE')->count() }}</p>
+ <p class="text-xl font-extrabold text-amber-600">{{ ($administracionesMedicacionLista ?? collect())->where('estado_administracion', 'PENDIENTE')->count() }}</p>
  </div>
  <div class="bg-fondo-panel p-3 rounded-xl border border-borde text-center">
  <p class="text-xs font-bold uppercase tracking-wide text-apoyo">Omitidas</p>
- <p class="text-xl font-extrabold text-red-600">{{ $administracionesMedicacion->where('estado_administracion', 'NO_ADMINISTRADO')->count() }}</p>
+ <p class="text-xl font-extrabold text-red-600">{{ ($administracionesMedicacionLista ?? collect())->where('estado_administracion', 'NO_ADMINISTRADO')->count() }}</p>
  </div>
  </div>
  <div class="flex items-center gap-2 pt-4">
@@ -404,8 +404,8 @@
  <!-- CONTENIDO INTERNO: VALORACIÓN FUNCIONAL -->
  <div x-show="vistaSaludActiva === 'valoracion'" style="display: none;" x-transition.opacity class="rounded-[24px] border border-borde bg-fondo-card/95 p-6 shadow-sm">
  <h3 class="text-lg font-extrabold text-titulo mb-4 border-b border-borde pb-3">Resumen de Valoración Funcional</h3>
- @if($valoracionesFuncionales->isNotEmpty())
- @php $valFunc = $valoracionesFuncionales->first(); @endphp
+ @if(($valoracionesFuncionalesLista ?? collect())->isNotEmpty())
+ @php $valFunc = ($valoracionesFuncionalesLista ?? collect())->first(); @endphp
  <div class="space-y-4">
  <div class="grid sm:grid-cols-2 gap-4 bg-fondo-panel p-4 rounded-xl border border-borde">
  <div>
@@ -444,8 +444,8 @@
  <!-- CONTENIDO INTERNO: EVALUACIONES GERIÁTRICAS -->
  <div x-show="vistaSaludActiva === 'evaluaciones'" style="display: none;" x-transition.opacity class="rounded-[24px] border border-borde bg-fondo-card/95 p-6 shadow-sm">
  <h3 class="text-lg font-extrabold text-titulo mb-4 border-b border-borde pb-3">Resumen de Evaluaciones Geriátricas</h3>
- @if($evaluacionesGeriatricasActivas->isNotEmpty())
- @php $latestGer = $evaluacionesGeriatricasActivas->first(); @endphp
+ @if(($evaluacionesGeriatricasActivas ?? collect())->isNotEmpty())
+ @php $latestGer = ($evaluacionesGeriatricasActivas ?? collect())->first(); @endphp
  <div class="space-y-4">
  <div class="bg-fondo-panel p-4 rounded-xl border border-borde text-sm">
  <span class="block text-xs font-bold uppercase tracking-wide text-apoyo mb-1">Última Evaluación Registrada</span>
@@ -497,7 +497,7 @@
  <i class="ph-bold ph-file-pdf text-2xl text-parrafo mb-2"></i>
  <p class="text-sm font-bold text-titulo">Reporte Consolidado Médico</p>
  <p class="text-xs text-apoyo mb-3">Historial clínico y últimas mediciones.</p>
- <a href="{{ route('admin.adultos-mayores.reporte-individual', ['adulto_mayor' => $adulto->cod_am, 'format' => 'pdf']) }}" class="text-xs font-bold text-parrafo hover:underline">Descargar PDF</a>
+ <a href="{{ (Route::has('admin.adultos-mayores.reporte-individual') ? route('admin.adultos-mayores.reporte-individual', ['adulto_mayor' => $adulto->cod_am, 'format' => 'pdf']) : '#') }}" class="text-xs font-bold text-parrafo hover:underline">Descargar PDF</a>
  </div>
  <div class="bg-fondo-panel p-4 rounded-xl border border-borde">
  <i class="ph-bold ph-chart-line-up text-2xl text-titulo mb-2"></i>

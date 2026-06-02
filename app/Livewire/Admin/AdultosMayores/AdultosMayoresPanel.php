@@ -56,14 +56,15 @@ class AdultosMayoresPanel extends Component
         ];
 
         $adultos = $service->obtenerListado($filtros);
+        $adultosBase = AdultoMayor::query()->visiblesClinicamentePara(auth()->user());
 
         $totales = [
-            'total' => AdultoMayor::count(),
-            'activos' => AdultoMayor::whereHas('estado', fn($q) => $q->whereRaw('UPPER(estado) = ?', ['ACTIVO']))->count(),
-            'archivados' => AdultoMayor::whereHas('estado', fn($q) => $q->whereRaw('UPPER(estado) IN (?, ?)', ['ARCHIVADO', 'INACTIVO']))->count(),
-            'seguimiento' => AdultoMayor::whereHas('estado', fn($q) => $q->whereRaw('UPPER(estado) LIKE ?', ['%SEGUIMIENTO%']))->count(),
-            'sin_evaluacion' => AdultoMayor::doesntHave('evaluacionesCognitivas')->count(),
-            'docs_pendientes' => AdultoMayor::doesntHave('documentos')->count(),
+            'total' => (clone $adultosBase)->count(),
+            'activos' => (clone $adultosBase)->whereHas('estado', fn($q) => $q->whereRaw('UPPER(estado) = ?', ['ACTIVO']))->count(),
+            'archivados' => (clone $adultosBase)->whereHas('estado', fn($q) => $q->whereRaw('UPPER(estado) IN (?, ?)', ['ARCHIVADO', 'INACTIVO']))->count(),
+            'seguimiento' => (clone $adultosBase)->whereHas('estado', fn($q) => $q->whereRaw('UPPER(estado) LIKE ?', ['%SEGUIMIENTO%']))->count(),
+            'sin_evaluacion' => (clone $adultosBase)->doesntHave('evaluacionesCognitivas')->count(),
+            'docs_pendientes' => (clone $adultosBase)->doesntHave('documentos')->count(),
         ];
 
         return view('livewire.admin.adultos-mayores.adultos-mayores-panel', [

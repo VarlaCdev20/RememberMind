@@ -12,6 +12,12 @@ class SaludSeguimientoPermissionsSeeder extends Seeder
     {
         $permissions = [
             'salud.ver',
+            'asignaciones_clinicas.ver',
+            'asignaciones_clinicas.crear',
+            'asignaciones_clinicas.finalizar',
+            'asignaciones_clinicas.suspender',
+            'asignaciones_clinicas.gestionar',
+            'asignaciones_clinicas.mis_pacientes',
             'salud.resumen.ver',
             'salud.ficha.ver',
             'salud.ficha.crear',
@@ -55,6 +61,7 @@ class SaludSeguimientoPermissionsSeeder extends Seeder
         $salud = Role::firstOrCreate(['name' => 'personal_salud']);
         $salud->givePermissionTo([
             'salud.ver',
+            'asignaciones_clinicas.mis_pacientes',
             'salud.resumen.ver',
             'salud.ficha.ver',
             'salud.ficha.crear',

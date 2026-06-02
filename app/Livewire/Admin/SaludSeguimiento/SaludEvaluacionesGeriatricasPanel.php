@@ -5,6 +5,7 @@ namespace App\Livewire\Admin\SaludSeguimiento;
 use Livewire\Component;
 use Livewire\WithPagination;
 use App\Models\AdultoMayor;
+use Illuminate\Support\Facades\Gate;
 
 class SaludEvaluacionesGeriatricasPanel extends Component
 {
@@ -15,6 +16,7 @@ class SaludEvaluacionesGeriatricasPanel extends Component
 
     public function mount(AdultoMayor $adulto)
     {
+        Gate::authorize('viewClinicalData', $adulto);
         $this->adulto = $adulto;
         // The EvaluacionGeriatrica table might exist according to AdultoMayorController.
         // We will load the data securely via a query if the model exists.
