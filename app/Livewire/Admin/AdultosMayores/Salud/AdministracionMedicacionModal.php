@@ -3,9 +3,11 @@
 namespace App\Livewire\Admin\AdultosMayores\Salud;
 
 use Livewire\Component;
+use App\Models\AdultoMayor;
 use App\Models\AdministracionMedicacion;
 use App\Models\MedicacionAdulto;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 
 class AdministracionMedicacionModal extends Component
 {
@@ -48,11 +50,15 @@ class AdministracionMedicacionModal extends Component
 
     public function abrirModalAdministracion($cod_am, $cod_med_adulto)
     {
+        $adulto = AdultoMayor::findOrFail($cod_am);
+        Gate::authorize('viewClinicalData', $adulto);
+
         $this->resetValidation();
         $this->cod_am = $cod_am;
         $this->cod_med_adulto = $cod_med_adulto;
         
         $medicacion = MedicacionAdulto::findOrFail($cod_med_adulto);
+        abort_if($medicacion->cod_am !== $cod_am, 403);
         $this->medicamento_nombre = $medicacion->nombre_medicamento;
         $this->hora_programada = $medicacion->hora_programada ? \Carbon\Carbon::parse($medicacion->hora_programada)->format('H:i') : now()->format('H:i');
         
@@ -85,6 +91,11 @@ class AdministracionMedicacionModal extends Component
     public function guardar()
     {
         $this->validate();
+        $adulto = AdultoMayor::findOrFail($this->cod_am);
+        Gate::authorize('viewClinicalData', $adulto);
+
+        $medicacion = MedicacionAdulto::findOrFail($this->cod_med_adulto);
+        abort_if($medicacion->cod_am !== $this->cod_am, 403);
 
         $datos = [
             'cod_med_adulto' => $this->cod_med_adulto,

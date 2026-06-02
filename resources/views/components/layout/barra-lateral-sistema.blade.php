@@ -152,8 +152,9 @@
                 'icon' => 'ph-calendar-check',
                 'items' => [
                     ['label' => 'Programación', 'route' => 'admin.actividades.index'],
-                    ['label' => 'Participación', 'route' => 'admin.actividades.participacion'], // Ruta real Livewire
-                    ['label' => 'Reportes', 'route' => 'admin.actividades.reportes'], // Ruta real Livewire
+                    ['label' => 'Calendario', 'route' => 'admin.actividades.calendario'],
+                    ['label' => 'Participación', 'route' => 'admin.actividades.participacion'],
+                    ['label' => 'Reportes', 'route' => 'admin.actividades.reportes'],
                 ],
             ],
             [

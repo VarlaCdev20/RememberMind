@@ -6,11 +6,14 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\AdultosMayores\Salud\StoreSignosVitalesRequest;
 use App\Models\AdultoMayor;
 use App\Models\SignosVitalesAdulto;
+use Illuminate\Support\Facades\Gate;
 
 class AdultoMayorSignosVitalesController extends Controller
 {
     public function store(StoreSignosVitalesRequest $request, AdultoMayor $adulto_mayor)
     {
+        Gate::authorize('viewClinicalData', $adulto_mayor);
+
         try {
             $data = $request->validated();
 
@@ -41,6 +44,9 @@ class AdultoMayorSignosVitalesController extends Controller
 
     public function update(StoreSignosVitalesRequest $request, AdultoMayor $adulto_mayor, SignosVitalesAdulto $signo)
     {
+        Gate::authorize('viewClinicalData', $adulto_mayor);
+        abort_if($signo->cod_am !== $adulto_mayor->cod_am, 403);
+
         try {
             $data = $request->validated();
 

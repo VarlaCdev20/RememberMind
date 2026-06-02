@@ -605,7 +605,7 @@
  </tr>
  </thead>
  <tbody class="divide-y divide-[#D5C7B9]/30">
- @forelse(($asignacionesLista ?? collect())Lista ?? collect() as $asignacion)
+ @forelse(($asignacionesLista ?? collect()) as $asignacion)
  @php
  $asignacionObj = is_object($asignacion) ? $asignacion : null;
  $nombreVol = optional($asignacionObj)->voluntario->persona->nombre_completo 

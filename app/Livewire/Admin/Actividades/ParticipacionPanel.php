@@ -3,10 +3,11 @@
 namespace App\Livewire\Admin\Actividades;
 
 use App\Models\ActividadAdulto;
+use App\Models\ActividadParticipante;
 use App\Models\AdultoMayor;
 use App\Models\TipoActividadAdulto;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -14,248 +15,407 @@ class ParticipacionPanel extends Component
 {
     use WithPagination;
 
-    // ── Filtros ───────────────────────────────────────────────────────────────
-    public string $search           = '';
-    public string $filtroTipo       = '';
-    public string $filtroEstado     = '';
+    // ── Modo de vista ─────────────────────────────────────────────────────────
+    public string $viewMode    = 'lista';   // 'lista' | 'participantes'
+    public ?int   $actividadId = null;
+
+    // ── Filtros lista de actividades ──────────────────────────────────────────
+    public string $searchActividad  = '';
+    public string $filtroTipoAct    = '';
+    public string $filtroEstadoAct  = '';
     public string $filtroFechaDesde = '';
     public string $filtroFechaHasta = '';
 
+    // ── Búsqueda dentro de participantes de una actividad ─────────────────────
+    public string $searchParticipante = '';
+
+    // ── Modal: agregar participante ───────────────────────────────────────────
+    public bool   $modalAgregar                  = false;
+    public string $searchAdultoAgregar           = '';
+    public string $codAmAgregar                  = '';
+    public string $estadoAsistenciaAgregar       = 'INSCRITO';
+    public string $nivelParticipacionAgregar     = 'NO_APLICA';
+    public string $estadoObservadoAgregar        = '';
+    public string $observacionIndividualAgregar  = '';
+    public bool   $requiereSeguimientoAgregar    = false;
+
+    // ── Autocomplete selección ────────────────────────────────────────────────
+    // Se almacena el nombre del adulto seleccionado para mostrar en UI
+    public string $nombreAdultoSeleccionado = '';
+
+    // ── Modal: detalle / editar participante ──────────────────────────────────
+    public bool   $modalParticipante            = false;
+    public bool   $editandoParticipante         = false;
+    public ?int   $participanteId               = null;
+    public string $estadoAsistenciaEdit         = 'INSCRITO';
+    public string $nivelParticipacionEdit       = 'NO_APLICA';
+    public string $estadoObservadoEdit          = '';
+    public string $observacionIndividualEdit    = '';
+    public bool   $requiereSeguimientoEdit      = false;
+
+    // ── Reseteo de paginación al cambiar filtros ───────────────────────────────
+    public function updatingSearchActividad(): void  { $this->resetPage(); }
+    public function updatingFiltroTipoAct(): void    { $this->resetPage(); }
+    public function updatingFiltroEstadoAct(): void  { $this->resetPage(); }
+    public function updatingFiltroFechaDesde(): void { $this->resetPage(); }
+    public function updatingFiltroFechaHasta(): void { $this->resetPage(); }
+
+    // ── Navegación entre modos ────────────────────────────────────────────────
+
+    public function seleccionarActividad(int $id): void
+    {
+        $this->actividadId        = $id;
+        $this->viewMode           = 'participantes';
+        $this->searchParticipante = '';
+        $this->resetPage();
+    }
+
+    public function volverALista(): void
+    {
+        $this->actividadId = null;
+        $this->viewMode    = 'lista';
+        $this->cerrarModales();
+        $this->resetPage();
+    }
+
     // ── Modales ───────────────────────────────────────────────────────────────
-    public bool $modalRegistrar = false;
-    public bool $modalEditar    = false;
-    public bool $modalDetalle   = false;
 
-    // ── Campos del formulario ─────────────────────────────────────────────────
-    public string $codAm      = '';
-    public string $codTipoAct = '';
-    public string $fecha      = '';
-    public string $hora       = '';
-    public string $obs        = '';
-    public string $estado     = 'PROGRAMADA';
-
-    // ── Tracking ──────────────────────────────────────────────────────────────
-    public ?int $editandoId = null;
-    public ?int $detalleId  = null;
-
-    protected function rules(): array
+    public function abrirAgregarParticipante(): void
     {
-        return [
-            'codAm'      => 'required|exists:adulto_mayor,cod_am',
-            'codTipoAct' => 'required|exists:tipo_actividades_adulto,cod_tipo_act',
-            'fecha'      => 'required|date',
-            'hora'       => 'required',
-            'obs'        => 'nullable|string|max:2000',
-            'estado'     => 'required|string|max:50',
-        ];
+        $actividad = $this->getActividad();
+        if (! $actividad) {
+            return;
+        }
+
+        if ($actividad->estaCancelada()) {
+            $this->dispatch('swal', [
+                'icon'  => 'error',
+                'title' => 'Actividad cancelada',
+                'text'  => 'No se pueden agregar participantes a una actividad cancelada.',
+            ]);
+            return;
+        }
+
+        $this->resetFormAgregar();
+        $this->modalAgregar = true;
     }
 
-    protected function messages(): array
+    public function abrirDetalleParticipante(int $id): void
     {
-        return [
-            'codAm.required'      => 'Seleccione un adulto mayor.',
-            'codAm.exists'        => 'El adulto mayor seleccionado no es válido.',
-            'codTipoAct.required' => 'Seleccione el tipo de actividad.',
-            'codTipoAct.exists'   => 'El tipo de actividad no es válido.',
-            'fecha.required'      => 'La fecha es obligatoria.',
-            'hora.required'       => 'La hora es obligatoria.',
-            'estado.required'     => 'El estado es obligatorio.',
-        ];
+        $p = ActividadParticipante::find($id);
+        if (! $p) {
+            return;
+        }
+
+        $this->participanteId             = $id;
+        $this->editandoParticipante       = false;
+        $this->estadoAsistenciaEdit       = $p->estado_asistencia;
+        $this->nivelParticipacionEdit     = $p->nivel_participacion ?? 'NO_APLICA';
+        $this->estadoObservadoEdit        = $p->estado_observado ?? '';
+        $this->observacionIndividualEdit  = $p->observacion_individual ?? '';
+        $this->requiereSeguimientoEdit    = (bool) $p->requiere_seguimiento;
+        $this->modalParticipante          = true;
     }
 
-    public function updatingSearch(): void           { $this->resetPage(); }
-    public function updatingFiltroTipo(): void        { $this->resetPage(); }
-    public function updatingFiltroEstado(): void      { $this->resetPage(); }
-    public function updatingFiltroFechaDesde(): void  { $this->resetPage(); }
-    public function updatingFiltroFechaHasta(): void  { $this->resetPage(); }
-
-    // ── Apertura de modales ───────────────────────────────────────────────────
-    public function abrirRegistrar(): void
+    public function abrirEditarParticipante(int $id): void
     {
-        $this->resetForm();
-        $this->fecha  = today()->format('Y-m-d');
-        $this->estado = 'PROGRAMADA';
-        $this->modalRegistrar = true;
-    }
-
-    public function abrirEditar(int $id): void
-    {
-        $a = ActividadAdulto::findOrFail($id);
-        $this->editandoId  = $id;
-        $this->codAm       = $a->cod_am;
-        $this->codTipoAct  = (string) $a->cod_tipo_act;
-        $this->fecha       = $a->fecha->format('Y-m-d');
-        $this->hora        = substr($a->hora ?? '', 0, 5);
-        $this->obs         = $a->obs ?? '';
-        $this->estado      = $a->estado;
-        $this->resetValidation();
-        $this->modalEditar = true;
-    }
-
-    public function abrirDetalle(int $id): void
-    {
-        $this->detalleId    = $id;
-        $this->modalDetalle = true;
+        $this->abrirDetalleParticipante($id);
+        $this->editandoParticipante = true;
     }
 
     public function cerrarModales(): void
     {
-        $this->modalRegistrar = false;
-        $this->modalEditar    = false;
-        $this->modalDetalle   = false;
-        $this->resetForm();
+        $this->modalAgregar      = false;
+        $this->modalParticipante = false;
+        $this->resetFormAgregar();
+        $this->resetFormEditar();
     }
 
-    // ── CRUD ──────────────────────────────────────────────────────────────────
-    private function horaFormateada(): string
-    {
-        return strlen(trim($this->hora)) === 5 ? $this->hora . ':00' : $this->hora;
-    }
+    // ── CRUD participantes ────────────────────────────────────────────────────
 
-    private function existeDuplicado(?int $excluirId = null): bool
+    public function agregarParticipante(): void
     {
-        return ActividadAdulto::where('cod_am', $this->codAm)
-            ->where('cod_tipo_act', (int) $this->codTipoAct)
-            ->where('fecha', $this->fecha)
-            ->where('hora', $this->horaFormateada())
-            ->when($excluirId, fn($q) => $q->where('cod_act_adul', '!=', $excluirId))
-            ->exists();
-    }
+        $this->validate([
+            'codAmAgregar'                 => 'required|exists:adulto_mayor,cod_am',
+            'estadoAsistenciaAgregar'      => 'required|in:INSCRITO,ASISTIO,FALTO,JUSTIFICADO',
+            'nivelParticipacionAgregar'    => 'required|in:ALTA,MEDIA,BAJA,NO_APLICA',
+            'estadoObservadoAgregar'       => 'nullable|in:ACTIVO,TRANQUILO,AISLADO,IRRITABLE,CANSADO,COLABORADOR,DESORIENTADO',
+            'observacionIndividualAgregar' => 'nullable|string|max:1000',
+        ], [
+            'codAmAgregar.required'            => 'Seleccione un adulto mayor.',
+            'codAmAgregar.exists'              => 'El adulto mayor seleccionado no es válido.',
+            'estadoAsistenciaAgregar.required' => 'El estado de asistencia es obligatorio.',
+            'estadoAsistenciaAgregar.in'       => 'Estado de asistencia no válido.',
+            'nivelParticipacionAgregar.in'     => 'Nivel de participación no válido.',
+            'estadoObservadoAgregar.in'        => 'Estado observado no válido.',
+            'observacionIndividualAgregar.max' => 'La observación no puede superar 1000 caracteres.',
+        ]);
 
-    public function guardarParticipacion(): void
-    {
-        $this->validate();
+        $nivelFinal = $this->nivelParticipacionAgregar;
+        if (in_array($this->estadoAsistenciaAgregar, ['FALTO', 'JUSTIFICADO'])) {
+            $nivelFinal = 'NO_APLICA';
+        }
 
-        if ($this->existeDuplicado()) {
-            $this->dispatch('swal', [
-                'icon'  => 'error',
-                'title' => 'Participación duplicada',
-                'text'  => 'Este adulto mayor ya tiene registrada una participación del mismo tipo en la misma fecha y horario.',
+        try {
+            ActividadParticipante::create([
+                'cod_act_adul'          => $this->actividadId,
+                'cod_am'                => $this->codAmAgregar,
+                'estado_asistencia'     => $this->estadoAsistenciaAgregar,
+                'nivel_participacion'   => $nivelFinal,
+                'estado_observado'      => $this->estadoObservadoAgregar ?: null,
+                'observacion_individual'=> $this->observacionIndividualAgregar ?: null,
+                'requiere_seguimiento'  => $this->requiereSeguimientoAgregar,
+                'registrado_por'        => Auth::id(),
             ]);
+
+            $this->modalAgregar = false;
+            $this->resetFormAgregar();
+            $this->dispatch('swal', ['icon' => 'success', 'title' => 'Participante agregado correctamente.']);
+        } catch (\Illuminate\Database\QueryException $e) {
+            if (str_contains($e->getMessage(), 'uq_participante_actividad')) {
+                $this->dispatch('swal', [
+                    'icon'  => 'warning',
+                    'title' => 'Participante duplicado',
+                    'text'  => 'Este adulto mayor ya está inscrito en esta actividad.',
+                ]);
+            } else {
+                $this->dispatch('swal', ['icon' => 'error', 'title' => 'Error al agregar participante.']);
+            }
+        }
+    }
+
+    public function guardarParticipante(): void
+    {
+        $this->validate([
+            'estadoAsistenciaEdit'      => 'required|in:INSCRITO,ASISTIO,FALTO,JUSTIFICADO',
+            'nivelParticipacionEdit'    => 'required|in:ALTA,MEDIA,BAJA,NO_APLICA',
+            'estadoObservadoEdit'       => 'nullable|in:ACTIVO,TRANQUILO,AISLADO,IRRITABLE,CANSADO,COLABORADOR,DESORIENTADO',
+            'observacionIndividualEdit' => 'nullable|string|max:1000',
+        ], [
+            'estadoAsistenciaEdit.required' => 'El estado de asistencia es obligatorio.',
+            'estadoAsistenciaEdit.in'       => 'Estado de asistencia no válido.',
+            'nivelParticipacionEdit.in'     => 'Nivel de participación no válido.',
+            'estadoObservadoEdit.in'        => 'Estado observado no válido.',
+            'observacionIndividualEdit.max' => 'La observación no puede superar 1000 caracteres.',
+        ]);
+
+        $nivelFinal = $this->nivelParticipacionEdit;
+        if (in_array($this->estadoAsistenciaEdit, ['FALTO', 'JUSTIFICADO'])) {
+            $nivelFinal = 'NO_APLICA';
+        }
+
+        $p = ActividadParticipante::findOrFail($this->participanteId);
+        $p->update([
+            'estado_asistencia'     => $this->estadoAsistenciaEdit,
+            'nivel_participacion'   => $nivelFinal,
+            'estado_observado'      => $this->estadoObservadoEdit ?: null,
+            'observacion_individual'=> $this->observacionIndividualEdit ?: null,
+            'requiere_seguimiento'  => $this->requiereSeguimientoEdit,
+        ]);
+
+        $this->editandoParticipante = false;
+        $this->modalParticipante    = false;
+        $this->dispatch('swal', ['icon' => 'success', 'title' => 'Participación actualizada.']);
+    }
+
+    public function quitarParticipante(int $id): void
+    {
+        $p = ActividadParticipante::find($id);
+        if (! $p) {
             return;
         }
 
-        ActividadAdulto::create([
-            'cod_am'       => $this->codAm,
-            'cod_tipo_act' => (int) $this->codTipoAct,
-            'fecha'        => $this->fecha,
-            'hora'         => $this->horaFormateada(),
-            'obs'          => $this->obs ?: null,
-            'estado'       => strtoupper(trim($this->estado)),
-        ]);
-
-        $this->modalRegistrar = false;
-        $this->resetForm();
-        $this->dispatch('swal', ['icon' => 'success', 'title' => 'Participación registrada correctamente.']);
-    }
-
-    public function actualizarParticipacion(): void
-    {
-        $this->validate();
-
-        if ($this->existeDuplicado($this->editandoId)) {
-            $this->dispatch('swal', [
-                'icon'  => 'error',
-                'title' => 'Participación duplicada',
-                'text'  => 'Este adulto mayor ya tiene registrada una participación del mismo tipo en la misma fecha y horario.',
-            ]);
-            return;
-        }
-
-        $a = ActividadAdulto::findOrFail($this->editandoId);
-        $a->update([
-            'cod_am'       => $this->codAm,
-            'cod_tipo_act' => (int) $this->codTipoAct,
-            'fecha'        => $this->fecha,
-            'hora'         => $this->horaFormateada(),
-            'obs'          => $this->obs ?: null,
-            'estado'       => strtoupper(trim($this->estado)),
-        ]);
-
-        $this->modalEditar = false;
-        $this->resetForm();
-        $this->dispatch('swal', ['icon' => 'success', 'title' => 'Participación actualizada correctamente.']);
-    }
-
-    public function cancelarParticipacion(int $id): void
-    {
-        $a = ActividadAdulto::findOrFail($id);
-        $a->update(['estado' => 'CANCELADA']);
-        $this->dispatch('swal', ['icon' => 'success', 'title' => 'Participación cancelada. El registro se conserva como historial institucional.']);
+        $p->delete(); // SoftDelete
+        $this->dispatch('swal', ['icon' => 'success', 'title' => 'Participante removido. El registro se conserva en el historial.']);
     }
 
     public function limpiarFiltros(): void
     {
-        $this->search           = '';
-        $this->filtroTipo       = '';
-        $this->filtroEstado     = '';
+        $this->searchActividad  = '';
+        $this->filtroTipoAct    = '';
+        $this->filtroEstadoAct  = '';
         $this->filtroFechaDesde = '';
         $this->filtroFechaHasta = '';
         $this->resetPage();
     }
 
-    // ── Helpers ───────────────────────────────────────────────────────────────
-    private function resetForm(): void
+    // ── Helpers privados ──────────────────────────────────────────────────────
+
+    // ── Autocomplete adulto mayor ─────────────────────────────────────────────
+
+    public function seleccionarAdultoAgregar(string $codAm, string $nombre): void
     {
-        $this->codAm      = '';
-        $this->codTipoAct = '';
-        $this->fecha      = '';
-        $this->hora       = '';
-        $this->obs        = '';
-        $this->estado     = 'PROGRAMADA';
-        $this->editandoId = null;
-        $this->detalleId  = null;
+        $this->codAmAgregar             = $codAm;
+        $this->nombreAdultoSeleccionado = $nombre;
+        $this->searchAdultoAgregar      = '';
+    }
+
+    public function limpiarAdultoAgregar(): void
+    {
+        $this->codAmAgregar             = '';
+        $this->nombreAdultoSeleccionado = '';
+        $this->searchAdultoAgregar      = '';
+    }
+
+    private function resetFormAgregar(): void
+    {
+        $this->searchAdultoAgregar          = '';
+        $this->codAmAgregar                 = '';
+        $this->nombreAdultoSeleccionado     = '';
+        $this->estadoAsistenciaAgregar      = 'INSCRITO';
+        $this->nivelParticipacionAgregar    = 'NO_APLICA';
+        $this->estadoObservadoAgregar       = '';
+        $this->observacionIndividualAgregar = '';
+        $this->requiereSeguimientoAgregar   = false;
         $this->resetValidation();
     }
 
-    private function tablaExiste(): bool
+    private function resetFormEditar(): void
     {
-        return Schema::hasTable('actividades_adulto');
+        $this->participanteId            = null;
+        $this->editandoParticipante      = false;
+        $this->estadoAsistenciaEdit      = 'INSCRITO';
+        $this->nivelParticipacionEdit    = 'NO_APLICA';
+        $this->estadoObservadoEdit       = '';
+        $this->observacionIndividualEdit = '';
+        $this->requiereSeguimientoEdit   = false;
+        $this->resetValidation();
+    }
+
+    private function getActividad(): ?ActividadAdulto
+    {
+        return $this->actividadId
+            ? ActividadAdulto::with(['tipoActividad'])->find($this->actividadId)
+            : null;
+    }
+
+    private function getParticipantes()
+    {
+        if (! $this->actividadId) {
+            return collect();
+        }
+        return ActividadParticipante::with(['adultoMayor'])
+            ->where('cod_act_adul', $this->actividadId)
+            ->when($this->searchParticipante, fn($q) =>
+                $q->whereHas('adultoMayor', fn($sq) =>
+                    $sq->where('nombres', 'ilike', '%' . $this->searchParticipante . '%')
+                      ->orWhere('ap_paterno', 'ilike', '%' . $this->searchParticipante . '%')
+                      ->orWhere('ci', 'ilike', '%' . $this->searchParticipante . '%')
+                )
+            )
+            ->orderBy('created_at')
+            ->get();
+    }
+
+    private function getActividades()
+    {
+        return ActividadAdulto::with(['tipoActividad'])
+            ->withCount(['participantesActivos as total_participantes'])
+            ->when($this->searchActividad, fn($q) =>
+                $q->where(fn($s) =>
+                    $s->where('nombre', 'ilike', '%' . $this->searchActividad . '%')
+                      ->orWhereHas('tipoActividad', fn($t) =>
+                            $t->where('tipo', 'ilike', '%' . $this->searchActividad . '%'))
+                )
+            )
+            ->when($this->filtroTipoAct, fn($q) => $q->where('cod_tipo_act', (int) $this->filtroTipoAct))
+            ->when($this->filtroEstadoAct, fn($q) => $q->where('estado', $this->filtroEstadoAct))
+            ->when($this->filtroFechaDesde, fn($q) => $q->whereDate('fecha', '>=', $this->filtroFechaDesde))
+            ->when($this->filtroFechaHasta, fn($q) => $q->whereDate('fecha', '<=', $this->filtroFechaHasta))
+            ->orderByDesc('fecha')
+            ->orderByDesc('hora')
+            ->paginate(12);
+    }
+
+    private function getAdultosDisponibles()
+    {
+        // Sin búsqueda activa no cargamos la lista (autocomplete bajo demanda)
+        if (strlen(trim($this->searchAdultoAgregar)) < 2) {
+            return collect();
+        }
+
+        $yaInscritos = ActividadParticipante::where('cod_act_adul', $this->actividadId)
+            ->whereNull('deleted_at')
+            ->pluck('cod_am');
+
+        return AdultoMayor::select('cod_am', 'nombres', 'ap_paterno', 'ap_materno', 'ci')
+            ->whereNull('archivado_en')
+            ->whereNotIn('cod_am', $yaInscritos)
+            ->where(fn($q) =>
+                $q->where('nombres', 'ilike', '%' . $this->searchAdultoAgregar . '%')
+                  ->orWhere('ap_paterno', 'ilike', '%' . $this->searchAdultoAgregar . '%')
+                  ->orWhere('ap_materno', 'ilike', '%' . $this->searchAdultoAgregar . '%')
+                  ->orWhere('ci', 'ilike', '%' . $this->searchAdultoAgregar . '%')
+            )
+            ->orderBy('ap_paterno')
+            ->limit(8)
+            ->get();
+    }
+
+    private function getAlertasPorParticipante(): array
+    {
+        if (! $this->actividadId) {
+            return [];
+        }
+
+        $alertas = [];
+        $participantes = ActividadParticipante::where('cod_act_adul', $this->actividadId)
+            ->whereNull('deleted_at')
+            ->get();
+
+        foreach ($participantes as $p) {
+            $flags = [];
+
+            if ($p->requiere_seguimiento) {
+                $flags[] = 'seguimiento';
+            }
+
+            if (in_array($p->estado_observado, ['AISLADO', 'IRRITABLE', 'DESORIENTADO'])) {
+                $flags[] = 'observacion';
+            }
+
+            // 3 faltas consecutivas (últimos 3 registros del adulto)
+            $ultimas3 = ActividadParticipante::where('cod_am', $p->cod_am)
+                ->whereNull('deleted_at')
+                ->latest('created_at')
+                ->limit(3)
+                ->pluck('estado_asistencia')
+                ->toArray();
+
+            if (count($ultimas3) === 3 && count(array_filter($ultimas3, fn($e) => in_array($e, ['FALTO', 'JUSTIFICADO']))) === 3) {
+                $flags[] = 'faltas_consecutivas';
+            }
+
+            // 3 participaciones bajas consecutivas
+            $ultimas3niv = ActividadParticipante::where('cod_am', $p->cod_am)
+                ->whereNull('deleted_at')
+                ->where('estado_asistencia', 'ASISTIO')
+                ->latest('created_at')
+                ->limit(3)
+                ->pluck('nivel_participacion')
+                ->toArray();
+
+            if (count($ultimas3niv) === 3 && count(array_filter($ultimas3niv, fn($n) => $n === 'BAJA')) === 3) {
+                $flags[] = 'participacion_baja';
+            }
+
+            if (! empty($flags)) {
+                $alertas[$p->id] = $flags;
+            }
+        }
+
+        return $alertas;
     }
 
     private function getStats(): array
     {
-        $zero = array_fill_keys(
-            ['total', 'adultos_distintos', 'tipos_distintos', 'programadas', 'realizadas', 'canceladas', 'hoy', 'proximas'],
-            0
-        );
-        if (! $this->tablaExiste()) {
-            return $zero;
-        }
         return [
-            'total'           => ActividadAdulto::count(),
-            'adultos_distintos'=> ActividadAdulto::distinct('cod_am')->count('cod_am'),
-            'tipos_distintos'  => ActividadAdulto::distinct('cod_tipo_act')->count('cod_tipo_act'),
-            'programadas'      => ActividadAdulto::where('estado', 'PROGRAMADA')->count(),
-            'realizadas'       => ActividadAdulto::whereIn('estado', ['COMPLETADA', 'REALIZADA'])->count(),
-            'canceladas'       => ActividadAdulto::where('estado', 'CANCELADA')->count(),
-            'hoy'              => ActividadAdulto::whereDate('fecha', today())->count(),
-            'proximas'         => ActividadAdulto::where('estado', 'PROGRAMADA')
-                                    ->where('fecha', '>=', today())
-                                    ->count(),
+            'total'          => ActividadAdulto::count(),
+            'con_participantes' => ActividadAdulto::has('participantesActivos')->count(),
+            'total_inscritos'   => ActividadParticipante::whereNull('deleted_at')->count(),
+            'requieren_seguimiento' => ActividadParticipante::whereNull('deleted_at')
+                ->where('requiere_seguimiento', true)->count(),
         ];
-    }
-
-    private function getParticipaciones()
-    {
-        if (! $this->tablaExiste()) {
-            return ActividadAdulto::paginate(12);
-        }
-        return ActividadAdulto::with(['tipoActividad', 'adultoMayor'])
-            ->when($this->search, fn($q) =>
-                $q->whereHas('adultoMayor', fn($sq) =>
-                    $sq->where('nombres', 'ilike', '%' . $this->search . '%')
-                      ->orWhere('ap_paterno', 'ilike', '%' . $this->search . '%')
-                      ->orWhere('ap_materno', 'ilike', '%' . $this->search . '%')
-                )
-            )
-            ->when($this->filtroTipo,       fn($q) => $q->where('cod_tipo_act', (int) $this->filtroTipo))
-            ->when($this->filtroEstado,     fn($q) => $q->where('estado', $this->filtroEstado))
-            ->when($this->filtroFechaDesde, fn($q) => $q->where('fecha', '>=', $this->filtroFechaDesde))
-            ->when($this->filtroFechaHasta, fn($q) => $q->where('fecha', '<=', $this->filtroFechaHasta))
-            ->orderByDesc('fecha')
-            ->orderByDesc('hora')
-            ->paginate(12);
     }
 
     private function getTipos()
@@ -263,47 +423,23 @@ class ParticipacionPanel extends Component
         return TipoActividadAdulto::orderBy('tipo')->get();
     }
 
-    private function getAdultos()
-    {
-        return AdultoMayor::select('cod_am', 'nombres', 'ap_paterno', 'ap_materno')
-            ->whereNull('archivado_en')
-            ->orderBy('ap_paterno')
-            ->orderBy('nombres')
-            ->get();
-    }
-
-    private function getDetalle(): ?ActividadAdulto
-    {
-        return $this->detalleId
-            ? ActividadAdulto::with(['tipoActividad', 'adultoMayor'])->find($this->detalleId)
-            : null;
-    }
-
-    private function getParticipacionPorTipo()
-    {
-        if (! $this->tablaExiste()) {
-            return collect();
-        }
-        return DB::table('actividades_adulto')
-            ->leftJoin('tipo_actividades_adulto', 'actividades_adulto.cod_tipo_act', '=', 'tipo_actividades_adulto.cod_tipo_act')
-            ->select('tipo_actividades_adulto.tipo', DB::raw('count(*) as total'))
-            ->whereNull('actividades_adulto.deleted_at')
-            ->groupBy('tipo_actividades_adulto.tipo')
-            ->orderByDesc('total')
-            ->get();
-    }
-
     public function render()
     {
-        $porTipo = $this->getParticipacionPorTipo();
+        $actividad    = $this->getActividad();
+        $participantes = $this->getParticipantes();
+        $alertas      = $this->getAlertasPorParticipante();
+
         return view('livewire.admin.actividades.participacion-panel', [
-            'stats'               => $this->getStats(),
-            'participaciones'     => $this->getParticipaciones(),
-            'tipos'               => $this->getTipos(),
-            'adultos'             => $this->getAdultos(),
-            'detalle'             => $this->getDetalle(),
-            'participacionPorTipo'=> $porTipo,
-            'maximo'              => $porTipo->max('total') ?: 1,
+            'actividad'          => $actividad,
+            'participantes'      => $participantes,
+            'alertas'            => $alertas,
+            'actividades'        => $this->viewMode === 'lista' ? $this->getActividades() : collect(),
+            'adultos'            => $this->modalAgregar ? $this->getAdultosDisponibles() : collect(),
+            'tipos'              => $this->getTipos(),
+            'stats'              => $this->getStats(),
+            'detalleParticipante'=> $this->participanteId
+                ? ActividadParticipante::with('adultoMayor')->find($this->participanteId)
+                : null,
         ])->layout('layouts.sistema');
     }
 }

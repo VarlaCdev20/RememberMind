@@ -3,8 +3,10 @@
 namespace App\Livewire\Admin\AdultosMayores\Salud;
 
 use Livewire\Component;
+use App\Models\AdultoMayor;
 use App\Models\ValoracionFuncionalAdulto;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 
 class ValoracionFuncionalAdultoModal extends Component
 {
@@ -53,6 +55,9 @@ class ValoracionFuncionalAdultoModal extends Component
 
     public function abrirModalValoracion($cod_am, $id_val = null)
     {
+        $adulto = AdultoMayor::findOrFail($cod_am);
+        Gate::authorize('viewClinicalData', $adulto);
+
         $this->resetValidation();
         $this->cod_am = $cod_am;
         
@@ -79,6 +84,7 @@ class ValoracionFuncionalAdultoModal extends Component
     public function cargarDatos()
     {
         $val = ValoracionFuncionalAdulto::findOrFail($this->cod_val_func);
+        abort_if($val->cod_am !== $this->cod_am, 403);
         
         $this->fecha_valoracion = $val->fecha_valoracion ? $val->fecha_valoracion->format('Y-m-d') : null;
         $this->come_solo = $val->come_solo;
@@ -152,6 +158,8 @@ class ValoracionFuncionalAdultoModal extends Component
     public function guardar()
     {
         $this->validate();
+        $adulto = AdultoMayor::findOrFail($this->cod_am);
+        Gate::authorize('viewClinicalData', $adulto);
 
         $datos = [
             'cod_am' => $this->cod_am,
@@ -178,6 +186,7 @@ class ValoracionFuncionalAdultoModal extends Component
 
         if ($this->isEditing) {
             $val = ValoracionFuncionalAdulto::findOrFail($this->cod_val_func);
+            abort_if($val->cod_am !== $this->cod_am, 403);
             $val->update($datos);
             $mensaje = 'Valoración funcional actualizada correctamente.';
         } else {

@@ -44,8 +44,8 @@ class StoreAdultoMayorRequest extends FormRequest
         return [
             // Identidad
             'nombres' => ['required', 'string', 'min:2', 'max:100', 'regex:/^[\pL\s\'-]+$/u'],
-            'ap_paterno' => ['required', 'string', 'min:2', 'max:100', 'regex:/^[\pL\s\'-]+$/u'],
-            'ap_materno' => ['nullable', 'string', 'min:2', 'max:100', 'regex:/^[\pL\s\'-]+$/u'],
+            'ap_paterno' => ['required_without:ap_materno', 'nullable', 'string', 'min:2', 'max:100', 'regex:/^[\pL\s\'-]+$/u'],
+            'ap_materno' => ['required_without:ap_paterno', 'nullable', 'string', 'min:2', 'max:100', 'regex:/^[\pL\s\'-]+$/u'],
             'ci' => ['required', 'string', 'regex:/^[0-9]{5,9}$/'],
             'complemento_ci' => ['nullable', 'string', 'regex:/^[A-Za-z0-9]{1,2}$/'],
             'expedicion_ci' => ['required', 'string', 'in:LP,SC,CB,OR,PT,CH,TJ,BE,PA'],
@@ -70,7 +70,7 @@ class StoreAdultoMayorRequest extends FormRequest
             'calle' => ['required', 'string', 'min:3', 'max:150'],
 
             // Información Médica Base
-            'fecha_nac' => ['required', 'date', 'before:today'],
+            'fecha_nac' => ['required', 'date', 'before_or_equal:' . now()->subYears(60)->format('Y-m-d')],
             'genero' => ['required', 'string', 'in:MASCULINO,FEMENINO,OTRO'],
             'grupo_sanguineo' => ['required', 'string', 'in:A+,A-,B+,B-,AB+,AB-,O+,O-'],
             'alergias' => ['required', 'string', 'max:1000'],
@@ -104,7 +104,7 @@ class StoreAdultoMayorRequest extends FormRequest
         return [
             'nombres.required' => 'El nombre es obligatorio.',
             'nombres.regex' => 'El nombre solo puede contener letras.',
-            'ap_paterno.required' => 'El apellido paterno es obligatorio.',
+            'ap_paterno.required_without' => 'Debe registrar al menos un apellido (paterno o materno).',
             'ap_paterno.regex' => 'El apellido paterno solo puede contener letras.',
             'ci.required' => 'El carnet de identidad es obligatorio.',
             'ci.regex' => 'El CI debe contener entre 5 y 9 dígitos.',
@@ -113,7 +113,7 @@ class StoreAdultoMayorRequest extends FormRequest
             'celular.required_if' => 'El celular es obligatorio si indica que tiene uno.',
             'celular.regex' => 'El celular debe tener 8 dígitos y comenzar con 6 o 7.',
             'fecha_nac.required' => 'La fecha de nacimiento es obligatoria.',
-            'fecha_nac.before' => 'La fecha de nacimiento debe ser anterior a hoy.',
+            'fecha_nac.before_or_equal' => 'El adulto mayor debe tener al menos 60 años de edad cumplidos.',
             'genero.required' => 'El género es obligatorio.',
             'grupo_sanguineo.required' => 'Debe seleccionar un grupo sanguíneo válido.',
             'alergias.required' => 'Debe indicar alergias o seleccionar Ninguna.',

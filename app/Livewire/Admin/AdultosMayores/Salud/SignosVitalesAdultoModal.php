@@ -3,8 +3,10 @@
 namespace App\Livewire\Admin\AdultosMayores\Salud;
 
 use Livewire\Component;
+use App\Models\AdultoMayor;
 use App\Models\SignosVitalesAdulto;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 
 class SignosVitalesAdultoModal extends Component
 {
@@ -58,6 +60,9 @@ class SignosVitalesAdultoModal extends Component
 
     public function abrirModalSignos($cod_am, $id_signo = null)
     {
+        $adulto = AdultoMayor::findOrFail($cod_am);
+        Gate::authorize('viewClinicalData', $adulto);
+
         $this->resetValidation();
         $this->cod_am = $cod_am;
         
@@ -84,6 +89,7 @@ class SignosVitalesAdultoModal extends Component
     public function cargarDatos()
     {
         $signo = SignosVitalesAdulto::findOrFail($this->cod_signo);
+        abort_if($signo->cod_am !== $this->cod_am, 403);
         
         $this->fecha = $signo->fecha ? $signo->fecha->format('Y-m-d') : null;
         $this->hora = $signo->hora ? \Carbon\Carbon::parse($signo->hora)->format('H:i') : null;
@@ -136,6 +142,8 @@ class SignosVitalesAdultoModal extends Component
     public function guardar()
     {
         $this->validate();
+        $adulto = AdultoMayor::findOrFail($this->cod_am);
+        Gate::authorize('viewClinicalData', $adulto);
 
         // Validar que al menos haya un signo vital
         if (empty($this->presion_arterial) && empty($this->frecuencia_cardiaca) && empty($this->temperatura) && 
@@ -162,6 +170,7 @@ class SignosVitalesAdultoModal extends Component
 
         if ($this->isEditing) {
             $signo = SignosVitalesAdulto::findOrFail($this->cod_signo);
+            abort_if($signo->cod_am !== $this->cod_am, 403);
             $signo->update($datos);
             $mensaje = 'Signos vitales actualizados correctamente.';
         } else {

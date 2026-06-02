@@ -101,9 +101,16 @@ public function show(AdultoMayor $adulto_mayor)
     $observacionesActivas = $adulto->observaciones()->latest()->get();
     $observacionesAnuladas = $adulto->observaciones()->onlyTrashed()->latest('deleted_at')->get();
 
-    // Actividades - Divididas por SoftDeletes
-    $actividadesActivas = $adulto->actividades()->latest()->get();
-    $actividadesAnuladas = $adulto->actividades()->onlyTrashed()->latest('deleted_at')->get();
+    // Actividades directas - Divididas por SoftDeletes
+    $actividadesActivas = $adulto->actividades()->with('tipoActividad')->latest()->get();
+    $actividadesAnuladas = $adulto->actividades()->onlyTrashed()->with('tipoActividad')->latest('deleted_at')->get();
+
+    // Participaciones grupales (actividad_participantes — Fase 2)
+    $participacionesGrupales = \App\Models\ActividadParticipante::with(['actividad.tipoActividad'])
+        ->where('cod_am', $adulto_mayor->cod_am)
+        ->whereNull('deleted_at')
+        ->latest('created_at')
+        ->get();
 
     // Atenciones - Divididas por SoftDeletes
     $atencionesActivas = $adulto->atenciones()->latest()->get();
@@ -157,6 +164,7 @@ public function show(AdultoMayor $adulto_mayor)
         'observacionesAnuladas',
         'actividadesActivas',
         'actividadesAnuladas',
+        'participacionesGrupales',
         'atencionesActivas',
         'atencionesAnuladas',
         'documentosActivos',
@@ -372,17 +380,18 @@ public function show(AdultoMayor $adulto_mayor)
 
     public function reporteGeneral()
     {
-    $adultos = AdultoMayor::with('estado')->get();
+    $adultos = AdultoMayor::query()->visiblesClinicamentePara(auth()->user())->with('estado')->get();
+    $codigosAdultos = $adultos->pluck('cod_am')->all();
     
-    $totalObservaciones = \App\Models\ObsAdulto::count();
-    $totalAtenciones = \App\Models\AtencionAdulto::count();
-    $totalActividades = \App\Models\ActividadAdulto::count();
-    $totalDocumentos = \App\Models\DocumentoAdultoMayor::count();
-    $totalEvaluaciones = \App\Models\EvaluacionCognitiva::count();
+    $totalObservaciones = \App\Models\ObsAdulto::whereIn('cod_am', $codigosAdultos)->count();
+    $totalAtenciones = \App\Models\AtencionAdulto::whereIn('cod_am', $codigosAdultos)->count();
+    $totalActividades = \App\Models\ActividadAdulto::whereIn('cod_am', $codigosAdultos)->count();
+    $totalDocumentos = \App\Models\DocumentoAdultoMayor::whereIn('cod_am', $codigosAdultos)->count();
+    $totalEvaluaciones = \App\Models\EvaluacionCognitiva::whereIn('cod_am', $codigosAdultos)->count();
 
     // Adultos sin seguimiento (sin observaciones ni atenciones en los últimos 30 días)
     $hace30Dias = now()->subDays(30);
-    $sinSeguimiento = AdultoMayor::whereDoesntHave('observaciones', function($q) use ($hace30Dias) {
+    $sinSeguimiento = AdultoMayor::query()->visiblesClinicamentePara(auth()->user())->whereDoesntHave('observaciones', function($q) use ($hace30Dias) {
         $q->where('fecha', '>=', $hace30Dias);
     })->whereDoesntHave('atenciones', function($q) use ($hace30Dias) {
         $q->where('fecha', '>=', $hace30Dias);
@@ -401,7 +410,7 @@ public function show(AdultoMayor $adulto_mayor)
         'doc_totales' => $totalDocumentos,
         'eval_totales' => $totalEvaluaciones,
         'sin_seguimiento' => $sinSeguimiento,
-        'ultimos_adultos' => AdultoMayor::latest()->take(5)->get(),
+        'ultimos_adultos' => AdultoMayor::query()->visiblesClinicamentePara(auth()->user())->latest()->take(5)->get(),
     ];
 
     return view('admin.adultos-mayores.reportes.general', compact('adultos', 'stats'));
@@ -410,10 +419,11 @@ public function show(AdultoMayor $adulto_mayor)
     public function reporteInstitucional()
     {
         // Este reporte es más orientado a impacto y estadísticas globales
-        $adultos = AdultoMayor::all();
-        $totalAtenciones = \App\Models\AtencionAdulto::count();
-        $totalActividades = \App\Models\ActividadAdulto::count();
-        $totalEvaluaciones = \App\Models\EvaluacionCognitiva::count();
+        $adultos = AdultoMayor::query()->visiblesClinicamentePara(auth()->user())->get();
+        $codigosAdultos = $adultos->pluck('cod_am')->all();
+        $totalAtenciones = \App\Models\AtencionAdulto::whereIn('cod_am', $codigosAdultos)->count();
+        $totalActividades = \App\Models\ActividadAdulto::whereIn('cod_am', $codigosAdultos)->count();
+        $totalEvaluaciones = \App\Models\EvaluacionCognitiva::whereIn('cod_am', $codigosAdultos)->count();
 
         $stats = [
             'poblacion' => $adultos->count(),
@@ -428,13 +438,14 @@ public function show(AdultoMayor $adulto_mayor)
 
     public function reporteBienestar()
     {
-        $adultos = AdultoMayor::all();
-        $totalEvaluaciones = \App\Models\EvaluacionCognitiva::count();
+        $adultos = AdultoMayor::query()->visiblesClinicamentePara(auth()->user())->get();
+        $codigosAdultos = $adultos->pluck('cod_am')->all();
+        $totalEvaluaciones = \App\Models\EvaluacionCognitiva::whereIn('cod_am', $codigosAdultos)->count();
         
         $distribucionRiesgo = [
-            'bajo' => \App\Models\EvaluacionCognitiva::where('nivel_riesgo', 'BAJO')->count(),
-            'medio' => \App\Models\EvaluacionCognitiva::where('nivel_riesgo', 'MEDIO')->count(),
-            'alto' => \App\Models\EvaluacionCognitiva::where('nivel_riesgo', 'ALTO')->count(),
+            'bajo' => \App\Models\EvaluacionCognitiva::whereIn('cod_am', $codigosAdultos)->where('nivel_riesgo', 'BAJO')->count(),
+            'medio' => \App\Models\EvaluacionCognitiva::whereIn('cod_am', $codigosAdultos)->where('nivel_riesgo', 'MEDIO')->count(),
+            'alto' => \App\Models\EvaluacionCognitiva::whereIn('cod_am', $codigosAdultos)->where('nivel_riesgo', 'ALTO')->count(),
         ];
 
         return view('admin.adultos-mayores.reportes.bienestar', compact('distribucionRiesgo', 'totalEvaluaciones'));

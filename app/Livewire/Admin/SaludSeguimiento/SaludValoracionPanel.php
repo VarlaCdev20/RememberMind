@@ -383,7 +383,9 @@ class SaludValoracionPanel extends Component
             ->first();
 
         $viendoDetalle = $this->viendoId
-            ? ValoracionFuncionalAdulto::with(['registradoPor', 'anuladoPor'])->find($this->viendoId)
+            ? ValoracionFuncionalAdulto::with(['registradoPor', 'anuladoPor'])
+                ->where('cod_am', $this->adulto->cod_am)
+                ->find($this->viendoId)
             : null;
 
         return view('livewire.admin.salud-seguimiento.salud-valoracion-funcional', [

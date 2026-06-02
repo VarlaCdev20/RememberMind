@@ -286,6 +286,17 @@ Route::middleware([
                     Route::get('/participacion', \App\Livewire\Admin\Actividades\ParticipacionPanel::class)->name('participacion');
                     Route::get('/asistencia', \App\Livewire\Admin\Actividades\AsistenciaPanel::class)->name('asistencia');
                     Route::get('/reportes', \App\Livewire\Admin\Actividades\ReportesActividadesPanel::class)->name('reportes');
+
+                    // ── FASE 4: Calendario ────────────────────────────────────
+                    Route::get('/calendario', \App\Livewire\Admin\Actividades\CalendarioActividadesPanel::class)
+                        ->name('calendario');
+                    Route::get('/eventos', [\App\Http\Controllers\Admin\ActividadCalendarioController::class, 'eventos'])
+                        ->name('eventos');
+                    Route::get('/{actividad}/detalle-json', [\App\Http\Controllers\Admin\ActividadCalendarioController::class, 'detalleJson'])
+                        ->name('detalle-json');
+                    Route::patch('/{actividad}/reprogramar', [\App\Http\Controllers\Admin\ActividadCalendarioController::class, 'reprogramar'])
+                        ->middleware('permission:actividades.editar')
+                        ->name('reprogramar');
                 });
 
             // Voluntariado

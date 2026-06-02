@@ -3,8 +3,10 @@
 namespace App\Livewire\Admin\AdultosMayores\Salud;
 
 use Livewire\Component;
+use App\Models\AdultoMayor;
 use App\Models\FichaMedicaAdulto;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 
 class FichaMedicaAdultoModal extends Component
 {
@@ -59,6 +61,9 @@ class FichaMedicaAdultoModal extends Component
 
     public function abrirModalFichaMedica($cod_am, $id_ficha = null)
     {
+        $adulto = AdultoMayor::findOrFail($cod_am);
+        Gate::authorize('viewClinicalData', $adulto);
+
         $this->resetValidation();
         $this->cod_am = $cod_am;
         
@@ -84,6 +89,7 @@ class FichaMedicaAdultoModal extends Component
     public function cargarDatos()
     {
         $ficha = FichaMedicaAdulto::findOrFail($this->cod_ficha_medica);
+        abort_if($ficha->cod_am !== $this->cod_am, 403);
         
         $this->hipertension = $ficha->hipertension;
         $this->diabetes = $ficha->diabetes;
@@ -131,6 +137,8 @@ class FichaMedicaAdultoModal extends Component
     public function guardar()
     {
         $this->validate();
+        $adulto = AdultoMayor::findOrFail($this->cod_am);
+        Gate::authorize('viewClinicalData', $adulto);
 
         $datos = [
             'cod_am' => $this->cod_am,
@@ -157,6 +165,7 @@ class FichaMedicaAdultoModal extends Component
 
         if ($this->isEditing) {
             $ficha = FichaMedicaAdulto::findOrFail($this->cod_ficha_medica);
+            abort_if($ficha->cod_am !== $this->cod_am, 403);
             $ficha->update($datos);
             $mensaje = 'Ficha médica actualizada correctamente.';
         } else {

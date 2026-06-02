@@ -8,11 +8,14 @@ use App\Http\Requests\Admin\AdultosMayores\Salud\UpdateMedicacionRequest;
 use App\Models\AdultoMayor;
 use App\Models\MedicacionAdulto;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 
 class AdultoMayorMedicacionController extends Controller
 {
     public function store(StoreMedicacionRequest $request, AdultoMayor $adulto_mayor)
     {
+        Gate::authorize('viewClinicalData', $adulto_mayor);
+
         try {
             DB::beginTransaction();
 
@@ -40,6 +43,9 @@ class AdultoMayorMedicacionController extends Controller
 
     public function update(UpdateMedicacionRequest $request, AdultoMayor $adulto_mayor, MedicacionAdulto $medicacion)
     {
+        Gate::authorize('viewClinicalData', $adulto_mayor);
+        abort_if($medicacion->cod_am !== $adulto_mayor->cod_am, 403);
+
         try {
             DB::beginTransaction();
             $medicacion->update($request->validated());
@@ -59,6 +65,9 @@ class AdultoMayorMedicacionController extends Controller
 
     public function suspender(AdultoMayor $adulto_mayor, MedicacionAdulto $medicacion)
     {
+        Gate::authorize('viewClinicalData', $adulto_mayor);
+        abort_if($medicacion->cod_am !== $adulto_mayor->cod_am, 403);
+
         $medicacion->update(['estado' => 'SUSPENDIDO']);
 
         activity('Medicación')
@@ -75,6 +84,9 @@ class AdultoMayorMedicacionController extends Controller
 
     public function finalizar(AdultoMayor $adulto_mayor, MedicacionAdulto $medicacion)
     {
+        Gate::authorize('viewClinicalData', $adulto_mayor);
+        abort_if($medicacion->cod_am !== $adulto_mayor->cod_am, 403);
+
         $medicacion->update([
             'estado'    => 'FINALIZADO',
             'fecha_fin' => now()->toDateString(),
@@ -94,6 +106,9 @@ class AdultoMayorMedicacionController extends Controller
 
     public function archivar(AdultoMayor $adulto_mayor, MedicacionAdulto $medicacion)
     {
+        Gate::authorize('viewClinicalData', $adulto_mayor);
+        abort_if($medicacion->cod_am !== $adulto_mayor->cod_am, 403);
+
         $medicacion->update(['estado' => 'ARCHIVADO']);
         $medicacion->delete(); // SoftDelete
 
@@ -104,7 +119,10 @@ class AdultoMayorMedicacionController extends Controller
 
     public function restore(AdultoMayor $adulto_mayor, $medicacion)
     {
+        Gate::authorize('viewClinicalData', $adulto_mayor);
+
         $med = MedicacionAdulto::withTrashed()->findOrFail($medicacion);
+        abort_if($med->cod_am !== $adulto_mayor->cod_am, 403);
         $med->restore();
         $med->update(['estado' => 'ACTIVO']);
 

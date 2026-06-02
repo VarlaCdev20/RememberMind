@@ -653,6 +653,61 @@ class ReporteDataService
             ->get();
     }
 
+    /**
+     * Lista enriquecida con participantes, asistencia y evaluación.
+     * Usada por el Excel de Fase 5.
+     */
+    public function actividadesListaEnriquecida(int $limite = 500): \Illuminate\Support\Collection
+    {
+        if (!Schema::hasTable('actividades_adulto')) {
+            return collect();
+        }
+
+        return DB::table('actividades_adulto as aa')
+            ->leftJoin('tipo_actividades_adulto as ta', 'aa.cod_tipo_act', '=', 'ta.cod_tipo_act')
+            ->leftJoin('adulto_mayor as am', 'aa.cod_am', '=', 'am.cod_am')
+            ->leftJoin(DB::raw("(
+                SELECT
+                    cod_act_adul,
+                    COUNT(*)                                                          AS total_participantes,
+                    SUM(CASE WHEN estado_asistencia = 'ASISTIO'      THEN 1 ELSE 0 END) AS asistieron,
+                    SUM(CASE WHEN estado_asistencia = 'FALTO'        THEN 1 ELSE 0 END) AS faltaron,
+                    SUM(CASE WHEN estado_asistencia = 'JUSTIFICADO'  THEN 1 ELSE 0 END) AS justificados,
+                    SUM(CASE WHEN requiere_seguimiento = true         THEN 1 ELSE 0 END) AS seguimiento
+                FROM actividad_participantes
+                WHERE deleted_at IS NULL
+                GROUP BY cod_act_adul
+            ) AS ap_agg"), 'ap_agg.cod_act_adul', '=', 'aa.cod_act_adul')
+            ->whereNull('aa.deleted_at')
+            ->select(
+                'aa.cod_act_adul',
+                'aa.nombre',
+                'ta.tipo as tipo_actividad',
+                'ta.categoria',
+                DB::raw("CASE WHEN am.cod_am IS NOT NULL THEN CONCAT(am.nombres,' ',am.ap_paterno) ELSE NULL END AS adulto"),
+                'aa.fecha',
+                'aa.hora',
+                'aa.hora_fin',
+                'aa.lugar',
+                'aa.responsable_id',
+                'aa.estado',
+                DB::raw('COALESCE(ap_agg.total_participantes, 0) AS total_participantes'),
+                DB::raw('COALESCE(ap_agg.asistieron, 0)          AS asistieron'),
+                DB::raw('COALESCE(ap_agg.faltaron, 0)            AS faltaron'),
+                DB::raw('COALESCE(ap_agg.justificados, 0)        AS justificados'),
+                DB::raw('COALESCE(ap_agg.seguimiento, 0)         AS seguimiento'),
+                'aa.resultado_general',
+                'aa.nivel_cumplimiento',
+                'aa.evaluacion_final',
+                'aa.incidencias',
+                'aa.recomendaciones',
+                'aa.obs'
+            )
+            ->orderByDesc('aa.fecha')
+            ->limit($limite)
+            ->get();
+    }
+
     public function actividadesPorMes(): array
     {
         if (!Schema::hasTable('actividades_adulto')) {

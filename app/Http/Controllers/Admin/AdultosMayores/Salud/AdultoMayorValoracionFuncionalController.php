@@ -6,11 +6,14 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\AdultosMayores\Salud\StoreValoracionFuncionalRequest;
 use App\Models\AdultoMayor;
 use App\Models\ValoracionFuncionalAdulto;
+use Illuminate\Support\Facades\Gate;
 
 class AdultoMayorValoracionFuncionalController extends Controller
 {
     public function store(StoreValoracionFuncionalRequest $request, AdultoMayor $adulto_mayor)
     {
+        Gate::authorize('viewClinicalData', $adulto_mayor);
+
         try {
             $valoracion = ValoracionFuncionalAdulto::create(array_merge(
                 $request->validated(),
@@ -33,6 +36,9 @@ class AdultoMayorValoracionFuncionalController extends Controller
 
     public function update(StoreValoracionFuncionalRequest $request, AdultoMayor $adulto_mayor, ValoracionFuncionalAdulto $valoracion)
     {
+        Gate::authorize('viewClinicalData', $adulto_mayor);
+        abort_if($valoracion->cod_am !== $adulto_mayor->cod_am, 403);
+
         try {
             $valoracion->update($request->validated());
 

@@ -3,7 +3,9 @@
 namespace App\Livewire\Admin\AdultosMayores\Salud;
 
 use Livewire\Component;
+use App\Models\AdultoMayor;
 use App\Models\HistorialEstadoAdulto;
+use Illuminate\Support\Facades\Gate;
 
 class HistorialEstadoAdultoPanel extends Component
 {
@@ -14,6 +16,9 @@ class HistorialEstadoAdultoPanel extends Component
 
     public function abrirModalHistorialEstado($cod_am)
     {
+        $adulto = AdultoMayor::findOrFail($cod_am);
+        Gate::authorize('viewClinicalData', $adulto);
+
         $this->cod_am = $cod_am;
         $this->showModal = true;
     }

@@ -45,9 +45,10 @@ class ActividadAdulto extends Model
         'responsable_tipo',  // agregado en strengthen_administrative_tables
         'responsable_id',    // agregado en strengthen_administrative_tables
 
-        // ── Cierre y evaluación (nuevos en Fase 1) ──────────────────────────────
+        // ── Cierre y evaluación (nuevos en Fase 1 / evaluacion_final en Fase 4) ─────
         'obs',
         'resultado_general',
+        'evaluacion_final',
         'nivel_cumplimiento',
         'incidencias',
         'recomendaciones',
@@ -176,6 +177,42 @@ class ActividadAdulto extends Model
                      ->programadas();
     }
 
+    // ── Ciclo de vida ─────────────────────────────────────────────────────────────
+
+    public function puedeAgregarParticipantes(): bool
+    {
+        return in_array(strtoupper($this->estado), ['BORRADOR', 'PROGRAMADA', 'EN_CURSO', 'PENDIENTE']);
+    }
+
+    public function puedeRegistrarAsistencia(): bool
+    {
+        return in_array(strtoupper($this->estado), ['PROGRAMADA', 'EN_CURSO', 'REALIZADA', 'PENDIENTE']);
+    }
+
+    public function puedeCerrar(): bool
+    {
+        if (! $this->puedeRegistrarAsistencia()) {
+            return false;
+        }
+        return $this->participantes()->count() > 0
+            && $this->participantes()->where('estado_asistencia', '!=', 'INSCRITO')->count() > 0;
+    }
+
+    public function estaCerrada(): bool
+    {
+        return in_array(strtoupper($this->estado), ['EVALUADA', 'REALIZADA', 'COMPLETADA', 'FINALIZADA']);
+    }
+
+    public function estaEvaluada(): bool
+    {
+        return strtoupper($this->estado) === 'EVALUADA';
+    }
+
+    public function estaCancelada(): bool
+    {
+        return in_array(strtoupper($this->estado), ['CANCELADA', 'ANULADA']);
+    }
+
     // ── Helpers ───────────────────────────────────────────────────────────────────
 
     public function duracionMinutos(): ?int
@@ -198,10 +235,25 @@ class ActividadAdulto extends Model
                 'color'    => '#2A9D8F',
                 'clase'    => 'border-[#8DA280]/30 bg-[#8DA280]/14 text-[#63775B]',
             ],
+            'EVALUADA' => [
+                'etiqueta' => 'Evaluada',
+                'color'    => '#2A9D8F',
+                'clase'    => 'border-[#8DA280]/50 bg-[#8DA280]/25 text-[#4A6043]',
+            ],
+            'EN_CURSO' => [
+                'etiqueta' => 'En curso',
+                'color'    => '#4A90D9',
+                'clase'    => 'border-[#4A90D9]/30 bg-[#4A90D9]/10 text-[#2A6096]',
+            ],
             'PROGRAMADA', 'PENDIENTE' => [
                 'etiqueta' => 'Programada',
                 'color'    => '#D9A05B',
                 'clase'    => 'border-[#D9A05B]/30 bg-[#D9A05B]/12 text-[#9A6B2E]',
+            ],
+            'BORRADOR' => [
+                'etiqueta' => 'Borrador',
+                'color'    => '#A0A0A0',
+                'clase'    => 'border-[#A0A0A0]/30 bg-[#A0A0A0]/10 text-[#666666]',
             ],
             'CANCELADA', 'ANULADA' => [
                 'etiqueta' => 'Cancelada',

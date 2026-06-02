@@ -3,8 +3,10 @@
 namespace App\Livewire\Admin\AdultosMayores\Salud;
 
 use Livewire\Component;
+use App\Models\AdultoMayor;
 use App\Models\MedicacionAdulto;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 
 class MedicacionAdultoModal extends Component
 {
@@ -59,6 +61,9 @@ class MedicacionAdultoModal extends Component
 
     public function abrirModalMedicacion($cod_am, $id_med = null)
     {
+        $adulto = AdultoMayor::findOrFail($cod_am);
+        Gate::authorize('viewClinicalData', $adulto);
+
         $this->resetValidation();
         $this->cod_am = $cod_am;
         
@@ -89,6 +94,7 @@ class MedicacionAdultoModal extends Component
     public function cargarDatos()
     {
         $med = MedicacionAdulto::findOrFail($this->cod_med_adulto);
+        abort_if($med->cod_am !== $this->cod_am, 403);
         
         $this->nombre_medicamento = $med->nombre_medicamento;
         $this->dosis = $med->dosis;
@@ -122,6 +128,8 @@ class MedicacionAdultoModal extends Component
     public function guardar()
     {
         $this->validate();
+        $adulto = AdultoMayor::findOrFail($this->cod_am);
+        Gate::authorize('viewClinicalData', $adulto);
 
         $datos = [
             'cod_am' => $this->cod_am,
@@ -139,6 +147,7 @@ class MedicacionAdultoModal extends Component
 
         if ($this->isEditing) {
             $med = MedicacionAdulto::findOrFail($this->cod_med_adulto);
+            abort_if($med->cod_am !== $this->cod_am, 403);
             $med->update($datos);
             $mensaje = 'Medicación actualizada correctamente.';
         } else {
@@ -160,6 +169,8 @@ class MedicacionAdultoModal extends Component
     public function cambiarEstado($id, $estado)
     {
         $med = MedicacionAdulto::findOrFail($id);
+        $adulto = AdultoMayor::findOrFail($med->cod_am);
+        Gate::authorize('viewClinicalData', $adulto);
         $med->estado = $estado;
         $med->save();
 
@@ -172,13 +183,18 @@ class MedicacionAdultoModal extends Component
 
     public function render()
     {
-        $adultosDisponibles = \App\Models\AdultoMayor::whereHas('estado', function ($q) {
+        $adultosDisponibles = \App\Models\AdultoMayor::query()
+            ->visiblesClinicamentePara(Auth::user())
+            ->whereHas('estado', function ($q) {
             $q->whereIn('estado', ['ACTIVO', 'ACTIVA']);
         })->orderBy('nombres')->get();
         
         $adultoSeleccionado = null;
         if ($this->cod_am) {
-            $adultoSeleccionado = \App\Models\AdultoMayor::where('cod_am', $this->cod_am)->first();
+            $adultoSeleccionado = \App\Models\AdultoMayor::query()
+                ->visiblesClinicamentePara(Auth::user())
+                ->where('cod_am', $this->cod_am)
+                ->first();
         }
 
         return view('livewire.admin.adultos-mayores.salud.medicacion-adulto-modal', [

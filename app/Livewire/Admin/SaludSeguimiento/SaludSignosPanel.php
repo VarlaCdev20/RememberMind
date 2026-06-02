@@ -312,6 +312,8 @@ class SaludSignosPanel extends Component
 
     public function abrirDetalle(int $id): void
     {
+        abort_if(!$this->adulto, 403, 'Paciente no seleccionado.');
+        Gate::authorize('viewClinicalData', $this->adulto);
         $this->signoDetalleId = $id;
         $this->modalDetalle = false;
     }
@@ -430,6 +432,8 @@ class SaludSignosPanel extends Component
 
     public function abrirAnular(int $id): void
     {
+        abort_if(!$this->adulto, 403, 'Paciente no seleccionado.');
+        Gate::authorize('viewClinicalData', $this->adulto);
         abort_if(!auth()->user()->can('salud.signos.anular'), 403);
         $this->dispatch('signos-confirmar-anulacion', ['id' => $id]);
     }
@@ -474,6 +478,7 @@ class SaludSignosPanel extends Component
     public function confirmarAnular(): void
     {
         abort_if(!$this->adulto, 403, 'Paciente no seleccionado.');
+        Gate::authorize('viewClinicalData', $this->adulto);
         abort_if(!auth()->user()->can('salud.signos.anular'), 403);
 
         $this->validateOnly('motivoAnulacion', [
@@ -508,6 +513,7 @@ class SaludSignosPanel extends Component
     public function restaurarRegistro(int $id): void
     {
         abort_if(!$this->adulto, 403, 'Paciente no seleccionado.');
+        Gate::authorize('viewClinicalData', $this->adulto);
         abort_if(!auth()->user()->can('salud.signos.anular'), 403);
 
         $signo = SignosVitalesAdulto::findOrFail($id);
@@ -531,6 +537,7 @@ class SaludSignosPanel extends Component
     public function abrirFormularioPresion(): void
     {
         abort_if(!$this->adulto, 403, 'Debe seleccionar un paciente antes de registrar signos vitales.');
+        Gate::authorize('viewClinicalData', $this->adulto);
         abort_if(!auth()->user()->can('salud.signos.crear'), 403);
         $this->limpiarFormulario();
         $this->modalPresion = true;
@@ -539,6 +546,7 @@ class SaludSignosPanel extends Component
     public function abrirFormularioCardiaca(): void
     {
         abort_if(!$this->adulto, 403, 'Debe seleccionar un paciente antes de registrar signos vitales.');
+        Gate::authorize('viewClinicalData', $this->adulto);
         abort_if(!auth()->user()->can('salud.signos.crear'), 403);
         $this->limpiarFormulario();
         $this->modalCardiaca = true;
@@ -547,6 +555,7 @@ class SaludSignosPanel extends Component
     public function abrirFormularioTemperatura(): void
     {
         abort_if(!$this->adulto, 403, 'Debe seleccionar un paciente antes de registrar signos vitales.');
+        Gate::authorize('viewClinicalData', $this->adulto);
         abort_if(!auth()->user()->can('salud.signos.crear'), 403);
         $this->limpiarFormulario();
         $this->modalTemperatura = true;
@@ -555,6 +564,7 @@ class SaludSignosPanel extends Component
     public function abrirFormularioPeso(): void
     {
         abort_if(!$this->adulto, 403, 'Debe seleccionar un paciente antes de registrar signos vitales.');
+        Gate::authorize('viewClinicalData', $this->adulto);
         abort_if(!auth()->user()->can('salud.signos.crear'), 403);
         $this->limpiarFormulario();
         $this->modalPeso = true;
@@ -563,6 +573,7 @@ class SaludSignosPanel extends Component
     public function abrirFormularioObservacion(): void
     {
         abort_if(!$this->adulto, 403, 'Debe seleccionar un paciente antes de registrar signos vitales.');
+        Gate::authorize('viewClinicalData', $this->adulto);
         abort_if(!auth()->user()->can('salud.signos.crear'), 403);
         $this->limpiarFormulario();
         $this->modalObservacion = true;

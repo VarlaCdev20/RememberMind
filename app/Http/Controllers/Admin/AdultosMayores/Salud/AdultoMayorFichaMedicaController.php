@@ -8,11 +8,14 @@ use App\Http\Requests\Admin\AdultosMayores\Salud\UpdateFichaMedicaRequest;
 use App\Models\AdultoMayor;
 use App\Models\FichaMedicaAdulto;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 
 class AdultoMayorFichaMedicaController extends Controller
 {
     public function store(StoreFichaMedicaRequest $request, AdultoMayor $adulto_mayor)
     {
+        Gate::authorize('viewClinicalData', $adulto_mayor);
+
         try {
             DB::beginTransaction();
 
@@ -40,6 +43,9 @@ class AdultoMayorFichaMedicaController extends Controller
 
     public function update(UpdateFichaMedicaRequest $request, AdultoMayor $adulto_mayor, FichaMedicaAdulto $ficha)
     {
+        Gate::authorize('viewClinicalData', $adulto_mayor);
+        abort_if($ficha->cod_am !== $adulto_mayor->cod_am, 403);
+
         try {
             DB::beginTransaction();
 
@@ -61,6 +67,9 @@ class AdultoMayorFichaMedicaController extends Controller
 
     public function archivar(AdultoMayor $adulto_mayor, FichaMedicaAdulto $ficha)
     {
+        Gate::authorize('viewClinicalData', $adulto_mayor);
+        abort_if($ficha->cod_am !== $adulto_mayor->cod_am, 403);
+
         $ficha->update(['estado' => 'ARCHIVADO']);
         $ficha->delete(); // SoftDelete
 
@@ -77,7 +86,10 @@ class AdultoMayorFichaMedicaController extends Controller
 
     public function restore(AdultoMayor $adulto_mayor, $ficha)
     {
+        Gate::authorize('viewClinicalData', $adulto_mayor);
+
         $fichaRestaurada = FichaMedicaAdulto::withTrashed()->findOrFail($ficha);
+        abort_if($fichaRestaurada->cod_am !== $adulto_mayor->cod_am, 403);
         $fichaRestaurada->restore();
         $fichaRestaurada->update(['estado' => 'ACTIVO']);
 

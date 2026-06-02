@@ -6,11 +6,14 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\AdultosMayores\Salud\StoreAdministracionMedicacionRequest;
 use App\Models\AdultoMayor;
 use App\Models\AdministracionMedicacion;
+use Illuminate\Support\Facades\Gate;
 
 class AdultoMayorAdministracionMedicacionController extends Controller
 {
     public function store(StoreAdministracionMedicacionRequest $request, AdultoMayor $adulto_mayor)
     {
+        Gate::authorize('viewClinicalData', $adulto_mayor);
+
         try {
             $registro = AdministracionMedicacion::create(array_merge(
                 $request->validated(),
