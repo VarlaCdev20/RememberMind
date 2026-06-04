@@ -247,16 +247,16 @@ class UsuariosPanel extends Component
         $this->observacion_vinculo = null;
         $this->vinculosFamiliar = [];
 
-        if ($val === 'voluntario') {
+        if ($val === 'VOLUNTARIO') {
             $this->cod_area = 'ARE_0008'; // Voluntariado y Relaciones Institucionales
             $this->fecha_ingreso = now()->format('Y-m-d');
-        } elseif ($val === 'familiar') {
+        } elseif ($val === 'FAMILIAR') {
             $this->cod_area = null;
             $this->fecha_ingreso = null;
-        } elseif ($val === 'personal_salud') {
+        } elseif (in_array($val, ['ENFERMEROS', 'MEDICO GENERAL/GERIATRA', 'PSICOLOGO/A', 'PEDAGOGO', 'NUTRICIONISTA', 'FISIOTERAPEUTA'])) {
             $this->cod_area = 'ARE_0004'; // Sugerencia inicial
             $this->fecha_ingreso = now()->format('Y-m-d');
-        } elseif ($val === 'personal_admin') {
+        } elseif (in_array($val, ['SUPERADMINISTRADOR', 'ADMINISTRADOR'])) {
             $this->cod_area = 'ARE_0003'; // Sugerencia inicial
             $this->fecha_ingreso = now()->format('Y-m-d');
         }
@@ -394,7 +394,7 @@ class UsuariosPanel extends Component
         return User::where('correo', $correo)
             ->orWhere('numero_documento', $numeroDocumento)
             ->whereHas('roles', function($q) {
-                $q->where('name', 'familiar');
+                $q->where('name', 'FAMILIAR');
             })->first();
     }
 
@@ -451,7 +451,7 @@ class UsuariosPanel extends Component
 
     private function limpiarCamposDependientesDelRol(): void
     {
-        if ($this->rol === 'personal_admin') {
+        if (in_array($this->rol, ['SUPERADMINISTRADOR', 'ADMINISTRADOR'])) {
             $this->especialidad_salud = null;
             $this->matricula_prof = null;
             $this->institucion_formacion = null;
@@ -462,7 +462,7 @@ class UsuariosPanel extends Component
             return;
         }
 
-        if ($this->rol === 'personal_salud') {
+        if (in_array($this->rol, ['ENFERMEROS', 'MEDICO GENERAL/GERIATRA', 'PSICOLOGO/A', 'PEDAGOGO', 'NUTRICIONISTA', 'FISIOTERAPEUTA'])) {
             $this->cargo_administrativo = null;
             $this->matricula_prof = null;
             $this->disponibilidad_inicial = null;
@@ -472,7 +472,7 @@ class UsuariosPanel extends Component
             return;
         }
 
-        if ($this->rol === 'voluntario') {
+        if ($this->rol === 'VOLUNTARIO') {
             $this->cargo_administrativo = null;
             $this->especialidad_salud = null;
             $this->matricula_prof = null;
@@ -482,7 +482,7 @@ class UsuariosPanel extends Component
             return;
         }
 
-        if ($this->rol === 'familiar') {
+        if ($this->rol === 'FAMILIAR') {
             $this->cod_area = null;
             $this->cargo_administrativo = null;
             $this->especialidad_salud = null;
@@ -660,7 +660,7 @@ class UsuariosPanel extends Component
 
     public function updatedEspecialidadSalud($val)
     {
-        if ($this->rol !== 'personal_salud') return;
+        if (!in_array($this->rol, ['ENFERMEROS', 'MEDICO GENERAL/GERIATRA', 'PSICOLOGO/A', 'PEDAGOGO', 'NUTRICIONISTA', 'FISIOTERAPEUTA'])) return;
         
         $esp = \App\Models\Especialidad::find($val);
         if ($esp) {
@@ -774,24 +774,24 @@ class UsuariosPanel extends Component
             }
         }
 
-        if ($this->rol === 'personal_salud') {
+        if (in_array($this->rol, ['ENFERMEROS', 'MEDICO GENERAL/GERIATRA', 'PSICOLOGO/A', 'PEDAGOGO', 'NUTRICIONISTA', 'FISIOTERAPEUTA'])) {
             $rules['especialidad_salud'] = ['required', 'exists:especialidades,cod_esp'];
             $rules['institucion_formacion'] = ['nullable', 'string', 'max:255'];
             $rules['fecha_ingreso'] = ['required', 'date'];
         }
 
-        if ($this->rol === 'personal_admin') {
+        if (in_array($this->rol, ['SUPERADMINISTRADOR', 'ADMINISTRADOR'])) {
             $rules['cargo_administrativo'] = ['required', 'exists:cargos_administrativos,cod_cargo_admin'];
             $rules['fecha_ingreso'] = ['required', 'date'];
         }
 
-        if ($this->rol === 'voluntario') {
+        if ($this->rol === 'VOLUNTARIO') {
             $rules['disponibilidad_inicial'] = ['nullable', 'string', 'max:150'];
             $rules['area_apoyo_preferente'] = ['nullable', 'string', 'max:150'];
             $rules['fecha_ingreso'] = ['required', 'date'];
         }
 
-        if ($this->rol === 'familiar') {
+        if ($this->rol === 'FAMILIAR') {
             $rules['observacion_vinculo'] = ['nullable', 'string', 'max:255'];
             $rules['vinculosFamiliar'] = ['required', 'array', 'min:1'];
             $rules['vinculosFamiliar.*.parentesco_vinculo'] = ['required', 'string', 'max:100'];
@@ -1275,24 +1275,24 @@ class UsuariosPanel extends Component
 
         $this->rol = $usuario->roles->first()?->name ?? '';
 
-        if ($this->rol === 'personal_salud') {
+        if (in_array($this->rol, ['ENFERMEROS', 'MEDICO GENERAL/GERIATRA', 'PSICOLOGO/A', 'PEDAGOGO', 'NUTRICIONISTA', 'FISIOTERAPEUTA'])) {
             $ps = $usuario->personalSalud;
             $this->fecha_ingreso = $ps?->fecha_ing ? \Carbon\Carbon::parse($ps->fecha_ing)->format('Y-m-d') : '';
             $this->especialidad_salud = $ps?->cod_esp;
             $this->matricula_prof = null;
             $this->institucion_formacion = $ps?->institucion_formacion;
-        } elseif ($this->rol === 'personal_admin') {
+        } elseif (in_array($this->rol, ['SUPERADMINISTRADOR', 'ADMINISTRADOR'])) {
             $pa = $usuario->personalAdmin;
             $this->fecha_ingreso = $pa?->fecha_ingreso ? \Carbon\Carbon::parse($pa->fecha_ingreso)->format('Y-m-d') : '';
             $this->cargo_administrativo = $pa?->cod_cargo_admin;
-        } elseif ($this->rol === 'voluntario') {
+        } elseif ($this->rol === 'VOLUNTARIO') {
             $vol = \App\Models\Voluntario::where('cod_usu', $usuario->cod_usu)->first();
             if ($vol) {
                 $this->fecha_ingreso = $vol->fecha_ing ? \Carbon\Carbon::parse($vol->fecha_ing)->format('Y-m-d') : '';
                 $this->disponibilidad_inicial = $vol->disponibilidad_inicial;
                 $this->area_apoyo_preferente = $vol->area_apoyo_preferente;
             }
-        } elseif ($this->rol === 'familiar') {
+        } elseif ($this->rol === 'FAMILIAR') {
             $fam = \App\Models\Familiar::where('cod_usu', $usuario->cod_usu)->first();
             if ($fam) {
                 $this->parentesco_emergencia = $fam->parentesco;
@@ -1468,11 +1468,11 @@ class UsuariosPanel extends Component
                 return;
             }
         } elseif ($this->pasoFormulario === 3) {
-            $this->tipo_vinculacion = match($this->rol) {
-                'personal_salud' => 'CONTRATO',
-                'personal_admin' => 'CONTRATO',
-                'voluntario' => 'VOLUNTARIADO',
-                'familiar' => 'FAMILIAR',
+            $this->tipo_vinculacion = match(true) {
+                in_array($this->rol, ['ENFERMEROS', 'MEDICO GENERAL/GERIATRA', 'PSICOLOGO/A', 'PEDAGOGO', 'NUTRICIONISTA', 'FISIOTERAPEUTA']) => 'CONTRATO',
+                in_array($this->rol, ['SUPERADMINISTRADOR', 'ADMINISTRADOR']) => 'CONTRATO',
+                $this->rol === 'VOLUNTARIO' => 'VOLUNTARIADO',
+                $this->rol === 'FAMILIAR' => 'FAMILIAR',
                 default => 'OTRO'
             };
 
@@ -1493,24 +1493,24 @@ class UsuariosPanel extends Component
                 $rules['acceso_sistema'] = ['required', 'in:HABILITADO,BLOQUEADO'];
             }
 
-            if ($this->rol === 'personal_salud') {
+            if (in_array($this->rol, ['ENFERMEROS', 'MEDICO GENERAL/GERIATRA', 'PSICOLOGO/A', 'PEDAGOGO', 'NUTRICIONISTA', 'FISIOTERAPEUTA'])) {
                 $rules['especialidad_salud'] = ['required', 'exists:especialidades,cod_esp'];
                 $rules['institucion_formacion'] = ['nullable', 'string', 'max:255'];
                 $rules['fecha_ingreso'] = ['required', 'date'];
             }
 
-            if ($this->rol === 'personal_admin') {
+            if (in_array($this->rol, ['SUPERADMINISTRADOR', 'ADMINISTRADOR'])) {
                 $rules['cargo_administrativo'] = ['required', 'exists:cargos_administrativos,cod_cargo_admin'];
                 $rules['fecha_ingreso'] = ['required', 'date'];
             }
 
-            if ($this->rol === 'voluntario') {
+            if ($this->rol === 'VOLUNTARIO') {
                 $rules['disponibilidad_inicial'] = ['nullable', 'string', 'max:150'];
                 $rules['area_apoyo_preferente'] = ['nullable', 'string', 'max:150'];
                 $rules['fecha_ingreso'] = ['required', 'date'];
             }
 
-            if ($this->rol === 'familiar') {
+            if ($this->rol === 'FAMILIAR') {
                 if (!empty($this->busquedaAdultoMayor) && empty($this->selected_cod_am) && count($this->vinculosFamiliar) === 0) {
                     $this->addError('selected_cod_am', 'Seleccione un adulto mayor válido de la lista.');
                     return;
@@ -1606,7 +1606,7 @@ class UsuariosPanel extends Component
         // Ejecutar normalización completa
         $this->normalizarDatosFormulario();
 
-        if ($this->rol === 'familiar') {
+        if ($this->rol === 'FAMILIAR') {
             if (!empty($this->busquedaAdultoMayor) && empty($this->selected_cod_am) && count($this->vinculosFamiliar) === 0) {
                 $this->addError('selected_cod_am', 'Seleccione un adulto mayor válido de la lista.');
                 return;
@@ -1798,7 +1798,7 @@ class UsuariosPanel extends Component
 
     private function guardarSubModelos(User $usuario)
     {
-        if ($this->rol === 'personal_salud') {
+        if (in_array($this->rol, ['ENFERMEROS', 'MEDICO GENERAL/GERIATRA', 'PSICOLOGO/A', 'PEDAGOGO', 'NUTRICIONISTA', 'FISIOTERAPEUTA'])) {
             \App\Models\PersonalSalud::updateOrCreate(
                 ['cod_usu' => $usuario->cod_usu],
                 [
@@ -1810,7 +1810,7 @@ class UsuariosPanel extends Component
                 ]
             );
             // TODO: definir flujo administrativo para archivar perfiles previos al cambiar de rol.
-        } elseif ($this->rol === 'personal_admin') {
+        } elseif (in_array($this->rol, ['SUPERADMINISTRADOR', 'ADMINISTRADOR'])) {
             \App\Models\PersonalAdmin::updateOrCreate(
                 ['cod_usu' => $usuario->cod_usu],
                 [
@@ -1822,7 +1822,7 @@ class UsuariosPanel extends Component
                 ]
             );
             // TODO: definir flujo administrativo para archivar perfiles previos al cambiar de rol.
-        } elseif ($this->rol === 'voluntario') {
+        } elseif ($this->rol === 'VOLUNTARIO') {
             \App\Models\Voluntario::updateOrCreate(
                 ['cod_usu' => $usuario->cod_usu],
                 [
@@ -1834,7 +1834,7 @@ class UsuariosPanel extends Component
                 ]
             );
             // TODO: definir flujo administrativo para archivar perfiles previos al cambiar de rol.
-        } elseif ($this->rol === 'familiar') {
+        } elseif ($this->rol === 'FAMILIAR') {
             $hayResponsable = collect($this->vinculosFamiliar)->contains(fn($v) => $v['es_responsable'] === 'SI');
             $fam = \App\Models\Familiar::updateOrCreate(
                 ['cod_usu' => $usuario->cod_usu],
@@ -2332,13 +2332,19 @@ class UsuariosPanel extends Component
     public function obtenerNombreRolLegible($rol): string
     {
         switch ($rol) {
-            case 'personal_admin':
+            case 'SUPERADMINISTRADOR':
+            case 'ADMINISTRADOR':
                 return 'Personal Administrativo';
-            case 'personal_salud':
+            case 'ENFERMEROS':
+            case 'MEDICO GENERAL/GERIATRA':
+            case 'PSICOLOGO/A':
+            case 'PEDAGOGO':
+            case 'NUTRICIONISTA':
+            case 'FISIOTERAPEUTA':
                 return 'Personal de Salud';
-            case 'voluntario':
+            case 'VOLUNTARIO':
                 return 'Voluntario';
-            case 'familiar':
+            case 'FAMILIAR':
                 return 'Familiar';
             case 'admin':
                 return 'Administrador';

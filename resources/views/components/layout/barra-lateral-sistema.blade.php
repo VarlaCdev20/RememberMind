@@ -81,92 +81,13 @@
  return false;
  };
 
- $sections = [
- [
- 'title' => 'Inicio',
- 'icon' => 'ph-house',
- 'route' => 'dashboard',
- ],
- [
- 'title' => 'Administración',
- 'icon' => 'ph-gear-six',
- 'items' => array_filter([
- auth()->user()->can('usuarios.ver') ? ['label' => 'Usuarios', 'route' => 'admin.usuarios.index'] : null,
- auth()->user()->can('roles.ver') ? ['label' => 'Roles y permisos', 'route' => 'admin.roles-permisos.index'] : null,
- auth()->user()->can('areas.ver') ? ['label' => 'Áreas institucionales', 'route' => 'admin.areas-institucionales.index'] : null,
- auth()->user()->can('turnos.ver') ? ['label' => 'Horarios y asignaciones', 'route' => 'admin.turnos-asignaciones.index'] : null,
- auth()->user()->can('bitacora.ver') ? ['label' => 'Bitácora y auditoría', 'route' => 'admin.bitacora.index'] : null,
- ]),
- ],
- [
- 'title' => 'Adultos Mayores',
- 'icon' => 'ph-users-four',
- 'items' => array_filter([
- auth()->user()->can('adultos.ver') ? ['label' => 'Centro de Adultos Mayores', 'route' => 'admin.adultos-mayores.index'] : null,
- auth()->user()->can('adultos.ver') ? ['label' => 'Alertas y Pendientes', 'route' => 'admin.adultos-mayores.alertas-pendientes'] : null,
- auth()->user()->can('reportes.ver') ? ['label' => 'Reportes Institucionales', 'route' => 'admin.adultos-mayores.reporte-institucional'] : null,
- ]),
- ],
- [
- 'title' => 'Salud y Seguimiento',
- 'icon' => 'ph-heartbeat',
- 'items' => array_filter([
- auth()->user()->can('salud.ver') ? ['label' => 'Resumen de salud', 'route' => 'admin.salud-seguimiento.index'] : null,
- auth()->user()->can('salud.ficha.ver') ? ['label' => 'Ficha médica', 'route' => 'admin.salud-seguimiento.ficha.index'] : null,
- auth()->user()->can('salud.signos.ver') ? ['label' => 'Signos vitales', 'route' => 'admin.salud-seguimiento.signos.index'] : null,
- auth()->user()->can('salud.medicacion.ver') ? ['label' => 'Medicación', 'route' => 'admin.salud-seguimiento.medicacion.index'] : null,
- auth()->user()->can('salud.medicacion.ver') ? ['label' => 'Administración', 'route' => 'admin.salud-seguimiento.administracion.index'] : null,
- auth()->user()->can('salud.ver') ? ['label' => 'Valoración funcional', 'route' => 'admin.salud-seguimiento.valoracion.index'] : null,
- auth()->user()->can('salud.ver') ? ['label' => 'Evaluaciones geriátricas', 'route' => 'admin.salud-seguimiento.evaluaciones-geriatricas.index'] : null,
- auth()->user()->can('salud.alertas.ver') ? ['label' => 'Alertas', 'route' => 'admin.salud-seguimiento.alertas'] : null,
- auth()->user()->can('salud.reportes.ver') ? ['label' => 'Reportes', 'route' => 'admin.salud-seguimiento.reportes'] : null,
- ]),
- ],
- [
- 'title' => 'Familia y Social',
- 'icon' => 'ph-house-line',
- 'items' => array_filter([
- auth()->user()->can('familiares.ver') ? ['label' => 'Resumen', 'route' => 'admin.familia-social.resumen'] : null,
- auth()->user()->can('familiares.ver') ? ['label' => 'Red de apoyo', 'route' => 'admin.familia-social.red-apoyo'] : null,
- auth()->user()->can('familiares.ver') ? ['label' => 'Visitas', 'route' => 'admin.familia-social.visitas'] : null,
- auth()->user()->can('familiares.ver') ? ['label' => 'Ficha social', 'route' => 'admin.familia-social.ficha-social'] : null,
- ]),
- ],
- [
- 'title' => 'Actividades',
- 'icon' => 'ph-calendar-check',
- 'items' => [
- ['label' => 'Actividades', 'route' => 'admin.actividades.index'],
- ['label' => 'Tipos de actividades', 'route' => 'admin.actividades.tipos'],
- ['label' => 'Participación', 'route' => 'admin.actividades.participacion'],
- ['label' => 'Asistencia', 'route' => 'admin.actividades.asistencia'],
- ['label' => 'Reportes', 'route' => 'admin.actividades.reportes'],
- ],
- ],
- [
- 'title' => 'Voluntariado',
- 'icon' => 'ph-hand-heart',
- 'items' => [
- ['label' => 'Resumen', 'route' => 'admin.voluntariado.index'],
- ['label' => 'Voluntarios', 'route' => 'admin.voluntariado.voluntarios.index'],
- ['label' => 'Disponibilidad', 'route' => 'admin.voluntariado.disponibilidad.index'],
- ['label' => 'Asignaciones', 'route' => 'admin.voluntariado.asignaciones.index'],
- ['label' => 'Asistencia', 'route' => 'admin.voluntariado.asistencia.index'],
- ['label' => 'Reportes', 'route' => 'admin.voluntariado.reportes.index'],
- ],
- ],
- ];
+    @inject('sidebarService', 'App\Services\SidebarService')
 
- // Filtrar secciones que tienen menú items y todos fueron ocultados
- $sections = array_filter($sections, function ($section) {
- if (isset($section['items'])) {
- return count($section['items']) > 0;
- }
- return true;
- });
- @endphp
+    @php
+        $sections = $sidebarService->getSidebar();
+    @endphp
 
- <nav class="space-y-2">
+    <nav class="space-y-2">
  @foreach($sections as $section)
  @php
  $isDirect = isset($section['route']);

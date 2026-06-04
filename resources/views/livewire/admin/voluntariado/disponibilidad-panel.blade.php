@@ -286,7 +286,7 @@
  </button>
  @endif
  @endcan
- <a href="{{ route('admin.voluntariado.asignaciones.index', ['voluntario' => $registro->cod_vol]) }}" class="flex h-8 w-8 items-center justify-center rounded-xl bg-fondo-panel text-titulo transition hover:bg-boton-principal hover:text-inverso" title="Ver asignaciones">
+ <a href="{{ route('admin.voluntariado.asignaciones.index', ['VOLUNTARIO' => $registro->cod_vol]) }}" class="flex h-8 w-8 items-center justify-center rounded-xl bg-fondo-panel text-titulo transition hover:bg-boton-principal hover:text-inverso" title="Ver asignaciones">
  <i class="ph-bold ph-handshake"></i>
  </a>
  </div>

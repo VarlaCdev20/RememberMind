@@ -313,11 +313,9 @@
  @foreach($roles as $r)
  @php
  $displayName = match($r->name) {
- 'personal_salud' => 'PERSONAL DE SALUD',
- 'personal_admin' => 'PERSONAL ADMINISTRATIVO',
- 'familiar' => 'FAMILIAR / RESPONSABLE',
- 'voluntario' => 'VOLUNTARIO',
- default => strtoupper(str_replace('_', ' ', $r->name))
+ 'FAMILIAR' => 'Familiar / Responsable',
+ 'VOLUNTARIO' => 'Voluntario',
+ default => mb_convert_case(str_replace('_', ' ', $r->name), MB_CASE_TITLE, 'UTF-8')
  };
  @endphp
  <option value="{{ $r->name }}">{{ $displayName }}</option>
@@ -332,7 +330,7 @@
  class="w-full rounded-2xl border border-borde-suave bg-fondo-card/50 px-5 py-3 text-sm font-bold outline-none transition focus:border-borde-focus">
  </div>
 
- <div x-show="rol === 'personal_salud'" x-transition>
+ <div x-show="['ENFERMEROS', 'MEDICO GENERAL/GERIATRA', 'PSICOLOGO/A', 'PEDAGOGO', 'NUTRICIONISTA', 'FISIOTERAPEUTA'].includes(rol)" x-transition>
  <label class="mb-1.5 block text-[10px] font-bold uppercase tracking-widest text-titulo/60">Especialidad Médica *</label>
  <select name="especialidad_salud" x-model="especialidad" @change="clearError('especialidad')"
  class="w-full rounded-2xl border border-borde-suave bg-fondo-card/50 px-5 py-3 text-sm font-bold outline-none transition focus:border-borde-focus"
@@ -345,7 +343,7 @@
  <p x-show="errors.especialidad" class="mt-1.5 text-[10px] font-bold text-red-500" x-text="errors.especialidad"></p>
  </div>
 
- <div x-show="rol === 'personal_admin'" x-transition>
+ <div x-show="['SUPERADMINISTRADOR', 'ADMINISTRADOR'].includes(rol)" x-transition>
  <label class="mb-1.5 block text-[10px] font-bold uppercase tracking-widest text-titulo/60">Función Administrativa *</label>
  <select name="cargo_administrativo" x-model="cargo" @change="clearError('cargo_administrativo')"
  class="w-full rounded-2xl border border-borde-suave bg-fondo-card/50 px-5 py-3 text-sm font-bold outline-none transition focus:border-borde-focus"
@@ -594,8 +592,8 @@
  { val: this.rol, weight: 1 }
  ];
 
- if (this.rol === 'personal_salud') fields.push({ val: this.especialidad, weight: 1 });
- else if (this.rol === 'personal_admin') fields.push({ val: this.cargo, weight: 1 });
+ if (['ENFERMEROS', 'MEDICO GENERAL/GERIATRA', 'PSICOLOGO/A', 'PEDAGOGO', 'NUTRICIONISTA', 'FISIOTERAPEUTA'].includes(this.rol)) fields.push({ val: this.especialidad, weight: 1 });
+ else if (['SUPERADMINISTRADOR', 'ADMINISTRADOR'].includes(this.rol)) fields.push({ val: this.cargo, weight: 1 });
 
  let completed = fields.filter(f => f.val).length;
  this.completionPercentage = Math.round((completed / fields.length) * 100);
@@ -612,10 +610,10 @@
  },
 
  rolDisplay() {
- if (this.rol === 'personal_salud') return 'PERSONAL DE SALUD';
- if (this.rol === 'personal_admin') return 'PERSONAL ADMINISTRATIVO';
- if (this.rol === 'familiar') return 'FAMILIAR / RESPONSABLE';
- if (this.rol === 'voluntario') return 'VOLUNTARIO';
+ if (['ENFERMEROS', 'MEDICO GENERAL/GERIATRA', 'PSICOLOGO/A', 'PEDAGOGO', 'NUTRICIONISTA', 'FISIOTERAPEUTA'].includes(this.rol)) return 'PERSONAL DE SALUD';
+ if (['SUPERADMINISTRADOR', 'ADMINISTRADOR'].includes(this.rol)) return 'PERSONAL ADMINISTRATIVO';
+ if (this.rol === 'FAMILIAR') return 'FAMILIAR / RESPONSABLE';
+ if (this.rol === 'VOLUNTARIO') return 'VOLUNTARIO';
  return this.rol ? this.rol.replace('_', ' ').toUpperCase() : 'ROL NO ASIGNADO';
  },
 
@@ -807,10 +805,10 @@
  
  if (this.step === 4) {
  if (!this.rol) stepErrors.rol = 'Debe asignar un rol al usuario.';
- if (this.rol === 'personal_salud' && !this.especialidad) {
+ if (['ENFERMEROS', 'MEDICO GENERAL/GERIATRA', 'PSICOLOGO/A', 'PEDAGOGO', 'NUTRICIONISTA', 'FISIOTERAPEUTA'].includes(this.rol) && !this.especialidad) {
  stepErrors.especialidad = 'Debe seleccionar una especialidad para el personal de salud.';
  }
- if (this.rol === 'personal_admin' && !this.cargo) {
+ if (['SUPERADMINISTRADOR', 'ADMINISTRADOR'].includes(this.rol) && !this.cargo) {
  stepErrors.cargo_administrativo = 'Debe seleccionar un cargo administrativo.';
  }
  }

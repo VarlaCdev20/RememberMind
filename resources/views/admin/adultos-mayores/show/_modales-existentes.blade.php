@@ -196,13 +196,13 @@
  </p>
  <h2 class="text-xl font-extrabold text-titulo"
  x-text="{
- familiar: (isViewing ? 'Ver ' : (isEditing ? 'Editar ' : 'Vincular ')) + 'familiar',
+ familiar: (isViewing ? 'Ver ' : (isEditing ? 'Editar ' : 'Vincular ')) + 'FAMILIAR',
  observacion: (isViewing ? 'Ver ' : (isEditing ? 'Editar ' : 'Registrar ')) + 'observación',
  atencion: (isViewing ? 'Ver ' : (isEditing ? 'Editar ' : 'Registrar ')) + 'atención',
  evaluacion: (isViewing ? 'Ver ' : (isEditing ? 'Editar ' : 'Registrar ')) + 'evaluación cognitiva',
  actividad: (isViewing ? 'Ver ' : (isEditing ? 'Editar ' : 'Registrar ')) + 'actividad',
  documento: (isViewing ? 'Ver ' : (isEditing ? 'Editar ' : 'Subir ')) + 'documento',
- voluntario: (isViewing ? 'Ver ' : (isEditing ? 'Editar ' : 'Asignar ')) + 'voluntario'
+ voluntario: (isViewing ? 'Ver ' : (isEditing ? 'Editar ' : 'Asignar ')) + 'VOLUNTARIO'
  }[modal]">
  </h2>
  </div>
@@ -232,7 +232,7 @@
 
 
  {{-- Familiar --}}
- <form id="form-familiar" method="POST" :action="isEditing ? `{{ route('admin.adultos-mayores.familiares.update', [$idAdulto, 'ID']) }}`.replace('ID', recordData.cod_fam) : `{{ route('admin.adultos-mayores.familiares.store', $idAdulto) }}`" x-show="modal === 'familiar'" class="grid gap-4 md:grid-cols-2" onsubmit="procesarFormulario(event)">
+ <form id="form-familiar" method="POST" :action="isEditing ? `{{ route('admin.adultos-mayores.familiares.update', [$idAdulto, 'ID']) }}`.replace('ID', recordData.cod_fam) : `{{ route('admin.adultos-mayores.familiares.store', $idAdulto) }}`" x-show="modal === 'FAMILIAR'" class="grid gap-4 md:grid-cols-2" onsubmit="procesarFormulario(event)">
  @csrf
  <input type="hidden" name="_method" :value="isEditing ? 'PATCH' : 'POST'">
  <input type="hidden" name="estado" value="ACTIVO">
@@ -660,7 +660,7 @@
  </form>
 
  {{-- Voluntario --}}
- <form method="POST" action="#" x-show="modal === 'voluntario'" class="grid gap-4 md:grid-cols-2">
+ <form method="POST" action="#" x-show="modal === 'VOLUNTARIO'" class="grid gap-4 md:grid-cols-2">
  @csrf
  <div class="md:col-span-2">
  <p class="text-xs text-red-500 font-bold mb-2"><i class="ph-bold ph-warning"></i> En desarrollo: Módulo de voluntarios no conectado.</p>
@@ -693,7 +693,7 @@
  </button>
 
  {{-- Botones Dinámicos de Guardado --}}
- <button type="submit" form="form-familiar" x-show="modal === 'familiar' && !isViewing" class="rounded-xl bg-boton-acento px-4 py-2.5 text-xs font-bold text-inverso transition hover:bg-fondo-panel active:scale-95" x-text="isEditing ? 'Actualizar Familiar' : 'Vincular Familiar'"></button>
+ <button type="submit" form="form-familiar" x-show="modal === 'FAMILIAR' && !isViewing" class="rounded-xl bg-boton-acento px-4 py-2.5 text-xs font-bold text-inverso transition hover:bg-fondo-panel active:scale-95" x-text="isEditing ? 'Actualizar Familiar' : 'Vincular Familiar'"></button>
  <button type="submit" form="form-observacion" x-show="modal === 'observacion' && !isViewing" :disabled="cargando" class="rounded-xl bg-boton-acento px-4 py-2.5 text-xs font-bold text-inverso transition hover:bg-fondo-panel active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed" x-text="cargando ? 'Guardando...' : (isEditing ? 'Actualizar Observación' : 'Guardar Observación')"></button>
  <button type="submit" form="form-atencion" x-show="modal === 'atencion' && !isViewing" :disabled="cargando" class="rounded-xl bg-boton-acento px-4 py-2.5 text-xs font-bold text-inverso transition hover:bg-fondo-panel active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed" x-text="cargando ? 'Guardando...' : (isEditing ? 'Actualizar Atención' : 'Guardar Atención')"></button>
  <button type="submit" form="form-evaluacion" x-show="modal === 'evaluacion' && !isViewing" class="rounded-xl bg-boton-acento px-4 py-2.5 text-xs font-bold text-inverso transition hover:bg-fondo-panel active:scale-95">Guardar Evaluación</button>

@@ -349,7 +349,7 @@
  </a>
  @endif
 
- <button type="button" @click="abrir('familiar')" class="flex w-full items-center justify-center gap-2 rounded-xl bg-fondo-panel py-3 text-xs font-bold text-inverso shadow-md transition hover:-translate-y-0.5 hover:bg-fondo-panel active:scale-95">
+ <button type="button" @click="abrir('FAMILIAR')" class="flex w-full items-center justify-center gap-2 rounded-xl bg-fondo-panel py-3 text-xs font-bold text-inverso shadow-md transition hover:-translate-y-0.5 hover:bg-fondo-panel active:scale-95">
  <i class="ph-bold ph-user-plus"></i> Vincular Familiar a Ficha
  </button>
  </div>
@@ -484,11 +484,11 @@
 
  {{-- Barra de Acciones Reales --}}
  <div class="mt-5 flex justify-end gap-1.5 border-t border-borde-suave pt-3">
- <button type="button" @click="abrir('familiar', @js($familiar), false, true)" title="Ver Ficha Detallada" class="flex h-8 w-8 items-center justify-center rounded-lg bg-fondo-panel text-titulo transition hover:bg-boton-principal hover:text-inverso">
+ <button type="button" @click="abrir('FAMILIAR', @js($familiar), false, true)" title="Ver Ficha Detallada" class="flex h-8 w-8 items-center justify-center rounded-lg bg-fondo-panel text-titulo transition hover:bg-boton-principal hover:text-inverso">
  <i class="ph-bold ph-eye text-sm"></i>
  </button>
  
- <button type="button" @click="abrir('familiar', @js($familiar), true, false)" title="Editar Familiar" class="flex h-8 w-8 items-center justify-center rounded-lg bg-fondo-panel text-titulo transition hover:bg-boton-principal hover:text-inverso">
+ <button type="button" @click="abrir('FAMILIAR', @js($familiar), true, false)" title="Editar Familiar" class="flex h-8 w-8 items-center justify-center rounded-lg bg-fondo-panel text-titulo transition hover:bg-boton-principal hover:text-inverso">
  <i class="ph-bold ph-pencil-simple text-sm"></i>
  </button>
 
@@ -509,7 +509,7 @@
  <p class="mx-auto mt-2 max-w-xs text-xs font-bold text-apoyo">
  Registre a los familiares responsables de apoyo directo para coordinar cuidados y actas.
  </p>
- <button type="button" @click="abrir('familiar')" class="mt-4 inline-flex items-center gap-2 rounded-xl bg-fondo-panel px-4 py-2 text-xs font-bold text-inverso transition hover:bg-fondo-panel active:scale-95 shadow-md">
+ <button type="button" @click="abrir('FAMILIAR')" class="mt-4 inline-flex items-center gap-2 rounded-xl bg-fondo-panel px-4 py-2 text-xs font-bold text-inverso transition hover:bg-fondo-panel active:scale-95 shadow-md">
  <i class="ph-bold ph-plus"></i> Vincular primer familiar
  </button>
  </div>
@@ -589,7 +589,7 @@
  <p class="text-[10px] font-bold text-apoyo uppercase tracking-widest">Apoyo y acompañamiento externo</p>
  </div>
  </div>
- <button type="button" @click="abrir('voluntario')" class="rounded-xl bg-fondo-panel px-4 py-2 text-xs font-bold text-inverso hover:bg-fondo-panel transition">
+ <button type="button" @click="abrir('VOLUNTARIO')" class="rounded-xl bg-fondo-panel px-4 py-2 text-xs font-bold text-inverso hover:bg-fondo-panel transition">
  <i class="ph-bold ph-user-plus mr-1"></i> Asignar
  </button>
  </div>
@@ -644,10 +644,10 @@
  </td>
  <td class="px-6 py-4 text-right">
  <div class="flex justify-end gap-1.5">
- <button type="button" @click="abrir('voluntario', @js($asignacion), false, true)" class="rounded-lg bg-fondo-panel p-2 text-titulo hover:bg-boton-principal hover:text-inverso transition">
+ <button type="button" @click="abrir('VOLUNTARIO', @js($asignacion), false, true)" class="rounded-lg bg-fondo-panel p-2 text-titulo hover:bg-boton-principal hover:text-inverso transition">
  <i class="ph-bold ph-eye"></i>
  </button>
- <button type="button" @click="abrir('voluntario', @js($asignacion), true, false)" class="rounded-lg bg-fondo-panel p-2 text-titulo hover:bg-boton-principal hover:text-inverso transition">
+ <button type="button" @click="abrir('VOLUNTARIO', @js($asignacion), true, false)" class="rounded-lg bg-fondo-panel p-2 text-titulo hover:bg-boton-principal hover:text-inverso transition">
  <i class="ph-bold ph-pencil-simple"></i>
  </button>
  <button type="button" class="rounded-lg bg-boton-acento/5 p-2 text-terracota hover:bg-boton-acento hover:text-inverso transition">

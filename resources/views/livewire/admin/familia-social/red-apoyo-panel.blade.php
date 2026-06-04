@@ -385,7 +385,7 @@
  <div class="flex flex-row flex-wrap justify-center items-start gap-4 md:gap-8 mt-10 w-full px-2">
  @foreach($voluntariosMapa as $vol)
  <div class="nodo-voluntario flex flex-col items-center group cursor-pointer transition-transform hover:scale-105"
- @click="seleccionarNodo('voluntario', '{{ $vol['cod_vol'] }}'); $wire.verDetalle('voluntario', '{{ $vol['cod_vol'] }}')"
+ @click="seleccionarNodo('VOLUNTARIO', '{{ $vol['cod_vol'] }}'); $wire.verDetalle('VOLUNTARIO', '{{ $vol['cod_vol'] }}')"
  :class="{ 'opacity-100 scale-105': nodoActivo === 'voluntario-{{ $vol['cod_vol'] }}', 'opacity-50': nodoActivo && nodoActivo !== 'voluntario-{{ $vol['cod_vol'] }}' }"
  >
  <div class="flex h-10 w-10 items-center justify-center rounded-full bg-fondo-panel border-2 border-borde text-parrafo shadow-sm">
@@ -428,10 +428,10 @@
  </div>
  <select wire:model.live="filtroTipo" class="h-10 rounded-xl border border-borde-suave bg-fondo-panel px-3 text-xs font-bold outline-none focus:border-borde-focus">
  <option value="">Todos los vínculos</option>
- <option value="familiar">Familiares</option>
+ <option value='FAMILIAR'>Familiares</option>
  <option value="responsable">Responsables</option>
  <option value="emergencia">Emergencia</option>
- <option value="voluntario">Voluntarios</option>
+ <option value='VOLUNTARIO'>Voluntarios</option>
  <option value="incompleto">Incompletos</option>
  </select>
  <select wire:model.live="filtroEstado" class="h-10 rounded-xl border border-borde-suave bg-fondo-panel px-3 text-xs font-bold outline-none focus:border-borde-focus">
@@ -465,11 +465,11 @@
  </thead>
  <tbody class="divide-y divide-[#C7B5A3]/45 bg-fondo-card/25">
  @forelse($personasListado as $persona)
- <?php $personaNodeKey = $persona['tipo'] === 'familiar' ? 'familiar-' . $persona['cod_fam'] : 'voluntario-' . $persona['cod_vol']; ?>
+ <?php $personaNodeKey = $persona['tipo'] === 'FAMILIAR' ? 'familiar-' . $persona['cod_fam'] : 'voluntario-' . $persona['cod_vol']; ?>
  <tr class="transition hover:bg-fondo-card/45">
  <td class="px-4 py-3">
  <div class="flex items-center gap-3">
- <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl {{ $persona['tipo'] === 'voluntario' ? 'bg-sky-100 text-sky-700' : 'bg-estado-exitoBg text-parrafo' }} text-xs font-bold">
+ <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl {{ $persona['tipo'] === 'VOLUNTARIO' ? 'bg-sky-100 text-sky-700' : 'bg-estado-exitoBg text-parrafo' }} text-xs font-bold">
  {{ $persona['iniciales'] }}
  </span>
  <div class="min-w-0">
@@ -478,7 +478,7 @@
  </div>
  </div>
  </td>
- <td class="px-4 py-3 text-xs font-bold text-apoyo">{{ $persona['tipo'] === 'voluntario' ? 'Voluntario' : 'Familiar' }}</td>
+ <td class="px-4 py-3 text-xs font-bold text-apoyo">{{ $persona['tipo'] === 'VOLUNTARIO' ? 'Voluntario' : 'Familiar' }}</td>
  <td class="px-4 py-3 text-xs font-bold text-apoyo">{{ $persona['parentesco'] }}</td>
  <td class="px-4 py-3 text-xs font-bold text-apoyo">{{ $persona['celular'] }}</td>
  <td class="px-4 py-3">
@@ -493,11 +493,11 @@
  <td class="px-4 py-3 text-xs font-bold text-apoyo">{{ $persona['actualizado'] }}</td>
  <td class="px-4 py-3">
  <div class="flex justify-end gap-1.5">
- <button type="button" wire:click.stop="abrirDetalleVinculo('{{ $persona['tipo'] }}', {{ $persona['tipo'] === 'familiar' ? $persona['cod_fam'] : $persona['cod_vol'] }})" @click="selectNode('{{ $personaNodeKey }}')" class="flex h-8 w-8 items-center justify-center rounded-lg bg-fondo-panel text-titulo transition hover:bg-boton-principal hover:text-inverso" title="Ver detalle">
+ <button type="button" wire:click.stop="abrirDetalleVinculo('{{ $persona['tipo'] }}', {{ $persona['tipo'] === 'FAMILIAR' ? $persona['cod_fam'] : $persona['cod_vol'] }})" @click="selectNode('{{ $personaNodeKey }}')" class="flex h-8 w-8 items-center justify-center rounded-lg bg-fondo-panel text-titulo transition hover:bg-boton-principal hover:text-inverso" title="Ver detalle">
  <i class="ph-bold ph-eye"></i>
  </button>
 
- @if($persona['tipo'] === 'familiar')
+ @if($persona['tipo'] === 'FAMILIAR')
  @can('familiares.editar')
  <button type="button" wire:click="editarVinculo({{ $persona['vinculo_id'] }})" class="flex h-8 w-8 items-center justify-center rounded-lg bg-fondo-panel text-titulo transition hover:bg-boton-principal hover:text-inverso" title="Editar vínculo">
  <i class="ph-bold ph-pencil-simple"></i>
@@ -692,7 +692,7 @@
  <div class="overflow-y-auto p-5 sm:p-6 bg-fondo-panel">
  <div class="flex flex-col sm:flex-row items-center sm:items-start gap-5">
  <div class="flex h-20 w-20 shrink-0 items-center justify-center rounded-[1.25rem] shadow-sm text-2xl font-black 
- {{ $detalleVinculo['tipo'] === 'voluntario' ? 'bg-sky-100 text-sky-700 border-2 border-sky-200' : 
+ {{ $detalleVinculo['tipo'] === 'VOLUNTARIO' ? 'bg-sky-100 text-sky-700 border-2 border-sky-200' : 
  ($detalleVinculo['tipo'] === 'adulto' ? 'bg-boton-principal text-inverso border-2 border-borde' : 
  'bg-estado-peligroBg text-parrafo border-2 border-borde-focus') }}">
  {{ strtoupper(mb_substr($detalleVinculo['nombre_completo'], 0, 1)) }}
@@ -763,7 +763,7 @@
  <div class="rounded-xl border border-slate-200/70 bg-fondo-card p-4 shadow-sm">
  <h4 class="mb-3 text-[10px] font-bold uppercase tracking-widest text-slate-400 border-b border-slate-100 pb-2">Sección 3: Rol dentro de la red</h4>
  <div class="grid grid-cols-1 sm:grid-cols-2 gap-y-4 gap-x-6 text-sm">
- @if($detalleVinculo['tipo'] === 'voluntario')
+ @if($detalleVinculo['tipo'] === 'VOLUNTARIO')
  <div>
  <p class="text-[10px] font-bold uppercase text-slate-400">Asignaciones / Horas</p>
  <p class="mt-0.5 font-black text-titulo">{{ $detalleVinculo['asignaciones'] ?? 0 }} turnos</p>
@@ -841,7 +841,7 @@
  
  <div class="bg-fondo-card border-t border-slate-200/70 p-4 flex justify-between gap-3 items-center">
  <div>
- @if($detalleVinculo['tipo'] === 'familiar' && auth()->user()->can('familiares.editar'))
+ @if($detalleVinculo['tipo'] === 'FAMILIAR' && auth()->user()->can('familiares.editar'))
  <button type="button" wire:click="editarVinculo({{ $detalleVinculo['vinculo_id'] }})" class="inline-flex h-10 items-center justify-center gap-2 rounded-xl bg-slate-100 border border-slate-200 px-4 text-xs font-bold text-slate-700 transition hover:bg-slate-200">
  <i class="ph-bold ph-pencil-simple text-sm"></i>
  Editar vínculo

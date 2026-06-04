@@ -64,16 +64,29 @@
  <nav class="overflow-x-auto rounded-[1.45rem] border border-borde/70 bg-fondo-panel p-2 shadow-sm backdrop-blur-xl scrollbar-hidden">
  <div class="flex min-w-max items-center gap-2">
  @php
- $tabs = [
- 'resumen' => ['label' => 'Resumen', 'icon' => 'ph-squares-four'],
- 'ficha' => ['label' => 'Ficha medica', 'icon' => 'ph-file-text'],
- 'signos' => ['label' => 'Signos vitales', 'icon' => 'ph-activity'],
- 'valoracion' => ['label' => 'Valoracion funcional', 'icon' => 'ph-person-simple-walk'],
- 'medicacion' => ['label' => 'Medicacion', 'icon' => 'ph-pill'],
- 'administracion' => ['label' => 'Administracion', 'icon' => 'ph-prescription'],
- 'alertas' => ['label' => 'Alertas', 'icon' => 'ph-warning-circle'],
- 'reportes' => ['label' => 'Reportes', 'icon' => 'ph-chart-bar'],
+ $tabsRaw = [
+ 'resumen' => ['label' => 'Resumen clinico', 'icon' => 'ph-squares-four', 'permission' => 'salud.ver'],
+ 'ficha' => ['label' => 'Ficha medica', 'icon' => 'ph-file-text', 'permission' => 'salud.ficha.ver', 'fallback_permission' => 'ficha_medica.crear'],
+ 'signos' => ['label' => 'Signos vitales', 'icon' => 'ph-activity', 'permission' => 'salud.signos.ver', 'fallback_permission' => 'signos_vitales.ver'],
+ 'medicacion' => ['label' => 'Medicacion', 'icon' => 'ph-pill', 'permission' => 'salud.medicacion.ver', 'fallback_permission' => 'medicacion.ver'],
+ 'administracion' => ['label' => 'Administracion', 'icon' => 'ph-prescription', 'permission' => 'salud.medicacion.ver', 'fallback_permission' => 'administracion_medicacion.registrar'],
+ 'valoracion' => ['label' => 'Valoracion funcional', 'icon' => 'ph-person-simple-walk', 'permission' => 'salud.ver', 'fallback_permission' => 'valoracion_funcional.crear'],
+ 'evaluaciones' => ['label' => 'Evaluaciones cognitivas', 'icon' => 'ph-brain', 'permission' => 'evaluaciones.ver'],
+ 'nutricion' => ['label' => 'Nutricion', 'icon' => 'ph-apple-pod', 'permission' => 'nutricion.ver'],
+ 'alertas' => ['label' => 'Alertas clinicas', 'icon' => 'ph-warning-circle', 'permission' => 'alertas.ver', 'fallback_permission' => 'salud.alertas.ver'],
+ 'reportes' => ['label' => 'Reportes clinicos', 'icon' => 'ph-chart-bar', 'permission' => 'reportes.ver', 'fallback_permission' => 'salud.reportes.ver'],
  ];
+ 
+ $tabs = array_filter($tabsRaw, function($tab) {
+     if (auth()->user()->hasRole(['Super-Admin', 'SUPERADMINISTRADOR'])) return true;
+     
+     $hasPerm = auth()->user()->can($tab['permission']);
+     if (isset($tab['fallback_permission']) && !$hasPerm) {
+         $hasPerm = auth()->user()->can($tab['fallback_permission']);
+     }
+     
+     return $hasPerm;
+ });
  @endphp
 
  @foreach($tabs as $key => $tab)
@@ -264,6 +277,18 @@
  @elseif($seccionActiva === 'ficha')
  <section class="animate-in fade-in duration-200">
  @livewire('admin.salud-seguimiento.salud-ficha-panel', key('ficha-general'))
+ </section>
+ @elseif($seccionActiva === 'evaluaciones')
+ <section class="animate-in fade-in duration-200">
+ @livewire('admin.salud-seguimiento.salud-evaluaciones-geriatricas-panel', key('evaluaciones'))
+ </section>
+ @elseif($seccionActiva === 'nutricion')
+ <section class="space-y-5 animate-in fade-in duration-200">
+     <div class="rounded-[1.6rem] border border-dashed border-borde/70 bg-fondo-panel p-12 text-center shadow-inner">
+         <i class="ph-bold ph-apple-pod text-4xl text-parrafo/25"></i>
+         <h3 class="mt-3 text-base font-extrabold text-parrafo">Modulo de Nutricion en desarrollo</h3>
+         <p class="mt-1 text-xs font-bold text-parrafo/55">Proximamente podras gestionar los planes nutricionales desde aqui.</p>
+     </div>
  </section>
  @else
  <section class="space-y-5 animate-in fade-in duration-200">

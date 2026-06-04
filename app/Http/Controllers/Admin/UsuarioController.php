@@ -72,14 +72,14 @@ class UsuarioController extends Controller
             $usuario->assignRole($request->rol);
 
             // Registro en tablas especializadas según rol
-            if ($request->rol === 'personal_salud') {
+            if (in_array($request->rol, ['ENFERMEROS', 'MEDICO GENERAL/GERIATRA', 'PSICOLOGO/A', 'PEDAGOGO', 'NUTRICIONISTA', 'FISIOTERAPEUTA'])) {
                 \App\Models\PersonalSalud::create([
                     'cod_usu'        => $usuario->cod_usu,
                     'cod_esp'        => $request->especialidad_salud,
                     'fecha_ing'      => $request->fecha_ingreso ?? now(),
                     'estado_laboral' => 'ACTIVO',
                 ]);
-            } elseif ($request->rol === 'personal_admin') {
+            } elseif (in_array($request->rol, ['SUPERADMINISTRADOR', 'ADMINISTRADOR'])) {
                 \App\Models\PersonalAdmin::create([
                     'cod_usu'          => $usuario->cod_usu,
                     'cod_cargo_admin'  => $request->cargo_administrativo,
@@ -171,7 +171,7 @@ class UsuarioController extends Controller
             }
 
             // Actualizar o crear registros vinculados
-            if ($request->rol === 'personal_salud') {
+            if (in_array($request->rol, ['ENFERMEROS', 'MEDICO GENERAL/GERIATRA', 'PSICOLOGO/A', 'PEDAGOGO', 'NUTRICIONISTA', 'FISIOTERAPEUTA'])) {
                 \App\Models\PersonalSalud::updateOrCreate(
                     ['cod_usu' => $usuario->cod_usu],
                     [
@@ -180,7 +180,7 @@ class UsuarioController extends Controller
                         'estado_laboral' => 'ACTIVO',
                     ]
                 );
-            } elseif ($request->rol === 'personal_admin') {
+            } elseif (in_array($request->rol, ['SUPERADMINISTRADOR', 'ADMINISTRADOR'])) {
                 \App\Models\PersonalAdmin::updateOrCreate(
                     ['cod_usu' => $usuario->cod_usu],
                     [

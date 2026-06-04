@@ -24,7 +24,7 @@ class PersonalSalud extends Model
     public $incrementing = true;
     protected $keyType = 'int';
 
-    public $timestamps = false;
+    public $timestamps = true;
 
     protected $fillable = [
         'fecha_ing',
@@ -35,6 +35,9 @@ class PersonalSalud extends Model
         'cod_usu',
         'cod_esp',
         'institucion_formacion',
+        // ── Fase 6 ──────────────────────────────────────────────────────────
+        'tipo_personal_salud',  // MEDICO, ENFERMERO, PSICOLOGO, FISIOTERAPEUTA, OTRO
+        'subtipo_enfermeria',   // GENERAL_ADMISION, ESPECIALIZADO_TURNO
     ];
 
     protected $casts = [

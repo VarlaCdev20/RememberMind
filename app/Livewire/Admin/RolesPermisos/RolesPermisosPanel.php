@@ -58,7 +58,7 @@ class RolesPermisosPanel extends Component
         $this->agruparPermisos();
 
         if ($this->roles->count() > 0) {
-            $adminRole = $this->roles->where('name', 'admin')->first();
+            $adminRole = $this->roles->where('name', 'SUPERADMINISTRADOR')->first();
             if ($adminRole) {
                 $this->seleccionarRol($adminRole->id);
             } else {
@@ -124,7 +124,7 @@ class RolesPermisosPanel extends Component
         }
 
         $rol = Role::find($this->rolSeleccionadoId);
-        if ($rol && $rol->name === 'admin' && $permissionName === 'roles.editar_permisos') {
+        if ($rol && $rol->name === 'SUPERADMINISTRADOR' && $permissionName === 'roles.editar_permisos') {
             if (in_array($permissionName, $this->permisosSeleccionados)) {
                 $this->dispatch('swal', [
                     'icon' => 'warning',
@@ -194,36 +194,39 @@ class RolesPermisosPanel extends Component
     // Helpers Visuales
     public function obtenerNombreVisualRol($roleName)
     {
-        return match ($roleName) {
-            'admin' => 'Superadministrador',
-            'personal_admin' => 'Personal Administrativo',
-            'personal_salud' => 'Personal de Salud',
-            'voluntario' => 'Voluntario',
-            'familiar' => 'Familiar',
-            default => strtoupper($roleName)
-        };
+        return strtoupper($roleName); // Todos los roles ya están en mayúsculas y nombrados correctamente
     }
 
     public function obtenerDescripcionRol($roleName)
     {
         return match ($roleName) {
-            'admin' => 'Acceso total al sistema y configuraciones.',
-            'personal_admin' => 'Gestión de reportes, ingresos e información institucional.',
-            'personal_salud' => 'Control clínico, bitácora médica y atenciones.',
-            'voluntario' => 'Visualización de actividades y apoyo.',
-            'familiar' => 'Acceso limitado para ver historial del adulto mayor.',
-            default => 'Rol institucional.'
+            'SUPERADMINISTRADOR' => 'Acceso total absoluto al sistema y configuraciones críticas.',
+            'ADMINISTRADOR' => 'Gestión institucional, administrativa, financiera y de reportes.',
+            'ENFERMEROS' => 'Control de pacientes, administración de medicación, signos vitales y pase de turno.',
+            'MEDICO GENERAL/GERIATRA' => 'Fichas clínicas completas, prescripciones, diagnósticos y altas médicas.',
+            'PSICOLOGO/A' => 'Evaluaciones cognitivas, historial conductual y apoyo emocional.',
+            'PEDAGOGO' => 'Diseño y control de actividades recreativas y estimulación cognitiva.',
+            'NUTRICIONISTA' => 'Dietas, suplementación y control de peso de los residentes.',
+            'FISIOTERAPEUTA' => 'Valoración funcional, rutinas físicas y terapias de rehabilitación.',
+            'VOLUNTARIO' => 'Participación en actividades y acompañamiento.',
+            'FAMILIAR' => 'Acceso limitado para ver el expediente y estado del adulto mayor vinculado.',
+            default => 'Rol institucional general.'
         };
     }
 
     public function obtenerColorRol($roleName)
     {
         return match ($roleName) {
-            'admin' => 'bg-[#2F3E5C] text-white',
-            'personal_admin' => 'bg-[#E27D60] text-white',
-            'personal_salud' => 'bg-[#8DA280] text-white',
-            'voluntario' => 'bg-[#D5C7B9] text-[#2F3E5C]',
-            'familiar' => 'bg-[#967B66] text-white',
+            'SUPERADMINISTRADOR' => 'bg-[#2F3E5C] text-white border border-[#2F3E5C]',
+            'ADMINISTRADOR' => 'bg-[#E27D60] text-white border border-[#E27D60]',
+            'ENFERMEROS' => 'bg-boton-acento text-white border border-boton-acento',
+            'MEDICO GENERAL/GERIATRA' => 'bg-[#6A8CAF] text-white border border-[#6A8CAF]',
+            'PSICOLOGO/A' => 'bg-[#A88CBA] text-white border border-[#A88CBA]',
+            'PEDAGOGO' => 'bg-[#E5A86B] text-white border border-[#E5A86B]',
+            'NUTRICIONISTA' => 'bg-[#8DA280] text-white border border-[#8DA280]',
+            'FISIOTERAPEUTA' => 'bg-[#C78283] text-white border border-[#C78283]',
+            'VOLUNTARIO' => 'bg-[#D5C7B9] text-[#2F3E5C] border border-[#BFA590]',
+            'FAMILIAR' => 'bg-[#967B66] text-white border border-[#967B66]',
             default => 'bg-gray-200 text-gray-800'
         };
     }

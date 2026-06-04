@@ -229,14 +229,14 @@
  <div class="min-w-0">
  <p class="text-[9px] font-bold uppercase tracking-widest text-parrafo/45">Cargo de Desempeño</p>
  
- @if($usuario->hasRole('personal_salud'))
+ @if($usuario->hasAnyRole(['ENFERMEROS', 'MEDICO GENERAL/GERIATRA', 'PSICOLOGO/A', 'PEDAGOGO', 'NUTRICIONISTA', 'FISIOTERAPEUTA']))
  <p class="mt-1 text-base font-extrabold text-parrafo uppercase truncate">{{ $usuario->personalSalud?->especialidad?->nombre ?? 'Sin Especialidad' }}</p>
  @if($usuario->personalSalud?->fecha_ing)
  <p class="mt-1 text-[10px] font-bold text-parrafo/45">
  Ingresó en: {{ $usuario->personalSalud->fecha_ing instanceof \Carbon\Carbon ? $usuario->personalSalud->fecha_ing->format('d/m/Y') : \Carbon\Carbon::parse($usuario->personalSalud->fecha_ing)->format('d/m/Y') }}
  </p>
  @endif
- @elseif($usuario->hasRole('personal_admin'))
+ @elseif($usuario->hasAnyRole(['SUPERADMINISTRADOR', 'ADMINISTRADOR']))
  <p class="mt-1 text-base font-extrabold text-parrafo uppercase truncate">{{ $usuario->personalAdmin?->cargoAdmin?->nombre ?? ($usuario->personalAdmin?->cargo ?? 'Sin cargo') }}</p>
  @if($usuario->personalAdmin?->fecha_ingreso)
  <p class="mt-1 text-[10px] font-bold text-parrafo/45">
@@ -254,7 +254,7 @@
  </section>
 
  {{-- Sección de Adultos Mayores Vinculados para el Rol Familiar --}}
- @if($usuario->hasRole('familiar'))
+ @if($usuario->hasRole('FAMILIAR'))
  <section class="md:col-span-2 rounded-[2rem] border border-borde/45 bg-fondo-card/70 p-6 shadow-sm space-y-5">
  <h3 class="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-boton-acento">
  <i class="ph-bold ph-link text-lg"></i> Adulto(s) Mayor(es) Vinculado(s)

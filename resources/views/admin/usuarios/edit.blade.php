@@ -280,11 +280,9 @@
  @foreach($roles as $r)
  @php
  $displayName = match($r->name) {
- 'personal_salud' => 'PERSONAL DE SALUD',
- 'personal_admin' => 'PERSONAL ADMINISTRATIVO',
- 'familiar' => 'FAMILIAR / RESPONSABLE',
- 'voluntario' => 'VOLUNTARIO',
- default => strtoupper(str_replace('_', ' ', $r->name))
+ 'FAMILIAR' => 'Familiar / Responsable',
+ 'VOLUNTARIO' => 'Voluntario',
+ default => mb_convert_case(str_replace('_', ' ', $r->name), MB_CASE_TITLE, 'UTF-8')
  };
  $selected = old('rol', $usuario->getRoleNames()->first()) == $r->name ? 'selected' : '';
  @endphp
@@ -304,9 +302,9 @@
  </div>
 
  {{-- Condicional: Especialidad Salud --}}
- <div x-show="rol === 'personal_salud'" x-transition>
+ <div x-show="['ENFERMEROS', 'MEDICO GENERAL/GERIATRA', 'PSICOLOGO/A', 'PEDAGOGO', 'NUTRICIONISTA', 'FISIOTERAPEUTA'].includes(rol)" x-transition>
  <label class="mb-1.5 block text-[10px] font-bold uppercase tracking-widest text-titulo/60">Especialidad del Personal de Salud *</label>
- <select name="especialidad_salud" :required="rol === 'personal_salud'"
+ <select name="especialidad_salud" :required="['ENFERMEROS', 'MEDICO GENERAL/GERIATRA', 'PSICOLOGO/A', 'PEDAGOGO', 'NUTRICIONISTA', 'FISIOTERAPEUTA'].includes(rol)"
  class="w-full rounded-2xl border border-borde-suave bg-fondo-card/40 px-5 py-3 text-sm font-bold outline-none transition focus:border-borde-focus">
  <option value="">Seleccionar especialidad...</option>
  @foreach($especialidades as $esp)
@@ -318,9 +316,9 @@
  </div>
 
  {{-- Condicional: Cargo Administrativo --}}
- <div x-show="rol === 'personal_admin'" x-transition>
+ <div x-show="['SUPERADMINISTRADOR', 'ADMINISTRADOR'].includes(rol)" x-transition>
  <label class="mb-1.5 block text-[10px] font-bold uppercase tracking-widest text-titulo/60">Función Administrativa *</label>
- <select name="cargo_administrativo" :required="rol === 'personal_admin'"
+ <select name="cargo_administrativo" :required="['SUPERADMINISTRADOR', 'ADMINISTRADOR'].includes(rol)"
  class="w-full rounded-2xl border border-borde-suave bg-fondo-card/40 px-5 py-3 text-sm font-bold outline-none transition focus:border-borde-focus">
  <option value="">Seleccionar función...</option>
  @foreach($cargosAdmin as $cargo)

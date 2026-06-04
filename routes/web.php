@@ -75,6 +75,11 @@ Route::middleware([
                 ->middleware('permission:usuarios.ver')
                 ->name('usuarios.ficha.enviar-correo');
 
+            // ── Personal Institucional ─────────────
+            Route::get('/personal-institucional', \App\Livewire\Admin\PersonalInstitucional\PersonalInstitucionalPanel::class)
+                ->middleware('permission:personal_institucional.ver')
+                ->name('personal-institucional');
+
             // ── Roles y Permisos ─────────────────
             Route::view('/roles-permisos', 'admin.roles-permisos.index')
                 ->middleware('permission:roles.ver')
@@ -111,6 +116,15 @@ Route::middleware([
             Route::get('adultos-mayores/alertas-pendientes', \App\Livewire\Admin\AdultosMayores\AlertasPendientesPanel::class)
                 ->middleware('permission:adultos.ver')
                 ->name('adultos-mayores.alertas-pendientes');
+
+            // ── Admisiones ───────────────────────
+            Route::prefix('admisiones')
+                ->name('admisiones.')
+                ->middleware('permission:admisiones.ver_dashboard')
+                ->group(function () {
+                    Route::get('/preadmisiones', \App\Livewire\Admin\Admisiones\PreadmisionesPanel::class)->name('preadmisiones');
+                    Route::get('/preadmision', \App\Livewire\Admin\Admisiones\PreadmisionWizard::class)->name('preadmision');
+                });
 
             // ── Adultos Mayores ──────────────────
             Route::resource('adultos-mayores', AdultoMayorController::class)
@@ -275,6 +289,78 @@ Route::middleware([
                     ])->name('ficha-social');
                 });
 
+            // ── FLUJO CLÍNICO / ENFERMERÍA (Fase 6) ──────────────────────────────
+
+            // Infraestructura: Habitaciones y Camas
+            Route::prefix('habitaciones')
+                ->name('habitaciones.')
+                ->middleware('permission:habitaciones.ver')
+                ->group(function () {
+                    Route::get('/', \App\Livewire\Admin\Enfermeria\HabitacionesPanel::class)->name('index');
+                });
+
+            // Turnos de Enfermería
+            Route::prefix('turnos-enfermeria')
+                ->name('turnos-enfermeria.')
+                ->middleware('permission:turnos_enfermeria.ver')
+                ->group(function () {
+                    Route::get('/', \App\Livewire\Admin\Enfermeria\TurnosEnfermeriaPanel::class)->name('index');
+                });
+
+            // Admisión clínica — Valoraciones
+            Route::prefix('admision')
+                ->name('admision.')
+                ->middleware('permission:valoracion_enfermeria.ver')
+                ->group(function () {
+                    Route::get('/valoracion-enfermeria', \App\Livewire\Admin\Enfermeria\ValoracionEnfermeriaPanel::class)->name('valoracion-enfermeria');
+                    Route::get('/valoracion-medica', \App\Livewire\Admin\Enfermeria\ValoracionMedicaPanel::class)
+                        ->middleware('permission:valoracion_medica.ver')
+                        ->name('valoracion-medica');
+                });
+
+            // Asignación de Turno
+            Route::prefix('asignacion-turno')
+                ->name('asignacion-turno.')
+                ->middleware('permission:asignacion_turno.ver')
+                ->group(function () {
+                    Route::get('/', \App\Livewire\Admin\Enfermeria\AsignacionTurnoPanel::class)->name('index');
+                });
+
+            // Plan de Cuidado y Tareas
+            Route::prefix('plan-cuidado')
+                ->name('plan-cuidado.')
+                ->middleware('permission:plan_cuidado.ver')
+                ->group(function () {
+                    Route::get('/', \App\Livewire\Admin\Enfermeria\PlanCuidadoPanel::class)->name('index');
+                    Route::get('/tareas', \App\Livewire\Admin\Enfermeria\TareasPlanPanel::class)
+                        ->middleware('permission:tareas.ver')
+                        ->name('tareas');
+                });
+
+            // Seguimiento Diario
+            Route::prefix('seguimiento-diario')
+                ->name('seguimiento-diario.')
+                ->middleware('permission:seguimiento.ver')
+                ->group(function () {
+                    Route::get('/', \App\Livewire\Admin\Enfermeria\SeguimientoDiarioPanel::class)->name('index');
+                });
+
+            // Alertas y Acciones
+            Route::prefix('alertas-clinicas')
+                ->name('alertas-clinicas.')
+                ->middleware('permission:alertas.ver')
+                ->group(function () {
+                    Route::get('/', \App\Livewire\Admin\Enfermeria\AlertasPanel::class)->name('index');
+                });
+
+            // Pase de Turno
+            Route::prefix('pase-turno')
+                ->name('pase-turno.')
+                ->middleware('permission:pase_turno.ver')
+                ->group(function () {
+                    Route::get('/', \App\Livewire\Admin\Enfermeria\PaseTurnoPanel::class)->name('index');
+                });
+
             // ── Actividades ─────────────────────────
             Route::prefix('actividades')
                 ->name('actividades.')
@@ -298,6 +384,197 @@ Route::middleware([
                     Route::view('/asignaciones', 'admin.voluntarios.asignaciones')->name('asignaciones.index');
                     Route::view('/asistencia', 'admin.voluntarios.asistencia')->name('asistencia.index');
                     Route::view('/reportes', 'admin.voluntarios.index')->name('reportes.index');
+                });
+
+            // ── Enfermería ─────────────────────────
+            Route::prefix('enfermeria')
+                ->name('enfermeria.')
+                ->group(function () {
+                    Route::get('/dashboard', \App\Livewire\Admin\Enfermeria\DashboardTurno::class)
+                        ->middleware('permission:enfermeria.ver_dashboard')
+                        ->name('dashboard');
+                    
+                    Route::get('/pacientes', \App\Livewire\Admin\Enfermeria\MisPacientes::class)
+                        ->middleware('permission:enfermeria.ver_pacientes_asignados')
+                        ->name('pacientes');
+                    
+                    Route::get('/pacientes/{adulto}', \App\Livewire\Admin\Enfermeria\FichaPaciente::class)
+                        ->middleware('permission:enfermeria.ver_ficha_paciente')
+                        ->name('pacientes.ficha');
+                        
+                    Route::get('/pacientes/{adulto}/pdf', [\App\Http\Controllers\Admin\Enfermeria\FichaPacienteReporteController::class, 'pdf'])
+                        ->middleware('permission:enfermeria.ver_ficha_paciente')
+                        ->name('pacientes.ficha.pdf');
+                    
+                    Route::get('/tareas', \App\Livewire\Admin\Enfermeria\TareasPlanPanel::class)
+                        ->middleware('permission:enfermeria.ver_dashboard')
+                        ->name('tareas');
+                    
+                    Route::get('/alertas', \App\Livewire\Admin\Enfermeria\AlertasPanel::class)
+                        ->middleware('permission:enfermeria.ver_dashboard')
+                        ->name('alertas');
+                        
+                    Route::get('/pase-turno', \App\Livewire\Admin\Enfermeria\PaseTurnoPanel::class)
+                        ->middleware('permission:enfermeria.ver_dashboard')
+                        ->name('pase-turno');
+                        
+                    Route::get('/actividades', \App\Livewire\Admin\Enfermeria\DashboardTurno::class)
+                        ->middleware('permission:enfermeria.ver_dashboard')
+                        ->name('actividades');
+                        
+                    Route::get('/reportes', \App\Livewire\Admin\Enfermeria\DashboardTurno::class)
+                        ->middleware('permission:enfermeria.ver_dashboard')
+                        ->name('reportes');
+                });
+
+            // ── Médico General ─────────────────────────
+            Route::prefix('medico')
+                ->name('medico.')
+                ->group(function () {
+                    Route::get('/dashboard', \App\Livewire\Admin\Medico\DashboardMedico::class)
+                        ->name('dashboard');
+                        
+                    // Admisiones Médicas
+                    Route::get('/valoraciones-medicas', \App\Livewire\Admin\Medico\DashboardMedico::class)
+                        ->name('valoraciones');
+                    Route::get('/decisiones-admision', \App\Livewire\Admin\Medico\DashboardMedico::class)
+                        ->name('decisiones');
+                        
+                    // Pacientes
+                    Route::get('/pacientes-observacion', \App\Livewire\Admin\Medico\DashboardMedico::class)
+                        ->name('pacientes.observacion');
+                    Route::get('/historial-clinico', \App\Livewire\Admin\Medico\DashboardMedico::class)
+                        ->name('pacientes.historial');
+                });
+
+            // ── Psicología ─────────────────────────
+            Route::prefix('psicologia')
+                ->name('psicologia.')
+                ->group(function () {
+                    Route::get('/dashboard', [DashboardController::class, 'index'])
+                        ->name('dashboard');
+                        
+                    // Psicología
+                    Route::get('/evaluaciones-asignadas', [DashboardController::class, 'index'])
+                        ->name('evaluaciones');
+                    Route::get('/seguimiento-emocional', [DashboardController::class, 'index'])
+                        ->name('seguimiento');
+                    Route::get('/alertas-conductuales', [DashboardController::class, 'index'])
+                        ->name('alertas');
+                        
+                    // Pacientes
+                    Route::get('/pacientes-derivados', [DashboardController::class, 'index'])
+                        ->name('pacientes.derivados');
+                    Route::get('/historial-psicologico', [DashboardController::class, 'index'])
+                        ->name('pacientes.historial');
+                        
+                    // Reportes
+                    Route::get('/reportes-psicologicos', [DashboardController::class, 'index'])
+                        ->name('reportes');
+                });
+
+            // ── Fisioterapia ─────────────────────────
+            Route::prefix('fisioterapia')
+                ->name('fisioterapia.')
+                ->group(function () {
+                    Route::get('/dashboard', [DashboardController::class, 'index'])
+                        ->name('dashboard');
+                        
+                    // Fisioterapia
+                    Route::get('/pacientes-derivados', [DashboardController::class, 'index'])
+                        ->name('pacientes.derivados');
+                    Route::get('/valoracion-funcional', [DashboardController::class, 'index'])
+                        ->name('valoracion');
+                    Route::get('/plan-funcional', [DashboardController::class, 'index'])
+                        ->name('plan');
+                    Route::get('/evolucion-fisica', [DashboardController::class, 'index'])
+                        ->name('evolucion');
+                        
+                    // Riesgos
+                    Route::get('/riesgo-caida', [DashboardController::class, 'index'])
+                        ->name('riesgo.caida');
+                    Route::get('/alertas-funcionales', [DashboardController::class, 'index'])
+                        ->name('alertas');
+                        
+                    // Reportes
+                    Route::get('/reportes-fisioterapia', [DashboardController::class, 'index'])
+                        ->name('reportes');
+                });
+
+            // ── Nutrición ─────────────────────────
+            Route::prefix('nutricion')
+                ->name('nutricion.')
+                ->group(function () {
+                    Route::get('/dashboard', [DashboardController::class, 'index'])
+                        ->name('dashboard');
+                        
+                    // Nutrición
+                    Route::get('/pacientes-derivados', [DashboardController::class, 'index'])
+                        ->name('pacientes.derivados');
+                    Route::get('/valoracion-nutricional', [DashboardController::class, 'index'])
+                        ->name('valoracion');
+                    Route::get('/plan-alimentario', [DashboardController::class, 'index'])
+                        ->name('plan');
+                    Route::get('/seguimiento-nutricional', [DashboardController::class, 'index'])
+                        ->name('seguimiento');
+                        
+                    // Control
+                    Route::get('/peso-imc', [DashboardController::class, 'index'])
+                        ->name('control.peso');
+                    Route::get('/hidratacion', [DashboardController::class, 'index'])
+                        ->name('control.hidratacion');
+                    Route::get('/alertas-nutricionales', [DashboardController::class, 'index'])
+                        ->name('alertas');
+                        
+                    // Reportes
+                    Route::get('/reportes-nutricionales', [DashboardController::class, 'index'])
+                        ->name('reportes');
+                });
+
+            // ── Voluntario ─────────────────────────
+            Route::prefix('voluntario')
+                ->name('voluntario.')
+                ->group(function () {
+                    Route::get('/dashboard', [DashboardController::class, 'index'])
+                        ->name('dashboard');
+                        
+                    // Voluntariado
+                    Route::get('/mis-actividades', [DashboardController::class, 'index'])
+                        ->name('actividades');
+                    Route::get('/asistencia', [DashboardController::class, 'index'])
+                        ->name('asistencia');
+                    Route::get('/disponibilidad', [DashboardController::class, 'index'])
+                        ->name('disponibilidad');
+                        
+                    // Adultos Mayores
+                    Route::get('/adultos-asignados', [DashboardController::class, 'index'])
+                        ->name('adultos.asignados');
+                        
+                    // Reportes
+                    Route::get('/reportes-actividades', [DashboardController::class, 'index'])
+                        ->name('reportes');
+                });
+
+            // ── Portal Familiar ─────────────────────────
+            Route::prefix('portal-familiar')
+                ->name('familiar.')
+                ->group(function () {
+                    Route::get('/dashboard', [DashboardController::class, 'index'])
+                        ->name('dashboard');
+                        
+                    // Mi Familiar
+                    Route::get('/resumen-estado', [DashboardController::class, 'index'])
+                        ->name('resumen');
+                    Route::get('/actividades', [DashboardController::class, 'index'])
+                        ->name('actividades');
+                    Route::get('/visitas', [DashboardController::class, 'index'])
+                        ->name('visitas');
+                        
+                    // Pagos y Documentos
+                    Route::get('/estado-cuenta', [DashboardController::class, 'index'])
+                        ->name('pagos');
+                    Route::get('/documentos', [DashboardController::class, 'index'])
+                        ->name('documentos');
                 });
 
             // ── Reportes Institucionales ─────────

@@ -357,7 +357,7 @@
  </button>
  @endif
  @endcan
- <a href="{{ route('admin.voluntariado.disponibilidad.index', ['voluntario' => $vol->cod_vol]) }}" class="flex h-9 w-9 items-center justify-center rounded-xl bg-fondo-panel text-apoyo transition hover:bg-fondo-panel hover:text-titulo" title="Ver disponibilidad">
+ <a href="{{ route('admin.voluntariado.disponibilidad.index', ['VOLUNTARIO' => $vol->cod_vol]) }}" class="flex h-9 w-9 items-center justify-center rounded-xl bg-fondo-panel text-apoyo transition hover:bg-fondo-panel hover:text-titulo" title="Ver disponibilidad">
  <i class="ph-bold ph-calendar-dots"></i>
  </a>
  </div>
@@ -523,7 +523,7 @@
 
  @if($mostrarPerfil && $perfil)
  @php
- $p = $perfil['voluntario'];
+ $p = $perfil['VOLUNTARIO'];
  $nombrePerfil = trim(($p->nombres ?? '') . ' ' . ($p->ap_paterno ?? '') . ' ' . ($p->ap_materno ?? ''));
  $estadoPerfil = $p->archivado_en ? 'ARCHIVADO' : strtoupper($p->estado ?? 'INACTIVO');
  @endphp

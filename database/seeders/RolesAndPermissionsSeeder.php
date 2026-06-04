@@ -17,6 +17,7 @@ class RolesAndPermissionsSeeder extends Seeder
         // 1. Definir la lista estricta de permisos por módulo
         $permisos = [
             // Administración
+            'personal_institucional.ver',
             'usuarios.ver',
             'usuarios.crear',
             'usuarios.editar',
@@ -158,6 +159,7 @@ class RolesAndPermissionsSeeder extends Seeder
 
         // PERSONAL ADMIN
         $rolePersonalAdmin->syncPermissions([
+            'personal_institucional.ver',
             'usuarios.ver',
             'areas.ver',
             'areas.reportes',

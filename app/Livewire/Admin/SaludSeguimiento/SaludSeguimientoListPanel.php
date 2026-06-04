@@ -16,13 +16,13 @@ class SaludSeguimientoListPanel extends Component
     use WithPagination;
 
     public $search = '';
-
-    protected $queryString = [
-        'search' => ['except' => '']
-    ];
-
     public string $seccionActiva = 'resumen';
     public ?AdultoMayor $adultoSeleccionadoParaModal = null;
+
+    protected $queryString = [
+        'search' => ['except' => ''],
+        'seccionActiva' => ['except' => 'resumen', 'as' => 'tab'],
+    ];
 
     public function updatingSearch()
     {
@@ -41,23 +41,36 @@ class SaludSeguimientoListPanel extends Component
 
     public function mount()
     {
-        if (request()->routeIs('*.ficha.index')) {
-            $this->seccionActiva = 'ficha';
-        } elseif (request()->routeIs('*.medicacion.index')) {
-            $this->seccionActiva = 'medicacion';
-        } elseif (request()->routeIs('*.administracion.index')) {
-            $this->seccionActiva = 'administracion';
-        } elseif (request()->routeIs('*.signos.index')) {
-            $this->seccionActiva = 'signos';
-        } elseif (request()->routeIs('*.valoracion.index')) {
-            $this->seccionActiva = 'valoracion';
-        } elseif (request()->routeIs('*.evaluaciones-geriatricas.index')) {
-            $this->seccionActiva = 'evaluaciones';
-        } elseif (request()->routeIs('*.alertas')) {
-            $this->seccionActiva = 'alertas';
-        } elseif (request()->routeIs('*.reportes')) {
-            $this->seccionActiva = 'reportes';
-        } else {
+        // Validación de permisos por tab. 
+        // Si el usuario entra directamente a un tab sin permiso, lo regresamos al que sí pueda ver o a resumen.
+        $this->validarPermisoSeccion();
+    }
+
+    public function updatedSeccionActiva()
+    {
+        $this->validarPermisoSeccion();
+        $this->resetPage();
+    }
+
+    protected function validarPermisoSeccion()
+    {
+        $user = auth()->user();
+        if ($user->hasRole(['Super-Admin', 'SUPERADMINISTRADOR'])) return;
+
+        $permitido = match($this->seccionActiva) {
+            'ficha' => $user->can('salud.ficha.ver') || $user->can('ficha_medica.crear'),
+            'signos' => $user->can('salud.signos.ver') || $user->can('signos_vitales.ver'),
+            'medicacion' => $user->can('salud.medicacion.ver') || $user->can('medicacion.ver'),
+            'administracion' => $user->can('salud.medicacion.ver') || $user->can('administracion_medicacion.registrar'),
+            'valoracion' => $user->can('salud.ver') || $user->can('valoracion_funcional.crear'),
+            'evaluaciones' => $user->can('evaluaciones.ver'),
+            'nutricion' => $user->can('nutricion.ver'),
+            'alertas' => $user->can('salud.alertas.ver') || $user->can('alertas.ver'),
+            'reportes' => $user->can('salud.reportes.ver') || $user->can('reportes.ver'),
+            default => true, // resumen
+        };
+
+        if (!$permitido) {
             $this->seccionActiva = 'resumen';
         }
     }

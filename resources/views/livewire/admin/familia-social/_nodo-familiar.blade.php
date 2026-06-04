@@ -11,7 +11,7 @@
 <button type="button" class="nodo-familiar flex flex-col items-center group cursor-pointer transition-transform hover:scale-105 relative border-none bg-transparent"
  data-responsable="{{ $isResponsable ? 'true' : 'false' }}"
  data-contacto="{{ $isContacto ? 'true' : 'false' }}"
- wire:click.stop="abrirDetalleVinculo('familiar', '{{ $fam['cod_fam'] }}')"
+ wire:click.stop="abrirDetalleVinculo('FAMILIAR', '{{ $fam['cod_fam'] }}')"
  :class="{ 'opacity-100 scale-105 z-20': nodoActivo === 'familiar-{{ $fam['cod_fam'] }}', 'opacity-40': nodoActivo && nodoActivo !== 'familiar-{{ $fam['cod_fam'] }}' }"
 >
  <div class="flex {{ $isResponsable ? 'h-14 w-14' : 'h-12 w-12' }} items-center justify-center rounded-full {{ $bgColor }} border-[3px] {{ $borderColor }} {{ $textColor }} shadow-sm z-10 relative bg-fondo-card">

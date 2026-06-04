@@ -53,9 +53,9 @@
  <tr>
  <td class="label-detail">Cargo / Especialidad:</td>
  <td class="value-detail">
- @if($usuario->hasRole('personal_salud'))
+ @if($usuario->hasAnyRole(['ENFERMEROS', 'MEDICO GENERAL/GERIATRA', 'PSICOLOGO/A', 'PEDAGOGO', 'NUTRICIONISTA', 'FISIOTERAPEUTA']))
  {{ $usuario->personalSalud?->especialidad?->nombre ?? 'Personal de salud' }}
- @elseif($usuario->hasRole('personal_admin'))
+ @elseif($usuario->hasAnyRole(['SUPERADMINISTRADOR', 'ADMINISTRADOR']))
  {{ $usuario->personalAdmin?->cargoAdmin?->nombre ?? 'Personal administrativo' }}
  @else
  {{ $nombre_rol }}
@@ -63,9 +63,9 @@
  </td>
  <td class="label-detail">Fecha Ingreso:</td>
  <td class="value-detail">
- @if($usuario->hasRole('personal_salud') && $usuario->personalSalud?->fecha_ing)
+ @if($usuario->hasAnyRole(['ENFERMEROS', 'MEDICO GENERAL/GERIATRA', 'PSICOLOGO/A', 'PEDAGOGO', 'NUTRICIONISTA', 'FISIOTERAPEUTA']) && $usuario->personalSalud?->fecha_ing)
  {{ $usuario->personalSalud->fecha_ing instanceof \Carbon\Carbon ? $usuario->personalSalud->fecha_ing->format('d/m/Y') : \Carbon\Carbon::parse($usuario->personalSalud->fecha_ing)->format('d/m/Y') }}
- @elseif($usuario->hasRole('personal_admin') && $usuario->personalAdmin?->fecha_ingreso)
+ @elseif($usuario->hasAnyRole(['SUPERADMINISTRADOR', 'ADMINISTRADOR']) && $usuario->personalAdmin?->fecha_ingreso)
  {{ $usuario->personalAdmin->fecha_ingreso instanceof \Carbon\Carbon ? $usuario->personalAdmin->fecha_ingreso->format('d/m/Y') : \Carbon\Carbon::parse($usuario->personalAdmin->fecha_ingreso)->format('d/m/Y') }}
  @else
  {{ $usuario->created_at->format('d/m/Y') }}

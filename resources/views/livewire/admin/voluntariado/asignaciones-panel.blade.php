@@ -303,7 +303,7 @@
  </div>
  @endif
 
- <a href="{{ route('admin.voluntariado.asistencia.index', ['voluntario' => $detalleAsignacion->cod_vol, 'fecha' => $detalleAsignacion->fecha_asig, 'asignacion' => $detalleAsignacion->cod_asig_vol]) }}" class="inline-flex h-9 items-center justify-center gap-2 rounded-xl bg-boton-principal px-3 text-[10px] font-bold uppercase tracking-wider text-inverso transition hover:bg-boton-acento">
+ <a href="{{ route('admin.voluntariado.asistencia.index', ['VOLUNTARIO' => $detalleAsignacion->cod_vol, 'fecha' => $detalleAsignacion->fecha_asig, 'asignacion' => $detalleAsignacion->cod_asig_vol]) }}" class="inline-flex h-9 items-center justify-center gap-2 rounded-xl bg-boton-principal px-3 text-[10px] font-bold uppercase tracking-wider text-inverso transition hover:bg-boton-acento">
  <i class="ph-bold ph-clipboard-text"></i>
  Registrar asistencia
  </a>
@@ -401,7 +401,7 @@
  </button>
  @endif
  @endcan
- <a href="{{ route('admin.voluntariado.asistencia.index', ['voluntario' => $registro->cod_vol, 'fecha' => $registro->fecha_asig, 'asignacion' => $registro->cod_asig_vol]) }}" class="flex h-8 w-8 items-center justify-center rounded-xl bg-fondo-panel text-titulo transition hover:bg-boton-acento hover:text-inverso" title="Registrar asistencia">
+ <a href="{{ route('admin.voluntariado.asistencia.index', ['VOLUNTARIO' => $registro->cod_vol, 'fecha' => $registro->fecha_asig, 'asignacion' => $registro->cod_asig_vol]) }}" class="flex h-8 w-8 items-center justify-center rounded-xl bg-fondo-panel text-titulo transition hover:bg-boton-acento hover:text-inverso" title="Registrar asistencia">
  <i class="ph-bold ph-clipboard-text"></i>
  </a>
  </div>

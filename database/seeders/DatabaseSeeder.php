@@ -19,6 +19,7 @@ class DatabaseSeeder extends Seeder
             EstadoAdultoSeeder::class,
             RolesAndPermissionsSeeder::class,
             SaludSeguimientoPermissionsSeeder::class,
+            FlujoClinicoPermissionsSeeder::class,
 
             // Datos institucionales
             AreasInstitucionalesSeeder::class,
@@ -34,6 +35,7 @@ class DatabaseSeeder extends Seeder
             // Datos de ejemplo
             AdminSeeder::class,
             AdultoMayorSeeder::class,
+            EnfermeriaPacienteSeeder::class,
         ]);
     }
 

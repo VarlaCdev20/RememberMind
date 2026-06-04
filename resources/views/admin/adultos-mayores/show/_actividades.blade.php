@@ -30,7 +30,7 @@
  </button>
 
  <button type="button"
- @click="abrir('voluntario')"
+ @click="abrir('VOLUNTARIO')"
  class="inline-flex items-center justify-center gap-2 rounded-2xl bg-fondo-panel px-4 py-2.5 text-xs font-bold text-inverso shadow-[0_10px_20px_rgba(142,161,125,0.18)] transition hover:-translate-y-0.5 hover:bg-fondo-panel active:scale-[0.98]">
  <i class="ph-bold ph-hand-heart"></i>
  Asignar voluntario
@@ -214,7 +214,7 @@
  <p class="text-[10px] font-bold text-apoyo uppercase tracking-widest">Apoyo y acompañamiento externo</p>
  </div>
  </div>
- <button type="button" @click="abrir('voluntario')" class="rounded-xl bg-fondo-panel px-4 py-2 text-xs font-bold text-inverso hover:bg-fondo-panel transition">
+ <button type="button" @click="abrir('VOLUNTARIO')" class="rounded-xl bg-fondo-panel px-4 py-2 text-xs font-bold text-inverso hover:bg-fondo-panel transition">
  <i class="ph-bold ph-user-plus mr-1"></i> Asignar
  </button>
  </div>
@@ -269,10 +269,10 @@
  </td>
  <td class="px-6 py-4 text-right">
  <div class="flex justify-end gap-1.5">
- <button type="button" @click="abrir('voluntario', @js($asignacion), false, true)" class="rounded-lg bg-fondo-panel p-2 text-titulo hover:bg-boton-principal hover:text-inverso transition">
+ <button type="button" @click="abrir('VOLUNTARIO', @js($asignacion), false, true)" class="rounded-lg bg-fondo-panel p-2 text-titulo hover:bg-boton-principal hover:text-inverso transition">
  <i class="ph-bold ph-eye"></i>
  </button>
- <button type="button" @click="abrir('voluntario', @js($asignacion), true, false)" class="rounded-lg bg-fondo-panel p-2 text-titulo hover:bg-boton-principal hover:text-inverso transition">
+ <button type="button" @click="abrir('VOLUNTARIO', @js($asignacion), true, false)" class="rounded-lg bg-fondo-panel p-2 text-titulo hover:bg-boton-principal hover:text-inverso transition">
  <i class="ph-bold ph-pencil-simple"></i>
  </button>
  <button type="button" class="rounded-lg bg-boton-acento/5 p-2 text-terracota hover:bg-boton-acento hover:text-inverso transition">

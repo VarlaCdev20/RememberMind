@@ -3,13 +3,13 @@
  @php
  $rolKey = $usuarioDetalle->roles->first()?->name;
  $rolDisplay = '';
- if ($rolKey === 'personal_admin') {
+ if (in_array($rolKey, ['SUPERADMINISTRADOR', 'ADMINISTRADOR'])) {
  $rolDisplay = 'PERSONAL ADMINISTRATIVO';
- } elseif ($rolKey === 'personal_salud') {
+ } elseif (in_array($rolKey, ['ENFERMEROS', 'MEDICO GENERAL/GERIATRA', 'PSICOLOGO/A', 'PEDAGOGO', 'NUTRICIONISTA', 'FISIOTERAPEUTA'])) {
  $rolDisplay = 'PERSONAL DE SALUD';
- } elseif ($rolKey === 'voluntario') {
+ } elseif ($rolKey === 'VOLUNTARIO') {
  $rolDisplay = 'VOLUNTARIO';
- } elseif ($rolKey === 'familiar') {
+ } elseif ($rolKey === 'FAMILIAR') {
  $rolDisplay = 'FAMILIAR AUTORIZADO';
  } else {
  $rolDisplay = mb_strtoupper(str_replace('_', ' ', $rolKey), 'UTF-8');
@@ -168,7 +168,7 @@
  <i class="ph-bold ph-shield-check mr-1.5 text-sm"></i>
  Acceso
  </button>
- @if($rolKey === 'familiar')
+ @if($rolKey === 'FAMILIAR')
  <button type="button"
  wire:click="cambiarSeccionDetalle('vinculo')"
  class="inline-flex h-9 shrink-0 items-center justify-center rounded-xl px-4 text-xs font-bold uppercase transition active:scale-95 shadow-sm border-2 {{ $seccionActivaDetalle === 'vinculo' ? 'bg-estado-peligroBg border-borde-focus text-boton-acento' : 'bg-fondo-card/60 border-borde-suave text-apoyo hover:bg-fondo-card' }}">
@@ -343,7 +343,7 @@
  <i class="ph-bold ph-user-gear text-lg"></i> Perfil Institucional
  </h4>
  
- @if($rolKey === 'personal_admin')
+ @if(in_array($rolKey, ['SUPERADMINISTRADOR', 'ADMINISTRADOR']))
  <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 text-xs">
  <div>
  <span class="font-black text-meta uppercase tracking-wider block">Área Institucional:</span>
@@ -360,7 +360,7 @@
  </span>
  </div>
  </div>
- @elseif($rolKey === 'personal_salud')
+ @elseif(in_array($rolKey, ['ENFERMEROS', 'MEDICO GENERAL/GERIATRA', 'PSICOLOGO/A', 'PEDAGOGO', 'NUTRICIONISTA', 'FISIOTERAPEUTA']))
  <div class="space-y-4">
  <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 text-xs">
  <div>
@@ -389,7 +389,7 @@
  </p>
  </div>
  </div>
- @elseif($rolKey === 'voluntario')
+ @elseif($rolKey === 'VOLUNTARIO')
  @php
  $volDetalle = $usuarioDetalle->voluntarios->first();
  @endphp
@@ -409,7 +409,7 @@
  </span>
  </div>
  </div>
- @elseif($rolKey === 'familiar')
+ @elseif($rolKey === 'FAMILIAR')
  <div class="space-y-2 text-xs font-bold text-apoyo">
  <p class="text-sm font-bold text-parrafo uppercase flex items-center gap-1.5">
  <i class="ph-bold ph-info text-base text-boton-acento"></i>
@@ -632,7 +632,7 @@
  @endif
 
  {{-- SECCION VINCULACION --}}
- @if($seccionActivaDetalle === 'vinculo' && $rolKey === 'familiar')
+ @if($seccionActivaDetalle === 'vinculo' && $rolKey === 'FAMILIAR')
  @php
  $famDetalle = $usuarioDetalle->familiares->first();
  @endphp
@@ -968,41 +968,41 @@
 
  $areaDisplay = $u->areaInstitucional?->nombre ?? match($roleKey) {
  'super_admin', 'superadministrador', 'admin', 'administrador' => 'Administración del sistema',
- 'personal_salud' => 'Área de salud',
- 'personal_admin' => 'Área administrativa',
- 'familiar' => 'Familiar autorizado',
- 'voluntario' => 'Voluntariado',
+ 'enfermeros', 'medico general/geriatra', 'psicologo/a', 'pedagogo', 'nutricionista', 'fisioterapeuta' => 'Área de salud',
+ 'superadministrador', 'administrador' => 'Área administrativa',
+ 'FAMILIAR' => 'Familiar autorizado',
+ 'VOLUNTARIO' => 'Voluntariado',
  default => 'Sin área asignada'
  };
 
  $perfilDetalle = match($roleKey) {
- 'personal_salud' => data_get($u, 'personalSalud.especialidad.nombre')
+ 'enfermeros', 'medico general/geriatra', 'psicologo/a', 'pedagogo', 'nutricionista', 'fisioterapeuta' => data_get($u, 'personalSalud.especialidad.nombre')
  ?? data_get($u, 'personalSalud.especialidad')
  ?? 'Personal de salud',
- 'personal_admin' => data_get($u, 'personalAdmin.cargoAdmin.nombre')
+ 'superadministrador', 'administrador' => data_get($u, 'personalAdmin.cargoAdmin.nombre')
  ?? $u->personalAdmin?->cargo
  ?? 'Personal administrativo',
  'super_admin', 'superadministrador', 'admin', 'administrador' => 'Administrador del sistema',
- 'voluntario' => 'Voluntario institucional',
- 'familiar' => 'Familiar autorizado',
+ 'VOLUNTARIO' => 'Voluntario institucional',
+ 'FAMILIAR' => 'Familiar autorizado',
  default => strtoupper(str_replace('_', ' ', $roleName))
  };
 
  $areaClass = match($roleKey) {
  'super_admin', 'superadministrador', 'admin', 'administrador' => 'bg-fondo-panel text-parrafo border-borde-fuerte',
- 'personal_salud' => 'bg-estado-exitoBg text-estado-exito border-estado-exitoBorde',
- 'personal_admin' => 'bg-estado-peligroBg text-boton-acento border-borde-focus',
- 'voluntario' => 'bg-fondo-panel text-parrafo border-borde',
- 'familiar' => 'bg-fondo-panel text-parrafo border-borde',
+ 'enfermeros', 'medico general/geriatra', 'psicologo/a', 'pedagogo', 'nutricionista', 'fisioterapeuta' => 'bg-estado-exitoBg text-estado-exito border-estado-exitoBorde',
+ 'superadministrador', 'administrador' => 'bg-estado-peligroBg text-boton-acento border-borde-focus',
+ 'VOLUNTARIO' => 'bg-fondo-panel text-parrafo border-borde',
+ 'FAMILIAR' => 'bg-fondo-panel text-parrafo border-borde',
  default => 'bg-fondo-panel text-parrafo/55 border-borde-suave'
  };
 
  $perfilClass = match($roleKey) {
  'super_admin', 'superadministrador', 'admin', 'administrador' => 'bg-fondo-panel text-parrafo border-borde-fuerte',
- 'personal_salud' => 'bg-estado-exitoBg text-estado-exito border-estado-exitoBorde',
- 'personal_admin' => 'bg-estado-peligroBg text-boton-acento border-borde-focus',
- 'voluntario' => 'bg-fondo-panel text-parrafo border-borde',
- 'familiar' => 'bg-fondo-panel text-parrafo border-borde',
+ 'enfermeros', 'medico general/geriatra', 'psicologo/a', 'pedagogo', 'nutricionista', 'fisioterapeuta' => 'bg-estado-exitoBg text-estado-exito border-estado-exitoBorde',
+ 'superadministrador', 'administrador' => 'bg-estado-peligroBg text-boton-acento border-borde-focus',
+ 'VOLUNTARIO' => 'bg-fondo-panel text-parrafo border-borde',
+ 'FAMILIAR' => 'bg-fondo-panel text-parrafo border-borde',
  default => 'bg-fondo-panel text-parrafo/55 border-borde-suave'
  };
 
@@ -1206,32 +1206,32 @@
 
  $areaDisplay = $u->areaInstitucional?->nombre ?? match($roleKey) {
  'super_admin', 'superadministrador', 'admin', 'administrador' => 'Administración del sistema',
- 'personal_salud' => 'Área de salud',
- 'personal_admin' => 'Área administrativa',
- 'familiar' => 'Familiar autorizado',
- 'voluntario' => 'Voluntariado',
+ 'enfermeros', 'medico general/geriatra', 'psicologo/a', 'pedagogo', 'nutricionista', 'fisioterapeuta' => 'Área de salud',
+ 'superadministrador', 'administrador' => 'Área administrativa',
+ 'FAMILIAR' => 'Familiar autorizado',
+ 'VOLUNTARIO' => 'Voluntariado',
  default => 'Sin área asignada'
  };
 
  $perfilDetalle = match($roleKey) {
- 'personal_salud' => data_get($u, 'personalSalud.especialidad.nombre')
+ 'enfermeros', 'medico general/geriatra', 'psicologo/a', 'pedagogo', 'nutricionista', 'fisioterapeuta' => data_get($u, 'personalSalud.especialidad.nombre')
  ?? data_get($u, 'personalSalud.especialidad')
  ?? 'Personal de salud',
- 'personal_admin' => data_get($u, 'personalAdmin.cargoAdmin.nombre')
+ 'superadministrador', 'administrador' => data_get($u, 'personalAdmin.cargoAdmin.nombre')
  ?? $u->personalAdmin?->cargo
  ?? 'Personal administrativo',
  'super_admin', 'superadministrador', 'admin', 'administrador' => 'Administrador del sistema',
- 'voluntario' => 'Voluntario institucional',
- 'familiar' => 'Familiar autorizado',
+ 'VOLUNTARIO' => 'Voluntario institucional',
+ 'FAMILIAR' => 'Familiar autorizado',
  default => strtoupper(str_replace('_', ' ', $roleName))
  };
 
  $areaClass = match($roleKey) {
  'super_admin', 'superadministrador', 'admin', 'administrador' => 'bg-fondo-panel text-parrafo border-borde-fuerte',
- 'personal_salud' => 'bg-estado-exitoBg text-estado-exito border-estado-exitoBorde',
- 'personal_admin' => 'bg-estado-peligroBg text-boton-acento border-borde-focus',
- 'voluntario' => 'bg-fondo-panel text-parrafo border-borde',
- 'familiar' => 'bg-fondo-panel text-parrafo border-borde',
+ 'enfermeros', 'medico general/geriatra', 'psicologo/a', 'pedagogo', 'nutricionista', 'fisioterapeuta' => 'bg-estado-exitoBg text-estado-exito border-estado-exitoBorde',
+ 'superadministrador', 'administrador' => 'bg-estado-peligroBg text-boton-acento border-borde-focus',
+ 'VOLUNTARIO' => 'bg-fondo-panel text-parrafo border-borde',
+ 'FAMILIAR' => 'bg-fondo-panel text-parrafo border-borde',
  default => 'bg-fondo-panel text-parrafo/55 border-borde-suave'
  };
 
@@ -1795,16 +1795,15 @@
  <label class="mb-1 block text-[9px] font-bold uppercase tracking-widest text-apoyo">Tipo de usuario / rol institucional *</label>
  <select wire:model.live="rol" class="w-full h-10 rounded-xl border {{ $errors->has('rol') ? 'border-borde-focus ring-4 ring-[#E27D60]/10' : 'border-borde focus:border-borde-fuerte' }} bg-fondo-card px-4 py-2 text-sm font-bold text-parrafo outline-none transition">
  <option value="">SELECCIONE TIPO DE USUARIO...</option>
+ @foreach($roles as $rolDisponible)
  @php
- $rolesFormulario = [
- 'personal_admin' => 'PERSONAL ADMINISTRATIVO',
- 'personal_salud' => 'PERSONAL DE SALUD',
- 'voluntario' => 'VOLUNTARIO',
- 'familiar' => 'FAMILIAR AUTORIZADO',
- ];
+ $nombreParaSelect = match($rolDisponible->name) {
+ 'FAMILIAR' => 'Familiar / Responsable',
+ 'VOLUNTARIO' => 'Voluntario',
+ default => mb_convert_case(str_replace('_', ' ', $rolDisponible->name), MB_CASE_TITLE, 'UTF-8')
+ };
  @endphp
- @foreach($roles->whereIn('name', array_keys($rolesFormulario)) as $rolDisponible)
- <option value="{{ $rolDisponible->name }}">{{ $rolesFormulario[$rolDisponible->name] }}</option>
+ <option value="{{ $rolDisponible->name }}">{{ $nombreParaSelect }}</option>
  @endforeach
  </select>
  @error('rol') <span class="mt-1 block text-[9px] font-bold text-boton-acento uppercase">{{ $message }}</span> @enderror
@@ -1818,11 +1817,11 @@
  @if($ar->cod_area !== 'ARE_0009') {{-- Ocultar Admin del Sistema --}}
  @php
  $esSugerida = false;
- if ($rol === 'personal_salud' && str_contains(strtolower($ar->nombre), 'salud')) $esSugerida = true;
- elseif ($rol === 'personal_salud' && str_contains(strtolower($ar->nombre), 'atención médica')) $esSugerida = true;
- elseif ($rol === 'personal_salud' && str_contains(strtolower($ar->nombre), 'psicología')) $esSugerida = true;
- elseif ($rol === 'personal_admin' && str_contains(strtolower($ar->nombre), 'admin')) $esSugerida = true;
- elseif ($rol === 'voluntario' && str_contains(strtolower($ar->nombre), 'voluntariado')) $esSugerida = true;
+ if (in_array($rol, ['ENFERMEROS', 'MEDICO GENERAL/GERIATRA', 'PSICOLOGO/A', 'PEDAGOGO', 'NUTRICIONISTA', 'FISIOTERAPEUTA']) && str_contains(strtolower($ar->nombre), 'salud')) $esSugerida = true;
+ elseif (in_array($rol, ['ENFERMEROS', 'MEDICO GENERAL/GERIATRA', 'PSICOLOGO/A', 'PEDAGOGO', 'NUTRICIONISTA', 'FISIOTERAPEUTA']) && str_contains(strtolower($ar->nombre), 'atención médica')) $esSugerida = true;
+ elseif (in_array($rol, ['ENFERMEROS', 'MEDICO GENERAL/GERIATRA', 'PSICOLOGO/A', 'PEDAGOGO', 'NUTRICIONISTA', 'FISIOTERAPEUTA']) && str_contains(strtolower($ar->nombre), 'psicología')) $esSugerida = true;
+ elseif (in_array($rol, ['SUPERADMINISTRADOR', 'ADMINISTRADOR']) && str_contains(strtolower($ar->nombre), 'admin')) $esSugerida = true;
+ elseif ($rol === 'VOLUNTARIO' && str_contains(strtolower($ar->nombre), 'voluntariado')) $esSugerida = true;
  @endphp
  <option value="{{ $ar->cod_area }}">
  {{ $ar->nombre }} {{ $esSugerida ? '⭐ (Recomendada)' : '' }}
@@ -1835,10 +1834,10 @@
  @if($rol)
  @php
  $sugeridaTxt = match($rol) {
- 'personal_salud' => 'Área de Atención Médica o Área de Psicología',
- 'personal_admin' => 'Área Administrativa y Registro Institucional',
- 'voluntario' => 'Voluntariado y Relaciones Institucionales',
- 'familiar' => 'No requiere vinculación a áreas internas',
+ 'enfermeros', 'medico general/geriatra', 'psicologo/a', 'pedagogo', 'nutricionista', 'fisioterapeuta' => 'Área de Atención Médica o Área de Psicología',
+ 'superadministrador', 'administrador' => 'Área Administrativa y Registro Institucional',
+ 'VOLUNTARIO' => 'Voluntariado y Relaciones Institucionales',
+ 'FAMILIAR' => 'No requiere vinculación a áreas internas',
  default => null
  };
  @endphp
@@ -1851,7 +1850,7 @@
  </div>
 
  {{-- Perfil de Salud --}}
- @if($rol === 'personal_salud')
+ @if(in_array($rol, ['ENFERMEROS', 'MEDICO GENERAL/GERIATRA', 'PSICOLOGO/A', 'PEDAGOGO', 'NUTRICIONISTA', 'FISIOTERAPEUTA']))
  <div class="md:col-span-2 grid gap-4 md:grid-cols-2 border-t border-borde-suave pt-3 animate-in fade-in duration-300">
  <div class="md:col-span-2">
  <h4 class="text-[10px] font-bold text-parrafo uppercase tracking-widest">Información Profesional Médica</h4>
@@ -1883,7 +1882,7 @@
  @endif
 
  {{-- Perfil Admin --}}
- @if($rol === 'personal_admin')
+ @if(in_array($rol, ['SUPERADMINISTRADOR', 'ADMINISTRADOR']))
  <div class="md:col-span-2 grid gap-4 md:grid-cols-2 border-t border-borde-suave pt-3 animate-in fade-in duration-300">
  <div class="md:col-span-2">
  <h4 class="text-[10px] font-bold text-parrafo uppercase tracking-widest">Información de Cargo Administrativo</h4>
@@ -1913,7 +1912,7 @@
  @endif
 
  {{-- Perfil Voluntario --}}
- @if($rol === 'voluntario')
+ @if($rol === 'VOLUNTARIO')
  <div class="md:col-span-2 grid gap-4 md:grid-cols-2 border-t border-borde-suave pt-3 animate-in fade-in duration-300">
  <div class="md:col-span-2">
  <h4 class="text-[10px] font-bold text-parrafo uppercase tracking-widest">Perfil de Voluntariado</h4>
@@ -1937,7 +1936,7 @@
  @endif
 
  {{-- Perfil Familiar --}}
- @if($rol === 'familiar')
+ @if($rol === 'FAMILIAR')
  <div class="md:col-span-2 grid gap-6 border-t border-borde-suave pt-4 animate-in fade-in duration-300">
  
  {{-- Encabezado de la Sección --}}
@@ -2483,19 +2482,19 @@
 
  $vistaAreaDisplay = $usuarioVista->areaInstitucional?->nombre ?? match($vistaRoleKey) {
  'super_admin', 'superadministrador', 'admin', 'administrador' => 'Administración del sistema',
- 'personal_salud' => 'Área de salud',
- 'personal_admin' => 'Área administrativa',
- 'familiar' => 'Familiar autorizado',
- 'voluntario' => 'Voluntariado',
+ 'enfermeros', 'medico general/geriatra', 'psicologo/a', 'pedagogo', 'nutricionista', 'fisioterapeuta' => 'Área de salud',
+ 'superadministrador', 'administrador' => 'Área administrativa',
+ 'FAMILIAR' => 'Familiar autorizado',
+ 'VOLUNTARIO' => 'Voluntariado',
  default => 'Sin área asignada'
  };
 
  $vistaPerfilDetalle = match($vistaRoleKey) {
- 'personal_salud' => $usuarioVista->personalSalud?->especialidad?->nombre ?? 'Personal de salud',
- 'personal_admin' => $usuarioVista->personalAdmin?->cargoAdmin?->nombre ?? $usuarioVista->personalAdmin?->cargo ?? 'Personal administrativo',
+ 'enfermeros', 'medico general/geriatra', 'psicologo/a', 'pedagogo', 'nutricionista', 'fisioterapeuta' => $usuarioVista->personalSalud?->especialidad?->nombre ?? 'Personal de salud',
+ 'superadministrador', 'administrador' => $usuarioVista->personalAdmin?->cargoAdmin?->nombre ?? $usuarioVista->personalAdmin?->cargo ?? 'Personal administrativo',
  'super_admin', 'superadministrador', 'admin', 'administrador' => 'Administrador del sistema',
- 'voluntario' => 'Voluntario institucional',
- 'familiar' => 'Familiar autorizado',
+ 'VOLUNTARIO' => 'Voluntario institucional',
+ 'FAMILIAR' => 'Familiar autorizado',
  default => strtoupper(str_replace('_', ' ', $vistaRoleName))
  };
 
@@ -2534,10 +2533,10 @@
  <span class="rounded-full bg-fondo-panel px-4 py-1.5 text-xs font-bold uppercase text-parrafo">
  <i class="ph-bold ph-shield mr-1"></i>
  {{ match($vistaRoleKey) {
- 'personal_admin' => 'PERSONAL ADMINISTRATIVO',
- 'personal_salud' => 'PERSONAL DE SALUD',
- 'voluntario' => 'VOLUNTARIO',
- 'familiar' => 'FAMILIAR AUTORIZADO',
+ 'superadministrador', 'administrador' => 'PERSONAL ADMINISTRATIVO',
+ 'enfermeros', 'medico general/geriatra', 'psicologo/a', 'pedagogo', 'nutricionista', 'fisioterapeuta' => 'PERSONAL DE SALUD',
+ 'VOLUNTARIO' => 'VOLUNTARIO',
+ 'FAMILIAR' => 'FAMILIAR AUTORIZADO',
  default => strtoupper(str_replace('_', ' ', $vistaRoleName)),
  } }}
  </span>
@@ -2610,7 +2609,7 @@
  <p class="text-[9px] font-bold uppercase tracking-widest text-meta">Cargo / Especialidad</p>
  <p class="mt-1 text-sm font-bold text-parrafo uppercase">{{ $vistaPerfilDetalle }}</p>
  </div>
- @if($vistaRoleKey === 'personal_salud' && $usuarioVista->personalSalud?->fecha_ing)
+ @if(in_array($vistaRoleKey, ['ENFERMEROS', 'MEDICO GENERAL/GERIATRA', 'PSICOLOGO/A', 'PEDAGOGO', 'NUTRICIONISTA', 'FISIOTERAPEUTA']) && $usuarioVista->personalSalud?->fecha_ing)
  <div>
  <p class="text-[9px] font-bold uppercase tracking-widest text-meta">Fecha de Ingreso</p>
  <p class="mt-1 text-sm font-bold text-parrafo">
@@ -2618,7 +2617,7 @@
  </p>
  </div>
  @endif
- @if($vistaRoleKey === 'personal_admin' && $usuarioVista->personalAdmin?->fecha_ingreso)
+ @if(in_array($vistaRoleKey, ['SUPERADMINISTRADOR', 'ADMINISTRADOR']) && $usuarioVista->personalAdmin?->fecha_ingreso)
  <div>
  <p class="text-[9px] font-bold uppercase tracking-widest text-meta">Fecha de Ingreso</p>
  <p class="mt-1 text-sm font-bold text-parrafo">
@@ -2736,19 +2735,19 @@
 
  $fichaAreaDisplay = $usuarioFicha->areaInstitucional?->nombre ?? match($fichaRoleKey) {
  'super_admin', 'superadministrador', 'admin', 'administrador' => 'Administración del sistema',
- 'personal_salud' => 'Área de salud',
- 'personal_admin' => 'Área administrativa',
- 'familiar' => 'Familiar autorizado',
- 'voluntario' => 'Voluntariado',
+ 'enfermeros', 'medico general/geriatra', 'psicologo/a', 'pedagogo', 'nutricionista', 'fisioterapeuta' => 'Área de salud',
+ 'superadministrador', 'administrador' => 'Área administrativa',
+ 'FAMILIAR' => 'Familiar autorizado',
+ 'VOLUNTARIO' => 'Voluntariado',
  default => 'Sin área asignada'
  };
 
  $fichaPerfilDetalle = match($fichaRoleKey) {
- 'personal_salud' => $usuarioFicha->personalSalud?->especialidad?->nombre ?? 'Personal de salud',
- 'personal_admin' => $usuarioFicha->personalAdmin?->cargoAdmin?->nombre ?? $usuarioFicha->personalAdmin?->cargo ?? 'Personal administrativo',
+ 'enfermeros', 'medico general/geriatra', 'psicologo/a', 'pedagogo', 'nutricionista', 'fisioterapeuta' => $usuarioFicha->personalSalud?->especialidad?->nombre ?? 'Personal de salud',
+ 'superadministrador', 'administrador' => $usuarioFicha->personalAdmin?->cargoAdmin?->nombre ?? $usuarioFicha->personalAdmin?->cargo ?? 'Personal administrativo',
  'super_admin', 'superadministrador', 'admin', 'administrador' => 'Administrador del sistema',
- 'voluntario' => 'Voluntario institucional',
- 'familiar' => 'Familiar autorizado',
+ 'VOLUNTARIO' => 'Voluntario institucional',
+ 'FAMILIAR' => 'Familiar autorizado',
  default => strtoupper(str_replace('_', ' ', $fichaRoleName))
  };
 
@@ -2782,10 +2781,10 @@
  </span>
  <span class="rounded-full bg-fondo-panel px-3 py-1 text-[10px] font-bold uppercase text-parrafo">
  {{ match($fichaRoleKey) {
- 'personal_admin' => 'PERSONAL ADMINISTRATIVO',
- 'personal_salud' => 'PERSONAL DE SALUD',
- 'voluntario' => 'VOLUNTARIO',
- 'familiar' => 'FAMILIAR AUTORIZADO',
+ 'superadministrador', 'administrador' => 'PERSONAL ADMINISTRATIVO',
+ 'enfermeros', 'medico general/geriatra', 'psicologo/a', 'pedagogo', 'nutricionista', 'fisioterapeuta' => 'PERSONAL DE SALUD',
+ 'VOLUNTARIO' => 'VOLUNTARIO',
+ 'FAMILIAR' => 'FAMILIAR AUTORIZADO',
  default => strtoupper(str_replace('_', ' ', $fichaRoleName)),
  } }}
  </span>
