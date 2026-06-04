@@ -13,7 +13,8 @@ class SidebarService
             return [];
         }
 
-        $isSuperadmin = $user->hasRole('Superadmin');
+        $superadminRoles = ['SUPERADMINISTRADOR', 'Superadmin', 'Super Administrador', 'superadmin', 'admin'];
+        $isSuperadmin = $user->hasAnyRole($superadminRoles);
         
         // Rol booleans
         $isMedico = $user->hasRole(['Medico', 'Médico', 'Medico General']);
@@ -67,14 +68,14 @@ class SidebarService
         // 3. SECCIONES CLÍNICAS Y OPERATIVAS
         if ($isMedico || $isSuperadmin) {
             $sections[] = $this->buildSection('Admisiones Médicas', 'ph-stethoscope', null, [
-                $this->buildItem('Valoraciones médicas', 'admin.medico.valoraciones.index'),
-                $this->buildItem('Decisiones de admisión', 'admin.medico.admisiones.decisiones'),
+                $this->buildItem('Valoraciones médicas', 'admin.medico.valoraciones'),
+                $this->buildItem('Decisiones de admisión', 'admin.medico.decisiones'),
             ]);
         }
 
         if ($isEnfermero || $isSuperadmin) {
             $sections[] = $this->buildSection('Enfermería', 'ph-first-aid', null, [
-                $this->buildItem('Valoraciones iniciales', 'admin.enfermeria.valoraciones'),
+                $this->buildItem('Valoraciones iniciales', 'admin.admision.valoracion-enfermeria'),
                 $this->buildItem('Mis pacientes', 'admin.enfermeria.pacientes'),
                 $this->buildItem('Tareas del turno', 'admin.enfermeria.tareas'),
                 $this->buildItem('Actividades del turno', 'admin.enfermeria.actividades'),
