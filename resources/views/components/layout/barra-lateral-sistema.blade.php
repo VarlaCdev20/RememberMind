@@ -80,12 +80,13 @@
  }
  return false;
  };
+ @endphp
 
-    @inject('sidebarService', 'App\Services\SidebarService')
+ @inject('sidebarService', 'App\Services\SidebarService')
 
-    @php
-        $sections = $sidebarService->getSidebar();
-    @endphp
+ @php
+     $sections = $sidebarService->getSidebar();
+ @endphp
 
     <nav class="space-y-2">
  @foreach($sections as $section)
