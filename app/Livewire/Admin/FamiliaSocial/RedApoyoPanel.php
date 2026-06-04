@@ -763,8 +763,8 @@ class RedApoyoPanel extends Component
 
         $usuario = User::create($usuarioPayload);
 
-        if (Schema::hasTable('roles') && Role::where('name', 'familiar')->exists()) {
-            $usuario->assignRole('familiar');
+        if (Schema::hasTable('roles') && Role::where('name', 'FAMILIAR')->exists()) {
+            $usuario->assignRole('FAMILIAR');
         }
 
         return Familiar::create([

@@ -2604,7 +2604,7 @@ class UsuariosPanel extends Component
 
         return view('livewire.admin.usuarios.usuarios-panel', [
             'usuarios' => $query->paginate(12),
-            'roles' => Role::all(),
+            'roles' => Role::whereNotIn('name', ['FAMILIAR', 'VOLUNTARIO'])->get(),
             'especialidades' => \App\Models\Especialidad::all(),
             'cargosAdmin' => \App\Models\CargoAdministrativo::all(),
             'areas' => \App\Models\AreaInstitucional::activas()->orderBy('orden')->get(),

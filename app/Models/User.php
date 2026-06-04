@@ -18,11 +18,12 @@ class User extends Authenticatable
     protected $table = 'users';
     protected $primaryKey = 'cod_usu';
 
-    public $incrementing = false;
-    protected $keyType = 'string';
+    public $incrementing = true;
+    protected $keyType = 'int';
 
+    // Columnas verificadas contra la BD real (2026-06-04).
+    // Las columnas pendientes de migración están fuera de esta lista.
     protected $fillable = [
-        'cod_usu',
         'nombres',
         'ap_paterno',
         'ap_materno',
@@ -43,20 +44,21 @@ class User extends Authenticatable
         'ultimo_acceso',
         'observaciones',
         'current_team_id',
-        'cod_area',
-        'debe_cambiar_password',
-        'password_changed_at',
-        'direccion',
-        'zona',
-        'ciudad',
-        'contacto_emergencia',
-        'parentesco_emergencia',
-        'celular_emergencia',
-        'tipo_vinculacion',
-        'calle',
-        'nro_domicilio',
-        'ap_paterno_emergencia',
-        'ap_materno_emergencia',
+        // Columnas pendientes de migración — agregar cuando corran:
+        // 'debe_cambiar_password',       → 2026_05_17_215318
+        // 'password_changed_at',         → 2026_05_17_215318
+        // 'cod_area',                    → sin migración aún
+        // 'direccion',                   → 2026_05_18_020000
+        // 'zona',                        → 2026_05_18_020000
+        // 'ciudad',                      → 2026_05_18_020000
+        // 'contacto_emergencia',         → 2026_05_18_020000
+        // 'parentesco_emergencia',       → 2026_05_18_020000
+        // 'celular_emergencia',          → 2026_05_18_020000
+        // 'tipo_vinculacion',            → 2026_05_18_020000
+        // 'calle',                       → 2026_05_18_150000
+        // 'nro_domicilio',               → 2026_05_18_150000
+        // 'ap_paterno_emergencia',       → 2026_05_18_150000
+        // 'ap_materno_emergencia',       → 2026_05_18_150000
     ];
 
     protected $hidden = [
@@ -64,31 +66,14 @@ class User extends Authenticatable
         'remember_token',
     ];
 
-    protected static function booted(): void
-    {
-        static::creating(function ($usuario) {
-            if (!$usuario->cod_usu) {
-                $ultimo = self::where('cod_usu', 'like', 'USU_%')
-                    ->orderByDesc('cod_usu')
-                    ->value('cod_usu');
-
-                $numero = $ultimo
-                    ? ((int) substr($ultimo, 4)) + 1
-                    : 1;
-
-                $usuario->cod_usu = 'USU_' . str_pad($numero, 4, '0', STR_PAD_LEFT);
-            }
-        });
-    }
-
     protected function casts(): array
     {
         return [
             'ultimo_acceso' => 'datetime',
             'fecha_nacimiento' => 'date',
             'password' => 'hashed',
-            'debe_cambiar_password' => 'boolean',
-            'password_changed_at' => 'datetime',
+            // 'debe_cambiar_password' => 'boolean', // activar tras migración 2026_05_17_215318
+            // 'password_changed_at' => 'datetime',  // activar tras migración 2026_05_17_215318
         ];
     }
 
@@ -122,7 +107,7 @@ class User extends Authenticatable
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
-            ->logOnly(['nombres', 'ap_paterno', 'correo', 'estado', 'observaciones', 'cod_area'])
+            ->logOnly(['nombres', 'ap_paterno', 'correo', 'estado', 'observaciones'])
             ->logOnlyDirty()
             ->useLogName('Usuarios')
             ->setDescriptionForEvent(function (string $eventName) {
@@ -160,12 +145,20 @@ class User extends Authenticatable
 
     public function documentosPendientes()
     {
-        return $this->hasMany(DocumentoUsuario::class, 'cod_usu', 'cod_usu')->whereIn('estado', ['PENDIENTE', 'CARGADO']);
+        return $this->hasMany(DocumentoUsuario::class, 'cod_usu', 'cod_usu')
+            ->whereIn('estado', [DocumentoUsuario::ESTADO_PENDIENTE, DocumentoUsuario::ESTADO_CARGADO]);
     }
 
-    public function documentosValidados()
+    public function documentosAprobados()
     {
-        return $this->hasMany(DocumentoUsuario::class, 'cod_usu', 'cod_usu')->where('estado', 'VALIDADO');
+        return $this->hasMany(DocumentoUsuario::class, 'cod_usu', 'cod_usu')
+            ->where('estado', DocumentoUsuario::ESTADO_APROBADO);
+    }
+
+    public function documentosObservados()
+    {
+        return $this->hasMany(DocumentoUsuario::class, 'cod_usu', 'cod_usu')
+            ->where('estado', DocumentoUsuario::ESTADO_OBSERVADO);
     }
 
     public function familiares()

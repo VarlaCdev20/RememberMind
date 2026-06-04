@@ -162,7 +162,7 @@ class UsuarioFormModal extends Component
     public function render()
     {
         return view('livewire.admin.usuarios.usuario-form-modal', [
-            'roles' => Role::all()
+            'roles' => Role::whereNotIn('name', ['FAMILIAR', 'VOLUNTARIO'])->get()
         ]);
     }
 }

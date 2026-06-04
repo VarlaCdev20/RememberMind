@@ -78,7 +78,11 @@ Route::middleware([
             // ── Personal Institucional ─────────────
             Route::get('/personal-institucional', \App\Livewire\Admin\PersonalInstitucional\PersonalInstitucionalPanel::class)
                 ->middleware('permission:personal_institucional.ver')
-                ->name('personal-institucional');
+                ->name('personal-institucional.index');
+
+            Route::get('/personal-institucional/generar-documento/{docId}', [App\Http\Controllers\Admin\PersonalDocumentosController::class, 'generarPdf'])
+                ->middleware('permission:personal_institucional.ver')
+                ->name('personal-institucional.generar-pdf');
 
             // ── Roles y Permisos ─────────────────
             Route::view('/roles-permisos', 'admin.roles-permisos.index')

@@ -3,52 +3,54 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
 
 class DocumentoUsuario extends Model
 {
-    use SoftDeletes, LogsActivity;
+    use LogsActivity;
 
     protected $table = 'documentos_usuarios';
     protected $primaryKey = 'cod_doc_usu';
-    public $incrementing = false;
-    protected $keyType = 'string';
 
+    public $incrementing = true;
+    protected $keyType = 'int';
+
+    // Estados válidos del ciclo de vida documental
+    const ESTADO_PENDIENTE  = 'PENDIENTE';
+    const ESTADO_CARGADO    = 'CARGADO';
+    const ESTADO_OBSERVADO  = 'OBSERVADO';
+    const ESTADO_APROBADO   = 'APROBADO';
+    const ESTADO_VENCIDO    = 'VENCIDO';
+
+    // Columnas verificadas contra la BD real (2026-06-04).
     protected $fillable = [
-        'cod_doc_usu',
+        // Originales
         'cod_usu',
-        'cod_tipo_doc',
-        'tipo_documento',
-        'nombre_documento',
-        'archivo',
-        'mime_type',
+        'nom_doc',
+        'tipo_doc',
+        'ruta_archivo',
         'extension',
-        'tamanio',
-        'fecha_emision',
-        'fecha_vencimiento',
-        'estado',
+        'fecha_doc',
         'observaciones',
-        'motivo_observacion',
+        // Control documental agregado en 2026_06_04_210000
+        'mime_type',
+        'tamanio',
+        'estado',
         'subido_por',
         'validado_por',
         'fecha_validacion',
-        'reemplaza_a',
-        'creado_por',
-        'actualizado_por',
+        'observacion_validacion',
+        'fecha_vencimiento_plazo',
     ];
 
     protected $casts = [
-        'fecha_emision' => 'date',
-        'fecha_vencimiento' => 'date',
-        'fecha_validacion' => 'datetime',
-        'tamanio' => 'integer',
+        'fecha_doc'              => 'date',
+        'fecha_validacion'       => 'datetime',
+        'fecha_vencimiento_plazo' => 'date',
+        'tamanio'                => 'integer',
     ];
 
-    /**
-     * Spatie Activitylog options
-     */
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
@@ -57,77 +59,60 @@ class DocumentoUsuario extends Model
             ->useLogName('DocumentosUsuarios')
             ->setDescriptionForEvent(function (string $eventName) {
                 return match ($eventName) {
-                    'created' => "Se subió/creó el documento '{$this->nombre_documento}' para el usuario {$this->usuario?->name} ({$this->cod_doc_usu}).",
-                    'updated' => "Se actualizó el documento '{$this->nombre_documento}' ({$this->cod_doc_usu}) — Estado: {$this->estado}.",
-                    'deleted' => "Se archivó/eliminó el documento '{$this->nombre_documento}' ({$this->cod_doc_usu}).",
-                    default   => "Documento {$this->nombre_documento} modificado ({$eventName}).",
+                    'created' => "Se registró el documento '{$this->nom_doc}' para el usuario {$this->cod_usu}.",
+                    'updated' => "Se actualizó '{$this->nom_doc}' (cod: {$this->cod_doc_usu}) — Estado: {$this->estado}.",
+                    'deleted' => "Se eliminó el documento '{$this->nom_doc}' (cod: {$this->cod_doc_usu}).",
+                    default   => "Documento '{$this->nom_doc}' modificado ({$eventName}).",
                 };
             });
     }
 
-    protected static function booted(): void
+    // ── Scopes de estado ─────────────────────────────────────────────────────
+
+    public function scopePendientes($query)
     {
-        static::creating(function ($doc) {
-            if (!$doc->cod_doc_usu) {
-                $ultimo = self::withTrashed()
-                    ->where('cod_doc_usu', 'like', 'DUS_%')
-                    ->orderByDesc('cod_doc_usu')
-                    ->value('cod_doc_usu');
-
-                $numero = $ultimo
-                    ? ((int) substr($ultimo, 4)) + 1
-                    : 1;
-
-                $doc->cod_doc_usu = 'DUS_' . str_pad($numero, 4, '0', STR_PAD_LEFT);
-            }
-        });
+        return $query->where('estado', self::ESTADO_PENDIENTE);
     }
 
-    /**
-     * Relación con el usuario dueño
-     */
+    public function scopeCargados($query)
+    {
+        return $query->where('estado', self::ESTADO_CARGADO);
+    }
+
+    public function scopeAprobados($query)
+    {
+        return $query->where('estado', self::ESTADO_APROBADO);
+    }
+
+    public function scopeObservados($query)
+    {
+        return $query->where('estado', self::ESTADO_OBSERVADO);
+    }
+
+    public function scopeVencidos($query)
+    {
+        return $query->where('estado', self::ESTADO_VENCIDO);
+    }
+
+    public function scopeActivos($query)
+    {
+        return $query->whereIn('estado', [self::ESTADO_CARGADO, self::ESTADO_APROBADO]);
+    }
+
+    // ── Relaciones ────────────────────────────────────────────────────────────
+
     public function usuario()
     {
         return $this->belongsTo(User::class, 'cod_usu', 'cod_usu');
     }
 
-    /**
-     * Relación con el catálogo de tipos
-     */
-    public function tipoDocumento()
-    {
-        return $this->belongsTo(TipoDocumentoUsuario::class, 'cod_tipo_doc', 'cod_tipo_doc');
-    }
-
-    /**
-     * Relación con quién subió el archivo
-     */
     public function subidor()
     {
         return $this->belongsTo(User::class, 'subido_por', 'cod_usu');
     }
 
-    /**
-     * Relación con quién validó el archivo
-     */
     public function validador()
     {
         return $this->belongsTo(User::class, 'validado_por', 'cod_usu');
-    }
-
-    /**
-     * Relación con el documento al que reemplaza
-     */
-    public function reemplazado()
-    {
-        return $this->belongsTo(self::class, 'reemplaza_a', 'cod_doc_usu');
-    }
-
-    /**
-     * Relación con los documentos que lo han reemplazado
-     */
-    public function reemplazos()
-    {
-        return $this->hasMany(self::class, 'reemplaza_a', 'cod_doc_usu');
     }
 }

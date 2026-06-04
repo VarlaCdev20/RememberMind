@@ -391,8 +391,8 @@ class VoluntariosPanel extends Component
             'observaciones' => $validated['observaciones'] ?: null,
         ]);
 
-        if (Role::where('name', 'voluntario')->exists()) {
-            $usuario->assignRole('voluntario');
+        if (Role::where('name', 'VOLUNTARIO')->exists()) {
+            $usuario->assignRole('VOLUNTARIO');
         }
 
         DB::table('voluntarios')->insert([

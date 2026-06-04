@@ -1,1 +1,0 @@
-<?php require __DIR__."/vendor/autoload.php"; $app = require_once __DIR__."/bootstrap/app.php"; $kernel = $app->make(Illuminate\Contracts\Console\Kernel::class); $kernel->bootstrap(); try { \Spatie\Permission\Models\Role::with("permissions", "users")->first(); echo "SUCCESS"; } catch (\Throwable $e) { echo $e->getMessage() . "\n" . $e->getFile() . ":" . $e->getLine(); }

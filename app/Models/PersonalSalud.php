@@ -34,10 +34,10 @@ class PersonalSalud extends Model
         'observaciones',
         'cod_usu',
         'cod_esp',
-        'institucion_formacion',
-        // ── Fase 6 ──────────────────────────────────────────────────────────
-        'tipo_personal_salud',  // MEDICO, ENFERMERO, PSICOLOGO, FISIOTERAPEUTA, OTRO
-        'subtipo_enfermeria',   // GENERAL_ADMISION, ESPECIALIZADO_TURNO
+        // ── Columnas que NO existen aún en la BD (comentadas para evitar QueryException) ──
+        // 'institucion_formacion',
+        // 'tipo_personal_salud',  // MEDICO, ENFERMERO, PSICOLOGO, FISIOTERAPEUTA, OTRO
+        // 'subtipo_enfermeria',   // GENERAL_ADMISION, ESPECIALIZADO_TURNO
     ];
 
     protected $casts = [
