@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -11,9 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('areas_institucionales', function (Blueprint $table) {
-            $table->string('imagen_area')->nullable()->after('responsable_id');
-        });
+        if (
+            Schema::hasTable('areas_institucionales') &&
+            !Schema::hasColumn('areas_institucionales', 'imagen_area')
+        ) {
+            Schema::table('areas_institucionales', function (Blueprint $table) {
+                $table->string('imagen_area')->nullable();
+            });
+        }
     }
 
     /**
@@ -21,8 +26,13 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('areas_institucionales', function (Blueprint $table) {
-            $table->dropColumn('imagen_area');
-        });
+        if (
+            Schema::hasTable('areas_institucionales') &&
+            Schema::hasColumn('areas_institucionales', 'imagen_area')
+        ) {
+            Schema::table('areas_institucionales', function (Blueprint $table) {
+                $table->dropColumn('imagen_area');
+            });
+        }
     }
 };
