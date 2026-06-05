@@ -6,6 +6,8 @@ use Illuminate\Support\Facades\Route;
 
 class SidebarService
 {
+    private const SUPERADMIN_ROLES = ['SUPERADMINISTRADOR', 'Superadmin', 'Super Administrador', 'superadmin', 'admin'];
+
     public function getSidebar()
     {
         $user = auth()->user();
@@ -13,8 +15,7 @@ class SidebarService
             return [];
         }
 
-        $superadminRoles = ['SUPERADMINISTRADOR', 'Superadmin', 'Super Administrador', 'superadmin', 'admin'];
-        $isSuperadmin = $user->hasAnyRole($superadminRoles);
+        $isSuperadmin = $this->isSuperadmin($user);
         
         // Rol booleans
         $isMedico = $user->hasRole(['Medico', 'Médico', 'Medico General']);
@@ -63,6 +64,10 @@ class SidebarService
                 $this->buildItem('Preadmisiones', 'admin.admisiones.preadmisiones', 'admisiones.ver_dashboard'),
                 $this->buildItem('Flujo de admisión', 'admin.admisiones.preadmision', 'admisiones.ver_dashboard'),
             ]);
+
+            $sections[] = $this->buildSection('Turnos / asignaciones', 'ph-clock-countdown', null, [
+                $this->buildItem('Turnos y asignaciones', 'admin.turnos-asignaciones.index', 'turnos.ver'),
+            ]);
         }
 
         // 3. SECCIONES CLÍNICAS Y OPERATIVAS
@@ -81,6 +86,10 @@ class SidebarService
                 $this->buildItem('Actividades del turno', 'admin.enfermeria.actividades'),
                 $this->buildItem('Alertas', 'admin.enfermeria.alertas'),
                 $this->buildItem('Pase de turno', 'admin.enfermeria.pase-turno'),
+                $this->buildItem('Habitaciones y camas', 'admin.habitaciones.index', 'habitaciones.ver'),
+                $this->buildItem('Turnos de enfermería', 'admin.turnos-enfermeria.index', 'turnos_enfermeria.ver'),
+                $this->buildItem('Asignación de turno', 'admin.asignacion-turno.index', 'asignacion_turno.ver'),
+                $this->buildItem('Plan de cuidado', 'admin.plan-cuidado.index', 'plan_cuidado.ver'),
             ]);
         }
 
@@ -163,7 +172,7 @@ class SidebarService
 
         // 5. PERSONAL Y APOYO
         if ($isAdministrative || $isSuperadmin) {
-            $sections[] = $this->buildSection('Personal y Apoyo', 'ph-users-three', null, [
+            $sections[] = $this->buildSection('Equipo institucional', 'ph-users-three', null, [
                 $this->buildItem('Personal institucional', 'admin.personal-institucional', 'personal_institucional.ver'),
                 $this->buildItem('Voluntariado', 'admin.voluntariado.index', 'voluntarios.ver'),
             ]);
@@ -181,7 +190,7 @@ class SidebarService
             $saludItems[] = $this->buildItem('Alertas clínicas', 'admin.salud-seguimiento.alertas.index', 'salud.alertas.ver');
         }
         if (!empty(array_filter($saludItems))) {
-            $sections[] = $this->buildSection('Salud', 'ph-heartbeat', null, $saludItems);
+            $sections[] = $this->buildSection('Salud y Seguimiento', 'ph-heartbeat', null, $saludItems);
         }
 
         // 7. ACTIVIDADES
@@ -245,11 +254,6 @@ class SidebarService
             return null;
         }
 
-        // Si es un enlace directo y la ruta no existe, no mostramos la seccion.
-        if ($route && !Route::has($route)) {
-            return null;
-        }
-
         $active = false;
         
         if ($route && Route::has($route) && request()->routeIs($route)) {
@@ -266,27 +270,37 @@ class SidebarService
         return [
             'title' => $title,
             'icon' => $icon,
-            'route' => $route && Route::has($route) ? route($route) : null,
+            'route' => $route,
             'items' => array_values($items),
             'active' => $active,
+            'disabled' => $route ? !Route::has($route) : false,
         ];
     }
 
     private function buildItem($label, $route, $permission = null, $badge = null)
     {
-        if ($permission && !auth()->user()->can($permission) && !auth()->user()->hasRole('Superadmin')) {
+        $user = auth()->user();
+        $isSuperadmin = $this->isSuperadmin($user);
+
+        if ($permission && (!$user || (!$user->can($permission) && !$isSuperadmin))) {
             return null;
         }
 
-        if (!Route::has($route)) {
-            return null; 
-        }
+        $routeExists = Route::has($route);
 
         return [
             'label' => $label,
-            'route' => route($route),
-            'active' => request()->routeIs($route),
+            'route' => $route,
+            'active' => $routeExists && request()->routeIs($route),
             'badge' => $badge,
+            'disabled' => !$routeExists,
         ];
+    }
+
+    private function isSuperadmin($user = null): bool
+    {
+        $user ??= auth()->user();
+
+        return $user && $user->hasAnyRole(self::SUPERADMIN_ROLES);
     }
 }

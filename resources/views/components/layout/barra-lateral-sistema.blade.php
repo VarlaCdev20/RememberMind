@@ -80,8 +80,9 @@
  }
  return false;
  };
+ @endphp
 
-    @inject('sidebarService', 'App\Services\SidebarService')
+ @inject('sidebarService', 'App\Services\SidebarService')
 
     @php
         $sections = $sidebarService->getSidebar();
