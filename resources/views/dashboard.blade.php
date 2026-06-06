@@ -1,127 +1,175 @@
 <x-sistema-layout>
 
-                <x-ui.encabezado-dashboard :estadisticas="$estadisticas ?? []" />
+    {{-- Zona 1: Encabezado personalizado --}}
+    <x-ui.encabezado-dashboard :saludo="$saludo ?? []" />
 
-                <x-ui.seccion-graficos-dashboard />
+    {{-- Zona 2: KPIs institucionales --}}
+    <x-ui.kpis-dashboard :kpis="$kpisInstitucionales ?? []" />
 
-                <x-ui.tabla-usuarios-dashboard :usuarios="$usuariosDashboard ?? []" />
+    {{-- Zona 3: Resumen de salud + Equipo institucional --}}
+    <div class="grid gap-4 xl:grid-cols-2">
+        <x-ui.panel-salud-dashboard :resumen="$resumenSalud ?? []" />
+        <x-ui.panel-equipo-institucional :equipo="$equipoInstitucional ?? []" :redFamiliar="$redFamiliar ?? []" />
+    </div>
 
-                <div class="grid gap-4 xl:grid-cols-3">
-                    <x-ui.panel-actividades-dashboard :actividades="$actividadesDashboard ?? $operacionHoy ?? []" />
-                    <x-ui.panel-alertas-dashboard :alertas="$alertasAdministrativas ?? []" />
-                    <x-ui.panel-modulos-dashboard :modulos="$modulos ?? []" />
-                </div>
+    {{-- Zona 4: Gráficas --}}
+    <x-ui.seccion-graficos-dashboard />
 
-                <x-ui.tabla-bitacora-dashboard :registros="$bitacoraDashboard ?? []" />
+    {{-- Zona 5: Alertas + Actividades --}}
+    <div class="grid gap-4 xl:grid-cols-[1fr_1.35fr]">
+        <x-ui.panel-alertas-dashboard :alertas="$alertasEstructuradas ?? []" />
+        <x-ui.panel-actividades-dashboard :actividades="$actividadesDashboard ?? []" />
+    </div>
 
-        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    {{-- Zona 6: Bitácora --}}
+    <x-ui.tabla-bitacora-dashboard :registros="$bitacoraDashboard ?? []" />
 
-        <script>
-            window.dashboardData = {
-                usuariosPorRol: @json($usuariosPorRol ?? ['labels' => [], 'data' => []]),
-                actividadMensual: @json($actividadMensual ?? ['labels' => [], 'data' => []]),
-                estadisticas: @json($estadisticas ?? []),
+    <script>
+        window.dashboardData = {
+            adultosPorEstado: @json($adultosPorEstado ?? ['labels' => [], 'data' => [], 'colores' => []]),
+            distribucionEquipo: @json($distribucionEquipoInstitucional ?? ['labels' => [], 'data' => [], 'colores' => []]),
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const getCssVar = (name, fallback) => {
+                const value = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+                return value || fallback;
             };
 
-            document.addEventListener('DOMContentLoaded', () => {
-                const light = document.querySelector('.mouse-light');
+            const getChartTheme = () => ({
+                primary: getCssVar('--chart-primary', '#2F3E5C'),
+                secondary: getCssVar('--chart-secondary', '#7FA587'),
+                accent: getCssVar('--chart-accent', '#D9795F'),
+                warning: getCssVar('--chart-warning', '#DDA15E'),
+                danger: getCssVar('--chart-danger', '#D96C75'),
+                muted: getCssVar('--chart-muted', '#6B7280'),
+                text: getCssVar('--chart-text', '#293A59'),
+                grid: getCssVar('--chart-grid', 'rgba(41,58,89,0.10)'),
+                panel: getCssVar('--chart-panel', 'rgba(244,238,231,0.78)'),
+                border: getCssVar('--chart-border', 'rgba(41,58,89,0.14)')
+            });
 
-                if (light) {
-                    document.addEventListener('mousemove', (e) => {
-                        light.style.opacity = '1';
-                        light.style.transform = `translate(${e.clientX - 85}px, ${e.clientY - 85}px)`;
-                    });
+            let chartAdultos = null;
+            let chartEquipo = null;
 
-                    document.addEventListener('mouseleave', () => {
-                        light.style.opacity = '0';
-                    });
-                }
+            const renderCharts = () => {
+                const chartTheme = getChartTheme();
 
-                const colores = ['#E97A5F', '#2F3E5C', '#8DA280', '#967B66', '#F4A261'];
+                // Gráfico 1: Adultos por estado (doughnut)
+                const ctxAdultos = document.getElementById('graficoAdultosPorEstado');
+                if (ctxAdultos && typeof Chart !== 'undefined') {
+                    if (chartAdultos) chartAdultos.destroy();
+                    const dAdultos = window.dashboardData.adultosPorEstado;
+                    const colorsAdultos = [chartTheme.primary, chartTheme.secondary, chartTheme.accent, chartTheme.warning, chartTheme.danger];
 
-                function crearGrafico(id, tipo, labels, data) {
-                    const ctx = document.getElementById(id);
-                    if (!ctx || typeof Chart === 'undefined') return;
-
-                    new Chart(ctx, {
-                        type: tipo,
+                    chartAdultos = new Chart(ctxAdultos, {
+                        type: 'doughnut',
                         data: {
-                            labels: labels,
+                            labels: dAdultos.labels ?? [],
                             datasets: [{
-                                data: data,
-                                backgroundColor: tipo === 'line' ? 'rgba(233,122,95,0.16)' : colores,
-                                borderColor: '#E97A5F',
-                                borderWidth: tipo === 'line' ? 3 : 0,
-                                fill: tipo === 'line',
-                                tension: 0.4,
-                                borderRadius: tipo === 'bar' ? 10 : 0,
+                                data: dAdultos.data ?? [],
+                                backgroundColor: colorsAdultos,
+                                borderWidth: 2,
+                                borderColor: chartTheme.panel,
                             }]
                         },
                         options: {
                             responsive: true,
                             maintainAspectRatio: false,
-                            cutout: tipo === 'doughnut' ? '65%' : undefined,
+                            cutout: '68%',
                             plugins: {
+                                datalabels: { display: false },
+                                tooltip: {
+                                    backgroundColor: chartTheme.panel,
+                                    titleColor: chartTheme.text,
+                                    bodyColor: chartTheme.text,
+                                    borderColor: chartTheme.border,
+                                    borderWidth: 1,
+                                    padding: 10
+                                },
                                 legend: {
-                                    display: tipo !== 'bar',
+                                    display: true,
                                     position: 'bottom',
                                     labels: {
-                                        color: '#2F3E5C',
+                                        color: chartTheme.text,
                                         boxWidth: 10,
-                                        font: { size: 11, weight: 'bold' }
+                                        font: { size: 11, weight: '700' }
                                     }
                                 }
-                            },
-                            scales: tipo === 'bar' || tipo === 'line' ? {
-                                y: {
-                                    grid: { color: 'rgba(47,62,92,0.08)' },
-                                    ticks: {
-                                        color: '#2F3E5C',
-                                        font: { size: 11, weight: 'bold' }
-                                    }
-                                },
-                                x: {
-                                    grid: { display: false },
-                                    ticks: {
-                                        color: '#2F3E5C',
-                                        font: { size: 11, weight: 'bold' }
-                                    }
-                                }
-                            } : {}
+                            }
                         }
                     });
                 }
 
-                crearGrafico(
-                    'graficoUsuariosRol',
-                    'bar',
-                    window.dashboardData.usuariosPorRol.labels ?? [],
-                    window.dashboardData.usuariosPorRol.data ?? []
-                );
+                // Gráfico 2: Distribución equipo institucional (barra horizontal)
+                const ctxEquipo = document.getElementById('graficoEquipoInstitucional');
+                if (ctxEquipo && typeof Chart !== 'undefined') {
+                    if (chartEquipo) chartEquipo.destroy();
+                    const dEquipo = window.dashboardData.distribucionEquipo;
+                    const colorsEquipo = [chartTheme.accent, chartTheme.secondary, chartTheme.primary];
 
-                crearGrafico(
-                    'graficoActividadMensual',
-                    'line',
-                    window.dashboardData.actividadMensual.labels ?? [],
-                    window.dashboardData.actividadMensual.data ?? []
-                );
+                    chartEquipo = new Chart(ctxEquipo, {
+                        type: 'bar',
+                        data: {
+                            labels: dEquipo.labels ?? [],
+                            datasets: [{
+                                data: dEquipo.data ?? [],
+                                backgroundColor: colorsEquipo,
+                                borderWidth: 1,
+                                borderColor: chartTheme.border,
+                                borderRadius: 6,
+                            }]
+                        },
+                        options: {
+                            indexAxis: 'y',
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                datalabels: {
+                                    display: true,
+                                    color: chartTheme.text,
+                                    font: { weight: 'bold', size: 10 },
+                                    formatter: (val) => val > 0 ? val : ''
+                                },
+                                legend: { display: false },
+                                tooltip: {
+                                    backgroundColor: chartTheme.panel,
+                                    titleColor: chartTheme.text,
+                                    bodyColor: chartTheme.text,
+                                    borderColor: chartTheme.border,
+                                    borderWidth: 1,
+                                    padding: 10
+                                }
+                            },
+                            scales: {
+                                x: {
+                                    grid: { color: chartTheme.grid },
+                                    ticks: { color: chartTheme.muted, font: { size: 11, weight: '700' } }
+                                },
+                                y: {
+                                    grid: { display: false },
+                                    ticks: { color: chartTheme.muted, font: { size: 11, weight: '700' } }
+                                }
+                            }
+                        }
+                    });
+                }
+            };
 
-                crearGrafico(
-    'graficoCumplimientoAdmin',
-    'bar',
-    [
-        'Usuarios con rol',
-        'Adultos vinculados',
-        'Voluntarios asignados',
-        'Actividades programadas'
-    ],
-    [
-        window.dashboardData.estadisticas.usuarios_con_rol ?? 0,
-        window.dashboardData.estadisticas.adultos_con_familiar ?? 0,
-        window.dashboardData.estadisticas.voluntarios_asignados ?? 0,
-        window.dashboardData.estadisticas.actividades_programadas ?? 0
-    ]
-);
+            // Render inicial
+            renderCharts();
+
+            // Observar cambios de tema
+            const observer = new MutationObserver((mutations) => {
+                mutations.forEach((mutation) => {
+                    if (mutation.attributeName === 'class' || mutation.attributeName === 'data-theme') {
+                        renderCharts();
+                    }
+                });
             });
-        </script>
+            observer.observe(document.documentElement, { attributes: true });
+
+        });
+    </script>
+
 </x-sistema-layout>

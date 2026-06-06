@@ -22,6 +22,7 @@ class MedicacionAdultoModal extends Component
     public $fecha_fin = '';
     public $medico_indica = '';
     public $observacion = '';
+    public $estado = 'ACTIVO';
 
     protected $listeners = ['abrirModalMedicacion'];
 
@@ -37,6 +38,8 @@ class MedicacionAdultoModal extends Component
             'fecha_fin' => 'nullable|date|after_or_equal:fecha_inicio',
             'medico_indica' => 'nullable|string|max:100',
             'observacion' => 'nullable|string|max:255',
+            'estado' => 'required|string|in:ACTIVO,PAUSADO,EN REVISION,SUSPENDIDO,FINALIZADO',
+            'cod_am' => 'required|string|exists:adulto_mayor,cod_am',
         ];
     }
 
@@ -50,6 +53,7 @@ class MedicacionAdultoModal extends Component
             'hora_programada.required' => 'La hora es obligatoria.',
             'fecha_inicio.required' => 'La fecha de inicio es obligatoria.',
             'fecha_fin.after_or_equal' => 'La fecha de fin debe ser posterior o igual a la de inicio.',
+            'cod_am.required' => 'Debe seleccionar un adulto mayor.',
         ];
     }
 
@@ -65,7 +69,11 @@ class MedicacionAdultoModal extends Component
         } else {
             $this->isEditing = false;
             $this->resetCampos();
+            if ($cod_am) {
+                $this->cod_am = $cod_am;
+            }
             $this->fecha_inicio = now()->format('Y-m-d');
+            $this->estado = 'ACTIVO';
         }
 
         $this->showModal = true;
@@ -91,6 +99,8 @@ class MedicacionAdultoModal extends Component
         $this->fecha_fin = $med->fecha_fin ? $med->fecha_fin->format('Y-m-d') : null;
         $this->medico_indica = $med->medico_indica;
         $this->observacion = $med->observacion;
+        $this->estado = $med->estado;
+        $this->cod_am = $med->cod_am;
     }
 
     public function resetCampos()
@@ -105,6 +115,8 @@ class MedicacionAdultoModal extends Component
         $this->fecha_fin = '';
         $this->medico_indica = '';
         $this->observacion = '';
+        $this->estado = 'ACTIVO';
+        // No reseteamos cod_am aquí para no perder la selección en caso de fallar validación
     }
 
     public function guardar()
@@ -122,6 +134,7 @@ class MedicacionAdultoModal extends Component
             'fecha_fin' => $this->fecha_fin ?: null,
             'medico_indica' => $this->medico_indica,
             'observacion' => $this->observacion,
+            'estado' => $this->estado,
         ];
 
         if ($this->isEditing) {
@@ -129,8 +142,7 @@ class MedicacionAdultoModal extends Component
             $med->update($datos);
             $mensaje = 'Medicación actualizada correctamente.';
         } else {
-            $datos['registrado_por'] = Auth::id() ?? \App\Models\User::first()->cod_usu;
-            $datos['estado'] = 'ACTIVO';
+            $datos['registrado_por'] = Auth::user()->cod_usu;
             MedicacionAdulto::create($datos);
             $mensaje = 'Medicación registrada correctamente.';
         }
@@ -160,12 +172,18 @@ class MedicacionAdultoModal extends Component
 
     public function render()
     {
-        $medicacionList = MedicacionAdulto::where('cod_am', $this->cod_am)
-            ->latest()
-            ->get();
+        $adultosDisponibles = \App\Models\AdultoMayor::whereHas('estado', function ($q) {
+            $q->whereIn('estado', ['ACTIVO', 'ACTIVA']);
+        })->orderBy('nombres')->get();
+        
+        $adultoSeleccionado = null;
+        if ($this->cod_am) {
+            $adultoSeleccionado = \App\Models\AdultoMayor::where('cod_am', $this->cod_am)->first();
+        }
 
         return view('livewire.admin.adultos-mayores.salud.medicacion-adulto-modal', [
-            'medicacionList' => $medicacionList
+            'adultosDisponibles' => $adultosDisponibles,
+            'adultoSeleccionado' => $adultoSeleccionado,
         ]);
     }
 }

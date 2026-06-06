@@ -1,8 +1,10 @@
 import './bootstrap';
-import Alpine from 'alpinejs';
 
-window.Alpine = Alpine;
-Alpine.start();
+// Alpine no se inicia aquí porque Livewire v3 ya lo carga automáticamente.
+// Esto evita el warning: "Detected multiple instances of Alpine running."
+// import Alpine from 'alpinejs';
+// window.Alpine = Alpine;
+// Alpine.start();
 
 // GSAP
 import { gsap } from 'gsap';
@@ -53,8 +55,12 @@ document.addEventListener('DOMContentLoaded', () => {
         
         requestAnimationFrame(updateLight);
     }
-    
-    // Iniciar loop de animación
     updateLight();
 });
+
+import redApoyoTree from './modules/red-apoyo-svg.js';
+window.redApoyoTree = redApoyoTree;
+
+// Tema institucional — Geriátrico Jardín de los Recuerdos
+import './gama-de-colores/modo-oscuro.js';
 

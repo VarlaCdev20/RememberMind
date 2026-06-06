@@ -1,22 +1,21 @@
 <?php
-require __DIR__ . '/vendor/autoload.php';
-$app = require_once __DIR__ . '/bootstrap/app.php';
+require 'vendor/autoload.php';
+$app = require_once 'bootstrap/app.php';
 $kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
 $kernel->bootstrap();
 
 try {
-    $a = App\Models\AdultoMayor::first();
-    $controller = app(App\Http\Controllers\Admin\AdultoMayorController::class);
-    $request = Illuminate\Http\Request::create('/admin/adultos-mayores/' . $a->cod_am . '/reporte-individual', 'GET', ['format' => 'pdf']);
-    $response = $controller->reporteIndividual($request, $a);
-    echo "PDF generated successfully, type: " . get_class($response) . "\n";
+    \Spatie\LaravelPdf\Facades\Pdf::view('pdf.personal-institucional.ficha', ['data' => []])
+        ->save(storage_path('app/public/test.pdf'));
+    echo "OK Spatie\n";
 } catch (\Exception $e) {
-    echo "Error generating PDF: " . $e->getMessage() . "\n" . $e->getTraceAsString();
+    echo "Spatie Failed: " . $e->getMessage() . "\n";
 }
 
 try {
-    $request = Illuminate\Http\Request::create('/admin/adultos-mayores/reporte-general', 'GET', ['format' => 'pdf']);
-    // Wait, is it reporte-general? Let's check route name.
+    $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('pdf.personal-institucional.ficha', ['data' => []]);
+    \Illuminate\Support\Facades\Storage::disk('public')->put('test2.pdf', $pdf->output());
+    echo "OK DomPDF\n";
 } catch (\Exception $e) {
-    echo "Error generating general report: " . $e->getMessage() . "\n";
+    echo "DomPDF Failed: " . $e->getMessage() . "\n";
 }

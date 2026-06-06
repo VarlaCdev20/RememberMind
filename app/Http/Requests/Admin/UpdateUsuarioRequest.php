@@ -16,16 +16,20 @@ class UpdateUsuarioRequest extends FormRequest
     protected function prepareForValidation(): void
     {
         $this->merge([
-            'nombres'           => Str::upper($this->nombres),
-            'ap_paterno'        => $this->ap_paterno ? Str::upper($this->ap_paterno) : null,
-            'ap_materno'        => $this->ap_materno ? Str::upper($this->ap_materno) : null,
-            'correo'            => Str::lower($this->correo),
-            'numero_documento'  => Str::upper(preg_replace('/[^A-Za-z0-9]/', '', $this->numero_documento)),
-            'expedido'          => ($this->pais_documento === 'Bolivia' && $this->tipo_documento === 'CI') ? Str::upper($this->expedido) : null,
-            'genero'            => Str::upper($this->genero),
-            'estado'            => Str::upper($this->estado),
-            'acceso_sistema'    => Str::upper($this->acceso_sistema),
-            'telefono'          => preg_replace('/[^0-9]/', '', $this->telefono),
+            'nombres'                 => Str::upper($this->nombres),
+            'ap_paterno'              => $this->ap_paterno ? Str::upper($this->ap_paterno) : null,
+            'ap_materno'              => $this->ap_materno ? Str::upper($this->ap_materno) : null,
+            'correo'                  => Str::lower($this->correo),
+            'numero_documento'        => Str::upper(preg_replace('/[^A-Za-z0-9]/', '', $this->numero_documento)),
+            'expedido'                => ($this->pais_documento === 'Bolivia' && $this->tipo_documento === 'CI') ? Str::upper($this->expedido) : null,
+            'genero'                  => Str::upper($this->genero),
+            'estado'                  => Str::upper($this->estado),
+            'acceso_sistema'          => Str::upper($this->acceso_sistema),
+            'telefono'                => preg_replace('/[^0-9]/', '', $this->telefono),
+            'contacto_emergencia'     => $this->contacto_emergencia ? Str::upper($this->contacto_emergencia) : null,
+            'ap_paterno_emergencia'   => $this->ap_paterno_emergencia ? Str::upper($this->ap_paterno_emergencia) : null,
+            'ap_materno_emergencia'   => $this->ap_materno_emergencia ? Str::upper($this->ap_materno_emergencia) : null,
+            'celular_emergencia'      => preg_replace('/[^0-9]/', '', $this->celular_emergencia),
         ]);
     }
 
@@ -123,20 +127,29 @@ class UpdateUsuarioRequest extends FormRequest
                 Rule::unique('users', 'correo')->ignore($codUsu, 'cod_usu')
             ],
             'rol'                  => ['required', 'string', 'exists:roles,name'],
-            'especialidad_salud'   => ['required_if:rol,personal_salud', 'nullable', 'exists:especialidades,cod_esp'],
-            'cargo_administrativo' => ['required_if:rol,personal_admin', 'nullable', 'exists:cargos_administrativos,cod_cargo_admin'],
+            'especialidad_salud'   => ['required_if:rol,ENFERMEROS,MEDICO GENERAL/GERIATRA,PSICOLOGO/A,PEDAGOGO,NUTRICIONISTA,FISIOTERAPEUTA', 'nullable', 'exists:especialidades,cod_esp'],
+            'cargo_administrativo' => ['required_if:rol,SUPERADMINISTRADOR,ADMINISTRADOR', 'nullable', 'exists:cargos_administrativos,cod_cargo_admin'],
             'genero'               => ['required', 'in:FEMENINO,MASCULINO,OTRO,PREFIERE NO ESPECIFICAR'],
             'fecha_nacimiento'     => [
                 'required', 
                 'date', 
-                'before_or_equal:' . now()->subYears(18)->format('Y-m-d'),
-                'after_or_equal:' . now()->subYears(100)->format('Y-m-d')
+                'before_or_equal:' . now()->subYears(16)->format('Y-m-d'),
+                'after_or_equal:' . now()->subYears(60)->format('Y-m-d')
             ],
             'estado'               => ['required', 'in:ACTIVO,INACTIVO,ARCHIVADO'],
             'acceso_sistema'       => ['required', 'in:HABILITADO,BLOQUEADO'],
             'foto_perfil'          => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
             'observaciones'        => ['nullable', 'string', 'max:500'],
             'fecha_ingreso'        => ['nullable', 'date', 'before_or_equal:today'],
+            'calle'                 => ['required', 'string', 'min:2', 'max:150'],
+            'nro_domicilio'         => ['required', 'string', 'max:20'],
+            'zona'                  => ['required', 'string', 'min:2', 'max:100'],
+            'ciudad'                => ['required', 'string', 'min:2', 'max:100'],
+            'contacto_emergencia'   => ['required', 'string', 'min:2', 'max:150', 'regex:/^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s\-]+$/u'],
+            'ap_paterno_emergencia' => ['required_without:ap_materno_emergencia', 'nullable', 'string', 'max:100', 'regex:/^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s\-]+$/u'],
+            'ap_materno_emergencia' => ['required_without:ap_paterno_emergencia', 'nullable', 'string', 'max:100', 'regex:/^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s\-]+$/u'],
+            'parentesco_emergencia' => ['required', 'string', 'max:100'],
+            'celular_emergencia'    => ['required', 'string', 'max:20', 'different:telefono', 'regex:/^\d+$/'],
         ];
     }
 
@@ -144,19 +157,24 @@ class UpdateUsuarioRequest extends FormRequest
     {
         return [
             'nombres.regex'                 => 'El nombre solo debe contener letras y espacios.',
-            'ap_paterno.required_without'   => 'Debe ingresar al menos un apellido: paterno o materno.',
-            'ap_materno.required_without'   => 'Debe ingresar al menos un apellido: paterno o materno.',
-            'numero_documento.unique'       => 'Este número de documento ya está registrado.',
-            'correo.unique'                 => 'Este correo ya se encuentra registrado.',
-            'expedido.required_if'          => 'Debe seleccionar el lugar de expedición para documentos de Bolivia.',
-            'especialidad_salud.required_if' => 'La especialidad es obligatoria para el personal de salud.',
-            'cargo_administrativo.required_if' => 'El cargo es obligatorio para el personal administrativo.',
-            'genero.required'               => 'El sexo es obligatorio.',
-            'fecha_nacimiento.required'     => 'La fecha de nacimiento es obligatoria.',
-            'fecha_nacimiento.before_or_equal' => 'El usuario debe tener entre 18 y 100 años.',
-            'fecha_nacimiento.after_or_equal'  => 'El usuario debe tener entre 18 y 100 años.',
+            'ap_paterno.required_without'   => 'Falta registrar al menos un apellido (paterno o materno) para el usuario.',
+            'ap_materno.required_without'   => 'Falta registrar al menos un apellido (paterno o materno) para el usuario.',
+            'numero_documento.unique'       => 'Este número de documento ya está registrado para otro usuario.',
+            'correo.unique'                 => 'Esta dirección de correo electrónico ya está registrada para otro usuario.',
+            'expedido.required_if'          => 'Debe seleccionar el departamento de expedición para documentos de Bolivia.',
+            'especialidad_salud.required_if' => 'Debe seleccionar la especialidad médica para el personal de salud.',
+            'cargo_administrativo.required_if' => 'Debe seleccionar el cargo administrativo para el personal administrativo.',
+            'genero.required'               => 'Debe seleccionar el género o sexo del usuario.',
+            'fecha_nacimiento.required'     => 'Debe ingresar la fecha de nacimiento del usuario.',
+            'fecha_nacimiento.before_or_equal' => 'El usuario registrado debe tener al menos 16 años.',
+            'fecha_nacimiento.after_or_equal'  => 'El usuario registrado no puede superar los 60 años.',
+            'telefono.required'             => 'Debe registrar el número de teléfono celular de contacto.',
             'telefono.min'                  => 'El celular debe tener al menos 6 dígitos.',
             'telefono.max'                  => 'El celular no puede superar los 15 dígitos.',
+            'calle.required'                => 'Debe ingresar la calle o avenida del domicilio.',
+            'nro_domicilio.required'        => 'Falta ingresar el número de casa/departamento, o escriba S/N.',
+            'zona.required'                 => 'Debe registrar la zona o barrio del domicilio.',
+            'ciudad.required'               => 'Debe seleccionar la ciudad de residencia.',
         ];
     }
 }

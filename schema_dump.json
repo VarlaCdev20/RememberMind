@@ -1,0 +1,2195 @@
+{
+    "acciones_alerta": {
+        "columns": {
+            "cod_accion_alerta": "int8",
+            "cod_alerta": "int8",
+            "accion": "text",
+            "responsable_id": "varchar",
+            "fecha_accion": "timestamp",
+            "estado": "varchar",
+            "observacion": "text",
+            "created_at": "timestamp",
+            "updated_at": "timestamp"
+        },
+        "foreign_keys": [
+            {
+                "columns": [
+                    "cod_alerta"
+                ],
+                "foreign_table": "alertas_adulto",
+                "foreign_columns": [
+                    "cod_alerta"
+                ]
+            },
+            {
+                "columns": [
+                    "responsable_id"
+                ],
+                "foreign_table": "users",
+                "foreign_columns": [
+                    "cod_usu"
+                ]
+            }
+        ]
+    },
+    "actividades_adulto": {
+        "columns": {
+            "cod_act_adul": "int4",
+            "fecha": "date",
+            "hora": "time",
+            "obs": "text",
+            "estado": "varchar",
+            "cod_tipo_act": "int4",
+            "cod_am": "varchar",
+            "hora_fin": "time",
+            "responsable_tipo": "varchar",
+            "responsable_id": "varchar",
+            "created_at": "timestamp",
+            "updated_at": "timestamp",
+            "deleted_at": "timestamp"
+        },
+        "foreign_keys": [
+            {
+                "columns": [
+                    "cod_am"
+                ],
+                "foreign_table": "adulto_mayor",
+                "foreign_columns": [
+                    "cod_am"
+                ]
+            },
+            {
+                "columns": [
+                    "cod_tipo_act"
+                ],
+                "foreign_table": "tipo_actividades_adulto",
+                "foreign_columns": [
+                    "cod_tipo_act"
+                ]
+            }
+        ]
+    },
+    "activity_log": {
+        "columns": {
+            "id": "int8",
+            "log_name": "varchar",
+            "description": "text",
+            "subject_type": "varchar",
+            "subject_id": "varchar",
+            "causer_type": "varchar",
+            "causer_id": "varchar",
+            "properties": "json",
+            "created_at": "timestamp",
+            "updated_at": "timestamp",
+            "event": "varchar",
+            "batch_uuid": "uuid"
+        },
+        "foreign_keys": []
+    },
+    "administracion_medicacion": {
+        "columns": {
+            "cod_admin_med": "int4",
+            "cod_med_adulto": "int4",
+            "cod_am": "varchar",
+            "fecha": "date",
+            "hora_programada": "time",
+            "hora_real": "time",
+            "administrado": "bool",
+            "motivo_omision": "text",
+            "efecto_observado": "text",
+            "observacion": "text",
+            "registrado_por": "varchar",
+            "created_at": "timestamp",
+            "updated_at": "timestamp",
+            "cod_turno": "int4",
+            "cod_tarea": "int8",
+            "estado": "varchar",
+            "reaccion_adversa": "bool",
+            "descripcion_reaccion": "text"
+        },
+        "foreign_keys": [
+            {
+                "columns": [
+                    "cod_am"
+                ],
+                "foreign_table": "adulto_mayor",
+                "foreign_columns": [
+                    "cod_am"
+                ]
+            },
+            {
+                "columns": [
+                    "cod_med_adulto"
+                ],
+                "foreign_table": "medicacion_adulto",
+                "foreign_columns": [
+                    "cod_med_adulto"
+                ]
+            },
+            {
+                "columns": [
+                    "cod_tarea"
+                ],
+                "foreign_table": "tareas_plan_cuidado",
+                "foreign_columns": [
+                    "cod_tarea"
+                ]
+            },
+            {
+                "columns": [
+                    "cod_turno"
+                ],
+                "foreign_table": "turnos_enfermeria",
+                "foreign_columns": [
+                    "cod_turno"
+                ]
+            },
+            {
+                "columns": [
+                    "registrado_por"
+                ],
+                "foreign_table": "users",
+                "foreign_columns": [
+                    "cod_usu"
+                ]
+            }
+        ]
+    },
+    "adulto_mayor": {
+        "columns": {
+            "cod_am": "varchar",
+            "nombres": "varchar",
+            "ap_paterno": "varchar",
+            "ap_materno": "varchar",
+            "ci": "varchar",
+            "fecha_nac": "date",
+            "genero": "varchar",
+            "estado_civil": "varchar",
+            "telefono": "varchar",
+            "zona": "varchar",
+            "calle": "varchar",
+            "fecha_ing": "date",
+            "tipo_ing": "varchar",
+            "permanencia": "varchar",
+            "nivel_educat": "varchar",
+            "observaciones": "text",
+            "cod_est_adul": "int4",
+            "created_at": "timestamp",
+            "updated_at": "timestamp",
+            "foto": "varchar",
+            "archivado_en": "timestamp",
+            "motivo_archivado": "text",
+            "hora_ing": "time",
+            "complemento_ci": "varchar",
+            "expedicion_ci": "varchar",
+            "celular": "varchar",
+            "telefono_fijo": "varchar",
+            "departamento_residencia": "varchar",
+            "ciudad_municipio": "varchar",
+            "grupo_sanguineo": "varchar",
+            "factor_rh": "varchar",
+            "alergias": "text",
+            "seguro_salud": "varchar",
+            "contacto_emergencia_nombre": "varchar",
+            "contacto_emergencia_parentesco": "varchar",
+            "contacto_emergencia_celular": "varchar",
+            "contacto_emergencia_direccion": "varchar",
+            "responsable_principal": "bool",
+            "autorizado_informacion_medica": "bool",
+            "consentimiento_datos": "bool",
+            "tiene_celular": "bool",
+            "sabe_usar_whatsapp": "bool",
+            "motivo_ingreso": "text",
+            "procedencia_ingreso": "varchar",
+            "cod_habitacion": "int8",
+            "cod_cama": "int8"
+        },
+        "foreign_keys": [
+            {
+                "columns": [
+                    "cod_cama"
+                ],
+                "foreign_table": "camas",
+                "foreign_columns": [
+                    "cod_cama"
+                ]
+            },
+            {
+                "columns": [
+                    "cod_est_adul"
+                ],
+                "foreign_table": "estado_adulto",
+                "foreign_columns": [
+                    "cod_est_adul"
+                ]
+            },
+            {
+                "columns": [
+                    "cod_habitacion"
+                ],
+                "foreign_table": "habitaciones",
+                "foreign_columns": [
+                    "cod_habitacion"
+                ]
+            }
+        ]
+    },
+    "alertas_adulto": {
+        "columns": {
+            "cod_alerta": "int8",
+            "cod_am": "varchar",
+            "cod_turno": "int4",
+            "origen": "varchar",
+            "tipo_alerta": "varchar",
+            "nivel": "varchar",
+            "motivo": "text",
+            "responsable_id": "varchar",
+            "estado": "varchar",
+            "accion_tomada": "text",
+            "fecha_atencion": "timestamp",
+            "atendido_por": "varchar",
+            "fecha_cierre": "timestamp",
+            "cerrado_por": "varchar",
+            "observacion_cierre": "text",
+            "created_at": "timestamp",
+            "updated_at": "timestamp"
+        },
+        "foreign_keys": [
+            {
+                "columns": [
+                    "atendido_por"
+                ],
+                "foreign_table": "users",
+                "foreign_columns": [
+                    "cod_usu"
+                ]
+            },
+            {
+                "columns": [
+                    "cerrado_por"
+                ],
+                "foreign_table": "users",
+                "foreign_columns": [
+                    "cod_usu"
+                ]
+            },
+            {
+                "columns": [
+                    "cod_am"
+                ],
+                "foreign_table": "adulto_mayor",
+                "foreign_columns": [
+                    "cod_am"
+                ]
+            },
+            {
+                "columns": [
+                    "cod_turno"
+                ],
+                "foreign_table": "turnos_enfermeria",
+                "foreign_columns": [
+                    "cod_turno"
+                ]
+            },
+            {
+                "columns": [
+                    "responsable_id"
+                ],
+                "foreign_table": "users",
+                "foreign_columns": [
+                    "cod_usu"
+                ]
+            }
+        ]
+    },
+    "areas_geriatricas": {
+        "columns": {
+            "cod_area": "varchar",
+            "nombre": "varchar",
+            "descripcion": "text",
+            "estado": "varchar",
+            "created_at": "timestamp",
+            "updated_at": "timestamp"
+        },
+        "foreign_keys": []
+    },
+    "areas_institucionales": {
+        "columns": {
+            "cod_area": "varchar",
+            "nombre": "varchar",
+            "slug": "varchar",
+            "tipo_area": "varchar",
+            "descripcion": "text",
+            "responsable_id": "varchar",
+            "roles_sugeridos": "jsonb",
+            "modulos_relacionados": "jsonb",
+            "color": "varchar",
+            "icono": "varchar",
+            "estado": "varchar",
+            "orden": "int4",
+            "observaciones": "text",
+            "creado_por": "varchar",
+            "actualizado_por": "varchar",
+            "created_at": "timestamp",
+            "updated_at": "timestamp",
+            "deleted_at": "timestamp",
+            "imagen_area": "varchar"
+        },
+        "foreign_keys": [
+            {
+                "columns": [
+                    "actualizado_por"
+                ],
+                "foreign_table": "users",
+                "foreign_columns": [
+                    "cod_usu"
+                ]
+            },
+            {
+                "columns": [
+                    "creado_por"
+                ],
+                "foreign_table": "users",
+                "foreign_columns": [
+                    "cod_usu"
+                ]
+            },
+            {
+                "columns": [
+                    "responsable_id"
+                ],
+                "foreign_table": "users",
+                "foreign_columns": [
+                    "cod_usu"
+                ]
+            }
+        ]
+    },
+    "asignacion_voluntarios": {
+        "columns": {
+            "cod_asig_vol": "int4",
+            "fecha_asig": "date",
+            "fecha_fin": "date",
+            "estado": "varchar",
+            "obser": "text",
+            "cod_am": "varchar",
+            "cod_vol": "int4"
+        },
+        "foreign_keys": [
+            {
+                "columns": [
+                    "cod_am"
+                ],
+                "foreign_table": "adulto_mayor",
+                "foreign_columns": [
+                    "cod_am"
+                ]
+            },
+            {
+                "columns": [
+                    "cod_vol"
+                ],
+                "foreign_table": "voluntarios",
+                "foreign_columns": [
+                    "cod_vol"
+                ]
+            }
+        ]
+    },
+    "asignaciones_turno": {
+        "columns": {
+            "cod_asignacion": "varchar",
+            "cod_usu": "varchar",
+            "cod_area": "varchar",
+            "cod_turno": "varchar",
+            "dias_semana": "json",
+            "fecha_inicio": "date",
+            "fecha_fin": "date",
+            "estado": "varchar",
+            "tipo_asignacion": "varchar",
+            "observaciones": "text",
+            "creado_por": "varchar",
+            "actualizado_por": "varchar",
+            "created_at": "timestamp",
+            "updated_at": "timestamp",
+            "deleted_at": "timestamp"
+        },
+        "foreign_keys": [
+            {
+                "columns": [
+                    "actualizado_por"
+                ],
+                "foreign_table": "users",
+                "foreign_columns": [
+                    "cod_usu"
+                ]
+            },
+            {
+                "columns": [
+                    "cod_area"
+                ],
+                "foreign_table": "areas_institucionales",
+                "foreign_columns": [
+                    "cod_area"
+                ]
+            },
+            {
+                "columns": [
+                    "cod_turno"
+                ],
+                "foreign_table": "turnos_institucionales",
+                "foreign_columns": [
+                    "cod_turno"
+                ]
+            },
+            {
+                "columns": [
+                    "cod_usu"
+                ],
+                "foreign_table": "users",
+                "foreign_columns": [
+                    "cod_usu"
+                ]
+            },
+            {
+                "columns": [
+                    "creado_por"
+                ],
+                "foreign_table": "users",
+                "foreign_columns": [
+                    "cod_usu"
+                ]
+            }
+        ]
+    },
+    "asignaciones_turno_adulto": {
+        "columns": {
+            "cod_asig_turno": "int8",
+            "cod_am": "varchar",
+            "cod_turno": "int4",
+            "cod_usu_enfermero": "varchar",
+            "cod_habitacion": "int8",
+            "cod_cama": "int8",
+            "fecha_inicio": "date",
+            "fecha_fin": "date",
+            "nivel_supervision": "varchar",
+            "estado": "varchar",
+            "motivo_asignacion": "text",
+            "asignado_por": "varchar",
+            "created_at": "timestamp",
+            "updated_at": "timestamp",
+            "deleted_at": "timestamp"
+        },
+        "foreign_keys": [
+            {
+                "columns": [
+                    "asignado_por"
+                ],
+                "foreign_table": "users",
+                "foreign_columns": [
+                    "cod_usu"
+                ]
+            },
+            {
+                "columns": [
+                    "cod_am"
+                ],
+                "foreign_table": "adulto_mayor",
+                "foreign_columns": [
+                    "cod_am"
+                ]
+            },
+            {
+                "columns": [
+                    "cod_cama"
+                ],
+                "foreign_table": "camas",
+                "foreign_columns": [
+                    "cod_cama"
+                ]
+            },
+            {
+                "columns": [
+                    "cod_habitacion"
+                ],
+                "foreign_table": "habitaciones",
+                "foreign_columns": [
+                    "cod_habitacion"
+                ]
+            },
+            {
+                "columns": [
+                    "cod_turno"
+                ],
+                "foreign_table": "turnos_enfermeria",
+                "foreign_columns": [
+                    "cod_turno"
+                ]
+            },
+            {
+                "columns": [
+                    "cod_usu_enfermero"
+                ],
+                "foreign_table": "users",
+                "foreign_columns": [
+                    "cod_usu"
+                ]
+            }
+        ]
+    },
+    "asistencia_voluntarios": {
+        "columns": {
+            "cod_asis_vol": "int4",
+            "fecha": "date",
+            "hora_entrada": "time",
+            "hora_salida": "time",
+            "estado": "varchar",
+            "actividad_realizada": "text",
+            "observaciones": "text",
+            "cod_vol": "int4"
+        },
+        "foreign_keys": [
+            {
+                "columns": [
+                    "cod_vol"
+                ],
+                "foreign_table": "voluntarios",
+                "foreign_columns": [
+                    "cod_vol"
+                ]
+            }
+        ]
+    },
+    "atenciones_adulto": {
+        "columns": {
+            "cod_aten_adul": "int4",
+            "fecha": "date",
+            "hora": "time",
+            "obs": "text",
+            "estado": "varchar",
+            "cod_tipo_aten": "int4",
+            "cod_am": "varchar",
+            "responsable_tipo": "varchar",
+            "responsable_id": "varchar",
+            "created_at": "timestamp",
+            "updated_at": "timestamp",
+            "deleted_at": "timestamp"
+        },
+        "foreign_keys": [
+            {
+                "columns": [
+                    "cod_am"
+                ],
+                "foreign_table": "adulto_mayor",
+                "foreign_columns": [
+                    "cod_am"
+                ]
+            },
+            {
+                "columns": [
+                    "cod_tipo_aten"
+                ],
+                "foreign_table": "tipo_atenciones_adulto",
+                "foreign_columns": [
+                    "cod_tipo_aten"
+                ]
+            }
+        ]
+    },
+    "cache": {
+        "columns": {
+            "key": "varchar",
+            "value": "text",
+            "expiration": "int8"
+        },
+        "foreign_keys": []
+    },
+    "cache_locks": {
+        "columns": {
+            "key": "varchar",
+            "owner": "varchar",
+            "expiration": "int8"
+        },
+        "foreign_keys": []
+    },
+    "camas": {
+        "columns": {
+            "cod_cama": "int8",
+            "cod_habitacion": "int8",
+            "codigo": "varchar",
+            "estado": "varchar",
+            "observacion": "varchar",
+            "created_at": "timestamp",
+            "updated_at": "timestamp",
+            "deleted_at": "timestamp"
+        },
+        "foreign_keys": [
+            {
+                "columns": [
+                    "cod_habitacion"
+                ],
+                "foreign_table": "habitaciones",
+                "foreign_columns": [
+                    "cod_habitacion"
+                ]
+            }
+        ]
+    },
+    "cargos_administrativos": {
+        "columns": {
+            "cod_cargo_admin": "int4",
+            "nombre": "varchar",
+            "descripcion": "text",
+            "estado": "varchar",
+            "created_at": "timestamp",
+            "updated_at": "timestamp"
+        },
+        "foreign_keys": []
+    },
+    "disponibilidad_voluntarios": {
+        "columns": {
+            "cod_hor_vol": "int4",
+            "dia_semana": "varchar",
+            "hora_inicio": "time",
+            "hora_fin": "time",
+            "observaciones": "text",
+            "cod_vol": "int4"
+        },
+        "foreign_keys": [
+            {
+                "columns": [
+                    "cod_vol"
+                ],
+                "foreign_table": "voluntarios",
+                "foreign_columns": [
+                    "cod_vol"
+                ]
+            }
+        ]
+    },
+    "documentos_adulto_mayor": {
+        "columns": {
+            "cod_doc_am": "int4",
+            "nom_doc": "varchar",
+            "tipo_doc": "varchar",
+            "ruta_archivo": "varchar",
+            "extension": "varchar",
+            "fecha_doc": "date",
+            "observaciones": "text",
+            "cod_am": "varchar",
+            "estado": "varchar",
+            "archivado_en": "timestamp",
+            "motivo_archivado": "text",
+            "created_at": "timestamp",
+            "updated_at": "timestamp",
+            "deleted_at": "timestamp",
+            "origen_modulo": "varchar",
+            "referencia_id": "int8"
+        },
+        "foreign_keys": [
+            {
+                "columns": [
+                    "cod_am"
+                ],
+                "foreign_table": "adulto_mayor",
+                "foreign_columns": [
+                    "cod_am"
+                ]
+            }
+        ]
+    },
+    "documentos_usuarios": {
+        "columns": {
+            "cod_doc_usu": "varchar",
+            "cod_usu": "varchar",
+            "cod_tipo_doc": "varchar",
+            "tipo_documento": "varchar",
+            "nombre_documento": "varchar",
+            "archivo": "varchar",
+            "mime_type": "varchar",
+            "extension": "varchar",
+            "tamanio": "int4",
+            "fecha_emision": "date",
+            "fecha_vencimiento": "date",
+            "estado": "varchar",
+            "observaciones": "text",
+            "motivo_observacion": "text",
+            "subido_por": "varchar",
+            "validado_por": "varchar",
+            "fecha_validacion": "timestamp",
+            "reemplaza_a": "varchar",
+            "creado_por": "varchar",
+            "actualizado_por": "varchar",
+            "created_at": "timestamp",
+            "updated_at": "timestamp",
+            "deleted_at": "timestamp"
+        },
+        "foreign_keys": [
+            {
+                "columns": [
+                    "cod_tipo_doc"
+                ],
+                "foreign_table": "tipos_documentos_usuario",
+                "foreign_columns": [
+                    "cod_tipo_doc"
+                ]
+            },
+            {
+                "columns": [
+                    "cod_usu"
+                ],
+                "foreign_table": "users",
+                "foreign_columns": [
+                    "cod_usu"
+                ]
+            },
+            {
+                "columns": [
+                    "reemplaza_a"
+                ],
+                "foreign_table": "documentos_usuarios",
+                "foreign_columns": [
+                    "cod_doc_usu"
+                ]
+            },
+            {
+                "columns": [
+                    "subido_por"
+                ],
+                "foreign_table": "users",
+                "foreign_columns": [
+                    "cod_usu"
+                ]
+            },
+            {
+                "columns": [
+                    "validado_por"
+                ],
+                "foreign_table": "users",
+                "foreign_columns": [
+                    "cod_usu"
+                ]
+            }
+        ]
+    },
+    "especialidades": {
+        "columns": {
+            "cod_esp": "int4",
+            "nombre": "varchar",
+            "descripcion": "text"
+        },
+        "foreign_keys": []
+    },
+    "estado_adulto": {
+        "columns": {
+            "cod_est_adul": "int4",
+            "estado": "varchar",
+            "fecha_in": "date",
+            "fecha_fin": "date",
+            "created_at": "timestamp",
+            "updated_at": "timestamp"
+        },
+        "foreign_keys": []
+    },
+    "evaluaciones_cognitivas": {
+        "columns": {
+            "cod_eval_cog": "varchar",
+            "cod_am": "varchar",
+            "cod_tipo_eval": "int8",
+            "cod_per_sal": "int4",
+            "fecha_eval": "date",
+            "hora_eval": "time",
+            "puntaje_total": "numeric",
+            "puntaje_maximo": "numeric",
+            "resultado_interpretacion": "varchar",
+            "nivel_riesgo": "varchar",
+            "observaciones": "text",
+            "estado_eval": "varchar",
+            "created_at": "timestamp",
+            "updated_at": "timestamp",
+            "deleted_at": "timestamp"
+        },
+        "foreign_keys": [
+            {
+                "columns": [
+                    "cod_am"
+                ],
+                "foreign_table": "adulto_mayor",
+                "foreign_columns": [
+                    "cod_am"
+                ]
+            },
+            {
+                "columns": [
+                    "cod_per_sal"
+                ],
+                "foreign_table": "personal_salud",
+                "foreign_columns": [
+                    "cod_per_sal"
+                ]
+            },
+            {
+                "columns": [
+                    "cod_tipo_eval"
+                ],
+                "foreign_table": "tipo_evaluacion_cognitiva",
+                "foreign_columns": [
+                    "cod_tipo_eval"
+                ]
+            }
+        ]
+    },
+    "evaluaciones_geriatricas": {
+        "columns": {
+            "cod_eval_ger": "varchar",
+            "cod_am": "varchar",
+            "cod_instrumento": "varchar",
+            "registrado_por": "varchar",
+            "evaluador_id": "varchar",
+            "evaluador_tipo": "varchar",
+            "fecha_eval": "date",
+            "hora_eval": "time",
+            "puntaje_total": "numeric",
+            "categoria_resultado": "varchar",
+            "nivel_alerta": "varchar",
+            "nivel_riesgo": "varchar",
+            "observaciones": "text",
+            "datos_formulario": "jsonb",
+            "estado_eval": "varchar",
+            "motivo_anulacion": "text",
+            "anulado_por": "varchar",
+            "anulado_en": "timestamp",
+            "deleted_at": "timestamp",
+            "created_at": "timestamp",
+            "updated_at": "timestamp"
+        },
+        "foreign_keys": [
+            {
+                "columns": [
+                    "anulado_por"
+                ],
+                "foreign_table": "users",
+                "foreign_columns": [
+                    "cod_usu"
+                ]
+            },
+            {
+                "columns": [
+                    "cod_am"
+                ],
+                "foreign_table": "adulto_mayor",
+                "foreign_columns": [
+                    "cod_am"
+                ]
+            },
+            {
+                "columns": [
+                    "cod_instrumento"
+                ],
+                "foreign_table": "instrumentos_geriatricos",
+                "foreign_columns": [
+                    "cod_instrumento"
+                ]
+            },
+            {
+                "columns": [
+                    "registrado_por"
+                ],
+                "foreign_table": "users",
+                "foreign_columns": [
+                    "cod_usu"
+                ]
+            }
+        ]
+    },
+    "failed_jobs": {
+        "columns": {
+            "id": "int8",
+            "uuid": "varchar",
+            "connection": "text",
+            "queue": "text",
+            "payload": "text",
+            "exception": "text",
+            "failed_at": "timestamp"
+        },
+        "foreign_keys": []
+    },
+    "familiar_adulto": {
+        "columns": {
+            "id": "int8",
+            "created_at": "timestamp",
+            "updated_at": "timestamp",
+            "cod_fam": "int4",
+            "cod_am": "varchar",
+            "parentesco_vinculo": "varchar",
+            "es_responsable": "bool",
+            "estado": "varchar",
+            "observaciones": "text",
+            "deleted_at": "timestamp"
+        },
+        "foreign_keys": [
+            {
+                "columns": [
+                    "cod_am"
+                ],
+                "foreign_table": "adulto_mayor",
+                "foreign_columns": [
+                    "cod_am"
+                ]
+            },
+            {
+                "columns": [
+                    "cod_fam"
+                ],
+                "foreign_table": "familiares",
+                "foreign_columns": [
+                    "cod_fam"
+                ]
+            }
+        ]
+    },
+    "familiares": {
+        "columns": {
+            "cod_fam": "int4",
+            "parentesco": "varchar",
+            "direccion": "varchar",
+            "ocupacion": "varchar",
+            "es_responsable": "varchar",
+            "observaciones": "text",
+            "cod_usu": "varchar",
+            "estado": "varchar",
+            "created_at": "timestamp",
+            "updated_at": "timestamp",
+            "observacion_vinculo": "varchar"
+        },
+        "foreign_keys": [
+            {
+                "columns": [
+                    "cod_usu"
+                ],
+                "foreign_table": "users",
+                "foreign_columns": [
+                    "cod_usu"
+                ]
+            }
+        ]
+    },
+    "ficha_medica_adulto": {
+        "columns": {
+            "cod_ficha_medica": "int4",
+            "cod_am": "varchar",
+            "hipertension": "bool",
+            "diabetes": "bool",
+            "problemas_cardiacos": "bool",
+            "acv": "bool",
+            "parkinson": "bool",
+            "epilepsia": "bool",
+            "alzheimer_diagnosticado": "bool",
+            "depresion": "bool",
+            "ansiedad": "bool",
+            "problemas_sueno": "bool",
+            "problemas_visuales": "bool",
+            "problemas_auditivos": "bool",
+            "dolor_cronico": "bool",
+            "alergias": "text",
+            "restricciones_alimentarias": "text",
+            "hospitalizaciones": "text",
+            "cirugias": "text",
+            "observacion_medica": "text",
+            "registrado_por": "varchar",
+            "estado": "varchar",
+            "created_at": "timestamp",
+            "updated_at": "timestamp",
+            "deleted_at": "timestamp"
+        },
+        "foreign_keys": [
+            {
+                "columns": [
+                    "cod_am"
+                ],
+                "foreign_table": "adulto_mayor",
+                "foreign_columns": [
+                    "cod_am"
+                ]
+            },
+            {
+                "columns": [
+                    "registrado_por"
+                ],
+                "foreign_table": "users",
+                "foreign_columns": [
+                    "cod_usu"
+                ]
+            }
+        ]
+    },
+    "habitaciones": {
+        "columns": {
+            "cod_habitacion": "int8",
+            "codigo": "varchar",
+            "nombre": "varchar",
+            "tipo_habitacion": "varchar",
+            "ubicacion": "varchar",
+            "capacidad": "int2",
+            "estado": "varchar",
+            "observacion": "varchar",
+            "created_at": "timestamp",
+            "updated_at": "timestamp",
+            "deleted_at": "timestamp"
+        },
+        "foreign_keys": []
+    },
+    "historial_estado_adulto": {
+        "columns": {
+            "cod_hist_estado": "int4",
+            "cod_am": "varchar",
+            "estado_anterior": "int4",
+            "estado_nuevo": "int4",
+            "fecha_cambio": "timestamp",
+            "motivo": "text",
+            "documento_respaldo": "int4",
+            "cambiado_por": "varchar",
+            "observacion": "text",
+            "created_at": "timestamp",
+            "updated_at": "timestamp"
+        },
+        "foreign_keys": [
+            {
+                "columns": [
+                    "cambiado_por"
+                ],
+                "foreign_table": "users",
+                "foreign_columns": [
+                    "cod_usu"
+                ]
+            },
+            {
+                "columns": [
+                    "cod_am"
+                ],
+                "foreign_table": "adulto_mayor",
+                "foreign_columns": [
+                    "cod_am"
+                ]
+            },
+            {
+                "columns": [
+                    "documento_respaldo"
+                ],
+                "foreign_table": "documentos_adulto_mayor",
+                "foreign_columns": [
+                    "cod_doc_am"
+                ]
+            },
+            {
+                "columns": [
+                    "estado_anterior"
+                ],
+                "foreign_table": "estado_adulto",
+                "foreign_columns": [
+                    "cod_est_adul"
+                ]
+            },
+            {
+                "columns": [
+                    "estado_nuevo"
+                ],
+                "foreign_table": "estado_adulto",
+                "foreign_columns": [
+                    "cod_est_adul"
+                ]
+            }
+        ]
+    },
+    "horarios_personal_admin": {
+        "columns": {
+            "cod_hor_per_admin": "int4",
+            "dia_semana": "varchar",
+            "hora_inicio": "time",
+            "hora_fin": "time",
+            "turno": "varchar",
+            "estado": "varchar",
+            "observaciones": "text",
+            "cod_per_adm": "int4"
+        },
+        "foreign_keys": [
+            {
+                "columns": [
+                    "cod_per_adm"
+                ],
+                "foreign_table": "personal_admin",
+                "foreign_columns": [
+                    "cod_per_adm"
+                ]
+            }
+        ]
+    },
+    "horarios_personal_salud": {
+        "columns": {
+            "cod_hor_per_sal": "int4",
+            "dia_semana": "varchar",
+            "hora_inicio": "time",
+            "hora_fin": "time",
+            "turno": "varchar",
+            "estado": "varchar",
+            "observaciones": "text",
+            "cod_per_sal": "int4"
+        },
+        "foreign_keys": [
+            {
+                "columns": [
+                    "cod_per_sal"
+                ],
+                "foreign_table": "personal_salud",
+                "foreign_columns": [
+                    "cod_per_sal"
+                ]
+            }
+        ]
+    },
+    "instrumentos_geriatricos": {
+        "columns": {
+            "cod_instrumento": "varchar",
+            "cod_area": "varchar",
+            "nombre": "varchar",
+            "siglas": "varchar",
+            "tipo_resultado": "varchar",
+            "puntaje_maximo": "numeric",
+            "punto_corte_normal": "numeric",
+            "punto_corte_riesgo": "numeric",
+            "descripcion": "text",
+            "estado": "varchar",
+            "created_at": "timestamp",
+            "updated_at": "timestamp"
+        },
+        "foreign_keys": [
+            {
+                "columns": [
+                    "cod_area"
+                ],
+                "foreign_table": "areas_geriatricas",
+                "foreign_columns": [
+                    "cod_area"
+                ]
+            }
+        ]
+    },
+    "job_batches": {
+        "columns": {
+            "id": "varchar",
+            "name": "varchar",
+            "total_jobs": "int4",
+            "pending_jobs": "int4",
+            "failed_jobs": "int4",
+            "failed_job_ids": "text",
+            "options": "text",
+            "cancelled_at": "int4",
+            "created_at": "int4",
+            "finished_at": "int4"
+        },
+        "foreign_keys": []
+    },
+    "jobs": {
+        "columns": {
+            "id": "int8",
+            "queue": "varchar",
+            "payload": "text",
+            "attempts": "int2",
+            "reserved_at": "int4",
+            "available_at": "int4",
+            "created_at": "int4"
+        },
+        "foreign_keys": []
+    },
+    "medicacion_adulto": {
+        "columns": {
+            "cod_med_adulto": "int4",
+            "cod_am": "varchar",
+            "nombre_medicamento": "varchar",
+            "dosis": "varchar",
+            "frecuencia": "varchar",
+            "via_administracion": "varchar",
+            "hora_programada": "time",
+            "fecha_inicio": "date",
+            "fecha_fin": "date",
+            "medico_indica": "varchar",
+            "documento_receta": "int4",
+            "estado": "varchar",
+            "observacion": "text",
+            "registrado_por": "varchar",
+            "created_at": "timestamp",
+            "updated_at": "timestamp",
+            "deleted_at": "timestamp",
+            "es_critica": "bool",
+            "requiere_control_signos": "bool"
+        },
+        "foreign_keys": [
+            {
+                "columns": [
+                    "cod_am"
+                ],
+                "foreign_table": "adulto_mayor",
+                "foreign_columns": [
+                    "cod_am"
+                ]
+            },
+            {
+                "columns": [
+                    "documento_receta"
+                ],
+                "foreign_table": "documentos_adulto_mayor",
+                "foreign_columns": [
+                    "cod_doc_am"
+                ]
+            },
+            {
+                "columns": [
+                    "registrado_por"
+                ],
+                "foreign_table": "users",
+                "foreign_columns": [
+                    "cod_usu"
+                ]
+            }
+        ]
+    },
+    "migrations": {
+        "columns": {
+            "id": "int4",
+            "migration": "varchar",
+            "batch": "int4"
+        },
+        "foreign_keys": []
+    },
+    "model_has_permissions": {
+        "columns": {
+            "permission_id": "int8",
+            "model_type": "varchar",
+            "model_id": "varchar"
+        },
+        "foreign_keys": [
+            {
+                "columns": [
+                    "permission_id"
+                ],
+                "foreign_table": "permissions",
+                "foreign_columns": [
+                    "id"
+                ]
+            }
+        ]
+    },
+    "model_has_roles": {
+        "columns": {
+            "role_id": "int8",
+            "model_type": "varchar",
+            "model_id": "varchar"
+        },
+        "foreign_keys": [
+            {
+                "columns": [
+                    "role_id"
+                ],
+                "foreign_table": "roles",
+                "foreign_columns": [
+                    "id"
+                ]
+            }
+        ]
+    },
+    "obs_adulto": {
+        "columns": {
+            "cod_obs_adul": "int4",
+            "fecha": "date",
+            "tipo_obs": "varchar",
+            "descripcion": "text",
+            "cod_am": "varchar",
+            "cod_est_adul": "int4",
+            "nivel_importancia": "varchar",
+            "registrado_por": "varchar",
+            "estado_revision": "varchar",
+            "created_at": "timestamp",
+            "updated_at": "timestamp",
+            "deleted_at": "timestamp"
+        },
+        "foreign_keys": [
+            {
+                "columns": [
+                    "cod_am"
+                ],
+                "foreign_table": "adulto_mayor",
+                "foreign_columns": [
+                    "cod_am"
+                ]
+            },
+            {
+                "columns": [
+                    "cod_est_adul"
+                ],
+                "foreign_table": "estado_adulto",
+                "foreign_columns": [
+                    "cod_est_adul"
+                ]
+            },
+            {
+                "columns": [
+                    "registrado_por"
+                ],
+                "foreign_table": "users",
+                "foreign_columns": [
+                    "cod_usu"
+                ]
+            }
+        ]
+    },
+    "pases_turno": {
+        "columns": {
+            "cod_pase": "int8",
+            "cod_am": "varchar",
+            "turno_saliente_id": "int4",
+            "turno_entrante_id": "int4",
+            "enfermero_saliente_id": "varchar",
+            "enfermero_entrante_id": "varchar",
+            "fecha": "date",
+            "estado_general_cierre": "varchar",
+            "resumen_turno": "text",
+            "tareas_realizadas_json": "json",
+            "tareas_pendientes_json": "json",
+            "alertas_activas_json": "json",
+            "recomendacion_siguiente_turno": "text",
+            "requiere_vigilancia_especial": "bool",
+            "motivo_vigilancia": "text",
+            "estado": "varchar",
+            "fecha_recibido": "timestamp",
+            "created_at": "timestamp",
+            "updated_at": "timestamp"
+        },
+        "foreign_keys": [
+            {
+                "columns": [
+                    "cod_am"
+                ],
+                "foreign_table": "adulto_mayor",
+                "foreign_columns": [
+                    "cod_am"
+                ]
+            },
+            {
+                "columns": [
+                    "enfermero_entrante_id"
+                ],
+                "foreign_table": "users",
+                "foreign_columns": [
+                    "cod_usu"
+                ]
+            },
+            {
+                "columns": [
+                    "enfermero_saliente_id"
+                ],
+                "foreign_table": "users",
+                "foreign_columns": [
+                    "cod_usu"
+                ]
+            },
+            {
+                "columns": [
+                    "turno_entrante_id"
+                ],
+                "foreign_table": "turnos_enfermeria",
+                "foreign_columns": [
+                    "cod_turno"
+                ]
+            },
+            {
+                "columns": [
+                    "turno_saliente_id"
+                ],
+                "foreign_table": "turnos_enfermeria",
+                "foreign_columns": [
+                    "cod_turno"
+                ]
+            }
+        ]
+    },
+    "password_reset_tokens": {
+        "columns": {
+            "correo": "varchar",
+            "token": "varchar",
+            "created_at": "timestamp"
+        },
+        "foreign_keys": []
+    },
+    "permissions": {
+        "columns": {
+            "id": "int8",
+            "name": "varchar",
+            "guard_name": "varchar",
+            "created_at": "timestamp",
+            "updated_at": "timestamp"
+        },
+        "foreign_keys": []
+    },
+    "personal_access_tokens": {
+        "columns": {
+            "id": "int8",
+            "tokenable_type": "varchar",
+            "tokenable_id": "int8",
+            "name": "text",
+            "token": "varchar",
+            "abilities": "text",
+            "last_used_at": "timestamp",
+            "expires_at": "timestamp",
+            "created_at": "timestamp",
+            "updated_at": "timestamp"
+        },
+        "foreign_keys": []
+    },
+    "personal_admin": {
+        "columns": {
+            "cod_per_adm": "int4",
+            "cargo": "varchar",
+            "fecha_ingreso": "date",
+            "area_admin": "varchar",
+            "estado_laboral": "varchar",
+            "observaciones": "text",
+            "cod_usu": "varchar",
+            "archivado_en": "timestamp",
+            "motivo_archivado": "text",
+            "created_at": "timestamp",
+            "updated_at": "timestamp",
+            "cod_cargo_admin": "int4"
+        },
+        "foreign_keys": [
+            {
+                "columns": [
+                    "cod_cargo_admin"
+                ],
+                "foreign_table": "cargos_administrativos",
+                "foreign_columns": [
+                    "cod_cargo_admin"
+                ]
+            },
+            {
+                "columns": [
+                    "cod_usu"
+                ],
+                "foreign_table": "users",
+                "foreign_columns": [
+                    "cod_usu"
+                ]
+            }
+        ]
+    },
+    "personal_salud": {
+        "columns": {
+            "cod_per_sal": "int4",
+            "fecha_ing": "date",
+            "anios_exp": "int4",
+            "matricula_prof": "varchar",
+            "estado_laboral": "varchar",
+            "observaciones": "text",
+            "cod_usu": "varchar",
+            "cod_esp": "int4",
+            "archivado_en": "timestamp",
+            "motivo_archivado": "text",
+            "created_at": "timestamp",
+            "updated_at": "timestamp",
+            "deleted_at": "timestamp",
+            "institucion_formacion": "varchar",
+            "tipo_personal_salud": "varchar",
+            "subtipo_enfermeria": "varchar"
+        },
+        "foreign_keys": [
+            {
+                "columns": [
+                    "cod_esp"
+                ],
+                "foreign_table": "especialidades",
+                "foreign_columns": [
+                    "cod_esp"
+                ]
+            },
+            {
+                "columns": [
+                    "cod_usu"
+                ],
+                "foreign_table": "users",
+                "foreign_columns": [
+                    "cod_usu"
+                ]
+            }
+        ]
+    },
+    "planes_cuidado": {
+        "columns": {
+            "cod_plan": "int8",
+            "cod_am": "varchar",
+            "tipo_plan": "varchar",
+            "version": "int2",
+            "nivel_cuidado": "varchar",
+            "estado": "varchar",
+            "origen": "varchar",
+            "resumen": "text",
+            "fecha_inicio": "date",
+            "fecha_fin": "date",
+            "creado_por": "varchar",
+            "validado_por": "varchar",
+            "created_at": "timestamp",
+            "updated_at": "timestamp",
+            "deleted_at": "timestamp"
+        },
+        "foreign_keys": [
+            {
+                "columns": [
+                    "cod_am"
+                ],
+                "foreign_table": "adulto_mayor",
+                "foreign_columns": [
+                    "cod_am"
+                ]
+            },
+            {
+                "columns": [
+                    "creado_por"
+                ],
+                "foreign_table": "users",
+                "foreign_columns": [
+                    "cod_usu"
+                ]
+            },
+            {
+                "columns": [
+                    "validado_por"
+                ],
+                "foreign_table": "users",
+                "foreign_columns": [
+                    "cod_usu"
+                ]
+            }
+        ]
+    },
+    "role_has_permissions": {
+        "columns": {
+            "permission_id": "int8",
+            "role_id": "int8"
+        },
+        "foreign_keys": [
+            {
+                "columns": [
+                    "permission_id"
+                ],
+                "foreign_table": "permissions",
+                "foreign_columns": [
+                    "id"
+                ]
+            },
+            {
+                "columns": [
+                    "role_id"
+                ],
+                "foreign_table": "roles",
+                "foreign_columns": [
+                    "id"
+                ]
+            }
+        ]
+    },
+    "roles": {
+        "columns": {
+            "id": "int8",
+            "name": "varchar",
+            "guard_name": "varchar",
+            "created_at": "timestamp",
+            "updated_at": "timestamp"
+        },
+        "foreign_keys": []
+    },
+    "seguimientos_diarios": {
+        "columns": {
+            "cod_seg_diario": "int8",
+            "cod_am": "varchar",
+            "cod_turno": "int4",
+            "cod_plan": "int8",
+            "registrado_por": "varchar",
+            "fecha": "date",
+            "hora_inicio": "time",
+            "hora_fin": "time",
+            "estado_general": "varchar",
+            "alimentacion": "varchar",
+            "porcentaje_alimentacion": "int2",
+            "hidratacion": "varchar",
+            "movilidad": "varchar",
+            "intento_caminar_solo": "bool",
+            "higiene": "varchar",
+            "sueno": "varchar",
+            "orientacion": "varchar",
+            "repite_preguntas": "bool",
+            "confusion_observable": "bool",
+            "conducta": "varchar",
+            "participacion": "varchar",
+            "incidente": "bool",
+            "requiere_medico": "bool",
+            "observacion": "text",
+            "created_at": "timestamp",
+            "updated_at": "timestamp"
+        },
+        "foreign_keys": [
+            {
+                "columns": [
+                    "cod_am"
+                ],
+                "foreign_table": "adulto_mayor",
+                "foreign_columns": [
+                    "cod_am"
+                ]
+            },
+            {
+                "columns": [
+                    "cod_plan"
+                ],
+                "foreign_table": "planes_cuidado",
+                "foreign_columns": [
+                    "cod_plan"
+                ]
+            },
+            {
+                "columns": [
+                    "cod_turno"
+                ],
+                "foreign_table": "turnos_enfermeria",
+                "foreign_columns": [
+                    "cod_turno"
+                ]
+            },
+            {
+                "columns": [
+                    "registrado_por"
+                ],
+                "foreign_table": "users",
+                "foreign_columns": [
+                    "cod_usu"
+                ]
+            }
+        ]
+    },
+    "sessions": {
+        "columns": {
+            "id": "varchar",
+            "user_id": "varchar",
+            "ip_address": "varchar",
+            "user_agent": "text",
+            "payload": "text",
+            "last_activity": "int4"
+        },
+        "foreign_keys": []
+    },
+    "signos_vitales_adulto": {
+        "columns": {
+            "cod_signo": "int4",
+            "cod_am": "varchar",
+            "fecha": "date",
+            "hora": "time",
+            "presion_arterial": "varchar",
+            "frecuencia_cardiaca": "int4",
+            "temperatura": "numeric",
+            "saturacion": "int4",
+            "glucosa": "numeric",
+            "peso": "numeric",
+            "talla": "numeric",
+            "imc": "numeric",
+            "dolor": "varchar",
+            "observacion": "text",
+            "registrado_por": "varchar",
+            "created_at": "timestamp",
+            "updated_at": "timestamp",
+            "presion_sistolica": "int4",
+            "presion_diastolica": "int4",
+            "frecuencia_respiratoria": "int4",
+            "estado": "varchar",
+            "motivo_anulacion": "text",
+            "anulado_por": "varchar",
+            "fecha_anulacion": "timestamp",
+            "intensidad_dolor": "int2",
+            "cod_turno": "int4",
+            "cod_tarea": "int8"
+        },
+        "foreign_keys": [
+            {
+                "columns": [
+                    "anulado_por"
+                ],
+                "foreign_table": "users",
+                "foreign_columns": [
+                    "cod_usu"
+                ]
+            },
+            {
+                "columns": [
+                    "cod_am"
+                ],
+                "foreign_table": "adulto_mayor",
+                "foreign_columns": [
+                    "cod_am"
+                ]
+            },
+            {
+                "columns": [
+                    "cod_tarea"
+                ],
+                "foreign_table": "tareas_plan_cuidado",
+                "foreign_columns": [
+                    "cod_tarea"
+                ]
+            },
+            {
+                "columns": [
+                    "cod_turno"
+                ],
+                "foreign_table": "turnos_enfermeria",
+                "foreign_columns": [
+                    "cod_turno"
+                ]
+            },
+            {
+                "columns": [
+                    "registrado_por"
+                ],
+                "foreign_table": "users",
+                "foreign_columns": [
+                    "cod_usu"
+                ]
+            }
+        ]
+    },
+    "tareas_plan_cuidado": {
+        "columns": {
+            "cod_tarea": "int8",
+            "cod_plan": "int8",
+            "cod_am": "varchar",
+            "cod_turno": "int4",
+            "responsable_id": "varchar",
+            "area": "varchar",
+            "titulo": "varchar",
+            "descripcion": "text",
+            "frecuencia": "varchar",
+            "fecha_programada": "date",
+            "hora_programada": "time",
+            "prioridad": "varchar",
+            "estado": "varchar",
+            "fecha_realizada": "timestamp",
+            "resultado": "text",
+            "observacion": "text",
+            "motivo_omision": "text",
+            "transferida_a_turno_id": "int4",
+            "registrado_por": "varchar",
+            "created_at": "timestamp",
+            "updated_at": "timestamp"
+        },
+        "foreign_keys": [
+            {
+                "columns": [
+                    "cod_am"
+                ],
+                "foreign_table": "adulto_mayor",
+                "foreign_columns": [
+                    "cod_am"
+                ]
+            },
+            {
+                "columns": [
+                    "cod_plan"
+                ],
+                "foreign_table": "planes_cuidado",
+                "foreign_columns": [
+                    "cod_plan"
+                ]
+            },
+            {
+                "columns": [
+                    "cod_turno"
+                ],
+                "foreign_table": "turnos_enfermeria",
+                "foreign_columns": [
+                    "cod_turno"
+                ]
+            },
+            {
+                "columns": [
+                    "registrado_por"
+                ],
+                "foreign_table": "users",
+                "foreign_columns": [
+                    "cod_usu"
+                ]
+            },
+            {
+                "columns": [
+                    "responsable_id"
+                ],
+                "foreign_table": "users",
+                "foreign_columns": [
+                    "cod_usu"
+                ]
+            },
+            {
+                "columns": [
+                    "transferida_a_turno_id"
+                ],
+                "foreign_table": "turnos_enfermeria",
+                "foreign_columns": [
+                    "cod_turno"
+                ]
+            }
+        ]
+    },
+    "tipo_actividades_adulto": {
+        "columns": {
+            "cod_tipo_act": "int4",
+            "tipo": "varchar",
+            "descripcion": "text"
+        },
+        "foreign_keys": []
+    },
+    "tipo_atenciones_adulto": {
+        "columns": {
+            "cod_tipo_aten": "int4",
+            "tipo": "varchar",
+            "descripcion": "text"
+        },
+        "foreign_keys": []
+    },
+    "tipo_evaluacion_cognitiva": {
+        "columns": {
+            "cod_tipo_eval": "int8",
+            "nombre": "varchar",
+            "descripcion": "text",
+            "puntaje_maximo": "numeric",
+            "punto_corte_normal": "numeric",
+            "punto_corte_riesgo": "numeric",
+            "estado": "varchar",
+            "created_at": "timestamp",
+            "updated_at": "timestamp"
+        },
+        "foreign_keys": []
+    },
+    "tipos_documentos_usuario": {
+        "columns": {
+            "cod_tipo_doc": "varchar",
+            "nombre": "varchar",
+            "descripcion": "text",
+            "aplica_roles": "json",
+            "obligatorio": "bool",
+            "requiere_vencimiento": "bool",
+            "requiere_validacion": "bool",
+            "estado": "varchar",
+            "orden": "int4",
+            "created_at": "timestamp",
+            "updated_at": "timestamp",
+            "deleted_at": "timestamp"
+        },
+        "foreign_keys": []
+    },
+    "turnos_enfermeria": {
+        "columns": {
+            "cod_turno": "int4",
+            "nombre": "varchar",
+            "hora_inicio": "time",
+            "hora_fin": "time",
+            "orden": "int2",
+            "estado": "varchar",
+            "observacion": "varchar",
+            "created_at": "timestamp",
+            "updated_at": "timestamp"
+        },
+        "foreign_keys": []
+    },
+    "turnos_institucionales": {
+        "columns": {
+            "cod_turno": "varchar",
+            "nombre": "varchar",
+            "hora_inicio": "time",
+            "hora_fin": "time",
+            "descripcion": "text",
+            "color": "varchar",
+            "estado": "varchar",
+            "observaciones": "text",
+            "creado_por": "varchar",
+            "actualizado_por": "varchar",
+            "created_at": "timestamp",
+            "updated_at": "timestamp",
+            "deleted_at": "timestamp"
+        },
+        "foreign_keys": [
+            {
+                "columns": [
+                    "actualizado_por"
+                ],
+                "foreign_table": "users",
+                "foreign_columns": [
+                    "cod_usu"
+                ]
+            },
+            {
+                "columns": [
+                    "creado_por"
+                ],
+                "foreign_table": "users",
+                "foreign_columns": [
+                    "cod_usu"
+                ]
+            }
+        ]
+    },
+    "users": {
+        "columns": {
+            "cod_usu": "varchar",
+            "nombres": "varchar",
+            "ap_paterno": "varchar",
+            "ap_materno": "varchar",
+            "correo": "varchar",
+            "email_verified_at": "timestamp",
+            "password": "varchar",
+            "telefono": "varchar",
+            "foto_de_perfil": "varchar",
+            "estado": "varchar",
+            "ultimo_acceso": "timestamp",
+            "remember_token": "varchar",
+            "current_team_id": "int8",
+            "created_at": "timestamp",
+            "updated_at": "timestamp",
+            "two_factor_secret": "text",
+            "two_factor_recovery_codes": "text",
+            "two_factor_confirmed_at": "timestamp",
+            "pais_documento": "varchar",
+            "tipo_documento": "varchar",
+            "numero_documento": "varchar",
+            "expedido": "varchar",
+            "pais_telefono": "varchar",
+            "codigo_telefono": "varchar",
+            "genero": "varchar",
+            "fecha_nacimiento": "date",
+            "acceso_sistema": "varchar",
+            "observaciones": "text",
+            "cod_area": "varchar",
+            "debe_cambiar_password": "bool",
+            "password_changed_at": "timestamp",
+            "direccion": "varchar",
+            "zona": "varchar",
+            "ciudad": "varchar",
+            "contacto_emergencia": "varchar",
+            "parentesco_emergencia": "varchar",
+            "celular_emergencia": "varchar",
+            "tipo_vinculacion": "varchar",
+            "calle": "varchar",
+            "nro_domicilio": "varchar",
+            "ap_paterno_emergencia": "varchar",
+            "ap_materno_emergencia": "varchar"
+        },
+        "foreign_keys": [
+            {
+                "columns": [
+                    "cod_area"
+                ],
+                "foreign_table": "areas_institucionales",
+                "foreign_columns": [
+                    "cod_area"
+                ]
+            }
+        ]
+    },
+    "valoracion_funcional_adulto": {
+        "columns": {
+            "cod_val_func": "int4",
+            "cod_am": "varchar",
+            "fecha_valoracion": "date",
+            "come_solo": "bool",
+            "se_bana_solo": "bool",
+            "se_viste_solo": "bool",
+            "va_bano_solo": "bool",
+            "camina_solo": "bool",
+            "usa_baston": "bool",
+            "usa_andador": "bool",
+            "usa_silla_ruedas": "bool",
+            "baja_vision": "bool",
+            "baja_audicion": "bool",
+            "dificultad_hablar": "bool",
+            "molestia_luz": "bool",
+            "molestia_ruido": "bool",
+            "se_asusta_facil": "bool",
+            "necesita_supervision": "bool",
+            "nivel_dependencia": "varchar",
+            "observacion": "text",
+            "registrado_por": "varchar",
+            "created_at": "timestamp",
+            "updated_at": "timestamp",
+            "estado": "varchar",
+            "riesgo_caida": "varchar",
+            "indice_barthel": "int2",
+            "motivo_anulacion": "text",
+            "anulado_por": "varchar",
+            "fecha_anulacion": "timestamp"
+        },
+        "foreign_keys": [
+            {
+                "columns": [
+                    "anulado_por"
+                ],
+                "foreign_table": "users",
+                "foreign_columns": [
+                    "cod_usu"
+                ]
+            },
+            {
+                "columns": [
+                    "cod_am"
+                ],
+                "foreign_table": "adulto_mayor",
+                "foreign_columns": [
+                    "cod_am"
+                ]
+            },
+            {
+                "columns": [
+                    "registrado_por"
+                ],
+                "foreign_table": "users",
+                "foreign_columns": [
+                    "cod_usu"
+                ]
+            }
+        ]
+    },
+    "valoraciones_enfermeria_admision": {
+        "columns": {
+            "cod_val_enf": "int8",
+            "cod_am": "varchar",
+            "fecha": "date",
+            "hora": "time",
+            "estado_general": "varchar",
+            "nivel_conciencia": "varchar",
+            "orientacion": "varchar",
+            "comunicacion": "varchar",
+            "dolor_actual": "bool",
+            "intensidad_dolor": "int2",
+            "ubicacion_dolor": "varchar",
+            "movilidad": "varchar",
+            "usa_apoyo_movilidad": "varchar",
+            "riesgo_caida": "varchar",
+            "piel_estado": "varchar",
+            "presenta_heridas": "bool",
+            "ubicacion_heridas": "varchar",
+            "higiene_ingreso": "varchar",
+            "requiere_atencion_inmediata": "bool",
+            "puede_pasar_valoracion_medica": "bool",
+            "recomendacion_enfermeria": "text",
+            "observacion": "text",
+            "registrado_por": "varchar",
+            "estado": "varchar",
+            "created_at": "timestamp",
+            "updated_at": "timestamp",
+            "deleted_at": "timestamp"
+        },
+        "foreign_keys": [
+            {
+                "columns": [
+                    "cod_am"
+                ],
+                "foreign_table": "adulto_mayor",
+                "foreign_columns": [
+                    "cod_am"
+                ]
+            },
+            {
+                "columns": [
+                    "registrado_por"
+                ],
+                "foreign_table": "users",
+                "foreign_columns": [
+                    "cod_usu"
+                ]
+            }
+        ]
+    },
+    "valoraciones_medicas_admision": {
+        "columns": {
+            "cod_val_med": "int8",
+            "cod_am": "varchar",
+            "cod_val_enf": "int8",
+            "fecha": "date",
+            "hora": "time",
+            "diagnosticos_referidos": "text",
+            "antecedentes_relevantes": "text",
+            "medicacion_actual_resumen": "text",
+            "alergias_referidas": "text",
+            "condicion_medica_general": "varchar",
+            "estado_neurologico_basico": "varchar",
+            "nivel_dependencia_sugerido": "varchar",
+            "resultado_admision": "varchar",
+            "motivo_decision": "text",
+            "recomendacion_medica": "text",
+            "requiere_seguimiento_especial": "bool",
+            "registrado_por": "varchar",
+            "estado": "varchar",
+            "created_at": "timestamp",
+            "updated_at": "timestamp",
+            "deleted_at": "timestamp"
+        },
+        "foreign_keys": [
+            {
+                "columns": [
+                    "cod_am"
+                ],
+                "foreign_table": "adulto_mayor",
+                "foreign_columns": [
+                    "cod_am"
+                ]
+            },
+            {
+                "columns": [
+                    "cod_val_enf"
+                ],
+                "foreign_table": "valoraciones_enfermeria_admision",
+                "foreign_columns": [
+                    "cod_val_enf"
+                ]
+            },
+            {
+                "columns": [
+                    "registrado_por"
+                ],
+                "foreign_table": "users",
+                "foreign_columns": [
+                    "cod_usu"
+                ]
+            }
+        ]
+    },
+    "voluntarios": {
+        "columns": {
+            "cod_vol": "int4",
+            "fecha_ing": "date",
+            "area_apoyo": "varchar",
+            "estado": "varchar",
+            "observaciones": "text",
+            "cod_usu": "varchar",
+            "archivado_en": "timestamp",
+            "motivo_archivado": "text",
+            "created_at": "timestamp",
+            "updated_at": "timestamp",
+            "disponibilidad_inicial": "varchar",
+            "area_apoyo_preferente": "varchar"
+        },
+        "foreign_keys": [
+            {
+                "columns": [
+                    "cod_usu"
+                ],
+                "foreign_table": "users",
+                "foreign_columns": [
+                    "cod_usu"
+                ]
+            }
+        ]
+    }
+}

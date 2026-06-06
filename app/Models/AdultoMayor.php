@@ -60,6 +60,12 @@ class AdultoMayor extends Model
         'foto',
         'archivado_en',
         'motivo_archivado',
+        // ── Fase 6: flujo de admisión ──────────────────────────────────────────
+        'motivo_ingreso',
+        'procedencia_ingreso',
+        // ── Fase 7: asignación de cama ────────────────────────────────────────
+        'cod_habitacion',
+        'cod_cama',
     ];
 
     public function getActivitylogOptions(): LogOptions
@@ -124,6 +130,11 @@ class AdultoMayor extends Model
     public function estado()
     {
         return $this->belongsTo(EstadoAdulto::class, 'cod_est_adul', 'cod_est_adul');
+    }
+
+    public function getEstadoTextoAttribute(): string
+    {
+        return $this->estado?->estado ?? 'SIN ESTADO';
     }
 
     public function observaciones()
@@ -211,5 +222,75 @@ class AdultoMayor extends Model
     public function historialEstados()
     {
         return $this->hasMany(HistorialEstadoAdulto::class, 'cod_am', 'cod_am');
+    }
+
+    // ── Relaciones del flujo médico clínico (Fase 6) ──────────────────────────
+
+    public function valoracionesEnfermeria()
+    {
+        return $this->hasMany(ValoracionEnfermeriaAdmision::class, 'cod_am', 'cod_am');
+    }
+
+    public function valoracionesMedicas()
+    {
+        return $this->hasMany(ValoracionMedicaAdmision::class, 'cod_am', 'cod_am');
+    }
+
+    public function asignacionesTurno()
+    {
+        return $this->hasMany(AsignacionTurnoAdulto::class, 'cod_am', 'cod_am');
+    }
+
+    public function asignacionTurnoActiva()
+    {
+        return $this->hasOne(AsignacionTurnoAdulto::class, 'cod_am', 'cod_am')
+            ->where('estado', 'ACTIVA');
+    }
+
+    public function planesCuidado()
+    {
+        return $this->hasMany(PlanCuidado::class, 'cod_am', 'cod_am');
+    }
+
+    public function planCuidadoActivo()
+    {
+        return $this->hasOne(PlanCuidado::class, 'cod_am', 'cod_am')
+            ->where('estado', 'ACTIVO');
+    }
+
+    public function tareasActuales()
+    {
+        return $this->hasMany(TareaPlanCuidado::class, 'cod_am', 'cod_am')
+            ->whereNotIn('estado', ['ANULADA', 'VENCIDA', 'REALIZADA']);
+    }
+
+    public function seguimientosDiarios()
+    {
+        return $this->hasMany(SeguimientoDiario::class, 'cod_am', 'cod_am');
+    }
+
+    public function alertas()
+    {
+        return $this->hasMany(AlertaAdulto::class, 'cod_am', 'cod_am');
+    }
+
+    public function alertasAbiertas()
+    {
+        return $this->alertas()->whereIn('estado', ['ABIERTA', 'EN_ATENCION']);
+    }
+
+    public function pasesTurno()
+    {
+        return $this->hasMany(PaseTurno::class, 'cod_am', 'cod_am');
+    }
+
+    public function habitacion()
+    {
+        return $this->belongsTo(Habitacion::class, 'cod_habitacion', 'cod_habitacion');
+    }
+
+    public function cama()
+    {
+        return $this->belongsTo(Cama::class, 'cod_cama', 'cod_cama');
     }
 }

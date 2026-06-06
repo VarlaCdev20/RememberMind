@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Auth;
 /**
  * DashboardController
  * 
- * Orquestador principal del panel administrativo de Casa Amandita.
+ * Orquestador principal del panel administrativo institucional.
  * Gestiona la auditoría de acceso y la integración con la capa de servicios.
  * 
  * @author Arquitecto Senior Laravel

@@ -1,0 +1,998 @@
+/* ============================================================
+   REMEMBERMIND / CASA AMANDITA
+   ANIMACIONES, TRANSICIONES Y MICROINTERACCIONES
+   ------------------------------------------------------------
+   Archivo: resources/css/paleta-colores/animaciones-transiciones.css
+
+   Objetivo:
+   Centralizar animaciones, transiciones, efectos de entrada,
+   hover, aparición de modales, tarjetas, sidebar, botones y
+   microinteracciones del sistema.
+
+   Criterio visual:
+   - Animaciones suaves, profesionales y no invasivas.
+   - Enfoque médico-administrativo cálido.
+   - Compatible con usuarios adultos y personal institucional.
+   - Respetar accesibilidad mediante prefers-reduced-motion.
+   ============================================================ */
+
+
+/* ============================================================
+   1. VARIABLES DE MOVIMIENTO
+   ============================================================ */
+
+:root {
+    /* Duraciones */
+    --rm-duration-instant: 80ms;
+    --rm-duration-fast: 140ms;
+    --rm-duration-normal: 220ms;
+    --rm-duration-medium: 320ms;
+    --rm-duration-slow: 480ms;
+    --rm-duration-slower: 720ms;
+
+    /* Curvas de movimiento */
+    --rm-ease-linear: linear;
+    --rm-ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+    --rm-ease-soft: cubic-bezier(0.22, 1, 0.36, 1);
+    --rm-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+    --rm-ease-in: cubic-bezier(0.7, 0, 0.84, 0);
+    --rm-ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+    /* Distancias */
+    --rm-motion-distance-xs: 4px;
+    --rm-motion-distance-sm: 8px;
+    --rm-motion-distance-md: 14px;
+    --rm-motion-distance-lg: 24px;
+    --rm-motion-distance-xl: 40px;
+
+    /* Escalas */
+    --rm-scale-hover: 1.015;
+    --rm-scale-active: 0.985;
+    --rm-scale-modal-start: 0.96;
+    --rm-scale-modal-end: 1;
+
+    /* Rotación sutil */
+    --rm-rotate-soft: 1deg;
+}
+
+
+/* ============================================================
+   2. TRANSICIONES BASE REUTILIZABLES
+   ============================================================ */
+
+.rm-transition {
+    transition:
+        color var(--rm-duration-normal) var(--rm-ease-standard),
+        background-color var(--rm-duration-normal) var(--rm-ease-standard),
+        border-color var(--rm-duration-normal) var(--rm-ease-standard),
+        box-shadow var(--rm-duration-normal) var(--rm-ease-standard),
+        transform var(--rm-duration-normal) var(--rm-ease-standard),
+        opacity var(--rm-duration-normal) var(--rm-ease-standard);
+}
+
+.rm-transition-fast {
+    transition:
+        color var(--rm-duration-fast) var(--rm-ease-standard),
+        background-color var(--rm-duration-fast) var(--rm-ease-standard),
+        border-color var(--rm-duration-fast) var(--rm-ease-standard),
+        box-shadow var(--rm-duration-fast) var(--rm-ease-standard),
+        transform var(--rm-duration-fast) var(--rm-ease-standard),
+        opacity var(--rm-duration-fast) var(--rm-ease-standard);
+}
+
+.rm-transition-soft {
+    transition:
+        color var(--rm-duration-medium) var(--rm-ease-soft),
+        background-color var(--rm-duration-medium) var(--rm-ease-soft),
+        border-color var(--rm-duration-medium) var(--rm-ease-soft),
+        box-shadow var(--rm-duration-medium) var(--rm-ease-soft),
+        transform var(--rm-duration-medium) var(--rm-ease-soft),
+        opacity var(--rm-duration-medium) var(--rm-ease-soft);
+}
+
+.rm-transition-transform {
+    transition:
+        transform var(--rm-duration-normal) var(--rm-ease-soft),
+        box-shadow var(--rm-duration-normal) var(--rm-ease-soft);
+}
+
+.rm-transition-opacity {
+    transition: opacity var(--rm-duration-normal) var(--rm-ease-standard);
+}
+
+
+/* ============================================================
+   3. MICROINTERACCIONES DE HOVER
+   ============================================================ */
+
+.rm-hover-lift {
+    transition:
+        transform var(--rm-duration-normal) var(--rm-ease-soft),
+        box-shadow var(--rm-duration-normal) var(--rm-ease-soft),
+        border-color var(--rm-duration-normal) var(--rm-ease-standard);
+}
+
+.rm-hover-lift:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--sombra-card-hover, 0 8px 22px rgba(47, 62, 92, 0.12));
+}
+
+.rm-hover-lift-sm {
+    transition:
+        transform var(--rm-duration-fast) var(--rm-ease-soft),
+        box-shadow var(--rm-duration-fast) var(--rm-ease-soft);
+}
+
+.rm-hover-lift-sm:hover {
+    transform: translateY(-1.5px);
+}
+
+.rm-hover-scale {
+    transition: transform var(--rm-duration-fast) var(--rm-ease-soft);
+}
+
+.rm-hover-scale:hover {
+    transform: scale(var(--rm-scale-hover));
+}
+
+.rm-hover-slide-right {
+    transition:
+        transform var(--rm-duration-normal) var(--rm-ease-soft),
+        color var(--rm-duration-normal) var(--rm-ease-standard);
+}
+
+.rm-hover-slide-right:hover {
+    transform: translateX(var(--rm-motion-distance-xs));
+}
+
+.rm-hover-soft-glow {
+    transition:
+        box-shadow var(--rm-duration-normal) var(--rm-ease-soft),
+        transform var(--rm-duration-normal) var(--rm-ease-soft);
+}
+
+.rm-hover-soft-glow:hover {
+    box-shadow: var(--glow-acento-hover, 0 0 25px rgba(233, 122, 95, 0.60));
+}
+
+.rm-active-press:active {
+    transform: scale(var(--rm-scale-active));
+}
+
+
+/* ============================================================
+   4. ANIMACIONES DE ENTRADA
+   ============================================================ */
+
+@keyframes rmFadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes rmFadeOut {
+    from {
+        opacity: 1;
+    }
+
+    to {
+        opacity: 0;
+    }
+}
+
+@keyframes rmFadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(var(--rm-motion-distance-md));
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes rmFadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(calc(var(--rm-motion-distance-md) * -1));
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes rmFadeInLeft {
+    from {
+        opacity: 0;
+        transform: translateX(calc(var(--rm-motion-distance-md) * -1));
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes rmFadeInRight {
+    from {
+        opacity: 0;
+        transform: translateX(var(--rm-motion-distance-md));
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes rmScaleIn {
+    from {
+        opacity: 0;
+        transform: scale(0.96);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes rmPopIn {
+    0% {
+        opacity: 0;
+        transform: scale(0.92) translateY(8px);
+    }
+
+    70% {
+        opacity: 1;
+        transform: scale(1.025) translateY(0);
+    }
+
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+
+/* ============================================================
+   5. CLASES DE ENTRADA
+   ============================================================ */
+
+.rm-animate-fade-in {
+    animation: rmFadeIn var(--rm-duration-medium) var(--rm-ease-standard) both;
+}
+
+.rm-animate-fade-out {
+    animation: rmFadeOut var(--rm-duration-normal) var(--rm-ease-standard) both;
+}
+
+.rm-animate-fade-up {
+    animation: rmFadeInUp var(--rm-duration-medium) var(--rm-ease-soft) both;
+}
+
+.rm-animate-fade-down {
+    animation: rmFadeInDown var(--rm-duration-medium) var(--rm-ease-soft) both;
+}
+
+.rm-animate-fade-left {
+    animation: rmFadeInLeft var(--rm-duration-medium) var(--rm-ease-soft) both;
+}
+
+.rm-animate-fade-right {
+    animation: rmFadeInRight var(--rm-duration-medium) var(--rm-ease-soft) both;
+}
+
+.rm-animate-scale-in {
+    animation: rmScaleIn var(--rm-duration-medium) var(--rm-ease-out) both;
+}
+
+.rm-animate-pop-in {
+    animation: rmPopIn var(--rm-duration-medium) var(--rm-ease-bounce) both;
+}
+
+
+/* ============================================================
+   6. DELAYS ESCALONADOS
+   ------------------------------------------------------------
+   Para listas, cards, dashboards y módulos.
+   ============================================================ */
+
+.rm-delay-1 {
+    animation-delay: 60ms;
+}
+
+.rm-delay-2 {
+    animation-delay: 120ms;
+}
+
+.rm-delay-3 {
+    animation-delay: 180ms;
+}
+
+.rm-delay-4 {
+    animation-delay: 240ms;
+}
+
+.rm-delay-5 {
+    animation-delay: 300ms;
+}
+
+.rm-delay-6 {
+    animation-delay: 360ms;
+}
+
+.rm-delay-7 {
+    animation-delay: 420ms;
+}
+
+.rm-delay-8 {
+    animation-delay: 480ms;
+}
+
+
+/* ============================================================
+   7. MODALES Y OVERLAYS
+   ============================================================ */
+
+@keyframes rmModalOverlayIn {
+    from {
+        opacity: 0;
+        backdrop-filter: blur(0);
+    }
+
+    to {
+        opacity: 1;
+        backdrop-filter: blur(10px);
+    }
+}
+
+@keyframes rmModalPanelIn {
+    from {
+        opacity: 0;
+        transform: translateY(var(--rm-motion-distance-lg)) scale(var(--rm-scale-modal-start));
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(var(--rm-scale-modal-end));
+    }
+}
+
+@keyframes rmModalPanelOut {
+    from {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+
+    to {
+        opacity: 0;
+        transform: translateY(var(--rm-motion-distance-md)) scale(0.97);
+    }
+}
+
+.rm-modal-enter {
+    animation: rmModalOverlayIn var(--rm-duration-normal) var(--rm-ease-standard) both;
+}
+
+.rm-modal-panel-enter {
+    animation: rmModalPanelIn var(--rm-duration-medium) var(--rm-ease-out) both;
+}
+
+.rm-modal-panel-leave {
+    animation: rmModalPanelOut var(--rm-duration-fast) var(--rm-ease-in) both;
+}
+
+
+/* ============================================================
+   8. SIDEBAR Y MENÚS
+   ============================================================ */
+
+@keyframes rmSidebarItemIn {
+    from {
+        opacity: 0;
+        transform: translateX(calc(var(--rm-motion-distance-sm) * -1));
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes rmSubmenuOpen {
+    from {
+        opacity: 0;
+        transform: translateY(-4px);
+        max-height: 0;
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+        max-height: 42rem;
+    }
+}
+
+@keyframes rmSubmenuClose {
+    from {
+        opacity: 1;
+        transform: translateY(0);
+        max-height: 42rem;
+    }
+
+    to {
+        opacity: 0;
+        transform: translateY(-4px);
+        max-height: 0;
+    }
+}
+
+.rm-sidebar-item-in {
+    animation: rmSidebarItemIn var(--rm-duration-medium) var(--rm-ease-soft) both;
+}
+
+.rm-submenu-open {
+    overflow: hidden;
+    animation: rmSubmenuOpen var(--rm-duration-medium) var(--rm-ease-soft) both;
+}
+
+.rm-submenu-close {
+    overflow: hidden;
+    animation: rmSubmenuClose var(--rm-duration-normal) var(--rm-ease-standard) both;
+}
+
+.rm-chevron-rotate {
+    transition: transform var(--rm-duration-normal) var(--rm-ease-soft);
+}
+
+.rm-chevron-rotate.is-open {
+    transform: rotate(180deg);
+}
+
+
+/* ============================================================
+   9. BOTONES
+   ============================================================ */
+
+@keyframes rmButtonShine {
+    from {
+        transform: translateX(-120%) skewX(-18deg);
+    }
+
+    to {
+        transform: translateX(140%) skewX(-18deg);
+    }
+}
+
+.rm-btn-shine {
+    position: relative;
+    overflow: hidden;
+}
+
+.rm-btn-shine::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    width: 45%;
+    transform: translateX(-120%) skewX(-18deg);
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.38),
+        transparent
+    );
+    pointer-events: none;
+}
+
+.rm-btn-shine:hover::after {
+    animation: rmButtonShine 760ms var(--rm-ease-soft);
+}
+
+.rm-btn-pulse-soft {
+    animation: rmPulseSoft 2.4s var(--rm-ease-standard) infinite;
+}
+
+
+/* ============================================================
+   10. PULSOS, GLOWS Y RESPIRACIÓN VISUAL
+   ============================================================ */
+
+@keyframes rmPulseSoft {
+    0%,
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    50% {
+        transform: scale(1.025);
+        opacity: 0.88;
+    }
+}
+
+@keyframes rmPulseRing {
+    0% {
+        transform: scale(0.85);
+        opacity: 0.45;
+    }
+
+    70% {
+        transform: scale(1.35);
+        opacity: 0;
+    }
+
+    100% {
+        transform: scale(1.35);
+        opacity: 0;
+    }
+}
+
+@keyframes rmGlowBreath {
+    0%,
+    100% {
+        box-shadow: var(--glow-acento, 0 0 15px rgba(233, 122, 95, 0.40));
+    }
+
+    50% {
+        box-shadow: var(--glow-acento-hover, 0 0 25px rgba(233, 122, 95, 0.60));
+    }
+}
+
+.rm-pulse-soft {
+    animation: rmPulseSoft 2.8s var(--rm-ease-standard) infinite;
+}
+
+.rm-pulse-ring {
+    position: relative;
+}
+
+.rm-pulse-ring::after {
+    content: "";
+    position: absolute;
+    inset: -4px;
+    border-radius: inherit;
+    border: 1px solid currentColor;
+    opacity: 0;
+    animation: rmPulseRing 1.8s var(--rm-ease-standard) infinite;
+}
+
+.rm-glow-breath {
+    animation: rmGlowBreath 2.6s var(--rm-ease-standard) infinite;
+}
+
+
+/* ============================================================
+   11. ALERTAS Y ESTADOS
+   ============================================================ */
+
+@keyframes rmAlertIn {
+    from {
+        opacity: 0;
+        transform: translateY(-8px) scale(0.98);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes rmWarningPulse {
+    0%,
+    100% {
+        box-shadow: 0 0 0 0 rgba(244, 162, 97, 0.36);
+    }
+
+    50% {
+        box-shadow: 0 0 0 8px rgba(244, 162, 97, 0);
+    }
+}
+
+@keyframes rmDangerPulse {
+    0%,
+    100% {
+        box-shadow: 0 0 0 0 rgba(225, 29, 72, 0.34);
+    }
+
+    50% {
+        box-shadow: 0 0 0 9px rgba(225, 29, 72, 0);
+    }
+}
+
+.rm-alert-in {
+    animation: rmAlertIn var(--rm-duration-medium) var(--rm-ease-soft) both;
+}
+
+.rm-warning-pulse {
+    animation: rmWarningPulse 1.9s var(--rm-ease-standard) infinite;
+}
+
+.rm-danger-pulse {
+    animation: rmDangerPulse 1.65s var(--rm-ease-standard) infinite;
+}
+
+
+/* ============================================================
+   12. TABLAS Y LISTAS
+   ============================================================ */
+
+@keyframes rmTableRowIn {
+    from {
+        opacity: 0;
+        transform: translateY(6px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.rm-table-row-in {
+    animation: rmTableRowIn var(--rm-duration-normal) var(--rm-ease-soft) both;
+}
+
+.rm-row-hover {
+    transition:
+        background-color var(--rm-duration-fast) var(--rm-ease-standard),
+        transform var(--rm-duration-fast) var(--rm-ease-standard);
+}
+
+.rm-row-hover:hover {
+    transform: translateX(2px);
+}
+
+
+/* ============================================================
+   13. FORMULARIOS
+   ============================================================ */
+
+@keyframes rmInputFocusGlow {
+    from {
+        box-shadow: 0 0 0 0 rgba(233, 122, 95, 0);
+    }
+
+    to {
+        box-shadow: 0 0 0 3px rgba(233, 122, 95, 0.14);
+    }
+}
+
+.rm-input-focus-animate:focus {
+    animation: rmInputFocusGlow var(--rm-duration-normal) var(--rm-ease-standard) both;
+}
+
+.rm-field-error-shake {
+    animation: rmShakeX 340ms var(--rm-ease-standard) both;
+}
+
+@keyframes rmShakeX {
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+
+    20% {
+        transform: translateX(-4px);
+    }
+
+    40% {
+        transform: translateX(4px);
+    }
+
+    60% {
+        transform: translateX(-3px);
+    }
+
+    80% {
+        transform: translateX(3px);
+    }
+}
+
+
+/* ============================================================
+   14. CARGA / SKELETON / SPINNER
+   ============================================================ */
+
+@keyframes rmSpin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes rmSkeleton {
+    0% {
+        background-position: 200% 0;
+    }
+
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+.rm-spin {
+    animation: rmSpin 850ms linear infinite;
+}
+
+.rm-skeleton {
+    background:
+        linear-gradient(
+            90deg,
+            rgba(199, 181, 163, 0.16) 25%,
+            rgba(255, 255, 255, 0.45) 37%,
+            rgba(199, 181, 163, 0.16) 63%
+        );
+    background-size: 400% 100%;
+    animation: rmSkeleton 1.4s var(--rm-ease-standard) infinite;
+}
+
+.rm-skeleton-text {
+    height: 0.75rem;
+    border-radius: 9999px;
+}
+
+.rm-skeleton-title {
+    height: 1.1rem;
+    border-radius: 9999px;
+}
+
+
+/* ============================================================
+   15. GRÁFICOS / KPI / DASHBOARD
+   ============================================================ */
+
+@keyframes rmMetricCountIn {
+    from {
+        opacity: 0;
+        transform: translateY(8px) scale(0.96);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes rmProgressGrow {
+    from {
+        width: 0;
+    }
+
+    to {
+        width: var(--progress-value, 100%);
+    }
+}
+
+@keyframes rmChartBarIn {
+    from {
+        transform: scaleY(0);
+        transform-origin: bottom;
+        opacity: 0;
+    }
+
+    to {
+        transform: scaleY(1);
+        transform-origin: bottom;
+        opacity: 1;
+    }
+}
+
+.rm-metric-count-in {
+    animation: rmMetricCountIn var(--rm-duration-medium) var(--rm-ease-out) both;
+}
+
+.rm-progress-grow {
+    width: var(--progress-value, 100%);
+    animation: rmProgressGrow var(--rm-duration-slow) var(--rm-ease-soft) both;
+}
+
+.rm-chart-bar-in {
+    animation: rmChartBarIn var(--rm-duration-slow) var(--rm-ease-soft) both;
+}
+
+
+/* ============================================================
+   16. TOASTS / NOTIFICACIONES
+   ============================================================ */
+
+@keyframes rmToastInRight {
+    from {
+        opacity: 0;
+        transform: translateX(28px) scale(0.98);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0) scale(1);
+    }
+}
+
+@keyframes rmToastOutRight {
+    from {
+        opacity: 1;
+        transform: translateX(0) scale(1);
+    }
+
+    to {
+        opacity: 0;
+        transform: translateX(28px) scale(0.98);
+    }
+}
+
+@keyframes rmToastInTop {
+    from {
+        opacity: 0;
+        transform: translateY(-18px) scale(0.98);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.rm-toast-in-right {
+    animation: rmToastInRight var(--rm-duration-medium) var(--rm-ease-out) both;
+}
+
+.rm-toast-out-right {
+    animation: rmToastOutRight var(--rm-duration-fast) var(--rm-ease-in) both;
+}
+
+.rm-toast-in-top {
+    animation: rmToastInTop var(--rm-duration-medium) var(--rm-ease-out) both;
+}
+
+
+/* ============================================================
+   17. DROPDOWNS
+   ============================================================ */
+
+@keyframes rmDropdownIn {
+    from {
+        opacity: 0;
+        transform: translateY(-6px) scale(0.98);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes rmDropdownOut {
+    from {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+
+    to {
+        opacity: 0;
+        transform: translateY(-6px) scale(0.98);
+    }
+}
+
+.rm-dropdown-in {
+    animation: rmDropdownIn var(--rm-duration-fast) var(--rm-ease-soft) both;
+}
+
+.rm-dropdown-out {
+    animation: rmDropdownOut var(--rm-duration-fast) var(--rm-ease-in) both;
+}
+
+
+/* ============================================================
+   18. UTILIDADES DE ORIGEN / COMPOSICIÓN
+   ============================================================ */
+
+.rm-origin-top {
+    transform-origin: top;
+}
+
+.rm-origin-top-right {
+    transform-origin: top right;
+}
+
+.rm-origin-top-left {
+    transform-origin: top left;
+}
+
+.rm-origin-center {
+    transform-origin: center;
+}
+
+.rm-will-change-transform {
+    will-change: transform;
+}
+
+.rm-will-change-opacity {
+    will-change: opacity;
+}
+
+
+/* ============================================================
+   19. COMPATIBILIDAD CON AOS / ANIMACIONES EXTERNAS
+   ============================================================ */
+
+[data-aos] {
+    pointer-events: auto;
+}
+
+.rm-aos-soft[data-aos="fade-up"] {
+    transform: translateY(14px);
+}
+
+.rm-aos-soft[data-aos="fade-down"] {
+    transform: translateY(-14px);
+}
+
+.rm-aos-soft[data-aos="fade-left"] {
+    transform: translateX(14px);
+}
+
+.rm-aos-soft[data-aos="fade-right"] {
+    transform: translateX(-14px);
+}
+
+
+/* ============================================================
+   20. ACCESIBILIDAD — REDUCIR MOVIMIENTO
+   ============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 1ms !important;
+        animation-iteration-count: 1 !important;
+        scroll-behavior: auto !important;
+        transition-duration: 1ms !important;
+    }
+
+    .rm-pulse-soft,
+    .rm-pulse-ring::after,
+    .rm-glow-breath,
+    .rm-warning-pulse,
+    .rm-danger-pulse,
+    .rm-btn-pulse-soft,
+    .rm-spin,
+    .rm-skeleton,
+    .rm-progress-grow,
+    .rm-chart-bar-in {
+        animation: none !important;
+    }
+
+    .rm-hover-lift:hover,
+    .rm-hover-lift-sm:hover,
+    .rm-hover-scale:hover,
+    .rm-hover-slide-right:hover,
+    .rm-row-hover:hover {
+        transform: none !important;
+    }
+}
+
+
+/* ============================================================
+   21. RESPONSIVE
+   ============================================================ */
+
+@media (max-width: 640px) {
+    :root {
+        --rm-motion-distance-md: 10px;
+        --rm-motion-distance-lg: 16px;
+        --rm-motion-distance-xl: 24px;
+    }
+
+    .rm-hover-lift:hover,
+    .rm-hover-lift-sm:hover,
+    .rm-hover-scale:hover {
+        transform: none;
+    }
+}

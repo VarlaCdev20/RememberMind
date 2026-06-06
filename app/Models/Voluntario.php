@@ -9,37 +9,20 @@ class Voluntario extends Model
     protected $table = 'voluntarios';
     protected $primaryKey = 'cod_vol';
 
-    public $incrementing = false;
-    protected $keyType = 'string';
+    public $incrementing = true;
+    protected $keyType = 'int';
 
     public $timestamps = false;
 
     protected $fillable = [
-        'cod_vol',
         'fecha_ing',
         'area_apoyo',
         'estado',
         'observaciones',
         'cod_usu',
+        'disponibilidad_inicial',
+        'area_apoyo_preferente',
     ];
-
-    protected static function boot(): void
-    {
-        parent::boot();
-        static::creating(function ($model) {
-            if (!$model->cod_vol) {
-                $ultimo = self::where('cod_vol', 'like', 'VOL_%')
-                    ->orderByDesc('cod_vol')
-                    ->value('cod_vol');
-
-                $numero = $ultimo
-                    ? ((int) substr($ultimo, 4)) + 1
-                    : 1;
-
-                $model->cod_vol = 'VOL_' . str_pad($numero, 4, '0', STR_PAD_LEFT);
-            }
-        });
-    }
 
     /**
      * Relaciones

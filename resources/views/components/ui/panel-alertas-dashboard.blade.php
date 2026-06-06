@@ -1,24 +1,46 @@
 @props(['alertas' => []])
 
-<div class="rounded-[2rem] border border-terracota/25 bg-terracota/10 p-5 shadow-[0_16px_38px_rgba(233,122,95,0.10)]">
-    <h2 class="text-lg font-black text-azul-profundo">
-        Alertas administrativas
-    </h2>
+@php
+$estilosNivel = [
+ 'URGENTE' => ['badge' => 'rm-badge-danger', 'icono_color' => 'text-estado-peligro-texto'],
+ 'INFORMATIVA' => ['badge' => 'rm-badge-info', 'icono_color' => 'text-estado-info-texto'],
+ 'OK' => ['badge' => 'rm-badge-success', 'icono_color' => 'text-estado-exito-texto'],
+];
+@endphp
 
-    <p class="mb-4 text-xs font-bold text-azul-profundo/55">
-        Pendientes de revisión
-    </p>
+<div class="card-interactiva borde-verde-suave rounded-[2rem] border p-5">
+ <h2 class="text-lg font-extrabold text-titulo">Alertas administrativas</h2>
+ <p class="mb-4 text-xs font-bold text-meta">Pendientes de revisión institucional</p>
 
-    <ul class="space-y-2">
-        @forelse($alertas as $alerta)
-            <li class="flex gap-2 rounded-[1.2rem] bg-[#E6DDD3]/65 p-3 text-xs font-bold leading-5 text-azul-profundo/70 transition hover:-translate-y-0.5">
-                <i class="ph-bold ph-warning-circle mt-0.5 text-terracota"></i>
-                {{ $alerta }}
-            </li>
-        @empty
-            <li class="rounded-[1.2rem] bg-[#E6DDD3]/65 p-3 text-xs font-bold text-azul-profundo/55">
-                Sin alertas pendientes.
-            </li>
-        @endforelse
-    </ul>
+ <ul class="space-y-2">
+ @forelse($alertas as $alerta)
+ @php
+ $nivel = $alerta['nivel'] ?? 'INFORMATIVA';
+ $estilo = $estilosNivel[$nivel] ?? $estilosNivel['INFORMATIVA'];
+ @endphp
+
+ <li class="card-interactiva rounded-[1.4rem] border border-transparent p-3 transition hover:-translate-y-0.5 hover:bg-fondo-hover">
+ <div class="flex items-start gap-2">
+ <i class="ph-bold {{ $alerta['icono'] ?? 'ph-info' }} mt-0.5 shrink-0 text-base {{ $estilo['icono_color'] }}"></i>
+ <div class="min-w-0 flex-1">
+ <div class="mb-1 flex items-center gap-2">
+ <span class="{{ $estilo['badge'] }}">{{ $nivel }}</span>
+ </div>
+ <p class="text-xs font-bold leading-4 text-apoyo">
+ {{ $alerta['descripcion'] ?? 'Sin descripción' }}
+ </p>
+ @if(!empty($alerta['accion']))
+ <p class="mt-1 text-[10px] font-bold uppercase tracking-wide text-meta">
+ {{ $alerta['accion'] }}
+ </p>
+ @endif
+ </div>
+ </div>
+ </li>
+ @empty
+ <li class="rounded-[1.4rem] bg-fondo-card p-4 text-sm font-bold text-apoyo">
+ Sin alertas pendientes.
+ </li>
+ @endforelse
+ </ul>
 </div>

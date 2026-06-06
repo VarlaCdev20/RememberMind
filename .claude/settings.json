@@ -1,0 +1,42 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell($bytes = [System.IO.File]::ReadAllBytes\\(\"c:\\\\laragon\\\\www\\\\RememberMind_F1\\\\app\\\\Livewire\\\\Admin\\\\Usuarios\\\\UsuariosPanel.php\"\\); \"Primeros 6 bytes ahora: $\\(\\($bytes[0..5] | ForEach-Object { $_.ToString\\('X2'\\) }\\) -join ' '\\) \\(debe iniciar con 3C 3F = <?\\)\")",
+      "PowerShell(New-Item -ItemType Directory -Force -Path \"c:\\\\laragon\\\\www\\\\RememberMind_F1\\\\app\\\\Exports\\\\Reportes\\\\Sheets\")",
+      "PowerShell(\"OK\")",
+      "PowerShell(php artisan route:list --path=admin/reportes 2>&1)",
+      "PowerShell(php -l app/Services/Reportes/ReporteDataService.php 2>&1)",
+      "PowerShell(php -l app/Http/Controllers/Admin/Reportes/ReporteAdultosController.php 2>&1)",
+      "PowerShell(php -l app/Exports/Reportes/Sheets/Adultos/AdultosResumenSheet.php 2>&1)",
+      "PowerShell(php -l app/Exports/Reportes/Sheets/Adultos/AdultosListaSheet.php 2>&1)",
+      "PowerShell(php artisan view:cache 2>&1)",
+      "Bash(Get-ChildItem -Path . -Name)",
+      "Bash(grep -n \"estado\" /c/laragon/www/RememberMind_F1\\\\app/Livewire/Admin/SaludSeguimiento/SaludSignosPanel.php)",
+      "Read(//c/laragon/www/RememberMind_F1app/Livewire/Admin/SaludSeguimiento/**)",
+      "Bash(php -l app/Livewire/Admin/SaludSeguimiento/SaludResumenPanel.php)",
+      "Bash(findstr /I \"signo\")",
+      "Bash(php -l app/Livewire/Admin/SaludSeguimiento/SaludSignosPanel.php)",
+      "Bash(php -l app/Models/SignosVitalesAdulto.php)",
+      "Bash(Get-Content storage/logs/laravel.log -Tail 50)",
+      "Bash(php -l resources/views/livewire/admin/usuarios/usuarios-panel.blade.php)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" \"http://localhost/admin/salud-seguimiento\")",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" \"http://remembermind_f1.test\")",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" \"http://remembermind-f1.test\")",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" \"http://remembermind_f1.test/admin/salud-seguimiento\")",
+      "Bash(curl -s -L -o /tmp/response.html -w \"HTTP: %{http_code}\\\\nURL final: %{url_effective}\\\\n\" \"http://remembermind_f1.test/admin/salud-seguimiento\")",
+      "Read(//tmp/**)",
+      "Read(//usr/local/apache2/logs/**)",
+      "Read(//var/log/apache2/**)",
+      "Bash(curl -s -o /dev/null -w \"HTTP %{http_code} → %{redirect_url}\\\\n\" \"http://127.0.0.1:8765/\")",
+      "Bash(curl -s -o /dev/null -w \"HTTP %{http_code} → %{redirect_url}\\\\n\" \"http://127.0.0.1:8765/admin/salud-seguimiento\")",
+      "Bash(curl -s -o /dev/null -w \"HTTP %{http_code}\\\\n\" \"http://127.0.0.1:8765/admin/salud-seguimiento/AM_0001/resumen\")",
+      "Bash(curl -s -o /dev/null -w \"HTTP %{http_code}\\\\n\" \"http://127.0.0.1:8765/admin/salud-seguimiento/AM_0001/signos\")",
+      "Bash(kill %1)",
+      "Bash(php -l app/Livewire/Admin/SaludSeguimiento/SaludSeguimientoListPanel.php)",
+      "Bash(grep -r \"use App\\\\\\\\\\\\Models\\\\\\\\\\\\Habitacion\\\\|use App\\\\\\\\\\\\Models\\\\\\\\\\\\Cama\" \"c:\\\\laragon\\\\www\\\\RememberMind_F1\\\\app\")"
+    ],
+    "additionalDirectories": [
+      "c:\\laragon\\www\\RememberMind_F1\\app\\Http\\Controllers\\Admin"
+    ]
+  }
+}

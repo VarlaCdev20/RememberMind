@@ -1,0 +1,153 @@
+:root {
+    /* ============================================================
+       REMEMBERMIND / CASA AMANDITA
+       PALETA BASE INSTITUCIONAL
+       Estilo: cálido, limpio, geriátrico, administrativo y acogedor
+       ============================================================ */
+
+    /* Marca principal */
+    --rm-terracota: #D9795F;
+    --rm-terracota-hover: #C9654E;
+    --rm-salmon: #E28B70;
+    --rm-salmon-soft: #F3CFC2;
+    --rm-naranja: #E9A05F;
+    --rm-naranja-dark: #C87C35;
+    --rm-durazno: #F2B49F;
+    --rm-rosa-crema: #F4D1C4;
+
+    /* Azul institucional */
+    --rm-azul-profundo: #293A59;
+    --rm-azul-profundo-hover: #1F2D45;
+    --rm-azul-clinico: #90AFCB;
+    --rm-azul-tecnico: #5B7C9D;
+
+    /* Verde geriátrico / salud */
+    --rm-verde-salud: #3F7D5A;
+    --rm-verde-salud-hover: #326646;
+    --rm-verde-suave: #7FA587;
+    --rm-verde-oliva: #5F7358;
+    --rm-verde-menta: #DCE8DD;
+    --rm-fondo-salud: #DCE8DD;
+
+    /* Cognitivo */
+    --rm-morado-cognitivo: #9B8AC7;
+    --rm-morado-cognitivo-dark: #7A68B0;
+    --rm-morado-tecnico: #7B6FB3;
+    --rm-fondo-cognitivo: #E7E0F0;
+
+    /* Neutros cálidos */
+    --rm-neutro-950: #1F2D45;
+    --rm-neutro-900: #293A59;
+    --rm-neutro-800: #374562;
+    --rm-neutro-700: #5B6273;
+    --rm-neutro-600: #737785;
+    --rm-neutro-500: #928C84;
+    --rm-neutro-400: #B8A99B;
+    --rm-neutro-300: #CDBEAF;
+    --rm-neutro-200: #DDD2C6;
+    --rm-neutro-100: #E9E0D7;
+    --rm-neutro-50: #F4EEE7;
+
+    --rm-neutro-borde-alt: #C7B8A8;
+    --rm-neutro-card-alt: #EEE6DD;
+    --rm-gris-calido: #E6DED6;
+    --rm-fondo-calido: #E9E0D7;
+
+    /* Textos */
+    --rm-texto-principal: #293A59;
+    --rm-texto-secundario: #5B6273;
+    --rm-texto-suave: #737785;
+    --rm-texto-muted: #8A857F;
+    --rm-texto-invertido: #FFF8F1;
+
+    /* Fondos principales */
+    --rm-fondo-body: #D8CDC0;
+    --rm-fondo-main: #D8CDC0;
+    --rm-fondo-layout: #DED3C7;
+
+    --rm-fondo-sidebar: #D8CDC0;
+    --rm-fondo-sidebar-header: #F4EEE7;
+    --rm-fondo-navbar: #E9E0D7;
+
+    --rm-fondo-panel: #E9E0D7;
+    --rm-fondo-panel-alt: #DED3C7;
+    --rm-fondo-card: #F4EEE7;
+    --rm-fondo-card-soft: #F4EEE7;
+    --rm-fondo-card-warm: #EEE6DD;
+    --rm-fondo-input: #F4EEE7;
+    --rm-fondo-tabla: #F4EEE7;
+
+    /* Estados */
+    --rm-success-bg: #DCE8DD;
+    --rm-success: #3F7D5A;
+    --rm-success-border: #AFCBB8;
+
+    --rm-warning-bg: #F6E4C8;
+    --rm-warning: #C87C35;
+    --rm-warning-border: #E9C88F;
+
+    --rm-danger-bg: #F4D1C4;
+    --rm-danger: #C9654E;
+    --rm-danger-border: #E7A08E;
+
+    --rm-info-bg: #DDE8EF;
+    --rm-info: #5B7C9D;
+    --rm-info-border: #B8CBD8;
+
+    /* Botones */
+    --rm-btn-primary: #293A59;
+    --rm-btn-primary-hover: #1F2D45;
+    --rm-btn-primary-text: #FFF8F1;
+
+    --rm-btn-accent: #D9795F;
+    --rm-btn-accent-hover: #C9654E;
+    --rm-btn-accent-text: #FFF8F1;
+
+    --rm-btn-secondary: #EEE6DD;
+    --rm-btn-secondary-hover: #DED3C7;
+    --rm-btn-secondary-text: #293A59;
+
+    --rm-btn-success: #3F7D5A;
+    --rm-btn-success-hover: #326646;
+    --rm-btn-success-text: #FFF8F1;
+
+    /* Bordes */
+    --rm-borde-suave: rgba(91, 98, 115, 0.14);
+    --rm-borde-card: rgba(91, 98, 115, 0.16);
+    --rm-borde-panel: rgba(91, 98, 115, 0.13);
+    --rm-borde-input: rgba(91, 98, 115, 0.22);
+    --rm-borde-focus: rgba(217, 121, 95, 0.52);
+
+    /* Sombras */
+    --rm-shadow-xs: 0 2px 8px rgba(41, 58, 89, 0.05);
+    --rm-shadow-sm: 0 8px 20px rgba(41, 58, 89, 0.07);
+    --rm-shadow-md: 0 14px 34px rgba(41, 58, 89, 0.10);
+    --rm-shadow-lg: 0 22px 55px rgba(41, 58, 89, 0.14);
+
+    --rm-sombra-card: 0 1px 3px rgba(41, 58, 89, 0.08);
+    --rm-sombra-card-hover: 0 8px 22px rgba(41, 58, 89, 0.12);
+    --rm-sombra-panel: 0 16px 38px rgba(41, 58, 89, 0.10);
+    --rm-sombra-sidebar: 16px 0 45px rgba(41, 58, 89, 0.10);
+    --rm-sombra-modal: 0 24px 70px rgba(41, 58, 89, 0.22);
+
+    --glow-acento: 0 0 0 rgba(0, 0, 0, 0);
+    --glow-acento-hover: 0 0 0 rgba(0, 0, 0, 0);
+
+    /* Radios */
+    --rm-radius-sm: 0.75rem;
+    --rm-radius-md: 1rem;
+    --rm-radius-lg: 1.35rem;
+    --rm-radius-xl: 1.75rem;
+
+    /* Compatibilidad */
+    --rm-fondo-alerta-terracota: rgba(217, 121, 95, 0.12);
+    --rm-fondo-alerta-verde: rgba(63, 125, 90, 0.12);
+    --rm-fondo-error-salud: rgba(201, 101, 78, 0.12);
+    --rm-fondo-exito-salud: rgba(63, 125, 90, 0.14);
+    --rm-fondo-recovery: rgba(63, 125, 90, 0.14);
+
+    --rm-textura-radial-terracota: rgba(217, 121, 95, 0.08);
+    --rm-textura-radial-salud: rgba(63, 125, 90, 0.06);
+    --rm-textura-radial-cognitivo: rgba(155, 138, 199, 0.06);
+    --rm-textura-radial-azul: rgba(41, 58, 89, 0.05);
+}

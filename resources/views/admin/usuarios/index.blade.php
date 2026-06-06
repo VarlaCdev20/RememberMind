@@ -1,3 +1,3 @@
 <x-sistema-layout>
-    <livewire:admin.usuarios.usuarios-panel />
+ <livewire:admin.usuarios.usuarios-panel />
 </x-sistema-layout>

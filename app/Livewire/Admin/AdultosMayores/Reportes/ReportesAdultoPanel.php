@@ -10,6 +10,8 @@ class ReportesAdultoPanel extends Component
     public AdultoMayor $adultoMayor;
     public $fecha_inicio;
     public $fecha_fin;
+    public $chartSignos = [];
+    public $chartCognitivo = [];
 
     public function mount(AdultoMayor $adultoMayor)
     {
@@ -28,7 +30,7 @@ class ReportesAdultoPanel extends Component
             ->whereBetween('fecha', [$start, $end])
             ->orderBy('fecha')->orderBy('hora')->get();
         
-        $chartSignos = [
+        $this->chartSignos = [
             'labels' => $signosVitales->map(fn($s) => $s->fecha->format('d/m') . ' ' . substr($s->hora, 0, 5))->toArray(),
             'fc' => $signosVitales->pluck('frecuencia_cardiaca')->toArray(),
             'temp' => $signosVitales->pluck('temperatura')->toArray(),
@@ -41,11 +43,11 @@ class ReportesAdultoPanel extends Component
             ->whereBetween('fecha_eval', [$start, $end])
             ->orderBy('fecha_eval')->get();
             
-        $chartCognitivo = [
+        $this->chartCognitivo = [
             'labels' => $evaluaciones->map(fn($e) => $e->fecha_eval->format('d/m/Y') . ' (' . $e->tipoEvaluacion->siglas . ')')->toArray(),
             'puntajes' => $evaluaciones->pluck('puntaje_total')->toArray(),
         ];
 
-        return view('livewire.admin.adultos-mayores.reportes.reportes-adulto-panel', compact('chartSignos', 'chartCognitivo'));
+        return view('livewire.admin.adultos-mayores.reportes.reportes-adulto-panel');
     }
 }
