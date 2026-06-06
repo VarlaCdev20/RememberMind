@@ -1134,9 +1134,7 @@ class PersonalInstitucionalForm extends Component
     {
         $clasificacion = $this->sincronizarClasificacionDesdeRoles();
 
-        if (!$this->esEdicion) {
-            $this->validate();
-        }
+        // La validación ya se completó en cada avanzarPaso()
 
         $this->estado = $this->determinarEstadoDocumental();
 
@@ -1308,6 +1306,58 @@ class PersonalInstitucionalForm extends Component
             }
 
             DB::commit();
+
+            if (!$this->esEdicion && class_exists(\App\Mail\PersonalInstitucionalBienvenidaMail::class)) {
+                $documentos_pendientes_arr = [];
+                $documentos_subidos_arr = [];
+                $documentos_institucionales_generados_arr = [];
+                $pdfPaths = [];
+
+                foreach ($this->documentos_configurados as $doc) {
+                    $estadoDoc = $this->estado_documentos[$doc['id']] ?? 'PENDIENTE';
+                    if ($estadoDoc === 'PENDIENTE' || $estadoDoc === 'OBSERVADO') {
+                        $documentos_pendientes_arr[] = $doc['nombre'];
+                    } elseif ($estadoDoc === 'CARGADO' || $estadoDoc === 'FIRMADO_SUBIDO' || $estadoDoc === 'GENERADO') {
+                        $documentos_subidos_arr[] = $doc['nombre'];
+                    }
+
+                    if ($doc['tipo'] === 'institucional' && in_array($estadoDoc, ['GENERADO', 'FIRMADO_SUBIDO'])) {
+                        $documentos_institucionales_generados_arr[] = $doc['nombre'];
+                        
+                        $fileMap = [
+                            'FICHA'            => 'ficha.pdf',
+                            'CONTRATO'         => 'contrato.pdf',
+                            'CONFIDENCIALIDAD' => 'confidencialidad.pdf',
+                            'FUNCIONES'        => 'acta_funciones.pdf',
+                        ];
+                        if (isset($fileMap[$doc['id']]) && !empty($this->tempId)) {
+                            $path = \Illuminate\Support\Facades\Storage::disk('public')->path("personal-institucional/temp/{$this->tempId}/{$fileMap[$doc['id']]}");
+                            if (file_exists($path)) {
+                                $pdfPaths[$fileMap[$doc['id']]] = $path;
+                            }
+                        }
+                    }
+                }
+
+                try {
+                    \Illuminate\Support\Facades\Mail::to($usuario->correo)->send(
+                        new \App\Mail\PersonalInstitucionalBienvenidaMail(
+                            $usuario,
+                            $clasificacion['rol_label'] ?? 'Personal',
+                            $clasificacion['area_nombre'] ?? 'Área Operativa',
+                            $this->estado,
+                            $documentos_pendientes_arr,
+                            $plazoVencimiento ?? \Carbon\Carbon::now()->addHours(48)->toDateString(),
+                            $pdfPaths,
+                            $this->contrasena_temporal,
+                            $documentos_subidos_arr,
+                            $documentos_institucionales_generados_arr
+                        )
+                    );
+                } catch (\Exception $mailEx) {
+                    logger()->error("No se pudo enviar correo de bienvenida: " . $mailEx->getMessage());
+                }
+            }
 
             if (!$this->esEdicion) {
                 $roles = empty($this->roles_seleccionados) ? 'Ninguno' : implode(', ', $this->roles_seleccionados);
