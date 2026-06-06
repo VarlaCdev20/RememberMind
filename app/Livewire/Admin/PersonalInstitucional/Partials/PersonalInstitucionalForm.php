@@ -10,7 +10,6 @@ use App\Models\Especialidad;
 use App\Models\CargoAdministrativo;
 use App\Models\AreaInstitucional;
 use Spatie\Permission\Models\Role;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
@@ -1122,11 +1121,11 @@ class PersonalInstitucionalForm extends Component
 
     public function preGuardar()
     {
-        $this->estado = $this->determinarEstadoDocumental();
+        $estadoDocumental = $this->determinarEstadoDocumental();
 
         $this->dispatch('confirmarRegistroFinal', [
-            'faltan_documentos' => $this->estado !== 'COMPLETO',
-            'estado' => $this->estado
+            'faltan_documentos' => $estadoDocumental !== 'COMPLETO',
+            'estado' => 'ACTIVO'
         ]);
     }
 
@@ -1136,7 +1135,8 @@ class PersonalInstitucionalForm extends Component
 
         // La validación ya se completó en cada avanzarPaso()
 
-        $this->estado = $this->determinarEstadoDocumental();
+        $this->estado = 'ACTIVO'; // Siempre se crea como ACTIVO
+        $estadoDocumental = $this->determinarEstadoDocumental();
 
         DB::beginTransaction();
         try {
@@ -1144,25 +1144,25 @@ class PersonalInstitucionalForm extends Component
                 $usuario = User::findOrFail($this->usuarioId);
             } else {
                 $usuario = new User();
-                // Usar la contraseña temporal que se mostró al usuario en el Paso 1
-                $usuario->password = Hash::make($this->contrasena_temporal);
+                $usuario->password = $this->contrasena_temporal;
+                $usuario->debe_cambiar_password = $this->forzar_cambio_password;
                 $usuario->created_at = \Carbon\Carbon::parse($this->fecha_registro . ' ' . $this->hora_registro);
             }
 
-            $usuario->nombres = $this->nombres;
-            $usuario->ap_paterno = $this->ap_paterno;
-            $usuario->ap_materno = $this->ap_materno;
-            $usuario->correo = trim(mb_strtolower($this->correo));
+            $usuario->nombres = mb_strtoupper(trim($this->nombres), 'UTF-8');
+            $usuario->ap_paterno = $this->ap_paterno ? mb_strtoupper(trim($this->ap_paterno), 'UTF-8') : null;
+            $usuario->ap_materno = $this->ap_materno ? mb_strtoupper(trim($this->ap_materno), 'UTF-8') : null;
+            $usuario->correo = trim(mb_strtolower($this->correo, 'UTF-8'));
             $usuario->telefono = $this->telefono;
-            $usuario->numero_documento = $this->numero_documento;
-            $usuario->expedido = $this->expedido;
+            $usuario->numero_documento = mb_strtoupper(trim($this->numero_documento), 'UTF-8');
+            $usuario->expedido = $this->expedido ? mb_strtoupper(trim($this->expedido), 'UTF-8') : null;
             $usuario->fecha_nacimiento = $this->fecha_nacimiento;
             $usuario->genero = $this->genero;
             $usuario->estado = $this->estado;
-            $usuario->observaciones = $this->observaciones;
-            $usuario->direccion = $this->direccion;
-            $usuario->zona = $this->zona;
-            $usuario->ciudad = $this->ciudad;
+            $usuario->observaciones = $this->observaciones ? mb_strtoupper(trim($this->observaciones), 'UTF-8') : null;
+            $usuario->direccion = $this->direccion ? mb_strtoupper(trim($this->direccion), 'UTF-8') : null;
+            $usuario->zona = $this->zona ? mb_strtoupper(trim($this->zona), 'UTF-8') : null;
+            $usuario->ciudad = $this->ciudad ? mb_strtoupper(trim($this->ciudad), 'UTF-8') : null;
             $usuario->cod_area = $this->cod_area;
             
             if ($this->foto_perfil && !is_string($this->foto_perfil)) {
@@ -1378,7 +1378,10 @@ class PersonalInstitucionalForm extends Component
                         "</div>" .
                         "</div>";
 
-                $this->dispatch('credencialesGeneradas', ['html' => $html]);
+                $this->dispatch('credencialesGeneradas', [
+                    'html' => $html,
+                    'usuarioId' => $usuario->cod_usu,
+                ]);
             } else {
                 $this->dispatch('mostrarAlerta', [
                     'type' => 'success',

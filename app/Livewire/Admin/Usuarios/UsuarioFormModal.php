@@ -5,7 +5,6 @@ namespace App\Livewire\Admin\Usuarios;
 use App\Models\User;
 use Spatie\Permission\Models\Role;
 use Livewire\Component;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 
 class UsuarioFormModal extends Component
@@ -24,6 +23,13 @@ class UsuarioFormModal extends Component
     public $estado = 'ACTIVO';
     public $password;
     public $password_confirmation;
+
+    // Propiedades para actualización de contraseña
+    public $showPasswordSection = false;
+    public $new_password;
+    public $new_password_confirmation;
+    public $forzar_cambio = false;
+    public $temp_password_generated = null;
 
     protected $listeners = [
         'usuario-form-abrir' => 'abrir',
@@ -92,13 +98,64 @@ class UsuarioFormModal extends Component
             $this->isEdit = false;
         }
 
+        $this->showPasswordSection = false;
+        $this->reset(['new_password', 'new_password_confirmation', 'temp_password_generated', 'forzar_cambio']);
+
         $this->mostrar = true;
     }
 
     public function cerrar()
     {
         $this->mostrar = false;
+        $this->showPasswordSection = false;
         $this->resetValidation();
+        $this->reset(['new_password', 'new_password_confirmation', 'temp_password_generated', 'forzar_cambio']);
+    }
+
+    public function togglePasswordSection()
+    {
+        $this->showPasswordSection = !$this->showPasswordSection;
+        $this->reset(['new_password', 'new_password_confirmation', 'temp_password_generated', 'forzar_cambio']);
+        $this->resetValidation(['new_password', 'new_password_confirmation']);
+    }
+
+    public function generarPasswordTemporal()
+    {
+        $chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()';
+        $pass = substr(str_shuffle($chars), 0, 12);
+        $this->new_password = $pass;
+        $this->new_password_confirmation = $pass;
+        $this->temp_password_generated = $pass;
+        $this->forzar_cambio = true;
+    }
+
+    public function actualizarPassword()
+    {
+        if (!auth()->user()->can('usuarios.editar')) {
+            abort(403, 'No tienes permiso para editar usuarios.');
+        }
+
+        $this->validate([
+            'new_password' => 'required|min:8|same:new_password_confirmation',
+        ], [
+            'new_password.required' => 'La nueva contraseña es obligatoria.',
+            'new_password.min' => 'La contraseña debe tener al menos 8 caracteres.',
+            'new_password.same' => 'Las contraseñas no coinciden.',
+        ]);
+
+        $usuario = User::findOrFail($this->usuarioId);
+        
+        $usuario->password = $this->new_password;
+        $usuario->debe_cambiar_password = $this->forzar_cambio;
+        $usuario->save();
+
+        $this->togglePasswordSection();
+        
+        $this->dispatch('swal', [
+            'icon' => 'success',
+            'title' => 'Éxito',
+            'text' => 'Contraseña actualizada correctamente.'
+        ]);
     }
 
     public function guardar()
@@ -127,7 +184,7 @@ class UsuarioFormModal extends Component
             ];
 
             if (!empty($this->password)) {
-                $data['password'] = Hash::make($this->password);
+                $data['password'] = $this->password;
             }
 
             $usuario->update($data);
@@ -142,7 +199,7 @@ class UsuarioFormModal extends Component
                 'correo' => $this->correo,
                 'telefono' => $this->telefono,
                 'estado' => $this->estado,
-                'password' => Hash::make($this->password),
+                'password' => $this->password,
             ]);
             
             $usuario->assignRole($this->rol);

@@ -24,11 +24,11 @@
             <button type="button" class="flex h-9 items-center gap-1.5 rounded-lg border border-borde bg-white px-3 text-xs font-bold text-texto shadow-sm transition-colors hover:border-borde-hover hover:bg-fondo hover:text-titulo">
                 <i class="ph-bold ph-file-pdf text-base"></i> Exportar PDF
             </button>
-            <button type="button" class="rm-btn-success h-9 gap-1.5 rounded-lg px-3 text-xs">
+            <button type="button" wire:click="abrirModuloHorarios" class="rm-btn-success h-9 gap-1.5 rounded-lg px-3 text-xs">
                 <i class="ph-bold ph-calendar-plus text-base"></i> Asignar horario
             </button>
             @can('usuarios.crear')
-            <button wire:click="abrirModalNuevo" class="rm-btn-primary h-9 gap-1.5 rounded-lg px-3 text-xs">
+            <button type="button" wire:click="abrirModalNuevo" class="rm-btn-primary h-9 gap-1.5 rounded-lg px-3 text-xs">
                 <i class="ph-bold ph-plus text-base"></i>
                 <span>Registrar personal</span>
             </button>
@@ -39,25 +39,25 @@
     <!-- Pestañas Principales (Nav) -->
     <div class="flex overflow-x-auto border-b border-borde scrollbar-hide">
         <div class="flex min-w-max items-center gap-1 px-1">
-            <button wire:click="setTab('resumen')" class="flex items-center gap-1.5 whitespace-nowrap border-b-2 px-2.5 py-2.5 text-xs font-bold transition-all {{ $tabActiva === 'resumen' ? 'text-boton-acento border-boton-acento' : 'text-apoyo border-transparent hover:text-titulo' }}">
+            <button type="button" wire:click="setTab('resumen')" class="flex items-center gap-1.5 whitespace-nowrap border-b-2 px-2.5 py-2.5 text-xs font-bold transition-all {{ $tabActiva === 'resumen' ? 'text-boton-acento border-boton-acento' : 'text-apoyo border-transparent hover:text-titulo' }}">
                 <i class="{{ $tabActiva === 'resumen' ? 'ph-fill' : 'ph-bold' }} ph-squares-four text-lg"></i> Resumen
             </button>
-            <button wire:click="setTab('salud')" class="flex items-center gap-1.5 whitespace-nowrap border-b-2 px-2.5 py-2.5 text-xs font-bold transition-all {{ $tabActiva === 'salud' ? 'text-estado-info border-estado-info' : 'text-apoyo border-transparent hover:text-titulo' }}">
+            <button type="button" wire:click="setTab('salud')" class="flex items-center gap-1.5 whitespace-nowrap border-b-2 px-2.5 py-2.5 text-xs font-bold transition-all {{ $tabActiva === 'salud' ? 'text-estado-info border-estado-info' : 'text-apoyo border-transparent hover:text-titulo' }}">
                 <i class="{{ $tabActiva === 'salud' ? 'ph-fill' : 'ph-bold' }} ph-stethoscope text-lg"></i> Personal de salud
             </button>
-            <button wire:click="setTab('admin')" class="flex items-center gap-1.5 whitespace-nowrap border-b-2 px-2.5 py-2.5 text-xs font-bold transition-all {{ $tabActiva === 'admin' ? 'text-estado-advertencia border-estado-advertencia' : 'text-apoyo border-transparent hover:text-titulo' }}">
+            <button type="button" wire:click="setTab('admin')" class="flex items-center gap-1.5 whitespace-nowrap border-b-2 px-2.5 py-2.5 text-xs font-bold transition-all {{ $tabActiva === 'admin' ? 'text-estado-advertencia border-estado-advertencia' : 'text-apoyo border-transparent hover:text-titulo' }}">
                 <i class="{{ $tabActiva === 'admin' ? 'ph-fill' : 'ph-bold' }} ph-desktop text-lg"></i> Personal administrativo
             </button>
-            <button wire:click="setTab('horarios')" class="flex items-center gap-1.5 whitespace-nowrap border-b-2 px-2.5 py-2.5 text-xs font-bold transition-all {{ $tabActiva === 'horarios' ? 'text-boton-acento border-boton-acento' : 'text-apoyo border-transparent hover:text-titulo' }}">
-                <i class="{{ $tabActiva === 'horarios' ? 'ph-fill' : 'ph-bold' }} ph-calendar-check text-lg"></i> Horarios y turnos
+            <button type="button" wire:click="setTab('horarios')" class="flex items-center gap-1.5 whitespace-nowrap border-b-2 px-2.5 py-2.5 text-xs font-bold transition-all {{ $tabActiva === 'horarios' ? 'text-boton-acento border-boton-acento' : 'text-apoyo border-transparent hover:text-titulo' }}">
+                <i class="{{ $tabActiva === 'horarios' ? 'ph-fill' : 'ph-bold' }} ph-calendar-check text-lg"></i> Horarios y Asignaciones
             </button>
-            <button wire:click="setTab('documentacion')" class="flex items-center gap-1.5 whitespace-nowrap border-b-2 px-2.5 py-2.5 text-xs font-bold transition-all {{ $tabActiva === 'documentacion' ? 'text-boton-acento border-boton-acento' : 'text-apoyo border-transparent hover:text-titulo' }}">
+            <button type="button" wire:click="setTab('documentacion')" class="flex items-center gap-1.5 whitespace-nowrap border-b-2 px-2.5 py-2.5 text-xs font-bold transition-all {{ $tabActiva === 'documentacion' ? 'text-boton-acento border-boton-acento' : 'text-apoyo border-transparent hover:text-titulo' }}">
                 <i class="{{ $tabActiva === 'documentacion' ? 'ph-fill' : 'ph-bold' }} ph-folders text-lg"></i> Documentación
             </button>
-            <button wire:click="setTab('disponibilidad')" class="flex items-center gap-1.5 whitespace-nowrap border-b-2 px-2.5 py-2.5 text-xs font-bold transition-all {{ $tabActiva === 'disponibilidad' ? 'text-boton-acento border-boton-acento' : 'text-apoyo border-transparent hover:text-titulo' }}">
+            <button type="button" wire:click="setTab('disponibilidad')" class="flex items-center gap-1.5 whitespace-nowrap border-b-2 px-2.5 py-2.5 text-xs font-bold transition-all {{ $tabActiva === 'disponibilidad' ? 'text-boton-acento border-boton-acento' : 'text-apoyo border-transparent hover:text-titulo' }}">
                 <i class="{{ $tabActiva === 'disponibilidad' ? 'ph-fill' : 'ph-bold' }} ph-clock-user text-lg"></i> Disponibilidad
             </button>
-            <button wire:click="setTab('reportes')" class="flex items-center gap-1.5 whitespace-nowrap border-b-2 px-2.5 py-2.5 text-xs font-bold transition-all {{ $tabActiva === 'reportes' ? 'text-boton-acento border-boton-acento' : 'text-apoyo border-transparent hover:text-titulo' }}">
+            <button type="button" wire:click="setTab('reportes')" class="flex items-center gap-1.5 whitespace-nowrap border-b-2 px-2.5 py-2.5 text-xs font-bold transition-all {{ $tabActiva === 'reportes' ? 'text-boton-acento border-boton-acento' : 'text-apoyo border-transparent hover:text-titulo' }}">
                 <i class="{{ $tabActiva === 'reportes' ? 'ph-fill' : 'ph-bold' }} ph-chart-bar text-lg"></i> Reportes
             </button>
         </div>
@@ -221,17 +221,24 @@
                         <div class="flex items-center justify-between mb-2">
                             <h4 class="text-sm font-bold text-titulo flex items-center gap-2"><i class="ph-fill ph-chart-pie-slice text-boton-acento"></i> Distribución de Áreas</h4>
                         </div>
-                        <div class="flex-1 min-h-0 relative w-full flex justify-center" x-data="{
+                        <div wire:ignore class="flex-1 min-h-0 relative w-full flex justify-center" x-data="{
+                            chartInstance: null,
                             hasData: {{ collect($chartData['area_data'])->sum() > 0 ? 'true' : 'false' }},
                             init() {
                                 if(this.hasData) {
-                                    new Chart(this.$refs.chart, {
+                                    const root = document.documentElement;
+                                    const bgColors = [
+                                        getComputedStyle(root).getPropertyValue('--color-grafico-1').trim() || '#3F7D5A',
+                                        getComputedStyle(root).getPropertyValue('--color-grafico-2').trim() || '#D9795F',
+                                        getComputedStyle(root).getPropertyValue('--color-grafico-4').trim() || '#E2E8F0'
+                                    ];
+                                    this.chartInstance = new Chart(this.$refs.chart, {
                                         type: 'doughnut',
                                         data: {
                                             labels: {{ json_encode($chartData['area_labels']) }},
                                             datasets: [{
                                                 data: {{ json_encode($chartData['area_data']) }},
-                                                backgroundColor: ['#3F7D5A', '#E28B70', '#CDBEAF'],
+                                                backgroundColor: bgColors,
                                                 borderWidth: 0,
                                                 hoverOffset: 4
                                             }]
@@ -256,18 +263,26 @@
                         <div class="flex items-center justify-between mb-2">
                             <h4 class="text-sm font-bold text-titulo flex items-center gap-2"><i class="ph-fill ph-chart-bar text-estado-info"></i> Estado Laboral</h4>
                         </div>
-                        <div class="flex-1 min-h-0 relative w-full flex justify-center" x-data="{
+                        <div wire:ignore class="flex-1 min-h-0 relative w-full flex justify-center" x-data="{
+                            chartInstance: null,
                             hasData: {{ collect($chartData['estado_data'])->sum() > 0 ? 'true' : 'false' }},
                             init() {
                                 if(this.hasData) {
-                                    new Chart(this.$refs.chart, {
+                                    const root = document.documentElement;
+                                    const bgColors = [
+                                        getComputedStyle(root).getPropertyValue('--color-grafico-1').trim() || '#3F7D5A',
+                                        getComputedStyle(root).getPropertyValue('--color-grafico-2').trim() || '#D9795F',
+                                        getComputedStyle(root).getPropertyValue('--color-grafico-3').trim() || '#E9A05F',
+                                        getComputedStyle(root).getPropertyValue('--color-grafico-4').trim() || '#E2E8F0'
+                                    ];
+                                    this.chartInstance = new Chart(this.$refs.chart, {
                                         type: 'bar',
                                         data: {
                                             labels: {{ json_encode($chartData['estado_labels']) }},
                                             datasets: [{
                                                 label: 'Personal',
                                                 data: {{ json_encode($chartData['estado_data']) }},
-                                                backgroundColor: ['#3F7D5A', '#928C84', '#E9A05F', '#D9795F'],
+                                                backgroundColor: bgColors,
                                                 borderRadius: 4
                                             }]
                                         },
@@ -291,18 +306,22 @@
                         <div class="flex items-center justify-between mb-2">
                             <h4 class="text-sm font-bold text-titulo flex items-center gap-2"><i class="ph-fill ph-clock text-modulo-salud"></i> Enfermeros por Turno</h4>
                         </div>
-                        <div class="flex-1 min-h-0 relative w-full flex justify-center" x-data="{
+                        <div wire:ignore class="flex-1 min-h-0 relative w-full flex justify-center" x-data="{
+                            chartInstance: null,
                             hasData: {{ collect($chartData['turno_data'])->sum() > 0 ? 'true' : 'false' }},
                             init() {
                                 if(this.hasData) {
-                                    new Chart(this.$refs.chart, {
+                                    const root = document.documentElement;
+                                    const colorTurno = getComputedStyle(root).getPropertyValue('--color-grafico-1').trim() || '#3F7D5A';
+                                    
+                                    this.chartInstance = new Chart(this.$refs.chart, {
                                         type: 'bar',
                                         data: {
                                             labels: {{ json_encode($chartData['turno_labels']) }},
                                             datasets: [{
                                                 label: 'Enfermeros',
                                                 data: {{ json_encode($chartData['turno_data']) }},
-                                                backgroundColor: '#7FA587',
+                                                backgroundColor: colorTurno,
                                                 borderRadius: 4
                                             }]
                                         },
@@ -326,7 +345,7 @@
                         <div class="flex items-center justify-between mb-2">
                             <h4 class="text-sm font-bold text-titulo flex items-center gap-2"><i class="ph-fill ph-folders text-estado-peligro"></i> Docs. Pendientes</h4>
                         </div>
-                        <div class="flex-1 min-h-0 relative w-full flex justify-center" x-data="{
+                        <div wire:ignore class="flex-1 min-h-0 relative w-full flex justify-center" x-data="{
                             hasData: {{ collect($chartData['docs_data'])->sum() > 0 ? 'true' : 'false' }},
                             init() {
                                 if(this.hasData) {
@@ -361,10 +380,16 @@
                         <div class="flex items-center justify-between mb-2">
                             <h4 class="text-sm font-bold text-titulo flex items-center gap-2"><i class="ph-fill ph-activity text-[#293A59]"></i> Disponibilidad Actual</h4>
                         </div>
-                        <div class="flex-1 min-h-0 relative w-full flex justify-center" x-data="{
+                        <div wire:ignore class="flex-1 min-h-0 relative w-full flex justify-center" x-data="{
                             hasData: {{ collect($chartData['disp_data'])->sum() > 0 ? 'true' : 'false' }},
                             init() {
                                 if(this.hasData) {
+                                    const root = document.documentElement;
+                                    const barColors = [
+                                        getComputedStyle(root).getPropertyValue('--color-grafico-1').trim() || '#3F7D5A',
+                                        getComputedStyle(root).getPropertyValue('--color-grafico-3').trim() || '#E9A05F',
+                                        getComputedStyle(root).getPropertyValue('--color-grafico-2').trim() || '#D9795F'
+                                    ];
                                     new Chart(this.$refs.chart, {
                                         type: 'bar',
                                         data: {
@@ -372,7 +397,7 @@
                                             datasets: [{
                                                 label: 'Disponibilidad',
                                                 data: {{ json_encode($chartData['disp_data']) }},
-                                                backgroundColor: ['#3F7D5A', '#293A59', '#D9795F'],
+                                                backgroundColor: barColors,
                                                 borderRadius: 4,
                                                 barThickness: 40
                                             }]
@@ -413,7 +438,7 @@
                                 <i class="ph-bold ph-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-apoyo group-focus-within:text-[#D9795F] transition-colors"></i>
                                 <input type="text" wire:model.live.debounce.300ms="busqueda" placeholder="Buscar nombre, correo o CI..." class="h-9 w-full rounded-lg border border-borde bg-white pl-9 pr-3 text-xs text-texto shadow-sm outline-none transition-all placeholder:text-apoyo/70 focus:border-[#D9795F] focus:ring-1 focus:ring-[#D9795F]">
                             </div>
-                            <button @click="openFilters = !openFilters" class="flex h-9 w-full items-center justify-center gap-1.5 rounded-lg border border-borde bg-white px-3 text-xs font-bold text-texto shadow-sm transition-colors hover:bg-fondo hover:text-titulo sm:w-auto">
+                            <button type="button" @click="openFilters = !openFilters" class="flex h-9 w-full items-center justify-center gap-1.5 rounded-lg border border-borde bg-white px-3 text-xs font-bold text-texto shadow-sm transition-colors hover:bg-fondo hover:text-titulo sm:w-auto">
                                 <i class="ph-bold ph-funnel text-base"></i> Filtros
                             </button>
                         </div>
@@ -521,8 +546,13 @@
                                                 -
                                             @endif
                                         </div>
+                                        @php
+                                            $asignacionActiva = $usuario->asignacionesTurno->first(
+                                                fn ($asignacion) => in_array($asignacion->estado, ['ACTIVO', 'ACTIVA'], true)
+                                            );
+                                        @endphp
                                         <div class="flex items-center gap-1 mt-1 text-[11px] font-medium text-apoyo">
-                                            <i class="ph-fill ph-clock"></i> {{ ['Mañana', 'Tarde', 'Noche', 'Rotativo'][rand(0,3)] }}
+                                            <i class="ph-fill ph-clock"></i> {{ $asignacionActiva?->turno?->nombre ?? 'Sin turno asignado' }}
                                         </div>
                                     </td>
 
@@ -559,9 +589,7 @@
 
                                     <!-- 5. Documentación -->
                                     <td class="px-4 py-2.5 text-center">
-                                        @php
-                                            $pendientes = \App\Models\DocumentoUsuario::where('cod_usu', $usuario->cod_usu)->where('estado', 'PENDIENTE')->count();
-                                        @endphp
+                                        @php $pendientes = $usuario->documentos_pendientes_count; @endphp
                                         @if($pendientes > 0)
                                             <span class="inline-flex cursor-default items-center gap-1 rounded-full border border-[#F2CFC4] bg-[#FDF5F2] px-2 py-0.5 text-[10px] font-bold text-[#D9795F] shadow-sm tooltip-btn" title="{{ $pendientes }} pendientes">
                                                 {{ $pendientes }} <i class="ph-fill ph-warning-circle"></i>
@@ -576,7 +604,9 @@
                                     <!-- 6. Carga -->
                                     <td class="px-4 py-2.5 text-center">
                                         @if($usuario->personalSalud && $usuario->personalSalud->tipo_personal_salud == 'ENFERMERO')
-                                            <span class="text-xs font-black text-[#5C4D40] bg-[#FDFBF7] px-2 py-1 rounded-md border border-[#E9E0D7]">{{ rand(1,3) }}/3</span>
+                                            <span class="text-xs font-black text-[#5C4D40] bg-[#FDFBF7] px-2 py-1 rounded-md border border-[#E9E0D7]" title="Asignaciones activas">
+                                                {{ $usuario->asignacionesTurno->whereIn('estado', ['ACTIVO', 'ACTIVA'])->count() }}
+                                            </span>
                                         @else
                                             <span class="text-[10px] font-bold text-apoyo uppercase">N/A</span>
                                         @endif
@@ -586,18 +616,18 @@
                                     <td class="px-4 py-2.5 text-center">
                                         <div class="flex items-center justify-center gap-1 opacity-70 transition-opacity group-hover:opacity-100 focus-within:opacity-100">
                                             @can('usuarios.editar')
-                                            <button wire:click="abrirModalEdicion('{{ $usuario->cod_usu }}')" class="h-8 w-8 rounded-lg flex items-center justify-center text-apoyo hover:bg-[#FDFBF7] hover:text-[#D9795F] transition-colors tooltip-btn border border-transparent hover:border-[#E9E0D7] shadow-sm" title="Ver / Editar Ficha">
+                                            <button type="button" wire:click="abrirModalEdicion('{{ $usuario->cod_usu }}')" class="h-8 w-8 rounded-lg flex items-center justify-center text-apoyo hover:bg-[#FDFBF7] hover:text-[#D9795F] transition-colors tooltip-btn border border-transparent hover:border-[#E9E0D7] shadow-sm" title="Ver / Editar Ficha">
                                                 <i class="ph-bold ph-pencil-simple text-base"></i>
                                             </button>
                                             @endcan
-                                            <button class="h-8 w-8 rounded-lg flex items-center justify-center text-apoyo hover:bg-[#F0F4FA] hover:text-[#293A59] transition-colors tooltip-btn border border-transparent hover:border-[#C5D0E6] shadow-sm" title="Ver Horarios">
+                                            <button type="button" wire:click="abrirHorariosPersonal('{{ $usuario->cod_usu }}')" class="h-8 w-8 rounded-lg flex items-center justify-center text-apoyo hover:bg-[#F0F4FA] hover:text-[#293A59] transition-colors tooltip-btn border border-transparent hover:border-[#C5D0E6] shadow-sm" title="Ver / asignar horarios">
                                                 <i class="ph-bold ph-calendar-plus text-base"></i>
                                             </button>
                                             <button class="h-8 w-8 rounded-lg flex items-center justify-center text-apoyo hover:bg-[#F2F7F4] hover:text-[#3F7D5A] transition-colors tooltip-btn border border-transparent hover:border-[#C6D9CE] shadow-sm md:hidden lg:flex" title="Ver Documentos">
                                                 <i class="ph-bold ph-folders text-base"></i>
                                             </button>
                                             @can('usuarios.eliminar')
-                                            <button wire:click="toggleEstado('{{ $usuario->cod_usu }}')" class="h-8 w-8 rounded-lg flex items-center justify-center text-apoyo hover:bg-[#FDF5F2] hover:text-[#D9795F] transition-colors tooltip-btn border border-transparent hover:border-[#F2CFC4] shadow-sm" title="{{ $usuario->estado === 'ACTIVO' || $usuario->estado == 1 ? 'Suspender' : 'Reactivar' }}">
+                                            <button type="button" wire:click="toggleEstado('{{ $usuario->cod_usu }}')" class="h-8 w-8 rounded-lg flex items-center justify-center text-apoyo hover:bg-[#FDF5F2] hover:text-[#D9795F] transition-colors tooltip-btn border border-transparent hover:border-[#F2CFC4] shadow-sm" title="{{ $usuario->estado === 'ACTIVO' || $usuario->estado == 1 ? 'Suspender' : 'Reactivar' }}">
                                                 <i class="ph-bold {{ $usuario->estado === 'ACTIVO' || $usuario->estado == 1 ? 'ph-pause-circle' : 'ph-play-circle' }} text-base"></i>
                                             </button>
                                             @endcan
@@ -640,11 +670,11 @@
                                     </div>
                                     <div class="flex gap-1">
                                         @can('usuarios.editar')
-                                        <button wire:click="abrirModalEdicion('{{ $usuario->cod_usu }}')" class="h-8 w-8 bg-fondo text-texto rounded-lg flex items-center justify-center border border-borde shadow-sm"><i class="ph-bold ph-pencil-simple"></i></button>
+                                        <button type="button" wire:click="abrirModalEdicion('{{ $usuario->cod_usu }}')" class="h-8 w-8 bg-fondo text-texto rounded-lg flex items-center justify-center border border-borde shadow-sm"><i class="ph-bold ph-pencil-simple"></i></button>
                                         @endcan
-                                        <button class="h-8 w-8 bg-fondo text-texto rounded-lg flex items-center justify-center border border-borde shadow-sm"><i class="ph-bold ph-calendar-plus"></i></button>
+                                        <button type="button" wire:click="abrirHorariosPersonal('{{ $usuario->cod_usu }}')" class="h-8 w-8 bg-fondo text-texto rounded-lg flex items-center justify-center border border-borde shadow-sm" title="Ver / asignar horarios"><i class="ph-bold ph-calendar-plus"></i></button>
                                         @can('usuarios.eliminar')
-                                        <button wire:click="toggleEstado('{{ $usuario->cod_usu }}')" class="h-8 w-8 bg-fondo text-texto rounded-lg flex items-center justify-center border border-borde shadow-sm"><i class="ph-bold {{ $usuario->estado === 'ACTIVO' || $usuario->estado == 1 ? 'ph-pause-circle' : 'ph-play-circle' }}"></i></button>
+                                        <button type="button" wire:click="toggleEstado('{{ $usuario->cod_usu }}')" class="h-8 w-8 bg-fondo text-texto rounded-lg flex items-center justify-center border border-borde shadow-sm"><i class="ph-bold {{ $usuario->estado === 'ACTIVO' || $usuario->estado == 1 ? 'ph-pause-circle' : 'ph-play-circle' }}"></i></button>
                                         @endcan
                                     </div>
                                 </div>
@@ -665,7 +695,7 @@
                                         <span class="inline-block px-2 py-0.5 rounded-md {{ $usuario->estado === 'ACTIVO' ? 'bg-[#3F7D5A] text-white' : 'bg-fondo text-texto' }} text-[9px] font-bold uppercase tracking-wider">
                                             {{ $usuario->estado === 'ACTIVO' ? 'ACTIVO' : 'INACTIVO' }}
                                         </span>
-                                        @php $pendientes = \App\Models\DocumentoUsuario::where('cod_usu', $usuario->cod_usu)->where('estado', 'PENDIENTE')->count(); @endphp
+                                        @php $pendientes = $usuario->documentos_pendientes_count; @endphp
                                         @if($pendientes > 0)
                                             <span class="text-[10px] font-bold text-[#D9795F]"><i class="ph-fill ph-warning-circle"></i> {{ $pendientes }} docs pend.</span>
                                         @else
@@ -684,14 +714,7 @@
             </div>
 
         @elseif($tabActiva === 'horarios')
-            <div class="flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-borde bg-fondo-card/50 px-4 py-14 text-center">
-                <div class="mb-3 flex h-14 w-14 items-center justify-center rounded-xl border border-borde bg-white shadow-sm">
-                    <i class="ph-fill ph-calendar-check text-3xl text-boton-acento"></i>
-                </div>
-                <h3 class="text-lg font-black text-titulo">Módulo de Horarios y Turnos</h3>
-                <p class="mt-1.5 max-w-md text-xs font-semibold text-apoyo">Aquí visualizarás la matriz general de horarios, turnos rotativos y cobertura del personal médico y administrativo.</p>
-                <button class="rm-btn-primary mt-4 h-9 rounded-lg px-4 text-xs">Configurar Matriz</button>
-            </div>
+            <livewire:admin.personal-institucional.turnos-asignaciones-panel wire:key="horarios-institucionales-panel" />
             
         @elseif($tabActiva === 'documentacion')
             <div class="flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-borde bg-fondo-card/50 px-4 py-14 text-center">
@@ -763,28 +786,28 @@
                     </div>
 
                     <!-- Contenido con Tabs Internos (Alpine.js) -->
-                    <div x-data="{ tabInterna: 'informacion' }" class="flex flex-col md:flex-row flex-1 overflow-hidden bg-fondo-card">
+                    <div x-data="{ tabInterna: @js($modalTabInicial) }" class="flex flex-col md:flex-row flex-1 overflow-hidden bg-fondo-card">
                         <!-- Sidebar de Tabs Internos -->
                         <div class="w-full md:w-64 border-r border-borde bg-white p-4 flex flex-col gap-2 overflow-y-auto">
                             <div class="text-[10px] font-black text-apoyo uppercase tracking-wider mb-2 px-3">Navegación del Perfil</div>
                             
-                            <button @click="tabInterna = 'informacion'" :class="tabInterna === 'informacion' ? 'bg-boton-acento/10 border-boton-acento text-boton-acento' : 'border-transparent text-apoyo hover:bg-fondo-hover hover:text-titulo'" class="flex items-center gap-3 px-4 py-3 rounded-xl border-l-4 font-bold text-sm transition-all text-left group">
+                            <button type="button" @click="tabInterna = 'informacion'" :class="tabInterna === 'informacion' ? 'bg-boton-acento/10 border-boton-acento text-boton-acento' : 'border-transparent text-apoyo hover:bg-fondo-hover hover:text-titulo'" class="flex items-center gap-3 px-4 py-3 rounded-xl border-l-4 font-bold text-sm transition-all text-left group">
                                 <i class="ph-fill ph-identification-card text-lg group-hover:scale-110 transition-transform"></i>
                                 Información Base
                             </button>
                             
-                            <button @click="tabInterna = 'documentacion'" :class="tabInterna === 'documentacion' ? 'bg-boton-acento/10 border-boton-acento text-boton-acento' : 'border-transparent text-apoyo hover:bg-fondo-hover hover:text-titulo'" class="flex items-center justify-between px-4 py-3 rounded-xl border-l-4 font-bold text-sm transition-all text-left group">
+                            <button type="button" @click="tabInterna = 'documentacion'" :class="tabInterna === 'documentacion' ? 'bg-boton-acento/10 border-boton-acento text-boton-acento' : 'border-transparent text-apoyo hover:bg-fondo-hover hover:text-titulo'" class="flex items-center justify-between px-4 py-3 rounded-xl border-l-4 font-bold text-sm transition-all text-left group">
                                 <div class="flex items-center gap-3">
                                     <i class="ph-fill ph-folder-open text-lg group-hover:scale-110 transition-transform"></i>
                                     Documentación
                                 </div>
                             </button>
-                            <button @click="tabInterna = 'horarios'" :class="tabInterna === 'horarios' ? 'bg-boton-acento/10 border-boton-acento text-boton-acento' : 'border-transparent text-apoyo hover:bg-fondo-hover hover:text-titulo'" class="flex items-center gap-3 px-4 py-3 rounded-xl border-l-4 font-bold text-sm transition-all text-left group">
+                            <button type="button" @click="tabInterna = 'horarios'" :class="tabInterna === 'horarios' ? 'bg-boton-acento/10 border-boton-acento text-boton-acento' : 'border-transparent text-apoyo hover:bg-fondo-hover hover:text-titulo'" class="flex items-center gap-3 px-4 py-3 rounded-xl border-l-4 font-bold text-sm transition-all text-left group">
                                 <i class="ph-fill ph-calendar-check text-lg group-hover:scale-110 transition-transform"></i>
                                 Horarios y Turnos
                             </button>
                             <div class="my-2 border-t border-borde"></div>
-                            <button @click="tabInterna = 'reportes'" :class="tabInterna === 'reportes' ? 'bg-boton-acento/10 border-boton-acento text-boton-acento' : 'border-transparent text-apoyo hover:bg-fondo-hover hover:text-titulo'" class="flex items-center gap-3 px-4 py-3 rounded-xl border-l-4 font-bold text-sm transition-all text-left group">
+                            <button type="button" @click="tabInterna = 'reportes'" :class="tabInterna === 'reportes' ? 'bg-boton-acento/10 border-boton-acento text-boton-acento' : 'border-transparent text-apoyo hover:bg-fondo-hover hover:text-titulo'" class="flex items-center gap-3 px-4 py-3 rounded-xl border-l-4 font-bold text-sm transition-all text-left group">
                                 <i class="ph-fill ph-chart-polar text-lg group-hover:scale-110 transition-transform"></i>
                                 Carga Operativa
                             </button>
@@ -804,7 +827,10 @@
 
                             <!-- Tab: Horarios -->
                             <div x-show="tabInterna === 'horarios'" style="display: none;" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0">
-                                <livewire:admin.personal-institucional.partials.personal-institucional-horarios :usuario-id="$usuarioSeleccionadoId" wire:key="horarios-{{ $usuarioSeleccionadoId }}" />
+                                <livewire:admin.personal-institucional.partials.personal-institucional-horarios
+                                    :usuario-id="$usuarioSeleccionadoId"
+                                    :abrir-formulario-inicial="$abrirFormularioHorarioInicial"
+                                    wire:key="horarios-{{ $usuarioSeleccionadoId }}-{{ $abrirFormularioHorarioInicial ? 'nuevo' : 'gestion' }}" />
                             </div>
                             
                             <!-- Tab: Reportes/Carga -->
@@ -822,3 +848,20 @@
         @endif
     @endif
 </div>
+
+@script
+<script>
+    $wire.on('swal', (event) => {
+        const data = event[0] ?? event;
+
+        Swal.fire({
+            icon: data.icon ?? 'info',
+            title: data.title ?? '',
+            text: data.text ?? '',
+            confirmButtonColor: '#3F7D5A',
+            timer: data.icon === 'success' ? 2200 : undefined,
+            timerProgressBar: data.icon === 'success',
+        });
+    });
+</script>
+@endscript

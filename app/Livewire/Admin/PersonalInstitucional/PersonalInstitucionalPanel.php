@@ -2,9 +2,12 @@
 
 namespace App\Livewire\Admin\PersonalInstitucional;
 
-use Livewire\Component;
+use App\Models\AsignacionTurno;
+use App\Models\DocumentoUsuario;
+use App\Models\PersonalAdmin;
+use App\Models\PersonalSalud;
 use App\Models\User;
-use Spatie\Permission\Models\Role;
+use Livewire\Component;
 
 class PersonalInstitucionalPanel extends Component
 {
@@ -20,28 +23,75 @@ class PersonalInstitucionalPanel extends Component
     // Modal state
     public $modalGestionAbierto = false;
     public $usuarioSeleccionadoId = null;
+    public string $modalTabInicial = 'informacion';
+    public bool $abrirFormularioHorarioInicial = false;
 
     protected $listeners = [
         'cerrarModalGestion' => 'cerrarModal',
-        'actualizarTablaPersonal' => '$refresh'
+        'actualizarTablaPersonal' => '$refresh',
+        'asignacionActualizada' => '$refresh',
+        'abrirHorariosPersonal' => 'abrirHorariosPersonal',
+        'personalRegistradoParaHorario' => 'continuarHorariosNuevoPersonal',
     ];
 
     public function abrirModalNuevo()
     {
         $this->usuarioSeleccionadoId = null;
+        $this->modalTabInicial = 'informacion';
+        $this->abrirFormularioHorarioInicial = false;
         $this->modalGestionAbierto = true;
     }
 
     public function abrirModalEdicion($usuarioId)
     {
         $this->usuarioSeleccionadoId = $usuarioId;
+        $this->modalTabInicial = 'informacion';
+        $this->abrirFormularioHorarioInicial = false;
         $this->modalGestionAbierto = true;
+    }
+
+    public function abrirHorariosPersonal(string $usuarioId): void
+    {
+        $usuarioExiste = User::where('cod_usu', $usuarioId)
+            ->where(fn ($query) => $query->has('personalSalud')->orHas('personalAdmin'))
+            ->exists();
+
+        if (!$usuarioExiste) {
+            $this->dispatch('swal', [
+                'icon' => 'warning',
+                'title' => 'Personal no disponible',
+                'text' => 'No se encontró un registro institucional válido para asignar horarios.',
+            ]);
+            return;
+        }
+
+        $this->usuarioSeleccionadoId = $usuarioId;
+        $this->modalTabInicial = 'horarios';
+        $this->abrirFormularioHorarioInicial = false;
+        $this->modalGestionAbierto = true;
+    }
+
+    public function continuarHorariosNuevoPersonal(string $usuarioId): void
+    {
+        $this->abrirHorariosPersonal($usuarioId);
+
+        if ($this->modalGestionAbierto) {
+            $this->abrirFormularioHorarioInicial = true;
+        }
+    }
+
+    public function abrirModuloHorarios(): void
+    {
+        $this->cerrarModal();
+        $this->tabActiva = 'horarios';
     }
 
     public function cerrarModal()
     {
         $this->modalGestionAbierto = false;
         $this->usuarioSeleccionadoId = null;
+        $this->modalTabInicial = 'informacion';
+        $this->abrirFormularioHorarioInicial = false;
     }
     
     public function toggleEstado($usuarioId)
@@ -55,6 +105,7 @@ class PersonalInstitucionalPanel extends Component
             }
             $usuario->save();
             $this->dispatch('swal', ['icon' => 'success', 'title' => 'Estado actualizado']);
+            $this->dispatch('actualizarTablaPersonal');
         }
     }
     
@@ -65,12 +116,24 @@ class PersonalInstitucionalPanel extends Component
 
     public function render()
     {
-        $query = User::with(['personalSalud', 'personalAdmin', 'areaInstitucional', 'roles'])
+        $query = User::with([
+                'personalSalud.especialidad',
+                'personalAdmin',
+                'areaInstitucional',
+                'roles',
+                'asignacionesTurno.turno',
+            ])
+            ->withCount([
+                'documentos as documentos_pendientes_count' => fn ($query) => $query->where('estado', 'PENDIENTE'),
+            ])
             ->where(function($q) {
                 $q->where('nombres', 'ilike', '%' . $this->busqueda . '%')
                   ->orWhere('ap_paterno', 'ilike', '%' . $this->busqueda . '%')
                   ->orWhere('correo', 'ilike', '%' . $this->busqueda . '%')
                   ->orWhere('cod_usu', 'ilike', '%' . $this->busqueda . '%');
+            })
+            ->where(function($q) {
+                $q->has('personalSalud')->orHas('personalAdmin');
             });
 
         if ($this->tabActiva === 'salud') {
@@ -103,84 +166,94 @@ class PersonalInstitucionalPanel extends Component
 
         if ($this->filtroDisponibilidad === 'ocupado') {
             $query->whereHas('asignacionesTurno', function($q) {
-                $q->where('estado', 'ACTIVO');
+                $q->where('estado', 'ACTIVA');
             });
         } elseif ($this->filtroDisponibilidad === 'libre') {
             $query->whereDoesntHave('asignacionesTurno', function($q) {
-                $q->where('estado', 'ACTIVO');
+                $q->where('estado', 'ACTIVA');
             });
         }
 
-        $usuarios = $query->orderBy('created_at', 'desc')->get();
+        $usuarios = in_array($this->tabActiva, ['resumen', 'salud', 'admin'], true)
+            ? $query->orderBy('created_at', 'desc')->get()
+            : collect();
 
-        $estadisticas = [
-            'total' => User::count(),
-            'activos' => User::where('estado', 'ACTIVO')->orWhere('estado', 1)->count(),
-            'salud' => \App\Models\PersonalSalud::count(),
-            'admin' => \App\Models\PersonalAdmin::count(),
-            'medicos' => \App\Models\PersonalSalud::where('tipo_personal_salud', 'MEDICO')->count(),
-            'enfermeros' => \App\Models\PersonalSalud::where('tipo_personal_salud', 'ENFERMERO')->count(),
-            'psicologos' => \App\Models\PersonalSalud::where('tipo_personal_salud', 'PSICOLOGO')->count(),
-            'fisioterapeutas' => \App\Models\PersonalSalud::where('tipo_personal_salud', 'FISIOTERAPEUTA')->count(),
-            'nutricionistas' => \App\Models\PersonalSalud::where('tipo_personal_salud', 'NUTRICIONISTA')->count(),
-            'suspendidos' => User::where('estado', 'SUSPENDIDO')->count(),
-            // Mocking active/inactive shift stats for visual completeness
-            'en_turno' => rand(3, 12),
-            'fuera_turno' => rand(10, 30),
-            'doc_pendiente' => \App\Models\DocumentoUsuario::where('estado', 'PENDIENTE')->count(),
-        ];
+        $estadisticas = [];
+        $chartData = [];
 
-        // Gráfica 3: Enfermeros por turno (Real)
-        $turnosQuery = \App\Models\AsignacionTurno::whereHas('usuario.personalSalud', function($q) {
-            $q->where('tipo_personal_salud', 'ENFERMERO');
-        })->with('turno')->get();
-        
-        $turnosGrouped = $turnosQuery->groupBy(function($asignacion) {
-            return $asignacion->turno ? $asignacion->turno->nombre : 'Sin Turno';
-        });
+        if ($this->tabActiva === 'resumen') {
+            $baseInstitucional = User::where(function($q) {
+                $q->has('personalSalud')->orHas('personalAdmin');
+            });
 
-        // Gráfica 4: Documentación pendiente por tipo (Real)
-        $docsPendientesQuery = \App\Models\DocumentoUsuario::where('estado', 'PENDIENTE')->get();
-        $docsGrouped = $docsPendientesQuery->groupBy(function($doc) {
-            return $doc->tipo_documento ?: 'Sin clasificar';
-        });
+            $totalUsuarios = (clone $baseInstitucional)->count();
+            $totalActivos = (clone $baseInstitucional)->where(function($q){ $q->where('estado', 'ACTIVO')->orWhere('estado', 1); })->count();
+            $totalInactivos = (clone $baseInstitucional)->where(function($q){ $q->where('estado', 'INACTIVO')->orWhere('estado', 0); })->count();
+            $totalSuspendidos = (clone $baseInstitucional)->where('estado', 'SUSPENDIDO')->count();
+            $totalRetirados = (clone $baseInstitucional)->where('estado', 'RETIRADO')->count();
+            $totalSalud = PersonalSalud::count();
+            $totalAdmin = PersonalAdmin::count();
+            $totalDocsPendientes = DocumentoUsuario::where('estado', 'PENDIENTE')->whereIn('cod_usu', (clone $baseInstitucional)->select('cod_usu'))->count();
+            $totalEnTurno = min(
+                $totalActivos,
+                AsignacionTurno::whereIn('estado', ['ACTIVO', 'ACTIVA'])
+                    ->distinct('cod_usu')
+                    ->count('cod_usu')
+            );
+            $totalFueraTurno = max(0, $totalActivos - $totalEnTurno);
 
-        // Gráfica 5: Disponibilidad (Real/Estimado)
-        $dispActivos = User::where('estado', 'ACTIVO')->orWhere('estado', 1)->count();
-        $dispAsignados = \App\Models\AsignacionTurno::where('estado', 'ACTIVO')->distinct('cod_usu')->count('cod_usu');
-        $dispInactivos = User::whereIn('estado', ['INACTIVO', 'SUSPENDIDO'])->orWhere('estado', 0)->count();
+            $estadisticas = [
+                'total' => $totalUsuarios,
+                'activos' => $totalActivos,
+                'salud' => $totalSalud,
+                'admin' => $totalAdmin,
+                'medicos' => PersonalSalud::where('tipo_personal_salud', 'MEDICO')->count(),
+                'enfermeros' => PersonalSalud::where('tipo_personal_salud', 'ENFERMERO')->count(),
+                'psicologos' => PersonalSalud::where('tipo_personal_salud', 'PSICOLOGO')->count(),
+                'fisioterapeutas' => PersonalSalud::where('tipo_personal_salud', 'FISIOTERAPEUTA')->count(),
+                'nutricionistas' => PersonalSalud::where('tipo_personal_salud', 'NUTRICIONISTA')->count(),
+                'suspendidos' => $totalSuspendidos,
+                'en_turno' => $totalEnTurno,
+                'fuera_turno' => $totalFueraTurno,
+                'doc_pendiente' => $totalDocsPendientes,
+            ];
 
-        // Chart Data Final
-        $chartData = [
-            // 1. Distribución por áreas
-            'area_labels' => ['Salud', 'Administrativo', 'Otros'],
-            'area_data' => [
-                \App\Models\PersonalSalud::count(),
-                \App\Models\PersonalAdmin::count(),
-                User::doesntHave('personalSalud')->doesntHave('personalAdmin')->count(),
-            ],
-            // 2. Estado Laboral
-            'estado_labels' => ['Activo', 'Inactivo', 'Suspendido', 'Retirado'],
-            'estado_data' => [
-                User::where('estado', 'ACTIVO')->orWhere('estado', 1)->count(),
-                User::where('estado', 'INACTIVO')->orWhere('estado', 0)->count(),
-                User::where('estado', 'SUSPENDIDO')->count(),
-                User::where('estado', 'RETIRADO')->count(),
-            ],
-            // 3. Enfermeros por Turno
-            'turno_labels' => $turnosGrouped->keys()->toArray(),
-            'turno_data' => $turnosGrouped->map->count()->values()->toArray(),
-            // 4. Docs Pendientes
-            'docs_labels' => $docsGrouped->keys()->toArray(),
-            'docs_data' => $docsGrouped->map->count()->values()->toArray(),
-            // 5. Disponibilidad
-            'disp_labels' => ['Disponible', 'En Turno', 'No Disponible'],
-            'disp_data' => [
-                max(0, $dispActivos - $dispAsignados),
-                $dispAsignados,
-                $dispInactivos
-            ]
-        ];
+            $turnosGrouped = AsignacionTurno::whereHas('usuario.personalSalud', function($query) {
+                    $query->where('tipo_personal_salud', 'ENFERMERO');
+                })
+                ->with('turno')
+                ->get()
+                ->groupBy(fn ($asignacion) => $asignacion->turno?->nombre ?? 'Sin Turno');
+
+            $docsGrouped = DocumentoUsuario::where('estado', 'PENDIENTE')
+                ->get()
+                ->groupBy(fn ($documento) => $documento->tipo_documento ?: 'Sin clasificar');
+
+            $chartData = [
+                'area_labels' => ['Salud', 'Administrativo'],
+                'area_data' => [
+                    $totalSalud,
+                    $totalAdmin,
+                ],
+                'estado_labels' => ['Activo', 'Inactivo', 'Suspendido', 'Retirado'],
+                'estado_data' => [
+                    $totalActivos,
+                    $totalInactivos,
+                    $totalSuspendidos,
+                    $totalRetirados,
+                ],
+                'turno_labels' => $turnosGrouped->keys()->toArray(),
+                'turno_data' => $turnosGrouped->map->count()->values()->toArray(),
+                'docs_labels' => $docsGrouped->keys()->toArray(),
+                'docs_data' => $docsGrouped->map->count()->values()->toArray(),
+                'disp_labels' => ['Disponible', 'En Turno', 'No Disponible'],
+                'disp_data' => [
+                    $totalFueraTurno,
+                    $totalEnTurno,
+                    $totalInactivos + $totalSuspendidos,
+                ],
+            ];
+        }
 
         return view('livewire.admin.personal-institucional.personal-institucional-panel', [
             'usuarios' => $usuarios,

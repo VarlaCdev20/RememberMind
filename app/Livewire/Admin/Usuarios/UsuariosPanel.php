@@ -1756,7 +1756,7 @@ class UsuariosPanel extends Component
                 $userData['estado'] = 'ACTIVO';
                 $userData['acceso_sistema'] = 'HABILITADO';
                 $passwordTemporal = $this->passwordTemporalVisual ?: $this->generarPasswordTemporal();
-                $userData['password'] = Hash::make($passwordTemporal);
+                $userData['password'] = $passwordTemporal;
                 $userData['debe_cambiar_password'] = true;
 
                 $usuario = User::create($userData);

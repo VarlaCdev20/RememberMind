@@ -179,7 +179,7 @@
                                     <label class="block text-xs font-bold text-apoyo uppercase tracking-wider mb-0.5">Contraseña Temporal Autogenerada</label>
                                     <div class="flex items-center gap-2">
                                         <div class="flex-1 relative">
-                                            <input :type="visible ? 'text' : 'password'" wire:model="contrasena_temporal" class="w-full rounded-xl border-input-borde bg-input-bg text-xs py-1.5 font-mono pr-10 cursor-not-allowed opacity-80" readonly>
+                                            <input :type="visible ? 'text' : 'password'" value="{{ $contrasena_temporal }}" class="w-full rounded-xl border-input-borde bg-input-bg text-xs py-1.5 font-mono pr-10 cursor-not-allowed opacity-80" readonly>
                                             <button type="button" @click="visible = !visible" class="absolute right-2 top-1/2 -translate-y-1/2 text-apoyo hover:text-titulo">
                                                 <i class="ph-bold" :class="visible ? 'ph-eye-slash' : 'ph-eye'"></i>
                                             </button>
@@ -1159,18 +1159,23 @@
         const data = e[0];
         Swal.fire({
             title: '¡Registro Exitoso!',
-            html: data.html + "<div class='mt-4 p-3 bg-estado-advertenciaBg text-estado-advertencia text-xs rounded-lg border border-estado-advertenciaBorde'><i class='ph-bold ph-warning-circle'></i> <b>IMPORTANTE:</b> Copie esta contraseña temporal. Por seguridad, no volverá a mostrarse en el sistema.</div>",
+            html: data.html + "<div class='mt-4 p-3 bg-estado-advertenciaBg text-estado-advertencia text-xs rounded-lg border border-estado-advertenciaBorde'><i class='ph-bold ph-warning-circle'></i> <b>IMPORTANTE:</b> Copie esta contraseña temporal. Por seguridad, no volverá a mostrarse en el sistema.</div><div class='mt-3 p-3 bg-boton-acento/10 text-boton-acento text-xs rounded-lg border border-boton-acento/30'><i class='ph-bold ph-calendar-plus'></i> El siguiente paso recomendado es asignar el horario institucional.</div>",
             icon: 'success',
-            confirmButtonText: '<i class="ph-bold ph-check"></i> Entendido, credenciales copiadas',
+            showCancelButton: true,
+            confirmButtonText: '<i class="ph-bold ph-calendar-plus"></i> Continuar a horarios',
+            cancelButtonText: 'Volver al listado',
             confirmButtonColor: '#3F7D5A',
+            cancelButtonColor: '#78716C',
             allowOutsideClick: false,
             allowEscapeKey: false,
             width: '600px'
         }).then((result) => {
             if (result.isConfirmed) {
-                // Un solo dispatch: cerrarModal() re-renderiza el panel (actualiza tabla automáticamente)
+                $wire.dispatch('personalRegistradoParaHorario', { usuarioId: data.usuarioId });
+            } else {
                 $wire.dispatch('cerrarModalGestion');
             }
+            $wire.dispatch('actualizarTablaPersonal');
         });
     });
 
@@ -1204,11 +1209,6 @@
         });
     });
 
-    $wire.on('abrirPdfGenerado', (e) => {
-        const data = e[0] ?? e;
-        if (data && data.url) {
-            window.open(data.url, '_blank');
-        }
-    });
+
 </script>
 @endscript

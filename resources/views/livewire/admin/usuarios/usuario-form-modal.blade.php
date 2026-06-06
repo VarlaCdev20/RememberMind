@@ -74,9 +74,11 @@
 
  <div class="md:col-span-2 pt-2 border-t border-borde-suave mt-2">
  <p class="text-xs font-bold text-parrafo mb-3"><i class="ph-bold ph-lock-key mr-1"></i> Seguridad</p>
+ 
+ @if(!$isEdit)
  <div class="grid gap-4 md:grid-cols-2">
  <div>
- <label class="mb-1 block text-[11px] font-bold uppercase tracking-widest text-apoyo">Contraseña {{ $isEdit ? '(Opcional)' : '*' }}</label>
+ <label class="mb-1 block text-[11px] font-bold uppercase tracking-widest text-apoyo">Contraseña *</label>
  <input type="password" wire:model="password"
  class="w-full rounded-xl border {{ $errors->has('password') ? 'border-borde-focus ring-4 ring-[#E27D60]/10 bg-estado-peligroBg' : 'border-borde bg-fondo-panel' }} px-3.5 py-2.5 text-sm font-bold text-parrafo outline-none transition focus:border-borde-focus focus:bg-fondo-app focus:ring-4 focus:ring-[#E27D60]/10">
  @error('password') <span class="mt-1 text-xs font-bold text-boton-acento">{{ $message }}</span> @enderror
@@ -89,6 +91,80 @@
  @error('password_confirmation') <span class="mt-1 text-xs font-bold text-boton-acento">{{ $message }}</span> @enderror
  </div>
  </div>
+ @else
+ @if(!$showPasswordSection)
+ <button type="button" wire:click="togglePasswordSection"
+ class="inline-flex items-center justify-center gap-2 rounded-xl border border-borde bg-white px-4 py-2 text-xs font-bold text-texto transition hover:bg-fondo hover:text-titulo active:scale-95">
+ <i class="ph-bold ph-key"></i> Actualizar contraseña
+ </button>
+ @else
+ <div class="rounded-xl border border-borde bg-fondo p-4">
+ <div class="flex items-center justify-between mb-3">
+ <h4 class="text-xs font-bold text-titulo">Actualizar contraseña del usuario</h4>
+ <button type="button" wire:click="generarPasswordTemporal"
+ class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-estado-infoBg px-3 py-1.5 text-[10px] font-bold text-estado-info transition hover:bg-estado-info hover:text-white">
+ <i class="ph-bold ph-magic-wand"></i> Generar contraseña temporal
+ </button>
+ </div>
+ 
+ @if($temp_password_generated)
+ <div class="mb-4 rounded-lg bg-estado-exitoBg p-3 border border-estado-exito/30 flex items-center justify-between">
+ <div>
+ <span class="block text-[10px] font-bold text-estado-exito uppercase tracking-wider">Contraseña generada</span>
+ <span class="font-mono text-sm font-bold text-titulo">{{ $temp_password_generated }}</span>
+ </div>
+ <p class="text-[10px] text-estado-exito/80 font-medium max-w-[150px] leading-tight">Copia esta contraseña, no se mostrará de nuevo.</p>
+ </div>
+ @endif
+
+ <div class="grid gap-4 md:grid-cols-2 mb-4">
+ <div>
+ <label class="mb-1 block text-[11px] font-bold uppercase tracking-widest text-apoyo">Nueva Contraseña</label>
+ <input type="password" wire:model="new_password"
+ class="w-full rounded-xl border {{ $errors->has('new_password') ? 'border-estado-peligro ring-4 ring-estado-peligroBg' : 'border-borde' }} bg-white px-3.5 py-2 text-sm font-bold text-parrafo outline-none transition focus:border-borde-focus">
+ @error('new_password') <span class="mt-1 text-[10px] font-bold text-estado-peligro">{{ $message }}</span> @enderror
+ </div>
+ <div>
+ <label class="mb-1 block text-[11px] font-bold uppercase tracking-widest text-apoyo">Confirmar Nueva Contraseña</label>
+ <input type="password" wire:model="new_password_confirmation"
+ class="w-full rounded-xl border {{ $errors->has('new_password_confirmation') ? 'border-estado-peligro ring-4 ring-estado-peligroBg' : 'border-borde' }} bg-white px-3.5 py-2 text-sm font-bold text-parrafo outline-none transition focus:border-borde-focus">
+ @error('new_password_confirmation') <span class="mt-1 text-[10px] font-bold text-estado-peligro">{{ $message }}</span> @enderror
+ </div>
+ </div>
+
+ <label class="flex items-center gap-2 mb-4 cursor-pointer">
+ <input type="checkbox" wire:model="forzar_cambio" class="rounded border-borde text-boton-acento focus:ring-boton-acento">
+ <span class="text-xs font-medium text-parrafo">Forzar cambio de contraseña al iniciar sesión</span>
+ </label>
+
+ <div class="flex items-center justify-end gap-2">
+ <button type="button" wire:click="togglePasswordSection"
+ class="px-3 py-1.5 text-xs font-bold text-apoyo hover:text-titulo transition">
+ Cancelar
+ </button>
+ <button type="button"
+ x-data
+ @click="Swal.fire({
+ title: '¿Deseas actualizar la contraseña de este usuario?',
+ icon: 'warning',
+ showCancelButton: true,
+ confirmButtonColor: '#E9A05F',
+ cancelButtonColor: '#9BA3AF',
+ confirmButtonText: 'Sí, actualizar',
+ cancelButtonText: 'Cancelar'
+ }).then((result) => {
+ if (result.isConfirmed) {
+ $wire.actualizarPassword()
+ }
+ })"
+ class="inline-flex items-center justify-center gap-2 rounded-lg bg-boton-acento px-4 py-1.5 text-xs font-bold text-inverso shadow-sm transition hover:-translate-y-0.5 active:scale-95">
+ <span wire:loading.remove wire:target="actualizarPassword"><i class="ph-bold ph-key"></i> Guardar contraseña</span>
+ <span wire:loading wire:target="actualizarPassword"><i class="ph-bold ph-spinner animate-spin"></i> Guardando...</span>
+ </button>
+ </div>
+ </div>
+ @endif
+ @endif
  </div>
  </div>
 
