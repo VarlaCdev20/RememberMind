@@ -15,7 +15,7 @@ class DashboardMedico extends Component
     {
         // En un caso real, esto se llamaría en mount o render.
         // Validar que es medico o super-admin (o manejar por middleware route)
-        if (!auth()->user()->hasRole(['Super-Admin', 'MÉDICO', 'MEDICO'])) {
+        if (!auth()->user()->hasRole(['SUPERADMINISTRADOR', 'MEDICO GENERAL/GERIATRA'])) {
             abort(403, 'Acceso denegado. Solo personal médico autorizado.');
         }
     }

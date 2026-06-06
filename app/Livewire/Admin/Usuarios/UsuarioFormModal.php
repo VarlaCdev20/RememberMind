@@ -109,8 +109,8 @@ class UsuarioFormModal extends Component
             $usuario = User::findOrFail($this->cod_usu);
             
             // Proteger último admin
-            if ($usuario->hasRole('admin') && $this->rol !== 'admin') {
-                $superadmins = User::role('admin')->where('estado', 'ACTIVO')->count();
+            if ($usuario->hasRole('SUPERADMINISTRADOR') && $this->rol !== 'SUPERADMINISTRADOR') {
+                $superadmins = User::role('SUPERADMINISTRADOR')->where('estado', 'ACTIVO')->count();
                 if ($superadmins <= 1) {
                     $this->addError('rol', 'No puedes quitar el rol de superadministrador al único superadministrador activo.');
                     return;

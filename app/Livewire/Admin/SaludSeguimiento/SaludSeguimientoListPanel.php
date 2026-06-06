@@ -55,7 +55,7 @@ class SaludSeguimientoListPanel extends Component
     protected function validarPermisoSeccion()
     {
         $user = auth()->user();
-        if ($user->hasRole(['Super-Admin', 'SUPERADMINISTRADOR'])) return;
+        if ($user->hasRole('SUPERADMINISTRADOR')) return;
 
         $permitido = match($this->seccionActiva) {
             'ficha' => $user->can('salud.ficha.ver') || $user->can('ficha_medica.crear'),

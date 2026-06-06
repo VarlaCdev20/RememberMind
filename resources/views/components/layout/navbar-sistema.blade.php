@@ -13,7 +13,7 @@
  <i class="ph-bold ph-list text-lg"></i>
  </button>
 
- <img src="{{ asset('storage/images/LOGO.png') }}"
+ <img src="{{ asset('storage/imagenes/LOGO.png') }}"
  alt="CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS"
  class="hidden sm:block h-9 w-auto object-contain shrink-0">
 

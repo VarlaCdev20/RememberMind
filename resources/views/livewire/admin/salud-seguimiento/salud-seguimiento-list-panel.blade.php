@@ -78,7 +78,7 @@
  ];
  
  $tabs = array_filter($tabsRaw, function($tab) {
-     if (auth()->user()->hasRole(['Super-Admin', 'SUPERADMINISTRADOR'])) return true;
+     if (auth()->user()->hasRole('SUPERADMINISTRADOR')) return true;
      
      $hasPerm = auth()->user()->can($tab['permission']);
      if (isset($tab['fallback_permission']) && !$hasPerm) {

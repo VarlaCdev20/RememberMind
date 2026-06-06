@@ -121,7 +121,7 @@ class PreadmisionesPanel extends Component
             $enTurno = rand(0, 1) == 1; // dummy para UI
             
             // Cantidad de valoraciones pendientes
-            $pendientes = \App\Models\AsignacionTurnoAdulto::where('cod_usu_enfermero', $user->id ?? $user->cod_usu)
+            $pendientes = \App\Models\AsignacionTurnoAdulto::where('cod_usu_enfermero', $user->cod_usu)
                 ->where('motivo_asignacion', 'VALORACION INICIAL')
                 ->where('estado', 'ACTIVA')
                 ->whereHas('adultoMayor', function($q) {
@@ -131,7 +131,7 @@ class PreadmisionesPanel extends Component
                 })->count();
 
             return [
-                'id' => $user->id ?? $user->cod_usu,
+                'id' => $user->cod_usu,
                 'nombre' => $user->nombres . ' ' . $user->apellidos,
                 'tipo' => 'Enfermero General',
                 'turno_actual' => $enTurno ? $turnoActual : 'FUERA DE TURNO',
@@ -570,7 +570,7 @@ class PreadmisionesPanel extends Component
 
     public function seleccionarEnfermero($id, $enTurno)
     {
-        if (!$enTurno && !auth()->user()->hasRole('Super-Admin')) {
+        if (!$enTurno && !auth()->user()->hasRole('SUPERADMINISTRADOR')) {
             $this->dispatch('swal', [
                 'title' => 'Asignación Restringida',
                 'text' => 'Este enfermero está fuera de turno. Solo un Super-Admin puede forzar esta asignación para valoración inicial.',
@@ -687,7 +687,7 @@ class PreadmisionesPanel extends Component
                 'cod_est_adul' => $estadoModel->cod_est_adul,
                 'fecha_cambio' => now(),
                 'observaciones' => 'Ingreso por Preadmisión (' . $this->tipo_ingreso . ')',
-                'cod_usu' => auth()->user()->id ?? auth()->user()->cod_usu,
+                'cod_usu' => auth()->user()->cod_usu,
             ]);
 
             // Guardar Documentos (Iniciales y Autogenerados)
@@ -699,8 +699,8 @@ class PreadmisionesPanel extends Component
 
                 \App\Models\AsignacionTurnoAdulto::create([
                     'cod_am' => $adulto->cod_am,
-                    'cod_usu_enfermero' => $enfermero->cod_usu ?? $enfermero->id,
-                    'cod_turno' => $turnoDefault ? ($turnoDefault->cod_turno ?? $turnoDefault->id) : 1,
+                    'cod_usu_enfermero' => $enfermero->cod_usu,
+                    'cod_turno' => $turnoDefault ? $turnoDefault->cod_turno : 1,
                     'fecha_inicio' => now()->toDateString(),
                     'motivo_asignacion' => 'VALORACION INICIAL',
                     'estado' => 'ACTIVA'
@@ -741,9 +741,11 @@ class PreadmisionesPanel extends Component
                 // Si es familia se podría enlazar, pero DocumentoAdultoMayor vincula al AM
                 \App\Models\DocumentoAdultoMayor::create([
                     'cod_am' => $cod_am,
-                    'tipo_documento' => substr($tipoDoc, 0, 100),
+                    'tipo_doc' => substr($tipoDoc, 0, 100),
                     'ruta_archivo' => $path,
-                    'fecha_subida' => now()->toDateString(),
+                    'nom_doc' => $doc['nombre_original'] ?? 'Documento ' . $tipoDoc,
+                    'extension' => $doc['is_pdf'] ? 'pdf' : 'img',
+                    'fecha_doc' => now()->toDateString(),
                     'observaciones' => $doc['observacion'] ?? 'Subido en Preadmisión'
                 ]);
             }
@@ -754,9 +756,11 @@ class PreadmisionesPanel extends Component
             if ($docDef['plazo_48h'] && !isset($this->documentos_subidos[$key])) {
                 \App\Models\DocumentoAdultoMayor::create([
                     'cod_am' => $cod_am,
-                    'tipo_documento' => substr(strtoupper($key), 0, 100),
+                    'tipo_doc' => substr(strtoupper($key), 0, 100),
                     'ruta_archivo' => 'PENDIENTE_48H',
-                    'fecha_subida' => now()->toDateString(),
+                    'nom_doc' => 'Documento Pendiente',
+                    'extension' => 'N/A',
+                    'fecha_doc' => now()->toDateString(),
                     'observaciones' => 'Pendiente plazo 48h'
                 ]);
             }
@@ -768,9 +772,11 @@ class PreadmisionesPanel extends Component
                 $path = $doc['file']->store('documentos_institucionales', 'public');
                 \App\Models\DocumentoAdultoMayor::create([
                     'cod_am' => $cod_am,
-                    'tipo_documento' => substr(strtoupper($key), 0, 100),
+                    'tipo_doc' => substr(strtoupper($key), 0, 100),
                     'ruta_archivo' => $path,
-                    'fecha_subida' => now()->toDateString(),
+                    'nom_doc' => $doc['nombre_original'] ?? 'Documento Institucional',
+                    'extension' => 'pdf',
+                    'fecha_doc' => now()->toDateString(),
                     'observaciones' => 'Documento Institucional Firmado'
                 ]);
             }
@@ -860,7 +866,7 @@ class PreadmisionesPanel extends Component
 
     public function exportarReportePdf()
     {
-        if (!auth()->user()->can('admisiones.ver_dashboard') && !auth()->user()->hasRole('Super-Admin')) {
+        if (!auth()->user()->can('admisiones.ver_dashboard') && !auth()->user()->hasRole('SUPERADMINISTRADOR')) {
             abort(403);
         }
 

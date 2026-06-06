@@ -152,23 +152,35 @@ class PreadmisionWizard extends Component
             $path_adulto = $this->doc_ci_adulto->store('documentos/' . $adulto->cod_am, 'public');
             DocumentoAdultoMayor::create([
                 'cod_am' => $adulto->cod_am,
-                'tipo_documento' => 'CI Adulto Mayor',
-                'archivo_url' => $path_adulto,
+                'tipo_doc' => 'CI_ADULTO_MAYOR',
+                'ruta_archivo' => $path_adulto,
+                'nom_doc' => 'CI Adulto Mayor',
+                'extension' => $this->doc_ci_adulto->getClientOriginalExtension() ?: 'pdf',
+                'fecha_doc' => now()->toDateString(),
+                'observaciones' => 'Subido en Wizard Preadmisión'
             ]);
 
             $path_familiar = $this->doc_ci_familiar->store('documentos/' . $adulto->cod_am, 'public');
             DocumentoAdultoMayor::create([
                 'cod_am' => $adulto->cod_am,
-                'tipo_documento' => 'CI Familiar Responsable',
-                'archivo_url' => $path_familiar,
+                'tipo_doc' => 'CI_FAMILIAR',
+                'ruta_archivo' => $path_familiar,
+                'nom_doc' => 'CI Familiar Responsable',
+                'extension' => $this->doc_ci_familiar->getClientOriginalExtension() ?: 'pdf',
+                'fecha_doc' => now()->toDateString(),
+                'observaciones' => 'Subido en Wizard Preadmisión'
             ]);
 
             if ($this->doc_croquis) {
                 $path_croquis = $this->doc_croquis->store('documentos/' . $adulto->cod_am, 'public');
                 DocumentoAdultoMayor::create([
                     'cod_am' => $adulto->cod_am,
-                    'tipo_documento' => 'Croquis Domicilio',
-                    'archivo_url' => $path_croquis,
+                    'tipo_doc' => 'CROQUIS',
+                    'ruta_archivo' => $path_croquis,
+                    'nom_doc' => 'Croquis Domicilio',
+                    'extension' => $this->doc_croquis->getClientOriginalExtension() ?: 'pdf',
+                    'fecha_doc' => now()->toDateString(),
+                    'observaciones' => 'Subido en Wizard Preadmisión'
                 ]);
             }
 
@@ -179,8 +191,8 @@ class PreadmisionWizard extends Component
 
             AsignacionTurnoAdulto::create([
                 'cod_am' => $adulto->cod_am,
-                'cod_usu_enfermero' => $enfermero->cod_usu ?? $enfermero->id,
-                'cod_turno' => $turnoDefault ? ($turnoDefault->cod_turno ?? $turnoDefault->id) : 1,
+                'cod_usu_enfermero' => $enfermero->cod_usu,
+                'cod_turno' => $turnoDefault ? $turnoDefault->cod_turno : 1,
                 'cod_habitacion' => null, // Default provisorio
                 'cod_cama' => null, // Default provisorio
                 'fecha_inicio' => now()->toDateString(),
@@ -201,7 +213,7 @@ class PreadmisionWizard extends Component
                 'icon' => 'success'
             ]);
 
-            return redirect()->route('admin.admisiones.index');
+            return redirect()->route('admin.admisiones.preadmisiones');
 
         } catch (\Exception $e) {
             DB::rollBack();

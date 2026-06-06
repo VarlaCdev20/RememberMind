@@ -14,7 +14,7 @@
                 </p>
             </div>
 
-            <a href="{{ route('admin.admisiones.index') }}" class="rm-btn-secondary">
+            <a href="{{ route('admin.admisiones.preadmisiones') }}" class="rm-btn-secondary">
                 <i class="ph-bold ph-arrow-left"></i>
                 Volver
             </a>

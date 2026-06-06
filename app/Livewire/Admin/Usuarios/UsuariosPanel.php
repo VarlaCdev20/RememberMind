@@ -1739,8 +1739,8 @@ class UsuariosPanel extends Component
                     unset($userData['password']);
                 }
 
-                if ($usuario->hasRole('admin') && $this->rol !== 'admin') {
-                    $superadmins = User::role('admin')->where('estado', 'ACTIVO')->count();
+                if ($usuario->hasRole('SUPERADMINISTRADOR') && $this->rol !== 'SUPERADMINISTRADOR') {
+                    $superadmins = User::role('SUPERADMINISTRADOR')->where('estado', 'ACTIVO')->count();
                     if ($superadmins <= 1) {
                         throw new \Exception('No puedes quitar el rol de superadministrador al único superadministrador activo.');
                     }
@@ -2101,8 +2101,8 @@ class UsuariosPanel extends Component
         }
 
         // Proteger último admin
-        if ($usuario->estado === 'ACTIVO' && $usuario->hasRole('admin')) {
-            $superadmins = User::role('admin')->where('estado', 'ACTIVO')->count();
+        if ($usuario->estado === 'ACTIVO' && $usuario->hasRole('SUPERADMINISTRADOR')) {
+            $superadmins = User::role('SUPERADMINISTRADOR')->where('estado', 'ACTIVO')->count();
             if ($superadmins <= 1) {
                 $this->dispatch('swal', [
                     'icon' => 'error',

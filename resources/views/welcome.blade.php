@@ -156,7 +156,7 @@
             <div class="flex justify-between items-center w-full">
                 {{-- Logo Institucional --}}
                 <div class="flex-shrink-0 flex items-center gap-2.5 group cursor-pointer z-[60]">
-                    <img src="{{ asset('storage/images/LOGO.png') }}"
+                    <img src="{{ asset('storage/imagenes/LOGO.png') }}"
                          alt="CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS"
                          class="h-9 w-auto object-contain transition-transform duration-500 group-hover:scale-105">
                     <a href="#" class="hidden max-w-[210px] font-outfit text-[11px] font-extrabold uppercase leading-[1.05] tracking-wide text-[var(--welcome-titulo)] transition-colors group-hover:text-[var(--welcome-texto)] sm:block">CENTRO GERIÁTRICO<br>JARDÍN DE LOS RECUERDOS</a>
@@ -236,7 +236,7 @@
              
             <div class="p-5 flex justify-between items-center border-b border-[var(--welcome-card-border)]">
                 <div class="flex items-center gap-3">
-                    <img src="{{ asset('storage/images/LOGO.png') }}"
+                    <img src="{{ asset('storage/imagenes/LOGO.png') }}"
                          alt="CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS"
                          class="h-10 w-auto object-contain">
                     <div class="leading-tight">
@@ -310,7 +310,7 @@
 
                 {{-- Logo institucional hero --}}
                 <div class="mb-5 md:mb-7" data-aos="fade-down" data-aos-delay="-50">
-                    <img src="{{ asset('storage/images/LOGO.png') }}"
+                    <img src="{{ asset('storage/imagenes/LOGO.png') }}"
                          alt="CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS"
                          class="h-20 w-auto object-contain drop-shadow-lg mx-auto">
                 </div>
@@ -614,7 +614,7 @@
                 
                 <div class="sm:col-span-2" data-aos="fade-up">
                     <div class="flex items-center gap-3 mb-6 group cursor-pointer w-fit">
-                        <img src="{{ asset('storage/images/LOGO.png') }}"
+                        <img src="{{ asset('storage/imagenes/LOGO.png') }}"
                              alt="CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS"
                              class="h-12 w-auto object-contain transition-transform duration-500 group-hover:scale-105">
                         <h2 class="font-outfit text-xl font-extrabold tracking-tight text-[var(--welcome-titulo)] group-hover:text-[var(--welcome-texto)] transition-colors leading-tight">CENTRO GERIÁTRICO<br>JARDÍN DE LOS RECUERDOS</h2>

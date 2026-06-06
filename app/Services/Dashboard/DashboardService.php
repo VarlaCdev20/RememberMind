@@ -16,8 +16,8 @@ class DashboardService
         $claveCache = 'dashboard_' . $usuario->cod_usu;
 
         return Cache::remember($claveCache, 60, function () use ($usuario) {
-            $esAdmin = $usuario->hasRole('admin');
-            $esSalud = $usuario->hasRole('personal_salud');
+            $esAdmin = $usuario->hasRole(['SUPERADMINISTRADOR', 'ADMINISTRADOR']);
+            $esSalud = $usuario->hasRole(['ENFERMEROS', 'MEDICO GENERAL/GERIATRA']);
 
             return [
                 // ── NUEVAS CLAVES — FASE 3A ───────────────────────────────
@@ -65,11 +65,16 @@ class DashboardService
             : ($usuario->name ?? $usuario->correo ?? 'Usuario del sistema');
 
         $rolesLegibles = [
-            'admin'          => 'Superadministrador',
-            'personal_salud' => 'Personal de Salud',
-            'personal_admin' => 'Personal Administrativo',
-            'voluntario'     => 'Voluntario',
-            'familiar'       => 'Familiar',
+            'SUPERADMINISTRADOR'      => 'Superadministrador',
+            'ADMINISTRADOR'           => 'Administrador',
+            'ENFERMEROS'              => 'Enfermero/a',
+            'MEDICO GENERAL/GERIATRA' => 'Médico',
+            'PSICOLOGO/A'             => 'Psicólogo/a',
+            'PEDAGOGO'                => 'Pedagogo/a',
+            'NUTRICIONISTA'           => 'Nutricionista',
+            'FISIOTERAPEUTA'          => 'Fisioterapeuta',
+            'VOLUNTARIO'              => 'Voluntario',
+            'FAMILIAR'                => 'Familiar',
         ];
         $rolClave   = $usuario->getRoleNames()->first();
         $rolLegible = $rolesLegibles[$rolClave] ?? 'Usuario del sistema';

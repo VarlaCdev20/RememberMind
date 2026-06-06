@@ -1,8 +1,8 @@
 <div class="text-center" style="margin-top: 150px;">
  @php
- $logoPath = public_path('storage/images/LOGO.png');
+ $logoPath = public_path('storage/imagenes/LOGO.png');
  if(!file_exists($logoPath)) {
- $logoPath = storage_path('app/public/images/LOGO.png');
+ $logoPath = storage_path('app/public/imagenes/LOGO.png');
  }
  @endphp
  @if(file_exists($logoPath))

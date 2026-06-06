@@ -1,5 +1,5 @@
 @php
- $logoPath = public_path('storage/images/LOGO.png');
+ $logoPath = public_path('storage/imagenes/LOGO.png');
 @endphp
 <div style="background-color: #2E5C31; padding: 25px; border-radius: 12px 12px 0 0; text-align: center; border-bottom: 5px solid #E27D60; position: relative;">
  <div style="position: absolute; top: 15px; left: 25px;">

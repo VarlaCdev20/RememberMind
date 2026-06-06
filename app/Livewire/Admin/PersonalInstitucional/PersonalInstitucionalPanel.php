@@ -11,6 +11,12 @@ class PersonalInstitucionalPanel extends Component
     public $tabActiva = 'resumen';
     public $busqueda = '';
     
+    // Filtros adicionales
+    public $filtroTipo = '';
+    public $filtroRol = '';
+    public $filtroEstado = '';
+    public $filtroDisponibilidad = '';
+    
     // Modal state
     public $modalGestionAbierto = false;
     public $usuarioSeleccionadoId = null;
@@ -38,6 +44,20 @@ class PersonalInstitucionalPanel extends Component
         $this->usuarioSeleccionadoId = null;
     }
     
+    public function toggleEstado($usuarioId)
+    {
+        $usuario = User::find($usuarioId);
+        if ($usuario) {
+            if ($usuario->estado === 'ACTIVO' || $usuario->estado == 1) {
+                $usuario->estado = 'SUSPENDIDO';
+            } else {
+                $usuario->estado = 'ACTIVO';
+            }
+            $usuario->save();
+            $this->dispatch('swal', ['icon' => 'success', 'title' => 'Estado actualizado']);
+        }
+    }
+    
     public function setTab($tab)
     {
         $this->tabActiva = $tab;
@@ -57,6 +77,38 @@ class PersonalInstitucionalPanel extends Component
             $query->has('personalSalud');
         } elseif ($this->tabActiva === 'admin') {
             $query->has('personalAdmin');
+        }
+
+        if ($this->filtroTipo === 'salud') {
+            $query->has('personalSalud');
+        } elseif ($this->filtroTipo === 'admin') {
+            $query->has('personalAdmin');
+        }
+
+        if ($this->filtroRol) {
+            $query->whereHas('personalSalud', function($q) {
+                $q->where('tipo_personal_salud', strtoupper($this->filtroRol));
+            });
+        }
+
+        if ($this->filtroEstado) {
+            if ($this->filtroEstado === 'activo') {
+                $query->where(function($q) { $q->where('estado', 'ACTIVO')->orWhere('estado', 1); });
+            } elseif ($this->filtroEstado === 'suspendido') {
+                $query->where('estado', 'SUSPENDIDO');
+            } elseif ($this->filtroEstado === 'inactivo') {
+                $query->where(function($q) { $q->where('estado', 'INACTIVO')->orWhere('estado', 0); });
+            }
+        }
+
+        if ($this->filtroDisponibilidad === 'ocupado') {
+            $query->whereHas('asignacionesTurno', function($q) {
+                $q->where('estado', 'ACTIVO');
+            });
+        } elseif ($this->filtroDisponibilidad === 'libre') {
+            $query->whereDoesntHave('asignacionesTurno', function($q) {
+                $q->where('estado', 'ACTIVO');
+            });
         }
 
         $usuarios = $query->orderBy('created_at', 'desc')->get();

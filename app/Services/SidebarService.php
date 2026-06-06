@@ -18,18 +18,18 @@ class SidebarService
         $isSuperadmin = $this->isSuperadmin($user);
         
         // Rol booleans
-        $isMedico = $user->hasRole(['Medico', 'Médico', 'Medico General']);
-        $isEnfermero = $user->hasRole(['Enfermero', 'Enfermera', 'Enfermería']);
-        $isPsicologo = $user->hasRole(['Psicologo', 'Psicólogo']);
-        $isFisioterapeuta = $user->hasRole(['Fisioterapeuta', 'Fisioterapia', 'Kinesiologo']);
-        $isNutricionista = $user->hasRole(['Nutricionista', 'Nutriologo', 'Nutriólogo']);
-        $isVoluntario = $user->hasRole(['Voluntario']);
-        $isFamiliar = $user->hasRole(['Familiar', 'Familia', 'Familiar Responsable']);
+        $isMedico = $user->hasRole('MEDICO GENERAL/GERIATRA');
+        $isEnfermero = $user->hasRole('ENFERMEROS');
+        $isPsicologo = $user->hasRole('PSICOLOGO/A');
+        $isFisioterapeuta = $user->hasRole('FISIOTERAPEUTA');
+        $isNutricionista = $user->hasRole('NUTRICIONISTA');
+        $isVoluntario = $user->hasRole('VOLUNTARIO');
+        $isFamiliar = $user->hasRole('FAMILIAR');
         
         $isClinico = $isMedico || $isEnfermero || $isPsicologo || $isFisioterapeuta || $isNutricionista;
         $isExternal = $isVoluntario || $isFamiliar;
         
-        $isAdministrative = !$isClinico && !$isExternal;
+        $isAdministrative = $user->hasRole('ADMINISTRADOR');
 
         $sections = [];
 
@@ -55,6 +55,7 @@ class SidebarService
         // 2. GESTIÓN DEL SISTEMA (Admins)
         if ($isAdministrative || $isSuperadmin) {
             $sections[] = $this->buildSection('Gestión del Sistema', 'ph-gear', null, [
+                $this->buildItem('Personal Institucional', 'admin.personal-institucional', 'personal_institucional.ver'),
                 $this->buildItem('Usuarios', 'admin.usuarios.index', 'usuarios.ver'),
                 $this->buildItem('Roles y permisos', 'admin.roles-permisos.index', 'roles.ver'),
                 $this->buildItem('Configuración general', 'admin.areas-institucionales.index', 'areas.ver'),
@@ -173,7 +174,6 @@ class SidebarService
         // 5. PERSONAL Y APOYO
         if ($isAdministrative || $isSuperadmin) {
             $sections[] = $this->buildSection('Equipo institucional', 'ph-users-three', null, [
-                $this->buildItem('Personal institucional', 'admin.personal-institucional', 'personal_institucional.ver'),
                 $this->buildItem('Voluntariado', 'admin.voluntariado.index', 'voluntarios.ver'),
             ]);
         }

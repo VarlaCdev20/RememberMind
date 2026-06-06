@@ -180,7 +180,7 @@ class DashboardTurno extends Component
         // Validar documentos obligatorios básicos (ejemplo: CI debe existir)
         $tieneCI = $adulto->documentos->whereIn('tipo_documento', ['CI', 'CI_ADULTO'])->count() > 0;
         
-        if (!$tieneCI && !auth()->user()->hasRole('Super-Admin')) {
+        if (!$tieneCI && !auth()->user()->hasRole('SUPERADMINISTRADOR')) {
             $this->dispatch('notificar', ['tipo' => 'error', 'mensaje' => 'Faltan documentos obligatorios (CI) para iniciar la valoración.']);
             return;
         }

@@ -26,7 +26,7 @@
  :class="sidebarCollapsed ? 'justify-center' : 'justify-between'"
  >
  <div class="flex min-w-0 items-center gap-3">
- <img src="{{ asset('storage/images/LOGO.png') }}"
+ <img src="{{ asset('storage/imagenes/LOGO.png') }}"
  alt="CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS"
  class="h-8 w-8 shrink-0 object-contain rounded-lg transition-all duration-500 hover:scale-110">
 

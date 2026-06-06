@@ -147,7 +147,7 @@
                     </div>
 
                     <div class="relative z-10 flex items-center gap-4">
-                        <img src="{{ asset('storage/images/LOGO.png') }}"
+                        <img src="{{ asset('storage/imagenes/LOGO.png') }}"
                             alt="Centro Geriátrico Jardín de los Recuerdos"
                             class="h-12 w-auto object-contain drop-shadow-md">
 
