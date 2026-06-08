@@ -2,94 +2,69 @@
 
 namespace App\Livewire\Admin\Admisiones;
 
-use App\Models\AdultoMayor;
-use App\Models\EstadoAdulto;
-use App\Models\Familiar;
-use App\Models\DocumentoAdultoMayor;
+use App\Models\DocumentoPreadmision;
+use App\Models\Preadmision;
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 use Livewire\WithFileUploads;
-use Illuminate\Support\Facades\DB;
-use Carbon\Carbon;
 
 class PreadmisionWizard extends Component
 {
     use WithFileUploads;
 
-    public $paso = 1;
-    public $totalPasos = 5;
+    public int $paso = 1;
+    public int $totalPasos = 6;
 
-    // Paso 1: Datos Obligatorios
-    public $nombres, $ap_paterno, $ap_materno, $ci, $expedicion_ci, $fecha_nac, $genero;
-    
-    // Paso 2: Familiar Responsable
-    public $contacto_emergencia_nombre, $contacto_emergencia_parentesco, $contacto_emergencia_celular, $contacto_emergencia_direccion;
+    public string $nombres = '';
+    public string $ap_paterno = '';
+    public string $ap_materno = '';
+    public string $ci = '';
+    public string $expedicion_ci = '';
+    public string $fecha_nac = '';
+    public string $genero = '';
+    public string $estado_civil = 'NO ESPECIFICADO';
+    public string $telefono = '';
+    public string $celular = '';
 
-    // Paso 3: Documentos
+    public string $departamento_residencia = '';
+    public string $ciudad_municipio = '';
+    public string $zona = '';
+    public string $calle = '';
+    public string $direccion_referencia = '';
+
+    public string $familiar_nombres = '';
+    public string $familiar_ap_paterno = '';
+    public string $familiar_ap_materno = '';
+    public string $familiar_ci = '';
+    public string $familiar_parentesco = '';
+    public string $familiar_celular = '';
+    public string $familiar_correo = '';
+    public string $familiar_direccion = '';
+
+    public string $motivo_ingreso = '';
+    public string $procedencia_ingreso = '';
+    public string $tipo_ingreso = 'REGULAR';
+    public string $permanencia = 'PERMANENTE';
+    public string $prioridad = 'MEDIA';
+    public string $descripcion_caso = '';
+
     public $doc_ci_adulto;
     public $doc_ci_familiar;
-    public $doc_croquis;
+    public $doc_solicitud_ingreso;
 
-    // Paso 4: Enfermero
-    public $enfermero_id;
+    public string $enfermero_id = '';
 
-    protected $rules = [
-        // Paso 1
-        'nombres' => 'required|string|min:2',
-        'ap_paterno' => 'required|string|min:2',
-        'ci' => 'required|numeric',
-        'expedicion_ci' => 'required|string',
-        'fecha_nac' => 'required|date|before:today',
-        'genero' => 'required|string',
-        // Paso 2
-        'contacto_emergencia_nombre' => 'required|string|min:3',
-        'contacto_emergencia_parentesco' => 'required|string',
-        'contacto_emergencia_celular' => 'required|numeric',
-        // Paso 3
-        'doc_ci_adulto' => 'required|file|max:2048|mimes:pdf,jpg,jpeg,png',
-        'doc_ci_familiar' => 'required|file|max:2048|mimes:pdf,jpg,jpeg,png',
-        // Paso 4
-        'enfermero_id' => 'required|exists:users,cod_usu',
-    ];
-
-    public function mount()
+    public function siguiente(): void
     {
-        // ...
-    }
-
-    public function siguiente()
-    {
-        if ($this->paso == 1) {
-            $this->validate([
-                'nombres' => 'required|string|min:2',
-                'ap_paterno' => 'required|string|min:2',
-                'ci' => 'required|numeric',
-                'expedicion_ci' => 'required|string',
-                'fecha_nac' => 'required|date|before:today',
-                'genero' => 'required|string',
-                'contacto_emergencia_nombre' => 'required|string|min:3',
-                'contacto_emergencia_parentesco' => 'required|string',
-                'contacto_emergencia_celular' => 'required|numeric',
-            ]);
-        } elseif ($this->paso == 2) {
-            $this->validate([
-                'doc_ci_adulto' => 'required|file|max:2048|mimes:pdf,jpg,jpeg,png',
-                'doc_ci_familiar' => 'required|file|max:2048|mimes:pdf,jpg,jpeg,png',
-            ]);
-        } elseif ($this->paso == 3) {
-            // Documentos institucionales - no validation needed, just informational or checkboxes
-        } elseif ($this->paso == 4) {
-            $this->validate([
-                'enfermero_id' => 'required|exists:users,cod_usu',
-            ]);
-        }
+        $this->validarPasoActual();
 
         if ($this->paso < $this->totalPasos) {
             $this->paso++;
         }
     }
 
-    public function anterior()
+    public function anterior(): void
     {
         if ($this->paso > 1) {
             $this->paso--;
@@ -98,120 +73,88 @@ class PreadmisionWizard extends Component
 
     public function confirmarPreadmision()
     {
-        $this->validate();
+        $this->validate($this->rules());
 
         try {
             DB::beginTransaction();
 
-            // 1. Encontrar estado VALORACION_INICIAL o PENDIENTE_VALORACION_INICIAL
-            $estadoValoracion = EstadoAdulto::where('estado', 'PENDIENTE_VALORACION_INICIAL')
-                                ->orWhere('estado', 'VALORACION_INICIAL')
-                                ->first();
-
-            if (!$estadoValoracion) {
-                // Fallback a algún estado activo o crear uno
-                $estadoValoracion = EstadoAdulto::firstOrCreate(['estado' => 'PENDIENTE_VALORACION_INICIAL']);
-            }
-
-            // 2. Crear Adulto Mayor
-            $adulto = AdultoMayor::create([
-                'nombres' => strtoupper($this->nombres),
-                'ap_paterno' => strtoupper($this->ap_paterno),
-                'ap_materno' => strtoupper($this->ap_materno ?? ''),
-                'ci' => $this->ci,
+            $preadmision = Preadmision::create([
+                'estado' => 'PREADMISION_ASIGNADA',
+                'fecha_solicitud' => today()->toDateString(),
+                'fecha_asignacion' => now(),
+                'nombres' => $this->normalizar($this->nombres),
+                'ap_paterno' => $this->normalizar($this->ap_paterno),
+                'ap_materno' => $this->normalizar($this->ap_materno),
+                'ci' => trim($this->ci),
                 'expedicion_ci' => $this->expedicion_ci,
                 'fecha_nac' => $this->fecha_nac,
                 'genero' => $this->genero,
-                'contacto_emergencia_nombre' => strtoupper($this->contacto_emergencia_nombre),
-                'contacto_emergencia_parentesco' => strtoupper($this->contacto_emergencia_parentesco),
-                'contacto_emergencia_celular' => $this->contacto_emergencia_celular,
-                'contacto_emergencia_direccion' => strtoupper($this->contacto_emergencia_direccion ?? ''),
-                'cod_est_adul' => $estadoValoracion->cod_est_adul,
-                'estado_civil' => 'NO ESPECIFICADO', // default for pre-admission
-                'tipo_ing' => 'REGULAR',
-                'permanencia' => 'PERMANENTE',
-                'grupo_sanguineo' => 'O+', // default o omitido en este paso rápido
-                'seguro_salud' => 'NINGUNO',
-                'nivel_educat' => 'NO ESPECIFICADO',
+                'estado_civil' => $this->estado_civil,
+                'telefono' => trim($this->telefono) ?: null,
+                'celular' => trim($this->celular) ?: null,
+                'departamento_residencia' => $this->departamento_residencia,
+                'ciudad_municipio' => $this->normalizar($this->ciudad_municipio),
+                'zona' => $this->normalizar($this->zona),
+                'calle' => $this->normalizar($this->calle),
+                'direccion_referencia' => $this->normalizar($this->direccion_referencia),
+                'familiar_nombres' => $this->normalizar($this->familiar_nombres),
+                'familiar_ap_paterno' => $this->normalizar($this->familiar_ap_paterno),
+                'familiar_ap_materno' => $this->normalizar($this->familiar_ap_materno),
+                'familiar_ci' => trim($this->familiar_ci) ?: null,
+                'familiar_parentesco' => $this->familiar_parentesco,
+                'familiar_celular' => trim($this->familiar_celular),
+                'familiar_correo' => trim($this->familiar_correo) ?: null,
+                'familiar_direccion' => $this->normalizar($this->familiar_direccion),
+                'motivo_ingreso' => $this->motivo_ingreso,
+                'procedencia_ingreso' => $this->procedencia_ingreso,
+                'tipo_ingreso' => $this->tipo_ingreso,
+                'permanencia' => $this->permanencia,
+                'prioridad' => $this->prioridad,
+                'descripcion_caso' => $this->normalizar($this->descripcion_caso),
+                'documentos_iniciales_completos' => true,
+                'documentos_institucionales_generados' => true,
+                'enfermero_asignado' => $this->enfermero_id,
+                'creado_por' => auth()->user()?->cod_usu,
+                'observaciones' => 'Preadmision registrada y asignada para valoracion inicial.',
             ]);
 
-            // 3. Crear Familiar Responsable
-            $familiar = Familiar::create([
-                'nombres' => strtoupper($this->contacto_emergencia_nombre),
-                'celular' => $this->contacto_emergencia_celular,
-            ]);
+            $this->guardarDocumentoSubido($preadmision, 'CI_ADULTO', 'CI del adulto mayor', $this->doc_ci_adulto, true);
+            $this->guardarDocumentoSubido($preadmision, 'CI_FAMILIAR', 'CI del familiar responsable', $this->doc_ci_familiar, true);
+            $this->guardarDocumentoSubido($preadmision, 'SOLICITUD_INGRESO', 'Solicitud inicial de ingreso', $this->doc_solicitud_ingreso, true);
 
-            $adulto->familiares()->attach($familiar->cod_fam, [
-                'parentesco_vinculo' => strtoupper($this->contacto_emergencia_parentesco),
-                'es_responsable' => true,
-                'estado' => 'ACTIVO',
-            ]);
-
-            // 4. Guardar Documentos
-            $path_adulto = $this->doc_ci_adulto->store('documentos/' . $adulto->cod_am, 'public');
-            DocumentoAdultoMayor::create([
-                'cod_am' => $adulto->cod_am,
-                'tipo_documento' => 'CI_ADULTO_MAYOR',
-                'ruta_archivo' => $path_adulto,
-                'nombre' => 'CI Adulto Mayor',
-                'fecha_subida' => now()->toDateString(),
-                'estado' => 'ACTIVO',
-                'modulo_ref' => 'PREADMISION',
-                'observaciones' => 'Subido en Wizard Preadmisión'
-            ]);
-
-            $path_familiar = $this->doc_ci_familiar->store('documentos/' . $adulto->cod_am, 'public');
-            DocumentoAdultoMayor::create([
-                'cod_am' => $adulto->cod_am,
-                'tipo_documento' => 'CI_FAMILIAR',
-                'ruta_archivo' => $path_familiar,
-                'nombre' => 'CI Familiar Responsable',
-                'fecha_subida' => now()->toDateString(),
-                'estado' => 'ACTIVO',
-                'modulo_ref' => 'PREADMISION',
-                'observaciones' => 'Subido en Wizard Preadmisión'
-            ]);
-
-            if ($this->doc_croquis) {
-                $path_croquis = $this->doc_croquis->store('documentos/' . $adulto->cod_am, 'public');
-                DocumentoAdultoMayor::create([
-                    'cod_am' => $adulto->cod_am,
-                    'tipo_documento' => 'CROQUIS',
-                    'ruta_archivo' => $path_croquis,
-                    'nombre' => 'Croquis Domicilio',
-                    'fecha_subida' => now()->toDateString(),
-                    'estado' => 'ACTIVO',
-                    'modulo_ref' => 'PREADMISION',
-                    'observaciones' => 'Subido en Wizard Preadmisión'
+            foreach ($this->documentosInstitucionales() as $tipo => $nombre) {
+                DocumentoPreadmision::create([
+                    'cod_pre' => $preadmision->cod_pre,
+                    'tipo_documento' => $tipo,
+                    'nombre_documento' => $nombre,
+                    'es_institucional' => true,
+                    'obligatorio' => true,
+                    'estado' => 'GENERADO',
+                    'observaciones' => 'Generado por el sistema al confirmar la preadmision.',
                 ]);
             }
 
-            $enfermero = User::where('cod_usu', $this->enfermero_id)->orWhere('id', $this->enfermero_id)->first();
-            $adulto->forceFill([
-                'observaciones' => trim(($adulto->observaciones ? $adulto->observaciones . "\n" : '') . "Valoración inicial sugerida para: {$enfermero->nombres} {$enfermero->ap_paterno}"),
-            ])->save();
-
-            // 6. Log
             activity('Admisiones')
-                ->performedOn($adulto)
-                ->log("Preadmisión confirmada. Asignado a enfermero: " . $enfermero->nombres);
+                ->causedBy(auth()->user())
+                ->performedOn($preadmision)
+                ->log("Preadmision {$preadmision->cod_pre} asignada para valoracion inicial.");
 
             DB::commit();
 
             $this->dispatch('swal', [
-                'title' => '¡Preadmisión Completada!',
-                'text' => 'El adulto mayor está listo para la valoración inicial.',
-                'icon' => 'success'
+                'title' => 'Preadmision asignada',
+                'text' => 'El caso quedo preparado para valoracion inicial. No se creo adulto mayor activo.',
+                'icon' => 'success',
             ]);
 
             return redirect()->route('admin.admisiones.preadmisiones');
-
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             DB::rollBack();
+
             $this->dispatch('swal', [
                 'title' => 'Error',
-                'text' => 'Hubo un problema: ' . $e->getMessage(),
-                'icon' => 'error'
+                'text' => 'No se pudo registrar la preadmision: ' . $e->getMessage(),
+                'icon' => 'error',
             ]);
         }
     }
@@ -219,7 +162,129 @@ class PreadmisionWizard extends Component
     public function render()
     {
         return view('livewire.admin.admisiones.preadmision-wizard', [
-            'enfermeros' => User::role('ENFERMEROS')->get()
+            'enfermeros' => User::role('ENFERMEROS')
+                ->where('estado', 'ACTIVO')
+                ->orderBy('ap_paterno')
+                ->get(['cod_usu', 'nombres', 'ap_paterno', 'ap_materno']),
+            'documentosInstitucionales' => $this->documentosInstitucionales(),
         ])->layout('layouts.sistema');
+    }
+
+    private function validarPasoActual(): void
+    {
+        $this->validate(match ($this->paso) {
+            1 => [
+                'nombres' => ['required', 'string', 'min:2', 'max:100'],
+                'ap_paterno' => ['required', 'string', 'min:2', 'max:80'],
+                'ci' => ['required', 'string', 'max:20', 'unique:preadmisiones,ci'],
+                'expedicion_ci' => ['required', 'string', 'max:10'],
+                'fecha_nac' => ['required', 'date', 'before_or_equal:' . now()->subYears(60)->format('Y-m-d')],
+                'genero' => ['required', 'string'],
+            ],
+            2 => [
+                'departamento_residencia' => ['required', 'string'],
+                'ciudad_municipio' => ['required', 'string', 'min:2'],
+                'zona' => ['required', 'string', 'min:2'],
+                'calle' => ['required', 'string', 'min:2'],
+            ],
+            3 => [
+                'familiar_nombres' => ['required', 'string', 'min:2'],
+                'familiar_parentesco' => ['required', 'string'],
+                'familiar_celular' => ['required', 'string', 'max:30'],
+            ],
+            4 => [
+                'motivo_ingreso' => ['required', 'string'],
+                'procedencia_ingreso' => ['required', 'string'],
+                'tipo_ingreso' => ['required', 'string'],
+                'permanencia' => ['required', 'string'],
+                'prioridad' => ['required', 'string'],
+            ],
+            5 => [
+                'doc_ci_adulto' => ['required', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:5120'],
+                'doc_ci_familiar' => ['required', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:5120'],
+                'doc_solicitud_ingreso' => ['required', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:5120'],
+            ],
+            6 => [
+                'enfermero_id' => ['required', 'exists:users,cod_usu'],
+            ],
+            default => [],
+        }, $this->mensajesValidacion());
+    }
+
+    private function mensajesValidacion(): array
+    {
+        return [
+            'required' => 'Este campo es obligatorio.',
+            'string' => 'El formato ingresado no es válido.',
+            'min' => 'Debe contener al menos :min caracteres.',
+            'max' => 'No debe exceder los :max caracteres.',
+            'unique' => 'Este valor ya se encuentra registrado.',
+            'date' => 'Debe ser una fecha válida.',
+            'before_or_equal' => 'La fecha no cumple con el requisito (mayor a 60 años).',
+            'file' => 'Debe seleccionar un archivo válido.',
+            'mimes' => 'El archivo debe ser de tipo: :values.',
+            'exists' => 'El registro seleccionado no es válido.',
+        ];
+    }
+
+    private function rules(): array
+    {
+        return [
+            'nombres' => ['required', 'string', 'min:2', 'max:100'],
+            'ap_paterno' => ['required', 'string', 'min:2', 'max:80'],
+            'ci' => ['required', 'string', 'max:20', 'unique:preadmisiones,ci'],
+            'expedicion_ci' => ['required', 'string', 'max:10'],
+            'fecha_nac' => ['required', 'date', 'before_or_equal:' . now()->subYears(60)->format('Y-m-d')],
+            'genero' => ['required', 'string'],
+            'departamento_residencia' => ['required', 'string'],
+            'ciudad_municipio' => ['required', 'string'],
+            'zona' => ['required', 'string'],
+            'calle' => ['required', 'string'],
+            'familiar_nombres' => ['required', 'string', 'min:2'],
+            'familiar_parentesco' => ['required', 'string'],
+            'familiar_celular' => ['required', 'string', 'max:30'],
+            'motivo_ingreso' => ['required', 'string'],
+            'procedencia_ingreso' => ['required', 'string'],
+            'tipo_ingreso' => ['required', 'string'],
+            'permanencia' => ['required', 'string'],
+            'prioridad' => ['required', 'string'],
+            'doc_ci_adulto' => ['required', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:5120'],
+            'doc_ci_familiar' => ['required', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:5120'],
+            'doc_solicitud_ingreso' => ['required', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:5120'],
+            'enfermero_id' => ['required', 'exists:users,cod_usu'],
+        ];
+    }
+
+    private function guardarDocumentoSubido(Preadmision $preadmision, string $tipo, string $nombre, $file, bool $obligatorio): void
+    {
+        $path = $file->store('preadmisiones/' . $preadmision->cod_pre, 'public');
+
+        DocumentoPreadmision::create([
+            'cod_pre' => $preadmision->cod_pre,
+            'tipo_documento' => $tipo,
+            'nombre_documento' => $nombre,
+            'archivo_path' => $path,
+            'nombre_original' => $file->getClientOriginalName(),
+            'es_institucional' => false,
+            'obligatorio' => $obligatorio,
+            'estado' => 'RECIBIDO',
+        ]);
+    }
+
+    private function documentosInstitucionales(): array
+    {
+        return [
+            'FICHA_PREADMISION' => 'Ficha institucional de preadmision',
+            'AUTORIZACION_VALORACION' => 'Autorizacion de valoracion inicial',
+            'CONSENTIMIENTO_DATOS' => 'Consentimiento de tratamiento de datos',
+            'ACTA_RECEPCION_DOCUMENTOS' => 'Acta de recepcion de documentos',
+        ];
+    }
+
+    private function normalizar(?string $value): ?string
+    {
+        $value = trim((string) $value);
+
+        return $value === '' ? null : mb_strtoupper($value, 'UTF-8');
     }
 }

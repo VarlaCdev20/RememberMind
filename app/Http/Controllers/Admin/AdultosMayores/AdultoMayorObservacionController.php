@@ -24,8 +24,12 @@ class AdultoMayorObservacionController extends Controller
         // Asignar el codigo del adulto mayor y crear el registro
         $validated['cod_am'] = $adulto_mayor->cod_am;
         // Asumiendo que el usuario autenticado está registrando
-        $validated['registrado_por'] = auth()->id();
-        $validated['nivel_importancia'] = $request->nivel_importancia ?? 'NORMAL'; 
+        $validated['registrado_por'] = auth()->user()?->cod_usu ?? auth()->id();
+        $validated['creado_por'] = $validated['registrado_por'];
+        $validated['categoria'] = $validated['tipo_obs'] ?? 'GENERAL';
+        $validated['observacion'] = $validated['descripcion'] ?? '';
+        $validated['nivel_importancia'] = $request->nivel_importancia ?? 'NORMAL';
+        $validated['nivel_riesgo'] = $validated['nivel_importancia'];
         
         $observacion = null;
         
@@ -50,7 +54,12 @@ class AdultoMayorObservacionController extends Controller
             'tipo_obs' => 'required|string',
         ]);
 
-        $observacion->update($request->only(['descripcion', 'tipo_obs', 'nivel_importancia']));
+        $data = $request->only(['descripcion', 'tipo_obs', 'nivel_importancia']);
+        $data['observacion'] = $data['descripcion'];
+        $data['categoria'] = $data['tipo_obs'];
+        $data['nivel_riesgo'] = $data['nivel_importancia'] ?? 'NORMAL';
+
+        $observacion->update($data);
 
         return redirect()->route('admin.adultos-mayores.show', ['adulto_mayor' => $adulto_mayor->cod_am, 'tab' => 'observaciones'])->with('success', 'Observación actualizada correctamente.');
     }

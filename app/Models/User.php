@@ -266,14 +266,12 @@ class User extends Authenticatable
 
     public function getAreaInstitucionalAttribute()
     {
-        $codArea = $this->cod_area_virtual;
-        if ($codArea && isset(self::$areasEstaticas[$codArea])) {
-            return (object) [
-                'nombre' => self::$areasEstaticas[$codArea],
-                'cod_area' => $codArea,
-            ];
-        }
-        return null;
+        return $this->areaInstitucional()->first();
+    }
+
+    public function areaInstitucional()
+    {
+        return $this->belongsTo(AreaInstitucional::class, 'cod_area', 'cod_area');
     }
 
     public function getRolPrincipalAttribute(): ?string
@@ -313,12 +311,12 @@ class User extends Authenticatable
 
     public function getCodAreaAttribute(): ?string
     {
-        return $this->cod_area_virtual;
+        return $this->attributes['cod_area'] ?? $this->cod_area_virtual;
     }
 
     public function setCodAreaAttribute($value): void
     {
-        // cod_area ya no existe en users; el área se deriva del rol institucional.
+        $this->attributes['cod_area'] = $value ?: null;
     }
 
     public function getAsignacionesTurnoAttribute()

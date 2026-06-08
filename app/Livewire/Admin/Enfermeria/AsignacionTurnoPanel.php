@@ -22,8 +22,8 @@ class AsignacionTurnoPanel extends Component
 
     public bool   $modalForm  = false;
     public bool   $modalVer   = false;
-    public ?int   $editandoId = null;
-    public ?int   $viendoId   = null;
+    public ?string $editandoId = null;
+    public ?string $viendoId   = null;
 
     public string $codAm              = '';
     public string $codTurno           = '';
@@ -67,7 +67,7 @@ class AsignacionTurnoPanel extends Component
         // Validar que no haya dos asignaciones activas del mismo adulto en el mismo turno
         if (! $this->editandoId) {
             $existente = AsignacionTurnoAdulto::where('cod_am', $this->codAm)
-                ->where('cod_turno', (int) $this->codTurno)
+                ->where('cod_turno', $this->codTurno)
                 ->where('estado', 'ACTIVA')
                 ->exists();
             if ($existente) {
@@ -78,7 +78,7 @@ class AsignacionTurnoPanel extends Component
 
         $datos = [
             'cod_am'           => $this->codAm,
-            'cod_turno'        => (int) $this->codTurno,
+            'cod_turno'        => $this->codTurno,
             'cod_usu_enfermero'=> $this->codEnfermero,
             'cod_habitacion'   => $this->codHabitacion ?: null,
             'cod_cama'         => $this->codCama ?: null,
@@ -102,7 +102,7 @@ class AsignacionTurnoPanel extends Component
         $this->dispatch('swal', ['icon' => 'success', 'title' => $msg]);
     }
 
-    public function finalizarAsignacion(int $id): void
+    public function finalizarAsignacion(string $id): void
     {
         AsignacionTurnoAdulto::findOrFail($id)->update([
             'estado'   => 'FINALIZADA',
@@ -129,7 +129,7 @@ class AsignacionTurnoPanel extends Component
                 )
             )
             ->when($this->filtroEstado, fn($q) => $q->where('estado', $this->filtroEstado))
-            ->when($this->filtroTurno,  fn($q) => $q->where('cod_turno', (int) $this->filtroTurno))
+            ->when($this->filtroTurno,  fn($q) => $q->where('cod_turno', $this->filtroTurno))
             ->orderByDesc('fecha_inicio')
             ->paginate(12);
 

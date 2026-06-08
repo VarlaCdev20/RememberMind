@@ -302,6 +302,18 @@ class AdultoMayor extends Model
         return $this->hasMany(AsignacionAdultoMayor::class, 'cod_am', 'cod_am');
     }
 
+    public function asignacionesTurno()
+    {
+        return $this->hasMany(AsignacionTurnoAdulto::class, 'cod_am', 'cod_am');
+    }
+
+    public function asignacionTurnoActiva()
+    {
+        return $this->hasOne(AsignacionTurnoAdulto::class, 'cod_am', 'cod_am')
+            ->whereIn('estado', ['ACTIVO', 'ACTIVA'])
+            ->latest('fecha_inicio');
+    }
+
     public function evaluacionesGeriatricas()
     {
         return $this->hasMany(EvaluacionGeriatrica::class, 'cod_am', 'cod_am');
@@ -309,6 +321,10 @@ class AdultoMayor extends Model
 
     public function getAsignacionTurnoActivaAttribute()
     {
-        return null;
+        if ($this->relationLoaded('asignacionTurnoActiva')) {
+            return $this->relations['asignacionTurnoActiva'];
+        }
+
+        return $this->asignacionTurnoActiva()->first();
     }
 }

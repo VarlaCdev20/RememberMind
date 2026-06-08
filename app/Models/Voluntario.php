@@ -17,15 +17,30 @@ class Voluntario extends Model
     protected $prefixCode = 'VOL';
     protected $digitsCode = 3;
 
-    public $timestamps = false;
+    public $timestamps = true;
 
     protected $fillable = [
+        'nombres',
+        'ap_paterno',
+        'ap_materno',
+        'ci',
+        'celular',
+        'correo',
+        'fecha_nac',
         'fecha_ing',
+        'profesion_ocupacion',
         'estado',
         'observaciones',
         'cod_usu',
         'disponibilidad_inicial',
         'area_apoyo_preferente',
+        'archivado_en',
+    ];
+
+    protected $casts = [
+        'fecha_nac' => 'date',
+        'fecha_ing' => 'date',
+        'archivado_en' => 'datetime',
     ];
 
     public function getAreaApoyoAttribute(): ?string

@@ -26,7 +26,7 @@ class AsignacionesPanel extends Component
 
     public bool $mostrarFormulario = false;
     public bool $isEdit = false;
-    public ?int $asignacionId = null;
+    public ?string $asignacionId = null;
     public string $cod_vol = '';
     public string $cod_am = '';
     public string $fecha_asig = '';
@@ -36,7 +36,7 @@ class AsignacionesPanel extends Component
     public bool $permitirSinDisponibilidad = false;
     public string $advertenciaDisponibilidad = '';
 
-    public ?int $detalleId = null;
+    public ?string $detalleId = null;
 
     protected $queryString = [
         'search' => ['except' => ''],
@@ -110,7 +110,7 @@ class AsignacionesPanel extends Component
         $this->mostrarFormulario = true;
     }
 
-    public function editar(int $id): void
+    public function editar(string $id): void
     {
         abort_unless(auth()->user()->can('asignaciones.editar'), 403);
 
@@ -120,7 +120,7 @@ class AsignacionesPanel extends Component
         }
 
         $this->resetValidation();
-        $this->asignacionId = (int) $asignacion->cod_asig_vol;
+        $this->asignacionId = (string) $asignacion->cod_asig_vol;
         $this->cod_vol = (string) $asignacion->cod_vol;
         $this->cod_am = (string) $asignacion->cod_am;
         $this->fecha_asig = $asignacion->fecha_asig ? Carbon::parse($asignacion->fecha_asig)->format('Y-m-d') : '';
@@ -133,7 +133,7 @@ class AsignacionesPanel extends Component
         $this->mostrarFormulario = true;
     }
 
-    public function reprogramar(int $id): void
+    public function reprogramar(string $id): void
     {
         abort_unless(auth()->user()->can('asignaciones.editar'), 403);
 
@@ -163,7 +163,7 @@ class AsignacionesPanel extends Component
         $this->resetPage();
     }
 
-    public function verDetalle(int $id): void
+    public function verDetalle(string $id): void
     {
         $this->detalleId = $id;
     }
@@ -173,17 +173,17 @@ class AsignacionesPanel extends Component
         $this->detalleId = null;
     }
 
-    public function confirmarAsignacion(int $id): void
+    public function confirmarAsignacion(string $id): void
     {
         $this->cambiarEstado($id, 'Confirmada', 'Asignación confirmada', 'El apoyo quedó listo para seguimiento institucional.');
     }
 
-    public function marcarCumplida(int $id): void
+    public function marcarCumplida(string $id): void
     {
         $this->cambiarEstado($id, 'Cumplida', 'Asignación marcada como cumplida', 'La asignación queda registrada como apoyo cumplido.');
     }
 
-    public function cancelarAsignacion(int $id): void
+    public function cancelarAsignacion(string $id): void
     {
         $this->cambiarEstado($id, 'Cancelada', 'Asignación cancelada', 'La asignación no fue eliminada; queda registrada como cancelada.');
     }
@@ -220,7 +220,7 @@ class AsignacionesPanel extends Component
 
         $validated = $this->validate($this->rules(), $this->messages());
 
-        if (! $this->voluntarioEstaActivo((int) $validated['cod_vol'])) {
+        if (! $this->voluntarioEstaActivo((string) $validated['cod_vol'])) {
             $this->dispatch('swal', [
                 'icon' => 'warning',
                 'title' => 'Voluntario no activo',
@@ -251,12 +251,13 @@ class AsignacionesPanel extends Component
         }
 
         $payload = [
-            'cod_vol' => (int) $validated['cod_vol'],
+            'cod_vol' => $validated['cod_vol'],
             'cod_am' => $validated['cod_am'],
             'fecha_asig' => $validated['fecha_asig'],
             'fecha_fin' => $validated['fecha_fin'] ?: null,
             'estado' => $validated['estado'],
             'obser' => $validated['obser'] ?: null,
+            'updated_at' => now(),
         ];
 
         $eraEdicion = $this->isEdit;
@@ -266,7 +267,10 @@ class AsignacionesPanel extends Component
                 ->where('cod_asig_vol', $this->asignacionId)
                 ->update($payload);
         } else {
-            DB::table('asignacion_voluntarios')->insert($payload);
+            DB::table('asignacion_voluntarios')->insert($payload + [
+                'cod_asig_vol' => $this->siguienteCodigoAsignacion(),
+                'created_at' => now(),
+            ]);
         }
 
         $this->mostrarFormulario = false;
@@ -283,7 +287,7 @@ class AsignacionesPanel extends Component
     private function rules(): array
     {
         return [
-            'cod_vol' => ['required', 'integer', Rule::exists('voluntarios', 'cod_vol')],
+            'cod_vol' => ['required', Rule::exists('voluntarios', 'cod_vol')],
             'cod_am' => ['required', Rule::exists('adulto_mayor', 'cod_am')],
             'fecha_asig' => ['required', 'date'],
             'fecha_fin' => ['nullable', 'date', 'after_or_equal:fecha_asig'],
@@ -338,7 +342,7 @@ class AsignacionesPanel extends Component
             ]);
 
         if ($this->voluntarioFiltro !== '') {
-            $query->where('a.cod_vol', (int) $this->voluntarioFiltro);
+            $query->where('a.cod_vol', $this->voluntarioFiltro);
         }
 
         if ($this->search !== '') {
@@ -522,7 +526,7 @@ class AsignacionesPanel extends Component
         $item->fecha_texto = $item->fecha_asig ? Carbon::parse($item->fecha_asig)->format('d/m/Y') : 'Sin fecha';
         $item->fecha_fin_texto = $item->fecha_fin ? Carbon::parse($item->fecha_fin)->format('d/m/Y') : null;
         $item->dia_semana = $item->fecha_asig ? $this->diaDesdeFecha(Carbon::parse($item->fecha_asig)) : 'Sin día';
-        $item->disponibilidad = $this->resumenDisponibilidad((int) $item->cod_vol, (string) $item->fecha_asig);
+        $item->disponibilidad = $this->resumenDisponibilidad((string) $item->cod_vol, (string) $item->fecha_asig);
         $item->turno = $item->disponibilidad['turno'];
         $item->horario = $item->disponibilidad['horario'];
         $item->asistencia_estado = $this->estadoAsistenciaAsignacion($item);
@@ -536,10 +540,10 @@ class AsignacionesPanel extends Component
             return ['horario' => 'Seleccione voluntario y fecha', 'turno' => 'Sin dato', 'estado' => 'Pendiente'];
         }
 
-        return $this->resumenDisponibilidad((int) $this->cod_vol, $this->fecha_asig);
+        return $this->resumenDisponibilidad((string) $this->cod_vol, $this->fecha_asig);
     }
 
-    private function resumenDisponibilidad(int $codVol, string $fecha): array
+    private function resumenDisponibilidad(string $codVol, string $fecha): array
     {
         if (! $fecha) {
             return ['horario' => 'Sin fecha asignada', 'turno' => 'Sin dato', 'estado' => 'Pendiente'];
@@ -612,7 +616,7 @@ class AsignacionesPanel extends Component
         }
 
         $this->advertenciaDisponibilidad = $this->advertenciaDisponibilidad([
-            'cod_vol' => (int) $this->cod_vol,
+            'cod_vol' => (string) $this->cod_vol,
             'fecha_asig' => $this->fecha_asig,
         ]);
     }
@@ -632,13 +636,13 @@ class AsignacionesPanel extends Component
         return $query->exists();
     }
 
-    private function cambiarEstado(int $id, string $estado, string $titulo, string $texto): void
+    private function cambiarEstado(string $id, string $estado, string $titulo, string $texto): void
     {
         abort_unless(auth()->user()->can('asignaciones.editar'), 403);
 
         DB::table('asignacion_voluntarios')
             ->where('cod_asig_vol', $id)
-            ->update(['estado' => $estado]);
+            ->update(['estado' => $estado, 'updated_at' => now()]);
 
         $this->dispatch('swal', [
             'icon' => 'success',
@@ -647,13 +651,30 @@ class AsignacionesPanel extends Component
         ]);
     }
 
-    private function voluntarioEstaActivo(int $codVol): bool
+    private function voluntarioEstaActivo(string $codVol): bool
     {
         return DB::table('voluntarios')
             ->where('cod_vol', $codVol)
             ->where('estado', 'ACTIVO')
             ->whereNull('archivado_en')
             ->exists();
+    }
+
+    private function siguienteCodigoAsignacion(): string
+    {
+        $ultimo = DB::table('asignacion_voluntarios')
+            ->where('cod_asig_vol', 'like', 'ASV_%')
+            ->orderByDesc('cod_asig_vol')
+            ->value('cod_asig_vol');
+
+        $numero = $ultimo ? ((int) substr((string) $ultimo, 4)) + 1 : 1;
+
+        do {
+            $codigo = 'ASV_' . str_pad($numero, 4, '0', STR_PAD_LEFT);
+            $numero++;
+        } while (DB::table('asignacion_voluntarios')->where('cod_asig_vol', $codigo)->exists());
+
+        return $codigo;
     }
 
     private function voluntariosActivos(): Collection

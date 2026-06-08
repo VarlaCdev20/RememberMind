@@ -31,6 +31,9 @@ class EvaluacionGeriatrica extends Model
     protected $casts = [
         'fecha_eval' => 'date',
         'puntaje' => 'decimal:2',
+        'puntaje_total' => 'decimal:2',
+        'datos_formulario' => 'array',
+        'anulado_en' => 'datetime',
     ];
 
     public function getActivitylogOptions(): \Spatie\Activitylog\LogOptions
@@ -63,6 +66,19 @@ class EvaluacionGeriatrica extends Model
 
                 $eval->cod_eval_ger = 'EVG_' . str_pad($numero, 4, '0', STR_PAD_LEFT);
             }
+        });
+
+        static::saving(function ($eval) {
+            $eval->registrado_por ??= $eval->evaluador_id;
+            $eval->evaluador_id ??= $eval->registrado_por;
+            $eval->puntaje_total ??= $eval->puntaje;
+            $eval->puntaje ??= $eval->puntaje_total;
+            $eval->categoria_resultado ??= $eval->resultado_cualitativo;
+            $eval->resultado_cualitativo ??= $eval->categoria_resultado;
+            $eval->nivel_riesgo ??= $eval->resultado_cualitativo;
+            $eval->estado_eval ??= $eval->estado;
+            $eval->estado ??= $eval->estado_eval ?? 'COMPLETADA';
+            $eval->nivel_alerta ??= $eval->estado === 'ALERTA' ? 'CRITICO' : 'NORMAL';
         });
     }
 
@@ -109,6 +125,7 @@ class EvaluacionGeriatrica extends Model
 
     public function setRegistradoPorAttribute($value): void
     {
+        $this->attributes['registrado_por'] = $value;
         $this->attributes['evaluador_id'] = $value;
     }
 
@@ -119,6 +136,7 @@ class EvaluacionGeriatrica extends Model
 
     public function setPuntajeTotalAttribute($value): void
     {
+        $this->attributes['puntaje_total'] = $value;
         $this->attributes['puntaje'] = $value;
     }
 
@@ -129,16 +147,18 @@ class EvaluacionGeriatrica extends Model
 
     public function setCategoriaResultadoAttribute($value): void
     {
+        $this->attributes['categoria_resultado'] = $value;
         $this->attributes['resultado_cualitativo'] = $value;
     }
 
     public function getNivelAlertaAttribute()
     {
-        return $this->estado;
+        return $this->attributes['nivel_alerta'] ?? $this->estado;
     }
 
     public function setEstadoEvalAttribute($value): void
     {
+        $this->attributes['estado_eval'] = $value;
         $this->attributes['estado'] = $value;
     }
 
@@ -149,21 +169,25 @@ class EvaluacionGeriatrica extends Model
 
     public function setNivelAlertaAttribute($value): void
     {
+        $this->attributes['nivel_alerta'] = $value;
         $this->attributes['estado'] = $value === 'CRITICO' ? 'ALERTA' : ($this->attributes['estado'] ?? 'COMPLETADA');
     }
 
     public function getNivelRiesgoAttribute()
     {
-        return $this->resultado_cualitativo;
+        return $this->attributes['nivel_riesgo'] ?? $this->resultado_cualitativo;
     }
 
     public function setNivelRiesgoAttribute($value): void
     {
+        $this->attributes['nivel_riesgo'] = $value;
         $this->attributes['resultado_cualitativo'] = $value;
     }
 
     public function setDatosFormularioAttribute($value): void
     {
+        $this->attributes['datos_formulario'] = is_array($value) ? json_encode($value) : $value;
+
         if (is_array($value) && empty($this->attributes['observaciones'])) {
             $this->attributes['observaciones'] = json_encode($value);
         }
@@ -171,6 +195,7 @@ class EvaluacionGeriatrica extends Model
 
     public function setMotivoAnulacionAttribute($value): void
     {
+        $this->attributes['motivo_anulacion'] = $value;
         if ($value) {
             $this->attributes['observaciones'] = trim(($this->attributes['observaciones'] ?? '') . "\nMotivo de anulación: " . $value);
         }
@@ -178,11 +203,12 @@ class EvaluacionGeriatrica extends Model
 
     public function setAnuladoPorAttribute($value): void
     {
-        // La BD limpia no persiste anulador separado; se conserva estado/deleted_at.
+        $this->attributes['anulado_por'] = $value;
     }
 
     public function setAnuladoEnAttribute($value): void
     {
+        $this->attributes['anulado_en'] = $value;
         $this->attributes['deleted_at'] = $value;
     }
 }

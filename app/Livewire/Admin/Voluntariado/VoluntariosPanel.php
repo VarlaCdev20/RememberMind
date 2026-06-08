@@ -26,7 +26,7 @@ class VoluntariosPanel extends Component
 
     public bool $mostrarFormulario = false;
     public bool $isEdit = false;
-    public ?int $voluntarioId = null;
+    public ?string $voluntarioId = null;
     public ?string $codUsu = null;
 
     public bool $mostrarPerfil = false;
@@ -96,7 +96,7 @@ class VoluntariosPanel extends Component
         $this->mostrarPerfil = false;
     }
 
-    public function editar(int $codVol): void
+    public function editar(string $codVol): void
     {
         abort_unless(auth()->user()->can('voluntarios.editar'), 403);
 
@@ -114,7 +114,7 @@ class VoluntariosPanel extends Component
         }
 
         $this->resetValidation();
-        $this->voluntarioId = (int) $voluntario->cod_vol;
+        $this->voluntarioId = (string) $voluntario->cod_vol;
         $this->codUsu = $voluntario->cod_usu;
         $this->nombres = (string) $voluntario->nombres;
         $this->ap_paterno = (string) $voluntario->ap_paterno;
@@ -179,7 +179,7 @@ class VoluntariosPanel extends Component
         ]);
     }
 
-    public function cambiarEstado(int $codVol, string $estado): void
+    public function cambiarEstado(string $codVol, string $estado): void
     {
         abort_unless(auth()->user()->can('voluntarios.cambiar_estado'), 403);
 
@@ -225,7 +225,7 @@ class VoluntariosPanel extends Component
         ]);
     }
 
-    public function archivar(int $codVol): void
+    public function archivar(string $codVol): void
     {
         abort_unless(auth()->user()->can('voluntarios.cambiar_estado'), 403);
 
@@ -261,7 +261,7 @@ class VoluntariosPanel extends Component
         ]);
     }
 
-    public function verPerfil(int $codVol): void
+    public function verPerfil(string $codVol): void
     {
         $voluntario = $this->voluntarioDetalleQuery()
             ->where('v.cod_vol', $codVol)
@@ -600,7 +600,7 @@ class VoluntariosPanel extends Component
         ];
     }
 
-    private function disponibilidades(int $codVol)
+    private function disponibilidades(string $codVol)
     {
         return DB::table('disponibilidad_voluntarios')
             ->where('cod_vol', $codVol)
@@ -609,7 +609,7 @@ class VoluntariosPanel extends Component
             ->get();
     }
 
-    private function asignacionesActivas(int $codVol)
+    private function asignacionesActivas(string $codVol)
     {
         return DB::table('asignacion_voluntarios as av')
             ->leftJoin('adulto_mayor as am', 'av.cod_am', '=', 'am.cod_am')
@@ -625,7 +625,7 @@ class VoluntariosPanel extends Component
             ->get();
     }
 
-    private function asistenciasRecientes(int $codVol)
+    private function asistenciasRecientes(string $codVol)
     {
         return DB::table('asistencia_voluntarios')
             ->where('cod_vol', $codVol)
@@ -634,14 +634,14 @@ class VoluntariosPanel extends Component
             ->get();
     }
 
-    private function conteo(string $tabla, int $codVol): int
+    private function conteo(string $tabla, string $codVol): int
     {
         return Schema::hasTable($tabla)
             ? DB::table($tabla)->where('cod_vol', $codVol)->count()
             : 0;
     }
 
-    private function conteoAsignacionesActivas(int $codVol): int
+    private function conteoAsignacionesActivas(string $codVol): int
     {
         return DB::table('asignacion_voluntarios')
             ->where('cod_vol', $codVol)
@@ -652,9 +652,9 @@ class VoluntariosPanel extends Component
             ->count();
     }
 
-    private function recargarPerfilSiCorresponde(int $codVol): void
+    private function recargarPerfilSiCorresponde(string $codVol): void
     {
-        if ($this->mostrarPerfil && $this->perfil && (int) $this->perfil['voluntario']->cod_vol === $codVol) {
+        if ($this->mostrarPerfil && $this->perfil && (string) $this->perfil['voluntario']->cod_vol === $codVol) {
             $this->verPerfil($codVol);
         }
     }
@@ -721,7 +721,7 @@ class VoluntariosPanel extends Component
         ];
     }
 
-    private function linksSubmodulos(int $codVol): array
+    private function linksSubmodulos(string $codVol): array
     {
         return [
             'disponibilidad' => route('admin.voluntariado.disponibilidad.index', ['voluntario' => $codVol]),

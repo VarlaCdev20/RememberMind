@@ -2,110 +2,75 @@
 
 namespace App\Models;
 
-use App\Models\User;
-use Illuminate\Support\Collection;
+use App\Traits\GeneraCodigo;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Str;
 
-class AreaInstitucional
+class AreaInstitucional extends Model
 {
-    public $cod_area;
-    public $nombre;
-    public $tipo_area;
-    public $descripcion;
-    public $color;
-    public $estado;
-    public $orden;
-    public $responsable_id;
-    public $responsable;
-    public $usuarios;
-    public $usuarios_count;
-    public $created_at;
-    public $updated_at;
+    use GeneraCodigo;
+    use SoftDeletes;
 
-    public function __construct(array $attributes = [])
+    protected $table = 'areas_institucionales';
+    protected $primaryKey = 'cod_area';
+    public $incrementing = false;
+    protected $keyType = 'string';
+    protected $prefixCode = 'ARE';
+    protected $digitsCode = 4;
+
+    protected $fillable = [
+        'cod_area',
+        'nombre',
+        'slug',
+        'tipo_area',
+        'descripcion',
+        'responsable_id',
+        'roles_sugeridos',
+        'modulos_relacionados',
+        'color',
+        'icono',
+        'estado',
+        'orden',
+        'observaciones',
+        'imagen_area',
+        'creado_por',
+        'actualizado_por',
+    ];
+
+    protected $casts = [
+        'roles_sugeridos' => 'array',
+        'modulos_relacionados' => 'array',
+        'orden' => 'integer',
+    ];
+
+    protected static function booted(): void
     {
-        $this->cod_area = $attributes['cod_area'] ?? '';
-        $this->nombre = $attributes['nombre'] ?? '';
-        $this->tipo_area = $attributes['tipo_area'] ?? 'Administrativa';
-        $this->descripcion = $attributes['descripcion'] ?? '';
-        $this->color = $attributes['color'] ?? '#2F3E5C';
-        $this->estado = $attributes['estado'] ?? 'ACTIVA';
-        $this->orden = $attributes['orden'] ?? 0;
-        $this->responsable_id = $attributes['responsable_id'] ?? null;
-        $this->created_at = now();
-        $this->updated_at = now();
-    }
-
-    public static function allAreas(): Collection
-    {
-        $areasData = [
-            'ARE_0001' => [
-                'cod_area' => 'ARE_0001',
-                'nombre' => 'DIRECCIÓN GENERAL',
-                'tipo_area' => 'Administrativa',
-                'descripcion' => 'Dirección general y toma de decisiones estratégicas.',
-                'color' => '#2F3E5C',
-                'estado' => 'ACTIVA',
-                'orden' => 1,
-            ],
-            'ARE_0002' => [
-                'cod_area' => 'ARE_0002',
-                'nombre' => 'COORDINACIÓN DE PROGRAMAS Y SERVICIOS',
-                'tipo_area' => 'Administrativa',
-                'descripcion' => 'Coordinación de programas asistenciales y servicios institucionales.',
-                'color' => '#5E6599',
-                'estado' => 'ACTIVA',
-                'orden' => 2,
-            ],
-            'ARE_0003' => [
-                'cod_area' => 'ARE_0003',
-                'nombre' => 'ÁREA ADMINISTRATIVA Y REGISTRO INSTITUCIONAL',
-                'tipo_area' => 'Administrativa',
-                'descripcion' => 'Gestión administrativa, contable y registro de usuarios.',
-                'color' => '#967B66',
-                'estado' => 'ACTIVA',
-                'orden' => 3,
-            ],
-            'ARE_0004' => [
-                'cod_area' => 'ARE_0004',
-                'nombre' => 'ÁREA DE ATENCIÓN MÉDICA',
-                'tipo_area' => 'Salud',
-                'descripcion' => 'Atención médica general, geriatría, enfermería y fisioterapia.',
-                'color' => '#63775B',
-                'estado' => 'ACTIVA',
-                'orden' => 4,
-            ],
-            'ARE_0005' => [
-                'cod_area' => 'ARE_0005',
-                'nombre' => 'ÁREA DE PSICOLOGÍA Y SEGUIMIENTO COGNITIVO',
-                'tipo_area' => 'Salud',
-                'descripcion' => 'Apoyo psicológico, evaluaciones cognitivas y actividades pedagógicas.',
-                'color' => '#9B8B7E',
-                'estado' => 'ACTIVA',
-                'orden' => 5,
-            ],
-        ];
-
-        return collect($areasData)->map(function ($data) {
-            $area = new self($data);
-            
-            $usuarios = User::with('roles')->get()
-                ->filter(fn (User $user) => $user->cod_area_virtual === $area->cod_area)
-                ->values();
-            $area->usuarios = $usuarios;
-            $area->usuarios_count = $usuarios->count();
-
-            // Find an active supervisor/admin in this area to designate as virtual responsible
-            $responsable = $usuarios->filter(fn($u) => $u->hasRole(['SUPERADMINISTRADOR', 'ADMINISTRADOR']))->first() ?? $usuarios->first();
-            $area->responsable = $responsable;
-            $area->responsable_id = $responsable?->cod_usu;
-
-            return $area;
+        static::saving(function (self $area) {
+            if (! $area->slug && $area->nombre) {
+                $area->slug = Str::slug($area->nombre);
+            }
         });
     }
 
-    public static function find($codArea)
+    public function responsable()
     {
-        return self::allAreas()->firstWhere('cod_area', $codArea);
+        return $this->belongsTo(User::class, 'responsable_id', 'cod_usu');
+    }
+
+    public function usuarios()
+    {
+        return $this->hasMany(User::class, 'cod_area', 'cod_area');
+    }
+
+    public function scopeActivas($query)
+    {
+        return $query->where('estado', 'ACTIVA');
+    }
+
+    public function scopeInactivas($query)
+    {
+        return $query->where('estado', 'INACTIVA');
     }
 
     public static function rolesPorArea(string $codArea): array
@@ -114,111 +79,8 @@ class AreaInstitucional
             'ARE_0001', 'ARE_0002', 'ARE_0003' => ['SUPERADMINISTRADOR', 'ADMINISTRADOR'],
             'ARE_0004' => ['ENFERMEROS', 'MEDICO GENERAL/GERIATRA', 'NUTRICIONISTA', 'FISIOTERAPEUTA'],
             'ARE_0005' => ['PSICOLOGO/A', 'PEDAGOGO'],
+            'ARE_0008' => ['VOLUNTARIO'],
             default => [],
         };
-    }
-
-    public static function findOrFail($codArea)
-    {
-        $area = self::find($codArea);
-        if (!$area) {
-            abort(404, "Área institucional no encontrada.");
-        }
-        return $area;
-    }
-
-    public static function count()
-    {
-        return self::allAreas()->count();
-    }
-
-    public static function query()
-    {
-        return new class {
-            public function with($relations) { return $this; }
-            public function withCount($relations) { return $this; }
-            public function orderBy($column, $direction = 'asc') { return $this; }
-            
-            public function where($column, $operator = null, $value = null)
-            {
-                return $this;
-            }
-
-            public function whereNull($column)
-            {
-                return $this;
-            }
-
-            public function whereNotNull($column)
-            {
-                return $this;
-            }
-
-            public function count()
-            {
-                return AreaInstitucional::count();
-            }
-
-            public function get() 
-            { 
-                return AreaInstitucional::allAreas(); 
-            }
-            
-            public function findOrFail($id) { return AreaInstitucional::findOrFail($id); }
-            public function find($id) { return AreaInstitucional::find($id); }
-        };
-    }
-
-    public static function __callStatic($name, $arguments)
-    {
-        return self::query()->$name(...$arguments);
-    }
-
-    public static function with($relations)
-    {
-        return self::query()->with($relations);
-    }
-
-    public static function withCount($relations)
-    {
-        return self::query()->withCount($relations);
-    }
-
-    public static function activas()
-    {
-        return new class {
-            public function count() { return AreaInstitucional::count(); }
-        };
-    }
-
-    public static function inactivas()
-    {
-        return new class {
-            public function count() { return 0; }
-        };
-    }
-
-    public static function doesntHave($relation)
-    {
-        return new class {
-            public function count() { 
-                return AreaInstitucional::allAreas()->filter(fn($a) => $a->usuarios_count === 0)->count(); 
-            }
-        };
-    }
-
-    public function update(array $attributes = [])
-    {
-        return true;
-    }
-
-    public static function create(array $attributes = [])
-    {
-        return new self($attributes);
-    }
-
-    public function save()
-    {
-        return true;
     }
 }

@@ -332,18 +332,18 @@ class DashboardService
 
         // Fuente 1: tabla alertas pendientes
         if (
-            Schema::hasTable('alertas') &&
-            Schema::hasColumn('alertas', 'estado') &&
-            Schema::hasColumn('alertas', 'descripcion')
+            Schema::hasTable('alertas_adulto') &&
+            Schema::hasColumn('alertas_adulto', 'estado') &&
+            Schema::hasColumn('alertas_adulto', 'motivo')
         ) {
-            $alertasDB = DB::table('alertas')
-                ->where('estado', 'PENDIENTE')
+            $alertasDB = DB::table('alertas_adulto')
+                ->whereIn('estado', ['ABIERTA', 'PENDIENTE'])
                 ->limit(3)
                 ->get();
             foreach ($alertasDB as $a) {
                 $alertas[] = [
                     'nivel'       => 'URGENTE',
-                    'descripcion' => $a->descripcion,
+                    'descripcion' => $a->motivo,
                     'icono'       => 'ph-warning-octagon',
                     'accion'      => 'Revisar en módulo de alertas',
                 ];
@@ -685,7 +685,7 @@ class DashboardService
             'usuarios_activos'        => $this->conteoSeguro('users', 'estado', 'ACTIVO'),
             'adultos_mayores'         => $this->conteoSeguro('adulto_mayor'),
             'voluntarios'             => $this->conteoSeguro('voluntarios'),
-            'alertas_pendientes'      => $this->conteoSeguro('alertas', 'estado', 'PENDIENTE'),
+            'alertas_pendientes'      => $this->conteoSeguro('alertas_adulto', 'estado', 'ABIERTA'),
             'usuarios_con_rol'        => $this->conteoSeguro('model_has_roles'),
             'adultos_con_familiar'    => $this->conteoSeguro('familiar_adulto'),
             'voluntarios_asignados'   => $this->conteoSeguro('asignacion_voluntarios'),
@@ -781,11 +781,11 @@ class DashboardService
     {
         $alertas = [];
 
-        if (Schema::hasTable('alertas')) {
-            $alertas = DB::table('alertas')
-                ->where('estado', 'PENDIENTE')
+        if (Schema::hasTable('alertas_adulto')) {
+            $alertas = DB::table('alertas_adulto')
+                ->whereIn('estado', ['ABIERTA', 'PENDIENTE'])
                 ->limit(3)
-                ->pluck('descripcion')
+                ->pluck('motivo')
                 ->toArray();
         }
 

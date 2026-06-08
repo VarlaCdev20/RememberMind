@@ -23,7 +23,7 @@ class HabitacionesPanel extends Component
     public bool $modalDetalle    = false;
 
     // ── Formulario habitación ──────────────────────────────────────────────────
-    public ?int   $editandoHabitacionId = null;
+    public ?string $editandoHabitacionId = null;
     public string $codigo        = '';
     public string $nombre        = '';
     public string $tipoHabitacion= '';
@@ -33,14 +33,14 @@ class HabitacionesPanel extends Component
     public string $observacion   = '';
 
     // ── Formulario cama ────────────────────────────────────────────────────────
-    public ?int   $editandoCamaId     = null;
-    public ?int   $habitacionParaCama = null;
+    public ?string $editandoCamaId     = null;
+    public ?string $habitacionParaCama = null;
     public string $codigoCama         = '';
     public string $estadoCama         = 'DISPONIBLE';
     public string $observacionCama    = '';
 
     // ── Detalle ────────────────────────────────────────────────────────────────
-    public ?int $detalleId = null;
+    public ?string $detalleId = null;
 
     public function updatingSearch(): void    { $this->resetPage(); }
     public function updatingFiltroTipo(): void   { $this->resetPage(); }
@@ -54,7 +54,7 @@ class HabitacionesPanel extends Component
         $this->modalHabitacion = true;
     }
 
-    public function abrirEditarHabitacion(int $id): void
+    public function abrirEditarHabitacion(string $id): void
     {
         $h = Habitacion::findOrFail($id);
         $this->editandoHabitacionId = $id;
@@ -107,7 +107,7 @@ class HabitacionesPanel extends Component
         $this->dispatch('swal', ['icon' => 'success', 'title' => $msg]);
     }
 
-    public function eliminarHabitacion(int $id): void
+    public function eliminarHabitacion(string $id): void
     {
         $h = Habitacion::withCount('camas')->findOrFail($id);
         if ($h->camas_count > 0) {
@@ -121,7 +121,7 @@ class HabitacionesPanel extends Component
 
     // ── CRUD Cama ──────────────────────────────────────────────────────────────
 
-    public function abrirCrearCama(int $habitacionId): void
+    public function abrirCrearCama(string $habitacionId): void
     {
         $this->resetCama();
         $this->habitacionParaCama = $habitacionId;

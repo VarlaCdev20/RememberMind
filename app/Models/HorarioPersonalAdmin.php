@@ -23,7 +23,7 @@ class HorarioPersonalAdmin extends Model
     protected $prefixCode = 'HAD';
     protected $digitsCode = 3;
 
-    public $timestamps = false;
+    public $timestamps = true;
 
     protected $fillable = [
         'dia_semana',
@@ -39,6 +39,15 @@ class HorarioPersonalAdmin extends Model
     public function user()
     {
         return $this->belongsTo(User::class, 'cod_usu', 'cod_usu');
+    }
+
+    protected static function booted(): void
+    {
+        static::saving(function (self $horario) {
+            $horario->cod_usu ??= $horario->cod_per_adm;
+            $horario->cod_per_adm ??= $horario->cod_usu;
+            $horario->estado ??= 'ACTIVO';
+        });
     }
 
 }

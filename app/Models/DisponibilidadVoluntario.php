@@ -14,33 +14,27 @@ class DisponibilidadVoluntario extends Model
 
     public $incrementing = false;
     protected $keyType = 'string';
-    protected $prefixCode = 'DVO';
-    protected $digitsCode = 3;
+    protected $prefixCode = 'HDV';
+    protected $digitsCode = 4;
 
-    public $timestamps = false;
+    public $timestamps = true;
 
     protected $fillable = [
         'dia_semana',
         'hora_inicio',
         'hora_fin',
+        'estado',
+        'obser',
         'observaciones',
         'cod_vol',
     ];
 
-    protected static function boot(): void
+    protected static function booted(): void
     {
-        static::creating(function ($DisponibilidadVoluntario) {
-            if (!$DisponibilidadVoluntario->cod_hor_vol) {
-                $ultimo = self::where('cod_hor_vol', 'like', 'HDV_%')
-                    ->orderByDesc('cod_hor_vol')
-                    ->value('cod_hor_vol');
-
-                $numero = $ultimo
-                    ? ((int) substr($ultimo, 3)) + 1
-                    : 1;
-
-                $DisponibilidadVoluntario->cod_hor_vol = 'HDV_' . str_pad($numero, 4, '0', STR_PAD_LEFT);
-            }
+        static::saving(function (self $disponibilidad) {
+            $disponibilidad->obser ??= $disponibilidad->observaciones;
+            $disponibilidad->observaciones ??= $disponibilidad->obser;
+            $disponibilidad->estado ??= 'ACTIVO';
         });
     }
 
@@ -52,5 +46,16 @@ class DisponibilidadVoluntario extends Model
     public function voluntario()
     {
         return $this->belongsTo(Voluntario::class, 'cod_vol', 'cod_vol');
+    }
+
+    public function getObservacionesAttribute(): ?string
+    {
+        return $this->attributes['observaciones'] ?? $this->attributes['obser'] ?? null;
+    }
+
+    public function setObservacionesAttribute(?string $value): void
+    {
+        $this->attributes['observaciones'] = $value;
+        $this->attributes['obser'] = $value;
     }
 }

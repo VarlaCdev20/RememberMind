@@ -356,7 +356,9 @@
  <div>
  <span class="font-black text-meta uppercase tracking-wider block">Fecha de Ingreso:</span>
  <span class="font-bold text-parrafo">
-  @php($fechaIngresoAdmin = $usuarioDetalle->personalAdmin->fecha_ingreso ?? $usuarioDetalle->created_at ?? null)
+  @php
+   $fechaIngresoAdmin = $usuarioDetalle->personalAdmin->fecha_ingreso ?? $usuarioDetalle->created_at ?? null;
+  @endphp
   {{ $fechaIngresoAdmin ? \Carbon\Carbon::parse($fechaIngresoAdmin)->format('d/m/Y') : 'No registrada' }}
  </span>
  </div>
@@ -379,7 +381,9 @@
  <div>
  <span class="font-black text-meta uppercase tracking-wider block">Fecha de Ingreso:</span>
  <span class="font-bold text-parrafo">
-  @php($fechaIngresoSalud = $usuarioDetalle->personalSalud->fecha_ingreso ?? $usuarioDetalle->created_at ?? null)
+  @php
+   $fechaIngresoSalud = $usuarioDetalle->personalSalud->fecha_ingreso ?? $usuarioDetalle->created_at ?? null;
+  @endphp
   {{ $fechaIngresoSalud ? \Carbon\Carbon::parse($fechaIngresoSalud)->format('d/m/Y') : 'No registrada' }}
  </span>
  </div>
@@ -969,7 +973,7 @@
  $inicial = mb_substr(trim($u->nombres ?? $nombreCompleto), 0, 1);
 
  $areaDisplay = $u->areaInstitucional?->nombre ?? match($roleKey) {
- 'super_admin', 'superadministrador', 'admin', 'administrador' => 'Administración del sistema',
+ 'super_admin', 'admin' => 'Administración del sistema',
  'enfermeros', 'medico general/geriatra', 'psicologo/a', 'pedagogo', 'nutricionista', 'fisioterapeuta' => 'Área de salud',
  'superadministrador', 'administrador' => 'Área administrativa',
  'FAMILIAR' => 'Familiar autorizado',
@@ -984,14 +988,14 @@
  'superadministrador', 'administrador' => data_get($u, 'personalAdmin.cargoAdmin.nombre')
  ?? $u->personalAdmin?->cargo
  ?? 'Personal administrativo',
- 'super_admin', 'superadministrador', 'admin', 'administrador' => 'Administrador del sistema',
+ 'super_admin', 'admin' => 'Administrador del sistema',
  'VOLUNTARIO' => 'Voluntario institucional',
  'FAMILIAR' => 'Familiar autorizado',
  default => strtoupper(str_replace('_', ' ', $roleName))
  };
 
  $areaClass = match($roleKey) {
- 'super_admin', 'superadministrador', 'admin', 'administrador' => 'bg-fondo-panel text-parrafo border-borde-fuerte',
+ 'super_admin', 'admin' => 'bg-fondo-panel text-parrafo border-borde-fuerte',
  'enfermeros', 'medico general/geriatra', 'psicologo/a', 'pedagogo', 'nutricionista', 'fisioterapeuta' => 'bg-estado-exitoBg text-estado-exito border-estado-exitoBorde',
  'superadministrador', 'administrador' => 'bg-estado-peligroBg text-boton-acento border-borde-focus',
  'VOLUNTARIO' => 'bg-fondo-panel text-parrafo border-borde',
@@ -1000,7 +1004,7 @@
  };
 
  $perfilClass = match($roleKey) {
- 'super_admin', 'superadministrador', 'admin', 'administrador' => 'bg-fondo-panel text-parrafo border-borde-fuerte',
+ 'super_admin', 'admin' => 'bg-fondo-panel text-parrafo border-borde-fuerte',
  'enfermeros', 'medico general/geriatra', 'psicologo/a', 'pedagogo', 'nutricionista', 'fisioterapeuta' => 'bg-estado-exitoBg text-estado-exito border-estado-exitoBorde',
  'superadministrador', 'administrador' => 'bg-estado-peligroBg text-boton-acento border-borde-focus',
  'VOLUNTARIO' => 'bg-fondo-panel text-parrafo border-borde',
@@ -1207,7 +1211,7 @@
  $inicial = mb_substr(trim($u->nombres ?? $nombreCompleto), 0, 1);
 
  $areaDisplay = $u->areaInstitucional?->nombre ?? match($roleKey) {
- 'super_admin', 'superadministrador', 'admin', 'administrador' => 'Administración del sistema',
+ 'super_admin', 'admin' => 'Administración del sistema',
  'enfermeros', 'medico general/geriatra', 'psicologo/a', 'pedagogo', 'nutricionista', 'fisioterapeuta' => 'Área de salud',
  'superadministrador', 'administrador' => 'Área administrativa',
  'FAMILIAR' => 'Familiar autorizado',
@@ -1222,14 +1226,14 @@
  'superadministrador', 'administrador' => data_get($u, 'personalAdmin.cargoAdmin.nombre')
  ?? $u->personalAdmin?->cargo
  ?? 'Personal administrativo',
- 'super_admin', 'superadministrador', 'admin', 'administrador' => 'Administrador del sistema',
+ 'super_admin', 'admin' => 'Administrador del sistema',
  'VOLUNTARIO' => 'Voluntario institucional',
  'FAMILIAR' => 'Familiar autorizado',
  default => strtoupper(str_replace('_', ' ', $roleName))
  };
 
  $areaClass = match($roleKey) {
- 'super_admin', 'superadministrador', 'admin', 'administrador' => 'bg-fondo-panel text-parrafo border-borde-fuerte',
+ 'super_admin', 'admin' => 'bg-fondo-panel text-parrafo border-borde-fuerte',
  'enfermeros', 'medico general/geriatra', 'psicologo/a', 'pedagogo', 'nutricionista', 'fisioterapeuta' => 'bg-estado-exitoBg text-estado-exito border-estado-exitoBorde',
  'superadministrador', 'administrador' => 'bg-estado-peligroBg text-boton-acento border-borde-focus',
  'VOLUNTARIO' => 'bg-fondo-panel text-parrafo border-borde',
@@ -2483,7 +2487,7 @@
  $vistaInicial = mb_substr(trim($usuarioVista->nombres ?? 'U'), 0, 1);
 
  $vistaAreaDisplay = $usuarioVista->areaInstitucional?->nombre ?? match($vistaRoleKey) {
- 'super_admin', 'superadministrador', 'admin', 'administrador' => 'Administración del sistema',
+ 'super_admin', 'admin' => 'Administración del sistema',
  'enfermeros', 'medico general/geriatra', 'psicologo/a', 'pedagogo', 'nutricionista', 'fisioterapeuta' => 'Área de salud',
  'superadministrador', 'administrador' => 'Área administrativa',
  'FAMILIAR' => 'Familiar autorizado',
@@ -2494,7 +2498,7 @@
  $vistaPerfilDetalle = match($vistaRoleKey) {
  'enfermeros', 'medico general/geriatra', 'psicologo/a', 'pedagogo', 'nutricionista', 'fisioterapeuta' => $usuarioVista->personalSalud?->especialidad?->nombre ?? 'Personal de salud',
  'superadministrador', 'administrador' => $usuarioVista->personalAdmin?->cargoAdmin?->nombre ?? $usuarioVista->personalAdmin?->cargo ?? 'Personal administrativo',
- 'super_admin', 'superadministrador', 'admin', 'administrador' => 'Administrador del sistema',
+ 'super_admin', 'admin' => 'Administrador del sistema',
  'VOLUNTARIO' => 'Voluntario institucional',
  'FAMILIAR' => 'Familiar autorizado',
  default => strtoupper(str_replace('_', ' ', $vistaRoleName))
@@ -2736,7 +2740,7 @@
  $fichaInicial = mb_substr(trim($usuarioFicha->nombres ?? 'U'), 0, 1);
 
  $fichaAreaDisplay = $usuarioFicha->areaInstitucional?->nombre ?? match($fichaRoleKey) {
- 'super_admin', 'superadministrador', 'admin', 'administrador' => 'Administración del sistema',
+ 'super_admin', 'admin' => 'Administración del sistema',
  'enfermeros', 'medico general/geriatra', 'psicologo/a', 'pedagogo', 'nutricionista', 'fisioterapeuta' => 'Área de salud',
  'superadministrador', 'administrador' => 'Área administrativa',
  'FAMILIAR' => 'Familiar autorizado',
@@ -2747,7 +2751,7 @@
  $fichaPerfilDetalle = match($fichaRoleKey) {
  'enfermeros', 'medico general/geriatra', 'psicologo/a', 'pedagogo', 'nutricionista', 'fisioterapeuta' => $usuarioFicha->personalSalud?->especialidad?->nombre ?? 'Personal de salud',
  'superadministrador', 'administrador' => $usuarioFicha->personalAdmin?->cargoAdmin?->nombre ?? $usuarioFicha->personalAdmin?->cargo ?? 'Personal administrativo',
- 'super_admin', 'superadministrador', 'admin', 'administrador' => 'Administrador del sistema',
+ 'super_admin', 'admin' => 'Administrador del sistema',
  'VOLUNTARIO' => 'Voluntario institucional',
  'FAMILIAR' => 'Familiar autorizado',
  default => strtoupper(str_replace('_', ' ', $fichaRoleName))

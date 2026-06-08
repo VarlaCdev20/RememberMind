@@ -25,6 +25,9 @@ class DocumentoUsuario extends Model
         'cod_doc_usu',
         'cod_usu',
         'cod_tipo_doc',
+        'archivo_path',
+        'nombre_original',
+        'fecha_subida',
         'tipo_documento',
         'nombre_documento',
         'archivo',
@@ -46,6 +49,7 @@ class DocumentoUsuario extends Model
 
     protected $casts = [
         'fecha_emision' => 'date',
+        'fecha_subida' => 'datetime',
         'fecha_vencimiento' => 'date',
         'fecha_validacion' => 'datetime',
         'tamanio' => 'integer',
@@ -84,6 +88,29 @@ class DocumentoUsuario extends Model
                     : 1;
 
                 $doc->cod_doc_usu = 'DUS_' . str_pad($numero, 4, '0', STR_PAD_LEFT);
+            }
+
+            $doc->archivo_path ??= $doc->archivo ?? 'pendiente';
+            $doc->archivo ??= $doc->archivo_path;
+            $doc->nombre_original ??= $doc->nombre_documento ?? 'Documento';
+            $doc->nombre_documento ??= $doc->nombre_original;
+            $doc->fecha_subida ??= now();
+            $doc->tipo_documento ??= $doc->tipoDocumento?->nombre;
+            $doc->extension ??= pathinfo((string) $doc->archivo_path, PATHINFO_EXTENSION) ?: null;
+        });
+
+        static::saving(function ($doc) {
+            if ($doc->archivo && ! $doc->archivo_path) {
+                $doc->archivo_path = $doc->archivo;
+            }
+            if ($doc->archivo_path && ! $doc->archivo) {
+                $doc->archivo = $doc->archivo_path;
+            }
+            if ($doc->nombre_documento && ! $doc->nombre_original) {
+                $doc->nombre_original = $doc->nombre_documento;
+            }
+            if ($doc->nombre_original && ! $doc->nombre_documento) {
+                $doc->nombre_documento = $doc->nombre_original;
             }
         });
     }

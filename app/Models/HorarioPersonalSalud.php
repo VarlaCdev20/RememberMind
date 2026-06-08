@@ -23,7 +23,7 @@ class HorarioPersonalSalud extends Model
     protected $prefixCode = 'HSA';
     protected $digitsCode = 3;
 
-    public $timestamps = false;
+    public $timestamps = true;
 
     protected $fillable = [
         'dia_semana',
@@ -39,6 +39,15 @@ class HorarioPersonalSalud extends Model
     public function user()
     {
         return $this->belongsTo(User::class, 'cod_usu', 'cod_usu');
+    }
+
+    protected static function booted(): void
+    {
+        static::saving(function (self $horario) {
+            $horario->cod_usu ??= $horario->cod_per_sal;
+            $horario->cod_per_sal ??= $horario->cod_usu;
+            $horario->estado ??= 'ACTIVO';
+        });
     }
 
 }

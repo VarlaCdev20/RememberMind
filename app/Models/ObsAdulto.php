@@ -5,11 +5,13 @@ namespace App\Models;
 use App\Traits\GeneraCodigo;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\Traits\LogsActivity;
 
 class ObsAdulto extends Model
 {
     use GeneraCodigo;
+    use SoftDeletes;
     use LogsActivity;
 
     protected $table = 'obs_adulto';
@@ -28,6 +30,10 @@ class ObsAdulto extends Model
         'descripcion',
         'cod_am',
         'cod_est_adul',
+        'creado_por',
+        'observacion',
+        'categoria',
+        'nivel_riesgo',
         'registrado_por',
         'nivel_importancia'
     ];
@@ -48,6 +54,20 @@ class ObsAdulto extends Model
                 if ($eventName === 'deleted') return "Se eliminó la observación #{$this->cod_obs_adul}.";
                 return "Observación {$this->cod_obs_adul} modificada ({$eventName}).";
             });
+    }
+
+    protected static function booted(): void
+    {
+        static::saving(function (self $obs) {
+            $obs->categoria = $obs->categoria ?: ($obs->tipo_obs ?: 'GENERAL');
+            $obs->tipo_obs = $obs->tipo_obs ?: $obs->categoria;
+            $obs->observacion = $obs->observacion ?: ($obs->descripcion ?: '');
+            $obs->descripcion = $obs->descripcion ?: $obs->observacion;
+            $obs->creado_por = $obs->creado_por ?: ($obs->registrado_por ?: auth()->id());
+            $obs->registrado_por = $obs->registrado_por ?: $obs->creado_por;
+            $obs->nivel_riesgo = $obs->nivel_riesgo ?: ($obs->nivel_importancia ?: 'BAJO');
+            $obs->nivel_importancia = $obs->nivel_importancia ?: $obs->nivel_riesgo;
+        });
     }
 
     public function adultoMayor()

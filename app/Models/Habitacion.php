@@ -32,6 +32,7 @@ class Habitacion extends Model
         'capacidad',
         'estado',
         'observacion',
+        'observaciones',
     ];
 
     protected $casts = [
@@ -64,6 +65,14 @@ class Habitacion extends Model
         return $this->camas()->where('estado', 'DISPONIBLE');
     }
 
+    protected static function booted(): void
+    {
+        static::saving(function (self $habitacion) {
+            $habitacion->observaciones ??= $habitacion->observacion;
+            $habitacion->observacion ??= $habitacion->observaciones;
+        });
+    }
+
     // ── Scopes ─────────────────────────────────────────────────────────────────
 
     public function scopeDisponibles($query)
@@ -81,5 +90,16 @@ class Habitacion extends Model
     public function getCapacidadDisponibleAttribute(): int
     {
         return $this->camasDisponibles()->count();
+    }
+
+    public function getObservacionAttribute(): ?string
+    {
+        return $this->attributes['observacion'] ?? $this->attributes['observaciones'] ?? null;
+    }
+
+    public function setObservacionAttribute(?string $value): void
+    {
+        $this->attributes['observacion'] = $value;
+        $this->attributes['observaciones'] = $value;
     }
 }

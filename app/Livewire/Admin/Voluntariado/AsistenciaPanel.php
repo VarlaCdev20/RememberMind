@@ -25,7 +25,7 @@ class AsistenciaPanel extends Component
 
     public bool $mostrarFormulario = false;
     public bool $isEdit = false;
-    public ?int $asistenciaId = null;
+    public ?string $asistenciaId = null;
     public string $asignacionContexto = '';
     public string $cod_vol = '';
     public string $fecha = '';
@@ -36,7 +36,7 @@ class AsistenciaPanel extends Component
     public string $observaciones = '';
     public string $advertenciaAsignacion = '';
 
-    public ?int $detalleId = null;
+    public ?string $detalleId = null;
 
     protected $queryString = [
         'search' => ['except' => ''],
@@ -53,7 +53,7 @@ class AsistenciaPanel extends Component
         $this->fechaFiltro = request('fecha') ? (string) request('fecha') : '';
 
         if (request('asignacion')) {
-            $this->abrirCrearDesdeAsignacion((int) request('asignacion'));
+            $this->abrirCrearDesdeAsignacion((string) request('asignacion'));
             return;
         }
 
@@ -102,7 +102,7 @@ class AsistenciaPanel extends Component
         $this->mostrarFormulario = true;
     }
 
-    public function abrirCrearDesdeAsignacion(int $id): void
+    public function abrirCrearDesdeAsignacion(string $id): void
     {
         abort_unless($this->puedeGestionarAsistencia(), 403);
 
@@ -121,7 +121,7 @@ class AsistenciaPanel extends Component
         $this->mostrarFormulario = true;
     }
 
-    public function editar(int $id): void
+    public function editar(string $id): void
     {
         abort_unless($this->puedeGestionarAsistencia(), 403);
 
@@ -131,15 +131,15 @@ class AsistenciaPanel extends Component
         }
 
         $this->resetValidation();
-        $this->asistenciaId = (int) $asistencia->cod_asis_vol;
+        $this->asistenciaId = (string) $asistencia->cod_asis_vol;
         $this->cod_vol = (string) $asistencia->cod_vol;
         $this->fecha = $asistencia->fecha ? Carbon::parse($asistencia->fecha)->format('Y-m-d') : '';
         $this->hora_entrada = $asistencia->hora_entrada ? substr((string) $asistencia->hora_entrada, 0, 5) : '';
         $this->hora_salida = $asistencia->hora_salida ? substr((string) $asistencia->hora_salida, 0, 5) : '';
         $this->estado = $this->normalizarEstado($asistencia->estado);
         $this->actividad_realizada = (string) $asistencia->actividad_realizada;
-        $this->observaciones = (string) $asistencia->observaciones;
-        $this->asignacionContexto = (string) ($this->asignacionRelacionada((int) $asistencia->cod_vol, (string) $asistencia->fecha)?->cod_asig_vol ?? '');
+        $this->observaciones = (string) ($asistencia->observaciones ?? $asistencia->novedades_observaciones ?? '');
+        $this->asignacionContexto = (string) ($this->asignacionRelacionada((string) $asistencia->cod_vol, (string) $asistencia->fecha)?->cod_asig_vol ?? '');
         $this->actualizarAdvertenciaAsignacion();
         $this->isEdit = true;
         $this->mostrarFormulario = true;
@@ -158,7 +158,7 @@ class AsistenciaPanel extends Component
             return;
         }
 
-        $asignacion = $this->buscarAsignacion((int) $this->asignacionContexto);
+        $asignacion = $this->buscarAsignacion((string) $this->asignacionContexto);
         if (! $asignacion) {
             return;
         }
@@ -185,7 +185,7 @@ class AsistenciaPanel extends Component
 
         $validated = $this->validate($this->rules(), $this->messages());
 
-        if ($this->asistenciaDuplicada((int) $validated['cod_vol'], $validated['fecha'])) {
+        if ($this->asistenciaDuplicada((string) $validated['cod_vol'], $validated['fecha'])) {
             $this->addError('fecha', 'Este voluntario ya tiene asistencia registrada para esa fecha.');
             $this->dispatch('swal', [
                 'icon' => 'warning',
@@ -196,7 +196,7 @@ class AsistenciaPanel extends Component
         }
 
         if ($this->asignacionContexto) {
-            $asignacion = $this->buscarAsignacion((int) $this->asignacionContexto);
+            $asignacion = $this->buscarAsignacion((string) $this->asignacionContexto);
             if ($asignacion && $this->normalizarEstadoAsignacion($asignacion->estado) === 'Cancelada' && ! in_array($validated['estado'], ['Cancelado', 'Justificado'], true)) {
                 $this->dispatch('swal', [
                     'icon' => 'warning',
@@ -209,13 +209,16 @@ class AsistenciaPanel extends Component
 
         $estado = $validated['estado'];
         $payload = [
-            'cod_vol' => (int) $validated['cod_vol'],
+            'cod_vol' => $validated['cod_vol'],
+            'cod_am' => $this->asignacionContexto ? ($this->buscarAsignacion((string) $this->asignacionContexto)?->cod_am ?? null) : null,
             'fecha' => $validated['fecha'],
             'hora_entrada' => in_array($estado, ['No asistió', 'Justificado', 'Cancelado', 'Reprogramado'], true) ? null : ($validated['hora_entrada'] ?: null),
             'hora_salida' => in_array($estado, ['No asistió', 'Justificado', 'Cancelado', 'Reprogramado'], true) ? null : ($validated['hora_salida'] ?: null),
             'estado' => $estado,
             'actividad_realizada' => $validated['actividad_realizada'] ?: null,
             'observaciones' => $validated['observaciones'] ?: null,
+            'novedades_observaciones' => $validated['observaciones'] ?: null,
+            'updated_at' => now(),
         ];
 
         $eraEdicion = $this->isEdit;
@@ -225,7 +228,10 @@ class AsistenciaPanel extends Component
                 ->where('cod_asis_vol', $this->asistenciaId)
                 ->update($payload);
         } else {
-            DB::table('asistencia_voluntarios')->insert($payload);
+            DB::table('asistencia_voluntarios')->insert($payload + [
+                'cod_asis_vol' => $this->siguienteCodigoAsistencia(),
+                'created_at' => now(),
+            ]);
         }
 
         $this->mostrarFormulario = false;
@@ -245,7 +251,7 @@ class AsistenciaPanel extends Component
         $this->resetPage();
     }
 
-    public function verDetalle(int $id): void
+    public function verDetalle(string $id): void
     {
         $this->detalleId = $id;
     }
@@ -255,22 +261,22 @@ class AsistenciaPanel extends Component
         $this->detalleId = null;
     }
 
-    public function marcarAsistio(int $id): void
+    public function marcarAsistio(string $id): void
     {
         $this->cambiarEstado($id, 'Asistió', 'Asistencia confirmada', 'La asistencia quedó marcada como asistió.');
     }
 
-    public function marcarNoAsistio(int $id): void
+    public function marcarNoAsistio(string $id): void
     {
         $this->cambiarEstado($id, 'No asistió', 'Ausencia registrada', 'La asistencia quedó registrada como ausencia y se conserva en historial.');
     }
 
-    public function justificarAusencia(int $id): void
+    public function justificarAusencia(string $id): void
     {
         $this->cambiarEstado($id, 'Justificado', 'Ausencia justificada', 'La asistencia quedó registrada como justificada.');
     }
 
-    public function marcarReprogramado(int $id): void
+    public function marcarReprogramado(string $id): void
     {
         $this->cambiarEstado($id, 'Reprogramado', 'Asistencia reprogramada', 'El registro queda marcado como reprogramado.');
     }
@@ -301,7 +307,7 @@ class AsistenciaPanel extends Component
     private function rules(): array
     {
         return [
-            'cod_vol' => ['required', 'integer', Rule::exists('voluntarios', 'cod_vol')],
+            'cod_vol' => ['required', Rule::exists('voluntarios', 'cod_vol')],
             'fecha' => ['required', 'date'],
             'hora_entrada' => [
                 Rule::requiredIf(fn () => in_array($this->estado, ['Asistió', 'Tarde'], true)),
@@ -364,7 +370,7 @@ class AsistenciaPanel extends Component
             ]);
 
         if ($this->voluntarioFiltro !== '') {
-            $query->where('asi.cod_vol', (int) $this->voluntarioFiltro);
+            $query->where('asi.cod_vol', $this->voluntarioFiltro);
         }
 
         if ($this->search !== '') {
@@ -557,7 +563,7 @@ class AsistenciaPanel extends Component
         $item->estado_normalizado = $this->normalizarEstado($item->estado);
         $item->fecha_texto = $item->fecha ? Carbon::parse($item->fecha)->format('d/m/Y') : 'Sin fecha';
         $item->dia_semana = $item->fecha ? $this->diaDesdeFecha(Carbon::parse($item->fecha)) : 'Sin día';
-        $item->programacion = $this->programacionPorVoluntarioFecha((int) $item->cod_vol, (string) $item->fecha);
+        $item->programacion = $this->programacionPorVoluntarioFecha((string) $item->cod_vol, (string) $item->fecha);
         $item->turno = $item->programacion['turno'];
         $item->horario_programado = $item->programacion['horario'];
         $item->tiempo_colaborado = $this->tiempoColaboradoTexto($item->hora_entrada, $item->hora_salida);
@@ -573,7 +579,7 @@ class AsistenciaPanel extends Component
         $item->adulto_nombre = trim(($item->adulto_nombres ?? '') . ' ' . ($item->adulto_ap_paterno ?? '') . ' ' . ($item->adulto_ap_materno ?? ''));
         $item->fecha_texto = $item->fecha_asig ? Carbon::parse($item->fecha_asig)->format('d/m/Y') : 'Sin fecha';
         $item->estado_normalizado = $this->normalizarEstadoAsignacion($item->estado);
-        $programacion = $this->programacionPorVoluntarioFecha((int) $item->cod_vol, (string) $item->fecha_asig);
+        $programacion = $this->programacionPorVoluntarioFecha((string) $item->cod_vol, (string) $item->fecha_asig);
         $item->horario_programado = $programacion['horario'];
         $item->turno = $programacion['turno'];
 
@@ -586,14 +592,14 @@ class AsistenciaPanel extends Component
             return ['horario' => 'Seleccione voluntario y fecha', 'turno' => 'Sin dato', 'asignacion' => 'Sin asignación seleccionada'];
         }
 
-        $programacion = $this->programacionPorVoluntarioFecha((int) $this->cod_vol, $this->fecha);
-        $asignacion = $this->asignacionRelacionada((int) $this->cod_vol, $this->fecha);
+        $programacion = $this->programacionPorVoluntarioFecha((string) $this->cod_vol, $this->fecha);
+        $asignacion = $this->asignacionRelacionada((string) $this->cod_vol, $this->fecha);
         $programacion['asignacion'] = $asignacion ? ('Asignación #' . $asignacion->cod_asig_vol) : 'Sin asignación relacionada';
 
         return $programacion;
     }
 
-    private function programacionPorVoluntarioFecha(int $codVol, string $fecha): array
+    private function programacionPorVoluntarioFecha(string $codVol, string $fecha): array
     {
         if (! $fecha) {
             return ['horario' => 'Sin fecha', 'turno' => 'Sin dato'];
@@ -627,7 +633,7 @@ class AsistenciaPanel extends Component
         ];
     }
 
-    private function buscarAsignacion(int $id): ?object
+    private function buscarAsignacion(string $id): ?object
     {
         $asignacion = DB::table('asignacion_voluntarios as a')
             ->join('voluntarios as v', 'a.cod_vol', '=', 'v.cod_vol')
@@ -638,6 +644,7 @@ class AsistenciaPanel extends Component
                 'a.fecha_asig',
                 'a.estado',
                 'a.cod_vol',
+                'a.cod_am',
                 DB::raw("concat_ws(' ', am.nombres, am.ap_paterno, am.ap_materno) as adulto_nombre"),
             ])
             ->where('a.cod_asig_vol', $id)
@@ -646,7 +653,7 @@ class AsistenciaPanel extends Component
         return $asignacion ?: null;
     }
 
-    private function asignacionRelacionada(int $codVol, string $fecha): ?object
+    private function asignacionRelacionada(string $codVol, string $fecha): ?object
     {
         $asignacion = DB::table('asignacion_voluntarios')
             ->where('cod_vol', $codVol)
@@ -665,7 +672,7 @@ class AsistenciaPanel extends Component
             return;
         }
 
-        $asignacion = $this->asignacionRelacionada((int) $this->cod_vol, $this->fecha);
+        $asignacion = $this->asignacionRelacionada((string) $this->cod_vol, $this->fecha);
         if (! $asignacion) {
             $this->advertenciaAsignacion = 'No existe una asignación registrada para este voluntario en la fecha seleccionada.';
             return;
@@ -676,7 +683,7 @@ class AsistenciaPanel extends Component
         }
     }
 
-    private function asistenciaDuplicada(int $codVol, string $fecha): bool
+    private function asistenciaDuplicada(string $codVol, string $fecha): bool
     {
         $query = DB::table('asistencia_voluntarios')
             ->where('cod_vol', $codVol)
@@ -689,7 +696,24 @@ class AsistenciaPanel extends Component
         return $query->exists();
     }
 
-    private function cambiarEstado(int $id, string $estado, string $titulo, string $texto): void
+    private function siguienteCodigoAsistencia(): string
+    {
+        $ultimo = DB::table('asistencia_voluntarios')
+            ->where('cod_asis_vol', 'like', 'ASI_%')
+            ->orderByDesc('cod_asis_vol')
+            ->value('cod_asis_vol');
+
+        $numero = $ultimo ? ((int) substr((string) $ultimo, 4)) + 1 : 1;
+
+        do {
+            $codigo = 'ASI_' . str_pad($numero, 4, '0', STR_PAD_LEFT);
+            $numero++;
+        } while (DB::table('asistencia_voluntarios')->where('cod_asis_vol', $codigo)->exists());
+
+        return $codigo;
+    }
+
+    private function cambiarEstado(string $id, string $estado, string $titulo, string $texto): void
     {
         abort_unless($this->puedeGestionarAsistencia(), 403);
 
@@ -698,6 +722,8 @@ class AsistenciaPanel extends Component
             $payload['hora_entrada'] = null;
             $payload['hora_salida'] = null;
         }
+
+        $payload['updated_at'] = now();
 
         DB::table('asistencia_voluntarios')
             ->where('cod_asis_vol', $id)

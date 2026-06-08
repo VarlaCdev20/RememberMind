@@ -1,349 +1,671 @@
-<div class="relative mx-auto max-w-6xl space-y-4">
-    {{-- Header --}}
-    <section class="rm-surface-glass p-5">
-        <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-            <div>
-                <span class="text-[11px] font-bold uppercase tracking-widest text-terracota">
-                    Módulo Admisiones
-                </span>
-                <h1 class="mt-1 text-2xl font-black leading-tight text-titulo">
-                    Preadmisión de Adulto Mayor
-                </h1>
-                <p class="mt-1 max-w-2xl text-sm font-bold leading-5 text-titulo/60">
-                    Complete los pasos obligatorios para registrar al paciente y asignarlo a una valoración inicial.
-                </p>
-            </div>
-
-            <a href="{{ route('admin.admisiones.preadmisiones') }}" class="rm-btn-secondary">
-                <i class="ph-bold ph-arrow-left"></i>
-                Volver
-            </a>
-        </div>
-
-        {{-- Barra de progreso --}}
-        <div class="mt-5">
-            <div class="mb-1.5 flex justify-between text-[11px] font-bold text-titulo/55">
-                <span>Paso {{ $paso }} de {{ $totalPasos }}</span>
-                <span>{{ round(($paso / $totalPasos) * 100) }}%</span>
-            </div>
-
-            <div class="h-1.5 overflow-hidden rounded-full bg-fondo-panel">
-                <div class="h-full rounded-full bg-gradient-to-r from-[#D9A27C] to-terracota transition-all duration-500 ease-out"
-                    style="width: {{ ($paso / $totalPasos) * 100 }}%">
+<div class="w-full">
+    <div x-data="{ isDirty: false }" x-on:input="isDirty = true" x-on:change="isDirty = true" class="max-w-5xl mx-auto w-full min-h-[calc(100vh-8rem)] flex flex-col p-4 md:p-6 bg-white rounded-2xl shadow-xl border border-borde/30 relative">
+        <!-- Header -->
+        <div class="flex items-start justify-between mb-4 border-b border-borde/50 pb-3">
+            <div class="flex items-center gap-3">
+                <div class="flex h-10 w-10 items-center justify-center rounded-2xl bg-boton-acento/10 text-boton-acento shadow-inner border border-boton-acento/20">
+                    <i class="ph-fill ph-file-plus text-xl"></i>
+                </div>
+                <div>
+                    <h3 class="text-xl font-black text-titulo leading-tight">Registrar Preadmisión</h3>
+                    <p class="text-sm font-semibold text-apoyo mt-0.5">Registra la solicitud inicial y prepara el caso para valoración</p>
                 </div>
             </div>
-
-            <div class="mt-3 grid grid-cols-5 gap-2 text-center text-[10px] font-bold">
-                <div class="truncate rounded-lg px-2 py-1.5 transition {{ $paso >= 1 ? 'bg-boton-acento text-inverso shadow-sm' : 'bg-fondo-panel text-titulo/45' }}">Datos Base</div>
-                <div class="truncate rounded-lg px-2 py-1.5 transition {{ $paso >= 2 ? 'bg-boton-acento text-inverso shadow-sm' : 'bg-fondo-panel text-titulo/45' }}">Docs Básicos</div>
-                <div class="truncate rounded-lg px-2 py-1.5 transition {{ $paso >= 3 ? 'bg-boton-acento text-inverso shadow-sm' : 'bg-fondo-panel text-titulo/45' }}">Institucional</div>
-                <div class="truncate rounded-lg px-2 py-1.5 transition {{ $paso >= 4 ? 'bg-boton-acento text-inverso shadow-sm' : 'bg-fondo-panel text-titulo/45' }}">Asignación</div>
-                <div class="truncate rounded-lg px-2 py-1.5 transition {{ $paso >= 5 ? 'bg-boton-acento text-inverso shadow-sm' : 'bg-fondo-panel text-titulo/45' }}">Confirmar</div>
-            </div>
+            <button type="button" @click="
+                if (isDirty) {
+                    Swal.fire({
+                        title: '¿Salir sin guardar?',
+                        text: 'Hay cambios sin guardar en el formulario. Si sale, perdera todos los datos.',
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: 'var(--estado-peligro)',
+                        cancelButtonColor: 'var(--boton-acento)',
+                        confirmButtonText: 'Si, salir',
+                        cancelButtonText: 'Permanecer',
+                        background: 'var(--fondo-card)',
+                        color: 'var(--texto-principal)'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.href = '{{ route('admin.admisiones.preadmisiones') }}';
+                        }
+                    });
+                } else {
+                    window.location.href = '{{ route('admin.admisiones.preadmisiones') }}';
+                }
+            " class="w-8 h-8 flex items-center justify-center rounded-full bg-fondo text-apoyo hover:bg-estado-peligroBg hover:text-estado-peligro transition-colors">
+                <i class="ph-bold ph-x text-xl"></i>
+            </button>
         </div>
-    </section>
 
-    {{-- Resumen de Errores Globales --}}
-    @if ($errors->any())
-        <section class="rounded-xl border border-terracota/30 bg-boton-acento/10 p-4 text-sm font-bold text-terracota">
-            <p class="mb-2 font-black"><i class="ph-bold ph-warning-circle mr-1"></i> Hay errores en el formulario:</p>
-            <ul class="list-inside list-disc space-y-1">
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
+        @php
+            $pasoActualsLista = [
+                1 => 'Identidad',
+                2 => 'Direccion',
+                3 => 'Familiar',
+                4 => 'Caso',
+                5 => 'Documentos',
+                6 => 'Asignacion'
+            ];
+            
+            // Simular errores para el stepper
+            $pasosErrores = [
+                1 => $errors->has('nombres') || $errors->has('ap_paterno') || $errors->has('ap_materno') || $errors->has('ci') || $errors->has('expedicion_ci') || $errors->has('fecha_nac') || $errors->has('genero') || $errors->has('estado_civil') || $errors->has('telefono') || $errors->has('celular'),
+                2 => $errors->has('departamento_residencia') || $errors->has('ciudad_municipio') || $errors->has('zona') || $errors->has('calle') || $errors->has('direccion_referencia'),
+                3 => $errors->has('familiar_nombres') || $errors->has('familiar_ap_paterno') || $errors->has('familiar_ap_materno') || $errors->has('familiar_ci') || $errors->has('familiar_parentesco') || $errors->has('familiar_celular') || $errors->has('familiar_correo') || $errors->has('familiar_direccion'),
+                4 => $errors->has('motivo_ingreso') || $errors->has('procedencia_ingreso') || $errors->has('tipo_ingreso') || $errors->has('permanencia') || $errors->has('prioridad') || $errors->has('descripcion_caso'),
+                5 => $errors->has('doc_ci_adulto') || $errors->has('doc_ci_familiar') || $errors->has('doc_solicitud_ingreso'),
+                6 => $errors->has('enfermero_id')
+            ];
+        @endphp
+
+        <!-- Stepper Compacto -->
+        <div class="mb-4">
+            <div class="relative flex items-center justify-between w-full pb-4">
+                <!-- Linea de fondo -->
+                <div class="absolute left-6 right-6 top-[18px] transform -translate-y-1/2 h-[3px] bg-borde/40 rounded-full z-0"></div>
+                <!-- Linea de progreso -->
+                <div class="absolute left-6 top-[18px] transform -translate-y-1/2 h-[3px] bg-boton-acento rounded-full z-0 transition-all duration-500 ease-out shadow-[0_0_8px_rgba(63,125,90,0.4)]" style="width: calc({{ (($paso - 1) / 5) * 100 }}% - 3rem)"></div>
+                
+                @foreach($pasoActualsLista as $num => $nombre)
+                    <div class="relative z-10 flex flex-col items-center group">
+                        @php
+                            $hasError = $pasosErrores[$num] ?? false;
+                            $isCompleted = $paso > $num;
+                            $isActive = $paso == $num;
+                        @endphp
+                        
+                        <div class="w-9 h-9 rounded-full flex items-center justify-center font-bold text-xs transition-all duration-300 {{ 
+                            $hasError 
+                                ? 'bg-estado-peligroBg text-estado-peligro border-2 border-estado-peligro' 
+                                : ($isActive 
+                                    ? 'bg-boton-acento text-white ring-4 ring-boton-acento/20 scale-110 shadow-lg' 
+                                    : ($isCompleted 
+                                        ? 'bg-boton-acento text-white hover:bg-boton-acentoHover' 
+                                        : 'bg-white text-apoyo/40 border-2 border-borde/60 hover:border-apoyo/30'))
+                        }}">
+                            @if($hasError)
+                                <i class="ph-bold ph-warning text-base"></i>
+                            @elseif($isCompleted)
+                                <i class="ph-bold ph-check text-base"></i>
+                            @else
+                                {{ $num }}
+                            @endif
+                        </div>
+                        
+                        <span class="absolute top-10 text-[10px] font-bold uppercase tracking-wider whitespace-nowrap transition-colors duration-300 {{ 
+                            $hasError 
+                                ? 'text-estado-peligro' 
+                                : ($isActive 
+                                    ? 'text-boton-acento font-black scale-105 origin-top' 
+                                    : ($isCompleted 
+                                        ? 'text-titulo/70' 
+                                        : 'text-apoyo/40')) 
+                        }} hidden sm:block">{{ $nombre }}</span>
+                    </div>
                 @endforeach
-            </ul>
-        </section>
-    @endif
+            </div>
+            <div class="text-center sm:hidden mt-2">
+                <span class="text-[11px] font-black text-boton-acento uppercase tracking-wider bg-boton-acento/10 px-3 py-1.5 rounded-full">Paso {{ $paso }}: {{ $pasoActualsLista[$paso] }}</span>
+            </div>
+        </div>
 
-    <div class="rm-surface-glass p-6">
-        {{-- Paso 1: Datos Obligatorios --}}
-        @if ($paso == 1)
-            <div class="animate-fade-in">
-                <div class="mb-6 flex items-start gap-3">
-                    <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-boton-acento/10 text-terracota">
-                        <i class="ph-fill ph-identification-card text-xl"></i>
-                    </div>
+        <!-- Form Body -->
+        <div class="flex-1 space-y-3 pb-4">
+        @if ($paso === 1)
+            <div class="space-y-3 animate-fade-in">
+                <h4 class="text-base font-bold text-titulo border-b border-borde pb-2 flex items-center gap-2">
+                    <i class="ph-bold ph-user text-boton-acento"></i> 1. Identificación y datos personales
+                </h4>
+                <div class="grid gap-3 md:grid-cols-3">
+                    @foreach ([
+                        'nombres' => 'Nombres *',
+                        'ap_paterno' => 'Apellido paterno *',
+                        'ap_materno' => 'Apellido materno',
+                        'ci' => 'CI *',
+                    ] as $field => $label)
+                        <div>
+                            <label class="block text-xs font-bold text-apoyo uppercase tracking-wider mb-0.5">{{ $label }}</label>
+                            <input type="text" wire:model.blur="{{ $field }}" @class([
+        'w-full rounded-xl border bg-input-bg py-1.5 text-xs text-input-texto',
+        'border-estado-peligro focus:border-estado-peligro focus:ring-estado-peligro' => $errors->has($field),
+        'border-input-borde focus:border-input-bordeFocus focus:ring-input-ringFocus' => !$errors->has($field),
+    ])>
+                            @error($field) <span class="mt-1 block text-[11px] font-bold text-estado-peligro">{{ $message }}</span> @enderror
+                        </div>
+                    @endforeach
                     <div>
-                        <h2 class="text-lg font-extrabold text-titulo">Paso 1: Datos Obligatorios</h2>
-                        <p class="text-xs font-bold text-titulo/55">Información básica del adulto mayor y contacto de emergencia.</p>
-                    </div>
-                </div>
-
-                <div class="grid gap-4 md:grid-cols-3">
-                    <div class="md:col-span-3">
-                        <h3 class="text-sm font-bold uppercase tracking-widest text-parrafo mb-2 border-b border-borde pb-1">Identidad Adulto Mayor</h3>
-                    </div>
-                    
-                    <div>
-                        <label class="mb-1 block text-[11px] font-bold uppercase tracking-widest text-titulo/55">Nombres *</label>
-                        <input type="text" wire:model.blur="nombres" placeholder="Ej. Juan" class="w-full rounded-xl border border-borde-suave bg-fondo-panel px-3.5 py-2.5 text-sm font-bold text-titulo outline-none transition focus:border-borde-focus focus:bg-fondo-app focus:ring-4 focus:ring-borde-focus/10">
-                    </div>
-                    <div>
-                        <label class="mb-1 block text-[11px] font-bold uppercase tracking-widest text-titulo/55">Apellido Paterno *</label>
-                        <input type="text" wire:model.blur="ap_paterno" placeholder="Ej. Pérez" class="w-full rounded-xl border border-borde-suave bg-fondo-panel px-3.5 py-2.5 text-sm font-bold text-titulo outline-none transition focus:border-borde-focus focus:bg-fondo-app focus:ring-4 focus:ring-borde-focus/10">
-                    </div>
-                    <div>
-                        <label class="mb-1 block text-[11px] font-bold uppercase tracking-widest text-titulo/55">Apellido Materno</label>
-                        <input type="text" wire:model.blur="ap_materno" placeholder="Ej. Gómez" class="w-full rounded-xl border border-borde-suave bg-fondo-panel px-3.5 py-2.5 text-sm font-bold text-titulo outline-none transition focus:border-borde-focus focus:bg-fondo-app focus:ring-4 focus:ring-borde-focus/10">
-                    </div>
-                    <div>
-                        <label class="mb-1 block text-[11px] font-bold uppercase tracking-widest text-titulo/55">C.I. *</label>
-                        <input type="text" wire:model.blur="ci" placeholder="Ej. 1234567" class="w-full rounded-xl border border-borde-suave bg-fondo-panel px-3.5 py-2.5 text-sm font-bold text-titulo outline-none transition focus:border-borde-focus focus:bg-fondo-app focus:ring-4 focus:ring-borde-focus/10">
-                    </div>
-                    <div>
-                        <label class="mb-1 block text-[11px] font-bold uppercase tracking-widest text-titulo/55">Expedición C.I. *</label>
-                        <select wire:model.blur="expedicion_ci" class="w-full rounded-xl border border-borde-suave bg-fondo-panel px-3.5 py-2.5 text-sm font-bold text-titulo outline-none transition focus:border-borde-focus focus:bg-fondo-app focus:ring-4 focus:ring-borde-focus/10">
+                        <label class="block text-xs font-bold text-apoyo uppercase tracking-wider mb-0.5">Expedicion CI *</label>
+                        <select wire:model.blur="expedicion_ci" @class([
+        'w-full rounded-xl border bg-input-bg py-1.5 text-xs text-input-texto',
+        'border-estado-peligro focus:border-estado-peligro focus:ring-estado-peligro' => $errors->has('expedicion_ci'),
+        'border-input-borde focus:border-input-bordeFocus focus:ring-input-ringFocus' => !$errors->has('expedicion_ci'),
+    ])>
                             <option value="">Seleccionar</option>
-                            <option value="LP">La Paz (LP)</option>
-                            <option value="SC">Santa Cruz (SC)</option>
-                            <option value="CB">Cochabamba (CB)</option>
-                            <option value="OR">Oruro (OR)</option>
-                            <option value="PT">Potosí (PT)</option>
-                            <option value="CH">Chuquisaca (CH)</option>
-                            <option value="TJ">Tarija (TJ)</option>
-                            <option value="BE">Beni (BE)</option>
-                            <option value="PA">Pando (PA)</option>
+                            @foreach (['LP','SC','CB','OR','PT','CH','TJ','BE','PA'] as $dep)
+                                <option value="{{ $dep }}">{{ $dep }}</option>
+                            @endforeach
                         </select>
+                            @error('expedicion_ci') <span class="mt-1 block text-[11px] font-bold text-estado-peligro">{{ $message }}</span> @enderror
                     </div>
                     <div>
-                        <label class="mb-1 block text-[11px] font-bold uppercase tracking-widest text-titulo/55">Fecha de Nacimiento *</label>
-                        <input type="date" wire:model.blur="fecha_nac" class="w-full rounded-xl border border-borde-suave bg-fondo-panel px-3.5 py-2.5 text-sm font-bold text-titulo outline-none transition focus:border-borde-focus focus:bg-fondo-app focus:ring-4 focus:ring-borde-focus/10">
+                        <label class="block text-xs font-bold text-apoyo uppercase tracking-wider mb-0.5">Fecha de nacimiento *</label>
+                        <input type="date" wire:model.blur="fecha_nac" @class([
+        'w-full rounded-xl border bg-input-bg py-1.5 text-xs text-input-texto',
+        'border-estado-peligro focus:border-estado-peligro focus:ring-estado-peligro' => $errors->has('fecha_nac'),
+        'border-input-borde focus:border-input-bordeFocus focus:ring-input-ringFocus' => !$errors->has('fecha_nac'),
+    ])>
+                            @error('fecha_nac') <span class="mt-1 block text-[11px] font-bold text-estado-peligro">{{ $message }}</span> @enderror
                     </div>
                     <div>
-                        <label class="mb-1 block text-[11px] font-bold uppercase tracking-widest text-titulo/55">Género *</label>
-                        <select wire:model.blur="genero" class="w-full rounded-xl border border-borde-suave bg-fondo-panel px-3.5 py-2.5 text-sm font-bold text-titulo outline-none transition focus:border-borde-focus focus:bg-fondo-app focus:ring-4 focus:ring-borde-focus/10">
+                        <label class="block text-xs font-bold text-apoyo uppercase tracking-wider mb-0.5">Genero *</label>
+                        <select wire:model.blur="genero" @class([
+        'w-full rounded-xl border bg-input-bg py-1.5 text-xs text-input-texto',
+        'border-estado-peligro focus:border-estado-peligro focus:ring-estado-peligro' => $errors->has('genero'),
+        'border-input-borde focus:border-input-bordeFocus focus:ring-input-ringFocus' => !$errors->has('genero'),
+    ])>
                             <option value="">Seleccionar</option>
                             <option value="MASCULINO">Masculino</option>
                             <option value="FEMENINO">Femenino</option>
                             <option value="OTRO">Otro</option>
                         </select>
-                    </div>
-                </div>
-
-                <div class="grid gap-4 md:grid-cols-2 mt-6">
-                    <div class="md:col-span-2">
-                        <h3 class="text-sm font-bold uppercase tracking-widest text-parrafo mb-2 border-b border-borde pb-1">Familiar Responsable (Emergencia)</h3>
+                            @error('genero') <span class="mt-1 block text-[11px] font-bold text-estado-peligro">{{ $message }}</span> @enderror
                     </div>
                     <div>
-                        <label class="mb-1 block text-[11px] font-bold uppercase tracking-widest text-titulo/55">Nombre Completo *</label>
-                        <input type="text" wire:model.blur="contacto_emergencia_nombre" placeholder="Nombre del familiar" class="w-full rounded-xl border border-borde-suave bg-fondo-panel px-3.5 py-2.5 text-sm font-bold text-titulo outline-none transition focus:border-borde-focus focus:bg-fondo-app focus:ring-4 focus:ring-borde-focus/10">
-                    </div>
-                    <div>
-                        <label class="mb-1 block text-[11px] font-bold uppercase tracking-widest text-titulo/55">Parentesco *</label>
-                        <select wire:model.blur="contacto_emergencia_parentesco" class="w-full rounded-xl border border-borde-suave bg-fondo-panel px-3.5 py-2.5 text-sm font-bold text-titulo outline-none transition focus:border-borde-focus focus:bg-fondo-app focus:ring-4 focus:ring-borde-focus/10">
-                            <option value="">Seleccionar</option>
-                            <option value="HIJO/A">Hijo/a</option>
-                            <option value="CÓNYUGE">Cónyuge</option>
-                            <option value="HERMANO/A">Hermano/a</option>
-                            <option value="NIETO/A">Nieto/a</option>
-                            <option value="SOBRINO/A">Sobrino/a</option>
-                            <option value="OTRO">Otro</option>
+                        <label class="block text-xs font-bold text-apoyo uppercase tracking-wider mb-0.5">Estado civil</label>
+                        <select wire:model.blur="estado_civil" @class([
+        'w-full rounded-xl border bg-input-bg py-1.5 text-xs text-input-texto',
+        'border-estado-peligro focus:border-estado-peligro focus:ring-estado-peligro' => $errors->has('estado_civil'),
+        'border-input-borde focus:border-input-bordeFocus focus:ring-input-ringFocus' => !$errors->has('estado_civil'),
+    ])>
+                            @foreach (['NO ESPECIFICADO','SOLTERO/A','CASADO/A','VIUDO/A','DIVORCIADO/A','UNION LIBRE'] as $estadoCivil)
+                                <option value="{{ $estadoCivil }}">{{ $estadoCivil }}</option>
+                            @endforeach
                         </select>
+                            @error('estado_civil') <span class="mt-1 block text-[11px] font-bold text-estado-peligro">{{ $message }}</span> @enderror
                     </div>
                     <div>
-                        <label class="mb-1 block text-[11px] font-bold uppercase tracking-widest text-titulo/55">Celular de Contacto *</label>
-                        <input type="text" wire:model.blur="contacto_emergencia_celular" placeholder="Ej. 70012345" class="w-full rounded-xl border border-borde-suave bg-fondo-panel px-3.5 py-2.5 text-sm font-bold text-titulo outline-none transition focus:border-borde-focus focus:bg-fondo-app focus:ring-4 focus:ring-borde-focus/10">
+                        <label class="block text-xs font-bold text-apoyo uppercase tracking-wider mb-0.5">Telefono</label>
+                        <input type="text" wire:model.blur="telefono" @class([
+        'w-full rounded-xl border bg-input-bg py-1.5 text-xs text-input-texto',
+        'border-estado-peligro focus:border-estado-peligro focus:ring-estado-peligro' => $errors->has('telefono'),
+        'border-input-borde focus:border-input-bordeFocus focus:ring-input-ringFocus' => !$errors->has('telefono'),
+    ])>
+                            @error('telefono') <span class="mt-1 block text-[11px] font-bold text-estado-peligro">{{ $message }}</span> @enderror
                     </div>
                     <div>
-                        <label class="mb-1 block text-[11px] font-bold uppercase tracking-widest text-titulo/55">Dirección Actual</label>
-                        <input type="text" wire:model.blur="contacto_emergencia_direccion" placeholder="Av. Siempre Viva 123" class="w-full rounded-xl border border-borde-suave bg-fondo-panel px-3.5 py-2.5 text-sm font-bold text-titulo outline-none transition focus:border-borde-focus focus:bg-fondo-app focus:ring-4 focus:ring-borde-focus/10">
+                        <label class="block text-xs font-bold text-apoyo uppercase tracking-wider mb-0.5">Celular</label>
+                        <input type="text" wire:model.blur="celular" @class([
+        'w-full rounded-xl border bg-input-bg py-1.5 text-xs text-input-texto',
+        'border-estado-peligro focus:border-estado-peligro focus:ring-estado-peligro' => $errors->has('celular'),
+        'border-input-borde focus:border-input-bordeFocus focus:ring-input-ringFocus' => !$errors->has('celular'),
+    ])>
+                            @error('celular') <span class="mt-1 block text-[11px] font-bold text-estado-peligro">{{ $message }}</span> @enderror
                     </div>
                 </div>
             </div>
-        @endif
-
-        {{-- Paso 2: Documentos Obligatorios --}}
-        @if ($paso == 2)
-            <div class="animate-fade-in">
-                <div class="mb-6 flex items-start gap-3">
-                    <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
-                        <i class="ph-fill ph-file-pdf text-xl"></i>
-                    </div>
+        @elseif ($paso === 2)
+            <div class="space-y-3 animate-fade-in">
+                <h4 class="text-base font-bold text-titulo border-b border-borde pb-2 flex items-center gap-2">
+                    <i class="ph-bold ph-map-pin text-boton-acento"></i> 2. Dirección de referencia
+                </h4>
+                <div class="grid gap-3 md:grid-cols-2">
                     <div>
-                        <h2 class="text-lg font-extrabold text-titulo">Paso 2: Documentos Obligatorios</h2>
-                        <p class="text-xs font-bold text-titulo/55">Cargue los documentos requeridos para la preadmisión.</p>
+                        <label class="block text-xs font-bold text-apoyo uppercase tracking-wider mb-0.5">Departamento *</label>
+                        <select wire:model.blur="departamento_residencia" @class([
+        'w-full rounded-xl border bg-input-bg py-1.5 text-xs text-input-texto',
+        'border-estado-peligro focus:border-estado-peligro focus:ring-estado-peligro' => $errors->has('departamento_residencia'),
+        'border-input-borde focus:border-input-bordeFocus focus:ring-input-ringFocus' => !$errors->has('departamento_residencia'),
+    ])>
+                            <option value="">Seleccionar</option>
+                            @foreach (['LA PAZ','SANTA CRUZ','COCHABAMBA','ORURO','POTOSI','CHUQUISACA','TARIJA','BENI','PANDO'] as $dep)
+                                <option value="{{ $dep }}">{{ $dep }}</option>
+                            @endforeach
+                        </select>
+                            @error('departamento_residencia') <span class="mt-1 block text-[11px] font-bold text-estado-peligro">{{ $message }}</span> @enderror
                     </div>
-                </div>
-
-                <div class="grid gap-6 md:grid-cols-2">
-                    <div class="rounded-xl border border-borde-suave bg-fondo-panel p-4 shadow-sm">
-                        <label class="mb-2 block text-xs font-bold uppercase tracking-widest text-titulo/70">Fotocopia CI Adulto Mayor *</label>
-                        <input type="file" wire:model="doc_ci_adulto" class="block w-full text-sm font-bold text-titulo file:mr-4 file:rounded-xl file:border-0 file:bg-boton-principal file:px-4 file:py-2 file:text-xs file:font-black file:text-inverso file:transition hover:file:bg-boton-acento focus:outline-none">
-                        <div wire:loading wire:target="doc_ci_adulto" class="text-[10px] text-blue-500 mt-1 font-bold">Cargando...</div>
-                        @if ($doc_ci_adulto)
-                            <p class="text-[10px] text-emerald-600 mt-1 font-bold"><i class="ph-bold ph-check-circle"></i> Archivo listo.</p>
-                        @endif
-                    </div>
-                    
-                    <div class="rounded-xl border border-borde-suave bg-fondo-panel p-4 shadow-sm">
-                        <label class="mb-2 block text-xs font-bold uppercase tracking-widest text-titulo/70">Fotocopia CI Familiar Responsable *</label>
-                        <input type="file" wire:model="doc_ci_familiar" class="block w-full text-sm font-bold text-titulo file:mr-4 file:rounded-xl file:border-0 file:bg-boton-principal file:px-4 file:py-2 file:text-xs file:font-black file:text-inverso file:transition hover:file:bg-boton-acento focus:outline-none">
-                        <div wire:loading wire:target="doc_ci_familiar" class="text-[10px] text-blue-500 mt-1 font-bold">Cargando...</div>
-                        @if ($doc_ci_familiar)
-                            <p class="text-[10px] text-emerald-600 mt-1 font-bold"><i class="ph-bold ph-check-circle"></i> Archivo listo.</p>
-                        @endif
-                    </div>
-
-                    <div class="rounded-xl border border-borde-suave bg-fondo-panel p-4 shadow-sm md:col-span-2">
-                        <label class="mb-2 block text-xs font-bold uppercase tracking-widest text-titulo/70">Croquis de Domicilio (Opcional)</label>
-                        <input type="file" wire:model="doc_croquis" class="block w-full text-sm font-bold text-titulo file:mr-4 file:rounded-xl file:border-0 file:bg-boton-principal file:px-4 file:py-2 file:text-xs file:font-black file:text-inverso file:transition hover:file:bg-boton-acento focus:outline-none">
-                        <div wire:loading wire:target="doc_croquis" class="text-[10px] text-blue-500 mt-1 font-bold">Cargando...</div>
-                        @if ($doc_croquis)
-                            <p class="text-[10px] text-emerald-600 mt-1 font-bold"><i class="ph-bold ph-check-circle"></i> Archivo listo.</p>
-                        @endif
+                    @foreach ([
+                        'ciudad_municipio' => 'Ciudad / municipio *',
+                        'zona' => 'Zona *',
+                        'calle' => 'Calle / avenida *',
+                    ] as $field => $label)
+                        <div>
+                            <label class="block text-xs font-bold text-apoyo uppercase tracking-wider mb-0.5">{{ $label }}</label>
+                            <input type="text" wire:model.blur="{{ $field }}" @class([
+        'w-full rounded-xl border bg-input-bg py-1.5 text-xs text-input-texto',
+        'border-estado-peligro focus:border-estado-peligro focus:ring-estado-peligro' => $errors->has($field),
+        'border-input-borde focus:border-input-bordeFocus focus:ring-input-ringFocus' => !$errors->has($field),
+    ])>
+                            @error($field) <span class="mt-1 block text-[11px] font-bold text-estado-peligro">{{ $message }}</span> @enderror
+                        </div>
+                    @endforeach
+                    <div class="md:col-span-2">
+                        <label class="block text-xs font-bold text-apoyo uppercase tracking-wider mb-0.5">Referencia de direccion</label>
+                        <textarea wire:model.blur="direccion_referencia" rows="3" @class([
+        'w-full rounded-xl border bg-input-bg py-1.5 text-xs text-input-texto',
+        'border-estado-peligro focus:border-estado-peligro focus:ring-estado-peligro' => $errors->has('direccion_referencia'),
+        'border-input-borde focus:border-input-bordeFocus focus:ring-input-ringFocus' => !$errors->has('direccion_referencia'),
+    ])></textarea>
+                            @error('direccion_referencia') <span class="mt-1 block text-[11px] font-bold text-estado-peligro">{{ $message }}</span> @enderror
                     </div>
                 </div>
             </div>
-        @endif
-
-        {{-- Paso 3: Documentos Institucionales --}}
-        @if ($paso == 3)
-            <div class="animate-fade-in">
-                <div class="mb-6 flex items-start gap-3">
-                    <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-purple-50 text-purple-600">
-                        <i class="ph-fill ph-files text-xl"></i>
+        @elseif ($paso === 3)
+            <div class="space-y-3 animate-fade-in">
+                <h4 class="text-base font-bold text-titulo border-b border-borde pb-2 flex items-center gap-2">
+                    <i class="ph-bold ph-users text-boton-acento"></i> 3. Familiar responsable
+                </h4>
+                <div class="grid gap-3 md:grid-cols-3">
+                    @foreach ([
+                        'familiar_nombres' => 'Nombres *',
+                        'familiar_ap_paterno' => 'Apellido paterno',
+                        'familiar_ap_materno' => 'Apellido materno',
+                        'familiar_ci' => 'CI familiar',
+                    ] as $field => $label)
+                        <div>
+                            <label class="block text-xs font-bold text-apoyo uppercase tracking-wider mb-0.5">{{ $label }}</label>
+                            <input type="text" wire:model.blur="{{ $field }}" @class([
+        'w-full rounded-xl border bg-input-bg py-1.5 text-xs text-input-texto',
+        'border-estado-peligro focus:border-estado-peligro focus:ring-estado-peligro' => $errors->has($field),
+        'border-input-borde focus:border-input-bordeFocus focus:ring-input-ringFocus' => !$errors->has($field),
+    ])>
+                            @error($field) <span class="mt-1 block text-[11px] font-bold text-estado-peligro">{{ $message }}</span> @enderror
+                        </div>
+                    @endforeach
+                    <div>
+                        <label class="block text-xs font-bold text-apoyo uppercase tracking-wider mb-0.5">Parentesco *</label>
+                        <select wire:model.blur="familiar_parentesco" @class([
+        'w-full rounded-xl border bg-input-bg py-1.5 text-xs text-input-texto',
+        'border-estado-peligro focus:border-estado-peligro focus:ring-estado-peligro' => $errors->has('familiar_parentesco'),
+        'border-input-borde focus:border-input-bordeFocus focus:ring-input-ringFocus' => !$errors->has('familiar_parentesco'),
+    ])>
+                            <option value="">Seleccionar</option>
+                            @foreach (['HIJO/A','ESPOSO/A','HERMANO/A','SOBRINO/A','NIETO/A','TUTOR/A','APODERADO/A','OTRO'] as $parentesco)
+                                <option value="{{ $parentesco }}">{{ $parentesco }}</option>
+                            @endforeach
+                        </select>
+                            @error('familiar_parentesco') <span class="mt-1 block text-[11px] font-bold text-estado-peligro">{{ $message }}</span> @enderror
                     </div>
                     <div>
-                        <h2 class="text-lg font-extrabold text-titulo">Paso 3: Documentos Institucionales</h2>
-                        <p class="text-xs font-bold text-titulo/55">Al confirmar la preadmisión se generarán automáticamente estos documentos.</p>
+                        <label class="block text-xs font-bold text-apoyo uppercase tracking-wider mb-0.5">Celular *</label>
+                        <input type="text" wire:model.blur="familiar_celular" @class([
+        'w-full rounded-xl border bg-input-bg py-1.5 text-xs text-input-texto',
+        'border-estado-peligro focus:border-estado-peligro focus:ring-estado-peligro' => $errors->has('familiar_celular'),
+        'border-input-borde focus:border-input-bordeFocus focus:ring-input-ringFocus' => !$errors->has('familiar_celular'),
+    ])>
+                            @error('familiar_celular') <span class="mt-1 block text-[11px] font-bold text-estado-peligro">{{ $message }}</span> @enderror
                     </div>
-                </div>
-
-                <div class="grid gap-4 md:grid-cols-2">
-                    <div class="flex items-start gap-4 rounded-xl border border-borde-suave bg-fondo-panel p-4 shadow-sm">
-                        <div class="mt-1 text-emerald-500"><i class="ph-bold ph-file-text text-2xl"></i></div>
-                        <div>
-                            <h4 class="text-sm font-bold text-titulo">Contrato de Prestación de Servicios</h4>
-                            <p class="text-xs text-apoyo">Se generará con los datos de {{ $nombres }} y del responsable {{ $contacto_emergencia_nombre }}.</p>
-                        </div>
+                    <div>
+                        <label class="block text-xs font-bold text-apoyo uppercase tracking-wider mb-0.5">Correo</label>
+                        <input type="email" wire:model.blur="familiar_correo" @class([
+        'w-full rounded-xl border bg-input-bg py-1.5 text-xs text-input-texto',
+        'border-estado-peligro focus:border-estado-peligro focus:ring-estado-peligro' => $errors->has('familiar_correo'),
+        'border-input-borde focus:border-input-bordeFocus focus:ring-input-ringFocus' => !$errors->has('familiar_correo'),
+    ])>
+                            @error('familiar_correo') <span class="mt-1 block text-[11px] font-bold text-estado-peligro">{{ $message }}</span> @enderror
                     </div>
-                    <div class="flex items-start gap-4 rounded-xl border border-borde-suave bg-fondo-panel p-4 shadow-sm">
-                        <div class="mt-1 text-emerald-500"><i class="ph-bold ph-file-text text-2xl"></i></div>
-                        <div>
-                            <h4 class="text-sm font-bold text-titulo">Consentimiento Informado</h4>
-                            <p class="text-xs text-apoyo">Documento legal sobre las condiciones médicas de ingreso.</p>
-                        </div>
-                    </div>
-                    <div class="flex items-start gap-4 rounded-xl border border-borde-suave bg-fondo-panel p-4 shadow-sm">
-                        <div class="mt-1 text-emerald-500"><i class="ph-bold ph-file-text text-2xl"></i></div>
-                        <div>
-                            <h4 class="text-sm font-bold text-titulo">Hoja de Admisión</h4>
-                            <p class="text-xs text-apoyo">Ficha resumida con datos para el expediente físico.</p>
-                        </div>
+                    <div class="md:col-span-2">
+                        <label class="block text-xs font-bold text-apoyo uppercase tracking-wider mb-0.5">Direccion familiar</label>
+                        <textarea wire:model.blur="familiar_direccion" rows="3" @class([
+        'w-full rounded-xl border bg-input-bg py-1.5 text-xs text-input-texto',
+        'border-estado-peligro focus:border-estado-peligro focus:ring-estado-peligro' => $errors->has('familiar_direccion'),
+        'border-input-borde focus:border-input-bordeFocus focus:ring-input-ringFocus' => !$errors->has('familiar_direccion'),
+    ])></textarea>
+                            @error('familiar_direccion') <span class="mt-1 block text-[11px] font-bold text-estado-peligro">{{ $message }}</span> @enderror
                     </div>
                 </div>
             </div>
-        @endif
-
-        {{-- Paso 4: Selección de Enfermero --}}
-        @if ($paso == 4)
-            <div class="animate-fade-in">
-                <div class="mb-6 flex items-start gap-3">
-                    <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
-                        <i class="ph-fill ph-user-nurse text-xl"></i>
+        @elseif ($paso === 4)
+            <div class="space-y-3 animate-fade-in">
+                <h4 class="text-base font-bold text-titulo border-b border-borde pb-2 flex items-center gap-2">
+                    <i class="ph-bold ph-file-text text-boton-acento"></i> 4. Datos del caso
+                </h4>
+                <div class="grid gap-3 md:grid-cols-2">
+                    <div>
+                        <label class="block text-xs font-bold text-apoyo uppercase tracking-wider mb-0.5">Motivo de ingreso *</label>
+                        <select wire:model.blur="motivo_ingreso" @class([
+        'w-full rounded-xl border bg-input-bg py-1.5 text-xs text-input-texto',
+        'border-estado-peligro focus:border-estado-peligro focus:ring-estado-peligro' => $errors->has('motivo_ingreso'),
+        'border-input-borde focus:border-input-bordeFocus focus:ring-input-ringFocus' => !$errors->has('motivo_ingreso'),
+    ])>
+                            <option value="">Seleccionar</option>
+                            @foreach (['CUIDADO_PERMANENTE','CUIDADO_TEMPORAL','CONTROL_MEDICACION','RIESGO_CAIDAS','DEPENDENCIA_FUNCIONAL','SOLEDAD_FAMILIAR','RECUPERACION_POST_HOSPITALARIA','OTRO'] as $motivo)
+                                <option value="{{ $motivo }}">{{ str_replace('_', ' ', $motivo) }}</option>
+                            @endforeach
+                        </select>
+                            @error('motivo_ingreso') <span class="mt-1 block text-[11px] font-bold text-estado-peligro">{{ $message }}</span> @enderror
                     </div>
                     <div>
-                        <h2 class="text-lg font-extrabold text-titulo">Paso 4: Valoración Inicial</h2>
-                        <p class="text-xs font-bold text-titulo/55">Seleccione al enfermero/a encargado de realizar la valoración inicial obligatoria.</p>
+                        <label class="block text-xs font-bold text-apoyo uppercase tracking-wider mb-0.5">Procedencia *</label>
+                        <select wire:model.blur="procedencia_ingreso" @class([
+        'w-full rounded-xl border bg-input-bg py-1.5 text-xs text-input-texto',
+        'border-estado-peligro focus:border-estado-peligro focus:ring-estado-peligro' => $errors->has('procedencia_ingreso'),
+        'border-input-borde focus:border-input-bordeFocus focus:ring-input-ringFocus' => !$errors->has('procedencia_ingreso'),
+    ])>
+                            <option value="">Seleccionar</option>
+                            @foreach (['DOMICILIO_FAMILIAR','HOSPITAL','OTRO_CENTRO_GERIATRICO','INSTITUCION_SOCIAL','CONSULTA_MEDICA_EXTERNA','OTRO'] as $procedencia)
+                                <option value="{{ $procedencia }}">{{ str_replace('_', ' ', $procedencia) }}</option>
+                            @endforeach
+                        </select>
+                            @error('procedencia_ingreso') <span class="mt-1 block text-[11px] font-bold text-estado-peligro">{{ $message }}</span> @enderror
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-apoyo uppercase tracking-wider mb-0.5">Tipo de ingreso *</label>
+                        <select wire:model.blur="tipo_ingreso" @class([
+        'w-full rounded-xl border bg-input-bg py-1.5 text-xs text-input-texto',
+        'border-estado-peligro focus:border-estado-peligro focus:ring-estado-peligro' => $errors->has('tipo_ingreso'),
+        'border-input-borde focus:border-input-bordeFocus focus:ring-input-ringFocus' => !$errors->has('tipo_ingreso'),
+    ])>
+                            <option value="REGULAR">Regular</option>
+                            <option value="URGENTE">Urgente</option>
+                            <option value="DERIVACION">Derivacion</option>
+                        </select>
+                            @error('tipo_ingreso') <span class="mt-1 block text-[11px] font-bold text-estado-peligro">{{ $message }}</span> @enderror
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-apoyo uppercase tracking-wider mb-0.5">Permanencia *</label>
+                        <select wire:model.blur="permanencia" @class([
+        'w-full rounded-xl border bg-input-bg py-1.5 text-xs text-input-texto',
+        'border-estado-peligro focus:border-estado-peligro focus:ring-estado-peligro' => $errors->has('permanencia'),
+        'border-input-borde focus:border-input-bordeFocus focus:ring-input-ringFocus' => !$errors->has('permanencia'),
+    ])>
+                            <option value="PERMANENTE">Permanente</option>
+                            <option value="TEMPORAL">Temporal</option>
+                            <option value="OBSERVACION">Observacion</option>
+                        </select>
+                            @error('permanencia') <span class="mt-1 block text-[11px] font-bold text-estado-peligro">{{ $message }}</span> @enderror
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-apoyo uppercase tracking-wider mb-0.5">Prioridad *</label>
+                        <select wire:model.blur="prioridad" @class([
+        'w-full rounded-xl border bg-input-bg py-1.5 text-xs text-input-texto',
+        'border-estado-peligro focus:border-estado-peligro focus:ring-estado-peligro' => $errors->has('prioridad'),
+        'border-input-borde focus:border-input-bordeFocus focus:ring-input-ringFocus' => !$errors->has('prioridad'),
+    ])>
+                            @foreach (['BAJA','MEDIA','ALTA','CRITICA'] as $nivel)
+                                <option value="{{ $nivel }}">{{ $nivel }}</option>
+                            @endforeach
+                        </select>
+                            @error('prioridad') <span class="mt-1 block text-[11px] font-bold text-estado-peligro">{{ $message }}</span> @enderror
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="block text-xs font-bold text-apoyo uppercase tracking-wider mb-0.5">Descripcion del caso</label>
+                        <textarea wire:model.blur="descripcion_caso" rows="4" @class([
+        'w-full rounded-xl border bg-input-bg py-1.5 text-xs text-input-texto',
+        'border-estado-peligro focus:border-estado-peligro focus:ring-estado-peligro' => $errors->has('descripcion_caso'),
+        'border-input-borde focus:border-input-bordeFocus focus:ring-input-ringFocus' => !$errors->has('descripcion_caso'),
+    ])></textarea>
+                            @error('descripcion_caso') <span class="mt-1 block text-[11px] font-bold text-estado-peligro">{{ $message }}</span> @enderror
                     </div>
                 </div>
+            </div>
+        @elseif ($paso === 5)
+            <div class="space-y-3 animate-fade-in">
+                <div class="flex justify-between items-center border-b border-borde pb-2">
+                    <h4 class="text-base font-bold text-titulo flex items-center gap-2">
+                        <i class="ph-bold ph-folder-open text-boton-acento"></i> 5. Documentos iniciales e institucionales
+                    </h4>
+                    <span class="px-2.5 py-1.5 rounded-full bg-estado-advertenciaBg text-estado-advertencia font-bold text-xs border border-estado-advertenciaBorde">
+                        Obligatorios: presentar hoy
+                    </span>
+                </div>
 
-                <div class="max-w-md">
-                    <label class="mb-2 block text-xs font-bold uppercase tracking-widest text-titulo/70">Enfermero de Turno / Disponible *</label>
-                    <div class="grid gap-3">
-                        @foreach ($enfermeros as $enfermero)
-                            <label class="flex items-center gap-4 cursor-pointer rounded-xl border {{ $enfermero_id == $enfermero->cod_usu ? 'border-boton-acento bg-boton-acento/5 ring-1 ring-boton-acento/50' : 'border-borde-suave bg-fondo-panel' }} p-4 transition-all hover:border-boton-acento hover:bg-boton-acento/5">
-                                <input type="radio" wire:model.live="enfermero_id" value="{{ $enfermero->cod_usu }}" class="h-4 w-4 text-boton-acento border-borde-suave focus:ring-boton-acento">
-                                <div class="flex items-center gap-3">
-                                    <div class="flex h-10 w-10 items-center justify-center rounded-full bg-boton-acento/10 text-boton-acento font-black">
-                                        {{ substr($enfermero->nombres, 0, 1) }}{{ substr($enfermero->ap_paterno, 0, 1) }}
+                {{-- Documentos del Solicitante --}}
+                <div class="space-y-2 bg-fondo/30 p-3 md:p-4 rounded-lg border border-borde/60">
+                    <div class="flex items-center gap-2 pb-3 border-b border-borde/50">
+                        <div class="w-7 h-7 rounded-full bg-boton-acento/10 text-boton-acento flex items-center justify-center">
+                            <i class="ph-bold ph-folder-user text-lg"></i>
+                        </div>
+                        <h5 class="text-sm font-bold text-titulo uppercase tracking-wider">Archivos del Solicitante</h5>
+                    </div>
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-2">
+                        @foreach ([
+                            'doc_ci_adulto' => ['label' => 'CI adulto mayor', 'desc' => 'Cédula de identidad vigente'],
+                            'doc_ci_familiar' => ['label' => 'CI familiar responsable', 'desc' => 'Documento del tutor o responsable'],
+                            'doc_solicitud_ingreso' => ['label' => 'Solicitud inicial de ingreso', 'desc' => 'Formulario de solicitud firmado'],
+                        ] as $model => $info)
+                            @php
+                                $docSubido = (($model === 'doc_ci_adulto' && $doc_ci_adulto) || ($model === 'doc_ci_familiar' && $doc_ci_familiar) || ($model === 'doc_solicitud_ingreso' && $doc_solicitud_ingreso));
+                            @endphp
+                            <div wire:key="doc-{{ $model }}" class="flex items-center justify-between p-2.5 border rounded-xl bg-white shadow-sm transition-all hover:border-boton-acento/40 {{ (!$docSubido) ? 'border-estado-peligro/30 bg-estado-peligroBg/10' : 'border-borde' }}">
+                                <div class="flex items-center gap-2 overflow-hidden flex-1">
+                                    <div class="w-7 h-7 rounded-full {{ $docSubido ? 'bg-estado-exitoBg text-estado-exito' : 'bg-fondo text-apoyo' }} flex items-center justify-center shrink-0 border border-borde/40">
+                                        <i class="ph-fill {{ $docSubido ? 'ph-check-circle' : 'ph-file-text' }} text-lg"></i>
                                     </div>
-                                    <div>
-                                        <p class="text-sm font-bold text-titulo">{{ $enfermero->nombres }} {{ $enfermero->ap_paterno }}</p>
-                                        <p class="text-xs font-semibold text-apoyo">Rol: Enfermería</p>
+                                    <div class="min-w-0 flex-1">
+                                        <h6 class="text-[11px] font-bold text-titulo truncate">{{ $info['label'] }}</h6>
+                                        <div class="flex items-center gap-1.5 mt-0.5">
+                                            <span class="px-1.5 py-0.5 rounded text-[8px] font-black bg-estado-peligroBg text-estado-peligro border border-estado-peligro/20 uppercase tracking-wider">Obligatorio</span>
+                                            <span class="text-[9px] text-apoyo truncate hidden sm:inline">{{ $info['desc'] }}</span>
+                                        </div>
+                                        @error($model) <p class="text-[9px] text-estado-peligro font-bold truncate mt-0.5">{{ $message }}</p> @enderror
                                     </div>
                                 </div>
-                            </label>
+                                <div class="flex items-center gap-1 shrink-0 ml-2">
+                                    @if($docSubido)
+                                        <span class="px-2 py-1.5 text-[10px] font-bold text-estado-exito bg-estado-exitoBg rounded border border-estado-exito/20">Subido</span>
+                                    @else
+                                        <label class="cursor-pointer px-2.5 py-1.5 text-[10px] font-bold text-boton-acento border border-boton-acento rounded hover:bg-boton-acento hover:text-white transition-all">
+                                            <i class="ph-bold ph-upload-simple"></i> Subir
+                                            <input type="file" wire:model="{{ $model }}" class="hidden" accept=".pdf,.jpg,.jpeg,.png,.webp">
+                                        </label>
+                                    @endif
+                                    <div wire:loading wire:target="{{ $model }}" class="text-xs font-semibold text-estado-info">
+                                        <i class="ph-bold ph-spinner animate-spin"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+
+                {{-- Documentos Institucionales Autogenerados --}}
+                <div class="space-y-2 bg-fondo/30 p-3 md:p-4 rounded-lg border border-borde/60">
+                    <div class="flex items-center gap-2 pb-3 border-b border-borde/50">
+                        <div class="w-7 h-7 rounded-full bg-estado-infoBg text-estado-info flex items-center justify-center">
+                            <i class="ph-bold ph-file-pdf text-lg"></i>
+                        </div>
+                        <h5 class="text-sm font-bold text-titulo uppercase tracking-wider">Documentos Institucionales</h5>
+                        <span class="ml-auto px-2 py-1 rounded-full bg-estado-infoBg text-estado-info text-[9px] font-bold border border-estado-infoBorde uppercase tracking-wider">Autogenerados</span>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        @foreach ($documentosInstitucionales as $nombre)
+                            <div class="flex items-center justify-between p-2.5 border rounded-xl bg-white shadow-sm border-borde transition-all">
+                                <div class="flex items-center gap-2 overflow-hidden flex-1">
+                                    <div class="w-7 h-7 rounded-full bg-estado-infoBg text-estado-info flex items-center justify-center shrink-0 border border-borde/40">
+                                        <i class="ph-fill ph-file-pdf text-lg"></i>
+                                    </div>
+                                    <div class="min-w-0 flex-1">
+                                        <h6 class="text-[11px] font-bold text-titulo truncate">{{ $nombre }}</h6>
+                                        <span class="text-[9px] text-apoyo">Se generara automaticamente al confirmar</span>
+                                    </div>
+                                </div>
+                                <span class="px-2 py-1.5 text-[10px] font-bold text-estado-info bg-estado-infoBg rounded border border-estado-infoBorde shrink-0 ml-2">Pendiente</span>
+                            </div>
                         @endforeach
                     </div>
                 </div>
             </div>
-        @endif
+        @elseif ($paso === 6)
+            <div class="space-y-3 animate-fade-in">
+                <h4 class="text-base font-bold text-titulo border-b border-borde pb-2 flex items-center gap-2">
+                    <i class="ph-bold ph-check-circle text-boton-acento"></i> 6. Asignación y confirmación
+                </h4>
 
-        {{-- Paso 5: Confirmación --}}
-        @if ($paso == 5)
-            <div class="animate-fade-in">
-                <div class="mb-6 flex items-start gap-3">
-                    <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-estado-exitoBg text-parrafo">
-                        <i class="ph-fill ph-check-circle text-xl"></i>
+                {{-- Seleccion de enfermero --}}
+                <div class="space-y-2 bg-fondo/30 p-3 md:p-4 rounded-lg border border-borde/60">
+                    <div class="flex items-center gap-2 pb-3 border-b border-borde/50">
+                        <div class="w-7 h-7 rounded-full bg-boton-acento/10 text-boton-acento flex items-center justify-center">
+                            <i class="ph-bold ph-stethoscope text-lg"></i>
+                        </div>
+                        <h5 class="text-sm font-bold text-titulo uppercase tracking-wider">Enfermero/a para Valoracion Inicial</h5>
                     </div>
-                    <div>
-                        <h2 class="text-lg font-extrabold text-titulo">Paso 5: Confirmación de Preadmisión</h2>
-                        <p class="text-xs font-bold text-titulo/55">Revise y finalice el proceso.</p>
+                    <div class="grid gap-2 md:grid-cols-2 lg:grid-cols-3">
+                        @forelse ($enfermeros as $enfermero)
+                            <label class="flex items-center gap-2 p-2.5 border rounded-xl cursor-pointer hover:bg-fondo-hover transition-colors {{ $enfermero_id === $enfermero->cod_usu ? 'border-boton-acento bg-boton-acento/5 shadow-sm' : 'border-borde bg-white' }}">
+                                <input type="radio" wire:model.live="enfermero_id" value="{{ $enfermero->cod_usu }}" class="rounded-full text-boton-acento focus:ring-boton-acento h-4 w-4 shrink-0">
+                                <span class="flex h-8 w-8 items-center justify-center rounded-full bg-boton-acento/10 text-[10px] font-black text-boton-acento shrink-0">
+                                    {{ substr($enfermero->nombres, 0, 1) }}{{ substr($enfermero->ap_paterno, 0, 1) }}
+                                </span>
+                                <span class="min-w-0 flex-1">
+                                    <span class="block text-xs font-bold text-titulo leading-tight truncate">{{ $enfermero->nombres }} {{ $enfermero->ap_paterno }} {{ $enfermero->ap_materno }}</span>
+                                    <span class="text-[9px] text-apoyo">Valoracion inicial</span>
+                                </span>
+                            </label>
+                        @empty
+                            <div class="col-span-full p-4 bg-estado-advertenciaBg/20 border-2 border-dashed border-estado-advertencia rounded-2xl text-center space-y-2">
+                                <div class="w-14 h-14 bg-estado-advertenciaBg text-estado-advertencia rounded-full flex items-center justify-center mx-auto shadow-sm">
+                                    <i class="ph-bold ph-user-minus text-xl"></i>
+                                </div>
+                                <h5 class="text-sm font-black text-titulo">Sin enfermeros disponibles</h5>
+                                <p class="text-xs font-bold text-apoyo">No hay enfermeros activos con rol ENFERMEROS.</p>
+                            </div>
+                        @endforelse
                     </div>
+                    @error("enfermero_id") <p class="text-xs text-estado-peligro font-bold mt-1"><i class="ph-bold ph-warning-circle mr-1"></i>{{ $message }}</p> @enderror
                 </div>
 
-                <div class="rounded-xl border border-borde-suave bg-fondo-panel p-5">
-                    <h3 class="text-sm font-bold text-titulo mb-3">Resumen:</h3>
-                    <ul class="text-xs font-bold text-titulo/70 space-y-2">
-                        <li><i class="ph-bold ph-caret-right text-terracota mr-1"></i> <strong>Adulto Mayor:</strong> {{ $nombres }} {{ $ap_paterno }}</li>
-                        <li><i class="ph-bold ph-caret-right text-terracota mr-1"></i> <strong>Responsable:</strong> {{ $contacto_emergencia_nombre }} ({{ $contacto_emergencia_parentesco }})</li>
-                        <li><i class="ph-bold ph-caret-right text-terracota mr-1"></i> <strong>Estado a aplicar:</strong> PENDIENTE DE VALORACIÓN INICIAL</li>
-                        @php
-                            $enfSelec = $enfermeros->where('cod_usu', $enfermero_id)->first();
-                        @endphp
-                        <li><i class="ph-bold ph-caret-right text-terracota mr-1"></i> <strong>Enfermero Asignado:</strong> {{ $enfSelec ? $enfSelec->nombres . ' ' . $enfSelec->ap_paterno : 'Ninguno' }}</li>
-                    </ul>
-                    
-                    <div class="mt-5 rounded-lg bg-amber-50 p-3 border border-amber-200">
-                        <p class="text-[11px] font-bold text-amber-700">
-                            <i class="ph-bold ph-info"></i> Al confirmar, el adulto mayor aparecerá en el dashboard del enfermero seleccionado para que inicie la valoración de enfermería requerida.
-                        </p>
+                {{-- Resumen Operativo --}}
+                <div class="space-y-2">
+                    <div class="text-center">
+                        <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-boton-acento/10 text-boton-acento mb-2">
+                            <i class="ph-bold ph-check-square-offset text-lg"></i>
+                        </div>
+                        <h4 class="text-sm font-bold text-titulo">Resumen de la Preadmision</h4>
+                        <p class="text-xs text-apoyo">Revise los datos antes de confirmar</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-left">
+                        {{-- Solicitante --}}
+                        <div class="bg-white border border-borde rounded-[1.25rem] p-4 shadow-sm space-y-2">
+                            <div class="flex items-center gap-2 pb-2 border-b border-borde">
+                                <i class="ph-bold ph-user text-boton-acento text-lg"></i>
+                                <h5 class="text-xs font-bold text-titulo uppercase tracking-wider">Adulto Mayor</h5>
+                            </div>
+                            <div class="space-y-1 text-xs">
+                                <div class="flex justify-between"><span class="text-apoyo">Nombre:</span> <span class="font-semibold text-titulo">{{ trim("$nombres $ap_paterno $ap_materno") ?: 'Sin completar' }}</span></div>
+                                <div class="flex justify-between"><span class="text-apoyo">CI:</span> <span class="font-semibold text-titulo">{{ $ci ?: '-' }} {{ $expedicion_ci }}</span></div>
+                                <div class="flex justify-between"><span class="text-apoyo">Genero:</span> <span class="font-semibold text-titulo">{{ $genero ?: '-' }}</span></div>
+                            </div>
+                        </div>
+
+                        {{-- Familiar --}}
+                        <div class="bg-white border border-borde rounded-[1.25rem] p-4 shadow-sm space-y-2">
+                            <div class="flex items-center gap-2 pb-2 border-b border-borde">
+                                <i class="ph-bold ph-users text-boton-acento text-lg"></i>
+                                <h5 class="text-xs font-bold text-titulo uppercase tracking-wider">Familiar Responsable</h5>
+                            </div>
+                            <div class="space-y-1 text-xs">
+                                <div class="flex justify-between"><span class="text-apoyo">Nombre:</span> <span class="font-semibold text-titulo">{{ trim("$familiar_nombres $familiar_ap_paterno $familiar_ap_materno") ?: 'Sin completar' }}</span></div>
+                                <div class="flex justify-between"><span class="text-apoyo">Parentesco:</span> <span class="font-semibold text-titulo">{{ $familiar_parentesco ?: '-' }}</span></div>
+                                <div class="flex justify-between"><span class="text-apoyo">Celular:</span> <span class="font-semibold text-titulo">{{ $familiar_celular ?: '-' }}</span></div>
+                            </div>
+                        </div>
+
+                        {{-- Caso --}}
+                        <div class="bg-white border border-borde rounded-[1.25rem] p-4 shadow-sm space-y-2">
+                            <div class="flex items-center gap-2 pb-2 border-b border-borde">
+                                <i class="ph-bold ph-file-text text-boton-acento text-lg"></i>
+                                <h5 class="text-xs font-bold text-titulo uppercase tracking-wider">Datos del Caso</h5>
+                            </div>
+                            <div class="space-y-1 text-xs">
+                                <div class="flex justify-between"><span class="text-apoyo">Motivo:</span> <span class="font-semibold text-titulo">{{ str_replace('_', ' ', $motivo_ingreso ?: '-') }}</span></div>
+                                <div class="flex justify-between"><span class="text-apoyo">Tipo:</span> <span class="font-semibold text-titulo">{{ $tipo_ingreso ?: '-' }}</span></div>
+                                <div class="flex justify-between"><span class="text-apoyo">Prioridad:</span>
+                                    <span class="px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider {{ ($prioridad ?? '') === 'CRITICA' ? 'bg-estado-peligroBg text-estado-peligro border border-estado-peligro/20' : (($prioridad ?? '') === 'ALTA' ? 'bg-estado-advertenciaBg text-estado-advertencia border border-estado-advertenciaBorde' : 'bg-fondo text-apoyo border border-borde') }}">
+                                        {{ $prioridad ?: '-' }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        {{-- Estado Resultante --}}
+                        <div class="bg-white border border-borde rounded-[1.25rem] p-4 shadow-sm space-y-2">
+                            <div class="flex items-center gap-2 pb-2 border-b border-borde">
+                                <i class="ph-bold ph-flag text-boton-acento text-lg"></i>
+                                <h5 class="text-xs font-bold text-titulo uppercase tracking-wider">Estado Operativo</h5>
+                            </div>
+                            <div class="space-y-1 text-xs">
+                                <div class="flex justify-between"><span class="text-apoyo">Estado resultante:</span>
+                                    <span class="px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider bg-estado-infoBg text-estado-info border border-estado-infoBorde">PREADMISION ASIGNADA</span>
+                                </div>
+                                <div class="flex justify-between"><span class="text-apoyo">Siguiente etapa:</span> <span class="font-semibold text-titulo">Valoracion inicial de enfermeria</span></div>
+                                <div class="flex justify-between"><span class="text-apoyo">Permanencia:</span> <span class="font-semibold text-titulo">{{ $permanencia ?: '-' }}</span></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         @endif
-    </div>
+        </div>
 
-    {{-- Botones de acción --}}
-    <div class="mt-4 flex justify-between items-center rm-surface-glass p-4 rounded-xl">
+        <!-- Botonera -->
+        <div class="flex items-center justify-between pt-4 mt-4 border-t border-borde/60">
         <div>
             @if ($paso > 1)
-                <button type="button" wire:click="anterior" class="rm-btn-secondary">
-                    <i class="ph-bold ph-arrow-left"></i> Atrás
-                </button>
-            @endif
-        </div>
-        <div>
-            @if ($paso < $totalPasos)
-                <button type="button" wire:click="siguiente" class="rm-btn-primary group">
-                    <span wire:loading.remove wire:target="siguiente">Siguiente <i class="ph-bold ph-arrow-right group-hover:translate-x-1 transition-transform"></i></span>
-                    <span wire:loading wire:target="siguiente"><i class="ph-bold ph-spinner animate-spin"></i> Validando...</span>
+                <button type="button" wire:click="anterior" wire:loading.attr="disabled" class="px-4 py-2 text-sm font-bold border-2 border-borde rounded-xl text-titulo hover:bg-fondo-hover hover:border-apoyo/30 transition-all disabled:opacity-50 flex items-center gap-2">
+                    <i class="ph-bold ph-arrow-left"></i>
+                    Atras
                 </button>
             @else
-                <button type="button" wire:click="confirmarPreadmision" class="rm-btn-accent group">
-                    <span wire:loading.remove wire:target="confirmarPreadmision"><i class="ph-bold ph-check-circle"></i> Confirmar Preadmisión</span>
-                    <span wire:loading wire:target="confirmarPreadmision"><i class="ph-bold ph-spinner animate-spin"></i> Procesando...</span>
+                <button type="button" x-on:click="
+                    if (isDirty) {
+                        Swal.fire({
+                            title: '¿Salir sin guardar?',
+                            text: 'Hay cambios sin guardar en el formulario. Si sale, perdera todos los datos.',
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonColor: 'var(--estado-peligro)',
+                            cancelButtonColor: 'var(--boton-acento)',
+                            confirmButtonText: 'Si, salir',
+                            cancelButtonText: 'Permanecer',
+                            background: 'var(--fondo-card)',
+                            color: 'var(--texto-principal)'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                window.location.href = '{{ route('admin.admisiones.preadmisiones') }}';
+                            }
+                        });
+                    } else {
+                        window.location.href = '{{ route('admin.admisiones.preadmisiones') }}';
+                    }
+                " class="px-4 py-2 text-sm font-bold text-apoyo hover:text-estado-peligro hover:bg-estado-peligroBg rounded-xl transition-all">
+                    Cancelar
                 </button>
             @endif
         </div>
+
+        @if ($paso < $totalPasos)
+            <button type="button" wire:click="siguiente" wire:loading.attr="disabled" class="bg-boton-acento hover:bg-boton-acentoHover text-white px-5 py-2 rounded-xl text-sm font-bold shadow-lg shadow-boton-acento/20 transition-all flex items-center gap-2 disabled:opacity-50">
+                <span wire:loading.remove wire:target="siguiente">Siguiente <i class="ph-bold ph-arrow-right"></i></span>
+                <span wire:loading wire:target="siguiente"><i class="ph-bold ph-spinner animate-spin"></i> Validando...</span>
+            </button>
+        @else
+            <button type="button" wire:click="confirmarPreadmision" wire:loading.attr="disabled" class="bg-estado-exito hover:bg-estado-exito/90 text-white px-5 py-2 rounded-xl text-sm font-bold shadow-lg shadow-estado-exito/30 transition-all flex items-center gap-2 disabled:opacity-50">
+                <span wire:loading.remove wire:target="confirmarPreadmision"><i class="ph-bold ph-check-circle text-lg"></i> Confirmar preadmision</span>
+                <span wire:loading wire:target="confirmarPreadmision"><i class="ph-bold ph-spinner animate-spin text-lg"></i> Guardando...</span>
+            </button>
+        @endif
+        </div>
+
+    @script
+    <script>
+        $wire.on('swal', (data) => {
+            const payload = data[0] || data;
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    title: payload.title,
+                    text: payload.text,
+                    icon: payload.icon,
+                    confirmButtonText: 'Entendido',
+                    confirmButtonColor: 'var(--boton-acento)',
+                    background: 'var(--fondo-card)',
+                    color: 'var(--texto-principal)'
+                });
+            } else {
+                alert(payload.title + '\n' + payload.text);
+            }
+        });
+    </script>
+    @endscript
     </div>
 </div>
-
-@script
-<script>
-    $wire.on('swal', (data) => {
-        if (typeof Swal !== 'undefined') {
-            Swal.fire({
-                title: data[0].title,
-                text: data[0].text,
-                icon: data[0].icon,
-                confirmButtonColor: '#D9A27C',
-                confirmButtonText: 'Entendido'
-            });
-        } else {
-            alert(data[0].title + '\n' + data[0].text);
-        }
-    });
-</script>
-@endscript

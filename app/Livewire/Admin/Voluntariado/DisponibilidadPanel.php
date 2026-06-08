@@ -24,7 +24,7 @@ class DisponibilidadPanel extends Component
 
     public bool $mostrarFormulario = false;
     public bool $isEdit = false;
-    public ?int $disponibilidadId = null;
+    public ?string $disponibilidadId = null;
     public string $cod_vol = '';
     public string $dia_semana = '';
     public string $hora_inicio = '';
@@ -107,7 +107,7 @@ class DisponibilidadPanel extends Component
         $this->mostrarFormulario = true;
     }
 
-    public function editar(int $id): void
+    public function editar(string $id): void
     {
         abort_unless(auth()->user()->can('voluntarios.editar'), 403);
 
@@ -117,7 +117,7 @@ class DisponibilidadPanel extends Component
         }
 
         $this->resetValidation();
-        $this->disponibilidadId = (int) $disponibilidad->cod_hor_vol;
+        $this->disponibilidadId = (string) $disponibilidad->cod_hor_vol;
         $this->cod_vol = (string) $disponibilidad->cod_vol;
         $this->dia_semana = (string) $disponibilidad->dia_semana;
         $this->hora_inicio = $disponibilidad->hora_inicio ? substr((string) $disponibilidad->hora_inicio, 0, 5) : '';
@@ -140,7 +140,7 @@ class DisponibilidadPanel extends Component
 
         $validated = $this->validate($this->rules(), $this->messages());
 
-        if (! $this->voluntarioEstaActivo((int) $validated['cod_vol'])) {
+        if (! $this->voluntarioEstaActivo((string) $validated['cod_vol'])) {
             $this->dispatch('swal', [
                 'icon' => 'warning',
                 'title' => 'Voluntario no activo',
@@ -160,11 +160,13 @@ class DisponibilidadPanel extends Component
         }
 
         $payload = [
-            'cod_vol' => (int) $validated['cod_vol'],
+            'cod_vol' => $validated['cod_vol'],
             'dia_semana' => $validated['dia_semana'],
             'hora_inicio' => $validated['hora_inicio'],
             'hora_fin' => $validated['hora_fin'],
             'observaciones' => $validated['observaciones'] ?: null,
+            'obser' => $validated['observaciones'] ?: null,
+            'updated_at' => now(),
         ];
 
         if ($this->isEdit) {
@@ -172,7 +174,12 @@ class DisponibilidadPanel extends Component
                 ->where('cod_hor_vol', $this->disponibilidadId)
                 ->update($payload);
         } else {
-            DB::table('disponibilidad_voluntarios')->insert($payload);
+            DB::table('disponibilidad_voluntarios')->insert($payload + [
+                'cod_hor_vol' => $this->siguienteCodigoDisponibilidad(),
+                'estado' => 'ACTIVO',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
         }
 
         $this->mostrarFormulario = false;
@@ -186,7 +193,7 @@ class DisponibilidadPanel extends Component
         ]);
     }
 
-    public function marcarNoDisponible(int $id): void
+    public function marcarNoDisponible(string $id): void
     {
         abort_unless(auth()->user()->can('voluntarios.editar'), 403);
 
@@ -202,7 +209,11 @@ class DisponibilidadPanel extends Component
 
         DB::table('disponibilidad_voluntarios')
             ->where('cod_hor_vol', $id)
-            ->update(['observaciones' => $observaciones]);
+            ->update([
+                'observaciones' => $observaciones,
+                'obser' => $observaciones,
+                'updated_at' => now(),
+            ]);
 
         $this->dispatch('swal', [
             'icon' => 'success',
@@ -211,7 +222,7 @@ class DisponibilidadPanel extends Component
         ]);
     }
 
-    public function reactivarDisponibilidad(int $id): void
+    public function reactivarDisponibilidad(string $id): void
     {
         abort_unless(auth()->user()->can('voluntarios.editar'), 403);
 
@@ -224,7 +235,11 @@ class DisponibilidadPanel extends Component
 
         DB::table('disponibilidad_voluntarios')
             ->where('cod_hor_vol', $id)
-            ->update(['observaciones' => $observaciones ?: null]);
+            ->update([
+                'observaciones' => $observaciones ?: null,
+                'obser' => $observaciones ?: null,
+                'updated_at' => now(),
+            ]);
 
         $this->dispatch('swal', [
             'icon' => 'success',
@@ -262,7 +277,7 @@ class DisponibilidadPanel extends Component
     private function rules(): array
     {
         return [
-            'cod_vol' => ['required', 'integer', Rule::exists('voluntarios', 'cod_vol')],
+            'cod_vol' => ['required', Rule::exists('voluntarios', 'cod_vol')],
             'dia_semana' => ['required', Rule::in($this->diasSemana())],
             'hora_inicio' => ['required', 'date_format:H:i'],
             'hora_fin' => ['required', 'date_format:H:i', 'after:hora_inicio'],
@@ -492,13 +507,30 @@ class DisponibilidadPanel extends Component
         return $query->exists();
     }
 
-    private function voluntarioEstaActivo(int $codVol): bool
+    private function voluntarioEstaActivo(string $codVol): bool
     {
         return DB::table('voluntarios')
             ->where('cod_vol', $codVol)
             ->where('estado', 'ACTIVO')
             ->whereNull('archivado_en')
             ->exists();
+    }
+
+    private function siguienteCodigoDisponibilidad(): string
+    {
+        $ultimo = DB::table('disponibilidad_voluntarios')
+            ->where('cod_hor_vol', 'like', 'HDV_%')
+            ->orderByDesc('cod_hor_vol')
+            ->value('cod_hor_vol');
+
+        $numero = $ultimo ? ((int) substr((string) $ultimo, 4)) + 1 : 1;
+
+        do {
+            $codigo = 'HDV_' . str_pad($numero, 4, '0', STR_PAD_LEFT);
+            $numero++;
+        } while (DB::table('disponibilidad_voluntarios')->where('cod_hor_vol', $codigo)->exists());
+
+        return $codigo;
     }
 
     private function resetForm(): void

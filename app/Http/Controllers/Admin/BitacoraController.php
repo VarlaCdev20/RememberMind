@@ -202,8 +202,8 @@ class BitacoraController extends Controller
                 'App\\Models\\AdultoMayor' => DB::table('adulto_mayor')->where('cod_am', $log->subject_id)->value(DB::raw("nombres || ' ' || ap_paterno")) ?? "AM: $log->subject_id",
                 'App\\Models\\User'        => DB::table('users')->where('cod_usu', $log->subject_id)->value(DB::raw("nombres || ' ' || ap_paterno")) ?? "Usuario: $log->subject_id",
                 'App\\Models\\Familiar'    => DB::table('familiares')->where('cod_fam', $log->subject_id)->value(DB::raw("nombres || ' ' || ap_paterno")) ?? "Familiar: $log->subject_id",
-                'App\\Models\\DocumentoAdultoMayor' => "Doc: " . (DB::table('documento_adulto_mayor')->where('cod_doc_am', $log->subject_id)->value('nombre_documento') ?? $log->subject_id),
-                'App\\Models\\MedicacionAdulto' => "Medicamento: " . (DB::table('medicacion_adulto')->where('cod_med_adul', $log->subject_id)->value('nombre_comercial') ?? $log->subject_id),
+                'App\\Models\\DocumentoAdultoMayor' => "Doc: " . (DB::table('documentos_adulto_mayor')->where('cod_doc_am', $log->subject_id)->value('nombre') ?? $log->subject_id),
+                'App\\Models\\MedicacionAdulto' => "Medicamento: " . (DB::table('medicacion_adulto')->where('cod_med_adulto', $log->subject_id)->value('nombre_medicamento') ?? $log->subject_id),
                 'Spatie\\Permission\\Models\\Role' => "Rol: " . (DB::table('roles')->where('id', $log->subject_id)->value('name') ?? $log->subject_id),
                 default => class_basename($log->subject_type) . " #$log->subject_id",
             };

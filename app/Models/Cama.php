@@ -30,6 +30,7 @@ class Cama extends Model
         'codigo',
         'estado',
         'observacion',
+        'observaciones',
     ];
 
     public function getActivitylogOptions(): LogOptions
@@ -50,8 +51,16 @@ class Cama extends Model
 
     public function asignacionesActivas(): HasMany
     {
-        return $this->hasMany(AsignacionTurnoAdulto::class, 'cod_cama', 'cod_cama')
-            ->where('estado', 'ACTIVA');
+        return $this->hasMany(AsignacionAdultoMayor::class, 'cod_cama', 'cod_cama')
+            ->whereIn('estado', ['ACTIVO', 'ACTIVA']);
+    }
+
+    protected static function booted(): void
+    {
+        static::saving(function (self $cama) {
+            $cama->observaciones ??= $cama->observacion;
+            $cama->observacion ??= $cama->observaciones;
+        });
     }
 
     // ── Scopes ─────────────────────────────────────────────────────────────────
@@ -61,8 +70,19 @@ class Cama extends Model
         return $query->where('estado', 'DISPONIBLE');
     }
 
-    public function scopeDeHabitacion($query, int $codHabitacion)
+    public function scopeDeHabitacion($query, string $codHabitacion)
     {
         return $query->where('cod_habitacion', $codHabitacion);
+    }
+
+    public function getObservacionAttribute(): ?string
+    {
+        return $this->attributes['observacion'] ?? $this->attributes['observaciones'] ?? null;
+    }
+
+    public function setObservacionAttribute(?string $value): void
+    {
+        $this->attributes['observacion'] = $value;
+        $this->attributes['observaciones'] = $value;
     }
 }
