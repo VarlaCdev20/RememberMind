@@ -2,22 +2,58 @@
 
 namespace App\Livewire\Admin\PersonalInstitucional;
 
-use App\Models\AreaInstitucional;
+use App\Models\HorarioPersonalAdmin;
+use App\Models\HorarioPersonalSalud;
 use App\Models\TurnoInstitucional;
 use App\Models\User;
+use App\Services\Enfermeria\GeneradorPlanillaEnfermeriaService;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
+use Illuminate\View\View;
 use Livewire\Component;
 use Spatie\Permission\Models\Role;
+use Throwable;
 
 class TurnosAsignacionesPanel extends Component
 {
     private const DIAS = [
-        'LUNES', 'MARTES', 'MIERCOLES', 'JUEVES', 'VIERNES', 'SABADO', 'DOMINGO',
+        'LUNES',
+        'MARTES',
+        'MIERCOLES',
+        'JUEVES',
+        'VIERNES',
+        'SABADO',
+        'DOMINGO',
     ];
 
-    private const BLOQUES = ['MAÑANA', 'TARDE', 'NOCHE', 'MADRUGADA', 'ADMINISTRATIVO'];
+    private const BLOQUES = [
+        'MAÑANA',
+        'TARDE',
+        'NOCHE',
+        'MADRUGADA',
+        'ADMINISTRATIVO',
+    ];
+
+    private const ROLES_ADMINISTRATIVOS = [
+        'SUPERADMINISTRADOR',
+        'ADMINISTRADOR',
+    ];
+
+    private const ROLES_SALUD = [
+        'ENFERMEROS',
+        'MEDICO GENERAL/GERIATRA',
+        'PSICOLOGO/A',
+        'PEDAGOGO',
+        'NUTRICIONISTA',
+        'FISIOTERAPEUTA',
+    ];
+
+    /*
+    |--------------------------------------------------------------------------
+    | Filtros generales del módulo Horarios y Asignaciones
+    |--------------------------------------------------------------------------
+    */
 
     public string $busqueda = '';
     public string $filtroTipo = '';
@@ -28,9 +64,56 @@ class TurnosAsignacionesPanel extends Component
     public string $vistaCalendario = 'semana';
     public string $fechaSeleccionada = '';
 
+    /*
+    |--------------------------------------------------------------------------
+    | Modal general para horarios simples de salud/admin
+    |--------------------------------------------------------------------------
+    */
+
     public bool $modalAbierto = false;
     public string $busquedaModal = '';
     public ?string $usuarioSeleccionado = null;
+
+    /*
+    |--------------------------------------------------------------------------
+    | Planilla institucional por tipo de personal
+    |--------------------------------------------------------------------------
+    | enfermeria       => planilla rotativa por algoritmo modular
+    | salud            => horarios simples desde horarios_personal_salud
+    | administrativo   => horarios simples desde horarios_personal_admin
+    */
+
+    public string $tipoPlanilla = 'enfermeria';
+
+    /*
+    |--------------------------------------------------------------------------
+    | Estado visual y filtros de la planilla de enfermería
+    |--------------------------------------------------------------------------
+    */
+
+    public string $vistaPlanilla = 'semanal';
+    public string $fechaInicioPlanilla = '';
+    public int $cantidadSemanas = 1;
+    public int $saltoSemanal = 1;
+    public ?string $trabajadorFiltro = null;
+    public ?string $turnoFiltroPlanilla = null;
+    public ?string $grupoFiltroPlanilla = null;
+
+    public bool $mostrarApoyo = true;
+    public bool $mostrarDescanso = true;
+    public bool $mostrarGrupos = false;
+    public bool $soloConflictos = false;
+    public bool $usarUsuariosReales = false;
+
+    public array $planillaEnfermeria = [];
+    public array $resumenPlanilla = [];
+    public array $cargaLaboral = [];
+    public array $alertasPlanilla = [];
+    public array $vistaSemanal = [];
+    public ?array $vistaHoy = null;
+    public array $vistaPorEnfermero = [];
+    public array $equilibrioPlanilla = [];
+    public array $filtrosPlanilla = [];
 
     protected $listeners = [
         'cerrarModalHorarios' => 'cerrarModal',
@@ -41,7 +124,16 @@ class TurnosAsignacionesPanel extends Component
     public function mount(): void
     {
         $this->fechaSeleccionada = now()->format('Y-m-d');
+        $this->fechaInicioPlanilla = now()->startOfWeek(Carbon::MONDAY)->format('Y-m-d');
+
+        $this->generarPlanillaEnfermeria(silencioso: true);
     }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Acciones generales
+    |--------------------------------------------------------------------------
+    */
 
     public function abrirNuevaAsignacion(): void
     {
@@ -72,8 +164,12 @@ class TurnosAsignacionesPanel extends Component
 
     public function seleccionarFecha(string $fecha): void
     {
-        $this->fechaSeleccionada = Carbon::parse($fecha)->format('Y-m-d');
-        $this->vistaCalendario = 'dia';
+        try {
+            $this->fechaSeleccionada = Carbon::parse($fecha)->format('Y-m-d');
+            $this->vistaCalendario = 'dia';
+        } catch (Throwable) {
+            $this->fechaSeleccionada = now()->format('Y-m-d');
+        }
     }
 
     public function irHoy(): void
@@ -116,13 +212,193 @@ class TurnosAsignacionesPanel extends Component
         ]);
     }
 
-    public function render(): \Illuminate\View\View
+    /*
+    |--------------------------------------------------------------------------
+    | Acciones de planilla por tipo de personal
+    |--------------------------------------------------------------------------
+    */
+
+    public function cambiarTipoPlanilla(string $tipo): void
+    {
+        if (! in_array($tipo, ['enfermeria', 'salud', 'administrativo'], true)) {
+            return;
+        }
+
+        $this->tipoPlanilla = $tipo;
+
+        if ($tipo === 'enfermeria') {
+            $this->filtroTipo = 'salud';
+            $this->filtroRol = 'ENFERMEROS';
+            $this->vistaPlanilla = 'semanal';
+
+            if ($this->planillaEnfermeria === []) {
+                $this->generarPlanillaEnfermeria(silencioso: true);
+            }
+
+            return;
+        }
+
+        if ($tipo === 'salud') {
+            $this->filtroTipo = 'salud';
+
+            if ($this->filtroRol === 'ENFERMEROS') {
+                $this->filtroRol = '';
+            }
+        }
+
+        if ($tipo === 'administrativo') {
+            $this->filtroTipo = 'admin';
+            $this->filtroRol = '';
+        }
+
+        $this->vistaPlanilla = 'semanal';
+    }
+
+    public function cambiarVistaPlanilla(string $vista): void
+    {
+        if (in_array($vista, ['semanal', 'hoy', 'enfermero', 'carga', 'alertas', 'grupos'], true)) {
+            $this->vistaPlanilla = $vista;
+        }
+    }
+
+    public function generarPlanillaEnfermeria(bool $silencioso = false): void
+    {
+        try {
+            $resultado = app(GeneradorPlanillaEnfermeriaService::class)->generar([
+                'fecha_inicio' => $this->fechaInicioPlanilla ?: now()->startOfWeek(Carbon::MONDAY)->format('Y-m-d'),
+                'cantidad_semanas' => $this->cantidadSemanas,
+                'salto_semanal' => $this->saltoSemanal,
+                'trabajador_filtro' => $this->trabajadorFiltro,
+                'turno_filtro' => $this->turnoFiltroPlanilla,
+                'grupo_filtro' => $this->grupoFiltroPlanilla,
+                'mostrar_apoyo' => $this->mostrarApoyo,
+                'mostrar_descanso' => $this->mostrarDescanso,
+                'mostrar_grupos' => $this->mostrarGrupos,
+                'solo_conflictos' => $this->soloConflictos,
+                'usar_usuarios_reales' => $this->usarUsuariosReales,
+            ]);
+
+            $this->planillaEnfermeria = $resultado['planilla'] ?? [];
+            $this->vistaSemanal = $resultado['vista_semanal'] ?? [];
+            $this->vistaHoy = $resultado['vista_hoy'] ?? null;
+            $this->vistaPorEnfermero = $resultado['vista_por_enfermero'] ?? [];
+            $this->cargaLaboral = $resultado['carga_laboral'] ?? [];
+            $this->alertasPlanilla = $resultado['alertas'] ?? [];
+            $this->resumenPlanilla = $resultado['resumen'] ?? [];
+            $this->equilibrioPlanilla = $resultado['equilibrio'] ?? [];
+            $this->filtrosPlanilla = $resultado['filtros_disponibles'] ?? [];
+
+            if (! $silencioso) {
+                $this->dispatch('mostrarAlerta', [
+                    'type' => ($this->resumenPlanilla['alertas_criticas'] ?? 0) > 0 ? 'warning' : 'success',
+                    'title' => 'Planilla generada',
+                    'message' => ($this->resumenPlanilla['estado_planilla'] ?? 'Vista previa generada correctamente.'),
+                ]);
+            }
+        } catch (Throwable $e) {
+            $this->resetPlanillaEnfermeria();
+
+            report($e);
+
+            if (! $silencioso) {
+                $this->dispatch('mostrarAlerta', [
+                    'type' => 'error',
+                    'title' => 'No se pudo generar la planilla',
+                    'message' => 'Revise el servicio GeneradorPlanillaEnfermeriaService y vuelva a intentarlo.',
+                ]);
+            }
+        }
+    }
+
+    public function limpiarFiltrosPlanilla(): void
+    {
+        $this->trabajadorFiltro = null;
+        $this->turnoFiltroPlanilla = null;
+        $this->grupoFiltroPlanilla = null;
+        $this->mostrarApoyo = true;
+        $this->mostrarDescanso = true;
+        $this->mostrarGrupos = false;
+        $this->soloConflictos = false;
+
+        $this->generarPlanillaEnfermeria(silencioso: true);
+    }
+
+    public function updatedFechaInicioPlanilla(): void
+    {
+        $this->generarPlanillaEnfermeria(silencioso: true);
+    }
+
+    public function updatedCantidadSemanas(): void
+    {
+        $this->cantidadSemanas = max(1, min((int) $this->cantidadSemanas, 52));
+        $this->generarPlanillaEnfermeria(silencioso: true);
+    }
+
+    public function updatedSaltoSemanal(): void
+    {
+        $this->saltoSemanal = max(1, (int) $this->saltoSemanal);
+        $this->generarPlanillaEnfermeria(silencioso: true);
+    }
+
+    public function updatedTrabajadorFiltro(): void
+    {
+        $this->generarPlanillaEnfermeria(silencioso: true);
+    }
+
+    public function updatedTurnoFiltroPlanilla(): void
+    {
+        $this->generarPlanillaEnfermeria(silencioso: true);
+    }
+
+    public function updatedGrupoFiltroPlanilla(): void
+    {
+        $this->generarPlanillaEnfermeria(silencioso: true);
+    }
+
+    public function updatedMostrarApoyo(): void
+    {
+        $this->generarPlanillaEnfermeria(silencioso: true);
+    }
+
+    public function updatedMostrarDescanso(): void
+    {
+        $this->generarPlanillaEnfermeria(silencioso: true);
+    }
+
+    public function updatedMostrarGrupos(): void
+    {
+        $this->generarPlanillaEnfermeria(silencioso: true);
+    }
+
+    public function updatedSoloConflictos(): void
+    {
+        $this->generarPlanillaEnfermeria(silencioso: true);
+    }
+
+    private function resetPlanillaEnfermeria(): void
+    {
+        $this->planillaEnfermeria = [];
+        $this->vistaSemanal = [];
+        $this->vistaHoy = null;
+        $this->vistaPorEnfermero = [];
+        $this->cargaLaboral = [];
+        $this->alertasPlanilla = [];
+        $this->resumenPlanilla = [];
+        $this->equilibrioPlanilla = [];
+        $this->filtrosPlanilla = [];
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Render
+    |--------------------------------------------------------------------------
+    */
+
+    public function render(): View
     {
         $fecha = Carbon::parse($this->fechaSeleccionada);
-        $areas = collect(User::$areasEstaticas)->map(fn ($nombre, $codigo) => (object) [
-            'cod_area' => $codigo,
-            'nombre' => $nombre,
-        ]);
+
+        $areas = $this->areasInstitucionales();
         $turnos = TurnoInstitucional::activos()->orderBy('hora_inicio')->get();
         $roles = Role::orderBy('name')->pluck('name');
         $personal = $this->personalFiltrado()->get();
@@ -138,9 +414,7 @@ class TurnosAsignacionesPanel extends Component
         };
 
         $usuarioSeleccionado = $this->usuarioSeleccionado
-            ? User::with(['roles'])
-                ->where('cod_usu', $this->usuarioSeleccionado)
-                ->first()
+            ? User::with(['roles'])->where('cod_usu', $this->usuarioSeleccionado)->first()
             : null;
 
         return view('livewire.admin.personal-institucional.turnos-asignaciones-panel', [
@@ -151,18 +425,55 @@ class TurnosAsignacionesPanel extends Component
             'datosCalendario' => $datosCalendario,
             'personalModal' => $this->personalModal(),
             'usuarioSeleccionadoData' => $usuarioSeleccionado,
+
+            // Datos nuevos para la vista de Planilla de Enfermería.
+            'tipoPlanillaActual' => $this->tipoPlanilla,
+            'resumenPlanilla' => $this->resumenPlanilla,
+            'vistaSemanalPlanilla' => $this->vistaSemanal,
+            'vistaHoyPlanilla' => $this->vistaHoy,
+            'vistaPorEnfermeroPlanilla' => $this->vistaPorEnfermero,
+            'cargaLaboralPlanilla' => $this->cargaLaboral,
+            'alertasPlanilla' => $this->alertasPlanilla,
+            'equilibrioPlanilla' => $this->equilibrioPlanilla,
+            'filtrosPlanilla' => $this->filtrosPlanilla,
         ]);
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Consultas base
+    |--------------------------------------------------------------------------
+    */
+
+    private function areasInstitucionales(): Collection
+    {
+        $areas = property_exists(User::class, 'areasEstaticas')
+            ? User::$areasEstaticas
+            : [
+                'SISTEMA' => 'Sistema',
+                'ADMINISTRACION' => 'Administración',
+                'SALUD' => 'Salud',
+                'ENFERMERIA' => 'Enfermería',
+                'APOYO' => 'Apoyo institucional',
+            ];
+
+        return collect($areas)->map(fn ($nombre, $codigo) => (object) [
+            'cod_area' => $codigo,
+            'nombre' => $nombre,
+        ])->values();
     }
 
     private function personalFiltrado(): Builder
     {
         $query = User::with(['roles'])
             ->whereHas('roles', fn (Builder $query) => $query->whereIn('name', [
-                'SUPERADMINISTRADOR', 'ADMINISTRADOR', 'ENFERMEROS', 'MEDICO GENERAL/GERIATRA', 'PSICOLOGO/A', 'PEDAGOGO', 'NUTRICIONISTA', 'FISIOTERAPEUTA'
+                ...self::ROLES_ADMINISTRATIVOS,
+                ...self::ROLES_SALUD,
             ]));
 
         if ($this->busqueda !== '') {
-            $busqueda = $this->busqueda;
+            $busqueda = trim($this->busqueda);
+
             $query->where(function (Builder $query) use ($busqueda) {
                 $query->where('nombres', 'ilike', "%{$busqueda}%")
                     ->orWhere('ap_paterno', 'ilike', "%{$busqueda}%")
@@ -173,13 +484,9 @@ class TurnosAsignacionesPanel extends Component
         }
 
         if ($this->filtroTipo === 'salud') {
-            $query->whereHas('roles', fn (Builder $query) => $query->whereIn('name', [
-                'ENFERMEROS', 'MEDICO GENERAL/GERIATRA', 'PSICOLOGO/A', 'PEDAGOGO', 'NUTRICIONISTA', 'FISIOTERAPEUTA'
-            ]));
+            $query->whereHas('roles', fn (Builder $query) => $query->whereIn('name', self::ROLES_SALUD));
         } elseif ($this->filtroTipo === 'admin') {
-            $query->whereHas('roles', fn (Builder $query) => $query->whereIn('name', [
-                'SUPERADMINISTRADOR', 'ADMINISTRADOR'
-            ]));
+            $query->whereHas('roles', fn (Builder $query) => $query->whereIn('name', self::ROLES_ADMINISTRATIVOS));
         }
 
         if ($this->filtroRol !== '') {
@@ -188,66 +495,94 @@ class TurnosAsignacionesPanel extends Component
         }
 
         if ($this->filtroArea !== '') {
-            $rolesArea = AreaInstitucional::rolesPorArea($this->filtroArea);
-            $query->whereHas('roles', fn (Builder $query) => $query->whereIn('name', $rolesArea));
+            $rolesArea = $this->rolesPorArea($this->filtroArea);
+
+            if ($rolesArea !== []) {
+                $query->whereHas('roles', fn (Builder $query) => $query->whereIn('name', $rolesArea));
+            }
         }
 
         return $query->orderBy('nombres')->orderBy('ap_paterno');
     }
 
+    private function rolesPorArea(string $area): array
+    {
+        return match ($area) {
+            'SISTEMA', 'ADMINISTRACION' => self::ROLES_ADMINISTRATIVOS,
+            'SALUD' => self::ROLES_SALUD,
+            'ENFERMERIA' => ['ENFERMEROS'],
+            default => [],
+        };
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Adaptador de horarios simples existentes
+    |--------------------------------------------------------------------------
+    */
+
     private function obtenerVirtualAsignaciones(): Collection
     {
-        $salud = \App\Models\HorarioPersonalSalud::with(['user.roles'])->get();
-        $admin = \App\Models\HorarioPersonalAdmin::with(['user.roles'])->get();
-
         $mapped = collect();
 
-        foreach ($salud as $h) {
-            $mapped->push((object) [
-                'cod_asignacion' => $h->cod_hor_per_sal,
-                'cod_usu' => $h->cod_usu,
-                'usuario' => $h->user,
-                'estado' => $h->estado === 'ACTIVO' ? 'ACTIVA' : 'FINALIZADA',
-                'dias_semana' => [$h->dia_semana],
-                'fecha_inicio' => Carbon::create(1900),
-                'fecha_fin' => Carbon::create(2999),
-                'cod_area' => $h->user?->cod_area_virtual,
-                'cod_turno' => $h->cod_hor_per_sal,
-                'turno' => (object) [
-                    'nombre' => $h->turno,
-                    'hora_inicio' => $h->hora_inicio,
-                    'hora_fin' => $h->hora_fin,
-                ],
-                'area' => (object) [
-                    'nombre' => $h->user?->areaInstitucional?->nombre ?? 'Sin asignar',
-                ],
-                'creador' => (object) ['name' => 'Sistema'],
-                'editor' => (object) ['name' => 'Sistema'],
-            ]);
+        try {
+            $salud = HorarioPersonalSalud::with(['user.roles'])->get();
+
+            foreach ($salud as $h) {
+                $mapped->push((object) [
+                    'cod_asignacion' => $h->cod_hor_per_sal,
+                    'cod_usu' => $h->cod_usu,
+                    'usuario' => $h->user,
+                    'estado' => $h->estado === 'ACTIVO' ? 'ACTIVA' : 'FINALIZADA',
+                    'dias_semana' => [$this->normalizarDiaSemana($h->dia_semana)],
+                    'fecha_inicio' => Carbon::create(1900, 1, 1),
+                    'fecha_fin' => Carbon::create(2999, 12, 31),
+                    'cod_area' => $this->codAreaUsuario($h->user),
+                    'cod_turno' => $h->cod_hor_per_sal,
+                    'turno' => (object) [
+                        'nombre' => $h->turno ?? 'Turno salud',
+                        'hora_inicio' => $h->hora_inicio,
+                        'hora_fin' => $h->hora_fin,
+                    ],
+                    'area' => (object) [
+                        'nombre' => $this->nombreAreaUsuario($h->user),
+                    ],
+                    'creador' => (object) ['name' => 'Sistema'],
+                    'editor' => (object) ['name' => 'Sistema'],
+                ]);
+            }
+        } catch (Throwable $e) {
+            report($e);
         }
 
-        foreach ($admin as $h) {
-            $mapped->push((object) [
-                'cod_asignacion' => $h->cod_hor_per_admin,
-                'cod_usu' => $h->cod_usu,
-                'usuario' => $h->user,
-                'estado' => $h->estado === 'ACTIVO' ? 'ACTIVA' : 'FINALIZADA',
-                'dias_semana' => [$h->dia_semana],
-                'fecha_inicio' => Carbon::create(1900),
-                'fecha_fin' => Carbon::create(2999),
-                'cod_area' => $h->user?->cod_area_virtual,
-                'cod_turno' => $h->cod_hor_per_admin,
-                'turno' => (object) [
-                    'nombre' => $h->turno,
-                    'hora_inicio' => $h->hora_inicio,
-                    'hora_fin' => $h->hora_fin,
-                ],
-                'area' => (object) [
-                    'nombre' => $h->user?->areaInstitucional?->nombre ?? 'Sin asignar',
-                ],
-                'creador' => (object) ['name' => 'Sistema'],
-                'editor' => (object) ['name' => 'Sistema'],
-            ]);
+        try {
+            $admin = HorarioPersonalAdmin::with(['user.roles'])->get();
+
+            foreach ($admin as $h) {
+                $mapped->push((object) [
+                    'cod_asignacion' => $h->cod_hor_per_admin,
+                    'cod_usu' => $h->cod_usu,
+                    'usuario' => $h->user,
+                    'estado' => $h->estado === 'ACTIVO' ? 'ACTIVA' : 'FINALIZADA',
+                    'dias_semana' => [$this->normalizarDiaSemana($h->dia_semana)],
+                    'fecha_inicio' => Carbon::create(1900, 1, 1),
+                    'fecha_fin' => Carbon::create(2999, 12, 31),
+                    'cod_area' => $this->codAreaUsuario($h->user),
+                    'cod_turno' => $h->cod_hor_per_admin,
+                    'turno' => (object) [
+                        'nombre' => $h->turno ?? 'Turno administrativo',
+                        'hora_inicio' => $h->hora_inicio,
+                        'hora_fin' => $h->hora_fin,
+                    ],
+                    'area' => (object) [
+                        'nombre' => $this->nombreAreaUsuario($h->user),
+                    ],
+                    'creador' => (object) ['name' => 'Sistema'],
+                    'editor' => (object) ['name' => 'Sistema'],
+                ]);
+            }
+        } catch (Throwable $e) {
+            report($e);
         }
 
         return $mapped;
@@ -258,24 +593,26 @@ class TurnosAsignacionesPanel extends Component
         $all = $this->obtenerVirtualAsignaciones();
 
         if ($this->busqueda !== '') {
-            $busqueda = strtolower($this->busqueda);
+            $busqueda = mb_strtolower(trim($this->busqueda));
+
             $all = $all->filter(function ($asig) use ($busqueda) {
-                return str_contains(strtolower($asig->usuario?->nombres ?? ''), $busqueda)
-                    || str_contains(strtolower($asig->usuario?->ap_paterno ?? ''), $busqueda)
-                    || str_contains(strtolower($asig->usuario?->ap_materno ?? ''), $busqueda)
-                    || str_contains(strtolower($asig->usuario?->cod_usu ?? ''), $busqueda);
+                return str_contains(mb_strtolower($asig->usuario?->nombres ?? ''), $busqueda)
+                    || str_contains(mb_strtolower($asig->usuario?->ap_paterno ?? ''), $busqueda)
+                    || str_contains(mb_strtolower($asig->usuario?->ap_materno ?? ''), $busqueda)
+                    || str_contains(mb_strtolower($asig->usuario?->correo ?? ''), $busqueda)
+                    || str_contains(mb_strtolower($asig->usuario?->cod_usu ?? ''), $busqueda);
             });
         }
 
         if ($this->filtroTipo === 'salud') {
-            $all = $all->filter(fn ($asig) => in_array($asig->usuario?->roles->first()?->name, ['ENFERMEROS', 'MEDICO GENERAL/GERIATRA', 'PSICOLOGO/A', 'PEDAGOGO', 'NUTRICIONISTA', 'FISIOTERAPEUTA']));
+            $all = $all->filter(fn ($asig) => $this->usuarioTieneRol($asig->usuario, self::ROLES_SALUD));
         } elseif ($this->filtroTipo === 'admin') {
-            $all = $all->filter(fn ($asig) => in_array($asig->usuario?->roles->first()?->name, ['SUPERADMINISTRADOR', 'ADMINISTRADOR']));
+            $all = $all->filter(fn ($asig) => $this->usuarioTieneRol($asig->usuario, self::ROLES_ADMINISTRATIVOS));
         }
 
         if ($this->filtroRol !== '') {
             $rol = $this->filtroRol;
-            $all = $all->filter(fn ($asig) => $asig->usuario?->roles->first()?->name === $rol);
+            $all = $all->filter(fn ($asig) => $this->usuarioTieneRol($asig->usuario, [$rol]));
         }
 
         if ($this->filtroArea !== '') {
@@ -285,7 +622,7 @@ class TurnosAsignacionesPanel extends Component
 
         if ($this->filtroTurno !== '') {
             $turno = $this->filtroTurno;
-            $all = $all->filter(fn ($asig) => $asig->turno?->nombre === $turno);
+            $all = $all->filter(fn ($asig) => ($asig->turno?->nombre ?? '') === $turno);
         }
 
         if ($this->filtroEstado === 'finalizado') {
@@ -294,21 +631,23 @@ class TurnosAsignacionesPanel extends Component
             $all = $all->filter(fn ($asig) => $asig->estado === 'ACTIVA');
         }
 
-        return $all;
+        return $all->values();
     }
 
     private function personalModal(): Collection
     {
-        if (!$this->modalAbierto || $this->usuarioSeleccionado) {
+        if (! $this->modalAbierto || $this->usuarioSeleccionado) {
             return collect();
         }
 
         return User::with(['roles'])
             ->whereHas('roles', fn (Builder $query) => $query->whereIn('name', [
-                'SUPERADMINISTRADOR', 'ADMINISTRADOR', 'ENFERMEROS', 'MEDICO GENERAL/GERIATRA', 'PSICOLOGO/A', 'PEDAGOGO', 'NUTRICIONISTA', 'FISIOTERAPEUTA'
+                ...self::ROLES_ADMINISTRATIVOS,
+                ...self::ROLES_SALUD,
             ]))
             ->when($this->busquedaModal !== '', function (Builder $query) {
-                $busqueda = $this->busquedaModal;
+                $busqueda = trim($this->busquedaModal);
+
                 $query->where(fn (Builder $query) => $query
                     ->where('nombres', 'ilike', "%{$busqueda}%")
                     ->orWhere('ap_paterno', 'ilike', "%{$busqueda}%")
@@ -318,6 +657,12 @@ class TurnosAsignacionesPanel extends Component
             ->limit(20)
             ->get();
     }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Métricas y calendario existente
+    |--------------------------------------------------------------------------
+    */
 
     private function metricas(Collection $personal, Collection $asignaciones, Collection $turnos): array
     {
@@ -355,7 +700,7 @@ class TurnosAsignacionesPanel extends Component
         });
 
         if ($this->filtroEstado !== '') {
-            $filas = $filas->where('estado', strtoupper(str_replace('_', ' ', $this->filtroEstado)));
+            $filas = $filas->where('estado', mb_strtoupper(str_replace('_', ' ', $this->filtroEstado)));
         }
 
         return [
@@ -367,8 +712,10 @@ class TurnosAsignacionesPanel extends Component
     private function datosSemana(Carbon $fecha, Collection $asignaciones, array $conflictos): array
     {
         $inicio = $fecha->copy()->startOfWeek(Carbon::MONDAY);
+
         $dias = collect(range(0, 6))->map(function (int $indice) use ($inicio, $asignaciones, $conflictos) {
             $dia = $inicio->copy()->addDays($indice);
+
             $eventos = $this->eventosSegunFiltro($this->eventosFecha($asignaciones, $dia), $dia, $conflictos)
                 ->map(fn (object $asignacion) => $this->mapEvento($asignacion, $dia, $conflictos));
 
@@ -400,6 +747,7 @@ class TurnosAsignacionesPanel extends Component
         for ($cursor = $inicio->copy(); $cursor <= $fin; $cursor->addDay()) {
             $eventos = $this->eventosSegunFiltro($this->eventosFecha($asignaciones, $cursor), $cursor, $conflictos);
             $ids = $eventos->pluck('cod_asignacion');
+
             $dias->push([
                 'fecha' => $cursor->format('Y-m-d'),
                 'numero' => $cursor->format('d'),
@@ -451,6 +799,12 @@ class TurnosAsignacionesPanel extends Component
         ];
     }
 
+    /*
+    |--------------------------------------------------------------------------
+    | Eventos y conflictos
+    |--------------------------------------------------------------------------
+    */
+
     private function eventosFecha(Collection $asignaciones, Carbon $fecha): Collection
     {
         $dia = self::DIAS[$fecha->dayOfWeekIso - 1];
@@ -458,8 +812,8 @@ class TurnosAsignacionesPanel extends Component
         return $asignaciones->filter(function (object $asignacion) use ($fecha, $dia) {
             return $asignacion->estado === 'ACTIVA'
                 && in_array($dia, $asignacion->dias_semana ?: [], true)
-                && (!$asignacion->fecha_inicio || $asignacion->fecha_inicio->lte($fecha))
-                && (!$asignacion->fecha_fin || $asignacion->fecha_fin->gte($fecha));
+                && (! $asignacion->fecha_inicio || $asignacion->fecha_inicio->lte($fecha))
+                && (! $asignacion->fecha_fin || $asignacion->fecha_fin->gte($fecha));
         })->values();
     }
 
@@ -468,7 +822,7 @@ class TurnosAsignacionesPanel extends Component
         return [
             'asignacion' => $asignacion,
             'rol' => $this->rolVisual($asignacion->usuario),
-            'estado' => !$this->usuarioActivo($asignacion->usuario)
+            'estado' => ! $this->usuarioActivo($asignacion->usuario)
                 ? 'SUSPENDIDO'
                 : (isset($conflictos[$asignacion->cod_asignacion])
                     ? 'CONFLICTO'
@@ -486,12 +840,12 @@ class TurnosAsignacionesPanel extends Component
         return $eventos->filter(function (object $asignacion) use ($fecha, $conflictos) {
             $enConflicto = isset($conflictos[$asignacion->cod_asignacion]);
             $enTurno = $fecha->isToday() && $this->estaEnTurnoAhora($asignacion);
-            $suspendido = !$this->usuarioActivo($asignacion->usuario);
+            $suspendido = ! $this->usuarioActivo($asignacion->usuario);
 
             return match ($this->filtroEstado) {
                 'conflicto' => $enConflicto,
-                'en_turno' => !$suspendido && $enTurno,
-                'ocupado' => !$suspendido && !$enConflicto && !$enTurno,
+                'en_turno' => ! $suspendido && $enTurno,
+                'ocupado' => ! $suspendido && ! $enConflicto && ! $enTurno,
                 'suspendido' => $suspendido,
                 'disponible', 'sin_horario' => false,
                 default => true,
@@ -501,7 +855,7 @@ class TurnosAsignacionesPanel extends Component
 
     private function estadoVisual(User $usuario, ?object $asignacion, Carbon $fecha, Collection $asignacionesUsuario, array $conflictos): string
     {
-        if (!$this->usuarioActivo($usuario)) {
+        if (! $this->usuarioActivo($usuario)) {
             return 'SUSPENDIDO';
         }
 
@@ -526,6 +880,7 @@ class TurnosAsignacionesPanel extends Component
 
         foreach ($asignaciones->groupBy('cod_usu') as $items) {
             $items = $items->values();
+
             for ($i = 0; $i < $items->count(); $i++) {
                 for ($j = $i + 1; $j < $items->count(); $j++) {
                     if ($this->asignacionesSeCruzan($items[$i], $items[$j])) {
@@ -545,10 +900,10 @@ class TurnosAsignacionesPanel extends Component
             return false;
         }
 
-        $inicioA = $a->fecha_inicio ?? Carbon::create(1900);
-        $inicioB = $b->fecha_inicio ?? Carbon::create(1900);
-        $finA = $a->fecha_fin ?? Carbon::create(2999);
-        $finB = $b->fecha_fin ?? Carbon::create(2999);
+        $inicioA = $a->fecha_inicio ?? Carbon::create(1900, 1, 1);
+        $inicioB = $b->fecha_inicio ?? Carbon::create(1900, 1, 1);
+        $finA = $a->fecha_fin ?? Carbon::create(2999, 12, 31);
+        $finB = $b->fecha_fin ?? Carbon::create(2999, 12, 31);
 
         if ($inicioA->gt($finB) || $inicioB->gt($finA)) {
             return false;
@@ -564,7 +919,7 @@ class TurnosAsignacionesPanel extends Component
 
     private function rangosHoraSeCruzan(?string $inicioA, ?string $finA, ?string $inicioB, ?string $finB): bool
     {
-        if (!$inicioA || !$finA || !$inicioB || !$finB) {
+        if (! $inicioA || ! $finA || ! $inicioB || ! $finB) {
             return true;
         }
 
@@ -582,8 +937,11 @@ class TurnosAsignacionesPanel extends Component
 
     private function rangoMinutos(string $inicio, string $fin): array
     {
-        $inicioMinutos = Carbon::parse($inicio)->hour * 60 + Carbon::parse($inicio)->minute;
-        $finMinutos = Carbon::parse($fin)->hour * 60 + Carbon::parse($fin)->minute;
+        $inicioCarbon = Carbon::parse($inicio);
+        $finCarbon = Carbon::parse($fin);
+
+        $inicioMinutos = $inicioCarbon->hour * 60 + $inicioCarbon->minute;
+        $finMinutos = $finCarbon->hour * 60 + $finCarbon->minute;
 
         if ($finMinutos <= $inicioMinutos) {
             $finMinutos += 1440;
@@ -594,7 +952,7 @@ class TurnosAsignacionesPanel extends Component
 
     private function estaEnTurnoAhora(object $asignacion): bool
     {
-        if (!$asignacion->turno?->hora_inicio || !$asignacion->turno?->hora_fin) {
+        if (! $asignacion->turno?->hora_inicio || ! $asignacion->turno?->hora_fin) {
             return false;
         }
 
@@ -625,24 +983,128 @@ class TurnosAsignacionesPanel extends Component
         };
     }
 
-    private function usuarioActivo(User $usuario): bool
+    /*
+    |--------------------------------------------------------------------------
+    | Helpers de usuario y estilo
+    |--------------------------------------------------------------------------
+    */
+
+    private function usuarioActivo(?User $usuario): bool
     {
+        if (! $usuario) {
+            return false;
+        }
+
         return in_array((string) $usuario->estado, ['ACTIVO', '1'], true);
     }
 
-    private function rolVisual(User $usuario): array
+    private function usuarioTieneRol(?User $usuario, array $roles): bool
     {
-        $texto = mb_strtoupper(($usuario->categoria_institucional ?? '') . ' ' . $usuario->roles->pluck('name')->implode(' '));
+        if (! $usuario) {
+            return false;
+        }
+
+        return $usuario->roles->pluck('name')->intersect($roles)->isNotEmpty();
+    }
+
+    private function rolVisual(?User $usuario): array
+    {
+        if (! $usuario) {
+            return [
+                'label' => 'Sin usuario',
+                'class' => 'border-borde-suave bg-fondo-hover text-apoyo',
+            ];
+        }
+
+        $roles = $usuario->roles->pluck('name')->all();
+        $texto = mb_strtoupper(implode(' ', $roles));
 
         return match (true) {
-            $usuario->tipo_personal === 'admin' => ['label' => 'Administrativo', 'class' => 'border-slate-300 bg-slate-100 text-slate-700'],
-            str_contains($texto, 'ENFERM') => ['label' => 'Enfermería', 'class' => 'border-emerald-200 bg-emerald-50 text-emerald-700'],
-            str_contains($texto, 'MEDICO') || str_contains($texto, 'MÉDICO') || str_contains($texto, 'GERIATRA') => ['label' => 'Médico / Geriatra', 'class' => 'border-[#F2CFC4] bg-[#FDF5F2] text-[#B85C45]'],
-            str_contains($texto, 'PSICO') => ['label' => 'Psicología', 'class' => 'border-violet-200 bg-violet-50 text-violet-700'],
-            str_contains($texto, 'NUTRI') => ['label' => 'Nutrición', 'class' => 'border-amber-200 bg-amber-50 text-amber-700'],
-            str_contains($texto, 'FISIO') => ['label' => 'Fisioterapia', 'class' => 'border-sky-200 bg-sky-50 text-sky-700'],
-            str_contains($texto, 'PEDAGOG') => ['label' => 'Pedagogía', 'class' => 'border-orange-200 bg-orange-50 text-orange-700'],
-            default => ['label' => $usuario->roles->first()?->name ?? 'Sin rol', 'class' => 'border-stone-200 bg-stone-50 text-stone-600'],
+            $this->usuarioTieneRol($usuario, self::ROLES_ADMINISTRATIVOS) => [
+                'label' => 'Administrativo',
+                'class' => 'border-borde-suave bg-fondo-hover text-apoyo',
+            ],
+            str_contains($texto, 'ENFERM') => [
+                'label' => 'Enfermería',
+                'class' => 'border-estado-exito/20 bg-estado-exitoBg text-estado-exito',
+            ],
+            str_contains($texto, 'MEDICO') || str_contains($texto, 'MÉDICO') || str_contains($texto, 'GERIATRA') => [
+                'label' => 'Médico / Geriatra',
+                'class' => 'border-boton-acento/20 bg-boton-acento/10 text-boton-acento',
+            ],
+            str_contains($texto, 'PSICO') => [
+                'label' => 'Psicología',
+                'class' => 'border-boton-principal/20 bg-boton-principal/10 text-boton-principal',
+            ],
+            str_contains($texto, 'NUTRI') => [
+                'label' => 'Nutrición',
+                'class' => 'border-boton-acento/20 bg-boton-acento/10 text-boton-acento',
+            ],
+            str_contains($texto, 'FISIO') => [
+                'label' => 'Fisioterapia',
+                'class' => 'border-estado-exito/20 bg-estado-exitoBg text-estado-exito',
+            ],
+            str_contains($texto, 'PEDAGOG') => [
+                'label' => 'Pedagogía',
+                'class' => 'border-boton-acento/20 bg-boton-acento/10 text-boton-acento',
+            ],
+            default => [
+                'label' => $usuario->roles->first()?->name ?? 'Sin rol',
+                'class' => 'border-borde-suave bg-fondo-hover text-apoyo',
+            ],
+        };
+    }
+
+    private function codAreaUsuario(?User $usuario): string
+    {
+        if (! $usuario) {
+            return 'SIN_AREA';
+        }
+
+        if ($this->usuarioTieneRol($usuario, self::ROLES_ADMINISTRATIVOS)) {
+            return 'ADMINISTRACION';
+        }
+
+        if ($this->usuarioTieneRol($usuario, ['ENFERMEROS'])) {
+            return 'ENFERMERIA';
+        }
+
+        if ($this->usuarioTieneRol($usuario, self::ROLES_SALUD)) {
+            return 'SALUD';
+        }
+
+        return 'SIN_AREA';
+    }
+
+    private function nombreAreaUsuario(?User $usuario): string
+    {
+        return match ($this->codAreaUsuario($usuario)) {
+            'ADMINISTRACION' => 'Administración',
+            'ENFERMERIA' => 'Enfermería',
+            'SALUD' => 'Salud',
+            default => 'Sin asignar',
+        };
+    }
+
+    private function normalizarDiaSemana(?string $dia): string
+    {
+        $dia = mb_strtoupper(trim((string) $dia));
+
+        $dia = str_replace(
+            ['Á', 'É', 'Í', 'Ó', 'Ú'],
+            ['A', 'E', 'I', 'O', 'U'],
+            $dia
+        );
+
+        return match ($dia) {
+            'LUNES' => 'LUNES',
+            'MARTES' => 'MARTES',
+            'MIERCOLES' => 'MIERCOLES',
+            'JUEVES' => 'JUEVES',
+            'VIERNES' => 'VIERNES',
+            'SABADO' => 'SABADO',
+            'DOMINGO' => 'DOMINGO',
+            default => 'LUNES',
         };
     }
 }
