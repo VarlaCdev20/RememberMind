@@ -24,7 +24,7 @@ class AdultoMayorSeeder extends Seeder
         }
 
         DB::table('adulto_mayor')->updateOrInsert(
-            ['cod_am' => 'AM_0001'],
+            ['cod_am' => 'AM_001'],
             [
                 'nombres' => 'MARÍA',
                 'ap_paterno' => 'QUISPE',

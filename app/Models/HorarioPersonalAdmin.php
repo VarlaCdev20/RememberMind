@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Traits\GeneraCodigo;
+
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -12,11 +14,14 @@ use Illuminate\Database\Eloquent\Model;
  */
 class HorarioPersonalAdmin extends Model
 {
+    use GeneraCodigo;
     protected $table = 'horarios_personal_admin';
     protected $primaryKey = 'cod_hor_per_admin';
 
-    public $incrementing = true;
-    protected $keyType = 'int';
+    public $incrementing = false;
+    protected $keyType = 'string';
+    protected $prefixCode = 'HAD';
+    protected $digitsCode = 3;
 
     public $timestamps = false;
 
@@ -28,14 +33,12 @@ class HorarioPersonalAdmin extends Model
         'estado',
         'observaciones',
         'cod_per_adm',
+        'cod_usu',
     ];
 
-    /**
-     * Relaciones
-     */
-
-    public function personalAdmin()
+    public function user()
     {
-        return $this->belongsTo(PersonalAdmin::class, 'cod_per_adm', 'cod_per_adm');
+        return $this->belongsTo(User::class, 'cod_usu', 'cod_usu');
     }
+
 }

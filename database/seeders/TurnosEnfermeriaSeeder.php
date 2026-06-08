@@ -2,8 +2,8 @@
 
 namespace Database\Seeders;
 
+use App\Models\TurnoEnfermeria;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 
 class TurnosEnfermeriaSeeder extends Seeder
 {
@@ -45,16 +45,11 @@ class TurnosEnfermeriaSeeder extends Seeder
         ];
 
         foreach ($turnos as $turno) {
-            $exists = DB::table('turnos_enfermeria')
-                ->where('nombre', $turno['nombre'])
-                ->exists();
+            $exists = TurnoEnfermeria::where('nombre', $turno['nombre'])->exists();
 
             if (! $exists) {
-                DB::table('turnos_enfermeria')->insert(array_merge($turno, [
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ]));
-                $this->command->line("  Turno creado: {$turno['nombre']} ({$turno['hora_inicio']}–{$turno['hora_fin']})");
+                $created = TurnoEnfermeria::create($turno);
+                $this->command->line("  Turno creado: {$created->nombre} ({$created->cod_turno})");
             } else {
                 $this->command->line("  Turno existente (omitido): {$turno['nombre']}");
             }

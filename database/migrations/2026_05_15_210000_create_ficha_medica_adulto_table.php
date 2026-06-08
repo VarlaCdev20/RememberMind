@@ -9,15 +9,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('ficha_medica_adulto', function (Blueprint $table) {
-            $table->increments('cod_ficha_medica');
-
-            // FK → adulto_mayor (string PK)
-            $table->string('cod_am', 10);
-            $table->foreign('cod_am')
-                ->references('cod_am')->on('adulto_mayor')
-                ->onUpdate('cascade')->onDelete('restrict');
-
-            // Antecedentes / condiciones crónicas
+            $table->string('cod_ficha_medica', 20)->primary();
+            $table->string('cod_am', 20);
             $table->boolean('hipertension')->default(false);
             $table->boolean('diabetes')->default(false);
             $table->boolean('problemas_cardiacos')->default(false);
@@ -31,33 +24,32 @@ return new class extends Migration
             $table->boolean('problemas_visuales')->default(false);
             $table->boolean('problemas_auditivos')->default(false);
             $table->boolean('dolor_cronico')->default(false);
-
-            // Información médica textual
             $table->text('alergias')->nullable();
             $table->text('restricciones_alimentarias')->nullable();
             $table->text('hospitalizaciones')->nullable();
             $table->text('cirugias')->nullable();
             $table->text('observacion_medica')->nullable();
-
-            // Registro y control
             $table->string('registrado_por', 20)->nullable();
-            $table->foreign('registrado_por')
-                ->references('cod_usu')->on('users')
-                ->onUpdate('cascade')->onDelete('set null');
-
-            $table->string('estado', 30)->default('ACTIVO');
-
-            $table->timestamps();
+            $table->string('estado', 50)->default('ACTIVO');
             $table->softDeletes();
+            $table->timestamps();
+
+            $table->foreign('cod_am')
+                ->references('cod_am')
+                ->on('adulto_mayor')
+                ->onUpdate('cascade')
+                ->onDelete('cascade');
+
+            $table->foreign('registrado_por')
+                ->references('cod_usu')
+                ->on('users')
+                ->onUpdate('cascade')
+                ->onDelete('set null');
         });
     }
 
     public function down(): void
     {
-        Schema::table('ficha_medica_adulto', function (Blueprint $table) {
-            $table->dropForeign(['cod_am']);
-            $table->dropForeign(['registrado_por']);
-        });
         Schema::dropIfExists('ficha_medica_adulto');
     }
 };

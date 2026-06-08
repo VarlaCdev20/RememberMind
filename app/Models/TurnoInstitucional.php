@@ -69,10 +69,7 @@ class TurnoInstitucional extends Model
     /**
      * Relationship with assignments
      */
-    public function asignaciones()
-    {
-        return $this->hasMany(AsignacionTurno::class, 'cod_turno', 'cod_turno');
-    }
+    
 
     /**
      * Relationship with creators/updaters

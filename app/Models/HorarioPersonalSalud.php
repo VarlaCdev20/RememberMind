@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Traits\GeneraCodigo;
+
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -12,11 +14,14 @@ use Illuminate\Database\Eloquent\Model;
  */
 class HorarioPersonalSalud extends Model
 {
+    use GeneraCodigo;
     protected $table = 'horarios_personal_salud';
     protected $primaryKey = 'cod_hor_per_sal';
 
-    public $incrementing = true;
-    protected $keyType = 'int';
+    public $incrementing = false;
+    protected $keyType = 'string';
+    protected $prefixCode = 'HSA';
+    protected $digitsCode = 3;
 
     public $timestamps = false;
 
@@ -28,14 +33,12 @@ class HorarioPersonalSalud extends Model
         'estado',
         'observaciones',
         'cod_per_sal',
+        'cod_usu',
     ];
 
-    /**
-     * Relaciones
-     */
-
-    public function personalSalud()
+    public function user()
     {
-        return $this->belongsTo(PersonalSalud::class, 'cod_per_sal', 'cod_per_sal');
+        return $this->belongsTo(User::class, 'cod_usu', 'cod_usu');
     }
+
 }

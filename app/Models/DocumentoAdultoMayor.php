@@ -2,12 +2,15 @@
 
 namespace App\Models;
 
+use App\Traits\GeneraCodigo;
+
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\Traits\LogsActivity;
 
 class DocumentoAdultoMayor extends Model
 {
+    use GeneraCodigo;
     use SoftDeletes, LogsActivity;
 
     public function getActivitylogOptions(): \Spatie\Activitylog\LogOptions
@@ -28,8 +31,10 @@ class DocumentoAdultoMayor extends Model
     protected $table = 'documentos_adulto_mayor';
     protected $primaryKey = 'cod_doc_am';
 
-    public $incrementing = true;
-    protected $keyType = 'int';
+    public $incrementing = false;
+    protected $keyType = 'string';
+    protected $prefixCode = 'DAM';
+    protected $digitsCode = 5;
 
     // Timestamps habilitados — columnas existen desde strengthen_administrative_tables migration
     public $timestamps = true;

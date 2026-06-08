@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Traits\GeneraCodigo;
+
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Spatie\Activitylog\Traits\LogsActivity;
@@ -9,13 +11,16 @@ use Spatie\Activitylog\LogOptions;
 
 class SeguimientoDiario extends Model
 {
+    use GeneraCodigo;
     use LogsActivity;
 
     protected $table      = 'seguimientos_diarios';
     protected $primaryKey = 'cod_seg_diario';
 
-    public $incrementing = true;
-    protected $keyType   = 'int';
+    public $incrementing = false;
+    protected $keyType = 'string';
+    protected $prefixCode = 'SGD';
+    protected $digitsCode = 5;
     public $timestamps   = true;
 
     protected $fillable = [

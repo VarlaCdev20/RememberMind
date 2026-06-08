@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Traits\GeneraCodigo;
+
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -10,13 +12,16 @@ use Spatie\Activitylog\LogOptions;
 
 class AlertaAdulto extends Model
 {
+    use GeneraCodigo;
     use LogsActivity;
 
     protected $table      = 'alertas_adulto';
     protected $primaryKey = 'cod_alerta';
 
-    public $incrementing = true;
-    protected $keyType   = 'int';
+    public $incrementing = false;
+    protected $keyType = 'string';
+    protected $prefixCode = 'ALA';
+    protected $digitsCode = 5;
     public $timestamps   = true;
 
     protected $fillable = [

@@ -9,14 +9,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('valoracion_funcional_adulto', function (Blueprint $table) {
-            $table->increments('cod_val_func');
-
-            // FK → adulto_mayor
-            $table->string('cod_am', 10);
-            $table->foreign('cod_am')
-                ->references('cod_am')->on('adulto_mayor')
-                ->onUpdate('cascade')->onDelete('restrict');
-
+            $table->string('cod_val_func', 20)->primary();
+            $table->string('cod_am', 20);
             $table->date('fecha_valoracion');
 
             // Autonomía básica (Actividades de la Vida Diaria)
@@ -41,18 +35,20 @@ return new class extends Migration
             $table->boolean('necesita_supervision')->default(false);
 
             // Clasificación funcional
-            // INDEPENDIENTE, DEPENDENCIA_PARCIAL, ALTA_DEPENDENCIA, SUPERVISION_PERMANENTE
             $table->string('nivel_dependencia', 50);
-
             $table->text('observacion')->nullable();
 
             // Registro
             $table->string('registrado_por', 20)->nullable();
+            $table->timestamps();
+
+            $table->foreign('cod_am')
+                ->references('cod_am')->on('adulto_mayor')
+                ->onUpdate('cascade')->onDelete('restrict');
+
             $table->foreign('registrado_por')
                 ->references('cod_usu')->on('users')
                 ->onUpdate('cascade')->onDelete('set null');
-
-            $table->timestamps();
 
             // Índice para historial por adulto
             $table->index(['cod_am', 'fecha_valoracion'], 'idx_valfunc_am_fecha');
@@ -61,11 +57,6 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::table('valoracion_funcional_adulto', function (Blueprint $table) {
-            $table->dropIndex('idx_valfunc_am_fecha');
-            $table->dropForeign(['cod_am']);
-            $table->dropForeign(['registrado_por']);
-        });
         Schema::dropIfExists('valoracion_funcional_adulto');
     }
 };

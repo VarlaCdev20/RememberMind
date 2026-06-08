@@ -13,14 +13,14 @@ class EstadoAdultoSeeder extends Seeder
     public function run(): void
     {
         $estados = [
-            ['cod_est_adul' => 1, 'estado' => 'ACTIVO'],
-            ['cod_est_adul' => 2, 'estado' => 'ARCHIVADO'],
-            ['cod_est_adul' => 3, 'estado' => 'INACTIVO'],
-            ['cod_est_adul' => 4, 'estado' => 'SEGUIMIENTO_ESPECIAL'],
-            ['cod_est_adul' => 5, 'estado' => 'RETIRADO'],
-            ['cod_est_adul' => 6, 'estado' => 'TRASLADADO'],
-            ['cod_est_adul' => 7, 'estado' => 'FALLECIDO'],
-            ['cod_est_adul' => 8, 'estado' => 'RESTAURADO'],
+            ['cod_est_adul' => 'EST_001', 'estado' => 'ACTIVO'],
+            ['cod_est_adul' => 'EST_002', 'estado' => 'ARCHIVADO'],
+            ['cod_est_adul' => 'EST_003', 'estado' => 'INACTIVO'],
+            ['cod_est_adul' => 'EST_004', 'estado' => 'SEGUIMIENTO_ESPECIAL'],
+            ['cod_est_adul' => 'EST_005', 'estado' => 'RETIRADO'],
+            ['cod_est_adul' => 'EST_006', 'estado' => 'TRASLADADO'],
+            ['cod_est_adul' => 'EST_007', 'estado' => 'FALLECIDO'],
+            ['cod_est_adul' => 'EST_008', 'estado' => 'RESTAURADO'],
         ];
 
         foreach ($estados as $est) {

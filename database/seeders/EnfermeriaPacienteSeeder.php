@@ -3,16 +3,16 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 use App\Models\User;
-use App\Models\PersonalSalud;
 use App\Models\AdultoMayor;
 use App\Models\EstadoAdulto;
 use App\Models\Habitacion;
 use App\Models\Cama;
-use App\Models\AsignacionTurnoAdulto;
+use App\Models\AsignacionAdultoMayor;
+use App\Models\SignosVitalesAdulto;
+use App\Models\PlanCuidado;
+use App\Models\TurnoEnfermeria;
 use Spatie\Permission\Models\Role;
-use Carbon\Carbon;
 use Illuminate\Support\Facades\Hash;
 
 class EnfermeriaPacienteSeeder extends Seeder
@@ -38,83 +38,82 @@ class EnfermeriaPacienteSeeder extends Seeder
             $user->assignRole('ENFERMEROS');
         }
 
-        // 3. Crear el registro en personal_salud
-        $personal = PersonalSalud::firstWhere('cod_usu', $user->cod_usu);
-        if (!$personal) {
-            $personal = clone $user; // not real, just a placeholder structure
-            $personal = PersonalSalud::create([
-                'cod_usu' => $user->cod_usu,
-                'fecha_ing' => '2026-05-01',
-                'estado_laboral' => 'ACTIVO',
-                'cod_esp' => 6, // Enfermería general? just random id
-                'created_at' => now(),
-                'updated_at' => now(),
+        // 3. Asegurar Habitacion y Cama
+        $habitacion = Habitacion::firstWhere('nombre', 'Habitacion 101');
+        if (!$habitacion) {
+            $habitacion = Habitacion::create([
+                'codigo' => 'HAB-101',
+                'nombre' => 'Habitacion 101',
+                'tipo_habitacion' => 'INDIVIDUAL',
+                'capacidad' => 1,
+                'estado' => 'DISPONIBLE'
             ]);
         }
 
-        // 4. Asegurar Habitacion y Cama
-        $habitacion = Habitacion::firstOrCreate(
-            ['codigo' => 'HAB-01'],
-            ['nombre' => 'Habitacion 101', 'tipo_habitacion' => 'INDIVIDUAL', 'capacidad' => 1, 'estado' => 'DISPONIBLE']
-        );
-
-        $cama = Cama::firstOrCreate(
-            ['codigo' => 'CAM-01'],
-            ['cod_habitacion' => $habitacion->cod_habitacion ?? 1, 'estado' => 'DISPONIBLE']
-        );
-
-        // 5. Obtener el estado activo de flujo clinico
-        $estadoId = DB::table('estado_adulto')->where('estado', 'EN_SEGUIMIENTO_ACTIVO')->value('cod_est_adul');
-        if (!$estadoId) {
-            $estadoId = DB::table('estado_adulto')->where('estado', 'ACTIVO')->value('cod_est_adul');
+        $cama = Cama::firstWhere('cod_habitacion', $habitacion->cod_habitacion);
+        if (!$cama) {
+            $cama = Cama::create([
+                'codigo' => 'CAM-101',
+                'cod_habitacion' => $habitacion->cod_habitacion,
+                'estado' => 'DISPONIBLE'
+            ]);
         }
 
-        // 6. Asegurar el Adulto Mayor de Demo (AM_0001)
-        $paciente = AdultoMayor::firstOrCreate(
-            ['cod_am' => 'AM_0001'],
-            [
+        // 4. Obtener el estado activo de flujo clinico
+        $estadoId = EstadoAdulto::where('estado', 'EN_SEGUIMIENTO_ACTIVO')->value('cod_est_adul');
+        if (!$estadoId) {
+            $estadoId = EstadoAdulto::where('estado', 'ACTIVO')->value('cod_est_adul');
+        }
+
+        // 5. Asegurar el Adulto Mayor de Demo (AM_002)
+        $paciente = AdultoMayor::firstWhere('ci', '1234567-DEMO');
+        if (!$paciente) {
+            $paciente = AdultoMayor::create([
+                'cod_am'       => 'AM_002',
                 'nombres'      => 'Roberto',
                 'ap_paterno'   => 'Choque',
                 'ap_materno'   => 'Condori',
-                'ci'           => '1234567',
+                'ci'           => '1234567-DEMO',
                 'fecha_nac'    => '1945-08-20',
                 'genero'       => 'MASCULINO',
                 'estado_civil' => 'CASADO',
                 'cod_est_adul' => $estadoId,
-            ]
-        );
-        $paciente->cod_est_adul = $estadoId;
-        $paciente->save();
-
-        // 7. Obtener Turno Mañana
-        $turno = DB::table('turnos_enfermeria')->where('nombre', 'MAÑANA')->first();
-        if (!$turno) {
-            DB::table('turnos_enfermeria')->insert([
-                'nombre' => 'MAÑANA',
-                'hora_inicio' => '06:00:00',
-                'hora_fin' => '12:00:00',
-                'orden' => 1,
-                'estado' => 'ACTIVO'
+                'fecha_ing'    => now()->toDateString(),
+                'hora_ing'     => '08:00',
+                'tipo_ing'     => 'REGULAR',
+                'permanencia'  => 'PERMANENTE',
+                'nivel_educat' => 'PRIMARIA',
+                'grupo_sanguineo' => 'O+',
+                'factor_rh'    => '+',
+                'alergias'     => 'NINGUNA',
+                'seguro_salud' => 'SUS',
+                'contacto_emergencia_nombre' => 'JUAN CHOQUE',
+                'contacto_emergencia_parentesco' => 'HIJO/A',
+                'contacto_emergencia_celular' => '71111111',
+                'contacto_emergencia_direccion' => 'MIRAFLORES',
+                'responsable_principal' => true,
+                'autorizado_informacion_medica' => true,
+                'consentimiento_datos' => true,
             ]);
-            $turno = DB::table('turnos_enfermeria')->where('nombre', 'MAÑANA')->first();
         }
 
-        // 8. Asignar turno
-        DB::table('asignaciones_turno_adulto')->updateOrInsert(
-            ['cod_am' => $paciente->cod_am, 'cod_usu_enfermero' => $user->cod_usu, 'estado' => 'ACTIVA'],
-            [
-                'cod_turno' => $turno->cod_turno ?? $turno->id ?? 1,
-                'cod_habitacion' => $habitacion->cod_habitacion ?? 1,
-                'cod_cama' => $cama->cod_cama ?? 1,
-                'fecha_inicio' => now()->toDateString(),
-                'motivo_asignacion' => 'Asignación de prueba automática',
-                'created_at' => now(),
-                'updated_at' => now()
-            ]
-        );
+        // 6. Asignar cama/habitacion en asignacion_adulto_mayor
+        $asignacion = AsignacionAdultoMayor::where('cod_am', $paciente->cod_am)->first();
+        if (!$asignacion) {
+            AsignacionAdultoMayor::create([
+                'cod_am' => $paciente->cod_am,
+                'cod_habitacion' => $habitacion->cod_habitacion,
+                'cod_cama' => $cama->cod_cama,
+                'fecha_asignacion' => now()->toDateString(),
+                'hora_asignacion' => now()->toTimeString(),
+                'estado' => 'ACTIVO',
+                'observaciones' => 'Asignación de prueba automática',
+                'registrado_por' => $user->cod_usu
+            ]);
+        }
 
-        // 9. Datos clínicos de prueba
-        DB::table('signos_vitales_adulto')->insert([
+        // 7. Signos vitales de prueba
+        SignosVitalesAdulto::create([
             'cod_am' => $paciente->cod_am,
             'registrado_por' => $user->cod_usu,
             'fecha' => now()->toDateString(),
@@ -125,22 +124,21 @@ class EnfermeriaPacienteSeeder extends Seeder
             'frecuencia_respiratoria' => 18,
             'temperatura' => 36.5,
             'saturacion' => 95,
-            'created_at' => now(),
-            'updated_at' => now()
         ]);
 
-        DB::table('planes_cuidado')->updateOrInsert(
-            ['cod_am' => $paciente->cod_am, 'estado' => 'ACTIVO'],
-            [
+        // 8. Plan de cuidado de prueba
+        $plan = PlanCuidado::where('cod_am', $paciente->cod_am)->first();
+        if (!$plan) {
+            PlanCuidado::create([
+                'cod_am' => $paciente->cod_am,
                 'nivel_cuidado' => 'INTERMEDIO',
                 'version' => 1,
-                'fecha_inicio' => now(),
+                'fecha_inicio' => now()->toDateString(),
                 'creado_por' => $user->cod_usu,
-                'created_at' => now(),
-                'updated_at' => now()
-            ]
-        );
+                'estado' => 'ACTIVO'
+            ]);
+        }
 
-        $this->command->info("Datos de enfermeria (enfermero@casaamandita.com y paciente AM_0001) sembrados correctamente.");
+        $this->command->info("Datos de enfermeria (enfermero@casaamandita.com y paciente AM_002) sembrados correctamente.");
     }
 }

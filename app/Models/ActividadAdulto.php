@@ -2,12 +2,15 @@
 
 namespace App\Models;
 
+use App\Traits\GeneraCodigo;
+
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\Traits\LogsActivity;
 
 class ActividadAdulto extends Model
 {
+    use GeneraCodigo;
     use SoftDeletes, LogsActivity;
 
     public function getActivitylogOptions(): \Spatie\Activitylog\LogOptions
@@ -28,8 +31,10 @@ class ActividadAdulto extends Model
     protected $table = 'actividades_adulto';
     protected $primaryKey = 'cod_act_adul';
 
-    public $incrementing = true;
-    protected $keyType = 'int';
+    public $incrementing = false;
+    protected $keyType = 'string';
+    protected $prefixCode = 'ACT';
+    protected $digitsCode = 5;
 
     // Timestamps habilitados — columnas existen desde strengthen_administrative_tables migration
     public $timestamps = true;

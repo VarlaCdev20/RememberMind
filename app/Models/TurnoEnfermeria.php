@@ -2,16 +2,21 @@
 
 namespace App\Models;
 
+use App\Traits\GeneraCodigo;
+
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class TurnoEnfermeria extends Model
 {
+    use GeneraCodigo;
     protected $table      = 'turnos_enfermeria';
     protected $primaryKey = 'cod_turno';
 
-    public $incrementing = true;
-    protected $keyType   = 'int';
+    public $incrementing = false;
+    protected $keyType = 'string';
+    protected $prefixCode = 'TEN';
+    protected $digitsCode = 3;
     public $timestamps   = true;
 
     protected $fillable = [
@@ -29,10 +34,7 @@ class TurnoEnfermeria extends Model
 
     // ── Relaciones ─────────────────────────────────────────────────────────────
 
-    public function asignacionesTurnoAdulto(): HasMany
-    {
-        return $this->hasMany(AsignacionTurnoAdulto::class, 'cod_turno', 'cod_turno');
-    }
+    
 
     public function tareasActuales(): HasMany
     {

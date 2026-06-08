@@ -2,18 +2,23 @@
 
 namespace App\Models;
 
+use App\Traits\GeneraCodigo;
+
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\Traits\LogsActivity;
 
 class EvaluacionGeriatrica extends Model
 {
+    use GeneraCodigo;
     use SoftDeletes, LogsActivity;
 
     protected $table = 'evaluaciones_geriatricas';
     protected $primaryKey = 'cod_eval_ger';
     public $incrementing = false;
     protected $keyType = 'string';
+    protected $prefixCode = 'EGE';
+    protected $digitsCode = 5;
 
     protected $fillable = [
         'cod_eval_ger', 'cod_am', 'cod_instrumento',

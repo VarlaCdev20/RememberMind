@@ -13,14 +13,12 @@ return new class extends Migration
         }
 
         Schema::create('acciones_alerta', function (Blueprint $table) {
-            $table->id('cod_accion_alerta');
-
-            $table->unsignedBigInteger('cod_alerta');
+            $table->string('cod_accion_alerta', 20)->primary();
+            $table->string('cod_alerta', 20);
             $table->text('accion');
             $table->string('responsable_id', 20)->nullable(); // FK users
             $table->timestamp('fecha_accion');
             $table->string('estado', 20)->default('PENDIENTE');
-            // PENDIENTE, REALIZADA, CANCELADA, REPROGRAMADA
             $table->text('observacion')->nullable();
 
             $table->timestamps();

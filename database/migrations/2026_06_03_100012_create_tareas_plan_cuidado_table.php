@@ -13,32 +13,26 @@ return new class extends Migration
         }
 
         Schema::create('tareas_plan_cuidado', function (Blueprint $table) {
-            $table->id('cod_tarea');
-
-            $table->unsignedBigInteger('cod_plan');
-            $table->string('cod_am', 10);
-            $table->unsignedInteger('cod_turno');            // turno en que se realiza
+            $table->string('cod_tarea', 20)->primary();
+            $table->string('cod_plan', 20);
+            $table->string('cod_am', 20);
+            $table->string('cod_turno', 20);
             $table->string('responsable_id', 20)->nullable(); // FK users
 
             $table->string('area', 30);
-            // SIGNOS, MEDICACION, MOVILIDAD, COGNITIVO, ALIMENTACION, HIDRATACION,
-            // HIGIENE, SUEÑO, SEGURIDAD, EMOCIONAL, FAMILIAR, REEVALUACION
-
             $table->string('titulo', 200);
             $table->text('descripcion')->nullable();
-            $table->string('frecuencia', 50)->nullable();    // DIARIA, CADA_8H, SEMANAL, etc.
+            $table->string('frecuencia', 50)->nullable();
             $table->date('fecha_programada');
             $table->time('hora_programada')->nullable();
             $table->string('prioridad', 20)->default('NORMAL');
-            // BAJA, NORMAL, ALTA, URGENTE
             $table->string('estado', 20)->default('PENDIENTE');
-            // PENDIENTE, EN_PROCESO, REALIZADA, OMITIDA, REPROGRAMADA, VENCIDA, TRANSFERIDA, ANULADA
 
             $table->timestamp('fecha_realizada')->nullable();
             $table->text('resultado')->nullable();
             $table->text('observacion')->nullable();
             $table->text('motivo_omision')->nullable();
-            $table->unsignedInteger('transferida_a_turno_id')->nullable(); // FK turnos_enfermeria
+            $table->string('transferida_a_turno_id', 20)->nullable(); // FK turnos_enfermeria
             $table->string('registrado_por', 20)->nullable(); // FK users
 
             $table->timestamps();

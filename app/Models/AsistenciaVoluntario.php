@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Traits\GeneraCodigo;
+
 use Illuminate\Database\Eloquent\Model;
 
 class AsistenciaVoluntarios extends Model
@@ -9,8 +11,10 @@ class AsistenciaVoluntarios extends Model
     protected $table = 'asistencia_voluntarios';
     protected $primaryKey = 'cod_asis_vol';
 
-    public $incrementing = true;
-    protected $keyType = 'int';
+    public $incrementing = false;
+    protected $keyType = 'string';
+    protected $prefixCode = 'AVS';
+    protected $digitsCode = 5;
 
     public $timestamps = false;
 

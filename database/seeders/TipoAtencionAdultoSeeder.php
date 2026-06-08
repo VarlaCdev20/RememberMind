@@ -10,16 +10,16 @@ class TipoAtencionAdultoSeeder extends Seeder
     public function run(): void
     {
         $tipos = [
-            ['tipo' => 'Médica General', 'descripcion' => 'Consulta de control médico rutinario.'],
-            ['tipo' => 'Enfermería', 'descripcion' => 'Curaciones, administración de medicamentos, signos vitales.'],
-            ['tipo' => 'Psicología', 'descripcion' => 'Apoyo emocional y evaluación psicológica.'],
-            ['tipo' => 'Fisioterapia', 'descripcion' => 'Sesiones de rehabilitación física.'],
-            ['tipo' => 'Nutrición', 'descripcion' => 'Control de dieta y estado nutricional.'],
-            ['tipo' => 'Odontología', 'descripcion' => 'Revisión y tratamiento dental.'],
+            ['nombre' => 'Médica General', 'descripcion' => 'Consulta de control médico rutinario.'],
+            ['nombre' => 'Enfermería', 'descripcion' => 'Curaciones, administración de medicamentos, signos vitales.'],
+            ['nombre' => 'Psicología', 'descripcion' => 'Apoyo emocional y evaluación psicológica.'],
+            ['nombre' => 'Fisioterapia', 'descripcion' => 'Sesiones de rehabilitación física.'],
+            ['nombre' => 'Nutrición', 'descripcion' => 'Control de dieta y estado nutricional.'],
+            ['nombre' => 'Odontología', 'descripcion' => 'Revisión y tratamiento dental.'],
         ];
 
         foreach ($tipos as $tipo) {
-            TipoAtencionAdulto::updateOrCreate(['tipo' => $tipo['tipo']], $tipo);
+            TipoAtencionAdulto::updateOrCreate(['nombre' => $tipo['nombre']], $tipo);
         }
     }
 }
