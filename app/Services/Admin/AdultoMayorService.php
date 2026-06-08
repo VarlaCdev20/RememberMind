@@ -15,7 +15,7 @@ class AdultoMayorService
      */
     public function obtenerListado(array $filtros = [])
     {
-        $query = AdultoMayor::with(['estado'])
+        $query = AdultoMayor::with(['estado', 'familiares', 'atenciones', 'evaluacionesGeriatricas'])
             ->withCount([
                 'familiares as fam_total',
                 'observaciones as obs_total',
@@ -50,6 +50,21 @@ class AdultoMayorService
 
         if (!empty($filtros['nivel_educat'])) {
             $query->where('nivel_educat', $filtros['nivel_educat']);
+        }
+
+        if (!empty($filtros['ciudad_municipio'])) {
+            $query->where('ciudad_municipio', 'ilike', "%{$filtros['ciudad_municipio']}%");
+        }
+
+        if (!empty($filtros['rango_edad'])) {
+            $rango = $filtros['rango_edad'];
+            if ($rango === '60-70') {
+                $query->whereBetween('fecha_nac', [now()->subYears(70)->format('Y-m-d'), now()->subYears(60)->format('Y-m-d')]);
+            } elseif ($rango === '70-80') {
+                $query->whereBetween('fecha_nac', [now()->subYears(80)->format('Y-m-d'), now()->subYears(70)->format('Y-m-d')]);
+            } elseif ($rango === '80+') {
+                $query->where('fecha_nac', '<', now()->subYears(80)->format('Y-m-d'));
+            }
         }
 
         if (!empty($filtros['fecha_desde'])) {
@@ -107,7 +122,7 @@ class AdultoMayorService
     public function obtenerTiposAtenciones()
     {
         if (Schema::hasTable('tipo_atenciones_adulto')) {
-            return \App\Models\TipoAtencionAdulto::orderBy('tipo')->get();
+            return \App\Models\TipoAtencionAdulto::orderBy('nombre')->get();
         }
         return collect();
     }

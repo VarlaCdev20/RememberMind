@@ -2,13 +2,15 @@
 
 namespace App\Models;
 
+use App\Traits\GeneraCodigo;
+
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\Traits\LogsActivity;
 
 class ActividadAdulto extends Model
 {
-    use SoftDeletes, LogsActivity;
+    use GeneraCodigo;
+    use LogsActivity;
 
     public function getActivitylogOptions(): \Spatie\Activitylog\LogOptions
     {
@@ -28,8 +30,10 @@ class ActividadAdulto extends Model
     protected $table = 'actividades_adulto';
     protected $primaryKey = 'cod_act_adul';
 
-    public $incrementing = true;
-    protected $keyType = 'int';
+    public $incrementing = false;
+    protected $keyType = 'string';
+    protected $prefixCode = 'ACT';
+    protected $digitsCode = 5;
 
     // Timestamps habilitados — columnas existen desde strengthen_administrative_tables migration
     public $timestamps = true;
@@ -37,15 +41,74 @@ class ActividadAdulto extends Model
     protected $fillable = [
         'fecha',
         'hora',
+        'hora_inicio',
+        'hora_fin',
         'obs',
+        'observacion',
         'estado',
         'cod_tipo_act',
-        'cod_am'
+        'cod_am',
+        'registrado_por',
     ];
 
     protected $casts = [
         'fecha' => 'date',
     ];
+
+    public function getHoraAttribute(): ?string
+    {
+        return $this->hora_inicio;
+    }
+
+    public function setHoraAttribute(?string $value): void
+    {
+        $this->attributes['hora_inicio'] = $value;
+    }
+
+    public function getObsAttribute(): ?string
+    {
+        return $this->observacion;
+    }
+
+    public function setObsAttribute(?string $value): void
+    {
+        $this->attributes['observacion'] = $value;
+    }
+
+    /**
+     * Normaliza un estado de actividad a su representación visual estandarizada.
+     * Cubre variantes en mayúsculas/minúsculas sin alterar la base de datos.
+     */
+    public static function normalizarEstado(string $estado): array
+    {
+        return match (strtoupper(trim($estado))) {
+            'COMPLETADA', 'REALIZADA', 'FINALIZADA' => [
+                'etiqueta' => 'Realizada',
+                'color'    => '#2A9D8F',
+                'clase'    => 'border-[#8DA280]/30 bg-[#8DA280]/14 text-[#63775B]',
+            ],
+            'PROGRAMADA', 'PENDIENTE' => [
+                'etiqueta' => 'Programada',
+                'color'    => '#D9A05B',
+                'clase'    => 'border-[#D9A05B]/30 bg-[#D9A05B]/12 text-[#9A6B2E]',
+            ],
+            'CANCELADA', 'ANULADA' => [
+                'etiqueta' => 'Cancelada',
+                'color'    => '#E97A5F',
+                'clase'    => 'border-[#E27D60]/25 bg-[#E27D60]/10 text-[#E27D60]',
+            ],
+            'REPROGRAMADA' => [
+                'etiqueta' => 'Reprogramada',
+                'color'    => '#7A68B0',
+                'clase'    => 'border-[#7A68B0]/30 bg-[#7A68B0]/10 text-[#5A4E8A]',
+            ],
+            default => [
+                'etiqueta' => ucfirst(strtolower($estado)),
+                'color'    => '#C7B5A3',
+                'clase'    => 'border-[#C7B5A3]/40 bg-[#D5C7B9]/40 text-[#7C7168]',
+            ],
+        };
+    }
 
     /**
      * Relaciones

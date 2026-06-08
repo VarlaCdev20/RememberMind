@@ -14,10 +14,10 @@ class StoreDocumentoAdultoRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'nom_doc' => 'required|string|max:150',
-            'tipo_doc' => 'required|string|max:100',
+            'nombre' => 'required|string|max:150',
+            'tipo_documento' => 'required|string|max:100',
             'archivo' => 'required|file|mimes:pdf,jpg,jpeg,png,doc,docx|max:5120',
-            'fecha_doc' => 'required|date',
+            'fecha_subida' => 'required|date',
             'observaciones' => 'nullable|string|max:1000',
         ];
     }
@@ -25,7 +25,7 @@ class StoreDocumentoAdultoRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'nom_doc.required' => 'el nombre del documento es obligatorio.',
+            'nombre.required' => 'el nombre del documento es obligatorio.',
             'archivo.required' => 'El archivo es obligatorio.',
             'archivo.max' => 'El archivo no debe pesar más de 5MB.',
         ];

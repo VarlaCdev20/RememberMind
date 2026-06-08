@@ -1,0 +1,21 @@
+<?php
+$u = "USU_9999";
+DB::table("model_has_roles")->where("model_id",$u)->delete();
+DB::table("model_has_permissions")->where("model_id",$u)->delete();
+DB::table("documentos_usuarios")->where("cod_usu",$u)->delete();
+DB::table("familiares")->where("cod_usu",$u)->delete();
+DB::table("voluntarios")->where("cod_usu",$u)->delete();
+DB::table("personal_salud")->where("cod_usu",$u)->delete();
+DB::table("personal_admin")->where("cod_usu",$u)->delete();
+DB::table("asignaciones_turno")->where("cod_usu",$u)->delete();
+DB::table("asignaciones_turno_adulto")->where("cod_usu_enfermero",$u)->delete();
+DB::table("fichas_medicas_adulto")->where("registrado_por",$u)->delete();
+DB::table("medicaciones_adulto")->where("registrado_por",$u)->delete();
+DB::table("administraciones_medicacion")->where("registrado_por",$u)->delete();
+DB::table("signos_vitales_adulto")->where("registrado_por",$u)->delete();
+DB::table("valoraciones_funcionales_adulto")->where("registrado_por",$u)->delete();
+DB::table("historial_estado_adulto")->where("cambiado_por",$u)->delete();
+DB::table("sessions")->where("user_id",$u)->delete();
+DB::table("activity_log")->where("causer_id",$u)->delete();
+DB::table("users")->where("cod_usu",$u)->delete();
+echo "Deleted all for USU_9999\n";

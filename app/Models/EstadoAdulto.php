@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Traits\GeneraCodigo;
+
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -24,12 +26,15 @@ use Illuminate\Database\Eloquent\Model;
  */
 class EstadoAdulto extends Model
 {
+    use GeneraCodigo;
     protected $table = 'estado_adulto';
     protected $primaryKey = 'cod_est_adul';
 
     // PK es integer autoincrement según migración: $table->increments('cod_est_adul')
-    public $incrementing = true;
-    protected $keyType = 'int';
+    public $incrementing = false;
+    protected $keyType = 'string';
+    protected $prefixCode = 'EST';
+    protected $digitsCode = 3;
 
     public $timestamps = false;
 

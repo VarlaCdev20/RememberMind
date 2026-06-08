@@ -17,6 +17,8 @@ class AdultosMayoresPanel extends Component
     public $permanencia = '';
     public $fecha_desde = '';
     public $fecha_hasta = '';
+    public $ciudad_municipio = '';
+    public $rango_edad = '';
 
     protected $listeners = [
         'adulto-mayor-guardado' => '$refresh',
@@ -24,7 +26,7 @@ class AdultosMayoresPanel extends Component
 
     public function updated($propertyName)
     {
-        if (in_array($propertyName, ['buscar', 'estado', 'genero', 'permanencia', 'fecha_desde', 'fecha_hasta'])) {
+        if (in_array($propertyName, ['buscar', 'estado', 'genero', 'permanencia', 'fecha_desde', 'fecha_hasta', 'ciudad_municipio', 'rango_edad'])) {
             $this->resetPage();
         }
     }
@@ -49,6 +51,8 @@ class AdultosMayoresPanel extends Component
             'permanencia' => $this->permanencia,
             'fecha_desde' => $this->fecha_desde,
             'fecha_hasta' => $this->fecha_hasta,
+            'ciudad_municipio' => $this->ciudad_municipio,
+            'rango_edad' => $this->rango_edad,
         ];
 
         $adultos = $service->obtenerListado($filtros);
@@ -57,7 +61,9 @@ class AdultosMayoresPanel extends Component
             'total' => AdultoMayor::count(),
             'activos' => AdultoMayor::whereHas('estado', fn($q) => $q->whereRaw('UPPER(estado) = ?', ['ACTIVO']))->count(),
             'archivados' => AdultoMayor::whereHas('estado', fn($q) => $q->whereRaw('UPPER(estado) IN (?, ?)', ['ARCHIVADO', 'INACTIVO']))->count(),
-            'sin_seguimiento' => AdultoMayor::doesntHave('observaciones')->doesntHave('atenciones')->count(),
+            'seguimiento' => AdultoMayor::whereHas('estado', fn($q) => $q->whereRaw('UPPER(estado) LIKE ?', ['%SEGUIMIENTO%']))->count(),
+            'sin_evaluacion' => AdultoMayor::doesntHave('evaluacionesGeriatricas')->count(),
+            'docs_pendientes' => AdultoMayor::doesntHave('documentos')->count(),
         ];
 
         return view('livewire.admin.adultos-mayores.adultos-mayores-panel', [

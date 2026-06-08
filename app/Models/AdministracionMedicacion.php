@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Traits\GeneraCodigo;
+
 use Illuminate\Database\Eloquent\Model;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
@@ -14,13 +16,16 @@ use Spatie\Activitylog\LogOptions;
  */
 class AdministracionMedicacion extends Model
 {
+    use GeneraCodigo;
     use LogsActivity;
 
     protected $table = 'administracion_medicacion';
     protected $primaryKey = 'cod_admin_med';
 
-    public $incrementing = true;
-    protected $keyType = 'int';
+    public $incrementing = false;
+    protected $keyType = 'string';
+    protected $prefixCode = 'AME';
+    protected $digitsCode = 5;
 
     public $timestamps = true;
 

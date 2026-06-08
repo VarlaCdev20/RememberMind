@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Traits\GeneraCodigo;
+
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\Traits\LogsActivity;
@@ -9,13 +11,16 @@ use Spatie\Activitylog\LogOptions;
 
 class FichaMedicaAdulto extends Model
 {
+    use GeneraCodigo;
     use SoftDeletes, LogsActivity;
 
     protected $table = 'ficha_medica_adulto';
     protected $primaryKey = 'cod_ficha_medica';
 
-    public $incrementing = true;
-    protected $keyType = 'int';
+    public $incrementing = false;
+    protected $keyType = 'string';
+    protected $prefixCode = 'FMA';
+    protected $digitsCode = 5;
 
     public $timestamps = true;
 

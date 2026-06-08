@@ -144,7 +144,7 @@ return [
     */
 
     'features' => [
-        Features::registration(),
+        // Features::registration(), // Deshabilitado: el registro lo gestiona solo el administrador
         Features::resetPasswords(),
         // Features::emailVerification(),
         Features::updateProfileInformation(),

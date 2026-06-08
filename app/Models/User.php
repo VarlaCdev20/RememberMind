@@ -43,6 +43,20 @@ class User extends Authenticatable
         'ultimo_acceso',
         'observaciones',
         'current_team_id',
+        'cod_area',
+        'debe_cambiar_password',
+        'password_changed_at',
+        'direccion',
+        'zona',
+        'ciudad',
+        'contacto_emergencia',
+        'parentesco_emergencia',
+        'celular_emergencia',
+        'tipo_vinculacion',
+        'calle',
+        'nro_domicilio',
+        'ap_paterno_emergencia',
+        'ap_materno_emergencia',
     ];
 
     protected $hidden = [
@@ -73,6 +87,8 @@ class User extends Authenticatable
             'ultimo_acceso' => 'datetime',
             'fecha_nacimiento' => 'date',
             'password' => 'hashed',
+            'debe_cambiar_password' => 'boolean',
+            'password_changed_at' => 'datetime',
         ];
     }
 
@@ -88,7 +104,7 @@ class User extends Authenticatable
 
     public function getNameAttribute(): string
     {
-        return trim($this->nombres . ' ' . $this->ap_paterno . ' ' . ($this->ap_materno ?? ''));
+        return trim($this->nombres . ' ' . ($this->ap_paterno ?? '') . ' ' . ($this->ap_materno ?? ''));
     }
 
     public function getEmailAttribute(): string
@@ -106,11 +122,11 @@ class User extends Authenticatable
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
-            ->logOnly(['nombres', 'ap_paterno', 'correo', 'estado', 'observaciones'])
+            ->logOnly(['nombres', 'ap_paterno', 'correo', 'estado', 'observaciones', 'cod_area'])
             ->logOnlyDirty()
             ->useLogName('Usuarios')
             ->setDescriptionForEvent(function (string $eventName) {
-                $nombre = $this->nombres . ' ' . $this->ap_paterno;
+                $nombre = trim($this->nombres . ' ' . ($this->ap_paterno ?? ''));
                 
                 if ($eventName === 'created') {
                     return "Se registró al nuevo usuario institucional: {$nombre}.";
@@ -137,6 +153,16 @@ class User extends Authenticatable
         return $this->hasMany(DocumentoUsuario::class, 'cod_usu', 'cod_usu');
     }
 
+    public function documentosPendientes()
+    {
+        return $this->hasMany(DocumentoUsuario::class, 'cod_usu', 'cod_usu')->whereIn('estado', ['PENDIENTE', 'CARGADO']);
+    }
+
+    public function documentosValidados()
+    {
+        return $this->hasMany(DocumentoUsuario::class, 'cod_usu', 'cod_usu')->where('estado', 'VALIDADO');
+    }
+
     public function familiares()
     {
         return $this->hasMany(Familiar::class, 'cod_usu', 'cod_usu');
@@ -145,16 +171,6 @@ class User extends Authenticatable
     public function voluntarios()
     {
         return $this->hasMany(Voluntario::class, 'cod_usu', 'cod_usu');
-    }
-
-    public function personalSalud()
-    {
-        return $this->hasMany(PersonalSalud::class, 'cod_usu', 'cod_usu');
-    }
-
-    public function personalAdmin()
-    {
-        return $this->hasMany(PersonalAdmin::class, 'cod_usu', 'cod_usu');
     }
 
     // ── Relaciones FASE 2: Registros médicos/administrativos realizados por este usuario ──
@@ -187,5 +203,149 @@ class User extends Authenticatable
     public function cambiosEstadoAdultoRealizados()
     {
         return $this->hasMany(HistorialEstadoAdulto::class, 'cambiado_por', 'cod_usu');
+    }
+
+    public function horariosSalud()
+    {
+        return $this->hasMany(HorarioPersonalSalud::class, 'cod_usu', 'cod_usu');
+    }
+
+    public function horariosAdmin()
+    {
+        return $this->hasMany(HorarioPersonalAdmin::class, 'cod_usu', 'cod_usu');
+    }
+
+    // ── VIRTUAL RELATIONS FOR ADAPTATION ──
+
+    public static array $areasEstaticas = [
+        'ARE_0001' => 'DIRECCIÓN GENERAL',
+        'ARE_0002' => 'COORDINACIÓN DE PROGRAMAS Y SERVICIOS',
+        'ARE_0003' => 'ÁREA ADMINISTRATIVA Y REGISTRO INSTITUCIONAL',
+        'ARE_0004' => 'ÁREA DE ATENCIÓN MÉDICA',
+        'ARE_0005' => 'ÁREA DE PSICOLOGÍA Y SEGUIMIENTO COGNITIVO',
+    ];
+
+    public function getPersonalSaludAttribute()
+    {
+        $rol = $this->rol_principal;
+        if (in_array($rol, ['ENFERMEROS', 'MEDICO GENERAL/GERIATRA', 'PSICOLOGO/A', 'PEDAGOGO', 'NUTRICIONISTA', 'FISIOTERAPEUTA'])) {
+            return (object) [
+                'tipo_personal_salud' => $this->categoria_institucional,
+                'especialidad' => (object) [
+                    'nombre' => $this->categoria_institucional,
+                    'nombre_especialidad' => $this->categoria_institucional,
+                    'cod_esp' => $rol,
+                ],
+                'cod_esp' => $rol,
+                'fecha_ingreso' => $this->created_at,
+                'fecha_ing' => $this->created_at,
+                'institucion_formacion' => $this->observaciones,
+            ];
+        }
+        return null;
+    }
+
+    public function getPersonalAdminAttribute()
+    {
+        $rol = $this->rol_principal;
+        if (in_array($rol, ['SUPERADMINISTRADOR', 'ADMINISTRADOR'])) {
+            return (object) [
+                'cargoAdmin' => (object) [
+                    'nombre' => $this->categoria_institucional,
+                    'cod_cargo_admin' => $rol,
+                ],
+                'cargo' => (object) [
+                    'nombre_cargo' => $this->categoria_institucional,
+                ],
+                'cod_cargo_admin' => $rol,
+                'fecha_ingreso' => $this->created_at,
+            ];
+        }
+        return null;
+    }
+
+    public function getAreaInstitucionalAttribute()
+    {
+        $codArea = $this->cod_area_virtual;
+        if ($codArea && isset(self::$areasEstaticas[$codArea])) {
+            return (object) [
+                'nombre' => self::$areasEstaticas[$codArea],
+                'cod_area' => $codArea,
+            ];
+        }
+        return null;
+    }
+
+    public function getRolPrincipalAttribute(): ?string
+    {
+        return $this->roles->first()?->name;
+    }
+
+    public function getTipoPersonalAttribute(): string
+    {
+        return in_array($this->rol_principal, ['SUPERADMINISTRADOR', 'ADMINISTRADOR'], true) ? 'admin'
+            : (in_array($this->rol_principal, ['ENFERMEROS', 'MEDICO GENERAL/GERIATRA', 'PSICOLOGO/A', 'PEDAGOGO', 'NUTRICIONISTA', 'FISIOTERAPEUTA'], true) ? 'salud' : 'otro');
+    }
+
+    public function getCategoriaInstitucionalAttribute(): string
+    {
+        return match ($this->rol_principal) {
+            'ENFERMEROS' => 'Enfermería',
+            'MEDICO GENERAL/GERIATRA' => 'Médico/Geriatría',
+            'PSICOLOGO/A' => 'Psicología',
+            'NUTRICIONISTA' => 'Nutrición',
+            'FISIOTERAPEUTA' => 'Fisioterapia',
+            'PEDAGOGO' => 'Pedagogía',
+            'SUPERADMINISTRADOR', 'ADMINISTRADOR' => 'Administrativo',
+            default => $this->rol_principal ?? 'Sistema',
+        };
+    }
+
+    public function getCodAreaVirtualAttribute(): ?string
+    {
+        return match ($this->rol_principal) {
+            'SUPERADMINISTRADOR', 'ADMINISTRADOR' => 'ARE_0003',
+            'PSICOLOGO/A', 'PEDAGOGO' => 'ARE_0005',
+            'ENFERMEROS', 'MEDICO GENERAL/GERIATRA', 'NUTRICIONISTA', 'FISIOTERAPEUTA' => 'ARE_0004',
+            default => null,
+        };
+    }
+
+    public function getCodAreaAttribute(): ?string
+    {
+        return $this->cod_area_virtual;
+    }
+
+    public function setCodAreaAttribute($value): void
+    {
+        // cod_area ya no existe en users; el área se deriva del rol institucional.
+    }
+
+    public function getAsignacionesTurnoAttribute()
+    {
+        $salud = $this->horariosSalud;
+        $admin = $this->horariosAdmin;
+
+        $mapped = collect();
+
+        foreach ($salud as $h) {
+            $mapped->push((object) [
+                'estado' => $h->estado === 'ACTIVO' ? 'ACTIVA' : 'INACTIVA',
+                'turno' => (object) [
+                    'nombre' => $h->turno,
+                ],
+            ]);
+        }
+
+        foreach ($admin as $h) {
+            $mapped->push((object) [
+                'estado' => $h->estado === 'ACTIVO' ? 'ACTIVA' : 'INACTIVA',
+                'turno' => (object) [
+                    'nombre' => $h->turno,
+                ],
+            ]);
+        }
+
+        return $mapped;
     }
 }

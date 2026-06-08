@@ -4,9 +4,8 @@ namespace App\Http\Controllers\Admin\AdultosMayores;
 
 use App\Http\Controllers\Controller;
 use App\Models\AdultoMayor;
-use App\Models\EvaluacionCognitiva;
-use App\Models\TipoEvaluacionCognitiva;
-use App\Models\PersonalSalud;
+use App\Models\EvaluacionGeriatrica;
+use App\Models\InstrumentoGeriatrico;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -14,14 +13,14 @@ class AdultoMayorEvaluacionController extends Controller
 {
     public function index(AdultoMayor $adulto_mayor)
     {
-        $evaluaciones = $adulto_mayor->evaluacionesCognitivas()->with(['tipoEvaluacion', 'personalSalud'])->latest()->get();
+        $evaluaciones = $adulto_mayor->evaluacionesGeriatricas()->with(['instrumento', 'registrador'])->latest()->get();
         return view('admin.adultos-mayores.evaluaciones.index', compact('adulto_mayor', 'evaluaciones'));
     }
 
     public function store(Request $request, AdultoMayor $adulto_mayor)
     {
         $request->validate([
-            'cod_tipo_eval' => 'required|exists:tipo_evaluacion_cognitiva,cod_tipo_eval',
+            'cod_tipo_eval' => 'required|exists:instrumentos_geriatricos,cod_instrumento',
             'fecha_eval' => 'required|date|before_or_equal:today',
             'puntaje_total' => 'required|numeric|min:0|max:30',
             'observaciones' => 'nullable|string',
@@ -35,35 +34,30 @@ class AdultoMayorEvaluacionController extends Controller
             'puntaje_total.max' => 'El puntaje máximo es 30.',
         ]);
 
-        $tipo = TipoEvaluacionCognitiva::findOrFail($request->cod_tipo_eval);
-        $personal = PersonalSalud::where('cod_usu', auth()->id())->first();
+        $tipo = InstrumentoGeriatrico::findOrFail($request->cod_tipo_eval);
 
-        if (!$personal) {
-            // Fallback if the user is admin but not in personal_salud table
-            // For testing, we might need a default personal_salud or handle this
-            $personal = PersonalSalud::first();
-        }
-
-        DB::transaction(function () use ($request, $adulto_mayor, $tipo, $personal) {
+        DB::transaction(function () use ($request, $adulto_mayor, $tipo) {
             $interpretacion = $this->interpretarPuntaje($tipo, $request->puntaje_total);
 
-            EvaluacionCognitiva::create([
+            EvaluacionGeriatrica::create([
                 'cod_am' => $adulto_mayor->cod_am,
-                'cod_tipo_eval' => $request->cod_tipo_eval,
-                'cod_per_sal' => $personal->cod_per_sal ?? 1,
+                'cod_instrumento' => $request->cod_tipo_eval,
+                'registrado_por' => auth()->id(),
+                'evaluador_id' => auth()->id(),
+                'evaluador_tipo' => \App\Models\User::class,
                 'fecha_eval' => $request->fecha_eval,
                 'hora_eval' => now()->format('H:i:s'),
                 'puntaje_total' => $request->puntaje_total,
-                'puntaje_maximo' => $tipo->puntaje_maximo,
-                'resultado_interpretacion' => $interpretacion['resultado'],
+                'categoria_resultado' => $interpretacion['resultado'],
                 'nivel_riesgo' => $interpretacion['riesgo'],
+                'nivel_alerta' => $interpretacion['riesgo'] === 'ALTO' ? 'CRITICO' : 'NORMAL',
                 'observaciones' => $request->observaciones,
-                'estado_eval' => 'COMPLETADO',
+                'estado_eval' => 'ACTIVO',
             ]);
 
             activity('adulto_mayor')
                 ->performedOn($adulto_mayor)
-                ->log("Se registró una evaluación cognitiva {$tipo->nombre} para {$adulto_mayor->nombres}");
+                ->log("Se registró una evaluación geriátrica {$tipo->nombre} para {$adulto_mayor->nombres}");
         });
 
         return redirect()->route('admin.adultos-mayores.show', ['adulto_mayor' => $adulto_mayor->cod_am, 'tab' => 'evaluaciones'])->with('success', 'Evaluación registrada correctamente.');
@@ -74,7 +68,8 @@ class AdultoMayorEvaluacionController extends Controller
         $resultado = 'Normal';
         $riesgo = 'BAJO';
 
-        if ($tipo->nombre === 'MoCA') {
+        $siglas = strtoupper($tipo->siglas ?? '');
+        if ($siglas === 'MOCA') {
             if ($puntaje < 26) {
                 $resultado = 'Deterioro Cognitivo Leve';
                 $riesgo = 'MEDIO';
@@ -82,7 +77,7 @@ class AdultoMayorEvaluacionController extends Controller
             if ($puntaje < 18) {
                 $riesgo = 'ALTO';
             }
-        } elseif ($tipo->nombre === 'MMSE') {
+        } elseif ($siglas === 'MMSE') {
             if ($puntaje < 24) {
                 $resultado = 'Deterioro Cognitivo';
                 $riesgo = 'MEDIO';
@@ -95,8 +90,17 @@ class AdultoMayorEvaluacionController extends Controller
         return ['resultado' => $resultado, 'riesgo' => $riesgo];
     }
 
-    public function destroy(AdultoMayor $adulto_mayor, EvaluacionCognitiva $evaluacion)
+    public function destroy(AdultoMayor $adulto_mayor, $id)
     {
+        $evaluacion = EvaluacionGeriatrica::findOrFail($id);
+        
+        $evaluacion->update([
+            'estado_eval' => 'ANULADO',
+            'motivo_anulacion' => 'Anulación desde panel de evaluaciones',
+            'anulado_por' => auth()->id(),
+            'anulado_en' => now()
+        ]);
+        
         $evaluacion->delete(); // Soft delete
 
         activity('Adulto Mayor')
@@ -108,7 +112,15 @@ class AdultoMayorEvaluacionController extends Controller
 
     public function restore(AdultoMayor $adulto_mayor, $id)
     {
-        $evaluacion = EvaluacionCognitiva::withTrashed()->findOrFail($id);
+        $evaluacion = EvaluacionGeriatrica::withTrashed()->findOrFail($id);
+        
+        $evaluacion->update([
+            'estado_eval' => 'ACTIVO',
+            'motivo_anulacion' => null,
+            'anulado_por' => null,
+            'anulado_en' => null
+        ]);
+        
         $evaluacion->restore();
 
         activity('Adulto Mayor')

@@ -2,15 +2,20 @@
 
 namespace App\Models;
 
+use App\Traits\GeneraCodigo;
+
 use Illuminate\Database\Eloquent\Model;
 
 class AsignacionVoluntario extends Model
 {
+    use GeneraCodigo;
     protected $table = 'asignacion_voluntarios';
     protected $primaryKey = 'cod_asig_vol';
 
-    public $incrementing = true;
-    protected $keyType = 'int';
+    public $incrementing = false;
+    protected $keyType = 'string';
+    protected $prefixCode = 'ASV';
+    protected $digitsCode = 3;
 
     public $timestamps = false;
 
@@ -22,25 +27,6 @@ class AsignacionVoluntario extends Model
         'cod_am',
         'cod_vol'
     ];
-
-    protected static function boot(): void
-    {
-        parent::boot();
-        static::creating(function ($AsignacionVoluntario) {
-            if (!$AsignacionVoluntario->cod_asig_vol) {
-                $ultimo = self::where('cod_asig_vol', 'like', 'ASV_%')
-                    ->orderByDesc('cod_asig_vol')
-                    ->value('cod_asig_vol');
-
-                $numero = $ultimo
-                    ? ((int) substr($ultimo, 3)) + 1
-                    : 1;
-
-                $AsignacionVoluntario->cod_asig_vol = 'ASV_' . str_pad($numero, 4, '0', STR_PAD_LEFT);
-            }
-        });
-    }
-
 
     /**
      * Relaciones

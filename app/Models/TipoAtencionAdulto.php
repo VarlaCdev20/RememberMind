@@ -2,22 +2,38 @@
 
 namespace App\Models;
 
+use App\Traits\GeneraCodigo;
+
 use Illuminate\Database\Eloquent\Model;
 
 class TipoAtencionAdulto extends Model
 {
+    use GeneraCodigo;
     protected $table = 'tipo_atenciones_adulto';
     protected $primaryKey = 'cod_tipo_aten';
 
-    public $incrementing = true;
-    protected $keyType = 'int';
+    public $incrementing = false;
+    protected $keyType = 'string';
+    protected $prefixCode = 'TAT';
+    protected $digitsCode = 3;
 
     public $timestamps = false;
 
     protected $fillable = [
-        'tipo',
+        'nombre',
         'descripcion',
+        'estado',
     ];
+
+    public function getTipoAttribute(): ?string
+    {
+        return $this->nombre;
+    }
+
+    public function setTipoAttribute(?string $value): void
+    {
+        $this->attributes['nombre'] = $value;
+    }
 
     /**
      * Relaciones

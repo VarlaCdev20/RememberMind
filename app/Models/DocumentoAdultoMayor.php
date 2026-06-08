@@ -2,13 +2,15 @@
 
 namespace App\Models;
 
+use App\Traits\GeneraCodigo;
+
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\Traits\LogsActivity;
 
 class DocumentoAdultoMayor extends Model
 {
-    use SoftDeletes, LogsActivity;
+    use GeneraCodigo;
+    use LogsActivity;
 
     public function getActivitylogOptions(): \Spatie\Activitylog\LogOptions
     {
@@ -18,7 +20,7 @@ class DocumentoAdultoMayor extends Model
             ->useLogName('Documentos')
             ->setDescriptionForEvent(function (string $eventName) {
                 return match ($eventName) {
-                    'created' => "Se cargó el documento '{$this->nom_doc}' para el adulto mayor {$this->cod_am}.",
+                    'created' => "Se cargó el documento '{$this->nombre}' para el adulto mayor {$this->cod_am}.",
                     'updated' => "Se actualizó la información del documento #{$this->cod_doc_am}.",
                     'deleted' => "Se eliminó el documento #{$this->cod_doc_am}.",
                     default   => "Documento {$this->cod_doc_am} modificado ({$eventName}).",
@@ -28,21 +30,54 @@ class DocumentoAdultoMayor extends Model
     protected $table = 'documentos_adulto_mayor';
     protected $primaryKey = 'cod_doc_am';
 
-    public $incrementing = true;
-    protected $keyType = 'int';
+    public $incrementing = false;
+    protected $keyType = 'string';
+    protected $prefixCode = 'DAM';
+    protected $digitsCode = 5;
 
     // Timestamps habilitados — columnas existen desde strengthen_administrative_tables migration
     public $timestamps = true;
 
     protected $fillable = [
-        'nom_doc',
-        'tipo_doc',
+        'nombre',
+        'tipo_documento',
         'ruta_archivo',
-        'extension',
-        'fecha_doc',
+        'fecha_subida',
+        'estado',
         'observaciones',
+        'modulo_ref',
         'cod_am'
     ];
+
+    public function getNomDocAttribute(): ?string
+    {
+        return $this->nombre;
+    }
+
+    public function setNomDocAttribute(?string $value): void
+    {
+        $this->attributes['nombre'] = $value;
+    }
+
+    public function getTipoDocAttribute(): ?string
+    {
+        return $this->tipo_documento;
+    }
+
+    public function setTipoDocAttribute(?string $value): void
+    {
+        $this->attributes['tipo_documento'] = $value;
+    }
+
+    public function getFechaDocAttribute(): mixed
+    {
+        return $this->fecha_subida;
+    }
+
+    public function setFechaDocAttribute(mixed $value): void
+    {
+        $this->attributes['fecha_subida'] = $value;
+    }
 
     /**
      * Relaciones

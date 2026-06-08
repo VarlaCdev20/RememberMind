@@ -1,56 +1,69 @@
-@import '@fontsource/inter/400.css';
-@import '@fontsource/inter/500.css';
-@import '@fontsource/inter/700.css';
-@import '@fontsource/outfit/400.css';
-@import '@fontsource/outfit/700.css';
-@import '@fontsource/outfit/800.css';
+/* ============================================================
+   RememberMind / CENTRO GERIATRICO JARDIN DE LOS RECUERDOS
+   Entrada principal de estilos.
+   ============================================================ */
+
+@import './design-of-system/fuentes.css';
+@import './design-of-system/paleta-colores.css';
+@import './design-of-system/variables-semanticas.css';
+@import './design-of-system/escala-visual.css';
+@import './design-of-system/texturas-tramas.css';
+@import './design-of-system/modo-oscuro.css';
+@import './design-of-system/animaciones-transiciones.css';
+@import './design-of-system/componentes-ui.css';
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-html {
-    scroll-behavior: smooth;
-}
+@layer base {
+    html {
+        scroll-behavior: smooth;
+    }
 
-[x-cloak] {
-    display: none !important;
+    body {
+        background: var(--color-fondo-app);
+        color: var(--color-parrafo);
+    }
+
+    [x-cloak] {
+        display: none !important;
+    }
+
+    * {
+        scrollbar-width: thin;
+        scrollbar-color: var(--color-scrollbar-thumb) var(--color-scrollbar-track);
+    }
+
+    *::-webkit-scrollbar {
+        width: 5px;
+        height: 5px;
+    }
+
+    *::-webkit-scrollbar-track {
+        background: var(--color-scrollbar-track);
+    }
+
+    *::-webkit-scrollbar-thumb {
+        background-color: var(--color-scrollbar-thumb);
+        border-radius: 9999px;
+    }
+
+    *::-webkit-scrollbar-thumb:hover {
+        background-color: var(--color-scrollbar-thumb-hover);
+    }
 }
 
 @layer utilities {
-    .glow-terracota {
-        box-shadow: 0 0 15px rgba(233, 122, 95, 0.4);
+    .text-balance {
+        text-wrap: balance;
     }
-    .glow-terracota:hover {
-        box-shadow: 0 0 25px rgba(233, 122, 95, 0.6);
+
+    .scrollbar-hidden {
+        scrollbar-width: none;
     }
-    
-    /* Efecto de Luz de Mouse - Más elegante y sutil */
-    .mouse-light {
-        pointer-events: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100vw;
-        height: 100vh;
-        z-index: 40;
-        background: radial-gradient(
-            200px circle at var(--mouse-x) var(--mouse-y),
-            rgba(233, 122, 95, 0.12),
-            transparent 60%
-        );
-        mix-blend-mode: multiply;
-        will-change: background;
+
+    .scrollbar-hidden::-webkit-scrollbar {
+        display: none;
     }
 }
-
-@layer components {
-    .nav-welcome-link {
-        @apply relative inline-flex items-center gap-2 rounded-full px-4 py-2.5 text-sm font-extrabold text-azul-profundo/85 transition-all duration-300 hover:-translate-y-0.5 hover:bg-white/65 hover:text-terracota;
-    }
-
-    .mobile-welcome-link {
-        @apply flex items-center gap-4 rounded-2xl bg-[#E6DDD3] px-4 py-3.5 text-lg font-extrabold text-azul-profundo transition-all duration-300 hover:bg-white hover:text-terracota hover:shadow-lg active:scale-[0.98];
-    }
-}
-

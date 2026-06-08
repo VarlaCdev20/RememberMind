@@ -2,18 +2,22 @@
 
 namespace App\Models;
 
+use App\Traits\GeneraCodigo;
+
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\Traits\LogsActivity;
 
 class AtencionAdulto extends Model
 {
-    use SoftDeletes, LogsActivity;
+    use GeneraCodigo;
+    use LogsActivity;
     protected $table = 'atenciones_adulto';
     protected $primaryKey = 'cod_aten_adul';
 
-    public $incrementing = true;
-    protected $keyType = 'int';
+    public $incrementing = false;
+    protected $keyType = 'string';
+    protected $prefixCode = 'ATE';
+    protected $digitsCode = 5;
 
     // Timestamps habilitados — columnas existen desde strengthen_administrative_tables migration
     public $timestamps = true;
@@ -22,14 +26,26 @@ class AtencionAdulto extends Model
         'fecha',
         'hora',
         'obs',
+        'observacion',
         'estado',
         'cod_tipo_aten',
-        'cod_am'
+        'cod_am',
+        'registrado_por',
     ];
 
     protected $casts = [
         'fecha' => 'date',
     ];
+
+    public function getObsAttribute(): ?string
+    {
+        return $this->observacion;
+    }
+
+    public function setObsAttribute(?string $value): void
+    {
+        $this->attributes['observacion'] = $value;
+    }
 
     public function getActivitylogOptions(): \Spatie\Activitylog\LogOptions
     {

@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Traits\GeneraCodigo;
+
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -17,6 +19,7 @@ use Spatie\Activitylog\LogOptions;
 
 class Familiar extends Model
 {
+    use GeneraCodigo;
     use LogsActivity;
 
     public function getActivitylogOptions(): LogOptions
@@ -40,8 +43,10 @@ class Familiar extends Model
     protected $primaryKey = 'cod_fam';
 
     // PK es integer autoincrement según migración: $table->increments('cod_fam')
-    public $incrementing = true;
-    protected $keyType = 'int';
+    public $incrementing = false;
+    protected $keyType = 'string';
+    protected $prefixCode = 'FAM';
+    protected $digitsCode = 3;
 
     public $timestamps = true;
 

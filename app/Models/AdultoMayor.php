@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Traits\GeneraCodigo;
+
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Spatie\Activitylog\Traits\LogsActivity;
@@ -9,6 +11,7 @@ use Spatie\Activitylog\LogOptions;
 
 class AdultoMayor extends Model
 {
+    use GeneraCodigo;
     use HasFactory, LogsActivity;
 
     protected $table = 'adulto_mayor';
@@ -16,6 +19,8 @@ class AdultoMayor extends Model
 
     public $incrementing = false;
     protected $keyType = 'string';
+    protected $prefixCode = 'AM';
+    protected $digitsCode = 3;
 
     public $timestamps = true;
 
@@ -60,6 +65,12 @@ class AdultoMayor extends Model
         'foto',
         'archivado_en',
         'motivo_archivado',
+        // ── Fase 6: flujo de admisión ──────────────────────────────────────────
+        'motivo_ingreso',
+        'procedencia_ingreso',
+        // ── Fase 7: asignación de cama ────────────────────────────────────────
+        'cod_habitacion',
+        'cod_cama',
     ];
 
     public function getActivitylogOptions(): LogOptions
@@ -126,6 +137,11 @@ class AdultoMayor extends Model
         return $this->belongsTo(EstadoAdulto::class, 'cod_est_adul', 'cod_est_adul');
     }
 
+    public function getEstadoTextoAttribute(): string
+    {
+        return $this->estado?->estado ?? 'SIN ESTADO';
+    }
+
     public function observaciones()
     {
         return $this->hasMany(ObsAdulto::class, 'cod_am', 'cod_am');
@@ -176,11 +192,6 @@ class AdultoMayor extends Model
             'obser',
         ]);
     }
-    public function evaluacionesCognitivas()
-    {
-        return $this->hasMany(EvaluacionCognitiva::class, 'cod_am', 'cod_am');
-    }
-
     // ── Relaciones FASE 2: Módulos médicos y administrativos ──
 
     public function fichasMedicas()
@@ -211,5 +222,93 @@ class AdultoMayor extends Model
     public function historialEstados()
     {
         return $this->hasMany(HistorialEstadoAdulto::class, 'cod_am', 'cod_am');
+    }
+
+    // ── Relaciones del flujo médico clínico (Fase 6) ──────────────────────────
+
+    public function valoracionesEnfermeria()
+    {
+        return $this->hasMany(ValoracionEnfermeriaAdmision::class, 'cod_am', 'cod_am');
+    }
+
+    public function valoracionesMedicas()
+    {
+        return $this->hasMany(ValoracionMedicaAdmision::class, 'cod_am', 'cod_am');
+    }
+
+    public function planesCuidado()
+    {
+        return $this->hasMany(PlanCuidado::class, 'cod_am', 'cod_am');
+    }
+
+    public function planCuidadoActivo()
+    {
+        return $this->hasOne(PlanCuidado::class, 'cod_am', 'cod_am')
+            ->where('estado', 'ACTIVO');
+    }
+
+    public function tareasActuales()
+    {
+        return $this->hasMany(TareaPlanCuidado::class, 'cod_am', 'cod_am')
+            ->whereNotIn('estado', ['ANULADA', 'VENCIDA', 'REALIZADA']);
+    }
+
+    public function seguimientosDiarios()
+    {
+        return $this->hasMany(SeguimientoDiario::class, 'cod_am', 'cod_am');
+    }
+
+    public function alertas()
+    {
+        return $this->hasMany(AlertaAdulto::class, 'cod_am', 'cod_am');
+    }
+
+    public function alertasAbiertas()
+    {
+        return $this->alertas()->whereIn('estado', ['ABIERTA', 'EN_ATENCION']);
+    }
+
+    public function pasesTurno()
+    {
+        return $this->hasMany(PaseTurno::class, 'cod_am', 'cod_am');
+    }
+
+    public function habitacion()
+    {
+        return $this->hasOneThrough(
+            Habitacion::class,
+            AsignacionAdultoMayor::class,
+            'cod_am',
+            'cod_habitacion',
+            'cod_am',
+            'cod_habitacion'
+        )->where('asignacion_adulto_mayor.estado', 'ACTIVO');
+    }
+
+    public function cama()
+    {
+        return $this->hasOneThrough(
+            Cama::class,
+            AsignacionAdultoMayor::class,
+            'cod_am',
+            'cod_cama',
+            'cod_am',
+            'cod_cama'
+        )->where('asignacion_adulto_mayor.estado', 'ACTIVO');
+    }
+
+    public function asignaciones()
+    {
+        return $this->hasMany(AsignacionAdultoMayor::class, 'cod_am', 'cod_am');
+    }
+
+    public function evaluacionesGeriatricas()
+    {
+        return $this->hasMany(EvaluacionGeriatrica::class, 'cod_am', 'cod_am');
+    }
+
+    public function getAsignacionTurnoActivaAttribute()
+    {
+        return null;
     }
 }

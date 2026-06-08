@@ -2,43 +2,40 @@
 
 namespace App\Models;
 
+use App\Traits\GeneraCodigo;
+
 use Illuminate\Database\Eloquent\Model;
 
 class Voluntario extends Model
 {
+    use GeneraCodigo;
     protected $table = 'voluntarios';
     protected $primaryKey = 'cod_vol';
 
     public $incrementing = false;
     protected $keyType = 'string';
+    protected $prefixCode = 'VOL';
+    protected $digitsCode = 3;
 
     public $timestamps = false;
 
     protected $fillable = [
-        'cod_vol',
         'fecha_ing',
-        'area_apoyo',
         'estado',
         'observaciones',
         'cod_usu',
+        'disponibilidad_inicial',
+        'area_apoyo_preferente',
     ];
 
-    protected static function boot(): void
+    public function getAreaApoyoAttribute(): ?string
     {
-        parent::boot();
-        static::creating(function ($model) {
-            if (!$model->cod_vol) {
-                $ultimo = self::where('cod_vol', 'like', 'VOL_%')
-                    ->orderByDesc('cod_vol')
-                    ->value('cod_vol');
+        return $this->area_apoyo_preferente ?? null;
+    }
 
-                $numero = $ultimo
-                    ? ((int) substr($ultimo, 4)) + 1
-                    : 1;
-
-                $model->cod_vol = 'VOL_' . str_pad($numero, 4, '0', STR_PAD_LEFT);
-            }
-        });
+    public function setAreaApoyoAttribute(?string $value): void
+    {
+        $this->attributes['area_apoyo_preferente'] = $value;
     }
 
     /**
