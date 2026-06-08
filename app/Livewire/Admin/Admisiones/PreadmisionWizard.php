@@ -7,7 +7,6 @@ use App\Models\EstadoAdulto;
 use App\Models\Familiar;
 use App\Models\DocumentoAdultoMayor;
 use App\Models\User;
-use App\Models\AsignacionTurnoAdulto;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use Illuminate\Support\Facades\DB;
@@ -50,7 +49,7 @@ class PreadmisionWizard extends Component
         'doc_ci_adulto' => 'required|file|max:2048|mimes:pdf,jpg,jpeg,png',
         'doc_ci_familiar' => 'required|file|max:2048|mimes:pdf,jpg,jpeg,png',
         // Paso 4
-        'enfermero_id' => 'required|exists:users,id',
+        'enfermero_id' => 'required|exists:users,cod_usu',
     ];
 
     public function mount()
@@ -152,22 +151,24 @@ class PreadmisionWizard extends Component
             $path_adulto = $this->doc_ci_adulto->store('documentos/' . $adulto->cod_am, 'public');
             DocumentoAdultoMayor::create([
                 'cod_am' => $adulto->cod_am,
-                'tipo_doc' => 'CI_ADULTO_MAYOR',
+                'tipo_documento' => 'CI_ADULTO_MAYOR',
                 'ruta_archivo' => $path_adulto,
-                'nom_doc' => 'CI Adulto Mayor',
-                'extension' => $this->doc_ci_adulto->getClientOriginalExtension() ?: 'pdf',
-                'fecha_doc' => now()->toDateString(),
+                'nombre' => 'CI Adulto Mayor',
+                'fecha_subida' => now()->toDateString(),
+                'estado' => 'ACTIVO',
+                'modulo_ref' => 'PREADMISION',
                 'observaciones' => 'Subido en Wizard Preadmisión'
             ]);
 
             $path_familiar = $this->doc_ci_familiar->store('documentos/' . $adulto->cod_am, 'public');
             DocumentoAdultoMayor::create([
                 'cod_am' => $adulto->cod_am,
-                'tipo_doc' => 'CI_FAMILIAR',
+                'tipo_documento' => 'CI_FAMILIAR',
                 'ruta_archivo' => $path_familiar,
-                'nom_doc' => 'CI Familiar Responsable',
-                'extension' => $this->doc_ci_familiar->getClientOriginalExtension() ?: 'pdf',
-                'fecha_doc' => now()->toDateString(),
+                'nombre' => 'CI Familiar Responsable',
+                'fecha_subida' => now()->toDateString(),
+                'estado' => 'ACTIVO',
+                'modulo_ref' => 'PREADMISION',
                 'observaciones' => 'Subido en Wizard Preadmisión'
             ]);
 
@@ -175,30 +176,20 @@ class PreadmisionWizard extends Component
                 $path_croquis = $this->doc_croquis->store('documentos/' . $adulto->cod_am, 'public');
                 DocumentoAdultoMayor::create([
                     'cod_am' => $adulto->cod_am,
-                    'tipo_doc' => 'CROQUIS',
+                    'tipo_documento' => 'CROQUIS',
                     'ruta_archivo' => $path_croquis,
-                    'nom_doc' => 'Croquis Domicilio',
-                    'extension' => $this->doc_croquis->getClientOriginalExtension() ?: 'pdf',
-                    'fecha_doc' => now()->toDateString(),
+                    'nombre' => 'Croquis Domicilio',
+                    'fecha_subida' => now()->toDateString(),
+                    'estado' => 'ACTIVO',
+                    'modulo_ref' => 'PREADMISION',
                     'observaciones' => 'Subido en Wizard Preadmisión'
                 ]);
             }
 
-            // 5. Asignar Enfermero Valorador
-            // We use the same AsignacionTurnoAdulto but just for initial valuation.
             $enfermero = User::where('cod_usu', $this->enfermero_id)->orWhere('id', $this->enfermero_id)->first();
-            $turnoDefault = DB::table('turnos_enfermeria')->where('estado', 'ACTIVO')->first();
-
-            AsignacionTurnoAdulto::create([
-                'cod_am' => $adulto->cod_am,
-                'cod_usu_enfermero' => $enfermero->cod_usu,
-                'cod_turno' => $turnoDefault ? $turnoDefault->cod_turno : 1,
-                'cod_habitacion' => null, // Default provisorio
-                'cod_cama' => null, // Default provisorio
-                'fecha_inicio' => now()->toDateString(),
-                'motivo_asignacion' => 'VALORACION INICIAL',
-                'estado' => 'ACTIVA'
-            ]);
+            $adulto->forceFill([
+                'observaciones' => trim(($adulto->observaciones ? $adulto->observaciones . "\n" : '') . "Valoración inicial sugerida para: {$enfermero->nombres} {$enfermero->ap_paterno}"),
+            ])->save();
 
             // 6. Log
             activity('Admisiones')

@@ -5,13 +5,12 @@ namespace App\Models;
 use App\Traits\GeneraCodigo;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\Traits\LogsActivity;
 
 class AtencionAdulto extends Model
 {
     use GeneraCodigo;
-    use SoftDeletes, LogsActivity;
+    use LogsActivity;
     protected $table = 'atenciones_adulto';
     protected $primaryKey = 'cod_aten_adul';
 

@@ -93,4 +93,20 @@ class EvaluacionGeriatrica extends Model
     {
         return $this->morphTo(__FUNCTION__, 'evaluador_tipo', 'evaluador_id');
     }
+
+    // Virtual accessors for backwards compatibility with EvaluacionCognitiva
+    public function getTipoEvaluacionAttribute()
+    {
+        return $this->instrumento;
+    }
+
+    public function getPersonalSaludAttribute()
+    {
+        return $this->registrador;
+    }
+
+    public function getResultadoInterpretacionAttribute()
+    {
+        return $this->categoria_resultado;
+    }
 }

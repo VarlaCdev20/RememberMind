@@ -152,14 +152,14 @@ class AreasReportDataService
      */
     public function getEvolucionMensualGlobal(): array
     {
-        $evolucion = User::whereNotNull('cod_area')
-            ->selectRaw("to_char(created_at, 'YYYY-MM') as mes, count(*) as total")
-            ->groupBy('mes')
-            ->orderBy('mes')
-            ->get();
+        $usuarios = User::whereNotNull('cod_area')->orderBy('created_at')->get();
+        $evolucion = $usuarios->groupBy(function($u) {
+            return $u->created_at ? $u->created_at->format('Y-m') : date('Y-m');
+        })->map(fn($group) => $group->count());
+
         return [
-            'labels' => $evolucion->pluck('mes')->toArray(),
-            'data' => $evolucion->pluck('total')->toArray(),
+            'labels' => $evolucion->keys()->toArray(),
+            'data' => $evolucion->values()->toArray(),
         ];
     }
 
@@ -211,11 +211,9 @@ class AreasReportDataService
      */
     public function getEvolucionArea($codArea): array
     {
-        $evolucion = User::where('cod_area', $codArea)
-            ->selectRaw("to_char(created_at, 'YYYY-MM') as mes, count(*) as total")
-            ->groupBy('mes')
-            ->orderBy('mes')
-            ->get();
-        return $evolucion->pluck('total', 'mes')->toArray();
+        $usuarios = User::where('cod_area', $codArea)->orderBy('created_at')->get();
+        return $usuarios->groupBy(function($u) {
+            return $u->created_at ? $u->created_at->format('Y-m') : date('Y-m');
+        })->map(fn($group) => $group->count())->toArray();
     }
 }

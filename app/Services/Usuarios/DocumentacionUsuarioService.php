@@ -34,19 +34,7 @@ class DocumentacionUsuarioService
             // Verificar si el tipo de documento aplica al rol del usuario
             $aplicaRoles = $tipo->aplica_roles ?? [];
             if (!in_array($rol, $aplicaRoles)) {
-                // Caso especial: Psicólogo
-                if ($rol === 'personal_salud') {
-                    $ps = $usuario->personalSalud;
-                    $espNombre = $ps?->especialidad?->nombre ?? '';
-                    $isCognitivo = Str::contains(Str::lower($espNombre), ['psico', 'cogni']);
-                    if ($tipo->nombre === 'Certificaciones de Especialidad o Formación' && $isCognitivo) {
-                        // Sí aplica
-                    } else {
-                        continue;
-                    }
-                } else {
-                    continue;
-                }
+                continue;
             }
 
             $cargados = $documentosCargados->get($tipo->cod_tipo_doc) ?? collect();

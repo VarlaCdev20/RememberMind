@@ -12,8 +12,14 @@ class DocumentosUsuarioService
      */
     public function documentosRequeridosPorRol(string $rol): array
     {
+        $rol = strtolower($rol);
+        if ($rol === 'superadministrador' || $rol === 'administrador' || $rol === 'admin') {
+            $rol = 'personal_admin';
+        } elseif (in_array(strtoupper($rol), ['ENFERMEROS', 'MEDICO GENERAL/GERIATRA', 'PSICOLOGO/A', 'PEDAGOGO', 'NUTRICIONISTA', 'FISIOTERAPEUTA'])) {
+            $rol = 'personal_salud';
+        }
+
         switch ($rol) {
-            case 'admin':
                 return [
                     'Cédula de identidad',
                     'Documento de designación institucional',
@@ -88,6 +94,13 @@ class DocumentosUsuarioService
 
     public function documentosGeneradosPorRol(string $rol): array
     {
+        $rol = strtolower($rol);
+        if ($rol === 'superadministrador' || $rol === 'administrador' || $rol === 'admin') {
+            $rol = 'personal_admin';
+        } elseif (in_array(strtoupper($rol), ['ENFERMEROS', 'MEDICO GENERAL/GERIATRA', 'PSICOLOGO/A', 'PEDAGOGO', 'NUTRICIONISTA', 'FISIOTERAPEUTA'])) {
+            $rol = 'personal_salud';
+        }
+
         $generales = [
             [
                 'slug' => 'constancia-registro',
@@ -261,13 +274,14 @@ class DocumentosUsuarioService
 
     private function obtenerAreaCargo(User $user, string $rol): string
     {
-        if ($rol === 'personal_salud' && $user->personalSalud) {
-            return $user->personalSalud->especialidad->nombre ?? 'ATENCIÓN EN SALUD';
+        $rolUpper = strtoupper($rol);
+        if (in_array($rolUpper, ['ENFERMEROS', 'MEDICO GENERAL/GERIATRA', 'PSICOLOGO/A', 'PEDAGOGO', 'NUTRICIONISTA', 'FISIOTERAPEUTA'])) {
+            return $rolUpper;
         }
-        if ($rol === 'personal_admin' && $user->personalAdmin) {
-            return $user->personalAdmin->cargoAdmin->nombre ?? 'ÁREA ADMINISTRATIVA';
+        if (in_array($rolUpper, ['SUPERADMINISTRADOR', 'ADMINISTRADOR'])) {
+            return $rolUpper;
         }
-        if ($rol === 'voluntario' && $user->voluntarios->first()) {
+        if ($rolUpper === 'VOLUNTARIO' && $user->voluntarios->first()) {
             return $user->voluntarios->first()->area_apoyo ?? 'APOYO GENERAL';
         }
         return 'N/A';

@@ -14,8 +14,6 @@ class FichaPacienteReporteController extends Controller
     {
         $adultoMayor = AdultoMayor::with([
             'habitacion', 'cama',
-            'asignacionTurnoActiva.turno',
-            'asignacionTurnoActiva.enfermero',
             'planCuidadoActivo',
             'valoracionesEnfermeria' => fn($q) => $q->orderBy('fecha', 'desc')->take(1),
             'valoracionesMedicas' => fn($q) => $q->orderBy('fecha', 'desc')->take(1),
@@ -27,11 +25,8 @@ class FichaPacienteReporteController extends Controller
             'pasesTurno' => fn($q) => $q->orderBy('fecha', 'desc')->orderBy('created_at', 'desc')->take(3)
         ])->findOrFail($adulto_id);
 
-        if (!auth()->user()->hasRole('SUPERADMINISTRADOR')) {
-            $asignacion = $adultoMayor->asignacionTurnoActiva;
-            if (!$asignacion || $asignacion->cod_usu_enfermero !== auth()->id()) {
-                abort(403, 'No tienes permiso para ver la ficha de un paciente no asignado a tu turno actual.');
-            }
+        if (!auth()->user()->hasAnyRole(['SUPERADMINISTRADOR', 'ADMINISTRADOR', 'ENFERMEROS', 'MEDICO GENERAL/GERIATRA'])) {
+            abort(403, 'No tienes permiso para ver la ficha operativa de este residente.');
         }
 
         $timeline = [
@@ -39,7 +34,7 @@ class FichaPacienteReporteController extends Controller
             'VALORACIÓN ENFERMERÍA' => $adultoMayor->valoracionesEnfermeria->isNotEmpty(),
             'VALORACIÓN MÉDICA' => $adultoMayor->valoracionesMedicas->isNotEmpty(),
             'ADMITIDO' => in_array($adultoMayor->estadoTexto, ['ACTIVO', 'EN_OBSERVACION']),
-            'ASIGNADO' => $adultoMayor->asignacionTurnoActiva !== null,
+            'ASIGNADO' => $adultoMayor->habitacion !== null,
             'PLAN ACTIVO' => $adultoMayor->planCuidadoActivo !== null,
             'SEGUIMIENTO ACTIVO' => $adultoMayor->seguimientosDiarios->isNotEmpty(),
         ];
@@ -47,9 +42,9 @@ class FichaPacienteReporteController extends Controller
         // Ensure variables exist for charts representation
         $signos = $adultoMayor->signosVitales->reverse();
         $labelsSignos = $signos->map(fn($s) => Carbon::parse($s->fecha)->format('d/m') . ' ' . Carbon::parse($s->hora)->format('H:i'))->values();
-        $dataPresionSis = $signos->map(fn($s) => $s->presion_sistolica)->values();
-        $dataPresionDia = $signos->map(fn($s) => $s->presion_diastolica)->values();
-        $dataSaturacion = $signos->map(fn($s) => $s->saturacion)->values();
+        $dataPresionSis = $signos->map(fn($s) => $s->presion_arterial_sistolica ?? $s->presion_sistolica ?? 0)->values();
+        $dataPresionDia = $signos->map(fn($s) => $s->presion_arterial_diastolica ?? $s->presion_diastolica ?? 0)->values();
+        $dataSaturacion = $signos->map(fn($s) => $s->saturacion_oxigeno ?? $s->saturacion ?? 0)->values();
 
         $tareas = $adultoMayor->tareasActuales()->get();
         $tareasRealizadas = $tareas->where('estado', 'REALIZADO')->count();
@@ -69,9 +64,6 @@ class FichaPacienteReporteController extends Controller
             'tareasRealizadas', 'tareasPendientes', 'tareasOmitidas',
             'alertasLabels', 'alertasData'
         ));
-
-        // For DOMPDF to be able to use chart images we'd need to generate them via API like QuickChart.
-        // For simplicity, we just output the data in tables or simple format since QuickChart requires internet.
 
         return $pdf->stream('Ficha_Operativa_'.$adultoMayor->nombres.'_'.$adultoMayor->ap_paterno.'.pdf');
     }

@@ -395,13 +395,11 @@ class VoluntariosPanel extends Component
             $usuario->assignRole('voluntario');
         }
 
-        DB::table('voluntarios')->insert([
+        $this->insertarVoluntario([
             'fecha_ing' => $validated['fecha_ing'],
-            'area_apoyo' => $validated['area_apoyo'],
             'estado' => $validated['estado'],
             'observaciones' => $validated['observaciones'] ?: null,
             'cod_usu' => $usuario->cod_usu,
-            'disponibilidad_inicial' => $validated['disponibilidad_inicial'] ?: null,
             'area_apoyo_preferente' => $validated['area_apoyo'],
             'created_at' => now(),
             'updated_at' => now(),
@@ -429,16 +427,11 @@ class VoluntariosPanel extends Component
                 'updated_at' => now(),
             ]);
 
-        DB::table('voluntarios')
-            ->where('cod_vol', $this->voluntarioId)
-            ->update([
+        $this->actualizarVoluntarioTabla([
                 'fecha_ing' => $validated['fecha_ing'],
-                'area_apoyo' => $validated['area_apoyo'],
                 'estado' => $validated['estado'],
                 'observaciones' => $validated['observaciones'] ?: null,
-                'disponibilidad_inicial' => $validated['disponibilidad_inicial'] ?: null,
                 'area_apoyo_preferente' => $validated['area_apoyo'],
-                'archivado_en' => $validated['estado'] === 'ACTIVO' ? null : DB::raw('archivado_en'),
                 'updated_at' => now(),
             ]);
     }
@@ -450,12 +443,12 @@ class VoluntariosPanel extends Component
                 'v.cod_vol',
                 'v.cod_usu',
                 'v.fecha_ing',
-                'v.area_apoyo',
+                $this->columnaVoluntario('area_apoyo_preferente', 'area_apoyo'),
                 'v.estado',
                 'v.observaciones',
-                'v.archivado_en',
-                'v.motivo_archivado',
-                'v.disponibilidad_inicial',
+                $this->columnaVoluntario('archivado_en'),
+                $this->columnaVoluntario('motivo_archivado'),
+                $this->columnaVoluntario('disponibilidad_inicial'),
                 'u.nombres',
                 'u.ap_paterno',
                 'u.ap_materno',
@@ -485,15 +478,15 @@ class VoluntariosPanel extends Component
 
         if ($this->estadoFiltro !== '') {
             if ($this->estadoFiltro === 'ARCHIVADO') {
-                $query->whereNotNull('v.archivado_en');
+                $this->whereArchivado($query, true);
             } else {
                 $query->where('v.estado', $this->estadoFiltro)
-                    ->whereNull('v.archivado_en');
+                    ->when($this->existeColumnaVoluntario('archivado_en'), fn (Builder $q) => $q->whereNull('v.archivado_en'));
             }
         }
 
-        if ($this->areaFiltro !== '') {
-            $query->where('v.area_apoyo', $this->areaFiltro);
+        if ($this->areaFiltro !== '' && $this->existeColumnaVoluntario('area_apoyo_preferente')) {
+            $query->where('v.area_apoyo_preferente', $this->areaFiltro);
         }
 
         if ($this->tipoFiltro !== '') {
@@ -515,7 +508,7 @@ class VoluntariosPanel extends Component
         }
 
         return $query
-            ->orderByRaw('case when v.archivado_en is null then 0 else 1 end')
+            ->when($this->existeColumnaVoluntario('archivado_en'), fn (Builder $q) => $q->orderByRaw('case when v.archivado_en is null then 0 else 1 end'))
             ->orderByRaw("case when v.estado = 'ACTIVO' then 0 when v.estado = 'SUSPENDIDO' then 1 when v.estado = 'INACTIVO' then 2 else 3 end")
             ->orderBy('u.ap_paterno')
             ->orderBy('u.nombres');
@@ -534,13 +527,13 @@ class VoluntariosPanel extends Component
                 'v.cod_vol',
                 'v.cod_usu',
                 'v.fecha_ing',
-                'v.area_apoyo',
+                $this->columnaVoluntario('area_apoyo_preferente', 'area_apoyo'),
                 'v.estado',
                 'v.observaciones',
-                'v.archivado_en',
-                'v.motivo_archivado',
-                'v.disponibilidad_inicial',
-                'v.area_apoyo_preferente',
+                $this->columnaVoluntario('archivado_en'),
+                $this->columnaVoluntario('motivo_archivado'),
+                $this->columnaVoluntario('disponibilidad_inicial'),
+                $this->columnaVoluntario('area_apoyo_preferente'),
                 'u.nombres',
                 'u.ap_paterno',
                 'u.ap_materno',
@@ -558,12 +551,12 @@ class VoluntariosPanel extends Component
 
     private function metricas(): array
     {
-        $totalActuales = DB::table('voluntarios')->whereNull('archivado_en')->count();
-        $activos = DB::table('voluntarios')->whereNull('archivado_en')->where('estado', 'ACTIVO')->count();
-        $inactivos = DB::table('voluntarios')->whereNull('archivado_en')->where('estado', 'INACTIVO')->count();
-        $archivados = DB::table('voluntarios')->whereNotNull('archivado_en')->count();
+        $totalActuales = $this->voluntariosNoArchivadosQuery()->count();
+        $activos = $this->voluntariosNoArchivadosQuery()->where('estado', 'ACTIVO')->count();
+        $inactivos = $this->voluntariosNoArchivadosQuery()->where('estado', 'INACTIVO')->count();
+        $archivados = $this->existeColumnaVoluntario('archivado_en') ? DB::table('voluntarios')->whereNotNull('archivado_en')->count() : 0;
         $sinDisponibilidad = DB::table('voluntarios as v')
-            ->whereNull('v.archivado_en')
+            ->when($this->existeColumnaVoluntario('archivado_en'), fn (Builder $q) => $q->whereNull('v.archivado_en'))
             ->whereNotExists(function (Builder $q) {
                 $q->select('dv.cod_vol')
                     ->from('disponibilidad_voluntarios as dv')
@@ -571,7 +564,7 @@ class VoluntariosPanel extends Component
             })
             ->count();
         $conAsignaciones = DB::table('voluntarios as v')
-            ->whereNull('v.archivado_en')
+            ->when($this->existeColumnaVoluntario('archivado_en'), fn (Builder $q) => $q->whereNull('v.archivado_en'))
             ->whereExists(function (Builder $q) {
                 $q->select('av.cod_vol')
                     ->from('asignacion_voluntarios as av')
@@ -583,7 +576,7 @@ class VoluntariosPanel extends Component
             })
             ->count();
         $conAsistencia = DB::table('voluntarios as v')
-            ->whereNull('v.archivado_en')
+            ->when($this->existeColumnaVoluntario('archivado_en'), fn (Builder $q) => $q->whereNull('v.archivado_en'))
             ->whereExists(function (Builder $q) {
                 $q->select('a.cod_vol')
                     ->from('asistencia_voluntarios as a')
@@ -591,7 +584,7 @@ class VoluntariosPanel extends Component
             })
             ->count();
         $recientes = DB::table('voluntarios')
-            ->whereNull('archivado_en')
+            ->when($this->existeColumnaVoluntario('archivado_en'), fn (Builder $q) => $q->whereNull('archivado_en'))
             ->where('created_at', '>=', now()->subDays(30))
             ->count();
 
@@ -690,11 +683,15 @@ class VoluntariosPanel extends Component
 
     private function areasDisponibles(): array
     {
+        if (! $this->existeColumnaVoluntario('area_apoyo_preferente')) {
+            return [];
+        }
+
         return DB::table('voluntarios')
-            ->whereNotNull('area_apoyo')
+            ->whereNotNull('area_apoyo_preferente')
             ->distinct()
-            ->orderBy('area_apoyo')
-            ->pluck('area_apoyo')
+            ->orderBy('area_apoyo_preferente')
+            ->pluck('area_apoyo_preferente')
             ->filter()
             ->values()
             ->all();
@@ -747,5 +744,54 @@ class VoluntariosPanel extends Component
         return DB::table('areas_institucionales')
             ->where('nombre', 'ilike', '%volunt%')
             ->value('cod_area');
+    }
+
+    private function existeColumnaVoluntario(string $columna): bool
+    {
+        return Schema::hasColumn('voluntarios', $columna);
+    }
+
+    private function columnaVoluntario(string $columna, ?string $alias = null): mixed
+    {
+        $alias ??= $columna;
+
+        return $this->existeColumnaVoluntario($columna)
+            ? "v.{$columna}" . ($alias !== $columna ? " as {$alias}" : '')
+            : DB::raw("NULL as {$alias}");
+    }
+
+    private function voluntariosNoArchivadosQuery(): Builder
+    {
+        return DB::table('voluntarios')
+            ->when($this->existeColumnaVoluntario('archivado_en'), fn (Builder $q) => $q->whereNull('archivado_en'));
+    }
+
+    private function whereArchivado(Builder $query, bool $archivado): void
+    {
+        if (! $this->existeColumnaVoluntario('archivado_en')) {
+            $archivado ? $query->whereRaw('1 = 0') : null;
+            return;
+        }
+
+        $archivado ? $query->whereNotNull('v.archivado_en') : $query->whereNull('v.archivado_en');
+    }
+
+    private function insertarVoluntario(array $datos): void
+    {
+        DB::table('voluntarios')->insert($this->filtrarColumnasVoluntarios($datos));
+    }
+
+    private function actualizarVoluntarioTabla(array $datos): void
+    {
+        DB::table('voluntarios')
+            ->where('cod_vol', $this->voluntarioId)
+            ->update($this->filtrarColumnasVoluntarios($datos));
+    }
+
+    private function filtrarColumnasVoluntarios(array $datos): array
+    {
+        return collect($datos)
+            ->filter(fn ($value, string $key) => $this->existeColumnaVoluntario($key))
+            ->all();
     }
 }

@@ -2,9 +2,6 @@
 
 namespace App\Livewire\Admin\PersonalInstitucional;
 
-use App\Models\AsignacionTurno;
-use App\Models\PersonalAdmin;
-use App\Models\PersonalSalud;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
@@ -239,11 +236,9 @@ class PersonalInstitucionalPanel extends Component
 
         $query = $this->baseUsuariosInstitucionales()
             ->with([
-                'personalSalud.especialidad',
-                'personalAdmin.cargo',
-                'areaInstitucional',
                 'roles',
-                'asignacionesTurno.turno',
+                'horariosSalud',
+                'horariosAdmin',
             ]);
 
         $this->aplicarTabActiva($query);
@@ -266,10 +261,9 @@ class PersonalInstitucionalPanel extends Component
 
         $query = $this->baseUsuariosInstitucionales()
             ->with([
-                'personalSalud.especialidad',
-                'personalAdmin.cargo',
                 'roles',
-                'asignacionesTurno.turno',
+                'horariosSalud',
+                'horariosAdmin',
             ]);
 
         $this->aplicarRubroResumen($query);
@@ -293,24 +287,16 @@ class PersonalInstitucionalPanel extends Component
     private function aplicarRubroResumen(Builder $query): void
     {
         if ($this->rubroResumen === 'salud') {
-            $query->where(function (Builder $subQuery) {
-                $subQuery
-                    ->whereHas('personalSalud')
-                    ->orWhereHas('roles', function (Builder $roleQuery) {
-                        $roleQuery->whereIn('name', $this->rolesSalud());
-                    });
+            $query->whereHas('roles', function (Builder $roleQuery) {
+                $roleQuery->whereIn('name', $this->rolesSalud());
             });
 
             return;
         }
 
         if ($this->rubroResumen === 'admin') {
-            $query->where(function (Builder $subQuery) {
-                $subQuery
-                    ->whereHas('personalAdmin')
-                    ->orWhereHas('roles', function (Builder $roleQuery) {
-                        $roleQuery->whereIn('name', $this->rolesAdministrativos());
-                    });
+            $query->whereHas('roles', function (Builder $roleQuery) {
+                $roleQuery->whereIn('name', $this->rolesAdministrativos());
             });
 
             return;
@@ -330,9 +316,7 @@ class PersonalInstitucionalPanel extends Component
         }
 
         if ($this->rubroResumen === 'en_turno') {
-            $query->whereHas('asignacionesTurno', function (Builder $subQuery) {
-                $subQuery->whereIn('estado', ['ACTIVO', 'ACTIVA']);
-            });
+            $query->whereIn('cod_usu', $this->usuariosConHorarioActivoIds());
 
             return;
         }
@@ -340,9 +324,7 @@ class PersonalInstitucionalPanel extends Component
         if ($this->rubroResumen === 'fuera_turno') {
             $this->aplicarEstado($query, 'activo');
 
-            $query->whereDoesntHave('asignacionesTurno', function (Builder $subQuery) {
-                $subQuery->whereIn('estado', ['ACTIVO', 'ACTIVA']);
-            });
+            $query->whereNotIn('cod_usu', $this->usuariosConHorarioActivoIds());
 
             return;
         }
@@ -388,16 +370,12 @@ class PersonalInstitucionalPanel extends Component
         }
 
         if ($this->turnoResumen === 'sin_turno') {
-            $query->whereDoesntHave('asignacionesTurno', function (Builder $subQuery) {
-                $subQuery->whereIn('estado', ['ACTIVO', 'ACTIVA']);
-            });
+            $query->whereNotIn('cod_usu', $this->usuariosConHorarioActivoIds());
 
             return;
         }
 
-        $query->whereHas('asignacionesTurno.turno', function (Builder $subQuery) {
-            $subQuery->where('nombre', 'ilike', "%{$this->turnoResumen}%");
-        });
+        $query->whereIn('cod_usu', $this->usuariosConTurnoIds($this->turnoResumen));
     }
 
     private function obtenerResumenInstitucional(): array
@@ -525,16 +503,25 @@ class PersonalInstitucionalPanel extends Component
             return $empty;
         }
 
-        $turnosGrouped = AsignacionTurno::whereIn('estado', ['ACTIVO', 'ACTIVA'])
-            ->whereHas('usuario', function (Builder $query) {
-                $query
-                    ->where(fn (Builder $subQuery) => $this->aplicarFiltroInstitucional($subQuery))
-                    ->whereDoesntHave('roles', function (Builder $roleQuery) {
-                        $roleQuery->whereIn('name', $this->rolesExcluidos());
-                    });
+        $saludTurnos = \App\Models\HorarioPersonalSalud::where('estado', 'ACTIVO')
+            ->whereHas('user', function (Builder $query) {
+                $query->whereHas('roles', function (Builder $roleQuery) {
+                    $roleQuery->whereIn('name', $this->rolesSalud());
+                });
             })
-            ->with('turno')
             ->get()
+            ->map(fn($h) => (object) ['turno' => (object) ['nombre' => $h->turno]]);
+
+        $adminTurnos = \App\Models\HorarioPersonalAdmin::where('estado', 'ACTIVO')
+            ->whereHas('user', function (Builder $query) {
+                $query->whereHas('roles', function (Builder $roleQuery) {
+                    $roleQuery->whereIn('name', $this->rolesAdministrativos());
+                });
+            })
+            ->get()
+            ->map(fn($h) => (object) ['turno' => (object) ['nombre' => $h->turno]]);
+
+        $turnosGrouped = $saludTurnos->concat($adminTurnos)
             ->groupBy(fn ($asignacion) => $asignacion->turno?->nombre ?? 'Sin turno');
 
         return [
@@ -643,12 +630,9 @@ class PersonalInstitucionalPanel extends Component
 
     private function aplicarFiltroInstitucional(Builder $query): void
     {
-        $query
-            ->whereHas('personalSalud')
-            ->orWhereHas('personalAdmin')
-            ->orWhereHas('roles', function (Builder $roleQuery) {
-                $roleQuery->whereIn('name', $this->rolesInstitucionales());
-            });
+        $query->whereHas('roles', function (Builder $roleQuery) {
+            $roleQuery->whereIn('name', $this->rolesInstitucionales());
+        });
     }
 
     private function contarUsuariosPorCategoria(string $categoria): array
@@ -656,23 +640,15 @@ class PersonalInstitucionalPanel extends Component
         $query = $this->baseUsuariosInstitucionales();
 
         if ($categoria === 'salud') {
-            $query->where(function (Builder $subQuery) {
-                $subQuery
-                    ->whereHas('personalSalud')
-                    ->orWhereHas('roles', function (Builder $roleQuery) {
-                        $roleQuery->whereIn('name', $this->rolesSalud());
-                    });
+            $query->whereHas('roles', function (Builder $roleQuery) {
+                $roleQuery->whereIn('name', $this->rolesSalud());
             });
 
             $titulo = 'Salud';
             $icono = 'ph-stethoscope';
         } elseif ($categoria === 'admin') {
-            $query->where(function (Builder $subQuery) {
-                $subQuery
-                    ->whereHas('personalAdmin')
-                    ->orWhereHas('roles', function (Builder $roleQuery) {
-                        $roleQuery->whereIn('name', $this->rolesAdministrativos());
-                    });
+            $query->whereHas('roles', function (Builder $roleQuery) {
+                $roleQuery->whereIn('name', $this->rolesAdministrativos());
             });
 
             $titulo = 'Administrativo';
@@ -703,27 +679,19 @@ class PersonalInstitucionalPanel extends Component
     private function aplicarTabActiva(Builder $query): void
     {
         if ($this->tabActiva === 'salud') {
-            $query->where(function (Builder $subQuery) {
-                $subQuery
-                    ->whereHas('personalSalud')
-                    ->orWhereHas('roles', function (Builder $roleQuery) {
-                        $roleQuery->whereIn('name', $this->rolesSalud());
-                    });
+            $query->whereHas('roles', function (Builder $roleQuery) {
+                $roleQuery->whereIn('name', $this->rolesSalud());
             });
 
             return;
         }
 
         if ($this->tabActiva === 'admin') {
-            $query->where(function (Builder $subQuery) {
-                $subQuery
-                    ->whereHas('personalAdmin')
-                    ->orWhereHas('roles', function (Builder $roleQuery) {
-                        $roleQuery->whereIn('name', array_merge(
-                            $this->rolesAdministrativos(),
-                            $this->rolesSistema()
-                        ));
-                    });
+            $query->whereHas('roles', function (Builder $roleQuery) {
+                $roleQuery->whereIn('name', array_merge(
+                    $this->rolesAdministrativos(),
+                    $this->rolesSistema()
+                ));
             });
         }
     }
@@ -765,36 +733,33 @@ class PersonalInstitucionalPanel extends Component
     private function aplicarFiltros(Builder $query): void
     {
         if ($this->filtroTipo === 'salud') {
-            $query->where(function (Builder $subQuery) {
-                $subQuery
-                    ->whereHas('personalSalud')
-                    ->orWhereHas('roles', function (Builder $roleQuery) {
-                        $roleQuery->whereIn('name', $this->rolesSalud());
-                    });
+            $query->whereHas('roles', function (Builder $roleQuery) {
+                $roleQuery->whereIn('name', $this->rolesSalud());
             });
         }
 
         if ($this->filtroTipo === 'admin') {
-            $query->where(function (Builder $subQuery) {
-                $subQuery
-                    ->whereHas('personalAdmin')
-                    ->orWhereHas('roles', function (Builder $roleQuery) {
-                        $roleQuery->whereIn('name', array_merge(
-                            $this->rolesAdministrativos(),
-                            $this->rolesSistema()
-                        ));
-                    });
+            $query->whereHas('roles', function (Builder $roleQuery) {
+                $roleQuery->whereIn('name', array_merge(
+                    $this->rolesAdministrativos(),
+                    $this->rolesSistema()
+                ));
             });
         }
 
         if ($this->filtroRol !== '') {
-            $tipos = $this->tiposSaludPorFiltro($this->filtroRol);
+            $rol = match ($this->filtroRol) {
+                'medico' => 'MEDICO GENERAL/GERIATRA',
+                'enfermero' => 'ENFERMEROS',
+                'psicologo' => 'PSICOLOGO/A',
+                'fisioterapeuta' => 'FISIOTERAPEUTA',
+                'nutricionista' => 'NUTRICIONISTA',
+                default => strtoupper($this->filtroRol),
+            };
 
-            if (!empty($tipos)) {
-                $query->whereHas('personalSalud', function (Builder $subQuery) use ($tipos) {
-                    $subQuery->whereIn('tipo_personal_salud', $tipos);
-                });
-            }
+            $query->whereHas('roles', function (Builder $subQuery) use ($rol) {
+                $subQuery->where('name', $rol);
+            });
         }
 
         if ($this->filtroEstado === 'activo') {
@@ -806,15 +771,11 @@ class PersonalInstitucionalPanel extends Component
         }
 
         if ($this->filtroDisponibilidad === 'ocupado') {
-            $query->whereHas('asignacionesTurno', function (Builder $subQuery) {
-                $subQuery->whereIn('estado', ['ACTIVO', 'ACTIVA']);
-            });
+            $query->whereIn('cod_usu', $this->usuariosConHorarioActivoIds());
         }
 
         if ($this->filtroDisponibilidad === 'libre') {
-            $query->whereDoesntHave('asignacionesTurno', function (Builder $subQuery) {
-                $subQuery->whereIn('estado', ['ACTIVO', 'ACTIVA']);
-            });
+            $query->whereNotIn('cod_usu', $this->usuariosConHorarioActivoIds());
         }
     }
 
@@ -863,17 +824,35 @@ class PersonalInstitucionalPanel extends Component
 
     private function contarPersonalEnTurno(): int
     {
-        return AsignacionTurno::whereIn('estado', ['ACTIVO', 'ACTIVA'])
+        return count($this->usuariosConHorarioActivoIds());
+    }
+
+    private function usuariosConHorarioActivoIds(): array
+    {
+        $saludUsu = \App\Models\HorarioPersonalSalud::where('estado', 'ACTIVO')
             ->whereNotNull('cod_usu')
-            ->whereHas('usuario', function (Builder $query) {
-                $query
-                    ->where(fn (Builder $subQuery) => $this->aplicarFiltroInstitucional($subQuery))
-                    ->whereDoesntHave('roles', function (Builder $roleQuery) {
-                        $roleQuery->whereIn('name', $this->rolesExcluidos());
-                    });
-            })
-            ->distinct()
-            ->count('cod_usu');
+            ->pluck('cod_usu');
+
+        $adminUsu = \App\Models\HorarioPersonalAdmin::where('estado', 'ACTIVO')
+            ->whereNotNull('cod_usu')
+            ->pluck('cod_usu');
+
+        return $saludUsu->merge($adminUsu)->unique()->values()->all();
+    }
+
+    private function usuariosConTurnoIds(string $turno): array
+    {
+        $saludUsu = \App\Models\HorarioPersonalSalud::where('estado', 'ACTIVO')
+            ->where('turno', 'ilike', "%{$turno}%")
+            ->whereNotNull('cod_usu')
+            ->pluck('cod_usu');
+
+        $adminUsu = \App\Models\HorarioPersonalAdmin::where('estado', 'ACTIVO')
+            ->where('turno', 'ilike', "%{$turno}%")
+            ->whereNotNull('cod_usu')
+            ->pluck('cod_usu');
+
+        return $saludUsu->merge($adminUsu)->unique()->values()->all();
     }
 
     private function existeUsuarioInstitucional(string $usuarioId): bool
@@ -885,7 +864,31 @@ class PersonalInstitucionalPanel extends Component
 
     private function contarPersonalSalud(array $tipos): int
     {
-        return PersonalSalud::whereIn('tipo_personal_salud', $tipos)->count();
+        $hasMedico = false;
+        $hasEnfermero = false;
+        $hasPsicologo = false;
+        $hasFisio = false;
+        $hasNutri = false;
+
+        foreach ($tipos as $tipo) {
+            $t = strtoupper($tipo);
+            if (str_contains($t, 'MEDIC') || str_contains($t, 'GERIATR')) $hasMedico = true;
+            if (str_contains($t, 'ENFERM')) $hasEnfermero = true;
+            if (str_contains($t, 'PSICOL')) $hasPsicologo = true;
+            if (str_contains($t, 'FISIO')) $hasFisio = true;
+            if (str_contains($t, 'NUTRI')) $hasNutri = true;
+        }
+
+        $roles = [];
+        if ($hasMedico) $roles[] = 'MEDICO GENERAL/GERIATRA';
+        if ($hasEnfermero) $roles[] = 'ENFERMEROS';
+        if ($hasPsicologo) $roles[] = 'PSICOLOGO/A';
+        if ($hasFisio) $roles[] = 'FISIOTERAPEUTA';
+        if ($hasNutri) $roles[] = 'NUTRICIONISTA';
+
+        if (empty($roles)) return 0;
+
+        return User::role($roles)->where('estado', 'ACTIVO')->count();
     }
 
     private function tiposSaludPorFiltro(string $filtro): array

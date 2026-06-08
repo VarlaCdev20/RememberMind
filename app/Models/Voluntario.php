@@ -21,13 +21,22 @@ class Voluntario extends Model
 
     protected $fillable = [
         'fecha_ing',
-        'area_apoyo',
         'estado',
         'observaciones',
         'cod_usu',
         'disponibilidad_inicial',
         'area_apoyo_preferente',
     ];
+
+    public function getAreaApoyoAttribute(): ?string
+    {
+        return $this->area_apoyo_preferente ?? null;
+    }
+
+    public function setAreaApoyoAttribute(?string $value): void
+    {
+        $this->attributes['area_apoyo_preferente'] = $value;
+    }
 
     /**
      * Relaciones

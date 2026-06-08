@@ -93,36 +93,32 @@ public function show(AdultoMayor $adulto_mayor)
     $familiaresActivos = $adulto->familiares()->wherePivot('estado', 'ACTIVO')->get();
     $familiaresInactivos = $adulto->familiares()->wherePivot('estado', 'INACTIVO')->get();
 
-    // Observaciones - Divididas por SoftDeletes
     $observacionesActivas = $adulto->observaciones()->latest()->get();
-    $observacionesAnuladas = $adulto->observaciones()->onlyTrashed()->latest('deleted_at')->get();
+    $observacionesAnuladas = collect();
 
-    // Actividades - Divididas por SoftDeletes
     $actividadesActivas = $adulto->actividades()->latest()->get();
-    $actividadesAnuladas = $adulto->actividades()->onlyTrashed()->latest('deleted_at')->get();
+    $actividadesAnuladas = collect();
 
-    // Atenciones - Divididas por SoftDeletes
     $atencionesActivas = $adulto->atenciones()->latest()->get();
-    $atencionesAnuladas = $adulto->atenciones()->onlyTrashed()->latest('deleted_at')->get();
+    $atencionesAnuladas = collect();
 
-    // Documentos - Divididos por SoftDeletes
     $documentosActivos = $adulto->documentos()->latest()->get();
-    $documentosArchivados = $adulto->documentos()->onlyTrashed()->latest('deleted_at')->get();
+    $documentosArchivados = collect();
     
     $asignaciones = $adulto->voluntarios()->get();
 
     // Evaluaciones - Divididas por SoftDeletes
-    $evaluacionesActivas = $adulto->evaluacionesCognitivas()->with(['tipoEvaluacion', 'personalSalud'])->latest()->get();
-    $evaluacionesAnuladas = $adulto->evaluacionesCognitivas()->onlyTrashed()->with(['tipoEvaluacion', 'personalSalud'])->latest('deleted_at')->get();
+    $evaluacionesActivas = $adulto->evaluacionesGeriatricas()->with(['instrumento', 'registrador'])->latest()->get();
+    $evaluacionesAnuladas = $adulto->evaluacionesGeriatricas()->onlyTrashed()->with(['instrumento', 'registrador'])->latest('deleted_at')->get();
 
     // Evaluaciones Geriátricas Integrales (Fase 2)
     $evaluacionesGeriatricasActivas = \App\Models\EvaluacionGeriatrica::where('cod_am', $adulto_mayor->cod_am)
-        ->where('estado_eval', 'ACTIVO')
+        ->where('estado', '<>', 'ANULADO')
         ->with(['instrumento.area', 'registrador'])
         ->latest('fecha_eval')
         ->get();
     $evaluacionesGeriatricasAnuladas = \App\Models\EvaluacionGeriatrica::where('cod_am', $adulto_mayor->cod_am)
-        ->where('estado_eval', 'ANULADO')
+        ->where('estado', 'ANULADO')
         ->with(['instrumento.area', 'registrador'])
         ->latest('fecha_eval')
         ->get();
@@ -138,7 +134,7 @@ public function show(AdultoMayor $adulto_mayor)
 
     $estadosAdulto   = $this->adultoMayorService->obtenerEstados();
     $tiposAtenciones = $this->adultoMayorService->obtenerTiposAtenciones();
-    $tiposEvaluaciones = \App\Models\TipoEvaluacionCognitiva::where('estado', 'ACTIVO')->get();
+    $tiposEvaluaciones = \App\Models\InstrumentoGeriatrico::where('estado', 'ACTIVO')->get();
     $tiposActividades = TipoActividadAdulto::all();
 
     // Bitácora escalable desde Spatie Activitylog
@@ -185,20 +181,20 @@ public function show(AdultoMayor $adulto_mayor)
         $adulto = $this->adultoMayorService->obtenerDetalle($adulto_mayor->cod_am);
         $adulto->edad = $this->adultoMayorService->calcularEdad($adulto->fecha_nac);
         
-        $evaluaciones = $adulto->evaluacionesCognitivas()->with(['tipoEvaluacion', 'personalSalud'])->latest()->get();
-        $evaluacionesAnuladas = $adulto->evaluacionesCognitivas()->onlyTrashed()->with(['tipoEvaluacion', 'personalSalud'])->latest('deleted_at')->get();
+        $evaluaciones = $adulto->evaluacionesGeriatricas()->with(['instrumento', 'registrador'])->latest()->get();
+        $evaluacionesAnuladas = $adulto->evaluacionesGeriatricas()->onlyTrashed()->with(['instrumento', 'registrador'])->latest('deleted_at')->get();
 
         $atenciones = $adulto->atenciones()->with('tipoAtencion')->latest()->get();
-        $atencionesAnuladas = $adulto->atenciones()->onlyTrashed()->with('tipoAtencion')->latest('deleted_at')->get();
+        $atencionesAnuladas = collect();
 
         $actividades = $adulto->actividades()->with('tipoActividad')->latest()->get();
-        $actividadesAnuladas = $adulto->actividades()->onlyTrashed()->with('tipoActividad')->latest('deleted_at')->get();
+        $actividadesAnuladas = collect();
 
         $observaciones = $adulto->observaciones()->latest()->get();
-        $observacionesAnuladas = $adulto->observaciones()->onlyTrashed()->latest('deleted_at')->get();
+        $observacionesAnuladas = collect();
 
         $documentos = $adulto->documentos()->latest()->get();
-        $documentosArchivados = $adulto->documentos()->onlyTrashed()->latest('deleted_at')->get();
+        $documentosArchivados = collect();
 
         $familiares = $adulto->familiares()->wherePivot('estado', 'ACTIVO')->get();
         $familiaresInactivos = $adulto->familiares()->wherePivot('estado', 'INACTIVO')->get();
@@ -333,7 +329,7 @@ public function show(AdultoMayor $adulto_mayor)
                 $titulo = "Reporte de Valoración Funcional Institucional";
                 break;
             case 'cognitivo':
-                $viewData['evaluaciones'] = $applyDateFilter($adulto->evaluacionesCognitivas()->with(['tipoEvaluacion', 'personalSalud']), 'fecha_eval')->latest('fecha_eval')->get();
+                $viewData['evaluaciones'] = $applyDateFilter($adulto->evaluacionesGeriatricas()->with(['instrumento', 'registrador']), 'fecha_eval')->latest('fecha_eval')->get();
                 $titulo = "Historial de Evaluaciones Cognitivas";
                 break;
             default:
@@ -370,7 +366,7 @@ public function show(AdultoMayor $adulto_mayor)
     $totalAtenciones = \App\Models\AtencionAdulto::count();
     $totalActividades = \App\Models\ActividadAdulto::count();
     $totalDocumentos = \App\Models\DocumentoAdultoMayor::count();
-    $totalEvaluaciones = \App\Models\EvaluacionCognitiva::count();
+    $totalEvaluaciones = \App\Models\EvaluacionGeriatrica::count();
 
     // Adultos sin seguimiento (sin observaciones ni atenciones en los últimos 30 días)
     $hace30Dias = now()->subDays(30);
@@ -405,7 +401,7 @@ public function show(AdultoMayor $adulto_mayor)
         $adultos = AdultoMayor::all();
         $totalAtenciones = \App\Models\AtencionAdulto::count();
         $totalActividades = \App\Models\ActividadAdulto::count();
-        $totalEvaluaciones = \App\Models\EvaluacionCognitiva::count();
+        $totalEvaluaciones = \App\Models\EvaluacionGeriatrica::count();
 
         $stats = [
             'poblacion' => $adultos->count(),
@@ -421,12 +417,12 @@ public function show(AdultoMayor $adulto_mayor)
     public function reporteBienestar()
     {
         $adultos = AdultoMayor::all();
-        $totalEvaluaciones = \App\Models\EvaluacionCognitiva::count();
+        $totalEvaluaciones = \App\Models\EvaluacionGeriatrica::count();
         
         $distribucionRiesgo = [
-            'bajo' => \App\Models\EvaluacionCognitiva::where('nivel_riesgo', 'BAJO')->count(),
-            'medio' => \App\Models\EvaluacionCognitiva::where('nivel_riesgo', 'MEDIO')->count(),
-            'alto' => \App\Models\EvaluacionCognitiva::where('nivel_riesgo', 'ALTO')->count(),
+            'bajo' => \App\Models\EvaluacionGeriatrica::where('nivel_riesgo', 'BAJO')->count(),
+            'medio' => \App\Models\EvaluacionGeriatrica::where('nivel_riesgo', 'MEDIO')->count(),
+            'alto' => \App\Models\EvaluacionGeriatrica::where('nivel_riesgo', 'ALTO')->count(),
         ];
 
         return view('admin.adultos-mayores.reportes.bienestar', compact('distribucionRiesgo', 'totalEvaluaciones'));

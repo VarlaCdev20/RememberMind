@@ -120,15 +120,9 @@ class PreadmisionesPanel extends Component
             // Simulamos si está en turno actualmente (idealmente viene de su horario real en base de datos)
             $enTurno = rand(0, 1) == 1; // dummy para UI
             
-            // Cantidad de valoraciones pendientes
-            $pendientes = \App\Models\AsignacionTurnoAdulto::where('cod_usu_enfermero', $user->cod_usu)
-                ->where('motivo_asignacion', 'VALORACION INICIAL')
-                ->where('estado', 'ACTIVA')
-                ->whereHas('adultoMayor', function($q) {
-                    $q->whereHas('estado', function($q2) {
-                        $q2->where('estado', 'PENDIENTE_VALORACION_INICIAL');
-                    });
-                })->count();
+            $pendientes = AdultoMayor::whereHas('estado', function($q) {
+                $q->where('estado', 'PENDIENTE_VALORACION_INICIAL');
+            })->count();
 
             return [
                 'id' => $user->cod_usu,
@@ -695,16 +689,9 @@ class PreadmisionesPanel extends Component
 
             if ($this->enfermero_asignado) {
                 $enfermero = \App\Models\User::find($this->enfermero_asignado);
-                $turnoDefault = \DB::table('turnos_enfermeria')->where('estado', 'ACTIVO')->first();
-
-                \App\Models\AsignacionTurnoAdulto::create([
-                    'cod_am' => $adulto->cod_am,
-                    'cod_usu_enfermero' => $enfermero->cod_usu,
-                    'cod_turno' => $turnoDefault ? $turnoDefault->cod_turno : 1,
-                    'fecha_inicio' => now()->toDateString(),
-                    'motivo_asignacion' => 'VALORACION INICIAL',
-                    'estado' => 'ACTIVA'
-                ]);
+                $adulto->forceFill([
+                    'observaciones' => trim(($adulto->observaciones ? $adulto->observaciones . "\n" : '') . "Valoración inicial sugerida para: {$enfermero->nombres} {$enfermero->ap_paterno}"),
+                ])->save();
                 
                 activity('Admisiones')
                     ->causedBy(auth()->user())
@@ -741,11 +728,12 @@ class PreadmisionesPanel extends Component
                 // Si es familia se podría enlazar, pero DocumentoAdultoMayor vincula al AM
                 \App\Models\DocumentoAdultoMayor::create([
                     'cod_am' => $cod_am,
-                    'tipo_doc' => substr($tipoDoc, 0, 100),
+                    'tipo_documento' => substr($tipoDoc, 0, 100),
                     'ruta_archivo' => $path,
-                    'nom_doc' => $doc['nombre_original'] ?? 'Documento ' . $tipoDoc,
-                    'extension' => $doc['is_pdf'] ? 'pdf' : 'img',
-                    'fecha_doc' => now()->toDateString(),
+                    'nombre' => $doc['nombre_original'] ?? 'Documento ' . $tipoDoc,
+                    'fecha_subida' => now()->toDateString(),
+                    'estado' => 'ACTIVO',
+                    'modulo_ref' => 'PREADMISION',
                     'observaciones' => $doc['observacion'] ?? 'Subido en Preadmisión'
                 ]);
             }
@@ -756,11 +744,12 @@ class PreadmisionesPanel extends Component
             if ($docDef['plazo_48h'] && !isset($this->documentos_subidos[$key])) {
                 \App\Models\DocumentoAdultoMayor::create([
                     'cod_am' => $cod_am,
-                    'tipo_doc' => substr(strtoupper($key), 0, 100),
+                    'tipo_documento' => substr(strtoupper($key), 0, 100),
                     'ruta_archivo' => 'PENDIENTE_48H',
-                    'nom_doc' => 'Documento Pendiente',
-                    'extension' => 'N/A',
-                    'fecha_doc' => now()->toDateString(),
+                    'nombre' => 'Documento Pendiente',
+                    'fecha_subida' => now()->toDateString(),
+                    'estado' => 'PENDIENTE',
+                    'modulo_ref' => 'PREADMISION',
                     'observaciones' => 'Pendiente plazo 48h'
                 ]);
             }
@@ -772,11 +761,12 @@ class PreadmisionesPanel extends Component
                 $path = $doc['file']->store('documentos_institucionales', 'public');
                 \App\Models\DocumentoAdultoMayor::create([
                     'cod_am' => $cod_am,
-                    'tipo_doc' => substr(strtoupper($key), 0, 100),
+                    'tipo_documento' => substr(strtoupper($key), 0, 100),
                     'ruta_archivo' => $path,
-                    'nom_doc' => $doc['nombre_original'] ?? 'Documento Institucional',
-                    'extension' => 'pdf',
-                    'fecha_doc' => now()->toDateString(),
+                    'nombre' => $doc['nombre_original'] ?? 'Documento Institucional',
+                    'fecha_subida' => now()->toDateString(),
+                    'estado' => 'ACTIVO',
+                    'modulo_ref' => 'PREADMISION',
                     'observaciones' => 'Documento Institucional Firmado'
                 ]);
             }
@@ -792,7 +782,7 @@ class PreadmisionesPanel extends Component
         $preadmisionesActivas = AdultoMayor::whereHas('estado', fn($q) => $q->where('estado', 'PREADMISION'))->count();
         
         // Asumiendo que documentos pendientes significa que le falta al menos 1 doc requerido (simplificado)
-        $documentosPendientes = AdultoMayor::whereDoesntHave('documentos', fn($q) => $q->whereIn('tipo_doc', ['CI_ADULTO', 'CI_FAMILIAR', 'CROQUIS', 'CERTIFICADO_MEDICO']))->whereHas('estado', fn($q) => $q->whereNotIn('estado', ['ADMITIDO', 'NO_ADMITIDO', 'FALLECIDO', 'BAJA']))->count();
+        $documentosPendientes = AdultoMayor::whereDoesntHave('documentos', fn($q) => $q->whereIn('tipo_documento', ['CI_ADULTO', 'CI_ADULTO_MAYOR', 'CI_FAMILIAR', 'CROQUIS', 'CERTIFICADO_MEDICO']))->whereHas('estado', fn($q) => $q->whereNotIn('estado', ['ADMITIDO', 'NO_ADMITIDO', 'FALLECIDO', 'BAJA']))->count();
 
         $pendientesValInicial = AdultoMayor::whereHas('estado', fn($q) => $q->where('estado', 'PENDIENTE_VALORACION_INICIAL'))->count();
         $enValInicial = AdultoMayor::whereHas('estado', fn($q) => $q->where('estado', 'VALORACION_INICIAL'))->count();

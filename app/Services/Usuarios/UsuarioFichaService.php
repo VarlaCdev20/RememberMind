@@ -16,9 +16,6 @@ class UsuarioFichaService
     {
         $usuario->load([
             'roles',
-            'personalSalud.especialidad',
-            'personalAdmin.cargoAdmin',
-            'areaInstitucional',
         ]);
 
         return [
@@ -35,13 +32,20 @@ class UsuarioFichaService
     /**
      * Obtiene las asignaciones de horarios activas del usuario.
      */
-    public function obtenerHorariosActivos(User $usuario): ?AsignacionTurno
+    public function obtenerHorariosActivos(User $usuario)
     {
-        return AsignacionTurno::with(['turno', 'area'])
-            ->where('cod_usu', $usuario->cod_usu)
-            ->where('estado', 'ACTIVA')
-            ->orderByDesc('fecha_inicio')
-            ->first();
+        $rol = $usuario->roles->first()?->name;
+        if (in_array($rol, ['ENFERMEROS', 'MEDICO GENERAL/GERIATRA', 'PSICOLOGO/A', 'PEDAGOGO', 'NUTRICIONISTA', 'FISIOTERAPEUTA'])) {
+            return \App\Models\HorarioPersonalSalud::where('cod_usu', $usuario->cod_usu)
+                ->where('estado', 'ACTIVO')
+                ->first();
+        }
+        if (in_array($rol, ['SUPERADMINISTRADOR', 'ADMINISTRADOR'])) {
+            return \App\Models\HorarioPersonalAdmin::where('cod_usu', $usuario->cod_usu)
+                ->where('estado', 'ACTIVO')
+                ->first();
+        }
+        return null;
     }
 
     /**
@@ -49,10 +53,18 @@ class UsuarioFichaService
      */
     public function obtenerHistorialHorarios(User $usuario)
     {
-        return AsignacionTurno::with(['turno', 'area', 'creador'])
-            ->where('cod_usu', $usuario->cod_usu)
-            ->orderByDesc('created_at')
-            ->get();
+        $rol = $usuario->roles->first()?->name;
+        if (in_array($rol, ['ENFERMEROS', 'MEDICO GENERAL/GERIATRA', 'PSICOLOGO/A', 'PEDAGOGO', 'NUTRICIONISTA', 'FISIOTERAPEUTA'])) {
+            return \App\Models\HorarioPersonalSalud::where('cod_usu', $usuario->cod_usu)
+                ->orderBy('dia_semana')
+                ->get();
+        }
+        if (in_array($rol, ['SUPERADMINISTRADOR', 'ADMINISTRADOR'])) {
+            return \App\Models\HorarioPersonalAdmin::where('cod_usu', $usuario->cod_usu)
+                ->orderBy('dia_semana')
+                ->get();
+        }
+        return collect();
     }
 
     /**
@@ -73,14 +85,6 @@ class UsuarioFichaService
                           ->whereIn('subject_id', function ($db) use ($usuario) {
                               $db->select('cod_doc_usu')
                                  ->from('documentos_usuarios')
-                                 ->where('cod_usu', $usuario->cod_usu);
-                          });
-                  })
-                  ->orWhere(function ($sub) use ($usuario) {
-                      $sub->where('subject_type', \App\Models\AsignacionTurno::class)
-                          ->whereIn('subject_id', function ($db) use ($usuario) {
-                              $db->select('cod_asignacion')
-                                 ->from('asignaciones_turno')
                                  ->where('cod_usu', $usuario->cod_usu);
                           });
                   });

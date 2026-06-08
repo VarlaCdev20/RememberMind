@@ -168,8 +168,8 @@
  $famPrincipal = $adulto->familiares->first();
  }
  
- $ultAtencion = $adulto->atenciones->sortByDesc('fecha')->first();
- $ultEval = $adulto->evaluacionesCognitivas->sortByDesc('fecha_eval')->first();
+ $ultAtencion = collect($adulto->atenciones)->sortByDesc('fecha')->first();
+ $ultEval = collect($adulto->evaluacionesGeriatricas)->sortByDesc('fecha_eval')->first();
  @endphp
  @if(!$esArchivado)
  @php $hayTarjetasActivas = true; @endphp
@@ -423,7 +423,7 @@
  if(!$adulto->contacto_emergencia_nombre) $alertas[] ="Falta registrar contacto de emergencia";
  if($adulto->obs_total == 0) $alertas[] ="Sin observaciones diarias";
  
- $tieneEval = $adulto->evaluacionesCognitivas->count() > 0;
+ $tieneEval = collect($adulto->evaluacionesGeriatricas)->count() > 0;
  if(!$tieneEval) $alertas[] ="Falta realizar evaluación cognitiva inicial";
  @endphp
  @if(count($alertas) > 0 && strtoupper($adulto->estado_adulto) !== 'ARCHIVADO')

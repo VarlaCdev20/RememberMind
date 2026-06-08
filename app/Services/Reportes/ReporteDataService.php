@@ -4,6 +4,7 @@ namespace App\Services\Reportes;
 
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use App\Models\User;
 
 class ReporteDataService
 {
@@ -225,13 +226,15 @@ class ReporteDataService
     public function saludResumen(): array
     {
         $fichas      = Schema::hasTable('ficha_medica_adulto')
-            ? DB::table('ficha_medica_adulto')->whereNull('deleted_at')->count() : 0;
+            ? $this->sinEliminados(DB::table('ficha_medica_adulto'), 'ficha_medica_adulto')->count() : 0;
         $medicaciones = Schema::hasTable('medicacion_adulto')
-            ? DB::table('medicacion_adulto')->whereNull('deleted_at')->where('estado', 'activa')->count() : 0;
+            ? $this->sinEliminados(DB::table('medicacion_adulto'), 'medicacion_adulto')
+                ->when(Schema::hasColumn('medicacion_adulto', 'estado'), fn ($q) => $q->where('estado', 'activa'))
+                ->count() : 0;
         $valoraciones = Schema::hasTable('valoracion_funcional_adulto')
-            ? DB::table('valoracion_funcional_adulto')->where('estado', 'VIGENTE')->count() : 0;
+            ? DB::table('valoracion_funcional_adulto')->count() : 0;
         $atenciones   = Schema::hasTable('atenciones_adulto')
-            ? DB::table('atenciones_adulto')->whereNull('deleted_at')->count() : 0;
+            ? $this->sinEliminados(DB::table('atenciones_adulto'), 'atenciones_adulto')->count() : 0;
 
         return [
             'fichas'       => $fichas,
@@ -249,11 +252,11 @@ class ReporteDataService
 
         return DB::table('ficha_medica_adulto as fm')
             ->join('adulto_mayor as am', 'fm.cod_am', '=', 'am.cod_am')
-            ->whereNull('fm.deleted_at')
+            ->when(Schema::hasColumn('ficha_medica_adulto', 'deleted_at'), fn ($q) => $q->whereNull('fm.deleted_at'))
             ->select(
                 'am.cod_am',
                 DB::raw("CONCAT(am.nombres, ' ', am.ap_paterno) AS nombre"),
-                'fm.estado',
+                Schema::hasColumn('ficha_medica_adulto', 'estado') ? 'fm.estado' : DB::raw("'ACTIVO' AS estado"),
                 'fm.hipertension',
                 'fm.diabetes',
                 'fm.problemas_cardiacos',
@@ -272,14 +275,14 @@ class ReporteDataService
 
         return DB::table('medicacion_adulto as ma')
             ->join('adulto_mayor as am', 'ma.cod_am', '=', 'am.cod_am')
-            ->whereNull('ma.deleted_at')
+            ->when(Schema::hasColumn('medicacion_adulto', 'deleted_at'), fn ($q) => $q->whereNull('ma.deleted_at'))
             ->select(
                 'am.cod_am',
                 DB::raw("CONCAT(am.nombres, ' ', am.ap_paterno) AS nombre"),
                 'ma.nombre_medicamento',
                 'ma.dosis',
                 'ma.frecuencia',
-                'ma.estado',
+                Schema::hasColumn('medicacion_adulto', 'estado') ? 'ma.estado' : DB::raw("'ACTIVA' AS estado"),
                 'ma.fecha_inicio',
                 'ma.fecha_fin'
             )
@@ -296,13 +299,12 @@ class ReporteDataService
 
         return DB::table('valoracion_funcional_adulto as vf')
             ->join('adulto_mayor as am', 'vf.cod_am', '=', 'am.cod_am')
-            ->where('vf.estado', 'VIGENTE')
             ->select(
                 'am.cod_am',
                 DB::raw("CONCAT(am.nombres, ' ', am.ap_paterno) AS nombre"),
                 'vf.nivel_dependencia',
-                'vf.riesgo_caida',
-                'vf.indice_barthel',
+                Schema::hasColumn('valoracion_funcional_adulto', 'riesgo_caida') ? 'vf.riesgo_caida' : DB::raw('NULL AS riesgo_caida'),
+                Schema::hasColumn('valoracion_funcional_adulto', 'indice_barthel') ? 'vf.indice_barthel' : DB::raw('NULL AS indice_barthel'),
                 'vf.fecha_valoracion'
             )
             ->orderByDesc('vf.fecha_valoracion')
@@ -317,7 +319,7 @@ class ReporteDataService
         }
 
         $resultados = DB::table('atenciones_adulto')
-            ->whereNull('deleted_at')
+            ->when(Schema::hasColumn('atenciones_adulto', 'deleted_at'), fn ($q) => $q->whereNull('deleted_at'))
             ->whereYear('fecha', now()->year)
             ->select(
                 DB::raw("TO_CHAR(fecha, 'MM') as mes"),
@@ -342,7 +344,6 @@ class ReporteDataService
         }
 
         $resultados = DB::table('valoracion_funcional_adulto')
-            ->where('estado', 'VIGENTE')
             ->whereNotNull('nivel_dependencia')
             ->select('nivel_dependencia', DB::raw('COUNT(*) as total'))
             ->groupBy('nivel_dependencia')
@@ -370,8 +371,11 @@ class ReporteDataService
             return ['labels' => [], 'data' => [], 'colores' => []];
         }
 
+        if (!Schema::hasColumn('valoracion_funcional_adulto', 'riesgo_caida')) {
+            return ['labels' => [], 'data' => [], 'colores' => []];
+        }
+
         $resultados = DB::table('valoracion_funcional_adulto')
-            ->where('estado', 'VIGENTE')
             ->whereNotNull('riesgo_caida')
             ->select('riesgo_caida', DB::raw('COUNT(*) as total'))
             ->groupBy('riesgo_caida')
@@ -478,11 +482,21 @@ class ReporteDataService
 
     public function equipoResumen(): array
     {
-        $personalSalud = Schema::hasTable('personal_salud')
-            ? DB::table('personal_salud')->whereNull('deleted_at')->count() : 0;
-        $personalAdmin = Schema::hasTable('personal_admin')
-            ? DB::table('personal_admin')->count() : 0;
-        $voluntarios   = Schema::hasTable('voluntarios')
+        $personalSalud = User::role([
+            'ENFERMEROS',
+            'MEDICO GENERAL/GERIATRA',
+            'PSICOLOGO/A',
+            'PEDAGOGO',
+            'NUTRICIONISTA',
+            'FISIOTERAPEUTA'
+        ])->where('estado', 'ACTIVO')->count();
+
+        $personalAdmin = User::role([
+            'SUPERADMINISTRADOR',
+            'ADMINISTRADOR'
+        ])->where('estado', 'ACTIVO')->count();
+
+        $voluntarios = Schema::hasTable('voluntarios')
             ? DB::table('voluntarios')->where('estado', 'activo')->count() : 0;
 
         return [
@@ -495,46 +509,52 @@ class ReporteDataService
 
     public function personalSaludLista(int $limite = 50): \Illuminate\Support\Collection
     {
-        if (!Schema::hasTable('personal_salud')) {
-            return collect();
-        }
+        $users = User::role([
+            'ENFERMEROS',
+            'MEDICO GENERAL/GERIATRA',
+            'PSICOLOGO/A',
+            'PEDAGOGO',
+            'NUTRICIONISTA',
+            'FISIOTERAPEUTA'
+        ])
+        ->where('estado', 'ACTIVO')
+        ->orderBy('ap_paterno')
+        ->limit($limite)
+        ->get();
 
-        return DB::table('personal_salud as ps')
-            ->join('users as u', 'ps.cod_usu', '=', 'u.cod_usu')
-            ->leftJoin('especialidades as e', 'ps.cod_esp', '=', 'e.cod_esp')
-            ->whereNull('ps.deleted_at')
-            ->select(
-                'ps.cod_per_sal',
-                DB::raw("CONCAT(u.nombres, ' ', u.ap_paterno) AS nombre"),
-                'e.nombre_especialidad',
-                'ps.matricula_prof',
-                'ps.estado_laboral',
-                'ps.fecha_ing'
-            )
-            ->orderBy('u.ap_paterno')
-            ->limit($limite)
-            ->get();
+        return $users->map(function ($u) {
+            return (object) [
+                'cod_per_sal' => $u->cod_usu,
+                'nombre' => trim($u->nombres . ' ' . ($u->ap_paterno ?? '')),
+                'nombre_especialidad' => $u->roles->first()?->name ?? 'SALUD',
+                'matricula_prof' => $u->numero_documento ?? 'N/A',
+                'estado_laboral' => $u->estado,
+                'fecha_ing' => $u->created_at,
+            ];
+        });
     }
 
     public function personalAdminLista(int $limite = 50): \Illuminate\Support\Collection
     {
-        if (!Schema::hasTable('personal_admin')) {
-            return collect();
-        }
+        $users = User::role([
+            'SUPERADMINISTRADOR',
+            'ADMINISTRADOR'
+        ])
+        ->where('estado', 'ACTIVO')
+        ->orderBy('ap_paterno')
+        ->limit($limite)
+        ->get();
 
-        return DB::table('personal_admin as pa')
-            ->join('users as u', 'pa.cod_usu', '=', 'u.cod_usu')
-            ->select(
-                'pa.cod_per_adm',
-                DB::raw("CONCAT(u.nombres, ' ', u.ap_paterno) AS nombre"),
-                'pa.cargo',
-                'pa.area_admin',
-                'pa.estado_laboral',
-                'pa.fecha_ingreso'
-            )
-            ->orderBy('u.ap_paterno')
-            ->limit($limite)
-            ->get();
+        return $users->map(function ($u) {
+            return (object) [
+                'cod_per_adm' => $u->cod_usu,
+                'nombre' => trim($u->nombres . ' ' . ($u->ap_paterno ?? '')),
+                'cargo' => $u->roles->first()?->name ?? 'ADMINISTRATIVO',
+                'area_admin' => $u->areaInstitucional?->nombre ?? 'N/A',
+                'estado_laboral' => $u->estado,
+                'fecha_ingreso' => $u->created_at,
+            ];
+        });
     }
 
     public function voluntariosLista(int $limite = 50): \Illuminate\Support\Collection
@@ -543,32 +563,39 @@ class ReporteDataService
             return collect();
         }
 
-        return DB::table('voluntarios as v')
-            ->join('users as u', 'v.cod_usu', '=', 'u.cod_usu')
+        return DB::table('voluntarios')
             ->select(
-                'v.cod_vol',
-                DB::raw("CONCAT(u.nombres, ' ', u.ap_paterno) AS nombre"),
-                'v.area_apoyo',
-                'v.area_apoyo_preferente',
-                'v.estado',
-                'v.fecha_ing'
+                'cod_vol',
+                DB::raw("CONCAT(nombres, ' ', ap_paterno) AS nombre"),
+                DB::raw("NULL AS area_apoyo"),
+                DB::raw("NULL AS area_apoyo_preferente"),
+                'estado',
+                DB::raw("created_at AS fecha_ing")
             )
-            ->orderBy('u.ap_paterno')
+            ->orderBy('ap_paterno')
             ->limit($limite)
             ->get();
     }
 
     public function especialidadesDistribucion(): array
     {
-        if (!Schema::hasTable('personal_salud') || !Schema::hasTable('especialidades')) {
-            return ['labels' => [], 'data' => [], 'colores' => []];
-        }
+        $rolesSalud = [
+            'ENFERMEROS',
+            'MEDICO GENERAL/GERIATRA',
+            'PSICOLOGO/A',
+            'PEDAGOGO',
+            'NUTRICIONISTA',
+            'FISIOTERAPEUTA'
+        ];
 
-        $resultados = DB::table('personal_salud as ps')
-            ->leftJoin('especialidades as e', 'ps.cod_esp', '=', 'e.cod_esp')
-            ->whereNull('ps.deleted_at')
-            ->select('e.nombre_especialidad', DB::raw('COUNT(*) as total'))
-            ->groupBy('e.nombre_especialidad')
+        $resultados = DB::table('model_has_roles as mhr')
+            ->join('roles as r', 'mhr.role_id', '=', 'r.id')
+            ->join('users as u', 'mhr.model_id', '=', 'u.cod_usu')
+            ->where('mhr.model_type', '=', User::class)
+            ->whereIn('r.name', $rolesSalud)
+            ->where('u.estado', '=', 'ACTIVO')
+            ->select('r.name as nombre_especialidad', DB::raw('COUNT(*) as total'))
+            ->groupBy('r.name')
             ->orderByDesc('total')
             ->get();
 
@@ -581,26 +608,10 @@ class ReporteDataService
         ];
     }
 
+
     public function areasVoluntariosDistribucion(): array
     {
-        if (!Schema::hasTable('voluntarios')) {
-            return ['labels' => [], 'data' => [], 'colores' => []];
-        }
-
-        $resultados = DB::table('voluntarios')
-            ->whereNotNull('area_apoyo')
-            ->select('area_apoyo', DB::raw('COUNT(*) as total'))
-            ->groupBy('area_apoyo')
-            ->orderByDesc('total')
-            ->get();
-
-        $colores = ['#2A9D8F', '#2F3E5C', '#D4843A', '#E97A5F', '#7A68B0'];
-
-        return [
-            'labels'  => $resultados->pluck('area_apoyo')->toArray(),
-            'data'    => $resultados->pluck('total')->map(fn($v) => (int) $v)->toArray(),
-            'colores' => array_slice($colores, 0, $resultados->count()),
-        ];
+        return ['labels' => [], 'data' => [], 'colores' => []];
     }
 
     // ──────────────────────────────────────────────────────────
@@ -855,5 +866,10 @@ class ReporteDataService
             'data'    => $resultados->pluck('total')->map(fn($v) => (int) $v)->toArray(),
             'colores' => array_fill(0, $resultados->count(), '#2F3E5C'),
         ];
+    }
+
+    private function sinEliminados(\Illuminate\Database\Query\Builder $query, string $tabla): \Illuminate\Database\Query\Builder
+    {
+        return Schema::hasColumn($tabla, 'deleted_at') ? $query->whereNull('deleted_at') : $query;
     }
 }

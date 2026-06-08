@@ -205,4 +205,96 @@ class User extends Authenticatable
         return $this->hasMany(HistorialEstadoAdulto::class, 'cambiado_por', 'cod_usu');
     }
 
+    public function horariosSalud()
+    {
+        return $this->hasMany(HorarioPersonalSalud::class, 'cod_usu', 'cod_usu');
+    }
+
+    public function horariosAdmin()
+    {
+        return $this->hasMany(HorarioPersonalAdmin::class, 'cod_usu', 'cod_usu');
+    }
+
+    // ── VIRTUAL RELATIONS FOR ADAPTATION ──
+
+    public static array $areasEstaticas = [
+        'ARE_0001' => 'DIRECCIÓN GENERAL',
+        'ARE_0002' => 'COORDINACIÓN DE PROGRAMAS Y SERVICIOS',
+        'ARE_0003' => 'ÁREA ADMINISTRATIVA Y REGISTRO INSTITUCIONAL',
+        'ARE_0004' => 'ÁREA DE ATENCIÓN MÉDICA',
+        'ARE_0005' => 'ÁREA DE PSICOLOGÍA Y SEGUIMIENTO COGNITIVO',
+    ];
+
+    public function getPersonalSaludAttribute()
+    {
+        $rol = $this->roles->first()?->name;
+        if (in_array($rol, ['ENFERMEROS', 'MEDICO GENERAL/GERIATRA', 'PSICOLOGO/A', 'PEDAGOGO', 'NUTRICIONISTA', 'FISIOTERAPEUTA'])) {
+            return (object) [
+                'especialidad' => (object) [
+                    'nombre' => $rol,
+                    'cod_esp' => $rol,
+                ],
+                'cod_esp' => $rol,
+                'fecha_ing' => $this->created_at,
+                'institucion_formacion' => $this->observaciones,
+            ];
+        }
+        return null;
+    }
+
+    public function getPersonalAdminAttribute()
+    {
+        $rol = $this->roles->first()?->name;
+        if (in_array($rol, ['SUPERADMINISTRADOR', 'ADMINISTRADOR'])) {
+            return (object) [
+                'cargoAdmin' => (object) [
+                    'nombre' => $rol,
+                    'cod_cargo_admin' => $rol,
+                ],
+                'cargo' => $rol,
+                'cod_cargo_admin' => $rol,
+                'fecha_ingreso' => $this->created_at,
+            ];
+        }
+        return null;
+    }
+
+    public function getAreaInstitucionalAttribute()
+    {
+        if ($this->cod_area && isset(self::$areasEstaticas[$this->cod_area])) {
+            return (object) [
+                'nombre' => self::$areasEstaticas[$this->cod_area],
+                'cod_area' => $this->cod_area,
+            ];
+        }
+        return null;
+    }
+
+    public function getAsignacionesTurnoAttribute()
+    {
+        $salud = $this->horariosSalud;
+        $admin = $this->horariosAdmin;
+
+        $mapped = collect();
+
+        foreach ($salud as $h) {
+            $mapped->push((object) [
+                'estado' => $h->estado === 'ACTIVO' ? 'ACTIVA' : 'INACTIVA',
+                'turno' => (object) [
+                    'nombre' => $h->turno,
+                ],
+            ]);
+        }
+
+        foreach ($admin as $h) {
+            $mapped->push((object) [
+                'estado' => $h->estado === 'ACTIVO' ? 'ACTIVA' : 'INACTIVA',
+                'turno' => (object) [
+                    'nombre' => $h->turno,
+                ],
+            ]);
+        }
+
+        return $mapped;
+    }
 }

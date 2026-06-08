@@ -25,7 +25,7 @@ class UsuariosPorAreaExport implements FromCollection, WithHeadings, WithMapping
      */
     public function collection()
     {
-        return User::with(['personalSalud.especialidad', 'personalAdmin.cargoAdmin', 'roles'])
+        return User::with(['roles'])
             ->where('cod_area', $this->codArea)
             ->orderBy('nombres')
             ->get();

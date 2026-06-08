@@ -4,10 +4,6 @@ namespace App\Livewire\Admin\PersonalInstitucional\Partials;
 
 use Livewire\Component;
 use App\Models\User;
-use App\Models\PersonalSalud;
-use App\Models\PersonalAdmin;
-use App\Models\Especialidad;
-use App\Models\CargoAdministrativo;
 use App\Models\AreaInstitucional;
 use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\DB;
@@ -114,8 +110,8 @@ class PersonalInstitucionalForm extends Component
         $this->zonas_list = [];
         $this->calles_list = [];
 
-        $this->especialidades_list = Especialidad::orderBy('nombre')->get();
-        $this->cargos_list = CargoAdministrativo::where('estado', 'ACTIVO')->orderBy('nombre')->get();
+        $this->especialidades_list = $this->catalogoEspecialidadesPorRol();
+        $this->cargos_list = $this->catalogoCargosAdministrativosPorRol();
 
         if (!$this->usuarioId) {
             $this->contrasena_temporal = Str::password(12, true, true, true, false);
@@ -130,7 +126,7 @@ class PersonalInstitucionalForm extends Component
 
     public function cargarDatos()
     {
-        $usuario = User::with(['areaInstitucional', 'personalSalud', 'personalAdmin', 'roles'])->find($this->usuarioId);
+        $usuario = User::with(['roles'])->find($this->usuarioId);
         if (!$usuario) return;
 
         $this->nombres = $usuario->nombres;
@@ -1062,8 +1058,8 @@ class PersonalInstitucionalForm extends Component
             $this->validate();
             
             if ($this->tipo_personal === 'salud' && $this->rol_operativo === 'MEDICO_GENERAL' && $this->estado === 'ACTIVO') {
-                $exists = PersonalSalud::where('tipo_personal_salud', 'MEDICO_GENERAL')
-                    ->where('estado_laboral', 'ACTIVO')
+                $exists = User::role('MEDICO GENERAL/GERIATRA')
+                    ->where('estado', 'ACTIVO')
                     ->where('cod_usu', '!=', $this->usuarioId)
                     ->exists();
                 if ($exists) {
@@ -1179,38 +1175,7 @@ class PersonalInstitucionalForm extends Component
                 $usuario->syncRoles([]);
             }
 
-            // Manage Personal Classification
-            if ($this->tipo_personal === 'salud') {
-                $ps = PersonalSalud::firstOrNew(['cod_usu' => $usuario->cod_usu]);
-                $ps->cod_esp = $this->cod_esp ?: null;
-                $ps->fecha_ing = now()->format('Y-m-d');
-                $ps->anios_exp = $this->anios_exp ?: 0;
-                $ps->matricula_prof = $this->matricula_prof ?: null;
-                $ps->estado_laboral = 'ACTIVO';
-                $ps->observaciones = $this->observaciones ?: null;
-                $ps->institucion_formacion = $this->institucion_formacion ?: null;
-                $ps->tipo_personal_salud = $this->rol_operativo ?: null;
-                $ps->subtipo_enfermeria = $this->subtipo_enfermeria ?: null;
-                $ps->save();
-
-                // Eliminar posible registro admin si cambió
-                PersonalAdmin::where('cod_usu', $usuario->cod_usu)->delete();
-            } elseif ($this->tipo_personal === 'admin') {
-                $pa = PersonalAdmin::firstOrNew(['cod_usu' => $usuario->cod_usu]);
-                $pa->cod_cargo_admin = $this->cod_cargo_admin ?: null;
-                $pa->cargo = $clasificacion['rol_operativo'];
-                $pa->fecha_ingreso = now()->format('Y-m-d');
-                $pa->area_admin = $clasificacion['area_nombre'];
-                $pa->estado_laboral = 'ACTIVO';
-                $pa->observaciones = ($this->observaciones ? $this->observaciones . " | " : "") . "Nivel de responsabilidad: " . $this->nivel_responsabilidad;
-                $pa->save();
-
-                // Eliminar posible registro salud si cambió
-                PersonalSalud::where('cod_usu', $usuario->cod_usu)->delete();
-            } else {
-                PersonalSalud::where('cod_usu', $usuario->cod_usu)->delete();
-                PersonalAdmin::where('cod_usu', $usuario->cod_usu)->delete();
-            }
+            $this->guardarDatosLaboralesEnUsuario($usuario, $clasificacion);
 
             // Guardar documentos utilizando el modelo DocumentoUsuario para asegurar esquema correcto y generación de ID
             $documentosFaltantes = [];
@@ -1423,10 +1388,47 @@ class PersonalInstitucionalForm extends Component
 
         return view('livewire.admin.personal-institucional.partials.personal-institucional-form', [
             'roles' => $rolesQuery->get(),
-            'especialidades' => Especialidad::all(),
-            'cargos' => CargoAdministrativo::where('estado', 'ACTIVO')->get(),
+            'especialidades' => $this->catalogoEspecialidadesPorRol(),
+            'cargos' => $this->catalogoCargosAdministrativosPorRol(),
             'areas' => AreaInstitucional::where('estado', 'ACTIVO')->get(),
             'clasificacion_derivada' => $this->clasificacionDesdeRoles(),
+        ]);
+    }
+
+    private function guardarDatosLaboralesEnUsuario(User $usuario, ?array $clasificacion): void
+    {
+        $datos = array_filter([
+            $this->observaciones ? trim($this->observaciones) : null,
+            $clasificacion ? 'Clasificación: ' . $clasificacion['tipo_label'] . ' / ' . $clasificacion['rol_label'] : null,
+            $this->institucion_formacion ? 'Formación: ' . $this->institucion_formacion : null,
+            $this->matricula_prof ? 'Matrícula: ' . $this->matricula_prof : null,
+            $this->anios_exp ? 'Años experiencia: ' . $this->anios_exp : null,
+            $this->subtipo_enfermeria ? 'Subtipo enfermería: ' . $this->subtipo_enfermeria : null,
+            $this->nivel_responsabilidad ? 'Nivel responsabilidad: ' . $this->nivel_responsabilidad : null,
+        ]);
+
+        $usuario->forceFill([
+            'observaciones' => $datos ? mb_strtoupper(implode(' | ', $datos), 'UTF-8') : $usuario->observaciones,
+        ])->save();
+    }
+
+    private function catalogoEspecialidadesPorRol(): \Illuminate\Support\Collection
+    {
+        return collect([
+            (object) ['cod_esp' => 'ENFERMEROS', 'nombre' => 'ENFERMEROS'],
+            (object) ['cod_esp' => 'MEDICO GENERAL/GERIATRA', 'nombre' => 'MEDICO GENERAL/GERIATRA'],
+            (object) ['cod_esp' => 'PSICOLOGO/A', 'nombre' => 'PSICOLOGO/A'],
+            (object) ['cod_esp' => 'PEDAGOGO', 'nombre' => 'PEDAGOGO'],
+            (object) ['cod_esp' => 'NUTRICIONISTA', 'nombre' => 'NUTRICIONISTA'],
+            (object) ['cod_esp' => 'FISIOTERAPEUTA', 'nombre' => 'FISIOTERAPEUTA'],
+        ]);
+    }
+
+    private function catalogoCargosAdministrativosPorRol(): \Illuminate\Support\Collection
+    {
+        return collect([
+            (object) ['cod_cargo_admin' => 'SUPERADMINISTRADOR', 'nombre' => 'SUPERADMINISTRADOR'],
+            (object) ['cod_cargo_admin' => 'ADMINISTRADOR', 'nombre' => 'ADMINISTRADOR'],
         ]);
     }
 

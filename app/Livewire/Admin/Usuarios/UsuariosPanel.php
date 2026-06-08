@@ -662,9 +662,8 @@ class UsuariosPanel extends Component
     {
         if (!in_array($this->rol, ['ENFERMEROS', 'MEDICO GENERAL/GERIATRA', 'PSICOLOGO/A', 'PEDAGOGO', 'NUTRICIONISTA', 'FISIOTERAPEUTA'])) return;
         
-        $esp = \App\Models\Especialidad::find($val);
-        if ($esp) {
-            $nombre = strtoupper($esp->nombre);
+        $nombre = strtoupper((string) $val);
+        if ($nombre !== '') {
             if (in_array($nombre, ['ENFERMERÍA', 'GERIATRÍA', 'NUTRICIÓN', 'FISIOTERAPIA'])) {
                 $this->cod_area = 'ARE_0004'; // Área de Atención Médica
             } elseif (in_array($nombre, ['PSICOLOGÍA', 'PEDAGOGÍA'])) {
@@ -675,11 +674,10 @@ class UsuariosPanel extends Component
 
     public function updatedCargoAdministrativo($val)
     {
-        if ($this->rol !== 'personal_admin') return;
+        if (! in_array($this->rol, ['SUPERADMINISTRADOR', 'ADMINISTRADOR', 'personal_admin'], true)) return;
         
-        $cargo = \App\Models\CargoAdministrativo::find($val);
-        if ($cargo) {
-            $nombre = strtoupper($cargo->nombre);
+        $nombre = strtoupper((string) $val);
+        if ($nombre !== '') {
             if (str_contains($nombre, 'COORDINACIÓN DE PROGRAMAS') || str_contains($nombre, 'PROGRAMAS')) {
                 $this->cod_area = 'ARE_0002'; // Coordinación de Programas y Servicios
             } elseif (str_contains($nombre, 'DIRECCIÓN')) {
@@ -760,7 +758,7 @@ class UsuariosPanel extends Component
             'parentesco_emergencia' => ['required', 'string', 'max:100'],
             'celular_emergencia' => ['required', 'string', 'max:20', 'different:telefono', 'regex:/^\d+$/'],
             'rol' => ['required', 'exists:roles,name'],
-            'cod_area' => ['nullable', 'exists:areas_institucionales,cod_area'],
+            'cod_area' => ['nullable', 'string', 'in:ARE_0001,ARE_0002,ARE_0003,ARE_0004,ARE_0005'],
         ];
 
         $rules = array_merge($rules, $this->reglasDireccion());
@@ -775,13 +773,13 @@ class UsuariosPanel extends Component
         }
 
         if (in_array($this->rol, ['ENFERMEROS', 'MEDICO GENERAL/GERIATRA', 'PSICOLOGO/A', 'PEDAGOGO', 'NUTRICIONISTA', 'FISIOTERAPEUTA'])) {
-            $rules['especialidad_salud'] = ['required', 'exists:especialidades,cod_esp'];
+            $rules['especialidad_salud'] = ['nullable', 'string'];
             $rules['institucion_formacion'] = ['nullable', 'string', 'max:255'];
             $rules['fecha_ingreso'] = ['required', 'date'];
         }
 
         if (in_array($this->rol, ['SUPERADMINISTRADOR', 'ADMINISTRADOR'])) {
-            $rules['cargo_administrativo'] = ['required', 'exists:cargos_administrativos,cod_cargo_admin'];
+            $rules['cargo_administrativo'] = ['nullable', 'string'];
             $rules['fecha_ingreso'] = ['required', 'date'];
         }
 
@@ -1174,7 +1172,7 @@ class UsuariosPanel extends Component
             return;
         }
 
-        $usuario = User::with(['personalSalud', 'personalAdmin'])->findOrFail($cod_usu);
+        $usuario = User::with(['roles'])->findOrFail($cod_usu);
 
         if ($usuario->estado !== 'ACTIVO') {
             $this->dispatch('swal', [
@@ -1494,13 +1492,13 @@ class UsuariosPanel extends Component
             }
 
             if (in_array($this->rol, ['ENFERMEROS', 'MEDICO GENERAL/GERIATRA', 'PSICOLOGO/A', 'PEDAGOGO', 'NUTRICIONISTA', 'FISIOTERAPEUTA'])) {
-                $rules['especialidad_salud'] = ['required', 'exists:especialidades,cod_esp'];
+                $rules['especialidad_salud'] = ['required', 'string'];
                 $rules['institucion_formacion'] = ['nullable', 'string', 'max:255'];
                 $rules['fecha_ingreso'] = ['required', 'date'];
             }
 
             if (in_array($this->rol, ['SUPERADMINISTRADOR', 'ADMINISTRADOR'])) {
-                $rules['cargo_administrativo'] = ['required', 'exists:cargos_administrativos,cod_cargo_admin'];
+                $rules['cargo_administrativo'] = ['required', 'string'];
                 $rules['fecha_ingreso'] = ['required', 'date'];
             }
 
@@ -1798,31 +1796,7 @@ class UsuariosPanel extends Component
 
     private function guardarSubModelos(User $usuario)
     {
-        if (in_array($this->rol, ['ENFERMEROS', 'MEDICO GENERAL/GERIATRA', 'PSICOLOGO/A', 'PEDAGOGO', 'NUTRICIONISTA', 'FISIOTERAPEUTA'])) {
-            \App\Models\PersonalSalud::updateOrCreate(
-                ['cod_usu' => $usuario->cod_usu],
-                [
-                    'fecha_ing' => $this->fecha_ingreso ?: now()->format('Y-m-d'), 
-                    'cod_esp' => $this->especialidad_salud,
-                    'matricula_prof' => null,
-                    'institucion_formacion' => $this->institucion_formacion,
-                    'estado_laboral' => 'ACTIVO'
-                ]
-            );
-            // TODO: definir flujo administrativo para archivar perfiles previos al cambiar de rol.
-        } elseif (in_array($this->rol, ['SUPERADMINISTRADOR', 'ADMINISTRADOR'])) {
-            \App\Models\PersonalAdmin::updateOrCreate(
-                ['cod_usu' => $usuario->cod_usu],
-                [
-                    'fecha_ingreso' => $this->fecha_ingreso ?: now()->format('Y-m-d'), 
-                    'cod_cargo_admin' => $this->cargo_administrativo,
-                    'cargo' => \App\Models\CargoAdministrativo::find($this->cargo_administrativo)?->nombre ?? 'Administrativo',
-                    'area_admin' => $this->cod_area ? (\App\Models\AreaInstitucional::find($this->cod_area)?->nombre ?? 'Administración') : 'Administración',
-                    'estado_laboral' => 'ACTIVO'
-                ]
-            );
-            // TODO: definir flujo administrativo para archivar perfiles previos al cambiar de rol.
-        } elseif ($this->rol === 'VOLUNTARIO') {
+        if ($this->rol === 'VOLUNTARIO') {
             \App\Models\Voluntario::updateOrCreate(
                 ['cod_usu' => $usuario->cod_usu],
                 [
@@ -1993,9 +1967,6 @@ class UsuariosPanel extends Component
     {
         $this->usuarioDetalle = User::with([
             'roles',
-            'personalSalud.especialidad',
-            'personalAdmin.cargoAdmin',
-            'areaInstitucional',
             'documentos',
             'familiares.adultosMayores',
             'voluntarios'
@@ -2520,9 +2491,6 @@ class UsuariosPanel extends Component
             // Refrescar el usuario para reflejar el estado cargado
             $this->usuarioDetalle = User::with([
                 'roles',
-                'personalSalud.especialidad',
-                'personalAdmin.cargoAdmin',
-                'areaInstitucional',
                 'documentos',
                 'familiares.adultosMayores',
                 'voluntarios'
@@ -2552,9 +2520,6 @@ class UsuariosPanel extends Component
     {
         $query = User::query()->with([
             'roles',
-            'personalSalud.especialidad',
-            'personalAdmin.cargoAdmin',
-            'areaInstitucional',
         ]);
 
         if (!empty($this->search)) {
@@ -2593,9 +2558,6 @@ class UsuariosPanel extends Component
         if ($this->mostrarFichaRapida && $this->usuarioFichaId) {
             $usuarioFichaModel = User::with([
                 'roles',
-                'personalSalud.especialidad',
-                'personalAdmin.cargoAdmin',
-                'areaInstitucional',
                 'documentos',
                 'familiares.adultosMayores',
                 'voluntarios'
@@ -2605,9 +2567,12 @@ class UsuariosPanel extends Component
         return view('livewire.admin.usuarios.usuarios-panel', [
             'usuarios' => $query->paginate(12),
             'roles' => Role::all(),
-            'especialidades' => \App\Models\Especialidad::all(),
-            'cargosAdmin' => \App\Models\CargoAdministrativo::all(),
-            'areas' => \App\Models\AreaInstitucional::activas()->orderBy('orden')->get(),
+            'especialidades' => collect(),
+            'cargosAdmin' => collect(),
+            'areas' => collect(User::$areasEstaticas)->map(fn ($nombre, $codigo) => (object) [
+                'cod_area' => $codigo,
+                'nombre' => $nombre,
+            ]),
             'usuarioFicha' => $usuarioFichaModel,
         ]);
     }

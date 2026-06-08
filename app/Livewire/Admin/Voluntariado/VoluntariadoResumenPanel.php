@@ -222,7 +222,7 @@ class VoluntariadoResumenPanel extends Component
                 'asignacion_voluntarios.obser',
                 'asignacion_voluntarios.cod_vol',
                 'asignacion_voluntarios.cod_am',
-                'voluntarios.area_apoyo',
+                Schema::hasColumn('voluntarios', 'area_apoyo') ? 'voluntarios.area_apoyo' : DB::raw('NULL AS area_apoyo'),
                 'users.nombres as voluntario_nombres',
                 'users.ap_paterno as voluntario_ap_paterno',
                 'users.ap_materno as voluntario_ap_materno',

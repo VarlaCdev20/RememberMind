@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Validation\Rule;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -352,7 +353,7 @@ class AsistenciaPanel extends Component
                 'asi.actividad_realizada',
                 'asi.observaciones',
                 'asi.cod_vol',
-                'v.area_apoyo',
+                Schema::hasColumn('voluntarios', 'area_apoyo') ? 'v.area_apoyo' : DB::raw('NULL AS area_apoyo'),
                 'u.nombres',
                 'u.ap_paterno',
                 'u.ap_materno',

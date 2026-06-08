@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Validation\Rule;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -323,8 +324,8 @@ class AsignacionesPanel extends Component
                 'a.cod_am',
                 'a.cod_vol',
                 'v.estado as voluntario_estado',
-                'v.archivado_en as voluntario_archivado_en',
-                'v.area_apoyo',
+                Schema::hasColumn('voluntarios', 'archivado_en') ? 'v.archivado_en as voluntario_archivado_en' : DB::raw('NULL AS voluntario_archivado_en'),
+                Schema::hasColumn('voluntarios', 'area_apoyo') ? 'v.area_apoyo' : DB::raw('NULL AS area_apoyo'),
                 'u.nombres as voluntario_nombres',
                 'u.ap_paterno as voluntario_ap_paterno',
                 'u.ap_materno as voluntario_ap_materno',

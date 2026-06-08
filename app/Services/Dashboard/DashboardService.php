@@ -105,13 +105,19 @@ class DashboardService
                 ->count('cod_am')
             : 0;
 
-        $personalSalud = Schema::hasTable('personal_salud')
-            ? DB::table('personal_salud')->whereNull('deleted_at')->count()
-            : 0;
+        $personalSalud = \App\Models\User::role([
+            'ENFERMEROS',
+            'MEDICO GENERAL/GERIATRA',
+            'PSICOLOGO/A',
+            'PEDAGOGO',
+            'NUTRICIONISTA',
+            'FISIOTERAPEUTA'
+        ])->where('estado', 'ACTIVO')->count();
 
-        $personalAdmin = Schema::hasTable('personal_admin')
-            ? DB::table('personal_admin')->count()
-            : 0;
+        $personalAdmin = \App\Models\User::role([
+            'SUPERADMINISTRADOR',
+            'ADMINISTRADOR'
+        ])->where('estado', 'ACTIVO')->count();
 
         $voluntariosActivos = Schema::hasTable('voluntarios')
             ? DB::table('voluntarios')->where('estado', 'ACTIVO')->count()
@@ -266,13 +272,13 @@ class DashboardService
                 ->count();
         }
 
-        // Evaluaciones cognitivas en los últimos 30 días
+        // Evaluaciones geriátricas en los últimos 30 días
         $evalCognitivas30d = 0;
         if (
-            Schema::hasTable('evaluaciones_cognitivas') &&
-            Schema::hasColumn('evaluaciones_cognitivas', 'fecha_eval')
+            Schema::hasTable('evaluaciones_geriatricas') &&
+            Schema::hasColumn('evaluaciones_geriatricas', 'fecha_eval')
         ) {
-            $evalCognitivas30d = DB::table('evaluaciones_cognitivas')
+            $evalCognitivas30d = DB::table('evaluaciones_geriatricas')
                 ->where('fecha_eval', '>=', now()->subDays(30)->toDateString())
                 ->count();
         }
@@ -447,90 +453,62 @@ class DashboardService
     public function obtenerEquipoInstitucional(): array
     {
         // ── PERSONAL DE SALUD ─────────────────────────────────────────
-        $psTotales      = 0;
-        $psActivos      = 0;
-        $psSinEsp       = 0;
-        $especialidades = [];
-        $especialidadesTotal = 0;
+        $rolesSalud = [
+            'ENFERMEROS',
+            'MEDICO GENERAL/GERIATRA',
+            'PSICOLOGO/A',
+            'PEDAGOGO',
+            'NUTRICIONISTA',
+            'FISIOTERAPEUTA'
+        ];
 
-        if (Schema::hasTable('personal_salud')) {
-            $psTotales = DB::table('personal_salud')->whereNull('deleted_at')->count();
-            $psActivos = DB::table('personal_salud')
-                ->where('estado_laboral', 'ACTIVO')
-                ->whereNull('deleted_at')
-                ->count();
-            $psSinEsp = DB::table('personal_salud')
-                ->whereNull('cod_esp')
-                ->whereNull('deleted_at')
-                ->count();
+        $psTotales = \App\Models\User::role($rolesSalud)->count();
+        $psActivos = \App\Models\User::role($rolesSalud)->where('estado', 'ACTIVO')->count();
+        $psSinEsp = 0;
+        $especialidadesTotal = count($rolesSalud);
 
-            if (Schema::hasTable('especialidades')) {
-                $especialidadesTotal = DB::table('especialidades')->count();
-
-                $especialidades = DB::table('especialidades')
-                    ->leftJoin('personal_salud', function ($join) {
-                        $join->on('especialidades.cod_esp', '=', 'personal_salud.cod_esp')
-                             ->whereNull('personal_salud.deleted_at');
-                    })
-                    ->selectRaw('especialidades.nombre, COUNT(personal_salud.cod_per_sal) as total')
-                    ->groupBy('especialidades.cod_esp', 'especialidades.nombre')
-                    ->orderByDesc('total')
-                    ->get()
-                    ->map(fn($e) => [
-                        'nombre' => $e->nombre,
-                        'total'  => (int) $e->total,
-                    ])
-                    ->toArray();
-            }
-        }
+        $especialidades = DB::table('model_has_roles as mhr')
+            ->join('roles as r', 'mhr.role_id', '=', 'r.id')
+            ->join('users as u', 'mhr.model_id', '=', 'u.cod_usu')
+            ->where('mhr.model_type', '=', \App\Models\User::class)
+            ->whereIn('r.name', $rolesSalud)
+            ->where('u.estado', '=', 'ACTIVO')
+            ->select('r.name as nombre', DB::raw('COUNT(*) as total'))
+            ->groupBy('r.name')
+            ->orderByDesc('total')
+            ->get()
+            ->map(fn($e) => [
+                'nombre' => $e->nombre,
+                'total'  => (int) $e->total,
+            ])
+            ->toArray();
 
         // ── PERSONAL ADMINISTRATIVO ───────────────────────────────────
-        // personal_admin NO tiene soft deletes
-        $paTotales = 0;
-        $paActivos = 0;
-        $cargos    = [];
+        $rolesAdmin = [
+            'SUPERADMINISTRADOR',
+            'ADMINISTRADOR'
+        ];
 
-        if (Schema::hasTable('personal_admin')) {
-            $paTotales = DB::table('personal_admin')->count();
-            $paActivos = DB::table('personal_admin')
-                ->where('estado_laboral', 'ACTIVO')
-                ->count();
+        $paTotales = \App\Models\User::role($rolesAdmin)->count();
+        $paActivos = \App\Models\User::role($rolesAdmin)->where('estado', 'ACTIVO')->count();
 
-            // Usar cargos_administrativos si la columna FK ya fue migrada
-            $usarCargosTabla = Schema::hasTable('cargos_administrativos') &&
-                               Schema::hasColumn('personal_admin', 'cod_cargo_admin');
-
-            if ($usarCargosTabla) {
-                $cargos = DB::table('personal_admin')
-                    ->leftJoin('cargos_administrativos',
-                        'personal_admin.cod_cargo_admin', '=', 'cargos_administrativos.cod_cargo_admin')
-                    ->selectRaw('COALESCE(cargos_administrativos.nombre, personal_admin.cargo) AS cargo_nombre, COUNT(*) AS total')
-                    ->groupBy('cargo_nombre')
-                    ->orderByDesc('total')
-                    ->limit(5)
-                    ->get()
-                    ->map(fn($c) => [
-                        'nombre' => $c->cargo_nombre ?? 'Sin cargo',
-                        'total'  => (int) $c->total,
-                    ])
-                    ->toArray();
-            } else {
-                $cargos = DB::table('personal_admin')
-                    ->selectRaw('cargo AS cargo_nombre, COUNT(*) AS total')
-                    ->groupBy('cargo')
-                    ->orderByDesc('total')
-                    ->limit(5)
-                    ->get()
-                    ->map(fn($c) => [
-                        'nombre' => $c->cargo_nombre ?? 'Sin cargo',
-                        'total'  => (int) $c->total,
-                    ])
-                    ->toArray();
-            }
-        }
+        $cargos = DB::table('model_has_roles as mhr')
+            ->join('roles as r', 'mhr.role_id', '=', 'r.id')
+            ->join('users as u', 'mhr.model_id', '=', 'u.cod_usu')
+            ->where('mhr.model_type', '=', \App\Models\User::class)
+            ->whereIn('r.name', $rolesAdmin)
+            ->where('u.estado', '=', 'ACTIVO')
+            ->select('r.name as cargo_nombre', DB::raw('COUNT(*) as total'))
+            ->groupBy('r.name')
+            ->orderByDesc('total')
+            ->get()
+            ->map(fn($c) => [
+                'nombre' => $c->cargo_nombre,
+                'total'  => (int) $c->total,
+            ])
+            ->toArray();
 
         // ── VOLUNTARIOS ───────────────────────────────────────────────
-        // voluntarios NO tiene soft deletes
         $volTotal    = 0;
         $volActivos  = 0;
         $volAsignados = 0;
@@ -539,18 +517,7 @@ class DashboardService
         if (Schema::hasTable('voluntarios')) {
             $volTotal   = DB::table('voluntarios')->count();
             $volActivos = DB::table('voluntarios')->where('estado', 'ACTIVO')->count();
-
-            $volAreas = DB::table('voluntarios')
-                ->selectRaw('area_apoyo, COUNT(*) AS total')
-                ->groupBy('area_apoyo')
-                ->orderByDesc('total')
-                ->limit(4)
-                ->get()
-                ->map(fn($v) => [
-                    'area'  => $v->area_apoyo ?? 'Sin área',
-                    'total' => (int) $v->total,
-                ])
-                ->toArray();
+            $volAreas   = []; // area_apoyo removed in clean DB
 
             if (Schema::hasTable('asignacion_voluntarios')) {
                 $volAsignados = DB::table('asignacion_voluntarios')
@@ -614,9 +581,21 @@ class DashboardService
 
     public function obtenerDistribucionEquipoInstitucional(): array
     {
-        $salud  = Schema::hasTable('personal_salud') ? DB::table('personal_salud')->whereNull('deleted_at')->count() : 0;
-        $admin  = Schema::hasTable('personal_admin')  ? DB::table('personal_admin')->count() : 0;
-        $volunt = Schema::hasTable('voluntarios')     ? DB::table('voluntarios')->count() : 0;
+        $salud = \App\Models\User::role([
+            'ENFERMEROS',
+            'MEDICO GENERAL/GERIATRA',
+            'PSICOLOGO/A',
+            'PEDAGOGO',
+            'NUTRICIONISTA',
+            'FISIOTERAPEUTA'
+        ])->where('estado', 'ACTIVO')->count();
+
+        $admin = \App\Models\User::role([
+            'SUPERADMINISTRADOR',
+            'ADMINISTRADOR'
+        ])->where('estado', 'ACTIVO')->count();
+
+        $volunt = Schema::hasTable('voluntarios') ? DB::table('voluntarios')->count() : 0;
 
         return [
             'labels' => ['Personal de Salud', 'Personal Administrativo', 'Voluntarios'],

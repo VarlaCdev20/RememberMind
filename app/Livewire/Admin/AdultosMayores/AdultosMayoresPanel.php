@@ -62,7 +62,7 @@ class AdultosMayoresPanel extends Component
             'activos' => AdultoMayor::whereHas('estado', fn($q) => $q->whereRaw('UPPER(estado) = ?', ['ACTIVO']))->count(),
             'archivados' => AdultoMayor::whereHas('estado', fn($q) => $q->whereRaw('UPPER(estado) IN (?, ?)', ['ARCHIVADO', 'INACTIVO']))->count(),
             'seguimiento' => AdultoMayor::whereHas('estado', fn($q) => $q->whereRaw('UPPER(estado) LIKE ?', ['%SEGUIMIENTO%']))->count(),
-            'sin_evaluacion' => AdultoMayor::doesntHave('evaluacionesCognitivas')->count(),
+            'sin_evaluacion' => AdultoMayor::doesntHave('evaluacionesGeriatricas')->count(),
             'docs_pendientes' => AdultoMayor::doesntHave('documentos')->count(),
         ];
 

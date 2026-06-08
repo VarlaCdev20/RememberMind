@@ -14,7 +14,7 @@ class AdultoMayorDocumentoController extends Controller
     public function index(AdultoMayor $adulto_mayor)
     {
         $adulto_mayor->load(['documentos' => function($q) {
-            $q->withTrashed()->latest();
+            $q->latest();
         }]);
         return view('admin.adultos-mayores.documentos.index', compact('adulto_mayor'));
     }
@@ -27,7 +27,7 @@ class AdultoMayorDocumentoController extends Controller
             $file = $request->file('archivo');
             $path = $file->store('documentos/adultos-mayores', 'public');
             $data['ruta_archivo'] = $path;
-            $data['extension'] = $file->getClientOriginalExtension();
+            $data['estado'] = 'ACTIVO';
         }
 
         $adulto_mayor->documentos()->create($data);
@@ -44,12 +44,12 @@ class AdultoMayorDocumentoController extends Controller
         $doc = $adulto_mayor->documentos()->findOrFail($documento);
         
         $request->validate([
-            'nom_doc' => 'required|string|max:255',
-            'tipo_doc' => 'required|string',
+            'nombre' => 'required|string|max:255',
+            'tipo_documento' => 'required|string',
             'observaciones' => 'nullable|string',
         ]);
 
-        $doc->update($request->only(['nom_doc', 'tipo_doc', 'observaciones']));
+        $doc->update($request->only(['nombre', 'tipo_documento', 'observaciones']));
 
         return redirect()->route('admin.adultos-mayores.documentos.index', $adulto_mayor->cod_am)->with('success', 'Metadatos del documento actualizados.');
     }
@@ -58,7 +58,6 @@ class AdultoMayorDocumentoController extends Controller
     {
         $doc = $adulto_mayor->documentos()->findOrFail($documento);
         
-        // No eliminamos el archivo físico para permitir restauración (Soft Delete)
         $doc->delete();
 
         activity('Adulto Mayor')
@@ -70,8 +69,8 @@ class AdultoMayorDocumentoController extends Controller
 
     public function restore(AdultoMayor $adulto_mayor, $id)
     {
-        $doc = DocumentoAdultoMayor::withTrashed()->findOrFail($id);
-        $doc->restore();
+        $doc = DocumentoAdultoMayor::findOrFail($id);
+        $doc->update(['estado' => 'ACTIVO']);
 
         activity('Adulto Mayor')
             ->performedOn($adulto_mayor)

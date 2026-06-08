@@ -20,9 +20,20 @@ class TipoAtencionAdulto extends Model
     public $timestamps = false;
 
     protected $fillable = [
-        'tipo',
+        'nombre',
         'descripcion',
+        'estado',
     ];
+
+    public function getTipoAttribute(): ?string
+    {
+        return $this->nombre;
+    }
+
+    public function setTipoAttribute(?string $value): void
+    {
+        $this->attributes['nombre'] = $value;
+    }
 
     /**
      * Relaciones

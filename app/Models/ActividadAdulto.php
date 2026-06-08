@@ -5,13 +5,12 @@ namespace App\Models;
 use App\Traits\GeneraCodigo;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\Traits\LogsActivity;
 
 class ActividadAdulto extends Model
 {
     use GeneraCodigo;
-    use SoftDeletes, LogsActivity;
+    use LogsActivity;
 
     public function getActivitylogOptions(): \Spatie\Activitylog\LogOptions
     {

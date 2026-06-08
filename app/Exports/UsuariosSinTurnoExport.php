@@ -23,10 +23,13 @@ class UsuariosSinTurnoExport implements FromCollection, WithHeadings, WithMappin
                   ->orWhere('estado', 1)
                   ->orWhere('estado', '1');
             })
-            ->whereDoesntHave('asignacionesTurno', function ($query) {
-                $query->where('estado', 'ACTIVA');
+            ->whereDoesntHave('horariosSalud', function ($query) {
+                $query->where('estado', 'ACTIVO');
             })
-            ->with(['areaInstitucional', 'roles'])
+            ->whereDoesntHave('horariosAdmin', function ($query) {
+                $query->where('estado', 'ACTIVO');
+            })
+            ->with(['roles'])
             ->get();
     }
 

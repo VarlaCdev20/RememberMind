@@ -15,7 +15,7 @@ class AdultoMayorService
      */
     public function obtenerListado(array $filtros = [])
     {
-        $query = AdultoMayor::with(['estado', 'familiares', 'atenciones', 'evaluacionesCognitivas'])
+        $query = AdultoMayor::with(['estado', 'familiares', 'atenciones', 'evaluacionesGeriatricas'])
             ->withCount([
                 'familiares as fam_total',
                 'observaciones as obs_total',
@@ -122,7 +122,7 @@ class AdultoMayorService
     public function obtenerTiposAtenciones()
     {
         if (Schema::hasTable('tipo_atenciones_adulto')) {
-            return \App\Models\TipoAtencionAdulto::orderBy('tipo')->get();
+            return \App\Models\TipoAtencionAdulto::orderBy('nombre')->get();
         }
         return collect();
     }

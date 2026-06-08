@@ -275,16 +275,40 @@ class AdultoMayor extends Model
 
     public function habitacion()
     {
-        return $this->belongsTo(Habitacion::class, 'cod_habitacion', 'cod_habitacion');
+        return $this->hasOneThrough(
+            Habitacion::class,
+            AsignacionAdultoMayor::class,
+            'cod_am',
+            'cod_habitacion',
+            'cod_am',
+            'cod_habitacion'
+        )->where('asignacion_adulto_mayor.estado', 'ACTIVO');
     }
 
     public function cama()
     {
-        return $this->belongsTo(Cama::class, 'cod_cama', 'cod_cama');
+        return $this->hasOneThrough(
+            Cama::class,
+            AsignacionAdultoMayor::class,
+            'cod_am',
+            'cod_cama',
+            'cod_am',
+            'cod_cama'
+        )->where('asignacion_adulto_mayor.estado', 'ACTIVO');
     }
 
     public function asignaciones()
     {
         return $this->hasMany(AsignacionAdultoMayor::class, 'cod_am', 'cod_am');
+    }
+
+    public function evaluacionesGeriatricas()
+    {
+        return $this->hasMany(EvaluacionGeriatrica::class, 'cod_am', 'cod_am');
+    }
+
+    public function getAsignacionTurnoActivaAttribute()
+    {
+        return null;
     }
 }
