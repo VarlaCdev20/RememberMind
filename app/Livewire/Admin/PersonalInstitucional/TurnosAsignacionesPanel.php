@@ -188,7 +188,8 @@ class TurnosAsignacionesPanel extends Component
         }
 
         if ($this->filtroArea !== '') {
-            $query->where('cod_area', $this->filtroArea);
+            $rolesArea = AreaInstitucional::rolesPorArea($this->filtroArea);
+            $query->whereHas('roles', fn (Builder $query) => $query->whereIn('name', $rolesArea));
         }
 
         return $query->orderBy('nombres')->orderBy('ap_paterno');
@@ -210,7 +211,7 @@ class TurnosAsignacionesPanel extends Component
                 'dias_semana' => [$h->dia_semana],
                 'fecha_inicio' => Carbon::create(1900),
                 'fecha_fin' => Carbon::create(2999),
-                'cod_area' => $h->user?->cod_area,
+                'cod_area' => $h->user?->cod_area_virtual,
                 'cod_turno' => $h->cod_hor_per_sal,
                 'turno' => (object) [
                     'nombre' => $h->turno,
@@ -234,7 +235,7 @@ class TurnosAsignacionesPanel extends Component
                 'dias_semana' => [$h->dia_semana],
                 'fecha_inicio' => Carbon::create(1900),
                 'fecha_fin' => Carbon::create(2999),
-                'cod_area' => $h->user?->cod_area,
+                'cod_area' => $h->user?->cod_area_virtual,
                 'cod_turno' => $h->cod_hor_per_admin,
                 'turno' => (object) [
                     'nombre' => $h->turno,
@@ -631,10 +632,10 @@ class TurnosAsignacionesPanel extends Component
 
     private function rolVisual(User $usuario): array
     {
-        $texto = mb_strtoupper(($usuario->personalSalud?->tipo_personal_salud ?? '') . ' ' . $usuario->roles->pluck('name')->implode(' '));
+        $texto = mb_strtoupper(($usuario->categoria_institucional ?? '') . ' ' . $usuario->roles->pluck('name')->implode(' '));
 
         return match (true) {
-            $usuario->personalAdmin !== null => ['label' => 'Administrativo', 'class' => 'border-slate-300 bg-slate-100 text-slate-700'],
+            $usuario->tipo_personal === 'admin' => ['label' => 'Administrativo', 'class' => 'border-slate-300 bg-slate-100 text-slate-700'],
             str_contains($texto, 'ENFERM') => ['label' => 'Enfermería', 'class' => 'border-emerald-200 bg-emerald-50 text-emerald-700'],
             str_contains($texto, 'MEDICO') || str_contains($texto, 'MÉDICO') || str_contains($texto, 'GERIATRA') => ['label' => 'Médico / Geriatra', 'class' => 'border-[#F2CFC4] bg-[#FDF5F2] text-[#B85C45]'],
             str_contains($texto, 'PSICO') => ['label' => 'Psicología', 'class' => 'border-violet-200 bg-violet-50 text-violet-700'],

@@ -25,8 +25,8 @@ class TiposActividadPanel extends Component
     public string $descripcion = '';
 
     // ── Tracking ──────────────────────────────────────────────────────────────
-    public ?int $editandoId = null;
-    public ?int $detalleId  = null;
+    public ?string $editandoId = null;
+    public ?string $detalleId  = null;
 
     protected function rules(): array
     {
@@ -35,7 +35,7 @@ class TiposActividadPanel extends Component
             'tipo' => [
                 'required', 'string', 'max:50',
                 function ($attribute, $value, $fail) use ($editandoId) {
-                    $q = TipoActividadAdulto::whereRaw('LOWER(tipo) = LOWER(?)', [trim($value)]);
+                    $q = TipoActividadAdulto::whereRaw('LOWER(nombre) = LOWER(?)', [trim($value)]);
                     if ($editandoId) {
                         $q->where('cod_tipo_act', '!=', $editandoId);
                     }
@@ -74,7 +74,7 @@ class TiposActividadPanel extends Component
         $this->modalRegistrar = true;
     }
 
-    public function abrirEditar(int $id): void
+    public function abrirEditar(string $id): void
     {
         $t = TipoActividadAdulto::findOrFail($id);
         $this->editandoId  = $id;
@@ -84,7 +84,7 @@ class TiposActividadPanel extends Component
         $this->modalEditar = true;
     }
 
-    public function abrirDetalle(int $id): void
+    public function abrirDetalle(string $id): void
     {
         $this->detalleId    = $id;
         $this->modalDetalle = true;
@@ -103,7 +103,7 @@ class TiposActividadPanel extends Component
     {
         $this->validate();
         TipoActividadAdulto::create([
-            'tipo'        => trim($this->tipo),
+            'nombre'      => trim($this->tipo),
             'descripcion' => $this->descripcion ?: null,
         ]);
         $this->modalRegistrar = false;
@@ -116,7 +116,7 @@ class TiposActividadPanel extends Component
         $this->validate();
         $t = TipoActividadAdulto::findOrFail($this->editandoId);
         $t->update([
-            'tipo'        => trim($this->tipo),
+            'nombre'      => trim($this->tipo),
             'descripcion' => $this->descripcion ?: null,
         ]);
         $this->modalEditar = false;
@@ -124,7 +124,7 @@ class TiposActividadPanel extends Component
         $this->dispatch('swal', ['icon' => 'success', 'title' => 'Tipo de actividad actualizado correctamente.']);
     }
 
-    public function eliminarTipo(int $id): void
+    public function eliminarTipo(string $id): void
     {
         $t = TipoActividadAdulto::withCount('actividades')->findOrFail($id);
         if ($t->actividades_count > 0) {
@@ -183,12 +183,12 @@ class TiposActividadPanel extends Component
         }
         return TipoActividadAdulto::withCount('actividades')
             ->when($this->search, fn($q) =>
-                $q->where('tipo', 'ilike', '%' . $this->search . '%')
+                $q->where('nombre', 'ilike', '%' . $this->search . '%')
                   ->orWhere('descripcion', 'ilike', '%' . $this->search . '%')
             )
             ->when($this->filtroUso === 'con', fn($q) => $q->has('actividades'))
             ->when($this->filtroUso === 'sin', fn($q) => $q->doesntHave('actividades'))
-            ->orderBy('tipo')
+            ->orderBy('nombre')
             ->paginate(12);
     }
 

@@ -227,14 +227,17 @@ class User extends Authenticatable
 
     public function getPersonalSaludAttribute()
     {
-        $rol = $this->roles->first()?->name;
+        $rol = $this->rol_principal;
         if (in_array($rol, ['ENFERMEROS', 'MEDICO GENERAL/GERIATRA', 'PSICOLOGO/A', 'PEDAGOGO', 'NUTRICIONISTA', 'FISIOTERAPEUTA'])) {
             return (object) [
+                'tipo_personal_salud' => $this->categoria_institucional,
                 'especialidad' => (object) [
-                    'nombre' => $rol,
+                    'nombre' => $this->categoria_institucional,
+                    'nombre_especialidad' => $this->categoria_institucional,
                     'cod_esp' => $rol,
                 ],
                 'cod_esp' => $rol,
+                'fecha_ingreso' => $this->created_at,
                 'fecha_ing' => $this->created_at,
                 'institucion_formacion' => $this->observaciones,
             ];
@@ -244,14 +247,16 @@ class User extends Authenticatable
 
     public function getPersonalAdminAttribute()
     {
-        $rol = $this->roles->first()?->name;
+        $rol = $this->rol_principal;
         if (in_array($rol, ['SUPERADMINISTRADOR', 'ADMINISTRADOR'])) {
             return (object) [
                 'cargoAdmin' => (object) [
-                    'nombre' => $rol,
+                    'nombre' => $this->categoria_institucional,
                     'cod_cargo_admin' => $rol,
                 ],
-                'cargo' => $rol,
+                'cargo' => (object) [
+                    'nombre_cargo' => $this->categoria_institucional,
+                ],
                 'cod_cargo_admin' => $rol,
                 'fecha_ingreso' => $this->created_at,
             ];
@@ -261,13 +266,59 @@ class User extends Authenticatable
 
     public function getAreaInstitucionalAttribute()
     {
-        if ($this->cod_area && isset(self::$areasEstaticas[$this->cod_area])) {
+        $codArea = $this->cod_area_virtual;
+        if ($codArea && isset(self::$areasEstaticas[$codArea])) {
             return (object) [
-                'nombre' => self::$areasEstaticas[$this->cod_area],
-                'cod_area' => $this->cod_area,
+                'nombre' => self::$areasEstaticas[$codArea],
+                'cod_area' => $codArea,
             ];
         }
         return null;
+    }
+
+    public function getRolPrincipalAttribute(): ?string
+    {
+        return $this->roles->first()?->name;
+    }
+
+    public function getTipoPersonalAttribute(): string
+    {
+        return in_array($this->rol_principal, ['SUPERADMINISTRADOR', 'ADMINISTRADOR'], true) ? 'admin'
+            : (in_array($this->rol_principal, ['ENFERMEROS', 'MEDICO GENERAL/GERIATRA', 'PSICOLOGO/A', 'PEDAGOGO', 'NUTRICIONISTA', 'FISIOTERAPEUTA'], true) ? 'salud' : 'otro');
+    }
+
+    public function getCategoriaInstitucionalAttribute(): string
+    {
+        return match ($this->rol_principal) {
+            'ENFERMEROS' => 'Enfermería',
+            'MEDICO GENERAL/GERIATRA' => 'Médico/Geriatría',
+            'PSICOLOGO/A' => 'Psicología',
+            'NUTRICIONISTA' => 'Nutrición',
+            'FISIOTERAPEUTA' => 'Fisioterapia',
+            'PEDAGOGO' => 'Pedagogía',
+            'SUPERADMINISTRADOR', 'ADMINISTRADOR' => 'Administrativo',
+            default => $this->rol_principal ?? 'Sistema',
+        };
+    }
+
+    public function getCodAreaVirtualAttribute(): ?string
+    {
+        return match ($this->rol_principal) {
+            'SUPERADMINISTRADOR', 'ADMINISTRADOR' => 'ARE_0003',
+            'PSICOLOGO/A', 'PEDAGOGO' => 'ARE_0005',
+            'ENFERMEROS', 'MEDICO GENERAL/GERIATRA', 'NUTRICIONISTA', 'FISIOTERAPEUTA' => 'ARE_0004',
+            default => null,
+        };
+    }
+
+    public function getCodAreaAttribute(): ?string
+    {
+        return $this->cod_area_virtual;
+    }
+
+    public function setCodAreaAttribute($value): void
+    {
+        // cod_area ya no existe en users; el área se deriva del rol institucional.
     }
 
     public function getAsignacionesTurnoAttribute()

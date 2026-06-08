@@ -462,11 +462,15 @@
  </div>
 
  <div class="relative z-10 flex-1 overflow-y-auto bg-fondo-panel p-4 sm:p-6">
- @if($seccionActiva === 'valoracion')
- @livewire('admin.salud-seguimiento.salud-valoracion-panel', ['adulto' => $adultoSeleccionadoParaModal], key('val-'.$adultoSeleccionadoParaModal->cod_am))
- @elseif($seccionActiva === 'administracion')
- @livewire('admin.salud-seguimiento.salud-administracion-medicacion-panel', ['adulto' => $adultoSeleccionadoParaModal], key('adminmed-'.$adultoSeleccionadoParaModal->cod_am))
- @endif
+  @if($seccionActiva === 'valoracion')
+  @livewire('admin.salud-seguimiento.salud-valoracion-panel', ['adulto' => $adultoSeleccionadoParaModal], key('val-'.$adultoSeleccionadoParaModal->cod_am))
+  @elseif($seccionActiva === 'signos')
+  @livewire('admin.salud-seguimiento.salud-signos-panel', ['adulto' => $adultoSeleccionadoParaModal], key('signos-'.$adultoSeleccionadoParaModal->cod_am))
+  @elseif($seccionActiva === 'evaluaciones')
+  @livewire('admin.salud-seguimiento.salud-evaluaciones-geriatricas-panel', ['adulto' => $adultoSeleccionadoParaModal], key('eval-'.$adultoSeleccionadoParaModal->cod_am))
+  @elseif($seccionActiva === 'administracion')
+  @livewire('admin.salud-seguimiento.salud-administracion-medicacion-panel', ['adulto' => $adultoSeleccionadoParaModal], key('adminmed-'.$adultoSeleccionadoParaModal->cod_am))
+  @endif
  </div>
  </aside>
  </div>

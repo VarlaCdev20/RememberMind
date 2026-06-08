@@ -321,9 +321,9 @@ Route::middleware([
             // Asignación de Turno
             Route::prefix('asignacion-turno')
                 ->name('asignacion-turno.')
-                ->middleware('permission:asignacion_turno.ver')
+                ->middleware('permission:turnos.ver')
                 ->group(function () {
-                    Route::get('/', \App\Livewire\Admin\Enfermeria\AsignacionTurnoPanel::class)->name('index');
+                    Route::get('/', fn () => redirect()->route('admin.turnos-asignaciones.index'))->name('index');
                 });
 
             // Plan de Cuidado y Tareas

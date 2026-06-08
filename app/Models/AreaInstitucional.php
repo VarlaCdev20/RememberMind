@@ -88,8 +88,9 @@ class AreaInstitucional
         return collect($areasData)->map(function ($data) {
             $area = new self($data);
             
-            // Find active users belonging to this area
-            $usuarios = User::where('cod_area', $area->cod_area)->get();
+            $usuarios = User::with('roles')->get()
+                ->filter(fn (User $user) => $user->cod_area_virtual === $area->cod_area)
+                ->values();
             $area->usuarios = $usuarios;
             $area->usuarios_count = $usuarios->count();
 
@@ -105,6 +106,16 @@ class AreaInstitucional
     public static function find($codArea)
     {
         return self::allAreas()->firstWhere('cod_area', $codArea);
+    }
+
+    public static function rolesPorArea(string $codArea): array
+    {
+        return match ($codArea) {
+            'ARE_0001', 'ARE_0002', 'ARE_0003' => ['SUPERADMINISTRADOR', 'ADMINISTRADOR'],
+            'ARE_0004' => ['ENFERMEROS', 'MEDICO GENERAL/GERIATRA', 'NUTRICIONISTA', 'FISIOTERAPEUTA'],
+            'ARE_0005' => ['PSICOLOGO/A', 'PEDAGOGO'],
+            default => [],
+        };
     }
 
     public static function findOrFail($codArea)

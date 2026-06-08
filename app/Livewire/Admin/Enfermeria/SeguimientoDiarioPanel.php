@@ -19,7 +19,7 @@ class SeguimientoDiarioPanel extends Component
     public string $filtroFecha  = '';
 
     public bool   $modalForm = false;
-    public ?int   $editandoId= null;
+    public ?string $editandoId= null;
 
     public string $codAm                = '';
     public string $codTurno             = '';
@@ -67,7 +67,7 @@ class SeguimientoDiarioPanel extends Component
         // Verificar duplicado
         $duplicado = SeguimientoDiario::where('cod_am', $this->codAm)
             ->where('fecha', $this->fecha)
-            ->where('cod_turno', (int) $this->codTurno)
+            ->where('cod_turno', $this->codTurno)
             ->when($this->editandoId, fn($q) => $q->where('cod_seg_diario', '!=', $this->editandoId))
             ->exists();
 
@@ -78,7 +78,7 @@ class SeguimientoDiarioPanel extends Component
 
         $datos = [
             'cod_am'                   => $this->codAm,
-            'cod_turno'                => (int) $this->codTurno,
+            'cod_turno'                => $this->codTurno,
             'cod_plan'                 => $this->codPlan ?: null,
             'registrado_por'           => Auth::id(),
             'fecha'                    => $this->fecha,
@@ -130,7 +130,7 @@ class SeguimientoDiarioPanel extends Component
                       ->orWhere('ap_paterno','ilike','%'.$this->search.'%')
                 )
             )
-            ->when($this->filtroTurno, fn($q) => $q->where('cod_turno', (int) $this->filtroTurno))
+            ->when($this->filtroTurno, fn($q) => $q->where('cod_turno', $this->filtroTurno))
             ->when($this->filtroFecha, fn($q) => $q->whereDate('fecha', $this->filtroFecha))
             ->orderByDesc('fecha')
             ->paginate(12);

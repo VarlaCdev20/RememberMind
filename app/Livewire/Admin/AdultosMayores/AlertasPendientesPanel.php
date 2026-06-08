@@ -4,6 +4,7 @@ namespace App\Livewire\Admin\AdultosMayores;
 
 use Livewire\Component;
 use App\Models\AdultoMayor;
+use Illuminate\Support\Facades\Schema;
 
 class AlertasPendientesPanel extends Component
 {
@@ -27,7 +28,11 @@ class AlertasPendientesPanel extends Component
         ])->get();
 
         // Carga de Evaluaciones Geriátricas de la Suite consolidada en una sola consulta
-        $evaluacionesGeriatricas = \App\Models\EvaluacionGeriatrica::whereNull('anulado_en')->get()->groupBy('cod_am');
+        $evaluacionesGeriatricas = \App\Models\EvaluacionGeriatrica::query()
+            ->when(Schema::hasColumn('evaluaciones_geriatricas', 'anulado_en'), fn ($q) => $q->whereNull('anulado_en'))
+            ->when(Schema::hasColumn('evaluaciones_geriatricas', 'deleted_at'), fn ($q) => $q->whereNull('deleted_at'))
+            ->get()
+            ->groupBy('cod_am');
 
         $todasLasAlertas = [];
 

@@ -22,7 +22,7 @@
  </p>
  </div>
  <div class="flex items-center gap-2">
- <a href="{{ route('admin.adultos-mayores.show', $adulto->cod_am) }}" class="inline-flex items-center gap-2 rounded-xl border border-borde bg-fondo-card px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-parrafo transition hover:bg-fondo-panel">
+  <a href="{{ isset($adulto) ? route('admin.adultos-mayores.show', ['adulto_mayor' => $adulto->cod_am]) : route('admin.adultos-mayores.index') }}" class="inline-flex items-center gap-2 rounded-xl border border-borde bg-fondo-card px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-parrafo transition hover:bg-fondo-panel">
  <i class="ph-bold ph-arrow-left"></i> Volver a Expediente
  </a>
  <button type="button" @click="$dispatch('evaluacion-geriatrica-abrir', { cod_am: '{{ $adulto->cod_am }}' })" class="inline-flex items-center justify-center gap-2 rounded-xl bg-fondo-panel px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-inverso shadow-md transition hover:-translate-y-0.5 hover:bg-fondo-panel active:scale-95">
@@ -78,7 +78,7 @@
  </div>
 
  <div class="mt-4 pt-3 border-t border-borde flex justify-end gap-2">
- <button type="button" @click="$dispatch('evaluacion-geriatrica-abrir', { cod_am: '{{ $adulto->cod_am }}', eval_id: {{ $eval->id }} })" class="inline-flex items-center gap-1.5 rounded-lg bg-fondo-card border border-borde px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-parrafo transition hover:bg-fondo-panel">
+  <button type="button" @click="$dispatch('evaluacion-geriatrica-abrir', { cod_am: '{{ $adulto->cod_am }}', eval_id: '{{ $eval->cod_eval_ger }}' })" class="inline-flex items-center gap-1.5 rounded-lg bg-fondo-card border border-borde px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-parrafo transition hover:bg-fondo-panel">
  <i class="ph-bold ph-pencil-simple"></i> Editar
  </button>
  <!-- TODO: Implementar visor detallado si existe -->

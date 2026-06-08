@@ -20,6 +20,7 @@ class DocumentosUsuarioService
         }
 
         switch ($rol) {
+            case 'personal_institucional':
                 return [
                     'Cédula de identidad',
                     'Documento de designación institucional',

@@ -28,8 +28,8 @@ class AsistenciaPanel extends Component
     public string $obs    = '';
 
     // ── Tracking ──────────────────────────────────────────────────────────────
-    public ?int $editandoId = null;
-    public ?int $detalleId  = null;
+    public ?string $editandoId = null;
+    public ?string $detalleId  = null;
 
     protected function rules(): array
     {
@@ -54,13 +54,13 @@ class AsistenciaPanel extends Component
     public function updatingFiltroFechaHasta(): void  { $this->resetPage(); }
 
     // ── Apertura de modales ───────────────────────────────────────────────────
-    public function abrirDetalle(int $id): void
+    public function abrirDetalle(string $id): void
     {
         $this->detalleId    = $id;
         $this->modalDetalle = true;
     }
 
-    public function abrirResultado(int $id): void
+    public function abrirResultado(string $id): void
     {
         $a = ActividadAdulto::findOrFail($id);
         $this->editandoId     = $id;
@@ -70,7 +70,7 @@ class AsistenciaPanel extends Component
         $this->modalResultado = true;
     }
 
-    public function abrirReprogramar(int $id): void
+    public function abrirReprogramar(string $id): void
     {
         $a = ActividadAdulto::findOrFail($id);
         $this->editandoId     = $id;
@@ -88,7 +88,7 @@ class AsistenciaPanel extends Component
     }
 
     // ── Acciones rápidas ──────────────────────────────────────────────────────
-    public function marcarRealizada(int $id): void
+    public function marcarRealizada(string $id): void
     {
         ActividadAdulto::findOrFail($id)->update(['estado' => 'REALIZADA']);
         $this->dispatch('swal', [
@@ -97,7 +97,7 @@ class AsistenciaPanel extends Component
         ]);
     }
 
-    public function marcarCancelada(int $id): void
+    public function marcarCancelada(string $id): void
     {
         ActividadAdulto::findOrFail($id)->update(['estado' => 'CANCELADA']);
         $this->dispatch('swal', [
@@ -180,7 +180,7 @@ class AsistenciaPanel extends Component
                       ->orWhere('ap_materno', 'ilike', '%' . $this->search . '%')
                 )
             )
-            ->when($this->filtroTipo, fn($q) => $q->where('cod_tipo_act', (int) $this->filtroTipo))
+            ->when($this->filtroTipo, fn($q) => $q->where('cod_tipo_act', $this->filtroTipo))
             ->when($this->filtroEstado, function ($q) {
                 return match ($this->filtroEstado) {
                     'PROGRAMADA'   => $q->whereIn('estado', ['PROGRAMADA', 'PENDIENTE']),
@@ -193,13 +193,13 @@ class AsistenciaPanel extends Component
             ->when($this->filtroFechaDesde, fn($q) => $q->where('fecha', '>=', $this->filtroFechaDesde))
             ->when($this->filtroFechaHasta, fn($q) => $q->where('fecha', '<=', $this->filtroFechaHasta))
             ->orderByDesc('fecha')
-            ->orderByDesc('hora')
+            ->orderByDesc('hora_inicio')
             ->paginate(12);
     }
 
     private function getTipos()
     {
-        return TipoActividadAdulto::orderBy('tipo')->get();
+        return TipoActividadAdulto::orderBy('nombre')->get();
     }
 
     private function getDetalle(): ?ActividadAdulto

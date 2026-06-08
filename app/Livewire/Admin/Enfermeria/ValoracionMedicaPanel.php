@@ -3,8 +3,7 @@
 namespace App\Livewire\Admin\Enfermeria;
 
 use App\Models\AdultoMayor;
-use App\Models\ValoracionEnfermeriaAdmision;
-use App\Models\ValoracionMedicaAdmision;
+use App\Models\FichaMedicaAdulto;
 use App\Models\HistorialEstadoAdulto;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
@@ -72,38 +71,28 @@ class ValoracionMedicaPanel extends Component
         ]);
 
         // Validar que exista valoración enfermería completada
-        if (! ValoracionEnfermeriaAdmision::where('cod_am', $this->codAm)
-            ->where('estado', 'COMPLETADA')
-            ->where('puede_pasar_valoracion_medica', true)
-            ->exists()) {
-            $this->addError('codAm', 'No existe valoración de enfermería completada y aprobada para este adulto mayor.');
-            return;
-        }
-
         $datos = [
             'cod_am'                      => $this->codAm,
-            'cod_val_enf'                 => $this->codValEnf,
-            'fecha'                       => $this->fecha,
-            'hora'                        => strlen($this->hora) === 5 ? $this->hora . ':00' : $this->hora,
-            'diagnosticos_referidos'      => $this->diagnosticosReferidos ?: null,
-            'antecedentes_relevantes'     => $this->antecedentesRelevantes ?: null,
-            'medicacion_actual_resumen'   => $this->medicacionActualResumen ?: null,
-            'alergias_referidas'          => $this->alergiasReferidas ?: null,
-            'condicion_medica_general'    => $this->condicionMedicaGeneral ?: null,
-            'estado_neurologico_basico'   => $this->estadoNeurologicoBasico ?: null,
-            'nivel_dependencia_sugerido'  => $this->nivelDependenciaSugerido ?: null,
-            'resultado_admision'          => $this->resultadoAdmision,
-            'motivo_decision'             => $this->motivoDecision,
-            'recomendacion_medica'        => $this->recomendacionMedica ?: null,
-            'requiere_seguimiento_especial'=> $this->requiereSeguimientoEsp,
+            'alergias'                    => $this->alergiasReferidas ?: null,
+            'observacion_medica'          => trim(implode("\n", array_filter([
+                $this->diagnosticosReferidos ? 'Diagnósticos referidos: ' . $this->diagnosticosReferidos : null,
+                $this->antecedentesRelevantes ? 'Antecedentes: ' . $this->antecedentesRelevantes : null,
+                $this->medicacionActualResumen ? 'Medicación actual: ' . $this->medicacionActualResumen : null,
+                $this->condicionMedicaGeneral ? 'Condición general: ' . $this->condicionMedicaGeneral : null,
+                $this->estadoNeurologicoBasico ? 'Estado neurológico: ' . $this->estadoNeurologicoBasico : null,
+                $this->nivelDependenciaSugerido ? 'Dependencia sugerida: ' . $this->nivelDependenciaSugerido : null,
+                $this->resultadoAdmision ? 'Resultado admisión: ' . $this->resultadoAdmision : null,
+                $this->motivoDecision ? 'Motivo: ' . $this->motivoDecision : null,
+                $this->recomendacionMedica ? 'Recomendación: ' . $this->recomendacionMedica : null,
+            ]))) ?: null,
             'registrado_por'              => Auth::id(),
-            'estado'                      => $this->estadoForm,
+            'estado'                      => $this->estadoForm === 'COMPLETADA' ? 'ACTIVO' : 'BORRADOR',
         ];
 
         if ($this->editandoId) {
-            ValoracionMedicaAdmision::findOrFail($this->editandoId)->update($datos);
+            FichaMedicaAdulto::findOrFail($this->editandoId)->update($datos);
         } else {
-            ValoracionMedicaAdmision::create($datos);
+            FichaMedicaAdulto::create($datos);
 
             // Si es COMPLETADA y resultado ADMITIDO → cambiar estado adulto
             if ($this->estadoForm === 'COMPLETADA' && $this->resultadoAdmision === 'ADMITIDO') {
@@ -139,7 +128,7 @@ class ValoracionMedicaPanel extends Component
 
     public function render()
     {
-        $valoraciones = ValoracionMedicaAdmision::with(['adultoMayor', 'registradoPor'])
+        $valoraciones = FichaMedicaAdulto::with(['adultoMayor', 'registrador'])
             ->when($this->search, fn($q) =>
                 $q->whereHas('adultoMayor', fn($sq) =>
                     $sq->where('nombres', 'ilike', '%' . $this->search . '%')
@@ -147,8 +136,7 @@ class ValoracionMedicaPanel extends Component
                 )
             )
             ->when($this->filtroEstado, fn($q) => $q->where('estado', $this->filtroEstado))
-            ->when($this->filtroResult, fn($q) => $q->where('resultado_admision', $this->filtroResult))
-            ->orderByDesc('fecha')->orderByDesc('hora')
+            ->orderByDesc('created_at')
             ->paginate(12);
 
         return view('livewire.admin.enfermeria.valoracion-medica-panel', [
@@ -156,7 +144,7 @@ class ValoracionMedicaPanel extends Component
             'adultos'      => AdultoMayor::select('cod_am','nombres','ap_paterno','ap_materno')
                 ->whereNull('archivado_en')->orderBy('ap_paterno')->get(),
             'detalle'      => $this->viendoId
-                ? ValoracionMedicaAdmision::with('adultoMayor','registradoPor','valoracionEnfermeria')->find($this->viendoId)
+                ? FichaMedicaAdulto::with('adultoMayor','registrador')->find($this->viendoId)
                 : null,
         ])->layout('layouts.sistema');
     }

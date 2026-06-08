@@ -3,7 +3,7 @@
 namespace App\Livewire\Admin\Enfermeria;
 
 use App\Models\AdultoMayor;
-use App\Models\AsignacionTurnoAdulto;
+use App\Models\AsignacionAdultoMayor;
 use App\Models\PlanCuidado;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
@@ -68,8 +68,8 @@ class PlanCuidadoPanel extends Component
 
         // Validar que haya asignación activa para ACTIVO
         if ($this->estadoPlan === 'ACTIVO') {
-            $asignado = AsignacionTurnoAdulto::where('cod_am', $this->codAm)
-                ->where('estado', 'ACTIVA')->exists();
+            $asignado = AsignacionAdultoMayor::where('cod_am', $this->codAm)
+                ->whereIn('estado', ['ACTIVO', 'ACTIVA'])->exists();
             if (! $asignado) {
                 $this->addError('codAm', 'El adulto mayor debe tener una asignación de turno activa antes de activar el plan.');
                 return;
@@ -104,7 +104,7 @@ class PlanCuidadoPanel extends Component
         $this->dispatch('swal', ['icon' => 'success', 'title' => $msg]);
     }
 
-    public function cerrarPlan(int $id): void
+    public function cerrarPlan(string $id): void
     {
         PlanCuidado::findOrFail($id)->update([
             'estado'   => 'CERRADO',

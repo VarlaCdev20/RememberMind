@@ -22,18 +22,15 @@ class EvaluacionGeriatrica extends Model
 
     protected $fillable = [
         'cod_eval_ger', 'cod_am', 'cod_instrumento',
-        'registrado_por', 'evaluador_id', 'evaluador_tipo',
-        'fecha_eval', 'hora_eval', 'puntaje_total',
-        'categoria_resultado', 'nivel_alerta', 'nivel_riesgo',
-        'observaciones', 'datos_formulario',
-        'estado_eval', 'motivo_anulacion', 'anulado_por', 'anulado_en'
+        'registrado_por', 'evaluador_id', 'fecha_eval', 'puntaje', 'puntaje_total',
+        'resultado_cualitativo', 'categoria_resultado', 'nivel_alerta', 'nivel_riesgo',
+        'observaciones', 'estado', 'estado_eval', 'datos_formulario', 'motivo_anulacion',
+        'anulado_por', 'anulado_en',
     ];
 
     protected $casts = [
         'fecha_eval' => 'date',
-        'anulado_en' => 'datetime',
-        'datos_formulario' => 'array',
-        'puntaje_total' => 'decimal:2'
+        'puntaje' => 'decimal:2',
     ];
 
     public function getActivitylogOptions(): \Spatie\Activitylog\LogOptions
@@ -81,17 +78,17 @@ class EvaluacionGeriatrica extends Model
 
     public function registrador()
     {
-        return $this->belongsTo(User::class, 'registrado_por', 'cod_usu');
+        return $this->belongsTo(User::class, 'evaluador_id', 'cod_usu');
     }
 
     public function anulador()
     {
-        return $this->belongsTo(User::class, 'anulado_por', 'cod_usu');
+        return $this->belongsTo(User::class, 'evaluador_id', 'cod_usu');
     }
 
     public function evaluador()
     {
-        return $this->morphTo(__FUNCTION__, 'evaluador_tipo', 'evaluador_id');
+        return $this->belongsTo(User::class, 'evaluador_id', 'cod_usu');
     }
 
     // Virtual accessors for backwards compatibility with EvaluacionCognitiva
@@ -108,5 +105,84 @@ class EvaluacionGeriatrica extends Model
     public function getResultadoInterpretacionAttribute()
     {
         return $this->categoria_resultado;
+    }
+
+    public function setRegistradoPorAttribute($value): void
+    {
+        $this->attributes['evaluador_id'] = $value;
+    }
+
+    public function getPuntajeTotalAttribute()
+    {
+        return $this->puntaje;
+    }
+
+    public function setPuntajeTotalAttribute($value): void
+    {
+        $this->attributes['puntaje'] = $value;
+    }
+
+    public function getCategoriaResultadoAttribute()
+    {
+        return $this->resultado_cualitativo;
+    }
+
+    public function setCategoriaResultadoAttribute($value): void
+    {
+        $this->attributes['resultado_cualitativo'] = $value;
+    }
+
+    public function getNivelAlertaAttribute()
+    {
+        return $this->estado;
+    }
+
+    public function setEstadoEvalAttribute($value): void
+    {
+        $this->attributes['estado'] = $value;
+    }
+
+    public function getEstadoEvalAttribute()
+    {
+        return $this->estado;
+    }
+
+    public function setNivelAlertaAttribute($value): void
+    {
+        $this->attributes['estado'] = $value === 'CRITICO' ? 'ALERTA' : ($this->attributes['estado'] ?? 'COMPLETADA');
+    }
+
+    public function getNivelRiesgoAttribute()
+    {
+        return $this->resultado_cualitativo;
+    }
+
+    public function setNivelRiesgoAttribute($value): void
+    {
+        $this->attributes['resultado_cualitativo'] = $value;
+    }
+
+    public function setDatosFormularioAttribute($value): void
+    {
+        if (is_array($value) && empty($this->attributes['observaciones'])) {
+            $this->attributes['observaciones'] = json_encode($value);
+        }
+    }
+
+    public function setMotivoAnulacionAttribute($value): void
+    {
+        if ($value) {
+            $this->attributes['observaciones'] = trim(($this->attributes['observaciones'] ?? '') . "\nMotivo de anulación: " . $value);
+        }
+    }
+
+    public function setAnuladoPorAttribute($value): void
+    {
+        // La BD limpia no persiste anulador separado; se conserva estado/deleted_at.
+    }
+
+    public function setAnuladoEnAttribute($value): void
+    {
+        $this->attributes['deleted_at'] = $value;
     }
 }

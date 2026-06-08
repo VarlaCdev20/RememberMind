@@ -35,8 +35,8 @@ class ParticipacionPanel extends Component
     public string $estado     = 'PROGRAMADA';
 
     // ── Tracking ──────────────────────────────────────────────────────────────
-    public ?int $editandoId = null;
-    public ?int $detalleId  = null;
+    public ?string $editandoId = null;
+    public ?string $detalleId  = null;
 
     protected function rules(): array
     {
@@ -78,7 +78,7 @@ class ParticipacionPanel extends Component
         $this->modalRegistrar = true;
     }
 
-    public function abrirEditar(int $id): void
+    public function abrirEditar(string $id): void
     {
         $a = ActividadAdulto::findOrFail($id);
         $this->editandoId  = $id;
@@ -112,12 +112,12 @@ class ParticipacionPanel extends Component
         return strlen(trim($this->hora)) === 5 ? $this->hora . ':00' : $this->hora;
     }
 
-    private function existeDuplicado(?int $excluirId = null): bool
+    private function existeDuplicado(?string $excluirId = null): bool
     {
         return ActividadAdulto::where('cod_am', $this->codAm)
-            ->where('cod_tipo_act', (int) $this->codTipoAct)
+            ->where('cod_tipo_act', $this->codTipoAct)
             ->where('fecha', $this->fecha)
-            ->where('hora', $this->horaFormateada())
+            ->where('hora_inicio', $this->horaFormateada())
             ->when($excluirId, fn($q) => $q->where('cod_act_adul', '!=', $excluirId))
             ->exists();
     }
@@ -137,7 +137,7 @@ class ParticipacionPanel extends Component
 
         ActividadAdulto::create([
             'cod_am'       => $this->codAm,
-            'cod_tipo_act' => (int) $this->codTipoAct,
+            'cod_tipo_act' => $this->codTipoAct,
             'fecha'        => $this->fecha,
             'hora'         => $this->horaFormateada(),
             'obs'          => $this->obs ?: null,
@@ -165,7 +165,7 @@ class ParticipacionPanel extends Component
         $a = ActividadAdulto::findOrFail($this->editandoId);
         $a->update([
             'cod_am'       => $this->codAm,
-            'cod_tipo_act' => (int) $this->codTipoAct,
+            'cod_tipo_act' => $this->codTipoAct,
             'fecha'        => $this->fecha,
             'hora'         => $this->horaFormateada(),
             'obs'          => $this->obs ?: null,
@@ -177,7 +177,7 @@ class ParticipacionPanel extends Component
         $this->dispatch('swal', ['icon' => 'success', 'title' => 'Participación actualizada correctamente.']);
     }
 
-    public function cancelarParticipacion(int $id): void
+    public function cancelarParticipacion(string $id): void
     {
         $a = ActividadAdulto::findOrFail($id);
         $a->update(['estado' => 'CANCELADA']);
@@ -249,18 +249,18 @@ class ParticipacionPanel extends Component
                       ->orWhere('ap_materno', 'ilike', '%' . $this->search . '%')
                 )
             )
-            ->when($this->filtroTipo,       fn($q) => $q->where('cod_tipo_act', (int) $this->filtroTipo))
+            ->when($this->filtroTipo,       fn($q) => $q->where('cod_tipo_act', $this->filtroTipo))
             ->when($this->filtroEstado,     fn($q) => $q->where('estado', $this->filtroEstado))
             ->when($this->filtroFechaDesde, fn($q) => $q->where('fecha', '>=', $this->filtroFechaDesde))
             ->when($this->filtroFechaHasta, fn($q) => $q->where('fecha', '<=', $this->filtroFechaHasta))
             ->orderByDesc('fecha')
-            ->orderByDesc('hora')
+            ->orderByDesc('hora_inicio')
             ->paginate(12);
     }
 
     private function getTipos()
     {
-        return TipoActividadAdulto::orderBy('tipo')->get();
+        return TipoActividadAdulto::orderBy('nombre')->get();
     }
 
     private function getAdultos()
@@ -286,9 +286,9 @@ class ParticipacionPanel extends Component
         }
         return DB::table('actividades_adulto')
             ->leftJoin('tipo_actividades_adulto', 'actividades_adulto.cod_tipo_act', '=', 'tipo_actividades_adulto.cod_tipo_act')
-            ->select('tipo_actividades_adulto.tipo', DB::raw('count(*) as total'))
-            ->whereNull('actividades_adulto.deleted_at')
-            ->groupBy('tipo_actividades_adulto.tipo')
+            ->select('tipo_actividades_adulto.nombre as tipo', DB::raw('count(*) as total'))
+            ->when(Schema::hasColumn('actividades_adulto', 'deleted_at'), fn($q) => $q->whereNull('actividades_adulto.deleted_at'))
+            ->groupBy('tipo_actividades_adulto.nombre')
             ->orderByDesc('total')
             ->get();
     }

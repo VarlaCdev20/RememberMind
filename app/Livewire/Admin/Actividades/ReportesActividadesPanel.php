@@ -49,7 +49,7 @@ class ReportesActividadesPanel extends Component
         return ActividadAdulto::query()
             ->when($this->fechaDesde, fn($q) => $q->where('fecha', '>=', $this->fechaDesde))
             ->when($this->fechaHasta, fn($q) => $q->where('fecha', '<=', $this->fechaHasta))
-            ->when($this->filtroTipo, fn($q) => $q->where('cod_tipo_act', (int) $this->filtroTipo))
+            ->when($this->filtroTipo, fn($q) => $q->where('cod_tipo_act', $this->filtroTipo))
             ->when($this->buscar, fn($q) =>
                 $q->whereHas('adultoMayor', fn($sq) =>
                     $sq->where('nombres', 'ilike', '%' . $this->buscar . '%')
@@ -109,7 +109,7 @@ class ReportesActividadesPanel extends Component
         return $this->queryFiltrada()
             ->with(['tipoActividad', 'adultoMayor'])
             ->orderByDesc('fecha')
-            ->orderByDesc('hora')
+            ->orderByDesc('hora_inicio')
             ->limit(15)
             ->get();
     }
@@ -150,7 +150,7 @@ class ReportesActividadesPanel extends Component
         }
 
         $q = DB::table('actividades_adulto')
-            ->whereNull('deleted_at')
+            ->when(Schema::hasColumn('actividades_adulto', 'deleted_at'), fn($q) => $q->whereNull('deleted_at'))
             ->select(
                 DB::raw("TO_CHAR(fecha, 'MM') as mes"),
                 DB::raw("TO_CHAR(fecha, 'Mon') as mes_nombre"),
@@ -161,7 +161,7 @@ class ReportesActividadesPanel extends Component
 
         if ($this->fechaDesde) $q->where('fecha', '>=', $this->fechaDesde);
         if ($this->fechaHasta) $q->where('fecha', '<=', $this->fechaHasta);
-        if ($this->filtroTipo) $q->where('cod_tipo_act', (int) $this->filtroTipo);
+        if ($this->filtroTipo) $q->where('cod_tipo_act', $this->filtroTipo);
         if (! $this->fechaDesde && ! $this->fechaHasta) {
             $q->whereYear('fecha', now()->year);
         }
@@ -182,15 +182,15 @@ class ReportesActividadesPanel extends Component
 
         $q = DB::table('actividades_adulto as aa')
             ->leftJoin('tipo_actividades_adulto as ta', 'aa.cod_tipo_act', '=', 'ta.cod_tipo_act')
-            ->whereNull('aa.deleted_at')
-            ->select('ta.tipo', DB::raw('COUNT(*) as total'))
-            ->groupBy('ta.tipo')
+            ->when(Schema::hasColumn('actividades_adulto', 'deleted_at'), fn($q) => $q->whereNull('aa.deleted_at'))
+            ->select('ta.nombre as tipo', DB::raw('COUNT(*) as total'))
+            ->groupBy('ta.nombre')
             ->orderByDesc('total')
             ->limit(8);
 
         if ($this->fechaDesde) $q->where('aa.fecha', '>=', $this->fechaDesde);
         if ($this->fechaHasta) $q->where('aa.fecha', '<=', $this->fechaHasta);
-        if ($this->filtroTipo) $q->where('aa.cod_tipo_act', (int) $this->filtroTipo);
+        if ($this->filtroTipo) $q->where('aa.cod_tipo_act', $this->filtroTipo);
 
         $resultados = $q->get();
         return [
@@ -218,7 +218,7 @@ class ReportesActividadesPanel extends Component
 
     private function getTipos()
     {
-        return TipoActividadAdulto::orderBy('tipo')->get();
+        return TipoActividadAdulto::orderBy('nombre')->get();
     }
 
     // ── Render ────────────────────────────────────────────────────────────────

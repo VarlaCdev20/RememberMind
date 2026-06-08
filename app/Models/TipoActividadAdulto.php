@@ -17,12 +17,23 @@ class TipoActividadAdulto extends Model
     protected $prefixCode = 'TAC';
     protected $digitsCode = 3;
 
-    public $timestamps = false;
+    public $timestamps = true;
 
     protected $fillable = [
-        'tipo',
-        'descripcion'
+        'nombre',
+        'descripcion',
+        'estado',
     ];
+
+    public function getTipoAttribute(): ?string
+    {
+        return $this->nombre;
+    }
+
+    public function setTipoAttribute(?string $value): void
+    {
+        $this->attributes['nombre'] = $value;
+    }
 
 
     /**

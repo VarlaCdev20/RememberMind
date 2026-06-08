@@ -624,12 +624,12 @@ class ReporteDataService
             return ['total' => 0, 'completadas' => 0, 'pendientes' => 0, 'canceladas' => 0];
         }
 
-        $total       = DB::table('actividades_adulto')->whereNull('deleted_at')->count();
-        $completadas = DB::table('actividades_adulto')->whereNull('deleted_at')
+        $total       = $this->sinEliminados(DB::table('actividades_adulto'), 'actividades_adulto')->count();
+        $completadas = $this->sinEliminados(DB::table('actividades_adulto'), 'actividades_adulto')
             ->whereIn('estado', ['COMPLETADA', 'REALIZADA', 'FINALIZADA'])->count();
-        $pendientes  = DB::table('actividades_adulto')->whereNull('deleted_at')
+        $pendientes  = $this->sinEliminados(DB::table('actividades_adulto'), 'actividades_adulto')
             ->whereIn('estado', ['PROGRAMADA', 'PENDIENTE'])->count();
-        $canceladas  = DB::table('actividades_adulto')->whereNull('deleted_at')
+        $canceladas  = $this->sinEliminados(DB::table('actividades_adulto'), 'actividades_adulto')
             ->whereIn('estado', ['CANCELADA', 'ANULADA'])->count();
 
         return [
@@ -649,15 +649,15 @@ class ReporteDataService
         return DB::table('actividades_adulto as aa')
             ->join('adulto_mayor as am', 'aa.cod_am', '=', 'am.cod_am')
             ->leftJoin('tipo_actividades_adulto as ta', 'aa.cod_tipo_act', '=', 'ta.cod_tipo_act')
-            ->whereNull('aa.deleted_at')
+            ->when(Schema::hasColumn('actividades_adulto', 'deleted_at'), fn ($q) => $q->whereNull('aa.deleted_at'))
             ->select(
                 'aa.cod_act_adul',
                 DB::raw("CONCAT(am.nombres, ' ', am.ap_paterno) AS adulto"),
-                'ta.tipo as tipo_actividad',
+                'ta.nombre as tipo_actividad',
                 'aa.fecha',
-                'aa.hora',
+                'aa.hora_inicio as hora',
                 'aa.estado',
-                'aa.obs'
+                'aa.observacion as obs'
             )
             ->orderByDesc('aa.fecha')
             ->limit($limite)
@@ -671,7 +671,7 @@ class ReporteDataService
         }
 
         $resultados = DB::table('actividades_adulto')
-            ->whereNull('deleted_at')
+            ->when(Schema::hasColumn('actividades_adulto', 'deleted_at'), fn ($q) => $q->whereNull('deleted_at'))
             ->whereYear('fecha', now()->year)
             ->select(
                 DB::raw("TO_CHAR(fecha, 'MM') as mes"),
@@ -696,7 +696,7 @@ class ReporteDataService
         }
 
         $resultados = DB::table('actividades_adulto')
-            ->whereNull('deleted_at')
+            ->when(Schema::hasColumn('actividades_adulto', 'deleted_at'), fn ($q) => $q->whereNull('deleted_at'))
             ->whereNotNull('estado')
             ->select('estado', DB::raw('COUNT(*) as total'))
             ->groupBy('estado')
@@ -734,7 +734,7 @@ class ReporteDataService
 
         return DB::table('actividades_adulto as aa')
             ->join('adulto_mayor as am', 'aa.cod_am', '=', 'am.cod_am')
-            ->whereNull('aa.deleted_at')
+            ->when(Schema::hasColumn('actividades_adulto', 'deleted_at'), fn ($q) => $q->whereNull('aa.deleted_at'))
             ->select(
                 'am.cod_am',
                 DB::raw("CONCAT(am.nombres, ' ', am.ap_paterno) AS adulto"),

@@ -6,6 +6,7 @@ use Livewire\Component;
 use Livewire\WithPagination;
 use App\Models\AdultoMayor;
 use App\Models\ValoracionFuncionalAdulto;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
 
 class SaludValoracionPanel extends Component
@@ -176,11 +177,17 @@ class SaludValoracionPanel extends Component
                 'se_asusta_facil'      => $this->se_asusta_facil,
                 'necesita_supervision' => $this->necesita_supervision,
                 'nivel_dependencia'    => $this->nivel_dependencia,
-                'riesgo_caida'         => $this->riesgo_caida,
-                'indice_barthel'       => $this->indice_barthel !== '' ? (int) $this->indice_barthel : null,
                 'observacion'          => $this->observacion ?: null,
                 'registrado_por'       => auth()->user()->cod_usu,
             ];
+
+            if (Schema::hasColumn('valoracion_funcional_adulto', 'riesgo_caida')) {
+                $data['riesgo_caida'] = $this->riesgo_caida;
+            }
+
+            if (Schema::hasColumn('valoracion_funcional_adulto', 'indice_barthel')) {
+                $data['indice_barthel'] = $this->indice_barthel !== '' ? (int) $this->indice_barthel : null;
+            }
 
             if ($this->editandoId) {
                 $valoracion = ValoracionFuncionalAdulto::where('cod_am', $this->adulto->cod_am)
@@ -191,11 +198,13 @@ class SaludValoracionPanel extends Component
                 $texto  = 'Los cambios fueron guardados correctamente.';
             } else {
                 // Pasar todas las valoraciones VIGENTE del adulto a HISTORICA
-                ValoracionFuncionalAdulto::where('cod_am', $this->adulto->cod_am)
-                    ->where('estado', 'VIGENTE')
-                    ->update(['estado' => 'HISTORICA']);
+                if (Schema::hasColumn('valoracion_funcional_adulto', 'estado')) {
+                    ValoracionFuncionalAdulto::where('cod_am', $this->adulto->cod_am)
+                        ->where('estado', 'VIGENTE')
+                        ->update(['estado' => 'HISTORICA']);
 
-                $data['estado'] = 'VIGENTE';
+                    $data['estado'] = 'VIGENTE';
+                }
                 $valoracion = ValoracionFuncionalAdulto::create($data);
                 $mensajeBitacora = $this->riesgo_caida === 'ALTO'
                     ? "Registró valoración funcional con riesgo de caída ALTO del adulto mayor {$this->adulto->cod_am}."
@@ -235,12 +244,12 @@ class SaludValoracionPanel extends Component
 
         DB::beginTransaction();
         try {
-            $valoracion->update([
-                'estado'           => 'ANULADA',
-                'motivo_anulacion' => $this->motivo_anulacion,
-                'anulado_por'      => auth()->user()->cod_usu,
-                'fecha_anulacion'  => now(),
-            ]);
+            $data = ['observacion' => trim(($valoracion->observacion ?? '') . "\nAnulada: " . $this->motivo_anulacion)];
+            if (Schema::hasColumn('valoracion_funcional_adulto', 'estado')) $data['estado'] = 'ANULADA';
+            if (Schema::hasColumn('valoracion_funcional_adulto', 'motivo_anulacion')) $data['motivo_anulacion'] = $this->motivo_anulacion;
+            if (Schema::hasColumn('valoracion_funcional_adulto', 'anulado_por')) $data['anulado_por'] = auth()->user()->cod_usu;
+            if (Schema::hasColumn('valoracion_funcional_adulto', 'fecha_anulacion')) $data['fecha_anulacion'] = now();
+            $valoracion->update($data);
 
             activity()
                 ->causedBy(auth()->user())
@@ -267,16 +276,13 @@ class SaludValoracionPanel extends Component
 
         DB::beginTransaction();
         try {
-            ValoracionFuncionalAdulto::where('cod_am', $this->adulto->cod_am)
-                ->where('estado', 'VIGENTE')
-                ->update(['estado' => 'HISTORICA']);
+            if (Schema::hasColumn('valoracion_funcional_adulto', 'estado')) {
+                ValoracionFuncionalAdulto::where('cod_am', $this->adulto->cod_am)
+                    ->where('estado', 'VIGENTE')
+                    ->update(['estado' => 'HISTORICA']);
 
-            $valoracion->update([
-                'estado'           => 'VIGENTE',
-                'motivo_anulacion' => null,
-                'anulado_por'      => null,
-                'fecha_anulacion'  => null,
-            ]);
+                $valoracion->update(['estado' => 'VIGENTE']);
+            }
 
             activity()
                 ->causedBy(auth()->user())
@@ -300,12 +306,14 @@ class SaludValoracionPanel extends Component
 
         DB::beginTransaction();
         try {
-            ValoracionFuncionalAdulto::where('cod_am', $this->adulto->cod_am)
-                ->where('estado', 'VIGENTE')
-                ->update(['estado' => 'HISTORICA']);
-
             $valoracion = ValoracionFuncionalAdulto::where('cod_am', $this->adulto->cod_am)->findOrFail($id);
-            $valoracion->update(['estado' => 'VIGENTE']);
+            if (Schema::hasColumn('valoracion_funcional_adulto', 'estado')) {
+                ValoracionFuncionalAdulto::where('cod_am', $this->adulto->cod_am)
+                    ->where('estado', 'VIGENTE')
+                    ->update(['estado' => 'HISTORICA']);
+
+                $valoracion->update(['estado' => 'VIGENTE']);
+            }
 
             activity()
                 ->causedBy(auth()->user())
@@ -362,8 +370,8 @@ class SaludValoracionPanel extends Component
     public function render()
     {
         $valoraciones = $this->adulto->valoracionesFuncionales()
-            ->when($this->filtroEstado, fn ($q) => $q->where('estado', $this->filtroEstado))
-            ->when($this->filtroRiesgo, fn ($q) => $q->where('riesgo_caida', $this->filtroRiesgo))
+            ->when($this->filtroEstado && Schema::hasColumn('valoracion_funcional_adulto', 'estado'), fn ($q) => $q->where('estado', $this->filtroEstado))
+            ->when($this->filtroRiesgo && Schema::hasColumn('valoracion_funcional_adulto', 'riesgo_caida'), fn ($q) => $q->where('riesgo_caida', $this->filtroRiesgo))
             ->when($this->fechaDesde,   fn ($q) => $q->where('fecha_valoracion', '>=', $this->fechaDesde))
             ->when($this->fechaHasta,   fn ($q) => $q->where('fecha_valoracion', '<=', $this->fechaHasta))
             ->with(['registradoPor', 'anuladoPor'])

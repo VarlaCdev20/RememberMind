@@ -469,12 +469,9 @@
                                         fn ($asignacion) => in_array($asignacion->estado, ['ACTIVO', 'ACTIVA'], true)
                                     );
 
-                                    $tipo = $usuario->personalSalud?->tipo_personal_salud
-                                        ?? ($usuario->personalAdmin ? 'ADMINISTRATIVO' : ($usuario->roles->first()?->name ?? 'Sistema'));
+                                    $tipo = $usuario->categoria_institucional ?? ($usuario->roles->first()?->name ?? 'Sistema');
 
-                                    $area = $usuario->personalSalud
-                                        ? ($usuario->personalSalud->especialidad->nombre_especialidad ?? 'Salud')
-                                        : ($usuario->personalAdmin ? ($usuario->personalAdmin->cargo->nombre_cargo ?? 'Administrativo') : 'Sistema');
+                                    $area = $usuario->areaInstitucional?->nombre ?? ($usuario->tipo_personal === 'salud' ? 'Salud' : ($usuario->tipo_personal === 'admin' ? 'Administrativo' : 'Sistema'));
 
                                     $estadoActivo = $usuario->estado === 'ACTIVO' || $usuario->estado == 1;
                                     $estadoSuspendido = $usuario->estado === 'SUSPENDIDO';
@@ -625,12 +622,9 @@
                                                 fn ($asignacion) => in_array($asignacion->estado, ['ACTIVO', 'ACTIVA'], true)
                                             );
 
-                                            $tipo = $usuario->personalSalud?->tipo_personal_salud
-                                                ?? ($usuario->personalAdmin ? 'ADMINISTRATIVO' : ($usuario->roles->first()?->name ?? 'Sistema'));
+                                            $tipo = $usuario->categoria_institucional ?? ($usuario->roles->first()?->name ?? 'Sistema');
 
-                                            $area = $usuario->personalSalud
-                                                ? ($usuario->personalSalud->especialidad->nombre_especialidad ?? 'Salud')
-                                                : ($usuario->personalAdmin ? ($usuario->personalAdmin->cargo->nombre_cargo ?? 'Administrativo') : 'Sistema');
+                                            $area = $usuario->areaInstitucional?->nombre ?? ($usuario->tipo_personal === 'salud' ? 'Salud' : ($usuario->tipo_personal === 'admin' ? 'Administrativo' : 'Sistema'));
 
                                             $estadoActivo = $usuario->estado === 'ACTIVO' || $usuario->estado == 1;
                                             $estadoSuspendido = $usuario->estado === 'SUSPENDIDO';
@@ -1323,14 +1317,11 @@
                                             fn ($asignacion) => in_array($asignacion->estado, ['ACTIVO', 'ACTIVA'], true)
                                         );
 
-                                        $tipoSalud = $usuario->personalSalud?->tipo_personal_salud;
+                                        $tipoSalud = $usuario->rol_principal;
 
-                                        $tipo = $usuario->personalSalud?->tipo_personal_salud
-                                            ?? ($usuario->personalAdmin ? 'ADMINISTRATIVO' : ($usuario->roles->first()?->name ?? 'Sistema'));
+                                        $tipo = $usuario->categoria_institucional ?? ($usuario->roles->first()?->name ?? 'Sistema');
 
-                                        $area = $usuario->personalSalud
-                                            ? ($usuario->personalSalud->especialidad->nombre_especialidad ?? 'Salud')
-                                            : ($usuario->personalAdmin ? ($usuario->personalAdmin->cargo->nombre_cargo ?? 'Administrativo') : 'Sistema');
+                                        $area = $usuario->areaInstitucional?->nombre ?? ($usuario->tipo_personal === 'salud' ? 'Salud' : ($usuario->tipo_personal === 'admin' ? 'Administrativo' : 'Sistema'));
 
                                         $estadoActivo = $usuario->estado === 'ACTIVO' || $usuario->estado == 1;
                                         $estadoSuspendido = $usuario->estado === 'SUSPENDIDO';

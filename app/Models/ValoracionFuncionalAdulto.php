@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Traits\GeneraCodigo;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Schema;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
 
@@ -84,17 +85,23 @@ class ValoracionFuncionalAdulto extends Model
 
     public function scopeVigente($query)
     {
-        return $query->where('estado', 'VIGENTE');
+        return Schema::hasColumn($this->table, 'estado')
+            ? $query->where('estado', 'VIGENTE')
+            : $query->orderByDesc('fecha_valoracion');
     }
 
     public function scopeHistorica($query)
     {
-        return $query->where('estado', 'HISTORICA');
+        return Schema::hasColumn($this->table, 'estado')
+            ? $query->where('estado', 'HISTORICA')
+            : $query->whereRaw('1 = 0');
     }
 
     public function scopeAnulada($query)
     {
-        return $query->where('estado', 'ANULADA');
+        return Schema::hasColumn($this->table, 'estado')
+            ? $query->where('estado', 'ANULADA')
+            : $query->whereRaw('1 = 0');
     }
 
     public function scopePorAdulto($query, string $codAm)

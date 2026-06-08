@@ -3,8 +3,10 @@
 namespace App\Livewire\Admin\Enfermeria;
 
 use App\Models\AdultoMayor;
-use App\Models\ValoracionEnfermeriaAdmision;
+use App\Models\ValoracionFuncionalAdulto;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -108,10 +110,10 @@ class ValoracionEnfermeriaPanel extends Component
         ];
 
         if ($this->editandoId) {
-            ValoracionEnfermeriaAdmision::findOrFail($this->editandoId)->update($datos);
+            ValoracionFuncionalAdulto::findOrFail($this->editandoId)->update($this->datosValoracionFuncional());
             $msg = 'Valoración actualizada.';
         } else {
-            ValoracionEnfermeriaAdmision::create($datos);
+            ValoracionFuncionalAdulto::create($this->datosValoracionFuncional());
             $msg = 'Valoración de enfermería registrada.';
         }
 
@@ -159,16 +161,16 @@ class ValoracionEnfermeriaPanel extends Component
 
     public function render()
     {
-        $valoraciones = ValoracionEnfermeriaAdmision::with(['adultoMayor', 'registradoPor'])
+        $valoraciones = ValoracionFuncionalAdulto::with(['adultoMayor', 'registradoPor'])
+            ->select($this->columnasValoracionFuncional())
             ->when($this->search, fn($q) =>
                 $q->whereHas('adultoMayor', fn($sq) =>
                     $sq->where('nombres', 'ilike', '%' . $this->search . '%')
                       ->orWhere('ap_paterno', 'ilike', '%' . $this->search . '%')
                 )
             )
-            ->when($this->filtroEstado, fn($q) => $q->where('estado', $this->filtroEstado))
-            ->orderByDesc('fecha')
-            ->orderByDesc('hora')
+            ->when($this->filtroEstado && Schema::hasColumn('valoracion_funcional_adulto', 'estado'), fn($q) => $q->where('estado', $this->filtroEstado))
+            ->orderByDesc('fecha_valoracion')
             ->paginate(12);
 
         return view('livewire.admin.enfermeria.valoracion-enfermeria-panel', [
@@ -176,8 +178,42 @@ class ValoracionEnfermeriaPanel extends Component
             'adultos'      => AdultoMayor::select('cod_am','nombres','ap_paterno','ap_materno')
                 ->whereNull('archivado_en')->orderBy('ap_paterno')->get(),
             'detalle'      => $this->viendoId
-                ? ValoracionEnfermeriaAdmision::with('adultoMayor','registradoPor')->find($this->viendoId)
+                ? ValoracionFuncionalAdulto::with('adultoMayor','registradoPor')->find($this->viendoId)
                 : null,
         ])->layout('layouts.sistema');
+    }
+
+    private function datosValoracionFuncional(): array
+    {
+        return [
+            'cod_am' => $this->codAm,
+            'fecha_valoracion' => $this->fecha,
+            'camina_solo' => $this->movilidad === 'INDEPENDIENTE',
+            'usa_baston' => $this->usaApoyoMovilidad === 'BASTON',
+            'usa_andador' => $this->usaApoyoMovilidad === 'ANDADOR',
+            'usa_silla_ruedas' => $this->usaApoyoMovilidad === 'SILLA_RUEDAS',
+            'necesita_supervision' => $this->riesgoCaida === 'ALTO' || $this->requiereAtencionInmediata,
+            'nivel_dependencia' => $this->movilidad ?: 'NO ESPECIFICADO',
+            'observacion' => $this->observacion ?: $this->recomendacionEnfermeria ?: null,
+            'registrado_por' => Auth::id(),
+        ];
+    }
+
+    private function columnasValoracionFuncional(): array
+    {
+        return [
+            'cod_val_func',
+            'cod_am',
+            'fecha_valoracion',
+            'fecha_valoracion as fecha',
+            DB::raw("'00:00:00' as hora"),
+            DB::raw("'FUNCIONAL' as estado_general"),
+            'nivel_dependencia as nivel_conciencia',
+            Schema::hasColumn('valoracion_funcional_adulto', 'riesgo_caida') ? 'riesgo_caida' : DB::raw('NULL as riesgo_caida'),
+            DB::raw('NULL as piel_estado'),
+            'observacion',
+            Schema::hasColumn('valoracion_funcional_adulto', 'estado') ? 'estado' : DB::raw("'COMPLETADA' as estado"),
+            'registrado_por',
+        ];
     }
 }

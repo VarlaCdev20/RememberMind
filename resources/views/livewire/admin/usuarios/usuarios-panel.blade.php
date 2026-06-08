@@ -356,7 +356,8 @@
  <div>
  <span class="font-black text-meta uppercase tracking-wider block">Fecha de Ingreso:</span>
  <span class="font-bold text-parrafo">
- {{ $usuarioDetalle->personalAdmin?->fecha_ingreso ? \Carbon\Carbon::parse($usuarioDetalle->personalAdmin->fecha_ingreso)->format('d/m/Y') : 'No registrada' }}
+  @php($fechaIngresoAdmin = $usuarioDetalle->personalAdmin->fecha_ingreso ?? $usuarioDetalle->created_at ?? null)
+  {{ $fechaIngresoAdmin ? \Carbon\Carbon::parse($fechaIngresoAdmin)->format('d/m/Y') : 'No registrada' }}
  </span>
  </div>
  </div>
@@ -378,7 +379,8 @@
  <div>
  <span class="font-black text-meta uppercase tracking-wider block">Fecha de Ingreso:</span>
  <span class="font-bold text-parrafo">
- {{ $usuarioDetalle->personalSalud?->fecha_ingreso ? \Carbon\Carbon::parse($usuarioDetalle->personalSalud->fecha_ingreso)->format('d/m/Y') : 'No registrada' }}
+  @php($fechaIngresoSalud = $usuarioDetalle->personalSalud->fecha_ingreso ?? $usuarioDetalle->created_at ?? null)
+  {{ $fechaIngresoSalud ? \Carbon\Carbon::parse($fechaIngresoSalud)->format('d/m/Y') : 'No registrada' }}
  </span>
  </div>
  </div>

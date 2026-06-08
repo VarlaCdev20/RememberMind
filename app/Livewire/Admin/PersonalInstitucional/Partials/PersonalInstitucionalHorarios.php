@@ -102,7 +102,7 @@ class PersonalInstitucionalHorarios extends Component
 
         if ($hasSalud) {
             $this->tipoPersonal = 'salud';
-            $this->subtipoSalud = $usuario->personalSalud->tipo_personal_salud ?? $userRoles[0] ?? '';
+            $this->subtipoSalud = $usuario->rol_principal ?? $userRoles[0] ?? '';
         } elseif ($hasAdmin) {
             $this->tipoPersonal = 'admin';
         } else {
@@ -131,9 +131,14 @@ class PersonalInstitucionalHorarios extends Component
             'observaciones'   => $h->observaciones,
         ])->toArray();
 
-        $this->areas = AreaInstitucional::where('estado', 'ACTIVA')
-            ->orderBy('nombre')
-            ->get(['cod_area', 'nombre', 'tipo_area'])
+        $this->areas = AreaInstitucional::allAreas()
+            ->sortBy('nombre')
+            ->map(fn ($area) => [
+                'cod_area' => $area->cod_area,
+                'nombre' => $area->nombre,
+                'tipo_area' => $area->tipo_area,
+            ])
+            ->values()
             ->toArray();
 
         $this->turnos = TurnoInstitucional::where('estado', 'ACTIVO')
@@ -205,7 +210,7 @@ class PersonalInstitucionalHorarios extends Component
         $usuario = User::where('cod_usu', $this->usuarioId)->first();
 
         $this->codAsignacionEditar = $cod;
-        $this->f_cod_area          = $usuario->cod_area ?? '';
+        $this->f_cod_area          = $usuario->cod_area_virtual ?? '';
         $this->f_cod_turno         = ''; // User can re-select from list
         $this->f_dias_semana       = [$asig->dia_semana];
         $this->f_fecha_inicio      = now()->format('Y-m-d');
@@ -287,10 +292,6 @@ class PersonalInstitucionalHorarios extends Component
                         'observaciones' => $this->f_observaciones ?: null,
                     ]);
                 }
-            }
-
-            if ($this->f_cod_area) {
-                User::where('cod_usu', $this->usuarioId)->update(['cod_area' => $this->f_cod_area]);
             }
 
             DB::commit();

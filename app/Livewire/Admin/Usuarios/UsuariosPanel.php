@@ -3,6 +3,7 @@
 namespace App\Livewire\Admin\Usuarios;
 
 use App\Models\User;
+use App\Models\AreaInstitucional;
 use Spatie\Permission\Models\Role;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -2183,7 +2184,7 @@ class UsuariosPanel extends Component
         }
 
         try {
-            $query = User::query()->with(['area', 'roles']);
+            $query = User::query()->with(['roles']);
 
             if (!empty($this->search)) {
                 $query->where(function ($q) {
@@ -2203,7 +2204,8 @@ class UsuariosPanel extends Component
             }
 
             if (!empty($this->filtroArea)) {
-                $query->where('cod_area', $this->filtroArea);
+                $rolesArea = AreaInstitucional::rolesPorArea($this->filtroArea);
+                $query->whereHas('roles', fn ($q) => $q->whereIn('name', $rolesArea));
             }
 
             $usuarios = $query->orderBy('ap_paterno')->orderBy('nombres')->get();
@@ -2545,7 +2547,8 @@ class UsuariosPanel extends Component
         }
 
         if (!empty($this->filtroArea)) {
-            $query->where('cod_area', $this->filtroArea);
+            $rolesArea = AreaInstitucional::rolesPorArea($this->filtroArea);
+            $query->whereHas('roles', fn ($q) => $q->whereIn('name', $rolesArea));
         }
 
         // Ordenamiento: ACTIVOS primero, luego alfabético

@@ -41,15 +41,39 @@ class ActividadAdulto extends Model
     protected $fillable = [
         'fecha',
         'hora',
+        'hora_inicio',
+        'hora_fin',
         'obs',
+        'observacion',
         'estado',
         'cod_tipo_act',
-        'cod_am'
+        'cod_am',
+        'registrado_por',
     ];
 
     protected $casts = [
         'fecha' => 'date',
     ];
+
+    public function getHoraAttribute(): ?string
+    {
+        return $this->hora_inicio;
+    }
+
+    public function setHoraAttribute(?string $value): void
+    {
+        $this->attributes['hora_inicio'] = $value;
+    }
+
+    public function getObsAttribute(): ?string
+    {
+        return $this->observacion;
+    }
+
+    public function setObsAttribute(?string $value): void
+    {
+        $this->attributes['observacion'] = $value;
+    }
 
     /**
      * Normaliza un estado de actividad a su representación visual estandarizada.
