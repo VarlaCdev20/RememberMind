@@ -13,18 +13,13 @@ return new class extends Migration
         }
 
         Schema::create('planes_cuidado', function (Blueprint $table) {
-            $table->id('cod_plan');
-
-            $table->string('cod_am', 10);
+            $table->string('cod_plan', 20)->primary();
+            $table->string('cod_am', 20);
             $table->string('tipo_plan', 20)->default('INICIAL');
-            // INICIAL, AJUSTE, REEVALUACION
             $table->unsignedSmallInteger('version')->default(1);
             $table->string('nivel_cuidado', 30)->default('ESTANDAR');
-            // PREVENTIVO, ESTANDAR, INTENSIVO, PALIATIVO
             $table->string('estado', 20)->default('BORRADOR');
-            // BORRADOR, ACTIVO, REEMPLAZADO, CERRADO, ANULADO
             $table->string('origen', 50)->nullable();
-            // ADMISION, REEVALUACION_PERIODICA, CAMBIO_CONDICION, SOLICITUD_MEDICA
             $table->text('resumen')->nullable();
             $table->date('fecha_inicio');
             $table->date('fecha_fin')->nullable();

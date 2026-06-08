@@ -77,7 +77,7 @@ class PersonalInstitucionalHorarios extends Component
 
     public function cargarDatos(): void
     {
-        $usuario = User::with(['personalSalud', 'personalAdmin', 'roles'])
+        $usuario = User::with(['roles'])
             ->where('cod_usu', $this->usuarioId)
             ->first();
 
@@ -87,10 +87,18 @@ class PersonalInstitucionalHorarios extends Component
         $this->rolesUsuario  = $usuario->roles->pluck('name')->values()->all();
         $this->sinRol        = empty($this->rolesUsuario);
 
-        if ($usuario->personalSalud) {
+        $rolesSalud = [
+            'MEDICO GENERAL/GERIATRA', 'MÉDICO GENERAL/GERIATRA', 'MEDICO', 'MÉDICO',
+            'ENFERMEROS', 'ENFERMERO', 'ENFERMERA',
+            'PSICOLOGO/A', 'PSICÓLOGO/A', 'NUTRICIONISTA', 'FISIOTERAPEUTA', 'PEDAGOGO',
+        ];
+        $rolesAdmin = ['SUPERADMINISTRADOR', 'ADMINISTRADOR', 'ADMINISTRATIVO', 'PERSONAL ADMIN'];
+
+        if ($usuario->hasAnyRole($rolesSalud)) {
             $this->tipoPersonal = 'salud';
-            $this->subtipoSalud = $usuario->personalSalud->tipo_personal_salud ?? '';
-        } elseif ($usuario->personalAdmin) {
+            $rolNombre = $usuario->roles->whereIn('name', $rolesSalud)->first()?->name ?? '';
+            $this->subtipoSalud = strtoupper(str_replace(['/', ' ', '-'], '_', $rolNombre));
+        } elseif ($usuario->hasAnyRole($rolesAdmin)) {
             $this->tipoPersonal = 'admin';
         } else {
             $this->tipoPersonal = 'ninguno';

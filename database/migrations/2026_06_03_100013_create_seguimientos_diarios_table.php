@@ -13,11 +13,10 @@ return new class extends Migration
         }
 
         Schema::create('seguimientos_diarios', function (Blueprint $table) {
-            $table->id('cod_seg_diario');
-
-            $table->string('cod_am', 10);
-            $table->unsignedInteger('cod_turno');
-            $table->unsignedBigInteger('cod_plan')->nullable();
+            $table->string('cod_seg_diario', 20)->primary();
+            $table->string('cod_am', 20);
+            $table->string('cod_turno', 20);
+            $table->string('cod_plan', 20)->nullable();
             $table->string('registrado_por', 20)->nullable();
 
             $table->date('fecha');
@@ -26,39 +25,30 @@ return new class extends Migration
 
             // Estado general
             $table->string('estado_general', 30)->nullable();
-            // ESTABLE, REGULAR, DETERIORO, CRITICO, MEJORADO
 
             // Alimentación e hidratación
             $table->string('alimentacion', 20)->nullable();
-            // COMPLETA, PARCIAL, RECHAZADA, SONDA
             $table->unsignedTinyInteger('porcentaje_alimentacion')->nullable(); // 0-100
             $table->string('hidratacion', 20)->nullable();
-            // ADECUADA, ESCASA, NULA
 
             // Movilidad
             $table->string('movilidad', 30)->nullable();
-            // INDEPENDIENTE, ASISTIDA, EN_CAMA, SILLA_RUEDAS
             $table->boolean('intento_caminar_solo')->default(false);
 
             // Higiene
             $table->string('higiene', 20)->nullable();
-            // REALIZADA, PARCIAL, RECHAZADA
 
             // Sueño
             $table->string('sueno', 30)->nullable();
-            // DESCANSADO, INTERRUMPIDO, INSOMNE
 
             // Estado cognitivo
             $table->string('orientacion', 30)->nullable();
-            // ORIENTADO, PARCIALMENTE, DESORIENTADO
             $table->boolean('repite_preguntas')->default(false);
             $table->boolean('confusion_observable')->default(false);
 
             // Conducta y participación
             $table->string('conducta', 30)->nullable();
-            // TRANQUILO, AGITADO, ANSIOSO, DEPRIMIDO, COLABORADOR
             $table->string('participacion', 30)->nullable();
-            // ACTIVA, PASIVA, NULA
 
             // Alertas
             $table->boolean('incidente')->default(false);

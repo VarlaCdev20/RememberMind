@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Models\AdultoMayor;
 use App\Models\EvaluacionCognitiva;
 use App\Models\TipoEvaluacionCognitiva;
-use App\Models\PersonalSalud;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -14,12 +13,18 @@ class AdultoMayorEvaluacionController extends Controller
 {
     public function index(AdultoMayor $adulto_mayor)
     {
-        $evaluaciones = $adulto_mayor->evaluacionesCognitivas()->with(['tipoEvaluacion', 'personalSalud'])->latest()->get();
+        $evaluaciones = \Illuminate\Support\Facades\Schema::hasTable('evaluaciones_cognitivas')
+            ? $adulto_mayor->evaluacionesCognitivas()->with(['tipoEvaluacion', 'user'])->latest()->get()
+            : collect();
         return view('admin.adultos-mayores.evaluaciones.index', compact('adulto_mayor', 'evaluaciones'));
     }
 
     public function store(Request $request, AdultoMayor $adulto_mayor)
     {
+        if (!\Illuminate\Support\Facades\Schema::hasTable('evaluaciones_cognitivas')) {
+            return redirect()->route('admin.adultos-mayores.show', ['adulto_mayor' => $adulto_mayor->cod_am, 'tab' => 'evaluaciones'])->with('error', 'Módulo de evaluaciones cognitivas no disponible.');
+        }
+
         $request->validate([
             'cod_tipo_eval' => 'required|exists:tipo_evaluacion_cognitiva,cod_tipo_eval',
             'fecha_eval' => 'required|date|before_or_equal:today',
@@ -36,21 +41,15 @@ class AdultoMayorEvaluacionController extends Controller
         ]);
 
         $tipo = TipoEvaluacionCognitiva::findOrFail($request->cod_tipo_eval);
-        $personal = PersonalSalud::where('cod_usu', auth()->id())->first();
+        $codUsu = auth()->user()->cod_usu;
 
-        if (!$personal) {
-            // Fallback if the user is admin but not in personal_salud table
-            // For testing, we might need a default personal_salud or handle this
-            $personal = PersonalSalud::first();
-        }
-
-        DB::transaction(function () use ($request, $adulto_mayor, $tipo, $personal) {
+        DB::transaction(function () use ($request, $adulto_mayor, $tipo, $codUsu) {
             $interpretacion = $this->interpretarPuntaje($tipo, $request->puntaje_total);
 
             EvaluacionCognitiva::create([
                 'cod_am' => $adulto_mayor->cod_am,
                 'cod_tipo_eval' => $request->cod_tipo_eval,
-                'cod_per_sal' => $personal->cod_per_sal ?? 1,
+                'cod_usu' => $codUsu,
                 'fecha_eval' => $request->fecha_eval,
                 'hora_eval' => now()->format('H:i:s'),
                 'puntaje_total' => $request->puntaje_total,
@@ -97,6 +96,10 @@ class AdultoMayorEvaluacionController extends Controller
 
     public function destroy(AdultoMayor $adulto_mayor, EvaluacionCognitiva $evaluacion)
     {
+        if (!\Illuminate\Support\Facades\Schema::hasTable('evaluaciones_cognitivas')) {
+            return redirect()->route('admin.adultos-mayores.show', ['adulto_mayor' => $adulto_mayor->cod_am, 'tab' => 'evaluaciones'])->with('error', 'Módulo de evaluaciones cognitivas no disponible.');
+        }
+
         $evaluacion->delete(); // Soft delete
 
         activity('Adulto Mayor')
@@ -108,6 +111,10 @@ class AdultoMayorEvaluacionController extends Controller
 
     public function restore(AdultoMayor $adulto_mayor, $id)
     {
+        if (!\Illuminate\Support\Facades\Schema::hasTable('evaluaciones_cognitivas')) {
+            return redirect()->route('admin.adultos-mayores.show', ['adulto_mayor' => $adulto_mayor->cod_am, 'tab' => 'evaluaciones'])->with('error', 'Módulo de evaluaciones cognitivas no disponible.');
+        }
+
         $evaluacion = EvaluacionCognitiva::withTrashed()->findOrFail($id);
         $evaluacion->restore();
 

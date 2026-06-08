@@ -64,6 +64,15 @@ class MisPacientes extends Component
 
     public function render()
     {
+        if (!\Illuminate\Support\Facades\Schema::hasTable('asignaciones_turno_adulto')) {
+            return view('livewire.admin.enfermeria.mis-pacientes', [
+                'pacientes' => new \Illuminate\Pagination\LengthAwarePaginator(collect(), 0, 12),
+                'stats'     => ['total' => 0, 'con_alerta' => 0, 'sin_seguimiento' => 0, 'tareas_vencidas' => 0],
+                'turnos'    => TurnoEnfermeria::activos()->get(),
+                'enfermeros'=> \App\Models\User::role('ENFERMEROS')->orderBy('ap_paterno')->get(['cod_usu','nombres','ap_paterno']),
+            ])->layout('layouts.sistema');
+        }
+
         $fechaHoy = Carbon::now()->toDateString();
 
         $amQuery = AdultoMayor::with([

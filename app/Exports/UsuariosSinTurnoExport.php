@@ -26,7 +26,7 @@ class UsuariosSinTurnoExport implements FromCollection, WithHeadings, WithMappin
             ->whereDoesntHave('asignacionesTurno', function ($query) {
                 $query->where('estado', 'ACTIVA');
             })
-            ->with(['areaInstitucional', 'roles'])
+            ->with(['roles'])
             ->get();
     }
 

@@ -2,15 +2,20 @@
 
 namespace App\Models;
 
+use App\Traits\GeneraCodigo;
+
 use Illuminate\Database\Eloquent\Model;
 
 class DisponibilidadVoluntario extends Model
 {
+    use GeneraCodigo;
     protected $table = 'disponibilidad_voluntarios';
     protected $primaryKey = 'cod_hor_vol';
 
-    public $incrementing = true;
-    protected $keyType = 'int';
+    public $incrementing = false;
+    protected $keyType = 'string';
+    protected $prefixCode = 'DVO';
+    protected $digitsCode = 3;
 
     public $timestamps = false;
 

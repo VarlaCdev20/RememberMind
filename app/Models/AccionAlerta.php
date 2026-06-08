@@ -2,16 +2,21 @@
 
 namespace App\Models;
 
+use App\Traits\GeneraCodigo;
+
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class AccionAlerta extends Model
 {
+    use GeneraCodigo;
     protected $table      = 'acciones_alerta';
     protected $primaryKey = 'cod_accion_alerta';
 
-    public $incrementing = true;
-    protected $keyType   = 'int';
+    public $incrementing = false;
+    protected $keyType = 'string';
+    protected $prefixCode = 'ACA';
+    protected $digitsCode = 5;
     public $timestamps   = true;
 
     protected $fillable = [

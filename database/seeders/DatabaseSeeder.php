@@ -7,8 +7,6 @@ use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
 {
-    use WithoutModelEvents;
-
     /**
      * Seed the application's database.
      */
@@ -17,19 +15,17 @@ class DatabaseSeeder extends Seeder
         $this->call([
             // Infraestructura base
             EstadoAdultoSeeder::class,
+            EstadosAdultoFlujoClinicoSeeder::class,
             RolesAndPermissionsSeeder::class,
             SaludSeguimientoPermissionsSeeder::class,
             FlujoClinicoPermissionsSeeder::class,
 
             // Datos institucionales
-            AreasInstitucionalesSeeder::class,
-            CargoAdministrativoSeeder::class,
-            EspecialidadSeeder::class,
             TurnoInstitucionalSeeder::class,
+            TurnosEnfermeriaSeeder::class,
             TipoDocumentoUsuarioSeeder::class,
             TipoAtencionAdultoSeeder::class,
             TipoActividadAdultoSeeder::class,
-            TipoEvaluacionCognitivaSeeder::class,
             GeriatricSuiteSeeder::class,
 
             // Datos de ejemplo
@@ -38,5 +34,4 @@ class DatabaseSeeder extends Seeder
             EnfermeriaPacienteSeeder::class,
         ]);
     }
-
 }

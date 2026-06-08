@@ -2,19 +2,24 @@
 
 namespace App\Models;
 
+use App\Traits\GeneraCodigo;
+
 use Illuminate\Database\Eloquent\Model;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
 
 class SignosVitalesAdulto extends Model
 {
+    use GeneraCodigo;
     use LogsActivity;
 
     protected $table = 'signos_vitales_adulto';
     protected $primaryKey = 'cod_signo';
 
-    public $incrementing = true;
-    protected $keyType = 'int';
+    public $incrementing = false;
+    protected $keyType = 'string';
+    protected $prefixCode = 'SVA';
+    protected $digitsCode = 5;
 
     public $timestamps = true;
 

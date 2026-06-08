@@ -47,6 +47,10 @@ class AsignacionTurnoPanel extends Component
 
     public function guardar(): void
     {
+        if (!\Illuminate\Support\Facades\Schema::hasTable('asignaciones_turno_adulto')) {
+            return;
+        }
+
         $this->validate([
             'codAm'            => 'required|exists:adulto_mayor,cod_am',
             'codTurno'         => 'required|exists:turnos_enfermeria,cod_turno',

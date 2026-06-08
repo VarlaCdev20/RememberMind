@@ -127,8 +127,8 @@ class UpdateUsuarioRequest extends FormRequest
                 Rule::unique('users', 'correo')->ignore($codUsu, 'cod_usu')
             ],
             'rol'                  => ['required', 'string', 'exists:roles,name'],
-            'especialidad_salud'   => ['required_if:rol,ENFERMEROS,MEDICO GENERAL/GERIATRA,PSICOLOGO/A,PEDAGOGO,NUTRICIONISTA,FISIOTERAPEUTA', 'nullable', 'exists:especialidades,cod_esp'],
-            'cargo_administrativo' => ['required_if:rol,SUPERADMINISTRADOR,ADMINISTRADOR', 'nullable', 'exists:cargos_administrativos,cod_cargo_admin'],
+            'especialidad_salud'   => ['nullable', 'string'],
+            'cargo_administrativo' => ['nullable', 'string'],
             'genero'               => ['required', 'in:FEMENINO,MASCULINO,OTRO,PREFIERE NO ESPECIFICAR'],
             'fecha_nacimiento'     => [
                 'required', 

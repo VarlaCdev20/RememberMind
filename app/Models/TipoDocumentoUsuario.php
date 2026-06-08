@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Traits\GeneraCodigo;
+
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\Traits\LogsActivity;
@@ -9,12 +11,15 @@ use Spatie\Activitylog\LogOptions;
 
 class TipoDocumentoUsuario extends Model
 {
+    use GeneraCodigo;
     use SoftDeletes, LogsActivity;
 
     protected $table = 'tipos_documentos_usuario';
     protected $primaryKey = 'cod_tipo_doc';
     public $incrementing = false;
     protected $keyType = 'string';
+    protected $prefixCode = 'TDU';
+    protected $digitsCode = 3;
 
     protected $fillable = [
         'cod_tipo_doc',

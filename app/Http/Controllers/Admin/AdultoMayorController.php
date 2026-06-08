@@ -112,8 +112,12 @@ public function show(AdultoMayor $adulto_mayor)
     $asignaciones = $adulto->voluntarios()->get();
 
     // Evaluaciones - Divididas por SoftDeletes
-    $evaluacionesActivas = $adulto->evaluacionesCognitivas()->with(['tipoEvaluacion', 'personalSalud'])->latest()->get();
-    $evaluacionesAnuladas = $adulto->evaluacionesCognitivas()->onlyTrashed()->with(['tipoEvaluacion', 'personalSalud'])->latest('deleted_at')->get();
+    $evaluacionesActivas = \Illuminate\Support\Facades\Schema::hasTable('evaluaciones_cognitivas')
+        ? $adulto->evaluacionesCognitivas()->with(['tipoEvaluacion', 'user'])->latest()->get()
+        : collect();
+    $evaluacionesAnuladas = \Illuminate\Support\Facades\Schema::hasTable('evaluaciones_cognitivas')
+        ? $adulto->evaluacionesCognitivas()->onlyTrashed()->with(['tipoEvaluacion', 'user'])->latest('deleted_at')->get()
+        : collect();
 
     // Evaluaciones Geriátricas Integrales (Fase 2)
     $evaluacionesGeriatricasActivas = \App\Models\EvaluacionGeriatrica::where('cod_am', $adulto_mayor->cod_am)
@@ -138,7 +142,9 @@ public function show(AdultoMayor $adulto_mayor)
 
     $estadosAdulto   = $this->adultoMayorService->obtenerEstados();
     $tiposAtenciones = $this->adultoMayorService->obtenerTiposAtenciones();
-    $tiposEvaluaciones = \App\Models\TipoEvaluacionCognitiva::where('estado', 'ACTIVO')->get();
+    $tiposEvaluaciones = \Illuminate\Support\Facades\Schema::hasTable('tipo_evaluacion_cognitiva')
+        ? \App\Models\TipoEvaluacionCognitiva::where('estado', 'ACTIVO')->get()
+        : collect();
     $tiposActividades = TipoActividadAdulto::all();
 
     // Bitácora escalable desde Spatie Activitylog
@@ -185,8 +191,12 @@ public function show(AdultoMayor $adulto_mayor)
         $adulto = $this->adultoMayorService->obtenerDetalle($adulto_mayor->cod_am);
         $adulto->edad = $this->adultoMayorService->calcularEdad($adulto->fecha_nac);
         
-        $evaluaciones = $adulto->evaluacionesCognitivas()->with(['tipoEvaluacion', 'personalSalud'])->latest()->get();
-        $evaluacionesAnuladas = $adulto->evaluacionesCognitivas()->onlyTrashed()->with(['tipoEvaluacion', 'personalSalud'])->latest('deleted_at')->get();
+        $evaluaciones = \Illuminate\Support\Facades\Schema::hasTable('evaluaciones_cognitivas')
+            ? $adulto->evaluacionesCognitivas()->with(['tipoEvaluacion', 'user'])->latest()->get()
+            : collect();
+        $evaluacionesAnuladas = \Illuminate\Support\Facades\Schema::hasTable('evaluaciones_cognitivas')
+            ? $adulto->evaluacionesCognitivas()->onlyTrashed()->with(['tipoEvaluacion', 'user'])->latest('deleted_at')->get()
+            : collect();
 
         $atenciones = $adulto->atenciones()->with('tipoAtencion')->latest()->get();
         $atencionesAnuladas = $adulto->atenciones()->onlyTrashed()->with('tipoAtencion')->latest('deleted_at')->get();
@@ -333,7 +343,9 @@ public function show(AdultoMayor $adulto_mayor)
                 $titulo = "Reporte de Valoración Funcional Institucional";
                 break;
             case 'cognitivo':
-                $viewData['evaluaciones'] = $applyDateFilter($adulto->evaluacionesCognitivas()->with(['tipoEvaluacion', 'personalSalud']), 'fecha_eval')->latest('fecha_eval')->get();
+                $viewData['evaluaciones'] = \Illuminate\Support\Facades\Schema::hasTable('evaluaciones_cognitivas')
+                    ? $applyDateFilter($adulto->evaluacionesCognitivas()->with(['tipoEvaluacion', 'user']), 'fecha_eval')->latest('fecha_eval')->get()
+                    : collect();
                 $titulo = "Historial de Evaluaciones Cognitivas";
                 break;
             default:
@@ -370,7 +382,9 @@ public function show(AdultoMayor $adulto_mayor)
     $totalAtenciones = \App\Models\AtencionAdulto::count();
     $totalActividades = \App\Models\ActividadAdulto::count();
     $totalDocumentos = \App\Models\DocumentoAdultoMayor::count();
-    $totalEvaluaciones = \App\Models\EvaluacionCognitiva::count();
+    $totalEvaluaciones = \Illuminate\Support\Facades\Schema::hasTable('evaluaciones_cognitivas')
+        ? \App\Models\EvaluacionCognitiva::count()
+        : 0;
 
     // Adultos sin seguimiento (sin observaciones ni atenciones en los últimos 30 días)
     $hace30Dias = now()->subDays(30);
@@ -405,7 +419,9 @@ public function show(AdultoMayor $adulto_mayor)
         $adultos = AdultoMayor::all();
         $totalAtenciones = \App\Models\AtencionAdulto::count();
         $totalActividades = \App\Models\ActividadAdulto::count();
-        $totalEvaluaciones = \App\Models\EvaluacionCognitiva::count();
+        $totalEvaluaciones = \Illuminate\Support\Facades\Schema::hasTable('evaluaciones_cognitivas')
+            ? \App\Models\EvaluacionCognitiva::count()
+            : 0;
 
         $stats = [
             'poblacion' => $adultos->count(),
@@ -421,13 +437,17 @@ public function show(AdultoMayor $adulto_mayor)
     public function reporteBienestar()
     {
         $adultos = AdultoMayor::all();
-        $totalEvaluaciones = \App\Models\EvaluacionCognitiva::count();
-        
-        $distribucionRiesgo = [
-            'bajo' => \App\Models\EvaluacionCognitiva::where('nivel_riesgo', 'BAJO')->count(),
-            'medio' => \App\Models\EvaluacionCognitiva::where('nivel_riesgo', 'MEDIO')->count(),
-            'alto' => \App\Models\EvaluacionCognitiva::where('nivel_riesgo', 'ALTO')->count(),
-        ];
+        $totalEvaluaciones = \Illuminate\Support\Facades\Schema::hasTable('evaluaciones_cognitivas')
+            ? \App\Models\EvaluacionCognitiva::count()
+            : 0;
+
+        $distribucionRiesgo = \Illuminate\Support\Facades\Schema::hasTable('evaluaciones_cognitivas')
+            ? [
+                'bajo' => \App\Models\EvaluacionCognitiva::where('nivel_riesgo', 'BAJO')->count(),
+                'medio' => \App\Models\EvaluacionCognitiva::where('nivel_riesgo', 'MEDIO')->count(),
+                'alto' => \App\Models\EvaluacionCognitiva::where('nivel_riesgo', 'ALTO')->count(),
+            ]
+            : ['bajo' => 0, 'medio' => 0, 'alto' => 0];
 
         return view('admin.adultos-mayores.reportes.bienestar', compact('distribucionRiesgo', 'totalEvaluaciones'));
     }

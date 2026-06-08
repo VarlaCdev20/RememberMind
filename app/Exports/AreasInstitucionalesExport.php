@@ -18,6 +18,10 @@ class AreasInstitucionalesExport implements FromCollection, WithHeadings, WithMa
      */
     public function collection()
     {
+        if (! \Illuminate\Support\Facades\Schema::hasTable('areas_institucionales')) {
+            return collect();
+        }
+
         return AreaInstitucional::with(['responsable', 'usuarios'])->orderBy('nombre')->get();
     }
 

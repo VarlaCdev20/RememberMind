@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Traits\GeneraCodigo;
+
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\Traits\LogsActivity;
@@ -9,12 +11,15 @@ use Spatie\Activitylog\LogOptions;
 
 class DocumentoUsuario extends Model
 {
+    use GeneraCodigo;
     use SoftDeletes, LogsActivity;
 
     protected $table = 'documentos_usuarios';
     protected $primaryKey = 'cod_doc_usu';
     public $incrementing = false;
     protected $keyType = 'string';
+    protected $prefixCode = 'DUS';
+    protected $digitsCode = 5;
 
     protected $fillable = [
         'cod_doc_usu',

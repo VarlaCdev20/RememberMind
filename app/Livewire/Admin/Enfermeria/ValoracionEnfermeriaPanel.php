@@ -66,6 +66,10 @@ class ValoracionEnfermeriaPanel extends Component
 
     public function guardar(): void
     {
+        if (!\Illuminate\Support\Facades\Schema::hasTable('valoraciones_enfermeria_admision')) {
+            return;
+        }
+
         $this->validate([
             'codAm'   => 'required|exists:adulto_mayor,cod_am',
             'fecha'   => 'required|date',
@@ -159,25 +163,30 @@ class ValoracionEnfermeriaPanel extends Component
 
     public function render()
     {
-        $valoraciones = ValoracionEnfermeriaAdmision::with(['adultoMayor', 'registradoPor'])
-            ->when($this->search, fn($q) =>
-                $q->whereHas('adultoMayor', fn($sq) =>
-                    $sq->where('nombres', 'ilike', '%' . $this->search . '%')
-                      ->orWhere('ap_paterno', 'ilike', '%' . $this->search . '%')
+        $valoraciones = \Illuminate\Support\Facades\Schema::hasTable('valoraciones_enfermeria_admision')
+            ? ValoracionEnfermeriaAdmision::with(['adultoMayor', 'registradoPor'])
+                ->when($this->search, fn($q) =>
+                    $q->whereHas('adultoMayor', fn($sq) =>
+                        $sq->where('nombres', 'ilike', '%' . $this->search . '%')
+                          ->orWhere('ap_paterno', 'ilike', '%' . $this->search . '%')
+                    )
                 )
-            )
-            ->when($this->filtroEstado, fn($q) => $q->where('estado', $this->filtroEstado))
-            ->orderByDesc('fecha')
-            ->orderByDesc('hora')
-            ->paginate(12);
+                ->when($this->filtroEstado, fn($q) => $q->where('estado', $this->filtroEstado))
+                ->orderByDesc('fecha')
+                ->orderByDesc('hora')
+                ->paginate(12)
+            : new \Illuminate\Pagination\LengthAwarePaginator(collect(), 0, 12);
+
+        $detalle = null;
+        if ($this->viendoId && \Illuminate\Support\Facades\Schema::hasTable('valoraciones_enfermeria_admision')) {
+            $detalle = ValoracionEnfermeriaAdmision::with('adultoMayor','registradoPor')->find($this->viendoId);
+        }
 
         return view('livewire.admin.enfermeria.valoracion-enfermeria-panel', [
             'valoraciones' => $valoraciones,
             'adultos'      => AdultoMayor::select('cod_am','nombres','ap_paterno','ap_materno')
                 ->whereNull('archivado_en')->orderBy('ap_paterno')->get(),
-            'detalle'      => $this->viendoId
-                ? ValoracionEnfermeriaAdmision::with('adultoMayor','registradoPor')->find($this->viendoId)
-                : null,
+            'detalle'      => $detalle,
         ])->layout('layouts.sistema');
     }
 }

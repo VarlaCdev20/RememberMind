@@ -33,7 +33,9 @@
       "Bash(curl -s -o /dev/null -w \"HTTP %{http_code}\\\\n\" \"http://127.0.0.1:8765/admin/salud-seguimiento/AM_0001/signos\")",
       "Bash(kill %1)",
       "Bash(php -l app/Livewire/Admin/SaludSeguimiento/SaludSeguimientoListPanel.php)",
-      "Bash(grep -r \"use App\\\\\\\\\\\\Models\\\\\\\\\\\\Habitacion\\\\|use App\\\\\\\\\\\\Models\\\\\\\\\\\\Cama\" \"c:\\\\laragon\\\\www\\\\RememberMind_F1\\\\app\")"
+      "Bash(grep -r \"use App\\\\\\\\\\\\Models\\\\\\\\\\\\Habitacion\\\\|use App\\\\\\\\\\\\Models\\\\\\\\\\\\Cama\" \"c:\\\\laragon\\\\www\\\\RememberMind_F1\\\\app\")",
+      "Bash(php artisan *)",
+      "Bash(php -r ' *)"
     ],
     "additionalDirectories": [
       "c:\\laragon\\www\\RememberMind_F1\\app\\Http\\Controllers\\Admin"

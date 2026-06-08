@@ -28,6 +28,10 @@ class AsignacionesPorAreaExport implements FromCollection, WithHeadings, WithMap
      */
     public function collection()
     {
+        if (! \Illuminate\Support\Facades\Schema::hasTable('asignaciones_turno') || ! \Illuminate\Support\Facades\Schema::hasTable('areas_institucionales')) {
+            return collect();
+        }
+
         return AsignacionTurno::with(['usuario', 'area', 'turno'])
             ->where('cod_area', $this->codArea)
             ->orderBy('fecha_inicio', 'desc')

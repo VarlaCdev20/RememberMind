@@ -9,8 +9,6 @@ use App\Models\AreaInstitucional;
 use App\Models\AsignacionTurno;
 use App\Models\HorarioPersonalAdmin;
 use App\Models\HorarioPersonalSalud;
-use App\Models\PersonalAdmin;
-use App\Models\PersonalSalud;
 use App\Models\TurnoInstitucional;
 use App\Models\User;
 use App\Services\Reports\ReportExportService;
@@ -18,6 +16,7 @@ use App\Services\Reports\ReportFileNameService;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Schema;
 use Livewire\Component;
 
 class TurnosAsignacionesPanel extends Component
@@ -117,18 +116,20 @@ class TurnosAsignacionesPanel extends Component
 
     public function render()
     {
-        $areasDisponibles = AreaInstitucional::activas()->orderBy('nombre')->get();
+        $areasDisponibles = Schema::hasTable('areas_institucionales') ? AreaInstitucional::activas()->orderBy('nombre')->get() : collect();
         $turnosDisponibles = TurnoInstitucional::activos()->orderBy('nombre')->get();
         $turnosLista = TurnoInstitucional::orderBy('nombre')->get();
         $usuariosDisponibles = $this->usuariosActivosQuery()
-            ->with(['areaInstitucional', 'personalAdmin.cargoAdmin', 'personalSalud.especialidad'])
+            ->with(['roles'])
             ->orderBy('nombres')
             ->get();
 
-        $asignaciones = $this->asignacionesFiltradasQuery()
-            ->orderByRaw("CASE WHEN estado = 'ACTIVA' THEN 0 WHEN estado = 'INACTIVA' THEN 1 ELSE 2 END")
-            ->orderBy('fecha_inicio', 'desc')
-            ->get();
+        $asignaciones = Schema::hasTable('asignaciones_turno')
+            ? $this->asignacionesFiltradasQuery()
+                ->orderByRaw("CASE WHEN estado = 'ACTIVA' THEN 0 WHEN estado = 'INACTIVA' THEN 1 ELSE 2 END")
+                ->orderBy('fecha_inicio', 'desc')
+                ->get()
+            : collect();
 
         $horarios = $this->horariosColeccion();
         $alertas = $this->alertasOperativas($usuariosDisponibles, $asignaciones, $horarios, $areasDisponibles);
@@ -292,7 +293,7 @@ class TurnosAsignacionesPanel extends Component
         $this->horarioId = $id;
         $this->horarioTipoEdicion = $tipo;
         $this->horario_tipo_personal = $tipo;
-        $this->horario_personal_id = $tipo === 'salud' ? $horario->cod_per_sal : $horario->cod_per_adm;
+        $this->horario_personal_id = $horario->cod_usu ?? '';
         $this->horario_dias_semana = [$horario->dia_semana];
         $this->horario_hora_inicio = $this->formatoHoraInput($horario->hora_inicio);
         $this->horario_hora_fin = $this->formatoHoraInput($horario->hora_fin);
@@ -313,7 +314,7 @@ class TurnosAsignacionesPanel extends Component
 
         $this->validate([
             'horario_tipo_personal' => 'required|in:admin,salud',
-            'horario_personal_id' => 'required|integer',
+            'horario_personal_id' => 'required|string|exists:users,cod_usu',
             'horario_dias_semana' => 'required|array|min:1',
             'horario_hora_inicio' => 'required|date_format:H:i',
             'horario_hora_fin' => 'required|date_format:H:i|after:horario_hora_inicio',
@@ -499,6 +500,11 @@ class TurnosAsignacionesPanel extends Component
 
     public function cargarAsignacion($codAsignacion): void
     {
+        if (! Schema::hasTable('asignaciones_turno')) {
+            $this->dispatch('swal', ['icon' => 'error', 'title' => 'No disponible', 'text' => 'Funcionalidad temporalmente deshabilitada.']);
+            return;
+        }
+
         if (! Auth::user()->can('turnos.asignar')) {
             $this->dispatch('swal', ['icon' => 'error', 'title' => 'Acceso denegado', 'text' => 'No tienes permiso para editar asignaciones.']);
             return;
@@ -524,13 +530,17 @@ class TurnosAsignacionesPanel extends Component
 
     public function verFichaAsignacion($codAsignacion): void
     {
-        $this->asignacionSeleccionada = AsignacionTurno::with(['usuario.areaInstitucional', 'area', 'turno', 'creador', 'editor'])
-            ->findOrFail($codAsignacion);
+        $this->asignacionSeleccionada = null;
         $this->mostrarFichaAsignacion = true;
     }
 
     public function guardarAsignacion(): void
     {
+        if (! Schema::hasTable('asignaciones_turno')) {
+            $this->dispatch('swal', ['icon' => 'error', 'title' => 'No disponible', 'text' => 'Funcionalidad temporalmente deshabilitada.']);
+            return;
+        }
+
         if (! Auth::user()->can('turnos.asignar')) {
             $this->dispatch('swal', ['icon' => 'error', 'title' => 'Acceso denegado', 'text' => 'No tienes permiso para realizar asignaciones.']);
             return;
@@ -632,6 +642,11 @@ class TurnosAsignacionesPanel extends Component
 
     public function finalizarAsignacion($codAsignacion): void
     {
+        if (! Schema::hasTable('asignaciones_turno')) {
+            $this->dispatch('swal', ['icon' => 'error', 'title' => 'No disponible', 'text' => 'Funcionalidad temporalmente deshabilitada.']);
+            return;
+        }
+
         if (! Auth::user()->can('turnos.finalizar')) {
             $this->dispatch('swal', ['icon' => 'error', 'title' => 'Acceso denegado', 'text' => 'No tienes permiso para finalizar asignaciones.']);
             return;
@@ -653,6 +668,11 @@ class TurnosAsignacionesPanel extends Component
 
     public function eliminarAsignacion($codAsignacion): void
     {
+        if (! Schema::hasTable('asignaciones_turno')) {
+            $this->dispatch('swal', ['icon' => 'error', 'title' => 'No disponible', 'text' => 'Funcionalidad temporalmente deshabilitada.']);
+            return;
+        }
+
         if (! Auth::user()->can('turnos.finalizar')) {
             $this->dispatch('swal', ['icon' => 'error', 'title' => 'Acceso denegado', 'text' => 'No tienes permiso para archivar asignaciones.']);
             return;
@@ -665,6 +685,11 @@ class TurnosAsignacionesPanel extends Component
 
     public function exportarReporteGeneralPdf()
     {
+        if (! Schema::hasTable('asignaciones_turno') || ! Schema::hasTable('areas_institucionales')) {
+            $this->dispatch('swal', ['icon' => 'error', 'title' => 'No disponible', 'text' => 'Funcionalidad temporalmente deshabilitada.']);
+            return;
+        }
+
         if (! Auth::user()->can('turnos.reportes')) {
             $this->dispatch('swal', ['icon' => 'error', 'title' => 'Acceso denegado', 'text' => 'No tienes permiso para exportar reportes.']);
             return;
@@ -709,6 +734,11 @@ class TurnosAsignacionesPanel extends Component
 
     public function exportarReporteAreaPdf($codArea)
     {
+        if (! Schema::hasTable('areas_institucionales') || ! Schema::hasTable('asignaciones_turno')) {
+            $this->dispatch('swal', ['icon' => 'error', 'title' => 'No disponible', 'text' => 'Funcionalidad temporalmente deshabilitada.']);
+            return;
+        }
+
         if (! Auth::user()->can('turnos.reportes')) {
             $this->dispatch('swal', ['icon' => 'error', 'title' => 'Acceso denegado', 'text' => 'No tienes permiso para exportar reportes.']);
             return;
@@ -734,6 +764,11 @@ class TurnosAsignacionesPanel extends Component
 
     public function exportarCoberturaSemanalPdf()
     {
+        if (! Schema::hasTable('asignaciones_turno') || ! Schema::hasTable('areas_institucionales')) {
+            $this->dispatch('swal', ['icon' => 'error', 'title' => 'No disponible', 'text' => 'Funcionalidad temporalmente deshabilitada.']);
+            return;
+        }
+
         if (! Auth::user()->can('turnos.reportes')) {
             $this->dispatch('swal', ['icon' => 'error', 'title' => 'Acceso denegado', 'text' => 'No tienes permiso para exportar reportes.']);
             return;
@@ -778,6 +813,11 @@ class TurnosAsignacionesPanel extends Component
 
     public function exportarReporteAreaExcel($codArea)
     {
+        if (! Schema::hasTable('areas_institucionales') || ! Schema::hasTable('asignaciones_turno')) {
+            $this->dispatch('swal', ['icon' => 'error', 'title' => 'No disponible', 'text' => 'Funcionalidad temporalmente deshabilitada.']);
+            return;
+        }
+
         if (! Auth::user()->can('turnos.reportes')) {
             $this->dispatch('swal', ['icon' => 'error', 'title' => 'Acceso denegado', 'text' => 'No tienes permiso para exportar reportes.']);
             return;
@@ -820,7 +860,11 @@ class TurnosAsignacionesPanel extends Component
 
     private function asignacionesFiltradasQuery()
     {
-        $query = AsignacionTurno::with(['usuario.personalAdmin', 'usuario.personalSalud', 'area', 'turno']);
+        if (! Schema::hasTable('asignaciones_turno')) {
+            return AsignacionTurno::whereRaw('1 = 0');
+        }
+
+        $query = AsignacionTurno::with(['usuario.roles', 'area', 'turno']);
 
         if ($this->search) {
             $query->whereHas('usuario', function ($q) {
@@ -851,11 +895,17 @@ class TurnosAsignacionesPanel extends Component
         }
 
         if ($this->filtroTipoPersonal === 'admin') {
-            $query->whereHas('usuario.personalAdmin');
+            $query->whereHas('usuario.roles', fn ($q) => $q->whereIn('name', [
+                'SUPERADMINISTRADOR', 'ADMINISTRADOR', 'ADMINISTRATIVO',
+            ]));
         }
 
         if ($this->filtroTipoPersonal === 'salud') {
-            $query->whereHas('usuario.personalSalud');
+            $query->whereHas('usuario.roles', fn ($q) => $q->whereIn('name', [
+                'MEDICO GENERAL/GERIATRA', 'MÉDICO GENERAL/GERIATRA',
+                'ENFERMEROS', 'ENFERMERO', 'ENFERMERA',
+                'PSICOLOGO/A', 'PSICÓLOGO/A', 'NUTRICIONISTA', 'FISIOTERAPEUTA', 'PEDAGOGO',
+            ]));
         }
 
         return $query;
@@ -863,11 +913,11 @@ class TurnosAsignacionesPanel extends Component
 
     private function horariosColeccion(): Collection
     {
-        $admin = HorarioPersonalAdmin::with(['personalAdmin.usuario', 'personalAdmin.cargoAdmin'])
+        $admin = HorarioPersonalAdmin::with(['user'])
             ->get()
             ->map(fn ($h) => $this->mapHorarioAdmin($h));
 
-        $salud = HorarioPersonalSalud::with(['personalSalud.usuario', 'personalSalud.especialidad'])
+        $salud = HorarioPersonalSalud::with(['user'])
             ->get()
             ->map(fn ($h) => $this->mapHorarioSalud($h));
 
@@ -880,7 +930,7 @@ class TurnosAsignacionesPanel extends Component
 
     private function mapHorarioAdmin(HorarioPersonalAdmin $h): array
     {
-        $usuario = $h->personalAdmin?->usuario;
+        $usuario = $h->user;
 
         return [
             'id' => $h->cod_hor_per_admin,
@@ -888,7 +938,7 @@ class TurnosAsignacionesPanel extends Component
             'tipo_label' => 'Administrativo',
             'persona' => $usuario?->name ?: 'Sin usuario',
             'cod_usu' => $usuario?->cod_usu,
-            'cargo' => $h->personalAdmin?->cargoAdmin?->nombre ?: ($h->personalAdmin?->cargo ?: 'Personal administrativo'),
+            'cargo' => 'Personal administrativo',
             'dia' => $h->dia_semana,
             'dia_label' => self::DIA_LABELS[$h->dia_semana] ?? $h->dia_semana,
             'hora_inicio' => $this->formatoHora($h->hora_inicio),
@@ -902,7 +952,7 @@ class TurnosAsignacionesPanel extends Component
 
     private function mapHorarioSalud(HorarioPersonalSalud $h): array
     {
-        $usuario = $h->personalSalud?->usuario;
+        $usuario = $h->user;
 
         return [
             'id' => $h->cod_hor_per_sal,
@@ -910,7 +960,7 @@ class TurnosAsignacionesPanel extends Component
             'tipo_label' => 'Salud',
             'persona' => $usuario?->name ?: 'Sin usuario',
             'cod_usu' => $usuario?->cod_usu,
-            'cargo' => $h->personalSalud?->especialidad?->nombre ?: 'Personal de salud',
+            'cargo' => $usuario?->roles->first()?->name ?: 'Personal de salud',
             'dia' => $h->dia_semana,
             'dia_label' => self::DIA_LABELS[$h->dia_semana] ?? $h->dia_semana,
             'hora_inicio' => $this->formatoHora($h->hora_inicio),
@@ -950,25 +1000,33 @@ class TurnosAsignacionesPanel extends Component
     private function personalHorarioOpciones(string $tipo): Collection
     {
         if ($tipo === 'salud') {
-            return PersonalSalud::with(['usuario', 'especialidad'])
-                ->orderBy('cod_per_sal')
+            return User::with(['roles'])
+                ->whereHas('roles', fn ($q) => $q->whereIn('name', [
+                    'MEDICO GENERAL/GERIATRA', 'MÉDICO GENERAL/GERIATRA',
+                    'ENFERMEROS', 'ENFERMERO', 'ENFERMERA',
+                    'PSICOLOGO/A', 'PSICÓLOGO/A', 'NUTRICIONISTA', 'FISIOTERAPEUTA', 'PEDAGOGO',
+                ]))
+                ->orderBy('nombres')
                 ->get()
-                ->map(fn ($p) => [
-                    'id' => $p->cod_per_sal,
-                    'nombre' => $p->usuario?->name ?: 'Sin usuario',
-                    'cargo' => $p->especialidad?->nombre ?: 'Personal de salud',
-                    'estado' => $p->estado_laboral ?: 'Sin estado',
+                ->map(fn ($u) => [
+                    'id' => $u->cod_usu,
+                    'nombre' => $u->name,
+                    'cargo' => $u->roles->first()?->name ?: 'Personal de salud',
+                    'estado' => $u->estado ?: 'ACTIVO',
                 ]);
         }
 
-        return PersonalAdmin::with(['usuario', 'cargoAdmin'])
-            ->orderBy('cod_per_adm')
+        return User::with(['roles'])
+            ->whereHas('roles', fn ($q) => $q->whereIn('name', [
+                'SUPERADMINISTRADOR', 'ADMINISTRADOR', 'ADMINISTRATIVO',
+            ]))
+            ->orderBy('nombres')
             ->get()
-            ->map(fn ($p) => [
-                'id' => $p->cod_per_adm,
-                'nombre' => $p->usuario?->name ?: 'Sin usuario',
-                'cargo' => $p->cargoAdmin?->nombre ?: ($p->cargo ?: 'Personal administrativo'),
-                'estado' => $p->estado_laboral ?: 'Sin estado',
+            ->map(fn ($u) => [
+                'id' => $u->cod_usu,
+                'nombre' => $u->name,
+                'cargo' => $u->roles->first()?->name ?: 'Personal administrativo',
+                'estado' => $u->estado ?: 'ACTIVO',
             ]);
     }
 
@@ -982,9 +1040,9 @@ class TurnosAsignacionesPanel extends Component
             'horarios_registrados' => $horarios->count(),
             'turnos_activos' => $turnos->where('estado', 'ACTIVO')->count(),
             'asignaciones_hoy' => $asignaciones->filter(fn ($a) => $this->asignacionActivaEnFecha($a, $hoy, $diaHoy))->count(),
-            'turnos_sin_cubrir' => $areas->filter(fn ($area) => AsignacionTurno::where('estado', 'ACTIVA')->where('cod_area', $area->cod_area)->doesntExist())->count(),
+            'turnos_sin_cubrir' => Schema::hasTable('asignaciones_turno') ? $areas->filter(fn ($area) => AsignacionTurno::where('estado', 'ACTIVA')->where('cod_area', $area->cod_area)->doesntExist())->count() : 0,
             'conflictos_detectados' => $alertas->whereIn('prioridad', ['Alta', 'Media'])->count(),
-            'personal_sobrecarga' => AsignacionTurno::where('estado', 'ACTIVA')->selectRaw('cod_usu, COUNT(*) as total')->groupBy('cod_usu')->havingRaw('COUNT(*) >= 4')->get()->count(),
+            'personal_sobrecarga' => Schema::hasTable('asignaciones_turno') ? AsignacionTurno::where('estado', 'ACTIVA')->selectRaw('cod_usu, COUNT(*) as total')->groupBy('cod_usu')->havingRaw('COUNT(*) >= 4')->get()->count() : 0,
             'proximas_asignaciones' => $this->proximasAsignaciones($asignaciones)->count(),
             'horarios_activos' => $horarios->where('estado', 'ACTIVO')->count(),
             'horarios_inactivos' => $horarios->where('estado', 'INACTIVO')->count(),
@@ -1000,9 +1058,11 @@ class TurnosAsignacionesPanel extends Component
             $alertas->push($this->alerta('Personal sin horario', $usuario->name, 'Sin fecha', 'Sin horario', 'No tiene horario registrado en administracion ni salud.', 'Media', 'Registrar horario'));
         }
 
-        foreach ($areas as $area) {
-            if (AsignacionTurno::where('estado', 'ACTIVA')->where('cod_area', $area->cod_area)->doesntExist()) {
-                $alertas->push($this->alerta('Turno sin cubrir', $area->nombre, 'Semana actual', 'Cobertura', 'El area no tiene asignaciones activas.', 'Alta', 'Asignar personal'));
+        if (Schema::hasTable('asignaciones_turno')) {
+            foreach ($areas as $area) {
+                if (AsignacionTurno::where('estado', 'ACTIVA')->where('cod_area', $area->cod_area)->doesntExist()) {
+                    $alertas->push($this->alerta('Turno sin cubrir', $area->nombre, 'Semana actual', 'Cobertura', 'El area no tiene asignaciones activas.', 'Alta', 'Asignar personal'));
+                }
             }
         }
 
@@ -1174,6 +1234,10 @@ class TurnosAsignacionesPanel extends Component
 
     private function distribucionAreas(Collection $areas): array
     {
+        if (! Schema::hasTable('asignaciones_turno')) {
+            return [];
+        }
+
         return $areas
             ->mapWithKeys(fn ($area) => [$area->nombre => AsignacionTurno::activas()->where('cod_area', $area->cod_area)->count()])
             ->filter(fn ($count) => $count > 0)
@@ -1182,6 +1246,10 @@ class TurnosAsignacionesPanel extends Component
 
     private function distribucionTurnos(Collection $turnos): array
     {
+        if (! Schema::hasTable('asignaciones_turno')) {
+            return [];
+        }
+
         return $turnos
             ->mapWithKeys(fn ($turno) => [$turno->nombre => AsignacionTurno::activas()->where('cod_turno', $turno->cod_turno)->count()])
             ->filter(fn ($count) => $count > 0)
@@ -1240,11 +1308,7 @@ class TurnosAsignacionesPanel extends Component
             'observaciones' => $this->horario_observaciones,
         ];
 
-        if ($this->horario_tipo_personal === 'salud') {
-            $payload['cod_per_sal'] = $this->horario_personal_id;
-        } else {
-            $payload['cod_per_adm'] = $this->horario_personal_id;
-        }
+        $payload['cod_usu'] = $this->horario_personal_id;
 
         return $payload;
     }
@@ -1252,8 +1316,8 @@ class TurnosAsignacionesPanel extends Component
     private function horarioDuplicado(string $dia): bool
     {
         $query = $this->horario_tipo_personal === 'salud'
-            ? HorarioPersonalSalud::where('cod_per_sal', $this->horario_personal_id)
-            : HorarioPersonalAdmin::where('cod_per_adm', $this->horario_personal_id);
+            ? HorarioPersonalSalud::where('cod_usu', $this->horario_personal_id)
+            : HorarioPersonalAdmin::where('cod_usu', $this->horario_personal_id);
 
         $query->where('dia_semana', $dia)
             ->where('hora_inicio', $this->horario_hora_inicio)
@@ -1270,8 +1334,8 @@ class TurnosAsignacionesPanel extends Component
     private function horarioSolapado(string $dia): bool
     {
         $items = $this->horario_tipo_personal === 'salud'
-            ? HorarioPersonalSalud::where('cod_per_sal', $this->horario_personal_id)->where('dia_semana', $dia)->get()
-            : HorarioPersonalAdmin::where('cod_per_adm', $this->horario_personal_id)->where('dia_semana', $dia)->get();
+            ? HorarioPersonalSalud::where('cod_usu', $this->horario_personal_id)->where('dia_semana', $dia)->get()
+            : HorarioPersonalAdmin::where('cod_usu', $this->horario_personal_id)->where('dia_semana', $dia)->get();
 
         foreach ($items as $item) {
             $key = $this->horario_tipo_personal === 'salud' ? $item->cod_hor_per_sal : $item->cod_hor_per_admin;
@@ -1289,6 +1353,10 @@ class TurnosAsignacionesPanel extends Component
 
     private function asignacionDuplicada(): bool
     {
+        if (! Schema::hasTable('asignaciones_turno')) {
+            return false;
+        }
+
         $items = AsignacionTurno::where('cod_usu', $this->asig_cod_usu)
             ->where('cod_area', $this->asig_cod_area)
             ->where('cod_turno', $this->asig_cod_turno)
@@ -1306,6 +1374,10 @@ class TurnosAsignacionesPanel extends Component
 
     private function asignacionConConflicto(TurnoInstitucional $turno): bool
     {
+        if (! Schema::hasTable('asignaciones_turno')) {
+            return false;
+        }
+
         $items = AsignacionTurno::with('turno')
             ->where('cod_usu', $this->asig_cod_usu)
             ->where('estado', 'ACTIVA')

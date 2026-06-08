@@ -57,6 +57,10 @@ class ValoracionMedicaPanel extends Component
 
     public function guardar(): void
     {
+        if (!\Illuminate\Support\Facades\Schema::hasTable('valoraciones_medicas_admision')) {
+            return;
+        }
+
         $this->validate([
             'codAm'             => 'required|exists:adulto_mayor,cod_am',
             'fecha'             => 'required|date',
@@ -72,10 +76,11 @@ class ValoracionMedicaPanel extends Component
         ]);
 
         // Validar que exista valoración enfermería completada
-        if (! ValoracionEnfermeriaAdmision::where('cod_am', $this->codAm)
-            ->where('estado', 'COMPLETADA')
-            ->where('puede_pasar_valoracion_medica', true)
-            ->exists()) {
+        if (\Illuminate\Support\Facades\Schema::hasTable('valoraciones_enfermeria_admision') &&
+            ! ValoracionEnfermeriaAdmision::where('cod_am', $this->codAm)
+                ->where('estado', 'COMPLETADA')
+                ->where('puede_pasar_valoracion_medica', true)
+                ->exists()) {
             $this->addError('codAm', 'No existe valoración de enfermería completada y aprobada para este adulto mayor.');
             return;
         }
@@ -139,25 +144,30 @@ class ValoracionMedicaPanel extends Component
 
     public function render()
     {
-        $valoraciones = ValoracionMedicaAdmision::with(['adultoMayor', 'registradoPor'])
-            ->when($this->search, fn($q) =>
-                $q->whereHas('adultoMayor', fn($sq) =>
-                    $sq->where('nombres', 'ilike', '%' . $this->search . '%')
-                      ->orWhere('ap_paterno', 'ilike', '%' . $this->search . '%')
+        $valoraciones = \Illuminate\Support\Facades\Schema::hasTable('valoraciones_medicas_admision')
+            ? ValoracionMedicaAdmision::with(['adultoMayor', 'registradoPor'])
+                ->when($this->search, fn($q) =>
+                    $q->whereHas('adultoMayor', fn($sq) =>
+                        $sq->where('nombres', 'ilike', '%' . $this->search . '%')
+                          ->orWhere('ap_paterno', 'ilike', '%' . $this->search . '%')
+                    )
                 )
-            )
-            ->when($this->filtroEstado, fn($q) => $q->where('estado', $this->filtroEstado))
-            ->when($this->filtroResult, fn($q) => $q->where('resultado_admision', $this->filtroResult))
-            ->orderByDesc('fecha')->orderByDesc('hora')
-            ->paginate(12);
+                ->when($this->filtroEstado, fn($q) => $q->where('estado', $this->filtroEstado))
+                ->when($this->filtroResult, fn($q) => $q->where('resultado_admision', $this->filtroResult))
+                ->orderByDesc('fecha')->orderByDesc('hora')
+                ->paginate(12)
+            : new \Illuminate\Pagination\LengthAwarePaginator(collect(), 0, 12);
+
+        $detalle = null;
+        if ($this->viendoId && \Illuminate\Support\Facades\Schema::hasTable('valoraciones_medicas_admision')) {
+            $detalle = ValoracionMedicaAdmision::with('adultoMayor','registradoPor','valoracionEnfermeria')->find($this->viendoId);
+        }
 
         return view('livewire.admin.enfermeria.valoracion-medica-panel', [
             'valoraciones' => $valoraciones,
             'adultos'      => AdultoMayor::select('cod_am','nombres','ap_paterno','ap_materno')
                 ->whereNull('archivado_en')->orderBy('ap_paterno')->get(),
-            'detalle'      => $this->viendoId
-                ? ValoracionMedicaAdmision::with('adultoMayor','registradoPor','valoracionEnfermeria')->find($this->viendoId)
-                : null,
+            'detalle'      => $detalle,
         ])->layout('layouts.sistema');
     }
 }

@@ -148,11 +148,6 @@ class User extends Authenticatable
             });
     }
 
-    public function areaInstitucional()
-    {
-        return $this->belongsTo(AreaInstitucional::class, 'cod_area', 'cod_area');
-    }
-
     public function documentos()
     {
         return $this->hasMany(DocumentoUsuario::class, 'cod_usu', 'cod_usu');
@@ -176,16 +171,6 @@ class User extends Authenticatable
     public function voluntarios()
     {
         return $this->hasMany(Voluntario::class, 'cod_usu', 'cod_usu');
-    }
-
-    public function personalSalud()
-    {
-        return $this->hasOne(PersonalSalud::class, 'cod_usu', 'cod_usu');
-    }
-
-    public function personalAdmin()
-    {
-        return $this->hasOne(PersonalAdmin::class, 'cod_usu', 'cod_usu');
     }
 
     // ── Relaciones FASE 2: Registros médicos/administrativos realizados por este usuario ──
@@ -220,13 +205,4 @@ class User extends Authenticatable
         return $this->hasMany(HistorialEstadoAdulto::class, 'cambiado_por', 'cod_usu');
     }
 
-    public function asignacionesTurno()
-    {
-        return $this->hasMany(AsignacionTurno::class, 'cod_usu', 'cod_usu');
-    }
-
-    public function turnosInstitucionales()
-    {
-        return $this->hasManyThrough(TurnoInstitucional::class, AsignacionTurno::class, 'cod_usu', 'cod_turno', 'cod_usu', 'cod_turno');
-    }
 }

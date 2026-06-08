@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Traits\GeneraCodigo;
+
 use Illuminate\Database\Eloquent\Model;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
@@ -14,13 +16,16 @@ use Spatie\Activitylog\LogOptions;
  */
 class HistorialEstadoAdulto extends Model
 {
+    use GeneraCodigo;
     use LogsActivity;
 
     protected $table = 'historial_estado_adulto';
     protected $primaryKey = 'cod_hist_estado';
 
-    public $incrementing = true;
-    protected $keyType = 'int';
+    public $incrementing = false;
+    protected $keyType = 'string';
+    protected $prefixCode = 'HEA';
+    protected $digitsCode = 5;
 
     public $timestamps = true;
 

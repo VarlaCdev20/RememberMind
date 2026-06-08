@@ -107,6 +107,10 @@ class ReportChartDataService
      */
     public function evaluacionesPorMes(): array
     {
+        if (!\Illuminate\Support\Facades\Schema::hasTable('evaluaciones_cognitivas')) {
+            return ['labels' => [], 'data' => []];
+        }
+
         $evaluaciones = EvaluacionCognitiva::selectRaw("to_char(fecha_eval, 'YYYY-MM') as mes, count(*) as total")
             ->whereNotNull('fecha_eval')
             ->groupBy('mes')

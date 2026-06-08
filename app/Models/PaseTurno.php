@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Traits\GeneraCodigo;
+
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Spatie\Activitylog\Traits\LogsActivity;
@@ -9,13 +11,16 @@ use Spatie\Activitylog\LogOptions;
 
 class PaseTurno extends Model
 {
+    use GeneraCodigo;
     use LogsActivity;
 
     protected $table      = 'pases_turno';
     protected $primaryKey = 'cod_pase';
 
-    public $incrementing = true;
-    protected $keyType   = 'int';
+    public $incrementing = false;
+    protected $keyType = 'string';
+    protected $prefixCode = 'PTT';
+    protected $digitsCode = 5;
     public $timestamps   = true;
 
     protected $fillable = [

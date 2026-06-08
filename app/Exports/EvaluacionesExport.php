@@ -15,7 +15,7 @@ class EvaluacionesExport implements FromCollection, WithHeadings, WithMapping
      */
     public function collection()
     {
-        return EvaluacionCognitiva::with(['adultoMayor', 'tipoEvaluacion', 'personalSalud.usuario'])
+        return EvaluacionCognitiva::with(['adultoMayor', 'tipoEvaluacion', 'user'])
             ->orderBy('fecha_eval', 'desc')
             ->get();
     }
@@ -46,7 +46,7 @@ class EvaluacionesExport implements FromCollection, WithHeadings, WithMapping
     {
         $residente = $ev->adultoMayor ? $ev->adultoMayor->nombres . ' ' . $ev->adultoMayor->ap_paterno : 'No Registrado';
         $test = $ev->tipoEvaluacion ? $ev->tipoEvaluacion->nombre : 'Sin Definir';
-        $evaluador = $ev->personalSalud && $ev->personalSalud->usuario ? $ev->personalSalud->usuario->name : 'No Asignado';
+        $evaluador = $ev->user?->name ?? 'No Asignado';
         
         return [
             $residente,

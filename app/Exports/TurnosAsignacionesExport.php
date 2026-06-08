@@ -18,6 +18,10 @@ class TurnosAsignacionesExport implements FromCollection, WithHeadings, WithMapp
      */
     public function collection()
     {
+        if (! \Illuminate\Support\Facades\Schema::hasTable('asignaciones_turno')) {
+            return collect();
+        }
+
         return AsignacionTurno::with(['usuario', 'area', 'turno'])
             ->orderBy('fecha_inicio', 'desc')
             ->get();

@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Traits\GeneraCodigo;
+
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -11,13 +13,16 @@ use Spatie\Activitylog\LogOptions;
 
 class Cama extends Model
 {
+    use GeneraCodigo;
     use SoftDeletes, LogsActivity;
 
     protected $table      = 'camas';
     protected $primaryKey = 'cod_cama';
 
-    public $incrementing = true;
-    protected $keyType   = 'int';
+    public $incrementing = false;
+    protected $keyType = 'string';
+    protected $prefixCode = 'CAM';
+    protected $digitsCode = 3;
     public $timestamps   = true;
 
     protected $fillable = [

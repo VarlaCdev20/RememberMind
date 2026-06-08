@@ -24,9 +24,8 @@ class UsuarioController extends Controller
     public function create()
     {
         $roles = Role::all();
-        $especialidades = \App\Models\Especialidad::orderBy('nombre')->get();
-        $cargosAdmin = \App\Models\CargoAdministrativo::where('estado', 'ACTIVO')->orderBy('nombre')->get();
-        
+        $especialidades = collect();
+        $cargosAdmin = collect();
         return view('admin.usuarios.create', compact('roles', 'especialidades', 'cargosAdmin'));
     }
 
@@ -71,24 +70,6 @@ class UsuarioController extends Controller
             $usuario = User::create($data);
             $usuario->assignRole($request->rol);
 
-            // Registro en tablas especializadas según rol
-            if (in_array($request->rol, ['ENFERMEROS', 'MEDICO GENERAL/GERIATRA', 'PSICOLOGO/A', 'PEDAGOGO', 'NUTRICIONISTA', 'FISIOTERAPEUTA'])) {
-                \App\Models\PersonalSalud::create([
-                    'cod_usu'        => $usuario->cod_usu,
-                    'cod_esp'        => $request->especialidad_salud,
-                    'fecha_ing'      => $request->fecha_ingreso ?? now(),
-                    'estado_laboral' => 'ACTIVO',
-                ]);
-            } elseif (in_array($request->rol, ['SUPERADMINISTRADOR', 'ADMINISTRADOR'])) {
-                \App\Models\PersonalAdmin::create([
-                    'cod_usu'          => $usuario->cod_usu,
-                    'cod_cargo_admin'  => $request->cargo_administrativo,
-                    'cargo'            => \App\Models\CargoAdministrativo::find($request->cargo_administrativo)?->nombre ?? 'ADMINISTRATIVO',
-                    'fecha_ingreso'    => $request->fecha_ingreso ?? now(),
-                    'area_admin'       => 'GENERAL',
-                    'estado_laboral'   => 'ACTIVO',
-                ]);
-            }
 
             activity('Usuarios')
                 ->causedBy(auth()->user())
@@ -135,12 +116,10 @@ class UsuarioController extends Controller
     public function edit(User $usuario)
     {
         $roles = Role::all();
-        $especialidades = \App\Models\Especialidad::orderBy('nombre')->get();
-        $cargosAdmin = \App\Models\CargoAdministrativo::where('estado', 'ACTIVO')->orderBy('nombre')->get();
-        
-        $personalSalud = $usuario->personalSalud->first();
-        $personalAdmin = $usuario->personalAdmin->first();
-
+        $especialidades = collect();
+        $cargosAdmin = collect();
+        $personalSalud = null;
+        $personalAdmin = null;
         return view('admin.usuarios.edit', compact('usuario', 'roles', 'especialidades', 'cargosAdmin', 'personalSalud', 'personalAdmin'));
     }
 
@@ -170,28 +149,6 @@ class UsuarioController extends Controller
                 $usuario->syncRoles([$request->rol]);
             }
 
-            // Actualizar o crear registros vinculados
-            if (in_array($request->rol, ['ENFERMEROS', 'MEDICO GENERAL/GERIATRA', 'PSICOLOGO/A', 'PEDAGOGO', 'NUTRICIONISTA', 'FISIOTERAPEUTA'])) {
-                \App\Models\PersonalSalud::updateOrCreate(
-                    ['cod_usu' => $usuario->cod_usu],
-                    [
-                        'cod_esp'        => $request->especialidad_salud,
-                        'fecha_ing'      => $request->fecha_ingreso ?? ($usuario->personalSalud->first()?->fecha_ing ?? now()),
-                        'estado_laboral' => 'ACTIVO',
-                    ]
-                );
-            } elseif (in_array($request->rol, ['SUPERADMINISTRADOR', 'ADMINISTRADOR'])) {
-                \App\Models\PersonalAdmin::updateOrCreate(
-                    ['cod_usu' => $usuario->cod_usu],
-                    [
-                        'cod_cargo_admin'  => $request->cargo_administrativo,
-                        'cargo'            => \App\Models\CargoAdministrativo::find($request->cargo_administrativo)?->nombre ?? 'ADMINISTRATIVO',
-                        'fecha_ingreso'    => $request->fecha_ingreso ?? ($usuario->personalAdmin->first()?->fecha_ingreso ?? now()),
-                        'area_admin'       => 'GENERAL',
-                        'estado_laboral'   => 'ACTIVO',
-                    ]
-                );
-            }
 
             activity('Usuarios')
                 ->causedBy(auth()->user())

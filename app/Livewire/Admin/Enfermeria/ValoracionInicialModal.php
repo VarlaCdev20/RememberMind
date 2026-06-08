@@ -134,13 +134,15 @@ class ValoracionInicialModal extends Component
             ]);
             
             // Finalizar la asignación temporal si aplica
-            $asignacion = $this->adulto->asignacionesTurno()
-                ->where('motivo_asignacion', 'VALORACION INICIAL')
-                ->where('estado', 'ACTIVA')
-                ->first();
-                
-            if($asignacion) {
-                $asignacion->update(['estado' => 'FINALIZADA']);
+            if (\Illuminate\Support\Facades\Schema::hasTable('asignaciones_turno_adulto')) {
+                $asignacion = $this->adulto->asignacionesTurno()
+                    ->where('motivo_asignacion', 'VALORACION INICIAL')
+                    ->where('estado', 'ACTIVA')
+                    ->first();
+
+                if ($asignacion) {
+                    $asignacion->update(['estado' => 'FINALIZADA']);
+                }
             }
 
             // Registrar Log

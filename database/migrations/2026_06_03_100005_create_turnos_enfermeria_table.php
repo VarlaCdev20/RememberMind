@@ -13,15 +13,13 @@ return new class extends Migration
         }
 
         Schema::create('turnos_enfermeria', function (Blueprint $table) {
-            $table->increments('cod_turno');
-
+            $table->string('cod_turno', 20)->primary();
             $table->string('nombre', 50)->unique();          // MAÑANA, TARDE, NOCHE, MADRUGADA
             $table->time('hora_inicio');
             $table->time('hora_fin');
             $table->unsignedTinyInteger('orden')->unique();  // 1, 2, 3, 4
             $table->string('estado', 20)->default('ACTIVO'); // ACTIVO, INACTIVO
             $table->string('observacion')->nullable();
-
             $table->timestamps();
 
             $table->index('estado');

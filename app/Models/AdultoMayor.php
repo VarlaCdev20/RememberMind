@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Traits\GeneraCodigo;
+
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Spatie\Activitylog\Traits\LogsActivity;
@@ -9,6 +11,7 @@ use Spatie\Activitylog\LogOptions;
 
 class AdultoMayor extends Model
 {
+    use GeneraCodigo;
     use HasFactory, LogsActivity;
 
     protected $table = 'adulto_mayor';
@@ -16,6 +19,8 @@ class AdultoMayor extends Model
 
     public $incrementing = false;
     protected $keyType = 'string';
+    protected $prefixCode = 'AM';
+    protected $digitsCode = 3;
 
     public $timestamps = true;
 
@@ -187,11 +192,6 @@ class AdultoMayor extends Model
             'obser',
         ]);
     }
-    public function evaluacionesCognitivas()
-    {
-        return $this->hasMany(EvaluacionCognitiva::class, 'cod_am', 'cod_am');
-    }
-
     // ── Relaciones FASE 2: Módulos médicos y administrativos ──
 
     public function fichasMedicas()
@@ -234,17 +234,6 @@ class AdultoMayor extends Model
     public function valoracionesMedicas()
     {
         return $this->hasMany(ValoracionMedicaAdmision::class, 'cod_am', 'cod_am');
-    }
-
-    public function asignacionesTurno()
-    {
-        return $this->hasMany(AsignacionTurnoAdulto::class, 'cod_am', 'cod_am');
-    }
-
-    public function asignacionTurnoActiva()
-    {
-        return $this->hasOne(AsignacionTurnoAdulto::class, 'cod_am', 'cod_am')
-            ->where('estado', 'ACTIVA');
     }
 
     public function planesCuidado()
@@ -292,5 +281,10 @@ class AdultoMayor extends Model
     public function cama()
     {
         return $this->belongsTo(Cama::class, 'cod_cama', 'cod_cama');
+    }
+
+    public function asignaciones()
+    {
+        return $this->hasMany(AsignacionAdultoMayor::class, 'cod_am', 'cod_am');
     }
 }

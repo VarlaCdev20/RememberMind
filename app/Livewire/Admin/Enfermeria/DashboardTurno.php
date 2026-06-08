@@ -41,11 +41,13 @@ class DashboardTurno extends Component
         }
 
         if ($this->turnoActual) {
-            $this->pacientesAsignadosIds = AsignacionTurnoAdulto::where('cod_usu_enfermero', $this->filtroEnfermeroId)
-                ->where('cod_turno', $this->turnoActual->cod_turno)
-                ->where('estado', 'ACTIVO')
-                ->pluck('cod_am')
-                ->toArray();
+            $this->pacientesAsignadosIds = \Illuminate\Support\Facades\Schema::hasTable('asignaciones_turno_adulto')
+                ? AsignacionTurnoAdulto::where('cod_usu_enfermero', $this->filtroEnfermeroId)
+                    ->where('cod_turno', $this->turnoActual->cod_turno)
+                    ->where('estado', 'ACTIVO')
+                    ->pluck('cod_am')
+                    ->toArray()
+                : [];
         }
     }
 
@@ -126,9 +128,11 @@ class DashboardTurno extends Component
             $stats['pase_pendiente'] = $pases ? $pases->estado : 'NO INICIADO';
 
             // Supervisión
-            $supervisiones = AsignacionTurnoAdulto::whereIn('cod_am', $this->pacientesAsignadosIds)
-                ->where('cod_turno', $this->turnoActual->cod_turno)
-                ->get();
+            $supervisiones = \Illuminate\Support\Facades\Schema::hasTable('asignaciones_turno_adulto')
+                ? AsignacionTurnoAdulto::whereIn('cod_am', $this->pacientesAsignadosIds)
+                    ->where('cod_turno', $this->turnoActual->cod_turno)
+                    ->get()
+                : collect();
                 
             foreach($supervisiones as $sup) {
                 $nivel = ucfirst(strtolower($sup->nivel_supervision ?? 'Baja'));
@@ -155,13 +159,15 @@ class DashboardTurno extends Component
                 ->get();
         }
 
-        $valoracionesPendientes = \App\Models\AdultoMayor::whereHas('asignacionesTurno', function($q) {
-            $q->where('cod_usu_enfermero', $this->filtroEnfermeroId)
-              ->where('motivo_asignacion', 'VALORACION INICIAL')
-              ->where('estado', 'ACTIVA');
-        })->whereHas('estado', function($q) {
-            $q->whereIn('estado', ['VALORACION_INICIAL', 'PENDIENTE_VALORACION_INICIAL']);
-        })->with(['estado', 'asignacionTurnoActiva', 'documentos'])->get();
+        $valoracionesPendientes = \Illuminate\Support\Facades\Schema::hasTable('asignaciones_turno_adulto')
+            ? \App\Models\AdultoMayor::whereHas('asignacionesTurno', function($q) {
+                $q->where('cod_usu_enfermero', $this->filtroEnfermeroId)
+                  ->where('motivo_asignacion', 'VALORACION INICIAL')
+                  ->where('estado', 'ACTIVA');
+              })->whereHas('estado', function($q) {
+                $q->whereIn('estado', ['VALORACION_INICIAL', 'PENDIENTE_VALORACION_INICIAL']);
+              })->with(['estado', 'asignacionTurnoActiva', 'documentos'])->get()
+            : collect();
 
         return view('livewire.admin.enfermeria.dashboard-turno', [
             'stats' => $stats,

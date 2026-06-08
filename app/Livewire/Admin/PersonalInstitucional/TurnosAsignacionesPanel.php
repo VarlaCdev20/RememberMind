@@ -136,7 +136,7 @@ class TurnosAsignacionesPanel extends Component
         };
 
         $usuarioSeleccionado = $this->usuarioSeleccionado
-            ? User::with(['roles', 'personalSalud', 'personalAdmin', 'areaInstitucional', 'asignacionesTurno'])
+            ? User::with(['roles'])
                 ->where('cod_usu', $this->usuarioSeleccionado)
                 ->first()
             : null;
@@ -154,8 +154,15 @@ class TurnosAsignacionesPanel extends Component
 
     private function personalFiltrado(): Builder
     {
-        $query = User::with(['roles', 'personalSalud', 'personalAdmin', 'areaInstitucional'])
-            ->where(fn (Builder $query) => $query->has('personalSalud')->orHas('personalAdmin'));
+        $rolesInstitucionales = [
+            'MEDICO GENERAL/GERIATRA', 'MÉDICO GENERAL/GERIATRA', 'MEDICO', 'MÉDICO',
+            'ENFERMEROS', 'ENFERMERO', 'ENFERMERA',
+            'PSICOLOGO/A', 'PSICÓLOGO/A', 'NUTRICIONISTA', 'FISIOTERAPEUTA', 'PEDAGOGO',
+            'SUPERADMINISTRADOR', 'ADMINISTRADOR', 'ADMINISTRATIVO', 'PERSONAL ADMIN',
+        ];
+
+        $query = User::with(['roles'])
+            ->whereHas('roles', fn (Builder $q) => $q->whereIn('name', $rolesInstitucionales));
 
         if ($this->busqueda !== '') {
             $busqueda = $this->busqueda;
@@ -169,9 +176,15 @@ class TurnosAsignacionesPanel extends Component
         }
 
         if ($this->filtroTipo === 'salud') {
-            $query->has('personalSalud');
+            $query->whereHas('roles', fn (Builder $q) => $q->whereIn('name', [
+                'MEDICO GENERAL/GERIATRA', 'MÉDICO GENERAL/GERIATRA', 'MEDICO', 'MÉDICO',
+                'ENFERMEROS', 'ENFERMERO', 'ENFERMERA',
+                'PSICOLOGO/A', 'PSICÓLOGO/A', 'NUTRICIONISTA', 'FISIOTERAPEUTA', 'PEDAGOGO',
+            ]));
         } elseif ($this->filtroTipo === 'admin') {
-            $query->has('personalAdmin');
+            $query->whereHas('roles', fn (Builder $q) => $q->whereIn('name', [
+                'SUPERADMINISTRADOR', 'ADMINISTRADOR', 'ADMINISTRATIVO', 'PERSONAL ADMIN',
+            ]));
         }
 
         if ($this->filtroRol !== '') {
@@ -198,14 +211,19 @@ class TurnosAsignacionesPanel extends Component
 
     private function asignacionesFiltradas(): Builder
     {
+        $rolesInstitucionales = [
+            'MEDICO GENERAL/GERIATRA', 'MÉDICO GENERAL/GERIATRA', 'MEDICO', 'MÉDICO',
+            'ENFERMEROS', 'ENFERMERO', 'ENFERMERA',
+            'PSICOLOGO/A', 'PSICÓLOGO/A', 'NUTRICIONISTA', 'FISIOTERAPEUTA', 'PEDAGOGO',
+            'SUPERADMINISTRADOR', 'ADMINISTRADOR', 'ADMINISTRATIVO', 'PERSONAL ADMIN',
+        ];
+
         $query = AsignacionTurno::with([
             'usuario.roles',
-            'usuario.personalSalud',
-            'usuario.personalAdmin',
             'area',
             'turno',
         ])->whereHas('usuario', fn (Builder $query) => $query
-            ->where(fn (Builder $query) => $query->has('personalSalud')->orHas('personalAdmin')));
+            ->whereHas('roles', fn (Builder $q) => $q->whereIn('name', $rolesInstitucionales)));
 
         if ($this->busqueda !== '') {
             $busqueda = $this->busqueda;
@@ -218,9 +236,15 @@ class TurnosAsignacionesPanel extends Component
         }
 
         if ($this->filtroTipo === 'salud') {
-            $query->whereHas('usuario.personalSalud');
+            $query->whereHas('usuario.roles', fn (Builder $q) => $q->whereIn('name', [
+                'MEDICO GENERAL/GERIATRA', 'MÉDICO GENERAL/GERIATRA', 'MEDICO', 'MÉDICO',
+                'ENFERMEROS', 'ENFERMERO', 'ENFERMERA',
+                'PSICOLOGO/A', 'PSICÓLOGO/A', 'NUTRICIONISTA', 'FISIOTERAPEUTA', 'PEDAGOGO',
+            ]));
         } elseif ($this->filtroTipo === 'admin') {
-            $query->whereHas('usuario.personalAdmin');
+            $query->whereHas('usuario.roles', fn (Builder $q) => $q->whereIn('name', [
+                'SUPERADMINISTRADOR', 'ADMINISTRADOR', 'ADMINISTRATIVO', 'PERSONAL ADMIN',
+            ]));
         }
 
         if ($this->filtroRol !== '') {
@@ -251,8 +275,15 @@ class TurnosAsignacionesPanel extends Component
             return collect();
         }
 
-        return User::with(['roles', 'personalSalud', 'personalAdmin', 'asignacionesTurno' => fn ($query) => $query->where('estado', 'ACTIVA')])
-            ->where(fn (Builder $query) => $query->has('personalSalud')->orHas('personalAdmin'))
+        $rolesInstitucionales = [
+            'MEDICO GENERAL/GERIATRA', 'MÉDICO GENERAL/GERIATRA', 'MEDICO', 'MÉDICO',
+            'ENFERMEROS', 'ENFERMERO', 'ENFERMERA',
+            'PSICOLOGO/A', 'PSICÓLOGO/A', 'NUTRICIONISTA', 'FISIOTERAPEUTA', 'PEDAGOGO',
+            'SUPERADMINISTRADOR', 'ADMINISTRADOR', 'ADMINISTRATIVO', 'PERSONAL ADMIN',
+        ];
+
+        return User::with(['roles', 'asignacionesTurno' => fn ($query) => $query->where('estado', 'ACTIVA')])
+            ->whereHas('roles', fn (Builder $query) => $query->whereIn('name', $rolesInstitucionales))
             ->when($this->busquedaModal !== '', function (Builder $query) {
                 $busqueda = $this->busquedaModal;
                 $query->where(fn (Builder $query) => $query
@@ -578,10 +609,11 @@ class TurnosAsignacionesPanel extends Component
 
     private function rolVisual(User $usuario): array
     {
-        $texto = mb_strtoupper(($usuario->personalSalud?->tipo_personal_salud ?? '') . ' ' . $usuario->roles->pluck('name')->implode(' '));
+        $rolesAdmin = ['SUPERADMINISTRADOR', 'ADMINISTRADOR', 'ADMINISTRATIVO', 'PERSONAL ADMIN', 'PERSONAL_ADMIN'];
+        $texto = mb_strtoupper($usuario->roles->pluck('name')->implode(' '));
 
         return match (true) {
-            $usuario->personalAdmin !== null => ['label' => 'Administrativo', 'class' => 'border-slate-300 bg-slate-100 text-slate-700'],
+            $usuario->hasAnyRole($rolesAdmin) => ['label' => 'Administrativo', 'class' => 'border-slate-300 bg-slate-100 text-slate-700'],
             str_contains($texto, 'ENFERM') => ['label' => 'Enfermería', 'class' => 'border-emerald-200 bg-emerald-50 text-emerald-700'],
             str_contains($texto, 'MEDICO') || str_contains($texto, 'MÉDICO') || str_contains($texto, 'GERIATRA') => ['label' => 'Médico / Geriatra', 'class' => 'border-[#F2CFC4] bg-[#FDF5F2] text-[#B85C45]'],
             str_contains($texto, 'PSICO') => ['label' => 'Psicología', 'class' => 'border-violet-200 bg-violet-50 text-violet-700'],

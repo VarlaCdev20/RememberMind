@@ -13,25 +13,16 @@ return new class extends Migration
         }
 
         Schema::create('alertas_adulto', function (Blueprint $table) {
-            $table->id('cod_alerta');
-
-            $table->string('cod_am', 10);
-            $table->unsignedInteger('cod_turno')->nullable();
+            $table->string('cod_alerta', 20)->primary();
+            $table->string('cod_am', 20);
+            $table->string('cod_turno', 20)->nullable();
 
             $table->string('origen', 30);
-            // SIGNOS, MEDICACION, SEGUIMIENTO, PLAN, INCIDENTE, SOLICITUD_MEDICA, MANUAL
-
             $table->string('tipo_alerta', 50);
-            // Libre: PRESION_ALTA, GLUCOSA_ALTA, TAREA_OMITIDA, REACCION_ADVERSA,
-            //        CAIDA, SOLICITUD_MEDICA, COMPORTAMIENTO, etc.
-
             $table->string('nivel', 20)->default('MEDIO');
-            // BAJO, MEDIO, ALTO, CRITICO
-
             $table->text('motivo');
-            $table->string('responsable_id', 20)->nullable(); // FK users (responsable asignado)
+            $table->string('responsable_id', 20)->nullable(); // FK users
             $table->string('estado', 20)->default('ABIERTA');
-            // ABIERTA, EN_ATENCION, CERRADA, ANULADA
 
             $table->text('accion_tomada')->nullable();
             $table->timestamp('fecha_atencion')->nullable();

@@ -2,19 +2,24 @@
 
 namespace App\Models;
 
+use App\Traits\GeneraCodigo;
+
 use Illuminate\Database\Eloquent\Model;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
 
 class ValoracionFuncionalAdulto extends Model
 {
+    use GeneraCodigo;
     use LogsActivity;
 
     protected $table = 'valoracion_funcional_adulto';
     protected $primaryKey = 'cod_val_func';
 
-    public $incrementing = true;
-    protected $keyType = 'int';
+    public $incrementing = false;
+    protected $keyType = 'string';
+    protected $prefixCode = 'VFA';
+    protected $digitsCode = 5;
 
     public $timestamps = true;
 

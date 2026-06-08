@@ -16,9 +16,6 @@ class UsuarioFichaService
     {
         $usuario->load([
             'roles',
-            'personalSalud.especialidad',
-            'personalAdmin.cargoAdmin',
-            'areaInstitucional',
         ]);
 
         return [
@@ -37,11 +34,7 @@ class UsuarioFichaService
      */
     public function obtenerHorariosActivos(User $usuario): ?AsignacionTurno
     {
-        return AsignacionTurno::with(['turno', 'area'])
-            ->where('cod_usu', $usuario->cod_usu)
-            ->where('estado', 'ACTIVA')
-            ->orderByDesc('fecha_inicio')
-            ->first();
+        return null;
     }
 
     /**
@@ -49,10 +42,7 @@ class UsuarioFichaService
      */
     public function obtenerHistorialHorarios(User $usuario)
     {
-        return AsignacionTurno::with(['turno', 'area', 'creador'])
-            ->where('cod_usu', $usuario->cod_usu)
-            ->orderByDesc('created_at')
-            ->get();
+        return collect();
     }
 
     /**

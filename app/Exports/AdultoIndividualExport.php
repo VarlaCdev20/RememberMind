@@ -274,7 +274,7 @@ class EvaluacionesCognitivasIndSheet implements FromCollection, WithTitle, WithH
     public function collection()
     {
         return $this->adulto->evaluacionesCognitivas()
-            ->with(['tipoEvaluacion', 'personalSalud'])
+            ->with(['tipoEvaluacion', 'user'])
             ->orderByDesc('fecha_eval')
             ->get()
             ->map(fn($e) => [
@@ -284,7 +284,7 @@ class EvaluacionesCognitivasIndSheet implements FromCollection, WithTitle, WithH
                 $e->puntaje_maximo,
                 $e->resultado_interpretacion ?? '—',
                 $e->nivel_riesgo ?? '—',
-                $e->personalSalud?->nombres ?? '—',
+                $e->user?->name ?? '—',
             ]);
     }
 

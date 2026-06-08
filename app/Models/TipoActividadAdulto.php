@@ -2,15 +2,20 @@
 
 namespace App\Models;
 
+use App\Traits\GeneraCodigo;
+
 use Illuminate\Database\Eloquent\Model;
 
 class TipoActividadAdulto extends Model
 {
+    use GeneraCodigo;
     protected $table = 'tipo_actividades_adulto';
     protected $primaryKey = 'cod_tipo_act';
 
-    public $incrementing = true;
-    protected $keyType = 'int';
+    public $incrementing = false;
+    protected $keyType = 'string';
+    protected $prefixCode = 'TAC';
+    protected $digitsCode = 3;
 
     public $timestamps = false;
 

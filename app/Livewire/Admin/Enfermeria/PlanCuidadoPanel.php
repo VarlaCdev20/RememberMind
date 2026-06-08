@@ -67,7 +67,7 @@ class PlanCuidadoPanel extends Component
         }
 
         // Validar que haya asignación activa para ACTIVO
-        if ($this->estadoPlan === 'ACTIVO') {
+        if ($this->estadoPlan === 'ACTIVO' && \Illuminate\Support\Facades\Schema::hasTable('asignaciones_turno_adulto')) {
             $asignado = AsignacionTurnoAdulto::where('cod_am', $this->codAm)
                 ->where('estado', 'ACTIVA')->exists();
             if (! $asignado) {

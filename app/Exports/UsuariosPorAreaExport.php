@@ -25,7 +25,7 @@ class UsuariosPorAreaExport implements FromCollection, WithHeadings, WithMapping
      */
     public function collection()
     {
-        return User::with(['personalSalud.especialidad', 'personalAdmin.cargoAdmin', 'roles'])
+        return User::with(['roles'])
             ->where('cod_area', $this->codArea)
             ->orderBy('nombres')
             ->get();
@@ -61,15 +61,9 @@ class UsuariosPorAreaExport implements FromCollection, WithHeadings, WithMapping
      */
     public function map($user): array
     {
-        $cargoEspecialidad = 'Sin Asignar';
-        if ($user->personalSalud && $user->personalSalud->especialidad) {
-            $cargoEspecialidad = $user->personalSalud->especialidad->nombre;
-        } elseif ($user->personalAdmin) {
-            $cargoEspecialidad = $user->personalAdmin->cargoAdmin?->nombre ?? $user->personalAdmin->cargo ?? 'Personal Administrativo';
-        }
-
         $rolName = $user->getRoleNames()->first() ?? 'Sin Rol';
         $rolLimpio = strtoupper(str_replace('_', ' ', $rolName));
+        $cargoEspecialidad = $rolLimpio !== 'SIN ROL' ? $rolLimpio : 'Sin Asignar';
 
         return [
             $user->name,
