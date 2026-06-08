@@ -41,6 +41,8 @@ class RolesAndPermissionsSeeder extends Seeder
             // Admisiones
             'admisiones.ver_dashboard',
             'admisiones.crear',
+            'valoracion_enfermeria.ver',
+            'valoracion_medica.ver',
 
             // Nuevos permisos de Ficha de Usuario
             'documentos_usuarios.ver',
@@ -171,7 +173,7 @@ class RolesAndPermissionsSeeder extends Seeder
         // 4. Asignar permisos
 
         // SUPERADMINISTRADOR: Todos los permisos creados arriba y los que existan en BD.
-        $todosLosPermisos = Permission::pluck('name')->toArray();
+        $todosLosPermisos = Permission::all();
         $rolesModels['SUPERADMINISTRADOR']->syncPermissions($todosLosPermisos);
 
         // ADMINISTRADOR
@@ -189,6 +191,9 @@ class RolesAndPermissionsSeeder extends Seeder
 
             'admisiones.ver_dashboard',
             'admisiones.crear',
+            'salud.ver',
+            'valoracion_enfermeria.ver',
+            'valoracion_medica.ver',
             
             // Permisos de Ficha del Usuario
             'documentos_usuarios.ver',
@@ -359,8 +364,17 @@ class RolesAndPermissionsSeeder extends Seeder
             'pase_turno.recibir',
         ])->pluck('name')->toArray();
 
-        $rolesModels['ENFERMEROS']->syncPermissions(array_merge($permisosClinicos, $permisosEnfermeria));
-        $rolesModels['MEDICO GENERAL/GERIATRA']->syncPermissions(array_merge($permisosClinicos, $permisosEnfermeria));
+        $rolesModels['ENFERMEROS']->syncPermissions(array_merge(
+            $permisosClinicos,
+            array_diff($permisosEnfermeria, ['valoracion_medica.ver', 'valoracion_medica.crear', 'valoracion_medica.editar', 'valoracion_medica.anular']),
+            ['salud.ver', 'valoracion_enfermeria.ver']
+        ));
+
+        $rolesModels['MEDICO GENERAL/GERIATRA']->syncPermissions(array_merge(
+            $permisosClinicos,
+            array_diff($permisosEnfermeria, ['valoracion_enfermeria.ver', 'valoracion_enfermeria.crear', 'valoracion_enfermeria.editar', 'valoracion_enfermeria.anular']),
+            ['salud.ver', 'valoracion_medica.ver']
+        ));
 
         // PROFESIONALES ESPECÍFICOS (PSICOLOGO/A, PEDAGOGO, NUTRICIONISTA, FISIOTERAPEUTA)
         $permisosProfesionales = [
