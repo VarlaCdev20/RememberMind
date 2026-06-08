@@ -38,5 +38,9 @@
     "additionalDirectories": [
       "c:\\laragon\\www\\RememberMind_F1\\app\\Http\\Controllers\\Admin"
     ]
+  },
+  "enabledPlugins": {
+    "skill-creator@claude-plugins-official": true,
+    "frontend-design@claude-plugins-official": true
   }
 }
