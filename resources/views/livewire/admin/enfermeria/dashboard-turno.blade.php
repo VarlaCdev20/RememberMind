@@ -423,8 +423,8 @@
                         <i class="ph-bold ph-clipboard-text text-3xl"></i>
                     </div>
                     <div>
-                        <h3 class="text-base font-black uppercase tracking-widest text-estado-info">ValoraciÃ³n Inicial Pendiente</h3>
-                        <p class="text-xs font-semibold text-estado-info/80 mt-1">Pacientes nuevos derivados de preadmisiÃ³n esperando la revisiÃ³n del enfermero asignado.</p>
+                        <h3 class="text-base font-black uppercase tracking-widest text-estado-info">Valoración Inicial Pendiente</h3>
+                        <p class="text-xs font-semibold text-estado-info/80 mt-1">Pacientes nuevos derivados de preadmisión esperando la revisión del enfermero asignado.</p>
                     </div>
                 </div>
                 <div class="flex items-center gap-2">
@@ -441,8 +441,8 @@
                             <th class="px-5 py-4">Caso / Paciente</th>
                             <th class="px-5 py-4 hidden md:table-cell">Edad / Origen</th>
                             <th class="px-5 py-4 hidden lg:table-cell">Motivo</th>
-                            <th class="px-5 py-4 hidden sm:table-cell">DocumentaciÃ³n</th>
-                            <th class="px-5 py-4 text-right">AcciÃ³n</th>
+                            <th class="px-5 py-4 hidden sm:table-cell">Documentación</th>
+                            <th class="px-5 py-4 text-right">Acción</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-estado-infoBorde/30">
@@ -460,12 +460,12 @@
                                     </div>
                                 </td>
                                 <td class="px-5 py-4 hidden md:table-cell">
-                                    <span class="block font-bold text-titulo text-xs">{{ \Carbon\Carbon::parse($paciente->fecha_nac)->age }} aÃ±os</span>
+                                    <span class="block font-bold text-titulo text-xs">{{ \Carbon\Carbon::parse($paciente->fecha_nac)->age }} años</span>
                                     <span class="text-[10px] font-bold text-apoyo uppercase tracking-wider">{{ str_replace('_', ' ', $paciente->procedencia_ingreso ?? 'NO ESPECIFICADA') }}</span>
                                 </td>
                                 <td class="px-5 py-4 hidden lg:table-cell">
                                     <span class="inline-flex rounded-lg bg-fondo-card px-2.5 py-1 text-[10px] font-bold text-parrafo border border-borde-suave">
-                                        {{ str_replace('_', ' ', $paciente->motivo_ingreso ?? 'EVALUACIÃ“N') }}
+                                        {{ str_replace('_', ' ', $paciente->motivo_ingreso ?? 'EVALUACIÓN') }}
                                     </span>
                                 </td>
                                 <td class="px-5 py-4 hidden sm:table-cell">
@@ -479,7 +479,7 @@
                                 </td>
                                 <td class="px-5 py-4 text-right">
                                     <div class="flex items-center justify-end gap-2">
-                                        <button wire:click="iniciarValoracion('{{ $paciente->cod_am }}')" class="inline-flex h-9 items-center justify-center rounded-xl bg-estado-info px-4 text-xs font-bold text-white shadow-glow transition hover:bg-estado-infoHover hover:scale-105 active:scale-95" title="Iniciar valoraciÃ³n inicial">
+                                        <button wire:click="iniciarValoracion('{{ $paciente->cod_pre }}')" class="inline-flex h-9 items-center justify-center rounded-xl bg-estado-info px-4 text-xs font-bold text-white shadow-glow transition hover:bg-estado-infoHover hover:scale-105 active:scale-95" title="Iniciar valoración de enfermería">
                                             <i class="ph-bold ph-stethoscope mr-1.5"></i> Iniciar
                                         </button>
                                     </div>

@@ -281,7 +281,7 @@ class DatosEnfermeriaDemoSeeder extends Seeder
         $preadmision = Preadmision::firstOrCreate(
             ['ci' => '9999999-PRE'],
             [
-                'cod_pre' => 'PRE_DEMO_01',
+                // cod_pre se auto-genera — no forzar PRE_DEMO_01 que ya usa AdultoConPreadmisionAprobadaSeeder
                 'nombres' => 'Carmen',
                 'ap_paterno' => 'Rosa',
                 'ap_materno' => 'Vargas',
@@ -318,7 +318,8 @@ class DatosEnfermeriaDemoSeeder extends Seeder
                     'fecha_nac' => '1950-01-01',
                     'genero' => 'FEMENINO',
                     'estado_civil' => 'SOLTERO/A',
-                    'cod_est_adul' => $estadoPreadmision,
+                    // Adulto generado desde preadmisión APROBADA → estado ADMITIDO, no de valoración
+                    'cod_est_adul' => EstadoAdulto::firstOrCreate(['estado' => 'ADMITIDO'], ['cod_est_adul' => 'EST_014'])->cod_est_adul,
 
                     'fecha_ing' => now()->toDateString(),
                     'hora_ing' => '08:00',

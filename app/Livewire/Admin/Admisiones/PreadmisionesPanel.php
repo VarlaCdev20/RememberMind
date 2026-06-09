@@ -3,8 +3,8 @@
 namespace App\Livewire\Admin\Admisiones;
 
 use App\Models\AdultoMayor;
-use App\Models\DocumentoPreadmision;
 use App\Models\DocumentoAdultoMayor;
+use App\Models\DocumentoPreadmision;
 use App\Models\EstadoAdulto;
 use App\Models\Familiar;
 use App\Models\HistorialEstadoAdulto;
@@ -29,6 +29,7 @@ class PreadmisionesPanel extends Component
     public bool $modalDocumentos = false;
     public ?string $codPreSeleccionada = null;
     public array $documentosModal = [];
+
     public bool $modalRechazo = false;
     public ?string $codPreRechazo = null;
     public string $motivo_rechazo = '';
@@ -66,7 +67,14 @@ class PreadmisionesPanel extends Component
 
     public function limpiarFiltros(): void
     {
-        $this->reset(['search', 'estado', 'prioridad', 'enfermero_id', 'fecha_inicio', 'fecha_fin']);
+        $this->reset([
+            'search',
+            'estado',
+            'prioridad',
+            'enfermero_id',
+            'fecha_inicio',
+            'fecha_fin',
+        ]);
 
         if ($this->soloRechazadas) {
             $this->estado = 'RECHAZADA';
@@ -78,11 +86,13 @@ class PreadmisionesPanel extends Component
     public function verDocumentos(string $codPre): void
     {
         $this->codPreSeleccionada = $codPre;
+
         $this->documentosModal = DocumentoPreadmision::where('cod_pre', $codPre)
             ->orderBy('es_institucional')
             ->orderBy('created_at')
             ->get()
             ->toArray();
+
         $this->modalDocumentos = true;
     }
 
@@ -107,126 +117,251 @@ class PreadmisionesPanel extends Component
         $this->codPreRechazo = null;
         $this->motivo_rechazo = '';
         $this->observacion_rechazo = '';
-        $this->resetValidation(['motivo_rechazo', 'observacion_rechazo']);
+        $this->resetValidation([
+            'motivo_rechazo',
+            'observacion_rechazo',
+        ]);
     }
 
     public function aprobar(string $codPre): void
     {
-        $preadmision = Preadmision::query()->findOrFail($codPre);
+        $preadmision = Preadmision::query()
+            ->with(['documentos'])
+            ->findOrFail($codPre);
 
         if ($preadmision->cod_am_generado) {
             $this->dispatch('swal', [
                 'title' => 'Ya convertida',
-                'text' => "La preadmision ya genero el adulto mayor {$preadmision->cod_am_generado}.",
+                'text' => "La preadmisión ya generó el adulto mayor {$preadmision->cod_am_generado}.",
                 'icon' => 'info',
             ]);
+
             return;
         }
 
         if ($preadmision->estado === 'RECHAZADA') {
             $this->dispatch('swal', [
-                'title' => 'Operacion no permitida',
-                'text' => 'Una preadmision rechazada no se aprueba desde este panel.',
+                'title' => 'Operación no permitida',
+                'text' => 'Una preadmisión rechazada no puede aprobarse desde este panel.',
                 'icon' => 'warning',
             ]);
+
+            return;
+        }
+
+        // Condición obligatoria: valoración médica debe estar finalizada antes de admitir
+        if ($preadmision->estado !== 'VALORACION_MEDICA_FINALIZADA') {
+            $this->dispatch('swal', [
+                'title' => 'No se puede admitir todavía',
+                'text' => 'La preadmisión debe completar valoración médica antes de ser admitida. Estado actual: ' . $preadmision->estado,
+                'icon' => 'warning',
+            ]);
+
+            return;
+        }
+
+        // Solo médico o administrador pueden tomar la decisión de admisión
+        $rolesPermitidos = ['MEDICO GENERAL/GERIATRA', 'ADMINISTRADOR', 'SUPERADMINISTRADOR'];
+        $tieneRolPermitido = collect($rolesPermitidos)->contains(
+            fn ($rol) => auth()->user()->hasRole($rol)
+        );
+
+        if (! $tieneRolPermitido) {
+            $this->dispatch('swal', [
+                'title' => 'Sin permiso',
+                'text' => 'Solo el médico o un administrador pueden aprobar el ingreso de una preadmisión.',
+                'icon' => 'warning',
+            ]);
+
             return;
         }
 
         try {
             DB::beginTransaction();
 
-            if (AdultoMayor::where('ci', $preadmision->ci)->where('expedicion_ci', $preadmision->expedicion_ci)->exists()) {
+            $ciNormalizado = $this->limitarTexto($preadmision->ci, 20);
+            $expedicionNormalizada = $this->limitarTexto($preadmision->expedicion_ci, 2);
+
+            if (
+                AdultoMayor::where('ci', $ciNormalizado)
+                    ->where('expedicion_ci', $expedicionNormalizada)
+                    ->exists()
+            ) {
                 throw new \RuntimeException('Ya existe un adulto mayor registrado con el mismo CI.');
             }
 
-            $estadoInicial = EstadoAdulto::firstOrCreate(
-                ['estado' => 'PENDIENTE_VALORACION_INICIAL']
-            );
-
-            $adulto = AdultoMayor::create([
-                'nombres' => $preadmision->nombres,
-                'ap_paterno' => $preadmision->ap_paterno,
-                'ap_materno' => $preadmision->ap_materno,
-                'ci' => $preadmision->ci,
-                'expedicion_ci' => $preadmision->expedicion_ci,
-                'fecha_nac' => $preadmision->fecha_nac,
-                'genero' => $preadmision->genero,
-                'estado_civil' => $preadmision->estado_civil,
-                'telefono' => $preadmision->telefono,
-                'tiene_celular' => filled($preadmision->celular),
-                'celular' => $preadmision->celular,
-                'sabe_usar_whatsapp' => false,
-                'telefono_fijo' => null,
-                'departamento_residencia' => $preadmision->departamento_residencia,
-                'ciudad_municipio' => $preadmision->ciudad_municipio,
-                'zona' => $preadmision->zona,
-                'calle' => $preadmision->calle,
-                'fecha_ing' => now()->toDateString(),
-                'hora_ing' => now()->format('H:i:s'),
-                'tipo_ing' => $preadmision->tipo_ingreso ?: 'REGULAR',
-                'permanencia' => $preadmision->permanencia ?: 'PERMANENTE',
-                'nivel_educat' => 'NO ESPECIFICADO',
-                'grupo_sanguineo' => 'NO ESPECIFICADO',
-                'factor_rh' => null,
-                'alergias' => 'NO ESPECIFICADO',
-                'seguro_salud' => 'NO ESPECIFICADO',
-                'contacto_emergencia_nombre' => $preadmision->familiar_completo,
-                'contacto_emergencia_parentesco' => $preadmision->familiar_parentesco,
-                'contacto_emergencia_celular' => $preadmision->familiar_celular,
-                'contacto_emergencia_direccion' => $preadmision->familiar_direccion,
-                'responsable_principal' => $preadmision->familiar_completo,
-                'autorizado_informacion_medica' => true,
-                'consentimiento_datos' => true,
-                'observaciones' => trim(implode(' | ', array_filter([
-                    'Generado desde preadmision ' . $preadmision->cod_pre,
-                    $preadmision->descripcion_caso,
-                ]))),
-                'cod_est_adul' => $estadoInicial->cod_est_adul,
-                'motivo_ingreso' => $preadmision->motivo_ingreso,
-                'procedencia_ingreso' => $preadmision->procedencia_ingreso,
-                'cod_pre_origen' => $preadmision->cod_pre,
+            // Las valoraciones ya ocurrieron en la preadmisión. El adulto nace ADMITIDO.
+            $estadoInicial = EstadoAdulto::firstOrCreate([
+                'estado' => 'ADMITIDO',
             ]);
 
+            /*
+            |--------------------------------------------------------------------------
+            | Normalización segura de datos
+            |--------------------------------------------------------------------------
+            | No tocamos la base de datos. Adaptamos los datos antes de insertar para
+            | evitar errores por varchar corto, booleanos mal llenados o teléfonos largos.
+            */
+
+            $motivoOriginal = $this->limpiarTexto($preadmision->motivo_ingreso);
+            $procedenciaOriginal = $this->limpiarTexto($preadmision->procedencia_ingreso);
+            $descripcionCaso = $this->limpiarTexto($preadmision->descripcion_caso);
+
+            $tipoIngreso = $this->limitarTexto($preadmision->tipo_ingreso ?: 'REGULAR', 100) ?: 'REGULAR';
+            $permanencia = $this->limitarTexto($preadmision->permanencia ?: 'PERMANENTE', 50) ?: 'PERMANENTE';
+
+            $telefonoAdulto = $this->soloNumeros($preadmision->telefono, 20);
+            $celularAdulto = $this->soloNumeros($preadmision->celular, 8);
+            $celularFamiliar = $this->soloNumeros($preadmision->familiar_celular, 8);
+
+            $motivoCorto = $this->clasificarMotivoIngreso($motivoOriginal);
+            $procedenciaCorta = $this->clasificarProcedenciaIngreso($procedenciaOriginal);
+
+            $observacionesAdulto = trim(implode(' | ', array_filter([
+                'Generado desde preadmisión ' . $preadmision->cod_pre,
+                $descripcionCaso ?: null,
+                $motivoOriginal ? 'Motivo de ingreso original: ' . $motivoOriginal : null,
+                $procedenciaOriginal ? 'Procedencia original: ' . $procedenciaOriginal : null,
+            ])));
+
+            /*
+            |--------------------------------------------------------------------------
+            | Crear adulto mayor
+            |--------------------------------------------------------------------------
+            */
+
+            $adulto = AdultoMayor::create([
+                'nombres' => $this->limitarTexto($preadmision->nombres, 100) ?: 'SIN NOMBRE',
+                'ap_paterno' => $this->limitarTexto($preadmision->ap_paterno, 80) ?: 'NO REGISTRADO',
+                'ap_materno' => $this->limitarTexto($preadmision->ap_materno, 80),
+
+                'ci' => $ciNormalizado,
+                'expedicion_ci' => $expedicionNormalizada,
+
+                'fecha_nac' => $preadmision->fecha_nac,
+                'genero' => $this->limitarTexto($preadmision->genero, 100) ?: 'NO ESPECIFICADO',
+                'estado_civil' => $this->limitarTexto($preadmision->estado_civil, 100),
+
+                'telefono' => $telefonoAdulto,
+                'tiene_celular' => filled($celularAdulto),
+                'celular' => $celularAdulto,
+                'sabe_usar_whatsapp' => false,
+                'telefono_fijo' => null,
+
+                'departamento_residencia' => $this->limitarTexto($preadmision->departamento_residencia, 50),
+                'ciudad_municipio' => $this->limitarTexto($preadmision->ciudad_municipio, 100),
+                'zona' => $this->limitarTexto($preadmision->zona, 100),
+                'calle' => $this->limitarTexto($preadmision->calle, 150),
+
+                'fecha_ing' => now()->toDateString(),
+                'hora_ing' => now()->format('H:i:s'),
+
+                'tipo_ing' => $tipoIngreso,
+                'permanencia' => $permanencia,
+
+                'nivel_educat' => 'NO ESPECIFICADO',
+
+                /*
+                 * Campos cortos:
+                 * grupo_sanguineo suele ser varchar(3)
+                 * factor_rh suele ser varchar(1)
+                 * Por eso no se debe guardar "NO ESPECIFICADO".
+                 */
+                'grupo_sanguineo' => null,
+                'factor_rh' => null,
+
+                'alergias' => 'NO ESPECIFICADO',
+                'seguro_salud' => 'NO ESPECIFICADO',
+
+                'contacto_emergencia_nombre' => $this->limitarTexto($preadmision->familiar_completo, 150),
+                'contacto_emergencia_parentesco' => $this->limitarTexto($preadmision->familiar_parentesco, 80),
+                'contacto_emergencia_celular' => $celularFamiliar,
+                'contacto_emergencia_direccion' => $this->limitarTexto($preadmision->familiar_direccion, 200),
+
+                /*
+                 * Este campo en adulto_mayor es booleano.
+                 * No debe guardar el nombre del familiar.
+                 */
+                'responsable_principal' => true,
+
+                'autorizado_informacion_medica' => true,
+                'consentimiento_datos' => true,
+
+                'observaciones' => $observacionesAdulto ?: null,
+
+                'cod_est_adul' => $estadoInicial->cod_est_adul,
+
+                /*
+                 * Clasificaciones cortas para evitar errores de varchar.
+                 * El texto completo se conserva en observaciones.
+                 */
+                'motivo_ingreso' => $motivoCorto,
+                'procedencia_ingreso' => $procedenciaCorta,
+
+                'cod_pre_origen' => $this->limitarTexto($preadmision->cod_pre, 20),
+            ]);
+
+            /*
+            |--------------------------------------------------------------------------
+            | Crear o actualizar familiar responsable
+            |--------------------------------------------------------------------------
+            */
+
+            $ciFamiliar = $this->limitarTexto(
+                $preadmision->familiar_ci ?: 'PRE-' . $preadmision->cod_pre,
+                20
+            );
+
             $familiar = Familiar::firstOrNew([
-                'ci' => $preadmision->familiar_ci ?: 'PRE-' . $preadmision->cod_pre,
+                'ci' => $ciFamiliar,
             ]);
 
             $familiar->fill([
-                'nombres' => $preadmision->familiar_nombres,
-                'ap_paterno' => $preadmision->familiar_ap_paterno ?: 'NO REGISTRADO',
-                'ap_materno' => $preadmision->familiar_ap_materno,
-                'ci' => $preadmision->familiar_ci ?: 'PRE-' . $preadmision->cod_pre,
-                'parentesco_vinculo' => $preadmision->familiar_parentesco,
+                'nombres' => $this->limitarTexto($preadmision->familiar_nombres, 120) ?: 'SIN NOMBRE',
+                'ap_paterno' => $this->limitarTexto($preadmision->familiar_ap_paterno ?: 'NO REGISTRADO', 80),
+                'ap_materno' => $this->limitarTexto($preadmision->familiar_ap_materno, 80),
+                'ci' => $ciFamiliar,
+                'parentesco_vinculo' => $this->limitarTexto($preadmision->familiar_parentesco, 80),
                 'telefono' => null,
-                'celular' => $preadmision->familiar_celular,
-                'correo' => $preadmision->familiar_correo,
-                'direccion' => $preadmision->familiar_direccion,
+                'celular' => $celularFamiliar,
+                'correo' => $this->limitarTexto($preadmision->familiar_correo, 140),
+                'direccion' => $this->limitarTexto($preadmision->familiar_direccion, 200),
                 'zona' => null,
                 'es_responsable' => true,
                 'estado' => 'ACTIVO',
-                'observaciones' => 'Generado desde preadmision ' . $preadmision->cod_pre,
+                'observaciones' => 'Generado desde preadmisión ' . $preadmision->cod_pre,
                 'cod_usu' => auth()->user()?->cod_usu,
             ]);
+
             $familiar->save();
 
             if (! $adulto->familiares()->where('familiares.cod_fam', $familiar->cod_fam)->exists()) {
                 $adulto->familiares()->attach($familiar->cod_fam, [
-                    'parentesco_vinculo' => $preadmision->familiar_parentesco,
+                    'parentesco_vinculo' => $this->limitarTexto($preadmision->familiar_parentesco, 80),
                     'es_responsable' => true,
                     'estado' => 'ACTIVO',
-                    'observaciones' => 'Vinculo creado desde preadmision ' . $preadmision->cod_pre,
+                    'observaciones' => 'Vínculo creado desde preadmisión ' . $preadmision->cod_pre,
                 ]);
             }
 
+            /*
+            |--------------------------------------------------------------------------
+            | Migrar documentos de preadmisión hacia documentos del adulto mayor
+            |--------------------------------------------------------------------------
+            */
+
             $documentoRespaldo = null;
+
             foreach ($preadmision->documentos as $documentoPreadmision) {
                 $documentoAdulto = DocumentoAdultoMayor::create([
                     'cod_am' => $adulto->cod_am,
-                    'nombre' => $documentoPreadmision->nombre_documento,
-                    'tipo_documento' => $documentoPreadmision->tipo_documento,
+                    'nombre' => $this->limitarTexto($documentoPreadmision->nombre_documento, 180) ?: 'Documento de preadmisión',
+                    'tipo_documento' => $this->limitarTexto($documentoPreadmision->tipo_documento, 80) ?: 'PREADMISION',
                     'ruta_archivo' => $documentoPreadmision->archivo_path ?: 'PENDIENTE_PREADMISION',
                     'fecha_subida' => optional($documentoPreadmision->created_at)->toDateString() ?: now()->toDateString(),
-                    'estado' => in_array($documentoPreadmision->estado, ['PENDIENTE', 'PENDIENTE_48H']) ? 'PENDIENTE' : 'ACTIVO',
+                    'estado' => in_array($documentoPreadmision->estado, ['PENDIENTE', 'PENDIENTE_48H'], true)
+                        ? 'PENDIENTE'
+                        : 'ACTIVO',
                     'observaciones' => $documentoPreadmision->observaciones,
                     'modulo_ref' => 'PREADMISION',
                 ]);
@@ -234,16 +369,28 @@ class PreadmisionesPanel extends Component
                 $documentoRespaldo ??= $documentoAdulto;
             }
 
+            /*
+            |--------------------------------------------------------------------------
+            | Registrar historial de estado
+            |--------------------------------------------------------------------------
+            */
+
             HistorialEstadoAdulto::create([
                 'cod_am' => $adulto->cod_am,
                 'estado_anterior' => null,
                 'estado_nuevo' => $estadoInicial->cod_est_adul,
                 'fecha_cambio' => now(),
-                'motivo' => 'Ingreso aprobado desde preadmision.',
+                'motivo' => 'Ingreso aprobado desde preadmisión.',
                 'documento_respaldo' => $documentoRespaldo?->cod_doc_am,
                 'cambiado_por' => auth()->user()?->cod_usu,
-                'observacion' => 'Preadmision origen: ' . $preadmision->cod_pre,
+                'observacion' => 'Preadmisión origen: ' . $preadmision->cod_pre,
             ]);
+
+            /*
+            |--------------------------------------------------------------------------
+            | Actualizar preadmisión
+            |--------------------------------------------------------------------------
+            */
 
             $preadmision->update([
                 'estado' => 'APROBADA',
@@ -260,21 +407,23 @@ class PreadmisionesPanel extends Component
             activity('Admisiones')
                 ->causedBy(auth()->user())
                 ->performedOn($preadmision)
-                ->log("Preadmision {$preadmision->cod_pre} aprobada y convertida en adulto {$adulto->cod_am}.");
+                ->log("Preadmisión {$preadmision->cod_pre} aprobada y convertida en adulto {$adulto->cod_am}.");
 
             DB::commit();
 
             $this->dispatch('swal', [
-                'title' => 'Preadmision aprobada',
-                'text' => "Se genero el adulto mayor {$adulto->cod_am} y se vinculo el familiar {$familiar->cod_fam}.",
+                'title' => 'Preadmisión aprobada',
+                'text' => "Se generó el adulto mayor {$adulto->cod_am} y se vinculó el familiar {$familiar->cod_fam}.",
                 'icon' => 'success',
             ]);
         } catch (\Throwable $e) {
             DB::rollBack();
 
+            report($e);
+
             $this->dispatch('swal', [
                 'title' => 'Error al aprobar',
-                'text' => 'No se pudo convertir la preadmision: ' . $e->getMessage(),
+                'text' => 'No se pudo convertir la preadmisión: ' . $e->getMessage(),
                 'icon' => 'error',
             ]);
         }
@@ -303,13 +452,13 @@ class PreadmisionesPanel extends Component
         activity('Admisiones')
             ->causedBy(auth()->user())
             ->performedOn($preadmision)
-            ->log("Preadmision {$preadmision->cod_pre} rechazada.");
+            ->log("Preadmisión {$preadmision->cod_pre} rechazada.");
 
         $this->cerrarModalRechazo();
 
         $this->dispatch('swal', [
-            'title' => 'Preadmision rechazada',
-            'text' => 'El caso fue movido a la seccion de rechazadas sin duplicar registros.',
+            'title' => 'Preadmisión rechazada',
+            'text' => 'El caso fue movido a la sección de rechazadas sin duplicar registros.',
             'icon' => 'success',
         ]);
     }
@@ -322,13 +471,147 @@ class PreadmisionesPanel extends Component
 
         activity('Admisiones')
             ->causedBy(auth()->user())
-            ->log('Solicito reporte de preadmisiones.');
+            ->log('Solicitó reporte de preadmisiones.');
 
         $this->dispatch('swal', [
-            'title' => 'Reporte en preparacion',
-            'text' => 'La consulta de preadmisiones esta lista. La plantilla PDF queda pendiente de integracion.',
+            'title' => 'Reporte en preparación',
+            'text' => 'La consulta de preadmisiones está lista. La plantilla PDF queda pendiente de integración.',
             'icon' => 'info',
         ]);
+    }
+
+    private function limpiarTexto($valor): string
+    {
+        return trim((string) $valor);
+    }
+
+    private function limitarTexto($valor, int $max): ?string
+    {
+        $texto = trim((string) $valor);
+
+        if ($texto === '') {
+            return null;
+        }
+
+        return mb_substr($texto, 0, $max, 'UTF-8');
+    }
+
+    private function soloNumeros($valor, int $max): ?string
+    {
+        $numero = preg_replace('/\D/', '', (string) $valor);
+
+        if ($numero === '') {
+            return null;
+        }
+
+        return substr($numero, 0, $max);
+    }
+
+    private function textoContiene(?string $texto, array $palabras): bool
+    {
+        $texto = mb_strtolower((string) $texto, 'UTF-8');
+
+        foreach ($palabras as $palabra) {
+            if (str_contains($texto, mb_strtolower($palabra, 'UTF-8'))) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private function clasificarMotivoIngreso(?string $motivo): string
+    {
+        if ($this->textoContiene($motivo, [
+            'cardio',
+            'cardiopatía',
+            'cardiopatia',
+            'insuficiencia',
+            'médic',
+            'medic',
+            'salud',
+            'tratamiento',
+            'control',
+            'clínic',
+            'clinic',
+            'hospital',
+        ])) {
+            return 'MEDICO';
+        }
+
+        if ($this->textoContiene($motivo, [
+            'caida',
+            'caída',
+            'fractura',
+            'golpe',
+            'accidente',
+        ])) {
+            return 'CAIDA';
+        }
+
+        if ($this->textoContiene($motivo, [
+            'cogn',
+            'memoria',
+            'olvido',
+            'desorient',
+            'alzheimer',
+            'demencia',
+        ])) {
+            return 'COGNITIVO';
+        }
+
+        if ($this->textoContiene($motivo, [
+            'famil',
+            'abandono',
+            'cuidador',
+            'responsable',
+        ])) {
+            return 'FAMILIAR';
+        }
+
+        return 'GENERAL';
+    }
+
+    private function clasificarProcedenciaIngreso(?string $procedencia): string
+    {
+        if ($this->textoContiene($procedencia, [
+            'médic',
+            'medic',
+            'cardiólogo',
+            'cardiologo',
+            'doctor',
+            'hospital',
+            'clínica',
+            'clinica',
+            'centro de salud',
+            'derivación médica',
+            'derivacion medica',
+        ])) {
+            return 'MEDICA';
+        }
+
+        if ($this->textoContiene($procedencia, [
+            'famil',
+            'hijo',
+            'hija',
+            'hermano',
+            'hermana',
+            'sobrino',
+            'sobrina',
+        ])) {
+            return 'FAMILIAR';
+        }
+
+        if ($this->textoContiene($procedencia, [
+            'social',
+            'trabajo social',
+            'defensoría',
+            'defensoria',
+        ])) {
+            return 'SOCIAL';
+        }
+
+        return 'GENERAL';
     }
 
     public function render()
@@ -339,6 +622,7 @@ class PreadmisionesPanel extends Component
 
         if ($this->search !== '') {
             $search = trim($this->search);
+
             $query->where(function ($q) use ($search) {
                 $q->where('cod_pre', 'like', "%{$search}%")
                     ->orWhere('nombres', 'like', "%{$search}%")

@@ -139,7 +139,9 @@ class CarlaPatriciaEnfermeriaSeeder extends Seeder
 
         if (!$preadmision) {
             Preadmision::create([
-                'estado'              => 'PENDIENTE_VALORACION_INICIAL',
+                // cod_pre explícito para no ocupar PRE_00001-PRE_00008 (reservados para demo)
+                'cod_pre'             => 'PRE_CARLA_01',
+                'estado'              => 'PREADMISION_ASIGNADA',
                 'fecha_solicitud'     => now()->toDateString(),
                 'fecha_asignacion'    => now(),
                 'nombres'             => 'PEDRO SEGUNDO',

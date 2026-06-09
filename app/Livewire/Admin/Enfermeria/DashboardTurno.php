@@ -181,18 +181,14 @@ class DashboardTurno extends Component
                 ->get();
         }
 
+        // Preadmisiones asignadas al enfermero que aún no han sido admitidas.
+        // En este punto del flujo la persona es solo una preadmisión (no adulto_mayor).
         $valoracionesPendientes = Preadmision::query()
-            ->with(['adultoGenerado', 'documentos', 'enfermero'])
+            ->with(['documentos', 'enfermero'])
             ->where('enfermero_asignado', $this->filtroEnfermeroId)
-            ->where('estado', 'APROBADA')
-            ->whereNotNull('cod_am_generado')
-            ->whereHas('adultoGenerado', function ($q) {
-                $q->whereNull('cod_habitacion')
-                  ->whereNull('cod_cama')
-                  ->whereHas('estado', function ($estadoQuery) {
-                      $estadoQuery->whereIn('estado', ['PENDIENTE_VALORACION_ENFERMERIA', 'PREADMISION']);
-                  });
-            })
+            ->whereIn('estado', ['PREADMISION_ASIGNADA', 'EN_VALORACION_ENFERMERIA'])
+            ->whereNull('cod_am_generado')
+            ->orderByRaw("CASE prioridad WHEN 'CRITICA' THEN 1 WHEN 'ALTA' THEN 2 WHEN 'MEDIA' THEN 3 ELSE 4 END")
             ->get();
 
         $valoracionesRealizadasHoy = ValoracionEnfermeriaAdmision::query()
@@ -221,28 +217,41 @@ class DashboardTurno extends Component
         ])->layout('layouts.sistema');
     }
 
-    public function iniciarValoracion($cod_am)
+    public function iniciarValoracion($cod_pre)
     {
-        $adulto = \App\Models\AdultoMayor::with(['documentos', 'preadmisionOrigen'])->find($cod_am);
-        
-        if (!$adulto) return;
+        $preadmision = Preadmision::with(['documentos'])->find($cod_pre);
 
-        if (! $adulto->preadmisionOrigen || $adulto->preadmisionOrigen->enfermero_asignado !== $this->filtroEnfermeroId) {
-            $this->dispatch('notificar', ['tipo' => 'error', 'mensaje' => 'Este caso no está asignado a tu usuario para valoración inicial.']);
+        if (! $preadmision) return;
+
+        if ($preadmision->enfermero_asignado !== $this->filtroEnfermeroId) {
+            $this->dispatch('notificar', ['tipo' => 'error', 'mensaje' => 'Esta preadmisión no está asignada a tu usuario.']);
             return;
         }
 
-        // Validar documentos obligatorios básicos (ejemplo: CI debe existir)
-        $tieneCI = $adulto->documentos->whereIn('tipo_documento', ['CI', 'CI_ADULTO'])->count() > 0;
-        
-        if (!$tieneCI && !auth()->user()->hasRole('SUPERADMINISTRADOR')) {
+        // Verificar documentos mínimos (CI)
+        $tieneCI = $preadmision->documentos
+            ->whereIn('tipo_documento', ['CI', 'CI_ADULTO', 'IDENTIFICACION'])
+            ->count() > 0;
+
+        if (! $tieneCI && ! auth()->user()->hasRole('SUPERADMINISTRADOR')) {
             $this->dispatch('notificar', ['tipo' => 'error', 'mensaje' => 'Faltan documentos obligatorios (CI) para iniciar la valoración.']);
             return;
         }
 
-        activity('Enfermeria')->causedBy(auth()->user())->performedOn($adulto)->log("Inició valoración inicial del paciente {$adulto->cod_am}");
-        
-        $this->dispatch('abrirValoracionInicial', $cod_am);
+        // Avanzar estado PREADMISION_ASIGNADA → EN_VALORACION_ENFERMERIA al iniciar
+        if ($preadmision->estado === 'PREADMISION_ASIGNADA') {
+            $preadmision->update(['estado' => 'EN_VALORACION_ENFERMERIA']);
+        }
+
+        activity('Enfermeria')
+            ->causedBy(auth()->user())
+            ->performedOn($preadmision)
+            ->log("Inició valoración de enfermería para preadmisión {$preadmision->cod_pre}");
+
+        $this->dispatch('notificar', [
+            'tipo'    => 'success',
+            'mensaje' => "Valoración iniciada para {$preadmision->nombres} {$preadmision->ap_paterno} ({$preadmision->cod_pre}).",
+        ]);
     }
 
     private function construirCalendarioHorarios($horarios): array

@@ -11,13 +11,18 @@ class PreadmisionesSeeder extends Seeder
 {
     public function run(): void
     {
-        $enfermero = User::whereHas('roles', fn($q) => $q->where('name', 'ENFERMEROS'))->first()
-                  ?? User::first();
-        $admin     = User::whereHas('roles', fn($q) => $q->where('name', 'SUPERADMINISTRADOR'))->first()
+        $enfermero = User::where('correo', 'enfermero.prueba@casaamandita.com')->first()
+                  ?? User::where('correo', 'enfermera.mendoza@casaamandita.com')->first()
+                  ?? User::whereHas('roles', fn($q) => $q->where('name', 'ENFERMEROS'))->first()
                   ?? User::first();
 
+        $admin = User::where('correo', 'admincasaamandita@gmail.com')->first()
+               ?? User::first();
+
         $preadmisiones = [
+            // ── CASO 1: Para enfermería — pendiente de iniciar valoración ──────────
             [
+                'cod_pre'             => 'PRE_00001',
                 'estado'              => 'PREADMISION_ASIGNADA',
                 'prioridad'           => 'MEDIA',
                 'nombres'             => 'HUGO ALBERTO',
@@ -32,7 +37,7 @@ class PreadmisionesSeeder extends Seeder
                 'ciudad_municipio'    => 'COCHABAMBA',
                 'zona'                => 'Cala Cala',
                 'calle'               => 'Av. Pando Nro. 789',
-                'motivo_ingreso'      => 'Parkinson avanzado. Caídas frecuentes. Familia no puede dar cuidados continuos.',
+                'motivo_ingreso'      => 'Parkinson avanzado con caídas frecuentes. La familia no puede brindar cuidados continuos.',
                 'procedencia_ingreso' => 'Derivación médica',
                 'tipo_ingreso'        => 'DERIVADO',
                 'permanencia'         => 'PERMANENTE',
@@ -40,20 +45,24 @@ class PreadmisionesSeeder extends Seeder
                 'familiar_nombres'    => 'PATRICIA',
                 'familiar_ap_paterno' => 'VILLAZON',
                 'familiar_ap_materno' => 'GUTIERREZ',
-                'familiar_ci'         => '8891122-PRE',
+                'familiar_ci'         => '8891122-PRE1',
                 'familiar_parentesco' => 'HIJA',
                 'familiar_celular'    => '76112233',
                 'familiar_correo'     => 'patricia.villazon@email.com',
                 'familiar_direccion'  => 'Av. Pando Nro. 789, Cala Cala, Cbba',
                 'dias_atras'          => 3,
+                'observaciones'       => null,
             ],
+
+            // ── CASO 2: Para enfermería — en proceso de valoración ────────────────
             [
-                'estado'              => 'EN_EVALUACION',
+                'cod_pre'             => 'PRE_00002',
+                'estado'              => 'EN_VALORACION_ENFERMERIA',
                 'prioridad'           => 'ALTA',
                 'nombres'             => 'ROSA ELVIRA',
                 'ap_paterno'          => 'AGUILAR',
                 'ap_materno'          => 'NINA',
-                'ci'                  => '7788992-PRE',
+                'ci'                  => '7788992-PRE2',
                 'expedicion_ci'       => 'LP',
                 'fecha_nac'           => '1937-04-22',
                 'genero'              => 'FEMENINO',
@@ -62,7 +71,7 @@ class PreadmisionesSeeder extends Seeder
                 'ciudad_municipio'    => 'EL ALTO',
                 'zona'                => 'Villa Adela',
                 'calle'               => 'Calle 8 Nro. 200',
-                'motivo_ingreso'      => 'Alzheimer estadio moderado. Episodios de deambulación nocturna. Riesgo de caída.',
+                'motivo_ingreso'      => 'Alzheimer estadio moderado. Episodios de deambulación nocturna y riesgo de caída.',
                 'procedencia_ingreso' => 'Solicitud familiar',
                 'tipo_ingreso'        => 'FAMILIA',
                 'permanencia'         => 'PERMANENTE',
@@ -70,20 +79,24 @@ class PreadmisionesSeeder extends Seeder
                 'familiar_nombres'    => 'MARIO FERNANDO',
                 'familiar_ap_paterno' => 'AGUILAR',
                 'familiar_ap_materno' => 'TORREZ',
-                'familiar_ci'         => '9902233-PRE',
+                'familiar_ci'         => '9902233-PRE2',
                 'familiar_parentesco' => 'HIJO',
                 'familiar_celular'    => '77223344',
                 'familiar_correo'     => 'mario.aguilar@email.com',
                 'familiar_direccion'  => 'Calle 8 Nro. 200, Villa Adela, El Alto',
                 'dias_atras'          => 7,
+                'observaciones'       => 'Valoración de enfermería iniciada. Pendiente de completar formulario.',
             ],
+
+            // ── CASO 3: Para médico — pendiente de valoración médica ──────────────
             [
-                'estado'              => 'EN_EVALUACION',
+                'cod_pre'             => 'PRE_00003',
+                'estado'              => 'PENDIENTE_VALORACION_MEDICA',
                 'prioridad'           => 'MEDIA',
                 'nombres'             => 'GUILLERMO ERNESTO',
                 'ap_paterno'          => 'ARZE',
                 'ap_materno'          => 'CALDERON',
-                'ci'                  => '8899003-PRE',
+                'ci'                  => '8899003-PRE3',
                 'expedicion_ci'       => 'SC',
                 'fecha_nac'           => '1947-12-03',
                 'genero'              => 'MASCULINO',
@@ -100,20 +113,92 @@ class PreadmisionesSeeder extends Seeder
                 'familiar_nombres'    => 'CLAUDIA',
                 'familiar_ap_paterno' => 'ARZE',
                 'familiar_ap_materno' => 'PARRA',
-                'familiar_ci'         => '0013344-PRE',
+                'familiar_ci'         => '0013344-PRE3',
                 'familiar_parentesco' => 'HIJA',
                 'familiar_celular'    => '78334455',
                 'familiar_correo'     => 'claudia.arze@email.com',
                 'familiar_direccion'  => 'Av. Roca y Coronado, Santa Cruz',
                 'dias_atras'          => 12,
+                'observaciones'       => 'Valoración de enfermería completada. Pendiente de evaluación médica.',
             ],
+
+            // ── CASO 4: Para médico — en proceso de valoración médica ─────────────
             [
+                'cod_pre'             => 'PRE_00004',
+                'estado'              => 'EN_VALORACION_MEDICA',
+                'prioridad'           => 'ALTA',
+                'nombres'             => 'ESTEBAN FELIX',
+                'ap_paterno'          => 'TORREZ',
+                'ap_materno'          => 'MAMANI',
+                'ci'                  => '0011225-PRE4',
+                'expedicion_ci'       => 'PT',
+                'fecha_nac'           => '1930-02-10',
+                'genero'              => 'MASCULINO',
+                'estado_civil'        => 'VIUDO/A',
+                'departamento_residencia' => 'POTOSÍ',
+                'ciudad_municipio'    => 'POTOSÍ',
+                'zona'                => 'Cantumarca',
+                'calle'               => 'Calle Sucre Nro. 15',
+                'motivo_ingreso'      => 'ACV reciente con hemiplejia derecha. Dependencia total. Requiere cuidados intensivos.',
+                'procedencia_ingreso' => 'Alta hospitalaria — Hospital Bracamonte Potosí',
+                'tipo_ingreso'        => 'DERIVADO',
+                'permanencia'         => 'PERMANENTE',
+                'descripcion_caso'    => 'Post-ACV con secuelas severas. Alta dependencia. Requiere cuidados de enfermería especializados.',
+                'familiar_nombres'    => 'SILVERIA',
+                'familiar_ap_paterno' => 'TORREZ',
+                'familiar_ap_materno' => 'FLORES',
+                'familiar_ci'         => '2225566-PRE4',
+                'familiar_parentesco' => 'HIJA',
+                'familiar_celular'    => '72556677',
+                'familiar_correo'     => 'silveria.torrez@email.com',
+                'familiar_direccion'  => 'Calle Sucre Nro. 15, Cantumarca, Potosí',
+                'dias_atras'          => 8,
+                'observaciones'       => 'Valoración médica en curso. Médico revisando antecedentes y resultados previos.',
+            ],
+
+            // ── CASO 5: Listo para decisión de admisión ───────────────────────────
+            [
+                'cod_pre'             => 'PRE_00005',
+                'estado'              => 'VALORACION_MEDICA_FINALIZADA',
+                'prioridad'           => 'ALTA',
+                'nombres'             => 'CARMEN LUCÍA',
+                'ap_paterno'          => 'MENDEZ',
+                'ap_materno'          => 'VARGAS',
+                'ci'                  => '5566778-PRE5',
+                'expedicion_ci'       => 'OR',
+                'fecha_nac'           => '1940-07-19',
+                'genero'              => 'FEMENINO',
+                'estado_civil'        => 'VIUDO/A',
+                'departamento_residencia' => 'ORURO',
+                'ciudad_municipio'    => 'ORURO',
+                'zona'                => 'Villa Pagador',
+                'calle'               => 'Calle Junín Nro. 501',
+                'motivo_ingreso'      => 'Fractura de cadera operada. Rehabilitación y cuidados post-quirúrgicos.',
+                'procedencia_ingreso' => 'Alta hospitalaria — Hospital Obrero Oruro',
+                'tipo_ingreso'        => 'DERIVADO',
+                'permanencia'         => 'TEMPORAL',
+                'descripcion_caso'    => 'Paciente post-operada de cadera. Requiere fisioterapia y cuidados de enfermería durante recuperación.',
+                'familiar_nombres'    => 'JORGE',
+                'familiar_ap_paterno' => 'MENDEZ',
+                'familiar_ap_materno' => 'QUISPE',
+                'familiar_ci'         => '6677889-PRE5',
+                'familiar_parentesco' => 'HIJO',
+                'familiar_celular'    => '71889900',
+                'familiar_correo'     => 'jorge.mendez@email.com',
+                'familiar_direccion'  => 'Calle Junín Nro. 501, Oruro',
+                'dias_atras'          => 15,
+                'observaciones'       => 'Valoraciones de enfermería y médica completadas. Pendiente de decisión de admisión por médico o administración.',
+            ],
+
+            // ── CASO 6: Rechazada ─────────────────────────────────────────────────
+            [
+                'cod_pre'             => 'PRE_00006',
                 'estado'              => 'RECHAZADA',
                 'prioridad'           => 'BAJA',
                 'nombres'             => 'BEATRIZ AMPARO',
                 'ap_paterno'          => 'LUNA',
                 'ap_materno'          => 'BERRIOS',
-                'ci'                  => '9900114-PRE',
+                'ci'                  => '9900114-PRE6',
                 'expedicion_ci'       => 'OR',
                 'fecha_nac'           => '1950-06-18',
                 'genero'              => 'FEMENINO',
@@ -126,58 +211,103 @@ class PreadmisionesSeeder extends Seeder
                 'procedencia_ingreso' => 'Solicitud propia',
                 'tipo_ingreso'        => 'VOLUNTARIO',
                 'permanencia'         => 'TEMPORAL',
-                'descripcion_caso'    => 'Adulta mayor autónoma. Solicita ingreso por preferencia personal.',
+                'descripcion_caso'    => 'Adulta mayor autónoma. Solicita ingreso por preferencia personal sin necesidad de cuidado médico.',
                 'familiar_nombres'    => 'CARLOS',
                 'familiar_ap_paterno' => 'LUNA',
                 'familiar_ap_materno' => 'MAMANI',
-                'familiar_ci'         => '1114455-PRE',
+                'familiar_ci'         => '1114455-PRE6',
                 'familiar_parentesco' => 'SOBRINO',
                 'familiar_celular'    => '79445566',
                 'familiar_correo'     => null,
                 'familiar_direccion'  => 'Calle Potosí Nro. 310, Oruro',
-                'motivo_rechazo'      => 'CAPACIDAD MAXIMA OCUPADA',
-                'observacion_rechazo' => 'La institución no cuenta con disponibilidad en este momento. Se sugiere reingresar solicitud en 3 meses.',
                 'dias_atras'          => 20,
+                'motivo_rechazo'      => 'CAPACIDAD MAXIMA OCUPADA',
+                'observacion_rechazo' => 'La institución no cuenta con disponibilidad en este momento. Se sugiere reingresar solicitud en 3 meses cuando haya cupos disponibles.',
+                'observaciones'       => null,
             ],
+
+            // ── CASO 7: Derivada ──────────────────────────────────────────────────
             [
-                'estado'              => 'PREADMISION_ASIGNADA',
-                'prioridad'           => 'CRITICA',
-                'nombres'             => 'ESTEBAN FELIX',
-                'ap_paterno'          => 'TORREZ',
-                'ap_materno'          => 'MAMANI',
-                'ci'                  => '0011225-PRE',
-                'expedicion_ci'       => 'PT',
-                'fecha_nac'           => '1930-02-10',
+                'cod_pre'             => 'PRE_00007',
+                'estado'              => 'DERIVADA',
+                'prioridad'           => 'MEDIA',
+                'nombres'             => 'FELIX ANTONIO',
+                'ap_paterno'          => 'ROJAS',
+                'ap_materno'          => 'HUANCA',
+                'ci'                  => '3344556-PRE7',
+                'expedicion_ci'       => 'BN',
+                'fecha_nac'           => '1945-03-05',
                 'genero'              => 'MASCULINO',
-                'estado_civil'        => 'VIUDO/A',
-                'departamento_residencia' => 'POTOSÍ',
-                'ciudad_municipio'    => 'POTOSÍ',
-                'zona'                => 'Cantumarca',
-                'calle'               => 'Calle Sucre Nro. 15',
-                'motivo_ingreso'      => 'ACV reciente. Hemiplejia derecha. Dependencia total. Requiere cuidados intensivos.',
-                'procedencia_ingreso' => 'Alta hospitalaria — Hospital Bracamonte Potosí',
+                'estado_civil'        => 'CASADO/A',
+                'departamento_residencia' => 'BENI',
+                'ciudad_municipio'    => 'TRINIDAD',
+                'zona'                => 'Plan Tres Mil',
+                'calle'               => 'Av. 6 de Agosto Nro. 78',
+                'motivo_ingreso'      => 'Demencia vascular avanzada con episodios agresivos. Requiere contención especializada.',
+                'procedencia_ingreso' => 'Derivación médica — Psiquiatra particular',
                 'tipo_ingreso'        => 'DERIVADO',
                 'permanencia'         => 'PERMANENTE',
-                'descripcion_caso'    => 'Post-ACV con secuelas severas. Alta dependencia. Requiere cuidados de enfermería especializados.',
-                'familiar_nombres'    => 'SILVERIA',
-                'familiar_ap_paterno' => 'TORREZ',
-                'familiar_ap_materno' => 'FLORES',
-                'familiar_ci'         => '2225566-PRE',
+                'descripcion_caso'    => 'Demencia vascular con episodios agresivos que superan la capacidad de atención de la institución.',
+                'familiar_nombres'    => 'ANA MARIA',
+                'familiar_ap_paterno' => 'ROJAS',
+                'familiar_ap_materno' => 'SUAREZ',
+                'familiar_ci'         => '4455667-PRE7',
                 'familiar_parentesco' => 'HIJA',
-                'familiar_celular'    => '72556677',
-                'familiar_correo'     => 'silveria.torrez@email.com',
-                'familiar_direccion'  => 'Calle Sucre Nro. 15, Cantumarca, Potosí',
-                'dias_atras'          => 1,
+                'familiar_celular'    => '73667788',
+                'familiar_correo'     => 'ana.rojas@email.com',
+                'familiar_direccion'  => 'Av. 6 de Agosto Nro. 78, Trinidad',
+                'dias_atras'          => 25,
+                'motivo_rechazo'      => null,
+                'observacion_rechazo' => null,
+                'observaciones'       => 'Caso derivado al Centro de Salud Mental de Referencia por requerir atención psiquiátrica especializada con contención. La institución no cuenta con capacidad para atención de episodios agresivos severos.',
+            ],
+
+            // ── CASO 8: Observada ─────────────────────────────────────────────────
+            [
+                'cod_pre'             => 'PRE_00008',
+                'estado'              => 'OBSERVADA',
+                'prioridad'           => 'BAJA',
+                'nombres'             => 'MARTA CECILIA',
+                'ap_paterno'          => 'GUTIERREZ',
+                'ap_materno'          => 'SALAZAR',
+                'ci'                  => '7788990-PRE8',
+                'expedicion_ci'       => 'TJ',
+                'fecha_nac'           => '1948-11-22',
+                'genero'              => 'FEMENINO',
+                'estado_civil'        => 'DIVORCIADO/A',
+                'departamento_residencia' => 'TARIJA',
+                'ciudad_municipio'    => 'TARIJA',
+                'zona'                => 'El Molino',
+                'calle'               => 'Calle Colón Nro. 230',
+                'motivo_ingreso'      => 'Diabetes descompensada e hipertensión arterial mal controlada. Requiere monitoreo continuo.',
+                'procedencia_ingreso' => 'Solicitud familiar con referencia médica',
+                'tipo_ingreso'        => 'FAMILIA',
+                'permanencia'         => 'PERMANENTE',
+                'descripcion_caso'    => 'Paciente con patologías crónicas no controladas. Se requiere confirmación de exámenes de laboratorio previos al ingreso.',
+                'familiar_nombres'    => 'ROBERTO',
+                'familiar_ap_paterno' => 'GUTIERREZ',
+                'familiar_ap_materno' => 'MAMANI',
+                'familiar_ci'         => '8899001-PRE8',
+                'familiar_parentesco' => 'HIJO',
+                'familiar_celular'    => '74112233',
+                'familiar_correo'     => 'roberto.gutierrez@email.com',
+                'familiar_direccion'  => 'Calle Colón Nro. 230, El Molino, Tarija',
+                'dias_atras'          => 10,
+                'motivo_rechazo'      => null,
+                'observacion_rechazo' => null,
+                'observaciones'       => 'Caso en observación. Se solicita presentar resultados de hemoglobina glicosilada, perfil lipídico y ecocardiograma actualizados (menos de 6 meses). Familiar notificado para entregar documentación pendiente.',
             ],
         ];
 
         foreach ($preadmisiones as $pData) {
-            $pre = Preadmision::firstWhere('ci', $pData['ci']);
-            if ($pre) continue;
+            if (Preadmision::where('cod_pre', $pData['cod_pre'])->exists()) {
+                continue;
+            }
 
             $fechaSolicitud = now()->subDays($pData['dias_atras'])->toDateString();
 
             $preData = [
+                'cod_pre'             => $pData['cod_pre'],
                 'estado'              => $pData['estado'],
                 'prioridad'           => $pData['prioridad'],
                 'fecha_solicitud'     => $fechaSolicitud,
@@ -207,27 +337,36 @@ class PreadmisionesSeeder extends Seeder
                 'familiar_celular'    => $pData['familiar_celular'],
                 'familiar_correo'     => $pData['familiar_correo'],
                 'familiar_direccion'  => $pData['familiar_direccion'],
+                'observaciones'       => $pData['observaciones'] ?? null,
                 'enfermero_asignado'  => $enfermero?->cod_usu,
                 'creado_por'          => $admin?->cod_usu,
-                'documentos_iniciales_completos'        => in_array($pData['estado'], ['EN_EVALUACION', 'RECHAZADA']),
-                'documentos_institucionales_generados'  => $pData['estado'] === 'EN_EVALUACION',
+                'cod_am_generado'     => null,
+                'cod_fam_generado'    => null,
+                'documentos_iniciales_completos'       => in_array($pData['estado'], [
+                    'PENDIENTE_VALORACION_MEDICA',
+                    'EN_VALORACION_MEDICA',
+                    'VALORACION_MEDICA_FINALIZADA',
+                    'RECHAZADA',
+                    'DERIVADA',
+                    'OBSERVADA',
+                ]),
+                'documentos_institucionales_generados' => false,
             ];
 
             if ($pData['estado'] === 'RECHAZADA') {
                 $preData['motivo_rechazo']      = $pData['motivo_rechazo'];
                 $preData['observacion_rechazo'] = $pData['observacion_rechazo'];
-                $preData['fecha_rechazo']       = now()->subDays($pData['dias_atras'] - 5);
-                $preData['rechazado_por']        = $admin?->cod_usu;
+                $preData['fecha_rechazo']        = now()->subDays($pData['dias_atras'] - 5);
+                $preData['rechazado_por']         = $admin?->cod_usu;
             }
 
             $pre = Preadmision::create($preData);
 
-            // Documentos básicos
             DocumentoPreadmision::create([
                 'cod_pre'          => $pre->cod_pre,
                 'nombre_documento' => 'Cédula de Identidad',
                 'tipo_documento'   => 'IDENTIFICACION',
-                'es_institucional'  => false,
+                'es_institucional' => false,
                 'estado'           => 'PENDIENTE',
                 'archivo_path'     => null,
                 'observaciones'    => 'Pendiente de entrega por familiar.',
@@ -237,13 +376,20 @@ class PreadmisionesSeeder extends Seeder
                 'cod_pre'          => $pre->cod_pre,
                 'nombre_documento' => 'Certificado Médico',
                 'tipo_documento'   => 'MEDICO',
-                'es_institucional'  => false,
-                'estado'           => in_array($pData['estado'], ['EN_EVALUACION', 'RECHAZADA']) ? 'ENTREGADO' : 'PENDIENTE',
-                'archivo_path'     => in_array($pData['estado'], ['EN_EVALUACION', 'RECHAZADA']) ? 'demo/cert_medico_pre.pdf' : null,
+                'es_institucional' => false,
+                'estado'           => in_array($pData['estado'], [
+                    'PENDIENTE_VALORACION_MEDICA',
+                    'EN_VALORACION_MEDICA',
+                    'VALORACION_MEDICA_FINALIZADA',
+                    'RECHAZADA',
+                    'DERIVADA',
+                    'OBSERVADA',
+                ]) ? 'ENTREGADO' : 'PENDIENTE',
+                'archivo_path'     => null,
                 'observaciones'    => null,
             ]);
         }
 
-        $this->command->info('[PreadmisionesSeeder] 5 preadmisiones creadas con distintos estados y documentos.');
+        $this->command->info('[PreadmisionesSeeder] 8 preadmisiones demo creadas — PRE_00001 a PRE_00008, todos con cod_am_generado = null.');
     }
 }
