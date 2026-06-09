@@ -20,6 +20,8 @@ class GeneradorPlanillaEnfermeriaService
     private const TURNO_APOYO = 'APOYO';
     private const TURNO_DESCANSO = 'DESCANSO';
 
+    protected array $temporales = [];
+
     /**
      * Turnos clínicos usados para la planilla de enfermería.
      * No se usan turnos institucionales administrativos aquí.
@@ -145,6 +147,24 @@ class GeneradorPlanillaEnfermeriaService
     {
         $config = $this->normalizarConfig($config);
 
+        $fechaInicioStr = $config['fecha_inicio']->toDateString();
+        $fechaFinStr = $config['fecha_inicio']->copy()->addWeeks($config['cantidad_semanas'])->subDay()->toDateString();
+
+        try {
+            if (Schema::hasTable('asignaciones_plazas_enfermeria')) {
+                $this->temporales = \App\Models\AsignacionPlazaEnfermeria::with('user')
+                    ->whereBetween('fecha', [$fechaInicioStr, $fechaFinStr])
+                    ->get()
+                    ->groupBy(fn($item) => $item->plaza . '_' . $item->fecha->toDateString())
+                    ->toArray();
+            } else {
+                $this->temporales = [];
+            }
+        } catch (\Throwable $e) {
+            report($e);
+            $this->temporales = [];
+        }
+
         $enfermeros = $this->resolverEnfermeros($config);
 
         if (count($enfermeros) < 12) {
@@ -227,42 +247,58 @@ class GeneradorPlanillaEnfermeriaService
      */
     protected function resolverEnfermeros(array $config): array
     {
-        if (! $config['usar_usuarios_reales']) {
-            return $this->enfermerosVirtuales($config['total_enfermeros']);
-        }
+        $enfermeros = [];
 
         try {
-            if (! class_exists(User::class) || ! Schema::hasTable('users')) {
-                return $this->enfermerosVirtuales($config['total_enfermeros']);
+            if (!class_exists(\App\Models\AsignacionPlazaEnfermeria::class) || !Schema::hasTable('asignaciones_plazas_enfermeria')) {
+                return $this->enfermerosVirtuales($config['total_enfermeros'] ?? 12);
             }
 
-            $usuarios = User::role('ENFERMEROS')
-                ->where('estado', 'ACTIVO')
-                ->orderBy('cod_usu')
-                ->limit($config['total_enfermeros'])
-                ->get();
+            $titulares = \App\Models\AsignacionPlazaEnfermeria::with('user')
+                ->whereNull('fecha')
+                ->where('tipo', 'TITULAR')
+                ->get()
+                ->keyBy('plaza');
 
-            if ($usuarios->count() < 12) {
-                return $this->enfermerosVirtuales($config['total_enfermeros']);
+            $total = max(12, (int) ($config['total_enfermeros'] ?? 12));
+
+            for ($i = 1; $i <= $total; $i++) {
+                $codigo = 'E' . str_pad((string) $i, 2, '0', STR_PAD_LEFT);
+                $titular = $titulares->get($codigo);
+                $user = $titular ? $titular->user : null;
+
+                if ($user) {
+                    $enfermeros[] = [
+                        'codigo' => $codigo,
+                        'cod_usu' => $user->cod_usu,
+                        'nombre' => trim(($user->nombres ?? '') . ' ' . ($user->ap_paterno ?? '')) ?: $codigo,
+                        'correo' => $user->correo ?? null,
+                        'rol' => 'ENFERMEROS',
+                        'estado' => $user->estado ?? 'ACTIVO',
+                        'tipo' => 'TITULAR',
+                        'familia_visual' => $this->familiaVisual($codigo),
+                        'clase_familia' => $this->claseFamilia($codigo),
+                    ];
+                } else {
+                    $enfermeros[] = [
+                        'codigo' => $codigo,
+                        'cod_usu' => null,
+                        'nombre' => 'Sin enfermero asignado',
+                        'correo' => null,
+                        'rol' => 'ENFERMEROS',
+                        'estado' => 'ACTIVO',
+                        'tipo' => 'DISPONIBLE',
+                        'familia_visual' => $this->familiaVisual($codigo),
+                        'clase_familia' => $this->claseFamilia($codigo),
+                    ];
+                }
             }
-
-            return $usuarios->values()->map(function (User $user, int $index) {
-                $codigoVisual = 'E' . str_pad((string) ($index + 1), 2, '0', STR_PAD_LEFT);
-
-                return [
-                    'codigo' => $codigoVisual,
-                    'cod_usu' => $user->cod_usu,
-                    'nombre' => trim(($user->nombres ?? '') . ' ' . ($user->ap_paterno ?? '')) ?: $codigoVisual,
-                    'correo' => $user->correo ?? null,
-                    'rol' => 'ENFERMEROS',
-                    'estado' => $user->estado ?? 'ACTIVO',
-                    'familia_visual' => $this->familiaVisual($codigoVisual),
-                    'clase_familia' => $this->claseFamilia($codigoVisual),
-                ];
-            })->all();
-        } catch (Throwable) {
-            return $this->enfermerosVirtuales($config['total_enfermeros']);
+        } catch (\Throwable $e) {
+            report($e);
+            return $this->enfermerosVirtuales($config['total_enfermeros'] ?? 12);
         }
+
+        return $enfermeros;
     }
 
     protected function enfermerosVirtuales(int $total = 12): array
@@ -328,16 +364,55 @@ class GeneradorPlanillaEnfermeriaService
 
             foreach ($codigosBase as $posicionEnTurno => $codigoBase) {
                 $codigoRotado = $this->rotarCodigo($codigoBase, $numeroSemana, $saltoSemanal, $total);
-                $enfermero = $this->buscarEnfermeroPorCodigo($enfermeros, $codigoRotado);
+                
+                // Get titular first
+                $titularBase = $this->buscarEnfermeroPorCodigo($enfermeros, $codigoRotado);
+                $titular_cod = ($titularBase && $titularBase['cod_usu']) ? $titularBase['cod_usu'] : null;
+                $titular_nom = ($titularBase && $titularBase['cod_usu']) ? $titularBase['nombre'] : 'Sin enfermero asignado';
+
+                $fechaStr = $fecha->toDateString();
+                $tempKey = $codigoRotado . '_' . $fechaStr;
+
+                $reemplazo_cod = null;
+                $reemplazo_nom = null;
+                $es_reemplazo = false;
+                $motivo = null;
+                $tipo_asignacion = ($titular_cod) ? 'TITULAR' : 'DISPONIBLE';
+
+                $active_enfermero = $titularBase;
+
+                // Check if date-specific assignment exists
+                if (isset($this->temporales[$tempKey]) && !empty($this->temporales[$tempKey])) {
+                    $temporal = $this->temporales[$tempKey][0];
+                    $user = $temporal['user'] ?? null;
+
+                    $reemplazo_cod = $user ? $user['cod_usu'] : null;
+                    $reemplazo_nom = $user ? trim(($user['nombres'] ?? '') . ' ' . ($user['ap_paterno'] ?? '')) : 'Sin enfermero asignado';
+                    $es_reemplazo = true;
+                    $motivo = $temporal['motivo'] ?? null;
+                    $tipo_asignacion = $temporal['tipo'] ?? 'REEMPLAZO';
+
+                    $active_enfermero = [
+                        'codigo' => $codigoRotado,
+                        'cod_usu' => $reemplazo_cod,
+                        'nombre' => $reemplazo_nom ?: 'Sin enfermero asignado',
+                        'correo' => $user ? ($user['correo'] ?? null) : null,
+                        'rol' => 'ENFERMEROS',
+                        'estado' => $user ? ($user['estado'] ?? 'ACTIVO') : 'ACTIVO',
+                        'tipo' => $tipo_asignacion,
+                        'familia_visual' => $this->familiaVisual($codigoRotado),
+                        'clase_familia' => $this->claseFamilia($codigoRotado),
+                    ];
+                }
 
                 $grupo = $this->resolverGrupoPorTurno($codigoTurno, $posicionEnTurno);
                 $turno = $this->turnos[$codigoTurno];
 
                 $asignaciones[] = [
                     'codigo' => $codigoRotado,
-                    'cod_usu' => $enfermero['cod_usu'] ?? null,
-                    'nombre' => $enfermero['nombre'] ?? $codigoRotado,
-                    'correo' => $enfermero['correo'] ?? null,
+                    'cod_usu' => $active_enfermero['cod_usu'] ?? null,
+                    'nombre' => $active_enfermero['nombre'] ?? 'Sin enfermero asignado',
+                    'correo' => $active_enfermero['correo'] ?? null,
                     'rol_en_turno' => $turno['rol'],
                     'turno_codigo' => $codigoTurno,
                     'turno_nombre' => $turno['nombre'],
@@ -349,6 +424,16 @@ class GeneradorPlanillaEnfermeriaService
                     'familia_visual' => $this->familiaVisual($codigoRotado),
                     'clase_familia' => $this->claseFamilia($codigoRotado),
                     'clase_turno' => $turno['clase_visual'],
+                    
+                    // Added metadata
+                    'titular_cod' => $titular_cod,
+                    'titular_nom' => $titular_nom,
+                    'reemplazo_cod' => $reemplazo_cod,
+                    'reemplazo_nom' => $reemplazo_nom,
+                    'es_reemplazo' => $es_reemplazo,
+                    'motivo' => $motivo,
+                    'tipo_asignacion' => $tipo_asignacion,
+                    'fecha' => $fechaStr,
                 ];
             }
 
@@ -991,5 +1076,37 @@ class GeneradorPlanillaEnfermeriaService
             0 => 'bg-boton-acento/10 text-boton-acento border border-boton-acento/20',
             default => 'bg-fondo-hover text-apoyo border border-borde-suave',
         };
+    }
+
+    public function obtenerTurnoEnFecha(string $codUsu, $fecha): ?array
+    {
+        $fechaCarbon = Carbon::parse($fecha);
+        $fechaInicioSemana = $fechaCarbon->copy()->startOfWeek(Carbon::MONDAY);
+
+        $resultado = $this->generar([
+            'fecha_inicio' => $fechaInicioSemana,
+            'cantidad_semanas' => 1,
+            'usar_usuarios_reales' => true,
+        ]);
+
+        $fechaStr = $fechaCarbon->toDateString();
+        $semana = $resultado['planilla'][0] ?? null;
+        if (!$semana) {
+            return null;
+        }
+
+        foreach ($semana['dias'] as $dia) {
+            if (($dia['fecha'] ?? null) === $fechaStr) {
+                foreach ($dia['turnos'] as $turno) {
+                    foreach ($turno['asignaciones'] ?? [] as $asignacion) {
+                        if (($asignacion['cod_usu'] ?? null) === $codUsu) {
+                            return $asignacion;
+                        }
+                    }
+                }
+            }
+        }
+
+        return null;
     }
 }

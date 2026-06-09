@@ -530,10 +530,10 @@
                                 <td class="px-5 py-4">
                                     <div class="flex items-center gap-3">
                                         <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-[14px] bg-estado-exito text-white font-bold shadow-sm ring-2 ring-white">
-                                            {{ substr($valoracion->adultoMayor->nombre_completo ?? $valoracion->adultoMayor->nombres ?? 'A', 0, 1) }}
+                                            {{ substr($valoracion->adultoMayor->nombre_completo ?? $valoracion->adultoMayor->nombres ?? $valoracion->preadmision->nombre_completo ?? 'A', 0, 1) }}
                                         </div>
                                         <div class="min-w-0">
-                                            <span class="font-bold text-titulo block truncate">{{ $valoracion->adultoMayor->nombre_completo ?? $valoracion->adultoMayor->nombres ?? 'Sin nombre' }}</span>
+                                            <span class="font-bold text-titulo block truncate">{{ $valoracion->adultoMayor->nombre_completo ?? $valoracion->adultoMayor->nombres ?? $valoracion->preadmision->nombre_completo ?? 'Sin nombre' }}</span>
                                             <span class="text-[11px] font-bold text-estado-exito/80">VAL: {{ $valoracion->cod_val_enf }}</span>
                                         </div>
                                     </div>
@@ -554,9 +554,15 @@
                                     </div>
                                 </td>
                                 <td class="px-5 py-4 text-right">
-                                    <a href="{{ route('admin.enfermeria.pacientes.ficha', $valoracion->cod_am) }}" class="inline-flex h-9 items-center justify-center rounded-xl bg-estado-exito px-4 text-xs font-bold text-white shadow-glow transition hover:bg-estado-exitoHover hover:scale-105 active:scale-95">
-                                        <i class="ph-bold ph-folder-open mr-1.5"></i> Ficha
-                                    </a>
+                                    @if($valoracion->cod_am)
+                                        <a href="{{ route('admin.enfermeria.pacientes.ficha', $valoracion->cod_am) }}" class="inline-flex h-9 items-center justify-center rounded-xl bg-estado-exito px-4 text-xs font-bold text-white shadow-glow transition hover:bg-estado-exitoHover hover:scale-105 active:scale-95">
+                                            <i class="ph-bold ph-folder-open mr-1.5"></i> Ficha
+                                        </a>
+                                    @else
+                                        <span class="inline-flex h-9 items-center justify-center rounded-xl bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 px-4 text-xs font-bold text-gray-400 dark:text-gray-500 select-none cursor-default" title="Aún no se ha generado la ficha de adulto mayor">
+                                            <i class="ph-bold ph-user mr-1.5"></i> Preadmisión
+                                        </span>
+                                    @endif
                                 </td>
                             </tr>
                         @endforeach

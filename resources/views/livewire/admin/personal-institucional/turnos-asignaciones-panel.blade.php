@@ -397,20 +397,49 @@
                                                     <td class="px-4 py-4">
                                                         <div class="space-y-1.5">
                                                             @forelse(($dia['turnos'][$codigoTurno]['asignaciones'] ?? []) as $asignacion)
-                                                                <button type="button"
-                                                                    class="inline-flex w-full items-center justify-between gap-2 rounded-xl border border-borde-suave bg-fondo-panel px-2.5 py-2 text-left text-xs font-bold text-titulo transition hover:border-borde-focus hover:bg-fondo-card"
-                                                                    title="{{ $asignacion['nombre'] ?? $asignacion['codigo'] }}">
-                                                                    <span class="flex min-w-0 items-center gap-2">
-                                                                        <span class="shrink-0 rounded-lg px-2 py-1 text-[10px] font-black {{ $asignacion['clase_familia'] ?? 'bg-fondo-card text-titulo' }}">{{ $asignacion['codigo'] ?? '-' }}</span>
-                                                                        <span class="min-w-0">
-                                                                            <span class="block truncate">{{ $asignacion['nombre'] ?? 'Sin nombre' }}</span>
-                                                                            @if ($mostrarGrupos && !empty($asignacion['grupo_nombre']))
-                                                                                <span class="block text-[10px] text-apoyo">{{ $asignacion['grupo_nombre'] }}</span>
-                                                                            @endif
-                                                                        </span>
-                                                                    </span>
-                                                                    <span class="shrink-0 text-[10px] text-apoyo">8h</span>
-                                                                </button>
+                                                                <div class="relative w-full rounded-xl border border-borde-suave bg-fondo-panel px-2.5 py-2 text-left text-xs font-bold text-titulo transition hover:border-borde-focus hover:bg-fondo-card">
+                                                                    <div class="flex items-center justify-between gap-2">
+                                                                        <div class="flex min-w-0 items-center gap-2">
+                                                                            <span class="shrink-0 rounded-lg px-2 py-1 text-[10px] font-black {{ $asignacion['clase_familia'] ?? 'bg-fondo-card text-titulo' }}">{{ $asignacion['codigo'] ?? '-' }}</span>
+                                                                            <div class="min-w-0">
+                                                                                @if ($asignacion['cod_usu'])
+                                                                                    <span class="block truncate text-titulo font-black">{{ $asignacion['nombre'] }}</span>
+                                                                                    @if ($asignacion['es_reemplazo'])
+                                                                                        <span class="block text-[9px] text-boton-acento">Reemplazo: {{ $asignacion['tipo_asignacion'] }}</span>
+                                                                                        @if($asignacion['motivo'])
+                                                                                            <span class="block text-[8px] text-apoyo truncate" title="{{ $asignacion['motivo'] }}">{{ $asignacion['motivo'] }}</span>
+                                                                                        @endif
+                                                                                    @else
+                                                                                        <span class="block text-[9px] text-estado-exito font-bold">Titular regular</span>
+                                                                                    @endif
+                                                                                @else
+                                                                                    <span class="block truncate text-apoyo italic font-normal">Sin enfermero asignado</span>
+                                                                                @endif
+                                                                                @if ($mostrarGrupos && !empty($asignacion['grupo_nombre']))
+                                                                                    <span class="block text-[10px] text-apoyo font-bold">{{ $asignacion['grupo_nombre'] }}</span>
+                                                                                @endif
+                                                                            </div>
+                                                                        </div>
+                                                                        
+                                                                        <div class="flex flex-col items-end gap-1 shrink-0">
+                                                                            <span class="text-[9px] text-apoyo font-bold">8h</span>
+                                                                            <div class="flex gap-1">
+                                                                                <button type="button" wire:click="abrirAsignarPlaza('{{ $asignacion['codigo'] }}', '{{ $asignacion['fecha'] }}')"
+                                                                                    class="inline-flex h-5 w-5 items-center justify-center rounded bg-boton-acento text-inverso hover:bg-boton-acento/90 transition"
+                                                                                    title="Asignar / Cambiar">
+                                                                                    <i class="ph-bold ph-pencil-simple text-[10px]"></i>
+                                                                                </button>
+                                                                                @if($asignacion['cod_usu'])
+                                                                                    <button type="button" wire:click="desvincularPlaza('{{ $asignacion['codigo'] }}', '{{ $asignacion['fecha'] }}')"
+                                                                                        class="inline-flex h-5 w-5 items-center justify-center rounded bg-estado-peligroBg text-estado-peligro hover:bg-estado-peligroBg/90 transition"
+                                                                                        title="Desvincular">
+                                                                                        <i class="ph-bold ph-trash text-[10px]"></i>
+                                                                                    </button>
+                                                                                @endif
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
                                                             @empty
                                                                 <span class="block rounded-xl border border-dashed border-borde-suave p-3 text-center text-[11px] font-bold text-apoyo">Sin asignar</span>
                                                             @endforelse
@@ -420,24 +449,52 @@
 
                                                 @if ($mostrarApoyo)
                                                     <td class="px-4 py-4">
-                                                        @forelse(($dia['turnos']['APOYO']['asignaciones'] ?? []) as $asignacion)
-                                                            <span class="inline-flex w-full items-center justify-between rounded-xl border border-borde-suave bg-boton-acento/10 px-2.5 py-2 text-xs font-bold text-boton-acento">
-                                                                <span>{{ $asignacion['codigo'] ?? '-' }} · {{ $asignacion['nombre'] ?? 'Apoyo' }}</span>
-                                                                <span class="text-[10px]">8h</span>
-                                                            </span>
-                                                        @empty
-                                                            <span class="block rounded-xl border border-dashed border-borde-suave p-3 text-center text-[11px] font-bold text-apoyo">Sin apoyo</span>
-                                                        @endforelse
+                                                        <div class="space-y-1.5">
+                                                            @forelse(($dia['turnos']['APOYO']['asignaciones'] ?? []) as $asignacion)
+                                                                <div class="relative w-full rounded-xl border border-borde-suave bg-boton-acento/10 px-2.5 py-2 text-left text-xs font-bold text-boton-acento transition hover:border-borde-focus">
+                                                                    <div class="flex items-center justify-between gap-2">
+                                                                        <div class="min-w-0">
+                                                                            <span class="font-black">{{ $asignacion['codigo'] ?? '-' }}</span> · 
+                                                                            @if ($asignacion['cod_usu'])
+                                                                                <span class="truncate">{{ $asignacion['nombre'] }}</span>
+                                                                            @else
+                                                                                <span class="italic font-normal">Disponible</span>
+                                                                            @endif
+                                                                        </div>
+                                                                        <div class="flex gap-1 shrink-0">
+                                                                            <button type="button" wire:click="abrirAsignarPlaza('{{ $asignacion['codigo'] }}', '{{ $asignacion['fecha'] }}')"
+                                                                                class="inline-flex h-5 w-5 items-center justify-center rounded bg-boton-acento text-inverso hover:bg-boton-acento/90 transition">
+                                                                                <i class="ph-bold ph-pencil-simple text-[10px]"></i>
+                                                                            </button>
+                                                                            @if($asignacion['cod_usu'])
+                                                                                <button type="button" wire:click="desvincularPlaza('{{ $asignacion['codigo'] }}', '{{ $asignacion['fecha'] }}')"
+                                                                                    class="inline-flex h-5 w-5 items-center justify-center rounded bg-estado-peligroBg text-estado-peligro hover:bg-estado-peligroBg/90 transition">
+                                                                                    <i class="ph-bold ph-trash text-[10px]"></i>
+                                                                                </button>
+                                                                            @endif
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            @empty
+                                                                <span class="block rounded-xl border border-dashed border-borde-suave p-3 text-center text-[11px] font-bold text-apoyo">Sin apoyo</span>
+                                                            @endforelse
+                                                        </div>
                                                     </td>
                                                 @endif
 
                                                 @if ($mostrarDescanso)
                                                     <td class="px-4 py-4">
-                                                        <div class="flex flex-wrap gap-1.5">
+                                                        <div class="flex flex-wrap gap-1">
                                                             @forelse(($dia['turnos']['DESCANSO']['asignaciones'] ?? []) as $asignacion)
-                                                                <span class="rounded-xl border border-borde-suave bg-fondo-hover px-2.5 py-2 text-xs font-bold text-apoyo">{{ $asignacion['codigo'] ?? '-' }}</span>
+                                                                <div class="inline-flex items-center gap-1 rounded-xl border border-borde-suave bg-fondo-hover px-2 py-1 text-xs font-bold text-apoyo">
+                                                                    <span>{{ $asignacion['codigo'] ?? '-' }}</span>
+                                                                    <button type="button" wire:click="abrirAsignarPlaza('{{ $asignacion['codigo'] }}', '{{ $asignacion['fecha'] }}')"
+                                                                        class="text-boton-principal hover:text-boton-acento transition">
+                                                                        <i class="ph-bold ph-pencil-simple text-[10px]"></i>
+                                                                    </button>
+                                                                </div>
                                                             @empty
-                                                                <span class="rounded-xl border border-dashed border-borde-suave p-3 text-[11px] font-bold text-apoyo">Sin descanso</span>
+                                                                <span class="rounded-xl border border-dashed border-borde-suave p-2 text-[11px] font-bold text-apoyo">Sin descanso</span>
                                                             @endforelse
                                                         </div>
                                                     </td>
@@ -864,6 +921,87 @@
                             </div>
                         @endif
                     </div>
+                </div>
+            </div>
+        @endif
+
+        {{-- MODAL DE ASIGNACIÓN DE ENFERMERO A PLAZA --}}
+        @if ($modalAsignarPlazaAbierto)
+            <div class="fixed inset-0 z-[80] flex items-center justify-center bg-titulo/40 p-4 backdrop-blur-sm">
+                <div class="w-full max-w-lg overflow-hidden rounded-[1.5rem] border border-borde-suave bg-fondo-panel shadow-2xl">
+                    <div class="flex items-center justify-between border-b border-borde-suave p-5">
+                        <div>
+                            <h2 class="text-lg font-black text-titulo">Asignar Enfermero a Plaza</h2>
+                            <p class="mt-1 text-xs font-bold text-apoyo">Gestión de la plaza {{ $plazaSeleccionada }}</p>
+                        </div>
+                        <button type="button" wire:click="$set('modalAsignarPlazaAbierto', false)"
+                            class="flex h-9 w-9 items-center justify-center rounded-xl bg-fondo-card text-titulo transition hover:bg-boton-acento hover:text-inverso">
+                            <i class="ph-bold ph-x"></i>
+                        </button>
+                    </div>
+
+                    <form wire:submit.prevent="guardarAsignacionPlaza" class="p-5 space-y-4">
+                        <div>
+                            <label class="mb-1.5 block text-[10px] font-black uppercase tracking-wide text-apoyo">Plaza Operativa</label>
+                            <input type="text" value="{{ $plazaSeleccionada }}" disabled
+                                class="h-10 w-full rounded-xl border border-borde-suave bg-fondo-card/30 px-3 text-xs font-bold text-apoyo outline-none">
+                        </div>
+
+                        <div>
+                            <label class="mb-1.5 block text-[10px] font-black uppercase tracking-wide text-apoyo">Tipo de Asignación</label>
+                            <select wire:model.live="tipoAsignacion"
+                                class="h-10 w-full rounded-xl border border-borde-suave bg-fondo-card/40 px-3 text-xs font-bold text-titulo outline-none focus:border-borde-focus">
+                                <option value="TITULAR">Titular regular (Permanente)</option>
+                                <option value="REEMPLAZO">Reemplazo temporal (Por fecha)</option>
+                                <option value="APOYO">Apoyo / Volante (Por fecha)</option>
+                                <option value="DESCANSO">Descanso programado (Por fecha)</option>
+                            </select>
+                        </div>
+
+                        @if ($tipoAsignacion !== 'DESCANSO')
+                            <div>
+                                <label class="mb-1.5 block text-[10px] font-black uppercase tracking-wide text-apoyo">Seleccionar Enfermero</label>
+                                <select wire:model="enfermeroSeleccionado"
+                                    class="h-10 w-full rounded-xl border border-borde-suave bg-fondo-card/40 px-3 text-xs font-bold text-titulo outline-none focus:border-borde-focus">
+                                    <option value="">Seleccione un enfermero...</option>
+                                    @foreach (\App\Models\User::role('ENFERMEROS')->where('estado', 'ACTIVO')->orderBy('nombres')->get() as $nurse)
+                                        <option value="{{ $nurse->cod_usu }}">{{ $nurse->name }} ({{ $nurse->cod_usu }})</option>
+                                    @endforeach
+                                </select>
+                                @error('enfermeroSeleccionado')
+                                    <span class="mt-1 block text-xs font-bold text-estado-peligro">{{ $message }}</span>
+                                @enderror
+                            </div>
+                        @endif
+
+                        @if ($tipoAsignacion !== 'TITULAR')
+                            <div>
+                                <label class="mb-1.5 block text-[10px] font-black uppercase tracking-wide text-apoyo">Fecha del Turno</label>
+                                <input type="text" value="{{ \Carbon\Carbon::parse($fechaSeleccionadaPlaza)->format('d/m/Y') }}" disabled
+                                    class="h-10 w-full rounded-xl border border-borde-suave bg-fondo-card/30 px-3 text-xs font-bold text-apoyo outline-none">
+                            </div>
+
+                            <div>
+                                <label class="mb-1.5 block text-[10px] font-black uppercase tracking-wide text-apoyo">Motivo / Observación</label>
+                                <textarea wire:model="motivoAsignacion" rows="3" placeholder="Ej. cobertura por baja médica, refuerzo de fin de semana..."
+                                    class="w-full rounded-xl border border-borde-suave bg-fondo-card/40 p-3 text-xs font-bold text-titulo outline-none focus:border-borde-focus"></textarea>
+                                @error('motivoAsignacion')
+                                    <span class="mt-1 block text-xs font-bold text-estado-peligro">{{ $message }}</span>
+                                @enderror
+                            </div>
+                        @endif
+
+                        <div class="flex justify-end gap-2 border-t border-borde-suave pt-4 shrink-0">
+                            <button type="button" wire:click="$set('modalAsignarPlazaAbierto', false)"
+                                class="rounded-xl border border-borde-suave bg-fondo-card/45 px-4 py-2 text-xs font-black uppercase tracking-wider text-titulo hover:bg-fondo-card">
+                                Cancelar
+                            </button>
+                            <button type="submit"
+                                class="rounded-xl bg-boton-acento px-4 py-2 text-xs font-black uppercase tracking-wider text-inverso hover:bg-boton-acento/90">
+                                Guardar Asignación
+                            </button>
+                        </div>
+                    </form>
                 </div>
             </div>
         @endif

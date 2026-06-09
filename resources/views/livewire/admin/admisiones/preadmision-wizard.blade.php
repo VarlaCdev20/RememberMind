@@ -584,7 +584,15 @@
                                 </span>
                                 <span class="min-w-0 flex-1">
                                     <span class="block text-xs font-bold text-titulo leading-tight truncate">{{ $enfermero->nombres }} {{ $enfermero->ap_paterno }} {{ $enfermero->ap_materno }}</span>
-                                    <span class="text-[9px] text-apoyo">Valoracion inicial</span>
+                                    @if($enfermero->horariosPersonalSalud->isNotEmpty())
+                                        <span class="text-[9px] text-estado-exito font-bold">
+                                            Turno {{ $enfermero->horariosPersonalSalud->first()->turno }}: 
+                                            {{ substr($enfermero->horariosPersonalSalud->first()->hora_inicio, 0, 5) }} - 
+                                            {{ substr($enfermero->horariosPersonalSalud->first()->hora_fin, 0, 5) }}
+                                        </span>
+                                    @else
+                                        <span class="text-[9px] text-apoyo">Valoración inicial</span>
+                                    @endif
                                 </span>
                             </label>
                         @empty
@@ -593,7 +601,7 @@
                                     <i class="ph-bold ph-user-minus text-xl"></i>
                                 </div>
                                 <h5 class="text-sm font-black text-titulo">Sin enfermeros disponibles</h5>
-                                <p class="text-xs font-bold text-apoyo">No hay enfermeros activos con rol ENFERMEROS.</p>
+                                <p class="text-xs font-bold text-apoyo">No hay enfermeros activos, en turno programado hoy y libres de solapamiento en este momento.</p>
                             </div>
                         @endforelse
                     </div>

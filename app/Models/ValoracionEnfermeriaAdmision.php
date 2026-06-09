@@ -24,6 +24,7 @@ class ValoracionEnfermeriaAdmision extends Model
     protected $fillable = [
         'cod_val_enf',
         'cod_am',
+        'cod_pre',
         'fecha_valoracion',
         'hora_valoracion',
         'estado_general',
@@ -59,6 +60,11 @@ class ValoracionEnfermeriaAdmision extends Model
     public function adultoMayor(): BelongsTo
     {
         return $this->belongsTo(AdultoMayor::class, 'cod_am', 'cod_am');
+    }
+
+    public function preadmision(): BelongsTo
+    {
+        return $this->belongsTo(Preadmision::class, 'cod_pre', 'cod_pre');
     }
 
     public function registradoPor(): BelongsTo

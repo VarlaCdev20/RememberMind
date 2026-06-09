@@ -18,6 +18,11 @@ use Illuminate\Support\Str;
 
 class DashboardTurno extends Component
 {
+    protected $listeners = [
+        'refreshDashboard' => '$refresh',
+        'valoracionCompletada' => '$refresh'
+    ];
+
     public $turnoActual;
     public $horarioAsignadoHoy;
     public $horarioSiguienteAsignado;
@@ -42,13 +47,33 @@ class DashboardTurno extends Component
         $this->turnosActivos = $turnosOrdenados->values();
         $this->turnoActual = null;
 
-        $this->horariosPersonal = auth()->user()?->horariosSalud()
-            ->where('estado', 'ACTIVO')
-            ->orderByRaw("CASE WHEN dia_semana = 'LUNES' THEN 1 WHEN dia_semana = 'MARTES' THEN 2 WHEN dia_semana = 'MIERCOLES' THEN 3 WHEN dia_semana = 'JUEVES' THEN 4 WHEN dia_semana = 'VIERNES' THEN 5 WHEN dia_semana = 'SABADO' THEN 6 WHEN dia_semana = 'DOMINGO' THEN 7 ELSE 8 END")
-            ->orderBy('hora_inicio')
-            ->get() ?? [];
+        $service = app(\App\Services\Enfermeria\GeneradorPlanillaEnfermeriaService::class);
+        $this->calendarioHorarios = [];
 
-        $this->calendarioHorarios = $this->construirCalendarioHorarios($this->horariosPersonal);
+        for ($i = 0; $i < 14; $i++) {
+            $fecha = Carbon::today()->addDays($i);
+            $fechaStr = $fecha->toDateString();
+            
+            $asignacion = $service->obtenerTurnoEnFecha($this->filtroEnfermeroId, $fechaStr);
+            $turnosDia = [];
+
+            if ($asignacion && $asignacion['turno_codigo'] !== 'DESCANSO') {
+                $turnosDia[] = [
+                    'turno' => $asignacion['turno_nombre'],
+                    'hora_inicio' => substr($asignacion['hora_inicio'], 0, 5),
+                    'hora_fin' => substr($asignacion['hora_fin'], 0, 5),
+                ];
+            }
+
+            $this->calendarioHorarios[] = [
+                'fecha' => $fechaStr,
+                'fecha_texto' => $fecha->translatedFormat('d \d\e F'),
+                'dia_semana' => $this->normalizarDiaSemana($fecha->locale('es')->translatedFormat('l')),
+                'es_hoy' => $i === 0,
+                'turnos' => $turnosDia,
+            ];
+        }
+
         $calendarioCollection = collect($this->calendarioHorarios);
         $this->horarioAsignadoHoy = $calendarioCollection->first(fn ($item) => $item['es_hoy'] && !empty($item['turnos']));
         $this->horarioSiguienteAsignado = $calendarioCollection
@@ -189,10 +214,11 @@ class DashboardTurno extends Component
             ->whereIn('estado', ['PREADMISION_ASIGNADA', 'EN_VALORACION_ENFERMERIA'])
             ->whereNull('cod_am_generado')
             ->orderByRaw("CASE prioridad WHEN 'CRITICA' THEN 1 WHEN 'ALTA' THEN 2 WHEN 'MEDIA' THEN 3 ELSE 4 END")
+            ->orderByDesc('created_at')
             ->get();
 
         $valoracionesRealizadasHoy = ValoracionEnfermeriaAdmision::query()
-            ->with(['adultoMayor', 'registradoPor'])
+            ->with(['adultoMayor', 'preadmision', 'registradoPor'])
             ->where('registrado_por', $this->filtroEnfermeroId)
             ->whereDate('fecha_valoracion', $this->filtroFecha)
             ->where('estado', 'COMPLETADA')
@@ -228,10 +254,40 @@ class DashboardTurno extends Component
             return;
         }
 
-        // Verificar documentos mínimos (CI)
-        $tieneCI = $preadmision->documentos
+        // 2. Validar que corresponde al turno/día vigente en la planilla rotativa
+        $service = app(\App\Services\Enfermeria\GeneradorPlanillaEnfermeriaService::class);
+        $fechaHoy = now()->toDateString();
+        $asignacionPlaza = $service->obtenerTurnoEnFecha($this->filtroEnfermeroId, $fechaHoy);
+
+        if (!$asignacionPlaza || $asignacionPlaza['turno_codigo'] === 'DESCANSO') {
+            $this->dispatch('notificar', [
+                'tipo' => 'error',
+                'mensaje' => "No tiene una asignación de turno vigente para iniciar esta valoración"
+            ]);
+            return;
+        }
+
+        // Nota: Permitimos iniciar la valoración a pesar de estar fuera del rango exacto de horas 
+        // del turno, siempre que el enfermero tenga una plaza vigente hoy. Esto previene bloqueos por horas extra o registros tardíos.
+
+        // 3. Validar no solapamiento con otras valoraciones iniciales que estén activamente EN PROCESO
+        $solapamiento = Preadmision::where('enfermero_asignado', $this->filtroEnfermeroId)
+            ->where('cod_pre', '!=', $cod_pre)
+            ->where('estado', 'EN_VALORACION_ENFERMERIA')
+            ->exists();
+
+        if ($solapamiento) {
+            $this->dispatch('notificar', [
+                'tipo' => 'error',
+                'mensaje' => 'Tienes otra valoración de preadmisión activa en proceso (solapamiento).'
+            ]);
+            return;
+        }
+
+        // Verificar documentos mínimos (cédula registrada en el modelo o archivo subido)
+        $tieneCI = !empty($preadmision->ci) || ($preadmision->documentos
             ->whereIn('tipo_documento', ['CI', 'CI_ADULTO', 'IDENTIFICACION'])
-            ->count() > 0;
+            ->count() > 0);
 
         if (! $tieneCI && ! auth()->user()->hasRole('SUPERADMINISTRADOR')) {
             $this->dispatch('notificar', ['tipo' => 'error', 'mensaje' => 'Faltan documentos obligatorios (CI) para iniciar la valoración.']);
@@ -252,6 +308,8 @@ class DashboardTurno extends Component
             'tipo'    => 'success',
             'mensaje' => "Valoración iniciada para {$preadmision->nombres} {$preadmision->ap_paterno} ({$preadmision->cod_pre}).",
         ]);
+
+        $this->dispatch('abrirValoracionInicial', $preadmision->cod_pre);
     }
 
     private function construirCalendarioHorarios($horarios): array

@@ -103,7 +103,15 @@ class TurnosAsignacionesPanel extends Component
     public bool $mostrarDescanso = true;
     public bool $mostrarGrupos = false;
     public bool $soloConflictos = false;
-    public bool $usarUsuariosReales = false;
+    public bool $usarUsuariosReales = true;
+
+    // Plaza assignment properties
+    public bool $modalAsignarPlazaAbierto = false;
+    public string $plazaSeleccionada = '';
+    public string $fechaSeleccionadaPlaza = '';
+    public string $enfermeroSeleccionado = '';
+    public string $tipoAsignacion = 'TITULAR';
+    public string $motivoAsignacion = '';
 
     public array $planillaEnfermeria = [];
     public array $resumenPlanilla = [];
@@ -125,6 +133,7 @@ class TurnosAsignacionesPanel extends Component
     {
         $this->fechaSeleccionada = now()->format('Y-m-d');
         $this->fechaInicioPlanilla = now()->startOfWeek(Carbon::MONDAY)->format('Y-m-d');
+        $this->usarUsuariosReales = true;
 
         $this->generarPlanillaEnfermeria(silencioso: true);
     }
@@ -1106,5 +1115,139 @@ class TurnosAsignacionesPanel extends Component
             'DOMINGO' => 'DOMINGO',
             default => 'LUNES',
         };
+    }
+
+    public function abrirAsignarPlaza(string $plaza, string $fecha): void
+    {
+        $this->plazaSeleccionada = $plaza;
+        $this->fechaSeleccionadaPlaza = $fecha;
+        $this->enfermeroSeleccionado = '';
+        
+        $existente = \App\Models\AsignacionPlazaEnfermeria::where('plaza', $plaza)
+            ->where('fecha', $fecha)
+            ->first();
+            
+        if (!$existente) {
+            $existente = \App\Models\AsignacionPlazaEnfermeria::where('plaza', $plaza)
+                ->whereNull('fecha')
+                ->first();
+        }
+
+        if ($existente) {
+            $this->enfermeroSeleccionado = $existente->cod_usu ?? '';
+            $this->tipoAsignacion = $existente->tipo;
+            $this->motivoAsignacion = $existente->motivo ?? '';
+        } else {
+            $this->tipoAsignacion = 'TITULAR';
+            $this->motivoAsignacion = '';
+        }
+
+        $this->modalAsignarPlazaAbierto = true;
+    }
+
+    public function guardarAsignacionPlaza(): void
+    {
+        $this->validate([
+            'plazaSeleccionada' => 'required|string',
+            'enfermeroSeleccionado' => 'required_unless:tipoAsignacion,DESCANSO|nullable|string',
+            'tipoAsignacion' => 'required|in:TITULAR,REEMPLAZO,APOYO,DESCANSO',
+            'motivoAsignacion' => 'required_if:tipoAsignacion,REEMPLAZO,APOYO,DESCANSO|nullable|string',
+        ], [
+            'enfermeroSeleccionado.required_unless' => 'Debe seleccionar un enfermero real activo.',
+            'motivoAsignacion.required_if' => 'El motivo es obligatorio para asignaciones temporales o descansos.',
+        ]);
+
+        $plaza = $this->plazaSeleccionada;
+        $codUsu = $this->enfermeroSeleccionado ?: null;
+        $tipo = $this->tipoAsignacion;
+        $fecha = $tipo === 'TITULAR' ? null : $this->fechaSeleccionadaPlaza;
+        $motivo = $this->motivoAsignacion ?: null;
+
+        if ($codUsu) {
+            $user = User::where('cod_usu', $codUsu)->first();
+            if (!$user || !$user->hasRole('ENFERMEROS') || $user->estado !== 'ACTIVO') {
+                $this->dispatch('mostrarAlerta', [
+                    'type' => 'error',
+                    'title' => 'Enfermero no válido',
+                    'message' => 'El usuario seleccionado debe tener el rol de ENFERMEROS y estar ACTIVO.',
+                ]);
+                return;
+            }
+
+            if ($tipo === 'TITULAR') {
+                $otraPlaza = \App\Models\AsignacionPlazaEnfermeria::where('cod_usu', $codUsu)
+                    ->whereNull('fecha')
+                    ->where('plaza', '!=', $plaza)
+                    ->first();
+                if ($otraPlaza) {
+                    $this->dispatch('mostrarAlerta', [
+                        'type' => 'error',
+                        'title' => 'Enfermero ya asignado',
+                        'message' => "El enfermero ya está asignado de forma permanente a la plaza {$otraPlaza->plaza}.",
+                    ]);
+                    return;
+                }
+            } else {
+                $otraPlaza = \App\Models\AsignacionPlazaEnfermeria::where('cod_usu', $codUsu)
+                    ->where('fecha', $fecha)
+                    ->where('plaza', '!=', $plaza)
+                    ->first();
+                if ($otraPlaza) {
+                    $this->dispatch('mostrarAlerta', [
+                        'type' => 'error',
+                        'title' => 'Enfermero ocupado',
+                        'message' => "El enfermero ya tiene una asignación temporal en la plaza {$otraPlaza->plaza} para la fecha {$fecha}.",
+                    ]);
+                    return;
+                }
+            }
+        }
+
+        if ($tipo === 'TITULAR') {
+            \App\Models\AsignacionPlazaEnfermeria::updateOrCreate(
+                ['plaza' => $plaza, 'fecha' => null],
+                ['cod_usu' => $codUsu, 'tipo' => $tipo, 'motivo' => $motivo]
+            );
+        } else {
+            \App\Models\AsignacionPlazaEnfermeria::updateOrCreate(
+                ['plaza' => $plaza, 'fecha' => $fecha],
+                ['cod_usu' => $codUsu, 'tipo' => $tipo, 'motivo' => $motivo]
+            );
+        }
+
+        $this->modalAsignarPlazaAbierto = false;
+        $this->generarPlanillaEnfermeria(silencioso: true);
+
+        $this->dispatch('mostrarAlerta', [
+            'type' => 'success',
+            'title' => 'Asignación guardada',
+            'message' => "Se actualizó la plaza {$plaza} correctamente.",
+        ]);
+    }
+
+    public function desvincularPlaza(string $plaza, string $fecha): void
+    {
+        $temporal = \App\Models\AsignacionPlazaEnfermeria::where('plaza', $plaza)
+            ->where('fecha', $fecha)
+            ->first();
+
+        if ($temporal) {
+            $temporal->delete();
+        } else {
+            $titular = \App\Models\AsignacionPlazaEnfermeria::where('plaza', $plaza)
+                ->whereNull('fecha')
+                ->first();
+            if ($titular) {
+                $titular->delete();
+            }
+        }
+
+        $this->generarPlanillaEnfermeria(silencioso: true);
+
+        $this->dispatch('mostrarAlerta', [
+            'type' => 'success',
+            'title' => 'Desvinculación exitosa',
+            'message' => "Se liberó la plaza {$plaza} de la asignación.",
+        ]);
     }
 }

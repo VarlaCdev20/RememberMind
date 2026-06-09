@@ -113,6 +113,11 @@ class Preadmision extends Model
         return $this->belongsTo(Familiar::class, 'cod_fam_generado', 'cod_fam');
     }
 
+    public function valoracionEnfermeria(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(ValoracionEnfermeriaAdmision::class, 'cod_pre', 'cod_pre');
+    }
+
     public function getNombreCompletoAttribute(): string
     {
         return trim("{$this->nombres} {$this->ap_paterno} {$this->ap_materno}");

@@ -488,11 +488,84 @@ class PreadmisionWizard extends Component
         $docsSolicitante   = array_filter($docsConfig, fn ($d) => ! $d['es_generado_sistema']);
         $docsInstitucionales = array_filter($docsConfig, fn ($d) => $d['es_generado_sistema']);
 
+        $service = app(\App\Services\Enfermeria\GeneradorPlanillaEnfermeriaService::class);
+        $fechaHoy = now()->toDateString();
+
+        $resultado = $service->generar([
+            'fecha_inicio' => now()->startOfWeek(\Carbon\Carbon::MONDAY),
+            'cantidad_semanas' => 1,
+            'usar_usuarios_reales' => true,
+        ]);
+
+        $semana = $resultado['planilla'][0] ?? null;
+        $activeNursesToday = [];
+
+        if ($semana) {
+            foreach ($semana['dias'] as $dia) {
+                if ($dia['fecha'] === $fechaHoy) {
+                    foreach ($dia['turnos'] as $turno) {
+                        if ($turno['codigo'] === 'DESCANSO') {
+                            continue;
+                        }
+                        
+                        $horaInicio = $turno['hora_inicio'];
+                        $horaFin = $turno['hora_fin'];
+                        if ($horaInicio && $horaFin) {
+                            $inicioMinutos = \Carbon\Carbon::parse($horaInicio)->hour * 60 + \Carbon\Carbon::parse($horaInicio)->minute;
+                            $finMinutos = \Carbon\Carbon::parse($horaFin)->hour * 60 + \Carbon\Carbon::parse($horaFin)->minute;
+                            if ($finMinutos <= $inicioMinutos) {
+                                $finMinutos += 1440;
+                            }
+                            $ahoraMinutos = now()->hour * 60 + now()->minute;
+                            $dentroRango = ($ahoraMinutos >= $inicioMinutos && $ahoraMinutos < $finMinutos)
+                                || ($finMinutos > 1440 && $ahoraMinutos + 1440 < $finMinutos);
+
+                            if ($dentroRango) {
+                                foreach ($turno['asignaciones'] ?? [] as $asignacion) {
+                                    if ($asignacion['cod_usu']) {
+                                        $activeNursesToday[] = $asignacion;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        $activeUserIds = collect($activeNursesToday)->pluck('cod_usu')->toArray();
+
+        // Obtener enfermeros con preadmisiones asignadas activas (evitar solapamiento)
+        $busyNurses = Preadmision::whereIn('estado', ['PREADMISION_ASIGNADA', 'EN_VALORACION_ENFERMERIA'])
+            ->whereNotNull('enfermero_asignado')
+            ->pluck('enfermero_asignado');
+
+        // Solo enfermeros activos, con rol ENFERMEROS, programados hoy en turno y sin solapamiento
+        $enfermeros = User::role('ENFERMEROS')
+            ->where('estado', 'ACTIVO')
+            ->whereIn('cod_usu', $activeUserIds)
+            ->whereNotIn('cod_usu', $busyNurses)
+            ->orderBy('ap_paterno')
+            ->get(['cod_usu', 'nombres', 'ap_paterno', 'ap_materno']);
+
+        // Mock the relationship for the view compatibility
+        foreach ($enfermeros as $enfermero) {
+            $asignacion = collect($activeNursesToday)->firstWhere('cod_usu', $enfermero->cod_usu);
+            if ($asignacion) {
+                $enfermero->setRelation('horariosPersonalSalud', collect([
+                    (object) [
+                        'turno' => $asignacion['turno_nombre'],
+                        'hora_inicio' => $asignacion['hora_inicio'],
+                        'hora_fin' => $asignacion['hora_fin'],
+                    ]
+                ]));
+            } else {
+                $enfermero->setRelation('horariosPersonalSalud', collect());
+            }
+        }
+
         return view('livewire.admin.admisiones.preadmision-wizard', [
-            'enfermeros' => User::role('ENFERMEROS')
-                ->where('estado', 'ACTIVO')
-                ->orderBy('ap_paterno')
-                ->get(['cod_usu', 'nombres', 'ap_paterno', 'ap_materno']),
+            'enfermeros'          => $enfermeros,
             'docsSolicitante'     => array_values($docsSolicitante),
             'docsInstitucionales' => array_values($docsInstitucionales),
         ])->layout('layouts.sistema');
@@ -530,7 +603,7 @@ class PreadmisionWizard extends Component
                 'prioridad'           => ['required', 'string'],
             ],
             6 => [
-                'enfermero_id' => ['required', 'exists:users,cod_usu'],
+                'enfermero_id' => $this->getEnfermeroRules(),
             ],
             default => [],
         }, $this->mensajesValidacion());
@@ -580,7 +653,62 @@ class PreadmisionWizard extends Component
             'doc_ci_adulto'           => ['required', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:5120'],
             'doc_ci_familiar'         => ['required', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:5120'],
             'doc_solicitud_ingreso'   => $solicitudRule,
-            'enfermero_id'            => ['required', 'exists:users,cod_usu'],
+            'enfermero_id'            => $this->getEnfermeroRules(),
+        ];
+    }
+
+    private function getEnfermeroRules(): array
+    {
+        return [
+            'required',
+            'exists:users,cod_usu',
+            function ($attribute, $value, $fail) {
+                $diasEsp = [
+                    0 => 'DOMINGO',
+                    1 => 'LUNES',
+                    2 => 'MARTES',
+                    3 => 'MIERCOLES',
+                    4 => 'JUEVES',
+                    5 => 'VIERNES',
+                    6 => 'SABADO',
+                ];
+                $diaHoy = $diasEsp[now()->dayOfWeek];
+                $currentTime = now()->toTimeString();
+
+                $enfermero = User::where('cod_usu', $value)->first();
+                if (!$enfermero || !$enfermero->hasRole('ENFERMEROS')) {
+                    $fail('El usuario seleccionado debe tener el rol de ENFERMEROS.');
+                    return;
+                }
+
+                if ($enfermero->estado !== 'ACTIVO') {
+                    $fail('El enfermero seleccionado no está activo.');
+                    return;
+                }
+
+                // Verificar horario activo en horarios_personal_salud
+                $horarioActivo = \App\Models\HorarioPersonalSalud::where('cod_usu', $value)
+                    ->where('estado', 'ACTIVO')
+                    ->where('dia_semana', $diaHoy)
+                    ->where('hora_inicio', '<=', $currentTime)
+                    ->where('hora_fin', '>=', $currentTime)
+                    ->first();
+
+                if (!$horarioActivo) {
+                    $fail("El enfermero no tiene un turno activo para el día de hoy ({$diaHoy}) en este horario.");
+                    return;
+                }
+
+                // Verificar solapamiento
+                $solapamiento = Preadmision::where('enfermero_asignado', $value)
+                    ->whereIn('estado', ['PREADMISION_ASIGNADA', 'EN_VALORACION_ENFERMERIA'])
+                    ->exists();
+
+                if ($solapamiento) {
+                    $fail('El enfermero ya tiene una preadmisión asignada en proceso (solapamiento).');
+                    return;
+                }
+            }
         ];
     }
 

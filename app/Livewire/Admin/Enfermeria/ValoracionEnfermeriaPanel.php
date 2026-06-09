@@ -39,12 +39,18 @@ class ValoracionEnfermeriaPanel extends Component
 
     public function render()
     {
-        $valoraciones = ValoracionEnfermeriaAdmision::with(['adultoMayor', 'registradoPor'])
+        $valoraciones = ValoracionEnfermeriaAdmision::with(['adultoMayor', 'preadmision', 'registradoPor'])
             ->when($this->search, function ($q) {
-                $q->whereHas('adultoMayor', function ($sq) {
-                    $sq->where('nombres', 'like', '%' . $this->search . '%')
-                        ->orWhere('ap_paterno', 'like', '%' . $this->search . '%')
-                        ->orWhere('ap_materno', 'like', '%' . $this->search . '%');
+                $q->where(function ($query) {
+                    $query->whereHas('adultoMayor', function ($sq) {
+                        $sq->where('nombres', 'like', '%' . $this->search . '%')
+                            ->orWhere('ap_paterno', 'like', '%' . $this->search . '%')
+                            ->orWhere('ap_materno', 'like', '%' . $this->search . '%');
+                    })->orWhereHas('preadmision', function ($sq) {
+                        $sq->where('nombres', 'like', '%' . $this->search . '%')
+                            ->orWhere('ap_paterno', 'like', '%' . $this->search . '%')
+                            ->orWhere('ap_materno', 'like', '%' . $this->search . '%');
+                    });
                 });
             })
             ->when($this->filtroEstado !== '', fn ($q) => $q->where('estado', $this->filtroEstado))
@@ -55,7 +61,7 @@ class ValoracionEnfermeriaPanel extends Component
         return view('livewire.admin.enfermeria.valoracion-enfermeria-panel', [
             'valoraciones' => $valoraciones,
             'detalle' => $this->viendoId
-                ? ValoracionEnfermeriaAdmision::with(['adultoMayor', 'registradoPor'])->find($this->viendoId)
+                ? ValoracionEnfermeriaAdmision::with(['adultoMayor', 'preadmision', 'registradoPor'])->find($this->viendoId)
                 : null,
         ])->layout('layouts.sistema');
     }
