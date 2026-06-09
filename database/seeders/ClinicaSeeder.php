@@ -264,6 +264,7 @@ class ClinicaSeeder extends Seeder
                         2 => 40,
                         3 => 55,
                         4 => 70,
+                        default => 70,
                     },
                     'estado'               => 'VIGENTE',
                     'registrado_por'       => $medico?->cod_usu,

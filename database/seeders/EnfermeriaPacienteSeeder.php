@@ -69,11 +69,10 @@ class EnfermeriaPacienteSeeder extends Seeder
         $paciente = AdultoMayor::firstWhere('ci', '1234567-DEMO');
         if (!$paciente) {
             $paciente = AdultoMayor::create([
-                'cod_am'       => 'AM_002',
                 'nombres'      => 'Roberto',
                 'ap_paterno'   => 'Choque',
                 'ap_materno'   => 'Condori',
-                'ci'           => '1234567-DEMO',
+                'ci'           => '1284567',
                 'fecha_nac'    => '1945-08-20',
                 'genero'       => 'MASCULINO',
                 'estado_civil' => 'CASADO',

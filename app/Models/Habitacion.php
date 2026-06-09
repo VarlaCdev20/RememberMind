@@ -25,14 +25,17 @@ class Habitacion extends Model
     public $timestamps   = true;
 
     protected $fillable = [
+        'cod_habitacion',
         'codigo',
         'nombre',
         'tipo_habitacion',
         'ubicacion',
         'capacidad',
+        'piso',
+        'descripcion',
         'estado',
-        'observacion',
         'observaciones',
+        'observacion',
     ];
 
     protected $casts = [

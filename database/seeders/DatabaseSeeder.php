@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -13,14 +12,18 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call([
-            // Infraestructura base
+            // ─────────────────────────────────────────────
+            // 1. Infraestructura base
+            // ─────────────────────────────────────────────
             EstadoAdultoSeeder::class,
             EstadosAdultoFlujoClinicoSeeder::class,
             RolesAndPermissionsSeeder::class,
             SaludSeguimientoPermissionsSeeder::class,
             FlujoClinicoPermissionsSeeder::class,
 
-            // Datos institucionales
+            // ─────────────────────────────────────────────
+            // 2. Catálogos y datos institucionales base
+            // ─────────────────────────────────────────────
             TurnoInstitucionalSeeder::class,
             TurnosEnfermeriaSeeder::class,
             TipoDocumentoUsuarioSeeder::class,
@@ -28,10 +31,42 @@ class DatabaseSeeder extends Seeder
             TipoActividadAdultoSeeder::class,
             GeriatricSuiteSeeder::class,
 
-            // Datos de ejemplo
+            // ─────────────────────────────────────────────
+            // 3. Usuarios, roles operativos y personal
+            // ─────────────────────────────────────────────
             AdminSeeder::class,
+            PersonalSeeder::class,
+            EnfermeroConHorarioSeeder::class,
+            CarlaPatriciaEnfermeriaSeeder::class,
+
+            // ─────────────────────────────────────────────
+            // 4. Habitaciones, camas y residentes
+            // ─────────────────────────────────────────────
+            HabitacionesCamasSeeder::class,
             AdultoMayorSeeder::class,
+            ResidentesSeeder::class,
+            PacienteMendozaSeeder::class,
+
+            // ─────────────────────────────────────────────
+            // 5. Preadmisiones y flujo inicial
+            // ─────────────────────────────────────────────
+            PreadmisionesSeeder::class,
+            AdultoConPreadmisionAprobadaSeeder::class,
+
+            // ─────────────────────────────────────────────
+            // 6. Datos clínicos, enfermería y seguimiento
+            // ─────────────────────────────────────────────
+            ClinicaSeeder::class,
             EnfermeriaPacienteSeeder::class,
+            DatosEnfermeriaDemoSeeder::class,
+            EnfermeriaOperativaSeeder::class,
+
+            // ─────────────────────────────────────────────
+            // 7. Actividades, voluntariado y demo integral
+            // ─────────────────────────────────────────────
+            ActividadesSeeder::class,
+            VoluntariosSeeder::class,
+            DemoIntegralSeeder::class,
         ]);
     }
 }

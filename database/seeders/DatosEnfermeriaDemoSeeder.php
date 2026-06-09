@@ -309,16 +309,42 @@ class DatosEnfermeriaDemoSeeder extends Seeder
         );
 
         if (!$preadmision->cod_am_generado) {
-            $pacienteGenerado = AdultoMayor::create([
-                'nombres' => 'Carmen',
-                'ap_paterno' => 'Rosa',
-                'ap_materno' => 'Vargas',
-                'ci' => '9999999-PRE',
-                'fecha_nac' => '1950-01-01',
-                'genero' => 'FEMENINO',
-                'cod_est_adul' => $estadoPreadmision,
-                'cod_pre_origen' => $preadmision->cod_pre,
-            ]);
+            $pacienteGenerado = AdultoMayor::firstOrCreate(
+                ['ci' => '9999999-PRE'],
+                [
+                    'nombres' => 'Carmen',
+                    'ap_paterno' => 'Rosa',
+                    'ap_materno' => 'Vargas',
+                    'fecha_nac' => '1950-01-01',
+                    'genero' => 'FEMENINO',
+                    'estado_civil' => 'SOLTERO/A',
+                    'cod_est_adul' => $estadoPreadmision,
+
+                    'fecha_ing' => now()->toDateString(),
+                    'hora_ing' => '08:00',
+                    'tipo_ing' => 'REGULAR',
+                    'permanencia' => 'PERMANENTE',
+                    'nivel_educat' => 'PRIMARIA',
+                    'grupo_sanguineo' => 'O+',
+                    'factor_rh' => '+',
+                    'alergias' => 'NINGUNA',
+                    'seguro_salud' => 'SUS',
+
+                    'contacto_emergencia_nombre' => 'Pedro Rosa López',
+                    'contacto_emergencia_parentesco' => 'HIJO/A',
+                    'contacto_emergencia_celular' => '71234567',
+                    'contacto_emergencia_direccion' => 'Sin dirección registrada',
+
+                    'responsable_principal' => true,
+                    'autorizado_informacion_medica' => true,
+                    'consentimiento_datos' => true,
+
+                    'motivo_ingreso' => 'ABANDONO_SOCIAL',
+                    'procedencia_ingreso' => 'FAMILIA',
+                    'cod_pre_origen' => $preadmision->cod_pre,
+                ]
+            );
+
             $preadmision->update(['cod_am_generado' => $pacienteGenerado->cod_am]);
         }
 

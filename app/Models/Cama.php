@@ -26,11 +26,13 @@ class Cama extends Model
     public $timestamps   = true;
 
     protected $fillable = [
+        'cod_cama',
         'cod_habitacion',
         'codigo',
+        'numero',
         'estado',
-        'observacion',
         'observaciones',
+        'observacion',
     ];
 
     public function getActivitylogOptions(): LogOptions
