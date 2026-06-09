@@ -796,26 +796,46 @@
         {{-- MODAL DE NUEVA ASIGNACIÓN / SELECCIÓN DE USUARIO --}}
         @if ($modalAbierto)
             <div class="fixed inset-0 z-[70] flex items-center justify-center bg-titulo/40 p-4 backdrop-blur-sm">
-                <div class="max-h-[86vh] w-full max-w-4xl overflow-hidden rounded-[1.5rem] border border-borde-suave bg-fondo-panel shadow-2xl">
-                    <div class="flex items-start justify-between gap-3 border-b border-borde-suave p-5">
+                <div class="max-h-[86vh] w-full max-w-4xl flex flex-col overflow-hidden rounded-[1.5rem] border border-borde-suave bg-fondo-panel shadow-2xl">
+                    <div class="flex shrink-0 items-start justify-between gap-3 border-b border-borde-suave p-5">
                         <div>
                             <h2 class="text-lg font-black text-titulo">Nueva asignación institucional</h2>
                             <p class="mt-1 text-xs font-bold text-apoyo">Seleccione el personal. El registro definitivo se conectará al flujo de asignación correspondiente.</p>
                         </div>
                         <button type="button" wire:click="cerrarModal"
-                            class="flex h-9 w-9 items-center justify-center rounded-xl bg-fondo-card text-titulo transition hover:bg-boton-acento hover:text-inverso">
+                            class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-fondo-card text-titulo transition hover:bg-boton-acento hover:text-inverso">
                             <i class="ph-bold ph-x"></i>
                         </button>
                     </div>
 
-                    <div class="p-5">
+                    <div class="p-5 overflow-y-auto">
                         @if ($usuarioSeleccionadoData)
                             <div class="rounded-2xl border border-borde-suave bg-fondo-card/35 p-4">
-                                <p class="text-[10px] font-black uppercase tracking-wider text-apoyo">Personal seleccionado</p>
-                                <p class="mt-2 text-base font-black text-titulo">{{ $usuarioSeleccionadoData->nombres }} {{ $usuarioSeleccionadoData->ap_paterno }}</p>
-                                <p class="text-xs font-bold text-apoyo">{{ $usuarioSeleccionadoData->correo }}</p>
-                                <div class="mt-4 flex justify-end">
-                                    <button type="button" wire:click="cerrarModal" class="rounded-xl bg-boton-principal px-4 py-2 text-xs font-black uppercase text-inverso">Cerrar</button>
+                                <div class="flex flex-col gap-4">
+                                    <div class="flex items-start justify-between">
+                                        <div>
+                                            <p class="text-[10px] font-black uppercase tracking-wider text-apoyo">Personal seleccionado</p>
+                                            <p class="mt-2 text-base font-black text-titulo">{{ $usuarioSeleccionadoData->nombres }} {{ $usuarioSeleccionadoData->ap_paterno }}</p>
+                                            <p class="text-xs font-bold text-apoyo">{{ $usuarioSeleccionadoData->correo }}</p>
+                                        </div>
+                                        <button type="button" wire:click="$set('usuarioSeleccionado', null)" class="text-[11px] font-bold text-boton-acento hover:text-boton-acento/80 transition">
+                                            Cambiar personal
+                                        </button>
+                                    </div>
+                                    
+                                    <div class="mt-2">
+                                        <livewire:admin.personal-institucional.partials.personal-institucional-horarios 
+                                            :usuario-id="$usuarioSeleccionadoData->cod_usu" 
+                                            :abrir-formulario-inicial="true"
+                                            wire:key="horario-modal-{{ $usuarioSeleccionadoData->cod_usu }}" 
+                                        />
+                                    </div>
+
+                                    <div class="mt-2 flex justify-end border-t border-borde-suave pt-4">
+                                        <button type="button" wire:click="cerrarModal" class="rounded-xl bg-boton-principal px-4 py-2 text-xs font-black uppercase tracking-wide text-inverso transition hover:bg-boton-principal/90">
+                                            Cerrar
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         @else

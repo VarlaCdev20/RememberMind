@@ -19,14 +19,14 @@
                     <i class="ph-fill ph-calendar-check text-boton-acento"></i>
                     Asignaciones de Turno
                     <span class="ml-1 inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider
-                        {{ $tipoPersonal === 'salud' && $subtipoSalud === 'ENFERMERO'
+                        {{ $tipoPersonal === 'salud' && $esEnfermeria
                             ? 'bg-estado-infoBg text-estado-info border border-estado-infoBorde'
                             : 'bg-boton-acento/10 text-boton-acento border border-boton-acento/20' }}">
                         {{ $tipoPersonal === 'salud' ? ($subtipoSalud ?: 'Salud') : 'Administrativo' }}
                     </span>
                 </h4>
                 <p class="text-xs text-apoyo font-semibold mt-0.5">
-                    {{ $tipoPersonal === 'salud' && $subtipoSalud === 'ENFERMERO'
+                    {{ $tipoPersonal === 'salud' && $esEnfermeria
                         ? 'Enfermería: validación estricta de solapamientos. Tipo ROTATIVO recomendado.'
                         : 'Gestiona turnos, áreas y días laborales del personal.' }}
                 </p>
@@ -168,7 +168,7 @@
             <div>
                 <label class="block text-xs font-bold text-apoyo uppercase tracking-wider mb-2">
                     Días Laborales <span class="text-estado-peligro">*</span>
-                    @if($tipoPersonal === 'salud' && $subtipoSalud === 'ENFERMERO')
+                    @if($tipoPersonal === 'salud' && $esEnfermeria)
                         <span class="ml-2 text-estado-info text-[10px] font-bold normal-case">Enfermería: sin solapamiento en ningún día</span>
                     @endif
                 </label>

@@ -111,7 +111,7 @@
     </div>
 
     <!-- Wizard Form Body -->
-    <form wire:submit.prevent="guardar" class="flex flex-col flex-1 min-h-0 overflow-hidden" x-on:keydown.enter="
+    <div class="flex flex-col flex-1 min-h-0 overflow-hidden" x-on:keydown.enter="
         if ($event.target.tagName === 'INPUT' && ['text', 'email', 'date', 'number', 'tel'].includes($event.target.type)) {
             $event.preventDefault();
             $wire.avanzarPaso();
@@ -950,7 +950,7 @@
 
         <div class="flex items-center justify-between pt-3 mt-2 border-t border-borde/60 bg-white sticky bottom-0 z-10 pb-1">
             @if($pasoActual > 1)
-                <button type="button" wire:click="retrocederPaso" wire:loading.attr="disabled" class="px-4 py-2 text-sm font-bold border-2 border-borde rounded-xl text-titulo hover:bg-fondo-hover hover:border-apoyo/30 transition-all disabled:opacity-50 flex items-center gap-2">
+                <button type="button" wire:click="retrocederPaso" wire:loading.attr="disabled" class="px-4 py-2 text-sm font-bold border-2 border-borde rounded-xl text-titulo hover:bg-fondo-hover hover:border-apoyo/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
                     <span wire:loading.remove wire:target="retrocederPaso"><i class="ph-bold ph-arrow-left"></i> Atrás</span>
                     <span wire:loading wire:target="retrocederPaso"><i class="ph-bold ph-spinner animate-spin"></i></span>
                 </button>
@@ -980,23 +980,23 @@
             @endif
 
             @if($pasoActual < $totalPasos)
-                <button type="button" wire:click="avanzarPaso" wire:loading.attr="disabled" class="bg-boton-acento hover:bg-boton-acentoHover text-white px-5 py-2 rounded-xl text-sm font-bold shadow-lg shadow-boton-acento/20 transition-all flex items-center gap-2 disabled:opacity-50">
+                <button type="button" wire:click="avanzarPaso" wire:loading.attr="disabled" class="bg-boton-acento hover:bg-boton-acentoHover text-white px-5 py-2 rounded-xl text-sm font-bold shadow-lg shadow-boton-acento/20 transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
                     <span wire:loading.remove wire:target="avanzarPaso">Siguiente <i class="ph-bold ph-arrow-right"></i></span>
                     <span wire:loading wire:target="avanzarPaso"><i class="ph-bold ph-spinner animate-spin"></i> Procesando...</span>
                 </button>
             @else
-                <button type="button" wire:click="preGuardar" wire:loading.attr="disabled" class="bg-estado-exito hover:bg-estado-exito/90 text-white px-5 py-2 rounded-xl text-sm font-bold shadow-lg shadow-estado-exito/30 transition-all flex items-center gap-2 disabled:opacity-50">
+                <button type="button" wire:click="preGuardar" wire:loading.attr="disabled" class="bg-estado-exito hover:bg-estado-exito/90 text-white px-5 py-2 rounded-xl text-sm font-bold shadow-lg shadow-estado-exito/30 transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
                     <span wire:loading.remove wire:target="preGuardar"><i class="ph-bold ph-check-circle text-lg"></i> Confirmar Registro</span>
                     <span wire:loading wire:target="preGuardar"><i class="ph-bold ph-spinner animate-spin text-lg"></i> Guardando...</span>
                 </button>
             @endif
         </div>
         </div>
-    </form>
+    </div>
 </div>
 
 @else
-<form wire:submit.prevent="guardar" class="space-y-2">
+<div class="space-y-2">
     <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
         <!-- Columna Izquierda: Datos de Usuario -->
         <div class="space-y-2">
@@ -1120,12 +1120,12 @@
         <button type="button" x-on:click="$wire.dispatch('cerrarModalGestion')" class="px-4 py-2 text-sm font-bold text-apoyo hover:text-titulo transition-colors">
             Cancelar
         </button>
-        <button type="button" wire:click="confirmarActualizacion" class="rm-btn-primary px-6 flex items-center gap-2 h-10 rounded-xl">
+        <button type="button" wire:click="confirmarActualizacion" wire:loading.attr="disabled" class="rm-btn-primary px-6 flex items-center gap-2 h-10 rounded-xl disabled:opacity-70 disabled:cursor-not-allowed">
             <i class="ph-bold ph-floppy-disk text-lg"></i>
             <span>Actualizar Personal</span>
         </button>
     </div>
-</form>
+</div>
 @endif
 </div>
 

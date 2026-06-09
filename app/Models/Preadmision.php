@@ -58,12 +58,22 @@ class Preadmision extends Model
         'enfermero_asignado',
         'creado_por',
         'observaciones',
+        'motivo_rechazo',
+        'observacion_rechazo',
+        'fecha_rechazo',
+        'rechazado_por',
+        'fecha_aprobacion',
+        'aprobado_por',
+        'cod_am_generado',
+        'cod_fam_generado',
     ];
 
     protected $casts = [
         'fecha_solicitud' => 'date',
         'fecha_asignacion' => 'datetime',
         'fecha_nac' => 'date',
+        'fecha_rechazo' => 'datetime',
+        'fecha_aprobacion' => 'datetime',
         'documentos_iniciales_completos' => 'boolean',
         'documentos_institucionales_generados' => 'boolean',
     ];
@@ -81,6 +91,26 @@ class Preadmision extends Model
     public function creador(): BelongsTo
     {
         return $this->belongsTo(User::class, 'creado_por', 'cod_usu');
+    }
+
+    public function aprobador(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'aprobado_por', 'cod_usu');
+    }
+
+    public function rechazador(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'rechazado_por', 'cod_usu');
+    }
+
+    public function adultoGenerado(): BelongsTo
+    {
+        return $this->belongsTo(AdultoMayor::class, 'cod_am_generado', 'cod_am');
+    }
+
+    public function familiarGenerado(): BelongsTo
+    {
+        return $this->belongsTo(Familiar::class, 'cod_fam_generado', 'cod_fam');
     }
 
     public function getNombreCompletoAttribute(): string

@@ -13,8 +13,7 @@
  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap"
  rel="stylesheet">
 
- <script src="https://unpkg.com/@phosphor-icons/web"></script>
- <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+ <script defer src="https://unpkg.com/@phosphor-icons/web"></script>
 
  @vite(['resources/css/app.css', 'resources/js/app.js'])
 

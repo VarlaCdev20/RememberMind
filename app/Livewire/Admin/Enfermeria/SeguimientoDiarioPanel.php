@@ -44,11 +44,30 @@ class SeguimientoDiarioPanel extends Component
     public bool   $requiereMedico       = false;
     public string $observacion          = '';
 
+    public function mount(): void
+    {
+        $this->filtroFecha = today()->toDateString();
+
+        $horaActual = now()->format('H:i:s');
+        $turnoActual = TurnoEnfermeria::whereTime('hora_inicio', '<=', $horaActual)
+            ->whereTime('hora_fin', '>=', $horaActual)
+            ->first() ?? TurnoEnfermeria::first();
+
+        if ($turnoActual) {
+            $this->filtroTurno = (string) $turnoActual->cod_turno;
+            $this->codTurno = (string) $turnoActual->cod_turno;
+        }
+    }
+
     public function abrirCrear(): void
     {
         $this->reset();
         $this->fecha     = today()->format('Y-m-d');
         $this->horaInicio= now()->format('H:i');
+        $this->filtroFecha = today()->toDateString();
+        if ($this->filtroTurno !== '') {
+            $this->codTurno = $this->filtroTurno;
+        }
         $this->modalForm = true;
     }
 

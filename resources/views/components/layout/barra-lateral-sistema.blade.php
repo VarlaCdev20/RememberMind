@@ -104,6 +104,7 @@
  $url = $safeUrl($section['route']);
  @endphp
  <a
+ wire:navigate
  href="{{ $url }}"
  @if($disabled) title="Próximamente" @else title="{{ $section['title'] }}" @endif
  class="flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-sm font-bold transition-all duration-300
@@ -178,6 +179,7 @@
  @endphp
 
  <a
+ wire:navigate
  href="{{ $url }}"
  @if($disabled) title="Próximamente" @else title="{{ $item['label'] }}" @endif
  class="group/item relative flex items-center gap-2.5 rounded-lg py-2 text-sm font-bold transition-all duration-300

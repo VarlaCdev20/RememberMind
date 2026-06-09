@@ -28,6 +28,57 @@
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
 
     <style>
+        .welcome-page {
+            --welcome-fondo: var(--color-fondo-layout);
+            --welcome-titulo: var(--color-titulo);
+            --welcome-texto: var(--color-parrafo);
+            --welcome-muted: var(--color-texto-apoyo);
+            --welcome-borde: var(--color-borde-suave);
+            --welcome-card: color-mix(in srgb, var(--color-fondo-card) 78%, transparent);
+            --welcome-card-strong: color-mix(in srgb, var(--color-fondo-card-suave) 92%, transparent);
+            --welcome-card-border: var(--color-borde-general);
+            --welcome-acento: var(--color-boton-acento);
+            --welcome-acento-hover: var(--color-boton-acento-hover);
+            --welcome-primario: var(--color-boton-principal);
+            --welcome-primario-hover: var(--color-boton-principal-hover);
+            --welcome-secundario: var(--color-boton-secundario);
+            --welcome-secundario-hover: var(--color-boton-secundario-hover);
+            --welcome-boton-texto: var(--color-boton-principal-texto);
+            --welcome-panel: var(--color-fondo-panel);
+            --welcome-card-shadow: var(--sombra-card);
+            --welcome-panel-shadow: var(--sombra-panel);
+            --welcome-grid-dot: color-mix(in srgb, var(--color-boton-acento) 38%, transparent);
+            --welcome-grid-line: color-mix(in srgb, var(--color-boton-principal) 18%, transparent);
+            --welcome-glow-primary: color-mix(in srgb, var(--color-boton-principal) 15%, transparent);
+            --welcome-glow-accent: color-mix(in srgb, var(--color-boton-acento) 10%, transparent);
+            --welcome-shadow-soft: color-mix(in srgb, var(--color-titulo) 16%, transparent);
+            --welcome-shadow-light: color-mix(in srgb, var(--color-fondo-card) 74%, transparent);
+            --welcome-chart-fill: color-mix(in srgb, var(--color-boton-acento) 18%, transparent);
+            --welcome-chart-grid: color-mix(in srgb, var(--color-borde-general) 55%, transparent);
+            --welcome-chart-ticks: var(--color-texto-apoyo);
+            --welcome-chart-point: var(--color-fondo-card);
+            --welcome-social-facebook: var(--color-modulo-salud);
+            --welcome-social-instagram: var(--color-modulo-cognitivo);
+            --welcome-social-whatsapp: var(--color-estado-exito-texto);
+        }
+
+        .dark .welcome-page,
+        [data-theme="dark"] .welcome-page {
+            --welcome-card: color-mix(in srgb, var(--color-fondo-panel) 82%, transparent);
+            --welcome-card-strong: color-mix(in srgb, var(--color-fondo-panel-fuerte) 92%, transparent);
+            --welcome-card-border: color-mix(in srgb, var(--color-borde-general) 82%, transparent);
+            --welcome-grid-dot: color-mix(in srgb, var(--color-boton-acento) 28%, transparent);
+            --welcome-grid-line: color-mix(in srgb, var(--color-boton-principal) 22%, transparent);
+            --welcome-glow-primary: color-mix(in srgb, var(--color-boton-principal) 18%, transparent);
+            --welcome-glow-accent: color-mix(in srgb, var(--color-boton-acento) 12%, transparent);
+            --welcome-shadow-soft: color-mix(in srgb, #000 36%, transparent);
+            --welcome-shadow-light: color-mix(in srgb, var(--color-fondo-layout) 24%, transparent);
+            --welcome-chart-fill: color-mix(in srgb, var(--color-boton-acento) 24%, transparent);
+            --welcome-chart-grid: color-mix(in srgb, var(--color-borde-general) 45%, transparent);
+            --welcome-chart-ticks: var(--color-subtitulo);
+            --welcome-chart-point: var(--color-fondo-panel);
+        }
+
         /* Micro-interacciones personalizadas */
         .hover-underline::after {
             content: '';
@@ -111,13 +162,13 @@
 
         /* Sistema de Sombras Tipográficas */
         .text-shadow-deep {
-            text-shadow: 0 8px 24px rgba(7, 60, 53, 0.16), 0 2px 4px rgba(250, 246, 239, 0.75);
+            text-shadow: 0 8px 24px var(--welcome-shadow-soft), 0 2px 4px var(--welcome-shadow-light);
         }
         .text-shadow-title {
-            text-shadow: 0 6px 18px rgba(7, 60, 53, 0.14), 0 1px 2px rgba(250, 246, 239, 0.75);
+            text-shadow: 0 6px 18px var(--welcome-shadow-soft), 0 1px 2px var(--welcome-shadow-light);
         }
         .text-shadow-light {
-            text-shadow: 0 2px 8px rgba(7, 60, 53, 0.12);
+            text-shadow: 0 2px 8px var(--welcome-shadow-soft);
         }
 
         /* Ambient Glow (Mouse Light interactivo) SUTIL Y FLUIDO */
@@ -125,12 +176,79 @@
             position: fixed;
             top: 0; left: 0;
             width: 250px; height: 250px;
-            background: radial-gradient(circle, rgba(94,211,230,0.14) 0%, rgba(242,139,84,0.06) 50%, transparent 80%);
+            background: radial-gradient(circle, var(--welcome-glow-primary) 0%, var(--welcome-glow-accent) 50%, transparent 80%);
             border-radius: 50%;
             pointer-events: none;
             z-index: 40;
             opacity: 0;
             mix-blend-mode: normal;
+        }
+
+        /* Reducción visual sin alterar la composición general */
+        .welcome-page header .max-w-7xl {
+            max-width: 72rem;
+        }
+
+        .welcome-page #inicio {
+            padding-top: 8rem;
+            padding-bottom: 3rem;
+        }
+
+        .welcome-page #inicio h1 {
+            font-size: clamp(2.65rem, 6vw, 5.4rem) !important;
+            margin-bottom: 1.25rem !important;
+        }
+
+        .welcome-page #inicio > div > div > p:nth-of-type(2) {
+            font-size: clamp(1rem, 2vw, 1.5rem) !important;
+            max-width: 56rem;
+        }
+
+        .welcome-page section h2 {
+            font-size: clamp(2rem, 4vw, 3.45rem) !important;
+            line-height: 1.08;
+        }
+
+        .welcome-page .card-interactiva {
+            border-radius: 2.2rem;
+            padding: 1.5rem;
+        }
+
+        .welcome-page .welcome-evolucion {
+            border-radius: 2.25rem;
+            padding: 1.5rem;
+        }
+
+        .welcome-page .welcome-evolucion-inner {
+            border-radius: 1.5rem;
+        }
+
+        .welcome-page #problema,
+        .welcome-page #experiencia,
+        .welcome-page #servicios,
+        .welcome-page #impacto,
+        .welcome-page footer {
+            padding-top: 4.5rem;
+            padding-bottom: 4.5rem;
+        }
+
+        .welcome-page .mobile-welcome-link {
+            font-size: 0.96rem;
+        }
+
+        @media (min-width: 768px) {
+            .welcome-page #inicio {
+                padding-top: 9rem;
+            }
+
+            .welcome-page #problema,
+            .welcome-page #experiencia,
+            .welcome-page #servicios,
+            .welcome-page #impacto,
+            .welcome-page footer {
+                padding-top: 5.5rem;
+                padding-bottom: 5.5rem;
+            }
         }
     </style>
 </head>
@@ -140,7 +258,7 @@
     <div class="fixed inset-0 z-[100] pointer-events-none opacity-[0.35] mix-blend-overlay" style="background-image: url('data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noise%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.85%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noise)%22/%3E%3C/svg%3E');"></div>
 
     {{-- Trama Geométrica de Puntos (Estructura Sutil) --}}
-    <div class="fixed inset-0 z-0 pointer-events-none opacity-[0.40]" style="background-image: radial-gradient(rgba(217,108,51,0.45) 1.5px, transparent 1.5px), linear-gradient(90deg, rgba(198,93,41,0.20) 1px, transparent 1px), linear-gradient(0deg, rgba(217,108,51,0.20) 1px, transparent 1px); background-size: 20px 20px, 60px 60px, 60px 60px;"></div>
+    <div class="fixed inset-0 z-0 pointer-events-none opacity-[0.40]" style="background-image: radial-gradient(var(--welcome-grid-dot) 1.5px, transparent 1.5px), linear-gradient(90deg, var(--welcome-grid-line) 1px, transparent 1px), linear-gradient(0deg, var(--welcome-grid-line) 1px, transparent 1px); background-size: 20px 20px, 60px 60px, 60px 60px;"></div>
     {{-- Efecto Global de Luz Interactiva (Visible y Notorio) --}}
     <div class="mouse-light pointer-events-none"></div>
 
@@ -551,7 +669,7 @@
     {{-- 6. IMPACTO E INSTITUCIÓN --}}
     <section id="impacto" class="py-16 md:py-24 bg-[var(--welcome-card-strong)] relative overflow-hidden text-[var(--welcome-titulo)]" x-data="impactDashboard()">
         {{-- Patrón de fondo con ligero parallax --}}
-        <div class="parallax-bg absolute inset-0 opacity-12" style="background-image: radial-gradient(#5ED3E6 1px, transparent 1px); background-size: 30px 30px; height: 130%;"></div>
+        <div class="parallax-bg absolute inset-0 opacity-12" style="background-image: radial-gradient(var(--welcome-glow-primary) 1px, transparent 1px); background-size: 30px 30px; height: 130%;"></div>
         
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
@@ -627,9 +745,9 @@
                     <div class="flex flex-wrap gap-4">
                         @php
                             $socials = [
-                                ['Facebook', 'ph-fill ph-facebook-logo', '#1877F2'],
-                                ['Instagram', 'ph-fill ph-instagram-logo', '#E4405F'],
-                                ['WhatsApp', 'ph-fill ph-whatsapp-logo', '#25D366'],
+                                ['Facebook', 'ph-fill ph-facebook-logo', 'var(--welcome-social-facebook)'],
+                                ['Instagram', 'ph-fill ph-instagram-logo', 'var(--welcome-social-instagram)'],
+                                ['WhatsApp', 'ph-fill ph-whatsapp-logo', 'var(--welcome-social-whatsapp)'],
                             ];
                         @endphp
                         
@@ -758,11 +876,11 @@
                                         label: 'Estabilidad Cognitiva (%)',
                                         data: [65, 72, 78, 85, 88, 92],
                                         borderColor: 'var(--color-boton-acento)',
-                                        backgroundColor: 'rgba(242, 139, 84, 0.20)',
+                                        backgroundColor: 'var(--welcome-chart-fill)',
                                         borderWidth: 4,
                                         tension: 0.4,
                                         fill: true,
-                                        pointBackgroundColor: '#fff',
+                                        pointBackgroundColor: 'var(--welcome-chart-point)',
                                         pointBorderColor: 'var(--color-boton-acento)',
                                         pointBorderWidth: 3,
                                         pointRadius: 6,
@@ -776,12 +894,12 @@
                                         y: { 
                                             beginAtZero: false, 
                                             min: 50,
-                                            grid: { color: 'rgba(255,255,255,0.05)' },
-                                            ticks: { color: '#97E3D5' }
+                                            grid: { color: 'var(--welcome-chart-grid)' },
+                                            ticks: { color: 'var(--welcome-chart-ticks)' }
                                         },
                                         x: { 
                                             grid: { display: false },
-                                            ticks: { color: '#97E3D5' }
+                                            ticks: { color: 'var(--welcome-chart-ticks)' }
                                         }
                                     }
                                 }

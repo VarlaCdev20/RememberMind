@@ -112,6 +112,11 @@ class RolesAndPermissionsSeeder extends Seeder
             'valoracion_funcional.crear',
             'valoracion_funcional.editar',
             'administracion_medicacion.registrar',
+            
+            // Enfermería Operativa
+            'enfermeria.ver_dashboard',
+            'enfermeria.ver_pacientes_asignados',
+            'enfermeria.ver_ficha_paciente',
 
             // Evaluaciones cognitivas
             'evaluaciones.ver',
@@ -285,8 +290,8 @@ class RolesAndPermissionsSeeder extends Seeder
             'alertas.gestionar',
         ];
 
-        // Añadir permisos específicos de enfermería que puedan estar en BD (creados por migración)
-        $permisosEnfermeria = Permission::whereIn('name', [
+        // Añadir permisos específicos de enfermería
+        $permisosEnfermeria = [
             'enfermeria.ver_dashboard',
             'enfermeria.ver_pacientes_asignados',
             'enfermeria.ver_ficha_paciente',
@@ -362,7 +367,12 @@ class RolesAndPermissionsSeeder extends Seeder
             'pase_turno.ver',
             'pase_turno.generar',
             'pase_turno.recibir',
-        ])->pluck('name')->toArray();
+        ];
+
+        // Asegurar que estos permisos existan (por si no se corrió FlujoClinicoPermissionsSeeder)
+        foreach ($permisosEnfermeria as $perm) {
+            Permission::firstOrCreate(['name' => $perm, 'guard_name' => 'web']);
+        }
 
         $rolesModels['ENFERMEROS']->syncPermissions(array_merge(
             $permisosClinicos,

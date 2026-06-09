@@ -445,6 +445,7 @@ class PersonalInstitucionalForm extends Component
         // Cédula de Identidad (Obligatorio inmediato para todos)
         $docs[] = [
             'id' => 'CI',
+            'cod_tipo_doc' => 'TDU_0001',
             'nombre' => 'Cédula de Identidad (Anverso y Reverso)',
             'desc' => 'Copia legible del documento de identidad',
             'obligatorio_inmediato' => true,
@@ -455,6 +456,7 @@ class PersonalInstitucionalForm extends Component
         // Fotografía actual (Obligatorio inmediato para todos)
         $docs[] = [
             'id' => 'FOTO_DOC',
+            'cod_tipo_doc' => 'TDU_0003',
             'nombre' => 'Fotografía Actual',
             'desc' => 'Fotografía formal fondo blanco',
             'obligatorio_inmediato' => true,
@@ -465,6 +467,7 @@ class PersonalInstitucionalForm extends Component
         // Hoja de Vida
         $docs[] = [
             'id' => 'CV',
+            'cod_tipo_doc' => 'TDU_0006',
             'nombre' => 'Hoja de Vida / CV',
             'desc' => 'Curriculum Vitae actualizado y documentado',
             'obligatorio_inmediato' => true,
@@ -476,6 +479,7 @@ class PersonalInstitucionalForm extends Component
         if (in_array($rol, ['ENFERMEROS', 'MEDICO GENERAL/GERIATRA', 'PSICOLOGO/A', 'NUTRICIONISTA', 'FISIOTERAPEUTA', 'PEDAGOGO'])) {
             $docs[] = [
                 'id' => 'TITULO',
+                'cod_tipo_doc' => 'TDU_0008',
                 'nombre' => 'Título o Certificado de Formación',
                 'desc' => 'Título profesional o certificado académico/técnico',
                 'obligatorio_inmediato' => true,
@@ -486,6 +490,7 @@ class PersonalInstitucionalForm extends Component
             if (in_array($rol, ['ENFERMEROS', 'MEDICO GENERAL/GERIATRA', 'PSICOLOGO/A', 'NUTRICIONISTA', 'FISIOTERAPEUTA'])) {
                 $docs[] = [
                     'id' => 'MATRICULA',
+                    'cod_tipo_doc' => 'TDU_0010',
                     'nombre' => 'Matrícula Profesional',
                     'desc' => 'Registro profesional vigente (Obligatorio para médicos)',
                     'obligatorio_inmediato' => $rol === 'MEDICO GENERAL/GERIATRA',
@@ -497,6 +502,7 @@ class PersonalInstitucionalForm extends Component
             if ($rol === 'MEDICO GENERAL/GERIATRA') {
                 $docs[] = [
                     'id' => 'CERT_ESP',
+                    'cod_tipo_doc' => 'TDU_0011',
                     'nombre' => 'Certificado de Especialidad',
                     'desc' => 'Requerido si se registra como especialista (Ej. Geriatra)',
                     'obligatorio_inmediato' => false,
@@ -527,6 +533,7 @@ class PersonalInstitucionalForm extends Component
         
         $docs[] = [
             'id' => 'CAPACITACION',
+            'cod_tipo_doc' => 'TDU_0018',
             'nombre' => 'Capacitaciones Específicas',
             'desc' => 'Certificados relevantes al cargo',
             'obligatorio_inmediato' => false,
@@ -536,6 +543,7 @@ class PersonalInstitucionalForm extends Component
 
         $docs[] = [
             'id' => 'ANTECEDENTES',
+            'cod_tipo_doc' => 'TDU_0007',
             'nombre' => 'Certificado de Antecedentes',
             'desc' => 'FELCC, FELCN, REJAP (si la institución lo exige)',
             'obligatorio_inmediato' => false,
@@ -590,6 +598,7 @@ class PersonalInstitucionalForm extends Component
         // 2. Contrato laboral o prestación profesional
         $docs[] = [
             'id' => 'CONTRATO',
+            'cod_tipo_doc' => 'TDU_0004',
             'nombre' => $esAdmin ? 'Contrato Laboral' : 'Contrato Laboral o Prestación Profesional',
             'desc' => 'Acuerdo formal de relación laboral o servicios',
             'tipo' => 'institucional',
@@ -604,6 +613,7 @@ class PersonalInstitucionalForm extends Component
         // 3. Declaración de confidencialidad
         $docs[] = [
             'id' => 'CONFIDENCIALIDAD',
+            'cod_tipo_doc' => 'TDU_0002',
             'nombre' => 'Declaración de Confidencialidad y Manejo de Información Sensible',
             'desc' => 'Compromiso de resguardo de información clínica/administrativa',
             'tipo' => 'institucional',
@@ -1189,6 +1199,24 @@ class PersonalInstitucionalForm extends Component
 
                 $estadoDoc = $this->estado_documentos[$doc['id']] ?? 'PENDIENTE';
 
+                // Resolver cod_tipo_doc: usar el mapeado o crear el tipo automáticamente si no existe
+                $codTipoDoc = $doc['cod_tipo_doc'] ?? null;
+                if (!$codTipoDoc) {
+                    $tipoReg = \App\Models\TipoDocumentoUsuario::firstOrCreate(
+                        ['nombre' => $doc['nombre']],
+                        [
+                            'descripcion'         => $doc['desc'] ?? null,
+                            'aplica_roles'        => [$this->rol_seleccionado ?? ''],
+                            'obligatorio'         => $doc['obligatorio_inmediato'] ?? false,
+                            'requiere_vencimiento' => false,
+                            'requiere_validacion' => false,
+                            'estado'              => 'ACTIVO',
+                            'orden'               => 99,
+                        ]
+                    );
+                    $codTipoDoc = $tipoReg->cod_tipo_doc;
+                }
+
                 // Usar Eloquent para generar el ID (cod_doc_usu) automáticamente
                 $docBD = \App\Models\DocumentoUsuario::where('cod_usu', $usuario->cod_usu)
                     ->where('nombre_documento', $doc['nombre'])
@@ -1199,6 +1227,9 @@ class PersonalInstitucionalForm extends Component
                     $docBD->cod_usu = $usuario->cod_usu;
                     $docBD->nombre_documento = $doc['nombre'];
                     $docBD->tipo_documento = $tipoDoc;
+                    $docBD->cod_tipo_doc = $codTipoDoc;
+                } elseif (!$docBD->cod_tipo_doc) {
+                    $docBD->cod_tipo_doc = $codTipoDoc;
                 }
 
                 if ($estadoDoc === 'CARGADO' && isset($this->archivos_temporales[$doc['id']])) {
@@ -1390,7 +1421,7 @@ class PersonalInstitucionalForm extends Component
             'roles' => $rolesQuery->get(),
             'especialidades' => $this->catalogoEspecialidadesPorRol(),
             'cargos' => $this->catalogoCargosAdministrativosPorRol(),
-            'areas' => AreaInstitucional::where('estado', 'ACTIVO')->get(),
+            'areas' => AreaInstitucional::whereIn('estado', ['ACTIVA', 'ACTIVO'])->get(),
             'clasificacion_derivada' => $this->clasificacionDesdeRoles(),
         ]);
     }

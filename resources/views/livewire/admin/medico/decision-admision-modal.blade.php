@@ -1,138 +1,157 @@
 <div>
-    @if($isOpen && $adulto)
-    <div class="fixed inset-0 z-[100] overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-        <!-- Overlay -->
-        <div class="fixed inset-0 bg-modal-overlay backdrop-blur-sm transition-opacity" wire:click="close"></div>
+@if($isOpen && $adulto)
+<div class="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto bg-black/60 px-4 py-8"
+     x-data x-on:keydown.escape.window="$wire.close()">
 
-        <div class="flex min-h-screen items-center justify-center p-4 text-center sm:p-0">
-            <!-- Contenedor del Modal -->
-            <div class="relative transform overflow-hidden rounded-2xl bg-modal-bg text-left shadow-modal transition-all sm:my-8 sm:w-full sm:max-w-2xl border border-modal-borde flex flex-col max-h-[90vh]">
-                
-                <!-- Header del Modal -->
-                <div class="bg-estado-infoBg px-6 py-4 border-b border-estado-infoBorde flex justify-between items-center shrink-0">
-                    <div>
-                        <h3 class="text-xl font-bold text-estado-info flex items-center gap-2" id="modal-title">
-                            <i class="ph-fill ph-check-square-offset text-2xl"></i>
-                            Decisión Final de Admisión Médica
-                        </h3>
-                        <p class="text-sm font-semibold text-estado-info/80 mt-1">
-                            Paciente: <span class="font-bold">{{ $adulto->nombres }} {{ $adulto->apellidos }}</span> | CI: {{ $adulto->ci }}
-                        </p>
-                    </div>
-                    <button wire:click="close" class="text-estado-info hover:text-red-700 transition-colors rounded-lg p-1 hover:bg-white/50">
-                        <i class="ph ph-x text-xl"></i>
-                    </button>
+    <div class="relative w-full max-w-2xl rounded-[28px] border border-borde bg-fondo-card shadow-2xl"
+         x-transition:enter="transition ease-out duration-200"
+         x-transition:enter-start="opacity-0 scale-95"
+         x-transition:enter-end="opacity-100 scale-100">
+
+        {{-- Header --}}
+        <div class="flex items-center justify-between rounded-t-[28px] border-b border-borde bg-estado-infoBg px-6 py-4">
+            <div class="flex items-center gap-3">
+                <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-estado-info text-white">
+                    <i class="ph-fill ph-check-square-offset text-xl"></i>
                 </div>
-
-                <div class="px-6 py-5 bg-fondo-app overflow-y-auto flex-1">
-                    <style>
-                        input:has(+ span.text-estado-peligro), 
-                        select:has(+ span.text-estado-peligro), 
-                        textarea:has(+ span.text-estado-peligro) {
-                            border-color: #ef4444 !important; 
-                            color: #ef4444 !important;
-                        }
-                    </style>
-                    <div class="space-y-6">
-                        
-                        <div>
-                            <label class="block text-sm font-black text-titulo mb-2">Decisión Médica <span class="text-estado-peligro">*</span></label>
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                <label class="cursor-pointer">
-                                    <input type="radio" wire:model.live="decision" value="ADMITIDO_NORMAL" class="peer sr-only">
-                                    <div class="rounded-xl border-2 border-borde p-3 text-center transition-all peer-checked:border-estado-exito peer-checked:bg-estado-exitoBg hover:bg-fondo-hover">
-                                        <i class="ph-bold ph-check-circle text-estado-exito text-2xl mb-1"></i>
-                                        <div class="font-bold text-titulo text-sm">Admisión Normal</div>
-                                    </div>
-                                </label>
-                                
-                                <label class="cursor-pointer">
-                                    <input type="radio" wire:model.live="decision" value="ADMITIDO_CON_SEGUIMIENTO" class="peer sr-only">
-                                    <div class="rounded-xl border-2 border-borde p-3 text-center transition-all peer-checked:border-estado-info peer-checked:bg-estado-infoBg hover:bg-fondo-hover">
-                                        <i class="ph-bold ph-eye text-estado-info text-2xl mb-1"></i>
-                                        <div class="font-bold text-titulo text-sm">Admisión c/ Seguimiento</div>
-                                    </div>
-                                </label>
-                                
-                                <label class="cursor-pointer">
-                                    <input type="radio" wire:model.live="decision" value="ADMITIDO_CON_CUIDADO_ESPECIAL" class="peer sr-only">
-                                    <div class="rounded-xl border-2 border-borde p-3 text-center transition-all peer-checked:border-estado-advertencia peer-checked:bg-estado-advertenciaBg hover:bg-fondo-hover">
-                                        <i class="ph-bold ph-warning-circle text-estado-advertencia text-2xl mb-1"></i>
-                                        <div class="font-bold text-titulo text-sm">Admisión c/ Cuidado Especial</div>
-                                    </div>
-                                </label>
-                                
-                                <label class="cursor-pointer">
-                                    <input type="radio" wire:model.live="decision" value="DERIVADO" class="peer sr-only">
-                                    <div class="rounded-xl border-2 border-borde p-3 text-center transition-all peer-checked:border-estado-peligro peer-checked:bg-estado-peligroBg hover:bg-fondo-hover">
-                                        <i class="ph-bold ph-arrow-u-up-right text-estado-peligro text-2xl mb-1"></i>
-                                        <div class="font-bold text-titulo text-sm">Derivar / Rechazar</div>
-                                    </div>
-                                </label>
-                            </div>
-                            @error('decision') <span class="text-estado-peligro text-xs font-medium mt-1 block">{{ $message }}</span> @enderror
-                        </div>
-
-                        <!-- Panel dinámico según decisión -->
-                        <div class="bg-fondo-card border border-borde rounded-xl p-4 shadow-sm min-h-[120px]">
-                            @if($decision === 'ADMITIDO_NORMAL')
-                                <div>
-                                    <label class="block text-sm font-semibold text-label mb-1">Motivo de la Decisión <span class="text-estado-peligro">*</span></label>
-                                    <textarea wire:model="motivo_decision" rows="3" placeholder="Paciente apto para convivencia general..." class="w-full rounded-lg border-input-borde bg-input-bg text-input-texto focus:border-input-bordeFocus shadow-sm uppercase"></textarea>
-                                    @error('motivo_decision') <span class="text-estado-peligro text-xs font-medium mt-1">{{ $message }}</span> @enderror
-                                </div>
-                            @elseif($decision === 'ADMITIDO_CON_SEGUIMIENTO')
-                                <div>
-                                    <label class="block text-sm font-semibold text-label mb-1">Protocolo de Seguimiento Requerido <span class="text-estado-peligro">*</span></label>
-                                    <textarea wire:model="seguimiento_requerido" rows="3" placeholder="Detalle qué seguimiento clínico o de enfermería se debe llevar a cabo..." class="w-full rounded-lg border-input-borde bg-input-bg text-input-texto focus:border-input-bordeFocus shadow-sm uppercase"></textarea>
-                                    @error('seguimiento_requerido') <span class="text-estado-peligro text-xs font-medium mt-1">{{ $message }}</span> @enderror
-                                </div>
-                            @elseif($decision === 'ADMITIDO_CON_CUIDADO_ESPECIAL')
-                                <div>
-                                    <label class="block text-sm font-semibold text-label mb-1">Especificación del Cuidado Especial <span class="text-estado-peligro">*</span></label>
-                                    <textarea wire:model="cuidado_especial_requerido" rows="3" placeholder="Detalle los cuidados paliativos, de movilización o de nutrición especiales requeridos..." class="w-full rounded-lg border-input-borde bg-input-bg text-input-texto focus:border-input-bordeFocus shadow-sm uppercase"></textarea>
-                                    @error('cuidado_especial_requerido') <span class="text-estado-peligro text-xs font-medium mt-1">{{ $message }}</span> @enderror
-                                </div>
-                            @elseif($decision === 'DERIVADO')
-                                <div class="grid grid-cols-1 gap-4">
-                                    <div>
-                                        <label class="block text-sm font-semibold text-label mb-1">Motivo Clínico de Derivación / Rechazo <span class="text-estado-peligro">*</span></label>
-                                        <textarea wire:model="motivo_derivacion" rows="2" placeholder="Requiere internación hospitalaria, psiquiátrica, etc." class="w-full rounded-lg border-input-borde bg-input-bg text-input-texto focus:border-input-bordeFocus shadow-sm uppercase"></textarea>
-                                        @error('motivo_derivacion') <span class="text-estado-peligro text-xs font-medium mt-1">{{ $message }}</span> @enderror
-                                    </div>
-                                    <div>
-                                        <label class="block text-sm font-semibold text-label mb-1">Institución Sugerida (Opcional)</label>
-                                        <input type="text" wire:model="institucion_derivada" placeholder="Hospital de Clínicas, Instituto Psiquiátrico, etc." class="w-full rounded-lg border-input-borde bg-input-bg text-input-texto focus:border-input-bordeFocus shadow-sm uppercase">
-                                    </div>
-                                </div>
-                            @else
-                                <div class="flex items-center justify-center h-20 text-apoyo text-sm italic">
-                                    Seleccione una decisión para habilitar los campos.
-                                </div>
-                            @endif
-                        </div>
-
-                        <div>
-                            <label class="block text-sm font-semibold text-label mb-1">Recomendación Final Adicional (Opcional)</label>
-                            <textarea wire:model="recomendacion_final" rows="2" placeholder="Cualquier nota para la familia o administración..." class="w-full rounded-lg border-input-borde bg-input-bg text-input-texto focus:border-input-bordeFocus shadow-sm uppercase"></textarea>
-                        </div>
-                        
-                    </div>
-                </div>
-
-                <!-- Footer del Modal -->
-                <div class="bg-modal-bg px-6 py-4 border-t border-modal-footerBorde flex justify-between items-center rounded-b-2xl shrink-0">
-                    <button wire:click="close" class="px-4 py-2 text-sm font-bold text-apoyo hover:text-texto-principal transition-colors">
-                        Cancelar
-                    </button>
-                    
-                    <button wire:click="guardar" class="px-5 py-2 bg-boton-acento hover:bg-boton-acentoHover text-white font-bold rounded-lg transition-colors flex items-center gap-2 shadow-sm">
-                        <i class="ph-bold ph-paper-plane-tilt text-lg"></i>
-                        Confirmar Dictamen Médico
-                    </button>
+                <div>
+                    <h3 class="text-lg font-black text-estado-info">Decisión Final de Admisión</h3>
+                    <p class="text-xs font-semibold text-estado-info/70">
+                        {{ $adulto->nombres }} {{ $adulto->ap_paterno }} · CI: {{ $adulto->ci }}
+                    </p>
                 </div>
             </div>
+            <button wire:click="close"
+                    class="flex h-8 w-8 items-center justify-center rounded-full text-estado-info hover:bg-estado-info hover:text-white transition">
+                <i class="ph-bold ph-x text-sm"></i>
+            </button>
+        </div>
+
+        <div class="space-y-5 p-6">
+
+            {{-- Selector de decisión --}}
+            <div>
+                <label class="mb-3 block text-xs font-black uppercase tracking-wider text-apoyo">
+                    Decisión médica <span class="text-estado-error">*</span>
+                </label>
+                <div class="grid grid-cols-2 gap-3">
+                    @foreach([
+                        ['ADMITIDO_NORMAL',            'ph-check-circle',       'estado-exito',      'Admisión normal'],
+                        ['ADMITIDO_CON_SEGUIMIENTO',   'ph-eye',                'estado-info',       'Admisión c/ seguimiento'],
+                        ['ADMITIDO_CON_CUIDADO_ESPECIAL','ph-warning-circle',   'estado-advertencia','Admisión c/ cuidado especial'],
+                        ['DERIVADO',                   'ph-arrow-u-up-right',   'estado-error',      'Derivar / Rechazar'],
+                    ] as [$val, $icon, $color, $label])
+                    <label class="cursor-pointer">
+                        <input type="radio" wire:model.live="decision" value="{{ $val }}" class="peer sr-only">
+                        <div class="flex flex-col items-center gap-1.5 rounded-2xl border-2 border-borde bg-fondo-panel p-3 text-center transition
+                                    peer-checked:border-{{ $color }} peer-checked:bg-{{ $color }}Bg hover:bg-fondo-card">
+                            <i class="ph-bold {{ $icon }} text-2xl text-{{ $color }}"></i>
+                            <span class="text-xs font-black text-titulo">{{ $label }}</span>
+                        </div>
+                    </label>
+                    @endforeach
+                </div>
+                @error('decision')
+                <span class="mt-1 block text-[10px] font-bold text-estado-error">{{ $message }}</span>
+                @enderror
+            </div>
+
+            {{-- Panel dinámico según decisión --}}
+            <div class="min-h-[100px] rounded-2xl border border-borde bg-fondo-panel p-4">
+                @if($decision === 'ADMITIDO_NORMAL')
+                <div>
+                    <label class="mb-1.5 block text-xs font-black uppercase tracking-wider text-apoyo">
+                        Motivo de la decisión <span class="text-estado-error">*</span>
+                    </label>
+                    <textarea wire:model="motivo_decision" rows="3"
+                              placeholder="Paciente apto para convivencia general. Sin requerimientos especiales..."
+                              class="w-full rounded-xl border @error('motivo_decision') border-estado-error @else border-borde @enderror bg-fondo-card px-3 py-2.5 text-sm font-semibold text-titulo placeholder-apoyo/50 outline-none focus:border-borde-focus transition resize-none uppercase"></textarea>
+                    @error('motivo_decision')
+                    <span class="mt-0.5 text-[10px] font-bold text-estado-error">{{ $message }}</span>
+                    @enderror
+                </div>
+
+                @elseif($decision === 'ADMITIDO_CON_SEGUIMIENTO')
+                <div>
+                    <label class="mb-1.5 block text-xs font-black uppercase tracking-wider text-apoyo">
+                        Protocolo de seguimiento requerido <span class="text-estado-error">*</span>
+                    </label>
+                    <textarea wire:model="seguimiento_requerido" rows="3"
+                              placeholder="Detalle qué seguimiento clínico o de enfermería se debe llevar a cabo..."
+                              class="w-full rounded-xl border @error('seguimiento_requerido') border-estado-error @else border-borde @enderror bg-fondo-card px-3 py-2.5 text-sm font-semibold text-titulo placeholder-apoyo/50 outline-none focus:border-borde-focus transition resize-none uppercase"></textarea>
+                    @error('seguimiento_requerido')
+                    <span class="mt-0.5 text-[10px] font-bold text-estado-error">{{ $message }}</span>
+                    @enderror
+                </div>
+
+                @elseif($decision === 'ADMITIDO_CON_CUIDADO_ESPECIAL')
+                <div>
+                    <label class="mb-1.5 block text-xs font-black uppercase tracking-wider text-apoyo">
+                        Especificación del cuidado especial <span class="text-estado-error">*</span>
+                    </label>
+                    <textarea wire:model="cuidado_especial_requerido" rows="3"
+                              placeholder="Cuidados paliativos, movilización especial, nutrición parenteral..."
+                              class="w-full rounded-xl border @error('cuidado_especial_requerido') border-estado-error @else border-borde @enderror bg-fondo-card px-3 py-2.5 text-sm font-semibold text-titulo placeholder-apoyo/50 outline-none focus:border-borde-focus transition resize-none uppercase"></textarea>
+                    @error('cuidado_especial_requerido')
+                    <span class="mt-0.5 text-[10px] font-bold text-estado-error">{{ $message }}</span>
+                    @enderror
+                </div>
+
+                @elseif($decision === 'DERIVADO')
+                <div class="space-y-3">
+                    <div>
+                        <label class="mb-1.5 block text-xs font-black uppercase tracking-wider text-apoyo">
+                            Motivo clínico de derivación <span class="text-estado-error">*</span>
+                        </label>
+                        <textarea wire:model="motivo_derivacion" rows="2"
+                                  placeholder="Requiere internación hospitalaria, psiquiátrica, etc."
+                                  class="w-full rounded-xl border @error('motivo_derivacion') border-estado-error @else border-borde @enderror bg-fondo-card px-3 py-2.5 text-sm font-semibold text-titulo placeholder-apoyo/50 outline-none focus:border-borde-focus transition resize-none uppercase"></textarea>
+                        @error('motivo_derivacion')
+                        <span class="mt-0.5 text-[10px] font-bold text-estado-error">{{ $message }}</span>
+                        @enderror
+                    </div>
+                    <div>
+                        <label class="mb-1.5 block text-xs font-black uppercase tracking-wider text-apoyo">Institución sugerida (opcional)</label>
+                        <input type="text" wire:model="institucion_derivada"
+                               placeholder="Hospital de Clínicas, Instituto Psiquiátrico..."
+                               class="w-full rounded-xl border border-borde bg-fondo-card px-3 py-2 text-sm font-bold text-titulo outline-none focus:border-borde-focus uppercase transition">
+                    </div>
+                </div>
+
+                @else
+                <div class="flex h-16 items-center justify-center text-sm text-apoyo italic">
+                    Seleccione una decisión para habilitar los campos.
+                </div>
+                @endif
+            </div>
+
+            {{-- Recomendación final --}}
+            <div>
+                <label class="mb-1.5 block text-xs font-black uppercase tracking-wider text-apoyo">Recomendación final adicional (opcional)</label>
+                <textarea wire:model="recomendacion_final" rows="2"
+                          placeholder="Notas adicionales para la familia o la administración..."
+                          class="w-full rounded-xl border border-borde bg-fondo-panel px-3 py-2.5 text-sm font-semibold text-titulo placeholder-apoyo/50 outline-none focus:border-borde-focus transition resize-none uppercase"></textarea>
+            </div>
+        </div>
+
+        {{-- Footer --}}
+        <div class="flex items-center justify-between rounded-b-[28px] border-t border-borde px-6 py-4">
+            <button wire:click="close" class="rm-btn-secondary h-10 px-5">Cancelar</button>
+            <button wire:click="guardar" wire:loading.attr="disabled" wire:target="guardar"
+                    class="flex h-10 items-center gap-2 rounded-xl bg-boton-acento px-6 text-sm font-black text-white transition hover:bg-boton-acento/80 disabled:opacity-50">
+                <span wire:loading.remove wire:target="guardar">
+                    <i class="ph-bold ph-paper-plane-tilt mr-1"></i> Confirmar dictamen médico
+                </span>
+                <span wire:loading wire:target="guardar" class="flex items-center gap-2">
+                    <svg class="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
+                    </svg>
+                    Guardando...
+                </span>
+            </button>
         </div>
     </div>
-    @endif
+</div>
+@endif
 </div>

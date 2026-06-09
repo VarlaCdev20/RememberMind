@@ -18,7 +18,7 @@ class FichaPaciente extends Component
             'asignacionTurnoActiva.turno',
             'asignacionTurnoActiva.enfermero',
             'planCuidadoActivo',
-            'valoracionesEnfermeria' => fn($q) => $q->orderBy('fecha', 'desc')->take(5),
+            'valoracionesEnfermeria' => fn($q) => $q->orderBy('fecha_valoracion', 'desc')->orderBy('hora_valoracion', 'desc')->take(5),
             'valoracionesMedicas' => fn($q) => $q->orderBy('fecha', 'desc')->take(5),
             'signosVitales' => fn($q) => $q->orderBy('fecha', 'desc')->orderBy('hora', 'desc')->take(15),
             'administracionesMedicacion' => fn($q) => $q->where('estado', 'PENDIENTE')->orderBy('fecha')->orderBy('hora_programada')->take(15),

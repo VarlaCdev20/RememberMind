@@ -68,6 +68,7 @@ class AdultoMayor extends Model
         // ── Fase 6: flujo de admisión ──────────────────────────────────────────
         'motivo_ingreso',
         'procedencia_ingreso',
+        'cod_pre_origen',
         // ── Fase 7: asignación de cama ────────────────────────────────────────
         'cod_habitacion',
         'cod_cama',
@@ -199,6 +200,11 @@ class AdultoMayor extends Model
         return $this->hasMany(FichaMedicaAdulto::class, 'cod_am', 'cod_am');
     }
 
+    public function notas()
+    {
+        return $this->hasMany(\App\Models\NotaEvolucionMedica::class, 'cod_am', 'cod_am');
+    }
+
     public function medicaciones()
     {
         return $this->hasMany(MedicacionAdulto::class, 'cod_am', 'cod_am');
@@ -233,7 +239,7 @@ class AdultoMayor extends Model
 
     public function valoracionesMedicas()
     {
-        return $this->hasMany(ValoracionMedicaAdmision::class, 'cod_am', 'cod_am');
+        return $this->hasMany(FichaMedicaAdulto::class, 'cod_am', 'cod_am');
     }
 
     public function planesCuidado()
@@ -312,6 +318,11 @@ class AdultoMayor extends Model
         return $this->hasOne(AsignacionTurnoAdulto::class, 'cod_am', 'cod_am')
             ->whereIn('estado', ['ACTIVO', 'ACTIVA'])
             ->latest('fecha_inicio');
+    }
+
+    public function preadmisionOrigen()
+    {
+        return $this->belongsTo(Preadmision::class, 'cod_pre_origen', 'cod_pre');
     }
 
     public function evaluacionesGeriatricas()

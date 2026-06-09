@@ -42,17 +42,26 @@ class Familiar extends Model
     protected $table = 'familiares';
     protected $primaryKey = 'cod_fam';
 
-    // PK es integer autoincrement según migración: $table->increments('cod_fam')
     public $incrementing = false;
     protected $keyType = 'string';
     protected $prefixCode = 'FAM';
-    protected $digitsCode = 3;
+    protected $digitsCode = 5;
 
     public $timestamps = true;
 
     protected $fillable = [
+        'cod_fam',
+        'nombres',
+        'ap_paterno',
+        'ap_materno',
+        'ci',
         'parentesco',
+        'parentesco_vinculo',
+        'telefono',
+        'celular',
+        'correo',
         'direccion',
+        'zona',
         'ocupacion',
         'es_responsable',
         'estado',

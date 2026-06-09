@@ -225,18 +225,21 @@
                                 <thead class="bg-fondo-card text-xs uppercase text-titulo">
                                     <tr>
                                         <th class="px-4 py-3">Fecha</th>
-                                        <th class="px-4 py-3">Puntuación Barthel</th>
-                                        <th class="px-4 py-3">Nivel Dependencia</th>
-                                        <th class="px-4 py-3">Enfermero(a)</th>
+                                        <th class="px-4 py-3">Estado General</th>
+                                        <th class="px-4 py-3">Riesgo Caida</th>
+                                        <th class="px-4 py-3">Registrado Por</th>
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-borde">
                                     @foreach($adultoMayor->valoracionesEnfermeria as $val)
                                     <tr class="hover:bg-fondo-card/50">
-                                        <td class="px-4 py-3">{{ \Carbon\Carbon::parse($val->fecha)->format('d/m/Y') }}</td>
-                                        <td class="px-4 py-3">{{ $val->puntuacion_barthel ?? 'N/A' }}</td>
-                                        <td class="px-4 py-3">{{ $val->nivel_dependencia ?? 'N/A' }}</td>
-                                        <td class="px-4 py-3">{{ $val->enfermero->nombres ?? 'N/A' }}</td>
+                                        <td class="px-4 py-3">
+                                            {{ \Carbon\Carbon::parse($val->fecha_valoracion)->format('d/m/Y') }}
+                                            <div class="text-xs text-parrafo/60">{{ $val->hora_valoracion ? \Carbon\Carbon::parse($val->hora_valoracion)->format('H:i') : 'SIN HORA' }}</div>
+                                        </td>
+                                        <td class="px-4 py-3">{{ $val->estado_general ?? 'N/A' }}</td>
+                                        <td class="px-4 py-3">{{ $val->riesgo_caida ?? 'N/A' }}</td>
+                                        <td class="px-4 py-3">{{ $val->registradoPor->name ?? $val->registradoPor->nombres ?? 'N/A' }}</td>
                                     </tr>
                                     @endforeach
                                 </tbody>

@@ -123,6 +123,7 @@ Route::middleware([
                 ->middleware('permission:admisiones.ver_dashboard')
                 ->group(function () {
                     Route::get('/preadmisiones', \App\Livewire\Admin\Admisiones\PreadmisionesPanel::class)->name('preadmisiones');
+                    Route::get('/preadmisiones/rechazadas', \App\Livewire\Admin\Admisiones\PreadmisionesPanel::class)->name('preadmisiones.rechazadas');
                     Route::get('/preadmision', \App\Livewire\Admin\Admisiones\PreadmisionWizard::class)->name('preadmision');
                 });
 
@@ -431,43 +432,77 @@ Route::middleware([
             Route::prefix('medico')
                 ->name('medico.')
                 ->group(function () {
+                    // Dashboard: estadísticas, KPIs, gráficos, cola de valoraciones
                     Route::get('/dashboard', \App\Livewire\Admin\Medico\DashboardMedico::class)
                         ->name('dashboard');
-                        
-                    // Admisiones Médicas
+
+                    // Admisiones: valoraciones y decisiones se muestran en el dashboard
+                    // con filtro de sección (querystring ?seccion=X)
                     Route::get('/valoraciones-medicas', \App\Livewire\Admin\Medico\DashboardMedico::class)
                         ->name('valoraciones');
                     Route::get('/decisiones-admision', \App\Livewire\Admin\Medico\DashboardMedico::class)
                         ->name('decisiones');
-                        
-                    // Pacientes
-                    Route::get('/pacientes-observacion', \App\Livewire\Admin\Medico\DashboardMedico::class)
+
+                    // Seguimiento: lista de pacientes con tabs
+                    // Tab 'activos' = seguimiento general
+                    Route::get('/pacientes-seguimiento', \App\Livewire\Admin\Medico\PacientesSeguimientoPanel::class)
                         ->name('pacientes.observacion');
-                    Route::get('/historial-clinico', \App\Livewire\Admin\Medico\DashboardMedico::class)
+
+                    // Tab 'historial' = todos los pacientes (sin filtro de estado)
+                    Route::get('/historial-clinico', \App\Livewire\Admin\Medico\PacientesSeguimientoPanel::class)
                         ->name('pacientes.historial');
+
+                    // Tab 'interconsultas' = pacientes con notas INTERCONSULTA activas
+                    Route::get('/interconsultas', \App\Livewire\Admin\Medico\PacientesSeguimientoPanel::class)
+                        ->name('interconsultas');
+
+                    // Monitor de signos vitales: todos los pacientes activos con alertas PA/FC/SpO2/Temp/Glucosa
+                    Route::get('/signos-vitales', \App\Livewire\Admin\Medico\SignosVitalesPanel::class)
+                        ->name('signos-vitales');
+
+                    // Ficha clínica integrada por paciente (6 tabs: resumen, notas, signos, medicación, funcional, geriátrico)
+                    Route::get('/paciente/{adulto}', \App\Livewire\Admin\Medico\FichaClinicaIntegradaPanel::class)
+                        ->name('paciente.ficha');
                 });
 
             // ── Psicología ─────────────────────────
             Route::prefix('psicologia')
                 ->name('psicologia.')
                 ->group(function () {
-                    Route::get('/dashboard', [DashboardController::class, 'index'])
+                    Route::get('/dashboard', \App\Livewire\Admin\Psicologia\DashboardPsicologo::class)
                         ->name('dashboard');
-                        
-                    // Psicología
-                    Route::get('/evaluaciones-asignadas', [DashboardController::class, 'index'])
+
+                    // Evaluaciones asignadas → dashboard principal
+                    Route::get('/evaluaciones-asignadas', \App\Livewire\Admin\Psicologia\DashboardPsicologo::class)
                         ->name('evaluaciones');
                     Route::get('/seguimiento-emocional', [DashboardController::class, 'index'])
                         ->name('seguimiento');
                     Route::get('/alertas-conductuales', [DashboardController::class, 'index'])
                         ->name('alertas');
-                        
+
+                    // Evaluaciones por área geriátrica
+                    Route::get('/evaluacion/cognitiva', \App\Livewire\Admin\Psicologia\EvaluacionesAreaPanel::class)
+                        ->defaults('codArea', 'ARE_COG')
+                        ->name('evaluacion.cognitiva');
+                    Route::get('/evaluacion/afectiva', \App\Livewire\Admin\Psicologia\EvaluacionesAreaPanel::class)
+                        ->defaults('codArea', 'ARE_AFE')
+                        ->name('evaluacion.afectiva');
+                    Route::get('/evaluacion/funcionamiento', \App\Livewire\Admin\Psicologia\EvaluacionesAreaPanel::class)
+                        ->defaults('codArea', 'ARE_FUN')
+                        ->name('evaluacion.funcionamiento');
+                    Route::get('/evaluacion/nutricional', \App\Livewire\Admin\Psicologia\EvaluacionesAreaPanel::class)
+                        ->defaults('codArea', 'ARE_NUT')
+                        ->name('evaluacion.nutricional');
+                    Route::get('/evaluacion/entorno', \App\Livewire\Admin\Psicologia\EvaluacionesAreaPanel::class)
+                        ->defaults('codArea', 'ARE_SOC')
+                        ->name('evaluacion.entorno');
+
                     // Pacientes
                     Route::get('/pacientes-derivados', [DashboardController::class, 'index'])
                         ->name('pacientes.derivados');
                     Route::get('/historial-psicologico', [DashboardController::class, 'index'])
                         ->name('pacientes.historial');
-                        
+
                     // Reportes
                     Route::get('/reportes-psicologicos', [DashboardController::class, 'index'])
                         ->name('reportes');

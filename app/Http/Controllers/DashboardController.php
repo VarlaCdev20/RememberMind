@@ -35,7 +35,12 @@ class DashboardController extends Controller
         // 1. Auditoría institucional (Evento en ESPAÑOL con contexto extendido)
         $this->registrarAcceso($usuario);
 
-        // 2. Obtención de datos (Optimizado mediante Caché en el Servicio)
+        // 2. Redirección basada en rol
+        if ($usuario->hasRole(['ENFERMEROS', 'MEDICO GENERAL/GERIATRA'])) {
+            return redirect()->route('admin.enfermeria.dashboard');
+        }
+
+        // 3. Obtención de datos (Optimizado mediante Caché en el Servicio)
         $datos = $this->dashboardService->obtenerDatosDashboard($usuario);
 
         return view('dashboard', $datos);
