@@ -10,7 +10,7 @@ use Illuminate\Queue\SerializesModels;
 use App\Models\User;
 use App\Services\Usuarios\UsuarioFichaService;
 use App\Services\Usuarios\DocumentacionUsuarioService;
-use App\Services\Reports\ReportFileNameService;
+use App\Services\Reportes\ReportFileNameService;
 use App\Mail\UsuarioFichaAdjuntaMail;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
@@ -59,10 +59,10 @@ class EnviarFichaUsuarioJob implements ShouldQueue
             // Generar PDF en memoria o usando DomPDF/Spatie
             $pdfContent = null;
             try {
-                $pdfContent = \Spatie\LaravelPdf\Facades\Pdf::view('reports.usuarios.expediente_ficha', $viewData)->output();
+                $pdfContent = \Spatie\LaravelPdf\Facades\Pdf::view('pdf.exports.usuarios.expediente_ficha', $viewData)->output();
             } catch (\Throwable $e) {
                 Log::warning("Spatie PDF falló en cola para enviar-ficha: {$e->getMessage()}. Usando DomPDF.");
-                $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('reports.usuarios.expediente_ficha', $viewData)
+                $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('pdf.exports.usuarios.expediente_ficha', $viewData)
                     ->setPaper('a4', 'portrait')
                     ->setWarnings(false);
                 $pdfContent = $pdf->output();
@@ -95,3 +95,5 @@ class EnviarFichaUsuarioJob implements ShouldQueue
         }
     }
 }
+
+

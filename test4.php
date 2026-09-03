@@ -1,1 +1,0 @@
-<?php require __DIR__."/vendor/autoload.php"; $app = require_once __DIR__."/bootstrap/app.php"; $kernel = $app->make(Illuminate\Contracts\Console\Kernel::class); $kernel->bootstrap(); try { echo count(\App\Models\User::role("admin")->get()); } catch (\Throwable $e) { echo $e->getMessage() . "\n" . $e->getFile() . ":" . $e->getLine(); }

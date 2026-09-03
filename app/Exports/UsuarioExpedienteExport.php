@@ -27,7 +27,7 @@ class UsuarioExpedienteExport implements FromView, ShouldAutoSize
         $checklist = $docService->obtenerChecklistUsuario($this->usuario);
         $actividades = $fichaService->obtenerHistorialActividad($this->usuario)->items();
 
-        return view('reports.usuarios.excel_ficha', [
+        return view('pdf.exports.usuarios.excel_ficha', [
             'usuario' => $this->usuario,
             'rol' => $expediente['rol'],
             'nombre_rol' => $expediente['nombre_rol'],
@@ -40,3 +40,4 @@ class UsuarioExpedienteExport implements FromView, ShouldAutoSize
         ]);
     }
 }
+

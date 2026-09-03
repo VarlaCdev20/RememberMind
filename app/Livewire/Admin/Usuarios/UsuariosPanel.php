@@ -2216,16 +2216,16 @@ class UsuariosPanel extends Component
                 'usuario' => auth()->user()->name,
             ];
 
-            $fileNameService = app(\App\Services\Reports\ReportFileNameService::class);
+            $fileNameService = app(\App\Services\Reportes\ReportFileNameService::class);
             $filename = $fileNameService->generate('usuarios_remembermind', 'pdf');
 
-            $exportService = app(\App\Services\Reports\ReportExportService::class);
+            $exportService = app(\App\Services\Reportes\ReportExportService::class);
 
             activity('Usuarios')
                 ->causedBy(auth()->user())
                 ->log('Se exportó el reporte general de usuarios en formato PDF.');
 
-            return $exportService->exportPdf('reports.usuarios.general', $viewData, $filename);
+            return $exportService->exportPdf('pdf.exports.usuarios.general', $viewData, $filename);
         } catch (\Throwable $e) {
             Log::error("Error al exportar PDF de usuarios: " . $e->getMessage());
             $this->dispatch('swal', [
@@ -2248,10 +2248,10 @@ class UsuariosPanel extends Component
         }
 
         try {
-            $fileNameService = app(\App\Services\Reports\ReportFileNameService::class);
+            $fileNameService = app(\App\Services\Reportes\ReportFileNameService::class);
             $filename = $fileNameService->generate('usuarios_remembermind', 'xlsx');
 
-            $exportService = app(\App\Services\Reports\ReportExportService::class);
+            $exportService = app(\App\Services\Reportes\ReportExportService::class);
 
             activity('Usuarios')
                 ->causedBy(auth()->user())
@@ -2280,10 +2280,10 @@ class UsuariosPanel extends Component
         }
 
         try {
-            $fileNameService = app(\App\Services\Reports\ReportFileNameService::class);
+            $fileNameService = app(\App\Services\Reportes\ReportFileNameService::class);
             $filename = $fileNameService->generate('usuarios_remembermind', 'csv');
 
-            $exportService = app(\App\Services\Reports\ReportExportService::class);
+            $exportService = app(\App\Services\Reportes\ReportExportService::class);
 
             activity('Usuarios')
                 ->causedBy(auth()->user())
@@ -2355,10 +2355,10 @@ class UsuariosPanel extends Component
 
             $pdfContent = null;
             try {
-                $pdfContent = \Spatie\LaravelPdf\Facades\Pdf::view('reports.usuarios.solicitud_documental_pdf', $viewData)->output();
+                $pdfContent = \Spatie\LaravelPdf\Facades\Pdf::view('pdf.exports.usuarios.solicitud_documental_pdf', $viewData)->output();
             } catch (\Throwable $e) {
                 Log::warning("Spatie PDF falló al generar adjunto en panel: {$e->getMessage()}. Usando DomPDF.");
-                $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('reports.usuarios.solicitud_documental_pdf', $viewData)
+                $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('pdf.exports.usuarios.solicitud_documental_pdf', $viewData)
                     ->setPaper('a4', 'portrait')
                     ->setWarnings(false);
                 $pdfContent = $pdf->output();
@@ -2580,3 +2580,5 @@ class UsuariosPanel extends Component
         ]);
     }
 }
+
+

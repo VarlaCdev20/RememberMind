@@ -5,9 +5,9 @@ namespace App\Http\Controllers\Admin\AreasInstitucionales;
 use App\Http\Controllers\Controller;
 use App\Models\AreaInstitucional;
 use App\Models\User;
-use App\Services\Reports\ReportExportService;
-use App\Services\Reports\ReportFileNameService;
-use App\Services\Reports\AreasReportDataService;
+use App\Services\Reportes\ReportExportService;
+use App\Services\Reportes\ReportFileNameService;
+use App\Services\Reportes\AreasReportDataService;
 use App\Exports\AreasInstitucionalesExport;
 use App\Exports\UsuariosPorAreaExport;
 use Illuminate\Support\Str;
@@ -102,7 +102,7 @@ class AreaReporteController extends Controller
                 ])
                 ->log("Se exportó el reporte general de áreas institucionales en formato PDF.");
 
-            return $this->exportService->exportPdf('reports.areas.general', $viewData, $filename);
+            return $this->exportService->exportPdf('pdf.exports.areas.general', $viewData, $filename);
 
         } catch (\Throwable $e) {
             Log::error("Error exportar PDF general: " . $e->getMessage());
@@ -136,7 +136,7 @@ class AreaReporteController extends Controller
                 ])
                 ->log("Se exportó el reporte del área {$area->nombre} en formato PDF.");
 
-            return $this->exportService->exportPdf('reports.areas.area', $data, $filename);
+            return $this->exportService->exportPdf('pdf.exports.areas.area', $data, $filename);
 
         } catch (\Throwable $e) {
             Log::error("Error exportar PDF área ($codArea): " . $e->getMessage());
@@ -220,3 +220,5 @@ class AreaReporteController extends Controller
         }
     }
 }
+
+

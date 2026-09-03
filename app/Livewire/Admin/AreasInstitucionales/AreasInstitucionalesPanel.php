@@ -9,8 +9,8 @@ use App\Models\User;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
-use App\Services\Reports\ReportExportService;
-use App\Services\Reports\ReportFileNameService;
+use App\Services\Reportes\ReportExportService;
+use App\Services\Reportes\ReportFileNameService;
 use App\Exports\AreasInstitucionalesExport;
 
 class AreasInstitucionalesPanel extends Component
@@ -548,7 +548,7 @@ class AreasInstitucionalesPanel extends Component
                 ->causedBy(Auth::user())
                 ->log('Se exportó el reporte general de áreas en formato PDF con la nueva arquitectura.');
 
-            return $exportService->exportPdf('reports.areas.general', $viewData, $filename);
+            return $exportService->exportPdf('pdf.exports.areas.general', $viewData, $filename);
         } catch (\Throwable $e) {
             \Illuminate\Support\Facades\Log::error("Error exportar PDF general: " . $e->getMessage());
             $this->dispatch('swal', [
@@ -599,7 +599,7 @@ class AreasInstitucionalesPanel extends Component
                 ->causedBy(Auth::user())
                 ->log("Se exportó el reporte del área '{$area->nombre}' en formato PDF.");
 
-            return $exportService->exportPdf('reports.areas.area', $data, $filename);
+            return $exportService->exportPdf('pdf.exports.areas.area', $data, $filename);
         } catch (\Throwable $e) {
             \Illuminate\Support\Facades\Log::error("Error exportar PDF área: " . $e->getMessage());
             $this->dispatch('swal', [
@@ -735,52 +735,52 @@ class AreasInstitucionalesPanel extends Component
 
     public function obtenerDatosReporteGeneral()
     {
-        return app(\App\Services\Reports\AreasReportDataService::class)->getGeneralReportData();
+        return app(\App\Services\Reportes\AreasReportDataService::class)->getGeneralReportData();
     }
 
     public function obtenerDatosReporteArea($codArea)
     {
-        return app(\App\Services\Reports\AreasReportDataService::class)->getAreaReportData($codArea);
+        return app(\App\Services\Reportes\AreasReportDataService::class)->getAreaReportData($codArea);
     }
 
     public function obtenerDatosGraficoUsuariosPorArea()
     {
-        return app(\App\Services\Reports\AreasReportDataService::class)->getUsuariosPorArea();
+        return app(\App\Services\Reportes\AreasReportDataService::class)->getUsuariosPorArea();
     }
 
     public function obtenerDatosGraficoAreasPorTipo()
     {
-        return app(\App\Services\Reports\AreasReportDataService::class)->getAreasPorTipo();
+        return app(\App\Services\Reportes\AreasReportDataService::class)->getAreasPorTipo();
     }
 
     public function obtenerDatosGraficoActivosInactivosPorArea()
     {
-        return app(\App\Services\Reports\AreasReportDataService::class)->getActivosInactivosPorArea();
+        return app(\App\Services\Reportes\AreasReportDataService::class)->getActivosInactivosPorArea();
     }
 
     public function obtenerDatosGraficoEvolucionMensual()
     {
-        return app(\App\Services\Reports\AreasReportDataService::class)->getEvolucionMensualGlobal();
+        return app(\App\Services\Reportes\AreasReportDataService::class)->getEvolucionMensualGlobal();
     }
 
     public function obtenerDatosGraficoActivosInactivosArea($codArea)
     {
-        return app(\App\Services\Reports\AreasReportDataService::class)->getActivosInactivosArea($codArea);
+        return app(\App\Services\Reportes\AreasReportDataService::class)->getActivosInactivosArea($codArea);
     }
 
     public function obtenerDatosGraficoUsuariosPorRolArea($codArea)
     {
-        return app(\App\Services\Reports\AreasReportDataService::class)->getUsuariosPorRolArea($codArea);
+        return app(\App\Services\Reportes\AreasReportDataService::class)->getUsuariosPorRolArea($codArea);
     }
 
     public function obtenerDatosGraficoEvolucionArea($codArea)
     {
-        return app(\App\Services\Reports\AreasReportDataService::class)->getEvolucionArea($codArea);
+        return app(\App\Services\Reportes\AreasReportDataService::class)->getEvolucionArea($codArea);
     }
 
     public function obtenerDatosGraficoRankingAreas()
     {
-        return app(\App\Services\Reports\AreasReportDataService::class)->getRankingAreasUsuarios();
+        return app(\App\Services\Reportes\AreasReportDataService::class)->getRankingAreasUsuarios();
     }
 
     // ── AUXILIARES Y FORMATO DE UI ──
@@ -825,3 +825,5 @@ class AreasInstitucionalesPanel extends Component
         $this->icono = 'ph-buildings';
     }
 }
+
+

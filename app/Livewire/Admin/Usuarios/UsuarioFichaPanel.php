@@ -322,10 +322,10 @@ class UsuarioFichaPanel extends Component
                 'usuario_solicitante' => auth()->user()->name,
             ];
 
-            $fileNameService = app(\App\Services\Reports\ReportFileNameService::class);
+            $fileNameService = app(\App\Services\Reportes\ReportFileNameService::class);
             $filename = $fileNameService->generate('expediente_' . $this->usuario->cod_usu, 'pdf');
 
-            $exportService = app(\App\Services\Reports\ReportExportService::class);
+            $exportService = app(\App\Services\Reportes\ReportExportService::class);
 
             activity('Usuarios')
                 ->causedBy(auth()->user())
@@ -333,7 +333,7 @@ class UsuarioFichaPanel extends Component
                 ->event('reportes')
                 ->log("Generó el expediente institucional en formato PDF.");
 
-            return $exportService->exportPdf('reports.usuarios.expediente_ficha', $viewData, $filename);
+            return $exportService->exportPdf('pdf.exports.usuarios.expediente_ficha', $viewData, $filename);
         } catch (\Throwable $e) {
             Log::error("Error al exportar PDF de expediente: " . $e->getMessage());
             $this->dispatch('swal', [
@@ -357,10 +357,10 @@ class UsuarioFichaPanel extends Component
         }
 
         try {
-            $fileNameService = app(\App\Services\Reports\ReportFileNameService::class);
+            $fileNameService = app(\App\Services\Reportes\ReportFileNameService::class);
             $filename = $fileNameService->generate('expediente_' . $this->usuario->cod_usu, 'xlsx');
 
-            $exportService = app(\App\Services\Reports\ReportExportService::class);
+            $exportService = app(\App\Services\Reportes\ReportExportService::class);
 
             activity('Usuarios')
                 ->causedBy(auth()->user())
@@ -412,3 +412,5 @@ class UsuarioFichaPanel extends Component
         ]);
     }
 }
+
+

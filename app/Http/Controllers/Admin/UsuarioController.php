@@ -214,10 +214,10 @@ class UsuarioController extends Controller
                 'usuario_solicitante' => auth()->user()->name,
             ];
 
-            $fileNameService = app(\App\Services\Reports\ReportFileNameService::class);
+            $fileNameService = app(\App\Services\Reportes\ReportFileNameService::class);
             $filename = $fileNameService->generate('expediente_' . $usuario->cod_usu, 'pdf');
 
-            $exportService = app(\App\Services\Reports\ReportExportService::class);
+            $exportService = app(\App\Services\Reportes\ReportExportService::class);
 
             activity('Usuarios')
                 ->causedBy(auth()->user())
@@ -225,7 +225,7 @@ class UsuarioController extends Controller
                 ->event('reportes')
                 ->log("Descargó la ficha institucional completa en PDF para el usuario: {$usuario->name}.");
 
-            return $exportService->exportPdf('reports.usuarios.expediente_ficha', $viewData, $filename);
+            return $exportService->exportPdf('pdf.exports.usuarios.expediente_ficha', $viewData, $filename);
         } catch (\Exception $e) {
             return back()->with('error', 'Error al generar la ficha PDF: ' . $e->getMessage());
         }
@@ -251,10 +251,10 @@ class UsuarioController extends Controller
                 'usuario_solicitante' => auth()->user()->name,
             ];
 
-            $fileNameService = app(\App\Services\Reports\ReportFileNameService::class);
+            $fileNameService = app(\App\Services\Reportes\ReportFileNameService::class);
             $filename = $fileNameService->generate('checklist_documentacion_' . $usuario->cod_usu, 'pdf');
 
-            $exportService = app(\App\Services\Reports\ReportExportService::class);
+            $exportService = app(\App\Services\Reportes\ReportExportService::class);
 
             activity('Usuarios')
                 ->causedBy(auth()->user())
@@ -262,7 +262,7 @@ class UsuarioController extends Controller
                 ->event('reportes')
                 ->log("Descargó el expediente documental en PDF para el usuario: {$usuario->name}.");
 
-            return $exportService->exportPdf('reports.usuarios.documentacion_pdf', $viewData, $filename);
+            return $exportService->exportPdf('pdf.exports.usuarios.documentacion_pdf', $viewData, $filename);
         } catch (\Exception $e) {
             return back()->with('error', 'Error al generar la documentación en PDF: ' . $e->getMessage());
         }
@@ -286,10 +286,10 @@ class UsuarioController extends Controller
                 'usuario_solicitante' => auth()->user()->name,
             ];
 
-            $fileNameService = app(\App\Services\Reports\ReportFileNameService::class);
+            $fileNameService = app(\App\Services\Reportes\ReportFileNameService::class);
             $filename = $fileNameService->generate('control_horarios_' . $usuario->cod_usu, 'pdf');
 
-            $exportService = app(\App\Services\Reports\ReportExportService::class);
+            $exportService = app(\App\Services\Reportes\ReportExportService::class);
 
             activity('Usuarios')
                 ->causedBy(auth()->user())
@@ -297,7 +297,7 @@ class UsuarioController extends Controller
                 ->event('reportes')
                 ->log("Descargó el reporte de horarios y turnos en PDF para el usuario: {$usuario->name}.");
 
-            return $exportService->exportPdf('reports.usuarios.horarios_pdf', $viewData, $filename);
+            return $exportService->exportPdf('pdf.exports.usuarios.horarios_pdf', $viewData, $filename);
         } catch (\Exception $e) {
             return back()->with('error', 'Error al generar los horarios en PDF: ' . $e->getMessage());
         }
@@ -350,10 +350,10 @@ class UsuarioController extends Controller
                 'usuario' => auth()->check() ? auth()->user()->name : 'Sistema',
             ];
 
-            $fileNameService = app(\App\Services\Reports\ReportFileNameService::class);
+            $fileNameService = app(\App\Services\Reportes\ReportFileNameService::class);
             $filename = $fileNameService->generate('solicitud_documental_' . $usuario->cod_usu, 'pdf');
 
-            $exportService = app(\App\Services\Reports\ReportExportService::class);
+            $exportService = app(\App\Services\Reportes\ReportExportService::class);
 
             activity('Usuarios')
                 ->causedBy(auth()->user())
@@ -361,10 +361,12 @@ class UsuarioController extends Controller
                 ->event('reportes')
                 ->log("Descargó la solicitud de documentación institucional en PDF para el usuario: {$usuario->name}.");
 
-            return $exportService->exportPdf('reports.usuarios.solicitud_documental_pdf', $viewData, $filename);
+            return $exportService->exportPdf('pdf.exports.usuarios.solicitud_documental_pdf', $viewData, $filename);
         } catch (\Exception $e) {
             return back()->with('error', 'Error al generar la solicitud de documentación en PDF: ' . $e->getMessage());
         }
     }
 
 }
+
+
