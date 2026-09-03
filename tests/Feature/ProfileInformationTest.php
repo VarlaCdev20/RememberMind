@@ -18,8 +18,10 @@ class ProfileInformationTest extends TestCase
 
         $component = Livewire::test(UpdateProfileInformationForm::class);
 
-        $this->assertEquals($user->name, $component->state['name']);
-        $this->assertEquals($user->email, $component->state['email']);
+        $this->assertEquals($user->nombres, $component->state['nombres']);
+        $this->assertEquals($user->ap_paterno, $component->state['ap_paterno']);
+        $this->assertEquals($user->ap_materno, $component->state['ap_materno']);
+        $this->assertEquals($user->correo, $component->state['correo']);
     }
 
     public function test_profile_information_can_be_updated(): void
@@ -27,10 +29,19 @@ class ProfileInformationTest extends TestCase
         $this->actingAs($user = User::factory()->create());
 
         Livewire::test(UpdateProfileInformationForm::class)
-            ->set('state', ['name' => 'Test Name', 'email' => 'test@example.com'])
+            ->set('state', [
+                'nombres' => 'Test',
+                'ap_paterno' => 'Usuario',
+                'ap_materno' => 'Prueba',
+                'correo' => 'test@example.com',
+            ])
             ->call('updateProfileInformation');
 
-        $this->assertEquals('Test Name', $user->fresh()->name);
-        $this->assertEquals('test@example.com', $user->fresh()->email);
+        $user->refresh();
+
+        $this->assertEquals('Test', $user->nombres);
+        $this->assertEquals('Usuario', $user->ap_paterno);
+        $this->assertEquals('Prueba', $user->ap_materno);
+        $this->assertEquals('test@example.com', $user->correo);
     }
 }

@@ -14,34 +14,27 @@ use Laravel\Jetstream\Features;
  */
 class UserFactory extends Factory
 {
-    /**
-     * The current password being used by the factory.
-     */
     protected static ?string $password;
 
-    /**
-     * Define the model's default state.
-     *
-     * @return array<string, mixed>
-     */
     public function definition(): array
     {
         return [
-            'name' => fake()->name(),
-            'email' => fake()->unique()->safeEmail(),
+            'nombres' => fake()->firstName(),
+            'ap_paterno' => fake()->lastName(),
+            'ap_materno' => fake()->lastName(),
+            'correo' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
             'two_factor_secret' => null,
             'two_factor_recovery_codes' => null,
             'remember_token' => Str::random(10),
-            'profile_photo_path' => null,
+            'foto_de_perfil' => null,
             'current_team_id' => null,
+            'estado' => 'ACTIVO',
+            'acceso_sistema' => 'SI',
         ];
     }
 
-    /**
-     * Indicate that the model's email address should be unverified.
-     */
     public function unverified(): static
     {
         return $this->state(fn (array $attributes) => [
@@ -49,9 +42,6 @@ class UserFactory extends Factory
         ]);
     }
 
-    /**
-     * Indicate that the user should have a personal team.
-     */
     public function withPersonalTeam(?callable $callback = null): static
     {
         if (! Features::hasTeamFeatures()) {
@@ -62,7 +52,7 @@ class UserFactory extends Factory
             Team::factory()
                 ->state(fn (array $attributes, User $user) => [
                     'name' => $user->name.'\'s Team',
-                    'user_id' => $user->id,
+                    'user_id' => $user->cod_usu,
                     'personal_team' => true,
                 ])
                 ->when(is_callable($callback), $callback),

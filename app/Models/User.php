@@ -6,6 +6,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Jetstream\HasProfilePhoto;
+use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 use Spatie\Activitylog\Traits\LogsActivity;
@@ -13,7 +14,7 @@ use Spatie\Activitylog\LogOptions;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, HasProfilePhoto, Notifiable, HasRoles, LogsActivity;
+    use HasApiTokens, HasFactory, HasProfilePhoto, TwoFactorAuthenticatable, Notifiable, HasRoles, LogsActivity;
 
     protected $table = 'users';
     protected $primaryKey = 'cod_usu';

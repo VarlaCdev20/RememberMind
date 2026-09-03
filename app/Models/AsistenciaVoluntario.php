@@ -6,7 +6,7 @@ use App\Traits\GeneraCodigo;
 
 use Illuminate\Database\Eloquent\Model;
 
-class AsistenciaVoluntarios extends Model
+class AsistenciaVoluntario extends Model
 {
     protected $table = 'asistencia_voluntarios';
     protected $primaryKey = 'cod_asis_vol';

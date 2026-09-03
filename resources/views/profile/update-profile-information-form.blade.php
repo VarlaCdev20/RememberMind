@@ -51,18 +51,32 @@
  </div>
  @endif
 
- <!-- Name -->
+ <!-- Nombres -->
  <div class="col-span-6 sm:col-span-4">
- <x-label for="name" value="{{ __('Name') }}" />
- <x-input id="name" type="text" class="mt-1 block w-full" wire:model="state.name" required autocomplete="name" />
- <x-input-error for="name" class="mt-2" />
+ <x-label for="nombres" value="{{ __('Nombres') }}" />
+ <x-input id="nombres" type="text" class="mt-1 block w-full" wire:model="state.nombres" required autocomplete="given-name" />
+ <x-input-error for="nombres" class="mt-2" />
+ </div>
+
+ <!-- Apellido paterno -->
+ <div class="col-span-6 sm:col-span-4">
+ <x-label for="ap_paterno" value="{{ __('Apellido paterno') }}" />
+ <x-input id="ap_paterno" type="text" class="mt-1 block w-full" wire:model="state.ap_paterno" required autocomplete="family-name" />
+ <x-input-error for="ap_paterno" class="mt-2" />
+ </div>
+
+ <!-- Apellido materno -->
+ <div class="col-span-6 sm:col-span-4">
+ <x-label for="ap_materno" value="{{ __('Apellido materno') }}" />
+ <x-input id="ap_materno" type="text" class="mt-1 block w-full" wire:model="state.ap_materno" autocomplete="additional-name" />
+ <x-input-error for="ap_materno" class="mt-2" />
  </div>
 
  <!-- Email -->
  <div class="col-span-6 sm:col-span-4">
- <x-label for="email" value="{{ __('Email') }}" />
- <x-input id="email" type="email" class="mt-1 block w-full" wire:model="state.email" required autocomplete="username" />
- <x-input-error for="email" class="mt-2" />
+ <x-label for="correo" value="{{ __('Correo electrónico') }}" />
+ <x-input id="correo" type="email" class="mt-1 block w-full" wire:model="state.correo" required autocomplete="username" />
+ <x-input-error for="correo" class="mt-2" />
 
  @if (Laravel\Fortify\Features::enabled(Laravel\Fortify\Features::emailVerification()) && ! $this->user->hasVerifiedEmail())
  <p class="text-sm mt-2">

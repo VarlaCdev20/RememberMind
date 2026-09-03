@@ -108,14 +108,16 @@ class PersonalInstitucionalHorariosTest extends TestCase
 
     private function crearArea(string $codigo, string $nombre, string $tipoArea): AreaInstitucional
     {
-        return AreaInstitucional::create([
-            'cod_area' => $codigo,
-            'nombre' => $nombre,
-            'slug' => strtolower($codigo),
-            'tipo_area' => $tipoArea,
-            'estado' => 'ACTIVA',
-            'orden' => 1,
-        ]);
+        return AreaInstitucional::updateOrCreate(
+            ['cod_area' => $codigo],
+            [
+                'nombre' => $nombre,
+                'slug' => strtolower($codigo),
+                'tipo_area' => $tipoArea,
+                'estado' => 'ACTIVA',
+                'orden' => 1,
+            ]
+        );
     }
 
     private function crearTurno(string $codigo, string $nombre, string $horaInicio, string $horaFin): TurnoInstitucional
