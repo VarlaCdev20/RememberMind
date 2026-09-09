@@ -19,13 +19,8 @@
     
     <!-- LIBRERÍAS FALTANTES (Corrección de Experto) -->
     <!-- Chart.js para el gráfico de impacto -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- GSAP & ScrollTrigger para animaciones complejas y Parallax -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
     <!-- AOS CSS & JS para animaciones fluidas al hacer scroll -->
-    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
 
     <style>
         .welcome-page {

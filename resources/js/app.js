@@ -24,6 +24,7 @@ Chart.register(ChartDataLabels);
 window.gsap = gsap;
 window.ScrollTrigger = ScrollTrigger;
 window.Chart = Chart;
+window.AOS = AOS;
 
 // Inicializar AOS
 document.addEventListener('DOMContentLoaded', () => {
@@ -58,51 +59,7 @@ document.addEventListener('DOMContentLoaded', () => {
     updateLight();
 });
 
-// Intercepta enlaces internos para usar navegacion de Livewire y evitar recargas completas.
-document.addEventListener('click', (event) => {
-    if (event.defaultPrevented || event.button !== 0) {
-        return;
-    }
-
-    if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) {
-        return;
-    }
-
-    const anchor = event.target instanceof Element ? event.target.closest('a[href]') : null;
-
-    if (!anchor) {
-        return;
-    }
-
-    if (anchor.hasAttribute('download') || anchor.getAttribute('target') === '_blank' || anchor.dataset.noNavigate !== undefined) {
-        return;
-    }
-
-    const href = anchor.getAttribute('href');
-
-    if (!href || href === '#' || href.startsWith('mailto:') || href.startsWith('tel:') || href.startsWith('javascript:')) {
-        return;
-    }
-
-    const url = new URL(href, window.location.origin);
-
-    if (url.origin !== window.location.origin) {
-        return;
-    }
-
-    const samePageHashOnly = url.pathname === window.location.pathname
-        && url.search === window.location.search
-        && url.hash !== '';
-
-    if (samePageHashOnly) {
-        return;
-    }
-
-    if (window.Livewire?.navigate) {
-        event.preventDefault();
-        window.Livewire.navigate(url.toString());
-    }
-}, true);
+// Livewire navigate handled via wire:navigate
 
 import redApoyoTree from './modules/red-apoyo-svg.js';
 window.redApoyoTree = redApoyoTree;
