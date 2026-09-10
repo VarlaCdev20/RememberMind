@@ -1,0 +1,20 @@
+/* ============================================================
+   RememberMind / CENTRO GERIATRICO JARDIN DE LOS RECUERDOS
+   Entrada principal de estilos.
+   ============================================================ */
+
+@import './tokens/tipografia.css';
+@import './tokens/paleta-colores.css';
+@import './tokens/variables-semanticas.css';
+@import './tokens/escala-visual.css';
+@import './base/texturas-tramas.css';
+@import './tokens/modo-oscuro.css';
+@import './components/animaciones-transiciones.css';
+@import './components/componentes-ui.css';
+
+@import './base/documento.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+

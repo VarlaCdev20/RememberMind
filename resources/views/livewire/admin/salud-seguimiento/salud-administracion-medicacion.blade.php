@@ -141,7 +141,7 @@
  </section>
 
  <div class="salud-hidden-livewire-modals">
- <livewire:admin.adultos-mayores.salud.medicacion-adulto-modal :cod_am="$adulto->cod_am" />
- <livewire:admin.adultos-mayores.salud.administracion-medicacion-modal :cod_am="$adulto->cod_am" />
+ <livewire:medicacion.medicacion-adulto-modal :cod_am="$adulto->cod_am" />
+ <livewire:medicacion.administracion-medicacion-modal :cod_am="$adulto->cod_am" />
  </div>
 </div>

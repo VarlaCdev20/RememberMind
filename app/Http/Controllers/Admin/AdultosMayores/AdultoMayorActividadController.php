@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Admin\AdultosMayores;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Admin\AdultosMayores\StoreActividadAdultoRequest;
+use App\Http\Requests\Residentes\StoreActividadAdultoRequest;
 use App\Models\AdultoMayor;
 use App\Models\ActividadAdulto;
 use Illuminate\Http\Request;

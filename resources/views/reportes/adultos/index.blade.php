@@ -5,7 +5,7 @@
 {{-- Chart.js (solo HTML, via Vite bundle) --}}
 @unless($esPdf)
 @push('head-scripts')
-@vite(['resources/js/app.js'])
+@vite(['resources/frontend/scripts/app.js'])
 @endpush
 @endunless
 

@@ -82,7 +82,7 @@
  };
  @endphp
 
- @inject('sidebarService', 'App\Services\SidebarService')
+ @inject('sidebarService', 'App\Services\Identidad\SidebarService')
 
     @php
         $sections = $sidebarService->getSidebar();

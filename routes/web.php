@@ -1,20 +1,20 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\Admin\UsuarioController;
-use App\Http\Controllers\Admin\AdultoMayorController;
-use App\Http\Controllers\Admin\Reportes\ReporteInstitucionalController;
-use App\Http\Controllers\Admin\Reportes\ReporteAdultosController;
-use App\Http\Controllers\Admin\Reportes\ReporteSaludController;
-use App\Http\Controllers\Admin\Reportes\ReporteFamiliaresController;
-use App\Http\Controllers\Admin\Reportes\ReporteEquipoController;
+use App\Http\Controllers\Reportes\DashboardController;
+use App\Http\Controllers\Identidad\UsuarioController;
+use App\Http\Controllers\Residentes\AdultoMayorController;
+use App\Http\Controllers\Reportes\ReporteInstitucionalController;
+use App\Http\Controllers\Reportes\ReporteAdultosController;
+use App\Http\Controllers\Reportes\ReporteSaludController;
+use App\Http\Controllers\Reportes\ReporteFamiliaresController;
+use App\Http\Controllers\Reportes\ReporteEquipoController;
 use App\Http\Controllers\Admin\Reportes\ReporteActividadesController;
-use App\Http\Controllers\Admin\Reportes\ReporteBitacoraController;
-use App\Http\Controllers\Admin\FamiliaSocial\ResumenFamiliaSocialController;
+use App\Http\Controllers\Reportes\ReporteBitacoraController;
+use App\Http\Controllers\Residentes\ResumenFamiliaSocialController;
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('pages.welcome');
 });
 
 // ──────────────────────────────────────────────
@@ -34,7 +34,33 @@ Route::middleware([
         ->group(function () {
 
             // ── Usuarios ─────────────────────────
-            Route::resource('usuarios', UsuarioController::class)->middleware('permission:usuarios.ver');
+            Route::get('usuarios', [UsuarioController::class, 'index'])
+                ->middleware('permission:usuarios.ver')
+                ->name('usuarios.index');
+
+            Route::get('usuarios/create', [UsuarioController::class, 'create'])
+                ->middleware('permission:usuarios.crear')
+                ->name('usuarios.create');
+
+            Route::post('usuarios', [UsuarioController::class, 'store'])
+                ->middleware('permission:usuarios.crear')
+                ->name('usuarios.store');
+
+            Route::get('usuarios/{usuario}', [UsuarioController::class, 'show'])
+                ->middleware('permission:usuarios.ver')
+                ->name('usuarios.show');
+
+            Route::get('usuarios/{usuario}/edit', [UsuarioController::class, 'edit'])
+                ->middleware('permission:usuarios.editar')
+                ->name('usuarios.edit');
+
+            Route::match(['put', 'patch'], 'usuarios/{usuario}', [UsuarioController::class, 'update'])
+                ->middleware('permission:usuarios.editar')
+                ->name('usuarios.update');
+
+            Route::delete('usuarios/{usuario}', [UsuarioController::class, 'destroy'])
+                ->middleware('permission:usuarios.editar')
+                ->name('usuarios.destroy');
 
             Route::patch('usuarios/{usuario}/desactivar', [UsuarioController::class, 'desactivar'])
                 ->middleware('permission:usuarios.cambiar_estado')
@@ -55,12 +81,12 @@ Route::middleware([
             Route::prefix('usuarios/{user}/documentos')
                 ->name('usuarios.documentos.')
                 ->group(function () {
-                    Route::get('/', [\App\Http\Controllers\Admin\Usuarios\DocumentosUsuarioController::class, 'preview'])->name('preview');
-                    Route::get('/pdf', [\App\Http\Controllers\Admin\Usuarios\DocumentosUsuarioController::class, 'paquetePdf'])->name('pdf');
-                    Route::post('/enviar', [\App\Http\Controllers\Admin\Usuarios\DocumentosUsuarioController::class, 'enviarPaqueteCorreo'])->name('enviar');
-                    Route::get('/{documento}/ver', [\App\Http\Controllers\Admin\Usuarios\DocumentosUsuarioController::class, 'verDocumento'])->name('ver');
-                    Route::get('/{documento}/pdf', [\App\Http\Controllers\Admin\Usuarios\DocumentosUsuarioController::class, 'pdfDocumento'])->name('documento-pdf');
-                    Route::get('/{documento}/imprimir', [\App\Http\Controllers\Admin\Usuarios\DocumentosUsuarioController::class, 'imprimirDocumento'])->name('imprimir');
+                    Route::get('/', [\App\Http\Controllers\Documentos\DocumentosUsuarioController::class, 'preview'])->name('preview');
+                    Route::get('/pdf', [\App\Http\Controllers\Documentos\DocumentosUsuarioController::class, 'paquetePdf'])->name('pdf');
+                    Route::post('/enviar', [\App\Http\Controllers\Documentos\DocumentosUsuarioController::class, 'enviarPaqueteCorreo'])->name('enviar');
+                    Route::get('/{documento}/ver', [\App\Http\Controllers\Documentos\DocumentosUsuarioController::class, 'verDocumento'])->name('ver');
+                    Route::get('/{documento}/pdf', [\App\Http\Controllers\Documentos\DocumentosUsuarioController::class, 'pdfDocumento'])->name('documento-pdf');
+                    Route::get('/{documento}/imprimir', [\App\Http\Controllers\Documentos\DocumentosUsuarioController::class, 'imprimirDocumento'])->name('imprimir');
                 });
 
             Route::get('usuarios/{usuario}/solicitud-documental/pdf', [UsuarioController::class, 'solicitudDocumentalPdf'])
@@ -76,22 +102,22 @@ Route::middleware([
                 ->name('usuarios.ficha.enviar-correo');
 
             // ── Personal Institucional ─────────────
-            Route::get('/personal-institucional', \App\Livewire\Admin\PersonalInstitucional\PersonalInstitucionalPanel::class)
+            Route::get('/personal-institucional', \App\Livewire\Identidad\PersonalInstitucionalPanel::class)
                 ->middleware('permission:personal_institucional.ver')
                 ->name('personal-institucional');
 
             // ── Roles y Permisos ─────────────────
-            Route::view('/roles-permisos', 'admin.roles-permisos.index')
+            Route::view('/roles-permisos', 'pages.roles-permisos.index')
                 ->middleware('permission:roles.ver')
                 ->name('roles-permisos.index');
 
             // ── Áreas Institucionales ─────────────
-            Route::view('/areas-institucionales', 'admin.areas-institucionales.index')
+            Route::view('/areas-institucionales', 'pages.areas-institucionales.index')
                 ->middleware('permission:areas.ver')
                 ->name('areas-institucionales.index');
 
             // ── Turnos y Asignaciones ─────────────
-            Route::view('/turnos-asignaciones', 'admin.turnos-asignaciones.index')
+            Route::view('/turnos-asignaciones', 'pages.turnos-asignaciones.index')
                 ->middleware('permission:turnos.ver')
                 ->name('turnos-asignaciones.index');
 
@@ -100,20 +126,20 @@ Route::middleware([
                 ->name('areas-institucionales.reportes.')
                 ->middleware('permission:areas.reportes')
                 ->group(function () {
-                    Route::get('general/pdf', [\App\Http\Controllers\Admin\AreasInstitucionales\AreaReporteController::class, 'generalPdf'])
+                    Route::get('general/pdf', [\App\Http\Controllers\Reportes\AreaReporteController::class, 'generalPdf'])
                         ->name('general.pdf');
-                    Route::get('general/excel', [\App\Http\Controllers\Admin\AreasInstitucionales\AreaReporteController::class, 'generalExcel'])
+                    Route::get('general/excel', [\App\Http\Controllers\Reportes\AreaReporteController::class, 'generalExcel'])
                         ->name('general.excel');
-                    Route::get('general/csv', [\App\Http\Controllers\Admin\AreasInstitucionales\AreaReporteController::class, 'generalCsv'])
+                    Route::get('general/csv', [\App\Http\Controllers\Reportes\AreaReporteController::class, 'generalCsv'])
                         ->name('general.csv');
-                    Route::get('{area}/pdf', [\App\Http\Controllers\Admin\AreasInstitucionales\AreaReporteController::class, 'areaPdf'])
+                    Route::get('{area}/pdf', [\App\Http\Controllers\Reportes\AreaReporteController::class, 'areaPdf'])
                         ->name('area.pdf');
-                    Route::get('{area}/excel', [\App\Http\Controllers\Admin\AreasInstitucionales\AreaReporteController::class, 'areaExcel'])
+                    Route::get('{area}/excel', [\App\Http\Controllers\Reportes\AreaReporteController::class, 'areaExcel'])
                         ->name('area.excel');
                 });
 
             // ── Alertas y Pendientes (Debe definirse antes del resource para evitar colisiones) ──
-            Route::get('adultos-mayores/alertas-pendientes', \App\Livewire\Admin\AdultosMayores\AlertasPendientesPanel::class)
+            Route::get('adultos-mayores/alertas-pendientes', \App\Livewire\Alertas\AlertasPendientesPanel::class)
                 ->middleware('permission:adultos.ver')
                 ->name('adultos-mayores.alertas-pendientes');
 
@@ -122,9 +148,9 @@ Route::middleware([
                 ->name('admisiones.')
                 ->middleware('permission:admisiones.ver_dashboard')
                 ->group(function () {
-                    Route::get('/preadmisiones', \App\Livewire\Admin\Admisiones\PreadmisionesPanel::class)->name('preadmisiones');
-                    Route::get('/preadmisiones/rechazadas', \App\Livewire\Admin\Admisiones\PreadmisionesPanel::class)->name('preadmisiones.rechazadas');
-                    Route::get('/preadmision', \App\Livewire\Admin\Admisiones\PreadmisionWizard::class)->name('preadmision');
+                    Route::get('/preadmisiones', \App\Livewire\Admisiones\PreadmisionesPanel::class)->name('preadmisiones');
+                    Route::get('/preadmisiones/rechazadas', \App\Livewire\Admisiones\PreadmisionesPanel::class)->name('preadmisiones.rechazadas');
+                    Route::get('/preadmision', \App\Livewire\Admisiones\PreadmisionWizard::class)->name('preadmision');
                 });
 
             // ── Adultos Mayores ──────────────────
@@ -154,32 +180,32 @@ Route::middleware([
                 ->name('adultos-mayores.')
                 ->group(function () {
                 // Familiares
-                Route::get('familiares', [\App\Http\Controllers\Admin\AdultosMayores\AdultoMayorFamiliarController::class, 'index'])->name('familiares.index');
-                Route::post('familiares', [\App\Http\Controllers\Admin\AdultosMayores\AdultoMayorFamiliarController::class, 'store'])->middleware('permission:familiares.crear')->name('familiares.store');
-                Route::patch('familiares/{familiar}', [\App\Http\Controllers\Admin\AdultosMayores\AdultoMayorFamiliarController::class, 'update'])->middleware('permission:familiares.editar')->name('familiares.update');
-                Route::delete('familiares/{familiar}', [\App\Http\Controllers\Admin\AdultosMayores\AdultoMayorFamiliarController::class, 'destroy'])->middleware('permission:familiares.anular')->name('familiares.destroy');
-                Route::patch('familiares/{familiar}/restaurar', [\App\Http\Controllers\Admin\AdultosMayores\AdultoMayorFamiliarController::class, 'restore'])->middleware('permission:familiares.editar')->name('familiares.restore');
+                Route::get('familiares', [\App\Http\Controllers\Residentes\AdultoMayorFamiliarController::class, 'index'])->name('familiares.index');
+                Route::post('familiares', [\App\Http\Controllers\Residentes\AdultoMayorFamiliarController::class, 'store'])->middleware('permission:familiares.crear')->name('familiares.store');
+                Route::patch('familiares/{familiar}', [\App\Http\Controllers\Residentes\AdultoMayorFamiliarController::class, 'update'])->middleware('permission:familiares.editar')->name('familiares.update');
+                Route::delete('familiares/{familiar}', [\App\Http\Controllers\Residentes\AdultoMayorFamiliarController::class, 'destroy'])->middleware('permission:familiares.anular')->name('familiares.destroy');
+                Route::patch('familiares/{familiar}/restaurar', [\App\Http\Controllers\Residentes\AdultoMayorFamiliarController::class, 'restore'])->middleware('permission:familiares.editar')->name('familiares.restore');
 
                 // Observaciones
-                Route::get('observaciones', [\App\Http\Controllers\Admin\AdultosMayores\AdultoMayorObservacionController::class, 'index'])->name('observaciones.index');
-                Route::post('observaciones', [\App\Http\Controllers\Admin\AdultosMayores\AdultoMayorObservacionController::class, 'store'])->middleware('permission:observaciones.crear')->name('observaciones.store');
-                Route::patch('observaciones/{observacion}', [\App\Http\Controllers\Admin\AdultosMayores\AdultoMayorObservacionController::class, 'update'])->middleware('permission:observaciones.editar')->name('observaciones.update');
-                Route::delete('observaciones/{observacion}', [\App\Http\Controllers\Admin\AdultosMayores\AdultoMayorObservacionController::class, 'destroy'])->middleware('permission:observaciones.anular')->name('observaciones.destroy');
-                Route::patch('observaciones/{observacion}/restaurar', [\App\Http\Controllers\Admin\AdultosMayores\AdultoMayorObservacionController::class, 'restore'])->middleware('permission:observaciones.editar')->name('observaciones.restore');
+                Route::get('observaciones', [\App\Http\Controllers\Residentes\AdultoMayorObservacionController::class, 'index'])->name('observaciones.index');
+                Route::post('observaciones', [\App\Http\Controllers\Residentes\AdultoMayorObservacionController::class, 'store'])->middleware('permission:observaciones.crear')->name('observaciones.store');
+                Route::patch('observaciones/{observacion}', [\App\Http\Controllers\Residentes\AdultoMayorObservacionController::class, 'update'])->middleware('permission:observaciones.editar')->name('observaciones.update');
+                Route::delete('observaciones/{observacion}', [\App\Http\Controllers\Residentes\AdultoMayorObservacionController::class, 'destroy'])->middleware('permission:observaciones.anular')->name('observaciones.destroy');
+                Route::patch('observaciones/{observacion}/restaurar', [\App\Http\Controllers\Residentes\AdultoMayorObservacionController::class, 'restore'])->middleware('permission:observaciones.editar')->name('observaciones.restore');
 
                 // Atenciones
-                Route::get('atenciones', [\App\Http\Controllers\Admin\AdultosMayores\AdultoMayorAtencionController::class, 'index'])->name('atenciones.index');
-                Route::post('atenciones', [\App\Http\Controllers\Admin\AdultosMayores\AdultoMayorAtencionController::class, 'store'])->middleware('permission:atenciones.crear')->name('atenciones.store');
-                Route::patch('atenciones/{atencion}', [\App\Http\Controllers\Admin\AdultosMayores\AdultoMayorAtencionController::class, 'update'])->middleware('permission:atenciones.editar')->name('atenciones.update');
-                Route::delete('atenciones/{atencion}', [\App\Http\Controllers\Admin\AdultosMayores\AdultoMayorAtencionController::class, 'destroy'])->middleware('permission:atenciones.anular')->name('atenciones.destroy');
-                Route::patch('atenciones/{atencion}/restaurar', [\App\Http\Controllers\Admin\AdultosMayores\AdultoMayorAtencionController::class, 'restore'])->middleware('permission:atenciones.editar')->name('atenciones.restore');
+                Route::get('atenciones', [\App\Http\Controllers\Residentes\AdultoMayorAtencionController::class, 'index'])->name('atenciones.index');
+                Route::post('atenciones', [\App\Http\Controllers\Residentes\AdultoMayorAtencionController::class, 'store'])->middleware('permission:atenciones.crear')->name('atenciones.store');
+                Route::patch('atenciones/{atencion}', [\App\Http\Controllers\Residentes\AdultoMayorAtencionController::class, 'update'])->middleware('permission:atenciones.editar')->name('atenciones.update');
+                Route::delete('atenciones/{atencion}', [\App\Http\Controllers\Residentes\AdultoMayorAtencionController::class, 'destroy'])->middleware('permission:atenciones.anular')->name('atenciones.destroy');
+                Route::patch('atenciones/{atencion}/restaurar', [\App\Http\Controllers\Residentes\AdultoMayorAtencionController::class, 'restore'])->middleware('permission:atenciones.editar')->name('atenciones.restore');
 
                 // Evaluaciones Cognitivas
-                Route::get('evaluaciones', [\App\Http\Controllers\Admin\AdultosMayores\AdultoMayorEvaluacionController::class, 'index'])->name('evaluaciones.index');
-                Route::post('evaluaciones', [\App\Http\Controllers\Admin\AdultosMayores\AdultoMayorEvaluacionController::class, 'store'])->middleware('permission:evaluaciones.crear')->name('evaluaciones.store');
-                Route::get('evaluaciones/{evaluacion}', [\App\Http\Controllers\Admin\AdultosMayores\AdultoMayorEvaluacionController::class, 'show'])->name('evaluaciones.show');
-                Route::delete('evaluaciones/{evaluacion}', [\App\Http\Controllers\Admin\AdultosMayores\AdultoMayorEvaluacionController::class, 'destroy'])->middleware('permission:evaluaciones.anular')->name('evaluaciones.destroy');
-                Route::patch('evaluaciones/{evaluacion}/restaurar', [\App\Http\Controllers\Admin\AdultosMayores\AdultoMayorEvaluacionController::class, 'restore'])->middleware('permission:evaluaciones.editar')->name('evaluaciones.restore');
+                Route::get('evaluaciones', [\App\Http\Controllers\Valoraciones\AdultoMayorEvaluacionController::class, 'index'])->name('evaluaciones.index');
+                Route::post('evaluaciones', [\App\Http\Controllers\Valoraciones\AdultoMayorEvaluacionController::class, 'store'])->middleware('permission:evaluaciones.crear')->name('evaluaciones.store');
+                Route::get('evaluaciones/{evaluacion}', [\App\Http\Controllers\Valoraciones\AdultoMayorEvaluacionController::class, 'show'])->name('evaluaciones.show');
+                Route::delete('evaluaciones/{evaluacion}', [\App\Http\Controllers\Valoraciones\AdultoMayorEvaluacionController::class, 'destroy'])->middleware('permission:evaluaciones.anular')->name('evaluaciones.destroy');
+                Route::patch('evaluaciones/{evaluacion}/restaurar', [\App\Http\Controllers\Valoraciones\AdultoMayorEvaluacionController::class, 'restore'])->middleware('permission:evaluaciones.editar')->name('evaluaciones.restore');
 
                 // Evaluaciones Geriátricas Integrales (Fase 2)
                 Route::delete('evaluaciones-geriatricas/{evaluacion}/anular', [AdultoMayorController::class, 'anularEvaluacionGeriatrica'])->middleware('permission:evaluaciones.anular')->name('evaluaciones-geriatricas.anular');
@@ -192,37 +218,37 @@ Route::middleware([
                 Route::patch('actividades/{actividad}/restaurar', [\App\Http\Controllers\Admin\AdultosMayores\AdultoMayorActividadController::class, 'restore'])->middleware('permission:actividades.editar')->name('actividades.restore');
 
                 // Documentos
-                Route::get('documentos', [\App\Http\Controllers\Admin\AdultosMayores\AdultoMayorDocumentoController::class, 'index'])->name('documentos.index');
-                Route::post('documentos', [\App\Http\Controllers\Admin\AdultosMayores\AdultoMayorDocumentoController::class, 'store'])->middleware('permission:documentos.subir')->name('documentos.store');
-                Route::patch('documentos/{documento}', [\App\Http\Controllers\Admin\AdultosMayores\AdultoMayorDocumentoController::class, 'update'])->middleware('permission:documentos.subir')->name('documentos.update');
-                Route::delete('documentos/{documento}', [\App\Http\Controllers\Admin\AdultosMayores\AdultoMayorDocumentoController::class, 'destroy'])->middleware('permission:documentos.archivar')->name('documentos.destroy');
-                Route::patch('documentos/{documento}/restaurar', [\App\Http\Controllers\Admin\AdultosMayores\AdultoMayorDocumentoController::class, 'restore'])->middleware('permission:documentos.archivar')->name('documentos.restore');
+                Route::get('documentos', [\App\Http\Controllers\Documentos\AdultoMayorDocumentoController::class, 'index'])->name('documentos.index');
+                Route::post('documentos', [\App\Http\Controllers\Documentos\AdultoMayorDocumentoController::class, 'store'])->middleware('permission:documentos.subir')->name('documentos.store');
+                Route::patch('documentos/{documento}', [\App\Http\Controllers\Documentos\AdultoMayorDocumentoController::class, 'update'])->middleware('permission:documentos.subir')->name('documentos.update');
+                Route::delete('documentos/{documento}', [\App\Http\Controllers\Documentos\AdultoMayorDocumentoController::class, 'destroy'])->middleware('permission:documentos.archivar')->name('documentos.destroy');
+                Route::patch('documentos/{documento}/restaurar', [\App\Http\Controllers\Documentos\AdultoMayorDocumentoController::class, 'restore'])->middleware('permission:documentos.archivar')->name('documentos.restore');
 
                 // FASE 3: Módulos Médicos y Administrativos
                 // Ficha Médica
-                Route::post('ficha-medica', [\App\Http\Controllers\Admin\AdultosMayores\Salud\AdultoMayorFichaMedicaController::class, 'store'])->middleware('permission:ficha_medica.crear')->name('ficha-medica.store');
-                Route::put('ficha-medica/{ficha}', [\App\Http\Controllers\Admin\AdultosMayores\Salud\AdultoMayorFichaMedicaController::class, 'update'])->middleware('permission:ficha_medica.editar')->name('ficha-medica.update');
-                Route::patch('ficha-medica/{ficha}/archivar', [\App\Http\Controllers\Admin\AdultosMayores\Salud\AdultoMayorFichaMedicaController::class, 'archivar'])->middleware('permission:ficha_medica.archivar')->name('ficha-medica.archivar');
-                Route::patch('ficha-medica/{ficha}/restaurar', [\App\Http\Controllers\Admin\AdultosMayores\Salud\AdultoMayorFichaMedicaController::class, 'restore'])->middleware('permission:ficha_medica.archivar')->name('ficha-medica.restore');
+                Route::post('ficha-medica', [\App\Http\Controllers\Clinica\AdultoMayorFichaMedicaController::class, 'store'])->middleware('permission:ficha_medica.crear')->name('ficha-medica.store');
+                Route::put('ficha-medica/{ficha}', [\App\Http\Controllers\Clinica\AdultoMayorFichaMedicaController::class, 'update'])->middleware('permission:ficha_medica.editar')->name('ficha-medica.update');
+                Route::patch('ficha-medica/{ficha}/archivar', [\App\Http\Controllers\Clinica\AdultoMayorFichaMedicaController::class, 'archivar'])->middleware('permission:ficha_medica.archivar')->name('ficha-medica.archivar');
+                Route::patch('ficha-medica/{ficha}/restaurar', [\App\Http\Controllers\Clinica\AdultoMayorFichaMedicaController::class, 'restore'])->middleware('permission:ficha_medica.archivar')->name('ficha-medica.restore');
 
                 // Medicación
-                Route::post('medicacion', [\App\Http\Controllers\Admin\AdultosMayores\Salud\AdultoMayorMedicacionController::class, 'store'])->middleware('permission:medicacion.crear')->name('medicacion.store');
-                Route::put('medicacion/{medicacion}', [\App\Http\Controllers\Admin\AdultosMayores\Salud\AdultoMayorMedicacionController::class, 'update'])->middleware('permission:medicacion.editar')->name('medicacion.update');
-                Route::patch('medicacion/{medicacion}/suspender', [\App\Http\Controllers\Admin\AdultosMayores\Salud\AdultoMayorMedicacionController::class, 'suspender'])->middleware('permission:medicacion.suspender')->name('medicacion.suspender');
-                Route::patch('medicacion/{medicacion}/finalizar', [\App\Http\Controllers\Admin\AdultosMayores\Salud\AdultoMayorMedicacionController::class, 'finalizar'])->middleware('permission:medicacion.editar')->name('medicacion.finalizar');
-                Route::patch('medicacion/{medicacion}/archivar', [\App\Http\Controllers\Admin\AdultosMayores\Salud\AdultoMayorMedicacionController::class, 'archivar'])->middleware('permission:medicacion.editar')->name('medicacion.archivar');
-                Route::patch('medicacion/{medicacion}/restaurar', [\App\Http\Controllers\Admin\AdultosMayores\Salud\AdultoMayorMedicacionController::class, 'restore'])->middleware('permission:medicacion.editar')->name('medicacion.restore');
+                Route::post('medicacion', [\App\Http\Controllers\Medicacion\AdultoMayorMedicacionController::class, 'store'])->middleware('permission:medicacion.crear')->name('medicacion.store');
+                Route::put('medicacion/{medicacion}', [\App\Http\Controllers\Medicacion\AdultoMayorMedicacionController::class, 'update'])->middleware('permission:medicacion.editar')->name('medicacion.update');
+                Route::patch('medicacion/{medicacion}/suspender', [\App\Http\Controllers\Medicacion\AdultoMayorMedicacionController::class, 'suspender'])->middleware('permission:medicacion.suspender')->name('medicacion.suspender');
+                Route::patch('medicacion/{medicacion}/finalizar', [\App\Http\Controllers\Medicacion\AdultoMayorMedicacionController::class, 'finalizar'])->middleware('permission:medicacion.editar')->name('medicacion.finalizar');
+                Route::patch('medicacion/{medicacion}/archivar', [\App\Http\Controllers\Medicacion\AdultoMayorMedicacionController::class, 'archivar'])->middleware('permission:medicacion.editar')->name('medicacion.archivar');
+                Route::patch('medicacion/{medicacion}/restaurar', [\App\Http\Controllers\Medicacion\AdultoMayorMedicacionController::class, 'restore'])->middleware('permission:medicacion.editar')->name('medicacion.restore');
 
                 // Administración de Medicación
-                Route::post('administracion-medicacion', [\App\Http\Controllers\Admin\AdultosMayores\Salud\AdultoMayorAdministracionMedicacionController::class, 'store'])->middleware('permission:administracion_medicacion.registrar')->name('administracion-medicacion.store');
+                Route::post('administracion-medicacion', [\App\Http\Controllers\Medicacion\AdultoMayorAdministracionMedicacionController::class, 'store'])->middleware('permission:administracion_medicacion.registrar')->name('administracion-medicacion.store');
 
                 // Signos Vitales
-                Route::post('signos-vitales', [\App\Http\Controllers\Admin\AdultosMayores\Salud\AdultoMayorSignosVitalesController::class, 'store'])->middleware('permission:signos_vitales.crear')->name('signos-vitales.store');
-                Route::put('signos-vitales/{signo}', [\App\Http\Controllers\Admin\AdultosMayores\Salud\AdultoMayorSignosVitalesController::class, 'update'])->middleware('permission:signos_vitales.editar')->name('signos-vitales.update');
+                Route::post('signos-vitales', [\App\Http\Controllers\Clinica\AdultoMayorSignosVitalesController::class, 'store'])->middleware('permission:signos_vitales.crear')->name('signos-vitales.store');
+                Route::put('signos-vitales/{signo}', [\App\Http\Controllers\Clinica\AdultoMayorSignosVitalesController::class, 'update'])->middleware('permission:signos_vitales.editar')->name('signos-vitales.update');
 
                 // Valoración Funcional
-                Route::post('valoracion-funcional', [\App\Http\Controllers\Admin\AdultosMayores\Salud\AdultoMayorValoracionFuncionalController::class, 'store'])->middleware('permission:valoracion_funcional.crear')->name('valoracion-funcional.store');
-                Route::put('valoracion-funcional/{valoracion}', [\App\Http\Controllers\Admin\AdultosMayores\Salud\AdultoMayorValoracionFuncionalController::class, 'update'])->middleware('permission:valoracion_funcional.editar')->name('valoracion-funcional.update');
+                Route::post('valoracion-funcional', [\App\Http\Controllers\Valoraciones\AdultoMayorValoracionFuncionalController::class, 'store'])->middleware('permission:valoracion_funcional.crear')->name('valoracion-funcional.store');
+                Route::put('valoracion-funcional/{valoracion}', [\App\Http\Controllers\Valoraciones\AdultoMayorValoracionFuncionalController::class, 'update'])->middleware('permission:valoracion_funcional.editar')->name('valoracion-funcional.update');
 
                 // Reporte individual (anidado bajo adulto_mayor)
                 Route::get('reporte-individual', [AdultoMayorController::class, 'reporteIndividual'])->middleware('permission:reportes.individual')->name('reporte-individual');
@@ -235,7 +261,7 @@ Route::middleware([
             Route::get('reporte-general', [AdultoMayorController::class, 'reporteGeneral'])
                 ->middleware('permission:reportes.ver')
                 ->name('adultos-mayores.reporte-general');
-            Route::get('reporte-institucional', \App\Livewire\Admin\AdultosMayores\ReportesInstitucionalesPanel::class)
+            Route::get('reporte-institucional', \App\Livewire\Reportes\ReportesInstitucionalesPanel::class)
                 ->middleware('permission:reportes.ver')
                 ->name('adultos-mayores.reporte-institucional');
             Route::get('reporte-bienestar', [AdultoMayorController::class, 'reporteBienestar'])
@@ -249,25 +275,25 @@ Route::middleware([
                 ->middleware('permission:salud.ver')
                 ->group(function () {
                     // Global Indexes for Sidebar
-                    Route::get('/', \App\Livewire\Admin\SaludSeguimiento\SaludSeguimientoListPanel::class)->name('index');
-                    Route::get('/resumenes', \App\Livewire\Admin\SaludSeguimiento\SaludSeguimientoListPanel::class)->name('resumen.index');
-                    Route::get('/fichas', \App\Livewire\Admin\SaludSeguimiento\SaludSeguimientoListPanel::class)->name('ficha.index');
-                    Route::get('/medicaciones', \App\Livewire\Admin\SaludSeguimiento\SaludSeguimientoListPanel::class)->name('medicacion.index');
-                    Route::get('/administraciones', \App\Livewire\Admin\SaludSeguimiento\SaludSeguimientoListPanel::class)->name('administracion.index');
-                    Route::get('/signos-vitales', \App\Livewire\Admin\SaludSeguimiento\SaludSeguimientoListPanel::class)->name('signos.index');
-                    Route::get('/valoraciones', \App\Livewire\Admin\SaludSeguimiento\SaludSeguimientoListPanel::class)->name('valoracion.index');
-                    Route::get('/evaluaciones-geriatricas', \App\Livewire\Admin\SaludSeguimiento\SaludSeguimientoListPanel::class)->name('evaluaciones-geriatricas.index');
-                    Route::get('/alertas', \App\Livewire\Admin\SaludSeguimiento\SaludSeguimientoListPanel::class)->name('alertas');
-                    Route::get('/reportes', \App\Livewire\Admin\SaludSeguimiento\SaludSeguimientoListPanel::class)->name('reportes');
+                    Route::get('/', \App\Livewire\Clinica\SaludSeguimientoListPanel::class)->name('index');
+                    Route::get('/resumenes', \App\Livewire\Clinica\SaludSeguimientoListPanel::class)->name('resumen.index');
+                    Route::get('/fichas', \App\Livewire\Clinica\SaludSeguimientoListPanel::class)->name('ficha.index');
+                    Route::get('/medicaciones', \App\Livewire\Clinica\SaludSeguimientoListPanel::class)->name('medicacion.index');
+                    Route::get('/administraciones', \App\Livewire\Clinica\SaludSeguimientoListPanel::class)->name('administracion.index');
+                    Route::get('/signos-vitales', \App\Livewire\Clinica\SaludSeguimientoListPanel::class)->name('signos.index');
+                    Route::get('/valoraciones', \App\Livewire\Clinica\SaludSeguimientoListPanel::class)->name('valoracion.index');
+                    Route::get('/evaluaciones-geriatricas', \App\Livewire\Clinica\SaludSeguimientoListPanel::class)->name('evaluaciones-geriatricas.index');
+                    Route::get('/alertas', \App\Livewire\Clinica\SaludSeguimientoListPanel::class)->name('alertas');
+                    Route::get('/reportes', \App\Livewire\Clinica\SaludSeguimientoListPanel::class)->name('reportes');
 
                     // Individual Panels
-                    Route::get('/{adulto}/resumen', \App\Livewire\Admin\SaludSeguimiento\SaludResumenPanel::class)->name('resumen');
-                    Route::get('/{adulto}/ficha', \App\Livewire\Admin\SaludSeguimiento\SaludFichaPanel::class)->name('ficha');
-                    Route::get('/{adulto}/medicacion', \App\Livewire\Admin\SaludSeguimiento\SaludMedicacionPanel::class)->name('medicacion');
-                    Route::get('/{adulto}/administracion', \App\Livewire\Admin\SaludSeguimiento\SaludAdministracionMedicacionPanel::class)->name('administracion');
-                    Route::get('/{adulto}/signos', \App\Livewire\Admin\SaludSeguimiento\SaludSignosPanel::class)->name('signos');
-                    Route::get('/{adulto}/valoracion', \App\Livewire\Admin\SaludSeguimiento\SaludValoracionPanel::class)->name('valoracion');
-                    Route::get('/{adulto}/evaluaciones-geriatricas', \App\Livewire\Admin\SaludSeguimiento\SaludEvaluacionesGeriatricasPanel::class)->name('evaluaciones-geriatricas');
+                    Route::get('/{adulto}/resumen', \App\Livewire\Clinica\SaludResumenPanel::class)->name('resumen');
+                    Route::get('/{adulto}/ficha', \App\Livewire\Clinica\SaludFichaPanel::class)->name('ficha');
+                    Route::get('/{adulto}/medicacion', \App\Livewire\Medicacion\SaludMedicacionPanel::class)->name('medicacion');
+                    Route::get('/{adulto}/administracion', \App\Livewire\Medicacion\SaludAdministracionMedicacionPanel::class)->name('administracion');
+                    Route::get('/{adulto}/signos', \App\Livewire\Clinica\SaludSignosPanel::class)->name('signos');
+                    Route::get('/{adulto}/valoracion', \App\Livewire\Valoraciones\SaludValoracionPanel::class)->name('valoracion');
+                    Route::get('/{adulto}/evaluaciones-geriatricas', \App\Livewire\Valoraciones\SaludEvaluacionesGeriatricasPanel::class)->name('evaluaciones-geriatricas');
                 });
 
             // Familia y Social
@@ -277,13 +303,13 @@ Route::middleware([
                 ->group(function () {
                     Route::redirect('/', '/admin/familia-social/resumen')->name('index');
                     Route::get('/resumen', ResumenFamiliaSocialController::class)->name('resumen');
-                    Route::get('/red-apoyo', \App\Livewire\Admin\FamiliaSocial\RedApoyoPanel::class)->name('red-apoyo');
-                    Route::view('/visitas', 'admin.familia-social.base', [
+                    Route::get('/red-apoyo', \App\Livewire\Residentes\RedApoyoPanel::class)->name('red-apoyo');
+                    Route::view('/visitas', 'pages.familia-social.base', [
                         'titulo' => 'Visitas',
                         'descripcion' => 'Visitas familiares, sociales y acompañamiento presencial.',
                         'icono' => 'ph-hand-heart',
                     ])->name('visitas');
-                    Route::view('/ficha-social', 'admin.familia-social.base', [
+                    Route::view('/ficha-social', 'pages.familia-social.base', [
                         'titulo' => 'Ficha social',
                         'descripcion' => 'Situacion social, convivencia, red de apoyo real y observaciones sociales.',
                         'icono' => 'ph-clipboard-text',
@@ -297,7 +323,7 @@ Route::middleware([
                 ->name('habitaciones.')
                 ->middleware('permission:habitaciones.ver')
                 ->group(function () {
-                    Route::get('/', \App\Livewire\Admin\Enfermeria\HabitacionesPanel::class)->name('index');
+                    Route::get('/', \App\Livewire\Admisiones\HabitacionesPanel::class)->name('index');
                 });
 
             // Turnos de Enfermería
@@ -305,7 +331,7 @@ Route::middleware([
                 ->name('turnos-enfermeria.')
                 ->middleware('permission:turnos_enfermeria.ver')
                 ->group(function () {
-                    Route::get('/', \App\Livewire\Admin\Enfermeria\TurnosEnfermeriaPanel::class)->name('index');
+                    Route::get('/', \App\Livewire\Cuidados\TurnosEnfermeriaPanel::class)->name('index');
                 });
 
             // Admisión clínica — Valoraciones
@@ -313,8 +339,8 @@ Route::middleware([
                 ->name('admision.')
                 ->middleware('permission:valoracion_enfermeria.ver')
                 ->group(function () {
-                    Route::get('/valoracion-enfermeria', \App\Livewire\Admin\Enfermeria\ValoracionEnfermeriaPanel::class)->name('valoracion-enfermeria');
-                    Route::get('/valoracion-medica', \App\Livewire\Admin\Enfermeria\ValoracionMedicaPanel::class)
+                    Route::get('/valoracion-enfermeria', \App\Livewire\Valoraciones\ValoracionEnfermeriaPanel::class)->name('valoracion-enfermeria');
+                    Route::get('/valoracion-medica', \App\Livewire\Valoraciones\ValoracionMedicaPanel::class)
                         ->middleware('permission:valoracion_medica.ver')
                         ->name('valoracion-medica');
                 });
@@ -332,8 +358,8 @@ Route::middleware([
                 ->name('plan-cuidado.')
                 ->middleware('permission:plan_cuidado.ver')
                 ->group(function () {
-                    Route::get('/', \App\Livewire\Admin\Enfermeria\PlanCuidadoPanel::class)->name('index');
-                    Route::get('/tareas', \App\Livewire\Admin\Enfermeria\TareasPlanPanel::class)
+                    Route::get('/', \App\Livewire\Cuidados\PlanCuidadoPanel::class)->name('index');
+                    Route::get('/tareas', \App\Livewire\Cuidados\TareasPlanPanel::class)
                         ->middleware('permission:tareas.ver')
                         ->name('tareas');
                 });
@@ -343,7 +369,7 @@ Route::middleware([
                 ->name('seguimiento-diario.')
                 ->middleware('permission:seguimiento.ver')
                 ->group(function () {
-                    Route::get('/', \App\Livewire\Admin\Enfermeria\SeguimientoDiarioPanel::class)->name('index');
+                    Route::get('/', \App\Livewire\Cuidados\SeguimientoDiarioPanel::class)->name('index');
                 });
 
             // Alertas y Acciones
@@ -351,7 +377,7 @@ Route::middleware([
                 ->name('alertas-clinicas.')
                 ->middleware('permission:alertas.ver')
                 ->group(function () {
-                    Route::get('/', \App\Livewire\Admin\Enfermeria\AlertasPanel::class)->name('index');
+                    Route::get('/', \App\Livewire\Alertas\AlertasPanel::class)->name('index');
                 });
 
             // Pase de Turno
@@ -359,7 +385,7 @@ Route::middleware([
                 ->name('pase-turno.')
                 ->middleware('permission:pase_turno.ver')
                 ->group(function () {
-                    Route::get('/', \App\Livewire\Admin\Enfermeria\PaseTurnoPanel::class)->name('index');
+                    Route::get('/', \App\Livewire\Cuidados\PaseTurnoPanel::class)->name('index');
                 });
 
             // ── Actividades ─────────────────────────
@@ -391,39 +417,39 @@ Route::middleware([
             Route::prefix('enfermeria')
                 ->name('enfermeria.')
                 ->group(function () {
-                    Route::get('/dashboard', \App\Livewire\Admin\Enfermeria\DashboardTurno::class)
+                    Route::get('/dashboard', \App\Livewire\Cuidados\DashboardTurno::class)
                         ->middleware('permission:enfermeria.ver_dashboard')
                         ->name('dashboard');
                     
-                    Route::get('/pacientes', \App\Livewire\Admin\Enfermeria\MisPacientes::class)
+                    Route::get('/pacientes', \App\Livewire\Cuidados\MisPacientes::class)
                         ->middleware('permission:enfermeria.ver_pacientes_asignados')
                         ->name('pacientes');
                     
-                    Route::get('/pacientes/{adulto}', \App\Livewire\Admin\Enfermeria\FichaPaciente::class)
+                    Route::get('/pacientes/{adulto}', \App\Livewire\Cuidados\FichaPaciente::class)
                         ->middleware('permission:enfermeria.ver_ficha_paciente')
                         ->name('pacientes.ficha');
                         
-                    Route::get('/pacientes/{adulto}/pdf', [\App\Http\Controllers\Admin\Enfermeria\FichaPacienteReporteController::class, 'pdf'])
+                    Route::get('/pacientes/{adulto}/pdf', [\App\Http\Controllers\Reportes\FichaPacienteReporteController::class, 'pdf'])
                         ->middleware('permission:enfermeria.ver_ficha_paciente')
                         ->name('pacientes.ficha.pdf');
                     
-                    Route::get('/tareas', \App\Livewire\Admin\Enfermeria\TareasPlanPanel::class)
+                    Route::get('/tareas', \App\Livewire\Cuidados\TareasPlanPanel::class)
                         ->middleware('permission:enfermeria.ver_dashboard')
                         ->name('tareas');
                     
-                    Route::get('/alertas', \App\Livewire\Admin\Enfermeria\AlertasPanel::class)
+                    Route::get('/alertas', \App\Livewire\Alertas\AlertasPanel::class)
                         ->middleware('permission:enfermeria.ver_dashboard')
                         ->name('alertas');
                         
-                    Route::get('/pase-turno', \App\Livewire\Admin\Enfermeria\PaseTurnoPanel::class)
+                    Route::get('/pase-turno', \App\Livewire\Cuidados\PaseTurnoPanel::class)
                         ->middleware('permission:enfermeria.ver_dashboard')
                         ->name('pase-turno');
                         
-                    Route::get('/actividades', \App\Livewire\Admin\Enfermeria\DashboardTurno::class)
+                    Route::get('/actividades', \App\Livewire\Cuidados\DashboardTurno::class)
                         ->middleware('permission:enfermeria.ver_dashboard')
                         ->name('actividades');
                         
-                    Route::get('/reportes', \App\Livewire\Admin\Enfermeria\DashboardTurno::class)
+                    Route::get('/reportes', \App\Livewire\Cuidados\DashboardTurno::class)
                         ->middleware('permission:enfermeria.ver_dashboard')
                         ->name('reportes');
                 });
@@ -433,35 +459,35 @@ Route::middleware([
                 ->name('medico.')
                 ->group(function () {
                     // Dashboard: estadísticas, KPIs, gráficos, cola de valoraciones
-                    Route::get('/dashboard', \App\Livewire\Admin\Medico\DashboardMedico::class)
+                    Route::get('/dashboard', \App\Livewire\Clinica\DashboardMedico::class)
                         ->name('dashboard');
 
                     // Admisiones: valoraciones y decisiones se muestran en el dashboard
                     // con filtro de sección (querystring ?seccion=X)
-                    Route::get('/valoraciones-medicas', \App\Livewire\Admin\Medico\DashboardMedico::class)
+                    Route::get('/valoraciones-medicas', \App\Livewire\Clinica\DashboardMedico::class)
                         ->name('valoraciones');
-                    Route::get('/decisiones-admision', \App\Livewire\Admin\Medico\DashboardMedico::class)
+                    Route::get('/decisiones-admision', \App\Livewire\Clinica\DashboardMedico::class)
                         ->name('decisiones');
 
                     // Seguimiento: lista de pacientes con tabs
                     // Tab 'activos' = seguimiento general
-                    Route::get('/pacientes-seguimiento', \App\Livewire\Admin\Medico\PacientesSeguimientoPanel::class)
+                    Route::get('/pacientes-seguimiento', \App\Livewire\Clinica\PacientesSeguimientoPanel::class)
                         ->name('pacientes.observacion');
 
                     // Tab 'historial' = todos los pacientes (sin filtro de estado)
-                    Route::get('/historial-clinico', \App\Livewire\Admin\Medico\PacientesSeguimientoPanel::class)
+                    Route::get('/historial-clinico', \App\Livewire\Clinica\PacientesSeguimientoPanel::class)
                         ->name('pacientes.historial');
 
                     // Tab 'interconsultas' = pacientes con notas INTERCONSULTA activas
-                    Route::get('/interconsultas', \App\Livewire\Admin\Medico\PacientesSeguimientoPanel::class)
+                    Route::get('/interconsultas', \App\Livewire\Clinica\PacientesSeguimientoPanel::class)
                         ->name('interconsultas');
 
                     // Monitor de signos vitales: todos los pacientes activos con alertas PA/FC/SpO2/Temp/Glucosa
-                    Route::get('/signos-vitales', \App\Livewire\Admin\Medico\SignosVitalesPanel::class)
+                    Route::get('/signos-vitales', \App\Livewire\Clinica\SignosVitalesPanel::class)
                         ->name('signos-vitales');
 
                     // Ficha clínica integrada por paciente (6 tabs: resumen, notas, signos, medicación, funcional, geriátrico)
-                    Route::get('/paciente/{adulto}', \App\Livewire\Admin\Medico\FichaClinicaIntegradaPanel::class)
+                    Route::get('/paciente/{adulto}', \App\Livewire\Clinica\FichaClinicaIntegradaPanel::class)
                         ->name('paciente.ficha');
                 });
 
@@ -469,11 +495,11 @@ Route::middleware([
             Route::prefix('psicologia')
                 ->name('psicologia.')
                 ->group(function () {
-                    Route::get('/dashboard', \App\Livewire\Admin\Psicologia\DashboardPsicologo::class)
+                    Route::get('/dashboard', \App\Livewire\Valoraciones\DashboardPsicologo::class)
                         ->name('dashboard');
 
                     // Evaluaciones asignadas → dashboard principal
-                    Route::get('/evaluaciones-asignadas', \App\Livewire\Admin\Psicologia\DashboardPsicologo::class)
+                    Route::get('/evaluaciones-asignadas', \App\Livewire\Valoraciones\DashboardPsicologo::class)
                         ->name('evaluaciones');
                     Route::get('/seguimiento-emocional', [DashboardController::class, 'index'])
                         ->name('seguimiento');
@@ -481,19 +507,19 @@ Route::middleware([
                         ->name('alertas');
 
                     // Evaluaciones por área geriátrica
-                    Route::get('/evaluacion/cognitiva', \App\Livewire\Admin\Psicologia\EvaluacionesAreaPanel::class)
+                    Route::get('/evaluacion/cognitiva', \App\Livewire\Valoraciones\EvaluacionesAreaPanel::class)
                         ->defaults('codArea', 'ARE_COG')
                         ->name('evaluacion.cognitiva');
-                    Route::get('/evaluacion/afectiva', \App\Livewire\Admin\Psicologia\EvaluacionesAreaPanel::class)
+                    Route::get('/evaluacion/afectiva', \App\Livewire\Valoraciones\EvaluacionesAreaPanel::class)
                         ->defaults('codArea', 'ARE_AFE')
                         ->name('evaluacion.afectiva');
-                    Route::get('/evaluacion/funcionamiento', \App\Livewire\Admin\Psicologia\EvaluacionesAreaPanel::class)
+                    Route::get('/evaluacion/funcionamiento', \App\Livewire\Valoraciones\EvaluacionesAreaPanel::class)
                         ->defaults('codArea', 'ARE_FUN')
                         ->name('evaluacion.funcionamiento');
-                    Route::get('/evaluacion/nutricional', \App\Livewire\Admin\Psicologia\EvaluacionesAreaPanel::class)
+                    Route::get('/evaluacion/nutricional', \App\Livewire\Valoraciones\EvaluacionesAreaPanel::class)
                         ->defaults('codArea', 'ARE_NUT')
                         ->name('evaluacion.nutricional');
-                    Route::get('/evaluacion/entorno', \App\Livewire\Admin\Psicologia\EvaluacionesAreaPanel::class)
+                    Route::get('/evaluacion/entorno', \App\Livewire\Valoraciones\EvaluacionesAreaPanel::class)
                         ->defaults('codArea', 'ARE_SOC')
                         ->name('evaluacion.entorno');
 
@@ -693,7 +719,7 @@ Route::middleware([
                 });
 
             // ── Bitácora ─────────────────────────
-            Route::get('bitacora', [\App\Http\Controllers\Admin\BitacoraController::class, 'index'])
+            Route::get('bitacora', [\App\Http\Controllers\Reportes\BitacoraController::class, 'index'])
                 ->middleware('permission:bitacora.ver')
                 ->name('bitacora.index');
         });

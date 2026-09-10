@@ -360,12 +360,12 @@
 
  <div class="salud-hidden-livewire-modals">
  @if($adulto)
- <livewire:admin.adultos-mayores.salud.medicacion-adulto-modal :cod_am="$adulto->cod_am" :key="'med-modal-'.$adulto->cod_am" />
- <livewire:admin.adultos-mayores.salud.administracion-medicacion-modal :cod_am="$adulto->cod_am" :key="'admin-modal-'.$adulto->cod_am" />
+ <livewire:medicacion.medicacion-adulto-modal :cod_am="$adulto->cod_am" :key="'med-modal-'.$adulto->cod_am" />
+ <livewire:medicacion.administracion-medicacion-modal :cod_am="$adulto->cod_am" :key="'admin-modal-'.$adulto->cod_am" />
  @else
  {{-- We still need the modals mounted with an empty ID in case someone clicks edit globally --}}
- <livewire:admin.adultos-mayores.salud.medicacion-adulto-modal cod_am="" />
- <livewire:admin.adultos-mayores.salud.administracion-medicacion-modal cod_am="" />
+ <livewire:medicacion.medicacion-adulto-modal cod_am="" />
+ <livewire:medicacion.administracion-medicacion-modal cod_am="" />
  @endif
  </div>
 </div>

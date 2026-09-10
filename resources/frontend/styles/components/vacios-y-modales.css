@@ -1,0 +1,99 @@
+@layer components {
+
+    .rm-empty-state {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        border: 1px dashed var(--color-borde-medio);
+        border-radius: 1rem;
+        background:
+            radial-gradient(circle, var(--rm-textura-punto-suave) 1px, transparent 1px),
+            var(--surface-empty-state);
+        background-size: 20px 20px, 100% 100%;
+        color: var(--color-parrafo);
+        padding: 2.5rem 1rem;
+        text-align: center;
+        box-shadow: var(--sombra-card);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+    }
+
+    .rm-empty-state-icon {
+        display: flex;
+        width: 3.5rem;
+        height: 3.5rem;
+        align-items: center;
+        justify-content: center;
+        border-radius: 9999px;
+        background: var(--color-modulo-salud-fondo);
+        color: var(--color-modulo-salud);
+    }
+
+    .rm-empty-state-title {
+        margin-top: 0.75rem;
+        color: var(--color-titulo);
+        font-size: 1rem;
+        font-weight: 900;
+    }
+
+    .rm-empty-state-text {
+        margin: 0.25rem auto 0;
+        max-width: 24rem;
+        color: var(--color-texto-apoyo);
+        font-size: 0.75rem;
+        font-weight: 700;
+    }
+
+    .rm-modal-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 50;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 1rem;
+        background: var(--color-modal-overlay);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+    }
+
+    .rm-modal-panel {
+        position: relative;
+        width: 100%;
+        max-width: 42rem;
+        border: 1px solid var(--color-modal-borde);
+        border-radius: 1rem;
+        background: var(--color-modal-bg);
+        color: var(--color-modal-texto);
+        box-shadow: var(--sombra-modal);
+    }
+
+    .rm-modal-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-bottom: 1px solid var(--color-modal-header-borde);
+        padding: 0.875rem 1.25rem;
+    }
+
+    .rm-modal-title {
+        color: var(--color-modal-titulo);
+        font-size: 0.875rem;
+        font-weight: 900;
+        letter-spacing: 0.025em;
+        text-transform: uppercase;
+    }
+
+    .rm-modal-body {
+        padding: 1.25rem;
+    }
+
+    .rm-modal-footer {
+        display: flex;
+        justify-content: flex-end;
+        gap: 0.5rem;
+        border-top: 1px solid var(--color-modal-footer-borde);
+        padding: 0.75rem 1.25rem;
+    }
+}

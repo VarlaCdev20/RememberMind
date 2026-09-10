@@ -12,7 +12,7 @@
 
  <script src="https://unpkg.com/@phosphor-icons/web"></script>
 
- @vite(['resources/css/app.css', 'resources/js/app.js'])
+ @vite(['resources/frontend/styles/app.css', 'resources/frontend/scripts/app.js'])
 
  @livewireStyles
 </head>

@@ -12,7 +12,8 @@ export default {
         './vendor/laravel/jetstream/**/*.blade.php',
         './storage/framework/views/*.php',
         './resources/views/**/*.blade.php',
-        './resources/js/**/*.js',
+        './resources/frontend/scripts/**/*.js',
+        './resources/frontend/scripts/**/*.blade.php',
     ],
 
     theme: {

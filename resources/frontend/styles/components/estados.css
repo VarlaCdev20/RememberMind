@@ -1,0 +1,74 @@
+@layer components {
+
+    .rm-badge,
+    .rm-badge-success,
+    .rm-badge-warning,
+    .rm-badge-danger,
+    .rm-badge-info,
+    .rm-badge-neutral,
+    .rm-badge-purple,
+    .badge-mint,
+    .badge-coral,
+    .badge-verde-institucional,
+    .badge-chartreuse,
+    .badge-tomatillo,
+    .badge-green-ash {
+        display: inline-flex;
+        align-items: center;
+        border-radius: 9999px;
+        border: 1px solid transparent;
+        padding: 0.125rem 0.5rem;
+        font-family: var(--font-ui);
+        font-size: var(--text-badge);
+        font-weight: var(--font-bold);
+        letter-spacing: var(--tracking-wider);
+        text-transform: uppercase;
+    }
+
+    .rm-badge-success,
+    .badge-mint,
+    .badge-verde-institucional,
+    .badge-tomatillo,
+    .badge-green-ash {
+        border-color: var(--color-estado-exito-borde);
+        background: var(--color-estado-exito-bg);
+        color: var(--color-estado-exito-texto);
+    }
+
+    .badge-chartreuse {
+        border-color: var(--color-estado-exito-borde);
+        background: var(--color-modulo-voluntarios-fondo);
+        color: var(--color-modulo-voluntarios-texto);
+    }
+
+    .rm-badge-warning,
+    .badge-coral {
+        border-color: var(--color-estado-advertencia-borde);
+        background: var(--color-estado-advertencia-bg);
+        color: var(--color-estado-advertencia-texto);
+    }
+
+    .rm-badge-danger {
+        border-color: var(--color-estado-peligro-borde);
+        background: var(--color-estado-peligro-bg);
+        color: var(--color-estado-peligro-texto);
+    }
+
+    .rm-badge-info {
+        border-color: var(--color-estado-info-borde);
+        background: var(--color-estado-info-bg);
+        color: var(--color-estado-info-texto);
+    }
+
+    .rm-badge-neutral {
+        border-color: var(--color-estado-neutral-borde);
+        background: var(--color-estado-neutral-bg);
+        color: var(--color-estado-neutral-texto);
+    }
+
+    .rm-badge-purple {
+        border-color: var(--color-estado-restaurado-borde);
+        background: var(--color-estado-restaurado-bg);
+        color: var(--color-estado-restaurado-texto);
+    }
+}

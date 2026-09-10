@@ -1,0 +1,12 @@
+/* Componentes compartidos: conservar el orden de la cascada. */
+@import '../layouts/estructura-institucional.css';
+@import '../components/tarjetas.css';
+@import '../components/botones.css';
+@import '../components/estados.css';
+@import '../components/campos.css';
+@import '../components/tablas.css';
+@import '../components/vacios-y-modales.css';
+@import '../layouts/navegacion.css';
+@import '../components/metricas.css';
+@import '../components/efectos.css';
+@import '../components/alertas.css';

@@ -16,7 +16,7 @@ export default defineConfig({
     },
     plugins: [
         laravel({
-            input: ['resources/css/app.css', 'resources/js/app.js'],
+            input: ['resources/frontend/styles/app.css', 'resources/frontend/scripts/app.js'],
             refresh: true,
         }),
     ],

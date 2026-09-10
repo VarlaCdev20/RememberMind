@@ -17,23 +17,9 @@
  <script src="https://unpkg.com/@phosphor-icons/web"></script>
  
  <script>
- tailwind.config = {
- theme: {
- extend: {
- fontFamily: {
- sans: ['Inter', 'sans-serif'],
- outfit: ['Outfit', 'sans-serif'],
- },
- colors: {
- 'azul-profundo': '#2F3E5C',
- 'terracota': '#E27D60',
- 'arena': '#F8F3ED',
- 'crema-oscura': '#E6DDD3',
- }
- }
- }
- }
- </script>
+
+{!! file_get_contents(resource_path('frontend/scripts/modules/errors-403.js')) !!}
+</script>
 </head>
 <body class="bg-fondo-app antialiased min-h-screen flex items-center justify-center p-4 relative overflow-hidden select-none">
  

@@ -13,7 +13,7 @@
  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏠</text></svg>">
 
  <!-- Scripts de la aplicación (Vite compila Inter, Outfit, Alpine, etc.) -->
- @vite(['resources/css/app.css', 'resources/js/app.js'])
+ @vite(['resources/frontend/styles/app.css', 'resources/frontend/scripts/app.js'])
 
  <!-- Phosphor Icons (igual que welcome.blade.php) -->
  <script src="https://unpkg.com/@phosphor-icons/web"></script>

@@ -1,0 +1,179 @@
+@layer components {
+
+    .rm-btn,
+    .rm-btn-primary,
+    .rm-btn-secondary,
+    .rm-btn-accent,
+    .rm-btn-terracota,
+    .rm-btn-danger,
+    .rm-btn-warning,
+    .rm-btn-success,
+    .rm-btn-ghost,
+    .rm-btn-print,
+    .rm-btn-pdf,
+    .rm-btn-excel {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.375rem;
+        border-radius: 0.75rem;
+        padding: 0.5rem 0.75rem;
+        font-family: var(--font-ui);
+        font-size: var(--text-button);
+        font-weight: var(--font-extrabold);
+        letter-spacing: var(--tracking-wider);
+        text-transform: uppercase;
+        text-decoration: none;
+        transition:
+            transform 180ms ease,
+            box-shadow 180ms ease,
+            background-color 180ms ease,
+            color 180ms ease,
+            border-color 180ms ease;
+    }
+
+    .rm-btn:disabled,
+    .rm-btn-primary:disabled,
+    .rm-btn-secondary:disabled,
+    .rm-btn-accent:disabled,
+    .rm-btn-terracota:disabled,
+    .rm-btn-danger:disabled,
+    .rm-btn-warning:disabled,
+    .rm-btn-success:disabled,
+    .rm-btn-ghost:disabled,
+    .rm-btn-print:disabled,
+    .rm-btn-pdf:disabled,
+    .rm-btn-excel:disabled {
+        cursor: not-allowed;
+        opacity: 0.6;
+        transform: none;
+        box-shadow: none;
+    }
+
+    .rm-btn-primary,
+    .rm-btn-print {
+        background: var(--color-boton-principal);
+        color: var(--color-boton-principal-texto);
+        box-shadow: var(--sombra-card);
+    }
+
+    .rm-btn-primary:hover,
+    .rm-btn-print:hover {
+        background: var(--color-boton-principal-hover);
+        color: var(--color-boton-principal-texto);
+        box-shadow: var(--sombra-card-hover);
+        transform: translateY(-1px);
+    }
+
+    .rm-btn-secondary {
+        border: 1px solid var(--color-borde-general);
+        background: var(--color-boton-secundario);
+        color: var(--color-boton-secundario-texto);
+        box-shadow: var(--sombra-card);
+    }
+
+    .rm-btn-secondary:hover {
+        border-color: rgba(217, 121, 95, 0.24);
+        background: var(--color-boton-secundario-hover);
+        color: var(--color-titulo);
+        box-shadow: var(--sombra-card-hover);
+        transform: translateY(-1px);
+    }
+
+    .rm-btn-accent,
+    .rm-btn-terracota,
+    .rm-btn-pdf {
+        background: var(--color-boton-acento);
+        color: var(--color-boton-acento-texto);
+        box-shadow: var(--glow-acento);
+    }
+
+    .rm-btn-accent:hover,
+    .rm-btn-terracota:hover,
+    .rm-btn-pdf:hover {
+        background: var(--color-boton-acento-hover);
+        color: var(--color-boton-acento-texto);
+        box-shadow: var(--glow-acento-hover);
+        transform: translateY(-1px);
+    }
+
+    .rm-btn-success,
+    .rm-btn-excel {
+        background: var(--color-modulo-salud);
+        color: var(--color-texto-inverso);
+        box-shadow: var(--sombra-card);
+    }
+
+    .rm-btn-success:hover,
+    .rm-btn-excel:hover {
+        background: var(--rm-verde-salud-hover, var(--color-modulo-salud));
+        color: var(--color-texto-inverso);
+        box-shadow: var(--sombra-card-hover);
+        transform: translateY(-1px);
+    }
+
+    .rm-btn-warning {
+        background: var(--color-estado-advertencia-texto);
+        color: var(--color-texto-inverso);
+        box-shadow: var(--sombra-card);
+    }
+
+    .rm-btn-warning:hover {
+        background: var(--rm-naranja-dark);
+        color: var(--color-texto-inverso);
+        box-shadow: var(--sombra-card-hover);
+        transform: translateY(-1px);
+    }
+
+    .rm-btn-danger {
+        background: var(--color-estado-peligro-texto);
+        color: var(--color-texto-inverso);
+        box-shadow: var(--sombra-card);
+    }
+
+    .rm-btn-danger:hover {
+        background: var(--rm-terracota-hover, var(--color-estado-peligro-texto));
+        color: var(--color-texto-inverso);
+        box-shadow: var(--sombra-card-hover);
+        transform: translateY(-1px);
+    }
+
+    .rm-btn-ghost {
+        border: 1px solid var(--color-boton-fantasma-borde);
+        background: var(--color-boton-fantasma-bg);
+        color: var(--color-boton-fantasma-texto);
+    }
+
+    .rm-btn-ghost:hover {
+        border-color: rgba(217, 121, 95, 0.24);
+        background: var(--color-boton-fantasma-hover);
+        color: var(--color-titulo);
+    }
+
+    .rm-btn-icon {
+        display: inline-flex;
+        width: 2rem;
+        height: 2rem;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid var(--color-borde-general);
+        border-radius: 9999px;
+        background: var(--color-boton-icono-bg);
+        color: var(--color-boton-icono-texto);
+        box-shadow: var(--sombra-card);
+        transition:
+            transform 180ms ease,
+            background-color 180ms ease,
+            color 180ms ease,
+            border-color 180ms ease,
+            box-shadow 180ms ease;
+    }
+
+    .rm-btn-icon:hover {
+        border-color: var(--color-boton-icono-hover);
+        background: var(--color-boton-icono-hover);
+        color: var(--color-boton-icono-texto-hover);
+        box-shadow: var(--sombra-card-hover);
+        transform: translateY(-1px);
+    }
+}

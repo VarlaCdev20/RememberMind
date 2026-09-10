@@ -1,55 +1,8 @@
 <div class="salud-valoracion-scope space-y-6">
  <style>
- .salud-valoracion-scope .rm-card,
- .salud-valoracion-scope .rm-card-soft,
- .salud-valoracion-scope .rm-card-warm {
- border-color: rgba(199, 181, 163, 0.65) !important;
- background: rgba(243, 236, 228, 0.74) !important;
- box-shadow: 0 12px 32px rgba(47, 62, 92, 0.08) !important;
- backdrop-filter: blur(14px);
- }
- .salud-valoracion-scope .rm-table-header {
- background: rgba(230, 221, 211, 0.78) !important;
- color: rgba(47, 62, 92, 0.62) !important;
- }
- .salud-valoracion-scope .rm-table-row:hover {
- background: rgba(230, 221, 211, 0.58) !important;
- }
- .salud-valoracion-scope .rm-input,
- .salud-valoracion-scope .rm-select,
- .salud-valoracion-scope .rm-textarea {
- border-color: rgba(199, 181, 163, 0.62) !important;
- background: rgba(243, 236, 228, 0.82) !important;
- color: #2F3E5C !important;
- }
- .salud-valoracion-scope .rm-modal-overlay {
- background: rgba(47, 62, 92, 0.62) !important;
- backdrop-filter: blur(10px);
- z-index: 120 !important;
- }
- .salud-valoracion-scope .rm-modal-panel {
- border-radius: 1.8rem !important;
- border-color: rgba(199, 181, 163, 0.72) !important;
- background: #E6DDD3 !important;
- box-shadow: 0 24px 70px rgba(47, 62, 92, 0.32) !important;
- overflow: hidden;
- }
- .salud-valoracion-scope .rm-modal-header {
- background: rgba(243, 236, 228, 0.86) !important;
- border-color: rgba(199, 181, 163, 0.45) !important;
- }
- .salud-valoracion-scope .rm-modal-body {
- background: rgba(230, 221, 211, 0.32) !important;
- }
- .salud-valoracion-scope .rm-modal-footer {
- background: rgba(213, 199, 185, 0.42) !important;
- border-color: rgba(199, 181, 163, 0.4) !important;
- }
- .salud-valoracion-scope .rm-empty-state {
- background: rgba(230, 221, 211, 0.42) !important;
- border-color: rgba(199, 181, 163, 0.72) !important;
- }
- </style>
+
+{!! file_get_contents(resource_path('frontend/styles/modules/livewire-admin-salud-seguimiento-salud-valoracion-funcional.css')) !!}
+</style>
  <section class="overflow-hidden rounded-[1.6rem] border border-borde/65 bg-fondo-panel shadow-sm backdrop-blur-xl">
  <div class="h-1.5 w-full bg-gradient-to-r from-[#E27D60] via-[#D9A05B] to-[#8DA280]"></div>
  <div class="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between">
