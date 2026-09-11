@@ -240,7 +240,7 @@
  <tr>
  <th width="30%">Colaborador</th>
  <th width="20%">Turno Asignado</th>
- <th width="25%">Días de Cobertura</th>
+ <th width="25%">Das de Cobertura</th>
  <th width="15%">Periodo</th>
  <th width="10%" style="text-align: center;">Estado</th>
  </tr>
@@ -290,7 +290,7 @@
  <span style="color: #E27D60; font-weight: bold;">ADVERTENCIA CRÍTICA:</span> Esta área no cuenta con ninguna asignación de turno activa. Se encuentra sin cobertura de personal, lo cual pone en riesgo las actividades diarias e institucionales vinculadas.
  @else
  El área cuenta con un total de <strong>{{ count($asignaciones->where('estado', 'ACTIVA')) }}</strong> asignaciones operativas activas. 
- Se sugiere verificar que los días y horarios cubran adecuadamente los flujos de trabajo específicos de esta sección.
+ Se sugiere verificar que los das y horarios cubran adecuadamente los flujos de trabajo específicos de esta sección.
  @endif
  <br><br>
  <strong>Rol del Responsable del Área:</strong><br>

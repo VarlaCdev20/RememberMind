@@ -32,7 +32,7 @@
 
     <p>4. Declaro que los datos personales y profesionales proporcionados en mi proceso de registro son verídicos y comprobables.</p>
 
-    <p>Firmado en señal de conformidad en la ciudad de La Paz, a los {{ date('d') }} días del mes de {{ \Carbon\Carbon::now()->translatedFormat('F') }} de {{ date('Y') }}.</p>
+    <p>Firmado en señal de conformidad en la ciudad de La Paz, a los {{ date('d') }} das del mes de {{ \Carbon\Carbon::now()->translatedFormat('F') }} de {{ date('Y') }}.</p>
 
     <table class="signatures">
         <tr>

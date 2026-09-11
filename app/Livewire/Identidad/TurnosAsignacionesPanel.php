@@ -484,11 +484,11 @@ class TurnosAsignacionesPanel extends Component
             $busqueda = trim($this->busqueda);
 
             $query->where(function (Builder $query) use ($busqueda) {
-                $query->where('nombres', 'ilike', "%{$busqueda}%")
-                    ->orWhere('ap_paterno', 'ilike', "%{$busqueda}%")
-                    ->orWhere('ap_materno', 'ilike', "%{$busqueda}%")
-                    ->orWhere('correo', 'ilike', "%{$busqueda}%")
-                    ->orWhere('cod_usu', 'ilike', "%{$busqueda}%");
+                $query->whereLike('nombres', "%{$busqueda}%")
+                    ->orWhereLike('ap_paterno', "%{$busqueda}%")
+                    ->orWhereLike('ap_materno', "%{$busqueda}%")
+                    ->orWhereLike('correo', "%{$busqueda}%")
+                    ->orWhereLike('cod_usu', "%{$busqueda}%");
             });
         }
 
@@ -658,9 +658,9 @@ class TurnosAsignacionesPanel extends Component
                 $busqueda = trim($this->busquedaModal);
 
                 $query->where(fn (Builder $query) => $query
-                    ->where('nombres', 'ilike', "%{$busqueda}%")
-                    ->orWhere('ap_paterno', 'ilike', "%{$busqueda}%")
-                    ->orWhere('cod_usu', 'ilike', "%{$busqueda}%"));
+                    ->whereLike('nombres', "%{$busqueda}%")
+                    ->orWhereLike('ap_paterno', "%{$busqueda}%")
+                    ->orWhereLike('cod_usu', "%{$busqueda}%"));
             })
             ->orderBy('nombres')
             ->limit(20)

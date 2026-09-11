@@ -22,7 +22,7 @@
  <i class="ph-bold ph-upload-simple text-lg"></i>
  Subir Documento
  </button>
- <a href="#" class="inline-flex items-center justify-center gap-2 rounded-xl bg-boton-principal px-4 py-2.5 text-xs font-bold text-inverso shadow-sm transition hover:-translate-y-0.5 hover:bg-fondo-panel active:scale-[0.98]">
+ <a href="{{ route('admin.adultos-mayores.documentos.index', $idAdulto) }}" class="inline-flex items-center justify-center gap-2 rounded-xl bg-boton-principal px-4 py-2.5 text-xs font-bold text-inverso shadow-sm transition hover:-translate-y-0.5 hover:opacity-90 active:scale-[0.98]">
  Ver Todos los Documentos <i class="ph-bold ph-arrow-right"></i>
  </a>
  </div>
@@ -80,7 +80,7 @@
  <p class="text-sm font-bold text-titulo truncate" title="{{ $doc->titulo }}">{{ $doc->titulo }}</p>
  <p class="text-[10px] font-bold text-apoyo mt-1 uppercase tracking-widest">{{ $doc->tipo_documento }}</p>
  <p class="text-[10px] font-bold text-apoyo mt-1">{{ \Carbon\Carbon::parse($doc->fecha_subida)->format('d/m/Y') }}</p>
- <a href="{{ Storage::url($doc->ruta_archivo) }}" class="inline-block mt-2 text-xs font-bold text-parrafo hover:underline">Ver / Descargar</a>
+ <a href="{{ route('admin.adultos-mayores.documentos.archivo', [$doc->cod_am, $doc->cod_doc_am]) }}" class="inline-block mt-2 text-xs font-bold text-parrafo hover:underline">Ver / Descargar</a>
  </div>
  </div>
  @endforeach

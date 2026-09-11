@@ -6,6 +6,8 @@ use Livewire\Component;
 use App\Models\AdultoMayor;
 use App\Models\AdministracionMedicacion;
 use App\Models\MedicacionAdulto;
+use App\Services\Enfermeria\TurnoEnfermeriaService;
+use App\Services\Medicacion\AgendaMedicacionService;
 
 class SaludAdministracionMedicacionPanel extends Component
 {
@@ -18,6 +20,14 @@ class SaludAdministracionMedicacionPanel extends Component
 
     public function mount(AdultoMayor $adulto)
     {
+        $user = auth()->user();
+        abort_unless($user, 401);
+        abort_unless($user->hasRole('SUPERADMINISTRADOR') || $user->canAny([
+            'medicacion.ver', 'salud.medicacion.ver', 'administracion_medicacion.registrar',
+        ]), 403);
+        if ($user->hasRole('ENFERMEROS')) {
+            app(TurnoEnfermeriaService::class)->autorizarAccionPaciente($adulto, $user);
+        }
         $this->adulto = $adulto;
     }
 
@@ -30,10 +40,11 @@ class SaludAdministracionMedicacionPanel extends Component
             ->get();
 
         $medicacionesActivas = MedicacionAdulto::where('cod_am', $this->adulto->cod_am)
-            ->where('estado', 'ACTIVO')
+            ->whereIn('estado', ['ACTIVO', 'ACTIVA', 'VIGENTE'])
             ->orderBy('hora_programada')
             ->get();
 
+        $agenda = app(AgendaMedicacionService::class)->paraAdulto($this->adulto->cod_am);
         $hoy = today();
         $administracionesHoy = $administraciones->filter(fn ($admin) => $admin->fecha && $admin->fecha->isSameDay($hoy));
 
@@ -45,13 +56,14 @@ class SaludAdministracionMedicacionPanel extends Component
                 ->where('administrado', false)
                 ->count(),
             'total_hoy' => $administracionesHoy->count(),
-            'pendientes' => max($medicacionesActivas->count() - $administracionesHoy->count(), 0),
+            'pendientes' => $agenda->whereIn('estado', ['PENDIENTE', 'PROXIMA', 'VENCIDA'])->count(),
         ];
 
-        return view('livewire.admin.salud-seguimiento.salud-administracion-medicacion', [
+        return view('livewire.medicacion.salud-administracion-medicacion', [
             'administraciones' => $administraciones,
             'medicacionesActivas' => $medicacionesActivas,
             'stats' => $stats,
+            'agenda' => $agenda,
         ])
             ->layout('layouts.sistema');
     }

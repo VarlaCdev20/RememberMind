@@ -69,6 +69,54 @@
         box-shadow: var(--sombra-modal);
     }
 
+    .modal-institucional,
+    .rm-drawer {
+        border: 1px solid var(--color-modal-borde);
+        background:
+            linear-gradient(145deg, var(--color-fondo-card), var(--color-fondo-panel));
+        color: var(--color-modal-texto);
+        box-shadow: var(--sombra-modal);
+    }
+
+    .rm-form-section {
+        min-width: 0;
+        border: 1px solid var(--color-borde-suave);
+        border-radius: 1rem;
+        background: var(--color-fondo-panel);
+        padding: 1rem;
+    }
+
+    .rm-patient-nav-link {
+        display: inline-flex;
+        min-height: 2.5rem;
+        flex: 0 0 auto;
+        align-items: center;
+        gap: 0.45rem;
+        border: 1px solid var(--color-borde-suave);
+        border-radius: 0.75rem;
+        background: var(--color-fondo-panel);
+        color: var(--color-texto-apoyo);
+        padding: 0.55rem 0.8rem;
+        font-size: 0.75rem;
+        font-weight: 800;
+        transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease;
+        white-space: nowrap;
+    }
+
+    .rm-patient-nav-link:hover,
+    .rm-patient-nav-link:focus-visible {
+        border-color: var(--color-borde-medio);
+        background: var(--color-fondo-hover);
+        color: var(--color-titulo);
+        outline: none;
+    }
+
+    .rm-patient-nav-link.is-active {
+        border-color: var(--color-boton-principal);
+        background: var(--color-boton-principal);
+        color: var(--color-texto-inverso);
+    }
+
     .rm-modal-header {
         display: flex;
         align-items: center;
@@ -95,5 +143,29 @@
         gap: 0.5rem;
         border-top: 1px solid var(--color-modal-footer-borde);
         padding: 0.75rem 1.25rem;
+    }
+
+    .modal-institucional :is(input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]), select, textarea),
+    .rm-drawer :is(input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]), select, textarea) {
+        width: 100%;
+        border: 1px solid var(--color-borde-medio);
+        border-radius: 0.75rem;
+        background: var(--color-fondo-card);
+        color: var(--color-parrafo);
+        min-height: 2.65rem;
+    }
+
+    .modal-institucional :is(input, select, textarea):focus,
+    .rm-drawer :is(input, select, textarea):focus {
+        border-color: var(--color-borde-focus);
+        outline: 2px solid color-mix(in srgb, var(--color-borde-focus) 24%, transparent);
+        outline-offset: 1px;
+    }
+
+    .modal-institucional label,
+    .rm-drawer label {
+        color: var(--color-titulo);
+        font-size: 0.75rem;
+        font-weight: 800;
     }
 }

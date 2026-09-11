@@ -175,9 +175,9 @@ class AsistenciaPanel extends Component
         return ActividadAdulto::with(['tipoActividad', 'adultoMayor'])
             ->when($this->search, fn($q) =>
                 $q->whereHas('adultoMayor', fn($sq) =>
-                    $sq->where('nombres', 'ilike', '%' . $this->search . '%')
-                      ->orWhere('ap_paterno', 'ilike', '%' . $this->search . '%')
-                      ->orWhere('ap_materno', 'ilike', '%' . $this->search . '%')
+                    $sq->whereLike('nombres', '%' . $this->search . '%')
+                      ->orWhereLike('ap_paterno', '%' . $this->search . '%')
+                      ->orWhereLike('ap_materno', '%' . $this->search . '%')
                 )
             )
             ->when($this->filtroTipo, fn($q) => $q->where('cod_tipo_act', $this->filtroTipo))
@@ -211,7 +211,7 @@ class AsistenciaPanel extends Component
 
     public function render()
     {
-        return view('livewire.admin.actividades.asistencia-panel', [
+        return view('livewire.actividades.asistencia-panel', [
             'stats'     => $this->getStats(),
             'registros' => $this->getRegistros(),
             'tipos'     => $this->getTipos(),

@@ -52,7 +52,7 @@
                     <img src="{{ asset('storage/imagenes/LOGO.png') }}"
                          alt="CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS"
                          class="h-9 w-auto object-contain transition-transform duration-500 group-hover:scale-105">
-                    <a href="#" class="hidden max-w-[210px] font-outfit text-[11px] font-extrabold uppercase leading-[1.05] tracking-wide text-[var(--welcome-titulo)] transition-colors group-hover:text-[var(--welcome-texto)] sm:block">CENTRO GERIÁTRICO<br>JARDÍN DE LOS RECUERDOS</a>
+                    <a href="#inicio" class="hidden max-w-[210px] font-outfit text-[11px] font-extrabold uppercase leading-[1.05] tracking-wide text-[var(--welcome-titulo)] transition-colors group-hover:text-[var(--welcome-texto)] sm:block">CENTRO GERIÁTRICO<br>JARDÍN DE LOS RECUERDOS</a>
                 </div>
 
                 {{-- Menú Escritorio --}}
@@ -455,7 +455,7 @@
                     </h2>
                     <p class="text-base md:text-lg text-[var(--welcome-titulo)]/90 font-bold mb-8 leading-relaxed">
                         El sistema RememberMind nos permite visualizar la evolución cognitiva de nuestros residentes en tiempo real. 
-                        Este seguimiento métrico reduce en un 40% las detecciones tardías y optimiza el tiempo de nuestros cuidadores.
+                        Este seguimiento métrico reduce en un 40% las detecciones tardas y optimiza el tiempo de nuestros cuidadores.
                     </p>
                     
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -519,25 +519,9 @@
                         Un hogar de amor, tecnología y respeto. Dedicados a mejorar la calidad de vida y proteger la memoria de quienes más queremos.
                     </p>
                     
-                    {{-- Botones de Redes Sociales --}}
-                    <div class="flex flex-wrap gap-4">
-                        @php
-                            $socials = [
-                                ['Facebook', 'ph-fill ph-facebook-logo', 'var(--welcome-social-facebook)'],
-                                ['Instagram', 'ph-fill ph-instagram-logo', 'var(--welcome-social-instagram)'],
-                                ['WhatsApp', 'ph-fill ph-whatsapp-logo', 'var(--welcome-social-whatsapp)'],
-                            ];
-                        @endphp
-                        
-                        @foreach($socials as $social)
-                            <a href="#" class="group flex items-center gap-0 overflow-hidden rounded-full bg-fondo-card p-3 shadow-md border border-[var(--welcome-card-border)] transition-all duration-300 hover:gap-3 hover:px-5 hover:shadow-lg hover:border-[var(--welcome-card-border)] hover:-translate-y-1 active:scale-95">
-                                <i class="{{ $social[1] }} text-xl text-[var(--welcome-muted)] group-hover:text-[{{ $social[2] }}] transition-colors"></i>
-                                <span class="w-0 overflow-hidden whitespace-nowrap text-sm font-bold text-[var(--welcome-titulo)] opacity-0 transition-all duration-300 group-hover:w-auto group-hover:opacity-100">
-                                    {{ $social[0] }}
-                                </span>
-                            </a>
-                        @endforeach
-                    </div>
+                    <p class="inline-flex items-center gap-2 rounded-full border border-[var(--welcome-card-border)] bg-fondo-card px-4 py-2 text-sm font-bold text-[var(--welcome-muted)]">
+                        <i class="ph-bold ph-info"></i> Canales institucionales disponibles en recepción
+                    </p>
                 </div>
 
                 <div data-aos="fade-up" data-aos-delay="100">

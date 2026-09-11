@@ -1,756 +1,832 @@
-<div class="space-y-6 lg:space-y-8" x-data="{ initAos() { if(typeof AOS !== 'undefined') AOS.init({ once: true, duration: 800 }); } }" x-init="initAos()">
-    @php
-        $turnoVisible = $horarioAsignadoHoy ?: $horarioSiguienteAsignado;
-    @endphp
-
-    {{-- Header del Dashboard --}}
-    <div class="flex flex-col gap-4 border-b border-borde pb-5 md:flex-row md:items-center md:justify-between" data-aos="fade-down">
-        <div class="flex items-center gap-4">
-            <div class="flex h-14 w-14 items-center justify-center rounded-[20px] bg-boton-acento/10 text-boton-acento shadow-glow transition-transform hover:scale-110">
-                <i class="ph-fill ph-stethoscope text-3xl"></i>
-            </div>
-            <div>
-                <h2 class="text-3xl font-black tracking-tight text-titulo">
-                    Dashboard Operativo
-                </h2>
-                <p class="text-sm font-semibold text-apoyo flex items-center gap-2 mt-1">
-                    <span class="inline-flex items-center gap-1.5 rounded-full bg-fondo-card px-2.5 py-0.5 text-xs font-bold text-meta border border-borde">
-                        <i class="ph-bold ph-clock"></i>
-                        {{ $turnoVisible ? ($turnoVisible['turnos'][0]['turno'] ?? 'Sin turno asignado') . ' (' . ($turnoVisible['turnos'][0]['hora_inicio'] ?? '00:00') . ' - ' . ($turnoVisible['turnos'][0]['hora_fin'] ?? '00:00') . ')' : 'Sin turno asignado' }}
+<div class="space-y-6 pb-12">
+    {{-- 1. CABECERA COMPACTA INSTITUCIONAL --}}
+    <div class="rounded-2xl border border-borde bg-fondo-panel p-5 shadow-sm">
+        <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+            <div class="space-y-1.5">
+                <div class="flex flex-wrap items-center gap-2">
+                    <span class="inline-flex items-center gap-1.5 rounded-lg border border-boton-principal/20 bg-boton-principal/5 px-2.5 py-1 text-xs font-bold text-boton-principal">
+                        <i class="ph-bold ph-shield-check text-sm"></i>
+                        <span>Dashboard de Enfermería</span>
                     </span>
-                    <span class="text-borde-suave">•</span>
-                    <span>{{ $turnoVisible ? $turnoVisible['fecha_texto'] : \Carbon\Carbon::parse($filtroFecha)->translatedFormat('d \d\e F, Y') }}</span>
-                </p>
-            </div>
-        </div>
-        <div class="flex items-center gap-3">
-            <button wire:click="$refresh" class="rm-btn-secondary h-11 px-5 rounded-xl hover:shadow-md transition-all active:scale-95">
-                <i class="ph-bold ph-arrows-clockwise text-lg"></i>
-                <span class="hidden sm:inline font-bold">Refrescar</span>
-            </button>
-            <button wire:click="exportarReporte" class="rm-btn-primary h-11 px-5 rounded-xl shadow-glow transition-all hover:scale-105 active:scale-95">
-                <i class="ph-bold ph-file-pdf text-lg"></i>
-                <span class="hidden sm:inline font-bold">Reporte de Turno</span>
-            </button>
-        </div>
-    </div>
 
-    <div class="grid gap-5 lg:grid-cols-3" data-aos="fade-up" data-aos-delay="120">
-        <div class="rounded-3xl border border-borde bg-fondo-panel p-6 shadow-sm">
-            <div class="flex items-start justify-between gap-4">
-                <div>
-                    <p class="text-[10px] font-black uppercase tracking-widest text-apoyo">Turno asignado hoy</p>
-                    <h3 class="mt-2 text-lg font-black text-titulo">
-                        {{ $horarioAsignadoHoy['turnos'][0]['turno'] ?? 'Sin asignación hoy' }}
-                    </h3>
-                    <p class="mt-1 text-xs font-semibold text-apoyo">
-                        {{ $horarioAsignadoHoy ? $horarioAsignadoHoy['fecha_texto'] . ' · ' . ($horarioAsignadoHoy['turnos'][0]['hora_inicio'] ?? '00:00') . ' - ' . ($horarioAsignadoHoy['turnos'][0]['hora_fin'] ?? '00:00') : 'No tienes turno asignado para hoy' }}
+                    @if($turnoActual)
+                        <span class="inline-flex items-center gap-1.5 rounded-lg border border-borde bg-fondo-card px-2.5 py-1 text-xs font-semibold text-titulo">
+                            <i class="ph-bold ph-sun text-amber-600"></i>
+                            <span>{{ $turnoActual->nombre }}</span>
+                            <span class="text-apoyo">({{ \Carbon\Carbon::parse($turnoActual->hora_inicio)->format('H:i') }} - {{ \Carbon\Carbon::parse($turnoActual->hora_fin)->format('H:i') }})</span>
+                        </span>
+                    @else
+                        <span class="inline-flex items-center gap-1.5 rounded-lg border border-amber-200 bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-700 dark:bg-amber-950/20 dark:text-amber-300">
+                            <i class="ph-bold ph-warning-circle"></i>
+                            <span>Sin turno asignado</span>
+                        </span>
+                    @endif
+
+                    <span class="inline-flex items-center gap-1.5 rounded-lg border border-borde bg-fondo-card px-2.5 py-1 text-xs font-semibold text-parrafo">
+                        <i class="ph-bold ph-calendar-blank text-apoyo"></i>
+                        <span>{{ ucfirst(\Carbon\Carbon::parse($filtroFecha)->translatedFormat('l, d \d\e F \d\e Y')) }}</span>
+                    </span>
+
+                    @if($esSuperAdmin)
+                        <span class="inline-flex items-center gap-1 rounded-lg border border-blue-200 bg-blue-50 px-2.5 py-1 text-xs font-bold text-blue-700 dark:bg-blue-950/20 dark:text-blue-300">
+                            <i class="ph-bold ph-buildings"></i>
+                            <span>Visión Global</span>
+                        </span>
+                    @endif
+                </div>
+
+                <div class="flex items-baseline gap-2">
+                    <h1 class="text-xl font-black tracking-tight text-titulo">
+                        Cola Operativa de Guardia
+                    </h1>
+                    <span class="text-xs text-apoyo">|</span>
+                    <p class="text-xs font-semibold text-apoyo">
+                        Enfermero(a): <strong class="text-parrafo">{{ auth()->user()->nombres }} {{ auth()->user()->ap_paterno }}</strong>
                     </p>
                 </div>
-                <div class="flex h-12 w-12 items-center justify-center rounded-[18px] bg-boton-acento/10 text-boton-acento">
-                    <i class="ph-bold ph-clock text-2xl"></i>
-                </div>
+            </div>
+
+            <div class="flex items-center gap-2">
+                <button wire:click="$refresh" class="rm-btn-secondary px-3.5 py-2 text-xs font-bold">
+                    <i class="ph-bold ph-arrows-clockwise text-sm"></i>
+                    <span>Actualizar</span>
+                </button>
+                <a href="{{ route('admin.enfermeria.pacientes') }}" class="rm-btn-primary px-3.5 py-2 text-xs font-bold">
+                    <i class="ph-bold ph-users text-sm"></i>
+                    <span>Mis Pacientes ({{ $stats['pacientes'] }})</span>
+                </a>
             </div>
         </div>
 
-        <div class="rounded-3xl border border-borde bg-fondo-panel p-6 shadow-sm">
-            <div class="flex items-start justify-between gap-4">
-                <div>
-                    <p class="text-[10px] font-black uppercase tracking-widest text-apoyo">Próxima fecha asignada</p>
-                    <h3 class="mt-2 text-lg font-black text-titulo">
-                        {{ $horarioSiguienteAsignado ? $horarioSiguienteAsignado['dia_semana'] : 'Sin próxima fecha' }}
-                    </h3>
-                    <p class="mt-1 text-xs font-semibold text-apoyo">
-                        {{ $horarioSiguienteAsignado ? $horarioSiguienteAsignado['fecha_texto'] . ' · ' . ($horarioSiguienteAsignado['turnos'][0]['hora_inicio'] ?? '00:00') . ' - ' . ($horarioSiguienteAsignado['turnos'][0]['hora_fin'] ?? '00:00') : 'No hay próximas fechas cargadas' }}
-                    </p>
+        {{-- 2. PRIMERA FILA DE INDICADORES (COMPACTAS Y CLICABLES) --}}
+        <div class="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6 border-t border-borde pt-4">
+            {{-- Pacientes --}}
+            <a href="{{ route('admin.enfermeria.pacientes') }}" class="group rounded-xl border border-borde bg-fondo-card/50 p-3 transition hover:border-boton-principal hover:bg-fondo-card block">
+                <div class="flex items-center justify-between text-apoyo group-hover:text-boton-principal">
+                    <span class="text-[10px] font-bold uppercase tracking-wider">Pacientes</span>
+                    <i class="ph-bold ph-users text-sm"></i>
                 </div>
-                <div class="flex h-12 w-12 items-center justify-center rounded-[18px] bg-estado-infoBg/50 text-estado-info">
-                    <i class="ph-bold ph-arrow-right text-2xl"></i>
-                </div>
-            </div>
-        </div>
-
-        <div class="rounded-3xl border border-borde bg-fondo-panel p-6 shadow-sm">
-            <div class="flex items-start justify-between gap-4">
-                <div>
-                    <p class="text-[10px] font-black uppercase tracking-widest text-apoyo">Horarios cargados</p>
-                    <h3 class="mt-2 text-lg font-black text-titulo">
-                        {{ count($horariosPersonal ?? []) }} registros
-                    </h3>
-                    <p class="mt-1 text-xs font-semibold text-apoyo">Solo los horarios vinculados a tu usuario.</p>
-                </div>
-                <div class="flex h-12 w-12 items-center justify-center rounded-[18px] bg-estado-exitoBg/50 text-estado-exito">
-                    <i class="ph-bold ph-calendar-check text-2xl"></i>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="rounded-3xl border border-borde bg-fondo-panel p-6 shadow-sm" data-aos="fade-up" data-aos-delay="205">
-        <div class="mb-5 flex items-center justify-between gap-3">
-            <div>
-                <h3 class="text-[11px] font-black uppercase tracking-widest text-parrafo">Areas operativas</h3>
-                <p class="mt-1 text-xs font-semibold text-apoyo">Acceso directo a lo que el enfermero usa en su jornada.</p>
-            </div>
-            <span class="inline-flex rounded-full border border-borde bg-fondo-card px-3 py-1 text-[10px] font-black uppercase tracking-widest text-parrafo">
-                {{ count($turnosActivos ?? []) }} turnos
-            </span>
-        </div>
-        <div class="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-            <a wire:navigate href="#calendario-enfermeria" class="group rounded-2xl border border-borde bg-fondo-card/40 p-4 transition-all hover:-translate-y-1 hover:border-boton-acento hover:shadow-card">
-                <div class="flex items-start justify-between gap-3">
-                    <div>
-                        <p class="text-[10px] font-black uppercase tracking-widest text-apoyo">Agenda</p>
-                        <h4 class="mt-2 text-sm font-black text-titulo">Calendario de turno</h4>
-                        <p class="mt-1 text-[11px] font-semibold text-apoyo">Fechas y horarios proximos</p>
-                    </div>
-                    <div class="flex h-11 w-11 items-center justify-center rounded-[16px] bg-boton-acento/10 text-boton-acento">
-                        <i class="ph-bold ph-calendar text-xl"></i>
-                    </div>
-                </div>
+                <p class="text-xl font-black text-titulo mt-1">{{ $stats['pacientes'] }}</p>
+                <span class="text-[10px] font-medium text-apoyo">Asignados en turno</span>
             </a>
 
-            <a wire:navigate href="{{ route('admin.admision.valoracion-enfermeria') }}" class="group rounded-2xl border border-borde bg-fondo-card/40 p-4 transition-all hover:-translate-y-1 hover:border-estado-info hover:shadow-card">
-                <div class="flex items-start justify-between gap-3">
-                    <div>
-                        <p class="text-[10px] font-black uppercase tracking-widest text-apoyo">Admision</p>
-                        <h4 class="mt-2 text-sm font-black text-titulo">Valoraciones iniciales</h4>
-                        <p class="mt-1 text-[11px] font-semibold text-apoyo">{{ $stats['valoraciones_pendientes'] ?? 0 }} pendientes</p>
-                    </div>
-                    <div class="flex h-11 w-11 items-center justify-center rounded-[16px] bg-estado-infoBg/50 text-estado-info">
-                        <i class="ph-bold ph-clipboard-text text-xl"></i>
-                    </div>
+            {{-- Alertas --}}
+            <a href="#zona-alertas" class="group rounded-xl border {{ $stats['alertas_activas'] > 0 ? 'border-red-200 bg-red-50/60 dark:bg-red-950/20' : 'border-borde bg-fondo-card/50' }} p-3 transition hover:border-red-400 block">
+                <div class="flex items-center justify-between {{ $stats['alertas_activas'] > 0 ? 'text-red-600' : 'text-apoyo' }}">
+                    <span class="text-[10px] font-bold uppercase tracking-wider">Alertas</span>
+                    <i class="ph-bold ph-bell-ringing text-sm"></i>
                 </div>
-            </a>
-
-            <a wire:navigate href="{{ route('admin.seguimiento-diario.index') }}" class="group rounded-2xl border border-borde bg-fondo-card/40 p-4 transition-all hover:-translate-y-1 hover:border-estado-exito hover:shadow-card">
-                <div class="flex items-start justify-between gap-3">
-                    <div>
-                        <p class="text-[10px] font-black uppercase tracking-widest text-apoyo">Control diario</p>
-                        <h4 class="mt-2 text-sm font-black text-titulo">Seguimiento diario</h4>
-                        <p class="mt-1 text-[11px] font-semibold text-apoyo">{{ $stats['seguimientos_hoy'] ?? 0 }} registros hoy</p>
-                    </div>
-                    <div class="flex h-11 w-11 items-center justify-center rounded-[16px] bg-estado-exitoBg/50 text-estado-exito">
-                        <i class="ph-bold ph-clipboard-text text-xl"></i>
-                    </div>
-                </div>
-            </a>
-
-            <a wire:navigate href="{{ route('admin.enfermeria.pacientes') }}" class="group rounded-2xl border border-borde bg-fondo-card/40 p-4 transition-all hover:-translate-y-1 hover:border-boton-acento hover:shadow-card">
-                <div class="flex items-start justify-between gap-3">
-                    <div>
-                        <p class="text-[10px] font-black uppercase tracking-widest text-apoyo">Pacientes</p>
-                        <h4 class="mt-2 text-sm font-black text-titulo">Mis pacientes</h4>
-                        <p class="mt-1 text-[11px] font-semibold text-apoyo">{{ $stats['pacientes'] ?? 0 }} asignados</p>
-                    </div>
-                    <div class="flex h-11 w-11 items-center justify-center rounded-[16px] bg-fondo-card text-boton-acento border border-borde">
-                        <i class="ph-bold ph-users text-xl"></i>
-                    </div>
-                </div>
-            </a>
-
-            <a wire:navigate href="{{ route('admin.enfermeria.tareas') }}" class="group rounded-2xl border border-borde bg-fondo-card/40 p-4 transition-all hover:-translate-y-1 hover:border-estado-peligro hover:shadow-card">
-                <div class="flex items-start justify-between gap-3">
-                    <div>
-                        <p class="text-[10px] font-black uppercase tracking-widest text-apoyo">Plan de cuidado</p>
-                        <h4 class="mt-2 text-sm font-black text-titulo">Tareas del turno</h4>
-                        <p class="mt-1 text-[11px] font-semibold text-apoyo">{{ $stats['tareas_pendientes'] ?? 0 }} pendientes</p>
-                    </div>
-                    <div class="flex h-11 w-11 items-center justify-center rounded-[16px] bg-estado-peligroBg/50 text-estado-peligro">
-                        <i class="ph-bold ph-list-checks text-xl"></i>
-                    </div>
-                </div>
-            </a>
-
-            <a wire:navigate href="{{ route('admin.enfermeria.alertas') }}" class="group rounded-2xl border border-borde bg-fondo-card/40 p-4 transition-all hover:-translate-y-1 hover:border-estado-peligro hover:shadow-card">
-                <div class="flex items-start justify-between gap-3">
-                    <div>
-                        <p class="text-[10px] font-black uppercase tracking-widest text-apoyo">Seguridad</p>
-                        <h4 class="mt-2 text-sm font-black text-titulo">Alertas clinicas</h4>
-                        <p class="mt-1 text-[11px] font-semibold text-apoyo">{{ $stats['alertas_activas'] ?? 0 }} activas</p>
-                    </div>
-                    <div class="flex h-11 w-11 items-center justify-center rounded-[16px] bg-estado-peligroBg/50 text-estado-peligro">
-                        <i class="ph-bold ph-bell-ringing text-xl"></i>
-                    </div>
-                </div>
-            </a>
-
-            <a wire:navigate href="{{ route('admin.enfermeria.pase-turno') }}" class="group rounded-2xl border border-borde bg-fondo-card/40 p-4 transition-all hover:-translate-y-1 hover:border-meta hover:shadow-card">
-                <div class="flex items-start justify-between gap-3">
-                    <div>
-                        <p class="text-[10px] font-black uppercase tracking-widest text-apoyo">Cierre</p>
-                        <h4 class="mt-2 text-sm font-black text-titulo">Pase de turno</h4>
-                        <p class="mt-1 text-[11px] font-semibold text-apoyo">{{ $stats['pase_pendiente'] ?? 'NO INICIADO' }}</p>
-                    </div>
-                    <div class="flex h-11 w-11 items-center justify-center rounded-[16px] bg-fondo-card text-meta border border-borde">
-                        <i class="ph-bold ph-handshake text-xl"></i>
-                    </div>
-                </div>
-            </a>
-
-            <a wire:navigate href="{{ route('admin.enfermeria.reportes') }}" class="group rounded-2xl border border-borde bg-fondo-card/40 p-4 transition-all hover:-translate-y-1 hover:border-estado-info hover:shadow-card">
-                <div class="flex items-start justify-between gap-3">
-                    <div>
-                        <p class="text-[10px] font-black uppercase tracking-widest text-apoyo">Historico</p>
-                        <h4 class="mt-2 text-sm font-black text-titulo">Reportes del turno</h4>
-                        <p class="mt-1 text-[11px] font-semibold text-apoyo">{{ $stats['valoraciones_realizadas_hoy'] ?? 0 }} valoraciones hoy</p>
-                    </div>
-                    <div class="flex h-11 w-11 items-center justify-center rounded-[16px] bg-estado-infoBg/50 text-estado-info">
-                        <i class="ph-bold ph-chart-bar text-xl"></i>
-                    </div>
-                </div>
-            </a>
-        </div>
-    </div>
-
-    @if(count($calendarioHorarios ?? []) > 0)
-        <div id="calendario-enfermeria" class="rounded-3xl border border-borde bg-fondo-panel p-6 shadow-sm" data-aos="fade-up" data-aos-delay="150">
-            <div class="mb-4 flex items-center justify-between gap-3">
-                <div>
-                    <h3 class="text-[11px] font-black uppercase tracking-widest text-parrafo">Calendario de próximas fechas</h3>
-                    <p class="mt-1 text-xs font-semibold text-apoyo">Vista de los próximos 14 días según tu programación real.</p>
-                </div>
-                <span class="inline-flex rounded-full border border-borde bg-fondo-card px-3 py-1 text-[10px] font-black uppercase tracking-widest text-parrafo">
-                    {{ count($calendarioHorarios) }} días
+                <p class="text-xl font-black {{ $stats['alertas_activas'] > 0 ? 'text-red-600' : 'text-titulo' }} mt-1">{{ $stats['alertas_activas'] }}</p>
+                <span class="text-[10px] font-medium {{ $stats['alertas_activas'] > 0 ? 'text-red-700 dark:text-red-300' : 'text-apoyo' }}">
+                    {{ $stats['alertas_criticas'] > 0 ? $stats['alertas_criticas'] . ' críticas' : ($stats['alertas_activas'] > 0 ? 'Por atender' : 'Sin alertas') }}
                 </span>
-            </div>
-            <div class="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-                @foreach($calendarioHorarios as $dia)
-                    <div class="rounded-2xl border {{ $dia['es_hoy'] ? 'border-boton-acento bg-boton-acento/5' : 'border-borde bg-fondo-card/40' }} p-4">
-                        <div class="flex items-center justify-between gap-3">
-                            <div>
-                                <p class="text-[10px] font-black uppercase tracking-widest text-apoyo">{{ $dia['dia_semana'] }}</p>
-                                <h4 class="mt-1 text-sm font-black text-titulo">{{ $dia['fecha_texto'] }}</h4>
-                            </div>
-                            @if($dia['es_hoy'])
-                                <span class="inline-flex rounded-full bg-boton-acento px-2.5 py-1 text-[9px] font-black uppercase tracking-widest text-white">
-                                    Hoy
-                                </span>
-                            @endif
-                        </div>
+            </a>
 
-                        <div class="mt-3 space-y-2">
-                            @forelse($dia['turnos'] as $turno)
-                                <div class="rounded-xl border border-borde bg-fondo-panel px-3 py-2">
-                                    <p class="text-xs font-black text-titulo">{{ $turno['turno'] }}</p>
-                                    <p class="mt-0.5 text-[10px] font-bold uppercase tracking-widest text-apoyo">
-                                        {{ $turno['hora_inicio'] }} - {{ $turno['hora_fin'] }}
-                                    </p>
-                                </div>
-                            @empty
-                                <div class="rounded-xl border border-dashed border-borde px-3 py-4 text-center">
-                                    <p class="text-[10px] font-bold uppercase tracking-widest text-apoyo">Sin turno asignado</p>
-                                </div>
-                            @endforelse
-                        </div>
-                    </div>
-                @endforeach
-            </div>
-        </div>
-    @endif
-
-    {{-- LÃ­nea de tiempo (Workflow del turno) --}}    {{-- LÃ­nea de tiempo (Workflow del turno) --}}
-    <div class="relative overflow-hidden rounded-3xl border border-borde bg-fondo-panel/60 p-6 shadow-panel backdrop-blur-xl" data-aos="fade-up" data-aos-delay="100">
-        <div class="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-boton-acento/5 blur-3xl"></div>
-        <h3 class="mb-6 flex items-center gap-2 text-[11px] font-black uppercase tracking-widest text-parrafo">
-            <i class="ph-bold ph-activity text-boton-acento text-lg"></i>
-            Flujo Operativo del Turno
-        </h3>
-
-        <div class="relative flex items-center justify-between px-2 sm:px-8">
-            <div class="absolute left-10 right-10 top-1/2 h-1 -translate-y-1/2 rounded-full bg-borde-suave/50"></div>
-
-            <div class="group relative z-10 flex flex-col items-center gap-3 cursor-pointer">
-                <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-boton-acento text-white shadow-glow transition-transform group-hover:scale-110 group-hover:rotate-6">
-                    <i class="ph-bold ph-check-circle text-xl"></i>
+            {{-- Medicación --}}
+            <a href="#zona-acciones" class="group rounded-xl border {{ $stats['medicacion_pendiente'] > 0 ? 'border-amber-200 bg-amber-50/60 dark:bg-amber-950/20' : 'border-borde bg-fondo-card/50' }} p-3 transition hover:border-amber-400 block">
+                <div class="flex items-center justify-between {{ $stats['medicacion_pendiente'] > 0 ? 'text-amber-600' : 'text-apoyo' }}">
+                    <span class="text-[10px] font-bold uppercase tracking-wider">Medicación</span>
+                    <i class="ph-bold ph-pill text-sm"></i>
                 </div>
-                <span class="text-[10px] font-black text-titulo uppercase tracking-wider transition-colors group-hover:text-boton-acento">Turno Recibido</span>
-            </div>
+                <p class="text-xl font-black {{ $stats['medicacion_pendiente'] > 0 ? 'text-amber-600' : 'text-titulo' }} mt-1">{{ $stats['medicacion_pendiente'] }}</p>
+                <span class="text-[10px] font-medium {{ $stats['medicacion_pendiente'] > 0 ? 'text-amber-700 dark:text-amber-300' : 'text-apoyo' }}">Dosis pendientes</span>
+            </a>
 
-            <div class="group relative z-10 flex flex-col items-center gap-3 cursor-pointer">
-                <div class="flex h-12 w-12 items-center justify-center rounded-2xl {{ $stats['tareas_pendientes'] == 0 ? 'bg-boton-acento text-white shadow-glow' : 'bg-estado-peligroBg text-estado-peligro ring-2 ring-estado-peligro animate-pulse' }} transition-transform group-hover:scale-110">
-                    <i class="ph-bold ph-list-checks text-xl"></i>
+            {{-- Tareas --}}
+            <a href="{{ route('admin.enfermeria.tareas') }}" class="group rounded-xl border {{ $stats['tareas_pendientes'] > 0 ? 'border-amber-200 bg-amber-50/60 dark:bg-amber-950/20' : 'border-borde bg-fondo-card/50' }} p-3 transition hover:border-amber-400 block">
+                <div class="flex items-center justify-between {{ $stats['tareas_pendientes'] > 0 ? 'text-amber-600' : 'text-apoyo' }}">
+                    <span class="text-[10px] font-bold uppercase tracking-wider">Tareas Plan</span>
+                    <i class="ph-bold ph-list-checks text-sm"></i>
                 </div>
-                <span class="text-[10px] font-black text-titulo uppercase tracking-wider transition-colors {{ $stats['tareas_pendientes'] > 0 ? 'text-estado-peligro' : 'group-hover:text-boton-acento' }}">Tareas</span>
-            </div>
+                <p class="text-xl font-black {{ $stats['tareas_pendientes'] > 0 ? 'text-amber-600' : 'text-titulo' }} mt-1">{{ $stats['tareas_pendientes'] }}</p>
+                <span class="text-[10px] font-medium {{ $stats['tareas_vencidas'] > 0 ? 'text-red-600 font-bold' : ($stats['tareas_pendientes'] > 0 ? 'text-amber-700 dark:text-amber-300' : 'text-apoyo') }}">
+                    {{ $stats['tareas_vencidas'] > 0 ? $stats['tareas_vencidas'] . ' vencidas' : 'Por ejecutar' }}
+                </span>
+            </a>
 
-            <div class="group relative z-10 flex flex-col items-center gap-3 cursor-pointer">
-                <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-fondo-card text-meta border border-borde transition-transform group-hover:scale-110">
-                    <i class="ph-bold ph-heartbeat text-xl"></i>
+            {{-- Seguimientos --}}
+            <a href="{{ route('admin.enfermeria.pacientes') }}" class="group rounded-xl border {{ $stats['seguimientos_faltantes'] > 0 ? 'border-blue-200 bg-blue-50/60 dark:bg-blue-950/20' : 'border-borde bg-fondo-card/50' }} p-3 transition hover:border-blue-400 block">
+                <div class="flex items-center justify-between {{ $stats['seguimientos_faltantes'] > 0 ? 'text-blue-600' : 'text-apoyo' }}">
+                    <span class="text-[10px] font-bold uppercase tracking-wider">Seguimientos</span>
+                    <i class="ph-bold ph-notebook text-sm"></i>
                 </div>
-                <span class="text-[10px] font-black text-titulo uppercase tracking-wider transition-colors group-hover:text-meta">Seguimiento</span>
-            </div>
+                <p class="text-xl font-black {{ $stats['seguimientos_faltantes'] > 0 ? 'text-blue-600' : 'text-titulo' }} mt-1">{{ $stats['seguimientos_faltantes'] }}</p>
+                <span class="text-[10px] font-medium {{ $stats['seguimientos_faltantes'] > 0 ? 'text-blue-700 dark:text-blue-300' : 'text-apoyo' }}">Faltan en guardia</span>
+            </a>
 
-            <div class="group relative z-10 flex flex-col items-center gap-3 cursor-pointer">
-                <div class="flex h-12 w-12 items-center justify-center rounded-2xl {{ $stats['alertas_activas'] == 0 ? 'bg-boton-acento text-white shadow-glow' : 'bg-estado-peligro text-white shadow-[0_0_15px_rgba(239,68,68,0.5)] animate-bounce' }} transition-transform group-hover:scale-110">
-                    <i class="ph-bold ph-bell-ringing text-xl"></i>
+            {{-- Pase de Turno --}}
+            <a href="{{ route('admin.enfermeria.pase-turno') }}" class="group rounded-xl border border-borde bg-fondo-card/50 p-3 transition hover:border-boton-principal hover:bg-fondo-card block">
+                <div class="flex items-center justify-between text-apoyo group-hover:text-boton-principal">
+                    <span class="text-[10px] font-bold uppercase tracking-wider">Pase Turno</span>
+                    <i class="ph-bold ph-arrows-left-right text-sm"></i>
                 </div>
-                <span class="text-[10px] font-black text-titulo uppercase tracking-wider transition-colors {{ $stats['alertas_activas'] > 0 ? 'text-estado-peligro' : 'group-hover:text-boton-acento' }}">Alertas</span>
-            </div>
-
-            <div class="group relative z-10 flex flex-col items-center gap-3 cursor-pointer">
-                <div class="flex h-12 w-12 items-center justify-center rounded-2xl {{ $stats['pase_pendiente'] === 'CERRADO' ? 'bg-boton-acento text-white shadow-glow' : 'bg-fondo-card text-apoyo border border-borde-suave' }} transition-transform group-hover:scale-110 group-hover:-rotate-6">
-                    <i class="ph-bold ph-handshake text-xl"></i>
-                </div>
-                <span class="text-[10px] font-black text-titulo uppercase tracking-wider transition-colors group-hover:text-titulo">Pase Turno</span>
-            </div>
+                <p class="text-xs font-black uppercase text-boton-acento mt-2 truncate">{{ $stats['pase_estado'] }}</p>
+                <span class="text-[10px] font-medium text-apoyo">Relevo de guardia</span>
+            </a>
         </div>
     </div>
 
-    {{-- Indicadores Kpis --}}
-    <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-7" data-aos="fade-up" data-aos-delay="200">
-        <!-- Pacientes asignados -->
-        <a href="{{ route('admin.enfermeria.pacientes') }}" class="group relative overflow-hidden rounded-3xl border border-borde bg-fondo-panel p-6 shadow-sm transition-all duration-300 hover:-translate-y-1.5 hover:border-boton-acento hover:shadow-card">
-            <div class="absolute -right-4 -top-4 h-16 w-16 rounded-full bg-boton-acento/5 transition-transform group-hover:scale-150"></div>
-            <div class="flex items-center justify-between mb-4">
-                <div class="flex h-12 w-12 items-center justify-center rounded-[18px] bg-fondo-card text-parrafo transition-colors group-hover:bg-boton-acento/10 group-hover:text-boton-acento">
-                    <i class="ph-bold ph-users text-2xl"></i>
+    {{-- 3. SECCIÓN PRINCIPAL: PACIENTES PRIORITARIOS (TABLA INSTITUCIONAL, 3-5 RESIDENTES) --}}
+    <div class="rounded-2xl border border-borde bg-fondo-panel p-5 shadow-sm">
+        <div class="flex items-center justify-between border-b border-borde pb-3.5 mb-4">
+            <div class="flex items-center gap-2.5">
+                <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-red-50 text-red-600 dark:bg-red-950/30">
+                    <i class="ph-bold ph-heart-straight text-lg"></i>
                 </div>
-            </div>
-            <p class="text-4xl font-black text-titulo">{{ $stats['pacientes'] }}</p>
-            <p class="mt-1 text-[11px] font-black uppercase tracking-widest text-apoyo group-hover:text-boton-acento">Pacientes<br>Asignados</p>
-        </a>
-
-        <!-- Tareas pendientes -->
-        <a href="{{ route('admin.enfermeria.tareas') }}" class="group relative overflow-hidden rounded-3xl border border-borde bg-fondo-panel p-6 shadow-sm transition-all duration-300 hover:-translate-y-1.5 hover:border-estado-peligro hover:shadow-card">
-            <div class="absolute -right-4 -top-4 h-16 w-16 rounded-full bg-estado-peligro/5 transition-transform group-hover:scale-150"></div>
-            <div class="flex items-center justify-between mb-4">
-                <div class="flex h-12 w-12 items-center justify-center rounded-[18px] bg-estado-peligroBg/50 text-estado-peligro transition-colors group-hover:bg-estado-peligroBg">
-                    <i class="ph-bold ph-list-checks text-2xl"></i>
-                </div>
-            </div>
-            <p class="text-4xl font-black text-estado-peligro">{{ $stats['tareas_pendientes'] }}</p>
-            <p class="mt-1 text-[11px] font-black uppercase tracking-widest text-apoyo group-hover:text-estado-peligro">Tareas<br>Pendientes</p>
-        </a>
-
-        <!-- MedicaciÃ³n -->
-        <div class="relative overflow-hidden rounded-3xl border border-borde bg-fondo-panel p-6 shadow-sm transition-all duration-300 hover:-translate-y-1.5 hover:border-estado-exito hover:shadow-card cursor-pointer">
-            <div class="absolute -right-4 -top-4 h-16 w-16 rounded-full bg-estado-exito/5 transition-transform hover:scale-150"></div>
-            <div class="flex items-center justify-between mb-4">
-                <div class="flex h-12 w-12 items-center justify-center rounded-[18px] bg-estado-exitoBg/50 text-estado-exito">
-                    <i class="ph-bold ph-pill text-2xl"></i>
-                </div>
-            </div>
-            <p class="text-4xl font-black text-estado-exito">{{ $stats['medicacion_pendiente'] }}</p>
-            <p class="mt-1 text-[11px] font-black uppercase tracking-widest text-apoyo">MedicaciÃ³n<br>Pendiente</p>
-        </div>
-
-        <!-- Signos -->
-        <div class="relative overflow-hidden rounded-3xl border border-borde bg-fondo-panel p-6 shadow-sm transition-all duration-300 hover:-translate-y-1.5 hover:border-estado-info hover:shadow-card cursor-pointer">
-            <div class="absolute -right-4 -top-4 h-16 w-16 rounded-full bg-estado-info/5 transition-transform hover:scale-150"></div>
-            <div class="flex items-center justify-between mb-4">
-                <div class="flex h-12 w-12 items-center justify-center rounded-[18px] bg-estado-infoBg/50 text-estado-info">
-                    <i class="ph-bold ph-thermometer text-2xl"></i>
-                </div>
-            </div>
-            <p class="text-4xl font-black text-estado-info">{{ $stats['signos_pendientes'] }}</p>
-            <p class="mt-1 text-[11px] font-black uppercase tracking-widest text-apoyo">Signos<br>Pendientes</p>
-        </div>
-
-        <!-- Alertas activas -->
-        <a href="{{ route('admin.enfermeria.alertas') }}" class="group relative overflow-hidden rounded-3xl border border-borde bg-fondo-panel p-6 shadow-sm transition-all duration-300 hover:-translate-y-1.5 hover:border-estado-peligro hover:shadow-card">
-            <div class="absolute -right-4 -top-4 h-16 w-16 rounded-full bg-estado-peligro/5 transition-transform group-hover:scale-150"></div>
-            <div class="flex items-center justify-between mb-4">
-                <div class="flex h-12 w-12 items-center justify-center rounded-[18px] bg-estado-peligroBg/50 text-estado-peligro transition-colors group-hover:bg-estado-peligroBg">
-                    <i class="ph-bold ph-bell-ringing text-2xl"></i>
-                </div>
-            </div>
-            <p class="text-4xl font-black text-estado-peligro">{{ $stats['alertas_activas'] }}</p>
-            <p class="mt-1 text-[11px] font-black uppercase tracking-widest text-apoyo group-hover:text-estado-peligro">Alertas<br>Activas</p>
-        </a>
-
-        <!-- Seguimiento diario -->
-        <a href="{{ route('admin.seguimiento-diario.index') }}" class="group relative overflow-hidden rounded-3xl border border-borde bg-fondo-panel p-6 shadow-sm transition-all duration-300 hover:-translate-y-1.5 hover:border-estado-info hover:shadow-card">
-            <div class="absolute -right-4 -top-4 h-16 w-16 rounded-full bg-estado-info/5 transition-transform group-hover:scale-150"></div>
-            <div class="flex items-center justify-between mb-4">
-                <div class="flex h-12 w-12 items-center justify-center rounded-[18px] bg-estado-infoBg/50 text-estado-info transition-colors group-hover:bg-estado-infoBg">
-                    <i class="ph-bold ph-clipboard-text text-2xl"></i>
-                </div>
-            </div>
-            <p class="text-4xl font-black text-estado-info">{{ $stats['seguimientos_hoy'] }}</p>
-            <p class="mt-1 text-[11px] font-black uppercase tracking-widest text-apoyo group-hover:text-estado-info">Seguimientos<br>Hoy</p>
-        </a>
-
-        <!-- Pase -->
-        <a href="{{ route('admin.enfermeria.pase-turno') }}" class="group relative overflow-hidden rounded-3xl border border-borde bg-fondo-panel p-6 shadow-sm transition-all duration-300 hover:-translate-y-1.5 hover:border-meta hover:shadow-card">
-            <div class="absolute -right-4 -top-4 h-16 w-16 rounded-full bg-meta/5 transition-transform group-hover:scale-150"></div>
-            <div class="flex items-center justify-between mb-4">
-                <div class="flex h-12 w-12 items-center justify-center rounded-[18px] bg-fondo-card text-meta border border-borde-suave transition-colors group-hover:bg-meta/10 group-hover:border-transparent">
-                    <i class="ph-bold ph-handshake text-2xl"></i>
-                </div>
-            </div>
-            <p class="text-sm font-black text-meta mt-2 truncate">{{ $stats['pase_pendiente'] }}</p>
-            <p class="mt-1 text-[11px] font-black uppercase tracking-widest text-apoyo group-hover:text-meta">Estado del<br>Pase</p>
-        </a>
-    </div>
-
-    <div class="grid gap-5 sm:grid-cols-2" data-aos="fade-up" data-aos-delay="230">
-        <div class="rounded-3xl border border-borde bg-fondo-panel p-6 shadow-sm">
-            <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-[10px] font-black uppercase tracking-widest text-apoyo">Valoraciones pendientes</p>
-                    <p class="mt-2 text-3xl font-black text-estado-info">{{ $stats['valoraciones_pendientes'] ?? 0 }}</p>
-                </div>
-                <div class="flex h-12 w-12 items-center justify-center rounded-[18px] bg-estado-infoBg/50 text-estado-info">
-                    <i class="ph-bold ph-clipboard-text text-2xl"></i>
+                    <h2 class="text-sm font-black uppercase tracking-wide text-titulo">
+                        Pacientes Prioritarios
+                    </h2>
+                    <p class="text-xs text-apoyo">Residentes con alertas activas o acciones inmediatas requeridas</p>
                 </div>
             </div>
-            <p class="mt-3 text-xs font-semibold text-apoyo">Casos aprobados por preadmisiÃ³n que esperan la revisiÃ³n inicial del enfermero asignado.</p>
+            <a href="{{ route('admin.enfermeria.pacientes') }}" class="text-xs font-bold text-boton-principal hover:underline flex items-center gap-1">
+                <span>Ver todos los pacientes ({{ $stats['pacientes'] }})</span>
+                <i class="ph-bold ph-arrow-right"></i>
+            </a>
         </div>
 
-        <div class="rounded-3xl border border-borde bg-fondo-panel p-6 shadow-sm">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-[10px] font-black uppercase tracking-widest text-apoyo">Valoraciones realizadas hoy</p>
-                    <p class="mt-2 text-3xl font-black text-estado-exito">{{ $stats['valoraciones_realizadas_hoy'] ?? 0 }}</p>
-                </div>
-                <div class="flex h-12 w-12 items-center justify-center rounded-[18px] bg-estado-exitoBg/50 text-estado-exito">
-                    <i class="ph-bold ph-check-circle text-2xl"></i>
-                </div>
+        @if($pacientesPrioritarios->isEmpty())
+            <div class="rounded-xl border border-dashed border-borde bg-fondo-card/20 p-6 text-center">
+                <i class="ph-bold ph-check-circle text-2xl text-emerald-600 mb-1"></i>
+                <p class="text-xs font-bold text-titulo">No hay pacientes con prioridades críticas en este turno</p>
+                <p class="text-[11px] text-apoyo">Todos los residentes asignados se encuentran con signos estables y tareas al día.</p>
             </div>
-            <p class="mt-3 text-xs font-semibold text-apoyo">Valoraciones de enfermerÃ­a ya guardadas y derivadas a valoraciÃ³n mÃ©dica.</p>
-        </div>
-    </div>
-
-    @if(count($valoracionesPendientes) > 0)
-        <!-- Valoraciones Iniciales Pendientes (Preadmisiones) -->
-        <div class="rounded-3xl border border-estado-infoBorde bg-gradient-to-r from-estado-infoBg/40 to-fondo-panel p-6 shadow-sm mt-4 relative overflow-hidden" data-aos="fade-up" data-aos-delay="300">
-            <div class="absolute -right-10 -top-10 w-40 h-40 bg-estado-info/10 rounded-full blur-2xl -z-10 pointer-events-none"></div>
-
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-                <div class="flex items-center gap-4">
-                    <div class="flex h-14 w-14 items-center justify-center rounded-[20px] bg-white text-estado-info shadow-sm ring-1 ring-estado-info/20">
-                        <i class="ph-bold ph-clipboard-text text-3xl"></i>
-                    </div>
-                    <div>
-                        <h3 class="text-base font-black uppercase tracking-widest text-estado-info">Valoración Inicial Pendiente</h3>
-                        <p class="text-xs font-semibold text-estado-info/80 mt-1">Pacientes nuevos derivados de preadmisión esperando la revisión del enfermero asignado.</p>
-                    </div>
-                </div>
-                <div class="flex items-center gap-2">
-                    <span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-estado-info text-white font-bold text-sm shadow-glow">
-                        {{ count($valoracionesPendientes) }}
-                    </span>
-                </div>
-            </div>
-
-            <div class="overflow-hidden rounded-2xl border border-estado-infoBorde/50 bg-white/40 backdrop-blur-sm">
-                <table class="w-full text-left text-sm">
+        @else
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs">
                     <thead>
-                        <tr class="bg-estado-info/5 text-[10px] font-black uppercase tracking-widest text-estado-info border-b border-estado-infoBorde/50">
-                            <th class="px-5 py-4">Caso / Paciente</th>
-                            <th class="px-5 py-4 hidden md:table-cell">Edad / Origen</th>
-                            <th class="px-5 py-4 hidden lg:table-cell">Motivo</th>
-                            <th class="px-5 py-4 hidden sm:table-cell">Documentación</th>
-                            <th class="px-5 py-4 text-right">Acción</th>
+                        <tr class="border-b border-borde bg-fondo-card/40 text-[10px] font-black uppercase tracking-wider text-apoyo">
+                            <th class="px-3.5 py-2.5">Paciente</th>
+                            <th class="px-3.5 py-2.5">Habitación / Cama</th>
+                            <th class="px-3.5 py-2.5">Estado</th>
+                            <th class="px-3.5 py-2.5">Próxima Acción</th>
+                            <th class="px-3.5 py-2.5 text-center">Alertas</th>
+                            <th class="px-3.5 py-2.5 text-right">Acción</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-estado-infoBorde/30">
-                        @foreach($valoracionesPendientes as $paciente)
-                            <tr class="group transition-colors hover:bg-white">
-                                <td class="px-5 py-4">
-                                    <div class="flex items-center gap-3">
-                                        <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-[14px] bg-estado-info text-white font-bold shadow-sm ring-2 ring-white">
-                                            {{ substr($paciente->nombre_completo, 0, 1) }}
+                    <tbody class="divide-y divide-borde">
+                        @foreach($pacientesPrioritarios as $item)
+                            @php
+                                $p = $item['paciente'];
+                                $estado = $item['estado'];
+                                $proxima = $item['proxima_accion'];
+                            @endphp
+                            <tr class="hover:bg-fondo-card/30 transition">
+                                {{-- Paciente --}}
+                                <td class="px-3.5 py-3">
+                                    <div class="flex items-center gap-2.5">
+                                        <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-fondo-card border border-borde font-bold text-titulo text-xs">
+                                            {{ substr($p->nombres, 0, 1) }}{{ substr($p->ap_paterno, 0, 1) }}
                                         </div>
-                                        <div class="min-w-0">
-                                            <span class="font-bold text-titulo block truncate">{{ $paciente->nombre_completo }}</span>
-                                            <span class="text-[11px] font-bold text-estado-info/80">PRE: {{ $paciente->cod_pre ?? 'N/A' }}</span>
+                                        <div>
+                                            <a href="{{ route('admin.enfermeria.pacientes.ficha', $p->cod_am) }}" class="font-bold text-titulo hover:text-boton-principal transition">
+                                                {{ $p->nombres }} {{ $p->ap_paterno }}
+                                            </a>
+                                            <div class="text-[10px] text-apoyo">
+                                                <span>{{ $p->cod_am }}</span>
+                                                @if($p->fecha_nacimiento)
+                                                    <span>· {{ \Carbon\Carbon::parse($p->fecha_nacimiento)->age }} años</span>
+                                                @endif
+                                            </div>
                                         </div>
                                     </div>
                                 </td>
-                                <td class="px-5 py-4 hidden md:table-cell">
-                                    <span class="block font-bold text-titulo text-xs">{{ \Carbon\Carbon::parse($paciente->fecha_nac)->age }} años</span>
-                                    <span class="text-[10px] font-bold text-apoyo uppercase tracking-wider">{{ str_replace('_', ' ', $paciente->procedencia_ingreso ?? 'NO ESPECIFICADA') }}</span>
-                                </td>
-                                <td class="px-5 py-4 hidden lg:table-cell">
-                                    <span class="inline-flex rounded-lg bg-fondo-card px-2.5 py-1 text-[10px] font-bold text-parrafo border border-borde-suave">
-                                        {{ str_replace('_', ' ', $paciente->motivo_ingreso ?? 'EVALUACIÓN') }}
+
+                                {{-- Habitación / Cama --}}
+                                <td class="px-3.5 py-3">
+                                    <span class="inline-flex items-center gap-1 font-semibold text-parrafo">
+                                        <i class="ph-bold ph-bed text-apoyo"></i>
+                                        <span>{{ $p->habitacion->codigo ?? 'Sin hab.' }}</span>
+                                        @if($p->cama)
+                                            <span class="text-apoyo font-normal">(Cama {{ $p->cama->numero ?? $p->cama->codigo ?? '1' }})</span>
+                                        @endif
                                     </span>
                                 </td>
-                                <td class="px-5 py-4 hidden sm:table-cell">
-                                    @php
-                                        $docsObligatorios = $paciente->documentos->whereIn('tipo_documento', ['CI', 'CI_ADULTO', 'FICHA_PREADMISION', 'COMPROMISO_INGRESO'])->count();
-                                    @endphp
-                                    <div class="flex items-center gap-1.5 {{ $docsObligatorios > 0 ? 'text-estado-exito' : 'text-estado-peligro' }}">
-                                        <i class="ph-fill {{ $docsObligatorios > 0 ? 'ph-check-circle' : 'ph-warning-circle' }} text-lg"></i>
-                                        <span class="font-bold text-[10px] uppercase tracking-widest">{{ $docsObligatorios > 0 ? 'Validada' : 'Faltan Req.' }}</span>
-                                    </div>
-                                </td>
-                                <td class="px-5 py-4 text-right">
-                                    <div class="flex items-center justify-end gap-2">
-                                        <button wire:click="iniciarValoracion('{{ $paciente->cod_pre }}')" class="inline-flex h-9 items-center justify-center rounded-xl bg-estado-info px-4 text-xs font-bold text-white shadow-glow transition hover:bg-estado-infoHover hover:scale-105 active:scale-95" title="Iniciar valoración de enfermería">
-                                            <i class="ph-bold ph-stethoscope mr-1.5"></i> Iniciar
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    @endif
 
-    @if(count($valoracionesRealizadasHoy ?? []) > 0)
-        <div class="rounded-3xl border border-estado-exitoBorde bg-gradient-to-r from-estado-exitoBg/30 to-fondo-panel p-6 shadow-sm mt-4 relative overflow-hidden" data-aos="fade-up" data-aos-delay="350">
-            <div class="absolute -left-10 -top-10 w-40 h-40 bg-estado-exito/10 rounded-full blur-2xl -z-10 pointer-events-none"></div>
-
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-                <div class="flex items-center gap-4">
-                    <div class="flex h-14 w-14 items-center justify-center rounded-[20px] bg-white text-estado-exito shadow-sm ring-1 ring-estado-exito/20">
-                        <i class="ph-bold ph-checks text-3xl"></i>
-                    </div>
-                    <div>
-                        <h3 class="text-base font-black uppercase tracking-widest text-estado-exito">Valoraciones realizadas hoy</h3>
-                        <p class="text-xs font-semibold text-estado-exito/80 mt-1">Registros ya completados por el enfermero activo en esta jornada.</p>
-                    </div>
-                </div>
-                <div class="flex items-center gap-2">
-                    <span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-estado-exito text-white font-bold text-sm shadow-glow">
-                        {{ count($valoracionesRealizadasHoy) }}
-                    </span>
-                </div>
-            </div>
-
-            <div class="overflow-hidden rounded-2xl border border-estado-exitoBorde/50 bg-white/40 backdrop-blur-sm">
-                <table class="w-full text-left text-sm">
-                    <thead>
-                        <tr class="bg-estado-exito/5 text-[10px] font-black uppercase tracking-widest text-estado-exito border-b border-estado-exitoBorde/50">
-                            <th class="px-5 py-4">Paciente</th>
-                            <th class="px-5 py-4 hidden md:table-cell">Fecha / Hora</th>
-                            <th class="px-5 py-4 hidden lg:table-cell">Estado General</th>
-                            <th class="px-5 py-4 hidden sm:table-cell">Derivacion</th>
-                            <th class="px-5 py-4 text-right">Accion</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-estado-exitoBorde/30">
-                        @foreach($valoracionesRealizadasHoy as $valoracion)
-                            <tr class="group transition-colors hover:bg-white">
-                                <td class="px-5 py-4">
-                                    <div class="flex items-center gap-3">
-                                        <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-[14px] bg-estado-exito text-white font-bold shadow-sm ring-2 ring-white">
-                                            {{ substr($valoracion->adultoMayor->nombre_completo ?? $valoracion->adultoMayor->nombres ?? $valoracion->preadmision->nombre_completo ?? 'A', 0, 1) }}
-                                        </div>
-                                        <div class="min-w-0">
-                                            <span class="font-bold text-titulo block truncate">{{ $valoracion->adultoMayor->nombre_completo ?? $valoracion->adultoMayor->nombres ?? $valoracion->preadmision->nombre_completo ?? 'Sin nombre' }}</span>
-                                            <span class="text-[11px] font-bold text-estado-exito/80">VAL: {{ $valoracion->cod_val_enf }}</span>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="px-5 py-4 hidden md:table-cell">
-                                    <span class="block font-bold text-titulo text-xs">{{ optional($valoracion->fecha_valoracion)->translatedFormat('d/m/Y') }}</span>
-                                    <span class="text-[10px] font-bold text-apoyo uppercase tracking-wider">{{ $valoracion->hora_valoracion ? \Carbon\Carbon::parse($valoracion->hora_valoracion)->format('H:i') : 'SIN HORA' }}</span>
-                                </td>
-                                <td class="px-5 py-4 hidden lg:table-cell">
-                                    <span class="inline-flex rounded-lg bg-fondo-card px-2.5 py-1 text-[10px] font-bold text-parrafo border border-borde-suave">
-                                        {{ str_replace('_', ' ', $valoracion->estado_general ?? 'EVALUADO') }}
-                                    </span>
-                                </td>
-                                <td class="px-5 py-4 hidden sm:table-cell">
-                                    <div class="flex items-center gap-1.5 text-estado-exito">
-                                        <i class="ph-fill ph-check-circle text-lg"></i>
-                                        <span class="font-bold text-[10px] uppercase tracking-widest">{{ $valoracion->estado }}</span>
-                                    </div>
-                                </td>
-                                <td class="px-5 py-4 text-right">
-                                    @if($valoracion->cod_am)
-                                        <a href="{{ route('admin.enfermeria.pacientes.ficha', $valoracion->cod_am) }}" class="inline-flex h-9 items-center justify-center rounded-xl bg-estado-exito px-4 text-xs font-bold text-white shadow-glow transition hover:bg-estado-exitoHover hover:scale-105 active:scale-95">
-                                            <i class="ph-bold ph-folder-open mr-1.5"></i> Ficha
-                                        </a>
+                                {{-- Estado --}}
+                                <td class="px-3.5 py-3">
+                                    @if($estado === 'ATENCION')
+                                        <span class="inline-flex items-center gap-1 rounded-md border border-red-200 bg-red-50 px-2 py-0.5 text-[10px] font-black uppercase text-red-700 dark:bg-red-950/30 dark:text-red-300">
+                                            <span class="h-1.5 w-1.5 rounded-full bg-red-600"></span>
+                                            <span>Atención</span>
+                                        </span>
+                                    @elseif($estado === 'VIGILANCIA')
+                                        <span class="inline-flex items-center gap-1 rounded-md border border-amber-200 bg-amber-50 px-2 py-0.5 text-[10px] font-black uppercase text-amber-700 dark:bg-amber-950/30 dark:text-amber-300">
+                                            <span class="h-1.5 w-1.5 rounded-full bg-amber-500"></span>
+                                            <span>Vigilancia</span>
+                                        </span>
                                     @else
-                                        <span class="inline-flex h-9 items-center justify-center rounded-xl bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 px-4 text-xs font-bold text-gray-400 dark:text-gray-500 select-none cursor-default" title="Aún no se ha generado la ficha de adulto mayor">
-                                            <i class="ph-bold ph-user mr-1.5"></i> Preadmisión
+                                        <span class="inline-flex items-center gap-1 rounded-md border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-[10px] font-black uppercase text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-300">
+                                            <span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
+                                            <span>Estable</span>
                                         </span>
                                     @endif
                                 </td>
+
+                                {{-- Próxima acción --}}
+                                <td class="px-3.5 py-3">
+                                    <div class="flex items-center gap-1.5 max-w-xs truncate text-parrafo">
+                                        <i class="ph-bold {{ $proxima['icono'] }} text-sm shrink-0 text-apoyo"></i>
+                                        <span class="truncate font-medium">{{ $proxima['texto'] }}</span>
+                                    </div>
+                                </td>
+
+                                {{-- Alertas --}}
+                                <td class="px-3.5 py-3 text-center">
+                                    @if($item['alertas_count'] > 0)
+                                        <span class="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-black {{ $item['alerta_max'] === 'CRITICO' ? 'bg-red-100 text-red-700 border border-red-200' : 'bg-amber-100 text-amber-700 border border-amber-200' }}">
+                                            <i class="ph-bold ph-warning"></i>
+                                            <span>{{ $item['alertas_count'] }} {{ $item['alerta_max'] ?? 'activa' }}</span>
+                                        </span>
+                                    @else
+                                        <span class="text-[10px] font-medium text-apoyo">Sin alertas</span>
+                                    @endif
+                                </td>
+
+                                {{-- Acción --}}
+                                <td class="px-3.5 py-3 text-right">
+                                    <div class="flex items-center justify-end gap-1.5">
+                                        <button wire:click="abrirRegistrarSignos('{{ $p->cod_am }}')" class="rm-btn-secondary px-2.5 py-1 text-[11px] font-bold" title="Control rápido de signos">
+                                            <i class="ph-bold ph-heartbeat"></i>
+                                            <span class="hidden sm:inline">Signos</span>
+                                        </button>
+                                        <a href="{{ route('admin.enfermeria.pacientes.ficha', $p->cod_am) }}" class="rm-btn-primary px-2.5 py-1 text-[11px] font-bold">
+                                            <span>Ficha 360°</span>
+                                            <i class="ph-bold ph-arrow-right"></i>
+                                        </a>
+                                    </div>
+                                </td>
                             </tr>
                         @endforeach
                     </tbody>
                 </table>
             </div>
+        @endif
+    </div>
+
+    {{-- 4. SEGUNDA ZONA: DOS COLUMNAS (PRÓXIMAS ACCIONES DEL TURNO VS ALERTAS RECIENTES) --}}
+    <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
+        {{-- Columna Izquierda: Próximas acciones del turno --}}
+        <div id="zona-acciones" class="rounded-2xl border border-borde bg-fondo-panel p-5 shadow-sm space-y-4">
+            <div class="flex items-center justify-between border-b border-borde pb-3">
+                <div class="flex items-center gap-2.5">
+                    <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-50 text-amber-600 dark:bg-amber-950/30">
+                        <i class="ph-bold ph-clock-countdown text-lg"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-sm font-black uppercase tracking-wide text-titulo">
+                            Próximas Acciones del Turno
+                        </h2>
+                        <p class="text-xs text-apoyo">Medicación y tareas programadas por ejecutar</p>
+                    </div>
+                </div>
+                <span class="rounded-full bg-fondo-card border border-borde px-2.5 py-0.5 text-[10px] font-bold text-apoyo">
+                    {{ $proximasAcciones->count() }} inmediatas
+                </span>
+            </div>
+
+            @if($proximasAcciones->isEmpty())
+                <div class="rounded-xl border border-dashed border-borde bg-fondo-card/20 p-6 text-center">
+                    <i class="ph-bold ph-check-circle text-2xl text-emerald-600 mb-1"></i>
+                    <p class="text-xs font-bold text-titulo">Sin acciones pendientes en este bloque</p>
+                    <p class="text-[11px] text-apoyo">Todas las tomas y tareas programadas han sido registradas.</p>
+                </div>
+            @else
+                <div class="space-y-2.5">
+                    @foreach($proximasAcciones as $accion)
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-xl border border-borde bg-fondo-card/40 p-3 hover:bg-fondo-card/70 transition">
+                            <div class="flex items-start gap-2.5">
+                                <span class="font-mono text-xs font-black rounded-lg bg-fondo-panel border border-borde px-2 py-1 text-titulo shrink-0 mt-0.5">
+                                    {{ $accion['hora'] }}
+                                </span>
+                                <div class="space-y-0.5">
+                                    <div class="flex items-center gap-1.5 flex-wrap">
+                                        @if($accion['tipo'] === 'MEDICACION')
+                                            <span class="rounded bg-emerald-50 text-emerald-700 border border-emerald-200 px-1.5 py-0.2 text-[9px] font-black uppercase">
+                                                Medicación
+                                            </span>
+                                        @else
+                                            <span class="rounded bg-amber-50 text-amber-700 border border-amber-200 px-1.5 py-0.2 text-[9px] font-black uppercase">
+                                                Tarea
+                                            </span>
+                                        @endif
+                                        <a href="{{ route('admin.enfermeria.pacientes.ficha', $accion['paciente']->cod_am) }}" class="text-xs font-bold text-titulo hover:text-boton-principal">
+                                            {{ $accion['paciente']->nombres }} {{ $accion['paciente']->ap_paterno }}
+                                        </a>
+                                        <span class="text-[10px] text-apoyo">
+                                            (Hab. {{ $accion['paciente']->habitacion->codigo ?? 'N/A' }})
+                                        </span>
+                                    </div>
+                                    <p class="text-xs font-medium text-parrafo">
+                                        {{ $accion['titulo'] }}
+                                    </p>
+                                    <p class="text-[10px] text-apoyo">
+                                        {{ $accion['detalle'] }}
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center gap-1.5 shrink-0 self-end sm:self-center">
+                                @if($accion['tipo'] === 'MEDICACION')
+                                    <button wire:click="administrarMed('{{ $accion['item_med']['medicacion']->cod_med_adulto }}', '{{ $accion['paciente']->cod_am }}')" class="rm-btn-primary px-2.5 py-1 text-[11px] font-bold">
+                                        <i class="ph-bold ph-check"></i>
+                                        <span>Administrar</span>
+                                    </button>
+                                    <button wire:click="abrirOmitirMed('{{ $accion['item_med']['medicacion']->cod_med_adulto }}', '{{ $accion['paciente']->cod_am }}')" class="rm-btn-secondary px-2 py-1 text-[11px] font-bold text-amber-700 hover:text-amber-800" title="Omitir toma">
+                                        <i class="ph-bold ph-x"></i>
+                                    </button>
+                                @else
+                                    <button wire:click="completarTarea('{{ $accion['item_tarea']->cod_tarea }}')" class="rm-btn-primary px-2.5 py-1 text-[11px] font-bold">
+                                        <i class="ph-bold ph-check"></i>
+                                        <span>Completar</span>
+                                    </button>
+                                    <button wire:click="abrirOmitirTarea('{{ $accion['item_tarea']->cod_tarea }}')" class="rm-btn-secondary px-2 py-1 text-[11px] font-bold text-amber-700 hover:text-amber-800" title="Omitir tarea">
+                                        <i class="ph-bold ph-x"></i>
+                                    </button>
+                                @endif
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            @endif
+        </div>
+
+        {{-- Columna Derecha: Alertas recientes --}}
+        <div id="zona-alertas" class="rounded-2xl border border-borde bg-fondo-panel p-5 shadow-sm space-y-4">
+            <div class="flex items-center justify-between border-b border-borde pb-3">
+                <div class="flex items-center gap-2.5">
+                    <div class="flex h-8 w-8 items-center justify-center rounded-lg {{ $alertas->isNotEmpty() ? 'bg-red-50 text-red-600 dark:bg-red-950/30' : 'bg-fondo-card text-apoyo' }}">
+                        <i class="ph-bold ph-bell-ringing text-lg"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-sm font-black uppercase tracking-wide text-titulo">
+                            Alertas Recientes
+                        </h2>
+                        <p class="text-xs text-apoyo">Notificaciones y alertas activas de tus residentes</p>
+                    </div>
+                </div>
+                <span class="rounded-full px-2.5 py-0.5 text-[10px] font-bold {{ $alertas->isNotEmpty() ? 'bg-red-100 text-red-700 border border-red-200' : 'bg-fondo-card text-apoyo border border-borde' }}">
+                    {{ $alertas->count() }} activas
+                </span>
+            </div>
+
+            @if($alertas->isEmpty())
+                <div class="rounded-xl border border-dashed border-borde bg-fondo-card/20 p-6 text-center">
+                    <i class="ph-bold ph-shield-check text-2xl text-emerald-600 mb-1"></i>
+                    <p class="text-xs font-bold text-titulo">Sin alertas clínicas activas</p>
+                    <p class="text-[11px] text-apoyo">Todos los signos vitales y condiciones están bajo control.</p>
+                </div>
+            @else
+                <div class="space-y-2.5 max-h-[380px] overflow-y-auto pr-1">
+                    @foreach($alertas as $alerta)
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-xl border p-3 transition {{ $alerta->nivel === 'CRITICO' ? 'border-red-300 bg-red-50/50 dark:bg-red-950/20' : ($alerta->nivel === 'ALTO' ? 'border-amber-300 bg-amber-50/40 dark:bg-amber-950/20' : 'border-borde bg-fondo-card/40') }}">
+                            <div class="space-y-1">
+                                <div class="flex items-center gap-2">
+                                    <span class="inline-flex shrink-0 items-center justify-center rounded px-1.5 py-0.5 text-[9px] font-black uppercase tracking-wider {{ $alerta->nivel === 'CRITICO' ? 'bg-red-600 text-white' : ($alerta->nivel === 'ALTO' ? 'bg-amber-500 text-white' : 'bg-blue-600 text-white') }}">
+                                        {{ $alerta->nivel }}
+                                    </span>
+                                    <h3 class="text-xs font-black text-titulo">
+                                        {{ $alerta->tipo_alerta }}
+                                    </h3>
+                                    <span class="text-[10px] text-apoyo">·</span>
+                                    <a href="{{ route('admin.enfermeria.pacientes.ficha', $alerta->cod_am) }}?tab=alertas" class="text-xs font-bold text-boton-principal hover:underline">
+                                        {{ $alerta->adultoMayor->nombres }} {{ $alerta->adultoMayor->ap_paterno }}
+                                    </a>
+                                </div>
+                                <p class="text-xs text-parrafo">
+                                    {{ $alerta->descripcion }}
+                                </p>
+                                <p class="text-[10px] text-apoyo">
+                                    Hab. {{ $alerta->adultoMayor->habitacion->codigo ?? 'N/A' }} · Hace {{ $alerta->created_at->diffForHumans(null, true) }}
+                                </p>
+                            </div>
+
+                            <div class="flex items-center gap-1.5 shrink-0 self-end sm:self-center">
+                                @if($alerta->estado === 'ABIERTA')
+                                    <button wire:click="abrirAtenderAlerta('{{ $alerta->cod_alerta }}')" class="rm-btn-primary px-2.5 py-1 text-[11px] font-bold">
+                                        <i class="ph-bold ph-hand-pointing"></i>
+                                        <span>Atender</span>
+                                    </button>
+                                @else
+                                    <span class="rounded bg-blue-50 px-2 py-0.5 text-[10px] font-bold text-blue-700 border border-blue-200">
+                                        En Atención
+                                    </span>
+                                @endif
+                                <button wire:click="abrirCerrarAlerta('{{ $alerta->cod_alerta }}')" class="rm-btn-secondary px-2.5 py-1 text-[11px] font-bold">
+                                    <i class="ph-bold ph-check"></i>
+                                    <span>Cerrar</span>
+                                </button>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            @endif
+        </div>
+    </div>
+
+    {{-- 5. MÁXIMO 2 GRÁFICAS ÚTILES (DATOS REALES) --}}
+    <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+        {{-- Gráfica 1: Cumplimiento del turno (% tareas y seguimientos) --}}
+        <div class="rounded-2xl border border-borde bg-fondo-panel p-5 shadow-sm flex flex-col justify-between">
+            <div>
+                <div class="flex items-center justify-between border-b border-borde pb-3 mb-3">
+                    <div class="flex items-center gap-2">
+                        <i class="ph-bold ph-chart-donut text-boton-principal text-base"></i>
+                        <h3 class="text-xs font-black uppercase tracking-wide text-titulo">
+                            Cumplimiento del Turno Operativo
+                        </h3>
+                    </div>
+                    <span class="rounded-full bg-fondo-card border border-borde px-2 py-0.5 text-[10px] font-black text-parrafo">
+                        {{ $cumplimientoTurno['porcentaje'] }}% completado
+                    </span>
+                </div>
+                <p class="text-xs text-apoyo mb-3">Progreso consolidado de tareas y seguimientos diarios de la guardia</p>
+
+                <div class="h-44 w-full relative flex items-center justify-center" wire:ignore x-data="{
+                    chart: null,
+                    init() {
+                        if (typeof window.Chart === 'undefined') return;
+                        const ctx = this.$refs.canvas.getContext('2d');
+                        const dataCompletada = {{ $cumplimientoTurno['completadas'] }};
+                        const dataPendiente = {{ max(0, $cumplimientoTurno['total_acciones'] - $cumplimientoTurno['completadas']) }};
+                        
+                        this.chart = new window.Chart(ctx, {
+                            type: 'doughnut',
+                            data: {
+                                labels: ['Realizadas', 'Pendientes'],
+                                datasets: [{
+                                    data: [dataCompletada, dataPendiente],
+                                    backgroundColor: ['#3F7D5A', '#E9A05F'],
+                                    borderWidth: 2,
+                                    borderColor: '#FFF8F1',
+                                    hoverOffset: 4
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                cutout: '75%',
+                                plugins: {
+                                    datalabels: { display: false },
+                                    legend: {
+                                        position: 'bottom',
+                                        labels: { boxWidth: 10, font: { size: 10, weight: 'bold' }, padding: 12 }
+                                    },
+                                    tooltip: {
+                                        padding: 8,
+                                        cornerRadius: 8,
+                                    }
+                                }
+                            }
+                        });
+                    }
+                }">
+                    <canvas x-ref="canvas" class="max-h-44"></canvas>
+                    <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none pb-5">
+                        <span class="text-xl font-black text-titulo">{{ $cumplimientoTurno['porcentaje'] }}%</span>
+                        <span class="text-[9px] uppercase font-bold text-apoyo">Completitud</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2 border-t border-borde pt-3 mt-3 text-center">
+                <div class="rounded-lg bg-fondo-card/50 p-2">
+                    <span class="text-[10px] font-bold text-apoyo block uppercase">Tareas Realizadas</span>
+                    <span class="text-xs font-black text-titulo">{{ $cumplimientoTurno['tareas_completadas'] }} / {{ $cumplimientoTurno['tareas_completadas'] + $cumplimientoTurno['tareas_pendientes'] }}</span>
+                </div>
+                <div class="rounded-lg bg-fondo-card/50 p-2">
+                    <span class="text-[10px] font-bold text-apoyo block uppercase">Seguimientos Listos</span>
+                    <span class="text-xs font-black text-titulo">{{ $cumplimientoTurno['seguimientos_completados'] }} / {{ $cumplimientoTurno['seguimientos_completados'] + $cumplimientoTurno['seguimientos_pendientes'] }}</span>
+                </div>
+            </div>
+        </div>
+
+        {{-- Gráfica 2: Distribución de pacientes (estable / vigilancia / atención) --}}
+        <div class="rounded-2xl border border-borde bg-fondo-panel p-5 shadow-sm flex flex-col justify-between">
+            <div>
+                <div class="flex items-center justify-between border-b border-borde pb-3 mb-3">
+                    <div class="flex items-center gap-2">
+                        <i class="ph-bold ph-chart-pie-slice text-boton-principal text-base"></i>
+                        <h3 class="text-xs font-black uppercase tracking-wide text-titulo">
+                            Distribución Asistencial de Pacientes
+                        </h3>
+                    </div>
+                    <span class="rounded-full bg-fondo-card border border-borde px-2 py-0.5 text-[10px] font-black text-parrafo">
+                        {{ $stats['pacientes'] }} residentes
+                    </span>
+                </div>
+                <p class="text-xs text-apoyo mb-3">Clasificación según nivel de criticidad y controles pendientes</p>
+
+                <div class="h-44 w-full relative flex items-center justify-center" wire:ignore x-data="{
+                    chart: null,
+                    init() {
+                        if (typeof window.Chart === 'undefined') return;
+                        const ctx = this.$refs.canvas.getContext('2d');
+                        const estable = {{ $distribucionPacientes['estable'] }};
+                        const vigilancia = {{ $distribucionPacientes['vigilancia'] }};
+                        const atencion = {{ $distribucionPacientes['atencion'] }};
+                        
+                        this.chart = new window.Chart(ctx, {
+                            type: 'doughnut',
+                            data: {
+                                labels: ['Estables', 'Vigilancia', 'Atención Prioritaria'],
+                                datasets: [{
+                                    data: [estable, vigilancia, atencion],
+                                    backgroundColor: ['#3F7D5A', '#E9A05F', '#C9654E'],
+                                    borderWidth: 2,
+                                    borderColor: '#FFF8F1',
+                                    hoverOffset: 4
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                cutout: '75%',
+                                plugins: {
+                                    datalabels: { display: false },
+                                    legend: {
+                                        position: 'bottom',
+                                        labels: { boxWidth: 10, font: { size: 10, weight: 'bold' }, padding: 12 }
+                                    },
+                                    tooltip: {
+                                        padding: 8,
+                                        cornerRadius: 8,
+                                    }
+                                }
+                            }
+                        });
+                    }
+                }">
+                    <canvas x-ref="canvas" class="max-h-44"></canvas>
+                    <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none pb-5">
+                        <span class="text-xl font-black text-titulo">{{ $stats['pacientes'] }}</span>
+                        <span class="text-[9px] uppercase font-bold text-apoyo">Residentes</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-3 gap-2 border-t border-borde pt-3 mt-3 text-center">
+                <div class="rounded-lg bg-emerald-50/70 dark:bg-emerald-950/20 p-2 border border-emerald-200">
+                    <span class="text-[10px] font-bold text-emerald-700 dark:text-emerald-300 block uppercase">Estables</span>
+                    <span class="text-xs font-black text-emerald-800 dark:text-emerald-200">{{ $distribucionPacientes['estable'] }}</span>
+                </div>
+                <div class="rounded-lg bg-amber-50/70 dark:bg-amber-950/20 p-2 border border-amber-200">
+                    <span class="text-[10px] font-bold text-amber-700 dark:text-amber-300 block uppercase">Vigilancia</span>
+                    <span class="text-xs font-black text-amber-800 dark:text-amber-200">{{ $distribucionPacientes['vigilancia'] }}</span>
+                </div>
+                <div class="rounded-lg bg-red-50/70 dark:bg-red-950/20 p-2 border border-red-200">
+                    <span class="text-[10px] font-bold text-red-700 dark:text-red-300 block uppercase">Atención</span>
+                    <span class="text-xs font-black text-red-800 dark:text-red-200">{{ $distribucionPacientes['atencion'] }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- 6. AL FINAL: RESUMEN PEQUEÑO DEL PASE DE TURNO --}}
+    <div class="rounded-2xl border border-borde bg-fondo-panel p-5 shadow-sm">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div class="space-y-1">
+                <div class="flex items-center gap-2">
+                    <span class="flex h-7 w-7 items-center justify-center rounded-lg bg-boton-principal/10 text-boton-principal">
+                        <i class="ph-bold ph-arrows-left-right text-sm"></i>
+                    </span>
+                    <h3 class="text-xs font-black uppercase tracking-wide text-titulo">
+                        Resumen del Pase de Guardia
+                    </h3>
+                    <span class="rounded-md border border-borde bg-fondo-card px-2 py-0.5 text-[10px] font-black uppercase text-boton-acento">
+                        {{ $stats['pase_estado'] }}
+                    </span>
+                </div>
+                <p class="text-xs text-parrafo">
+                    @if($paseTurnoHoy)
+                        Relevo registrado de <strong>{{ $paseTurnoHoy->enfermeroSaliente->name ?? 'Enfermero(a)' }}</strong> hacia <strong>{{ $paseTurnoHoy->enfermeroEntrante->name ?? 'Por confirmar' }}</strong>.
+                        @if($paseTurnoHoy->requiere_vigilancia_especial)
+                            <span class="font-bold text-amber-700 block mt-0.5">· Vigilancia especial activa registrada en el pase.</span>
+                        @endif
+                    @else
+                        El pase de este turno aún no ha sido redactado. Complete la entrega antes de finalizar su horario.
+                    @endif
+                </p>
+            </div>
+
+            <div class="flex items-center gap-2 shrink-0">
+                <a href="{{ route('admin.enfermeria.pase-turno') }}" class="rm-btn-secondary px-3.5 py-2 text-xs font-bold">
+                    <i class="ph-bold ph-clipboard-text"></i>
+                    <span>Gestionar Pase de Turno</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    {{-- 7. MODALES OPERATIVOS (PRESERVADOS Y FUNCIONALES) --}}
+
+    {{-- Modal Omitir Tarea --}}
+    @if($modalOmitirTarea)
+        <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+            <div class="w-full max-w-md rounded-2xl border border-borde bg-fondo-panel p-5 shadow-lg">
+                <h3 class="text-sm font-black text-titulo">Registrar Omisión de Tarea</h3>
+                <p class="text-xs text-apoyo mt-1">Indique el motivo asistencial por el cual no se ejecutó la tarea.</p>
+                <div class="mt-4">
+                    <label class="text-xs font-bold text-parrafo block mb-1">Motivo de omisión *</label>
+                    <textarea wire:model="motivoOmisionTarea" rows="3" class="rm-input w-full text-xs" placeholder="Ej: Residente dormido en horario programado..."></textarea>
+                    @error('motivoOmisionTarea') <span class="text-xs text-red-500 font-bold mt-1 block">{{ $message }}</span> @enderror
+                </div>
+                <div class="mt-5 flex justify-end gap-2">
+                    <button wire:click="$set('modalOmitirTarea', false)" class="rm-btn-secondary px-3.5 py-1.5 text-xs font-bold">Cancelar</button>
+                    <button wire:click="confirmarOmisionTarea" class="rm-btn-primary px-3.5 py-1.5 text-xs font-bold">Confirmar Omisión</button>
+                </div>
+            </div>
         </div>
     @endif
 
-    @if(!$turnoActual || count($pacientesAsignadosIds) == 0)
-        <!-- Empty State -->
-        <div class="flex flex-col items-center justify-center rounded-3xl border-2 border-dashed border-borde bg-fondo-panel/50 py-20 text-center" data-aos="fade-up" data-aos-delay="300">
-            <div class="mb-5 flex h-20 w-20 items-center justify-center rounded-3xl bg-fondo-card text-meta shadow-inner border border-borde">
-                <i class="ph-bold ph-bed text-4xl"></i>
-            </div>
-            <h3 class="text-xl font-black text-titulo">No hay pacientes asignados</h3>
-            <p class="mt-2 max-w-sm text-sm font-semibold text-apoyo">Actualmente no tienes pacientes asignados a este turno, o no hay un turno activo. Consulta con el administrador.</p>
-        </div>
-    @else
-        <!-- GrÃ¡ficas y Tabla -->
-        <div class="grid gap-6 lg:grid-cols-3" data-aos="fade-up" data-aos-delay="400">
-
-            <div class="lg:col-span-2 space-y-6">
-                <!-- GrÃ¡ficas Principales -->
-                <div class="grid gap-6 md:grid-cols-2">
-                    <div class="rounded-3xl border border-borde bg-fondo-panel p-6 shadow-panel">
-                        <h3 class="mb-5 flex items-center gap-2 text-[11px] font-black uppercase tracking-widest text-parrafo">
-                            <i class="ph-bold ph-chart-pie-slice text-boton-acento text-lg"></i>
-                            Estado de Tareas
-                        </h3>
-                        <div class="relative h-56 w-full flex items-center justify-center">
-                            <canvas id="chartTareas"></canvas>
-                        </div>
-                    </div>
-                    <div class="rounded-3xl border border-borde bg-fondo-panel p-6 shadow-panel">
-                        <h3 class="mb-5 flex items-center gap-2 text-[11px] font-black uppercase tracking-widest text-parrafo">
-                            <i class="ph-bold ph-trend-up text-boton-acento text-lg"></i>
-                            Actividad por Hora
-                        </h3>
-                        <div class="relative h-56 w-full">
-                            <canvas id="chartActividad"></canvas>
-                        </div>
-                    </div>
+    {{-- Modal Omitir Medicación --}}
+    @if($modalOmitirMed)
+        <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+            <div class="w-full max-w-md rounded-2xl border border-borde bg-fondo-panel p-5 shadow-lg">
+                <h3 class="text-sm font-black text-titulo">Registrar Omisión de Medicamento</h3>
+                <p class="text-xs text-apoyo mt-1">Justifique la razón clínica o de rechazo para no suministrar la dosis.</p>
+                <div class="mt-4">
+                    <label class="text-xs font-bold text-parrafo block mb-1">Motivo clínico de omisión *</label>
+                    <textarea wire:model="motivoOmisionMed" rows="3" class="rm-input w-full text-xs" placeholder="Ej: Rechazo explícito por náuseas, informado a médico..."></textarea>
+                    @error('motivoOmisionMed') <span class="text-xs text-red-500 font-bold mt-1 block">{{ $message }}</span> @enderror
                 </div>
-
-                <!-- Tabla Principal -->
-                <div class="rounded-3xl border border-borde bg-fondo-panel shadow-panel overflow-hidden">
-                    <div class="flex items-center justify-between border-b border-borde p-6 bg-fondo-card/30">
-                        <h3 class="flex items-center gap-2 text-[11px] font-black uppercase tracking-widest text-titulo">
-                            <i class="ph-bold ph-list-numbers text-boton-acento text-lg"></i>
-                            PrÃ³ximas Tareas (Top 10)
-                        </h3>
-                        <a href="{{ route('admin.enfermeria.tareas') }}" class="text-[10px] font-black uppercase tracking-widest text-boton-acento transition-colors hover:text-boton-acentoHover flex items-center gap-1">
-                            Ver todas <i class="ph-bold ph-arrow-right"></i>
-                        </a>
-                    </div>
-
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left text-sm">
-                            <thead>
-                                <tr class="bg-fondo-hover text-[10px] font-black uppercase tracking-widest text-apoyo border-b border-borde">
-                                    <th class="px-5 py-4">Hora</th>
-                                    <th class="px-5 py-4">Paciente</th>
-                                    <th class="px-5 py-4 hidden sm:table-cell">Tarea</th>
-                                    <th class="px-5 py-4 hidden md:table-cell">Prioridad</th>
-                                    <th class="px-5 py-4">Estado</th>
-                                    <th class="px-5 py-4 text-right">AcciÃ³n</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-borde-suave">
-                                @forelse($tareasTabla as $tarea)
-                                    <tr class="group transition-colors hover:bg-fondo-card/50">
-                                        <td class="px-5 py-4">
-                                            <span class="inline-flex rounded-lg bg-fondo-card px-2.5 py-1 text-xs font-bold text-titulo border border-borde shadow-sm group-hover:border-boton-acento/30 transition-colors">
-                                                {{ \Carbon\Carbon::parse($tarea->hora_programada)->format('H:i') }}
-                                            </span>
-                                        </td>
-                                        <td class="px-5 py-4">
-                                            <div class="flex items-center gap-3">
-                                                <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] bg-boton-acento/10 text-[11px] font-black text-boton-acento">
-                                                    {{ substr($tarea->adultoMayor->nombres ?? 'A', 0, 1) }}
-                                                </div>
-                                                <div class="min-w-0">
-                                                    <span class="font-bold text-titulo block truncate">{{ $tarea->adultoMayor->nombres ?? 'Desconocido' }}</span>
-                                                    <span class="text-[10px] font-bold text-meta truncate">Hab. {{ $tarea->adultoMayor->habitacion->numero ?? $tarea->adultoMayor->cod_habitacion ?? 'N/A' }}</span>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td class="px-5 py-4 hidden sm:table-cell text-xs font-semibold text-parrafo">
-                                            {{ Str::limit($tarea->titulo, 30) }}
-                                        </td>
-                                        <td class="px-5 py-4 hidden md:table-cell">
-                                            @php
-                                                $colorPrioridad = match($tarea->prioridad) {
-                                                    'ALTA' => 'bg-estado-peligroBg text-estado-peligro border-estado-peligroBorde',
-                                                    'MEDIA' => 'bg-estado-advertenciaBg text-estado-advertencia border-estado-advertenciaBorde',
-                                                    default => 'bg-fondo-card text-apoyo border-borde',
-                                                };
-                                            @endphp
-                                            <span class="inline-flex rounded-md border px-2 py-0.5 text-[9px] font-black uppercase tracking-widest {{ $colorPrioridad }}">
-                                                {{ $tarea->prioridad }}
-                                            </span>
-                                        </td>
-                                        <td class="px-5 py-4">
-                                            @php
-                                                $colorEstado = match($tarea->estado) {
-                                                    'PENDIENTE' => 'text-estado-advertencia',
-                                                    'REALIZADA' => 'text-estado-exito',
-                                                    'OMITIDA' => 'text-estado-peligro',
-                                                    default => 'text-meta',
-                                                };
-                                            @endphp
-                                            <div class="flex items-center gap-1.5 {{ $colorEstado }}">
-                                                <i class="ph-fill ph-circle text-[8px]"></i>
-                                                <span class="text-[10px] font-black uppercase tracking-widest">{{ $tarea->estado }}</span>
-                                            </div>
-                                        </td>
-                                        <td class="px-5 py-4 text-right">
-                                            <a href="{{ route('admin.enfermeria.tareas') }}" class="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-fondo-card text-apoyo border border-borde shadow-sm transition hover:bg-boton-acento hover:text-white hover:border-boton-acento hover:scale-110 active:scale-95" title="Atender Tarea">
-                                                <i class="ph-bold ph-arrow-right text-lg"></i>
-                                            </a>
-                                        </td>
-                                    </tr>
-                                @empty
-                                    <tr>
-                                        <td colspan="6" class="py-12 text-center text-xs font-bold text-apoyo">
-                                            <div class="flex flex-col items-center gap-3">
-                                                <i class="ph-bold ph-check-circle text-4xl text-estado-exito/50"></i>
-                                                <span>No hay tareas programadas pendientes.</span>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Columna lateral: Mini grÃ¡ficas -->
-            <div class="space-y-6">
-                <!-- MedicaciÃ³n -->
-                <div class="rounded-3xl border border-borde bg-fondo-panel p-6 shadow-panel relative overflow-hidden">
-                    <h3 class="mb-5 flex items-center gap-2 text-[11px] font-black uppercase tracking-widest text-parrafo">
-                        <i class="ph-bold ph-pill text-estado-exito text-lg"></i>
-                        Estatus MedicaciÃ³n
-                    </h3>
-                    <div class="relative h-44 w-full flex items-center justify-center">
-                        <canvas id="chartMedicacion"></canvas>
-                    </div>
-                </div>
-
-                <!-- Nivel de supervisiÃ³n -->
-                <div class="rounded-3xl border border-borde bg-fondo-panel p-6 shadow-panel">
-                    <h3 class="mb-5 flex items-center gap-2 text-[11px] font-black uppercase tracking-widest text-parrafo">
-                        <i class="ph-bold ph-eye text-meta text-lg"></i>
-                        SupervisiÃ³n Asignada
-                    </h3>
-                    <div class="relative h-44 w-full">
-                        <canvas id="chartSupervision"></canvas>
-                    </div>
-                </div>
-
-                <!-- Alertas -->
-                <div class="rounded-3xl border border-borde bg-fondo-panel p-6 shadow-panel relative overflow-hidden">
-                    <div class="absolute right-0 top-0 w-24 h-24 bg-estado-peligro/5 rounded-bl-[100px] pointer-events-none"></div>
-                    <h3 class="mb-5 flex items-center gap-2 text-[11px] font-black uppercase tracking-widest text-parrafo">
-                        <i class="ph-bold ph-bell-ringing text-estado-peligro text-lg"></i>
-                        Alertas ClÃ­nicas
-                    </h3>
-                    <div class="relative h-40 w-full">
-                        <canvas id="chartAlertas"></canvas>
-                    </div>
-                    <div class="mt-5 flex w-full">
-                        <a href="{{ route('admin.enfermeria.alertas') }}" class="rm-btn-secondary w-full text-center py-2.5 rounded-xl border-borde text-xs uppercase tracking-widest group">
-                            Gestionar <i class="ph-bold ph-arrow-right ml-1 transition-transform group-hover:translate-x-1"></i>
-                        </a>
-                    </div>
+                <div class="mt-5 flex justify-end gap-2">
+                    <button wire:click="$set('modalOmitirMed', false)" class="rm-btn-secondary px-3.5 py-1.5 text-xs font-bold">Cancelar</button>
+                    <button wire:click="confirmarOmisionMed" class="rm-btn-primary px-3.5 py-1.5 text-xs font-bold">Confirmar Omisión</button>
                 </div>
             </div>
         </div>
     @endif
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script>
-const rmDatos46828cbc9c7f = @json($charts ?? []);
-{!! file_get_contents(resource_path('frontend/scripts/modules/livewire-cuidados-dashboard-turno.js')) !!}
-</script>
+    {{-- Modal Atender Alerta --}}
+    @if($modalAtenderAlerta)
+        <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+            <div class="w-full max-w-md rounded-2xl border border-borde bg-fondo-panel p-5 shadow-lg">
+                <h3 class="text-sm font-black text-titulo">Registrar Atención de Alerta</h3>
+                <p class="text-xs text-apoyo mt-1">Describa la intervención o verificación inicial realizada.</p>
+                <div class="mt-4">
+                    <label class="text-xs font-bold text-parrafo block mb-1">Acción tomada *</label>
+                    <textarea wire:model="accionTomadaAlerta" rows="3" class="rm-input w-full text-xs" placeholder="Ej: Se acudió a habitación y se verificó saturación de O2..."></textarea>
+                    @error('accionTomadaAlerta') <span class="text-xs text-red-500 font-bold mt-1 block">{{ $message }}</span> @enderror
+                </div>
+                <div class="mt-5 flex justify-end gap-2">
+                    <button wire:click="$set('modalAtenderAlerta', false)" class="rm-btn-secondary px-3.5 py-1.5 text-xs font-bold">Cancelar</button>
+                    <button wire:click="confirmarAtencionAlerta" class="rm-btn-primary px-3.5 py-1.5 text-xs font-bold">Registrar Atención</button>
+                </div>
+            </div>
+        </div>
+    @endif
 
-    @livewire('valoraciones.valoracion-inicial-modal')
+    {{-- Modal Cerrar Alerta --}}
+    @if($modalCerrarAlerta)
+        <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+            <div class="w-full max-w-md rounded-2xl border border-borde bg-fondo-panel p-5 shadow-lg">
+                <h3 class="text-sm font-black text-titulo">Cerrar Alerta Clínica</h3>
+                <p class="text-xs text-apoyo mt-1">Registre el resultado final y la resolución de la condición clínica.</p>
+                <div class="mt-4">
+                    <label class="text-xs font-bold text-parrafo block mb-1">Observación de Cierre *</label>
+                    <textarea wire:model="observacionCierreAlerta" rows="3" class="rm-input w-full text-xs" placeholder="Ej: Parámetros estabilizados tras administración de medicación indicada..."></textarea>
+                    @error('observacionCierreAlerta') <span class="text-xs text-red-500 font-bold mt-1 block">{{ $message }}</span> @enderror
+                </div>
+                <div class="mt-5 flex justify-end gap-2">
+                    <button wire:click="$set('modalCerrarAlerta', false)" class="rm-btn-secondary px-3.5 py-1.5 text-xs font-bold">Cancelar</button>
+                    <button wire:click="confirmarCierreAlerta" class="rm-btn-primary px-3.5 py-1.5 text-xs font-bold">Confirmar Cierre</button>
+                </div>
+            </div>
+        </div>
+    @endif
+
+    {{-- Modal Rápido de Signos Vitales --}}
+    @if($modalSignos)
+        <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+            <div class="w-full max-w-lg rounded-2xl border border-borde bg-fondo-panel p-5 shadow-lg">
+                <div class="flex items-center justify-between border-b border-borde pb-3">
+                    <div class="flex items-center gap-2">
+                        <i class="ph-bold ph-heartbeat text-boton-principal text-lg"></i>
+                        <h3 class="text-sm font-black text-titulo">Control Rápido de Signos Vitales</h3>
+                    </div>
+                    <button wire:click="$set('modalSignos', false)" class="text-apoyo hover:text-parrafo">
+                        <i class="ph-bold ph-x text-base"></i>
+                    </button>
+                </div>
+                <p class="text-xs text-apoyo mt-2">Registre los valores obtenidos en la valoración directa.</p>
+
+                <div class="mt-4 grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="text-xs font-bold text-parrafo block mb-1">Presión Arterial (PA)</label>
+                        <input type="text" wire:model="signoPresion" placeholder="120/80" class="rm-input w-full text-xs" />
+                    </div>
+                    <div>
+                        <label class="text-xs font-bold text-parrafo block mb-1">Frec. Cardaca (bpm)</label>
+                        <input type="number" wire:model="signoFC" placeholder="72" class="rm-input w-full text-xs" />
+                    </div>
+                    <div>
+                        <label class="text-xs font-bold text-parrafo block mb-1">Temperatura (°C)</label>
+                        <input type="number" step="0.1" wire:model="signoTemp" placeholder="36.5" class="rm-input w-full text-xs" />
+                    </div>
+                    <div>
+                        <label class="text-xs font-bold text-parrafo block mb-1">Saturación SpO2 (%)</label>
+                        <input type="number" wire:model="signoSat" placeholder="96" class="rm-input w-full text-xs" />
+                    </div>
+                    <div>
+                        <label class="text-xs font-bold text-parrafo block mb-1">Glucemia (mg/dL)</label>
+                        <input type="number" step="0.1" wire:model="signoGlucosa" placeholder="95" class="rm-input w-full text-xs" />
+                    </div>
+                    <div>
+                        <label class="text-xs font-bold text-parrafo block mb-1">Dolor Escala EVA (0-10)</label>
+                        <input type="number" min="0" max="10" wire:model="signoDolor" placeholder="0" class="rm-input w-full text-xs" />
+                    </div>
+                </div>
+
+                <div class="mt-3">
+                    <label class="text-xs font-bold text-parrafo block mb-1">Observaciones</label>
+                    <input type="text" wire:model="signoObservacion" placeholder="Opcional..." class="rm-input w-full text-xs" />
+                </div>
+
+                <div class="mt-5 flex justify-end gap-2 border-t border-borde pt-3">
+                    <button wire:click="$set('modalSignos', false)" class="rm-btn-secondary px-3.5 py-1.5 text-xs font-bold">Cancelar</button>
+                    <button wire:click="guardarSignos" class="rm-btn-primary px-3.5 py-1.5 text-xs font-bold">Guardar Signos</button>
+                </div>
+            </div>
+        </div>
+    @endif
+
+    {{-- Modal Rápido de Seguimiento --}}
+    @if($modalSeguimiento)
+        <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+            <div class="w-full max-w-lg rounded-2xl border border-borde bg-fondo-panel p-5 shadow-lg">
+                <div class="flex items-center justify-between border-b border-borde pb-3">
+                    <div class="flex items-center gap-2">
+                        <i class="ph-bold ph-notebook text-boton-principal text-lg"></i>
+                        <h3 class="text-sm font-black text-titulo">Registro de Seguimiento Diario</h3>
+                    </div>
+                    <button wire:click="$set('modalSeguimiento', false)" class="text-apoyo hover:text-parrafo">
+                        <i class="ph-bold ph-x text-base"></i>
+                    </button>
+                </div>
+                <p class="text-xs text-apoyo mt-2">Evolución durante el turno activo para el residente.</p>
+
+                <div class="mt-4 grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="text-xs font-bold text-parrafo block mb-1">Estado General</label>
+                        <select wire:model="segEstadoGeneral" class="rm-select w-full text-xs">
+                            <option value="ESTABLE">Estable</option>
+                            <option value="DELICADO">Delicado</option>
+                            <option value="EN_OBSERVACION">En Observación</option>
+                            <option value="CRITICO">Crítico</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="text-xs font-bold text-parrafo block mb-1">Alimentación</label>
+                        <select wire:model="segAlimentacion" class="rm-select w-full text-xs">
+                            <option value="COMPLETA">Completa (100%)</option>
+                            <option value="PARCIAL">Parcial (50-75%)</option>
+                            <option value="ESCASA">Escasa (&lt; 50%)</option>
+                            <option value="RECHAZO">Rechazo Total</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="text-xs font-bold text-parrafo block mb-1">Movilidad</label>
+                        <select wire:model="segMovilidad" class="rm-select w-full text-xs">
+                            <option value="INDEPENDIENTE">Independiente</option>
+                            <option value="ASISTIDA">Asistida</option>
+                            <option value="EN_CAMA">En Cama / Reposo</option>
+                            <option value="SILLA_RUEDAS">Silla de Ruedas</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="text-xs font-bold text-parrafo block mb-1">Sueño / Descanso</label>
+                        <select wire:model="segSueno" class="rm-select w-full text-xs">
+                            <option value="NORMAL">Normal / Reparador</option>
+                            <option value="INTERRUMPIDO">Interrumpido</option>
+                            <option value="INSOMNIO">Insomnio</option>
+                            <option value="SOMNOLENCIA">Somnolencia excesiva</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="mt-4 space-y-2">
+                    <label class="flex items-center gap-2 text-xs font-semibold text-parrafo cursor-pointer">
+                        <input type="checkbox" wire:model="segIncidente" class="rounded text-boton-acento" />
+                        <span>Ocurrió un incidente (caída, desorientación severa, etc.)</span>
+                    </label>
+                    <label class="flex items-center gap-2 text-xs font-semibold text-parrafo cursor-pointer">
+                        <input type="checkbox" wire:model="segRequiereMedico" class="rounded text-boton-acento" />
+                        <span>Requiere valoración o revisión médica inmediata</span>
+                    </label>
+                </div>
+
+                <div class="mt-3">
+                    <label class="text-xs font-bold text-parrafo block mb-1">Observaciones</label>
+                    <textarea wire:model="segObservacion" rows="2" class="rm-input w-full text-xs" placeholder="Detalles de la guardia..."></textarea>
+                </div>
+
+                <div class="mt-5 flex justify-end gap-2 border-t border-borde pt-3">
+                    <button wire:click="$set('modalSeguimiento', false)" class="rm-btn-secondary px-3.5 py-1.5 text-xs font-bold">Cancelar</button>
+                    <button wire:click="guardarSeguimiento" class="rm-btn-primary px-3.5 py-1.5 text-xs font-bold">Guardar Seguimiento</button>
+                </div>
+            </div>
+        </div>
+    @endif
 </div>

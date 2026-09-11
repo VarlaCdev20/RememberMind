@@ -91,7 +91,7 @@ class ActividadesPanel extends Component
         $this->modalEditar = true;
     }
 
-    public function abrirDetalle(int $id): void
+    public function abrirDetalle(string $id): void
     {
         $this->detalleId    = $id;
         $this->modalDetalle = true;
@@ -205,9 +205,9 @@ class ActividadesPanel extends Component
         return ActividadAdulto::with(['tipoActividad', 'adultoMayor'])
             ->when($this->search, fn($q) =>
                 $q->whereHas('adultoMayor', fn($sq) =>
-                    $sq->where('nombres', 'ilike', '%' . $this->search . '%')
-                      ->orWhere('ap_paterno', 'ilike', '%' . $this->search . '%')
-                      ->orWhere('ap_materno', 'ilike', '%' . $this->search . '%')
+                    $sq->whereLike('nombres', '%' . $this->search . '%')
+                      ->orWhereLike('ap_paterno', '%' . $this->search . '%')
+                      ->orWhereLike('ap_materno', '%' . $this->search . '%')
                 )
             )
             ->when($this->filtroTipo,       fn($q) => $q->where('cod_tipo_act', $this->filtroTipo))
@@ -242,7 +242,7 @@ class ActividadesPanel extends Component
 
     public function render()
     {
-        return view('livewire.admin.actividades.actividades-panel', [
+        return view('livewire.actividades.actividades-panel', [
             'stats'       => $this->getStats(),
             'actividades' => $this->getActividades(),
             'tipos'       => $this->getTipos(),

@@ -3,26 +3,30 @@
 namespace App\Models;
 
 use App\Traits\GeneraCodigo;
-
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class Habitacion extends Model
 {
     use GeneraCodigo;
-    use SoftDeletes, LogsActivity;
+    use LogsActivity, SoftDeletes;
 
-    protected $table      = 'habitaciones';
+    protected $table = 'habitaciones';
+
     protected $primaryKey = 'cod_habitacion';
 
     public $incrementing = false;
+
     protected $keyType = 'string';
+
     protected $prefixCode = 'HAB';
+
     protected $digitsCode = 3;
-    public $timestamps   = true;
+
+    public $timestamps = true;
 
     protected $fillable = [
         'cod_habitacion',
@@ -48,11 +52,11 @@ class Habitacion extends Model
             ->logFillable()
             ->logOnlyDirty()
             ->useLogName('Habitaciones')
-            ->setDescriptionForEvent(fn(string $e) => match($e) {
+            ->setDescriptionForEvent(fn (string $e) => match ($e) {
                 'created' => "Habitación {$this->codigo} registrada.",
                 'updated' => "Habitación {$this->codigo} actualizada.",
                 'deleted' => "Habitación {$this->codigo} eliminada.",
-                default   => "Habitación {$this->codigo} modificada ({$e}).",
+                default => "Habitación {$this->codigo} modificada ({$e}).",
             });
     }
 
@@ -65,7 +69,15 @@ class Habitacion extends Model
 
     public function camasDisponibles(): HasMany
     {
-        return $this->camas()->where('estado', 'DISPONIBLE');
+        return $this->camas()
+            ->where('estado', 'DISPONIBLE')
+            ->whereDoesntHave('asignacionesActivas');
+    }
+
+    public function asignacionesActivas(): HasMany
+    {
+        return $this->hasMany(AsignacionAdultoMayor::class, 'cod_habitacion', 'cod_habitacion')
+            ->whereIn('estado', ['ACTIVO', 'ACTIVA']);
     }
 
     protected static function booted(): void

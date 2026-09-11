@@ -16,7 +16,7 @@
  $antiguedadTexto = $meses . ($meses === 1 ? ' mes' : ' meses');
  if ($meses === 0) {
  $dias = $ingreso->diffInDays($ahora);
- $antiguedadTexto = $dias . ($dias === 1 ? ' día' : ' días');
+ $antiguedadTexto = $dias . ($dias === 1 ? ' día' : ' das');
  }
  }
  }
@@ -185,7 +185,7 @@
  <div class="flex items-center justify-between border-b border-borde-suave px-6 py-4">
  <div>
  <span class="text-[10px] font-bold uppercase tracking-[0.2em] text-parrafo">
- Estadía
+ Estada
  </span>
  <h2 class="mt-0.5 text-base font-extrabold text-titulo">
  Permanencia y Ubicación Institucional

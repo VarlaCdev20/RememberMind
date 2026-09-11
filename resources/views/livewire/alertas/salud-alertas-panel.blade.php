@@ -34,15 +34,15 @@
  <p class="mt-1 text-xs font-bold text-parrafo/55">Seleccione un tipo de alerta para depurar el seguimiento.</p>
  </div>
  <label class="block w-full sm:max-w-xs">
- <span class="mb-1.5 block text-[9px] font-bold uppercase tracking-widest text-parrafo/55">Tipo de alerta</span>
+ <span class="mb-1.5 block text-[9px] font-bold uppercase tracking-widestá text-parrafo/55">Tipo de alerta</span>
  <div class="relative">
  <i class="ph-bold ph-funnel absolute left-3.5 top-1/2 -translate-y-1/2 text-meta"></i>
  <select wire:model.live="filtroTipo" class="w-full rounded-xl border border-borde/70 bg-fondo-panel py-2.5 pl-10 pr-4 text-xs font-bold text-parrafo outline-none transition focus:border-borde-focus focus:ring-2 focus:ring-[#E27D60]/15">
  <option value="">Todos los tipos</option>
- <option value="Ficha MÃ©dica">Ficha médica</option>
- <option value="MedicaciÃ³n">Medicación</option>
+ <option value="Ficha Médica">Ficha médica</option>
+ <option value="Medicación">Medicación</option>
  <option value="Signos Vitales">Signos vitales</option>
- <option value="ValoraciÃ³n">Valoración funcional</option>
+ <option value="Valoración">Valoración funcional</option>
  </select>
  </div>
  </label>
@@ -55,10 +55,10 @@
  $esCritica = $alerta['nivel'] === 'critica';
  $tipo = $alerta['tipo'];
  $icono = match($tipo) {
- 'Ficha MÃ©dica', 'Ficha Médica' => 'ph-file-dashed',
- 'MedicaciÃ³n', 'Medicación' => 'ph-pill',
+ 'Ficha Médica', 'Ficha Médica' => 'ph-file-dashed',
+ 'Medicación', 'Medicación' => 'ph-pill',
  'Signos Vitales' => 'ph-activity',
- 'ValoraciÃ³n', 'Valoración' => 'ph-person-simple-walk',
+ 'Valoración', 'Valoración' => 'ph-person-simple-walk',
  default => 'ph-warning-circle',
  };
  $panel = $esCritica
@@ -86,7 +86,7 @@
  <div class="space-y-4 p-5">
  <p class="text-sm font-bold leading-relaxed text-parrafo/78">{{ $alerta['mensaje'] }}</p>
  <div class="rounded-2xl border border-borde/35 bg-fondo-panel px-4 py-3">
- <p class="text-[9px] font-bold uppercase tracking-widest text-parrafo/45">Acción sugerida</p>
+ <p class="text-[9px] font-bold uppercase tracking-widestá text-parrafo/45">Acción sugerida</p>
  <p class="mt-1 text-xs font-bold uppercase text-parrafo">{{ $alerta['accion'] }}</p>
  </div>
  <a href="{{ $alerta['ruta'] }}" class="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-boton-principal px-4 py-2.5 text-[10px] font-bold uppercase tracking-wider text-inverso shadow-[0_8px_18px_rgba(47,62,92,0.18)] transition hover:bg-fondo-panel active:scale-95">

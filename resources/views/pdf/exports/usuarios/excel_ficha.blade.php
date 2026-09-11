@@ -85,7 +85,7 @@
  <tr>
  <td style="font-weight: bold;">Horario de Entrada/Salida:</td>
  <td>{{ substr($horarios->turno?->hora_inicio, 0, 5) }} - {{ substr($horarios->turno?->hora_fin, 0, 5) }}</td>
- <td style="font-weight: bold;">Días Planificados:</td>
+ <td style="font-weight: bold;">Das Planificados:</td>
  <td>{{ implode(', ', $horarios->dias_semana ?? []) }}</td>
  </tr>
  @else

@@ -41,6 +41,7 @@ class SaludSeguimientoListPanel extends Component
 
     public function mount()
     {
+        $this->seccionActiva = request()->route('seccion') ?: $this->seccionActiva;
         // Validación de permisos por tab. 
         // Si el usuario entra directamente a un tab sin permiso, lo regresamos al que sí pueda ver o a resumen.
         $this->validarPermisoSeccion();
@@ -269,9 +270,9 @@ class SaludSeguimientoListPanel extends Component
                 'administracionesMedicacion' => function($q) { $q->latest('fecha')->limit(3); },
             ])
             ->where(function ($q) {
-                $q->where('nombres', 'ilike', '%' . $this->search . '%')
-                  ->orWhere('ap_paterno', 'ilike', '%' . $this->search . '%')
-                  ->orWhere('cod_am', 'ilike', '%' . $this->search . '%');
+                $q->whereLike('nombres', '%' . $this->search . '%')
+                  ->orWhereLike('ap_paterno', '%' . $this->search . '%')
+                  ->orWhereLike('cod_am', '%' . $this->search . '%');
             });
 
         $adultos = $query->orderBy('ap_paterno')->paginate(12);

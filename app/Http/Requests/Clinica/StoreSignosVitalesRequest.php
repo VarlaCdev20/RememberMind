@@ -2,62 +2,113 @@
 
 namespace App\Http\Requests\Clinica;
 
+use App\Services\Clinica\ValidacionSignosVitalesService;
+use App\Services\Enfermeria\TurnoEnfermeriaService;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreSignosVitalesRequest extends FormRequest
 {
-    public function authorize(): bool { return true; }
+    public function authorize(): bool
+    {
+        return true;
+    }
+
+    protected function prepareForValidation(): void
+    {
+        $sis = $this->input('presion_sistolica');
+        $dia = $this->input('presion_diastolica');
+
+        if (($sis === null || $sis === '') && !empty($this->input('presion_arterial')) && str_contains($this->input('presion_arterial'), '/')) {
+            $partes = explode('/', $this->input('presion_arterial'));
+            if (isset($partes[0]) && is_numeric(trim($partes[0]))) {
+                $sis = (int) trim($partes[0]);
+            }
+            if (isset($partes[1]) && is_numeric(trim($partes[1]))) {
+                $dia = (int) trim($partes[1]);
+            }
+            $this->merge([
+                'presion_sistolica' => $sis,
+                'presion_diastolica' => $dia,
+            ]);
+        }
+
+        // Normalizar talla a cm e IMC server-side
+        $talla = $this->input('talla') !== null && $this->input('talla') !== '' ? (float) $this->input('talla') : null;
+        $peso = $this->input('peso') !== null && $this->input('peso') !== '' ? (float) $this->input('peso') : null;
+
+        if ($peso && $talla) {
+            $imc = ValidacionSignosVitalesService::calcularImc($peso, $talla);
+            $this->merge(['imc' => $imc]);
+        }
+    }
 
     public function rules(): array
     {
         return [
-            'cod_am'              => 'required|string|exists:adulto_mayor,cod_am',
-            'fecha'               => 'required|date',
-            'hora'                => 'required|date_format:H:i',
-            'presion_arterial'    => 'nullable|string|max:20',
-            'frecuencia_cardiaca' => 'nullable|integer|min:20|max:220',
-            'temperatura'         => 'nullable|numeric|min:30|max:45',
-            'saturacion'          => 'nullable|integer|min:50|max:100',
-            'glucosa'             => 'nullable|numeric|min:20|max:600',
-            'peso'                => 'nullable|numeric|min:20|max:250',
-            'talla'               => 'nullable|numeric|min:0.8|max:2.2',
-            'imc'                 => 'nullable|numeric|min:5|max:80',
-            'dolor'               => 'nullable|string|max:50',
-            'observacion'         => 'nullable|string|max:5000',
+            'cod_am'                  => 'required|string|exists:adulto_mayor,cod_am',
+            'fecha'                   => 'required|date|before_or_equal:today',
+            'hora'                    => 'required|date_format:H:i',
+            'presion_arterial'        => 'nullable|string|max:20',
+            'presion_sistolica'       => 'nullable|integer|min:' . ValidacionSignosVitalesService::PAS_MIN . '|max:' . ValidacionSignosVitalesService::PAS_MAX,
+            'presion_diastolica'      => 'nullable|integer|min:' . ValidacionSignosVitalesService::PAD_MIN . '|max:' . ValidacionSignosVitalesService::PAD_MAX,
+            'frecuencia_cardiaca'     => 'nullable|integer|min:' . ValidacionSignosVitalesService::FC_MIN . '|max:' . ValidacionSignosVitalesService::FC_MAX,
+            'frecuencia_respiratoria' => 'nullable|integer|min:' . ValidacionSignosVitalesService::FR_MIN . '|max:' . ValidacionSignosVitalesService::FR_MAX,
+            'temperatura'             => 'nullable|numeric|min:' . ValidacionSignosVitalesService::TEMP_MIN . '|max:' . ValidacionSignosVitalesService::TEMP_MAX,
+            'saturacion'              => 'nullable|integer|min:' . ValidacionSignosVitalesService::SPO2_MIN . '|max:' . ValidacionSignosVitalesService::SPO2_MAX,
+            'glucosa'                 => 'nullable|numeric|min:' . ValidacionSignosVitalesService::GLUCOSA_MIN . '|max:' . ValidacionSignosVitalesService::GLUCOSA_MAX,
+            'peso'                    => 'nullable|numeric|min:' . ValidacionSignosVitalesService::PESO_MIN . '|max:' . ValidacionSignosVitalesService::PESO_MAX,
+            'talla'                   => 'nullable|numeric|min:0.5|max:' . ValidacionSignosVitalesService::TALLA_CM_MAX,
+            'imc'                     => 'nullable|numeric|min:5|max:80',
+            'dolor'                   => 'nullable|integer|min:' . ValidacionSignosVitalesService::DOLOR_MIN . '|max:' . ValidacionSignosVitalesService::DOLOR_MAX,
+            'observacion'             => 'nullable|string|max:5000',
         ];
     }
 
     public function messages(): array
     {
-        return [
-            'cod_am.required'          => 'El adulto mayor es obligatorio.',
-            'cod_am.exists'            => 'El adulto mayor seleccionado no existe.',
-            'fecha.required'           => 'La fecha es obligatoria.',
-            'hora.required'            => 'La hora es obligatoria.',
-            'hora.date_format'         => 'La hora debe tener formato HH:MM.',
-            'frecuencia_cardiaca.min'  => 'La frecuencia cardíaca debe ser al menos 20 bpm.',
-            'frecuencia_cardiaca.max'  => 'La frecuencia cardíaca no puede exceder 220 bpm.',
-            'temperatura.min'          => 'La temperatura debe ser al menos 30°C.',
-            'temperatura.max'          => 'La temperatura no puede exceder 45°C.',
-            'saturacion.min'           => 'La saturación debe ser al menos 50%.',
-            'saturacion.max'           => 'La saturación no puede exceder 100%.',
-            'glucosa.min'              => 'La glucosa debe ser al menos 20 mg/dL.',
-            'glucosa.max'              => 'La glucosa no puede exceder 600 mg/dL.',
-            'peso.min'                 => 'El peso debe ser al menos 20 kg.',
-            'peso.max'                 => 'El peso no puede exceder 250 kg.',
-            'talla.min'                => 'La talla debe ser al menos 0.80 m.',
-            'talla.max'                => 'La talla no puede exceder 2.20 m.',
-        ];
+        return array_merge(ValidacionSignosVitalesService::mensajes(), [
+            'cod_am.required'        => 'El adulto mayor es obligatorio.',
+            'cod_am.exists'          => 'El adulto mayor seleccionado no existe.',
+            'fecha.required'         => 'La fecha es obligatoria.',
+            'fecha.before_or_equal'  => 'La fecha no puede ser futura.',
+            'hora.required'          => 'La hora es obligatoria.',
+            'hora.date_format'       => 'La hora debe tener formato HH:MM.',
+        ]);
     }
 
     public function withValidator($validator): void
     {
         $validator->after(function ($validator) {
-            $campos = ['presion_arterial','frecuencia_cardiaca','temperatura','saturacion','glucosa','peso','talla','dolor'];
-            $alMenosUno = collect($campos)->contains(fn($c) => !is_null($this->input($c)) && $this->input($c) !== '');
+            $sis = $this->input('presion_sistolica');
+            $dia = $this->input('presion_diastolica');
 
-            if (!$alMenosUno) {
-                $validator->errors()->add('signos', 'Debe registrar al menos un signo vital o medición.');
+            $campos = [
+                $sis, $dia,
+                $this->input('frecuencia_cardiaca'),
+                $this->input('frecuencia_respiratoria'),
+                $this->input('temperatura'),
+                $this->input('saturacion'),
+                $this->input('glucosa'),
+                $this->input('peso'),
+                $this->input('dolor'),
+            ];
+
+            ValidacionSignosVitalesService::validarIntegridadCruzada(
+                $validator,
+                $sis !== null && $sis !== '' ? (int) $sis : null,
+                $dia !== null && $dia !== '' ? (int) $dia : null,
+                $campos,
+                'presion_arterial',
+                'signos'
+            );
+
+            // Verificar ámbito del enfermero
+            if ($this->user() && $this->input('cod_am')) {
+                try {
+                    app(TurnoEnfermeriaService::class)->autorizarAccionPaciente($this->input('cod_am'), $this->user());
+                } catch (\Throwable $e) {
+                    $validator->errors()->add('cod_am', $e->getMessage());
+                }
             }
         });
     }

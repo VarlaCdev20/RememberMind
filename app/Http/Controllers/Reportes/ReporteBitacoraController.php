@@ -24,7 +24,7 @@ class ReporteBitacoraController extends Controller
 
     public function preview()
     {
-        return view('reportes.bitacora.index', [
+        return view('pages.reportes.bitacora.index', [
             'esPdf'    => false,
             'datos'    => $this->compilarDatos(),
             'graficas' => [
@@ -46,7 +46,7 @@ class ReporteBitacoraController extends Controller
     {
         $datos = $this->compilarDatos();
 
-        $pdf = Pdf::loadView('reportes.bitacora.index', [
+        $pdf = Pdf::loadView('pages.reportes.bitacora.index', [
             'esPdf'    => true,
             'datos'    => $datos,
             'graficas' => [

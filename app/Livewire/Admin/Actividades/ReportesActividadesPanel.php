@@ -52,9 +52,9 @@ class ReportesActividadesPanel extends Component
             ->when($this->filtroTipo, fn($q) => $q->where('cod_tipo_act', $this->filtroTipo))
             ->when($this->buscar, fn($q) =>
                 $q->whereHas('adultoMayor', fn($sq) =>
-                    $sq->where('nombres', 'ilike', '%' . $this->buscar . '%')
-                      ->orWhere('ap_paterno', 'ilike', '%' . $this->buscar . '%')
-                      ->orWhere('ap_materno', 'ilike', '%' . $this->buscar . '%')
+                    $sq->whereLike('nombres', '%' . $this->buscar . '%')
+                      ->orWhereLike('ap_paterno', '%' . $this->buscar . '%')
+                      ->orWhereLike('ap_materno', '%' . $this->buscar . '%')
                 )
             );
     }
@@ -152,12 +152,12 @@ class ReportesActividadesPanel extends Component
         $q = DB::table('actividades_adulto')
             ->when(Schema::hasColumn('actividades_adulto', 'deleted_at'), fn($q) => $q->whereNull('deleted_at'))
             ->select(
-                DB::raw("TO_CHAR(fecha, 'MM') as mes"),
-                DB::raw("TO_CHAR(fecha, 'Mon') as mes_nombre"),
+                DB::raw(\App\Services\Reportes\ReporteDataService::expresionMes('fecha').' as mes'),
+                DB::raw(\App\Services\Reportes\ReporteDataService::expresionMes('fecha', true).' as mes_nombre'),
                 DB::raw('COUNT(*) as total')
             )
-            ->groupByRaw("TO_CHAR(fecha, 'MM'), TO_CHAR(fecha, 'Mon')")
-            ->orderByRaw("TO_CHAR(fecha, 'MM')");
+            ->groupByRaw(\App\Services\Reportes\ReporteDataService::expresionMes('fecha').', '.\App\Services\Reportes\ReporteDataService::expresionMes('fecha', true))
+            ->orderByRaw(\App\Services\Reportes\ReporteDataService::expresionMes('fecha'));
 
         if ($this->fechaDesde) $q->where('fecha', '>=', $this->fechaDesde);
         if ($this->fechaHasta) $q->where('fecha', '<=', $this->fechaHasta);
@@ -226,7 +226,7 @@ class ReportesActividadesPanel extends Component
     {
         $filtros = $this->buildFiltros();
 
-        return view('livewire.admin.actividades.reportes-actividades-panel', [
+        return view('livewire.actividades.reportes-actividades-panel', [
             'stats'       => $this->getStats(),
             'preview'     => $this->getPreview(),
             'chartEstado' => $this->getChartEstado(),

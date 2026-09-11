@@ -20,9 +20,9 @@ class SaludValoracionPanel extends Component
     public bool $modalDetalleOpen  = false;
     public bool $modalAnularOpen   = false;
 
-    public ?int $editandoId  = null;
-    public ?int $viendoId    = null;
-    public ?int $anulandoId  = null;
+    public ?string $editandoId  = null;
+    public ?string $viendoId    = null;
+    public ?string $anulandoId  = null;
 
     // ── Filtros ──────────────────────────────────────────────────────────────
     public string $filtroEstado = '';
@@ -101,7 +101,7 @@ class SaludValoracionPanel extends Component
         $this->modalFormOpen = true;
     }
 
-    public function abrirFormEditar(int $id): void
+    public function abrirFormEditar(string $id): void
     {
         if (!auth()->user()->can('salud.valoracion.editar')) abort(403);
 
@@ -120,13 +120,13 @@ class SaludValoracionPanel extends Component
         $this->modalFormOpen = true;
     }
 
-    public function abrirDetalle(int $id): void
+    public function abrirDetalle(string $id): void
     {
         $this->viendoId         = $id;
         $this->modalDetalleOpen = true;
     }
 
-    public function abrirAnular(int $id): void
+    public function abrirAnular(string $id): void
     {
         if (!auth()->user()->can('salud.valoracion.anular')) abort(403);
         $this->anulandoId      = $id;
@@ -268,7 +268,7 @@ class SaludValoracionPanel extends Component
         }
     }
 
-    public function restaurar(int $id): void
+    public function restaurar(string $id): void
     {
         if (!auth()->user()->can('salud.valoracion.editar')) abort(403);
 
@@ -300,7 +300,7 @@ class SaludValoracionPanel extends Component
         }
     }
 
-    public function marcarVigente(int $id): void
+    public function marcarVigente(string $id): void
     {
         if (!auth()->user()->can('salud.valoracion.editar')) abort(403);
 
@@ -392,7 +392,7 @@ class SaludValoracionPanel extends Component
             ? ValoracionFuncionalAdulto::with(['registradoPor', 'anuladoPor'])->find($this->viendoId)
             : null;
 
-        return view('livewire.admin.salud-seguimiento.salud-valoracion-funcional', [
+        return view('livewire.valoraciones.salud-valoracion-funcional', [
             'valoraciones'  => $valoraciones,
             'vigente'       => $vigente,
             'anterior'      => $anterior,

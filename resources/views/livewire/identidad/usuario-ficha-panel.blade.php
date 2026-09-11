@@ -500,7 +500,7 @@
  <p class="mt-1 text-base font-extrabold text-parrafo uppercase">{{ $horarios->area?->nombre }}</p>
  </div>
  <div>
- <p class="text-[9px] font-bold uppercase tracking-widest text-parrafo/45">Días Laborales</p>
+ <p class="text-[9px] font-bold uppercase tracking-widest text-parrafo/45">Das Laborales</p>
  <div class="mt-1.5 flex flex-wrap gap-1">
  @foreach($horarios->dias_semana ?? [] as $d)
  <span class="rounded bg-boton-principal px-2 py-0.5 text-[8px] font-black uppercase text-inverso shadow-sm">

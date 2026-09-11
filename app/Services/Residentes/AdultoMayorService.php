@@ -27,9 +27,9 @@ class AdultoMayorService
             $buscar = $filtros['buscar'];
             $query->where(function ($q) use ($buscar) {
                 $q->where('cod_am', 'like', "%{$buscar}%")
-                  ->orWhere('nombres', 'ilike', "%{$buscar}%")
-                  ->orWhere('ap_paterno', 'ilike', "%{$buscar}%")
-                  ->orWhere('ap_materno', 'ilike', "%{$buscar}%")
+                  ->orWhereLike('nombres', "%{$buscar}%")
+                  ->orWhereLike('ap_paterno', "%{$buscar}%")
+                  ->orWhereLike('ap_materno', "%{$buscar}%")
                   ->orWhere('ci', 'like', "%{$buscar}%");
             });
         }
@@ -53,7 +53,7 @@ class AdultoMayorService
         }
 
         if (!empty($filtros['ciudad_municipio'])) {
-            $query->where('ciudad_municipio', 'ilike', "%{$filtros['ciudad_municipio']}%");
+            $query->whereLike('ciudad_municipio', "%{$filtros['ciudad_municipio']}%");
         }
 
         if (!empty($filtros['rango_edad'])) {

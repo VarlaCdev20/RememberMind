@@ -47,7 +47,7 @@
  <div class="rm-metric-card">
  <div class="rm-metric-label">Valoraciones recientes</div>
  <div class="rm-metric-value-neutral">{{ $resumen['valoracionesRecientes'] ?? 0 }}</div>
- <div class="rm-metric-label mt-1">Últimos 30 días</div>
+ <div class="rm-metric-label mt-1">Últimos 30 das</div>
  </div>
 
  <div class="rm-metric-card {{ ($resumen['altaDependencia'] ?? 0) > 0 ? 'border-estado-advertencia-borde' : '' }}">
@@ -74,7 +74,7 @@
  <div>
  <p class="text-[10px] font-bold uppercase tracking-wide text-meta">Signos vitales</p>
  <p class="text-base font-extrabold text-titulo">{{ $resumen['signosVitales7d'] ?? 0 }}</p>
- <p class="text-[9px] font-bold text-meta">Últimos 7 días</p>
+ <p class="text-[9px] font-bold text-meta">Últimos 7 das</p>
  </div>
  </div>
 
@@ -83,7 +83,7 @@
  <div>
  <p class="text-[10px] font-bold uppercase tracking-wide text-meta">Eval. cognitiva</p>
  <p class="text-base font-extrabold text-titulo">{{ $resumen['evalCognitivas30d'] ?? 0 }}</p>
- <p class="text-[9px] font-bold text-meta">Últimos 30 días</p>
+ <p class="text-[9px] font-bold text-meta">Últimos 30 das</p>
  </div>
  </div>
 

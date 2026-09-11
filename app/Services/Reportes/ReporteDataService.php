@@ -8,6 +8,16 @@ use App\Models\User;
 
 class ReporteDataService
 {
+    public static function expresionMes(string $columna, bool $nombre = false): string
+    {
+        if (!in_array($columna, ['fecha', 'created_at'])) throw new \InvalidArgumentException('Columna no permitida');
+        return match (DB::connection()->getDriverName()) {
+            'pgsql' => "TO_CHAR({$columna}, '".($nombre ? 'Mon' : 'MM')."')",
+            'mysql', 'mariadb' => "DATE_FORMAT({$columna}, '".($nombre ? '%b' : '%m')."')",
+            default => "strftime('%m', {$columna})",
+        };
+    }
+
     // ──────────────────────────────────────────────────────────
     // ADULTOS MAYORES
     // ──────────────────────────────────────────────────────────
@@ -80,11 +90,11 @@ class ReporteDataService
             ->leftJoin('estado_adulto as ea', 'am.cod_est_adul', '=', 'ea.cod_est_adul')
             ->select(
                 'am.cod_am',
-                DB::raw("TRIM(am.nombres || ' ' || am.ap_paterno || CASE WHEN am.ap_materno IS NOT NULL THEN ' ' || am.ap_materno ELSE '' END) AS nombre_completo"),
+                DB::raw("TRIM(CONCAT(am.nombres, ' ', am.ap_paterno, ' ', COALESCE(am.ap_materno, ''))) AS nombre_completo"),
                 'am.ci',
                 'am.genero',
                 'am.fecha_nac',
-                DB::raw("CASE WHEN am.fecha_nac IS NOT NULL THEN CAST(DATE_PART('year', AGE(CURRENT_DATE, am.fecha_nac)) AS INT) ELSE NULL END AS edad"),
+                DB::raw('NULL AS edad'),
                 'am.estado_civil',
                 'am.nivel_educat',
                 'am.tipo_ing',
@@ -98,7 +108,10 @@ class ReporteDataService
             )
             ->orderBy('am.ap_paterno')
             ->limit($limite)
-            ->get();
+            ->get()->map(function ($adulto) {
+                $adulto->edad = $adulto->fecha_nac ? \Carbon\Carbon::parse($adulto->fecha_nac)->age : null;
+                return $adulto;
+            });
     }
 
     public function adultosLista(int $limite = 50): \Illuminate\Support\Collection
@@ -199,17 +212,15 @@ class ReporteDataService
 
         foreach ($rangos as $etiqueta => [$min, $max]) {
             $count = DB::table('adulto_mayor')
-                ->whereRaw("DATE_PART('year', AGE(CAST(? AS DATE), fecha_nac)) >= ?", [$hoy, $min])
-                ->whereRaw("DATE_PART('year', AGE(CAST(? AS DATE), fecha_nac)) <= ?", [$hoy, $max])
+                ->whereDate('fecha_nac', '<=', now()->subYears($min)->toDateString())
+                ->whereDate('fecha_nac', '>', now()->subYears($max + 1)->toDateString())
                 ->whereNotNull('fecha_nac')
                 ->count();
             $data[] = (int) $count;
         }
 
-        $promedio = (int) DB::table('adulto_mayor')
-            ->whereNotNull('fecha_nac')
-            ->selectRaw("ROUND(AVG(DATE_PART('year', AGE(CURRENT_DATE, fecha_nac)))) as promedio")
-            ->value('promedio');
+        $promedio = (int) round(DB::table('adulto_mayor')->whereNotNull('fecha_nac')->pluck('fecha_nac')
+            ->avg(fn ($fecha) => \Carbon\Carbon::parse($fecha)->age) ?? 0);
 
         return [
             'labels'   => array_keys($rangos),
@@ -322,12 +333,12 @@ class ReporteDataService
             ->when(Schema::hasColumn('atenciones_adulto', 'deleted_at'), fn ($q) => $q->whereNull('deleted_at'))
             ->whereYear('fecha', now()->year)
             ->select(
-                DB::raw("TO_CHAR(fecha, 'MM') as mes"),
-                DB::raw("TO_CHAR(fecha, 'Mon') as mes_nombre"),
+                DB::raw(\App\Services\Reportes\ReporteDataService::expresionMes('fecha').' as mes'),
+                DB::raw(\App\Services\Reportes\ReporteDataService::expresionMes('fecha', true).' as mes_nombre'),
                 DB::raw('COUNT(*) as total')
             )
-            ->groupByRaw("TO_CHAR(fecha, 'MM'), TO_CHAR(fecha, 'Mon')")
-            ->orderByRaw("TO_CHAR(fecha, 'MM')")
+            ->groupByRaw(\App\Services\Reportes\ReporteDataService::expresionMes('fecha').', '.\App\Services\Reportes\ReporteDataService::expresionMes('fecha', true))
+            ->orderByRaw(\App\Services\Reportes\ReporteDataService::expresionMes('fecha'))
             ->get();
 
         return [
@@ -674,12 +685,12 @@ class ReporteDataService
             ->when(Schema::hasColumn('actividades_adulto', 'deleted_at'), fn ($q) => $q->whereNull('deleted_at'))
             ->whereYear('fecha', now()->year)
             ->select(
-                DB::raw("TO_CHAR(fecha, 'MM') as mes"),
-                DB::raw("TO_CHAR(fecha, 'Mon') as mes_nombre"),
+                DB::raw(\App\Services\Reportes\ReporteDataService::expresionMes('fecha').' as mes'),
+                DB::raw(\App\Services\Reportes\ReporteDataService::expresionMes('fecha', true).' as mes_nombre'),
                 DB::raw('COUNT(*) as total')
             )
-            ->groupByRaw("TO_CHAR(fecha, 'MM'), TO_CHAR(fecha, 'Mon')")
-            ->orderByRaw("TO_CHAR(fecha, 'MM')")
+            ->groupByRaw(\App\Services\Reportes\ReporteDataService::expresionMes('fecha').', '.\App\Services\Reportes\ReporteDataService::expresionMes('fecha', true))
+            ->orderByRaw(\App\Services\Reportes\ReporteDataService::expresionMes('fecha'))
             ->get();
 
         return [
@@ -853,12 +864,12 @@ class ReporteDataService
         $resultados = DB::table('activity_log')
             ->whereYear('created_at', now()->year)
             ->select(
-                DB::raw("TO_CHAR(created_at, 'MM') as mes"),
-                DB::raw("TO_CHAR(created_at, 'Mon') as mes_nombre"),
+                DB::raw(\App\Services\Reportes\ReporteDataService::expresionMes('created_at').' as mes'),
+                DB::raw(\App\Services\Reportes\ReporteDataService::expresionMes('created_at', true).' as mes_nombre'),
                 DB::raw('COUNT(*) as total')
             )
-            ->groupByRaw("TO_CHAR(created_at, 'MM'), TO_CHAR(created_at, 'Mon')")
-            ->orderByRaw("TO_CHAR(created_at, 'MM')")
+            ->groupByRaw(\App\Services\Reportes\ReporteDataService::expresionMes('created_at').', '.\App\Services\Reportes\ReporteDataService::expresionMes('created_at', true))
+            ->orderByRaw(\App\Services\Reportes\ReporteDataService::expresionMes('created_at'))
             ->get();
 
         return [

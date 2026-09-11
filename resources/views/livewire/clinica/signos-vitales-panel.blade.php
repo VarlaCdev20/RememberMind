@@ -431,11 +431,11 @@
     ══════════════════════════════════════════════════════════════ --}}
     <div class="grid grid-cols-1 gap-4 lg:grid-cols-5">
 
-        {{-- Tendencia 7 días --}}
+        {{-- Tendencia 7 das --}}
         <div class="lg:col-span-3 rounded-[24px] border border-borde bg-fondo-card p-5 shadow-sm">
             <div class="mb-4 flex items-center justify-between">
                 <div>
-                    <h3 class="font-black text-titulo">Tendencia últimos 7 días</h3>
+                    <h3 class="font-black text-titulo">Tendencia últimos 7 das</h3>
                     <p class="text-xs text-apoyo">Promedios diarios de PA sistólica, FC y SpO₂</p>
                 </div>
                 <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-[#9B8AC7]/15 text-[#9B8AC7]">

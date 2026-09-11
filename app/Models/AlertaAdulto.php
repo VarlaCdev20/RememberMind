@@ -110,6 +110,12 @@ class AlertaAdulto extends Model
 
     // ── Helpers ────────────────────────────────────────────────────────────────
 
+    
+    public function getMotivoAttribute($value): string
+    {
+        return preg_replace('/^\\[[a-z_]+:[A-Za-z0-9_]+\\]\\s*/', '', (string)$value);
+    }
+
     public function puedeCerrarse(): bool
     {
         return in_array($this->estado, ['ABIERTA', 'EN_ATENCION']);

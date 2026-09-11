@@ -172,7 +172,7 @@
     ══════════════════════════════════════════════════════ --}}
     <div class="grid grid-cols-1 gap-5 lg:grid-cols-3">
 
-        {{-- Gráfico 3: Tendencia de signos vitales (30 días) --}}
+        {{-- Gráfico 3: Tendencia de signos vitales (30 das) --}}
         <div class="rounded-[24px] border border-borde bg-fondo-card p-5 shadow-sm lg:col-span-2">
             <div class="mb-4 flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
                 <div class="flex items-center gap-2">
@@ -181,7 +181,7 @@
                     </div>
                     <div>
                         <h3 class="text-sm font-black text-titulo">Tendencia de Signos Vitales</h3>
-                        <p class="text-[10px] text-apoyo">Promedios diarios — últimos 30 días</p>
+                        <p class="text-[10px] text-apoyo">Promedios diarios — últimos 30 das</p>
                     </div>
                 </div>
                 <div class="flex flex-wrap gap-2 text-[10px] font-bold">

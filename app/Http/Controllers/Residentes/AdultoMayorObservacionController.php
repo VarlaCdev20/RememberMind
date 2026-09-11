@@ -13,8 +13,12 @@ class AdultoMayorObservacionController extends Controller
 {
     public function index(AdultoMayor $adulto_mayor)
     {
-        $observaciones = $adulto_mayor->observaciones()->latest()->get();
-        return view('admin.adultos-mayores.observaciones.index', compact('adulto_mayor', 'observaciones'));
+        $registros = $adulto_mayor->observaciones()->withTrashed()
+            ->when(request('buscar'), fn ($q) => $q->whereLike('observacion', '%'.request('buscar').'%'))
+            ->latest()->paginate(15)->withQueryString();
+        return view('pages.adultos-mayores.observaciones.index', [
+            'adulto_mayor' => $adulto_mayor, 'observaciones' => $registros,
+        ]);
     }
 
     public function store(StoreObservacionAdultoRequest $request, AdultoMayor $adulto_mayor)
@@ -49,6 +53,7 @@ class AdultoMayorObservacionController extends Controller
 
     public function update(Request $request, AdultoMayor $adulto_mayor, ObsAdulto $observacion)
     {
+        abort_unless($observacion->cod_am === $adulto_mayor->cod_am, 404);
         $request->validate([
             'descripcion' => 'required|string',
             'tipo_obs' => 'required|string',
@@ -66,6 +71,7 @@ class AdultoMayorObservacionController extends Controller
 
     public function destroy(AdultoMayor $adulto_mayor, ObsAdulto $observacion)
     {
+        abort_unless($observacion->cod_am === $adulto_mayor->cod_am, 404);
         $observacion->delete(); // Soft delete
 
         activity('Adulto Mayor')
@@ -77,7 +83,7 @@ class AdultoMayorObservacionController extends Controller
 
     public function restore(AdultoMayor $adulto_mayor, $id)
     {
-        $observacion = ObsAdulto::withTrashed()->findOrFail($id);
+        $observacion = ObsAdulto::withTrashed()->where('cod_am', $adulto_mayor->cod_am)->findOrFail($id);
         $observacion->restore();
 
         activity('Adulto Mayor')

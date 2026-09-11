@@ -9,7 +9,7 @@ $fecha = $saludo['fecha'] ?? '';
 $acciones = [];
 if (auth()->user()?->can('adultos-mayores.crear')) {
  $acciones[] = [
- 'href' => route('admin.adultos-mayores.create'),
+ 'href' => route('admin.admisiones.preadmision'),
  'icono' => 'ph-plus-circle',
  'label' => 'Nuevo registro',
  'estilo' => 'terracota',

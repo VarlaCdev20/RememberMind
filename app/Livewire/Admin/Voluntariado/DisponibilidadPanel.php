@@ -258,7 +258,7 @@ class DisponibilidadPanel extends Component
     {
         $registrosCalendario = $this->disponibilidadQuery(false)->get()->map(fn (object $item) => $this->decorarDisponibilidad($item));
 
-        return view('livewire.admin.voluntariado.disponibilidad-panel', [
+        return view('livewire.voluntariado.disponibilidad-panel', [
             'metricas' => $this->metricas(),
             'diasSemana' => $this->diasSemana(),
             'turnos' => $this->turnos(),
@@ -326,10 +326,10 @@ class DisponibilidadPanel extends Component
         if ($this->search !== '') {
             $term = '%' . trim($this->search) . '%';
             $query->where(function (Builder $q) use ($term) {
-                $q->where('u.nombres', 'ilike', $term)
-                    ->orWhere('u.ap_paterno', 'ilike', $term)
-                    ->orWhere('u.ap_materno', 'ilike', $term)
-                    ->orWhere('u.numero_documento', 'ilike', $term);
+                $q->whereLike('u.nombres', $term)
+                    ->orWhereLike('u.ap_paterno', $term)
+                    ->orWhereLike('u.ap_materno', $term)
+                    ->orWhereLike('u.numero_documento', $term);
             });
         }
 

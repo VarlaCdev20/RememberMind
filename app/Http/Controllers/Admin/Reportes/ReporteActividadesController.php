@@ -26,7 +26,7 @@ class ReporteActividadesController extends Controller
 
     public function preview()
     {
-        return view('reportes.actividades.index', [
+        return view('pages.reportes.actividades.index', [
             'esPdf'    => false,
             'datos'    => $this->compilarDatos(),
             'graficas' => [
@@ -46,7 +46,7 @@ class ReporteActividadesController extends Controller
     {
         $datos = $this->compilarDatos();
 
-        $pdf = Pdf::loadView('reportes.actividades.index', [
+        $pdf = Pdf::loadView('pages.reportes.actividades.index', [
             'esPdf'    => true,
             'datos'    => $datos,
             'graficas' => [

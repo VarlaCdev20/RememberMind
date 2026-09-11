@@ -241,6 +241,9 @@ class User extends Authenticatable
                 'fecha_ingreso' => $this->created_at,
                 'fecha_ing' => $this->created_at,
                 'institucion_formacion' => $this->observaciones,
+                'anios_exp' => 0,
+                'matricula_prof' => null,
+                'subtipo_enfermeria' => null,
             ];
         }
         return null;
@@ -260,6 +263,7 @@ class User extends Authenticatable
                 ],
                 'cod_cargo_admin' => $rol,
                 'fecha_ingreso' => $this->created_at,
+                'anios_exp' => 0,
             ];
         }
         return null;

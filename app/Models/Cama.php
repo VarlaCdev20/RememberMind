@@ -3,27 +3,31 @@
 namespace App\Models;
 
 use App\Traits\GeneraCodigo;
-
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class Cama extends Model
 {
     use GeneraCodigo;
-    use SoftDeletes, LogsActivity;
+    use LogsActivity, SoftDeletes;
 
-    protected $table      = 'camas';
+    protected $table = 'camas';
+
     protected $primaryKey = 'cod_cama';
 
     public $incrementing = false;
+
     protected $keyType = 'string';
+
     protected $prefixCode = 'CAM';
+
     protected $digitsCode = 3;
-    public $timestamps   = true;
+
+    public $timestamps = true;
 
     protected $fillable = [
         'cod_cama',
@@ -41,7 +45,7 @@ class Cama extends Model
             ->logFillable()
             ->logOnlyDirty()
             ->useLogName('Habitaciones')
-            ->setDescriptionForEvent(fn(string $e) => "Cama {$this->codigo} {$e}.");
+            ->setDescriptionForEvent(fn (string $e) => "Cama {$this->codigo} {$e}.");
     }
 
     // ── Relaciones ─────────────────────────────────────────────────────────────
@@ -69,7 +73,8 @@ class Cama extends Model
 
     public function scopeDisponibles($query)
     {
-        return $query->where('estado', 'DISPONIBLE');
+        return $query->where('estado', 'DISPONIBLE')
+            ->whereDoesntHave('asignacionesActivas');
     }
 
     public function scopeDeHabitacion($query, string $codHabitacion)

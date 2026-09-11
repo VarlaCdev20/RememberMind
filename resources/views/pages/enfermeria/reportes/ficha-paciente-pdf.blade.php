@@ -62,15 +62,15 @@
             </tr>
             <tr>
                 <th>Edad</th>
-                <td>{{ \Carbon\Carbon::parse($adultoMayor->fecha_nacimiento)->age }} años</td>
+                <td>{{ $adultoMayor->fecha_nac?->age ?? 'N/D' }} años</td>
                 <th>Ubicación</th>
-                <td>Hab. {{ $adultoMayor->habitacion->numero ?? 'N/A' }} / Cama {{ $adultoMayor->cama->numero ?? 'N/A' }}</td>
+                <td>Hab. {{ $habitacionActual->codigo ?? 'N/A' }} / Cama {{ $camaActual->codigo ?? $camaActual->numero ?? 'N/A' }}</td>
             </tr>
             <tr>
                 <th>Estado</th>
                 <td>
-                    <span class="badges {{ $adultoMayor->estado === 'ACTIVO' ? 'badge-green' : 'badge-yellow' }}">
-                        {{ $adultoMayor->estado }}
+                    <span class="badges {{ $adultoMayor->estadoTexto === 'ACTIVO' ? 'badge-green' : 'badge-yellow' }}">
+                        {{ $adultoMayor->estadoTexto }}
                     </span>
                 </td>
                 <th>Turno Actual</th>
@@ -144,8 +144,8 @@
                         <tr>
                             <td>{{ $alerta->tipo_alerta }}</td>
                             <td>
-                                <span class="badges {{ $alerta->nivel_prioridad === 'ALTA' ? 'badge-red' : ($alerta->nivel_prioridad === 'MEDIA' ? 'badge-yellow' : 'badge-blue') }}">
-                                    {{ $alerta->nivel_prioridad }}
+                                <span class="badges {{ in_array($alerta->nivel, ['ALTO', 'CRITICO']) ? 'badge-red' : ($alerta->nivel === 'MEDIO' ? 'badge-yellow' : 'badge-blue') }}">
+                                    {{ $alerta->nivel }}
                                 </span>
                             </td>
                             <td>{{ \Carbon\Carbon::parse($alerta->created_at)->format('d/m/Y H:i') }}</td>
@@ -175,11 +175,11 @@
                 @foreach($adultoMayor->signosVitales->take(5) as $signo)
                 <tr>
                     <td>{{ \Carbon\Carbon::parse($signo->fecha)->format('d/m/Y') }} {{ \Carbon\Carbon::parse($signo->hora)->format('H:i') }}</td>
-                    <td>{{ $signo->presion_arterial_sistolica }}/{{ $signo->presion_arterial_diastolica }}</td>
+                    <td>{{ $signo->presion_formateada ?? 'N/D' }}</td>
                     <td>{{ $signo->frecuencia_cardiaca }}</td>
                     <td>{{ $signo->frecuencia_respiratoria }}</td>
                     <td>{{ $signo->temperatura }}</td>
-                    <td>{{ $signo->saturacion_oxigeno }}</td>
+                    <td>{{ $signo->saturacion }}</td>
                 </tr>
                 @endforeach
             </table>
@@ -201,7 +201,7 @@
                 @foreach($adultoMayor->administracionesMedicacion as $admin)
                 <tr>
                     <td>{{ \Carbon\Carbon::parse($admin->fecha)->format('d/m/Y') }} {{ \Carbon\Carbon::parse($admin->hora_programada)->format('H:i') }}</td>
-                    <td>{{ $admin->medicacion->medicamento ?? 'N/A' }}</td>
+                    <td>{{ $admin->medicacion->nombre_medicamento ?? 'N/A' }}</td>
                     <td>{{ $admin->medicacion->dosis ?? '' }} - {{ $admin->medicacion->via_administracion ?? '' }}</td>
                 </tr>
                 @endforeach
@@ -224,10 +224,10 @@
                 </tr>
                 @foreach($adultoMayor->seguimientosDiarios as $seg)
                 <tr>
-                    <td>{{ \Carbon\Carbon::parse($seg->fecha)->format('d/m/Y') }} {{ \Carbon\Carbon::parse($seg->hora)->format('H:i') }}</td>
+                    <td>{{ \Carbon\Carbon::parse($seg->fecha)->format('d/m/Y') }} {{ $seg->hora_inicio ? \Carbon\Carbon::parse($seg->hora_inicio)->format('H:i') : '' }}</td>
                     <td>{{ $seg->turno->nombre ?? 'N/A' }}</td>
                     <td>{{ $seg->estado_general }}</td>
-                    <td>{{ \Illuminate\Support\Str::limit($seg->observaciones, 50) }}</td>
+                    <td>{{ \Illuminate\Support\Str::limit($seg->observacion, 50) }}</td>
                 </tr>
                 @endforeach
             </table>

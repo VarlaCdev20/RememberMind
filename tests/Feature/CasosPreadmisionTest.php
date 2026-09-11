@@ -4,9 +4,10 @@ namespace Tests\Feature;
 
 use App\Models\Preadmision;
 use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Spatie\Permission\PermissionRegistrar;
 use Tests\TestCase;
 
 class CasosPreadmisionTest extends TestCase
@@ -16,10 +17,11 @@ class CasosPreadmisionTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
+        app()[PermissionRegistrar::class]->forgetCachedPermissions();
         Permission::firstOrCreate(['name' => 'admisiones.ver_dashboard', 'guard_name' => 'web']);
+        Permission::firstOrCreate(['name' => 'admisiones.crear', 'guard_name' => 'web']);
         $roleSuper = Role::firstOrCreate(['name' => 'SUPERADMINISTRADOR', 'guard_name' => 'web']);
-        $roleSuper->givePermissionTo('admisiones.ver_dashboard');
+        $roleSuper->givePermissionTo(['admisiones.ver_dashboard', 'admisiones.crear']);
         Role::firstOrCreate(['name' => 'ENFERMEROS', 'guard_name' => 'web']);
     }
 
@@ -50,6 +52,16 @@ class CasosPreadmisionTest extends TestCase
         $user->assignRole('SUPERADMINISTRADOR');
         $response = $this->actingAs($user)->get(route('admin.admisiones.preadmision'));
         $response->assertStatus(200);
+    }
+
+    public function test_usuario_que_solo_puede_ver_no_puede_registrar_preadmision(): void
+    {
+        $user = User::factory()->create(['estado' => 'ACTIVO']);
+        $user->givePermissionTo('admisiones.ver_dashboard');
+
+        $this->actingAs($user)
+            ->get(route('admin.admisiones.preadmision'))
+            ->assertForbidden();
     }
 
     public function test_creacion_y_persistencia_de_caso_en_base_de_datos(): void

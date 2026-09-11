@@ -272,7 +272,7 @@
  
  <div class="flex flex-wrap justify-center gap-3 max-w-full w-full">
  @foreach(array_merge($gruposFamiliares['conyuge'], $gruposFamiliares['hijos']) as $fam)
- @include('livewire.admin.familia-social._nodo-familiar', ['fam' => $fam])
+ @include('livewire.residentes.partials._nodo-familiar', ['fam' => $fam])
  @endforeach
  @if(empty($gruposFamiliares['conyuge']) && empty($gruposFamiliares['hijos']))
  <p class="text-[9px] font-bold text-slate-400 bg-fondo-card/60 px-3 py-1 rounded-full border border-slate-100">Sin familia directa</p>
@@ -284,7 +284,7 @@
  <span class="text-[8px] font-black text-slate-400 mb-3 absolute -top-2 bg-fondo-panel px-2 rounded-full">NIETOS/AS</span>
  <div class="flex flex-wrap justify-center gap-3 max-w-full w-full">
  @foreach($gruposFamiliares['nietos'] as $fam)
- @include('livewire.admin.familia-social._nodo-familiar', ['fam' => $fam])
+ @include('livewire.residentes.partials._nodo-familiar', ['fam' => $fam])
  @endforeach
  </div>
  </div>
@@ -297,7 +297,7 @@
  
  <div class="flex flex-wrap justify-center gap-3 max-w-full w-full">
  @foreach($gruposFamiliares['hermanos'] as $fam)
- @include('livewire.admin.familia-social._nodo-familiar', ['fam' => $fam])
+ @include('livewire.residentes.partials._nodo-familiar', ['fam' => $fam])
  @endforeach
  @if(empty($gruposFamiliares['hermanos']))
  <p class="text-[9px] font-bold text-slate-400 bg-fondo-card/60 px-3 py-1 rounded-full border border-slate-100">Sin hermanos/as</p>
@@ -309,7 +309,7 @@
  <span class="text-[8px] font-black text-slate-400 mb-3 absolute -top-2 bg-fondo-panel px-2 rounded-full">SOBRINOS/AS</span>
  <div class="flex flex-wrap justify-center gap-3 max-w-full w-full">
  @foreach($gruposFamiliares['sobrinos'] as $fam)
- @include('livewire.admin.familia-social._nodo-familiar', ['fam' => $fam])
+ @include('livewire.residentes.partials._nodo-familiar', ['fam' => $fam])
  @endforeach
  </div>
  </div>
@@ -322,7 +322,7 @@
  
  <div class="flex flex-wrap justify-center gap-3 max-w-full w-full">
  @foreach($gruposFamiliares['otros'] as $fam)
- @include('livewire.admin.familia-social._nodo-familiar', ['fam' => $fam])
+ @include('livewire.residentes.partials._nodo-familiar', ['fam' => $fam])
  @endforeach
  @if(empty($gruposFamiliares['otros']))
  <p class="text-[9px] font-bold text-slate-400 bg-fondo-card/60 px-3 py-1 rounded-full border border-slate-100">Sin otros contactos</p>

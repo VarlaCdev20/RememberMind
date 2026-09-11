@@ -261,7 +261,7 @@
  <th width="25%">Nombre / Colaborador</th>
  <th width="20%">Área Operativa</th>
  <th width="15%">Turno</th>
- <th width="20%">Días Semanales</th>
+ <th width="20%">Das Semanales</th>
  <th width="12%">Periodo</th>
  <th width="8%" style="text-align: center;">Estado</th>
  </tr>

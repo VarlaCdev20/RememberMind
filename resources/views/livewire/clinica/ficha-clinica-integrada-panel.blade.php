@@ -1,5 +1,7 @@
 <div class="space-y-6">
 
+    <x-residentes.navegacion-ficha :adulto="$adulto" />
+
     {{-- Encabezado del paciente --}}
     <div class="flex flex-col gap-4 rounded-[24px] border border-borde bg-fondo-card p-5 shadow-sm md:flex-row md:items-center">
         <div class="flex items-center gap-4 flex-1">
@@ -338,7 +340,7 @@
             <div class="grid grid-cols-2 gap-3 sm:grid-cols-4">
                 @foreach([
                     ['Presión Arterial', $ultimosSignos->presion_sistolica ? $ultimosSignos->presion_sistolica.'/'.$ultimosSignos->presion_diastolica.' mmHg' : '—', 'ph-heart'],
-                    ['Frec. Cardíaca', $ultimosSignos->frecuencia_cardiaca ? $ultimosSignos->frecuencia_cardiaca.' bpm' : '—', 'ph-heartbeat'],
+                    ['Frec. Cardaca', $ultimosSignos->frecuencia_cardiaca ? $ultimosSignos->frecuencia_cardiaca.' bpm' : '—', 'ph-heartbeat'],
                     ['Frec. Respiratoria', $ultimosSignos->frecuencia_respiratoria ? $ultimosSignos->frecuencia_respiratoria.' rpm' : '—', 'ph-wind'],
                     ['Temperatura', $ultimosSignos->temperatura ? $ultimosSignos->temperatura.' °C' : '—', 'ph-thermometer'],
                     ['Saturación O2', $ultimosSignos->saturacion ? $ultimosSignos->saturacion.'%' : '—', 'ph-drop'],

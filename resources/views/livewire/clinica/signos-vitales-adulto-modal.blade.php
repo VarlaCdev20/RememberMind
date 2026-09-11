@@ -110,7 +110,7 @@
  @error('presion_arterial') <span class="mt-1 text-xs text-terracota font-bold">{{ $message }}</span> @enderror
  </div>
  <div>
- <label class="mb-1 block text-[11px] font-bold uppercase tracking-widest text-apoyo">Frecuencia Cardíaca (lpm)</label>
+ <label class="mb-1 block text-[11px] font-bold uppercase tracking-widest text-apoyo">Frecuencia Cardaca (lpm)</label>
  <input type="number" wire:model="frecuencia_cardiaca" placeholder="Ej. 75"
  class="w-full rounded-xl border border-borde-suave bg-fondo-panel px-3 py-2 text-sm text-titulo focus:border-borde-focus focus:ring-borde-focus">
  @error('frecuencia_cardiaca') <span class="mt-1 text-xs text-terracota font-bold">{{ $message }}</span> @enderror

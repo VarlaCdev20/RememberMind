@@ -57,7 +57,7 @@
     <p><strong>Funciones Principales:</strong><br>
     Las funciones específicas estarán determinadas por el Manual de Organización y Funciones de la Institución correspondiente a su rol, así como por las instrucciones directas de su jefe inmediato. El trabajador declara haber recibido la inducción necesaria para el ejercicio de sus labores.</p>
 
-    <p>Se firma la presente Acta en señal de conocimiento y conformidad, en la ciudad de La Paz, a los {{ date('d') }} días del mes de {{ \Carbon\Carbon::now()->translatedFormat('F') }} de {{ date('Y') }}.</p>
+    <p>Se firma la presente Acta en señal de conocimiento y conformidad, en la ciudad de La Paz, a los {{ date('d') }} das del mes de {{ \Carbon\Carbon::now()->translatedFormat('F') }} de {{ date('Y') }}.</p>
 
     <table class="signatures">
         <tr>

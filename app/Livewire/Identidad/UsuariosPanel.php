@@ -559,10 +559,10 @@ class UsuariosPanel extends Component
         return \App\Models\AdultoMayor::query()
             ->where('cod_est_adul', 1)
             ->where(function ($q) use ($termino) {
-                $q->where('nombres', 'ilike', $termino)
-                    ->orWhere('ap_paterno', 'ilike', $termino)
-                    ->orWhere('ap_materno', 'ilike', $termino)
-                    ->orWhere('ci', 'ilike', $termino)
+                $q->whereLike('nombres', $termino)
+                    ->orWhereLike('ap_paterno', $termino)
+                    ->orWhereLike('ap_materno', $termino)
+                    ->orWhereLike('ci', $termino)
                     ->orWhereRaw("CONCAT_WS(' ', nombres, ap_paterno, ap_materno) ILIKE ?", [$termino]);
             })
             ->orderBy('ap_paterno')
@@ -2188,10 +2188,10 @@ class UsuariosPanel extends Component
 
             if (!empty($this->search)) {
                 $query->where(function ($q) {
-                    $q->where('nombres', 'ilike', '%' . $this->search . '%')
-                      ->orWhere('ap_paterno', 'ilike', '%' . $this->search . '%')
-                      ->orWhere('ap_materno', 'ilike', '%' . $this->search . '%')
-                      ->orWhere('correo', 'ilike', '%' . $this->search . '%');
+                    $q->whereLike('nombres', '%' . $this->search . '%')
+                      ->orWhereLike('ap_paterno', '%' . $this->search . '%')
+                      ->orWhereLike('ap_materno', '%' . $this->search . '%')
+                      ->orWhereLike('correo', '%' . $this->search . '%');
                 });
             }
 
@@ -2526,11 +2526,11 @@ class UsuariosPanel extends Component
 
         if (!empty($this->search)) {
             $query->where(function ($q) {
-                $q->where('nombres', 'ilike', '%' . $this->search . '%')
-                  ->orWhere('ap_paterno', 'ilike', '%' . $this->search . '%')
-                  ->orWhere('ap_materno', 'ilike', '%' . $this->search . '%')
-                  ->orWhere('correo', 'ilike', '%' . $this->search . '%')
-                  ->orWhere('cod_usu', 'ilike', '%' . $this->search . '%');
+                $q->whereLike('nombres', '%' . $this->search . '%')
+                  ->orWhereLike('ap_paterno', '%' . $this->search . '%')
+                  ->orWhereLike('ap_materno', '%' . $this->search . '%')
+                  ->orWhereLike('correo', '%' . $this->search . '%')
+                  ->orWhereLike('cod_usu', '%' . $this->search . '%');
             });
         }
 

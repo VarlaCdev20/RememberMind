@@ -87,12 +87,14 @@
  $totalEvaluaciones = count($evaluacionesLista);
  $totalAsignaciones = count($asignacionesLista);
 
- $tabInicial = request('tab', 'identificacion');
+ $tabSolicitada = request('tab', 'identificacion');
+ $tabInicial = ['familiares'=>'red_apoyo','evaluaciones'=>'cognitivo','atenciones'=>'salud','medicacion'=>'salud','observaciones'=>'historial'][$tabSolicitada] ?? $tabSolicitada;
+ if (!in_array($tabInicial, ['identificacion','red_apoyo','documentos','salud','cognitivo','participacion','historial','reportes'])) $tabInicial = 'identificacion';
 @endphp
 
  <div
  x-data="{
- carpetaActiva: 'identificacion',
+ carpetaActiva: @js($tabInicial),
  modal: null,
  isEditing: false,
  isViewing: false,
@@ -114,6 +116,7 @@
  >
  {{-- 1. Encabezado del expediente --}}
  @include('pages.adultos-mayores.show._cabecera-expediente')
+ <x-residentes.navegacion-ficha :adulto="$adulto" />
 
  {{-- 2. Estado del Expediente --}}
  <div class="mb-6 rounded-[24px] border border-borde bg-fondo-card p-5 shadow-sm">

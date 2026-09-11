@@ -24,7 +24,7 @@ class AdultoMayorDocumentoController extends Controller
 
         if ($request->hasFile('archivo')) {
             $file = $request->file('archivo');
-            $path = $file->store('documentos/adultos-mayores', 'public');
+            $path = $file->store('documentos/adultos-mayores', 'local');
             $data['ruta_archivo'] = $path;
             $data['estado'] = 'ACTIVO';
         }
@@ -36,6 +36,15 @@ class AdultoMayorDocumentoController extends Controller
             ->log("Se subió un documento para el adulto mayor: {$adulto_mayor->nombres}");
 
         return redirect()->route('admin.adultos-mayores.documentos.index', $adulto_mayor->cod_am)->with('success', 'Documento subido correctamente.');
+    }
+
+    public function archivo(AdultoMayor $adulto_mayor, string $documento)
+    {
+        $doc = $adulto_mayor->documentos()->findOrFail($documento);
+        $disco = \Illuminate\Support\Facades\Storage::disk('local');
+        if (!$disco->exists($doc->ruta_archivo)) $disco = \Illuminate\Support\Facades\Storage::disk('public');
+        abort_unless($disco->exists($doc->ruta_archivo), 404, 'Archivo no disponible.');
+        return $disco->download($doc->ruta_archivo);
     }
 
     public function update(Request $request, AdultoMayor $adulto_mayor, $documento)
@@ -57,7 +66,7 @@ class AdultoMayorDocumentoController extends Controller
     {
         $doc = $adulto_mayor->documentos()->findOrFail($documento);
         
-        $doc->delete();
+        $doc->update(['estado' => 'ARCHIVADO']);
 
         activity('Adulto Mayor')
             ->performedOn($adulto_mayor)
@@ -68,7 +77,7 @@ class AdultoMayorDocumentoController extends Controller
 
     public function restore(AdultoMayor $adulto_mayor, $id)
     {
-        $doc = DocumentoAdultoMayor::findOrFail($id);
+        $doc = $adulto_mayor->documentos()->findOrFail($id);
         $doc->update(['estado' => 'ACTIVO']);
 
         activity('Adulto Mayor')

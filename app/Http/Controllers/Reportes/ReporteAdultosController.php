@@ -41,14 +41,14 @@ class ReporteAdultosController extends Controller
 
     public function preview()
     {
-        return view('reportes.adultos.index', $this->prepararPayload(false));
+        return view('pages.reportes.adultos.index', $this->prepararPayload(false));
     }
 
     public function pdf()
     {
         $payload = $this->prepararPayload(true);
 
-        $pdf = Pdf::loadView('reportes.adultos.index', $payload)
+        $pdf = Pdf::loadView('pages.reportes.adultos.index', $payload)
             ->setPaper('a4', 'portrait')
             ->setOptions([
                 'defaultFont'          => 'DejaVu Sans',

@@ -22,9 +22,9 @@
  <i class="ph-bold ph-arrow-left text-sm"></i> Panel de Inicio
  </a>
 
- <button type="button" wire:click="crearAdultoMayor" class="inline-flex items-center justify-center gap-2 rounded-xl bg-boton-acento px-4 py-2.5 text-xs font-bold text-inverso shadow-[0_8px_20px_rgba(233,122,95,0.22)] transition hover:-translate-y-0.5 hover:bg-fondo-panel active:scale-95">
- <i class="ph-bold ph-plus-circle text-sm"></i> Registrar adulto mayor
- </button>
+ <a wire:navigate href="{{ route('admin.admisiones.preadmision') }}" class="inline-flex items-center justify-center gap-2 rounded-xl bg-boton-acento px-4 py-2.5 text-xs font-bold text-inverso shadow-[0_8px_20px_rgba(233,122,95,0.22)] transition hover:-translate-y-0.5 hover:bg-fondo-panel active:scale-95">
+ <i class="ph-bold ph-plus-circle text-sm"></i> Nueva preadmisión
+ </a>
 
  <a href="{{ route('admin.adultos-mayores.reporte-general') }}" target="_blank" class="inline-flex items-center justify-center gap-2 rounded-xl bg-boton-principal px-4 py-2.5 text-xs font-bold text-inverso shadow-[0_8px_20px_rgba(47,62,92,0.12)] transition hover:-translate-y-0.5 hover:bg-fondo-panel active:scale-95">
  <i class="ph-bold ph-file-pdf text-sm"></i> Censo en PDF
@@ -307,7 +307,7 @@
  <td class="px-5 py-3.5 text-xs font-bold">{{ $adulto->edad }} años</td>
  <td class="px-5 py-3.5 text-xs">{{ optional($adulto->fecha_ing)->format('d/m/Y') }}</td>
  <td class="px-5 py-3.5">
- <span class="rounded-lg px-2 py-0.5 text-[9px] font-bold uppercase {{ strtoupper($adulto->estado_adulto) === 'ACTIVO' ? 'bg-estado-exitoBg text-parrafo' : 'bg-estado-peligroBg text-boton-acento' }}">
+ <span class="rounded-lg px-2 py-0.5 text-[9px] font-bold uppercase {{ in_array(strtoupper($adulto->estado_adulto), ['ACTIVO', 'ADMITIDO']) ? 'bg-estado-exitoBg text-parrafo' : 'bg-estado-peligroBg text-boton-acento' }}">
  {{ $adulto->estado_adulto }}
  </span>
  </td>

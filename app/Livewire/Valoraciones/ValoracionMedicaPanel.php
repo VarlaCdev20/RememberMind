@@ -19,11 +19,11 @@ class ValoracionMedicaPanel extends Component
 
     public bool   $modalForm = false;
     public bool   $modalVer  = false;
-    public ?int   $editandoId = null;
-    public ?int   $viendoId  = null;
+    public ?string   $editandoId = null;
+    public ?string   $viendoId  = null;
 
     public string $codAm                    = '';
-    public ?int   $codValEnf                = null;
+    public ?string   $codValEnf                = null;
     public string $fecha                    = '';
     public string $hora                     = '';
     public string $diagnosticosReferidos    = '';
@@ -48,7 +48,7 @@ class ValoracionMedicaPanel extends Component
         $this->modalForm = true;
     }
 
-    public function abrirVer(int $id): void
+    public function abrirVer(string $id): void
     {
         $this->viendoId = $id;
         $this->modalVer = true;
@@ -131,8 +131,8 @@ class ValoracionMedicaPanel extends Component
         $valoraciones = FichaMedicaAdulto::with(['adultoMayor', 'registrador'])
             ->when($this->search, fn($q) =>
                 $q->whereHas('adultoMayor', fn($sq) =>
-                    $sq->where('nombres', 'ilike', '%' . $this->search . '%')
-                      ->orWhere('ap_paterno', 'ilike', '%' . $this->search . '%')
+                    $sq->whereLike('nombres', '%' . $this->search . '%')
+                      ->orWhereLike('ap_paterno', '%' . $this->search . '%')
                 )
             )
             ->when($this->filtroEstado, fn($q) => $q->where('estado', $this->filtroEstado))

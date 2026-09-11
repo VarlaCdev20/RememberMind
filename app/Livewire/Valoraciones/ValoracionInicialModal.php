@@ -251,14 +251,14 @@ class ValoracionInicialModal extends Component
             'orientacion_espacio' => 'required',
             'movilidad' => 'required',
             'riesgo_caida' => 'required',
-            'pa_sistolica' => 'required|numeric|min:50|max:250',
-            'pa_diastolica' => 'required|numeric|min:30|max:150',
-            'frecuencia_cardiaca' => 'required|numeric|min:30|max:200',
-            'frecuencia_respiratoria' => 'required|numeric|min:8|max:40',
-            'temperatura' => 'required|numeric|min:34|max:43',
-            'saturacion_oxigeno' => 'required|numeric|min:50|max:100',
-            'peso' => 'nullable|numeric|min:20|max:250',
-            'talla' => 'nullable|numeric|min:100|max:220',
+            'pa_sistolica' => 'required|numeric|min:' . \App\Services\Clinica\ValidacionSignosVitalesService::PAS_MIN . '|max:' . \App\Services\Clinica\ValidacionSignosVitalesService::PAS_MAX,
+            'pa_diastolica' => 'required|numeric|min:' . \App\Services\Clinica\ValidacionSignosVitalesService::PAD_MIN . '|max:' . \App\Services\Clinica\ValidacionSignosVitalesService::PAD_MAX,
+            'frecuencia_cardiaca' => 'required|numeric|min:' . \App\Services\Clinica\ValidacionSignosVitalesService::FC_MIN . '|max:' . \App\Services\Clinica\ValidacionSignosVitalesService::FC_MAX,
+            'frecuencia_respiratoria' => 'required|numeric|min:' . \App\Services\Clinica\ValidacionSignosVitalesService::FR_MIN . '|max:' . \App\Services\Clinica\ValidacionSignosVitalesService::FR_MAX,
+            'temperatura' => 'required|numeric|min:' . \App\Services\Clinica\ValidacionSignosVitalesService::TEMP_MIN . '|max:' . \App\Services\Clinica\ValidacionSignosVitalesService::TEMP_MAX,
+            'saturacion_oxigeno' => 'required|numeric|min:' . \App\Services\Clinica\ValidacionSignosVitalesService::SPO2_MIN . '|max:' . \App\Services\Clinica\ValidacionSignosVitalesService::SPO2_MAX,
+            'peso' => 'nullable|numeric|min:' . \App\Services\Clinica\ValidacionSignosVitalesService::PESO_MIN . '|max:' . \App\Services\Clinica\ValidacionSignosVitalesService::PESO_MAX,
+            'talla' => 'nullable|numeric|min:0.5|max:' . \App\Services\Clinica\ValidacionSignosVitalesService::TALLA_CM_MAX,
             'dependencia_funcional' => 'required',
             'riesgo_nutricional' => 'required',
             'riesgo_cognitivo' => 'required',
@@ -273,6 +273,11 @@ class ValoracionInicialModal extends Component
 
         if ($this->hay_heridas) {
             $rules['ubicacion_heridas'] = 'required|min:5';
+        }
+
+                if ((float)$this->pa_sistolica <= (float)$this->pa_diastolica) {
+            $this->addError('pa_sistolica', 'La presión sistólica (' . $this->pa_sistolica . ' mmHg) debe ser estrictamente mayor a la diastólica (' . $this->pa_diastolica . ' mmHg).');
+            return;
         }
 
         $this->validate($rules, [
@@ -327,6 +332,7 @@ class ValoracionInicialModal extends Component
                 'dependencia_funcional' => $this->dependencia_funcional,
                 'riesgo_nutricional' => $this->riesgo_nutricional,
                 'riesgo_cognitivo' => $this->riesgo_cognitivo,
+            'tipo_evaluacion_cognitiva' => 'CRIBADO_OBSERVACIONAL_ENFERMERIA',
                 'necesidad_apoyo_inmediato' => $this->necesidad_apoyo_inmediato,
                 'prioridad_sugerida' => $this->prioridad_sugerida,
                 'confirmacion_documentacion' => $this->confirmacion_documentacion,

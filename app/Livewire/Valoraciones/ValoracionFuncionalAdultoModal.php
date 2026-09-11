@@ -151,6 +151,8 @@ class ValoracionFuncionalAdultoModal extends Component
 
     public function guardar()
     {
+        abort_unless(Auth::check(), 401);
+        app(\App\Services\Enfermeria\TurnoEnfermeriaService::class)->autorizarAccionPaciente($this->cod_am, Auth::user());
         $this->validate();
 
         $datos = [
@@ -173,7 +175,7 @@ class ValoracionFuncionalAdultoModal extends Component
             'necesita_supervision' => $this->necesita_supervision,
             'nivel_dependencia' => $this->nivel_dependencia,
             'observacion' => $this->observacion,
-            'registrado_por' => Auth::id() ?? \App\Models\User::first()->cod_usu,
+            'registrado_por' => Auth::id(),
         ];
 
         if ($this->isEditing) {

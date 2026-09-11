@@ -1,231 +1,271 @@
 <aside
- @toggle-sidebar.window="sidebarOpen = !sidebarOpen"
- :class="[
- sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0',
- sidebarCollapsed ? 'lg:w-[82px]' : 'lg:w-[240px]'
- ]"
- class="sidebar-institucional fixed left-0 top-0 z-50 flex h-screen w-[240px] flex-col shadow-sidebar backdrop-blur-xl transition-all duration-300 ease-in-out"
+    id="sidebar"
+    @toggle-sidebar.window="sidebarOpen = !sidebarOpen"
+    :class="[
+        sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0',
+        sidebarCollapsed ? 'lg:w-[82px]' : 'lg:w-[240px]'
+    ]"
+    class="sidebar-institucional fixed left-0 top-0 z-50 flex h-screen w-[240px] flex-col shadow-sidebar backdrop-blur-xl transition-all duration-300 ease-in-out"
+    aria-label="Barra lateral de navegación"
 >
- {{-- BOTÓN COLAPSAR --}}
- <button
- type="button"
- @click="sidebarCollapsed = !sidebarCollapsed"
- class="rm-btn-icon absolute -right-4 top-8 hidden lg:flex"
- aria-label="Contraer o expandir menú lateral"
- >
- <i
- class="ph-bold ph-caret-left text-sm transition-transform duration-300"
- :class="sidebarCollapsed ? 'rotate-180' : ''"
- ></i>
- </button>
+    {{-- BOTÓN COLAPSAR --}}
+    <button
+        type="button"
+        @click="sidebarCollapsed = !sidebarCollapsed"
+        class="rm-btn-icon absolute -right-4 top-8 hidden lg:flex"
+        aria-label="Contraer o expandir menú lateral"
+    >
+        <i
+            class="ph-bold ph-caret-left text-sm transition-transform duration-300"
+            :class="sidebarCollapsed ? 'rotate-180' : ''"
+        ></i>
+    </button>
 
- {{-- HEADER --}}
- <div class="shrink-0 px-3 pt-4">
- <div
- class="flex items-center rounded-xl border border-borde bg-fondo-card px-2.5 py-2 shadow-card transition-all duration-300"
- :class="sidebarCollapsed ? 'justify-center' : 'justify-between'"
- >
- <div class="flex min-w-0 items-center gap-3">
- <img src="{{ asset('storage/imagenes/LOGO.png') }}"
- alt="CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS"
- class="h-8 w-8 shrink-0 object-contain rounded-lg transition-all duration-500 hover:scale-110">
+    {{-- HEADER --}}
+    <div class="shrink-0 px-3 pt-4">
+        <div
+            class="flex items-center rounded-xl border border-borde bg-fondo-card px-2.5 py-2 shadow-card transition-all duration-300"
+            :class="sidebarCollapsed ? 'justify-center' : 'justify-between'"
+        >
+            <div class="flex min-w-0 items-center gap-3">
+                <img src="{{ asset('storage/imagenes/LOGO.png') }}"
+                     alt="CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS"
+                     class="h-8 w-8 shrink-0 object-contain rounded-lg transition-all duration-500 hover:scale-110">
 
- <div
- x-show="!sidebarCollapsed"
- x-transition.opacity.duration.300ms
- class="min-w-0"
- >
- <h2 class="max-w-[150px] text-[10px] font-bold uppercase leading-[1.05] text-titulo">
- CENTRO GERIÁTRICO<br>JARDÍN DE LOS RECUERDOS
- </h2>
- <p class="truncate text-[10px] font-bold uppercase tracking-widest text-modulo-salud">
- RememberMind
- </p>
- </div>
- </div>
+                <div
+                    x-show="!sidebarCollapsed"
+                    x-transition.opacity.duration.300ms
+                    class="min-w-0"
+                >
+                    <h2 class="max-w-[150px] text-[10px] font-bold uppercase leading-[1.05] text-titulo">
+                        CENTRO GERIÁTRICO<br>JARDÍN DE LOS RECUERDOS
+                    </h2>
+                    <p class="truncate text-[10px] font-bold uppercase tracking-widest text-modulo-salud">
+                        RememberMind
+                    </p>
+                </div>
+            </div>
 
- <button
- @click="sidebarOpen = false"
- class="rm-btn-icon lg:hidden"
- aria-label="Cerrar menú lateral"
- >
- <i class="ph-bold ph-x"></i>
- </button>
- </div>
- </div>
+            <button
+                type="button"
+                @click="sidebarOpen = false"
+                class="rm-btn-icon lg:hidden"
+                aria-label="Cerrar menú lateral"
+            >
+                <i class="ph-bold ph-x"></i>
+            </button>
+        </div>
+    </div>
 
- {{-- MENÚ --}}
- <div class="mt-3 flex-1 overflow-y-auto px-3 pb-4 [scrollbar-width:thin] [scrollbar-color:var(--color-scrollbar-thumb)_transparent]">
- @php
- $safeUrl = function (?string $route, string $fallback = '#') {
- return $route && Route::has($route) ? route($route) : $fallback;
- };
+    {{-- MENÚ --}}
+    <div class="mt-3 flex-1 overflow-y-auto px-3 pb-4 [scrollbar-width:thin] [scrollbar-color:var(--color-scrollbar-thumb)_transparent]">
+        @php
+            $safeUrl = function (?string $route, string $fallback = 'javascript:void(0)') {
+                return $route && Route::has($route) ? route($route) : $fallback;
+            };
 
- $isDisabled = function (?string $route) {
- return ! $route || ! Route::has($route);
- };
+            $isDisabled = function (?string $route) {
+                return ! $route || ! Route::has($route);
+            };
 
- $isActiveItem = function (array $item) {
- if (isset($item['route']) && $item['route'] && request()->routeIs($item['route'] . '*')) {
- return true;
- }
- return false;
- };
+            $isActiveItem = function (array $item) {
+                if (isset($item['route']) && $item['route']) {
+                    if (request()->routeIs($item['route'])) {
+                        return true;
+                    }
+                    $base = preg_replace('/\.index$/', '.*', $item['route']);
+                    if ($base !== $item['route'] && request()->routeIs($base)) {
+                        return true;
+                    }
+                }
+                return false;
+            };
 
- $isActiveSection = function (array $section) use ($isActiveItem) {
- if (isset($section['items'])) {
- foreach ($section['items'] as $item) {
- if ($isActiveItem($item)) return true;
- }
- }
- return false;
- };
- @endphp
+            $isActiveSection = function (array $section) use ($isActiveItem) {
+                if (isset($section['items'])) {
+                    foreach ($section['items'] as $item) {
+                        if ($isActiveItem($item)) return true;
+                    }
+                }
+                return false;
+            };
+        @endphp
 
- @inject('sidebarService', 'App\Services\Identidad\SidebarService')
+        @inject('sidebarService', 'App\Services\Identidad\SidebarService')
 
-    @php
-        $sections = $sidebarService->getSidebar();
-    @endphp
+        @php
+            $sections = $sidebarService->getSidebar();
+            $initialOpen = null;
+            foreach ($sections as $idx => $sec) {
+                if (!isset($sec['route']) && !empty($sec['items'])) {
+                    $sActive = false;
+                    foreach ($sec['items'] as $it) {
+                        if ($isActiveItem($it)) {
+                            $sActive = true;
+                            break;
+                        }
+                    }
+                    if ($sActive) {
+                        $initialOpen = $idx;
+                        break;
+                    }
+                    if (!empty($sec['default_expanded']) && $initialOpen === null) {
+                        $initialOpen = $idx;
+                    }
+                }
+            }
+        @endphp
 
-    <nav class="space-y-2">
- @foreach($sections as $section)
- @php
- $isDirect = isset($section['route']);
- $isSectionActive = $isDirect 
- ? (request()->routeIs($section['route'] . '*'))
- : $isActiveSection($section);
- @endphp
+        <nav x-data="{ openSection: {{ $initialOpen !== null ? $initialOpen : 'null' }} }" class="space-y-2">
+            @foreach($sections as $section)
+                @php
+                    $isDirect = isset($section['route']) && !empty($section['route']);
+                    $isSectionActive = $isDirect 
+                        ? (request()->routeIs($section['route']) || (($base = preg_replace('/\.index$/', '.*', $section['route'])) !== $section['route'] && request()->routeIs($base)))
+                        : $isActiveSection($section);
+                @endphp
 
- @if($isDirect)
- <div class="group/section relative">
- @php
- $disabled = $isDisabled($section['route']);
- $url = $safeUrl($section['route']);
- @endphp
- <a
- wire:navigate
- href="{{ $url }}"
- @if($disabled) title="Próximamente" @else title="{{ $section['title'] }}" @endif
- class="flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-sm font-bold transition-all duration-300
- {{ $isSectionActive ? 'bg-fondo-card-calido text-boton-acento shadow-card ring-1 ring-borde border-l-4 border-boton-acento' : 'text-apoyo hover:bg-fondo-hover hover:text-boton-acento' }}"
- :class="sidebarCollapsed ? 'justify-center px-0' : ''"
- >
- <div class="flex items-center gap-3">
- <i class="ph-bold {{ $section['icon'] }} text-xl shrink-0 transition-all duration-300
- {{ $isSectionActive ? 'text-boton-acento' : 'text-meta group-hover/section:text-boton-acento group-hover/section:rotate-3' }}"></i>
- <span
- x-show="!sidebarCollapsed"
- x-transition.opacity.duration.300ms
- class="text-xs uppercase tracking-[0.15em] font-black"
- >
- {{ $section['title'] }}
- </span>
- </div>
- </a>
- 
- {{-- DIVISOR EN MODO COLAPSADO --}}
- <div class="mx-auto h-px w-8 bg-borde my-2" x-show="sidebarCollapsed"></div>
+                @if($isDirect)
+                    <div class="group/section relative">
+                        @php
+                            $disabled = $isDisabled($section['route']);
+                            $url = $safeUrl($section['route']);
+                        @endphp
+                        <a
+                            wire:navigate
+                            href="{{ $url }}"
+                            @if($disabled) title="Próximamente" @else title="{{ $section['title'] }}" @endif
+                            class="flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-sm font-bold transition-all duration-300
+                                   {{ $isSectionActive ? 'bg-fondo-card-calido text-boton-acento shadow-card ring-1 ring-borde border-l-4 border-boton-acento' : 'text-apoyo hover:bg-fondo-hover hover:text-boton-acento' }}"
+                            :class="sidebarCollapsed ? 'justify-center px-0' : ''"
+                        >
+                            <div class="flex items-center gap-3">
+                                <i class="ph-bold {{ $section['icon'] }} text-xl shrink-0 transition-all duration-300
+                                          {{ $isSectionActive ? 'text-boton-acento' : 'text-meta group-hover/section:text-boton-acento group-hover/section:rotate-3' }}"></i>
+                                <span
+                                    x-show="!sidebarCollapsed"
+                                    x-transition.opacity.duration.300ms
+                                    class="text-xs uppercase tracking-[0.15em] font-black"
+                                >
+                                    {{ $section['title'] }}
+                                </span>
+                            </div>
+                        </a>
+                        
+                        {{-- DIVISOR EN MODO COLAPSADO --}}
+                        <div class="mx-auto h-px w-8 bg-borde my-2" x-show="sidebarCollapsed"></div>
 
- {{-- TOOLTIP CUANDO ESTÁ COLAPSADO --}}
- <div
- x-show="sidebarCollapsed"
- class="pointer-events-none absolute left-full z-50 ml-4 hidden whitespace-nowrap rounded-lg bg-boton-principal px-3 py-2 text-[11px] font-bold text-boton-principalTexto shadow-panel transition-all group-hover/section:block"
- >
- {{ $section['title'] }}
- </div>
- </div>
- @else
- <div x-data="{ expanded: {{ $isSectionActive ? 'true' : 'false' }} }" class="group/section relative">
- {{-- HEADER DE SECCIÓN --}}
- <button
- @click="expanded = !expanded"
- class="flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-sm font-bold transition-all duration-300
- {{ $isSectionActive ? 'bg-fondo-card-calido text-boton-acento shadow-card ring-1 ring-borde border-l-4 border-boton-acento' : 'text-apoyo hover:bg-fondo-hover hover:text-boton-acento' }}"
- :class="sidebarCollapsed ? 'justify-center px-0' : ''"
- >
- <div class="flex items-center gap-3">
- <i class="ph-bold {{ $section['icon'] }} text-xl shrink-0 transition-all duration-300
- {{ $isSectionActive ? 'text-boton-acento' : 'text-meta group-hover/section:text-boton-acento group-hover/section:rotate-3' }}"></i>
- <span
- x-show="!sidebarCollapsed"
- x-transition.opacity.duration.300ms
- class="text-xs uppercase tracking-[0.15em] font-black"
- >
- {{ $section['title'] }}
- </span>
- </div>
+                        {{-- TOOLTIP CUANDO ESTÁ COLAPSADO --}}
+                        <div
+                            x-show="sidebarCollapsed"
+                            class="pointer-events-none absolute left-full z-50 ml-4 hidden whitespace-nowrap rounded-lg bg-boton-principal px-3 py-2 text-[11px] font-bold text-boton-principalTexto shadow-panel transition-all group-hover/section:block"
+                        >
+                            {{ $section['title'] }}
+                        </div>
+                    </div>
+                @else
+                    <div class="group/section relative">
+                        {{-- HEADER DE SECCIÓN --}}
+                        <button
+                            type="button"
+                            @click="openSection = (openSection === {{ $loop->index }}) ? null : {{ $loop->index }}"
+                            class="flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-sm font-bold transition-all duration-300
+                                   {{ $isSectionActive ? 'bg-fondo-card-calido text-boton-acento shadow-card ring-1 ring-borde border-l-4 border-boton-acento' : 'text-apoyo hover:bg-fondo-hover hover:text-boton-acento' }}"
+                            :class="sidebarCollapsed ? 'justify-center px-0' : ''"
+                        >
+                            <div class="flex items-center gap-3">
+                                <i class="ph-bold {{ $section['icon'] }} text-xl shrink-0 transition-all duration-300
+                                          {{ $isSectionActive ? 'text-boton-acento' : 'text-meta group-hover/section:text-boton-acento group-hover/section:rotate-3' }}"></i>
+                                <span
+                                    x-show="!sidebarCollapsed"
+                                    x-transition.opacity.duration.300ms
+                                    class="text-xs uppercase tracking-[0.15em] font-black"
+                                >
+                                    {{ $section['title'] }}
+                                </span>
+                            </div>
 
- <i
- x-show="!sidebarCollapsed"
- class="ph-bold ph-caret-down text-[10px] transition-transform duration-500"
- :class="expanded ? 'rotate-180 text-boton-acento' : 'text-meta'"
- ></i>
- </button>
+                            <div class="flex items-center gap-1.5" x-show="!sidebarCollapsed">
+                                @if($isSectionActive)
+                                    <span x-show="openSection !== {{ $loop->index }}" class="h-1.5 w-1.5 rounded-full bg-boton-acento shadow-glow shrink-0"></span>
+                                @endif
+                                <i
+                                    class="ph-bold ph-caret-down text-[10px] transition-transform duration-500"
+                                    :class="openSection === {{ $loop->index }} ? 'rotate-180 text-boton-acento' : 'text-meta'"
+                                ></i>
+                            </div>
+                        </button>
 
- {{-- ITEMS DE SECCIÓN --}}
- <div
- x-show="expanded && !sidebarCollapsed"
- x-transition:enter="transition ease-out duration-300"
- x-transition:enter-start="opacity-0 -translate-y-2"
- x-transition:enter-end="opacity-100 translate-y-0"
- class="mt-1 space-y-0.5 pl-10"
- >
- @foreach($section['items'] as $item)
- @php
- $active = $isActiveItem($item);
- $disabled = $isDisabled($item['route']);
- $url = $safeUrl($item['route']);
- @endphp
+                        {{-- ITEMS DE SECCIÓN --}}
+                        <div
+                            x-show="openSection === {{ $loop->index }} && !sidebarCollapsed"
+                            x-transition:enter="transition ease-out duration-300"
+                            x-transition:enter-start="opacity-0 -translate-y-2"
+                            x-transition:enter-end="opacity-100 translate-y-0"
+                            class="mt-1 space-y-0.5 pl-10"
+                        >
+                            @foreach($section['items'] as $item)
+                                @php
+                                    $active = $isActiveItem($item);
+                                    $disabled = $isDisabled($item['route']);
+                                    $url = $safeUrl($item['route']);
+                                @endphp
 
- <a
- wire:navigate
- href="{{ $url }}"
- @if($disabled) title="Próximamente" @else title="{{ $item['label'] }}" @endif
- class="group/item relative flex items-center gap-2.5 rounded-lg py-2 text-sm font-bold transition-all duration-300
- {{ $active
- ? 'text-boton-acento'
- : 'text-meta hover:text-boton-acento hover:translate-x-1'
- }}
- {{ $disabled ? 'opacity-40 cursor-not-allowed grayscale' : '' }}"
- >
- @if($active)
- <span class="absolute -left-4 top-1/2 -translate-y-1/2 h-2 w-2 rounded-full bg-boton-acento shadow-glow"></span>
- @endif
+                                <a
+                                    wire:navigate
+                                    href="{{ $url }}"
+                                    @if($disabled) title="Próximamente" @else title="{{ $item['label'] }}" @endif
+                                    class="group/item relative flex items-center justify-between gap-2.5 pr-2 rounded-lg py-2 text-sm font-bold transition-all duration-300
+                                           {{ $active
+                                                ? 'text-boton-acento'
+                                                : 'text-meta hover:text-boton-acento hover:translate-x-1'
+                                           }}
+                                           {{ $disabled ? 'opacity-40 cursor-not-allowed grayscale' : '' }}"
+                                >
+                                    <div class="flex items-center gap-2.5 min-w-0">
+                                        @if($active)
+                                            <span class="absolute -left-4 top-1/2 -translate-y-1/2 h-2 w-2 rounded-full bg-boton-acento shadow-glow"></span>
+                                        @endif
+                                        <span class="truncate">{{ $item['label'] }}</span>
+                                    </div>
 
- <span class="truncate">{{ $item['label'] }}</span>
- </a>
- @endforeach
- </div>
- 
- {{-- DIVISOR EN MODO COLAPSADO --}}
- <div class="mx-auto h-px w-8 bg-borde my-2" x-show="sidebarCollapsed"></div>
+                                    @if(!empty($item['badge']))
+                                        <span class="inline-flex items-center justify-center rounded-full bg-red-500/15 px-2 py-0.5 text-[10px] font-black text-red-600 border border-red-200 dark:border-red-800 shrink-0">
+                                            {{ $item['badge'] }}
+                                        </span>
+                                    @endif
+                                </a>
+                            @endforeach
+                        </div>
+                        
+                        {{-- DIVISOR EN MODO COLAPSADO --}}
+                        <div class="mx-auto h-px w-8 bg-borde my-2" x-show="sidebarCollapsed"></div>
 
- {{-- TOOLTIP CUANDO ESTÁ COLAPSADO --}}
- <div
- x-show="sidebarCollapsed"
- class="pointer-events-none absolute left-full z-50 ml-4 hidden whitespace-nowrap rounded-lg bg-boton-principal px-3 py-2 text-[11px] font-bold text-boton-principalTexto shadow-panel transition-all group-hover/section:block"
- >
- {{ $section['title'] }}
- </div>
- </div>
- @endif
- @endforeach
- </nav>
- </div>
+                        {{-- TOOLTIP CUANDO ESTÁ COLAPSADO --}}
+                        <div
+                            x-show="sidebarCollapsed"
+                            class="pointer-events-none absolute left-full z-50 ml-4 hidden whitespace-nowrap rounded-lg bg-boton-principal px-3 py-2 text-[11px] font-bold text-boton-principalTexto shadow-panel transition-all group-hover/section:block"
+                        >
+                            {{ $section['title'] }}
+                        </div>
+                    </div>
+                @endif
+            @endforeach
+        </nav>
+    </div>
 
- {{-- FOOTER --}}
- <div class="shrink-0 border-t border-[var(--color-borde-suave)] p-3">
- <a
- href="#"
- class="group flex items-center gap-3 rounded-xl px-3 py-3 text-[15px] font-black text-apoyo transition-all duration-300 hover:bg-boton-principal hover:text-boton-principalTexto active:scale-95"
- :class="sidebarCollapsed ? 'justify-center px-0' : ''"
- >
- <i class="ph-bold ph-question text-xl shrink-0 group-hover:rotate-12 transition-transform"></i>
+    {{-- FOOTER --}}
+    <div class="shrink-0 border-t border-[var(--color-borde-suave)] p-3">
+        <button
+            type="button"
+            class="group flex w-full items-center gap-3 rounded-xl px-3 py-3 text-[15px] font-black text-apoyo transition-all duration-300 hover:bg-boton-principal hover:text-boton-principalTexto active:scale-95"
+            :class="sidebarCollapsed ? 'justify-center px-0' : ''"
+        >
+            <i class="ph-bold ph-question text-xl shrink-0 group-hover:rotate-12 transition-transform"></i>
 
- <span x-show="!sidebarCollapsed" x-transition.opacity.duration.200ms>
- Centro de Ayuda
- </span>
- </a>
- </div>
+            <span x-show="!sidebarCollapsed" x-transition.opacity.duration.200ms>
+                Centro de Ayuda
+            </span>
+        </button>
+    </div>
 </aside>

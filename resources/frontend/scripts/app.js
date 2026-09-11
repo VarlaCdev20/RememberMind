@@ -32,3 +32,6 @@ window.redApoyoTree = redApoyoTree;
 
 // Tema institucional — Geriátrico Jardín de los Recuerdos
 import './utilities/modo-oscuro.js';
+
+import documentosAdulto from './modules/documentos-adulto.js';
+window.documentosAdulto = documentosAdulto;

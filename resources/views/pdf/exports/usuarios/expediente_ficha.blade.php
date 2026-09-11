@@ -101,7 +101,7 @@
  <tr>
  <td class="label-detail">Rango Horario:</td>
  <td class="value-detail">{{ substr($horarios->turno?->hora_inicio, 0, 5) }} a {{ substr($horarios->turno?->hora_fin, 0, 5) }}</td>
- <td class="label-detail">Días de Jornada:</td>
+ <td class="label-detail">Das de Jornada:</td>
  <td class="value-detail">
  @foreach($horarios->dias_semana ?? [] as $d)
  <span style="font-weight: bold; background-color: #2F3E5C; color: #ffffff; padding: 1px 3px; border-radius: 3px; font-size: 7px; margin-right: 2px;">

@@ -101,9 +101,9 @@ class AdultoMayorBitacoraService
 
         $query = DB::table('activity_log')
             ->leftJoin('users',
-                DB::raw('activity_log.causer_id::text'),
+                'activity_log.causer_id',
                 '=',
-                DB::raw('users.cod_usu::text')
+                'users.cod_usu'
             )
             ->select([
                 'activity_log.id',

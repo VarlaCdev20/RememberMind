@@ -29,7 +29,7 @@ class VoluntariadoResumenPanel extends Component
     {
         $stats = $this->obtenerMetricas();
 
-        return view('livewire.admin.voluntariado.voluntariado-resumen-panel', [
+        return view('livewire.voluntariado.voluntariado-resumen-panel', [
             'stats' => $stats,
             'metricas' => $this->metricasResumen($stats),
             'flujoOperativo' => $this->flujoOperativo(),

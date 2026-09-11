@@ -5,6 +5,8 @@ namespace App\Livewire\Valoraciones;
 use Livewire\Component;
 use App\Models\AdultoMayor;
 use App\Models\ValoracionFuncionalAdulto;
+use App\Services\Enfermeria\TurnoEnfermeriaService;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class ValoracionBarthelModal extends Component
@@ -15,7 +17,7 @@ class ValoracionBarthelModal extends Component
 
     public string  $fecha_valoracion = '';
 
-    // Barthel Index — 10 ítems
+    // Barthel Index — 10 ítems con puntuación oficial estándar
     public int $alimentacion     = 0;   // 0,5,10
     public int $bano             = 0;   // 0,5
     public int $aseo_personal    = 0;   // 0,5
@@ -27,7 +29,7 @@ class ValoracionBarthelModal extends Component
     public int $deambulacion     = 0;   // 0,5,10,15
     public int $escaleras        = 0;   // 0,5,10
 
-    // Auxiliares de movilidad
+    // Auxiliares de movilidad (observación clínica independiente)
     public bool $usa_baston      = false;
     public bool $usa_andador     = false;
     public bool $usa_silla_ruedas = false;
@@ -53,7 +55,12 @@ class ValoracionBarthelModal extends Component
     {
         $this->resetForm();
         $this->cod_am = $cod_am;
+
+        abort_unless(Auth::check(), 401);
+        app(TurnoEnfermeriaService::class)->autorizarAccionPaciente($cod_am, Auth::user());
+
         $this->adulto = AdultoMayor::find($cod_am);
+        $this->recalcular();
         $this->mostrar = true;
     }
 
@@ -73,11 +80,12 @@ class ValoracionBarthelModal extends Component
     public function getClasificacionBarthelProperty(): string
     {
         return match (true) {
-            $this->totalBarthel >= 91 => 'Independiente',
-            $this->totalBarthel >= 61 => 'Dependencia leve',
-            $this->totalBarthel >= 41 => 'Dependencia moderada',
-            $this->totalBarthel >= 21 => 'Dependencia severa',
-            default                   => 'Dependencia total',
+            $this->totalBarthel >= 100 => 'Independiente',
+            $this->totalBarthel >= 91  => 'Dependencia escasa',
+            $this->totalBarthel >= 61  => 'Dependencia leve',
+            $this->totalBarthel >= 41  => 'Dependencia moderada',
+            $this->totalBarthel >= 21  => 'Dependencia severa',
+            default                    => 'Dependencia total',
         };
     }
 
@@ -94,14 +102,9 @@ class ValoracionBarthelModal extends Component
 
     private function recalcular(): void
     {
-        $total = $this->totalBarthel;
+        // El total y la dependencia corresponden exclusivamente al instrumento Barthel
         $this->nivel_dependencia = $this->clasificacionBarthel;
-
-        $this->riesgo_caida = match (true) {
-            $this->usa_silla_ruedas || $total < 20 => 'ALTO',
-            $total < 60 || $this->usa_andador      => 'MODERADO',
-            default                                => 'BAJO',
-        };
+        // El riesgo de caída NO se deduce artificialmente del índice Barthel
     }
 
     protected function rules(): array
@@ -119,12 +122,16 @@ class ValoracionBarthelModal extends Component
             'traslados'           => 'required|in:0,5,10,15',
             'deambulacion'        => 'required|in:0,5,10,15',
             'escaleras'           => 'required|in:0,5,10',
+            'riesgo_caida'        => 'required|in:BAJO,MODERADO,ALTO',
             'observacion'         => 'nullable|string|max:1000',
         ];
     }
 
     public function guardar(): void
     {
+        abort_unless(Auth::check(), 401);
+        app(TurnoEnfermeriaService::class)->autorizarAccionPaciente($this->cod_am, Auth::user());
+
         $this->recalcular();
         $this->validate();
 
@@ -136,26 +143,26 @@ class ValoracionBarthelModal extends Component
                     ->update(['estado' => 'HISTORICA']);
 
                 ValoracionFuncionalAdulto::create([
-                    'cod_am'            => $this->cod_am,
-                    'fecha_valoracion'  => $this->fecha_valoracion,
-                    'come_solo'         => $this->alimentacion >= 10,
-                    'se_bana_solo'      => $this->bano >= 5,
-                    'se_viste_solo'     => $this->vestido >= 10,
-                    'va_bano_solo'      => $this->uso_retrete >= 10,
-                    'camina_solo'       => $this->deambulacion >= 15,
-                    'usa_baston'        => $this->usa_baston,
-                    'usa_andador'       => $this->usa_andador,
-                    'usa_silla_ruedas'  => $this->usa_silla_ruedas,
-                    'baja_vision'       => $this->baja_vision,
-                    'baja_audicion'     => $this->baja_audicion,
-                    'dificultad_hablar' => $this->dificultad_hablar,
+                    'cod_am'               => $this->cod_am,
+                    'fecha_valoracion'     => $this->fecha_valoracion,
+                    'come_solo'            => $this->alimentacion >= 10,
+                    'se_bana_solo'         => $this->bano >= 5,
+                    'se_viste_solo'        => $this->vestido >= 10,
+                    'va_bano_solo'         => $this->uso_retrete >= 10,
+                    'camina_solo'          => $this->deambulacion >= 15,
+                    'usa_baston'           => $this->usa_baston,
+                    'usa_andador'          => $this->usa_andador,
+                    'usa_silla_ruedas'     => $this->usa_silla_ruedas,
+                    'baja_vision'          => $this->baja_vision,
+                    'baja_audicion'        => $this->baja_audicion,
+                    'dificultad_hablar'    => $this->dificultad_hablar,
                     'necesita_supervision' => $this->necesita_supervision,
-                    'nivel_dependencia' => $this->nivel_dependencia,
-                    'riesgo_caida'      => $this->riesgo_caida,
-                    'indice_barthel'    => $this->totalBarthel,
-                    'estado'            => 'VIGENTE',
-                    'observacion'       => $this->observacion ?: null,
-                    'registrado_por'    => auth()->user()->cod_usu,
+                    'nivel_dependencia'    => $this->nivel_dependencia,
+                    'riesgo_caida'         => $this->riesgo_caida,
+                    'indice_barthel'       => $this->totalBarthel,
+                    'estado'               => 'VIGENTE',
+                    'observacion'          => $this->observacion ?: null,
+                    'registrado_por'       => Auth::id(),
                 ]);
             });
 
@@ -180,19 +187,34 @@ class ValoracionBarthelModal extends Component
         $this->cod_am = null;
         $this->adulto = null;
         $this->fecha_valoracion = date('Y-m-d');
-        $this->alimentacion = $this->bano = $this->aseo_personal = 0;
-        $this->vestido = $this->control_intestinal = $this->control_vesical = 0;
-        $this->uso_retrete = $this->traslados = $this->deambulacion = $this->escaleras = 0;
-        $this->usa_baston = $this->usa_andador = $this->usa_silla_ruedas = false;
-        $this->baja_vision = $this->baja_audicion = $this->dificultad_hablar = false;
+        $this->alimentacion = 0;
+        $this->bano = 0;
+        $this->aseo_personal = 0;
+        $this->vestido = 0;
+        $this->control_intestinal = 0;
+        $this->control_vesical = 0;
+        $this->uso_retrete = 0;
+        $this->traslados = 0;
+        $this->deambulacion = 0;
+        $this->escaleras = 0;
+        $this->usa_baston = false;
+        $this->usa_andador = false;
+        $this->usa_silla_ruedas = false;
+        $this->baja_vision = false;
+        $this->baja_audicion = false;
+        $this->dificultad_hablar = false;
         $this->necesita_supervision = false;
         $this->nivel_dependencia = '';
         $this->riesgo_caida = 'MODERADO';
         $this->observacion = '';
+        $this->resetValidation();
     }
 
     public function render()
     {
-        return view('livewire.valoraciones.valoracion-barthel-modal');
+        return view('livewire.valoraciones.valoracion-barthel-modal', [
+            'totalBarthel' => $this->totalBarthel,
+            'clasificacionBarthel' => $this->clasificacionBarthel,
+        ]);
     }
 }

@@ -3,18 +3,25 @@
 namespace App\Models;
 
 use App\Traits\GeneraCodigo;
-
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class AsignacionAdultoMayor extends Model
 {
     use GeneraCodigo;
+
     protected $table = 'asignacion_adulto_mayor';
+
     protected $primaryKey = 'cod_asig_adulto';
+
     protected $keyType = 'string';
+
     protected $prefixCode = 'AAM';
+
     protected $digitsCode = 5;
+
     public $incrementing = false;
+
     public $timestamps = true;
 
     protected $fillable = [
@@ -29,10 +36,25 @@ class AsignacionAdultoMayor extends Model
         'registrado_por',
     ];
 
+    public function adultoMayor(): BelongsTo
+    {
+        return $this->belongsTo(AdultoMayor::class, 'cod_am', 'cod_am');
+    }
+
+    public function habitacion(): BelongsTo
+    {
+        return $this->belongsTo(Habitacion::class, 'cod_habitacion', 'cod_habitacion');
+    }
+
+    public function cama(): BelongsTo
+    {
+        return $this->belongsTo(Cama::class, 'cod_cama', 'cod_cama');
+    }
+
     protected static function booted(): void
     {
         static::creating(function ($asignacion) {
-            if (!$asignacion->cod_asig_adulto) {
+            if (! $asignacion->cod_asig_adulto) {
                 $ultimo = self::where('cod_asig_adulto', 'like', 'AAM_%')
                     ->orderByDesc('cod_asig_adulto')
                     ->value('cod_asig_adulto');
@@ -41,7 +63,7 @@ class AsignacionAdultoMayor extends Model
                     ? ((int) substr($ultimo, 4)) + 1
                     : 1;
 
-                $asignacion->cod_asig_adulto = 'AAM_' . str_pad($numero, 5, '0', STR_PAD_LEFT);
+                $asignacion->cod_asig_adulto = 'AAM_'.str_pad($numero, 5, '0', STR_PAD_LEFT);
             }
         });
 
@@ -91,12 +113,16 @@ class AsignacionAdultoMayor extends Model
             return;
         }
 
-        $ocupadas = Cama::where('cod_habitacion', $codHabitacion)
-            ->where('estado', 'OCUPADA')
+        $habitacion = Habitacion::find($codHabitacion);
+        if (! $habitacion || in_array($habitacion->estado, ['MANTENIMIENTO', 'BLOQUEADA'], true)) {
+            return;
+        }
+
+        $disponibles = Cama::where('cod_habitacion', $codHabitacion)
+            ->where('estado', 'DISPONIBLE')
+            ->whereDoesntHave('asignacionesActivas')
             ->count();
 
-        Habitacion::where('cod_habitacion', $codHabitacion)->update([
-            'estado' => $ocupadas >= $total ? 'OCUPADA' : 'DISPONIBLE',
-        ]);
+        $habitacion->update(['estado' => $disponibles > 0 ? 'DISPONIBLE' : 'OCUPADA']);
     }
 }

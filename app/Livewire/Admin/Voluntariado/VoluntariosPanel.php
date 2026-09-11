@@ -302,7 +302,7 @@ class VoluntariosPanel extends Component
 
     public function render()
     {
-        return view('livewire.admin.voluntariado.voluntarios-panel', [
+        return view('livewire.voluntariado.voluntarios-panel', [
             'voluntarios' => $this->voluntariosQuery()->paginate(10),
             'metricas' => $this->metricas(),
             'areas' => $this->areasDisponibles(),
@@ -467,12 +467,12 @@ class VoluntariosPanel extends Component
         if ($this->search !== '') {
             $term = '%' . trim($this->search) . '%';
             $query->where(function (Builder $q) use ($term) {
-                $q->where('u.nombres', 'ilike', $term)
-                    ->orWhere('u.ap_paterno', 'ilike', $term)
-                    ->orWhere('u.ap_materno', 'ilike', $term)
-                    ->orWhere('u.numero_documento', 'ilike', $term)
-                    ->orWhere('u.telefono', 'ilike', $term)
-                    ->orWhere('u.correo', 'ilike', $term);
+                $q->whereLike('u.nombres', $term)
+                    ->orWhereLike('u.ap_paterno', $term)
+                    ->orWhereLike('u.ap_materno', $term)
+                    ->orWhereLike('u.numero_documento', $term)
+                    ->orWhereLike('u.telefono', $term)
+                    ->orWhereLike('u.correo', $term);
             });
         }
 
@@ -742,7 +742,7 @@ class VoluntariosPanel extends Component
         }
 
         return DB::table('areas_institucionales')
-            ->where('nombre', 'ilike', '%volunt%')
+            ->whereLike('nombre', '%volunt%')
             ->value('cod_area');
     }
 

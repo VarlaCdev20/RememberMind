@@ -1,8 +1,12 @@
+@php
+$estadoTexto = $adulto->estado?->estado ?? 'Sin estado';
+@endphp
 <div class="salud-resumen-scope space-y-6 animate-[fadeIn_0.3s_ease-out]">
  <style>
 
 {!! file_get_contents(resource_path('frontend/styles/modules/livewire-clinica-salud-resumen-panel.css')) !!}
 </style>
+ @if($adulto)<x-residentes.navegacion-ficha :adulto="$adulto" />@endif
  <section class="overflow-hidden rounded-[1.6rem] border border-borde/65 bg-fondo-panel shadow-sm backdrop-blur-xl">
  <div class="h-1.5 w-full bg-gradient-to-r from-[#E27D60] via-[#D9A05B] to-[#8DA280]"></div>
  <div class="p-5">
@@ -263,7 +267,7 @@
  $condiciones = array_filter([
  'Hipertensión' => $fichaMedica->hipertension,
  'Diabetes' => $fichaMedica->diabetes,
- 'Prob. Cardíacos' => $fichaMedica->problemas_cardiacos,
+ 'Prob. Cardacos' => $fichaMedica->problemas_cardiacos,
  'ACV' => $fichaMedica->acv,
  'Parkinson' => $fichaMedica->parkinson,
  'Epilepsia' => $fichaMedica->epilepsia,
@@ -437,7 +441,7 @@
  <p class="text-[9px] text-meta">mmHg</p>
  </div>
  <div class="rounded-xl bg-fondo-panel p-3 text-center border border-borde-suave">
- <p class="text-[9px] font-bold uppercase tracking-widest text-meta">F. Cardíaca</p>
+ <p class="text-[9px] font-bold uppercase tracking-widest text-meta">F. Cardaca</p>
  <p class="mt-1 text-base font-extrabold text-boton-acento leading-tight">
  {{ $ultimoSigno->frecuencia_cardiaca ?? '—' }}
  </p>

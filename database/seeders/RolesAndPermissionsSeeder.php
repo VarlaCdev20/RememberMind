@@ -149,6 +149,10 @@ class RolesAndPermissionsSeeder extends Seeder
             'reportes.exportar_pdf',
             'alertas.ver',
             'alertas.gestionar',
+            'alertas.crear',
+            'alertas.atender',
+            'alertas.cerrar',
+            'alertas.anular',
         ];
 
         // 2. Crear permisos
@@ -246,6 +250,10 @@ class RolesAndPermissionsSeeder extends Seeder
             'reportes.ver',
             'reportes.institucional',
             'reportes.bienestar',
+            'alertas.ver',
+            'alertas.gestionar',
+            'alertas.atender',
+            'alertas.cerrar',
         ]);
 
         // ENFERMEROS Y MEDICO GENERAL/GERIATRA (basados en personal_salud + enfermería)
@@ -288,6 +296,10 @@ class RolesAndPermissionsSeeder extends Seeder
             'reportes.bienestar',
             'alertas.ver',
             'alertas.gestionar',
+            'alertas.crear',
+            'alertas.atender',
+            'alertas.cerrar',
+            'alertas.anular',
         ];
 
         // Añadir permisos específicos de enfermería

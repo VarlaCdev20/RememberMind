@@ -49,14 +49,9 @@
  <span data-theme-icon>🌙</span>
  </button>
 
- <button
- type="button"
- class="rm-btn-icon relative"
- aria-label="Notificaciones"
- >
- <i class="ph-bold ph-bell text-base"></i>
- <span class="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-boton-acento ring-2 ring-fondo-card"></span>
- </button>
+ @auth
+                <livewire:alertas.campana-notificaciones />
+            @endauth
 
  <div x-data="{ abierto:false }" class="relative">
  <button

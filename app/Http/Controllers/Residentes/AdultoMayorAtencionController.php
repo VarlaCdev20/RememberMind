@@ -14,8 +14,13 @@ class AdultoMayorAtencionController extends Controller
 {
     public function index(AdultoMayor $adulto_mayor)
     {
-        $atenciones = $adulto_mayor->atenciones()->with('tipo')->latest()->get();
-        return view('admin.adultos-mayores.atenciones.index', compact('adulto_mayor', 'atenciones'));
+        $registros = $adulto_mayor->atenciones()->with('tipoAtencion')
+            ->when(request('buscar'), fn ($q) => $q->whereLike('observacion', '%'.request('buscar').'%'))
+            ->latest()->paginate(15)->withQueryString();
+        return view('pages.adultos-mayores.atenciones.index', [
+            'adulto_mayor' => $adulto_mayor, 'atenciones' => $registros,
+            'tiposAtencion' => \App\Models\TipoAtencionAdulto::all(),
+        ]);
     }
 
     public function store(StoreAtencionAdultoRequest $request, AdultoMayor $adulto_mayor)
@@ -25,6 +30,7 @@ class AdultoMayorAtencionController extends Controller
         DB::transaction(function () use ($request, $adulto_mayor, &$atencion) {
             $data = $request->validated();
             $data['cod_am'] = $adulto_mayor->cod_am;
+            $data['registrado_por'] = auth()->id();
 
             $atencion = AtencionAdulto::create($data);
 
@@ -52,6 +58,7 @@ class AdultoMayorAtencionController extends Controller
 
     public function update(Request $request, AdultoMayor $adulto_mayor, AtencionAdulto $atencion)
     {
+        abort_unless($atencion->cod_am === $adulto_mayor->cod_am, 404);
         $request->validate([
             'obs' => 'nullable|string',
             'estado' => 'required|string',
@@ -64,7 +71,8 @@ class AdultoMayorAtencionController extends Controller
 
     public function destroy(AdultoMayor $adulto_mayor, AtencionAdulto $atencion)
     {
-        $atencion->delete(); // Soft delete
+        abort_unless($atencion->cod_am === $adulto_mayor->cod_am, 404);
+        $atencion->update(['estado' => 'ANULADO']);
 
         activity('Adulto Mayor')
             ->performedOn($adulto_mayor)
@@ -75,8 +83,8 @@ class AdultoMayorAtencionController extends Controller
 
     public function restore(AdultoMayor $adulto_mayor, $id)
     {
-        $atencion = AtencionAdulto::withTrashed()->findOrFail($id);
-        $atencion->restore();
+        $atencion = AtencionAdulto::where('cod_am', $adulto_mayor->cod_am)->findOrFail($id);
+        $atencion->update(['estado' => 'PENDIENTE']);
 
         activity('Adulto Mayor')
             ->performedOn($adulto_mayor)

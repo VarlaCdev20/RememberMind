@@ -34,7 +34,7 @@ class ReporteInstitucionalController extends Controller
         $datos = $this->obtenerDatos();
         $datos['esPdf'] = false;
 
-        return view('reportes.institucional.general', $datos);
+        return view('pages.reportes.institucional.general', $datos);
     }
 
     public function pdf()
@@ -42,7 +42,7 @@ class ReporteInstitucionalController extends Controller
         $datos = $this->obtenerDatos();
         $datos['esPdf'] = true;
 
-        $pdf = Pdf::loadView('reportes.institucional.general', $datos)
+        $pdf = Pdf::loadView('pages.reportes.institucional.general', $datos)
             ->setPaper('a4', 'portrait')
             ->setOptions([
                 'defaultFont'         => 'DejaVu Sans',

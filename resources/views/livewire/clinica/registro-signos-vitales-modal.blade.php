@@ -69,7 +69,7 @@
                         @error('pa_diastolica')<span class="text-[9px] font-bold text-estado-error">{{ $message }}</span>@enderror
                     </div>
                     <div>
-                        <label class="mb-1 block text-[10px] font-bold text-apoyo">Frec. Cardíaca (bpm)</label>
+                        <label class="mb-1 block text-[10px] font-bold text-apoyo">Frec. Cardaca (bpm)</label>
                         <input wire:model.live="fc" type="number" min="20" max="300" placeholder="70"
                                class="w-full rounded-xl border @error('fc') border-estado-error @else border-borde @enderror bg-fondo-panel px-3 py-2 text-sm font-bold text-titulo outline-none focus:border-borde-focus">
                         @error('fc')<span class="text-[9px] font-bold text-estado-error">{{ $message }}</span>@enderror

@@ -33,7 +33,7 @@
     <p><strong>TERCERA: DE LA VIGENCIA.</strong><br>
     El presente contrato entrará en vigencia a partir del <strong>{{ $data['fecha_ingreso'] ?? '' }}</strong>. Su duración estará sujeta a la naturaleza del servicio y las evaluaciones periódicas de desempeño institucional.</p>
 
-    <p>En conformidad con las cláusulas anteriores, las partes firman el presente documento en la ciudad de La Paz, a los {{ date('d') }} días del mes de {{ \Carbon\Carbon::now()->translatedFormat('F') }} de {{ date('Y') }}.</p>
+    <p>En conformidad con las cláusulas anteriores, las partes firman el presente documento en la ciudad de La Paz, a los {{ date('d') }} das del mes de {{ \Carbon\Carbon::now()->translatedFormat('F') }} de {{ date('Y') }}.</p>
 
     <table class="signatures">
         <tr>

@@ -13,14 +13,15 @@ class FichaPacienteReporteController extends Controller
     {
         $adultoMayor = AdultoMayor::with([
             'habitacion', 'cama',
+            'asignacionTurnoActiva.turno', 'asignacionTurnoActiva.enfermero',
             'planCuidadoActivo',
             'valoracionesEnfermeria' => fn($q) => $q->orderBy('fecha_valoracion', 'desc')->orderBy('hora_valoracion', 'desc')->take(1),
-            'valoracionesMedicas' => fn($q) => $q->orderBy('fecha', 'desc')->take(1),
+            'valoracionesMedicas' => fn($q) => $q->orderBy('created_at', 'desc')->take(1),
             'signosVitales' => fn($q) => $q->orderBy('fecha', 'desc')->orderBy('hora', 'desc')->take(7),
-            'administracionesMedicacion' => fn($q) => $q->where('estado', 'PENDIENTE')->orderBy('fecha')->orderBy('hora_programada')->take(5),
+            'administracionesMedicacion' => fn($q) => $q->orderByDesc('fecha')->orderByDesc('hora_programada')->take(5),
             'tareasActuales' => fn($q) => $q->orderBy('fecha_programada')->orderBy('hora_programada')->take(5),
             'alertasAbiertas' => fn($q) => $q->orderBy('nivel', 'desc')->orderBy('created_at', 'desc'),
-            'seguimientosDiarios' => fn($q) => $q->orderBy('fecha', 'desc')->orderBy('hora', 'desc')->take(5),
+            'seguimientosDiarios' => fn($q) => $q->orderBy('fecha', 'desc')->orderBy('hora_inicio', 'desc')->take(5),
             'pasesTurno' => fn($q) => $q->orderBy('fecha', 'desc')->orderBy('created_at', 'desc')->take(3)
         ])->findOrFail($adulto_id);
 
@@ -33,10 +34,17 @@ class FichaPacienteReporteController extends Controller
             'VALORACIÓN ENFERMERÍA' => $adultoMayor->valoracionesEnfermeria->isNotEmpty(),
             'VALORACIÓN MÉDICA' => $adultoMayor->valoracionesMedicas->isNotEmpty(),
             'ADMITIDO' => in_array($adultoMayor->estadoTexto, ['ACTIVO', 'EN_OBSERVACION']),
-            'ASIGNADO' => $adultoMayor->habitacion !== null,
+            'ASIGNADO' => $adultoMayor->cod_habitacion !== null || $adultoMayor->habitacion !== null,
             'PLAN ACTIVO' => $adultoMayor->planCuidadoActivo !== null,
             'SEGUIMIENTO ACTIVO' => $adultoMayor->seguimientosDiarios->isNotEmpty(),
         ];
+
+        $habitacionActual = $adultoMayor->cod_habitacion
+            ? \App\Models\Habitacion::find($adultoMayor->cod_habitacion)
+            : $adultoMayor->habitacion;
+        $camaActual = $adultoMayor->cod_cama
+            ? \App\Models\Cama::find($adultoMayor->cod_cama)
+            : $adultoMayor->cama;
 
         // Ensure variables exist for charts representation
         $signos = $adultoMayor->signosVitales->reverse();
@@ -45,10 +53,10 @@ class FichaPacienteReporteController extends Controller
         $dataPresionDia = $signos->map(fn($s) => $s->presion_arterial_diastolica ?? $s->presion_diastolica ?? 0)->values();
         $dataSaturacion = $signos->map(fn($s) => $s->saturacion_oxigeno ?? $s->saturacion ?? 0)->values();
 
-        $tareas = $adultoMayor->tareasActuales()->get();
-        $tareasRealizadas = $tareas->where('estado', 'REALIZADO')->count();
+        $tareas = \App\Models\TareaPlanCuidado::where('cod_am', $adultoMayor->cod_am)->get();
+        $tareasRealizadas = $tareas->where('estado', 'REALIZADA')->count();
         $tareasPendientes = $tareas->where('estado', 'PENDIENTE')->count();
-        $tareasOmitidas = $tareas->where('estado', 'OMITIDO')->count();
+        $tareasOmitidas = $tareas->where('estado', 'OMITIDA')->count();
 
         $alertas = $adultoMayor->alertasAbiertas()->get();
         $alertasLabels = $alertas->pluck('tipo_alerta')->unique()->values();
@@ -57,7 +65,7 @@ class FichaPacienteReporteController extends Controller
         });
 
         $pdf = Pdf::loadView('pages.enfermeria.reportes.ficha-paciente-pdf', compact(
-            'adultoMayor', 
+            'adultoMayor', 'habitacionActual', 'camaActual',
             'timeline',
             'labelsSignos', 'dataPresionSis', 'dataPresionDia', 'dataSaturacion',
             'tareasRealizadas', 'tareasPendientes', 'tareasOmitidas',

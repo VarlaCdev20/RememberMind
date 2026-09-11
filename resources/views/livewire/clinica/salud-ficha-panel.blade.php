@@ -1,4 +1,5 @@
 <div class="relative mx-auto max-w-7xl space-y-5 p-3 sm:p-5 lg:p-6">
+ @if($adulto)<x-residentes.navegacion-ficha :adulto="$adulto" />@endif
  <div class="mb-2">
  <a href="{{ route('admin.salud-seguimiento.ficha.index') }}" class="inline-flex items-center gap-2 rounded-xl bg-fondo-panel px-4 py-2.5 text-[10px] font-bold uppercase tracking-wider text-parrafo transition-all hover:bg-fondo-panel hover:shadow-sm">
  <i class="ph-bold ph-arrow-left text-sm"></i>
@@ -11,7 +12,7 @@
  $patologias = [
  ['cond' => $fichaActiva?->hipertension, 'label' => 'Hipertensión', 'icon' => 'ph-heartbeat'],
  ['cond' => $fichaActiva?->diabetes, 'label' => 'Diabetes', 'icon' => 'ph-drop'],
- ['cond' => $fichaActiva?->problemas_cardiacos, 'label' => 'Prob. cardíacos', 'icon' => 'ph-heart'],
+ ['cond' => $fichaActiva?->problemas_cardiacos, 'label' => 'Prob. cardacos', 'icon' => 'ph-heart'],
  ['cond' => $fichaActiva?->acv, 'label' => 'ACV', 'icon' => 'ph-brain'],
  ['cond' => $fichaActiva?->parkinson, 'label' => 'Parkinson', 'icon' => 'ph-person-simple-walk'],
  ['cond' => $fichaActiva?->epilepsia, 'label' => 'Epilepsia', 'icon' => 'ph-pulse'],
@@ -515,7 +516,7 @@
  @foreach([
  'hipertension' => 'Hipertensión',
  'diabetes' => 'Diabetes',
- 'problemas_cardiacos' => 'Prob. cardíacos',
+ 'problemas_cardiacos' => 'Prob. cardacos',
  'acv' => 'ACV',
  'alzheimer_diagnosticado' => 'Alzheimer',
  'depresion' => 'Depresión',

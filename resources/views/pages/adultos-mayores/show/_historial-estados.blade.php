@@ -18,7 +18,7 @@
  </div>
  
  <div class="flex items-center gap-2">
- <a href="#" class="inline-flex items-center justify-center gap-2 rounded-xl bg-fondo-card border border-borde px-4 py-2.5 text-xs font-bold text-titulo shadow-sm transition hover:-translate-y-0.5 hover:bg-fondo-panel active:scale-[0.98]">
+ <a href="{{ route('admin.bitacora.index', ['buscar' => $idAdulto]) }}" class="inline-flex items-center justify-center gap-2 rounded-xl bg-fondo-card border border-borde px-4 py-2.5 text-xs font-bold text-titulo shadow-sm transition hover:-translate-y-0.5 hover:bg-fondo-panel active:scale-[0.98]">
  <i class="ph-bold ph-magnifying-glass text-lg"></i>
  Ver Trazabilidad Completa
  </a>
@@ -89,7 +89,7 @@
  @endforeach
  </div>
  <div class="mt-4 text-center">
- <a href="#" class="inline-flex items-center justify-center gap-2 rounded-xl bg-fondo-card border border-borde px-6 py-2.5 text-xs font-bold uppercase tracking-wider text-parrafo shadow-sm transition hover:bg-fondo-panel active:scale-[0.98]">
+ <a href="{{ route('admin.bitacora.index', ['buscar' => $idAdulto]) }}" class="inline-flex items-center justify-center gap-2 rounded-xl bg-fondo-card border border-borde px-6 py-2.5 text-xs font-bold uppercase tracking-wider text-parrafo shadow-sm transition hover:bg-fondo-panel active:scale-[0.98]">
  Ver Bitácora Completa
  </a>
  </div>

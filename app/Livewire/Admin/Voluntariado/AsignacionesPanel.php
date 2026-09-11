@@ -194,7 +194,7 @@ class AsignacionesPanel extends Component
             ->paginate(8)
             ->through(fn (object $item) => $this->decorarAsignacion($item));
 
-        return view('livewire.admin.voluntariado.asignaciones-panel', [
+        return view('livewire.voluntariado.asignaciones-panel', [
             'metricas' => $this->metricas(),
             'estados' => $this->estados(),
             'turnos' => $this->turnos(),
@@ -348,14 +348,14 @@ class AsignacionesPanel extends Component
         if ($this->search !== '') {
             $term = '%' . trim($this->search) . '%';
             $query->where(function (Builder $q) use ($term) {
-                $q->where('u.nombres', 'ilike', $term)
-                    ->orWhere('u.ap_paterno', 'ilike', $term)
-                    ->orWhere('u.ap_materno', 'ilike', $term)
-                    ->orWhere('u.numero_documento', 'ilike', $term)
-                    ->orWhere('am.nombres', 'ilike', $term)
-                    ->orWhere('am.ap_paterno', 'ilike', $term)
-                    ->orWhere('am.ap_materno', 'ilike', $term)
-                    ->orWhere('am.ci', 'ilike', $term);
+                $q->whereLike('u.nombres', $term)
+                    ->orWhereLike('u.ap_paterno', $term)
+                    ->orWhereLike('u.ap_materno', $term)
+                    ->orWhereLike('u.numero_documento', $term)
+                    ->orWhereLike('am.nombres', $term)
+                    ->orWhereLike('am.ap_paterno', $term)
+                    ->orWhereLike('am.ap_materno', $term)
+                    ->orWhereLike('am.ci', $term);
             });
         }
 

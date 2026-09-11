@@ -252,11 +252,10 @@ class DashboardService
             $resultado = DB::select("
                 SELECT COUNT(*) AS total
                 FROM (
-                    SELECT DISTINCT ON (cod_am) cod_am, nivel_dependencia
+                    SELECT cod_am, nivel_dependencia, ROW_NUMBER() OVER (PARTITION BY cod_am ORDER BY fecha_valoracion DESC, cod_val_func DESC) AS orden
                     FROM valoracion_funcional_adulto
-                    ORDER BY cod_am, fecha_valoracion DESC
                 ) AS ultima_val
-                WHERE nivel_dependencia = 'ALTA_DEPENDENCIA'
+                WHERE orden = 1 AND nivel_dependencia = 'ALTA_DEPENDENCIA'
             ");
             $altaDependencia = (int) ($resultado[0]->total ?? 0);
         }
@@ -292,11 +291,10 @@ class DashboardService
             $resultado = DB::select("
                 SELECT COUNT(*) AS total
                 FROM (
-                    SELECT DISTINCT ON (cod_am) cod_am, riesgo_caida
+                    SELECT cod_am, riesgo_caida, ROW_NUMBER() OVER (PARTITION BY cod_am ORDER BY fecha_valoracion DESC, cod_val_func DESC) AS orden
                     FROM valoracion_funcional_adulto
-                    ORDER BY cod_am, fecha_valoracion DESC
                 ) AS ultima_val
-                WHERE riesgo_caida = 'ALTO'
+                WHERE orden = 1 AND riesgo_caida = 'ALTO'
             ");
             $riesgoCaidaAlto = (int) ($resultado[0]->total ?? 0);
         }
@@ -400,11 +398,10 @@ class DashboardService
             $resultado = DB::select("
                 SELECT COUNT(*) AS total
                 FROM (
-                    SELECT DISTINCT ON (cod_am) cod_am, nivel_dependencia
+                    SELECT cod_am, nivel_dependencia, ROW_NUMBER() OVER (PARTITION BY cod_am ORDER BY fecha_valoracion DESC, cod_val_func DESC) AS orden
                     FROM valoracion_funcional_adulto
-                    ORDER BY cod_am, fecha_valoracion DESC
                 ) AS ultima_val
-                WHERE nivel_dependencia = 'ALTA_DEPENDENCIA'
+                WHERE orden = 1 AND nivel_dependencia = 'ALTA_DEPENDENCIA'
             ");
             $altaDep = (int) ($resultado[0]->total ?? 0);
             if ($altaDep > 0) {
@@ -718,7 +715,7 @@ class DashboardService
 
         if (Schema::hasTable('activity_log') && Schema::hasColumn('activity_log', 'created_at')) {
             $actividad = DB::table('activity_log')
-                ->selectRaw('EXTRACT(MONTH FROM created_at) as mes, count(*) as total')
+                ->selectRaw(\App\Services\Reportes\ReporteDataService::expresionMes('created_at').' as mes, count(*) as total')
                 ->whereYear('created_at', date('Y'))
                 ->groupBy('mes')
                 ->get();
@@ -830,9 +827,9 @@ class DashboardService
 
         $query = DB::table('activity_log')
             ->leftJoin('users',
-                DB::raw('activity_log.causer_id::text'),
+                'activity_log.causer_id',
                 '=',
-                DB::raw('users.cod_usu::text')
+                'users.cod_usu'
             )
             ->select('activity_log.*', 'users.nombres as usuario_nombre');
 

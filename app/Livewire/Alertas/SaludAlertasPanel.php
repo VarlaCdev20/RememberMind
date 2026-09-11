@@ -11,6 +11,8 @@ class SaludAlertasPanel extends Component
 
     public function render()
     {
+        // Persistir y sincronizar alertas preventivas hacia AlertaAdulto sin duplicados
+        app(\App\Services\Alertas\DeteccionAlertasService::class)->detectarPreventivas();
         // Cargamos solo adultos activos con relaciones acotadas para evitar timeout
         $adultos = AdultoMayor::with([
             'fichasMedicas'           => fn ($q) => $q->where('estado', 'ACTIVA')->latest()->limit(1),

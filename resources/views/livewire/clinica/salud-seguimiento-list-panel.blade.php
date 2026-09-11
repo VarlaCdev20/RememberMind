@@ -14,14 +14,14 @@
  <div class="max-w-3xl">
  <span class="inline-flex items-center gap-2 rounded-full border border-borde-focus bg-estado-peligroBg px-3 py-1 text-[10px] font-bold uppercase tracking-[0.22em] text-boton-acento">
  <i class="ph-bold ph-heartbeat text-sm"></i>
- CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS - Area clinico asistencial
+ CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS · Área clínico asistencial
  </span>
  <h1 class="mt-3 text-2xl font-black tracking-tight text-parrafo sm:text-3xl">
  Salud y Seguimiento
  </h1>
  <p class="mt-2 max-w-2xl text-sm font-bold leading-relaxed text-parrafo/72">
- Panel institucional para revisar fichas medicas, signos vitales, valoraciones funcionales,
- medicacion, administraciones y alertas preventivas de los adultos mayores.
+ Panel institucional para revisar fichas médicas, signos vitales, valoraciones funcionales,
+ medicación, administraciones y alertas preventivas de los adultos mayores.
  </p>
  <div class="mt-4 flex flex-wrap gap-2">
  @can('salud.ficha.crear')
@@ -65,16 +65,16 @@
  <div class="flex min-w-max items-center gap-2">
  @php
  $tabsRaw = [
- 'resumen' => ['label' => 'Resumen clinico', 'icon' => 'ph-squares-four', 'permission' => 'salud.ver'],
+ 'resumen' => ['label' => 'Resumen clínico', 'icon' => 'ph-squares-four', 'permission' => 'salud.ver'],
  'ficha' => ['label' => 'Ficha medica', 'icon' => 'ph-file-text', 'permission' => 'salud.ficha.ver', 'fallback_permission' => 'ficha_medica.crear'],
  'signos' => ['label' => 'Signos vitales', 'icon' => 'ph-activity', 'permission' => 'salud.signos.ver', 'fallback_permission' => 'signos_vitales.ver'],
- 'medicacion' => ['label' => 'Medicacion', 'icon' => 'ph-pill', 'permission' => 'salud.medicacion.ver', 'fallback_permission' => 'medicacion.ver'],
- 'administracion' => ['label' => 'Administracion', 'icon' => 'ph-prescription', 'permission' => 'salud.medicacion.ver', 'fallback_permission' => 'administracion_medicacion.registrar'],
+ 'medicacion' => ['label' => 'Medicación', 'icon' => 'ph-pill', 'permission' => 'salud.medicacion.ver', 'fallback_permission' => 'medicacion.ver'],
+ 'administracion' => ['label' => 'Administración', 'icon' => 'ph-prescription', 'permission' => 'salud.medicacion.ver', 'fallback_permission' => 'administracion_medicacion.registrar'],
  'valoracion' => ['label' => 'Valoracion funcional', 'icon' => 'ph-person-simple-walk', 'permission' => 'salud.ver', 'fallback_permission' => 'valoracion_funcional.crear'],
  'evaluaciones' => ['label' => 'Evaluaciones cognitivas', 'icon' => 'ph-brain', 'permission' => 'evaluaciones.ver'],
  'nutricion' => ['label' => 'Nutricion', 'icon' => 'ph-apple-pod', 'permission' => 'nutricion.ver'],
  'alertas' => ['label' => 'Alertas clinicas', 'icon' => 'ph-warning-circle', 'permission' => 'alertas.ver', 'fallback_permission' => 'salud.alertas.ver'],
- 'reportes' => ['label' => 'Reportes clinicos', 'icon' => 'ph-chart-bar', 'permission' => 'reportes.ver', 'fallback_permission' => 'salud.reportes.ver'],
+ 'reportes' => ['label' => 'Reportes clínicos', 'icon' => 'ph-chart-bar', 'permission' => 'reportes.ver', 'fallback_permission' => 'salud.reportes.ver'],
  ];
  
  $tabs = array_filter($tabsRaw, function($tab) {
@@ -237,7 +237,7 @@
  @foreach([
  ['key' => 'ficha', 'label' => 'Ficha medica', 'icon' => 'ph-file-text'],
  ['key' => 'signos', 'label' => 'Signos vitales', 'icon' => 'ph-activity'],
- ['key' => 'medicacion', 'label' => 'Medicacion', 'icon' => 'ph-pill'],
+ ['key' => 'medicacion', 'label' => 'Medicación', 'icon' => 'ph-pill'],
  ['key' => 'alertas', 'label' => 'Alertas', 'icon' => 'ph-warning'],
  ] as $atajo)
  <button wire:click="cambiarSeccion('{{ $atajo['key'] }}')" type="button" class="group rounded-2xl border border-borde/45 bg-fondo-panel px-3 py-3 text-left transition hover:-translate-y-0.5 hover:border-borde-focus hover:bg-fondo-panel">
@@ -397,7 +397,7 @@
  <span class="text-[10px] font-bold uppercase tracking-wide text-apoyo">Tratamientos activos</span>
  <span class="rounded-full bg-estado-exitoBg px-2.5 py-0.5 text-xs font-bold uppercase text-estado-exito">{{ $medicacionesActivas }}</span>
  </div>
- <p class="mt-2 text-xs font-bold text-parrafo/62">{{ $medicacionesActivas > 0 ? 'Listo para revisar prescripciones y administraciones.' : 'Sin medicacion activa registrada.' }}</p>
+ <p class="mt-2 text-xs font-bold text-parrafo/62">{{ $medicacionesActivas > 0 ? 'Listo para revisar prescripciones y administraciones.' : 'Sin medicación activa registrada.' }}</p>
  </div>
  @endif
  </div>

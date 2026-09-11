@@ -48,7 +48,7 @@
                     {{ $t->estado }}
                 </span>
                 @can('turnos_enfermeria.editar')
-                <button wire:click="abrirEditar({{ $t->cod_turno }})"
+                <button wire:click="abrirEditar('{{ $t->cod_turno }}')"
                     class="flex h-7 w-7 items-center justify-center rounded-lg border border-estado-advertenciaBorde bg-estado-advertenciaBg text-estado-advertencia hover:bg-estado-advertenciaBg transition">
                     <i class="ph-bold ph-pencil text-xs"></i>
                 </button>

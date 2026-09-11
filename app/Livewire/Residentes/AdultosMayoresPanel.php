@@ -2,22 +2,29 @@
 
 namespace App\Livewire\Residentes;
 
+use App\Models\AdultoMayor;
+use App\Services\Residentes\AdultoMayorService;
 use Livewire\Component;
 use Livewire\WithPagination;
-use App\Services\Residentes\AdultoMayorService;
-use App\Models\AdultoMayor;
 
 class AdultosMayoresPanel extends Component
 {
     use WithPagination;
 
     public $buscar = '';
+
     public $estado = '';
+
     public $genero = '';
+
     public $permanencia = '';
+
     public $fecha_desde = '';
+
     public $fecha_hasta = '';
+
     public $ciudad_municipio = '';
+
     public $rango_edad = '';
 
     protected $listeners = [
@@ -29,11 +36,6 @@ class AdultosMayoresPanel extends Component
         if (in_array($propertyName, ['buscar', 'estado', 'genero', 'permanencia', 'fecha_desde', 'fecha_hasta', 'ciudad_municipio', 'rango_edad'])) {
             $this->resetPage();
         }
-    }
-
-    public function crearAdultoMayor()
-    {
-        $this->dispatch('adulto-mayor-form-abrir');
     }
 
     public function editarAdultoMayor($cod_am)
@@ -59,9 +61,9 @@ class AdultosMayoresPanel extends Component
 
         $totales = [
             'total' => AdultoMayor::count(),
-            'activos' => AdultoMayor::whereHas('estado', fn($q) => $q->whereRaw('UPPER(estado) = ?', ['ACTIVO']))->count(),
-            'archivados' => AdultoMayor::whereHas('estado', fn($q) => $q->whereRaw('UPPER(estado) IN (?, ?)', ['ARCHIVADO', 'INACTIVO']))->count(),
-            'seguimiento' => AdultoMayor::whereHas('estado', fn($q) => $q->whereRaw('UPPER(estado) LIKE ?', ['%SEGUIMIENTO%']))->count(),
+            'activos' => AdultoMayor::whereHas('estado', fn ($q) => $q->whereRaw('UPPER(estado) IN (?, ?)', ['ACTIVO', 'ADMITIDO']))->count(),
+            'archivados' => AdultoMayor::whereHas('estado', fn ($q) => $q->whereRaw('UPPER(estado) IN (?, ?)', ['ARCHIVADO', 'INACTIVO']))->count(),
+            'seguimiento' => AdultoMayor::whereHas('estado', fn ($q) => $q->whereRaw('UPPER(estado) LIKE ?', ['%SEGUIMIENTO%']))->count(),
             'sin_evaluacion' => AdultoMayor::doesntHave('evaluacionesGeriatricas')->count(),
             'docs_pendientes' => AdultoMayor::doesntHave('documentos')->count(),
         ];

@@ -28,7 +28,7 @@
                 <p class="text-xs text-apoyo font-semibold mt-0.5">
                     {{ $tipoPersonal === 'salud' && $esEnfermeria
                         ? 'Enfermería: validación estricta de solapamientos. Tipo ROTATIVO recomendado.'
-                        : 'Gestiona turnos, áreas y días laborales del personal.' }}
+                        : 'Gestiona turnos, áreas y das laborales del personal.' }}
                 </p>
             </div>
             @if(!$formAbierto)
@@ -164,10 +164,10 @@
                 </div>
             </div>
 
-            {{-- Días de la semana --}}
+            {{-- Das de la semana --}}
             <div>
                 <label class="block text-xs font-bold text-apoyo uppercase tracking-wider mb-2">
-                    Días Laborales <span class="text-estado-peligro">*</span>
+                    Das Laborales <span class="text-estado-peligro">*</span>
                     @if($tipoPersonal === 'salud' && $esEnfermeria)
                         <span class="ml-2 text-estado-info text-[10px] font-bold normal-case">Enfermería: sin solapamiento en ningún día</span>
                     @endif
@@ -216,7 +216,7 @@
                 <thead class="bg-fondo-tabla text-apoyo uppercase text-[10px] font-bold tracking-wider">
                     <tr>
                         <th class="px-4 py-3">Turno / Área</th>
-                        <th class="px-4 py-3">Días</th>
+                        <th class="px-4 py-3">Das</th>
                         <th class="px-4 py-3 text-center">Tipo</th>
                         <th class="px-4 py-3 text-center">Vigencia</th>
                         <th class="px-4 py-3 text-center">Estado</th>
@@ -414,7 +414,7 @@
                 </div>
 
                 <div class="p-3 bg-fondo rounded-xl border border-borde">
-                    <span class="block text-[10px] font-bold uppercase tracking-wider text-apoyo mb-2">Días laborales</span>
+                    <span class="block text-[10px] font-bold uppercase tracking-wider text-apoyo mb-2">Das laborales</span>
                     <div class="flex flex-wrap gap-1.5">
                         @foreach($detalleAsignacion['dias_semana'] as $dia)
                             <span class="px-2 py-0.5 bg-boton-acento/10 text-boton-acento text-xs font-bold rounded-lg">{{ $dia }}</span>

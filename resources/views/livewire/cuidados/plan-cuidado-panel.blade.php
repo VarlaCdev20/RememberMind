@@ -1,4 +1,5 @@
 <div class="space-y-6">
+<x-validation-errors />
     <div class="flex flex-col gap-4 rounded-3xl border border-borde bg-fondo-card p-5 shadow-sm md:flex-row md:items-center md:justify-between">
         <div>
             <p class="text-xs font-black uppercase tracking-widest text-meta">Enfermería</p>
@@ -36,6 +37,7 @@
                     <div class="rounded-xl bg-fondo-panel p-3"><span class="block text-meta">Fin</span>{{ optional($plan->fecha_fin)->format('d/m/Y') ?: 'Vigente' }}</div>
                     <div class="rounded-xl bg-fondo-panel p-3"><span class="block text-meta">Tareas activas</span>{{ $plan->tareas_activas_count }}</div>
                 </div>
+                @if($plan->estado === 'BORRADOR') @can('plan_cuidado.editar')<x-secondary-button wire:click="editarBorrador('{{ $plan->cod_plan }}')">Editar / activar borrador</x-secondary-button>@endcan @endif
                 @if($plan->estado === 'ACTIVO')
                     <button type="button" wire:click="cerrarPlan('{{ $plan->cod_plan }}')" class="mt-4 rounded-xl border border-borde px-4 py-2 text-xs font-bold text-parrafo">Cerrar plan</button>
                 @endif

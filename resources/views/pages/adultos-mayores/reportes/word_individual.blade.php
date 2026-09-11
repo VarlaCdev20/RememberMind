@@ -93,7 +93,7 @@
  $condiciones = array_filter([
  $ficha->hipertension ? 'Hipertensión' : null,
  $ficha->diabetes ? 'Diabetes' : null,
- $ficha->problemas_cardiacos? 'Problemas cardíacos' : null,
+ $ficha->problemas_cardiacos? 'Problemas cardacos' : null,
  $ficha->acv ? 'ACV' : null,
  $ficha->parkinson ? 'Parkinson' : null,
  $ficha->epilepsia ? 'Epilepsia' : null,

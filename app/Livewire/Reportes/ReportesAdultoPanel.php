@@ -34,17 +34,17 @@ class ReportesAdultoPanel extends Component
             'labels' => $signosVitales->map(fn($s) => $s->fecha->format('d/m') . ' ' . substr($s->hora, 0, 5))->toArray(),
             'fc' => $signosVitales->pluck('frecuencia_cardiaca')->toArray(),
             'temp' => $signosVitales->pluck('temperatura')->toArray(),
-            'sat' => $signosVitales->pluck('saturacion_oxigeno')->toArray(),
+            'sat' => $signosVitales->pluck('saturacion')->toArray(),
         ];
 
         // Evaluaciones Cognitivas Data
-        $evaluaciones = $this->adultoMayor->evaluacionesCognitivas()
-            ->with('tipoEvaluacion')
+        $evaluaciones = $this->adultoMayor->evaluacionesGeriatricas()->whereHas('instrumento', fn ($q) => $q->where('cod_area', 'ARE_COG'))
+            ->with('instrumento')
             ->whereBetween('fecha_eval', [$start, $end])
             ->orderBy('fecha_eval')->get();
             
         $this->chartCognitivo = [
-            'labels' => $evaluaciones->map(fn($e) => $e->fecha_eval->format('d/m/Y') . ' (' . $e->tipoEvaluacion->siglas . ')')->toArray(),
+            'labels' => $evaluaciones->map(fn($e) => $e->fecha_eval->format('d/m/Y') . ' (' . $e->instrumento?->siglas . ')')->toArray(),
             'puntajes' => $evaluaciones->pluck('puntaje_total')->toArray(),
         ];
 

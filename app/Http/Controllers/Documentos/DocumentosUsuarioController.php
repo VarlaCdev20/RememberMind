@@ -26,7 +26,7 @@ class DocumentosUsuarioController extends Controller
         }
 
         $datos = $this->docService->prepararPaquete($user);
-        return view('admin.usuarios.documentos.preview', $datos);
+        return view('pages.usuarios.documentos.paquete-documental', $datos);
     }
 
     public function paquetePdf(User $user)

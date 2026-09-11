@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 namespace Database\Seeders;
 
@@ -60,6 +60,7 @@ class DatabaseSeeder extends Seeder
             EnfermeriaPacienteSeeder::class,
             DatosEnfermeriaDemoSeeder::class,
             EnfermeriaOperativaSeeder::class,
+            AlertasRealesSeeder::class,
 
             // ─────────────────────────────────────────────
             // 7. Actividades, voluntariado y demo integral

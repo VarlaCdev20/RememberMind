@@ -1,4 +1,4 @@
-@props(['id', 'title' => '', 'maxWidth' => '2xl', 'closeMethod' => 'cerrarModal'])
+@props(['id' => null, 'title' => '', 'maxWidth' => '2xl', 'closeMethod' => 'cerrarModal'])
 
 @php
 $maxWidthClass = match ($maxWidth) {
@@ -14,6 +14,7 @@ $maxWidthClass = match ($maxWidth) {
  '7xl' => 'sm:max-w-7xl',
  default => 'sm:max-w-2xl',
 };
+$modalId = $id ?: 'modal-'.\Illuminate\Support\Str::slug((string) ($attributes->wire('model')->value() ?: 'formulario'));
 @endphp
 
 <div 
@@ -47,17 +48,18 @@ $maxWidthClass = match ($maxWidth) {
  x-transition:leave="ease-in duration-200"
  x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
  x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
- class="modal-institucional relative w-full flex flex-col max-h-[82vh] transform overflow-hidden rounded-[24px] transition-all {{ $maxWidthClass }}"
+ role="dialog" aria-modal="true" aria-labelledby="{{ $modalId }}-titulo"
+ class="modal-institucional rm-modal-panel relative w-full flex flex-col max-h-[82vh] transform overflow-hidden rounded-[24px] transition-all {{ $maxWidthClass }}"
  >
  <!-- Header -->
  <div class="border-b border-borde bg-fondo-hover px-6 py-4 flex items-center justify-between">
- <h3 class="text-xl font-extrabold text-titulo flex items-center gap-2">
+ <h3 id="{{ $modalId }}-titulo" class="text-xl font-extrabold text-titulo flex items-center gap-2">
  @if(isset($icon))
  {{ $icon }}
  @endif
  {{ $title }}
  </h3>
- <button type="button" @click="$wire.{{ $closeMethod }}()" class="rm-btn-icon rounded-xl">
+ <button type="button" @click="$wire.{{ $closeMethod }}()" class="rm-btn-icon rounded-xl" aria-label="Cerrar formulario">
  <i class="ph-bold ph-x"></i>
  </button>
  </div>

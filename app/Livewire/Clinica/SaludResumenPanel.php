@@ -66,7 +66,7 @@ class SaludResumenPanel extends Component
             ->get();
 
         // 9. Evaluación cognitiva más reciente (columna real: fecha_eval)
-        $evaluacionCognitiva = $this->adulto->evaluacionesCognitivas()
+        $evaluacionCognitiva = $this->adulto->evaluacionesGeriatricas()->whereHas('instrumento', fn ($q) => $q->where('cod_area', 'ARE_COG'))
             ->latest('fecha_eval')
             ->first();
 

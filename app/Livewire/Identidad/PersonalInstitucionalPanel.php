@@ -199,6 +199,8 @@ class PersonalInstitucionalPanel extends Component
 
     public function toggleEstado(string $usuarioId): void
     {
+        abort_unless(auth()->user()?->can('usuarios.cambiar_estado'), 403);
+
         $usuario = $this->baseUsuariosInstitucionales()
             ->where('cod_usu', $usuarioId)
             ->first();
@@ -843,12 +845,12 @@ class PersonalInstitucionalPanel extends Component
     private function usuariosConTurnoIds(string $turno): array
     {
         $saludUsu = \App\Models\HorarioPersonalSalud::where('estado', 'ACTIVO')
-            ->where('turno', 'ilike', "%{$turno}%")
+            ->whereLike('turno', "%{$turno}%")
             ->whereNotNull('cod_usu')
             ->pluck('cod_usu');
 
         $adminUsu = \App\Models\HorarioPersonalAdmin::where('estado', 'ACTIVO')
-            ->where('turno', 'ilike', "%{$turno}%")
+            ->whereLike('turno', "%{$turno}%")
             ->whereNotNull('cod_usu')
             ->pluck('cod_usu');
 

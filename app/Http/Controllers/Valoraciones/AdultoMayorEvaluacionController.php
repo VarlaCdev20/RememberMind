@@ -8,13 +8,14 @@ use App\Models\EvaluacionGeriatrica;
 use App\Models\InstrumentoGeriatrico;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 
 class AdultoMayorEvaluacionController extends Controller
 {
     public function index(AdultoMayor $adulto_mayor)
     {
         $evaluaciones = $adulto_mayor->evaluacionesGeriatricas()->with(['instrumento', 'registrador'])->latest()->get();
-        return view('admin.adultos-mayores.evaluaciones.index', compact('adulto_mayor', 'evaluaciones'));
+        return new RedirectResponse(route('admin.adultos-mayores.show', ['adulto_mayor' => $adulto_mayor->cod_am, 'tab' => 'evaluaciones']));
     }
 
     public function store(Request $request, AdultoMayor $adulto_mayor)

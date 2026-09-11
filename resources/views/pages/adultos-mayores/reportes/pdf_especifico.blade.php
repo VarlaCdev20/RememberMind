@@ -144,7 +144,7 @@
  <tr>
  <th>Fecha y Hora</th>
  <th>P. Arterial</th>
- <th>F. Cardíaca</th>
+ <th>F. Cardaca</th>
  <th>F. Respiratoria</th>
  <th>Temperatura</th>
  <th>Saturación</th>

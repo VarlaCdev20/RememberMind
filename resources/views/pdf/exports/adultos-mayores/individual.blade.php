@@ -81,7 +81,7 @@
  <td class="value-detail">{{ $sv->presion_sistolica }}/{{ $sv->presion_diastolica }} mmHg</td>
  </tr>
  <tr>
- <td class="label-detail">Frecuencia Cardíaca:</td>
+ <td class="label-detail">Frecuencia Cardaca:</td>
  <td class="value-detail">{{ $sv->frecuencia_cardiaca }} lpm</td>
  </tr>
  <tr>

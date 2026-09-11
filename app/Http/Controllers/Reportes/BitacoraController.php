@@ -27,7 +27,7 @@ class BitacoraController extends Controller
         $timezone = config('app.timezone', 'America/La_Paz');
 
         $query = DB::table('activity_log')
-            ->leftJoin('users', DB::raw('activity_log.causer_id::text'), '=', DB::raw('users.cod_usu::text'))
+            ->leftJoin('users', 'activity_log.causer_id', '=', 'users.cod_usu')
             ->select([
                 'activity_log.id',
                 'activity_log.log_name',

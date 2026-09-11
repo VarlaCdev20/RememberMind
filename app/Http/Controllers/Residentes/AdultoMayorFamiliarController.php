@@ -11,13 +11,14 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 
 class AdultoMayorFamiliarController extends Controller
 {
     public function index(AdultoMayor $adulto_mayor)
     {
         $familiares = $adulto_mayor->familiares;
-        return view('admin.adultos-mayores.familiares.index', compact('adulto_mayor', 'familiares'));
+        return new RedirectResponse(route('admin.adultos-mayores.show', ['adulto_mayor' => $adulto_mayor->cod_am, 'tab' => 'familiares']));
     }
 
     public function store(StoreFamiliarAdultoRequest $request, AdultoMayor $adulto_mayor)
@@ -47,7 +48,7 @@ class AdultoMayorFamiliarController extends Controller
                     'estado'            => 'ACTIVO',
                     'acceso_sistema'    => 'HABILITADO',
                 ]);
-                $user->assignRole('familiar');
+                $user->assignRole('FAMILIAR');
 
                 // Crear registro en tabla familiares
                 $familiar = Familiar::create([

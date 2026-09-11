@@ -22,6 +22,7 @@ class DecisionAdmisionModal extends Component
 
     public function open($cod_am)
     {
+        abort_unless(auth()->user()?->hasAnyRole(['SUPERADMINISTRADOR', 'MEDICO GENERAL/GERIATRA']), 403);
         $this->resetForm();
         $this->adulto = AdultoMayor::find($cod_am);
         if($this->adulto && $this->adulto->estado->estado === 'DECISION_ADMISION') {
@@ -59,8 +60,9 @@ class DecisionAdmisionModal extends Component
 
     public function guardar()
     {
+        abort_unless(auth()->user()?->hasAnyRole(['SUPERADMINISTRADOR', 'MEDICO GENERAL/GERIATRA']), 403);
         $rules = [
-            'decision' => 'required',
+            'decision' => 'required|in:ADMITIDO_NORMAL,ADMITIDO_CON_SEGUIMIENTO,ADMITIDO_CON_CUIDADO_ESPECIAL,DERIVADO',
             'recomendacion_final' => 'nullable|string'
         ];
 
@@ -83,8 +85,12 @@ class DecisionAdmisionModal extends Component
             'motivo_derivacion.required' => 'Debe justificar el motivo de la derivación.',
         ]);
 
+        abort_unless($this->adulto && $this->adulto->fresh()->estado?->estado === 'DECISION_ADMISION', 409);
         \DB::beginTransaction();
         try {
+            $this->adulto = AdultoMayor::lockForUpdate()->findOrFail($this->adulto->cod_am);
+            if ($this->adulto->estado?->estado !== 'DECISION_ADMISION') throw new \RuntimeException('La decisión ya fue registrada.');
+            $estadoAnteriorId = $this->adulto->cod_est_adul;
             $nuevoEstadoStr = ($this->decision === 'DERIVADO') ? 'DERIVADO' : 'PENDIENTE_ASIGNACION';
             $estadoModel = \App\Models\EstadoAdulto::firstOrCreate(['estado' => $nuevoEstadoStr]);
             
@@ -96,11 +102,11 @@ class DecisionAdmisionModal extends Component
             if(class_exists('\App\Models\HistorialEstadoAdulto')) {
                 \App\Models\HistorialEstadoAdulto::create([
                     'cod_am' => $this->adulto->cod_am,
-                    'estado_anterior' => 'DECISION_ADMISION',
-                    'estado_nuevo' => $nuevoEstadoStr,
+                    'estado_anterior' => $estadoAnteriorId,
+                    'estado_nuevo' => $estadoModel->cod_est_adul,
                     'fecha_cambio' => now(),
                     'motivo' => $this->decision . ' - ' . ($this->motivo_decision ?: ($this->motivo_derivacion ?: 'Decisión de Admisión')),
-                    'usuario_id' => auth()->id()
+                    'cambiado_por' => auth()->id()
                 ]);
             }
 

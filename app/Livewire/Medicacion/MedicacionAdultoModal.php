@@ -5,6 +5,7 @@ namespace App\Livewire\Medicacion;
 use Livewire\Component;
 use App\Models\MedicacionAdulto;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 
 class MedicacionAdultoModal extends Component
 {
@@ -33,12 +34,12 @@ class MedicacionAdultoModal extends Component
             'dosis' => 'required|string|max:50',
             'frecuencia' => 'required|string|max:100',
             'via_administracion' => 'required|string|max:50',
-            'hora_programada' => 'required',
+            'hora_programada' => 'required|date_format:H:i',
             'fecha_inicio' => 'required|date',
             'fecha_fin' => 'nullable|date|after_or_equal:fecha_inicio',
             'medico_indica' => 'nullable|string|max:100',
             'observacion' => 'nullable|string|max:255',
-            'estado' => 'required|string|in:ACTIVO,PAUSADO,EN REVISION,SUSPENDIDO,FINALIZADO',
+            'estado' => ['required', Rule::in(['ACTIVO', 'PAUSADO', 'EN REVISION', 'SUSPENDIDO', 'FINALIZADO'])],
             'cod_am' => 'required|string|exists:adulto_mayor,cod_am',
         ];
     }
@@ -51,6 +52,7 @@ class MedicacionAdultoModal extends Component
             'frecuencia.required' => 'La frecuencia es obligatoria.',
             'via_administracion.required' => 'La vía de administración es obligatoria.',
             'hora_programada.required' => 'La hora es obligatoria.',
+            'hora_programada.date_format' => 'La hora programada debe tener el formato HH:MM.',
             'fecha_inicio.required' => 'La fecha de inicio es obligatoria.',
             'fecha_fin.after_or_equal' => 'La fecha de fin debe ser posterior o igual a la de inicio.',
             'cod_am.required' => 'Debe seleccionar un adulto mayor.',
@@ -59,6 +61,8 @@ class MedicacionAdultoModal extends Component
 
     public function abrirModalMedicacion($cod_am, $id_med = null)
     {
+        $permiso = $id_med ? ['medicacion.editar', 'salud.medicacion.editar'] : ['medicacion.crear', 'salud.medicacion.crear'];
+        abort_unless(auth()->user()?->canAny($permiso), 403);
         $this->resetValidation();
         $this->cod_am = $cod_am;
         
@@ -88,7 +92,7 @@ class MedicacionAdultoModal extends Component
 
     public function cargarDatos()
     {
-        $med = MedicacionAdulto::findOrFail($this->cod_med_adulto);
+        $med = MedicacionAdulto::where('cod_am', $this->cod_am)->findOrFail($this->cod_med_adulto);
         
         $this->nombre_medicamento = $med->nombre_medicamento;
         $this->dosis = $med->dosis;
@@ -121,24 +125,26 @@ class MedicacionAdultoModal extends Component
 
     public function guardar()
     {
+        $permiso = $this->isEditing ? ['medicacion.editar', 'salud.medicacion.editar'] : ['medicacion.crear', 'salud.medicacion.crear'];
+        abort_unless(auth()->user()?->canAny($permiso), 403);
         $this->validate();
 
         $datos = [
             'cod_am' => $this->cod_am,
-            'nombre_medicamento' => $this->nombre_medicamento,
-            'dosis' => $this->dosis,
-            'frecuencia' => $this->frecuencia,
-            'via_administracion' => $this->via_administracion,
+            'nombre_medicamento' => trim($this->nombre_medicamento),
+            'dosis' => trim($this->dosis),
+            'frecuencia' => trim($this->frecuencia),
+            'via_administracion' => trim($this->via_administracion),
             'hora_programada' => $this->hora_programada,
             'fecha_inicio' => $this->fecha_inicio,
             'fecha_fin' => $this->fecha_fin ?: null,
-            'medico_indica' => $this->medico_indica,
-            'observacion' => $this->observacion,
+            'medico_indica' => filled($this->medico_indica) ? trim($this->medico_indica) : null,
+            'observacion' => filled($this->observacion) ? trim($this->observacion) : null,
             'estado' => $this->estado,
         ];
 
         if ($this->isEditing) {
-            $med = MedicacionAdulto::findOrFail($this->cod_med_adulto);
+            $med = MedicacionAdulto::where('cod_am', $this->cod_am)->findOrFail($this->cod_med_adulto);
             $med->update($datos);
             $mensaje = 'Medicación actualizada correctamente.';
         } else {
@@ -159,7 +165,9 @@ class MedicacionAdultoModal extends Component
 
     public function cambiarEstado($id, $estado)
     {
-        $med = MedicacionAdulto::findOrFail($id);
+        abort_unless(auth()->user()?->canAny(['medicacion.editar', 'salud.medicacion.editar']), 403);
+        validator(['estado' => $estado], ['estado' => ['required', Rule::in(['ACTIVO', 'PAUSADO', 'EN REVISION', 'SUSPENDIDO', 'FINALIZADO'])]])->validate();
+        $med = MedicacionAdulto::where('cod_am', $this->cod_am)->findOrFail($id);
         $med->estado = $estado;
         $med->save();
 

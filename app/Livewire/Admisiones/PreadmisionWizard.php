@@ -3,14 +3,9 @@
 namespace App\Livewire\Admisiones;
 
 use App\Mail\PreadmisionDocumentosPendientesMail;
-use App\Models\AsignacionPlazaEnfermeria;
 use App\Models\DocumentoPreadmision;
 use App\Models\Preadmision;
-use App\Models\User;
-use App\Services\Identidad\GeneradorPlanillaEnfermeriaService;
 use Barryvdh\DomPDF\Facade\Pdf;
-use Carbon\Carbon;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
@@ -22,57 +17,87 @@ class PreadmisionWizard extends Component
     use WithFileUploads;
 
     public int $paso = 1;
-    public int $totalPasos = 6;
+
+    public int $totalPasos = 5;
 
     // Paso 1: Identidad
     public string $nombres = '';
+
     public string $ap_paterno = '';
+
     public string $ap_materno = '';
+
     public string $ci = '';
+
     public string $expedicion_ci = '';
+
     public string $fecha_nac = '';
+
     public string $genero = '';
+
     public string $estado_civil = 'NO ESPECIFICADO';
+
     public string $telefono = '';
+
     public string $celular = '';
 
     // Paso 2: Dirección
     public string $departamento_residencia = '';
+
     public string $ciudad_municipio = '';
+
     public string $zona = '';
+
     public string $calle = '';
+
     public string $direccion_referencia = '';
 
     // Paso 3: Familiar
     public string $familiar_nombres = '';
+
     public string $familiar_ap_paterno = '';
+
     public string $familiar_ap_materno = '';
+
     public string $familiar_ci = '';
+
     public string $familiar_parentesco = '';
+
     public string $familiar_celular = '';
+
     public string $familiar_correo = '';
+
     public string $familiar_direccion = '';
 
     // Paso 4: Caso
     public string $motivo_ingreso = '';
+
     public string $procedencia_ingreso = '';
+
     public string $tipo_ingreso = 'REGULAR';
+
     public string $permanencia = 'PERMANENTE';
+
     public string $prioridad = 'MEDIA';
+
     public string $descripcion_caso = '';
 
     // Paso 5: Documentos subidos
     public $doc_ci_adulto;
+
     public $doc_ci_familiar;
+
     public $doc_solicitud_ingreso;
 
     // Documentos marcados para entregar en 48h
     public array $docs_pendientes_48h = [];
 
-    // Paso 6: Asignación
-    public string $enfermero_id = '';
     public bool $guardadoExitoso = false;
-    public ?string $codigoGenerado = null;
+
+    public function mount(): void
+    {
+        abort_unless(auth()->user()?->can('admisiones.crear'), 403);
+    }
 
     // ─────────────────────────────────────────────────────────────────────────────
     // CONFIGURACIÓN DE DOCUMENTOS
@@ -180,6 +205,7 @@ class PreadmisionWizard extends Component
     {
         if ($this->paso === 5) {
             $this->validarPaso5();
+
             return;
         }
 
@@ -195,11 +221,6 @@ class PreadmisionWizard extends Component
         if ($this->paso > 1) {
             $this->paso--;
         }
-    }
-
-    public function updatedEnfermeroId(): void
-    {
-        $this->resetValidation('enfermero_id');
     }
 
     // ─────────────────────────────────────────────────────────────────────────────
@@ -226,7 +247,7 @@ class PreadmisionWizard extends Component
             $this->dispatch('swal', [
                 'icon' => 'warning',
                 'title' => 'Documentación obligatoria pendiente',
-                'text' => 'Debe subir los siguientes documentos para continuar: ' . implode(', ', $bloqueantes) . '.',
+                'text' => 'Debe subir los siguientes documentos para continuar: '.implode(', ', $bloqueantes).'.',
             ]);
 
             return;
@@ -266,16 +287,6 @@ class PreadmisionWizard extends Component
 
         $this->validate($this->rules(), $this->mensajesValidacion());
 
-        if (! $this->validarEnfermeroSeleccionadoParaPreadmision()) {
-            $this->dispatch('swal', [
-                'title' => 'Asignación de enfermería inválida',
-                'text' => $this->primerErrorEnfermero(),
-                'icon' => 'warning',
-            ]);
-
-            return;
-        }
-
         try {
             DB::beginTransaction();
 
@@ -283,9 +294,9 @@ class PreadmisionWizard extends Component
             $fechaLimite48h = now()->addHours(48);
 
             $preadmision = Preadmision::create([
-                'estado' => 'PREADMISION_ASIGNADA',
+                'estado' => 'PENDIENTE',
                 'fecha_solicitud' => today()->toDateString(),
-                'fecha_asignacion' => now(),
+                'fecha_asignacion' => null,
 
                 'nombres' => $this->normalizar($this->nombres),
                 'ap_paterno' => $this->normalizar($this->ap_paterno),
@@ -323,9 +334,9 @@ class PreadmisionWizard extends Component
                 'documentos_iniciales_completos' => ! $hayPendientes48h,
                 'documentos_institucionales_generados' => false,
 
-                'enfermero_asignado' => $this->enfermero_id,
+                'enfermero_asignado' => null,
                 'creado_por' => auth()->user()?->cod_usu,
-                'observaciones' => 'Preadmisión registrada y asignada para valoración inicial de enfermería.',
+                'observaciones' => 'Solicitud registrada. Pendiente de revisión institucional.',
             ]);
 
             $docsPendientesNombres = [];
@@ -442,30 +453,29 @@ class PreadmisionWizard extends Component
             activity('Admisiones')
                 ->causedBy(auth()->user())
                 ->performedOn($preadmision)
-                ->log("Preadmisión {$preadmision->cod_pre} asignada para valoración inicial de enfermería.");
+                ->log('Solicitud de preadmisión registrada y pendiente de revisión.');
 
             DB::commit();
 
-            $textoExito = 'El caso quedó preparado para valoración inicial de enfermería.';
+            $textoExito = 'La solicitud quedó pendiente de revisión. Todavía no se creó un residente institucional.';
 
             if (! empty($docsPendientesNombres)) {
                 $textoExito .= ' Se notificó al familiar sobre los documentos pendientes en 48 horas.';
             }
 
             $this->dispatch('swal', [
-                'title' => 'Preadmisión asignada',
+                'title' => 'Preadmisión registrada',
                 'text' => $textoExito,
                 'icon' => 'success',
             ]);
 
             $this->guardadoExitoso = true;
-            $this->codigoGenerado = $preadmision->cod_pre;
         } catch (\Throwable $e) {
             DB::rollBack();
 
             $this->dispatch('swal', [
                 'title' => 'Error al guardar',
-                'text' => 'No se pudo registrar la preadmisión: ' . $e->getMessage(),
+                'text' => 'No se pudo registrar la preadmisión: '.$e->getMessage(),
                 'icon' => 'error',
             ]);
         }
@@ -508,9 +518,7 @@ class PreadmisionWizard extends Component
             'doc_ci_familiar',
             'doc_solicitud_ingreso',
             'docs_pendientes_48h',
-            'enfermero_id',
             'guardadoExitoso',
-            'codigoGenerado',
         ]);
 
         $this->paso = 1;
@@ -541,281 +549,12 @@ class PreadmisionWizard extends Component
         );
 
         return view('livewire.admisiones.preadmision-wizard', [
-            'enfermeros' => $this->obtenerEnfermerosDisponiblesParaValoracion(),
             'docsSolicitante' => array_values($docsSolicitante),
             'docsInstitucionales' => array_values($docsInstitucionales),
         ])->layout('layouts.sistema');
     }
 
-    // ─────────────────────────────────────────────────────────────────────────────
-    // PLANILLA OPERATIVA DE ENFERMERÍA E01–E12
-    // ─────────────────────────────────────────────────────────────────────────────
-
-    private function obtenerEnfermerosDisponiblesParaValoracion(): Collection
-    {
-        $fechaHora = now();
-
-        $turnosVigentes = $this->obtenerTurnosVigentesDesdePlanilla($fechaHora);
-
-        if ($turnosVigentes->isEmpty()) {
-            return collect();
-        }
-
-        $codigosDisponibles = $turnosVigentes
-            ->pluck('cod_usu')
-            ->filter()
-            ->unique()
-            ->values();
-
-        if ($codigosDisponibles->isEmpty()) {
-            return collect();
-        }
-
-        $enfermerosOcupados = Preadmision::query()
-            ->whereIn('estado', ['PREADMISION_ASIGNADA', 'EN_VALORACION_ENFERMERIA'])
-            ->whereNotNull('enfermero_asignado')
-            ->pluck('enfermero_asignado')
-            ->filter()
-            ->unique()
-            ->values();
-
-        $enfermeros = User::role('ENFERMEROS')
-            ->where('estado', 'ACTIVO')
-            ->whereIn('cod_usu', $codigosDisponibles)
-            ->whereNotIn('cod_usu', $enfermerosOcupados)
-            ->orderBy('ap_paterno')
-            ->orderBy('ap_materno')
-            ->orderBy('nombres')
-            ->get(['cod_usu', 'nombres', 'ap_paterno', 'ap_materno', 'estado']);
-
-        return $enfermeros
-            ->map(function (User $enfermero) use ($turnosVigentes) {
-                $turno = $turnosVigentes->firstWhere('cod_usu', $enfermero->cod_usu);
-
-                $enfermero->plaza_operativa = $turno['plaza'] ?? null;
-                $enfermero->tipo_asignacion_plaza = $turno['tipo_asignacion'] ?? null;
-                $enfermero->turno_nombre = $turno['turno_nombre'] ?? 'Turno según planilla';
-                $enfermero->turno_hora_inicio = $turno['hora_inicio'] ?? null;
-                $enfermero->turno_hora_fin = $turno['hora_fin'] ?? null;
-
-                if ($enfermero->turno_hora_inicio && $enfermero->turno_hora_fin) {
-                    $enfermero->turno_label = "{$enfermero->turno_nombre}: {$enfermero->turno_hora_inicio} - {$enfermero->turno_hora_fin}";
-                } else {
-                    $enfermero->turno_label = $enfermero->turno_nombre;
-                }
-
-                $enfermero->setRelation('horariosPersonalSalud', collect([
-                    (object) [
-                        'turno' => $enfermero->turno_nombre,
-                        'hora_inicio' => $enfermero->turno_hora_inicio,
-                        'hora_fin' => $enfermero->turno_hora_fin,
-                        'plaza' => $enfermero->plaza_operativa,
-                        'tipo_asignacion' => $enfermero->tipo_asignacion_plaza,
-                    ],
-                ]));
-
-                return $enfermero;
-            })
-            ->values();
-    }
-
-    private function obtenerTurnosVigentesDesdePlanilla(?Carbon $fechaHora = null): Collection
-    {
-        $fechaHora = $fechaHora ?: now();
-        $fechaDia = $fechaHora->toDateString();
-
-        $servicio = app(GeneradorPlanillaEnfermeriaService::class);
-
-        $resultado = $servicio->generar([
-            'fecha_inicio' => $fechaHora->copy()->startOfWeek(Carbon::MONDAY),
-            'cantidad_semanas' => 1,
-            'usar_usuarios_reales' => true,
-        ]);
-
-        $semana = $resultado['planilla'][0] ?? null;
-
-        if (! $semana || empty($semana['dias'])) {
-            return collect();
-        }
-
-        $turnosVigentes = collect();
-
-        foreach ($semana['dias'] as $dia) {
-            if (($dia['fecha'] ?? null) !== $fechaDia) {
-                continue;
-            }
-
-            foreach (($dia['turnos'] ?? []) as $turno) {
-                if (($turno['codigo'] ?? null) === 'DESCANSO') {
-                    continue;
-                }
-
-                $horaInicio = $turno['hora_inicio'] ?? null;
-                $horaFin = $turno['hora_fin'] ?? null;
-
-                if (! $horaInicio || ! $horaFin) {
-                    continue;
-                }
-
-                if (! $this->horaEstaDentroDelTurno($horaInicio, $horaFin, $fechaHora)) {
-                    continue;
-                }
-
-                foreach (($turno['asignaciones'] ?? []) as $asignacionTurno) {
-                    $codUsu = $asignacionTurno['cod_usu'] ?? null;
-
-                    if (! $codUsu) {
-                        continue;
-                    }
-
-                    $asignacionPlaza = $this->obtenerAsignacionPlazaVigente($codUsu, $fechaHora);
-
-                    if (! $asignacionPlaza) {
-                        continue;
-                    }
-
-                    if ($this->enfermeroTieneDescansoEnFecha($codUsu, $fechaHora)) {
-                        continue;
-                    }
-
-                    $turnosVigentes->push([
-                        'cod_usu' => $codUsu,
-                        'plaza' => $asignacionPlaza->plaza,
-                        'tipo_asignacion' => $asignacionPlaza->tipo,
-                        'turno_codigo' => $turno['codigo'] ?? null,
-                        'turno_nombre' => $turno['nombre'] ?? $turno['turno_nombre'] ?? $asignacionTurno['turno_nombre'] ?? 'Turno',
-                        'hora_inicio' => $horaInicio,
-                        'hora_fin' => $horaFin,
-                    ]);
-                }
-            }
-        }
-
-        return $turnosVigentes
-            ->unique('cod_usu')
-            ->values();
-    }
-
-    private function obtenerAsignacionPlazaVigente(string $codUsu, ?Carbon $fecha = null): ?AsignacionPlazaEnfermeria
-    {
-        $fecha = $fecha ?: now();
-        $fechaDia = $fecha->toDateString();
-
-        return AsignacionPlazaEnfermeria::query()
-            ->where('cod_usu', $codUsu)
-            ->whereIn('tipo', ['TITULAR', 'REEMPLAZO', 'APOYO'])
-            ->where(function ($query) use ($fechaDia) {
-                $query
-                    ->where(function ($q) {
-                        $q->where('tipo', 'TITULAR')
-                            ->whereNull('fecha');
-                    })
-                    ->orWhere(function ($q) use ($fechaDia) {
-                        $q->whereIn('tipo', ['TITULAR', 'REEMPLAZO', 'APOYO'])
-                            ->whereDate('fecha', $fechaDia);
-                    });
-            })
-            ->orderByRaw("
-                CASE tipo
-                    WHEN 'REEMPLAZO' THEN 1
-                    WHEN 'APOYO' THEN 2
-                    WHEN 'TITULAR' THEN 3
-                    ELSE 4
-                END
-            ")
-            ->latest('updated_at')
-            ->first();
-    }
-
-    private function enfermeroTieneDescansoEnFecha(string $codUsu, ?Carbon $fecha = null): bool
-    {
-        $fecha = $fecha ?: now();
-
-        return AsignacionPlazaEnfermeria::query()
-            ->where('cod_usu', $codUsu)
-            ->where('tipo', 'DESCANSO')
-            ->whereDate('fecha', $fecha->toDateString())
-            ->exists();
-    }
-
-    private function horaEstaDentroDelTurno(string $horaInicio, string $horaFin, ?Carbon $momento = null): bool
-    {
-        $momento = $momento ?: now();
-
-        $inicio = Carbon::parse($momento->toDateString() . ' ' . $horaInicio);
-        $fin = Carbon::parse($momento->toDateString() . ' ' . $horaFin);
-        $actual = $momento->copy();
-
-        if ($fin->lessThanOrEqualTo($inicio)) {
-            $fin->addDay();
-
-            if ($actual->lessThan($inicio)) {
-                $actual->addDay();
-            }
-        }
-
-        return $actual->greaterThanOrEqualTo($inicio)
-            && $actual->lessThan($fin);
-    }
-
-    private function validarEnfermeroSeleccionadoParaPreadmision(): bool
-    {
-        if (blank($this->enfermero_id)) {
-            $this->addError('enfermero_id', 'Debe seleccionar un enfermero para la valoración inicial.');
-            return false;
-        }
-
-        $enfermero = User::role('ENFERMEROS')
-            ->where('estado', 'ACTIVO')
-            ->where('cod_usu', $this->enfermero_id)
-            ->first();
-
-        if (! $enfermero) {
-            $this->addError('enfermero_id', 'El usuario seleccionado no es un enfermero activo.');
-            return false;
-        }
-
-        $asignacion = $this->obtenerAsignacionPlazaVigente($this->enfermero_id, now());
-
-        if (! $asignacion) {
-            $this->addError('enfermero_id', 'El enfermero no tiene una plaza activa en la planilla de enfermería.');
-            return false;
-        }
-
-        if ($this->enfermeroTieneDescansoEnFecha($this->enfermero_id, now())) {
-            $this->addError('enfermero_id', 'El enfermero tiene descanso registrado para el día de hoy.');
-            return false;
-        }
-
-        $turnosVigentes = $this->obtenerTurnosVigentesDesdePlanilla(now());
-
-        if (! $turnosVigentes->contains('cod_usu', $this->enfermero_id)) {
-            $this->addError('enfermero_id', 'El enfermero no tiene un turno activo según la planilla rotativa para este horario.');
-            return false;
-        }
-
-        $solapamiento = Preadmision::query()
-            ->where('enfermero_asignado', $this->enfermero_id)
-            ->whereIn('estado', ['PREADMISION_ASIGNADA', 'EN_VALORACION_ENFERMERIA'])
-            ->exists();
-
-        if ($solapamiento) {
-            $this->addError('enfermero_id', 'El enfermero ya tiene una preadmisión asignada en proceso.');
-            return false;
-        }
-
-        return true;
-    }
-
-    private function primerErrorEnfermero(): string
-    {
-        return $this->getErrorBag()->first('enfermero_id')
-            ?: 'El enfermero seleccionado no cumple las condiciones de la planilla.';
-    }
-
-    // ─────────────────────────────────────────────────────────────────────────────
-    // VALIDACIONES
-    // ─────────────────────────────────────────────────────────────────────────────
+    // VALIDACIONES DEL FORMULARIO
 
     private function validarPasoActual(): void
     {
@@ -823,10 +562,14 @@ class PreadmisionWizard extends Component
             1 => [
                 'nombres' => ['required', 'string', 'min:2', 'max:100'],
                 'ap_paterno' => ['required', 'string', 'min:2', 'max:80'],
+                'ap_materno' => ['nullable', 'string', 'min:2', 'max:80'],
                 'ci' => ['required', 'string', 'max:20', 'unique:preadmisiones,ci'],
                 'expedicion_ci' => ['required', 'string', 'max:10'],
-                'fecha_nac' => ['required', 'date', 'before_or_equal:' . now()->subYears(60)->format('Y-m-d')],
+                'fecha_nac' => ['required', 'date', 'before_or_equal:'.now()->subYears(60)->format('Y-m-d')],
                 'genero' => ['required', 'string'],
+                'estado_civil' => ['required', 'string', 'max:50'],
+                'telefono' => ['nullable', 'regex:/^[0-9+()\-\s]{7,20}$/'],
+                'celular' => ['nullable', 'regex:/^[0-9+()\-\s]{7,20}$/'],
             ],
             2 => [
                 'departamento_residencia' => ['required', 'string'],
@@ -836,8 +579,12 @@ class PreadmisionWizard extends Component
             ],
             3 => [
                 'familiar_nombres' => ['required', 'string', 'min:2'],
+                'familiar_ap_paterno' => ['required', 'string', 'min:2', 'max:80'],
+                'familiar_ci' => ['required', 'string', 'max:20'],
                 'familiar_parentesco' => ['required', 'string'],
-                'familiar_celular' => ['required', 'string', 'max:30'],
+                'familiar_celular' => ['required', 'regex:/^[0-9+()\-\s]{7,20}$/'],
+                'familiar_correo' => ['nullable', 'email', 'max:140'],
+                'familiar_direccion' => ['required', 'string', 'min:5', 'max:255'],
             ],
             4 => [
                 'motivo_ingreso' => ['required', 'string'],
@@ -845,9 +592,7 @@ class PreadmisionWizard extends Component
                 'tipo_ingreso' => ['required', 'string'],
                 'permanencia' => ['required', 'string'],
                 'prioridad' => ['required', 'string'],
-            ],
-            6 => [
-                'enfermero_id' => $this->getEnfermeroRules(),
+                'descripcion_caso' => ['required', 'string', 'min:10', 'max:2000'],
             ],
             default => [],
         }, $this->mensajesValidacion());
@@ -862,73 +607,34 @@ class PreadmisionWizard extends Component
         return [
             'nombres' => ['required', 'string', 'min:2', 'max:100'],
             'ap_paterno' => ['required', 'string', 'min:2', 'max:80'],
+            'ap_materno' => ['nullable', 'string', 'min:2', 'max:80'],
             'ci' => ['required', 'string', 'max:20', 'unique:preadmisiones,ci'],
             'expedicion_ci' => ['required', 'string', 'max:10'],
-            'fecha_nac' => ['required', 'date', 'before_or_equal:' . now()->subYears(60)->format('Y-m-d')],
+            'fecha_nac' => ['required', 'date', 'before_or_equal:'.now()->subYears(60)->format('Y-m-d')],
             'genero' => ['required', 'string'],
+            'estado_civil' => ['required', 'string', 'max:50'],
+            'telefono' => ['nullable', 'regex:/^[0-9+()\-\s]{7,20}$/'],
+            'celular' => ['nullable', 'regex:/^[0-9+()\-\s]{7,20}$/'],
             'departamento_residencia' => ['required', 'string'],
             'ciudad_municipio' => ['required', 'string'],
             'zona' => ['required', 'string'],
             'calle' => ['required', 'string'],
             'familiar_nombres' => ['required', 'string', 'min:2'],
+            'familiar_ap_paterno' => ['required', 'string', 'min:2', 'max:80'],
+            'familiar_ci' => ['required', 'string', 'max:20'],
             'familiar_parentesco' => ['required', 'string'],
-            'familiar_celular' => ['required', 'string', 'max:30'],
+            'familiar_celular' => ['required', 'regex:/^[0-9+()\-\s]{7,20}$/'],
+            'familiar_correo' => ['nullable', 'email', 'max:140'],
+            'familiar_direccion' => ['required', 'string', 'min:5', 'max:255'],
             'motivo_ingreso' => ['required', 'string'],
             'procedencia_ingreso' => ['required', 'string'],
             'tipo_ingreso' => ['required', 'string'],
             'permanencia' => ['required', 'string'],
             'prioridad' => ['required', 'string'],
+            'descripcion_caso' => ['required', 'string', 'min:10', 'max:2000'],
             'doc_ci_adulto' => ['required', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:5120'],
             'doc_ci_familiar' => ['required', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:5120'],
             'doc_solicitud_ingreso' => $solicitudRule,
-            'enfermero_id' => $this->getEnfermeroRules(),
-        ];
-    }
-
-    private function getEnfermeroRules(): array
-    {
-        return [
-            'required',
-            'exists:users,cod_usu',
-            function ($attribute, $value, $fail) {
-                $enfermero = User::role('ENFERMEROS')
-                    ->where('estado', 'ACTIVO')
-                    ->where('cod_usu', $value)
-                    ->first();
-
-                if (! $enfermero) {
-                    $fail('El usuario seleccionado debe ser un enfermero activo.');
-                    return;
-                }
-
-                $asignacion = $this->obtenerAsignacionPlazaVigente((string) $value, now());
-
-                if (! $asignacion) {
-                    $fail('El enfermero no tiene una plaza activa en la planilla de enfermería.');
-                    return;
-                }
-
-                if ($this->enfermeroTieneDescansoEnFecha((string) $value, now())) {
-                    $fail('El enfermero tiene descanso registrado para el día de hoy.');
-                    return;
-                }
-
-                $turnosVigentes = $this->obtenerTurnosVigentesDesdePlanilla(now());
-
-                if (! $turnosVigentes->contains('cod_usu', $value)) {
-                    $fail('El enfermero no tiene un turno activo según la planilla rotativa para este horario.');
-                    return;
-                }
-
-                $solapamiento = Preadmision::query()
-                    ->where('enfermero_asignado', $value)
-                    ->whereIn('estado', ['PREADMISION_ASIGNADA', 'EN_VALORACION_ENFERMERIA'])
-                    ->exists();
-
-                if ($solapamiento) {
-                    $fail('El enfermero ya tiene una preadmisión asignada en proceso.');
-                }
-            },
         ];
     }
 
@@ -945,6 +651,8 @@ class PreadmisionWizard extends Component
             'file' => 'Debe seleccionar un archivo válido.',
             'mimes' => 'El archivo debe ser de tipo: :values.',
             'exists' => 'El registro seleccionado no es válido.',
+            'email' => 'Ingrese un correo electrónico válido.',
+            'regex' => 'Ingrese un número de teléfono válido.',
         ];
     }
 

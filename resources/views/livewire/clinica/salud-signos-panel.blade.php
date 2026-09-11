@@ -28,6 +28,7 @@
 @endphp
 
 <div class="space-y-4">
+ @if($adulto)<x-residentes.navegacion-ficha :adulto="$adulto" />@endif
  {{-- A. CABECERA DEL SUBMÓDULO --}}
  <section class="overflow-hidden rounded-[1.6rem] border border-borde/65 bg-fondo-panel shadow-sm backdrop-blur-xl">
  <div class="h-1.5 w-full bg-gradient-to-r from-[#E27D60] via-[#D9A05B] to-[#8DA280]"></div>
@@ -312,7 +313,7 @@
  @if($signo->estado === 'VIGENTE')
  <div class="flex items-center justify-end gap-1.5">
  @can('salud.signos.editar')
- <button type="button" wire:click="abrirFormularioEditar({{ $signo->cod_signo }})" class="inline-flex items-center justify-center rounded-lg border border-borde bg-fondo-panel p-1.5 text-apoyo transition hover:bg-boton-principal hover:text-inverso active:scale-95" title="Editar">
+ <button type="button" wire:click="abrirFormularioEditar('{{ $signo->cod_signo }}')" class="inline-flex items-center justify-center rounded-lg border border-borde bg-fondo-panel p-1.5 text-apoyo transition hover:bg-boton-principal hover:text-inverso active:scale-95" title="Editar">
  <i class="ph-bold ph-pencil-simple"></i>
  </button>
  <button type="button" onclick="window.dispatchEvent(new CustomEvent('signos-confirmar-anulacion', { detail: { id: {{ $signo->cod_signo }} } }))" class="inline-flex items-center justify-center rounded-lg border border-red-200 bg-red-50 p-1.5 text-red-600 transition hover:bg-red-600 hover:text-inverso active:scale-95" title="Anular">
@@ -430,7 +431,7 @@
  <h4 class="mb-4 text-sm font-bold uppercase tracking-wider text-parrafo">3. Frecuencias y Temperatura</h4>
  <div class="grid gap-4 md:grid-cols-2">
  <div>
- <label class="mb-1 block text-[11px] font-bold uppercase tracking-widest text-parrafo/55">Frecuencia Cardíaca (lpm)</label>
+ <label class="mb-1 block text-[11px] font-bold uppercase tracking-widest text-parrafo/55">Frecuencia Cardaca (lpm)</label>
  <input type="number" wire:model.live.debounce.400ms="frecuencia_cardiaca" min="30" max="220" placeholder="Ej. 72" class="w-full rounded-xl border {{ $errors->has('frecuencia_cardiaca') ? 'border-red-500' : 'border-borde/70' }} bg-fondo-card px-3 py-2.5 text-xs font-bold text-parrafo outline-none transition focus:border-borde-focus focus:ring-2 focus:ring-[#E27D60]/15">
  @error('frecuencia_cardiaca') <span class="mt-1 text-[10px] font-bold text-red-500">{{ $message }}</span> @enderror
  </div>

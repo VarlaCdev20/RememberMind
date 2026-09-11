@@ -204,15 +204,28 @@ class PersonalInstitucionalForm extends Component
         $this->cod_area = $usuario->cod_area;
 
         if ($usuario->personalSalud) {
-            $this->cod_esp = $usuario->personalSalud->cod_esp;
-            $this->anios_exp = $usuario->personalSalud->anios_exp;
-            $this->matricula_prof = $usuario->personalSalud->matricula_prof;
-            $this->institucion_formacion = $usuario->personalSalud->institucion_formacion;
-            $this->subtipo_enfermeria = $usuario->personalSalud->subtipo_enfermeria;
+            $this->cod_esp = data_get($usuario->personalSalud, 'cod_esp') ?? '';
+            $this->anios_exp = data_get($usuario->personalSalud, 'anios_exp', 0);
+            $this->matricula_prof = data_get($usuario->personalSalud, 'matricula_prof') ?? '';
+            $this->institucion_formacion = data_get($usuario->personalSalud, 'institucion_formacion') ?? '';
+            $this->subtipo_enfermeria = data_get($usuario->personalSalud, 'subtipo_enfermeria') ?? '';
+
+            if (empty($this->anios_exp) && preg_match('/EXPERIENCIA:\s*(\d+)/i', (string) $usuario->observaciones, $m)) {
+                $this->anios_exp = (int) $m[1];
+            }
+            if (empty($this->matricula_prof) && preg_match('/MATR[IÍ]CULA:\s*([^|]+)/ui', (string) $usuario->observaciones, $m)) {
+                $this->matricula_prof = trim($m[1]);
+            }
+            if (empty($this->subtipo_enfermeria) && preg_match('/SUBTIPO.*?:\s*([^|]+)/ui', (string) $usuario->observaciones, $m)) {
+                $this->subtipo_enfermeria = trim($m[1]);
+            }
         }
 
         if ($usuario->personalAdmin) {
-            $this->cod_cargo_admin = $usuario->personalAdmin->cod_cargo_admin;
+            $this->cod_cargo_admin = data_get($usuario->personalAdmin, 'cod_cargo_admin') ?? '';
+            if (empty($this->anios_exp) && preg_match('/EXPERIENCIA:\s*(\d+)/i', (string) $usuario->observaciones, $m)) {
+                $this->anios_exp = (int) $m[1];
+            }
         }
 
         $this->sincronizarClasificacionDesdeRoles(false);

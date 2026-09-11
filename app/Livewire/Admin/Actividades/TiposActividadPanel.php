@@ -183,8 +183,8 @@ class TiposActividadPanel extends Component
         }
         return TipoActividadAdulto::withCount('actividades')
             ->when($this->search, fn($q) =>
-                $q->where('nombre', 'ilike', '%' . $this->search . '%')
-                  ->orWhere('descripcion', 'ilike', '%' . $this->search . '%')
+                $q->whereLike('nombre', '%' . $this->search . '%')
+                  ->orWhereLike('descripcion', '%' . $this->search . '%')
             )
             ->when($this->filtroUso === 'con', fn($q) => $q->has('actividades'))
             ->when($this->filtroUso === 'sin', fn($q) => $q->doesntHave('actividades'))
@@ -205,7 +205,7 @@ class TiposActividadPanel extends Component
 
     public function render()
     {
-        return view('livewire.admin.actividades.tipos-actividad-panel', [
+        return view('livewire.actividades.tipos-actividad-panel', [
             'stats'  => $this->getStats(),
             'tipos'  => $this->getTiposFiltrados(),
             'detalle'=> $this->getDetalle(),

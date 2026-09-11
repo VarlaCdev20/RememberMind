@@ -28,7 +28,7 @@ class SaludSignosPanel extends Component
     public bool $modalDetalle = false;
     public bool $modalAnular = false;
 
-    public ?int $signoId = null;
+    public ?string $signoId = null;
     public string $fecha = '';
     public string $hora = '';
     public ?int $presion_sistolica = null;
@@ -44,9 +44,9 @@ class SaludSignosPanel extends Component
     public ?int $dolor = null;
     public string $observacion = '';
 
-    public ?int $signoIdAnular = null;
+    public ?string $signoIdAnular = null;
     public string $motivoAnulacion = '';
-    public ?int $signoDetalleId = null;
+    public ?string $signoDetalleId = null;
 
     public string $fechaDesde = '';
     public string $fechaHasta = '';
@@ -266,7 +266,7 @@ class SaludSignosPanel extends Component
         $this->modalFormulario = true;
     }
 
-    public function abrirFormularioEditar(int $id): void
+    public function abrirFormularioEditar(string $id): void
     {
         abort_if(!auth()->user()->can('salud.signos.editar'), 403);
 
@@ -301,10 +301,10 @@ class SaludSignosPanel extends Component
         $this->modalFormulario = true;
     }
 
-    public function abrirDetalle(int $id): void
+    public function abrirDetalle(string $id): void
     {
         $this->signoDetalleId = $id;
-        $this->modalDetalle = false;
+        $this->modalDetalle = true;
     }
 
     public function guardar(): void
@@ -417,13 +417,13 @@ class SaludSignosPanel extends Component
         $this->guardar();
     }
 
-    public function abrirAnular(int $id): void
+    public function abrirAnular(string $id): void
     {
         abort_if(!auth()->user()->can('salud.signos.anular'), 403);
         $this->dispatch('signos-confirmar-anulacion', ['id' => $id]);
     }
 
-    public function anularConMotivo(int $id, string $motivo): void
+    public function anularConMotivo(string $id, string $motivo): void
     {
         abort_if(!$this->adulto, 403, 'Paciente no seleccionado.');
         abort_if(!auth()->user()->can('salud.signos.anular'), 403);
@@ -493,7 +493,7 @@ class SaludSignosPanel extends Component
         ]);
     }
 
-    public function restaurarRegistro(int $id): void
+    public function restaurarRegistro(string $id): void
     {
         abort_if(!$this->adulto, 403, 'Paciente no seleccionado.');
         abort_if(!auth()->user()->can('salud.signos.anular'), 403);

@@ -1,5 +1,22 @@
 # Reorganización del código
 
+## Continuación: vistas en COMPLETAR_SISTEMA
+
+Esta sección registra el trabajo posterior de completar el sistema. El informe original de MEJORA-SYS se conserva debajo.
+
+- Se reubicaron otras 31 vistas: 22 de actividades, voluntariado, clínica, medicación, valoraciones y red de apoyo; 9 de reportes. Las páginas de reportes están en `resources/views/pages/reportes/` y su layout compartido en `resources/views/layouts/reportes/reporte-base.blade.php`.
+- Se extrajeron 14 parciales de modales/formularios: 9 de identidad, 4 de alertas y 1 de documentos. Usuarios, personal y turnos los agrupan en `livewire/identidad/<panel>/modales/`; alertas, en `livewire/alertas/modales/`. Atenciones y observaciones tienen otros 4 parciales para creación y registro individual.
+- La navegación del residente se comparte en `components/residentes/navegacion-ficha.blade.php`. Atenciones y notas reutilizan encabezado, campos, botones y estados vacíos existentes.
+- Se conservaron las convenciones de autenticación, perfil, correos, PDF, vendor y componentes Livewire de archivo único. Los movimientos no cambian alias Livewire, rutas ni permisos. No se eliminaron archivos sin reemplazo; se mantienen los respaldos y archivos de uso dudoso, incluido `livewire/admin/enfermeria${view}.blade.php`.
+- Atenciones cargaba la relación inexistente `tipo`; ahora utiliza `tipoAtencion`. Se verifica con una atención persistida y una búsqueda. El resumen documental utiliza `nombre` y la descarga autenticada con `cod_doc_am`.
+- El JavaScript documental buscaba campos HTML antiguos e impedía enviar formularios válidos. Se corrigieron los selectores a `nombre` y `tipo_documento` y se extrajo a `resources/frontend/scripts/modules/documentos-adulto.js`, importado por Vite. Blade aporta la fecha como dato; el módulo gestiona apertura, edición, validación y confirmación.
+- Se añadieron pruebas de apertura/cierre de formularios Livewire, notas, documentos y generación de PDF reales. Las pruebas JavaScript se ejecutan con `node --test tests/Frontend/documentos-adulto.test.js`, sin instalar paquetes.
+- Verificación final de esta continuación: PHP **80 passed, 8 skipped, 0 failed (378 assertions)**; JavaScript **4 passed, 0 failed**; Vite build, autoload optimizado, compilación de Blade y listado de **254 rutas** correctos. La prueba de PDF se aísla en un proceso para evitar agotar los 128 MB de memoria acumulados por la suite.
+- Compilar Blade y obtener respuestas HTTP correctas no demuestra que todos los flujos estén completos. Subsisten rutas especializadas que reutilizan el dashboard; requieren completar y probar su flujo antes de declararlas terminadas.
+- No se incorporaron Vue, Inertia ni TypeScript. No se modificaron migraciones ni se ejecutaron cambios sobre la base de datos de trabajo; las pruebas usan SQLite en memoria. Se conservan los cambios previos del directorio. Sin commit ni push en esta continuación.
+
+## Informe original de la reorganización
+
 Fecha: 2026-09-10. Rama: MEJORA-SYS.
 
 ## Alcance y resultado

@@ -270,9 +270,9 @@ class DashboardMedico extends Component
         $datos = SignosVitalesAdulto::where('fecha', '>=', now()->subDays(30)->toDateString())
             ->select(
                 DB::raw('DATE(fecha) as dia'),
-                DB::raw('ROUND(AVG(presion_sistolica)::numeric, 0) as avg_pa'),
-                DB::raw('ROUND(AVG(CASE WHEN saturacion > 0 THEN saturacion ELSE NULL END)::numeric, 1) as avg_sat'),
-                DB::raw('ROUND(AVG(CASE WHEN glucosa > 0 THEN glucosa ELSE NULL END)::numeric, 0) as avg_gluc')
+                DB::raw('ROUND(CAST(AVG(presion_sistolica) AS DECIMAL(12,2)), 0) as avg_pa'),
+                DB::raw('ROUND(CAST(AVG(CASE WHEN saturacion > 0 THEN saturacion ELSE NULL END) AS DECIMAL(12,2)), 1) as avg_sat'),
+                DB::raw('ROUND(CAST(AVG(CASE WHEN glucosa > 0 THEN glucosa ELSE NULL END) AS DECIMAL(12,2)), 0) as avg_gluc')
             )
             ->groupBy(DB::raw('DATE(fecha)'))
             ->orderBy(DB::raw('DATE(fecha)'))

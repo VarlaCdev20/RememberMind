@@ -59,7 +59,7 @@
  </label>
  <label class="flex items-center gap-2 cursor-pointer">
  <input type="checkbox" wire:model="problemas_cardiacos" class="h-4 w-4 rounded border-borde-suave text-terracota focus:ring-borde-focus">
- <span class="text-sm font-bold text-titulo">Problemas Cardíacos</span>
+ <span class="text-sm font-bold text-titulo">Problemas Cardacos</span>
  </label>
  </div>
  </div>

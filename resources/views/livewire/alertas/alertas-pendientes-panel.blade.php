@@ -66,7 +66,7 @@
  <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
  {{-- Filtros Rápidos (Categorías) --}}
  <div class="flex flex-wrap items-center gap-1.5">
- <span class="text-[10px] font-bold uppercase tracking-widest text-apoyo mr-1">Filtrar:</span>
+ <span class="text-[10px] font-bold uppercase tracking-widestá text-apoyo mr-1">Filtrar:</span>
  
  @php
  $filtros = [

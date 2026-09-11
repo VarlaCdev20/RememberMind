@@ -11,9 +11,9 @@ class StoreCambioEstadoRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'cod_est_adul'        => 'required|integer|exists:estado_adulto,cod_est_adul',
+            'cod_est_adul'        => 'required|string|exists:estado_adulto,cod_est_adul',
             'motivo'              => 'required|string|min:10|max:2000',
-            'documento_respaldo'  => 'nullable|integer|exists:documentos_adulto_mayor,cod_doc_am',
+            'documento_respaldo'  => 'nullable|string|exists:documentos_adulto_mayor,cod_doc_am',
             'observacion'         => 'nullable|string|max:5000',
         ];
     }

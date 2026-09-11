@@ -20,7 +20,7 @@ class StoreMedicacionRequest extends FormRequest
             'fecha_inicio'         => 'required|date',
             'fecha_fin'            => 'nullable|date|after_or_equal:fecha_inicio',
             'medico_indica'        => 'nullable|string|max:200',
-            'documento_receta'     => 'nullable|integer|exists:documentos_adulto_mayor,cod_doc_am',
+            'documento_receta'     => 'nullable|string|exists:documentos_adulto_mayor,cod_doc_am',
             'estado'               => 'required|in:ACTIVO,SUSPENDIDO,FINALIZADO,ARCHIVADO',
             'observacion'          => 'nullable|string|max:5000',
         ];

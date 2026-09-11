@@ -79,7 +79,7 @@ class ReportesInstitucionalesPanel extends Component
         $sinDocumentos = AdultoMayor::whereIn('cod_am', $adultosIds)->doesntHave('documentos')->count();
         
         $documentosActivos = \App\Models\DocumentoAdultoMayor::whereIn('cod_am', $adultosIds)->count();
-        $documentosAnulados = \App\Models\DocumentoAdultoMayor::whereIn('cod_am', $adultosIds)->onlyTrashed()->count();
+        $documentosAnulados = \App\Models\DocumentoAdultoMayor::whereIn('cod_am', $adultosIds)->where('estado', 'ARCHIVADO')->count();
 
         // ── 3. REPORTE RED DE APOYO ──────────────────────────────
         $conFamiliar = AdultoMayor::whereIn('cod_am', $adultosIds)->has('familiares')->count();

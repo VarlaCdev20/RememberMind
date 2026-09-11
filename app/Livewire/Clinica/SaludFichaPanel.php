@@ -332,7 +332,7 @@ class SaludFichaPanel extends Component
                 'cuidados' => $cuidadosCount,
             ];
 
-            return view('livewire.admin.salud-seguimiento.salud-ficha-general', [
+            return view('livewire.clinica.salud-ficha-general', [
                 'pacientes' => $pacientesGeneral,
                 'stats' => $stats
             ]);

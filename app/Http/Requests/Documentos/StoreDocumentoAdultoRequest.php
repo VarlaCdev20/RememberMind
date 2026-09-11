@@ -16,7 +16,7 @@ class StoreDocumentoAdultoRequest extends FormRequest
         return [
             'nombre' => 'required|string|max:150',
             'tipo_documento' => 'required|string|max:100',
-            'archivo' => 'required|file|mimes:pdf,jpg,jpeg,png,doc,docx|max:5120',
+            'archivo' => 'required|file|mimes:pdf,jpg,jpeg,png,webp,doc,docx|max:5120',
             'fecha_subida' => 'required|date',
             'observaciones' => 'nullable|string|max:1000',
         ];

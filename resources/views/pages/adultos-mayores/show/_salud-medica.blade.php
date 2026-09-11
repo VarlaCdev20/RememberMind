@@ -126,7 +126,7 @@
  <p class="text-sm font-bold">{{ $latestSigno->presion_arterial ?: '—' }}</p>
  </div>
  <div class="bg-red-50/70 text-red-950 rounded-xl p-3 border border-red-100/50 text-center">
- <p class="text-[10px] font-bold uppercase tracking-wide text-red-700/75 mb-1">F. Cardíaca</p>
+ <p class="text-[10px] font-bold uppercase tracking-wide text-red-700/75 mb-1">F. Cardaca</p>
  <p class="text-sm font-bold">{{ $latestSigno->frecuencia_cardiaca ?: '—' }}</p>
  </div>
  <div class="bg-orange-50/70 text-orange-950 rounded-xl p-3 border border-orange-100/50 text-center">
@@ -301,7 +301,7 @@
  <tr>
  <th class="px-4 py-2">Fecha/Hora</th>
  <th class="px-4 py-2">P. Arterial</th>
- <th class="px-4 py-2">F. Cardíaca</th>
+ <th class="px-4 py-2">F. Cardaca</th>
  <th class="px-4 py-2">Temp</th>
  <th class="px-4 py-2">Saturación</th>
  </tr>

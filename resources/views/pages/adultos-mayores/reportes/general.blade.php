@@ -63,7 +63,7 @@
  <p class="text-[10px] font-bold uppercase tracking-[0.2em] opacity-40">Alerta de Seguimiento</p>
  <div class="mt-2 flex items-end justify-between">
  <h3 class="text-4xl font-black">{{ $stats['sin_seguimiento'] }}</h3>
- <p class="text-xs font-bold opacity-80 max-w-[100px] text-right">Adultos sin registro en 30 días</p>
+ <p class="text-xs font-bold opacity-80 max-w-[100px] text-right">Adultos sin registro en 30 das</p>
  </div>
  </div>
  </div>
