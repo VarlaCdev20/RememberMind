@@ -39,7 +39,7 @@ class SignosVitalesAdultoModal extends Component
             'frecuencia_cardiaca' => 'nullable|integer|min:' . ValidacionSignosVitalesService::FC_MIN . '|max:' . ValidacionSignosVitalesService::FC_MAX,
             'temperatura'         => 'nullable|numeric|min:' . ValidacionSignosVitalesService::TEMP_MIN . '|max:' . ValidacionSignosVitalesService::TEMP_MAX,
             'saturacion'          => 'nullable|integer|min:' . ValidacionSignosVitalesService::SPO2_MIN . '|max:' . ValidacionSignosVitalesService::SPO2_MAX,
-            'glucosa'             => 'nullable|numeric|min:' . ValidacionSignosVitalesService::GLUCOSA_MIN . '|max:' . ValidacionSignosVitalesService::GLUCOSA_MAX,
+            'glucosa'             => 'nullable|numeric|min:' . ValidacionSignosVitalesService::GLUCOSA_MIN,
             'peso'                => 'nullable|numeric|min:' . ValidacionSignosVitalesService::PESO_MIN . '|max:' . ValidacionSignosVitalesService::PESO_MAX,
             'talla'               => 'nullable|numeric|min:0.5|max:' . ValidacionSignosVitalesService::TALLA_CM_MAX,
             'dolor'               => 'nullable|integer|min:' . ValidacionSignosVitalesService::DOLOR_MIN . '|max:' . ValidacionSignosVitalesService::DOLOR_MAX,

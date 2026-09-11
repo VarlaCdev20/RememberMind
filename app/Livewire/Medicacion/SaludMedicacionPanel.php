@@ -64,6 +64,7 @@ class SaludMedicacionPanel extends Component
 
     public function toggleFormularioCrear(): void
     {
+        $this->autorizarGestionOrden();
         $this->mostrarFormularioCrear = !$this->mostrarFormularioCrear;
         if ($this->mostrarFormularioCrear) {
             $this->nuevo_cod_am = $this->adulto ? $this->adulto->cod_am : '';
@@ -186,7 +187,10 @@ class SaludMedicacionPanel extends Component
 
     public function suspenderMedicamento($id): void
     {
+        $this->autorizarGestionOrden();
         $medicacion = MedicacionAdulto::findOrFail($id);
+        $this->autorizarResidente($medicacion->adultoMayor);
+        abort_unless(in_array($medicacion->estado, ['ACTIVO', 'ACTIVA'], true), 409, 'Solo puede suspender una orden activa.');
         $medicacion->update(['estado' => 'SUSPENDIDO']);
 
         activity('Medicación')
@@ -202,7 +206,10 @@ class SaludMedicacionPanel extends Component
 
     public function finalizarMedicamento($id): void
     {
+        $this->autorizarGestionOrden();
         $medicacion = MedicacionAdulto::findOrFail($id);
+        $this->autorizarResidente($medicacion->adultoMayor);
+        abort_unless(in_array($medicacion->estado, ['ACTIVO', 'ACTIVA'], true), 409, 'Solo puede finalizar una orden activa.');
         $medicacion->update([
             'estado' => 'FINALIZADO',
             'fecha_fin' => now()->toDateString(),
@@ -360,8 +367,13 @@ class SaludMedicacionPanel extends Component
 
     private function autorizarCreacion(): void
     {
-        $user = auth()->user();
-        abort_unless($user?->hasRole('SUPERADMINISTRADOR') || $user?->canAny(['medicacion.crear', 'salud.medicacion.crear']), 403);
+        $this->autorizarGestionOrden();
+    }
+
+    private function autorizarGestionOrden(): void
+    {
+        abort_unless(auth()->user()?->hasAnyRole(['SUPERADMINISTRADOR', 'MEDICO GENERAL/GERIATRA']), 403,
+            'Las prescripciones solo pueden ser creadas o modificadas por personal médico autorizado.');
     }
 
     private function autorizarResidente(AdultoMayor $adulto): void

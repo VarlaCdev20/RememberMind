@@ -6,26 +6,27 @@ use Illuminate\Contracts\Validation\Validator;
 
 class ValidacionSignosVitalesService
 {
-    // Constantes de rangos biológicos unificados
-    public const PAS_MIN = 50;
-    public const PAS_MAX = 260;
-    public const PAD_MIN = 30;
-    public const PAD_MAX = 160;
+    // Límites técnicos de captura definidos para Enfermería. Los umbrales
+    // clínicos de alerta se evalúan por separado y no deben impedir registrar
+    // una medición real tomada al residente.
+    public const PAS_MIN = 1;
+    public const PAS_MAX = 400;
+    public const PAD_MIN = 1;
+    public const PAD_MAX = 400;
 
-    public const FC_MIN = 30;
-    public const FC_MAX = 220;
+    public const FC_MIN = 1;
+    public const FC_MAX = 300;
 
-    public const FR_MIN = 8;
-    public const FR_MAX = 60;
+    public const FR_MIN = 1;
+    public const FR_MAX = 100;
 
-    public const TEMP_MIN = 32.0;
-    public const TEMP_MAX = 43.0;
+    public const TEMP_MIN = 25.0;
+    public const TEMP_MAX = 45.0;
 
-    public const SPO2_MIN = 50;
+    public const SPO2_MIN = 0;
     public const SPO2_MAX = 100;
 
-    public const GLUCOSA_MIN = 20.0;
-    public const GLUCOSA_MAX = 700.0;
+    public const GLUCOSA_MIN = 0.0;
 
     public const PESO_MIN = 20.0;
     public const PESO_MAX = 300.0;
@@ -83,7 +84,7 @@ class ValidacionSignosVitalesService
             'frecuencia_respiratoria' => 'nullable|integer|min:' . self::FR_MIN . '|max:' . self::FR_MAX,
             'temperatura'             => 'nullable|numeric|min:' . self::TEMP_MIN . '|max:' . self::TEMP_MAX,
             'saturacion'              => 'nullable|integer|min:' . self::SPO2_MIN . '|max:' . self::SPO2_MAX,
-            'glucosa'                 => 'nullable|numeric|min:' . self::GLUCOSA_MIN . '|max:' . self::GLUCOSA_MAX,
+            'glucosa'                 => 'nullable|numeric|min:' . self::GLUCOSA_MIN,
             'peso'                    => 'nullable|numeric|min:' . self::PESO_MIN . '|max:' . self::PESO_MAX,
             'talla'                   => 'nullable|numeric|min:0.5|max:' . self::TALLA_CM_MAX,
             'dolor'                   => 'nullable|integer|min:' . self::DOLOR_MIN . '|max:' . self::DOLOR_MAX,
@@ -110,7 +111,6 @@ class ValidacionSignosVitalesService
             'saturacion.min'              => 'La saturación de oxígeno debe ser de al menos ' . self::SPO2_MIN . '%.',
             'saturacion.max'              => 'La saturación de oxígeno no puede exceder ' . self::SPO2_MAX . '%.',
             'glucosa.min'                 => 'La glucosa debe ser de al menos ' . self::GLUCOSA_MIN . ' mg/dL.',
-            'glucosa.max'                 => 'La glucosa no puede exceder ' . self::GLUCOSA_MAX . ' mg/dL.',
             'peso.min'                    => 'El peso debe ser de al menos ' . self::PESO_MIN . ' kg.',
             'peso.max'                    => 'El peso no puede exceder ' . self::PESO_MAX . ' kg.',
             'talla.min'                   => 'La talla debe ser válida (al menos 0.50 m o 50 cm).',
@@ -123,7 +123,7 @@ class ValidacionSignosVitalesService
     /**
      * Valida reglas cruzadas:
      * 1. Si viene sistólica o diastólica, deben venir ambas.
-     * 2. Sistólica debe ser mayor a diastólica.
+     * 2. Una presión atípica requiere confirmación explícita.
      * 3. Al menos un signo vital debe estar presente.
      */
     public static function validarIntegridadCruzada(
@@ -132,7 +132,8 @@ class ValidacionSignosVitalesService
         ?int $dia,
         array $mediciones,
         string $campoErrorPa = 'presion_sistolica',
-        string $campoErrorGeneral = 'general'
+        string $campoErrorGeneral = 'general',
+        bool $presionAtipicaConfirmada = false
     ): void {
         // Pares de PA
         if (($sis !== null && $dia === null) || ($sis === null && $dia !== null)) {
@@ -140,10 +141,10 @@ class ValidacionSignosVitalesService
                 $campoErrorPa,
                 'La presión arterial requiere registrar tanto la sistólica como la diastólica.'
             );
-        } elseif ($sis !== null && $dia !== null && $sis <= $dia) {
+        } elseif ($sis !== null && $dia !== null && $sis <= $dia && ! $presionAtipicaConfirmada) {
             $validator->errors()->add(
                 $campoErrorPa,
-                'La presión sistólica (' . $sis . ' mmHg) debe ser estrictamente mayor a la diastólica (' . $dia . ' mmHg).'
+                'La presión sistólica es menor o igual a la diastólica. Verifique la medición y confirme expresamente si el valor es correcto.'
             );
         }
 

@@ -134,6 +134,26 @@ class FormulariosEnfermeriaHardeningTest extends TestCase
             ->assertHasErrors(['pa_sistolica']);
     }
 
+    public function test_signos_vitales_permite_valor_atipico_solo_con_confirmacion_explicita(): void
+    {
+        $this->actingAs($this->enfermeroAsignado);
+
+        Livewire::test(RegistroSignosVitalesModal::class)
+            ->call('abrir', $this->adulto->cod_am)
+            ->set('pa_sistolica', 80)
+            ->set('pa_diastolica', 120)
+            ->set('confirmar_presion_atipica', true)
+            ->call('guardar')
+            ->assertHasNoErrors();
+
+        $this->assertDatabaseHas('signos_vitales_adulto', [
+            'cod_am' => $this->adulto->cod_am,
+            'presion_sistolica' => 80,
+            'presion_diastolica' => 120,
+            'valor_atipico_confirmado' => true,
+        ]);
+    }
+
     public function test_signos_vitales_rechaza_sistolica_sin_diastolica_y_viceversa(): void
     {
         $this->actingAs($this->enfermeroAsignado);
@@ -178,17 +198,17 @@ class FormulariosEnfermeriaHardeningTest extends TestCase
     {
         $this->actingAs($this->enfermeroAsignado);
 
-        // Temperatura fuera de rango (ej. 48°C > 43°C max)
+        // Temperatura fuera del límite técnico definido (46°C > 45°C)
         Livewire::test(RegistroSignosVitalesModal::class)
             ->call('abrir', $this->adulto->cod_am)
-            ->set('temperatura', 48)
+            ->set('temperatura', 46)
             ->call('guardar')
             ->assertHasErrors(['temperatura']);
 
-        // FC fuera de rango (ej. 290 bpm > 220)
+        // FC fuera del límite técnico definido (301 bpm > 300)
         Livewire::test(RegistroSignosVitalesModal::class)
             ->call('abrir', $this->adulto->cod_am)
-            ->set('fc', 290)
+            ->set('fc', 301)
             ->call('guardar')
             ->assertHasErrors(['fc']);
     }

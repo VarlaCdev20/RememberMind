@@ -10,13 +10,19 @@
                 <span class="text-xs font-semibold text-apoyo">{{ now()->locale('es')->isoFormat('dddd D [de] MMMM') }}</span>
             </div>
             <h1 class="text-2xl font-black tracking-tight text-titulo">
-                Mis pacientes
+                {{ $esSuperAdmin ? 'Supervisión de residentes' : 'Mis pacientes' }}
             </h1>
             <p class="text-xs font-semibold text-apoyo">
-                Residentes asignados a tu turno actual
+                {{ $esSuperAdmin ? 'Visibilidad global de residentes, asignaciones y estado asistencial' : 'Residentes asignados a tu turno actual' }}
             </p>
         </div>
         <div class="flex items-center gap-2">
+            <a href="{{ route('admin.enfermeria.agenda') }}" class="rm-btn-secondary h-9 px-3 text-xs font-bold" title="Abrir agenda priorizada">
+                <i class="ph-bold ph-calendar-check text-sm"></i><span class="hidden sm:inline">Agenda</span>
+            </a>
+            <a href="{{ route('admin.enfermeria.registros') }}" class="rm-btn-secondary h-9 px-3 text-xs font-bold" title="Registrar cuidados">
+                <i class="ph-bold ph-notebook text-sm"></i><span class="hidden sm:inline">Registros</span>
+            </a>
             <button wire:click="$refresh" class="rm-btn-secondary h-9 px-3 text-xs font-bold" title="Actualizar datos">
                 <i class="ph-bold ph-arrows-clockwise text-sm"></i>
                 <span class="hidden sm:inline">Actualizar</span>
@@ -129,12 +135,12 @@
             <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-fondo-card text-apoyo mb-3">
                 <i class="ph-bold ph-users text-2xl"></i>
             </div>
-            <h3 class="text-base font-bold text-titulo">No se encontraron residentes asignados</h3>
+            <h3 class="text-base font-bold text-titulo">{{ $esSuperAdmin ? 'No se encontraron residentes' : 'No se encontraron residentes asignados' }}</h3>
             <p class="text-xs text-apoyo max-w-sm mt-1">
                 @if($filtroEstado !== 'TODOS' || $search)
                     No hay pacientes que coincidan con los filtros seleccionados. Intenta restablecer el filtro o término de búsqueda.
                 @else
-                    No tienes pacientes asignados en el turno actual o tu guardia no está activa.
+                    {{ $esSuperAdmin ? 'No existen residentes que coincidan con los filtros seleccionados.' : 'No tienes pacientes asignados en el turno actual o tu guardia no está activa.' }}
                 @endif
             </p>
             @if($filtroEstado !== 'TODOS' || $search)
@@ -518,6 +524,19 @@
                         </div>
                     </div>
                 </div>
+
+                @php
+                    $partesPaRapida = preg_split('/\s*\/\s*/', trim((string) $signoPA));
+                    $paRapidaAtipica = count($partesPaRapida) === 2
+                        && is_numeric($partesPaRapida[0]) && is_numeric($partesPaRapida[1])
+                        && (int) $partesPaRapida[0] <= (int) $partesPaRapida[1];
+                @endphp
+                @if($paRapidaAtipica)
+                    <label class="mt-3 flex cursor-pointer items-start gap-2 rounded-xl bg-estado-advertenciaBg p-3 text-xs font-bold text-estado-advertencia">
+                        <input type="checkbox" wire:model="signoConfirmarAtipico" class="mt-0.5 rounded border-borde text-boton-acento focus:ring-boton-acento">
+                        <span>Repetí la medición y confirmo que los valores atípicos son correctos.</span>
+                    </label>
+                @endif
             @endforeach
         </div>
     @endif
@@ -775,7 +794,7 @@
 
                 <div class="mt-6 flex justify-end gap-2">
                     <button wire:click="$set('modalAlerta', false)" class="rm-btn-secondary px-4 py-2 text-xs">Cancelar</button>
-                    <button wire:click="guardarAlerta" class="rm-btn-primary px-4 py-2 text-xs bg-red-600 hover:bg-red-700">Generar Alerta</button>
+                    <button wire:click="guardarAlerta" class="rm-btn-primary px-4 py-2 text-xs">Generar Alerta</button>
                 </div>
             </div>
         </div>

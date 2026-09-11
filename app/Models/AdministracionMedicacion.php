@@ -36,6 +36,12 @@ class AdministracionMedicacion extends Model
         'hora_programada',
         'hora_real',
         'administrado',
+        'resultado',
+        'motivo_prn',
+        'valoracion_previa',
+        'intensidad_previa',
+        'requiere_reevaluacion',
+        'fecha_hora_reevaluacion',
         'motivo_omision',
         'efecto_observado',
         'observacion',
@@ -47,7 +53,16 @@ class AdministracionMedicacion extends Model
         'hora_programada' => 'datetime:H:i',
         'hora_real'       => 'datetime:H:i',
         'administrado'    => 'boolean',
+        'requiere_reevaluacion' => 'boolean',
+        'fecha_hora_reevaluacion' => 'datetime',
     ];
+
+    protected static function booted(): void
+    {
+        static::creating(function (AdministracionMedicacion $registro) {
+            $registro->resultado ??= $registro->administrado ? 'ADMINISTRADO' : 'OMITIDO';
+        });
+    }
 
     public function getActivitylogOptions(): LogOptions
     {

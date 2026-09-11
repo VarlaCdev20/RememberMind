@@ -35,6 +35,7 @@ class MisPacientes extends Component
     public bool $modalSignos = false;
     public ?string $modalCodAm = null;
     public string $signoPA = '', $signoFC = '', $signoFR = '', $signoTemp = '', $signoSat = '', $signoGlucosa = '', $signoObs = '';
+    public bool $signoConfirmarAtipico = false;
 
     public bool $modalSeguimiento = false;
     public string $segEstado = 'ESTABLE', $segAlimentacion = 'COMPLETA', $segMovilidad = 'INDEPENDIENTE', $segSueno = 'NORMAL';
@@ -89,7 +90,7 @@ class MisPacientes extends Component
         abort_unless(auth()->user()?->can('signos_vitales.crear'), 403);
         $this->getTurnoService()->autorizarAccionPaciente($codAm);
         $this->modalCodAm = $codAm;
-        $this->reset(['signoPA', 'signoFC', 'signoFR', 'signoTemp', 'signoSat', 'signoGlucosa', 'signoObs']);
+        $this->reset(['signoPA', 'signoFC', 'signoFR', 'signoTemp', 'signoSat', 'signoGlucosa', 'signoObs', 'signoConfirmarAtipico']);
         $this->modalSignos = true;
     }
 
@@ -108,7 +109,7 @@ class MisPacientes extends Component
             'signoFR' => 'nullable|integer|min:' . ValidacionSignosVitalesService::FR_MIN . '|max:' . ValidacionSignosVitalesService::FR_MAX,
             'signoTemp' => 'nullable|numeric|min:' . ValidacionSignosVitalesService::TEMP_MIN . '|max:' . ValidacionSignosVitalesService::TEMP_MAX,
             'signoSat' => 'nullable|integer|min:' . ValidacionSignosVitalesService::SPO2_MIN . '|max:' . ValidacionSignosVitalesService::SPO2_MAX,
-            'signoGlucosa' => 'nullable|numeric|min:' . ValidacionSignosVitalesService::GLUCOSA_MIN . '|max:' . ValidacionSignosVitalesService::GLUCOSA_MAX,
+            'signoGlucosa' => 'nullable|numeric|min:' . ValidacionSignosVitalesService::GLUCOSA_MIN,
             'signoObs' => 'nullable|string|max:1000',
         ]);
 
@@ -130,8 +131,8 @@ class MisPacientes extends Component
                 $this->addError('signoPA', 'La presión arterial está fuera de los rangos biológicos admitidos.');
                 return;
             }
-            if ($sis <= $dia) {
-                $this->addError('signoPA', 'La presión sistólica debe ser mayor que la presión diastólica.');
+            if ($sis <= $dia && ! $this->signoConfirmarAtipico) {
+                $this->addError('signoPA', 'La presión sistólica es menor o igual a la diastólica. Repita la medición y confirme expresamente si el valor es correcto.');
                 return;
             }
         }
@@ -151,6 +152,7 @@ class MisPacientes extends Component
             'observacion' => $this->signoObs ?: null,
             'registrado_por' => Auth::id(),
             'estado' => 'VIGENTE',
+            'valor_atipico_confirmado' => $this->signoConfirmarAtipico,
         ]);
 
         $this->modalSignos = false;

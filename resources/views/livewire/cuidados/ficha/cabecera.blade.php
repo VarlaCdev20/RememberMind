@@ -76,12 +76,24 @@
                             <i class="ph-bold ph-bell-ringing"></i> {{ $activasCab }} {{ $activasCab === 1 ? 'alerta activa' : 'alertas activas' }}
                         </span>
                     @endif
+
+                    <span class="inline-flex items-center gap-1 rounded-lg border border-borde bg-fondo-card px-2.5 py-1 text-xs font-bold text-parrafo">
+                        <i class="ph-bold ph-map-pin"></i> {{ str_replace('_', ' ', $adultoMayor->estado_operativo ?: 'EN_CENTRO') }}
+                    </span>
+                    @foreach($adultoMayor->dispositivosActivos as $dispositivo)
+                        <span class="inline-flex items-center gap-1 rounded-lg border border-borde bg-fondo-card px-2.5 py-1 text-xs font-bold text-parrafo">
+                            <i class="ph-bold ph-first-aid-kit"></i> {{ str_replace('_', ' ', $dispositivo->tipo) }}
+                        </span>
+                    @endforeach
                 </div>
             </div>
         </div>
 
         {{-- ACCIONES PRINCIPALES (ÚNICA UBICACIÓN EN TODA LA FICHA) --}}
         <div class="flex flex-wrap items-center gap-2 pt-2 lg:pt-0 shrink-0">
+            <a href="{{ route('admin.enfermeria.registros', ['adulto' => $adultoMayor->cod_am]) }}" class="rm-btn-primary px-3.5 py-2.5 text-xs font-bold">
+                <i class="ph-bold ph-hand-heart text-base"></i><span>Registrar cuidado</span>
+            </a>
             <button type="button"
                     wire:click="abrirModalSignos"
                     wire:loading.attr="disabled"

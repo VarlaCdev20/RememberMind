@@ -55,12 +55,13 @@ class StoreSignosVitalesRequest extends FormRequest
             'frecuencia_respiratoria' => 'nullable|integer|min:' . ValidacionSignosVitalesService::FR_MIN . '|max:' . ValidacionSignosVitalesService::FR_MAX,
             'temperatura'             => 'nullable|numeric|min:' . ValidacionSignosVitalesService::TEMP_MIN . '|max:' . ValidacionSignosVitalesService::TEMP_MAX,
             'saturacion'              => 'nullable|integer|min:' . ValidacionSignosVitalesService::SPO2_MIN . '|max:' . ValidacionSignosVitalesService::SPO2_MAX,
-            'glucosa'                 => 'nullable|numeric|min:' . ValidacionSignosVitalesService::GLUCOSA_MIN . '|max:' . ValidacionSignosVitalesService::GLUCOSA_MAX,
+            'glucosa'                 => 'nullable|numeric|min:' . ValidacionSignosVitalesService::GLUCOSA_MIN,
             'peso'                    => 'nullable|numeric|min:' . ValidacionSignosVitalesService::PESO_MIN . '|max:' . ValidacionSignosVitalesService::PESO_MAX,
             'talla'                   => 'nullable|numeric|min:0.5|max:' . ValidacionSignosVitalesService::TALLA_CM_MAX,
             'imc'                     => 'nullable|numeric|min:5|max:80',
             'dolor'                   => 'nullable|integer|min:' . ValidacionSignosVitalesService::DOLOR_MIN . '|max:' . ValidacionSignosVitalesService::DOLOR_MAX,
             'observacion'             => 'nullable|string|max:5000',
+            'confirmar_presion_atipica' => 'nullable|boolean',
         ];
     }
 
@@ -99,7 +100,8 @@ class StoreSignosVitalesRequest extends FormRequest
                 $dia !== null && $dia !== '' ? (int) $dia : null,
                 $campos,
                 'presion_arterial',
-                'signos'
+                'signos',
+                $this->boolean('confirmar_presion_atipica')
             );
 
             // Verificar ámbito del enfermero

@@ -42,6 +42,9 @@ class SignosVitalesAdulto extends Model
         'talla',
         'imc',
         'dolor',
+        'posicion',
+        'usa_oxigeno',
+        'valor_atipico_confirmado',
         'observacion',
         'registrado_por',
         'estado',
@@ -63,6 +66,8 @@ class SignosVitalesAdulto extends Model
         'talla'                  => 'decimal:2',
         'imc'                    => 'decimal:2',
         'fecha_anulacion'        => 'datetime',
+        'usa_oxigeno'            => 'boolean',
+        'valor_atipico_confirmado' => 'boolean',
     ];
 
     public function getActivitylogOptions(): LogOptions

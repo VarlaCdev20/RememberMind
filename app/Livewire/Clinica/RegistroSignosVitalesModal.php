@@ -30,6 +30,7 @@ class RegistroSignosVitalesModal extends Component
     public ?string $imc           = null;
     public ?string $dolor         = null;
     public string  $observacion   = '';
+    public bool $confirmar_presion_atipica = false;
 
     protected $listeners = ['abrir-signos-vitales-medico' => 'abrir'];
 
@@ -90,11 +91,12 @@ class RegistroSignosVitalesModal extends Component
             'fr'           => 'nullable|integer|min:' . ValidacionSignosVitalesService::FR_MIN . '|max:' . ValidacionSignosVitalesService::FR_MAX,
             'temperatura'  => 'nullable|numeric|min:' . ValidacionSignosVitalesService::TEMP_MIN . '|max:' . ValidacionSignosVitalesService::TEMP_MAX,
             'saturacion'   => 'nullable|integer|min:' . ValidacionSignosVitalesService::SPO2_MIN . '|max:' . ValidacionSignosVitalesService::SPO2_MAX,
-            'glucosa'      => 'nullable|numeric|min:' . ValidacionSignosVitalesService::GLUCOSA_MIN . '|max:' . ValidacionSignosVitalesService::GLUCOSA_MAX,
+            'glucosa'      => 'nullable|numeric|min:' . ValidacionSignosVitalesService::GLUCOSA_MIN,
             'peso'         => 'nullable|numeric|min:' . ValidacionSignosVitalesService::PESO_MIN . '|max:' . ValidacionSignosVitalesService::PESO_MAX,
             'talla'        => 'nullable|numeric|min:0.5|max:' . ValidacionSignosVitalesService::TALLA_CM_MAX,
             'dolor'        => 'nullable|integer|min:' . ValidacionSignosVitalesService::DOLOR_MIN . '|max:' . ValidacionSignosVitalesService::DOLOR_MAX,
             'observacion'  => 'nullable|string|max:5000',
+            'confirmar_presion_atipica' => 'boolean',
         ];
     }
 
@@ -121,8 +123,8 @@ class RegistroSignosVitalesModal extends Component
             $this->addError('pa_sistolica', 'Debe registrar tanto la presión sistólica como la diastólica.');
             return;
         }
-        if ($sis !== null && $dia !== null && $sis <= $dia) {
-            $this->addError('pa_sistolica', "La presión sistólica ({$sis}) debe ser mayor a la diastólica ({$dia}).");
+        if ($sis !== null && $dia !== null && $sis <= $dia && ! $this->confirmar_presion_atipica) {
+            $this->addError('pa_sistolica', 'La presión sistólica es menor o igual a la diastólica. Repita la medición y confirme si el valor registrado es correcto.');
             return;
         }
 
@@ -165,6 +167,7 @@ class RegistroSignosVitalesModal extends Component
                     'talla'                   => $tallaNorm,
                     'imc'                     => $imcCalc,
                     'dolor'                   => $this->dolor !== '' ? $this->dolor : null,
+                    'valor_atipico_confirmado'=> $this->confirmar_presion_atipica,
                     'observacion'             => $this->observacion ?: null,
                     'registrado_por'          => Auth::id(),
                     'estado'                  => 'VIGENTE',
@@ -201,6 +204,7 @@ class RegistroSignosVitalesModal extends Component
         $this->imc           = null;
         $this->dolor         = null;
         $this->observacion   = '';
+        $this->confirmar_presion_atipica = false;
         $this->resetValidation();
     }
 

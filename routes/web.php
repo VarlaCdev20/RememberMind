@@ -46,6 +46,9 @@ use App\Livewire\Clinica\SaludSignosPanel;
 use App\Livewire\Clinica\SignosVitalesPanel;
 use App\Livewire\Cuidados\AsignacionTurnoPanel;
 use App\Livewire\Cuidados\DashboardTurno;
+use App\Livewire\Cuidados\AgendaEnfermeria;
+use App\Livewire\Cuidados\RegistrosEnfermeria;
+use App\Livewire\Cuidados\ReporteEnfermeria;
 use App\Livewire\Cuidados\FichaPaciente;
 use App\Livewire\Cuidados\MisPacientes;
 use App\Livewire\Cuidados\PaseTurnoPanel;
@@ -498,6 +501,14 @@ Route::middleware([
                         ->middleware('permission:enfermeria.ver_dashboard')
                         ->name('dashboard');
 
+                    Route::get('/agenda', AgendaEnfermeria::class)
+                        ->middleware('permission:enfermeria.ver_dashboard')
+                        ->name('agenda');
+
+                    Route::get('/registros', RegistrosEnfermeria::class)
+                        ->middleware('permission:seguimiento.ver')
+                        ->name('registros');
+
                     Route::get('/pacientes', MisPacientes::class)
                         ->middleware('permission:enfermeria.ver_pacientes_asignados')
                         ->name('pacientes');
@@ -522,11 +533,7 @@ Route::middleware([
                         ->middleware('permission:pase_turno.ver')
                         ->name('pase-turno');
 
-                    Route::get('/actividades', DashboardTurno::class)
-                        ->middleware('permission:enfermeria.ver_dashboard')
-                        ->name('actividades');
-
-                    Route::get('/reportes', DashboardTurno::class)
+                    Route::get('/reportes', ReporteEnfermeria::class)
                         ->middleware('permission:enfermeria.ver_dashboard')
                         ->name('reportes');
                 });

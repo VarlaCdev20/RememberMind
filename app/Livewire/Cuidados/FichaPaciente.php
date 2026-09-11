@@ -53,6 +53,8 @@ class FichaPaciente extends Component
 
     public bool $modalSignos = false;
     public ?string $signoPA = null, $signoFC = null, $signoFR = null, $signoTemp = null, $signoSat = null, $signoGlucosa = null, $signoDolor = null, $signoObs = null;
+    public string $signoPosicion = '';
+    public bool $signoUsaOxigeno = false, $signoConfirmarAtipico = false;
 
     public bool $modalMed = false;
     public ?string $medSeleccionadoId = null;
@@ -61,6 +63,9 @@ class FichaPaciente extends Component
     public string $medAccion = 'ADMINISTRAR';
     public bool $medAdministrado = true;
     public string $medMotivoOmision = '', $medEfectoObs = '';
+    public bool $medEsPrn = false;
+    public string $medCondicionPrn = '', $medMotivoPrn = '', $medValoracionPrevia = '';
+    public ?int $medIntensidadPrevia = null;
 
     public bool $modalTarea = false;
     public ?string $tareaAccionId = null;
@@ -112,6 +117,10 @@ class FichaPaciente extends Component
             'alertas' => fn($q) => $q->with(['acciones', 'responsable', 'cerradoPor'])->orderByDesc('created_at')->take(25),
             'seguimientosDiarios' => fn($q) => $q->with('turno')->orderByDesc('fecha')->orderByDesc('hora_inicio')->take(25),
             'pasesTurno' => fn($q) => $q->with(['enfermeroSaliente', 'enfermeroEntrante', 'turnoSaliente', 'turnoEntrante'])->orderByDesc('fecha')->orderByDesc('created_at')->take(15),
+            'registrosCuidados' => fn($q) => $q->with('registrador')->orderByDesc('fecha_hora_evento')->take(40),
+            'dispositivosActivos',
+            'incidentes' => fn($q) => $q->with('registrador')->orderByDesc('fecha_hora_evento')->take(30),
+            'lesiones.seguimientos',
             'evaluacionesGeriatricas.evaluador',
             'valoracionesFuncionales.registradoPor',
         ])->findOrFail($codAm);
@@ -149,7 +158,7 @@ class FichaPaciente extends Component
     public function abrirRegistrarSignos(): void
     {
         app(TurnoEnfermeriaService::class)->autorizarAccionPaciente($this->adultoMayor, Auth::user());
-        $this->reset(['signoPA', 'signoFC', 'signoFR', 'signoTemp', 'signoSat', 'signoGlucosa', 'signoDolor', 'signoObs']);
+        $this->reset(['signoPA', 'signoFC', 'signoFR', 'signoTemp', 'signoSat', 'signoGlucosa', 'signoDolor', 'signoObs', 'signoPosicion', 'signoUsaOxigeno', 'signoConfirmarAtipico']);
         $this->modalSignos = true;
     }
 
@@ -164,9 +173,10 @@ class FichaPaciente extends Component
             'signoFR'      => 'nullable|integer|min:' . \App\Services\Clinica\ValidacionSignosVitalesService::FR_MIN . '|max:' . \App\Services\Clinica\ValidacionSignosVitalesService::FR_MAX,
             'signoTemp'    => 'nullable|numeric|min:' . \App\Services\Clinica\ValidacionSignosVitalesService::TEMP_MIN . '|max:' . \App\Services\Clinica\ValidacionSignosVitalesService::TEMP_MAX,
             'signoSat'     => 'nullable|integer|min:' . \App\Services\Clinica\ValidacionSignosVitalesService::SPO2_MIN . '|max:' . \App\Services\Clinica\ValidacionSignosVitalesService::SPO2_MAX,
-            'signoGlucosa' => 'nullable|numeric|min:' . \App\Services\Clinica\ValidacionSignosVitalesService::GLUCOSA_MIN . '|max:' . \App\Services\Clinica\ValidacionSignosVitalesService::GLUCOSA_MAX,
+            'signoGlucosa' => 'nullable|numeric|min:' . \App\Services\Clinica\ValidacionSignosVitalesService::GLUCOSA_MIN,
             'signoDolor'   => 'nullable|integer|min:' . \App\Services\Clinica\ValidacionSignosVitalesService::DOLOR_MIN . '|max:' . \App\Services\Clinica\ValidacionSignosVitalesService::DOLOR_MAX,
             'signoObs'     => 'nullable|string|max:1000',
+            'signoPosicion'=> 'nullable|in:SENTADO,ACOSTADO,DE_PIE',
         ]);
 
         $sis = null; $dia = null;
@@ -191,8 +201,8 @@ class FichaPaciente extends Component
                 $this->addError('signoPA', 'La presión diastólica debe estar entre ' . \App\Services\Clinica\ValidacionSignosVitalesService::PAD_MIN . ' y ' . \App\Services\Clinica\ValidacionSignosVitalesService::PAD_MAX . ' mmHg.');
                 return;
             }
-            if ($sis <= $dia) {
-                $this->addError('signoPA', "La presión sistólica ({$sis}) debe ser estrictamente mayor a la diastólica ({$dia}).");
+            if ($sis <= $dia && !$this->signoConfirmarAtipico) {
+                $this->addError('signoPA', "La sistólica ({$sis}) no supera a la diastólica ({$dia}). Verifique la medición y confirme el valor atípico para conservarlo.");
                 return;
             }
         }
@@ -215,6 +225,9 @@ class FichaPaciente extends Component
             'saturacion'              => $this->signoSat ?: null,
             'glucosa'                 => $this->signoGlucosa ?: null,
             'dolor'                   => $this->signoDolor !== null && $this->signoDolor !== '' ? (int)$this->signoDolor : null,
+            'posicion'                => $this->signoPosicion ?: null,
+            'usa_oxigeno'             => $this->signoUsaOxigeno,
+            'valor_atipico_confirmado'=> $this->signoConfirmarAtipico,
             'observacion'             => $this->signoObs ?: null,
             'registrado_por'          => Auth::id(),
             'estado'                  => 'VIGENTE',
@@ -258,6 +271,11 @@ class FichaPaciente extends Component
         $this->medNombre = $med->nombre_medicamento;
         $this->medDosis = $med->dosis ?? '';
         $this->medVia = $med->via_administracion ?? 'Oral';
+        $this->medEsPrn = (bool) $med->es_prn;
+        $this->medCondicionPrn = $med->condicion_prn ?? '';
+        $this->medMotivoPrn = '';
+        $this->medValoracionPrevia = '';
+        $this->medIntensidadPrevia = null;
         $this->medAccion = 'ADMINISTRAR';
         $this->medAdministrado = true;
         $this->medMotivoOmision = '';
@@ -284,18 +302,32 @@ class FichaPaciente extends Component
             return;
         }
 
-        $esAdmin = $this->medAccion === 'ADMINISTRAR' && (bool)$this->medAdministrado;
+        $resultado = match ($this->medAccion) {
+            'ADMINISTRAR' => 'ADMINISTRADO', 'RECHAZAR' => 'RECHAZADO',
+            'NO_DISPONIBLE' => 'NO_DISPONIBLE', default => 'OMITIDO',
+        };
+        $esAdmin = $resultado === 'ADMINISTRADO';
 
         if (!$esAdmin) {
             $this->validate(['medMotivoOmision' => 'required|string|min:5|max:500'], ['medMotivoOmision.min' => 'El motivo de omisión debe tener al menos 5 caracteres.']);
         }
         $this->validate(['medEfectoObs' => 'nullable|string|max:1000']);
+        if ($med->es_prn && $esAdmin) {
+            $this->validate([
+                'medMotivoPrn' => 'required|string|min:5|max:500',
+                'medValoracionPrevia' => 'required|string|min:5|max:1000',
+                'medIntensidadPrevia' => 'nullable|integer|min:0|max:10',
+            ], [
+                'medMotivoPrn.required' => 'Indique el síntoma o motivo que justifica la medicación PRN.',
+                'medValoracionPrevia.required' => 'Registre la valoración previa antes de administrar PRN.',
+            ]);
+        }
 
         $horaProgramada = $this->medHoraProgramada ?: ($med->hora_programada
             ? Carbon::parse($med->hora_programada)->format('H:i')
             : now()->format('H:i'));
 
-        $guardado = DB::transaction(function () use ($horaProgramada, $esAdmin): bool {
+        $guardado = DB::transaction(function () use ($horaProgramada, $esAdmin, $resultado, $med): bool {
             $duplicado = AdministracionMedicacion::where('cod_med_adulto', $this->medSeleccionadoId)
                 ->whereDate('fecha', today())
                 ->where('hora_programada', 'like', $horaProgramada . '%')
@@ -312,10 +344,27 @@ class FichaPaciente extends Component
                 'hora_programada'   => $horaProgramada,
                 'hora_real'         => $esAdmin ? now()->format('H:i') : null,
                 'administrado'      => $esAdmin,
+                'resultado'         => $resultado,
                 'motivo_omision'    => !$esAdmin ? trim($this->medMotivoOmision) : null,
+                'motivo_prn'        => $med->es_prn ? trim($this->medMotivoPrn) : null,
+                'valoracion_previa' => $med->es_prn ? trim($this->medValoracionPrevia) : null,
+                'intensidad_previa' => $med->es_prn ? $this->medIntensidadPrevia : null,
+                'requiere_reevaluacion' => $med->es_prn && $esAdmin,
+                'fecha_hora_reevaluacion' => $med->es_prn && $esAdmin ? now()->addMinutes(config('enfermeria.minutos_reevaluacion_prn', 60)) : null,
                 'efecto_observado'  => filled($this->medEfectoObs) ? trim($this->medEfectoObs) : null,
                 'registrado_por'    => Auth::id(),
             ]);
+            if ($med->es_prn && $esAdmin && $this->adultoMayor->planCuidadoActivo) {
+                TareaPlanCuidado::create([
+                    'cod_plan' => $this->adultoMayor->planCuidadoActivo->cod_plan,
+                    'cod_am' => $this->adultoMayor->cod_am,
+                    'cod_turno' => $this->adultoMayor->asignacionTurnoActiva?->cod_turno,
+                    'area' => 'REEVALUACION', 'titulo' => 'Reevaluar respuesta a '.$med->nombre_medicamento,
+                    'descripcion' => 'Valorar respuesta y efectos una hora después de medicación PRN.',
+                    'fecha_programada' => today(), 'hora_programada' => now()->addMinutes(config('enfermeria.minutos_reevaluacion_prn', 60))->format('H:i:s'),
+                    'prioridad' => 'ALTA', 'estado' => 'PENDIENTE', 'registrado_por' => Auth::id(),
+                ]);
+            }
             return true;
         });
 
@@ -878,6 +927,38 @@ class FichaPaciente extends Component
                 'badge_color' => 'sky',
                 'icon' => 'ph-gauge',
                 'es_incidente' => false,
+            ]);
+        }
+
+        foreach ($this->adultoMayor->registrosCuidados as $registro) {
+            $detalle = collect([
+                $registro->porcentaje !== null ? "Consumo {$registro->porcentaje}%" : null,
+                $registro->cantidad_ml ? "{$registro->cantidad_ml} ml" : null,
+                $registro->nivel_ayuda ? 'Ayuda: '.strtolower(str_replace('_', ' ', $registro->nivel_ayuda)) : null,
+                $registro->resultado ? 'Resultado: '.strtolower(str_replace('_', ' ', $registro->resultado)) : null,
+                $registro->cambio_respecto_basal === 'PEOR' ? 'Empeoramiento respecto al basal' : null,
+                $registro->observacion ?: $registro->motivo,
+            ])->filter()->implode(' · ');
+            $eventos->push([
+                'tipo' => 'CUIDADOS', 'tipo_label' => 'Cuidado diario',
+                'titulo' => ucfirst(strtolower(str_replace('_', ' ', $registro->tipo))).': '.ucfirst(strtolower(str_replace('_', ' ', $registro->subtipo))),
+                'resumen' => $detalle ?: 'Cuidado registrado', 'descripcion' => $detalle ?: 'Registro estructurado de Enfermería',
+                'fecha' => $registro->fecha_hora_evento->format('Y-m-d'), 'hora' => $registro->fecha_hora_evento->format('H:i'),
+                'timestamp' => $registro->fecha_hora_evento, 'responsable' => $registro->registrador->name ?? 'Enfermero/a',
+                'estado_badge' => $registro->estado, 'badge' => $registro->estado, 'badge_color' => 'teal',
+                'icon' => 'ph-hand-heart', 'es_incidente' => $registro->cambio_respecto_basal === 'PEOR',
+            ]);
+        }
+
+        foreach ($this->adultoMayor->incidentes as $incidente) {
+            $eventos->push([
+                'tipo' => 'INCIDENTE', 'tipo_label' => 'Incidente',
+                'titulo' => 'Incidente: '.ucfirst(strtolower(str_replace('_', ' ', $incidente->tipo))),
+                'resumen' => $incidente->descripcion, 'descripcion' => $incidente->descripcion,
+                'fecha' => $incidente->fecha_hora_evento->format('Y-m-d'), 'hora' => $incidente->fecha_hora_evento->format('H:i'),
+                'timestamp' => $incidente->fecha_hora_evento, 'responsable' => $incidente->registrador->name ?? 'Enfermero/a',
+                'estado_badge' => $incidente->estado, 'badge' => $incidente->tipo, 'badge_color' => 'red',
+                'icon' => 'ph-warning-octagon', 'es_incidente' => true,
             ]);
         }
 

@@ -9,6 +9,7 @@ use Livewire\Component;
 use Livewire\WithPagination;
 use App\Models\AdultoMayor;
 use App\Models\SignosVitalesAdulto;
+use App\Services\Clinica\ValidacionSignosVitalesService;
 
 class SaludSignosPanel extends Component
 {
@@ -268,6 +269,7 @@ class SaludSignosPanel extends Component
 
     public function abrirFormularioEditar(string $id): void
     {
+        abort_if(auth()->user()?->hasRole('ENFERMEROS'), 403, 'Los registros clínicos firmados se rectifican; no se editan.');
         abort_if(!auth()->user()->can('salud.signos.editar'), 403);
 
         $signo = SignosVitalesAdulto::findOrFail($id);
@@ -419,12 +421,14 @@ class SaludSignosPanel extends Component
 
     public function abrirAnular(string $id): void
     {
+        abort_if(auth()->user()?->hasRole('ENFERMEROS'), 403, 'Los registros firmados se rectifican; no se eliminan ni restauran desde Enfermería.');
         abort_if(!auth()->user()->can('salud.signos.anular'), 403);
         $this->dispatch('signos-confirmar-anulacion', ['id' => $id]);
     }
 
     public function anularConMotivo(string $id, string $motivo): void
     {
+        abort_if(auth()->user()?->hasRole('ENFERMEROS'), 403, 'Los registros firmados se rectifican; no se eliminan ni restauran desde Enfermería.');
         abort_if(!$this->adulto, 403, 'Paciente no seleccionado.');
         abort_if(!auth()->user()->can('salud.signos.anular'), 403);
 
@@ -461,6 +465,7 @@ class SaludSignosPanel extends Component
 
     public function confirmarAnular(): void
     {
+        abort_if(auth()->user()?->hasRole('ENFERMEROS'), 403, 'Los registros firmados se rectifican; no se eliminan ni restauran desde Enfermería.');
         abort_if(!$this->adulto, 403, 'Paciente no seleccionado.');
         abort_if(!auth()->user()->can('salud.signos.anular'), 403);
 
@@ -495,6 +500,7 @@ class SaludSignosPanel extends Component
 
     public function restaurarRegistro(string $id): void
     {
+        abort_if(auth()->user()?->hasRole('ENFERMEROS'), 403, 'Los registros firmados se rectifican; no se eliminan ni restauran desde Enfermería.');
         abort_if(!$this->adulto, 403, 'Paciente no seleccionado.');
         abort_if(!auth()->user()->can('salud.signos.anular'), 403);
 
@@ -637,13 +643,13 @@ class SaludSignosPanel extends Component
         return [
             'fecha' => 'required|date|before_or_equal:today',
             'hora' => 'required',
-            'presion_sistolica' => 'nullable|integer|min:60|max:250',
-            'presion_diastolica' => 'nullable|integer|min:40|max:160',
-            'frecuencia_cardiaca' => 'nullable|integer|min:30|max:220',
-            'frecuencia_respiratoria' => 'nullable|integer|min:5|max:60',
-            'temperatura' => 'nullable|numeric|min:30|max:45',
-            'saturacion' => 'nullable|integer|min:0|max:100',
-            'glucosa' => 'nullable|numeric|min:20|max:600',
+            'presion_sistolica' => 'nullable|integer|min:'.ValidacionSignosVitalesService::PAS_MIN.'|max:'.ValidacionSignosVitalesService::PAS_MAX,
+            'presion_diastolica' => 'nullable|integer|min:'.ValidacionSignosVitalesService::PAD_MIN.'|max:'.ValidacionSignosVitalesService::PAD_MAX,
+            'frecuencia_cardiaca' => 'nullable|integer|min:'.ValidacionSignosVitalesService::FC_MIN.'|max:'.ValidacionSignosVitalesService::FC_MAX,
+            'frecuencia_respiratoria' => 'nullable|integer|min:'.ValidacionSignosVitalesService::FR_MIN.'|max:'.ValidacionSignosVitalesService::FR_MAX,
+            'temperatura' => 'nullable|numeric|min:'.ValidacionSignosVitalesService::TEMP_MIN.'|max:'.ValidacionSignosVitalesService::TEMP_MAX,
+            'saturacion' => 'nullable|integer|min:'.ValidacionSignosVitalesService::SPO2_MIN.'|max:'.ValidacionSignosVitalesService::SPO2_MAX,
+            'glucosa' => 'nullable|numeric|min:'.ValidacionSignosVitalesService::GLUCOSA_MIN,
             'peso' => 'nullable|numeric|min:20|max:250',
             'talla' => 'nullable|numeric|min:0.5|max:250',
             'imc' => 'nullable|numeric|min:0|max:100',
@@ -658,16 +664,16 @@ class SaludSignosPanel extends Component
             'fecha.required' => 'La fecha es obligatoria.',
             'fecha.before_or_equal' => 'La fecha de medición no puede ser futura.',
             'hora.required' => 'La hora es obligatoria.',
-            'presion_sistolica.min' => 'La presión sistólica mínima aceptada es 60 mmHg.',
-            'presion_sistolica.max' => 'La presión sistólica máxima aceptada es 250 mmHg.',
-            'presion_diastolica.min' => 'La presión diastólica mínima aceptada es 40 mmHg.',
-            'presion_diastolica.max' => 'La presión diastólica máxima aceptada es 160 mmHg.',
+            'presion_sistolica.min' => 'La presión sistólica mínima aceptada es '.ValidacionSignosVitalesService::PAS_MIN.' mmHg.',
+            'presion_sistolica.max' => 'La presión sistólica máxima aceptada es '.ValidacionSignosVitalesService::PAS_MAX.' mmHg.',
+            'presion_diastolica.min' => 'La presión diastólica mínima aceptada es '.ValidacionSignosVitalesService::PAD_MIN.' mmHg.',
+            'presion_diastolica.max' => 'La presión diastólica máxima aceptada es '.ValidacionSignosVitalesService::PAD_MAX.' mmHg.',
             'frecuencia_cardiaca.min' => 'La frecuencia cardíaca debe ser mayor a cero y clínicamente posible.',
-            'frecuencia_cardiaca.max' => 'La frecuencia cardíaca máxima aceptada es 220 lpm.',
-            'frecuencia_respiratoria.min' => 'La frecuencia respiratoria mínima aceptada es 5 rpm.',
-            'frecuencia_respiratoria.max' => 'La frecuencia respiratoria máxima aceptada es 60 rpm.',
-            'temperatura.min' => 'La temperatura mínima aceptada es 30 °C.',
-            'temperatura.max' => 'La temperatura máxima aceptada es 45 °C.',
+            'frecuencia_cardiaca.max' => 'La frecuencia cardíaca máxima aceptada es '.ValidacionSignosVitalesService::FC_MAX.' lpm.',
+            'frecuencia_respiratoria.min' => 'La frecuencia respiratoria mínima aceptada es '.ValidacionSignosVitalesService::FR_MIN.' rpm.',
+            'frecuencia_respiratoria.max' => 'La frecuencia respiratoria máxima aceptada es '.ValidacionSignosVitalesService::FR_MAX.' rpm.',
+            'temperatura.min' => 'La temperatura mínima aceptada es '.ValidacionSignosVitalesService::TEMP_MIN.' °C.',
+            'temperatura.max' => 'La temperatura máxima aceptada es '.ValidacionSignosVitalesService::TEMP_MAX.' °C.',
             'saturacion.min' => 'La saturación mínima es 0%.',
             'saturacion.max' => 'La saturación no puede superar 100%.',
             'peso.min' => 'El peso debe ser positivo y clínicamente posible.',
@@ -694,8 +700,8 @@ class SaludSignosPanel extends Component
 
     private function validarCoherenciaClinica(): void
     {
-        if ($this->presion_sistolica && $this->presion_diastolica && $this->presion_sistolica <= $this->presion_diastolica) {
-            $this->addError('presion_sistolica', 'La presión sistólica debe ser mayor que la diastólica.');
+        if (($this->presion_sistolica === null) !== ($this->presion_diastolica === null)) {
+            $this->addError('presion_sistolica', 'Debe registrar la presión sistólica y diastólica juntas.');
         }
     }
 
@@ -1149,6 +1155,10 @@ class SaludSignosPanel extends Component
 
         $sis = (int) $sistolica;
         $dia = (int) $diastolica;
+
+        if ($sis <= $dia) {
+            return ['key' => 'requiere_revision', 'label' => 'Confirmación requerida', 'message' => 'La sistólica es menor o igual a la diastólica. Repita la toma y confirme el valor antes de guardarlo.'];
+        }
 
         if ($sis >= 160 || $dia >= 100 || $sis < 90 || $dia < 60) {
             return ['key' => 'requiere_revision', 'label' => 'Requiere revisión', 'message' => 'Valor bajo o elevado. Requiere revisión del personal de salud.'];

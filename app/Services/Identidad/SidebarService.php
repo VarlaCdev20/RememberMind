@@ -150,8 +150,21 @@ class SidebarService
             $this->buildSection('Áreas de atención', 'ph-stethoscope', null, [
                 $this->buildItem('Administración', 'admin.administracion.dashboard'),
                 $this->buildItem('Medicina', 'admin.medico.dashboard'),
-                $this->buildItem('Enfermería', 'admin.enfermeria.dashboard', 'enfermeria.ver_dashboard'),
                 $this->buildItem('Psicología', 'admin.psicologia.dashboard'),
+            ]),
+
+            $this->buildSection('Supervisión de Enfermería', 'ph-first-aid', null, [
+                $this->buildItem('Resumen global', 'admin.enfermeria.dashboard', 'enfermeria.ver_dashboard'),
+                $this->buildItem('Todos los residentes', 'admin.enfermeria.pacientes', 'enfermeria.ver_pacientes_asignados'),
+                $this->buildItem('Agenda institucional', 'admin.enfermeria.agenda', 'enfermeria.ver_dashboard'),
+                $this->buildItem('Medicación prescrita', 'admin.salud-seguimiento.medicacion.index', 'medicacion.ver'),
+                $this->buildItem('Administraciones', 'admin.salud-seguimiento.administracion.index', 'salud.ver'),
+                $this->buildItem('Cuidados e incidentes', 'admin.enfermeria.registros', 'seguimiento.ver'),
+                $this->buildItem('Alertas clínicas', 'admin.enfermeria.alertas', 'alertas.ver'),
+                $this->buildItem('Planes y tareas', 'admin.enfermeria.tareas', 'tareas.ver'),
+                $this->buildItem('Evolución 360°', 'admin.salud-seguimiento.ficha.index', 'salud.ver'),
+                $this->buildItem('Pases de turno', 'admin.enfermeria.pase-turno', 'pase_turno.ver'),
+                $this->buildItem('Reportes de Enfermería', 'admin.enfermeria.reportes', 'enfermeria.ver_dashboard'),
             ]),
 
             $this->buildSection('Alertas', 'ph-bell-ringing', 'admin.alertas-clinicas.index', [], false, 'alertas.ver'),
@@ -228,6 +241,7 @@ class SidebarService
     private function getEnfermeroSidebar($user = null): array
     {
         $user ??= auth()->user();
+        $esSupervision = $this->isSuperadmin($user);
 
         $alertasBadge = null;
         try {
@@ -256,12 +270,29 @@ class SidebarService
         }
 
         // GRUPO 1: ENFERMERÍA
-        $enfermeriaItems = [
-            $this->buildItem('Inicio', 'admin.enfermeria.dashboard', 'enfermeria.ver_dashboard'),
-            $this->buildItem('Mis pacientes', 'admin.enfermeria.pacientes', 'enfermeria.ver_pacientes_asignados'),
+        $enfermeriaItems = $esSupervision ? [
+            $this->buildItem('Resumen global', 'admin.enfermeria.dashboard', 'enfermeria.ver_dashboard'),
+            $this->buildItem('Todos los residentes', 'admin.enfermeria.pacientes', 'enfermeria.ver_pacientes_asignados'),
+            $this->buildItem('Agenda institucional', 'admin.enfermeria.agenda', 'enfermeria.ver_dashboard'),
+            $this->buildItem('Medicación prescrita', 'admin.salud-seguimiento.medicacion.index', 'medicacion.ver'),
+            $this->buildItem('Administraciones', 'admin.salud-seguimiento.administracion.index', 'salud.ver'),
             $this->buildItem('Valoraciones iniciales', 'admin.admision.valoracion-enfermeria', 'valoracion_enfermeria.ver'),
+            $this->buildItem('Alertas clínicas', 'admin.enfermeria.alertas', 'alertas.ver', $alertasBadge),
+            $this->buildItem('Cuidados e incidentes', 'admin.enfermeria.registros', 'seguimiento.ver'),
+            $this->buildItem('Planes y tareas', 'admin.enfermeria.tareas', 'tareas.ver'),
+            $this->buildItem('Evolución 360°', 'admin.salud-seguimiento.ficha.index', 'salud.ver'),
+            $this->buildItem('Turnos', 'admin.turnos-enfermeria.index', 'turnos_enfermeria.ver'),
+            $this->buildItem('Asignaciones', 'admin.asignacion-turno.index', 'asignacion_turno.ver'),
+            $this->buildItem('Pases de turno', 'admin.enfermeria.pase-turno', 'pase_turno.ver'),
+        ] : [
+            $this->buildItem('Mi turno', 'admin.enfermeria.dashboard', 'enfermeria.ver_dashboard'),
+            $this->buildItem('Mis pacientes', 'admin.enfermeria.pacientes', 'enfermeria.ver_pacientes_asignados'),
+            $this->buildItem('Agenda', 'admin.enfermeria.agenda', 'enfermeria.ver_dashboard'),
+            $this->buildItem('Medicación', 'admin.salud-seguimiento.medicacion.index', 'medicacion.ver'),
             $this->buildItem('Alertas', 'admin.enfermeria.alertas', 'alertas.ver', $alertasBadge),
-            $this->buildItem('Pase de turno', 'admin.enfermeria.pase-turno', 'pase_turno.ver'),
+            $this->buildItem('Registros', 'admin.enfermeria.registros', 'seguimiento.ver'),
+            $this->buildItem('Evolución 360°', 'admin.enfermeria.pacientes', 'enfermeria.ver_pacientes_asignados'),
+            $this->buildItem('Entrega de turno', 'admin.enfermeria.pase-turno', 'pase_turno.ver'),
         ];
 
         $enfermeriaSection = $this->buildSection('Enfermería', 'ph-first-aid', null, $enfermeriaItems, true);
@@ -273,6 +304,9 @@ class SidebarService
         $informacionItems = [
             $this->buildItem('Reportes', 'admin.enfermeria.reportes', 'enfermeria.ver_dashboard'),
         ];
+        if ($esSupervision) {
+            $informacionItems[] = $this->buildItem('Auditoría', 'admin.bitacora.index', 'bitacora.ver');
+        }
 
         $informacionSection = $this->buildSection('Información', 'ph-chart-bar', null, $informacionItems, true);
         if ($informacionSection) {

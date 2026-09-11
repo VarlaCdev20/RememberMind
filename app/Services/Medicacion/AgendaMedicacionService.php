@@ -33,6 +33,7 @@ class AgendaMedicacionService
                 $query->whereNull('fecha_fin')->orWhereDate('fecha_fin', '>=', $fecha);
             })
             ->whereNotNull('hora_programada')
+            ->where('es_prn', false)
             ->orderBy('hora_programada')
             ->get();
 
@@ -54,7 +55,7 @@ class AgendaMedicacionService
                     $estado = $registro->administrado ? 'ADMINISTRADA' : 'OMITIDA';
                 } elseif ($programada->isPast()) {
                     $estado = 'VENCIDA';
-                } elseif ($ahora->diffInMinutes($programada, false) <= 60) {
+                } elseif ($ahora->diffInMinutes($programada, false) <= config('enfermeria.minutos_proximo_medicacion', 60)) {
                     $estado = 'PROXIMA';
                 } else {
                     $estado = 'PENDIENTE';
@@ -102,11 +103,14 @@ class AgendaMedicacionService
         $minutoInicial = ($horaInicial->hour * 60) + $horaInicial->minute;
         $frecuencia = mb_strtoupper($medicacion->frecuencia ?? '');
 
-        if (!preg_match('/CADA\s+(\d{1,2})\s+HORA/', $frecuencia, $coincidencia)) {
-            return [$horaInicial->format('H:i')];
+        $intervaloHoras = $medicacion->intervalo_horas;
+        if (!$intervaloHoras && preg_match('/CADA\s+(\d{1,2})\s+HORA/', $frecuencia, $coincidencia)) {
+            $intervaloHoras = (int) $coincidencia[1];
         }
 
-        $intervaloHoras = (int) $coincidencia[1];
+        if (!$intervaloHoras) {
+            return [$horaInicial->format('H:i')];
+        }
         if ($intervaloHoras < 1 || $intervaloHoras > 24) {
             return [$horaInicial->format('H:i')];
         }

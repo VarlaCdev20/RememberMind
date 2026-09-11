@@ -84,20 +84,21 @@ class DeteccionAlertasService
     public function detectarPreventivas(?string $codAm = null): int
     {
         $adultos = AdultoMayor::with([
-            'fichasMedicas' => fn ($q) => $q->where('estado', 'ACTIVA')->latest()->limit(1),
+            'fichasMedicas' => fn ($q) => $q->whereIn('estado', ['ACTIVA', 'ACTIVO', 'VIGENTE'])->latest()->limit(1),
             'medicaciones' => fn ($q) => $q->whereIn('estado', ['ACTIVA', 'ACTIVO']),
             'administracionesMedicacion' => fn ($q) => $q->latest('fecha')->limit(3),
             'signosVitales' => fn ($q) => $q->where('estado', 'VIGENTE')->latest('fecha')->limit(1),
             'valoracionesFuncionales' => fn ($q) => $q->latest('fecha_valoracion')->limit(1),
         ])
             ->when($codAm, fn ($q) => $q->where('cod_am', $codAm))
-            ->whereHas('estado', fn ($q) => $q->whereIn('estado', ['ACTIVO', 'SEGUIMIENTO_ESPECIAL']))
+            ->whereHas('estado', fn ($q) => $q->whereIn('estado', ['ACTIVO', 'ADMITIDO', 'ASIGNADO', 'EN_SEGUIMIENTO_ACTIVO', 'OBSERVADO', 'SEGUIMIENTO_ESPECIAL']))
+            ->where('estado_operativo', 'EN_CENTRO')
             ->get();
 
         $creadas = 0;
 
         foreach ($adultos as $adulto) {
-            $fichaMedica = $adulto->fichasMedicas->where('estado', 'ACTIVA')->first();
+            $fichaMedica = $adulto->fichasMedicas->whereIn('estado', ['ACTIVA', 'ACTIVO', 'VIGENTE'])->first();
             $medicacionesActivas = $adulto->medicaciones->whereIn('estado', ['ACTIVA', 'ACTIVO']);
             $valFuncional = $adulto->valoracionesFuncionales->sortByDesc('fecha_valoracion')->first();
             $ultimosSignos = $adulto->signosVitales->where('estado', 'VIGENTE')->sortByDesc('fecha')->first();
@@ -114,16 +115,18 @@ class DeteccionAlertasService
                 if ($alerta) $creadas++;
             }
 
-            // 2. Medicación activa sin administración reciente (>= 24h)
+            // 2. Dosis realmente vencidas según la pauta activa; las órdenes PRN no generan vencimiento.
             if ($medicacionesActivas->isNotEmpty()) {
-                $ultimaToma = $adulto->administracionesMedicacion->sortByDesc('fecha')->first();
-                if (!$ultimaToma || \Carbon\Carbon::parse($ultimaToma->fecha)->diffInDays(now()) >= 1) {
+                $dosisVencidas = app(\App\Services\Medicacion\AgendaMedicacionService::class)
+                    ->paraAdulto($adulto->cod_am)
+                    ->where('estado', 'VENCIDA');
+                if ($dosisVencidas->isNotEmpty()) {
                     $alerta = $this->registrarPreventivaSiNoExiste(
                         $adulto->cod_am,
                         'MEDICACION',
                         'MEDICACION SIN ADMINISTRACION',
                         'MEDIO',
-                        'Medicación activa sin administración reciente registrada (más de 24h).'
+                        $dosisVencidas->count().' dosis programada(s) vencida(s) sin administración u omisión registrada.'
                     );
                     if ($alerta) $creadas++;
                 }

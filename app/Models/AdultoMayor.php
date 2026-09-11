@@ -62,6 +62,9 @@ class AdultoMayor extends Model
         'consentimiento_datos',
         'observaciones',
         'cod_est_adul',
+        'estado_operativo',
+        'motivo_estado_operativo',
+        'estado_operativo_desde',
         'foto',
         'archivado_en',
         'motivo_archivado',
@@ -112,6 +115,7 @@ class AdultoMayor extends Model
         'fecha_nac' => 'date',
         'fecha_ing' => 'date',
         'archivado_en' => 'datetime',
+        'estado_operativo_desde' => 'datetime',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];
@@ -277,6 +281,36 @@ class AdultoMayor extends Model
     public function pasesTurno()
     {
         return $this->hasMany(PaseTurno::class, 'cod_am', 'cod_am');
+    }
+
+    public function registrosCuidados()
+    {
+        return $this->hasMany(RegistroCuidado::class, 'cod_am', 'cod_am');
+    }
+
+    public function dispositivos()
+    {
+        return $this->hasMany(DispositivoResidente::class, 'cod_am', 'cod_am');
+    }
+
+    public function dispositivosActivos()
+    {
+        return $this->dispositivos()->where('estado', 'ACTIVO');
+    }
+
+    public function incidentes()
+    {
+        return $this->hasMany(IncidenteResidente::class, 'cod_am', 'cod_am');
+    }
+
+    public function lesiones()
+    {
+        return $this->hasMany(LesionResidente::class, 'cod_am', 'cod_am');
+    }
+
+    public function historialEstadoOperativo()
+    {
+        return $this->hasMany(HistorialEstadoOperativo::class, 'cod_am', 'cod_am');
     }
 
     public function habitacion()

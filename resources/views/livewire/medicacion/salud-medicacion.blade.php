@@ -23,7 +23,7 @@
             </div>
 
             <div class="flex flex-wrap items-center gap-2.5">
-                @if(auth()->user()?->hasRole('SUPERADMINISTRADOR') || auth()->user()?->canAny(['medicacion.crear', 'salud.medicacion.crear']))
+                @if(auth()->user()?->hasAnyRole(['SUPERADMINISTRADOR', 'MEDICO GENERAL/GERIATRA']))
                     <button wire:click="toggleFormularioCrear" type="button" class="inline-flex items-center gap-2 rounded-xl border border-boton-principal bg-boton-principal px-4 py-2.5 text-xs font-black text-inverso shadow-sm transition hover:bg-boton-principalHover hover:shadow active:scale-95">
                         <i class="ph-bold {{ $mostrarFormularioCrear ? 'ph-x' : 'ph-plus-circle' }} text-base"></i>
                         <span>{{ $mostrarFormularioCrear ? 'Cerrar formulario' : 'Prescribir medicamento' }}</span>
@@ -347,7 +347,7 @@
                             <span class="font-black text-estado-exito">{{ $stats['activas'] }}</span>
                         </div>
                         
-                        @if(auth()->user()?->hasRole('SUPERADMINISTRADOR') || auth()->user()?->canAny(['medicacion.crear', 'salud.medicacion.crear']))
+                        @if(auth()->user()?->hasAnyRole(['SUPERADMINISTRADOR', 'MEDICO GENERAL/GERIATRA']))
                             <button type="button" wire:click="abrirFormularioPara('{{ $adulto->cod_am }}')" class="w-full inline-flex items-center justify-center gap-2 rounded-xl border border-boton-principal bg-boton-principal px-3 py-2 text-xs font-bold text-inverso shadow-sm transition hover:bg-boton-principalHover active:scale-95">
                                 <i class="ph-bold ph-plus-circle text-sm"></i>
                                 <span>Prescribir para {{ strtok($adulto->nombres, ' ') }}</span>
@@ -481,10 +481,12 @@
                                 @endif
                             </p>
                         </div>
+                        @if(auth()->user()?->hasAnyRole(['SUPERADMINISTRADOR', 'MEDICO GENERAL/GERIATRA']))
                         <button type="button" wire:click="toggleFormularioCrear" class="inline-flex items-center gap-2 rounded-xl border border-boton-principal bg-boton-principal px-4 py-2.5 text-xs font-bold text-inverso shadow-sm transition hover:bg-boton-principalHover active:scale-95">
                             <i class="ph-bold ph-plus-circle text-base"></i>
                             <span>Prescribir Primer Medicamento</span>
                         </button>
+                        @endif
                     </div>
                 @else
                     <div class="overflow-x-auto">
@@ -566,13 +568,13 @@
                                                     </button>
                                                 @endif
 
-                                                @can('salud.medicacion.editar')
+                                                @if(auth()->user()?->hasAnyRole(['SUPERADMINISTRADOR', 'MEDICO GENERAL/GERIATRA']))
                                                     <button type="button" @click="$dispatch('abrirModalMedicacion', { cod_am: '{{ $med->cod_am }}', id_med: {{ $med->cod_med_adulto }} })" class="inline-flex items-center justify-center rounded-lg border border-borde bg-fondo-panel p-1.5 text-apoyo transition hover:bg-fondo-app hover:text-parrafo active:scale-95" title="Editar prescripción">
                                                         <i class="ph-bold ph-pencil-simple"></i>
                                                     </button>
-                                                @endcan
+                                                @endif
 
-                                                @if($estado === 'ACTIVO')
+                                                @if($estado === 'ACTIVO' && auth()->user()?->hasAnyRole(['SUPERADMINISTRADOR', 'MEDICO GENERAL/GERIATRA']))
                                                     <button type="button"
                                                         wire:click="suspenderMedicamento({{ $med->cod_med_adulto }})"
                                                         wire:confirm="¿Seguro que desea suspender la medicación '{{ $med->nombre_medicamento }}'?"

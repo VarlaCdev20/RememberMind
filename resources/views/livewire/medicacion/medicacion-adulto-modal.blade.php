@@ -42,6 +42,17 @@
                     Datos del Medicamento
                 </h4>
                 <div class="grid gap-4 sm:grid-cols-3">
+                    <label class="sm:col-span-3 flex items-center gap-3 rounded-xl border border-borde bg-fondo-app p-3 text-xs font-bold text-titulo">
+                        <input type="checkbox" wire:model.live="es_prn" class="rounded border-borde text-boton-principal focus:ring-boton-principal">
+                        Medicación PRN (administrar solo cuando exista la condición indicada)
+                    </label>
+                    @if($es_prn)
+                        <div class="sm:col-span-3">
+                            <label class="mb-1.5 block text-[10px] font-bold uppercase tracking-wider text-parrafo/70">Condición clínica para administrar *</label>
+                            <textarea wire:model="condicion_prn" rows="2" class="w-full rounded-xl border border-borde bg-fondo-app px-3.5 py-2.5 text-xs font-bold text-parrafo" placeholder="Ej.: Dolor ≥ 6/10 después de valoración de Enfermería"></textarea>
+                            @error('condicion_prn') <span class="mt-1 block text-[10px] font-bold text-estado-peligro">{{ $message }}</span> @enderror
+                        </div>
+                    @endif
                     <div class="sm:col-span-3">
                         <label class="mb-1.5 block text-[10px] font-bold uppercase tracking-wider text-parrafo/70">Nombre del Medicamento / Principio Activo *</label>
                         <div class="relative">
@@ -52,7 +63,7 @@
                         @error('nombre_medicamento') <span class="mt-1 block text-[10px] font-bold text-estado-peligro">{{ $message }}</span> @enderror
                     </div>
 
-                    <div>
+                    <div @class(['opacity-50' => $es_prn])>
                         <label class="mb-1.5 block text-[10px] font-bold uppercase tracking-wider text-parrafo/70">Dosis *</label>
                         <input type="text" wire:model="dosis" placeholder="Ej: 50mg, 1 comp."
                             class="w-full rounded-xl border {{ $errors->has('dosis') ? 'border-estado-peligroBorde' : 'border-borde' }} bg-fondo-app px-3.5 py-2.5 text-xs font-bold text-parrafo outline-none transition focus:border-boton-principal focus:ring-2 focus:ring-boton-principal/20">
@@ -109,10 +120,18 @@
 
                     <div>
                         <label class="mb-1.5 block text-[10px] font-bold uppercase tracking-wider text-parrafo/70">Hora Programada *</label>
-                        <input type="time" wire:model="hora_programada"
+                        <input type="time" wire:model="hora_programada" @disabled($es_prn)
                             class="w-full rounded-xl border {{ $errors->has('hora_programada') ? 'border-estado-peligroBorde' : 'border-borde' }} bg-fondo-app px-3.5 py-2.5 text-xs font-bold text-parrafo outline-none transition focus:border-boton-principal focus:ring-2 focus:ring-boton-principal/20">
                         @error('hora_programada') <span class="mt-1 block text-[10px] font-bold text-estado-peligro">{{ $message }}</span> @enderror
                     </div>
+
+                    @if(!$es_prn)
+                        <div>
+                            <label class="mb-1.5 block text-[10px] font-bold uppercase tracking-wider text-parrafo/70">Intervalo en horas</label>
+                            <input type="number" min="1" max="24" wire:model="intervalo_horas" placeholder="Ej.: 8" class="w-full rounded-xl border border-borde bg-fondo-app px-3.5 py-2.5 text-xs font-bold text-parrafo">
+                            @error('intervalo_horas') <span class="mt-1 block text-[10px] font-bold text-estado-peligro">{{ $message }}</span> @enderror
+                        </div>
+                    @endif
 
                     <div>
                         <label class="mb-1.5 block text-[10px] font-bold uppercase tracking-wider text-parrafo/70">Fecha Inicio *</label>

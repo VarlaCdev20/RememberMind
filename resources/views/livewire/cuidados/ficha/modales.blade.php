@@ -47,6 +47,20 @@
                         </span>
                     </div>
                 </div>
+                <div>
+                    <label class="font-bold text-parrafo block mb-1">Posición durante el control</label>
+                    <select wire:model="signoPosicion" class="rm-input w-full text-xs"><option value="">No registrada</option><option>SENTADO</option><option>ACOSTADO</option><option>DE_PIE</option></select>
+                </div>
+                <div class="flex items-center gap-2 pt-5">
+                    <input id="signo-oxigeno" type="checkbox" wire:model="signoUsaOxigeno" class="rounded border-borde text-boton-principal">
+                    <label for="signo-oxigeno" class="font-bold text-parrafo">Usa oxígeno</label>
+                </div>
+                @error('signoPA')
+                    <label class="col-span-2 flex items-start gap-2 rounded-xl border border-estado-advertenciaBorde bg-estado-advertenciaBg p-3 text-xs font-bold text-titulo">
+                        <input type="checkbox" wire:model="signoConfirmarAtipico" class="mt-0.5 rounded border-borde text-boton-principal">
+                        Confirmo que repetí la medición y deseo conservar este valor atípico.
+                    </label>
+                @enderror
                 <div class="col-span-2">
                     <label class="font-bold text-parrafo block mb-1">Observaciones</label>
                     <textarea wire:model="signoObs" rows="2" placeholder="Notas clínicas adicionales..." class="rm-input w-full text-xs"></textarea>
@@ -88,16 +102,28 @@
                         <button type="button"
                                 wire:click="$set('medAccion', 'OMITIR')"
                                 class="rounded-xl py-2 font-bold text-center border transition {{ $medAccion === 'OMITIR' ? 'bg-amber-50 text-amber-800 border-amber-300' : 'bg-fondo-card text-apoyo border-borde' }}">
-                            <i class="ph-bold ph-warning mr-1"></i> Omitida / Rechazo
+                            <i class="ph-bold ph-warning mr-1"></i> Omitida
                         </button>
+                        <button type="button" wire:click="$set('medAccion', 'RECHAZAR')" class="rounded-xl py-2 font-bold text-center border transition {{ $medAccion === 'RECHAZAR' ? 'bg-estado-advertenciaBg text-estado-advertencia border-estado-advertenciaBorde' : 'bg-fondo-card text-apoyo border-borde' }}"><i class="ph-bold ph-hand mr-1"></i> Rechazada</button>
+                        <button type="button" wire:click="$set('medAccion', 'NO_DISPONIBLE')" class="rounded-xl py-2 font-bold text-center border transition {{ $medAccion === 'NO_DISPONIBLE' ? 'bg-estado-peligroBg text-estado-peligro border-estado-peligroBorde' : 'bg-fondo-card text-apoyo border-borde' }}"><i class="ph-bold ph-package mr-1"></i> No disponible</button>
                     </div>
                 </div>
 
-                @if($medAccion === 'OMITIR')
+                @if($medAccion !== 'ADMINISTRAR')
                     <div>
                         <label class="font-bold text-rose-700 block mb-1">Motivo de Omisión *</label>
                         <textarea wire:model="medMotivoOmision" rows="2" placeholder="Rechazo del paciente, náuseas, etc." class="rm-input w-full text-xs"></textarea>
                         @error('medMotivoOmision') <span class="text-rose-600 text-[10px] font-bold">{{ $message }}</span> @enderror
+                    </div>
+                @endif
+
+                @if($medEsPrn && $medAccion === 'ADMINISTRAR')
+                    <div class="rounded-xl border border-estado-advertenciaBorde bg-estado-advertenciaBg p-3 space-y-3">
+                        <p class="text-xs font-black text-titulo">PRN · {{ $medCondicionPrn }}</p>
+                        <label class="block font-bold text-parrafo">Síntoma o motivo actual *<textarea wire:model="medMotivoPrn" rows="2" class="rm-input mt-1 w-full text-xs"></textarea>@error('medMotivoPrn')<span class="text-estado-peligro text-[10px] font-bold">{{ $message }}</span>@enderror</label>
+                        <label class="block font-bold text-parrafo">Valoración previa *<textarea wire:model="medValoracionPrevia" rows="2" class="rm-input mt-1 w-full text-xs"></textarea>@error('medValoracionPrevia')<span class="text-estado-peligro text-[10px] font-bold">{{ $message }}</span>@enderror</label>
+                        <label class="block font-bold text-parrafo">Intensidad 0–10<input wire:model="medIntensidadPrevia" type="number" min="0" max="10" class="rm-input mt-1 w-full text-xs"></label>
+                        <p class="text-[10px] font-bold text-apoyo">Se programará una reevaluación una hora después.</p>
                     </div>
                 @endif
 

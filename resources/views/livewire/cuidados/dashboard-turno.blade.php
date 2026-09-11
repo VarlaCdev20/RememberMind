@@ -6,7 +6,7 @@
                 <div class="flex flex-wrap items-center gap-2">
                     <span class="inline-flex items-center gap-1.5 rounded-lg border border-boton-principal/20 bg-boton-principal/5 px-2.5 py-1 text-xs font-bold text-boton-principal">
                         <i class="ph-bold ph-shield-check text-sm"></i>
-                        <span>Dashboard de Enfermería</span>
+                        <span>{{ $esSuperAdmin ? 'Supervisión global de Enfermería' : 'Dashboard de Enfermería' }}</span>
                     </span>
 
                     @if($turnoActual)
@@ -37,23 +37,32 @@
 
                 <div class="flex items-baseline gap-2">
                     <h1 class="text-xl font-black tracking-tight text-titulo">
-                        Cola Operativa de Guardia
+                        {{ $esSuperAdmin ? 'Panel institucional de cuidados' : 'Cola Operativa de Guardia' }}
                     </h1>
                     <span class="text-xs text-apoyo">|</span>
                     <p class="text-xs font-semibold text-apoyo">
-                        Enfermero(a): <strong class="text-parrafo">{{ auth()->user()->nombres }} {{ auth()->user()->ap_paterno }}</strong>
+                        {{ $esSuperAdmin ? 'Cobertura: todos los residentes y turnos' : 'Enfermero(a):' }}
+                        @unless($esSuperAdmin)<strong class="text-parrafo">{{ auth()->user()->nombres }} {{ auth()->user()->ap_paterno }}</strong>@endunless
                     </p>
                 </div>
             </div>
 
             <div class="flex items-center gap-2">
+                <a href="{{ route('admin.enfermeria.agenda') }}" class="rm-btn-secondary px-3.5 py-2 text-xs font-bold">
+                    <i class="ph-bold ph-calendar-check text-sm"></i>
+                    <span>Agenda</span>
+                </a>
+                <a href="{{ route('admin.enfermeria.registros') }}" class="rm-btn-secondary px-3.5 py-2 text-xs font-bold">
+                    <i class="ph-bold ph-notebook text-sm"></i>
+                    <span>{{ $esSuperAdmin ? 'Cuidados e incidentes' : 'Registrar cuidado' }}</span>
+                </a>
                 <button wire:click="$refresh" class="rm-btn-secondary px-3.5 py-2 text-xs font-bold">
                     <i class="ph-bold ph-arrows-clockwise text-sm"></i>
                     <span>Actualizar</span>
                 </button>
                 <a href="{{ route('admin.enfermeria.pacientes') }}" class="rm-btn-primary px-3.5 py-2 text-xs font-bold">
                     <i class="ph-bold ph-users text-sm"></i>
-                    <span>Mis Pacientes ({{ $stats['pacientes'] }})</span>
+                    <span>{{ $esSuperAdmin ? 'Todos los residentes' : 'Mis Pacientes' }} ({{ $stats['pacientes'] }})</span>
                 </a>
             </div>
         </div>
@@ -67,7 +76,7 @@
                     <i class="ph-bold ph-users text-sm"></i>
                 </div>
                 <p class="text-xl font-black text-titulo mt-1">{{ $stats['pacientes'] }}</p>
-                <span class="text-[10px] font-medium text-apoyo">Asignados en turno</span>
+                <span class="text-[10px] font-medium text-apoyo">{{ $esSuperAdmin ? 'Cobertura institucional' : 'Asignados en turno' }}</span>
             </a>
 
             {{-- Alertas --}}
@@ -124,6 +133,25 @@
                 <span class="text-[10px] font-medium text-apoyo">Relevo de guardia</span>
             </a>
         </div>
+
+        @if($esSuperAdmin)
+            <div class="mt-3 grid grid-cols-2 gap-3 border-t border-borde pt-3 md:grid-cols-4">
+                @foreach([
+                    ['cuidados_registrados', 'Cuidados de hoy', 'ph-hand-heart', 'admin.enfermeria.registros'],
+                    ['incidentes_abiertos', 'Incidentes abiertos', 'ph-warning-octagon', 'admin.enfermeria.registros'],
+                    ['lesiones_activas', 'Lesiones activas', 'ph-bandaids', 'admin.enfermeria.registros'],
+                    ['dispositivos_activos', 'Dispositivos activos', 'ph-first-aid-kit', 'admin.enfermeria.registros'],
+                ] as [$clave, $etiqueta, $icono, $ruta])
+                    <a href="{{ route($ruta) }}" class="rounded-xl border border-borde bg-fondo-card/50 p-3 transition hover:border-boton-principal">
+                        <div class="flex items-center justify-between text-apoyo">
+                            <span class="text-[10px] font-bold uppercase tracking-wider">{{ $etiqueta }}</span>
+                            <i class="ph-bold {{ $icono }} text-sm"></i>
+                        </div>
+                        <p class="mt-1 text-xl font-black text-titulo">{{ $stats[$clave] }}</p>
+                    </a>
+                @endforeach
+            </div>
+        @endif
     </div>
 
     {{-- 3. SECCIÓN PRINCIPAL: PACIENTES PRIORITARIOS (TABLA INSTITUCIONAL, 3-5 RESIDENTES) --}}

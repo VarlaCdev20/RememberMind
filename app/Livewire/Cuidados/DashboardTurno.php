@@ -7,8 +7,12 @@ use App\Models\AdministracionMedicacion;
 use App\Models\AdultoMayor;
 use App\Models\AlertaAdulto;
 use App\Models\MedicacionAdulto;
+use App\Models\DispositivoResidente;
+use App\Models\IncidenteResidente;
+use App\Models\LesionResidente;
 use App\Models\PaseTurno;
 use App\Models\Preadmision;
+use App\Models\RegistroCuidado;
 use App\Models\SeguimientoDiario;
 use App\Models\SignosVitalesAdulto;
 use App\Models\TareaPlanCuidado;
@@ -89,10 +93,9 @@ class DashboardTurno extends Component
         $this->turnosActivos = TurnoEnfermeria::activos()->orderBy('orden')->get();
         $this->turnoActual = $service->obtenerTurnoActivo(Auth::user(), $this->filtroFecha);
 
-        $this->pacientesAsignadosIds = $service->obtenerPacientesAsignadosIds(
-            Auth::user(),
-            $this->turnoActual?->cod_turno
-        );
+        $this->pacientesAsignadosIds = $service->esSuperAdmin(Auth::user())
+            ? $service->obtenerPacientesAsignadosIds(Auth::user())
+            : $service->obtenerPacientesAsignadosIds(Auth::user(), $this->turnoActual?->cod_turno);
     }
 
     // ─── ACCIONES DE TAREAS ──────────────────────────────────────────
@@ -536,11 +539,12 @@ class DashboardTurno extends Component
     {
         $service = app(TurnoEnfermeriaService::class);
         $esSuperAdmin = $service->esSuperAdmin(Auth::user());
+        $turnoAlcance = $esSuperAdmin ? null : $this->turnoActual?->cod_turno;
 
-        // 1. Pacientes asignados
+        // 1. Alcance: global para supervisión; turno asignado para Enfermería.
         $pacientesQuery = $service->obtenerPacientesAsignadosQuery(
             Auth::user(),
-            $this->turnoActual?->cod_turno
+            $turnoAlcance
         )->with(['habitacion', 'cama', 'planCuidadoActivo']);
 
         $pacientesAsignados = $pacientesQuery->get();
@@ -585,9 +589,9 @@ class DashboardTurno extends Component
             ->whereIn('cod_am', $codAms)
             ->whereIn('estado', ['PENDIENTE', 'EN_PROCESO']);
 
-        if ($this->turnoActual) {
-            $tareasQuery->where(function ($q) {
-                $q->where('cod_turno', $this->turnoActual->cod_turno)
+        if ($turnoAlcance) {
+            $tareasQuery->where(function ($q) use ($turnoAlcance) {
+                $q->where('cod_turno', $turnoAlcance)
                   ->orWhereNull('cod_turno');
             });
         }
@@ -618,7 +622,7 @@ class DashboardTurno extends Component
         // 6. Seguimientos faltantes en el turno
         $seguimientosHoy = SeguimientoDiario::whereIn('cod_am', $codAms)
             ->whereDate('fecha', $this->filtroFecha)
-            ->when($this->turnoActual, fn ($q) => $q->where('cod_turno', $this->turnoActual->cod_turno))
+            ->when($turnoAlcance, fn ($q) => $q->where('cod_turno', $turnoAlcance))
             ->pluck('cod_am')
             ->toArray();
 
@@ -646,6 +650,19 @@ class DashboardTurno extends Component
                 ->first();
         }
 
+        $registrosCuidadosHoy = RegistroCuidado::whereIn('cod_am', $codAms)
+            ->whereDate('fecha_hora_evento', $this->filtroFecha)
+            ->count();
+        $incidentesAbiertos = IncidenteResidente::whereIn('cod_am', $codAms)
+            ->whereIn('estado', ['ABIERTO', 'EN_SEGUIMIENTO'])
+            ->count();
+        $lesionesActivas = LesionResidente::whereIn('cod_am', $codAms)
+            ->where('estado', 'ACTIVA')
+            ->count();
+        $dispositivosActivos = DispositivoResidente::whereIn('cod_am', $codAms)
+            ->where('estado', 'ACTIVO')
+            ->count();
+
         // Estadísticas consolidadas reales
         $stats = [
             'pacientes' => count($codAms),
@@ -658,6 +675,10 @@ class DashboardTurno extends Component
             'seguimientos_faltantes' => $seguimientosFaltantes->count(),
             'valoraciones_pendientes' => $valoracionesPendientes->count(),
             'pase_estado' => $paseTurnoHoy ? $paseTurnoHoy->estado : 'NO INICIADO',
+            'cuidados_registrados' => $registrosCuidadosHoy,
+            'incidentes_abiertos' => $incidentesAbiertos,
+            'lesiones_activas' => $lesionesActivas,
+            'dispositivos_activos' => $dispositivosActivos,
         ];
 
         // 10. Datos para Gráfica 1: Cumplimiento del turno (% tareas y seguimientos con datos 100% reales)

@@ -386,9 +386,25 @@ class RolesAndPermissionsSeeder extends Seeder
             Permission::firstOrCreate(['name' => $perm, 'guard_name' => 'web']);
         }
 
+        $permisosGestionOrdenMedica = [
+            'medicacion.crear', 'medicacion.editar', 'medicacion.suspender',
+            'salud.medicacion.crear', 'salud.medicacion.editar',
+            'salud.medicacion.suspender', 'salud.medicacion.finalizar', 'salud.medicacion.anular',
+        ];
+        $permisosEdicionHistoriaClinica = [
+            'signos_vitales.editar', 'salud.signos.editar', 'salud.signos.anular',
+            'ficha_medica.crear', 'ficha_medica.editar', 'ficha_medica.archivar',
+            'salud.ficha.crear', 'salud.ficha.editar', 'salud.ficha.archivar',
+            'salud.ficha.anular', 'salud.ficha.restaurar',
+        ];
+
         $rolesModels['ENFERMEROS']->syncPermissions(array_merge(
-            $permisosClinicos,
-            array_diff($permisosEnfermeria, ['valoracion_medica.ver', 'valoracion_medica.crear', 'valoracion_medica.editar', 'valoracion_medica.anular']),
+            array_diff($permisosClinicos, array_merge($permisosGestionOrdenMedica, $permisosEdicionHistoriaClinica)),
+            array_diff($permisosEnfermeria, array_merge(
+                ['valoracion_medica.ver', 'valoracion_medica.crear', 'valoracion_medica.editar', 'valoracion_medica.anular'],
+                $permisosGestionOrdenMedica,
+                $permisosEdicionHistoriaClinica
+            )),
             ['salud.ver', 'valoracion_enfermeria.ver']
         ));
 

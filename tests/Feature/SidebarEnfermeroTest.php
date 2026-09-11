@@ -40,11 +40,15 @@ class SidebarEnfermeroTest extends TestCase
         $this->assertSame('Enfermería', $secEnfermeria['title']);
         $labelsEnfermeria = array_column($secEnfermeria['items'], 'label');
         $this->assertSame([
-            'Inicio',
+            'Mi turno',
             'Mis pacientes',
+            'Agenda',
+            'Medicación',
             'Valoraciones iniciales',
             'Alertas',
-            'Pase de turno',
+            'Registros',
+            'Evolución 360°',
+            'Entrega de turno',
         ], $labelsEnfermeria);
 
         // Rutas de Enfermería
@@ -52,8 +56,12 @@ class SidebarEnfermeroTest extends TestCase
         $this->assertSame([
             'admin.enfermeria.dashboard',
             'admin.enfermeria.pacientes',
+            'admin.enfermeria.agenda',
+            'admin.salud-seguimiento.medicacion.index',
             'admin.admision.valoracion-enfermeria',
             'admin.enfermeria.alertas',
+            'admin.enfermeria.registros',
+            'admin.enfermeria.pacientes',
             'admin.enfermeria.pase-turno',
         ], $routesEnfermeria);
 
@@ -152,11 +160,15 @@ class SidebarEnfermeroTest extends TestCase
 
         // Textos del nuevo sidebar
         $response->assertSee('Enfermería');
-        $response->assertSee('Inicio');
+        $response->assertSee('Mi turno');
         $response->assertSee('Mis pacientes');
+        $response->assertSee('Agenda');
+        $response->assertSee('Medicación');
         $response->assertSee('Valoraciones iniciales');
         $response->assertSee('Alertas');
-        $response->assertSee('Pase de turno');
+        $response->assertSee('Registros');
+        $response->assertSee('Evolución 360°');
+        $response->assertSee('Entrega de turno');
         $response->assertSee('Información');
         $response->assertSee('Reportes');
 

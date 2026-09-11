@@ -10,7 +10,6 @@
                 ['Visitas familiares', 'admin.familia-social.visitas', 'Vista base sin flujo ni persistencia.'],
                 ['Ficha social', 'admin.familia-social.ficha-social', 'Vista base sin flujo ni persistencia.'],
                 ['Reportes de voluntariado', 'admin.voluntariado.reportes.index', 'Reutiliza el resumen; no es un reporte independiente.'],
-                ['Actividades de Enfermería', 'admin.enfermeria.actividades', 'Reutiliza el dashboard de turno.'],
                 ['Reportes de Enfermería', 'admin.enfermeria.reportes', 'Reutiliza el dashboard de turno.'],
             ],
             'Portales ocultos o pendientes' => [

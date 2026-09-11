@@ -29,8 +29,11 @@ class MedicacionAdulto extends Model
         'nombre_medicamento',
         'dosis',
         'frecuencia',
+        'es_prn',
+        'condicion_prn',
         'via_administracion',
         'hora_programada',
+        'intervalo_horas',
         'fecha_inicio',
         'fecha_fin',
         'medico_indica',
@@ -44,6 +47,8 @@ class MedicacionAdulto extends Model
         'fecha_inicio'    => 'date',
         'fecha_fin'       => 'date',
         'hora_programada' => 'datetime:H:i',
+        'es_prn'           => 'boolean',
+        'intervalo_horas'  => 'integer',
     ];
 
     public function getActivitylogOptions(): LogOptions

@@ -17,6 +17,9 @@ class MedicacionAdultoModal extends Component
     public $nombre_medicamento = '';
     public $dosis = '';
     public $frecuencia = '';
+    public bool $es_prn = false;
+    public $condicion_prn = '';
+    public $intervalo_horas = null;
     public $via_administracion = '';
     public $hora_programada = '';
     public $fecha_inicio = '';
@@ -34,7 +37,10 @@ class MedicacionAdultoModal extends Component
             'dosis' => 'required|string|max:50',
             'frecuencia' => 'required|string|max:100',
             'via_administracion' => 'required|string|max:50',
-            'hora_programada' => 'required|date_format:H:i',
+            'hora_programada' => 'required_unless:es_prn,true|nullable|date_format:H:i',
+            'es_prn' => 'boolean',
+            'condicion_prn' => 'required_if:es_prn,true|nullable|string|min:5|max:500',
+            'intervalo_horas' => 'nullable|integer|min:1|max:24',
             'fecha_inicio' => 'required|date',
             'fecha_fin' => 'nullable|date|after_or_equal:fecha_inicio',
             'medico_indica' => 'nullable|string|max:100',
@@ -53,6 +59,8 @@ class MedicacionAdultoModal extends Component
             'via_administracion.required' => 'La vía de administración es obligatoria.',
             'hora_programada.required' => 'La hora es obligatoria.',
             'hora_programada.date_format' => 'La hora programada debe tener el formato HH:MM.',
+            'condicion_prn.required_if' => 'La medicación PRN requiere una condición clínica explícita.',
+            'intervalo_horas.min' => 'El intervalo mínimo es de una hora.',
             'fecha_inicio.required' => 'La fecha de inicio es obligatoria.',
             'fecha_fin.after_or_equal' => 'La fecha de fin debe ser posterior o igual a la de inicio.',
             'cod_am.required' => 'Debe seleccionar un adulto mayor.',
@@ -61,6 +69,7 @@ class MedicacionAdultoModal extends Component
 
     public function abrirModalMedicacion($cod_am, $id_med = null)
     {
+        $this->autorizarGestionOrden();
         $permiso = $id_med ? ['medicacion.editar', 'salud.medicacion.editar'] : ['medicacion.crear', 'salud.medicacion.crear'];
         abort_unless(auth()->user()?->canAny($permiso), 403);
         $this->resetValidation();
@@ -97,6 +106,9 @@ class MedicacionAdultoModal extends Component
         $this->nombre_medicamento = $med->nombre_medicamento;
         $this->dosis = $med->dosis;
         $this->frecuencia = $med->frecuencia;
+        $this->es_prn = (bool) $med->es_prn;
+        $this->condicion_prn = $med->condicion_prn;
+        $this->intervalo_horas = $med->intervalo_horas;
         $this->via_administracion = $med->via_administracion;
         $this->hora_programada = $med->hora_programada ? \Carbon\Carbon::parse($med->hora_programada)->format('H:i') : null;
         $this->fecha_inicio = $med->fecha_inicio ? $med->fecha_inicio->format('Y-m-d') : null;
@@ -113,6 +125,9 @@ class MedicacionAdultoModal extends Component
         $this->nombre_medicamento = '';
         $this->dosis = '';
         $this->frecuencia = '';
+        $this->es_prn = false;
+        $this->condicion_prn = '';
+        $this->intervalo_horas = null;
         $this->via_administracion = '';
         $this->hora_programada = '';
         $this->fecha_inicio = '';
@@ -125,6 +140,7 @@ class MedicacionAdultoModal extends Component
 
     public function guardar()
     {
+        $this->autorizarGestionOrden();
         $permiso = $this->isEditing ? ['medicacion.editar', 'salud.medicacion.editar'] : ['medicacion.crear', 'salud.medicacion.crear'];
         abort_unless(auth()->user()?->canAny($permiso), 403);
         $this->validate();
@@ -134,8 +150,11 @@ class MedicacionAdultoModal extends Component
             'nombre_medicamento' => trim($this->nombre_medicamento),
             'dosis' => trim($this->dosis),
             'frecuencia' => trim($this->frecuencia),
+            'es_prn' => $this->es_prn,
+            'condicion_prn' => $this->es_prn ? trim($this->condicion_prn) : null,
+            'intervalo_horas' => $this->es_prn ? null : $this->intervalo_horas,
             'via_administracion' => trim($this->via_administracion),
-            'hora_programada' => $this->hora_programada,
+            'hora_programada' => $this->es_prn ? null : $this->hora_programada,
             'fecha_inicio' => $this->fecha_inicio,
             'fecha_fin' => $this->fecha_fin ?: null,
             'medico_indica' => filled($this->medico_indica) ? trim($this->medico_indica) : null,
@@ -165,6 +184,7 @@ class MedicacionAdultoModal extends Component
 
     public function cambiarEstado($id, $estado)
     {
+        $this->autorizarGestionOrden();
         abort_unless(auth()->user()?->canAny(['medicacion.editar', 'salud.medicacion.editar']), 403);
         validator(['estado' => $estado], ['estado' => ['required', Rule::in(['ACTIVO', 'PAUSADO', 'EN REVISION', 'SUSPENDIDO', 'FINALIZADO'])]])->validate();
         $med = MedicacionAdulto::where('cod_am', $this->cod_am)->findOrFail($id);
@@ -193,5 +213,14 @@ class MedicacionAdultoModal extends Component
             'adultosDisponibles' => $adultosDisponibles,
             'adultoSeleccionado' => $adultoSeleccionado,
         ]);
+    }
+
+    private function autorizarGestionOrden(): void
+    {
+        abort_unless(
+            auth()->user()?->hasAnyRole(['SUPERADMINISTRADOR', 'MEDICO GENERAL/GERIATRA']),
+            403,
+            'Las órdenes médicas solo pueden ser creadas o modificadas por personal médico autorizado.'
+        );
     }
 }

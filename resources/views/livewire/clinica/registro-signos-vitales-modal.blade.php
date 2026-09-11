@@ -58,19 +58,19 @@
                 <div class="grid grid-cols-2 gap-3 sm:grid-cols-3">
                     <div>
                         <label class="mb-1 block text-[10px] font-bold text-apoyo">PA Sistólica (mmHg)</label>
-                        <input wire:model.live="pa_sistolica" type="number" min="50" max="300" placeholder="120"
+                        <input wire:model.live="pa_sistolica" type="number" min="1" max="400" placeholder="120"
                                class="w-full rounded-xl border @error('pa_sistolica') border-estado-error @else border-borde @enderror bg-fondo-panel px-3 py-2 text-sm font-bold text-titulo outline-none focus:border-borde-focus">
                         @error('pa_sistolica')<span class="text-[9px] font-bold text-estado-error">{{ $message }}</span>@enderror
                     </div>
                     <div>
                         <label class="mb-1 block text-[10px] font-bold text-apoyo">PA Diastólica (mmHg)</label>
-                        <input wire:model.live="pa_diastolica" type="number" min="30" max="200" placeholder="80"
+                        <input wire:model.live="pa_diastolica" type="number" min="1" max="400" placeholder="80"
                                class="w-full rounded-xl border @error('pa_diastolica') border-estado-error @else border-borde @enderror bg-fondo-panel px-3 py-2 text-sm font-bold text-titulo outline-none focus:border-borde-focus">
                         @error('pa_diastolica')<span class="text-[9px] font-bold text-estado-error">{{ $message }}</span>@enderror
                     </div>
                     <div>
                         <label class="mb-1 block text-[10px] font-bold text-apoyo">Frec. Cardaca (bpm)</label>
-                        <input wire:model.live="fc" type="number" min="20" max="300" placeholder="70"
+                        <input wire:model.live="fc" type="number" min="1" max="300" placeholder="70"
                                class="w-full rounded-xl border @error('fc') border-estado-error @else border-borde @enderror bg-fondo-panel px-3 py-2 text-sm font-bold text-titulo outline-none focus:border-borde-focus">
                         @error('fc')<span class="text-[9px] font-bold text-estado-error">{{ $message }}</span>@enderror
                     </div>
@@ -81,6 +81,12 @@
                     <i class="ph-bold ph-warning text-sm"></i>
                     PA {{ $pa_sistolica > 140 ? 'elevada' : 'baja' }} — requiere atención médica
                 </div>
+                @endif
+                @if(is_numeric($pa_sistolica) && is_numeric($pa_diastolica) && (int) $pa_sistolica <= (int) $pa_diastolica)
+                <label class="mt-2 flex cursor-pointer items-start gap-2 rounded-lg bg-estado-advertenciaBg px-3 py-2 text-xs font-bold text-estado-advertencia">
+                    <input wire:model="confirmar_presion_atipica" type="checkbox" class="mt-0.5 rounded border-borde text-boton-acento focus:ring-boton-acento">
+                    <span>Repetí la medición y confirmo que estos valores atípicos son correctos.</span>
+                </label>
                 @endif
             </div>
 
@@ -93,12 +99,12 @@
                 <div class="grid grid-cols-2 gap-3">
                     <div>
                         <label class="mb-1 block text-[10px] font-bold text-apoyo">Frec. Respiratoria (rpm)</label>
-                        <input wire:model.live="fr" type="number" min="5" max="60" placeholder="16"
+                        <input wire:model.live="fr" type="number" min="1" max="100" placeholder="16"
                                class="w-full rounded-xl border @error('fr') border-estado-error @else border-borde @enderror bg-fondo-panel px-3 py-2 text-sm font-bold text-titulo outline-none focus:border-borde-focus">
                     </div>
                     <div>
                         <label class="mb-1 block text-[10px] font-bold text-apoyo">Saturación O2 (%)</label>
-                        <input wire:model.live="saturacion" type="number" min="50" max="100" placeholder="98"
+                        <input wire:model.live="saturacion" type="number" min="0" max="100" placeholder="98"
                                class="w-full rounded-xl border @error('saturacion') border-estado-error @else border-borde @enderror bg-fondo-panel px-3 py-2 text-sm font-bold text-titulo outline-none focus:border-borde-focus">
                         @error('saturacion')<span class="text-[9px] font-bold text-estado-error">{{ $message }}</span>@enderror
                     </div>
@@ -120,12 +126,12 @@
                 <div class="grid grid-cols-2 gap-3">
                     <div>
                         <label class="mb-1 block text-[10px] font-bold text-apoyo">Temperatura (°C)</label>
-                        <input wire:model.live="temperatura" type="number" step="0.1" min="30" max="44" placeholder="36.5"
+                        <input wire:model.live="temperatura" type="number" step="0.1" min="25" max="45" placeholder="36.5"
                                class="w-full rounded-xl border @error('temperatura') border-estado-error @else border-borde @enderror bg-fondo-panel px-3 py-2 text-sm font-bold text-titulo outline-none focus:border-borde-focus">
                     </div>
                     <div>
                         <label class="mb-1 block text-[10px] font-bold text-apoyo">Glucosa (mg/dL)</label>
-                        <input wire:model.live="glucosa" type="number" step="0.1" min="0" max="800" placeholder="100"
+                        <input wire:model.live="glucosa" type="number" step="0.1" min="0" placeholder="100"
                                class="w-full rounded-xl border border-borde bg-fondo-panel px-3 py-2 text-sm font-bold text-titulo outline-none focus:border-borde-focus">
                     </div>
                 </div>
