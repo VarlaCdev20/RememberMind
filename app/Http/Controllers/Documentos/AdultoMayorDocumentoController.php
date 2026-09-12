@@ -38,12 +38,19 @@ class AdultoMayorDocumentoController extends Controller
         return redirect()->route('admin.adultos-mayores.documentos.index', $adulto_mayor->cod_am)->with('success', 'Documento subido correctamente.');
     }
 
-    public function archivo(AdultoMayor $adulto_mayor, string $documento)
+    public function archivo(Request $request, AdultoMayor $adulto_mayor, string $documento)
     {
         $doc = $adulto_mayor->documentos()->findOrFail($documento);
         $disco = \Illuminate\Support\Facades\Storage::disk('local');
         if (!$disco->exists($doc->ruta_archivo)) $disco = \Illuminate\Support\Facades\Storage::disk('public');
         abort_unless($disco->exists($doc->ruta_archivo), 404, 'Archivo no disponible.');
+
+        if ($request->has('ver') || $request->has('preview') || $request->has('inline')) {
+            $path = $disco->path($doc->ruta_archivo);
+            $mime = $disco->mimeType($doc->ruta_archivo) ?: 'application/pdf';
+            return response()->file($path, ['Content-Type' => $mime]);
+        }
+
         return $disco->download($doc->ruta_archivo);
     }
 

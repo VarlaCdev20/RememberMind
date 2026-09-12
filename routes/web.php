@@ -751,12 +751,12 @@ Route::middleware([
                         ->defaults('seccion', 'reportes')
                         ->name('reportes');
 
-                    // Ficha clínica integrada por residente.
-                    Route::get('/residente/{adulto}', FichaClinicaIntegradaPanel::class)
+                    // Ficha médica y clínica integrada por residente (unificada con FichaPaciente).
+                    Route::get('/residente/{adulto}', \App\Livewire\Cuidados\FichaPaciente::class)
                         ->name('residente.ficha');
 
                     // Compatibilidad con enlaces existentes que todavía usan /paciente/.
-                    Route::get('/paciente/{adulto}', FichaClinicaIntegradaPanel::class)
+                    Route::get('/paciente/{adulto}', \App\Livewire\Cuidados\FichaPaciente::class)
                         ->name('paciente.ficha');
                 });
 

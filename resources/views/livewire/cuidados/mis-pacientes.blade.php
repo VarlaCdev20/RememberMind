@@ -1,4 +1,23 @@
-<div class="rm-pilot-enfermeria rm-page-layout font-sans space-y-4 max-w-7xl mx-auto">
+<div class="rm-pilot-enfermeria rm-page-layout font-sans space-y-4 max-w-7xl mx-auto"
+     x-data="{
+         modalSelectorAtencion: false,
+         residenteSeleccionado: {
+             cod_am: '',
+             nombre_completo: '',
+             edad_texto: '',
+             habitacion_texto: '',
+             cama_texto: '',
+             estado_humano: 'Vigilancia',
+             alertas_count: 0,
+             foto: '',
+             iniciales: ''
+         },
+         abrirSelectorAtencion(data) {
+             this.residenteSeleccionado = data;
+             this.modalSelectorAtencion = true;
+         }
+     }"
+     @keydown.escape.window="modalSelectorAtencion = false">
     <!-- 1. HEADER INSTITUCIONAL COMPACTO (90-110px) -->
     <header class="rm-page-header flex flex-col gap-3 border-b border-[var(--rm-border)] pb-3 md:flex-row md:items-center md:justify-between">
         <div>
@@ -295,68 +314,25 @@
                             <span>Ficha clínica</span>
                         </a>
 
-                        <!-- Registrar atención (Primary Azul con Dropdown contextual estructurado) -->
-                        <div x-data="{ open: false }" class="relative flex-1" @click.outside="open = false">
-                            <button type="button"
-                                    @click="open = !open"
-                                    class="rm-btn rm-btn-primary w-full justify-center h-10 px-3 text-xs font-bold inline-flex items-center gap-1.5 shadow-xs whitespace-nowrap"
-                                    title="Registrar atención">
-                                <i class="ph-bold ph-plus-circle text-base"></i>
-                                <span>Registrar atención</span>
-                                <i class="ph-bold ph-caret-down text-xs transition-transform" :class="open ? 'rotate-180' : ''"></i>
-                            </button>
-
-                            <div x-show="open"
-                                 x-transition:enter="transition ease-out duration-150"
-                                 x-transition:enter-start="opacity-0 translate-y-1 scale-95"
-                                 x-transition:enter-end="opacity-100 translate-y-0 scale-100"
-                                 x-transition:leave="transition ease-in duration-100"
-                                 x-transition:leave-start="opacity-100 translate-y-0 scale-100"
-                                 x-transition:leave-end="opacity-0 translate-y-1 scale-95"
-                                 x-cloak
-                                 class="absolute right-0 bottom-full mb-1.5 z-50 w-56 rounded-xl border border-[var(--rm-border)] bg-[var(--rm-surface)] p-1.5 shadow-xl divide-y divide-[var(--rm-border-soft)] text-left"
-                                 style="display: none;">
-                                <div class="px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-[var(--rm-text-muted)]">
-                                    Registrar Atención Clínica
-                                </div>
-                                <div class="py-1 space-y-0.5">
-                                    <button type="button"
-                                            @click="open = false; $wire.abrirRegistrarSignos('{{ $paciente->cod_am }}')"
-                                            class="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs font-medium text-[var(--rm-text-body)] hover:bg-[var(--rm-surface-alt)] transition">
-                                        <i class="ph-bold ph-heartbeat text-rose-500 text-sm"></i>
-                                        <span>Signos vitales</span>
-                                    </button>
-                                    <a href="{{ route('admin.enfermeria.registros', ['adulto' => $paciente->cod_am]) }}"
-                                       class="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs font-medium text-[var(--rm-text-body)] hover:bg-[var(--rm-surface-alt)] transition">
-                                        <i class="ph-bold ph-hand-heart text-[var(--rm-primary)] text-sm"></i>
-                                        <span>Cuidado de enfermería</span>
-                                    </a>
-                                    <button type="button"
-                                            @click="open = false; $wire.abrirAdministrarMed('{{ $paciente->cod_am }}')"
-                                            class="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs font-medium text-[var(--rm-text-body)] hover:bg-[var(--rm-surface-alt)] transition">
-                                        <i class="ph-bold ph-pill text-emerald-600 text-sm"></i>
-                                        <span>Medicación</span>
-                                    </button>
-                                    <button type="button"
-                                            @click="open = false; $wire.abrirRegistrarSeguimiento('{{ $paciente->cod_am }}')"
-                                            class="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs font-medium text-[var(--rm-text-body)] hover:bg-[var(--rm-surface-alt)] transition">
-                                        <i class="ph-bold ph-notebook text-sky-500 text-sm"></i>
-                                        <span>Seguimiento de guardia</span>
-                                    </button>
-                                    <button type="button"
-                                            @click="open = false; $wire.abrirReportarAlerta('{{ $paciente->cod_am }}')"
-                                            class="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs font-semibold text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition">
-                                        <i class="ph-bold ph-warning-octagon text-sm"></i>
-                                        <span>Incidente / Caída</span>
-                                    </a>
-                                    <a href="{{ route('admin.enfermeria.pacientes.ficha', ['adulto' => $paciente->cod_am, 'tab' => 'historial']) }}"
-                                       class="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs font-medium text-[var(--rm-text-body)] hover:bg-[var(--rm-surface-alt)] transition">
-                                        <i class="ph-bold ph-chart-line-up text-violet-500 text-sm"></i>
-                                        <span>Evolución clínica</span>
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
+                        <!-- Registrar atención (Botón directo que abre el Modal Central Clínico Golden Reference) -->
+                        <button type="button"
+                                @click="abrirSelectorAtencion({
+                                    cod_am: '{{ $paciente->cod_am }}',
+                                    nombre_completo: '{{ addslashes($paciente->nombre_completo) }}',
+                                    edad_texto: '{{ $paciente->edad_texto ?? ($paciente->edad . ' años') }}',
+                                    habitacion_texto: '{{ $paciente->habitacion_texto ?? ($paciente->habitacion?->codigo ?? 'HAB-D01') }}',
+                                    cama_texto: '{{ $paciente->cama_texto ?? ($paciente->cama?->codigo ?? 'CAM-D01-01') }}',
+                                    estado_humano: '{{ $paciente->estado_humano ?: 'Vigilancia' }}',
+                                    alertas_count: {{ (int) ($paciente->alertas_activas_count ?? 0) }},
+                                    foto: '{{ $paciente->foto ? asset('storage/' . $paciente->foto) : '' }}',
+                                    iniciales: '{{ strtoupper(substr($paciente->nombres, 0, 1) . substr($paciente->ap_paterno, 0, 1)) }}'
+                                })"
+                                class="rm-btn rm-btn-primary flex-1 justify-center h-10 px-3 text-xs font-bold inline-flex items-center gap-1.5 shadow-xs whitespace-nowrap cursor-pointer"
+                                title="Registrar atención clínica">
+                            <i class="ph-bold ph-plus-circle text-base"></i>
+                            <span>+ REGISTRAR ATENCIÓN</span>
+                        </button>
+                    
                     </div>
                 </article>
             @endforeach
@@ -487,59 +463,24 @@
                                         <span>Ficha clínica</span>
                                     </a>
 
-                                    <!-- Menú contextual (...) -->
-                                    <div x-data="{ open: false }" class="relative inline-block text-left" @click.outside="open = false">
-                                        <button @click="open = !open"
-                                                type="button"
-                                                class="rm-btn-icon h-8 w-8 rounded-lg border border-[var(--rm-border)] text-[var(--rm-text-muted)] hover:text-[var(--rm-text-title)] bg-[var(--rm-surface)] shadow-xs transition"
-                                                title="Más opciones">
-                                            <i class="ph-bold ph-dots-three-vertical text-sm"></i>
-                                        </button>
-                                        <div x-show="open"
-                                             x-transition:enter="transition ease-out duration-150"
-                                             x-transition:enter-start="opacity-0 translate-y-1 scale-95"
-                                             x-transition:enter-end="opacity-100 translate-y-0 scale-100"
-                                             x-transition:leave="transition ease-in duration-100"
-                                             x-transition:leave-start="opacity-100 translate-y-0 scale-100"
-                                             x-transition:leave-end="opacity-0 translate-y-1 scale-95"
-                                             x-cloak
-                                             class="absolute right-0 z-40 mt-1 w-52 rounded-xl border border-[var(--rm-border)] bg-[var(--rm-surface)] p-1.5 shadow-xl text-left divide-y divide-[var(--rm-border-soft)]"
-                                             style="display: none;">
-                                            <div class="py-1 space-y-0.5">
-                                                <button type="button"
-                                                        @click="open = false; $wire.abrirRegistrarSignos('{{ $paciente->cod_am }}')"
-                                                        class="flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-xs font-semibold text-[var(--rm-text-body)] hover:bg-[var(--rm-surface-alt)] transition">
-                                                    <i class="ph-bold ph-heartbeat text-sm text-rose-500"></i>
-                                                    <span>Registrar signos</span>
-                                                </button>
-                                                <button type="button"
-                                                        @click="open = false; $wire.abrirAdministrarMed('{{ $paciente->cod_am }}')"
-                                                        class="flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-xs font-semibold text-[var(--rm-text-body)] hover:bg-[var(--rm-surface-alt)] transition">
-                                                    <i class="ph-bold ph-pill text-sm text-emerald-600"></i>
-                                                    <span>Administrar medicación</span>
-                                                </button>
-                                                <button type="button"
-                                                        @click="open = false; $wire.abrirRegistrarSeguimiento('{{ $paciente->cod_am }}')"
-                                                        class="flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-xs font-semibold text-[var(--rm-text-body)] hover:bg-[var(--rm-surface-alt)] transition">
-                                                    <i class="ph-bold ph-notebook text-sm text-sky-500"></i>
-                                                    <span>Registrar seguimiento</span>
-                                                </button>
-                                            </div>
-                                            <div class="py-1 space-y-0.5">
-                                                <button type="button"
-                                                        @click="open = false; $wire.abrirReportarAlerta('{{ $paciente->cod_am }}')"
-                                                        class="flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-xs font-semibold text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition">
-                                                    <i class="ph-bold ph-bell-ringing text-sm"></i>
-                                                    <span>Reportar alerta / Incidente</span>
-                                                </button>
-                                                <a href="{{ route('admin.enfermeria.pacientes.ficha', ['adulto' => $paciente->cod_am, 'tab' => 'historial']) }}"
-                                                   class="flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-xs font-semibold text-[var(--rm-text-body)] hover:bg-[var(--rm-surface-alt)] transition">
-                                                    <i class="ph-bold ph-clock-counter-clockwise text-sm text-[var(--rm-primary)]"></i>
-                                                    <span>Ver historial rápido</span>
-                                                </a>
-                                            </div>
-                                        </div>
-                                    </div>
+                                    <!-- Botón Registrar Atención en tabla -->
+                                    <button type="button"
+                                            @click="abrirSelectorAtencion({
+                                                cod_am: '{{ $paciente->cod_am }}',
+                                                nombre_completo: '{{ addslashes($paciente->nombre_completo) }}',
+                                                edad_texto: '{{ $paciente->edad_texto ?? ($paciente->edad . ' años') }}',
+                                                habitacion_texto: '{{ $paciente->habitacion_texto ?? ($paciente->habitacion?->codigo ?? 'HAB-D01') }}',
+                                                cama_texto: '{{ $paciente->cama_texto ?? ($paciente->cama?->codigo ?? 'CAM-D01-01') }}',
+                                                estado_humano: '{{ $paciente->estado_humano ?: 'Vigilancia' }}',
+                                                alertas_count: {{ (int) ($paciente->alertas_activas_count ?? 0) }},
+                                                foto: '{{ $paciente->foto ? asset('storage/' . $paciente->foto) : '' }}',
+                                                iniciales: '{{ strtoupper(substr($paciente->nombres, 0, 1) . substr($paciente->ap_paterno, 0, 1)) }}'
+                                            })"
+                                            class="rm-btn rm-btn-xs rm-btn-primary h-8 px-2.5 text-xs font-bold inline-flex items-center gap-1 shadow-xs cursor-pointer"
+                                            title="Registrar atención clínica">
+                                        <i class="ph-bold ph-plus-circle text-xs"></i>
+                                        <span>+ REGISTRAR ATENCIÓN</span>
+                                    </button>
                                 </div>
                             </td>
                         </tr>
@@ -555,6 +496,323 @@
     </div>
 
     <!-- ── 7. MODALES OPERATIVOS RÁPIDOS ─────────────────────────────── -->
+
+    <!-- ============================================================= -->
+    <!-- MODAL CENTRAL CLÍNICO: REGISTRAR ATENCIÓN (GOLDEN REFERENCE) -->
+    <!-- ============================================================= -->
+    <div x-show="modalSelectorAtencion"
+         x-cloak
+         class="fixed inset-0 z-50 overflow-y-auto"
+         aria-labelledby="modal-title-atencion"
+         role="dialog"
+         aria-modal="true"
+         style="display: none;">
+        
+        {{-- Backdrop nítido oscuro suave (35-45% opacidad) --}}
+        <div x-show="modalSelectorAtencion"
+             x-transition:enter="ease-out duration-200"
+             x-transition:enter-start="opacity-0"
+             x-transition:enter-end="opacity-100"
+             x-transition:leave="ease-in duration-150"
+             x-transition:leave-start="opacity-100"
+             x-transition:leave-end="opacity-0"
+             @click="modalSelectorAtencion = false"
+             class="fixed inset-0 bg-slate-900/40 transition-opacity"></div>
+
+        {{-- Contenedor para centrado vertical y horizontal perfecto --}}
+        <div class="flex min-h-full items-center justify-center p-3 sm:p-5 text-center">
+            <div x-show="modalSelectorAtencion"
+                 x-transition:enter="ease-out duration-200"
+                 x-transition:enter-start="opacity-0 scale-95"
+                 x-transition:enter-end="opacity-100 scale-100"
+                 x-transition:leave="ease-in duration-150"
+                 x-transition:leave-start="opacity-100 scale-100"
+                 x-transition:leave-end="opacity-0 scale-95"
+                 @click.stop
+                 class="relative w-full max-w-[800px] max-h-[90vh] flex flex-col rounded-[20px] border border-[var(--rm-border)] bg-[var(--rm-surface)] shadow-2xl overflow-hidden text-left font-sans">
+                
+                {{-- Header del Modal --}}
+                <div class="p-5 sm:p-6 border-b border-[var(--rm-border)] flex items-center justify-between gap-4 bg-[var(--rm-surface)]">
+                    <div class="flex items-center gap-3.5">
+                        <div class="h-11 w-11 rounded-full bg-[#1E3A8A] text-white flex items-center justify-center shrink-0 shadow-sm">
+                            <i class="ph-bold ph-plus text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 id="modal-title-atencion" class="text-base sm:text-lg font-black tracking-tight text-[var(--rm-text-title)] uppercase">
+                                REGISTRAR ATENCIÓN CLÍNICA
+                            </h3>
+                            <p class="text-xs text-[var(--rm-text-muted)] mt-0.5 font-medium">
+                                Selecciona el tipo de atención que deseas registrar.
+                            </p>
+                        </div>
+                    </div>
+
+                    {{-- Botón Cuadrado de Cerrar X arriba a la derecha --}}
+                    <button type="button"
+                            @click="modalSelectorAtencion = false"
+                            class="h-9 w-9 rounded-xl border border-[var(--rm-border)] bg-[var(--rm-surface-alt)] hover:bg-[var(--rm-surface)] flex items-center justify-center text-[var(--rm-text-muted)] hover:text-[var(--rm-text-title)] transition cursor-pointer shrink-0"
+                            title="Cerrar modal (Esc)">
+                        <i class="ph-bold ph-x text-base"></i>
+                    </button>
+                </div>
+
+                {{-- Body Scrollable --}}
+                <div class="p-5 sm:p-6 overflow-y-auto space-y-4 flex-1">
+                    
+                    {{-- 5. Contexto del Residente (Card Horizontal con Datos Reales) --}}
+                    <div class="p-3.5 rounded-2xl border border-[var(--rm-border)] bg-[var(--rm-surface-alt)] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                        <div class="flex items-center gap-3 min-w-0">
+                            {{-- Avatar / Foto --}}
+                            <template x-if="residenteSeleccionado.foto">
+                                <img :src="residenteSeleccionado.foto"
+                                     :alt="residenteSeleccionado.nombre_completo"
+                                     class="h-12 w-12 rounded-xl object-cover border border-[var(--rm-border)] shadow-2xs shrink-0">
+                            </template>
+                            <template x-if="!residenteSeleccionado.foto">
+                                <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-100 dark:bg-blue-950/60 text-[#1E3A8A] dark:text-blue-300 font-black text-base shrink-0 border border-blue-200 dark:border-blue-800"
+                                     x-text="residenteSeleccionado.iniciales || 'AM'">
+                                </div>
+                            </template>
+
+                            <div class="min-w-0">
+                                <h4 class="text-sm font-black text-[var(--rm-text-title)] uppercase truncate"
+                                    x-text="residenteSeleccionado.nombre_completo">
+                                </h4>
+                                <div class="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-[var(--rm-text-muted)] font-medium mt-0.5">
+                                    <span x-text="residenteSeleccionado.edad_texto"></span>
+                                    <span>·</span>
+                                    <span class="font-mono font-bold text-[var(--rm-text-title)]" x-text="residenteSeleccionado.cod_am"></span>
+                                    <span>·</span>
+                                    <span x-text="residenteSeleccionado.habitacion_texto"></span>
+                                    <span>·</span>
+                                    <span x-text="residenteSeleccionado.cama_texto"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        {{-- Badges a la derecha --}}
+                        <div class="flex items-center gap-2 shrink-0">
+                            <span class="inline-flex items-center gap-1 rounded-lg bg-amber-50 dark:bg-amber-950/40 px-2.5 py-1 text-xs font-bold text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800">
+                                <span class="h-1.5 w-1.5 rounded-full bg-amber-500"></span>
+                                <span x-text="residenteSeleccionado.estado_humano || 'Vigilancia'"></span>
+                            </span>
+
+                            <span class="inline-flex items-center gap-1 rounded-lg bg-rose-50 dark:bg-rose-950/40 px-2.5 py-1 text-xs font-bold text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800">
+                                <i class="ph-bold ph-warning"></i>
+                                <span x-text="(residenteSeleccionado.alertas_count || 0) + ' alertas activas'"></span>
+                            </span>
+                        </div>
+                    </div>
+
+                    {{-- 6. Grid Exacto 2x4 (8 cards clickeables, altura ~95-105px) --}}
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-left">
+                        
+                        {{-- FILA 1 — CARD 1: SIGNOS VITALES --}}
+                        <button type="button"
+                                @click="modalSelectorAtencion = false; $wire.abrirRegistrarSignos(residenteSeleccionado.cod_am)"
+                                class="group p-3.5 sm:p-4 rounded-[16px] border border-[var(--rm-border)] bg-[var(--rm-surface)] hover:bg-[var(--rm-surface-alt)] hover:border-blue-400/80 shadow-2xs hover:shadow-md transition-all duration-150 flex items-center justify-between gap-3 text-left cursor-pointer min-h-[95px] h-auto sm:h-[102px]">
+                            <div class="flex items-center gap-3.5 min-w-0">
+                                <div class="h-12 w-12 rounded-2xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 text-rose-600 dark:text-rose-400 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                                    <i class="ph-bold ph-heartbeat text-2xl"></i>
+                                </div>
+                                <div class="min-w-0">
+                                    <h4 class="text-sm font-black text-[var(--rm-text-title)] group-hover:text-[#1E3A8A] dark:group-hover:text-blue-400 transition-colors uppercase">
+                                        Signos vitales
+                                    </h4>
+                                    <p class="text-xs font-medium text-[var(--rm-text-body)] mt-0.5 truncate">
+                                        Registrar control fisiológico.
+                                    </p>
+                                    <p class="text-[10.5px] text-[var(--rm-text-muted)] mt-0.5 truncate">
+                                        PA, FC, FR, SpO₂, Temperatura, Dolor, etc.
+                                    </p>
+                                </div>
+                            </div>
+                            <i class="ph-bold ph-caret-right text-base text-[var(--rm-text-muted)] group-hover:text-[#1E3A8A] dark:group-hover:text-blue-400 group-hover:translate-x-0.5 transition-all shrink-0"></i>
+                        </button>
+
+                        {{-- FILA 1 — CARD 2: CUIDADO DE ENFERMERÍA --}}
+                        <button type="button"
+                                @click="modalSelectorAtencion = false; $wire.abrirRegistrarCuidado(residenteSeleccionado.cod_am)"
+                                class="group p-3.5 sm:p-4 rounded-[16px] border border-[var(--rm-border)] bg-[var(--rm-surface)] hover:bg-[var(--rm-surface-alt)] hover:border-blue-400/80 shadow-2xs hover:shadow-md transition-all duration-150 flex items-center justify-between gap-3 text-left cursor-pointer min-h-[95px] h-auto sm:h-[102px]">
+                            <div class="flex items-center gap-3.5 min-w-0">
+                                <div class="h-12 w-12 rounded-2xl bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800 text-[#1E3A8A] dark:text-blue-400 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                                    <i class="ph-bold ph-hand-heart text-2xl"></i>
+                                </div>
+                                <div class="min-w-0">
+                                    <h4 class="text-sm font-black text-[var(--rm-text-title)] group-hover:text-[#1E3A8A] dark:group-hover:text-blue-400 transition-colors uppercase">
+                                        Cuidado de enfermería
+                                    </h4>
+                                    <p class="text-xs font-medium text-[var(--rm-text-body)] mt-0.5 truncate">
+                                        Registrar cuidado asistencial realizado.
+                                    </p>
+                                    <p class="text-[10.5px] text-[var(--rm-text-muted)] mt-0.5 truncate">
+                                        Higiene, alimentación, hidratación, movilidad, eliminación, piel.
+                                    </p>
+                                </div>
+                            </div>
+                            <i class="ph-bold ph-caret-right text-base text-[var(--rm-text-muted)] group-hover:text-[#1E3A8A] dark:group-hover:text-blue-400 group-hover:translate-x-0.5 transition-all shrink-0"></i>
+                        </button>
+
+                        {{-- FILA 2 — CARD 3: MEDICACIÓN --}}
+                        <button type="button"
+                                @click="modalSelectorAtencion = false; $wire.abrirAdministrarMed(residenteSeleccionado.cod_am)"
+                                class="group p-3.5 sm:p-4 rounded-[16px] border border-[var(--rm-border)] bg-[var(--rm-surface)] hover:bg-[var(--rm-surface-alt)] hover:border-blue-400/80 shadow-2xs hover:shadow-md transition-all duration-150 flex items-center justify-between gap-3 text-left cursor-pointer min-h-[95px] h-auto sm:h-[102px]">
+                            <div class="flex items-center gap-3.5 min-w-0">
+                                <div class="h-12 w-12 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-400 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                                    <i class="ph-bold ph-pill text-2xl"></i>
+                                </div>
+                                <div class="min-w-0">
+                                    <h4 class="text-sm font-black text-[var(--rm-text-title)] group-hover:text-[#1E3A8A] dark:group-hover:text-blue-400 transition-colors uppercase">
+                                        Medicación
+                                    </h4>
+                                    <p class="text-xs font-medium text-[var(--rm-text-body)] mt-0.5 truncate">
+                                        Administrar o registrar medicación prescrita.
+                                    </p>
+                                    <p class="text-[10.5px] text-[var(--rm-text-muted)] mt-0.5 truncate">
+                                        Dosis programadas, PRN y administración.
+                                    </p>
+                                </div>
+                            </div>
+                            <i class="ph-bold ph-caret-right text-base text-[var(--rm-text-muted)] group-hover:text-[#1E3A8A] dark:group-hover:text-blue-400 group-hover:translate-x-0.5 transition-all shrink-0"></i>
+                        </button>
+
+                        {{-- FILA 2 — CARD 4: EVOLUCIÓN DE ENFERMERÍA --}}
+                        <button type="button"
+                                @click="modalSelectorAtencion = false; $wire.abrirRegistrarSeguimiento(residenteSeleccionado.cod_am)"
+                                class="group p-3.5 sm:p-4 rounded-[16px] border border-[var(--rm-border)] bg-[var(--rm-surface)] hover:bg-[var(--rm-surface-alt)] hover:border-blue-400/80 shadow-2xs hover:shadow-md transition-all duration-150 flex items-center justify-between gap-3 text-left cursor-pointer min-h-[95px] h-auto sm:h-[102px]">
+                            <div class="flex items-center gap-3.5 min-w-0">
+                                <div class="h-12 w-12 rounded-2xl bg-violet-50 dark:bg-violet-950/40 border border-violet-200 dark:border-violet-800 text-violet-700 dark:text-violet-400 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                                    <i class="ph-bold ph-chart-line-up text-2xl"></i>
+                                </div>
+                                <div class="min-w-0">
+                                    <h4 class="text-sm font-black text-[var(--rm-text-title)] group-hover:text-[#1E3A8A] dark:group-hover:text-blue-400 transition-colors uppercase">
+                                        Evolución de enfermería
+                                    </h4>
+                                    <p class="text-xs font-medium text-[var(--rm-text-body)] mt-0.5 truncate">
+                                        Registrar evolución y estado actual.
+                                    </p>
+                                    <p class="text-[10.5px] text-[var(--rm-text-muted)] mt-0.5 truncate">
+                                        Estado general, cambios observados, intervención y seguimiento.
+                                    </p>
+                                </div>
+                            </div>
+                            <i class="ph-bold ph-caret-right text-base text-[var(--rm-text-muted)] group-hover:text-[#1E3A8A] dark:group-hover:text-blue-400 group-hover:translate-x-0.5 transition-all shrink-0"></i>
+                        </button>
+
+                        {{-- FILA 3 — CARD 5: SEGUIMIENTO DE GUARDIA --}}
+                        <button type="button"
+                                @click="modalSelectorAtencion = false; $wire.abrirRegistrarSeguimiento(residenteSeleccionado.cod_am)"
+                                class="group p-3.5 sm:p-4 rounded-[16px] border border-[var(--rm-border)] bg-[var(--rm-surface)] hover:bg-[var(--rm-surface-alt)] hover:border-blue-400/80 shadow-2xs hover:shadow-md transition-all duration-150 flex items-center justify-between gap-3 text-left cursor-pointer min-h-[95px] h-auto sm:h-[102px]">
+                            <div class="flex items-center gap-3.5 min-w-0">
+                                <div class="h-12 w-12 rounded-2xl bg-sky-50 dark:bg-sky-950/40 border border-sky-200 dark:border-sky-800 text-sky-700 dark:text-sky-400 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                                    <i class="ph-bold ph-notebook text-2xl"></i>
+                                </div>
+                                <div class="min-w-0">
+                                    <h4 class="text-sm font-black text-[var(--rm-text-title)] group-hover:text-[#1E3A8A] dark:group-hover:text-blue-400 transition-colors uppercase">
+                                        Seguimiento de guardia
+                                    </h4>
+                                    <p class="text-xs font-medium text-[var(--rm-text-body)] mt-0.5 truncate">
+                                        Registrar seguimiento durante el turno.
+                                    </p>
+                                    <p class="text-[10.5px] text-[var(--rm-text-muted)] mt-0.5 truncate">
+                                        Observación, reevaluación y continuidad de cuidados.
+                                    </p>
+                                </div>
+                            </div>
+                            <i class="ph-bold ph-caret-right text-base text-[var(--rm-text-muted)] group-hover:text-[#1E3A8A] dark:group-hover:text-blue-400 group-hover:translate-x-0.5 transition-all shrink-0"></i>
+                        </button>
+
+                        {{-- FILA 3 — CARD 6: INCIDENTE / CAÍDA --}}
+                        <button type="button"
+                                @click="modalSelectorAtencion = false; $wire.abrirReportarAlerta(residenteSeleccionado.cod_am)"
+                                class="group p-3.5 sm:p-4 rounded-[16px] border border-[var(--rm-border)] bg-[var(--rm-surface)] hover:bg-[var(--rm-surface-alt)] hover:border-blue-400/80 shadow-2xs hover:shadow-md transition-all duration-150 flex items-center justify-between gap-3 text-left cursor-pointer min-h-[95px] h-auto sm:h-[102px]">
+                            <div class="flex items-center gap-3.5 min-w-0">
+                                <div class="h-12 w-12 rounded-2xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 text-rose-700 dark:text-rose-400 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                                    <i class="ph-bold ph-warning-octagon text-2xl"></i>
+                                </div>
+                                <div class="min-w-0">
+                                    <h4 class="text-sm font-black text-[var(--rm-text-title)] group-hover:text-[#1E3A8A] dark:group-hover:text-blue-400 transition-colors uppercase">
+                                        Incidente / Caída
+                                    </h4>
+                                    <p class="text-xs font-medium text-[var(--rm-text-body)] mt-0.5 truncate">
+                                        Registrar evento asistencial o incidente.
+                                    </p>
+                                    <p class="text-[10.5px] text-[var(--rm-text-muted)] mt-0.5 truncate">
+                                        Caídas, lesiones, eventos adversos y acciones realizadas.
+                                    </p>
+                                </div>
+                            </div>
+                            <i class="ph-bold ph-caret-right text-base text-[var(--rm-text-muted)] group-hover:text-[#1E3A8A] dark:group-hover:text-blue-400 group-hover:translate-x-0.5 transition-all shrink-0"></i>
+                        </button>
+
+                        {{-- FILA 4 — CARD 7: DOLOR / SÍNTOMA --}}
+                        <button type="button"
+                                @click="modalSelectorAtencion = false; $wire.abrirRegistrarDolor(residenteSeleccionado.cod_am)"
+                                class="group p-3.5 sm:p-4 rounded-[16px] border border-[var(--rm-border)] bg-[var(--rm-surface)] hover:bg-[var(--rm-surface-alt)] hover:border-blue-400/80 shadow-2xs hover:shadow-md transition-all duration-150 flex items-center justify-between gap-3 text-left cursor-pointer min-h-[95px] h-auto sm:h-[102px]">
+                            <div class="flex items-center gap-3.5 min-w-0">
+                                <div class="h-12 w-12 rounded-2xl bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                                    <i class="ph-bold ph-activity text-2xl"></i>
+                                </div>
+                                <div class="min-w-0">
+                                    <h4 class="text-sm font-black text-[var(--rm-text-title)] group-hover:text-[#1E3A8A] dark:group-hover:text-blue-400 transition-colors uppercase">
+                                        Dolor / Síntoma
+                                    </h4>
+                                    <p class="text-xs font-medium text-[var(--rm-text-body)] mt-0.5 truncate">
+                                        Registrar síntoma o cambio clínico.
+                                    </p>
+                                    <p class="text-[10.5px] text-[var(--rm-text-muted)] mt-0.5 truncate">
+                                        EVA, localización, intensidad e intervención.
+                                    </p>
+                                </div>
+                            </div>
+                            <i class="ph-bold ph-caret-right text-base text-[var(--rm-text-muted)] group-hover:text-[#1E3A8A] dark:group-hover:text-blue-400 group-hover:translate-x-0.5 transition-all shrink-0"></i>
+                        </button>
+
+                        {{-- FILA 4 — CARD 8: PROCEDIMIENTO / DISPOSITIVO --}}
+                        <button type="button"
+                                @click="modalSelectorAtencion = false; $wire.abrirRegistrarProcedimiento(residenteSeleccionado.cod_am)"
+                                class="group p-3.5 sm:p-4 rounded-[16px] border border-[var(--rm-border)] bg-[var(--rm-surface)] hover:bg-[var(--rm-surface-alt)] hover:border-blue-400/80 shadow-2xs hover:shadow-md transition-all duration-150 flex items-center justify-between gap-3 text-left cursor-pointer min-h-[95px] h-auto sm:h-[102px]">
+                            <div class="flex items-center gap-3.5 min-w-0">
+                                <div class="h-12 w-12 rounded-2xl bg-teal-50 dark:bg-teal-950/40 border border-teal-200 dark:border-teal-800 text-teal-700 dark:text-teal-400 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                                    <i class="ph-bold ph-first-aid text-2xl"></i>
+                                </div>
+                                <div class="min-w-0">
+                                    <h4 class="text-sm font-black text-[var(--rm-text-title)] group-hover:text-[#1E3A8A] dark:group-hover:text-blue-400 transition-colors uppercase">
+                                        Procedimiento / Dispositivo
+                                    </h4>
+                                    <p class="text-xs font-medium text-[var(--rm-text-body)] mt-0.5 truncate">
+                                        Registrar procedimiento o control.
+                                    </p>
+                                    <p class="text-[10.5px] text-[var(--rm-text-muted)] mt-0.5 truncate">
+                                        Curaciones, sondas, catéteres, oxígeno, etc.
+                                    </p>
+                                </div>
+                            </div>
+                            <i class="ph-bold ph-caret-right text-base text-[var(--rm-text-muted)] group-hover:text-[#1E3A8A] dark:group-hover:text-blue-400 group-hover:translate-x-0.5 transition-all shrink-0"></i>
+                        </button>
+
+                    </div>
+                </div>
+
+                {{-- 8. Footer Informativo con Botón Cancelar --}}
+                <div class="p-4 sm:p-5 border-t border-[var(--rm-border)] bg-[var(--rm-surface-alt)] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                    {{-- Caja informativa azul suave a la izquierda --}}
+                    <div class="flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl bg-blue-50/90 dark:bg-blue-950/40 border border-blue-200/80 dark:border-blue-800 text-[#1E3A8A] dark:text-blue-300 text-xs font-medium leading-relaxed">
+                        <i class="ph-bold ph-info text-base shrink-0"></i>
+                        <span>Toda la información se registra en el historial clínico del residente, con trazabilidad y fecha/hora automática.</span>
+                    </div>
+
+                    {{-- Botón Cancelar a la derecha (Sin botón guardar) --}}
+                    <button type="button"
+                            @click="modalSelectorAtencion = false"
+                            class="rm-btn rm-btn-secondary px-5 py-2 text-xs font-bold self-end sm:self-auto cursor-pointer shrink-0">
+                        Cancelar
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
 
     <!-- 1. Modal Registrar Signos -->
     @if($modalSignos)
@@ -824,4 +1082,133 @@
             </div>
         </div>
     @endif
+
+    <!-- 5. Modal Registrar Cuidado Asistencial -->
+    @if($modalCuidado)
+        <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+            <div class="rm-modal-panel w-full max-w-md p-6 shadow-2xl">
+                <div class="flex items-start justify-between">
+                    <div>
+                        <h3 class="text-base font-black text-[var(--rm-text-title)]">Registrar Cuidado de Enfermería</h3>
+                        <p class="text-xs text-[var(--rm-text-muted)] mt-0.5">Control de cuidados asistenciales y confort del residente.</p>
+                    </div>
+                    <button wire:click="$set('modalCuidado', false)" class="text-[var(--rm-text-muted)] hover:text-[var(--rm-text-title)] p-1">
+                        <i class="ph-bold ph-x text-lg"></i>
+                    </button>
+                </div>
+
+                <div class="mt-4 space-y-3">
+                    <div class="rm-field">
+                        <label class="rm-label">Tipo de Cuidado *</label>
+                        <select wire:model="cuidadoTipo" class="rm-select w-full text-xs">
+                            <option value="HIGIENE">Higiene y Confort</option>
+                            <option value="ALIMENTACION">Alimentación</option>
+                            <option value="MOVILIDAD">Movilidad y Cambios Posturales</option>
+                            <option value="ELIMINACION">Eliminación e Incontinencia</option>
+                            <option value="PIEL">Cuidado e Integridad de la Piel</option>
+                        </select>
+                    </div>
+
+                    <div class="rm-field">
+                        <label class="rm-label">Acción / Subtipo *</label>
+                        <input type="text" wire:model="cuidadoSubtipo" class="rm-input w-full text-xs" placeholder="Ej: Aseo matutino, Cambio de pañal, Asistencia en cena...">
+                        @error('cuidadoSubtipo') <span class="rm-error text-[10px]">{{ $message }}</span> @enderror
+                    </div>
+
+                    <div class="rm-field">
+                        <label class="rm-label">Observaciones</label>
+                        <textarea wire:model="cuidadoObs" rows="3" class="rm-textarea w-full text-xs" placeholder="Detalles de la tolerancia, postura, incidencias..."></textarea>
+                        @error('cuidadoObs') <span class="rm-error text-[10px]">{{ $message }}</span> @enderror
+                    </div>
+                </div>
+
+                <div class="mt-6 flex justify-end gap-2">
+                    <button wire:click="$set('modalCuidado', false)" class="rm-btn-secondary px-4 py-2 text-xs">Cancelar</button>
+                    <button wire:click="guardarCuidado" class="rm-btn-primary px-4 py-2 text-xs">Guardar Cuidado</button>
+                </div>
+            </div>
+        </div>
+    @endif
+
+    <!-- 6. Modal Registrar Dolor / Síntoma -->
+    @if($modalDolor)
+        <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+            <div class="rm-modal-panel w-full max-w-md p-6 shadow-2xl">
+                <div class="flex items-start justify-between">
+                    <div>
+                        <h3 class="text-base font-black text-[var(--rm-text-title)]">Valoración de Dolor / Síntoma</h3>
+                        <p class="text-xs text-[var(--rm-text-muted)] mt-0.5">Escala visual analógica (EVA) y registro sintomático.</p>
+                    </div>
+                    <button wire:click="$set('modalDolor', false)" class="text-[var(--rm-text-muted)] hover:text-[var(--rm-text-title)] p-1">
+                        <i class="ph-bold ph-x text-lg"></i>
+                    </button>
+                </div>
+
+                <div class="mt-4 space-y-3">
+                    <div class="rm-field">
+                        <label class="rm-label">Intensidad EVA (0 = Sin dolor, 10 = Máximo dolor) *</label>
+                        <div class="flex items-center gap-3">
+                            <input type="range" min="0" max="10" wire:model.live="dolorIntensidad" class="w-full accent-rose-600">
+                            <span class="text-base font-black text-rose-600 px-3 py-1 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800">
+                                {{ $dolorIntensidad }} / 10
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="rm-field">
+                        <label class="rm-label">Localización y Características *</label>
+                        <textarea wire:model="dolorDetalle" rows="3" class="rm-textarea w-full text-xs" placeholder="Ej: Dolor lumbar irradiado a pierna derecha al incorporarse..."></textarea>
+                        @error('dolorDetalle') <span class="rm-error text-[10px]">{{ $message }}</span> @enderror
+                    </div>
+                </div>
+
+                <div class="mt-6 flex justify-end gap-2">
+                    <button wire:click="$set('modalDolor', false)" class="rm-btn-secondary px-4 py-2 text-xs">Cancelar</button>
+                    <button wire:click="guardarDolor" class="rm-btn-primary px-4 py-2 text-xs">Guardar Valoración</button>
+                </div>
+            </div>
+        </div>
+    @endif
+
+    <!-- 7. Modal Registrar Procedimiento / Dispositivo -->
+    @if($modalProcedimiento)
+        <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+            <div class="rm-modal-panel w-full max-w-md p-6 shadow-2xl">
+                <div class="flex items-start justify-between">
+                    <div>
+                        <h3 class="text-base font-black text-[var(--rm-text-title)]">Procedimiento / Control de Dispositivo</h3>
+                        <p class="text-xs text-[var(--rm-text-muted)] mt-0.5">Curaciones, sondas, vías, oxigenoterapia y dispositivos.</p>
+                    </div>
+                    <button wire:click="$set('modalProcedimiento', false)" class="text-[var(--rm-text-muted)] hover:text-[var(--rm-text-title)] p-1">
+                        <i class="ph-bold ph-x text-lg"></i>
+                    </button>
+                </div>
+
+                <div class="mt-4 space-y-3">
+                    <div class="rm-field">
+                        <label class="rm-label">Tipo de Procedimiento *</label>
+                        <select wire:model="procTipo" class="rm-select w-full text-xs">
+                            <option value="CURACION">Curación de herida / úlcera</option>
+                            <option value="SONDA">Revisión / Cambio de sonda vesical o nasogástrica</option>
+                            <option value="CATETER">Control de vía periférica / catéter</option>
+                            <option value="OXIGENO">Terapia de Oxígeno / Saturación</option>
+                            <option value="OTRO">Otro procedimiento asistencial</option>
+                        </select>
+                    </div>
+
+                    <div class="rm-field">
+                        <label class="rm-label">Detalles del Procedimiento Realizado *</label>
+                        <textarea wire:model="procDetalle" rows="3" class="rm-textarea w-full text-xs" placeholder="Describa el material usado, estado del sitio, apósito y respuesta del residente..."></textarea>
+                        @error('procDetalle') <span class="rm-error text-[10px]">{{ $message }}</span> @enderror
+                    </div>
+                </div>
+
+                <div class="mt-6 flex justify-end gap-2">
+                    <button wire:click="$set('modalProcedimiento', false)" class="rm-btn-secondary px-4 py-2 text-xs">Cancelar</button>
+                    <button wire:click="guardarProcedimiento" class="rm-btn-primary px-4 py-2 text-xs">Guardar Procedimiento</button>
+                </div>
+            </div>
+        </div>
+    @endif
+
 </div>

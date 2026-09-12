@@ -4,8 +4,9 @@
    DENSIDAD COMPACTA: Padding 14px, KPIs ~105px de altura.
    ============================================================ */
 
-.rm-card {
-    background-color: var(--rm-surface);
+.rm-card,
+.rm-card-beige {
+    background-color: var(--rm-surface-beige, var(--rm-surface));
     border: 1px solid var(--rm-border);
     border-radius: var(--rm-radius-card, 14px);
     box-shadow: var(--rm-shadow-sm);

@@ -1,4 +1,4 @@
-<div class="space-y-6" x-data="{ activeTab: @entangle('tabActivo') }">
+<div class="space-y-5" x-data="{ activeTab: @entangle('tabActivo'), modalSelectorAtencion: false, modalExportar: false, drawerExpediente: false, drawerFamilia: false }" @keydown.escape.window="modalSelectorAtencion = false; modalExportar = false; drawerExpediente = false; drawerFamilia = false">
     {{-- MENSAJES DE NOTIFICACIÓN CLÍNICA --}}
     @if(session()->has('success'))
         <div class="flex items-center gap-2 rounded-2xl bg-emerald-50 border border-emerald-200 p-4 text-xs font-bold text-emerald-800 shadow-sm">
@@ -21,9 +21,8 @@
         </div>
     @endif
 
-    {{-- CABECERA INSTITUCIONAL CLÍNICA --}}
+    {{-- CABECERA INSTITUCIONAL CLÍNICA (Encabezado + Card Residente + Tabs) --}}
     @include('livewire.cuidados.ficha.cabecera')
-    <x-residentes.navegacion-ficha :adulto="$adultoMayor" />
 
     {{-- PANELES MODULARES SEGÚN PESTAÑA ACTIVA --}}
     {{-- 1. Resumen Clínico --}}
@@ -32,7 +31,7 @@
     </div>
 
     {{-- 2. Signos Vitales --}}
-    <div x-show="activeTab === 'signos'" x-cloak>
+    <div x-show="activeTab === 'signos'" x-cloak x-effect="if (activeTab === 'signos') { window.dispatchEvent(new CustomEvent('render-graficos-signos')); }">
         @include('livewire.cuidados.ficha.tab-signos')
     </div>
 
@@ -47,19 +46,28 @@
     </div>
 
     {{-- 5. Seguimiento --}}
-    <div x-show="activeTab === 'seguimiento'" x-cloak>
+    <div x-show="activeTab === 'seguimiento'" x-cloak x-effect="if (activeTab === 'seguimiento') { window.dispatchEvent(new CustomEvent('render-graficos-seguimiento')); }">
         @include('livewire.cuidados.ficha.tab-seguimiento')
     </div>
 
-    {{-- 6. Alertas --}}
-    <div x-show="activeTab === 'alertas'" x-cloak>
-        @include('livewire.cuidados.ficha.tab-alertas')
+    {{-- 6. Eventos clínicos (Golden Reference) / Alertas --}}
+    <div x-show="activeTab === 'eventos' || activeTab === 'alertas'" x-cloak x-effect="if (activeTab === 'eventos' || activeTab === 'alertas') { window.dispatchEvent(new CustomEvent('render-graficos-eventos')); }">
+        @include('livewire.cuidados.ficha.tab-eventos')
     </div>
 
-    {{-- 7. Historial 360° --}}
-    <div x-show="activeTab === 'historial'" x-cloak>
-        @include('livewire.cuidados.ficha.tab-historial')
+    {{-- 7. Resultados y Estudios Clínicos (Reemplaza Valoración Integral) --}}
+    <div x-show="activeTab === 'estudios' || activeTab === 'historial' || activeTab === 'resultados'" x-cloak x-effect="if (activeTab === 'estudios' || activeTab === 'historial' || activeTab === 'resultados') { window.dispatchEvent(new CustomEvent('render-graficos-estudios')); }">
+        @include('livewire.cuidados.ficha.tab-estudios')
     </div>
+
+    {{-- 8. Documentación (Golden Reference) --}}
+    <div x-show="activeTab === 'documentos'" x-cloak>
+        @include('livewire.cuidados.ficha.tab-documentos')
+    </div>
+
+    {{-- MODALES CLÍNICOS OPERATIVOS --}}
+    {{-- MODAL DE PRESCRIPCIÓN MÉDICA --}}
+    @livewire('medicacion.medicacion-adulto-modal')
 
     {{-- MODALES CLÍNICOS OPERATIVOS --}}
     @include('livewire.cuidados.ficha.modales')

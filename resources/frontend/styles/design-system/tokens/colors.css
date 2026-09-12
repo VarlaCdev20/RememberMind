@@ -13,18 +13,19 @@
 
     /* ============================================================
        2. SUPERFICIES (Jerarquía cálida de alto contraste)
-       Evita el blanco plano; utiliza capas perceptibles.
+       Evita el blanco plano; utiliza beige clarito canónico.
        ============================================================ */
-    --rm-surface: #FBF7F2;          /* Cards y contenedores base */
-    --rm-surface-soft: #F7F0E9;     /* Paneles intermedios y toolbars */
-    --rm-surface-alt: #F2E8DD;      /* Bloques internos y celdas agrupadas */
-    --rm-surface-strong: #EEE2D4;   /* Fondos activos y cabeceras contrastadas */
+    --rm-surface-beige: #F5EBE1;    /* Beige clarito canónico RememberMind */
+    --rm-surface: #F5EBE1;          /* Cards y contenedores base (Beige clarito) */
+    --rm-surface-soft: #EFE5D9;     /* Paneles intermedios y toolbars (Beige suave) */
+    --rm-surface-alt: #EAE0D4;      /* Bloques internos y celdas agrupadas (Beige cálido) */
+    --rm-surface-strong: #E2D6C8;   /* Fondos activos y cabeceras contrastadas */
 
     /* ============================================================
        3. BORDES (Delimitación sutil y definida)
        ============================================================ */
-    --rm-border: #E3D6C8;           /* Borde estándar estructural */
-    --rm-border-soft: #EADFD3;      /* Separadores tenues internos */
+    --rm-border: #E2D6C8;           /* Borde estándar estructural */
+    --rm-border-soft: #EADFD2;      /* Separadores tenues internos */
     --rm-border-hover: #D5C4B1;     /* Borde interactivo al pasar cursor */
     --rm-border-strong: #CBB8A3;    /* Delimitación de alto énfasis */
 
@@ -111,6 +112,7 @@
     --rm-bg-layout: #131D24;
 
     /* 2. SUPERFICIES (Capas oscuras traslúcidas cálidas) */
+    --rm-surface-beige: #18222A;
     --rm-surface: #18222A;
     --rm-surface-soft: #1D2A34;
     --rm-surface-alt: #22323E;

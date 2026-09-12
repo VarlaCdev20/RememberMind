@@ -107,10 +107,12 @@ class CampanaNotificaciones extends Component
             $nuevo = $recordatorios->first(fn (array $item) => !in_array($item['id'], $this->recordatorioIdsConocidos, true));
             if ($nuevo) {
                 $nombre = trim(($nuevo['adulto']?->nombres ?? 'Residente').' '.($nuevo['adulto']?->ap_paterno ?? ''));
+                $hora12 = $nuevo['hora_12h'] ?? \Carbon\Carbon::parse("2000-01-01 {$nuevo['hora']}")->format('h:i A');
+                $horaCompleta = now()->format('h:i:s A');
                 $this->dispatch('alerta-nueva', [
                     'id' => $nuevo['id'],
-                    'titulo' => $nuevo['estado'] === 'VENCIDA' ? 'Dosis de medicación vencida' : 'Próxima dosis de medicación',
-                    'mensaje' => "{$nombre}: {$nuevo['medicacion']->nombre_medicamento} a las {$nuevo['hora']}",
+                    'titulo' => $nuevo['estado'] === 'VENCIDA' ? '⚠️ Se pasó de hora: Dosis vencida' : 'Próxima dosis de medicación',
+                    'mensaje' => "{$nombre}: {$nuevo['medicacion']->nombre_medicamento} programada para las {$nuevo['hora']} ({$hora12}) [Hora: {$horaCompleta}]",
                     'nivel' => $nuevo['estado'] === 'VENCIDA' ? 'ALTO' : 'MEDIO',
                 ]);
             }

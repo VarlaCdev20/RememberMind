@@ -15,6 +15,7 @@ use App\Services\Medicacion\AgendaMedicacionService;
 use App\Services\Medicacion\RegistrarAdministracionMedicacionService;
 use App\Services\Clinica\SignosVitalesService;
 use App\Services\Alertas\AlertasService;
+use App\Services\Enfermeria\CuidadosEnfermeriaService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -53,6 +54,16 @@ class MisPacientes extends Component
 
     public bool $modalAlerta = false;
     public string $alertaTipo = 'INCIDENTE', $alertaNivel = 'ALTO', $alertaMotivo = '';
+
+    public bool $modalCuidado = false;
+    public string $cuidadoTipo = 'HIGIENE', $cuidadoSubtipo = 'GENERAL', $cuidadoObs = '';
+
+    public bool $modalDolor = false;
+    public int $dolorIntensidad = 5;
+    public string $dolorDetalle = '';
+
+    public bool $modalProcedimiento = false;
+    public string $procTipo = 'CURACION', $procDetalle = '';
 
     protected function getTurnoService(): TurnoEnfermeriaService
     {
@@ -263,6 +274,97 @@ class MisPacientes extends Component
         $this->modalAlerta = false;
         $this->modalCodAm = null;
         $this->dispatch('swal', ['icon' => 'warning', 'title' => 'Alerta creada', 'text' => 'La alerta fue enviada al monitor del turno y campana.']);
+    }
+
+    public function abrirRegistrarCuidado(string $codAm): void
+    {
+        abort_unless(auth()->user()?->can('seguimiento.crear'), 403);
+        $this->getTurnoService()->autorizarAccionPaciente($codAm);
+        $this->modalCodAm = $codAm;
+        $this->cuidadoTipo = 'HIGIENE';
+        $this->cuidadoSubtipo = 'GENERAL';
+        $this->cuidadoObs = '';
+        $this->modalCuidado = true;
+    }
+
+    public function guardarCuidado(): void
+    {
+        abort_unless(auth()->user()?->can('seguimiento.crear'), 403);
+        $this->validate([
+            'cuidadoTipo' => 'required|in:HIGIENE,ALIMENTACION,MOVILIDAD,ELIMINACION,PIEL',
+            'cuidadoSubtipo' => 'required|string|max:50',
+            'cuidadoObs' => 'nullable|string|max:2000',
+        ]);
+
+        app(CuidadosEnfermeriaService::class)->registrar($this->modalCodAm, [
+            'tipo' => $this->cuidadoTipo === 'PIEL' ? 'HIGIENE' : $this->cuidadoTipo,
+            'subtipo' => $this->cuidadoSubtipo,
+            'observacion' => $this->cuidadoObs ?: 'Cuidado de enfermería registrado desde Mis Pacientes.',
+        ], Auth::user());
+
+        $this->modalCuidado = false;
+        $this->modalCodAm = null;
+        $this->dispatch('swal', ['icon' => 'success', 'title' => 'Cuidado registrado', 'text' => 'El cuidado asistencial fue registrado correctamente.']);
+    }
+
+    public function abrirRegistrarDolor(string $codAm): void
+    {
+        abort_unless(auth()->user()?->can('seguimiento.crear'), 403);
+        $this->getTurnoService()->autorizarAccionPaciente($codAm);
+        $this->modalCodAm = $codAm;
+        $this->dolorIntensidad = 5;
+        $this->dolorDetalle = '';
+        $this->modalDolor = true;
+    }
+
+    public function guardarDolor(): void
+    {
+        abort_unless(auth()->user()?->can('seguimiento.crear'), 403);
+        $this->validate([
+            'dolorIntensidad' => 'required|integer|min:0|max:10',
+            'dolorDetalle' => 'required|string|min:5|max:1000',
+        ]);
+
+        app(CuidadosEnfermeriaService::class)->registrarDolor(
+            $this->modalCodAm,
+            'VALORACION',
+            $this->dolorIntensidad,
+            $this->dolorDetalle,
+            Auth::user()
+        );
+
+        $this->modalDolor = false;
+        $this->modalCodAm = null;
+        $this->dispatch('swal', ['icon' => 'success', 'title' => 'Dolor registrado', 'text' => 'Valoración del síntoma guardada correctamente.']);
+    }
+
+    public function abrirRegistrarProcedimiento(string $codAm): void
+    {
+        abort_unless(auth()->user()?->can('seguimiento.crear'), 403);
+        $this->getTurnoService()->autorizarAccionPaciente($codAm);
+        $this->modalCodAm = $codAm;
+        $this->procTipo = 'CURACION';
+        $this->procDetalle = '';
+        $this->modalProcedimiento = true;
+    }
+
+    public function guardarProcedimiento(): void
+    {
+        abort_unless(auth()->user()?->can('seguimiento.crear'), 403);
+        $this->validate([
+            'procTipo' => 'required|in:CURACION,SONDA,CATETER,OXIGENO,OTRO',
+            'procDetalle' => 'required|string|min:5|max:2000',
+        ]);
+
+        app(CuidadosEnfermeriaService::class)->registrar($this->modalCodAm, [
+            'tipo' => 'PROCEDIMIENTO',
+            'subtipo' => $this->procTipo,
+            'observacion' => $this->procDetalle,
+        ], Auth::user());
+
+        $this->modalProcedimiento = false;
+        $this->modalCodAm = null;
+        $this->dispatch('swal', ['icon' => 'success', 'title' => 'Procedimiento registrado', 'text' => 'El procedimiento o control fue registrado correctamente.']);
     }
 
     // ─── RENDER ─────────────────────────────────────────────────────

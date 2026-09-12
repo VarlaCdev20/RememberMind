@@ -223,12 +223,21 @@ class FichaPacienteRedisenadaTest extends TestCase
             ->assertSee('Temp')
             ->assertSee('SpO2')
             ->call('setMetricaSignos', 'GLUCEMIA')
-            ->assertSet('metricaSignosSeleccionada', 'GLUCOSA');
+            ->assertSet('metricaSignosSeleccionada', 'GLUCOSA')
+            ->call('setPeriodoSignos', '24h')
+            ->assertSet('periodoSignos', '24h')
+            ->call('setPeriodoSignos', '30d')
+            ->assertSet('periodoSignos', '30d');
 
         // 2. Probar pestaña Medicación
         Livewire::test(FichaPaciente::class, ['adulto' => $this->adulto->cod_am])
             ->call('cambiarTab', 'medicacion')
             ->assertSee('Medicación Activa Prescrita')
+            ->assertSee('Plan de medicación')
+            ->assertSee('Medicamentos PRN')
+            ->assertSee('Histórico de administración')
+            ->assertSee('PANEL LATERAL DE CONSULTA')
+            ->assertSee('DETALLE DE MEDICACIÓN')
             ->assertSee('Losartán 50mg')
             ->assertSee('ADMINISTRADA')
             ->assertSee('OMITIDA')
@@ -241,5 +250,21 @@ class FichaPacienteRedisenadaTest extends TestCase
             ->assertSee('Hipotensión matutina')
             ->assertSee('Historial de Alertas Resueltas')
             ->assertSee('Se acompaña y tranquiliza satisfactoriamente');
+    }
+
+    public function test_pestana_evolucion_clinica_completa(): void
+    {
+        $this->actingAs($this->enfermero);
+
+        Livewire::test(FichaPaciente::class, ['adulto' => $this->adulto->cod_am])
+            ->call('cambiarTab', 'seguimiento')
+            ->assertSee('Historial Longitudinal Clínico')
+            ->assertSee('Perfil Geriátrico Multidimensional')
+            ->assertSee('Tendencias Clínicas')
+            ->assertSee('Cambios Relevantes del Periodo')
+            ->assertSee('Índice de Barthel')
+            ->assertSee('Riesgo de caídas')
+            ->assertSee('Detalle del área seleccionada')
+            ->assertSee('Registrar evolución');
     }
 }

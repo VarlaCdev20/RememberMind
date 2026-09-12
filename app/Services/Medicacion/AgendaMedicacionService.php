@@ -66,6 +66,8 @@ class AgendaMedicacionService
                     'medicacion' => $medicacion,
                     'adulto' => $medicacion->adultoMayor,
                     'hora' => $hora,
+                    'hora_12h' => Carbon::parse("2000-01-01 {$hora}")->format('h:i A'),
+                    'se_paso' => $programada->isPast() && !$registro,
                     'programada' => $programada,
                     'registro' => $registro,
                     'estado' => $estado,

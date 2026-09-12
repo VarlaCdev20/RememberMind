@@ -1,6 +1,57 @@
 <div
     wire:poll.12s="verificarAlertas"
-    x-data="{ abierto: false }"
+    x-data="{
+        abierto: false,
+        relojPC: {
+            hora: '',
+            segundosDesdeMedianoche: 0,
+            init() {
+                const tick = () => {
+                    const now = new Date();
+                    let h = now.getHours();
+                    const m = String(now.getMinutes()).padStart(2, '0');
+                    const s = String(now.getSeconds()).padStart(2, '0');
+                    const ampm = h >= 12 ? 'PM' : 'AM';
+                    const h12 = h % 12 || 12;
+                    this.hora = `${String(h12).padStart(2, '0')}:${m}:${s} ${ampm}`;
+                    this.segundosDesdeMedianoche = (now.getHours() * 3600) + (now.getMinutes() * 60) + now.getSeconds();
+                };
+                tick();
+                setInterval(tick, 1000);
+            },
+            sePaso(horaStr) {
+                if (!horaStr) return false;
+                let [horaParte, ampm] = horaStr.trim().split(/\s+/);
+                let [h, m] = horaParte.split(':').map(Number);
+                if (ampm) {
+                    ampm = ampm.toUpperCase();
+                    if (ampm === 'PM' && h < 12) h += 12;
+                    if (ampm === 'AM' && h === 12) h = 0;
+                }
+                const segProg = (h * 3600) + ((m || 0) * 60);
+                return this.segundosDesdeMedianoche > segProg;
+            },
+            tiempoDiferenciaFormateado(horaStr) {
+                if (!horaStr) return '00h 00m 00s';
+                let [horaParte, ampm] = horaStr.trim().split(/\s+/);
+                let [h, m] = horaParte.split(':').map(Number);
+                if (ampm) {
+                    ampm = ampm.toUpperCase();
+                    if (ampm === 'PM' && h < 12) h += 12;
+                    if (ampm === 'AM' && h === 12) h = 0;
+                }
+                const segProg = (h * 3600) + ((m || 0) * 60);
+                const diffSeg = Math.abs(this.segundosDesdeMedianoche - segProg);
+                const horas = Math.floor(diffSeg / 3600);
+                const minutos = Math.floor((diffSeg % 3600) / 60);
+                const segundos = diffSeg % 60;
+                return `${String(horas).padStart(2, '0')}h ${String(minutos).padStart(2, '0')}m ${String(segundos).padStart(2, '0')}s`;
+            }
+        },
+        init() {
+            this.relojPC.init();
+        }
+    }"
     @click.outside="abierto = false"
     @alerta-nueva.window="
         const info = Array.isArray($event.detail) ? $event.detail[0] : $event.detail;
@@ -75,6 +126,10 @@
                 </div>
             </div>
             <div class="flex items-center gap-2">
+                <div class="hidden sm:flex items-center gap-1.5 px-2 py-0.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-[10px] font-bold text-emerald-800 dark:text-emerald-300 shadow-2xs">
+                    <i class="ph-bold ph-desktop text-emerald-600 animate-pulse"></i>
+                    <span>Hora PC: <strong x-text="relojPC.hora" class="font-mono"></strong></span>
+                </div>
                 <span class="rounded-full px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider {{ $conteoAbiertas > 0 ? 'bg-red-500/15 text-red-600 border border-red-500/30' : 'bg-green-500/15 text-green-600 border border-green-500/30' }}">
                     {{ $conteoAbiertas }} pendientes
                 </span>
@@ -125,10 +180,29 @@
                             <i class="ph-bold ph-prescription mr-1 text-boton-principal"></i>
                             {{ $recordatorio['medicacion']->nombre_medicamento }} · {{ $recordatorio['medicacion']->dosis }}
                         </p>
-                        <p class="text-[10px] text-apoyo font-semibold flex items-center gap-1">
+@php
+                        $horaAmPm = \Carbon\Carbon::parse("2000-01-01 {$recordatorio['hora']}")->format('h:i A');
+                    @endphp
+                    <div class="flex items-center justify-between text-[10px] pt-0.5">
+                        <p class="text-apoyo font-semibold flex items-center gap-1">
                             <i class="ph-bold ph-clock text-[10px]"></i>
-                            Programada: {{ $recordatorio['hora'] }}
+                            Programada: {{ $recordatorio['hora'] }} <span class="font-mono font-bold text-titulo">({{ $horaAmPm }})</span>
                         </p>
+                        <div class="shrink-0">
+                            <template x-if="relojPC.sePaso('{{ $recordatorio['hora'] }}') || {{ $vencida ? 'true' : 'false' }}">
+                                <span class="text-[9.5px] font-black text-rose-700 dark:text-rose-400 bg-rose-100 dark:bg-rose-950/60 px-2 py-0.5 rounded flex items-center gap-1 border border-rose-300 animate-pulse">
+                                    <i class="ph-bold ph-warning"></i>
+                                    <span>Se pasó de hora por: <strong class="font-mono font-black" x-text="relojPC.tiempoDiferenciaFormateado('{{ $recordatorio['hora'] }}')"></strong></span>
+                                </span>
+                            </template>
+                            <template x-if="!relojPC.sePaso('{{ $recordatorio['hora'] }}') && !{{ $vencida ? 'true' : 'false' }}">
+                                <span class="text-[9.5px] font-bold text-amber-700 dark:text-amber-400 bg-amber-100 dark:bg-amber-950/60 px-2 py-0.5 rounded border border-amber-300 flex items-center gap-1">
+                                    <i class="ph-bold ph-clock-countdown"></i>
+                                    <span>Próxima en: <strong class="font-mono font-black" x-text="relojPC.tiempoDiferenciaFormateado('{{ $recordatorio['hora'] }}')"></strong></span>
+                                </span>
+                            </template>
+                        </div>
+                    </div>
                     </div>
 
                     {{-- Botones de Acción --}}

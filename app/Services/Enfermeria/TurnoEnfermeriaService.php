@@ -27,6 +27,18 @@ class TurnoEnfermeriaService
         return $user->hasRole('SUPERADMINISTRADOR') || $user->hasRole('ADMINISTRADOR');
     }
 
+    public function esPersonalClinicoAutorizado(?User $user = null): bool
+    {
+        $user = $user ?? Auth::user();
+        if (!$user) {
+            return false;
+        }
+        return $this->esSuperAdmin($user)
+            || $user->hasRole('MEDICO GENERAL/GERIATRA')
+            || $user->can('salud.ver')
+            || $user->can('valoracion_medica.ver');
+    }
+
     /**
      * Obtiene el turno activo del enfermero en una fecha dada.
      * Prioriza la planilla institucional y como fallback la franja horaria actual.
@@ -150,7 +162,7 @@ class TurnoEnfermeriaService
     public function esPacienteAsignado(string|AdultoMayor $adulto, ?User $user = null, ?string $codTurno = null): bool
     {
         $user = $user ?? Auth::user();
-        if ($this->esSuperAdmin($user)) {
+        if ($this->esPersonalClinicoAutorizado($user)) {
             return true;
         }
 
@@ -183,7 +195,7 @@ class TurnoEnfermeriaService
     public function autorizarAccionPaciente(string|AdultoMayor $adulto, ?User $user = null, ?string $codTurno = null): void
     {
         $user = $user ?? Auth::user();
-        if ($this->esSuperAdmin($user)) {
+        if ($this->esPersonalClinicoAutorizado($user)) {
             return;
         }
 
