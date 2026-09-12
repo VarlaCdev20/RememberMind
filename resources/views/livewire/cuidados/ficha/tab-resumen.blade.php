@@ -14,7 +14,7 @@
         </div>
 
         {{-- Tarjeta Agrupada 1: Diagnósticos, Alergias y Antecedentes --}}
-        <div class="rounded-2xl border border-borde bg-fondo-panel p-4 shadow-sm space-y-4">
+        <div class="rounded-2xl border border-borde rm-surface-card bg-fondo-panel p-4 shadow-sm space-y-4">
             {{-- Diagnósticos Activos --}}
             <div>
                 <h3 class="text-xs font-bold text-parrafo flex items-center gap-1.5 mb-2">
@@ -78,7 +78,7 @@
         </div>
 
         {{-- Tarjeta Agrupada 2: Datos Médicos y Contacto de Emergencia --}}
-        <div class="rounded-2xl border border-borde bg-fondo-panel p-4 shadow-sm space-y-3">
+        <div class="rounded-2xl border border-borde rm-surface-card bg-fondo-panel p-4 shadow-sm space-y-3">
             <div class="grid grid-cols-2 gap-3 text-xs">
                 <div class="rounded-xl bg-fondo-card p-2.5 border border-borde">
                     <span class="text-[10px] font-bold text-apoyo uppercase block">Grupo Sanguíneo</span>
@@ -89,7 +89,7 @@
                 <div class="rounded-xl bg-fondo-card p-2.5 border border-borde">
                     <span class="text-[10px] font-bold text-apoyo uppercase block">Seguro de Salud</span>
                     <span class="text-xs font-bold text-titulo mt-0.5 block truncate" title="{{ $adultoMayor->seguro_medico ?? $adultoMayor->seguro_salud ?? 'Particular' }}">
-                        {{ $adultoMayor->seguro_medico ?? $adultoMayor->seguro_salud ?? 'Particular / N/E' }}
+                        {{ $adultoMayor->seguro_medico ?? $adultoMayor->seguro_salud ?? 'Particular / No registrado' }}
                     </span>
                 </div>
             </div>
@@ -146,7 +146,7 @@
         @php
             $ultSeg = isset($adultoMayor->seguimientosDiarios) ? $adultoMayor->seguimientosDiarios->first() : null;
         @endphp
-        <div class="rounded-2xl border border-borde bg-fondo-panel p-4 shadow-sm">
+        <div class="rounded-2xl border border-borde rm-surface-card bg-fondo-panel p-4 shadow-sm">
             <div class="flex items-center justify-between mb-2">
                 <h3 class="text-xs font-bold text-parrafo flex items-center gap-1.5">
                     <i class="ph-bold ph-note-pencil text-blue-600"></i>
@@ -191,7 +191,7 @@
         @php
             $ultFunc = isset($adultoMayor->valoracionesFuncionales) ? $adultoMayor->valoracionesFuncionales->sortByDesc('fecha_valoracion')->first() : null;
         @endphp
-        <div class="rounded-2xl border border-borde bg-fondo-panel p-4 shadow-sm">
+        <div class="rounded-2xl border border-borde rm-surface-card bg-fondo-panel p-4 shadow-sm">
             <h3 class="text-xs font-bold text-parrafo flex items-center gap-1.5 mb-2.5">
                 <i class="ph-bold ph-gauge text-indigo-600"></i>
                 <span>Nivel Funcional y Dependencia</span>
@@ -228,7 +228,7 @@
         @php
             $plan = $adultoMayor->planCuidadoActivo ?? null;
         @endphp
-        <div class="rounded-2xl border border-borde bg-fondo-panel p-4 shadow-sm">
+        <div class="rounded-2xl border border-borde rm-surface-card bg-fondo-panel p-4 shadow-sm">
             <h3 class="text-xs font-bold text-parrafo flex items-center gap-1.5 mb-2">
                 <i class="ph-bold ph-hand-heart text-sky-600"></i>
                 <span>Plan de Cuidados Vigente</span>
@@ -258,7 +258,7 @@
         @php
             $ultSigno = isset($adultoMayor->signosVitales) ? $adultoMayor->signosVitales->first() : null;
         @endphp
-        <div class="rounded-2xl border border-borde bg-fondo-panel p-4 shadow-sm">
+        <div class="rounded-2xl border border-borde rm-surface-card bg-fondo-panel p-4 shadow-sm">
             <h3 class="text-xs font-bold text-parrafo flex items-center gap-1.5 mb-2.5">
                 <i class="ph-bold ph-activity text-teal-600"></i>
                 <span>Parámetros Fisiológicos y de Confort</span>
@@ -322,7 +322,7 @@
             $cantPuntos = $grafica ? count($grafica['labels']) : 0;
         @endphp
 
-        <div class="rounded-2xl border border-borde bg-fondo-panel p-4 shadow-sm space-y-4">
+        <div class="rounded-2xl border border-borde rm-surface-card bg-fondo-panel p-4 shadow-sm space-y-4">
             {{-- Gráfica A: Presión Arterial (Sistólica y Diastólica) --}}
             <div>
                 <div class="flex items-center justify-between mb-2">
@@ -486,7 +486,7 @@
         </div>
 
         {{-- Próxima Medicación Programada --}}
-        <div class="rounded-2xl border border-borde bg-fondo-panel p-4 shadow-sm">
+        <div class="rounded-2xl border border-borde rm-surface-card bg-fondo-panel p-4 shadow-sm">
             <h3 class="text-xs font-bold text-parrafo flex items-center gap-1.5 mb-2.5">
                 <i class="ph-bold ph-pill text-emerald-600"></i>
                 <span>Próxima Medicación</span>
@@ -518,7 +518,7 @@
         </div>
 
         {{-- Próximas Tareas de Cuidado --}}
-        <div class="rounded-2xl border border-borde bg-fondo-panel p-4 shadow-sm">
+        <div class="rounded-2xl border border-borde rm-surface-card bg-fondo-panel p-4 shadow-sm">
             <h3 class="text-xs font-bold text-parrafo flex items-center gap-1.5 mb-2.5">
                 <i class="ph-bold ph-check-square-offset text-sky-600"></i>
                 <span>Próximas Tareas de Cuidado</span>

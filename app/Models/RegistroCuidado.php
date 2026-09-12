@@ -34,4 +34,7 @@ class RegistroCuidado extends Model
     public function turno() { return $this->belongsTo(TurnoEnfermeria::class, 'cod_turno', 'cod_turno'); }
     public function registrador() { return $this->belongsTo(User::class, 'registrado_por', 'cod_usu'); }
     public function original() { return $this->belongsTo(self::class, 'rectifica_a', 'cod_registro_cuidado'); }
+    public function relacionado() { return $this->belongsTo(self::class, 'relacionado_a', 'cod_registro_cuidado'); }
+    public function relacionados() { return $this->hasMany(self::class, 'relacionado_a', 'cod_registro_cuidado'); }
+    public function rectificaciones() { return $this->hasMany(self::class, 'rectifica_a', 'cod_registro_cuidado'); }
 }

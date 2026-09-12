@@ -376,7 +376,7 @@
                     </div>
                     <div>
                         <h5 class="font-black text-titulo text-sm">Detalle de Asignación</h5>
-                        <p class="text-xs text-apoyo font-mono">{{ $detalleAsignacion['cod_asignacion'] }}</p>
+                        <p class="text-xs text-apoyo">{{ $detalleAsignacion['tipo_asignacion'] }} · {{ $detalleAsignacion['area'] }}</p>
                     </div>
                 </div>
                 <button type="button" wire:click="cerrarDetalle"

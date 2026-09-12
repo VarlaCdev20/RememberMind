@@ -273,21 +273,25 @@ class AdultoMayorController extends Controller
 
         if ($format === 'pdf') {
             $pdf = Pdf::loadView('pages.adultos-mayores.reportes.pdf_individual', $viewData)->setPaper('a4', 'portrait');
+            $nombreArchivo = \Illuminate\Support\Str::slug(trim("{$adulto->nombres} {$adulto->ap_paterno} {$adulto->ap_materno}"), '_');
 
-            return $pdf->download("Expediente_Integral_{$adulto->cod_am}.pdf");
+            return $pdf->download("Expediente_Integral_{$nombreArchivo}.pdf");
         }
 
         if ($format === 'excel') {
             activity()->causedBy(auth()->user())->performedOn($adulto)->event('reporte_generado')
                 ->log('Se descargó el expediente completo en formato Excel.');
 
-            return Excel::download(new AdultoIndividualExport($adulto), "Expediente_{$adulto->cod_am}.xlsx");
+            $nombreArchivo = \Illuminate\Support\Str::slug(trim("{$adulto->nombres} {$adulto->ap_paterno} {$adulto->ap_materno}"), '_');
+
+            return Excel::download(new AdultoIndividualExport($adulto), "Expediente_{$nombreArchivo}.xlsx");
         }
 
         if ($format === 'word') {
+            $nombreArchivo = \Illuminate\Support\Str::slug(trim("{$adulto->nombres} {$adulto->ap_paterno} {$adulto->ap_materno}"), '_');
             $headers = [
                 'Content-Type' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-                'Content-Disposition' => "attachment; filename=\"Ficha_{$adulto->cod_am}.doc\"",
+                'Content-Disposition' => "attachment; filename=\"Ficha_{$nombreArchivo}.doc\"",
             ];
             $content = view('pages.adultos-mayores.reportes.word_individual', $viewData)->render();
 

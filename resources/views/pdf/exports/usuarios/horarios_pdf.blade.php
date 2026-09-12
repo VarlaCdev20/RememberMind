@@ -11,8 +11,8 @@
  <tr>
  <td class="label-detail">Nombre Completo:</td>
  <td class="value-detail" style="font-weight: bold; font-size: 11px;">{{ $usuario->nombres }} {{ $usuario->ap_paterno }} {{ $usuario->ap_materno }}</td>
- <td class="label-detail">Código Interno:</td>
- <td class="value-detail" style="font-weight: bold; color: #E27D60;">{{ $usuario->cod_usu }}</td>
+ <td class="label-detail">Estado de acceso:</td>
+ <td class="value-detail" style="font-weight: bold; color: #E27D60;">{{ $usuario->estado ?? 'SIN REGISTRAR' }}</td>
  </tr>
  <tr>
  <td class="label-detail">Documento Identidad:</td>
@@ -115,4 +115,5 @@
  Esta grilla horaria determina la planificación formal del colaborador. Cualquier desvío de la jornada debe informarse por los canales oficiales de CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS.
  </div>
 @endsection
+
 

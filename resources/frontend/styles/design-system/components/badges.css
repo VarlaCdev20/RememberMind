@@ -1,0 +1,78 @@
+/* ============================================================
+   REMEMBERMIND DESIGN SYSTEM — COMPONENTS / BADGES
+   Pills de estado clínico y del sistema. NUNCA solo color:
+   Combina punto/icono + texto legible + color.
+   ============================================================ */
+
+.rm-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--rm-space-1);
+    padding: 3px 10px;
+    border-radius: var(--rm-radius-badge);
+    font-family: var(--rm-font-ui);
+    font-size: var(--rm-font-badge);
+    font-weight: var(--rm-font-weight-bold);
+    text-transform: uppercase;
+    letter-spacing: var(--rm-letter-spacing-wide);
+    line-height: 1.2;
+    border: 1px solid transparent;
+    white-space: nowrap;
+}
+
+.rm-badge-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: var(--rm-radius-badge);
+    flex-shrink: 0;
+}
+
+/* 1. Success / Estable / Activo */
+.rm-badge-success {
+    background-color: var(--rm-state-success-bg);
+    color: var(--rm-state-success-text);
+    border-color: var(--rm-state-success-border);
+}
+.rm-badge-success .rm-badge-dot {
+    background-color: var(--rm-success);
+}
+
+/* 2. Warning / Observación / Pendiente */
+.rm-badge-warning {
+    background-color: var(--rm-state-warning-bg);
+    color: var(--rm-state-warning-text);
+    border-color: var(--rm-state-warning-border);
+}
+.rm-badge-warning .rm-badge-dot {
+    background-color: var(--rm-warning);
+}
+
+/* 3. Danger / Riesgo / Alerta Crítica */
+.rm-badge-danger {
+    background-color: var(--rm-state-danger-bg);
+    color: var(--rm-state-danger-text);
+    border-color: var(--rm-state-danger-border);
+}
+.rm-badge-danger .rm-badge-dot {
+    background-color: var(--rm-danger);
+}
+
+/* 4. Info / Clínico / Contextual */
+.rm-badge-info {
+    background-color: var(--rm-state-info-bg);
+    color: var(--rm-state-info-text);
+    border-color: var(--rm-state-info-border);
+}
+.rm-badge-info .rm-badge-dot {
+    background-color: var(--rm-info);
+}
+
+/* 5. Neutral / Inactivo / Cerrado */
+.rm-badge-neutral {
+    background-color: var(--rm-state-neutral-bg);
+    color: var(--rm-state-neutral-text);
+    border-color: var(--rm-state-neutral-border);
+}
+.rm-badge-neutral .rm-badge-dot {
+    background-color: var(--rm-text-soft);
+}

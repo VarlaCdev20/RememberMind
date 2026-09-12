@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
  <meta charset="UTF-8">
- <title>Reporte Individual - {{ $adulto->cod_am }}</title>
+ <title>Reporte Individual - {{ $adulto->nombres }} {{ $adulto->ap_paterno }}</title>
  <style>
  @page { margin: 1cm; }
  body { font-family: 'Helvetica', 'Arial', sans-serif; color: #2F3E5C; font-size: 11px; line-height: 1.4; }
@@ -54,7 +54,7 @@
  </td>
  <td class="title">
  <h2>Ficha Técnica Individual</h2>
- <p>Expediente: {{ $adulto->cod_am }}</p>
+ <p>Residente: {{ $adulto->nombres }} {{ $adulto->ap_paterno }} {{ $adulto->ap_materno }}</p>
  <p>Fecha: {{ now()->format('d/m/Y') }}</p>
  </td>
  </tr>
@@ -226,7 +226,7 @@
  <span style="font-size:9px;color:#666;text-transform:uppercase;letter-spacing:1px;">CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS · Resumen Visual de Indicadores</span></td>
  <td style="text-align:right;">
  <span style="font-size:15px;font-weight:bold;text-transform:uppercase;color:#2F3E5C;">Análisis Gráfico</span><br>
- <span style="color:#666;font-weight:bold;font-size:10px;">Expediente: {{ $adulto->cod_am }}</span>
+ <span style="color:#666;font-weight:bold;font-size:10px;">{{ $adulto->ci ? 'CI '.$adulto->ci : 'Documento no registrado' }}</span>
  <span style="color:#999;font-size:9px;"> · {{ now()->format('d/m/Y') }}</span>
  </td>
  </tr>

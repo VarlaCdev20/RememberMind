@@ -180,7 +180,7 @@
  {{-- FOTO Y ENCABEZADO TARJETA --}}
  <div class="p-5 flex flex-col items-center border-b border-borde-suave bg-gradient-to-b from-[#E6DDD3]/10 to-transparent">
  <span class="absolute top-4 right-4 rounded-lg {{ $colorEstado }} px-2 py-1 text-[9px] font-bold uppercase tracking-wider">{{ $estado }}</span>
- <span class="absolute top-4 left-4 text-[9px] font-bold uppercase tracking-widest text-apoyo bg-fondo-panel px-2 py-1 rounded-md border border-borde-suave shadow-sm"><i class="ph-bold ph-hash mr-0.5"></i>{{ $adulto->cod_am }}</span>
+ <span class="absolute top-4 left-4 text-[9px] font-bold uppercase tracking-widest text-apoyo bg-fondo-panel px-2 py-1 rounded-md border border-borde-suave shadow-sm">{{ $adulto->edad ?? 'Edad no registrada' }}{{ $adulto->edad ? ' años' : '' }}</span>
  
  @if($fotoUrl)
  <img src="{{ $fotoUrl }}" class="mt-4 mb-3 h-24 w-24 rounded-2xl object-cover border-4 border-white shadow-sm">
@@ -282,7 +282,6 @@
  <table class="w-full text-left text-sm text-titulo">
  <thead class="bg-fondo-panel text-[9px] font-bold uppercase tracking-widest text-apoyo border-b border-borde-suave">
  <tr>
- <th class="px-5 py-4">Ficha</th>
  <th class="px-5 py-4">Nombre Completo</th>
  <th class="px-5 py-4">Carnet Identidad</th>
  <th class="px-5 py-4">Edad</th>
@@ -301,7 +300,6 @@
  }
  @endphp
  <tr class="hover:bg-fondo-panel transition">
- <td class="px-5 py-3.5 font-bold text-xs text-boton-acento">{{ $adulto->cod_am }}</td>
  <td class="px-5 py-3.5 font-bold text-xs">{{ $adulto->nombres }} {{ $adulto->ap_paterno }} {{ $adulto->ap_materno }}</td>
  <td class="px-5 py-3.5 text-xs">{{ $adulto->ci }} {{ $adulto->complemento_ci }}</td>
  <td class="px-5 py-3.5 text-xs font-bold">{{ $adulto->edad }} años</td>
@@ -365,7 +363,7 @@
  <div>
  <div class="mb-3 flex items-center justify-between">
  <span class="rounded-lg bg-fondo-panel px-2.5 py-1 text-[9px] font-bold uppercase text-parrafo tracking-wider border border-borde shadow-sm">{{ $adulto->estado_adulto }}</span>
- <span class="text-[10px] font-bold text-apoyo"><i class="ph-bold ph-hash mr-0.5"></i>{{ $adulto->cod_am }}</span>
+ <span class="text-[10px] font-bold text-apoyo">{{ $adulto->ci ? 'CI '.$adulto->ci : 'Documento no registrado' }}</span>
  </div>
  <h3 class="text-base font-extrabold text-apoyo leading-tight">{{ $adulto->nombres }} {{ $adulto->ap_paterno }}</h3>
  <p class="text-xs text-apoyo font-bold mt-1">{{ $adulto->ap_materno }}</p>
@@ -433,7 +431,7 @@
  <div>
  <div class="flex justify-between items-start mb-3">
  <div>
- <span class="text-[9px] font-bold text-boton-acento bg-estado-peligroBg px-2 py-0.5 rounded-full border border-borde-focus tracking-widest uppercase">{{ $adulto->cod_am }}</span>
+ <span class="text-[9px] font-bold text-boton-acento bg-estado-peligroBg px-2 py-0.5 rounded-full border border-borde-focus tracking-widest uppercase">{{ $adulto->ci ? 'CI '.$adulto->ci : 'Documento pendiente' }}</span>
  <h3 class="text-base font-extrabold text-titulo leading-tight mt-1">{{ $adulto->nombres }} {{ $adulto->ap_paterno }}</h3>
  </div>
  <span class="rounded-full bg-estado-peligroBg p-2 text-boton-acento border border-borde-focus shadow-inner"><i class="ph-bold ph-warning text-base"></i></span>

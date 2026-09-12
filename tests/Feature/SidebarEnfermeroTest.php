@@ -44,7 +44,6 @@ class SidebarEnfermeroTest extends TestCase
             'Mis pacientes',
             'Agenda',
             'Medicación',
-            'Valoraciones iniciales',
             'Alertas',
             'Registros',
             'Evolución 360°',
@@ -58,7 +57,6 @@ class SidebarEnfermeroTest extends TestCase
             'admin.enfermeria.pacientes',
             'admin.enfermeria.agenda',
             'admin.salud-seguimiento.medicacion.index',
-            'admin.admision.valoracion-enfermeria',
             'admin.enfermeria.alertas',
             'admin.enfermeria.registros',
             'admin.enfermeria.pacientes',
@@ -164,7 +162,6 @@ class SidebarEnfermeroTest extends TestCase
         $response->assertSee('Mis pacientes');
         $response->assertSee('Agenda');
         $response->assertSee('Medicación');
-        $response->assertSee('Valoraciones iniciales');
         $response->assertSee('Alertas');
         $response->assertSee('Registros');
         $response->assertSee('Evolución 360°');

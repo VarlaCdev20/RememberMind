@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 
 namespace Database\Seeders;
 
@@ -18,6 +18,7 @@ class DatabaseSeeder extends Seeder
             EstadoAdultoSeeder::class,
             EstadosAdultoFlujoClinicoSeeder::class,
             RolesAndPermissionsSeeder::class,
+            EnfermeriaSecurityPermissionsSeeder::class,
             SaludSeguimientoPermissionsSeeder::class,
             FlujoClinicoPermissionsSeeder::class,
 
@@ -31,43 +32,9 @@ class DatabaseSeeder extends Seeder
             TipoActividadAdultoSeeder::class,
             GeriatricSuiteSeeder::class,
 
-            // ─────────────────────────────────────────────
-            // 3. Usuarios, roles operativos y personal
-            // ─────────────────────────────────────────────
+            // Cuenta inicial necesaria para acceder a una instalación vacía.
+            // El personal, residentes y expedientes se registran desde el sistema.
             AdminSeeder::class,
-            PersonalSeeder::class,
-            EnfermeroConHorarioSeeder::class,
-            CarlaPatriciaEnfermeriaSeeder::class,
-
-            // ─────────────────────────────────────────────
-            // 4. Habitaciones, camas y residentes
-            // ─────────────────────────────────────────────
-            HabitacionesCamasSeeder::class,
-            AdultoMayorSeeder::class,
-            ResidentesSeeder::class,
-            PacienteMendozaSeeder::class,
-
-            // ─────────────────────────────────────────────
-            // 5. Preadmisiones y flujo inicial
-            // ─────────────────────────────────────────────
-            PreadmisionesSeeder::class,
-            AdultoConPreadmisionAprobadaSeeder::class,
-
-            // ─────────────────────────────────────────────
-            // 6. Datos clínicos, enfermería y seguimiento
-            // ─────────────────────────────────────────────
-            ClinicaSeeder::class,
-            EnfermeriaPacienteSeeder::class,
-            DatosEnfermeriaDemoSeeder::class,
-            EnfermeriaOperativaSeeder::class,
-            AlertasRealesSeeder::class,
-
-            // ─────────────────────────────────────────────
-            // 7. Actividades, voluntariado y demo integral
-            // ─────────────────────────────────────────────
-            ActividadesSeeder::class,
-            VoluntariosSeeder::class,
-            DemoIntegralSeeder::class,
         ]);
     }
 }

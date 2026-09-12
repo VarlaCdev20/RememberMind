@@ -121,10 +121,10 @@
 		@foreach($alertas as $alerta)
 		<article class="rounded-[1rem] transition flex flex-col justify-between rm-alert-card rm-alert-card-compact {{ $alerta['nivel'] === 'prioritaria' ? 'rm-alert-card-prioritaria' : ($alerta['nivel'] === 'preventiva' ? 'rm-alert-card-preventiva' : '') }}">
 			<div class="rm-alert-card-body">
-				{{-- Fila superior: ID y Nivel --}}
+				{{-- Fila superior: categoría y nivel --}}
 				<div class="flex items-center justify-between gap-2">
 					<span class="rm-alert-meta uppercase">
-						{{ $alerta['adulto_id'] }}
+						{{ $alerta['categoria_label'] }}
 					</span>
 					<span class="rm-alert-pill {{ $alerta['nivel'] === 'prioritaria' ? 'bg-estado-peligroBg text-estado-peligro border-estado-peligroBorde' : ($alerta['nivel'] === 'preventiva' ? 'bg-estado-advertenciaBg text-estado-advertencia border-estado-advertenciaBorde' : 'bg-fondo-card text-apoyo border-borde-suave') }}">
 						{{ $alerta['nivel'] }}

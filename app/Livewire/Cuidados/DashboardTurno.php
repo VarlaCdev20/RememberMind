@@ -19,6 +19,10 @@ use App\Models\TareaPlanCuidado;
 use App\Models\TurnoEnfermeria;
 use App\Models\ValoracionEnfermeriaAdmision;
 use App\Services\Enfermeria\TurnoEnfermeriaService;
+use App\Services\Clinica\SignosVitalesService;
+use App\Services\Alertas\AlertasService;
+use App\Services\Medicacion\RegistrarAdministracionMedicacionService;
+use App\Services\Medicacion\AgendaMedicacionService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -48,6 +52,7 @@ class DashboardTurno extends Component
     public bool $modalOmitirMed = false;
     public ?string $medOmitirId = null;
     public ?string $medOmitirCodAm = null;
+    public ?string $medOmitirHora = null;
     public string $motivoOmisionMed = '';
 
     public bool $modalAtenderAlerta = false;
@@ -104,7 +109,7 @@ class DashboardTurno extends Component
     {
         abort_unless(auth()->user()?->can('tareas.registrar_resultado'), 403);
         $tarea = TareaPlanCuidado::findOrFail($codTarea);
-        app(TurnoEnfermeriaService::class)->autorizarAccionPaciente($tarea->cod_am, Auth::user());
+        app(TurnoEnfermeriaService::class)->autorizarMutacionPaciente($tarea->cod_am, 'tareas.registrar_resultado', Auth::user());
 
         DB::transaction(function () use ($tarea) {
             $bloqueada = TareaPlanCuidado::lockForUpdate()->findOrFail($tarea->cod_tarea);
@@ -128,7 +133,7 @@ class DashboardTurno extends Component
     {
         abort_unless(auth()->user()?->can('tareas.omitir'), 403);
         $tarea = TareaPlanCuidado::findOrFail($codTarea);
-        app(TurnoEnfermeriaService::class)->autorizarAccionPaciente($tarea->cod_am, Auth::user());
+        app(TurnoEnfermeriaService::class)->autorizarMutacionPaciente($tarea->cod_am, 'tareas.omitir', Auth::user());
         abort_unless($tarea->puedeCompletarse(), 409, 'La tarea ya no está pendiente de ejecución.');
         $this->tareaOmitirId = $codTarea;
         $this->motivoOmisionTarea = '';
@@ -145,7 +150,7 @@ class DashboardTurno extends Component
         ]);
 
         $tarea = TareaPlanCuidado::findOrFail($this->tareaOmitirId);
-        app(TurnoEnfermeriaService::class)->autorizarAccionPaciente($tarea->cod_am, Auth::user());
+        app(TurnoEnfermeriaService::class)->autorizarMutacionPaciente($tarea->cod_am, 'tareas.omitir', Auth::user());
         abort_unless($tarea->puedeCompletarse(), 409, 'La tarea ya no está pendiente de ejecución.');
         $tarea->update([
             'estado' => 'OMITIDA',
@@ -165,50 +170,18 @@ class DashboardTurno extends Component
 
     // ─── ACCIONES DE MEDICACIÓN ──────────────────────────────────────
 
-    public function administrarMed(string $codMedAdulto, string $codAm)
+    public function administrarMed(string $codMedAdulto, string $codAm, ?string $horaProgramada = null)
     {
         abort_unless(auth()->user()?->can('administracion_medicacion.registrar'), 403);
-        app(TurnoEnfermeriaService::class)->autorizarAccionPaciente($codAm, Auth::user());
-
-        $med = \App\Models\MedicacionAdulto::where('cod_med_adulto', $codMedAdulto)
-            ->where('cod_am', $codAm)
-            ->firstOrFail();
-
-        if (!in_array($med->estado, ['ACTIVO', 'ACTIVA', 'VIGENTE'])) {
-            $this->dispatch('swal', ['icon' => 'error', 'title' => 'Error', 'text' => 'El medicamento no se encuentra activo.']);
-            return;
+        if (! $horaProgramada) {
+            $ocurrencia = app(AgendaMedicacionService::class)->paraAdulto($codAm)
+                ->first(fn (array $item) => $item['medicacion']->cod_med_adulto === $codMedAdulto);
+            $horaProgramada = $ocurrencia['hora'] ?? '';
         }
-
-        $horaProgramada = $med->hora_programada
-            ? Carbon::parse($med->hora_programada)->format('H:i')
-            : now()->format('H:i');
-        $guardado = DB::transaction(function () use ($codMedAdulto, $codAm, $horaProgramada): bool {
-            $yaRegistrado = AdministracionMedicacion::where('cod_med_adulto', $codMedAdulto)
-                ->whereDate('fecha', $this->filtroFecha)
-                ->where('hora_programada', 'like', $horaProgramada . '%')
-                ->lockForUpdate()
-                ->exists();
-            if ($yaRegistrado) {
-                return false;
-            }
-
-            AdministracionMedicacion::create([
-                'cod_med_adulto' => $codMedAdulto,
-                'cod_am' => $codAm,
-                'fecha' => $this->filtroFecha,
-                'hora_programada' => $horaProgramada,
-                'hora_real' => now()->format('H:i'),
-                'administrado' => true,
-                'registrado_por' => Auth::id(),
-                'observacion' => 'Administrada desde cola operativa.',
-            ]);
-            return true;
-        });
-
-        if (!$guardado) {
-            $this->dispatch('swal', ['icon' => 'warning', 'title' => 'Aviso', 'text' => 'Esta dosis ya fue registrada previamente.']);
-            return;
-        }
+        app(RegistrarAdministracionMedicacionService::class)->registrarProgramada(
+            Auth::user(), $codAm, $codMedAdulto, $horaProgramada, true,
+            null, 'Administrada desde la agenda del turno.'
+        );
 
         $this->dispatch('swal', [
             'icon' => 'success',
@@ -217,7 +190,7 @@ class DashboardTurno extends Component
         ]);
     }
 
-    public function abrirOmitirMed(string $codMedAdulto, string $codAm)
+    public function abrirOmitirMed(string $codMedAdulto, string $codAm, ?string $horaProgramada = null)
     {
         abort_unless(auth()->user()?->can('administracion_medicacion.registrar'), 403);
         app(TurnoEnfermeriaService::class)->autorizarAccionPaciente($codAm, Auth::user());
@@ -225,6 +198,9 @@ class DashboardTurno extends Component
             ->whereIn('estado', ['ACTIVO', 'ACTIVA', 'VIGENTE'])->exists(), 404);
         $this->medOmitirId = $codMedAdulto;
         $this->medOmitirCodAm = $codAm;
+        $ocurrencia = app(AgendaMedicacionService::class)->paraAdulto($codAm)
+            ->first(fn (array $item) => $item['medicacion']->cod_med_adulto === $codMedAdulto && $item['registro'] === null);
+        $this->medOmitirHora = $horaProgramada ?: ($ocurrencia['hora'] ?? null);
         $this->motivoOmisionMed = '';
         $this->modalOmitirMed = true;
     }
@@ -238,35 +214,15 @@ class DashboardTurno extends Component
             'motivoOmisionMed.required' => 'Debe indicar el motivo por el cual no se administró el medicamento.',
         ]);
 
-        app(TurnoEnfermeriaService::class)->autorizarAccionPaciente($this->medOmitirCodAm, Auth::user());
-        $med = MedicacionAdulto::where('cod_med_adulto', $this->medOmitirId)
-            ->where('cod_am', $this->medOmitirCodAm)
-            ->whereIn('estado', ['ACTIVO', 'ACTIVA', 'VIGENTE'])
-            ->firstOrFail();
-        $horaProgramada = $med->hora_programada
-            ? Carbon::parse($med->hora_programada)->format('H:i')
-            : now()->format('H:i');
-
-        if (AdministracionMedicacion::where('cod_med_adulto', $med->cod_med_adulto)
-            ->whereDate('fecha', $this->filtroFecha)
-            ->where('hora_programada', 'like', $horaProgramada . '%')->exists()) {
-            $this->addError('motivoOmisionMed', 'Esta dosis ya tiene una administración u omisión registrada.');
-            return;
-        }
-
-        AdministracionMedicacion::create([
-            'cod_med_adulto' => $this->medOmitirId,
-            'cod_am' => $this->medOmitirCodAm,
-            'fecha' => $this->filtroFecha,
-            'hora_programada' => $horaProgramada,
-            'administrado' => false,
-            'motivo_omision' => $this->motivoOmisionMed,
-            'registrado_por' => Auth::id(),
-        ]);
+        app(RegistrarAdministracionMedicacionService::class)->registrarProgramada(
+            Auth::user(), $this->medOmitirCodAm, $this->medOmitirId,
+            (string) $this->medOmitirHora, false, $this->motivoOmisionMed
+        );
 
         $this->modalOmitirMed = false;
         $this->medOmitirId = null;
         $this->medOmitirCodAm = null;
+        $this->medOmitirHora = null;
 
         $this->dispatch('swal', [
             'icon' => 'warning',
@@ -290,33 +246,7 @@ class DashboardTurno extends Component
 
     public function confirmarAtencionAlerta()
     {
-        abort_unless(auth()->user()?->can('alertas.atender'), 403);
-        $this->validate([
-            'accionTomadaAlerta' => 'required|string|min:5|max:1000',
-        ], [
-            'accionTomadaAlerta.required' => 'Debe registrar la acción médica/enfermería iniciada.',
-        ]);
-
-        $alertaCheck = AlertaAdulto::findOrFail($this->alertaAccionId);
-        app(TurnoEnfermeriaService::class)->autorizarAccionPaciente($alertaCheck->cod_am, Auth::user());
-        abort_unless($alertaCheck->estado === 'ABIERTA', 409, 'La alerta ya fue atendida o cerrada.');
-
-        DB::transaction(function () {
-            $alerta = AlertaAdulto::lockForUpdate()->findOrFail($this->alertaAccionId);
-            $alerta->update([
-                'estado' => 'EN_ATENCION',
-                'accion_tomada' => $this->accionTomadaAlerta,
-                'fecha_atencion' => now(),
-                'atendido_por' => Auth::id(),
-            ]);
-
-            $alerta->acciones()->create([
-                'accion' => $this->accionTomadaAlerta,
-                'responsable_id' => Auth::id(),
-                'fecha_accion' => now(),
-                'estado' => 'REALIZADA',
-            ]);
-        });
+        app(AlertasService::class)->registrarIntervencion(AlertaAdulto::findOrFail($this->alertaAccionId), $this->accionTomadaAlerta, Auth::user());
 
         $this->modalAtenderAlerta = false;
         $this->alertaAccionId = null;
@@ -341,31 +271,7 @@ class DashboardTurno extends Component
 
     public function confirmarCierreAlerta()
     {
-        abort_unless(auth()->user()?->can('alertas.cerrar'), 403);
-        $this->validate([
-            'observacionCierreAlerta' => 'required|string|min:5|max:1000',
-        ], [
-            'observacionCierreAlerta.required' => 'Debe indicar la resolución o motivo de cierre de la alerta.',
-        ]);
-
-        DB::transaction(function () {
-            $alerta = AlertaAdulto::lockForUpdate()->findOrFail($this->alertaAccionId);
-            app(TurnoEnfermeriaService::class)->autorizarAccionPaciente($alerta->cod_am, Auth::user());
-            abort_unless($alerta->puedeCerrarse(), 409, 'La alerta ya está cerrada.');
-            $alerta->update([
-                'estado' => 'CERRADA',
-                'observacion_cierre' => $this->observacionCierreAlerta,
-                'fecha_cierre' => now(),
-                'cerrado_por' => Auth::id(),
-            ]);
-
-            $alerta->acciones()->create([
-                'accion' => 'Cierre de alerta: ' . $this->observacionCierreAlerta,
-                'responsable_id' => Auth::id(),
-                'fecha_accion' => now(),
-                'estado' => 'REALIZADA',
-            ]);
-        });
+        app(AlertasService::class)->cerrar(AlertaAdulto::findOrFail($this->alertaAccionId), $this->observacionCierreAlerta, Auth::user());
 
         $this->modalCerrarAlerta = false;
         $this->alertaAccionId = null;
@@ -397,60 +303,16 @@ class DashboardTurno extends Component
 
     public function guardarSignos()
     {
-        abort_unless(auth()->user()?->can('signos_vitales.crear'), 403);
-        app(TurnoEnfermeriaService::class)->autorizarAccionPaciente($this->signoCodAm, Auth::user());
-        $this->validate([
-            'signoPresion' => 'nullable|string|max:20',
-            'signoFC' => 'nullable|integer|min:30|max:220',
-            'signoFR' => 'nullable|integer|min:8|max:60',
-            'signoTemp' => 'nullable|numeric|min:32|max:43',
-            'signoSat' => 'nullable|integer|min:50|max:100',
-            'signoGlucosa' => 'nullable|numeric|min:20|max:700',
-            'signoDolor' => 'nullable|integer|min:0|max:10',
-            'signoObservacion' => 'nullable|string|max:1000',
-        ]);
-
-        if (empty($this->signoPresion) && empty($this->signoFC) && empty($this->signoTemp) && empty($this->signoSat)) {
-            $this->addError('signoPresion', 'Registre al menos un signo vital principal (PA, FC, Temp o Sat).');
-            return;
-        }
-
-        $presionSis = null;
-        $presionDia = null;
-        if (!empty($this->signoPresion) && !preg_match('/^\s*(\d{2,3})\s*\/\s*(\d{2,3})\s*$/', $this->signoPresion, $coincidencia)) {
-            $this->addError('signoPresion', 'La presión arterial debe tener el formato sistólica/diastólica, por ejemplo 120/80.');
-            return;
-        }
-        if (!empty($this->signoPresion)) {
-            $presionSis = (int) $coincidencia[1];
-            $presionDia = (int) $coincidencia[2];
-            if ($presionSis < 50 || $presionSis > 260 || $presionDia < 30 || $presionDia > 160) {
-                $this->addError('signoPresion', 'La presión arterial está fuera de los rangos biológicos admitidos.');
-                return;
-            }
-            if ($presionSis <= $presionDia) {
-                $this->addError('signoPresion', 'La presión sistólica debe ser mayor que la presión diastólica.');
-                return;
-            }
-        }
-
-        SignosVitalesAdulto::create([
-            'cod_am' => $this->signoCodAm,
-            'fecha' => $this->filtroFecha,
-            'hora' => now()->format('H:i:s'),
-            'presion_arterial' => $this->signoPresion ?: null,
-            'presion_sistolica' => $presionSis,
-            'presion_diastolica' => $presionDia,
-            'frecuencia_cardiaca' => $this->signoFC ?: null,
-            'frecuencia_respiratoria' => $this->signoFR ?: null,
-            'temperatura' => $this->signoTemp ?: null,
-            'saturacion' => $this->signoSat ?: null,
-            'glucosa' => $this->signoGlucosa ?: null,
-            'dolor' => $this->signoDolor !== '' ? (int) $this->signoDolor : null,
-            'observacion' => $this->signoObservacion ?: null,
-            'registrado_por' => Auth::id(),
-            'estado' => 'VIGENTE',
-        ]);
+        app(SignosVitalesService::class)->registrar($this->signoCodAm, [
+            'presion_arterial' => $this->signoPresion,
+            'frecuencia_cardiaca' => $this->signoFC,
+            'frecuencia_respiratoria' => $this->signoFR,
+            'temperatura' => $this->signoTemp,
+            'saturacion' => $this->signoSat,
+            'glucosa' => $this->signoGlucosa,
+            'dolor' => $this->signoDolor,
+            'observacion' => $this->signoObservacion,
+        ], Auth::user());
 
         $this->modalSignos = false;
         $this->signoCodAm = null;
@@ -482,7 +344,7 @@ class DashboardTurno extends Component
     public function guardarSeguimiento()
     {
         abort_unless(auth()->user()?->can('seguimiento.crear'), 403);
-        app(TurnoEnfermeriaService::class)->autorizarAccionPaciente($this->segCodAm, Auth::user());
+        app(TurnoEnfermeriaService::class)->autorizarMutacionPaciente($this->segCodAm, 'seguimiento.crear', Auth::user());
         $this->validate([
             'segEstadoGeneral' => 'required|in:ESTABLE,VIGILANCIA,DELICADO,CRITICO',
             'segAlimentacion' => 'required|in:COMPLETA,PARCIAL,RECHAZADA,AYUNO',

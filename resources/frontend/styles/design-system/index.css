@@ -1,0 +1,38 @@
+﻿/* ============================================================
+   REMEMBERMIND DESIGN SYSTEM â€” ÃNDICE CANÃ“NICO
+   Fuente Ãºnica de verdad de estilos y componentes.
+   Orden de cascada: Tokens â†’ Componentes â†’ Patrones.
+   ============================================================ */
+
+/* 1. TOKENS */
+@import './tokens/colors.css';
+@import './tokens/typography.css';
+@import './tokens/spacing.css';
+@import './tokens/radius.css';
+@import './tokens/shadows.css';
+@import './tokens/states.css';
+@import './tokens/motion.css';
+@import './tokens/accessibility.css';
+@import './tokens/chart-colors.css';
+
+/* 2. COMPONENTES */
+@import './components/buttons.css';
+@import './components/cards.css';
+@import './components/forms.css';
+@import './components/badges.css';
+@import './components/tables.css';
+@import './components/tabs.css';
+@import './components/filters.css';
+@import './components/modals.css';
+@import './components/drawers.css';
+@import './components/alerts.css';
+@import './components/charts.css';
+@import './components/empty-states.css';
+
+/* 3. PATRONES */
+@import './patterns/module-page.css';
+@import './patterns/clinical-dashboard.css';
+@import './patterns/resident-summary.css';
+@import './patterns/clinical-table.css';
+@import './patterns/clinical-detail.css';
+

@@ -48,7 +48,7 @@ class ValoracionBarthelModal extends Component
 
     public function mount(): void
     {
-        $this->fecha_valoracion = date('Y-m-d');
+        $this->fecha_valoracion = today()->toDateString();
     }
 
     public function abrir(string $cod_am): void
@@ -130,7 +130,7 @@ class ValoracionBarthelModal extends Component
     public function guardar(): void
     {
         abort_unless(Auth::check(), 401);
-        app(TurnoEnfermeriaService::class)->autorizarAccionPaciente($this->cod_am, Auth::user());
+        app(TurnoEnfermeriaService::class)->autorizarMutacionEnfermeria($this->cod_am, 'valoracion_enfermeria.crear', Auth::user());
 
         $this->recalcular();
         $this->validate();
@@ -186,7 +186,7 @@ class ValoracionBarthelModal extends Component
     {
         $this->cod_am = null;
         $this->adulto = null;
-        $this->fecha_valoracion = date('Y-m-d');
+        $this->fecha_valoracion = today()->toDateString();
         $this->alimentacion = 0;
         $this->bano = 0;
         $this->aseo_personal = 0;

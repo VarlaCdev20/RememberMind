@@ -133,8 +133,8 @@
  </div>
 
  <div class="rounded-xl border border-borde-suave bg-fondo-panel p-3.5">
- <p class="text-[9px] font-bold uppercase tracking-widest text-apoyo">Código Interno</p>
- <p class="mt-1 text-sm font-bold text-boton-acento">#{{ $idAdulto }}</p>
+ <p class="text-[9px] font-bold uppercase tracking-widest text-apoyo">Estado institucional</p>
+ <p class="mt-1 text-sm font-bold text-boton-acento">{{ optional($adultoObj)->estado_adulto ?: 'Sin registrar' }}</p>
  </div>
 
  <div class="rounded-xl border border-borde-suave bg-fondo-panel p-3.5">

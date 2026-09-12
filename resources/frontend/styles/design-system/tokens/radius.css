@@ -1,0 +1,13 @@
+/* ============================================================
+   REMEMBERMIND DESIGN SYSTEM — TOKENS / RADIUS
+   Definición balanceada y compacta para evitar interfaces sobre-redondeadas.
+   ============================================================ */
+
+:root {
+    --rm-radius-input: 10px;        /* Campos de texto, selects y textareas */
+    --rm-radius-button: 10px;       /* Botones principales y secundarios (9-10px) */
+    --rm-radius-card: 14px;         /* Tarjetas, bloques de KPI y paneles */
+    --rm-radius-panel: 16px;        /* Contenedores maestros de pantalla */
+    --rm-radius-modal: 16px;        /* Modales centrales y drawers */
+    --rm-radius-badge: 9999px;      /* Pills de estado, chips y badges */
+}

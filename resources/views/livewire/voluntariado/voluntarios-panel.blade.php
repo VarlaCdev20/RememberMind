@@ -289,7 +289,7 @@
  </span>
  <span class="min-w-0">
  <span class="block max-w-[220px] truncate text-sm font-bold text-titulo group-hover:text-boton-acento">{{ $nombre ?: 'Voluntario sin nombre' }}</span>
- <span class="mt-0.5 block text-xs font-bold uppercase tracking-wide text-apoyo">VOL-{{ str_pad($vol->cod_vol, 4, '0', STR_PAD_LEFT) }}</span>
+ <span class="mt-0.5 block text-xs font-bold uppercase tracking-wide text-apoyo">{{ $vol->area_apoyo ?: 'Apoyo institucional' }}</span>
  </span>
  </button>
  </td>
@@ -537,7 +537,7 @@
  Perfil del voluntario
  </span>
  <h2 class="mt-2 truncate text-2xl font-black text-titulo">{{ $nombrePerfil ?: 'Voluntario' }}</h2>
- <p class="mt-1 text-xs font-bold text-apoyo">VOL-{{ str_pad($p->cod_vol, 4, '0', STR_PAD_LEFT) }} · {{ $p->area_apoyo ?: 'Apoyo institucional' }}</p>
+ <p class="mt-1 text-xs font-bold text-apoyo">{{ $p->area_apoyo ?: 'Apoyo institucional' }}</p>
  </div>
  <button type="button" wire:click="cerrarPerfil" class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-borde-suave bg-fondo-panel text-titulo transition hover:bg-boton-acento hover:text-inverso">
  <i class="ph-bold ph-x"></i>

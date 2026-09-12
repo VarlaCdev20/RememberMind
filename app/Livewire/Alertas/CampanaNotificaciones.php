@@ -5,6 +5,7 @@ namespace App\Livewire\Alertas;
 use App\Models\AlertaAdulto;
 use App\Models\AccionAlerta;
 use App\Services\Alertas\DeteccionAlertasService;
+use App\Services\Alertas\AlertasService;
 use App\Services\Enfermeria\TurnoEnfermeriaService;
 use App\Services\Medicacion\AgendaMedicacionService;
 use App\Models\AdultoMayor;
@@ -154,10 +155,11 @@ class CampanaNotificaciones extends Component
             ]);
         });
 
-        $this->modalAtencion = false;
-        $this->alertaIdAccion = null;
         $this->actualizarConteoYLista(false);
         $this->dispatch('alerta-atendida');
+        $this->modalAtencion = false;
+        $this->alertaIdAccion = null;
+        $this->accionTomada = '';
     }
 
     public function abrirCerrar(string $id): void
@@ -196,10 +198,11 @@ class CampanaNotificaciones extends Component
             ]);
         });
 
-        $this->modalCierre = false;
-        $this->alertaIdAccion = null;
         $this->actualizarConteoYLista(false);
         $this->dispatch('alerta-cerrada');
+        $this->modalCierre = false;
+        $this->alertaIdAccion = null;
+        $this->observacionCierre = '';
     }
 
     public function verGraficos(string $codAm): void

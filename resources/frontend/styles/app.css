@@ -11,6 +11,7 @@
 @import './tokens/modo-oscuro.css';
 @import './components/animaciones-transiciones.css';
 @import './components/componentes-ui.css';
+@import './design-system/index.css';
 
 @import './components/enfermeria.css';
 @import './base/documento.css';

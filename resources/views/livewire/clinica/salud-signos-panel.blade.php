@@ -352,7 +352,7 @@
  @endif
 
  {{-- MODAL FORMULARIO DE REGISTRO / EDICIÓN --}}
- <x-ui.modal-livewire wire:model="modalFormulario" title="{{ $signoId ? 'Editar Signos Vitales' : 'Registrar Signos Vitales' }}" maxWidth="2xl" closeMethod="cerrarModal">
+<x-ui.modal-livewire wire:model="modalFormulario" title="{{ $signoId ? 'Rectificar signos vitales' : 'Registrar signos vitales' }}" maxWidth="2xl" closeMethod="cerrarModal">
  <x-slot name="icon">
  <i class="ph-bold ph-heartbeat text-boton-acento"></i>
  </x-slot>
@@ -517,12 +517,16 @@
  </form>
 
  <x-slot name="footer">
+ @if($signoId)
+ <label class="mr-auto block min-w-72 text-sm font-semibold text-titulo">Motivo de rectificación<textarea wire:model="motivoRectificacion" rows="2" class="mt-1 w-full rounded-xl border border-borde bg-fondo-card" placeholder="Explique el dato que debe corregirse"></textarea></label>
+ @error('motivo')<p class="text-xs font-bold text-estado-peligro">{{ $message }}</p>@enderror
+ @endif
  <button type="button" wire:click="cerrarModal" class="rounded-xl border border-borde/70 bg-fondo-card px-5 py-2.5 text-xs font-bold uppercase tracking-wider text-parrafo transition hover:bg-fondo-app active:scale-95">
  Cancelar
  </button>
  <button type="submit" form="formSignos" class="inline-flex items-center justify-center gap-2 rounded-xl bg-boton-acento px-6 py-2.5 text-xs font-bold uppercase tracking-wider text-inverso shadow-[0_8px_16px_rgba(226,125,96,0.2)] transition hover:-translate-y-0.5 hover:bg-fondo-panel active:scale-95 disabled:opacity-50" wire:loading.attr="disabled" wire:target="guardar,confirmarGuardarConAlertas">
  <i wire:loading wire:target="guardar,confirmarGuardarConAlertas" class="ph-bold ph-spinner animate-spin"></i>
- <span>{{ $signoId ? 'Actualizar Signos Vitales' : 'Guardar Signos Vitales' }}</span>
+<span>{{ $signoId ? 'Registrar rectificación' : 'Guardar signos vitales' }}</span>
  </button>
  </x-slot>
  </x-ui.modal-livewire>

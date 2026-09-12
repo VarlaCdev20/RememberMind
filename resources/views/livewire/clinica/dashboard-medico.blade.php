@@ -128,7 +128,7 @@
     <div class="grid grid-cols-1 gap-5 lg:grid-cols-2">
 
         {{-- Gráfico 1: Distribución por Edad y Género --}}
-        <div class="rounded-[24px] border border-borde bg-fondo-card p-5 shadow-sm">
+        <div class="rm-chart-card rm-chart-glass">
             <div class="mb-4 flex items-center justify-between">
                 <div class="flex items-center gap-2">
                     <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-estado-infoBg text-estado-info">
@@ -149,7 +149,7 @@
         </div>
 
         {{-- Gráfico 2: Prevalencia de Diagnósticos --}}
-        <div class="rounded-[24px] border border-borde bg-fondo-card p-5 shadow-sm">
+        <div class="rm-chart-card rm-chart-glass">
             <div class="mb-4 flex items-center gap-2">
                 <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-estado-errorBg text-estado-error">
                     <i class="ph-bold ph-heartbeat text-base"></i>
@@ -173,7 +173,7 @@
     <div class="grid grid-cols-1 gap-5 lg:grid-cols-3">
 
         {{-- Gráfico 3: Tendencia de signos vitales (30 das) --}}
-        <div class="rounded-[24px] border border-borde bg-fondo-card p-5 shadow-sm lg:col-span-2">
+        <div class="rm-chart-card rm-chart-glass lg:col-span-2">
             <div class="mb-4 flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
                 <div class="flex items-center gap-2">
                     <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-boton-acento/10 text-boton-acento">
@@ -213,7 +213,7 @@
         </div>
 
         {{-- Gráfico 4: Nivel de Dependencia Funcional --}}
-        <div class="rounded-[24px] border border-borde bg-fondo-card p-5 shadow-sm">
+        <div class="rm-chart-card rm-chart-glass">
             <div class="mb-4 flex items-center gap-2">
                 <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-estado-exitoBg text-estado-exito">
                     <i class="ph-bold ph-person text-base"></i>
@@ -261,7 +261,7 @@
     <div class="grid grid-cols-1 gap-5 sm:grid-cols-3">
 
         {{-- Gráfico 5: Distribución IMC --}}
-        <div class="rounded-[24px] border border-borde bg-fondo-card p-5 shadow-sm">
+        <div class="rm-chart-card rm-chart-glass">
             <div class="mb-4 flex items-center gap-2">
                 <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-estado-advertenciaBg text-estado-advertencia">
                     <i class="ph-bold ph-scales text-base"></i>
@@ -286,7 +286,7 @@
         </div>
 
         {{-- Gráfico 6: Distribución de Estados --}}
-        <div class="rounded-[24px] border border-borde bg-fondo-card p-5 shadow-sm">
+        <div class="rm-chart-card rm-chart-glass">
             <div class="mb-4 flex items-center gap-2">
                 <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-boton-acento/10 text-boton-acento">
                     <i class="ph-bold ph-chart-pie text-base"></i>
@@ -310,7 +310,7 @@
         </div>
 
         {{-- Gráfico 7: Notas por Tipo --}}
-        <div class="rounded-[24px] border border-borde bg-fondo-card p-5 shadow-sm">
+        <div class="rm-chart-card rm-chart-glass">
             <div class="mb-4 flex items-center gap-2">
                 <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-estado-exitoBg text-estado-exito">
                     <i class="ph-bold ph-note text-base"></i>
@@ -486,7 +486,7 @@
     {{-- ══════════════════════════════════════════════════════
          NOTAS MÉDICAS RECIENTES
     ══════════════════════════════════════════════════════ --}}
-    <div class="rounded-[24px] border border-borde bg-fondo-card p-5 shadow-sm">
+    <div class="rm-chart-card rm-chart-glass">
         <div class="mb-4 flex items-center justify-between">
             <div class="flex items-center gap-2">
                 <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-boton-acento/10 text-boton-acento">

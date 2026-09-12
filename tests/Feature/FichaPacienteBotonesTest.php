@@ -12,6 +12,7 @@ use App\Models\Cama;
 use App\Models\Habitacion;
 use App\Models\MedicacionAdulto;
 use App\Models\PlanCuidado;
+use App\Models\RecepcionTurno;
 use App\Models\SignosVitalesAdulto;
 use App\Models\TareaPlanCuidado;
 use App\Models\TurnoEnfermeria;
@@ -19,6 +20,7 @@ use App\Models\User;
 use Database\Seeders\EstadoAdultoSeeder;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Carbon;
 use Livewire\Livewire;
 use Tests\TestCase;
 
@@ -35,6 +37,7 @@ class FichaPacienteBotonesTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        Carbon::setTestNow('2026-09-11 10:00:00');
 
         $this->seed([EstadoAdultoSeeder::class, RolesAndPermissionsSeeder::class]);
 
@@ -104,6 +107,17 @@ class FichaPacienteBotonesTest extends TestCase
             'nivel_supervision' => 'MEDIO',
             'estado' => 'ACTIVO',
         ]);
+        RecepcionTurno::create([
+            'cod_turno' => $this->turno->cod_turno,
+            'cod_usuario' => $this->enfermero->cod_usu,
+            'fecha_hora_recepcion' => now(),
+        ]);
+    }
+
+    protected function tearDown(): void
+    {
+        Carbon::setTestNow();
+        parent::tearDown();
     }
 
     public function test_modal_registrar_signos_vitales_completo(): void
@@ -143,6 +157,7 @@ class FichaPacienteBotonesTest extends TestCase
             'dosis' => '850 mg',
             'via_administracion' => 'Oral',
             'frecuencia' => 'Cada 12 horas',
+            'hora_programada' => '08:00',
             'fecha_inicio' => today()->toDateString(),
             'estado' => 'ACTIVO',
         ]);

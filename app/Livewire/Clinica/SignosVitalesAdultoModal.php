@@ -5,6 +5,7 @@ namespace App\Livewire\Clinica;
 use Livewire\Component;
 use App\Models\SignosVitalesAdulto;
 use App\Services\Clinica\ValidacionSignosVitalesService;
+use App\Services\Clinica\SignosVitalesService;
 use App\Services\Enfermeria\TurnoEnfermeriaService;
 use Illuminate\Support\Facades\Auth;
 
@@ -27,25 +28,11 @@ class SignosVitalesAdultoModal extends Component
     public $imc = '';
     public $dolor = '';
     public $observacion = '';
+    public $motivoRectificacion = '';
 
     protected $listeners = ['abrirModalSignos'];
 
-    public function rules()
-    {
-        return [
-            'fecha'               => 'required|date|before_or_equal:today',
-            'hora'                => 'required',
-            'presion_arterial'    => 'nullable|string|max:20',
-            'frecuencia_cardiaca' => 'nullable|integer|min:' . ValidacionSignosVitalesService::FC_MIN . '|max:' . ValidacionSignosVitalesService::FC_MAX,
-            'temperatura'         => 'nullable|numeric|min:' . ValidacionSignosVitalesService::TEMP_MIN . '|max:' . ValidacionSignosVitalesService::TEMP_MAX,
-            'saturacion'          => 'nullable|integer|min:' . ValidacionSignosVitalesService::SPO2_MIN . '|max:' . ValidacionSignosVitalesService::SPO2_MAX,
-            'glucosa'             => 'nullable|numeric|min:' . ValidacionSignosVitalesService::GLUCOSA_MIN,
-            'peso'                => 'nullable|numeric|min:' . ValidacionSignosVitalesService::PESO_MIN . '|max:' . ValidacionSignosVitalesService::PESO_MAX,
-            'talla'               => 'nullable|numeric|min:0.5|max:' . ValidacionSignosVitalesService::TALLA_CM_MAX,
-            'dolor'               => 'nullable|integer|min:' . ValidacionSignosVitalesService::DOLOR_MIN . '|max:' . ValidacionSignosVitalesService::DOLOR_MAX,
-            'observacion'         => 'nullable|string|max:5000',
-        ];
-    }
+
 
     public function messages()
     {
@@ -114,6 +101,7 @@ class SignosVitalesAdultoModal extends Component
         $this->imc = '';
         $this->dolor = '';
         $this->observacion = '';
+        $this->motivoRectificacion = '';
     }
 
     public function updated($propertyName)
@@ -134,86 +122,33 @@ class SignosVitalesAdultoModal extends Component
     public function guardar()
     {
         abort_unless(Auth::check(), 401);
-        app(TurnoEnfermeriaService::class)->autorizarAccionPaciente($this->cod_am, Auth::user());
-
-        $this->validate();
-
-        // Validar PA en formato sis/dia
-        $sis = null; $dia = null;
-        if (!empty($this->presion_arterial)) {
-            if (!str_contains($this->presion_arterial, '/')) {
-                $this->addError('presion_arterial', 'La presión arterial debe tener formato Sistólica/Diastólica (ej. 120/80).');
-                return;
-            }
-            $partes = explode('/', $this->presion_arterial);
-            $sis = is_numeric(trim($partes[0])) ? (int) trim($partes[0]) : null;
-            $dia = isset($partes[1]) && is_numeric(trim($partes[1])) ? (int) trim($partes[1]) : null;
-
-            if ($sis === null || $dia === null) {
-                $this->addError('presion_arterial', 'Valores de presión incompletos.');
-                return;
-            }
-            if ($sis < ValidacionSignosVitalesService::PAS_MIN || $sis > ValidacionSignosVitalesService::PAS_MAX) {
-                $this->addError('presion_arterial', 'La presión sistólica debe estar entre ' . ValidacionSignosVitalesService::PAS_MIN . ' y ' . ValidacionSignosVitalesService::PAS_MAX . ' mmHg.');
-                return;
-            }
-            if ($dia < ValidacionSignosVitalesService::PAD_MIN || $dia > ValidacionSignosVitalesService::PAD_MAX) {
-                $this->addError('presion_arterial', 'La presión diastólica debe estar entre ' . ValidacionSignosVitalesService::PAD_MIN . ' y ' . ValidacionSignosVitalesService::PAD_MAX . ' mmHg.');
-                return;
-            }
-            if ($sis <= $dia) {
-                $this->addError('presion_arterial', "La presión sistólica ({$sis}) debe ser estrictamente mayor a la diastólica ({$dia}).");
-                return;
-            }
-        }
-
-        // Validar que al menos haya un signo vital
-        if (empty($this->presion_arterial) && empty($this->frecuencia_cardiaca) && empty($this->temperatura) && 
-            empty($this->saturacion) && empty($this->glucosa) && empty($this->peso) && empty($this->dolor)) {
-            $this->addError('general', 'Debe registrar al menos un signo vital o medición real.');
-            return;
-        }
-
-        $p = $this->peso !== null && $this->peso !== '' ? (float) $this->peso : null;
-        $t = $this->talla !== null && $this->talla !== '' ? (float) $this->talla : null;
-        $tallaNorm = ValidacionSignosVitalesService::normalizarTalla($t);
-        $imcCalc = ValidacionSignosVitalesService::calcularImc($p, $t);
-
+        $servicio = app(SignosVitalesService::class);
         $datos = [
-            'cod_am'              => $this->cod_am,
-            'fecha'               => $this->fecha,
-            'hora'                => $this->hora,
-            'presion_arterial'    => $this->presion_arterial ?: null,
-            'presion_sistolica'   => $sis,
-            'presion_diastolica'  => $dia,
-            'frecuencia_cardiaca' => $this->frecuencia_cardiaca ?: null,
-            'temperatura'         => $this->temperatura ?: null,
-            'saturacion'          => $this->saturacion ?: null,
-            'glucosa'             => $this->glucosa ?: null,
-            'peso'                => $this->peso ?: null,
-            'talla'               => $tallaNorm,
-            'imc'                 => $imcCalc,
-            'dolor'               => $this->dolor !== '' ? $this->dolor : null,
-            'observacion'         => $this->observacion,
+            'fecha' => $this->fecha,
+            'hora' => $this->hora,
+            'presion_arterial' => $this->presion_arterial,
+            'frecuencia_cardiaca' => $this->frecuencia_cardiaca,
+            'temperatura' => $this->temperatura,
+            'saturacion' => $this->saturacion,
+            'glucosa' => $this->glucosa,
+            'peso' => $this->peso,
+            'talla' => $this->talla,
+            'dolor' => $this->dolor,
+            'observacion' => $this->observacion,
         ];
 
         if ($this->isEditing) {
-            $signo = SignosVitalesAdulto::findOrFail($this->cod_signo);
-            $signo->update($datos);
-            $mensaje = 'Signos vitales actualizados correctamente.';
+            $original = SignosVitalesAdulto::where('cod_am', $this->cod_am)->findOrFail($this->cod_signo);
+            $servicio->rectificar($original, $datos, $this->motivoRectificacion, Auth::user());
+            $mensaje = 'Rectificación registrada sin sobrescribir el control original.';
         } else {
-            $datos['registrado_por'] = Auth::id();
-            SignosVitalesAdulto::create($datos);
+            $servicio->registrar($this->cod_am, $datos, Auth::user());
             $mensaje = 'Signos vitales registrados correctamente.';
         }
 
         $this->cerrarModal();
         $this->dispatch('signos-actualizados');
-        $this->dispatch('swal', [
-            'icon' => 'success',
-            'title' => 'Éxito',
-            'text' => $mensaje,
-        ]);
+        $this->dispatch('swal', ['icon' => 'success', 'title' => 'Registro guardado', 'text' => $mensaje]);
     }
 
     public function render()

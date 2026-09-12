@@ -25,6 +25,7 @@ use App\Models\Habitacion;
 use App\Models\MedicacionAdulto;
 use App\Models\PaseTurno;
 use App\Models\PlanCuidado;
+use App\Models\RecepcionTurno;
 use App\Models\SignosVitalesAdulto;
 use App\Models\TareaPlanCuidado;
 use App\Models\TurnoEnfermeria;
@@ -34,6 +35,7 @@ use Database\Seeders\EstadoAdultoSeeder;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Carbon;
 use Livewire\Livewire;
 use Tests\TestCase;
 
@@ -53,6 +55,7 @@ class FormulariosEnfermeriaHardeningTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        Carbon::setTestNow('2026-09-11 10:00:00');
         $this->seed([EstadoAdultoSeeder::class, RolesAndPermissionsSeeder::class]);
 
         $this->enfermeroAsignado = User::factory()->create(['estado' => 'ACTIVO']);
@@ -107,6 +110,20 @@ class FormulariosEnfermeriaHardeningTest extends TestCase
             'estado' => 'ACTIVA',
             'registrado_por' => $this->enfermeroAsignado->cod_usu,
         ]);
+        AsignacionTurnoAdulto::create([
+            'cod_am' => $this->adulto->cod_am,
+            'cod_turno' => $this->turnoTarde->cod_turno,
+            'cod_usu_enfermero' => $this->enfermeroReceptor->cod_usu,
+            'fecha_inicio' => today()->toDateString(),
+            'nivel_supervision' => 'ESTANDAR',
+            'estado' => 'ACTIVA',
+            'registrado_por' => $this->enfermeroAsignado->cod_usu,
+        ]);
+        RecepcionTurno::create([
+            'cod_turno' => $this->turno->cod_turno,
+            'cod_usuario' => $this->enfermeroAsignado->cod_usu,
+            'fecha_hora_recepcion' => now(),
+        ]);
     }
 
     // =========================================================================
@@ -152,6 +169,12 @@ class FormulariosEnfermeriaHardeningTest extends TestCase
             'presion_diastolica' => 120,
             'valor_atipico_confirmado' => true,
         ]);
+    }
+
+    protected function tearDown(): void
+    {
+        Carbon::setTestNow();
+        parent::tearDown();
     }
 
     public function test_signos_vitales_rechaza_sistolica_sin_diastolica_y_viceversa(): void
@@ -536,7 +559,7 @@ class FormulariosEnfermeriaHardeningTest extends TestCase
             ->call('administrarMed', $med->cod_med_adulto, $this->adulto->cod_am)
             ->assertHasNoErrors()
             ->call('administrarMed', $med->cod_med_adulto, $this->adulto->cod_am)
-            ->assertHasNoErrors();
+            ->assertHasErrors(['cod_med_adulto']);
 
         $this->assertDatabaseCount('administracion_medicacion', 1);
         $administracion = AdministracionMedicacion::sole();
@@ -620,6 +643,12 @@ class FormulariosEnfermeriaHardeningTest extends TestCase
 
         // El enfermero receptor SÍ puede confirmar la recepción
         $this->actingAs($this->enfermeroReceptor);
+        Carbon::setTestNow('2026-09-11 16:00:00');
+        RecepcionTurno::create([
+            'cod_turno' => $this->turnoTarde->cod_turno,
+            'cod_usuario' => $this->enfermeroReceptor->cod_usu,
+            'fecha_hora_recepcion' => now(),
+        ]);
         Livewire::test(PaseTurnoPanel::class)
             ->call('recibirPase', $pase->cod_pase)
             ->assertHasNoErrors();

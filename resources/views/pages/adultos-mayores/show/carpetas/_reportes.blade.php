@@ -64,7 +64,7 @@
  </div>
  </div>
  <span class="hidden sm:block text-xs font-bold uppercase tracking-wide bg-fondo-card/10 rounded-lg px-4 py-2">
- {{ $adulto->cod_am }}
+ {{ $adulto->nombres }} {{ $adulto->ap_paterno }} {{ $adulto->ap_materno }}
  </span>
  </div>
  </div>
@@ -133,7 +133,7 @@
  <div class="grid md:grid-cols-2 gap-6" id="reportes-charts-section-{{ $idAdulto }}">
 
  {{-- Gráfica 1: Signos Vitales --}}
- <div class="rounded-[20px] border border-borde bg-fondo-card p-5 shadow-sm">
+ <div class="rm-chart-card rm-chart-glass">
  <div class="flex items-center gap-2 mb-4">
  <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-fondo-panel text-parrafo">
  <i class="ph-bold ph-activity text-sm"></i>
@@ -156,7 +156,7 @@
  </div>
 
  {{-- Gráfica 2: Medicación por Estado --}}
- <div class="rounded-[20px] border border-borde bg-fondo-card p-5 shadow-sm">
+ <div class="rm-chart-card rm-chart-glass">
  <div class="flex items-center gap-2 mb-4">
  <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-fondo-panel text-parrafo">
  <i class="ph-bold ph-pill text-sm"></i>
@@ -179,7 +179,7 @@
  </div>
 
  {{-- Gráfica 3: Índice Barthel --}}
- <div class="rounded-[20px] border border-borde bg-fondo-card p-5 shadow-sm">
+ <div class="rm-chart-card rm-chart-glass">
  <div class="flex items-center gap-2 mb-4">
  <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-fondo-panel text-parrafo">
  <i class="ph-bold ph-person-arms-spread text-sm"></i>
@@ -202,7 +202,7 @@
  </div>
 
  {{-- Gráfica 4: Evaluaciones Cognitivas --}}
- <div class="rounded-[20px] border border-borde bg-fondo-card p-5 shadow-sm">
+ <div class="rm-chart-card rm-chart-glass">
  <div class="flex items-center gap-2 mb-4">
  <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-fondo-panel text-parrafo">
  <i class="ph-bold ph-brain text-sm"></i>

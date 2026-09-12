@@ -3,11 +3,10 @@
 namespace App\Livewire\Medicacion;
 
 use Livewire\Component;
-use App\Models\AdministracionMedicacion;
 use App\Models\MedicacionAdulto;
 use App\Services\Enfermeria\TurnoEnfermeriaService;
+use App\Services\Medicacion\RegistrarAdministracionMedicacionService;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 
 class AdministracionMedicacionModal extends Component
 {
@@ -31,9 +30,7 @@ class AdministracionMedicacionModal extends Component
         return [
             'cod_am'          => 'required|exists:adulto_mayor,cod_am',
             'cod_med_adulto'  => 'required|exists:medicacion_adulto,cod_med_adulto',
-            'fecha'           => 'required|date|before_or_equal:today',
             'hora_programada' => 'required|date_format:H:i',
-            'hora_real'       => $this->administrado ? 'required|date_format:H:i' : 'nullable|date_format:H:i',
             'administrado'    => 'required|boolean',
             'motivo_omision'  => !$this->administrado ? 'required|string|min:5|max:255' : 'nullable|string|max:255',
             'efecto_observado'=> 'nullable|string|max:255',
@@ -131,59 +128,15 @@ class AdministracionMedicacionModal extends Component
 
         $this->validate();
 
-        // Verificar que el medicamento pertenece al paciente y está vigente
-        $medicacion = MedicacionAdulto::where('cod_med_adulto', $this->cod_med_adulto)
-            ->where('cod_am', $this->cod_am)
-            ->first();
-
-        if (!$medicacion || !in_array($medicacion->estado, ['ACTIVO', 'ACTIVA', 'VIGENTE'])) {
-            $this->addError('cod_med_adulto', 'El medicamento seleccionado no pertenece al paciente o no está activo.');
-            return;
-        }
-
-        // Evitar doble administración para la misma ocurrencia programada
-        $h = substr($this->hora_programada, 0, 5);
-        $yaRegistrado = AdministracionMedicacion::where('cod_med_adulto', $this->cod_med_adulto)
-            ->whereDate('fecha', $this->fecha)
-            ->where('hora_programada', 'like', '%' . $h . '%')
-            ->exists();
-
-        if ($yaRegistrado) {
-            $this->addError('cod_med_adulto', 'Ya existe un registro para esta dosis en la fecha y hora programada.');
-            return;
-        }
-
-        $datos = [
-            'cod_med_adulto'  => $this->cod_med_adulto,
-            'cod_am'          => $this->cod_am,
-            'fecha'           => $this->fecha,
-            'hora_programada' => $this->hora_programada,
-            'hora_real'       => $this->administrado ? $this->hora_real : null,
-            'administrado'    => $this->administrado,
-            'motivo_omision'  => !$this->administrado ? $this->motivo_omision : null,
-            'efecto_observado'=> $this->efecto_observado ?: null,
-            'observacion'     => $this->observacion ?: null,
-            'registrado_por'  => Auth::id(),
-        ];
-
-        DB::transaction(function () use ($datos) {
-            $duplicado = AdministracionMedicacion::where('cod_med_adulto', $this->cod_med_adulto)
-                ->whereDate('fecha', $this->fecha)
-                ->where('hora_programada', 'like', substr($this->hora_programada, 0, 5) . '%')
-                ->lockForUpdate()
-                ->exists();
-
-            if ($duplicado) {
-                $this->addError('cod_med_adulto', 'Esta dosis ya tiene una administración u omisión registrada.');
-                return;
-            }
-
-            AdministracionMedicacion::create($datos);
-        });
-
-        if ($this->getErrorBag()->has('cod_med_adulto')) {
-            return;
-        }
+        app(RegistrarAdministracionMedicacionService::class)->registrarProgramada(
+            Auth::user(),
+            $this->cod_am,
+            $this->cod_med_adulto,
+            $this->hora_programada,
+            (bool) $this->administrado,
+            $this->motivo_omision,
+            $this->observacion,
+        );
 
         $mensaje = $this->administrado ? 'Administración registrada correctamente.' : 'Omisión registrada correctamente.';
         $icono = $this->administrado ? 'success' : 'warning';
@@ -200,14 +153,10 @@ class AdministracionMedicacionModal extends Component
 
     public function render()
     {
-        $administracionList = [];
-        if ($this->cod_am) {
-            $administracionList = AdministracionMedicacion::with('medicacion')
-                ->where('cod_am', $this->cod_am)
-                ->orderBy('fecha', 'desc')
-                ->orderBy('hora_programada', 'desc')
-                ->take(5)
-                ->get();
+        $administracionList = collect();
+        if ($this->cod_am && app(TurnoEnfermeriaService::class)->esPacienteAsignado($this->cod_am, Auth::user())) {
+            $administracionList = \App\Models\AdministracionMedicacion::with('medicacion')
+                ->where('cod_am', $this->cod_am)->latest('fecha')->latest('hora_programada')->take(5)->get();
         }
 
         return view('livewire.medicacion.administracion-medicacion-modal', [

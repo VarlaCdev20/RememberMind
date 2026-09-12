@@ -201,7 +201,7 @@
  {{ optional($p->adultoMayor)->nombres ?? '' }}
  </p>
  @if($p->adultoMayor)
- <p class="text-[9px] font-bold text-apoyo">{{ $p->cod_am }}</p>
+ <p class="text-[9px] font-bold text-apoyo">{{ $p->adultoMayor?->edad ?? 'Edad no registrada' }}{{ $p->adultoMayor?->edad ? ' años' : '' }}</p>
  @endif
  </div>
  </td>
@@ -534,7 +534,7 @@
  </span>
  <div>
  <p class="text-[10px] font-bold uppercase tracking-[0.15em] text-apoyo">Participación</p>
- <h3 class="text-sm font-bold text-titulo">Detalle #{{ $detalle->cod_act_adul }}</h3>
+ <h3 class="text-sm font-bold text-titulo">Detalle de participación</h3>
  </div>
  </div>
  <div class="flex items-center gap-2">
@@ -556,9 +556,7 @@
  {{ $am?->nombres ?? '' }}
  </p>
  <div class="mt-1 flex items-center gap-3 text-[10px] font-bold text-apoyo">
- <span>{{ $detalle->cod_am }}</span>
  @if($edad !== null)
- <span>·</span>
  <span>{{ $edad }} años</span>
  @endif
  </div>

@@ -15,26 +15,25 @@
 
     $estilo = $colores[$color] ?? $colores['terracota'];
 @endphp
-    
-       <div class="rm-card group h-full rounded-[1.8rem] p-4 backdrop-blur-xl transition-all duration-300 hover:-translate-y-1">
-            <div class="mb-4 flex items-center justify-between gap-3">
-                <div>
-            <h2 class="text-base font-extrabold text-titulo md:text-lg">
+
+<div class="rm-chart-card rm-chart-glass group h-full">
+    <div class="rm-chart-header">
+        <div>
+            <h3 class="rm-chart-title">
                 {{ $titulo }}
-            </h2>
-      
- 
-            <p class="text-xs font-bold text-meta">
+            </h3>
+            @if($subtitulo)
+            <p class="rm-chart-subtitle">
                 {{ $subtitulo }}
             </p>
+            @endif
         </div>
-  
-         <div class="flex h-10 w-10 items-center justify-center rounded-xl shadow-inner transition-all duration-300 group-hover:rotate-6 group-hover:scale-105 {{ $estilo }}">
-            <i class="ph-fill {{ $icono }} text-xl"></i>
+        <div class="flex h-9 w-9 items-center justify-center rounded-xl shadow-xs transition-all duration-300 group-hover:rotate-6 group-hover:scale-105 {{ $estilo }}">
+            <i class="ph-bold {{ $icono }} text-lg"></i>
         </div>
     </div>
 
- <div class="h-44 rm-chart-panel p-3">
- <canvas id="{{ $id }}"></canvas>
- </div>
+    <div class="rm-chart-body is-sm">
+        <canvas id="{{ $id }}"></canvas>
+    </div>
 </div>

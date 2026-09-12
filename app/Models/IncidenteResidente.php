@@ -22,6 +22,7 @@ class IncidenteResidente extends Model
         'fecha_hora_evento' => 'datetime', 'fue_presenciado' => 'boolean', 'lesion' => 'boolean',
         'cambio_cognitivo' => 'boolean', 'medico_informado' => 'boolean',
         'familiar_informado' => 'boolean', 'requiere_seguimiento' => 'boolean',
+        'fecha_seguimiento' => 'datetime', 'fecha_cierre' => 'datetime',
     ];
 
     public function getActivitylogOptions(): LogOptions
@@ -34,4 +35,6 @@ class IncidenteResidente extends Model
     public function turno() { return $this->belongsTo(TurnoEnfermeria::class, 'cod_turno', 'cod_turno'); }
     public function registrador() { return $this->belongsTo(User::class, 'registrado_por', 'cod_usu'); }
     public function lesiones() { return $this->hasMany(LesionResidente::class, 'cod_incidente', 'cod_incidente'); }
+    public function responsable() { return $this->belongsTo(User::class, 'responsable_id', 'cod_usu'); }
+    public function cerradoPor() { return $this->belongsTo(User::class, 'cerrado_por', 'cod_usu'); }
 }

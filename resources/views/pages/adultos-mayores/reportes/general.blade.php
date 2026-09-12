@@ -79,7 +79,6 @@
  <table class="w-full text-left">
  <thead>
  <tr class="text-[10px] font-bold uppercase tracking-widest text-apoyo border-b border-borde">
- <th class="px-8 py-4">Ficha</th>
  <th class="px-8 py-4">Residente</th>
  <th class="px-8 py-4">Edad</th>
  <th class="px-8 py-4 text-center">Estado</th>
@@ -88,7 +87,6 @@
  <tbody class="divide-y divide-[#F2EBE3]">
  @foreach($adultos as $adulto)
  <tr class="hover:bg-fondo-panel transition-colors">
- <td class="px-8 py-4 text-xs font-bold text-apoyo">{{ $adulto->cod_am }}</td>
  <td class="px-8 py-4">
  <p class="text-sm font-bold text-titulo">{{ $adulto->nombres }} {{ $adulto->ap_paterno }}</p>
  <p class="text-[10px] font-bold text-apoyo">CI: {{ $adulto->ci }}</p>

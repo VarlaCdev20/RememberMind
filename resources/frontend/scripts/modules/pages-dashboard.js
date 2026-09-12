@@ -1,147 +1,104 @@
-
         window.dashboardData = {
             adultosPorEstado: rmDatosc535f32d75d9,
             distribucionEquipo: rmDatos62d1a989ad1d,
         };
 
         document.addEventListener('DOMContentLoaded', () => {
-            const getCssVar = (name, fallback) => {
-                const value = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
-                return value || fallback;
-            };
-
-            const getChartTheme = () => ({
-                primary: getCssVar('--chart-primary', '#2F3E5C'),
-                secondary: getCssVar('--chart-secondary', '#7FA587'),
-                accent: getCssVar('--chart-accent', '#D9795F'),
-                warning: getCssVar('--chart-warning', '#DDA15E'),
-                danger: getCssVar('--chart-danger', '#D96C75'),
-                muted: getCssVar('--chart-muted', '#6B7280'),
-                text: getCssVar('--chart-text', '#293A59'),
-                grid: getCssVar('--chart-grid', 'rgba(41,58,89,0.10)'),
-                panel: getCssVar('--chart-panel', 'rgba(244,238,231,0.78)'),
-                border: getCssVar('--chart-border', 'rgba(41,58,89,0.14)')
-            });
-
-            let chartAdultos = null;
-            let chartEquipo = null;
-
             const renderCharts = () => {
-                const chartTheme = getChartTheme();
+                const isDark = window.RMCharts?.isDark() || false;
+                const palette = window.RMCharts?.palette() || ['#344D7A', '#D9745B', '#5F9271', '#C9913E', '#7565A8'];
+                const sem = window.RMCharts?.semanticColors() || {
+                    primary: '#344D7A',
+                    success: '#5F9271',
+                    danger: '#D9745B',
+                    warning: '#C9913E',
+                    neutral: '#64748B'
+                };
 
-                // Gráfico 1: Adultos por estado (doughnut)
+                // Gráfico 1: Adultos por estado (doughnut grueso y translúcido)
                 const ctxAdultos = document.getElementById('graficoAdultosPorEstado');
                 if (ctxAdultos && typeof Chart !== 'undefined') {
-                    if (chartAdultos) chartAdultos.destroy();
                     const dAdultos = window.dashboardData.adultosPorEstado;
-                    const colorsAdultos = [chartTheme.primary, chartTheme.secondary, chartTheme.accent, chartTheme.warning, chartTheme.danger];
+                    const colorsAdultos = [palette[0], palette[2], palette[1], palette[3], palette[4]];
 
-                    chartAdultos = new Chart(ctxAdultos, {
-                        type: 'doughnut',
-                        data: {
-                            labels: dAdultos.labels ?? [],
-                            datasets: [{
-                                data: dAdultos.data ?? [],
-                                backgroundColor: colorsAdultos,
-                                borderWidth: 2,
-                                borderColor: chartTheme.panel,
-                            }]
-                        },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            cutout: '68%',
-                            plugins: {
-                                datalabels: { display: false },
-                                tooltip: {
-                                    backgroundColor: chartTheme.panel,
-                                    titleColor: chartTheme.text,
-                                    bodyColor: chartTheme.text,
-                                    borderColor: chartTheme.border,
-                                    borderWidth: 1,
-                                    padding: 10
-                                },
-                                legend: {
-                                    display: true,
-                                    position: 'bottom',
-                                    labels: {
-                                        color: chartTheme.text,
-                                        boxWidth: 10,
-                                        font: { size: 11, weight: '700' }
+                    const config = window.RMCharts && window.RMCharts.presets
+                        ? window.RMCharts.presets.doughnut(
+                            dAdultos.labels ?? [],
+                            dAdultos.data ?? [],
+                            colorsAdultos,
+                            {
+                                plugins: {
+                                    legend: {
+                                        display: true,
+                                        position: 'bottom',
+                                        labels: {
+                                            boxWidth: 10,
+                                            font: { family: 'Inter', size: 10, weight: '700' },
+                                            padding: 10,
+                                        }
                                     }
                                 }
                             }
-                        }
-                    });
+                        )
+                        : {
+                            type: 'doughnut',
+                            data: {
+                                labels: dAdultos.labels ?? [],
+                                datasets: [{ data: dAdultos.data ?? [], backgroundColor: colorsAdultos }]
+                            },
+                            options: { responsive: true, maintainAspectRatio: false, cutout: '58%' }
+                        };
+
+                    if (window.RMCharts) {
+                        window.RMCharts.init('dashboard_adultos_estado', ctxAdultos, config, renderCharts);
+                    } else {
+                        new Chart(ctxAdultos, config);
+                    }
                 }
 
-                // Gráfico 2: Distribución equipo institucional (barra horizontal)
+                // Gráfico 2: Distribución equipo institucional (barras horizontales gruesas y translúcidas)
                 const ctxEquipo = document.getElementById('graficoEquipoInstitucional');
                 if (ctxEquipo && typeof Chart !== 'undefined') {
-                    if (chartEquipo) chartEquipo.destroy();
                     const dEquipo = window.dashboardData.distribucionEquipo;
-                    const colorsEquipo = [chartTheme.accent, chartTheme.secondary, chartTheme.primary];
+                    const colorsEquipo = [palette[1], palette[2], palette[0]];
 
-                    chartEquipo = new Chart(ctxEquipo, {
-                        type: 'bar',
-                        data: {
-                            labels: dEquipo.labels ?? [],
-                            datasets: [{
-                                data: dEquipo.data ?? [],
-                                backgroundColor: colorsEquipo,
-                                borderWidth: 1,
-                                borderColor: chartTheme.border,
-                                borderRadius: 6,
-                            }]
-                        },
-                        options: {
-                            indexAxis: 'y',
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            plugins: {
-                                datalabels: {
-                                    display: true,
-                                    color: chartTheme.text,
-                                    font: { weight: 'bold', size: 10 },
-                                    formatter: (val) => val > 0 ? val : ''
-                                },
-                                legend: { display: false },
-                                tooltip: {
-                                    backgroundColor: chartTheme.panel,
-                                    titleColor: chartTheme.text,
-                                    bodyColor: chartTheme.text,
-                                    borderColor: chartTheme.border,
-                                    borderWidth: 1,
-                                    padding: 10
-                                }
-                            },
-                            scales: {
-                                x: {
-                                    grid: { color: chartTheme.grid },
-                                    ticks: { color: chartTheme.muted, font: { size: 11, weight: '700' } }
-                                },
-                                y: {
-                                    grid: { display: false },
-                                    ticks: { color: chartTheme.muted, font: { size: 11, weight: '700' } }
+                    const config = window.RMCharts && window.RMCharts.presets
+                        ? window.RMCharts.presets.barHorizontal(
+                            dEquipo.labels ?? [],
+                            dEquipo.data ?? [],
+                            colorsEquipo,
+                            {
+                                _datasetLabel: 'Miembros',
+                                plugins: {
+                                    legend: { display: false }
                                 }
                             }
-                        }
-                    });
+                        )
+                        : {
+                            type: 'bar',
+                            data: {
+                                labels: dEquipo.labels ?? [],
+                                datasets: [{ data: dEquipo.data ?? [], backgroundColor: colorsEquipo, borderRadius: 8 }]
+                            },
+                            options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false }
+                        };
+
+                    if (window.RMCharts) {
+                        window.RMCharts.init('dashboard_equipo_dist', ctxEquipo, config, renderCharts);
+                    } else {
+                        new Chart(ctxEquipo, config);
+                    }
                 }
             };
 
             // Render inicial
             renderCharts();
 
-            // Observar cambios de tema
-            const observer = new MutationObserver((mutations) => {
-                mutations.forEach((mutation) => {
-                    if (mutation.attributeName === 'class' || mutation.attributeName === 'data-theme') {
-                        renderCharts();
-                    }
-                });
-            });
-            observer.observe(document.documentElement, { attributes: true });
-
+            // Observador de modo oscuro
+            if (window.RMCharts) {
+                window.RMCharts.onThemeChange(renderCharts);
+            } else {
+                const observer = new MutationObserver(() => renderCharts());
+                observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class', 'data-theme'] });
+            }
         });
-    

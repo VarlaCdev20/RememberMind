@@ -133,7 +133,7 @@
  </div>
  <div>
  <p class="text-xs font-bold text-parrafo">{{ $paciente->nombres }} {{ $paciente->ap_paterno }}</p>
- <p class="text-[10px] font-bold text-apoyo">{{ $paciente->cod_am }}</p>
+ <p class="text-[10px] font-bold text-apoyo">{{ $paciente->ci ? 'CI '.$paciente->ci : 'Documento no registrado' }}</p>
  </div>
  </div>
  </td>

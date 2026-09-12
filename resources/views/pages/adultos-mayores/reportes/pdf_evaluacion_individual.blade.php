@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
  <meta charset="UTF-8">
- <title>Reporte de Evaluación Geriátrica - #{{ $evaluacion->cod_eval_ger }}</title>
+ <title>Reporte de Evaluación Geriátrica - {{ $adulto->nombres }} {{ $adulto->ap_paterno }}</title>
  <style>
  @page { margin: 1.2cm; }
  body { font-family: 'Helvetica', 'Arial', sans-serif; color: #2F3E5C; font-size: 11px; line-height: 1.5; }
@@ -54,7 +54,7 @@
  </td>
  <td class="title">
  <h2>Reporte de Valoración Geriátrica</h2>
- <p>Código Evaluación: {{ $evaluacion->cod_eval_ger }}</p>
+ <p>Residente evaluado: {{ $adulto->nombres }} {{ $adulto->ap_paterno }} {{ $adulto->ap_materno }}</p>
  <p>Fecha de Emisión: {{ now()->format('d/m/Y H:i') }}</p>
  </td>
  </tr>
@@ -67,8 +67,8 @@
  <tr>
  <td width="20%" style="font-weight: bold; color: #666; font-size: 9px; text-transform: uppercase;">Nombre Completo:</td>
  <td width="30%" style="font-weight: bold;">{{ $adulto->nombres }} {{ $adulto->ap_paterno }} {{ $adulto->ap_materno }}</td>
- <td width="20%" style="font-weight: bold; color: #666; font-size: 9px; text-transform: uppercase;">Código Expediente:</td>
- <td width="30%" style="font-weight: bold;">{{ $adulto->cod_am }}</td>
+ <td width="20%" style="font-weight: bold; color: #666; font-size: 9px; text-transform: uppercase;">Documento:</td>
+ <td width="30%" style="font-weight: bold;">{{ $adulto->ci ?: 'No registrado' }}</td>
  </tr>
  <tr>
  <td style="font-weight: bold; color: #666; font-size: 9px; text-transform: uppercase;">C.I.:</td>

@@ -240,6 +240,9 @@ class DatosEnfermeriaDemoSeeder extends Seeder
                     'hora_programada' => '08:00',
                     'hora_real' => $index % 2 == 0 ? now()->toTimeString() : null,
                     'administrado' => $index % 2 == 0,
+                    'motivo_omision' => $index % 2 == 0
+                        ? null
+                        : 'Residente en ayuno indicado para valoración clínica.',
                     'registrado_por' => $enfermero->cod_usu,
                 ]
             );

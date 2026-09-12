@@ -1,0 +1,152 @@
+/* ============================================================
+   REMEMBERMIND DESIGN SYSTEM — COMPONENTS / FORMS
+   Formularios Unificados:
+   - Fondo suave cálido (NUNCA blanco puro #ffffff)
+   - Focus coral suave: var(--rm-accent) + ring coral
+   - Bordes visibles pero elegantes: var(--rm-border)
+   - Mismo alto (38px compacto), radio (10px), tipografía y labels
+   - Estados de error y éxito coherentes
+   ============================================================ */
+
+.rm-field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    width: 100%;
+}
+
+.rm-label {
+    display: block;
+    font-family: var(--rm-font-ui, system-ui, sans-serif);
+    font-size: 11.5px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.035em;
+    color: var(--rm-text-title);
+    margin-bottom: 2px;
+}
+
+.rm-label-required::after {
+    content: " *";
+    color: var(--rm-danger, #E0564C);
+}
+
+.rm-input,
+.rm-select,
+.rm-textarea {
+    width: 100%;
+    font-family: var(--rm-font-ui, system-ui, sans-serif);
+    font-size: 12.5px;
+    color: var(--rm-text-title);
+    background-color: color-mix(in srgb, var(--rm-surface) 96%, transparent);
+    border: 1px solid var(--rm-border);
+    border-radius: var(--rm-radius-input, 10px);
+    padding: 0 12px;
+    height: var(--rm-control-height, 38px);
+    line-height: var(--rm-control-height, 38px);
+    transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+    outline: none;
+    box-sizing: border-box;
+}
+
+.rm-input::placeholder,
+.rm-textarea::placeholder {
+    color: var(--rm-text-muted);
+    opacity: 0.68;
+}
+
+/* Foco coral unificado sobre superficie cálida */
+.rm-input:focus,
+.rm-select:focus,
+.rm-textarea:focus {
+    border-color: var(--rm-accent) !important;
+    box-shadow: 0 0 0 3px rgba(226, 125, 96, 0.22) !important;
+    background-color: var(--rm-surface);
+}
+
+/* Área de Texto Compacta */
+.rm-textarea {
+    height: auto;
+    min-height: 80px;
+    padding: 9px 12px;
+    line-height: 1.4;
+    resize: vertical;
+}
+
+/* Select flecha cálida */
+.rm-select {
+    cursor: pointer;
+}
+
+/* Estado de Error */
+.rm-input-error,
+.rm-select-error,
+.rm-textarea-error,
+.rm-input.is-invalid,
+.is-invalid {
+    border-color: var(--rm-danger, #E0564C) !important;
+    background-color: color-mix(in srgb, var(--rm-danger, #E0564C) 7%, var(--rm-surface)) !important;
+}
+
+.rm-input-error:focus,
+.rm-select-error:focus,
+.rm-textarea-error:focus {
+    box-shadow: 0 0 0 3px rgba(224, 86, 76, 0.22) !important;
+}
+
+/* Mensajes de Ayuda y Error */
+.rm-help {
+    font-size: 11px;
+    color: var(--rm-text-muted);
+    margin-top: 2px;
+}
+
+.rm-error {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--rm-danger, #E0564C);
+    margin-top: 2px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+/* Barra de Acciones del Formulario */
+.rm-form-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 16px;
+    padding-top: 12px;
+    border-top: 1px solid var(--rm-border-soft);
+}
+
+/* ============================================================
+   MODO OSCURO - FORMULARIOS
+   ============================================================ */
+.dark .rm-input,
+.dark .rm-select,
+.dark .rm-textarea {
+    background-color: #1A2530;
+    border-color: var(--rm-border);
+    color: var(--rm-text-title);
+}
+
+.dark .rm-input:focus,
+.dark .rm-select:focus,
+.dark .rm-textarea:focus {
+    background-color: #1D2A34;
+    border-color: var(--rm-accent) !important;
+    box-shadow: 0 0 0 3px rgba(226, 125, 96, 0.28) !important;
+}
+
+.dark .rm-label {
+    color: var(--rm-text-title);
+}
+
+.dark .rm-input-error,
+.dark .rm-select-error,
+.dark .rm-textarea-error {
+    background-color: rgba(224, 86, 76, 0.12) !important;
+}

@@ -5,7 +5,7 @@
         $plan = $adultoMayor->planCuidadoActivo;
     @endphp
 
-    <div class="rounded-3xl border border-borde bg-fondo-panel p-5 shadow-sm space-y-3">
+    <div class="rounded-3xl border border-borde rm-surface-card bg-fondo-panel p-5 shadow-sm space-y-3">
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-borde pb-3">
             <div>
                 <h2 class="text-xs font-black uppercase tracking-wider text-titulo flex items-center gap-2">
@@ -66,7 +66,7 @@
     </div>
 
     {{-- 2. TAREAS PROGRAMADAS Y ESTADO DE EJECUCIÓN --}}
-    <div class="rounded-3xl border border-borde bg-fondo-panel p-5 shadow-sm space-y-4">
+    <div class="rounded-3xl border border-borde rm-surface-card bg-fondo-panel p-5 shadow-sm space-y-4">
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-borde pb-3">
             <div>
                 <h2 class="text-xs font-black uppercase tracking-wider text-titulo flex items-center gap-2">
@@ -158,7 +158,7 @@
                                     </span>
                                 @elseif($esOmitida)
                                     <span class="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2.5 py-0.5 text-[10px] font-bold text-amber-700 border border-amber-200">
-                                        <i class="ph-bold ph-prohibit"></i> {{ $tar->estado }}
+                                        <i class="ph-bold ph-prohibit"></i> {{ ucfirst(strtolower($tar->estado)) }}
                                     </span>
                                 @else
                                     <span class="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2.5 py-0.5 text-[10px] font-bold text-slate-700 border border-slate-200">

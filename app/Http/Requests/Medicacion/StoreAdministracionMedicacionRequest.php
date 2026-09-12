@@ -12,7 +12,9 @@ class StoreAdministracionMedicacionRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return Auth::check();
+        return Auth::check()
+            && Auth::user()->hasRole('ENFERMEROS')
+            && Auth::user()->can('administracion_medicacion.registrar');
     }
 
     protected function prepareForValidation(): void
@@ -23,6 +25,10 @@ class StoreAdministracionMedicacionRequest extends FormRequest
         if (!$this->has('administrado')) {
             $this->merge(['administrado' => false]);
         }
+        $this->merge([
+            'fecha' => today()->toDateString(),
+            'hora_real' => $this->boolean('administrado') ? now()->format('H:i') : null,
+        ]);
     }
 
     public function rules(): array
@@ -79,7 +85,9 @@ class StoreAdministracionMedicacionRequest extends FormRequest
             // Verificar ámbito de enfermería
             if ($codAm && Auth::check()) {
                 try {
-                    app(TurnoEnfermeriaService::class)->autorizarAccionPaciente($codAm, Auth::user());
+                    app(TurnoEnfermeriaService::class)->autorizarMutacionPaciente(
+                        $codAm, 'administracion_medicacion.registrar', Auth::user()
+                    );
                 } catch (\Throwable $e) {
                     $validator->errors()->add('cod_am', $e->getMessage());
                 }

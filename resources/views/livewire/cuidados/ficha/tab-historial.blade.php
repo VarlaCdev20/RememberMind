@@ -1,7 +1,7 @@
 {{-- TAB 7: HISTORIAL 360° (TRAYECTORIA CLÍNICA Y CUIDADOS DEL RESIDENTE) --}}
 <div class="space-y-6">
     {{-- CABECERA DE LA PESTAÑA HISTORIAL 360° --}}
-    <div class="rounded-3xl border border-borde bg-fondo-panel p-5 shadow-sm">
+    <div class="rounded-3xl border border-borde rm-surface-card bg-fondo-panel p-5 shadow-sm">
         <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 border-b border-borde pb-4">
             <div>
                 <h2 class="text-base font-bold tracking-tight text-titulo flex items-center gap-2">
@@ -60,7 +60,7 @@
             @endphp
 
             @forelse($eventos as $ev)
-                <div class="rounded-2xl border border-borde bg-fondo-panel p-4 shadow-sm transition hover:border-blue-300">
+                <div class="rounded-2xl border border-borde rm-surface-card bg-fondo-panel p-4 shadow-sm transition hover:border-blue-300">
                     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1.5 border-b border-borde/50 pb-2 mb-2.5">
                         <div class="flex items-center gap-2">
                             <span class="inline-flex items-center gap-1.5 rounded-lg px-2 py-0.5 text-[10px] font-bold uppercase
@@ -98,7 +98,7 @@
                     </div>
                 </div>
             @empty
-                <div class="rounded-3xl border border-borde bg-fondo-panel p-10 text-center">
+                <div class="rounded-3xl border border-borde rm-surface-card bg-fondo-panel p-10 text-center">
                     <i class="ph-bold ph-calendar-blank text-3xl text-apoyo mb-2 block"></i>
                     <p class="text-sm font-bold text-titulo">No se encontraron eventos en este período o filtro.</p>
                     <p class="text-xs text-apoyo mt-1">Pruebe seleccionando "Todos" o ampliando el rango de fechas.</p>
@@ -108,7 +108,7 @@
 
         {{-- COLUMNA LATERAL: RESUMEN LONGITUDINAL --}}
         <div class="space-y-4 lg:col-span-4">
-            <div class="rounded-3xl border border-borde bg-fondo-panel p-5 shadow-sm space-y-4">
+            <div class="rounded-3xl border border-borde rm-surface-card bg-fondo-panel p-5 shadow-sm space-y-4">
                 <h3 class="text-xs font-black uppercase tracking-wider text-titulo flex items-center gap-2 border-b border-borde pb-2">
                     <i class="ph-bold ph-chart-donut text-blue-600"></i>
                     <span>Resumen Longitudinal</span>

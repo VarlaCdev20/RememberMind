@@ -245,8 +245,8 @@ class VoluntariadoResumenPanel extends Component
                     'codigo' => $asignacion->cod_asig_vol,
                     'fecha' => $fecha->format('d/m/Y'),
                     'relativa' => $fecha->toDateString() === $hoy ? 'Hoy' : ($fecha->isTomorrow() ? 'Mañana' : 'Próxima'),
-                    'voluntario' => $this->nombrePersona($asignacion, 'voluntario', 'Voluntario #' . $asignacion->cod_vol),
-                    'adulto' => $this->nombrePersona($asignacion, 'adulto', 'Adulto mayor #' . $asignacion->cod_am),
+                    'voluntario' => $this->nombrePersona($asignacion, 'voluntario', 'Voluntario no identificado'),
+                    'adulto' => $this->nombrePersona($asignacion, 'adulto', 'Adulto mayor no identificado'),
                     'area' => $asignacion->area_apoyo ?: 'Apoyo institucional',
                     'estado' => $asignacion->estado ?: 'Pendiente',
                 ];

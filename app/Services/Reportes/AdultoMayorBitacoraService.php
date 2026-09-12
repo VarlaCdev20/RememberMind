@@ -208,7 +208,7 @@ class AdultoMayorBitacoraService
 
         // Nombre del usuario que causó el evento
         $causer = trim(($log->causer_nombres ?? '') . ' ' . ($log->causer_ap_paterno ?? ''));
-        $causer = $causer ?: ($log->causer_id ? 'Usuario #' . $log->causer_id : 'Sistema');
+        $causer = $causer ?: ($log->causer_id ? 'Usuario no identificado' : 'Sistema');
 
         // Fecha relativa en español con Zona Horaria Bolivia
         $fechaRelativa = '-';

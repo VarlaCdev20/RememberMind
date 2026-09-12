@@ -335,7 +335,7 @@ class DashboardService
             Schema::hasColumn('alertas_adulto', 'motivo')
         ) {
             $alertasDB = DB::table('alertas_adulto')
-                ->whereIn('estado', ['ABIERTA', 'PENDIENTE'])
+                ->whereIn('estado', ['ABIERTA', 'PENDIENTE', 'EN_ATENCION'])
                 ->limit(3)
                 ->get();
             foreach ($alertasDB as $a) {
@@ -344,6 +344,7 @@ class DashboardService
                     'descripcion' => $a->motivo,
                     'icono'       => 'ph-warning-octagon',
                     'accion'      => 'Revisar en módulo de alertas',
+                    'url'         => route('admin.alertas-clinicas.index'),
                 ];
             }
         }
@@ -374,6 +375,7 @@ class DashboardService
                         'descripcion' => "{$etiqueta} — requiere revisión.",
                         'icono'       => 'ph-warning-circle',
                         'accion'      => 'Ir a Salud y Seguimiento',
+                        'url'         => route('admin.salud-seguimiento.index'),
                     ];
                 }
             }
@@ -390,6 +392,7 @@ class DashboardService
                 'descripcion' => "{$etiqueta} seguimiento especial — alerta orientativa.",
                 'icono'       => 'ph-eye',
                 'accion'      => 'Ver adultos mayores',
+                'url'         => route('admin.adultos-mayores.index'),
             ];
         }
 
@@ -413,6 +416,7 @@ class DashboardService
                     'descripcion' => "{$etiqueta} con alta dependencia funcional — seguimiento pendiente.",
                     'icono'       => 'ph-info',
                     'accion'      => 'Revisar valoraciones funcionales',
+                    'url'         => route('admin.salud-seguimiento.valoracion.index'),
                 ];
             }
         }
@@ -431,6 +435,7 @@ class DashboardService
                     'descripcion' => 'No se han registrado actividades institucionales para hoy — alerta orientativa.',
                     'icono'       => 'ph-calendar-x',
                     'accion'      => 'Registrar actividad',
+                    'url'         => route('admin.actividades.index'),
                 ];
             }
         }

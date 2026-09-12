@@ -11,6 +11,7 @@ use App\Models\AsignacionTurnoAdulto;
 use App\Models\MedicacionAdulto;
 use App\Models\LesionResidente;
 use App\Models\PlanCuidado;
+use App\Models\RecepcionTurno;
 use App\Models\TareaPlanCuidado;
 use App\Models\TurnoEnfermeria;
 use App\Models\User;
@@ -44,6 +45,11 @@ class ModuloEnfermeriaIntegralTest extends TestCase
             'cod_usu_enfermero' => $this->enfermero->cod_usu, 'fecha_inicio' => today(),
             'nivel_supervision' => 'ESTANDAR', 'estado' => 'ACTIVA', 'motivo_asignacion' => 'Prueba integral',
             'asignado_por' => $this->enfermero->cod_usu,
+        ]);
+        RecepcionTurno::create([
+            'cod_turno' => $this->turno->cod_turno,
+            'cod_usuario' => $this->enfermero->cod_usu,
+            'fecha_hora_recepcion' => now(),
         ]);
         $this->actingAs($this->enfermero);
     }
@@ -133,6 +139,7 @@ class ModuloEnfermeriaIntegralTest extends TestCase
         $med = MedicacionAdulto::create([
             'cod_am' => $this->residente->cod_am, 'nombre_medicamento' => 'Paracetamol', 'dosis' => '500 mg',
             'frecuencia' => 'PRN', 'es_prn' => true, 'condicion_prn' => 'Dolor igual o mayor a 5/10',
+            'intervalo_horas' => 6,
             'via_administracion' => 'ORAL', 'fecha_inicio' => today(), 'estado' => 'ACTIVO',
         ]);
 

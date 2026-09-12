@@ -11,7 +11,10 @@ use App\Models\SignosVitalesAdulto;
 use App\Models\TurnoEnfermeria;
 use App\Models\User;
 use App\Services\Enfermeria\TurnoEnfermeriaService;
-use App\Services\Clinica\ValidacionSignosVitalesService;
+use App\Services\Medicacion\AgendaMedicacionService;
+use App\Services\Medicacion\RegistrarAdministracionMedicacionService;
+use App\Services\Clinica\SignosVitalesService;
+use App\Services\Alertas\AlertasService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -101,59 +104,16 @@ class MisPacientes extends Component
 
     public function guardarSignos(): void
     {
-        abort_unless(auth()->user()?->can('signos_vitales.crear'), 403);
-        $this->getTurnoService()->autorizarAccionPaciente($this->modalCodAm);
-        $this->validate([
-            'signoPA' => 'nullable|string|max:20',
-            'signoFC' => 'nullable|integer|min:' . ValidacionSignosVitalesService::FC_MIN . '|max:' . ValidacionSignosVitalesService::FC_MAX,
-            'signoFR' => 'nullable|integer|min:' . ValidacionSignosVitalesService::FR_MIN . '|max:' . ValidacionSignosVitalesService::FR_MAX,
-            'signoTemp' => 'nullable|numeric|min:' . ValidacionSignosVitalesService::TEMP_MIN . '|max:' . ValidacionSignosVitalesService::TEMP_MAX,
-            'signoSat' => 'nullable|integer|min:' . ValidacionSignosVitalesService::SPO2_MIN . '|max:' . ValidacionSignosVitalesService::SPO2_MAX,
-            'signoGlucosa' => 'nullable|numeric|min:' . ValidacionSignosVitalesService::GLUCOSA_MIN,
-            'signoObs' => 'nullable|string|max:1000',
-        ]);
-
-        if (empty($this->signoPA) && empty($this->signoFC) && empty($this->signoFR) && empty($this->signoTemp) && empty($this->signoSat) && empty($this->signoGlucosa)) {
-            $this->addError('signoPA', 'Registre al menos un parámetro de signos vitales.');
-            return;
-        }
-
-        $sis = null; $dia = null;
-        if (!empty($this->signoPA) && !preg_match('/^\s*(\d{2,3})\s*\/\s*(\d{2,3})\s*$/', $this->signoPA, $presion)) {
-            $this->addError('signoPA', 'La presión arterial debe tener el formato sistólica/diastólica, por ejemplo 120/80.');
-            return;
-        }
-        if (!empty($this->signoPA)) {
-            $sis = (int) $presion[1];
-            $dia = (int) $presion[2];
-            if ($sis < ValidacionSignosVitalesService::PAS_MIN || $sis > ValidacionSignosVitalesService::PAS_MAX ||
-                $dia < ValidacionSignosVitalesService::PAD_MIN || $dia > ValidacionSignosVitalesService::PAD_MAX) {
-                $this->addError('signoPA', 'La presión arterial está fuera de los rangos biológicos admitidos.');
-                return;
-            }
-            if ($sis <= $dia && ! $this->signoConfirmarAtipico) {
-                $this->addError('signoPA', 'La presión sistólica es menor o igual a la diastólica. Repita la medición y confirme expresamente si el valor es correcto.');
-                return;
-            }
-        }
-
-        SignosVitalesAdulto::create([
-            'cod_am' => $this->modalCodAm,
-            'fecha' => today()->toDateString(),
-            'hora' => now()->format('H:i:s'),
-            'presion_arterial' => $this->signoPA ?: null,
-            'presion_sistolica' => $sis,
-            'presion_diastolica' => $dia,
-            'frecuencia_cardiaca' => $this->signoFC ?: null,
-            'frecuencia_respiratoria' => $this->signoFR ?: null,
-            'temperatura' => $this->signoTemp ?: null,
-            'saturacion' => $this->signoSat ?: null,
-            'glucosa' => $this->signoGlucosa ?: null,
-            'observacion' => $this->signoObs ?: null,
-            'registrado_por' => Auth::id(),
-            'estado' => 'VIGENTE',
+        app(SignosVitalesService::class)->registrar($this->modalCodAm, [
+            'presion_arterial' => $this->signoPA,
+            'frecuencia_cardiaca' => $this->signoFC,
+            'frecuencia_respiratoria' => $this->signoFR,
+            'temperatura' => $this->signoTemp,
+            'saturacion' => $this->signoSat,
+            'glucosa' => $this->signoGlucosa,
             'valor_atipico_confirmado' => $this->signoConfirmarAtipico,
-        ]);
+            'observacion' => $this->signoObs,
+        ], Auth::user());
 
         $this->modalSignos = false;
         $this->modalCodAm = null;
@@ -183,7 +143,7 @@ class MisPacientes extends Component
     public function guardarSeguimiento(): void
     {
         abort_unless(auth()->user()?->can('seguimiento.crear'), 403);
-        $this->getTurnoService()->autorizarAccionPaciente($this->modalCodAm);
+        $turno = $this->getTurnoService()->autorizarMutacionPaciente($this->modalCodAm, 'seguimiento.crear', Auth::user());
         $service = $this->getTurnoService();
         $turno = $service->obtenerTurnoActivo(Auth::user());
         $this->validate([
@@ -234,6 +194,7 @@ class MisPacientes extends Component
         $this->modalCodAm = $codAm;
         $this->medicacionesPaciente = MedicacionAdulto::where('cod_am', $codAm)
             ->whereIn('estado', ['ACTIVA', 'ACTIVO'])
+            ->where('es_prn', false)
             ->get();
         $this->medCodMed = $this->medicacionesPaciente->first()?->cod_med_adulto;
         $this->medAdministrado = true;
@@ -249,7 +210,7 @@ class MisPacientes extends Component
     public function guardarMed(): void
     {
         abort_unless(auth()->user()?->can('administracion_medicacion.registrar'), 403);
-        $this->getTurnoService()->autorizarAccionPaciente($this->modalCodAm);
+        $this->getTurnoService()->autorizarMutacionPaciente($this->modalCodAm, 'administracion_medicacion.registrar', Auth::user());
         $this->validate([
             'medCodMed' => 'required|exists:medicacion_adulto,cod_med_adulto',
             'medAdministrado' => 'boolean',
@@ -260,40 +221,16 @@ class MisPacientes extends Component
             'medMotivoOmision.min' => 'El motivo de omisión debe tener al menos 5 caracteres.',
         ]);
 
-        $med = MedicacionAdulto::where('cod_am', $this->modalCodAm)
-            ->whereIn('estado', ['ACTIVA', 'ACTIVO', 'VIGENTE'])
-            ->findOrFail($this->medCodMed);
-        $horaProgramada = $med->hora_programada
-            ? Carbon::parse($med->hora_programada)->format('H:i')
-            : now()->format('H:i');
-
-        $guardado = DB::transaction(function () use ($med, $horaProgramada): bool {
-            $duplicado = AdministracionMedicacion::where('cod_med_adulto', $med->cod_med_adulto)
-                ->whereDate('fecha', today())
-                ->where('hora_programada', 'like', $horaProgramada . '%')
-                ->lockForUpdate()
-                ->exists();
-            if ($duplicado) {
-                return false;
-            }
-
-            AdministracionMedicacion::create([
-                'cod_med_adulto' => $med->cod_med_adulto,
-                'cod_am' => $this->modalCodAm,
-                'fecha' => today()->toDateString(),
-                'hora_programada' => $horaProgramada,
-                'hora_real' => $this->medAdministrado ? now()->format('H:i') : null,
-                'administrado' => $this->medAdministrado,
-                'motivo_omision' => $this->medAdministrado ? null : trim($this->medMotivoOmision),
-                'registrado_por' => Auth::id(),
-                'observacion' => 'Registrado desde Mis Pacientes.',
-            ]);
-            return true;
-        });
-        if (!$guardado) {
-            $this->addError('medCodMed', 'Esta dosis ya fue registrada previamente hoy.');
+        $ocurrencia = app(AgendaMedicacionService::class)->paraAdulto($this->modalCodAm)
+            ->first(fn (array $item) => $item['medicacion']->cod_med_adulto === $this->medCodMed && $item['registro'] === null);
+        if (! $ocurrencia) {
+            $this->addError('medCodMed', 'No existe una dosis programada pendiente para este medicamento hoy.');
             return;
         }
+        app(RegistrarAdministracionMedicacionService::class)->registrarProgramada(
+            Auth::user(), $this->modalCodAm, $this->medCodMed, $ocurrencia['hora'],
+            (bool) $this->medAdministrado, $this->medMotivoOmision, 'Registrado desde Mis Pacientes.'
+        );
 
         $this->modalMed = false;
         $this->modalCodAm = null;
@@ -318,29 +255,10 @@ class MisPacientes extends Component
 
     public function guardarAlerta(): void
     {
-        abort_unless(auth()->user()?->can('alertas.crear'), 403);
-        $this->getTurnoService()->autorizarAccionPaciente($this->modalCodAm);
-        $this->validate([
-            'alertaTipo' => 'required|in:INCIDENTE,CAIDA,CONDUCTA,DESORIENTACION,DOLOR,SIGNOS,SOLICITUD_MEDICA,CLINICA,MEDICACION,CUIDADO',
-            'alertaNivel' => 'required|in:BAJO,MEDIO,ALTO,CRITICO',
-            'alertaMotivo' => 'required|string|min:8|max:1000',
-        ], [
-            'alertaMotivo.required' => 'Describa el motivo o incidente que originó la alerta.',
-        ]);
-
-        $service = $this->getTurnoService();
-        $turno = $service->obtenerTurnoActivo(Auth::user());
-
-        AlertaAdulto::create([
-            'cod_am' => $this->modalCodAm,
-            'cod_turno' => $turno?->cod_turno,
-            'origen' => 'INCIDENTE',
-            'tipo_alerta' => mb_strtoupper(trim($this->alertaTipo)),
-            'nivel' => $this->alertaNivel,
-            'motivo' => $this->alertaMotivo,
-            'responsable_id' => Auth::id(),
-            'estado' => 'ABIERTA',
-        ]);
+        app(AlertasService::class)->crear($this->modalCodAm, [
+            'origen' => 'INCIDENTE', 'tipo_alerta' => $this->alertaTipo,
+            'nivel' => $this->alertaNivel, 'motivo' => $this->alertaMotivo,
+        ], Auth::user());
 
         $this->modalAlerta = false;
         $this->modalCodAm = null;

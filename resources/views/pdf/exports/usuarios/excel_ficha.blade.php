@@ -16,8 +16,8 @@
  <td colspan="4" style="font-weight: bold; background-color: #E6DDD3; color: #2F3E5C;">1. DATOS PERSONALES</td>
  </tr>
  <tr>
- <td style="font-weight: bold;">Código de Usuario:</td>
- <td style="color: #E27D60; font-weight: bold;">{{ $usuario->cod_usu }}</td>
+ <td style="font-weight: bold;">Estado de acceso:</td>
+ <td style="color: #E27D60; font-weight: bold;">{{ $usuario->estado ?? 'SIN REGISTRAR' }}</td>
  <td style="font-weight: bold;">Nombres Completo:</td>
  <td>{{ $usuario->nombres }} {{ $usuario->ap_paterno }} {{ $usuario->ap_materno }}</td>
  </tr>
@@ -136,3 +136,4 @@
  </tr>
  @endforelse
 </table>
+

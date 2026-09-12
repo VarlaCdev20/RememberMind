@@ -1,0 +1,145 @@
+/* ============================================================
+   REMEMBERMIND DESIGN SYSTEM — COMPONENTS / DRAWERS
+   Panel Lateral Unificado:
+   - Fondo general cálido translúcido: var(--rm-surface-soft) 86% + blur(16px)
+   - Header marcado: var(--rm-surface-strong) 88% + blur(8px)
+   - Body suave: transparente, con bloques internos var(--rm-surface)
+   - Footer claro y limpio: var(--rm-surface-soft) 92% + blur(8px)
+   - Bordes: var(--rm-border) y var(--rm-border-soft)
+   - Cero blanco plano, perfectamente integrado con Alertas
+   ============================================================ */
+
+.rm-drawer-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    background-color: rgba(35, 50, 70, 0.45);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    transition: opacity 0.25s ease;
+}
+
+.rm-drawer {
+    background: color-mix(in srgb, var(--rm-surface-soft) 88%, transparent);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-left: 1px solid var(--rm-border);
+    box-shadow: -8px 0 32px -4px rgba(47, 62, 92, 0.12);
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+/* Anchos Estándar Compactos */
+.rm-drawer-sm { width: 520px; max-width: 100vw; }
+.rm-drawer-md { width: 660px; max-width: 100vw; }
+.rm-drawer-lg { width: 720px; max-width: 100vw; }
+
+/* Estructura Jerárquica del Drawer */
+.rm-drawer-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--rm-border);
+    background: color-mix(in srgb, var(--rm-surface-strong) 88%, transparent);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    flex-shrink: 0;
+}
+
+.rm-drawer-title {
+    font-family: var(--rm-font-title, 'Outfit', sans-serif);
+    font-size: var(--rm-font-card-title, 15px);
+    font-weight: 700;
+    color: var(--rm-text-title);
+    letter-spacing: -0.01em;
+}
+
+.rm-drawer-subtitle {
+    font-size: 11.5px;
+    color: var(--rm-text-muted);
+    margin-top: 1px;
+}
+
+.rm-drawer-body {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    padding: 16px 20px;
+    background: transparent;
+    overscroll-behavior: contain;
+}
+
+/* Bloques internos del drawer */
+.rm-drawer-card {
+    background: var(--rm-surface);
+    border: 1px solid var(--rm-border);
+    border-radius: 14px;
+    padding: 14px;
+    box-shadow: 0 2px 8px rgba(47, 62, 92, 0.03);
+    transition: border-color 0.2s ease;
+}
+
+.rm-drawer-card-highlight {
+    background: var(--rm-surface-alt);
+    border: 1px solid var(--rm-border);
+    border-radius: 14px;
+    padding: 14px;
+    box-shadow: 0 2px 8px rgba(47, 62, 92, 0.03);
+}
+
+.rm-drawer-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 20px;
+    border-top: 1px solid var(--rm-border);
+    background: color-mix(in srgb, var(--rm-surface-soft) 92%, transparent);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    flex-shrink: 0;
+}
+
+@keyframes rm-drawer-in {
+    from { transform: translateX(100%); }
+    to { transform: translateX(0); }
+}
+
+/* ============================================================
+   MODO OSCURO - DRAWERS
+   ============================================================ */
+.dark .rm-drawer {
+    background: color-mix(in srgb, var(--rm-surface-soft) 90%, transparent);
+    border-color: var(--rm-border);
+    box-shadow: -12px 0 40px rgba(0, 0, 0, 0.6);
+    color: #F8FAFC;
+}
+
+.dark .rm-drawer-header {
+    background: color-mix(in srgb, var(--rm-surface-strong) 90%, transparent);
+    border-color: var(--rm-border);
+}
+
+.dark .rm-drawer-title {
+    color: var(--rm-text-title);
+}
+
+.dark .rm-drawer-subtitle {
+    color: var(--rm-text-muted);
+}
+
+.dark .rm-drawer-card {
+    background: #18222A;
+    border-color: var(--rm-border);
+}
+
+.dark .rm-drawer-card-highlight {
+    background: #1D2A34;
+    border-color: var(--rm-border);
+}
+
+.dark .rm-drawer-footer {
+    background: color-mix(in srgb, var(--rm-surface-soft) 94%, transparent);
+    border-color: var(--rm-border);
+}

@@ -148,7 +148,7 @@
 
  <div class="grid gap-6 lg:grid-cols-2">
  {{-- Gráfico Signos Vitales --}}
- <div class="rounded-2xl border border-borde bg-fondo-panel p-5 shadow-xs flex flex-col justify-between">
+ <div class="rm-chart-card rm-chart-glass flex flex-col justify-between">
  <h4 class="text-xs font-bold text-titulo mb-3 flex items-center gap-1.5">
  <span class="h-2 w-2 rounded-full bg-fondo-panel"></span>
  Evolución de Signos Vitales
@@ -165,26 +165,29 @@
  x-data="{ chart: null }"
  x-init="
  chart = new Chart($refs.canvasSignos, {
- type: 'line',
- data: {
- labels: @js($chartSignos['labels']),
- datasets: [
- { label: 'Frecuencia Cardíaca', data: @js($chartSignos['fc']), borderColor: '#D96F58', backgroundColor: 'rgba(217,111,88,0.08)', tension: 0.3, fill: true },
- { label: 'Saturación O2', data: @js($chartSignos['sat']), borderColor: '#5B5F97', backgroundColor: 'transparent', tension: 0.3 },
- { label: 'Temperatura', data: @js($chartSignos['temp']), borderColor: '#8EA17D', backgroundColor: 'transparent', tension: 0.3 }
- ]
- },
- options: { 
- responsive: true, 
- maintainAspectRatio: false,
- plugins: { 
- legend: { 
- position: 'bottom', 
- labels: { font: { size: 9, family: 'Outfit', weight: 'bold' }, color: '#2F3E5C' } 
- } 
- } 
- }
- });
+                                    type: 'line',
+                                    data: {
+                                        labels: @js($chartSignos['labels']),
+                                        datasets: [
+                                            { label: 'Frecuencia Cardíaca', data: @js($chartSignos['fc']), borderColor: '#D9745B', backgroundColor: 'rgba(217,116,91,0.14)', tension: 0.38, fill: true, pointRadius: 4, pointHoverRadius: 6, borderWidth: 2.5 },
+                                            { label: 'Saturación O2', data: @js($chartSignos['sat']), borderColor: '#4E8CA6', backgroundColor: 'rgba(78,140,166,0.10)', tension: 0.38, fill: true, pointRadius: 3.5, borderWidth: 2 },
+                                            { label: 'Temperatura', data: @js($chartSignos['temp']), borderColor: '#5F9271', backgroundColor: 'transparent', tension: 0.38, pointRadius: 3.5, borderWidth: 2 }
+                                        ]
+                                    },
+                                    options: { 
+                                        responsive: true, 
+                                        maintainAspectRatio: false,
+                                        animation: { duration: 950, easing: 'easeOutQuart' },
+                                        plugins: { 
+                                            legend: { position: 'bottom', labels: { boxWidth: 10, font: { family: 'Inter', size: 10, weight: 'bold' } } } 
+                                        },
+                                        scales: {
+                                            y: { beginAtZero: false, grid: { color: 'rgba(224,212,198,0.35)' }, ticks: { font: { size: 9 } } },
+                                            x: { grid: { display: false }, ticks: { font: { size: 9 } } }
+                                        } 
+                                    }
+                                });
+
  $watch('$wire.chartSignos', value => {
  if (value && value.labels && value.labels.length > 0) {
  chart.data.labels = value.labels;
@@ -201,7 +204,7 @@
  </div>
 
  {{-- Gráfico Evaluaciones --}}
- <div class="rounded-2xl border border-borde bg-fondo-panel p-5 shadow-xs flex flex-col justify-between">
+ <div class="rm-chart-card rm-chart-glass flex flex-col justify-between">
  <h4 class="text-xs font-bold text-titulo mb-3 flex items-center gap-1.5">
  <span class="h-2 w-2 rounded-full bg-fondo-panel"></span>
  Evolución de Evaluaciones Cognitivas
@@ -218,28 +221,36 @@
  x-data="{ chart: null }"
  x-init="
  chart = new Chart($refs.canvasCognitivo, {
- type: 'bar',
- data: {
- labels: @js($chartCognitivo['labels']),
- datasets: [
- { label: 'Puntaje Obtenido', data: @js($chartCognitivo['puntajes']), backgroundColor: '#5B5F97', borderRadius: 6 }
- ]
- },
- options: { 
- responsive: true, 
- maintainAspectRatio: false,
- plugins: { 
- legend: { 
- position: 'bottom', 
- labels: { font: { size: 9, family: 'Outfit', weight: 'bold' }, color: '#2F3E5C' } 
- } 
- },
- scales: { 
- y: { beginAtZero: true, ticks: { color: '#2F3E5C', font: { size: 9 } } },
- x: { ticks: { color: '#2F3E5C', font: { size: 9 } } }
- } 
- }
- });
+                                    type: 'bar',
+                                    data: {
+                                        labels: @js($chartCognitivo['labels']),
+                                        datasets: [
+                                            {
+                                                label: 'Puntaje Obtenido',
+                                                data: @js($chartCognitivo['puntajes']),
+                                                backgroundColor: 'rgba(117,101,168,0.78)',
+                                                borderColor: '#7565A8',
+                                                borderWidth: 1.5,
+                                                borderRadius: 8,
+                                                barPercentage: 0.86,
+                                                categoryPercentage: 0.90
+                                            }
+                                        ]
+                                    },
+                                    options: { 
+                                        responsive: true, 
+                                        maintainAspectRatio: false,
+                                        animation: { duration: 950, easing: 'easeOutQuart' },
+                                        plugins: { 
+                                            legend: { position: 'bottom', labels: { boxWidth: 10, font: { family: 'Inter', size: 10, weight: 'bold' } } } 
+                                        },
+                                        scales: {
+                                            y: { beginAtZero: true, grid: { color: 'rgba(224,212,198,0.35)' }, ticks: { precision: 0, font: { size: 9 } } },
+                                            x: { grid: { display: false }, ticks: { font: { size: 9 } } }
+                                        } 
+                                    }
+                                });
+
  $watch('$wire.chartCognitivo', value => {
  if (value && value.labels && value.labels.length > 0) {
  chart.data.labels = value.labels;

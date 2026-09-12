@@ -50,7 +50,7 @@
  <h3 class="line-clamp-1 text-center text-base font-extrabold leading-tight text-titulo">
  {{ $adulto->nombres }} {{ $adulto->ap_paterno }}
  </h3>
- <p class="mt-0.5 text-[11px] font-bold text-boton-acento">{{ $adulto->cod_am }}</p>
+ <p class="mt-0.5 text-[11px] font-bold text-boton-acento">{{ $adulto->edad ?? 'Edad no registrada' }}{{ $adulto->edad ? ' años' : '' }}</p>
 
  {{-- Slot de datos contextuales --}}
  <div class="mt-3 w-full flex-1 rounded-2xl bg-fondo-panel px-4 py-3 text-xs">

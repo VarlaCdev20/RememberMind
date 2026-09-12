@@ -6,27 +6,14 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Clinica\StoreSignosVitalesRequest;
 use App\Models\AdultoMayor;
 use App\Models\SignosVitalesAdulto;
+use App\Services\Clinica\SignosVitalesService;
 
 class AdultoMayorSignosVitalesController extends Controller
 {
     public function store(StoreSignosVitalesRequest $request, AdultoMayor $adulto_mayor)
     {
         try {
-            $data = $request->validated();
-
-            // Calcular IMC automáticamente si peso y talla están presentes
-            if (!empty($data['peso']) && !empty($data['talla']) && $data['talla'] > 0) {
-                $tallaMetros = $data['talla'] > 3 ? $data['talla'] / 100 : $data['talla'];
-                $data['imc'] = round($data['peso'] / ($tallaMetros * $tallaMetros), 2);
-            }
-
-            $signo = SignosVitalesAdulto::create(array_merge(
-                $data,
-                [
-                    'cod_am'         => $adulto_mayor->cod_am,
-                    'registrado_por' => auth()->user()->cod_usu,
-                ]
-            ));
+            app(SignosVitalesService::class)->registrar($adulto_mayor->cod_am, $request->validated(), auth()->user());
 
             return redirect()
                 ->route('admin.adultos-mayores.show', ['adulto_mayor' => $adulto_mayor->cod_am, 'tab' => 'signos-vitales'])
@@ -41,19 +28,14 @@ class AdultoMayorSignosVitalesController extends Controller
 
     public function update(StoreSignosVitalesRequest $request, AdultoMayor $adulto_mayor, SignosVitalesAdulto $signo)
     {
+        abort_unless($signo->cod_am === $adulto_mayor->cod_am, 404);
         try {
             $data = $request->validated();
-
-            if (!empty($data['peso']) && !empty($data['talla']) && $data['talla'] > 0) {
-                $tallaMetros = $data['talla'] > 3 ? $data['talla'] / 100 : $data['talla'];
-                $data['imc'] = round($data['peso'] / ($tallaMetros * $tallaMetros), 2);
-            }
-
-            $signo->update($data);
+            app(SignosVitalesService::class)->rectificar($signo, $data, (string) $request->input('motivo_rectificacion'), auth()->user());
 
             return redirect()
                 ->route('admin.adultos-mayores.show', ['adulto_mayor' => $adulto_mayor->cod_am, 'tab' => 'signos-vitales'])
-                ->with('success', 'Signos vitales actualizados correctamente.');
+                ->with('success', 'Rectificación registrada; el control original se conserva.');
 
         } catch (\Exception $e) {
             return redirect()->back()

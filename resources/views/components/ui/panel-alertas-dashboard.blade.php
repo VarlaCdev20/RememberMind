@@ -30,9 +30,13 @@ $estilosNivel = [
  {{ $alerta['descripcion'] ?? 'Sin descripción' }}
  </p>
  @if(!empty($alerta['accion']))
- <p class="mt-1 text-[10px] font-bold uppercase tracking-wide text-meta">
- {{ $alerta['accion'] }}
- </p>
+ <div class="mt-2 flex items-center">
+     <a href="{{ $alerta['url'] ?? route('admin.alertas-clinicas.index') }}"
+        class="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-[11px] font-bold text-verde-interactivo bg-fondo-card hover:bg-verde-interactivo/10 transition border border-borde-suave group shadow-xs">
+         <span>{{ $alerta['accion'] }}</span>
+         <i class="ph-bold ph-arrow-right text-[10px] transition-transform group-hover:translate-x-0.5"></i>
+     </a>
+ </div>
  @endif
  </div>
  </div>

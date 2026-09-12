@@ -1,0 +1,50 @@
+/* ============================================================
+   REMEMBERMIND DESIGN SYSTEM — COMPONENTS / FILTERS
+   Barra horizontal de filtros: Fondo Beige Translúcido
+   ============================================================ */
+
+.rm-filter-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px 12px;
+    padding: 12px 14px;
+    background-color: rgba(250, 246, 240, 0.88);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(228, 214, 199, 0.80);
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(60, 45, 30, 0.04);
+}
+
+.dark .rm-filter-bar {
+    background-color: rgba(26, 32, 44, 0.85);
+    border-color: rgba(55, 65, 81, 0.70);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+}
+
+.rm-filter-group {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 10px;
+    flex: 1 1 auto;
+}
+
+.rm-filter-search {
+    min-width: 260px;
+    max-width: 420px;
+    flex: 1 1 auto;
+}
+
+.rm-filter-select {
+    min-width: 150px;
+}
+
+.rm-filter-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+}

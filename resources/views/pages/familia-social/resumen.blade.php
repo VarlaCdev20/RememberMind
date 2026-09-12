@@ -91,7 +91,7 @@
  </div>
 
  <div class="grid gap-4 lg:grid-cols-[0.95fr_1.05fr]">
- <section class="rounded-2xl border border-borde-suave bg-fondo-panel p-4 shadow-sm backdrop-blur-xl">
+ <section class="rm-chart-card rm-chart-glass">
  <div class="flex items-start justify-between gap-3">
  <div>
  <h2 class="text-base font-extrabold text-titulo">Estado social general</h2>
@@ -129,7 +129,7 @@
  </div>
  </section>
 
- <section class="rounded-2xl border border-borde-suave bg-fondo-panel p-4 shadow-sm backdrop-blur-xl">
+ <section class="rm-chart-card rm-chart-glass">
  <div class="mb-3 flex items-start justify-between gap-3">
  <div>
  <h2 class="text-base font-extrabold text-titulo">Cobertura de red de apoyo</h2>
@@ -153,7 +153,7 @@
  </div>
 
  <div class="grid gap-4 lg:grid-cols-2">
- <section class="rounded-2xl border border-borde-suave bg-fondo-panel p-4 shadow-sm backdrop-blur-xl">
+ <section class="rm-chart-card rm-chart-glass">
  <div class="mb-3 flex items-start justify-between gap-3">
  <div>
  <h2 class="text-base font-extrabold text-titulo">Visitas registradas</h2>
@@ -176,7 +176,7 @@
  @endif
  </section>
 
- <section class="rounded-2xl border border-borde-suave bg-fondo-panel p-4 shadow-sm backdrop-blur-xl">
+ <section class="rm-chart-card rm-chart-glass">
  <div class="mb-3 flex items-start justify-between gap-3">
  <div>
  <h2 class="text-base font-extrabold text-titulo">Estado de ficha social</h2>
@@ -201,7 +201,7 @@
  </div>
 
  <div class="grid gap-4 xl:grid-cols-2">
- <section class="rounded-2xl border border-borde-suave bg-fondo-panel p-4 shadow-sm backdrop-blur-xl">
+ <section class="rm-chart-card rm-chart-glass">
  <div class="mb-3 flex items-start justify-between gap-3">
  <div>
  <h2 class="text-base font-extrabold text-titulo">Alertas sociales</h2>
@@ -233,7 +233,7 @@
  </div>
  </section>
 
- <section class="rounded-2xl border border-borde-suave bg-fondo-panel p-4 shadow-sm backdrop-blur-xl">
+ <section class="rm-chart-card rm-chart-glass">
  <div class="mb-3 flex items-start justify-between gap-3">
  <div>
  <h2 class="text-base font-extrabold text-titulo">Visitas recientes</h2>
@@ -267,7 +267,7 @@
  </div>
 
  <div class="grid gap-4 xl:grid-cols-[1.05fr_0.95fr]">
- <section class="rounded-2xl border border-borde-suave bg-fondo-panel p-4 shadow-sm backdrop-blur-xl">
+ <section class="rm-chart-card rm-chart-glass">
  <div class="mb-3 flex items-start justify-between gap-3">
  <div>
  <h2 class="text-base font-extrabold text-titulo">Red de apoyo por completar</h2>
@@ -303,7 +303,7 @@
  </div>
  </section>
 
- <section class="rounded-2xl border border-borde-suave bg-fondo-panel p-4 shadow-sm backdrop-blur-xl">
+ <section class="rm-chart-card rm-chart-glass">
  <div class="mb-3 flex items-start justify-between gap-3">
  <div>
  <h2 class="text-base font-extrabold text-titulo">Ficha social</h2>
@@ -352,7 +352,7 @@
  </div>
 
  <div class="grid gap-4 xl:grid-cols-[1fr_0.9fr]">
- <section class="rounded-2xl border border-borde-suave bg-fondo-panel p-4 shadow-sm backdrop-blur-xl">
+ <section class="rm-chart-card rm-chart-glass">
  <div class="mb-3 flex items-start justify-between gap-3">
  <div>
  <h2 class="text-base font-extrabold text-titulo">Reportes sociales</h2>
@@ -389,7 +389,7 @@
  </div>
  </section>
 
- <section class="rounded-2xl border border-borde-suave bg-fondo-panel p-4 shadow-sm backdrop-blur-xl">
+ <section class="rm-chart-card rm-chart-glass">
  <div class="mb-3">
  <h2 class="text-base font-extrabold text-titulo">Accesos a submodulos</h2>
  <p class="mt-1 text-xs font-bold text-apoyo">Continuidad operativa del modulo Familia y Social.</p>

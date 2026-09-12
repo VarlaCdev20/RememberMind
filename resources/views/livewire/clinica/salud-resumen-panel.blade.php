@@ -58,8 +58,8 @@ $estadoTexto = $adulto->estado?->estado ?? 'Sin estado';
 
  <div class="mt-4 w-full space-y-2 text-xs">
  <div class="flex justify-between border-b border-borde-suave pb-2">
- <span class="font-bold text-meta uppercase tracking-wide text-[10px]">Código</span>
- <span class="font-black text-titulo">{{ $adulto->cod_am }}</span>
+ <span class="font-bold text-meta uppercase tracking-wide text-[10px]">Documento</span>
+ <span class="font-black text-titulo">{{ $adulto->ci ?: 'No registrado' }}</span>
  </div>
  <div class="flex justify-between border-b border-borde-suave pb-2">
  <span class="font-bold text-meta uppercase tracking-wide text-[10px]">CI</span>

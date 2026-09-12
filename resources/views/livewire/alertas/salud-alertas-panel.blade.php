@@ -79,7 +79,7 @@
  <h3 class="mt-2 truncate text-base font-extrabold text-parrafo">
  {{ $alerta['adulto']->nombres }} {{ $alerta['adulto']->ap_paterno }}
  </h3>
- <p class="mt-0.5 text-[10px] font-bold uppercase tracking-wider text-parrafo/42">{{ $alerta['adulto']->cod_am }}</p>
+ <p class="mt-0.5 text-[10px] font-bold uppercase tracking-wider text-parrafo/42">{{ $alerta['adulto']->edad ?? 'Edad no registrada' }}{{ $alerta['adulto']->edad ? ' años' : '' }}</p>
  </div>
  </div>
 

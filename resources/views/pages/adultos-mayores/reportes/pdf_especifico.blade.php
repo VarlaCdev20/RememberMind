@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
  <meta charset="UTF-8">
- <title>{{ $titulo }} - {{ $adulto->cod_am }}</title>
+ <title>{{ $titulo }} - {{ $adulto->nombres }} {{ $adulto->ap_paterno }}</title>
  <style>
  @page { margin: 1cm; }
  body { font-family: 'Helvetica', 'Arial', sans-serif; color: #2F3E5C; font-size: 11px; line-height: 1.4; }
@@ -35,7 +35,7 @@
  </td>
  <td class="title">
  <h2>{{ $titulo }}</h2>
- <p>Residente: {{ $adulto->nombres }} {{ $adulto->ap_paterno }} ({{ $adulto->cod_am }})</p>
+ <p>Residente: {{ $adulto->nombres }} {{ $adulto->ap_paterno }} {{ $adulto->ap_materno }}</p>
  <p>Periodo: {{ $startDate ? \Carbon\Carbon::parse($startDate)->format('d/m/Y') : 'Inicio' }} al {{ $endDate ? \Carbon\Carbon::parse($endDate)->format('d/m/Y') : 'Actualidad' }}</p>
  <p>Fecha de emisión: {{ now()->format('d/m/Y H:i') }}</p>
  </td>

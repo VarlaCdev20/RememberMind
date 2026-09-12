@@ -364,7 +364,7 @@
  options: {
  responsive: true,
  maintainAspectRatio: false,
- cutout: '70%',
+ cutout: '58%',
  plugins: {
  legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10, weight: 'bold' } } }
  }
@@ -1098,7 +1098,7 @@
  options: {
  responsive: true,
  maintainAspectRatio: false,
- cutout: '70%',
+ cutout: '58%',
  plugins: { legend: { position: 'bottom', labels: { boxWidth: 10 } } }
  }
  });
@@ -1202,7 +1202,7 @@
  
  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
  {{-- Barras: usuarios por area --}}
- <div class="bg-fondo-card p-4 rounded-xl border border-borde-suave shadow-sm">
+ <div class="rm-chart-card rm-chart-glass">
  <h5 class="text-[10px] font-bold text-titulo mb-2 uppercase tracking-wide">Personal por Área Institucional</h5>
  <div class="relative h-44 w-full">
  <canvas x-ref="canvasUsr"></canvas>
@@ -1210,7 +1210,7 @@
  </div>
 
  {{-- Dona: areas por tipo --}}
- <div class="bg-fondo-card p-4 rounded-xl border border-borde-suave shadow-sm">
+ <div class="rm-chart-card rm-chart-glass">
  <h5 class="text-[10px] font-bold text-titulo mb-2 uppercase tracking-wide">Distribución de Áreas por Tipo</h5>
  <div class="relative h-44 w-full">
  <canvas x-ref="canvasType"></canvas>
@@ -1218,7 +1218,7 @@
  </div>
 
  {{-- Barras apiladas: activos vs inactivos por area --}}
- <div class="bg-fondo-card p-4 rounded-xl border border-borde-suave shadow-sm">
+ <div class="rm-chart-card rm-chart-glass">
  <h5 class="text-[10px] font-bold text-titulo mb-2 uppercase tracking-wide">Personal Activo vs Inactivo por Área</h5>
  <div class="relative h-44 w-full">
  <canvas x-ref="canvasActInact"></canvas>
@@ -1226,7 +1226,7 @@
  </div>
 
  {{-- Evolucion mensual --}}
- <div class="bg-fondo-card p-4 rounded-xl border border-borde-suave shadow-sm">
+ <div class="rm-chart-card rm-chart-glass">
  <h5 class="text-[10px] font-bold text-titulo mb-2 uppercase tracking-wide">Evolución Mensual Asignación General</h5>
  @if(count($this->obtenerDatosGraficoEvolucionMensual()['labels']) >= 2)
  <div class="relative h-44 w-full">
@@ -1240,7 +1240,7 @@
  </div>
 
  {{-- Ranking Top 5 --}}
- <div class="bg-fondo-card p-4 rounded-xl border border-borde-suave shadow-sm col-span-1 md:col-span-2">
+ <div class="rm-chart-card rm-chart-glass col-span-1 md:col-span-2">
  <h5 class="text-[10px] font-bold text-titulo mb-2 uppercase tracking-wide">Top 5 Áreas con Mayor Número de Personal</h5>
  <div class="relative h-56 w-full">
  <canvas x-ref="canvasRank"></canvas>
@@ -1367,7 +1367,7 @@
  @if($reporteData['totalUsuarios'] > 0)
  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
  {{-- Dona activos vs inactivos --}}
- <div class="bg-fondo-card p-4 rounded-xl border border-borde-suave shadow-sm">
+ <div class="rm-chart-card rm-chart-glass">
  <h5 class="text-[10px] font-bold text-titulo mb-2 uppercase tracking-wide">Usuarios Activos vs Inactivos</h5>
  <div class="relative h-44 w-full">
  <canvas x-ref="canvasAreaActive"></canvas>
@@ -1375,7 +1375,7 @@
  </div>
 
  {{-- Barras usuarios por rol --}}
- <div class="bg-fondo-card p-4 rounded-xl border border-borde-suave shadow-sm">
+ <div class="rm-chart-card rm-chart-glass">
  <h5 class="text-[10px] font-bold text-titulo mb-2 uppercase tracking-wide">Usuarios por Rol</h5>
  <div class="relative h-44 w-full">
  <canvas x-ref="canvasAreaRol"></canvas>
@@ -1386,7 +1386,7 @@
 
  {{-- Evolución asignación --}}
  @if(count($this->obtenerDatosGraficoEvolucionArea($reporteData['area']['cod_area'])) >= 2)
- <div class="bg-fondo-card p-4 rounded-xl border border-borde-suave shadow-sm">
+ <div class="rm-chart-card rm-chart-glass">
  <h5 class="text-[10px] font-bold text-titulo mb-2 uppercase tracking-wide">Evolución Mensual Asignación</h5>
  <div class="relative h-44 w-full">
  <canvas x-ref="canvasAreaLine"></canvas>

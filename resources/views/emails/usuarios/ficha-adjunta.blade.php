@@ -110,7 +110,7 @@
  <p>Adjunto a este correo encontrará la <strong>Ficha Institucional / Expediente Digital</strong> oficial correspondiente a su registro en la plataforma RememberMind de CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS.</p>
  
  <div class="info-box">
- <p><span class="info-label">Código Interno:</span> <span class="info-value">{{ $usuario->cod_usu }}</span></p>
+ <p><span class="info-label">Nombre completo:</span> <span class="info-value">{{ $usuario->name }}</span></p>
  <p><span class="info-label">Documento:</span> <span class="info-value">{{ $usuario->tipo_documento ?? 'CI' }} {{ $usuario->numero_documento }}</span></p>
  <p><span class="info-label">Correo Habilitado:</span> <span class="info-value" style="text-transform: lowercase;">{{ $usuario->correo }}</span></p>
  <p><span class="info-label">Fecha de Emisión:</span> <span class="info-value">{{ now()->format('d/m/Y H:i') }}</span></p>

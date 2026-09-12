@@ -594,7 +594,7 @@ class AsistenciaPanel extends Component
 
         $programacion = $this->programacionPorVoluntarioFecha((string) $this->cod_vol, $this->fecha);
         $asignacion = $this->asignacionRelacionada((string) $this->cod_vol, $this->fecha);
-        $programacion['asignacion'] = $asignacion ? ('Asignación #' . $asignacion->cod_asig_vol) : 'Sin asignación relacionada';
+        $programacion['asignacion'] = $asignacion ? 'Asignación institucional vinculada' : 'Sin asignación relacionada';
 
         return $programacion;
     }

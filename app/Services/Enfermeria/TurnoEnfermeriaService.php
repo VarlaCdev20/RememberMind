@@ -4,6 +4,7 @@ namespace App\Services\Enfermeria;
 
 use App\Models\AdultoMayor;
 use App\Models\AsignacionTurnoAdulto;
+use App\Models\RecepcionTurno;
 use App\Models\TurnoEnfermeria;
 use App\Models\User;
 use App\Services\Identidad\GeneradorPlanillaEnfermeriaService;
@@ -45,7 +46,10 @@ class TurnoEnfermeriaService
             try {
                 $service = app(GeneradorPlanillaEnfermeriaService::class);
                 $asignacion = $service->obtenerTurnoEnFecha($user->cod_usu, $fechaStr);
-                if ($asignacion && !empty($asignacion['turno_nombre']) && $asignacion['turno_codigo'] !== 'DESCANSO') {
+                if ($asignacion && ($asignacion['turno_codigo'] ?? null) === 'DESCANSO') {
+                    return null;
+                }
+                if ($asignacion && !empty($asignacion['turno_nombre'])) {
                     $nombreAsignado = Str::lower(trim($asignacion['turno_nombre']));
                     $turnoPlanilla = $turnosOrdenados->first(fn ($t) => Str::lower(trim($t->nombre)) === $nombreAsignado);
                     if ($turnoPlanilla) {
@@ -60,22 +64,23 @@ class TurnoEnfermeriaService
         // 2. Cálculo por hora actual
         $horaActual = Carbon::now()->format('H:i:s');
         $turnoPorHora = TurnoEnfermeria::activos()
-            ->where(function ($q) use ($horaActual) {
-                $q->whereColumn('hora_inicio', '<=', 'hora_fin')
-                    ->whereTime('hora_inicio', '<=', $horaActual)
-                    ->whereTime('hora_fin', '>=', $horaActual);
-            })
-            ->orWhere(function ($q) use ($horaActual) {
-                $q->whereColumn('hora_inicio', '>', 'hora_fin')
-                    ->where(function ($sub) use ($horaActual) {
-                        $sub->whereTime('hora_inicio', '<=', $horaActual)
-                            ->orWhereTime('hora_fin', '>=', $horaActual);
-                    });
+            ->where(function ($turnos) use ($horaActual) {
+                $turnos->where(function ($q) use ($horaActual) {
+                    $q->whereColumn('hora_inicio', '<=', 'hora_fin')
+                        ->whereTime('hora_inicio', '<=', $horaActual)
+                        ->whereTime('hora_fin', '>=', $horaActual);
+                })->orWhere(function ($q) use ($horaActual) {
+                    $q->whereColumn('hora_inicio', '>', 'hora_fin')
+                        ->where(function ($sub) use ($horaActual) {
+                            $sub->whereTime('hora_inicio', '<=', $horaActual)
+                                ->orWhereTime('hora_fin', '>=', $horaActual);
+                        });
+                });
             })
             ->orderBy('orden')
             ->first();
 
-        return $turnoPorHora ?: $turnosOrdenados->first();
+        return $turnoPorHora;
     }
 
     /**
@@ -113,6 +118,7 @@ class TurnoEnfermeriaService
         $query->whereHas('asignacionesTurno', function ($q) use ($codEnf, $codTurno) {
             $q->whereIn('estado', ['ACTIVO', 'ACTIVA'])
                 ->where('cod_usu_enfermero', $codEnf)
+                ->whereDate('fecha_inicio', '<=', Carbon::today())
                 ->where(function ($dateQ) {
                     $dateQ->whereNull('fecha_fin')
                           ->orWhereDate('fecha_fin', '>=', Carbon::today());
@@ -157,6 +163,7 @@ class TurnoEnfermeriaService
         return AsignacionTurnoAdulto::where('cod_am', $codAm)
             ->where('cod_usu_enfermero', $user->cod_usu)
             ->whereIn('estado', ['ACTIVO', 'ACTIVA'])
+            ->whereDate('fecha_inicio', '<=', Carbon::today())
             ->where(function ($dateQ) {
                 $dateQ->whereNull('fecha_fin')
                       ->orWhereDate('fecha_fin', '>=', Carbon::today());
@@ -175,9 +182,65 @@ class TurnoEnfermeriaService
      */
     public function autorizarAccionPaciente(string|AdultoMayor $adulto, ?User $user = null, ?string $codTurno = null): void
     {
+        $user = $user ?? Auth::user();
+        if ($this->esSuperAdmin($user)) {
+            return;
+        }
+
         if (!$this->esPacienteAsignado($adulto, $user, $codTurno)) {
             abort(403, 'Acción denegada: no tiene asignado a este residente en su turno activo.');
         }
+    }
+
+    /**
+     *   * Autoriza una mutación clínica de Enfermería con el contexto calculado
+     * exclusivamente en el servidor: rol, permiso, turno vigente, recepción,
+     * asignación fechada y presencia institucional del residente.
+     */
+    public function autorizarMutacionPaciente(
+        string|AdultoMayor $adulto,
+        string $permiso,
+        ?User $user = null
+    ): TurnoEnfermeria {
+        $user = $user ?? Auth::user();
+        if ($this->esSuperAdmin($user)) {
+            return $this->obtenerTurnoActivo($user) ?? TurnoEnfermeria::activos()->first() ?? new TurnoEnfermeria();
+        }
+
+        abort_unless($user && $user->hasRole('ENFERMEROS'), 403, 'La acción está reservada al personal de Enfermería.');
+        abort_unless($user->can($permiso), 403, 'No cuenta con el permiso requerido para esta acción.');
+
+        $turno = $this->obtenerTurnoActivo($user);
+        abort_unless($turno, 403, 'No tiene un turno de Enfermería vigente en este momento.');
+
+        $recibido = RecepcionTurno::query()
+            ->where('cod_turno', $turno->cod_turno)
+            ->where('cod_usuario', $user->cod_usu)
+            ->whereDate('fecha_hora_recepcion', Carbon::today())
+            ->exists();
+        abort_unless($recibido, 403, 'Debe recibir el turno vigente antes de registrar acciones clínicas.');
+
+        $residente = $adulto instanceof AdultoMayor
+            ? $adulto->fresh()
+            : AdultoMayor::query()->findOrFail($adulto);
+        abort_unless($residente && $residente->estado_operativo === 'EN_CENTRO', 403, 'El residente no se encuentra EN CENTRO.');
+        abort_unless($this->esPacienteAsignado($residente, $user, $turno->cod_turno), 403, 'El residente no está asignado a su turno vigente.');
+
+        return $turno;
+    }
+
+    public function autorizarMutacionEnfermeria(
+        string|AdultoMayor $adulto,
+        string $permiso,
+        ?User $user = null
+    ): ?TurnoEnfermeria {
+        $user = $user ?? Auth::user();
+        if ($user?->hasRole('ENFERMEROS')) {
+            return $this->autorizarMutacionPaciente($adulto, $permiso, $user);
+        }
+        abort_unless($user?->can($permiso), 403);
+        $this->autorizarAccionPaciente($adulto, $user);
+        return null;
     }
 
     /**

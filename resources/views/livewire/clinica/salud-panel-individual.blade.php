@@ -11,7 +11,7 @@
  {{ $titulo }}
  </h1>
  <p class="mt-1 text-sm font-bold text-apoyo">
- {{ $adulto->nombres }} {{ $adulto->ap_paterno }} • {{ $adulto->cod_am }}
+ {{ $adulto->nombres }} {{ $adulto->ap_paterno }} {{ $adulto->ap_materno }}
  </p>
  </div>
  </div>

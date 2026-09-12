@@ -5,20 +5,19 @@ namespace App\Http\Controllers\Medicacion;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Medicacion\StoreAdministracionMedicacionRequest;
 use App\Models\AdultoMayor;
-use App\Models\AdministracionMedicacion;
+use App\Services\Medicacion\RegistrarAdministracionMedicacionService;
 
 class AdultoMayorAdministracionMedicacionController extends Controller
 {
-    public function store(StoreAdministracionMedicacionRequest $request, AdultoMayor $adulto_mayor)
+    public function store(StoreAdministracionMedicacionRequest $request, AdultoMayor $adulto_mayor, RegistrarAdministracionMedicacionService $servicio)
     {
         try {
-            $registro = AdministracionMedicacion::create(array_merge(
-                $request->validated(),
-                [
-                    'cod_am'         => $adulto_mayor->cod_am,
-                    'registrado_por' => auth()->user()->cod_usu,
-                ]
-            ));
+            $datos = $request->validated();
+            $registro = $servicio->registrarProgramada(
+                auth()->user(), $adulto_mayor->cod_am, $datos['cod_med_adulto'],
+                $datos['hora_programada'], (bool) $datos['administrado'],
+                $datos['motivo_omision'] ?? null, $datos['observacion'] ?? null,
+            );
 
             $tipoEvento = $registro->administrado
                 ? 'Se registró administración de medicación'

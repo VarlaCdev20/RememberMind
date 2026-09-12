@@ -430,35 +430,34 @@
          GRÁFICOS: TENDENCIA 7 DÍAS + DISTRIBUCIÓN PA
     ══════════════════════════════════════════════════════════════ --}}
     <div class="grid grid-cols-1 gap-4 lg:grid-cols-5">
-
-        {{-- Tendencia 7 das --}}
-        <div class="lg:col-span-3 rounded-[24px] border border-borde bg-fondo-card p-5 shadow-sm">
-            <div class="mb-4 flex items-center justify-between">
+        {{-- Tendencia 7 días (Design System Translúcido) --}}
+        <div class="lg:col-span-3 rm-chart-card rm-chart-glass">
+            <div class="rm-chart-header border-b border-[var(--rm-border)] pb-3 mb-3">
                 <div>
-                    <h3 class="font-black text-titulo">Tendencia últimos 7 das</h3>
-                    <p class="text-xs text-apoyo">Promedios diarios de PA sistólica, FC y SpO₂</p>
+                    <h3 class="rm-chart-title">Tendencia últimos 7 días</h3>
+                    <p class="rm-chart-subtitle">Promedios diarios de PA sistólica, FC y SpO₂</p>
                 </div>
-                <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-[#9B8AC7]/15 text-[#9B8AC7]">
+                <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-[var(--rm-surface-alt)] text-[var(--rm-primary)] border border-[var(--rm-border)]">
                     <i class="ph-bold ph-trend-up text-base"></i>
                 </div>
             </div>
-            <div wire:ignore class="h-52">
+            <div wire:ignore class="h-56 w-full">
                 <canvas id="chartTendenciaSV"></canvas>
             </div>
         </div>
 
-        {{-- Distribución PA sistólica --}}
-        <div class="lg:col-span-2 rounded-[24px] border border-borde bg-fondo-card p-5 shadow-sm">
-            <div class="mb-4 flex items-center justify-between">
+        {{-- Distribución PA sistólica (Design System Translúcido Grueso) --}}
+        <div class="lg:col-span-2 rm-chart-card rm-chart-glass">
+            <div class="rm-chart-header border-b border-[var(--rm-border)] pb-3 mb-3">
                 <div>
-                    <h3 class="font-black text-titulo">Distribución PA</h3>
-                    <p class="text-xs text-apoyo">Clasificación sistólica actual</p>
+                    <h3 class="rm-chart-title">Distribución PA</h3>
+                    <p class="rm-chart-subtitle">Clasificación sistólica actual</p>
                 </div>
-                <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-[#C9654E]/15 text-[#C9654E]">
+                <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-[var(--rm-surface-alt)] text-[#D9745B] border border-[var(--rm-border)]">
                     <i class="ph-bold ph-chart-donut text-base"></i>
                 </div>
             </div>
-            <div wire:ignore class="h-52">
+            <div wire:ignore class="h-56 w-full">
                 <canvas id="chartDistPA"></canvas>
             </div>
         </div>

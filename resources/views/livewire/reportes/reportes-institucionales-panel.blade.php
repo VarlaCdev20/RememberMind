@@ -457,7 +457,7 @@
 
  <!-- COLUMNA DE GRÁFICAS (Derecha) -->
  <div class="space-y-6">
- <div class="rm-card p-6 print:break-before-page">
+ <div class="rm-chart-card rm-chart-glass p-6 print:break-before-page">
  <h3 class="text-xs font-bold uppercase tracking-widest text-titulo border-b border-borde-suave pb-3 mb-6">
  Análisis Visual Real
  </h3>
@@ -594,176 +594,206 @@
  });
  this.charts = {};
 
- // 1. Dona: Adultos por Estado
- const ctxEstados = document.getElementById('chartEstados');
- if (ctxEstados && Object.keys(estados).length > 0) {
- this.charts.estados = new Chart(ctxEstados, {
- type: 'doughnut',
- data: {
- labels: Object.keys(estados),
- datasets: [{
- data: Object.values(estados),
- backgroundColor: ['#E27D60', '#5B5F97', '#85D2B4', '#D9A27C', '#2F3E5C'],
- borderWidth: 0
- }]
- },
- options: {
- responsive: true,
- maintainAspectRatio: false,
- plugins: {
- legend: {
- position: 'bottom',
- labels: {
- boxWidth: 8,
- font: { family: 'Outfit', size: 10, weight: 'bold' }
- }
- }
- }
- }
- });
- }
+                    // Paleta institucional translúcida
+                    const palette = window.RMCharts?.palette() || ['#344D7A', '#D9745B', '#5F9271', '#C9913E', '#7565A8', '#4E8CA6'];
+                    const toTranslucent = (hex, a = 0.80) => window.RMCharts?.hexToRgba ? window.RMCharts.hexToRgba(hex, a) : hex;
 
- // 2. Barras: Adultos por Rango de Edad
- const ctxEdades = document.getElementById('chartEdades');
- if (ctxEdades && Object.values(edades).some(v => v > 0)) {
- this.charts.edades = new Chart(ctxEdades, {
- type: 'bar',
- data: {
- labels: Object.keys(edades),
- datasets: [{
- data: Object.values(edades),
- backgroundColor: '#5B5F97',
- borderRadius: 6
- }]
- },
- options: {
- responsive: true,
- maintainAspectRatio: false,
- plugins: {
- legend: { display: false }
- },
- scales: {
- y: {
- beginAtZero: true,
- ticks: { stepSize: 1, font: { family: 'Outfit', size: 9 } }
- },
- x: {
- ticks: { font: { family: 'Outfit', size: 9, weight: 'bold' } }
- }
- }
- }
- });
- }
+                    // 1. Dona: Adultos por Estado (Anillo grueso y translúcido con giro)
+                    const ctxEstados = document.getElementById('chartEstados');
+                    if (ctxEstados && Object.keys(estados).length > 0) {
+                        const rawColors = [palette[0], palette[2], palette[1], palette[3], palette[4]];
+                        this.charts.estados = new Chart(ctxEstados, {
+                            type: 'doughnut',
+                            data: {
+                                labels: Object.keys(estados),
+                                datasets: [{
+                                    data: Object.values(estados),
+                                    backgroundColor: rawColors.map(c => toTranslucent(c, 0.80)),
+                                    borderColor: rawColors.map(c => toTranslucent(c, 0.98)),
+                                    borderWidth: 2,
+                                    hoverOffset: 8,
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                cutout: '58%',
+                                animation: {
+                                    duration: 1000,
+                                    easing: 'easeOutQuart',
+                                    animateRotate: true,
+                                    animateScale: true,
+                                },
+                                plugins: {
+                                    legend: {
+                                        position: 'bottom',
+                                        labels: {
+                                            boxWidth: 10,
+                                            font: { family: 'Inter', size: 10, weight: 'bold' },
+                                            padding: 10
+                                        }
+                                    }
+                                }
+                            }
+                        });
+                    }
 
- // 3. Dona: Evaluaciones por Nivel de Alerta
- const ctxNiveles = document.getElementById('chartNiveles');
- if (ctxNiveles && tipoReporte === 'evaluaciones' && Object.values(niveles).some(v => v > 0)) {
- this.charts.niveles = new Chart(ctxNiveles, {
- type: 'doughnut',
- data: {
- labels: Object.keys(niveles),
- datasets: [{
- data: Object.values(niveles),
- backgroundColor: ['#85D2B4', '#F4D068', '#E27D60'],
- borderWidth: 0
- }]
- },
- options: {
- responsive: true,
- maintainAspectRatio: false,
- plugins: {
- legend: {
- position: 'bottom',
- labels: { boxWidth: 8, font: { family: 'Outfit', size: 10, weight: 'bold' } }
- }
- }
- }
- });
- }
+                    // 2. Barras: Adultos por Rango de Edad (Barras gruesas translúcidas)
+                    const ctxEdades = document.getElementById('chartEdades');
+                    if (ctxEdades && Object.values(edades).some(v => v > 0)) {
+                        this.charts.edades = new Chart(ctxEdades, {
+                            type: 'bar',
+                            data: {
+                                labels: Object.keys(edades),
+                                datasets: [{
+                                    data: Object.values(edades),
+                                    backgroundColor: toTranslucent(palette[4], 0.80),
+                                    borderColor: palette[4],
+                                    borderWidth: 1.5,
+                                    borderRadius: 8,
+                                    barPercentage: 0.86,
+                                    categoryPercentage: 0.90,
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                animation: { duration: 950, easing: 'easeOutQuart' },
+                                plugins: { legend: { display: false } },
+                                scales: {
+                                    x: { grid: { display: false } },
+                                    y: { beginAtZero: true, ticks: { precision: 0 } }
+                                }
+                            }
+                        });
+                    }
 
- // 4. PolarArea: Evaluaciones por Área
- const ctxAreas = document.getElementById('chartAreas');
- if (ctxAreas && tipoReporte === 'evaluaciones' && Object.keys(areas).length > 0) {
- this.charts.areas = new Chart(ctxAreas, {
- type: 'polarArea',
- data: {
- labels: Object.keys(areas),
- datasets: [{
- data: Object.values(areas),
- backgroundColor: ['rgba(226, 125, 96, 0.7)', 'rgba(91, 95, 151, 0.7)', 'rgba(133, 210, 180, 0.7)', 'rgba(217, 162, 124, 0.7)'],
- borderWidth: 0
- }]
- },
- options: {
- responsive: true,
- maintainAspectRatio: false,
- plugins: {
- legend: {
- position: 'bottom',
- labels: { boxWidth: 8, font: { family: 'Outfit', size: 9, weight: 'bold' } }
- }
- }
- }
- });
- }
+                    // 3. Dona: Evaluaciones por Nivel de Alerta (Anillo grueso semántico)
+                    const ctxNiveles = document.getElementById('chartNiveles');
+                    if (ctxNiveles && tipoReporte === 'evaluaciones' && Object.values(niveles).some(v => v > 0)) {
+                        const sem = window.RMCharts?.semanticColors() || { danger: '#E5534B', warning: '#D9822B', success: '#2D8A6E', info: '#2563EB' };
+                        const rawNivelColors = [sem.danger, sem.warning, sem.success, sem.info];
+                        this.charts.niveles = new Chart(ctxNiveles, {
+                            type: 'doughnut',
+                            data: {
+                                labels: Object.keys(niveles),
+                                datasets: [{
+                                    data: Object.values(niveles),
+                                    backgroundColor: rawNivelColors.map(c => toTranslucent(c, 0.80)),
+                                    borderColor: rawNivelColors.map(c => toTranslucent(c, 0.98)),
+                                    borderWidth: 2,
+                                    hoverOffset: 8,
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                cutout: '58%',
+                                animation: {
+                                    duration: 1000,
+                                    easing: 'easeOutQuart',
+                                    animateRotate: true,
+                                    animateScale: true,
+                                },
+                                plugins: {
+                                    legend: {
+                                        position: 'bottom',
+                                        labels: { boxWidth: 10, font: { family: 'Inter', size: 10, weight: 'bold' } }
+                                    }
+                                }
+                            }
+                        });
+                    }
 
- // 5. Pie: Documentos Activos vs Anulados/Archivados
- const ctxDocumentos = document.getElementById('chartDocumentos');
- if (ctxDocumentos && tipoReporte === 'documental' && Object.values(documentos).some(v => v > 0)) {
- this.charts.documentos = new Chart(ctxDocumentos, {
- type: 'pie',
- data: {
- labels: Object.keys(documentos),
- datasets: [{
- data: Object.values(documentos),
- backgroundColor: ['#85D2B4', '#E27D60'],
- borderWidth: 0
- }]
- },
- options: {
- responsive: true,
- maintainAspectRatio: false,
- plugins: {
- legend: {
- position: 'bottom',
- labels: { boxWidth: 8, font: { family: 'Outfit', size: 10, weight: 'bold' } }
- }
- }
- }
- });
- }
+                    // 4. PolarArea: Evaluaciones por Área
+                    const ctxAreas = document.getElementById('chartAreas');
+                    if (ctxAreas && tipoReporte === 'evaluaciones' && Object.keys(areas).length > 0) {
+                        const areaPalette = palette.map(c => toTranslucent(c, 0.75));
+                        this.charts.areas = new Chart(ctxAreas, {
+                            type: 'polarArea',
+                            data: {
+                                labels: Object.keys(areas),
+                                datasets: [{
+                                    data: Object.values(areas),
+                                    backgroundColor: areaPalette,
+                                    borderColor: palette,
+                                    borderWidth: 1.5,
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                animation: { duration: 950, easing: 'easeOutQuart', animateScale: true, animateRotate: true },
+                                plugins: {
+                                    legend: {
+                                        position: 'bottom',
+                                        labels: { boxWidth: 10, font: { family: 'Inter', size: 10, weight: 'bold' } }
+                                    }
+                                }
+                            }
+                        });
+                    }
 
- // 6. Barras: Seguimiento por Tipo
- const ctxSeguimiento = document.getElementById('chartSeguimiento');
- if (ctxSeguimiento && tipoReporte === 'seguimiento' && Object.values(seguimiento).some(v => v > 0)) {
- this.charts.seguimiento = new Chart(ctxSeguimiento, {
- type: 'bar',
- data: {
- labels: Object.keys(seguimiento),
- datasets: [{
- data: Object.values(seguimiento),
- backgroundColor: '#E27D60',
- borderRadius: 6
- }]
- },
- options: {
- responsive: true,
- maintainAspectRatio: false,
- plugins: {
- legend: { display: false }
- },
- scales: {
- y: {
- beginAtZero: true,
- ticks: { stepSize: 1, font: { family: 'Outfit', size: 9 } }
- },
- x: {
- ticks: { font: { family: 'Outfit', size: 9, weight: 'bold' } }
- }
- }
- }
- });
- }
+                    // 5. Pie: Documentos Activos vs Anulados
+                    const ctxDocumentos = document.getElementById('chartDocumentos');
+                    if (ctxDocumentos && tipoReporte === 'documental' && Object.values(documentos).some(v => v > 0)) {
+                        const docColors = [palette[2], palette[1], palette[3]];
+                        this.charts.documentos = new Chart(ctxDocumentos, {
+                            type: 'pie',
+                            data: {
+                                labels: Object.keys(documentos),
+                                datasets: [{
+                                    data: Object.values(documentos),
+                                    backgroundColor: docColors.map(c => toTranslucent(c, 0.80)),
+                                    borderColor: docColors.map(c => toTranslucent(c, 0.98)),
+                                    borderWidth: 2,
+                                    hoverOffset: 8,
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                animation: { duration: 950, easing: 'easeOutQuart', animateRotate: true, animateScale: true },
+                                plugins: {
+                                    legend: {
+                                        position: 'bottom',
+                                        labels: { boxWidth: 10, font: { family: 'Inter', size: 10, weight: 'bold' } }
+                                    }
+                                }
+                            }
+                        });
+                    }
+
+                    // 6. Barras: Seguimiento por Tipo (Barras gruesas translúcidas)
+                    const ctxSeguimiento = document.getElementById('chartSeguimiento');
+                    if (ctxSeguimiento && tipoReporte === 'seguimiento' && Object.values(seguimiento).some(v => v > 0)) {
+                        this.charts.seguimiento = new Chart(ctxSeguimiento, {
+                            type: 'bar',
+                            data: {
+                                labels: Object.keys(seguimiento),
+                                datasets: [{
+                                    data: Object.values(seguimiento),
+                                    backgroundColor: toTranslucent(palette[1], 0.80),
+                                    borderColor: palette[1],
+                                    borderWidth: 1.5,
+                                    borderRadius: 8,
+                                    barPercentage: 0.86,
+                                    categoryPercentage: 0.90,
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                animation: { duration: 950, easing: 'easeOutQuart' },
+                                plugins: { legend: { display: false } },
+                                scales: {
+                                    x: { grid: { display: false } },
+                                    y: { beginAtZero: true, ticks: { precision: 0 } }
+                                }
+                            }
+                        });
+                    }
+
  }
  }
  }

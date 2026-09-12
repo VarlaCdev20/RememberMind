@@ -1,6 +1,4 @@
-
     Alpine.data('signosVitalesCharts', () => ({
-        charts: {},
         init() {
             this.$nextTick(() => {
                 this.initTendencia();
@@ -8,19 +6,27 @@
             });
 
             $wire.$watch('chartTendencia7d', () => {
-                if (this.charts.tendencia) { this.charts.tendencia.destroy(); }
                 this.initTendencia();
             });
             $wire.$watch('chartDistPA', () => {
-                if (this.charts.distPA) { this.charts.distPA.destroy(); }
+                this.initDistPA();
+            });
+
+            window.RMCharts?.onThemeChange(() => {
+                this.initTendencia();
                 this.initDistPA();
             });
         },
         initTendencia() {
             const data = rmDatosa9b5f3c2c94b;
-            const ctx = document.getElementById('chartTendenciaSV');
-            if (!ctx) return;
-            this.charts.tendencia = new Chart(ctx, {
+            const canvas = document.getElementById('chartTendenciaSV');
+            if (!canvas || typeof Chart === 'undefined') return;
+
+            const isDark = window.RMCharts?.isDark() || false;
+            const axisTextColor = window.RMCharts ? window.RMCharts.getCss('--rm-chart-axis-text') : '#64748B';
+            const gridColor = window.RMCharts ? window.RMCharts.getCss('--rm-chart-grid') : 'rgba(224,212,198,0.35)';
+
+            const config = {
                 type: 'line',
                 data: {
                     labels: data.labels,
@@ -28,104 +34,147 @@
                         {
                             label: 'PA Sistólica (mmHg)',
                             data: data.pa,
-                            borderColor: '#9B8AC7',
-                            backgroundColor: 'rgba(155,138,199,0.12)',
+                            borderColor: '#7565A8',
+                            backgroundColor: 'rgba(117,101,168,0.16)',
                             borderWidth: 2.5,
                             pointRadius: 4,
                             pointHoverRadius: 6,
-                            pointBackgroundColor: '#9B8AC7',
-                            tension: 0.4,
+                            pointBackgroundColor: isDark ? '#1E293B' : '#FFFFFF',
+                            pointBorderColor: '#7565A8',
+                            tension: 0.38,
                             fill: true,
                             yAxisID: 'yPA',
                         },
                         {
                             label: 'FC (bpm)',
                             data: data.fc,
-                            borderColor: '#D9795F',
-                            backgroundColor: 'transparent',
+                            borderColor: '#D9745B',
+                            backgroundColor: 'rgba(217,116,91,0.12)',
                             borderWidth: 2,
-                            pointRadius: 3,
-                            pointBackgroundColor: '#D9795F',
-                            tension: 0.4,
-                            borderDash: [5, 3],
+                            pointRadius: 3.5,
+                            pointBackgroundColor: isDark ? '#1E293B' : '#FFFFFF',
+                            pointBorderColor: '#D9745B',
+                            tension: 0.38,
+                            borderDash: [4, 3],
                             yAxisID: 'yPA',
                         },
                         {
                             label: 'SpO₂ (%)',
                             data: data.sat,
-                            borderColor: '#5B7C9D',
-                            backgroundColor: 'rgba(91,124,157,0.06)',
-                            borderWidth: 2,
-                            pointRadius: 3,
-                            pointBackgroundColor: '#5B7C9D',
-                            tension: 0.4,
+                            borderColor: '#4E8CA6',
+                            backgroundColor: 'rgba(78,140,166,0.14)',
+                            borderWidth: 2.5,
+                            pointRadius: 3.5,
+                            pointBackgroundColor: isDark ? '#1E293B' : '#FFFFFF',
+                            pointBorderColor: '#4E8CA6',
+                            tension: 0.38,
                             fill: true,
                             yAxisID: 'ySat',
                         },
                     ]
                 },
                 options: {
-                    responsive: true, maintainAspectRatio: false,
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    animation: { duration: 400 },
                     plugins: {
-                        legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10 }, padding: 10 } },
-                        tooltip: { mode: 'index', intersect: false },
+                        legend: {
+                            display: true,
+                            position: 'bottom',
+                            labels: {
+                                boxWidth: 10,
+                                font: { family: 'Inter', size: 10, weight: 'bold' },
+                                color: axisTextColor,
+                                padding: 10,
+                                usePointStyle: true
+                            }
+                        },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false,
+                            cornerRadius: 8,
+                            padding: 10,
+                            backgroundColor: isDark ? '#0F172A' : '#1E293B',
+                            titleColor: '#F8FAFC',
+                            bodyColor: '#F8FAFC',
+                        },
                         datalabels: { display: false },
                     },
                     scales: {
                         yPA: {
-                            type: 'linear', position: 'left',
-                            min: 50, max: 200,
-                            grid: { color: 'rgba(0,0,0,0.05)' },
-                            ticks: { font: { size: 10 }, color: '#9B8AC7' },
+                            type: 'linear',
+                            position: 'left',
+                            min: 50,
+                            max: 200,
+                            grid: { color: gridColor, drawBorder: false },
+                            ticks: { font: { size: 10 }, color: '#7565A8' },
                         },
                         ySat: {
-                            type: 'linear', position: 'right',
-                            min: 80, max: 100,
+                            type: 'linear',
+                            position: 'right',
+                            min: 80,
+                            max: 100,
                             grid: { display: false },
-                            ticks: { font: { size: 10 }, color: '#5B7C9D',
-                                     callback: (v) => v + '%' },
+                            ticks: {
+                                font: { size: 10 },
+                                color: '#4E8CA6',
+                                callback: (v) => v + '%'
+                            },
                         },
-                        x: { grid: { display: false }, ticks: { font: { size: 10 } } },
+                        x: {
+                            grid: { color: gridColor, drawBorder: false },
+                            ticks: { font: { size: 10 }, color: axisTextColor }
+                        },
                     }
                 }
-            });
+            };
+
+            if (window.RMCharts) {
+                window.RMCharts.init('sv_tendencia', canvas, config, () => this.initTendencia());
+            } else {
+                new Chart(canvas, config);
+            }
         },
         initDistPA() {
             const data = rmDatos2e40af881bbb;
-            const ctx = document.getElementById('chartDistPA');
-            if (!ctx) return;
-            const colors = ['#5B7C9D','#3F7D5A','#E9A05F','#D9795F','#C9654E'];
-            this.charts.distPA = new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: data.labels,
-                    datasets: [{
-                        data: data.values,
-                        backgroundColor: colors,
-                        borderWidth: 2,
-                        borderColor: '#F4EEE7',
-                        hoverOffset: 6,
-                    }]
-                },
-                options: {
-                    responsive: true, maintainAspectRatio: false,
-                    plugins: {
-                        legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10 }, padding: 8 } },
-                        datalabels: {
-                            display: true,
-                            color: '#fff',
-                            font: { size: 10, weight: 'bold' },
-                            formatter: (val, ctx) => val > 0 ? val : '',
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: (ctx) => ` ${ctx.label}: ${ctx.parsed} pacientes`
+            const canvas = document.getElementById('chartDistPA');
+            if (!canvas || typeof Chart === 'undefined') return;
+
+            const palette = window.RMCharts ? window.RMCharts.palette() : ['#4E8CA6', '#5F9271', '#C9913E', '#D9745B', '#A85C73'];
+            const colors = [palette[5], palette[2], palette[3], palette[1], palette[6]];
+
+            const config = window.RMCharts && window.RMCharts.presets
+                ? window.RMCharts.presets.doughnut(
+                    data.labels,
+                    data.values,
+                    colors,
+                    {
+                        plugins: {
+                            legend: {
+                                display: true,
+                                position: 'bottom',
+                                labels: { boxWidth: 10, font: { family: 'Inter', size: 10, weight: '600' }, padding: 8 }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: (ctx) => ` ${ctx.label}: ${ctx.parsed} pacientes`
+                                }
                             }
                         }
-                    },
-                    cutout: '58%',
-                }
-            });
+                    }
+                )
+                : {
+                    type: 'doughnut',
+                    data: {
+                        labels: data.labels,
+                        datasets: [{ data: data.values, backgroundColor: colors }]
+                    }
+                };
+
+            if (window.RMCharts) {
+                window.RMCharts.init('sv_dist_pa', canvas, config, () => this.initDistPA());
+            } else {
+                new Chart(canvas, config);
+            }
         },
     }));
-    

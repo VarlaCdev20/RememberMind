@@ -10,11 +10,17 @@ class StoreSignosVitalesRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return true;
+        return $this->user()?->canAny(['signos_vitales.crear', 'salud.signos.crear']) === true;
     }
 
     protected function prepareForValidation(): void
     {
+        if ($adulto = $this->route('adulto_mayor')) {
+            $this->merge(['cod_am' => $adulto->cod_am]);
+        }
+        if ($this->user()?->hasRole('ENFERMEROS')) {
+            $this->merge(['fecha' => today()->toDateString(), 'hora' => now()->format('H:i')]);
+        }
         $sis = $this->input('presion_sistolica');
         $dia = $this->input('presion_diastolica');
 
@@ -62,6 +68,7 @@ class StoreSignosVitalesRequest extends FormRequest
             'dolor'                   => 'nullable|integer|min:' . ValidacionSignosVitalesService::DOLOR_MIN . '|max:' . ValidacionSignosVitalesService::DOLOR_MAX,
             'observacion'             => 'nullable|string|max:5000',
             'confirmar_presion_atipica' => 'nullable|boolean',
+            'motivo_rectificacion' => 'nullable|string|min:10|max:2000',
         ];
     }
 
@@ -107,7 +114,11 @@ class StoreSignosVitalesRequest extends FormRequest
             // Verificar ámbito del enfermero
             if ($this->user() && $this->input('cod_am')) {
                 try {
-                    app(TurnoEnfermeriaService::class)->autorizarAccionPaciente($this->input('cod_am'), $this->user());
+                    if ($this->user()->hasRole('ENFERMEROS')) {
+                        app(TurnoEnfermeriaService::class)->autorizarMutacionPaciente(
+                            $this->input('cod_am'), 'signos_vitales.crear', $this->user()
+                        );
+                    }
                 } catch (\Throwable $e) {
                     $validator->errors()->add('cod_am', $e->getMessage());
                 }

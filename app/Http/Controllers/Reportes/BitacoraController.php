@@ -80,7 +80,7 @@ class BitacoraController extends Controller
         // Enriquecer datos
         $registros->getCollection()->transform(function ($log) use ($timezone) {
             $log->causer_nombre = trim(($log->causer_nombres ?? '') . ' ' . ($log->causer_ap_paterno ?? ''));
-            $log->causer_nombre = $log->causer_nombre ?: ($log->causer_id ? 'Usuario #' . $log->causer_id : 'Sistema');
+            $log->causer_nombre = $log->causer_nombre ?: ($log->causer_id ? 'Usuario no identificado' : 'Sistema');
             
             // Obtener Rol
             $user = \App\Models\User::find($log->causer_id);

@@ -152,11 +152,13 @@
     --rm-textura-radial-azul: rgba(41, 58, 89, 0.05);
 
     /* ============================================================
-       SISTEMA VISUAL UNIFICADO DE ENFERMERÍA (REMEMBERMIND)
+       SISTEMA VISUAL CONSOLIDADO (REMEMBERMIND)
+       Valores cálidos, con alto contraste para evitar fondos blancos/lavados.
        ============================================================ */
     --rm-enf-bg: #F4ECE3;
     --rm-enf-surface: #FBF7F2;
-    --rm-enf-surface-hover: #F7EFE7;
+    --rm-enf-surface-hover: #F6EFE7;
+    --rm-enf-surface-contrast: #F5EEE5;
     --rm-enf-border: #E3D6C8;
     --rm-enf-border-hover: #D5C4B1;
     --rm-enf-border-focus: #E58C6C;
@@ -167,11 +169,15 @@
     --rm-enf-coral-hover: #D97A58;
     --rm-enf-coral-light: rgba(229, 140, 108, 0.12);
     --rm-enf-positive: #6F9D7B;
-    --rm-enf-positive-light: rgba(111, 157, 123, 0.14);
+    --rm-enf-positive-light: #F1F7F3;
+    --rm-enf-positive-border: rgba(111, 157, 123, 0.35);
     --rm-enf-warning: #C99A4B;
-    --rm-enf-warning-light: rgba(201, 154, 75, 0.14);
+    --rm-enf-warning-light: #FDF9F2;
+    --rm-enf-warning-border: rgba(201, 154, 75, 0.35);
     --rm-enf-risk: #C8645A;
-    --rm-enf-risk-light: rgba(200, 100, 90, 0.14);
+    --rm-enf-risk-light: #FDF4F3;
+    --rm-enf-risk-border: rgba(200, 100, 90, 0.35);
     --rm-enf-info: #778EAD;
-    --rm-enf-info-light: rgba(119, 142, 173, 0.14);
+    --rm-enf-info-light: #F3F6FA;
+    --rm-enf-info-border: rgba(119, 142, 173, 0.35);
 }

@@ -162,8 +162,15 @@ class SeguimientoDiarioPanel extends Component
             'observacion.min'                 => 'La nota de seguimiento debe tener al menos 10 caracteres.',
         ]);
 
-        app(\App\Services\Enfermeria\TurnoEnfermeriaService::class)
-            ->autorizarAccionPaciente($this->codAm, Auth::user());
+        $turnoVigente = app(\App\Services\Enfermeria\TurnoEnfermeriaService::class)
+            ->autorizarMutacionPaciente(
+                $this->codAm,
+                $this->editandoId ? 'seguimiento.editar' : 'seguimiento.crear',
+                Auth::user()
+            );
+        $this->codTurno = $turnoVigente->cod_turno;
+        $this->fecha = today()->toDateString();
+        $this->horaInicio = now()->format('H:i');
 
         if ($this->codPlan !== '' && !PlanCuidado::where('cod_plan', $this->codPlan)->where('cod_am', $this->codAm)->exists()) {
             $this->addError('codPlan', 'El plan de cuidados seleccionado no pertenece al adulto mayor.');

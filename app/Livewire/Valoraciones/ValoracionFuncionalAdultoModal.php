@@ -152,7 +152,7 @@ class ValoracionFuncionalAdultoModal extends Component
     public function guardar()
     {
         abort_unless(Auth::check(), 401);
-        app(\App\Services\Enfermeria\TurnoEnfermeriaService::class)->autorizarAccionPaciente($this->cod_am, Auth::user());
+        app(\App\Services\Enfermeria\TurnoEnfermeriaService::class)->autorizarMutacionEnfermeria($this->cod_am, 'valoracion_funcional.crear', Auth::user());
         $this->validate();
 
         $datos = [

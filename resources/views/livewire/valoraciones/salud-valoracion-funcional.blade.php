@@ -248,7 +248,7 @@
  <x-ui.status-badge :estado="$val->estado" />
  </td>
  <td class="rm-table-cell-meta">
- {{ $val->registradoPor?->name ?? $val->registrado_por ?? '—' }}
+ {{ $val->registradoPor?->name ?? 'Profesional no identificado' }}
  </td>
  <td>
  <div class="flex items-center gap-1.5">
@@ -587,11 +587,11 @@
  {{-- Estado y registro --}}
  <div class="flex flex-wrap gap-4 border-t border-borde-suave pt-4 text-xs font-bold text-apoyo">
  <span><x-ui.status-badge :estado="$viendoDetalle->estado" /></span>
- <span>Registrado por: {{ $viendoDetalle->registradoPor?->name ?? $viendoDetalle->registrado_por ?? '—' }}</span>
+ <span>Registrado por: {{ $viendoDetalle->registradoPor?->name ?? 'Profesional no identificado' }}</span>
  @if($viendoDetalle->estado === 'ANULADA')
  <span class="text-red-600">
  Anulado: {{ $viendoDetalle->fecha_anulacion?->format('d/m/Y H:i') }}
- por {{ $viendoDetalle->anuladoPor?->name ?? $viendoDetalle->anulado_por ?? '—' }}
+ por {{ $viendoDetalle->anuladoPor?->name ?? 'Profesional no identificado' }}
  </span>
  @if($viendoDetalle->motivo_anulacion)
  <span class="w-full text-red-600">Motivo: {{ $viendoDetalle->motivo_anulacion }}</span>

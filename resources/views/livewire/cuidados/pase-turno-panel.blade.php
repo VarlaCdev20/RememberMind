@@ -1,6 +1,6 @@
-<div class="space-y-6">
+<div class="rm-page-layout font-sans space-y-5">
     <!-- Encabezado de Pase de Turno -->
-    <div class="flex flex-col gap-4 border-b border-borde pb-5 md:flex-row md:items-center md:justify-between">
+    <div class="flex flex-col gap-4 rm-page-header-card p-4 sm:p-5 flex flex-col gap-4 md:flex-row md:items-center md:justify-between shadow-sm">
         <div class="flex items-center gap-4">
             <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-boton-acento/10 text-boton-acento">
                 <i class="ph-bold ph-handshake text-3xl"></i>
@@ -26,17 +26,17 @@
 
     <!-- Stats de Pases de Turno -->
     <div class="grid grid-cols-2 gap-3 sm:grid-cols-3">
-        <div class="rounded-2xl border border-borde bg-fondo-panel p-4 shadow-sm">
+        <div class="rm-card-metric p-4">
             <span class="text-[10px] font-bold uppercase tracking-wider text-apoyo">Generados Hoy</span>
             <p class="text-2xl font-black text-titulo mt-1">{{ $statsPases['generados'] }}</p>
             <span class="text-[10px] text-apoyo">Pases entregados</span>
         </div>
-        <div class="rounded-2xl border border-borde bg-fondo-panel p-4 shadow-sm">
+        <div class="rm-card-metric p-4">
             <span class="text-[10px] font-bold uppercase tracking-wider text-apoyo">Recibidos Hoy</span>
             <p class="text-2xl font-black text-emerald-600 mt-1">{{ $statsPases['recibidos'] }}</p>
             <span class="text-[10px] text-apoyo">Guardias asumidas</span>
         </div>
-        <div class="rounded-2xl border border-borde bg-fondo-panel p-4 shadow-sm">
+        <div class="rm-card-metric p-4">
             <span class="text-[10px] font-bold uppercase tracking-wider text-apoyo">Pendientes de recepción</span>
             <p class="text-2xl font-black text-amber-600 mt-1">{{ $statsPases['pendientes'] }}</p>
             <span class="text-[10px] text-apoyo">Esperando confirmación</span>
@@ -44,7 +44,7 @@
     </div>
 
     <!-- Filtros de Pases -->
-    <div class="flex flex-col gap-3 rounded-2xl border border-borde bg-fondo-panel p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+    <div class="flex flex-col gap-3 rm-card-metric p-4 sm:flex-row sm:items-center sm:justify-between">
         <div class="flex flex-1 flex-col gap-3 sm:flex-row sm:items-center">
             <div class="relative w-full sm:max-w-xs">
                 <i class="ph-bold ph-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-apoyo text-base"></i>
@@ -80,7 +80,7 @@
                                     {{ $pase->adultoMayor?->nombres }} {{ $pase->adultoMayor?->ap_paterno }}
                                 </h3>
                                 <p class="text-xs text-apoyo">
-                                    Hab. {{ $pase->adultoMayor?->habitacion?->codigo ?? 'S/H' }} · {{ $pase->fecha ? $pase->fecha->format('d/m/Y') : '' }}
+                                    {{ $pase->adultoMayor?->habitacion_texto ?? 'Sin habitación' }} · {{ $pase->fecha ? $pase->fecha->format('d/m/Y') : '' }}
                                 </p>
                             </div>
 
@@ -92,7 +92,7 @@
                         <div class="mt-3 rounded-xl bg-fondo-card/50 p-2.5 text-xs text-parrafo border border-borde space-y-1">
                             <p class="flex items-center justify-between">
                                 <span class="text-apoyo">De:</span>
-                                <strong>{{ $pase->turnoSaliente?->nombre }} ({{ $pase->enfermeroSaliente?->nombres }})</strong>
+                                <strong>{{ $pase->turnoSaliente?->nombre }} ({{ $pase->enfermeroSaliente?->name ?? 'Sin asignar' }})</strong>
                             </p>
                             <p class="flex items-center justify-between">
                                 <span class="text-apoyo">A:</span>
@@ -196,12 +196,15 @@
 
                     <div>
                         <div class="flex items-center justify-between mb-1">
-                            <label class="text-xs font-bold text-parrafo">Resumen Operativo del Turno *</label>
+                            <label class="text-xs font-bold text-parrafo">Pendientes generados por el sistema</label>
                             <button type="button" wire:click="autoCompletarResumen" class="text-[10px] font-bold text-boton-acento hover:underline">
                                 <i class="ph-bold ph-magic-wand"></i> Regenerar Resumen
                             </button>
                         </div>
-                        <textarea wire:model="resumenTurno" rows="3" class="rm-input w-full text-xs" placeholder="Detalles de la guardia, tareas completadas, incidentes ocurridos..."></textarea>
+                        <p class="mb-2 rounded-xl border border-borde bg-fondo-card p-3 text-xs text-parrafo">{{ $resumenAutomatico ?: 'Seleccione residente y turno para calcular pendientes.' }}</p>
+                        <div class="mb-3 max-h-40 space-y-1 overflow-y-auto">@foreach($pendientesAutomaticos as $pendiente)<p class="rounded-lg bg-fondo-card px-3 py-2 text-xs text-parrafo"><strong>{{ $pendiente['tipo'] }}</strong> · {{ $pendiente['detalle'] }} · {{ $pendiente['estado'] }}</p>@endforeach</div>
+                        <label class="text-xs font-bold text-parrafo">Observaciones importantes de Enfermería</label>
+                        <textarea wire:model="resumenTurno" rows="3" class="rm-input w-full text-xs" placeholder="Agregue solo información importante que no esté en los registros automáticos"></textarea>
                         @error('resumenTurno') <span class="text-red-500 text-[10px] font-bold">{{ $message }}</span> @enderror
                     </div>
 
@@ -246,7 +249,7 @@
                         <h3 class="text-base font-black text-titulo mt-1">
                             {{ $detalle->adultoMayor?->nombres }} {{ $detalle->adultoMayor?->ap_paterno }}
                         </h3>
-                        <p class="text-xs text-apoyo">Hab. {{ $detalle->adultoMayor?->habitacion?->codigo ?? 'S/H' }} · {{ $detalle->fecha?->format('d/m/Y') }}</p>
+                        <p class="text-xs text-apoyo">{{ $detalle->adultoMayor?->habitacion_texto ?? 'Sin habitación' }} · {{ $detalle->fecha?->format('d/m/Y') }}</p>
                     </div>
                     <button wire:click="cerrarModales" class="rm-btn-secondary h-8 w-8 p-0 justify-center">
                         <i class="ph-bold ph-x text-sm"></i>
@@ -293,7 +296,7 @@
                             <div class="space-y-1">
                                 @forelse($detalle->$campo ?? [] as $fila)
                                     <div class="rounded-lg border border-borde bg-fondo-card/30 p-2 text-xs flex items-center justify-between">
-                                        <span>{{ $fila['titulo'] ?? $fila['tipo_alerta'] ?? 'Registro' }}</span>
+                                        <span>{{ $fila['titulo'] ?? $fila['tipo_alerta'] ?? $fila['detalle'] ?? $fila['tipo'] ?? 'Registro clínico' }}</span>
                                         <span class="text-apoyo font-semibold">{{ $fila['resultado'] ?? $fila['nivel'] ?? $fila['prioridad'] ?? '' }}</span>
                                     </div>
                                 @empty

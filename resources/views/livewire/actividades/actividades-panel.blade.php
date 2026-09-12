@@ -176,7 +176,6 @@
  <table class="w-full min-w-[700px] text-xs">
  <thead>
  <tr class="border-b border-borde-suave">
- <th class="pb-2.5 text-left font-black uppercase tracking-[0.12em] text-apoyo">#</th>
  <th class="pb-2.5 text-left font-black uppercase tracking-[0.12em] text-apoyo">Adulto mayor</th>
  <th class="pb-2.5 text-left font-black uppercase tracking-[0.12em] text-apoyo">Tipo actividad</th>
  <th class="pb-2.5 text-left font-black uppercase tracking-[0.12em] text-apoyo">Fecha</th>
@@ -192,7 +191,6 @@
  $ne = \App\Models\ActividadAdulto::normalizarEstado($actividad->estado ?? '');
  @endphp
  <tr wire:key="act-{{ $actividad->cod_act_adul }}" class="group transition hover:bg-fondo-panel">
- <td class="py-3 pr-3 font-bold text-apoyo">{{ $actividad->cod_act_adul }}</td>
  <td class="py-3 pr-4 font-bold text-titulo">
  {{ optional($actividad->adultoMayor)->ap_paterno ?? '—' }}
  {{ optional($actividad->adultoMayor)->nombres ?? '' }}
@@ -492,7 +490,7 @@
  <div class="p-5 space-y-4">
  {{-- Estado badge --}}
  <div class="flex items-center justify-between">
- <span class="text-[10px] font-bold uppercase tracking-[0.15em] text-apoyo">Actividad #{{ $detalle->cod_act_adul }}</span>
+ <span class="text-[10px] font-bold uppercase tracking-[0.15em] text-apoyo">Detalle de actividad</span>
  <span class="inline-flex items-center rounded-full border px-3 py-1 text-[10px] font-bold uppercase tracking-wide {{ $ne['clase'] }}">
  {{ $ne['etiqueta'] }}
  </span>
@@ -506,7 +504,7 @@
  {{ optional($detalle->adultoMayor)->nombres ?? '' }}
  </p>
  @if($detalle->adultoMayor)
- <p class="text-[10px] font-bold text-apoyo">{{ $detalle->cod_am }}</p>
+ <p class="text-[10px] font-bold text-apoyo">{{ $detalle->adultoMayor?->edad ?? 'Edad no registrada' }}{{ $detalle->adultoMayor?->edad ? ' años' : '' }}</p>
  @endif
  </div>
  {{-- Tipo + Programación --}}

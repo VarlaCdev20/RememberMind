@@ -13,6 +13,7 @@ use App\Models\AsignacionTurnoAdulto;
 use App\Models\MedicacionAdulto;
 use App\Models\PaseTurno;
 use App\Models\PlanCuidado;
+use App\Models\RecepcionTurno;
 use App\Models\SeguimientoDiario;
 use App\Models\SignosVitalesAdulto;
 use App\Models\TareaPlanCuidado;
@@ -115,6 +116,11 @@ class TurnoCompletoEnfermeroTest extends TestCase
             'motivo_asignacion' => 'Asignación de turno matutino',
             'asignado_por' => $enfermero->cod_usu,
         ]);
+        RecepcionTurno::create([
+            'cod_turno' => $turnoManana->cod_turno,
+            'cod_usuario' => $enfermero->cod_usu,
+            'fecha_hora_recepcion' => now(),
+        ]);
 
         // Medicación y Plan de cuidados para pacienteAsignado
         $med = MedicacionAdulto::create([
@@ -123,6 +129,7 @@ class TurnoCompletoEnfermeroTest extends TestCase
             'dosis' => '1 comprimido',
             'frecuencia' => 'Cada 12 horas',
             'via_administracion' => 'Oral',
+            'hora_programada' => '08:00',
             'fecha_inicio' => today()->toDateString(),
             'estado' => 'ACTIVA',
         ]);
@@ -322,6 +329,21 @@ class TurnoCompletoEnfermeroTest extends TestCase
             'motivo_asignacion' => 'Asignación matutina',
             'asignado_por' => $enfermero->cod_usu,
         ]);
+        AsignacionTurnoAdulto::create([
+            'cod_am' => $paciente->cod_am,
+            'cod_turno' => $turnoTarde->cod_turno,
+            'cod_usu_enfermero' => $enfermeroReceptor->cod_usu,
+            'fecha_inicio' => today()->toDateString(),
+            'nivel_supervision' => 'ESTANDAR',
+            'estado' => 'ACTIVA',
+            'motivo_asignacion' => 'Asignación de relevo',
+            'asignado_por' => $enfermero->cod_usu,
+        ]);
+        RecepcionTurno::create([
+            'cod_turno' => $turnoManana->cod_turno,
+            'cod_usuario' => $enfermero->cod_usu,
+            'fecha_hora_recepcion' => now(),
+        ]);
 
         $this->actingAs($enfermero);
         Livewire::test(PaseTurnoPanel::class)
@@ -340,6 +362,12 @@ class TurnoCompletoEnfermeroTest extends TestCase
 
         // Relevo entrante confirma la recepción de guardia
         $this->actingAs($enfermeroReceptor);
+        Carbon::setTestNow('2026-09-10 16:00:00');
+        RecepcionTurno::create([
+            'cod_turno' => $turnoTarde->cod_turno,
+            'cod_usuario' => $enfermeroReceptor->cod_usu,
+            'fecha_hora_recepcion' => now(),
+        ]);
         Livewire::test(PaseTurnoPanel::class)
             ->call('recibirPase', $pase->cod_pase)
             ->assertHasNoErrors();

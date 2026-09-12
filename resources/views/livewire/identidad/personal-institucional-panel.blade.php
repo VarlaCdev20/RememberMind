@@ -880,7 +880,7 @@
                 </div>
 
                 <div class="grid grid-cols-1 gap-4 xl:grid-cols-2">
-                    <div class="rm-chart-panel flex h-[300px] flex-col rounded-xl border border-borde bg-fondo-card p-4 shadow-sm">
+                    <div class="rm-chart-card rm-chart-glass flex h-[300px] flex-col">
                         <h4 class="mb-2 flex items-center gap-2 text-sm font-black text-titulo">
                             <i class="ph-fill ph-chart-pie-slice text-boton-acento"></i>
                             Distribución por áreas
@@ -946,7 +946,7 @@
                         </div>
                     </div>
 
-                    <div class="rm-chart-panel flex h-[300px] flex-col rounded-xl border border-borde bg-fondo-card p-4 shadow-sm">
+                    <div class="rm-chart-card rm-chart-glass flex h-[300px] flex-col">
                         <h4 class="mb-2 flex items-center gap-2 text-sm font-black text-titulo">
                             <i class="ph-fill ph-chart-bar text-estado-info"></i>
                             Estado laboral
@@ -1016,7 +1016,7 @@
                         </div>
                     </div>
 
-                    <div class="rm-chart-panel flex h-[300px] flex-col rounded-xl border border-borde bg-fondo-card p-4 shadow-sm">
+                    <div class="rm-chart-card rm-chart-glass flex h-[300px] flex-col">
                         <h4 class="mb-2 flex items-center gap-2 text-sm font-black text-titulo">
                             <i class="ph-fill ph-clock text-modulo-salud"></i>
                             Personal asignado por turno
@@ -1082,7 +1082,7 @@
                         </div>
                     </div>
 
-                    <div class="rm-chart-panel flex h-[300px] flex-col rounded-xl border border-borde bg-fondo-card p-4 shadow-sm">
+                    <div class="rm-chart-card rm-chart-glass flex h-[300px] flex-col">
                         <h4 class="mb-2 flex items-center gap-2 text-sm font-black text-titulo">
                             <i class="ph-fill ph-first-aid text-estado-exito"></i>
                             Distribución del personal de salud

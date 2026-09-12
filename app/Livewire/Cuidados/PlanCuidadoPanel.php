@@ -73,7 +73,9 @@ class PlanCuidadoPanel extends Component
             'nivelCuidado.required'=> 'Seleccione el nivel de cuidado.',
             'fechaInicio.required'=> 'La fecha de inicio es obligatoria.',
         ]);
-        app(TurnoEnfermeriaService::class)->autorizarAccionPaciente($this->codAm, Auth::user());
+        app(TurnoEnfermeriaService::class)->autorizarMutacionEnfermeria(
+            $this->codAm, $this->editandoId ? 'plan_cuidado.editar' : 'plan_cuidado.crear', Auth::user()
+        );
 
         // Validar que no exista plan ACTIVO
         if ($this->estadoPlan === 'ACTIVO') {
@@ -140,7 +142,7 @@ class PlanCuidadoPanel extends Component
     {
         abort_unless(auth()->user()?->can('plan_cuidado.cerrar'), 403);
         $plan = PlanCuidado::findOrFail($id);
-        app(TurnoEnfermeriaService::class)->autorizarAccionPaciente($plan->cod_am, Auth::user());
+        app(TurnoEnfermeriaService::class)->autorizarMutacionEnfermeria($plan->cod_am, 'plan_cuidado.cerrar', Auth::user());
         abort_unless($plan->estado === 'ACTIVO', 409, 'Solo puede cerrar un plan activo.');
         $plan->update([
             'estado'   => 'CERRADO',

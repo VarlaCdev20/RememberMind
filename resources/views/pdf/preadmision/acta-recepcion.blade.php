@@ -36,7 +36,7 @@
     </div>
 
     <div class="doc-title">Acta de Recepción de Documentos</div>
-    <p class="meta">Generado el {{ $fecha }} — Código de preadmisión: {{ $preadmision->cod_pre }}</p>
+    <p class="meta">Generado el {{ $fecha }} — Solicitante: {{ $preadmision->nombre_completo }}</p>
 
     <div class="section">
         <div class="section-title">I. Datos de la Preadmisión</div>
@@ -84,8 +84,7 @@
         <p class="body-text">
             La institución <strong>Casa Amandita</strong> deja constancia de haber recibido la documentación
             indicada en el presente acta para el proceso de preadmisión del adulto mayor
-            <strong>{{ $preadmision->nombre_completo }}</strong>, registrado bajo el código
-            <strong>{{ $preadmision->cod_pre }}</strong>. Los documentos pendientes deberán ser
+            <strong>{{ $preadmision->nombre_completo }}</strong>. Los documentos pendientes deberán ser
             entregados dentro del plazo establecido.
         </p>
     </div>
@@ -106,7 +105,7 @@
     </div>
 
     <div class="footer">
-        Casa Amandita — RememberMind · Documento generado el {{ $fecha }} · {{ $preadmision->cod_pre }}
+        Casa Amandita — RememberMind · Documento generado el {{ $fecha }} · {{ $preadmision->nombre_completo }}
     </div>
 </body>
 </html>

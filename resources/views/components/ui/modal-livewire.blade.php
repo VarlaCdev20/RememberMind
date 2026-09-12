@@ -21,7 +21,7 @@ $modalId = $id ?: 'modal-'.\Illuminate\Support\Str::slug((string) ($attributes->
  x-data="{ show: @entangle($attributes->wire('model')) }"
  x-show="show"
  x-on:keydown.escape.window="$wire.{{ $closeMethod }}()"
- class="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto overflow-x-hidden pt-16 px-4 pb-10 sm:pt-20"
+ class="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto overflow-x-hidden p-4 sm:p-6"
  style="display: none;"
 >
  <!-- Overlay -->
@@ -49,10 +49,10 @@ $modalId = $id ?: 'modal-'.\Illuminate\Support\Str::slug((string) ($attributes->
  x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
  x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
  role="dialog" aria-modal="true" aria-labelledby="{{ $modalId }}-titulo"
- class="modal-institucional rm-modal-panel relative w-full flex flex-col max-h-[82vh] transform overflow-hidden rounded-[24px] transition-all {{ $maxWidthClass }}"
+ class="modal-institucional enf-modal-panel relative w-full my-auto flex flex-col max-h-[calc(100vh-2rem)] sm:max-h-[calc(100vh-3rem)] transform overflow-hidden transition-all {{ $maxWidthClass }}"
  >
  <!-- Header -->
- <div class="border-b border-borde bg-fondo-hover px-6 py-4 flex items-center justify-between">
+ <div class="enf-modal-header shrink-0 flex items-center justify-between">
  <h3 id="{{ $modalId }}-titulo" class="text-xl font-extrabold text-titulo flex items-center gap-2">
  @if(isset($icon))
  {{ $icon }}
@@ -65,13 +65,13 @@ $modalId = $id ?: 'modal-'.\Illuminate\Support\Str::slug((string) ($attributes->
  </div>
 
  <!-- Body (con scroll) -->
- <div class="overflow-y-auto px-6 py-5">
+ <div class="flex-1 min-h-0 overflow-y-auto px-5 sm:px-6 py-4 sm:py-5">
  {{ $slot }}
  </div>
 
  <!-- Footer -->
  @if(isset($footer))
- <div class="border-t border-borde bg-fondo-hover px-6 py-4 flex flex-col sm:flex-row items-center justify-end gap-3">
+ <div class="enf-modal-footer shrink-0 flex flex-col sm:flex-row items-center justify-end gap-3">
  {{ $footer }}
  </div>
  @endif

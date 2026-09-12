@@ -6,7 +6,21 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class StoreMedicacionRequest extends FormRequest
 {
-    public function authorize(): bool { return true; }
+    public function authorize(): bool
+    {
+        $usuario = $this->user();
+        $permiso = $this->isMethod('post')
+            ? ['medicacion.crear', 'salud.medicacion.crear']
+            : ['medicacion.editar', 'salud.medicacion.editar'];
+        return $usuario && ! $usuario->hasRole('ENFERMEROS') && $usuario->canAny($permiso);
+    }
+
+    protected function prepareForValidation(): void
+    {
+        if ($adulto = $this->route('adulto_mayor')) {
+            $this->merge(['cod_am' => $adulto->cod_am]);
+        }
+    }
 
     public function rules(): array
     {
@@ -15,7 +29,7 @@ class StoreMedicacionRequest extends FormRequest
             'nombre_medicamento'   => 'required|string|max:200',
             'dosis'                => 'required|string|max:100',
             'frecuencia'           => 'required|string|max:100',
-            'via_administracion'   => 'nullable|string|max:80',
+            'via_administracion'   => 'required|string|max:80',
             'hora_programada'      => 'nullable|date_format:H:i',
             'fecha_inicio'         => 'required|date',
             'fecha_fin'            => 'nullable|date|after_or_equal:fecha_inicio',

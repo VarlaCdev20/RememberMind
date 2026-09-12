@@ -128,7 +128,7 @@ class TareasPlanPanel extends Component
             $this->addError('codPlan', 'El plan de cuidados no corresponde al paciente seleccionado.');
             return;
         }
-        app(TurnoEnfermeriaService::class)->autorizarAccionPaciente($plan->cod_am, Auth::user());
+        app(TurnoEnfermeriaService::class)->autorizarMutacionEnfermeria($plan->cod_am, 'tareas.crear', Auth::user());
 
         TareaPlanCuidado::create([
             'cod_plan'         => $this->codPlan,
@@ -193,7 +193,11 @@ class TareasPlanPanel extends Component
         DB::transaction(function () {
         $tarea = TareaPlanCuidado::lockForUpdate()->findOrFail($this->resultandoId);
         abort_unless($tarea->puedeCompletarse(), 409);
-        app(TurnoEnfermeriaService::class)->autorizarAccionPaciente($tarea->cod_am);
+        app(TurnoEnfermeriaService::class)->autorizarMutacionEnfermeria(
+            $tarea->cod_am,
+            $this->estadoTarea === 'OMITIDA' ? 'tareas.omitir' : 'tareas.registrar_resultado',
+            Auth::user()
+        );
         if ($this->estadoTarea === 'REPROGRAMADA') {
             $nueva = $tarea->replicate();
             $nueva->fecha_programada = $this->fechaProgramada;

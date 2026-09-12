@@ -6,7 +6,7 @@
         $alertasCerradas = $adultoMayor->alertas->where('estado', 'CERRADA');
     @endphp
 
-    <div class="rounded-3xl border border-borde bg-fondo-panel p-5 shadow-sm space-y-4">
+    <div class="rounded-3xl border border-borde rm-surface-card bg-fondo-panel p-5 shadow-sm space-y-4">
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-borde pb-3">
             <div>
                 <h2 class="text-xs font-black uppercase tracking-wider text-titulo flex items-center gap-2">
@@ -101,7 +101,7 @@
     </div>
 
     {{-- 2. HISTORIAL DE ALERTAS CERRADAS (HISTÓRICO AUDITADO) --}}
-    <div class="rounded-3xl border border-borde bg-fondo-panel p-5 shadow-sm space-y-4">
+    <div class="rounded-3xl border border-borde rm-surface-card bg-fondo-panel p-5 shadow-sm space-y-4">
         <div class="flex items-center justify-between border-b border-borde pb-3">
             <div>
                 <h2 class="text-xs font-black uppercase tracking-wider text-titulo flex items-center gap-2">

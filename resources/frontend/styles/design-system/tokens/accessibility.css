@@ -1,0 +1,53 @@
+/* ============================================================
+   REMEMBERMIND DESIGN SYSTEM — TOKENS / ACCESSIBILITY
+   Garantiza foco visible, respeto a lectores de pantalla y soporte asistivo.
+   ============================================================ */
+
+:root {
+    --rm-focus-ring-color: var(--rm-accent);
+    --rm-focus-ring-offset: 2px;
+    --rm-focus-ring-width: 2px;
+}
+
+/* Foco de teclado perceptible y accesible */
+:focus-visible {
+    outline: var(--rm-focus-ring-width) solid var(--rm-focus-ring-color) !important;
+    outline-offset: var(--rm-focus-ring-offset) !important;
+}
+
+/* Estados deshabilitados:
+   NOTA ARQUITECTÓNICA: [aria-disabled="true"] comunica el estado a tecnologías asistivas.
+   La lógica en Blade/Livewire/DOM debe ser quien impida materialmente la acción
+   (atributo disabled, validación y autorización del backend).
+   CSS aplica pointer-events: none y opacidad como refuerzo visual, nunca como control de seguridad. */
+:disabled,
+[aria-disabled="true"] {
+    cursor: not-allowed !important;
+    opacity: var(--rm-state-disabled-opacity) !important;
+    pointer-events: none;
+}
+
+/* Ocultación visual para lectores de pantalla */
+.rm-sr-only {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    padding: 0 !important;
+    margin: -1px !important;
+    overflow: hidden !important;
+    clip: rect(0, 0, 0, 0) !important;
+    white-space: nowrap !important;
+    border: 0 !important;
+}
+
+/* Respeto de preferencias de movimiento reducido */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}

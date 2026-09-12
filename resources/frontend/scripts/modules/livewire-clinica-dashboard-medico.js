@@ -1,48 +1,73 @@
+    // Paleta de colores institucional RememberMind y utilidades de translucidez
+    function getRMColors() {
+        if (window.RMCharts) {
+            const pal = window.RMCharts.palette();
+            const sem = window.RMCharts.semanticColors();
+            return {
+                azulProfundo : pal[0] || '#344D7A',
+                azulClinico  : pal[5] || '#4E8CA6',
+                azulClaro    : '#90AFCB',
+                verdeSalud   : sem.success || '#5F9271',
+                verdeSuave   : pal[2] || '#7FA587',
+                terracota    : sem.danger || '#D9745B',
+                naranja      : sem.warningHigh || '#E67A22',
+                salmon       : pal[6] || '#A85C73',
+                morado       : pal[4] || '#7565A8',
+                danger       : sem.danger || '#E5534B',
+                neutro       : sem.neutral || '#64748B',
+                neutroCard   : '#F4EEE7',
+                borde        : 'rgba(91,98,115,0.12)',
+            };
+        }
+        return {
+            azulProfundo : '#344D7A',
+            azulClinico  : '#4E8CA6',
+            azulClaro    : '#90AFCB',
+            verdeSalud   : '#5F9271',
+            verdeSuave   : '#7FA587',
+            terracota    : '#D9745B',
+            naranja      : '#E67A22',
+            salmon       : '#A85C73',
+            morado       : '#7565A8',
+            danger       : '#E5534B',
+            neutro       : '#64748B',
+            neutroCard   : '#F4EEE7',
+            borde        : 'rgba(91,98,115,0.12)',
+        };
+    }
 
-    // ── Paleta de colores institucional RememberMind ──────────────
-    const RM = {
-        azulProfundo : '#293A59',
-        azulClinico  : '#5B7C9D',
-        azulClaro    : '#90AFCB',
-        verdeSalud   : '#3F7D5A',
-        verdeSuave   : '#7FA587',
-        terracota    : '#D9795F',
-        naranja      : '#E9A05F',
-        salmon       : '#E28B70',
-        morado       : '#9B8AC7',
-        danger       : '#C9654E',
-        neutro       : '#737785',
-        neutroCard   : '#F4EEE7',
-        borde        : 'rgba(91,98,115,0.09)',
-    };
+    function toTranslucent(color, alpha = 0.78) {
+        if (window.RMCharts?.hexToRgba) {
+            return window.RMCharts.hexToRgba(color, alpha);
+        }
+        return color;
+    }
 
-    // Opciones base compartidas
-    const BASE_OPTS = {
-        responsive          : true,
-        maintainAspectRatio : false,
-        plugins: {
-            datalabels: { display: false },
-            legend    : {
-                labels: { color: '#5B6273', font: { size: 11, weight: '600' }, padding: 12, boxWidth: 12 }
-            },
-            tooltip: {
-                backgroundColor : '#293A59',
-                titleColor      : '#FFF8F1',
-                bodyColor       : '#D8CDC0',
-                padding         : 10,
-                cornerRadius    : 10,
+    function getBaseOpts() {
+        if (window.RMCharts?.baseOptions) {
+            return window.RMCharts.baseOptions();
+        }
+        return {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                datalabels: { display: false },
+                legend: { labels: { font: { family: 'Inter', size: 11, weight: '600' } } }
             }
-        },
-    };
+        };
+    }
 
-    // ── 1. Edad por Género ────────────────────────────────────────
+    // 1. Edad por Género (Barras gruesas translúcidas)
     Alpine.data('graficoEdad', (initial) => ({
         chart: null,
         init() {
             this.draw(initial);
             this.$watch('$wire.chartEdad', (d) => { this.chart?.destroy(); this.draw(d); });
+            window.RMCharts?.onThemeChange(() => { this.chart?.destroy(); this.draw(initial); });
         },
         draw(d) {
+            const RM = getRMColors();
+            const BASE_OPTS = getBaseOpts();
             this.chart = new window.Chart(this.$refs.canvas, {
                 type: 'bar',
                 data: {
@@ -51,16 +76,22 @@
                         {
                             label           : 'Masculino',
                             data            : d.masculino,
-                            backgroundColor : RM.azulClinico,
+                            backgroundColor : toTranslucent(RM.azulClinico, 0.78),
+                            borderColor     : toTranslucent(RM.azulClinico, 0.95),
+                            borderWidth     : 1.5,
                             borderRadius    : 8,
-                            borderWidth     : 0,
+                            barPercentage   : 0.85,
+                            categoryPercentage: 0.90,
                         },
                         {
                             label           : 'Femenino',
                             data            : d.femenino,
-                            backgroundColor : RM.terracota,
+                            backgroundColor : toTranslucent(RM.terracota, 0.78),
+                            borderColor     : toTranslucent(RM.terracota, 0.95),
+                            borderWidth     : 1.5,
                             borderRadius    : 8,
-                            borderWidth     : 0,
+                            barPercentage   : 0.85,
+                            categoryPercentage: 0.90,
                         },
                     ],
                 },
@@ -68,162 +99,93 @@
                     ...BASE_OPTS,
                     plugins: {
                         ...BASE_OPTS.plugins,
-                        legend  : { position: 'top', labels: { ...BASE_OPTS.plugins.legend.labels } },
-                        datalabels: {
-                            display : true,
-                            anchor  : 'end',
-                            align   : 'top',
-                            color   : RM.neutro,
-                            font    : { weight: 'bold', size: 10 },
-                            formatter: (v) => v > 0 ? v : '',
-                        },
+                        legend: { display: true, position: 'top' },
                     },
                     scales: {
-                        x: { grid: { display: false }, ticks: { color: RM.neutro, font: { size: 11 } } },
-                        y: {
-                            beginAtZero: true,
-                            ticks: { stepSize: 1, color: RM.neutro, font: { size: 10 } },
-                            grid : { color: RM.borde },
-                        },
+                        x: { grid: { display: false } },
+                        y: { beginAtZero: true, ticks: { precision: 0 } },
                     },
                 },
             });
         },
     }));
 
-    // ── 2. Diagnósticos (barras horizontales) ─────────────────────
-    Alpine.data('graficoDiagnosticos', (initial) => ({
-        chart: null,
-        init() {
-            this.draw(initial);
-            this.$watch('$wire.chartDiagnosticos', (d) => { this.chart?.destroy(); this.draw(d); });
-        },
-        draw(d) {
-            const colores = [
-                RM.azulProfundo, RM.azulClinico, RM.verdeSalud, RM.morado,
-                RM.terracota,    RM.naranja,     RM.salmon,     RM.danger,
-                RM.verdeSuave,   RM.azulClaro,
-            ];
-            this.chart = new window.Chart(this.$refs.canvas, {
-                type: 'bar',
-                data: {
-                    labels  : d.labels,
-                    datasets: [{
-                        label           : 'Nº pacientes',
-                        data            : d.values,
-                        backgroundColor : colores.slice(0, d.labels.length),
-                        borderRadius    : 6,
-                        borderWidth     : 0,
-                    }],
-                },
-                options: {
-                    ...BASE_OPTS,
-                    indexAxis: 'y',
-                    plugins: {
-                        ...BASE_OPTS.plugins,
-                        legend: { display: false },
-                        datalabels: {
-                            display  : true,
-                            anchor   : 'end',
-                            align    : 'end',
-                            color    : RM.neutro,
-                            font     : { weight: 'bold', size: 10 },
-                            formatter: (v) => v > 0 ? v : '',
-                        },
-                    },
-                    scales: {
-                        x: {
-                            beginAtZero: true,
-                            ticks: { stepSize: 1, color: RM.neutro, font: { size: 10 } },
-                            grid : { color: RM.borde },
-                        },
-                        y: { grid: { display: false }, ticks: { color: RM.neutro, font: { size: 10 } } },
-                    },
-                },
-            });
-        },
-    }));
-
-    // ── 3. Tendencia signos vitales (30 días) ─────────────────────
+    // 2. Tendencia de Signos Vitales (Líneas y áreas suaves translúcidas)
     Alpine.data('graficoTendencia', (initial) => ({
         chart: null,
         init() {
             this.draw(initial);
             this.$watch('$wire.chartTendencia', (d) => { this.chart?.destroy(); this.draw(d); });
+            window.RMCharts?.onThemeChange(() => { this.chart?.destroy(); this.draw(initial); });
         },
         draw(d) {
-            if (!d.labels || d.labels.length === 0) {
-                const ctx = this.$refs.canvas.getContext('2d');
-                ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-                ctx.font = '12px Inter, sans-serif';
-                ctx.fillStyle = RM.neutro;
-                ctx.textAlign = 'center';
-                ctx.fillText('Sin datos de signos vitales en los últimos 30 días', ctx.canvas.width / 2, ctx.canvas.height / 2);
-                return;
-            }
+            const RM = getRMColors();
+            const BASE_OPTS = getBaseOpts();
             this.chart = new window.Chart(this.$refs.canvas, {
                 type: 'line',
                 data: {
                     labels  : d.labels,
                     datasets: [
                         {
-                            label           : 'PA Sistólica (mmHg)',
+                            label           : 'PA Sistólica',
                             data            : d.pa,
                             borderColor     : RM.danger,
-                            backgroundColor : 'rgba(201,101,78,0.07)',
-                            fill            : true,
-                            tension         : 0.4,
+                            backgroundColor : toTranslucent(RM.danger, 0.15),
                             borderWidth     : 2.5,
-                            pointRadius     : 3,
-                            pointBackgroundColor: RM.danger,
+                            pointRadius     : 3.5,
+                            pointBackgroundColor: '#FFFFFF',
+                            pointBorderColor: RM.danger,
+                            tension         : 0.38,
+                            fill            : true,
                             yAxisID         : 'y',
                         },
                         {
-                            label           : 'Glucosa (mg/dL)',
-                            data            : d.gluc,
-                            borderColor     : RM.naranja,
-                            backgroundColor : 'rgba(0,0,0,0)',
-                            fill            : false,
-                            tension         : 0.4,
-                            borderWidth     : 2,
-                            borderDash      : [5, 3],
-                            pointRadius     : 3,
-                            pointBackgroundColor: RM.naranja,
-                            yAxisID         : 'y',
-                        },
-                        {
-                            label           : 'SpO2 (%)',
-                            data            : d.sat,
+                            label           : 'SpO2 %',
+                            data            : d.spo2,
                             borderColor     : RM.verdeSalud,
-                            backgroundColor : 'rgba(63,125,90,0.07)',
-                            fill            : true,
-                            tension         : 0.4,
-                            borderWidth     : 2.5,
+                            backgroundColor : toTranslucent(RM.verdeSalud, 0.12),
+                            borderWidth     : 2,
                             pointRadius     : 3,
-                            pointBackgroundColor: RM.verdeSalud,
+                            pointBackgroundColor: '#FFFFFF',
+                            pointBorderColor: RM.verdeSalud,
+                            tension         : 0.38,
+                            fill            : true,
                             yAxisID         : 'y1',
+                        },
+                        {
+                            label           : 'Glucosa',
+                            data            : d.glucosa,
+                            borderColor     : RM.naranja,
+                            backgroundColor : toTranslucent(RM.naranja, 0.10),
+                            borderWidth     : 2,
+                            pointRadius     : 3,
+                            pointBackgroundColor: '#FFFFFF',
+                            pointBorderColor: RM.naranja,
+                            tension         : 0.38,
+                            fill            : true,
+                            yAxisID         : 'y',
                         },
                     ],
                 },
                 options: {
                     ...BASE_OPTS,
                     interaction: { mode: 'index', intersect: false },
-                    plugins: { ...BASE_OPTS.plugins, legend: { position: 'top', labels: { ...BASE_OPTS.plugins.legend.labels } } },
+                    plugins: {
+                        ...BASE_OPTS.plugins,
+                        legend: { display: true, position: 'top' }
+                    },
                     scales: {
-                        x : { grid: { display: false }, ticks: { color: RM.neutro, font: { size: 10 } } },
+                        x : { grid: { display: false } },
                         y : {
                             position: 'left',
                             beginAtZero: false,
-                            ticks: { color: RM.danger, font: { size: 10 } },
-                            grid : { color: RM.borde },
-                            title: { display: true, text: 'mmHg / mg/dL', color: RM.neutro, font: { size: 9 } },
+                            title: { display: true, text: 'mmHg / mg/dL' },
                         },
                         y1: {
                             position: 'right',
                             min : 80, max: 100,
-                            ticks: { color: RM.verdeSalud, font: { size: 10 } },
                             grid : { drawOnChartArea: false },
-                            title: { display: true, text: 'SpO2 %', color: RM.verdeSalud, font: { size: 9 } },
+                            title: { display: true, text: 'SpO2 %' },
                         },
                     },
                 },
@@ -231,54 +193,84 @@
         },
     }));
 
-    // ── 4. Dependencia funcional Barthel (doughnut) ───────────────
+    // 3. Dependencia funcional Barthel (Doughnut grueso translúcido)
     Alpine.data('graficoDependencia', (initial) => ({
         chart: null,
         init() {
             this.draw(initial);
             this.$watch('$wire.chartDependencia', (d) => { this.chart?.destroy(); this.draw(d); });
+            window.RMCharts?.onThemeChange(() => { this.chart?.destroy(); this.draw(initial); });
         },
         draw(d) {
+            const RM = getRMColors();
             const colMap = {
                 'Independiente'       : RM.verdeSalud,
                 'Dependencia leve'    : RM.azulClinico,
                 'Dependencia moderada': RM.naranja,
-                'Dependencia severa'  : RM.terracota,
+                'Dependencia severa'  : RM.salmon,
                 'Dependencia total'   : RM.danger,
             };
             const colors = d.labels.map(l => colMap[l] || RM.azulClaro);
+            const translucentColors = colors.map(c => toTranslucent(c, 0.80));
+            const borderColors = colors.map(c => toTranslucent(c, 0.98));
+
             this.chart = new window.Chart(this.$refs.canvas, {
                 type: 'doughnut',
                 data: {
                     labels  : d.labels,
-                    datasets: [{ data: d.values, backgroundColor: colors, borderColor: RM.neutroCard, borderWidth: 3, hoverOffset: 8 }],
+                    datasets: [{
+                        data: d.values,
+                        backgroundColor: translucentColors,
+                        borderColor: borderColors,
+                        borderWidth: 2,
+                        hoverOffset: 6
+                    }],
                 },
                 options: {
-                    ...BASE_OPTS,
-                    cutout : '65%',
+                    ...getBaseOpts(),
+                    cutout : '58%', // Anillo grueso con presencia
                     plugins: {
-                        ...BASE_OPTS.plugins,
                         legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: (ctx) => ` ${ctx.label}: ${ctx.parsed} residentes`
+                            }
+                        }
                     },
                 },
             });
         },
     }));
 
-    // ── 5. IMC (barras) ───────────────────────────────────────────
+    // 4. IMC (Barras gruesas translúcidas)
     Alpine.data('graficoImc', (initial) => ({
         chart: null,
         init() {
             this.draw(initial);
             this.$watch('$wire.chartImc', (d) => { this.chart?.destroy(); this.draw(d); });
+            window.RMCharts?.onThemeChange(() => { this.chart?.destroy(); this.draw(initial); });
         },
         draw(d) {
-            const colors = [RM.azulClinico, RM.verdeSalud, RM.naranja, RM.terracota, RM.danger];
+            const RM = getRMColors();
+            const BASE_OPTS = getBaseOpts();
+            const colors = [RM.azulClinico, RM.verdeSalud, RM.naranja, RM.salmon, RM.danger];
+            const translucentColors = colors.map(c => toTranslucent(c, 0.78));
+            const borderColors = colors.map(c => toTranslucent(c, 0.95));
+
             this.chart = new window.Chart(this.$refs.canvas, {
                 type: 'bar',
                 data: {
                     labels  : d.labels,
-                    datasets: [{ label: 'Pacientes', data: d.values, backgroundColor: colors, borderRadius: 8, borderWidth: 0 }],
+                    datasets: [{
+                        label: 'Pacientes',
+                        data: d.values,
+                        backgroundColor: translucentColors,
+                        borderColor: borderColors,
+                        borderWidth: 1.5,
+                        borderRadius: 8,
+                        barPercentage: 0.85,
+                        categoryPercentage: 0.90,
+                    }],
                 },
                 options: {
                     ...BASE_OPTS,
@@ -289,52 +281,56 @@
                             display  : true,
                             anchor   : 'end',
                             align    : 'top',
-                            color    : RM.neutro,
                             font     : { weight: 'bold', size: 10 },
                             formatter: (v) => v > 0 ? v : '',
                         },
                     },
                     scales: {
-                        x: { grid: { display: false }, ticks: { color: RM.neutro, font: { size: 9 } } },
-                        y: { beginAtZero: true, ticks: { stepSize: 1, color: RM.neutro }, grid: { color: RM.borde } },
+                        x: { grid: { display: false } },
+                        y: { beginAtZero: true, ticks: { precision: 0 } },
                     },
                 },
             });
         },
     }));
 
-    // ── 6. Estado de residentes (doughnut) ────────────────────────
+    // 5. Estado de residentes (Doughnut grueso translúcido)
     Alpine.data('graficoEstados', (initial) => ({
         chart: null,
         init() {
             this.draw(initial);
             this.$watch('$wire.chartEstados', (d) => { this.chart?.destroy(); this.draw(d); });
+            window.RMCharts?.onThemeChange(() => { this.chart?.destroy(); this.draw(initial); });
         },
         draw(d) {
+            const RM = getRMColors();
             const palette = [
                 RM.verdeSalud, RM.azulClinico, RM.verdeSuave, RM.morado,
-                RM.naranja, RM.terracota, RM.danger, RM.salmon, RM.azulClaro,
+                RM.naranja, RM.salmon, RM.danger, RM.azulClaro,
             ];
+            const rawColors = d.labels.map((_, i) => palette[i % palette.length]);
+            const translucentColors = rawColors.map(c => toTranslucent(c, 0.80));
+            const borderColors = rawColors.map(c => toTranslucent(c, 0.98));
+
             this.chart = new window.Chart(this.$refs.canvas, {
                 type: 'doughnut',
                 data: {
                     labels  : d.labels,
                     datasets: [{
                         data            : d.values,
-                        backgroundColor : d.labels.map((_, i) => palette[i % palette.length]),
-                        borderColor     : RM.neutroCard,
-                        borderWidth     : 3,
-                        hoverOffset     : 8,
+                        backgroundColor : translucentColors,
+                        borderColor     : borderColors,
+                        borderWidth     : 2,
+                        hoverOffset     : 6,
                     }],
                 },
                 options: {
-                    ...BASE_OPTS,
-                    cutout : '60%',
+                    ...getBaseOpts(),
+                    cutout : '58%', // Grueso y consistente con Alertas
                     plugins: {
-                        ...BASE_OPTS.plugins,
                         legend: {
                             position: 'bottom',
-                            labels  : { ...BASE_OPTS.plugins.legend.labels, boxWidth: 10, padding: 6, font: { size: 9 } }
+                            labels  : { boxWidth: 10, padding: 8, font: { size: 10, weight: '600' } }
                         },
                     },
                 },
@@ -342,20 +338,35 @@
         },
     }));
 
-    // ── 7. Notas por tipo de nota (barras) ────────────────────────
+    // 6. Notas por tipo de nota (Barras gruesas translúcidas)
     Alpine.data('graficoNotasTipo', (initial) => ({
         chart: null,
         init() {
             this.draw(initial);
             this.$watch('$wire.chartNotasTipo', (d) => { this.chart?.destroy(); this.draw(d); });
+            window.RMCharts?.onThemeChange(() => { this.chart?.destroy(); this.draw(initial); });
         },
         draw(d) {
-            const colors = [RM.verdeSalud, RM.azulClinico, RM.azulProfundo, RM.morado, RM.danger, RM.terracota];
+            const RM = getRMColors();
+            const BASE_OPTS = getBaseOpts();
+            const colors = [RM.verdeSalud, RM.azulClinico, RM.azulProfundo, RM.morado, RM.danger, RM.salmon];
+            const translucentColors = colors.map(c => toTranslucent(c, 0.78));
+            const borderColors = colors.map(c => toTranslucent(c, 0.95));
+
             this.chart = new window.Chart(this.$refs.canvas, {
                 type: 'bar',
                 data: {
                     labels  : d.labels,
-                    datasets: [{ label: 'Notas', data: d.values, backgroundColor: colors, borderRadius: 8, borderWidth: 0 }],
+                    datasets: [{
+                        label: 'Notas',
+                        data: d.values,
+                        backgroundColor: translucentColors,
+                        borderColor: borderColors,
+                        borderWidth: 1.5,
+                        borderRadius: 8,
+                        barPercentage: 0.85,
+                        categoryPercentage: 0.90,
+                    }],
                 },
                 options: {
                     ...BASE_OPTS,
@@ -366,14 +377,13 @@
                             display  : true,
                             anchor   : 'end',
                             align    : 'top',
-                            color    : RM.neutro,
                             font     : { weight: 'bold', size: 10 },
                             formatter: (v) => v > 0 ? v : '',
                         },
                     },
                     scales: {
-                        x: { grid: { display: false }, ticks: { color: RM.neutro, font: { size: 9 } } },
-                        y: { beginAtZero: true, ticks: { stepSize: 1, color: RM.neutro }, grid: { color: RM.borde } },
+                        x: { grid: { display: false } },
+                        y: { beginAtZero: true, ticks: { precision: 0 } },
                     },
                 },
             });

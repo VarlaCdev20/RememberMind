@@ -67,5 +67,94 @@ class AlertasFlujoTest extends TestCase
         $this->assertSame(1, AlertaAdulto::count());
         $this->assertSame('CERRADA', $alerta->fresh()->estado);
     }
-}
 
+    public function test_usuario_no_autorizado_no_puede_atender_ni_cerrar(): void
+    {
+        [, $adulto] = $this->preparar(['alertas.ver']);
+        $alerta = AlertaAdulto::create([
+            'cod_am' => $adulto->cod_am,
+            'origen' => 'MANUAL',
+            'tipo_alerta' => 'REVISION',
+            'motivo' => 'Monitoreo de prueba',
+            'estado' => 'ABIERTA',
+        ]);
+
+        Livewire::test(AlertasPanel::class)
+            ->call('atenderAlerta', $alerta->cod_alerta)
+            ->assertForbidden();
+
+        Livewire::test(AlertasPanel::class)
+            ->call('cerrarAlerta', $alerta->cod_alerta)
+            ->assertForbidden();
+    }
+
+    public function test_cerrar_exige_observacion_valida_y_rechaza_textos_triviales(): void
+    {
+        [$user, $adulto] = $this->preparar(['alertas.ver', 'alertas.cerrar']);
+        $alerta = AlertaAdulto::create([
+            'cod_am' => $adulto->cod_am,
+            'origen' => 'MANUAL',
+            'tipo_alerta' => 'EVALUACION',
+            'motivo' => 'Monitoreo para cierre asistencial',
+            'estado' => 'ABIERTA',
+        ]);
+
+        // 1. Rechaza vacio
+        Livewire::test(AlertasPanel::class)
+            ->call('cerrarAlerta', $alerta->cod_alerta)
+            ->set('observacionCierre', '')
+            ->call('confirmarCierre')
+            ->assertHasErrors(['observacionCierre']);
+
+        // 2. Rechaza texto trivial 'ok'
+        Livewire::test(AlertasPanel::class)
+            ->call('cerrarAlerta', $alerta->cod_alerta)
+            ->set('observacionCierre', 'ok')
+            ->call('confirmarCierre')
+            ->assertHasErrors(['observacionCierre']);
+
+        // 3. Rechaza texto trivial '-'
+        Livewire::test(AlertasPanel::class)
+            ->call('cerrarAlerta', $alerta->cod_alerta)
+            ->set('observacionCierre', '-')
+            ->call('confirmarCierre')
+            ->assertHasErrors(['observacionCierre']);
+
+        // 4. Acepta justificacion clinica valida
+        Livewire::test(AlertasPanel::class)
+            ->call('cerrarAlerta', $alerta->cod_alerta)
+            ->set('observacionCierre', 'Condicion estabilizada tras control y reposo asistencial.')
+            ->call('confirmarCierre')
+            ->assertHasNoErrors();
+
+        // 5. Verifica que la alerta se conserva intacta en BD como CERRADA (nunca borrada)
+        $this->assertDatabaseHas('alertas_adulto', [
+            'cod_alerta' => $alerta->cod_alerta,
+            'estado' => 'CERRADA',
+            'cerrado_por' => $user->cod_usu,
+        ]);
+        $this->assertSame('CERRADA', $alerta->fresh()->estado);
+    }
+
+    public function test_drawers_de_graficos_y_ubicacion_no_modifican_datos(): void
+    {
+        [, $adulto] = $this->preparar(['alertas.ver']);
+        $nombreOriginal = $adulto->nombres;
+        $estadoOriginal = $adulto->cod_est_adul;
+
+        Livewire::test(AlertasPanel::class)
+            ->call('verGraficos', $adulto->cod_am)
+            ->assertSet('drawerGrafico', true)
+            ->assertSet('adultoDrawerId', $adulto->cod_am)
+            ->call('verUbicacion', $adulto->cod_am)
+            ->assertSet('drawerUbicacion', true)
+            ->assertSet('drawerGrafico', false)
+            ->call('cerrarDrawer')
+            ->assertSet('drawerGrafico', false)
+            ->assertSet('drawerUbicacion', false)
+            ;
+
+        $this->assertSame($nombreOriginal, $adulto->fresh()->nombres);
+        $this->assertSame($estadoOriginal, $adulto->fresh()->cod_est_adul);
+    }
+}

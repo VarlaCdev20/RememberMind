@@ -303,7 +303,7 @@
  <label class="relative block">
  <span class="mb-1.5 block text-[10px] font-bold uppercase tracking-widest text-parrafo/55">Buscar adulto mayor</span>
  <i class="ph-bold ph-magnifying-glass absolute bottom-3 left-3.5 text-meta"></i>
- <input type="text" wire:model.live.debounce.300ms="search" placeholder="Nombre, apellido o codigo..." class="w-full rounded-xl border border-borde/70 bg-fondo-panel py-2.5 pl-10 pr-4 text-xs font-bold text-parrafo outline-none transition placeholder:text-meta focus:border-borde-focus focus:ring-2 focus:ring-[#E27D60]/15">
+ <input type="text" wire:model.live.debounce.300ms="search" placeholder="Buscar por nombre, apellido o documento..." class="w-full rounded-xl border border-borde/70 bg-fondo-panel py-2.5 pl-10 pr-4 text-xs font-bold text-parrafo outline-none transition placeholder:text-meta focus:border-borde-focus focus:ring-2 focus:ring-[#E27D60]/15">
  </label>
  <div class="flex items-end">
  <button type="button" wire:click="$refresh" class="inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-borde/70 bg-fondo-panel px-4 text-xs font-bold uppercase tracking-wider text-parrafo transition hover:bg-fondo-panel active:scale-95">
@@ -332,7 +332,7 @@
  <div class="relative bg-gradient-to-b from-[#D5C7B9]/72 to-[#E6DDD3]/30 px-5 pb-5 pt-4 text-center">
  <div class="mb-3 flex items-center justify-between gap-2">
  <span class="rounded-full border px-2.5 py-1 text-xs font-bold uppercase tracking-wide {{ $estadoClase }}">{{ $estadoTexto }}</span>
- <span class="rounded-full border border-borde/45 bg-fondo-panel px-2.5 py-1 text-xs font-bold uppercase tracking-wide text-parrafo/55">{{ $adulto->cod_am }}</span>
+ <span class="rounded-full border border-borde/45 bg-fondo-panel px-2.5 py-1 text-xs font-bold uppercase tracking-wide text-parrafo/55">{{ $adulto->edad ?? 'Edad no registrada' }}{{ $adulto->edad ? ' años' : '' }}</span>
  </div>
 
  <div class="mx-auto h-20 w-20 overflow-hidden rounded-2xl border-[4px] border-borde bg-boton-principal shadow-md transition group-hover:scale-105">
@@ -453,7 +453,7 @@
  <h2 class="mt-1 truncate text-lg font-extrabold text-parrafo">
  {{ $adultoSeleccionadoParaModal->nombres }} {{ $adultoSeleccionadoParaModal->ap_paterno }} {{ $adultoSeleccionadoParaModal->ap_materno }}
  </h2>
- <p class="text-[10px] font-bold uppercase tracking-wider text-parrafo/45">{{ $adultoSeleccionadoParaModal->cod_am }}</p>
+ <p class="text-[10px] font-bold uppercase tracking-wider text-parrafo/45">{{ $adultoSeleccionadoParaModal->ci ? 'CI '.$adultoSeleccionadoParaModal->ci : 'Documento no registrado' }}</p>
  </div>
  </div>
  <button wire:click="cerrarExpediente" type="button" class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-borde bg-fondo-panel text-parrafo shadow-sm transition hover:bg-boton-acento hover:text-inverso active:scale-95">

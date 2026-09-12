@@ -21,7 +21,7 @@
 
     <div class="space-y-4">
         @forelse($adultoMayor->seguimientosDiarios as $seg)
-            <div class="rounded-3xl border border-borde bg-fondo-panel p-5 shadow-sm space-y-3">
+            <div class="rounded-3xl border border-borde rm-surface-card bg-fondo-panel p-5 shadow-sm space-y-3">
                 <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-borde pb-3">
                     <div class="flex items-center gap-2">
                         <span class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-bold border {{ $seg->incidente ? 'bg-rose-50 text-rose-700 border-rose-200' : 'bg-blue-50 text-blue-700 border-blue-200' }}">
@@ -91,7 +91,7 @@
                 @endif
             </div>
         @empty
-            <div class="rounded-3xl border border-borde bg-fondo-panel p-8 text-center">
+            <div class="rounded-3xl border border-borde rm-surface-card bg-fondo-panel p-8 text-center">
                 <i class="ph-bold ph-note-pencil text-3xl text-apoyo mb-2 block"></i>
                 <p class="text-sm font-bold text-titulo">No existen registros de seguimiento diario.</p>
                 <p class="text-xs text-apoyo mt-1">Haga clic en "Registrar seguimiento" para ingresar la primera anotación de enfermería.</p>

@@ -36,7 +36,7 @@ php artisan migrate --seed   # run all migrations + seeders
 - `GET /` → welcome view
 - `GET /dashboard` → `DashboardController@index` (single-dashboard-per-role pattern)
 - All backend under `Route::prefix('admin')` with permission middleware
-- Livewire components organized under `app/Livewire/Admin/` by module
+- Livewire components organized by functional area under `app/Livewire/`
 
 ### Seeder order matters
 `DatabaseSeeder` runs in this sequence:
@@ -69,10 +69,6 @@ Tests use SQLite `:memory:` (see `phpunit.xml`). No external DB needed for tests
 | Audit log | `spatie/laravel-activitylog` |
 | Animations | `gsap`, `aos`, `three`, `chart.js` |
 
-## Pre-existing tooling scripts (Python/PHP)
-
-Several ad-hoc scripts exist in the repo root (`replace_classes.py`, `fix_areas.py`, `check_users_roles.php`, etc.). These are **one-off utilities** and should not be treated as part of the application.
-
 ## Environment
 
-Runs on **Laragon** (Windows). The `.env` uses MySQL in practice despite the default in `config/database.php` being SQLite. Set `DB_CONNECTION=mysql` with appropriate `DB_HOST`, `DB_PORT`, `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD` for local dev.
+Runs on **Laragon** (Windows). The development database is PostgreSQL. Tests use SQLite `:memory:` and must remain portable between both engines.

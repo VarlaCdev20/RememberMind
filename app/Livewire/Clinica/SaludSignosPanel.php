@@ -10,6 +10,8 @@ use Livewire\WithPagination;
 use App\Models\AdultoMayor;
 use App\Models\SignosVitalesAdulto;
 use App\Services\Clinica\ValidacionSignosVitalesService;
+use App\Services\Clinica\SignosVitalesService;
+use App\Services\Enfermeria\TurnoEnfermeriaService;
 
 class SaludSignosPanel extends Component
 {
@@ -44,6 +46,7 @@ class SaludSignosPanel extends Component
     public mixed $imc = null;
     public ?int $dolor = null;
     public string $observacion = '';
+    public string $motivoRectificacion = '';
 
     public ?string $signoIdAnular = null;
     public string $motivoAnulacion = '';
@@ -182,6 +185,9 @@ class SaludSignosPanel extends Component
 
     private function cargarAdulto(string $codAm): void
     {
+        if (auth()->user()?->hasRole('ENFERMEROS')) {
+            app(TurnoEnfermeriaService::class)->autorizarAccionPaciente($codAm, auth()->user());
+        }
         $this->adulto = AdultoMayor::with('estado')->findOrFail($codAm);
         $this->adultoSeleccionado = $this->adulto->cod_am;
         $this->signoDetalleId = null;
@@ -195,6 +201,9 @@ class SaludSignosPanel extends Component
             ->withCount('signosVitales')
             ->orderBy('nombres')
             ->orderBy('ap_paterno');
+        if (auth()->user()?->hasRole('ENFERMEROS')) {
+            $query->whereIn('cod_am', app(TurnoEnfermeriaService::class)->obtenerPacientesAsignadosIds(auth()->user()));
+        }
 
         if (trim($this->buscarPaciente) !== '') {
             $busqueda = '%' . trim($this->buscarPaciente) . '%';
@@ -312,43 +321,11 @@ class SaludSignosPanel extends Component
     public function guardar(): void
     {
         abort_if(!$this->adulto, 403, 'Paciente no seleccionado.');
-        $esEdicion = $this->signoId !== null;
-        abort_if(!auth()->user()->can($esEdicion ? 'salud.signos.editar' : 'salud.signos.crear'), 403);
+        $esRectificacion = $this->signoId !== null;
+        $permiso = $esRectificacion ? 'salud.signos.editar' : 'salud.signos.crear';
+        abort_unless(auth()->user()->can($permiso), 403);
 
         $alertas = $this->detectarAlertas();
-
-        $this->validate($this->rules(), $this->messages());
-
-        $this->validarMomentoMedicion();
-        $this->validarCoherenciaClinica();
-
-        if ($this->getErrorBag()->count() > 0) {
-            return;
-        }
-
-        $valoresIngresados = array_filter([
-            $this->presion_sistolica,
-            $this->presion_diastolica,
-            $this->frecuencia_cardiaca,
-            $this->frecuencia_respiratoria,
-            $this->temperatura,
-            $this->saturacion,
-            $this->glucosa,
-            $this->peso,
-            $this->talla,
-            $this->dolor,
-            trim($this->observacion),
-        ], fn ($valor) => $valor !== null && $valor !== '');
-
-        if (empty($valoresIngresados)) {
-            $this->dispatch('swal', [
-                'icon' => 'warning',
-                'title' => 'Datos insuficientes',
-                'text' => 'Debe registrar al menos un signo vital o una observación para continuar.',
-            ]);
-            return;
-        }
-
         if (!empty($alertas) && !$this->guardarConfirmado) {
             $this->dispatch('signos-confirmar-alertas', [
                 'titulo' => 'Valores fuera del rango referencial',
@@ -356,59 +333,29 @@ class SaludSignosPanel extends Component
             ]);
             return;
         }
-
         $this->guardarConfirmado = false;
-        $this->calcularImcVisual();
-
-        $presionArterial = ($this->presion_sistolica && $this->presion_diastolica)
-            ? "{$this->presion_sistolica}/{$this->presion_diastolica}"
-            : null;
-
         $datos = [
-            'cod_am' => $this->adulto->cod_am,
-            'fecha' => $this->fecha,
-            'hora' => $this->hora,
-            'presion_arterial' => $presionArterial,
-            'presion_sistolica' => $this->presion_sistolica ?: null,
-            'presion_diastolica' => $this->presion_diastolica ?: null,
-            'frecuencia_cardiaca' => $this->frecuencia_cardiaca ?: null,
-            'frecuencia_respiratoria' => $this->frecuencia_respiratoria ?: null,
-            'temperatura' => $this->temperatura ?: null,
-            'saturacion' => $this->saturacion !== null && $this->saturacion !== '' ? $this->saturacion : null,
-            'glucosa' => $this->glucosa ?: null,
-            'peso' => $this->peso ?: null,
-            'talla' => $this->talla ?: null,
-            'imc' => $this->imc ?: null,
-            'dolor' => $this->dolor !== null && $this->dolor !== '' ? $this->dolor : null,
-            'observacion' => $this->observacion ?: null,
-            'estado' => 'VIGENTE',
-            'registrado_por' => auth()->user()->cod_usu,
+            'fecha' => $this->fecha, 'hora' => $this->hora,
+            'presion_sistolica' => $this->presion_sistolica, 'presion_diastolica' => $this->presion_diastolica,
+            'frecuencia_cardiaca' => $this->frecuencia_cardiaca, 'frecuencia_respiratoria' => $this->frecuencia_respiratoria,
+            'temperatura' => $this->temperatura, 'saturacion' => $this->saturacion, 'glucosa' => $this->glucosa,
+            'peso' => $this->peso, 'talla' => $this->talla, 'dolor' => $this->dolor, 'observacion' => $this->observacion,
+            'valor_atipico_confirmado' => !empty($alertas),
         ];
-
-        if ($esEdicion) {
-            $signo = SignosVitalesAdulto::findOrFail($this->signoId);
-            abort_if($signo->cod_am !== $this->adulto->cod_am, 403);
-            abort_if($signo->estado === 'ANULADO', 422);
-
-            $signo->descripcionLog = "Actualizó signos vitales del adulto mayor {$this->adulto->cod_am}.";
-            $signo->update($datos);
+        $servicio = app(SignosVitalesService::class);
+        if ($esRectificacion) {
+            $original = SignosVitalesAdulto::where('cod_am', $this->adulto->cod_am)->findOrFail($this->signoId);
+            $servicio->rectificar($original, $datos, $this->motivoRectificacion, auth()->user(), $permiso);
         } else {
-            $signo = new SignosVitalesAdulto($datos);
-            $signo->descripcionLog = !empty($alertas)
-                ? "Registró signos vitales con alerta orientativa del adulto mayor {$this->adulto->cod_am}."
-                : "Registró signos vitales del adulto mayor {$this->adulto->cod_am}.";
-            $signo->save();
+            $servicio->registrar($this->adulto->cod_am, $datos, auth()->user(), $permiso);
         }
 
         $this->cerrarFormulario();
         $this->resetPage();
-
         $this->dispatch('swal', [
             'icon' => !empty($alertas) ? 'warning' : 'success',
-            'title' => !empty($alertas) ? 'Guardado con alerta referencial' : 'Registro guardado',
-            'text' => !empty($alertas)
-                ? 'Los signos vitales fueron guardados. La alerta es orientativa y no constituye diagnóstico médico.'
-                : 'Los signos vitales se guardaron correctamente.',
+            'title' => $esRectificacion ? 'Rectificación registrada' : 'Registro guardado',
+            'text' => $esRectificacion ? 'El registro original se conserva sin modificaciones.' : 'Los signos vitales se guardaron correctamente.',
         ]);
     }
 
@@ -597,6 +544,7 @@ class SaludSignosPanel extends Component
     public function limpiarFormulario(): void
     {
         $this->signoId = null;
+        $this->motivoRectificacion = '';
         $this->fecha = now()->toDateString();
         $this->hora = now()->format('H:i');
         $this->presion_sistolica = null;
@@ -638,72 +586,13 @@ class SaludSignosPanel extends Component
         return $alertas;
     }
 
-    private function rules(): array
-    {
-        return [
-            'fecha' => 'required|date|before_or_equal:today',
-            'hora' => 'required',
-            'presion_sistolica' => 'nullable|integer|min:'.ValidacionSignosVitalesService::PAS_MIN.'|max:'.ValidacionSignosVitalesService::PAS_MAX,
-            'presion_diastolica' => 'nullable|integer|min:'.ValidacionSignosVitalesService::PAD_MIN.'|max:'.ValidacionSignosVitalesService::PAD_MAX,
-            'frecuencia_cardiaca' => 'nullable|integer|min:'.ValidacionSignosVitalesService::FC_MIN.'|max:'.ValidacionSignosVitalesService::FC_MAX,
-            'frecuencia_respiratoria' => 'nullable|integer|min:'.ValidacionSignosVitalesService::FR_MIN.'|max:'.ValidacionSignosVitalesService::FR_MAX,
-            'temperatura' => 'nullable|numeric|min:'.ValidacionSignosVitalesService::TEMP_MIN.'|max:'.ValidacionSignosVitalesService::TEMP_MAX,
-            'saturacion' => 'nullable|integer|min:'.ValidacionSignosVitalesService::SPO2_MIN.'|max:'.ValidacionSignosVitalesService::SPO2_MAX,
-            'glucosa' => 'nullable|numeric|min:'.ValidacionSignosVitalesService::GLUCOSA_MIN,
-            'peso' => 'nullable|numeric|min:20|max:250',
-            'talla' => 'nullable|numeric|min:0.5|max:250',
-            'imc' => 'nullable|numeric|min:0|max:100',
-            'dolor' => 'nullable|integer|min:0|max:10',
-            'observacion' => 'nullable|string|max:1000',
-        ];
-    }
 
-    private function messages(): array
-    {
-        return [
-            'fecha.required' => 'La fecha es obligatoria.',
-            'fecha.before_or_equal' => 'La fecha de medición no puede ser futura.',
-            'hora.required' => 'La hora es obligatoria.',
-            'presion_sistolica.min' => 'La presión sistólica mínima aceptada es '.ValidacionSignosVitalesService::PAS_MIN.' mmHg.',
-            'presion_sistolica.max' => 'La presión sistólica máxima aceptada es '.ValidacionSignosVitalesService::PAS_MAX.' mmHg.',
-            'presion_diastolica.min' => 'La presión diastólica mínima aceptada es '.ValidacionSignosVitalesService::PAD_MIN.' mmHg.',
-            'presion_diastolica.max' => 'La presión diastólica máxima aceptada es '.ValidacionSignosVitalesService::PAD_MAX.' mmHg.',
-            'frecuencia_cardiaca.min' => 'La frecuencia cardíaca debe ser mayor a cero y clínicamente posible.',
-            'frecuencia_cardiaca.max' => 'La frecuencia cardíaca máxima aceptada es '.ValidacionSignosVitalesService::FC_MAX.' lpm.',
-            'frecuencia_respiratoria.min' => 'La frecuencia respiratoria mínima aceptada es '.ValidacionSignosVitalesService::FR_MIN.' rpm.',
-            'frecuencia_respiratoria.max' => 'La frecuencia respiratoria máxima aceptada es '.ValidacionSignosVitalesService::FR_MAX.' rpm.',
-            'temperatura.min' => 'La temperatura mínima aceptada es '.ValidacionSignosVitalesService::TEMP_MIN.' °C.',
-            'temperatura.max' => 'La temperatura máxima aceptada es '.ValidacionSignosVitalesService::TEMP_MAX.' °C.',
-            'saturacion.min' => 'La saturación mínima es 0%.',
-            'saturacion.max' => 'La saturación no puede superar 100%.',
-            'peso.min' => 'El peso debe ser positivo y clínicamente posible.',
-            'peso.max' => 'El peso máximo aceptado es 250 kg.',
-            'talla.min' => 'La talla debe ser positiva.',
-            'talla.max' => 'La talla máxima aceptada es 250 cm.',
-            'dolor.min' => 'La escala de dolor va de 0 a 10.',
-            'dolor.max' => 'La escala de dolor va de 0 a 10.',
-        ];
-    }
 
-    private function validarMomentoMedicion(): void
-    {
-        if (!$this->fecha || !$this->hora) {
-            return;
-        }
 
-        $momento = Carbon::parse("{$this->fecha} {$this->hora}");
 
-        if ($momento->isFuture()) {
-            $this->addError('hora', 'La fecha y hora de medición no pueden estar en el futuro.');
-        }
-    }
 
-    private function validarCoherenciaClinica(): void
-    {
-        if (($this->presion_sistolica === null) !== ($this->presion_diastolica === null)) {
-            $this->addError('presion_sistolica', 'Debe registrar la presión sistólica y diastólica juntas.');
-        }
-    }
+
+
 
     private function calcularImcVisual(): void
     {
@@ -782,7 +671,7 @@ class SaludSignosPanel extends Component
         return $signos
             ->filter(fn ($signo) => $signo->registrado_por)
             ->mapWithKeys(fn ($signo) => [
-                $signo->registrado_por => optional($signo->registradoPor)->name ?? "Usuario {$signo->registrado_por}",
+                $signo->registrado_por => optional($signo->registradoPor)->name ?? 'Profesional no identificado',
             ])
             ->sort()
             ->all();

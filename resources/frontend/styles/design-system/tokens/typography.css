@@ -1,0 +1,38 @@
+/* ============================================================
+   REMEMBERMIND DESIGN SYSTEM — TOKENS / TYPOGRAPHY
+   Títulos: Outfit | UI y Cuerpo: Inter
+   Escala compacta / operativa (WCAG AA probado, mín. 11px).
+   ============================================================ */
+
+:root {
+    /* Familias Tipográficas */
+    --rm-font-title: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --rm-font-ui: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --rm-font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
+    /* Escala Tipográfica Compacta / Operativa */
+    --rm-font-page-title: 24px;     /* Título de pantalla / módulo principal */
+    --rm-font-section-title: 16px;  /* Título de sección / panel grande */
+    --rm-font-card-title: 15px;     /* Cabecera de tarjeta / modal / widget */
+    --rm-font-body: 13px;           /* Cuerpo de texto / campos de entrada */
+    --rm-font-table: 13px;          /* Celdas de tabla clínica */
+    --rm-font-label: 11.5px;        /* Etiquetas de formulario / metadatos */
+    --rm-font-badge: 11px;          /* Badges de estado / pills (mínimo absoluto) */
+
+    /* Pesos */
+    --rm-font-weight-regular: 400;
+    --rm-font-weight-medium: 500;
+    --rm-font-weight-semibold: 600;
+    --rm-font-weight-bold: 700;
+
+    /* Alturas de Línea */
+    --rm-line-height-tight: 1.25;
+    --rm-line-height-normal: 1.40;
+    --rm-line-height-relaxed: 1.55;
+
+    /* Espaciado entre Caracteres */
+    --rm-letter-spacing-tight: -0.015em;
+    --rm-letter-spacing-normal: 0em;
+    --rm-letter-spacing-wide: 0.03em;
+    --rm-letter-spacing-wider: 0.06em;
+}

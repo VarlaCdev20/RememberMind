@@ -14,7 +14,7 @@
  </div>
  <div class="text-right mt-4 sm:mt-0">
  <h2 class="text-xl font-extrabold uppercase">Ficha Técnica Individual</h2>
- <p class="text-sm font-bold text-apoyo uppercase tracking-widest">Código: {{ $adulto->cod_am }}</p>
+ <p class="text-sm font-bold text-apoyo uppercase tracking-widest">{{ $adulto->ci ? 'CI '.$adulto->ci : 'Documento no registrado' }}</p>
  <div class="mt-2 no-print flex flex-wrap gap-2 justify-end">
  <button onclick="window.print()" class="rounded-full bg-boton-principal px-6 py-2 text-xs font-bold text-inverso shadow-lg transition hover:bg-fondo-panel active:scale-95">
  <i class="ph-bold ph-printer mr-2"></i> IMPRIMIR

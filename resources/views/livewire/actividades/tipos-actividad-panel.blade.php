@@ -492,7 +492,7 @@
  <span class="inline-flex items-center rounded-full border border-estado-exitoBorde bg-estado-exitoBg px-2.5 py-1 text-[9px] font-bold uppercase tracking-wide text-estado-exito">
  Activo
  </span>
- <span class="text-[10px] font-bold text-apoyo">#{{ $detalle->cod_tipo_act }}</span>
+ <span class="text-[10px] font-bold text-apoyo">Catálogo institucional</span>
  </div>
  </div>
  {{-- Descripción --}}
@@ -509,7 +509,7 @@
  <p class="mt-1 text-2xl font-black text-titulo">{{ number_format($detalle->actividades_count) }}</p>
  </div>
  <div class="rounded-xl border border-borde-suave bg-fondo-panel px-4 py-3 text-center">
- <p class="text-[10px] font-bold uppercase tracking-[0.13em] text-apoyo">Identificador visual</p>
+ <p class="text-[10px] font-bold uppercase tracking-[0.13em] text-apoyo">Icono representativo</p>
  <div class="mt-2 flex justify-center">
  <span class="flex h-10 w-10 items-center justify-center rounded-xl {{ $vi['cls'] }}">
  <i class="ph-bold {{ $vi['icon'] }} text-xl"></i>
@@ -565,3 +565,4 @@
  @endif
 
 </div>
+

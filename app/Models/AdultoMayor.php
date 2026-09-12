@@ -142,9 +142,122 @@ class AdultoMayor extends Model
         return $this->belongsTo(EstadoAdulto::class, 'cod_est_adul', 'cod_est_adul');
     }
 
+    public function getNombreCompletoAttribute(): string
+    {
+        return trim($this->nombres . ' ' . ($this->ap_paterno ?? '') . ' ' . ($this->ap_materno ?? ''));
+    }
+
+    public function getEdadAttribute(): ?int
+    {
+        return $this->fecha_nac ? (int) \Carbon\Carbon::parse($this->fecha_nac)->age : null;
+    }
+
+    public function getEdadTextoAttribute(): string
+    {
+        $edad = $this->edad;
+        return $edad !== null ? "{$edad} años" : 'Edad no registrada';
+    }
+
     public function getEstadoTextoAttribute(): string
     {
         return $this->estado?->estado ?? 'SIN ESTADO';
+    }
+
+    public function getEstadoHumanoAttribute(): string
+    {
+        $codigo = $this->estado?->estado ?? $this->estado_operativo ?? '';
+        if (empty($codigo)) {
+            return 'No registrado';
+        }
+
+        return match (strtoupper($codigo)) {
+            'EN_SEGUIMIENTO_ACTIVO' => 'En seguimiento activo',
+            'EN_CENTRO' => 'En el centro',
+            'SALIDA_TEMPORAL' => 'Salida temporal',
+            'HOSPITALIZADO' => 'Hospitalizado',
+            'EGRESADO' => 'Egresado',
+            'FALLECIDO' => 'Fallecido',
+            'ACTIVO', 'ACTIVA' => 'Activo',
+            'INACTIVO', 'INACTIVA' => 'Inactivo',
+            'ARCHIVADO' => 'Archivado',
+            'SEGUIMIENTO_ESPECIAL' => 'Seguimiento especial',
+            'RETIRADO' => 'Retirado',
+            'TRASLADADO' => 'Trasladado',
+            'RESTAURADO' => 'Restaurado',
+            'PREADMISION' => 'Preadmisión',
+            'PENDIENTE_VALORACION_ENFERMERIA' => 'Pend. valoración enfermería',
+            'VALORACION_ENFERMERIA_COMPLETADA' => 'Valoración enfermería completada',
+            'PENDIENTE_VALORACION_MEDICA' => 'Pend. valoración médica',
+            'VALORACION_MEDICA_COMPLETADA' => 'Valoración médica completada',
+            'ADMITIDO' => 'Admitido',
+            'NO_ADMITIDO' => 'No admitido',
+            'DERIVADO' => 'Derivado',
+            'OBSERVADO' => 'Observado',
+            'ASIGNADO' => 'Asignado',
+            default => ucwords(strtolower(str_replace('_', ' ', $codigo))),
+        };
+    }
+
+    public function getEstadoBadgeColorAttribute(): string
+    {
+        $codigo = $this->estado?->estado ?? $this->estado_operativo ?? '';
+        return match (strtoupper($codigo)) {
+            'ACTIVO', 'ACTIVA', 'EN_CENTRO', 'EN_SEGUIMIENTO_ACTIVO', 'ADMITIDO' => 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800/50',
+            'HOSPITALIZADO', 'SEGUIMIENTO_ESPECIAL', 'OBSERVADO' => 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-800/50',
+            'SALIDA_TEMPORAL', 'DERIVADO', 'TRASLADADO' => 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/40 dark:text-blue-300 dark:border-blue-800/50',
+            'FALLECIDO', 'INACTIVO', 'INACTIVA', 'ARCHIVADO', 'EGRESADO', 'RETIRADO' => 'bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700',
+            default => 'bg-slate-50 text-slate-600 border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700',
+        };
+    }
+
+    public function getHabitacionTextoAttribute(): string
+    {
+        if ($this->habitacion) {
+            return $this->habitacion->codigo ?? ($this->habitacion->nombre ?? 'Habitación no asignada');
+        }
+        if ($this->cod_habitacion) {
+            $direct = Habitacion::find($this->cod_habitacion);
+            if ($direct) {
+                return $direct->codigo ?? ($direct->nombre ?? 'Habitación no asignada');
+            }
+        }
+        return 'Habitación no asignada';
+    }
+
+    public function getCamaTextoAttribute(): string
+    {
+        if ($this->cama) {
+            $cod = $this->cama->codigo ?? ($this->cama->nombre ?? '');
+            return $cod ? "Cama {$cod}" : 'Cama no asignada';
+        }
+        if ($this->cod_cama) {
+            $direct = Cama::find($this->cod_cama);
+            if ($direct) {
+                $cod = $direct->codigo ?? ($direct->nombre ?? '');
+                return $cod ? "Cama {$cod}" : 'Cama no asignada';
+            }
+        }
+        return 'Cama no asignada';
+    }
+
+    public function getUbicacionTextoAttribute(): string
+    {
+        $hab = $this->habitacion_texto;
+        $cama = $this->cama_texto;
+
+        $hasHab = $hab !== 'Habitación no asignada';
+        $hasCama = $cama !== 'Cama no asignada';
+
+        if ($hasHab && $hasCama) {
+            return "{$hab} • {$cama}";
+        }
+        if ($hasHab) {
+            return "{$hab} • Cama no asignada";
+        }
+        if ($hasCama) {
+            return "Habitación no asignada • {$cama}";
+        }
+        return 'Sin ubicación asignada';
     }
 
     public function observaciones()

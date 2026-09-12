@@ -1,0 +1,11 @@
+/* ============================================================
+   REMEMBERMIND DESIGN SYSTEM — TOKENS / SHADOWS
+   Sombras suaves y orgánicas con tintes cálidos de apoyo.
+   ============================================================ */
+
+:root {
+    --rm-shadow-sm: 0 1px 3px rgba(52, 69, 99, 0.06);
+    --rm-shadow-md: 0 6px 18px rgba(52, 69, 99, 0.08);
+    --rm-shadow-lg: 0 12px 28px rgba(52, 69, 99, 0.10);
+    --rm-shadow-modal: 0 20px 48px rgba(52, 69, 99, 0.16);
+}

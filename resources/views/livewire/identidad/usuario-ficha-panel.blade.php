@@ -291,7 +291,7 @@
  <tr class="hover:bg-fondo-panel">
  <td class="px-5 py-4">
  <p class="font-black text-parrafo uppercase">{{ $v->ap_paterno }} {{ $v->ap_materno }} {{ $v->nombres }}</p>
- <p class="text-[10px] text-meta font-bold mt-0.5">{{ $v->cod_am }}</p>
+ <p class="text-[10px] text-meta font-bold mt-0.5">{{ $v->ci ? 'CI '.$v->ci : 'Documento no registrado' }}</p>
  </td>
  <td class="px-5 py-4 font-black">
  <span class="px-2.5 py-0.5 rounded bg-fondo-panel text-parrafo text-[9px] font-bold uppercase">

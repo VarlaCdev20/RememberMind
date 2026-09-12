@@ -1,0 +1,110 @@
+/* ============================================================
+   REMEMBERMIND DESIGN SYSTEM — COMPONENTS / CARDS
+   Contenedores modulares cálidos y no hospitalarios.
+   DENSIDAD COMPACTA: Padding 14px, KPIs ~105px de altura.
+   ============================================================ */
+
+.rm-card {
+    background-color: var(--rm-surface);
+    border: 1px solid var(--rm-border);
+    border-radius: var(--rm-radius-card, 14px);
+    box-shadow: var(--rm-shadow-sm);
+    transition: var(--rm-transition-all);
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Cabecera, Cuerpo y Footer Compactos */
+.rm-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--rm-border-soft);
+    background-color: var(--rm-surface-soft);
+}
+
+.rm-card-body {
+    padding: var(--rm-card-padding, 14px);
+    flex: 1 1 auto;
+}
+
+.rm-card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    border-top: 1px solid var(--rm-border-soft);
+    background-color: var(--rm-surface-alt);
+}
+
+/* Variantes */
+.rm-card-default {
+    background-color: var(--rm-surface);
+}
+
+.rm-card-soft {
+    background-color: var(--rm-surface-soft);
+    border-color: var(--rm-border-soft);
+}
+
+.rm-card-interactive {
+    cursor: pointer;
+}
+
+.rm-card-interactive:hover {
+    border-color: var(--rm-border-hover);
+    box-shadow: var(--rm-shadow-md);
+    transform: translateY(-1px);
+}
+
+/* Variante Métrica / KPI Compacta (100–110px de altura) */
+.rm-card-metric {
+    padding: 10px 14px;
+    background-color: rgba(254, 251, 246, 0.55);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(228, 214, 199, 0.55);
+    border-radius: 14px;
+    box-shadow: 0 4px 20px rgba(60, 45, 30, 0.04);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 82px;
+    box-sizing: border-box;
+}
+
+.dark .rm-card-metric {
+    background-color: rgba(20, 28, 36, 0.50);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-color: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+}
+
+.rm-card-metric .rm-metric-label {
+    font-size: 10.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: var(--rm-text-muted);
+}
+
+.rm-card-metric .rm-metric-value {
+    font-family: var(--rm-font-title);
+    font-size: 21px;
+    font-weight: 700;
+    color: var(--rm-text-title);
+    line-height: 1.05;
+    margin: 1px 0;
+}
+
+.rm-card-metric .rm-metric-meta {
+    font-size: 10.5px;
+    color: var(--rm-text-soft);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}

@@ -40,7 +40,7 @@
             </p>
 
             <div class="info-box">
-                <p><strong>Código de preadmisión:</strong> {{ $preadmision->cod_pre }}</p>
+                <p><strong>Adulto mayor:</strong> {{ $preadmision->nombre_completo }}</p>
                 <p><strong>Adulto mayor:</strong> {{ $nombreAdulto }}</p>
                 <p><strong>Fecha de registro:</strong> {{ now()->format('d/m/Y H:i') }}</p>
             </div>

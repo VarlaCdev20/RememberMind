@@ -84,7 +84,7 @@
                     <i class="ph-bold ph-magnifying-glass pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-apoyo"></i>
                     <input type="search" wire:model.live.debounce.300ms="busqueda"
                         class="h-10 w-full rounded-xl border border-borde-suave bg-fondo-card/40 pl-9 pr-3 text-xs font-bold text-titulo outline-none transition focus:border-borde-focus"
-                        placeholder="Buscar personal por nombre, correo o código...">
+                        placeholder="Buscar personal por nombre, apellido o correo...">
                 </div>
 
                 <select wire:model.live="filtroTipo" class="h-10 rounded-xl border border-borde-suave bg-fondo-card/40 px-3 text-xs font-bold text-titulo outline-none focus:border-borde-focus">
@@ -276,7 +276,7 @@
                                 <select wire:model.live="trabajadorFiltro" class="h-10 w-full rounded-xl border border-borde-suave bg-fondo-panel px-3 text-xs font-bold text-titulo outline-none focus:border-borde-focus">
                                     <option value="">Todos</option>
                                     @foreach (($filtrosPlanilla['trabajadores'] ?? []) as $trabajador)
-                                        <option value="{{ $trabajador['codigo'] }}">{{ $trabajador['codigo'] }} · {{ $trabajador['nombre'] }}</option>
+                                        <option value="{{ $trabajador['codigo'] }}">{{ $trabajador['nombre'] }}</option>
                                     @endforeach
                                 </select>
                             </div>
@@ -400,7 +400,7 @@
                                                                 <div class="relative w-full rounded-xl border border-borde-suave bg-fondo-panel px-2.5 py-2 text-left text-xs font-bold text-titulo transition hover:border-borde-focus hover:bg-fondo-card">
                                                                     <div class="flex items-center justify-between gap-2">
                                                                         <div class="flex min-w-0 items-center gap-2">
-                                                                            <span class="shrink-0 rounded-lg px-2 py-1 text-[10px] font-black {{ $asignacion['clase_familia'] ?? 'bg-fondo-card text-titulo' }}">{{ $asignacion['codigo'] ?? '-' }}</span>
+                                                                            <span class="shrink-0 rounded-lg px-2 py-1 text-[10px] font-black {{ $asignacion['clase_familia'] ?? 'bg-fondo-card text-titulo' }}">{{ $asignacion['familia'] ?? 'Personal' }}</span>
                                                                             <div class="min-w-0">
                                                                                 @if ($asignacion['cod_usu'])
                                                                                     <span class="block truncate text-titulo font-black">{{ $asignacion['nombre'] }}</span>
@@ -454,7 +454,7 @@
                                                                 <div class="relative w-full rounded-xl border border-borde-suave bg-boton-acento/10 px-2.5 py-2 text-left text-xs font-bold text-boton-acento transition hover:border-borde-focus">
                                                                     <div class="flex items-center justify-between gap-2">
                                                                         <div class="min-w-0">
-                                                                            <span class="font-black">{{ $asignacion['codigo'] ?? '-' }}</span> · 
+                                                                            
                                                                             @if ($asignacion['cod_usu'])
                                                                                 <span class="truncate">{{ $asignacion['nombre'] }}</span>
                                                                             @else
@@ -487,7 +487,7 @@
                                                         <div class="flex flex-wrap gap-1">
                                                             @forelse(($dia['turnos']['DESCANSO']['asignaciones'] ?? []) as $asignacion)
                                                                 <div class="inline-flex items-center gap-1 rounded-xl border border-borde-suave bg-fondo-hover px-2 py-1 text-xs font-bold text-apoyo">
-                                                                    <span>{{ $asignacion['codigo'] ?? '-' }}</span>
+                                                                    <span>{{ $asignacion['nombre'] ?? 'Personal no identificado' }}</span>
                                                                     <button type="button" wire:click="abrirAsignarPlaza('{{ $asignacion['codigo'] }}', '{{ $asignacion['fecha'] }}')"
                                                                         class="text-boton-principal hover:text-boton-acento transition">
                                                                         <i class="ph-bold ph-pencil-simple text-[10px]"></i>
@@ -531,7 +531,7 @@
                                         <div class="mt-3 space-y-2">
                                             @forelse(($vistaHoyPlanilla['turnos'][$codigoTurno]['asignaciones'] ?? []) as $asignacion)
                                                 <div class="rounded-xl bg-fondo-panel p-2">
-                                                    <p class="text-xs font-black text-titulo">{{ $asignacion['codigo'] ?? '-' }} · {{ $asignacion['nombre'] ?? '' }}</p>
+                                                    <p class="text-xs font-black text-titulo">{{ $asignacion['nombre'] ?? 'Personal no identificado' }}</p>
                                                     <p class="text-[10px] font-bold text-apoyo">{{ $asignacion['grupo_nombre'] ?? 'Sin grupo asignado' }}</p>
                                                 </div>
                                             @empty
@@ -546,7 +546,7 @@
                             <article class="rounded-2xl border border-borde-suave bg-boton-acento/10 p-4 text-boton-acento">
                                 <p class="text-[10px] font-black uppercase tracking-wider">Apoyo / volante</p>
                                 @forelse(($vistaHoyPlanilla['turnos']['APOYO']['asignaciones'] ?? []) as $asignacion)
-                                    <p class="mt-3 text-sm font-black">{{ $asignacion['codigo'] ?? '-' }} · {{ $asignacion['nombre'] ?? '' }}</p>
+                                    <p class="mt-3 text-sm font-black">{{ $asignacion['nombre'] ?? 'Personal no identificado' }}</p>
                                 @empty
                                     <p class="mt-3 text-xs font-bold">Sin apoyo programado.</p>
                                 @endforelse
@@ -555,7 +555,7 @@
                                 <p class="text-[10px] font-black uppercase tracking-wider">Descanso</p>
                                 <div class="mt-3 flex flex-wrap gap-2">
                                     @forelse(($vistaHoyPlanilla['turnos']['DESCANSO']['asignaciones'] ?? []) as $asignacion)
-                                        <span class="rounded-xl bg-fondo-card px-3 py-2 text-xs font-black">{{ $asignacion['codigo'] ?? '-' }}</span>
+                                        <span class="rounded-xl bg-fondo-card px-3 py-2 text-xs font-black">{{ $asignacion['familia'] ?? 'Personal' }}</span>
                                     @empty
                                         <p class="text-xs font-bold">Sin descansos programados.</p>
                                     @endforelse
@@ -574,7 +574,7 @@
                                 @forelse(($vistaPorEnfermeroPlanilla ?? []) as $enfermero)
                                     <button type="button" wire:click="$set('trabajadorFiltro', '{{ $enfermero['codigo'] }}')"
                                         class="w-full rounded-xl border border-borde-suave bg-fondo-card/35 p-3 text-left transition hover:border-borde-focus">
-                                        <p class="text-sm font-black text-titulo">{{ $enfermero['codigo'] }} · {{ $enfermero['nombre'] }}</p>
+                                        <p class="text-sm font-black text-titulo">{{ $enfermero['nombre'] }}</p>
                                         <p class="text-[11px] font-bold text-apoyo">{{ $enfermero['familia_visual'] ?? 'Sin familia visual' }}</p>
                                     </button>
                                 @empty
@@ -604,7 +604,7 @@
                                         @forelse(($vistaPorEnfermeroPlanilla ?? []) as $enfermero)
                                             @foreach (($enfermero['programacion'] ?? []) as $programacion)
                                                 <tr class="transition hover:bg-fondo-card/45">
-                                                    <td class="px-4 py-3 font-black text-titulo">{{ $enfermero['codigo'] }} · {{ $enfermero['nombre'] }}</td>
+                                                    <td class="px-4 py-3 font-black text-titulo">{{ $enfermero['nombre'] }}</td>
                                                     <td class="px-4 py-3 text-xs font-bold text-apoyo">{{ $programacion['semana'] }}</td>
                                                     <td class="px-4 py-3 text-xs font-bold text-titulo">{{ $programacion['dia'] }}<br><span class="font-bold text-apoyo">{{ $programacion['fecha'] }}</span></td>
                                                     <td class="px-4 py-3"><span class="rounded-full px-2.5 py-1 text-[10px] font-black {{ $programacion['clase_turno'] ?? 'bg-fondo-card text-titulo' }}">{{ $programacion['turno_nombre'] }}</span></td>
@@ -650,7 +650,7 @@
                                 <tbody class="divide-y divide-borde-suave bg-fondo-card/20">
                                     @forelse(($cargaLaboralPlanilla ?? []) as $carga)
                                         <tr class="transition hover:bg-fondo-card/45">
-                                            <td class="px-4 py-3 font-black text-titulo">{{ $carga['codigo'] }} · {{ $carga['nombre'] }}</td>
+                                            <td class="px-4 py-3 font-black text-titulo">{{ $carga['nombre'] }}</td>
                                             <td class="px-4 py-3 text-xs font-bold text-apoyo">{{ $carga['mananas'] }}</td>
                                             <td class="px-4 py-3 text-xs font-bold text-apoyo">{{ $carga['tardes'] }}</td>
                                             <td class="px-4 py-3 text-xs font-bold text-apoyo">{{ $carga['noches'] }}</td>
@@ -857,3 +857,4 @@
         @include('livewire.identidad.turnos-asignaciones-panel.modales.asignar-plaza')
     </div>
 </div>
+

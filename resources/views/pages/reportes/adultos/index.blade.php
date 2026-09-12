@@ -167,29 +167,29 @@
 <div class="rm-seccion" style="margin-bottom:28px;">
  <div class="rm-seccion-titulo">2. Distribución por Variables</div>
 
- {{-- Doughnut estado + Doughnut género --}}
- <div style="display:flex; gap:24px; margin-bottom:24px;">
- <div style="flex:1; min-width:0;">
- <div class="rm-seccion-titulo-verde" style="margin-bottom:10px;">Por Estado</div>
- <div style="position:relative; height:240px;">
- <canvas id="rm-chart-estado"></canvas>
- </div>
- </div>
- <div style="flex:1; min-width:0;">
- <div class="rm-seccion-titulo-naranja" style="margin-bottom:10px;">Por Género</div>
- <div style="position:relative; height:240px;">
- <canvas id="rm-chart-genero"></canvas>
- </div>
- </div>
- </div>
+    {{-- Doughnut estado + Doughnut género --}}
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+        <div class="rm-chart-card rm-chart-glass p-5 rounded-2xl">
+            <div class="rm-seccion-titulo-verde font-bold text-xs uppercase tracking-wider mb-3">Por Estado</div>
+            <div style="position:relative; height:240px;">
+                <canvas id="rm-chart-estado"></canvas>
+            </div>
+        </div>
+        <div class="rm-chart-card rm-chart-glass p-5 rounded-2xl">
+            <div class="rm-seccion-titulo-naranja font-bold text-xs uppercase tracking-wider mb-3">Por Género</div>
+            <div style="position:relative; height:240px;">
+                <canvas id="rm-chart-genero"></canvas>
+            </div>
+        </div>
+    </div>
 
- {{-- Barras horizontales por rango de edad --}}
- <div>
- <div class="rm-seccion-titulo-morado" style="margin-bottom:10px;">Por Rango de Edad</div>
- <div style="position:relative; height:180px;">
- <canvas id="rm-chart-edad"></canvas>
- </div>
- </div>
+    {{-- Barras horizontales por rango de edad --}}
+    <div class="rm-chart-card rm-chart-glass p-5 rounded-2xl">
+        <div class="rm-seccion-titulo-morado font-bold text-xs uppercase tracking-wider mb-3">Por Rango de Edad</div>
+        <div style="position:relative; height:210px;">
+            <canvas id="rm-chart-edad"></canvas>
+        </div>
+    </div>
 </div>
 @endunless
 
@@ -223,7 +223,6 @@
  <table class="rm-table">
  <thead>
  <tr>
- <th>Código</th>
  <th>Nombre Completo</th>
  <th>Edad</th>
  <th>Género</th>
@@ -238,7 +237,6 @@
  <tbody>
  @foreach($datos['lista'] as $am)
  <tr>
- <td style="font-family:monospace; font-size:8.5pt;">{{ $am->cod_am }}</td>
  <td>{{ $am->nombre_completo }}</td>
  <td style="text-align:center;">
  {{ $am->edad !== null ? $am->edad . ' a.' : '—' }}
@@ -291,8 +289,7 @@
  <table class="rm-table" style="font-size:8pt;">
  <thead>
  <tr>
- <th style="width:14%;">Código</th>
- <th style="width:30%;">Nombre</th>
+ <th style="width:44%;">Nombre</th>
  <th style="width:7%; text-align:center;">Edad</th>
  <th style="width:7%; text-align:center;">Gén.</th>
  <th style="width:16%;">Estado</th>
@@ -303,7 +300,6 @@
  <tbody>
  @foreach($datos['lista'] as $am)
  <tr>
- <td style="font-size:7.5pt; font-family:monospace;">{{ $am->cod_am }}</td>
  <td style="font-size:8pt;">{{ Str::limit($am->nombre_completo, 28) }}</td>
  <td style="text-align:center;">{{ $am->edad !== null ? $am->edad : '—' }}</td>
  <td style="text-align:center;">{{ strtoupper(substr($am->genero ?? '—', 0, 1)) }}</td>
@@ -344,170 +340,233 @@
 @push('scripts')
 <script>
 (function () {
- // Datos desde PHP — inyectados server-side
- var RM = {
- estado: @json($graficas['estado']),
- genero: @json($graficas['genero']),
- edad: @json($graficas['edad']),
- };
+    var RM = {
+        estado: @json($graficas['estado']),
+        genero: @json($graficas['genero']),
+        edad:   @json($graficas['edad']),
+    };
 
- // Espera a que window.Chart esté disponible (app.js carga como módulo ESM)
- function inicializarGraficas() {
- if (typeof window.Chart === 'undefined') {
- setTimeout(inicializarGraficas, 60);
- return;
- }
+    function hexToRgba(hex, alpha) {
+        if (window.RMCharts && window.RMCharts.helpers && window.RMCharts.helpers.hexToRgba) {
+            return window.RMCharts.helpers.hexToRgba(hex, alpha);
+        }
+        if (!hex || typeof hex !== 'string') return hex;
+        let c = hex.replace('#', '');
+        if (c.length === 3) c = c.split('').map(x => x + x).join('');
+        if (c.length === 6) {
+            const num = parseInt(c, 16);
+            return `rgba(${(num >> 16) & 255}, ${(num >> 8) & 255}, ${num & 255}, ${alpha})`;
+        }
+        return hex;
+    }
 
- var Chart = window.Chart;
+    function inicializarGraficas() {
+        if (typeof window.Chart === 'undefined') {
+            setTimeout(inicializarGraficas, 60);
+            return;
+        }
 
- // ── Opciones comunes de datalabels (deshabilitados globalmente) ──
- var sinDatalabels = {
- plugins: {
- datalabels: { display: false }
- }
- };
+        var Chart = window.Chart;
+        window.__rmReportesAdultosCharts = window.__rmReportesAdultosCharts || new Map();
+        function setChart(key, chart) {
+            if (window.__rmReportesAdultosCharts.has(key)) {
+                try { window.__rmReportesAdultosCharts.get(key).destroy(); } catch (e) {}
+            }
+            window.__rmReportesAdultosCharts.set(key, chart);
+            return chart;
+        }
 
- // ── 1. Doughnut: Por Estado ──
- var ctxEstado = document.getElementById('rm-chart-estado');
- if (ctxEstado && RM.estado.labels.length > 0) {
- new Chart(ctxEstado, {
- type: 'doughnut',
- data: {
- labels: RM.estado.labels,
- datasets: [{
- data: RM.estado.data,
- backgroundColor: RM.estado.colores,
- borderWidth: 2,
- borderColor: '#ffffff',
- }]
- },
- options: {
- responsive: true,
- maintainAspectRatio: false,
- plugins: {
- datalabels: { display: false },
- legend: {
- position: 'bottom',
- labels: {
- font: { size: 11 },
- color: '#2F3E5C',
- padding: 12,
- }
- },
- tooltip: {
- callbacks: {
- label: function(ctx) {
- var total = ctx.dataset.data.reduce(function(a,b){return a+b;}, 0);
- var pct = total > 0 ? Math.round(ctx.raw / total * 100) : 0;
- return ' ' + ctx.raw + ' (' + pct + '%)';
- }
- }
- }
- }
- }
- });
- }
+        // ── 1. Doughnut: Por Estado ──
+        var ctxEstado = document.getElementById('rm-chart-estado');
+        if (ctxEstado && RM.estado.labels.length > 0) {
+            var bgColoresEstado = (RM.estado.colores || []).map(function(c) { return hexToRgba(c, 0.78); });
+            var borderColoresEstado = (RM.estado.colores || []).map(function(c) { return hexToRgba(c, 0.95); });
 
- // ── 2. Doughnut: Por Género ──
- var ctxGenero = document.getElementById('rm-chart-genero');
- if (ctxGenero && RM.genero.labels.length > 0) {
- new Chart(ctxGenero, {
- type: 'doughnut',
- data: {
- labels: RM.genero.labels,
- datasets: [{
- data: RM.genero.data,
- backgroundColor: RM.genero.colores,
- borderWidth: 2,
- borderColor: '#ffffff',
- }]
- },
- options: {
- responsive: true,
- maintainAspectRatio: false,
- plugins: {
- datalabels: { display: false },
- legend: {
- position: 'bottom',
- labels: {
- font: { size: 11 },
- color: '#2F3E5C',
- padding: 12,
- }
- },
- tooltip: {
- callbacks: {
- label: function(ctx) {
- var total = ctx.dataset.data.reduce(function(a,b){return a+b;}, 0);
- var pct = total > 0 ? Math.round(ctx.raw / total * 100) : 0;
- return ' ' + ctx.raw + ' (' + pct + '%)';
- }
- }
- }
- }
- }
- });
- }
+            setChart('estado', new Chart(ctxEstado, {
+                type: 'doughnut',
+                data: {
+                    labels: RM.estado.labels,
+                    datasets: [{
+                        data: RM.estado.data,
+                        backgroundColor: bgColoresEstado,
+                        borderWidth: 2.5,
+                        borderColor: '#ffffff',
+                        hoverOffset: 8,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '58%',
+                    animation: {
+                        duration: 950,
+                        easing: 'easeOutQuart',
+                        animateRotate: true,
+                        animateScale: true,
+                    },
+                    plugins: {
+                        datalabels: { display: false },
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                font: { size: 11, weight: 'bold' },
+                                color: '#2F3E5C',
+                                padding: 12,
+                                usePointStyle: true,
+                                pointStyle: 'circle',
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(47, 62, 92, 0.92)',
+                            titleColor: '#F3ECE4',
+                            bodyColor: '#F3ECE4',
+                            padding: 10,
+                            cornerRadius: 10,
+                            callbacks: {
+                                label: function(ctx) {
+                                    var total = ctx.dataset.data.reduce(function(a,b){return a+b;}, 0);
+                                    var pct = total > 0 ? Math.round(ctx.raw / total * 100) : 0;
+                                    return ' ' + ctx.raw + ' (' + pct + '%)';
+                                }
+                            }
+                        }
+                    }
+                }
+            }));
+        }
 
- // ── 3. Barras Horizontales: Por Rango de Edad ──
- var ctxEdad = document.getElementById('rm-chart-edad');
- if (ctxEdad && RM.edad.labels.length > 0) {
- new Chart(ctxEdad, {
- type: 'bar',
- data: {
- labels: RM.edad.labels,
- datasets: [{
- label: 'Adultos Mayores',
- data: RM.edad.data,
- backgroundColor: RM.edad.colores,
- borderRadius: 4,
- borderSkipped: false,
- }]
- },
- options: {
- indexAxis: 'y',
- responsive: true,
- maintainAspectRatio: false,
- plugins: {
- datalabels: { display: false },
- legend: { display: false },
- tooltip: {
- callbacks: {
- label: function(ctx) {
- return ' ' + ctx.raw + ' adultos';
- }
- }
- }
- },
- scales: {
- x: {
- beginAtZero: true,
- ticks: {
- precision: 0,
- color: '#2F3E5C',
- font: { size: 11 },
- },
- grid: { color: '#E6DDD3' }
- },
- y: {
- ticks: {
- color: '#2F3E5C',
- font: { size: 11 },
- },
- grid: { display: false }
- }
- }
- }
- });
- }
- }
+        // ── 2. Doughnut: Por Género ──
+        var ctxGenero = document.getElementById('rm-chart-genero');
+        if (ctxGenero && RM.genero.labels.length > 0) {
+            var bgColoresGenero = (RM.genero.colores || []).map(function(c) { return hexToRgba(c, 0.78); });
 
- // Iniciar cuando el DOM esté listo
- if (document.readyState === 'loading') {
- document.addEventListener('DOMContentLoaded', inicializarGraficas);
- } else {
- inicializarGraficas();
- }
+            setChart('genero', new Chart(ctxGenero, {
+                type: 'doughnut',
+                data: {
+                    labels: RM.genero.labels,
+                    datasets: [{
+                        data: RM.genero.data,
+                        backgroundColor: bgColoresGenero,
+                        borderWidth: 2.5,
+                        borderColor: '#ffffff',
+                        hoverOffset: 8,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '58%',
+                    animation: {
+                        duration: 950,
+                        easing: 'easeOutQuart',
+                        animateRotate: true,
+                        animateScale: true,
+                    },
+                    plugins: {
+                        datalabels: { display: false },
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                font: { size: 11, weight: 'bold' },
+                                color: '#2F3E5C',
+                                padding: 12,
+                                usePointStyle: true,
+                                pointStyle: 'circle',
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(47, 62, 92, 0.92)',
+                            titleColor: '#F3ECE4',
+                            bodyColor: '#F3ECE4',
+                            padding: 10,
+                            cornerRadius: 10,
+                            callbacks: {
+                                label: function(ctx) {
+                                    var total = ctx.dataset.data.reduce(function(a,b){return a+b;}, 0);
+                                    var pct = total > 0 ? Math.round(ctx.raw / total * 100) : 0;
+                                    return ' ' + ctx.raw + ' (' + pct + '%)';
+                                }
+                            }
+                        }
+                    }
+                }
+            }));
+        }
+
+        // ── 3. Barras Horizontales: Por Rango de Edad ──
+        var ctxEdad = document.getElementById('rm-chart-edad');
+        if (ctxEdad && RM.edad.labels.length > 0) {
+            var bgColoresEdad = (RM.edad.colores || []).map(function(c) { return hexToRgba(c, 0.80); });
+            var borderColoresEdad = (RM.edad.colores || []).map(function(c) { return hexToRgba(c, 0.98); });
+
+            setChart('edad', new Chart(ctxEdad, {
+                type: 'bar',
+                data: {
+                    labels: RM.edad.labels,
+                    datasets: [{
+                        label: 'Adultos Mayores',
+                        data: RM.edad.data,
+                        backgroundColor: bgColoresEdad,
+                        borderColor: borderColoresEdad,
+                        borderWidth: 2,
+                        borderRadius: 8,
+                        borderSkipped: false,
+                        barPercentage: 0.86,
+                        categoryPercentage: 0.92,
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    animation: {
+                        duration: 950,
+                        easing: 'easeOutQuart',
+                    },
+                    plugins: {
+                        datalabels: { display: false },
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: 'rgba(47, 62, 92, 0.92)',
+                            titleColor: '#F3ECE4',
+                            bodyColor: '#F3ECE4',
+                            padding: 10,
+                            cornerRadius: 10,
+                            callbacks: {
+                                label: function(ctx) {
+                                    return ' ' + ctx.raw + ' adultos';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            ticks: {
+                                precision: 0,
+                                color: '#2F3E5C',
+                                font: { size: 11, weight: 'bold' },
+                            },
+                            grid: { color: 'rgba(47, 62, 92, 0.08)' }
+                        },
+                        y: {
+                            ticks: {
+                                color: '#2F3E5C',
+                                font: { size: 11, weight: 'bold' },
+                            },
+                            grid: { display: false }
+                        }
+                    }
+                }
+            }));
+        }
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', inicializarGraficas);
+    } else {
+        inicializarGraficas();
+    }
 })();
 </script>
 @endpush

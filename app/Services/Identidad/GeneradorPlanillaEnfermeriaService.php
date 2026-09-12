@@ -308,7 +308,7 @@ class GeneradorPlanillaEnfermeriaService
                 return [
                     'codigo' => $codigo,
                     'cod_usu' => null,
-                    'nombre' => 'Enfermero ' . $codigo,
+                    'nombre' => 'Profesional no identificado',
                     'correo' => null,
                     'rol' => 'ENFERMEROS',
                     'estado' => 'ACTIVO',

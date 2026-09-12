@@ -33,7 +33,7 @@
     </div>
 
     <div class="doc-title">Ficha Institucional de Preadmisión</div>
-    <p class="meta">Generado el {{ $fecha }} — Código: {{ $preadmision->cod_pre }}</p>
+    <p class="meta">Generado el {{ $fecha }} — Solicitante: {{ $preadmision->nombre_completo }}</p>
 
     <div class="section">
         <div class="section-title">I. Datos del Adulto Mayor</div>
@@ -91,7 +91,7 @@
     </div>
 
     <div class="footer">
-        Casa Amandita — RememberMind · Documento generado el {{ $fecha }} · {{ $preadmision->cod_pre }}
+        Casa Amandita — RememberMind · Documento generado el {{ $fecha }} · {{ $preadmision->nombre_completo }}
     </div>
 </body>
 </html>

@@ -10,22 +10,22 @@
 @php
  $valor = strtoupper((string) $estado);
 
- $clase = match($valor) {
- 'ACTIVO', 'ACTIVA', 'VIGENTE', 'DISPONIBLE'
- => 'rm-badge-success',
- 'SUSPENDIDO', 'SUSPENDIDA', 'EN_REVISION', 'PENDIENTE'
- => 'rm-badge-warning',
- 'INACTIVO', 'INACTIVA', 'ANULADO', 'ANULADA', 'ARCHIVADO', 'ARCHIVADA', 'FINALIZADO', 'FINALIZADA'
- => 'rm-badge-neutral',
- 'CRÍTICO', 'CRITICO', 'FALLECIDO', 'RETIRADO'
- => 'rm-badge-danger',
- 'TRASLADADO', 'SEGUIMIENTO_ESPECIAL'
- => 'rm-badge-info',
- 'RESTAURADO'
- => 'rm-badge-purple',
- default
- => 'rm-badge-neutral',
- };
+     $clase = match($valor) {
+        'ACTIVO', 'ACTIVA', 'VIGENTE', 'DISPONIBLE'
+            => 'enf-badge enf-badge-positive',
+        'SUSPENDIDO', 'SUSPENDIDA', 'EN_REVISION', 'PENDIENTE'
+            => 'enf-badge enf-badge-warning',
+        'INACTIVO', 'INACTIVA', 'ANULADO', 'ANULADA', 'ARCHIVADO', 'ARCHIVADA', 'FINALIZADO', 'FINALIZADA'
+            => 'enf-badge enf-badge-neutral',
+        'CRÍTICO', 'CRITICO', 'FALLECIDO', 'RETIRADO'
+            => 'enf-badge enf-badge-risk',
+        'TRASLADADO', 'SEGUIMIENTO_ESPECIAL'
+            => 'enf-badge enf-badge-info',
+        'RESTAURADO'
+            => 'enf-badge enf-badge-coral',
+        default
+            => 'enf-badge enf-badge-neutral',
+    };
 @endphp
 
 <span class="{{ $clase }}">{{ $valor ?: '—' }}</span>

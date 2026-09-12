@@ -1,6 +1,6 @@
-<div class="space-y-6 pb-12">
+<div class="rm-pilot-enfermeria rm-page-layout font-sans space-y-5 pb-10">
     {{-- 1. CABECERA COMPACTA INSTITUCIONAL --}}
-    <div class="rounded-2xl border border-borde bg-fondo-panel p-5 shadow-sm">
+    <div class="rm-page-header-card rounded-2xl border border-[var(--rm-border)] bg-[var(--rm-surface)] p-5 shadow-sm">
         <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
             <div class="space-y-1.5">
                 <div class="flex flex-wrap items-center gap-2">
@@ -10,10 +10,10 @@
                     </span>
 
                     @if($turnoActual)
-                        <span class="inline-flex items-center gap-1.5 rounded-lg border border-borde bg-fondo-card px-2.5 py-1 text-xs font-semibold text-titulo">
+                        <span class="inline-flex items-center gap-1.5 rounded-lg border border-[var(--rm-border)] bg-[var(--rm-surface-alt)] px-2.5 py-1 text-xs font-semibold text-[var(--rm-text-title)]">
                             <i class="ph-bold ph-sun text-amber-600"></i>
                             <span>{{ $turnoActual->nombre }}</span>
-                            <span class="text-apoyo">({{ \Carbon\Carbon::parse($turnoActual->hora_inicio)->format('H:i') }} - {{ \Carbon\Carbon::parse($turnoActual->hora_fin)->format('H:i') }})</span>
+                            <span class="text-[var(--rm-text-muted)]">({{ \Carbon\Carbon::parse($turnoActual->hora_inicio)->format('H:i') }} - {{ \Carbon\Carbon::parse($turnoActual->hora_fin)->format('H:i') }})</span>
                         </span>
                     @else
                         <span class="inline-flex items-center gap-1.5 rounded-lg border border-amber-200 bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-700 dark:bg-amber-950/20 dark:text-amber-300">
@@ -22,8 +22,8 @@
                         </span>
                     @endif
 
-                    <span class="inline-flex items-center gap-1.5 rounded-lg border border-borde bg-fondo-card px-2.5 py-1 text-xs font-semibold text-parrafo">
-                        <i class="ph-bold ph-calendar-blank text-apoyo"></i>
+                    <span class="inline-flex items-center gap-1.5 rounded-lg border border-[var(--rm-border)] bg-[var(--rm-surface-alt)] px-2.5 py-1 text-xs font-semibold text-[var(--rm-text-body)]">
+                        <i class="ph-bold ph-calendar-blank text-[var(--rm-text-muted)]"></i>
                         <span>{{ ucfirst(\Carbon\Carbon::parse($filtroFecha)->translatedFormat('l, d \d\e F \d\e Y')) }}</span>
                     </span>
 
@@ -36,13 +36,13 @@
                 </div>
 
                 <div class="flex items-baseline gap-2">
-                    <h1 class="text-xl font-black tracking-tight text-titulo">
+                    <h1 class="text-xl font-black tracking-tight text-[var(--rm-text-title)]">
                         {{ $esSuperAdmin ? 'Panel institucional de cuidados' : 'Cola Operativa de Guardia' }}
                     </h1>
-                    <span class="text-xs text-apoyo">|</span>
-                    <p class="text-xs font-semibold text-apoyo">
+                    <span class="text-xs text-[var(--rm-text-muted)]">|</span>
+                    <p class="text-xs font-semibold text-[var(--rm-text-muted)]">
                         {{ $esSuperAdmin ? 'Cobertura: todos los residentes y turnos' : 'Enfermero(a):' }}
-                        @unless($esSuperAdmin)<strong class="text-parrafo">{{ auth()->user()->nombres }} {{ auth()->user()->ap_paterno }}</strong>@endunless
+                        @unless($esSuperAdmin)<strong class="text-[var(--rm-text-body)]">{{ auth()->user()->nombres }} {{ auth()->user()->ap_paterno }}</strong>@endunless
                     </p>
                 </div>
             </div>
@@ -68,86 +68,107 @@
         </div>
 
         {{-- 2. PRIMERA FILA DE INDICADORES (COMPACTAS Y CLICABLES) --}}
-        <div class="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6 border-t border-borde pt-4">
+        <div class="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6 border-t border-[var(--rm-border)] pt-4">
             {{-- Pacientes --}}
-            <a href="{{ route('admin.enfermeria.pacientes') }}" class="group rounded-xl border border-borde bg-fondo-card/50 p-3 transition hover:border-boton-principal hover:bg-fondo-card block">
-                <div class="flex items-center justify-between text-apoyo group-hover:text-boton-principal">
-                    <span class="text-[10px] font-bold uppercase tracking-wider">Pacientes</span>
-                    <i class="ph-bold ph-users text-sm"></i>
+            <a href="{{ route('admin.enfermeria.pacientes') }}" class="rm-card-metric rm-card-interactive border-l-4 border-l-[var(--rm-primary)] block cursor-pointer">
+                <div class="flex items-center justify-between">
+                    <span class="rm-metric-label">Pacientes</span>
+                    <span class="flex h-7 w-7 items-center justify-center rounded-lg bg-[var(--rm-surface-alt)] text-[var(--rm-primary)]">
+                        <i class="ph-bold ph-users text-sm"></i>
+                    </span>
                 </div>
-                <p class="text-xl font-black text-titulo mt-1">{{ $stats['pacientes'] }}</p>
-                <span class="text-[10px] font-medium text-apoyo">{{ $esSuperAdmin ? 'Cobertura institucional' : 'Asignados en turno' }}</span>
+                <p class="rm-metric-value mt-1">{{ $stats['pacientes'] }}</p>
+                <div class="rm-metric-meta justify-between">
+                    <span>{{ $esSuperAdmin ? 'Institucional' : 'En turno' }}</span>
+                    <span class="font-semibold underline">Ver lista</span>
+                </div>
             </a>
 
             {{-- Alertas --}}
-            <a href="#zona-alertas" class="group rounded-xl border {{ $stats['alertas_activas'] > 0 ? 'border-red-200 bg-red-50/60 dark:bg-red-950/20' : 'border-borde bg-fondo-card/50' }} p-3 transition hover:border-red-400 block">
-                <div class="flex items-center justify-between {{ $stats['alertas_activas'] > 0 ? 'text-red-600' : 'text-apoyo' }}">
-                    <span class="text-[10px] font-bold uppercase tracking-wider">Alertas</span>
-                    <i class="ph-bold ph-bell-ringing text-sm"></i>
+            <a href="#zona-alertas" class="rm-card-metric rm-card-interactive border-l-4 border-l-[var(--rm-danger-action)] block cursor-pointer {{ $stats['alertas_activas'] > 0 ? 'ring-1 ring-rose-500/30' : '' }}">
+                <div class="flex items-center justify-between">
+                    <span class="rm-metric-label">Alertas</span>
+                    <span class="flex h-7 w-7 items-center justify-center rounded-lg {{ $stats['alertas_activas'] > 0 ? 'bg-rose-50 text-[var(--rm-danger-action)] dark:bg-rose-950/40' : 'bg-[var(--rm-surface-alt)] text-[var(--rm-text-muted)]' }}">
+                        <i class="ph-bold ph-bell-ringing text-sm"></i>
+                    </span>
                 </div>
-                <p class="text-xl font-black {{ $stats['alertas_activas'] > 0 ? 'text-red-600' : 'text-titulo' }} mt-1">{{ $stats['alertas_activas'] }}</p>
-                <span class="text-[10px] font-medium {{ $stats['alertas_activas'] > 0 ? 'text-red-700 dark:text-red-300' : 'text-apoyo' }}">
-                    {{ $stats['alertas_criticas'] > 0 ? $stats['alertas_criticas'] . ' críticas' : ($stats['alertas_activas'] > 0 ? 'Por atender' : 'Sin alertas') }}
-                </span>
+                <p class="rm-metric-value mt-1 {{ $stats['alertas_activas'] > 0 ? 'text-[var(--rm-danger-action)]' : '' }}">{{ $stats['alertas_activas'] }}</p>
+                <div class="rm-metric-meta">
+                    <span>{{ $stats['alertas_criticas'] > 0 ? $stats['alertas_criticas'] . ' críticas' : ($stats['alertas_activas'] > 0 ? 'Por atender' : 'Sin alertas') }}</span>
+                </div>
             </a>
 
             {{-- Medicación --}}
-            <a href="#zona-acciones" class="group rounded-xl border {{ $stats['medicacion_pendiente'] > 0 ? 'border-amber-200 bg-amber-50/60 dark:bg-amber-950/20' : 'border-borde bg-fondo-card/50' }} p-3 transition hover:border-amber-400 block">
-                <div class="flex items-center justify-between {{ $stats['medicacion_pendiente'] > 0 ? 'text-amber-600' : 'text-apoyo' }}">
-                    <span class="text-[10px] font-bold uppercase tracking-wider">Medicación</span>
-                    <i class="ph-bold ph-pill text-sm"></i>
+            <a href="#zona-acciones" class="rm-card-metric rm-card-interactive border-l-4 border-l-[var(--rm-warning-action)] block cursor-pointer">
+                <div class="flex items-center justify-between">
+                    <span class="rm-metric-label">Medicación</span>
+                    <span class="flex h-7 w-7 items-center justify-center rounded-lg {{ $stats['medicacion_pendiente'] > 0 ? 'bg-amber-50 text-[var(--rm-warning-action)] dark:bg-amber-950/40' : 'bg-[var(--rm-surface-alt)] text-[var(--rm-text-muted)]' }}">
+                        <i class="ph-bold ph-pill text-sm"></i>
+                    </span>
                 </div>
-                <p class="text-xl font-black {{ $stats['medicacion_pendiente'] > 0 ? 'text-amber-600' : 'text-titulo' }} mt-1">{{ $stats['medicacion_pendiente'] }}</p>
-                <span class="text-[10px] font-medium {{ $stats['medicacion_pendiente'] > 0 ? 'text-amber-700 dark:text-amber-300' : 'text-apoyo' }}">Dosis pendientes</span>
+                <p class="rm-metric-value mt-1 {{ $stats['medicacion_pendiente'] > 0 ? 'text-[var(--rm-warning-action)]' : '' }}">{{ $stats['medicacion_pendiente'] }}</p>
+                <div class="rm-metric-meta">
+                    <span>Dosis pendientes</span>
+                </div>
             </a>
 
             {{-- Tareas --}}
-            <a href="{{ route('admin.enfermeria.tareas') }}" class="group rounded-xl border {{ $stats['tareas_pendientes'] > 0 ? 'border-amber-200 bg-amber-50/60 dark:bg-amber-950/20' : 'border-borde bg-fondo-card/50' }} p-3 transition hover:border-amber-400 block">
-                <div class="flex items-center justify-between {{ $stats['tareas_pendientes'] > 0 ? 'text-amber-600' : 'text-apoyo' }}">
-                    <span class="text-[10px] font-bold uppercase tracking-wider">Tareas Plan</span>
-                    <i class="ph-bold ph-list-checks text-sm"></i>
+            <a href="{{ route('admin.enfermeria.tareas') }}" class="rm-card-metric rm-card-interactive border-l-4 border-l-[var(--rm-accent)] block cursor-pointer">
+                <div class="flex items-center justify-between">
+                    <span class="rm-metric-label">Tareas Plan</span>
+                    <span class="flex h-7 w-7 items-center justify-center rounded-lg bg-[var(--rm-surface-alt)] text-[var(--rm-accent)]">
+                        <i class="ph-bold ph-list-checks text-sm"></i>
+                    </span>
                 </div>
-                <p class="text-xl font-black {{ $stats['tareas_pendientes'] > 0 ? 'text-amber-600' : 'text-titulo' }} mt-1">{{ $stats['tareas_pendientes'] }}</p>
-                <span class="text-[10px] font-medium {{ $stats['tareas_vencidas'] > 0 ? 'text-red-600 font-bold' : ($stats['tareas_pendientes'] > 0 ? 'text-amber-700 dark:text-amber-300' : 'text-apoyo') }}">
-                    {{ $stats['tareas_vencidas'] > 0 ? $stats['tareas_vencidas'] . ' vencidas' : 'Por ejecutar' }}
-                </span>
+                <p class="rm-metric-value mt-1">{{ $stats['tareas_pendientes'] }}</p>
+                <div class="rm-metric-meta">
+                    <span>{{ $stats['tareas_vencidas'] > 0 ? $stats['tareas_vencidas'] . ' vencidas' : 'Por ejecutar' }}</span>
+                </div>
             </a>
 
             {{-- Seguimientos --}}
-            <a href="{{ route('admin.enfermeria.pacientes') }}" class="group rounded-xl border {{ $stats['seguimientos_faltantes'] > 0 ? 'border-blue-200 bg-blue-50/60 dark:bg-blue-950/20' : 'border-borde bg-fondo-card/50' }} p-3 transition hover:border-blue-400 block">
-                <div class="flex items-center justify-between {{ $stats['seguimientos_faltantes'] > 0 ? 'text-blue-600' : 'text-apoyo' }}">
-                    <span class="text-[10px] font-bold uppercase tracking-wider">Seguimientos</span>
-                    <i class="ph-bold ph-notebook text-sm"></i>
+            <a href="{{ route('admin.enfermeria.pacientes') }}" class="rm-card-metric rm-card-interactive border-l-4 border-l-[var(--rm-info-action)] block cursor-pointer">
+                <div class="flex items-center justify-between">
+                    <span class="rm-metric-label">Seguimientos</span>
+                    <span class="flex h-7 w-7 items-center justify-center rounded-lg bg-[var(--rm-surface-alt)] text-[var(--rm-info-action)]">
+                        <i class="ph-bold ph-notebook text-sm"></i>
+                    </span>
                 </div>
-                <p class="text-xl font-black {{ $stats['seguimientos_faltantes'] > 0 ? 'text-blue-600' : 'text-titulo' }} mt-1">{{ $stats['seguimientos_faltantes'] }}</p>
-                <span class="text-[10px] font-medium {{ $stats['seguimientos_faltantes'] > 0 ? 'text-blue-700 dark:text-blue-300' : 'text-apoyo' }}">Faltan en guardia</span>
+                <p class="rm-metric-value mt-1">{{ $stats['seguimientos_faltantes'] }}</p>
+                <div class="rm-metric-meta">
+                    <span>Faltan en guardia</span>
+                </div>
             </a>
 
             {{-- Pase de Turno --}}
-            <a href="{{ route('admin.enfermeria.pase-turno') }}" class="group rounded-xl border border-borde bg-fondo-card/50 p-3 transition hover:border-boton-principal hover:bg-fondo-card block">
-                <div class="flex items-center justify-between text-apoyo group-hover:text-boton-principal">
-                    <span class="text-[10px] font-bold uppercase tracking-wider">Pase Turno</span>
-                    <i class="ph-bold ph-arrows-left-right text-sm"></i>
+            <a href="{{ route('admin.enfermeria.pase-turno') }}" class="rm-card-metric rm-card-interactive border-l-4 border-l-[var(--rm-state-success-border)] block cursor-pointer">
+                <div class="flex items-center justify-between">
+                    <span class="rm-metric-label">Pase Turno</span>
+                    <span class="flex h-7 w-7 items-center justify-center rounded-lg bg-[var(--rm-surface-alt)] text-[var(--rm-state-success-border)]">
+                        <i class="ph-bold ph-arrows-left-right text-sm"></i>
+                    </span>
                 </div>
-                <p class="text-xs font-black uppercase text-boton-acento mt-2 truncate">{{ $stats['pase_estado'] }}</p>
-                <span class="text-[10px] font-medium text-apoyo">Relevo de guardia</span>
+                <p class="text-xs font-black uppercase text-[var(--rm-accent)] mt-2 truncate">{{ $stats['pase_estado'] }}</p>
+                <div class="rm-metric-meta">
+                    <span>Relevo guardia</span>
+                </div>
             </a>
         </div>
 
         @if($esSuperAdmin)
-            <div class="mt-3 grid grid-cols-2 gap-3 border-t border-borde pt-3 md:grid-cols-4">
+            <div class="mt-3 grid grid-cols-2 gap-3 border-t border-[var(--rm-border)] pt-3 md:grid-cols-4">
                 @foreach([
                     ['cuidados_registrados', 'Cuidados de hoy', 'ph-hand-heart', 'admin.enfermeria.registros'],
                     ['incidentes_abiertos', 'Incidentes abiertos', 'ph-warning-octagon', 'admin.enfermeria.registros'],
                     ['lesiones_activas', 'Lesiones activas', 'ph-bandaids', 'admin.enfermeria.registros'],
                     ['dispositivos_activos', 'Dispositivos activos', 'ph-first-aid-kit', 'admin.enfermeria.registros'],
                 ] as [$clave, $etiqueta, $icono, $ruta])
-                    <a href="{{ route($ruta) }}" class="rounded-xl border border-borde bg-fondo-card/50 p-3 transition hover:border-boton-principal">
-                        <div class="flex items-center justify-between text-apoyo">
+                    <a href="{{ route($ruta) }}" class="rounded-xl border border-[var(--rm-border)] bg-[var(--rm-surface-alt)]/60 p-3 transition hover:border-boton-principal">
+                        <div class="flex items-center justify-between text-[var(--rm-text-muted)]">
                             <span class="text-[10px] font-bold uppercase tracking-wider">{{ $etiqueta }}</span>
                             <i class="ph-bold {{ $icono }} text-sm"></i>
                         </div>
-                        <p class="mt-1 text-xl font-black text-titulo">{{ $stats[$clave] }}</p>
+                        <p class="mt-1 text-xl font-black text-[var(--rm-text-title)]">{{ $stats[$clave] }}</p>
                     </a>
                 @endforeach
             </div>
@@ -155,17 +176,17 @@
     </div>
 
     {{-- 3. SECCIÓN PRINCIPAL: PACIENTES PRIORITARIOS (TABLA INSTITUCIONAL, 3-5 RESIDENTES) --}}
-    <div class="rounded-2xl border border-borde bg-fondo-panel p-5 shadow-sm">
-        <div class="flex items-center justify-between border-b border-borde pb-3.5 mb-4">
+    <div class="rounded-2xl border border-[var(--rm-border)] bg-[var(--rm-surface)] p-5 shadow-sm">
+        <div class="flex items-center justify-between border-b border-[var(--rm-border)] pb-3.5 mb-4">
             <div class="flex items-center gap-2.5">
                 <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-red-50 text-red-600 dark:bg-red-950/30">
                     <i class="ph-bold ph-heart-straight text-lg"></i>
                 </div>
                 <div>
-                    <h2 class="text-sm font-black uppercase tracking-wide text-titulo">
+                    <h2 class="text-sm font-black uppercase tracking-wide text-[var(--rm-text-title)]">
                         Pacientes Prioritarios
                     </h2>
-                    <p class="text-xs text-apoyo">Residentes con alertas activas o acciones inmediatas requeridas</p>
+                    <p class="text-xs text-[var(--rm-text-muted)]">Residentes con alertas activas o acciones inmediatas requeridas</p>
                 </div>
             </div>
             <a href="{{ route('admin.enfermeria.pacientes') }}" class="text-xs font-bold text-boton-principal hover:underline flex items-center gap-1">
@@ -175,16 +196,16 @@
         </div>
 
         @if($pacientesPrioritarios->isEmpty())
-            <div class="rounded-xl border border-dashed border-borde bg-fondo-card/20 p-6 text-center">
+            <div class="rounded-xl border border-dashed border-[var(--rm-border)] bg-[var(--rm-surface-alt)]/20 p-6 text-center">
                 <i class="ph-bold ph-check-circle text-2xl text-emerald-600 mb-1"></i>
-                <p class="text-xs font-bold text-titulo">No hay pacientes con prioridades críticas en este turno</p>
-                <p class="text-[11px] text-apoyo">Todos los residentes asignados se encuentran con signos estables y tareas al día.</p>
+                <p class="text-xs font-bold text-[var(--rm-text-title)]">No hay pacientes con prioridades críticas en este turno</p>
+                <p class="text-[11px] text-[var(--rm-text-muted)]">Todos los residentes asignados se encuentran con signos estables y tareas al día.</p>
             </div>
         @else
-            <div class="overflow-x-auto">
-                <table class="w-full text-left text-xs">
+            <div class="rm-table-container">
+                <table class="rm-table text-xs">
                     <thead>
-                        <tr class="border-b border-borde bg-fondo-card/40 text-[10px] font-black uppercase tracking-wider text-apoyo">
+                        <tr class="rm-table-header">
                             <th class="px-3.5 py-2.5">Paciente</th>
                             <th class="px-3.5 py-2.5">Habitación / Cama</th>
                             <th class="px-3.5 py-2.5">Estado</th>
@@ -200,19 +221,19 @@
                                 $estado = $item['estado'];
                                 $proxima = $item['proxima_accion'];
                             @endphp
-                            <tr class="hover:bg-fondo-card/30 transition">
+                            <tr class="rm-table-row">
                                 {{-- Paciente --}}
                                 <td class="px-3.5 py-3">
                                     <div class="flex items-center gap-2.5">
-                                        <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-fondo-card border border-borde font-bold text-titulo text-xs">
+                                        <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--rm-surface-alt)] border border-[var(--rm-border)] font-bold text-[var(--rm-text-title)] text-xs">
                                             {{ substr($p->nombres, 0, 1) }}{{ substr($p->ap_paterno, 0, 1) }}
                                         </div>
                                         <div>
-                                            <a href="{{ route('admin.enfermeria.pacientes.ficha', $p->cod_am) }}" class="font-bold text-titulo hover:text-boton-principal transition">
+                                            <a href="{{ route('admin.enfermeria.pacientes.ficha', $p->cod_am) }}" class="font-bold text-[var(--rm-text-title)] hover:text-boton-principal transition">
                                                 {{ $p->nombres }} {{ $p->ap_paterno }}
                                             </a>
-                                            <div class="text-[10px] text-apoyo">
-                                                <span>{{ $p->cod_am }}</span>
+                                            <div class="text-[10px] text-[var(--rm-text-muted)]">
+                                                <span>{{ $p->ci ? 'CI '.$p->ci : 'Documento no registrado' }}</span>
                                                 @if($p->fecha_nacimiento)
                                                     <span>· {{ \Carbon\Carbon::parse($p->fecha_nacimiento)->age }} años</span>
                                                 @endif
@@ -223,11 +244,11 @@
 
                                 {{-- Habitación / Cama --}}
                                 <td class="px-3.5 py-3">
-                                    <span class="inline-flex items-center gap-1 font-semibold text-parrafo">
-                                        <i class="ph-bold ph-bed text-apoyo"></i>
-                                        <span>{{ $p->habitacion->codigo ?? 'Sin hab.' }}</span>
+                                    <span class="inline-flex items-center gap-1 font-semibold text-[var(--rm-text-body)]">
+                                        <i class="ph-bold ph-bed text-[var(--rm-text-muted)]"></i>
+                                        <span>{{ $p->habitacion_texto }}</span>
                                         @if($p->cama)
-                                            <span class="text-apoyo font-normal">(Cama {{ $p->cama->numero ?? $p->cama->codigo ?? '1' }})</span>
+                                            <span class="text-[var(--rm-text-muted)] font-normal">({{ $p->cama_texto }})</span>
                                         @endif
                                     </span>
                                 </td>
@@ -254,8 +275,8 @@
 
                                 {{-- Próxima acción --}}
                                 <td class="px-3.5 py-3">
-                                    <div class="flex items-center gap-1.5 max-w-xs truncate text-parrafo">
-                                        <i class="ph-bold {{ $proxima['icono'] }} text-sm shrink-0 text-apoyo"></i>
+                                    <div class="flex items-center gap-1.5 max-w-xs truncate text-[var(--rm-text-body)]">
+                                        <i class="ph-bold {{ $proxima['icono'] }} text-sm shrink-0 text-[var(--rm-text-muted)]"></i>
                                         <span class="truncate font-medium">{{ $proxima['texto'] }}</span>
                                     </div>
                                 </td>
@@ -268,7 +289,7 @@
                                             <span>{{ $item['alertas_count'] }} {{ $item['alerta_max'] ?? 'activa' }}</span>
                                         </span>
                                     @else
-                                        <span class="text-[10px] font-medium text-apoyo">Sin alertas</span>
+                                        <span class="text-[10px] font-medium text-[var(--rm-text-muted)]">Sin alertas</span>
                                     @endif
                                 </td>
 
@@ -296,36 +317,36 @@
     {{-- 4. SEGUNDA ZONA: DOS COLUMNAS (PRÓXIMAS ACCIONES DEL TURNO VS ALERTAS RECIENTES) --}}
     <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
         {{-- Columna Izquierda: Próximas acciones del turno --}}
-        <div id="zona-acciones" class="rounded-2xl border border-borde bg-fondo-panel p-5 shadow-sm space-y-4">
-            <div class="flex items-center justify-between border-b border-borde pb-3">
+        <div id="zona-acciones" class="rm-card rm-card-glass p-4 sm:p-5 rounded-2xl border border-[var(--rm-border)] space-y-4">
+            <div class="flex items-center justify-between border-b border-[var(--rm-border)] pb-3">
                 <div class="flex items-center gap-2.5">
                     <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-50 text-amber-600 dark:bg-amber-950/30">
                         <i class="ph-bold ph-clock-countdown text-lg"></i>
                     </div>
                     <div>
-                        <h2 class="text-sm font-black uppercase tracking-wide text-titulo">
+                        <h2 class="text-sm font-black uppercase tracking-wide text-[var(--rm-text-title)]">
                             Próximas Acciones del Turno
                         </h2>
-                        <p class="text-xs text-apoyo">Medicación y tareas programadas por ejecutar</p>
+                        <p class="text-xs text-[var(--rm-text-muted)]">Medicación y tareas programadas por ejecutar</p>
                     </div>
                 </div>
-                <span class="rounded-full bg-fondo-card border border-borde px-2.5 py-0.5 text-[10px] font-bold text-apoyo">
+                <span class="rounded-full bg-[var(--rm-surface-alt)] border border-[var(--rm-border)] px-2.5 py-0.5 text-[10px] font-bold text-[var(--rm-text-muted)]">
                     {{ $proximasAcciones->count() }} inmediatas
                 </span>
             </div>
 
             @if($proximasAcciones->isEmpty())
-                <div class="rounded-xl border border-dashed border-borde bg-fondo-card/20 p-6 text-center">
+                <div class="rounded-xl border border-dashed border-[var(--rm-border)] bg-[var(--rm-surface-alt)]/20 p-6 text-center">
                     <i class="ph-bold ph-check-circle text-2xl text-emerald-600 mb-1"></i>
-                    <p class="text-xs font-bold text-titulo">Sin acciones pendientes en este bloque</p>
-                    <p class="text-[11px] text-apoyo">Todas las tomas y tareas programadas han sido registradas.</p>
+                    <p class="text-xs font-bold text-[var(--rm-text-title)]">Sin acciones pendientes en este bloque</p>
+                    <p class="text-[11px] text-[var(--rm-text-muted)]">Todas las tomas y tareas programadas han sido registradas.</p>
                 </div>
             @else
                 <div class="space-y-2.5">
                     @foreach($proximasAcciones as $accion)
-                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-xl border border-borde bg-fondo-card/40 p-3 hover:bg-fondo-card/70 transition">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-xl border border-[var(--rm-border)] bg-[var(--rm-surface-alt)]/40 p-3 hover:bg-[var(--rm-surface-alt)]/70 transition">
                             <div class="flex items-start gap-2.5">
-                                <span class="font-mono text-xs font-black rounded-lg bg-fondo-panel border border-borde px-2 py-1 text-titulo shrink-0 mt-0.5">
+                                <span class="font-mono text-xs font-black rounded-lg bg-[var(--rm-surface)] border border-[var(--rm-border)] px-2 py-1 text-[var(--rm-text-title)] shrink-0 mt-0.5">
                                     {{ $accion['hora'] }}
                                 </span>
                                 <div class="space-y-0.5">
@@ -339,17 +360,17 @@
                                                 Tarea
                                             </span>
                                         @endif
-                                        <a href="{{ route('admin.enfermeria.pacientes.ficha', $accion['paciente']->cod_am) }}" class="text-xs font-bold text-titulo hover:text-boton-principal">
+                                        <a href="{{ route('admin.enfermeria.pacientes.ficha', $accion['paciente']->cod_am) }}" class="text-xs font-bold text-[var(--rm-text-title)] hover:text-boton-principal">
                                             {{ $accion['paciente']->nombres }} {{ $accion['paciente']->ap_paterno }}
                                         </a>
-                                        <span class="text-[10px] text-apoyo">
-                                            (Hab. {{ $accion['paciente']->habitacion->codigo ?? 'N/A' }})
+                                        <span class="text-[10px] text-[var(--rm-text-muted)]">
+                                            ({{ $accion['paciente']->habitacion_texto }})
                                         </span>
                                     </div>
-                                    <p class="text-xs font-medium text-parrafo">
+                                    <p class="text-xs font-medium text-[var(--rm-text-body)]">
                                         {{ $accion['titulo'] }}
                                     </p>
-                                    <p class="text-[10px] text-apoyo">
+                                    <p class="text-[10px] text-[var(--rm-text-muted)]">
                                         {{ $accion['detalle'] }}
                                     </p>
                                 </div>
@@ -357,11 +378,11 @@
 
                             <div class="flex items-center gap-1.5 shrink-0 self-end sm:self-center">
                                 @if($accion['tipo'] === 'MEDICACION')
-                                    <button wire:click="administrarMed('{{ $accion['item_med']['medicacion']->cod_med_adulto }}', '{{ $accion['paciente']->cod_am }}')" class="rm-btn-primary px-2.5 py-1 text-[11px] font-bold">
+                                    <button wire:click="administrarMed('{{ $accion['item_med']['medicacion']->cod_med_adulto }}', '{{ $accion['paciente']->cod_am }}', '{{ $accion['hora'] }}')" class="rm-btn-primary px-2.5 py-1 text-[11px] font-bold">
                                         <i class="ph-bold ph-check"></i>
                                         <span>Administrar</span>
                                     </button>
-                                    <button wire:click="abrirOmitirMed('{{ $accion['item_med']['medicacion']->cod_med_adulto }}', '{{ $accion['paciente']->cod_am }}')" class="rm-btn-secondary px-2 py-1 text-[11px] font-bold text-amber-700 hover:text-amber-800" title="Omitir toma">
+                                    <button wire:click="abrirOmitirMed('{{ $accion['item_med']['medicacion']->cod_med_adulto }}', '{{ $accion['paciente']->cod_am }}', '{{ $accion['hora'] }}')" class="rm-btn-secondary px-2 py-1 text-[11px] font-bold text-amber-700 hover:text-amber-800" title="Omitir toma">
                                         <i class="ph-bold ph-x"></i>
                                     </button>
                                 @else
@@ -381,52 +402,52 @@
         </div>
 
         {{-- Columna Derecha: Alertas recientes --}}
-        <div id="zona-alertas" class="rounded-2xl border border-borde bg-fondo-panel p-5 shadow-sm space-y-4">
-            <div class="flex items-center justify-between border-b border-borde pb-3">
+        <div id="zona-alertas" class="rm-card rm-card-glass p-4 sm:p-5 rounded-2xl border border-[var(--rm-border)] space-y-4">
+            <div class="flex items-center justify-between border-b border-[var(--rm-border)] pb-3">
                 <div class="flex items-center gap-2.5">
-                    <div class="flex h-8 w-8 items-center justify-center rounded-lg {{ $alertas->isNotEmpty() ? 'bg-red-50 text-red-600 dark:bg-red-950/30' : 'bg-fondo-card text-apoyo' }}">
+                    <div class="flex h-8 w-8 items-center justify-center rounded-lg {{ $alertas->isNotEmpty() ? 'bg-red-50 text-red-600 dark:bg-red-950/30' : 'bg-[var(--rm-surface-alt)] text-[var(--rm-text-muted)]' }}">
                         <i class="ph-bold ph-bell-ringing text-lg"></i>
                     </div>
                     <div>
-                        <h2 class="text-sm font-black uppercase tracking-wide text-titulo">
+                        <h2 class="text-sm font-black uppercase tracking-wide text-[var(--rm-text-title)]">
                             Alertas Recientes
                         </h2>
-                        <p class="text-xs text-apoyo">Notificaciones y alertas activas de tus residentes</p>
+                        <p class="text-xs text-[var(--rm-text-muted)]">Notificaciones y alertas activas de tus residentes</p>
                     </div>
                 </div>
-                <span class="rounded-full px-2.5 py-0.5 text-[10px] font-bold {{ $alertas->isNotEmpty() ? 'bg-red-100 text-red-700 border border-red-200' : 'bg-fondo-card text-apoyo border border-borde' }}">
+                <span class="rounded-full px-2.5 py-0.5 text-[10px] font-bold {{ $alertas->isNotEmpty() ? 'bg-red-100 text-red-700 border border-red-200' : 'bg-[var(--rm-surface-alt)] text-[var(--rm-text-muted)] border border-[var(--rm-border)]' }}">
                     {{ $alertas->count() }} activas
                 </span>
             </div>
 
             @if($alertas->isEmpty())
-                <div class="rounded-xl border border-dashed border-borde bg-fondo-card/20 p-6 text-center">
+                <div class="rounded-xl border border-dashed border-[var(--rm-border)] bg-[var(--rm-surface-alt)]/20 p-6 text-center">
                     <i class="ph-bold ph-shield-check text-2xl text-emerald-600 mb-1"></i>
-                    <p class="text-xs font-bold text-titulo">Sin alertas clínicas activas</p>
-                    <p class="text-[11px] text-apoyo">Todos los signos vitales y condiciones están bajo control.</p>
+                    <p class="text-xs font-bold text-[var(--rm-text-title)]">Sin alertas clínicas activas</p>
+                    <p class="text-[11px] text-[var(--rm-text-muted)]">Todos los signos vitales y condiciones están bajo control.</p>
                 </div>
             @else
                 <div class="space-y-2.5 max-h-[380px] overflow-y-auto pr-1">
                     @foreach($alertas as $alerta)
-                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-xl border p-3 transition {{ $alerta->nivel === 'CRITICO' ? 'border-red-300 bg-red-50/50 dark:bg-red-950/20' : ($alerta->nivel === 'ALTO' ? 'border-amber-300 bg-amber-50/40 dark:bg-amber-950/20' : 'border-borde bg-fondo-card/40') }}">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-xl border p-3 transition {{ $alerta->nivel === 'CRITICO' ? 'border-red-300 bg-red-50/50 dark:bg-red-950/20' : ($alerta->nivel === 'ALTO' ? 'border-amber-300 bg-amber-50/40 dark:bg-amber-950/20' : 'border-[var(--rm-border)] bg-[var(--rm-surface-alt)]/40') }}">
                             <div class="space-y-1">
                                 <div class="flex items-center gap-2">
                                     <span class="inline-flex shrink-0 items-center justify-center rounded px-1.5 py-0.5 text-[9px] font-black uppercase tracking-wider {{ $alerta->nivel === 'CRITICO' ? 'bg-red-600 text-white' : ($alerta->nivel === 'ALTO' ? 'bg-amber-500 text-white' : 'bg-blue-600 text-white') }}">
                                         {{ $alerta->nivel }}
                                     </span>
-                                    <h3 class="text-xs font-black text-titulo">
+                                    <h3 class="text-xs font-black text-[var(--rm-text-title)]">
                                         {{ $alerta->tipo_alerta }}
                                     </h3>
-                                    <span class="text-[10px] text-apoyo">·</span>
+                                    <span class="text-[10px] text-[var(--rm-text-muted)]">·</span>
                                     <a href="{{ route('admin.enfermeria.pacientes.ficha', $alerta->cod_am) }}?tab=alertas" class="text-xs font-bold text-boton-principal hover:underline">
                                         {{ $alerta->adultoMayor->nombres }} {{ $alerta->adultoMayor->ap_paterno }}
                                     </a>
                                 </div>
-                                <p class="text-xs text-parrafo">
+                                <p class="text-xs text-[var(--rm-text-body)]">
                                     {{ $alerta->descripcion }}
                                 </p>
-                                <p class="text-[10px] text-apoyo">
-                                    Hab. {{ $alerta->adultoMayor->habitacion->codigo ?? 'N/A' }} · Hace {{ $alerta->created_at->diffForHumans(null, true) }}
+                                <p class="text-[10px] text-[var(--rm-text-muted)]">
+                                    {{ $alerta->adultoMayor?->habitacion_texto ?? 'Habitación no asignada' }} · Hace {{ $alerta->created_at->diffForHumans(null, true) }}
                                 </p>
                             </div>
 
@@ -456,145 +477,133 @@
     {{-- 5. MÁXIMO 2 GRÁFICAS ÚTILES (DATOS REALES) --}}
     <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
         {{-- Gráfica 1: Cumplimiento del turno (% tareas y seguimientos) --}}
-        <div class="rounded-2xl border border-borde bg-fondo-panel p-5 shadow-sm flex flex-col justify-between">
+        {{-- Gráfica 1: Cumplimiento del turno operativo (Design System Translúcido Grueso) --}}
+        <div class="rm-chart-card rm-chart-glass flex flex-col justify-between">
             <div>
-                <div class="flex items-center justify-between border-b border-borde pb-3 mb-3">
+                <div class="rm-chart-header border-b border-[var(--rm-border)] pb-3 mb-3">
                     <div class="flex items-center gap-2">
-                        <i class="ph-bold ph-chart-donut text-boton-principal text-base"></i>
-                        <h3 class="text-xs font-black uppercase tracking-wide text-titulo">
+                        <i class="ph-bold ph-chart-donut text-[var(--rm-primary)] text-base"></i>
+                        <h3 class="rm-chart-title">
                             Cumplimiento del Turno Operativo
                         </h3>
                     </div>
-                    <span class="rounded-full bg-fondo-card border border-borde px-2 py-0.5 text-[10px] font-black text-parrafo">
+                    <span class="rm-chart-kpi-badge">
                         {{ $cumplimientoTurno['porcentaje'] }}% completado
                     </span>
                 </div>
-                <p class="text-xs text-apoyo mb-3">Progreso consolidado de tareas y seguimientos diarios de la guardia</p>
+                <p class="rm-chart-subtitle mb-3">Progreso consolidado de tareas y seguimientos diarios de la guardia</p>
 
                 <div class="h-44 w-full relative flex items-center justify-center" wire:ignore x-data="{
-                    chart: null,
-                    init() {
-                        if (typeof window.Chart === 'undefined') return;
-                        const ctx = this.$refs.canvas.getContext('2d');
+                    render() {
+                        if (typeof window.RMCharts === 'undefined' || !window.RMCharts.presets) {
+                            setTimeout(() => this.render(), 80);
+                            return;
+                        }
+                        const sem = window.RMCharts.semanticColors();
                         const dataCompletada = {{ $cumplimientoTurno['completadas'] }};
                         const dataPendiente = {{ max(0, $cumplimientoTurno['total_acciones'] - $cumplimientoTurno['completadas']) }};
                         
-                        this.chart = new window.Chart(ctx, {
-                            type: 'doughnut',
-                            data: {
-                                labels: ['Realizadas', 'Pendientes'],
-                                datasets: [{
-                                    data: [dataCompletada, dataPendiente],
-                                    backgroundColor: ['#3F7D5A', '#E9A05F'],
-                                    borderWidth: 2,
-                                    borderColor: '#FFF8F1',
-                                    hoverOffset: 4
-                                }]
-                            },
-                            options: {
-                                responsive: true,
-                                maintainAspectRatio: false,
-                                cutout: '75%',
+                        const config = window.RMCharts.presets.doughnut(
+                            ['Realizadas', 'Pendientes'],
+                            [dataCompletada, dataPendiente],
+                            [sem.success, sem.warning],
+                            {
                                 plugins: {
-                                    datalabels: { display: false },
                                     legend: {
+                                        display: true,
                                         position: 'bottom',
                                         labels: { boxWidth: 10, font: { size: 10, weight: 'bold' }, padding: 12 }
-                                    },
-                                    tooltip: {
-                                        padding: 8,
-                                        cornerRadius: 8,
                                     }
                                 }
                             }
-                        });
+                        );
+
+                        window.RMCharts.init('dashboard_turno_cumplimiento', this.$refs.canvas, config, () => this.render());
+                    },
+                    init() {
+                        this.$nextTick(() => this.render());
+                        window.RMCharts?.onThemeChange(() => this.render());
                     }
                 }">
                     <canvas x-ref="canvas" class="max-h-44"></canvas>
                     <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none pb-5">
-                        <span class="text-xl font-black text-titulo">{{ $cumplimientoTurno['porcentaje'] }}%</span>
-                        <span class="text-[9px] uppercase font-bold text-apoyo">Completitud</span>
+                        <span class="text-xl font-extrabold text-[var(--rm-text-title)]">{{ $cumplimientoTurno['porcentaje'] }}%</span>
+                        <span class="text-[9px] uppercase font-bold text-[var(--rm-text-muted)]">Completitud</span>
                     </div>
                 </div>
             </div>
 
-            <div class="grid grid-cols-2 gap-2 border-t border-borde pt-3 mt-3 text-center">
-                <div class="rounded-lg bg-fondo-card/50 p-2">
-                    <span class="text-[10px] font-bold text-apoyo block uppercase">Tareas Realizadas</span>
-                    <span class="text-xs font-black text-titulo">{{ $cumplimientoTurno['tareas_completadas'] }} / {{ $cumplimientoTurno['tareas_completadas'] + $cumplimientoTurno['tareas_pendientes'] }}</span>
+            <div class="grid grid-cols-2 gap-2 border-t border-[var(--rm-border)] pt-3 mt-3 text-center">
+                <div class="rounded-xl bg-[var(--rm-surface-alt)] p-2 border border-[var(--rm-border)]">
+                    <span class="text-[10px] font-bold text-[var(--rm-text-muted)] block uppercase">Tareas Realizadas</span>
+                    <span class="text-xs font-black text-[var(--rm-text-title)]">{{ $cumplimientoTurno['tareas_completadas'] }} / {{ $cumplimientoTurno['tareas_completadas'] + $cumplimientoTurno['tareas_pendientes'] }}</span>
                 </div>
-                <div class="rounded-lg bg-fondo-card/50 p-2">
-                    <span class="text-[10px] font-bold text-apoyo block uppercase">Seguimientos Listos</span>
-                    <span class="text-xs font-black text-titulo">{{ $cumplimientoTurno['seguimientos_completados'] }} / {{ $cumplimientoTurno['seguimientos_completados'] + $cumplimientoTurno['seguimientos_pendientes'] }}</span>
+                <div class="rounded-xl bg-[var(--rm-surface-alt)] p-2 border border-[var(--rm-border)]">
+                    <span class="text-[10px] font-bold text-[var(--rm-text-muted)] block uppercase">Seguimientos Listos</span>
+                    <span class="text-xs font-black text-[var(--rm-text-title)]">{{ $cumplimientoTurno['seguimientos_completados'] }} / {{ $cumplimientoTurno['seguimientos_completados'] + $cumplimientoTurno['seguimientos_pendientes'] }}</span>
                 </div>
             </div>
         </div>
 
         {{-- Gráfica 2: Distribución de pacientes (estable / vigilancia / atención) --}}
-        <div class="rounded-2xl border border-borde bg-fondo-panel p-5 shadow-sm flex flex-col justify-between">
+        <div class="rm-chart-card rm-chart-glass flex flex-col justify-between">
             <div>
-                <div class="flex items-center justify-between border-b border-borde pb-3 mb-3">
+                <div class="rm-chart-header border-b border-[var(--rm-border)] pb-3 mb-3">
                     <div class="flex items-center gap-2">
-                        <i class="ph-bold ph-chart-pie-slice text-boton-principal text-base"></i>
-                        <h3 class="text-xs font-black uppercase tracking-wide text-titulo">
+                        <i class="ph-bold ph-chart-pie-slice text-[var(--rm-primary)] text-base"></i>
+                        <h3 class="rm-chart-title">
                             Distribución Asistencial de Pacientes
                         </h3>
                     </div>
-                    <span class="rounded-full bg-fondo-card border border-borde px-2 py-0.5 text-[10px] font-black text-parrafo">
+                    <span class="rm-chart-kpi-badge">
                         {{ $stats['pacientes'] }} residentes
                     </span>
                 </div>
-                <p class="text-xs text-apoyo mb-3">Clasificación según nivel de criticidad y controles pendientes</p>
+                <p class="rm-chart-subtitle mb-3">Clasificación según nivel de criticidad y controles pendientes</p>
 
                 <div class="h-44 w-full relative flex items-center justify-center" wire:ignore x-data="{
-                    chart: null,
-                    init() {
-                        if (typeof window.Chart === 'undefined') return;
-                        const ctx = this.$refs.canvas.getContext('2d');
+                    render() {
+                        if (typeof window.RMCharts === 'undefined' || !window.RMCharts.presets) {
+                            setTimeout(() => this.render(), 80);
+                            return;
+                        }
+                        const sem = window.RMCharts.semanticColors();
                         const estable = {{ $distribucionPacientes['estable'] }};
                         const vigilancia = {{ $distribucionPacientes['vigilancia'] }};
                         const atencion = {{ $distribucionPacientes['atencion'] }};
                         
-                        this.chart = new window.Chart(ctx, {
-                            type: 'doughnut',
-                            data: {
-                                labels: ['Estables', 'Vigilancia', 'Atención Prioritaria'],
-                                datasets: [{
-                                    data: [estable, vigilancia, atencion],
-                                    backgroundColor: ['#3F7D5A', '#E9A05F', '#C9654E'],
-                                    borderWidth: 2,
-                                    borderColor: '#FFF8F1',
-                                    hoverOffset: 4
-                                }]
-                            },
-                            options: {
-                                responsive: true,
-                                maintainAspectRatio: false,
-                                cutout: '75%',
+                        const config = window.RMCharts.presets.doughnut(
+                            ['Estables', 'Vigilancia', 'Atención Prioritaria'],
+                            [estable, vigilancia, atencion],
+                            [sem.success, sem.warning, sem.danger],
+                            {
                                 plugins: {
-                                    datalabels: { display: false },
                                     legend: {
+                                        display: true,
                                         position: 'bottom',
                                         labels: { boxWidth: 10, font: { size: 10, weight: 'bold' }, padding: 12 }
-                                    },
-                                    tooltip: {
-                                        padding: 8,
-                                        cornerRadius: 8,
                                     }
                                 }
                             }
-                        });
+                        );
+
+                        window.RMCharts.init('dashboard_turno_distribucion', this.$refs.canvas, config, () => this.render());
+                    },
+                    init() {
+                        this.$nextTick(() => this.render());
+                        window.RMCharts?.onThemeChange(() => this.render());
                     }
                 }">
                     <canvas x-ref="canvas" class="max-h-44"></canvas>
                     <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none pb-5">
-                        <span class="text-xl font-black text-titulo">{{ $stats['pacientes'] }}</span>
-                        <span class="text-[9px] uppercase font-bold text-apoyo">Residentes</span>
+                        <span class="text-xl font-extrabold text-[var(--rm-text-title)]">{{ $stats['pacientes'] }}</span>
+                        <span class="text-[9px] uppercase font-bold text-[var(--rm-text-muted)]">Residentes</span>
                     </div>
                 </div>
             </div>
 
-            <div class="grid grid-cols-3 gap-2 border-t border-borde pt-3 mt-3 text-center">
+
+            <div class="grid grid-cols-3 gap-2 border-t border-[var(--rm-border)] pt-3 mt-3 text-center">
                 <div class="rounded-lg bg-emerald-50/70 dark:bg-emerald-950/20 p-2 border border-emerald-200">
                     <span class="text-[10px] font-bold text-emerald-700 dark:text-emerald-300 block uppercase">Estables</span>
                     <span class="text-xs font-black text-emerald-800 dark:text-emerald-200">{{ $distribucionPacientes['estable'] }}</span>
@@ -612,21 +621,21 @@
     </div>
 
     {{-- 6. AL FINAL: RESUMEN PEQUEÑO DEL PASE DE TURNO --}}
-    <div class="rounded-2xl border border-borde bg-fondo-panel p-5 shadow-sm">
+    <div class="rounded-2xl border border-[var(--rm-border)] bg-[var(--rm-surface)] p-5 shadow-sm">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div class="space-y-1">
                 <div class="flex items-center gap-2">
                     <span class="flex h-7 w-7 items-center justify-center rounded-lg bg-boton-principal/10 text-boton-principal">
                         <i class="ph-bold ph-arrows-left-right text-sm"></i>
                     </span>
-                    <h3 class="text-xs font-black uppercase tracking-wide text-titulo">
+                    <h3 class="text-xs font-black uppercase tracking-wide text-[var(--rm-text-title)]">
                         Resumen del Pase de Guardia
                     </h3>
-                    <span class="rounded-md border border-borde bg-fondo-card px-2 py-0.5 text-[10px] font-black uppercase text-boton-acento">
+                    <span class="rounded-md border border-[var(--rm-border)] bg-[var(--rm-surface-alt)] px-2 py-0.5 text-[10px] font-black uppercase text-boton-acento">
                         {{ $stats['pase_estado'] }}
                     </span>
                 </div>
-                <p class="text-xs text-parrafo">
+                <p class="text-xs text-[var(--rm-text-body)]">
                     @if($paseTurnoHoy)
                         Relevo registrado de <strong>{{ $paseTurnoHoy->enfermeroSaliente->name ?? 'Enfermero(a)' }}</strong> hacia <strong>{{ $paseTurnoHoy->enfermeroEntrante->name ?? 'Por confirmar' }}</strong>.
                         @if($paseTurnoHoy->requiere_vigilancia_especial)
@@ -652,11 +661,11 @@
     {{-- Modal Omitir Tarea --}}
     @if($modalOmitirTarea)
         <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-            <div class="w-full max-w-md rounded-2xl border border-borde bg-fondo-panel p-5 shadow-lg">
-                <h3 class="text-sm font-black text-titulo">Registrar Omisión de Tarea</h3>
-                <p class="text-xs text-apoyo mt-1">Indique el motivo asistencial por el cual no se ejecutó la tarea.</p>
+            <div class="w-full max-w-md rounded-2xl border border-[var(--rm-border)] bg-[var(--rm-surface)] p-5 shadow-lg">
+                <h3 class="text-sm font-black text-[var(--rm-text-title)]">Registrar Omisión de Tarea</h3>
+                <p class="text-xs text-[var(--rm-text-muted)] mt-1">Indique el motivo asistencial por el cual no se ejecutó la tarea.</p>
                 <div class="mt-4">
-                    <label class="text-xs font-bold text-parrafo block mb-1">Motivo de omisión *</label>
+                    <label class="text-xs font-bold text-[var(--rm-text-body)] block mb-1">Motivo de omisión *</label>
                     <textarea wire:model="motivoOmisionTarea" rows="3" class="rm-input w-full text-xs" placeholder="Ej: Residente dormido en horario programado..."></textarea>
                     @error('motivoOmisionTarea') <span class="text-xs text-red-500 font-bold mt-1 block">{{ $message }}</span> @enderror
                 </div>
@@ -671,11 +680,11 @@
     {{-- Modal Omitir Medicación --}}
     @if($modalOmitirMed)
         <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-            <div class="w-full max-w-md rounded-2xl border border-borde bg-fondo-panel p-5 shadow-lg">
-                <h3 class="text-sm font-black text-titulo">Registrar Omisión de Medicamento</h3>
-                <p class="text-xs text-apoyo mt-1">Justifique la razón clínica o de rechazo para no suministrar la dosis.</p>
+            <div class="w-full max-w-md rounded-2xl border border-[var(--rm-border)] bg-[var(--rm-surface)] p-5 shadow-lg">
+                <h3 class="text-sm font-black text-[var(--rm-text-title)]">Registrar Omisión de Medicamento</h3>
+                <p class="text-xs text-[var(--rm-text-muted)] mt-1">Justifique la razón clínica o de rechazo para no suministrar la dosis.</p>
                 <div class="mt-4">
-                    <label class="text-xs font-bold text-parrafo block mb-1">Motivo clínico de omisión *</label>
+                    <label class="text-xs font-bold text-[var(--rm-text-body)] block mb-1">Motivo clínico de omisión *</label>
                     <textarea wire:model="motivoOmisionMed" rows="3" class="rm-input w-full text-xs" placeholder="Ej: Rechazo explícito por náuseas, informado a médico..."></textarea>
                     @error('motivoOmisionMed') <span class="text-xs text-red-500 font-bold mt-1 block">{{ $message }}</span> @enderror
                 </div>
@@ -690,11 +699,11 @@
     {{-- Modal Atender Alerta --}}
     @if($modalAtenderAlerta)
         <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-            <div class="w-full max-w-md rounded-2xl border border-borde bg-fondo-panel p-5 shadow-lg">
-                <h3 class="text-sm font-black text-titulo">Registrar Atención de Alerta</h3>
-                <p class="text-xs text-apoyo mt-1">Describa la intervención o verificación inicial realizada.</p>
+            <div class="w-full max-w-md rounded-2xl border border-[var(--rm-border)] bg-[var(--rm-surface)] p-5 shadow-lg">
+                <h3 class="text-sm font-black text-[var(--rm-text-title)]">Registrar Atención de Alerta</h3>
+                <p class="text-xs text-[var(--rm-text-muted)] mt-1">Describa la intervención o verificación inicial realizada.</p>
                 <div class="mt-4">
-                    <label class="text-xs font-bold text-parrafo block mb-1">Acción tomada *</label>
+                    <label class="text-xs font-bold text-[var(--rm-text-body)] block mb-1">Acción tomada *</label>
                     <textarea wire:model="accionTomadaAlerta" rows="3" class="rm-input w-full text-xs" placeholder="Ej: Se acudió a habitación y se verificó saturación de O2..."></textarea>
                     @error('accionTomadaAlerta') <span class="text-xs text-red-500 font-bold mt-1 block">{{ $message }}</span> @enderror
                 </div>
@@ -709,11 +718,11 @@
     {{-- Modal Cerrar Alerta --}}
     @if($modalCerrarAlerta)
         <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-            <div class="w-full max-w-md rounded-2xl border border-borde bg-fondo-panel p-5 shadow-lg">
-                <h3 class="text-sm font-black text-titulo">Cerrar Alerta Clínica</h3>
-                <p class="text-xs text-apoyo mt-1">Registre el resultado final y la resolución de la condición clínica.</p>
+            <div class="w-full max-w-md rounded-2xl border border-[var(--rm-border)] bg-[var(--rm-surface)] p-5 shadow-lg">
+                <h3 class="text-sm font-black text-[var(--rm-text-title)]">Cerrar Alerta Clínica</h3>
+                <p class="text-xs text-[var(--rm-text-muted)] mt-1">Registre el resultado final y la resolución de la condición clínica.</p>
                 <div class="mt-4">
-                    <label class="text-xs font-bold text-parrafo block mb-1">Observación de Cierre *</label>
+                    <label class="text-xs font-bold text-[var(--rm-text-body)] block mb-1">Observación de Cierre *</label>
                     <textarea wire:model="observacionCierreAlerta" rows="3" class="rm-input w-full text-xs" placeholder="Ej: Parámetros estabilizados tras administración de medicación indicada..."></textarea>
                     @error('observacionCierreAlerta') <span class="text-xs text-red-500 font-bold mt-1 block">{{ $message }}</span> @enderror
                 </div>
@@ -728,51 +737,51 @@
     {{-- Modal Rápido de Signos Vitales --}}
     @if($modalSignos)
         <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-            <div class="w-full max-w-lg rounded-2xl border border-borde bg-fondo-panel p-5 shadow-lg">
-                <div class="flex items-center justify-between border-b border-borde pb-3">
+            <div class="w-full max-w-lg rounded-2xl border border-[var(--rm-border)] bg-[var(--rm-surface)] p-5 shadow-lg">
+                <div class="flex items-center justify-between border-b border-[var(--rm-border)] pb-3">
                     <div class="flex items-center gap-2">
                         <i class="ph-bold ph-heartbeat text-boton-principal text-lg"></i>
-                        <h3 class="text-sm font-black text-titulo">Control Rápido de Signos Vitales</h3>
+                        <h3 class="text-sm font-black text-[var(--rm-text-title)]">Control Rápido de Signos Vitales</h3>
                     </div>
-                    <button wire:click="$set('modalSignos', false)" class="text-apoyo hover:text-parrafo">
+                    <button wire:click="$set('modalSignos', false)" class="text-[var(--rm-text-muted)] hover:text-[var(--rm-text-body)]">
                         <i class="ph-bold ph-x text-base"></i>
                     </button>
                 </div>
-                <p class="text-xs text-apoyo mt-2">Registre los valores obtenidos en la valoración directa.</p>
+                <p class="text-xs text-[var(--rm-text-muted)] mt-2">Registre los valores obtenidos en la valoración directa.</p>
 
                 <div class="mt-4 grid grid-cols-2 gap-3">
                     <div>
-                        <label class="text-xs font-bold text-parrafo block mb-1">Presión Arterial (PA)</label>
+                        <label class="text-xs font-bold text-[var(--rm-text-body)] block mb-1">Presión Arterial (PA)</label>
                         <input type="text" wire:model="signoPresion" placeholder="120/80" class="rm-input w-full text-xs" />
                     </div>
                     <div>
-                        <label class="text-xs font-bold text-parrafo block mb-1">Frec. Cardaca (bpm)</label>
+                        <label class="text-xs font-bold text-[var(--rm-text-body)] block mb-1">Frec. Cardaca (bpm)</label>
                         <input type="number" wire:model="signoFC" placeholder="72" class="rm-input w-full text-xs" />
                     </div>
                     <div>
-                        <label class="text-xs font-bold text-parrafo block mb-1">Temperatura (°C)</label>
+                        <label class="text-xs font-bold text-[var(--rm-text-body)] block mb-1">Temperatura (°C)</label>
                         <input type="number" step="0.1" wire:model="signoTemp" placeholder="36.5" class="rm-input w-full text-xs" />
                     </div>
                     <div>
-                        <label class="text-xs font-bold text-parrafo block mb-1">Saturación SpO2 (%)</label>
+                        <label class="text-xs font-bold text-[var(--rm-text-body)] block mb-1">Saturación SpO2 (%)</label>
                         <input type="number" wire:model="signoSat" placeholder="96" class="rm-input w-full text-xs" />
                     </div>
                     <div>
-                        <label class="text-xs font-bold text-parrafo block mb-1">Glucemia (mg/dL)</label>
+                        <label class="text-xs font-bold text-[var(--rm-text-body)] block mb-1">Glucemia (mg/dL)</label>
                         <input type="number" step="0.1" wire:model="signoGlucosa" placeholder="95" class="rm-input w-full text-xs" />
                     </div>
                     <div>
-                        <label class="text-xs font-bold text-parrafo block mb-1">Dolor Escala EVA (0-10)</label>
+                        <label class="text-xs font-bold text-[var(--rm-text-body)] block mb-1">Dolor Escala EVA (0-10)</label>
                         <input type="number" min="0" max="10" wire:model="signoDolor" placeholder="0" class="rm-input w-full text-xs" />
                     </div>
                 </div>
 
                 <div class="mt-3">
-                    <label class="text-xs font-bold text-parrafo block mb-1">Observaciones</label>
+                    <label class="text-xs font-bold text-[var(--rm-text-body)] block mb-1">Observaciones</label>
                     <input type="text" wire:model="signoObservacion" placeholder="Opcional..." class="rm-input w-full text-xs" />
                 </div>
 
-                <div class="mt-5 flex justify-end gap-2 border-t border-borde pt-3">
+                <div class="mt-5 flex justify-end gap-2 border-t border-[var(--rm-border)] pt-3">
                     <button wire:click="$set('modalSignos', false)" class="rm-btn-secondary px-3.5 py-1.5 text-xs font-bold">Cancelar</button>
                     <button wire:click="guardarSignos" class="rm-btn-primary px-3.5 py-1.5 text-xs font-bold">Guardar Signos</button>
                 </div>
@@ -783,21 +792,21 @@
     {{-- Modal Rápido de Seguimiento --}}
     @if($modalSeguimiento)
         <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-            <div class="w-full max-w-lg rounded-2xl border border-borde bg-fondo-panel p-5 shadow-lg">
-                <div class="flex items-center justify-between border-b border-borde pb-3">
+            <div class="w-full max-w-lg rounded-2xl border border-[var(--rm-border)] bg-[var(--rm-surface)] p-5 shadow-lg">
+                <div class="flex items-center justify-between border-b border-[var(--rm-border)] pb-3">
                     <div class="flex items-center gap-2">
                         <i class="ph-bold ph-notebook text-boton-principal text-lg"></i>
-                        <h3 class="text-sm font-black text-titulo">Registro de Seguimiento Diario</h3>
+                        <h3 class="text-sm font-black text-[var(--rm-text-title)]">Registro de Seguimiento Diario</h3>
                     </div>
-                    <button wire:click="$set('modalSeguimiento', false)" class="text-apoyo hover:text-parrafo">
+                    <button wire:click="$set('modalSeguimiento', false)" class="text-[var(--rm-text-muted)] hover:text-[var(--rm-text-body)]">
                         <i class="ph-bold ph-x text-base"></i>
                     </button>
                 </div>
-                <p class="text-xs text-apoyo mt-2">Evolución durante el turno activo para el residente.</p>
+                <p class="text-xs text-[var(--rm-text-muted)] mt-2">Evolución durante el turno activo para el residente.</p>
 
                 <div class="mt-4 grid grid-cols-2 gap-3">
                     <div>
-                        <label class="text-xs font-bold text-parrafo block mb-1">Estado General</label>
+                        <label class="text-xs font-bold text-[var(--rm-text-body)] block mb-1">Estado General</label>
                         <select wire:model="segEstadoGeneral" class="rm-select w-full text-xs">
                             <option value="ESTABLE">Estable</option>
                             <option value="DELICADO">Delicado</option>
@@ -806,7 +815,7 @@
                         </select>
                     </div>
                     <div>
-                        <label class="text-xs font-bold text-parrafo block mb-1">Alimentación</label>
+                        <label class="text-xs font-bold text-[var(--rm-text-body)] block mb-1">Alimentación</label>
                         <select wire:model="segAlimentacion" class="rm-select w-full text-xs">
                             <option value="COMPLETA">Completa (100%)</option>
                             <option value="PARCIAL">Parcial (50-75%)</option>
@@ -815,7 +824,7 @@
                         </select>
                     </div>
                     <div>
-                        <label class="text-xs font-bold text-parrafo block mb-1">Movilidad</label>
+                        <label class="text-xs font-bold text-[var(--rm-text-body)] block mb-1">Movilidad</label>
                         <select wire:model="segMovilidad" class="rm-select w-full text-xs">
                             <option value="INDEPENDIENTE">Independiente</option>
                             <option value="ASISTIDA">Asistida</option>
@@ -824,7 +833,7 @@
                         </select>
                     </div>
                     <div>
-                        <label class="text-xs font-bold text-parrafo block mb-1">Sueño / Descanso</label>
+                        <label class="text-xs font-bold text-[var(--rm-text-body)] block mb-1">Sueño / Descanso</label>
                         <select wire:model="segSueno" class="rm-select w-full text-xs">
                             <option value="NORMAL">Normal / Reparador</option>
                             <option value="INTERRUMPIDO">Interrumpido</option>
@@ -835,22 +844,22 @@
                 </div>
 
                 <div class="mt-4 space-y-2">
-                    <label class="flex items-center gap-2 text-xs font-semibold text-parrafo cursor-pointer">
+                    <label class="flex items-center gap-2 text-xs font-semibold text-[var(--rm-text-body)] cursor-pointer">
                         <input type="checkbox" wire:model="segIncidente" class="rounded text-boton-acento" />
                         <span>Ocurrió un incidente (caída, desorientación severa, etc.)</span>
                     </label>
-                    <label class="flex items-center gap-2 text-xs font-semibold text-parrafo cursor-pointer">
+                    <label class="flex items-center gap-2 text-xs font-semibold text-[var(--rm-text-body)] cursor-pointer">
                         <input type="checkbox" wire:model="segRequiereMedico" class="rounded text-boton-acento" />
                         <span>Requiere valoración o revisión médica inmediata</span>
                     </label>
                 </div>
 
                 <div class="mt-3">
-                    <label class="text-xs font-bold text-parrafo block mb-1">Observaciones</label>
+                    <label class="text-xs font-bold text-[var(--rm-text-body)] block mb-1">Observaciones</label>
                     <textarea wire:model="segObservacion" rows="2" class="rm-input w-full text-xs" placeholder="Detalles de la guardia..."></textarea>
                 </div>
 
-                <div class="mt-5 flex justify-end gap-2 border-t border-borde pt-3">
+                <div class="mt-5 flex justify-end gap-2 border-t border-[var(--rm-border)] pt-3">
                     <button wire:click="$set('modalSeguimiento', false)" class="rm-btn-secondary px-3.5 py-1.5 text-xs font-bold">Cancelar</button>
                     <button wire:click="guardarSeguimiento" class="rm-btn-primary px-3.5 py-1.5 text-xs font-bold">Guardar Seguimiento</button>
                 </div>

@@ -51,6 +51,8 @@ class SignosVitalesAdulto extends Model
         'motivo_anulacion',
         'anulado_por',
         'fecha_anulacion',
+        'rectifica_a',
+        'motivo_rectificacion',
     ];
 
     protected $casts = [
@@ -106,6 +108,16 @@ class SignosVitalesAdulto extends Model
     public function anuladoPor()
     {
         return $this->belongsTo(User::class, 'anulado_por', 'cod_usu');
+    }
+
+    public function original()
+    {
+        return $this->belongsTo(self::class, 'rectifica_a', 'cod_signo');
+    }
+
+    public function rectificaciones()
+    {
+        return $this->hasMany(self::class, 'rectifica_a', 'cod_signo');
     }
 
     // ── Scopes ──────────────────────────────────────────────────

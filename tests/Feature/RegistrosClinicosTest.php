@@ -22,8 +22,18 @@ class RegistrosClinicosTest extends TestCase
     public function test_administracion_acepta_codigo_real_y_rechaza_medicacion_de_otro_adulto(): void
     {
         [, $adulto] = $this->contexto();
+        $enfermero = User::factory()->create(['estado' => 'ACTIVO']);
+        $enfermero->assignRole('ENFERMEROS');
+        $turno = \App\Models\TurnoEnfermeria::create(['orden' => 1, 'nombre' => 'Turno clínico', 'hora_inicio' => '00:00', 'hora_fin' => '23:59', 'estado' => 'ACTIVO']);
+        \App\Models\AsignacionTurnoAdulto::create([
+            'cod_am' => $adulto->cod_am, 'cod_turno' => $turno->cod_turno,
+            'cod_usu_enfermero' => $enfermero->cod_usu, 'fecha_inicio' => today(),
+            'estado' => 'ACTIVA', 'nivel_supervision' => 'ESTANDAR',
+        ]);
+        \App\Models\RecepcionTurno::create(['cod_turno' => $turno->cod_turno, 'cod_usuario' => $enfermero->cod_usu, 'fecha_hora_recepcion' => now()]);
+        $this->actingAs($enfermero);
         $otro = AdultoMayor::factory()->create(['cod_est_adul' => 'EST_001']);
-        $med = MedicacionAdulto::create(['cod_am' => $adulto->cod_am, 'nombre_medicamento' => 'Orden de prueba', 'dosis' => 'Según orden', 'frecuencia' => 'Diaria', 'fecha_inicio' => today()]);
+        $med = MedicacionAdulto::create(['cod_am' => $adulto->cod_am, 'nombre_medicamento' => 'Orden de prueba', 'dosis' => 'Según orden', 'via_administracion' => 'ORAL', 'frecuencia' => 'Diaria', 'hora_programada' => '08:00', 'fecha_inicio' => today(), 'estado' => 'ACTIVO']);
         $datos = ['cod_med_adulto' => $med->cod_med_adulto, 'fecha' => today()->format('Y-m-d'), 'hora_programada' => '08:00', 'administrado' => false, 'motivo_omision' => 'Rechazo registrado'];
         $this->post(route('admin.adultos-mayores.administracion-medicacion.store', $otro), $datos)->assertSessionHasErrors('cod_med_adulto');
         $this->assertDatabaseCount('administracion_medicacion', 0);

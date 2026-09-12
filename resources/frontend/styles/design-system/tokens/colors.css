@@ -1,0 +1,178 @@
+/* ============================================================
+   REMEMBERMIND DESIGN SYSTEM — TOKENS / COLORS
+   Fuente única de verdad de color institucional y clínico.
+   Todos los contrastes de texto y botones cumplen WCAG AA (>= 4.5:1).
+   ============================================================ */
+
+:root {
+    /* ============================================================
+       1. APP & LAYOUT (Lienzo principal)
+       ============================================================ */
+    --rm-bg-app: #F4ECE3;
+    --rm-bg-layout: #EFE4D8;
+
+    /* ============================================================
+       2. SUPERFICIES (Jerarquía cálida de alto contraste)
+       Evita el blanco plano; utiliza capas perceptibles.
+       ============================================================ */
+    --rm-surface: #FBF7F2;          /* Cards y contenedores base */
+    --rm-surface-soft: #F7F0E9;     /* Paneles intermedios y toolbars */
+    --rm-surface-alt: #F2E8DD;      /* Bloques internos y celdas agrupadas */
+    --rm-surface-strong: #EEE2D4;   /* Fondos activos y cabeceras contrastadas */
+
+    /* ============================================================
+       3. BORDES (Delimitación sutil y definida)
+       ============================================================ */
+    --rm-border: #E3D6C8;           /* Borde estándar estructural */
+    --rm-border-soft: #EADFD3;      /* Separadores tenues internos */
+    --rm-border-hover: #D5C4B1;     /* Borde interactivo al pasar cursor */
+    --rm-border-strong: #CBB8A3;    /* Delimitación de alto énfasis */
+
+    /* ============================================================
+       4. TEXTOS CON CONTRASTE WCAG AA PROBADO (>= 4.5:1)
+       ============================================================ */
+    --rm-text-title: #344563;        /* Contraste: 7.56:1 a 9.04:1 sobre superficies */
+    --rm-text-body: #4A5A78;         /* Contraste: 5.44:1 a 6.51:1 sobre superficies */
+    --rm-text-muted: #556276;        /* Contraste: 4.85:1 a 5.80:1 sobre superficies (WCAG AA) */
+    --rm-text-soft: #59667A;         /* Contraste: 4.57:1 a 5.46:1 sobre superficies (WCAG AA) */
+    --rm-text-inverse: #FFFFFF;      /* Texto sobre botones filled de acción */
+
+    /* ============================================================
+       5. ACCIONES PRIMARIAS (Azul institucional)
+       ============================================================ */
+    --rm-primary: #344D7A;           /* Botón primario: 8.44:1 vs #FFFFFF */
+    --rm-primary-hover: #2D4268;
+    --rm-primary-soft: #E8EEF8;
+
+    /* ============================================================
+       6. ACENTO (Coral cálido)
+       --rm-accent: Identidad, badges, iconos, gráficos y bordes.
+       --rm-accent-action: Botones filled accesibles con texto blanco (4.57:1).
+       ============================================================ */
+    --rm-accent: #E58C6C;
+    --rm-accent-hover: #D97A58;
+    --rm-accent-soft: #F7E1D9;
+
+    --rm-accent-action: #B35E43;
+    --rm-accent-action-hover: #9E4E36;
+
+    /* ============================================================
+       7. ESTADOS SEMÁNTICOS (Identidad vs Acción accesible)
+       ============================================================ */
+    /* Success: Identidad (#6F9D7B) vs Acción con texto blanco (#4F7E5B: 4.70:1) */
+    --rm-success: #6F9D7B;
+    --rm-success-hover: #5D8968;
+    --rm-success-soft: #E7F3EA;
+    --rm-success-action: #4F7E5B;
+    --rm-success-action-hover: #426A4D;
+
+    /* Warning: Identidad (#C99A4B) */
+    --rm-warning: #C99A4B;
+    --rm-warning-hover: #B4853A;
+    --rm-warning-soft: #FAF1DE;
+
+    /* Danger: Identidad (#C8645A) vs Acción destructiva con texto blanco (#A7443B: 5.94:1) */
+    --rm-danger: #C8645A;
+    --rm-danger-hover: #B35248;
+    --rm-danger-soft: #F8E3E0;
+    --rm-danger-action: #A7443B;
+    --rm-danger-action-hover: #913931;
+
+    /* Info: Identidad (#778EAD) vs Acción con texto blanco (#5F7899: 4.53:1) */
+    --rm-info: #778EAD;
+    --rm-info-hover: #637A99;
+    --rm-info-soft: #E9EEF6;
+    --rm-info-action: #5F7899;
+    --rm-info-action-hover: #4F6582;
+    /* ============================================================
+       8. PALETA CATEGÓRICA DE GRÁFICOS (10 Colores Diferenciables)
+       Distingue categorías asistenciales sin implicar severidad.
+       ============================================================ */
+    --rm-chart-1: #344D7A;   /* Azul naval */
+    --rm-chart-2: #D9745B;   /* Terracota cálido */
+    --rm-chart-3: #5F9271;   /* Verde salvia */
+    --rm-chart-4: #C9913E;   /* Ocre / Ámbar dorado */
+    --rm-chart-5: #7565A8;   /* Lavanda / Amatista */
+    --rm-chart-6: #4E8CA6;   /* Azul cerúleo */
+    --rm-chart-7: #A85C73;   /* Rosa viejo / Berenjena */
+    --rm-chart-8: #7B879A;   /* Pizarra / Gris acero */
+    --rm-chart-9: #9A744E;   /* Siena / Madera cálida */
+    --rm-chart-10: #568A80;  /* Verde azulado / Eucalipto */
+}
+
+/* ============================================================
+   MODO OSCURO INSTITUCIONAL (WCAG AA)
+   Activación mediante clase .dark o [data-theme="dark"]
+   ============================================================ */
+.dark,
+[data-theme="dark"] {
+    /* 1. APP & LAYOUT */
+    --rm-bg-app: #0F172A;
+    --rm-bg-layout: #131D24;
+
+    /* 2. SUPERFICIES (Capas oscuras traslúcidas cálidas) */
+    --rm-surface: #18222A;
+    --rm-surface-soft: #1D2A34;
+    --rm-surface-alt: #22323E;
+    --rm-surface-strong: #273A48;
+
+    /* 3. BORDES */
+    --rm-border: rgba(255, 255, 255, 0.12);
+    --rm-border-soft: rgba(255, 255, 255, 0.08);
+    --rm-border-hover: rgba(255, 255, 255, 0.20);
+    --rm-border-strong: rgba(255, 255, 255, 0.25);
+
+    /* 4. TEXTOS CON ALTO CONTRASTE */
+    --rm-text-title: #F8FAFC;
+    --rm-text-body: #E2E8F0;
+    --rm-text-muted: #94A3B8;
+    --rm-text-soft: #CBD5E1;
+    --rm-text-inverse: #0F172A;
+
+    /* 5. ACCIONES PRIMARIAS */
+    --rm-primary: #3B82F6;
+    --rm-primary-hover: #2563EB;
+    --rm-primary-soft: rgba(59, 130, 246, 0.15);
+
+    /* 6. ACENTO */
+    --rm-accent: #F97316;
+    --rm-accent-hover: #EA580C;
+    --rm-accent-soft: rgba(249, 115, 22, 0.15);
+    --rm-accent-action: #F97316;
+    --rm-accent-action-hover: #EA580C;
+
+    /* 7. ESTADOS SEMÁNTICOS */
+    --rm-success: #10B981;
+    --rm-success-hover: #059669;
+    --rm-success-soft: rgba(16, 185, 129, 0.15);
+    --rm-success-action: #10B981;
+    --rm-success-action-hover: #059669;
+
+    --rm-warning: #F59E0B;
+    --rm-warning-hover: #D97706;
+    --rm-warning-soft: rgba(245, 158, 11, 0.15);
+
+    --rm-danger: #EF4444;
+    --rm-danger-hover: #DC2626;
+    --rm-danger-soft: rgba(239, 68, 68, 0.15);
+    --rm-danger-action: #EF4444;
+    --rm-danger-action-hover: #DC2626;
+
+    --rm-info: #38BDF8;
+    --rm-info-hover: #0284C7;
+    --rm-info-soft: rgba(56, 189, 248, 0.15);
+    --rm-info-action: #38BDF8;
+    --rm-info-action-hover: #0284C7;
+
+    /* 8. PALETA GRÁFICOS OSCURA */
+    --rm-chart-1: #60A5FA;
+    --rm-chart-2: #FB923C;
+    --rm-chart-3: #34D399;
+    --rm-chart-4: #FBBF24;
+    --rm-chart-5: #A78BFA;
+    --rm-chart-6: #38BDF8;
+    --rm-chart-7: #F472B6;
+    --rm-chart-8: #94A3B8;
+    --rm-chart-9: #D97706;
+    --rm-chart-10: #2DD4BF;
+}

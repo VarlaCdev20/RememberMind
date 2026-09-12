@@ -201,8 +201,8 @@
                                     <p class="text-xs font-bold text-titulo truncate">
                                         {{ $alerta->adultoMayor?->nombres }} {{ $alerta->adultoMayor?->ap_paterno }} {{ $alerta->adultoMayor?->ap_materno }}
                                     </p>
-                                    <p class="text-[10px] text-apoyo font-mono font-semibold">
-                                        ID: {{ $alerta->cod_am }}
+                                    <p class="text-[10px] text-apoyo font-semibold">
+                                        {{ $alerta->adultoMayor?->habitacion?->nombre ?? ($alerta->adultoMayor?->habitacion?->codigo ? 'Habitación '.$alerta->adultoMayor->habitacion->codigo : 'Ubicación sin asignar') }}
                                     </p>
                                 </div>
                             </div>

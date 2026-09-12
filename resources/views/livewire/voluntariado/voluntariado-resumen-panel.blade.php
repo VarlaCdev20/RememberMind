@@ -145,13 +145,13 @@
  {{ $asignacion['estado'] }}
  </span>
  </div>
- <p class="mt-2 truncate text-sm font-bold text-titulo">{{ $asignacion['VOLUNTARIO'] }}</p>
+ <p class="mt-2 truncate text-sm font-bold text-titulo">{{ $asignacion['voluntario'] }}</p>
  <p class="mt-1 text-xs font-bold leading-relaxed text-apoyo">
  {{ $asignacion['adulto'] }} · {{ $asignacion['area'] }}
  </p>
  </div>
  <span class="shrink-0 rounded-xl border border-borde-suave bg-fondo-panel px-3 py-2 text-[10px] font-bold uppercase tracking-wider text-apoyo">
- {{ $asignacion['codigo'] }}
+ {{ $asignacion['fecha'] }}
  </span>
  </div>
  @empty

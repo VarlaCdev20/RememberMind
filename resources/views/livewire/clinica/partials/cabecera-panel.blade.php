@@ -28,7 +28,7 @@
  <p class="rm-section-subtitle">
  {{ $adulto->nombres }} {{ $adulto->ap_paterno }}
  <span class="mx-1.5 text-boton-acento">•</span>
- <span class="font-black text-boton-acento">{{ $adulto->cod_am }}</span>
+ <span class="font-black text-boton-acento">{{ $adulto->ci ? 'CI '.$adulto->ci : 'Documento no registrado' }}</span>
  </p>
  @if(!empty($subtitulo))
  <p class="mt-0.5 text-xs font-bold text-titulo/45">{{ $subtitulo }}</p>

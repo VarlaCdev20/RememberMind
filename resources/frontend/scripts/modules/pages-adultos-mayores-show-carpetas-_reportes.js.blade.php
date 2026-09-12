@@ -102,7 +102,7 @@
  },
  options: {
  ...defaults,
- cutout: '60%',
+ cutout: '58%', animation: { duration: 1000, easing: 'easeOutQuart', animateRotate: true, animateScale: true },
  plugins: {
  ...defaults.plugins,
  datalabels: {
@@ -169,7 +169,7 @@
  backgroundColor: 'rgba(168,107,60,0.75)',
  borderColor: '#A86B3C',
  borderWidth: 1,
- borderRadius: 5,
+ borderRadius: 8, barPercentage: 0.86,
  },
  {
  label: 'Puntaje Máximo',
@@ -177,7 +177,7 @@
  backgroundColor: 'rgba(203,187,170,0.4)',
  borderColor: '#CBBBAA',
  borderWidth: 1,
- borderRadius: 5,
+ borderRadius: 8, barPercentage: 0.86,
  },
  ],
  },

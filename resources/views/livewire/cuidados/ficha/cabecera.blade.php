@@ -1,5 +1,5 @@
 {{-- CABECERA INSTITUCIONAL CLÍNICA COMPACTA Y ACCIONES PRINCIPALES --}}
-<div class="rounded-3xl border border-borde bg-fondo-panel p-5 shadow-panel">
+<div class="rounded-3xl border rm-page-header-card p-4 sm:p-5 shadow-sm">
     <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         {{-- Datos Primarios del Residente --}}
         <div class="flex items-start gap-4 min-w-0">
@@ -17,25 +17,22 @@
             <div class="min-w-0">
                 <div class="flex flex-wrap items-center gap-2">
                     <h1 class="text-xl font-bold tracking-tight text-titulo">
-                        {{ $adultoMayor->nombres }} {{ $adultoMayor->ap_paterno }} {{ $adultoMayor->ap_materno }}
+                        {{ $adultoMayor->nombre_completo }}
                     </h1>
-                    <span class="rounded-full bg-fondo-card px-2.5 py-0.5 text-[10px] font-bold uppercase text-apoyo border border-borde">
-                        {{ $adultoMayor->cod_am }}
-                    </span>
-                    <span class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase border {{ in_array($adultoMayor->estadoTexto ?? $adultoMayor->estado, ['ACTIVO', 'ACTIVA']) ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-amber-50 text-amber-700 border-amber-200' }}">
-                        <span class="h-1.5 w-1.5 rounded-full {{ in_array($adultoMayor->estadoTexto ?? $adultoMayor->estado, ['ACTIVO', 'ACTIVA']) ? 'bg-emerald-500' : 'bg-amber-500' }}"></span>
-                        Estado: {{ $adultoMayor->estadoTexto ?? $adultoMayor->estado }}
+                    <span class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[10.5px] font-semibold border {{ $adultoMayor->estado_badge_color }}">
+                        <span class="h-1.5 w-1.5 rounded-full bg-current"></span>
+                        Estado: {{ $adultoMayor->estado_humano }}
                     </span>
                 </div>
 
                 <div class="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-parrafo">
-                    <span><strong>{{ \Carbon\Carbon::parse($adultoMayor->fecha_nac)->age }} años</strong> ({{ \Carbon\Carbon::parse($adultoMayor->fecha_nac)->format('d/m/Y') }})</span>
+                    <span><strong>{{ $adultoMayor->edad_texto }}</strong> ({{ $adultoMayor->fecha_nac ? \Carbon\Carbon::parse($adultoMayor->fecha_nac)->format('d/m/Y') : 'Sin fecha nac.' }})</span>
                     <span class="text-apoyo">·</span>
-                    <span>CI: <strong>{{ $adultoMayor->ci }}</strong></span>
+                    <span>CI: <strong>{{ $adultoMayor->ci ?? 'No registrado' }}</strong></span>
                     <span class="text-apoyo">·</span>
-                    <span>Habitación: <strong>{{ $adultoMayor->habitacion->codigo ?? $adultoMayor->habitacion->numero ?? 'S/H' }}</strong></span>
+                    <span>Habitación: <strong>{{ $adultoMayor->habitacion_texto }}</strong></span>
                     <span class="text-apoyo">·</span>
-                    <span>Cama: <strong>{{ $adultoMayor->cama->codigo ?? $adultoMayor->cama->numero ?? 'S/C' }}</strong></span>
+                    <span>Cama: <strong>{{ $adultoMayor->cama_texto }}</strong></span>
                 </div>
 
                 {{-- Badges clínicos esenciales: Alergias, Nivel de cuidado, Riesgos --}}
@@ -89,41 +86,109 @@
             </div>
         </div>
 
-        {{-- ACCIONES PRINCIPALES (ÚNICA UBICACIÓN EN TODA LA FICHA) --}}
+                {{-- ACCIONES UNIFICADAS ENFERMERIA (REGLA 6 DESIGN SYSTEM) --}}
         <div class="flex flex-wrap items-center gap-2 pt-2 lg:pt-0 shrink-0">
-            <a href="{{ route('admin.enfermeria.registros', ['adulto' => $adultoMayor->cod_am]) }}" class="rm-btn-primary px-3.5 py-2.5 text-xs font-bold">
-                <i class="ph-bold ph-hand-heart text-base"></i><span>Registrar cuidado</span>
-            </a>
-            <button type="button"
-                    wire:click="abrirModalSignos"
-                    wire:loading.attr="disabled"
-                    class="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-3.5 py-2.5 text-xs font-bold text-white shadow-sm hover:bg-blue-700 transition">
-                <i class="ph-bold ph-heartbeat text-base"></i>
-                <span>Registrar signos</span>
-            </button>
+            {{-- DROPDOWN UNIFICADO: + REGISTRAR --}}
+            <div class="relative" x-data="{ openRegistrar: false }" @click.outside="openRegistrar = false">
+                <button type="button"
+                        @click="openRegistrar = !openRegistrar"
+                        class="rm-btn-primary px-3.5 py-2 text-xs font-bold shadow-sm inline-flex items-center gap-2">
+                    <i class="ph-bold ph-plus-circle text-base"></i>
+                    <span>+ REGISTRAR</span>
+                    <i class="ph-bold ph-caret-down text-xs transition-transform" :class="openRegistrar ? 'rotate-180' : ''"></i>
+                </button>
 
+                <div x-show="openRegistrar"
+                     x-transition:enter="transition ease-out duration-150"
+                     x-transition:enter-start="opacity-0 translate-y-1 scale-95"
+                     x-transition:enter-end="opacity-100 translate-y-0 scale-100"
+                     x-transition:leave="transition ease-in duration-100"
+                     x-transition:leave-start="opacity-100 translate-y-0 scale-100"
+                     x-transition:leave-end="opacity-0 translate-y-1 scale-95"
+                     x-cloak
+                     class="absolute right-0 mt-1.5 w-64 rounded-xl border border-borde bg-fondo-panel p-1.5 shadow-xl z-50 divide-y divide-borde/40 text-xs">
+                    <div class="p-1 text-[11px] font-bold uppercase tracking-wider text-apoyo">
+                        Registro Clínico y Cuidado
+                    </div>
+                    <div class="py-1 space-y-0.5">
+                        <button type="button"
+                                wire:click="abrirModalSignos"
+                                @click="openRegistrar = false"
+                                class="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-left text-titulo hover:bg-fondo-card font-medium transition">
+                            <i class="ph-bold ph-heartbeat text-rose-500 text-sm"></i>
+                            <span>Registrar signos (Signos vitales)</span>
+                        </button>
+                        <a href="{{ route('admin.enfermeria.registros', ['adulto' => $adultoMayor->cod_am, 'categoria' => 'DOLOR']) }}"
+                           class="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-left text-titulo hover:bg-fondo-card font-medium transition">
+                            <i class="ph-bold ph-smiley-sad text-amber-500 text-sm"></i>
+                            <span>Escala de dolor</span>
+                        </a>
+                        <a href="{{ route('admin.enfermeria.registros', ['adulto' => $adultoMayor->cod_am, 'categoria' => 'ALIMENTACION']) }}"
+                           class="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-left text-titulo hover:bg-fondo-card font-medium transition">
+                            <i class="ph-bold ph-fork-knife text-emerald-500 text-sm"></i>
+                            <span>Alimentación y nutrición</span>
+                        </a>
+                        <a href="{{ route('admin.enfermeria.registros', ['adulto' => $adultoMayor->cod_am, 'categoria' => 'HIDRATACION']) }}"
+                           class="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-left text-titulo hover:bg-fondo-card font-medium transition">
+                            <i class="ph-bold ph-drop text-sky-500 text-sm"></i>
+                            <span>Hidratación</span>
+                        </a>
+                        <a href="{{ route('admin.enfermeria.registros', ['adulto' => $adultoMayor->cod_am, 'categoria' => 'ELIMINACION']) }}"
+                           class="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-left text-titulo hover:bg-fondo-card font-medium transition">
+                            <i class="ph-bold ph-toilet text-indigo-500 text-sm"></i>
+                            <span>Eliminación (Diuresis / Deposición)</span>
+                        </a>
+                        <a href="{{ route('admin.enfermeria.registros', ['adulto' => $adultoMayor->cod_am, 'categoria' => 'HIGIENE']) }}"
+                           class="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-left text-titulo hover:bg-fondo-card font-medium transition">
+                            <i class="ph-bold ph-sparkle text-teal-500 text-sm"></i>
+                            <span>Higiene y confort</span>
+                        </a>
+                        <a href="{{ route('admin.enfermeria.registros', ['adulto' => $adultoMayor->cod_am, 'categoria' => 'MOVILIDAD']) }}"
+                           class="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-left text-titulo hover:bg-fondo-card font-medium transition">
+                            <i class="ph-bold ph-person-simple-walk text-blue-500 text-sm"></i>
+                            <span>Movilidad y cambios posturales</span>
+                        </a>
+                        <a href="{{ route('admin.enfermeria.registros', ['adulto' => $adultoMayor->cod_am, 'categoria' => 'SUENO']) }}"
+                           class="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-left text-titulo hover:bg-fondo-card font-medium transition">
+                            <i class="ph-bold ph-moon-stars text-violet-500 text-sm"></i>
+                            <span>Sueño y descanso</span>
+                        </a>
+                        <a href="{{ route('admin.enfermeria.registros', ['adulto' => $adultoMayor->cod_am, 'categoria' => 'PROCEDIMIENTO']) }}"
+                           class="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-left text-titulo hover:bg-fondo-card font-medium transition">
+                            <i class="ph-bold ph-bandaids text-cyan-500 text-sm"></i>
+                            <span>Procedimientos de enfermería</span>
+                        </a>
+                        <a href="{{ route('admin.enfermeria.registros', ['adulto' => $adultoMayor->cod_am, 'categoria' => 'LESION']) }}"
+                           class="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-left text-titulo hover:bg-fondo-card font-medium transition">
+                            <i class="ph-bold ph-shield-warning text-orange-500 text-sm"></i>
+                            <span>Lesiones y curaciones (UPP)</span>
+                        </a>
+                        <button type="button"
+                                wire:click="abrirModalIncidente"
+                                @click="openRegistrar = false"
+                                class="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-left text-rose-700 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/20 font-bold transition">
+                            <i class="ph-bold ph-warning-octagon text-rose-600 text-sm"></i>
+                            <span>Reportar incidente / Caídas</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            {{-- 2 ACCIONES RAPIDAS PRINCIPALES --}}
             <button type="button"
                     wire:click="abrirModalMedicacion"
                     wire:loading.attr="disabled"
-                    class="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-3.5 py-2.5 text-xs font-bold text-white shadow-sm hover:bg-emerald-700 transition">
-                <i class="ph-bold ph-pill text-base"></i>
+                    class="rm-btn-secondary px-3 py-2 text-xs font-semibold">
+                <i class="ph-bold ph-pill text-emerald-600 text-sm"></i>
                 <span>Administrar medicación</span>
             </button>
 
             <button type="button"
                     wire:click="abrirModalSeguimiento"
                     wire:loading.attr="disabled"
-                    class="inline-flex items-center gap-2 rounded-xl bg-sky-600 px-3.5 py-2.5 text-xs font-bold text-white shadow-sm hover:bg-sky-700 transition">
-                <i class="ph-bold ph-clipboard-text text-base"></i>
+                    class="rm-btn-secondary px-3 py-2 text-xs font-semibold">
+                <i class="ph-bold ph-clipboard-text text-sky-600 text-sm"></i>
                 <span>Registrar seguimiento</span>
-            </button>
-
-            <button type="button"
-                    wire:click="abrirModalIncidente"
-                    wire:loading.attr="disabled"
-                    class="inline-flex items-center gap-2 rounded-xl bg-rose-600 px-3.5 py-2.5 text-xs font-bold text-white shadow-sm hover:bg-rose-700 transition">
-                <i class="ph-bold ph-warning-octagon text-base"></i>
-                <span>Reportar incidente</span>
             </button>
         </div>
     </div>

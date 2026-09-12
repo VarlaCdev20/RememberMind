@@ -67,7 +67,7 @@
  @endif
  </div>
 
- <x-ui.modal-livewire wire:model="showModal" title="{{ $isEditing ? 'Editar Signos Vitales' : 'Registrar Signos Vitales' }}" maxWidth="3xl">
+ <x-ui.modal-livewire wire:model="showModal" title="{{ $isEditing ? 'Rectificar signos vitales' : 'Registrar signos vitales' }}" maxWidth="3xl">
  <x-slot name="icon">
  <i class="ph-bold ph-activity text-terracota"></i>
  </x-slot>
@@ -182,6 +182,12 @@
  <textarea wire:model="observacion" rows="3" placeholder="Paciente se encuentra estable..."
  class="w-full rounded-xl border border-borde-suave bg-fondo-panel px-3 py-2 text-sm text-titulo focus:border-borde-focus focus:ring-borde-focus"></textarea>
  @error('observacion') <span class="mt-1 text-xs text-terracota font-bold">{{ $message }}</span> @enderror
+ @if($isEditing)
+ <label class="mt-4 block text-sm font-semibold text-titulo">Motivo de rectificación
+     <textarea wire:model="motivoRectificacion" rows="2" class="mt-1 w-full rounded-xl border border-borde bg-fondo-card" placeholder="Explique el dato incorrecto y la razón de la corrección"></textarea>
+ </label>
+ @error('motivo') <span class="mt-1 text-xs font-bold text-estado-peligro">{{ $message }}</span> @enderror
+ @endif
  </div>
  </div>
  </div>
@@ -194,7 +200,7 @@
  </button>
  <button type="submit" form="formSignos" class="inline-flex items-center justify-center gap-2 rounded-xl bg-boton-acento px-4 py-2 text-sm font-bold text-inverso transition hover:bg-fondo-panel active:scale-95 disabled:opacity-50" wire:loading.attr="disabled">
  <i wire:loading wire:target="guardar" class="ph-bold ph-spinner animate-spin"></i>
- <span>{{ $isEditing ? 'Actualizar Signos' : 'Guardar Signos' }}</span>
+ <span>{{ $isEditing ? 'Registrar rectificación' : 'Guardar signos' }}</span>
  </button>
  </x-slot>
  </x-ui.modal-livewire>

@@ -11,7 +11,10 @@ use App\Models\SeguimientoDiario;
 use App\Models\SignosVitalesAdulto;
 use App\Models\TareaPlanCuidado;
 use App\Services\Alertas\DeteccionAlertasService;
+use App\Services\Alertas\AlertasService;
+use App\Services\Clinica\SignosVitalesService;
 use App\Services\Enfermeria\TurnoEnfermeriaService;
+use App\Services\Medicacion\RegistrarAdministracionMedicacionService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -164,74 +167,19 @@ class FichaPaciente extends Component
 
     public function guardarSignos(): void
     {
-        abort_unless(auth()->user()?->can('signos_vitales.crear'), 403);
-        app(TurnoEnfermeriaService::class)->autorizarAccionPaciente($this->adultoMayor, Auth::user());
-
-        $this->validate([
-            'signoPA'      => 'nullable|string|max:20',
-            'signoFC'      => 'nullable|integer|min:' . \App\Services\Clinica\ValidacionSignosVitalesService::FC_MIN . '|max:' . \App\Services\Clinica\ValidacionSignosVitalesService::FC_MAX,
-            'signoFR'      => 'nullable|integer|min:' . \App\Services\Clinica\ValidacionSignosVitalesService::FR_MIN . '|max:' . \App\Services\Clinica\ValidacionSignosVitalesService::FR_MAX,
-            'signoTemp'    => 'nullable|numeric|min:' . \App\Services\Clinica\ValidacionSignosVitalesService::TEMP_MIN . '|max:' . \App\Services\Clinica\ValidacionSignosVitalesService::TEMP_MAX,
-            'signoSat'     => 'nullable|integer|min:' . \App\Services\Clinica\ValidacionSignosVitalesService::SPO2_MIN . '|max:' . \App\Services\Clinica\ValidacionSignosVitalesService::SPO2_MAX,
-            'signoGlucosa' => 'nullable|numeric|min:' . \App\Services\Clinica\ValidacionSignosVitalesService::GLUCOSA_MIN,
-            'signoDolor'   => 'nullable|integer|min:' . \App\Services\Clinica\ValidacionSignosVitalesService::DOLOR_MIN . '|max:' . \App\Services\Clinica\ValidacionSignosVitalesService::DOLOR_MAX,
-            'signoObs'     => 'nullable|string|max:1000',
-            'signoPosicion'=> 'nullable|in:SENTADO,ACOSTADO,DE_PIE',
-        ]);
-
-        $sis = null; $dia = null;
-        if (!empty($this->signoPA)) {
-            if (!str_contains($this->signoPA, '/')) {
-                $this->addError('signoPA', 'La presión arterial debe tener formato Sistólica/Diastólica (ej. 120/80).');
-                return;
-            }
-            $partes = explode('/', $this->signoPA);
-            $sis = is_numeric(trim($partes[0])) ? (int)trim($partes[0]) : null;
-            $dia = isset($partes[1]) && is_numeric(trim($partes[1])) ? (int)trim($partes[1]) : null;
-
-            if ($sis === null || $dia === null) {
-                $this->addError('signoPA', 'Valores de presión arterial incompletos.');
-                return;
-            }
-            if ($sis < \App\Services\Clinica\ValidacionSignosVitalesService::PAS_MIN || $sis > \App\Services\Clinica\ValidacionSignosVitalesService::PAS_MAX) {
-                $this->addError('signoPA', 'La presión sistólica debe estar entre ' . \App\Services\Clinica\ValidacionSignosVitalesService::PAS_MIN . ' y ' . \App\Services\Clinica\ValidacionSignosVitalesService::PAS_MAX . ' mmHg.');
-                return;
-            }
-            if ($dia < \App\Services\Clinica\ValidacionSignosVitalesService::PAD_MIN || $dia > \App\Services\Clinica\ValidacionSignosVitalesService::PAD_MAX) {
-                $this->addError('signoPA', 'La presión diastólica debe estar entre ' . \App\Services\Clinica\ValidacionSignosVitalesService::PAD_MIN . ' y ' . \App\Services\Clinica\ValidacionSignosVitalesService::PAD_MAX . ' mmHg.');
-                return;
-            }
-            if ($sis <= $dia && !$this->signoConfirmarAtipico) {
-                $this->addError('signoPA', "La sistólica ({$sis}) no supera a la diastólica ({$dia}). Verifique la medición y confirme el valor atípico para conservarlo.");
-                return;
-            }
-        }
-
-        if (empty($this->signoPA) && empty($this->signoFC) && empty($this->signoTemp) && empty($this->signoSat) && empty($this->signoGlucosa) && empty($this->signoDolor)) {
-            $this->addError('signoPA', 'Registre al menos un parámetro de signos vitales.');
-            return;
-        }
-
-        SignosVitalesAdulto::create([
-            'cod_am'                  => $this->adultoMayor->cod_am,
-            'fecha'                   => today()->toDateString(),
-            'hora'                    => now()->format('H:i:s'),
-            'presion_arterial'        => $this->signoPA ?: null,
-            'presion_sistolica'       => $sis,
-            'presion_diastolica'      => $dia,
-            'frecuencia_cardiaca'     => $this->signoFC ?: null,
-            'frecuencia_respiratoria' => $this->signoFR ?: null,
-            'temperatura'             => $this->signoTemp ?: null,
-            'saturacion'              => $this->signoSat ?: null,
-            'glucosa'                 => $this->signoGlucosa ?: null,
-            'dolor'                   => $this->signoDolor !== null && $this->signoDolor !== '' ? (int)$this->signoDolor : null,
-            'posicion'                => $this->signoPosicion ?: null,
-            'usa_oxigeno'             => $this->signoUsaOxigeno,
-            'valor_atipico_confirmado'=> $this->signoConfirmarAtipico,
-            'observacion'             => $this->signoObs ?: null,
-            'registrado_por'          => Auth::id(),
-            'estado'                  => 'VIGENTE',
-        ]);
+        app(SignosVitalesService::class)->registrar($this->adultoMayor->cod_am, [
+            'presion_arterial' => $this->signoPA,
+            'frecuencia_cardiaca' => $this->signoFC,
+            'frecuencia_respiratoria' => $this->signoFR,
+            'temperatura' => $this->signoTemp,
+            'saturacion' => $this->signoSat,
+            'glucosa' => $this->signoGlucosa,
+            'dolor' => $this->signoDolor,
+            'posicion' => $this->signoPosicion,
+            'usa_oxigeno' => $this->signoUsaOxigeno,
+            'valor_atipico_confirmado' => $this->signoConfirmarAtipico,
+            'observacion' => $this->signoObs,
+        ], Auth::user());
 
         $this->modalSignos = false;
         $this->cargarAdulto($this->adultoMayor->cod_am);
@@ -316,61 +264,30 @@ class FichaPaciente extends Component
             $this->validate([
                 'medMotivoPrn' => 'required|string|min:5|max:500',
                 'medValoracionPrevia' => 'required|string|min:5|max:1000',
-                'medIntensidadPrevia' => 'nullable|integer|min:0|max:10',
+                'medIntensidadPrevia' => 'required|integer|min:0|max:10',
             ], [
                 'medMotivoPrn.required' => 'Indique el síntoma o motivo que justifica la medicación PRN.',
                 'medValoracionPrevia.required' => 'Registre la valoración previa antes de administrar PRN.',
             ]);
         }
 
-        $horaProgramada = $this->medHoraProgramada ?: ($med->hora_programada
-            ? Carbon::parse($med->hora_programada)->format('H:i')
-            : now()->format('H:i'));
-
-        $guardado = DB::transaction(function () use ($horaProgramada, $esAdmin, $resultado, $med): bool {
-            $duplicado = AdministracionMedicacion::where('cod_med_adulto', $this->medSeleccionadoId)
-                ->whereDate('fecha', today())
-                ->where('hora_programada', 'like', $horaProgramada . '%')
-                ->lockForUpdate()
-                ->exists();
-            if ($duplicado) {
-                return false;
+        $servicio = app(RegistrarAdministracionMedicacionService::class);
+        if ($med->es_prn && $esAdmin) {
+            $servicio->registrarPrn(
+                Auth::user(), $this->adultoMayor->cod_am, $this->medSeleccionadoId,
+                $this->medMotivoPrn, $this->medValoracionPrevia, (int) $this->medIntensidadPrevia,
+                $this->medEfectoObs,
+            );
+        } else {
+            if ($med->es_prn) {
+                $this->addError('medAccion', 'Las dosis PRN solo se registran cuando se administran por una indicación clínica presente.');
+                return;
             }
-
-            AdministracionMedicacion::create([
-                'cod_am'            => $this->adultoMayor->cod_am,
-                'cod_med_adulto'    => $this->medSeleccionadoId,
-                'fecha'             => today()->toDateString(),
-                'hora_programada'   => $horaProgramada,
-                'hora_real'         => $esAdmin ? now()->format('H:i') : null,
-                'administrado'      => $esAdmin,
-                'resultado'         => $resultado,
-                'motivo_omision'    => !$esAdmin ? trim($this->medMotivoOmision) : null,
-                'motivo_prn'        => $med->es_prn ? trim($this->medMotivoPrn) : null,
-                'valoracion_previa' => $med->es_prn ? trim($this->medValoracionPrevia) : null,
-                'intensidad_previa' => $med->es_prn ? $this->medIntensidadPrevia : null,
-                'requiere_reevaluacion' => $med->es_prn && $esAdmin,
-                'fecha_hora_reevaluacion' => $med->es_prn && $esAdmin ? now()->addMinutes(config('enfermeria.minutos_reevaluacion_prn', 60)) : null,
-                'efecto_observado'  => filled($this->medEfectoObs) ? trim($this->medEfectoObs) : null,
-                'registrado_por'    => Auth::id(),
-            ]);
-            if ($med->es_prn && $esAdmin && $this->adultoMayor->planCuidadoActivo) {
-                TareaPlanCuidado::create([
-                    'cod_plan' => $this->adultoMayor->planCuidadoActivo->cod_plan,
-                    'cod_am' => $this->adultoMayor->cod_am,
-                    'cod_turno' => $this->adultoMayor->asignacionTurnoActiva?->cod_turno,
-                    'area' => 'REEVALUACION', 'titulo' => 'Reevaluar respuesta a '.$med->nombre_medicamento,
-                    'descripcion' => 'Valorar respuesta y efectos una hora después de medicación PRN.',
-                    'fecha_programada' => today(), 'hora_programada' => now()->addMinutes(config('enfermeria.minutos_reevaluacion_prn', 60))->format('H:i:s'),
-                    'prioridad' => 'ALTA', 'estado' => 'PENDIENTE', 'registrado_por' => Auth::id(),
-                ]);
-            }
-            return true;
-        });
-
-        if (!$guardado) {
-            $this->dispatch('swal', ['icon' => 'warning', 'title' => 'Aviso', 'text' => 'Esta dosis ya fue registrada previamente hoy.']);
-            return;
+            $horaProgramada = $this->medHoraProgramada ?: ($med->hora_programada ? Carbon::parse($med->hora_programada)->format('H:i') : '');
+            $servicio->registrarProgramada(
+                Auth::user(), $this->adultoMayor->cod_am, $this->medSeleccionadoId,
+                $horaProgramada, $esAdmin, $this->medMotivoOmision, $this->medEfectoObs,
+            );
         }
 
         $this->modalMed = false;
@@ -399,7 +316,7 @@ class FichaPaciente extends Component
     {
         abort_unless(auth()->user()?->can('tareas.registrar_resultado'), 403);
         $tarea = TareaPlanCuidado::findOrFail($codTarea);
-        app(TurnoEnfermeriaService::class)->autorizarAccionPaciente($tarea->cod_am, Auth::user());
+        app(TurnoEnfermeriaService::class)->autorizarMutacionPaciente($tarea->cod_am, 'tareas.registrar_resultado', Auth::user());
         abort_unless($tarea->puedeCompletarse(), 409, 'La tarea ya no está pendiente de ejecución.');
 
         $tarea->update([
@@ -422,7 +339,7 @@ class FichaPaciente extends Component
     {
         abort_unless(auth()->user()?->can('tareas.registrar_resultado'), 403);
         $tarea = TareaPlanCuidado::findOrFail($this->tareaAccionId);
-        app(TurnoEnfermeriaService::class)->autorizarAccionPaciente($tarea->cod_am, Auth::user());
+        app(TurnoEnfermeriaService::class)->autorizarMutacionPaciente($tarea->cod_am, 'tareas.registrar_resultado', Auth::user());
         abort_unless($tarea->puedeCompletarse(), 409, 'La tarea ya no está pendiente de ejecución.');
 
         $this->validate([
@@ -467,7 +384,7 @@ class FichaPaciente extends Component
     public function guardarSeguimiento(): void
     {
         abort_unless(auth()->user()?->can('seguimiento.crear'), 403);
-        app(TurnoEnfermeriaService::class)->autorizarAccionPaciente($this->adultoMayor, Auth::user());
+        app(TurnoEnfermeriaService::class)->autorizarMutacionPaciente($this->adultoMayor, 'seguimiento.crear', Auth::user());
         $this->validate([
             'segEstado' => 'required|in:ESTABLE,VIGILANCIA,DELICADO,CRITICO',
             'segAlimentacion' => 'required|in:COMPLETA,PARCIAL,RECHAZADA,AYUNO',
@@ -541,41 +458,10 @@ class FichaPaciente extends Component
 
     public function guardarIncidente(): void
     {
-        abort_unless(auth()->user()?->can('alertas.crear'), 403);
-        app(TurnoEnfermeriaService::class)->autorizarAccionPaciente($this->adultoMayor, Auth::user());
-
-        $this->validate([
-            'incidenteMotivo' => 'required|string|min:15|max:1000',
-            'incidenteTipo'   => 'required|in:INCIDENTE,CAIDA,CONDUCTA,DOLOR_AGUDO,DESVIACION_CLINICA',
-            'incidenteNivel'  => 'required|in:BAJO,MEDIO,ALTO,CRITICO',
-        ], [
-            'incidenteMotivo.required' => 'El detalle del incidente es obligatorio.',
-            'incidenteMotivo.min'      => 'El detalle del incidente debe tener al menos 15 caracteres.',
-        ]);
-
-        $tipo = mb_strtoupper(trim($this->incidenteTipo));
-        $duplicada = AlertaAdulto::where('cod_am', $this->adultoMayor->cod_am)
-            ->where('tipo_alerta', $tipo)
-            ->whereIn('estado', ['ABIERTA', 'EN_ATENCION'])
-            ->exists();
-
-        if ($duplicada) {
-            $this->addError('incidenteTipo', 'Ya existe una alerta activa para este incidente.');
-            return;
-        }
-
-        $turnoActivo = app(TurnoEnfermeriaService::class)->obtenerTurnoActivo(Auth::user());
-
-        AlertaAdulto::create([
-            'cod_am'         => $this->adultoMayor->cod_am,
-            'cod_turno'      => $turnoActivo?->cod_turno,
-            'origen'         => 'INCIDENTE',
-            'tipo_alerta'    => $tipo,
-            'nivel'          => $this->incidenteNivel,
-            'motivo'         => $this->incidenteMotivo,
-            'responsable_id' => Auth::id(),
-            'estado'         => 'ABIERTA',
-        ]);
+        app(AlertasService::class)->crear($this->adultoMayor->cod_am, [
+            'origen' => 'INCIDENTE', 'tipo_alerta' => $this->incidenteTipo,
+            'nivel' => $this->incidenteNivel, 'motivo' => $this->incidenteMotivo,
+        ], Auth::user());
 
         $this->modalIncidente = false;
         $this->cargarAdulto($this->adultoMayor->cod_am);
@@ -599,29 +485,7 @@ class FichaPaciente extends Component
 
     public function confirmarAtencionAlerta(): void
     {
-        abort_unless(auth()->user()?->can('alertas.atender'), 403);
-        $this->validate(
-            ['accionTomadaAlerta' => 'required|string|min:5|max:1000'],
-            ['accionTomadaAlerta.required' => 'La acción realizada es obligatoria.']
-        );
-
-        DB::transaction(function () {
-            $alerta = AlertaAdulto::lockForUpdate()->findOrFail($this->alertaAccionId);
-            app(TurnoEnfermeriaService::class)->autorizarAccionPaciente($alerta->cod_am, Auth::user());
-            abort_unless($alerta->estado === 'ABIERTA', 409, 'La alerta ya fue atendida o cerrada.');
-            $alerta->update([
-                'estado' => 'EN_ATENCION',
-                'accion_tomada' => $this->accionTomadaAlerta,
-                'fecha_atencion' => now(),
-                'atendido_por' => Auth::id(),
-            ]);
-            $alerta->acciones()->create([
-                'accion' => $this->accionTomadaAlerta,
-                'responsable_id' => Auth::id(),
-                'fecha_accion' => now(),
-                'estado' => 'REALIZADA',
-            ]);
-        });
+        app(AlertasService::class)->registrarIntervencion(AlertaAdulto::findOrFail($this->alertaAccionId), $this->accionTomadaAlerta, Auth::user());
 
         $this->modalAtenderAlerta = false;
         $this->cargarAdulto($this->adultoMayor->cod_am);
@@ -641,33 +505,8 @@ class FichaPaciente extends Component
 
     public function confirmarCierreAlerta(): void
     {
-        abort_unless(auth()->user()?->can('alertas.cerrar'), 403);
         $alerta = AlertaAdulto::findOrFail($this->alertaAccionId);
-        app(TurnoEnfermeriaService::class)->autorizarAccionPaciente($alerta->cod_am, Auth::user());
-        abort_unless($alerta->puedeCerrarse(), 409, 'La alerta ya está cerrada.');
-
-        $this->validate([
-            'observacionCierreAlerta' => 'required|string|min:5|max:1000',
-        ], [
-            'observacionCierreAlerta.required' => 'La nota de cierre es obligatoria.',
-            'observacionCierreAlerta.min'      => 'La nota de cierre debe tener al menos 5 caracteres.',
-        ]);
-
-        DB::transaction(function () use ($alerta) {
-            $alerta->update([
-                'estado'             => 'CERRADA',
-                'observacion_cierre' => $this->observacionCierreAlerta,
-                'fecha_cierre'       => now(),
-                'cerrado_por'        => Auth::id(),
-            ]);
-
-            $alerta->acciones()->create([
-                'accion' => 'Cierre: ' . $this->observacionCierreAlerta,
-                'responsable_id' => Auth::id(),
-                'fecha_accion' => now(),
-                'estado' => 'REALIZADA',
-            ]);
-        });
+        app(AlertasService::class)->cerrar($alerta, $this->observacionCierreAlerta, Auth::user());
 
         $this->modalCerrarAlerta = false;
         $this->cargarAdulto($this->adultoMayor->cod_am);

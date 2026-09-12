@@ -17,7 +17,9 @@
 
  @vite(['resources/frontend/styles/app.css', 'resources/frontend/scripts/app.js'])
 
- @livewireStyles
+     @stack('styles')
+
+    @livewireStyles
 </head>
 
 <body class="antialiased bg-fondo-app">

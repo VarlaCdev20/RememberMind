@@ -277,7 +277,7 @@
  <div class="rounded-2xl border border-borde-suave bg-fondo-panel p-3">
  <p class="text-[10px] font-bold uppercase tracking-widest text-apoyo">Asignación / apoyo</p>
  <p class="mt-1 text-xs font-bold text-titulo">{{ $detalleAsistencia->adulto_nombre ?: 'Apoyo institucional' }}</p>
- <p class="mt-0.5 text-[11px] font-bold text-apoyo">{{ $detalleAsistencia->cod_asig_vol ? 'Asignación #' . $detalleAsistencia->cod_asig_vol : 'Sin vínculo directo guardado' }}</p>
+ <p class="mt-0.5 text-[11px] font-bold text-apoyo">{{ $detalleAsistencia->cod_asig_vol ? 'Asignación institucional vinculada' : 'Sin asignación vinculada' }}</p>
  </div>
  <div class="rounded-2xl border border-borde-suave bg-fondo-panel p-3">
  <p class="text-[10px] font-bold uppercase tracking-widest text-apoyo">Tiempo colaborado</p>
@@ -351,7 +351,7 @@
  </td>
  <td class="px-3 py-3 align-top">
  <p class="max-w-[190px] truncate text-xs font-bold text-titulo">{{ $registro->adulto_nombre ?: 'Apoyo institucional' }}</p>
- <p class="mt-0.5 max-w-[190px] truncate text-[10px] font-bold text-apoyo">{{ $registro->actividad_realizada ?: ($registro->cod_asig_vol ? 'Asignación #' . $registro->cod_asig_vol : 'Sin asignación directa') }}</p>
+ <p class="mt-0.5 max-w-[190px] truncate text-[10px] font-bold text-apoyo">{{ $registro->actividad_realizada ?: ($registro->cod_asig_vol ? 'Asignación institucional' : 'Sin asignación directa') }}</p>
  </td>
  <td class="px-3 py-3 align-top">
  <p class="text-xs font-bold text-titulo">{{ $registro->fecha_texto }}</p>
@@ -459,7 +459,7 @@
  <option value="">Sin asignación seleccionada</option>
  @foreach($asignacionesFormulario as $asignacion)
  <option value="{{ $asignacion->cod_asig_vol }}">
- #{{ $asignacion->cod_asig_vol }} · {{ $asignacion->fecha_texto }} · {{ $asignacion->voluntario_nombre }} · {{ $asignacion->adulto_nombre ?: 'Apoyo institucional' }}
+ {{ $asignacion->fecha_texto }} · {{ $asignacion->voluntario_nombre }} · {{ $asignacion->adulto_nombre ?: 'Apoyo institucional' }}
  </option>
  @endforeach
  </select>

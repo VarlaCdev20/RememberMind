@@ -2,279 +2,466 @@
 @php
     $ultSigno = $signosDrawer->first();
     $historialSignos = $signosDrawer->take(8);
+    
+    $puntos = $signosDrawer->take(8)->reverse()->values();
+    $labels = $puntos->map(fn($s) => $s->fecha ? $s->fecha->format('d/m') . ($s->hora ? ' ' . substr($s->hora, 0, 5) : '') : 'Control')->values()->toArray();
+    $sisData = $puntos->map(fn($s) => (float)($s->presion_sistolica ?? 120))->values()->toArray();
+    $diaData = $puntos->map(fn($s) => (float)($s->presion_diastolica ?? 80))->values()->toArray();
+    $fcData = $puntos->map(fn($s) => (float)($s->frecuencia_cardiaca ?? 75))->values()->toArray();
+    $spo2Data = $puntos->map(fn($s) => (float)($s->saturacion ?? 96))->values()->toArray();
+    $tempData = $puntos->map(fn($s) => (float)($s->temperatura ?? 36.5))->values()->toArray();
 @endphp
 <div class="fixed inset-0 z-50 overflow-hidden font-sans"
-     x-data
+     role="dialog"
+     aria-modal="true"
+     aria-labelledby="drawer-graficos-title"
+     x-data="{
+        tab: 'presion',
+        labels: @js($labels),
+        sisData: @js($sisData),
+        diaData: @js($diaData),
+        fcData: @js($fcData),
+        spo2Data: @js($spo2Data),
+        tempData: @js($tempData),
+        init() {
+            this.$watch('tab', () => this.renderCurrentChart());
+            this.$nextTick(() => {
+                this.renderCurrentChart();
+            });
+            window.RMCharts?.onThemeChange(() => {
+                this.renderCurrentChart();
+            });
+        },
+        renderCurrentChart() {
+            if (typeof Chart === 'undefined' || typeof window.RMCharts === 'undefined' || !window.RMCharts.presets) {
+                setTimeout(() => this.renderCurrentChart(), 60);
+                return;
+            }
+            const canvas = document.getElementById('chart-drawer-evolucion');
+            if (!canvas) return;
+
+            const isDark = window.RMCharts.isDark();
+            const gridColor = window.RMCharts.getCss('--rm-chart-grid') || (isDark ? 'rgba(255,255,255,0.08)' : 'rgba(224,212,198,0.40)');
+            const axisTextColor = window.RMCharts.getCss('--rm-chart-axis-text') || (isDark ? '#94A3B8' : '#64748B');
+
+            let datasets = [];
+            let yMin = undefined;
+            let yMax = undefined;
+            let yStep = undefined;
+            let unit = '';
+
+            if (this.tab === 'presion') {
+                unit = 'mmHg';
+                datasets = [
+                    {
+                        label: 'Sistólica',
+                        data: this.sisData,
+                        borderColor: '#F43F5E',
+                    },
+                    {
+                        label: 'Diastólica',
+                        data: this.diaData,
+                        borderColor: '#0EA5E9',
+                    }
+                ];
+                yMin = 40;
+                yMax = 190;
+                yStep = 20;
+            } else if (this.tab === 'pulso') {
+                unit = 'lpm';
+                datasets = [{
+                    label: 'Frecuencia Cardíaca',
+                    data: this.fcData,
+                    borderColor: '#F97316',
+                }];
+                yMin = 40;
+                yMax = 140;
+                yStep = 20;
+            } else if (this.tab === 'spo2') {
+                unit = '%';
+                datasets = [{
+                    label: 'Saturación SpO2',
+                    data: this.spo2Data,
+                    borderColor: '#14B8A6',
+                }];
+                yMin = 80;
+                yMax = 100;
+                yStep = 5;
+            } else if (this.tab === 'temp') {
+                unit = '°C';
+                datasets = [{
+                    label: 'Temperatura',
+                    data: this.tempData,
+                    borderColor: '#F59E0B',
+                }];
+                yMin = 34.5;
+                yMax = 40.5;
+                yStep = 1;
+            }
+
+            const customOptions = {
+                _showPoints: true,
+                layout: {
+                    padding: { top: 8, right: 14, bottom: 4, left: 6 }
+                },
+                scales: {
+                    x: {
+                        display: true,
+                        grid: {
+                            color: gridColor,
+                            drawBorder: false,
+                        },
+                        ticks: {
+                            color: axisTextColor,
+                            font: { family: 'Inter, system-ui, sans-serif', size: 10, weight: '600' },
+                            maxRotation: 0,
+                        }
+                    },
+                    y: {
+                        display: true,
+                        min: yMin,
+                        max: yMax,
+                        grid: {
+                            color: gridColor,
+                            drawBorder: false,
+                        },
+                        ticks: {
+                            color: axisTextColor,
+                            font: { family: 'Inter, system-ui, sans-serif', size: 10, weight: '600' },
+                            stepSize: yStep,
+                            callback: function(val) {
+                                return val + ' ' + unit;
+                            }
+                        }
+                    }
+                },
+                plugins: {
+                    tooltip: {
+                        enabled: true,
+                        backgroundColor: isDark ? 'rgba(15, 23, 42, 0.94)' : 'rgba(30, 41, 59, 0.94)',
+                        titleColor: '#FFFFFF',
+                        bodyColor: '#F8FAFC',
+                        borderColor: isDark ? 'rgba(255, 255, 255, 0.12)' : 'rgba(0, 0, 0, 0.08)',
+                        borderWidth: 1,
+                        cornerRadius: 8,
+                        padding: 10,
+                        titleFont: { family: 'Inter, system-ui, sans-serif', size: 11, weight: '700' },
+                        bodyFont: { family: 'Inter, system-ui, sans-serif', size: 11, weight: '500' },
+                        displayColors: true,
+                        boxPadding: 4,
+                        callbacks: {
+                            label: function(context) {
+                                const val = context.parsed?.y !== undefined ? context.parsed.y : context.raw;
+                                return ' ' + context.dataset.label + ': ' + val + ' ' + unit;
+                            }
+                        }
+                    }
+                }
+            };
+
+            const cfg = window.RMCharts.presets.sparkline(
+                this.labels,
+                datasets,
+                null,
+                customOptions
+            );
+
+            window.RMCharts.init('chart-drawer-evolucion', canvas, cfg, () => this.renderCurrentChart());
+        }
+     }"
      x-on:keydown.escape.window="$wire.cerrarDrawer()">
     <!-- Backdrop oscuro con blur suave -->
-    <div class="fixed inset-0 bg-[var(--color-modal-overlay)] backdrop-blur-sm transition-opacity"
+    <div class="fixed inset-0 bg-black/40 backdrop-blur-sm transition-opacity"
          wire:click="cerrarDrawer"></div>
 
     <!-- Contenedor Deslizante Lateral (Barra Derecha) -->
     <div class="pointer-events-none fixed inset-y-0 right-0 flex max-w-full pl-10">
-        <div class="rm-drawer pointer-events-auto flex h-full w-screen max-w-2xl transform flex-col overflow-hidden transition duration-300 ease-in-out">
+        <div class="pointer-events-auto flex h-full w-screen max-w-[660px] transform flex-col overflow-hidden rm-drawer transition duration-300 ease-in-out">
             
-            <!-- Encabezado del Drawer con color institucional -->
-            <div class="flex items-center justify-between border-b border-borde bg-fondo-hover px-6 py-4 backdrop-blur-sm">
+            <!-- Encabezado del Drawer -->
+            <div class="rm-drawer-header">
                 <div class="flex items-center gap-3">
-                    <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-purple-600 text-white shadow-md shadow-purple-600/30">
+                    <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--rm-surface-alt)] text-[var(--rm-primary)] border border-[var(--rm-border)] shadow-xs">
                         <i class="ph-bold ph-chart-line-up text-xl"></i>
                     </span>
                     <div>
-                        <h3 class="text-base font-extrabold text-titulo">Gráficos de Evolución Clínica</h3>
-                        <p class="text-xs text-apoyo">Tendencias de signos vitales registradas</p>
+                        <div class="flex items-center gap-2 mb-1">
+                            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-indigo-100 text-indigo-800 border border-indigo-200 shadow-xs flex items-center gap-1">
+                                <i class="ph-bold ph-sidebar"></i> Panel Lateral de Consulta
+                            </span>
+                        </div>
+                        <h3 id="drawer-graficos-title" class="rm-modal-title text-base font-bold text-[var(--rm-text-title)]">
+                            Gráficos de Evolución Clínica
+                        </h3>
+                        <p class="text-xs text-[var(--rm-text-muted)]">Tendencias y monitoreo fisiológico continuo</p>
                     </div>
                 </div>
                 <button type="button"
                     wire:click="cerrarDrawer"
-                    class="rm-btn-icon h-8 w-8 rounded-lg" aria-label="Cerrar panel">
-                    <i class="ph-bold ph-x text-lg"></i>
+                    aria-label="Cerrar panel de gráficos"
+                    class="rm-btn-icon text-[var(--rm-text-muted)] hover:text-[var(--rm-text-title)] transition cursor-pointer">
+                    <i class="ph ph-x text-lg"></i>
                 </button>
             </div>
 
-            <!-- Cuerpo del Drawer con Scroll y Fondo enriquecido -->
-            <div class="flex-1 overflow-y-auto p-6 space-y-6 scrollbar-thin">
+            <!-- Cuerpo del Drawer con Scroll -->
+            <div class="flex-1 overflow-y-auto p-4 space-y-3.5">
                 
-                <!-- 1. Tarjeta del residente y ubicación -->
-                <div class="flex items-center justify-between p-4 rounded-2xl bg-white/90 dark:bg-slate-800/80 border border-purple-200/70 dark:border-purple-900/50 shadow-sm backdrop-blur-sm">
+                <!-- 1. Tarjeta del Residente y Ubicación Física -->
+                <div class="flex items-center justify-between p-3 rounded-xl bg-[var(--rm-surface-alt)] border border-[var(--rm-border)] shadow-xs">
                     <div class="flex items-center gap-3">
-                        <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-purple-100 text-purple-700 dark:bg-purple-950 dark:text-purple-300 font-extrabold text-base shadow-sm">
-                            {{ substr($adultoDrawer->nombres ?? 'A', 0, 1) }}{{ substr($adultoDrawer->ap_paterno ?? 'M', 0, 1) }}
+                        <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-[var(--rm-primary)] text-white font-bold text-sm shadow-xs">
+                            {{ substr($adultoDrawer->nombres, 0, 1) }}{{ substr($adultoDrawer->ap_paterno, 0, 1) }}
                         </div>
                         <div>
-                            <h4 class="text-sm font-black text-slate-800 dark:text-white">
-                                {{ $adultoDrawer->nombres }} {{ $adultoDrawer->ap_paterno }} {{ $adultoDrawer->ap_materno }}
+                            <h4 class="font-bold text-[var(--rm-text-title)] text-sm leading-tight">
+                                {{ $adultoDrawer->ap_paterno }} {{ $adultoDrawer->ap_materno }} {{ $adultoDrawer->nombres }}
                             </h4>
-                            <p class="text-xs text-slate-500 dark:text-slate-400 font-mono">
-                                Código: <span class="font-bold">{{ $adultoDrawer->cod_am }}</span>
-                                @if($adultoDrawer->fecha_nacimiento)
-                                    ? {{ $adultoDrawer->fecha_nacimiento->age }} años
-                                @elseif($adultoDrawer->edad)
-                                    ? {{ $adultoDrawer->edad }} años
+                            <div class="flex items-center gap-2 text-xs text-[var(--rm-text-muted)] mt-0.5">
+                                <span>{{ $adultoDrawer->edad_texto }}</span>
+                                @if($adultoDrawer->ci)
+                                    <span>•</span>
+                                    <span>CI: {{ $adultoDrawer->ci }}</span>
                                 @endif
-                            </p>
+                            </div>
                         </div>
                     </div>
-                    <div class="text-right">
-                        <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800 text-xs font-bold shadow-sm">
-                            <i class="ph-bold ph-door text-sm"></i>
-                            <span>{{ $adultoDrawer->habitacion?->nombre ?? ($adultoDrawer->habitacion?->codigo ?? 'Sin hab.') }}</span>
-                            <span>?</span>
-                            <i class="ph-bold ph-bed text-sm"></i>
-                            <span>{{ $adultoDrawer->cama?->codigo ?? 'Sin cama' }}</span>
+
+                    <div class="text-right text-xs">
+                        <span class="inline-block px-2.5 py-1 rounded-lg bg-[var(--rm-surface)] border border-[var(--rm-border)] text-[var(--rm-text-title)] font-semibold">
+                            {{ $adultoDrawer->ubicacion_texto }}
+                        </span>
+                        <div class="mt-1 flex items-center justify-end gap-1.5">
+                            <span class="text-[11px] text-[var(--rm-text-muted)]">Estado:</span>
+                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10.5px] font-semibold border {{ $adultoDrawer->estado_badge_color }}">
+                                {{ $adultoDrawer->estado_humano }}
+                            </span>
                         </div>
-                        @if($adultoDrawer->habitacion?->ubicacion)
-                            <p class="text-[11px] text-slate-400 mt-1">{{ $adultoDrawer->habitacion->ubicacion }}</p>
-                        @endif
                     </div>
                 </div>
 
-                <!-- 2. Tarjetas KPI con fondos diferenciados por par?metro -->
+                <!-- 2. KPIs del Último Control Registrado con Micrográficos -->
                 <div>
-                    <div class="flex items-center justify-between mb-3">
-                        <span class="text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                            Último Control Asistencial ({{ $ultSigno?->fecha ? \Carbon\Carbon::parse($ultSigno->fecha)->format('d/m/Y') : 'Hoy' }} {{ $ultSigno?->hora ?? '' }})
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-xs font-bold uppercase tracking-wider text-[var(--rm-text-title)] flex items-center gap-1.5">
+                            <i class="ph-bold ph-heartbeat text-base text-[var(--rm-accent)]"></i>
+                            Último Control de Signos Vitales
                         </span>
-                        <span class="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1 bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 rounded-md border border-emerald-200 dark:border-emerald-800">
-                            <span class="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                            Monitoreo Activo
+                        <span class="text-[11px] text-[var(--rm-text-muted)] font-mono">
+                            {{ $ultSigno ? ($ultSigno->fecha ? $ultSigno->fecha->format('d/m/Y') : '') . ' ' . ($ultSigno->hora ? substr($ultSigno->hora, 0, 5) : '') : 'Sin registros recientes' }}
                         </span>
                     </div>
 
-                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                        <!-- Presi?n Arterial -->
-                        <div class="p-3.5 rounded-2xl bg-rose-50/80 dark:bg-rose-950/40 border border-rose-200/80 dark:border-rose-900/50 shadow-sm">
-                            <div class="flex items-center justify-between text-rose-500 mb-1">
-                                <span class="text-[10px] font-bold uppercase tracking-wider">Presión Art.</span>
-                                <i class="ph-bold ph-heartbeat text-rose-600 text-base"></i>
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                        {{-- Presión Arterial --}}
+                        <div class="p-2.5 rounded-xl bg-[var(--rm-surface)] border border-[var(--rm-border)] shadow-xs flex flex-col justify-between">
+                            <div>
+                                <span class="text-[10px] font-bold uppercase text-[var(--rm-text-muted)] block">Presión Art.</span>
+                                <div class="text-sm font-bold text-[var(--rm-danger-action)] font-mono mt-0.5">
+                                    {{ $ultSigno && $ultSigno->presion_sistolica ? $ultSigno->presion_sistolica.'/'.$ultSigno->presion_diastolica : '--/--' }}
+                                    <span class="text-[10px] font-normal text-[var(--rm-text-muted)]">mmHg</span>
+                                </div>
                             </div>
-                            <span class="text-lg font-black text-slate-800 dark:text-white font-mono">
-                                {{ $ultSigno?->presion_arterial ?? ($ultSigno?->presion_sistolica ? $ultSigno->presion_sistolica.'/'.$ultSigno->presion_diastolica : '120/80') }}
-                            </span>
-                            <span class="block text-[10px] text-slate-400 font-medium">mmHg</span>
+                            @if(count($sisData) >= 2)
+                                <div class="mt-2 h-7 w-full">
+                                    <x-ui.sparkline :data="$sisData" :labels="$labels" color="danger" height="28px" />
+                                </div>
+                            @endif
                         </div>
 
-                        <!-- Frecuencia Cardíaca -->
-                        <div class="p-3.5 rounded-2xl bg-blue-50/80 dark:bg-blue-950/40 border border-blue-200/80 dark:border-blue-900/50 shadow-sm">
-                            <div class="flex items-center justify-between text-blue-500 mb-1">
-                                <span class="text-[10px] font-bold uppercase tracking-wider">Pulso / FC</span>
-                                <i class="ph-bold ph-activity text-blue-600 text-base"></i>
+                        {{-- Frecuencia Cardíaca --}}
+                        <div class="p-2.5 rounded-xl bg-[var(--rm-surface)] border border-[var(--rm-border)] shadow-xs flex flex-col justify-between">
+                            <div>
+                                <span class="text-[10px] font-bold uppercase text-[var(--rm-text-muted)] block">Pulso / F.C.</span>
+                                <div class="text-sm font-bold text-[var(--rm-accent-action)] font-mono mt-0.5">
+                                    {{ $ultSigno && $ultSigno->frecuencia_cardiaca ? $ultSigno->frecuencia_cardiaca : '--' }}
+                                    <span class="text-[10px] font-normal text-[var(--rm-text-muted)]">lpm</span>
+                                </div>
                             </div>
-                            <span class="text-lg font-black text-slate-800 dark:text-white font-mono">
-                                {{ $ultSigno?->frecuencia_cardiaca ?? '72' }}
-                            </span>
-                            <span class="block text-[10px] text-slate-400 font-medium">lpm</span>
+                            @if(count($fcData) >= 2)
+                                <div class="mt-2 h-7 w-full">
+                                    <x-ui.sparkline :data="$fcData" :labels="$labels" color="terracota" height="28px" />
+                                </div>
+                            @endif
                         </div>
 
-                        <!-- Saturación O2 -->
-                        <div class="p-3.5 rounded-2xl bg-cyan-50/80 dark:bg-cyan-950/40 border border-cyan-200/80 dark:border-cyan-900/50 shadow-sm">
-                            <div class="flex items-center justify-between text-cyan-500 mb-1">
-                                <span class="text-[10px] font-bold uppercase tracking-wider">SpO2</span>
-                                <i class="ph-bold ph-drop text-cyan-600 text-base"></i>
+                        {{-- Saturación SpO2 --}}
+                        <div class="p-2.5 rounded-xl bg-[var(--rm-surface)] border border-[var(--rm-border)] shadow-xs flex flex-col justify-between">
+                            <div>
+                                <span class="text-[10px] font-bold uppercase text-[var(--rm-text-muted)] block">SpO2</span>
+                                <div class="text-sm font-bold text-[var(--rm-info-action)] font-mono mt-0.5">
+                                    {{ $ultSigno && $ultSigno->saturacion ? $ultSigno->saturacion : '--' }}
+                                    <span class="text-[10px] font-normal text-[var(--rm-text-muted)]">%</span>
+                                </div>
                             </div>
-                            <span class="text-lg font-black text-slate-800 dark:text-white font-mono">
-                                {{ $ultSigno?->saturacion ?? '97' }}%
-                            </span>
-                            <span class="block text-[10px] text-slate-400 font-medium">oxígeno</span>
+                            @if(count($spo2Data) >= 2)
+                                <div class="mt-2 h-7 w-full">
+                                    <x-ui.sparkline :data="$spo2Data" :labels="$labels" color="info" height="28px" />
+                                </div>
+                            @endif
                         </div>
 
-                        <!-- Temperatura -->
-                        <div class="p-3.5 rounded-2xl bg-amber-50/80 dark:bg-amber-950/40 border border-amber-200/80 dark:border-amber-900/50 shadow-sm">
-                            <div class="flex items-center justify-between text-amber-500 mb-1">
-                                <span class="text-[10px] font-bold uppercase tracking-wider">Temperatura</span>
-                                <i class="ph-bold ph-thermometer text-amber-600 text-base"></i>
+                        {{-- Temperatura --}}
+                        <div class="p-2.5 rounded-xl bg-[var(--rm-surface)] border border-[var(--rm-border)] shadow-xs flex flex-col justify-between">
+                            <div>
+                                <span class="text-[10px] font-bold uppercase text-[var(--rm-text-muted)] block">Temperatura</span>
+                                <div class="text-sm font-bold text-[var(--rm-text-title)] font-mono mt-0.5">
+                                    {{ $ultSigno && $ultSigno->temperatura ? $ultSigno->temperatura : '--' }}
+                                    <span class="text-[10px] font-normal text-[var(--rm-text-muted)]">°C</span>
+                                </div>
                             </div>
-                            <span class="text-lg font-black text-slate-800 dark:text-white font-mono">
-                                {{ $ultSigno?->temperatura ?? '36.5' }}?C
-                            </span>
-                            <span class="block text-[10px] text-slate-400 font-medium">axilar</span>
+                            @if(count($tempData) >= 2)
+                                <div class="mt-2 h-7 w-full">
+                                    <x-ui.sparkline :data="$tempData" :labels="$labels" color="warning" height="28px" />
+                                </div>
+                            @endif
                         </div>
                     </div>
                 </div>
 
-                <!-- 3. Curva Gráfica Visual de Evolución Clínica (SVG Vectorial) -->
-                <div class="p-5 rounded-2xl bg-white/95 dark:bg-slate-800/80 border border-purple-200/70 dark:border-purple-900/50 shadow-sm space-y-4">
+                <!-- 3. Selector de Pestañas Interactivas de Gráficos -->
+                <div class="space-y-2">
                     <div class="flex items-center justify-between">
-                        <div>
-                            <h4 class="text-xs font-black uppercase tracking-wider text-slate-800 dark:text-white flex items-center gap-2">
-                                <i class="ph-bold ph-chart-line text-purple-600 text-sm"></i>
-                                Curva de Presión Arterial y Tendencias
-                            </h4>
-                            <p class="text-[11px] text-slate-400">Evolución cronológica de los últimos registros clínicos</p>
-                        </div>
-                        <div class="flex items-center gap-3 text-xs font-bold">
-                            <span class="flex items-center gap-1 text-rose-600 dark:text-rose-400 text-[11px]">
-                                <span class="h-2.5 w-2.5 rounded-full bg-rose-500"></span> Sistólica
-                            </span>
-                            <span class="flex items-center gap-1 text-blue-600 dark:text-blue-400 text-[11px]">
-                                <span class="h-2.5 w-2.5 rounded-full bg-blue-500"></span> Diastólica
-                            </span>
+                        <span class="text-xs font-bold uppercase tracking-wider text-[var(--rm-text-title)] flex items-center gap-1.5">
+                            <i class="ph-bold ph-chart-line text-base text-[var(--rm-primary)]"></i>
+                            Curva de Tendencia Temporal
+                        </span>
+
+                        <div class="flex items-center gap-1 bg-[var(--rm-surface-alt)] p-1 rounded-lg border border-[var(--rm-border)]">
+                            <button type="button"
+                                @click="tab = 'presion'"
+                                :class="tab === 'presion' ? 'bg-[var(--rm-surface)] text-[var(--rm-danger-action)] font-bold shadow-xs' : 'text-[var(--rm-text-muted)] hover:text-[var(--rm-text-title)]'"
+                                class="px-2.5 py-1 rounded-md text-[11px] transition cursor-pointer">
+                                Presión
+                            </button>
+                            <button type="button"
+                                @click="tab = 'pulso'"
+                                :class="tab === 'pulso' ? 'bg-[var(--rm-surface)] text-[var(--rm-accent-action)] font-bold shadow-xs' : 'text-[var(--rm-text-muted)] hover:text-[var(--rm-text-title)]'"
+                                class="px-2.5 py-1 rounded-md text-[11px] transition cursor-pointer">
+                                Pulso
+                            </button>
+                            <button type="button"
+                                @click="tab = 'spo2'"
+                                :class="tab === 'spo2' ? 'bg-[var(--rm-surface)] text-[var(--rm-info-action)] font-bold shadow-xs' : 'text-[var(--rm-text-muted)] hover:text-[var(--rm-text-title)]'"
+                                class="px-2.5 py-1 rounded-md text-[11px] transition cursor-pointer">
+                                SpO2
+                            </button>
+                            <button type="button"
+                                @click="tab = 'temp'"
+                                :class="tab === 'temp' ? 'bg-[var(--rm-surface)] text-[#8F5C00] font-bold shadow-xs' : 'text-[var(--rm-text-muted)] hover:text-[var(--rm-text-title)]'"
+                                class="px-2.5 py-1 rounded-md text-[11px] transition cursor-pointer">
+                                Temp.
+                            </button>
                         </div>
                     </div>
 
-                    @php
-                        $signosOrdenados = $signosDrawer->sortBy('fecha')->values();
-                        $countPuntos = $signosOrdenados->count();
-                    @endphp
+                    @if($signosDrawer->count() >= 2)
+                        <div class="rm-chart-card rm-chart-glass p-4 rounded-2xl relative w-full overflow-hidden">
+                            <!-- Leyendas Dinámicas Contextuales -->
+                            <div class="flex items-center justify-between text-[11px] text-[var(--rm-text-muted)] mb-3 font-mono">
+                                <template x-if="tab === 'presion'">
+                                    <div class="flex items-center justify-between w-full">
+                                        <div class="flex items-center gap-3">
+                                            <span class="flex items-center gap-1.5 text-[var(--rm-danger-action)] font-bold">
+                                                <span class="inline-block w-2.5 h-2.5 rounded-full bg-[var(--rm-danger-action)]"></span>
+                                                Sistólica (mmHg)
+                                            </span>
+                                            <span class="flex items-center gap-1.5 text-[var(--rm-info-action)] font-bold">
+                                                <span class="inline-block w-2.5 h-2.5 rounded-full bg-[var(--rm-info-action)]"></span>
+                                                Diastólica (mmHg)
+                                            </span>
+                                        </div>
+                                        <span class="text-[10px] text-[var(--rm-text-muted)]">Norma: &lt; 120/80 mmHg</span>
+                                    </div>
+                                </template>
+                                <template x-if="tab === 'pulso'">
+                                    <div class="flex items-center justify-between w-full">
+                                        <span class="flex items-center gap-1.5 text-[var(--rm-accent-action)] font-bold">
+                                            <span class="inline-block w-2.5 h-2.5 rounded-full bg-[var(--rm-accent-action)]"></span>
+                                            Frecuencia Cardíaca (lpm)
+                                        </span>
+                                        <span class="text-[10px] text-[var(--rm-text-muted)]">Norma: 60 - 100 lpm</span>
+                                    </div>
+                                </template>
+                                <template x-if="tab === 'spo2'">
+                                    <div class="flex items-center justify-between w-full">
+                                        <span class="flex items-center gap-1.5 text-[var(--rm-info-action)] font-bold">
+                                            <span class="inline-block w-2.5 h-2.5 rounded-full bg-[var(--rm-info-action)]"></span>
+                                            Saturación de Oxígeno (%)
+                                        </span>
+                                        <span class="text-[10px] text-[var(--rm-text-muted)]">Norma: 95% - 100% (Crítico &lt; 90%)</span>
+                                    </div>
+                                </template>
+                                <template x-if="tab === 'temp'">
+                                    <div class="flex items-center justify-between w-full">
+                                        <span class="flex items-center gap-1.5 text-[#8F5C00] font-bold">
+                                            <span class="inline-block w-2.5 h-2.5 rounded-full bg-[#C27D00]"></span>
+                                            Temperatura Corporal (°C)
+                                        </span>
+                                        <span class="text-[10px] text-[var(--rm-text-muted)]">Norma: 36.5°C - 37.5°C</span>
+                                    </div>
+                                </template>
+                            </div>
 
-                    @if($countPuntos > 0)
-                        <div class="relative w-full h-48 bg-slate-50 dark:bg-slate-900 rounded-xl p-3 border border-slate-200/70 dark:border-slate-700/80">
-                            <svg class="w-full h-full overflow-visible" viewBox="0 0 500 140" preserveAspectRatio="none">
-                                <defs>
-                                    <linearGradient id="gradSistolicaDrawer" x1="0%" y1="0%" x2="0%" y2="100%">
-                                        <stop offset="0%" stop-color="#E11D48" stop-opacity="0.3"/>
-                                        <stop offset="100%" stop-color="#E11D48" stop-opacity="0.0"/>
-                                    </linearGradient>
-                                    <linearGradient id="gradDiastolicaDrawer" x1="0%" y1="0%" x2="0%" y2="100%">
-                                        <stop offset="0%" stop-color="#2563EB" stop-opacity="0.2"/>
-                                        <stop offset="100%" stop-color="#2563EB" stop-opacity="0.0"/>
-                                    </linearGradient>
-                                </defs>
-
-                                <line x1="0" y1="20" x2="500" y2="20" stroke="currentColor" class="text-slate-200 dark:text-slate-800" stroke-dasharray="4"/>
-                                <line x1="0" y1="60" x2="500" y2="60" stroke="currentColor" class="text-slate-200 dark:text-slate-800" stroke-dasharray="4"/>
-                                <line x1="0" y1="100" x2="500" y2="100" stroke="currentColor" class="text-slate-200 dark:text-slate-800" stroke-dasharray="4"/>
-
-                                @php
-                                    $minVal = 50;
-                                    $maxVal = 190;
-                                    $rango = $maxVal - $minVal;
-                                    $stepX = $countPuntos > 1 ? 460 / ($countPuntos - 1) : 230;
-
-                                    $puntosSis = [];
-                                    $puntosDia = [];
-                                    foreach($signosOrdenados as $i => $s) {
-                                        $x = 20 + ($i * $stepX);
-                                        $valSis = max(50, min(190, (float)($s->presion_sistolica ?? 120)));
-                                        $valDia = max(50, min(190, (float)($s->presion_diastolica ?? 80)));
-                                        $ySis = 120 - (($valSis - $minVal) / $rango * 100);
-                                        $yDia = 120 - (($valDia - $minVal) / $rango * 100);
-                                        $puntosSis[] = ['x' => $x, 'y' => $ySis, 'val' => $valSis, 'fecha' => $s->fecha ? \Carbon\Carbon::parse($s->fecha)->format('d/m') : ''];
-                                        $puntosDia[] = ['x' => $x, 'y' => $yDia, 'val' => $valDia];
-                                    }
-
-                                    $pathSis = '';
-                                    $pathDia = '';
-                                    foreach($puntosSis as $idx => $pt) {
-                                        $pathSis .= ($idx === 0 ? 'M' : 'L') . " {$pt['x']} {$pt['y']} ";
-                                    }
-                                    foreach($puntosDia as $idx => $pt) {
-                                        $pathDia .= ($idx === 0 ? 'M' : 'L') . " {$pt['x']} {$pt['y']} ";
-                                    }
-                                @endphp
-
-                                @if(count($puntosSis) > 1)
-                                    <path d="{{ $pathSis }} L {{ end($puntosSis)['x'] }} 130 L {{ $puntosSis[0]['x'] }} 130 Z" fill="url(#gradSistolicaDrawer)" />
-                                    <path d="{{ $pathDia }} L {{ end($puntosDia)['x'] }} 130 L {{ $puntosDia[0]['x'] }} 130 Z" fill="url(#gradDiastolicaDrawer)" />
-                                @endif
-
-                                <path d="{{ $pathSis }}" fill="none" stroke="#E11D48" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-                                <path d="{{ $pathDia }}" fill="none" stroke="#2563EB" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-
-                                @foreach($puntosSis as $idx => $pt)
-                                    <circle cx="{{ $pt['x'] }}" cy="{{ $pt['y'] }}" r="4" fill="#E11D48" stroke="#FFFFFF" stroke-width="2"/>
-                                    <text x="{{ $pt['x'] }}" y="{{ $pt['y'] - 8 }}" font-size="9" font-weight="bold" fill="#E11D48" text-anchor="middle">{{ round($pt['val']) }}</text>
-                                @endforeach
-
-                                @foreach($puntosDia as $idx => $pt)
-                                    <circle cx="{{ $pt['x'] }}" cy="{{ $pt['y'] }}" r="4" fill="#2563EB" stroke="#FFFFFF" stroke-width="2"/>
-                                    <text x="{{ $pt['x'] }}" y="{{ $pt['y'] + 12 }}" font-size="9" font-weight="bold" fill="#2563EB" text-anchor="middle">{{ round($pt['val']) }}</text>
-                                @endforeach
-                            </svg>
+                            <!-- Canvas para Gráfico Dinámico con Movimiento y Relleno Translúcido -->
+                            <div class="w-full h-44 relative" wire:ignore>
+                                <canvas id="chart-drawer-evolucion"></canvas>
+                            </div>
                         </div>
                     @else
-                        <div class="py-8 text-center text-xs text-slate-400">
-                            No se registran suficientes puntos de signos vitales para trazar la curva.
+                        <div class="py-8 text-center border border-dashed border-[var(--rm-border)] rounded-xl text-xs text-[var(--rm-text-muted)] bg-[var(--rm-surface)]">
+                            Se requieren al menos 2 controles de signos vitales para graficar la curva de evolución.
                         </div>
                     @endif
                 </div>
 
-                <!-- 4. Tabla Unificada de Historial Clínico -->
+                <!-- 4. Tabla de Historial Clínico Reciente -->
                 <div class="space-y-2">
-                    <span class="text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 block">
-                        Registros Históricos Recientes
+                    <span class="text-xs font-bold uppercase tracking-wider text-[var(--rm-text-title)] flex items-center gap-1.5">
+                        <i class="ph ph-table text-base text-[var(--rm-primary)]"></i>
+                        Historial de Controles Recientes
                     </span>
 
-                    <div class="rounded-2xl border border-slate-200/80 dark:border-slate-700 overflow-hidden bg-white/95 dark:bg-slate-900 shadow-sm">
-                        <table class="w-full text-left text-xs">
-                            <thead class="bg-slate-50 dark:bg-slate-800/80 border-b border-slate-200/80 dark:border-slate-700 text-[10px] font-extrabold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                    <div class="rm-table-container">
+                        <table class="rm-table text-xs">
+                            <thead class="rm-table-header">
                                 <tr>
-                                    <th class="py-2.5 px-3">Fecha y Hora</th>
-                                    <th class="py-2.5 px-3">P. Arterial</th>
-                                    <th class="py-2.5 px-3">Pulso</th>
-                                    <th class="py-2.5 px-3">SpO2</th>
-                                    <th class="py-2.5 px-3">Temp.</th>
-                                    <th class="py-2.5 px-3">Estado</th>
+                                    <th>Fecha / Hora</th>
+                                    <th>P.A.</th>
+                                    <th>Pulso</th>
+                                    <th>SpO2</th>
+                                    <th>Temp.</th>
+                                    <th>Estado</th>
                                 </tr>
                             </thead>
-                            <tbody class="divide-y divide-slate-100 dark:divide-slate-800 text-slate-700 dark:text-slate-300 font-medium">
+                            <tbody>
                                 @forelse($historialSignos as $s)
-                                    <tr class="hover:bg-slate-50/70 dark:hover:bg-slate-800/40 transition">
-                                        <td class="py-2 px-3 font-bold text-slate-800 dark:text-white">
-                                            {{ $s->fecha ? \Carbon\Carbon::parse($s->fecha)->format('d/m/Y') : '-' }} <span class="text-[10px] text-slate-400">{{ $s->hora }}</span>
+                                    <tr class="rm-table-row">
+                                        <td class="rm-table-cell font-mono py-2 px-2.5">
+                                            {{ ($s->fecha ? $s->fecha->format('d/m/Y') : '') . ' ' . ($s->hora ? substr($s->hora, 0, 5) : '') }}
                                         </td>
-                                        <td class="py-2 px-3 font-mono font-bold text-rose-600 dark:text-rose-400">
-                                            {{ $s->presion_arterial ?? ($s->presion_sistolica ? $s->presion_sistolica.'/'.$s->presion_diastolica : '-') }}
+                                        <td class="rm-table-cell font-mono font-bold py-2 px-2.5 text-[var(--rm-danger-action)]">
+                                            {{ $s->presion_sistolica ? $s->presion_sistolica.'/'.$s->presion_diastolica : '-' }}
                                         </td>
-                                        <td class="py-2 px-3 font-mono">
+                                        <td class="rm-table-cell font-mono font-bold py-2 px-2.5 text-[var(--rm-accent-action)]">
                                             {{ $s->frecuencia_cardiaca ? $s->frecuencia_cardiaca.' lpm' : '-' }}
                                         </td>
-                                        <td class="py-2 px-3 font-mono font-bold text-cyan-600 dark:text-cyan-400">
+                                        <td class="rm-table-cell font-mono font-bold py-2 px-2.5 text-[var(--rm-info-action)]">
                                             {{ $s->saturacion ? $s->saturacion.'%' : '-' }}
                                         </td>
-                                        <td class="py-2 px-3 font-mono">
-                                            {{ $s->temperatura ? $s->temperatura.'?C' : '-' }}
+                                        <td class="rm-table-cell font-mono py-2 px-2.5">
+                                            {{ $s->temperatura ? $s->temperatura.'°C' : '-' }}
                                         </td>
-                                        <td class="py-2 px-3">
-                                            <span class="px-2 py-0.5 rounded-md text-[9px] font-bold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+                                        <td class="rm-table-cell py-2 px-2.5">
+                                            <span class="rm-badge rm-badge-success text-[10px]">
                                                 Registrado
                                             </span>
                                         </td>
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="6" class="py-6 text-center text-slate-400">
-                                            No hay registros de signos vitales disponibles.
+                                        <td colspan="6" class="py-6 text-center text-[var(--rm-text-muted)]">
+                                            No hay registros de signos vitales disponibles para este residente.
                                         </td>
                                     </tr>
                                 @endforelse
@@ -285,17 +472,17 @@
             </div>
 
             <!-- Pie del Drawer -->
-            <div class="px-6 py-4 border-t border-purple-200/70 dark:border-purple-900/50 bg-gradient-to-r from-purple-50/80 via-white/90 dark:via-slate-900/90 to-indigo-50/80 flex items-center justify-between">
+            <div class="rm-drawer-footer flex items-center justify-between">
                 <button type="button"
                     wire:click="verUbicacion('{{ $adultoDrawer->cod_am }}')"
-                    class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold text-blue-700 hover:text-blue-800 bg-blue-100/80 hover:bg-blue-200 dark:bg-blue-950/60 dark:hover:bg-blue-900/60 border border-blue-300 dark:border-blue-800 transition cursor-pointer shadow-sm active:scale-95">
-                    <i class="ph-bold ph-bed text-sm"></i>
-                    <span>Ver Ubicación y Habitación</span>
+                    class="rm-btn rm-btn-sm rm-btn-secondary cursor-pointer">
+                    <i class="ph ph-bed text-base"></i>
+                    <span>Ver Ubicación y Cama</span>
                 </button>
 
                 <button type="button"
                     wire:click="cerrarDrawer"
-                    class="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-300 bg-white/80 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 transition cursor-pointer shadow-sm active:scale-95">
+                    class="rm-btn rm-btn-sm rm-btn-ghost cursor-pointer">
                     Cerrar Panel
                 </button>
             </div>

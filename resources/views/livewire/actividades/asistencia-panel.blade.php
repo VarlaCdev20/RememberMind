@@ -336,7 +336,7 @@
  <p class="max-w-[160px] truncate text-xs font-bold text-titulo">
  {{ $am->ap_paterno }} {{ $am->ap_materno }}, {{ $am->nombres }}
  </p>
- <p class="text-[10px] font-bold text-apoyo">{{ $r->cod_am }}</p>
+ <p class="text-[10px] font-bold text-apoyo">{{ $am?->edad ?? 'Edad no registrada' }}{{ $am?->edad ? ' años' : '' }}</p>
  </td>
 
  {{-- Tipo --}}
@@ -522,7 +522,7 @@
  @if($dAm->nombres), {{ $dAm->nombres }}@endif
  </h2>
  <p class="text-xs font-bold text-apoyo">
- {{ $detalle->cod_am }} · {{ $dEdad }}
+ {{ $dEdad }}
  </p>
  </div>
  <button

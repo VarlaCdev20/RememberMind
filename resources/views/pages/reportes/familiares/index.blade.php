@@ -62,14 +62,12 @@
  <table class="rm-table">
  <thead>
  <tr>
- <th>Código</th>
  <th>Nombre</th>
  </tr>
  </thead>
  <tbody>
  @foreach(array_slice((array) $datos['adultos_sin_fam'], 0, 20) as $adulto)
  <tr>
- <td>{{ $adulto->cod_am ?? $adulto['cod_am'] ?? '—' }}</td>
  <td>{{ $adulto->nombre ?? $adulto['nombre'] ?? '—' }}</td>
  </tr>
  @endforeach

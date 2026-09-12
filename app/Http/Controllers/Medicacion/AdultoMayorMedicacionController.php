@@ -40,6 +40,7 @@ class AdultoMayorMedicacionController extends Controller
 
     public function update(UpdateMedicacionRequest $request, AdultoMayor $adulto_mayor, MedicacionAdulto $medicacion)
     {
+        abort_unless($medicacion->cod_am === $adulto_mayor->cod_am, 404);
         try {
             DB::beginTransaction();
             $medicacion->update($request->validated());
@@ -59,6 +60,7 @@ class AdultoMayorMedicacionController extends Controller
 
     public function suspender(AdultoMayor $adulto_mayor, MedicacionAdulto $medicacion)
     {
+        $this->autorizarOrden($adulto_mayor, $medicacion, ['medicacion.suspender', 'salud.medicacion.suspender']);
         $medicacion->update(['estado' => 'SUSPENDIDO']);
 
         activity('Medicación')
@@ -75,6 +77,7 @@ class AdultoMayorMedicacionController extends Controller
 
     public function finalizar(AdultoMayor $adulto_mayor, MedicacionAdulto $medicacion)
     {
+        $this->autorizarOrden($adulto_mayor, $medicacion, ['medicacion.suspender', 'salud.medicacion.finalizar']);
         $medicacion->update([
             'estado'    => 'FINALIZADO',
             'fecha_fin' => now()->toDateString(),
@@ -94,6 +97,7 @@ class AdultoMayorMedicacionController extends Controller
 
     public function archivar(AdultoMayor $adulto_mayor, MedicacionAdulto $medicacion)
     {
+        $this->autorizarOrden($adulto_mayor, $medicacion, ['medicacion.suspender', 'salud.medicacion.anular']);
         $medicacion->update(['estado' => 'ARCHIVADO']);
         $medicacion->delete(); // SoftDelete
 
@@ -105,11 +109,19 @@ class AdultoMayorMedicacionController extends Controller
     public function restore(AdultoMayor $adulto_mayor, $medicacion)
     {
         $med = MedicacionAdulto::withTrashed()->findOrFail($medicacion);
+        $this->autorizarOrden($adulto_mayor, $med, ['medicacion.editar', 'salud.medicacion.editar']);
         $med->restore();
         $med->update(['estado' => 'ACTIVO']);
 
         return redirect()
             ->route('admin.adultos-mayores.show', ['adulto_mayor' => $adulto_mayor->cod_am, 'tab' => 'medicacion'])
             ->with('success', "Medicación '{$med->nombre_medicamento}' restaurada.");
+    }
+
+    private function autorizarOrden(AdultoMayor $adulto, MedicacionAdulto $medicacion, array $permisos): void
+    {
+        abort_unless($medicacion->cod_am === $adulto->cod_am, 404);
+        abort_if(auth()->user()?->hasRole('ENFERMEROS'), 403, 'Enfermería no puede modificar órdenes médicas.');
+        abort_unless(auth()->user()?->canAny($permisos), 403);
     }
 }

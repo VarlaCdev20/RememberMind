@@ -1,0 +1,98 @@
+/* ============================================================
+   REMEMBERMIND DESIGN SYSTEM — PATTERNS / MODULE PAGE
+   Patrón maestro institucional para pantallas de gestión clínica:
+   PAGE HEADER → KPIS → VISUALIZACIÓN / GRÁFICOS → FILTER BAR →
+   LISTADO / TABLA → MODAL / DRAWER CONTEXTUAL.
+   DENSIDAD COMPACTA / OPERACIONAL: Minimiza scroll, maximiza datos.
+   ============================================================ */
+
+.rm-page-layout {
+    display: flex;
+    flex-direction: column;
+    gap: var(--rm-page-gap, 16px);
+    padding-bottom: var(--rm-space-6, 24px);
+    width: 100%;
+}
+
+/* 1. Header de Página Compacto (3) */
+.rm-page-header {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 12px 20px;
+    background-color: var(--rm-surface-soft);
+    border: 1px solid var(--rm-border);
+    border-radius: var(--rm-radius-panel, 16px);
+    box-shadow: var(--rm-shadow-sm);
+}
+
+@media (min-width: 1024px) {
+    .rm-page-header {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+    }
+}
+
+.rm-page-title-group {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.rm-page-title {
+    font-family: var(--rm-font-title);
+    font-size: var(--rm-font-page-title, 24px);
+    font-weight: var(--rm-font-weight-bold);
+    color: var(--rm-text-title);
+    margin: 0;
+    line-height: var(--rm-line-height-tight);
+}
+
+.rm-page-subtitle {
+    font-size: 13px;
+    color: var(--rm-text-muted);
+    margin: 0;
+    line-height: 1.35;
+}
+
+/* 2. Cuadrícula de KPIs */
+.rm-kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+    gap: var(--rm-section-gap, 14px);
+}
+
+@media (min-width: 640px) {
+    .rm-kpi-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (min-width: 1024px) {
+    .rm-kpi-grid {
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+    }
+}
+
+/* 3. Sección de Visualización y Gráficos */
+.rm-chart-grid {
+    display: grid;
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+    gap: var(--rm-section-gap, 14px);
+}
+
+@media (min-width: 1024px) {
+    .rm-chart-grid {
+        grid-template-columns: repeat(12, minmax(0, 1fr));
+    }
+}
+
+/* 4. Barra de Filtros (véase components/filters.css) */
+
+/* 5. Contenedor Maestro de Tabla / Listado */
+.rm-table-section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--rm-section-gap, 14px);
+}

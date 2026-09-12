@@ -21,4 +21,5 @@ class LesionResidente extends Model
     public function adultoMayor() { return $this->belongsTo(AdultoMayor::class, 'cod_am', 'cod_am'); }
     public function incidente() { return $this->belongsTo(IncidenteResidente::class, 'cod_incidente', 'cod_incidente'); }
     public function seguimientos() { return $this->hasMany(SeguimientoLesion::class, 'cod_lesion', 'cod_lesion'); }
+    public function cerradoPor() { return $this->belongsTo(User::class, 'cerrado_por', 'cod_usu'); }
 }

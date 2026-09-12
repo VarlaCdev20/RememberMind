@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
  <meta charset="UTF-8">
- <title>Expediente - {{ $adulto->cod_am }}</title>
+ <title>Expediente - {{ $adulto->nombres }} {{ $adulto->ap_paterno }}</title>
  <style>
  body { font-family: 'Calibri', 'Arial', sans-serif; font-size: 11pt; color: #1a1a1a; margin: 2cm; }
  h1 { font-size: 18pt; color: #2F3E5C; text-align: center; border-bottom: 2pt solid #2F3E5C; padding-bottom: 6pt; margin-bottom: 14pt; }
@@ -34,14 +34,14 @@
 {{-- Encabezado --}}
 <h1>FICHA TÉCNICA INDIVIDUAL<br><small style="font-size: 14pt;">{{ strtoupper($adulto->nombres . ' ' . $adulto->ap_paterno . ' ' . $adulto->ap_materno) }}</small></h1>
 <div class="sub-header">
- CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS · RememberMind · Expediente: <strong>{{ $adulto->cod_am }}</strong> · Generado: {{ now()->format('d/m/Y H:i') }}<br>
+ CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS · RememberMind · Residente: <strong>{{ $adulto->nombres }} {{ $adulto->ap_paterno }} {{ $adulto->ap_materno }}</strong> · Generado: {{ now()->format('d/m/Y H:i') }}<br>
  <em>Documento confidencial — uso institucional exclusivo</em>
 </div>
 
 {{-- Datos personales --}}
 <h2>1. Identificación Personal</h2>
 <table>
- <tr><td class="label">Código de expediente</td><td class="value">{{ $adulto->cod_am }}</td>
+ <tr><td class="label">Documento de identidad</td><td class="value">{{ $adulto->ci ?: 'No registrado' }}</td>
  <td class="label">Estado actual</td><td class="value"><span class="badge">{{ $adulto->estado?->estado ?? 'ACTIVO' }}</span></td></tr>
  <tr><td class="label">Nombres</td><td class="value" colspan="3">{{ $adulto->nombres }} {{ $adulto->ap_paterno }} {{ $adulto->ap_materno }}</td></tr>
  <tr><td class="label">C.I.</td><td class="value">{{ $adulto->ci }}{{ $adulto->complemento_ci ? '-'.$adulto->complemento_ci : '' }} ({{ $adulto->expedicion_ci }})</td>
@@ -236,7 +236,7 @@
 </table>
 
 <div class="footer">
- Documento generado por RememberMind · CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS · {{ now()->format('d/m/Y H:i') }} · Expediente {{ $adulto->cod_am }}<br>
+ Documento generado por RememberMind · CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS · {{ now()->format('d/m/Y H:i') }} · {{ $adulto->nombres }} {{ $adulto->ap_paterno }}<br>
  Este documento es confidencial y de uso institucional. Prohibida su reproducción sin autorización.
 </div>
 
