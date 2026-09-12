@@ -2,349 +2,302 @@
 
 namespace App\Livewire\Medicacion;
 
-use Livewire\Component;
-use Livewire\WithPagination;
 use App\Models\AdultoMayor;
 use App\Models\MedicacionAdulto;
 use App\Services\Enfermeria\TurnoEnfermeriaService;
 use App\Services\Medicacion\AgendaMedicacionService;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Livewire\Component;
+use Livewire\WithPagination;
+use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
+use Throwable;
 
 class SaludMedicacionPanel extends Component
 {
     use WithPagination;
 
-    public ?AdultoMayor $adulto = null;
-    public $cod_am = '';
-
-    // Filtros de búsqueda para medicamentos
-    public $search = '';
-    public $filtroEstado = '';
-    public $filtroVia = '';
-
-    // Apartado para agregar medicamentos
-    public bool $mostrarFormularioCrear = false;
-    public bool $drawerUbicacion = false;
-    public bool $drawerGrafico = false;
-    public ?AdultoMayor $adultoDrawer = null;
-    public $signosDrawer = [];
-    public string $nuevo_cod_am = '';
-    public string $nuevo_nombre = '';
-    public string $nuevo_dosis = '';
-    public string $nuevo_frecuencia = 'CADA 12 HORAS';
-    public string $nuevo_via = 'ORAL';
-    public string $nuevo_hora = '08:00';
-    public string $nuevo_fecha_inicio = '';
-    public ?string $nuevo_fecha_fin = null;
-    public string $nuevo_medico = '';
-    public string $nuevo_observacion = '';
-
-    protected $listeners = [
-        'medicacion-actualizada' => '$refresh',
-        'administracion-actualizada' => '$refresh',
+    private const ESTADOS_ACTIVOS = ['ACTIVO', 'ACTIVA', 'VIGENTE'];
+    private const ESTADOS_EN_CURSO = ['ACTIVO', 'ACTIVA', 'VIGENTE', 'PAUSADO', 'EN REVISION'];
+    private const ESTADOS_RESIDENTE_NO_MODIFICABLES = [
+        'ARCHIVADO',
+        'EGRESADO',
+        'FALLECIDO',
+        'INACTIVO',
+        'INACTIVA',
+        'NO_ADMITIDO',
+        'RETIRADO',
+        'DERIVADO',
+        'TRASLADADO',
     ];
 
-    public function mount($adulto = null)
+    public ?AdultoMayor $adulto = null;
+    public string $cod_am = '';
+
+    public string $search = '';
+    public string $filtroEstado = 'EN_CURSO';
+    public string $filtroVia = '';
+
+    public bool $drawerUbicacion = false;
+    public ?AdultoMayor $adultoDrawer = null;
+
+    protected $listeners = [
+        'medicacion-actualizada' => 'refrescarPanel',
+        'administracion-actualizada' => 'refrescarPanel',
+    ];
+
+    public function mount($adulto = null): void
     {
         $this->autorizarVista();
 
-        if ($adulto) {
-            if ($adulto instanceof AdultoMayor) {
-                $this->adulto = $adulto;
-                $this->cod_am = $adulto->cod_am;
-            } else {
-                $this->adulto = AdultoMayor::find($adulto);
-                $this->cod_am = $this->adulto?->cod_am ?? '';
-            }
-
-            abort_unless($this->adulto, 404);
-            $this->autorizarResidente($this->adulto);
-        }
-    }
-
-    public function toggleFormularioCrear(): void
-    {
-        $this->autorizarGestionOrden();
-        $this->mostrarFormularioCrear = !$this->mostrarFormularioCrear;
-        if ($this->mostrarFormularioCrear) {
-            $this->nuevo_cod_am = $this->adulto ? $this->adulto->cod_am : '';
-            $this->nuevo_fecha_inicio = now()->toDateString();
-            $this->nuevo_hora = '08:00';
-            $this->nuevo_medico = '';
-            $this->resetValidation();
-        }
-    }
-
-    public function abrirFormularioPara(string $codAm): void
-    {
-        $this->autorizarCreacion();
-        $this->cod_am = $codAm;
-        $this->adulto = AdultoMayor::findOrFail($codAm);
-        $this->autorizarResidente($this->adulto);
-        $this->mostrarFormularioCrear = true;
-        $this->nuevo_cod_am = $codAm;
-        $this->nuevo_fecha_inicio = now()->toDateString();
-        $this->nuevo_hora = '08:00';
-        $this->nuevo_medico = '';
-        $this->resetValidation();
-    }
-
-    public function cancelarCreacion(): void
-    {
-        $this->mostrarFormularioCrear = false;
-        $this->resetValidation();
-    }
-
-    public function guardarNuevoMedicamento(): void
-    {
-        $this->autorizarCreacion();
-
-        $this->validate([
-            'nuevo_cod_am' => 'required|exists:adulto_mayor,cod_am',
-            'nuevo_nombre' => 'required|string|min:2|max:100',
-            'nuevo_dosis' => 'required|string|max:50',
-            'nuevo_frecuencia' => 'required|string|max:50',
-            'nuevo_via' => 'required|string|max:50',
-            'nuevo_hora' => 'required|date_format:H:i',
-            'nuevo_fecha_inicio' => 'required|date',
-            'nuevo_fecha_fin' => 'nullable|date|after_or_equal:nuevo_fecha_inicio',
-            'nuevo_medico' => 'nullable|string|max:100',
-            'nuevo_observacion' => 'nullable|string|max:255',
-        ], [
-            'nuevo_cod_am.required' => 'Debe seleccionar un residente.',
-            'nuevo_nombre.required' => 'El nombre del medicamento es obligatorio.',
-            'nuevo_dosis.required' => 'La dosis es obligatoria (ej: 50mg, 1 comprimido).',
-            'nuevo_frecuencia.required' => 'La frecuencia de administración es obligatoria.',
-            'nuevo_via.required' => 'La vía de administración es obligatoria.',
-            'nuevo_hora.required' => 'La hora programada es obligatoria.',
-            'nuevo_hora.date_format' => 'La hora programada debe tener el formato HH:MM.',
-            'nuevo_fecha_inicio.required' => 'La fecha de inicio es obligatoria.',
-            'nuevo_fecha_fin.after_or_equal' => 'La fecha de fin debe ser igual o posterior a la fecha de inicio.',
-        ]);
-
-        $this->autorizarResidente(AdultoMayor::findOrFail($this->nuevo_cod_am));
-
-        $med = MedicacionAdulto::create([
-            'cod_am' => $this->nuevo_cod_am,
-            'nombre_medicamento' => $this->nuevo_nombre,
-            'dosis' => $this->nuevo_dosis,
-            'frecuencia' => $this->nuevo_frecuencia,
-            'via_administracion' => $this->nuevo_via,
-            'hora_programada' => $this->nuevo_hora,
-            'fecha_inicio' => $this->nuevo_fecha_inicio,
-            'fecha_fin' => $this->nuevo_fecha_fin,
-            'medico_indica' => filled($this->nuevo_medico) ? trim($this->nuevo_medico) : null,
-            'estado' => 'ACTIVA',
-            'observacion' => $this->nuevo_observacion,
-            'registrado_por' => auth()->id(),
-        ]);
-
-        if (!$this->adulto || $this->adulto->cod_am !== $this->nuevo_cod_am) {
-            $this->cod_am = $this->nuevo_cod_am;
-            $this->adulto = AdultoMayor::find($this->nuevo_cod_am);
+        if ($adulto === null || $adulto === '') {
+            return;
         }
 
-        $this->reset([
-            'nuevo_nombre', 'nuevo_dosis', 'nuevo_observacion', 'nuevo_fecha_fin'
-        ]);
-        $this->mostrarFormularioCrear = false;
+        $codAm = $adulto instanceof AdultoMayor
+            ? $adulto->cod_am
+            : (string) $adulto;
 
-        session()->flash('mensaje_exito', 'Medicamento '.$med->nombre_medicamento.' prescrito correctamente. La toma quedó programada para las '.$this->nuevo_hora.'.');
-        $this->dispatch('medicacion-actualizada');
+        $this->adulto = $this->resolverResidenteVisible($codAm);
+        $this->cod_am = $this->adulto->cod_am;
     }
 
-    public function updatedCodAm($value)
+    public function refrescarPanel(): void
     {
-        if ($value) {
-            $this->adulto = AdultoMayor::where('cod_am', $value)->firstOrFail();
-            $this->autorizarResidente($this->adulto);
-            $this->resetPage();
-        } else {
+        if ($this->cod_am !== '') {
+            $this->adulto = $this->resolverResidenteVisible($this->cod_am);
+        }
+
+        $this->resetPage();
+    }
+
+    public function updatedCodAm($value): void
+    {
+        $this->autorizarVista();
+        $this->cerrarDrawer();
+
+        $codAm = trim((string) $value);
+
+        if ($codAm === '') {
+            $this->cod_am = '';
             $this->adulto = null;
+            $this->resetPage();
+            return;
         }
+
+        $this->adulto = $this->resolverResidenteVisible($codAm);
+        $this->cod_am = $this->adulto->cod_am;
+        $this->resetPage();
     }
 
-    public function updatingSearch()
+    public function updatingSearch(): void
     {
         $this->resetPage();
     }
 
-    public function updatingFiltroEstado()
+    public function updatingFiltroEstado(): void
     {
         $this->resetPage();
     }
 
-    public function updatingFiltroVia()
+    public function updatingFiltroVia(): void
     {
         $this->resetPage();
     }
 
-    public function limpiarFiltros()
+    public function limpiarFiltros(): void
     {
-        $this->reset(['search', 'filtroEstado', 'filtroVia']);
+        $this->search = '';
+        $this->filtroEstado = 'EN_CURSO';
+        $this->filtroVia = '';
         $this->resetPage();
     }
 
-    public function suspenderMedicamento($id): void
+    public function abrirNuevaPrescripcion(?string $codAm = null): void
     {
-        $this->autorizarGestionOrden();
-        $medicacion = MedicacionAdulto::findOrFail($id);
-        $this->autorizarResidente($medicacion->adultoMayor);
-        abort_unless(in_array($medicacion->estado, ['ACTIVO', 'ACTIVA'], true), 409, 'Solo puede suspender una orden activa.');
-        $medicacion->update(['estado' => 'SUSPENDIDO']);
+        $this->autorizarGestionOrden('medicacion.crear');
 
-        activity('Medicación')
-            ->causedBy(auth()->user())
-            ->performedOn($medicacion)
-            ->event('suspended')
-            ->withProperties(['nombre_medicamento' => $medicacion->nombre_medicamento])
-            ->log("Se suspendió la medicación '{$medicacion->nombre_medicamento}' del adulto mayor {$medicacion->cod_am}.");
+        $codigo = filled($codAm)
+            ? trim((string) $codAm)
+            : ($this->adulto?->cod_am ?? null);
 
-        session()->flash('mensaje_exito', "Medicación '{$medicacion->nombre_medicamento}' suspendida correctamente.");
-        $this->dispatch('medicacion-actualizada');
+        if ($codigo) {
+            $adulto = $this->resolverResidenteVisible($codigo);
+            $this->autorizarResidenteModificable($adulto);
+            $codigo = $adulto->cod_am;
+        }
+
+        $this->dispatch('abrirModalMedicacion', cod_am: $codigo, id_med: null);
     }
 
-    public function finalizarMedicamento($id): void
+    public function editarMedicacion(string $id): void
     {
-        $this->autorizarGestionOrden();
-        $medicacion = MedicacionAdulto::findOrFail($id);
-        $this->autorizarResidente($medicacion->adultoMayor);
-        abort_unless(in_array($medicacion->estado, ['ACTIVO', 'ACTIVA'], true), 409, 'Solo puede finalizar una orden activa.');
-        $medicacion->update([
-            'estado' => 'FINALIZADO',
-            'fecha_fin' => now()->toDateString(),
-        ]);
+        $this->autorizarGestionOrden('medicacion.editar');
 
-        activity('Medicación')
-            ->causedBy(auth()->user())
-            ->performedOn($medicacion)
-            ->event('finalized')
-            ->withProperties(['nombre_medicamento' => $medicacion->nombre_medicamento])
-            ->log("Se finalizó el tratamiento de '{$medicacion->nombre_medicamento}' del adulto mayor {$medicacion->cod_am}.");
+        $medicacion = MedicacionAdulto::query()
+            ->with('adultoMayor.estado')
+            ->findOrFail($id);
 
-        session()->flash('mensaje_exito', "Tratamiento de '{$medicacion->nombre_medicamento}' finalizado con éxito.");
-        $this->dispatch('medicacion-actualizada');
+        abort_unless($medicacion->adultoMayor, 404);
+
+        $this->autorizarResidenteVisible($medicacion->adultoMayor);
+        $this->autorizarResidenteModificable($medicacion->adultoMayor);
+
+        abort_unless(
+            in_array($medicacion->estado, self::ESTADOS_EN_CURSO, true),
+            409,
+            'Una orden suspendida, finalizada o archivada ya no puede editarse.'
+        );
+
+        $this->dispatch(
+            'abrirModalMedicacion',
+            cod_am: $medicacion->cod_am,
+            id_med: $medicacion->cod_med_adulto
+        );
+    }
+
+    public function suspenderMedicamento(string $id): void
+    {
+        $this->cambiarEstadoTerminal($id, 'SUSPENDIDO');
+    }
+
+    public function finalizarMedicamento(string $id): void
+    {
+        $this->cambiarEstadoTerminal($id, 'FINALIZADO');
     }
 
     public function verUbicacion(string $codAm): void
     {
-        $this->adultoDrawer = AdultoMayor::with([
-            'habitacion',
-            'cama',
-            'alertas' => fn ($q) => $q->latest()->take(5),
-        ])->find($codAm);
+        $this->autorizarVista();
+
+        $adulto = $this->resolverResidenteVisible($codAm);
+
+        $this->adultoDrawer = AdultoMayor::query()
+            ->with([
+                'habitacion',
+                'cama',
+                'alertas' => fn($query) => $query->latest()->take(5),
+            ])
+            ->findOrFail($adulto->cod_am);
 
         $this->drawerUbicacion = true;
-        $this->drawerGrafico = false;
-    }
-
-    public function verGraficos(string $codAm): void
-    {
-        $this->adultoDrawer = AdultoMayor::with([
-            'habitacion',
-            'cama',
-            'signosVitales' => fn ($q) => $q->where('estado', '!=', 'ANULADO')->latest('fecha')->latest('hora')->take(10),
-        ])->find($codAm);
-
-        $this->signosDrawer = $this->adultoDrawer?->signosVitales ?? collect();
-        $this->drawerGrafico = true;
-        $this->drawerUbicacion = false;
     }
 
     public function cerrarDrawer(): void
     {
         $this->drawerUbicacion = false;
-        $this->drawerGrafico = false;
         $this->adultoDrawer = null;
-        $this->signosDrawer = [];
     }
 
     public function render()
     {
-        $adultosQuery = AdultoMayor::whereHas('estado', function ($q) {
-            $q->whereIn('estado', ['ACTIVO', 'ACTIVA']);
-        });
+        $this->autorizarVista();
 
-        if (auth()->user()?->hasRole('ENFERMEROS')) {
-            $adultosQuery->whereIn('cod_am', app(TurnoEnfermeriaService::class)->obtenerPacientesAsignadosIds(auth()->user()));
+        $adultosDisponibles = $this->residentesVisiblesQuery()
+            ->with(['estado', 'habitacion', 'cama'])
+            ->orderBy('nombres')
+            ->orderBy('ap_paterno')
+            ->get();
+
+        $codigosVisibles = $adultosDisponibles->pluck('cod_am')->values()->all();
+
+        /**
+         * Si se abrió la vista directamente con un residente histórico,
+         * se conserva su expediente aunque no aparezca en el selector operativo.
+         */
+        if ($this->adulto && !in_array($this->adulto->cod_am, $codigosVisibles, true)) {
+            $codigosVisibles[] = $this->adulto->cod_am;
         }
 
-        $adultosDisponibles = $adultosQuery->orderBy('nombres')->get();
-
-        $stats = [
-            'activas' => 0,
-            'suspendidas' => 0,
-            'finalizadas' => 0,
-            'archivadas' => 0,
-        ];
-        
-        $medicaciones = collect();
-        $viasDisponibles = collect();
-        $agenda = collect();
+        $base = MedicacionAdulto::query();
 
         if ($this->adulto) {
-            $allMedicaciones = MedicacionAdulto::where('cod_am', $this->adulto->cod_am)->get();
-            $stats = [
-                'activas' => $allMedicaciones->whereIn('estado', ['ACTIVO', 'ACTIVA'])->count(),
-                'suspendidas' => $allMedicaciones->where('estado', 'SUSPENDIDO')->count(),
-                'finalizadas' => $allMedicaciones->where('estado', 'FINALIZADO')->count(),
-                'archivadas' => $allMedicaciones->where('estado', 'ARCHIVADO')->count(),
-            ];
-
-            $query = MedicacionAdulto::with(['registrador', 'administraciones' => function($q) {
-                $q->whereDate('fecha', Carbon::today());
-            }])->where('cod_am', $this->adulto->cod_am);
-
-            if (!empty($this->search)) {
-                $query->where('nombre_medicamento', 'like', '%' . $this->search . '%');
-            }
-
-            if (!empty($this->filtroEstado)) {
-                $query->where('estado', $this->filtroEstado);
-            }
-
-            if (!empty($this->filtroVia)) {
-                $query->where('via_administracion', $this->filtroVia);
-            }
-
-            $medicaciones = $query->latest()->paginate(10);
-
-            $viasDisponibles = MedicacionAdulto::where('cod_am', $this->adulto->cod_am)
-                ->whereNotNull('via_administracion')
-                ->select('via_administracion')
-                ->distinct()
-                ->pluck('via_administracion');
-            $agenda = app(AgendaMedicacionService::class)->paraAdulto($this->adulto->cod_am);
+            $base->where('cod_am', $this->adulto->cod_am);
         } else {
-            $allGlobal = MedicacionAdulto::all();
-            $stats = [
-                'activas' => $allGlobal->whereIn('estado', ['ACTIVO', 'ACTIVA'])->count(),
-                'suspendidas' => $allGlobal->where('estado', 'SUSPENDIDO')->count(),
-                'finalizadas' => $allGlobal->where('estado', 'FINALIZADO')->count(),
-                'archivadas' => $allGlobal->where('estado', 'ARCHIVADO')->count(),
-            ];
-            
-            $query = MedicacionAdulto::with(['registrador', 'adultoMayor']);
-            
-            if (!empty($this->search)) {
-                $query->where('nombre_medicamento', 'like', '%' . $this->search . '%');
-            }
-            if (!empty($this->filtroEstado)) {
-                $query->where('estado', $this->filtroEstado);
-            } else {
-                $query->whereIn('estado', ['ACTIVO', 'ACTIVA']);
-            }
-            if (!empty($this->filtroVia)) {
-                $query->where('via_administracion', $this->filtroVia);
-            }
-            
-            $medicaciones = $query->latest()->paginate(10);
-            
-            $viasDisponibles = MedicacionAdulto::whereNotNull('via_administracion')
-                ->select('via_administracion')
-                ->distinct()
-                ->pluck('via_administracion');
+            $base->whereIn('cod_am', $codigosVisibles);
         }
+
+        $stats = [
+            'activas' => (clone $base)->whereIn('estado', self::ESTADOS_ACTIVOS)->count(),
+            'revision' => (clone $base)->whereIn('estado', ['PAUSADO', 'EN REVISION'])->count(),
+            'suspendidas' => (clone $base)->where('estado', 'SUSPENDIDO')->count(),
+            'finalizadas' => (clone $base)->whereIn('estado', ['FINALIZADO', 'ARCHIVADO'])->count(),
+        ];
+
+        $query = MedicacionAdulto::query()
+            ->with([
+                'registrador',
+                'adultoMayor.habitacion',
+                'adultoMayor.cama',
+                'administraciones' => fn($q) => $q->whereDate('fecha', Carbon::today()),
+            ]);
+
+        if ($this->adulto) {
+            $query->where('cod_am', $this->adulto->cod_am);
+        } else {
+            $query->whereIn('cod_am', $codigosVisibles);
+        }
+
+        $busqueda = trim($this->search);
+
+        if ($busqueda !== '') {
+            $query->where(function ($q) use ($busqueda) {
+                $q->where('nombre_medicamento', 'like', "%{$busqueda}%")
+                    ->orWhere('dosis', 'like', "%{$busqueda}%")
+                    ->orWhere('frecuencia', 'like', "%{$busqueda}%")
+                    ->orWhere('medico_indica', 'like', "%{$busqueda}%");
+            });
+        }
+
+        if ($this->filtroEstado === 'EN_CURSO') {
+            $query->whereIn('estado', self::ESTADOS_EN_CURSO);
+        } elseif ($this->filtroEstado !== '' && $this->filtroEstado !== 'TODOS') {
+            $query->where('estado', $this->filtroEstado);
+        }
+
+        if ($this->filtroVia !== '') {
+            $query->where('via_administracion', $this->filtroVia);
+        }
+
+        $medicaciones = $query
+            ->orderByRaw("
+                CASE
+                    WHEN estado IN ('ACTIVO', 'ACTIVA', 'VIGENTE') THEN 1
+                    WHEN estado IN ('PAUSADO', 'EN REVISION') THEN 2
+                    WHEN estado = 'SUSPENDIDO' THEN 3
+                    WHEN estado = 'FINALIZADO' THEN 4
+                    ELSE 5
+                END
+            ")
+            ->latest('updated_at')
+            ->paginate(10);
+
+        $viasQuery = MedicacionAdulto::query()
+            ->whereNotNull('via_administracion')
+            ->where('via_administracion', '!=', '');
+
+        if ($this->adulto) {
+            $viasQuery->where('cod_am', $this->adulto->cod_am);
+        } else {
+            $viasQuery->whereIn('cod_am', $codigosVisibles);
+        }
+
+        $viasDisponibles = $viasQuery
+            ->distinct()
+            ->orderBy('via_administracion')
+            ->pluck('via_administracion');
+
+        $agenda = $this->adulto
+            ? app(AgendaMedicacionService::class)->paraAdulto($this->adulto->cod_am)
+            : collect();
+
+        $agendaStats = [
+            'pendientes' => $agenda->whereIn('estado', ['PENDIENTE', 'PROXIMA'])->count(),
+            'vencidas' => $agenda->where('estado', 'VENCIDA')->count(),
+            'administradas' => $agenda->where('estado', 'ADMINISTRADA')->count(),
+            'omitidas' => $agenda->where('estado', 'OMITIDA')->count(),
+        ];
 
         return view('livewire.medicacion.salud-medicacion', [
             'adultosDisponibles' => $adultosDisponibles,
@@ -353,33 +306,174 @@ class SaludMedicacionPanel extends Component
             'stats' => $stats,
             'viasDisponibles' => $viasDisponibles,
             'agenda' => $agenda,
+            'agendaStats' => $agendaStats,
         ])->layout('layouts.sistema');
+    }
+
+    private function cambiarEstadoTerminal(string $id, string $nuevoEstado): void
+    {
+        abort_unless(
+            in_array($nuevoEstado, ['SUSPENDIDO', 'FINALIZADO'], true),
+            422,
+            'El estado solicitado no es válido.'
+        );
+
+        $this->autorizarGestionOrden('medicacion.suspender');
+
+        try {
+            $medicacion = DB::transaction(function () use ($id, $nuevoEstado) {
+                $medicacion = MedicacionAdulto::query()
+                    ->with('adultoMayor.estado')
+                    ->lockForUpdate()
+                    ->findOrFail($id);
+
+                abort_unless($medicacion->adultoMayor, 404);
+
+                $this->autorizarResidenteVisible($medicacion->adultoMayor);
+                $this->autorizarResidenteModificable($medicacion->adultoMayor);
+
+                abort_unless(
+                    in_array($medicacion->estado, self::ESTADOS_EN_CURSO, true),
+                    409,
+                    'Solo puede modificar una orden que todavía se encuentre en curso.'
+                );
+
+                if ($nuevoEstado === 'FINALIZADO') {
+                    abort_if(
+                        $medicacion->fecha_inicio && $medicacion->fecha_inicio->isFuture(),
+                        409,
+                        'No puede finalizar un tratamiento que todavía no ha iniciado. Puede suspenderlo si corresponde.'
+                    );
+                }
+
+                $cambios = ['estado' => $nuevoEstado];
+
+                if ($nuevoEstado === 'FINALIZADO') {
+                    $cambios['fecha_fin'] = today()->toDateString();
+                }
+
+                $medicacion->update($cambios);
+
+                return $medicacion->fresh();
+            });
+
+            $mensaje = $nuevoEstado === 'SUSPENDIDO'
+                ? "La medicación '{$medicacion->nombre_medicamento}' fue suspendida."
+                : "El tratamiento '{$medicacion->nombre_medicamento}' fue finalizado.";
+
+            $this->dispatch('medicacion-actualizada');
+
+            $this->dispatch('swal', [
+                'icon' => 'success',
+                'title' => $nuevoEstado === 'SUSPENDIDO' ? 'Medicación suspendida' : 'Tratamiento finalizado',
+                'text' => $mensaje,
+            ]);
+        } catch (HttpExceptionInterface $e) {
+            throw $e;
+        } catch (Throwable $e) {
+            report($e);
+
+            $this->dispatch('swal', [
+                'icon' => 'error',
+                'title' => 'No se pudo actualizar',
+                'text' => 'Ocurrió un problema al actualizar el tratamiento. Intente nuevamente.',
+            ]);
+        }
     }
 
     private function autorizarVista(): void
     {
-        $user = auth()->user();
+        $user = Auth::user();
+
         abort_unless($user, 401);
-        abort_unless($user->hasRole('SUPERADMINISTRADOR') || $user->canAny([
-            'medicacion.ver', 'salud.medicacion.ver', 'medicacion.crear', 'salud.medicacion.crear',
-        ]), 403);
+
+        abort_unless(
+            $user->can('salud.ver') && $user->can('medicacion.ver'),
+            403,
+            'No cuenta con permiso para consultar la medicación.'
+        );
     }
 
-    private function autorizarCreacion(): void
+    private function autorizarGestionOrden(string $permiso): void
     {
-        $this->autorizarGestionOrden();
+        $user = Auth::user();
+
+        abort_unless($user, 401);
+
+        abort_unless(
+            $user->hasAnyRole(['SUPERADMINISTRADOR', 'MEDICO GENERAL/GERIATRA']),
+            403,
+            'Las órdenes médicas solo pueden ser gestionadas por personal médico autorizado.'
+        );
+
+        abort_unless(
+            $user->can('salud.ver')
+                && $user->can('adultos.ver_expediente')
+                && $user->can($permiso),
+            403,
+            'No cuenta con los permisos necesarios para esta acción.'
+        );
     }
 
-    private function autorizarGestionOrden(): void
+    private function resolverResidenteVisible(string $codAm): AdultoMayor
     {
-        abort_unless(auth()->user()?->hasAnyRole(['SUPERADMINISTRADOR', 'MEDICO GENERAL/GERIATRA']), 403,
-            'Las prescripciones solo pueden ser creadas o modificadas por personal médico autorizado.');
+        $adulto = AdultoMayor::query()
+            ->with(['estado', 'habitacion', 'cama'])
+            ->findOrFail($codAm);
+
+        $this->autorizarResidenteVisible($adulto);
+
+        return $adulto;
     }
 
-    private function autorizarResidente(AdultoMayor $adulto): void
+    private function autorizarResidenteVisible(AdultoMayor $adulto): void
     {
-        if (auth()->user()?->hasRole('ENFERMEROS')) {
-            app(TurnoEnfermeriaService::class)->autorizarAccionPaciente($adulto, auth()->user());
+        $this->autorizarVista();
+
+        $user = Auth::user();
+
+        if ($user?->hasRole('ENFERMEROS')) {
+            app(TurnoEnfermeriaService::class)
+                ->autorizarAccionPaciente($adulto, $user);
         }
+    }
+
+    private function autorizarResidenteModificable(AdultoMayor $adulto): void
+    {
+        abort_if(
+            $adulto->archivado_en !== null,
+            409,
+            'El expediente del residente está archivado y solo puede consultarse.'
+        );
+
+        $estadoInstitucional = strtoupper(trim((string) ($adulto->estado?->estado ?? '')));
+        $estadoOperativo = strtoupper(trim((string) ($adulto->estado_operativo ?? '')));
+
+        abort_if(
+            in_array($estadoInstitucional, self::ESTADOS_RESIDENTE_NO_MODIFICABLES, true)
+                || in_array($estadoOperativo, self::ESTADOS_RESIDENTE_NO_MODIFICABLES, true),
+            409,
+            'El estado actual del residente no permite modificar órdenes médicas.'
+        );
+    }
+
+    private function residentesVisiblesQuery()
+    {
+        $query = AdultoMayor::query()
+            ->whereNull('archivado_en')
+            ->whereHas('estado', function ($q) {
+                $q->whereIn('estado', ['ACTIVO', 'ACTIVA']);
+            });
+
+        $user = Auth::user();
+
+        if ($user?->hasRole('ENFERMEROS')) {
+            $ids = app(TurnoEnfermeriaService::class)
+                ->obtenerPacientesAsignadosIds($user);
+
+            $query->whereIn('cod_am', $ids);
+        }
+
+        return $query;
     }
 }
