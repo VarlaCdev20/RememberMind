@@ -149,11 +149,7 @@ return [
         // Features::emailVerification(),
         Features::updateProfileInformation(),
         Features::updatePasswords(),
-        Features::twoFactorAuthentication([
-            'confirm' => true,
-            'confirmPassword' => true,
-            // 'window' => 0,
-        ]),
+        // 2FA requiere columnas que no pertenecen al baseline congelado.
     ],
 
 ];

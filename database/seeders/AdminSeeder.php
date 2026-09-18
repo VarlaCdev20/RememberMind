@@ -13,10 +13,8 @@ class AdminSeeder extends Seeder
         $admin = User::updateOrCreate(
             ['correo' => 'admincasaamandita@gmail.com'],
             [
-                'cod_usu'     => 'USU_0001',
-                'nombres'     => 'Super',
-                'ap_paterno'  => 'Administrador',
-                'password'    => Hash::make('CasaAmandita123'),
+                'cod_usuario' => 'USU_0001',
+                'contrasena'  => Hash::make('CasaAmandita123'),
                 'estado'      => 'ACTIVO',
             ]
         );

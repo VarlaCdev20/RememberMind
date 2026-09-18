@@ -1,39 +1,10 @@
 <?php
-
 namespace App\Actions\Identidad\Fortify;
-
 use App\Models\User;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 use Laravel\Fortify\Contracts\CreatesNewUsers;
-use Laravel\Jetstream\Jetstream;
-
-class CreateNewUser implements CreatesNewUsers
-{
+class CreateNewUser implements CreatesNewUsers {
     use PasswordValidationRules;
-
-    /**
-     * Validate and create a newly registered user.
-     *
-     * @param  array<string, string>  $input
-     */
-    public function create(array $input): User
-    {
-        Validator::make($input, [
-            'nombres' => ['required', 'string', 'max:100'],
-            'ap_paterno' => ['required', 'string', 'max:80'],
-            'ap_materno' => ['nullable', 'string', 'max:80'],
-           'correo' => ['required', 'string', 'email', 'max:120', 'unique:users,correo'],
-            'password' => $this->passwordRules(),
-            'terms' => Jetstream::hasTermsAndPrivacyPolicyFeature() ? ['accepted', 'required'] : '',
-        ])->validate();
-
-        return User::create([
-            'nombres' => $input['nombres'],
-            'ap_paterno' => $input['ap_paterno'],
-            'ap_materno' => $input['ap_materno'] ?? null,
-            'correo' => $input['correo'],
-            'password' => Hash::make($input['password']),
-        ]);
-    }
+    public function create(array $input): User { Validator::make($input,['correo'=>['required','email','max:120','unique:usuarios,correo'],'password'=>$this->passwordRules()])->validate(); return User::query()->create(['cod_usuario'=>'USU_'.Str::upper(Str::random(12)),'correo'=>Str::lower($input['correo']),'contrasena'=>$input['password'],'estado'=>'ACTIVO']); }
 }

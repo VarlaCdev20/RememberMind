@@ -203,7 +203,7 @@ class FortifyServiceProvider extends ServiceProvider
                     ||
                     ! Hash::check(
                         $password,
-                        $user->password
+                        $user->getAuthPassword()
                     )
                 ) {
                     return null;

@@ -3,554 +3,119 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 use Spatie\Permission\PermissionRegistrar;
 
 class RolesAndPermissionsSeeder extends Seeder
 {
     public function run(): void
     {
-        // Limpiar caché de permisos
-        app()[PermissionRegistrar::class]->forgetCachedPermissions();
+        app(PermissionRegistrar::class)->forgetCachedPermissions();
+        Role::query()->where('name', 'VOLUNTARIO')->delete();
 
-        // 1. Definir la lista exhaustiva y normalizada de permisos institucionales
-        $permisos = [
-            // Administración e Identidad
-            'personal_institucional.ver',
-            'usuarios.ver',
-            'usuarios.crear',
-            'usuarios.editar',
-            'usuarios.cambiar_estado',
-            'roles.ver',
-            'roles.editar_permisos',
-            'areas.ver',
-            'areas.crear',
-            'areas.editar',
-            'areas.cambiar_estado',
-            'areas.reportes',
-            'turnos.ver',
-            'turnos.crear',
-            'turnos.editar',
-            'turnos.cambiar_estado',
-            'turnos.asignar',
-            'turnos.finalizar',
-            'turnos.reportes',
-            'bitacora.ver',
-
-            // Ficha de Usuario y Seguridad
-            'documentos_usuarios.ver',
-            'documentos_usuarios.subir',
-            'documentos_usuarios.validar',
-            'documentos_usuarios.observar',
-            'documentos_usuarios.reemplazar',
-            'documentos_usuarios.anular',
-            'documentos_usuarios.descargar',
-            'documentos_usuarios.reportes',
-            'usuarios.acceso.ver',
-            'usuarios.acceso.bloquear',
-            'usuarios.acceso.restablecer_password',
-            'usuarios.historial.ver',
-            'usuarios.reportes',
-            'usuarios.reportes.pdf',
-            'usuarios.reportes.excel',
-            'usuarios.horarios.ver',
-            'usuarios.horarios.asignar',
-            'usuarios.horarios.finalizar',
-
-            // Admisiones, Habitaciones y Camas
-            'admisiones.ver_dashboard',
-            'admisiones.crear',
-            'habitaciones.ver',
-            'habitaciones.crear',
-            'habitaciones.editar',
-            'habitaciones.eliminar',
-            'camas.ver',
-            'camas.crear',
-            'camas.editar',
-
-            // Adultos mayores y Expedientes
-            'adultos.ver',
-            'adultos.crear',
-            'adultos.editar',
-            'adultos.cambiar_estado',
-            'adultos.archivar',
-            'adultos.restaurar',
-            'adultos.ver_expediente',
-
-            // Familiares y Red de Apoyo
-            'familiares.ver',
-            'familiares.crear',
-            'familiares.editar',
-            'familiares.anular',
-            'documentos.ver',
-            'documentos.subir',
-            'documentos.descargar',
-            'documentos.archivar',
-
-            // Salud, Historia Clínica y Seguimiento
-            'salud.ver',
-            'salud.resumen.ver',
-            'salud.ficha.ver',
-            'salud.ficha.crear',
-            'salud.ficha.editar',
-            'salud.ficha.archivar',
-            'salud.ficha.anular',
-            'salud.ficha.restaurar',
-            'atenciones.ver',
-            'atenciones.crear',
-            'atenciones.editar',
-            'atenciones.anular',
-            'observaciones.ver',
-            'observaciones.crear',
-            'observaciones.editar',
-            'observaciones.anular',
-            'signos_vitales.ver',
-            'signos_vitales.crear',
-            'signos_vitales.editar',
-            'salud.signos.ver',
-            'salud.signos.crear',
-            'salud.signos.editar',
-            'salud.signos.anular',
-            'salud.valoracion.ver',
-            'salud.valoracion.crear',
-            'salud.valoracion.editar',
-            'salud.valoracion.anular',
-            'salud.alertas.ver',
-            'salud.alertas.gestionar',
-            'salud.reportes.ver',
-            'salud.reportes.generar',
-
-            // Farmacología y Administración
-            'medicacion.ver',
-            'medicacion.crear',
-            'medicacion.editar',
-            'medicacion.suspender',
-            'salud.medicacion.ver',
-            'salud.medicacion.crear',
-            'salud.medicacion.editar',
-            'salud.medicacion.suspender',
-            'salud.medicacion.finalizar',
-            'salud.medicacion.anular',
-            'salud.administracion.ver',
-            'salud.administracion.crear',
-            'salud.administracion.editar',
-            'salud.administracion.anular',
-            'administracion_medicacion.registrar',
-
-            // Valoraciones Médicas y Funcionales
-            'ficha_medica.crear',
-            'ficha_medica.editar',
-            'ficha_medica.archivar',
-            'valoracion_funcional.crear',
-            'valoracion_funcional.editar',
-            'valoracion_enfermeria.ver',
-            'valoracion_enfermeria.crear',
-            'valoracion_enfermeria.editar',
-            'valoracion_enfermeria.anular',
-            'valoracion_medica.ver',
-            'valoracion_medica.crear',
-            'valoracion_medica.editar',
-            'valoracion_medica.anular',
-
-            // Enfermería Operativa y Cuidados
-            'enfermeria.ver_dashboard',
-            'enfermeria.ver_pacientes_asignados',
-            'enfermeria.ver_ficha_paciente',
-            'turnos_enfermeria.ver',
-            'turnos_enfermeria.crear',
-            'turnos_enfermeria.editar',
-            'asignacion_turno.ver',
-            'asignacion_turno.crear',
-            'asignacion_turno.editar',
-            'asignacion_turno.anular',
-            'plan_cuidado.ver',
-            'plan_cuidado.crear',
-            'plan_cuidado.editar',
-            'plan_cuidado.validar',
-            'plan_cuidado.cerrar',
-            'plan_cuidado.anular',
-            'tareas.ver',
-            'tareas.crear',
-            'tareas.registrar_resultado',
-            'tareas.omitir',
-            'tareas.anular',
-            'seguimiento.ver',
-            'seguimiento.crear',
-            'seguimiento.editar',
-            'pase_turno.ver',
-            'pase_turno.generar',
-            'pase_turno.recibir',
-
-            // Evaluaciones Geriátricas y Cognitivas
-            'evaluaciones.ver',
-            'evaluaciones.crear',
-            'evaluaciones.editar',
-            'evaluaciones.anular',
-            'evaluaciones.historial',
-            'evaluaciones.resultados',
-
-            // Actividades y Voluntariado
-            'actividades.ver',
-            'actividades.crear',
-            'actividades.editar',
-            'actividades.anular',
-            'voluntarios.ver',
-            'voluntarios.crear',
-            'voluntarios.editar',
-            'voluntarios.cambiar_estado',
-            'asignaciones.ver',
-            'asignaciones.crear',
-            'asignaciones.editar',
-            'asistencia.ver',
-            'asistencia.registrar',
-
-            // Reportes y Alertas
-            'reportes.ver',
-            'reportes.individual',
-            'reportes.institucional',
-            'reportes.bienestar',
-            'reportes.exportar_pdf',
-            'alertas.ver',
-            'alertas.gestionar',
-            'alertas.crear',
-            'alertas.atender',
-            'alertas.cerrar',
-            'alertas.anular',
+        $recursos = [
+            'usuarios','personal','areas','turnos','contactos','residentes','habitaciones','camas',
+            'tipos_estudio_clinico','medicamentos','instrumentos','jornadas','asignaciones_personal',
+            'preadmisiones','admisiones','residentes_contactos','historial_estados_residente',
+            'ocupaciones_cama','documentos','consentimientos','atenciones','notas_clinicas',
+            'antecedentes_clinicos','diagnosticos','alergias','seguros_residente','dispositivos_clinicos',
+            'signos_vitales','valoraciones_dolor','mediciones_antropometricas','componentes_estudio',
+            'estudios_clinicos','resultados_estudio','informes_estudio','documentos_clinicos','derivaciones',
+            'incidentes','indicaciones_clinicas','asignaciones_residente_jornada','controles_cognitivos',
+            'registros_conductuales','registros_sueno','registros_ingesta','registros_hidratacion',
+            'registros_eliminacion','registros_movilidad','heridas','curaciones_herida','pases_turno',
+            'planes_cuidado','intervenciones_cuidado','programaciones_cuidado','ejecuciones_cuidado',
+            'prescripciones','horarios_prescripcion','administraciones_medicacion','preguntas_instrumento',
+            'opciones_pregunta','aplicaciones_instrumento','respuestas_instrumento',
+            'valoraciones_psicologicas','valoraciones_nutricionales','valoraciones_funcionales',
+            'seguimientos_pedagogicos','actividades','participantes_actividad','visitas','alertas','eventos_alerta',
         ];
 
-        // 2. Crear o asegurar todos los permisos
-        foreach ($permisos as $permiso) {
-            Permission::firstOrCreate(['name' => $permiso, 'guard_name' => 'web']);
+        $permisos = array_map(fn (string $recurso) => $recurso.'.ver', $recursos);
+        $permisos = array_merge($permisos, [
+            'auditoria.ver','usuarios.gestionar','personal.gestionar','areas.gestionar','turnos.gestionar',
+            'jornadas.gestionar','preadmisiones.crear','preadmisiones.revisar','admisiones.formalizar',
+            'habitaciones.gestionar','camas.gestionar','contactos.gestionar','documentos.gestionar',
+            'consentimientos.gestionar','atenciones.crear','notas_clinicas.crear','diagnosticos.crear',
+            'antecedentes_clinicos.crear','alergias.crear','signos_vitales.crear',
+            'valoraciones_dolor.crear','mediciones_antropometricas.crear','estudios_clinicos.crear',
+            'resultados_estudio.crear','informes_estudio.crear','documentos_clinicos.crear',
+            'indicaciones_clinicas.crear','incidentes.crear','controles_cognitivos.crear',
+            'registros_conductuales.crear','registros_sueno.crear','registros_ingesta.crear',
+            'registros_hidratacion.crear','registros_eliminacion.crear','registros_movilidad.crear',
+            'heridas.crear','curaciones_herida.crear','pases_turno.crear','planes_cuidado.crear',
+            'ejecuciones_cuidado.crear','prescripciones.crear','prescripciones.editar','prescripciones.suspender',
+            'administraciones_medicacion.crear','aplicaciones_instrumento.crear',
+            'valoraciones_psicologicas.crear','valoraciones_nutricionales.crear',
+            'valoraciones_funcionales.crear','seguimientos_pedagogicos.crear','actividades.gestionar',
+            'visitas.gestionar','alertas.gestionar',
+        ]);
+
+        foreach (array_unique($permisos) as $permiso) {
+            Permission::findOrCreate($permiso, 'web');
         }
 
-        // 3. Crear/asegurar roles institucionales
-        $rolesInstitucionales = [
-            'SUPERADMINISTRADOR',
-            'ADMINISTRADOR',
-            'ENFERMEROS',
-            'MEDICO GENERAL/GERIATRA',
-            'PSICOLOGO/A',
-            'PEDAGOGO',
-            'NUTRICIONISTA',
-            'FISIOTERAPEUTA',
-            'VOLUNTARIO',
-            'FAMILIAR'
-        ];
+        $roles = collect([
+            'SUPERADMINISTRADOR','ADMINISTRADOR','ENFERMEROS','MEDICO GENERAL/GERIATRA',
+            'PSICOLOGO/A','PEDAGOGO','NUTRICIONISTA','FISIOTERAPEUTA','FAMILIAR',
+        ])->mapWithKeys(fn (string $nombre) => [$nombre => Role::findOrCreate($nombre, 'web')]);
 
-        $rolesModels = [];
-        foreach ($rolesInstitucionales as $roleName) {
-            $rolesModels[$roleName] = Role::firstOrCreate(['name' => $roleName, 'guard_name' => 'web']);
-        }
+        $roles['SUPERADMINISTRADOR']->syncPermissions($this->permitir($permisos, [
+            '.ver','usuarios.gestionar','personal.gestionar','areas.gestionar','turnos.gestionar',
+            'jornadas.gestionar','preadmisiones.crear','preadmisiones.revisar','admisiones.formalizar',
+            'habitaciones.gestionar','camas.gestionar','contactos.gestionar','documentos.gestionar',
+            'consentimientos.gestionar','actividades.gestionar','visitas.gestionar','alertas.gestionar',
+            'auditoria.ver',
+        ]));
 
-        // 4. Asignar permisos por rol
+        $roles['ADMINISTRADOR']->syncPermissions($this->permitir($permisos, [
+            'usuarios','personal','areas','turnos','jornadas','asignaciones_personal','preadmisiones',
+            'admisiones','residentes.ver','contactos','residentes_contactos','habitaciones','camas',
+            'ocupaciones_cama','documentos','consentimientos','seguros_residente','actividades','visitas',
+            'alertas.ver','incidentes.ver','auditoria.ver',
+        ]));
 
-        // ─── SUPERADMINISTRADOR: Control total del sistema ─────────────────────────
-        $rolesModels['SUPERADMINISTRADOR']->syncPermissions(Permission::all());
+        $roles['MEDICO GENERAL/GERIATRA']->syncPermissions($this->permitir($permisos, [
+            'residentes.ver','atenciones','notas_clinicas','antecedentes_clinicos','diagnosticos','alergias',
+            'seguros_residente.ver','dispositivos_clinicos','signos_vitales','valoraciones_dolor',
+            'mediciones_antropometricas','estudios_clinicos','resultados_estudio','informes_estudio',
+            'documentos_clinicos','derivaciones','incidentes','indicaciones_clinicas','controles_cognitivos',
+            'registros_','heridas','curaciones_herida','planes_cuidado','prescripciones',
+            'horarios_prescripcion.ver','administraciones_medicacion','aplicaciones_instrumento',
+            'valoraciones_','alertas.ver',
+        ]));
 
-        // ─── ADMINISTRADOR: Gestión institucional completa ────────────────────────
-        $rolesModels['ADMINISTRADOR']->syncPermissions([
-            'personal_institucional.ver',
-            'usuarios.ver',
-            'usuarios.crear',
-            'usuarios.editar',
-            'usuarios.cambiar_estado',
-            'roles.ver',
-            'areas.ver',
-            'areas.crear',
-            'areas.editar',
-            'areas.cambiar_estado',
-            'areas.reportes',
-            'turnos.ver',
-            'turnos.crear',
-            'turnos.editar',
-            'turnos.cambiar_estado',
-            'turnos.asignar',
-            'turnos.finalizar',
-            'turnos.reportes',
-            'turnos_enfermeria.ver',
-            'turnos_enfermeria.crear',
-            'turnos_enfermeria.editar',
-            'asignacion_turno.ver',
-            'asignacion_turno.crear',
-            'asignacion_turno.editar',
-            'asignacion_turno.anular',
-            'admisiones.ver_dashboard',
-            'admisiones.crear',
-            'habitaciones.ver',
-            'habitaciones.crear',
-            'habitaciones.editar',
-            'habitaciones.eliminar',
-            'camas.ver',
-            'camas.crear',
-            'camas.editar',
-            'documentos_usuarios.ver',
-            'documentos_usuarios.subir',
-            'documentos_usuarios.validar',
-            'documentos_usuarios.observar',
-            'documentos_usuarios.reemplazar',
-            'documentos_usuarios.descargar',
-            'documentos_usuarios.reportes',
-            'usuarios.acceso.ver',
-            'usuarios.acceso.bloquear',
-            'usuarios.acceso.restablecer_password',
-            'usuarios.historial.ver',
-            'usuarios.reportes',
-            'usuarios.reportes.pdf',
-            'usuarios.reportes.excel',
-            'usuarios.horarios.ver',
-            'usuarios.horarios.asignar',
-            'usuarios.horarios.finalizar',
-            'adultos.ver',
-            'adultos.crear',
-            'adultos.editar',
-            'adultos.cambiar_estado',
-            'adultos.archivar',
-            'adultos.restaurar',
-            'adultos.ver_expediente',
-            'familiares.ver',
-            'familiares.crear',
-            'familiares.editar',
-            'familiares.anular',
-            'documentos.ver',
-            'documentos.subir',
-            'documentos.descargar',
-            'documentos.archivar',
-            'salud.ver',
-            'salud.resumen.ver',
-            'salud.reportes.ver',
-            'salud.reportes.generar',
-            'valoracion_enfermeria.ver',
-            'valoracion_medica.ver',
-            'actividades.ver',
-            'actividades.crear',
-            'actividades.editar',
-            'actividades.anular',
-            'voluntarios.ver',
-            'voluntarios.crear',
-            'voluntarios.editar',
-            'voluntarios.cambiar_estado',
-            'asignaciones.ver',
-            'asignaciones.crear',
-            'asignaciones.editar',
-            'reportes.ver',
-            'reportes.institucional',
-            'reportes.bienestar',
-            'reportes.exportar_pdf',
-            'alertas.ver',
-            'alertas.gestionar',
-            'alertas.atender',
-            'alertas.cerrar',
-            'bitacora.ver',
-        ]);
+        $roles['ENFERMEROS']->syncPermissions($this->permitir($permisos, [
+            'residentes.ver','ocupaciones_cama.ver','atenciones.ver','notas_clinicas','antecedentes_clinicos.ver',
+            'diagnosticos.ver','alergias.ver','dispositivos_clinicos','signos_vitales','valoraciones_dolor',
+            'estudios_clinicos.ver','resultados_estudio.ver','indicaciones_clinicas.ver','incidentes',
+            'controles_cognitivos','registros_','heridas','curaciones_herida','pases_turno','planes_cuidado',
+            'intervenciones_cuidado.ver','programaciones_cuidado.ver','ejecuciones_cuidado',
+            'prescripciones.ver','horarios_prescripcion.ver','administraciones_medicacion','alertas',
+        ]));
 
-        // ─── MEDICO GENERAL/GERIATRA: Autoridad clínica y farmacológica ───────────
-        $rolesModels['MEDICO GENERAL/GERIATRA']->syncPermissions([
-            'adultos.ver',
-            'adultos.ver_expediente',
-            'salud.ver',
-            'salud.resumen.ver',
-            'salud.ficha.ver',
-            'salud.ficha.crear',
-            'salud.ficha.editar',
-            'salud.ficha.archivar',
-            'ficha_medica.crear',
-            'ficha_medica.editar',
-            'ficha_medica.archivar',
-            'valoracion_medica.ver',
-            'valoracion_medica.crear',
-            'valoracion_medica.editar',
-            'valoracion_medica.anular',
-            'valoracion_funcional.crear',
-            'valoracion_funcional.editar',
-            'medicacion.ver',
-            'medicacion.crear',
-            'medicacion.editar',
-            'medicacion.suspender',
-            'salud.medicacion.ver',
-            'salud.medicacion.crear',
-            'salud.medicacion.editar',
-            'salud.medicacion.suspender',
-            'salud.medicacion.finalizar',
-            'salud.medicacion.anular',
-            'salud.administracion.ver',
-            'administracion_medicacion.registrar',
-            'signos_vitales.ver',
-            'signos_vitales.crear',
-            'signos_vitales.editar',
-            'salud.signos.ver',
-            'salud.signos.crear',
-            'salud.signos.editar',
-            'atenciones.ver',
-            'atenciones.crear',
-            'atenciones.editar',
-            'observaciones.ver',
-            'observaciones.crear',
-            'observaciones.editar',
-            'evaluaciones.ver',
-            'evaluaciones.crear',
-            'evaluaciones.editar',
-            'evaluaciones.historial',
-            'evaluaciones.resultados',
-            'plan_cuidado.ver',
-            'seguimiento.ver',
-            'alertas.ver',
-            'alertas.gestionar',
-            'alertas.crear',
-            'alertas.atender',
-            'alertas.cerrar',
-            'salud.alertas.ver',
-            'salud.alertas.gestionar',
-            'reportes.ver',
-            'reportes.individual',
-            'reportes.bienestar',
-            'salud.reportes.ver',
-            'salud.reportes.generar',
-            'habitaciones.ver',
-            'camas.ver',
-            'areas.ver',
-            'turnos.ver',
-        ]);
+        $roles['PSICOLOGO/A']->syncPermissions($this->permitir($permisos, ['residentes.ver','atenciones','notas_clinicas','controles_cognitivos.ver','registros_conductuales','registros_sueno.ver','instrumentos.ver','preguntas_instrumento.ver','opciones_pregunta.ver','aplicaciones_instrumento','respuestas_instrumento.ver','valoraciones_psicologicas','planes_cuidado.ver','alertas.ver']));
+        $roles['NUTRICIONISTA']->syncPermissions($this->permitir($permisos, ['residentes.ver','atenciones','notas_clinicas','diagnosticos.ver','alergias.ver','indicaciones_clinicas.ver','mediciones_antropometricas','registros_ingesta.ver','registros_hidratacion.ver','registros_eliminacion.ver','valoraciones_nutricionales','planes_cuidado']));
+        $roles['FISIOTERAPEUTA']->syncPermissions($this->permitir($permisos, ['residentes.ver','atenciones','notas_clinicas','diagnosticos.ver','dispositivos_clinicos.ver','signos_vitales.ver','valoraciones_dolor','registros_movilidad','valoraciones_funcionales','planes_cuidado']));
+        $roles['PEDAGOGO']->syncPermissions($this->permitir($permisos, ['residentes.ver','atenciones','notas_clinicas','indicaciones_clinicas.ver','controles_cognitivos.ver','registros_conductuales.ver','planes_cuidado','seguimientos_pedagogicos','actividades']));
+        $roles['FAMILIAR']->syncPermissions($this->permitir($permisos, ['residentes.ver','residentes_contactos.ver','documentos.ver','consentimientos.ver','actividades.ver','participantes_actividad.ver','visitas.ver']));
 
-        // ─── ENFERMEROS: Cuidados continuos, administración de dosis y monitoreo ───
-        $rolesModels['ENFERMEROS']->syncPermissions([
-            'enfermeria.ver_dashboard',
-            'enfermeria.ver_pacientes_asignados',
-            'enfermeria.ver_ficha_paciente',
-            'adultos.ver',
-            'adultos.ver_expediente',
-            'salud.ver',
-            'salud.resumen.ver',
-            'salud.ficha.ver',
-            'salud.administracion.ver',
-            'salud.administracion.crear',
-            'administracion_medicacion.registrar',
-            'salud.medicacion.ver',
-            'medicacion.ver',
-            'signos_vitales.ver',
-            'signos_vitales.crear',
-            'salud.signos.ver',
-            'salud.signos.crear',
-            'valoracion_enfermeria.ver',
-            'valoracion_enfermeria.crear',
-            'valoracion_enfermeria.editar',
-            'plan_cuidado.ver',
-            'plan_cuidado.crear',
-            'plan_cuidado.editar',
-            'tareas.ver',
-            'tareas.crear',
-            'tareas.registrar_resultado',
-            'tareas.omitir',
-            'seguimiento.ver',
-            'seguimiento.crear',
-            'seguimiento.editar',
-            'atenciones.ver',
-            'atenciones.crear',
-            'atenciones.editar',
-            'observaciones.ver',
-            'observaciones.crear',
-            'observaciones.editar',
-            'pase_turno.ver',
-            'pase_turno.generar',
-            'pase_turno.recibir',
-            'turnos_enfermeria.ver',
-            'asignacion_turno.ver',
-            'alertas.ver',
-            'alertas.crear',
-            'alertas.atender',
-            'alertas.cerrar',
-            'salud.alertas.ver',
-            'salud.alertas.gestionar',
-            'habitaciones.ver',
-            'camas.ver',
-            'reportes.ver',
-            'reportes.individual',
-            'salud.reportes.ver',
-            'salud.reportes.generar',
-            'bitacora.ver',
-        ]);
+        app(PermissionRegistrar::class)->forgetCachedPermissions();
+    }
 
-        // ─── PSICOLOGO/A: Salud mental y evaluaciones cognitivas/afectivas ────────
-        $rolesModels['PSICOLOGO/A']->syncPermissions([
-            'adultos.ver',
-            'adultos.ver_expediente',
-            'evaluaciones.ver',
-            'evaluaciones.crear',
-            'evaluaciones.editar',
-            'evaluaciones.anular',
-            'evaluaciones.historial',
-            'evaluaciones.resultados',
-            'observaciones.ver',
-            'observaciones.crear',
-            'observaciones.editar',
-            'actividades.ver',
-            'actividades.crear',
-            'alertas.ver',
-            'alertas.crear',
-            'reportes.ver',
-            'reportes.individual',
-        ]);
+    private function permitir(array $permisos, array $prefijos): array
+    {
+        return array_values(array_filter($permisos, function (string $permiso) use ($prefijos): bool {
+            foreach ($prefijos as $prefijo) {
+                if ((str_starts_with($prefijo, '.') && str_ends_with($permiso, $prefijo))
+                    || $permiso === $prefijo
+                    || str_starts_with($permiso, $prefijo.'.')) {
+                    return true;
+                }
+            }
 
-        // ─── PEDAGOGO: Estimulación pedagógica, socio-afectiva y talleres ─────────
-        $rolesModels['PEDAGOGO']->syncPermissions([
-            'adultos.ver',
-            'adultos.ver_expediente',
-            'actividades.ver',
-            'actividades.crear',
-            'actividades.editar',
-            'observaciones.ver',
-            'observaciones.crear',
-            'evaluaciones.ver',
-            'reportes.ver',
-            'reportes.individual',
-        ]);
-
-        // ─── NUTRICIONISTA: Vigilancia dietética y control antropométrico ─────────
-        $rolesModels['NUTRICIONISTA']->syncPermissions([
-            'adultos.ver',
-            'adultos.ver_expediente',
-            'observaciones.ver',
-            'observaciones.crear',
-            'observaciones.editar',
-            'signos_vitales.ver',
-            'salud.signos.ver',
-            'reportes.ver',
-            'reportes.individual',
-        ]);
-
-        // ─── FISIOTERAPEUTA: Rehabilitación física y prevención de caídas ─────────
-        $rolesModels['FISIOTERAPEUTA']->syncPermissions([
-            'adultos.ver',
-            'adultos.ver_expediente',
-            'valoracion_funcional.crear',
-            'valoracion_funcional.editar',
-            'observaciones.ver',
-            'observaciones.crear',
-            'observaciones.editar',
-            'reportes.ver',
-            'reportes.individual',
-        ]);
-
-        // ─── VOLUNTARIO: Acompañamiento, actividades y registro de asistencia ─────
-        $rolesModels['VOLUNTARIO']->syncPermissions([
-            'adultos.ver',
-            'voluntarios.ver',
-            'actividades.ver',
-            'asignaciones.ver',
-            'asistencia.ver',
-            'asistencia.registrar',
-            'observaciones.ver',
-            'observaciones.crear',
-        ]);
-
-        // ─── FAMILIAR: Portal de seguimiento, red de apoyo y consultas ────────────
-        $rolesModels['FAMILIAR']->syncPermissions([
-            'adultos.ver',
-            'adultos.ver_expediente',
-            'familiares.ver',
-            'actividades.ver',
-            'reportes.ver',
-            'reportes.individual',
-        ]);
+            return false;
+        }));
     }
 }

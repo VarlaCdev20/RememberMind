@@ -70,7 +70,7 @@ class ResetPasswordNotification extends Notification
 
         $nombre = trim(
             (string) (
-                $notifiable->nombres
+                $notifiable->name
                 ?? ''
             )
         );
