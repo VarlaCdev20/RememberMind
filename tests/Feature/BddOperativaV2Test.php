@@ -9,6 +9,7 @@ use App\Models\AplicacionInstrumento;
 use App\Models\Area;
 use App\Models\Atencion;
 use App\Models\Cama;
+use App\Models\ComponenteEstudio;
 use App\Models\Contacto;
 use App\Models\Habitacion;
 use App\Models\Instrumento;
@@ -22,14 +23,17 @@ use App\Models\Prescripcion;
 use App\Models\Residente;
 use App\Models\RespuestaInstrumento;
 use App\Models\Turno;
+use App\Models\TipoEstudioClinico;
 use App\Models\User;
 use App\Policies\AdministracionMedicacionPolicy;
 use App\Policies\PrescripcionPolicy;
 use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 use Spatie\Permission\Models\Role;
 use Tests\TestCase;
@@ -194,6 +198,111 @@ class BddOperativaV2Test extends TestCase
         }
         $this->assertFalse($super->can('prescripciones.crear'));
         $this->assertFalse($super->can('diagnosticos.crear'));
+    }
+
+    public function test_dashboard_y_expediente_web_funcionan_con_modelos_v2(): void
+    {
+        $datos = $this->escenarioAdmision();
+        $residente = app(FormalizarAdmision::class)->ejecutar($datos['preadmision'], ['cod_cama'=>$datos['cama']->cod_cama,'cod_contacto'=>$datos['contacto']->cod_contacto], $datos['usuario']);
+        $super = User::query()->where('correo', 'admincasaamandita@gmail.com')->firstOrFail();
+
+        $this->actingAs($super)->get('/dashboard')->assertOk()->assertSee('Panel institucional');
+        $this->actingAs($super)->get(route('admin.residentes.show', $residente))->assertOk()->assertSee($residente->cod_residente);
+    }
+
+    public function test_registro_clinico_toma_el_personal_del_usuario_autenticado(): void
+    {
+        $datos = $this->escenarioAdmision();
+        $residente = app(FormalizarAdmision::class)->ejecutar($datos['preadmision'], ['cod_cama'=>$datos['cama']->cod_cama,'cod_contacto'=>$datos['contacto']->cod_contacto], $datos['usuario']);
+        $enfermera = $this->usuarioRol('enfermera.v2@test.local', 'ENFERMEROS');
+        $personal = Personal::query()->create(['cod_personal'=>'PER_ENF','cod_usuario'=>$enfermera->cod_usuario,'nombres'=>'Elena','apellido_paterno'=>'Rojas','numero_documento'=>'ENF-1','profesion'=>'ENFERMERA','estado'=>'ACTIVO']);
+
+        $this->actingAs($enfermera)->postJson(route('admin.clinica.store', [$residente, 'signo-vital']), [
+            'cod_personal'=>'PER_FALSO','temperatura'=>36.8,'saturacion_oxigeno'=>97,
+        ])->assertCreated();
+
+        $this->assertDatabaseHas('signos_vitales', ['cod_residente'=>$residente->cod_residente,'cod_personal'=>$personal->cod_personal,'temperatura'=>36.8]);
+    }
+
+    public function test_familiar_no_puede_acceder_por_idor_a_otro_expediente(): void
+    {
+        $datos = $this->escenarioAdmision(true);
+        $propio = app(FormalizarAdmision::class)->ejecutar($datos['preadmision'], ['cod_cama'=>$datos['cama']->cod_cama,'cod_contacto'=>$datos['contacto']->cod_contacto], $datos['usuario']);
+        $ajeno = $this->crearSegundoResidente($datos);
+
+        $this->actingAs($datos['familiar'])->get(route('admin.residentes.show', $propio))->assertOk();
+        $this->actingAs($datos['familiar'])->get(route('admin.residentes.show', $ajeno))->assertForbidden();
+    }
+
+    public function test_alerta_conserva_historial_de_eventos(): void
+    {
+        $datos = $this->escenarioAdmision();
+        $residente = app(FormalizarAdmision::class)->ejecutar($datos['preadmision'], ['cod_cama'=>$datos['cama']->cod_cama,'cod_contacto'=>$datos['contacto']->cod_contacto], $datos['usuario']);
+        $admin = User::query()->where('correo', 'admincasaamandita@gmail.com')->firstOrFail();
+
+        $respuesta = $this->actingAs($admin)->postJson(route('admin.alertas.store', $residente), ['tipo'=>'OPERATIVA','prioridad'=>'MEDIA','titulo'=>'Seguimiento','descripcion'=>'Revisión requerida'])->assertCreated();
+        $codigo = $respuesta->json('cod_alerta');
+        $this->actingAs($admin)->patchJson(route('admin.alertas.estado', $codigo), ['estado'=>'CERRADA','descripcion'=>'Atendida'])->assertOk();
+        $this->assertDatabaseCount('eventos_alerta', 2);
+        $this->assertDatabaseHas('alertas', ['cod_alerta'=>$codigo,'estado'=>'CERRADA']);
+    }
+
+    public function test_estudios_rechazan_componentes_ajenos_y_aceptan_los_propios(): void
+    {
+        [$base, $residente] = $this->escenarioClinico();
+        $medico = $this->usuarioRol('medico.estudios@test.local', 'MEDICO GENERAL/GERIATRA');
+        Personal::query()->create(['cod_personal'=>'PER_EST','cod_usuario'=>$medico->cod_usuario,'nombres'=>'Marta','apellido_paterno'=>'Soliz','numero_documento'=>'MED-EST','profesion'=>'MÉDICO','estado'=>'ACTIVO']);
+        $atencion = Atencion::query()->create(['cod_atencion'=>'ATE_EST','cod_residente'=>$residente->cod_residente,'cod_area'=>$base['area']->cod_area,'cod_personal'=>$base['personal']->cod_personal,'tipo_atencion'=>'CONSULTA','fecha_hora'=>now(),'estado'=>'ABIERTA']);
+        $tipo = TipoEstudioClinico::query()->create(['cod_tipo_estudio'=>'TES_1','nombre'=>'Hemograma','categoria'=>'LABORATORIO','requiere_componentes'=>true,'requiere_informe'=>true,'estado'=>'ACTIVO']);
+        $otroTipo = TipoEstudioClinico::query()->create(['cod_tipo_estudio'=>'TES_2','nombre'=>'Química','categoria'=>'LABORATORIO','requiere_componentes'=>true,'requiere_informe'=>false,'estado'=>'ACTIVO']);
+        $componente = ComponenteEstudio::query()->create(['cod_componente'=>'COM_1','cod_tipo_estudio'=>$tipo->cod_tipo_estudio,'nombre'=>'Hemoglobina','tipo_resultado'=>'NUMERICO','orden'=>1,'estado'=>'ACTIVO']);
+        $ajeno = ComponenteEstudio::query()->create(['cod_componente'=>'COM_2','cod_tipo_estudio'=>$otroTipo->cod_tipo_estudio,'nombre'=>'Glucosa','tipo_resultado'=>'NUMERICO','orden'=>1,'estado'=>'ACTIVO']);
+
+        $solicitud = $this->actingAs($medico)->postJson(route('admin.estudios.store', $residente), ['cod_atencion'=>$atencion->cod_atencion,'cod_tipo_estudio'=>$tipo->cod_tipo_estudio])->assertCreated();
+        $codigo = $solicitud->json('cod_estudio');
+        $this->actingAs($medico)->postJson(route('admin.estudios.resultados', $codigo), ['resultados'=>[['cod_componente'=>$ajeno->cod_componente,'valor_numerico'=>95]]])->assertStatus(422);
+        $this->assertDatabaseCount('resultados_estudio', 0);
+        $this->actingAs($medico)->postJson(route('admin.estudios.resultados', $codigo), ['resultados'=>[['cod_componente'=>$componente->cod_componente,'valor_numerico'=>13.5]]])->assertCreated();
+        $this->assertDatabaseHas('resultados_estudio', ['cod_estudio'=>$codigo,'cod_componente'=>$componente->cod_componente]);
+    }
+
+    public function test_documento_clinico_se_guarda_en_disco_privado_y_valida_al_residente(): void
+    {
+        Storage::fake('local');
+        [$base, $residente] = $this->escenarioClinico();
+        $medico = $this->usuarioRol('medico.documentos@test.local', 'MEDICO GENERAL/GERIATRA');
+        Personal::query()->create(['cod_personal'=>'PER_DOC','cod_usuario'=>$medico->cod_usuario,'nombres'=>'Daniel','apellido_paterno'=>'Vega','numero_documento'=>'MED-DOC','profesion'=>'MÉDICO','estado'=>'ACTIVO']);
+        $atencion = Atencion::query()->create(['cod_atencion'=>'ATE_DOC','cod_residente'=>$residente->cod_residente,'cod_area'=>$base['area']->cod_area,'cod_personal'=>$base['personal']->cod_personal,'tipo_atencion'=>'CONSULTA','fecha_hora'=>now(),'estado'=>'ABIERTA']);
+
+        $respuesta = $this->actingAs($medico)->postJson(route('admin.documentos-clinicos.store', $residente), [
+            'archivo'=>UploadedFile::fake()->create('resultado.pdf', 40, 'application/pdf'),
+            'cod_atencion'=>$atencion->cod_atencion, 'tipo_documento'=>'RESULTADO', 'titulo'=>'Resultado clínico',
+        ])->assertCreated();
+        $ruta = $respuesta->json('ruta_archivo');
+        Storage::disk('local')->assertExists($ruta);
+        $this->assertStringStartsWith('documentos-clinicos/'.$residente->cod_residente.'/', $ruta);
+    }
+
+    public function test_rutas_de_lectura_v2_responden_sin_dependencias_legacy(): void
+    {
+        [$base, $residente] = $this->escenarioClinico();
+        $super = User::query()->where('correo', 'admincasaamandita@gmail.com')->firstOrFail();
+
+        $this->get('/')->assertOk()->assertSee('RememberMind');
+        $this->actingAs($super)->get('/dashboard')->assertOk();
+        $this->actingAs($super)->get(route('admin.preadmisiones.index'))->assertOk();
+        $this->actingAs($super)->getJson(route('admin.institucional.usuarios'))->assertOk();
+        $this->actingAs($super)->getJson(route('admin.infraestructura.index'))->assertOk();
+        $this->actingAs($super)->getJson(route('admin.expediente.index', $residente))->assertOk();
+        $this->actingAs($super)->getJson(route('admin.cuidados.index', $residente))->assertOk();
+        $this->actingAs($super)->getJson(route('admin.medicacion.index', $residente))->assertOk();
+        $this->actingAs($super)->getJson(route('admin.estudios.index', $residente))->assertOk();
+        $this->actingAs($super)->getJson(route('admin.residentes.relaciones', $residente))->assertOk();
+        $this->actingAs($super)->getJson(route('admin.instrumentos.index'))->assertOk();
+        $this->actingAs($super)->getJson(route('admin.actividades.index'))->assertOk();
+        $this->actingAs($super)->getJson(route('admin.alertas.index'))->assertOk();
+        $this->actingAs($super)->get(route('admin.reportes.residentes'))->assertOk();
+        $this->actingAs($super)->get(route('admin.reportes.residente', $residente))->assertOk();
     }
 
     private function escenarioAdmision(bool $contactoConCuenta = false): array

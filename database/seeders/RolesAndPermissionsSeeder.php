@@ -12,7 +12,11 @@ class RolesAndPermissionsSeeder extends Seeder
     public function run(): void
     {
         app(PermissionRegistrar::class)->forgetCachedPermissions();
-        Role::query()->where('name', 'VOLUNTARIO')->delete();
+        $rolesActivos = [
+            'SUPERADMINISTRADOR','ADMINISTRADOR','ENFERMEROS','MEDICO GENERAL/GERIATRA',
+            'PSICOLOGO/A','PEDAGOGO','NUTRICIONISTA','FISIOTERAPEUTA','FAMILIAR',
+        ];
+        Role::query()->whereNotIn('name', $rolesActivos)->delete();
 
         $recursos = [
             'usuarios','personal','areas','turnos','contactos','residentes','habitaciones','camas',
@@ -41,7 +45,7 @@ class RolesAndPermissionsSeeder extends Seeder
             'antecedentes_clinicos.crear','alergias.crear','signos_vitales.crear',
             'valoraciones_dolor.crear','mediciones_antropometricas.crear','estudios_clinicos.crear',
             'resultados_estudio.crear','informes_estudio.crear','documentos_clinicos.crear',
-            'indicaciones_clinicas.crear','incidentes.crear','controles_cognitivos.crear',
+            'indicaciones_clinicas.crear','derivaciones.crear','incidentes.crear','asignaciones_residente_jornada.gestionar','controles_cognitivos.crear',
             'registros_conductuales.crear','registros_sueno.crear','registros_ingesta.crear',
             'registros_hidratacion.crear','registros_eliminacion.crear','registros_movilidad.crear',
             'heridas.crear','curaciones_herida.crear','pases_turno.crear','planes_cuidado.crear',
@@ -56,10 +60,7 @@ class RolesAndPermissionsSeeder extends Seeder
             Permission::findOrCreate($permiso, 'web');
         }
 
-        $roles = collect([
-            'SUPERADMINISTRADOR','ADMINISTRADOR','ENFERMEROS','MEDICO GENERAL/GERIATRA',
-            'PSICOLOGO/A','PEDAGOGO','NUTRICIONISTA','FISIOTERAPEUTA','FAMILIAR',
-        ])->mapWithKeys(fn (string $nombre) => [$nombre => Role::findOrCreate($nombre, 'web')]);
+        $roles = collect($rolesActivos)->mapWithKeys(fn (string $nombre) => [$nombre => Role::findOrCreate($nombre, 'web')]);
 
         $roles['SUPERADMINISTRADOR']->syncPermissions($this->permitir($permisos, [
             '.ver','usuarios.gestionar','personal.gestionar','areas.gestionar','turnos.gestionar',
@@ -90,7 +91,7 @@ class RolesAndPermissionsSeeder extends Seeder
             'residentes.ver','ocupaciones_cama.ver','atenciones.ver','notas_clinicas','antecedentes_clinicos.ver',
             'diagnosticos.ver','alergias.ver','dispositivos_clinicos','signos_vitales','valoraciones_dolor',
             'estudios_clinicos.ver','resultados_estudio.ver','indicaciones_clinicas.ver','incidentes',
-            'controles_cognitivos','registros_','heridas','curaciones_herida','pases_turno','planes_cuidado',
+            'asignaciones_residente_jornada','controles_cognitivos','registros_','heridas','curaciones_herida','pases_turno','planes_cuidado',
             'intervenciones_cuidado.ver','programaciones_cuidado.ver','ejecuciones_cuidado',
             'prescripciones.ver','horarios_prescripcion.ver','administraciones_medicacion','alertas',
         ]));

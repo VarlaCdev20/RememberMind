@@ -8,12 +8,14 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
+use Illuminate\View\View;
 
 class PreadmisionController extends Controller
 {
-    public function index(): JsonResponse
+    public function index(Request $request): JsonResponse|View
     {
-        return response()->json(Preadmision::query()->latest('fecha_solicitud')->paginate());
+        $preadmisiones = Preadmision::query()->latest('fecha_solicitud')->paginate(20);
+        return $request->expectsJson() ? response()->json($preadmisiones) : view('pages.preadmisiones.index', compact('preadmisiones'));
     }
 
     public function store(Request $request): JsonResponse

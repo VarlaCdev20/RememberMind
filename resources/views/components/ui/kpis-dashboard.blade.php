@@ -7,7 +7,7 @@ $estilosColor = [
  'verde-salud' => ['bg' => 'bg-estado-exito-bg', 'text' => 'text-estado-exito-texto', 'val' => 'text-estado-exito-texto'],
  'morado-cog' => ['bg' => 'bg-modulo-cognitivoFondo', 'text' => 'text-modulo-cognitivoTexto', 'val' => 'text-modulo-cognitivoTexto'],
  'terracota' => ['bg' => 'bg-estado-advertencia-bg', 'text' => 'text-boton-acento', 'val' => 'text-boton-acento'],
- 'verde-olivo' => ['bg' => 'bg-modulo-voluntariosFondo', 'text' => 'text-modulo-voluntariosTexto', 'val' => 'text-modulo-voluntariosTexto'],
+ 'verde-olivo' => ['bg' => 'bg-estado-advertenciaBg', 'text' => 'text-estado-advertencia', 'val' => 'text-estado-advertencia'],
 ];
 
 $badgeNivel = [

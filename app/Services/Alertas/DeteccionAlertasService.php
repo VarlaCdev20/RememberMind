@@ -1,254 +1,42 @@
 <?php
+
 namespace App\Services\Alertas;
 
-use App\Livewire\Clinica\SignosVitalesPanel;
-use App\Models\{AdultoMayor, AlertaAdulto, SignosVitalesAdulto, AdministracionMedicacion, SeguimientoDiario, TareaPlanCuidado};
+use App\Models\AdministracionMedicacion;
+use App\Models\Alerta;
+use App\Models\EjecucionCuidado;
+use App\Models\EventoAlerta;
+use App\Models\User;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class DeteccionAlertasService
 {
-    public function detectar(?string $codAm = null): int
+    public function detectar(): int
     {
+        $usuario = User::query()->where('estado', 'ACTIVO')->orderBy('cod_usuario')->first();
+        if (! $usuario) { return 0; }
+
         $creadas = 0;
-        SignosVitalesAdulto::vigentes()->when($codAm, fn ($q) => $q->where('cod_am', $codAm))->orderBy('cod_signo')->chunk(100, function ($registros) use (&$creadas) {
-            foreach ($registros as $s) {
-                $nivel = SignosVitalesPanel::nivelGlobal(
-                    $s->presion_sistolica,
-                    $s->presion_diastolica,
-                    $s->frecuencia_cardiaca,
-                    $s->frecuencia_respiratoria,
-                    $s->temperatura !== null ? (float) $s->temperatura : null,
-                    $s->saturacion,
-                    $s->glucosa !== null ? (float) $s->glucosa : null
-                );
-                if ($nivel !== 'normal') {
-                    $creadas += $this->registrar(
-                        $s,
-                        'SIGNOS',
-                        'SIGNOS FUERA DE PARÁMETROS',
-                        $nivel === 'critico' ? 'CRITICO' : 'MEDIO',
-                        'Control del ' . ($s->fecha?->format('d/m/Y') ?? 'hoy') . ' ' . $s->hora . ': Parámetros clínicos fuera de rango de referencia. Requiere valoración de enfermería.'
-                    );
-                }
-            }
+        AdministracionMedicacion::query()->where('resultado', 'OMITIDA')->where('estado', 'REGISTRADA')->chunk(100, function ($registros) use (&$creadas, $usuario): void {
+            foreach ($registros as $registro) { $creadas += $this->crearSiNoExiste($registro, $usuario, 'MEDICACION', 'ALTA', 'Administración de medicación omitida', $registro->motivo_omision ?: 'Omisión sin motivo documentado.'); }
         });
-
-        AdministracionMedicacion::query()->when($codAm, fn ($q) => $q->where('cod_am', $codAm))->where('administrado', false)->orderBy('cod_admin_med')->chunk(100, function ($registros) use (&$creadas) {
-            foreach ($registros as $r) {
-                $creadas += $this->registrar(
-                    $r,
-                    'MEDICACION',
-                    'MEDICACIÓN OMITIDA',
-                    'ALTO',
-                    'Omisión de medicación: ' . ($r->motivo_omision ?: 'Sin motivo registrado') . '. Requiere reevaluación clínica.'
-                );
-            }
+        EjecucionCuidado::query()->where('resultado', 'OMITIDA')->where('estado', 'REGISTRADA')->chunk(100, function ($registros) use (&$creadas, $usuario): void {
+            foreach ($registros as $registro) { $creadas += $this->crearSiNoExiste($registro, $usuario, 'CUIDADOS', 'MEDIA', 'Intervención de cuidado omitida', $registro->motivo_omision ?: 'Omisión sin motivo documentado.'); }
         });
-
-        TareaPlanCuidado::whereIn('estado', ['PENDIENTE', 'EN_PROCESO', 'OMITIDA'])
-            ->when($codAm, fn ($q) => $q->where('cod_am', $codAm))
-            ->whereDate('fecha_programada', '<=', today())->orderBy('cod_tarea')->chunk(100, function ($registros) use (&$creadas) {
-                foreach ($registros as $r) {
-                    if ($r->estado !== 'OMITIDA' && $r->fecha_programada->isToday()
-                        && (!$r->hora_programada || $r->hora_programada > now()->format('H:i:s'))) {
-                        continue;
-                    }
-                    $creadas += $this->registrar(
-                        $r,
-                        'PLAN',
-                        'TAREA PENDIENTE U OMITIDA',
-                        'MEDIO',
-                        'Cuidado pendiente: ' . $r->titulo . ' (Fecha: ' . $r->fecha_programada->format('d/m/Y') . ' ' . $r->hora_programada . '). Requiere cumplimiento.'
-                    );
-                }
-            });
-
-        SeguimientoDiario::query()->when($codAm, fn ($q) => $q->where('cod_am', $codAm))->where(fn ($q) => $q->where('incidente', true)->orWhere('requiere_medico', true))
-            ->orderBy('cod_seg_diario')->chunk(100, function ($registros) use (&$creadas) {
-                foreach ($registros as $r) {
-                    $creadas += $this->registrar(
-                        $r,
-                        $r->requiere_medico ? 'SOLICITUD_MEDICA' : 'INCIDENTE',
-                        $r->requiere_medico ? 'REQUIERE REVISIÓN MÉDICA' : 'INCIDENTE EN SEGUIMIENTO',
-                        'ALTO',
-                        $r->requiere_medico
-                            ? ('Evaluación médica requerida: ' . ($r->observacion ?: 'Solicitud de valoración médica en turno.'))
-                            : ('Incidente registrado en turno: ' . ($r->observacion ?: 'Seguimiento de enfermería.'))
-                    );
-                }
-            });
-
         return $creadas;
     }
 
-    public function detectarPreventivas(?string $codAm = null): int
+    private function crearSiNoExiste(Model $registro, User $usuario, string $modulo, string $prioridad, string $titulo, string $descripcion): int
     {
-        $adultos = AdultoMayor::with([
-            'fichasMedicas' => fn ($q) => $q->whereIn('estado', ['ACTIVA', 'ACTIVO', 'VIGENTE'])->latest()->limit(1),
-            'medicaciones' => fn ($q) => $q->whereIn('estado', ['ACTIVA', 'ACTIVO']),
-            'administracionesMedicacion' => fn ($q) => $q->latest('fecha')->limit(3),
-            'signosVitales' => fn ($q) => $q->where('estado', 'VIGENTE')->latest('fecha')->limit(1),
-            'valoracionesFuncionales' => fn ($q) => $q->latest('fecha_valoracion')->limit(1),
-        ])
-            ->when($codAm, fn ($q) => $q->where('cod_am', $codAm))
-            ->whereHas('estado', fn ($q) => $q->whereIn('estado', ['ACTIVO', 'ADMITIDO', 'ASIGNADO', 'EN_SEGUIMIENTO_ACTIVO', 'OBSERVADO', 'SEGUIMIENTO_ESPECIAL']))
-            ->where('estado_operativo', 'EN_CENTRO')
-            ->get();
-
-        $creadas = 0;
-
-        foreach ($adultos as $adulto) {
-            $fichaMedica = $adulto->fichasMedicas->whereIn('estado', ['ACTIVA', 'ACTIVO', 'VIGENTE'])->first();
-            $medicacionesActivas = $adulto->medicaciones->whereIn('estado', ['ACTIVA', 'ACTIVO']);
-            $valFuncional = $adulto->valoracionesFuncionales->sortByDesc('fecha_valoracion')->first();
-            $ultimosSignos = $adulto->signosVitales->where('estado', 'VIGENTE')->sortByDesc('fecha')->first();
-
-            // 1. Falta de Ficha Médica activa
-            if (!$fichaMedica) {
-                $alerta = $this->registrarPreventivaSiNoExiste(
-                    $adulto->cod_am,
-                    'FICHA',
-                    'FICHA MEDICA',
-                    'MEDIO',
-                    'Ficha médica no registrada. Requiere valoración clínica inicial.'
-                );
-                if ($alerta) $creadas++;
-            }
-
-            // 2. Dosis realmente vencidas según la pauta activa; las órdenes PRN no generan vencimiento.
-            if ($medicacionesActivas->isNotEmpty()) {
-                $dosisVencidas = app(\App\Services\Medicacion\AgendaMedicacionService::class)
-                    ->paraAdulto($adulto->cod_am)
-                    ->where('estado', 'VENCIDA');
-                if ($dosisVencidas->isNotEmpty()) {
-                    $alerta = $this->registrarPreventivaSiNoExiste(
-                        $adulto->cod_am,
-                        'MEDICACION',
-                        'MEDICACION SIN ADMINISTRACION',
-                        'MEDIO',
-                        $dosisVencidas->count().' dosis programada(s) vencida(s) sin administración u omisión registrada.'
-                    );
-                    if ($alerta) $creadas++;
-                }
-            }
-
-            // 3. Signos vitales desregulados en último control
-            if ($ultimosSignos) {
-                if ($ultimosSignos->temperatura > 37.8 || ($ultimosSignos->saturacion !== null && $ultimosSignos->saturacion < 92)) {
-                    $alerta = $this->registrarPreventivaSiNoExiste(
-                        $adulto->cod_am,
-                        'SIGNOS',
-                        'SIGNOS FUERA DE RANGO',
-                        'CRITICO',
-                        'Signos vitales fuera de rango en el último control (Temp: ' . $ultimosSignos->temperatura . '°C, Sat: ' . $ultimosSignos->saturacion . '%).'
-                    );
-                    if ($alerta) $creadas++;
-                }
-            }
-
-            // 4. Valoración Funcional: Riesgo de caída, dependencia alta o falta de valoración
-            if ($valFuncional) {
-                if ($valFuncional->riesgo_caida === 'ALTO') {
-                    $alerta = $this->registrarPreventivaSiNoExiste(
-                        $adulto->cod_am,
-                        'VALORACION',
-                        'RIESGO DE CAIDA',
-                        'CRITICO',
-                        'Riesgo de caída alto detectado en valoración funcional geriátrica.'
-                    );
-                    if ($alerta) $creadas++;
-                }
-                if (\in_array($valFuncional->nivel_dependencia, ['ALTA_DEPENDENCIA', 'SUPERVISION_PERMANENTE'])) {
-                    $alerta = $this->registrarPreventivaSiNoExiste(
-                        $adulto->cod_am,
-                        'VALORACION',
-                        'DEPENDENCIA FUNCIONAL',
-                        'MEDIO',
-                        'Dependencia funcional alta detectada en valoración funcional.'
-                    );
-                    if ($alerta) $creadas++;
-                }
-            } else {
-                $alerta = $this->registrarPreventivaSiNoExiste(
-                    $adulto->cod_am,
-                    'VALORACION',
-                    'VALORACION FALTANTE',
-                    'MEDIO',
-                    'Sin valoración funcional registrada.'
-                );
-                if ($alerta) $creadas++;
-            }
-        }
-
-        return $creadas;
-    }
-
-    public function registrarPreventivaSiNoExiste(
-        string $codAm,
-        string $origen,
-        string $tipoAlerta,
-        string $nivel,
-        string $motivo
-    ): ?AlertaAdulto {
-        return DB::transaction(function () use ($codAm, $origen, $tipoAlerta, $nivel, $motivo) {
-            $existe = AlertaAdulto::where('cod_am', $codAm)
-                ->where('origen', $origen)
-                ->where('tipo_alerta', $tipoAlerta)
-                ->whereIn('estado', ['ABIERTA', 'EN_ATENCION'])
-                ->exists();
-
-            if ($existe) {
-                return null;
-            }
-
-            return AlertaAdulto::create([
-                'cod_am' => $codAm,
-                'origen' => $origen,
-                'tipo_alerta' => $tipoAlerta,
-                'nivel' => $nivel,
-                'motivo' => $motivo,
-                'estado' => 'ABIERTA',
-            ]);
+        if (Alerta::query()->where('modulo', $modulo)->where('cod_registro', (string) $registro->getKey())->exists()) { return 0; }
+        DB::transaction(function () use ($registro, $usuario, $modulo, $prioridad, $titulo, $descripcion): void {
+            $alerta = Alerta::query()->create(['cod_alerta' => $this->codigo('ALE'), 'cod_residente' => $registro->cod_residente, 'tipo' => 'OMISION', 'prioridad' => $prioridad, 'modulo' => $modulo, 'cod_registro' => (string) $registro->getKey(), 'titulo' => $titulo, 'descripcion' => $descripcion, 'fecha_hora' => now(), 'generacion' => 'AUTOMATICA', 'estado' => 'ABIERTA']);
+            EventoAlerta::query()->create(['cod_evento_alerta' => $this->codigo('EAL'), 'cod_alerta' => $alerta->cod_alerta, 'cod_usuario' => $usuario->cod_usuario, 'tipo_evento' => 'CREADA', 'estado_nuevo' => 'ABIERTA', 'fecha_hora' => now(), 'descripcion' => 'Generada automáticamente por seguimiento operativo.']);
         });
+        return 1;
     }
 
-    private function registrar($registro, string $origen, string $tipo, string $nivel, string $texto): int
-    {
-        $motivo = '['.$registro->getTable().':'.$registro->getKey().'] '.$texto;
-        return DB::transaction(function () use ($registro, $origen, $tipo, $nivel, $motivo, $texto) {
-            AdultoMayor::whereKey($registro->cod_am)->lockForUpdate()->firstOrFail();
-            $referencia = '['.$registro->getTable().':'.$registro->getKey().'] ';
-
-            // 1. Idempotencia por referencia de entidad
-            if (AlertaAdulto::where('cod_am', $registro->cod_am)->where('origen', $origen)
-                ->where('motivo', 'like', $referencia.'%')->exists()) {
-                return 0;
-            }
-
-            // 2. Idempotencia por tipo y condición activa (ABIERTA o EN_ATENCION)
-            $alertaEquivalente = AlertaAdulto::where('cod_am', $registro->cod_am)
-                ->where('origen', $origen)
-                ->where('tipo_alerta', $tipo)
-                ->whereIn('estado', ['ABIERTA', 'EN_ATENCION'])
-                ->where(function ($q) use ($referencia, $texto) {
-                    $q->where('motivo', 'like', $referencia.'%')
-                      ->orWhere('motivo', 'like', '%'.$texto.'%');
-                })
-                ->exists();
-
-            if ($alertaEquivalente) {
-                return 0;
-            }
-            AlertaAdulto::create([
-                'cod_am' => $registro->cod_am,
-                'cod_turno' => $registro->cod_turno ?: null,
-                'origen' => $origen,
-                'tipo_alerta' => $tipo,
-                'nivel' => $nivel,
-                'motivo' => $motivo,
-                'estado' => 'ABIERTA',
-            ]);
-            return 1;
-        });
-    }
+    private function codigo(string $prefijo): string { return $prefijo.'_'.Str::upper(Str::random(12)); }
 }

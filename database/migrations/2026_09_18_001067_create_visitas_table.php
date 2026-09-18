@@ -1,0 +1,32 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('visitas', function (Blueprint $table) {
+            $table->string('cod_visita', 20)->primary();
+            $table->string('cod_residente', 20);
+            $table->string('cod_contacto', 20);
+            $table->string('cod_usuario_autorizacion', 20);
+            $table->dateTime('fecha_hora_programada')->nullable();
+            $table->dateTime('fecha_hora_ingreso')->nullable();
+            $table->dateTime('fecha_hora_salida')->nullable();
+            $table->string('motivo', 160)->nullable();
+            $table->string('estado', 20);
+            $table->text('observacion')->nullable();
+            $table->foreign('cod_residente')->references('cod_residente')->on('residentes')->restrictOnDelete();
+            $table->foreign('cod_contacto')->references('cod_contacto')->on('contactos')->restrictOnDelete();
+            $table->foreign('cod_usuario_autorizacion')->references('cod_usuario')->on('usuarios')->restrictOnDelete();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('visitas');
+    }
+};
