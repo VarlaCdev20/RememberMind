@@ -105,4 +105,20 @@ class MedicoFichaUnificadaTest extends TestCase
             ->assertOk()
             ->assertSee('Beatriz');
     }
+
+    public function test_medico_visualiza_todos_los_pacientes_en_mis_pacientes_sin_quedar_bloqueado(): void
+    {
+        $this->actingAs($this->medico);
+
+        $otroResidente = AdultoMayor::factory()->create([
+            'cod_est_adul' => 'EST_001',
+            'nombres'      => 'Beatriz',
+            'ap_paterno'   => 'Sarmiento',
+        ]);
+
+        Livewire::test(\App\Livewire\Cuidados\MisPacientes::class)
+            ->assertOk()
+            ->assertSee('Aurelio')
+            ->assertSee('Beatriz');
+    }
 }

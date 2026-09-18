@@ -35,10 +35,29 @@ class DashboardController extends Controller
 
         // 1. Auditoría institucional (Evento en ESPAÑOL con contexto extendido)
         $this->registrarAcceso($usuario);
-
         // 2. Redirección basada en rol
-        if ($usuario->hasRole(['ENFERMEROS', 'MEDICO GENERAL/GERIATRA'])) {
+        if ($usuario->hasRole('MEDICO GENERAL/GERIATRA') || (!$usuario->hasAnyRole(['SUPERADMINISTRADOR', 'ADMINISTRADOR', 'superadmin', 'admin']) && $usuario->can('valoracion_medica.ver'))) {
+            return redirect()->route('admin.medico.dashboard');
+        }
+
+        if ($usuario->hasRole('ENFERMEROS') || (!$usuario->hasAnyRole(['SUPERADMINISTRADOR', 'ADMINISTRADOR', 'superadmin', 'admin']) && $usuario->can('enfermeria.ver_dashboard'))) {
             return redirect()->route('admin.enfermeria.dashboard');
+        }
+
+        if ($usuario->hasRole('PSICOLOGO/A')) {
+            return redirect()->route('admin.psicologia.dashboard');
+        }
+
+        if ($usuario->hasRole('NUTRICIONISTA')) {
+            return redirect()->route('admin.nutricion.valoracion');
+        }
+
+        if ($usuario->hasRole('VOLUNTARIO')) {
+            return redirect()->route('admin.voluntariado.index');
+        }
+
+        if ($usuario->hasRole('FAMILIAR')) {
+            return redirect()->route('admin.familiar.dashboard');
         }
 
         // 3. Obtención de datos (Optimizado mediante Caché en el Servicio)

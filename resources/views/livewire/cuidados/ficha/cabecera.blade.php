@@ -59,7 +59,7 @@
                             @click="openMas = false; drawerExpediente = true"
                             class="w-full flex items-center gap-2 px-2.5 py-2 rounded-lg text-left text-[var(--rm-text-title)] hover:bg-[var(--rm-surface-soft)] font-medium transition cursor-pointer">
                         <i class="ph-bold ph-identification-card text-blue-600 text-sm"></i>
-                        <span>Expediente integral 360°</span>
+                        <span>Expediente Integral</span>
                     </button>
                     <button type="button"
                             @click="openMas = false; drawerFamilia = true"

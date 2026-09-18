@@ -1,27 +1,30 @@
 <x-sistema-layout>
 
-    {{-- Zona 1: Encabezado personalizado --}}
+    {{-- Zona 1: Encabezado personalizado y estado institucional --}}
     <x-ui.encabezado-dashboard :saludo="$saludo ?? []" />
 
-    {{-- Zona 2: KPIs institucionales --}}
+    {{-- Zona 2: KPIs institucionales macro --}}
     <x-ui.kpis-dashboard :kpis="$kpisInstitucionales ?? []" />
 
-    {{-- Zona 3: Resumen de salud + Equipo institucional --}}
+    {{-- Zona 3: Centro de Mando / Hub de Módulos (Todas las Vistas como Botones) --}}
+    <x-ui.hub-modulos-dashboard />
+
+    {{-- Zona 4: Vigilancia Clínica y Alertas Prioritarias --}}
     <div class="grid gap-4 xl:grid-cols-2">
+        <x-ui.panel-alertas-dashboard :alertas="$alertasEstructuradas ?? []" />
         <x-ui.panel-salud-dashboard :resumen="$resumenSalud ?? []" />
+    </div>
+
+    {{-- Zona 5: Operativa Asistencial Diaria y Equipo Institucional --}}
+    <div class="grid gap-4 xl:grid-cols-[1.35fr_1fr]">
+        <x-ui.panel-actividades-dashboard :actividades="$actividadesDashboard ?? []" />
         <x-ui.panel-equipo-institucional :equipo="$equipoInstitucional ?? []" :redFamiliar="$redFamiliar ?? []" />
     </div>
 
-    {{-- Zona 4: Gráficas --}}
+    {{-- Zona 6: Analítica y Gráficas de Tendencia --}}
     <x-ui.seccion-graficos-dashboard />
 
-    {{-- Zona 5: Alertas + Actividades --}}
-    <div class="grid gap-4 xl:grid-cols-[1fr_1.35fr]">
-        <x-ui.panel-alertas-dashboard :alertas="$alertasEstructuradas ?? []" />
-        <x-ui.panel-actividades-dashboard :actividades="$actividadesDashboard ?? []" />
-    </div>
-
-    {{-- Zona 6: Bitácora --}}
+    {{-- Zona 7: Trazabilidad y Auditoría Forense Reciente --}}
     <x-ui.tabla-bitacora-dashboard :registros="$bitacoraDashboard ?? []" />
 
     <script>

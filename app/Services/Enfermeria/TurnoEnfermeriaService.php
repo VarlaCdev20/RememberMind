@@ -35,8 +35,7 @@ class TurnoEnfermeriaService
         }
         return $this->esSuperAdmin($user)
             || $user->hasRole('MEDICO GENERAL/GERIATRA')
-            || $user->can('salud.ver')
-            || $user->can('valoracion_medica.ver');
+            || $user->can('valoracion_medica.crear');
     }
 
     /**
@@ -103,11 +102,11 @@ class TurnoEnfermeriaService
     public function obtenerPacientesAsignadosQuery(?User $user = null, ?string $codTurno = null, ?string $codEnfermeroFiltro = null): Builder
     {
         $user = $user ?? Auth::user();
-        $esSuperAdmin = $this->esSuperAdmin($user);
+        $esSupervisor = $this->esPersonalClinicoAutorizado($user);
 
         $query = AdultoMayor::query();
 
-        if ($esSuperAdmin) {
+        if ($esSupervisor) {
             if ($codEnfermeroFiltro) {
                 $query->whereHas('asignacionesTurno', function ($q) use ($codEnfermeroFiltro, $codTurno) {
                     $q->whereIn('estado', ['ACTIVO', 'ACTIVA'])

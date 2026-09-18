@@ -277,7 +277,7 @@ class TurnoCompletoEnfermeroTest extends TestCase
 
         // ─── PASO 9: VERIFICAR HISTORIAL CLÍNICO INTEGRADO 360° ──────────────
         $ficha->call('cambiarTab', 'historial')
-            ->assertSee('Cronología de Eventos Clínicos 360°')
+            ->assertSee('Cronología de Eventos Clínicos y Cuidados')
             ->assertSee('Control de Signos Vitales')
             ->assertSee('Evolución de Enfermería');
 

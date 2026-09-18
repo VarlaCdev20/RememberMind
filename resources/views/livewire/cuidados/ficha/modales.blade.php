@@ -313,7 +313,7 @@
 </div>
 
 
-{{-- MODALES CLÍNICOS OPERATIVOS (CENTRALIZADOS EN LA FICHA 360°) --}}
+{{-- MODALES CLÍNICOS OPERATIVOS (CENTRALIZADOS EN LA FICHA MÉDICA) --}}
 
 {{-- 1. MODAL REGISTRO DE SIGNOS VITALES --}}
 @if($modalSignos)
@@ -876,7 +876,7 @@
 
 
 {{-- ========================================================================= --}}
-{{-- 9. VENTANA LATERAL FLOTANTE: EXPEDIENTE INTEGRAL 360° (SLIDE-OVER DRAWER) --}}
+{{-- 9. VENTANA LATERAL FLOTANTE: EXPEDIENTE CLÍNICO INTEGRAL (SLIDE-OVER DRAWER) --}}
 {{-- ========================================================================= --}}
 <div x-show="drawerExpediente"
      x-cloak
@@ -912,7 +912,7 @@
                 <div class="space-y-1">
                     <span class="rm-drawer-badge">
                         <span class="h-1.5 w-1.5 rounded-full bg-blue-600 animate-pulse"></span>
-                        EXPEDIENTE INSTITUCIONAL 360°
+                        EXPEDIENTE CLÍNICO INTEGRAL
                     </span>
                     <div class="flex items-center gap-2 pt-0.5">
                         <span class="flex h-8 w-8 items-center justify-center rounded-xl bg-blue-50 text-[#1E3A8A] border border-blue-200 text-base shadow-2xs">

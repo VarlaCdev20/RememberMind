@@ -63,7 +63,15 @@ class SidebarService
 
         // Superadmin: sidebar contextual según ruta
         if ($isSuperadmin) {
-            $isEnfermeriaModule = request()->is('admin/enfermeria*') || request()->routeIs('admin.enfermeria.*');
+            $isEnfermeriaModule = request()->is('admin/enfermeria*')
+                || request()->routeIs('admin.enfermeria.*')
+                || request()->is('admin/turnos-enfermeria*')
+                || request()->routeIs('admin.turnos-enfermeria.*')
+                || request()->is('admin/asignacion-turno*')
+                || request()->routeIs('admin.asignacion-turno.*')
+                || request()->is('admin/plan-cuidado*')
+                || request()->routeIs('admin.plan-cuidado.*')
+                || request()->routeIs('admin.admision.valoracion-enfermeria');
             $isMedicoModule = request()->is('admin/medico*') || request()->routeIs('admin.medico.*');
             $isPsicologiaModule = request()->is('admin/psicologia*') || request()->routeIs('admin.psicologia.*');
 
@@ -125,59 +133,83 @@ class SidebarService
     // =========================================================
     private function getSuperadminSidebar(): array
     {
-        $sidebar = [
-            $this->buildSection('Inicio', 'ph-house', 'dashboard'),
+        $alertasBadge = null;
+        try {
+            $alertasCount = \App\Models\AlertaClinica::where('estado', 'ABIERTA')->count();
+            if ($alertasCount > 0) {
+                $alertasBadge = (string) $alertasCount;
+            }
+        } catch (\Throwable $e) {
+            $alertasBadge = null;
+        }
 
+        $sidebar = [
+            // GRUPO 1: PRINCIPAL
+            $this->buildSection('Inicio', 'ph-house', 'dashboard', [], false, null, null, 'Principal'),
+
+            // GRUPO 2: GESTIÓN INSTITUCIONAL
             $this->buildSection('Usuarios y accesos', 'ph-shield-check', null, [
                 $this->buildItem('Usuarios', 'admin.usuarios.index', 'usuarios.ver'),
                 $this->buildItem('Roles y permisos', 'admin.roles-permisos.index', 'roles.ver'),
-            ]),
+            ], false, null, null, 'Gestión Institucional'),
 
             $this->buildSection('Residentes', 'ph-users-four', null, [
                 $this->buildItem('Expedientes', 'admin.adultos-mayores.index', 'adultos.ver'),
                 $this->buildItem('Preadmisiones', 'admin.admisiones.preadmisiones', 'admisiones.ver_dashboard'),
                 $this->buildItem('Habitaciones y camas', 'admin.habitaciones.index', 'habitaciones.ver'),
                 $this->buildItem('Familia / red de apoyo', 'admin.familia-social.resumen', 'familiares.ver'),
-            ]),
+            ], false, null, null, 'Gestión Institucional'),
 
             $this->buildSection('Personal', 'ph-identification-badge', null, [
                 $this->buildItem('Personal institucional', 'admin.personal-institucional', 'personal_institucional.ver'),
                 $this->buildItem('Horarios y asignaciones', 'admin.turnos-asignaciones.index', 'turnos.ver'),
                 $this->buildItem('Turnos de enfermería', 'admin.turnos-enfermeria.index', 'turnos_enfermeria.ver'),
                 $this->buildItem('Asignación de pacientes', 'admin.asignacion-turno.index', 'asignacion_turno.ver'),
-            ]),
+            ], false, null, null, 'Gestión Institucional'),
 
+                        // GRUPO 3: SERVICIOS CLÍNICOS Y ÁREAS DE ATENCIÓN
             $this->buildSection('Áreas de atención', 'ph-stethoscope', null, [
-                $this->buildItem('Administración', 'admin.administracion.dashboard'),
-                $this->buildItem('Medicina', 'admin.medico.dashboard'),
-                $this->buildItem('Psicología', 'admin.psicologia.dashboard'),
-            ]),
+                $this->buildItem('Centro de Áreas de Atención', 'admin.areas-atencion.index'),
+                $this->buildItem('Enfermería y Cuidados', 'admin.enfermeria.dashboard', 'enfermeria.ver_dashboard'),
+                $this->buildItem('Medicina y Geriatría', 'admin.medico.dashboard'),
+                $this->buildItem('Psicología y Cognición', 'admin.psicologia.dashboard'),
+                $this->buildItem('Nutrición y Dietética', 'admin.nutricion.valoracion'),
+                $this->buildItem('Terapia y Actividades', 'admin.actividades.index', 'actividades.ver'),
+                $this->buildItem('Social y Familias', 'admin.familia-social.resumen', 'familiares.ver'),
+                $this->buildItem('Dirección Administrativa', 'admin.administracion.dashboard'),
+            ], false, null, null, 'Servicios Clínicos'),
 
             $this->buildSection('Supervisión de Enfermería', 'ph-first-aid', null, [
-                $this->buildItem('Resumen global', 'admin.enfermeria.dashboard', 'enfermeria.ver_dashboard'),
+                // Vista Operativa Completa
+                $this->buildItem('Resumen global de guardia', 'admin.enfermeria.dashboard', 'enfermeria.ver_dashboard'),
                 $this->buildItem('Todos los residentes', 'admin.enfermeria.pacientes', 'enfermeria.ver_pacientes_asignados'),
-                $this->buildItem('Agenda institucional', 'admin.enfermeria.agenda', 'enfermeria.ver_dashboard'),
+                $this->buildItem('Ficha de cuidados', 'admin.salud-seguimiento.ficha.index', 'salud.ver'),
+                $this->buildItem('Agenda de cuidados', 'admin.enfermeria.agenda', 'enfermeria.ver_dashboard'),
                 $this->buildItem('Medicación prescrita', 'admin.salud-seguimiento.medicacion.index', 'medicacion.ver'),
-                $this->buildItem('Administraciones', 'admin.salud-seguimiento.administracion.index', 'salud.ver'),
+                $this->buildItem('Kardex y administraciones', 'admin.salud-seguimiento.administracion.index', 'salud.ver'),
                 $this->buildItem('Cuidados e incidentes', 'admin.enfermeria.registros', 'seguimiento.ver'),
-                $this->buildItem('Alertas clínicas', 'admin.enfermeria.alertas', 'alertas.ver'),
                 $this->buildItem('Planes y tareas', 'admin.enfermeria.tareas', 'tareas.ver'),
-                $this->buildItem('Evolución 360°', 'admin.salud-seguimiento.ficha.index', 'salud.ver'),
+                $this->buildItem('Valoraciones iniciales', 'admin.admision.valoracion-enfermeria', 'valoracion_enfermeria.ver'),
+                // Supervisión y Coordinación
+                $this->buildItem('Turnos de enfermería', 'admin.turnos-enfermeria.index', 'turnos_enfermeria.ver'),
+                $this->buildItem('Asignación de pacientes', 'admin.asignacion-turno.index', 'asignacion_turno.ver'),
                 $this->buildItem('Pases de turno', 'admin.enfermeria.pase-turno', 'pase_turno.ver'),
-                $this->buildItem('Reportes de Enfermería', 'admin.enfermeria.reportes', 'enfermeria.ver_dashboard'),
-            ]),
+                $this->buildItem('Alertas clínicas', 'admin.enfermeria.alertas', 'alertas.ver', $alertasBadge),
+                $this->buildItem('Reportes de enfermería', 'admin.enfermeria.reportes', 'enfermeria.ver_dashboard'),
+            ], false, null, null, 'Servicios Clínicos'),
 
-            $this->buildSection('Alertas', 'ph-bell-ringing', 'admin.alertas-clinicas.index', [], false, 'alertas.ver'),
+            $this->buildSection('Alertas', 'ph-bell-ringing', 'admin.alertas-clinicas.index', [], false, 'alertas.ver', $alertasBadge, 'Servicios Clínicos'),
 
+            // GRUPO 4: AUDITORÍA Y CONTROL
             $this->buildSection('Reportes', 'ph-chart-bar', null, [
                 $this->buildItem('Reporte institucional', 'admin.reportes.institucional.preview', 'reportes.institucional'),
                 $this->buildItem('Adultos mayores', 'admin.reportes.adultos.preview', 'reportes.ver'),
                 $this->buildItem('Salud y evaluación', 'admin.reportes.salud.preview', 'reportes.ver'),
                 $this->buildItem('Equipo institucional', 'admin.reportes.equipo.preview', 'reportes.ver'),
-            ]),
+            ], false, null, null, 'Control y Auditoría'),
 
-            $this->buildSection('Bitácora y auditoría', 'ph-scroll', 'admin.bitacora.index', [], false, 'bitacora.ver'),
-            $this->buildSection('Vistas extra', 'ph-stack-simple', 'admin.vistas-extra'),
+            $this->buildSection('Bitácora y auditoría', 'ph-scroll', 'admin.bitacora.index', [], false, 'bitacora.ver', null, 'Control y Auditoría'),
+            $this->buildSection('Vistas extra', 'ph-stack-simple', 'admin.vistas-extra', [], false, null, null, 'Control y Auditoría'),
         ];
 
         return array_values(array_filter($sidebar));
@@ -264,34 +296,45 @@ class SidebarService
 
         $sections = [];
 
-        // Si es superadmin navegando en enfermería, mantener el botón para retornar
-        if ($this->isSuperadmin($user) && (request()->is('admin/enfermeria*') || request()->routeIs('admin.enfermeria.*'))) {
-            $sections[] = $this->buildSection('Volver a Administración', 'ph-arrow-u-up-left', 'dashboard');
+                if ($esSupervision) {
+            $sections[] = $this->buildSection('Volver a Áreas de Atención', 'ph-arrow-u-up-left', 'admin.areas-atencion.index');
+
+            // BLOQUE 1: ATENCIÓN DE ENFERMERÍA (VISTA COMPLETA)
+            $sections[] = $this->buildSection('Atención de Enfermería', 'ph-first-aid', null, [
+                $this->buildItem('Mi turno activo', 'admin.enfermeria.dashboard', 'enfermeria.ver_dashboard'),
+                $this->buildItem('Todos los residentes', 'admin.enfermeria.pacientes', 'enfermeria.ver_pacientes_asignados'),
+                $this->buildItem('Ficha de cuidados', 'admin.salud-seguimiento.ficha.index', 'salud.ver'),
+                $this->buildItem('Agenda de cuidados', 'admin.enfermeria.agenda', 'enfermeria.ver_dashboard'),
+                $this->buildItem('Medicación prescrita', 'admin.salud-seguimiento.medicacion.index', 'medicacion.ver'),
+                $this->buildItem('Kardex y administraciones', 'admin.salud-seguimiento.administracion.index', 'salud.ver'),
+                $this->buildItem('Cuidados e incidentes', 'admin.enfermeria.registros', 'seguimiento.ver'),
+                $this->buildItem('Planes y tareas', 'admin.enfermeria.tareas', 'tareas.ver'),
+                $this->buildItem('Valoraciones iniciales', 'admin.admision.valoracion-enfermeria', 'valoracion_enfermeria.ver'),
+            ], true);
+
+            // BLOQUE 2: SUPERVISIÓN Y COORDINACIÓN DE CUIDADOS
+            $sections[] = $this->buildSection('Supervisión de Enfermería', 'ph-shield-check', null, [
+                $this->buildItem('Resumen global de guardia', 'admin.enfermeria.dashboard', 'enfermeria.ver_dashboard'),
+                $this->buildItem('Turnos de enfermería', 'admin.turnos-enfermeria.index', 'turnos_enfermeria.ver'),
+                $this->buildItem('Asignación de pacientes', 'admin.asignacion-turno.index', 'asignacion_turno.ver'),
+                $this->buildItem('Pases y relevos de turno', 'admin.enfermeria.pase-turno', 'pase_turno.ver'),
+                $this->buildItem('Alertas de guardia', 'admin.enfermeria.alertas', 'alertas.ver', $alertasBadge),
+                $this->buildItem('Reportes de enfermería', 'admin.enfermeria.reportes', 'enfermeria.ver_dashboard'),
+                $this->buildItem('Auditoría de cuidados', 'admin.bitacora.index', 'bitacora.ver'),
+            ], true);
+
+            return array_values(array_filter($sections));
         }
 
-        // GRUPO 1: ENFERMERÍA
-        $enfermeriaItems = $esSupervision ? [
-            $this->buildItem('Resumen global', 'admin.enfermeria.dashboard', 'enfermeria.ver_dashboard'),
-            $this->buildItem('Todos los residentes', 'admin.enfermeria.pacientes', 'enfermeria.ver_pacientes_asignados'),
-            $this->buildItem('Agenda institucional', 'admin.enfermeria.agenda', 'enfermeria.ver_dashboard'),
-            $this->buildItem('Medicación prescrita', 'admin.salud-seguimiento.medicacion.index', 'medicacion.ver'),
-            $this->buildItem('Administraciones', 'admin.salud-seguimiento.administracion.index', 'salud.ver'),
-            $this->buildItem('Valoraciones iniciales', 'admin.admision.valoracion-enfermeria', 'valoracion_enfermeria.ver'),
-            $this->buildItem('Alertas clínicas', 'admin.enfermeria.alertas', 'alertas.ver', $alertasBadge),
-            $this->buildItem('Cuidados e incidentes', 'admin.enfermeria.registros', 'seguimiento.ver'),
-            $this->buildItem('Planes y tareas', 'admin.enfermeria.tareas', 'tareas.ver'),
-            $this->buildItem('Evolución 360°', 'admin.salud-seguimiento.ficha.index', 'salud.ver'),
-            $this->buildItem('Turnos', 'admin.turnos-enfermeria.index', 'turnos_enfermeria.ver'),
-            $this->buildItem('Asignaciones', 'admin.asignacion-turno.index', 'asignacion_turno.ver'),
-            $this->buildItem('Pases de turno', 'admin.enfermeria.pase-turno', 'pase_turno.ver'),
-        ] : [
+        // ROL ENFERMEROS (ESTRUCTURA SIMPLIFICADA OPERATIVA)
+        $enfermeriaItems = [
             $this->buildItem('Mi turno', 'admin.enfermeria.dashboard', 'enfermeria.ver_dashboard'),
             $this->buildItem('Mis pacientes', 'admin.enfermeria.pacientes', 'enfermeria.ver_pacientes_asignados'),
             $this->buildItem('Agenda', 'admin.enfermeria.agenda', 'enfermeria.ver_dashboard'),
             $this->buildItem('Medicación', 'admin.salud-seguimiento.medicacion.index', 'medicacion.ver'),
             $this->buildItem('Alertas', 'admin.enfermeria.alertas', 'alertas.ver', $alertasBadge),
             $this->buildItem('Registros', 'admin.enfermeria.registros', 'seguimiento.ver'),
-            $this->buildItem('Evolución 360°', 'admin.enfermeria.pacientes', 'enfermeria.ver_pacientes_asignados'),
+            $this->buildItem('Ficha médica', 'admin.enfermeria.pacientes', 'enfermeria.ver_pacientes_asignados'),
             $this->buildItem('Entrega de turno', 'admin.enfermeria.pase-turno', 'pase_turno.ver'),
         ];
 
@@ -304,15 +347,12 @@ class SidebarService
         $informacionItems = [
             $this->buildItem('Reportes', 'admin.enfermeria.reportes', 'enfermeria.ver_dashboard'),
         ];
-        if ($esSupervision) {
-            $informacionItems[] = $this->buildItem('Auditoría', 'admin.bitacora.index', 'bitacora.ver');
-        }
 
         $informacionSection = $this->buildSection('Información', 'ph-chart-bar', null, $informacionItems, true);
         if ($informacionSection) {
             $sections[] = $informacionSection;
         }
-
+        
         return array_values(array_filter($sections));
     }
 
@@ -434,7 +474,7 @@ class SidebarService
     //  BUILDERS
     // =========================================================
 
-    private function buildSection($title, $icon, $route = null, $items = [], $defaultExpanded = false, $permission = null)
+    private function buildSection($title, $icon, $route = null, $items = [], $defaultExpanded = false, $permission = null, $badge = null, $group = null)
     {
         if ($route && $this->isPlaceholderRoute($route)) {
             return null;
@@ -483,6 +523,8 @@ class SidebarService
             'active' => $active,
             'disabled' => $route ? !Route::has($route) : false,
             'default_expanded' => $defaultExpanded,
+            'badge' => $badge,
+            'group' => $group,
         ];
     }
 

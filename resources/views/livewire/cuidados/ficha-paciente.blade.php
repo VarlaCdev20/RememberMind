@@ -70,5 +70,19 @@
     @livewire('medicacion.medicacion-adulto-modal')
 
     {{-- MODALES CLÍNICOS OPERATIVOS --}}
+        {{-- TAB ALERTAS --}}
+    @if($tabActivo === 'alertas')
+        <div x-show="activeTab === 'alertas'">
+            @include('livewire.cuidados.ficha.tab-alertas')
+        </div>
+    @endif
+
+    {{-- TAB HISTORIAL --}}
+    @if($tabActivo === 'historial')
+        <div x-show="activeTab === 'historial'">
+            @include('livewire.cuidados.ficha.tab-historial')
+        </div>
+    @endif
+
     @include('livewire.cuidados.ficha.modales')
 </div>

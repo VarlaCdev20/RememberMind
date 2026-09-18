@@ -116,40 +116,86 @@
             }
         @endphp
 
-        <nav x-data="{ openSection: {{ $initialOpen !== null ? $initialOpen : 'null' }} }" class="space-y-2">
+        <nav x-data="{ openSection: {{ $initialOpen !== null ? $initialOpen : 'null' }}, search: '' }" class="space-y-1">
+            {{-- BUSCADOR RÁPIDO EN MENÚ --}}
+            <div x-show="!sidebarCollapsed" class="mb-2 px-1">
+                <div class="relative flex items-center">
+                    <i class="ph-bold ph-magnifying-glass absolute left-2.5 text-xs text-meta pointer-events-none"></i>
+                    <input
+                        type="text"
+                        x-model="search"
+                        placeholder="Buscar módulo..."
+                        class="w-full h-8 pl-7 pr-6 text-xs rounded-xl bg-fondo-card/70 border border-borde text-titulo placeholder:text-meta/70 focus:outline-none focus:ring-1 focus:ring-boton-acento focus:border-boton-acento transition"
+                    />
+                    <button
+                        x-show="search.length > 0"
+                        @click="search = ''"
+                        type="button"
+                        class="absolute right-2 text-meta hover:text-titulo text-xs cursor-pointer"
+                        title="Limpiar búsqueda"
+                    >
+                        <i class="ph-bold ph-x"></i>
+                    </button>
+                </div>
+            </div>
+
             @foreach($sections as $section)
                 @php
                     $isDirect = isset($section['route']) && !empty($section['route']);
                     $isSectionActive = $isDirect 
-                        ? (request()->routeIs($section['route']) || (($base = preg_replace('/\.index$/', '.*', $section['route'])) !== $section['route'] && request()->routeIs($base)))
+                        ? (request()->routeIs($section['route']) || (preg_replace('/\.index$/', '.*', $section['route']) !== $section['route'] && request()->routeIs(preg_replace('/\.index$/', '.*', $section['route']))))
                         : $isActiveSection($section);
+                    $url = $isDirect ? $safeUrl($section['route']) : '#';
+                    $hasChildren = !empty($section['items']);
+                    $group = $section['group'] ?? null;
+                    $prevGroup = ($loop->index > 0 && isset($sections[$loop->index - 1]['group'])) ? $sections[$loop->index - 1]['group'] : null;
+                    $itemsJson = json_encode(strtolower(implode(' ', array_column($section['items'] ?? [], 'label'))));
+                    $titleJson = json_encode(strtolower($section['title']));
                 @endphp
 
+                {{-- OVERLINE DE CATEGORÍA --}}
+                @if(!empty($group) && $group !== $prevGroup)
+                    <div class="pt-3 pb-1 px-3" x-show="!sidebarCollapsed && search === ''">
+                        <span class="text-[9.5px] font-black uppercase tracking-[0.16em] text-apoyo/80 select-none">
+                            {{ $group }}
+                        </span>
+                    </div>
+                @endif
+
                 @if($isDirect)
-                    <div class="group/section relative">
-                        @php
-                            $disabled = $isDisabled($section['route']);
-                            $url = $safeUrl($section['route']);
-                        @endphp
+                    {{-- SECCIÓN CON LINK DIRECTO --}}
+                    <div
+                        class="group/section relative"
+                        x-show="search === '' || {{ $titleJson }}.includes(search.toLowerCase())"
+                    >
                         <a
                             wire:navigate
                             href="{{ $url }}"
-                            @if($disabled) title="Próximamente" @else title="{{ $section['title'] }}" @endif
-                            class="flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-sm font-bold transition-all duration-300
+                            class="flex items-center justify-between rounded-xl px-3 py-2 text-sm font-bold transition-all duration-300
                                    {{ $isSectionActive ? 'bg-fondo-card-calido text-boton-acento shadow-card ring-1 ring-borde border-l-4 border-boton-acento' : 'text-apoyo hover:bg-fondo-hover hover:text-boton-acento' }}"
                             :class="sidebarCollapsed ? 'justify-center px-0' : ''"
+                            title="{{ $section['title'] }}"
                         >
-                            <div class="flex items-center gap-3">
+                            <div class="flex items-center gap-3 min-w-0">
                                 <i class="ph-bold {{ $section['icon'] }} text-xl shrink-0 transition-all duration-300
                                           {{ $isSectionActive ? 'text-boton-acento' : 'text-meta group-hover/section:text-boton-acento group-hover/section:rotate-3' }}"></i>
                                 <span
                                     x-show="!sidebarCollapsed"
                                     x-transition.opacity.duration.300ms
-                                    class="text-xs uppercase tracking-[0.15em] font-black"
+                                    class="text-xs uppercase tracking-[0.15em] font-black truncate"
                                 >
                                     {{ $section['title'] }}
                                 </span>
                             </div>
+
+                            @if(!empty($section['badge']))
+                                <span
+                                    x-show="!sidebarCollapsed"
+                                    class="inline-flex items-center justify-center rounded-full bg-red-500/15 px-2 py-0.5 text-[10px] font-black text-red-600 border border-red-200 dark:border-red-800 shrink-0"
+                                >
+                                    {{ $section['badge'] }}
+                                </span>
+                            @endif
                         </a>
                         
                         {{-- DIVISOR EN MODO COLAPSADO --}}
@@ -158,47 +204,60 @@
                         {{-- TOOLTIP CUANDO ESTÁ COLAPSADO --}}
                         <div
                             x-show="sidebarCollapsed"
-                            class="pointer-events-none absolute left-full z-50 ml-4 hidden whitespace-nowrap rounded-lg bg-boton-principal px-3 py-2 text-[11px] font-bold text-boton-principalTexto shadow-panel transition-all group-hover/section:block"
+                            class="pointer-events-none absolute left-full top-1/2 -translate-y-1/2 z-50 ml-3 hidden whitespace-nowrap rounded-lg bg-boton-principal px-3 py-2 text-[11px] font-bold text-boton-principalTexto shadow-panel transition-all group-hover/section:block"
                         >
                             {{ $section['title'] }}
+                            @if(!empty($section['badge']))
+                                <span class="ml-1.5 rounded-full bg-red-500 px-1.5 py-0.2 text-[9px] text-white">
+                                    {{ $section['badge'] }}
+                                </span>
+                            @endif
                         </div>
                     </div>
                 @else
-                    <div class="group/section relative">
+                    {{-- SECCIÓN CON ACORDEÓN DE SUB-ITEMS --}}
+                    <div
+                        class="group/section relative"
+                        x-show="search === '' || {{ $titleJson }}.includes(search.toLowerCase()) || {{ $itemsJson }}.includes(search.toLowerCase())"
+                    >
                         {{-- HEADER DE SECCIÓN --}}
                         <button
                             type="button"
                             @click="openSection = (openSection === {{ $loop->index }}) ? null : {{ $loop->index }}"
-                            class="flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-sm font-bold transition-all duration-300
+                            class="flex w-full items-center justify-between rounded-xl px-3 py-2 text-sm font-bold transition-all duration-300
                                    {{ $isSectionActive ? 'bg-fondo-card-calido text-boton-acento shadow-card ring-1 ring-borde border-l-4 border-boton-acento' : 'text-apoyo hover:bg-fondo-hover hover:text-boton-acento' }}"
                             :class="sidebarCollapsed ? 'justify-center px-0' : ''"
                         >
-                            <div class="flex items-center gap-3">
+                            <div class="flex items-center gap-3 min-w-0">
                                 <i class="ph-bold {{ $section['icon'] }} text-xl shrink-0 transition-all duration-300
                                           {{ $isSectionActive ? 'text-boton-acento' : 'text-meta group-hover/section:text-boton-acento group-hover/section:rotate-3' }}"></i>
                                 <span
                                     x-show="!sidebarCollapsed"
                                     x-transition.opacity.duration.300ms
-                                    class="text-xs uppercase tracking-[0.15em] font-black"
+                                    class="text-xs uppercase tracking-[0.15em] font-black truncate"
                                 >
                                     {{ $section['title'] }}
                                 </span>
                             </div>
 
                             <div class="flex items-center gap-1.5" x-show="!sidebarCollapsed">
-                                @if($isSectionActive)
+                                @if(!empty($section['badge']))
+                                    <span class="inline-flex items-center justify-center rounded-full bg-red-500/15 px-2 py-0.5 text-[10px] font-black text-red-600 border border-red-200 dark:border-red-800 shrink-0">
+                                        {{ $section['badge'] }}
+                                    </span>
+                                @elseif($isSectionActive)
                                     <span x-show="openSection !== {{ $loop->index }}" class="h-1.5 w-1.5 rounded-full bg-boton-acento shadow-glow shrink-0"></span>
                                 @endif
                                 <i
                                     class="ph-bold ph-caret-down text-[10px] transition-transform duration-500"
-                                    :class="openSection === {{ $loop->index }} ? 'rotate-180 text-boton-acento' : 'text-meta'"
+                                    :class="(openSection === {{ $loop->index }} || (search !== '' && {{ $itemsJson }}.includes(search.toLowerCase()))) ? 'rotate-180 text-boton-acento' : 'text-meta'"
                                 ></i>
                             </div>
                         </button>
 
                         {{-- ITEMS DE SECCIÓN --}}
                         <div
-                            x-show="openSection === {{ $loop->index }} && !sidebarCollapsed"
+                            x-show="(openSection === {{ $loop->index }} || (search !== '' && {{ $itemsJson }}.includes(search.toLowerCase()))) && !sidebarCollapsed"
                             x-transition:enter="transition ease-out duration-300"
                             x-transition:enter-start="opacity-0 -translate-y-2"
                             x-transition:enter-end="opacity-100 translate-y-0"
@@ -209,13 +268,15 @@
                                     $active = $isActiveItem($item);
                                     $disabled = $isDisabled($item['route']);
                                     $url = $safeUrl($item['route']);
+                                    $labelJson = json_encode(strtolower($item['label']));
                                 @endphp
 
                                 <a
                                     wire:navigate
                                     href="{{ $url }}"
+                                    x-show="search === '' || {{ $labelJson }}.includes(search.toLowerCase()) || {{ $titleJson }}.includes(search.toLowerCase())"
                                     @if($disabled) title="Próximamente" @else title="{{ $item['label'] }}" @endif
-                                    class="group/item relative flex items-center justify-between gap-2.5 pr-2 rounded-lg py-2 text-sm font-bold transition-all duration-300
+                                    class="group/item relative flex items-center justify-between gap-2.5 pr-2 rounded-lg py-1.5 text-sm font-bold transition-all duration-300
                                            {{ $active
                                                 ? 'text-boton-acento'
                                                 : 'text-meta hover:text-boton-acento hover:translate-x-1'
@@ -241,12 +302,35 @@
                         {{-- DIVISOR EN MODO COLAPSADO --}}
                         <div class="mx-auto h-px w-8 bg-borde my-2" x-show="sidebarCollapsed"></div>
 
-                        {{-- TOOLTIP CUANDO ESTÁ COLAPSADO --}}
+                        {{-- FLYOUT POPOVER CUANDO ESTÁ COLAPSADO --}}
                         <div
                             x-show="sidebarCollapsed"
-                            class="pointer-events-none absolute left-full z-50 ml-4 hidden whitespace-nowrap rounded-lg bg-boton-principal px-3 py-2 text-[11px] font-bold text-boton-principalTexto shadow-panel transition-all group-hover/section:block"
+                            class="pointer-events-none absolute left-full top-0 z-50 ml-3 hidden min-w-[210px] rounded-xl border border-borde bg-fondo-card p-3 shadow-panel transition-all group-hover/section:block group-hover/section:pointer-events-auto"
                         >
-                            {{ $section['title'] }}
+                            <div class="flex items-center gap-2 border-b border-borde pb-2 mb-2">
+                                <i class="ph-bold {{ $section['icon'] }} text-boton-acento text-base"></i>
+                                <span class="text-xs font-black uppercase tracking-wider text-titulo">{{ $section['title'] }}</span>
+                            </div>
+                            <div class="space-y-1">
+                                @foreach($section['items'] as $item)
+                                    @php
+                                        $active = $isActiveItem($item);
+                                        $url = $safeUrl($item['route']);
+                                    @endphp
+                                    <a
+                                        wire:navigate
+                                        href="{{ $url }}"
+                                        class="flex items-center justify-between rounded-lg px-2 py-1.5 text-xs font-bold transition {{ $active ? 'bg-fondo-card-calido text-boton-acento' : 'text-meta hover:bg-fondo-hover hover:text-boton-acento' }}"
+                                    >
+                                        <span class="truncate">{{ $item['label'] }}</span>
+                                        @if(!empty($item['badge']))
+                                            <span class="rounded-full bg-red-500/15 px-1.5 py-0.2 text-[9px] font-black text-red-600 border border-red-200">
+                                                {{ $item['badge'] }}
+                                            </span>
+                                        @endif
+                                    </a>
+                                @endforeach
+                            </div>
                         </div>
                     </div>
                 @endif
@@ -255,13 +339,38 @@
     </div>
 
     {{-- FOOTER --}}
-    <div class="shrink-0 border-t border-[var(--color-borde-suave)] p-3">
+    <div class="shrink-0 border-t border-[var(--color-borde-suave)] p-3 space-y-2">
+        @php
+            $currentUser = auth()->user();
+            $userRole = $currentUser ? ($currentUser->getRoleNames()->first() ?? 'USUARIO') : null;
+        @endphp
+
+        {{-- TARJETA DE ROL Y USUARIO --}}
+        @if($currentUser)
+            <div class="px-1" x-show="!sidebarCollapsed">
+                <div class="flex items-center gap-2.5 rounded-xl border border-borde/70 bg-fondo-card/60 p-2 text-xs shadow-2xs">
+                    <div class="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-boton-acento/10 text-boton-acento font-black text-xs">
+                        {{ strtoupper(substr($currentUser->nombres ?? 'U', 0, 1)) }}
+                    </div>
+                    <div class="min-w-0 flex-1">
+                        <p class="truncate text-[11px] font-bold text-titulo leading-tight">
+                            {{ $currentUser->nombres }}
+                        </p>
+                        <span class="inline-flex items-center gap-1 text-[9px] font-black uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
+                            <span class="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                            {{ $userRole ?? 'ACTIVO' }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        @endif
+
         <button
             type="button"
-            class="group flex w-full items-center gap-3 rounded-xl px-3 py-3 text-[15px] font-black text-apoyo transition-all duration-300 hover:bg-boton-principal hover:text-boton-principalTexto active:scale-95"
+            class="group flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-xs font-black text-apoyo transition-all duration-300 hover:bg-boton-principal hover:text-boton-principalTexto active:scale-95"
             :class="sidebarCollapsed ? 'justify-center px-0' : ''"
         >
-            <i class="ph-bold ph-question text-xl shrink-0 group-hover:rotate-12 transition-transform"></i>
+            <i class="ph-bold ph-question text-base shrink-0 group-hover:rotate-12 transition-transform"></i>
 
             <span x-show="!sidebarCollapsed" x-transition.opacity.duration.200ms>
                 Centro de Ayuda

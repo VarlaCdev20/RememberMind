@@ -9,6 +9,7 @@ use App\Http\Controllers\Documentos\DocumentosUsuarioController;
 use App\Http\Controllers\Identidad\UsuarioController;
 use App\Http\Controllers\Medicacion\AdultoMayorAdministracionMedicacionController;
 use App\Http\Controllers\Medicacion\AdultoMayorMedicacionController;
+use App\Http\Controllers\Admin\AreasAtencionController;
 use App\Http\Controllers\Reportes\AreaReporteController;
 use App\Http\Controllers\Reportes\BitacoraController;
 use App\Http\Controllers\Reportes\DashboardController;
@@ -38,7 +39,6 @@ use App\Livewire\Admisiones\PreadmisionWizard;
 use App\Livewire\Alertas\AlertasPanel;
 use App\Livewire\Alertas\AlertasPendientesPanel;
 use App\Livewire\Clinica\DashboardMedico;
-use App\Livewire\Clinica\FichaClinicaIntegradaPanel;
 use App\Livewire\Clinica\PacientesSeguimientoPanel;
 use App\Livewire\Clinica\SaludFichaPanel;
 use App\Livewire\Clinica\SaludResumenPanel;
@@ -106,37 +106,7 @@ Route::middleware([
     |   general como fallback para no romper áreas existentes.
     |
     */
-    Route::get('/dashboard', function () {
-        $usuario = auth()->user();
-
-        abort_unless($usuario, 401);
-
-        // Administración siempre tiene prioridad sobre los paneles operativos.
-        if ($usuario->hasAnyRole([
-            'SUPERADMINISTRADOR',
-            'ADMINISTRADOR',
-            'superadmin',
-            'admin',
-        ])) {
-            return redirect()->route('admin.administracion.dashboard');
-        }
-
-        // Médico / Geriatría: se resuelve antes que Enfermería.
-        // Se utiliza un permiso existente del proyecto para no inventar
-        // una dependencia nueva antes de actualizar el seeder de permisos.
-        if ($usuario->can('valoracion_medica.ver')) {
-            return redirect()->route('admin.medico.dashboard');
-        }
-
-        // Enfermería.
-        if ($usuario->can('enfermeria.ver_dashboard')) {
-            return redirect()->route('admin.enfermeria.dashboard');
-        }
-
-        // Fallback para Psicología, Fisioterapia, Nutrición, Voluntariado,
-        // Familiar u otros perfiles mientras su resolución se centraliza.
-        return app(DashboardController::class)->index();
-    })->name('dashboard');
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     /*
     |--------------------------------------------------------------------------
@@ -253,6 +223,9 @@ Route::middleware([
             Route::view('/roles-permisos', 'pages.roles-permisos.index')
                 ->middleware('permission:roles.ver')
                 ->name('roles-permisos.index');
+
+                        Route::get('/areas-atencion', [AreasAtencionController::class, 'index'])
+                ->name('areas-atencion.index');
 
             Route::view('/areas-institucionales', 'pages.areas-institucionales.index')
                 ->middleware('permission:areas.ver')

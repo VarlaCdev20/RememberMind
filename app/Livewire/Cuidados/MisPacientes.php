@@ -78,7 +78,7 @@ class MisPacientes extends Component
         $service = $this->getTurnoService();
         $user = Auth::user();
 
-        if ($service->esSuperAdmin($user)) {
+        if ($service->esPersonalClinicoAutorizado($user)) {
             $this->filtroEnfermero = '';
             $this->filtroTurno = '';
         } else {
@@ -374,10 +374,11 @@ class MisPacientes extends Component
         $fechaHoy = Carbon::now()->toDateString();
         $service = $this->getTurnoService();
         $user = Auth::user();
-        $esSuperAdmin = $service->esSuperAdmin($user);
+        $esSupervisor = $service->esPersonalClinicoAutorizado($user);
+        $esSuperAdmin = $esSupervisor;
 
         // Asegurar que enfermero estándar no pueda burlar el filtro
-        $enfermeroEfectivo = $esSuperAdmin ? $this->filtroEnfermero : (string) $user?->cod_usu;
+        $enfermeroEfectivo = $esSupervisor ? $this->filtroEnfermero : (string) $user?->cod_usu;
         $turnoEfectivo = $this->filtroTurno ?: null;
 
         $pacientesQuery = $service->obtenerPacientesAsignadosQuery(

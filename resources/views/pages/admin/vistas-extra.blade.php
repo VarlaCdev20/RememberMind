@@ -2,9 +2,9 @@
     @php
         $grupos = [
             'Pantallas duplicadas de pacientes' => [
-                ['Expediente administrativo anterior', 'admin.adultos-mayores.index', 'Conservar hasta validar que la Ficha 360 cubra identificación, documentos y reportes.'],
-                ['Selector general de Salud', 'admin.salud-seguimiento.index', 'Conservar como selector; unificar después sus paneles individuales con Ficha 360.'],
-                ['Ficha clínica médica alternativa', 'admin.medico.pacientes.observacion', 'Duplica navegación clínica de la Ficha 360.'],
+                ['Expediente administrativo anterior', 'admin.adultos-mayores.index', 'Conservar hasta validar que la Ficha Médica cubra identificación, documentos y reportes.'],
+                ['Selector general de Salud', 'admin.salud-seguimiento.index', 'Conservar como selector; unificar después sus paneles individuales con la Ficha Médica.'],
+                ['Ficha clínica médica alternativa', 'admin.medico.pacientes.observacion', 'Duplica navegación clínica de la Ficha Médica.'],
             ],
             'Pantallas provisionales' => [
                 ['Visitas familiares', 'admin.familia-social.visitas', 'Vista base sin flujo ni persistencia.'],

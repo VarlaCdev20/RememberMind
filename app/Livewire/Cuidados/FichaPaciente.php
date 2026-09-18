@@ -43,7 +43,7 @@ class FichaPaciente extends Component
     public string $tabActivo = 'resumen';
 
     // Modales de Acción Rápida
-    // Filtros y Métricas de Historial 360°
+    // Filtros y Métricas de Historial Clínico
     public string $historialFiltroTipo = 'TODOS';
     public ?string $historialFechaDesde = null;
     public ?string $historialFechaHasta = null;
@@ -338,7 +338,7 @@ class FichaPaciente extends Component
         if ($tab === 'medicaciones') {
             $tab = 'medicacion';
         }
-        if ($tab === 'estudios' || $tab === 'estudio' || $tab === 'resultados' || $tab === 'historial') {
+        if ($tab === 'estudios' || $tab === 'estudio' || $tab === 'resultados') {
             $tab = 'estudios';
         }
         if ($tab === 'documentos' || $tab === 'documento' || $tab === 'documentacion') {
@@ -1189,7 +1189,7 @@ class FichaPaciente extends Component
     }
 
     // ──────────────────────────────────────────────────────────────────────────
-    // 7. LÓGICA DE HISTORIAL CLÍNICO CRONOLÓGICO INTEGRADO 360°
+    // 7. LÓGICA DE HISTORIAL CLÍNICO CRONOLÓGICO INTEGRADO
     // ──────────────────────────────────────────────────────────────────────────
 
     private function resolverTimestamp($fecha, $hora = null, $createdAt = null): Carbon

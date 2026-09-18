@@ -14,9 +14,9 @@ class RolesAndPermissionsSeeder extends Seeder
         // Limpiar caché de permisos
         app()[PermissionRegistrar::class]->forgetCachedPermissions();
 
-        // 1. Definir la lista estricta de permisos por módulo
+        // 1. Definir la lista exhaustiva y normalizada de permisos institucionales
         $permisos = [
-            // Administración
+            // Administración e Identidad
             'personal_institucional.ver',
             'usuarios.ver',
             'usuarios.crear',
@@ -38,13 +38,7 @@ class RolesAndPermissionsSeeder extends Seeder
             'turnos.reportes',
             'bitacora.ver',
 
-            // Admisiones
-            'admisiones.ver_dashboard',
-            'admisiones.crear',
-            'valoracion_enfermeria.ver',
-            'valoracion_medica.ver',
-
-            // Nuevos permisos de Ficha de Usuario
+            // Ficha de Usuario y Seguridad
             'documentos_usuarios.ver',
             'documentos_usuarios.subir',
             'documentos_usuarios.validar',
@@ -53,22 +47,29 @@ class RolesAndPermissionsSeeder extends Seeder
             'documentos_usuarios.anular',
             'documentos_usuarios.descargar',
             'documentos_usuarios.reportes',
-            
             'usuarios.acceso.ver',
             'usuarios.acceso.bloquear',
             'usuarios.acceso.restablecer_password',
-            
             'usuarios.historial.ver',
-            
             'usuarios.reportes',
             'usuarios.reportes.pdf',
             'usuarios.reportes.excel',
-            
             'usuarios.horarios.ver',
             'usuarios.horarios.asignar',
             'usuarios.horarios.finalizar',
 
-            // Adultos mayores
+            // Admisiones, Habitaciones y Camas
+            'admisiones.ver_dashboard',
+            'admisiones.crear',
+            'habitaciones.ver',
+            'habitaciones.crear',
+            'habitaciones.editar',
+            'habitaciones.eliminar',
+            'camas.ver',
+            'camas.crear',
+            'camas.editar',
+
+            // Adultos mayores y Expedientes
             'adultos.ver',
             'adultos.crear',
             'adultos.editar',
@@ -77,7 +78,7 @@ class RolesAndPermissionsSeeder extends Seeder
             'adultos.restaurar',
             'adultos.ver_expediente',
 
-            // Familiares y documentos
+            // Familiares y Red de Apoyo
             'familiares.ver',
             'familiares.crear',
             'familiares.editar',
@@ -87,8 +88,15 @@ class RolesAndPermissionsSeeder extends Seeder
             'documentos.descargar',
             'documentos.archivar',
 
-            // Salud y seguimiento
+            // Salud, Historia Clínica y Seguimiento
             'salud.ver',
+            'salud.resumen.ver',
+            'salud.ficha.ver',
+            'salud.ficha.crear',
+            'salud.ficha.editar',
+            'salud.ficha.archivar',
+            'salud.ficha.anular',
+            'salud.ficha.restaurar',
             'atenciones.ver',
             'atenciones.crear',
             'atenciones.editar',
@@ -100,25 +108,81 @@ class RolesAndPermissionsSeeder extends Seeder
             'signos_vitales.ver',
             'signos_vitales.crear',
             'signos_vitales.editar',
+            'salud.signos.ver',
+            'salud.signos.crear',
+            'salud.signos.editar',
+            'salud.signos.anular',
+            'salud.valoracion.ver',
+            'salud.valoracion.crear',
+            'salud.valoracion.editar',
+            'salud.valoracion.anular',
+            'salud.alertas.ver',
+            'salud.alertas.gestionar',
+            'salud.reportes.ver',
+            'salud.reportes.generar',
+
+            // Farmacología y Administración
             'medicacion.ver',
             'medicacion.crear',
             'medicacion.editar',
             'medicacion.suspender',
+            'salud.medicacion.ver',
+            'salud.medicacion.crear',
+            'salud.medicacion.editar',
+            'salud.medicacion.suspender',
+            'salud.medicacion.finalizar',
+            'salud.medicacion.anular',
+            'salud.administracion.ver',
+            'salud.administracion.crear',
+            'salud.administracion.editar',
+            'salud.administracion.anular',
+            'administracion_medicacion.registrar',
 
-            // Salud — permisos específicos de escritura médica
+            // Valoraciones Médicas y Funcionales
             'ficha_medica.crear',
             'ficha_medica.editar',
             'ficha_medica.archivar',
             'valoracion_funcional.crear',
             'valoracion_funcional.editar',
-            'administracion_medicacion.registrar',
-            
-            // Enfermería Operativa
+            'valoracion_enfermeria.ver',
+            'valoracion_enfermeria.crear',
+            'valoracion_enfermeria.editar',
+            'valoracion_enfermeria.anular',
+            'valoracion_medica.ver',
+            'valoracion_medica.crear',
+            'valoracion_medica.editar',
+            'valoracion_medica.anular',
+
+            // Enfermería Operativa y Cuidados
             'enfermeria.ver_dashboard',
             'enfermeria.ver_pacientes_asignados',
             'enfermeria.ver_ficha_paciente',
+            'turnos_enfermeria.ver',
+            'turnos_enfermeria.crear',
+            'turnos_enfermeria.editar',
+            'asignacion_turno.ver',
+            'asignacion_turno.crear',
+            'asignacion_turno.editar',
+            'asignacion_turno.anular',
+            'plan_cuidado.ver',
+            'plan_cuidado.crear',
+            'plan_cuidado.editar',
+            'plan_cuidado.validar',
+            'plan_cuidado.cerrar',
+            'plan_cuidado.anular',
+            'tareas.ver',
+            'tareas.crear',
+            'tareas.registrar_resultado',
+            'tareas.omitir',
+            'tareas.anular',
+            'seguimiento.ver',
+            'seguimiento.crear',
+            'seguimiento.editar',
+            'pase_turno.ver',
+            'pase_turno.generar',
+            'pase_turno.recibir',
 
-            // Evaluaciones cognitivas
+            // Evaluaciones Geriátricas y Cognitivas
             'evaluaciones.ver',
             'evaluaciones.crear',
             'evaluaciones.editar',
@@ -126,7 +190,7 @@ class RolesAndPermissionsSeeder extends Seeder
             'evaluaciones.historial',
             'evaluaciones.resultados',
 
-            // Actividades y voluntariado
+            // Actividades y Voluntariado
             'actividades.ver',
             'actividades.crear',
             'actividades.editar',
@@ -141,7 +205,7 @@ class RolesAndPermissionsSeeder extends Seeder
             'asistencia.ver',
             'asistencia.registrar',
 
-            // Reportes y alertas
+            // Reportes y Alertas
             'reportes.ver',
             'reportes.individual',
             'reportes.institucional',
@@ -155,7 +219,7 @@ class RolesAndPermissionsSeeder extends Seeder
             'alertas.anular',
         ];
 
-        // 2. Crear permisos
+        // 2. Crear o asegurar todos los permisos
         foreach ($permisos as $permiso) {
             Permission::firstOrCreate(['name' => $permiso, 'guard_name' => 'web']);
         }
@@ -179,32 +243,47 @@ class RolesAndPermissionsSeeder extends Seeder
             $rolesModels[$roleName] = Role::firstOrCreate(['name' => $roleName, 'guard_name' => 'web']);
         }
 
-        // 4. Asignar permisos
+        // 4. Asignar permisos por rol
 
-        // SUPERADMINISTRADOR: Todos los permisos creados arriba y los que existan en BD.
-        $todosLosPermisos = Permission::all();
-        $rolesModels['SUPERADMINISTRADOR']->syncPermissions($todosLosPermisos);
+        // ─── SUPERADMINISTRADOR: Control total del sistema ─────────────────────────
+        $rolesModels['SUPERADMINISTRADOR']->syncPermissions(Permission::all());
 
-        // ADMINISTRADOR
+        // ─── ADMINISTRADOR: Gestión institucional completa ────────────────────────
         $rolesModels['ADMINISTRADOR']->syncPermissions([
             'personal_institucional.ver',
             'usuarios.ver',
+            'usuarios.crear',
+            'usuarios.editar',
+            'usuarios.cambiar_estado',
+            'roles.ver',
             'areas.ver',
+            'areas.crear',
+            'areas.editar',
+            'areas.cambiar_estado',
             'areas.reportes',
             'turnos.ver',
             'turnos.crear',
             'turnos.editar',
+            'turnos.cambiar_estado',
             'turnos.asignar',
             'turnos.finalizar',
             'turnos.reportes',
-
+            'turnos_enfermeria.ver',
+            'turnos_enfermeria.crear',
+            'turnos_enfermeria.editar',
+            'asignacion_turno.ver',
+            'asignacion_turno.crear',
+            'asignacion_turno.editar',
+            'asignacion_turno.anular',
             'admisiones.ver_dashboard',
             'admisiones.crear',
-            'salud.ver',
-            'valoracion_enfermeria.ver',
-            'valoracion_medica.ver',
-            
-            // Permisos de Ficha del Usuario
+            'habitaciones.ver',
+            'habitaciones.crear',
+            'habitaciones.editar',
+            'habitaciones.eliminar',
+            'camas.ver',
+            'camas.crear',
+            'camas.editar',
             'documentos_usuarios.ver',
             'documentos_usuarios.subir',
             'documentos_usuarios.validar',
@@ -222,11 +301,12 @@ class RolesAndPermissionsSeeder extends Seeder
             'usuarios.horarios.ver',
             'usuarios.horarios.asignar',
             'usuarios.horarios.finalizar',
-
             'adultos.ver',
             'adultos.crear',
             'adultos.editar',
             'adultos.cambiar_estado',
+            'adultos.archivar',
+            'adultos.restaurar',
             'adultos.ver_expediente',
             'familiares.ver',
             'familiares.crear',
@@ -236,6 +316,12 @@ class RolesAndPermissionsSeeder extends Seeder
             'documentos.subir',
             'documentos.descargar',
             'documentos.archivar',
+            'salud.ver',
+            'salud.resumen.ver',
+            'salud.reportes.ver',
+            'salud.reportes.generar',
+            'valoracion_enfermeria.ver',
+            'valoracion_medica.ver',
             'actividades.ver',
             'actividades.crear',
             'actividades.editar',
@@ -250,70 +336,37 @@ class RolesAndPermissionsSeeder extends Seeder
             'reportes.ver',
             'reportes.institucional',
             'reportes.bienestar',
+            'reportes.exportar_pdf',
             'alertas.ver',
             'alertas.gestionar',
             'alertas.atender',
             'alertas.cerrar',
+            'bitacora.ver',
         ]);
 
-        // ENFERMEROS Y MEDICO GENERAL/GERIATRA (basados en personal_salud + enfermería)
-        $permisosClinicos = [
-            'areas.ver',
-            'turnos.ver',
-            'turnos.reportes',
+        // ─── MEDICO GENERAL/GERIATRA: Autoridad clínica y farmacológica ───────────
+        $rolesModels['MEDICO GENERAL/GERIATRA']->syncPermissions([
             'adultos.ver',
             'adultos.ver_expediente',
             'salud.ver',
-            'atenciones.ver',
-            'atenciones.crear',
-            'atenciones.editar',
-            'atenciones.anular',
-            'observaciones.ver',
-            'observaciones.crear',
-            'observaciones.editar',
-            'observaciones.anular',
-            'signos_vitales.ver',
-            'signos_vitales.crear',
-            'signos_vitales.editar',
-            'medicacion.ver',
-            'medicacion.crear',
-            'medicacion.editar',
-            'medicacion.suspender',
-            'ficha_medica.crear',
-            'ficha_medica.editar',
-            'ficha_medica.archivar',
-            'valoracion_funcional.crear',
-            'valoracion_funcional.editar',
-            'administracion_medicacion.registrar',
-            'evaluaciones.ver',
-            'evaluaciones.crear',
-            'evaluaciones.editar',
-            'evaluaciones.anular',
-            'evaluaciones.historial',
-            'evaluaciones.resultados',
-            'reportes.ver',
-            'reportes.individual',
-            'reportes.bienestar',
-            'alertas.ver',
-            'alertas.gestionar',
-            'alertas.crear',
-            'alertas.atender',
-            'alertas.cerrar',
-            'alertas.anular',
-        ];
-
-        // Añadir permisos específicos de enfermería
-        $permisosEnfermeria = [
-            'enfermeria.ver_dashboard',
-            'enfermeria.ver_pacientes_asignados',
-            'enfermeria.ver_ficha_paciente',
             'salud.resumen.ver',
             'salud.ficha.ver',
             'salud.ficha.crear',
             'salud.ficha.editar',
             'salud.ficha.archivar',
-            'salud.ficha.anular',
-            'salud.ficha.restaurar',
+            'ficha_medica.crear',
+            'ficha_medica.editar',
+            'ficha_medica.archivar',
+            'valoracion_medica.ver',
+            'valoracion_medica.crear',
+            'valoracion_medica.editar',
+            'valoracion_medica.anular',
+            'valoracion_funcional.crear',
+            'valoracion_funcional.editar',
+            'medicacion.ver',
+            'medicacion.crear',
+            'medicacion.editar',
+            'medicacion.suspender',
             'salud.medicacion.ver',
             'salud.medicacion.crear',
             'salud.medicacion.editar',
@@ -321,131 +374,180 @@ class RolesAndPermissionsSeeder extends Seeder
             'salud.medicacion.finalizar',
             'salud.medicacion.anular',
             'salud.administracion.ver',
-            'salud.administracion.crear',
-            'salud.administracion.editar',
-            'salud.administracion.anular',
+            'administracion_medicacion.registrar',
+            'signos_vitales.ver',
+            'signos_vitales.crear',
+            'signos_vitales.editar',
             'salud.signos.ver',
             'salud.signos.crear',
             'salud.signos.editar',
-            'salud.signos.anular',
-            'salud.valoracion.ver',
-            'salud.valoracion.crear',
-            'salud.valoracion.editar',
-            'salud.valoracion.anular',
+            'atenciones.ver',
+            'atenciones.crear',
+            'atenciones.editar',
+            'observaciones.ver',
+            'observaciones.crear',
+            'observaciones.editar',
+            'evaluaciones.ver',
+            'evaluaciones.crear',
+            'evaluaciones.editar',
+            'evaluaciones.historial',
+            'evaluaciones.resultados',
+            'plan_cuidado.ver',
+            'seguimiento.ver',
+            'alertas.ver',
+            'alertas.gestionar',
+            'alertas.crear',
+            'alertas.atender',
+            'alertas.cerrar',
             'salud.alertas.ver',
             'salud.alertas.gestionar',
+            'reportes.ver',
+            'reportes.individual',
+            'reportes.bienestar',
             'salud.reportes.ver',
             'salud.reportes.generar',
             'habitaciones.ver',
-            'habitaciones.crear',
-            'habitaciones.editar',
-            'habitaciones.eliminar',
             'camas.ver',
-            'camas.crear',
-            'camas.editar',
-            'turnos_enfermeria.ver',
-            'turnos_enfermeria.crear',
-            'turnos_enfermeria.editar',
+            'areas.ver',
+            'turnos.ver',
+        ]);
+
+        // ─── ENFERMEROS: Cuidados continuos, administración de dosis y monitoreo ───
+        $rolesModels['ENFERMEROS']->syncPermissions([
+            'enfermeria.ver_dashboard',
+            'enfermeria.ver_pacientes_asignados',
+            'enfermeria.ver_ficha_paciente',
+            'adultos.ver',
+            'adultos.ver_expediente',
+            'salud.ver',
+            'salud.resumen.ver',
+            'salud.ficha.ver',
+            'salud.administracion.ver',
+            'salud.administracion.crear',
+            'administracion_medicacion.registrar',
+            'salud.medicacion.ver',
+            'medicacion.ver',
+            'signos_vitales.ver',
+            'signos_vitales.crear',
+            'salud.signos.ver',
+            'salud.signos.crear',
             'valoracion_enfermeria.ver',
             'valoracion_enfermeria.crear',
             'valoracion_enfermeria.editar',
-            'valoracion_enfermeria.anular',
-            'valoracion_medica.ver',
-            'valoracion_medica.crear',
-            'valoracion_medica.editar',
-            'valoracion_medica.anular',
-            'asignacion_turno.ver',
-            'asignacion_turno.crear',
-            'asignacion_turno.editar',
-            'asignacion_turno.anular',
             'plan_cuidado.ver',
             'plan_cuidado.crear',
             'plan_cuidado.editar',
-            'plan_cuidado.validar',
-            'plan_cuidado.cerrar',
-            'plan_cuidado.anular',
             'tareas.ver',
             'tareas.crear',
             'tareas.registrar_resultado',
             'tareas.omitir',
-            'tareas.anular',
             'seguimiento.ver',
             'seguimiento.crear',
             'seguimiento.editar',
-            'alertas.crear',
-            'alertas.atender',
-            'alertas.cerrar',
-            'alertas.anular',
+            'atenciones.ver',
+            'atenciones.crear',
+            'atenciones.editar',
+            'observaciones.ver',
+            'observaciones.crear',
+            'observaciones.editar',
             'pase_turno.ver',
             'pase_turno.generar',
             'pase_turno.recibir',
-        ];
+            'turnos_enfermeria.ver',
+            'asignacion_turno.ver',
+            'alertas.ver',
+            'alertas.crear',
+            'alertas.atender',
+            'alertas.cerrar',
+            'salud.alertas.ver',
+            'salud.alertas.gestionar',
+            'habitaciones.ver',
+            'camas.ver',
+            'reportes.ver',
+            'reportes.individual',
+            'salud.reportes.ver',
+            'salud.reportes.generar',
+            'bitacora.ver',
+        ]);
 
-        // Asegurar que estos permisos existan (por si no se corrió FlujoClinicoPermissionsSeeder)
-        foreach ($permisosEnfermeria as $perm) {
-            Permission::firstOrCreate(['name' => $perm, 'guard_name' => 'web']);
-        }
+        // ─── PSICOLOGO/A: Salud mental y evaluaciones cognitivas/afectivas ────────
+        $rolesModels['PSICOLOGO/A']->syncPermissions([
+            'adultos.ver',
+            'adultos.ver_expediente',
+            'evaluaciones.ver',
+            'evaluaciones.crear',
+            'evaluaciones.editar',
+            'evaluaciones.anular',
+            'evaluaciones.historial',
+            'evaluaciones.resultados',
+            'observaciones.ver',
+            'observaciones.crear',
+            'observaciones.editar',
+            'actividades.ver',
+            'actividades.crear',
+            'alertas.ver',
+            'alertas.crear',
+            'reportes.ver',
+            'reportes.individual',
+        ]);
 
-        $permisosGestionOrdenMedica = [
-            'medicacion.crear', 'medicacion.editar', 'medicacion.suspender',
-            'salud.medicacion.crear', 'salud.medicacion.editar',
-            'salud.medicacion.suspender', 'salud.medicacion.finalizar', 'salud.medicacion.anular',
-        ];
-        $permisosEdicionHistoriaClinica = [
-            'signos_vitales.editar', 'salud.signos.editar', 'salud.signos.anular',
-            'ficha_medica.crear', 'ficha_medica.editar', 'ficha_medica.archivar',
-            'salud.ficha.crear', 'salud.ficha.editar', 'salud.ficha.archivar',
-            'salud.ficha.anular', 'salud.ficha.restaurar',
-        ];
-
-        $rolesModels['ENFERMEROS']->syncPermissions(array_merge(
-            array_diff($permisosClinicos, array_merge($permisosGestionOrdenMedica, $permisosEdicionHistoriaClinica)),
-            array_diff($permisosEnfermeria, array_merge(
-                ['valoracion_medica.ver', 'valoracion_medica.crear', 'valoracion_medica.editar', 'valoracion_medica.anular'],
-                $permisosGestionOrdenMedica,
-                $permisosEdicionHistoriaClinica
-            )),
-            ['salud.ver', 'valoracion_enfermeria.ver']
-        ));
-
-        $rolesModels['MEDICO GENERAL/GERIATRA']->syncPermissions(array_merge(
-            $permisosClinicos,
-            array_diff($permisosEnfermeria, ['valoracion_enfermeria.ver', 'valoracion_enfermeria.crear', 'valoracion_enfermeria.editar', 'valoracion_enfermeria.anular']),
-            ['salud.ver', 'valoracion_medica.ver']
-        ));
-
-        // PROFESIONALES ESPECÍFICOS (PSICOLOGO/A, PEDAGOGO, NUTRICIONISTA, FISIOTERAPEUTA)
-        $permisosProfesionales = [
+        // ─── PEDAGOGO: Estimulación pedagógica, socio-afectiva y talleres ─────────
+        $rolesModels['PEDAGOGO']->syncPermissions([
             'adultos.ver',
             'adultos.ver_expediente',
             'actividades.ver',
             'actividades.crear',
+            'actividades.editar',
             'observaciones.ver',
             'observaciones.crear',
+            'evaluaciones.ver',
             'reportes.ver',
-            'reportes.individual'
-        ];
-        
-        $rolesModels['PSICOLOGO/A']->syncPermissions($permisosProfesionales);
-        $rolesModels['PEDAGOGO']->syncPermissions($permisosProfesionales);
-        $rolesModels['NUTRICIONISTA']->syncPermissions($permisosProfesionales);
-        $rolesModels['FISIOTERAPEUTA']->syncPermissions($permisosProfesionales);
+            'reportes.individual',
+        ]);
 
-        // VOLUNTARIO
+        // ─── NUTRICIONISTA: Vigilancia dietética y control antropométrico ─────────
+        $rolesModels['NUTRICIONISTA']->syncPermissions([
+            'adultos.ver',
+            'adultos.ver_expediente',
+            'observaciones.ver',
+            'observaciones.crear',
+            'observaciones.editar',
+            'signos_vitales.ver',
+            'salud.signos.ver',
+            'reportes.ver',
+            'reportes.individual',
+        ]);
+
+        // ─── FISIOTERAPEUTA: Rehabilitación física y prevención de caídas ─────────
+        $rolesModels['FISIOTERAPEUTA']->syncPermissions([
+            'adultos.ver',
+            'adultos.ver_expediente',
+            'valoracion_funcional.crear',
+            'valoracion_funcional.editar',
+            'observaciones.ver',
+            'observaciones.crear',
+            'observaciones.editar',
+            'reportes.ver',
+            'reportes.individual',
+        ]);
+
+        // ─── VOLUNTARIO: Acompañamiento, actividades y registro de asistencia ─────
         $rolesModels['VOLUNTARIO']->syncPermissions([
             'adultos.ver',
+            'voluntarios.ver',
             'actividades.ver',
             'asignaciones.ver',
             'asistencia.ver',
             'asistencia.registrar',
             'observaciones.ver',
             'observaciones.crear',
-            'turnos.ver',
         ]);
 
-        // FAMILIAR
+        // ─── FAMILIAR: Portal de seguimiento, red de apoyo y consultas ────────────
         $rolesModels['FAMILIAR']->syncPermissions([
             'adultos.ver',
+            'adultos.ver_expediente',
+            'familiares.ver',
             'actividades.ver',
             'reportes.ver',
             'reportes.individual',

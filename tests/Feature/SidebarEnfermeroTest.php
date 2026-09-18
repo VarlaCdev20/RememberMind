@@ -46,7 +46,7 @@ class SidebarEnfermeroTest extends TestCase
             'Medicación',
             'Alertas',
             'Registros',
-            'Evolución 360°',
+            'Ficha médica',
             'Entrega de turno',
         ], $labelsEnfermeria);
 
@@ -164,7 +164,7 @@ class SidebarEnfermeroTest extends TestCase
         $response->assertSee('Medicación');
         $response->assertSee('Alertas');
         $response->assertSee('Registros');
-        $response->assertSee('Evolución 360°');
+        $response->assertSee('Ficha médica');
         $response->assertSee('Entrega de turno');
         $response->assertSee('Información');
         $response->assertSee('Reportes');

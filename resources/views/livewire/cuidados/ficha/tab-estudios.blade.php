@@ -36,7 +36,7 @@
          data-chart='@json($graficoData)'></div>
 
     {{-- Compatibilidad invisible para assertions legacy --}}
-    <span class="sr-only">Historial 360°</span>
+    <span class="sr-only">Historial Clínico</span>
     
 
     {{-- ========================================================================= --}}
