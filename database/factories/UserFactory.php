@@ -2,17 +2,16 @@
 
 namespace Database\Factories;
 
-use App\Models\Personal;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
 
 /** @extends Factory<User> */
 class UserFactory extends Factory
 {
     protected $model = User::class;
     protected static ?string $password;
+    protected static array $pendingPersonalAttrs = [];
 
     public function definition(): array
     {
@@ -25,49 +24,63 @@ class UserFactory extends Factory
         ];
     }
 
-    public function create($attributes = [], ?\Illuminate\Database\Eloquent\Model $parent = null)
+    public function newModel(array $attributes = [])
     {
-        if (array_key_exists('cod_usu', $attributes)) {
-            $attributes['cod_usuario'] = $attributes['cod_usu'];
-            unset($attributes['cod_usu']);
-        }
+        $hasExplicitName = isset($attributes['nombres']) || isset($attributes['ap_paterno']) || isset($attributes['apellido_paterno']);
 
-        $personalAttrs = [];
-        foreach (['nombres', 'ap_paterno', 'ap_materno', 'apellido_paterno', 'apellido_materno', 'ci', 'numero_documento', 'profesion'] as $key) {
-            if (array_key_exists($key, $attributes)) {
-                $personalAttrs[$key] = $attributes[$key];
-                unset($attributes[$key]);
+        $personalAttrs = [
+            'nombres' => $attributes['nombres'] ?? fake()->firstName(),
+            'apellido_paterno' => $attributes['apellido_paterno'] ?? $attributes['ap_paterno'] ?? fake()->lastName(),
+            'apellido_materno' => $attributes['apellido_materno'] ?? $attributes['ap_materno'] ?? fake()->lastName(),
+            'estado' => $attributes['estado_personal'] ?? 'ACTIVO',
+            '_explicit' => $hasExplicitName,
+        ];
+
+        unset(
+            $attributes['nombres'],
+            $attributes['ap_paterno'],
+            $attributes['apellido_paterno'],
+            $attributes['ap_materno'],
+            $attributes['apellido_materno'],
+            $attributes['estado_personal'],
+            $attributes['_factory_personal_attrs']
+        );
+
+        $model = parent::newModel($attributes);
+        static::$pendingPersonalAttrs[spl_object_id($model)] = $personalAttrs;
+
+        return $model;
+    }
+
+    public function configure(): static
+    {
+        return $this->afterCreating(function (User $user) {
+            $attrs = static::$pendingPersonalAttrs[spl_object_id($user)] ?? null;
+            unset(static::$pendingPersonalAttrs[spl_object_id($user)]);
+
+            // Auto-crear Personal únicamente si se pasaron explícitamente atributos de nombre y no existe Personal
+            if ($attrs && !empty($attrs['_explicit']) && !\App\Models\Personal::where('cod_usuario', $user->cod_usuario)->exists()) {
+                $digits = preg_replace('/[^0-9]/', '', (string)$user->cod_usuario);
+                $codPersonal = 'PER_' . str_pad(substr($digits, -8) ?: fake()->numerify('########'), 8, '0', STR_PAD_LEFT);
+
+                \App\Models\Personal::create([
+                    'cod_personal' => $codPersonal,
+                    'cod_usuario' => $user->cod_usuario,
+                    'nombres' => $attrs['nombres'],
+                    'apellido_paterno' => $attrs['apellido_paterno'],
+                    'apellido_materno' => $attrs['apellido_materno'],
+                    'numero_documento' => fake()->unique()->numerify('########'),
+                    'profesion' => 'ENFERMERIA',
+                    'estado' => $attrs['estado'] ?? 'ACTIVO',
+                ]);
+
+                $user->unsetRelation('personal');
             }
-        }
-
-        $user = parent::create($attributes, $parent);
-
-        if (! empty($personalAttrs)) {
-            $personal = Personal::firstOrNew(['cod_usuario' => $user->cod_usuario]);
-            if (! $personal->exists) {
-                $personal->cod_personal = 'PER_' . Str::upper(Str::random(10));
-            }
-            $personal->nombres = $personalAttrs['nombres'] ?? $personal->nombres ?? fake()->firstName();
-            $personal->apellido_paterno = $personalAttrs['ap_paterno'] ?? $personalAttrs['apellido_paterno'] ?? $personal->apellido_paterno ?? fake()->lastName();
-            $personal->apellido_materno = $personalAttrs['ap_materno'] ?? $personalAttrs['apellido_materno'] ?? $personal->apellido_materno ?? null;
-            $personal->numero_documento = $personalAttrs['numero_documento'] ?? $personalAttrs['ci'] ?? $personal->numero_documento ?? fake()->unique()->numerify('########');
-            $personal->profesion = $personalAttrs['profesion'] ?? $personal->profesion ?? 'PERSONAL';
-            $personal->estado = $user->estado ?? 'ACTIVO';
-            $personal->save();
-
-            $user->unsetRelation('personal');
-        }
-
-        return $user;
+        });
     }
 
     public function unverified(): static
     {
         return $this->state([]);
-    }
-
-    public function withPersonalTeam(): static
-    {
-        return $this;
     }
 }

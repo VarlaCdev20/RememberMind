@@ -23,6 +23,64 @@ class AsignacionPersonal extends ModeloOperativo
         return ['fecha_asignacion' => 'datetime'];
     }
 
+        protected static function booted(): void
+    {
+        static::creating(function (self $asig): void {
+            if (empty($asig->cod_asignacion_personal)) {
+                $asig->cod_asignacion_personal = 'ASP_' . strtoupper(\Illuminate\Support\Str::random(10));
+            }
+            if (empty($asig->fecha_asignacion)) {
+                $asig->fecha_asignacion = now();
+            }
+            if (empty($asig->estado)) {
+                $asig->estado = 'ACTIVA';
+            }
+            if (empty($asig->tipo_asignacion)) {
+                $asig->tipo_asignacion = 'TURNO';
+            }
+
+            // Resolver cod_personal desde cod_usuario o cod_usu si viene provisto
+            if (empty($asig->cod_personal)) {
+                $codUsu = $asig->getAttribute('cod_usuario') ?: $asig->getAttribute('cod_usu');
+                if ($codUsu) {
+                    $u = \App\Models\User::find($codUsu);
+                    $asig->cod_personal = $u?->personal?->cod_personal;
+                }
+            }
+            if (empty($asig->cod_personal)) {
+                $asig->cod_personal = \App\Models\Personal::first()?->cod_personal ?? 'PER_00000001';
+            }
+
+            // Resolver cod_jornada desde cod_turno si viene provisto
+            if (empty($asig->cod_jornada)) {
+                $targetTurno = $asig->getAttribute('cod_turno') ?: (\App\Models\Turno::first()?->cod_turno ?? 'TUR_001');
+                $j = \App\Models\Jornada::whereDate('fecha_jornada', today())->where('cod_turno', $targetTurno)->first();
+                if (!$j) {
+                    $j = \App\Models\Jornada::create([
+                        'cod_jornada' => 'JOR_' . strtoupper(\Illuminate\Support\Str::random(10)),
+                        'cod_turno' => $targetTurno,
+                        'fecha_jornada' => today(),
+                        'estado' => 'ACTIVA',
+                    ]);
+                }
+                $asig->cod_jornada = $j->cod_jornada;
+            }
+
+            // Resolver cod_area si no viene provista
+            if (empty($asig->cod_area)) {
+                $area = \App\Models\Area::first();
+                if (!$area) {
+                    $area = \App\Models\Area::create([
+                        'cod_area' => 'ARE_001',
+                        'nombre' => 'Área General',
+                        'estado' => 'ACTIVA',
+                    ]);
+                }
+                $asig->cod_area = $area->cod_area;
+            }
+        });
+    }
+
     public function jornada(): BelongsTo
     {
         return $this->belongsTo(Jornada::class, 'cod_jornada', 'cod_jornada');

@@ -1034,6 +1034,42 @@ class MiTurnoService
             }
         }
 
+                // C. EJECUCIONES DIRECTAS O HEREDADAS NO VINCULADAS A PROGRAMACIONES DE PLAN
+        foreach ($ejecuciones as $ejec) {
+            $nombreAccion = $ejec->intervencion?->nombre ?: ($ejec->titulo ?? 'Cuidado Asistencial');
+            $claveEjec = "EJEC_{$ejec->cod_ejecucion}";
+
+            $alreadyPresent = false;
+            foreach ($agenda as $item) {
+                if (($item['cod_residente'] ?? '') === $ejec->cod_residente && ($item['accion'] ?? '') === $nombreAccion) {
+                    $alreadyPresent = true;
+                    break;
+                }
+            }
+            if ($alreadyPresent) {
+                continue;
+            }
+
+            $progTime = $ejec->fecha_hora_programada ? Carbon::parse($ejec->fecha_hora_programada) : ($ejec->fecha_hora_ejecucion ? Carbon::parse($ejec->fecha_hora_ejecucion) : $inicioTurno);
+            $estado = in_array(strtoupper((string)$ejec->estado), ['REALIZADA', 'COMPLETADA', 'FINALIZADA']) ? 'REALIZADO' : 'PENDIENTE';
+            if ($estado === 'PENDIENTE' && $momentoActual->gt($progTime->copy()->addMinutes(60))) {
+                $estado = 'RETRASADO';
+            }
+
+            $agenda[$claveEjec] = [
+                'hora' => $progTime->format('H:i'),
+                'momento' => $progTime->timestamp,
+                'tipo' => 'CUIDADO',
+                'icono' => 'ph-stethoscope',
+                'accion' => $nombreAccion,
+                'residente' => $ejec->residente?->nombre_completo ?? 'Residente asignado',
+                'ubicacion' => $this->formatearUbicacion($ejec->residente),
+                'cod_residente' => $ejec->cod_residente,
+                'estado' => $estado,
+                'detalle_omision' => $ejec->motivo_omision,
+            ];
+        }
+
         // Orden determinista cuando dos tareas tienen la misma hora
         $agendaArray = array_values($agenda);
         usort($agendaArray, function ($a, $b) {

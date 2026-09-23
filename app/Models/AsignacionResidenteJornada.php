@@ -46,6 +46,13 @@ class AsignacionResidenteJornada extends ModeloOperativo
                 $asig->cod_jornada = $j->cod_jornada;
             }
             if (empty($asig->cod_personal)) {
+                $codEnf = $asig->getAttribute('cod_usu_enfermero') ?: $asig->getAttribute('cod_usuario');
+                if ($codEnf) {
+                    $u = \App\Models\User::find($codEnf);
+                    $asig->cod_personal = $u?->personal?->cod_personal;
+                }
+            }
+            if (empty($asig->cod_personal)) {
                 $p = \App\Models\Personal::first();
                 if (!$p) {
                     $u = \App\Models\User::first();

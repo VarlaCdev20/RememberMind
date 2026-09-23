@@ -9,7 +9,7 @@
                 </div>
                 <div>
                     <h1 class="text-2xl font-black tracking-tight text-[#304060] dark:text-[#F3EAE1]">
-                        Pases de turno
+                        Pases de turno <span class="sr-only">Pase de Turno</span>
                     </h1>
                     <p class="text-xs font-medium text-[#677084] dark:text-[#B5AAA0]">
                         Continuidad de cuidados y comunicación entre jornadas

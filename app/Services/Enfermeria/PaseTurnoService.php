@@ -159,6 +159,31 @@ class PaseTurnoService
     /**
      * Obtiene la lista estructurada de residentes a entregar por el profesional autenticado
      */
+        /**
+     * Resuelve el modelo Personal asociado a un User, ID o instancia.
+     */
+    public function resolverPersonal(Personal|User|string $sujeto): Personal
+    {
+        if ($sujeto instanceof Personal) {
+            return $sujeto;
+        }
+
+        if ($sujeto instanceof User) {
+            $personal = $sujeto->personal ?: Personal::where('cod_usuario', $sujeto->cod_usuario ?? $sujeto->cod_usu)->first();
+            if ($personal) {
+                return $personal;
+            }
+            throw new \Symfony\Component\HttpKernel\Exception\HttpException(404, 'Personal no encontrado para el usuario.', null, [], 404);
+        }
+
+        $personal = Personal::find($sujeto) ?: Personal::where('cod_usuario', $sujeto)->first();
+        if ($personal) {
+            return $personal;
+        }
+
+        throw new \Symfony\Component\HttpKernel\Exception\HttpException(404, 'Personal no encontrado.', null, [], 404);
+    }
+
     public function obtenerResidentesAEntregar(Personal|User $personalSaliente, Jornada $jornadaSaliente, ?Jornada $jornadaEntrante = null): \Illuminate\Support\Collection
     {
         if ($personalSaliente instanceof User) {
@@ -244,6 +269,7 @@ class PaseTurnoService
                 'ubicacion' => $residente->ubicacion_formateada,
                 'personal_entrante' => $personalEntrante,
                 'cod_personal_entrante' => $personalEntrante?->cod_personal,
+                'nombre_personal_entrante' => $personalEntrante ? ($personalEntrante->usuario?->name ?? "{$personalEntrante->nombres} {$personalEntrante->apellido_paterno}") : 'Pendiente de asignación',
                 'nombre_receptor' => $personalEntrante ? ($personalEntrante->usuario?->name ?? "{$personalEntrante->nombres} {$personalEntrante->apellido_paterno}") : 'Pendiente de asignación',
                 'tiene_receptor' => (bool)$personalEntrante,
                 'pase' => $pase,
@@ -497,7 +523,7 @@ class PaseTurnoService
             ->exists();
 
         if (!$asignadoSaliente && !$usuario->hasRole('SUPERADMINISTRADOR')) {
-            throw ValidationException::withMessages(['cod_residente' => 'El residente no está asignado a su guardia actual.']);
+            throw new \Symfony\Component\HttpKernel\Exception\HttpException(403, 'El residente no está asignado a su guardia actual.', null, [], 403);
         }
 
         // Resolver receptor para este residente en la jornada entrante
@@ -516,9 +542,7 @@ class PaseTurnoService
 
             if ($paseExistente) {
                 // Si ya fue entregado o recibido, no se puede sobrescribir
-                if ($paseExistente->esRecibido() || ($paseExistente->esEntregado() && $estadoDestino === 'BORRADOR')) {
-                    throw ValidationException::withMessages(['cod_residente' => 'El pase ya fue confirmado y no puede modificarse.']);
-                }
+                if ($paseExistente->esRecibido() || ($paseExistente->esEntregado() && $estadoDestino === 'BORRADOR') || ($paseExistente->esEntregado() && $estadoDestino === 'ENTREGADO')) { throw new \Symfony\Component\HttpKernel\Exception\HttpException(409, 'El pase ya fue confirmado y no puede modificarse.', null, [], 409); }
 
                 $paseExistente->estado_general = $datos['estado_general'] ?? $paseExistente->estado_general;
                 $paseExistente->resumen = trim($datos['resumen'] ?? $paseExistente->resumen);
@@ -568,20 +592,27 @@ class PaseTurnoService
         });
     }
 
-    /**
-     * Confirma la recepción del pase por parte del profesional entrante
-     */
-    public function confirmarRecepcion(PaseTurno $pase, ?string $observacionRecepcion, User $usuario): PaseTurno
+        public function confirmarRecepcion(mixed $arg1, mixed $arg2 = null, mixed $arg3 = null): PaseTurno
     {
-        $personal = $usuario->personal ?: Personal::where('cod_usuario', $usuario->cod_usuario ?? $usuario->cod_usu)->first();
-        if (!$personal) {
-            abort(403, 'El usuario no posee un registro de personal activo.');
+        if ($arg1 instanceof User || $arg1 instanceof Personal) {
+            $usuario = $arg1 instanceof User ? $arg1 : $arg1->usuario;
+            $pase = $arg2 instanceof PaseTurno ? $arg2 : PaseTurno::findOrFail($arg2);
+            $observacionRecepcion = $arg3 !== null ? (string)$arg3 : null;
+        } else {
+            $pase = $arg1 instanceof PaseTurno ? $arg1 : PaseTurno::findOrFail($arg1);
+            $observacionRecepcion = is_string($arg2) ? $arg2 : null;
+            $usuario = $arg3 instanceof User ? $arg3 : ($arg2 instanceof User ? $arg2 : Auth::user());
         }
 
-        // Validar que el pase esté entregado
-        abort_unless($pase->puedeRecibirse(), 409, 'El pase no se encuentra en estado entregado para recepción.');
+        $personal = $usuario->personal ?: Personal::where('cod_usuario', $usuario->cod_usuario ?? $usuario->cod_usu)->first();
+        if (!$personal) {
+            throw new \Symfony\Component\HttpKernel\Exception\HttpException(403, 'El usuario no posee un registro de personal activo.', null, [], 403);
+        }
 
-        // Validar que el receptor sea válido: asignado en la jornada entrante o receptor designado
+        if (!$pase->puedeRecibirse()) {
+            throw new \Symfony\Component\HttpKernel\Exception\HttpException(409, 'El pase no se encuentra en estado entregado para recepción.', null, [], 409);
+        }
+
         $asignadoEntrante = AsignacionResidenteJornada::where('cod_jornada', $pase->cod_jornada_entrante)
             ->where('cod_residente', $pase->cod_residente)
             ->where('cod_personal', $personal->cod_personal)
@@ -589,34 +620,63 @@ class PaseTurnoService
             ->exists();
 
         $esReceptorDesignado = $pase->cod_personal_entrante === $personal->cod_personal;
-        $esSuperAdmin = $usuario->hasRole('SUPERADMINISTRADOR');
+        $esSuperAdmin = method_exists($usuario, 'hasRole') && $usuario->hasRole('SUPERADMINISTRADOR');
 
         if (!$asignadoEntrante && !$esReceptorDesignado && !$esSuperAdmin) {
-            abort(403, 'No está autorizado para recibir este residente en la jornada entrante.');
+            throw new \Symfony\Component\HttpKernel\Exception\HttpException(403, 'No está autorizado para recibir este residente en la jornada entrante.', null, [], 403);
         }
 
         return DB::transaction(function () use ($pase, $personal, $observacionRecepcion, $usuario) {
             $bloqueado = PaseTurno::lockForUpdate()->findOrFail($pase->getKey());
-            abort_unless($bloqueado->puedeRecibirse(), 409, 'El pase ya fue recibido previamente.');
+            if (!$bloqueado->puedeRecibirse()) {
+                throw new \Symfony\Component\HttpKernel\Exception\HttpException(409, 'El pase ya fue recibido previamente.', null, [], 409);
+            }
 
-            // Si el pase no tenía personal entrante designado y este profesional lo recibe, se asigna
             if (empty($bloqueado->cod_personal_entrante)) {
                 $bloqueado->cod_personal_entrante = $personal->cod_personal;
             }
 
-            $bloqueado->estado = 'RECIBIDO';
+            $bloqueado->estado = PaseTurno::ESTADO_RECIBIDO ?? 'RECIBIDO';
             $bloqueado->fecha_hora_recepcion = now();
-            $bloqueado->observacion_recepcion = $observacionRecepcion ? trim($observacionRecepcion) : null;
+            $bloqueado->observacion_recepcion = $observacionRecepcion !== null && trim($observacionRecepcion) !== '' ? trim($observacionRecepcion) : null;
             $bloqueado->save();
 
             activity()
                 ->performedOn($bloqueado)
                 ->causedBy($usuario)
-                ->withProperties(['estado' => 'RECIBIDO', 'receptor' => $personal->cod_personal])
+                ->withProperties(['estado' => PaseTurno::ESTADO_RECIBIDO ?? 'RECIBIDO', 'receptor' => $personal->cod_personal])
                 ->log('Confirmación de recepción de pase de turno');
 
             return $bloqueado->refresh();
         });
+    }
+
+    /**
+     * Anula lógicamente un pase de turno
+     */
+    public function anularPase(mixed $arg1, mixed $arg2 = null, ?string $motivo = null): PaseTurno
+    {
+        if ($arg1 instanceof User || $arg1 instanceof Personal) {
+            $usuario = $arg1 instanceof User ? $arg1 : $arg1->usuario;
+            $pase = $arg2 instanceof PaseTurno ? $arg2 : PaseTurno::findOrFail($arg2);
+        } else {
+            $pase = $arg1 instanceof PaseTurno ? $arg1 : PaseTurno::findOrFail($arg1);
+            $usuario = $arg2 instanceof User ? $arg2 : Auth::user();
+        }
+
+        $pase->estado = PaseTurno::ESTADO_ANULADO ?? 'ANULADO';
+        if ($motivo) {
+            $pase->observacion_recepcion = $motivo;
+        }
+        $pase->save();
+
+        activity()
+            ->performedOn($pase)
+            ->causedBy($usuario)
+            ->withProperties(['motivo' => $motivo])
+            ->log('Anulación lógica de pase de turno');
+
+        return $pase;
     }
 
     // ========================================================
