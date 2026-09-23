@@ -10,7 +10,6 @@ return new class extends Migration
     {
         Schema::create('prescripciones', function (Blueprint $table) {
             $table->string('cod_prescripcion', 20)->primary();
-            $table->string('cod_med_adulto', 30)->nullable();
             $table->string('cod_residente', 20);
             $table->string('cod_atencion', 20);
             $table->string('cod_medicamento', 20);

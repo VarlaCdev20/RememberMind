@@ -158,9 +158,6 @@ export default {
                     bitacora: 'var(--color-modulo-bitacora)',
                     bitacoraFondo: 'var(--color-modulo-bitacora-fondo)',
 
-                    apoyo: 'var(--color-modulo-apoyo)',
-                    apoyoTexto: 'var(--color-modulo-apoyo-texto)',
-                    apoyoFondo: 'var(--color-modulo-apoyo-fondo)',
                 },
 
                 estado: {
@@ -223,8 +220,6 @@ export default {
                     actividades: 'var(--color-kpi-actividades-texto)',
                     actividadesBg: 'var(--color-kpi-actividades-bg)',
 
-                    apoyo: 'var(--color-kpi-apoyo-texto)',
-                    apoyoBg: 'var(--color-kpi-apoyo-bg)',
                 },
 
                 tabla: {

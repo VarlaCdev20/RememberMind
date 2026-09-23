@@ -1,6 +1,6 @@
 <nav
  class="header-institucional sticky top-0 z-30 px-5 py-2.5 backdrop-blur-xl transition-all duration-300 ease-in-out"
- :class="sidebarCollapsed ? 'lg:ml-[82px]' : 'lg:ml-[280px]'"
+ :class="sidebarCollapsed ? 'lg:ml-[82px]' : 'lg:ml-[240px]'"
 >
  <div class="flex items-center justify-between gap-4">
  <div class="flex items-center gap-3">

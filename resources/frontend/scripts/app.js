@@ -116,11 +116,5 @@ window.RMCharts = {
 import { iniciarEfectosAmbientales } from './components/efectos-ambientales.js';
 iniciarEfectosAmbientales(AOS);
 
-import redApoyoTree from './modules/red-apoyo-svg.js';
-window.redApoyoTree = redApoyoTree;
-
 // Tema institucional — Geriátrico Jardín de los Recuerdos
 import './utilities/modo-oscuro.js';
-
-import documentosAdulto from './modules/documentos-adulto.js';
-window.documentosAdulto = documentosAdulto;

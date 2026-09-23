@@ -8,5 +8,4 @@ class Personal extends ModeloOperativo {
     public function usuario(): BelongsTo { return $this->belongsTo(User::class,'cod_usuario','cod_usuario'); }
     public function atenciones(): HasMany { return $this->hasMany(Atencion::class,'cod_personal','cod_personal'); }
     public function asignaciones(): HasMany { return $this->hasMany(AsignacionPersonal::class,'cod_personal','cod_personal'); }
-    public function getNombreAttribute(): ?string { return $this->asignaciones()->with('area')->first()?->area?->nombre; }
 }

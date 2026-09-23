@@ -10,7 +10,7 @@
         'terracota' => 'bg-estado-advertencia-bg text-boton-acento',
         'azul' => 'bg-fondo-hover text-titulo',
         'verde' => 'bg-estado-exito-bg text-estado-exito-texto',
-        'marron' => 'bg-modulo-apoyoFondo text-modulo-apoyoTexto',
+        'marron' => 'bg-estado-advertenciaBg text-estado-advertencia',
     ];
 
     $estilo = $colores[$color] ?? $colores['terracota'];
