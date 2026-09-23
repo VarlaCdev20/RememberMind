@@ -6,25 +6,25 @@
        ============================================================ */
 
     /* Marca principal */
-    --rm-terracota: #D9795F;
-    --rm-terracota-hover: #C9654E;
-    --rm-salmon: #E28B70;
+    --rm-terracota: #A35A44;
+    --rm-terracota-hover: #8D4B37;
+    --rm-salmon: #D6AE86;
     --rm-salmon-soft: #F3CFC2;
-    --rm-naranja: #E9A05F;
+    --rm-naranja: #D2A45E;
     --rm-naranja-dark: #C87C35;
     --rm-durazno: #F2B49F;
     --rm-rosa-crema: #F4D1C4;
 
     /* Azul institucional */
-    --rm-azul-profundo: #293A59;
-    --rm-azul-profundo-hover: #1F2D45;
+    --rm-azul-profundo: #304060;
+    --rm-azul-profundo-hover: #24324D;
     --rm-azul-clinico: #90AFCB;
     --rm-azul-tecnico: #5B7C9D;
 
     /* Verde geriátrico / salud */
-    --rm-verde-salud: #3F7D5A;
+    --rm-verde-salud: #63775B;
     --rm-verde-salud-hover: #326646;
-    --rm-verde-suave: #7FA587;
+    --rm-verde-suave: #8DA280;
     --rm-verde-oliva: #5F7358;
     --rm-verde-menta: #DCE8DD;
     --rm-fondo-salud: #DCE8DD;
@@ -54,26 +54,26 @@
     --rm-fondo-calido: #E9E0D7;
 
     /* Textos */
-    --rm-texto-principal: #293A59;
-    --rm-texto-secundario: #5B6273;
+    --rm-texto-principal: #304060;
+    --rm-texto-secundario: #677084;
     --rm-texto-suave: #737785;
     --rm-texto-muted: #8A857F;
     --rm-texto-invertido: #FFF8F1;
 
     /* Fondos principales */
-    --rm-fondo-body: #D8CDC0;
-    --rm-fondo-main: #D8CDC0;
-    --rm-fondo-layout: #DED3C7;
+    --rm-fondo-body: #E9DFD3;
+    --rm-fondo-main: #E9DFD3;
+    --rm-fondo-layout: #E9DFD3;
 
-    --rm-fondo-sidebar: #D8CDC0;
+    --rm-fondo-sidebar: #E9DFD3;
     --rm-fondo-sidebar-header: #F4EEE7;
     --rm-fondo-navbar: #E9E0D7;
 
-    --rm-fondo-panel: #E9E0D7;
-    --rm-fondo-panel-alt: #DED3C7;
-    --rm-fondo-card: #F4EEE7;
+    --rm-fondo-panel: #F0E8DE;
+    --rm-fondo-panel-alt: #E0D5C9;
+    --rm-fondo-card: #F0E8DE;
     --rm-fondo-card-soft: #F4EEE7;
-    --rm-fondo-card-warm: #EEE6DD;
+    --rm-fondo-card-warm: #E0D5C9;
     --rm-fondo-input: #F4EEE7;
     --rm-fondo-tabla: #F4EEE7;
 
@@ -95,17 +95,17 @@
     --rm-info-border: #B8CBD8;
 
     /* Botones */
-    --rm-btn-primary: #293A59;
-    --rm-btn-primary-hover: #1F2D45;
+    --rm-btn-primary: #304060;
+    --rm-btn-primary-hover: #24324D;
     --rm-btn-primary-text: #FFF8F1;
 
-    --rm-btn-accent: #D9795F;
-    --rm-btn-accent-hover: #C9654E;
+    --rm-btn-accent: #A35A44;
+    --rm-btn-accent-hover: #8D4B37;
     --rm-btn-accent-text: #FFF8F1;
 
-    --rm-btn-secondary: #EEE6DD;
-    --rm-btn-secondary-hover: #DED3C7;
-    --rm-btn-secondary-text: #293A59;
+    --rm-btn-secondary: #F0E8DE;
+    --rm-btn-secondary-hover: #E0D5C9;
+    --rm-btn-secondary-text: #304060;
 
     --rm-btn-success: #3F7D5A;
     --rm-btn-success-hover: #326646;

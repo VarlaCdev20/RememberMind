@@ -343,5 +343,5 @@ Documentación histórica: puede conservar términos legacy porque no es ejecuta
 - `docs/refactorizacion-total/10_DECISIONES_PENDIENTES.md`
 - `docs/refactorizacion-total/12_REORGANIZACION_CODIGO.md`
 - `docs/refactorizacion-total/13_AUDITORIA_VENTANAS_FORMULARIOS_Y_ACCIONES.md`
-- `RESUMEN_ARQUITECTURA.md`
-- `walkthrough.md`
+- `docs/architecture-audit/RESUMEN_ARQUITECTURA.md`
+- `docs/architecture-audit/WALKTHROUGH_ALERTAS.md`

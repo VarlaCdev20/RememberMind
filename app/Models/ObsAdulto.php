@@ -1,0 +1,82 @@
+<?php
+
+namespace App\Models;
+
+use App\Traits\GeneraCodigo;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\Activitylog\Traits\LogsActivity;
+
+class ObsAdulto extends Model
+{
+    use GeneraCodigo;
+    use SoftDeletes;
+    use LogsActivity;
+
+    protected $table = 'obs_adulto';
+    protected $primaryKey = 'cod_obs_adul';
+
+    public $incrementing = false;
+    protected $keyType = 'string';
+    protected $prefixCode = 'OBS';
+    protected $digitsCode = 5;
+
+    public $timestamps = true;
+
+    protected $fillable = [
+        'fecha',
+        'tipo_obs',
+        'descripcion',
+        'cod_am',
+        'cod_est_adul',
+        'creado_por',
+        'observacion',
+        'categoria',
+        'nivel_riesgo',
+        'registrado_por',
+        'nivel_importancia'
+    ];
+
+    protected $casts = [
+        'fecha' => 'date',
+    ];
+
+    public function getActivitylogOptions(): \Spatie\Activitylog\LogOptions
+    {
+        return \Spatie\Activitylog\LogOptions::defaults()
+            ->logFillable()
+            ->logOnlyDirty()
+            ->useLogName('Observaciones')
+            ->setDescriptionForEvent(function (string $eventName) {
+                if ($eventName === 'created') return "Se registró una observación de tipo {$this->tipo_obs} para el adulto mayor {$this->cod_am}.";
+                if ($eventName === 'updated') return "Se actualizó la observación #{$this->cod_obs_adul} del adulto mayor {$this->cod_am}.";
+                if ($eventName === 'deleted') return "Se eliminó la observación #{$this->cod_obs_adul}.";
+                return "Observación {$this->cod_obs_adul} modificada ({$eventName}).";
+            });
+    }
+
+    protected static function booted(): void
+    {
+        static::saving(function (self $obs) {
+            $obs->categoria = $obs->categoria ?: ($obs->tipo_obs ?: 'GENERAL');
+            $obs->tipo_obs = $obs->tipo_obs ?: $obs->categoria;
+            $obs->observacion = $obs->observacion ?: ($obs->descripcion ?: '');
+            $obs->descripcion = $obs->descripcion ?: $obs->observacion;
+            $obs->creado_por = $obs->creado_por ?: ($obs->registrado_por ?: auth()->id());
+            $obs->registrado_por = $obs->registrado_por ?: $obs->creado_por;
+            $obs->nivel_riesgo = $obs->nivel_riesgo ?: ($obs->nivel_importancia ?: 'BAJO');
+            $obs->nivel_importancia = $obs->nivel_importancia ?: $obs->nivel_riesgo;
+        });
+    }
+
+    public function adultoMayor()
+    {
+        return $this->belongsTo(AdultoMayor::class, 'cod_am', 'cod_am');
+    }
+
+    public function estadoAdulto()
+    {
+        return $this->belongsTo(EstadoAdulto::class, 'cod_est_adul', 'cod_est_adul');
+    }
+}
