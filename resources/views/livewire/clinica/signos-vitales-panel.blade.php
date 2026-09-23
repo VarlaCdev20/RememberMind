@@ -10,7 +10,7 @@
                        type="text"
                        placeholder="Buscar paciente por nombre o CI..."
                        class="w-full rounded-xl border border-[#C7B9AA] dark:border-[#423B34] bg-[#F0E8DE] dark:bg-[#26221F] py-2 pl-9 pr-8 text-xs font-medium text-[#304060] dark:text-[#F3EAE1] placeholder-[#677084] dark:placeholder-[#8C8276] focus:border-[#A35A44] focus:outline-none">
-                @if(!empty())
+                @if($busqueda !== '')
                     <button type="button"
                             wire:click="limpiarFiltro('busqueda')"
                             class="absolute right-2.5 top-1/2 -translate-y-1/2 text-[#677084] hover:text-[#A35A44] transition"
@@ -161,8 +161,8 @@
                         $lvlFC   = \App\Livewire\Clinica\SignosVitalesPanel::alertaFC($fc);
                         $lvlFR   = \App\Livewire\Clinica\SignosVitalesPanel::alertaFR($fr);
                         $lvlTemp = \App\Livewire\Clinica\SignosVitalesPanel::alertaTemp($temp);
-                        $lvlSat  = \App\Livewire\Clinica\SignosVitalesPanel::alertaSat($sat);
-                        $lvlGluc = \App\Livewire\Clinica\SignosVitalesPanel::alertaGluc($gluc);
+                        $lvlSat  = \App\Livewire\Clinica\SignosVitalesPanel::alertaSPO2($sat);
+                        $lvlGluc = \App\Livewire\Clinica\SignosVitalesPanel::alertaGlucosa($gluc);
                         $lvlGlobal = $sv ? \App\Livewire\Clinica\SignosVitalesPanel::nivelGlobal($sist, $diast, $fc, $fr, $temp, $sat, $gluc) : 'sin_dato';
 
                         // Función de clases de celda

@@ -103,14 +103,22 @@ class ReportesActividadesPanel extends Component
 
     private function getChartMes(): array
     {
+        $driver = DB::connection()->getDriverName();
+        $mesSql = $driver === 'sqlite'
+            ? "strftime('%Y-%m', fecha_hora)"
+            : "TO_CHAR(fecha_hora, 'YYYY-MM')";
+        $nombreMesSql = $driver === 'sqlite'
+            ? "strftime('%m/%Y', fecha_hora)"
+            : "TO_CHAR(fecha_hora, 'Mon YYYY')";
+
         $q = DB::table('actividades')
             ->select(
-                DB::raw("TO_CHAR(fecha_hora, 'YYYY-MM') as mes"),
-                DB::raw("TO_CHAR(fecha_hora, 'Mon YYYY') as mes_nombre"),
+                DB::raw("{$mesSql} as mes"),
+                DB::raw("{$nombreMesSql} as mes_nombre"),
                 DB::raw('COUNT(*) as total')
             )
-            ->groupByRaw("TO_CHAR(fecha_hora, 'YYYY-MM'), TO_CHAR(fecha_hora, 'Mon YYYY')")
-            ->orderByRaw("TO_CHAR(fecha_hora, 'YYYY-MM')");
+            ->groupByRaw("{$mesSql}, {$nombreMesSql}")
+            ->orderByRaw($mesSql);
 
         if ($this->fechaDesde) $q->whereDate('fecha_hora', '>=', $this->fechaDesde);
         if ($this->fechaHasta) $q->whereDate('fecha_hora', '<=', $this->fechaHasta);

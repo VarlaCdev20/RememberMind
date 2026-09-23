@@ -11,8 +11,6 @@ class DatabaseSeeder extends Seeder
         $this->call([
             RolesAndPermissionsSeeder::class,
             AdminSeeder::class,
-            EnfermeriaPacienteSeeder::class,
-            AsignarMedicacionResidenteSeeder::class,
         ]);
     }
 }

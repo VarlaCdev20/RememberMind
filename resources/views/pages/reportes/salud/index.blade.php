@@ -53,7 +53,7 @@
  'titulo' => 'Dependencia',
  'labels' => $graficas['dependencia']['labels'],
  'data' => $graficas['dependencia']['data'],
- 'colores' => $graficas['dependencia']['colores'],
+ 'colores' => $graficas['dependencia']['colores'] ?? [],
  ])
 </div>
 @endif
@@ -66,7 +66,7 @@
  'titulo' => 'Riesgo de Caída',
  'labels' => $graficas['riesgos']['labels'],
  'data' => $graficas['riesgos']['data'],
- 'colores' => $graficas['riesgos']['colores'],
+ 'colores' => $graficas['riesgos']['colores'] ?? [],
  ])
 </div>
 @endif
@@ -79,7 +79,7 @@
  'titulo' => 'Atenciones mensuales',
  'labels' => $graficas['atenciones']['labels'],
  'data' => $graficas['atenciones']['data'],
- 'colores' => $graficas['atenciones']['colores'],
+ 'colores' => $graficas['atenciones']['colores'] ?? [],
  ])
 </div>
 @endif

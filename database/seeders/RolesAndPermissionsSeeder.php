@@ -45,7 +45,7 @@ class RolesAndPermissionsSeeder extends Seeder
             'enfermeria.ver_dashboard', 'enfermeria.ver_pacientes_asignados',
             'enfermeria.ver_ficha_paciente',
             'administracion_medicacion.registrar', 'reportes.ver', 'reportes.institucional',
-            'reportes.exportar_pdf', 'bitacora.ver',
+            'reportes.exportar_pdf', 'reportes.individual', 'bitacora.ver',
         ];
         $permisosCompatibilidadInstitucional = [
             'admisiones.crear',

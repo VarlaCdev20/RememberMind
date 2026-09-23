@@ -168,13 +168,21 @@ class AdministracionMedicacion extends ModeloOperativo
                 $registro->cod_residente = $rawAm;
             }
             if (!empty($registro->cod_prescripcion)) {
-                $presc = Prescripcion::where($registro->cod_prescripcion)->first() ?? Prescripcion::where('cod_med_adulto', $registro->cod_prescripcion)->first();
+                $presc = Prescripcion::query()->whereKey($registro->cod_prescripcion)->first();
                 if ($presc) {
                     $registro->cod_prescripcion = $presc->cod_prescripcion;
                     if (empty($registro->cod_residente)) {
                         $registro->cod_residente = $presc->cod_residente;
                     }
                 }
+            }
+
+            if (! empty($registro->cod_prescripcion) && ! empty($registro->cod_residente)
+                && ! Prescripcion::query()->whereKey($registro->cod_prescripcion)
+                    ->where('cod_residente', $registro->cod_residente)->exists()) {
+                throw \Illuminate\Validation\ValidationException::withMessages([
+                    'cod_prescripcion' => 'La prescripción no corresponde al residente.',
+                ]);
             }
         });
     }

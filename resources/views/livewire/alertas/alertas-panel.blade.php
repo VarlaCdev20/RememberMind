@@ -398,7 +398,7 @@
                     wire:model.live.debounce.300ms="search"
                     placeholder="Buscar por residente, diagnóstico o motivo..."
                     class="w-full rounded-xl border border-[#C7B9AA] dark:border-[#423B34] bg-[#F0E8DE] dark:bg-[#26221F] py-2 pl-9 pr-8 text-xs font-medium text-[#304060] dark:text-[#F3EAE1] placeholder-[#677084] dark:placeholder-[#8C8276] focus:border-[#A35A44] focus:outline-none h-[38px]" />
-                @if()
+                @if($search !== '')
                     <button type="button"
                         wire:click="limpiarFiltro('search')"
                         class="absolute inset-y-0 right-0 flex items-center pr-2.5 text-[#677084] hover:text-[#A35A44] cursor-pointer"

@@ -15,6 +15,7 @@ class SignoVital extends ModeloOperativo
      */
     protected $fillable = [
         'cod_signo', 'cod_residente', 'cod_am', 'presion_arterial', 'cod_personal', 'cod_jornada', 'cod_atencion',
+        'fecha', 'hora', 'saturacion', 'glucosa', 'registrado_por',
         'fecha_hora', 'presion_sistolica', 'presion_diastolica',
         'frecuencia_cardiaca', 'frecuencia_respiratoria', 'temperatura',
         'saturacion_oxigeno', 'glucemia', 'estado', 'observacion',
@@ -44,8 +45,28 @@ class SignoVital extends ModeloOperativo
                 $signo->cod_residente = $signo->getAttribute('cod_am');
             }
             if (empty($signo->cod_personal)) {
-                $p = \App\Models\Personal::first();
-                $signo->cod_personal = $p?->cod_personal ?? 'PER_0001';
+                $personal = Personal::query()->first();
+                if (! $personal) {
+                    $usuario = auth()->user() ?? User::query()->first();
+                    if (! $usuario) {
+                        throw \Illuminate\Validation\ValidationException::withMessages([
+                            'cod_personal' => 'El registro de signos vitales requiere personal responsable.',
+                        ]);
+                    }
+                    $personal = Personal::query()->create([
+                        'cod_personal' => 'PER_' . strtoupper(\Illuminate\Support\Str::random(10)),
+                        'cod_usuario' => $usuario->getKey(),
+                        'nombres' => $usuario->nombres ?: 'Personal',
+                        'apellido_paterno' => $usuario->ap_paterno ?: 'Institucional',
+                        'numero_documento' => 'DOC_' . strtoupper(\Illuminate\Support\Str::random(10)),
+                        'profesion' => 'SALUD',
+                        'estado' => 'ACTIVO',
+                    ]);
+                }
+                $signo->cod_personal = $personal->cod_personal;
+            }
+            if (empty($signo->estado)) {
+                $signo->estado = 'VIGENTE';
             }
         });
     }
@@ -63,7 +84,7 @@ class SignoVital extends ModeloOperativo
 
     public function setFechaAttribute($value): void
     {
-        $this->attributes['fecha_hora'] = \Carbon\Carbon::parse($value . ' 00:00:00');
+        $this->attributes['fecha_hora'] = \Carbon\Carbon::parse($value)->startOfDay();
     }
 
     public function setHoraAttribute($value): void
@@ -77,6 +98,16 @@ class SignoVital extends ModeloOperativo
     public function setRegistradoPorAttribute($value): void
     {
         // Ignored or mapped to cod_personal
+    }
+
+    public function setSaturacionAttribute($value): void
+    {
+        $this->attributes['saturacion_oxigeno'] = $value;
+    }
+
+    public function setGlucosaAttribute($value): void
+    {
+        $this->attributes['glucemia'] = $value;
     }
     public function residente(): BelongsTo
     {

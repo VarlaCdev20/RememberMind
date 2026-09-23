@@ -309,7 +309,14 @@ Route::middleware([
                 ]);
 
             Route::resource('adultos-mayores', AdultoMayorController::class)
-                ->only(['edit', 'update'])
+                ->only(['edit'])
+                ->middleware('permission:adultos.ver')
+                ->parameters([
+                    'adultos-mayores' => 'adulto_mayor',
+                ]);
+
+            Route::resource('adultos-mayores', AdultoMayorController::class)
+                ->only(['update'])
                 ->middleware('permission:adultos.editar')
                 ->parameters([
                     'adultos-mayores' => 'adulto_mayor',

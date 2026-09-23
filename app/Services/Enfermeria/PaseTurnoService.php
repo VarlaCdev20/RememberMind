@@ -78,7 +78,21 @@ class PaseTurnoService
 
         // 2. Buscar jornada activa para el turno según la hora actual
         $turnoActual = $this->turnos->obtenerTurnoActivo($usuario, today()->toDateString());
-        $codTurno = $turnoActual ? $turnoActual->cod_turno : (Turno::where('estado', 'ACTIVO')->orderBy('orden')->value('cod_turno'));
+        $codTurno = $turnoActual?->cod_turno
+            ?? Turno::query()->whereIn('estado', ['ACTIVO', 'ACTIVA'])->orderBy('orden')->value('cod_turno')
+            ?? Turno::query()->orderBy('orden')->value('cod_turno');
+
+        if (! $codTurno) {
+            $turno = Turno::query()->create([
+                'cod_turno' => 'TUR_' . strtoupper(Str::random(10)),
+                'nombre' => 'Turno operativo',
+                'hora_inicio' => '07:00:00',
+                'hora_cierre' => '15:00:00',
+                'orden' => 1,
+                'estado' => 'ACTIVO',
+            ]);
+            $codTurno = $turno->cod_turno;
+        }
 
         $jornada = Jornada::where('cod_turno', $codTurno)
             ->whereDate('fecha_jornada', today())
