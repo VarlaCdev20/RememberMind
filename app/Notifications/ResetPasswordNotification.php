@@ -2,41 +2,16 @@
 
 namespace App\Notifications;
 
+use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Notifications\Messages\MailMessage;
-use Illuminate\Notifications\Notification;
 use Laravel\Fortify\Fortify;
-use SensitiveParameter;
 
-class ResetPasswordNotification extends Notification
+class ResetPasswordNotification extends ResetPassword
 {
-    /**
-     * Token de recuperación generado por Laravel.
-     */
-    public function __construct(
-        #[SensitiveParameter]
-        private readonly string $token
-    ) {
-        //
-    }
-
-
-    /**
-     * Canal utilizado para enviar la notificación.
-     *
-     * @return array<int, string>
-     */
-    public function via(object $notifiable): array
-    {
-        return [
-            'mail',
-        ];
-    }
-
-
     /**
      * Construir el correo de recuperación.
      */
-    public function toMail(object $notifiable): MailMessage
+    public function toMail($notifiable): MailMessage
     {
         $url = $this->resetUrl(
             $notifiable
@@ -70,7 +45,7 @@ class ResetPasswordNotification extends Notification
 
         $nombre = trim(
             (string) (
-                $notifiable->name
+                $notifiable->nombres
                 ?? ''
             )
         );
@@ -133,7 +108,7 @@ class ResetPasswordNotification extends Notification
      * RememberMind utiliza "correo" como identificador
      * de recuperación en lugar del "email" convencional.
      */
-    private function resetUrl(object $notifiable): string
+    protected function resetUrl($notifiable): string
     {
         return route(
             'password.reset',

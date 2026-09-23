@@ -5,28 +5,32 @@
  </x-ui.page-header>
 --}}
 @props([
- 'titulo' => '',
- 'subtitulo' => '',
- 'icono' => 'ph-squares-four',
- 'color' => 'bg-boton-principal', // clase bg para el ícono
+    'titulo' => '',
+    'subtitulo' => '',
+    'icono' => 'ph-squares-four',
+    'color' => 'bg-[#A35A44]', // Terracota canónico de acción
 ])
 
-<div class="rm-page-header">
- <div class="flex items-center gap-3">
- <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full {{ $color }} shadow-sm">
- <i class="ph-bold {{ $icono }} text-lg text-inverso"></i>
- </div>
- <div>
- <h1 class="rm-section-title">{{ $titulo }}</h1>
- @if($subtitulo)
- <p class="rm-section-subtitle">{{ $subtitulo }}</p>
- @endif
- </div>
- </div>
+<header class="rm-page-header mb-5 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+    <div class="flex items-center gap-3.5">
+        <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl {{ $color }} text-white shadow-sm transition-transform duration-200 hover:scale-105">
+            <i class="ph-bold {{ $icono }} text-xl"></i>
+        </span>
+        <div class="rm-page-title-group min-w-0">
+            <h1 class="text-xl sm:text-2xl font-black text-[#304060] dark:text-[#F8F2EC] leading-tight tracking-tight">
+                {{ $titulo }}
+            </h1>
+            @if($subtitulo)
+                <p class="text-xs sm:text-sm font-semibold text-[#677084] dark:text-[#B8ADA2] mt-0.5 leading-snug">
+                    {{ $subtitulo }}
+                </p>
+            @endif
+        </div>
+    </div>
 
- @if($slot->isNotEmpty())
- <div class="flex shrink-0 flex-wrap items-center gap-2">
- {{ $slot }}
- </div>
- @endif
-</div>
+    @if($slot->isNotEmpty())
+        <div class="flex shrink-0 flex-wrap items-center gap-2.5">
+            {{ $slot }}
+        </div>
+    @endif
+</header>

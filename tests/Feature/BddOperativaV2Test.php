@@ -27,6 +27,7 @@ use App\Models\TipoEstudioClinico;
 use App\Models\User;
 use App\Policies\AdministracionMedicacionPolicy;
 use App\Policies\PrescripcionPolicy;
+use Database\Seeders\DatabaseSeeder;
 use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
@@ -43,6 +44,12 @@ class BddOperativaV2Test extends TestCase
     use RefreshDatabase;
 
     protected $seed = true;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->seed(DatabaseSeeder::class);
+    }
 
     public function test_existen_exactamente_las_69_tablas_operativas(): void
     {
@@ -206,7 +213,7 @@ class BddOperativaV2Test extends TestCase
         $residente = app(FormalizarAdmision::class)->ejecutar($datos['preadmision'], ['cod_cama'=>$datos['cama']->cod_cama,'cod_contacto'=>$datos['contacto']->cod_contacto], $datos['usuario']);
         $super = User::query()->where('correo', 'admincasaamandita@gmail.com')->firstOrFail();
 
-        $this->actingAs($super)->get('/dashboard')->assertOk()->assertSee('Panel institucional');
+        $this->actingAs($super)->get('/dashboard')->assertOk()->assertSee('Centro de Mando');
         $this->actingAs($super)->get(route('admin.residentes.show', $residente))->assertOk()->assertSee($residente->cod_residente);
     }
 

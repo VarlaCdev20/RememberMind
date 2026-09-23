@@ -3,39 +3,97 @@
 namespace App\Http\Controllers\Reportes;
 
 use App\Http\Controllers\Controller;
-use App\Models\Admision;
-use App\Models\Alerta;
-use App\Models\OcupacionCama;
-use App\Models\Preadmision;
-use App\Models\Residente;
-use Illuminate\Http\JsonResponse;
-use Illuminate\View\View;
 
+use App\Services\Reportes\DashboardService;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Auth;
+
+/**
+ * DashboardController
+ *
+ * Orquestador principal del panel administrativo institucional.
+ * Gestiona la auditoría de acceso y la integración con la capa de servicios.
+ *
+ * @author Arquitecto Senior Laravel
+ * @version 3.0 (Profesional)
+ */
 class DashboardController extends Controller
 {
-    public function index(): View|JsonResponse
-    {
-        $usuario = request()->user();
-        if ($usuario->hasRole('FAMILIAR')) {
-            $codigos = \App\Models\ResidenteContacto::query()
-                ->whereIn('cod_contacto', $usuario->contactos()->pluck('cod_contacto'))
-                ->where('autoriza_informacion', true)->where('estado', 'ACTIVO')
-                ->pluck('cod_residente');
-            $resumen = [
-                'residentes_admitidos' => Residente::query()->whereIn('cod_residente', $codigos)->where('estado', 'ADMITIDO')->count(),
-                'preadmisiones_pendientes' => 0, 'admisiones_activas' => 0,
-                'camas_ocupadas' => 0, 'alertas_abiertas' => 0,
-            ];
-            return request()->expectsJson() ? response()->json($resumen) : view('pages.dashboard', compact('resumen'));
-        }
-        $resumen = [
-            'residentes_admitidos' => Residente::query()->where('estado', 'ADMITIDO')->count(),
-            'preadmisiones_pendientes' => Preadmision::query()->where('estado', 'PENDIENTE')->count(),
-            'admisiones_activas' => Admision::query()->where('estado', 'ACTIVA')->count(),
-            'camas_ocupadas' => OcupacionCama::query()->where('estado', 'ACTIVA')->count(),
-            'alertas_abiertas' => Alerta::query()->whereNotIn('estado', ['CERRADA', 'ANULADA'])->count(),
-        ];
+    protected $dashboardService;
 
-        return request()->expectsJson() ? response()->json($resumen) : view('pages.dashboard', compact('resumen'));
+    public function __construct(DashboardService $dashboardService)
+    {
+        $this->dashboardService = $dashboardService;
     }
+
+    /**
+     * Punto de entrada principal del dashboard.
+     */
+    public function index()
+    {
+        $usuario = Auth::user();
+
+        // 1. Auditoría institucional (Evento en ESPAÑOL con contexto extendido)
+        $this->registrarAcceso($usuario);
+        // 2. Redirección basada en rol
+        if ($usuario->hasRole('MEDICO GENERAL/GERIATRA') || (!$usuario->hasAnyRole(['SUPERADMINISTRADOR', 'ADMINISTRADOR', 'superadmin', 'admin']) && $usuario->can('valoracion_medica.ver'))) {
+            return redirect()->route('admin.medico.dashboard');
+        }
+
+        if ($usuario->hasRole('ENFERMEROS') || (!$usuario->hasAnyRole(['SUPERADMINISTRADOR', 'ADMINISTRADOR', 'superadmin', 'admin']) && $usuario->can('enfermeria.ver_dashboard'))) {
+            return redirect()->route('admin.enfermeria.dashboard');
+        }
+
+        if ($usuario->hasRole('PSICOLOGO/A')) {
+            return redirect()->route('admin.psicologia.dashboard');
+        }
+
+        // 3. Obtención de datos (Optimizado mediante Caché en el Servicio)
+        $datos = $this->dashboardService->obtenerDatosDashboard($usuario);
+
+        return view('pages.dashboard', $datos);
+    }
+
+    /**
+     * Registra la trazabilidad del acceso con estándares de auditoría.
+     * Solo registra el primer acceso del día para evitar saturar la bitácora.
+     */
+    private function registrarAcceso($usuario)
+    {
+        if (Schema::hasTable('activity_log')) {
+            $hoy = now()->toDateString();
+
+            // Verificar si ya se registró el acceso hoy
+            $yaExiste = \Spatie\Activitylog\Models\Activity::where('causer_id', $usuario->getKey())
+                ->where('event', 'inicio_sesion')
+                ->whereDate('created_at', $hoy)
+                ->exists();
+
+            if (!$yaExiste) {
+                $rol = $usuario->getRoleNames()->first() ?? 'Sin rol';
+
+                activity('Seguridad')
+                    ->causedBy($usuario)
+                    ->event('inicio_sesion')
+                    ->withProperties([
+                        'rol'       => $rol,
+                        'correo'    => $usuario->correo,
+                        'ip'        => request()->ip(),
+                        'navegador' => request()->userAgent(),
+                        'modulo'    => 'Seguridad'
+                    ])
+                    ->log('Inició sesión en el sistema');
+            }
+        }
+    }
+
+    /**
+     * NOTA PARA DESARROLLADORES:
+     * Para invalidar la caché del dashboard tras cambios críticos,
+     * llamar a: $this->dashboardService->limpiarCache(auth()->id());
+     *
+     * Puntos sugeridos:
+     * - Store/Update de Usuarios
+     * - Registro de Actividades
+     */
 }

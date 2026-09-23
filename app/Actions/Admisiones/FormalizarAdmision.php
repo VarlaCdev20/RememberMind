@@ -20,7 +20,10 @@ class FormalizarAdmision
 {
     public function ejecutar(Preadmision $solicitud, array $datos, User $usuario): Residente
     {
+        // La admisión es la única entrada válida para crear residentes. Toda la
+        // operación se confirma o revierte como una sola unidad de trabajo.
         return DB::transaction(function () use ($solicitud, $datos, $usuario): Residente {
+            // Los bloqueos evitan admitir dos veces la solicitud o reutilizar una cama.
             $solicitud = Preadmision::query()->lockForUpdate()->findOrFail($solicitud->getKey());
 
             if ($solicitud->estado !== 'APROBADA' || $solicitud->admision()->exists()) {

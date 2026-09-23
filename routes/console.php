@@ -11,4 +11,5 @@ Artisan::command('inspire', function () {
 Schedule::call(function () {
     $detector = app(\App\Services\Alertas\DeteccionAlertasService::class);
     $detector->detectar();
+    $detector->detectarPreventivas();
 })->name('vigilancia-asistencial')->everyFiveMinutes()->withoutOverlapping();

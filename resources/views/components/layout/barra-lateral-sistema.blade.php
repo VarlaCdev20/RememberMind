@@ -3,9 +3,9 @@
     @toggle-sidebar.window="sidebarOpen = !sidebarOpen"
     :class="[
         sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0',
-        sidebarCollapsed ? 'lg:w-[82px]' : 'lg:w-[240px]'
+        sidebarCollapsed ? 'lg:w-[82px]' : 'lg:w-[280px]'
     ]"
-    class="sidebar-institucional fixed left-0 top-0 z-50 flex h-screen w-[240px] flex-col shadow-sidebar backdrop-blur-xl transition-all duration-300 ease-in-out"
+    class="sidebar-institucional fixed left-0 top-0 z-50 flex h-screen w-[280px] flex-col shadow-sidebar backdrop-blur-xl transition-all duration-300 ease-in-out"
     aria-label="Barra lateral de navegación"
 >
     {{-- BOTÓN COLAPSAR --}}
@@ -37,10 +37,10 @@
                     x-transition.opacity.duration.300ms
                     class="min-w-0"
                 >
-                    <h2 class="max-w-[150px] text-[10px] font-bold uppercase leading-[1.05] text-titulo">
+                    <h2 class="max-w-[180px] text-[11px] font-extrabold uppercase leading-[1.1] text-titulo tracking-wide">
                         CENTRO GERIÁTRICO<br>JARDÍN DE LOS RECUERDOS
                     </h2>
-                    <p class="truncate text-[10px] font-bold uppercase tracking-widest text-modulo-salud">
+                    <p class="truncate text-[10.5px] font-black uppercase tracking-widest text-modulo-salud">
                         RememberMind
                     </p>
                 </div>
@@ -124,7 +124,7 @@
                     <input
                         type="text"
                         x-model="search"
-                        placeholder="Buscar módulo..."
+                        placeholder="BUSCAR MÓDULO..."
                         class="w-full h-8 pl-7 pr-6 text-xs rounded-xl bg-fondo-card/70 border border-borde text-titulo placeholder:text-meta/70 focus:outline-none focus:ring-1 focus:ring-boton-acento focus:border-boton-acento transition"
                     />
                     <button
@@ -156,7 +156,7 @@
                 {{-- OVERLINE DE CATEGORÍA --}}
                 @if(!empty($group) && $group !== $prevGroup)
                     <div class="pt-3 pb-1 px-3" x-show="!sidebarCollapsed && search === ''">
-                        <span class="text-[9.5px] font-black uppercase tracking-[0.16em] text-apoyo/80 select-none">
+                        <span class="text-[10px] font-black uppercase tracking-[0.18em] text-apoyo/80 select-none">
                             {{ $group }}
                         </span>
                     </div>
@@ -182,7 +182,7 @@
                                 <span
                                     x-show="!sidebarCollapsed"
                                     x-transition.opacity.duration.300ms
-                                    class="text-xs uppercase tracking-[0.15em] font-black truncate"
+                                    class="text-xs uppercase tracking-wider font-extrabold truncate"
                                 >
                                     {{ $section['title'] }}
                                 </span>
@@ -204,7 +204,7 @@
                         {{-- TOOLTIP CUANDO ESTÁ COLAPSADO --}}
                         <div
                             x-show="sidebarCollapsed"
-                            class="pointer-events-none absolute left-full top-1/2 -translate-y-1/2 z-50 ml-3 hidden whitespace-nowrap rounded-lg bg-boton-principal px-3 py-2 text-[11px] font-bold text-boton-principalTexto shadow-panel transition-all group-hover/section:block"
+                            class="pointer-events-none absolute left-full top-1/2 -translate-y-1/2 z-50 ml-3 hidden whitespace-nowrap rounded-lg bg-boton-principal px-3 py-2 text-[11px] font-extrabold uppercase tracking-wider text-boton-principalTexto shadow-panel transition-all group-hover/section:block"
                         >
                             {{ $section['title'] }}
                             @if(!empty($section['badge']))
@@ -234,7 +234,7 @@
                                 <span
                                     x-show="!sidebarCollapsed"
                                     x-transition.opacity.duration.300ms
-                                    class="text-xs uppercase tracking-[0.15em] font-black truncate"
+                                    class="text-xs uppercase tracking-wider font-extrabold truncate"
                                 >
                                     {{ $section['title'] }}
                                 </span>
@@ -287,7 +287,7 @@
                                         @if($active)
                                             <span class="absolute -left-4 top-1/2 -translate-y-1/2 h-2 w-2 rounded-full bg-boton-acento shadow-glow"></span>
                                         @endif
-                                        <span class="truncate">{{ $item['label'] }}</span>
+                                        <span class="truncate uppercase tracking-wider font-extrabold text-[11.5px]">{{ $item['label'] }}</span>
                                     </div>
 
                                     @if(!empty($item['badge']))
@@ -322,7 +322,7 @@
                                         href="{{ $url }}"
                                         class="flex items-center justify-between rounded-lg px-2 py-1.5 text-xs font-bold transition {{ $active ? 'bg-fondo-card-calido text-boton-acento' : 'text-meta hover:bg-fondo-hover hover:text-boton-acento' }}"
                                     >
-                                        <span class="truncate">{{ $item['label'] }}</span>
+                                        <span class="truncate uppercase tracking-wider font-extrabold text-[11.5px]">{{ $item['label'] }}</span>
                                         @if(!empty($item['badge']))
                                             <span class="rounded-full bg-red-500/15 px-1.5 py-0.2 text-[9px] font-black text-red-600 border border-red-200">
                                                 {{ $item['badge'] }}
@@ -353,7 +353,7 @@
                         {{ strtoupper(substr($currentUser->nombres ?? 'U', 0, 1)) }}
                     </div>
                     <div class="min-w-0 flex-1">
-                        <p class="truncate text-[11px] font-bold text-titulo leading-tight">
+                        <p class="truncate text-xs font-bold uppercase text-titulo leading-tight">
                             {{ $currentUser->nombres }}
                         </p>
                         <span class="inline-flex items-center gap-1 text-[9px] font-black uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
@@ -373,7 +373,7 @@
             <i class="ph-bold ph-question text-base shrink-0 group-hover:rotate-12 transition-transform"></i>
 
             <span x-show="!sidebarCollapsed" x-transition.opacity.duration.200ms>
-                Centro de Ayuda
+                CENTRO DE AYUDA
             </span>
         </button>
     </div>
