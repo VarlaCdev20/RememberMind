@@ -25,6 +25,12 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     Route::prefix('admin')->name('admin.')->group(function (): void {
+        // Compatibilidad con el destino por rol usado por LoginResponse.
+        // Mantiene el acceso de enfermería sobre el dashboard V2 mientras
+        // se reconstruyen sus vistas especializadas sin recuperar tablas legacy.
+        Route::get('/enfermeria/dashboard', [DashboardController::class, 'index'])
+            ->name('enfermeria.dashboard');
+
         Route::get('/residentes', [ResidenteController::class, 'index'])->middleware('can:viewAny,App\\Models\\Residente')->name('residentes.index');
         Route::get('/residentes/{residente}', [ResidenteController::class, 'show'])->middleware('can:view,residente')->name('residentes.show');
 
