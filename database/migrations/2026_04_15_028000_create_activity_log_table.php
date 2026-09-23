@@ -13,7 +13,7 @@ class CreateActivityLogTable extends Migration
             $table->string('log_name')->nullable()->index();
             $table->text('description');
             
-            // Definición manual de morphs para soportar claves primarias tipo string (como cod_am, cod_usu)
+            // Definición manual de morphs para soportar claves primarias tipo string.
             $table->string('subject_type', 255)->nullable();
             $table->string('subject_id', 255)->nullable();
             $table->string('causer_type', 255)->nullable();
