@@ -122,7 +122,7 @@ class IncidentesEnfermeriaTest extends TestCase
 
     public function test_registro_incidente_exitoso_y_normalizacion_de_texto(): void
     {
-        $hoy = Carbon::today()->format('Y-m-d');
+        $fechaInc = Carbon::now()->subMinutes(15);
 
         Livewire::actingAs($this->user)
             ->test(IncidentesPanel::class)
@@ -131,8 +131,8 @@ class IncidentesEnfermeriaTest extends TestCase
             ->set('tipo_incidente', 'CAÍDA')
             ->set('gravedad', 'ALTA')
             ->set('lugar', 'Pasillo Norte ')
-            ->set('fecha_incidente', $hoy)
-            ->set('hora_incidente', '08:30')
+            ->set('fecha_incidente', $fechaInc->format('Y-m-d'))
+            ->set('hora_incidente', $fechaInc->format('H:i'))
             ->set('descripcion', 'Paciente resbaló levemente al caminar hacia el baño sin calzado adecuado.')
             ->set('medida_inmediata', 'Ayuda para incorporarse, toma de tensión arterial (120/80) y reposo en sillón.')
             ->set('requiere_medico', true)

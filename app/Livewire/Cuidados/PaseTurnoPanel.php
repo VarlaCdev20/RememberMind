@@ -84,12 +84,12 @@ class PaseTurnoPanel extends Component
     public function mount(): void
     {
         abort_unless(
-            Auth::user()?->can('pase_turno.ver') ||
+            Auth::user()?->hasRole('SUPERADMINISTRADOR') ||
             Auth::user()?->can('pases_turno.ver') ||
-            Auth::user()?->can('pases_turno') ||
-            Auth::user()?->hasRole(['ENFERMEROS', 'SUPERADMINISTRADOR']),
+            Auth::user()?->can('enfermeria.ver_dashboard'),
             403
         );
+        $this->tabActivo = 'entrega';
 
         $this->filtroFechaHistorial = today()->format('Y-m-d');
         $this->filtroFecha = today()->format('Y-m-d');

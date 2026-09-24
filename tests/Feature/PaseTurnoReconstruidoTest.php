@@ -53,8 +53,9 @@ class PaseTurnoReconstruidoTest extends TestCase
 
         // Permisos y Roles
         Permission::firstOrCreate(['name' => 'enfermeria.ver_dashboard', 'guard_name' => 'web']);
+        Permission::firstOrCreate(['name' => 'pases_turno.ver', 'guard_name' => 'web']);
         $rolEnfermero = Role::firstOrCreate(['name' => 'ENFERMEROS', 'guard_name' => 'web']);
-        $rolEnfermero->givePermissionTo('enfermeria.ver_dashboard');
+        $rolEnfermero->givePermissionTo(['enfermeria.ver_dashboard', 'pases_turno.ver']);
 
         // Área
         $this->area = Area::create([
