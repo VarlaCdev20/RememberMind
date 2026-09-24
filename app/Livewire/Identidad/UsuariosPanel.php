@@ -1077,7 +1077,7 @@ class UsuariosPanel extends Component
             'quick_nombres' => 'required|string|max:100',
             'quick_ap_paterno' => 'required|string|max:100',
             'quick_ap_materno' => 'nullable|string|max:100',
-            'quick_ci' => 'required|string|max:20|unique:adulto_mayor,ci',
+            'quick_ci' => 'required|string|max:20|unique:residentes,numero_documento',
             'quick_genero' => 'required|in:MASCULINO,FEMENINO,OTRO',
             'quick_fecha_nac' => 'required|date|before:today',
         ], [
@@ -2544,4 +2544,3 @@ class UsuariosPanel extends Component
         ]);
     }
 }
-

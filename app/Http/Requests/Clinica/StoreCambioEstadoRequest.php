@@ -11,9 +11,9 @@ class StoreCambioEstadoRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'cod_est_adul'        => 'required|string|exists:estado_adulto,cod_est_adul',
+            'cod_est_adul'        => 'required|string|in:ACTIVO,INACTIVO,EGRESADO,FALLECIDO,HOSPITALIZADO,SUSPENDIDO',
             'motivo'              => 'required|string|min:10|max:2000',
-            'documento_respaldo'  => 'nullable|string|exists:documentos_adulto_mayor,cod_doc_am',
+            'documento_respaldo'  => 'nullable|string|exists:documentos,cod_documento',
             'observacion'         => 'nullable|string|max:5000',
         ];
     }
@@ -22,7 +22,7 @@ class StoreCambioEstadoRequest extends FormRequest
     {
         return [
             'cod_est_adul.required' => 'El nuevo estado es obligatorio.',
-            'cod_est_adul.exists'   => 'El estado seleccionado no existe en el catálogo.',
+            'cod_est_adul.in'       => 'El estado institucional seleccionado no es válido.',
             'motivo.required'       => 'El motivo del cambio de estado es obligatorio.',
             'motivo.min'            => 'El motivo debe tener al menos 10 caracteres.',
             'motivo.max'            => 'El motivo no puede exceder 2000 caracteres.',

@@ -18,7 +18,7 @@
 <x-dialog-modal wire:model="modalForm">
 <x-slot name="title">Asignar residente a turno y cama</x-slot>
 <x-slot name="content"><div class="space-y-3"><x-validation-errors />
-<label class="block">Adulto mayor<select wire:model="codResidente" class="block w-full"><option value="">Seleccione</option>@foreach($adultos as $adulto)<option value="{{ $adulto->cod_residente }}">{{ $adulto->nombres }} {{ $adulto->apellido_paterno }}</option>@endforeach</select></label>
+<label class="block">Adulto mayor<select wire:model="codAm" class="block w-full"><option value="">Seleccione</option>@foreach($adultos as $adulto)<option value="{{ $adulto->cod_residente }}">{{ $adulto->nombres }} {{ $adulto->apellido_paterno }}</option>@endforeach</select></label>
 <label class="block">Turno<select wire:model="codTurno"><option value="">Seleccione</option>@foreach($turnos as $turno)<option value="{{ $turno->cod_turno }}">{{ $turno->nombre }}</option>@endforeach</select></label>
 <label class="block">Responsable<select wire:model="codEnfermero"><option value="">Seleccione</option>@foreach($enfermeros as $u)<option value="{{ $u->cod_usuario }}">{{ $u->name }}</option>@endforeach</select></label>
 <p class="text-sm text-texto-secundario">La habitación y cama provienen de la admisión formal y no se modifican desde esta pantalla.</p>

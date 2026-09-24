@@ -833,97 +833,136 @@
  </div>
 </section>
 
- {{-- FILTROS COMPACTOS --}}
-<section class="mb-5 rounded-[1.35rem] bg-fondo-panel px-4 py-3 shadow-[0_12px_28px_rgba(47,62,92,0.11)] backdrop-blur-md">
- <div class="grid items-end gap-3 xl:grid-cols-12">
- <div class="xl:col-span-3">
- <label class="mb-1 block text-[9px] font-bold uppercase tracking-[0.18em] text-parrafo/45">
- Buscar
- </label>
+    {{-- BARRA DE FILTROS UNIFICADA FORMATO ALERTAS --}}
+    <section class="mb-4 rounded-2xl bg-[#DED1C3] dark:bg-[#2C2723] border border-[#C7B9AA] dark:border-[#423B34] p-3 text-xs shadow-sm flex flex-col gap-2.5">
+        <div class="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-2 items-center">
+            {{-- Buscar --}}
+            <div class="lg:col-span-3 relative flex items-center">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-[#677084] dark:text-[#9A9084]">
+                    <i class="ph-bold ph-magnifying-glass text-base"></i>
+                </span>
+                <input type="text"
+                    wire:model.defer="search"
+                    placeholder="Nombre o correo..."
+                    class="w-full rounded-xl border border-[#C7B9AA] dark:border-[#423B34] bg-[#F0E8DE] dark:bg-[#26221F] py-2 pl-9 pr-8 text-xs font-medium text-[#304060] dark:text-[#F3EAE1] placeholder-[#677084] dark:placeholder-[#8C8276] focus:border-[#A35A44] focus:outline-none h-[38px]">
+                @if($search !== '')
+                    <button type="button"
+                        wire:click="$set('search', ''); $wire.aplicarFiltros();"
+                        class="absolute inset-y-0 right-0 flex items-center pr-2.5 text-[#677084] hover:text-[#A35A44] cursor-pointer"
+                        title="Limpiar búsqueda">
+                        <i class="ph-bold ph-x-circle text-base"></i>
+                    </button>
+                @endif
+            </div>
 
- <div class="relative">
- <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
- <i class="ph-bold ph-magnifying-glass text-base text-parrafo/32"></i>
- </div>
+            {{-- Rol --}}
+            <div class="lg:col-span-2">
+                <select wire:model.defer="filtroRol"
+                    class="w-full rounded-xl border border-[#C7B9AA] dark:border-[#4E463E] bg-[#F0E8DE] dark:bg-[#211E1B] py-2 px-3 text-xs font-medium text-[#304060] dark:text-[#E8DFD5] focus:border-[#A35A44] focus:outline-none h-[38px]">
+                    <option value="">Todos los roles</option>
+                    @foreach($roles as $r)
+                        <option value="{{ $r->name }}">{{ strtoupper(str_replace('_', ' ', $r->name)) }}</option>
+                    @endforeach
+                </select>
+            </div>
 
- <input type="text"
- wire:model.defer="search"
- placeholder="Nombre o correo..."
- class="h-10 w-full rounded-xl border-0 bg-fondo-panel py-2 pl-10 pr-3 text-xs font-bold text-parrafo shadow-[inset_0_1px_0_rgba(255,255,255,0.45),0_4px_12px_rgba(47,62,92,0.04)] outline-none transition-all placeholder:text-parrafo/35 focus:bg-fondo-card focus:ring-2 focus:ring-[#E27D60]/18">
- </div>
- </div>
+            {{-- Área --}}
+            <div class="lg:col-span-2">
+                <select wire:model.defer="filtroArea"
+                    class="w-full rounded-xl border border-[#C7B9AA] dark:border-[#4E463E] bg-[#F0E8DE] dark:bg-[#211E1B] py-2 px-3 text-xs font-medium text-[#304060] dark:text-[#E8DFD5] focus:border-[#A35A44] focus:outline-none h-[38px]">
+                    <option value="">Todas las áreas</option>
+                    @foreach($areas as $ar)
+                        <option value="{{ $ar->cod_area }}">{{ $ar->nombre }}</option>
+                    @endforeach
+                </select>
+            </div>
 
- <div class="xl:col-span-2">
- <label class="mb-1 block text-[9px] font-bold uppercase tracking-[0.18em] text-parrafo/45">
- Rol
- </label>
+            {{-- Estado --}}
+            <div class="lg:col-span-2">
+                <select wire:model.defer="filtroEstado"
+                    class="w-full rounded-xl border border-[#C7B9AA] dark:border-[#4E463E] bg-[#F0E8DE] dark:bg-[#211E1B] py-2 px-3 text-xs font-medium text-[#304060] dark:text-[#E8DFD5] focus:border-[#A35A44] focus:outline-none h-[38px]">
+                    <option value="">Todos los estados</option>
+                    <option value="ACTIVO">Activos</option>
+                    <option value="INACTIVO">Inactivos</option>
+                </select>
+            </div>
 
- <select wire:model.defer="filtroRol"
- class="h-10 w-full rounded-xl border-0 bg-fondo-panel px-3 text-xs font-bold text-parrafo shadow-[inset_0_1px_0_rgba(255,255,255,0.45),0_4px_12px_rgba(47,62,92,0.04)] outline-none transition-all focus:bg-fondo-card focus:ring-2 focus:ring-[#E27D60]/18">
- <option value="">Todos los roles</option>
- @foreach($roles as $r)
- <option value="{{ $r->name }}">{{ strtoupper(str_replace('_', ' ', $r->name)) }}</option>
- @endforeach
- </select>
- </div>
+            {{-- Género --}}
+            <div class="lg:col-span-2">
+                <select wire:model.defer="filtroGenero"
+                    class="w-full rounded-xl border border-[#C7B9AA] dark:border-[#4E463E] bg-[#F0E8DE] dark:bg-[#211E1B] py-2 px-3 text-xs font-medium text-[#304060] dark:text-[#E8DFD5] focus:border-[#A35A44] focus:outline-none h-[38px]">
+                    <option value="">Todos los géneros</option>
+                    <option value="FEMENINO">Femenino</option>
+                    <option value="MASCULINO">Masculino</option>
+                </select>
+            </div>
 
- <div class="xl:col-span-2">
- <label class="mb-1 block text-[9px] font-bold uppercase tracking-[0.18em] text-parrafo/45">
- Área
- </label>
+            {{-- Botón Aplicar --}}
+            <div class="lg:col-span-1 flex justify-end">
+                <button type="button"
+                    wire:click="aplicarFiltros"
+                    class="w-full h-[38px] inline-flex items-center justify-center gap-1 rounded-xl bg-[#A35A44] text-white hover:bg-[#884A39] transition font-bold cursor-pointer"
+                    title="Aplicar filtros">
+                    <i class="ph-bold ph-funnel text-base"></i>
+                </button>
+            </div>
+        </div>
 
- <select wire:model.defer="filtroArea"
- class="h-10 w-full rounded-xl border-0 bg-fondo-panel px-3 text-xs font-bold text-parrafo shadow-[inset_0_1px_0_rgba(255,255,255,0.45),0_4px_12px_rgba(47,62,92,0.04)] outline-none transition-all focus:bg-fondo-card focus:ring-2 focus:ring-[#E27D60]/18">
- <option value="">Todas las áreas</option>
- @foreach($areas as $ar)
- <option value="{{ $ar->cod_area }}">{{ $ar->nombre }}</option>
- @endforeach
- </select>
- </div>
-
- <div class="xl:col-span-2">
- <label class="mb-1 block text-[9px] font-bold uppercase tracking-[0.18em] text-parrafo/45">
- Estado
- </label>
-
- <select wire:model.defer="filtroEstado"
- class="h-10 w-full rounded-xl border-0 bg-fondo-panel px-3 text-xs font-bold text-parrafo shadow-[inset_0_1px_0_rgba(255,255,255,0.45),0_4px_12px_rgba(47,62,92,0.04)] outline-none transition-all focus:bg-fondo-card focus:ring-2 focus:ring-[#E27D60]/18">
- <option value="">Todos</option>
- <option value="ACTIVO">Activos</option>
- <option value="INACTIVO">Inactivos</option>
- </select>
- </div>
-
- <div class="xl:col-span-2">
- <label class="mb-1 block text-[9px] font-bold uppercase tracking-[0.18em] text-parrafo/45">
- Género
- </label>
-
- <select wire:model.defer="filtroGenero"
- class="h-10 w-full rounded-xl border-0 bg-fondo-panel px-3 text-xs font-bold text-parrafo shadow-[inset_0_1px_0_rgba(255,255,255,0.45),0_4px_12px_rgba(47,62,92,0.04)] outline-none transition-all focus:bg-fondo-card focus:ring-2 focus:ring-[#E27D60]/18">
- <option value="">Todos</option>
- <option value="FEMENINO">Femenino</option>
- <option value="MASCULINO">Masculino</option>
- </select>
- </div>
-
- <div class="flex gap-2 xl:col-span-1">
- <button type="button"
- wire:click="aplicarFiltros"
- class="inline-flex h-10 flex-1 items-center justify-center gap-1.5 rounded-xl bg-boton-principal px-3 text-[10px] font-bold uppercase tracking-wide text-inverso shadow-[0_8px_16px_rgba(47,62,92,0.18)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_10px_20px_rgba(47,62,92,0.24)] active:scale-95"
- title="Buscar">
- <i class="ph-bold ph-funnel"></i>
- </button>
-
- <button type="button"
- wire:click="limpiarFiltros"
- class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-fondo-panel text-parrafo shadow-[0_6px_14px_rgba(47,62,92,0.08)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-boton-acento hover:text-inverso active:scale-95"
- title="Limpiar filtros">
- <i class="ph-bold ph-x"></i>
- </button>
- </div>
- </div>
-</section>
+        {{-- Fila de chips de filtros activos --}}
+        @php
+            $hasFiltrosActivos = !empty($search) || !empty($filtroRol) || !empty($filtroArea) || !empty($filtroEstado) || !empty($filtroGenero);
+        @endphp
+        @if($hasFiltrosActivos)
+            <div class="w-full flex flex-wrap items-center justify-between gap-2 pt-2.5 border-t border-[#C7B9AA]/60 dark:border-[#423B34] text-xs">
+                <div class="flex flex-wrap items-center gap-1.5">
+                    <span class="text-[11px] font-bold text-[#677084] dark:text-[#9A9084] flex items-center gap-1 mr-1">
+                        <i class="ph-bold ph-funnel text-xs"></i> Filtros activos:
+                    </span>
+                    @if(!empty($search))
+                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[#F0E8DE] dark:bg-[#211E1B] border border-[#C7B9AA] dark:border-[#4E463E] text-[11px] font-semibold text-[#304060] dark:text-[#F3EAE1]">
+                            <span>Búsqueda: "{{ Str::limit($search, 16) }}"</span>
+                            <button type="button" wire:click="$set('search', ''); $wire.aplicarFiltros();" class="hover:text-[#A35A44] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
+                        </span>
+                    @endif
+                    @if(!empty($filtroRol))
+                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[#304060]/10 dark:bg-[#F3EAE1]/10 border border-[#C7B9AA] text-[11px] font-bold text-[#304060] dark:text-[#F3EAE1]">
+                            <span>Rol: {{ strtoupper(str_replace('_', ' ', $filtroRol)) }}</span>
+                            <button type="button" wire:click="$set('filtroRol', ''); $wire.aplicarFiltros();" class="hover:text-[#A35A44] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
+                        </span>
+                    @endif
+                    @if(!empty($filtroArea))
+                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[#71876A]/15 border border-[#71876A]/30 text-[11px] font-bold text-[#495B44] dark:text-[#9FB897]">
+                            <span>Área filtrada</span>
+                            <button type="button" wire:click="$set('filtroArea', ''); $wire.aplicarFiltros();" class="hover:text-[#A35A44] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
+                        </span>
+                    @endif
+                    @if(!empty($filtroEstado))
+                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[#D2A45E]/15 border border-[#D2A45E]/30 text-[11px] font-bold text-[#8C6422] dark:text-[#E2BD7E]">
+                            <span>Estado: {{ $filtroEstado }}</span>
+                            <button type="button" wire:click="$set('filtroEstado', ''); $wire.aplicarFiltros();" class="hover:text-[#A35A44] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
+                        </span>
+                    @endif
+                    @if(!empty($filtroGenero))
+                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[#304060]/10 dark:bg-[#F3EAE1]/10 border border-[#C7B9AA] text-[11px] font-bold text-[#304060] dark:text-[#F3EAE1]">
+                            <span>Género: {{ $filtroGenero === 'FEMENINO' ? 'Fem.' : 'Masc.' }}</span>
+                            <button type="button" wire:click="$set('filtroGenero', ''); $wire.aplicarFiltros();" class="hover:text-[#A35A44] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
+                        </span>
+                    @endif
+                </div>
+                <div class="flex items-center gap-2.5">
+                    <span class="text-[11px] px-2.5 py-0.5 rounded-full font-bold bg-[#304060]/10 dark:bg-[#F3EAE1]/10 text-[#304060] dark:text-[#F3EAE1]">
+                        {{ $usuarios->total() ?? count($usuarios) }} coincidentes
+                    </span>
+                    <button type="button"
+                        wire:click="limpiarFiltros"
+                        class="inline-flex items-center gap-1 rounded-xl bg-[#A35A44]/15 hover:bg-[#A35A44]/25 text-[#A35A44] dark:text-[#D58C79] py-1 px-2.5 text-xs font-bold transition cursor-pointer">
+                        <i class="ph-bold ph-arrow-counter-clockwise"></i>
+                        <span>Limpiar filtros</span>
+                    </button>
+                </div>
+            </div>
+        @endif
+    </section>
 
  {{-- CONTENIDO PRINCIPAL --}}
  <section class="relative">

@@ -350,7 +350,7 @@
  <i class="ph-bold ph-x text-sm"></i>
  </button>
  </div>
- <form wire:submit.prevent="guardarParticipacion" class="p-5 space-y-4">
+ <form wire:submit.prevent="guardarActividad" class="p-5 space-y-4">
  <div>
  <label class="{{ $labelCls }}">Adulto mayor <span class="text-boton-acento">*</span></label>
  <select wire:model="codAm" class="{{ $inputCls }}">
@@ -445,7 +445,7 @@
  <i class="ph-bold ph-x text-sm"></i>
  </button>
  </div>
- <form wire:submit.prevent="actualizarParticipacion" class="p-5 space-y-4">
+ <form wire:submit.prevent="actualizarActividad" class="p-5 space-y-4">
  <div>
  <label class="{{ $labelCls }}">Adulto mayor <span class="text-boton-acento">*</span></label>
  <select wire:model="codAm" class="{{ $inputCls }}">

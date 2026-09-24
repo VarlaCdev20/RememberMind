@@ -113,7 +113,7 @@ class AlertasPanel extends Component
         $this->comprobarPermiso('crear');
 
         $this->validate([
-            'codAm' => 'required|string|exists:adulto_mayor,cod_am',
+            'codAm' => 'required|string|exists:residentes,cod_residente',
             'origen' => 'required|in:SIGNOS,MEDICACION,SEGUIMIENTO,PLAN,INCIDENTE,SOLICITUD_MEDICA,MANUAL,FICHA,VALORACION',
             'tipoAlerta' => 'required|string|min:3|max:80',
             'nivel' => 'required|in:BAJO,MEDIO,ALTO,CRITICO',

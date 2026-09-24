@@ -110,7 +110,7 @@ class ValoracionBarthelModal extends Component
     protected function rules(): array
     {
         return [
-            'cod_am'              => 'required|exists:adulto_mayor,cod_am',
+            'cod_am'              => 'required|exists:residentes,cod_residente',
             'fecha_valoracion'    => 'required|date|before_or_equal:today',
             'alimentacion'        => 'required|in:0,5,10',
             'bano'                => 'required|in:0,5',

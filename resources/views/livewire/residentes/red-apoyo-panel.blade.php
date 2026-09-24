@@ -229,10 +229,10 @@
  
  <!-- Nivel 0: Adulto Mayor -->
  <button type="button" id="nodo-adulto" 
- wire:click.stop="abrirDetalleVinculo('adulto', '{{ $adulto->cod_am }}')"
- @click="seleccionarNodo('adulto', '{{ $adulto->cod_am }}')"
+ wire:click.stop="verDetalleAdulto"
+ @click="seleccionarNodo('adulto', '{{ $adulto->cod_residente }}')"
  class="flex flex-col items-center group cursor-pointer transition-transform hover:scale-105 border-none bg-transparent"
- :class="{ 'opacity-100 scale-105': nodoActivo === 'adulto-{{ $adulto->cod_am }}', 'opacity-50': nodoActivo && nodoActivo !== 'adulto-{{ $adulto->cod_am }}' }"
+ :class="{ 'opacity-100 scale-105': nodoActivo === 'adulto-{{ $adulto->cod_residente }}', 'opacity-50': nodoActivo && nodoActivo !== 'adulto-{{ $adulto->cod_residente }}' }"
  >
  <div class="flex h-16 w-16 items-center justify-center rounded-full bg-boton-principal border-[3px] border-borde text-inverso shadow-md">
  <span class="text-xl font-extrabold">{{ $adultoIniciales }}</span>
@@ -409,7 +409,7 @@
  <td class="px-4 py-3 text-xs font-bold text-apoyo">{{ $persona['actualizado'] }}</td>
  <td class="px-4 py-3">
  <div class="flex justify-end gap-1.5">
- <button type="button" wire:click.stop="abrirDetalleVinculo('{{ $persona['tipo'] }}', {{ $persona['tipo'] === 'FAMILIAR' ? $persona['cod_fam'] : $persona['cod_vol'] }})" @click="selectNode('{{ $personaNodeKey }}')" class="flex h-8 w-8 items-center justify-center rounded-lg bg-fondo-panel text-titulo transition hover:bg-boton-principal hover:text-inverso" title="Ver detalle">
+ <button type="button" wire:click.stop="verDetalle('{{ $persona['vinculo_id'] }}')" @click="selectNode('{{ $personaNodeKey }}')" class="flex h-8 w-8 items-center justify-center rounded-lg bg-fondo-panel text-titulo transition hover:bg-boton-principal hover:text-inverso" title="Ver detalle">
  <i class="ph-bold ph-eye"></i>
  </button>
 

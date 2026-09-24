@@ -51,7 +51,7 @@ class StoreSignosVitalesRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'cod_am'                  => 'required|string|exists:adulto_mayor,cod_am',
+            'cod_am'                  => 'required|string|exists:residentes,cod_residente',
             'fecha'                   => 'required|date|before_or_equal:today',
             'hora'                    => 'required|date_format:H:i',
             'presion_arterial'        => 'nullable|string|max:20',

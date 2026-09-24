@@ -11,7 +11,7 @@ class StoreValoracionFuncionalRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'cod_am'                => 'required|string|exists:adulto_mayor,cod_am',
+            'cod_am'                => 'required|string|exists:residentes,cod_residente',
             'fecha_valoracion'      => 'required|date',
             'come_solo'             => 'nullable|boolean',
             'se_bana_solo'          => 'nullable|boolean',

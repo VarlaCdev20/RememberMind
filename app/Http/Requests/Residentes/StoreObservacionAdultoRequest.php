@@ -17,7 +17,7 @@ class StoreObservacionAdultoRequest extends FormRequest
             'fecha' => 'required|date|before_or_equal:today',
             'tipo_obs' => 'required|string|max:80',
             'descripcion' => 'required|string|min:5|max:1000',
-            'cod_est_adul' => 'required|exists:estado_adulto,cod_est_adul',
+            'cod_est_adul' => 'required|in:ACTIVO,INACTIVO,EGRESADO,FALLECIDO,HOSPITALIZADO,SUSPENDIDO',
         ];
     }
 
@@ -35,7 +35,7 @@ class StoreObservacionAdultoRequest extends FormRequest
             'descripcion.min' => 'La descripción debe tener al menos 5 caracteres.',
             'descripcion.max' => 'La descripción no debe superar los 1000 caracteres.',
             'cod_est_adul.required' => 'Debe seleccionar un estado institucional válido.',
-            'cod_est_adul.exists' => 'Debe seleccionar un estado institucional válido.',
+            'cod_est_adul.in' => 'Debe seleccionar un estado institucional válido.',
         ];
     }
 }

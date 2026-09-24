@@ -237,8 +237,8 @@ class PersonalInstitucionalForm extends Component
             'nombres' => 'required|string|max:255',
             'ap_paterno' => 'required_without:ap_materno|string|max:255|nullable',
             'ap_materno' => 'required_without:ap_paterno|string|max:255|nullable',
-            'correo' => 'required|email|max:255|unique:users,correo,' . $this->usuarioId . ',cod_usu',
-            'numero_documento' => 'required|regex:/^[0-9]{5,10}$/|unique:users,numero_documento,' . $this->usuarioId . ',cod_usu',
+            'correo' => 'required|email|max:255|unique:usuarios,correo,' . $this->usuarioId . ',cod_usuario',
+            'numero_documento' => 'required|regex:/^[0-9]{5,10}$/|unique:usuarios,numero_documento,' . $this->usuarioId . ',cod_usuario',
             'estado' => 'required|string',
             'fecha_nacimiento' => 'nullable|date|before_or_equal:' . now()->subYears(18)->format('Y-m-d') . '|after_or_equal:' . now()->subYears(100)->format('Y-m-d'),
             'foto_perfil' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
@@ -820,7 +820,7 @@ class PersonalInstitucionalForm extends Component
         if ($this->pasoActual === 1) {
             $this->correo = trim(mb_strtolower($this->correo));
             $this->validate([
-                'correo' => 'required|email|max:255|unique:users,correo' . ($this->usuarioId ? ',' . $this->usuarioId . ',cod_usu' : ''),
+                'correo' => 'required|email|max:255|unique:usuarios,correo' . ($this->usuarioId ? ',' . $this->usuarioId . ',cod_usuario' : ''),
                 'estado' => 'required|in:ACTIVO,PENDIENTE,BLOQUEADO',
                 'fecha_registro' => 'required|date|before_or_equal:today',
                 'hora_registro' => 'required|date_format:H:i'
@@ -838,7 +838,7 @@ class PersonalInstitucionalForm extends Component
                 'nombres' => 'required|string|max:255|regex:/^[\pL\s]+$/u',
                 'ap_paterno' => 'required_without:ap_materno|nullable|string|max:255|regex:/^[\pL\s]+$/u',
                 'ap_materno' => 'required_without:ap_paterno|nullable|string|max:255|regex:/^[\pL\s]+$/u',
-                'numero_documento' => 'required|regex:/^[0-9]+$/|min:5|max:15|unique:users,numero_documento,' . $this->usuarioId . ',cod_usu',
+                'numero_documento' => 'required|regex:/^[0-9]+$/|min:5|max:15|unique:usuarios,numero_documento,' . $this->usuarioId . ',cod_usuario',
                 'expedido' => 'required|string|max:10',
                 'genero' => 'required|in:M,F',
                 'fecha_nacimiento' => 'required|date|before_or_equal:' . now()->subYears(18)->format('Y-m-d') . '|after_or_equal:' . now()->subYears(100)->format('Y-m-d'),

@@ -11,20 +11,22 @@
         </button>
     </div>
 
-        {{-- BARRA DE FILTROS UNIFICADA: ESTRUCTURA DE EMERGENCIAS + VISTA DE INCIDENTES --}}
-    <div class="rounded-2xl bg-[#DED1C3] dark:bg-[#2C2723] border border-[#C7B9AA] dark:border-[#423B34] p-3 text-xs shadow-sm">
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-2.5 items-center">
+    {{-- BARRA DE FILTROS UNIFICADA FORMATO ALERTAS --}}
+    <section class="rounded-2xl bg-[#DED1C3] dark:bg-[#2C2723] border border-[#C7B9AA] dark:border-[#423B34] p-3 text-xs shadow-sm flex flex-col gap-2.5">
+        <div class="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-2">
             {{-- Buscador Principal --}}
-            <div class="lg:col-span-6 relative">
-                <i class="ph-bold ph-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-sm text-[#677084] dark:text-[#9A9084]"></i>
+            <div class="lg:col-span-6 relative flex items-center">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-[#677084] dark:text-[#9A9084]">
+                    <i class="ph-bold ph-magnifying-glass text-base"></i>
+                </span>
                 <input wire:model.live.debounce.300ms="search"
                        type="text"
                        placeholder="Buscar por nombre, apellido o CI del residente..."
-                       class="w-full rounded-xl border border-[#C7B9AA] dark:border-[#423B34] bg-[#F0E8DE] dark:bg-[#26221F] py-2 pl-9 pr-8 text-xs font-medium text-[#304060] dark:text-[#F3EAE1] placeholder-[#677084] dark:placeholder-[#8C8276] focus:border-[#A35A44] focus:outline-none">
+                       class="w-full rounded-xl border border-[#C7B9AA] dark:border-[#423B34] bg-[#F0E8DE] dark:bg-[#26221F] py-2 pl-9 pr-8 text-xs font-medium text-[#304060] dark:text-[#F3EAE1] placeholder-[#677084] dark:placeholder-[#8C8276] focus:border-[#A35A44] focus:outline-none h-[38px]">
                 @if(!empty($search))
                     <button type="button"
                             wire:click="limpiarFiltro('search')"
-                            class="absolute right-2.5 top-1/2 -translate-y-1/2 text-[#677084] hover:text-[#A35A44] transition"
+                            class="absolute inset-y-0 right-0 flex items-center pr-2.5 text-[#677084] hover:text-[#A35A44] cursor-pointer"
                             title="Limpiar búsqueda">
                         <i class="ph-bold ph-x-circle text-base"></i>
                     </button>
@@ -34,7 +36,7 @@
             {{-- Filtro Estado de la Valoración --}}
             <div class="lg:col-span-3">
                 <select wire:model.live="filtroEstado"
-                        class="w-full rounded-xl border border-[#C7B9AA] dark:border-[#4E463E] bg-[#F0E8DE] dark:bg-[#211E1B] py-2 px-3 text-xs font-medium text-[#304060] dark:text-[#E8DFD5] focus:border-[#A35A44] focus:outline-none">
+                        class="w-full rounded-xl border border-[#C7B9AA] dark:border-[#4E463E] bg-[#F0E8DE] dark:bg-[#211E1B] py-2 px-3 text-xs font-medium text-[#304060] dark:text-[#E8DFD5] focus:border-[#A35A44] focus:outline-none h-[38px]">
                     <option value="">Todos los estados</option>
                     <option value="COMPLETADA">Completada</option>
                     <option value="BORRADOR">Borrador</option>
@@ -45,7 +47,7 @@
             {{-- Filtro Resultado de Admisión --}}
             <div class="lg:col-span-3">
                 <select wire:model.live="filtroResult"
-                        class="w-full rounded-xl border border-[#C7B9AA] dark:border-[#4E463E] bg-[#F0E8DE] dark:bg-[#211E1B] py-2 px-3 text-xs font-medium text-[#304060] dark:text-[#E8DFD5] focus:border-[#A35A44] focus:outline-none">
+                        class="w-full rounded-xl border border-[#C7B9AA] dark:border-[#4E463E] bg-[#F0E8DE] dark:bg-[#211E1B] py-2 px-3 text-xs font-medium text-[#304060] dark:text-[#E8DFD5] focus:border-[#A35A44] focus:outline-none h-[38px]">
                     <option value="">Todos los resultados</option>
                     <option value="ADMITIDO">Admitido</option>
                     <option value="OBSERVADO">Observado</option>
@@ -60,37 +62,44 @@
             $hasFiltrosActivos = !empty($search) || !empty($filtroEstado) || !empty($filtroResult);
         @endphp
         @if($hasFiltrosActivos)
-            <div class="mt-2.5 pt-2.5 border-t border-[#C7B9AA]/60 dark:border-[#423B34] flex flex-wrap items-center justify-between gap-2">
+            <div class="w-full flex flex-wrap items-center justify-between gap-2 pt-2.5 border-t border-[#C7B9AA]/60 dark:border-[#423B34] text-xs">
                 <div class="flex flex-wrap items-center gap-1.5">
-                    <span class="text-[11px] font-bold text-[#677084] dark:text-[#9A9084] flex items-center gap-1">
+                    <span class="text-[11px] font-bold text-[#677084] dark:text-[#9A9084] flex items-center gap-1 mr-1">
                         <i class="ph-bold ph-funnel text-xs"></i> Filtros activos:
                     </span>
                     @if(!empty($search))
                         <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[#F0E8DE] dark:bg-[#211E1B] border border-[#C7B9AA] dark:border-[#4E463E] text-[11px] font-semibold text-[#304060] dark:text-[#F3EAE1]">
                             <span>Búsqueda: "{{ Str::limit($search, 18) }}"</span>
-                            <button type="button" wire:click="limpiarFiltro('search')" class="hover:text-[#A35A44]"><i class="ph-bold ph-x text-xs"></i></button>
+                            <button type="button" wire:click="limpiarFiltro('search')" class="hover:text-[#A35A44] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
                         </span>
                     @endif
                     @if(!empty($filtroEstado))
                         <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[#D2A45E]/15 border border-[#D2A45E]/30 text-[11px] font-bold text-[#8C6422] dark:text-[#E2BD7E]">
                             <span>Estado: {{ $filtroEstado }}</span>
-                            <button type="button" wire:click="limpiarFiltro('filtroEstado')" class="hover:text-[#A35A44]"><i class="ph-bold ph-x text-xs"></i></button>
+                            <button type="button" wire:click="limpiarFiltro('filtroEstado')" class="hover:text-[#A35A44] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
                         </span>
                     @endif
                     @if(!empty($filtroResult))
                         <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[#304060]/10 dark:bg-[#F3EAE1]/10 border border-[#C7B9AA] text-[11px] font-bold text-[#304060] dark:text-[#F3EAE1]">
                             <span>Resultado: {{ $filtroResult }}</span>
-                            <button type="button" wire:click="limpiarFiltro('filtroResult')" class="hover:text-[#A35A44]"><i class="ph-bold ph-x text-xs"></i></button>
+                            <button type="button" wire:click="limpiarFiltro('filtroResult')" class="hover:text-[#A35A44] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
                         </span>
                     @endif
                 </div>
-                <button wire:click="limpiarFiltros"
-                        class="inline-flex items-center gap-1 rounded-xl bg-[#A35A44]/15 hover:bg-[#A35A44]/25 text-[#A35A44] dark:text-[#D58C79] py-1 px-2.5 text-xs font-bold transition">
-                    <i class="ph-bold ph-arrow-counter-clockwise"></i> Limpiar filtros
-                </button>
+                <div class="flex items-center gap-2.5">
+                    <span class="text-[11px] px-2.5 py-0.5 rounded-full font-bold bg-[#304060]/10 dark:bg-[#F3EAE1]/10 text-[#304060] dark:text-[#F3EAE1]">
+                        {{ $valoraciones->total() ?? count($valoraciones) }} coincidentes
+                    </span>
+                    <button type="button"
+                            wire:click="limpiarFiltros"
+                            class="inline-flex items-center gap-1 rounded-xl bg-[#A35A44]/15 hover:bg-[#A35A44]/25 text-[#A35A44] dark:text-[#D58C79] py-1 px-2.5 text-xs font-bold transition cursor-pointer">
+                        <i class="ph-bold ph-arrow-counter-clockwise"></i>
+                        <span>Limpiar filtros</span>
+                    </button>
+                </div>
             </div>
         @endif
-    </div>
+    </section>
 
     <div class="overflow-hidden rounded-[1.5rem] border border-borde/70 bg-fondo-panel shadow-sm">
         <div class="overflow-x-auto">

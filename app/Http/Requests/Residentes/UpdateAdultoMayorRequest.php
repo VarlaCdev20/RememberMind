@@ -42,7 +42,7 @@ class UpdateAdultoMayorRequest extends FormRequest
     public function rules(): array
     {
         $adulto = $this->route('adulto_mayor');
-        $codAm = $adulto instanceof \App\Models\AdultoMayor ? $adulto->cod_am : $adulto;
+        $codAm = $adulto instanceof \App\Models\Residente ? $adulto->cod_residente : $adulto;
 
         return [
             // Identidad
@@ -55,10 +55,8 @@ class UpdateAdultoMayorRequest extends FormRequest
             
             // Regla compuesta única para ci + exp + comp, ignorando el actual
             'ci_unique' => [
-                Rule::unique('adulto_mayor', 'ci')
-                    ->where('expedicion_ci', $this->expedicion_ci)
-                    ->where('complemento_ci', $this->complemento_ci)
-                    ->ignore($codAm, 'cod_am')
+                Rule::unique('residentes', 'numero_documento')
+                    ->ignore($codAm, 'cod_residente')
             ],
 
             'estado_civil' => ['required', 'string', 'in:SOLTERO/A,CASADO/A,VIUDO/A,DIVORCIADO/A,UNIÓN LIBRE,NO ESPECIFICADO'],
@@ -86,7 +84,7 @@ class UpdateAdultoMayorRequest extends FormRequest
             'hora_ing' => ['nullable', 'date_format:H:i'],
             'tipo_ing' => ['required', 'string', 'in:REGULAR,DERIVADO,EMERGENCIA,OTRO'],
             'permanencia' => ['required', 'string', 'in:PERMANENTE,TEMPORAL,EVENTUAL'],
-            'cod_est_adul' => ['required', 'exists:estado_adulto,cod_est_adul'],
+            'cod_est_adul' => ['required', 'in:ACTIVO,INACTIVO,EGRESADO,FALLECIDO,HOSPITALIZADO,SUSPENDIDO'],
             'observaciones' => ['nullable', 'string', 'max:1500'],
             'foto' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
 

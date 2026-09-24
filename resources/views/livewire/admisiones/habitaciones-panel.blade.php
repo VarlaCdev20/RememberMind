@@ -10,11 +10,94 @@
 @endforeach
 </section>
 
-<section class="rounded-2xl border border-borde bg-fondo-card p-4"><div class="grid gap-3 md:grid-cols-4">
-<div class="md:col-span-2"><label class="mb-1 block text-xs font-bold text-apoyo">Buscar habitación</label><input type="search" wire:model.live.debounce.300ms="search" placeholder="Nombre, número, piso o ubicación" class="w-full rounded-xl border border-input-borde bg-input-bg px-3 py-2.5 text-sm"></div>
-<div><label class="mb-1 block text-xs font-bold text-apoyo">Tipo</label><select wire:model.live="filtroTipo" class="w-full rounded-xl border border-input-borde bg-input-bg px-3 py-2.5 text-sm"><option value="">Todos</option><option value="INDIVIDUAL">Individual</option><option value="COMPARTIDA">Compartida</option><option value="UCI">UCI</option><option value="OBSERVACION">Observación</option></select></div>
-<div><label class="mb-1 block text-xs font-bold text-apoyo">Disponibilidad</label><select wire:model.live="filtroEstado" class="w-full rounded-xl border border-input-borde bg-input-bg px-3 py-2.5 text-sm"><option value="">Todas</option><option value="DISPONIBLE">Con disponibilidad</option><option value="OCUPADA">Capacidad completa</option><option value="MANTENIMIENTO">Mantenimiento</option><option value="BLOQUEADA">Bloqueada</option></select></div>
-</div></section>
+    {{-- BARRA DE FILTROS UNIFICADA FORMATO ALERTAS --}}
+    <section class="rounded-2xl bg-[#DED1C3] dark:bg-[#2C2723] border border-[#C7B9AA] dark:border-[#423B34] p-3 text-xs shadow-sm flex flex-col gap-2.5">
+        <div class="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-2 items-center">
+            {{-- Buscador Principal --}}
+            <div class="lg:col-span-6 relative flex items-center">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-[#677084] dark:text-[#9A9084]">
+                    <i class="ph-bold ph-magnifying-glass text-base"></i>
+                </span>
+                <input type="search"
+                    wire:model.live.debounce.300ms="search"
+                    placeholder="Nombre, número, piso o ubicación..."
+                    class="w-full rounded-xl border border-[#C7B9AA] dark:border-[#423B34] bg-[#F0E8DE] dark:bg-[#26221F] py-2 pl-9 pr-8 text-xs font-medium text-[#304060] dark:text-[#F3EAE1] placeholder-[#677084] dark:placeholder-[#8C8276] focus:border-[#A35A44] focus:outline-none h-[38px]">
+                @if($search !== '')
+                    <button type="button"
+                        wire:click="$set('search', '')"
+                        class="absolute inset-y-0 right-0 flex items-center pr-2.5 text-[#677084] hover:text-[#A35A44] cursor-pointer"
+                        title="Limpiar búsqueda">
+                        <i class="ph-bold ph-x-circle text-base"></i>
+                    </button>
+                @endif
+            </div>
+
+            {{-- Tipo --}}
+            <div class="lg:col-span-3">
+                <select wire:model.live="filtroTipo" class="w-full rounded-xl border border-[#C7B9AA] dark:border-[#4E463E] bg-[#F0E8DE] dark:bg-[#211E1B] py-2 px-3 text-xs font-medium text-[#304060] dark:text-[#E8DFD5] focus:border-[#A35A44] focus:outline-none h-[38px]">
+                    <option value="">Tipo (Todas)</option>
+                    <option value="INDIVIDUAL">Individual</option>
+                    <option value="COMPARTIDA">Compartida</option>
+                    <option value="UCI">UCI</option>
+                    <option value="OBSERVACION">Observación</option>
+                </select>
+            </div>
+
+            {{-- Disponibilidad --}}
+            <div class="lg:col-span-3">
+                <select wire:model.live="filtroEstado" class="w-full rounded-xl border border-[#C7B9AA] dark:border-[#4E463E] bg-[#F0E8DE] dark:bg-[#211E1B] py-2 px-3 text-xs font-medium text-[#304060] dark:text-[#E8DFD5] focus:border-[#A35A44] focus:outline-none h-[38px]">
+                    <option value="">Disponibilidad (Todas)</option>
+                    <option value="DISPONIBLE">Con disponibilidad</option>
+                    <option value="OCUPADA">Capacidad completa</option>
+                    <option value="MANTENIMIENTO">Mantenimiento</option>
+                    <option value="BLOQUEADA">Bloqueada</option>
+                </select>
+            </div>
+        </div>
+
+        {{-- Fila de chips de filtros activos --}}
+        @php
+            $hasFiltrosActivos = !empty($search) || !empty($filtroTipo) || !empty($filtroEstado);
+        @endphp
+        @if($hasFiltrosActivos)
+            <div class="w-full flex flex-wrap items-center justify-between gap-2 pt-2.5 border-t border-[#C7B9AA]/60 dark:border-[#423B34] text-xs">
+                <div class="flex flex-wrap items-center gap-1.5">
+                    <span class="text-[11px] font-bold text-[#677084] dark:text-[#9A9084] flex items-center gap-1 mr-1">
+                        <i class="ph-bold ph-funnel text-xs"></i> Filtros activos:
+                    </span>
+                    @if(!empty($search))
+                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[#F0E8DE] dark:bg-[#211E1B] border border-[#C7B9AA] dark:border-[#4E463E] text-[11px] font-semibold text-[#304060] dark:text-[#F3EAE1]">
+                            <span>Búsqueda: "{{ Str::limit($search, 16) }}"</span>
+                            <button type="button" wire:click="$set('search', '')" class="hover:text-[#A35A44] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
+                        </span>
+                    @endif
+                    @if(!empty($filtroTipo))
+                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[#304060]/10 dark:bg-[#F3EAE1]/10 border border-[#C7B9AA] text-[11px] font-bold text-[#304060] dark:text-[#F3EAE1]">
+                            <span>Tipo: {{ $filtroTipo }}</span>
+                            <button type="button" wire:click="$set('filtroTipo', '')" class="hover:text-[#A35A44] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
+                        </span>
+                    @endif
+                    @if(!empty($filtroEstado))
+                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[#D2A45E]/15 border border-[#D2A45E]/30 text-[11px] font-bold text-[#8C6422] dark:text-[#E2BD7E]">
+                            <span>Estado: {{ $filtroEstado }}</span>
+                            <button type="button" wire:click="$set('filtroEstado', '')" class="hover:text-[#A35A44] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
+                        </span>
+                    @endif
+                </div>
+                <div class="flex items-center gap-2.5">
+                    <span class="text-[11px] px-2.5 py-0.5 rounded-full font-bold bg-[#304060]/10 dark:bg-[#F3EAE1]/10 text-[#304060] dark:text-[#F3EAE1]">
+                        {{ count($habitaciones) }} habitaciones
+                    </span>
+                    <button type="button"
+                        wire:click="$set('search', ''); $set('filtroTipo', ''); $set('filtroEstado', '');"
+                        class="inline-flex items-center gap-1 rounded-xl bg-[#A35A44]/15 hover:bg-[#A35A44]/25 text-[#A35A44] dark:text-[#D58C79] py-1 px-2.5 text-xs font-bold transition cursor-pointer">
+                        <i class="ph-bold ph-arrow-counter-clockwise"></i>
+                        <span>Limpiar filtros</span>
+                    </button>
+                </div>
+            </div>
+        @endif
+    </section>
 
 <section class="grid gap-4 lg:grid-cols-2 xl:grid-cols-3">
 @forelse($habitaciones as $habitacion)

@@ -60,7 +60,7 @@ class NotaEvolucionMedicaModal extends Component
     protected function rules(): array
     {
         $rules = [
-            'cod_am'      => 'required|exists:adulto_mayor,cod_am',
+            'cod_am'      => 'required|exists:residentes,cod_residente',
             'tipo_nota'   => 'required|in:EVOLUCION,INGRESO,EGRESO,INTERCONSULTA,URGENCIA,PROCEDIMIENTO',
             'fecha'       => 'required|date|before_or_equal:today',
             'hora'        => 'nullable|string',

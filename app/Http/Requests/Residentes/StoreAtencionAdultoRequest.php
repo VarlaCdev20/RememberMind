@@ -27,7 +27,7 @@ class StoreAtencionAdultoRequest extends FormRequest
         return [
             'fecha'         => 'required|date|before_or_equal:today',
             'hora'          => 'required|date_format:H:i',
-            'cod_tipo_aten' => 'required|exists:tipo_atenciones_adulto,cod_tipo_aten',
+            'cod_tipo_aten' => 'required|string|max:60',
             'estado'        => 'required|in:PENDIENTE,REALIZADA,FINALIZADA,CANCELADA',
             'obs'           => 'nullable|string|max:1000',
         ];
@@ -42,7 +42,7 @@ class StoreAtencionAdultoRequest extends FormRequest
             'hora.required'          => 'La hora de atención es obligatoria.',
             'hora.date_format'       => 'La hora debe tener un formato válido (HH:MM).',
             'cod_tipo_aten.required' => 'Debe seleccionar un tipo de atención.',
-            'cod_tipo_aten.exists'   => 'El tipo de atención seleccionado no es válido.',
+            'cod_tipo_aten.max'      => 'El tipo de atención no puede superar 60 caracteres.',
             'estado.required'        => 'Debe seleccionar un estado para la atención.',
             'estado.in'              => 'El estado seleccionado no es válido. Use: Pendiente, Realizada, Finalizada o Cancelada.',
             'obs.max'                => 'La observación no debe superar los 1000 caracteres.',

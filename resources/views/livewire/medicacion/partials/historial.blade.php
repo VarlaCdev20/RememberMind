@@ -3,7 +3,7 @@
     {{-- ==================================================
          1. BARRA DE FILTROS ESPECÍFICA DE HISTORIAL
          ================================================== --}}
-    <section class="p-4 sm:p-5 rounded-[16px] bg-[#DED1C3] dark:bg-[#25221F] border border-[#C7B9AA] dark:border-[#494139] shadow-2xs space-y-3.5 transition-colors">
+    <section class="rounded-2xl bg-[#DED1C3] dark:bg-[#2C2723] border border-[#C7B9AA] dark:border-[#423B34] p-3 text-xs shadow-sm flex flex-col gap-2.5">
         
         {{-- Fila Principal: Búsqueda y Selectores Primarios --}}
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3 items-center">
@@ -19,7 +19,7 @@
                     placeholder="Buscar residente o medicamento..."
                     title="Buscar residente..."
                     aria-label="Buscar residente..."
-                    class="w-full h-10 pl-9 pr-8 text-xs rounded-[10px] border border-[#C7B9AA] dark:border-[#494139] bg-[#F0E8DE] dark:bg-[#211F1B] text-[#304060] dark:text-[#EFE5DA] placeholder-[#677084] dark:placeholder-[#BDAE9F] focus:outline-none focus:ring-1 focus:ring-[#A35A44] shadow-2xs transition" />
+                    class="w-full rounded-xl border border-[#C7B9AA] dark:border-[#423B34] bg-[#F0E8DE] dark:bg-[#26221F] py-2 pl-9 pr-8 text-xs font-medium text-[#304060] dark:text-[#F3EAE1] placeholder-[#677084] dark:placeholder-[#8C8276] focus:border-[#A35A44] focus:outline-none h-[38px]" />
                 @if(!empty($filtroHistorialBusqueda))
                     <button type="button"
                         wire:click="limpiarFiltro('filtroHistorialBusqueda')"
@@ -33,7 +33,7 @@
             {{-- 2. Resultado (Administrada / Omitida / Rechazada) --}}
             <div class="lg:col-span-3">
                 <select wire:model.live="filtroHistorialResultado" 
-                    class="w-full h-10 px-3 text-xs rounded-[10px] border border-[#C7B9AA] dark:border-[#494139] bg-[#F0E8DE] dark:bg-[#211F1B] text-[#304060] dark:text-[#EFE5DA] focus:outline-none focus:ring-1 focus:ring-[#A35A44] shadow-2xs cursor-pointer">
+                    class="w-full rounded-xl border border-[#C7B9AA] dark:border-[#4E463E] bg-[#F0E8DE] dark:bg-[#211E1B] py-2 px-3 text-xs font-medium text-[#304060] dark:text-[#E8DFD5] focus:border-[#A35A44] focus:outline-none h-[38px]">
                     <option value="">Todos los resultados</option>
                     <option value="ADMINISTRADA">Administradas</option>
                     <option value="OMITIDA">OMITIDA / Omisiones</option>
@@ -44,7 +44,7 @@
             {{-- 3. Residente --}}
             <div class="lg:col-span-3">
                 <select wire:model.live="filtroHistorialResidente" 
-                    class="w-full h-10 px-3 text-xs rounded-[10px] border border-[#C7B9AA] dark:border-[#494139] bg-[#F0E8DE] dark:bg-[#211F1B] text-[#304060] dark:text-[#EFE5DA] focus:outline-none focus:ring-1 focus:ring-[#A35A44] shadow-2xs cursor-pointer">
+                    class="w-full rounded-xl border border-[#C7B9AA] dark:border-[#4E463E] bg-[#F0E8DE] dark:bg-[#211E1B] py-2 px-3 text-xs font-medium text-[#304060] dark:text-[#E8DFD5] focus:border-[#A35A44] focus:outline-none h-[38px]">
                     <option value="">Todos los residentes</option>
                     @foreach($residentes as $res)
                         <option value="{{ $res->cod_residente }}">
@@ -57,7 +57,7 @@
             {{-- 4. Vía de Administración --}}
             <div class="lg:col-span-2">
                 <select wire:model.live="filtroHistorialVia" 
-                    class="w-full h-10 px-3 text-xs rounded-[10px] border border-[#C7B9AA] dark:border-[#494139] bg-[#F0E8DE] dark:bg-[#211F1B] text-[#304060] dark:text-[#EFE5DA] focus:outline-none focus:ring-1 focus:ring-[#A35A44] shadow-2xs cursor-pointer">
+                    class="w-full rounded-xl border border-[#C7B9AA] dark:border-[#4E463E] bg-[#F0E8DE] dark:bg-[#211E1B] py-2 px-3 text-xs font-medium text-[#304060] dark:text-[#E8DFD5] focus:border-[#A35A44] focus:outline-none h-[38px]">
                     <option value="">Vía (Todas)</option>
                     <option value="ORAL">Oral</option>
                     <option value="SUBLINGUAL">Sublingual</option>
@@ -82,7 +82,7 @@
                 <input type="text"
                     wire:model.live.debounce.300ms="filtroHistorialMedicamento"
                     placeholder="Filtrar por medicamento..."
-                    class="w-full h-9 pl-9 pr-8 text-xs rounded-[8px] border border-[#C7B9AA] dark:border-[#494139] bg-[#F0E8DE] dark:bg-[#211F1B] text-[#304060] dark:text-[#EFE5DA] placeholder-[#677084] dark:placeholder-[#BDAE9F] focus:outline-none focus:ring-1 focus:ring-[#A35A44] shadow-2xs" />
+                    class="w-full rounded-xl border border-[#C7B9AA] dark:border-[#4E463E] bg-[#F0E8DE] dark:bg-[#211E1B] py-2 pl-9 pr-8 text-xs font-medium text-[#304060] dark:text-[#E8DFD5] focus:border-[#A35A44] focus:outline-none h-[38px]" />
                 @if(!empty($filtroHistorialMedicamento))
                     <button type="button"
                         wire:click="limpiarFiltro('filtroHistorialMedicamento')"
@@ -99,7 +99,7 @@
                 <input type="date"
                     id="fDesde"
                     wire:model.live="filtroHistorialFechaDesde"
-                    class="w-full h-9 px-2.5 text-xs rounded-[8px] border border-[#C7B9AA] dark:border-[#494139] bg-[#F0E8DE] dark:bg-[#211F1B] text-[#304060] dark:text-[#EFE5DA] focus:outline-none focus:ring-1 focus:ring-[#A35A44] shadow-2xs"
+                    class="w-full rounded-xl border border-[#C7B9AA] dark:border-[#4E463E] bg-[#F0E8DE] dark:bg-[#211E1B] py-2 px-3 text-xs font-medium text-[#304060] dark:text-[#E8DFD5] focus:border-[#A35A44] focus:outline-none h-[38px]"
                     title="Fecha desde" />
             </div>
 
@@ -109,7 +109,7 @@
                 <input type="date"
                     id="fHasta"
                     wire:model.live="filtroHistorialFechaHasta"
-                    class="w-full h-9 px-2.5 text-xs rounded-[8px] border border-[#C7B9AA] dark:border-[#494139] bg-[#F0E8DE] dark:bg-[#211F1B] text-[#304060] dark:text-[#EFE5DA] focus:outline-none focus:ring-1 focus:ring-[#A35A44] shadow-2xs"
+                    class="w-full rounded-xl border border-[#C7B9AA] dark:border-[#4E463E] bg-[#F0E8DE] dark:bg-[#211E1B] py-2 px-3 text-xs font-medium text-[#304060] dark:text-[#E8DFD5] focus:border-[#A35A44] focus:outline-none h-[38px]"
                     title="Fecha hasta" />
             </div>
         </div>
@@ -198,16 +198,16 @@
                 </div>
 
                 {{-- Conteo y Botón Restablecer --}}
-                <div class="flex items-center gap-3">
-                    <span class="text-[11px] px-2.5 py-1 rounded-full font-bold bg-[#E4D8CC] dark:bg-[#211F1B] text-[#304060] dark:text-[#EFE5DA] border border-[#C7B9AA] dark:border-[#494139]">
-                        {{ count($historial) }} coincidencias
+                <div class="flex items-center gap-2.5">
+                    <span class="text-[11px] px-2.5 py-0.5 rounded-full font-bold bg-[#304060]/10 dark:bg-[#F3EAE1]/10 text-[#304060] dark:text-[#F3EAE1]">
+                        {{ count($historial) }} coincidentes
                     </span>
 
                     <button type="button"
                         wire:click="resetFilters"
-                        class="text-xs text-[#A35A44] dark:text-[#E5A898] hover:text-[#884A39] cursor-pointer inline-flex items-center gap-1 font-bold transition">
-                        <i class="ph ph-arrow-counter-clockwise"></i>
-                        <span>Restablecer todo</span>
+                        class="inline-flex items-center gap-1 rounded-xl bg-[#A35A44]/15 hover:bg-[#A35A44]/25 text-[#A35A44] dark:text-[#D58C79] py-1 px-2.5 text-xs font-bold transition cursor-pointer">
+                        <i class="ph-bold ph-arrow-counter-clockwise"></i>
+                        <span>Limpiar filtros</span>
                     </button>
                 </div>
             </div>

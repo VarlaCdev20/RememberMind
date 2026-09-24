@@ -20,6 +20,21 @@ class ValoracionEnfermeriaPanel extends Component
         $this->resetPage();
     }
 
+    public function limpiarFiltro(string $campo): void
+    {
+        if (property_exists($this, $campo)) {
+            $this->$campo = "";
+            $this->resetPage();
+        }
+    }
+
+    public function limpiarFiltros(): void
+    {
+        $this->search = "";
+        $this->filtroEstado = "";
+        $this->resetPage();
+    }
+
     public function updatingFiltroEstado(): void
     {
         $this->resetPage();

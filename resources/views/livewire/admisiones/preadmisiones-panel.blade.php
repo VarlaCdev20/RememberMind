@@ -46,48 +46,120 @@
         @endforeach
     </section>
 
-    <section class="rounded-xl border border-borde bg-fondo-card p-5 shadow-card">
-        <div class="grid gap-4 lg:grid-cols-5">
-            <div class="lg:col-span-2">
-                <label class="mb-1 block text-xs font-semibold text-apoyo">Buscar</label>
-                <input type="text" wire:model.live.debounce.350ms="search" placeholder="Nombre, cédula o familiar responsable" class="w-full rounded-lg border border-input-borde bg-input-bg px-3 py-2 text-sm text-input-texto placeholder-input-placeholder focus:border-input-bordeFocus focus:ring-input-ringFocus">
+    {{-- BARRA DE FILTROS UNIFICADA FORMATO ALERTAS --}}
+    <section class="rounded-2xl bg-[#DED1C3] dark:bg-[#2C2723] border border-[#C7B9AA] dark:border-[#423B34] p-3 text-xs shadow-sm flex flex-col gap-2.5">
+        <div class="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-2 items-center">
+            {{-- Buscador Principal --}}
+            <div class="lg:col-span-3 relative flex items-center">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-[#677084] dark:text-[#9A9084]">
+                    <i class="ph-bold ph-magnifying-glass text-base"></i>
+                </span>
+                <input type="text"
+                    wire:model.live.debounce.350ms="search"
+                    placeholder="Nombre, cédula o familiar..."
+                    class="w-full rounded-xl border border-[#C7B9AA] dark:border-[#423B34] bg-[#F0E8DE] dark:bg-[#26221F] py-2 pl-9 pr-8 text-xs font-medium text-[#304060] dark:text-[#F3EAE1] placeholder-[#677084] dark:placeholder-[#8C8276] focus:border-[#A35A44] focus:outline-none h-[38px]">
+                @if($search !== '')
+                    <button type="button"
+                        wire:click="$set('search', '')"
+                        class="absolute inset-y-0 right-0 flex items-center pr-2.5 text-[#677084] hover:text-[#A35A44] cursor-pointer"
+                        title="Limpiar búsqueda">
+                        <i class="ph-bold ph-x-circle text-base"></i>
+                    </button>
+                @endif
             </div>
-            <div>
-                <label class="mb-1 block text-xs font-semibold text-apoyo">Estado</label>
-                <select wire:model.live="estado" class="w-full rounded-lg border border-input-borde bg-input-bg px-3 py-2 text-sm text-input-texto focus:border-input-bordeFocus focus:ring-input-ringFocus">
-                    <option value="">Todos</option>
+
+            {{-- Estado --}}
+            <div class="lg:col-span-3">
+                <select wire:model.live="estado" class="w-full rounded-xl border border-[#C7B9AA] dark:border-[#4E463E] bg-[#F0E8DE] dark:bg-[#211E1B] py-2 px-3 text-xs font-medium text-[#304060] dark:text-[#E8DFD5] focus:border-[#A35A44] focus:outline-none h-[38px]">
+                    <option value="">Todos los estados</option>
                     <option value="PENDIENTE">Pendiente de revisión</option>
-                    <option value="PREADMISION_ASIGNADA">Preadmision asignada</option>
-                    <option value="PENDIENTE_VALORACION_MEDICA">Pendiente de valoración médica</option>
-                    <option value="VALORACION_MEDICA_FINALIZADA">Valoración médica finalizada</option>
+                    <option value="PREADMISION_ASIGNADA">Preadmisión asignada</option>
+                    <option value="PENDIENTE_VALORACION_MEDICA">Pend. valoración médica</option>
+                    <option value="VALORACION_MEDICA_FINALIZADA">Val. médica finalizada</option>
                     <option value="APROBADA">Aprobada</option>
                     <option value="ADMITIDA">Admitida</option>
                     <option value="RECHAZADA">Rechazada</option>
                 </select>
             </div>
-            <div>
-                <label class="mb-1 block text-xs font-semibold text-apoyo">Prioridad</label>
-                <select wire:model.live="prioridad" class="w-full rounded-lg border border-input-borde bg-input-bg px-3 py-2 text-sm text-input-texto focus:border-input-bordeFocus focus:ring-input-ringFocus">
-                    <option value="">Todas</option>
-                    @foreach (['BAJA','MEDIA','ALTA','CRITICA'] as $nivel)
-                        <option value="{{ $nivel }}">{{ $nivel }}</option>
-                    @endforeach
+
+            {{-- Prioridad --}}
+            <div class="lg:col-span-2">
+                <select wire:model.live="prioridad" class="w-full rounded-xl border border-[#C7B9AA] dark:border-[#4E463E] bg-[#F0E8DE] dark:bg-[#211E1B] py-2 px-3 text-xs font-medium text-[#304060] dark:text-[#E8DFD5] focus:border-[#A35A44] focus:outline-none h-[38px]">
+                    <option value="">Prioridad (Todas)</option>
+                    <option value="BAJA">🟢 Baja</option>
+                    <option value="MEDIA">⚡ Media</option>
+                    <option value="ALTA">⚠️ Alta</option>
+                    <option value="CRITICA">🚨 Crítica</option>
                 </select>
             </div>
-            <div class="flex items-end">
-                <button wire:click="limpiarFiltros" class="w-full rounded-lg border border-borde bg-boton-fantasma px-3 py-2 text-sm font-semibold text-boton-fantasmaTexto transition hover:bg-boton-fantasmaHover">
-                    Limpiar
-                </button>
-            </div>
-            <div>
-                <label class="mb-1 block text-xs font-semibold text-apoyo">Desde</label>
-                <input type="date" wire:model.live="fecha_inicio" class="w-full rounded-lg border border-input-borde bg-input-bg px-3 py-2 text-sm text-input-texto focus:border-input-bordeFocus focus:ring-input-ringFocus">
-            </div>
-            <div>
-                <label class="mb-1 block text-xs font-semibold text-apoyo">Hasta</label>
-                <input type="date" wire:model.live="fecha_fin" class="w-full rounded-lg border border-input-borde bg-input-bg px-3 py-2 text-sm text-input-texto focus:border-input-bordeFocus focus:ring-input-ringFocus">
+
+            {{-- Fechas Desde / Hasta --}}
+            <div class="lg:col-span-4 grid grid-cols-2 gap-1.5">
+                <input type="date"
+                    wire:model.live="fecha_inicio"
+                    title="Fecha desde"
+                    class="w-full rounded-xl border border-[#C7B9AA] dark:border-[#4E463E] bg-[#F0E8DE] dark:bg-[#211E1B] py-2 px-2 text-xs font-medium text-[#304060] dark:text-[#E8DFD5] focus:border-[#A35A44] focus:outline-none h-[38px]" />
+                <input type="date"
+                    wire:model.live="fecha_fin"
+                    title="Fecha hasta"
+                    class="w-full rounded-xl border border-[#C7B9AA] dark:border-[#4E463E] bg-[#F0E8DE] dark:bg-[#211E1B] py-2 px-2 text-xs font-medium text-[#304060] dark:text-[#E8DFD5] focus:border-[#A35A44] focus:outline-none h-[38px]" />
             </div>
         </div>
+
+        {{-- Fila de chips de filtros activos --}}
+        @php
+            $hasFiltrosActivos = !empty($search) || !empty($estado) || !empty($prioridad) || !empty($fecha_inicio) || !empty($fecha_fin);
+        @endphp
+        @if($hasFiltrosActivos)
+            <div class="w-full flex flex-wrap items-center justify-between gap-2 pt-2.5 border-t border-[#C7B9AA]/60 dark:border-[#423B34] text-xs">
+                <div class="flex flex-wrap items-center gap-1.5">
+                    <span class="text-[11px] font-bold text-[#677084] dark:text-[#9A9084] flex items-center gap-1 mr-1">
+                        <i class="ph-bold ph-funnel text-xs"></i> Filtros activos:
+                    </span>
+                    @if(!empty($search))
+                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[#F0E8DE] dark:bg-[#211E1B] border border-[#C7B9AA] dark:border-[#4E463E] text-[11px] font-semibold text-[#304060] dark:text-[#F3EAE1]">
+                            <span>Búsqueda: "{{ Str::limit($search, 16) }}"</span>
+                            <button type="button" wire:click="$set('search', '')" class="hover:text-[#A35A44] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
+                        </span>
+                    @endif
+                    @if(!empty($estado))
+                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[#D2A45E]/15 border border-[#D2A45E]/30 text-[11px] font-bold text-[#8C6422] dark:text-[#E2BD7E]">
+                            <span>Estado: {{ str_replace('_', ' ', $estado) }}</span>
+                            <button type="button" wire:click="$set('estado', '')" class="hover:text-[#A35A44] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
+                        </span>
+                    @endif
+                    @if(!empty($prioridad))
+                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[#C85D52]/15 border border-[#C85D52]/30 text-[11px] font-bold text-[#8C2C22] dark:text-[#FFA399]">
+                            <span>Prioridad: {{ $prioridad }}</span>
+                            <button type="button" wire:click="$set('prioridad', '')" class="hover:text-[#A35A44] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
+                        </span>
+                    @endif
+                    @if(!empty($fecha_inicio))
+                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[#71876A]/15 border border-[#71876A]/30 text-[11px] font-bold text-[#495B44] dark:text-[#9FB897]">
+                            <span>Desde: {{ $fecha_inicio }}</span>
+                            <button type="button" wire:click="$set('fecha_inicio', '')" class="hover:text-[#A35A44] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
+                        </span>
+                    @endif
+                    @if(!empty($fecha_fin))
+                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[#71876A]/15 border border-[#71876A]/30 text-[11px] font-bold text-[#495B44] dark:text-[#9FB897]">
+                            <span>Hasta: {{ $fecha_fin }}</span>
+                            <button type="button" wire:click="$set('fecha_fin', '')" class="hover:text-[#A35A44] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
+                        </span>
+                    @endif
+                </div>
+                <div class="flex items-center gap-2.5">
+                    <span class="text-[11px] px-2.5 py-0.5 rounded-full font-bold bg-[#304060]/10 dark:bg-[#F3EAE1]/10 text-[#304060] dark:text-[#F3EAE1]">
+                        {{ $preadmisiones->total() }} coincidentes
+                    </span>
+                    <button type="button"
+                        wire:click="limpiarFiltros"
+                        class="inline-flex items-center gap-1 rounded-xl bg-[#A35A44]/15 hover:bg-[#A35A44]/25 text-[#A35A44] dark:text-[#D58C79] py-1 px-2.5 text-xs font-bold transition cursor-pointer">
+                        <i class="ph-bold ph-arrow-counter-clockwise"></i>
+                        <span>Limpiar filtros</span>
+                    </button>
+                </div>
+            </div>
+        @endif
     </section>
 
     <section class="overflow-hidden rounded-xl border border-borde bg-fondo-card shadow-card">

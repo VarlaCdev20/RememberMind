@@ -64,100 +64,162 @@
         </div>
     @endif
 
-    {{-- TABS & FILTROS COMPACTOS --}}
-    <div class="space-y-4">
-        {{-- Barra de Tabs y Búsqueda Rápida --}}
-        <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
-            {{-- Tabs --}}
+    {{-- TABS & FILTRO UNIFICADO ESTILO ALERTAS --}}
+    <div class="space-y-3">
+        {{-- Barra de Tabs y Acciones Secundarias --}}
+        <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
             <div class="inline-flex rounded-xl bg-[#DED1C3] dark:bg-[#2C2723] p-1 border border-[#C7B9AA] dark:border-[#423B34]">
                 <button wire:click="setTab('listado')"
-                    class="flex items-center gap-2 rounded-lg px-4 py-2 text-xs font-bold transition {{ $tabActiva === 'listado' ? 'bg-[#F0E8DE] dark:bg-[#211E1B] text-[#304060] dark:text-[#F3EAE1] shadow-sm' : 'text-[#677084] dark:text-[#A89F93] hover:text-[#304060]' }}">
+                    class="flex items-center gap-2 rounded-lg px-4 py-1.5 text-xs font-bold transition {{ $tabActiva === 'listado' ? 'bg-[#F0E8DE] dark:bg-[#211E1B] text-[#304060] dark:text-[#F3EAE1] shadow-sm' : 'text-[#677084] dark:text-[#A89F93] hover:text-[#304060]' }}">
                     <i class="ph-bold ph-list-dashes text-sm"></i>
-                    <span>Listado</span>
+                    <span>Listado activo</span>
                 </button>
                 <button wire:click="setTab('historial')"
-                    class="flex items-center gap-2 rounded-lg px-4 py-2 text-xs font-bold transition {{ $tabActiva === 'historial' ? 'bg-[#F0E8DE] dark:bg-[#211E1B] text-[#304060] dark:text-[#F3EAE1] shadow-sm' : 'text-[#677084] dark:text-[#A89F93] hover:text-[#304060]' }}">
+                    class="flex items-center gap-2 rounded-lg px-4 py-1.5 text-xs font-bold transition {{ $tabActiva === 'historial' ? 'bg-[#F0E8DE] dark:bg-[#211E1B] text-[#304060] dark:text-[#F3EAE1] shadow-sm' : 'text-[#677084] dark:text-[#A89F93] hover:text-[#304060]' }}">
                     <i class="ph-bold ph-clock-counter-clockwise text-sm"></i>
-                    <span>Historial</span>
+                    <span>Historial cerrado</span>
                 </button>
-            </div>
-
-            {{-- Buscador General --}}
-            <div class="relative w-full sm:w-80">
-                <i class="ph-bold ph-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-sm text-[#677084] dark:text-[#9A9084]"></i>
-                <input wire:model.live.debounce.300ms="search"
-                    type="text"
-                    placeholder="Buscar residente, tipo o descripción..."
-                    class="w-full rounded-xl border border-[#C7B9AA] dark:border-[#423B34] bg-[#F0E8DE] dark:bg-[#26221F] py-2 pl-9 pr-3 text-xs font-medium text-[#304060] dark:text-[#F3EAE1] placeholder-[#677084] dark:placeholder-[#8C8276] focus:border-[#A35A44] focus:outline-none">
             </div>
         </div>
 
-        {{-- Filtros Compactos --}}
-        <div class="flex flex-wrap items-center gap-2 rounded-2xl bg-[#DED1C3] dark:bg-[#2C2723] border border-[#C7B9AA] dark:border-[#423B34] p-3 text-xs">
-            <span class="font-bold text-[#677084] dark:text-[#A89F93] flex items-center gap-1 mr-1">
-                <i class="ph-bold ph-funnel text-sm"></i> Filtros:
-            </span>
-
-            {{-- Tipo --}}
-            <select wire:model.live="filtro_tipo"
-                class="rounded-xl border border-[#C7B9AA] dark:border-[#4E463E] bg-[#F0E8DE] dark:bg-[#211E1B] py-1.5 px-3 text-xs font-medium text-[#304060] dark:text-[#E8DFD5] focus:border-[#A35A44] focus:outline-none">
-                <option value="">Todos los tipos</option>
-                @foreach($tiposFrecuentes as $tf)
-                    @if($tf !== 'OTRO')
-                        <option value="{{ $tf }}">{{ $tf }}</option>
+        {{-- BARRA DE FILTROS UNIFICADA FORMATO ALERTAS --}}
+        <section class="rounded-2xl bg-[#DED1C3] dark:bg-[#2C2723] border border-[#C7B9AA] dark:border-[#423B34] p-3 text-xs shadow-sm flex flex-col gap-2.5">
+            <div class="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-2">
+                {{-- Búsqueda textual --}}
+                <div class="lg:col-span-3 relative flex items-center">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-[#677084] dark:text-[#9A9084]">
+                        <i class="ph-bold ph-magnifying-glass text-base"></i>
+                    </span>
+                    <input type="text"
+                        wire:model.live.debounce.300ms="search"
+                        placeholder="Buscar residente, tipo o descripción..."
+                        class="w-full rounded-xl border border-[#C7B9AA] dark:border-[#423B34] bg-[#F0E8DE] dark:bg-[#26221F] py-2 pl-9 pr-8 text-xs font-medium text-[#304060] dark:text-[#F3EAE1] placeholder-[#677084] dark:placeholder-[#8C8276] focus:border-[#A35A44] focus:outline-none h-[38px]" />
+                    @if($search !== '')
+                        <button type="button"
+                            wire:click="limpiarFiltro('search')"
+                            class="absolute inset-y-0 right-0 flex items-center pr-2.5 text-[#677084] hover:text-[#A35A44] cursor-pointer"
+                            title="Limpiar búsqueda">
+                            <i class="ph-bold ph-x-circle text-base"></i>
+                        </button>
                     @endif
-                @endforeach
-            </select>
-
-            {{-- Gravedad --}}
-            <select wire:model.live="filtro_gravedad"
-                class="rounded-xl border border-[#C7B9AA] dark:border-[#4E463E] bg-[#F0E8DE] dark:bg-[#211E1B] py-1.5 px-3 text-xs font-medium text-[#304060] dark:text-[#E8DFD5] focus:border-[#A35A44] focus:outline-none">
-                <option value="">Todas las gravedades</option>
-                <option value="BAJA">Baja</option>
-                <option value="MEDIA">Media</option>
-                <option value="ALTA">Alta</option>
-                <option value="CRITICA">Crítica</option>
-            </select>
-
-            {{-- Estado --}}
-            <select wire:model.live="filtro_estado"
-                class="rounded-xl border border-[#C7B9AA] dark:border-[#4E463E] bg-[#F0E8DE] dark:bg-[#211E1B] py-1.5 px-3 text-xs font-medium text-[#304060] dark:text-[#E8DFD5] focus:border-[#A35A44] focus:outline-none">
-                <option value="">Todos los estados</option>
-                <option value="ABIERTO">Abierto</option>
-                <option value="EN_SEGUIMIENTO">En seguimiento</option>
-                <option value="CERRADO">Cerrado</option>
-                <option value="ANULADO">Anulado</option>
-            </select>
-
-            {{-- Botón Más filtros --}}
-            <button wire:click="toggleMasFiltros"
-                class="rounded-xl border border-[#C7B9AA] dark:border-[#4E463E] bg-[#F0E8DE] dark:bg-[#211E1B] py-1.5 px-3 text-xs font-semibold text-[#677084] dark:text-[#B5AAA0] hover:text-[#304060] dark:hover:text-[#F3EAE1] transition">
-                <i class="ph-bold ph-calendar text-xs mr-1"></i> Fechas {{ $mostrarMasFiltros ? '▲' : '▼' }}
-            </button>
-
-            @if($search || $filtro_tipo || $filtro_gravedad || $filtro_estado || $fecha_desde || $fecha_hasta)
-                <button wire:click="limpiarFiltros"
-                    class="ml-auto inline-flex items-center gap-1 rounded-xl bg-[#A35A44]/15 hover:bg-[#A35A44]/25 text-[#A35A44] dark:text-[#D58C79] py-1.5 px-3 text-xs font-bold transition">
-                    <i class="ph-bold ph-arrow-counter-clockwise"></i> Limpiar
-                </button>
-            @endif
-        </div>
-
-        {{-- Fila Desplegable de Fechas si se activa "Más filtros" --}}
-        @if($mostrarMasFiltros)
-            <div class="flex flex-wrap items-center gap-3 rounded-2xl bg-[#DED1C3]/70 dark:bg-[#2C2723]/70 border border-[#C7B9AA] dark:border-[#423B34] p-3 text-xs">
-                <div class="flex items-center gap-2">
-                    <span class="font-medium text-[#677084] dark:text-[#A89F93]">Desde:</span>
-                    <input wire:model.live="fecha_desde" type="date"
-                        class="rounded-xl border border-[#C7B9AA] dark:border-[#4E463E] bg-[#F0E8DE] dark:bg-[#211E1B] py-1 px-2.5 text-xs text-[#304060] dark:text-[#E8DFD5] focus:outline-none focus:border-[#A35A44]">
                 </div>
-                <div class="flex items-center gap-2">
-                    <span class="font-medium text-[#677084] dark:text-[#A89F93]">Hasta:</span>
-                    <input wire:model.live="fecha_hasta" type="date"
-                        class="rounded-xl border border-[#C7B9AA] dark:border-[#4E463E] bg-[#F0E8DE] dark:bg-[#211E1B] py-1 px-2.5 text-xs text-[#304060] dark:text-[#E8DFD5] focus:outline-none focus:border-[#A35A44]">
+
+                {{-- Filtro Tipo --}}
+                <div class="lg:col-span-2">
+                    <select wire:model.live="filtro_tipo" class="w-full rounded-xl border border-[#C7B9AA] dark:border-[#4E463E] bg-[#F0E8DE] dark:bg-[#211E1B] py-2 px-3 text-xs font-medium text-[#304060] dark:text-[#E8DFD5] focus:border-[#A35A44] focus:outline-none h-[38px]">
+                        <option value="">Todos los tipos</option>
+                        @foreach($tiposFrecuentes as $tf)
+                            @if($tf !== 'OTRO')
+                                <option value="{{ $tf }}">{{ $tf }}</option>
+                            @endif
+                        @endforeach
+                    </select>
+                </div>
+
+                {{-- Filtro Gravedad --}}
+                <div class="lg:col-span-2">
+                    <select wire:model.live="filtro_gravedad" class="w-full rounded-xl border border-[#C7B9AA] dark:border-[#4E463E] bg-[#F0E8DE] dark:bg-[#211E1B] py-2 px-3 text-xs font-medium text-[#304060] dark:text-[#E8DFD5] focus:border-[#A35A44] focus:outline-none h-[38px]">
+                        <option value="">Todas las gravedades</option>
+                        <option value="BAJA">🟢 Baja</option>
+                        <option value="MEDIA">⚡ Media</option>
+                        <option value="ALTA">⚠️ Alta</option>
+                        <option value="CRITICA">🚨 Crítica</option>
+                    </select>
+                </div>
+
+                {{-- Filtro Estado --}}
+                <div class="lg:col-span-2">
+                    <select wire:model.live="filtro_estado" class="w-full rounded-xl border border-[#C7B9AA] dark:border-[#4E463E] bg-[#F0E8DE] dark:bg-[#211E1B] py-2 px-3 text-xs font-medium text-[#304060] dark:text-[#E8DFD5] focus:border-[#A35A44] focus:outline-none h-[38px]">
+                        <option value="">Todos los estados</option>
+                        <option value="ABIERTO">Abierto</option>
+                        <option value="EN_SEGUIMIENTO">En seguimiento</option>
+                        <option value="CERRADO">Cerrado</option>
+                        <option value="ANULADO">Anulado</option>
+                    </select>
+                </div>
+
+                {{-- Fechas Desde / Hasta agrupadas --}}
+                <div class="lg:col-span-3 grid grid-cols-2 gap-1.5">
+                    <input type="date"
+                        wire:model.live="fecha_desde"
+                        title="Fecha desde"
+                        class="w-full rounded-xl border border-[#C7B9AA] dark:border-[#4E463E] bg-[#F0E8DE] dark:bg-[#211E1B] py-2 px-2 text-xs font-medium text-[#304060] dark:text-[#E8DFD5] focus:border-[#A35A44] focus:outline-none h-[38px]" />
+                    <input type="date"
+                        wire:model.live="fecha_hasta"
+                        title="Fecha hasta"
+                        class="w-full rounded-xl border border-[#C7B9AA] dark:border-[#4E463E] bg-[#F0E8DE] dark:bg-[#211E1B] py-2 px-2 text-xs font-medium text-[#304060] dark:text-[#E8DFD5] focus:border-[#A35A44] focus:outline-none h-[38px]" />
                 </div>
             </div>
-        @endif
+
+            {{-- Fila de chips de filtros activos --}}
+            @php
+                $hasFiltrosActivos = !empty($search) || !empty($filtro_tipo) || !empty($filtro_gravedad) || !empty($filtro_estado) || !empty($fecha_desde) || !empty($fecha_hasta);
+            @endphp
+            @if($hasFiltrosActivos)
+                <div class="w-full flex flex-wrap items-center justify-between gap-2 pt-2.5 border-t border-[#C7B9AA]/60 dark:border-[#423B34] text-xs">
+                    <div class="flex flex-wrap items-center gap-1.5">
+                        <span class="text-[11px] font-bold text-[#677084] dark:text-[#9A9084] flex items-center gap-1 mr-1">
+                            <i class="ph-bold ph-funnel text-xs"></i> Filtros activos:
+                        </span>
+
+                        @if(!empty($search))
+                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[#F0E8DE] dark:bg-[#211E1B] border border-[#C7B9AA] dark:border-[#4E463E] text-[11px] font-semibold text-[#304060] dark:text-[#F3EAE1]">
+                                <span>Búsqueda: "{{ Str::limit($search, 16) }}"</span>
+                                <button type="button" wire:click="limpiarFiltro('search')" class="hover:text-[#A35A44] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
+                            </span>
+                        @endif
+
+                        @if(!empty($filtro_tipo))
+                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[#304060]/10 dark:bg-[#F3EAE1]/10 border border-[#C7B9AA] text-[11px] font-bold text-[#304060] dark:text-[#F3EAE1]">
+                                <span>Tipo: {{ $filtro_tipo }}</span>
+                                <button type="button" wire:click="limpiarFiltro('filtro_tipo')" class="hover:text-[#A35A44] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
+                            </span>
+                        @endif
+
+                        @if(!empty($filtro_gravedad))
+                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[#C85D52]/15 border border-[#C85D52]/30 text-[11px] font-bold text-[#8C2C22] dark:text-[#FFA399]">
+                                <span>Gravedad: {{ $filtro_gravedad }}</span>
+                                <button type="button" wire:click="limpiarFiltro('filtro_gravedad')" class="hover:text-[#A35A44] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
+                            </span>
+                        @endif
+
+                        @if(!empty($filtro_estado))
+                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[#D2A45E]/15 border border-[#D2A45E]/30 text-[11px] font-bold text-[#8C6422] dark:text-[#E2BD7E]">
+                                <span>Estado: {{ $filtro_estado }}</span>
+                                <button type="button" wire:click="limpiarFiltro('filtro_estado')" class="hover:text-[#A35A44] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
+                            </span>
+                        @endif
+
+                        @if(!empty($fecha_desde))
+                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[#71876A]/15 border border-[#71876A]/30 text-[11px] font-bold text-[#495B44] dark:text-[#9FB897]">
+                                <span>Desde: {{ $fecha_desde }}</span>
+                                <button type="button" wire:click="limpiarFiltro('fecha_desde')" class="hover:text-[#A35A44] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
+                            </span>
+                        @endif
+
+                        @if(!empty($fecha_hasta))
+                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[#71876A]/15 border border-[#71876A]/30 text-[11px] font-bold text-[#495B44] dark:text-[#9FB897]">
+                                <span>Hasta: {{ $fecha_hasta }}</span>
+                                <button type="button" wire:click="limpiarFiltro('fecha_hasta')" class="hover:text-[#A35A44] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
+                            </span>
+                        @endif
+                    </div>
+
+                    <div class="flex items-center gap-2.5">
+                        <span class="text-[11px] px-2.5 py-0.5 rounded-full font-bold bg-[#304060]/10 dark:bg-[#F3EAE1]/10 text-[#304060] dark:text-[#F3EAE1]">
+                            {{ $incidentes instanceof \Illuminate\Pagination\LengthAwarePaginator ? $incidentes->total() : count($incidentes) }} coincidentes
+                        </span>
+
+                        <button type="button"
+                            wire:click="limpiarFiltros"
+                            class="inline-flex items-center gap-1 rounded-xl bg-[#A35A44]/15 hover:bg-[#A35A44]/25 text-[#A35A44] dark:text-[#D58C79] py-1 px-2.5 text-xs font-bold transition cursor-pointer">
+                            <i class="ph-bold ph-arrow-counter-clockwise"></i>
+                            <span>Limpiar filtros</span>
+                        </button>
+                    </div>
+                </div>
+            @endif
+        </section>
     </div>
 
     {{-- ======================================================== --}}

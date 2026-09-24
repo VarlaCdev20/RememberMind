@@ -68,84 +68,92 @@
         </div>
     </header>
 
-    {{-- ============================================================= --}}
-    {{-- 2. BARRA DE CONTROL: BÚSQUEDA, CHIPS DE ESTADO Y VISTA MODO  --}}
-    {{-- ============================================================= --}}
-    <div class="p-3 sm:p-3.5 rounded-2xl border border-[#D5CABE]/60 dark:border-[#383C3D] bg-[#F0E8DE] dark:bg-[#222527] flex flex-col md:flex-row md:items-center md:justify-between gap-3 shadow-2xs">
-        
-        {{-- Buscador --}}
-        <div class="relative flex-1 min-w-[220px] max-w-md">
-            <i class="ph-bold ph-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-sm text-[#677084]"></i>
-            <input type="text"
-                   wire:model.live.debounce.300ms="search"
-                   placeholder="Buscar por nombre, CI o habitación..."
-                   class="w-full h-9 pl-9 pr-8 rounded-xl border border-[#D5CABE] dark:border-[#52585A] bg-[#F7F2EC] dark:bg-[#1C1E20] text-xs text-[#304060] dark:text-[#F0E8DE] placeholder-[#677084] focus:border-[#8DA280] focus:ring-1 focus:ring-[#8DA280] transition outline-hidden">
-            @if($search)
-                <button type="button" wire:click="$set('search', '')" class="absolute right-2.5 top-1/2 -translate-y-1/2 text-[#677084] hover:text-[#304060] text-xs cursor-pointer">
-                    <i class="ph-bold ph-x"></i>
-                </button>
-            @endif
+    {{-- BARRA DE FILTROS UNIFICADA FORMATO ALERTAS --}}
+    <section class="rounded-2xl bg-[#DED1C3] dark:bg-[#2C2723] border border-[#C7B9AA] dark:border-[#423B34] p-3 text-xs shadow-sm flex flex-col gap-2.5">
+        <div class="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-2">
+            {{-- Buscador Principal --}}
+            <div class="lg:col-span-5 relative flex items-center">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-[#677084] dark:text-[#9A9084]">
+                    <i class="ph-bold ph-magnifying-glass text-base"></i>
+                </span>
+                <input type="text"
+                    wire:model.live.debounce.300ms="search"
+                    placeholder="Buscar por nombre, CI o habitación..."
+                    class="w-full rounded-xl border border-[#C7B9AA] dark:border-[#423B34] bg-[#F0E8DE] dark:bg-[#26221F] py-2 pl-9 pr-8 text-xs font-medium text-[#304060] dark:text-[#F3EAE1] placeholder-[#677084] dark:placeholder-[#8C8276] focus:border-[#A35A44] focus:outline-none h-[38px]">
+                @if($search)
+                    <button type="button" wire:click="$set('search', '')" class="absolute inset-y-0 right-0 flex items-center pr-2.5 text-[#677084] hover:text-[#A35A44] cursor-pointer" title="Limpiar búsqueda">
+                        <i class="ph-bold ph-x-circle text-base"></i>
+                    </button>
+                @endif
+            </div>
+
+            {{-- Selector Estado de Atención --}}
+            <div class="lg:col-span-4">
+                <select wire:model.live="filtroEstado"
+                    class="w-full rounded-xl border border-[#C7B9AA] dark:border-[#4E463E] bg-[#F0E8DE] dark:bg-[#211E1B] py-2 px-3 text-xs font-medium text-[#304060] dark:text-[#E8DFD5] focus:border-[#A35A44] focus:outline-none h-[38px]">
+                    <option value="TODOS">Todos los estados ({{ $stats['total'] ?? $pacientes->count() }})</option>
+                    <option value="REQUIERE_ATENCION">🚨 Requiere atención ({{ $stats['criticos'] ?? 0 }})</option>
+                    <option value="OBSERVACION">⚠️ En observación ({{ $stats['observacion'] ?? 0 }})</option>
+                    <option value="ESTABLE">🟢 Estables ({{ $stats['estables'] ?? 0 }})</option>
+                </select>
+            </div>
+
+            {{-- Conmutador de Vista (Listado vs Tarjetas) --}}
+            <div class="lg:col-span-3 flex items-center justify-end">
+                <div class="flex items-center p-0.5 rounded-xl bg-[#F0E8DE] dark:bg-[#211E1B] border border-[#C7B9AA] dark:border-[#4E463E] w-full h-[38px]">
+                    <button type="button"
+                            wire:click="$set('vistaModo', 'tabla')"
+                            class="flex-1 h-full rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 transition cursor-pointer {{ $vistaModo === 'tabla' ? 'bg-[#304060] text-white shadow-xs' : 'text-[#677084] hover:text-[#304060] dark:text-[#A6B2C8]' }}">
+                        <i class="ph-bold ph-list-dashes text-sm"></i>
+                        <span>Listado</span>
+                    </button>
+                    <button type="button"
+                            wire:click="$set('vistaModo', 'tarjetas')"
+                            class="flex-1 h-full rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 transition cursor-pointer {{ $vistaModo === 'tarjetas' ? 'bg-[#304060] text-white shadow-xs' : 'text-[#677084] hover:text-[#304060] dark:text-[#A6B2C8]' }}">
+                        <i class="ph-bold ph-squares-four text-sm"></i>
+                        <span>Tarjetas</span>
+                    </button>
+                </div>
+            </div>
         </div>
 
-        {{-- Chips de Filtro de Estado --}}
-        <div class="flex items-center gap-1.5 flex-wrap">
-            <button type="button"
-                    wire:click="$set('filtroEstado', 'TODOS')"
-                    class="px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer {{ $filtroEstado === 'TODOS' ? 'bg-[#304060] text-white shadow-xs' : 'bg-[#F7F2EC] dark:bg-[#1C1E20] text-[#304060] dark:text-[#F0E8DE] hover:bg-[#EAE0D5] border border-[#D5CABE]' }}">
-                <span>Todos</span>
-                <span class="px-1.5 py-0.2 rounded text-[9px] font-black {{ $filtroEstado === 'TODOS' ? 'bg-white/20 text-white' : 'bg-[#D5CABE]/50 text-[#304060]' }}">
-                    {{ $stats['total'] ?? $pacientes->count() }}
-                </span>
-            </button>
-
-            <button type="button"
-                    wire:click="$set('filtroEstado', 'REQUIERE_ATENCION')"
-                    class="px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer {{ $filtroEstado === 'REQUIERE_ATENCION' ? 'bg-[#D85C55] text-white shadow-xs' : 'bg-[#F7F2EC] dark:bg-[#1C1E20] text-[#D85C55] hover:bg-red-50 dark:hover:bg-red-950/30 border border-[#D5CABE]' }}">
-                <span class="h-1.5 w-1.5 rounded-full bg-[#D85C55]"></span>
-                <span>Requiere atención</span>
-                <span class="px-1.5 py-0.2 rounded text-[9px] font-black {{ $filtroEstado === 'REQUIERE_ATENCION' ? 'bg-white/20 text-white' : 'bg-red-100 text-[#D85C55]' }}">
-                    {{ $stats['criticos'] ?? 0 }}
-                </span>
-            </button>
-
-            <button type="button"
-                    wire:click="$set('filtroEstado', 'OBSERVACION')"
-                    class="px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer {{ $filtroEstado === 'OBSERVACION' ? 'bg-[#D2A45E] text-white shadow-xs' : 'bg-[#F7F2EC] dark:bg-[#1C1E20] text-[#D2A45E] hover:bg-amber-50 dark:hover:bg-amber-950/30 border border-[#D5CABE]' }}">
-                <span class="h-1.5 w-1.5 rounded-full bg-[#D2A45E]"></span>
-                <span>Observación</span>
-                <span class="px-1.5 py-0.2 rounded text-[9px] font-black {{ $filtroEstado === 'OBSERVACION' ? 'bg-white/20 text-white' : 'bg-amber-100 text-[#D2A45E]' }}">
-                    {{ $stats['observacion'] ?? 0 }}
-                </span>
-            </button>
-
-            <button type="button"
-                    wire:click="$set('filtroEstado', 'ESTABLE')"
-                    class="px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer {{ $filtroEstado === 'ESTABLE' ? 'bg-[#8DA280] text-white shadow-xs' : 'bg-[#F7F2EC] dark:bg-[#1C1E20] text-[#63775B] dark:text-[#8DA280] hover:bg-emerald-50 dark:hover:bg-emerald-950/30 border border-[#D5CABE]' }}">
-                <span class="h-1.5 w-1.5 rounded-full bg-[#8DA280]"></span>
-                <span>Estables</span>
-                <span class="px-1.5 py-0.2 rounded text-[9px] font-black {{ $filtroEstado === 'ESTABLE' ? 'bg-white/20 text-white' : 'bg-emerald-100 text-[#63775B]' }}">
-                    {{ $stats['estables'] ?? 0 }}
-                </span>
-            </button>
-        </div>
-
-        {{-- Conmutador de Vista (Listado vs Tarjetas) --}}
-        <div class="flex items-center p-0.5 rounded-xl bg-[#F7F2EC] dark:bg-[#1C1E20] border border-[#D5CABE] dark:border-[#383C3D] self-end md:self-auto">
-            <button type="button"
-                    wire:click="$set('vistaModo', 'tabla')"
-                    class="px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition cursor-pointer {{ $vistaModo === 'tabla' ? 'bg-[#304060] text-white shadow-xs' : 'text-[#677084] hover:text-[#304060] dark:text-[#A6B2C8]' }}">
-                <i class="ph-bold ph-list-dashes text-sm"></i>
-                <span>Listado</span>
-            </button>
-
-            <button type="button"
-                    wire:click="$set('vistaModo', 'tarjetas')"
-                    class="px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition cursor-pointer {{ $vistaModo === 'tarjetas' ? 'bg-[#304060] text-white shadow-xs' : 'text-[#677084] hover:text-[#304060] dark:text-[#A6B2C8]' }}">
-                <i class="ph-bold ph-squares-four text-sm"></i>
-                <span>Tarjetas</span>
-            </button>
-        </div>
-    </div>
+        {{-- Fila de chips de filtros activos --}}
+        @php
+            $hasFiltrosActivos = !empty($search) || ($filtroEstado !== 'TODOS');
+        @endphp
+        @if($hasFiltrosActivos)
+            <div class="w-full flex flex-wrap items-center justify-between gap-2 pt-2.5 border-t border-[#C7B9AA]/60 dark:border-[#423B34] text-xs">
+                <div class="flex flex-wrap items-center gap-1.5">
+                    <span class="text-[11px] font-bold text-[#677084] dark:text-[#9A9084] flex items-center gap-1 mr-1">
+                        <i class="ph-bold ph-funnel text-xs"></i> Filtros activos:
+                    </span>
+                    @if(!empty($search))
+                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[#F0E8DE] dark:bg-[#211E1B] border border-[#C7B9AA] dark:border-[#4E463E] text-[11px] font-semibold text-[#304060] dark:text-[#F3EAE1]">
+                            <span>Búsqueda: "{{ Str::limit($search, 18) }}"</span>
+                            <button type="button" wire:click="$set('search', '')" class="hover:text-[#A35A44] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
+                        </span>
+                    @endif
+                    @if($filtroEstado !== 'TODOS')
+                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg {{ $filtroEstado === 'REQUIERE_ATENCION' ? 'bg-[#C85D52]/15 border border-[#C85D52]/30 text-[#8C2C22] dark:text-[#FFA399]' : ($filtroEstado === 'OBSERVACION' ? 'bg-[#D2A45E]/15 border border-[#D2A45E]/30 text-[#8C6422] dark:text-[#E2BD7E]' : 'bg-[#71876A]/15 border border-[#71876A]/30 text-[#495B44] dark:text-[#9FB897]') }} text-[11px] font-bold">
+                            <span>Estado: {{ $filtroEstado === 'REQUIERE_ATENCION' ? 'Requiere atención' : ($filtroEstado === 'OBSERVACION' ? 'En observación' : 'Estable') }}</span>
+                            <button type="button" wire:click="$set('filtroEstado', 'TODOS')" class="hover:text-[#A35A44] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
+                        </span>
+                    @endif
+                </div>
+                <div class="flex items-center gap-2.5">
+                    <span class="text-[11px] px-2.5 py-0.5 rounded-full font-bold bg-[#304060]/10 dark:bg-[#F3EAE1]/10 text-[#304060] dark:text-[#F3EAE1]">
+                        {{ $pacientes->total() ?? $pacientes->count() }} residentes coincidentes
+                    </span>
+                    <button type="button"
+                            wire:click="$set('search', ''); $set('filtroEstado', 'TODOS')"
+                            class="inline-flex items-center gap-1 rounded-xl bg-[#A35A44]/15 hover:bg-[#A35A44]/25 text-[#A35A44] dark:text-[#D58C79] py-1 px-2.5 text-xs font-bold transition cursor-pointer">
+                        <i class="ph-bold ph-arrow-counter-clockwise"></i>
+                        <span>Limpiar filtros</span>
+                    </button>
+                </div>
+            </div>
+        @endif
+    </section>
 
     {{-- ============================================================= --}}
     {{-- 3. CONTENIDO PRINCIPAL                                        --}}
@@ -721,7 +729,7 @@
                     </div>
                     <div>
                         <label class="font-bold text-[#304060] dark:text-[#F0E8DE] block mb-0.5">Notas de evolución</label>
-                        <textarea wire:model="segNota" rows="2" placeholder="Observaciones clínicas relevantes..." class="w-full rounded-xl border border-[#D5CABE] p-2 text-xs bg-[#F0E8DE] dark:bg-[#222527]"></textarea>
+                        <textarea wire:model="segObs" rows="2" placeholder="Observaciones clínicas relevantes..." class="w-full rounded-xl border border-[#D5CABE] p-2 text-xs bg-[#F0E8DE] dark:bg-[#222527]"></textarea>
                     </div>
                 </div>
                 <div class="flex items-center justify-end gap-2 pt-2 border-t border-[#D5CABE]/50">
@@ -748,20 +756,27 @@
                 <div class="space-y-2 text-xs">
                     <div>
                         <label class="font-bold text-[#304060] dark:text-[#F0E8DE] block mb-0.5">Medicamento / Fármaco</label>
-                        <input type="text" wire:model="medNombre" placeholder="Nombre del fármaco y dosis..." class="w-full h-8.5 rounded-xl border border-[#D5CABE] px-2.5 bg-[#F0E8DE] dark:bg-[#222527]">
+                        <select wire:model="medCodMed" class="w-full h-8.5 rounded-xl border border-[#D5CABE] px-2.5 bg-[#F0E8DE] dark:bg-[#222527]">
+                            <option value="">Seleccione una prescripción activa</option>
+                            @foreach($medicacionesPaciente as $prescripcion)
+                                <option value="{{ $prescripcion->cod_prescripcion }}">
+                                    {{ $prescripcion->nombre_medicamento }} · {{ $prescripcion->dosis }} {{ $prescripcion->unidad_dosis }} · {{ $prescripcion->via_administracion }}
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('medCodMed') <p class="mt-1 text-[11px] font-bold text-estado-peligro">{{ $message }}</p> @enderror
                     </div>
                     <div>
                         <label class="font-bold text-[#304060] dark:text-[#F0E8DE] block mb-0.5">Estado de administración</label>
-                        <select wire:model="medEstado" class="w-full h-8.5 rounded-xl border border-[#D5CABE] px-2 bg-[#F0E8DE] dark:bg-[#222527]">
-                            <option value="ADMINISTRADO">Administrado según indicación</option>
-                            <option value="RECHAZADO">Rechazado por el residente</option>
-                            <option value="OMITIDO">Omitido por criterio clínico</option>
-                            <option value="SUSPENDIDO">Suspendido temporalmente</option>
+                        <select wire:model.live="medAdministrado" class="w-full h-8.5 rounded-xl border border-[#D5CABE] px-2 bg-[#F0E8DE] dark:bg-[#222527]">
+                            <option value="1">Administrada según indicación</option>
+                            <option value="0">Omitida o rechazada</option>
                         </select>
                     </div>
                     <div>
-                        <label class="font-bold text-[#304060] dark:text-[#F0E8DE] block mb-0.5">Observación / Justificación</label>
-                        <textarea wire:model="medObs" rows="2" placeholder="Notas sobre tolerancia, efectos o justificación..." class="w-full rounded-xl border border-[#D5CABE] p-2 text-xs bg-[#F0E8DE] dark:bg-[#222527]"></textarea>
+                        <label class="font-bold text-[#304060] dark:text-[#F0E8DE] block mb-0.5">Observación / Justificación {{ $medAdministrado ? '(opcional)' : '(obligatoria)' }}</label>
+                        <textarea wire:model="medMotivoOmision" rows="2" placeholder="Notas sobre tolerancia o motivo de omisión..." class="w-full rounded-xl border border-[#D5CABE] p-2 text-xs bg-[#F0E8DE] dark:bg-[#222527]"></textarea>
+                        @error('medMotivoOmision') <p class="mt-1 text-[11px] font-bold text-estado-peligro">{{ $message }}</p> @enderror
                     </div>
                 </div>
                 <div class="flex items-center justify-end gap-2 pt-2 border-t border-[#D5CABE]/50">

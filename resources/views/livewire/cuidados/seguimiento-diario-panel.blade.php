@@ -78,7 +78,7 @@
                 </div>
                 <div class="grid gap-3 md:grid-cols-3">
                     <label class="space-y-1 text-xs font-bold text-apoyo">Adulto mayor *
-                        <select wire:model.live="codResidente" @disabled($editandoId) class="rm-select w-full text-sm"><option value="">Seleccione</option>@foreach($adultos as $adulto)<option value="{{ $adulto->cod_residente }}">{{ $adulto->nombres }} {{ $adulto->ap_paterno }}</option>@endforeach</select>
+                        <select wire:model.live="codAm" @disabled($editandoId) class="rm-select w-full text-sm"><option value="">Seleccione</option>@foreach($adultos as $adulto)<option value="{{ $adulto->cod_residente }}">{{ $adulto->nombres }} {{ $adulto->ap_paterno }}</option>@endforeach</select>
                         @error('codResidente')<span class="text-xs text-estado-peligro">{{ $message }}</span>@enderror
                     </label>
                     <label class="space-y-1 text-xs font-bold text-apoyo">Turno *

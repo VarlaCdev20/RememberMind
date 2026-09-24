@@ -90,65 +90,128 @@
  </nav>
 
  {{-- SECCIÓN DE FILTROS AVANZADOS --}}
- <section class="rounded-2xl border border-borde-suave bg-fondo-panel p-5 shadow-sm" x-show="tab !== 'alertas'">
- <div class="grid gap-3 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-9 items-end">
- <div class="sm:col-span-2 md:col-span-2 xl:col-span-2">
- <label class="mb-1 block text-[10px] font-bold uppercase tracking-widest text-apoyo">Buscar</label>
- <input type="text" wire:model.live.debounce.300ms="buscar" placeholder="Ficha, CI, Nombre, Teléfono..." class="w-full rounded-xl border border-borde-suave bg-fondo-panel px-3 py-2 text-xs font-bold text-titulo outline-none transition focus:border-borde-focus focus:ring-2 focus:ring-[#E27D60]/20">
- </div>
- <div>
- <label class="mb-1 block text-[10px] font-bold uppercase tracking-widest text-apoyo">Estado</label>
- <select wire:model.live="estado" class="w-full rounded-xl border border-borde-suave bg-fondo-panel px-3 py-2 text-xs font-bold text-titulo outline-none transition focus:border-borde-focus focus:ring-2 focus:ring-[#E27D60]/20">
- <option value="">Todos</option>
- @foreach($estadosAdulto ?? [] as $est)
- <option value="{{ $est->estado }}">{{ $est->estado }}</option>
- @endforeach
- </select>
- </div>
- <div>
- <label class="mb-1 block text-[10px] font-bold uppercase tracking-widest text-apoyo">Ciudad/Muni.</label>
- <input type="text" wire:model.live.debounce.300ms="ciudad_municipio" placeholder="Ej. Santa Cruz" class="w-full rounded-xl border border-borde-suave bg-fondo-panel px-3 py-2 text-xs font-bold text-titulo outline-none transition focus:border-borde-focus focus:ring-2 focus:ring-[#E27D60]/20">
- </div>
- <div>
- <label class="mb-1 block text-[10px] font-bold uppercase tracking-widest text-apoyo">Rango de Edad</label>
- <select wire:model.live="rango_edad" class="w-full rounded-xl border border-borde-suave bg-fondo-panel px-3 py-2 text-xs font-bold text-titulo outline-none transition focus:border-borde-focus focus:ring-2 focus:ring-[#E27D60]/20">
- <option value="">Todos</option>
- <option value="60-70">60 a 70 años</option>
- <option value="70-80">70 a 80 años</option>
- <option value="80+">Mayores a 80 años</option>
- </select>
- </div>
- <div>
- <label class="mb-1 block text-[10px] font-bold uppercase tracking-widest text-apoyo">Género</label>
- <select wire:model.live="genero" class="w-full rounded-xl border border-borde-suave bg-fondo-panel px-3 py-2 text-xs font-bold text-titulo outline-none transition focus:border-borde-focus focus:ring-2 focus:ring-[#E27D60]/20">
- <option value="">Todos</option>
- <option value="MASCULINO">Masculino</option>
- <option value="FEMENINO">Femenino</option>
- </select>
- </div>
- <div>
- <label class="mb-1 block text-[10px] font-bold uppercase tracking-widest text-apoyo">Permanencia</label>
- <select wire:model.live="permanencia" class="w-full rounded-xl border border-borde-suave bg-fondo-panel px-3 py-2 text-xs font-bold text-titulo outline-none transition focus:border-borde-focus focus:ring-2 focus:ring-[#E27D60]/20">
- <option value="">Todas</option>
- <option value="PERMANENTE">Permanente</option>
- <option value="TEMPORAL">Temporal</option>
- <option value="EVENTUAL">Eventual</option>
- </select>
- </div>
- <div>
- <label class="mb-1 block text-[10px] font-bold uppercase tracking-widest text-apoyo">Desde (Ingreso)</label>
- <input type="date" wire:model.live="fecha_desde" class="w-full rounded-xl border border-borde-suave bg-fondo-panel px-3 py-2 text-xs font-bold text-titulo outline-none transition focus:border-borde-focus focus:ring-2 focus:ring-[#E27D60]/20">
- </div>
- <div class="flex gap-2">
- <button type="button" wire:click="$refresh" class="w-full rounded-xl bg-boton-principal px-3 py-2.5 text-xs font-bold text-inverso hover:bg-fondo-panel transition" title="Refrescar">
- <i class="ph-bold ph-arrows-counter-clockwise text-sm"></i>
- </button>
- <button type="button" wire:click="$set('buscar', ''); $set('estado', ''); $set('genero', ''); $set('permanencia', ''); $set('ciudad_municipio', ''); $set('rango_edad', ''); $set('fecha_desde', ''); $set('fecha_hasta', '');" class="flex w-full items-center justify-center rounded-xl bg-fondo-app px-3 py-2.5 text-xs font-bold text-titulo hover:bg-fondo-panel transition" title="Limpiar Filtros">
- <i class="ph-bold ph-x text-sm"></i>
- </button>
- </div>
- </div>
- </section>
+    {{-- SECCIÓN DE FILTROS AVANZADOS UNIFICADA FORMATO ALERTAS --}}
+    <section class="rounded-2xl bg-[#DED1C3] dark:bg-[#2C2723] border border-[#C7B9AA] dark:border-[#423B34] p-3 text-xs shadow-sm flex flex-col gap-2.5" x-show="tab !== 'alertas'">
+        <div class="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-2 items-center">
+            {{-- Buscador Principal --}}
+            <div class="lg:col-span-3 relative flex items-center">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-[#677084] dark:text-[#9A9084]">
+                    <i class="ph-bold ph-magnifying-glass text-base"></i>
+                </span>
+                <input type="text"
+                    wire:model.live.debounce.300ms="buscar"
+                    placeholder="Ficha, CI, Nombre, Teléfono..."
+                    class="w-full rounded-xl border border-[#C7B9AA] dark:border-[#423B34] bg-[#F0E8DE] dark:bg-[#26221F] py-2 pl-9 pr-8 text-xs font-medium text-[#304060] dark:text-[#F3EAE1] placeholder-[#677084] dark:placeholder-[#8C8276] focus:border-[#A35A44] focus:outline-none h-[38px]">
+                @if($buscar !== '')
+                    <button type="button"
+                        wire:click="$set('buscar', '')"
+                        class="absolute inset-y-0 right-0 flex items-center pr-2.5 text-[#677084] hover:text-[#A35A44] cursor-pointer"
+                        title="Limpiar búsqueda">
+                        <i class="ph-bold ph-x-circle text-base"></i>
+                    </button>
+                @endif
+            </div>
+
+            {{-- Estado --}}
+            <div class="lg:col-span-2">
+                <select wire:model.live="estado" class="w-full rounded-xl border border-[#C7B9AA] dark:border-[#4E463E] bg-[#F0E8DE] dark:bg-[#211E1B] py-2 px-3 text-xs font-medium text-[#304060] dark:text-[#E8DFD5] focus:border-[#A35A44] focus:outline-none h-[38px]">
+                    <option value="">Todos los estados</option>
+                    @foreach($estadosAdulto ?? [] as $est)
+                        <option value="{{ $est->estado }}">{{ $est->estado }}</option>
+                    @endforeach
+                </select>
+            </div>
+
+            {{-- Género --}}
+            <div class="lg:col-span-1">
+                <select wire:model.live="genero" class="w-full rounded-xl border border-[#C7B9AA] dark:border-[#4E463E] bg-[#F0E8DE] dark:bg-[#211E1B] py-2 px-2 text-xs font-medium text-[#304060] dark:text-[#E8DFD5] focus:border-[#A35A44] focus:outline-none h-[38px]">
+                    <option value="">Género</option>
+                    <option value="MASCULINO">Masc.</option>
+                    <option value="FEMENINO">Fem.</option>
+                </select>
+            </div>
+
+            {{-- Rango de Edad --}}
+            <div class="lg:col-span-2">
+                <select wire:model.live="rango_edad" class="w-full rounded-xl border border-[#C7B9AA] dark:border-[#4E463E] bg-[#F0E8DE] dark:bg-[#211E1B] py-2 px-3 text-xs font-medium text-[#304060] dark:text-[#E8DFD5] focus:border-[#A35A44] focus:outline-none h-[38px]">
+                    <option value="">Cualquier edad</option>
+                    <option value="60-70">60 a 70 años</option>
+                    <option value="70-80">70 a 80 años</option>
+                    <option value="80+">Mayores a 80 años</option>
+                </select>
+            </div>
+
+            {{-- Permanencia --}}
+            <div class="lg:col-span-2">
+                <select wire:model.live="permanencia" class="w-full rounded-xl border border-[#C7B9AA] dark:border-[#4E463E] bg-[#F0E8DE] dark:bg-[#211E1B] py-2 px-3 text-xs font-medium text-[#304060] dark:text-[#E8DFD5] focus:border-[#A35A44] focus:outline-none h-[38px]">
+                    <option value="">Permanencia (Todas)</option>
+                    <option value="PERMANENTE">Permanente</option>
+                    <option value="TEMPORAL">Temporal</option>
+                    <option value="EVENTUAL">Eventual</option>
+                </select>
+            </div>
+
+            {{-- Ciudad / Muni --}}
+            <div class="lg:col-span-2">
+                <input type="text" wire:model.live.debounce.300ms="ciudad_municipio" placeholder="Ciudad/Muni..." class="w-full rounded-xl border border-[#C7B9AA] dark:border-[#4E463E] bg-[#F0E8DE] dark:bg-[#211E1B] py-2 px-3 text-xs font-medium text-[#304060] dark:text-[#E8DFD5] focus:border-[#A35A44] focus:outline-none h-[38px]">
+            </div>
+        </div>
+
+        {{-- Fila de chips de filtros activos --}}
+        @php
+            $hasFiltrosActivos = !empty($buscar) || !empty($estado) || !empty($genero) || !empty($rango_edad) || !empty($permanencia) || !empty($ciudad_municipio) || !empty($fecha_desde);
+        @endphp
+        @if($hasFiltrosActivos)
+            <div class="w-full flex flex-wrap items-center justify-between gap-2 pt-2.5 border-t border-[#C7B9AA]/60 dark:border-[#423B34] text-xs">
+                <div class="flex flex-wrap items-center gap-1.5">
+                    <span class="text-[11px] font-bold text-[#677084] dark:text-[#9A9084] flex items-center gap-1 mr-1">
+                        <i class="ph-bold ph-funnel text-xs"></i> Filtros activos:
+                    </span>
+                    @if(!empty($buscar))
+                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[#F0E8DE] dark:bg-[#211E1B] border border-[#C7B9AA] dark:border-[#4E463E] text-[11px] font-semibold text-[#304060] dark:text-[#F3EAE1]">
+                            <span>Búsqueda: "{{ Str::limit($buscar, 16) }}"</span>
+                            <button type="button" wire:click="$set('buscar', '')" class="hover:text-[#A35A44] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
+                        </span>
+                    @endif
+                    @if(!empty($estado))
+                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[#D2A45E]/15 border border-[#D2A45E]/30 text-[11px] font-bold text-[#8C6422] dark:text-[#E2BD7E]">
+                            <span>Estado: {{ $estado }}</span>
+                            <button type="button" wire:click="$set('estado', '')" class="hover:text-[#A35A44] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
+                        </span>
+                    @endif
+                    @if(!empty($genero))
+                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[#304060]/10 dark:bg-[#F3EAE1]/10 border border-[#C7B9AA] text-[11px] font-bold text-[#304060] dark:text-[#F3EAE1]">
+                            <span>{{ $genero === 'MASCULINO' ? 'Masc.' : 'Fem.' }}</span>
+                            <button type="button" wire:click="$set('genero', '')" class="hover:text-[#A35A44] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
+                        </span>
+                    @endif
+                    @if(!empty($rango_edad))
+                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[#71876A]/15 border border-[#71876A]/30 text-[11px] font-bold text-[#495B44] dark:text-[#9FB897]">
+                            <span>Edad: {{ $rango_edad }}</span>
+                            <button type="button" wire:click="$set('rango_edad', '')" class="hover:text-[#A35A44] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
+                        </span>
+                    @endif
+                    @if(!empty($permanencia))
+                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[#304060]/10 dark:bg-[#F3EAE1]/10 border border-[#C7B9AA] text-[11px] font-bold text-[#304060] dark:text-[#F3EAE1]">
+                            <span>Perm.: {{ $permanencia }}</span>
+                            <button type="button" wire:click="$set('permanencia', '')" class="hover:text-[#A35A44] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
+                        </span>
+                    @endif
+                </div>
+                <div class="flex items-center gap-2.5">
+                    <span class="text-[11px] px-2.5 py-0.5 rounded-full font-bold bg-[#304060]/10 dark:bg-[#F3EAE1]/10 text-[#304060] dark:text-[#F3EAE1]">
+                        {{ $adultos->total() ?? count($adultos) }} coincidentes
+                    </span>
+                    <button type="button"
+                        wire:click="$set('buscar', ''); $set('estado', ''); $set('genero', ''); $set('permanencia', ''); $set('ciudad_municipio', ''); $set('rango_edad', ''); $set('fecha_desde', ''); $set('fecha_hasta', '');"
+                        class="inline-flex items-center gap-1 rounded-xl bg-[#A35A44]/15 hover:bg-[#A35A44]/25 text-[#A35A44] dark:text-[#D58C79] py-1 px-2.5 text-xs font-bold transition cursor-pointer">
+                        <i class="ph-bold ph-arrow-counter-clockwise"></i>
+                        <span>Limpiar filtros</span>
+                    </button>
+                </div>
+            </div>
+        @endif
+    </section>
 
  {{-- VISTA TARJETAS (CARDS RESPONSIVAS PREMIUM) --}}
  <section x-show="tab === 'tarjetas'">

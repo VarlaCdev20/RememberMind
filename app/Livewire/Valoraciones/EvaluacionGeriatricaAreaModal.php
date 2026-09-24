@@ -79,8 +79,8 @@ class EvaluacionGeriatricaAreaModal extends Component
     protected function rules(): array
     {
         $rules = [
-            'cod_am'              => 'required|string|exists:adulto_mayor,cod_am',
-            'cod_instrumento'     => 'required|string|exists:instrumentos_geriatricos,cod_instrumento',
+            'cod_am'              => 'required|string|exists:residentes,cod_residente',
+            'cod_instrumento'     => 'required|string|exists:instrumentos,cod_instrumento',
             'fecha_eval'          => 'required|date|before_or_equal:today',
             'hora_eval'           => 'nullable|string',
             'categoria_resultado' => 'nullable|string|max:150',

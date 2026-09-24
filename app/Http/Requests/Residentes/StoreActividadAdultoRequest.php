@@ -16,7 +16,7 @@ class StoreActividadAdultoRequest extends FormRequest
         return [
             'fecha' => 'required|date',
             'hora' => 'required',
-            'cod_tipo_act' => 'required|exists:tipo_actividades_adulto,cod_tipo_act',
+            'cod_tipo_act' => 'required|string|max:60',
             'obs' => 'nullable|string|max:2000',
             'estado' => 'required|string|max:50',
         ];

@@ -340,85 +340,122 @@
                 </div>
 
                 <div class="rm-card border border-borde bg-fondo-card !p-0 shadow-sm">
-                    <div class="border-b border-borde bg-fondo-hover/30 px-4 py-3">
-                        <div class="grid grid-cols-1 gap-3 lg:grid-cols-12">
-                            <div class="lg:col-span-3">
-                                <label class="mb-1 block text-[10px] font-black uppercase tracking-[0.18em] text-apoyo">
-                                    Buscar
-                                </label>
-                                <div class="relative">
-                                    <i class="ph-bold ph-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-apoyo"></i>
+                    <div class="p-3">
+                        <section class="rounded-2xl bg-[#DED1C3] dark:bg-[#2C2723] border border-[#C7B9AA] dark:border-[#423B34] p-3 text-xs shadow-sm flex flex-col gap-2.5">
+                            <div class="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-2 items-center">
+                                {{-- Buscador Principal --}}
+                                <div class="lg:col-span-4 relative flex items-center">
+                                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-[#677084] dark:text-[#9A9084]">
+                                        <i class="ph-bold ph-magnifying-glass text-base"></i>
+                                    </span>
                                     <input
                                         type="text"
                                         wire:model.live.debounce.300ms="busquedaResumen"
                                         placeholder="Nombre, correo o CI..."
-                                        class="h-9 w-full rounded-lg border border-borde bg-fondo-card pl-9 pr-3 text-xs text-texto shadow-sm outline-none transition-all placeholder:text-apoyo/70 focus:border-boton-acento focus:ring-1 focus:ring-boton-acento"
+                                        class="w-full rounded-xl border border-[#C7B9AA] dark:border-[#423B34] bg-[#F0E8DE] dark:bg-[#26221F] py-2 pl-9 pr-8 text-xs font-medium text-[#304060] dark:text-[#F3EAE1] placeholder-[#677084] dark:placeholder-[#8C8276] focus:border-[#A35A44] focus:outline-none h-[38px]"
                                     >
+                                    @if($busquedaResumen !== '')
+                                        <button type="button"
+                                            wire:click="$set('busquedaResumen', '')"
+                                            class="absolute inset-y-0 right-0 flex items-center pr-2.5 text-[#677084] hover:text-[#A35A44] cursor-pointer"
+                                            title="Limpiar búsqueda">
+                                            <i class="ph-bold ph-x-circle text-base"></i>
+                                        </button>
+                                    @endif
+                                </div>
+
+                                {{-- Rubro --}}
+                                <div class="lg:col-span-3">
+                                    <select
+                                        wire:model.live="rubroResumen"
+                                        class="w-full rounded-xl border border-[#C7B9AA] dark:border-[#4E463E] bg-[#F0E8DE] dark:bg-[#211E1B] py-2 px-3 text-xs font-medium text-[#304060] dark:text-[#E8DFD5] focus:border-[#A35A44] focus:outline-none h-[38px]"
+                                    >
+                                        <option value="institucional">Todos los institucionales</option>
+                                        <option value="salud">Personal de salud</option>
+                                        <option value="admin">Personal administrativo</option>
+                                        <option value="sistema">Administradores del sistema</option>
+                                        <option value="activos">Personal activo</option>
+                                        <option value="en_turno">En turno actual</option>
+                                        <option value="fuera_turno">Fuera de turno</option>
+                                        <option value="incidencias">Suspendidos / inactivos</option>
+                                    </select>
+                                </div>
+
+                                {{-- Estado --}}
+                                <div class="lg:col-span-2">
+                                    <select
+                                        wire:model.live="estadoResumen"
+                                        class="w-full rounded-xl border border-[#C7B9AA] dark:border-[#4E463E] bg-[#F0E8DE] dark:bg-[#211E1B] py-2 px-3 text-xs font-medium text-[#304060] dark:text-[#E8DFD5] focus:border-[#A35A44] focus:outline-none h-[38px]"
+                                    >
+                                        <option value="">Todos los estados</option>
+                                        <option value="activo">Activo</option>
+                                        <option value="inactivo">Inactivo</option>
+                                        <option value="suspendido">Suspendido</option>
+                                    </select>
+                                </div>
+
+                                {{-- Turno --}}
+                                <div class="lg:col-span-3">
+                                    <select
+                                        wire:model.live="turnoResumen"
+                                        class="w-full rounded-xl border border-[#C7B9AA] dark:border-[#4E463E] bg-[#F0E8DE] dark:bg-[#211E1B] py-2 px-3 text-xs font-medium text-[#304060] dark:text-[#E8DFD5] focus:border-[#A35A44] focus:outline-none h-[38px]"
+                                    >
+                                        <option value="">Todos los turnos</option>
+                                        <option value="Mañana">Mañana</option>
+                                        <option value="Tarde">Tarde</option>
+                                        <option value="Noche">Noche</option>
+                                        <option value="Madrugada">Madrugada</option>
+                                        <option value="sin_turno">Sin turno</option>
+                                    </select>
                                 </div>
                             </div>
 
-                            <div class="lg:col-span-3">
-                                <label class="mb-1 block text-[10px] font-black uppercase tracking-[0.18em] text-apoyo">
-                                    Rubro
-                                </label>
-                                <select
-                                    wire:model.live="rubroResumen"
-                                    class="h-9 w-full rounded-lg border border-borde bg-fondo-card px-3 text-xs font-bold text-texto shadow-sm outline-none transition-all focus:border-boton-acento focus:ring-1 focus:ring-boton-acento"
-                                >
-                                    <option value="institucional">Todos los institucionales</option>
-                                    <option value="salud">Personal de salud</option>
-                                    <option value="admin">Personal administrativo</option>
-                                    <option value="sistema">Administradores del sistema</option>
-                                    <option value="activos">Personal activo</option>
-                                    <option value="en_turno">En turno actual</option>
-                                    <option value="fuera_turno">Fuera de turno</option>
-                                    <option value="incidencias">Suspendidos / inactivos</option>
-                                </select>
-                            </div>
-
-                            <div class="lg:col-span-2">
-                                <label class="mb-1 block text-[10px] font-black uppercase tracking-[0.18em] text-apoyo">
-                                    Estado
-                                </label>
-                                <select
-                                    wire:model.live="estadoResumen"
-                                    class="h-9 w-full rounded-lg border border-borde bg-fondo-card px-3 text-xs font-bold text-texto shadow-sm outline-none transition-all focus:border-boton-acento focus:ring-1 focus:ring-boton-acento"
-                                >
-                                    <option value="">Todos</option>
-                                    <option value="activo">Activo</option>
-                                    <option value="inactivo">Inactivo</option>
-                                    <option value="suspendido">Suspendido</option>
-                                </select>
-                            </div>
-
-                            <div class="lg:col-span-2">
-                                <label class="mb-1 block text-[10px] font-black uppercase tracking-[0.18em] text-apoyo">
-                                    Turno
-                                </label>
-                                <select
-                                    wire:model.live="turnoResumen"
-                                    class="h-9 w-full rounded-lg border border-borde bg-fondo-card px-3 text-xs font-bold text-texto shadow-sm outline-none transition-all focus:border-boton-acento focus:ring-1 focus:ring-boton-acento"
-                                >
-                                    <option value="">Todos</option>
-                                    <option value="Mañana">Mañana</option>
-                                    <option value="Tarde">Tarde</option>
-                                    <option value="Noche">Noche</option>
-                                    <option value="Madrugada">Madrugada</option>
-                                    <option value="sin_turno">Sin turno</option>
-                                </select>
-                            </div>
-
-                            <div class="flex items-end lg:col-span-2">
-                                <button
-                                    type="button"
-                                    wire:click="limpiarFiltrosResumen"
-                                    class="flex h-9 w-full items-center justify-center gap-1.5 rounded-lg border border-borde bg-fondo-card px-3 text-xs font-black text-apoyo shadow-sm transition-colors hover:bg-fondo-hover hover:text-titulo"
-                                >
-                                    <i class="ph-bold ph-broom text-base"></i>
-                                    Limpiar
-                                </button>
-                            </div>
-                        </div>
+                            {{-- Fila de chips de filtros activos --}}
+                            @php
+                                $hasFiltrosActivos = !empty($busquedaResumen) || ($rubroResumen !== 'institucional') || !empty($estadoResumen) || !empty($turnoResumen);
+                            @endphp
+                            @if($hasFiltrosActivos)
+                                <div class="w-full flex flex-wrap items-center justify-between gap-2 pt-2.5 border-t border-[#C7B9AA]/60 dark:border-[#423B34] text-xs">
+                                    <div class="flex flex-wrap items-center gap-1.5">
+                                        <span class="text-[11px] font-bold text-[#677084] dark:text-[#9A9084] flex items-center gap-1 mr-1">
+                                            <i class="ph-bold ph-funnel text-xs"></i> Filtros activos:
+                                        </span>
+                                        @if(!empty($busquedaResumen))
+                                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[#F0E8DE] dark:bg-[#211E1B] border border-[#C7B9AA] dark:border-[#4E463E] text-[11px] font-semibold text-[#304060] dark:text-[#F3EAE1]">
+                                                <span>Búsqueda: "{{ Str::limit($busquedaResumen, 16) }}"</span>
+                                                <button type="button" wire:click="$set('busquedaResumen', '')" class="hover:text-[#A35A44] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
+                                            </span>
+                                        @endif
+                                        @if($rubroResumen !== 'institucional')
+                                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[#304060]/10 dark:bg-[#F3EAE1]/10 border border-[#C7B9AA] text-[11px] font-bold text-[#304060] dark:text-[#F3EAE1]">
+                                                <span>Rubro: {{ ucfirst($rubroResumen) }}</span>
+                                                <button type="button" wire:click="$set('rubroResumen', 'institucional')" class="hover:text-[#A35A44] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
+                                            </span>
+                                        @endif
+                                        @if(!empty($estadoResumen))
+                                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[#D2A45E]/15 border border-[#D2A45E]/30 text-[11px] font-bold text-[#8C6422] dark:text-[#E2BD7E]">
+                                                <span>Estado: {{ ucfirst($estadoResumen) }}</span>
+                                                <button type="button" wire:click="$set('estadoResumen', '')" class="hover:text-[#A35A44] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
+                                            </span>
+                                        @endif
+                                        @if(!empty($turnoResumen))
+                                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[#71876A]/15 border border-[#71876A]/30 text-[11px] font-bold text-[#495B44] dark:text-[#9FB897]">
+                                                <span>Turno: {{ $turnoResumen }}</span>
+                                                <button type="button" wire:click="$set('turnoResumen', '')" class="hover:text-[#A35A44] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
+                                            </span>
+                                        @endif
+                                    </div>
+                                    <div class="flex items-center gap-2.5">
+                                        <button type="button"
+                                            wire:click="limpiarFiltrosResumen"
+                                            class="inline-flex items-center gap-1 rounded-xl bg-[#A35A44]/15 hover:bg-[#A35A44]/25 text-[#A35A44] dark:text-[#D58C79] py-1 px-2.5 text-xs font-bold transition cursor-pointer">
+                                            <i class="ph-bold ph-arrow-counter-clockwise"></i>
+                                            <span>Limpiar filtros</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            @endif
+                        </section>
                     </div>
 
                     <div class="flex flex-col gap-2 border-b border-borde px-4 py-3 sm:flex-row sm:items-center sm:justify-between">

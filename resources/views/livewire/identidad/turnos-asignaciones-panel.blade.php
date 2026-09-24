@@ -77,56 +77,135 @@
             @endforeach
         </section>
 
-        {{-- FILTROS GENERALES --}}
-        <section class="rounded-2xl border border-borde-suave bg-fondo-panel p-3 shadow-sm">
-            <div class="grid gap-2 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-8">
-                <div class="relative sm:col-span-2">
-                    <i class="ph-bold ph-magnifying-glass pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-apoyo"></i>
+        {{-- FILTROS GENERALES FORMATO ALERTAS --}}
+        <section class="rounded-2xl bg-[#DED1C3] dark:bg-[#2C2723] border border-[#C7B9AA] dark:border-[#423B34] p-3 text-xs shadow-sm flex flex-col gap-2.5">
+            <div class="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-2 items-center">
+                {{-- Buscador Principal --}}
+                <div class="lg:col-span-4 relative flex items-center">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-[#677084] dark:text-[#9A9084]">
+                        <i class="ph-bold ph-magnifying-glass text-base"></i>
+                    </span>
                     <input type="search" wire:model.live.debounce.300ms="busqueda"
-                        class="h-10 w-full rounded-xl border border-borde-suave bg-fondo-card/40 pl-9 pr-3 text-xs font-bold text-titulo outline-none transition focus:border-borde-focus"
+                        class="w-full rounded-xl border border-[#C7B9AA] dark:border-[#423B34] bg-[#F0E8DE] dark:bg-[#26221F] py-2 pl-9 pr-8 text-xs font-medium text-[#304060] dark:text-[#F3EAE1] placeholder-[#677084] dark:placeholder-[#8C8276] focus:border-[#A35A44] focus:outline-none h-[38px]"
                         placeholder="Buscar personal por nombre, apellido o correo...">
+                    @if($busqueda !== '')
+                        <button type="button"
+                            wire:click="$set('busqueda', '')"
+                            class="absolute inset-y-0 right-0 flex items-center pr-2.5 text-[#677084] hover:text-[#A35A44] cursor-pointer"
+                            title="Limpiar búsqueda">
+                            <i class="ph-bold ph-x-circle text-base"></i>
+                        </button>
+                    @endif
                 </div>
 
-                <select wire:model.live="filtroTipo" class="h-10 rounded-xl border border-borde-suave bg-fondo-card/40 px-3 text-xs font-bold text-titulo outline-none focus:border-borde-focus">
-                    <option value="">Todo el personal</option>
-                    <option value="salud">Personal de salud</option>
-                    <option value="admin">Administrativo</option>
-                </select>
+                {{-- Tipo Personal --}}
+                <div class="lg:col-span-2">
+                    <select wire:model.live="filtroTipo" class="w-full rounded-xl border border-[#C7B9AA] dark:border-[#4E463E] bg-[#F0E8DE] dark:bg-[#211E1B] py-2 px-3 text-xs font-medium text-[#304060] dark:text-[#E8DFD5] focus:border-[#A35A44] focus:outline-none h-[38px]">
+                        <option value="">Todo el personal</option>
+                        <option value="salud">Personal de salud</option>
+                        <option value="admin">Administrativo</option>
+                    </select>
+                </div>
 
-                <select wire:model.live="filtroRol" class="h-10 rounded-xl border border-borde-suave bg-fondo-card/40 px-3 text-xs font-bold text-titulo outline-none focus:border-borde-focus">
-                    <option value="">Todos los roles</option>
-                    @foreach ($roles as $rol)
-                        <option value="{{ $rol }}">{{ $rol }}</option>
-                    @endforeach
-                </select>
+                {{-- Rol --}}
+                <div class="lg:col-span-2">
+                    <select wire:model.live="filtroRol" class="w-full rounded-xl border border-[#C7B9AA] dark:border-[#4E463E] bg-[#F0E8DE] dark:bg-[#211E1B] py-2 px-3 text-xs font-medium text-[#304060] dark:text-[#E8DFD5] focus:border-[#A35A44] focus:outline-none h-[38px]">
+                        <option value="">Todos los roles</option>
+                        @foreach ($roles as $rol)
+                            <option value="{{ $rol }}">{{ $rol }}</option>
+                        @endforeach
+                    </select>
+                </div>
 
-                <select wire:model.live="filtroArea" class="h-10 rounded-xl border border-borde-suave bg-fondo-card/40 px-3 text-xs font-bold text-titulo outline-none focus:border-borde-focus">
-                    <option value="">Todas las áreas</option>
-                    @foreach ($areas as $area)
-                        <option value="{{ $area->cod_area }}">{{ $area->nombre }}</option>
-                    @endforeach
-                </select>
+                {{-- Área --}}
+                <div class="lg:col-span-2">
+                    <select wire:model.live="filtroArea" class="w-full rounded-xl border border-[#C7B9AA] dark:border-[#4E463E] bg-[#F0E8DE] dark:bg-[#211E1B] py-2 px-3 text-xs font-medium text-[#304060] dark:text-[#E8DFD5] focus:border-[#A35A44] focus:outline-none h-[38px]">
+                        <option value="">Todas las áreas</option>
+                        @foreach ($areas as $area)
+                            <option value="{{ $area->cod_area }}">{{ $area->nombre }}</option>
+                        @endforeach
+                    </select>
+                </div>
 
-                <select wire:model.live="filtroTurno" class="h-10 rounded-xl border border-borde-suave bg-fondo-card/40 px-3 text-xs font-bold text-titulo outline-none focus:border-borde-focus">
-                    <option value="">Todos los turnos</option>
-                    @foreach ($turnos as $turno)
-                        <option value="{{ $turno->nombre }}">{{ $turno->nombre }}</option>
-                    @endforeach
-                </select>
+                {{-- Turno --}}
+                <div class="lg:col-span-1">
+                    <select wire:model.live="filtroTurno" class="w-full rounded-xl border border-[#C7B9AA] dark:border-[#4E463E] bg-[#F0E8DE] dark:bg-[#211E1B] py-2 px-2 text-xs font-medium text-[#304060] dark:text-[#E8DFD5] focus:border-[#A35A44] focus:outline-none h-[38px]">
+                        <option value="">Turno</option>
+                        @foreach ($turnos as $turno)
+                            <option value="{{ $turno->nombre }}">{{ $turno->nombre }}</option>
+                        @endforeach
+                    </select>
+                </div>
 
-                <select wire:model.live="filtroEstado" class="h-10 rounded-xl border border-borde-suave bg-fondo-card/40 px-3 text-xs font-bold text-titulo outline-none focus:border-borde-focus">
-                    <option value="">Todos los estados</option>
-                    <option value="EN_TURNO">En turno</option>
-                    <option value="DISPONIBLE">Disponible</option>
-                    <option value="SIN_HORARIO">Sin horario</option>
-                    <option value="CONFLICTO">Conflicto</option>
-                </select>
-
-                <button type="button" wire:click="limpiarFiltros"
-                    class="h-10 rounded-xl border border-borde-suave bg-fondo-card/45 px-3 text-xs font-bold uppercase tracking-wide text-titulo transition hover:bg-fondo-card">
-                    Limpiar
-                </button>
+                {{-- Estado --}}
+                <div class="lg:col-span-1">
+                    <select wire:model.live="filtroEstado" class="w-full rounded-xl border border-[#C7B9AA] dark:border-[#4E463E] bg-[#F0E8DE] dark:bg-[#211E1B] py-2 px-2 text-xs font-medium text-[#304060] dark:text-[#E8DFD5] focus:border-[#A35A44] focus:outline-none h-[38px]">
+                        <option value="">Estado</option>
+                        <option value="EN_TURNO">En turno</option>
+                        <option value="DISPONIBLE">Disponible</option>
+                        <option value="SIN_HORARIO">Sin horario</option>
+                        <option value="CONFLICTO">Conflicto</option>
+                    </select>
+                </div>
             </div>
+
+            {{-- Fila de chips de filtros activos --}}
+            @php
+                $hasFiltrosActivos = !empty($busqueda) || !empty($filtroTipo) || !empty($filtroRol) || !empty($filtroArea) || !empty($filtroTurno) || !empty($filtroEstado);
+            @endphp
+            @if($hasFiltrosActivos)
+                <div class="w-full flex flex-wrap items-center justify-between gap-2 pt-2.5 border-t border-[#C7B9AA]/60 dark:border-[#423B34] text-xs">
+                    <div class="flex flex-wrap items-center gap-1.5">
+                        <span class="text-[11px] font-bold text-[#677084] dark:text-[#9A9084] flex items-center gap-1 mr-1">
+                            <i class="ph-bold ph-funnel text-xs"></i> Filtros activos:
+                        </span>
+                        @if(!empty($busqueda))
+                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[#F0E8DE] dark:bg-[#211E1B] border border-[#C7B9AA] dark:border-[#4E463E] text-[11px] font-semibold text-[#304060] dark:text-[#F3EAE1]">
+                                <span>Búsqueda: "{{ Str::limit($busqueda, 16) }}"</span>
+                                <button type="button" wire:click="$set('busqueda', '')" class="hover:text-[#A35A44] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
+                            </span>
+                        @endif
+                        @if(!empty($filtroTipo))
+                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[#304060]/10 dark:bg-[#F3EAE1]/10 border border-[#C7B9AA] text-[11px] font-bold text-[#304060] dark:text-[#F3EAE1]">
+                                <span>Tipo: {{ ucfirst($filtroTipo) }}</span>
+                                <button type="button" wire:click="$set('filtroTipo', '')" class="hover:text-[#A35A44] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
+                            </span>
+                        @endif
+                        @if(!empty($filtroRol))
+                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[#304060]/10 dark:bg-[#F3EAE1]/10 border border-[#C7B9AA] text-[11px] font-bold text-[#304060] dark:text-[#F3EAE1]">
+                                <span>Rol: {{ $filtroRol }}</span>
+                                <button type="button" wire:click="$set('filtroRol', '')" class="hover:text-[#A35A44] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
+                            </span>
+                        @endif
+                        @if(!empty($filtroArea))
+                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[#71876A]/15 border border-[#71876A]/30 text-[11px] font-bold text-[#495B44] dark:text-[#9FB897]">
+                                <span>Área filtrada</span>
+                                <button type="button" wire:click="$set('filtroArea', '')" class="hover:text-[#A35A44] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
+                            </span>
+                        @endif
+                        @if(!empty($filtroTurno))
+                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[#D2A45E]/15 border border-[#D2A45E]/30 text-[11px] font-bold text-[#8C6422] dark:text-[#E2BD7E]">
+                                <span>Turno: {{ $filtroTurno }}</span>
+                                <button type="button" wire:click="$set('filtroTurno', '')" class="hover:text-[#A35A44] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
+                            </span>
+                        @endif
+                        @if(!empty($filtroEstado))
+                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[#D2A45E]/15 border border-[#D2A45E]/30 text-[11px] font-bold text-[#8C6422] dark:text-[#E2BD7E]">
+                                <span>Estado: {{ $filtroEstado }}</span>
+                                <button type="button" wire:click="$set('filtroEstado', '')" class="hover:text-[#A35A44] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
+                            </span>
+                        @endif
+                    </div>
+                    <div class="flex items-center gap-2.5">
+                        <button type="button"
+                            wire:click="limpiarFiltros"
+                            class="inline-flex items-center gap-1 rounded-xl bg-[#A35A44]/15 hover:bg-[#A35A44]/25 text-[#A35A44] dark:text-[#D58C79] py-1 px-2.5 text-xs font-bold transition cursor-pointer">
+                            <i class="ph-bold ph-arrow-counter-clockwise"></i>
+                            <span>Limpiar filtros</span>
+                        </button>
+                    </div>
+                </div>
+            @endif
         </section>
 
         {{-- CONTROLES DE VISTA PRINCIPAL --}}

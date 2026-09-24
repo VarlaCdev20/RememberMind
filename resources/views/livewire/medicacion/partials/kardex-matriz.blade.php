@@ -2,7 +2,7 @@
     {{-- ==================================================
          1. BARRA DE FILTROS COMPACTA ÚNICA
          ================================================== --}}
-    <section x-data="{ masFiltros: false }" class="p-3 sm:p-3.5 rounded-[14px] bg-[#F0E8DE] dark:bg-[#2C2924] border border-[#C7B9AA] dark:border-[#494139] shadow-2xs space-y-2.5 transition-colors">
+    <section x-data="{ masFiltros: false }" class="rounded-2xl bg-[#DED1C3] dark:bg-[#2C2723] border border-[#C7B9AA] dark:border-[#423B34] p-3 text-xs shadow-sm flex flex-col gap-2.5">
         <div class="w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-12 gap-2 items-center text-xs">
             {{-- 1. Búsqueda rápida: residente o medicamento --}}
             <div class="lg:col-span-3 relative flex items-center">
@@ -12,7 +12,7 @@
                 <input type="text"
                     wire:model.live.debounce.300ms="filtroKardexBusqueda"
                     placeholder="Buscar residente o medicamento..."
-                    class="w-full h-9 pl-8 pr-7 text-xs rounded-[8px] border border-[#C7B9AA] dark:border-[#494139] bg-[#E4D8CC] dark:bg-[#211F1B] text-[#304060] dark:text-[#EFE5DA] placeholder-[#677084] dark:placeholder-[#BDAE9F] focus:outline-none focus:ring-1 focus:ring-[#A35A44] transition" />
+                    class="w-full rounded-xl border border-[#C7B9AA] dark:border-[#423B34] bg-[#F0E8DE] dark:bg-[#26221F] py-2 pl-9 pr-8 text-xs font-medium text-[#304060] dark:text-[#F3EAE1] placeholder-[#677084] dark:placeholder-[#8C8276] focus:border-[#A35A44] focus:outline-none h-[38px]" />
                 @if(!empty($filtroKardexBusqueda))
                     <button type="button"
                         wire:click="limpiarFiltro('filtroKardexBusqueda')"
@@ -25,7 +25,7 @@
 
             {{-- 2. Estado --}}
             <div class="lg:col-span-2">
-                <select wire:model.live="filtroKardexEstado" class="w-full h-9 px-2.5 text-xs rounded-[8px] border border-[#C7B9AA] dark:border-[#494139] bg-[#E4D8CC] dark:bg-[#211F1B] text-[#304060] dark:text-[#EFE5DA] focus:outline-none focus:ring-1 focus:ring-[#A35A44] cursor-pointer">
+                <select wire:model.live="filtroKardexEstado" class="w-full rounded-xl border border-[#C7B9AA] dark:border-[#4E463E] bg-[#F0E8DE] dark:bg-[#211E1B] py-2 px-3 text-xs font-medium text-[#304060] dark:text-[#E8DFD5] focus:border-[#A35A44] focus:outline-none h-[38px]">
                     <option value="">Todos los estados</option>
                     <option value="PROXIMA">Próximas</option>
                     <option value="PENDIENTE">Pendientes</option>
@@ -36,7 +36,7 @@
 
             {{-- 3. Residente --}}
             <div class="lg:col-span-3">
-                <select wire:model.live="filtroKardexResidente" class="w-full h-9 px-2.5 text-xs rounded-[8px] border border-[#C7B9AA] dark:border-[#494139] bg-[#E4D8CC] dark:bg-[#211F1B] text-[#304060] dark:text-[#EFE5DA] focus:outline-none focus:ring-1 focus:ring-[#A35A44] cursor-pointer">
+                <select wire:model.live="filtroKardexResidente" class="w-full rounded-xl border border-[#C7B9AA] dark:border-[#4E463E] bg-[#F0E8DE] dark:bg-[#211E1B] py-2 px-3 text-xs font-medium text-[#304060] dark:text-[#E8DFD5] focus:border-[#A35A44] focus:outline-none h-[38px]">
                     <option value="">Todos los residentes</option>
                     @foreach($residentes as $res)
                         <option value="{{ $res->cod_residente }}">
@@ -48,7 +48,7 @@
 
             {{-- 4. Horario --}}
             <div class="lg:col-span-2">
-                <select wire:model.live="filtroKardexHorario" class="w-full h-9 px-2 text-xs rounded-[8px] border border-[#C7B9AA] dark:border-[#494139] bg-[#E4D8CC] dark:bg-[#211F1B] text-[#304060] dark:text-[#EFE5DA] focus:outline-none focus:ring-1 focus:ring-[#A35A44] cursor-pointer">
+                <select wire:model.live="filtroKardexHorario" class="w-full rounded-xl border border-[#C7B9AA] dark:border-[#4E463E] bg-[#F0E8DE] dark:bg-[#211E1B] py-2 px-3 text-xs font-medium text-[#304060] dark:text-[#E8DFD5] focus:border-[#A35A44] focus:outline-none h-[38px]">
                     <option value="">Cualquier horario</option>
                     <option value="MANANA">Mañana (06:00 - 13:00)</option>
                     <option value="TARDE">Tarde (13:00 - 19:00)</option>
@@ -63,7 +63,7 @@
 
             {{-- 5. Vía --}}
             <div class="lg:col-span-1">
-                <select wire:model.live="filtroKardexVia" class="w-full h-9 px-1.5 text-xs rounded-[8px] border border-[#C7B9AA] dark:border-[#494139] bg-[#E4D8CC] dark:bg-[#211F1B] text-[#304060] dark:text-[#EFE5DA] focus:outline-none focus:ring-1 focus:ring-[#A35A44] cursor-pointer">
+                <select wire:model.live="filtroKardexVia" class="w-full rounded-xl border border-[#C7B9AA] dark:border-[#4E463E] bg-[#F0E8DE] dark:bg-[#211E1B] py-2 px-3 text-xs font-medium text-[#304060] dark:text-[#E8DFD5] focus:border-[#A35A44] focus:outline-none h-[38px]">
                     <option value="">Vía (Todas)</option>
                     <option value="ORAL">Oral</option>
                     <option value="SUBLINGUAL">Sublingual</option>
@@ -79,7 +79,7 @@
             <div class="lg:col-span-1 flex items-center justify-end">
                 <button type="button" 
                     @click="masFiltros = !masFiltros"
-                    class="h-9 px-2 w-full inline-flex items-center justify-center gap-1 text-[11px] font-bold rounded-[8px] border border-[#C7B9AA] dark:border-[#494139] bg-[#E4D8CC] dark:bg-[#211F1B] text-[#304060] dark:text-[#EFE5DA] hover:bg-[#DED1C3] transition cursor-pointer"
+                    class="h-[38px] px-2 w-full inline-flex items-center justify-center gap-1 text-xs font-bold rounded-xl border border-[#C7B9AA] dark:border-[#4E463E] bg-[#F0E8DE] dark:bg-[#211E1B] text-[#304060] dark:text-[#E8DFD5] hover:bg-[#DED1C3] transition cursor-pointer"
                     :class="masFiltros ? 'bg-[#A35A44] text-white border-[#A35A44]' : ''"
                     title="Ver más filtros">
                     <i class="ph ph-faders text-xs"></i>
@@ -164,16 +164,16 @@
                     @endif
                 </div>
 
-                <div class="flex items-center gap-3">
-                    <span class="text-[11px] text-[#677084] dark:text-[#BDAE9F]">
-                        {{ count($dosisHoy) }} coincidencias
+                <div class="flex items-center gap-2.5">
+                    <span class="text-[11px] px-2.5 py-0.5 rounded-full font-bold bg-[#304060]/10 dark:bg-[#F3EAE1]/10 text-[#304060] dark:text-[#F3EAE1]">
+                        {{ count($dosisHoy) }} coincidentes
                     </span>
 
                     <button type="button"
                         wire:click="resetFilters"
-                        class="text-xs text-[#A35A44] dark:text-[#E5A898] hover:text-[#884A39] cursor-pointer inline-flex items-center gap-1 font-bold transition">
-                        <i class="ph ph-arrow-counter-clockwise"></i>
-                        <span>Restablecer todo</span>
+                        class="inline-flex items-center gap-1 rounded-xl bg-[#A35A44]/15 hover:bg-[#A35A44]/25 text-[#A35A44] dark:text-[#D58C79] py-1 px-2.5 text-xs font-bold transition cursor-pointer">
+                        <i class="ph-bold ph-arrow-counter-clockwise"></i>
+                        <span>Limpiar filtros</span>
                     </button>
                 </div>
             </div>

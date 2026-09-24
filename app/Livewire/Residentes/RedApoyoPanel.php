@@ -220,10 +220,11 @@ class RedApoyoPanel extends Component
         $r = $vinculo->residente;
 
         $this->detalleVinculo = [
-            'tipo' => 'familiar',
+            'tipo' => 'FAMILIAR',
             'id' => $vinculo->cod_residente_contacto,
+            'vinculo_id' => $vinculo->cod_residente_contacto,
             'cod_fam' => $c->cod_contacto,
-            'nombre' => trim("{$c->nombres} {$c->apellido_paterno} {$c->apellido_materno}"),
+            'nombre_completo' => trim("{$c->nombres} {$c->apellido_paterno} {$c->apellido_materno}"),
             'parentesco' => $vinculo->parentesco,
             'rol' => $vinculo->parentesco,
             'celular' => $c->celular ?? $c->telefono ?? 'No registrado',
@@ -231,11 +232,12 @@ class RedApoyoPanel extends Component
             'direccion' => $c->direccion ?? 'No registrada',
             'estado' => $vinculo->estado,
             'estado_badge' => $vinculo->estado,
-            'observaciones' => $vinculo->observacion ?: 'Sin observaciones',
-            'responsable' => (bool) $vinculo->responsable_principal,
-            'emergencia' => (bool) $vinculo->contacto_emergencia,
-            'adulto_nombre' => $r ? $r->nombre_completo : '',
-            'adulto_id' => $this->adultoSeleccionado,
+            'observacion' => $vinculo->observacion ?: 'Sin observaciones',
+            'responsable_principal' => (bool) $vinculo->responsable_principal,
+            'contacto_emergencia' => (bool) $vinculo->contacto_emergencia,
+            'adulto_mayor' => $r ? $r->nombre_completo : '',
+            'ultima_actualizacion' => 'Sin fecha registrada',
+            'incompleto' => blank($c->celular ?? $c->telefono) || blank($c->correo),
         ];
 
         $this->modalDetalleVinculo = true;
@@ -431,11 +433,28 @@ class RedApoyoPanel extends Component
 
     private function agruparFamiliares(Collection $familiares): array
     {
-        $grupos = [];
+        $grupos = [
+            'conyuge' => [],
+            'hijos' => [],
+            'nietos' => [],
+            'hermanos' => [],
+            'sobrinos' => [],
+            'otros' => [],
+        ];
+
         foreach ($familiares as $f) {
-            $p = $f->parentesco_vinculo ?: 'Otros';
-            $grupos[$p][] = $f;
+            $parentesco = Str::upper(Str::ascii((string) $f->parentesco_vinculo));
+            $grupo = match (true) {
+                str_contains($parentesco, 'CONYUGE'), str_contains($parentesco, 'ESPOS') => 'conyuge',
+                str_contains($parentesco, 'NIET') => 'nietos',
+                str_contains($parentesco, 'HIJ') => 'hijos',
+                str_contains($parentesco, 'HERMAN') => 'hermanos',
+                str_contains($parentesco, 'SOBRIN') => 'sobrinos',
+                default => 'otros',
+            };
+            $grupos[$grupo][] = $this->presentarFamiliar($f);
         }
+
         return $grupos;
     }
 
@@ -448,16 +467,52 @@ class RedApoyoPanel extends Component
             $b = mb_strtolower(trim($this->buscarPersona));
             $familiares = $familiares->filter(fn ($f) => str_contains(mb_strtolower("{$f->nombres} {$f->ap_paterno} {$f->ap_materno}"), $b));
         }
-        return $familiares;
+        if ($this->filtroTipo === 'responsable') {
+            $familiares = $familiares->where('es_responsable', true);
+        } elseif ($this->filtroTipo === 'emergencia') {
+            $familiares = $familiares->where('es_contacto_emergencia', true);
+        } elseif ($this->filtroTipo === 'incompleto') {
+            $familiares = $familiares->filter(fn ($f) => blank($f->telefono) || blank($f->correo));
+        }
+
+        return $familiares->map(fn ($f) => $this->presentarFamiliar($f))->values();
+    }
+
+    private function presentarFamiliar(object $f): array
+    {
+        $nombre = trim("{$f->nombres} {$f->ap_paterno} {$f->ap_materno}");
+
+        return [
+            'tipo' => 'FAMILIAR',
+            'vinculo_id' => (string) $f->vinculo_id,
+            'cod_fam' => (string) $f->cod_fam,
+            'nombre' => $nombre,
+            'iniciales' => Str::upper(mb_substr((string) $f->nombres, 0, 1) . mb_substr((string) $f->ap_paterno, 0, 1)),
+            'correo' => $f->correo ?: 'No registrado',
+            'celular' => $f->telefono ?: 'No registrado',
+            'parentesco' => $f->parentesco_vinculo ?: 'Contacto',
+            'responsable' => (bool) $f->es_responsable,
+            'emergencia' => (bool) $f->es_contacto_emergencia,
+            'estado' => $f->estado_vinculo ?: 'INACTIVO',
+            'estado_badge' => $f->estado_vinculo ?: 'INACTIVO',
+            'actualizado' => 'Sin fecha registrada',
+        ];
     }
 
     private function metricas(?Residente $adulto, Collection $familiares): array
     {
+        $responsable = $familiares->firstWhere('es_responsable', true);
+
         return [
             'total' => $familiares->count(),
             'responsables' => $familiares->where('es_responsable', true)->count(),
             'activos' => $familiares->where('estado_vinculo', 'ACTIVO')->count(),
             'inactivos' => $familiares->where('estado_vinculo', '!=', 'ACTIVO')->count(),
+            'familiares' => $familiares->count(),
+            'emergencias' => $familiares->where('es_contacto_emergencia', true)->count(),
+            'responsable' => $responsable
+                ? trim("{$responsable->nombres} {$responsable->ap_paterno} {$responsable->ap_materno}")
+                : 'No definido',
         ];
     }
 
@@ -504,18 +559,18 @@ class RedApoyoPanel extends Component
     {
         return [
             'tipo' => 'adulto',
-            'nombre' => $adulto->nombre_completo,
+            'nombre_completo' => $adulto->nombre_completo,
             'parentesco' => 'Nodo central',
             'rol' => 'Residente',
             'celular' => $adulto->celular ?: $adulto->telefono ?: 'No registrado',
             'correo' => 'No aplica',
             'direccion' => $adulto->direccion ?: 'No registrada',
+            'edad' => $adulto->fecha_nacimiento ? Carbon::parse($adulto->fecha_nacimiento)->age . ' años' : 'Edad no registrada',
             'estado' => $adulto->estado ?? 'ACTIVO',
             'estado_badge' => $adulto->estado ?? 'ACTIVO',
-            'observaciones' => $adulto->observacion ?: 'Sin observación registrada',
-            'actualizado' => 'Hoy',
-            'responsable' => false,
-            'emergencia' => false,
+            'observacion' => $adulto->observacion ?: 'Sin observación registrada',
+            'responsable_principal' => false,
+            'contacto_emergencia' => false,
         ];
     }
 
