@@ -5,7 +5,10 @@ namespace Tests\Feature;
 use App\Livewire\Cuidados\FichaPaciente;
 use App\Models\AdultoMayor;
 use App\Models\AdministracionMedicacion;
+use App\Models\AsignacionResidenteJornada;
+use App\Models\Jornada;
 use App\Models\Prescripcion;
+use App\Models\TurnoEnfermeria;
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -18,6 +21,7 @@ class TabMedicacionEnfermeriaTest extends TestCase
 
     private User $enfermero;
     private AdultoMayor $adulto;
+    private Jornada $jornada;
 
     protected function setUp(): void
     {
@@ -29,12 +33,37 @@ class TabMedicacionEnfermeriaTest extends TestCase
             'nombres' => 'Laura',
             'ap_paterno' => 'González',
         ]);
-        $this->enfermero->assignRole('SUPERADMINISTRADOR');
+        $this->enfermero->assignRole(['SUPERADMINISTRADOR', 'ENFERMEROS']);
 
         $this->adulto = AdultoMayor::factory()->create([
             'cod_est_adul' => 'EST_001',
             'nombres' => 'María Carmen',
             'ap_paterno' => 'Gómez',
+        ]);
+
+        $turno = TurnoEnfermeria::create([
+            'cod_turno' => 'TUR_PRUEBA_MED',
+            'orden' => 1,
+            'nombre' => 'Turno de prueba medicación',
+            'hora_inicio' => '00:00:00',
+            'hora_fin' => '23:59:59',
+            'estado' => 'ACTIVO',
+        ]);
+        $this->jornada = Jornada::create([
+            'cod_jornada' => 'JOR_PRUEBA_MED',
+            'cod_turno' => $turno->cod_turno,
+            'cod_usuario_apertura' => $this->enfermero->cod_usuario,
+            'fecha_jornada' => today(),
+            'estado' => 'ACTIVA',
+        ]);
+        AsignacionResidenteJornada::create([
+            'cod_asignacion' => 'ARJ_PRUEBA_MED',
+            'cod_residente' => $this->adulto->cod_residente,
+            'cod_jornada' => $this->jornada->cod_jornada,
+            'cod_personal' => $this->enfermero->personal->cod_personal,
+            'nivel_supervision' => 'ESTANDAR',
+            'fecha_hora' => now(),
+            'estado' => 'ACTIVA',
         ]);
 
         $this->actingAs($this->enfermero);
@@ -78,16 +107,16 @@ class TabMedicacionEnfermeriaTest extends TestCase
             'estado' => 'ACTIVO',
         ]);
         AdministracionMedicacion::create([
-            'cod_am' => $this->adulto->cod_am,
-            'cod_med_adulto' => $medAdmin->cod_med_adulto,
-            'fecha' => today()->toDateString(),
-            'hora_programada' => '07:00',
-            'frecuencia' => 'En ayunas',
-            'fecha_inicio' => today()->toDateString(),
-            'hora_real' => '07:02',
-            'administrado' => true,
-            'resultado' => 'ADMINISTRADO',
-            'registrado_por' => $this->enfermero->cod_usu,
+            'cod_prescripcion' => $medAdmin->cod_prescripcion,
+            'cod_horario_prescripcion' => $medAdmin->horarios()->value('cod_horario_prescripcion'),
+            'cod_residente' => $this->adulto->cod_residente,
+            'cod_jornada' => $this->jornada->cod_jornada,
+            'cod_personal' => $this->enfermero->personal->cod_personal,
+            'fecha_hora_programada' => today()->setTime(7, 0),
+            'fecha_hora_administracion' => today()->setTime(7, 2),
+            'resultado' => 'ADMINISTRADA',
+            'dosis_administrada' => 20,
+            'estado' => 'REGISTRADA',
         ]);
 
         // E. Medicamento suspendido
@@ -160,11 +189,11 @@ class TabMedicacionEnfermeriaTest extends TestCase
         // G. Registro directo de administración vía backend
         $test->call('registrarAdministracionDirecta', $medAtrasado->cod_med_adulto, 'ADMINISTRADA', '08:15', 'Toma asistida sin incidencias');
 
-        $this->assertDatabaseHas('administracion_medicacion', [
-            'cod_am' => $this->adulto->cod_am,
-            'cod_med_adulto' => $medAtrasado->cod_med_adulto,
-            'administrado' => true,
-            'resultado' => 'ADMINISTRADO',
+        $this->assertDatabaseHas('administraciones_medicacion', [
+            'cod_residente' => $this->adulto->cod_residente,
+            'cod_prescripcion' => $medAtrasado->cod_prescripcion,
+            'resultado' => 'ADMINISTRADA',
+            'estado' => 'REGISTRADA',
         ]);
     }
 

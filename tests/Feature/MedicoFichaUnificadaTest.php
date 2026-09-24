@@ -44,7 +44,7 @@ class MedicoFichaUnificadaTest extends TestCase
             'via_administracion' => 'ORAL',
             'hora_programada'    => '08:00',
             'fecha_inicio'       => today(),
-            'estado'             => 'ACTIVO',
+            'estado'             => 'ACTIVA',
         ]);
 
         SignoVital::create([

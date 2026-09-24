@@ -7,6 +7,10 @@ use App\Livewire\Medicacion\MedicacionAdultoModal;
 use App\Livewire\Cuidados\PaseTurnoPanel;
 use App\Models\AdultoMayor;
 use App\Models\Alerta;
+use App\Models\Area;
+use App\Models\Atencion;
+use App\Models\HorarioPrescripcion;
+use App\Models\Medicamento;
 use App\Models\AsignacionResidenteJornada;
 use App\Models\Prescripcion;
 use App\Models\AsignacionPersonal;
@@ -35,6 +39,10 @@ class SeguridadCriticaEnfermeriaTest extends TestCase
         parent::setUp();
         Carbon::setTestNow('2026-09-11 10:00:00');
         $this->seed([ RolesAndPermissionsSeeder::class]);
+        Area::firstOrCreate(
+            ['cod_area' => 'ARE_ENF'],
+            ['nombre' => 'Enfermería', 'descripcion' => 'Área clínica de enfermería', 'estado' => 'ACTIVO']
+        );
         $this->enfermero = User::factory()->create(['estado' => 'ACTIVO']);
         $this->enfermero->assignRole('ENFERMEROS');
         \App\Models\Personal::create([
@@ -52,7 +60,7 @@ class SeguridadCriticaEnfermeriaTest extends TestCase
             'hora_fin' => '15:00', 'estado' => 'ACTIVO',
         ]);
         $this->residente = AdultoMayor::factory()->create([
-            'cod_est_adul' => 'EST_001', 'estado_operativo' => 'EN_CENTRO',
+            'cod_est_adul' => 'EST_001',
         ]);
         $this->asignar($this->enfermero, $this->residente, $this->turno);
         $this->actingAs($this->enfermero);
@@ -75,7 +83,7 @@ class SeguridadCriticaEnfermeriaTest extends TestCase
     public function test_mutacion_exige_asignacion_vigente_y_residente_en_centro(): void
     {
         $this->recibir($this->enfermero, $this->turno);
-        $otro = AdultoMayor::factory()->create(['cod_est_adul' => 'EST_001', 'estado_operativo' => 'EN_CENTRO']);
+        $otro = AdultoMayor::factory()->create(['cod_est_adul' => 'EST_001']);
         try {
             app(TurnoEnfermeriaService::class)->autorizarMutacionPaciente($otro, 'seguimiento.crear', $this->enfermero);
             $this->fail('Se autorizó un residente no asignado.');
@@ -83,14 +91,14 @@ class SeguridadCriticaEnfermeriaTest extends TestCase
             $this->assertSame(403, $e->getStatusCode());
         }
 
-        $this->residente->update(['estado_operativo' => 'HOSPITALIZADO']);
+        $this->residente->update(['estado' => 'HOSPITALIZADO']);
         $this->expectException(HttpException::class);
         app(TurnoEnfermeriaService::class)->autorizarMutacionPaciente($this->residente, 'seguimiento.crear', $this->enfermero);
     }
 
     public function test_enfermeria_no_gestiona_ordenes_medicas_aunque_se_le_otorgue_permiso(): void
     {
-        $this->enfermero->givePermissionTo('medicacion.crear');
+        $this->enfermero->givePermissionTo('prescripciones.crear');
         Livewire::test(MedicacionAdultoModal::class)
             ->call('abrirModalMedicacion', $this->residente->cod_am)
             ->assertForbidden();
@@ -99,49 +107,54 @@ class SeguridadCriticaEnfermeriaTest extends TestCase
     public function test_dosis_programada_se_resuelve_en_servidor_y_no_se_duplica(): void
     {
         $this->recibir($this->enfermero, $this->turno);
-        $orden = $this->orden(['hora_programada' => '08:00', 'intervalo_horas' => 12]);
+        $orden = $this->orden(['hora_programada' => '08:00']);
         $servicio = app(RegistrarAdministracionMedicacionService::class);
 
         $this->expectValidationErrors(fn () => $servicio->registrarProgramada(
-            $this->enfermero, $this->residente->cod_am, $orden->cod_med_adulto, '09:37', true
+            $this->enfermero, $this->residente->cod_residente, $orden->cod_prescripcion, '09:37', true
         ));
 
         $registro = $servicio->registrarProgramada(
-            $this->enfermero, $this->residente->cod_am, $orden->cod_med_adulto, '08:00', true
+            $this->enfermero, $this->residente->cod_residente, $orden->cod_prescripcion, '08:00', true
         );
-        $this->assertSame(today()->toDateString(), $registro->fecha->toDateString());
-        $this->assertNotNull($registro->hora_real);
+        $this->assertSame(today()->toDateString(), $registro->fecha_hora_programada->toDateString());
+        $this->assertNotNull($registro->fecha_hora_administracion);
         $this->expectValidationErrors(fn () => $servicio->registrarProgramada(
-            $this->enfermero, $this->residente->cod_am, $orden->cod_med_adulto, '08:00', true
+            $this->enfermero, $this->residente->cod_residente, $orden->cod_prescripcion, '08:00', true
         ));
     }
 
-    public function test_prn_exige_valoracion_intensidad_intervalo_y_programa_reevaluacion(): void
+    public function test_prn_exige_valoracion_e_intensidad_y_conserva_trazabilidad(): void
     {
         $this->recibir($this->enfermero, $this->turno);
         $orden = $this->orden([
-            'es_prn' => true, 'condicion_prn' => 'Dolor agudo referido',
-            'intervalo_horas' => 6, 'hora_programada' => null,
+            'segun_necesidad' => true, 'indicacion' => 'Dolor agudo referido',
+            'hora_programada' => null,
         ]);
         $servicio = app(RegistrarAdministracionMedicacionService::class);
         $registro = $servicio->registrarPrn(
-            $this->enfermero, $this->residente->cod_am, $orden->cod_med_adulto,
+            $this->enfermero, $this->residente->cod_residente, $orden->cod_prescripcion,
             'Dolor lumbar intenso', 'Dolor verificado antes de administrar', 8
         );
-        $this->assertTrue($registro->requiere_reevaluacion);
-        $this->assertNotNull($registro->fecha_hora_reevaluacion);
+        $this->assertSame('ADMINISTRADA', $registro->resultado);
+        $this->assertStringContainsString('Intensidad: 8/10', $registro->observacion);
         $this->expectValidationErrors(fn () => $servicio->registrarPrn(
-            $this->enfermero, $this->residente->cod_am, $orden->cod_med_adulto,
-            'Dolor nuevamente', 'Nueva valoración previa', 7
+            $this->enfermero, $this->residente->cod_residente, $orden->cod_prescripcion,
+            'No', 'Nueva valoración previa', 11
         ));
     }
 
     public function test_alerta_por_id_fuera_del_alcance_es_rechazada(): void
     {
-        $otro = AdultoMayor::factory()->create(['cod_est_adul' => 'EST_001', 'estado_operativo' => 'EN_CENTRO']);
+        $otro = AdultoMayor::factory()->create(['cod_est_adul' => 'EST_001']);
         $alerta = Alerta::create([
-            'cod_am' => $otro->cod_am, 'origen' => 'MANUAL', 'tipo_alerta' => 'RIESGO',
-            'nivel' => 'ALTO', 'motivo' => 'Alerta fuera del ámbito asignado.', 'estado' => 'ABIERTA',
+            'cod_residente' => $otro->cod_residente,
+            'modulo' => 'MANUAL',
+            'tipo' => 'RIESGO',
+            'prioridad' => 'ALTO',
+            'descripcion' => 'Alerta fuera del ámbito asignado.',
+            'fecha_hora' => now(),
+            'estado' => 'ABIERTA',
         ]);
         Livewire::test(AlertasPanel::class)->call('verDetalle', $alerta->cod_alerta)->assertForbidden();
     }
@@ -155,10 +168,10 @@ class SeguridadCriticaEnfermeriaTest extends TestCase
         ]);
         $noEnfermero = User::factory()->create(['estado' => 'ACTIVO']);
         $componente = Livewire::test(PaseTurnoPanel::class)
-            ->set('codAm', $this->residente->cod_am)
+            ->set('codAm', $this->residente->cod_residente)
             ->set('turnoSalienteId', $this->turno->cod_turno)
             ->set('turnoEntranteId', $entrante->cod_turno)
-            ->set('enfermeroEntranteId', $noEnfermero->cod_usu)
+            ->set('enfermeroEntranteId', $noEnfermero->cod_usuario)
             ->set('resumenTurno', 'Residente estable con cuidados completados y vigilancia habitual.')
             ->call('generarPase')
             ->assertHasErrors(['enfermeroEntranteId']);
@@ -166,7 +179,9 @@ class SeguridadCriticaEnfermeriaTest extends TestCase
         $receptor = User::factory()->create(['estado' => 'ACTIVO']);
         $receptor->assignRole('ENFERMEROS');
         $this->asignar($receptor, $this->residente, $entrante);
-        $componente->set('enfermeroEntranteId', $receptor->cod_usu)
+        $receptor->unsetRelation('personal');
+        $receptor->load('personal');
+        $componente->set('enfermeroEntranteId', $receptor->cod_usuario)
             ->call('generarPase')->assertHasNoErrors();
         $this->assertDatabaseHas('pases_turno', [
             'cod_residente' => $this->residente->cod_residente,
@@ -223,12 +238,57 @@ class SeguridadCriticaEnfermeriaTest extends TestCase
 
     private function orden(array $datos = []): Prescripcion
     {
-        return Prescripcion::create(array_merge([
-            'cod_am' => $this->residente->cod_am, 'nombre_medicamento' => 'Paracetamol',
-            'dosis' => '500 mg', 'frecuencia' => 'CADA 12 HORAS', 'es_prn' => false,
-            'via_administracion' => 'ORAL', 'hora_programada' => '08:00',
-            'fecha_inicio' => today(), 'estado' => 'ACTIVO',
+        $hora = $datos['hora_programada'] ?? '08:00';
+        unset($datos['hora_programada']);
+
+        $medicamento = Medicamento::create([
+            'cod_medicamento' => 'MED_' . strtoupper(\Illuminate\Support\Str::random(10)),
+            'nombre_generico' => 'Paracetamol',
+            'nombre_comercial' => 'Paracetamol 500 mg',
+            'concentracion' => '500 mg',
+            'forma_farmaceutica' => 'COMPRIMIDO',
+            'unidad' => 'mg',
+            'via_predeterminada' => 'ORAL',
+            'control_especial' => false,
+            'estado' => 'ACTIVO',
+        ]);
+        $atencion = Atencion::create([
+            'cod_atencion' => 'ATN_' . strtoupper(\Illuminate\Support\Str::random(10)),
+            'cod_residente' => $this->residente->cod_residente,
+            'cod_area' => 'ARE_ENF',
+            'cod_personal' => $this->enfermero->personal->cod_personal,
+            'tipo_atencion' => 'CONTROL_MEDICO',
+            'motivo' => 'Indicación farmacológica de prueba',
+            'fecha_hora' => now(),
+            'estado' => 'COMPLETADA',
+        ]);
+        $prescripcion = Prescripcion::create(array_merge([
+            'cod_prescripcion' => 'PRS_' . strtoupper(\Illuminate\Support\Str::random(10)),
+            'cod_residente' => $this->residente->cod_residente,
+            'cod_atencion' => $atencion->cod_atencion,
+            'cod_medicamento' => $medicamento->cod_medicamento,
+            'cod_personal' => $this->enfermero->personal->cod_personal,
+            'dosis' => 500,
+            'unidad_dosis' => 'mg',
+            'frecuencia' => 'CADA 12 HORAS',
+            'segun_necesidad' => false,
+            'via_administracion' => 'ORAL',
+            'indicacion' => 'Analgesia prescrita',
+            'fecha_hora_prescripcion' => now(),
+            'estado' => 'ACTIVA',
         ], $datos));
+
+        if ($hora) {
+            HorarioPrescripcion::create([
+                'cod_horario_prescripcion' => 'HPR_' . strtoupper(\Illuminate\Support\Str::random(10)),
+                'cod_prescripcion' => $prescripcion->cod_prescripcion,
+                'hora_programada' => $hora,
+                'dosis_programada' => $prescripcion->dosis,
+                'estado' => 'ACTIVO',
+            ]);
+        }
+
+        return $prescripcion;
     }
 
     private function expectValidationErrors(callable $accion): void

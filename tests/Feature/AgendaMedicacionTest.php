@@ -6,7 +6,13 @@ use App\Livewire\Alertas\CampanaNotificaciones;
 use App\Livewire\Medicacion\SaludMedicacionPanel;
 use App\Models\AdministracionMedicacion;
 use App\Models\AdultoMayor;
+use App\Models\Area;
+use App\Models\Atencion;
+use App\Models\HorarioPrescripcion;
+use App\Models\Jornada;
+use App\Models\Medicamento;
 use App\Models\Prescripcion;
+use App\Models\Turno;
 use App\Models\User;
 use App\Services\Medicacion\AgendaMedicacionService;
 use Carbon\Carbon;
@@ -21,14 +27,49 @@ class AgendaMedicacionTest extends TestCase
 
     private User $usuario;
     private AdultoMayor $adulto;
+    private Atencion $atencion;
+    private Jornada $jornada;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->seed([ RolesAndPermissionsSeeder::class]);
-        $this->usuario = User::factory()->create(['estado' => 'ACTIVO']);
-        $this->usuario->assignRole('SUPERADMINISTRADOR');
-        $this->adulto = AdultoMayor::factory()->create(['cod_est_adul' => 'EST_001']);
+        $this->seed([RolesAndPermissionsSeeder::class]);
+        $this->usuario = User::factory()->create([
+            'nombres' => 'Mario',
+            'ap_paterno' => 'Médico',
+            'estado' => 'ACTIVO',
+        ]);
+        $this->usuario->assignRole('MEDICO GENERAL/GERIATRA');
+        $this->adulto = AdultoMayor::factory()->create(['estado' => 'ADMITIDO']);
+
+        $area = Area::query()->create([
+            'cod_area' => 'ARE_MED',
+            'nombre' => 'Atención médica',
+            'estado' => 'ACTIVA',
+        ]);
+        $this->atencion = Atencion::query()->create([
+            'cod_atencion' => 'ATE_AGENDA',
+            'cod_residente' => $this->adulto->cod_residente,
+            'cod_area' => $area->cod_area,
+            'cod_personal' => $this->usuario->personal->cod_personal,
+            'tipo_atencion' => 'CONSULTA',
+            'fecha_hora' => now(),
+            'estado' => 'FINALIZADA',
+        ]);
+        $turno = Turno::query()->create([
+            'cod_turno' => 'TUR_AGENDA',
+            'nombre' => 'Mañana',
+            'hora_inicio' => '07:00',
+            'hora_cierre' => '15:00',
+            'orden' => 1,
+            'estado' => 'ACTIVO',
+        ]);
+        $this->jornada = Jornada::query()->create([
+            'cod_jornada' => 'JOR_AGENDA',
+            'cod_turno' => $turno->cod_turno,
+            'fecha_jornada' => '2026-09-10',
+            'estado' => 'ABIERTA',
+        ]);
         $this->actingAs($this->usuario);
     }
 
@@ -54,12 +95,11 @@ class AgendaMedicacionTest extends TestCase
             ->call('guardarNuevoMedicamento')
             ->assertHasNoErrors();
 
-        $this->assertDatabaseHas('prescripciones', [
-            'cod_am' => $this->adulto->cod_am,
-            'nombre_medicamento' => 'Losartán',
-            'hora_programada' => '08:00',
-        ]);
-        $this->assertDatabaseCount('administracion_medicacion', 0);
+        $prescripcion = Prescripcion::query()->with(['medicamento', 'horarios'])->sole();
+        $this->assertSame($this->adulto->cod_residente, $prescripcion->cod_residente);
+        $this->assertSame('LOSARTÁN', $prescripcion->medicamento->nombre_generico);
+        $this->assertSame('08:00', substr((string) $prescripcion->horarios->sole()->hora_programada, 0, 5));
+        $this->assertDatabaseCount('administraciones_medicacion', 0);
     }
 
     public function test_agenda_cambia_de_proxima_a_administrada_segun_el_registro_real(): void
@@ -71,13 +111,16 @@ class AgendaMedicacionTest extends TestCase
         $this->assertSame('PROXIMA', $agenda->first()['estado']);
 
         AdministracionMedicacion::create([
-            'cod_med_adulto' => $medicacion->cod_med_adulto,
-            'cod_am' => $this->adulto->cod_am,
-            'fecha' => '2026-09-10',
-            'hora_programada' => '08:00',
-            'hora_real' => '07:35',
-            'administrado' => true,
-            'registrado_por' => $this->usuario->cod_usu,
+            'cod_administracion' => 'ADM_AGENDA',
+            'cod_prescripcion' => $medicacion->cod_prescripcion,
+            'cod_horario_prescripcion' => $medicacion->horarios()->value('cod_horario_prescripcion'),
+            'cod_residente' => $this->adulto->cod_residente,
+            'cod_jornada' => $this->jornada->cod_jornada,
+            'cod_personal' => $this->usuario->personal->cod_personal,
+            'fecha_hora_programada' => '2026-09-10 08:00:00',
+            'fecha_hora_administracion' => '2026-09-10 07:35:00',
+            'resultado' => 'ADMINISTRADA',
+            'estado' => 'FINALIZADO',
         ]);
 
         $agenda = app(AgendaMedicacionService::class)->paraAdulto($this->adulto->cod_am);
@@ -96,11 +139,20 @@ class AgendaMedicacionTest extends TestCase
             ->assertSee('Programada: 08:00');
     }
 
-    public function test_frecuencia_cada_ocho_horas_genera_todos_los_horarios_del_dia(): void
+    public function test_varios_horarios_v2_generan_todas_las_dosis_del_dia(): void
     {
         Carbon::setTestNow('2026-09-10 07:30:00');
         $medicacion = $this->crearMedicacion('08:00');
         $medicacion->update(['frecuencia' => 'Cada 8 horas']);
+        foreach (['00:00', '16:00'] as $indice => $hora) {
+            HorarioPrescripcion::query()->create([
+                'cod_horario_prescripcion' => 'HPR_EXTRA_'.$indice,
+                'cod_prescripcion' => $medicacion->cod_prescripcion,
+                'hora_programada' => $hora,
+                'dosis_programada' => 50,
+                'estado' => 'ACTIVO',
+            ]);
+        }
 
         $agenda = app(AgendaMedicacionService::class)->paraAdulto($this->adulto->cod_am);
 
@@ -110,16 +162,32 @@ class AgendaMedicacionTest extends TestCase
 
     private function crearMedicacion(string $hora): Prescripcion
     {
-        return Prescripcion::create([
-            'cod_am' => $this->adulto->cod_am,
-            'nombre_medicamento' => 'Losartán',
-            'dosis' => '50 mg',
+        $medicamento = Medicamento::query()->firstOrCreate(
+            ['cod_medicamento' => 'MED_AGENDA'],
+            ['nombre_generico' => 'Losartán', 'control_especial' => false, 'estado' => 'ACTIVO'],
+        );
+        $prescripcion = Prescripcion::query()->create([
+            'cod_prescripcion' => 'PRE_AGENDA',
+            'cod_residente' => $this->adulto->cod_residente,
+            'cod_atencion' => $this->atencion->cod_atencion,
+            'cod_medicamento' => $medicamento->cod_medicamento,
+            'cod_personal' => $this->usuario->personal->cod_personal,
+            'dosis' => 50,
+            'unidad_dosis' => 'mg',
             'frecuencia' => 'Cada 24 horas',
             'via_administracion' => 'ORAL',
-            'hora_programada' => $hora,
-            'fecha_inicio' => '2026-09-01',
             'estado' => 'ACTIVA',
-            'registrado_por' => $this->usuario->cod_usu,
+            'segun_necesidad' => false,
+            'fecha_hora_prescripcion' => '2026-09-01 08:00:00',
         ]);
+        HorarioPrescripcion::query()->create([
+            'cod_horario_prescripcion' => 'HPR_AGENDA',
+            'cod_prescripcion' => $prescripcion->cod_prescripcion,
+            'hora_programada' => $hora,
+            'dosis_programada' => 50,
+            'estado' => 'ACTIVO',
+        ]);
+
+        return $prescripcion;
     }
 }

@@ -7,6 +7,7 @@ use App\Livewire\Cuidados\RegistrosEnfermeria;
 use App\Livewire\Cuidados\ReporteEnfermeria;
 use App\Models\AdministracionMedicacion;
 use App\Models\AdultoMayor;
+use App\Models\Area;
 use App\Models\AreaInstitucional;
 use App\Models\AsignacionPersonal;
 use App\Models\AsignacionResidenteJornada;
@@ -69,12 +70,15 @@ class EnfermeriaV2CorreccionCriticaTest extends TestCase
             'fecha_jornada' => today(),
             'estado' => 'ABIERTA',
         ]);
-        $area = AreaInstitucional::first();
+        $area = Area::query()->firstOrCreate(
+            ['cod_area' => 'ARE_CRIT_TEST'],
+            ['nombre' => 'Enfermería crítica', 'estado' => 'ACTIVA'],
+        );
         AsignacionPersonal::query()->create([
             'cod_asignacion_personal' => 'ASP_CRIT_TEST',
             'cod_jornada' => $jornada->cod_jornada,
             'cod_personal' => $personal->cod_personal,
-            'cod_area' => $area?->cod_area ?: 'ARE_0001',
+            'cod_area' => $area->cod_area,
             'funcion' => 'ENFERMERO',
             'tipo_asignacion' => 'TURNO',
             'fecha_asignacion' => today(),

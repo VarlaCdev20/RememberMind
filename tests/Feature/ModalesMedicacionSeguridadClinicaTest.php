@@ -6,10 +6,13 @@ use App\Livewire\Medicacion\SaludAdministracionMedicacionPanel;
 use App\Models\AdultoMayor;
 use App\Models\AdministracionMedicacion;
 use App\Models\Area;
+use App\Models\AsignacionResidenteJornada;
 use App\Models\Atencion;
 use App\Models\HorarioPrescripcion;
+use App\Models\Jornada;
 use App\Models\Medicamento;
 use App\Models\Prescripcion;
+use App\Models\TurnoEnfermeria;
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -33,15 +36,38 @@ class ModalesMedicacionSeguridadClinicaTest extends TestCase
             'estado' => 'ACTIVO',
             'nombres' => 'Elena',
             'ap_paterno' => 'Vargas',
-            'profesion' => 'ENFERMERO',
         ]);
-        $this->enfermero->assignRole('SUPERADMINISTRADOR');
+        $this->enfermero->assignRole('ENFERMEROS');
 
         $this->adulto = AdultoMayor::factory()->create([
             'cod_est_adul' => 'EST_001',
             'nombres' => 'Mario',
             'ap_paterno' => 'Gutierrez',
             'ap_materno' => 'Mendoza',
+        ]);
+
+        $turno = TurnoEnfermeria::create([
+            'cod_turno' => 'TUR_TEST_MED',
+            'nombre' => 'Turno clínico',
+            'orden' => 1,
+            'hora_inicio' => '00:00:00',
+            'hora_fin' => '23:59:59',
+            'estado' => 'ACTIVO',
+        ]);
+        $jornada = Jornada::create([
+            'cod_jornada' => 'JOR_TEST_MED',
+            'cod_turno' => $turno->cod_turno,
+            'fecha_jornada' => today(),
+            'estado' => 'ABIERTA',
+        ]);
+        AsignacionResidenteJornada::create([
+            'cod_asignacion' => 'ARJ_TEST_MED',
+            'cod_residente' => $this->adulto->cod_residente,
+            'cod_jornada' => $jornada->cod_jornada,
+            'cod_personal' => $this->enfermero->personal->cod_personal,
+            'nivel_supervision' => 'DIRECTA',
+            'fecha_hora' => now(),
+            'estado' => 'ACTIVA',
         ]);
 
         Area::firstOrCreate(
@@ -142,9 +168,16 @@ class ModalesMedicacionSeguridadClinicaTest extends TestCase
     {
         Livewire::test(SaludAdministracionMedicacionPanel::class, ['adulto' => $this->adulto])
             ->call('abrirModalAdministrar', $this->prescripcion->cod_prescripcion, '08:00', $this->adulto->cod_residente)
+            ->assertSet('esModoConsulta', false)
+            ->assertSet('formDosisPrescritaValor', '50')
             ->set('formDosisAdministrada', '25') // Difiere de los 50 prescritos
+            ->assertSet('formDosisAdministrada', '25')
+            ->assertSet('formDosisPrescritaValor', '50')
+            ->assertSet('selectedPrescripcionId', $this->prescripcion->cod_prescripcion)
             ->set('formObservacionAdmin', '')   // Sin justificación
+            ->assertSet('selectedPrescripcionId', $this->prescripcion->cod_prescripcion)
             ->call('guardarAdministracion')
+            ->assertSet('modalAdministrarAbierto', true)
             ->assertHasErrors(['formObservacionAdmin'])
             ->set('formObservacionAdmin', 'Reducción de dosis por PA baja 90/60 según indicación médica verbal.')
             ->call('guardarAdministracion')

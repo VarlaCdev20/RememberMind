@@ -550,7 +550,7 @@ class MiTurnoAuditoriaCierreTest extends TestCase
      * - informar inconsistencia;
      * - no inventar ubicación.
      */
-    public function test_punto_4_ocupacion_con_dos_camas_activas_informa_inconsistencia(): void
+    public function test_punto_4_la_bdd_impide_dos_camas_activas_para_un_residente(): void
     {
         $hab1 = Habitacion::create([
             'cod_habitacion' => 'HAB_INC_1',
@@ -599,7 +599,8 @@ class MiTurnoAuditoriaCierreTest extends TestCase
             'estado' => 'ACTIVA',
         ]);
 
-        // Simular inconsistencia en BDD insertando una segunda ocupación activa directa
+        // La garantía física evita que incluso un INSERT directo cree la inconsistencia.
+        $this->expectException(\Illuminate\Database\QueryException::class);
         \Illuminate\Support\Facades\DB::table('ocupaciones_cama')->insert([
             'cod_ocupacion' => 'OCU_INC_2',
             'cod_admision' => $admision->cod_admision,
@@ -609,16 +610,6 @@ class MiTurnoAuditoriaCierreTest extends TestCase
             'cod_cama' => $cama2->cod_cama,
             'estado' => 'ACTIVA',
         ]);
-
-        $residenteFreshed = Residente::with('ocupacionesCama.cama.habitacion')->find($this->residente1->cod_residente);
-        $textoUbicacion = $this->service->formatearUbicacion($residenteFreshed);
-
-        // No debe escoger una de las dos camas arbitrariamente
-        $this->assertStringNotContainsString('CAMA-201A', $textoUbicacion);
-        $this->assertStringNotContainsString('CAMA-202B', $textoUbicacion);
-
-        // Debe informar la inconsistencia explícitamente
-        $this->assertEquals('Inconsistencia de asignación de cama', $textoUbicacion);
     }
 
     /**

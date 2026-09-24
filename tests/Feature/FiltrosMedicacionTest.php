@@ -53,8 +53,8 @@ class FiltrosMedicacionTest extends TestCase
             ->assertSet('filtroKardexEstado', 'RETRASADA')
             ->assertSee('Filtros activos:')
             ->assertSee('Estado: Retrasadas')
-            ->assertSee('coincidencias')
-            ->assertSee('Restablecer todo')
+            ->assertSee('coincidentes')
+            ->assertSee('Limpiar filtros')
             // Limpiar chip individual
             ->call('limpiarFiltro', 'filtroKardexEstado')
             ->assertSet('filtroKardexEstado', '')
@@ -82,8 +82,8 @@ class FiltrosMedicacionTest extends TestCase
             ->assertSet('filtroHistorialResultado', 'ADMINISTRADA')
             ->assertSee('Filtros activos:')
             ->assertSee('Resultado: Administrada')
-            ->assertSee('coincidencias')
-            ->assertSee('Restablecer todo')
+            ->assertSee('coincidentes')
+            ->assertSee('Limpiar filtros')
             // Limpiar chip individual
             ->call('limpiarFiltro', 'filtroHistorialResultado')
             ->assertSet('filtroHistorialResultado', '')

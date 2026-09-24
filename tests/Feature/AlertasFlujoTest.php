@@ -4,6 +4,7 @@ namespace Tests\Feature;
 use App\Livewire\Alertas\AlertasPanel;
 use App\Models\{AdultoMayor, Alerta, User, SignoVital, Atencion};
 use App\Services\Alertas\DeteccionAlertasService;
+use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use Spatie\Permission\Models\Permission;
@@ -16,7 +17,7 @@ class AlertasFlujoTest extends TestCase
     private function preparar(array $permisos): array
     {
         $this->seed(RolesAndPermissionsSeeder::class);
-        $user = User::factory()->create();
+        $user = User::factory()->create(['nombres' => 'Ana', 'ap_paterno' => 'Profesional']);
         foreach ($permisos as $p) $user->givePermissionTo(Permission::findOrCreate($p, 'web'));
         $this->actingAs($user);
         return [$user, AdultoMayor::factory()->create(['cod_est_adul' => 'EST_001'])];
@@ -24,7 +25,7 @@ class AlertasFlujoTest extends TestCase
 
     public function test_registrar_asignar_atender_agregar_accion_cerrar_y_consultar_historial(): void
     {
-        [$user, $adulto] = $this->preparar(['alertas.ver', 'alertas.crear', 'alertas.atender', 'alertas.cerrar', 'alertas.gestionar']);
+        [$user, $adulto] = $this->preparar(['alertas.ver', 'alertas.gestionar']);
         $this->get(route('admin.enfermeria.alertas'))->assertOk()->assertSee('Detectar pendientes');
         $panel = Livewire::test(AlertasPanel::class)->call('abrirCrear')
             ->set('codAm', $adulto->cod_am)->set('tipoAlerta', 'Revisión requerida')
@@ -41,25 +42,32 @@ class AlertasFlujoTest extends TestCase
             ->call('confirmarCierre')->assertHasNoErrors()->set('filtroEstado', 'CERRADA')
             ->call('verDetalle', $alerta->cod_alerta)->assertSee('Se informa al equipo responsable.');
         $this->assertSame('CERRADA', $alerta->fresh()->estado);
-        $this->assertSame(4, $alerta->acciones()->count());
-        $this->assertSame($user->cod_usu, $alerta->fresh()->cerrado_por);
+        $this->assertSame(4, $alerta->eventos()->count());
+        $this->assertSame($user->cod_usuario, $alerta->eventos()->latest('fecha_hora')->value('cod_usuario'));
         $panel->set('accion', 'Intento de cambiar el historial.')->call('guardarAccion')->assertStatus(409);
-        $this->assertSame(4, $alerta->acciones()->count());
+        $this->assertSame(4, $alerta->eventos()->count());
     }
 
     public function test_lectura_no_permite_mutar_y_los_filtros_no_mezclan_estados(): void
     {
         [, $adulto] = $this->preparar(['alertas.ver']);
-        Alerta::create(['cod_am' => $adulto->cod_am, 'origen' => 'MANUAL', 'tipo_alerta' => 'CERRADA ESPECIAL', 'motivo' => 'Seguimiento concluido', 'estado' => 'CERRADA']);
+        Alerta::create(['cod_residente' => $adulto->cod_residente, 'modulo' => 'MANUAL', 'tipo' => 'CERRADA ESPECIAL', 'descripcion' => 'Seguimiento concluido', 'estado' => 'CERRADA']);
         Livewire::test(AlertasPanel::class)->set('search', $adulto->nombres)->assertDontSee('CERRADA ESPECIAL')
             ->call('abrirCrear')->assertForbidden();
     }
 
     public function test_detecta_signos_y_seguimiento_sin_duplicar_ni_reabrir_alertas_cerradas(): void
     {
-        [, $adulto] = $this->preparar(['alertas.ver', 'alertas.crear']);
-        SignoVital::create(['cod_am' => $adulto->cod_am, 'fecha' => today(), 'hora' => '10:00:00', 'saturacion' => 85, 'estado' => 'VIGENTE']);
-        $this->assertDatabaseHas('alertas', ['cod_am' => $adulto->cod_am, 'origen' => 'SIGNOS', 'nivel' => 'CRITICO']);
+        [$user, $adulto] = $this->preparar(['alertas.ver', 'alertas.gestionar']);
+        SignoVital::create([
+            'cod_residente' => $adulto->cod_residente,
+            'cod_personal' => $user->personal->cod_personal,
+            'fecha_hora' => today()->setTime(10, 0),
+            'saturacion_oxigeno' => 85,
+            'estado' => 'VIGENTE',
+        ]);
+        $this->assertSame(1, app(DeteccionAlertasService::class)->detectar());
+        $this->assertDatabaseHas('alertas', ['cod_residente' => $adulto->cod_residente, 'modulo' => 'SIGNOS', 'prioridad' => 'CRITICO']);
         $alerta = Alerta::sole();
         $alerta->update(['estado' => 'CERRADA']);
         $this->assertSame(0, app(DeteccionAlertasService::class)->detectar());
@@ -71,10 +79,10 @@ class AlertasFlujoTest extends TestCase
     {
         [, $adulto] = $this->preparar(['alertas.ver']);
         $alerta = Alerta::create([
-            'cod_am' => $adulto->cod_am,
-            'origen' => 'MANUAL',
-            'tipo_alerta' => 'REVISION',
-            'motivo' => 'Monitoreo de prueba',
+            'cod_residente' => $adulto->cod_residente,
+            'modulo' => 'MANUAL',
+            'tipo' => 'REVISION',
+            'descripcion' => 'Monitoreo de prueba',
             'estado' => 'ABIERTA',
         ]);
 
@@ -89,12 +97,12 @@ class AlertasFlujoTest extends TestCase
 
     public function test_cerrar_exige_observacion_valida_y_rechaza_textos_triviales(): void
     {
-        [$user, $adulto] = $this->preparar(['alertas.ver', 'alertas.cerrar']);
+        [$user, $adulto] = $this->preparar(['alertas.ver', 'alertas.gestionar']);
         $alerta = Alerta::create([
-            'cod_am' => $adulto->cod_am,
-            'origen' => 'MANUAL',
-            'tipo_alerta' => 'EVALUACION',
-            'motivo' => 'Monitoreo para cierre asistencial',
+            'cod_residente' => $adulto->cod_residente,
+            'modulo' => 'MANUAL',
+            'tipo' => 'EVALUACION',
+            'descripcion' => 'Monitoreo para cierre asistencial',
             'estado' => 'ABIERTA',
         ]);
 
@@ -130,8 +138,8 @@ class AlertasFlujoTest extends TestCase
         $this->assertDatabaseHas('alertas', [
             'cod_alerta' => $alerta->cod_alerta,
             'estado' => 'CERRADA',
-            'cerrado_por' => $user->cod_usu,
         ]);
+        $this->assertSame($user->cod_usuario, $alerta->eventos()->latest('fecha_hora')->value('cod_usuario'));
         $this->assertSame('CERRADA', $alerta->fresh()->estado);
     }
 

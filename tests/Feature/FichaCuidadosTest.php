@@ -4,8 +4,13 @@ namespace Tests\Feature;
 
 use App\Livewire\Cuidados\FichaPaciente;
 use App\Models\AdultoMayor;
+use App\Models\Area;
 use App\Models\Cama;
 use App\Models\Habitacion;
+use App\Models\IntervencionCuidado;
+use App\Models\Jornada;
+use App\Models\PlanCuidado;
+use App\Models\Turno;
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -104,6 +109,44 @@ class FichaCuidadosTest extends TestCase
 
     public function test_drawer_de_detalle_de_cuidado_y_registro_directo(): void
     {
+        $area = Area::query()->create([
+            'cod_area' => 'ARE_CUIDADOS',
+            'nombre' => 'Cuidados de enfermería',
+            'estado' => 'ACTIVA',
+        ]);
+        $plan = PlanCuidado::query()->create([
+            'cod_plan' => 'PLC_FICHA',
+            'cod_residente' => $this->adulto->cod_residente,
+            'cod_area' => $area->cod_area,
+            'cod_personal' => $this->enfermero->personal->cod_personal,
+            'tipo_plan' => 'ENFERMERIA',
+            'nombre' => 'Plan de movilidad',
+            'objetivo_general' => 'Mantener la movilidad segura.',
+            'fecha_hora_apertura' => now(),
+            'estado' => 'ACTIVO',
+        ]);
+        IntervencionCuidado::query()->create([
+            'cod_intervencion' => 'INT_FICHA',
+            'cod_plan' => $plan->cod_plan,
+            'nombre' => 'Movilización asistida',
+            'descripcion' => 'Deambulación asistida y segura.',
+            'estado' => 'ACTIVA',
+        ]);
+        $turno = Turno::query()->create([
+            'cod_turno' => 'TUR_FICHA',
+            'nombre' => 'Turno completo',
+            'hora_inicio' => '00:00',
+            'hora_cierre' => '23:59',
+            'orden' => 1,
+            'estado' => 'ACTIVO',
+        ]);
+        Jornada::query()->create([
+            'cod_jornada' => 'JOR_FICHA',
+            'cod_turno' => $turno->cod_turno,
+            'fecha_jornada' => today(),
+            'estado' => 'ABIERTA',
+        ]);
+
         $component = Livewire::test(FichaPaciente::class, ['adulto' => $this->adulto->cod_am])
             ->call('cambiarTab', 'cuidados')
             ->assertSee('PANEL LATERAL DE CONSULTA')

@@ -9,7 +9,12 @@ use App\Livewire\Medicacion\MedicacionAdultoModal;
 use App\Livewire\Medicacion\SaludMedicacionPanel;
 use App\Models\AdultoMayor;
 use App\Models\Alerta;
+use App\Models\Area;
 use App\Models\AsignacionResidenteJornada;
+use App\Models\Atencion;
+use App\Models\HorarioPrescripcion;
+use App\Models\Jornada;
+use App\Models\Medicamento;
 use App\Models\Prescripcion;
 use App\Models\TurnoEnfermeria;
 use App\Models\User;
@@ -41,10 +46,19 @@ class SuperadminEnfermeriaSupervisionTest extends TestCase
 
         $this->superadmin = User::factory()->create(['estado' => 'ACTIVO']);
         $this->superadmin->assignRole('SUPERADMINISTRADOR');
-        $this->enfermeroUno = User::factory()->create(['estado' => 'ACTIVO']);
+        $this->enfermeroUno = User::factory()->create([
+            'estado' => 'ACTIVO', 'nombres' => 'Enfermera Uno', 'ap_paterno' => 'Prueba',
+        ]);
         $this->enfermeroUno->assignRole('ENFERMEROS');
-        $this->enfermeroDos = User::factory()->create(['estado' => 'ACTIVO']);
+        $this->enfermeroDos = User::factory()->create([
+            'estado' => 'ACTIVO', 'nombres' => 'Enfermera Dos', 'ap_paterno' => 'Prueba',
+        ]);
         $this->enfermeroDos->assignRole('ENFERMEROS');
+
+        Area::create([
+            'cod_area' => 'ARE_ENF_SUP', 'nombre' => 'Enfermería',
+            'descripcion' => 'Área clínica de supervisión', 'estado' => 'ACTIVO',
+        ]);
 
         $this->turnoManana = TurnoEnfermeria::create([
             'orden' => 1, 'nombre' => 'Mañana', 'hora_inicio' => '07:00', 'hora_fin' => '15:00', 'estado' => 'ACTIVO',
@@ -63,19 +77,64 @@ class SuperadminEnfermeriaSupervisionTest extends TestCase
         $this->asignar($this->residenteUno, $this->enfermeroUno, $this->turnoManana);
         $this->asignar($this->residenteDos, $this->enfermeroDos, $this->turnoNoche);
 
-        foreach ([$this->residenteUno, $this->residenteDos] as $residente) {
-            Prescripcion::create([
-                'cod_am' => $residente->cod_am,
-                'nombre_medicamento' => $residente->is($this->residenteUno) ? 'Losartán' : 'Metformina',
-                'dosis' => '1 comprimido', 'frecuencia' => 'DIARIA', 'via_administracion' => 'ORAL',
-                'hora_programada' => '08:00', 'fecha_inicio' => today(), 'estado' => 'ACTIVO',
+        foreach ([$this->residenteUno, $this->residenteDos] as $indice => $residente) {
+            $nombre = $residente->is($this->residenteUno) ? 'Losartán' : 'Metformina';
+            $personal = $residente->is($this->residenteUno)
+                ? $this->enfermeroUno->personal
+                : $this->enfermeroDos->personal;
+            $medicamento = Medicamento::create([
+                'cod_medicamento' => 'MED_SUP_'.$indice,
+                'nombre_generico' => $nombre,
+                'nombre_comercial' => $nombre,
+                'concentracion' => '1 comprimido',
+                'forma_farmaceutica' => 'COMPRIMIDO',
+                'unidad' => 'comprimido',
+                'via_predeterminada' => 'ORAL',
+                'control_especial' => false,
+                'estado' => 'ACTIVO',
+            ]);
+            $atencion = Atencion::create([
+                'cod_atencion' => 'ATN_SUP_'.$indice,
+                'cod_residente' => $residente->cod_residente,
+                'cod_area' => 'ARE_ENF_SUP',
+                'cod_personal' => $personal->cod_personal,
+                'tipo_atencion' => 'CONTROL_MEDICO',
+                'motivo' => 'Prescripción de supervisión',
+                'fecha_hora' => now(),
+                'estado' => 'COMPLETADA',
+            ]);
+            $prescripcion = Prescripcion::create([
+                'cod_prescripcion' => 'PRS_SUP_'.$indice,
+                'cod_residente' => $residente->cod_residente,
+                'cod_atencion' => $atencion->cod_atencion,
+                'cod_medicamento' => $medicamento->cod_medicamento,
+                'cod_personal' => $personal->cod_personal,
+                'dosis' => 1,
+                'unidad_dosis' => 'comprimido',
+                'frecuencia' => 'DIARIA',
+                'via_administracion' => 'ORAL',
+                'indicacion' => 'Control diario',
+                'segun_necesidad' => false,
+                'fecha_hora_prescripcion' => now(),
+                'estado' => 'ACTIVA',
+            ]);
+            HorarioPrescripcion::create([
+                'cod_horario_prescripcion' => 'HPR_SUP_'.$indice,
+                'cod_prescripcion' => $prescripcion->cod_prescripcion,
+                'hora_programada' => '08:00:00',
+                'dosis_programada' => 1,
+                'estado' => 'ACTIVO',
             ]);
         }
 
         Alerta::create([
-            'cod_am' => $this->residenteDos->cod_am, 'origen' => 'SIGNOS',
-            'tipo_alerta' => 'SATURACIÓN BAJA', 'nivel' => 'CRITICO',
-            'motivo' => 'Control global requerido.', 'estado' => 'ABIERTA',
+            'cod_residente' => $this->residenteDos->cod_residente,
+            'modulo' => 'SIGNOS',
+            'tipo' => 'SATURACIÓN BAJA',
+            'prioridad' => 'CRITICO',
+            'descripcion' => 'Control global requerido.',
+            'fecha_hora' => now(),
+            'estado' => 'ABIERTA',
         ]);
     }
 
@@ -138,7 +197,8 @@ class SuperadminEnfermeriaSupervisionTest extends TestCase
 
         $this->assertNotNull($seccion);
         $rutas = collect($seccion['items'])->pluck('route');
-        $this->assertContains('admin.enfermeria.dashboard', $rutas);
+        $todasLasRutas = collect($sidebar)->flatMap(fn (array $item) => collect($item['items'] ?? [])->pluck('route'));
+        $this->assertSame(1, $todasLasRutas->filter(fn ($ruta) => $ruta === 'admin.enfermeria.dashboard')->count());
         $this->assertContains('admin.enfermeria.agenda', $rutas);
         $this->assertContains('admin.salud-seguimiento.medicacion.index', $rutas);
         $this->assertContains('admin.salud-seguimiento.administracion.index', $rutas);
@@ -150,18 +210,18 @@ class SuperadminEnfermeriaSupervisionTest extends TestCase
     public function test_enfermeria_puede_administrar_pero_no_crear_ni_modificar_ordenes_medicas(): void
     {
         $this->actingAs($this->enfermeroUno);
-        $medicacion = Prescripcion::where('cod_am', $this->residenteUno->cod_am)->firstOrFail();
+        $medicacion = Prescripcion::where('cod_residente', $this->residenteUno->cod_residente)->firstOrFail();
 
-        $this->assertTrue($this->enfermeroUno->can('administracion_medicacion.registrar'));
-        $this->assertFalse($this->enfermeroUno->can('medicacion.crear'));
-        $this->assertFalse($this->enfermeroUno->can('salud.medicacion.editar'));
+        $this->assertTrue($this->enfermeroUno->can('administraciones_medicacion.crear'));
+        $this->assertFalse($this->enfermeroUno->can('prescripciones.crear'));
+        $this->assertFalse($this->enfermeroUno->can('prescripciones.editar'));
 
         Livewire::test(SaludMedicacionPanel::class)
             ->call('toggleFormularioCrear')
             ->assertForbidden();
 
         Livewire::test(SaludMedicacionPanel::class)
-            ->call('suspenderMedicamento', $medicacion->cod_med_adulto)
+            ->call('suspenderMedicamento', $medicacion->cod_prescripcion)
             ->assertForbidden();
 
         Livewire::test(MedicacionAdultoModal::class)
@@ -169,18 +229,26 @@ class SuperadminEnfermeriaSupervisionTest extends TestCase
             ->assertForbidden();
 
         $this->assertDatabaseHas('prescripciones', [
-            'cod_med_adulto' => $medicacion->cod_med_adulto,
-            'estado' => 'ACTIVO',
+            'cod_prescripcion' => $medicacion->cod_prescripcion,
+            'estado' => 'ACTIVA',
         ]);
     }
 
     private function asignar(AdultoMayor $residente, User $enfermero, TurnoEnfermeria $turno): void
     {
+        $jornada = Jornada::firstOrCreate(
+            ['cod_turno' => $turno->cod_turno, 'fecha_jornada' => today()],
+            ['cod_jornada' => 'JOR_'.$turno->cod_turno, 'estado' => 'ABIERTA'],
+        );
         AsignacionResidenteJornada::create([
-            'cod_am' => $residente->cod_am, 'cod_turno' => $turno->cod_turno,
-            'cod_usu_enfermero' => $enfermero->cod_usu, 'fecha_inicio' => today(),
-            'nivel_supervision' => 'ESTANDAR', 'estado' => 'ACTIVA',
-            'motivo_asignacion' => 'Cobertura de prueba', 'asignado_por' => $this->superadmin->cod_usu,
+            'cod_asignacion' => 'ARJ_'.$residente->cod_residente,
+            'cod_residente' => $residente->cod_residente,
+            'cod_jornada' => $jornada->cod_jornada,
+            'cod_personal' => $enfermero->personal->cod_personal,
+            'nivel_supervision' => 'ESTANDAR',
+            'fecha_hora' => now(),
+            'estado' => 'ACTIVA',
+            'observacion' => 'Cobertura de prueba',
         ]);
     }
 }

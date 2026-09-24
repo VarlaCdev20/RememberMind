@@ -6,6 +6,7 @@ use App\Livewire\Cuidados\AgendaEnfermeria;
 use App\Livewire\Cuidados\FichaPaciente;
 use App\Livewire\Cuidados\RegistrosEnfermeria;
 use App\Models\Alerta;
+use App\Models\Area;
 use App\Models\AsignacionPersonal;
 use App\Models\AsignacionResidenteJornada;
 use App\Models\CuracionHerida;
@@ -78,12 +79,15 @@ class ModuloEnfermeriaIntegralTest extends TestCase
             'estado' => 'ABIERTA',
         ]);
 
-        $area = \App\Models\AreaInstitucional::first();
+        $area = Area::firstOrCreate(
+            ['cod_area' => 'ARE_TEST_INT'],
+            ['nombre' => 'Enfermería integral', 'descripcion' => 'Área clínica de prueba', 'estado' => 'ACTIVO']
+        );
         AsignacionPersonal::create([
             'cod_asignacion_personal' => 'ASP_TEST_INT',
             'cod_jornada' => $this->jornada->cod_jornada,
             'cod_personal' => $this->personal->cod_personal,
-            'cod_area' => $area?->cod_area ?: 'ARE_0001',
+            'cod_area' => $area->cod_area,
             'funcion' => 'ENFERMERO',
             'tipo_asignacion' => 'TURNO',
             'fecha_asignacion' => today(),

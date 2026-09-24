@@ -206,9 +206,10 @@ class TurnoCompletoEnfermeroTest extends TestCase
             ->call('guardarSignos')
             ->assertHasNoErrors();
 
-        $this->assertDatabaseHas('signos_vitales_adulto', [
-            'cod_am' => $pacienteAsignado->cod_am,
-            'presion_arterial' => '135/85',
+        $this->assertDatabaseHas('signos_vitales', [
+            'cod_residente' => $pacienteAsignado->cod_residente,
+            'presion_sistolica' => 135,
+            'presion_diastolica' => 85,
             'frecuencia_cardiaca' => 78,
             'temperatura' => 36.8,
         ]);
@@ -221,10 +222,10 @@ class TurnoCompletoEnfermeroTest extends TestCase
             ->call('confirmarAdministracionMed')
             ->assertHasNoErrors();
 
-        $this->assertDatabaseHas('administracion_medicacion', [
-            'cod_am' => $pacienteAsignado->cod_am,
-            'cod_med_adulto' => $med->cod_med_adulto,
-            'administrado' => false,
+        $this->assertDatabaseHas('administraciones_medicacion', [
+            'cod_residente' => $pacienteAsignado->cod_residente,
+            'cod_prescripcion' => $med->cod_prescripcion,
+            'resultado' => 'OMITIDA',
             'motivo_omision' => 'Paciente presenta náuseas y rechaza la toma oral matutina',
         ]);
 
@@ -233,7 +234,7 @@ class TurnoCompletoEnfermeroTest extends TestCase
             ->assertHasNoErrors();
 
         $this->assertSame('REALIZADA', $tarea->fresh()->estado);
-        $this->assertNotNull($tarea->fresh()->fecha_realizada);
+        $this->assertNotNull($tarea->fresh()->fecha_hora_ejecucion);
 
         // ─── PASO 6: REGISTRAR SEGUIMIENTO CON INCIDENTE / MÉDICO ─────────────
         $ficha->call('abrirRegistrarSeguimiento')
@@ -244,13 +245,14 @@ class TurnoCompletoEnfermeroTest extends TestCase
             ->assertHasNoErrors();
 
         $this->assertDatabaseHas('atenciones', [
-            'cod_am' => $pacienteAsignado->cod_am,
-            'requiere_medico' => true,
-            'incidente' => true,
+            'cod_residente' => $pacienteAsignado->cod_residente,
+            'tipo_atencion' => 'SEGUIMIENTO_DIARIO',
+            'estado' => 'FINALIZADA',
+            'observacion' => 'Se observa marcha inestable y náuseas post-ingesta. Se solicita revisión médica.',
         ]);
 
         // ─── PASO 7: VERIFICAR GENERACIÓN AUTOMÁTICA DE ALERTAS ────────────────
-        $alertaGenerada = Alerta::where('cod_am', $pacienteAsignado->cod_am)
+        $alertaGenerada = Alerta::where('cod_residente', $pacienteAsignado->cod_residente)
             ->whereIn('estado', ['ABIERTA', 'EN_ATENCION'])
             ->first();
         $this->assertNotNull($alertaGenerada, 'Debe existir una alerta abierta para el paciente');
@@ -269,7 +271,12 @@ class TurnoCompletoEnfermeroTest extends TestCase
             ->assertHasNoErrors();
 
         $this->assertSame('CERRADA', $alertaGenerada->fresh()->estado);
-        $this->assertSame($enfermero->cod_usu, $alertaGenerada->fresh()->cerrado_por);
+        $this->assertDatabaseHas('eventos_alerta', [
+            'cod_alerta' => $alertaGenerada->cod_alerta,
+            'cod_usuario' => $enfermero->cod_usuario,
+            'tipo_evento' => 'CIERRE',
+            'descripcion' => 'Médico de turno evaluó y estabilizó al residente.',
+        ]);
 
         $ficha->call('cambiarTab', 'alertas')
             ->assertSee('Médico de turno evaluó y estabilizó al residente.');
@@ -355,7 +362,7 @@ class TurnoCompletoEnfermeroTest extends TestCase
             ->call('generarPase')
             ->assertHasNoErrors();
 
-        $pase = PaseTurno::where('cod_am', $paciente->cod_am)->first();
+        $pase = PaseTurno::where('cod_residente', $paciente->cod_residente)->first();
         $this->assertNotNull($pase);
         $this->assertSame('GENERADO', $pase->estado);
 
