@@ -38,7 +38,7 @@ class AdministracionMedicacionPolicy
         }
 
         $tieneRol = method_exists($user, 'hasAnyRole') && $user->hasAnyRole(['ENFERMEROS', 'MEDICO GENERAL/GERIATRA']);
-        $tienePermiso = $user->can('administraciones_medicacion.crear') || $user->can('medicacion.administrar');
+        $tienePermiso = $user->can('administraciones_medicacion.crear');
 
         return $tieneRol && $tienePermiso;
     }

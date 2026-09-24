@@ -7,9 +7,11 @@
             <h1 class="text-2xl font-black text-titulo">Seguimiento diario</h1>
             <p class="text-sm font-semibold text-apoyo">Registro operativo por adulto mayor, turno, plan de cuidado e incidencias.</p>
         </div>
-        <button type="button" wire:click="abrirCrear" class="rounded-xl bg-boton-principal px-4 py-2 text-xs font-black uppercase tracking-wider text-white shadow-sm">
+        @can('atenciones.crear')
+        <button type="button" wire:click="abrirCrear" class="rounded-xl bg-boton-principal px-4 py-2 text-xs font-black uppercase tracking-wider text-inverso shadow-sm">
             Registrar seguimiento
         </button>
+        @endcan
     </div>
 
     <div class="grid gap-3 rounded-2xl border border-borde bg-fondo-card p-4 md:grid-cols-3">
@@ -50,7 +52,7 @@
                             @if(!$seg->incidente && !$seg->requiere_medico) Sin alertas @endif
                         </td>
                         <td class="px-4 py-3 text-right">
-                            @can('seguimiento.editar')
+                            @can('atenciones.editar')
                                 <button type="button" wire:click="abrirEditar('{{ $seg->cod_seg_diario }}')" class="rm-btn-secondary px-3 py-1.5 text-xs font-bold">
                                     Corregir
                                 </button>

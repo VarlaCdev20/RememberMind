@@ -55,12 +55,12 @@ class TareasPlanPanel extends Component
 
     public function mount(): void
     {
-        abort_unless(auth()->user()?->can('tareas.ver'), 403);
+        abort_unless(auth()->user()?->can('ejecuciones_cuidado.ver'), 403);
     }
 
     public function abrirCrear(?string $planId = null): void
     {
-        abort_unless(auth()->user()?->can('tareas.crear'), 403);
+        abort_unless(auth()->user()?->can('ejecuciones_cuidado.gestionar'), 403);
 
         $this->resetValidation();
         $this->reset(
@@ -99,7 +99,7 @@ class TareasPlanPanel extends Component
 
     public function guardarTarea(): void
     {
-        abort_unless(auth()->user()?->can('tareas.crear'), 403);
+        abort_unless(auth()->user()?->can('ejecuciones_cuidado.gestionar'), 403);
 
         $this->validate([
             'codPlan'        => 'required|exists:planes_cuidado,cod_plan',
@@ -132,7 +132,7 @@ class TareasPlanPanel extends Component
             $this->addError('codPlan', 'El plan de cuidados no corresponde al paciente seleccionado.');
             return;
         }
-        app(TurnoEnfermeriaService::class)->autorizarMutacionEnfermeria($plan->cod_residente, 'tareas.crear', Auth::user());
+        app(TurnoEnfermeriaService::class)->autorizarMutacionEnfermeria($plan->cod_residente, 'ejecuciones_cuidado.gestionar', Auth::user());
 
         // ejecuciones_cuidado.cod_personal exige personal.cod_personal; nunca se
         // guarda usuarios.cod_usuario como si fuera una FK clínica.
@@ -191,7 +191,7 @@ class TareasPlanPanel extends Component
 
     public function abrirResultado(string $id): void
     {
-        abort_unless(auth()->user()?->can('tareas.registrar_resultado'), 403);
+        abort_unless(auth()->user()?->can('ejecuciones_cuidado.gestionar'), 403);
 
         $t = EjecucionCuidado::findOrFail($id);
         app(TurnoEnfermeriaService::class)->autorizarAccionPaciente($t->cod_residente, Auth::user());
@@ -210,7 +210,7 @@ class TareasPlanPanel extends Component
 
     public function guardarResultado(): void
     {
-        abort_unless(auth()->user()?->can('tareas.registrar_resultado'), 403);
+        abort_unless(auth()->user()?->can('ejecuciones_cuidado.gestionar'), 403);
 
         $this->validate([
             'estadoTarea'     => 'required|in:REALIZADA,OMITIDA,REPROGRAMADA',
@@ -228,14 +228,14 @@ class TareasPlanPanel extends Component
             'fechaProgramada.after_or_equal' => 'La nueva fecha no puede estar en el pasado.',
         ]);
 
-        if ($this->estadoTarea === 'OMITIDA') abort_unless(auth()->user()?->can('tareas.omitir'), 403);
+        if ($this->estadoTarea === 'OMITIDA') abort_unless(auth()->user()?->can('ejecuciones_cuidado.gestionar'), 403);
         DB::transaction(function (): void {
             // El bloqueo impide que dos enfermeros completen la misma ejecución.
             $tarea = EjecucionCuidado::lockForUpdate()->findOrFail($this->resultandoId);
             abort_unless($tarea->puedeCompletarse(), 409);
             app(TurnoEnfermeriaService::class)->autorizarMutacionEnfermeria(
                 $tarea->cod_residente,
-                $this->estadoTarea === 'OMITIDA' ? 'tareas.omitir' : 'tareas.registrar_resultado',
+                'ejecuciones_cuidado.gestionar',
                 Auth::user()
             );
 

@@ -549,7 +549,7 @@
 
             {{-- Bloque derecho con fecha y turno exactos --}}
             <div class="flex flex-wrap items-center gap-2 self-start sm:self-auto">
-                @if(Auth::user()?->hasRole('MEDICO GENERAL/GERIATRA') || Auth::user()?->can('medicacion.crear') || Auth::user()?->can('salud.medicacion.crear'))
+                @if(Auth::user()?->hasRole('MEDICO GENERAL/GERIATRA') && Auth::user()?->can('prescripciones.crear'))
                 <button type="button"
                         @click="$dispatch('abrirModalMedicacion', { cod_residente: '{{ $adultoMayor->cod_residente }}' })"
                         class="rm-btn-primary h-9 px-3.5 rounded-xl text-xs font-bold inline-flex items-center gap-1.5 shadow-xs transition cursor-pointer">

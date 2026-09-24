@@ -28,6 +28,16 @@ class TurnoEnfermeriaService
         ]);
     }
 
+    public function tieneLecturaClinicaGlobal(?User $user = null): bool
+    {
+        $user ??= Auth::user();
+
+        return $this->esSuperAdmin($user) || (bool) $user?->hasAnyRole([
+            'MEDICO GENERAL/GERIATRA', 'PSICOLOGO/A', 'NUTRICIONISTA',
+            'FISIOTERAPEUTA', 'PEDAGOGO',
+        ]);
+    }
+
     public function obtenerTurnoActivo(?User $user = null, ?string $fecha = null): ?TurnoEnfermeria
     {
         $user ??= Auth::user();
@@ -96,7 +106,8 @@ class TurnoEnfermeriaService
     {
         $user ??= Auth::user();
         $query = Residente::query();
-        if ($this->esSuperAdmin($user) && ! $codEnfermeroFiltro && ! $codTurno) {
+
+        if ($this->tieneLecturaClinicaGlobal($user) && ! $codEnfermeroFiltro && ! $codTurno) {
             return $query;
         }
 
@@ -173,6 +184,12 @@ class TurnoEnfermeriaService
     public function autorizarAccionPaciente(string|Residente $adulto, ?User $user = null, ?string $codTurno = null): void
     {
         $user ??= Auth::user();
+        if ($user?->hasAnyRole([
+            'MEDICO GENERAL/GERIATRA', 'PSICOLOGO/A', 'NUTRICIONISTA',
+            'FISIOTERAPEUTA', 'PEDAGOGO',
+        ])) {
+            return;
+        }
         // Lectura global permitida para superadmin si la peticion es de lectura (GET)
         if ($this->esSuperAdmin($user) && request()->isMethod('get')) {
             return;
@@ -186,13 +203,7 @@ class TurnoEnfermeriaService
         $user ??= Auth::user();
         abort_unless($user?->hasRole('ENFERMEROS'), 403,
             'La acción está reservada al personal de Enfermería.');
-        $permisoValido = $user->can($permiso)
-            || ($permiso === 'administracion_medicacion.registrar' && ($user->can('administraciones_medicacion.crear') || $user->can('administraciones_medicacion')))
-            || ($permiso === 'seguimiento.crear' && ($user->can('atenciones.crear') || $user->can('pases_turno.crear') || $user->can('atenciones')))
-            || ($permiso === 'tareas.registrar_resultado' && ($user->can('ejecuciones_cuidado.crear') || $user->can('planes_cuidado.crear') || $user->can('ejecuciones_cuidado')))
-            || (in_array($permiso, ['alertas.crear', 'alertas.atender', 'alertas.cerrar']) && ($user->can('alertas.gestionar') || $user->can('alertas')))
-            || ($permiso === 'pase_turno.generar' && ($user->can('pases_turno.crear') || $user->can('pases_turno') || $user->can('pases_turno.gestionar')))
-            || ($permiso === 'pase_turno.recibir' && ($user->can('pases_turno.editar') || $user->can('pases_turno') || $user->can('pases_turno.crear')));
+        $permisoValido = $user->can($permiso);
         abort_unless($permisoValido, 403, 'No cuenta con el permiso requerido para esta acción.');
 
         $turno = $this->obtenerTurnoActivo($user);

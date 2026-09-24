@@ -14,7 +14,7 @@
         default => $detalle->estado
     };
 
-    $badgeNivelClass = match($detalle->nivel ?? $detalle->tipoAlerta?->severidad) {
+    $badgeNivelClass = match($detalle->prioridad) {
         'CRITICO' => 'rm-badge-danger',
         'ALTO' => 'rm-badge-warning',
         'MEDIO' => 'rm-badge-info',
@@ -97,13 +97,13 @@
 
                 <div class="flex items-center gap-2">
                     <button type="button"
-                        wire:click="verGraficos('{{ $detalle->cod_am }}')"
+                        wire:click="verGraficos('{{ $detalle->cod_residente }}')"
                         class="rm-btn rm-btn-sm rm-btn-secondary text-xs cursor-pointer shadow-xs">
                         <i class="ph ph-chart-line-up"></i>
                         <span>Evolución</span>
                     </button>
                     <button type="button"
-                        wire:click="verUbicacion('{{ $detalle->cod_am }}')"
+                        wire:click="verUbicacion('{{ $detalle->cod_residente }}')"
                         class="rm-btn rm-btn-sm rm-btn-secondary text-xs cursor-pointer shadow-xs">
                         <i class="ph ph-bed"></i>
                         <span>Ubicación</span>
@@ -117,28 +117,28 @@
                     <div class="space-y-0.5">
                         <span class="block text-[10px] font-bold uppercase tracking-wider text-[var(--rm-text-muted)]">Severidad</span>
                         <span class="rm-badge {{ $badgeNivelClass }}">
-                            {{ $detalle->nivel }}
+                            {{ $detalle->prioridad }}
                         </span>
                     </div>
                     <div class="space-y-0.5">
                         <span class="block text-[10px] font-bold uppercase tracking-wider text-[var(--rm-text-muted)]">Canal / Origen</span>
                         <span class="rm-badge rm-badge-neutral text-[10px]">
-                            {{ $detalle->origen }}
+                            {{ $detalle->modulo }}
                         </span>
                     </div>
                     <div class="space-y-0.5">
                         <span class="block text-[10px] font-bold uppercase tracking-wider text-[var(--rm-text-muted)]">Responsable</span>
                         <p class="font-bold text-[var(--rm-text-title)] text-xs truncate">
-                            {{ $detalle->responsable?->name ?? 'Sistema Automático' }}
+                            {{ $detalle->responsable?->usuario?->name ?? 'Sistema Automático' }}
                         </p>
                         <p class="text-[10px] text-[var(--rm-text-muted)]">{{ $detalle->turno?->nombre ?? 'Guardia General' }}</p>
                     </div>
                     <div class="space-y-0.5">
                         <span class="block text-[10px] font-bold uppercase tracking-wider text-[var(--rm-text-muted)]">Detección</span>
                         <p class="font-bold text-[var(--rm-text-title)] text-xs">
-                            {{ $detalle->created_at?->translatedFormat('d M, H:i') }}
+                            {{ $detalle->fecha_hora?->translatedFormat('d M, H:i') }}
                         </p>
-                        <p class="text-[10px] text-[var(--rm-text-muted)] font-mono">{{ $detalle->created_at?->diffForHumans() }}</p>
+                        <p class="text-[10px] text-[var(--rm-text-muted)] font-mono">{{ $detalle->fecha_hora?->diffForHumans() }}</p>
                     </div>
                 </div>
 
@@ -148,54 +148,41 @@
                         Motivo y Diagnóstico Clínico
                     </span>
                     <p class="p-2.5 rounded-lg bg-[var(--rm-surface-alt)] border border-[var(--rm-border-soft)] text-xs text-[var(--rm-text-body)] leading-relaxed">
-                        <strong class="text-[var(--rm-text-title)]">{{ $detalle->tipo_alerta }}:</strong> {{ $detalle->motivo }}
+                        <strong class="text-[var(--rm-text-title)]">{{ $detalle->tipo }}:</strong> {{ $detalle->descripcion }}
                     </p>
                 </div>
             </div>
-
-            @if($detalle->observacion_cierre)
-                <div class="p-3 rounded-xl bg-[var(--rm-state-success-bg)] border border-[var(--rm-state-success-border)] text-xs text-[var(--rm-state-success-text)] space-y-1">
-                    <span class="font-bold uppercase tracking-wider flex items-center gap-1.5 text-[var(--rm-success-action)]">
-                        <i class="ph ph-check-circle text-base"></i>
-                        Resolución y Justificación de Cierre
-                    </span>
-                    <p class="leading-relaxed text-[var(--rm-text-body)]">{{ $detalle->observacion_cierre }}</p>
-                    <p class="text-[10.5px] text-[var(--rm-text-muted)] font-mono mt-1">
-                        Cerrado por: {{ $detalle->cerradoPor?->name ?? 'Equipo asistencial' }} el {{ $detalle->fecha_cierre?->translatedFormat('d/m/Y H:i') }}
-                    </p>
-                </div>
-            @endif
 
             <!-- 3. Historial de Intervenciones Clínicas (Timeline) -->
             <div class="space-y-2">
                 <div class="flex items-center justify-between">
                     <span class="text-xs font-bold uppercase tracking-wider text-[var(--rm-text-title)] flex items-center gap-1.5">
                         <i class="ph-bold ph-clock-counter-clockwise text-base text-[var(--rm-primary)]"></i>
-                        Historial de Intervenciones y Evolución ({{ $detalle->acciones->count() }})
+                        Historial de Intervenciones y Evolución ({{ $detalle->eventos->count() }})
                     </span>
                     <span class="text-[11px] text-[var(--rm-text-muted)] font-mono">Orden cronológico</span>
                 </div>
 
-                @if($detalle->acciones->isEmpty())
+                @if($detalle->eventos->isEmpty())
                     <div class="text-center py-6 border border-dashed border-[var(--rm-border)] rounded-xl text-[var(--rm-text-muted)] text-xs font-medium bg-[var(--rm-surface-alt)]">
                         No se han registrado intervenciones aún en esta alerta.
                     </div>
                 @else
                     <div class="space-y-2 max-h-52 overflow-y-auto pr-1">
-                        @foreach($detalle->acciones as $acc)
+                        @foreach($detalle->eventos as $acc)
                             <div class="p-2.5 rounded-xl bg-[var(--rm-surface-alt)] border border-[var(--rm-border)] text-xs space-y-1">
                                 <div class="flex items-center justify-between text-[11px]">
                                     <span class="font-bold text-[var(--rm-text-title)] flex items-center gap-1.5">
                                         <i class="ph ph-user-circle text-sm text-[var(--rm-primary)]"></i>
-                                        <span>{{ $acc->responsable?->name ?? 'Profesional Clínico' }}</span>
-                                        <span class="text-[var(--rm-text-muted)] font-normal">· {{ $acc->responsable?->roles?->first()?->name ?? 'Enfermería' }}</span>
+                                        <span>{{ $acc->usuario?->name ?? 'Profesional Clínico' }}</span>
+                                        <span class="text-[var(--rm-text-muted)] font-normal">· {{ $acc->tipo_evento }}</span>
                                     </span>
                                     <span class="text-[var(--rm-text-muted)] font-mono">
-                                        {{ $acc->fecha_accion?->format('H:i') }} ({{ $acc->fecha_accion?->format('d/m/Y') }})
+                                        {{ $acc->fecha_hora?->format('H:i') }} ({{ $acc->fecha_hora?->format('d/m/Y') }})
                                     </span>
                                 </div>
                                 <p class="text-[var(--rm-text-body)] font-medium leading-relaxed pl-5">
-                                    {{ $acc->accion }}
+                                    {{ $acc->descripcion }}
                                 </p>
                             </div>
                         @endforeach
@@ -205,7 +192,7 @@
 
             <!-- 4. Formulario para Registrar Nueva Intervención (si la alerta no está cerrada) -->
             @if($detalle->puedeCerrarse())
-                @canany(['alertas.atender','alertas.gestionar','salud.alertas.gestionar'])
+                @can('alertas.gestionar')
                     <div class="p-3 rounded-xl bg-[var(--rm-surface)] border border-[var(--rm-border)] space-y-2">
                         <label for="nuevaIntervencionInput" class="block text-xs font-bold uppercase tracking-wider text-[var(--rm-text-title)]">
                             Agregar Nota de Evolución o Intervención
@@ -229,7 +216,7 @@
                             <span class="text-xs text-[var(--rm-danger-action)] font-medium block">{{ $message }}</span>
                         @enderror
                     </div>
-                @endcanany
+                @endcan
             @endif
         </div>
 
@@ -237,14 +224,14 @@
         <div class="rm-modal-footer shrink-0 justify-between">
             <div>
                 @if($detalle && $detalle->puedeCerrarse())
-                    @canany(['alertas.cerrar','alertas.gestionar','salud.alertas.gestionar'])
+                    @can('alertas.gestionar')
                         <button type="button"
                             wire:click="cerrarAlerta('{{ $detalle->cod_alerta }}')"
                             class="rm-btn rm-btn-sm rm-btn-success cursor-pointer shadow-xs">
                             <i class="ph ph-archive-box text-base"></i>
                             <span>Cerrar y Archivar Alerta</span>
                         </button>
-                    @endcanany
+                    @endcan
                 @endif
             </div>
 
@@ -256,14 +243,14 @@
                 </button>
 
                 @if($detalle && $detalle->estado === 'ABIERTA')
-                    @canany(['alertas.atender','alertas.gestionar','salud.alertas.gestionar'])
+                    @can('alertas.gestionar')
                         <button type="button"
                             wire:click="atenderAlerta('{{ $detalle->cod_alerta }}')"
                             class="rm-btn rm-btn-accent cursor-pointer shadow-xs">
                             <i class="ph-bold ph-stethoscope text-base"></i>
                             <span>Atender Alerta</span>
                         </button>
-                    @endcanany
+                    @endcan
                 @endif
             </div>
         </div>

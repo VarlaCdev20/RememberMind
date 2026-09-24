@@ -269,7 +269,7 @@ class SaludSignosPanel extends Component
     public function abrirFormularioNuevo(): void
     {
         abort_if(!$this->adulto, 403, 'Debe seleccionar un paciente antes de registrar signos vitales.');
-        abort_if(!auth()->user()->can('salud.signos.crear'), 403);
+        abort_if(!auth()->user()->can('signos_vitales.crear'), 403);
         $this->limpiarFormulario();
         $this->modalFormulario = true;
     }
@@ -277,7 +277,7 @@ class SaludSignosPanel extends Component
     public function abrirFormularioEditar(string $id): void
     {
         abort_if(auth()->user()?->hasRole('ENFERMEROS'), 403, 'Los registros clínicos firmados se rectifican; no se editan.');
-        abort_if(!auth()->user()->can('salud.signos.editar'), 403);
+        abort_if(!auth()->user()->can('signos_vitales.editar'), 403);
 
         $signo = SignoVital::findOrFail($id);
         abort_if(!$this->adulto || $signo->cod_residente !== $this->adulto->cod_residente, 403);
@@ -320,7 +320,7 @@ class SaludSignosPanel extends Component
     {
         abort_if(!$this->adulto, 403, 'Paciente no seleccionado.');
         $esRectificacion = $this->signoId !== null;
-        $permiso = $esRectificacion ? 'salud.signos.editar' : 'salud.signos.crear';
+        $permiso = $esRectificacion ? 'signos_vitales.editar' : 'signos_vitales.crear';
         abort_unless(auth()->user()->can($permiso), 403);
 
         $alertas = $this->detectarAlertas();
@@ -367,7 +367,7 @@ class SaludSignosPanel extends Component
     public function abrirAnular(string $id): void
     {
         abort_if(auth()->user()?->hasRole('ENFERMEROS'), 403, 'Los registros firmados se rectifican; no se eliminan ni restauran desde Enfermería.');
-        abort_if(!auth()->user()->can('salud.signos.anular'), 403);
+        abort_if(!auth()->user()->can('signos_vitales.anular'), 403);
         $this->dispatch('signos-confirmar-anulacion', ['id' => $id]);
     }
 
@@ -375,7 +375,7 @@ class SaludSignosPanel extends Component
     {
         abort_if(auth()->user()?->hasRole('ENFERMEROS'), 403, 'Los registros firmados se rectifican; no se eliminan ni restauran desde Enfermería.');
         abort_if(!$this->adulto, 403, 'Paciente no seleccionado.');
-        abort_if(!auth()->user()->can('salud.signos.anular'), 403);
+        abort_if(!auth()->user()->can('signos_vitales.anular'), 403);
 
         $motivo = trim($motivo);
 
@@ -412,7 +412,7 @@ class SaludSignosPanel extends Component
     {
         abort_if(auth()->user()?->hasRole('ENFERMEROS'), 403, 'Los registros firmados se rectifican; no se eliminan ni restauran desde Enfermería.');
         abort_if(!$this->adulto, 403, 'Paciente no seleccionado.');
-        abort_if(!auth()->user()->can('salud.signos.anular'), 403);
+        abort_if(!auth()->user()->can('signos_vitales.anular'), 403);
 
         $this->validateOnly('motivoAnulacion', [
             'motivoAnulacion' => 'required|string|min:10|max:500',
@@ -447,7 +447,7 @@ class SaludSignosPanel extends Component
     {
         abort_if(auth()->user()?->hasRole('ENFERMEROS'), 403, 'Los registros firmados se rectifican; no se eliminan ni restauran desde Enfermería.');
         abort_if(!$this->adulto, 403, 'Paciente no seleccionado.');
-        abort_if(!auth()->user()->can('salud.signos.anular'), 403);
+        abort_if(!auth()->user()->can('signos_vitales.anular'), 403);
 
         $signo = SignoVital::findOrFail($id);
         abort_if($signo->cod_residente !== $this->adulto->cod_residente, 403);
@@ -470,7 +470,7 @@ class SaludSignosPanel extends Component
     public function abrirFormularioPresion(): void
     {
         abort_if(!$this->adulto, 403, 'Debe seleccionar un paciente antes de registrar signos vitales.');
-        abort_if(!auth()->user()->can('salud.signos.crear'), 403);
+        abort_if(!auth()->user()->can('signos_vitales.crear'), 403);
         $this->limpiarFormulario();
         $this->modalPresion = true;
     }
@@ -478,7 +478,7 @@ class SaludSignosPanel extends Component
     public function abrirFormularioCardiaca(): void
     {
         abort_if(!$this->adulto, 403, 'Debe seleccionar un paciente antes de registrar signos vitales.');
-        abort_if(!auth()->user()->can('salud.signos.crear'), 403);
+        abort_if(!auth()->user()->can('signos_vitales.crear'), 403);
         $this->limpiarFormulario();
         $this->modalCardiaca = true;
     }
@@ -486,7 +486,7 @@ class SaludSignosPanel extends Component
     public function abrirFormularioTemperatura(): void
     {
         abort_if(!$this->adulto, 403, 'Debe seleccionar un paciente antes de registrar signos vitales.');
-        abort_if(!auth()->user()->can('salud.signos.crear'), 403);
+        abort_if(!auth()->user()->can('signos_vitales.crear'), 403);
         $this->limpiarFormulario();
         $this->modalTemperatura = true;
     }
@@ -494,7 +494,7 @@ class SaludSignosPanel extends Component
     public function abrirFormularioPeso(): void
     {
         abort_if(!$this->adulto, 403, 'Debe seleccionar un paciente antes de registrar signos vitales.');
-        abort_if(!auth()->user()->can('salud.signos.crear'), 403);
+        abort_if(!auth()->user()->can('signos_vitales.crear'), 403);
         $this->limpiarFormulario();
         $this->modalPeso = true;
     }
@@ -502,7 +502,7 @@ class SaludSignosPanel extends Component
     public function abrirFormularioObservacion(): void
     {
         abort_if(!$this->adulto, 403, 'Debe seleccionar un paciente antes de registrar signos vitales.');
-        abort_if(!auth()->user()->can('salud.signos.crear'), 403);
+        abort_if(!auth()->user()->can('signos_vitales.crear'), 403);
         $this->limpiarFormulario();
         $this->modalObservacion = true;
     }

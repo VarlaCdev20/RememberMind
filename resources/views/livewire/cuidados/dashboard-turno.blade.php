@@ -28,7 +28,7 @@
 
         {{-- HERO PRINCIPAL COMPACTO Y EDITORIAL (8 COLS) --}}
 
-        <div class="group lg:col-span-8 rounded-[16px] border border-[#D5CABE] hover:border-[#304060]/60 dark:border-[#383C3D] dark:hover:border-[#52585A] bg-[#F0E8DE] dark:bg-[#222527] shadow-[0_3px_12px_rgba(47,62,92,0.06)] hover:shadow-[0_8px_20px_rgba(47,62,92,0.12)] overflow-hidden flex flex-col sm:flex-row min-h-[142px] lg:h-[148px] transition-all duration-200 ease-out">
+        <div class="group lg:col-span-8 rounded-[16px] border border-[#D5CABE] hover:border-[#304060]/60 dark:border-[#494139] dark:hover:border-[#52585A] bg-[#F0E8DE] dark:bg-[#2D2924] shadow-[0_3px_12px_rgba(47,62,92,0.06)] hover:shadow-[0_8px_20px_rgba(47,62,92,0.12)] overflow-hidden flex flex-col sm:flex-row min-h-[142px] lg:h-[148px] transition-all duration-200 ease-out">
 
 
 
@@ -50,7 +50,7 @@
 
                         </span>
 
-                        <span class="text-[#967B66]/60 dark:text-[#C4BCB3]/50">•</span>
+                        <span class="text-[#967B66]/60 dark:text-[#BDAE9F]/50">•</span>
 
                         <span class="capitalize">{{ $dashboard['jornada']['fecha_humana'] ?? \Carbon\Carbon::now()->locale('es')->isoFormat('dddd D [de] MMMM') }}</span>
 
@@ -60,7 +60,7 @@
 
                         @if(($dashboard['modo'] ?? '') === 'EN_TURNO')
 
-                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-[#63775B]/20 text-[#63775B] dark:bg-[#63775B]/30 dark:text-[#8DA280] font-black uppercase tracking-wider text-[9.5px] border border-[#63775B]/30">
+                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-[#63775B]/20 text-[#63775B] dark:bg-[#63775B]/30 dark:text-[#9DB491] font-black uppercase tracking-wider text-[9.5px] border border-[#63775B]/30">
 
                                 <i class="ph-bold ph-check-circle text-xs"></i>
 
@@ -70,7 +70,7 @@
 
                         @else
 
-                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-[#C98A17]/20 text-[#C98A17] dark:bg-[#C98A17]/30 dark:text-[#F3B740] font-black uppercase tracking-wider text-[9.5px] border border-[#C98A17]/30">
+                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-[#FFF1D6] text-[#966B24] border border-[#E8C178] dark:bg-[#D2A45E]/20 dark:text-[#E0B36D] dark:border-[#D2A45E]/40 font-black uppercase tracking-wider text-[9.5px]">
 
                                 <i class="ph-bold ph-clock text-xs"></i>
 
@@ -104,7 +104,7 @@
 
                     <p class="mt-0.5 text-xs font-semibold text-[#63775B] dark:text-[#9BB391] italic flex items-center gap-1">
 
-                        <span class="text-[#C98A17] font-black text-sm not-italic">“</span>Tu labor hace la diferencia<span class="text-[#C98A17] font-black text-sm not-italic">”</span>
+                        <span class="text-[#D2A45E] font-black text-sm not-italic">“</span>Tu labor hace la diferencia<span class="text-[#D2A45E] font-black text-sm not-italic">”</span>
 
                     </p>
 
@@ -114,7 +114,7 @@
 
                 {{-- PIE OPERATIVO COMPACTO --}}
 
-                <div class="pt-2 border-t border-[#D5CABE]/40 dark:border-[#383C3D]/60 flex items-center gap-3 text-[11px] font-semibold text-[#677084] dark:text-[#A6B2C8]">
+                <div class="pt-2 border-t border-[#D5CABE]/40 dark:border-[#494139]/60 flex items-center gap-3 text-[11px] font-semibold text-[#677084] dark:text-[#A6B2C8]">
 
                     <div class="flex items-center gap-1 text-[#304060] dark:text-[#A6B2C8] font-bold">
 
@@ -124,9 +124,9 @@
 
                     </div>
 
-                    <span class="text-[#D5CABE] dark:text-[#383C3D]">|</span>
+                    <span class="text-[#D5CABE] dark:text-[#494139]">|</span>
 
-                    <div class="flex items-center gap-1 text-[#63775B] dark:text-[#8DA280] font-bold">
+                    <div class="flex items-center gap-1 text-[#63775B] dark:text-[#9DB491] font-bold">
 
                         <i class="ph-bold ph-users text-xs"></i>
 
@@ -142,7 +142,7 @@
 
             {{-- LADO DERECHO: FOTOGRAFÍA INSTITUCIONAL REAL DE MANOS (36%) --}}
 
-            <div class="w-full sm:w-[36%] relative min-h-[120px] sm:min-h-full overflow-hidden shrink-0 border-t sm:border-t-0 sm:border-l border-[#D5CABE]/50 dark:border-[#383C3D] bg-[#E0D5C9]">
+            <div class="w-full sm:w-[36%] relative min-h-[120px] sm:min-h-full overflow-hidden shrink-0 border-t sm:border-t-0 sm:border-l border-[#D5CABE]/50 dark:border-[#494139] bg-[#E0D5C9]">
 
                 <img src="{{ asset('storage/imagenes/ENFERMERIA/manos.png') }}"
 
@@ -158,7 +158,7 @@
 
                 {{-- Transición sutil en el borde izquierdo para fundir armónicamente --}}
 
-                <div class="absolute inset-y-0 left-0 w-6 bg-gradient-to-r from-[#F0E8DE] to-transparent dark:from-[#222527] pointer-events-none hidden sm:block"></div>
+                <div class="absolute inset-y-0 left-0 w-6 bg-gradient-to-r from-[#F0E8DE] to-transparent dark:from-[#2D2924] pointer-events-none hidden sm:block"></div>
 
             </div>
 
@@ -168,7 +168,7 @@
 
         {{-- PANEL ESTADO GENERAL (4 COLS) --}}
 
-        <div class="lg:col-span-4 rounded-[16px] border border-[#D5CABE] dark:border-[#383C3D] bg-[#F0E8DE] dark:bg-[#222527] shadow-[0_3px_12px_rgba(47,62,92,0.06)] overflow-hidden flex flex-col justify-between min-h-[142px] lg:h-[148px] transition-all duration-200 ease-out p-3.5 sm:p-4">
+        <div class="lg:col-span-4 rounded-[16px] border border-[#D5CABE] dark:border-[#494139] bg-[#F0E8DE] dark:bg-[#2D2924] shadow-[0_3px_12px_rgba(47,62,92,0.06)] overflow-hidden flex flex-col justify-between min-h-[142px] lg:h-[148px] transition-all duration-200 ease-out p-3.5 sm:p-4">
 
             @php
 
@@ -186,11 +186,11 @@
 
                     {{-- Encabezado con Icono, Título y Badge Crítica --}}
 
-                    <div class="flex items-center justify-between border-b border-[#D62828]/25 dark:border-[#D62828]/40 pb-2">
+                    <div class="flex items-center justify-between border-b border-rose-200/80 dark:border-rose-900/60 pb-2">
 
                         <div class="flex items-center gap-1.5">
 
-                            <span class="relative flex h-6 w-6 items-center justify-center rounded bg-[#D62828] text-white shadow-2xs shrink-0">
+                            <span class="relative flex h-6 w-6 items-center justify-center rounded-lg bg-rose-100 dark:bg-rose-900/50 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800/60 shadow-xs shrink-0">
 
                                 <i class="ph-bold ph-warning-octagon text-sm"></i>
 
@@ -198,13 +198,13 @@
 
                             <div>
 
-                                <h2 class="text-[11px] font-black uppercase tracking-wider text-[#D62828] dark:text-[#FF7A7A] leading-tight">
+                                <h2 class="text-[11px] font-black uppercase tracking-wider text-rose-800 dark:text-rose-200 leading-tight">
 
                                     ALERTA CRÍTICA
 
                                 </h2>
 
-                                <p class="text-[9.5px] font-semibold text-[#D62828]/80 dark:text-[#FF7A7A]/80 leading-tight">
+                                <p class="text-[9.5px] font-semibold text-rose-700/80 dark:text-rose-300/80 leading-tight">
 
                                     Requiere atención inmediata
 
@@ -214,7 +214,7 @@
 
                         </div>
 
-                        <span class="rounded bg-[#D62828] px-2 py-0.5 text-[9px] font-black uppercase tracking-wider text-white shadow-2xs shrink-0">
+                        <span class="rounded-md bg-rose-100 dark:bg-rose-900/60 text-rose-800 dark:text-rose-200 border border-rose-200/80 dark:border-rose-800/60 px-2 py-0.5 text-[9px] font-black uppercase tracking-wider shadow-xs shrink-0">
 
                             CRÍTICA
 
@@ -226,15 +226,15 @@
 
                     {{-- Residente y Motivo --}}
 
-                    <div class="mt-2 rounded-lg border border-[#D62828]/25 bg-[#FBF8F5]/60 dark:bg-[#2B2A27]/60 p-2 text-center">
+                    <div class="mt-2 rounded-xl border border-rose-200/70 bg-white/70 dark:bg-[#332F29]/80 dark:border-rose-900/40 p-2 text-center">
 
-                        <p class="text-xs font-bold text-[#D62828] dark:text-[#FF7A7A] truncate">
+                        <p class="text-xs font-black text-rose-900 dark:text-rose-200 truncate">
 
                             {{ $alertaCritica['residente_nombre'] ?? ($alertaCritica['residente'] ?? 'Residente asignado') }}
 
                         </p>
 
-                        <p class="text-[10.5px] font-semibold text-[#677084] dark:text-[#C4BCB3] truncate">
+                        <p class="text-[10.5px] font-semibold text-[#677084] dark:text-[#BDAE9F] truncate">
 
                             {{ $alertaCritica['titulo'] ?? 'Atención prioritaria requerida' }}
 
@@ -248,7 +248,7 @@
 
                 {{-- Pie con Acción y Tiempo --}}
 
-                <div class="pt-1.5 border-t border-[#D62828]/20 flex items-center justify-between text-[11px] text-[#D62828] dark:text-[#FF7A7A] font-bold">
+                <div class="pt-1.5 border-t border-rose-200/60 dark:border-rose-900/50 flex items-center justify-between text-[11px] text-rose-800 dark:text-rose-300 font-bold">
 
                     <span>{{ $alertaCritica['tiempo_relativo'] ?? ($alertaCritica['tiempo'] ?? 'Hace unos momentos') }}</span>
 
@@ -272,7 +272,7 @@
 
                     {{-- Encabezado: Icono, Estado General, Badge Estable --}}
 
-                    <div class="flex items-center justify-between border-b border-[#8DA280]/35 dark:border-[#49453F] pb-2">
+                    <div class="flex items-center justify-between border-b border-[#8DA280]/35 dark:border-[#494139] pb-2">
 
                         <div class="flex items-center gap-1.5">
 
@@ -312,7 +312,7 @@
 
                     {{-- Mensaje clínico central --}}
 
-                    <div class="mt-2 rounded-lg border border-[#D5CABE]/40 dark:border-[#49453F] bg-[#FBF8F5]/70 dark:bg-[#201E1C]/60 p-2 text-center">
+                    <div class="mt-2 rounded-lg border border-[#D5CABE]/40 dark:border-[#494139] bg-[#FBF8F5]/70 dark:bg-[#332F29]/60 p-2 text-center">
 
                         <p class="text-xs font-bold text-[#304060] dark:text-[#F2EBE3]">
 
@@ -320,7 +320,7 @@
 
                         </p>
 
-                        <p class="mt-0.5 text-[10px] font-medium text-[#677084] dark:text-[#C4BCB3]">
+                        <p class="mt-0.5 text-[10px] font-medium text-[#677084] dark:text-[#BDAE9F]">
 
                             Todos los residentes asignados se encuentran con signos dentro de rango.
 
@@ -334,7 +334,7 @@
 
                 {{-- Línea inferior con "Monitoreo al día" y hora --}}
 
-                <div class="pt-1.5 border-t border-[#8DA280]/30 dark:border-[#49453F] flex items-center justify-between text-[11px] text-[#63775B] dark:text-[#9BB391] font-semibold">
+                <div class="pt-1.5 border-t border-[#8DA280]/30 dark:border-[#494139] flex items-center justify-between text-[11px] text-[#63775B] dark:text-[#9BB391] font-semibold">
 
                     <span class="inline-flex items-center gap-1">
 
@@ -372,7 +372,7 @@
 
         <a href="{{ Route::has('admin.enfermeria.alertas') ? route('admin.enfermeria.alertas') : '#' }}"
 
-           class="group relative overflow-hidden rounded-[14px] p-3 sm:p-3.5 transition-all duration-200 ease-out hover:-translate-y-0.5 bg-[#F0E8DE] dark:bg-[#222527] border border-[#D5CABE] hover:border-[#304060] dark:border-[#383C3D] dark:hover:border-[#304060] shadow-[0_2px_8px_rgba(47,62,92,0.06)] hover:shadow-[0_6px_16px_rgba(47,62,92,0.12)] border-l-[4px] border-l-[#304060] flex flex-col justify-between h-[88px] sm:h-[92px]"
+           class="group relative overflow-hidden rounded-2xl p-3 sm:p-3.5 transition-all duration-200 ease-out hover:-translate-y-0.5 bg-[#F0E8DE] dark:bg-[#2D2924] border border-[#D5CABE] hover:border-[#304060] dark:border-[#494139] dark:hover:border-[#304060] shadow-[0_2px_8px_rgba(47,62,92,0.06)] hover:shadow-[0_6px_16px_rgba(47,62,92,0.12)] border-l-[3.5px] border-l-[#304060] flex flex-col justify-between h-[88px] sm:h-[92px]"
 
            aria-label="Ver todas las alertas registradas en el sistema">
 
@@ -426,19 +426,19 @@
 
         <a href="{{ Route::has('admin.enfermeria.alertas') ? route('admin.enfermeria.alertas') : '#' }}"
 
-           class="group relative overflow-hidden rounded-[14px] p-3 sm:p-3.5 transition-all duration-200 ease-out hover:-translate-y-0.5 bg-[#F0E8DE] dark:bg-[#222527] border border-[#D5CABE] hover:border-[#D62828] dark:border-[#383C3D] dark:hover:border-[#D62828] shadow-[0_2px_8px_rgba(214,40,40,0.06)] hover:shadow-[0_6px_16px_rgba(214,40,40,0.12)] border-l-[4px] border-l-[#D62828] flex flex-col justify-between h-[88px] sm:h-[92px]"
+           class="group relative overflow-hidden rounded-2xl p-3 sm:p-3.5 transition-all duration-200 ease-out hover:-translate-y-0.5 bg-[#F0E8DE] dark:bg-[#2D2924] border border-[#D5CABE] hover:border-rose-300 dark:border-[#494139] dark:hover:border-rose-800 shadow-[0_2px_8px_rgba(163,90,68,0.06)] hover:shadow-[0_6px_16px_rgba(163,90,68,0.12)] border-l-[3.5px] border-l-rose-600 dark:border-l-rose-500 flex flex-col justify-between h-[88px] sm:h-[92px]"
 
            aria-label="Ver alertas críticas y altas">
 
             <div class="flex items-center justify-between gap-1.5">
 
-                <span class="text-[11px] font-black tracking-wider uppercase text-[#D62828] dark:text-[#FF7A7A]">
+                <span class="text-[11px] font-black tracking-wider uppercase text-rose-800 dark:text-rose-200">
 
                     CRÍTICAS Y ALTAS
 
                 </span>
 
-                <span class="flex h-7 w-7 items-center justify-center rounded-lg bg-[#D62828]/12 dark:bg-[#D62828]/25 text-[#D62828] dark:text-[#FF7A7A] transition-transform duration-200 group-hover:scale-105">
+                <span class="flex h-7 w-7 items-center justify-center rounded-lg bg-rose-100 dark:bg-rose-900/50 text-rose-700 dark:text-rose-300 transition-transform duration-200 group-hover:scale-105 border border-rose-200/60 dark:border-rose-800/50">
 
                     <i class="ph-bold ph-warning-octagon text-base"></i>
 
@@ -448,7 +448,7 @@
 
             <div class="flex items-baseline justify-between gap-2 z-10">
 
-                <div class="text-[26px] sm:text-[28px] font-black leading-none tracking-tight text-[#D62828] dark:text-[#FF7A7A]">
+                <div class="text-[26px] sm:text-[28px] font-black leading-none tracking-tight text-rose-800 dark:text-rose-200">
 
                     {{ $dashboard['kpis']['criticas_altas']['numero'] ?? 0 }}
 
@@ -464,7 +464,7 @@
 
             <div class="absolute bottom-1 right-2 pointer-events-none opacity-40 group-hover:opacity-80 transition-opacity">
 
-                <svg width="34" height="16" viewBox="0 0 34 16" fill="none" class="text-[#D62828] dark:text-[#FF7A7A]">
+                <svg width="34" height="16" viewBox="0 0 34 16" fill="none" class="text-rose-600/60 dark:text-rose-400/60">
 
                     <path d="M2 14C12 14 18 10 24 5C28 2 31 2 33 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
 
@@ -480,19 +480,19 @@
 
         <a href="{{ Route::has('admin.enfermeria.alertas') ? route('admin.enfermeria.alertas') : '#' }}"
 
-           class="group relative overflow-hidden rounded-[14px] p-3 sm:p-3.5 transition-all duration-200 ease-out hover:-translate-y-0.5 bg-[#F0E8DE] dark:bg-[#222527] border border-[#D5CABE] hover:border-[#C98A17] dark:border-[#383C3D] dark:hover:border-[#C98A17] shadow-[0_2px_8px_rgba(201,138,23,0.06)] hover:shadow-[0_6px_16px_rgba(201,138,23,0.12)] border-l-[4px] border-l-[#C98A17] flex flex-col justify-between h-[88px] sm:h-[92px]"
+           class="group relative overflow-hidden rounded-2xl p-3 sm:p-3.5 transition-all duration-200 ease-out hover:-translate-y-0.5 bg-[#F0E8DE] dark:bg-[#2D2924] border border-[#D5CABE] hover:border-[#D2A45E] dark:border-[#494139] dark:hover:border-[#D2A45E] shadow-[0_2px_8px_rgba(210,164,94,0.08)] hover:shadow-[0_6px_16px_rgba(210,164,94,0.14)] border-l-[3.5px] border-l-[#D2A45E] flex flex-col justify-between h-[88px] sm:h-[92px]"
 
            aria-label="Ver alertas abiertas por atender">
 
             <div class="flex items-center justify-between gap-1.5">
 
-                <span class="text-[11px] font-black tracking-wider uppercase text-[#C98A17] dark:text-[#F3B740]">
+                <span class="text-[11px] font-black tracking-wider uppercase text-[#966B24] dark:text-[#E0B36D]">
 
                     POR ATENDER
 
                 </span>
 
-                <span class="flex h-7 w-7 items-center justify-center rounded-lg bg-[#C98A17]/12 dark:bg-[#C98A17]/25 text-[#C98A17] dark:text-[#F3B740] transition-transform duration-200 group-hover:scale-105">
+                <span class="flex h-7 w-7 items-center justify-center rounded-lg bg-[#D2A45E]/15 dark:bg-[#D2A45E]/30 text-[#966B24] dark:text-[#E0B36D] transition-transform duration-200 group-hover:scale-105 border border-[#E8C178]/60 dark:border-[#D2A45E]/40">
 
                     <i class="ph-bold ph-clock text-base"></i>
 
@@ -502,7 +502,7 @@
 
             <div class="flex items-baseline justify-between gap-2 z-10">
 
-                <div class="text-[26px] sm:text-[28px] font-black leading-none tracking-tight text-[#C98A17] dark:text-[#F3B740]">
+                <div class="text-[26px] sm:text-[28px] font-black leading-none tracking-tight text-[#966B24] dark:text-[#E0B36D]">
 
                     {{ $dashboard['kpis']['por_atender']['numero'] ?? 4 }}
 
@@ -518,7 +518,7 @@
 
             <div class="absolute bottom-1 right-2 pointer-events-none opacity-40 group-hover:opacity-80 transition-opacity">
 
-                <svg width="34" height="16" viewBox="0 0 34 16" fill="none" class="text-[#C98A17] dark:text-[#F3B740]">
+                <svg width="34" height="16" viewBox="0 0 34 16" fill="none" class="text-[#D2A45E]/60 dark:text-[#E0B36D]/60">
 
                     <path d="M2 14C12 14 18 10 24 5C28 2 31 2 33 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
 
@@ -534,7 +534,7 @@
 
         <a href="{{ Route::has('admin.enfermeria.alertas') ? route('admin.enfermeria.alertas') : '#' }}"
 
-           class="group relative overflow-hidden rounded-[14px] p-3 sm:p-3.5 transition-all duration-200 ease-out hover:-translate-y-0.5 bg-[#F0E8DE] dark:bg-[#222527] border border-[#D5CABE] hover:border-[#243B6B] dark:border-[#383C3D] dark:hover:border-[#243B6B] shadow-[0_2px_8px_rgba(36,59,107,0.06)] hover:shadow-[0_6px_16px_rgba(36,59,107,0.12)] border-l-[4px] border-l-[#243B6B] flex flex-col justify-between h-[88px] sm:h-[92px]"
+           class="group relative overflow-hidden rounded-2xl p-3 sm:p-3.5 transition-all duration-200 ease-out hover:-translate-y-0.5 bg-[#F0E8DE] dark:bg-[#2D2924] border border-[#D5CABE] hover:border-[#243B6B] dark:border-[#494139] dark:hover:border-[#243B6B] shadow-[0_2px_8px_rgba(36,59,107,0.06)] hover:shadow-[0_6px_16px_rgba(36,59,107,0.12)] border-l-[3.5px] border-l-[#243B6B] flex flex-col justify-between h-[88px] sm:h-[92px]"
 
            aria-label="Ver alertas en curso de atención">
 
@@ -588,19 +588,19 @@
 
         <a href="{{ Route::has('admin.enfermeria.alertas') ? route('admin.enfermeria.alertas') : '#' }}"
 
-           class="group relative overflow-hidden rounded-[14px] p-3 sm:p-3.5 transition-all duration-200 ease-out hover:-translate-y-0.5 bg-[#F0E8DE] dark:bg-[#222527] border border-[#D5CABE] hover:border-[#63775B] dark:border-[#383C3D] dark:hover:border-[#63775B] shadow-[0_2px_8px_rgba(99,119,91,0.06)] hover:shadow-[0_6px_16px_rgba(99,119,91,0.12)] border-l-[4px] border-l-[#63775B] flex flex-col justify-between h-[88px] sm:h-[92px]"
+           class="group relative overflow-hidden rounded-2xl p-3 sm:p-3.5 transition-all duration-200 ease-out hover:-translate-y-0.5 bg-[#F0E8DE] dark:bg-[#2D2924] border border-[#D5CABE] hover:border-[#63775B] dark:border-[#494139] dark:hover:border-[#63775B] shadow-[0_2px_8px_rgba(99,119,91,0.06)] hover:shadow-[0_6px_16px_rgba(99,119,91,0.12)] border-l-[3.5px] border-l-[#63775B] flex flex-col justify-between h-[88px] sm:h-[92px]"
 
            aria-label="Ver alertas resueltas e historial">
 
             <div class="flex items-center justify-between gap-1.5">
 
-                <span class="text-[11px] font-black tracking-wider uppercase text-[#63775B] dark:text-[#8DA280]">
+                <span class="text-[11px] font-black tracking-wider uppercase text-[#63775B] dark:text-[#9DB491]">
 
                     RESUELTAS
 
                 </span>
 
-                <span class="flex h-7 w-7 items-center justify-center rounded-lg bg-[#63775B]/12 dark:bg-[#63775B]/25 text-[#63775B] dark:text-[#8DA280] transition-transform duration-200 group-hover:scale-105">
+                <span class="flex h-7 w-7 items-center justify-center rounded-lg bg-[#63775B]/12 dark:bg-[#63775B]/25 text-[#63775B] dark:text-[#9DB491] transition-transform duration-200 group-hover:scale-105">
 
                     <i class="ph-bold ph-check-circle text-base"></i>
 
@@ -610,7 +610,7 @@
 
             <div class="flex items-baseline justify-between gap-2 z-10">
 
-                <div class="text-[26px] sm:text-[28px] font-black leading-none tracking-tight text-[#63775B] dark:text-[#8DA280]">
+                <div class="text-[26px] sm:text-[28px] font-black leading-none tracking-tight text-[#63775B] dark:text-[#9DB491]">
 
                     {{ $dashboard['kpis']['resueltas']['numero'] ?? 0 }}
 
@@ -626,7 +626,7 @@
 
             <div class="absolute bottom-1 right-2 pointer-events-none opacity-40 group-hover:opacity-80 transition-opacity">
 
-                <svg width="34" height="16" viewBox="0 0 34 16" fill="none" class="text-[#63775B] dark:text-[#8DA280]">
+                <svg width="34" height="16" viewBox="0 0 34 16" fill="none" class="text-[#63775B] dark:text-[#9DB491]">
 
                     <path d="M2 14C12 14 18 10 24 5C28 2 31 2 33 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
 
@@ -654,11 +654,11 @@
 
         {{-- AGENDA DE HOY (7 COLS): CORAZÓN OPERATIVO PROTAGONISTA --}}
 
-        <section class="lg:col-span-7 rounded-[16px] border border-[#D5CABE] hover:border-[#304060]/60 dark:border-[#383C3D] dark:hover:border-[#52585A] bg-[#F0E8DE] dark:bg-[#222527] p-3.5 sm:p-4 shadow-[0_3px_12px_rgba(47,62,92,0.06)] hover:shadow-[0_8px_20px_rgba(47,62,92,0.12)] transition-all duration-200 ease-out" aria-label="Agenda operativa de hoy">
+        <section class="lg:col-span-7 rounded-[16px] border border-[#D5CABE] hover:border-[#304060]/60 dark:border-[#494139] dark:hover:border-[#52585A] bg-[#F0E8DE] dark:bg-[#2D2924] p-3.5 sm:p-4 shadow-[0_3px_12px_rgba(47,62,92,0.06)] hover:shadow-[0_8px_20px_rgba(47,62,92,0.12)] transition-all duration-200 ease-out" aria-label="Agenda operativa de hoy">
 
             {{-- Cabecera con Ícono Contextual y Enlace a Agenda Completa --}}
 
-            <div class="flex items-center justify-between gap-2 border-b border-[#D5CABE]/40 dark:border-[#383C3D] pb-2.5">
+            <div class="flex items-center justify-between gap-2 border-b border-[#D5CABE]/40 dark:border-[#494139] pb-2.5">
 
                 <div class="flex items-center gap-2">
 
@@ -688,7 +688,7 @@
 
                 <a href="{{ Route::has('admin.enfermeria.agenda') ? route('admin.enfermeria.agenda') : '#' }}"
 
-                   class="group/link text-[11px] font-extrabold text-[#304060] dark:text-[#A6B2C8] hover:text-[#C98A17] dark:hover:text-[#F3B740] flex items-center gap-1 transition-colors duration-200">
+                   class="group/link text-[11px] font-extrabold text-[#304060] dark:text-[#A6B2C8] hover:text-[#966B24] dark:hover:text-[#E0B36D] flex items-center gap-1 transition-colors duration-200">
 
                     <span>Ver agenda completa</span>
 
@@ -718,33 +718,33 @@
 
                         if (str_contains($estado, 'complet') || str_contains($estado, 'realiz')) {
 
-                            $badgeClase = 'bg-[#63775B]/15 text-[#63775B] dark:text-[#8DA280] border border-[#63775B]/30';
+                            $badgeClase = 'bg-[#E8F1E5] text-[#63775B] border border-[#B8CDAE] dark:bg-[#63775B]/25 dark:text-[#9DB491] dark:border-[#63775B]';
 
-                            $iconoEstado = 'ph-check-circle text-[#63775B]';
+                            $iconoEstado = 'ph-check-circle text-[#63775B] dark:text-[#9DB491]';
 
                             $bordeLeft = 'border-l-[3.5px] border-l-[#63775B]';
 
                         } elseif (str_contains($estado, 'retras') || str_contains($estado, 'crit')) {
 
-                            $badgeClase = 'bg-[#D62828]/15 text-[#D62828] dark:text-[#FF7A7A] border border-[#D62828]/30';
+                            $badgeClase = 'bg-rose-100 text-rose-800 border border-rose-200/80 dark:bg-rose-900/50 dark:text-rose-200 dark:border-rose-800/60';
 
-                            $iconoEstado = 'ph-warning-circle text-[#D62828]';
+                            $iconoEstado = 'ph-warning-circle text-rose-700 dark:text-rose-300';
 
-                            $bordeLeft = 'border-l-[3.5px] border-l-[#D62828]';
+                            $bordeLeft = 'border-l-[3.5px] border-l-rose-500 dark:border-l-rose-400';
 
                         } else {
 
-                            $badgeClase = 'bg-[#C98A17]/15 text-[#C98A17] dark:text-[#F3B740] border border-[#C98A17]/30';
+                            $badgeClase = 'bg-[#FFF1D6] text-[#966B24] border border-[#E8C178] dark:bg-[#D2A45E]/20 dark:text-[#E0B36D] dark:border-[#D2A45E]/40';
 
-                            $iconoEstado = 'ph-clock text-[#C98A17]';
+                            $iconoEstado = 'ph-clock text-[#966B24] dark:text-[#E0B36D]';
 
-                            $bordeLeft = 'border-l-[3.5px] border-l-[#C98A17]';
+                            $bordeLeft = 'border-l-[3.5px] border-l-[#D2A45E]';
 
                         }
 
                     @endphp
 
-                    <div class="group/item flex items-center justify-between gap-2.5 rounded-xl border border-[#D5CABE]/40 dark:border-[#383C3D] bg-[#FBF8F5]/70 dark:bg-[#2A2D2E]/60 p-2.5 hover:bg-[#FBF8F5] dark:hover:bg-[#2A2D2E] hover:shadow-xs transition-all duration-150 {{ $bordeLeft }}">
+                    <div class="group/item flex items-center justify-between gap-2.5 rounded-xl border border-[#D5CABE]/40 dark:border-[#494139] bg-[#FBF8F5]/70 dark:bg-[#332F29]/80 p-2.5 hover:bg-[#FBF8F5] dark:hover:bg-[#2A2D2E] hover:shadow-xs transition-all duration-150 {{ $bordeLeft }}">
 
                         <div class="flex items-center gap-2.5 min-w-0">
 
@@ -760,7 +760,7 @@
 
                             {{-- Ícono por Tipo de Evento --}}
 
-                            <span class="flex h-6 w-6 items-center justify-center rounded-lg bg-[#F0E8DE] dark:bg-[#222527] border border-[#D5CABE]/40 dark:border-[#383C3D] shrink-0">
+                            <span class="flex h-6 w-6 items-center justify-center rounded-lg bg-[#F0E8DE] dark:bg-[#2D2924] border border-[#D5CABE]/40 dark:border-[#494139] shrink-0">
 
                                 @if(str_contains(strtolower($evento['tipo'] ?? ''), 'medic'))
 
@@ -768,7 +768,7 @@
 
                                 @elseif(str_contains(strtolower($evento['tipo'] ?? ''), 'signo') || str_contains(strtolower($evento['tipo'] ?? ''), 'vital'))
 
-                                    <i class="ph-bold ph-heartbeat text-xs text-[#D62828]"></i>
+                                    <i class="ph-bold ph-heartbeat text-xs text-rose-600 dark:text-rose-400"></i>
 
                                 @else
 
@@ -796,11 +796,11 @@
 
                                     @if(!empty($evento['ubicacion']))
 
-                                        <span class="text-[#967B66] dark:text-[#C4BCB3]">· {{ $evento['ubicacion'] }}</span>
+                                        <span class="text-[#967B66] dark:text-[#BDAE9F]">· {{ $evento['ubicacion'] }}</span>
 
                                     @elseif(!empty($evento['habitacion']))
 
-                                        <span class="text-[#967B66] dark:text-[#C4BCB3]">· {{ $evento['habitacion'] }}</span>
+                                        <span class="text-[#967B66] dark:text-[#BDAE9F]">· {{ $evento['habitacion'] }}</span>
 
                                     @endif
 
@@ -842,15 +842,15 @@
 
         {{-- PROGRESO DEL TURNO Y DISTRIBUCIÓN (5 COLS): GRÁFICAS INTEGRADAS Y CONTRASTADAS --}}
 
-        <section class="lg:col-span-5 rounded-[16px] border border-[#D5CABE] hover:border-[#304060]/60 dark:border-[#383C3D] dark:hover:border-[#52585A] bg-[#F0E8DE] dark:bg-[#222527] p-3.5 sm:p-4 shadow-[0_3px_12px_rgba(47,62,92,0.06)] hover:shadow-[0_8px_20px_rgba(47,62,92,0.12)] space-y-3 transition-all duration-200 ease-out" aria-label="Progreso del turno">
+        <section class="lg:col-span-5 rounded-[16px] border border-[#D5CABE] hover:border-[#304060]/60 dark:border-[#494139] dark:hover:border-[#52585A] bg-[#F0E8DE] dark:bg-[#2D2924] p-3.5 sm:p-4 shadow-[0_3px_12px_rgba(47,62,92,0.06)] hover:shadow-[0_8px_20px_rgba(47,62,92,0.12)] space-y-3 transition-all duration-200 ease-out" aria-label="Progreso del turno">
 
             {{-- Título con Ícono Contextual --}}
 
-            <div class="flex items-center justify-between border-b border-[#D5CABE]/40 dark:border-[#383C3D] pb-2">
+            <div class="flex items-center justify-between border-b border-[#D5CABE]/40 dark:border-[#494139] pb-2">
 
                 <div class="flex items-center gap-2">
 
-                    <span class="flex h-7 w-7 items-center justify-center rounded-lg bg-[#63775B]/15 text-[#63775B] dark:text-[#8DA280] shrink-0">
+                    <span class="flex h-7 w-7 items-center justify-center rounded-lg bg-[#63775B]/15 text-[#63775B] dark:text-[#9DB491] shrink-0">
 
                         <i class="ph-bold ph-chart-donut text-base"></i>
 
@@ -890,7 +890,7 @@
 
             {{-- Bloque Donut: Grosor Óptimo y Colores Vivos --}}
 
-            <div class="rounded-xl border border-[#D5CABE]/40 dark:border-[#383C3D] bg-[#FBF8F5]/70 dark:bg-[#2A2D2E]/60 p-3 shadow-2xs">
+            <div class="rounded-xl border border-[#D5CABE]/40 dark:border-[#494139] bg-[#FBF8F5]/70 dark:bg-[#332F29]/80 p-3 shadow-2xs">
 
                 @php
 
@@ -903,7 +903,7 @@
 
                     <span>Cumplimiento Global</span>
 
-                    <span class="text-[#63775B] dark:text-[#8DA280] font-black text-sm">{{ $pctCumplimiento }}%</span>
+                    <span class="text-[#63775B] dark:text-[#9DB491] font-black text-sm">{{ $pctCumplimiento }}%</span>
 
                 </div>
 
@@ -929,7 +929,7 @@
 
                 {{-- Leyenda y Totales de Alta Jerarquía --}}
 
-                <div class="mt-2 flex items-center justify-around text-[11px] font-bold text-[#677084] dark:text-[#A6B2C8] border-t border-[#D5CABE]/30 dark:border-[#383C3D] pt-1.5">
+                <div class="mt-2 flex items-center justify-around text-[11px] font-bold text-[#677084] dark:text-[#A6B2C8] border-t border-[#D5CABE]/30 dark:border-[#494139] pt-1.5">
 
                     <span class="flex items-center gap-1.5">
 
@@ -941,7 +941,7 @@
 
                     <span class="flex items-center gap-1.5">
 
-                        <span class="h-2.5 w-2.5 rounded-full bg-[#C98A17]"></span>
+                        <span class="h-2.5 w-2.5 rounded-full bg-[#D2A45E]"></span>
 
                         <span>Pendientes</span>
 
@@ -949,7 +949,7 @@
 
                     <span class="flex items-center gap-1.5">
 
-                        <span class="h-2.5 w-2.5 rounded-full bg-[#D62828]"></span>
+                        <span class="h-2.5 w-2.5 rounded-full bg-[#C85D52]"></span>
 
                         <span>Con retraso</span>
 
@@ -963,7 +963,7 @@
 
             {{-- Bloque Distribución de Cuidados --}}
 
-            <div class="rounded-xl border border-[#D5CABE]/40 dark:border-[#383C3D] bg-[#FBF8F5]/70 dark:bg-[#2A2D2E]/60 p-3 shadow-2xs">
+            <div class="rounded-xl border border-[#D5CABE]/40 dark:border-[#494139] bg-[#FBF8F5]/70 dark:bg-[#332F29]/80 p-3 shadow-2xs">
 
                 <div class="flex items-center justify-between text-xs font-extrabold text-[#304060] dark:text-[#F0E8DE] mb-1">
 
@@ -1001,11 +1001,11 @@
 
         {{-- RESIDENTES DE MI TURNO (8 COLS): FORMATO EDITORIAL CLÍNICO --}}
 
-        <section class="lg:col-span-8 rounded-[16px] border border-[#D5CABE] hover:border-[#304060]/60 dark:border-[#383C3D] dark:hover:border-[#52585A] bg-[#F0E8DE] dark:bg-[#222527] p-3.5 sm:p-4 shadow-[0_3px_12px_rgba(47,62,92,0.06)] hover:shadow-[0_8px_20px_rgba(47,62,92,0.12)] transition-all duration-200 ease-out flex flex-col justify-between" aria-label="Residentes asignados en mi turno">
+        <section class="lg:col-span-8 rounded-[16px] border border-[#D5CABE] hover:border-[#304060]/60 dark:border-[#494139] dark:hover:border-[#52585A] bg-[#F0E8DE] dark:bg-[#2D2924] p-3.5 sm:p-4 shadow-[0_3px_12px_rgba(47,62,92,0.06)] hover:shadow-[0_8px_20px_rgba(47,62,92,0.12)] transition-all duration-200 ease-out flex flex-col justify-between" aria-label="Residentes asignados en mi turno">
 
             {{-- Cabecera con Ícono Contextual + Enlace Textual con Chevron --}}
 
-            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 border-b border-[#D5CABE]/40 dark:border-[#383C3D] pb-2.5">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 border-b border-[#D5CABE]/40 dark:border-[#494139] pb-2.5">
 
                 <div class="flex items-center gap-2">
 
@@ -1035,7 +1035,7 @@
 
                 <a href="{{ Route::has('admin.enfermeria.residentes') ? route('admin.enfermeria.residentes') : (Route::has('admin.enfermeria.pacientes') ? route('admin.enfermeria.pacientes') : '#') }}"
 
-                   class="group/link text-[11px] font-extrabold text-[#304060] dark:text-[#A6B2C8] hover:text-[#C98A17] dark:hover:text-[#F3B740] flex items-center gap-1 transition-colors duration-200 self-start sm:self-auto">
+                   class="group/link text-[11px] font-extrabold text-[#304060] dark:text-[#A6B2C8] hover:text-[#966B24] dark:hover:text-[#E0B36D] flex items-center gap-1 transition-colors duration-200 self-start sm:self-auto">
 
                     <span>Ver todos</span>
 
@@ -1077,7 +1077,7 @@
 
                     <a href="{{ $rutaFicha }}"
 
-                       class="group/res block rounded-xl border border-[#D5CABE]/40 dark:border-[#383C3D] bg-[#FBF8F5]/70 dark:bg-[#2A2D2E]/60 p-2.5 hover:bg-[#FBF8F5] dark:hover:bg-[#2A2D2E] hover:border-[#304060]/60 dark:hover:border-[#A6B2C8]/60 hover:shadow-xs transition-all duration-150">
+                       class="group/res block rounded-xl border border-[#D5CABE]/40 dark:border-[#494139] bg-[#FBF8F5]/70 dark:bg-[#332F29]/80 p-2.5 hover:bg-[#FBF8F5] dark:hover:bg-[#2A2D2E] hover:border-[#304060]/60 dark:hover:border-[#A6B2C8]/60 hover:shadow-xs transition-all duration-150">
 
                         <div class="flex items-center justify-between gap-3">
 
@@ -1093,7 +1093,7 @@
 
                                              alt="{{ $residente['nombre_completo'] ?? ($residente['nombre'] ?? 'Residente') }}"
 
-                                             class="h-10 w-10 rounded-full object-cover border border-[#D5CABE] dark:border-[#52585A]">
+                                             class="h-10 w-10 rounded-full object-cover border border-[#D5CABE] dark:border-[#5A5147]">
 
                                     @else
 
@@ -1113,7 +1113,7 @@
 
                                 <div class="min-w-0">
 
-                                    <div class="text-xs sm:text-[13px] font-bold text-[#304060] dark:text-[#F0E8DE] truncate group-hover/res:text-[#C98A17] dark:group-hover/res:text-[#F3B740] transition-colors">
+                                    <div class="text-xs sm:text-[13px] font-bold text-[#304060] dark:text-[#F0E8DE] truncate group-hover/res:text-[#966B24] dark:group-hover/res:text-[#E0B36D] transition-colors">
 
                                         {{ $residente['nombre_completo'] ?? ($residente['nombre'] ?? 'Residente') }}
 
@@ -1123,7 +1123,7 @@
 
                                         {{ $residente['edad'] ?? '80 años' }} ·
 
-                                        <span class="font-bold text-[#304060] dark:text-[#E6DDD3]">
+                                        <span class="font-bold text-[#304060] dark:text-[#EFE4D8]">
 
                                             {{ $residente['ubicacion'] ?? ($residente['cama_texto'] ?? 'Hab. 102 · Cama A') }}
 
@@ -1137,21 +1137,20 @@
 
                                     <div class="mt-1 flex flex-wrap items-center gap-1.5 text-[10px]">
 
-                                        <span class="px-1.5 py-0.2 rounded font-extrabold uppercase bg-[#63775B]/15 text-[#63775B] dark:text-[#8DA280]">
                                         {{-- Estado de seguimiento operativo vs institucional --}}
                                         @php
                                             $estSeg = $residente['estado_seguimiento'] ?? ($residente['estado_label'] ?? 'ESTABLE');
                                             $segColor = match(strtoupper(trim((string)$estSeg))) {
-                                                'CRÍTICO', 'CRITICO', 'REQUIERE_ATENCION' => 'bg-[#D62828]/15 text-[#D62828] dark:text-[#FF7A7A]',
-                                                'VIGILANCIA' => 'bg-[#C98A17]/15 text-[#C98A17] dark:text-[#F3B740]',
-                                                default => 'bg-[#63775B]/15 text-[#63775B] dark:text-[#8DA280]',
+                                                'CRÍTICO', 'CRITICO', 'REQUIERE_ATENCION' => 'bg-rose-100 text-rose-800 dark:bg-rose-900/50 dark:text-rose-200 border border-rose-200/80 dark:border-rose-800/60',
+                                                'VIGILANCIA' => 'bg-[#FFF1D6] text-[#966B24] border border-[#E8C178] dark:bg-[#D2A45E]/20 dark:text-[#E0B36D] dark:border-[#D2A45E]/40',
+                                                default => 'bg-[#63775B]/15 text-[#63775B] dark:text-[#9DB491]',
                                             };
                                         @endphp
                                         <span class="px-1.5 py-0.5 rounded font-extrabold uppercase {{ $segColor }}" title="Estado de seguimiento">
                                             {{ $estSeg }}
                                         </span>
 
-                                        <span class="px-1.5 py-0.5 rounded font-bold bg-[#F0E8DE] dark:bg-[#222527] border border-[#D5CABE]/50 dark:border-[#383C3D] text-[#677084] dark:text-[#A6B2C8]" title="Nivel de supervisión">
+                                        <span class="px-1.5 py-0.5 rounded font-bold bg-[#F0E8DE] dark:bg-[#2D2924] border border-[#D5CABE]/50 dark:border-[#494139] text-[#677084] dark:text-[#A6B2C8]" title="Nivel de supervisión">
                                             {{ $residente['supervision_label'] ?? 'Supervisión moderada' }}
                                         </span>
 
@@ -1163,7 +1162,7 @@
 
                                         @if(!empty($residente['turno_actual']))
 
-                                            <span class="px-1.5 py-0.2 rounded font-bold bg-[#C98A17]/15 text-[#C98A17] dark:text-[#F3B740]">
+                                            <span class="px-1.5 py-0.2 rounded font-bold bg-[#FFF1D6] text-[#966B24] border border-[#E8C178] dark:bg-[#D2A45E]/20 dark:text-[#E0B36D] dark:border-[#D2A45E]/40">
 
                                                 {{ $residente['turno_actual'] }}
 
@@ -1183,7 +1182,7 @@
 
                                         @endif
 
-                                        <span class="px-1.5 py-0.2 rounded font-bold bg-[#F0E8DE] dark:bg-[#222527] border border-[#D5CABE]/50 dark:border-[#383C3D] text-[#677084] dark:text-[#A6B2C8]">
+                                        <span class="px-1.5 py-0.2 rounded font-bold bg-[#F0E8DE] dark:bg-[#2D2924] border border-[#D5CABE]/50 dark:border-[#494139] text-[#677084] dark:text-[#A6B2C8]">
 
                                             {{ $residente['movilidad_label'] ?? 'Movilidad asistida' }}
 
@@ -1193,9 +1192,9 @@
 
                                         @if($alertCnt > 0)
 
-                                            <span class="inline-flex items-center gap-0.5 px-1.5 py-0.2 rounded font-black text-[#D62828] bg-[#D62828]/12 dark:bg-[#D62828]/25">
+                                            <span class="inline-flex items-center gap-0.5 px-1.5 py-0.2 rounded font-black text-rose-800 dark:text-rose-200 bg-rose-100 dark:bg-rose-900/50 border border-rose-200/80 dark:border-rose-800/60">
 
-                                                <i class="ph-bold ph-bell-ringing text-[10px]"></i>
+                                                <i class="ph-bold ph-bell-ringing text-[10px] text-rose-600 dark:text-rose-400"></i>
 
                                                 <span>{{ $alertCnt }} {{ $alertCnt === 1 ? 'alerta' : 'alertas' }}</span>
 
@@ -1203,7 +1202,7 @@
 
                                         @else
 
-                                            <span class="inline-flex items-center gap-0.5 px-1.5 py-0.2 rounded font-semibold text-[#63775B] bg-[#63775B]/12 dark:bg-[#63775B]/25">
+                                            <span class="inline-flex items-center gap-0.5 px-1.5 py-0.2 rounded font-semibold text-[#63775B] dark:text-[#9DB491] bg-[#E8F1E5] dark:bg-[#63775B]/25 border border-[#B8CDAE]/60 dark:border-[#63775B]/40">
 
                                                 <i class="ph-bold ph-check text-[10px]"></i>
 
@@ -1225,7 +1224,7 @@
 
                             <div class="hidden sm:flex items-center justify-center pl-2">
 
-                                <i class="ph-bold ph-caret-right text-sm text-[#967B66] dark:text-[#C4BCB3] opacity-50 group-hover/res:opacity-100 group-hover/res:translate-x-0.5 transition-all duration-150"></i>
+                                <i class="ph-bold ph-caret-right text-sm text-[#967B66] dark:text-[#BDAE9F] opacity-50 group-hover/res:opacity-100 group-hover/res:translate-x-0.5 transition-all duration-150"></i>
 
                             </div>
 
@@ -1251,15 +1250,15 @@
 
         {{-- ALERTAS RECIENTES (4 COLS): STREAM DE NOTIFICACIONES CLÍNICAS --}}
 
-        <section class="lg:col-span-4 rounded-[16px] border border-[#D5CABE] hover:border-[#304060]/60 dark:border-[#383C3D] dark:hover:border-[#52585A] bg-[#F0E8DE] dark:bg-[#222527] p-3.5 sm:p-4 shadow-[0_3px_12px_rgba(47,62,92,0.06)] hover:shadow-[0_8px_20px_rgba(47,62,92,0.12)] transition-all duration-200 ease-out flex flex-col justify-between" aria-label="Alertas recientes del turno">
+        <section class="lg:col-span-4 rounded-[16px] border border-[#D5CABE] hover:border-[#304060]/60 dark:border-[#494139] dark:hover:border-[#52585A] bg-[#F0E8DE] dark:bg-[#2D2924] p-3.5 sm:p-4 shadow-[0_3px_12px_rgba(47,62,92,0.06)] hover:shadow-[0_8px_20px_rgba(47,62,92,0.12)] transition-all duration-200 ease-out flex flex-col justify-between" aria-label="Alertas recientes del turno">
 
             {{-- Cabecera con Ícono Contextual + Enlace Textual con Chevron --}}
 
-            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 border-b border-[#D5CABE]/40 dark:border-[#383C3D] pb-2.5">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 border-b border-[#D5CABE]/40 dark:border-[#494139] pb-2.5">
 
                 <div class="flex items-center gap-2">
 
-                    <span class="flex h-7 w-7 items-center justify-center rounded-lg bg-[#D62828]/12 text-[#D62828] dark:bg-[#D62828]/25 dark:text-[#FF7A7A] shrink-0">
+                    <span class="flex h-7 w-7 items-center justify-center rounded-lg bg-rose-100 text-rose-700 dark:bg-rose-900/50 dark:text-rose-300 border border-rose-200/80 dark:border-rose-800/60 shrink-0">
 
                         <i class="ph-bold ph-bell-ringing text-base"></i>
 
@@ -1285,7 +1284,7 @@
 
                 <a href="{{ Route::has('admin.enfermeria.alertas') ? route('admin.enfermeria.alertas') : '#' }}"
 
-                   class="group/link text-[11px] font-extrabold text-[#D62828] dark:text-[#FF7A7A] hover:underline flex items-center gap-1 transition-colors duration-200 self-start sm:self-auto">
+                   class="group/link text-[11px] font-extrabold text-rose-700 dark:text-rose-300 hover:text-rose-800 dark:hover:text-rose-200 hover:underline flex items-center gap-1 transition-colors duration-200 self-start sm:self-auto">
 
                     <span>Ver todas</span>
 
@@ -1315,27 +1314,27 @@
 
                         if ($prioridad === 'CRITICA' || $prioridad === 'CRÍTICA' || $prioridad === 'CRITICO' || $prioridad === 'ALTA' || $prioridad === 'ALTO') {
 
-                            $bordeLeft = 'border-l-[3.5px] border-l-[#D62828] bg-[#FBF8F5]/70 hover:bg-[#FFF5F5] dark:bg-[#2A2D2E]/60 dark:hover:bg-[rgba(214,40,40,0.15)]';
+                            $bordeLeft = 'border-l-[3.5px] border-l-rose-500 bg-rose-50/70 hover:bg-rose-100/70 dark:bg-rose-950/30 dark:hover:bg-rose-900/40';
 
-                            $badgeStyle = 'bg-[#D62828] text-white';
+                            $badgeStyle = 'bg-rose-100 text-rose-800 dark:bg-rose-900/60 dark:text-rose-200 border border-rose-200/80 dark:border-rose-800/60';
 
-                            $iconoAlerta = 'ph-warning-octagon text-[#D62828]';
+                            $iconoAlerta = 'ph-warning-octagon text-rose-600 dark:text-rose-400';
 
                         } elseif ($prioridad === 'MEDIA' || $prioridad === 'MEDIO') {
 
-                            $bordeLeft = 'border-l-[3.5px] border-l-[#C98A17] bg-[#FBF8F5]/70 hover:bg-[#FDF9F2] dark:bg-[#2A2D2E]/60 dark:hover:bg-[#382C22]/60';
+                            $bordeLeft = 'border-l-[3.5px] border-l-[#D2A45E] bg-[#FFF1D6]/60 hover:bg-[#FFF1D6] dark:bg-[#D2A45E]/15 dark:hover:bg-[#D2A45E]/25';
 
-                            $badgeStyle = 'bg-[#C98A17] text-white';
+                            $badgeStyle = 'bg-[#FFF1D6] text-[#966B24] border border-[#E8C178] dark:bg-[#D2A45E]/20 dark:text-[#E0B36D] dark:border-[#D2A45E]/40';
 
-                            $iconoAlerta = 'ph-warning text-[#C98A17]';
+                            $iconoAlerta = 'ph-warning text-[#966B24] dark:text-[#E0B36D]';
 
                         } else {
 
-                            $bordeLeft = 'border-l-[3.5px] border-l-[#304060] bg-[#FBF8F5]/70 hover:bg-[#EEF1FA] dark:bg-[#2A2D2E]/60 dark:hover:bg-[#252A38]/60';
+                            $bordeLeft = 'border-l-[3.5px] border-l-[#304060] bg-[#EEF1FA]/60 hover:bg-[#EEF1FA] dark:bg-[#304060]/20 dark:hover:bg-[#304060]/30';
 
-                            $badgeStyle = 'bg-[#304060] text-white';
+                            $badgeStyle = 'bg-[#304060]/10 text-[#304060] dark:bg-[#304060]/30 dark:text-[#8595B5] border border-[#304060]/20 dark:border-[#304060]/40';
 
-                            $iconoAlerta = 'ph-info text-[#304060]';
+                            $iconoAlerta = 'ph-info text-[#304060] dark:text-[#8595B5]';
 
                         }
 
@@ -1343,7 +1342,7 @@
 
                     <a href="{{ Route::has('admin.enfermeria.alertas') ? route('admin.enfermeria.alertas') : '#' }}"
 
-                       class="group/alerta block rounded-xl border border-[#D5CABE]/40 dark:border-[#383C3D] p-2.5 hover:-translate-y-0.5 transition-all duration-150 {{ $bordeLeft }}">
+                       class="group/alerta block rounded-xl border border-[#D5CABE]/40 dark:border-[#494139] p-2.5 hover:-translate-y-0.5 transition-all duration-150 {{ $bordeLeft }}">
 
                         <div class="flex items-start justify-between gap-1.5">
 
@@ -1433,21 +1432,21 @@
 
                 grid: isDark ? 'rgba(255, 255, 255, 0.06)' : 'rgba(47, 62, 92, 0.06)',
 
-                border: isDark ? '#222527' : '#F0E8DE',
+                border: isDark ? '#2D2924' : '#F0E8DE',
 
                 completadas: '#63775B', // Verde salvia oscuro
 
-                pendientes: '#C98A17',  // Ámbar
+                pendientes: '#D2A45E',  // Ámbar
 
-                retrasadas: '#D62828',  // Rojo clínico
+                retrasadas: '#C85D52',  // Rojo clínico
 
                 medicacion: '#304060',  // Azul profundo principal
 
-                signos: '#243B6B',      // Azul intenso
+                signos: '#71876A',      // Azul intenso
 
                 higiene: '#63775B',     // Verde salvia
 
-                movilizacion: '#C98A17' // Ámbar
+                movilizacion: '#D2A45E' // Ámbar
 
             };
 
@@ -1535,7 +1534,7 @@
 
                                     bodyColor: colors.text,
 
-                                    borderColor: isDark ? '#383C3D' : '#D5CABE',
+                                    borderColor: isDark ? '#494139' : '#D5CABE',
 
                                     borderWidth: 1,
 
@@ -1661,7 +1660,7 @@
 
                                     bodyColor: colors.text,
 
-                                    borderColor: isDark ? '#383C3D' : '#D5CABE',
+                                    borderColor: isDark ? '#494139' : '#D5CABE',
 
                                     borderWidth: 1,
 

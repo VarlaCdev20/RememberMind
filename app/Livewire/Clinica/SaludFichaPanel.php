@@ -214,7 +214,7 @@ class SaludFichaPanel extends Component
 
     public function save()
     {
-        if (!auth()->user()->can('salud.ficha.crear') && !auth()->user()->can('salud.ficha.editar')) {
+        if (!auth()->user()->can('atenciones.crear') && !auth()->user()->can('atenciones.editar')) {
             abort(403);
         }
 
@@ -265,7 +265,7 @@ class SaludFichaPanel extends Component
 
     public function archivar()
     {
-        if (!auth()->user()->can('salud.ficha.archivar')) {
+        if (!auth()->user()->can('atenciones.anular')) {
             abort(403);
         }
 

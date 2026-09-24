@@ -52,11 +52,11 @@ class RegistrarAdministracionMedicacionService
             ->with('jornada')
             ->where('cod_residente', $codResidente)
             ->where('cod_personal', $personal->cod_personal)
-            ->where('estado', 'ACTIVA')
+            ->whereIn('estado', ['ACTIVA', 'ACTIVO'])
             ->whereHas('jornada', fn ($query) => $query
                 ->whereDate('fecha_jornada', today())
                 ->where('cod_turno', $turno->cod_turno)
-                ->where('estado', 'ABIERTA'))
+                ->whereIn('estado', ['ABIERTA', 'ACTIVA']))
             ->firstOrFail();
 
         return DB::transaction(function () use (
@@ -76,7 +76,7 @@ class RegistrarAdministracionMedicacionService
             $prescripcion = Prescripcion::query()
                 ->whereKey($codPrescripcion)
                 ->where('cod_residente', $codResidente)
-                ->where('estado', 'ACTIVA')
+                ->whereIn('estado', ['ACTIVA', 'ACTIVO'])
                 ->lockForUpdate()
                 ->first();
             $this->exigir($prescripcion !== null, 'La prescripción no pertenece al residente o ya no está activa.');
@@ -129,16 +129,16 @@ class RegistrarAdministracionMedicacionService
         $this->exigir(mb_strlen(trim($motivo)) >= 5, 'El motivo clínico PRN debe tener al menos 5 caracteres.');
         $this->exigir($intensidad >= 0 && $intensidad <= 10, 'La intensidad previa debe estar entre 0 y 10.');
         $prescripcion = Prescripcion::query()->whereKey($codPrescripcion)
-            ->where('cod_residente', $codResidente)->where('estado', 'ACTIVA')
+            ->where('cod_residente', $codResidente)->whereIn('estado', ['ACTIVA', 'ACTIVO'])
             ->where('segun_necesidad', true)->first();
         $this->exigir($prescripcion !== null, 'La orden PRN no pertenece al residente o no está activa.');
 
         $asignacion = AsignacionResidenteJornada::query()
             ->where('cod_residente', $codResidente)
             ->where('cod_personal', $usuario->personal->cod_personal)
-            ->where('estado', 'ACTIVA')
+            ->whereIn('estado', ['ACTIVA', 'ACTIVO'])
             ->whereHas('jornada', fn ($query) => $query->whereDate('fecha_jornada', today())
-                ->where('cod_turno', $turno->cod_turno)->where('estado', 'ABIERTA'))
+                ->where('cod_turno', $turno->cod_turno)->whereIn('estado', ['ABIERTA', 'ACTIVA']))
             ->firstOrFail();
 
         return AdministracionMedicacion::query()->create([

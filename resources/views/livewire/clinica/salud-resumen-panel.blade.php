@@ -139,7 +139,7 @@ $estadoTexto = $adulto->estado?->estado ?? 'Sin estado';
  </h3>
 
  <div class="space-y-1.5">
- @can('salud.ficha.ver')
+ @can('atenciones.ver')
  <a href="{{ route('admin.salud-seguimiento.ficha', $adulto) }}"
  class="flex items-center justify-between rounded-xl bg-fondo-card px-3 py-2.5 text-xs font-bold text-titulo shadow-sm hover:text-boton-acento hover:shadow-md transition-all">
  <span class="flex items-center gap-2">
@@ -150,7 +150,7 @@ $estadoTexto = $adulto->estado?->estado ?? 'Sin estado';
  </a>
  @endcan
 
- @can('salud.medicacion.ver')
+ @can('prescripciones.ver')
  <a href="{{ route('admin.salud-seguimiento.medicacion', $adulto) }}"
  class="flex items-center justify-between rounded-xl bg-fondo-card px-3 py-2.5 text-xs font-bold text-titulo shadow-sm hover:text-boton-acento hover:shadow-md transition-all">
  <span class="flex items-center gap-2">
@@ -161,7 +161,7 @@ $estadoTexto = $adulto->estado?->estado ?? 'Sin estado';
  </a>
  @endcan
 
- @can('salud.signos.ver')
+ @can('signos_vitales.ver')
  <a href="{{ route('admin.salud-seguimiento.signos', $adulto) }}"
  class="flex items-center justify-between rounded-xl bg-fondo-card px-3 py-2.5 text-xs font-bold text-titulo shadow-sm hover:text-boton-acento hover:shadow-md transition-all">
  <span class="flex items-center gap-2">
@@ -172,7 +172,7 @@ $estadoTexto = $adulto->estado?->estado ?? 'Sin estado';
  </a>
  @endcan
 
- @can('salud.valoracion.ver')
+ @can('valoraciones_funcionales.ver')
  <a href="{{ route('admin.salud-seguimiento.valoracion', $adulto) }}"
  class="flex items-center justify-between rounded-xl bg-fondo-card px-3 py-2.5 text-xs font-bold text-titulo shadow-sm hover:text-boton-acento hover:shadow-md transition-all">
  <span class="flex items-center gap-2">
@@ -249,7 +249,7 @@ $estadoTexto = $adulto->estado?->estado ?? 'Sin estado';
  <i class="ph-bold ph-file-text text-boton-acento text-base"></i>
  Ficha Médica Base
  </h3>
- @can('salud.ficha.ver')
+ @can('atenciones.ver')
  <a href="{{ route('admin.salud-seguimiento.ficha', $adulto) }}"
  class="rounded-lg bg-fondo-card/10 px-3 py-1.5 text-xs font-bold text-inverso hover:bg-fondo-card/20 transition-colors">
  Gestionar Ficha
@@ -313,7 +313,7 @@ $estadoTexto = $adulto->estado?->estado ?? 'Sin estado';
  <div class="py-6 text-center">
  <i class="ph-fill ph-file-dashed text-3xl text-meta mb-2 block"></i>
  <p class="text-sm font-bold text-meta">Sin ficha médica activa registrada</p>
- @can('salud.ficha.crear')
+ @can('atenciones.crear')
  <a href="{{ route('admin.salud-seguimiento.ficha', $adulto) }}"
  class="mt-3 inline-flex items-center gap-1.5 rounded-lg bg-boton-principal px-3 py-1.5 text-xs font-bold text-inverso hover:opacity-90 transition-opacity">
  <i class="ph-bold ph-plus"></i> Registrar Ficha Médica
@@ -337,13 +337,13 @@ $estadoTexto = $adulto->estado?->estado ?? 'Sin estado';
  @endif
  </h3>
  <div class="flex gap-2">
- @can('salud.administracion.ver')
+ @can('administraciones_medicacion.ver')
  <a href="{{ route('admin.salud-seguimiento.administracion', $adulto) }}"
  class="rounded-lg bg-boton-acento px-3 py-1.5 text-[10px] uppercase font-black text-inverso hover:opacity-90 transition-opacity">
  Registrar Toma
  </a>
  @endcan
- @can('salud.medicacion.ver')
+ @can('prescripciones.ver')
  <a href="{{ route('admin.salud-seguimiento.medicacion', $adulto) }}"
  class="rounded-lg bg-fondo-card/10 px-3 py-1.5 text-xs font-bold text-inverso hover:bg-fondo-card/20 transition-colors">
  Ver Medicación
@@ -422,7 +422,7 @@ $estadoTexto = $adulto->estado?->estado ?? 'Sin estado';
  <i class="ph-bold ph-activity text-boton-acento text-sm"></i>
  Últimos Signos Vitales
  </h3>
- @can('salud.signos.ver')
+ @can('signos_vitales.ver')
  <a href="{{ route('admin.salud-seguimiento.signos', $adulto) }}"
  class="rounded-lg bg-fondo-card/10 px-2 py-1 text-[10px] font-bold uppercase text-inverso hover:bg-fondo-card/20 transition-colors"
  title="Registrar signos vitales">
@@ -486,7 +486,7 @@ $estadoTexto = $adulto->estado?->estado ?? 'Sin estado';
  <div class="py-8 text-center">
  <i class="ph-bold ph-activity text-3xl text-meta mb-2 block"></i>
  <p class="text-xs font-bold text-meta">Sin registros de signos vitales</p>
- @can('salud.signos.crear')
+ @can('signos_vitales.crear')
  <a href="{{ route('admin.salud-seguimiento.signos', $adulto) }}"
  class="mt-3 inline-flex items-center gap-1.5 rounded-lg bg-boton-principal px-3 py-1.5 text-xs font-bold text-inverso hover:opacity-90 transition-opacity">
  <i class="ph-bold ph-plus"></i> Registrar
@@ -504,7 +504,7 @@ $estadoTexto = $adulto->estado?->estado ?? 'Sin estado';
  <i class="ph-bold ph-person-simple-walk text-boton-acento text-sm"></i>
  Valoración Funcional
  </h3>
- @can('salud.valoracion.ver')
+ @can('valoraciones_funcionales.ver')
  <a href="{{ route('admin.salud-seguimiento.valoracion', $adulto) }}"
  class="rounded-lg bg-fondo-card/10 px-2 py-1 text-[10px] font-bold uppercase text-inverso hover:bg-fondo-card/20 transition-colors"
  title="Registrar valoración funcional">
@@ -573,7 +573,7 @@ $estadoTexto = $adulto->estado?->estado ?? 'Sin estado';
  <div class="py-8 text-center">
  <i class="ph-bold ph-person-simple-walk text-3xl text-meta mb-2 block"></i>
  <p class="text-xs font-bold text-meta">Sin valoración funcional vigente</p>
- @can('salud.valoracion.crear')
+ @can('valoraciones_funcionales.crear')
  <a href="{{ route('admin.salud-seguimiento.valoracion', $adulto) }}"
  class="mt-3 inline-flex items-center gap-1.5 rounded-lg bg-boton-principal px-3 py-1.5 text-xs font-bold text-inverso hover:opacity-90 transition-opacity">
  <i class="ph-bold ph-plus"></i> Registrar

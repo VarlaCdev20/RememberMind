@@ -91,7 +91,7 @@ class MisPacientes extends Component
         $turnoActual = $service->obtenerTurnoActivo($user);
         $this->esModoConsulta = ($turnoActual === null) && !$service->esSuperAdmin($user);
 
-        if ($service->esSuperAdmin($user)) {
+        if ($service->tieneLecturaClinicaGlobal($user)) {
             $this->filtroEnfermero = '';
             $this->filtroTurno = '';
         } else {
@@ -124,7 +124,7 @@ class MisPacientes extends Component
         $user = Auth::user();
         abort_unless($user && $user->estado === 'ACTIVO', 403, 'Sesión no activa o usuario inactivo.');
         abort_unless(
-            $user->can('pacientes.ver') || $user->can('residentes.ver') || $user->can('pacientes') || $user->can('cuidados.ver') || $user->hasRole(['ENFERMEROS', 'SUPERADMINISTRADOR']),
+            $user->can('residentes.ver') || $user->hasRole(['ENFERMEROS', 'SUPERADMINISTRADOR']),
             403,
             'No tiene permisos para consultar residentes.'
         );
@@ -132,6 +132,7 @@ class MisPacientes extends Component
         $service = $this->getTurnoService();
         $turnoActual = $service->obtenerTurnoActivo($user);
         $esSuperAdmin = $service->esSuperAdmin($user);
+        $tieneLecturaClinicaGlobal = $service->tieneLecturaClinicaGlobal($user);
         $this->esModoConsulta = ($turnoActual === null) && !$esSuperAdmin;
 
         // Buscar residente por cod_residente
@@ -156,7 +157,7 @@ class MisPacientes extends Component
         $esPermitido = false;
         $esAsignadoAlUsuario = false;
 
-        if ($esSuperAdmin) {
+        if ($tieneLecturaClinicaGlobal) {
             $esPermitido = true;
             $esAsignadoAlUsuario = false;
         } elseif ($turnoActual) {
@@ -456,7 +457,7 @@ class MisPacientes extends Component
     public function abrirRegistrarSignos(string $codAm): void
     {
         abort_if($this->esModoConsulta, 403, 'Operación no permitida en modo consulta / fuera de turno.');
-        abort_unless((auth()->user()?->can('signos_vitales.crear') || auth()->user()?->can('signos_vitales.registrar') || auth()->user()?->can('signos_vitales') || auth()->user()?->hasRole('ENFERMEROS')), 403);
+        abort_unless(auth()->user()?->can('signos_vitales.crear'), 403);
         $this->getTurnoService()->autorizarAccionPaciente($codAm);
         $this->modalCodAm = $codAm;
         $this->reset(['signoPA', 'signoFC', 'signoFR', 'signoTemp', 'signoSat', 'signoGlucosa', 'signoObs', 'signoConfirmarAtipico']);
@@ -494,7 +495,7 @@ class MisPacientes extends Component
     public function abrirRegistrarSeguimiento(string $codAm): void
     {
         abort_if($this->esModoConsulta, 403, 'Operación no permitida en modo consulta / fuera de turno.');
-        abort_unless((auth()->user()?->can('seguimiento.crear') || auth()->user()?->can('atenciones.crear') || auth()->user()?->can('atenciones') || auth()->user()?->can('pases_turno') || auth()->user()?->hasRole('ENFERMEROS')), 403);
+        abort_unless(auth()->user()?->can('atenciones.crear'), 403);
         $this->getTurnoService()->autorizarAccionPaciente($codAm);
         $this->modalCodAm = $codAm;
         $this->segEstado = 'ESTABLE';
@@ -515,8 +516,8 @@ class MisPacientes extends Component
     public function guardarSeguimiento(): void
     {
         abort_if($this->esModoConsulta, 403, 'Operación no permitida en modo consulta / fuera de turno.');
-        abort_unless((auth()->user()?->can('seguimiento.crear') || auth()->user()?->can('atenciones.crear') || auth()->user()?->can('atenciones') || auth()->user()?->can('pases_turno') || auth()->user()?->hasRole('ENFERMEROS')), 403);
-        $turno = $this->getTurnoService()->autorizarMutacionPaciente($this->modalCodAm, 'seguimiento.crear', Auth::user());
+        abort_unless(auth()->user()?->can('atenciones.crear'), 403);
+        $turno = $this->getTurnoService()->autorizarMutacionPaciente($this->modalCodAm, 'atenciones.crear', Auth::user());
         $service = $this->getTurnoService();
         $turno = $service->obtenerTurnoActivo(Auth::user());
         $this->validate([
@@ -566,7 +567,7 @@ class MisPacientes extends Component
     public function abrirAdministrarMed(string $codAm): void
     {
         abort_if($this->esModoConsulta, 403, 'Operación no permitida en modo consulta / fuera de turno.');
-        abort_unless((auth()->user()?->can('administracion_medicacion.registrar') || auth()->user()?->can('administraciones_medicacion.crear') || auth()->user()?->can('administraciones_medicacion')), 403);
+        abort_unless(auth()->user()?->can('administraciones_medicacion.crear'), 403);
         $this->getTurnoService()->autorizarAccionPaciente($codAm);
         $this->modalCodAm = $codAm;
         $this->medicacionesPaciente = Prescripcion::where('cod_residente', $codAm)
@@ -588,8 +589,8 @@ class MisPacientes extends Component
     public function guardarMed(): void
     {
         abort_if($this->esModoConsulta, 403, 'Operación no permitida en modo consulta / fuera de turno.');
-        abort_unless((auth()->user()?->can('administracion_medicacion.registrar') || auth()->user()?->can('administraciones_medicacion.crear') || auth()->user()?->can('administraciones_medicacion')), 403);
-        $this->getTurnoService()->autorizarMutacionPaciente($this->modalCodAm, 'administracion_medicacion.registrar', Auth::user());
+        abort_unless(auth()->user()?->can('administraciones_medicacion.crear'), 403);
+        $this->getTurnoService()->autorizarMutacionPaciente($this->modalCodAm, 'administraciones_medicacion.crear', Auth::user());
         $this->validate([
             'medCodMed' => 'required|exists:prescripciones,cod_prescripcion',
             'medAdministrado' => 'boolean',
@@ -623,7 +624,7 @@ class MisPacientes extends Component
     public function abrirReportarAlerta(string $codAm): void
     {
         abort_if($this->esModoConsulta, 403, 'Operación no permitida en modo consulta / fuera de turno.');
-        abort_unless((auth()->user()?->can('alertas.crear') || auth()->user()?->can('incidentes.crear') || auth()->user()?->can('alertas.ver') || auth()->user()?->hasRole('ENFERMEROS')), 403);
+        abort_unless(auth()->user()?->can('alertas.gestionar'), 403);
         $this->getTurnoService()->autorizarAccionPaciente($codAm);
         $this->modalCodAm = $codAm;
         $this->alertaTipo = 'INCIDENTE';
@@ -657,7 +658,7 @@ class MisPacientes extends Component
     public function abrirRegistrarCuidado(string $codAm, string $tipo = 'HIGIENE', string $subtipo = 'GENERAL'): void
     {
         abort_if($this->esModoConsulta, 403, 'Operación no permitida en modo consulta / fuera de turno.');
-        abort_unless((auth()->user()?->can('seguimiento.crear') || auth()->user()?->can('atenciones.crear') || auth()->user()?->can('atenciones') || auth()->user()?->can('pases_turno') || auth()->user()?->hasRole('ENFERMEROS')), 403);
+        abort_unless(auth()->user()?->can('atenciones.crear'), 403);
         $this->getTurnoService()->autorizarAccionPaciente($codAm);
         $this->modalCodAm = $codAm;
         $tipoUpper = strtoupper(trim($tipo));
@@ -670,7 +671,7 @@ class MisPacientes extends Component
     public function guardarCuidado(): void
     {
         abort_if($this->esModoConsulta, 403, 'Operación no permitida en modo consulta / fuera de turno.');
-        abort_unless((auth()->user()?->can('seguimiento.crear') || auth()->user()?->can('atenciones.crear') || auth()->user()?->can('atenciones') || auth()->user()?->can('pases_turno') || auth()->user()?->hasRole('ENFERMEROS')), 403);
+        abort_unless(auth()->user()?->can('atenciones.crear'), 403);
         $this->validate([
             'cuidadoTipo' => 'required|in:HIGIENE,ALIMENTACION,MOVILIDAD,ELIMINACION,PIEL',
             'cuidadoSubtipo' => 'required|string|max:50',
@@ -695,7 +696,7 @@ class MisPacientes extends Component
     public function abrirRegistrarDolor(string $codAm, int $intensidad = 5): void
     {
         abort_if($this->esModoConsulta, 403, 'Operación no permitida en modo consulta / fuera de turno.');
-        abort_unless((auth()->user()?->can('seguimiento.crear') || auth()->user()?->can('atenciones.crear') || auth()->user()?->can('atenciones') || auth()->user()?->can('pases_turno') || auth()->user()?->hasRole('ENFERMEROS')), 403);
+        abort_unless(auth()->user()?->can('atenciones.crear'), 403);
         $this->getTurnoService()->autorizarAccionPaciente($codAm);
         $this->modalCodAm = $codAm;
         $this->dolorIntensidad = max(0, min(10, $intensidad));
@@ -706,7 +707,7 @@ class MisPacientes extends Component
     public function guardarDolor(): void
     {
         abort_if($this->esModoConsulta, 403, 'Operación no permitida en modo consulta / fuera de turno.');
-        abort_unless((auth()->user()?->can('seguimiento.crear') || auth()->user()?->can('atenciones.crear') || auth()->user()?->can('atenciones') || auth()->user()?->can('pases_turno') || auth()->user()?->hasRole('ENFERMEROS')), 403);
+        abort_unless(auth()->user()?->can('atenciones.crear'), 403);
         $this->validate([
             'dolorIntensidad' => 'required|integer|min:0|max:10',
             'dolorDetalle' => 'required|string|min:5|max:1000',
@@ -732,7 +733,7 @@ class MisPacientes extends Component
     public function abrirRegistrarProcedimiento(string $codAm, string $tipo = 'CURACION'): void
     {
         abort_if($this->esModoConsulta, 403, 'Operación no permitida en modo consulta / fuera de turno.');
-        abort_unless((auth()->user()?->can('seguimiento.crear') || auth()->user()?->can('atenciones.crear') || auth()->user()?->can('atenciones') || auth()->user()?->can('pases_turno') || auth()->user()?->hasRole('ENFERMEROS')), 403);
+        abort_unless(auth()->user()?->can('atenciones.crear'), 403);
         $this->getTurnoService()->autorizarAccionPaciente($codAm);
         $this->modalCodAm = $codAm;
         $tipoUpper = strtoupper(trim($tipo));
@@ -744,7 +745,7 @@ class MisPacientes extends Component
     public function guardarProcedimiento(): void
     {
         abort_if($this->esModoConsulta, 403, 'Operación no permitida en modo consulta / fuera de turno.');
-        abort_unless((auth()->user()?->can('seguimiento.crear') || auth()->user()?->can('atenciones.crear') || auth()->user()?->can('atenciones') || auth()->user()?->can('pases_turno') || auth()->user()?->hasRole('ENFERMEROS')), 403);
+        abort_unless(auth()->user()?->can('atenciones.crear'), 403);
         $this->validate([
             'procTipo' => 'required|in:CURACION,SONDA,CATETER,OXIGENO,OTRO',
             'procDetalle' => 'required|string|min:5|max:2000',
@@ -774,9 +775,10 @@ class MisPacientes extends Component
         $user = Auth::user();
         $esSuperAdmin = $service->esSuperAdmin($user);
         $esSupervisor = $esSuperAdmin;
+        $tieneLecturaClinicaGlobal = $service->tieneLecturaClinicaGlobal($user);
 
         // Asegurar que enfermero estándar no pueda burlar el filtro
-        $enfermeroEfectivo = $esSupervisor ? $this->filtroEnfermero : (string) $user?->cod_usuario;
+        $enfermeroEfectivo = $tieneLecturaClinicaGlobal ? $this->filtroEnfermero : (string) $user?->cod_usuario;
         $turnoEfectivo = $this->filtroTurno ?: null;
 
         $pacientesQuery = $service->obtenerPacientesAsignadosQuery(

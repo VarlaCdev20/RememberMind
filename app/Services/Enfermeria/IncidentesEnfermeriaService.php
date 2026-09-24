@@ -20,7 +20,7 @@ class IncidentesEnfermeriaService
 
     public function registrar(string $codResidente, array $datos, User $usuario): Incidente
     {
-        $this->turnos->autorizarMutacionEnfermeria($codResidente, 'seguimiento.crear', $usuario);
+        $this->turnos->autorizarMutacionEnfermeria($codResidente, 'incidentes.crear', $usuario);
         $datos = Validator::make($datos, [
             'tipo' => 'required|in:CAIDA,GOLPE,ERROR_MEDICACION,LESION,CAMBIO_CLINICO,OTRO',
             'lugar' => 'required|string|min:2|max:120',
@@ -88,7 +88,7 @@ class IncidentesEnfermeriaService
 
     public function registrarSeguimiento(Incidente $incidente, string $accion, User $usuario): Incidente
     {
-        $this->turnos->autorizarMutacionEnfermeria($incidente->cod_residente, 'seguimiento.crear', $usuario);
+        $this->turnos->autorizarMutacionEnfermeria($incidente->cod_residente, 'incidentes.crear', $usuario);
         Validator::make(['accion' => $accion], ['accion' => 'required|string|min:10|max:5000'])->validate();
 
         return DB::transaction(function () use ($incidente, $accion) {
@@ -105,7 +105,7 @@ class IncidentesEnfermeriaService
 
     public function cerrar(Incidente $incidente, string $evaluacion, string $resultado, User $usuario): Incidente
     {
-        $this->turnos->autorizarMutacionEnfermeria($incidente->cod_residente, 'seguimiento.crear', $usuario);
+        $this->turnos->autorizarMutacionEnfermeria($incidente->cod_residente, 'incidentes.crear', $usuario);
         Validator::make(compact('evaluacion', 'resultado'), [
             'evaluacion' => 'required|string|min:10|max:5000',
             'resultado' => 'required|string|min:5|max:5000',

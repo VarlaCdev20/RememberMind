@@ -10,7 +10,7 @@ class StoreSignosVitalesRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return $this->user()?->canAny(['signos_vitales.crear', 'salud.signos.crear']) === true;
+        return $this->user()?->can('signos_vitales.crear') === true;
     }
 
     protected function prepareForValidation(): void

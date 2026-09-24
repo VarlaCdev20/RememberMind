@@ -704,7 +704,7 @@ class PaseTurnoService
 
     public function generar(string $codResidente, string $turnoEntranteId, string $enfermeroEntranteId, array $datos, User $usuario): PaseTurno
     {
-        $saliente = $this->turnos->autorizarMutacionPaciente($codResidente, 'pase_turno.generar', $usuario);
+        $saliente = $this->turnos->autorizarMutacionPaciente($codResidente, 'pases_turno.crear', $usuario);
 
         $datosValidados = Validator::make($datos, [
             'observaciones' => 'nullable|string|max:5000',

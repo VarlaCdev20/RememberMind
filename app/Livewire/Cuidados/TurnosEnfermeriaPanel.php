@@ -19,12 +19,12 @@ class TurnosEnfermeriaPanel extends Component
 
     public function mount(): void
     {
-        abort_unless(auth()->user()?->can('turnos_enfermeria.ver'), 403);
+        abort_unless(auth()->user()?->can('turnos.ver'), 403);
     }
 
     public function abrirCrear(): void
     {
-        abort_unless(auth()->user()?->can('turnos_enfermeria.crear'), 403);
+        abort_unless(auth()->user()?->can('turnos.gestionar'), 403);
         $this->reset('editandoId','nombre','horaInicio','horaFin','orden','estado','observacion');
         $this->estado = 'ACTIVO';
         $this->modalTurno = true;
@@ -32,7 +32,7 @@ class TurnosEnfermeriaPanel extends Component
 
     public function abrirEditar(string $id): void
     {
-        abort_unless(auth()->user()?->can('turnos_enfermeria.editar'), 403);
+        abort_unless(auth()->user()?->can('turnos.gestionar'), 403);
         $t = TurnoEnfermeria::findOrFail($id);
         $this->editandoId  = $id;
         $this->nombre      = $t->nombre;
@@ -47,7 +47,7 @@ class TurnosEnfermeriaPanel extends Component
 
     public function guardar(): void
     {
-        abort_unless(auth()->user()?->can($this->editandoId ? 'turnos_enfermeria.editar' : 'turnos_enfermeria.crear'), 403);
+        abort_unless(auth()->user()?->can('turnos.gestionar'), 403);
         $this->validate([
             'nombre'     => ['required', 'string', 'max:50', \Illuminate\Validation\Rule::unique('turnos', 'nombre')->ignore($this->editandoId, 'cod_turno')],
             'horaInicio' => 'required|date_format:H:i',

@@ -24,7 +24,7 @@
  medicación, administraciones y alertas preventivas de los adultos mayores.
  </p>
  <div class="mt-4 flex flex-wrap gap-2">
- @can('salud.ficha.crear')
+ @can('atenciones.crear')
  <button wire:click="cambiarSeccion('ficha')" type="button" class="inline-flex items-center justify-center gap-2 rounded-xl bg-boton-acento px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-inverso shadow-[0_10px_24px_rgba(226,125,96,0.25)] transition hover:-translate-y-0.5 hover:bg-fondo-panel active:scale-95">
  <i class="ph-bold ph-plus-circle text-sm"></i>
  Nuevo registro de salud
@@ -66,25 +66,21 @@
  @php
  $tabsRaw = [
  'resumen' => ['label' => 'Resumen clínico', 'icon' => 'ph-squares-four', 'permission' => 'salud.ver'],
- 'ficha' => ['label' => 'Ficha medica', 'icon' => 'ph-file-text', 'permission' => 'salud.ficha.ver', 'fallback_permission' => 'ficha_medica.crear'],
- 'signos' => ['label' => 'Signos vitales', 'icon' => 'ph-activity', 'permission' => 'salud.signos.ver', 'fallback_permission' => 'signos_vitales.ver'],
- 'medicacion' => ['label' => 'Medicación', 'icon' => 'ph-pill', 'permission' => 'salud.medicacion.ver', 'fallback_permission' => 'medicacion.ver'],
- 'administracion' => ['label' => 'Administración', 'icon' => 'ph-prescription', 'permission' => 'salud.medicacion.ver', 'fallback_permission' => 'administracion_medicacion.registrar'],
- 'valoracion' => ['label' => 'Valoracion funcional', 'icon' => 'ph-person-simple-walk', 'permission' => 'salud.ver', 'fallback_permission' => 'valoracion_funcional.crear'],
- 'evaluaciones' => ['label' => 'Evaluaciones cognitivas', 'icon' => 'ph-brain', 'permission' => 'evaluaciones.ver'],
- 'nutricion' => ['label' => 'Nutricion', 'icon' => 'ph-apple-pod', 'permission' => 'nutricion.ver'],
- 'alertas' => ['label' => 'Alertas clinicas', 'icon' => 'ph-warning-circle', 'permission' => 'alertas.ver', 'fallback_permission' => 'salud.alertas.ver'],
- 'reportes' => ['label' => 'Reportes clínicos', 'icon' => 'ph-chart-bar', 'permission' => 'reportes.ver', 'fallback_permission' => 'salud.reportes.ver'],
+ 'ficha' => ['label' => 'Ficha medica', 'icon' => 'ph-file-text', 'permission' => 'atenciones.ver'],
+ 'signos' => ['label' => 'Signos vitales', 'icon' => 'ph-activity', 'permission' => 'signos_vitales.ver'],
+ 'medicacion' => ['label' => 'Medicación', 'icon' => 'ph-pill', 'permission' => 'prescripciones.ver'],
+ 'administracion' => ['label' => 'Administración', 'icon' => 'ph-prescription', 'permission' => 'administraciones_medicacion.ver'],
+ 'valoracion' => ['label' => 'Valoracion funcional', 'icon' => 'ph-person-simple-walk', 'permission' => 'valoraciones_funcionales.ver'],
+ 'evaluaciones' => ['label' => 'Evaluaciones cognitivas', 'icon' => 'ph-brain', 'permission' => 'aplicaciones_instrumento.ver'],
+ 'nutricion' => ['label' => 'Nutricion', 'icon' => 'ph-apple-pod', 'permission' => 'valoraciones_nutricionales.ver'],
+ 'alertas' => ['label' => 'Alertas clinicas', 'icon' => 'ph-warning-circle', 'permission' => 'alertas.ver'],
+ 'reportes' => ['label' => 'Reportes clínicos', 'icon' => 'ph-chart-bar', 'permission' => 'reportes.ver'],
  ];
  
  $tabs = array_filter($tabsRaw, function($tab) {
      if (auth()->user()->hasRole('SUPERADMINISTRADOR')) return true;
      
      $hasPerm = auth()->user()->can($tab['permission']);
-     if (isset($tab['fallback_permission']) && !$hasPerm) {
-         $hasPerm = auth()->user()->can($tab['fallback_permission']);
-     }
-     
      return $hasPerm;
  });
  @endphp

@@ -14,7 +14,7 @@ class StoreAdministracionMedicacionRequest extends FormRequest
     {
         return Auth::check()
             && Auth::user()->hasRole('ENFERMEROS')
-            && Auth::user()->can('administracion_medicacion.registrar');
+            && Auth::user()->can('administraciones_medicacion.crear');
     }
 
     protected function prepareForValidation(): void
@@ -86,7 +86,7 @@ class StoreAdministracionMedicacionRequest extends FormRequest
             if ($codAm && Auth::check()) {
                 try {
                     app(TurnoEnfermeriaService::class)->autorizarMutacionPaciente(
-                        $codAm, 'administracion_medicacion.registrar', Auth::user()
+                        $codAm, 'administraciones_medicacion.crear', Auth::user()
                     );
                 } catch (\Throwable $e) {
                     $validator->errors()->add('cod_am', $e->getMessage());

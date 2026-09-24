@@ -38,13 +38,7 @@ class AlertasPanel extends Component
     {
         $user = auth()->user();
         abort_unless($user, 401);
-        if ($user->hasRole('SUPERADMINISTRADOR') || $user->hasRole('ADMINISTRADOR')) {
-            return;
-        }
-        abort_unless($user->canAny([
-            'alertas.'.$accion, 'alertas.gestionar', 'salud.alertas.gestionar',
-            ...($accion === 'ver' ? ['salud.alertas.ver'] : []),
-        ]), 403);
+        abort_unless($user->can($accion === 'ver' ? 'alertas.ver' : 'alertas.gestionar'), 403);
     }
 
     public function updated($campo): void
@@ -301,10 +295,8 @@ class AlertasPanel extends Component
     {
         $this->adultoDrawerId = $codAm;
         $this->adultoDrawer = AdultoMayor::with([
-            'estado',
-            'habitacion',
-            'cama',
-            'signosVitales' => fn ($q) => $q->where('estado', '!=', 'ANULADO')->latest('fecha')->latest('hora')->take(10),
+            'cama.habitacion',
+            'signosVitales' => fn ($q) => $q->where('estado', '!=', 'ANULADO')->latest('fecha_hora')->take(10),
         ])->find($codAm);
 
         $this->signosDrawer = $this->adultoDrawer?->signosVitales ?? collect();
@@ -316,9 +308,7 @@ class AlertasPanel extends Component
     {
         $this->adultoDrawerId = $codAm;
         $this->adultoDrawer = AdultoMayor::with([
-            'estado',
-            'habitacion',
-            'cama',
+            'cama.habitacion',
             'alertas' => fn ($q) => $q->latest()->take(5),
         ])->find($codAm);
 

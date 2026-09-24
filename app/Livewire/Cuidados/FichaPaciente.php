@@ -321,7 +321,7 @@ class FichaPaciente extends Component
             'signosVitales' => fn($q) => $q->orderByDesc('fecha_hora')->take(60),
             'medicaciones' => fn($q) => $q->with(['medicamento', 'horarios'])->where('estado', 'ACTIVA'),
             'administracionesMedicacion' => fn($q) => $q->with('medicacion.medicamento')->orderByDesc('fecha_hora_programada')->take(30),
-            'alertas' => fn($q) => $q->orderByDesc('fecha_hora')->take(25),
+            'alertas' => fn($q) => $q->with('eventos.usuario')->orderByDesc('fecha_hora')->take(25),
             'evaluacionesGeriatricas' => fn($q) => $q->orderByDesc('fecha_hora')->take(10),
             'valoracionesFuncionales' => fn($q) => $q->with('registradoPor')->orderByDesc('fecha_hora')->take(10),
         ])->findOrFail($codAm);
@@ -425,7 +425,7 @@ class FichaPaciente extends Component
         abort_unless($personal && strtoupper(trim((string)$personal->estado)) === 'ACTIVO', 403, 'Acción no permitida: Personal no vinculado o inactivo.');
 
         abort_unless(
-            $user->can('incidentes.crear') || $user->can('seguimiento.crear') || $user->hasAnyRole(['ENFERMEROS', 'SUPERADMINISTRADOR', 'MEDICO GENERAL/GERIATRA']),
+            $user->can('incidentes.crear') || $user->can('atenciones.crear') || $user->hasAnyRole(['ENFERMEROS', 'SUPERADMINISTRADOR', 'MEDICO GENERAL/GERIATRA']),
             403,
             'No cuenta con el permiso requerido para registrar incidentes.'
         );
@@ -863,7 +863,7 @@ class FichaPaciente extends Component
 
     public function confirmarAdministracionMed(): void
     {
-        abort_unless(auth()->user()?->can('administracion_medicacion.registrar') || auth()->user()?->can('administraciones_medicacion.crear') || auth()->user()?->can('administraciones_medicacion'), 403);
+        abort_unless(auth()->user()?->can('administraciones_medicacion.crear'), 403);
         app(TurnoEnfermeriaService::class)->autorizarAccionPaciente($this->adultoMayor, Auth::user());
 
         $codResidente = $this->adultoMayor->cod_residente ?? $this->adultoMayor->cod_residente;
@@ -940,9 +940,9 @@ class FichaPaciente extends Component
 
     public function completarTarea(string $codTarea): void
     {
-        abort_unless(auth()->user()?->can('tareas.registrar_resultado') || auth()->user()?->can('ejecuciones_cuidado.crear') || auth()->user()?->can('planes_cuidado.crear'), 403);
+        abort_unless(auth()->user()?->can('ejecuciones_cuidado.gestionar'), 403);
         $tarea = EjecucionCuidado::findOrFail($codTarea);
-        app(TurnoEnfermeriaService::class)->autorizarMutacionPaciente($tarea->cod_residente, 'tareas.registrar_resultado', Auth::user());
+        app(TurnoEnfermeriaService::class)->autorizarMutacionPaciente($tarea->cod_residente, 'ejecuciones_cuidado.gestionar', Auth::user());
         abort_unless($tarea->puedeCompletarse(), 409, 'La tarea ya no está pendiente de ejecución.');
 
         $tarea->update([
@@ -1021,28 +1021,25 @@ class FichaPaciente extends Component
     public function registrarAdministracionDirecta(string $codMed, string $resultado = 'ADMINISTRADA', ?string $horaReal = null, ?string $observaciones = null, ?string $motivo = null): void
     {
         abort_unless(Auth::check(), 401);
-        if (Auth::user()->hasRole('ENFERMEROS')) {
-            app(TurnoEnfermeriaService::class)->autorizarAccionPaciente($this->adultoMayor->cod_residente, Auth::user());
-        }
 
         $med = Prescripcion::where('cod_residente', $this->adultoMayor->cod_residente ?? $this->adultoMayor->cod_residente)
             ->where('cod_prescripcion', $codMed)
-            ->first();
+            ->firstOrFail();
 
         $esAdmin = strtoupper($resultado) === 'ADMINISTRADA' || strtoupper($resultado) === 'ADMINISTRADO';
+        $horaProgramada = $med->hora_programada
+            ? Carbon::parse($med->hora_programada)->format('H:i')
+            : now()->format('H:i');
 
-        AdministracionMedicacion::create([
-            'cod_med_adulto' => $med ? $med->cod_med_adulto : $codMed,
-            'cod_residente' => $this->adultoMayor->cod_residente,
-            'fecha' => now()->toDateString(),
-            'hora_programada' => $med?->hora_programada ?? '08:00',
-            'hora_real' => $horaReal ?: now()->format('H:i:s'),
-            'administrado' => $esAdmin,
-            'resultado' => $esAdmin ? 'ADMINISTRADO' : ($resultado === 'RECHAZADA' ? 'RECHAZADO' : 'OMITIDO'),
-            'motivo_omision' => !$esAdmin ? ($motivo ?: 'Demora u omisión asistencial justificada.') : null,
-            'observacion' => $observaciones ?: ($esAdmin ? 'Administración completada con buena tolerancia.' : 'Dosis no administrada.'),
-            'registrado_por' => Auth::id(),
-        ]);
+        app(RegistrarAdministracionMedicacionService::class)->registrarProgramada(
+            Auth::user(),
+            $this->adultoMayor->cod_residente,
+            $med->cod_prescripcion,
+            $horaProgramada,
+            $esAdmin,
+            $esAdmin ? null : ($motivo ?: 'Demora u omisión asistencial justificada.'),
+            $observaciones ?: ($esAdmin ? 'Administración completada con buena tolerancia.' : 'Dosis no administrada.'),
+        );
 
         $this->dispatch('swal', [
             'icon' => 'success',
@@ -1055,9 +1052,9 @@ class FichaPaciente extends Component
 
     public function guardarAccionTarea(): void
     {
-        abort_unless(auth()->user()?->can('tareas.registrar_resultado') || auth()->user()?->can('ejecuciones_cuidado.crear') || auth()->user()?->can('planes_cuidado.crear'), 403);
+        abort_unless(auth()->user()?->can('ejecuciones_cuidado.gestionar'), 403);
         $tarea = EjecucionCuidado::findOrFail($this->tareaAccionId);
-        app(TurnoEnfermeriaService::class)->autorizarMutacionPaciente($tarea->cod_residente, 'tareas.registrar_resultado', Auth::user());
+        app(TurnoEnfermeriaService::class)->autorizarMutacionPaciente($tarea->cod_residente, 'ejecuciones_cuidado.gestionar', Auth::user());
         abort_unless($tarea->puedeCompletarse(), 409, 'La tarea ya no está pendiente de ejecución.');
 
         $this->validate([
@@ -1067,7 +1064,7 @@ class FichaPaciente extends Component
         if ($this->tareaEstadoAccion === 'REALIZADA') {
             $this->validate(['tareaResultado' => 'required|string|min:5|max:60'], ['tareaResultado.required' => 'El resultado de la tarea es obligatorio.', 'tareaResultado.min' => 'El resultado debe tener al menos 5 caracteres.']);
         } elseif ($this->tareaEstadoAccion === 'OMITIDA') {
-            abort_unless(auth()->user()?->can('tareas.omitir') || auth()->user()?->can('ejecuciones_cuidado.crear') || auth()->user()?->can('planes_cuidado.crear'), 403);
+            abort_unless(auth()->user()?->can('ejecuciones_cuidado.gestionar'), 403);
             $this->validate(['tareaMotivoOmision' => 'required|string|min:5|max:500'], ['tareaMotivoOmision.required' => 'El motivo de omisión es obligatorio.', 'tareaMotivoOmision.min' => 'El motivo debe tener al menos 5 caracteres.']);
         }
 
@@ -1101,8 +1098,8 @@ class FichaPaciente extends Component
 
     public function guardarSeguimiento(): void
     {
-        abort_unless(auth()->user()?->can('seguimiento.crear') || auth()->user()?->can('atenciones.crear') || auth()->user()?->can('pases_turno.crear') || auth()->user()?->can('atenciones'), 403);
-        app(TurnoEnfermeriaService::class)->autorizarMutacionPaciente($this->adultoMayor, 'seguimiento.crear', Auth::user());
+        abort_unless(auth()->user()?->can('atenciones.crear'), 403);
+        app(TurnoEnfermeriaService::class)->autorizarMutacionPaciente($this->adultoMayor, 'atenciones.crear', Auth::user());
         $this->validate([
             'segEstado' => 'required|in:ESTABLE,VIGILANCIA,DELICADO,CRITICO',
             'segAlimentacion' => 'required|in:COMPLETA,PARCIAL,RECHAZADA,AYUNO',
@@ -1141,7 +1138,7 @@ class FichaPaciente extends Component
         $personal = Auth::user()?->personal;
         $codArea = $personal?->asignaciones()->whereIn('estado', ['ACTIVA', 'ACTIVO'])->latest('fecha_asignacion')->value('cod_area');
         abort_unless($personal && $codArea, 422, 'El usuario debe tener personal y área institucional asignados.');
-        Atencion::create([
+        $atencion = Atencion::create([
             'cod_residente' => $this->adultoMayor->cod_residente,
             'cod_area' => $codArea,
             'cod_personal' => $personal->cod_personal,
@@ -1151,6 +1148,17 @@ class FichaPaciente extends Component
             'estado' => 'FINALIZADA',
             'observacion' => $this->segObs,
         ]);
+
+        if ($this->segIncidente || $this->segRequiereMedico) {
+            app(AlertasService::class)->crear($this->adultoMayor->cod_residente, [
+                'origen' => $this->segIncidente ? 'INCIDENTE' : 'SOLICITUD_MEDICA',
+                'tipo_alerta' => $this->segIncidente ? 'INCIDENTE_EN_SEGUIMIENTO' : 'EVALUACION_MEDICA_REQUERIDA',
+                'nivel' => $this->segIncidente ? 'ALTO' : 'MEDIO',
+                'motivo' => $this->segObs,
+            ], Auth::user())->update([
+                'cod_registro' => $atencion->cod_atencion,
+            ]);
+        }
 
         $this->modalSeguimiento = false;
         $this->cargarAdulto($this->adultoMayor->cod_residente);
@@ -1163,7 +1171,7 @@ class FichaPaciente extends Component
 
     public function abrirReportarIncidente(): void
     {
-        abort_unless(auth()->user()?->can('alertas.crear') || auth()->user()?->can('alertas.gestionar') || auth()->user()?->can('alertas'), 403);
+        abort_unless(auth()->user()?->can('alertas.gestionar'), 403);
         app(TurnoEnfermeriaService::class)->autorizarAccionPaciente($this->adultoMayor, Auth::user());
         $this->reset(['incidenteMotivo']);
         $this->incidenteTipo = 'INCIDENTE';
@@ -1189,7 +1197,7 @@ class FichaPaciente extends Component
 
     public function abrirAtenderAlerta(string $codAlerta): void
     {
-        abort_unless(auth()->user()?->can('alertas.atender') || auth()->user()?->can('alertas.gestionar') || auth()->user()?->can('alertas'), 403);
+        abort_unless(auth()->user()?->can('alertas.gestionar'), 403);
         $alerta = Alerta::findOrFail($codAlerta);
         app(TurnoEnfermeriaService::class)->autorizarAccionPaciente($alerta->cod_residente, Auth::user());
 
@@ -1209,7 +1217,7 @@ class FichaPaciente extends Component
 
     public function abrirCerrarAlerta(string $codAlerta): void
     {
-        abort_unless(auth()->user()?->can('alertas.cerrar') || auth()->user()?->can('alertas.gestionar') || auth()->user()?->can('alertas'), 403);
+        abort_unless(auth()->user()?->can('alertas.gestionar'), 403);
         $alerta = Alerta::findOrFail($codAlerta);
         app(TurnoEnfermeriaService::class)->autorizarAccionPaciente($alerta->cod_residente, Auth::user());
 
@@ -1310,7 +1318,7 @@ class FichaPaciente extends Component
                 'fecha' => $alerta->fecha_hora ? $alerta->fecha_hora->format('Y-m-d') : today()->toDateString(),
                 'hora' => $alerta->fecha_hora ? $alerta->fecha_hora->format('H:i') : '',
                 'timestamp' => $alerta->fecha_hora,
-                'responsable' => $alerta->responsable->name ?? ($alerta->atendidoPor->name ?? 'Sistema Clínico'),
+                'responsable' => $alerta->responsable?->usuario?->name ?? 'Sistema Clínico',
                 'estado_badge' => $alerta->estado === 'CERRADA' ? 'CERRADA' : ($alerta->estado === 'EN_ATENCION' ? 'EN ATENCIÓN' : 'ABIERTA'),
                 'badge' => $alerta->estado,
                 'badge_color' => $alerta->estado === 'CERRADA' ? 'zinc' : ($alerta->prioridad === 'CRITICO' ? 'red' : 'amber'),
@@ -1337,7 +1345,7 @@ class FichaPaciente extends Component
                 'fecha' => $signo->fecha ? Carbon::parse($signo->fecha)->format('Y-m-d') : today()->toDateString(),
                 'hora' => $signo->hora ? substr($signo->hora, 0, 5) : ($signo->created_at ? $signo->created_at->format('H:i') : ''),
                 'timestamp' => $this->resolverTimestamp($signo->fecha, $signo->hora, $signo->created_at),
-                'responsable' => $signo->profesional->name ?? 'Enfermero/a',
+                'responsable' => $signo->personal?->usuario?->name ?? 'Enfermero/a',
                 'estado_badge' => 'NORMAL',
                 'badge' => 'SIGNOS VITALES',
                 'badge_color' => 'emerald',
@@ -1352,7 +1360,7 @@ class FichaPaciente extends Component
             $medNombre = $admin->medicacion->nombre_medicamento ?? 'Fármaco prescrito';
             $dosis = $admin->medicacion?->dosis ? " {$admin->medicacion->dosis}" : '';
             $resumenMed = $adminOk
-                ? "{$medNombre}{$dosis} administrado" . ($admin->hora_real ? " a las " . substr($admin->hora_real, 0, 5) : '')
+                ? "{$medNombre}{$dosis} administrado" . ($admin->fecha_hora_administracion ? " a las " . $admin->fecha_hora_administracion->format('H:i') : '')
                 : "Omisión: " . ($admin->motivo_omision ?: 'Rechazo / no suministrado');
 
             $eventos->push([
@@ -1361,10 +1369,10 @@ class FichaPaciente extends Component
                 'titulo' => ($adminOk ? 'Medicación Administrada: ' : 'Medicación Omitida: ') . $medNombre,
                 'resumen' => $resumenMed,
                 'descripcion' => $resumenMed,
-                'fecha' => $admin->fecha ? Carbon::parse($admin->fecha)->format('Y-m-d') : today()->toDateString(),
-                'hora' => ($admin->hora_real ? ($admin->hora_real instanceof Carbon ? $admin->hora_real->format('H:i') : (strlen($admin->hora_real) >= 10 ? Carbon::parse($admin->hora_real)->format('H:i') : substr($admin->hora_real, 0, 5))) : ($admin->hora_programada ? ($admin->hora_programada instanceof Carbon ? $admin->hora_programada->format('H:i') : (strlen($admin->hora_programada) >= 10 ? Carbon::parse($admin->hora_programada)->format('H:i') : substr($admin->hora_programada, 0, 5))) : '')),
-                'timestamp' => $this->resolverTimestamp($admin->fecha, $admin->hora_real ?: $admin->hora_programada, $admin->created_at),
-                'responsable' => $admin->enfermero->name ?? 'Enfermero/a',
+                'fecha' => ($admin->fecha_hora_administracion ?: $admin->fecha_hora_programada)?->format('Y-m-d') ?? today()->toDateString(),
+                'hora' => ($admin->fecha_hora_administracion ?: $admin->fecha_hora_programada)?->format('H:i') ?? '',
+                'timestamp' => $admin->fecha_hora_administracion ?: $admin->fecha_hora_programada,
+                'responsable' => $admin->personal?->usuario?->name ?? 'Enfermero/a',
                 'estado_badge' => $adminOk ? 'ADMINISTRADA' : 'OMITIDA',
                 'badge' => $adminOk ? 'ADMINISTRADA' : 'OMITIDA',
                 'badge_color' => $adminOk ? 'teal' : 'amber',
@@ -1376,7 +1384,7 @@ class FichaPaciente extends Component
         // 5. Tareas de Planes de Cuidados
         $tareasHistorial = EjecucionCuidado::where('cod_residente', $this->adultoMayor->cod_residente)
             ->whereIn('estado', ['REALIZADA', 'OMITIDA'])
-            ->with(['responsable', 'intervencion.plan.area'])
+            ->with(['personal.usuario', 'intervencion.plan.area'])
             ->orderByDesc('fecha_hora_ejecucion')
             ->orderByDesc('fecha_hora_programada')
             ->take(40)
@@ -1396,7 +1404,7 @@ class FichaPaciente extends Component
                 'fecha' => ($tarea->fecha_hora_ejecucion ?: $tarea->fecha_hora_programada)?->format('Y-m-d') ?? today()->toDateString(),
                 'hora' => ($tarea->fecha_hora_ejecucion ?: $tarea->fecha_hora_programada)?->format('H:i') ?? '',
                 'timestamp' => $tarea->fecha_hora_ejecucion ?: $tarea->fecha_hora_programada,
-                'responsable' => $tarea->responsable?->nombre_completo ?? 'Enfermero/a',
+                'responsable' => $tarea->personal?->usuario?->name ?? 'Enfermero/a',
                 'estado_badge' => $tarea->estado,
                 'badge' => $tarea->estado,
                 'badge_color' => $tarea->estado === 'REALIZADA' ? 'blue' : 'rose',
@@ -1407,28 +1415,28 @@ class FichaPaciente extends Component
 
         // 6. Seguimientos Diarios
         foreach ($this->adultoMayor->seguimientosDiarios as $seg) {
-            $estadoGen = ucfirst(strtolower(str_replace('_', ' ', $seg->estado_general ?? 'Estable')));
-            $alim = $seg->alimentacion ? 'apetito ' . strtolower($seg->alimentacion) : 'apetito conservado';
-            $incidenteTxt = $seg->incidente
-                ? 'Incidente reportado: ' . ($seg->observacion ?: 'Caída o desorientación')
-                : 'sin incidente';
-            $resumenSeg = "{$estadoGen}, {$alim}, {$incidenteTxt}";
+            if ($seg->tipo_atencion->tipo !== 'SEGUIMIENTO_DIARIO') {
+                continue;
+            }
+            $alertaSeguimiento = $this->adultoMayor->alertas->firstWhere('cod_registro', $seg->cod_atencion);
+            $esIncidente = (bool) $alertaSeguimiento;
+            $resumenSeg = $seg->observacion ?: 'Seguimiento diario registrado';
 
             $eventos->push([
                 'tipo' => 'SEGUIMIENTO',
                 'tipo_label' => 'Seguimiento',
-                'titulo' => 'Evolución de Enfermería' . ($seg->incidente ? ' [INCIDENTE]' : '') . ($seg->requiere_medico ? ' [REVISIÓN MÉDICA]' : ''),
+                'titulo' => 'Evolución de Enfermería' . ($esIncidente ? ' [ALERTA CLÍNICA]' : ''),
                 'resumen' => $resumenSeg,
                 'descripcion' => $seg->observacion ?: 'Seguimiento registrado en guardia',
-                'fecha' => $seg->fecha ? Carbon::parse($seg->fecha)->format('Y-m-d') : today()->toDateString(),
-                'hora' => $seg->hora_inicio ? substr($seg->hora_inicio, 0, 5) : ($seg->created_at ? $seg->created_at->format('H:i') : ''),
-                'timestamp' => $this->resolverTimestamp($seg->fecha, $seg->hora_inicio, $seg->created_at),
-                'responsable' => $seg->enfermero->name ?? 'Enfermero/a',
-                'estado_badge' => $seg->incidente ? 'INCIDENTE' : ($seg->requiere_medico ? 'REVISIÓN MÉDICA' : 'REGISTRADO'),
-                'badge' => $seg->incidente ? 'INCIDENTE' : 'EVOLUCION',
-                'badge_color' => $seg->incidente ? 'red' : 'purple',
+                'fecha' => $seg->fecha_hora?->format('Y-m-d') ?? today()->toDateString(),
+                'hora' => $seg->fecha_hora?->format('H:i') ?? '',
+                'timestamp' => $seg->fecha_hora,
+                'responsable' => $seg->personal?->usuario?->name ?? 'Enfermero/a',
+                'estado_badge' => $esIncidente ? 'ALERTA CLÍNICA' : 'REGISTRADO',
+                'badge' => $esIncidente ? 'ALERTA' : 'EVOLUCION',
+                'badge_color' => $esIncidente ? 'red' : 'purple',
                 'icon' => 'ph-notebook',
-                'es_incidente' => (bool) $seg->incidente,
+                'es_incidente' => $esIncidente,
             ]);
         }
 
@@ -1475,38 +1483,6 @@ class FichaPaciente extends Component
                 'badge_color' => 'sky',
                 'icon' => 'ph-gauge',
                 'es_incidente' => false,
-            ]);
-        }
-
-        foreach ($this->adultoMayor->registrosCuidados as $registro) {
-            $detalle = collect([
-                $registro->porcentaje !== null ? "Consumo {$registro->porcentaje}%" : null,
-                $registro->cantidad_ml ? "{$registro->cantidad_ml} ml" : null,
-                $registro->nivel_ayuda ? 'Ayuda: '.strtolower(str_replace('_', ' ', $registro->nivel_ayuda)) : null,
-                $registro->resultado ? 'Resultado: '.strtolower(str_replace('_', ' ', $registro->resultado)) : null,
-                $registro->cambio_respecto_basal === 'PEOR' ? 'Empeoramiento respecto al basal' : null,
-                $registro->observacion ?: $registro->motivo,
-            ])->filter()->implode(' · ');
-            $eventos->push([
-                'tipo' => 'CUIDADOS', 'tipo_label' => 'Cuidado diario',
-                'titulo' => ucfirst(strtolower(str_replace('_', ' ', $registro->tipo))).': '.ucfirst(strtolower(str_replace('_', ' ', $registro->subtipo))),
-                'resumen' => $detalle ?: 'Cuidado registrado', 'descripcion' => $detalle ?: 'Registro estructurado de Enfermería',
-                'fecha' => $registro->fecha_hora_evento->format('Y-m-d'), 'hora' => $registro->fecha_hora_evento->format('H:i'),
-                'timestamp' => $registro->fecha_hora_evento, 'responsable' => $registro->registrador->name ?? 'Enfermero/a',
-                'estado_badge' => $registro->estado, 'badge' => $registro->estado, 'badge_color' => 'teal',
-                'icon' => 'ph-hand-heart', 'es_incidente' => $registro->cambio_respecto_basal === 'PEOR',
-            ]);
-        }
-
-        foreach ($this->adultoMayor->incidentes as $incidente) {
-            $eventos->push([
-                'tipo' => 'INCIDENTE', 'tipo_label' => 'Incidente',
-                'titulo' => 'Incidente: '.ucfirst(strtolower(str_replace('_', ' ', $incidente->tipo))),
-                'resumen' => $incidente->descripcion, 'descripcion' => $incidente->descripcion,
-                'fecha' => $incidente->fecha_hora_evento->format('Y-m-d'), 'hora' => $incidente->fecha_hora_evento->format('H:i'),
-                'timestamp' => $incidente->fecha_hora_evento, 'responsable' => $incidente->registrador->name ?? 'Enfermero/a',
-                'estado_badge' => $incidente->estado, 'badge' => $incidente->tipo, 'badge_color' => 'red',
-                'icon' => 'ph-warning-octagon', 'es_incidente' => true,
             ]);
         }
 
@@ -2079,7 +2055,7 @@ class FichaPaciente extends Component
                 'signosVitales' => fn($q) => $q->orderByDesc('fecha_hora')->take(60),
                 'medicaciones' => fn($q) => $q->with(['medicamento', 'horarios'])->where('estado', 'ACTIVA'),
                 'administracionesMedicacion' => fn($q) => $q->with('medicacion.medicamento')->orderByDesc('fecha_hora_programada')->take(30),
-                'alertas' => fn($q) => $q->orderByDesc('fecha_hora')->take(25),
+                'alertas' => fn($q) => $q->with('eventos.usuario')->orderByDesc('fecha_hora')->take(25),
                 'evaluacionesGeriatricas' => fn($q) => $q->orderByDesc('fecha_hora')->take(10),
                 'valoracionesFuncionales' => fn($q) => $q->with('registradoPor')->orderByDesc('fecha_hora')->take(10),
             ]);

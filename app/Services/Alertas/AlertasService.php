@@ -12,7 +12,7 @@ class AlertasService
 {
     public function __construct(private readonly TurnoEnfermeriaService $turnos) {}
 
-    public function crear(string $codAm, array $datos, User $usuario, string $permiso = 'alertas.crear'): Alerta
+    public function crear(string $codAm, array $datos, User $usuario, string $permiso = 'alertas.gestionar'): Alerta
     {
         $this->turnos->autorizarMutacionEnfermeria($codAm, $permiso, $usuario);
         $datos = Validator::make($datos, [
@@ -48,7 +48,7 @@ class AlertasService
 
     public function registrarIntervencion(Alerta $alerta, string $texto, User $usuario): Alerta
     {
-        $this->turnos->autorizarMutacionEnfermeria($alerta->cod_residente, 'alertas.atender', $usuario);
+        $this->turnos->autorizarMutacionEnfermeria($alerta->cod_residente, 'alertas.gestionar', $usuario);
         Validator::make(['accion' => $texto], ['accion' => 'required|string|min:5|max:10000'])->validate();
         return $this->mutarActiva($alerta, function (Alerta $bloqueada) use ($texto, $usuario) {
             $bloqueada->update(['estado' => 'EN_ATENCION']);
@@ -58,7 +58,7 @@ class AlertasService
 
     public function asignarResponsable(Alerta $alerta, User $responsable, User $usuario): Alerta
     {
-        $this->turnos->autorizarMutacionEnfermeria($alerta->cod_residente, 'alertas.atender', $usuario);
+        $this->turnos->autorizarMutacionEnfermeria($alerta->cod_residente, 'alertas.gestionar', $usuario);
         abort_unless($responsable->estado === 'ACTIVO', 422, 'El responsable seleccionado debe estar activo.');
         return $this->mutarActiva($alerta, function (Alerta $bloqueada) use ($responsable, $usuario) {
             $codPersonal = $responsable->personal?->cod_personal;
@@ -70,14 +70,14 @@ class AlertasService
 
     public function registrarSeguimiento(Alerta $alerta, string $texto, User $usuario): Alerta
     {
-        $this->turnos->autorizarMutacionEnfermeria($alerta->cod_residente, 'alertas.atender', $usuario);
+        $this->turnos->autorizarMutacionEnfermeria($alerta->cod_residente, 'alertas.gestionar', $usuario);
         Validator::make(['seguimiento' => $texto], ['seguimiento' => 'required|string|min:5|max:10000'])->validate();
         return $this->mutarActiva($alerta, fn (Alerta $bloqueada) => $this->accion($bloqueada, 'SEGUIMIENTO', $texto, $usuario));
     }
 
     public function cerrar(Alerta $alerta, string $resultado, User $usuario): Alerta
     {
-        $this->turnos->autorizarMutacionEnfermeria($alerta->cod_residente, 'alertas.cerrar', $usuario);
+        $this->turnos->autorizarMutacionEnfermeria($alerta->cod_residente, 'alertas.gestionar', $usuario);
         Validator::make(['resultado' => $resultado], ['resultado' => 'required|string|min:5|max:10000'])->validate();
         return $this->mutarActiva($alerta, function (Alerta $bloqueada) use ($resultado, $usuario) {
             $bloqueada->update(['estado' => 'CERRADA']);

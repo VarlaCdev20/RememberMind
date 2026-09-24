@@ -63,7 +63,7 @@ class RegistrosEnfermeria extends Component
 
     public function mount(?string $codAm = null, ?string $codResidente = null): void
     {
-        abort_unless(Auth::user()?->canAny(["seguimiento.ver", "enfermeria.ver_ficha_paciente"]), 403);
+        abort_unless(Auth::user()?->canAny(['atenciones.ver', 'enfermeria.ver_ficha_paciente']), 403);
         $this->codResidente = $codResidente ?: $codAm ?: $this->codResidente ?: $this->codAm;
         $this->codAm = $this->codResidente;
         if ($this->codResidente) {
@@ -79,7 +79,7 @@ class RegistrosEnfermeria extends Component
     private function autorizarMutacion(string $codResidente): void
     {
         app(TurnoEnfermeriaService::class)
-            ->autorizarMutacionPaciente($codResidente, 'seguimiento.crear', Auth::user());
+            ->autorizarMutacionPaciente($codResidente, 'atenciones.crear', Auth::user());
     }
 
     private function turnoActual(): ?string

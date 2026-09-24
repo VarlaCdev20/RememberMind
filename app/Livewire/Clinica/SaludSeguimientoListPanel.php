@@ -7,7 +7,6 @@ use Livewire\WithPagination;
 use App\Models\AdultoMayor;
 use App\Models\AdministracionMedicacion;
 use App\Models\Prescripcion;
-use App\Models\ValoracionFuncionalAdulto;
 use App\Models\SignoVital;
 
 class SaludSeguimientoListPanel extends Component
@@ -54,7 +53,7 @@ class SaludSeguimientoListPanel extends Component
 
     public function abrirExpediente(string $cod_am)
     {
-        $this->adultoSeleccionadoParaModal = AdultoMayor::where('cod_am', $cod_am)->firstOrFail();
+        $this->adultoSeleccionadoParaModal = AdultoMayor::where('cod_residente', $cod_am)->firstOrFail();
     }
 
     public function cerrarExpediente()
@@ -80,15 +79,15 @@ class SaludSeguimientoListPanel extends Component
         if ($user->hasRole('SUPERADMINISTRADOR')) return;
 
         $permitido = match($this->seccionActiva) {
-            'ficha' => $user->can('salud.ficha.ver') || $user->can('ficha_medica.crear'),
-            'signos' => $user->can('salud.signos.ver') || $user->can('signos_vitales.ver'),
-            'medicacion' => $user->can('salud.medicacion.ver') || $user->can('medicacion.ver'),
-            'administracion' => $user->can('salud.medicacion.ver') || $user->can('administracion_medicacion.registrar'),
-            'valoracion' => $user->can('salud.ver') || $user->can('valoracion_funcional.crear'),
-            'evaluaciones' => $user->can('evaluaciones.ver'),
-            'nutricion' => $user->can('nutricion.ver'),
-            'alertas' => $user->can('salud.alertas.ver') || $user->can('alertas.ver'),
-            'reportes' => $user->can('salud.reportes.ver') || $user->can('reportes.ver'),
+            'ficha' => $user->can('atenciones.ver'),
+            'signos' => $user->can('signos_vitales.ver'),
+            'medicacion' => $user->can('prescripciones.ver'),
+            'administracion' => $user->can('administraciones_medicacion.ver'),
+            'valoracion' => $user->can('valoraciones_funcionales.ver'),
+            'evaluaciones' => $user->can('aplicaciones_instrumento.ver'),
+            'nutricion' => $user->can('valoraciones_nutricionales.ver'),
+            'alertas' => $user->can('alertas.ver'),
+            'reportes' => $user->can('reportes.ver'),
             default => true, // resumen
         };
 

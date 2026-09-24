@@ -94,8 +94,8 @@ class SaludAdministracionMedicacionPanel extends Component
     {
         $user = Auth::user();
         abort_unless($user, 401);
-        abort_unless($user->hasRole('SUPERADMINISTRADOR') || $user->canAny([
-            'medicacion.ver', 'salud.medicacion.ver', 'administracion_medicacion.registrar', 'enfermeria.ver_dashboard'
+        abort_unless($user->canAny([
+            'prescripciones.ver', 'administraciones_medicacion.ver', 'enfermeria.ver_dashboard'
         ]), 403);
 
         if ($adulto) {
@@ -127,7 +127,7 @@ class SaludAdministracionMedicacionPanel extends Component
             $this->esModoConsulta = false;
         } elseif ($user->hasRole('ENFERMEROS') && !$turnoActivo) {
             $this->esModoConsulta = true;
-        } elseif (!$user->can('administracion_medicacion.registrar')) {
+        } elseif (!$user->can('administraciones_medicacion.crear')) {
             $this->esModoConsulta = true;
         }
     }
@@ -250,7 +250,7 @@ class SaludAdministracionMedicacionPanel extends Component
     {
         $user = \Illuminate\Support\Facades\Auth::user();
         abort_unless($user, 401);
-        abort_unless($user->hasRole('SUPERADMINISTRADOR') || $user->can('administracion_medicacion.registrar'), 403);
+        abort_unless($user->can('administraciones_medicacion.crear'), 403);
 
         if ($this->esModoConsulta) {
             $this->dispatch('swal', [
@@ -260,6 +260,10 @@ class SaludAdministracionMedicacionPanel extends Component
             ]);
             return;
         }
+
+        $prescripcion = \App\Models\Prescripcion::query()
+            ->whereKey($this->selectedPrescripcionId)
+            ->first();
 
         $rules = [
             'formDosisAdministrada' => 'required|numeric|min:0.001',
@@ -277,17 +281,20 @@ class SaludAdministracionMedicacionPanel extends Component
             'formObservacionAdmin.max'       => 'La observación no puede exceder 1000 caracteres.',
         ];
 
-        $dPresc = (float)($this->formDosisPrescritaValor ?: 0);
+        $dPresc = (float) ($prescripcion?->dosis ?? 0);
         $dAdmin = (float)$this->formDosisAdministrada;
         $dosisDifiere = ($dPresc > 0 && abs($dAdmin - $dPresc) > 0.001);
 
-        if ($dosisDifiere) {
-            $rules['formObservacionAdmin'] = 'required|string|min:5|max:1000';
-            $messages['formObservacionAdmin.required'] = 'La dosis administrada (' . $dAdmin . ') difiere de la dosis prescrita (' . $dPresc . '). Debe registrar una justificación clínica obligatoria en la observación.';
-            $messages['formObservacionAdmin.min'] = 'La justificación clínica de la dosis modificada debe tener al menos 5 caracteres.';
-        }
-
         $this->validate($rules, $messages);
+
+        if ($dosisDifiere) {
+            $this->validate([
+                'formObservacionAdmin' => 'required|string|min:5|max:1000',
+            ], [
+                'formObservacionAdmin.required' => 'La dosis administrada difiere de la prescrita. Registre una justificación clínica.',
+                'formObservacionAdmin.min' => 'La justificación clínica debe tener al menos 5 caracteres.',
+            ]);
+        }
 
         $codPrescripcion = $this->selectedPrescripcionId;
         $hora = substr(trim($this->selectedHora ?: '08:00'), 0, 5);
@@ -315,8 +322,6 @@ class SaludAdministracionMedicacionPanel extends Component
                 }
             }
         }
-
-        $prescripcion = \App\Models\Prescripcion::where('cod_prescripcion', $codPrescripcion)->first();
 
         if ($prescripcion) {
             // Validación backend: prescripción médica activa
@@ -381,7 +386,7 @@ class SaludAdministracionMedicacionPanel extends Component
     {
         $user = \Illuminate\Support\Facades\Auth::user();
         abort_unless($user, 401);
-        abort_unless($user->hasRole('SUPERADMINISTRADOR') || $user->can('administracion_medicacion.registrar'), 403);
+        abort_unless($user->can('administraciones_medicacion.crear'), 403);
 
         if ($this->esModoConsulta) {
             $this->dispatch('swal', [
@@ -785,7 +790,7 @@ class SaludAdministracionMedicacionPanel extends Component
     {
         $user = Auth::user();
         abort_unless($user, 401);
-        abort_unless($user->hasRole('SUPERADMINISTRADOR') || $user->can('administracion_medicacion.registrar'), 403);
+        abort_unless($user->can('administraciones_medicacion.crear'), 403);
 
         if ($this->esModoConsulta) {
             $this->dispatch('swal', [
@@ -852,7 +857,7 @@ class SaludAdministracionMedicacionPanel extends Component
     {
         $user = Auth::user();
         abort_unless($user, 401);
-        abort_unless($user->hasRole('SUPERADMINISTRADOR') || $user->can('administracion_medicacion.registrar'), 403);
+        abort_unless($user->can('administraciones_medicacion.crear'), 403);
 
         if ($this->esModoConsulta) {
             $this->dispatch('swal', [

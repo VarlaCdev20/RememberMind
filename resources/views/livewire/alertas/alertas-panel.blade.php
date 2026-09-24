@@ -20,7 +20,7 @@
         </div>
 
         <div class="flex flex-wrap items-center gap-2.5">
-            @canany(['alertas.crear','alertas.gestionar','salud.alertas.gestionar'])
+            @can('alertas.gestionar')
                 <button type="button"
                     wire:click="abrirCrear"
                     class="rm-btn rm-btn-accent cursor-pointer">
@@ -36,7 +36,7 @@
                     <span wire:loading.remove wire:target="detectarAlertas">Detectar pendientes</span>
                     <span wire:loading wire:target="detectarAlertas">Analizando...</span>
                 </button>
-            @endcanany
+            @endcan
 
             <button type="button"
                 wire:click="$refresh"

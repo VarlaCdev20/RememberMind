@@ -34,22 +34,22 @@
                                     <span class="rounded-full px-2 py-0.5 text-[10px] font-black uppercase {{ $esAbierta ? 'bg-rose-600 text-white' : 'bg-amber-600 text-white' }}">
                                         {{ $al->estado }}
                                     </span>
-                                    <span class="rounded-md px-2 py-0.5 text-[10px] font-bold uppercase {{ in_array(strtoupper($al->nivel), ['ALTO', 'CRITICO']) ? 'bg-rose-100 text-rose-800' : 'bg-slate-100 text-slate-700' }}">
-                                        Nivel {{ $al->nivel }}
+                                    <span class="rounded-md px-2 py-0.5 text-[10px] font-bold uppercase {{ in_array(strtoupper($al->prioridad), ['ALTO', 'CRITICO']) ? 'bg-rose-100 text-rose-800' : 'bg-slate-100 text-slate-700' }}">
+                                        Nivel {{ $al->prioridad }}
                                     </span>
                                     <span class="text-xs font-bold text-titulo">
-                                        {{ $al->tipo_alerta }}
+                                        {{ $al->tipo }}
                                     </span>
                                 </div>
 
                                 <p class="text-xs font-medium text-parrafo leading-relaxed">
-                                    {{ $al->motivo ?? 'Alerta generada por parámetros fuera de rango' }}
+                                    {{ $al->descripcion }}
                                 </p>
 
                                 <div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-apoyo pt-1">
-                                    <span>Detectada: <strong>{{ $al->created_at ? $al->created_at->format('d/m/Y H:i') : 'Reciente' }}</strong></span>
+                                    <span>Detectada: <strong>{{ $al->fecha_hora?->format('d/m/Y H:i') ?? 'Reciente' }}</strong></span>
                                     <span>·</span>
-                                    <span>Origen: <strong>{{ $al->origen ?? 'Sistema Clínico' }}</strong></span>
+                                    <span>Origen: <strong>{{ $al->modulo ?? 'Sistema Clínico' }}</strong></span>
                                     @if($al->responsable)
                                         <span>·</span>
                                         <span>Registrada por: <strong>{{ $al->responsable->name }}</strong></span>
@@ -57,12 +57,12 @@
                                 </div>
 
                                 {{-- Acciones Realizadas hasta el momento --}}
-                                @if($al->acciones && $al->acciones->count() > 0)
+                                @if($al->eventos->isNotEmpty())
                                     <div class="mt-2 rounded-xl bg-[#F0E8DE]/80 p-2.5 border border-borde text-xs space-y-1">
                                         <span class="font-bold text-titulo text-[11px] block">Acciones registradas:</span>
-                                        @foreach($al->acciones as $acc)
+                                        @foreach($al->eventos->sortBy('fecha_hora') as $evento)
                                             <p class="text-parrafo text-[11px]">
-                                                · {{ $acc->accion }} <span class="text-apoyo">({{ $acc->fecha_accion?->format('H:i') ?? $acc->created_at?->format('H:i') }})</span>
+                                                · {{ $evento->descripcion }} <span class="text-apoyo">({{ $evento->fecha_hora?->format('H:i') }})</span>
                                             </p>
                                         @endforeach
                                     </div>
@@ -129,33 +129,31 @@
                 </thead>
                 <tbody class="divide-y divide-borde/50">
                     @forelse($alertasCerradas as $alc)
+                        @php
+                            $eventoCierre = $alc->eventos->where('tipo_evento', 'CIERRE')->sortByDesc('fecha_hora')->first();
+                        @endphp
                         <tr class="hover:bg-fondo-card/60 transition">
                             <td class="py-3 px-3 whitespace-nowrap font-medium text-titulo">
-                                {{ $alc->created_at ? $alc->created_at->format('d/m/Y') : '' }}
-                                <span class="text-apoyo block text-[10px]">{{ $alc->created_at ? $alc->created_at->format('H:i') : '' }}</span>
+                                {{ $alc->fecha_hora?->format('d/m/Y') }}
+                                <span class="text-apoyo block text-[10px]">{{ $alc->fecha_hora?->format('H:i') }}</span>
                             </td>
 
                             <td class="py-3 px-3 font-bold text-titulo max-w-[200px]">
-                                {{ $alc->tipo_alerta }}
-                                <span class="text-parrafo font-normal text-[11px] block truncate" title="{{ $alc->motivo }}">
-                                    {{ $alc->motivo }}
+                                {{ $alc->tipo }}
+                                <span class="text-parrafo font-normal text-[11px] block truncate" title="{{ $alc->descripcion }}">
+                                    {{ $alc->descripcion }}
                                 </span>
                             </td>
 
                             <td class="py-3 px-3 whitespace-nowrap">
                                 <span class="rounded px-2 py-0.5 text-[10px] font-bold bg-fondo-card text-parrafo border border-borde">
-                                    {{ $alc->nivel }}
+                                    {{ $alc->prioridad }}
                                 </span>
                             </td>
 
                             <td class="py-3 px-3 text-parrafo max-w-[260px]">
-                                @if($alc->observacion_cierre)
-                                    <span class="text-titulo font-medium block">{{ $alc->observacion_cierre }}</span>
-                                @endif
-                                @if($alc->acciones && $alc->acciones->count() > 0)
-                                    <span class="text-[10px] text-apoyo block truncate">
-                                        Acción: {{ $alc->acciones->last()->accion ?? 'Atención oportuna' }}
-                                    </span>
+                                @if($eventoCierre)
+                                    <span class="text-titulo font-medium block">{{ $eventoCierre->descripcion }}</span>
                                 @else
                                     <span class="text-[10px] text-apoyo">Cerrada tras resolución clínica</span>
                                 @endif
@@ -168,7 +166,7 @@
                             </td>
 
                             <td class="py-3 px-3 whitespace-nowrap text-apoyo font-medium">
-                                {{ $alc->cerradoPor?->name ?? $alc->responsable?->name ?? 'Enfermería' }}
+                                {{ $eventoCierre?->usuario?->name ?? $alc->responsable?->name ?? 'Enfermería' }}
                             </td>
                         </tr>
                     @empty

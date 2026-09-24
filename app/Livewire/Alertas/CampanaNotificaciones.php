@@ -45,10 +45,9 @@ class CampanaNotificaciones extends Component
     {
         $user = auth()->user();
 
-        return (bool) ($user?->hasRole('SUPERADMINISTRADOR') || $user?->canAny([
-            'alertas.ver', 'alertas.gestionar', 'salud.alertas.ver', 'salud.alertas.gestionar',
-            'medicacion.ver', 'salud.medicacion.ver', 'administracion_medicacion.registrar',
-        ]));
+        return (bool) $user?->canAny([
+            'alertas.ver', 'alertas.gestionar', 'prescripciones.ver', 'administraciones_medicacion.ver',
+        ]);
     }
 
     public function togglePanel(): void
@@ -252,14 +251,7 @@ class CampanaNotificaciones extends Component
         $user = auth()->user();
         abort_unless($user, 401);
 
-        if ($user->hasRole('SUPERADMINISTRADOR')) {
-            return;
-        }
-
-        abort_unless($user->canAny([
-            'alertas.'.$accion, 'alertas.gestionar', 'salud.alertas.gestionar',
-            ...($accion === 'ver' ? ['salud.alertas.ver'] : []),
-        ]), 403);
+        abort_unless($user->can($accion === 'ver' ? 'alertas.ver' : 'alertas.gestionar'), 403);
     }
 
     public function render()
@@ -274,8 +266,8 @@ class CampanaNotificaciones extends Component
             ->get();
 
         $user = auth()->user();
-        $puedeAtender = (bool) ($user?->hasRole('SUPERADMINISTRADOR') || $user?->canAny(['alertas.atender', 'alertas.gestionar', 'salud.alertas.gestionar']));
-        $puedeCerrar = (bool) ($user?->hasRole('SUPERADMINISTRADOR') || $user?->canAny(['alertas.cerrar', 'alertas.gestionar', 'salud.alertas.gestionar']));
+        $puedeAtender = (bool) $user?->can('alertas.gestionar');
+        $puedeCerrar = (bool) $user?->can('alertas.gestionar');
 
         return view('livewire.alertas.campana-notificaciones', [
             'alertas' => $alertas,
@@ -290,9 +282,7 @@ class CampanaNotificaciones extends Component
         $query = Alerta::query()->whereIn('estado', ['ABIERTA', 'EN_ATENCION']);
         $user = auth()->user();
 
-        if (!$user?->hasRole('SUPERADMINISTRADOR') && !$user?->canAny([
-            'alertas.ver', 'alertas.gestionar', 'salud.alertas.ver', 'salud.alertas.gestionar',
-        ])) {
+        if (!$user?->canAny(['alertas.ver', 'alertas.gestionar'])) {
             return $query->whereRaw('1 = 0');
         }
 
@@ -317,9 +307,7 @@ class CampanaNotificaciones extends Component
     {
         $user = auth()->user();
 
-        if (!$user || (!$user->hasRole('SUPERADMINISTRADOR') && !$user->canAny([
-            'medicacion.ver', 'salud.medicacion.ver', 'administracion_medicacion.registrar',
-        ]))) {
+        if (!$user || !$user->canAny(['prescripciones.ver', 'administraciones_medicacion.ver'])) {
             return collect();
         }
 

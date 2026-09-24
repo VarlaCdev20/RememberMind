@@ -4,8 +4,11 @@ namespace App\Livewire\Clinica;
 
 use Livewire\Component;
 use App\Models\AdultoMayor;
-use App\Models\NotaEvolucionMedica;
+use App\Models\Atencion;
+use App\Models\NotaClinica;
+use App\Models\SignoVital;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class NotaEvolucionMedicaModal extends Component
 {
@@ -99,32 +102,61 @@ class NotaEvolucionMedicaModal extends Component
 
         try {
             DB::transaction(function () {
-                $data = [
-                    'cod_am'       => $this->cod_am,
-                    'tipo_nota'    => $this->tipo_nota,
-                    'fecha'        => $this->fecha,
-                    'hora'         => $this->hora ?: null,
-                    'subjetivo'    => $this->subjetivo   ?: null,
-                    'objetivo'     => $this->objetivo    ?: null,
-                    'valoracion'   => $this->valoracion,
-                    'plan'         => $this->plan,
-                    'observaciones'=> $this->observaciones ?: null,
-                    'registrado_por' => auth()->user()->cod_usu,
-                    'estado'       => 'ACTIVO',
-                ];
+                $personal = auth()->user()?->personal;
+                $codArea = $personal?->asignaciones()
+                    ->whereIn('estado', ['ACTIVA', 'ACTIVO'])
+                    ->latest('fecha_asignacion')
+                    ->value('cod_area');
+                abort_unless($personal && $codArea, 422, 'El usuario debe tener personal y área institucional activa.');
+
+                $fechaHora = $this->fecha . ' ' . ($this->hora ?: now()->format('H:i'));
+                $atencion = Atencion::query()->create([
+                    'cod_atencion' => 'ATN_' . Str::upper(Str::random(10)),
+                    'cod_residente' => $this->cod_am,
+                    'cod_area' => $codArea,
+                    'cod_personal' => $personal->cod_personal,
+                    'tipo_atencion' => $this->tipo_nota,
+                    'motivo' => $this->valoracion,
+                    'fecha_hora' => $fechaHora,
+                    'estado' => 'FINALIZADA',
+                    'observacion' => $this->observaciones ?: null,
+                ]);
+
+                NotaClinica::query()->create([
+                    'cod_nota' => 'NCL_' . Str::upper(Str::random(10)),
+                    'cod_atencion' => $atencion->cod_atencion,
+                    'cod_residente' => $this->cod_am,
+                    'cod_personal' => $personal->cod_personal,
+                    'tipo_nota' => $this->tipo_nota,
+                    'contenido' => collect([
+                        filled($this->subjetivo) ? "Subjetivo: {$this->subjetivo}" : null,
+                        filled($this->objetivo) ? "Objetivo: {$this->objetivo}" : null,
+                        "Valoración: {$this->valoracion}",
+                        "Plan: {$this->plan}",
+                        filled($this->observaciones) ? "Observaciones: {$this->observaciones}" : null,
+                    ])->filter()->implode("\n"),
+                    'fecha_hora' => $fechaHora,
+                    'estado' => 'ACTIVA',
+                ]);
 
                 if ($this->incluirSignos) {
-                    $data['pa_sistolica']  = $this->pa_sistolica  ?: null;
-                    $data['pa_diastolica'] = $this->pa_diastolica ?: null;
-                    $data['fc']            = $this->fc            ?: null;
-                    $data['fr']            = $this->fr            ?: null;
-                    $data['temperatura']   = $this->temperatura   ?: null;
-                    $data['saturacion']    = $this->saturacion    ?: null;
-                    $data['glucosa']       = $this->glucosa       ?: null;
-                    $data['peso']          = $this->peso          ?: null;
+                    SignoVital::query()->create([
+                        'cod_signo' => 'SGN_' . Str::upper(Str::random(10)),
+                        'cod_residente' => $this->cod_am,
+                        'cod_personal' => $personal->cod_personal,
+                        'cod_atencion' => $atencion->cod_atencion,
+                        'fecha_hora' => $fechaHora,
+                        'presion_sistolica' => $this->pa_sistolica ?: null,
+                        'presion_diastolica' => $this->pa_diastolica ?: null,
+                        'frecuencia_cardiaca' => $this->fc ?: null,
+                        'frecuencia_respiratoria' => $this->fr ?: null,
+                        'temperatura' => $this->temperatura ?: null,
+                        'saturacion_oxigeno' => $this->saturacion ?: null,
+                        'glucemia' => $this->glucosa ?: null,
+                        'estado' => 'VIGENTE',
+                        'observacion' => $this->peso ? "Peso informado: {$this->peso} kg" : null,
+                    ]);
                 }
-
-                NotaEvolucionMedica::create($data);
             });
 
             $this->cerrar();

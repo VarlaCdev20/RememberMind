@@ -6,9 +6,11 @@
             <h1 class="text-2xl font-black text-titulo">Plan de cuidado</h1>
             <p class="text-sm font-semibold text-apoyo">Planes activos, tareas vinculadas y estado de cuidado por adulto mayor.</p>
         </div>
-        <button type="button" wire:click="abrirCrear" class="rounded-xl bg-boton-principal px-4 py-2 text-xs font-black uppercase tracking-wider text-white shadow-sm">
+        @can('planes_cuidado.crear')
+        <button type="button" wire:click="abrirCrear" class="rounded-xl bg-boton-principal px-4 py-2 text-xs font-black uppercase tracking-wider text-inverso shadow-sm">
             Crear plan
         </button>
+        @endcan
     </div>
 
     <div class="grid gap-3 rounded-2xl border border-borde bg-fondo-card p-4 md:grid-cols-2">
@@ -37,9 +39,11 @@
                     <div class="rounded-xl bg-fondo-panel p-3"><span class="block text-meta">Fin</span>{{ optional($plan->fecha_fin)->format('d/m/Y') ?: 'Vigente' }}</div>
                     <div class="rounded-xl bg-fondo-panel p-3"><span class="block text-meta">Tareas activas</span>{{ $plan->tareas_activas_count }}</div>
                 </div>
-                @if($plan->estado === 'BORRADOR') @can('plan_cuidado.editar')<x-secondary-button wire:click="editarBorrador('{{ $plan->cod_plan }}')">Editar / activar borrador</x-secondary-button>@endcan @endif
+                @if($plan->estado === 'BORRADOR') @can('planes_cuidado.editar')<x-secondary-button wire:click="editarBorrador('{{ $plan->cod_plan }}')">Editar / activar borrador</x-secondary-button>@endcan @endif
                 @if($plan->estado === 'ACTIVO')
+                    @can('planes_cuidado.cerrar')
                     <button type="button" wire:click="cerrarPlan('{{ $plan->cod_plan }}')" class="mt-4 rounded-xl border border-borde px-4 py-2 text-xs font-bold text-parrafo">Cerrar plan</button>
+                    @endcan
                 @endif
             </article>
         @empty

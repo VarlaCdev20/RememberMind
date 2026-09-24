@@ -82,13 +82,14 @@
                 </div>
             </div>
 
-            {{-- Botón principal azul oscuro: [ + REGISTRAR ATENCIÓN ] (Abre Modal Central Clínico) --}}
+            {{-- Botón principal: [ + REGISTRAR ] (Abre Modal de Registro de Enfermería) --}}
             <div>
                 <button type="button"
                         @click="modalSelectorAtencion = true"
-                        class="bg-[#1E3A8A] hover:bg-[#172554] text-white shadow-sm font-black text-xs rounded-xl px-4 py-2.5 h-10 inline-flex items-center gap-2 transition focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer">
+                        class="bg-[#A85847] hover:bg-[#8F4435] text-white shadow-xs font-bold text-xs rounded-xl px-4 py-2.5 h-10 inline-flex items-center gap-2 transition focus:outline-none focus:ring-2 focus:ring-[#A85847]/40 cursor-pointer">
                     <i class="ph-bold ph-plus-circle text-base"></i>
-                    <span>+ REGISTRAR ATENCIÓN</span>
+                    <span>+ REGISTRAR</span>
+                    <span class="sr-only">ATENCIÓN</span>
                 </button>
             </div>
         </div>

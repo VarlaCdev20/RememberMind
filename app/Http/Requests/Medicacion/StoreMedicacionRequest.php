@@ -9,10 +9,8 @@ class StoreMedicacionRequest extends FormRequest
     public function authorize(): bool
     {
         $usuario = $this->user();
-        $permiso = $this->isMethod('post')
-            ? ['medicacion.crear', 'salud.medicacion.crear']
-            : ['medicacion.editar', 'salud.medicacion.editar'];
-        return $usuario && ! $usuario->hasRole('ENFERMEROS') && $usuario->canAny($permiso);
+        $permiso = $this->isMethod('post') ? 'prescripciones.crear' : 'prescripciones.editar';
+        return $usuario && ! $usuario->hasRole('ENFERMEROS') && $usuario->can($permiso);
     }
 
     protected function prepareForValidation(): void

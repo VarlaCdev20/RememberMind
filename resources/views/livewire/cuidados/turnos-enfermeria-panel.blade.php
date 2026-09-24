@@ -13,7 +13,7 @@
             <h1 class="text-2xl font-black text-titulo">Turnos de Enfermería</h1>
             <p class="mt-1 text-sm font-bold text-apoyo">Configuración de turnos institucionales: Mañana, Tarde, Noche, Madrugada.</p>
         </div>
-        @can('turnos_enfermeria.crear')
+        @can('turnos.gestionar')
         <button wire:click="abrirCrear" class="inline-flex items-center gap-2 rounded-xl bg-boton-acento px-4 py-2.5 text-xs font-bold text-inverso shadow-sm hover:shadow-md transition active:scale-95">
             <i class="ph-bold ph-plus text-sm"></i> Nuevo turno
         </button>
@@ -47,7 +47,7 @@
                 <span class="inline-flex items-center rounded-full border px-2 py-0.5 text-[9px] font-bold {{ $t->estado === 'ACTIVO' ? 'border-estado-exitoBorde bg-estado-exitoBg text-estado-exito' : 'border-borde-suave bg-fondo-panel text-apoyo' }}">
                     {{ $t->estado }}
                 </span>
-                @can('turnos_enfermeria.editar')
+                @can('turnos.gestionar')
                 <button wire:click="abrirEditar('{{ $t->cod_turno }}')"
                     class="flex h-7 w-7 items-center justify-center rounded-lg border border-estado-advertenciaBorde bg-estado-advertenciaBg text-estado-advertencia hover:bg-estado-advertenciaBg transition">
                     <i class="ph-bold ph-pencil text-xs"></i>

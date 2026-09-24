@@ -23,7 +23,7 @@ class CuidadosEnfermeriaService
 
     public function registrar(string $codResidente, array $datos, User $usuario): object
     {
-        $this->turnos->autorizarMutacionEnfermeria($codResidente, 'seguimiento.crear', $usuario);
+        $this->turnos->autorizarMutacionEnfermeria($codResidente, 'atenciones.crear', $usuario);
         $datos = $this->validar($datos);
 
         $personal = $usuario->personal ?: Personal::where('cod_usuario', $usuario->cod_usuario)->first();
@@ -155,7 +155,7 @@ class CuidadosEnfermeriaService
 
     public function colocarDispositivo(string $codResidente, array $datos, User $usuario): DispositivoClinico
     {
-        $this->turnos->autorizarMutacionEnfermeria($codResidente, 'seguimiento.crear', $usuario);
+        $this->turnos->autorizarMutacionEnfermeria($codResidente, 'atenciones.crear', $usuario);
         $datos = Validator::make($datos, [
             'tipo' => 'required|in:OXIGENO,SONDA_URINARIA,OSTOMIA,ALIMENTACION_ENTERAL,OTRO',
             'ubicacion' => 'nullable|string|max:120',
@@ -179,7 +179,7 @@ class CuidadosEnfermeriaService
 
     public function retirarDispositivo(DispositivoClinico $dispositivo, string $motivo, User $usuario): void
     {
-        $this->turnos->autorizarMutacionEnfermeria($dispositivo->cod_residente, 'seguimiento.crear', $usuario);
+        $this->turnos->autorizarMutacionEnfermeria($dispositivo->cod_residente, 'atenciones.crear', $usuario);
         Validator::make(['motivo' => $motivo], ['motivo' => 'required|string|min:5|max:1000'])->validate();
         abort_unless($dispositivo->estado === 'ACTIVO', 409, 'El dispositivo ya fue retirado.');
         $dispositivo->update([

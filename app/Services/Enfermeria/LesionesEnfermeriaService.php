@@ -18,7 +18,7 @@ class LesionesEnfermeriaService
 
     public function registrar(string $codResidente, array $datos, User $usuario): Herida
     {
-        $this->turnos->autorizarMutacionEnfermeria($codResidente, 'seguimiento.crear', $usuario);
+        $this->turnos->autorizarMutacionEnfermeria($codResidente, 'heridas.crear', $usuario);
         $datos = $this->validar($datos);
 
         $personal = $usuario->personal ?: Personal::where('cod_usuario', $usuario->cod_usuario)->first();
@@ -59,7 +59,7 @@ class LesionesEnfermeriaService
 
     public function registrarSeguimiento(Herida $herida, array $datos, User $usuario): CuracionHerida
     {
-        $this->turnos->autorizarMutacionEnfermeria($herida->cod_residente, 'seguimiento.crear', $usuario);
+        $this->turnos->autorizarMutacionEnfermeria($herida->cod_residente, 'heridas.crear', $usuario);
         $datos = Validator::make($datos, [
             'largo_cm' => 'nullable|numeric|min:0.1|max:100',
             'ancho_cm' => 'nullable|numeric|min:0.1|max:100',
@@ -88,7 +88,7 @@ class LesionesEnfermeriaService
 
     public function cerrar(Herida $herida, string $resultado, string $motivo, User $usuario): Herida
     {
-        $this->turnos->autorizarMutacionEnfermeria($herida->cod_residente, 'seguimiento.crear', $usuario);
+        $this->turnos->autorizarMutacionEnfermeria($herida->cod_residente, 'heridas.crear', $usuario);
         Validator::make(compact('resultado', 'motivo'), [
             'resultado' => 'required|string|max:50',
             'motivo' => 'required|string|min:5|max:2000',

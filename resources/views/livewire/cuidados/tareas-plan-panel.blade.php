@@ -4,7 +4,7 @@
             <h1 class="text-2xl font-bold text-titulo">Tareas de cuidado</h1>
             <p class="mt-1 text-sm text-apoyo">Programa cuidados, registra resultados y conserva la trazabilidad de cada cambio.</p>
         </div>
-        @can('tareas.crear')<x-button wire:click="abrirCrear">Crear tarea</x-button>@endcan
+        @can('ejecuciones_cuidado.gestionar')<x-button wire:click="abrirCrear">Crear tarea</x-button>@endcan
     </div>
 
     @if(session('mensaje'))
@@ -54,7 +54,7 @@
                         <a class="mt-1 inline-block text-sm font-semibold text-boton-principal hover:underline" href="{{ route('admin.adultos-mayores.show', $tarea->cod_residente) }}">{{ $tarea->adultoMayor?->nombres }} {{ $tarea->adultoMayor?->apellido_paterno }}</a>
                     </div>
                     @if($tarea->puedeCompletarse())
-                        @can('tareas.registrar_resultado')<x-secondary-button wire:click="abrirResultado('{{ $tarea->cod_ejecucion }}')">Registrar resultado</x-secondary-button>@endcan
+                        @can('ejecuciones_cuidado.gestionar')<x-secondary-button wire:click="abrirResultado('{{ $tarea->cod_ejecucion }}')">Registrar resultado</x-secondary-button>@endcan
                     @endif
                 </div>
 
@@ -131,7 +131,7 @@
         <x-slot name="content">
             <div class="space-y-4">
                 <label class="space-y-1 text-xs font-bold text-apoyo">Resultado *
-                    <select class="rm-select w-full text-sm" wire:model.live="estadoTarea"><option value="REALIZADA">Realizada</option>@can('tareas.omitir')<option value="OMITIDA">Omitida</option>@endcan<option value="REPROGRAMADA">Reprogramada</option></select>
+                    <select class="rm-select w-full text-sm" wire:model.live="estadoTarea"><option value="REALIZADA">Realizada</option>@can('ejecuciones_cuidado.gestionar')<option value="OMITIDA">Omitida</option>@endcan<option value="REPROGRAMADA">Reprogramada</option></select>
                     @error('estadoTarea')<span class="block text-xs text-estado-peligro">{{ $message }}</span>@enderror
                 </label>
                 @if($estadoTarea === 'REALIZADA')

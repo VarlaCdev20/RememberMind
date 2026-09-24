@@ -157,7 +157,7 @@ class AdultoMayorMedicacionController extends Controller
 
     public function suspender(Residente $adulto_mayor, Prescripcion $medicacion)
     {
-        $this->autorizarOrden($adulto_mayor, $medicacion, ['medicacion.suspender', 'salud.medicacion.suspender']);
+        $this->autorizarOrden($adulto_mayor, $medicacion, ['prescripciones.suspender']);
         $medicacion->update([
             'estado'                 => 'SUSPENDIDA',
             'fecha_hora_suspension'  => now(),
@@ -177,7 +177,7 @@ class AdultoMayorMedicacionController extends Controller
 
     public function finalizar(Residente $adulto_mayor, Prescripcion $medicacion)
     {
-        $this->autorizarOrden($adulto_mayor, $medicacion, ['medicacion.suspender', 'salud.medicacion.finalizar']);
+        $this->autorizarOrden($adulto_mayor, $medicacion, ['prescripciones.editar']);
         $medicacion->update([
             'estado'                => 'FINALIZADA',
             'fecha_hora_suspension' => now(),
@@ -196,7 +196,7 @@ class AdultoMayorMedicacionController extends Controller
 
     public function archivar(Residente $adulto_mayor, Prescripcion $medicacion)
     {
-        $this->autorizarOrden($adulto_mayor, $medicacion, ['medicacion.suspender', 'salud.medicacion.anular']);
+        $this->autorizarOrden($adulto_mayor, $medicacion, ['prescripciones.editar']);
         $medicacion->update(['estado' => 'ANULADA']);
 
         return redirect()
@@ -207,7 +207,7 @@ class AdultoMayorMedicacionController extends Controller
     public function restore(Residente $adulto_mayor, $medicacion)
     {
         $med = Prescripcion::findOrFail($medicacion);
-        $this->autorizarOrden($adulto_mayor, $med, ['medicacion.editar', 'salud.medicacion.editar']);
+        $this->autorizarOrden($adulto_mayor, $med, ['prescripciones.editar']);
         $med->update(['estado' => 'ACTIVA']);
 
         return redirect()

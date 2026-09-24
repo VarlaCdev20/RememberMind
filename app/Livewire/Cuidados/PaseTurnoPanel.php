@@ -306,6 +306,8 @@ class PaseTurnoPanel extends Component
 
     public function generarPase(): void
     {
+        $this->resetValidation();
+
         $cod = $this->codAm ?: $this->codResidenteSeleccionado;
         if (!$cod) {
             $this->addError('codAm', 'Seleccione un residente.');

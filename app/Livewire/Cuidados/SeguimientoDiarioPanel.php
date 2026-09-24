@@ -48,7 +48,7 @@ class SeguimientoDiarioPanel extends Component
 
     public function mount(): void
     {
-        abort_unless(auth()->user()?->can('seguimiento.ver'), 403);
+        abort_unless(auth()->user()?->can('atenciones.ver'), 403);
         $this->filtroFecha = today()->toDateString();
 
         $horaActual = now()->format('H:i:s');
@@ -64,7 +64,7 @@ class SeguimientoDiarioPanel extends Component
 
     public function abrirCrear(): void
     {
-        abort_unless(auth()->user()?->can('seguimiento.crear'), 403);
+        abort_unless(auth()->user()?->can('atenciones.crear'), 403);
         $this->resetValidation();
         $this->reset([
             'editandoId', 'codAm', 'codPlan', 'horaFin', 'higiene', 'orientacion',
@@ -90,7 +90,7 @@ class SeguimientoDiarioPanel extends Component
 
     public function abrirEditar(string $id): void
     {
-        abort_unless(auth()->user()?->can('seguimiento.editar'), 403);
+        abort_unless(auth()->user()?->can('atenciones.editar'), 403);
         $seguimiento = Atencion::findOrFail($id);
         app(\App\Services\Enfermeria\TurnoEnfermeriaService::class)
             ->autorizarAccionPaciente($seguimiento->cod_residente, Auth::user());
@@ -124,7 +124,7 @@ class SeguimientoDiarioPanel extends Component
 
     public function guardar(): void
     {
-        abort_unless(auth()->user()?->can($this->editandoId ? 'seguimiento.editar' : 'seguimiento.crear'), 403);
+        abort_unless(auth()->user()?->can($this->editandoId ? 'atenciones.editar' : 'atenciones.crear'), 403);
         abort_unless(Auth::check(), 401);
         $this->validate([
             'codAm'                  => 'required|exists:residentes,cod_residente',
@@ -165,7 +165,7 @@ class SeguimientoDiarioPanel extends Component
         $turnoVigente = app(\App\Services\Enfermeria\TurnoEnfermeriaService::class)
             ->autorizarMutacionPaciente(
                 $this->codAm,
-                $this->editandoId ? 'seguimiento.editar' : 'seguimiento.crear',
+                $this->editandoId ? 'atenciones.editar' : 'atenciones.crear',
                 Auth::user()
             );
         $this->codTurno = $turnoVigente->cod_turno;

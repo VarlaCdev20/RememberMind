@@ -46,13 +46,13 @@
  <div class="flex flex-wrap items-center gap-3">
  @if($adulto)
  @if(!$fichaActiva)
- @can('salud.ficha.crear')
+ @can('atenciones.crear')
  <button wire:click="openModalGeneral" type="button" class="inline-flex items-center justify-center gap-2 rounded-xl bg-boton-acento px-5 py-2.5 text-[11px] font-bold uppercase tracking-wider text-inverso shadow-[0_10px_22px_rgba(226,125,96,0.24)] transition hover:-translate-y-0.5 hover:bg-fondo-panel active:scale-95">
  <i class="ph-bold ph-plus-circle text-sm"></i> Registrar Ficha Médica
  </button>
  @endcan
  @else
- @can('salud.ficha.editar')
+ @can('atenciones.editar')
  <button wire:click="openModalAntecedentes" type="button" class="inline-flex items-center justify-center gap-2 rounded-xl border border-borde bg-fondo-card px-4 py-2 text-[10px] font-bold uppercase tracking-wider text-parrafo transition hover:bg-fondo-app active:scale-95">
  <i class="ph-bold ph-activity text-sm"></i> Agregar Antecedente
  </button>
@@ -225,7 +225,7 @@
  <div x-show="tab === 'resumen'" x-transition.opacity.duration.300ms>
  <div class="flex items-center justify-between mb-4">
  <h3 class="text-sm font-bold uppercase tracking-wider text-estado-exito">Resumen Médico</h3>
- @can('salud.ficha.editar')
+ @can('atenciones.editar')
  <button wire:click="openModalGeneral" type="button" class="text-[10px] font-bold uppercase tracking-wider text-boton-acento hover:underline">
  Editar Resumen General
  </button>
@@ -279,7 +279,7 @@
  <div x-show="tab === 'antecedentes'" x-transition.opacity.duration.300ms style="display: none;">
  <div class="flex items-center justify-between mb-4">
  <h3 class="text-sm font-bold uppercase tracking-wider text-estado-exito">Antecedentes Quirúrgicos e Hospitalarios</h3>
- @can('salud.ficha.editar')
+ @can('atenciones.editar')
  <button wire:click="openModalAntecedentes" type="button" class="text-[10px] font-bold uppercase tracking-wider text-boton-acento hover:underline">
  Editar Antecedentes
  </button>
@@ -301,7 +301,7 @@
  <div x-show="tab === 'alergias'" x-transition.opacity.duration.300ms style="display: none;">
  <div class="flex items-center justify-between mb-4">
  <h3 class="text-sm font-bold uppercase tracking-wider text-estado-exito">Alergias Registradas</h3>
- @can('salud.ficha.editar')
+ @can('atenciones.editar')
  <button wire:click="openModalAlergias" type="button" class="text-[10px] font-bold uppercase tracking-wider text-boton-acento hover:underline">
  Editar Alergias
  </button>
@@ -322,7 +322,7 @@
  <div x-show="tab === 'condiciones'" x-transition.opacity.duration.300ms style="display: none;">
  <div class="flex items-center justify-between mb-4">
  <h3 class="text-sm font-bold uppercase tracking-wider text-estado-exito">Condiciones Médicas</h3>
- @can('salud.ficha.editar')
+ @can('atenciones.editar')
  <button wire:click="openModalCondiciones" type="button" class="text-[10px] font-bold uppercase tracking-wider text-boton-acento hover:underline">
  Editar Condiciones
  </button>
@@ -350,7 +350,7 @@
  <div x-show="tab === 'restricciones'" x-transition.opacity.duration.300ms style="display: none;">
  <div class="flex items-center justify-between mb-4">
  <h3 class="text-sm font-bold uppercase tracking-wider text-estado-exito">Restricciones y Cuidados</h3>
- @can('salud.ficha.editar')
+ @can('atenciones.editar')
  <button wire:click="openModalObservaciones" type="button" class="text-[10px] font-bold uppercase tracking-wider text-boton-acento hover:underline">
  Editar Restricciones
  </button>
@@ -371,7 +371,7 @@
  <div x-show="tab === 'observaciones'" x-transition.opacity.duration.300ms style="display: none;">
  <div class="flex items-center justify-between mb-4">
  <h3 class="text-sm font-bold uppercase tracking-wider text-estado-exito">Observaciones Médicas</h3>
- @can('salud.ficha.editar')
+ @can('atenciones.editar')
  <button wire:click="openModalObservaciones" type="button" class="text-[10px] font-bold uppercase tracking-wider text-boton-acento hover:underline">
  Editar Observaciones
  </button>
@@ -392,7 +392,7 @@
  <p class="mx-auto mt-2 max-w-md text-sm font-semibold leading-relaxed text-apoyo">
  Regístrela para completar el seguimiento clínico base, antecedentes y patologías.
  </p>
- @can('salud.ficha.crear')
+ @can('atenciones.crear')
  <button wire:click="openModalGeneral" type="button" class="mt-6 inline-flex items-center justify-center gap-2 rounded-xl bg-boton-acento px-6 py-3 text-xs font-bold uppercase tracking-wider text-inverso shadow-[0_10px_22px_rgba(226,125,96,0.24)] transition hover:-translate-y-0.5 hover:bg-fondo-panel active:scale-95">
  <i class="ph-bold ph-plus-circle"></i> Registrar ficha médica
  </button>

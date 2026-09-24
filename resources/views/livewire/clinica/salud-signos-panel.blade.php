@@ -50,7 +50,7 @@
  <i class="ph-bold ph-file-chart text-sm"></i>
  Generar Reporte
  </a>
- @can('salud.signos.crear')
+ @can('signos_vitales.crear')
  <button type="button" wire:click="abrirFormularioNuevo" class="inline-flex items-center justify-center gap-2 rounded-xl bg-boton-acento px-5 py-2.5 text-xs font-bold uppercase tracking-wider text-inverso shadow-[0_10px_22px_rgba(226,125,96,0.24)] transition hover:-translate-y-0.5 hover:bg-fondo-panel active:scale-95">
  <i class="ph-bold ph-plus-circle text-sm"></i>
  Registrar Signos Vitales
@@ -312,7 +312,7 @@
  <td class="px-4 py-2.5 text-right">
  @if($signo->estado === 'VIGENTE')
  <div class="flex items-center justify-end gap-1.5">
- @can('salud.signos.editar')
+ @can('signos_vitales.editar')
  <button type="button" wire:click="abrirFormularioEditar('{{ $signo->cod_signo }}')" class="inline-flex items-center justify-center rounded-lg border border-borde bg-fondo-panel p-1.5 text-apoyo transition hover:bg-boton-principal hover:text-inverso active:scale-95" title="Editar">
  <i class="ph-bold ph-pencil-simple"></i>
  </button>

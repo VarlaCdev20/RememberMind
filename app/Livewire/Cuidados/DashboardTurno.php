@@ -148,8 +148,8 @@ class DashboardTurno extends Component
     {
         $this->asegurarModoOperativo();
         $tarea = EjecucionCuidado::findOrFail($codTarea);
-        $this->asegurarModoOperativo($tarea->cod_residente, 'tareas.registrar_resultado');
-        app(TurnoEnfermeriaService::class)->autorizarMutacionPaciente($tarea->cod_residente, 'tareas.registrar_resultado', Auth::user());
+        $this->asegurarModoOperativo($tarea->cod_residente, 'ejecuciones_cuidado.gestionar');
+        app(TurnoEnfermeriaService::class)->autorizarMutacionPaciente($tarea->cod_residente, 'ejecuciones_cuidado.gestionar', Auth::user());
 
         DB::transaction(function () use ($tarea) {
             $bloqueada = EjecucionCuidado::lockForUpdate()->findOrFail($tarea->cod_ejecucion);
@@ -172,8 +172,8 @@ class DashboardTurno extends Component
     {
         $this->asegurarModoOperativo();
         $tarea = EjecucionCuidado::findOrFail($codTarea);
-        $this->asegurarModoOperativo($tarea->cod_residente, 'tareas.omitir');
-        app(TurnoEnfermeriaService::class)->autorizarMutacionPaciente($tarea->cod_residente, 'tareas.omitir', Auth::user());
+        $this->asegurarModoOperativo($tarea->cod_residente, 'ejecuciones_cuidado.gestionar');
+        app(TurnoEnfermeriaService::class)->autorizarMutacionPaciente($tarea->cod_residente, 'ejecuciones_cuidado.gestionar', Auth::user());
         abort_unless($tarea->puedeCompletarse(), 409, 'La tarea ya no está pendiente de ejecución.');
         $this->tareaOmitirId = $codTarea;
         $this->motivoOmisionTarea = '';
@@ -184,7 +184,7 @@ class DashboardTurno extends Component
     {
         $this->asegurarModoOperativo();
         $tarea = EjecucionCuidado::findOrFail($this->tareaOmitirId);
-        $this->asegurarModoOperativo($tarea->cod_residente, 'tareas.omitir');
+        $this->asegurarModoOperativo($tarea->cod_residente, 'ejecuciones_cuidado.gestionar');
         $this->validate([
             'motivoOmisionTarea' => 'required|string|min:5|max:500',
         ], [
@@ -192,7 +192,7 @@ class DashboardTurno extends Component
         ]);
 
         $tarea = EjecucionCuidado::findOrFail($this->tareaOmitirId);
-        app(TurnoEnfermeriaService::class)->autorizarMutacionPaciente($tarea->cod_residente, 'tareas.omitir', Auth::user());
+        app(TurnoEnfermeriaService::class)->autorizarMutacionPaciente($tarea->cod_residente, 'ejecuciones_cuidado.gestionar', Auth::user());
         abort_unless($tarea->puedeCompletarse(), 409, 'La tarea ya no está pendiente de ejecución.');
         $tarea->update([
             'estado' => 'OMITIDA',
@@ -213,7 +213,7 @@ class DashboardTurno extends Component
 
     public function administrarMed(string $codMedAdulto, string $codAm, ?string $horaProgramada = null)
     {
-        $this->asegurarModoOperativo($codAm, 'administracion_medicacion.registrar');
+        $this->asegurarModoOperativo($codAm, 'administraciones_medicacion.crear');
         abort_unless(\Illuminate\Support\Facades\Gate::forUser(Auth::user())->allows('create', \App\Models\AdministracionMedicacion::class), 403);
         if (! $horaProgramada) {
             $ocurrencia = app(AgendaMedicacionService::class)->paraAdulto($codAm)
@@ -234,7 +234,7 @@ class DashboardTurno extends Component
 
     public function abrirOmitirMed(string $codMedAdulto, string $codAm, ?string $horaProgramada = null)
     {
-        $this->asegurarModoOperativo($codAm, 'administracion_medicacion.registrar');
+        $this->asegurarModoOperativo($codAm, 'administraciones_medicacion.crear');
         app(TurnoEnfermeriaService::class)->autorizarAccionPaciente($codAm, Auth::user());
         abort_unless(Prescripcion::where('cod_prescripcion', $codMedAdulto)->where('cod_residente', $codAm)
             ->whereIn('estado', ['ACTIVO', 'ACTIVA', 'VIGENTE'])->exists(), 404);
@@ -249,7 +249,7 @@ class DashboardTurno extends Component
 
     public function confirmarOmisionMed()
     {
-        $this->asegurarModoOperativo($this->medOmitirCodAm, 'administracion_medicacion.registrar');
+        $this->asegurarModoOperativo($this->medOmitirCodAm, 'administraciones_medicacion.crear');
         $this->validate([
             'motivoOmisionMed' => 'required|string|min:5|max:500',
         ], [
@@ -279,7 +279,7 @@ class DashboardTurno extends Component
     {
         $this->asegurarModoOperativo();
         $alerta = Alerta::findOrFail($codAlerta);
-        $this->asegurarModoOperativo($alerta->cod_residente, 'alertas.atender');
+        $this->asegurarModoOperativo($alerta->cod_residente, 'alertas.gestionar');
         app(TurnoEnfermeriaService::class)->autorizarAccionPaciente($alerta->cod_residente, Auth::user());
         abort_unless($alerta->estado === 'ABIERTA', 409, 'La alerta ya fue atendida o cerrada.');
         $this->alertaAccionId = $codAlerta;
@@ -291,7 +291,7 @@ class DashboardTurno extends Component
     {
         $this->asegurarModoOperativo();
         $alerta = Alerta::findOrFail($this->alertaAccionId);
-        $this->asegurarModoOperativo($alerta->cod_residente, 'alertas.atender');
+        $this->asegurarModoOperativo($alerta->cod_residente, 'alertas.gestionar');
         app(AlertasService::class)->registrarIntervencion($alerta, $this->accionTomadaAlerta, Auth::user());
 
         $this->modalAtenderAlerta = false;
@@ -308,7 +308,7 @@ class DashboardTurno extends Component
     {
         $this->asegurarModoOperativo();
         $alerta = Alerta::findOrFail($codAlerta);
-        $this->asegurarModoOperativo($alerta->cod_residente, 'alertas.cerrar');
+        $this->asegurarModoOperativo($alerta->cod_residente, 'alertas.gestionar');
         app(TurnoEnfermeriaService::class)->autorizarAccionPaciente($alerta->cod_residente, Auth::user());
         abort_unless($alerta->puedeCerrarse(), 409, 'La alerta ya está cerrada.');
         $this->alertaAccionId = $codAlerta;
@@ -320,7 +320,7 @@ class DashboardTurno extends Component
     {
         $this->asegurarModoOperativo();
         $alerta = Alerta::findOrFail($this->alertaAccionId);
-        $this->asegurarModoOperativo($alerta->cod_residente, 'alertas.cerrar');
+        $this->asegurarModoOperativo($alerta->cod_residente, 'alertas.gestionar');
         app(AlertasService::class)->cerrar($alerta, $this->observacionCierreAlerta, Auth::user());
 
         $this->modalCerrarAlerta = false;
@@ -379,7 +379,7 @@ class DashboardTurno extends Component
 
     public function abrirRegistrarSeguimiento(string $codAm)
     {
-        $this->asegurarModoOperativo($codAm, 'seguimiento.crear');
+        $this->asegurarModoOperativo($codAm, 'atenciones.crear');
         app(TurnoEnfermeriaService::class)->autorizarAccionPaciente($codAm, Auth::user());
         $this->segCodAm = $codAm;
         $this->segEstadoGeneral = 'ESTABLE';
@@ -394,8 +394,8 @@ class DashboardTurno extends Component
 
     public function guardarSeguimiento()
     {
-        $this->asegurarModoOperativo($this->segCodAm, 'seguimiento.crear');
-        app(TurnoEnfermeriaService::class)->autorizarMutacionPaciente($this->segCodAm, 'seguimiento.crear', Auth::user());
+        $this->asegurarModoOperativo($this->segCodAm, 'atenciones.crear');
+        app(TurnoEnfermeriaService::class)->autorizarMutacionPaciente($this->segCodAm, 'atenciones.crear', Auth::user());
         $this->validate([
             'segEstadoGeneral' => 'required|in:ESTABLE,VIGILANCIA,DELICADO,CRITICO',
             'segAlimentacion' => 'required|in:COMPLETA,PARCIAL,RECHAZADA,AYUNO',

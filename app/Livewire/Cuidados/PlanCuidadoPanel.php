@@ -35,12 +35,12 @@ class PlanCuidadoPanel extends Component
 
     public function mount(): void
     {
-        abort_unless(auth()->user()?->can('plan_cuidado.ver'), 403);
+        abort_unless(auth()->user()?->can('planes_cuidado.ver'), 403);
     }
 
     public function abrirCrear(): void
     {
-        abort_unless(auth()->user()?->can('plan_cuidado.crear'), 403);
+        abort_unless(auth()->user()?->can('planes_cuidado.crear'), 403);
         $this->resetValidation();
         $this->reset('editandoId','codAm','tipoPlan','nivelCuidado','resumen','fechaFin');
         $this->tipoPlan   = 'INICIAL';
@@ -57,7 +57,7 @@ class PlanCuidadoPanel extends Component
 
     public function guardar(): void
     {
-        abort_unless(auth()->user()?->can($this->editandoId ? 'plan_cuidado.editar' : 'plan_cuidado.crear'), 403);
+        abort_unless(auth()->user()?->can($this->editandoId ? 'planes_cuidado.editar' : 'planes_cuidado.crear'), 403);
         if ($this->editandoId) abort_unless(PlanCuidado::findOrFail($this->editandoId)->estado === 'BORRADOR', 409);
         $this->validate([
             'codAm'      => 'required|exists:residentes,cod_residente',
@@ -74,7 +74,7 @@ class PlanCuidadoPanel extends Component
             'fechaInicio.required'=> 'La fecha de inicio es obligatoria.',
         ]);
         app(TurnoEnfermeriaService::class)->autorizarMutacionEnfermeria(
-            $this->codAm, $this->editandoId ? 'plan_cuidado.editar' : 'plan_cuidado.crear', Auth::user()
+            $this->codAm, $this->editandoId ? 'planes_cuidado.editar' : 'planes_cuidado.crear', Auth::user()
         );
 
         // Validar que no exista plan ACTIVO
@@ -132,7 +132,7 @@ class PlanCuidadoPanel extends Component
 
     public function editarBorrador(string $id): void
     {
-        abort_unless(auth()->user()?->can('plan_cuidado.editar'), 403);
+        abort_unless(auth()->user()?->can('planes_cuidado.editar'), 403);
         $plan = PlanCuidado::findOrFail($id);
         app(TurnoEnfermeriaService::class)->autorizarAccionPaciente($plan->cod_residente, Auth::user());
         abort_unless($plan->estado === 'BORRADOR', 409);
@@ -145,9 +145,9 @@ class PlanCuidadoPanel extends Component
 
     public function cerrarPlan(string $id): void
     {
-        abort_unless(auth()->user()?->can('plan_cuidado.cerrar'), 403);
+        abort_unless(auth()->user()?->can('planes_cuidado.cerrar'), 403);
         $plan = PlanCuidado::findOrFail($id);
-        app(TurnoEnfermeriaService::class)->autorizarMutacionEnfermeria($plan->cod_residente, 'plan_cuidado.cerrar', Auth::user());
+        app(TurnoEnfermeriaService::class)->autorizarMutacionEnfermeria($plan->cod_residente, 'planes_cuidado.cerrar', Auth::user());
         abort_unless($plan->estado === 'ACTIVO', 409, 'Solo puede cerrar un plan activo.');
         $plan->update([
             'estado'   => 'CERRADO',
