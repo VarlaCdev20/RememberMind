@@ -502,25 +502,31 @@
  <div class="flex items-center gap-1">
  @if($item['cargado'])
  <!-- Ver documento -->
+ @can('documentos.ver')
  <a href="{{ Storage::url($item['documento']->archivo) }}" target="_blank"
  class="flex h-7 w-7 items-center justify-center rounded-lg bg-fondo-panel text-parrafo transition hover:bg-boton-principal hover:text-inverso"
  title="Ver Documento">
  <i class="ph-bold ph-eye text-xs"></i>
  </a>
+ @endcan
  
  <!-- Reemplazar documento -->
+ @canany(['documentos.subir', 'documentos.gestionar'])
  <button type="button" wire:click="abrirModalSubirDoc('{{ $item['cod_tipo_doc'] }}')"
  class="flex h-7 w-7 items-center justify-center rounded-lg bg-estado-peligroBg text-boton-acento transition hover:bg-boton-acento hover:text-inverso"
  title="Reemplazar Archivo">
  <i class="ph-bold ph-arrow-counter-clockwise text-xs"></i>
  </button>
+ @endcanany
  @else
  <!-- Subir por primera vez -->
+ @canany(['documentos.subir', 'documentos.gestionar'])
  <button type="button" wire:click="abrirModalSubirDoc('{{ $item['cod_tipo_doc'] }}')"
  class="flex h-7 w-7 items-center justify-center rounded-lg bg-estado-exitoBg text-estado-exito transition hover:bg-estado-exitoBg hover:text-inverso font-black"
  title="Subir Documento">
  <i class="ph-bold ph-upload-simple text-xs"></i>
  </button>
+ @endcanany
  @endif
  </div>
  </div>

@@ -37,7 +37,7 @@
             @endforeach
         @endcan
 
-        @can('adultos.ver')
+        @can('residentes.ver')
             @foreach([
                 ['atenciones', 'ph-stethoscope', 'Atenciones'], ['observaciones', 'ph-note-pencil', 'Notas y evolución'],
                 ['documentos', 'ph-folder-open', 'Documentos'],
@@ -49,7 +49,7 @@
             @endforeach
         @endcan
 
-        @can('familiares.ver')
+        @can('residentes_contactos.ver')
             @php $red = $enlace('admin.familia-social.red-apoyo', ['adulto' => $codigo]); @endphp
             <a href="{{ $red['href'] }}" @class(['rm-patient-nav-link', 'is-active' => $red['activo']])>
                 <i class="ph-bold ph-users-three"></i> Red de apoyo

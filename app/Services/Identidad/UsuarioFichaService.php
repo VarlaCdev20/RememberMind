@@ -51,7 +51,7 @@ class UsuarioFichaService
     public function obtenerHistorialHorarios(User $usuario)
     {
         // El historial V2 proviene de asignaciones_personal; no se consultan las
-        // antiguas tablas horarios_personal_admin/horarios_personal_salud.
+        // La agenda se obtiene de jornadas y asignaciones_personal V2.
         return AsignacionPersonal::query()
             ->with(['jornada.turno', 'area', 'personal'])
             ->whereHas('personal', fn ($query) => $query->where('cod_usuario', $usuario->cod_usuario))

@@ -1200,94 +1200,40 @@ class PersonalInstitucionalForm extends Component
 
             $this->guardarDatosLaboralesEnUsuario($usuario, $clasificacion);
 
-            // Guardar documentos utilizando el modelo DocumentoUsuario para asegurar esquema correcto y generación de ID
+            // Registrar exclusivamente archivos reales en la tabla documental unificada V2.
             $documentosFaltantes = [];
-            $plazoVencimiento = \Carbon\Carbon::parse($this->fecha_registro)->addHours(48)->toDateString();
             $responsableId = auth()->id();
 
             foreach ($this->documentos_configurados as $doc) {
                 $esInstitucional = ($doc['tipo'] === 'institucional');
-                $tipoDoc  = $esInstitucional ? 'INSTITUCIONAL' : 'PERSONAL';
-                $fechaDoc = $esInstitucional ? \Carbon\Carbon::parse($this->fecha_registro)->toDateString() : null;
-
                 $estadoDoc = $this->estado_documentos[$doc['id']] ?? 'PENDIENTE';
-
-                // Resolver cod_tipo_doc: usar el mapeado o crear el tipo automáticamente si no existe
-                $codTipoDoc = $doc['cod_tipo_doc'] ?? null;
-                if (!$codTipoDoc) {
-                    $tipoReg = \App\Models\TipoDocumentoUsuario::firstOrCreate(
-                        ['nombre' => $doc['nombre']],
-                        [
-                            'descripcion'         => $doc['desc'] ?? null,
-                            'aplica_roles'        => [$this->rol_seleccionado ?? ''],
-                            'obligatorio'         => $doc['obligatorio_inmediato'] ?? false,
-                            'requiere_vencimiento' => false,
-                            'requiere_validacion' => false,
-                            'estado'              => 'ACTIVO',
-                            'orden'               => 99,
-                        ]
-                    );
-                    $codTipoDoc = $tipoReg->cod_tipo_doc;
-                }
-
-                // Usar Eloquent para generar el ID (cod_doc_usu) automáticamente
-                $docBD = \App\Models\DocumentoUsuario::where('cod_usu', $usuario->cod_usu)
-                    ->where('nombre_documento', $doc['nombre'])
-                    ->first();
-
-                if (!$docBD) {
-                    $docBD = new \App\Models\DocumentoUsuario();
-                    $docBD->cod_usu = $usuario->cod_usu;
-                    $docBD->nombre_documento = $doc['nombre'];
-                    $docBD->tipo_documento = $tipoDoc;
-                    $docBD->cod_tipo_doc = $codTipoDoc;
-                } elseif (!$docBD->cod_tipo_doc) {
-                    $docBD->cod_tipo_doc = $codTipoDoc;
-                }
 
                 if ($estadoDoc === 'CARGADO' && isset($this->archivos_temporales[$doc['id']])) {
                     $file = $this->archivos_temporales[$doc['id']];
                     if (!is_string($file)) {
                         $path = $file->store('documentos_personal', 'public');
-
-                        $docBD->archivo = $path;
-                        $docBD->extension = $file->getClientOriginalExtension();
-                        $docBD->fecha_emision = $fechaDoc;
-                        $docBD->mime_type = $file->getMimeType();
-                        $docBD->tamanio = $file->getSize();
-                        $docBD->estado = 'CARGADO';
-                        $docBD->subido_por = $responsableId;
-                        $docBD->observaciones = null;
-                        $docBD->motivo_observacion = null;
-                        $docBD->fecha_vencimiento = null;
-                        $docBD->save();
+                        $anterior = \App\Models\Documento::where('cod_usuario', $usuario->cod_usuario)
+                            ->where('tipo_documento', $doc['id'])->whereNotIn('estado', ['ANULADO', 'REEMPLAZADO'])->first();
+                        \App\Models\Documento::create([
+                            'cod_documento' => 'DOC_' . strtoupper(\Illuminate\Support\Str::random(10)),
+                            'cod_usuario' => $usuario->cod_usuario,
+                            'cod_documento_anterior' => $anterior?->cod_documento,
+                            'tipo_documento' => $doc['id'],
+                            'nombre' => $doc['nombre'],
+                            'ruta_archivo' => $path,
+                            'tipo_archivo' => $file->getMimeType() ?: 'application/octet-stream',
+                            'hash_archivo' => hash_file('sha256', \Storage::disk('public')->path($path)),
+                            'estado' => 'CARGADO',
+                            'observacion' => 'Subido por: ' . $responsableId,
+                        ]);
+                        $anterior?->update(['estado' => 'REEMPLAZADO']);
                     }
                 } elseif ($estadoDoc === 'OBSERVADO') {
-                    $obsTexto = $this->observacion_documentos[$doc['id']] ?? 'Documento observado.';
-                    
-                    $docBD->estado = 'OBSERVADO';
-                    $docBD->motivo_observacion = $obsTexto;
-                    $docBD->fecha_vencimiento = $plazoVencimiento;
-                    if (empty($docBD->archivo)) {
-                        $docBD->archivo = 'pendiente';
-                    }
-                    $docBD->save();
+                    $documentosFaltantes[] = $doc['nombre'] . ': ' . ($this->observacion_documentos[$doc['id']] ?? 'Documento observado.');
                 } elseif ($estadoDoc === 'PENDIENTE') {
-                    $obsDefault = $esInstitucional
-                        ? 'Documento institucional pendiente. Regularizar en 48 horas.'
-                        : 'Pendiente de entrega (plazo: 48 horas).';
-
                     if ($esInstitucional && in_array($doc['id'], ['CONTRATO', 'CONFIDENCIALIDAD'])) {
                         $documentosFaltantes[] = $doc['nombre'];
                     }
-
-                    $docBD->estado = 'PENDIENTE';
-                    $docBD->observaciones = $obsDefault;
-                    $docBD->fecha_vencimiento = $plazoVencimiento;
-                    if (empty($docBD->archivo)) {
-                        $docBD->archivo = 'pendiente';
-                    }
-                    $docBD->save();
                 }
             }
 
@@ -1356,7 +1302,7 @@ class PersonalInstitucionalForm extends Component
                             $clasificacion['area_nombre'] ?? 'Área Operativa',
                             $this->estado,
                             $documentos_pendientes_arr,
-                            $plazoVencimiento ?? \Carbon\Carbon::now()->addHours(48)->toDateString(),
+                            \Carbon\Carbon::now()->addHours(48)->toDateString(),
                             $pdfPaths,
                             $this->contrasena_temporal,
                             $documentos_subidos_arr,

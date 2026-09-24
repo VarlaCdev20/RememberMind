@@ -3,8 +3,7 @@
 namespace App\Livewire\Identidad;
 
 use App\Models\User;
-use App\Models\DocumentoUsuario;
-use App\Models\TipoDocumentoUsuario;
+use App\Models\Documento;
 use App\Services\Identidad\UsuarioFichaService;
 use App\Services\Documentos\DocumentacionUsuarioService;
 use App\Exports\UsuarioExpedienteExport;
@@ -60,7 +59,12 @@ class UsuarioFichaPanel extends Component
 
     public function abrirSubida(string $codTipoDoc): void
     {
-        $tipo = TipoDocumentoUsuario::findOrFail($codTipoDoc);
+        abort_unless(
+            auth()->user()?->can('documentos.subir') || auth()->user()?->can('documentos.gestionar'),
+            403
+        );
+
+        $tipo = app(DocumentacionUsuarioService::class)->tipoDisponible($this->usuario, $codTipoDoc);
         $this->selectedTipoDoc = $tipo;
         $this->archivoSubida = null;
         $this->fechaEmision = null;
@@ -71,6 +75,11 @@ class UsuarioFichaPanel extends Component
 
     public function subirArchivo(): void
     {
+        abort_unless(
+            auth()->user()?->can('documentos.subir') || auth()->user()?->can('documentos.gestionar'),
+            403
+        );
+
         $rules = [
             'archivoSubida' => ['required', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:10240'], // 10MB máx
             'fechaEmision' => ['nullable', 'date', 'before_or_equal:today'],
@@ -123,7 +132,7 @@ class UsuarioFichaPanel extends Component
 
     public function validarDoc(string $codDoc): void
     {
-        if (!auth()->user()->can('documentos_usuarios.validar')) {
+        if (!auth()->user()->can('documentos.gestionar')) {
             $this->dispatch('swal', [
                 'icon' => 'error',
                 'title' => 'Acceso denegado',
@@ -132,7 +141,7 @@ class UsuarioFichaPanel extends Component
             return;
         }
 
-        $documento = DocumentoUsuario::findOrFail($codDoc);
+        $documento = Documento::where('cod_usuario', $this->usuario->cod_usuario)->findOrFail($codDoc);
         app(DocumentacionUsuarioService::class)->validarDocumento($documento, auth()->user());
 
         $this->dispatch('swal', [
@@ -144,6 +153,8 @@ class UsuarioFichaPanel extends Component
 
     public function abrirObservarDoc(string $codDoc): void
     {
+        abort_unless(auth()->user()?->can('documentos.gestionar'), 403);
+
         $this->selectedDocId = $codDoc;
         $this->motivoRechazo = '';
         $this->mostrarObservacionModal = true;
@@ -151,6 +162,8 @@ class UsuarioFichaPanel extends Component
 
     public function observarDoc(): void
     {
+        abort_unless(auth()->user()?->can('documentos.gestionar'), 403);
+
         $this->validate([
             'motivoRechazo' => ['required', 'string', 'min:5', 'max:255']
         ], [
@@ -158,7 +171,7 @@ class UsuarioFichaPanel extends Component
             'motivoRechazo.min' => 'Indique un motivo más descriptivo.'
         ]);
 
-        $documento = DocumentoUsuario::findOrFail($this->selectedDocId);
+        $documento = Documento::where('cod_usuario', $this->usuario->cod_usuario)->findOrFail($this->selectedDocId);
         app(DocumentacionUsuarioService::class)->observarDocumento($documento, $this->motivoRechazo, auth()->user());
 
         $this->mostrarObservacionModal = false;
@@ -173,6 +186,11 @@ class UsuarioFichaPanel extends Component
 
     public function abrirAnularDoc(string $codDoc): void
     {
+        abort_unless(
+            auth()->user()?->can('documentos.archivar') || auth()->user()?->can('documentos.gestionar'),
+            403
+        );
+
         $this->selectedDocId = $codDoc;
         $this->motivoRechazo = '';
         $this->mostrarAnulacionModal = true;
@@ -180,13 +198,18 @@ class UsuarioFichaPanel extends Component
 
     public function anularDoc(): void
     {
+        abort_unless(
+            auth()->user()?->can('documentos.archivar') || auth()->user()?->can('documentos.gestionar'),
+            403
+        );
+
         $this->validate([
             'motivoRechazo' => ['required', 'string', 'min:5', 'max:255']
         ], [
             'motivoRechazo.required' => 'El motivo de la anulación es obligatorio.'
         ]);
 
-        $documento = DocumentoUsuario::findOrFail($this->selectedDocId);
+        $documento = Documento::where('cod_usuario', $this->usuario->cod_usuario)->findOrFail($this->selectedDocId);
         app(DocumentacionUsuarioService::class)->anularDocumento($documento, $this->motivoRechazo, auth()->user());
 
         $this->mostrarAnulacionModal = false;
@@ -201,7 +224,9 @@ class UsuarioFichaPanel extends Component
 
     public function descargarDoc(string $codDoc)
     {
-        $documento = DocumentoUsuario::findOrFail($codDoc);
+        abort_unless(auth()->user()?->can('documentos.ver'), 403);
+
+        $documento = Documento::where('cod_usuario', $this->usuario->cod_usuario)->findOrFail($codDoc);
         
         if (!Storage::disk('public')->exists($documento->archivo)) {
             $this->dispatch('swal', [
@@ -221,7 +246,7 @@ class UsuarioFichaPanel extends Component
 
     public function restablecerPassword(): void
     {
-        if (!auth()->user()->can('usuarios.acceso.restablecer_password')) {
+        if (!auth()->user()->can('usuarios.gestionar')) {
             $this->dispatch('swal', [
                 'icon' => 'error',
                 'title' => 'Acceso denegado',
@@ -254,7 +279,7 @@ class UsuarioFichaPanel extends Component
 
     public function toggleAcceso(): void
     {
-        if (!auth()->user()->can('usuarios.acceso.bloquear')) {
+        if (!auth()->user()->can('usuarios.gestionar')) {
             $this->dispatch('swal', [
                 'icon' => 'error',
                 'title' => 'Acceso denegado',
@@ -412,5 +437,3 @@ class UsuarioFichaPanel extends Component
         ]);
     }
 }
-
-

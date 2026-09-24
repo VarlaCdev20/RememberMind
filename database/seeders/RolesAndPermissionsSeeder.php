@@ -38,13 +38,12 @@ class RolesAndPermissionsSeeder extends Seeder
 
         $permisos = array_map(fn (string $recurso) => $recurso.'.ver', $recursos);
         $permisosCompatibilidadLectura = [
-            'adultos.ver', 'admisiones.ver_dashboard', 'personal_institucional.ver',
-            'roles.ver', 'areas.reportes', 'salud.ver', 'familiares.ver',
-            'turnos_enfermeria.ver', 'valoracion_enfermeria.ver', 'valoracion_medica.ver',
-            'plan_cuidado.ver', 'tareas.ver', 'seguimiento.ver', 'pase_turno.ver',
+            'admisiones.ver_dashboard', 'personal_institucional.ver',
+            'roles.ver', 'areas.reportes', 'salud.ver',
+            'valoracion_enfermeria.ver', 'valoracion_medica.ver',
             'enfermeria.ver_dashboard', 'enfermeria.ver_pacientes_asignados',
             'enfermeria.ver_ficha_paciente',
-            'administracion_medicacion.registrar', 'reportes.ver', 'reportes.institucional',
+            'reportes.ver', 'reportes.institucional',
             'reportes.exportar_pdf', 'reportes.individual', 'bitacora.ver',
         ];
         $permisosCompatibilidadInstitucional = [
@@ -53,7 +52,6 @@ class RolesAndPermissionsSeeder extends Seeder
             'usuarios.reportes.pdf', 'usuarios.reportes.excel',
             'areas.crear', 'areas.editar', 'areas.cambiar_estado',
             'turnos.asignar', 'turnos.finalizar',
-            'turnos_enfermeria.crear', 'turnos_enfermeria.editar',
             'habitaciones.crear', 'habitaciones.editar',
             'camas.crear', 'camas.editar',
             'documentos.subir', 'documentos.archivar',
@@ -62,6 +60,7 @@ class RolesAndPermissionsSeeder extends Seeder
         $permisos = array_merge($permisos, [
             'auditoria.ver','usuarios.gestionar','personal.gestionar','areas.gestionar','turnos.gestionar',
             'jornadas.gestionar','preadmisiones.crear','preadmisiones.revisar','admisiones.formalizar',
+            'residentes.gestionar','residentes_contactos.gestionar',
             'habitaciones.gestionar','camas.gestionar','contactos.gestionar','documentos.gestionar',
             'consentimientos.gestionar','atenciones.crear','notas_clinicas.crear','diagnosticos.crear',
             'antecedentes_clinicos.crear','alergias.crear','signos_vitales.crear',
@@ -71,14 +70,20 @@ class RolesAndPermissionsSeeder extends Seeder
             'registros_conductuales.crear','registros_sueno.crear','registros_ingesta.crear',
             'registros_hidratacion.crear','registros_eliminacion.crear','registros_movilidad.crear',
             'heridas.crear','curaciones_herida.crear','pases_turno.crear','planes_cuidado.crear',
+            'pases_turno.editar','planes_cuidado.editar','planes_cuidado.cerrar','ejecuciones_cuidado.gestionar',
             'ejecuciones_cuidado.crear','prescripciones.crear','prescripciones.editar','prescripciones.suspender',
-            'administraciones_medicacion.crear','aplicaciones_instrumento.crear',
+            'atenciones.editar','atenciones.anular','notas_clinicas.editar','notas_clinicas.anular',
+            'signos_vitales.editar','signos_vitales.anular','administraciones_medicacion.crear',
+            'aplicaciones_instrumento.crear','aplicaciones_instrumento.editar','aplicaciones_instrumento.anular',
             'valoraciones_psicologicas.crear','valoraciones_nutricionales.crear',
-            'valoraciones_funcionales.crear','seguimientos_pedagogicos.crear','actividades.gestionar',
+            'valoraciones_funcionales.crear','valoraciones_funcionales.editar','seguimientos_pedagogicos.crear','actividades.gestionar',
             'visitas.gestionar','alertas.gestionar',
         ], $permisosCompatibilidadLectura, $permisosCompatibilidadInstitucional);
 
-        foreach (array_unique($permisos) as $permiso) {
+        $permisos = array_values(array_unique($permisos));
+        Permission::query()->where('guard_name', 'web')->whereNotIn('name', $permisos)->delete();
+
+        foreach ($permisos as $permiso) {
             Permission::findOrCreate($permiso, 'web');
         }
 
@@ -87,6 +92,7 @@ class RolesAndPermissionsSeeder extends Seeder
         $roles['SUPERADMINISTRADOR']->syncPermissions(array_values(array_unique(array_merge($this->permitir($permisos, [
             '.ver','usuarios.gestionar','personal.gestionar','areas.gestionar','turnos.gestionar',
             'jornadas.gestionar','preadmisiones.crear','preadmisiones.revisar','admisiones.formalizar',
+            'residentes.gestionar','residentes_contactos.gestionar',
             'habitaciones.gestionar','camas.gestionar','contactos.gestionar','documentos.gestionar',
             'consentimientos.gestionar','actividades.gestionar','visitas.gestionar','alertas.gestionar',
             'auditoria.ver',
@@ -94,9 +100,10 @@ class RolesAndPermissionsSeeder extends Seeder
 
         $roles['ADMINISTRADOR']->syncPermissions(array_values(array_unique(array_merge($this->permitir($permisos, [
             'usuarios','personal','areas','turnos','jornadas','asignaciones_personal','preadmisiones',
-            'admisiones','residentes.ver','contactos','residentes_contactos','habitaciones','camas',
+            'admisiones','residentes.ver','residentes.gestionar','contactos','residentes_contactos','habitaciones','camas',
             'ocupaciones_cama','documentos','consentimientos','seguros_residente','actividades','visitas',
-            'alertas.ver','incidentes.ver','auditoria.ver',
+            'alertas.ver','alertas.gestionar','incidentes.ver','auditoria.ver','atenciones.ver','planes_cuidado.ver',
+            'ejecuciones_cuidado.ver','pases_turno.ver',
         ]), $permisosCompatibilidadLectura, $permisosCompatibilidadInstitucional))));
 
         $roles['MEDICO GENERAL/GERIATRA']->syncPermissions(array_values(array_unique(array_merge($this->permitir($permisos, [
@@ -110,18 +117,16 @@ class RolesAndPermissionsSeeder extends Seeder
         ]), ['salud.ver', 'valoracion_medica.ver']))));
 
         $roles['ENFERMEROS']->syncPermissions(array_values(array_unique(array_merge($this->permitir($permisos, [
-            'residentes.ver','ocupaciones_cama.ver','atenciones.ver','notas_clinicas','antecedentes_clinicos.ver',
+            'residentes.ver','ocupaciones_cama.ver','atenciones.ver','atenciones.crear','atenciones.editar','notas_clinicas','antecedentes_clinicos.ver',
             'diagnosticos.ver','alergias.ver','dispositivos_clinicos','signos_vitales','valoraciones_dolor',
             'estudios_clinicos.ver','resultados_estudio.ver','indicaciones_clinicas.ver','incidentes',
             'asignaciones_residente_jornada','controles_cognitivos','registros_','heridas','curaciones_herida','pases_turno','planes_cuidado',
             'intervenciones_cuidado.ver','programaciones_cuidado.ver','ejecuciones_cuidado',
             'prescripciones.ver','horarios_prescripcion.ver','administraciones_medicacion','alertas',
         ]), [
-            'salud.ver', 'turnos_enfermeria.ver', 'valoracion_enfermeria.ver',
-            'plan_cuidado.ver', 'tareas.ver', 'seguimiento.ver', 'pase_turno.ver',
+            'salud.ver', 'turnos.ver', 'valoracion_enfermeria.ver',
             'enfermeria.ver_dashboard', 'enfermeria.ver_pacientes_asignados',
             'enfermeria.ver_ficha_paciente',
-            'administracion_medicacion.registrar',
         ]))));
 
         $roles['PSICOLOGO/A']->syncPermissions($this->permitir($permisos, ['residentes.ver','atenciones','notas_clinicas','controles_cognitivos.ver','registros_conductuales','registros_sueno.ver','instrumentos.ver','preguntas_instrumento.ver','opciones_pregunta.ver','aplicaciones_instrumento','respuestas_instrumento.ver','valoraciones_psicologicas','planes_cuidado.ver','alertas.ver']));

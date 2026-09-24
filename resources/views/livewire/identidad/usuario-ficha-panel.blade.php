@@ -391,7 +391,7 @@
  <td class="px-5 py-4">
  <div class="flex items-center justify-center gap-1.5 flex-wrap">
  @if(!$item['cargado'])
- @can('documentos_usuarios.subir')
+ @can('documentos.subir')
  <button type="button"
  wire:click="abrirSubida('{{ $item['cod_tipo_doc'] }}')"
  class="inline-flex items-center gap-1 rounded-full bg-boton-acento px-3.5 py-1.5 text-[9px] font-bold uppercase tracking-wider text-inverso shadow-sm hover:shadow active:scale-95">
@@ -399,7 +399,7 @@
  </button>
  @endcan
  @else
- @can('documentos_usuarios.descargar')
+ @can('documentos.ver')
  <button type="button"
  wire:click="descargarDoc('{{ $item['documento']->cod_doc_usu }}')"
  class="flex h-8 w-8 items-center justify-center rounded-xl bg-fondo-panel text-parrafo hover:bg-boton-principal hover:text-inverso transition shadow-sm active:scale-90"
@@ -410,7 +410,7 @@
 
  {{-- Reemplazar si está observado o vencido --}}
  @if(in_array($item['estado'], ['OBSERVADO', 'VENCIDO']))
- @can('documentos_usuarios.reemplazar')
+ @can('documentos.gestionar')
  <button type="button"
  wire:click="abrirSubida('{{ $item['cod_tipo_doc'] }}')"
  class="inline-flex items-center gap-1 rounded-full bg-boton-acento px-3.5 py-1.5 text-[9px] font-bold uppercase tracking-wider text-inverso shadow-sm hover:bg-fondo-panel active:scale-95"
@@ -422,7 +422,7 @@
 
  {{-- Validadores autorizados --}}
  @if($item['estado'] === 'CARGADO')
- @can('documentos_usuarios.validar')
+ @can('documentos.gestionar')
  <button type="button"
  wire:click="validarDoc('{{ $item['documento']->cod_doc_usu }}')"
  wire:confirm="¿Está seguro de validar este documento?"
@@ -432,7 +432,7 @@
  </button>
  @endcan
 
- @can('documentos_usuarios.observar')
+ @can('documentos.gestionar')
  <button type="button"
  wire:click="abrirObservarDoc('{{ $item['documento']->cod_doc_usu }}')"
  class="inline-flex items-center gap-1 rounded-full bg-fondo-app border border-borde/65 px-3.5 py-1.5 text-[9px] font-bold uppercase tracking-wider text-parrafo shadow-sm hover:bg-boton-acento hover:text-inverso active:scale-95"
@@ -442,7 +442,7 @@
  @endcan
  @endif
 
- @can('documentos_usuarios.anular')
+ @can('documentos.archivar')
  @if($item['estado'] !== 'ANULADO')
  <button type="button"
  wire:click="abrirAnularDoc('{{ $item['documento']->cod_doc_usu }}')"
@@ -604,7 +604,7 @@
  Impide o reactiva de inmediato el inicio de sesión y uso del portal RememberMind.
  </p>
  </div>
- @can('usuarios.acceso.bloquear')
+ @can('usuarios.gestionar')
  @if($usuario->cod_usu !== auth()->id())
  <button type="button"
  wire:click="toggleAcceso"

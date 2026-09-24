@@ -482,29 +482,27 @@ class UsuariosPanel extends Component
         }
     }
 
-    private function guardarVinculosFamiliar(\App\Models\Familiar $fam): void
+    private function guardarVinculosFamiliar(\App\Models\Contacto $contacto): void
     {
         foreach ($this->vinculosFamiliar as $vinculo) {
             $obsSerialized = "Salud: " . ($vinculo['responsable_salud'] ?? 'NO')
                 . " | Económico: " . ($vinculo['responsable_economico'] ?? 'NO')
                 . " | Obs: " . ($vinculo['observaciones'] ?? '');
 
-            $relacion = \App\Models\FamiliarAdulto::withTrashed()->updateOrCreate(
-                [
-                    'cod_fam' => $fam->cod_fam,
-                    'cod_am' => $vinculo['cod_am'],
-                ],
-                [
-                    'parentesco_vinculo' => $vinculo['parentesco_vinculo'],
-                    'es_responsable' => ($vinculo['es_responsable'] ?? 'NO') === 'SI',
-                    'estado' => 'ACTIVO',
-                    'observaciones' => $obsSerialized,
-                ]
-            );
-
-            if ($relacion->trashed()) {
-                $relacion->restore();
-            }
+            $relacion = \App\Models\ResidenteContacto::firstOrNew([
+                'cod_contacto' => $contacto->cod_contacto,
+                'cod_residente' => $vinculo['cod_am'],
+            ]);
+            $relacion->cod_residente_contacto ??= 'RCO_' . strtoupper(\Illuminate\Support\Str::random(10));
+            $relacion->fill([
+                'parentesco' => $vinculo['parentesco_vinculo'],
+                'responsable_principal' => ($vinculo['es_responsable'] ?? 'NO') === 'SI',
+                'contacto_emergencia' => true,
+                'autoriza_informacion' => true,
+                'autoriza_salida' => false,
+                'estado' => 'ACTIVO',
+                'observacion' => $obsSerialized,
+            ])->save();
         }
     }
 
@@ -1266,7 +1264,7 @@ class UsuariosPanel extends Component
             $this->fecha_ingreso = $pa?->fecha_ingreso ? \Carbon\Carbon::parse($pa->fecha_ingreso)->format('Y-m-d') : '';
             $this->cargo_administrativo = $pa?->cod_cargo_admin;
         } elseif ($this->rol === 'FAMILIAR') {
-            $fam = \App\Models\Familiar::where('cod_usu', $usuario->cod_usu)->first();
+            $fam = \App\Models\Contacto::where('cod_usuario', $usuario->cod_usuario)->first();
             if ($fam) {
                 $this->parentesco_emergencia = $fam->parentesco;
                 $this->observacion_vinculo = $fam->observaciones;
@@ -1274,7 +1272,7 @@ class UsuariosPanel extends Component
                 // Cargar adultos mayores vinculados existentes
                 $this->vinculosFamiliar = [];
                 foreach ($fam->adultosMayores as $am) {
-                    $obs = $am->pivot->observaciones ?? '';
+                    $obs = $am->pivot->observacion ?? '';
                     $salud = 'NO';
                     $economico = 'NO';
                     $cleanObs = $obs;
@@ -1292,8 +1290,8 @@ class UsuariosPanel extends Component
                     $this->vinculosFamiliar[] = [
                         'cod_am' => $am->cod_am,
                         'nombres_completos' => $this->obtenerEtiquetaAdultoMayor($am),
-                        'parentesco_vinculo' => $am->pivot->parentesco_vinculo ?? 'Familiar',
-                        'es_responsable' => $am->pivot->es_responsable ? 'SI' : 'NO',
+                        'parentesco_vinculo' => $am->pivot->parentesco ?? 'Familiar',
+                        'es_responsable' => $am->pivot->responsable_principal ? 'SI' : 'NO',
                         'responsable_salud' => $salud,
                         'responsable_economico' => $economico,
                         'observaciones' => $cleanObs,
@@ -1766,13 +1764,20 @@ class UsuariosPanel extends Component
     {
         if ($this->rol === 'FAMILIAR') {
             $hayResponsable = collect($this->vinculosFamiliar)->contains(fn($v) => $v['es_responsable'] === 'SI');
-            $fam = \App\Models\Familiar::updateOrCreate(
-                ['cod_usu' => $usuario->cod_usu],
+            $fam = \App\Models\Contacto::updateOrCreate(
+                ['cod_usuario' => $usuario->cod_usuario],
                 [
-                    'parentesco' => $this->parentesco_emergencia ?? 'Familiar',
+                    'cod_contacto' => \App\Models\Contacto::where('cod_usuario', $usuario->cod_usuario)->value('cod_contacto') ?: ('CON_' . strtoupper(\Illuminate\Support\Str::random(10))),
+                    'nombres' => $this->nombres ?: 'FAMILIAR',
+                    'apellido_paterno' => $this->ap_paterno ?: 'SIN APELLIDO',
+                    'apellido_materno' => $this->ap_materno,
+                    'numero_documento' => $this->numero_documento,
+                    'telefono' => $this->telefono,
+                    'celular' => $this->telefono,
+                    'correo' => $this->correo,
                     'direccion' => $this->direccion,
-                    'es_responsable' => $hayResponsable ? 'SI' : 'NO',
-                    'observaciones' => $this->observacion_vinculo,
+                    'estado' => 'ACTIVO',
+                    'observacion' => trim(($this->parentesco_emergencia ?? 'Familiar') . ' | ' . ($this->observacion_vinculo ?? '')),
                 ]
             );
             
@@ -2206,7 +2211,7 @@ class UsuariosPanel extends Component
 
     public function exportarUsuariosExcel()
     {
-        if (!auth()->user()->can('reportes.exportar_excel')) {
+        if (!auth()->user()->can('usuarios.reportes.excel')) {
             $this->dispatch('swal', [
                 'icon' => 'error',
                 'title' => 'Acceso denegado',
@@ -2238,7 +2243,7 @@ class UsuariosPanel extends Component
 
     public function exportarUsuariosCsv()
     {
-        if (!auth()->user()->can('reportes.exportar_excel')) {
+        if (!auth()->user()->can('usuarios.reportes.excel')) {
             $this->dispatch('swal', [
                 'icon' => 'error',
                 'title' => 'Acceso denegado',
@@ -2402,7 +2407,14 @@ class UsuariosPanel extends Component
 
     public function abrirModalSubirDoc($codTipoDoc)
     {
-        $tipo = \App\Models\TipoDocumentoUsuario::findOrFail($codTipoDoc);
+        abort_unless(
+            auth()->user()?->can('documentos.subir') || auth()->user()?->can('documentos.gestionar'),
+            403
+        );
+
+        $usuario = $this->usuarioDetalle;
+        abort_unless($usuario, 404);
+        $tipo = app(\App\Services\Documentos\DocumentacionUsuarioService::class)->tipoDisponible($usuario, $codTipoDoc);
         $this->tipoDocSeleccionado = $codTipoDoc;
         $this->tipoDocNombre = $tipo->nombre;
         $this->archivoTemporal = null;
@@ -2425,6 +2437,11 @@ class UsuariosPanel extends Component
 
     public function guardarDocumento()
     {
+        abort_unless(
+            auth()->user()?->can('documentos.subir') || auth()->user()?->can('documentos.gestionar'),
+            403
+        );
+
         $this->validate([
             'archivoTemporal' => 'required|file|mimes:pdf,jpg,jpeg,png|max:10240', // 10MB max
             'fechaEmisionDoc' => 'nullable|date',
@@ -2460,7 +2477,7 @@ class UsuariosPanel extends Component
             $this->usuarioDetalle = User::with([
                 'roles',
                 'documentos',
-                'familiares.adultosMayores'
+                'contactos.adultosMayores'
             ])->findOrFail($usuario->cod_usu);
 
             $this->cerrarModalSubirDoc();
@@ -2527,7 +2544,7 @@ class UsuariosPanel extends Component
             $usuarioFichaModel = User::with([
                 'roles',
                 'documentos',
-                'familiares.adultosMayores'
+                'contactos.adultosMayores'
             ])->where('cod_usu', $this->usuarioFichaId)->first();
         }
 

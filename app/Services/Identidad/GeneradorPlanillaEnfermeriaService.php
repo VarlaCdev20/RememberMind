@@ -3,7 +3,7 @@
 namespace App\Services\Identidad;
 
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Schema;
+use App\Models\AsignacionPersonal;
 use Throwable;
 
 class GeneradorPlanillaEnfermeriaService
@@ -149,15 +149,21 @@ class GeneradorPlanillaEnfermeriaService
         $fechaFinStr = $config['fecha_inicio']->copy()->addWeeks($config['cantidad_semanas'])->subDay()->toDateString();
 
         try {
-            if (Schema::hasTable('asignaciones_plazas_enfermeria')) {
-                $this->temporales = \App\Models\AsignacionPlazaEnfermeria::with('user')
-                    ->whereBetween('fecha', [$fechaInicioStr, $fechaFinStr])
-                    ->get()
-                    ->groupBy(fn($item) => $item->plaza . '_' . $item->fecha->toDateString())
-                    ->toArray();
-            } else {
-                $this->temporales = [];
-            }
+            $this->temporales = AsignacionPersonal::with(['personal.usuario', 'jornada'])
+                ->where('estado', 'ACTIVA')
+                ->where('funcion', 'like', 'PLAZA:%')
+                ->whereHas('jornada', fn ($q) => $q->whereBetween('fecha_jornada', [$fechaInicioStr, $fechaFinStr]))
+                ->get()
+                ->map(fn (AsignacionPersonal $item) => [
+                    'plaza' => substr((string) $item->funcion, 6),
+                    'fecha' => $item->jornada->fecha_jornada->toDateString(),
+                    'tipo' => $item->tipo_asignacion,
+                    'motivo' => $item->observacion,
+                    'user' => $item->personal?->usuario?->toArray(),
+                ])
+                ->groupBy(fn (array $item) => $item['plaza'].'_'.$item['fecha'])
+                ->map(fn ($items) => $items->values()->all())
+                ->all();
         } catch (\Throwable $e) {
             report($e);
             $this->temporales = [];
@@ -248,22 +254,21 @@ class GeneradorPlanillaEnfermeriaService
         $enfermeros = [];
 
         try {
-            if (!class_exists(\App\Models\AsignacionPlazaEnfermeria::class) || !Schema::hasTable('asignaciones_plazas_enfermeria')) {
-                return $this->enfermerosVirtuales($config['total_enfermeros'] ?? 12);
-            }
-
-            $titulares = \App\Models\AsignacionPlazaEnfermeria::with('user')
-                ->whereNull('fecha')
-                ->where('tipo', 'TITULAR')
+            $titulares = AsignacionPersonal::with('personal.usuario')
+                ->where('estado', 'ACTIVA')
+                ->where('tipo_asignacion', 'TITULAR')
+                ->where('funcion', 'like', 'PLAZA:%')
+                ->orderByDesc('fecha_asignacion')
                 ->get()
-                ->keyBy('plaza');
+                ->unique('funcion')
+                ->keyBy(fn (AsignacionPersonal $item) => substr((string) $item->funcion, 6));
 
             $total = max(12, (int) ($config['total_enfermeros'] ?? 12));
 
             for ($i = 1; $i <= $total; $i++) {
                 $codigo = 'E' . str_pad((string) $i, 2, '0', STR_PAD_LEFT);
                 $titular = $titulares->get($codigo);
-                $user = $titular ? $titular->user : null;
+                $user = $titular?->personal?->usuario;
 
                 if ($user) {
                     $enfermeros[] = [
@@ -384,7 +389,7 @@ class GeneradorPlanillaEnfermeriaService
                     $temporal = $this->temporales[$tempKey][0];
                     $user = $temporal['user'] ?? null;
 
-                    $reemplazo_cod = $user ? $user['cod_usu'] : null;
+                    $reemplazo_cod = $user ? ($user['cod_usuario'] ?? $user['cod_usu'] ?? null) : null;
                     $reemplazo_nom = $user ? trim(($user['nombres'] ?? '') . ' ' . ($user['ap_paterno'] ?? '')) : 'Sin enfermero asignado';
                     $es_reemplazo = true;
                     $motivo = $temporal['motivo'] ?? null;

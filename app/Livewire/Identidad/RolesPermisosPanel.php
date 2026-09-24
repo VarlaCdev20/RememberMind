@@ -70,13 +70,14 @@ class RolesPermisosPanel extends Component
     {
         $allPermissions = Permission::all()->pluck('name')->toArray();
         $grupos = [
-            'Administración' => ['usuarios.', 'roles.', 'areas.', 'turnos.', 'bitacora.'],
-            'Adultos mayores' => ['adultos.'],
-            'Familiares y documentos' => ['familiares.', 'documentos.'],
-            'Salud y seguimiento' => ['salud.', 'atenciones.', 'observaciones.', 'signos_vitales.', 'medicacion.'],
-            'Evaluaciones cognitivas' => ['evaluaciones.'],
-            'Actividades' => ['actividades.'],
-            'Reportes y alertas' => ['reportes.', 'alertas.']
+            'Administración' => ['usuarios.', 'personal.', 'roles.', 'areas.', 'turnos.', 'jornadas.', 'asignaciones_personal.', 'auditoria.', 'bitacora.'],
+            'Residentes y admisiones' => ['residentes.', 'preadmisiones.', 'admisiones.', 'habitaciones.', 'camas.', 'ocupaciones_cama.'],
+            'Red de apoyo y documentos' => ['residentes_contactos.', 'contactos.', 'documentos.', 'consentimientos.'],
+            'Salud y seguimiento' => ['salud.', 'atenciones.', 'notas_clinicas.', 'antecedentes_clinicos.', 'diagnosticos.', 'alergias.', 'signos_vitales.', 'prescripciones.', 'administraciones_medicacion.', 'estudios_clinicos.', 'resultados_estudio.', 'informes_estudio.'],
+            'Cuidados de enfermería' => ['asignaciones_residente_jornada.', 'planes_cuidado.', 'intervenciones_cuidado.', 'programaciones_cuidado.', 'ejecuciones_cuidado.', 'pases_turno.', 'incidentes.', 'heridas.', 'curaciones_herida.', 'registros_'],
+            'Valoraciones e instrumentos' => ['instrumentos.', 'preguntas_instrumento.', 'opciones_pregunta.', 'aplicaciones_instrumento.', 'respuestas_instrumento.', 'valoraciones_'],
+            'Actividades y visitas' => ['actividades.', 'participantes_actividad.', 'visitas.'],
+            'Reportes y alertas' => ['reportes.', 'alertas.', 'eventos_alerta.'],
         ];
 
         $this->permisosAgrupados = [];
@@ -247,22 +248,15 @@ class RolesPermisosPanel extends Component
             'turnos.cambiar_estado' => 'Estado de turnos',
             'bitacora.ver' => 'Ver bitácora',
             
-            'adultos.ver' => 'Ver adultos mayores',
-            'adultos.crear' => 'Registrar adultos',
-            'adultos.editar' => 'Editar adultos',
-            'adultos.cambiar_estado' => 'Estado de adultos',
-            'adultos.archivar' => 'Archivar adultos',
-            'adultos.restaurar' => 'Restaurar adultos',
-            'adultos.ver_expediente' => 'Ver expediente completo',
+            'residentes.ver' => 'Ver residentes',
+            'residentes.gestionar' => 'Gestionar residentes',
             
-            'familiares.ver' => 'Ver familiares',
-            'familiares.crear' => 'Vincular familiares',
-            'familiares.editar' => 'Editar familiares',
-            'familiares.anular' => 'Anular familiares',
+            'residentes_contactos.ver' => 'Ver red de apoyo',
+            'residentes_contactos.gestionar' => 'Gestionar red de apoyo',
             
             'documentos.ver' => 'Ver documentos',
             'documentos.subir' => 'Subir documentos',
-            'documentos.descargar' => 'Descargar docs',
+            'documentos.gestionar' => 'Gestionar documentos',
             'documentos.archivar' => 'Archivar docs',
             
             'salud.ver' => 'Ver ficha de salud',
@@ -280,22 +274,18 @@ class RolesPermisosPanel extends Component
             'signos_vitales.crear' => 'Registrar signos',
             'signos_vitales.editar' => 'Editar signos',
             
-            'medicacion.ver' => 'Ver medicación',
-            'medicacion.crear' => 'Recetar medicación',
-            'medicacion.editar' => 'Editar medicación',
-            'medicacion.suspender' => 'Suspender medicación',
+            'prescripciones.ver' => 'Ver medicación',
+            'prescripciones.crear' => 'Recetar medicación',
+            'prescripciones.editar' => 'Editar medicación',
+            'prescripciones.suspender' => 'Suspender medicación',
             
-            'evaluaciones.ver' => 'Ver evaluaciones',
-            'evaluaciones.crear' => 'Hacer evaluaciones',
-            'evaluaciones.editar' => 'Editar evaluaciones',
-            'evaluaciones.anular' => 'Anular evaluaciones',
-            'evaluaciones.historial' => 'Ver historial cognitivo',
-            'evaluaciones.resultados' => 'Ver resultados',
+            'aplicaciones_instrumento.ver' => 'Ver evaluaciones',
+            'aplicaciones_instrumento.crear' => 'Hacer evaluaciones',
+            'aplicaciones_instrumento.editar' => 'Editar evaluaciones',
+            'aplicaciones_instrumento.anular' => 'Anular evaluaciones',
             
             'actividades.ver' => 'Ver actividades',
-            'actividades.crear' => 'Programar actividades',
-            'actividades.editar' => 'Editar actividades',
-            'actividades.anular' => 'Anular actividades',
+            'actividades.gestionar' => 'Gestionar actividades',
             
             'asignaciones.ver' => 'Ver asignaciones',
             'asignaciones.crear' => 'Crear asignaciones',

@@ -7,7 +7,7 @@ $saludoTexto = $saludo['saludo'] ?? 'Bienvenido';
 $fecha = $saludo['fecha'] ?? '';
 
 $acciones = [];
-if (auth()->user()?->can('adultos-mayores.crear')) {
+if (auth()->user()?->can('residentes.gestionar')) {
     $acciones[] = [
         'href' => route('admin.admisiones.preadmision'),
         'icono' => 'ph-plus-circle',

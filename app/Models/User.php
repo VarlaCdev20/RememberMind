@@ -187,6 +187,17 @@ public static array $areasEstaticas = [
         return $this->hasMany(Contacto::class, 'cod_usuario', 'cod_usuario');
     }
 
+    /** Alias de interfaz; los datos se conservan en contactos V2. */
+    public function familiares(): HasMany
+    {
+        return $this->contactos();
+    }
+
+    public function documentos(): HasMany
+    {
+        return $this->hasMany(Documento::class, 'cod_usuario', 'cod_usuario');
+    }
+
     /**
      * Adaptadores de lectura para el perfil histórico. En V2 el área y el
      * horario se obtienen a través de personal -> asignaciones_personal.

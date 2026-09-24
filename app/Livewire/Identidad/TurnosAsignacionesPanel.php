@@ -1077,21 +1077,18 @@ class TurnosAsignacionesPanel extends Component
         $this->plazaSeleccionada = $plaza;
         $this->fechaSeleccionadaPlaza = $fecha;
         $this->enfermeroSeleccionado = '';
-        
-        $existente = \App\Models\AsignacionPlazaEnfermeria::where('plaza', $plaza)
-            ->where('fecha', $fecha)
+
+        $existente = AsignacionPersonal::with(['personal', 'jornada'])
+            ->where('funcion', 'PLAZA:'.$plaza)
+            ->where('estado', 'ACTIVA')
+            ->whereHas('jornada', fn ($q) => $q->whereDate('fecha_jornada', $fecha))
+            ->latest('fecha_asignacion')
             ->first();
-            
-        if (!$existente) {
-            $existente = \App\Models\AsignacionPlazaEnfermeria::where('plaza', $plaza)
-                ->whereNull('fecha')
-                ->first();
-        }
 
         if ($existente) {
-            $this->enfermeroSeleccionado = $existente->cod_usu ?? '';
-            $this->tipoAsignacion = $existente->tipo;
-            $this->motivoAsignacion = $existente->motivo ?? '';
+            $this->enfermeroSeleccionado = $existente->personal?->cod_usuario ?? '';
+            $this->tipoAsignacion = $existente->tipo_asignacion;
+            $this->motivoAsignacion = $existente->observacion ?? '';
         } else {
             $this->tipoAsignacion = 'TITULAR';
             $this->motivoAsignacion = '';
@@ -1115,11 +1112,11 @@ class TurnosAsignacionesPanel extends Component
         $plaza = $this->plazaSeleccionada;
         $codUsu = $this->enfermeroSeleccionado ?: null;
         $tipo = $this->tipoAsignacion;
-        $fecha = $tipo === 'TITULAR' ? null : $this->fechaSeleccionadaPlaza;
+        $fecha = $this->fechaSeleccionadaPlaza;
         $motivo = $this->motivoAsignacion ?: null;
 
         if ($codUsu) {
-            $user = User::where('cod_usu', $codUsu)->first();
+            $user = User::find($codUsu);
             if (!$user || !$user->hasRole('ENFERMEROS') || $user->estado !== 'ACTIVO') {
                 $this->dispatch('mostrarAlerta', [
                     'type' => 'error',
@@ -1129,45 +1126,44 @@ class TurnosAsignacionesPanel extends Component
                 return;
             }
 
-            if ($tipo === 'TITULAR') {
-                $otraPlaza = \App\Models\AsignacionPlazaEnfermeria::where('cod_usu', $codUsu)
-                    ->whereNull('fecha')
-                    ->where('plaza', '!=', $plaza)
-                    ->first();
-                if ($otraPlaza) {
-                    $this->dispatch('mostrarAlerta', [
-                        'type' => 'error',
-                        'title' => 'Enfermero ya asignado',
-                        'message' => "El enfermero ya está asignado de forma permanente a la plaza {$otraPlaza->plaza}.",
-                    ]);
-                    return;
-                }
-            } else {
-                $otraPlaza = \App\Models\AsignacionPlazaEnfermeria::where('cod_usu', $codUsu)
-                    ->where('fecha', $fecha)
-                    ->where('plaza', '!=', $plaza)
-                    ->first();
-                if ($otraPlaza) {
-                    $this->dispatch('mostrarAlerta', [
-                        'type' => 'error',
-                        'title' => 'Enfermero ocupado',
-                        'message' => "El enfermero ya tiene una asignación temporal en la plaza {$otraPlaza->plaza} para la fecha {$fecha}.",
-                    ]);
-                    return;
-                }
+            $otraPlaza = AsignacionPersonal::where('cod_personal', $user->personal?->cod_personal)
+                ->where('estado', 'ACTIVA')->where('funcion', 'like', 'PLAZA:%')->where('funcion', '!=', 'PLAZA:'.$plaza)
+                ->whereHas('jornada', fn ($q) => $q->whereDate('fecha_jornada', $fecha))->first();
+            if ($otraPlaza) {
+                $this->dispatch('mostrarAlerta', [
+                    'type' => 'error', 'title' => 'Enfermero ocupado',
+                    'message' => 'El enfermero ya tiene otra asignación para esa fecha.',
+                ]);
+                return;
             }
         }
 
-        if ($tipo === 'TITULAR') {
-            \App\Models\AsignacionPlazaEnfermeria::updateOrCreate(
-                ['plaza' => $plaza, 'fecha' => null],
-                ['cod_usu' => $codUsu, 'tipo' => $tipo, 'motivo' => $motivo]
+        $anteriores = AsignacionPersonal::where('funcion', 'PLAZA:'.$plaza)->where('estado', 'ACTIVA')
+            ->whereHas('jornada', fn ($q) => $q->whereDate('fecha_jornada', $fecha))->get();
+        foreach ($anteriores as $anterior) {
+            $anterior->update(['estado' => 'ANULADA']);
+        }
+
+        if ($tipo !== 'DESCANSO' && $codUsu) {
+            $personal = User::findOrFail($codUsu)->personal;
+            abort_unless($personal, 422, 'El usuario no tiene ficha de personal V2.');
+            $turnoCodigo = $this->turnoCodigoParaPlaza($plaza, $fecha);
+            $turnoId = match ($turnoCodigo) {
+                'MANANA' => 'TUR_0001', 'TARDE' => 'TUR_0002', 'NOCHE' => 'TUR_0003', default => 'TUR_0004',
+            };
+            $jornada = \App\Models\Jornada::firstOrCreate(
+                ['cod_turno' => $turnoId, 'fecha_jornada' => $fecha],
+                ['cod_jornada' => 'JOR_'.strtoupper(\Illuminate\Support\Str::random(10)), 'estado' => 'ACTIVA']
             );
-        } else {
-            \App\Models\AsignacionPlazaEnfermeria::updateOrCreate(
-                ['plaza' => $plaza, 'fecha' => $fecha],
-                ['cod_usu' => $codUsu, 'tipo' => $tipo, 'motivo' => $motivo]
-            );
+            $areaId = $personal->asignaciones()->where('estado', 'ACTIVA')->value('cod_area')
+                ?: Area::where('nombre', 'like', '%ENFERMER%')->value('cod_area')
+                ?: Area::value('cod_area');
+            abort_unless($areaId, 422, 'No existe un área institucional para la asignación.');
+            AsignacionPersonal::create([
+                'cod_jornada' => $jornada->cod_jornada, 'cod_personal' => $personal->cod_personal, 'cod_area' => $areaId,
+                'funcion' => 'PLAZA:'.$plaza, 'tipo_asignacion' => $tipo, 'fecha_asignacion' => now(),
+                'estado' => 'ACTIVA', 'observacion' => $motivo,
+            ]);
         }
 
         $this->modalAsignarPlazaAbierto = false;
@@ -1182,19 +1178,10 @@ class TurnosAsignacionesPanel extends Component
 
     public function desvincularPlaza(string $plaza, string $fecha): void
     {
-        $temporal = \App\Models\AsignacionPlazaEnfermeria::where('plaza', $plaza)
-            ->where('fecha', $fecha)
-            ->first();
-
-        if ($temporal) {
-            $temporal->delete();
-        } else {
-            $titular = \App\Models\AsignacionPlazaEnfermeria::where('plaza', $plaza)
-                ->whereNull('fecha')
-                ->first();
-            if ($titular) {
-                $titular->delete();
-            }
+        $asignaciones = AsignacionPersonal::where('funcion', 'PLAZA:'.$plaza)->where('estado', 'ACTIVA')
+            ->whereHas('jornada', fn ($q) => $q->whereDate('fecha_jornada', $fecha))->get();
+        foreach ($asignaciones as $asignacion) {
+            $asignacion->update(['estado' => 'ANULADA', 'observacion' => trim(($asignacion->observacion ?? '').' | Desvinculada manualmente')]);
         }
 
         $this->generarPlanillaEnfermeria(silencioso: true);
@@ -1204,5 +1191,20 @@ class TurnosAsignacionesPanel extends Component
             'title' => 'Desvinculación exitosa',
             'message' => "Se liberó la plaza {$plaza} de la asignación.",
         ]);
+    }
+
+    private function turnoCodigoParaPlaza(string $plaza, string $fecha): string
+    {
+        foreach ($this->planillaEnfermeria as $semana) {
+            foreach ($semana['dias'] ?? [] as $dia) {
+                if (($dia['fecha'] ?? null) !== $fecha) continue;
+                foreach ($dia['turnos'] ?? [] as $codigo => $turno) {
+                    foreach ($turno['asignaciones'] ?? [] as $asignacion) {
+                        if (($asignacion['codigo'] ?? null) === $plaza) return $codigo;
+                    }
+                }
+            }
+        }
+        return 'APOYO';
     }
 }
