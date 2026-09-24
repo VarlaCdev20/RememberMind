@@ -16,6 +16,7 @@ class AsignacionPersonal extends ModeloOperativo
     protected $fillable = [
         'cod_asignacion_personal', 'cod_jornada', 'cod_personal', 'cod_area',
         'funcion', 'tipo_asignacion', 'fecha_asignacion', 'estado', 'observacion',
+        'cod_usuario', 'cod_usu', 'cod_turno', 'fecha_hora_recepcion',
     ];
 
     protected function casts(): array
@@ -29,6 +30,9 @@ class AsignacionPersonal extends ModeloOperativo
             if (empty($asig->cod_asignacion_personal)) {
                 $asig->cod_asignacion_personal = 'ASP_' . strtoupper(\Illuminate\Support\Str::random(10));
             }
+            if (! empty($asig->attributes['fecha_hora_recepcion'])) {
+                $asig->fecha_asignacion = $asig->attributes['fecha_hora_recepcion'];
+            }
             if (empty($asig->fecha_asignacion)) {
                 $asig->fecha_asignacion = now();
             }
@@ -41,7 +45,7 @@ class AsignacionPersonal extends ModeloOperativo
 
             // Resolver cod_personal desde cod_usuario o cod_usu si viene provisto
             if (empty($asig->cod_personal)) {
-                $codUsu = $asig->getAttribute('cod_usuario') ?: $asig->getAttribute('cod_usu');
+                $codUsu = $asig->attributes['cod_usuario'] ?? $asig->attributes['cod_usu'] ?? null;
                 if ($codUsu) {
                     $u = \App\Models\User::find($codUsu);
                     $asig->cod_personal = $u?->personal?->cod_personal;
@@ -53,7 +57,8 @@ class AsignacionPersonal extends ModeloOperativo
 
             // Resolver cod_jornada desde cod_turno si viene provisto
             if (empty($asig->cod_jornada)) {
-                $targetTurno = $asig->getAttribute('cod_turno') ?: (\App\Models\Turno::first()?->cod_turno ?? 'TUR_001');
+                $targetTurno = ($asig->attributes['cod_turno'] ?? null)
+                    ?: (\App\Models\Turno::first()?->cod_turno ?? 'TUR_001');
                 $j = \App\Models\Jornada::whereDate('fecha_jornada', today())->where('cod_turno', $targetTurno)->first();
                 if (!$j) {
                     $j = \App\Models\Jornada::create([
@@ -78,6 +83,13 @@ class AsignacionPersonal extends ModeloOperativo
                 }
                 $asig->cod_area = $area->cod_area;
             }
+
+            unset(
+                $asig->attributes['cod_usuario'],
+                $asig->attributes['cod_usu'],
+                $asig->attributes['cod_turno'],
+                $asig->attributes['fecha_hora_recepcion'],
+            );
         });
     }
 

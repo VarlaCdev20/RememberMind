@@ -96,9 +96,8 @@ class OcupacionCama extends ModeloOperativo
                 return;
             }
 
-            // La BDD congelada no define una restricción parcial para esta regla.
-            // Se bloquea en la aplicación que una cama o residente tengan dos
-            // ocupaciones activas, sin crear columnas ni índices adicionales.
+            // La aplicación entrega un error legible; la BDD repite la garantía
+            // mediante índices únicos parciales para cubrir concurrencia y SQL directo.
             $duplicada = self::query()
                 ->whereIn('estado', ['ACTIVA', 'ACTIVO'])
                 ->where(function ($query) use ($ocupacion): void {

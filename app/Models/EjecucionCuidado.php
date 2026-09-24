@@ -153,6 +153,11 @@ class EjecucionCuidado extends ModeloOperativo
         return $this->belongsTo(Jornada::class, 'cod_jornada', 'cod_jornada');
     }
 
+    public function puedeCompletarse(): bool
+    {
+        return in_array($this->estado, ['PENDIENTE', 'EN_PROCESO'], true);
+    }
+
     // Accessors de compatibilidad con V1
     public function getCodRegistroCuidadoAttribute(): string
     {

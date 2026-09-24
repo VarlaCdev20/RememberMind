@@ -194,10 +194,8 @@ class Prescripcion extends ModeloOperativo
             if (isset($model->attributes['hora_programada'])) {
                 $model->hora_programada_temp = $model->attributes['hora_programada'];
             }
-            if (empty($model->cod_med_adulto)) { $model->cod_med_adulto = $model->cod_prescripcion; }
             if (empty($model->cod_prescripcion)) {
                 $model->cod_prescripcion = "PRS_" . strtoupper(\Illuminate\Support\Str::random(10));
-                $model->cod_med_adulto = $model->cod_prescripcion;
             }
             if (isset($model->attributes["cod_am"]) && empty($model->cod_residente)) {
                 $model->cod_residente = $model->attributes["cod_am"];
