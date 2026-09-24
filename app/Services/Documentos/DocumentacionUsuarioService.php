@@ -2,243 +2,106 @@
 
 namespace App\Services\Documentos;
 
-use App\Models\User;
 use App\Models\Documento;
-use App\Models\DocumentoUsuario;
-use App\Models\TipoDocumentoUsuario;
+use App\Models\User;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
-use Illuminate\Http\UploadedFile;
 
 class DocumentacionUsuarioService
 {
-    /**
-     * Obtiene el checklist documental para un usuario según su rol.
-     * Combina el catálogo de tipos con los archivos ya cargados por el usuario.
-     */
-    public function obtenerChecklistUsuario(User $usuario): array
+    public function tiposDisponibles(User $usuario): array
     {
-        return Documento::query()
-            ->where('cod_usuario', $usuario->cod_usuario)
-            ->whereNotIn('estado', ['ANULADO', 'ANULADA'])
-            ->orderBy('tipo_documento')
-            ->get()
-            ->groupBy('tipo_documento')
-            ->map(function ($documentos, string $tipo): array {
-                $actual = $documentos->sortByDesc('fecha_validacion')->first();
+        $tipos = [
+            ['cod_tipo_doc' => 'CI', 'nombre' => 'Cédula de Identidad', 'descripcion' => 'Anverso y reverso legibles.', 'obligatorio' => true, 'requiere_vencimiento' => false],
+            ['cod_tipo_doc' => 'FOTO', 'nombre' => 'Fotografía actual', 'descripcion' => 'Fotografía formal vigente.', 'obligatorio' => true, 'requiere_vencimiento' => false],
+            ['cod_tipo_doc' => 'CV', 'nombre' => 'Hoja de Vida / CV', 'descripcion' => 'Currículum actualizado y documentado.', 'obligatorio' => true, 'requiere_vencimiento' => false],
+            ['cod_tipo_doc' => 'CONTRATO', 'nombre' => 'Contrato o prestación profesional', 'descripcion' => 'Relación laboral o de servicios.', 'obligatorio' => false, 'requiere_vencimiento' => true],
+            ['cod_tipo_doc' => 'CONFIDENCIALIDAD', 'nombre' => 'Declaración de confidencialidad', 'descripcion' => 'Compromiso de manejo de información sensible.', 'obligatorio' => false, 'requiere_vencimiento' => false],
+        ];
 
-                return [
-                    'cod_tipo_doc' => $tipo,
-                    'nombre' => $tipo,
-                    'descripcion' => $actual->nombre,
-                    'obligatorio' => false,
-                    'requiere_vencimiento' => $actual->fecha_vencimiento !== null,
-                    'requiere_validacion' => true,
-                    'cargado' => true,
-                    'documento' => $actual,
-                    'estado' => $actual->estado,
-                ];
-            })
-            ->values()
-            ->all();
-    }
-
-    /**
-     * Calcula métricas y el porcentaje de avance documental de un usuario.
-     */
-    public function calcularAvanceDocumental(User $usuario): array
-    {
-        $checklist = $this->obtenerChecklistUsuario($usuario);
-        
-        $totalRequeridos = 0;
-        $totalOpcionales = 0;
-        $cargadosRequeridos = 0;
-        $validadosRequeridos = 0;
-        
-        $totalCargados = 0;
-        $totalValidados = 0;
-        $totalPendientes = 0;
-        $totalObservados = 0;
-        $totalVencidos = 0;
-
-        foreach ($checklist as $item) {
-            if ($item['obligatorio']) {
-                $totalRequeridos++;
-                if ($item['cargado']) {
-                    $cargadosRequeridos++;
-                    if ($item['estado'] === 'VALIDADO') {
-                        $validadosRequeridos++;
-                    }
-                }
-            } else {
-                $totalOpcionales++;
-            }
-
-            if ($item['cargado']) {
-                $totalCargados++;
-                switch ($item['estado']) {
-                    case 'VALIDADO':
-                        $totalValidados++;
-                        break;
-                    case 'OBSERVADO':
-                        $totalObservados++;
-                        break;
-                    case 'VENCIDO':
-                        $totalVencidos++;
-                        break;
-                    default:
-                        $totalPendientes++;
-                        break;
-                }
-            }
+        if ($usuario->hasAnyRole(['ENFERMEROS', 'MEDICO GENERAL/GERIATRA', 'PSICOLOGO/A', 'NUTRICIONISTA', 'FISIOTERAPEUTA', 'PEDAGOGO'])) {
+            $tipos[] = ['cod_tipo_doc' => 'TITULO', 'nombre' => 'Título o certificado de formación', 'descripcion' => 'Respaldo académico o técnico.', 'obligatorio' => true, 'requiere_vencimiento' => false];
+            $tipos[] = ['cod_tipo_doc' => 'MATRICULA', 'nombre' => 'Matrícula profesional', 'descripcion' => 'Registro profesional vigente.', 'obligatorio' => $usuario->hasRole('MEDICO GENERAL/GERIATRA'), 'requiere_vencimiento' => true];
         }
 
-        // Avance basado en los obligatorios requeridos
-        $porcentaje = $totalRequeridos > 0 
-            ? round(($validadosRequeridos / $totalRequeridos) * 100) 
-            : 100;
+        return $tipos;
+    }
 
+    public function tipoDisponible(User $usuario, string $codigo): object
+    {
+        $tipo = collect($this->tiposDisponibles($usuario))->firstWhere('cod_tipo_doc', $codigo);
+        abort_unless($tipo, 404, 'Tipo documental no válido.');
+        return (object) $tipo;
+    }
+
+    public function obtenerChecklistUsuario(User $usuario): array
+    {
+        $documentos = Documento::query()->where('cod_usuario', $usuario->cod_usuario)
+            ->whereNotIn('estado', ['ANULADO', 'ANULADA'])->orderByDesc('fecha_validacion')->get()->groupBy('tipo_documento');
+
+        return collect($this->tiposDisponibles($usuario))->map(function (array $tipo) use ($documentos): array {
+            $actual = $documentos->get($tipo['cod_tipo_doc'])?->first();
+            return $tipo + ['requiere_validacion' => true, 'cargado' => $actual !== null, 'documento' => $actual, 'estado' => $actual?->estado ?? 'PENDIENTE'];
+        })->all();
+    }
+
+    public function calcularAvanceDocumental(User $usuario): array
+    {
+        $items = collect($this->obtenerChecklistUsuario($usuario));
+        $requeridos = $items->where('obligatorio', true);
+        $validadosRequeridos = $requeridos->where('estado', 'VALIDADO')->count();
         return [
-            'total_requeridos' => $totalRequeridos,
-            'total_opcionales' => $totalOpcionales,
-            'cargados' => $totalCargados,
-            'validados' => $totalValidados,
-            'pendientes_validacion' => $totalPendientes,
-            'observados' => $totalObservados,
-            'vencidos' => $totalVencidos,
-            'porcentaje_avance' => $porcentaje,
-            'completo' => ($validadosRequeridos === $totalRequeridos),
+            'total_requeridos' => $requeridos->count(), 'total_opcionales' => $items->where('obligatorio', false)->count(),
+            'cargados' => $items->where('cargado', true)->count(), 'validados' => $items->where('estado', 'VALIDADO')->count(),
+            'pendientes_validacion' => $items->whereIn('estado', ['PENDIENTE', 'CARGADO'])->count(),
+            'observados' => $items->where('estado', 'OBSERVADO')->count(), 'vencidos' => $items->where('estado', 'VENCIDO')->count(),
+            'porcentaje_avance' => $requeridos->isEmpty() ? 100 : (int) round(($validadosRequeridos / $requeridos->count()) * 100),
+            'completo' => $validadosRequeridos === $requeridos->count(),
         ];
     }
 
-    /**
-     * Sube un documento al storage del usuario y lo registra en base de datos.
-     */
-    public function subirDocumento(
-        User $usuario,
-        string $codTipoDoc,
-        UploadedFile $file,
-        ?string $fechaEmision = null,
-        ?string $fechaVencimiento = null,
-        ?string $observaciones = null,
-        ?User $subidoPor = null
-    ): DocumentoUsuario {
-        $tipo = TipoDocumentoUsuario::findOrFail($codTipoDoc);
-
-        // Generar nombre de archivo limpio en UTF-8
-        $nombreLimpio = Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME));
+    public function subirDocumento(User $usuario, string $codTipoDoc, UploadedFile $file, ?string $fechaEmision = null, ?string $fechaVencimiento = null, ?string $observaciones = null, ?User $subidoPor = null): Documento
+    {
+        $tipo = $this->tipoDisponible($usuario, $codTipoDoc);
+        $nombre = Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME));
         $extension = strtolower($file->getClientOriginalExtension());
-        $fileName = time() . '_' . $nombreLimpio . '.' . $extension;
-        
-        // Guardar en storage public/documentos/usuarios/{cod_usu}
-        $relPath = "documentos/usuarios/{$usuario->cod_usu}";
-        $path = $file->storeAs($relPath, $fileName, 'public');
-
-        // Si ya tiene un documento activo para este tipo, marcarlo como REEMPLAZADO o archivarlo
-        $previo = DocumentoUsuario::where('cod_usu', $usuario->cod_usu)
-            ->where('cod_tipo_doc', $codTipoDoc)
-            ->whereIn('estado', ['PENDIENTE', 'CARGADO', 'VALIDADO', 'OBSERVADO', 'VENCIDO'])
-            ->orderByDesc('created_at')
-            ->first();
-
-        $documento = DocumentoUsuario::create([
-            'cod_usu' => $usuario->cod_usu,
-            'cod_tipo_doc' => $codTipoDoc,
-            'tipo_documento' => $tipo->nombre,
-            'nombre_documento' => $tipo->nombre,
-            'archivo_path' => $path,
-            'nombre_original' => $file->getClientOriginalName(),
-            'archivo' => $path,
-            'mime_type' => $file->getClientMimeType(),
-            'extension' => $extension,
-            'tamanio' => $file->getSize(),
-            'fecha_subida' => now(),
-            'fecha_emision' => $fechaEmision,
-            'fecha_vencimiento' => $fechaVencimiento,
-            'estado' => 'CARGADO',
-            'observaciones' => $observaciones,
-            'subido_por' => $subidoPor?->cod_usu ?? auth()->id(),
-            'creado_por' => auth()->id(),
+        $ruta = $file->storeAs("documentos/usuarios/{$usuario->cod_usuario}", time()."_{$nombre}.{$extension}", 'public');
+        $previo = Documento::query()->where('cod_usuario', $usuario->cod_usuario)->where('tipo_documento', $codTipoDoc)
+            ->whereIn('estado', ['PENDIENTE', 'CARGADO', 'VALIDADO', 'OBSERVADO', 'VENCIDO'])->first();
+        $detalle = array_filter([$observaciones, $fechaEmision ? "Fecha de emisión: {$fechaEmision}" : null, "Nombre original: {$file->getClientOriginalName()}", 'Subido por: '.($subidoPor?->cod_usuario ?? auth()->id())]);
+        $documento = Documento::create([
+            'cod_documento' => 'DOC_'.strtoupper(Str::random(10)), 'cod_usuario' => $usuario->cod_usuario,
+            'cod_documento_anterior' => $previo?->cod_documento, 'tipo_documento' => $codTipoDoc, 'nombre' => $tipo->nombre,
+            'ruta_archivo' => $ruta, 'tipo_archivo' => $file->getClientMimeType() ?: 'application/octet-stream',
+            'hash_archivo' => hash_file('sha256', Storage::disk('public')->path($ruta)), 'fecha_vencimiento' => $fechaVencimiento,
+            'estado' => 'CARGADO', 'observacion' => implode("\n", $detalle),
         ]);
-
-        if ($previo) {
-            $previo->update([
-                'estado' => 'REEMPLAZADO',
-                'actualizado_por' => auth()->id(),
-            ]);
-            $documento->update([
-                'reemplaza_a' => $previo->cod_doc_usu
-            ]);
-
-            activity('Usuarios')
-                ->causedBy(auth()->user())
-                ->performedOn($usuario)
-                ->event('documentacion')
-                ->log("Reemplazó el documento '{$tipo->nombre}' anterior por una nueva versión.");
-        } else {
-            activity('Usuarios')
-                ->causedBy(auth()->user())
-                ->performedOn($usuario)
-                ->event('documentacion')
-                ->log("Subió el documento obligatorio '{$tipo->nombre}' al expediente.");
-        }
-
+        $previo?->update(['estado' => 'REEMPLAZADO']);
+        activity('Usuarios')->causedBy(auth()->user())->performedOn($usuario)->event('documentacion')->log(($previo ? 'Reemplazó' : 'Subió')." el documento '{$tipo->nombre}'.");
         return $documento;
     }
 
-    /**
-     * Valida un documento cargado.
-     */
-    public function validarDocumento(DocumentoUsuario $documento, User $validador): void
+    public function validarDocumento(Documento $documento, User $validador): void
     {
-        $documento->update([
-            'estado' => 'VALIDADO',
-            'validado_por' => $validador->cod_usu,
-            'fecha_validacion' => now(),
-            'actualizado_por' => $validador->cod_usu,
-        ]);
-
-        activity('Usuarios')
-            ->causedBy($validador)
-            ->performedOn($documento->usuario)
-            ->event('documentacion')
-            ->log("Validó satisfactoriamente el documento '{$documento->nombre_documento}'.");
+        $documento->update(['estado' => 'VALIDADO', 'cod_usuario_validacion' => $validador->cod_usuario, 'fecha_validacion' => now()]);
+        $this->registrarActividad($documento, $validador, 'Validó');
     }
 
-    /**
-     * Marca un documento como observado especificando un motivo.
-     */
-    public function observarDocumento(DocumentoUsuario $documento, string $motivo, User $validador): void
+    public function observarDocumento(Documento $documento, string $motivo, User $validador): void
     {
-        $documento->update([
-            'estado' => 'OBSERVADO',
-            'motivo_observacion' => $motivo,
-            'actualizado_por' => $validador->cod_usu,
-        ]);
-
-        activity('Usuarios')
-            ->causedBy($validador)
-            ->performedOn($documento->usuario)
-            ->event('documentacion')
-            ->log("Observó el documento '{$documento->nombre_documento}' con motivo: {$motivo}.");
+        $documento->update(['estado' => 'OBSERVADO', 'cod_usuario_validacion' => $validador->cod_usuario, 'observacion' => trim($documento->observacion."\nOBSERVADO: {$motivo}")]);
+        $this->registrarActividad($documento, $validador, 'Observó');
     }
 
-    /**
-     * Anula un documento especificando un motivo.
-     */
-    public function anularDocumento(DocumentoUsuario $documento, string $motivo, User $validador): void
+    public function anularDocumento(Documento $documento, string $motivo, User $validador): void
     {
-        $documento->update([
-            'estado' => 'ANULADO',
-            'observaciones' => $documento->observaciones . "\n[ANULADO] Motivo: " . $motivo,
-            'motivo_observacion' => $motivo,
-            'actualizado_por' => $validador->cod_usu,
-        ]);
+        $documento->update(['estado' => 'ANULADO', 'cod_usuario_validacion' => $validador->cod_usuario, 'observacion' => trim($documento->observacion."\nANULADO: {$motivo}")]);
+        $this->registrarActividad($documento, $validador, 'Anuló');
+    }
 
-        activity('Usuarios')
-            ->causedBy($validador)
-            ->performedOn($documento->usuario)
-            ->event('documentacion')
-            ->log("Anuló el documento '{$documento->nombre_documento}'.");
+    private function registrarActividad(Documento $documento, User $usuario, string $accion): void
+    {
+        activity('Usuarios')->causedBy($usuario)->performedOn($documento->usuario)->event('documentacion')->log("{$accion} el documento '{$documento->nombre}'.");
     }
 }

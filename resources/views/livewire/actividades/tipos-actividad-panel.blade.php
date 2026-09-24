@@ -69,7 +69,7 @@
  <i class="ph-bold ph-arrows-clockwise text-sm" wire:loading.class="animate-spin" wire:target="$refresh"></i>
  Actualizar
  </button>
- @can('actividades.crear')
+ @can('actividades.gestionar')
  <button wire:click="abrirRegistrar"
  class="inline-flex items-center justify-center gap-2 rounded-xl bg-boton-acento px-4 py-2.5 text-xs font-bold uppercase tracking-[0.12em] text-inverso shadow-sm transition hover:bg-fondo-panel hover:shadow-md active:scale-95">
  <i class="ph-bold ph-plus text-sm"></i>
@@ -283,7 +283,7 @@
  <i class="ph-bold ph-eye text-xs"></i>
  </button>
  {{-- Editar --}}
- @can('actividades.editar')
+ @can('actividades.gestionar')
  <button wire:click="abrirEditar('{{ $tipo->cod_tipo_act }}')"
  title="Editar"
  class="flex h-7 w-7 items-center justify-center rounded-lg border border-estado-advertenciaBorde bg-estado-advertenciaBg text-estado-advertencia transition hover:border-estado-advertenciaBorde hover:bg-estado-advertenciaBg">
@@ -291,7 +291,7 @@
  </button>
  @endcan
  {{-- Eliminar --}}
- @can('actividades.editar')
+ @can('actividades.gestionar')
  @if($tipo->actividades_count === 0)
  <button type="button"
  title="Eliminar tipo"
@@ -525,7 +525,7 @@
  </p>
  <div class="space-y-1.5">
  @foreach($detalle->actividades as $act)
- @php($ne = \App\Models\ActividadAdulto::normalizarEstado($act->estado ?? ''))
+ @php($ne = \App\Models\Actividad::normalizarEstado($act->estado ?? ''))
  <div class="flex items-center justify-between gap-3 rounded-xl border border-borde-suave bg-fondo-panel px-3 py-2">
  <div class="min-w-0 flex-1">
  <p class="truncate text-[10px] font-bold text-titulo">
@@ -547,7 +547,7 @@
  @endif
  {{-- Botones --}}
  <div class="flex justify-end gap-2.5 border-t border-borde-suave pt-4">
- @can('actividades.editar')
+ @can('actividades.gestionar')
  <button type="button" wire:click="abrirEditar('{{ $detalle->cod_tipo_act }}')"
  class="inline-flex items-center gap-1.5 rounded-xl border border-estado-advertenciaBorde bg-estado-advertenciaBg px-4 py-2 text-xs font-bold text-estado-advertencia transition hover:bg-estado-advertenciaBg">
  <i class="ph-bold ph-pencil text-xs"></i>
@@ -565,4 +565,3 @@
  @endif
 
 </div>
-

@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 
 /**
  * Adaptador del nombre usado por la interfaz histórica.
@@ -25,14 +24,10 @@ class AdultoMayor extends Residente
         $this->attributes['cod_residente'] = $value;
     }
 
-public function estado(): HasOne
-    {
-        return $this->hasOne(self::class, 'cod_residente', 'cod_residente');
-    }
-
     public function familiares(): BelongsToMany
     {
         return $this->belongsToMany(Contacto::class, 'residentes_contactos', 'cod_residente', 'cod_contacto')
+            ->using(ResidenteContacto::class)
             ->withPivot(['parentesco', 'responsable_principal', 'contacto_emergencia', 'autoriza_informacion', 'autoriza_salida', 'estado']);
     }
 

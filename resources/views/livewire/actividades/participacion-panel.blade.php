@@ -36,7 +36,7 @@
  <i class="ph-bold ph-arrows-clockwise text-sm" wire:loading.class="animate-spin" wire:target="$refresh"></i>
  Actualizar
  </button>
- @can('actividades.crear')
+ @can('actividades.gestionar')
  <button wire:click="abrirRegistrar"
  class="inline-flex items-center justify-center gap-2 rounded-xl bg-boton-acento px-4 py-2.5 text-xs font-bold uppercase tracking-[0.12em] text-inverso shadow-sm transition hover:bg-fondo-panel hover:shadow-md active:scale-95">
  <i class="ph-bold ph-plus text-sm"></i>
@@ -191,7 +191,7 @@
  <tbody class="divide-y divide-[#C7B5A3]/25">
  @foreach($participaciones as $p)
  @php
- $ne = \App\Models\ActividadAdulto::normalizarEstado($p->estado ?? '');
+ $ne = \App\Models\Actividad::normalizarEstado($p->estado ?? '');
  @endphp
  <tr wire:key="part-{{ $p->cod_act_adul }}" class="group transition hover:bg-fondo-panel">
  <td class="py-3 pr-4">
@@ -234,7 +234,7 @@
  <i class="ph-bold ph-eye text-xs"></i>
  </button>
  {{-- Editar --}}
- @can('actividades.editar')
+ @can('actividades.gestionar')
  @if(strtoupper($p->estado) !== 'CANCELADA')
  <button wire:click="abrirEditar('{{ $p->cod_act_adul }}')"
  title="Editar participación"
@@ -244,7 +244,7 @@
  @endif
  @endcan
  {{-- Cancelar --}}
- @can('actividades.anular')
+ @can('actividades.gestionar')
  @if(strtoupper($p->estado) !== 'CANCELADA')
  <button type="button"
  title="Cancelar participación"
@@ -320,7 +320,7 @@
  <div class="flex items-start gap-3 rounded-2xl border border-borde-suave bg-fondo-panel p-4">
  <i class="ph-bold ph-info mt-0.5 shrink-0 text-lg text-apoyo"></i>
  <p class="text-xs font-bold leading-relaxed text-apoyo">
- La participación institucional usa <strong>actividades_adulto</strong> como base de datos. Cada registro representa la vinculación de un adulto mayor a un tipo de actividad.
+ La participación institucional usa <strong>actividades</strong> y <strong>participantes_actividad</strong>. Cada registro representa la vinculación de un residente a una actividad.
  Para una gestión avanzada de estados (confirmado, invitado, en espera), se recomienda crear una tabla <em>participaciones_actividades</em> en una fase futura.
  </p>
  </div>
@@ -518,7 +518,7 @@
  {{-- ════════════════════════════════════════════════════════════════════════ --}}
  @if($modalDetalle && $detalle)
  @php
- $ne = \App\Models\ActividadAdulto::normalizarEstado($detalle->estado ?? '');
+ $ne = \App\Models\Actividad::normalizarEstado($detalle->estado ?? '');
  $am = $detalle->adultoMayor;
  $edad = $am?->fecha_nac ? \Carbon\Carbon::parse($am->fecha_nac)->age : null;
  @endphp
@@ -606,7 +606,7 @@
  Ver ficha
  </a>
  @endif
- @can('actividades.editar')
+ @can('actividades.gestionar')
  @if(strtoupper($detalle->estado) !== 'CANCELADA')
  <button type="button" wire:click="abrirEditar('{{ $detalle->cod_act_adul }}')"
  class="inline-flex items-center gap-1.5 rounded-xl border border-estado-advertenciaBorde bg-estado-advertenciaBg px-4 py-2 text-xs font-bold text-estado-advertencia transition hover:bg-estado-advertenciaBg">

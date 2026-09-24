@@ -4,10 +4,11 @@ namespace App\Livewire\Valoraciones;
 
 use Livewire\Component;
 use App\Models\AdultoMayor;
-use App\Models\AreaGeriatrica;
-use App\Models\InstrumentoGeriatrico;
-use App\Models\EvaluacionGeriatrica;
+use App\Models\AplicacionInstrumento;
+use App\Models\Area;
+use App\Models\Instrumento;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class EvaluacionGeriatricaAreaModal extends Component
 {
@@ -51,11 +52,9 @@ class EvaluacionGeriatricaAreaModal extends Component
         $this->hora_eval  = date('H:i');
 
         if ($this->cod_area) {
-            $area = AreaGeriatrica::find($this->cod_area);
+            $area = Area::find($this->cod_area);
             $this->nombreArea  = $area?->nombre ?? '';
-            $this->instrumentos = InstrumentoGeriatrico::where('cod_area', $this->cod_area)
-                ->where('estado', 'ACTIVO')
-                ->get();
+            $this->instrumentos = Instrumento::query()->where('estado', 'ACTIVO')->get();
         }
 
         $this->mostrar = true;
@@ -72,7 +71,7 @@ class EvaluacionGeriatricaAreaModal extends Component
         $this->puntaje_total      = null;
         $this->categoria_resultado = null;
         $this->instrumentoSeleccionado = $value
-            ? InstrumentoGeriatrico::find($value)
+            ? Instrumento::find($value)
             : null;
     }
 
@@ -127,21 +126,22 @@ class EvaluacionGeriatricaAreaModal extends Component
 
         try {
             DB::transaction(function () {
-                EvaluacionGeriatrica::create([
-                    'cod_am'               => $this->cod_am,
-                    'cod_instrumento'      => $this->cod_instrumento,
-                    'registrado_por'       => auth()->user()->cod_usu,
-                    'evaluador_id'         => auth()->user()->cod_usu,
-                    'fecha_eval'           => $this->fecha_eval,
-                    'puntaje'              => $this->puntaje_total,
-                    'puntaje_total'        => $this->puntaje_total,
-                    'resultado_cualitativo'=> $this->categoria_resultado,
-                    'categoria_resultado'  => $this->categoria_resultado,
-                    'nivel_alerta'         => $this->nivel_alerta,
-                    'nivel_riesgo'         => $this->nivel_riesgo,
-                    'observaciones'        => $this->observaciones,
-                    'estado'               => 'COMPLETADA',
-                    'estado_eval'          => 'COMPLETADA',
+                $personal = auth()->user()?->personal;
+                abort_unless($personal, 422, 'El usuario debe tener un registro de personal asociado.');
+                $instrumento = Instrumento::query()->findOrFail($this->cod_instrumento);
+
+                AplicacionInstrumento::create([
+                    'cod_aplicacion' => 'APL_' . Str::upper(Str::random(10)),
+                    'cod_residente' => $this->cod_am,
+                    'cod_instrumento' => $instrumento->cod_instrumento,
+                    'cod_personal' => $personal->cod_personal,
+                    'fecha_hora' => $this->fecha_eval . ' ' . ($this->hora_eval ?: now()->format('H:i')),
+                    'puntaje_total' => $this->puntaje_total,
+                    'puntaje_maximo' => $instrumento->puntaje_maximo,
+                    'clasificacion' => $this->categoria_resultado ?: $this->nivel_alerta,
+                    'interpretacion' => $this->nivel_riesgo,
+                    'observacion' => $this->observaciones,
+                    'estado' => 'COMPLETA',
                 ]);
             });
 

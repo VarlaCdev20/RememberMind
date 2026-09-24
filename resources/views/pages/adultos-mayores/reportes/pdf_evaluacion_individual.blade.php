@@ -80,7 +80,7 @@
  <td style="font-weight: bold; color: #666; font-size: 9px; text-transform: uppercase;">Fecha de Ingreso:</td>
  <td>{{ $adulto->fecha_ing ? \Carbon\Carbon::parse($adulto->fecha_ing)->format('d/m/Y') : 'No registrada' }}</td>
  <td style="font-weight: bold; color: #666; font-size: 9px; text-transform: uppercase;">Estado actual:</td>
- <td><span style="font-weight: bold; color: #617453;">{{ $adulto->estado->estado ?? 'ACTIVO' }}</span></td>
+ <td><span style="font-weight: bold; color: #617453;">{{ $adulto->estado ?? 'ACTIVO' }}</span></td>
  </tr>
  </table>
 
@@ -89,7 +89,7 @@
  <table class="grid-table" style="margin-bottom: 20px;">
  <tr>
  <td width="25%" style="font-weight: bold; color: #666; font-size: 9px; text-transform: uppercase;">Área Geriátrica:</td>
- <td width="75%" style="font-weight: bold;">{{ $evaluacion->instrumento->area->nombre }}</td>
+ <td width="75%" style="font-weight: bold;">{{ $evaluacion->instrumento->tipo }}</td>
  </tr>
  <tr>
  <td style="font-weight: bold; color: #666; font-size: 9px; text-transform: uppercase;">Instrumento / Escala:</td>
@@ -177,7 +177,7 @@
  <div class="signature-line"></div>
  <div class="signature-text">Evaluador Registrado:</div>
  <div style="font-size: 9px; font-weight: bold; color: #2F3E5C; margin-top: 3px;">
- {{ $evaluacion->registrador->nombre }}
+ {{ $evaluacion->evaluador?->usuario?->name ?? $evaluacion->evaluador?->nombres ?? 'Personal institucional' }}
  </div>
  <div style="font-size: 7.5px; color: #777;">Especialista CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS</div>
  </div>

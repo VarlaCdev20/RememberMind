@@ -180,9 +180,9 @@ class ResumenFamiliaSocialController extends Controller
     {
         return [
             ['titulo' => 'Reporte de red de apoyo', 'descripcion' => 'Resumen de contactos y vínculos activos.', 'estado' => Route::has('admin.reportes.familiares.preview') ? 'Disponible' : 'Preparado', 'url' => Route::has('admin.reportes.familiares.preview') ? route('admin.reportes.familiares.preview') : null, 'permiso' => 'reportes.ver', 'icono' => 'ph-users-three'],
-            ['titulo' => 'Reporte de visitas', 'descripcion' => 'Seguimiento de visitas familiares y sociales.', 'estado' => 'Disponible próximamente', 'url' => null, 'permiso' => 'familiares.ver', 'icono' => 'ph-calendar-check'],
-            ['titulo' => 'Fichas sociales pendientes', 'descripcion' => 'La BDD V2 no define una ficha social operativa.', 'estado' => 'No implementado', 'url' => null, 'permiso' => 'familiares.ver', 'icono' => 'ph-clipboard-text'],
-            ['titulo' => 'Reporte social institucional', 'descripcion' => 'Indicadores consolidados para seguimiento directivo.', 'estado' => 'Preparado', 'url' => null, 'permiso' => 'familiares.ver', 'icono' => 'ph-chart-pie-slice'],
+            ['titulo' => 'Reporte de visitas', 'descripcion' => 'Seguimiento de visitas familiares y sociales.', 'estado' => 'Disponible próximamente', 'url' => null, 'permiso' => 'residentes_contactos.ver', 'icono' => 'ph-calendar-check'],
+            ['titulo' => 'Fichas sociales pendientes', 'descripcion' => 'La BDD V2 no define una ficha social operativa.', 'estado' => 'No implementado', 'url' => null, 'permiso' => 'residentes_contactos.ver', 'icono' => 'ph-clipboard-text'],
+            ['titulo' => 'Reporte social institucional', 'descripcion' => 'Indicadores consolidados para seguimiento directivo.', 'estado' => 'Preparado', 'url' => null, 'permiso' => 'residentes_contactos.ver', 'icono' => 'ph-chart-pie-slice'],
         ];
     }
 

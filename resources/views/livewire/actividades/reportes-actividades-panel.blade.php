@@ -439,7 +439,7 @@
  <tbody class="divide-y divide-[#C7B5A3]/20">
  @forelse($preview as $r)
  @php
- $norm = \App\Models\ActividadAdulto::normalizarEstado($r->estado);
+ $norm = \App\Models\Actividad::normalizarEstado($r->estado);
  $am = optional($r->adultoMayor);
  $tipo = optional($r->tipoActividad);
  @endphp
@@ -607,7 +607,7 @@
  <div class="min-w-0">
  <p class="text-[11px] font-bold text-apoyo">Acerca de estos reportes</p>
  <p class="mt-0.5 text-[11px] font-bold leading-relaxed text-apoyo">
- Los reportes incluyen datos de la tabla <span class="font-black">actividades_adulto</span>. Los filtros seleccionados
+ Los reportes incluyen datos de las tablas V2 <span class="font-black">actividades</span> y <span class="font-black">participantes_actividad</span>. Los filtros seleccionados
  se conservan en los enlaces de exportación PDF y Excel. La exportación requiere el permiso
  <span class="font-black">reportes.exportar_pdf</span>.
  Los registros se muestran sin incluir actividades eliminadas (soft delete).

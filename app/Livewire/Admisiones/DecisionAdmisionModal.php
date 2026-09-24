@@ -4,6 +4,8 @@ namespace App\Livewire\Admisiones;
 
 use Livewire\Component;
 use App\Models\AdultoMayor;
+use App\Models\HistorialEstadoResidente;
+use Illuminate\Support\Facades\DB;
 
 class DecisionAdmisionModal extends Component
 {
@@ -25,7 +27,7 @@ class DecisionAdmisionModal extends Component
         abort_unless(auth()->user()?->hasAnyRole(['SUPERADMINISTRADOR', 'MEDICO GENERAL/GERIATRA']), 403);
         $this->resetForm();
         $this->adulto = AdultoMayor::find($cod_am);
-        if($this->adulto && $this->adulto->estado->estado === 'DECISION_ADMISION') {
+        if($this->adulto && $this->adulto->estado === 'DECISION_ADMISION') {
             $this->isOpen = true;
         } else {
             $this->dispatch('notificar', ['tipo' => 'error', 'mensaje' => 'No se puede decidir sin valoración médica completa.']);
@@ -85,30 +87,22 @@ class DecisionAdmisionModal extends Component
             'motivo_derivacion.required' => 'Debe justificar el motivo de la derivación.',
         ]);
 
-        abort_unless($this->adulto && $this->adulto->fresh()->estado?->estado === 'DECISION_ADMISION', 409);
-        \DB::beginTransaction();
+        abort_unless($this->adulto && $this->adulto->fresh()->estado === 'DECISION_ADMISION', 409);
+        DB::beginTransaction();
         try {
-            $this->adulto = AdultoMayor::lockForUpdate()->findOrFail($this->adulto->cod_am);
-            if ($this->adulto->estado?->estado !== 'DECISION_ADMISION') throw new \RuntimeException('La decisión ya fue registrada.');
-            $estadoAnteriorId = $this->adulto->cod_est_adul;
+            $this->adulto = AdultoMayor::lockForUpdate()->findOrFail($this->adulto->cod_residente);
+            if ($this->adulto->estado !== 'DECISION_ADMISION') throw new \RuntimeException('La decisión ya fue registrada.');
+            $estadoAnterior = $this->adulto->estado;
             $nuevoEstadoStr = ($this->decision === 'DERIVADO') ? 'DERIVADO' : 'PENDIENTE_ASIGNACION';
-            $estadoModel = \App\Models\EstadoAdulto::firstOrCreate(['estado' => $nuevoEstadoStr]);
+            $this->adulto->update(['estado' => $nuevoEstadoStr]);
             
-            $this->adulto->update([
-                'cod_est_adul' => $estadoModel->cod_est_adul
+            HistorialEstadoResidente::create([
+                'cod_residente' => $this->adulto->cod_residente,
+                'cod_usuario_registro' => auth()->id(),
+                'estado_anterior' => $estadoAnterior,
+                'estado_nuevo' => $nuevoEstadoStr,
+                'motivo' => $this->decision . ' - ' . ($this->motivo_decision ?: ($this->motivo_derivacion ?: 'Decisión de Admisión')),
             ]);
-            
-            // Guardar historial de estado
-            if(class_exists('\App\Models\HistorialEstadoAdulto')) {
-                \App\Models\HistorialEstadoAdulto::create([
-                    'cod_am' => $this->adulto->cod_am,
-                    'estado_anterior' => $estadoAnteriorId,
-                    'estado_nuevo' => $estadoModel->cod_est_adul,
-                    'fecha_cambio' => now(),
-                    'motivo' => $this->decision . ' - ' . ($this->motivo_decision ?: ($this->motivo_derivacion ?: 'Decisión de Admisión')),
-                    'cambiado_por' => auth()->id()
-                ]);
-            }
 
             // Registrar Log
             activity('Medico')
@@ -125,7 +119,7 @@ class DecisionAdmisionModal extends Component
                 ])
                 ->log("Tomó la decisión de {$this->decision} para el paciente.");
 
-            \DB::commit();
+            DB::commit();
 
             $mensajeExito = ($this->decision === 'DERIVADO') 
                 ? 'El paciente ha sido marcado como DERIVADO y sale del flujo de admisión.'
@@ -141,7 +135,7 @@ class DecisionAdmisionModal extends Component
             $this->close();
 
         } catch (\Exception $e) {
-            \DB::rollBack();
+            DB::rollBack();
             $this->dispatch('swal', [
                 'title' => 'Error',
                 'text' => 'Ocurrió un error al guardar la decisión: ' . $e->getMessage(),

@@ -5,179 +5,133 @@ namespace App\Http\Controllers\Residentes;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Residentes\StoreFamiliarAdultoRequest;
 use App\Models\AdultoMayor;
-use App\Models\Familiar;
-use App\Models\User;
+use App\Models\Contacto;
+use App\Models\ResidenteContacto;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 
 class AdultoMayorFamiliarController extends Controller
 {
-    public function index(AdultoMayor $adulto_mayor)
+    public function index(AdultoMayor $adulto_mayor): RedirectResponse
     {
-        $familiares = $adulto_mayor->familiares;
-        return new RedirectResponse(route('admin.adultos-mayores.show', ['adulto_mayor' => $adulto_mayor->cod_am, 'tab' => 'familiares']));
+        return $this->volver($adulto_mayor);
     }
 
-    public function store(StoreFamiliarAdultoRequest $request, AdultoMayor $adulto_mayor)
+    public function store(StoreFamiliarAdultoRequest $request, AdultoMayor $adulto_mayor): RedirectResponse
     {
-        try {
-            DB::beginTransaction();
+        $data = $request->validated();
 
-            $codFam = $request->cod_fam;
+        DB::transaction(function () use ($data, $adulto_mayor): void {
+            $contacto = filled($data['cod_fam'] ?? null)
+                ? Contacto::query()->findOrFail($data['cod_fam'])
+                : $this->crearContacto($data);
 
-            // Si es un familiar nuevo, crear usuario y registro de familiar
-            if (!$codFam) {
-                // Generar contraseña temporal segura basada en iniciales + fragmento aleatorio
-                $passwordLimpia = $this->generarPasswordTemporal(
-                    $request->nombres ?? $request->nombre_nuevo ?? 'FAMILIAR',
-                    $request->ap_paterno ?? '',
-                    $request->ap_materno ?? ''
-                );
-
-                // Crear usuario con los campos REALES del modelo User
-                $user = User::create([
-                    'nombres'           => $request->nombres ?? $request->nombre_nuevo ?? 'FAMILIAR',
-                    'ap_paterno'        => $request->ap_paterno ?? null,
-                    'ap_materno'        => $request->ap_materno ?? null,
-                    'correo'            => $request->correo ?? $request->email_nuevo ?? $this->generarCorreoTemporal(),
-                    'password'          => Hash::make($passwordLimpia),
-                    'telefono'          => $request->telefono ?? null,
-                    'estado'            => 'ACTIVO',
-                    'acceso_sistema'    => 'HABILITADO',
-                ]);
-                $user->assignRole('FAMILIAR');
-
-                // Crear registro en tabla familiares
-                $familiar = Familiar::create([
-                    'parentesco'    => $request->parentesco_vinculo,
-                    'cod_usu'       => $user->cod_usu,
-                    'es_responsable' => $request->es_responsable ? 'SI' : 'NO',
-                ]);
-                $codFam = $familiar->cod_fam;
+            if (! empty($data['es_responsable'])) {
+                ResidenteContacto::query()
+                    ->where('cod_residente', $adulto_mayor->cod_residente)
+                    ->update(['responsable_principal' => false]);
             }
 
-            // Vincular con el Adulto Mayor si no está ya vinculado
-            if (!$adulto_mayor->familiares()->where('familiar_adulto.cod_fam', $codFam)->exists()) {
-                $adulto_mayor->familiares()->attach($codFam, [
-                    'parentesco_vinculo' => $request->parentesco_vinculo,
-                    'es_responsable'     => $request->es_responsable ?? false,
-                    'estado'             => $request->estado ?? 'ACTIVO',
-                    'observaciones'      => $request->observaciones,
-                ]);
+            $vinculo = ResidenteContacto::query()->firstOrNew([
+                'cod_residente' => $adulto_mayor->cod_residente,
+                'cod_contacto' => $contacto->cod_contacto,
+            ]);
+            if (! $vinculo->exists) {
+                $vinculo->cod_residente_contacto = 'RC_' . Str::upper(Str::random(10));
             }
+            $vinculo->fill([
+                'parentesco' => $data['parentesco_vinculo'],
+                'responsable_principal' => (bool) $data['es_responsable'],
+                'contacto_emergencia' => (bool) $data['es_responsable'],
+                'autoriza_informacion' => true,
+                'autoriza_salida' => false,
+                'estado' => $data['estado'],
+                'observacion' => $data['observaciones'] ?? null,
+            ])->save();
+        });
 
-            DB::commit();
+        activity('Residentes')
+            ->performedOn($adulto_mayor)
+            ->event('contacto_vinculado')
+            ->log("Se vinculó un contacto al residente {$adulto_mayor->cod_residente}.");
 
-            activity('Adulto Mayor')
-                ->performedOn($adulto_mayor)
-                ->event('familiar_vinculado')
-                ->withProperties(['cod_fam' => $codFam, 'cod_am' => $adulto_mayor->cod_am])
-                ->log("Se vinculó un familiar al adulto mayor: {$adulto_mayor->nombres}");
+        return $this->volver($adulto_mayor)->with('success', 'Contacto vinculado correctamente.');
+    }
 
-            // Incluir contraseña temporal en mensaje de éxito (solo si se creó usuario nuevo)
-            $mensaje = 'Familiar vinculado correctamente.';
-            if (isset($passwordLimpia)) {
-                $mensaje .= " Contraseña temporal del familiar: {$passwordLimpia} (anótela, no se mostrará de nuevo).";
+    public function update(Request $request, AdultoMayor $adulto_mayor, string $familiar): RedirectResponse
+    {
+        $data = $request->validate([
+            'parentesco_vinculo' => ['required', 'string', 'max:40'],
+            'es_responsable' => ['required', 'boolean'],
+            'estado' => ['required', 'in:ACTIVO,INACTIVO'],
+            'observaciones' => ['nullable', 'string', 'max:1000'],
+        ]);
+
+        DB::transaction(function () use ($data, $adulto_mayor, $familiar): void {
+            $vinculo = $this->vinculo($adulto_mayor, $familiar);
+            if ($data['es_responsable']) {
+                ResidenteContacto::query()
+                    ->where('cod_residente', $adulto_mayor->cod_residente)
+                    ->where('cod_residente_contacto', '!=', $vinculo->cod_residente_contacto)
+                    ->update(['responsable_principal' => false]);
             }
+            $vinculo->update([
+                'parentesco' => $data['parentesco_vinculo'],
+                'responsable_principal' => (bool) $data['es_responsable'],
+                'estado' => $data['estado'],
+                'observacion' => $data['observaciones'] ?? null,
+            ]);
+        });
 
-            return redirect()
-                ->route('admin.adultos-mayores.show', ['adulto_mayor' => $adulto_mayor->cod_am, 'tab' => 'familiares'])
-                ->with('success', $mensaje);
-
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return redirect()
-                ->route('admin.adultos-mayores.show', ['adulto_mayor' => $adulto_mayor->cod_am, 'tab' => 'familiares'])
-                ->with('error', 'Error al vincular familiar: ' . $e->getMessage());
-        }
+        return $this->volver($adulto_mayor)->with('success', 'Vínculo actualizado correctamente.');
     }
 
-    /**
-     * Genera una contraseña temporal segura: iniciales del nombre + 6 caracteres aleatorios.
-     * Ejemplo: "JPA_x7Km3q"
-     */
-    private function generarPasswordTemporal(string $nombres, string $paterno, string $materno): string
+    public function destroy(AdultoMayor $adulto_mayor, string $familiar): RedirectResponse
     {
-        $partes = array_filter([$nombres, $paterno, $materno]);
-        $iniciales = '';
-        foreach ($partes as $parte) {
-            $iniciales .= mb_strtoupper(mb_substr(trim($parte), 0, 1));
-        }
+        $this->vinculo($adulto_mayor, $familiar)->update(['estado' => 'INACTIVO']);
 
-        return $iniciales . '_' . Str::random(6);
+        return $this->volver($adulto_mayor)->with('success', 'Vínculo desactivado correctamente.');
     }
 
-    /**
-     * Genera un correo temporal único cuando el familiar no tiene correo propio.
-     */
-    private function generarCorreoTemporal(): string
+    public function restore(AdultoMayor $adulto_mayor, string $familiar): RedirectResponse
     {
-        return 'familiar_' . Str::random(8) . '@casaamandita.temporal';
+        $this->vinculo($adulto_mayor, $familiar)->update(['estado' => 'ACTIVO']);
+
+        return $this->volver($adulto_mayor)->with('success', 'Vínculo restaurado correctamente.');
     }
 
-    public function update(Request $request, AdultoMayor $adulto_mayor, $familiar)
+    private function crearContacto(array $data): Contacto
     {
-        $request->validate([
-            'parentesco_vinculo' => 'required|string',
-            'es_responsable' => 'boolean',
-            'estado' => 'required|in:ACTIVO,INACTIVO',
+        $partes = preg_split('/\s+/u', trim($data['nombre_nuevo'])) ?: [];
+        $apellido = count($partes) > 1 ? array_pop($partes) : 'SIN APELLIDO';
+        $nombres = trim(implode(' ', $partes)) ?: trim($data['nombre_nuevo']);
+
+        return Contacto::query()->create([
+            'cod_contacto' => 'CON_' . Str::upper(Str::random(10)),
+            'nombres' => $nombres,
+            'apellido_paterno' => $apellido,
+            'correo' => $data['email_nuevo'] ?? null,
+            'estado' => 'ACTIVO',
         ]);
-
-        $adulto_mayor->familiares()->updateExistingPivot($familiar, [
-            'parentesco_vinculo' => $request->parentesco_vinculo,
-            'es_responsable' => $request->es_responsable,
-            'estado' => $request->estado,
-            'observaciones' => $request->observaciones,
-        ]);
-
-        activity('Adulto Mayor')
-            ->performedOn($adulto_mayor)
-            ->event('updated')
-            ->log("Se actualizó el vínculo del familiar con la ficha {$adulto_mayor->cod_am}.");
-
-        return redirect()
-            ->route('admin.adultos-mayores.show', ['adulto_mayor' => $adulto_mayor->cod_am, 'tab' => 'familiares'])
-            ->with('success', 'Vínculo actualizado correctamente.');
     }
 
-    public function destroy(AdultoMayor $adulto_mayor, $familiar)
+    private function vinculo(AdultoMayor $adulto, string $id): ResidenteContacto
     {
-        // Desactivar vínculo en vez de eliminar (soft-disable)
-        $adulto_mayor->familiares()->updateExistingPivot($familiar, [
-            'estado' => 'INACTIVO'
-        ]);
-
-        activity('Adulto Mayor')
-            ->performedOn($adulto_mayor)
-            ->event('deleted')
-            ->withProperties(['cod_fam' => $familiar])
-            ->log("Se desactivó el vínculo del familiar con la ficha {$adulto_mayor->cod_am}.");
-
-        return redirect()
-            ->route('admin.adultos-mayores.show', ['adulto_mayor' => $adulto_mayor->cod_am, 'tab' => 'familiares'])
-            ->with('success', 'Familiar desactivado correctamente.');
+        return ResidenteContacto::query()
+            ->where('cod_residente', $adulto->cod_residente)
+            ->where(function ($query) use ($id): void {
+                $query->where('cod_residente_contacto', $id)->orWhere('cod_contacto', $id);
+            })
+            ->firstOrFail();
     }
 
-    /**
-     * Restaurar vínculo de familiar.
-     */
-    public function restore(AdultoMayor $adulto_mayor, $familiar)
+    private function volver(AdultoMayor $adulto): RedirectResponse
     {
-        $adulto_mayor->familiares()->updateExistingPivot($familiar, [
-            'estado' => 'ACTIVO'
-        ]);
-
-        activity('Adulto Mayor')
-            ->performedOn($adulto_mayor)
-            ->event('restored')
-            ->withProperties(['cod_fam' => $familiar])
-            ->log("Se restauró el vínculo con el familiar.");
-
-        return redirect()
-            ->route('admin.adultos-mayores.show', ['adulto_mayor' => $adulto_mayor->cod_am, 'tab' => 'familiares'])
-            ->with('success', 'Vínculo restaurado correctamente.');
+        return new RedirectResponse(route('admin.adultos-mayores.show', [
+            'adulto_mayor' => $adulto->cod_residente,
+            'tab' => 'familiares',
+        ]));
     }
 }

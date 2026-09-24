@@ -4,7 +4,6 @@ namespace App\Livewire\Valoraciones;
 
 use Livewire\Component;
 use App\Models\AdultoMayor;
-use App\Models\EvaluacionGeriatrica;
 use App\Models\AplicacionInstrumento;
 
 class DashboardPsicologo extends Component

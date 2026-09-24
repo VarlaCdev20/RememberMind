@@ -73,6 +73,7 @@ class Residente extends ModeloOperativo {
 
     public function familiares(): BelongsToMany {
         return $this->belongsToMany(Contacto::class, 'residentes_contactos', 'cod_residente', 'cod_contacto')
+            ->using(ResidenteContacto::class)
             ->withPivot(['parentesco', 'responsable_principal', 'contacto_emergencia', 'autoriza_informacion', 'autoriza_salida', 'estado']);
     }
     public function observaciones(): HasMany { return $this->hasMany(NotaClinica::class, 'cod_residente', 'cod_residente'); }

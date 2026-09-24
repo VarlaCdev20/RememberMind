@@ -17,11 +17,11 @@ class StoreFamiliarAdultoRequest extends FormRequest
             'cod_fam' => 'nullable|exists:contactos,cod_contacto',
             'parentesco_vinculo' => 'required|string|max:100',
             'es_responsable' => 'required|boolean',
-            'estado' => 'required|string|max:50',
+            'estado' => 'required|in:ACTIVO,INACTIVO',
             'observaciones' => 'nullable|string|max:1000',
             // Si es familiar nuevo (opcional, dependiendo de la implementación UI)
             'nombre_nuevo' => 'nullable|required_without:cod_fam|string|max:100',
-            'email_nuevo' => 'nullable|required_without:cod_fam|email|unique:usuarios,correo',
+            'email_nuevo' => 'nullable|email|unique:contactos,correo',
         ];
     }
 

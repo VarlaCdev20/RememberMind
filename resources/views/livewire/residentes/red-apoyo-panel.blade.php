@@ -107,7 +107,7 @@
  </div>
 
  <div class="flex flex-wrap gap-2">
- @can('familiares.crear')
+ @can('residentes_contactos.gestionar')
  <button
  type="button"
  wire:click="abrirVincular"
@@ -414,7 +414,7 @@
  </button>
 
  @if($persona['tipo'] === 'FAMILIAR')
- @can('familiares.editar')
+ @can('residentes_contactos.gestionar')
  <button type="button" wire:click="editarVinculo({{ $persona['vinculo_id'] }})" class="flex h-8 w-8 items-center justify-center rounded-lg bg-fondo-panel text-titulo transition hover:bg-boton-principal hover:text-inverso" title="Editar vínculo">
  <i class="ph-bold ph-pencil-simple"></i>
  </button>
@@ -431,13 +431,13 @@
  @endcan
 
  @if($persona['estado'] === 'ACTIVO')
- @can('familiares.anular')
+ @can('residentes_contactos.gestionar')
  <button type="button" @click="confirmarRed({{ $persona['vinculo_id'] }}, 'desactivar')" class="flex h-8 w-8 items-center justify-center rounded-lg bg-rose-100 text-rose-700 transition hover:bg-rose-600 hover:text-inverso" title="Desactivar vínculo">
  <i class="ph-bold ph-user-minus"></i>
  </button>
  @endcan
  @else
- @can('familiares.editar')
+ @can('residentes_contactos.gestionar')
  <button type="button" @click="confirmarRed({{ $persona['vinculo_id'] }}, 'activar')" class="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-100 text-emerald-700 transition hover:bg-emerald-600 hover:text-inverso" title="Reactivar vínculo">
  <i class="ph-bold ph-user-plus"></i>
  </button>
@@ -741,7 +741,7 @@
  
  <div class="bg-fondo-card border-t border-slate-200/70 p-4 flex justify-between gap-3 items-center">
  <div>
- @if($detalleVinculo['tipo'] === 'FAMILIAR' && auth()->user()->can('familiares.editar'))
+ @if($detalleVinculo['tipo'] === 'FAMILIAR' && auth()->user()->can('residentes_contactos.gestionar'))
  <button type="button" wire:click="editarVinculo({{ $detalleVinculo['vinculo_id'] }})" class="inline-flex h-10 items-center justify-center gap-2 rounded-xl bg-slate-100 border border-slate-200 px-4 text-xs font-bold text-slate-700 transition hover:bg-slate-200">
  <i class="ph-bold ph-pencil-simple text-sm"></i>
  Editar vínculo

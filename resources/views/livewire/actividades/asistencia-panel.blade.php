@@ -321,7 +321,7 @@
  @else
  @foreach($registros as $r)
  @php
- $estadoNorm = \App\Models\ActividadAdulto::normalizarEstado($r->estado);
+ $estadoNorm = \App\Models\Actividad::normalizarEstado($r->estado);
  $res = $resultado($r->estado);
  $estadoUpper = strtoupper($r->estado);
  $esRealizada = in_array($estadoUpper, ['REALIZADA', 'COMPLETADA', 'FINALIZADA']);
@@ -393,7 +393,7 @@
  </button>
 
  {{-- Marcar realizada (si no lo está ya) --}}
- @can('actividades.editar')
+ @can('actividades.gestionar')
  @if(!$esRealizada && !$esCancelada)
  <button
  type="button"
@@ -415,7 +415,7 @@
  @endcan
 
  {{-- Marcar cancelada (si no lo está ya) --}}
- @can('actividades.anular')
+ @can('actividades.gestionar')
  @if(!$esCancelada)
  <button
  type="button"
@@ -437,7 +437,7 @@
  @endcan
 
  {{-- Registrar resultado (incluye reprogramar) --}}
- @can('actividades.editar')
+ @can('actividades.gestionar')
  <button
  type="button"
  wire:click="abrirResultado('{{ $r->cod_act_adul }}')"
@@ -493,7 +493,7 @@
  @php
  $dAm = optional($detalle->adultoMayor);
  $dTipo = optional($detalle->tipoActividad);
- $dNorm = \App\Models\ActividadAdulto::normalizarEstado($detalle->estado);
+ $dNorm = \App\Models\Actividad::normalizarEstado($detalle->estado);
  $dRes = $resultado($detalle->estado);
  $dEdad = $dAm->fecha_nac
  ? \Carbon\Carbon::parse($dAm->fecha_nac)->age . ' años'
@@ -610,7 +610,7 @@
  >
  Cerrar
  </button>
- @can('actividades.editar')
+ @can('actividades.gestionar')
  <button
  type="button"
  wire:click="abrirResultado('{{ $detalle->cod_act_adul }}')"

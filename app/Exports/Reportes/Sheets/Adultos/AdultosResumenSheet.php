@@ -42,7 +42,7 @@ class AdultosResumenSheet implements FromArray, WithTitle, WithHeadings, WithSty
             ['Edad Promedio',              ($edad['promedio'] ?? 0) . ' años', 'Calculado sobre registros con fecha de nac.'],
             ['', '', ''],
             // — Familiar —
-            ['Con Familiar Vinculado',     $resumen['con_familiar'],  'Al menos un vínculo activo en familiar_adulto'],
+            ['Con Familiar Vinculado',     $resumen['con_familiar'],  'Al menos un vínculo activo en residentes_contactos'],
             ['Sin Familiar Vinculado',     $resumen['sin_familiar'],  'Sin ningún vínculo activo'],
             ['', '', ''],
             // — Ficha médica —

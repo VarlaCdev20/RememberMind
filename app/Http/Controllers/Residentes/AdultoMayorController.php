@@ -2,30 +2,15 @@
 
 namespace App\Http\Controllers\Residentes;
 
-use App\Exports\AdultoIndividualExport;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Clinica\StoreCambioEstadoRequest;
 use App\Http\Requests\Residentes\UpdateAdultoMayorRequest;
-use App\Models\Actividad;
 use App\Models\AdultoMayor;
-use App\Models\AreaGeriatrica;
-use App\Models\Atencion;
-use App\Models\Documento;
-use App\Models\EstadoAdulto;
 use App\Models\AplicacionInstrumento;
-use App\Models\Familiar;
-use App\Models\HistorialEstadoResidente;
-use App\Models\InstrumentoGeriatrico;
-use App\Models\NotaClinica;
-use App\Models\TipoActividadAdulto;
-use App\Models\TipoAtencionAdulto;
 use App\Services\Reportes\AdultoMayorBitacoraService;
 use App\Services\Residentes\AdultoMayorService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Maatwebsite\Excel\Facades\Excel;
-use Spatie\Activitylog\Models\Activity;
 
 class AdultoMayorController extends Controller
 {
@@ -399,7 +384,7 @@ class AdultoMayorController extends Controller
     }
 
     /**
-     * Cambiar estado directamente (Integra historial_estado_adulto).
+     * Cambiar estado directamente y registrar historial_estados_residente.
      */
     public function cambiarEstado(\Illuminate\Http\Request $request, AdultoMayor $adulto_mayor)
     {
@@ -460,15 +445,13 @@ class AdultoMayorController extends Controller
 
         try {
             \DB::transaction(function () use ($request, $adulto_mayor, $evaluacionId) {
-                $eval = EvaluacionGeriatrica::where('cod_am', $adulto_mayor->cod_am)
-                    ->where('cod_eval_ger', $evaluacionId)
+                $eval = AplicacionInstrumento::where('cod_residente', $adulto_mayor->cod_residente)
+                    ->where('cod_aplicacion', $evaluacionId)
                     ->firstOrFail();
 
                 $eval->update([
-                    'estado_eval' => 'ANULADO',
-                    'motivo_anulacion' => $request->input('motivo_anulacion'),
-                    'anulado_por' => auth()->user()->cod_usu,
-                    'anulado_en' => now(),
+                    'estado' => 'ANULADA',
+                    'observacion' => trim(($eval->observacion ?? '')."\nANULADA: ".$request->input('motivo_anulacion').' ('.auth()->id().', '.now()->toDateTimeString().')'),
                 ]);
             });
 
@@ -486,9 +469,9 @@ class AdultoMayorController extends Controller
         $adulto = $this->adultoMayorService->obtenerDetalle($adulto_mayor->cod_am);
         $adulto->edad = $this->adultoMayorService->calcularEdad($adulto->fecha_nac);
 
-        $evaluacion = EvaluacionGeriatrica::where('cod_am', $adulto_mayor->cod_am)
-            ->where('cod_eval_ger', $evaluacionId)
-            ->with(['instrumento.area', 'registrador'])
+        $evaluacion = AplicacionInstrumento::where('cod_residente', $adulto_mayor->cod_residente)
+            ->where('cod_aplicacion', $evaluacionId)
+            ->with(['instrumento', 'evaluador'])
             ->firstOrFail();
 
         $pdf = Pdf::loadView('pages.adultos-mayores.reportes.pdf_evaluacion_individual', compact('adulto', 'evaluacion'));

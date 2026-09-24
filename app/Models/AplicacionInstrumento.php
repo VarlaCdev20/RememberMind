@@ -15,5 +15,8 @@ class AplicacionInstrumento extends ModeloOperativo {
     public function getNivelAlertaAttribute(): ?string{return $this->clasificacion;}
     public function getCategoriaResultadoAttribute(): ?string{return $this->interpretacion;}
     public function getObservacionesAttribute(): ?string{return $this->observacion;}
+    public function getHoraEvalAttribute(): ?string{return $this->fecha_hora?->format('H:i:s');}
+    public function getNivelRiesgoAttribute(): ?string{return $this->clasificacion;}
+    public function getRegistradorAttribute(): mixed{return $this->evaluador;}
     public function getCreatedAtColumn() { return 'fecha_hora'; }
 }

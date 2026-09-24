@@ -10,4 +10,11 @@ class Documento extends ModeloOperativo {
     public function getCodDocAttribute(): string { return (string) $this->cod_documento; }
     public function getCodAmAttribute(): string { return (string) $this->cod_residente; }
     public function getObservacionesAttribute(): ?string { return $this->observacion; }
+    public function getCodDocUsuAttribute(): string { return (string) $this->cod_documento; }
+    public function getCodTipoDocAttribute(): string { return (string) $this->tipo_documento; }
+    public function getNombreDocumentoAttribute(): string { return (string) $this->nombre; }
+    public function getArchivoAttribute(): string { return (string) $this->ruta_archivo; }
+    public function getArchivoPathAttribute(): string { return (string) $this->ruta_archivo; }
+    public function getExtensionAttribute(): string { return strtolower(pathinfo((string) $this->ruta_archivo, PATHINFO_EXTENSION)); }
+    public function getMotivoObservacionAttribute(): ?string { return $this->observacion; }
 }

@@ -2,401 +2,269 @@
 
 namespace App\Livewire\Valoraciones;
 
+use App\Models\AdultoMayor;
+use App\Models\Atencion;
+use App\Models\ValoracionFuncional;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use Livewire\Component;
 use Livewire\WithPagination;
-use App\Models\AdultoMayor;
-use App\Models\ValoracionFuncionalAdulto;
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\Facades\DB;
 
 class SaludValoracionPanel extends Component
 {
     use WithPagination;
 
     public AdultoMayor $adulto;
-
-    // ── Estado de modales ────────────────────────────────────────────────────
-    public bool $modalFormOpen     = false;
-    public bool $modalDetalleOpen  = false;
-    public bool $modalAnularOpen   = false;
-
-    public ?string $editandoId  = null;
-    public ?string $viendoId    = null;
-    public ?string $anulandoId  = null;
-
-    // ── Filtros ──────────────────────────────────────────────────────────────
+    public bool $modalFormOpen = false;
+    public bool $modalDetalleOpen = false;
+    public bool $modalAnularOpen = false;
+    public ?string $editandoId = null;
+    public ?string $viendoId = null;
+    public ?string $anulandoId = null;
     public string $filtroEstado = '';
     public string $filtroRiesgo = '';
-    public string $fechaDesde   = '';
-    public string $fechaHasta   = '';
-
-    // ── Campos del formulario ─────────────────────────────────────────────────
+    public string $fechaDesde = '';
+    public string $fechaHasta = '';
     public string $fecha_valoracion = '';
-
-    public bool $come_solo          = false;
-    public bool $se_bana_solo       = false;
-    public bool $se_viste_solo      = false;
-    public bool $va_bano_solo       = false;
-    public bool $camina_solo        = false;
-    public bool $usa_baston         = false;
-    public bool $usa_andador        = false;
-    public bool $usa_silla_ruedas   = false;
-    public bool $baja_vision        = false;
-    public bool $baja_audicion      = false;
-    public bool $dificultad_hablar  = false;
-    public bool $molestia_luz       = false;
-    public bool $molestia_ruido     = false;
-    public bool $se_asusta_facil    = false;
+    public bool $come_solo = false;
+    public bool $se_bana_solo = false;
+    public bool $se_viste_solo = false;
+    public bool $va_bano_solo = false;
+    public bool $camina_solo = false;
+    public bool $usa_baston = false;
+    public bool $usa_andador = false;
+    public bool $usa_silla_ruedas = false;
+    public bool $baja_vision = false;
+    public bool $baja_audicion = false;
+    public bool $dificultad_hablar = false;
+    public bool $molestia_luz = false;
+    public bool $molestia_ruido = false;
+    public bool $se_asusta_facil = false;
     public bool $necesita_supervision = false;
-
     public string $nivel_dependencia = '';
-    public string $riesgo_caida      = '';
-    public string $indice_barthel    = '';
-    public string $observacion       = '';
-
-    // ── Anulación ────────────────────────────────────────────────────────────
+    public string $riesgo_caida = '';
+    public string $indice_barthel = '';
+    public string $observacion = '';
     public string $motivo_anulacion = '';
 
-    // ── Reglas de validación ─────────────────────────────────────────────────
+    public function mount(AdultoMayor $adulto): void
+    {
+        $this->adulto = $adulto;
+        $this->fecha_valoracion = today()->toDateString();
+    }
+
     protected function rules(): array
     {
         return [
-            'fecha_valoracion'  => ['required', 'date'],
+            'fecha_valoracion' => ['required', 'date', 'before_or_equal:today'],
             'nivel_dependencia' => ['required', 'in:INDEPENDIENTE,DEPENDENCIA_PARCIAL,ALTA_DEPENDENCIA,SUPERVISION_PERMANENTE'],
-            'riesgo_caida'      => ['required', 'in:BAJO,MEDIO,ALTO'],
-            'indice_barthel'    => ['nullable', 'integer', 'min:0', 'max:100'],
-            'observacion'       => ['nullable', 'string', 'max:2000'],
+            'riesgo_caida' => ['required', 'in:BAJO,MEDIO,ALTO'],
+            'indice_barthel' => ['nullable', 'integer', 'min:0', 'max:100'],
+            'observacion' => ['nullable', 'string', 'max:2000'],
         ];
-    }
-
-    protected $messages = [
-        'fecha_valoracion.required'  => 'La fecha de valoración es obligatoria.',
-        'nivel_dependencia.required' => 'El nivel de dependencia es obligatorio.',
-        'nivel_dependencia.in'       => 'Seleccione un nivel de dependencia válido.',
-        'riesgo_caida.required'      => 'El riesgo de caída es obligatorio.',
-        'riesgo_caida.in'            => 'Seleccione un riesgo de caída válido.',
-        'indice_barthel.integer'     => 'El índice Barthel debe ser un número entero.',
-        'indice_barthel.min'         => 'El índice Barthel mínimo es 0.',
-        'indice_barthel.max'         => 'El índice Barthel máximo es 100.',
-    ];
-
-    // ── Ciclo de vida ─────────────────────────────────────────────────────────
-    public function mount(AdultoMayor $adulto): void
-    {
-        $this->adulto           = $adulto;
-        $this->fecha_valoracion = today()->format('Y-m-d');
     }
 
     public function updatedFiltroEstado(): void { $this->resetPage(); }
     public function updatedFiltroRiesgo(): void { $this->resetPage(); }
-    public function updatedFechaDesde(): void   { $this->resetPage(); }
-    public function updatedFechaHasta(): void   { $this->resetPage(); }
+    public function updatedFechaDesde(): void { $this->resetPage(); }
+    public function updatedFechaHasta(): void { $this->resetPage(); }
 
-    // ── Apertura de modales ───────────────────────────────────────────────────
     public function abrirFormNuevo(): void
     {
-        if (!auth()->user()->can('salud.valoracion.crear')) abort(403);
+        $this->autorizar('valoraciones_funcionales.crear');
         $this->resetForm();
-        $this->editandoId   = null;
         $this->modalFormOpen = true;
     }
 
     public function abrirFormEditar(string $id): void
     {
-        if (!auth()->user()->can('salud.valoracion.editar')) abort(403);
-
-        $valoracion = ValoracionFuncionalAdulto::where('cod_am', $this->adulto->cod_am)->findOrFail($id);
-
-        if ($valoracion->estado === 'ANULADA') {
-            $this->dispatch('swal:warning', [
-                'title' => 'No permitido',
-                'text'  => 'No se puede editar una valoración anulada. Use "Restaurar" si necesita reactivarla.',
-            ]);
-            return;
-        }
-
+        $this->autorizar('valoraciones_funcionales.editar');
+        $valoracion = $this->valoracion($id);
+        abort_if($valoracion->estado === 'ANULADA', 422, 'No se puede editar una valoración anulada.');
         $this->fillFormDesde($valoracion);
-        $this->editandoId    = $id;
+        $this->editandoId = $id;
         $this->modalFormOpen = true;
     }
 
     public function abrirDetalle(string $id): void
     {
-        $this->viendoId         = $id;
+        $this->viendoId = $id;
         $this->modalDetalleOpen = true;
     }
 
     public function abrirAnular(string $id): void
     {
-        if (!auth()->user()->can('salud.valoracion.anular')) abort(403);
-        $this->anulandoId      = $id;
+        $this->autorizar('valoraciones_funcionales.editar');
+        $this->anulandoId = $id;
         $this->motivo_anulacion = '';
-        $this->modalAnularOpen  = true;
+        $this->modalAnularOpen = true;
     }
 
     public function cerrarModales(): void
     {
-        $this->modalFormOpen    = false;
+        $this->modalFormOpen = false;
         $this->modalDetalleOpen = false;
-        $this->modalAnularOpen  = false;
+        $this->modalAnularOpen = false;
+        $this->editandoId = $this->viendoId = $this->anulandoId = null;
         $this->resetForm();
-        $this->editandoId  = null;
-        $this->viendoId    = null;
-        $this->anulandoId  = null;
     }
 
-    // ── CRUD ──────────────────────────────────────────────────────────────────
     public function guardar(): void
     {
         $this->validate();
+        $this->autorizar($this->editandoId ? 'valoraciones_funcionales.editar' : 'valoraciones_funcionales.crear');
 
-        if ($this->editandoId) {
-            if (!auth()->user()->can('salud.valoracion.editar')) abort(403);
-        } else {
-            if (!auth()->user()->can('salud.valoracion.crear')) abort(403);
-        }
-
-        DB::beginTransaction();
-        try {
-            $data = [
-                'cod_am'               => $this->adulto->cod_am,
-                'fecha_valoracion'     => $this->fecha_valoracion,
-                'come_solo'            => $this->come_solo,
-                'se_bana_solo'         => $this->se_bana_solo,
-                'se_viste_solo'        => $this->se_viste_solo,
-                'va_bano_solo'         => $this->va_bano_solo,
-                'camina_solo'          => $this->camina_solo,
-                'usa_baston'           => $this->usa_baston,
-                'usa_andador'          => $this->usa_andador,
-                'usa_silla_ruedas'     => $this->usa_silla_ruedas,
-                'baja_vision'          => $this->baja_vision,
-                'baja_audicion'        => $this->baja_audicion,
-                'dificultad_hablar'    => $this->dificultad_hablar,
-                'molestia_luz'         => $this->molestia_luz,
-                'molestia_ruido'       => $this->molestia_ruido,
-                'se_asusta_facil'      => $this->se_asusta_facil,
-                'necesita_supervision' => $this->necesita_supervision,
-                'nivel_dependencia'    => $this->nivel_dependencia,
-                'observacion'          => $this->observacion ?: null,
-                'registrado_por'       => auth()->user()->cod_usu,
-            ];
-
-            if (Schema::hasColumn('valoracion_funcional_adulto', 'riesgo_caida')) {
-                $data['riesgo_caida'] = $this->riesgo_caida;
-            }
-
-            if (Schema::hasColumn('valoracion_funcional_adulto', 'indice_barthel')) {
-                $data['indice_barthel'] = $this->indice_barthel !== '' ? (int) $this->indice_barthel : null;
-            }
-
+        DB::transaction(function (): void {
             if ($this->editandoId) {
-                $valoracion = ValoracionFuncionalAdulto::where('cod_am', $this->adulto->cod_am)
-                    ->findOrFail($this->editandoId);
-                $valoracion->update($data);
-                $mensajeBitacora = "Actualizó valoración funcional del adulto mayor {$this->adulto->cod_am}.";
-                $titulo = 'Valoración Actualizada';
-                $texto  = 'Los cambios fueron guardados correctamente.';
-            } else {
-                // Pasar todas las valoraciones VIGENTE del adulto a HISTORICA
-                if (Schema::hasColumn('valoracion_funcional_adulto', 'estado')) {
-                    ValoracionFuncionalAdulto::where('cod_am', $this->adulto->cod_am)
-                        ->where('estado', 'VIGENTE')
-                        ->update(['estado' => 'HISTORICA']);
-
-                    $data['estado'] = 'VIGENTE';
-                }
-                $valoracion = ValoracionFuncionalAdulto::create($data);
-                $mensajeBitacora = $this->riesgo_caida === 'ALTO'
-                    ? "Registró valoración funcional con riesgo de caída ALTO del adulto mayor {$this->adulto->cod_am}."
-                    : "Registró valoración funcional del adulto mayor {$this->adulto->cod_am}.";
-                $titulo = 'Valoración Registrada';
-                $texto  = 'La valoración funcional fue registrada correctamente.';
+                $valoracion = $this->valoracion($this->editandoId);
+                $valoracion->update($this->payload($valoracion->cod_personal, $valoracion->cod_atencion, $valoracion->cod_valoracion_funcional));
+                return;
             }
 
-            activity()
-                ->causedBy(auth()->user())
-                ->performedOn($valoracion)
-                ->log($mensajeBitacora);
+            [$personal, $codArea] = $this->contextoPersonal();
+            ValoracionFuncional::query()
+                ->where('cod_residente', $this->adulto->cod_residente)
+                ->whereIn('estado', ['ACTIVA', 'VIGENTE'])
+                ->update(['estado' => 'HISTORICA']);
 
-            DB::commit();
-            $this->cerrarModales();
-            $this->dispatch('swal:success', ['title' => $titulo, 'text' => $texto]);
+            $atencion = Atencion::query()->create([
+                'cod_atencion' => 'ATN_' . Str::upper(Str::random(10)),
+                'cod_residente' => $this->adulto->cod_residente,
+                'cod_area' => $codArea,
+                'cod_personal' => $personal->cod_personal,
+                'tipo_atencion' => 'VALORACION_FUNCIONAL',
+                'motivo' => $this->nivel_dependencia,
+                'fecha_hora' => $this->fecha_valoracion . ' ' . now()->format('H:i:s'),
+                'estado' => 'FINALIZADA',
+                'observacion' => $this->observacion ?: null,
+            ]);
 
-        } catch (\Exception $e) {
-            DB::rollBack();
-            $this->dispatch('swal:error', ['title' => 'Error', 'text' => 'No se pudo guardar: ' . $e->getMessage()]);
-        }
+            ValoracionFuncional::query()->create($this->payload($personal->cod_personal, $atencion->cod_atencion));
+        });
+
+        $this->cerrarModales();
+        $this->dispatch('swal:success', ['title' => 'Valoración guardada', 'text' => 'La valoración funcional se guardó en BDD V2.']);
     }
 
     public function confirmarAnular(): void
     {
-        if (!auth()->user()->can('salud.valoracion.anular')) abort(403);
-
-        $this->validate([
-            'motivo_anulacion' => ['required', 'string', 'min:10', 'max:500'],
-        ], [
-            'motivo_anulacion.required' => 'El motivo de anulación es obligatorio.',
-            'motivo_anulacion.min'      => 'Describa el motivo con al menos 10 caracteres.',
+        $this->autorizar('valoraciones_funcionales.editar');
+        $this->validate(['motivo_anulacion' => ['required', 'string', 'min:10', 'max:500']]);
+        $valoracion = $this->valoracion((string) $this->anulandoId);
+        $valoracion->update([
+            'estado' => 'ANULADA',
+            'conclusion' => trim((string) $valoracion->conclusion . "\nAnulada: {$this->motivo_anulacion}"),
         ]);
-
-        $valoracion = ValoracionFuncionalAdulto::where('cod_am', $this->adulto->cod_am)
-            ->findOrFail($this->anulandoId);
-
-        DB::beginTransaction();
-        try {
-            $data = ['observacion' => trim(($valoracion->observacion ?? '') . "\nAnulada: " . $this->motivo_anulacion)];
-            if (Schema::hasColumn('valoracion_funcional_adulto', 'estado')) $data['estado'] = 'ANULADA';
-            if (Schema::hasColumn('valoracion_funcional_adulto', 'motivo_anulacion')) $data['motivo_anulacion'] = $this->motivo_anulacion;
-            if (Schema::hasColumn('valoracion_funcional_adulto', 'anulado_por')) $data['anulado_por'] = auth()->user()->cod_usu;
-            if (Schema::hasColumn('valoracion_funcional_adulto', 'fecha_anulacion')) $data['fecha_anulacion'] = now();
-            $valoracion->update($data);
-
-            activity()
-                ->causedBy(auth()->user())
-                ->performedOn($valoracion)
-                ->log("Anuló valoración funcional del adulto mayor {$this->adulto->cod_am}. Motivo: {$this->motivo_anulacion}");
-
-            DB::commit();
-            $this->cerrarModales();
-            $this->dispatch('swal:success', [
-                'title' => 'Valoración Anulada',
-                'text'  => 'La valoración quedó registrada en el historial como anulada.',
-            ]);
-        } catch (\Exception $e) {
-            DB::rollBack();
-            $this->dispatch('swal:error', ['title' => 'Error', 'text' => $e->getMessage()]);
-        }
+        $this->cerrarModales();
     }
 
     public function restaurar(string $id): void
     {
-        if (!auth()->user()->can('salud.valoracion.editar')) abort(403);
-
-        $valoracion = ValoracionFuncionalAdulto::where('cod_am', $this->adulto->cod_am)->findOrFail($id);
-
-        DB::beginTransaction();
-        try {
-            if (Schema::hasColumn('valoracion_funcional_adulto', 'estado')) {
-                ValoracionFuncionalAdulto::where('cod_am', $this->adulto->cod_am)
-                    ->where('estado', 'VIGENTE')
-                    ->update(['estado' => 'HISTORICA']);
-
-                $valoracion->update(['estado' => 'VIGENTE']);
-            }
-
-            activity()
-                ->causedBy(auth()->user())
-                ->performedOn($valoracion)
-                ->log("Restauró valoración funcional del adulto mayor {$this->adulto->cod_am}.");
-
-            DB::commit();
-            $this->dispatch('swal:success', [
-                'title' => 'Restaurada',
-                'text'  => 'La valoración fue restaurada como vigente.',
-            ]);
-        } catch (\Exception $e) {
-            DB::rollBack();
-            $this->dispatch('swal:error', ['title' => 'Error', 'text' => $e->getMessage()]);
-        }
+        $this->marcarComoVigente($id);
     }
 
     public function marcarVigente(string $id): void
     {
-        if (!auth()->user()->can('salud.valoracion.editar')) abort(403);
-
-        DB::beginTransaction();
-        try {
-            $valoracion = ValoracionFuncionalAdulto::where('cod_am', $this->adulto->cod_am)->findOrFail($id);
-            if (Schema::hasColumn('valoracion_funcional_adulto', 'estado')) {
-                ValoracionFuncionalAdulto::where('cod_am', $this->adulto->cod_am)
-                    ->where('estado', 'VIGENTE')
-                    ->update(['estado' => 'HISTORICA']);
-
-                $valoracion->update(['estado' => 'VIGENTE']);
-            }
-
-            activity()
-                ->causedBy(auth()->user())
-                ->performedOn($valoracion)
-                ->log("Marcó como vigente la valoración funcional del adulto mayor {$this->adulto->cod_am}.");
-
-            DB::commit();
-            $this->dispatch('swal:success', ['title' => 'Vigente marcada', 'text' => 'La valoración seleccionada es ahora la vigente.']);
-        } catch (\Exception $e) {
-            DB::rollBack();
-            $this->dispatch('swal:error', ['title' => 'Error', 'text' => $e->getMessage()]);
-        }
+        $this->marcarComoVigente($id);
     }
 
-    // ── Helpers privados ──────────────────────────────────────────────────────
-    private function fillFormDesde(ValoracionFuncionalAdulto $v): void
+    private function marcarComoVigente(string $id): void
     {
-        $this->fecha_valoracion    = $v->fecha_valoracion->format('Y-m-d');
-        $this->come_solo           = $v->come_solo;
-        $this->se_bana_solo        = $v->se_bana_solo;
-        $this->se_viste_solo       = $v->se_viste_solo;
-        $this->va_bano_solo        = $v->va_bano_solo;
-        $this->camina_solo         = $v->camina_solo;
-        $this->usa_baston          = $v->usa_baston;
-        $this->usa_andador         = $v->usa_andador;
-        $this->usa_silla_ruedas    = $v->usa_silla_ruedas;
-        $this->baja_vision         = $v->baja_vision;
-        $this->baja_audicion       = $v->baja_audicion;
-        $this->dificultad_hablar   = $v->dificultad_hablar;
-        $this->molestia_luz        = $v->molestia_luz;
-        $this->molestia_ruido      = $v->molestia_ruido;
-        $this->se_asusta_facil     = $v->se_asusta_facil;
-        $this->necesita_supervision = $v->necesita_supervision;
-        $this->nivel_dependencia   = $v->nivel_dependencia;
-        $this->riesgo_caida        = $v->riesgo_caida ?? '';
-        $this->indice_barthel      = $v->indice_barthel !== null ? (string) $v->indice_barthel : '';
-        $this->observacion         = $v->observacion ?? '';
+        $this->autorizar('valoraciones_funcionales.editar');
+        DB::transaction(function () use ($id): void {
+            ValoracionFuncional::query()
+                ->where('cod_residente', $this->adulto->cod_residente)
+                ->whereIn('estado', ['ACTIVA', 'VIGENTE'])
+                ->update(['estado' => 'HISTORICA']);
+            $this->valoracion($id)->update(['estado' => 'ACTIVA']);
+        });
+    }
+
+    private function payload(string $codPersonal, string $codAtencion, ?string $id = null): array
+    {
+        $autonomia = fn (bool $valor): string => $valor ? 'INDEPENDIENTE' : 'REQUIERE_APOYO';
+        $apoyo = $this->usa_silla_ruedas ? 'SILLA_RUEDAS' : ($this->usa_andador ? 'ANDADOR' : ($this->usa_baston ? 'BASTON' : 'SIN_APOYO'));
+
+        return [
+            'cod_valoracion_funcional' => $id ?? 'VAF_' . Str::upper(Str::random(10)),
+            'cod_residente' => $this->adulto->cod_residente,
+            'cod_personal' => $codPersonal,
+            'cod_atencion' => $codAtencion,
+            'fecha_hora' => $this->fecha_valoracion . ' ' . now()->format('H:i:s'),
+            'marcha' => $this->camina_solo ? 'INDEPENDIENTE' : 'ASISTIDA',
+            'equilibrio' => $apoyo,
+            'traslado' => $this->usa_silla_ruedas ? 'SILLA_RUEDAS' : $autonomia($this->camina_solo),
+            'alimentacion_autonoma' => $autonomia($this->come_solo),
+            'bano_autonomo' => $autonomia($this->se_bana_solo),
+            'vestido_autonomo' => $autonomia($this->se_viste_solo),
+            'higiene_autonoma' => $autonomia($this->se_bana_solo),
+            'continencia' => $autonomia($this->va_bano_solo),
+            'movilidad_autonoma' => $autonomia($this->camina_solo),
+            'necesita_supervision' => $this->necesita_supervision,
+            'nivel_dependencia' => $this->nivel_dependencia,
+            'conclusion' => trim(($this->indice_barthel !== '' ? "Barthel {$this->indice_barthel}/100. " : '')
+                . "Riesgo de caída: {$this->riesgo_caida}. " . $this->observacion),
+            'estado' => 'ACTIVA',
+        ];
+    }
+
+    private function fillFormDesde(ValoracionFuncional $valoracion): void
+    {
+        $this->fecha_valoracion = $valoracion->fecha_hora->toDateString();
+        foreach (['come_solo','se_bana_solo','se_viste_solo','va_bano_solo','camina_solo','usa_baston','usa_andador','usa_silla_ruedas','necesita_supervision'] as $campo) {
+            $this->{$campo} = (bool) $valoracion->{$campo};
+        }
+        $this->nivel_dependencia = (string) $valoracion->nivel_dependencia;
+        $this->riesgo_caida = $valoracion->riesgo_caida;
+        $this->indice_barthel = $valoracion->indice_barthel !== null ? (string) $valoracion->indice_barthel : '';
+        $this->observacion = (string) $valoracion->observacion;
+    }
+
+    private function valoracion(string $id): ValoracionFuncional
+    {
+        return ValoracionFuncional::query()
+            ->where('cod_residente', $this->adulto->cod_residente)
+            ->findOrFail($id);
+    }
+
+    private function contextoPersonal(): array
+    {
+        $personal = auth()->user()?->personal;
+        $codArea = $personal?->asignaciones()->whereIn('estado', ['ACTIVA', 'ACTIVO'])->latest('fecha_asignacion')->value('cod_area');
+        abort_unless($personal && $codArea, 422, 'El usuario debe tener personal y área institucional activa.');
+        return [$personal, $codArea];
+    }
+
+    private function autorizar(string $permiso): void
+    {
+        abort_unless(auth()->user()?->can($permiso), 403);
     }
 
     private function resetForm(): void
     {
         $this->reset([
-            'come_solo', 'se_bana_solo', 'se_viste_solo', 'va_bano_solo', 'camina_solo',
-            'usa_baston', 'usa_andador', 'usa_silla_ruedas',
-            'baja_vision', 'baja_audicion', 'dificultad_hablar',
-            'molestia_luz', 'molestia_ruido', 'se_asusta_facil', 'necesita_supervision',
-            'nivel_dependencia', 'riesgo_caida', 'indice_barthel', 'observacion',
+            'come_solo','se_bana_solo','se_viste_solo','va_bano_solo','camina_solo','usa_baston','usa_andador','usa_silla_ruedas',
+            'baja_vision','baja_audicion','dificultad_hablar','molestia_luz','molestia_ruido','se_asusta_facil','necesita_supervision',
+            'nivel_dependencia','riesgo_caida','indice_barthel','observacion','motivo_anulacion',
         ]);
-        $this->fecha_valoracion = today()->format('Y-m-d');
+        $this->fecha_valoracion = today()->toDateString();
         $this->resetValidation();
     }
 
-    // ── Render ────────────────────────────────────────────────────────────────
     public function render()
     {
-        $valoraciones = $this->adulto->valoracionesFuncionales()
+        $query = $this->adulto->valoracionesFuncionales()
             ->when($this->filtroEstado, fn ($q) => $q->where('estado', $this->filtroEstado))
+            ->when($this->filtroRiesgo, fn ($q) => $q->where('conclusion', 'like', "%Riesgo de caída: {$this->filtroRiesgo}%"))
             ->when($this->fechaDesde, fn ($q) => $q->whereDate('fecha_hora', '>=', $this->fechaDesde))
-            ->when($this->fechaHasta, fn ($q) => $q->whereDate('fecha_hora', '<=', $this->fechaHasta))
-            ->with('registradoPor')
-            ->latest('fecha_hora')
-            ->paginate(10);
-
-        $vigente = $this->adulto->valoracionesFuncionales()
-            ->vigente()
-            ->latest('fecha_hora')
-            ->first();
-
-        $anterior = $this->adulto->valoracionesFuncionales()
-            ->historica()
-            ->latest('fecha_hora')
-            ->first();
-
-        $viendoDetalle = $this->viendoId
-            ? ValoracionFuncionalAdulto::with(['registradoPor', 'anuladoPor'])->find($this->viendoId)
-            : null;
+            ->when($this->fechaHasta, fn ($q) => $q->whereDate('fecha_hora', '<=', $this->fechaHasta));
 
         return view('livewire.valoraciones.salud-valoracion-funcional', [
-            'valoraciones'  => $valoraciones,
-            'vigente'       => $vigente,
-            'anterior'      => $anterior,
+            'valoraciones' => (clone $query)->with('registradoPor')->latest('fecha_hora')->paginate(10),
+            'vigente' => $this->adulto->valoracionesFuncionales()->vigente()->latest('fecha_hora')->first(),
+            'anterior' => $this->adulto->valoracionesFuncionales()->historica()->latest('fecha_hora')->first(),
             'totalRegistros' => $this->adulto->valoracionesFuncionales()->count(),
-            'viendoDetalle' => $viendoDetalle,
+            'viendoDetalle' => $this->viendoId ? ValoracionFuncional::with('registradoPor')->find($this->viendoId) : null,
         ])->layout('layouts.sistema');
     }
 }

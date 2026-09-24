@@ -3,7 +3,6 @@
 namespace App\Livewire\Valoraciones;
 
 use App\Models\Preadmision;
-use App\Models\ValoracionEnfermeriaAdmision;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 
@@ -76,76 +75,18 @@ class ValoracionInicialModal extends Component
             return;
         }
 
-        $existente = ValoracionEnfermeriaAdmision::where('cod_pre', $this->preadmision->cod_pre)
-            ->orderByDesc('fecha_valoracion')
-            ->first();
+        $existente = $this->preadmision->valoracion_enfermeria;
 
-        if ($existente) {
-            $this->valoracionId = $existente->cod_val_enf;
-            $this->estado_general = $existente->estado_general;
-            $this->nivel_conciencia = $existente->nivel_conciencia;
-            $this->orientacion = $existente->orientacion;
-            $this->comunicacion = $existente->comunicacion;
-            $this->hay_dolor = (bool) $existente->hay_dolor;
-            $this->intensidad_dolor = $existente->intensidad_dolor;
-            $this->ubicacion_dolor = $existente->ubicacion_dolor;
-            $this->movilidad = $existente->movilidad;
-            $this->apoyo_movilidad = $existente->apoyo_movilidad;
-            $this->riesgo_caida = $existente->riesgo_caida;
-            $this->piel_estado = $existente->piel_estado;
-            $this->hay_heridas = (bool) $existente->hay_heridas;
-            $this->ubicacion_heridas = $existente->ubicacion_heridas;
-            $this->higiene_ingreso = $existente->higiene_ingreso;
-            $this->continencia_basica = $existente->continencia_basica;
-            $this->alimentacion_aparente = $existente->alimentacion_aparente;
-            $this->recomendacion_enfermeria = $existente->recomendacion_enfermeria;
-
-            // Parse orientacion desglosada
-            if (preg_match('/Persona:\s*([A-Z]+)/i', $existente->orientacion, $matches)) {
-                $this->orientacion_persona = strtoupper($matches[1]);
-            } else {
-                $this->orientacion_persona = 'ORIENTADO';
+        if (is_array($existente)) {
+            $this->valoracionId = $this->preadmision->cod_preadmision;
+            foreach ($existente as $campo => $valor) {
+                if (property_exists($this, $campo)) {
+                    $this->{$campo} = $valor;
+                }
             }
-            if (preg_match('/Tiempo:\s*([A-Z]+)/i', $existente->orientacion, $matches)) {
-                $this->orientacion_tiempo = strtoupper($matches[1]);
-            } else {
-                $this->orientacion_tiempo = 'ORIENTADO';
-            }
-            if (preg_match('/Espacio:\s*([A-Z]+)/i', $existente->orientacion, $matches)) {
-                $this->orientacion_espacio = strtoupper($matches[1]);
-            } else {
-                $this->orientacion_espacio = 'ORIENTADO';
-            }
-
-            // Parse signos vitales
-            $vitals = json_decode($existente->signos_vitales_iniciales, true);
-            if (is_array($vitals)) {
-                $this->pa_sistolica = $vitals['pa_sistolica'] ?? '';
-                $this->pa_diastolica = $vitals['pa_diastolica'] ?? '';
-                $this->frecuencia_cardiaca = $vitals['frecuencia_cardiaca'] ?? '';
-                $this->frecuencia_respiratoria = $vitals['frecuencia_respiratoria'] ?? '';
-                $this->temperatura = $vitals['temperatura'] ?? '';
-                $this->saturacion_oxigeno = $vitals['saturacion_oxigeno'] ?? '';
-                $this->peso = $vitals['peso'] ?? '';
-                $this->talla = $vitals['talla'] ?? '';
-            }
-
-            // Parse observaciones y detalles clínicos extendidos
-            $obs = json_decode($existente->observacion, true);
-            if (is_array($obs)) {
-                $this->antecedentes_relevantes = $obs['antecedentes_relevantes'] ?? '';
-                $this->medicacion_referida = $obs['medicacion_referida'] ?? '';
-                $this->alergias_referidas = $obs['alergias_referidas'] ?? '';
-                $this->dependencia_funcional = $obs['dependencia_funcional'] ?? 'INDEPENDIENTE';
-                $this->riesgo_nutricional = $obs['riesgo_nutricional'] ?? 'SIN RIESGO';
-                $this->riesgo_cognitivo = $obs['riesgo_cognitivo'] ?? 'SIN DETERIORO';
-                $this->necesidad_apoyo_inmediato = $obs['necesidad_apoyo_inmediato'] ?? '';
-                $this->prioridad_sugerida = $obs['prioridad_sugerida'] ?? 'MEDIA';
-                $this->confirmacion_documentacion = $obs['confirmacion_documentacion'] ?? false;
-                $this->comentarios_adicionales = $obs['comentarios'] ?? '';
-            } else {
-                $this->comentarios_adicionales = $existente->observacion;
-            }
+            $this->hay_dolor = (bool) ($existente['hay_dolor'] ?? false);
+            $this->hay_heridas = (bool) ($existente['hay_heridas'] ?? false);
+            $this->confirmacion_documentacion = (bool) ($existente['confirmacion_documentacion'] ?? false);
         } else {
             // Valores por defecto para nueva valoración
             $this->orientacion_persona = 'ORIENTADO';
@@ -309,11 +250,28 @@ class ValoracionInicialModal extends Component
         DB::beginTransaction();
 
         try {
-            // Combinar orientación desglosada
             $orientacionCombinada = "Persona: {$this->orientacion_persona}, Tiempo: {$this->orientacion_tiempo}, Espacio: {$this->orientacion_espacio}";
-
-            // Serializar signos vitales
-            $signosVitalesData = [
+            $valoracion = [
+                'fecha_hora' => now()->toIso8601String(),
+                'estado_general' => $this->estado_general,
+                'nivel_conciencia' => $this->nivel_conciencia,
+                'orientacion' => $orientacionCombinada,
+                'orientacion_persona' => $this->orientacion_persona,
+                'orientacion_tiempo' => $this->orientacion_tiempo,
+                'orientacion_espacio' => $this->orientacion_espacio,
+                'comunicacion' => $this->comunicacion,
+                'hay_dolor' => (bool) $this->hay_dolor,
+                'intensidad_dolor' => $this->hay_dolor ? $this->intensidad_dolor : null,
+                'ubicacion_dolor' => $this->hay_dolor ? $this->ubicacion_dolor : null,
+                'movilidad' => $this->movilidad,
+                'apoyo_movilidad' => $this->apoyo_movilidad,
+                'riesgo_caida' => $this->riesgo_caida,
+                'piel_estado' => $this->piel_estado,
+                'hay_heridas' => (bool) $this->hay_heridas,
+                'ubicacion_heridas' => $this->hay_heridas ? $this->ubicacion_heridas : null,
+                'higiene_ingreso' => $this->higiene_ingreso,
+                'continencia_basica' => $this->continencia_basica,
+                'alimentacion_aparente' => $this->alimentacion_aparente,
                 'pa_sistolica' => $this->pa_sistolica,
                 'pa_diastolica' => $this->pa_diastolica,
                 'frecuencia_cardiaca' => $this->frecuencia_cardiaca,
@@ -322,64 +280,32 @@ class ValoracionInicialModal extends Component
                 'saturacion_oxigeno' => $this->saturacion_oxigeno,
                 'peso' => $this->peso,
                 'talla' => $this->talla,
-            ];
-
-            // Serializar observaciones y extendidos
-            $observacionData = [
                 'antecedentes_relevantes' => $this->antecedentes_relevantes,
                 'medicacion_referida' => $this->medicacion_referida,
                 'alergias_referidas' => $this->alergias_referidas,
                 'dependencia_funcional' => $this->dependencia_funcional,
                 'riesgo_nutricional' => $this->riesgo_nutricional,
                 'riesgo_cognitivo' => $this->riesgo_cognitivo,
-            'tipo_evaluacion_cognitiva' => 'CRIBADO_OBSERVACIONAL_ENFERMERIA',
+                'tipo_evaluacion_cognitiva' => 'CRIBADO_OBSERVACIONAL_ENFERMERIA',
                 'necesidad_apoyo_inmediato' => $this->necesidad_apoyo_inmediato,
                 'prioridad_sugerida' => $this->prioridad_sugerida,
-                'confirmacion_documentacion' => $this->confirmacion_documentacion,
-                'comentarios' => $this->comentarios_adicionales,
+                'confirmacion_documentacion' => (bool) $this->confirmacion_documentacion,
+                'comentarios_adicionales' => $this->comentarios_adicionales,
+                'recomendacion_enfermeria' => $this->recomendacion_enfermeria,
+                'registrado_por' => auth()->id(),
             ];
 
-            $valoracion = ValoracionEnfermeriaAdmision::updateOrCreate(
-                ['cod_pre' => $this->preadmision->cod_pre],
-                [
-                    'cod_am' => null,
-                    'fecha_valoracion' => now()->toDateString(),
-                    'hora_valoracion' => now()->format('H:i:s'),
-                    'estado_general' => $this->estado_general,
-                    'nivel_conciencia' => $this->nivel_conciencia,
-                    'orientacion' => $orientacionCombinada,
-                    'comunicacion' => $this->comunicacion,
-                    'hay_dolor' => (bool) $this->hay_dolor,
-                    'intensidad_dolor' => $this->hay_dolor && $this->intensidad_dolor !== '' ? (int) $this->intensidad_dolor : null,
-                    'ubicacion_dolor' => $this->hay_dolor ? $this->ubicacion_dolor : null,
-                    'movilidad' => $this->movilidad,
-                    'apoyo_movilidad' => $this->apoyo_movilidad,
-                    'riesgo_caida' => $this->riesgo_caida,
-                    'piel_estado' => $this->piel_estado,
-                    'hay_heridas' => (bool) $this->hay_heridas,
-                    'ubicacion_heridas' => $this->hay_heridas ? $this->ubicacion_heridas : null,
-                    'higiene_ingreso' => $this->higiene_ingreso,
-                    'continencia_basica' => $this->continencia_basica,
-                    'alimentacion_aparente' => $this->alimentacion_aparente,
-                    'signos_vitales_iniciales' => json_encode($signosVitalesData),
-                    'observacion' => json_encode($observacionData),
-                    'recomendacion_enfermeria' => $this->recomendacion_enfermeria,
-                    'estado' => 'COMPLETADA',
-                    'registrado_por' => auth()->user()?->cod_usu,
-                ]
-            );
-
-            // Cambiar estado de preadmisión a PENDIENTE_VALORACION_MEDICA y actualizar prioridad sugerida
             $this->preadmision->update([
                 'estado' => 'PENDIENTE_VALORACION_MEDICA',
                 'prioridad' => $this->prioridad_sugerida,
+                'valoracion_enfermeria' => $valoracion,
             ]);
 
             activity('Enfermeria')
                 ->causedBy(auth()->user())
                 ->performedOn($this->preadmision)
                 ->withProperties([
-                    'cod_val_enf' => $valoracion->cod_val_enf,
+                    'cod_preadmision' => $this->preadmision->cod_preadmision,
                     'estado_general' => $this->estado_general,
                     'orientacion' => $orientacionCombinada,
                     'movilidad' => $this->movilidad,
@@ -397,7 +323,7 @@ class ValoracionInicialModal extends Component
                 'icon' => 'success',
             ]);
 
-            $this->dispatch('valoracionCompletada', cod_pre: $this->preadmision->cod_pre, cod_val_enf: $valoracion->cod_val_enf);
+            $this->dispatch('valoracionCompletada', cod_pre: $this->preadmision->cod_preadmision, cod_val_enf: $this->preadmision->cod_preadmision);
             $this->dispatch('refreshDashboard');
             $this->close();
         } catch (\Throwable $e) {

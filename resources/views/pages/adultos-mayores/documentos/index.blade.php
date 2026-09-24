@@ -76,7 +76,7 @@
  </div>
  <div>
  <p class="font-black text-titulo">{{ $doc->titulo ?? $doc->nom_doc }}</p>
- <p class="text-xs text-apoyo truncate max-w-xs">{{ $doc->observaciones ?? 'Sin observación' }}</p>
+ <p class="text-xs text-apoyo truncate max-w-xs">{{ $doc->observacion ?? 'Sin observación' }}</p>
  </div>
  </div>
  </td>
@@ -98,20 +98,20 @@
  <td class="px-6 py-4 text-right">
  <div class="flex justify-end gap-2">
  @if(($doc->estado === 'ARCHIVADO'))
- <form action="{{ route('admin.adultos-mayores.documentos.restore', ['adulto_mayor' => $adulto_mayor->cod_am, 'documento' => $doc->cod_doc_am]) }}" method="POST" class="inline">
+ <form action="{{ route('admin.adultos-mayores.documentos.restore', ['adulto_mayor' => $adulto_mayor->cod_residente, 'documento' => $doc->cod_documento]) }}" method="POST" class="inline">
  @csrf @method('PATCH')
  <button type="submit" class="rounded-lg p-2 text-amber-600 hover:bg-amber-50" title="Restaurar Documento">
  <i class="ph-bold ph-arrow-u-up-left text-lg"></i>
  </button>
  </form>
  @else
- <a href="{{ route('admin.adultos-mayores.documentos.archivo', [$adulto_mayor->cod_am, $doc->cod_doc_am]) }}" target="_blank" class="rounded-lg p-2 text-apoyo hover:bg-fondo-panel hover:text-titulo" title="Ver/Descargar">
+ <a href="{{ route('admin.adultos-mayores.documentos.archivo', [$adulto_mayor->cod_residente, $doc->cod_documento]) }}" target="_blank" class="rounded-lg p-2 text-apoyo hover:bg-fondo-panel hover:text-titulo" title="Ver/Descargar">
  <i class="ph-bold ph-download-simple text-lg"></i>
  </a>
  <button type="button" @click='abrirEdicion(@json($doc))' class="rounded-lg p-2 text-apoyo hover:bg-fondo-panel hover:text-titulo" title="Editar Información">
  <i class="ph-bold ph-pencil-simple text-lg"></i>
  </button>
- <form action="{{ route('admin.adultos-mayores.documentos.destroy', ['adulto_mayor' => $adulto_mayor->cod_am, 'documento' => $doc->cod_doc_am]) }}" method="POST" class="inline" onsubmit="return confirm('¿Archivar este documento?');">
+ <form action="{{ route('admin.adultos-mayores.documentos.destroy', ['adulto_mayor' => $adulto_mayor->cod_residente, 'documento' => $doc->cod_documento]) }}" method="POST" class="inline" onsubmit="return confirm('¿Archivar este documento?');">
  @csrf @method('DELETE')
  <button type="submit" class="rounded-lg p-2 text-red-500 hover:bg-red-50" title="Archivar">
  <i class="ph-bold ph-archive text-lg"></i>

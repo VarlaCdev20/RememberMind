@@ -65,6 +65,44 @@ class ValoracionFuncional extends ModeloOperativo
         return $this->conclusion;
     }
 
+    public function getCodValFuncAttribute(): string
+    {
+        return (string) $this->cod_valoracion_funcional;
+    }
+
+    public function getRiesgoCaidaAttribute(): string
+    {
+        if (preg_match('/Riesgo de caída:\s*(BAJO|MEDIO|MODERADO|ALTO)/iu', (string) $this->conclusion, $matches)) {
+            return strtoupper($matches[1]) === 'MODERADO' ? 'MEDIO' : strtoupper($matches[1]);
+        }
+
+        return 'MEDIO';
+    }
+
+    public function getIndiceBarthelAttribute(): ?int
+    {
+        return preg_match('/Barthel\s+(\d+)\/100/iu', (string) $this->conclusion, $matches)
+            ? (int) $matches[1]
+            : null;
+    }
+
+    public function getUsaBastonAttribute(): bool { return str_contains((string) $this->equilibrio, 'BASTON'); }
+    public function getUsaAndadorAttribute(): bool { return str_contains((string) $this->equilibrio, 'ANDADOR'); }
+    public function getUsaSillaRuedasAttribute(): bool { return $this->traslado === 'SILLA_RUEDAS'; }
+    public function getComeSoloAttribute(): bool { return $this->alimentacion_autonoma === 'INDEPENDIENTE'; }
+    public function getSeBanaSoloAttribute(): bool { return $this->bano_autonomo === 'INDEPENDIENTE'; }
+    public function getSeVisteSoloAttribute(): bool { return $this->vestido_autonomo === 'INDEPENDIENTE'; }
+    public function getVaBanoSoloAttribute(): bool { return in_array($this->continencia, ['INDEPENDIENTE', 'CONTINENTE'], true); }
+    public function getCaminaSoloAttribute(): bool { return $this->marcha === 'INDEPENDIENTE'; }
+    public function getBajaVisionAttribute(): bool { return false; }
+    public function getBajaAudicionAttribute(): bool { return false; }
+    public function getDificultadHablarAttribute(): bool { return false; }
+    public function getMolestiaLuzAttribute(): bool { return false; }
+    public function getMolestiaRuidoAttribute(): bool { return false; }
+    public function getSeAsustaFacilAttribute(): bool { return false; }
+    public function getMotivoAnulacionAttribute(): ?string { return $this->estado === 'ANULADA' ? $this->conclusion : null; }
+    public function getFechaAnulacionAttribute(): mixed { return $this->estado === 'ANULADA' ? $this->fecha_hora : null; }
+
     public function getEstadoGeneralAttribute(): string
     {
         return $this->nivel_dependencia ?? 'REGULAR';

@@ -46,7 +46,7 @@
  </div>
  </div>
 
- @can('familiares.ver')
+ @can('residentes_contactos.ver')
  <div class="flex flex-wrap gap-2">
  @if($rutasSubmodulos['red_apoyo'])
  <a href="{{ $rutasSubmodulos['red_apoyo'] }}" class="inline-flex items-center gap-2 rounded-xl border border-borde-suave bg-fondo-panel px-3 py-2 text-xs font-bold text-titulo shadow-sm transition hover:-translate-y-0.5 hover:border-borde-focus">
@@ -285,7 +285,7 @@
  </div>
  <div class="flex shrink-0 items-center gap-2">
  <span class="rounded-full bg-fondo-app px-2.5 py-1 text-[11px] font-bold text-apoyo">{{ $item['estado'] }}</span>
- @can('adultos.ver')
+ @can('residentes.ver')
  @if($item['url'])
  <a href="{{ $item['url'] }}" class="rounded-lg bg-boton-principal px-3 py-1.5 text-xs font-bold text-inverso transition hover:bg-boton-acento">
  Revisar red

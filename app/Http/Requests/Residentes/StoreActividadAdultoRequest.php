@@ -15,10 +15,10 @@ class StoreActividadAdultoRequest extends FormRequest
     {
         return [
             'fecha' => 'required|date',
-            'hora' => 'required',
+            'hora' => 'required|date_format:H:i',
             'cod_tipo_act' => 'required|string|max:60',
             'obs' => 'nullable|string|max:2000',
-            'estado' => 'required|string|max:50',
+            'estado' => 'required|in:PROGRAMADA,EN_CURSO,REALIZADA,FINALIZADA,CANCELADA,ANULADA,ACTIVA',
         ];
     }
 

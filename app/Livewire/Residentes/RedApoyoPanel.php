@@ -80,7 +80,7 @@ class RedApoyoPanel extends Component
 
     public function abrirVincular(): void
     {
-        abort_unless(auth()->user()->can('familiares.crear'), 403);
+        abort_unless(auth()->user()->can('residentes_contactos.gestionar'), 403);
 
         if ($this->adultoSeleccionado === '') {
             $this->dispatch('swal', [
@@ -98,7 +98,7 @@ class RedApoyoPanel extends Component
 
     public function editarVinculo(string $id): void
     {
-        abort_unless(auth()->user()->can('familiares.editar'), 403);
+        abort_unless(auth()->user()->can('residentes_contactos.gestionar'), 403);
 
         $vinculo = ResidenteContacto::with('contacto')
             ->where('cod_residente_contacto', $id)
@@ -160,7 +160,7 @@ class RedApoyoPanel extends Component
 
     public function guardarVinculo(): void
     {
-        abort_unless(auth()->user()->can($this->modoEdicion ? 'familiares.editar' : 'familiares.crear'), 403);
+        abort_unless(auth()->user()->can('residentes_contactos.gestionar'), 403);
 
         $this->validate($this->rules(), $this->messages());
 
@@ -260,7 +260,7 @@ class RedApoyoPanel extends Component
 
     public function marcarResponsable(string $vinculoId): void
     {
-        abort_unless(auth()->user()->can('familiares.editar'), 403);
+        abort_unless(auth()->user()->can('residentes_contactos.gestionar'), 403);
 
         ResidenteContacto::where('cod_residente', $this->adultoSeleccionado)->update(['responsable_principal' => false]);
         ResidenteContacto::where('cod_residente_contacto', $vinculoId)->update(['responsable_principal' => true, 'estado' => 'ACTIVO']);
@@ -274,7 +274,7 @@ class RedApoyoPanel extends Component
 
     public function marcarContactoEmergencia(string $vinculoId): void
     {
-        abort_unless(auth()->user()->can('familiares.editar'), 403);
+        abort_unless(auth()->user()->can('residentes_contactos.gestionar'), 403);
 
         ResidenteContacto::where('cod_residente', $this->adultoSeleccionado)->update(['contacto_emergencia' => false]);
         ResidenteContacto::where('cod_residente_contacto', $vinculoId)->update(['contacto_emergencia' => true, 'estado' => 'ACTIVO']);
@@ -288,7 +288,7 @@ class RedApoyoPanel extends Component
 
     public function desactivarVinculo(string $vinculoId): void
     {
-        abort_unless(auth()->user()->can('familiares.anular'), 403);
+        abort_unless(auth()->user()->can('residentes_contactos.gestionar'), 403);
 
         ResidenteContacto::where('cod_residente_contacto', $vinculoId)
             ->where('cod_residente', $this->adultoSeleccionado)
@@ -304,7 +304,7 @@ class RedApoyoPanel extends Component
 
     public function activarVinculo(string $vinculoId): void
     {
-        abort_unless(auth()->user()->can('familiares.editar'), 403);
+        abort_unless(auth()->user()->can('residentes_contactos.gestionar'), 403);
 
         ResidenteContacto::where('cod_residente_contacto', $vinculoId)
             ->where('cod_residente', $this->adultoSeleccionado)

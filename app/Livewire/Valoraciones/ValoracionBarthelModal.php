@@ -4,10 +4,12 @@ namespace App\Livewire\Valoraciones;
 
 use Livewire\Component;
 use App\Models\AdultoMayor;
-use App\Models\ValoracionFuncionalAdulto;
+use App\Models\Atencion;
+use App\Models\ValoracionFuncional;
 use App\Services\Enfermeria\TurnoEnfermeriaService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class ValoracionBarthelModal extends Component
 {
@@ -138,31 +140,49 @@ class ValoracionBarthelModal extends Component
         try {
             DB::transaction(function () {
                 // Marcar anterior como histórica
-                ValoracionFuncionalAdulto::where('cod_am', $this->cod_am)
+                ValoracionFuncional::where('cod_residente', $this->cod_am)
                     ->vigente()
                     ->update(['estado' => 'HISTORICA']);
 
-                ValoracionFuncionalAdulto::create([
-                    'cod_am'               => $this->cod_am,
-                    'fecha_valoracion'     => $this->fecha_valoracion,
-                    'come_solo'            => $this->alimentacion >= 10,
-                    'se_bana_solo'         => $this->bano >= 5,
-                    'se_viste_solo'        => $this->vestido >= 10,
-                    'va_bano_solo'         => $this->uso_retrete >= 10,
-                    'camina_solo'          => $this->deambulacion >= 15,
-                    'usa_baston'           => $this->usa_baston,
-                    'usa_andador'          => $this->usa_andador,
-                    'usa_silla_ruedas'     => $this->usa_silla_ruedas,
-                    'baja_vision'          => $this->baja_vision,
-                    'baja_audicion'        => $this->baja_audicion,
-                    'dificultad_hablar'    => $this->dificultad_hablar,
+                $personal = Auth::user()?->personal;
+                $codArea = $personal?->asignaciones()
+                    ->whereIn('estado', ['ACTIVA', 'ACTIVO'])
+                    ->latest('fecha_asignacion')
+                    ->value('cod_area');
+                abort_unless($personal && $codArea, 422, 'El usuario debe tener personal y área institucional activa.');
+
+                $atencion = Atencion::query()->create([
+                    'cod_atencion' => 'ATN_' . Str::upper(Str::random(10)),
+                    'cod_residente' => $this->cod_am,
+                    'cod_area' => $codArea,
+                    'cod_personal' => $personal->cod_personal,
+                    'tipo_atencion' => 'VALORACION_BARTHEL',
+                    'motivo' => "Índice de Barthel {$this->totalBarthel}/100",
+                    'fecha_hora' => $this->fecha_valoracion . ' ' . now()->format('H:i:s'),
+                    'estado' => 'FINALIZADA',
+                    'observacion' => $this->observacion ?: null,
+                ]);
+
+                ValoracionFuncional::create([
+                    'cod_valoracion_funcional' => 'VAF_' . Str::upper(Str::random(10)),
+                    'cod_residente' => $this->cod_am,
+                    'cod_personal' => $personal->cod_personal,
+                    'cod_atencion' => $atencion->cod_atencion,
+                    'fecha_hora' => $this->fecha_valoracion . ' ' . now()->format('H:i:s'),
+                    'marcha' => $this->deambulacion >= 15 ? 'INDEPENDIENTE' : 'ASISTIDA',
+                    'equilibrio' => ($this->usa_baston || $this->usa_andador) ? 'CON_APOYO' : 'SIN_APOYO',
+                    'traslado' => $this->usa_silla_ruedas ? 'SILLA_RUEDAS' : ($this->traslados >= 15 ? 'INDEPENDIENTE' : 'ASISTIDO'),
+                    'alimentacion_autonoma' => $this->alimentacion >= 10 ? 'INDEPENDIENTE' : 'REQUIERE_APOYO',
+                    'bano_autonomo' => $this->bano >= 5 ? 'INDEPENDIENTE' : 'REQUIERE_APOYO',
+                    'vestido_autonomo' => $this->vestido >= 10 ? 'INDEPENDIENTE' : 'REQUIERE_APOYO',
+                    'higiene_autonoma' => $this->aseo_personal >= 5 ? 'INDEPENDIENTE' : 'REQUIERE_APOYO',
+                    'continencia' => ($this->control_intestinal >= 10 && $this->control_vesical >= 10) ? 'CONTINENTE' : 'REQUIERE_APOYO',
+                    'movilidad_autonoma' => $this->deambulacion >= 15 ? 'INDEPENDIENTE' : 'REQUIERE_APOYO',
                     'necesita_supervision' => $this->necesita_supervision,
                     'nivel_dependencia'    => $this->nivel_dependencia,
-                    'riesgo_caida'         => $this->riesgo_caida,
-                    'indice_barthel'       => $this->totalBarthel,
-                    'estado'               => 'VIGENTE',
-                    'observacion'          => $this->observacion ?: null,
-                    'registrado_por'       => Auth::id(),
+                    'conclusion' => "Barthel {$this->totalBarthel}/100 ({$this->clasificacionBarthel}). Riesgo de caída: {$this->riesgo_caida}."
+                        . ($this->observacion ? " {$this->observacion}" : ''),
+                    'estado' => 'ACTIVA',
                 ]);
             });
 

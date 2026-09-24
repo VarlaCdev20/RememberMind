@@ -20,7 +20,7 @@
  </div>
  </div>
 
- @can('salud.valoracion.crear')
+ @can('valoraciones_funcionales.crear')
  <button wire:click="abrirFormNuevo" type="button" class="inline-flex items-center justify-center gap-2 rounded-xl bg-boton-acento px-5 py-2.5 text-xs font-bold uppercase tracking-wider text-inverso shadow-[0_10px_22px_rgba(226,125,96,0.24)] transition hover:-translate-y-0.5 hover:bg-fondo-panel active:scale-95">
  <i class="ph-bold ph-plus-circle text-sm"></i>
  Registrar valoración
@@ -152,7 +152,7 @@
  <h2 class="text-sm font-bold uppercase tracking-wider text-apoyo">
  Historial de valoraciones funcionales
  </h2>
- @can('salud.valoracion.crear')
+ @can('valoraciones_funcionales.crear')
  <button wire:click="abrirFormNuevo" type="button" class="rm-btn-terracota">
  <i class="ph-bold ph-plus"></i>
  <span>Registrar valoración</span>
@@ -186,7 +186,7 @@
  texto="Registre la primera valoración funcional del paciente para iniciar el seguimiento."
  class="py-12"
  >
- @can('salud.valoracion.crear')
+ @can('valoraciones_funcionales.crear')
  <button wire:click="abrirFormNuevo" type="button" class="rm-btn-terracota mt-4">
  <i class="ph-bold ph-plus"></i> Registrar valoración
  </button>
@@ -261,7 +261,7 @@
 
  @if($val->estado !== 'ANULADA')
  {{-- Editar --}}
- @can('salud.valoracion.editar')
+ @can('valoraciones_funcionales.editar')
  <button wire:click="abrirFormEditar('{{ $val->cod_val_func }}')"
  type="button" class="rm-btn-icon text-apoyo hover:text-titulo"
  title="Editar">
@@ -271,7 +271,7 @@
 
  {{-- Marcar vigente (solo para históricas) --}}
  @if($val->estado === 'HISTORICA')
- @can('salud.valoracion.editar')
+ @can('valoraciones_funcionales.editar')
  <button wire:click="marcarVigente('{{ $val->cod_val_func }}')"
  type="button" class="rm-btn-icon text-estado-exito hover:text-estado-exito"
  title="Marcar como vigente">
@@ -281,7 +281,7 @@
  @endif
 
  {{-- Anular --}}
- @can('salud.valoracion.anular')
+ @can('valoraciones_funcionales.editar')
  <button wire:click="abrirAnular('{{ $val->cod_val_func }}')"
  type="button" class="rm-btn-icon text-red-500 hover:text-red-700"
  title="Anular">
@@ -290,7 +290,7 @@
  @endcan
  @else
  {{-- Restaurar (anuladas) --}}
- @can('salud.valoracion.editar')
+ @can('valoraciones_funcionales.editar')
  <button wire:click="restaurar('{{ $val->cod_val_func }}')"
  type="button" class="rm-btn-icon text-estado-exito hover:text-estado-exito"
  title="Restaurar valoración">

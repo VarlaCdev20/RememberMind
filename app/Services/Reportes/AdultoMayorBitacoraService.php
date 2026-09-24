@@ -128,20 +128,18 @@ class AdultoMayorBitacoraService
                 // Eventos sobre submódulos (observaciones, atenciones, etc.)
                 ->orWhere(function ($q2) use ($codAm) {
                     $q2->whereIn('activity_log.subject_type', [
-                        'App\\Models\\ObsAdulto',
-                        'App\\Models\\AtencionAdulto',
-                        'App\\Models\\ActividadAdulto',
-                        'App\\Models\\DocumentoAdultoMayor',
-                        'App\\Models\\Familiar',
-                        'App\\Models\\FamiliarAdulto',
-                        'App\\Models\\EvaluacionCognitiva',
-                        // FASE 2: Módulos médicos y administrativos
+                        'App\\Models\\NotaClinica',
                         'App\\Models\\Atencion',
+                        'App\\Models\\Actividad',
+                        'App\\Models\\Documento',
+                        'App\\Models\\Contacto',
+                        'App\\Models\\ResidenteContacto',
+                        'App\\Models\\AplicacionInstrumento',
                         'App\\Models\\Prescripcion',
                         'App\\Models\\AdministracionMedicacion',
                         'App\\Models\\SignoVital',
-                        'App\\Models\\ValoracionFuncionalAdulto',
-                        'App\\Models\\HistorialEstadoAdulto',
+                        'App\\Models\\ValoracionFuncional',
+                        'App\\Models\\HistorialEstadoResidente',
                     ])
                     ->where('activity_log.properties', 'like', '%' . $codAm . '%');
                 })
@@ -248,8 +246,8 @@ class AdultoMayorBitacoraService
     {
         return match(strtolower($logName)) {
             'adulto mayor', 'adulto_mayor' => 'Adulto Mayor',
-            'observacion', 'obs_adulto'    => 'Observaciones',
-            'atencion', 'atenciones_adulto'=> 'Atenciones',
+            'observacion', 'notas_clinicas' => 'Observaciones',
+            'atencion', 'atenciones' => 'Atenciones',
             'actividad', 'actividades'     => 'Actividades',
             'documento'                    => 'Documentos',
             'familiar'                     => 'Familiares',

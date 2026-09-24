@@ -5,8 +5,9 @@ namespace App\Http\Controllers\Documentos;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Documentos\StoreDocumentoAdultoRequest;
 use App\Models\AdultoMayor;
-use App\Models\DocumentoAdultoMayor;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class AdultoMayorDocumentoController extends Controller
 {
@@ -21,15 +22,20 @@ class AdultoMayorDocumentoController extends Controller
     public function store(StoreDocumentoAdultoRequest $request, AdultoMayor $adulto_mayor)
     {
         $data = $request->validated();
+        $file = $request->file('archivo');
+        $path = $file->store('documentos/residentes', 'local');
 
-        if ($request->hasFile('archivo')) {
-            $file = $request->file('archivo');
-            $path = $file->store('documentos/adultos-mayores', 'local');
-            $data['ruta_archivo'] = $path;
-            $data['estado'] = 'ACTIVO';
-        }
-
-        $adulto_mayor->documentos()->create($data);
+        $adulto_mayor->documentos()->create([
+            'cod_documento' => 'DOC_' . Str::upper(Str::random(10)),
+            'cod_residente' => $adulto_mayor->cod_residente,
+            'tipo_documento' => $data['tipo_documento'],
+            'nombre' => $data['nombre'],
+            'ruta_archivo' => $path,
+            'tipo_archivo' => $file->getMimeType() ?: 'application/octet-stream',
+            'hash_archivo' => hash_file('sha256', Storage::disk('local')->path($path)),
+            'estado' => 'ACTIVO',
+            'observacion' => $data['observaciones'] ?? null,
+        ]);
 
         activity('Adulto Mayor')
             ->performedOn($adulto_mayor)
@@ -61,10 +67,14 @@ class AdultoMayorDocumentoController extends Controller
         $request->validate([
             'nombre' => 'required|string|max:255',
             'tipo_documento' => 'required|string',
-            'observaciones' => 'nullable|string',
+            'observaciones' => 'nullable|string|max:1000',
         ]);
 
-        $doc->update($request->only(['nombre', 'tipo_documento', 'observaciones']));
+        $doc->update([
+            'nombre' => $request->string('nombre')->toString(),
+            'tipo_documento' => $request->string('tipo_documento')->toString(),
+            'observacion' => $request->input('observaciones'),
+        ]);
 
         return redirect()->route('admin.adultos-mayores.documentos.index', $adulto_mayor->cod_am)->with('success', 'Metadatos del documento actualizados.');
     }

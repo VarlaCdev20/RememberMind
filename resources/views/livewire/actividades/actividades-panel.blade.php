@@ -188,7 +188,7 @@
  <tbody class="divide-y divide-[#C7B5A3]/25">
  @foreach($actividades as $actividad)
  @php
- $ne = \App\Models\ActividadAdulto::normalizarEstado($actividad->estado ?? '');
+ $ne = \App\Models\Actividad::normalizarEstado($actividad->estado ?? '');
  @endphp
  <tr wire:key="act-{{ $actividad->cod_act_adul }}" class="group transition hover:bg-fondo-panel">
  <td class="py-3 pr-4 font-bold text-titulo">
@@ -464,7 +464,7 @@
  {{-- ════════════════════════════════════════════════════════════════════════ --}}
  @if($modalDetalle && $detalle)
  @php
- $ne = \App\Models\ActividadAdulto::normalizarEstado($detalle->estado ?? '');
+ $ne = \App\Models\Actividad::normalizarEstado($detalle->estado ?? '');
  @endphp
  <div class="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto px-4 py-8"
  style="background: rgba(47,62,92,0.50)"

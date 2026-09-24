@@ -570,7 +570,7 @@
  <form 
  id="form-documento" 
  method="POST" 
- :action="isEditing ? `{{ route('admin.adultos-mayores.documentos.update', [$idAdulto, 'ID']) }}`.replace('ID', recordData.cod_doc_am) : `{{ route('admin.adultos-mayores.documentos.store', $idAdulto) }}`" 
+ :action="isEditing ? `{{ route('admin.adultos-mayores.documentos.update', [$idAdulto, 'ID']) }}`.replace('ID', recordData.cod_documento) : `{{ route('admin.adultos-mayores.documentos.store', $idAdulto) }}`"
  enctype="multipart/form-data" 
  x-show="modal === 'documento'" 
  class="grid gap-4 md:grid-cols-2" 
@@ -645,7 +645,7 @@
  <label class="mb-1 block text-[10px] font-bold uppercase text-apoyo">Observaciones adicionales (Opcional)</label>
  <textarea 
  name="observaciones" 
- :value="recordData.observaciones || ''" 
+ :value="recordData.observacion || ''"
  :disabled="isViewing" 
  class="w-full rounded-xl border bg-fondo-panel px-4 py-3 text-sm font-bold outline-none focus:border-borde-focus" 
  :class="errors.observaciones ? 'border-rose-500 ring-4 ring-rose-500/10' : 'border-borde-suave'"

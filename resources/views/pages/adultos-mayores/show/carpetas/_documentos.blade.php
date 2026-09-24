@@ -31,7 +31,7 @@
  <div class="flex items-start gap-3 rounded-xl border border-borde-suave bg-fondo-card p-3">
  <i class="ph-fill ph-file-pdf text-2xl text-parrafo"></i>
  <div class="min-w-0">
- <a href="{{ route('admin.adultos-mayores.documentos.archivo', [$idAdulto, $doc->cod_doc_am]) }}" class="block truncate text-xs font-bold text-titulo underline">{{ $doc->nombre }}</a>
+ <a href="{{ route('admin.adultos-mayores.documentos.archivo', [$idAdulto, $doc->cod_documento]) }}" class="block truncate text-xs font-bold text-titulo underline">{{ $doc->nombre }}</a>
  <p class="text-xs font-bold text-apoyo mt-0.5 uppercase tracking-wide">{{ $doc->tipo_documento ?? 'Documento' }} • {{ $doc->created_at->format('d/m/Y') }}</p>
  </div>
  </div>

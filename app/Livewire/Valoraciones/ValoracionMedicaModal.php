@@ -4,6 +4,12 @@ namespace App\Livewire\Valoraciones;
 
 use Livewire\Component;
 use App\Models\AdultoMayor;
+use App\Models\Atencion;
+use App\Models\HistorialEstadoResidente;
+use App\Models\NotaClinica;
+use App\Models\SignoVital;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class ValoracionMedicaModal extends Component
 {
@@ -94,18 +100,55 @@ class ValoracionMedicaModal extends Component
             'detalle_cuidado_especial.required' => 'Si requiere cuidado especial, debe detallarlo.',
         ]);
 
-        \DB::beginTransaction();
+        DB::beginTransaction();
         try {
-            // Actualizar estado a DECISION_ADMISION
-            $estadoModel = \App\Models\EstadoAdulto::firstOrCreate(['estado' => 'DECISION_ADMISION']);
-            
-            $this->adulto->update([
-                'cod_est_adul' => $estadoModel->cod_est_adul
+            $estadoAnterior = $this->adulto->estado;
+            $this->adulto->update(['estado' => 'DECISION_ADMISION']);
+
+            HistorialEstadoResidente::create([
+                'cod_residente' => $this->adulto->cod_residente,
+                'cod_usuario_registro' => auth()->id(),
+                'estado_anterior' => $estadoAnterior,
+                'estado_nuevo' => 'DECISION_ADMISION',
+                'motivo' => 'Valoración médica general completada.',
             ]);
-            
-            // Opcional: Registrar Signos Vitales Iniciales (Si existen)
+
+            $atencion = Atencion::create([
+                'cod_residente' => $this->adulto->cod_residente,
+                'tipo_atencion' => 'VALORACION_MEDICA_ADMISION',
+                'motivo' => 'Valoración médica para decisión de admisión',
+                'fecha_hora' => now(),
+                'estado' => 'FINALIZADA',
+                'observacion' => $this->observacion_medica,
+                'registrado_por' => auth()->id(),
+            ]);
+
+            NotaClinica::create([
+                'cod_nota' => 'NOT_' . strtoupper(Str::random(10)),
+                'cod_atencion' => $atencion->cod_atencion,
+                'cod_residente' => $this->adulto->cod_residente,
+                'cod_personal' => $atencion->cod_personal,
+                'tipo_nota' => 'VALORACION_MEDICA_ADMISION',
+                'contenido' => $this->observacion_medica,
+                'fecha_hora' => now(),
+                'estado' => 'VIGENTE',
+            ]);
+
             if ($this->pa_sistolica && $this->fc && $this->temp) {
-                // Si existe el módulo de salud se puede guardar aquí, por ahora lo enviaremos a properties
+                SignoVital::create([
+                    'cod_residente' => $this->adulto->cod_residente,
+                    'cod_personal' => $atencion->cod_personal,
+                    'cod_atencion' => $atencion->cod_atencion,
+                    'fecha_hora' => now(),
+                    'presion_sistolica' => $this->pa_sistolica,
+                    'presion_diastolica' => $this->pa_diastolica,
+                    'frecuencia_cardiaca' => $this->fc,
+                    'frecuencia_respiratoria' => $this->fr,
+                    'temperatura' => $this->temp,
+                    'saturacion_oxigeno' => $this->sato2,
+                    'estado' => 'VIGENTE',
+                    'observacion' => 'Signos vitales de valoración médica de admisión.',
+                ]);
             }
 
             // Registrar Log
@@ -127,7 +170,7 @@ class ValoracionMedicaModal extends Component
                 ])
                 ->log("Completó valoración médica general.");
 
-            \DB::commit();
+            DB::commit();
 
             $this->dispatch('swal', [
                 'title' => 'Valoración Médica Completada',
@@ -139,7 +182,7 @@ class ValoracionMedicaModal extends Component
             $this->close();
 
         } catch (\Exception $e) {
-            \DB::rollBack();
+            DB::rollBack();
             $this->dispatch('swal', [
                 'title' => 'Error',
                 'text' => 'Ocurrió un error al guardar la valoración: ' . $e->getMessage(),

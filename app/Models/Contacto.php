@@ -7,5 +7,9 @@ class Contacto extends ModeloOperativo {
     protected $table='contactos'; protected $primaryKey='cod_contacto';
     public function usuario(): BelongsTo { return $this->belongsTo(User::class,'cod_usuario','cod_usuario'); }
     public function residentes(): BelongsToMany { return $this->belongsToMany(Residente::class,'residentes_contactos','cod_contacto','cod_residente')->using(ResidenteContacto::class); }
+    public function adultosMayores(): BelongsToMany { return $this->residentes()->withPivot(['parentesco','responsable_principal','contacto_emergencia','autoriza_informacion','autoriza_salida','estado','observacion']); }
     public function vinculos(): HasMany { return $this->hasMany(ResidenteContacto::class,'cod_contacto','cod_contacto'); }
+    public function getCodFamAttribute(): string { return (string) $this->cod_contacto; }
+    public function getParentescoAttribute(): string { return 'FAMILIAR'; }
+    public function getObservacionesAttribute(): ?string { return $this->observacion; }
 }
