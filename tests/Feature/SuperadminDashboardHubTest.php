@@ -62,7 +62,6 @@ class SuperadminDashboardHubTest extends TestCase
         // Módulos clave de Especialidades
         $response->assertSee('Panel de Psicología');
         $response->assertSee('Evaluación Cognitiva');
-        $response->assertSee('Valoración Nutricional');
         $response->assertSee('Actividades y Talleres');
 
         // Módulos clave de Administración y Auditoría

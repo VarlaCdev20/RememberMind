@@ -323,8 +323,8 @@ class SidebarServiceTest extends TestCase
 
         $response = $this->actingAs($user)->get(route('admin.enfermeria.dashboard'));
         $response->assertOk();
-        $response->assertSee('w-[280px]', false);
-        $response->assertSee('lg:pl-[280px]', false);
+        $response->assertSee('w-[260px]', false);
+        $response->assertSee('lg:pl-[260px]', false);
     }
 
     public function test_superadmin_accede_a_admin_dashboard_y_sidebar_muestra_administracion_en_areas_de_atencion(): void

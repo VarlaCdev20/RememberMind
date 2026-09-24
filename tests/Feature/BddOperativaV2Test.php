@@ -51,7 +51,7 @@ class BddOperativaV2Test extends TestCase
         $this->seed(DatabaseSeeder::class);
     }
 
-    public function test_existen_exactamente_las_69_tablas_operativas(): void
+    public function test_existen_exactamente_las_70_tablas_operativas(): void
     {
         $esperadas = $this->tablasOperativas();
         $tecnicas = [
@@ -67,7 +67,7 @@ class BddOperativaV2Test extends TestCase
         sort($esperadas);
         sort($reales);
 
-        $this->assertCount(69, $reales);
+        $this->assertCount(70, $reales);
         $this->assertSame($esperadas, $reales);
         foreach ($esperadas as $tabla) {
             $this->assertTrue(Schema::hasTable($tabla), "Falta la tabla operativa {$tabla}");
@@ -368,7 +368,7 @@ class BddOperativaV2Test extends TestCase
     {
         return [
             'usuarios','personal','areas','turnos','contactos','residentes','habitaciones','camas','tipos_estudio_clinico','medicamentos','instrumentos',
-            'jornadas','preadmisiones','admisiones','historial_estados_residente','documentos','consentimientos','atenciones','notas_clinicas','antecedentes_clinicos','diagnosticos','alergias','seguros_residente','dispositivos_clinicos','signos_vitales','valoraciones_dolor','mediciones_antropometricas','estudios_clinicos','informes_estudio','documentos_clinicos','derivaciones','incidentes','indicaciones_clinicas','controles_cognitivos','registros_conductuales','registros_sueno','registros_ingesta','registros_hidratacion','registros_eliminacion','registros_movilidad','heridas','curaciones_herida','pases_turno','planes_cuidado','ejecuciones_cuidado','prescripciones','administraciones_medicacion','aplicaciones_instrumento','valoraciones_psicologicas','valoraciones_nutricionales','valoraciones_funcionales','seguimientos_pedagogicos','actividades','visitas','alertas','eventos_alerta',
+            'jornadas','preadmisiones','valoraciones_enfermeria_preadmision','admisiones','historial_estados_residente','documentos','consentimientos','atenciones','notas_clinicas','antecedentes_clinicos','diagnosticos','alergias','seguros_residente','dispositivos_clinicos','signos_vitales','valoraciones_dolor','mediciones_antropometricas','estudios_clinicos','informes_estudio','documentos_clinicos','derivaciones','incidentes','indicaciones_clinicas','controles_cognitivos','registros_conductuales','registros_sueno','registros_ingesta','registros_hidratacion','registros_eliminacion','registros_movilidad','heridas','curaciones_herida','pases_turno','planes_cuidado','ejecuciones_cuidado','prescripciones','administraciones_medicacion','aplicaciones_instrumento','valoraciones_psicologicas','valoraciones_nutricionales','valoraciones_funcionales','seguimientos_pedagogicos','actividades','visitas','alertas','eventos_alerta',
             'asignaciones_personal','residentes_contactos','ocupaciones_cama','resultados_estudio','asignaciones_residente_jornada','respuestas_instrumento','participantes_actividad',
             'componentes_estudio','intervenciones_cuidado','programaciones_cuidado','horarios_prescripcion','preguntas_instrumento','opciones_pregunta',
         ];
