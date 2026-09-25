@@ -1,0 +1,51 @@
+/* ============================================================
+   REMEMBERMIND DESIGN SYSTEM — COMPONENTS / EMPTY STATES
+   Estados vacíos cálidos, humanos y tranquilizadores.
+   ============================================================ */
+
+.rm-empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: var(--rm-space-8) var(--rm-space-5);
+    background-color: var(--rm-surface);
+    border: 1px dashed var(--rm-border-hover);
+    border-radius: var(--rm-radius-card);
+}
+
+.rm-empty-state-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: var(--rm-radius-card);
+    background-color: var(--rm-accent-soft);
+    color: var(--rm-accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    margin-bottom: var(--rm-space-3);
+}
+
+.rm-empty-state-title {
+    font-family: var(--rm-font-title);
+    font-size: var(--rm-font-card-title);
+    font-weight: var(--rm-font-weight-bold);
+    color: var(--rm-text-title);
+    margin: 0 0 var(--rm-space-1) 0;
+}
+
+.rm-empty-state-desc {
+    font-size: var(--rm-font-body);
+    color: var(--rm-text-muted);
+    max-width: 420px;
+    margin: 0 0 var(--rm-space-4) 0;
+    line-height: var(--rm-line-height-normal);
+}
+
+.rm-empty-state-action {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--rm-space-2);
+}

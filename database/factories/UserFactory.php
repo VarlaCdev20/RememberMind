@@ -2,71 +2,85 @@
 
 namespace Database\Factories;
 
-use App\Models\Team;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
-use Laravel\Jetstream\Features;
 
-/**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\User>
- */
+/** @extends Factory<User> */
 class UserFactory extends Factory
 {
-    /**
-     * The current password being used by the factory.
-     */
+    protected $model = User::class;
     protected static ?string $password;
+    protected static array $pendingPersonalAttrs = [];
 
-    /**
-     * Define the model's default state.
-     *
-     * @return array<string, mixed>
-     */
     public function definition(): array
     {
         return [
-            'name' => fake()->name(),
-            'email' => fake()->unique()->safeEmail(),
-            'email_verified_at' => now(),
-            'password' => static::$password ??= Hash::make('password'),
-            'two_factor_secret' => null,
-            'two_factor_recovery_codes' => null,
-            'remember_token' => Str::random(10),
-            'profile_photo_path' => null,
-            'current_team_id' => null,
+            'cod_usuario' => 'USU_'.fake()->unique()->numerify('########'),
+            'correo' => fake()->unique()->safeEmail(),
+            'contrasena' => static::$password ??= Hash::make('password'),
+            'foto' => null,
+            'estado' => 'ACTIVO',
         ];
     }
 
-    /**
-     * Indicate that the model's email address should be unverified.
-     */
-    public function unverified(): static
+    public function newModel(array $attributes = [])
     {
-        return $this->state(fn (array $attributes) => [
-            'email_verified_at' => null,
-        ]);
+        $hasExplicitName = isset($attributes['nombres']) || isset($attributes['ap_paterno']) || isset($attributes['apellido_paterno']);
+
+        $personalAttrs = [
+            'nombres' => $attributes['nombres'] ?? fake()->firstName(),
+            'apellido_paterno' => $attributes['apellido_paterno'] ?? $attributes['ap_paterno'] ?? fake()->lastName(),
+            'apellido_materno' => $attributes['apellido_materno'] ?? $attributes['ap_materno'] ?? fake()->lastName(),
+            'estado' => $attributes['estado_personal'] ?? 'ACTIVO',
+            '_explicit' => $hasExplicitName,
+        ];
+
+        unset(
+            $attributes['nombres'],
+            $attributes['ap_paterno'],
+            $attributes['apellido_paterno'],
+            $attributes['ap_materno'],
+            $attributes['apellido_materno'],
+            $attributes['estado_personal'],
+            $attributes['_factory_personal_attrs']
+        );
+
+        $model = parent::newModel($attributes);
+        static::$pendingPersonalAttrs[spl_object_id($model)] = $personalAttrs;
+
+        return $model;
     }
 
-    /**
-     * Indicate that the user should have a personal team.
-     */
-    public function withPersonalTeam(?callable $callback = null): static
+    public function configure(): static
     {
-        if (! Features::hasTeamFeatures()) {
-            return $this->state([]);
-        }
+        return $this->afterCreating(function (User $user) {
+            $attrs = static::$pendingPersonalAttrs[spl_object_id($user)] ?? null;
+            unset(static::$pendingPersonalAttrs[spl_object_id($user)]);
 
-        return $this->has(
-            Team::factory()
-                ->state(fn (array $attributes, User $user) => [
-                    'name' => $user->name.'\'s Team',
-                    'user_id' => $user->id,
-                    'personal_team' => true,
-                ])
-                ->when(is_callable($callback), $callback),
-            'ownedTeams'
-        );
+            // Auto-crear Personal únicamente si se pasaron explícitamente atributos de nombre y no existe Personal
+            if ($attrs && !empty($attrs['_explicit']) && !\App\Models\Personal::where('cod_usuario', $user->cod_usuario)->exists()) {
+                $digits = preg_replace('/[^0-9]/', '', (string)$user->cod_usuario);
+                $codPersonal = 'PER_' . str_pad(substr($digits, -8) ?: fake()->numerify('########'), 8, '0', STR_PAD_LEFT);
+
+                \App\Models\Personal::create([
+                    'cod_personal' => $codPersonal,
+                    'cod_usuario' => $user->cod_usuario,
+                    'nombres' => $attrs['nombres'],
+                    'apellido_paterno' => $attrs['apellido_paterno'],
+                    'apellido_materno' => $attrs['apellido_materno'],
+                    'numero_documento' => fake()->unique()->numerify('########'),
+                    'profesion' => 'ENFERMERIA',
+                    'estado' => $attrs['estado'] ?? 'ACTIVO',
+                ]);
+
+                $user->unsetRelation('personal');
+            }
+        });
+    }
+
+    public function unverified(): static
+    {
+        return $this->state([]);
     }
 }

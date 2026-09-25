@@ -1,0 +1,1 @@
+.welcome-evolucion { background: var(--welcome-card); border: 1px solid var(--welcome-card-border); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); } .welcome-evolucion-inner { background: var(--welcome-card-strong); border: 1px solid var(--welcome-card-border); }

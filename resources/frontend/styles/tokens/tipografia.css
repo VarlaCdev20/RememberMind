@@ -1,0 +1,231 @@
+/* ============================================================
+   REMEMBERMIND / CASA AMANDITA
+   FUENTES DEL SISTEMA
+   ------------------------------------------------------------
+   Archivo: resources/css/paleta-colores/fuentes.css
+
+   Objetivo:
+   Centralizar la carga de tipografías y definir variables
+   tipográficas reutilizables para todo el sistema.
+
+   Tipografías:
+   - Inter: lectura, formularios, tablas, textos administrativos.
+   - Outfit: títulos, encabezados, métricas y elementos destacados.
+   ============================================================ */
+
+
+/* ============================================================
+   1. IMPORTACIÓN DE FUENTES
+   ============================================================ */
+
+/* Inter — fuente principal para interfaz administrativa */
+
+/* Outfit — fuente de apoyo para títulos y elementos visuales */
+
+
+/* ============================================================
+   2. VARIABLES TIPOGRÁFICAS
+   ============================================================ */
+
+@import '../../assets/fuentes.css';
+
+:root {
+    /* Familias tipográficas */
+    --font-principal: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --font-titulos: 'Outfit', 'Inter', system-ui, sans-serif;
+    --font-sistema: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+    /* Pesos tipográficos */
+    --font-light: 300;
+    --font-regular: 400;
+    --font-medium: 500;
+    --font-semibold: 600;
+    --font-bold: 700;
+    --font-extrabold: 800;
+    --font-black: 900;
+
+    /* Tamaños base */
+    --text-xs: 0.75rem;       /* 12px */
+    --text-sm: 0.875rem;      /* 14px */
+    --text-base: 1rem;        /* 16px */
+    --text-lg: 1.125rem;      /* 18px */
+    --text-xl: 1.25rem;       /* 20px */
+    --text-2xl: 1.5rem;       /* 24px */
+    --text-3xl: 1.875rem;     /* 30px */
+    --text-4xl: 2.25rem;      /* 36px */
+    --text-5xl: 3rem;         /* 48px */
+
+    /* Tamaños funcionales del sistema */
+    --text-label: 0.75rem;
+    --text-table-header: 0.72rem;
+    --text-table-cell: 0.875rem;
+    --text-badge: 0.72rem;
+    --text-button: 0.75rem;
+    --text-sidebar: 0.82rem;
+    --text-caption: 0.75rem;
+
+    /* Interlineado */
+    --leading-tight: 1.15;
+    --leading-title: 1.2;
+    --leading-normal: 1.5;
+    --leading-relaxed: 1.65;
+
+    /* Tracking */
+    --tracking-tight: -0.025em;
+    --tracking-normal: 0;
+    --tracking-wide: 0.025em;
+    --tracking-wider: 0.045em;
+    --tracking-widest: 0.065em;
+
+    /* Jerarquía tipográfica institucional */
+    --font-page-title: var(--font-titulos);
+    --font-section-title: var(--font-titulos);
+    --font-card-title: var(--font-titulos);
+    --font-body: var(--font-principal);
+    --font-ui: var(--font-principal);
+}
+
+
+/* ============================================================
+   3. BASE TIPOGRÁFICA GLOBAL
+   ============================================================ */
+
+html {
+    font-family: var(--font-principal);
+    font-size: 16px;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+    font-family: var(--font-body);
+    font-weight: var(--font-regular);
+    line-height: var(--leading-normal);
+}
+
+button,
+input,
+textarea,
+select {
+    font-family: var(--font-ui);
+}
+
+
+/* ============================================================
+   4. CLASES TIPOGRÁFICAS REUTILIZABLES
+   ------------------------------------------------------------
+   Estas clases son opcionales, pero ayudan a mantener coherencia
+   visual sin repetir utilidades Tailwind en exceso.
+   ============================================================ */
+
+.rm-font-title {
+    font-family: var(--font-titulos);
+}
+
+.rm-font-body {
+    font-family: var(--font-principal);
+}
+
+.rm-title-page {
+    font-family: var(--font-page-title);
+    font-size: clamp(1.75rem, 2.5vw, 2.75rem);
+    font-weight: var(--font-extrabold);
+    line-height: var(--leading-title);
+    letter-spacing: var(--tracking-tight);
+}
+
+.rm-title-section {
+    font-family: var(--font-section-title);
+    font-size: clamp(1.25rem, 1.7vw, 1.75rem);
+    font-weight: var(--font-extrabold);
+    line-height: var(--leading-title);
+    letter-spacing: var(--tracking-tight);
+}
+
+.rm-title-card {
+    font-family: var(--font-card-title);
+    font-size: var(--text-lg);
+    font-weight: var(--font-bold);
+    line-height: var(--leading-tight);
+}
+
+.rm-text-body {
+    font-family: var(--font-principal);
+    font-size: var(--text-sm);
+    font-weight: var(--font-regular);
+    line-height: var(--leading-normal);
+}
+
+.rm-text-muted {
+    font-family: var(--font-principal);
+    font-size: var(--text-sm);
+    font-weight: var(--font-medium);
+    line-height: var(--leading-normal);
+}
+
+.rm-text-label {
+    font-family: var(--font-principal);
+    font-size: var(--text-label);
+    font-weight: var(--font-bold);
+    line-height: var(--leading-tight);
+    letter-spacing: var(--tracking-wider);
+    text-transform: uppercase;
+}
+
+.rm-text-button {
+    font-family: var(--font-principal);
+    font-size: var(--text-button);
+    font-weight: var(--font-extrabold);
+    line-height: var(--leading-tight);
+    letter-spacing: var(--tracking-wider);
+    text-transform: uppercase;
+}
+
+.rm-text-badge {
+    font-family: var(--font-principal);
+    font-size: var(--text-badge);
+    font-weight: var(--font-bold);
+    line-height: var(--leading-tight);
+    letter-spacing: var(--tracking-wider);
+    text-transform: uppercase;
+}
+
+.rm-text-table-header {
+    font-family: var(--font-principal);
+    font-size: var(--text-table-header);
+    font-weight: var(--font-bold);
+    line-height: var(--leading-tight);
+    letter-spacing: var(--tracking-widest);
+    text-transform: uppercase;
+}
+
+.rm-text-caption {
+    font-family: var(--font-principal);
+    font-size: var(--text-caption);
+    font-weight: var(--font-medium);
+    line-height: var(--leading-normal);
+}
+
+
+/* ============================================================
+   5. RESPONSIVE TIPOGRÁFICO
+   ============================================================ */
+
+@media (max-width: 640px) {
+    :root {
+        --text-base: 0.95rem;
+        --text-lg: 1.05rem;
+        --text-xl: 1.15rem;
+        --text-2xl: 1.35rem;
+        --text-3xl: 1.65rem;
+    }
+
+    .rm-title-page {
+        font-size: clamp(1.55rem, 7vw, 2.1rem);
+    }
+
+    .rm-title-section {
+        font-size: clamp(1.15rem, 5vw, 1.45rem);
+    }
+}

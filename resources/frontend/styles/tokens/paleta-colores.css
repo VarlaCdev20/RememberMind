@@ -1,0 +1,183 @@
+:root {
+    /* ============================================================
+       REMEMBERMIND / CASA AMANDITA
+       PALETA BASE INSTITUCIONAL
+       Estilo: cálido, limpio, geriátrico, administrativo y acogedor
+       ============================================================ */
+
+    /* Marca principal */
+    --rm-terracota: #A35A44;
+    --rm-terracota-hover: #8D4B37;
+    --rm-salmon: #D6AE86;
+    --rm-salmon-soft: #F3CFC2;
+    --rm-naranja: #D2A45E;
+    --rm-naranja-dark: #C87C35;
+    --rm-durazno: #F2B49F;
+    --rm-rosa-crema: #F4D1C4;
+
+    /* Azul institucional */
+    --rm-azul-profundo: #304060;
+    --rm-azul-profundo-hover: #24324D;
+    --rm-azul-clinico: #90AFCB;
+    --rm-azul-tecnico: #5B7C9D;
+
+    /* Verde geriátrico / salud */
+    --rm-verde-salud: #63775B;
+    --rm-verde-salud-hover: #326646;
+    --rm-verde-suave: #8DA280;
+    --rm-verde-oliva: #5F7358;
+    --rm-verde-menta: #DCE8DD;
+    --rm-fondo-salud: #DCE8DD;
+
+    /* Cognitivo */
+    --rm-morado-cognitivo: #9B8AC7;
+    --rm-morado-cognitivo-dark: #7A68B0;
+    --rm-morado-tecnico: #7B6FB3;
+    --rm-fondo-cognitivo: #E7E0F0;
+
+    /* Neutros cálidos */
+    --rm-neutro-950: #1F2D45;
+    --rm-neutro-900: #293A59;
+    --rm-neutro-800: #374562;
+    --rm-neutro-700: #5B6273;
+    --rm-neutro-600: #737785;
+    --rm-neutro-500: #928C84;
+    --rm-neutro-400: #B8A99B;
+    --rm-neutro-300: #CDBEAF;
+    --rm-neutro-200: #DDD2C6;
+    --rm-neutro-100: #E9E0D7;
+    --rm-neutro-50: #F4EEE7;
+
+    --rm-neutro-borde-alt: #C7B8A8;
+    --rm-neutro-card-alt: #EEE6DD;
+    --rm-gris-calido: #E6DED6;
+    --rm-fondo-calido: #E9E0D7;
+
+    /* Textos */
+    --rm-texto-principal: #304060;
+    --rm-texto-secundario: #677084;
+    --rm-texto-suave: #737785;
+    --rm-texto-muted: #8A857F;
+    --rm-texto-invertido: #FFF8F1;
+
+    /* Fondos principales */
+    --rm-fondo-body: #E9DFD3;
+    --rm-fondo-main: #E9DFD3;
+    --rm-fondo-layout: #E9DFD3;
+
+    --rm-fondo-sidebar: #E9DFD3;
+    --rm-fondo-sidebar-header: #F4EEE7;
+    --rm-fondo-navbar: #E9E0D7;
+
+    --rm-fondo-panel: #F0E8DE;
+    --rm-fondo-panel-alt: #E0D5C9;
+    --rm-fondo-card: #F0E8DE;
+    --rm-fondo-card-soft: #F4EEE7;
+    --rm-fondo-card-warm: #E0D5C9;
+    --rm-fondo-input: #F4EEE7;
+    --rm-fondo-tabla: #F4EEE7;
+
+    /* Estados */
+    --rm-success-bg: #DCE8DD;
+    --rm-success: #3F7D5A;
+    --rm-success-border: #AFCBB8;
+
+    --rm-warning-bg: #F6E4C8;
+    --rm-warning: #C87C35;
+    --rm-warning-border: #E9C88F;
+
+    --rm-danger-bg: #F4D1C4;
+    --rm-danger: #C9654E;
+    --rm-danger-border: #E7A08E;
+
+    --rm-info-bg: #DDE8EF;
+    --rm-info: #5B7C9D;
+    --rm-info-border: #B8CBD8;
+
+    /* Botones */
+    --rm-btn-primary: #304060;
+    --rm-btn-primary-hover: #24324D;
+    --rm-btn-primary-text: #FFF8F1;
+
+    --rm-btn-accent: #A35A44;
+    --rm-btn-accent-hover: #8D4B37;
+    --rm-btn-accent-text: #FFF8F1;
+
+    --rm-btn-secondary: #F0E8DE;
+    --rm-btn-secondary-hover: #E0D5C9;
+    --rm-btn-secondary-text: #304060;
+
+    --rm-btn-success: #3F7D5A;
+    --rm-btn-success-hover: #326646;
+    --rm-btn-success-text: #FFF8F1;
+
+    /* Bordes */
+    --rm-borde-suave: rgba(91, 98, 115, 0.14);
+    --rm-borde-card: rgba(91, 98, 115, 0.16);
+    --rm-borde-panel: rgba(91, 98, 115, 0.13);
+    --rm-borde-input: rgba(91, 98, 115, 0.22);
+    --rm-borde-focus: rgba(217, 121, 95, 0.52);
+
+    /* Sombras */
+    --rm-shadow-xs: 0 2px 8px rgba(41, 58, 89, 0.05);
+    --rm-shadow-sm: 0 8px 20px rgba(41, 58, 89, 0.07);
+    --rm-shadow-md: 0 14px 34px rgba(41, 58, 89, 0.10);
+    --rm-shadow-lg: 0 22px 55px rgba(41, 58, 89, 0.14);
+
+    --rm-sombra-card: 0 1px 3px rgba(41, 58, 89, 0.08);
+    --rm-sombra-card-hover: 0 8px 22px rgba(41, 58, 89, 0.12);
+    --rm-sombra-panel: 0 16px 38px rgba(41, 58, 89, 0.10);
+    --rm-sombra-sidebar: 16px 0 45px rgba(41, 58, 89, 0.10);
+    --rm-sombra-modal: 0 24px 70px rgba(41, 58, 89, 0.22);
+
+    --glow-acento: 0 0 0 rgba(0, 0, 0, 0);
+    --glow-acento-hover: 0 0 0 rgba(0, 0, 0, 0);
+
+    /* Radios */
+    --rm-radius-sm: 0.75rem;
+    --rm-radius-md: 1rem;
+    --rm-radius-lg: 1.35rem;
+    --rm-radius-xl: 1.75rem;
+
+    /* Compatibilidad */
+    --rm-fondo-alerta-terracota: rgba(217, 121, 95, 0.12);
+    --rm-fondo-alerta-verde: rgba(63, 125, 90, 0.12);
+    --rm-fondo-error-salud: rgba(201, 101, 78, 0.12);
+    --rm-fondo-exito-salud: rgba(63, 125, 90, 0.14);
+    --rm-fondo-recovery: rgba(63, 125, 90, 0.14);
+
+    --rm-textura-radial-terracota: rgba(217, 121, 95, 0.08);
+    --rm-textura-radial-salud: rgba(63, 125, 90, 0.06);
+    --rm-textura-radial-cognitivo: rgba(155, 138, 199, 0.06);
+    --rm-textura-radial-azul: rgba(41, 58, 89, 0.05);
+
+    /* ============================================================
+       SISTEMA VISUAL CONSOLIDADO (REMEMBERMIND)
+       Valores cálidos, con alto contraste para evitar fondos blancos/lavados.
+       ============================================================ */
+    --rm-enf-bg: #F4ECE3;
+    --rm-enf-surface: #FBF7F2;
+    --rm-enf-surface-hover: #F6EFE7;
+    --rm-enf-surface-contrast: #F5EEE5;
+    --rm-enf-border: #E3D6C8;
+    --rm-enf-border-hover: #D5C4B1;
+    --rm-enf-border-focus: #E58C6C;
+    --rm-enf-text-main: #344563;
+    --rm-enf-text-body: #4A5A78;
+    --rm-enf-text-muted: #6F7B8F;
+    --rm-enf-coral: #E58C6C;
+    --rm-enf-coral-hover: #D97A58;
+    --rm-enf-coral-light: rgba(229, 140, 108, 0.12);
+    --rm-enf-positive: #6F9D7B;
+    --rm-enf-positive-light: #F1F7F3;
+    --rm-enf-positive-border: rgba(111, 157, 123, 0.35);
+    --rm-enf-warning: #C99A4B;
+    --rm-enf-warning-light: #FDF9F2;
+    --rm-enf-warning-border: rgba(201, 154, 75, 0.35);
+    --rm-enf-risk: #C8645A;
+    --rm-enf-risk-light: #FDF4F3;
+    --rm-enf-risk-border: rgba(200, 100, 90, 0.35);
+    --rm-enf-info: #778EAD;
+    --rm-enf-info-light: #F3F6FA;
+    --rm-enf-info-border: rgba(119, 142, 173, 0.35);
+}

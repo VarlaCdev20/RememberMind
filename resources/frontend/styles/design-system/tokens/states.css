@@ -1,0 +1,45 @@
+/* ============================================================
+   REMEMBERMIND DESIGN SYSTEM — TOKENS / STATES
+   Semántica de estados visuales.
+   PRINCIPIO ARQUITECTÓNICO:
+   El Design System NO define ni interpreta reglas clínicas.
+   El dominio clínico determina la severidad (ej. severity = danger);
+   el Design System únicamente representa visualmente el estado.
+   Todo estado combina icono + texto + color (no depender solo de color).
+   ============================================================ */
+
+:root {
+    /* Estados Semánticos de Interacción */
+    --rm-state-hover-opacity: 0.88;
+    --rm-state-active-opacity: 0.95;
+    --rm-state-disabled-opacity: 0.55;
+
+    /* Estado Success / Normal */
+    --rm-state-success-text: #2F593B;
+    --rm-state-success-bg: var(--rm-success-soft);
+    --rm-state-success-border: rgba(111, 157, 123, 0.40);
+
+    /* Estado Warning / Observación */
+    --rm-state-warning-text: #7B571F;
+    --rm-state-warning-bg: var(--rm-warning-soft);
+    --rm-state-warning-border: rgba(201, 154, 75, 0.40);
+
+    /* Estado Danger / Riesgo */
+    --rm-state-danger-text: #8C3229;
+    --rm-state-danger-bg: var(--rm-danger-soft);
+    --rm-state-danger-border: rgba(200, 100, 90, 0.40);
+
+    /* Estado Info / Informativo */
+    --rm-state-info-text: #2E4562;
+    --rm-state-info-bg: var(--rm-info-soft);
+    --rm-state-info-border: rgba(119, 142, 173, 0.40);
+
+    /* Estado Neutral */
+    --rm-state-neutral-text: var(--rm-text-muted);
+    --rm-state-neutral-bg: var(--rm-surface-alt);
+    --rm-state-neutral-border: var(--rm-border);
+
+    /* Fondos de Fila para Tablas Clínicas (consumidos en patterns) */
+    --rm-row-danger-bg: rgba(167, 68, 59, 0.05);
+    --rm-row-warning-bg: rgba(201, 154, 75, 0.05);
+}

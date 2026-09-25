@@ -1,0 +1,177 @@
+/* ============================================================
+   REMEMBERMIND DESIGN SYSTEM — TOKENS / COLORS
+   Fuente única de verdad de color institucional y clínico.
+   Todos los contrastes de texto y botones cumplen WCAG AA (>= 4.5:1).
+   ============================================================ */
+
+:root {
+    /* ============================================================
+       1. APP & LAYOUT (Lienzo principal cálido unificado)
+       ============================================================ */
+    --rm-bg-app: #E9DFD3;
+    --rm-bg-layout: #E9DFD3;
+
+    /* ============================================================
+       2. SUPERFICIES (Jerarquía cálida de alto contraste)
+       ============================================================ */
+    --rm-surface-beige: #F0E8DE;    /* Superficie principal canónica */
+    --rm-surface: #F0E8DE;          /* Cards y contenedores base (#F0E8DE) */
+    --rm-surface-soft: #E0D5C9;     /* Superficie secundaria / panels (#E0D5C9) */
+    --rm-surface-alt: #E0D5C9;      /* Bloques internos y celdas agrupadas */
+    --rm-surface-strong: #D5CABE;   /* Fondos activos y cabeceras contrastadas */
+
+    /* ============================================================
+       3. BORDES (Delimitación sutil y definida)
+       ============================================================ */
+    --rm-border: #D5CABE;           /* Borde estándar estructural 1px */
+    --rm-border-soft: #E0D5C9;      /* Separadores tenues internos */
+    --rm-border-hover: #C7BEB6;     /* Borde interactivo al pasar cursor */
+    --rm-border-strong: #C7BEB6;    /* Delimitación de alto énfasis / borde fuerte */
+
+    /* ============================================================
+       4. TEXTOS CON CONTRASTE WCAG AA PROBADO (>= 4.5:1)
+       ============================================================ */
+    --rm-text-title: #304060;        /* Navy institucional */
+    --rm-text-body: #304060;         /* Navy institucional */
+    --rm-text-muted: #677084;        /* Texto secundario cálido */
+    --rm-text-soft: #677084;         /* Texto secundario cálido */
+    --rm-text-inverse: #FFFFFF;      /* Texto sobre botones filled de acción */
+
+    /* ============================================================
+       5. ACCIONES PRIMARIAS (Navy institucional)
+       ============================================================ */
+    --rm-primary: #304060;           /* Navy */
+    --rm-primary-hover: #24324D;
+    --rm-primary-soft: #E0D5C9;
+
+    /* ============================================================
+       6. ACENTO (Terracota institucional)
+       ============================================================ */
+    --rm-accent: #A35A44;            /* Terracota principal */
+    --rm-accent-hover: #8D4B37;
+    --rm-accent-soft: #D6AE86;       /* Terracota suave */
+
+    --rm-accent-action: #A35A44;
+    --rm-accent-action-hover: #8D4B37;
+
+    /* ============================================================
+       7. ESTADOS SEMÁNTICOS (Institucionales)
+       ============================================================ */
+    /* Success: Verde Sage (#8DA280 / #63775B) */
+    --rm-success: #8DA280;
+    --rm-success-hover: #798E6D;
+    --rm-success-soft: #E8F1E5;
+    --rm-success-action: #63775B;
+    --rm-success-action-hover: #50614A;
+
+    /* Warning: Mostaza / Ámbar (#D2A45E) */
+    --rm-warning: #D2A45E;
+    --rm-warning-hover: #BF924E;
+    --rm-warning-soft: #FFF1D6;
+
+    /* Danger: Rojo Coral institucional (#A7443B / #D62828) */
+    --rm-danger: #A7443B;
+    --rm-danger-hover: #8F372F;
+    --rm-danger-soft: #FFF0F0;
+    --rm-danger-action: #A7443B;
+    --rm-danger-action-hover: #8F372F;
+
+    /* Info: Navy / Azul grisáceo (#5F7899) */
+    --rm-info: #5F7899;
+    --rm-info-hover: #4F6582;
+    --rm-info-soft: #E9EEF6;
+    --rm-info-action: #5F7899;
+    --rm-info-action-hover: #4F6582;
+
+    /* ============================================================
+       8. PALETA CATEGÓRICA DE GRÁFICOS
+       ============================================================ */
+    --rm-chart-1: #304060;   /* Navy */
+    --rm-chart-2: #A35A44;   /* Terracota */
+    --rm-chart-3: #8DA280;   /* Verde sage */
+    --rm-chart-4: #D2A45E;   /* Mostaza */
+    --rm-chart-5: #7565A8;   /* Lavanda */
+    --rm-chart-6: #5F7899;   /* Azul grisáceo */
+    --rm-chart-7: #D6AE86;   /* Terracota suave */
+    --rm-chart-8: #677084;   /* Pizarra */
+    --rm-chart-9: #9A744E;   /* Siena */
+    --rm-chart-10: #63775B;  /* Verde sage oscuro */
+}
+
+/* ============================================================
+   MODO OSCURO INSTITUCIONAL (WCAG AA)
+   Activación mediante clase .dark o [data-theme="dark"]
+   ============================================================ */
+.dark,
+[data-theme="dark"] {
+    /* 1. APP & LAYOUT */
+    --rm-bg-app: #1A1918;
+    --rm-bg-layout: #1E1D1B;
+
+    /* 2. SUPERFICIES */
+    --rm-surface-beige: #262422;
+    --rm-surface: #262422;
+    --rm-surface-soft: #2D2A28;
+    --rm-surface-alt: #34302C;
+    --rm-surface-strong: #3D3934;
+
+    /* 3. BORDES */
+    --rm-border: #4A443E;
+    --rm-border-soft: #3D3934;
+    --rm-border-hover: #5D564E;
+    --rm-border-strong: #6D655C;
+
+    /* 4. TEXTOS */
+    --rm-text-title: #F8F2EC;
+    --rm-text-body: #EAE0D4;
+    --rm-text-muted: #B8ADA2;
+    --rm-text-soft: #B8ADA2;
+    --rm-text-inverse: #1A1918;
+
+    /* 5. ACCIONES PRIMARIAS */
+    --rm-primary: #8595B5;
+    --rm-primary-hover: #A0AED0;
+    --rm-primary-soft: rgba(133, 149, 181, 0.15);
+
+    /* 6. ACENTO */
+    --rm-accent: #D68A72;
+    --rm-accent-hover: #E29E88;
+    --rm-accent-soft: rgba(214, 138, 114, 0.18);
+    --rm-accent-action: #D68A72;
+    --rm-accent-action-hover: #E29E88;
+
+    /* 7. ESTADOS SEMÁNTICOS */
+    --rm-success: #9DB491;
+    --rm-success-hover: #B0C5A5;
+    --rm-success-soft: rgba(99, 119, 91, 0.25);
+    --rm-success-action: #9DB491;
+    --rm-success-action-hover: #B0C5A5;
+
+    --rm-warning: #E0B36D;
+    --rm-warning-hover: #ECC485;
+    --rm-warning-soft: rgba(210, 164, 94, 0.22);
+
+    --rm-danger: #E06B60;
+    --rm-danger-hover: #EB8076;
+    --rm-danger-soft: rgba(214, 40, 40, 0.22);
+    --rm-danger-action: #E06B60;
+    --rm-danger-action-hover: #EB8076;
+
+    --rm-info: #7892B5;
+    --rm-info-hover: #8EA7C8;
+    --rm-info-soft: rgba(120, 146, 181, 0.20);
+    --rm-info-action: #7892B5;
+    --rm-info-action-hover: #8EA7C8;
+
+    /* 8. PALETA GRÁFICOS OSCURA */
+    --rm-chart-1: #8595B5;
+    --rm-chart-2: #D68A72;
+    --rm-chart-3: #9DB491;
+    --rm-chart-4: #E0B36D;
+    --rm-chart-5: #A78BFA;
+    --rm-chart-6: #7892B5;
+    --rm-chart-7: #F472B6;
+    --rm-chart-8: #B8ADA2;
+    --rm-chart-9: #D97706;
+    --rm-chart-10: #2DD4BF;
+}

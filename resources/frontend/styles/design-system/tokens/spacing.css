@@ -1,0 +1,31 @@
+/* ============================================================
+   REMEMBERMIND DESIGN SYSTEM — TOKENS / SPACING
+   Escala geométrica compacta y estricta para densidad operativa.
+   ============================================================ */
+
+:root {
+    /* Escala base */
+    --rm-space-1: 4px;
+    --rm-space-2: 8px;
+    --rm-space-3: 12px;
+    --rm-space-4: 16px;
+    --rm-space-5: 20px;
+    --rm-space-6: 24px;
+    --rm-space-8: 32px;
+
+    /* Tokens Canónicos de Densidad Compacta / Operativa */
+    --rm-page-gap: 16px;
+    --rm-section-gap: 14px;
+    --rm-card-padding: 14px;
+    --rm-card-padding-compact: 12px;
+
+    --rm-control-height: 38px;
+    --rm-control-height-sm: 34px;
+
+    --rm-table-row-height: 48px;
+    --rm-table-header-height: 42px;
+
+    --rm-chart-height-sm: 240px;
+    --rm-chart-height-md: 280px;
+    --rm-chart-height-lg: 360px;
+}

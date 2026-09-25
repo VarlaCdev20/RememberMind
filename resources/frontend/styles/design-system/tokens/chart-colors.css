@@ -1,0 +1,54 @@
+﻿/* ============================================================
+   REMEMBERMIND DESIGN SYSTEM - TOKENS / CHART-COLORS
+   Variables semanticas, reticulas, ejes y transparencias para Chart.js.
+   Consume los 10 colores categoricos de colors.css (no duplicados).
+   ============================================================ */
+
+:root {
+    --rm-chart-danger:       var(--rm-danger);
+    --rm-chart-danger-soft:  var(--rm-danger-soft);
+    --rm-chart-warning:      var(--rm-warning);
+    --rm-chart-warning-soft: var(--rm-warning-soft);
+    --rm-chart-success:      var(--rm-success);
+    --rm-chart-success-soft: var(--rm-success-soft);
+    --rm-chart-info:         var(--rm-info);
+    --rm-chart-info-soft:    var(--rm-info-soft);
+    --rm-chart-neutral:      var(--rm-text-muted);
+
+    --rm-chart-warning-high: #E67A22;
+
+    --rm-chart-fill-strong:  0.38;
+    --rm-chart-fill-medium:  0.18;
+    --rm-chart-fill-soft:    0.02;
+    --rm-chart-fill-donut:   0.88;
+    --rm-chart-fill-radar:   0.17;
+
+    --rm-chart-grid:           rgba(224, 212, 198, 0.35);
+    --rm-chart-grid-strong:    rgba(200, 188, 173, 0.50);
+    --rm-chart-axis-text:      #64748B;
+    --rm-chart-axis-title:     #1E293B;
+
+    --rm-chart-tooltip-bg:     #1E293B;
+    --rm-chart-tooltip-text:   #F8FAFC;
+    --rm-chart-tooltip-border: rgba(226, 232, 240, 0.20);
+}
+
+.dark,
+[data-theme="dark"] {
+    --rm-chart-warning-high: #FB923C;
+
+    --rm-chart-fill-strong:  0.32;
+    --rm-chart-fill-medium:  0.14;
+    --rm-chart-fill-soft:    0.02;
+    --rm-chart-fill-donut:   0.85;
+    --rm-chart-fill-radar:   0.15;
+
+    --rm-chart-grid:           rgba(255, 255, 255, 0.06);
+    --rm-chart-grid-strong:    rgba(255, 255, 255, 0.10);
+    --rm-chart-axis-text:      #94A3B8;
+    --rm-chart-axis-title:     #F8FAFC;
+
+    --rm-chart-tooltip-bg:     #0F172A;
+    --rm-chart-tooltip-text:   #F1F5F9;
+    --rm-chart-tooltip-border: rgba(255, 255, 255, 0.12);
+}

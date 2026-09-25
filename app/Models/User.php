@@ -2,190 +2,247 @@
 
 namespace App\Models;
 
-use Illuminate\Foundation\Auth\User as Authenticatable;
+use App\Notifications\ResetPasswordNotification;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Laravel\Jetstream\HasProfilePhoto;
 use Laravel\Sanctum\HasApiTokens;
-use Spatie\Permission\Traits\HasRoles;
-use Spatie\Activitylog\Traits\LogsActivity;
+use Laravel\Jetstream\HasProfilePhoto;
 use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, HasProfilePhoto, Notifiable, HasRoles, LogsActivity;
+    use HasApiTokens, HasFactory, HasProfilePhoto, HasRoles, LogsActivity, Notifiable;
 
-    protected $table = 'users';
-    protected $primaryKey = 'cod_usu';
-
-    public $incrementing = false;
-    protected $keyType = 'string';
-
-    protected $fillable = [
-        'cod_usu',
-        'nombres',
-        'ap_paterno',
-        'ap_materno',
-        'pais_documento',
-        'tipo_documento',
-        'numero_documento',
-        'expedido',
-        'correo',
-        'password',
-        'telefono',
-        'pais_telefono',
-        'codigo_telefono',
-        'genero',
-        'fecha_nacimiento',
-        'foto_de_perfil',
-        'estado',
-        'acceso_sistema',
-        'ultimo_acceso',
-        'observaciones',
-        'current_team_id',
-    ];
-
-    protected $hidden = [
-        'password',
-        'remember_token',
-    ];
-
-    protected static function booted(): void
+        protected static function booted(): void
     {
-        static::creating(function ($usuario) {
-            if (!$usuario->cod_usu) {
-                $ultimo = self::where('cod_usu', 'like', 'USU_%')
-                    ->orderByDesc('cod_usu')
-                    ->value('cod_usu');
-
-                $numero = $ultimo
-                    ? ((int) substr($ultimo, 4)) + 1
-                    : 1;
-
-                $usuario->cod_usu = 'USU_' . str_pad($numero, 4, '0', STR_PAD_LEFT);
+        static::creating(function (self $user): void {
+            if (empty($user->cod_usuario)) {
+                $user->cod_usuario = 'USU_' . strtoupper(\Illuminate\Support\Str::random(10));
+            }
+            if (empty($user->estado)) {
+                $user->estado = 'ACTIVO';
             }
         });
     }
 
+public static array $areasEstaticas = [
+        'ARE_0001' => 'DIRECCIÓN GENERAL',
+        'ARE_0002' => 'COORDINACIÓN DE PROGRAMAS Y SERVICIOS',
+        'ARE_0003' => 'ÁREA ADMINISTRATIVA Y REGISTRO INSTITUCIONAL',
+        'ARE_0004' => 'ÁREA DE ATENCIÓN MÉDICA',
+        'ARE_0005' => 'ÁREA DE PSICOLOGÍA Y SEGUIMIENTO COGNITIVO',
+    ];
+
+    protected $table = 'usuarios';
+    protected $primaryKey = 'cod_usuario';
+    public $incrementing = false;
+    protected $keyType = 'string';
+    public $timestamps = false;
+
+    protected $fillable = ['cod_usuario', 'correo', 'contrasena', 'password', 'foto', 'estado'];
+    protected $hidden = ['contrasena'];
+    protected $appends = ['nombres', 'ap_paterno', 'ap_materno'];
+
     protected function casts(): array
     {
-        return [
-            'ultimo_acceso' => 'datetime',
-            'fecha_nacimiento' => 'date',
-            'password' => 'hashed',
-        ];
+        return [];
     }
 
-    public function getAuthIdentifierName()
+    public function getAuthIdentifierName(): string
     {
-        return 'cod_usu';
+        return 'cod_usuario';
     }
 
-    public function getRouteKeyName()
+    public function getAuthPasswordName(): string
     {
-        return 'cod_usu';
+        return 'contrasena';
     }
 
-    public function getNameAttribute(): string
+    public function getAuthPassword(): string
     {
-        return trim($this->nombres . ' ' . $this->ap_paterno . ' ' . ($this->ap_materno ?? ''));
+        return (string) $this->contrasena;
     }
 
-    public function getEmailAttribute(): string
+    public function getRememberToken(): ?string
+    {
+        return null;
+    }
+
+    public function setRememberToken($value): void
+    {
+        // El baseline congelado no incluye remember_token.
+    }
+
+    public function getRouteKeyName(): string
+    {
+        return 'cod_usuario';
+    }
+
+    public function getEmailForPasswordReset(): string
     {
         return $this->correo;
     }
 
-    public function getProfilePhotoUrlAttribute(): string
+    public function routeNotificationForMail(): string
     {
-        return $this->foto_de_perfil
-            ? asset('storage/' . $this->foto_de_perfil)
-            : $this->defaultProfilePhotoUrl();
+        return $this->correo;
+    }
+
+    public function sendPasswordResetNotification($token): void
+    {
+        $this->notify(new ResetPasswordNotification($token));
+    }
+
+    public function getNameAttribute(): string
+    {
+        $persona = $this->personal ?: $this->contactos()->first();
+
+        return $persona
+            ? trim("{$persona->nombres} {$persona->apellido_paterno} {$persona->apellido_materno}")
+            : $this->correo;
+    }
+
+    /**
+     * Alias de lectura para las vistas históricas. La clave persistida de V2
+     * continúa siendo cod_usuario; este alias no crea una columna legacy.
+     */
+
+    /**
+     * Fortify y algunos componentes de Jetstream todavía consultan password.
+     * La contraseña real permanece en usuarios.contrasena.
+     */
+    public function setPasswordAttribute($value): void
+    {
+        if ($value === null || $value === '') {
+            return;
+        }
+        $this->attributes['contrasena'] = \Illuminate\Support\Facades\Hash::isHashed($value)
+            ? $value
+            : \Illuminate\Support\Facades\Hash::make($value);
+    }
+
+    public function setContrasenaAttribute($value): void
+    {
+        if ($value === null || $value === '') {
+            return;
+        }
+        $this->attributes['contrasena'] = \Illuminate\Support\Facades\Hash::isHashed($value)
+            ? $value
+            : \Illuminate\Support\Facades\Hash::make($value);
+    }
+
+    public function getPasswordAttribute(): string
+    {
+        return (string) $this->contrasena;
+    }
+
+    public function getNombresAttribute(): string
+    {
+        return (string) ($this->personal?->nombres ?? $this->contactos()->value('nombres') ?? '');
+    }
+
+    public function getApPaternoAttribute(): string
+    {
+        return (string) ($this->personal?->apellido_paterno ?? $this->contactos()->value('apellido_paterno') ?? '');
+    }
+
+    public function getApMaternoAttribute(): string
+    {
+        return (string) ($this->personal?->apellido_materno ?? $this->contactos()->value('apellido_materno') ?? '');
+    }
+
+    public function getFotoDePerfilAttribute(): ?string
+    {
+        return $this->foto;
+    }
+
+    public function getProfilePhotoPathAttribute(): ?string
+    {
+        return $this->foto;
+    }
+
+    public function personal(): HasOne
+    {
+        return $this->hasOne(Personal::class, 'cod_usuario', 'cod_usuario');
+    }
+
+    public function contactos(): HasMany
+    {
+        return $this->hasMany(Contacto::class, 'cod_usuario', 'cod_usuario');
+    }
+
+    /** Alias de interfaz; los datos se conservan en contactos V2. */
+    public function familiares(): HasMany
+    {
+        return $this->contactos();
+    }
+
+    public function documentos(): HasMany
+    {
+        return $this->hasMany(Documento::class, 'cod_usuario', 'cod_usuario');
+    }
+
+    /**
+     * Adaptadores de lectura para el perfil histórico. En V2 el área y el
+     * horario se obtienen a través de personal -> asignaciones_personal.
+     */
+    public function areaInstitucional(): HasOne
+    {
+        return $this->hasOne(Personal::class, 'cod_usuario', 'cod_usuario')
+            ->with('asignaciones.area');
+    }
+
+    public function horariosSalud(): HasManyThrough
+    {
+        return $this->asignacionesV2();
+    }
+
+    public function horariosAdmin(): HasManyThrough
+    {
+        return $this->asignacionesV2();
+    }
+
+    /** Relación V2 usada por el panel institucional restaurado. */
+    public function asignacionesTurno(): HasManyThrough
+    {
+        return $this->asignacionesV2();
+    }
+
+    private function asignacionesV2(): HasManyThrough
+    {
+        return $this->hasManyThrough(
+            AsignacionPersonal::class,
+            Personal::class,
+            'cod_usuario',
+            'cod_personal',
+            'cod_usuario',
+            'cod_personal',
+        )->with(['jornada.turno', 'area']);
     }
 
     public function getActivitylogOptions(): LogOptions
     {
-        return LogOptions::defaults()
-            ->logOnly(['nombres', 'ap_paterno', 'correo', 'estado', 'observaciones'])
-            ->logOnlyDirty()
-            ->useLogName('Usuarios')
-            ->setDescriptionForEvent(function (string $eventName) {
-                $nombre = $this->nombres . ' ' . $this->ap_paterno;
-                
-                if ($eventName === 'created') {
-                    return "Se registró al nuevo usuario institucional: {$nombre}.";
-                }
-                
-                if ($eventName === 'updated') {
-                    if ($this->wasChanged('estado')) {
-                        $nuevoEstado = $this->estado == 1 ? 'ACTIVO' : 'INACTIVO';
-                        return "Se cambió el estado del usuario {$this->cod_usu} a {$nuevoEstado}.";
-                    }
-                    return "Se actualizaron los datos del usuario: {$nombre}.";
-                }
-                
-                if ($eventName === 'deleted') {
-                    return "Se eliminó el registro del usuario: {$nombre}.";
-                }
-
-                return "Usuario {$this->cod_usu} fue modificado ({$eventName}).";
-            });
+        return LogOptions::defaults()->logOnly(['correo', 'foto', 'estado'])->logOnlyDirty();
+    }
+    public function scopeOrderByNombre($query, string $direction = 'asc')
+    {
+        return $query->leftJoin('personal', 'usuarios.cod_usuario', '=', 'personal.cod_usuario')
+            ->orderBy('personal.nombres', $direction)
+            ->orderBy('personal.apellido_paterno', $direction)
+            ->select('usuarios.*');
     }
 
-    public function documentos()
+    public function scopeOrderByApellidoPaterno($query, string $direction = 'asc')
     {
-        return $this->hasMany(DocumentoUsuario::class, 'cod_usu', 'cod_usu');
-    }
-
-    public function familiares()
-    {
-        return $this->hasMany(Familiar::class, 'cod_usu', 'cod_usu');
-    }
-
-    public function voluntarios()
-    {
-        return $this->hasMany(Voluntario::class, 'cod_usu', 'cod_usu');
-    }
-
-    public function personalSalud()
-    {
-        return $this->hasMany(PersonalSalud::class, 'cod_usu', 'cod_usu');
-    }
-
-    public function personalAdmin()
-    {
-        return $this->hasMany(PersonalAdmin::class, 'cod_usu', 'cod_usu');
-    }
-
-    // ── Relaciones FASE 2: Registros médicos/administrativos realizados por este usuario ──
-
-    public function fichasMedicasRegistradas()
-    {
-        return $this->hasMany(FichaMedicaAdulto::class, 'registrado_por', 'cod_usu');
-    }
-
-    public function medicacionesRegistradas()
-    {
-        return $this->hasMany(MedicacionAdulto::class, 'registrado_por', 'cod_usu');
-    }
-
-    public function administracionesMedicacionRegistradas()
-    {
-        return $this->hasMany(AdministracionMedicacion::class, 'registrado_por', 'cod_usu');
-    }
-
-    public function signosVitalesRegistrados()
-    {
-        return $this->hasMany(SignosVitalesAdulto::class, 'registrado_por', 'cod_usu');
-    }
-
-    public function valoracionesFuncionalesRegistradas()
-    {
-        return $this->hasMany(ValoracionFuncionalAdulto::class, 'registrado_por', 'cod_usu');
-    }
-
-    public function cambiosEstadoAdultoRealizados()
-    {
-        return $this->hasMany(HistorialEstadoAdulto::class, 'cambiado_por', 'cod_usu');
+        return $query->leftJoin('personal', 'usuarios.cod_usuario', '=', 'personal.cod_usuario')
+            ->orderBy('personal.apellido_paterno', $direction)
+            ->orderBy('personal.nombres', $direction)
+            ->select('usuarios.*');
     }
 }

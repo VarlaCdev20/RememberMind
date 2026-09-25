@@ -1,0 +1,224 @@
+
+        .welcome-page {
+            --welcome-fondo: var(--color-fondo-layout);
+            --welcome-titulo: var(--color-titulo);
+            --welcome-texto: var(--color-parrafo);
+            --welcome-muted: var(--color-texto-apoyo);
+            --welcome-borde: var(--color-borde-suave);
+            --welcome-card: color-mix(in srgb, var(--color-fondo-card) 78%, transparent);
+            --welcome-card-strong: color-mix(in srgb, var(--color-fondo-card-suave) 92%, transparent);
+            --welcome-card-border: var(--color-borde-general);
+            --welcome-acento: var(--color-boton-acento);
+            --welcome-acento-hover: var(--color-boton-acento-hover);
+            --welcome-primario: var(--color-boton-principal);
+            --welcome-primario-hover: var(--color-boton-principal-hover);
+            --welcome-secundario: var(--color-boton-secundario);
+            --welcome-secundario-hover: var(--color-boton-secundario-hover);
+            --welcome-boton-texto: var(--color-boton-principal-texto);
+            --welcome-panel: var(--color-fondo-panel);
+            --welcome-card-shadow: var(--sombra-card);
+            --welcome-panel-shadow: var(--sombra-panel);
+            --welcome-grid-dot: color-mix(in srgb, var(--color-boton-acento) 38%, transparent);
+            --welcome-grid-line: color-mix(in srgb, var(--color-boton-principal) 18%, transparent);
+            --welcome-glow-primary: color-mix(in srgb, var(--color-boton-principal) 15%, transparent);
+            --welcome-glow-accent: color-mix(in srgb, var(--color-boton-acento) 10%, transparent);
+            --welcome-shadow-soft: color-mix(in srgb, var(--color-titulo) 16%, transparent);
+            --welcome-shadow-light: color-mix(in srgb, var(--color-fondo-card) 74%, transparent);
+            --welcome-chart-fill: color-mix(in srgb, var(--color-boton-acento) 18%, transparent);
+            --welcome-chart-grid: color-mix(in srgb, var(--color-borde-general) 55%, transparent);
+            --welcome-chart-ticks: var(--color-texto-apoyo);
+            --welcome-chart-point: var(--color-fondo-card);
+            --welcome-social-facebook: var(--color-modulo-salud);
+            --welcome-social-instagram: var(--color-modulo-cognitivo);
+            --welcome-social-whatsapp: var(--color-estado-exito-texto);
+        }
+
+        .dark .welcome-page,
+        [data-theme="dark"] .welcome-page {
+            --welcome-card: color-mix(in srgb, var(--color-fondo-panel) 82%, transparent);
+            --welcome-card-strong: color-mix(in srgb, var(--color-fondo-panel-fuerte) 92%, transparent);
+            --welcome-card-border: color-mix(in srgb, var(--color-borde-general) 82%, transparent);
+            --welcome-grid-dot: color-mix(in srgb, var(--color-boton-acento) 28%, transparent);
+            --welcome-grid-line: color-mix(in srgb, var(--color-boton-principal) 22%, transparent);
+            --welcome-glow-primary: color-mix(in srgb, var(--color-boton-principal) 18%, transparent);
+            --welcome-glow-accent: color-mix(in srgb, var(--color-boton-acento) 12%, transparent);
+            --welcome-shadow-soft: color-mix(in srgb, #000 36%, transparent);
+            --welcome-shadow-light: color-mix(in srgb, var(--color-fondo-layout) 24%, transparent);
+            --welcome-chart-fill: color-mix(in srgb, var(--color-boton-acento) 24%, transparent);
+            --welcome-chart-grid: color-mix(in srgb, var(--color-borde-general) 45%, transparent);
+            --welcome-chart-ticks: var(--color-subtitulo);
+            --welcome-chart-point: var(--color-fondo-panel);
+        }
+
+        /* Micro-interacciones personalizadas */
+        .hover-underline::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2.5px;
+            bottom: -6px;
+            left: 50%;
+            background-color: var(--welcome-acento);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transform: translateX(-50%);
+            border-radius: 2px;
+        }
+        .hover-underline:hover::after {
+            width: 100%;
+        }
+        
+        .float-anim {
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        .float-anim-delayed {
+            animation: float 6s ease-in-out 3s infinite;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-15px) rotate(5deg); }
+            100% { transform: translateY(0px) rotate(0deg); }
+        }
+
+        .floating-element {
+            position: absolute;
+            pointer-events: none;
+            opacity: 0.15;
+            z-index: 1;
+            animation: float 8s ease-in-out infinite;
+        }
+
+        @keyframes scrollHint {
+            0% { transform: translateY(0); opacity: 0; }
+            50% { transform: translateY(10px); opacity: 1; }
+            100% { transform: translateY(20px); opacity: 0; }
+        }
+
+        .scroll-indicator {
+            animation: scrollHint 2s ease-in-out infinite;
+        }
+
+        .icon-pulse:hover {
+            animation: iconPulse 1s ease-in-out infinite;
+        }
+
+        @keyframes iconPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.15); }
+            100% { transform: scale(1); }
+        }
+
+        /* Ocultar barra de scroll */
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        /* Animación para el Carrusel Infinito (Marquee súper rápido) */
+        @keyframes marquee {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+        .animate-marquee {
+            /* Velocidad rápida de Marquesina */
+            animation: marquee 10s linear infinite;
+        }
+        .animate-marquee:hover {
+            animation-play-state: paused;
+        }
+
+        /* Sistema de Sombras Tipográficas */
+        .text-shadow-deep {
+            text-shadow: 0 8px 24px var(--welcome-shadow-soft), 0 2px 4px var(--welcome-shadow-light);
+        }
+        .text-shadow-title {
+            text-shadow: 0 6px 18px var(--welcome-shadow-soft), 0 1px 2px var(--welcome-shadow-light);
+        }
+        .text-shadow-light {
+            text-shadow: 0 2px 8px var(--welcome-shadow-soft);
+        }
+
+        /* Ambient Glow (Mouse Light interactivo) SUTIL Y FLUIDO */
+        .mouse-light {
+            position: fixed;
+            top: 0; left: 0;
+            width: 250px; height: 250px;
+            background: radial-gradient(circle, var(--welcome-glow-primary) 0%, var(--welcome-glow-accent) 50%, transparent 80%);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 40;
+            opacity: 0;
+            mix-blend-mode: normal;
+        }
+
+        /* Reducción visual sin alterar la composición general */
+        .welcome-page header .max-w-7xl {
+            max-width: 72rem;
+        }
+
+        .welcome-page #inicio {
+            padding-top: 8rem;
+            padding-bottom: 3rem;
+        }
+
+        .welcome-page #inicio h1 {
+            font-size: clamp(2.65rem, 6vw, 5.4rem) !important;
+            margin-bottom: 1.25rem !important;
+        }
+
+        .welcome-page #inicio > div > div > p:nth-of-type(2) {
+            font-size: clamp(1rem, 2vw, 1.5rem) !important;
+            max-width: 56rem;
+        }
+
+        .welcome-page section h2 {
+            font-size: clamp(2rem, 4vw, 3.45rem) !important;
+            line-height: 1.08;
+        }
+
+        .welcome-page .card-interactiva {
+            border-radius: 2.2rem;
+            padding: 1.5rem;
+        }
+
+        .welcome-page .welcome-evolucion {
+            border-radius: 2.25rem;
+            padding: 1.5rem;
+        }
+
+        .welcome-page .welcome-evolucion-inner {
+            border-radius: 1.5rem;
+        }
+
+        .welcome-page #problema,
+        .welcome-page #experiencia,
+        .welcome-page #servicios,
+        .welcome-page #impacto,
+        .welcome-page footer {
+            padding-top: 4.5rem;
+            padding-bottom: 4.5rem;
+        }
+
+        .welcome-page .mobile-welcome-link {
+            font-size: 0.96rem;
+        }
+
+        @media (min-width: 768px) {
+            .welcome-page #inicio {
+                padding-top: 9rem;
+            }
+
+            .welcome-page #problema,
+            .welcome-page #experiencia,
+            .welcome-page #servicios,
+            .welcome-page #impacto,
+            .welcome-page footer {
+                padding-top: 5.5rem;
+                padding-bottom: 5.5rem;
+            }
+        }
+    

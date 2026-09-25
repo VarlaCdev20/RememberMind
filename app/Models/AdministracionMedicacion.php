@@ -2,78 +2,222 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
-use Spatie\Activitylog\Traits\LogsActivity;
-use Spatie\Activitylog\LogOptions;
+use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Str;
 
-/**
- * AdministracionMedicacion — Registro de administración real de medicamentos.
- *
- * Sin SoftDeletes: estos son registros de trazabilidad clínica que
- * NO deben eliminarse bajo ninguna circunstancia.
- */
-class AdministracionMedicacion extends Model
+class AdministracionMedicacion extends ModeloOperativo
 {
-    use LogsActivity;
+    protected $table = 'administraciones_medicacion';
+    protected $primaryKey = 'cod_administracion';
 
-    protected $table = 'administracion_medicacion';
-    protected $primaryKey = 'cod_admin_med';
+    protected function casts(): array
+    {
+        return [
+            'dosis_administrada' => 'decimal:3',
+            'fecha_hora_programada' => 'datetime',
+            'fecha_hora_administracion' => 'datetime',
+        ];
+    }
 
-    public $incrementing = true;
-    protected $keyType = 'int';
-
-    public $timestamps = true;
-
-    protected $fillable = [
-        'cod_med_adulto',
-        'cod_am',
-        'fecha',
-        'hora_programada',
-        'hora_real',
-        'administrado',
+    protected static array $columnasValidas = [
+        'cod_administracion',
+        'cod_prescripcion',
+        'cod_horario_prescripcion',
+        'cod_residente',
+        'cod_jornada',
+        'cod_personal',
+        'fecha_hora_programada',
+        'fecha_hora_administracion',
+        'resultado',
+        'dosis_administrada',
         'motivo_omision',
         'efecto_observado',
+        'reaccion_adversa',
         'observacion',
-        'registrado_por',
+        'estado',
     ];
 
-    protected $casts = [
-        'fecha'           => 'date',
-        'hora_programada' => 'datetime:H:i',
-        'hora_real'       => 'datetime:H:i',
-        'administrado'    => 'boolean',
-    ];
-
-    public function getActivitylogOptions(): LogOptions
+    public function setCodMedAdultoAttribute($value): void
     {
-        return LogOptions::defaults()
-            ->logFillable()
-            ->logOnlyDirty()
-            ->useLogName('Administración Medicación')
-            ->setDescriptionForEvent(function (string $eventName) {
-                $estado = $this->administrado ? 'administrada' : 'no administrada';
-                return match ($eventName) {
-                    'created' => "Se registró administración de medicación ({$estado}) para el adulto mayor {$this->cod_am}.",
-                    'updated' => "Se actualizó registro de administración de medicación del adulto mayor {$this->cod_am}.",
-                    default   => "Evento '{$eventName}' en administración de medicación del adulto mayor {$this->cod_am}.",
-                };
-            });
+        $this->attributes['cod_prescripcion'] = $value;
     }
 
-    // ── Relaciones ──────────────────────────
-
-    public function medicacion()
+    public function setAdministradoAttribute($value): void
     {
-        return $this->belongsTo(MedicacionAdulto::class, 'cod_med_adulto', 'cod_med_adulto');
+        $this->attributes['resultado'] = $value ? 'ADMINISTRADA' : 'OMITIDA';
     }
 
-    public function adultoMayor()
+    public function getAdministradoAttribute(): bool
     {
-        return $this->belongsTo(AdultoMayor::class, 'cod_am', 'cod_am');
+        return $this->esAdministrada();
     }
 
-    public function registrador()
+    public function getCodMedAdultoAttribute(): string
     {
-        return $this->belongsTo(User::class, 'registrado_por', 'cod_usu');
+        return (string) $this->cod_prescripcion;
+    }
+
+    protected static function booted(): void
+    {
+        static::creating(function (self $registro): void {
+            if (empty($registro->cod_administracion)) {
+                $registro->cod_administracion = 'ADM_' . strtoupper(Str::random(10));
+            }
+            $rawMed = $registro->attributes['cod_med_adulto'] ?? $registro->attributes['cod_prescripcion'] ?? null;
+            if (empty($registro->cod_prescripcion) && !empty($rawMed)) {
+                $registro->cod_prescripcion = $rawMed;
+            }
+
+            if (empty($registro->cod_residente) && !empty($registro->cod_prescripcion)) {
+                $p = Prescripcion::find($registro->cod_prescripcion);
+                if ($p) {
+                    $registro->cod_residente = $p->cod_residente;
+                }
+            }
+            if (empty($registro->cod_personal)) {
+                $codUsuario = $registro->attributes['registrado_por'] ?? null;
+                $pers = null;
+                if ($codUsuario) {
+                    $pers = Personal::where('cod_usuario', $codUsuario)->first() ?? Personal::where('cod_personal', $codUsuario)->first();
+                }
+                $pers ??= auth()->user()?->personal ?? Personal::first();
+                if (!$pers) {
+                    $u = auth()->user() ?? User::first();
+                    $pers = Personal::create([
+                        'cod_personal' => 'PER_' . strtoupper(Str::random(10)),
+                        'cod_usuario' => $u?->cod_usuario ?? 'USU_0001',
+                        'nombres' => 'Personal',
+                        'apellido_paterno' => 'Enfermeria',
+                        'numero_documento' => 'DOC_' . strtoupper(Str::random(8)),
+                        'profesion' => 'ENFERMERIA',
+                        'estado' => 'ACTIVO',
+                    ]);
+                }
+                $registro->cod_personal = $pers->cod_personal;
+            }
+            if (empty($registro->cod_jornada)) {
+                $j = Jornada::whereDate('fecha_jornada', today())->first() ?? Jornada::first();
+                if (!$j) {
+                    $t = TurnoEnfermeria::first();
+                    if (!$t) {
+                        $t = TurnoEnfermeria::create([
+                            'cod_turno' => 'TUR_' . strtoupper(Str::random(10)),
+                            'orden' => 1,
+                            'nombre' => 'Turno Mañana',
+                            'hora_inicio' => '07:00:00',
+                            'hora_fin' => '15:00:00',
+                            'estado' => 'ACTIVO',
+                        ]);
+                    }
+                    $j = Jornada::create([
+                        'cod_jornada' => 'JOR_' . strtoupper(Str::random(10)),
+                        'cod_turno' => $t->cod_turno,
+                        'fecha_jornada' => today(),
+                        'estado' => 'ACTIVA',
+                    ]);
+                }
+                $registro->cod_jornada = $j->cod_jornada;
+            }
+            if (empty($registro->fecha_hora_programada)) {
+                $fec = $registro->attributes['fecha'] ?? today()->toDateString();
+                $hora = $registro->attributes['hora_programada'] ?? '08:00';
+                $registro->fecha_hora_programada = Carbon::parse($fec . ' ' . $hora);
+            }
+            if (empty($registro->fecha_hora_administracion) && !empty($registro->attributes['hora_real'])) {
+                $fec = $registro->attributes['fecha'] ?? today()->toDateString();
+                $registro->fecha_hora_administracion = Carbon::parse($fec . ' ' . $registro->attributes['hora_real']);
+            }
+            if (empty($registro->resultado) || $registro->resultado === 'ADMINISTRADA') {
+                $adm = $registro->attributes['administrado'] ?? null;
+                if ($adm !== null) {
+                    $registro->resultado = $adm ? 'ADMINISTRADA' : 'OMITIDA';
+                } elseif (empty($registro->resultado)) {
+                    $registro->resultado = 'ADMINISTRADA';
+                }
+            }
+            if (empty($registro->estado)) {
+                $registro->estado = 'FINALIZADO';
+            }
+            $validos = [
+                'cod_administracion', 'cod_prescripcion', 'cod_horario_prescripcion',
+                'cod_residente', 'cod_jornada', 'cod_personal', 'fecha_hora_programada',
+                'fecha_hora_administracion', 'resultado', 'dosis_administrada',
+                'motivo_omision', 'efecto_observado', 'reaccion_adversa', 'observacion', 'estado'
+            ];
+            $registro->attributes = array_intersect_key($registro->attributes, array_flip($validos));
+        });
+
+        static::saving(function (self $registro): void {
+
+            if (!empty($registro->cod_prescripcion)) {
+                $presc = Prescripcion::query()->whereKey($registro->cod_prescripcion)->first();
+                if ($presc) {
+                    $registro->cod_prescripcion = $presc->cod_prescripcion;
+                    if (empty($registro->cod_residente)) {
+                        $registro->cod_residente = $presc->cod_residente;
+                    }
+                }
+            }
+
+            if (! empty($registro->cod_prescripcion) && ! empty($registro->cod_residente)
+                && ! Prescripcion::query()->whereKey($registro->cod_prescripcion)
+                    ->where('cod_residente', $registro->cod_residente)->exists()) {
+                throw \Illuminate\Validation\ValidationException::withMessages([
+                    'cod_prescripcion' => 'La prescripción no corresponde al residente.',
+                ]);
+            }
+        });
+    }
+
+    public function esAdministrada(): bool
+    {
+        return in_array(strtoupper(trim((string) $this->resultado)), ['ADMINISTRADA', 'ADMINISTRADO', 'REALIZADA', 'APLICADA', 'SUMINISTRADA'], true);
+    }
+
+    public function esOmitida(): bool
+    {
+        return strtoupper(trim((string) $this->resultado)) === 'OMITIDA';
+    }
+
+    public function esRechazada(): bool
+    {
+        return strtoupper(trim((string) $this->resultado)) === 'RECHAZADA';
+    }
+
+    public function prescripcion(): BelongsTo
+    {
+        return $this->belongsTo(Prescripcion::class, 'cod_prescripcion', 'cod_prescripcion');
+    }
+
+    public function medicacion(): BelongsTo
+    {
+        return $this->prescripcion();
+    }
+
+    public function residente(): BelongsTo
+    {
+        return $this->belongsTo(Residente::class, 'cod_residente', 'cod_residente');
+    }
+
+    public function personal(): BelongsTo
+    {
+        return $this->belongsTo(Personal::class, 'cod_personal', 'cod_personal');
+    }
+
+    public function registrador(): BelongsTo
+    {
+        return $this->personal();
+    }
+
+    public function adultoMayor(): BelongsTo
+    {
+        return $this->belongsTo(AdultoMayor::class, 'cod_residente', 'cod_residente');
+    }
+
+    public function horario(): BelongsTo
+    {
+        return $this->belongsTo(HorarioPrescripcion::class, 'cod_horario_prescripcion', 'cod_horario_prescripcion');
     }
 }

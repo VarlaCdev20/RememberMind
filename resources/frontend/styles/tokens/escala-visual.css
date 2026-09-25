@@ -1,0 +1,70 @@
+/* ============================================================
+   CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS
+   ESCALA VISUAL Y DENSIDAD
+   Centraliza espaciados, tamaños, alturas y paddings
+   ============================================================ */
+
+:root {
+    /* 1. Densidad visual */
+    --densidad-compacta: 0.75;
+    --densidad-normal: 1;
+    --densidad-comoda: 1.25;
+
+    /* 2. Espaciados */
+    --espaciado-xs: 0.25rem;
+    --espaciado-sm: 0.5rem;
+    --espaciado-md: 0.75rem;
+    --espaciado-lg: 1rem;
+    --espaciado-xl: 1.5rem;
+    --espaciado-2xl: 2rem;
+
+    /* 3. Cards Generales */
+    --card-padding-sm: 0.75rem;
+    --card-padding-md: 1.25rem;
+    --card-padding-lg: 1.5rem;
+    --card-radius-sm: 0.5rem;
+    --card-radius-md: 1rem;
+    --card-radius-lg: 1.5rem;
+    --card-gap: 0.75rem;
+
+    /* 4. Alertas / Pendientes */
+    --alert-card-padding: 1rem;
+    --alert-card-min-height: 120px;
+    --alert-card-gap: 0.5rem;
+    --alert-title-size: 0.875rem;     /* 14px */
+    --alert-desc-size: 0.75rem;      /* 12px */
+    --alert-meta-size: 0.625rem;     /* 10px */
+    --alert-pill-size: 0.5625rem;    /* 9px */
+    --alert-action-padding: 0.375rem 0.75rem;
+    --alert-grid-gap: 1rem;
+
+    /* 5. KPIs Compactos */
+    --kpi-padding: 0.75rem;
+    --kpi-radius: 0.75rem;
+    --kpi-label-size: 0.5625rem;
+    --kpi-value-size: 1.25rem;
+
+    /* 6. Formularios */
+    --form-input-height: 2.5rem;
+    --form-input-padding: 0.5rem 0.75rem;
+    --form-section-gap: 1.5rem;
+    --form-grid-gap: 1rem;
+    --form-modal-padding: 1.25rem;
+
+    /* 7. Layout */
+    --layout-max-width-normal: 64rem; /* 1024px */
+    --layout-max-width-amplio: 80rem; /* 1280px */
+    --layout-padding-x: 1rem;
+}
+
+@media (min-width: 640px) {
+    :root {
+        --layout-padding-x: 1.5rem;
+    }
+}
+
+@media (min-width: 1024px) {
+    :root {
+        --layout-padding-x: 2rem;
+    }
+}

@@ -1,0 +1,53 @@
+@layer components {
+
+    .rm-table {
+        width: 100%;
+        text-align: left;
+        font-family: var(--font-ui);
+        font-size: 0.875rem;
+    }
+
+    .rm-table-header {
+        border-bottom: 1px solid var(--color-tabla-header-borde);
+        background: var(--color-tabla-header-bg);
+        color: var(--color-tabla-header-texto);
+        font-family: var(--font-ui);
+        font-size: var(--text-table-header);
+        font-weight: var(--font-bold);
+        letter-spacing: var(--tracking-wider);
+        text-transform: uppercase;
+    }
+
+    .rm-table-header th {
+        padding: 0.5rem 1rem;
+    }
+
+    .rm-table-row {
+        border-bottom: 1px solid var(--color-tabla-row-borde);
+        transition:
+            background-color 180ms ease,
+            transform 180ms ease;
+    }
+
+    .rm-table-row:hover {
+        background: var(--color-tabla-row-hover);
+    }
+
+    .rm-table-row td {
+        padding: 0.625rem 1rem;
+    }
+
+    .rm-table-cell-label {
+        color: var(--color-tabla-cell-label);
+        font-family: var(--font-body);
+        font-size: var(--text-sm);
+        font-weight: var(--font-bold);
+    }
+
+    .rm-table-cell-meta {
+        color: var(--color-tabla-cell-meta);
+        font-family: var(--font-body);
+        font-size: var(--text-caption);
+        font-weight: var(--font-medium);
+    }
+}

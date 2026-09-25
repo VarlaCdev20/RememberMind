@@ -1,0 +1,145 @@
+/* ============================================================
+   REMEMBERMIND DESIGN SYSTEM — COMPONENTS / MODALS
+   Modales Unificados con la misma jerarquía de superficies:
+   - Contenedor cálido translúcido: var(--rm-surface) 96%
+   - Header marcado: var(--rm-surface-strong) 88% + blur(8px)
+   - Body suave: var(--rm-surface-soft) 40%
+   - Footer claro y limpio: var(--rm-surface-soft) 92% + blur(8px)
+   - Bordes: var(--rm-border)
+   - Totalmente integrado en altura (max-height: calc(100vh - 32px))
+   ============================================================ */
+
+.rm-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(35, 50, 70, 0.45);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    padding: 16px;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+}
+
+@media (max-height: 800px) {
+    .rm-modal-backdrop {
+        align-items: flex-start;
+        padding-top: 12px;
+        padding-bottom: 12px;
+    }
+}
+
+.rm-modal {
+    width: 100%;
+    margin: auto 0;
+    background: color-mix(in srgb, var(--rm-surface) 96%, transparent);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--rm-border);
+    border-radius: var(--rm-radius-modal, 16px);
+    box-shadow: 0 20px 50px -6px rgba(47, 62, 92, 0.16), 0 4px 12px rgba(0, 0, 0, 0.04);
+    display: flex;
+    flex-direction: column;
+    max-height: calc(100vh - 32px);
+    position: relative;
+    overflow: hidden;
+    animation: rm-modal-in var(--rm-duration-normal) var(--rm-ease-out);
+}
+
+@media (max-height: 700px) {
+    .rm-modal {
+        max-height: calc(100vh - 20px);
+    }
+}
+
+/* Tamaños */
+.rm-modal-sm { max-width: 500px; }
+.rm-modal-md { max-width: 600px; }
+.rm-modal-lg { max-width: 780px; }
+.rm-modal-xl { max-width: 1020px; }
+
+/* Partes del Modal Compacto y Totalmente Accesible */
+.rm-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 13px 20px;
+    border-bottom: 1px solid var(--rm-border);
+    background: color-mix(in srgb, var(--rm-surface-strong) 88%, transparent);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    flex-shrink: 0;
+}
+
+.rm-modal-title {
+    font-family: var(--rm-font-title, 'Outfit', sans-serif);
+    font-size: var(--rm-font-card-title, 15px);
+    font-weight: 700;
+    color: var(--rm-text-title);
+    letter-spacing: -0.01em;
+}
+
+.rm-modal-body {
+    padding: 18px 20px;
+    overflow-y: auto;
+    flex: 1 1 auto;
+    min-height: 0;
+    background: color-mix(in srgb, var(--rm-surface-soft) 40%, transparent);
+    overscroll-behavior: contain;
+}
+
+.rm-modal-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 12px 20px;
+    border-top: 1px solid var(--rm-border);
+    background: color-mix(in srgb, var(--rm-surface-soft) 92%, transparent);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    flex-shrink: 0;
+}
+
+@keyframes rm-modal-in {
+    from {
+        opacity: 0;
+        transform: translateY(8px) scale(0.98);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* ============================================================
+   MODO OSCURO - MODALES
+   ============================================================ */
+.dark .rm-modal {
+    background: color-mix(in srgb, var(--rm-surface) 94%, transparent);
+    border-color: var(--rm-border);
+    box-shadow: 0 24px 55px rgba(0, 0, 0, 0.65);
+    color: #F8FAFC;
+}
+
+.dark .rm-modal-header {
+    background: color-mix(in srgb, var(--rm-surface-strong) 90%, transparent);
+    border-color: var(--rm-border);
+}
+
+.dark .rm-modal-title {
+    color: var(--rm-text-title);
+}
+
+.dark .rm-modal-body {
+    background: color-mix(in srgb, var(--rm-surface-soft) 40%, transparent);
+    color: #E2E8F0;
+}
+
+.dark .rm-modal-footer {
+    background: color-mix(in srgb, var(--rm-surface-soft) 94%, transparent);
+    border-color: var(--rm-border);
+}
