@@ -42,13 +42,13 @@
                         $partes = explode(' ', $nomRes);
                         $iniciales = strtoupper(substr($partes[0] ?? 'R', 0, 1) . substr($partes[1] ?? 'M', 0, 1));
                         
-                        $codPresc = $omision->cod_prescripcion ?? ($omision->prescripcion?->cod_prescripcion ?? 'PRS_0001');
+                        $codPresc = $omision->cod_prescripcion ?? $omision->prescripcion?->cod_prescripcion;
                         $horaStr = $omision->fecha_hora_programada?->format('H:i') ?? '08:00';
-                        $codRes = $omision->cod_residente ?? ($omision->residente?->cod_residente ?? 'RES_0001');
+                        $codRes = $omision->cod_residente ?? $omision->residente?->cod_residente;
                     @endphp
                     <tr 
                         wire:key="omision-{{ $omision->cod_administracion ?? $loop->index }}"
-                        wire:click="abrirDrawerDosis('{{ $codPresc }}', '{{ $horaStr }}', '{{ $codRes }}')"
+                        @if($codPresc && $codRes) wire:click="abrirDrawerDosis('{{ $codPresc }}', '{{ $horaStr }}', '{{ $codRes }}')" @endif
                         class="cursor-pointer transition-colors duration-150 hover:bg-[#E4D8CC]/50 dark:hover:bg-white/[0.03]">
                         
                         {{-- Hora --}}

@@ -58,18 +58,18 @@
                     {{-- RESIDENTE --}}
                     <div class="flex items-center gap-3 pb-3">
                         <div class="w-[42px] h-[42px] rounded-full bg-[#E4D8CC] dark:bg-[#332F29] border border-[#C7B9AA] dark:border-[#494139] flex items-center justify-center font-[700] text-sm text-[#304060] dark:text-[#EFE5DA] shrink-0">
-                            {{ $dosisDetalle['residente']['iniciales'] ?? 'MG' }}
+                            {{ $dosisDetalle['residente']['iniciales'] ?? 'SR' }}
                         </div>
                         <div class="min-w-0 flex-1">
                             <div class="font-[700] text-[14.5px] text-[#304060] dark:text-[#EFE5DA] truncate">
-                                {{ $dosisDetalle['residente']['nombre_completo'] ?? 'Mario Gutiérrez Mendoza' }}
+                                {{ $dosisDetalle['residente']['nombre_completo'] ?? 'Sin residente' }}
                             </div>
                             <div class="text-[11.5px] text-[#677084] dark:text-[#BDAE9F] flex items-center gap-2 mt-0.5 flex-wrap">
-                                <span>{{ $dosisDetalle['residente']['edad'] ?? 79 }} años</span>
+                                <span>{{ $dosisDetalle['residente']['edad'] ?? 'Edad no registrada' }}</span>
                                 <span>·</span>
-                                <span>{{ $dosisDetalle['residente']['habitacion'] ?? 'Habitación 101' }}</span>
+                                <span>{{ $dosisDetalle['residente']['habitacion'] ?? 'Sin habitación' }}</span>
                                 <span>·</span>
-                                <span class="font-mono">NHC: {{ $dosisDetalle['residente']['nhc'] ?? '10234' }}</span>
+                                <span class="font-mono">NHC: {{ $dosisDetalle['residente']['nhc'] ?? 'No registrado' }}</span>
                             </div>
                         </div>
                     </div>
@@ -187,7 +187,7 @@
                         <div class="flex items-center justify-between text-[11.5px] text-[#677084] dark:text-[#BDAE9F]">
                             <span>Último Seguimiento:</span>
                             <span class="font-medium text-[#304060] dark:text-[#EFE5DA]">
-                                {{ $dosisDetalle['seguimiento']['ultima_admin'] ?? '13/04/2025 - 10:00' }}
+                                {{ $dosisDetalle['seguimiento']['ultima_admin'] ?? 'Sin administraciones previas' }}
                             </span>
                         </div>
                     </div>

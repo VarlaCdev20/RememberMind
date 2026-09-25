@@ -38,29 +38,29 @@ class TabsMedicacionFlujoTest extends TestCase
         $this->actingAs($this->enfermero);
     }
 
-    public function test_pestana_proximas_dosis_funciona_y_abre_drawer(): void
+    public function test_pestana_proximas_dosis_muestra_estado_vacio_sin_datos_ficticios(): void
     {
         Livewire::test(SaludAdministracionMedicacionPanel::class, ['adulto' => $this->adulto])
             ->call('setTab', 'proximas')
             ->assertSet('tabActivo', 'proximas')
             ->assertSee('Próximas Dosis del Turno')
             ->assertSee('Priorización clínica')
-            ->assertSee('María Carmen')
+            ->assertDontSee('Omeprazol')
+            ->assertDontSee('PRS_0001')
             ->call('abrirDrawerDosis', 'PRS_0001', '08:00', $this->adulto->cod_residente)
-            ->assertSet('drawerDosisAbierto', true)
-            ->assertSee('Administrar medicación');
+            ->assertSet('drawerDosisAbierto', false)
+            ->assertSet('selectedPrescripcionId', null);
     }
 
-    public function test_pestana_omisiones_funciona_y_abre_drawer(): void
+    public function test_pestana_omisiones_no_fabrica_registros(): void
     {
         Livewire::test(SaludAdministracionMedicacionPanel::class, ['adulto' => $this->adulto])
             ->call('setTab', 'omisiones')
             ->assertSet('tabActivo', 'omisiones')
             ->assertSee('Registro de Omisiones del Turno')
             ->assertSee('Justificaciones clínicas')
-            ->assertSee('María Carmen')
-            ->call('abrirDrawerDosis', 'PRS_0001', '08:00', $this->adulto->cod_residente)
-            ->assertSet('drawerDosisAbierto', true);
+            ->assertDontSee('Ayuno médico programado')
+            ->assertDontSee('ADM_OM_001');
     }
 
     public function test_pestana_historial_funciona_con_filtros_reactivos(): void
@@ -71,10 +71,9 @@ class TabsMedicacionFlujoTest extends TestCase
             ->assertSee('Historial de Administración')
             ->assertSee('Trazabilidad clínica')
             ->assertSee('Buscar residente...')
-            ->assertSee('María Carmen')
             ->set('filtroHistorialResultado', 'OMITIDA')
             ->assertSet('filtroHistorialResultado', 'OMITIDA')
-            ->assertSee('OMITIDA')
+            ->assertDontSee('ADM_H_003')
             ->call('limpiarFiltrosHistorial')
             ->assertSet('filtroHistorialResultado', '');
     }

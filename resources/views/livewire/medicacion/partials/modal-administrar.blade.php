@@ -75,7 +75,7 @@
                                     {{ $dosisDetalle['residente']['nombre_completo'] ?? 'Residente' }}
                                 </span>
                                 <span class="text-[11px] text-[#677084] dark:text-[#BDAE9F] block mt-0.5">
-                                    <strong class="text-[#304060] dark:text-[#EFE5DA]">{{ $dosisDetalle['residente']['habitacion'] ?? 'Hab. 101' }}</strong> / <strong class="text-[#304060] dark:text-[#EFE5DA]">{{ $dosisDetalle['residente']['cama'] ?? 'Cama 1' }}</strong> &bull; {{ $dosisDetalle['residente']['edad'] ?? '' }}
+                                    <strong class="text-[#304060] dark:text-[#EFE5DA]">{{ $dosisDetalle['residente']['habitacion'] ?? 'Sin habitación' }}</strong> / <strong class="text-[#304060] dark:text-[#EFE5DA]">{{ $dosisDetalle['residente']['cama'] ?? 'Sin cama' }}</strong> &bull; {{ $dosisDetalle['residente']['edad'] ?? '' }}
                                 </span>
                             </div>
 

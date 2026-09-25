@@ -188,6 +188,9 @@ class SaludAdministracionMedicacionPanel extends Component
     {
         if ($codPrescripcion) {
             $this->abrirDrawerDosis($codPrescripcion, $hora ?: '08:00', $codResidente);
+            if (! $this->selectedPrescripcionId) {
+                return;
+            }
         }
 
         // Cierre explícito del panel lateral para no usar drawer al administrar
@@ -220,6 +223,9 @@ class SaludAdministracionMedicacionPanel extends Component
     {
         if ($codPrescripcion) {
             $this->abrirDrawerDosis($codPrescripcion, $hora ?: '08:00', $codResidente);
+            if (! $this->selectedPrescripcionId) {
+                return;
+            }
         }
 
         // Cierre explícito del panel lateral para mostrar la ventana emergente centrada
@@ -264,6 +270,11 @@ class SaludAdministracionMedicacionPanel extends Component
         $prescripcion = \App\Models\Prescripcion::query()
             ->whereKey($this->selectedPrescripcionId)
             ->first();
+
+        if (! $prescripcion) {
+            $this->addError('formDosisAdministrada', 'La prescripción seleccionada no existe.');
+            return;
+        }
 
         $rules = [
             'formDosisAdministrada' => 'required|numeric|min:0.001',
@@ -427,6 +438,11 @@ class SaludAdministracionMedicacionPanel extends Component
 
         $prescripcion = \App\Models\Prescripcion::where('cod_prescripcion', $codPrescripcion)->first();
 
+        if (! $prescripcion) {
+            $this->addError('formMotivoOmision', 'La prescripción seleccionada no existe.');
+            return;
+        }
+
         if ($prescripcion) {
             try {
                 app(\App\Backend\Modulos\Medicacion\Servicios\RegistrarAdministracionMedicacionService::class)->registrarProgramada(
@@ -485,9 +501,14 @@ class SaludAdministracionMedicacionPanel extends Component
             ->first();
 
         if (!$prescripcion) {
-            // Soporte fallback para referencias de prueba
-            $this->cargarDosisReferencial($codPrescripcion, $this->selectedHora, $codResidente);
-            $this->drawerDosisAbierto = true; $this->drawerAbierto = true; $this->drawerPaso = 'detalle';
+            $this->selectedPrescripcionId = null;
+            $this->selectedResidenteId = null;
+            $this->dosisDetalle = [];
+            $this->dispatch('swal', [
+                'icon' => 'error',
+                'title' => 'Prescripción no disponible',
+                'text' => 'La prescripción seleccionada no existe o ya no está disponible.',
+            ]);
             return;
         }
 
@@ -607,7 +628,7 @@ class SaludAdministracionMedicacionPanel extends Component
 
             // F. SEGUIMIENTO
             'seguimiento' => [
-                'ultima_admin' => $ultimaAdmin ? ($ultimaAdmin->fecha_hora_administracion?->format('d/m/Y - H:i') ?? $ultimaAdmin->fecha_hora_programada?->format('d/m/Y - H:i')) : '13/04/2025 - 10:00',
+                'ultima_admin' => $ultimaAdmin ? ($ultimaAdmin->fecha_hora_administracion?->format('d/m/Y - H:i') ?? $ultimaAdmin->fecha_hora_programada?->format('d/m/Y - H:i')) : 'Sin administraciones previas',
                 'proxima_dosis' => Carbon::parse(today()->toDateString() . ' ' . $this->selectedHora)->addDay()->format('d/m/Y - H:i'),
                 'resultado' => $ultimaAdmin?->resultado ?? 'N/A',
                 'dosis_administrada' => $ultimaAdmin?->dosis_administrada ? "{$ultimaAdmin->dosis_administrada} {$prescripcion->unidad_dosis}" : 'N/A',
@@ -618,75 +639,6 @@ class SaludAdministracionMedicacionPanel extends Component
         ];
 
         $this->drawerDosisAbierto = true; $this->drawerAbierto = true; $this->drawerPaso = 'detalle';
-    }
-
-    private function cargarDosisReferencial(string $codPrescripcion, string $hora, ?string $codResidente = null): void
-    {
-        $nombre = match($codPrescripcion) {
-            'ESCITALOPRAM' => 'Escitalopram',
-            'ENSURE' => 'Ensure Plus',
-            'OMEPRAZOL' => 'Omeprazol',
-            default => 'Paracetamol',
-        };
-        $dosis = match($codPrescripcion) {
-            'ESCITALOPRAM' => '10 mg',
-            'ENSURE' => '220 ml',
-            'OMEPRAZOL' => '20 mg',
-            default => '500 mg',
-        };
-
-        $this->dosisDetalle = [
-            'cod_prescripcion' => $codPrescripcion,
-            'cod_medicamento' => $codPrescripcion,
-            'cod_residente' => $codResidente ?: 'RES_DEMO',
-            'hora' => $hora,
-            'estado_dosis' => 'PENDIENTE',
-            'ya_registrada' => false,
-            'registro_hoy' => null,
-            'residente' => [
-                'nombre_completo' => $this->adulto ? trim("{$this->adulto->nombres} {$this->adulto->ap_paterno} {$this->adulto->ap_materno}") : 'Residente en seguimiento',
-                'edad' => '78 años',
-                'habitacion' => 'Hab. 101',
-                'cama' => 'Cama A',
-                'iniciales' => 'RM',
-            ],
-            'medicamento' => [
-                'nombre_destacado' => $nombre,
-                'concentracion' => $dosis,
-                'forma' => 'Comprimido',
-                'via' => 'Vía oral',
-            ],
-            'prescripcion' => [
-                'dosis' => $dosis,
-                'unidad' => 'mg',
-                'via' => 'Oral',
-                'frecuencia' => 'Cada 8 horas',
-                'indicacion' => 'Tratamiento según indicación médica',
-                'segun_necesidad' => 'No',
-                'fecha' => '12/09/2026 08:00',
-                'prescriptor' => 'Dr. Carlos Méndez',
-                'estado' => 'ACTIVA',
-            ],
-            'programacion' => [
-                'hora_programada' => $hora,
-                'dosis_programada' => $dosis,
-                'dias' => 'Todos los días',
-                'estado_horario' => 'ACTIVO',
-            ],
-            'seguridad' => [
-                'alergias' => 'Sin alergias medicamentosas registradas',
-                'observaciones' => 'Sin observaciones relevantes registradas.',
-                'control_especial' => 'No',
-            ],
-            'seguimiento' => [
-                'ultima_admin' => 'Ayer 20:00',
-                'resultado' => 'ADMINISTRADA',
-                'dosis_administrada' => $dosis,
-                'efecto_observado' => 'Sin efecto adverso observado',
-                'reaccion_adversa' => 'Sin reacción adversa registrada',
-                'observacion' => 'Toma habitual post-cena',
-            ],
-        ];
     }
 
     public function cerrarDrawerDosis(): void
@@ -947,44 +899,6 @@ class SaludAdministracionMedicacionPanel extends Component
             }
         }
 
-        // Si no hay dosis cargadas de la BD para los residentes (o ambiente de pruebas sin seed), asegurar valores representativos para la UI
-        if ($agendaDosis->isEmpty() && $residentes->isNotEmpty()) {
-            $conteoAdministradas = 3;
-            $conteoPendientes = 2;
-            $conteoRetrasadas = 1;
-            $conteoOmitidas = 0;
-
-            // Inyectar datos referenciales en el primer residente para no romper la matriz
-            $primerRes = $residentes->first();
-            $matrizKardex[$primerRes->cod_residente]['07:00'][] = [
-                'id' => 'OMEPRAZOL',
-                'cod_prescripcion' => 'OMEPRAZOL',
-                'cod_residente' => $primerRes->cod_residente,
-                'nombre_corto' => 'Omeprazol',
-                'dosis' => '20 mg',
-                'hora' => '07:00',
-                'estado' => 'ADMINISTRADA',
-            ];
-            $matrizKardex[$primerRes->cod_residente]['08:00'][] = [
-                'id' => 'PARACETAMOL',
-                'cod_prescripcion' => 'PARACETAMOL',
-                'cod_residente' => $primerRes->cod_residente,
-                'nombre_corto' => 'Paracetamol',
-                'dosis' => '500 mg',
-                'hora' => '08:00',
-                'estado' => 'RETRASADA',
-            ];
-            $matrizKardex[$primerRes->cod_residente]['12:00'][] = [
-                'id' => 'LOSARTAN',
-                'cod_prescripcion' => 'LOSARTAN',
-                'cod_residente' => $primerRes->cod_residente,
-                'nombre_corto' => 'Losartán',
-                'dosis' => '50 mg',
-                'hora' => '12:00',
-                'estado' => 'PENDIENTE',
-            ];
-        }
-
         // 4. Alertas de medicación reales (Alergias y Retrasos)
         $residentesConAlergiasList = Alergia::whereIn('cod_residente', $codigosResidentes)
             ->whereIn('estado', ['ACTIVO', 'ACTIVA'])
@@ -1046,7 +960,7 @@ class SaludAdministracionMedicacionPanel extends Component
             $med = $presc?->medicamento;
             $cama = $res?->ocupacionActiva?->cama;
             $hab = $cama?->habitacion;
-            $habTexto = $hab?->nombre ?? ($hab?->numero ? "Hab. {$hab->numero}" : 'Hab. 101');
+            $habTexto = $hab?->nombre ?? ($hab?->numero ? "Hab. {$hab->numero}" : 'Sin habitación');
             $estadoRaw = $item['estado'];
 
             $estadoTexto = match($estadoRaw) {
@@ -1074,41 +988,6 @@ class SaludAdministracionMedicacionPanel extends Component
                 'cod_prescripcion' => $presc->cod_prescripcion,
                 'tiene_alerta_clinica' => in_array($res?->cod_residente, $residentesConAlergiasList),
             ]);
-        }
-
-        if ($dosisHoy->isEmpty()) {
-            $nomPrimer = $residentes->first() ? trim($residentes->first()->nombres . ' ' . ($residentes->first()->apellido_paterno ?? $residentes->first()->ap_paterno ?? '')) : 'María del Carmen López';
-            $codPrimer = $residentes->first()?->cod_residente ?? 'RES_0001';
-
-            $ejemplos = [
-                ['07:00', $nomPrimer, 'Hab. 101', 'Omeprazol', '20 mg', 'Vía oral', 'Administrada', 'ADMINISTRADA', 'PRS_0001', $codPrimer],
-                ['08:00', $nomPrimer, 'Hab. 101', 'Paracetamol', '500 mg', 'Vía oral', 'Con retraso', 'RETRASADA', 'PRS_0002', $codPrimer],
-                ['12:00', $nomPrimer, 'Hab. 101', 'Losartán', '50 mg', 'Vía oral', 'Pendiente', 'PENDIENTE', 'PRS_0003', $codPrimer],
-                ['16:00', $nomPrimer, 'Hab. 101', 'Simvastatina', '20 mg', 'Vía oral', 'Pendiente', 'PENDIENTE', 'PRS_0004', $codPrimer],
-                ['20:00', $nomPrimer, 'Hab. 101', 'Losartán', '50 mg', 'Vía oral', 'Pendiente', 'PENDIENTE', 'PRS_0005', $codPrimer],
-            ];
-            foreach ($ejemplos as $e) {
-                $partesNom = explode(' ', $e[1]);
-                $ini = strtoupper(substr($partesNom[0], 0, 1) . substr(end($partesNom), 0, 1));
-                $dosisHoy->push([
-                    'id' => $e[8] . '|' . $e[0],
-                    'hora' => $e[0],
-                    'hora_12h' => Carbon::parse("2000-01-01 {$e[0]}")->format('h:i A'),
-                    'cod_residente' => $e[9],
-                    'nombre_residente' => $e[1],
-                    'iniciales' => $ini,
-                    'habitacion' => $e[2],
-                    'medicamento' => $e[3],
-                    'dosis' => $e[4],
-                    'via' => $e[5],
-                    'estado' => $e[6],
-                    'estado_raw' => $e[7],
-                    'cod_prescripcion' => $e[8],
-                    'es_prn' => $e[10] ?? false,
-                    'via_raw' => $e[11] ?? 'ORAL',
-                    'tiene_alerta_clinica' => ($residentesConAlergias > 0 && $e[0] === '08:00'),
-                ]);
-            }
         }
 
                 // Filtros específicos y combinables de Kardex
@@ -1200,162 +1079,6 @@ class SaludAdministracionMedicacionPanel extends Component
             if ($rA !== $rB) return $rA <=> $rB;
             return strcmp($a['hora'], $b['hora']);
         })->values();
-
-        $nomPrimerFallback = $residentes->first() ? trim($residentes->first()->nombres . ' ' . ($residentes->first()->apellido_paterno ?? $residentes->first()->ap_paterno ?? '')) : 'Mario Gutiérrez Mendoza';
-        $codPrimerFallback = $residentes->first()?->cod_residente ?? 'RES_0001';
-
-        // Asegurar que Próximas Dosis tenga dataset representativo y funcional
-        if ($proximasDosis->isEmpty()) {
-            $proximasDosis = $dosisHoy->whereIn('estado_raw', ['VENCIDA', 'RETRASADA', 'PENDIENTE', 'PROXIMA'])->values();
-            if ($proximasDosis->isEmpty()) {
-                $proximasDosis = $dosisHoy;
-            }
-        }
-
-        // Asegurar que Omisiones tenga dataset representativo si aún no hay registros en BD
-        if ($omisiones->isEmpty()) {
-            $omisiones = collect([
-                (object)[
-                    'cod_administracion' => 'ADM_OM_001',
-                    'cod_prescripcion' => 'PRS_0001',
-                    'cod_residente' => $codPrimerFallback,
-                    'fecha_hora_programada' => now()->startOfDay()->addHours(8),
-                    'motivo_omision' => 'Ayuno médico programado',
-                    'observacion' => 'Programada extracción analítica a las 09:15.',
-                    'residente' => (object)[
-                        'nombres' => $nomPrimerFallback,
-                        'ap_paterno' => '',
-                        'apellido_paterno' => '',
-                    ],
-                    'prescripcion' => (object)[
-                        'cod_prescripcion' => 'PRS_0001',
-                        'nombre_medicamento' => 'Metformina',
-                        'dosis' => '850',
-                        'unidad_dosis' => 'mg',
-                        'medicamento' => (object)[
-                            'nombre_generico' => 'Metformina',
-                            'nombre_comercial' => 'Glucophage®',
-                        ],
-                    ],
-                    'personal' => (object)[
-                        'nombres' => 'Laura González',
-                    ],
-                ],
-                (object)[
-                    'cod_administracion' => 'ADM_OM_002',
-                    'cod_prescripcion' => 'PRS_0002',
-                    'cod_residente' => $codPrimerFallback,
-                    'fecha_hora_programada' => now()->startOfDay()->addHours(7),
-                    'motivo_omision' => 'Rechazo del paciente',
-                    'observacion' => 'Paciente refiere náuseas leves y pide postergar 1 hora.',
-                    'residente' => (object)[
-                        'nombres' => $nomPrimerFallback,
-                        'ap_paterno' => '',
-                        'apellido_paterno' => '',
-                    ],
-                    'prescripcion' => (object)[
-                        'cod_prescripcion' => 'PRS_0002',
-                        'nombre_medicamento' => 'Omeprazol',
-                        'dosis' => '20',
-                        'unidad_dosis' => 'mg',
-                        'medicamento' => (object)[
-                            'nombre_generico' => 'Omeprazol',
-                            'nombre_comercial' => 'Normon®',
-                        ],
-                    ],
-                    'personal' => (object)[
-                        'nombres' => 'Elena Vargas',
-                    ],
-                ],
-            ]);
-        }
-
-        // Asegurar que Historial tenga dataset representativo si aún no hay registros en BD
-        if ($historial->isEmpty() && empty($this->buscarResidente) && empty($this->filtroHistorialMedicamento) && empty($this->filtroHistorialFecha)) {
-            $ejemplosHist = collect([
-                (object)[
-                    'cod_administracion' => 'ADM_H_001',
-                    'cod_prescripcion' => 'PRS_0001',
-                    'cod_residente' => $codPrimerFallback,
-                    'fecha_hora_administracion' => now()->startOfDay()->addHours(7)->addMinutes(10),
-                    'fecha_hora_programada' => now()->startOfDay()->addHours(7),
-                    'resultado' => 'ADMINISTRADA',
-                    'administrado' => true,
-                    'dosis_administrada' => '20 mg',
-                    'residente' => (object)['nombres' => $nomPrimerFallback, 'ap_paterno' => '', 'apellido_paterno' => ''],
-                    'prescripcion' => (object)['cod_prescripcion' => 'PRS_0001', 'nombre_medicamento' => 'Omeprazol', 'dosis' => '20', 'unidad_dosis' => 'mg', 'medicamento' => (object)['nombre_generico' => 'Omeprazol', 'nombre_comercial' => 'Normon®']],
-                    'personal' => (object)['nombres' => 'Elena Vargas'],
-                ],
-                (object)[
-                    'cod_administracion' => 'ADM_H_002',
-                    'cod_prescripcion' => 'PRS_0002',
-                    'cod_residente' => $codPrimerFallback,
-                    'fecha_hora_administracion' => now()->subDay()->startOfDay()->addHours(20),
-                    'fecha_hora_programada' => now()->subDay()->startOfDay()->addHours(20),
-                    'resultado' => 'ADMINISTRADA',
-                    'administrado' => true,
-                    'dosis_administrada' => '50 mg',
-                    'residente' => (object)['nombres' => $nomPrimerFallback, 'ap_paterno' => '', 'apellido_paterno' => ''],
-                    'prescripcion' => (object)['cod_prescripcion' => 'PRS_0002', 'nombre_medicamento' => 'Losartán', 'dosis' => '50', 'unidad_dosis' => 'mg', 'medicamento' => (object)['nombre_generico' => 'Losartán', 'nombre_comercial' => 'Cozaar®']],
-                    'personal' => (object)['nombres' => 'Laura González'],
-                ],
-                (object)[
-                    'cod_administracion' => 'ADM_H_003',
-                    'cod_prescripcion' => 'PRS_0003',
-                    'cod_residente' => $codPrimerFallback,
-                    'fecha_hora_administracion' => now()->subDay()->startOfDay()->addHours(8),
-                    'fecha_hora_programada' => now()->subDay()->startOfDay()->addHours(8),
-                    'resultado' => 'OMITIDA',
-                    'administrado' => false,
-                    'dosis_administrada' => '850 mg',
-                    'residente' => (object)['nombres' => $nomPrimerFallback, 'ap_paterno' => '', 'apellido_paterno' => ''],
-                    'prescripcion' => (object)['cod_prescripcion' => 'PRS_0003', 'nombre_medicamento' => 'Metformina', 'dosis' => '850', 'unidad_dosis' => 'mg', 'medicamento' => (object)['nombre_generico' => 'Metformina', 'nombre_comercial' => 'Glucophage®']],
-                    'personal' => (object)['nombres' => 'Elena Vargas'],
-                ],
-            ]);
-
-            if (!empty($this->filtroHistorialBusqueda) || !empty($this->buscarResidente)) {
-                $busq = mb_strtolower(trim(!empty($this->filtroHistorialBusqueda) ? $this->filtroHistorialBusqueda : $this->buscarResidente));
-                $ejemplosHist = $ejemplosHist->filter(function ($h) use ($busq) {
-                    $nom = mb_strtolower($h->residente->nombres ?? '');
-                    $med = mb_strtolower($h->prescripcion->medicamento->nombre_generico ?? ($h->prescripcion->nombre_medicamento ?? ''));
-                    return str_contains($nom, $busq) || str_contains($med, $busq);
-                })->values();
-            }
-            if ($this->filtroHistorialResultado) {
-                $ejemplosHist = $ejemplosHist->where('resultado', $this->filtroHistorialResultado)->values();
-            }
-            if ($this->filtroHistorialResidente) {
-                $ejemplosHist = $ejemplosHist->where('cod_residente', $this->filtroHistorialResidente)->values();
-            }
-            if ($this->filtroHistorialMedicamento) {
-                $busqMed = mb_strtolower(trim($this->filtroHistorialMedicamento));
-                $ejemplosHist = $ejemplosHist->filter(function ($h) use ($busqMed) {
-                    $med = mb_strtolower($h->prescripcion->medicamento->nombre_generico ?? ($h->prescripcion->nombre_medicamento ?? ''));
-                    return str_contains($med, $busqMed);
-                })->values();
-            }
-            if ($this->filtroHistorialVia) {
-                $viaF = strtoupper(trim($this->filtroHistorialVia));
-                $ejemplosHist = $ejemplosHist->filter(function ($h) use ($viaF) {
-                    $via = strtoupper($h->prescripcion->via_administracion ?? 'ORAL');
-                    return str_contains($via, $viaF);
-                })->values();
-            }
-            if ($this->filtroHistorialFechaDesde) {
-                $desde = Carbon::parse($this->filtroHistorialFechaDesde)->startOfDay();
-                $ejemplosHist = $ejemplosHist->filter(function ($h) use ($desde) {
-                    return Carbon::parse($h->fecha_hora_programada)->greaterThanOrEqualTo($desde);
-                })->values();
-            }
-            if ($this->filtroHistorialFechaHasta) {
-                $hasta = Carbon::parse($this->filtroHistorialFechaHasta)->endOfDay();
-                $ejemplosHist = $ejemplosHist->filter(function ($h) use ($hasta) {
-                    return Carbon::parse($h->fecha_hora_programada)->lessThanOrEqualTo($hasta);
-                })->values();
-            }
-            $historial = $ejemplosHist;
-        }
 
         return view('livewire.medicacion.salud-administracion-medicacion', [
             'residentes' => $residentes,

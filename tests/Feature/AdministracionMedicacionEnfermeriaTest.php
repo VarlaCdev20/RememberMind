@@ -78,50 +78,48 @@ class AdministracionMedicacionEnfermeriaTest extends TestCase
             ->assertSee('Historial de Administración');
     }
 
-    public function test_drawer_lateral_se_abre_con_secciones_y_medicamento_clickeable(): void
+    public function test_drawer_rechaza_una_prescripcion_inexistente_sin_inventar_datos(): void
     {
         Livewire::test(SaludAdministracionMedicacionPanel::class, ['adulto' => $this->adulto])
             ->assertSet('drawerDosisAbierto', false)
             ->call('abrirDrawerDosis', 'PARACETAMOL', '08:00', $this->adulto->cod_residente)
-            ->assertSet('drawerDosisAbierto', true)
-            ->assertSee('Detalle de la Dosis')
-            ->assertSee('Paracetamol')
-            ->assertSee('Prescripción Médica')
-            ->assertSee('Programación del Horario')
-            ->assertSee('Seguridad y Alergias')
-            ->assertSee('Último Seguimiento')
-            ->assertSee('Observación de Enfermería')
-            ->assertSee('Administrar')
-            ->assertSee('Registrar omisión');
+            ->assertSet('drawerDosisAbierto', false)
+            ->assertSet('selectedPrescripcionId', null)
+            ->assertSet('dosisDetalle', [])
+            ->assertDispatched('swal');
     }
 
     public function test_ficha_flotante_del_medicamento_se_abre_como_modal_independiente(): void
     {
+        Medicamento::create([
+            'cod_medicamento' => 'MED_PARACETAMOL_REAL',
+            'nombre_generico' => 'Paracetamol',
+            'concentracion' => '500 mg',
+            'forma_farmaceutica' => 'Comprimido',
+            'unidad' => 'mg',
+            'via_predeterminada' => 'ORAL',
+            'control_especial' => false,
+            'estado' => 'ACTIVO',
+        ]);
+
         Livewire::test(SaludAdministracionMedicacionPanel::class, ['adulto' => $this->adulto])
-            ->call('abrirDrawerDosis', 'PARACETAMOL', '08:00', $this->adulto->cod_residente)
-            ->assertSet('drawerDosisAbierto', true)
             ->assertSet('modalMedicamentoAbierto', false)
-            ->call('abrirModalMedicamento', 'PARACETAMOL')
+            ->call('abrirModalMedicamento', 'MED_PARACETAMOL_REAL')
             ->assertSet('modalMedicamentoAbierto', true)
-            ->assertSet('drawerDosisAbierto', true) // El drawer sigue abierto debajo
             ->assertSee('Ficha del medicamento')
             ->assertSee('Concentración')
             ->assertSee('Forma farmacéutica')
             ->assertSee('Información farmacológica ampliada no registrada.')
             ->call('cerrarModalMedicamento')
-            ->assertSet('modalMedicamentoAbierto', false)
-            ->assertSet('drawerDosisAbierto', true);
+            ->assertSet('modalMedicamentoAbierto', false);
     }
 
-    public function test_flujo_omision_justificada_en_drawer(): void
+    public function test_no_abre_flujo_de_omision_para_prescripcion_inexistente(): void
     {
         Livewire::test(SaludAdministracionMedicacionPanel::class, ['adulto' => $this->adulto])
             ->call('abrirDrawerDosis', 'PARACETAMOL', '08:00', $this->adulto->cod_residente)
+            ->assertSet('drawerDosisAbierto', false)
             ->assertSet('mostrarFormularioOmision', false)
-            ->call('mostrarOmisionForm')
-            ->assertSet('mostrarFormularioOmision', true)
-            ->assertSee('Motivo de Omisión Justificada')
-            ->call('cancelarOmisionForm')
-            ->assertSet('mostrarFormularioOmision', false);
+            ->assertSet('selectedPrescripcionId', null);
     }
 }

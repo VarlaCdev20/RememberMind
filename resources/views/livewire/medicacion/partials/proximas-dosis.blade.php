@@ -51,7 +51,7 @@
                         $iniciales = strtoupper(substr($partes[0] ?? 'R', 0, 1) . substr($partes[1] ?? 'M', 0, 1));
 
                         $hora = $isArray ? ($item['hora'] ?? '08:00') : ($item->fecha_hora_programada?->format('H:i') ?? '08:00');
-                        $hab = $isArray ? ($item['habitacion'] ?? 'Hab. 101') : 'Hab. 101';
+                        $hab = $isArray ? ($item['habitacion'] ?? 'Sin habitación') : 'Sin habitación';
                         
                         $medNombre = $isArray 
                             ? ($item['medicamento'] ?? ($presc?->medicamento?->nombre_generico ?? 'Medicamento')) 
@@ -69,12 +69,12 @@
                             default => 'bg-[#FBF0D9] dark:bg-[#D2A45E]/20 text-[#D2A45E] dark:text-[#E5BA79] border border-[#EED7A1] dark:border-[#D2A45E]/40',
                         };
 
-                        $codPresc = $isArray ? ($item['cod_prescripcion'] ?? 'PRS_0001') : ($presc?->cod_prescripcion ?? 'PRS_0001');
-                        $codRes = $isArray ? ($item['cod_residente'] ?? 'RES_0001') : ($res?->cod_residente ?? 'RES_0001');
+                        $codPresc = $isArray ? ($item['cod_prescripcion'] ?? null) : $presc?->cod_prescripcion;
+                        $codRes = $isArray ? ($item['cod_residente'] ?? null) : $res?->cod_residente;
                     @endphp
                     <tr 
                         wire:key="prox-{{ $isArray ? ($item['id'] ?? $loop->index) : ($item->cod_administracion ?? $loop->index) }}"
-                        wire:click="abrirDrawerDosis('{{ $codPresc }}', '{{ $hora }}', '{{ $codRes }}')"
+                        @if($codPresc && $codRes) wire:click="abrirDrawerDosis('{{ $codPresc }}', '{{ $hora }}', '{{ $codRes }}')" @endif
                         class="cursor-pointer transition-colors duration-150 hover:bg-[#E4D8CC]/50 dark:hover:bg-white/[0.03]">
                         
                         {{-- Hora --}}

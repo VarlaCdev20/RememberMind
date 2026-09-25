@@ -286,7 +286,7 @@
 
                             {{-- Hab / Cama --}}
                             <td class="px-2 py-2 text-[#677084] dark:text-[#BDAE9F] font-medium text-xs whitespace-nowrap">
-                                {{ $dosis['habitacion'] ?? 'Hab. 101' }}
+                                {{ $dosis['habitacion'] ?? 'Sin habitación' }}
                             </td>
 
                             {{-- Medicamento --}}
