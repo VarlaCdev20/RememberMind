@@ -53,60 +53,64 @@ class PaseTurnoService
     public function resolverJornadaSaliente(?User $usuario = null): Jornada
     {
         $usuario = $usuario ?: Auth::user();
-        $personal = $usuario?->personal ?: Personal::where('cod_usuario', $usuario?->cod_usuario)->first();
+
+        if (! $usuario || $usuario->estado !== 'ACTIVO') {
+            throw ValidationException::withMessages([
+                'usuario' => 'Se requiere un usuario activo para resolver la jornada saliente.',
+            ]);
+        }
+
+        $personal = $usuario->personal ?: Personal::where('cod_usuario', $usuario->cod_usuario)->first();
+
+        if (! $personal || ! in_array($personal->estado, ['ACTIVO', 'ACTIVA'], true)) {
+            throw ValidationException::withMessages([
+                'usuario' => 'El usuario no posee un registro de personal activo.',
+            ]);
+        }
 
         // 1. Buscar jornada donde el personal tiene asignaciones activas hoy
-        if ($personal) {
-            $asignacion = AsignacionResidenteJornada::where('cod_personal', $personal->cod_personal)
-                ->whereIn('estado', ['ACTIVO', 'ACTIVA'])
-                ->whereDate('fecha_hora', today())
-                ->latest('fecha_hora')
-                ->first();
+        $asignacion = AsignacionResidenteJornada::where('cod_personal', $personal->cod_personal)
+            ->whereIn('estado', ['ACTIVO', 'ACTIVA', 'ASIGNADO'])
+            ->whereDate('fecha_hora', today())
+            ->whereHas('jornada', fn ($query) => $query
+                ->whereDate('fecha_jornada', today())
+                ->whereIn('estado', ['ABIERTA', 'ACTIVA', 'EN_CURSO']))
+            ->latest('fecha_hora')
+            ->first();
 
-            if ($asignacion && $asignacion->jornada) {
-                return $asignacion->jornada;
-            }
+        if ($asignacion?->jornada) {
+            return $asignacion->jornada;
+        }
 
-            $asigPersonal = AsignacionPersonal::where('cod_personal', $personal->cod_personal)
-                ->whereIn('estado', ['ACTIVO', 'ACTIVA'])
-                ->whereDate('fecha_asignacion', today())
-                ->latest('fecha_asignacion')
-                ->first();
+        $asigPersonal = AsignacionPersonal::where('cod_personal', $personal->cod_personal)
+            ->whereIn('estado', ['ACTIVO', 'ACTIVA', 'ASIGNADO', 'PRESENTE'])
+            ->whereDate('fecha_asignacion', today())
+            ->whereHas('jornada', fn ($query) => $query
+                ->whereDate('fecha_jornada', today())
+                ->whereIn('estado', ['ABIERTA', 'ACTIVA', 'EN_CURSO']))
+            ->latest('fecha_asignacion')
+            ->first();
 
-            if ($asigPersonal && $asigPersonal->jornada) {
-                return $asigPersonal->jornada;
-            }
+        if ($asigPersonal?->jornada) {
+            return $asigPersonal->jornada;
         }
 
         // 2. Buscar jornada activa para el turno según la hora actual
         $turnoActual = $this->turnos->obtenerTurnoActivo($usuario, today()->toDateString());
-        $codTurno = $turnoActual?->cod_turno
-            ?? Turno::query()->whereIn('estado', ['ACTIVO', 'ACTIVA'])->orderBy('orden')->value('cod_turno')
-            ?? Turno::query()->orderBy('orden')->value('cod_turno');
-
-        if (! $codTurno) {
-            $turno = Turno::query()->create([
-                'cod_turno' => 'TUR_' . strtoupper(Str::random(10)),
-                'nombre' => 'Turno operativo',
-                'hora_inicio' => '07:00:00',
-                'hora_cierre' => '15:00:00',
-                'orden' => 1,
-                'estado' => 'ACTIVO',
+        if (! $turnoActual) {
+            throw ValidationException::withMessages([
+                'jornada' => 'El personal no tiene un turno activo y asignado para la fecha actual.',
             ]);
-            $codTurno = $turno->cod_turno;
         }
 
-        $jornada = Jornada::where('cod_turno', $codTurno)
+        $jornada = Jornada::where('cod_turno', $turnoActual->cod_turno)
             ->whereDate('fecha_jornada', today())
+            ->whereIn('estado', ['ABIERTA', 'ACTIVA', 'EN_CURSO'])
             ->first();
 
-        if (!$jornada) {
-            $jornada = Jornada::create([
-                'cod_jornada' => 'JOR_' . strtoupper(Str::random(10)),
-                'cod_turno' => $codTurno,
-                'cod_usuario_apertura' => $usuario?->cod_usuario ?? 'SISTEMA',
-                'fecha_jornada' => today(),
-                'estado' => 'ACTIVA',
+        if (! $jornada) {
+            throw ValidationException::withMessages([
+                'jornada' => 'No existe una jornada abierta para el turno activo del personal.',
             ]);
         }
 
@@ -119,10 +123,17 @@ class PaseTurnoService
     public function resolverJornadaEntrante(Jornada $jornadaSaliente): Jornada
     {
         $turnoSaliente = $jornadaSaliente->turno ?: Turno::find($jornadaSaliente->cod_turno);
-        $ordenActual = $turnoSaliente ? $turnoSaliente->orden : 1;
+
+        if (! $turnoSaliente || ! in_array($turnoSaliente->estado, ['ACTIVO', 'ACTIVA'], true)) {
+            throw ValidationException::withMessages([
+                'jornada' => 'La jornada saliente no está vinculada a un turno activo.',
+            ]);
+        }
+
+        $ordenActual = $turnoSaliente->orden;
 
         // Buscar siguiente turno con orden superior
-        $siguienteTurno = Turno::where('estado', 'ACTIVO')
+        $siguienteTurno = Turno::whereIn('estado', ['ACTIVO', 'ACTIVA'])
             ->where('orden', '>', $ordenActual)
             ->orderBy('orden')
             ->first();
@@ -131,23 +142,24 @@ class PaseTurnoService
 
         if (!$siguienteTurno) {
             // Ciclo cumplido (rollover): vuelve al primer turno del día siguiente
-            $siguienteTurno = Turno::where('estado', 'ACTIVO')->orderBy('orden')->first();
+            $siguienteTurno = Turno::whereIn('estado', ['ACTIVO', 'ACTIVA'])->orderBy('orden')->first();
             $fechaEntrante = Carbon::parse($jornadaSaliente->fecha_jornada)->addDay()->format('Y-m-d');
         }
 
-        $codTurnoEntrante = $siguienteTurno ? $siguienteTurno->cod_turno : $jornadaSaliente->cod_turno;
+        if (! $siguienteTurno) {
+            throw ValidationException::withMessages([
+                'turno_entrante' => 'No existe un turno activo configurado para continuar el pase.',
+            ]);
+        }
 
-        $jornadaEntrante = Jornada::where('cod_turno', $codTurnoEntrante)
+        $jornadaEntrante = Jornada::where('cod_turno', $siguienteTurno->cod_turno)
             ->whereDate('fecha_jornada', $fechaEntrante)
+            ->whereIn('estado', ['PLANIFICADA', 'ABIERTA', 'ACTIVA', 'EN_CURSO'])
             ->first();
 
-        if (!$jornadaEntrante) {
-            $jornadaEntrante = Jornada::create([
-                'cod_jornada' => 'JOR_' . strtoupper(Str::random(10)),
-                'cod_turno' => $codTurnoEntrante,
-                'cod_usuario_apertura' => Auth::user()?->cod_usuario ?? 'SISTEMA',
-                'fecha_jornada' => $fechaEntrante,
-                'estado' => 'ACTIVA',
+        if (! $jornadaEntrante) {
+            throw ValidationException::withMessages([
+                'jornada_entrante' => 'La siguiente jornada debe estar planificada antes de realizar el pase.',
             ]);
         }
 
@@ -699,7 +711,7 @@ class PaseTurnoService
         $saliente = $this->turnos->autorizarMutacionPaciente($codResidente, 'pases_turno.crear', $usuario);
 
         $datosValidados = Validator::make($datos, [
-            'observaciones' => 'nullable|string|max:5000',
+            'observaciones' => 'required|string|min:5|max:5000',
             'estado_general' => 'nullable|string|max:100',
             'recomendacion' => 'nullable|string|max:5000',
             'vigilancia' => 'required|boolean',
@@ -714,18 +726,32 @@ class PaseTurnoService
         $codPersonalSaliente = $usuario->personal?->cod_personal;
         $codPersonalEntrante = $receptor->personal?->cod_personal;
 
+        if (! $codPersonalSaliente || ! $codPersonalEntrante) {
+            throw ValidationException::withMessages([
+                'personal' => 'El personal saliente y entrante deben estar vinculados a usuarios activos.',
+            ]);
+        }
+
         $jornadaSaliente = $this->resolverJornadaSaliente($usuario);
-        $jornadaEntrante = Jornada::whereDate('fecha_jornada', today())
-            ->where('cod_turno', $turnoEntranteId)
+        $turnoEntrante = Turno::query()
+            ->whereKey($turnoEntranteId)
+            ->whereIn('estado', ['ACTIVO', 'ACTIVA'])
             ->first();
 
-        if (!$jornadaEntrante) {
-            $jornadaEntrante = Jornada::create([
-                'cod_jornada' => 'JOR_' . strtoupper(Str::random(10)),
-                'cod_turno' => $turnoEntranteId,
-                'cod_usuario_apertura' => $receptor->cod_usuario,
-                'fecha_jornada' => today(),
-                'estado' => 'ABIERTA',
+        if (! $turnoEntrante) {
+            throw ValidationException::withMessages([
+                'turno_entrante_id' => 'El turno entrante no existe o no está activo.',
+            ]);
+        }
+
+        $jornadaEntrante = Jornada::whereDate('fecha_jornada', today())
+            ->where('cod_turno', $turnoEntranteId)
+            ->whereIn('estado', ['PLANIFICADA', 'ABIERTA', 'ACTIVA', 'EN_CURSO'])
+            ->first();
+
+        if (! $jornadaEntrante) {
+            throw ValidationException::withMessages([
+                'jornada_entrante' => 'La jornada entrante debe existir y estar planificada antes de generar el pase.',
             ]);
         }
 
@@ -739,7 +765,7 @@ class PaseTurnoService
         }
 
         $pendientes = $this->pendientes($codResidente, $saliente);
-        $resumen = trim(($datosValidados['observaciones'] ?? 'Se entrega guardia con novedades normales.'));
+        $resumen = trim($datosValidados['observaciones']);
 
         return PaseTurno::create([
             'cod_pase' => 'PAS_' . strtoupper(Str::random(10)),

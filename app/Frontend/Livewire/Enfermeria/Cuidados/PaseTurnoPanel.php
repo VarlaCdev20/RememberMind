@@ -388,31 +388,60 @@ class PaseTurnoPanel extends Component
         $user = Auth::user();
 
         $personal = $user?->personal ?: Personal::where('cod_usuario', $user?->cod_usuario)->first();
-
-        // 1. Resolver jornadas saliente y entrante de forma automática
-        $jornadaSaliente = $service->resolverJornadaSaliente($user);
-        $jornadaEntrante = $service->resolverJornadaEntrante($jornadaSaliente);
-
-        // 2. Obtener residentes a entregar (si el usuario es personal)
-        $residentesAEntregar = [];
-        if ($personal) {
-            $residentesAEntregar = $service->obtenerResidentesAEntregar($personal, $jornadaSaliente, $jornadaEntrante);
-        }
-
-        // Filtrar residentes según subfiltro
-        if ($this->filtroEntrega === 'criticos') {
-            $residentesAEntregar = array_filter($residentesAEntregar, fn ($r) => $r['tiene_alerta_critica'] || $r['incidentes_count'] > 0);
-        } elseif ($this->filtroEntrega === 'pendientes') {
-            $residentesAEntregar = array_filter($residentesAEntregar, fn ($r) => $r['estado_pase'] !== 'ENTREGADO' && $r['estado_pase'] !== 'RECIBIDO');
-        }
-
-        // 3. Obtener pases pendientes de recibir para este profesional
+        $jornadaSaliente = null;
+        $jornadaEntrante = null;
+        $errorConfiguracion = null;
+        $residentesAEntregar = collect();
         $pasesPendientesRecibir = [];
-        if ($personal) {
-            $pasesPendientesRecibir = $service->obtenerPasesPendientesRecibir($personal, $jornadaSaliente);
-            // También revisar si la jornada entrante es la actual
-            if (empty($pasesPendientesRecibir)) {
-                $pasesPendientesRecibir = $service->obtenerPasesPendientesRecibir($personal, $jornadaEntrante);
+
+        try {
+            // 1. Resolver jornadas reales, sin crearlas durante una consulta.
+            $jornadaSaliente = $service->resolverJornadaSaliente($user);
+            $jornadaEntrante = $service->resolverJornadaEntrante($jornadaSaliente);
+
+            // 2. Obtener residentes a entregar (si el usuario es personal)
+            if ($personal) {
+                $residentesAEntregar = $service->obtenerResidentesAEntregar($personal, $jornadaSaliente, $jornadaEntrante);
+            }
+
+            if ($this->filtroEntrega === 'criticos') {
+                $residentesAEntregar = $residentesAEntregar->filter(
+                    fn ($residente) => $residente['tiene_alerta_critica'] || $residente['incidentes_count'] > 0
+                );
+            } elseif ($this->filtroEntrega === 'pendientes') {
+                $residentesAEntregar = $residentesAEntregar->filter(
+                    fn ($residente) => ! in_array($residente['estado_pase'], ['ENTREGADO', 'RECIBIDO'], true)
+                );
+            }
+
+            // 3. Obtener pases pendientes de recibir para este profesional
+            if ($personal) {
+                $pasesPendientesRecibir = $service->obtenerPasesPendientesRecibir($personal, $jornadaSaliente);
+                if (empty($pasesPendientesRecibir)) {
+                    $pasesPendientesRecibir = $service->obtenerPasesPendientesRecibir($personal, $jornadaEntrante);
+                }
+            }
+        } catch (ValidationException $exception) {
+            $errorConfiguracion = collect($exception->errors())->flatten()->first()
+                ?? 'No existe una configuración operativa completa para realizar el pase de turno.';
+
+            // Un receptor puede consultar y aceptar pases de una jornada ya planificada,
+            // aunque su jornada todavía no esté abierta como jornada saliente.
+            if ($personal) {
+                $asignacionRecepcion = AsignacionResidenteJornada::query()
+                    ->with('jornada.turno')
+                    ->where('cod_personal', $personal->cod_personal)
+                    ->whereIn('estado', ['ACTIVO', 'ACTIVA', 'ASIGNADO'])
+                    ->whereHas('jornada', fn ($query) => $query
+                        ->whereDate('fecha_jornada', today())
+                        ->whereIn('estado', ['PLANIFICADA', 'ABIERTA', 'ACTIVA', 'EN_CURSO']))
+                    ->latest('fecha_hora')
+                    ->first();
+
+                if ($asignacionRecepcion?->jornada) {
+                    $jornadaEntrante = $asignacionRecepcion->jornada;
+                    $pasesPendientesRecibir = $service->obtenerPasesPendientesRecibir($personal, $jornadaEntrante);
+                }
             }
         }
 
@@ -455,6 +484,7 @@ class PaseTurnoPanel extends Component
             'residentesAEntregar' => $residentesAEntregar,
             'pasesPendientesRecibir' => $pasesPendientesRecibir,
             'historialPases' => $historialPases,
+            'errorConfiguracion' => $errorConfiguracion,
         ])->layout(request()->routeIs('admin.enfermeria.*') ? 'layouts.enfermeria' : 'layouts.sistema');
     }
 }

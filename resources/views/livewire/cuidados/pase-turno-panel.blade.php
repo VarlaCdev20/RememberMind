@@ -46,6 +46,18 @@
         </div>
     @endif
 
+    @if($errorConfiguracion)
+        <div class="rounded-xl border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900 dark:border-amber-700 dark:bg-amber-950/30 dark:text-amber-200">
+            <div class="flex items-start gap-2">
+                <i class="ph-bold ph-warning-circle mt-0.5 text-base"></i>
+                <div>
+                    <p class="font-bold">Configuración de pase incompleta</p>
+                    <p class="mt-1 text-xs">{{ $errorConfiguracion }}</p>
+                </div>
+            </div>
+        </div>
+    @endif
+
     {{-- BARRA DE CONTEXTO ASISTENCIAL (SOLO LECTURA, DETERMINADA POR EL SISTEMA) --}}
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 rounded-2xl bg-[#DED1C3] dark:bg-[#2C2723] border border-[#C7B9AA] dark:border-[#423B34] p-4 text-xs">
         {{-- Jornada actual --}}
@@ -56,7 +68,11 @@
             <div>
                 <span class="text-[10px] uppercase font-bold text-[#677084] dark:text-[#A89F93] block">Jornada actual (Saliente):</span>
                 <span class="font-bold text-xs text-[#304060] dark:text-[#F3EAE1]">
-                    {{ $jornadaSaliente->turno?->nombre ?? 'Guardia activa' }} · {{ \Carbon\Carbon::parse($jornadaSaliente->fecha_jornada)->format('d/m/Y') }}
+                    @if($jornadaSaliente)
+                        {{ $jornadaSaliente->turno?->nombre ?? 'Guardia activa' }} · {{ \Carbon\Carbon::parse($jornadaSaliente->fecha_jornada)->format('d/m/Y') }}
+                    @else
+                        Sin jornada activa asignada
+                    @endif
                 </span>
             </div>
         </div>
@@ -82,7 +98,11 @@
             <div>
                 <span class="text-[10px] uppercase font-bold text-[#677084] dark:text-[#A89F93] block">Siguiente jornada (Entrante):</span>
                 <span class="font-bold text-xs text-[#884A39] dark:text-[#D58C79]">
-                    {{ $jornadaEntrante->turno?->nombre ?? 'Siguiente guardia' }} · {{ \Carbon\Carbon::parse($jornadaEntrante->fecha_jornada)->format('d/m/Y') }}
+                    @if($jornadaEntrante)
+                        {{ $jornadaEntrante->turno?->nombre ?? 'Siguiente guardia' }} · {{ \Carbon\Carbon::parse($jornadaEntrante->fecha_jornada)->format('d/m/Y') }}
+                    @else
+                        Sin jornada entrante planificada
+                    @endif
                 </span>
             </div>
         </div>
