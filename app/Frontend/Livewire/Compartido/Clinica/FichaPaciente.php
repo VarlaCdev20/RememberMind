@@ -745,9 +745,9 @@ class FichaPaciente extends Component
         $criticos = $todos->filter(fn ($e) => ($e['severidad'] ?? '') === 'Grave / Crítica' || ($e['severidad'] ?? '') === 'Crítica')->count();
 
         return [
-            'activos' => $activos > 0 ? $activos : 2,
-            'en_seguimiento' => $enSeguimiento > 0 ? $enSeguimiento : 1,
-            'resueltos' => $resueltos > 0 ? $resueltos : 8,
+            'activos' => $activos,
+            'en_seguimiento' => $enSeguimiento,
+            'resueltos' => $resueltos,
             'criticos' => $criticos,
         ];
     }
@@ -772,17 +772,6 @@ class FichaPaciente extends Component
             $key = $ev['fecha_hora_carbon']->format('Y-m');
             if (isset($meses[$key])) {
                 $meses[$key]['count']++;
-            }
-        }
-
-        // Si todos los conteos están en 0, asegurar los datos de la Golden Reference
-        $totalSum = array_sum(array_column($meses, 'count'));
-        if ($totalSum === 0) {
-            $grValores = [1, 2, 2, 3, 1, 2];
-            $idx = 0;
-            foreach ($meses as &$m) {
-                $m['count'] = $grValores[$idx % count($grValores)];
-                $idx++;
             }
         }
 
@@ -818,17 +807,6 @@ class FichaPaciente extends Component
         }
 
         $total = array_sum($conteo);
-        if ($total === 0) {
-            $conteo = [
-                'Caídas' => 4,
-                'Lesiones' => 2,
-                'Incidentes' => 2,
-                'Complicaciones' => 1,
-                'Otros' => 1,
-            ];
-            $total = 10;
-        }
-
         $percentages = [];
         foreach ($conteo as $k => $v) {
             $percentages[$k] = $total > 0 ? round(($v / $total) * 100) : 0;
