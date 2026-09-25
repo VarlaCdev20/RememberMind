@@ -459,6 +459,14 @@ class DashboardTurno extends Component
     {
         $miTurnoService = app(\App\Backend\Modulos\Enfermeria\Servicios\MiTurnoService::class);
         $dashboard = $miTurnoService->obtenerDatosDashboard(Auth::user(), $this->filtroFecha);
+        $residentesDashboard = collect($dashboard['residentes'] ?? []);
+        $distribucionPacientes = [
+            'estable' => $residentesDashboard->where('estado_seguimiento', 'ESTABLE')->count(),
+            'vigilancia' => $residentesDashboard->where('estado_seguimiento', 'VIGILANCIA')->count(),
+            'atencion' => $residentesDashboard->filter(
+                fn ($residente) => in_array($residente['estado_seguimiento'] ?? null, ['CRITICO', 'CRÍTICO', 'ATENCION'], true)
+            )->count(),
+        ];
 
         return view('livewire.cuidados.dashboard-turno', [
             'dashboard' => $dashboard,
@@ -490,13 +498,13 @@ class DashboardTurno extends Component
             'cumplimientoTurno' => [
                 'total_acciones' => $dashboard['estado_tareas']['total'] ?? 0,
                 'completadas' => $dashboard['estado_tareas']['realizadas'] ?? 0,
-                'porcentaje' => $dashboard['estado_tareas']['porcentaje'] ?? 100,
+                'porcentaje' => $dashboard['estado_tareas']['porcentaje'] ?? null,
                 'tareas_completadas' => $dashboard['estado_tareas']['realizadas'] ?? 0,
                 'tareas_pendientes' => $dashboard['estado_tareas']['pendientes'] ?? 0,
                 'seguimientos_completados' => 0,
                 'seguimientos_pendientes' => 0,
             ],
-            'distribucionPacientes' => ['estable' => count($dashboard['residentes'] ?? []), 'vigilancia' => 0, 'atencion' => 0],
+            'distribucionPacientes' => $distribucionPacientes,
             'pacientesPrioritarios' => collect(),
             'proximasAcciones' => collect(),
         ])->layout('layouts.enfermeria');

@@ -166,8 +166,10 @@
                         if ($sv) {
                             $sist = $sv->presion_sistolica ?? 0;
                             $fc   = $sv->frecuencia_cardiaca ?? 0;
-                            $sat  = $sv->saturacion ?? 100;
-                            $alertaSv = $sist > 160 || $sist < 90 || $fc > 100 || $fc < 50 || $sat < 92;
+                            $sat  = $sv->saturacion;
+                            $alertaSv = $sist > 160 || ($sist > 0 && $sist < 90)
+                                || $fc > 100 || ($fc > 0 && $fc < 50)
+                                || ($sat !== null && $sat < 92);
                         }
                     @endphp
                     <tr class="hover:bg-fondo-panel/50 transition-colors">
@@ -199,8 +201,12 @@
                                             PA: {{ $sv->presion_sistolica }}/{{ $sv->presion_diastolica }}
                                         </div>
                                         @endif
-                                        @if($sv->frecuencia_cardiaca)
-                                        <div class="text-[10px] text-apoyo">FC: {{ $sv->frecuencia_cardiaca }} bpm · Sat: {{ $sv->saturacion }}%</div>
+                                        @if($sv->frecuencia_cardiaca !== null || $sv->saturacion !== null)
+                                        <div class="text-[10px] text-apoyo">
+                                            @if($sv->frecuencia_cardiaca !== null) FC: {{ $sv->frecuencia_cardiaca }} bpm @endif
+                                            @if($sv->frecuencia_cardiaca !== null && $sv->saturacion !== null) · @endif
+                                            @if($sv->saturacion !== null) Sat: {{ $sv->saturacion }}% @endif
+                                        </div>
                                         @endif
                                         <div class="text-[10px] text-meta">{{ \Carbon\Carbon::parse($sv->fecha)->diffForHumans() }}</div>
                                     </div>

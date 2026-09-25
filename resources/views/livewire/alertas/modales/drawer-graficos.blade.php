@@ -16,23 +16,23 @@
     if ($adultoDrawer->valoracionesEnfermeria && $adultoDrawer->valoracionesEnfermeria->count()) {
         foreach ($adultoDrawer->valoracionesEnfermeria->take(3) as $val) {
             $registrosTimeline->push([
-                'fecha' => $val->created_at ? $val->created_at->format('d/m/Y H:i') : 'Reciente',
+                'fecha' => $val->created_at ? $val->created_at->format('d/m/Y H:i') : 'Fecha no registrada',
                 'tipo' => 'Enfermería',
-                'profesional' => $val->profesional->name ?? ($val->registradoPor->name ?? 'Lic. de Guardia'),
-                'resumen' => $val->observaciones ?: ($val->diagnostico_enfermeria ?: 'Residente colaboradora, signos basales controlados sin incidencias.'),
-                'estado' => 'Estable',
-                'badge' => 'bg-emerald-100 text-emerald-800 border-emerald-200',
+                'profesional' => $val->profesional->name ?? ($val->registradoPor->name ?? 'No registrado'),
+                'resumen' => $val->observaciones ?: ($val->diagnostico_enfermeria ?: 'Sin resumen registrado.'),
+                'estado' => $val->estado ?? 'Registrado',
+                'badge' => 'bg-blue-100 text-blue-800 border-blue-200',
             ]);
         }
     }
     if ($registrosTimeline->isEmpty() && $adultoDrawer->seguimientosDiarios && $adultoDrawer->seguimientosDiarios->count()) {
         foreach ($adultoDrawer->seguimientosDiarios->take(3) as $seg) {
             $registrosTimeline->push([
-                'fecha' => $seg->created_at ? $seg->created_at->format('d/m/Y H:i') : 'Reciente',
+                'fecha' => $seg->created_at ? $seg->created_at->format('d/m/Y H:i') : 'Fecha no registrada',
                 'tipo' => 'Seguimiento',
-                'profesional' => $seg->profesional->name ?? 'Equipo Asistencial',
-                'resumen' => $seg->observacion ?: 'Seguimiento de rutina efectuado conforme a plan de cuidados.',
-                'estado' => 'Conforme',
+                'profesional' => $seg->profesional->name ?? 'No registrado',
+                'resumen' => $seg->observacion ?: 'Sin resumen registrado.',
+                'estado' => $seg->estado ?? 'Registrado',
                 'badge' => 'bg-blue-100 text-blue-800 border-blue-200',
             ]);
         }
