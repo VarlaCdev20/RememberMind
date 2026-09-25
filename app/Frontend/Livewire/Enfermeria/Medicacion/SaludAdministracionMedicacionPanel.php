@@ -368,7 +368,9 @@ class SaludAdministracionMedicacionPanel extends Component
                 $this->dispatch('swal', ['icon' => 'error', 'title' => 'No se pudo registrar', 'text' => $primerError]);
                 return;
             } catch (\Throwable $t) {
-                $this->guardarDirectoAdmin($user, $prescripcion, $codResidente, $hora, true, $dAdmin);
+                $this->addError('formDosisAdministrada', $t->getMessage());
+                $this->dispatch('swal', ['icon' => 'error', 'title' => 'Error de registro', 'text' => $t->getMessage()]);
+                return;
             }
         }
 
@@ -443,7 +445,9 @@ class SaludAdministracionMedicacionPanel extends Component
                 $this->dispatch('swal', ['icon' => 'error', 'title' => 'No se pudo registrar', 'text' => $primerError]);
                 return;
             } catch (\Throwable $t) {
-                $this->guardarDirectoAdmin($user, $prescripcion, $codResidente, $hora, false, null, $motivo);
+                $this->addError('formMotivoOmision', $t->getMessage());
+                $this->dispatch('swal', ['icon' => 'error', 'title' => 'Error de registro', 'text' => $t->getMessage()]);
+                return;
             }
         }
 
@@ -455,57 +459,6 @@ class SaludAdministracionMedicacionPanel extends Component
             'icon' => 'warning',
             'title' => 'Omisión registrada',
             'text' => 'La dosis ha quedado registrada como OMITIDA con su debida justificación clínica.',
-        ]);
-    }
-
-    private function guardarDirectoAdmin($user, $prescripcion, $codResidente, $hora, bool $administrada, ?float $dosisAdmin = null, ?string $motivo = null): void
-    {
-        $personal = $user->personal;
-        $codPersonal = $personal?->cod_personal ?? 'PER_ADMIN';
-        $programada = \Carbon\Carbon::parse(today()->toDateString() . ' ' . $hora);
-
-        $jornada = \App\Models\Jornada::whereDate('fecha_jornada', today())->first()
-            ?? \App\Models\Jornada::first();
-        if (!$jornada) {
-            $turno = \App\Models\Turno::firstOrCreate(
-                ['cod_turno' => 'TUR_MANANA'],
-                [
-                    'nombre' => 'Turno Mañana',
-                    'hora_inicio' => '07:00:00',
-                    'hora_cierre' => '15:00:00',
-                    'orden' => 1,
-                    'estado' => 'ACTIVO',
-                ]
-            );
-            $jornada = \App\Models\Jornada::firstOrCreate(
-                ['cod_jornada' => 'JOR_TEST_01'],
-                [
-                    'cod_turno' => $turno->cod_turno,
-                    'fecha_jornada' => today(),
-                    'estado' => 'ABIERTA',
-                ]
-            );
-        }
-
-        $codHorario = $prescripcion->horarios?->firstWhere('hora_programada', $hora)?->cod_horario_prescripcion
-            ?? \App\Models\HorarioPrescripcion::where('cod_prescripcion', $prescripcion->cod_prescripcion)->first()?->cod_horario_prescripcion;
-
-        \App\Models\AdministracionMedicacion::create([
-            'cod_administracion' => 'ADM_' . \Illuminate\Support\Str::upper(\Illuminate\Support\Str::random(12)),
-            'cod_prescripcion' => $prescripcion->cod_prescripcion,
-            'cod_horario_prescripcion' => $codHorario,
-            'cod_residente' => $codResidente ?: $prescripcion->cod_residente,
-            'cod_jornada' => $jornada->cod_jornada,
-            'cod_personal' => $codPersonal,
-            'fecha_hora_programada' => $programada,
-            'fecha_hora_administracion' => $administrada ? now() : null,
-            'resultado' => $administrada ? 'ADMINISTRADA' : 'OMITIDA',
-            'dosis_administrada' => $administrada ? ($dosisAdmin ?? $prescripcion->dosis) : null,
-            'motivo_omision' => $administrada ? null : ($motivo ?: $this->formMotivoOmision),
-            'efecto_observado' => $administrada ? ($this->formEfectoObservado ?: null) : null,
-            'reaccion_adversa' => $administrada ? ($this->formReaccionAdversa ?: null) : null,
-            'observacion' => $administrada ? ($this->formObservacionAdmin ?: null) : ($this->formObservacionOmision ?: null),
-            'estado' => 'REGISTRADA',
         ]);
     }
 

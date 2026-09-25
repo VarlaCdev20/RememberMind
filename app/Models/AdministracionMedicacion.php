@@ -77,48 +77,10 @@ class AdministracionMedicacion extends ModeloOperativo
                 }
             }
             if (empty($registro->cod_personal)) {
-                $codUsuario = $registro->attributes['registrado_por'] ?? null;
-                $pers = null;
-                if ($codUsuario) {
-                    $pers = Personal::where('cod_usuario', $codUsuario)->first() ?? Personal::where('cod_personal', $codUsuario)->first();
-                }
-                $pers ??= auth()->user()?->personal ?? Personal::first();
-                if (!$pers) {
-                    $u = auth()->user() ?? User::first();
-                    $pers = Personal::create([
-                        'cod_personal' => 'PER_' . strtoupper(Str::random(10)),
-                        'cod_usuario' => $u?->cod_usuario ?? 'USU_0001',
-                        'nombres' => 'Personal',
-                        'apellido_paterno' => 'Enfermeria',
-                        'numero_documento' => 'DOC_' . strtoupper(Str::random(8)),
-                        'profesion' => 'ENFERMERIA',
-                        'estado' => 'ACTIVO',
-                    ]);
-                }
-                $registro->cod_personal = $pers->cod_personal;
+                throw new \LogicException('La administración requiere el personal responsable.');
             }
             if (empty($registro->cod_jornada)) {
-                $j = Jornada::whereDate('fecha_jornada', today())->first() ?? Jornada::first();
-                if (!$j) {
-                    $t = TurnoEnfermeria::first();
-                    if (!$t) {
-                        $t = TurnoEnfermeria::create([
-                            'cod_turno' => 'TUR_' . strtoupper(Str::random(10)),
-                            'orden' => 1,
-                            'nombre' => 'Turno Mañana',
-                            'hora_inicio' => '07:00:00',
-                            'hora_fin' => '15:00:00',
-                            'estado' => 'ACTIVO',
-                        ]);
-                    }
-                    $j = Jornada::create([
-                        'cod_jornada' => 'JOR_' . strtoupper(Str::random(10)),
-                        'cod_turno' => $t->cod_turno,
-                        'fecha_jornada' => today(),
-                        'estado' => 'ACTIVA',
-                    ]);
-                }
-                $registro->cod_jornada = $j->cod_jornada;
+                throw new \LogicException('La administración requiere una jornada clínica activa.');
             }
             if (empty($registro->fecha_hora_programada)) {
                 $fec = $registro->attributes['fecha'] ?? today()->toDateString();
