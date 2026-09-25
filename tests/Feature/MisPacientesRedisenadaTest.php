@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Frontend\Livewire\Enfermeria\Cuidados\MisPacientes;
 use App\Models\AdultoMayor;
 use App\Models\Alerta;
+use App\Models\Area;
 use App\Models\OcupacionCama;
 use App\Models\Admision;
 use App\Models\AsignacionResidenteJornada;
@@ -12,6 +13,7 @@ use App\Models\Cama;
 use App\Models\Habitacion;
 use App\Models\Prescripcion;
 use App\Models\PlanCuidado;
+use App\Models\Personal;
 use App\Models\Atencion;
 use App\Models\SignoVital;
 use App\Models\TurnoEnfermeria;
@@ -28,6 +30,8 @@ class MisPacientesRedisenadaTest extends TestCase
     use RefreshDatabase;
 
     private User $enfermero;
+    private Area $area;
+    private Personal $personal;
     private TurnoEnfermeria $turno;
     private AdultoMayor $residenteEstable;
     private AdultoMayor $residenteCritico;
@@ -45,6 +49,13 @@ class MisPacientesRedisenadaTest extends TestCase
             'estado' => 'ACTIVO',
         ]);
         $this->enfermero->assignRole('ENFERMEROS');
+
+        $this->area = Area::create([
+            'cod_area' => 'ARE_ENF_TEST',
+            'nombre' => 'Enfermería de prueba',
+            'estado' => 'ACTIVA',
+        ]);
+        $this->personal = $this->enfermero->personal()->firstOrFail();
 
         $this->turno = TurnoEnfermeria::create([
             'cod_turno' => 'TUR_MANANA',
@@ -206,6 +217,8 @@ class MisPacientesRedisenadaTest extends TestCase
         // Seguimiento para el residente estable
         Atencion::create([
             'cod_residente' => $this->residenteEstable->cod_residente,
+            'cod_area' => $this->area->cod_area,
+            'cod_personal' => $this->personal->cod_personal,
             'cod_turno' => $this->turno->cod_turno,
             'fecha' => today()->toDateString(),
             'hora' => '09:00:00',
@@ -215,7 +228,6 @@ class MisPacientesRedisenadaTest extends TestCase
             'sueno' => 'NORMAL',
             'incidente' => false,
             'requiere_medico' => false,
-            'registrado_por' => $this->enfermero->cod_usuario,
         ]);
     }
 

@@ -100,6 +100,13 @@ class ValoracionMedicaModal extends Component
             'detalle_cuidado_especial.required' => 'Si requiere cuidado especial, debe detallarlo.',
         ]);
 
+        $personal = auth()->user()?->personal;
+        $codArea = $personal?->asignaciones()
+            ->whereIn('estado', ['ACTIVA', 'ACTIVO'])
+            ->latest('fecha_asignacion')
+            ->value('cod_area');
+        abort_unless($personal && $codArea, 422, 'El usuario debe tener personal y área institucional asignados.');
+
         DB::beginTransaction();
         try {
             $estadoAnterior = $this->adulto->estado;
@@ -115,12 +122,13 @@ class ValoracionMedicaModal extends Component
 
             $atencion = Atencion::create([
                 'cod_residente' => $this->adulto->cod_residente,
+                'cod_area' => $codArea,
+                'cod_personal' => $personal->cod_personal,
                 'tipo_atencion' => 'VALORACION_MEDICA_ADMISION',
                 'motivo' => 'Valoración médica para decisión de admisión',
                 'fecha_hora' => now(),
                 'estado' => 'FINALIZADA',
                 'observacion' => $this->observacion_medica,
-                'registrado_por' => auth()->id(),
             ]);
 
             NotaClinica::create([

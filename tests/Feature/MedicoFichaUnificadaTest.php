@@ -4,6 +4,9 @@ namespace Tests\Feature;
 
 use App\Frontend\Livewire\Compartido\Clinica\FichaPaciente;
 use App\Models\AdultoMayor;
+use App\Models\Area;
+use App\Models\Atencion;
+use App\Models\Personal;
 use App\Models\Prescripcion;
 use App\Models\SignoVital;
 use App\Models\User;
@@ -28,6 +31,20 @@ class MedicoFichaUnificadaTest extends TestCase
 
         $this->medico = User::factory()->create(['estado' => 'ACTIVO']);
         $this->medico->assignRole('MEDICO GENERAL/GERIATRA');
+        $personal = Personal::create([
+            'cod_personal' => 'PER_MED_TEST',
+            'cod_usuario' => $this->medico->cod_usuario,
+            'nombres' => 'Médico',
+            'apellido_paterno' => 'Clínico',
+            'numero_documento' => 'MED-TEST-01',
+            'profesion' => 'MEDICINA',
+            'estado' => 'ACTIVO',
+        ]);
+        $area = Area::create([
+            'cod_area' => 'ARE_MED_TEST',
+            'nombre' => 'Área médica de prueba',
+            'estado' => 'ACTIVA',
+        ]);
 
         $this->residente = AdultoMayor::factory()->create([
             'cod_est_adul' => 'EST_001',
@@ -36,8 +53,18 @@ class MedicoFichaUnificadaTest extends TestCase
             'ap_materno'   => 'Paredes',
         ]);
 
+        $atencion = Atencion::create([
+            'cod_residente' => $this->residente->cod_residente,
+            'cod_area' => $area->cod_area,
+            'cod_personal' => $personal->cod_personal,
+            'tipo_atencion' => 'CONSULTA_MEDICA',
+            'fecha_hora' => now(),
+            'estado' => 'FINALIZADA',
+        ]);
+
         Prescripcion::create([
             'cod_residente' => $this->residente->cod_residente,
+            'cod_atencion' => $atencion->cod_atencion,
             'nombre_medicamento' => 'Enalapril 10mg',
             'dosis'              => '1 comprimido',
             'frecuencia'         => 'DIARIA',

@@ -53,11 +53,17 @@ class AdultoMayorAtencionController extends Controller
 
         $fechaHora = $request->input('fecha') . ' ' . $request->input('hora');
         $personal = Personal::where('cod_usuario', auth()->user()?->cod_usuario)->first();
+        $codArea = $personal?->asignaciones()
+            ->whereIn('estado', ['ACTIVA', 'ACTIVO'])
+            ->latest('fecha_asignacion')
+            ->value('cod_area');
+        abort_unless($personal && $codArea, 422, 'El usuario debe tener personal y área institucional asignados.');
 
         Atencion::create([
             'cod_atencion' => 'ATN_' . strtoupper(Str::random(10)),
             'cod_residente' => $adulto_mayor->cod_residente,
-            'cod_personal' => $personal?->cod_personal,
+            'cod_area' => $codArea,
+            'cod_personal' => $personal->cod_personal,
             'tipo_atencion' => $request->input('cod_tipo_aten'),
             'motivo' => $request->input('motivo') ?? 'Atención programada',
             'fecha_hora' => $fechaHora,

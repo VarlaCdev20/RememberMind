@@ -6,6 +6,8 @@ use App\Frontend\Livewire\Compartido\Clinica\FichaPaciente;
 use App\Models\AdministracionMedicacion;
 use App\Models\AdultoMayor;
 use App\Models\Admision;
+use App\Models\Area;
+use App\Models\Atencion;
 use App\Models\Alerta;
 use App\Models\OcupacionCama;
 use App\Models\AsignacionResidenteJornada;
@@ -162,8 +164,19 @@ class FichaPacienteBotonesTest extends TestCase
     {
         $this->actingAs($this->enfermero);
 
+        $atencion = Atencion::create([
+            'cod_residente' => $this->adulto->cod_residente,
+            'cod_area' => Area::query()->firstOrFail()->cod_area,
+            'cod_personal' => $this->enfermero->personal()->firstOrFail()->cod_personal,
+            'tipo_atencion' => 'PRESCRIPCION_MEDICA',
+            'motivo' => 'Preparación del escenario de medicación',
+            'fecha_hora' => now(),
+            'estado' => 'FINALIZADA',
+        ]);
+
         $med = Prescripcion::create([
             'cod_residente' => $this->adulto->cod_residente,
+            'cod_atencion' => $atencion->cod_atencion,
             'nombre_medicamento' => 'Metformina 850mg',
             'dosis' => '850 mg',
             'via_administracion' => 'Oral',

@@ -223,6 +223,7 @@ class MiTurnoAuditoriaCierreTest extends TestCase
         $atencion = Atencion::create([
             'cod_atencion' => 'ATN_' . strtoupper(Str::random(6)),
             'cod_residente' => $this->residente1->cod_residente,
+            'cod_area' => $this->area->cod_area,
             'cod_personal' => $this->enfermeraPersonal->cod_personal,
             'tipo_atencion' => 'CONTROL',
             'motivo' => 'Control de Medicación',

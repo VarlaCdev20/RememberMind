@@ -148,39 +148,11 @@ class Atencion extends ModeloOperativo
             }
 
             if (empty($model->cod_personal)) {
-                $codUsuario = $model->attributes['registrado_por'] ?? null;
-                $p = null;
-                if ($codUsuario) {
-                    $p = Personal::where('cod_usuario', $codUsuario)->first() ?? Personal::where('cod_personal', $codUsuario)->first();
-                }
-                if (!$p) {
-                    $p = Personal::first();
-                }
-                if (!$p) {
-                    $u = User::first() ?? User::factory()->create();
-                    $p = Personal::create([
-                        'cod_personal' => 'PER_' . strtoupper(Str::random(10)),
-                        'cod_usuario' => $u->cod_usuario,
-                        'nombres' => 'Personal',
-                        'apellido_paterno' => 'Enfermeria',
-                        'numero_documento' => (string) rand(10000000, 99999999),
-                        'profesion' => 'ENFERMERO',
-                        'estado' => 'ACTIVO',
-                    ]);
-                }
-                $model->cod_personal = $p->cod_personal;
+                throw new \LogicException('La atención requiere el personal responsable.');
             }
 
-            if (empty($model->cod_area) || !Area::where('cod_area', $model->cod_area)->exists()) {
-                $a = Area::first();
-                if (!$a) {
-                    $a = Area::create([
-                        'cod_area' => 'ARE_ENF',
-                        'nombre' => 'Enfermería',
-                        'estado' => 'ACTIVO',
-                    ]);
-                }
-                $model->cod_area = $a->cod_area;
+            if (empty($model->cod_area)) {
+                throw new \LogicException('La atención requiere el área responsable.');
             }
 
             // Descartar campos legacy que no pertenecen a la tabla atenciones

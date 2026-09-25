@@ -5,7 +5,9 @@ namespace Tests\Feature;
 use App\Frontend\Livewire\Compartido\Clinica\FichaPaciente;
 use App\Models\AdultoMayor;
 use App\Models\AdministracionMedicacion;
+use App\Models\Area;
 use App\Models\AsignacionResidenteJornada;
+use App\Models\Atencion;
 use App\Models\Jornada;
 use App\Models\Prescripcion;
 use App\Models\TurnoEnfermeria;
@@ -22,6 +24,7 @@ class TabMedicacionEnfermeriaTest extends TestCase
     private User $enfermero;
     private AdultoMayor $adulto;
     private Jornada $jornada;
+    private Atencion $atencion;
 
     protected function setUp(): void
     {
@@ -65,6 +68,19 @@ class TabMedicacionEnfermeriaTest extends TestCase
             'fecha_hora' => now(),
             'estado' => 'ACTIVA',
         ]);
+        $area = Area::create([
+            'cod_area' => 'ARE_MED_TEST',
+            'nombre' => 'Área de medicación de prueba',
+            'estado' => 'ACTIVA',
+        ]);
+        $this->atencion = Atencion::create([
+            'cod_residente' => $this->adulto->cod_residente,
+            'cod_area' => $area->cod_area,
+            'cod_personal' => $this->enfermero->personal->cod_personal,
+            'tipo_atencion' => 'PRESCRIPCION_MEDICA',
+            'fecha_hora' => now(),
+            'estado' => 'FINALIZADA',
+        ]);
 
         $this->actingAs($this->enfermero);
     }
@@ -74,6 +90,7 @@ class TabMedicacionEnfermeriaTest extends TestCase
         // A. Medicación futura (ej: 20:00)
         $medFuturo = Prescripcion::create([
             'cod_residente' => $this->adulto->cod_residente,
+            'cod_atencion' => $this->atencion->cod_atencion,
             'nombre_medicamento' => 'Atorvastatina 20mg',
             'dosis' => '20 mg',
             'via_administracion' => 'Oral',
@@ -86,6 +103,7 @@ class TabMedicacionEnfermeriaTest extends TestCase
         // B. Medicación a la hora y C. Medicación atrasada (ej: 08:00 sin administrar)
         $medAtrasado = Prescripcion::create([
             'cod_residente' => $this->adulto->cod_residente,
+            'cod_atencion' => $this->atencion->cod_atencion,
             'nombre_medicamento' => 'Paracetamol 1g',
             'dosis' => '1 g',
             'via_administracion' => 'Oral',
@@ -98,6 +116,7 @@ class TabMedicacionEnfermeriaTest extends TestCase
         // D. Medicación administrada (ej: Omeprazol 07:00)
         $medAdmin = Prescripcion::create([
             'cod_residente' => $this->adulto->cod_residente,
+            'cod_atencion' => $this->atencion->cod_atencion,
             'nombre_medicamento' => 'Omeprazol 20mg',
             'dosis' => '20 mg',
             'via_administracion' => 'Oral',
@@ -122,6 +141,7 @@ class TabMedicacionEnfermeriaTest extends TestCase
         // E. Medicamento suspendido
         $medSusp = Prescripcion::create([
             'cod_residente' => $this->adulto->cod_residente,
+            'cod_atencion' => $this->atencion->cod_atencion,
             'nombre_medicamento' => 'Digoxina 0.25mg',
             'dosis' => '0.25 mg',
             'via_administracion' => 'Oral',
@@ -134,6 +154,7 @@ class TabMedicacionEnfermeriaTest extends TestCase
         // F. Medicamento PRN
         $medPrn = Prescripcion::create([
             'cod_residente' => $this->adulto->cod_residente,
+            'cod_atencion' => $this->atencion->cod_atencion,
             'nombre_medicamento' => 'Lactulosa 15ml',
             'dosis' => '15 ml',
             'via_administracion' => 'Oral',
@@ -201,6 +222,7 @@ class TabMedicacionEnfermeriaTest extends TestCase
     {
         Prescripcion::create([
             'cod_residente' => $this->adulto->cod_residente,
+            'cod_atencion' => $this->atencion->cod_atencion,
             'nombre_medicamento' => 'Paracetamol 1g',
             'dosis' => '1 g',
             'via_administracion' => 'Oral',
