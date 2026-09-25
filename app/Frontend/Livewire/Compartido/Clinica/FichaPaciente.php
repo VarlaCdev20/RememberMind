@@ -1457,7 +1457,7 @@ class FichaPaciente extends Component
     // 7. LÓGICA DE HISTORIAL CLÍNICO CRONOLÓGICO INTEGRADO
     // ──────────────────────────────────────────────────────────────────────────
 
-    private function resolverTimestamp($fecha, $hora = null, $createdAt = null): Carbon
+    private function resolverTimestamp($fecha, $hora = null, $createdAt = null): ?Carbon
     {
         if (! empty($fecha)) {
             $fStr = $fecha instanceof Carbon ? $fecha->format('Y-m-d') : (string) $fecha;
@@ -1482,7 +1482,7 @@ class FichaPaciente extends Component
             return Carbon::parse($createdAt);
         }
 
-        return now();
+        return null;
     }
 
     public function getHistorialCronologicoProperty()
@@ -1491,11 +1491,11 @@ class FichaPaciente extends Component
 
         // 1. Pases de Turno
         foreach ($this->adultoMayor->pasesTurno as $pase) {
-            $saliente = $pase->turnoSaliente->nombre ?? 'Turno Saliente';
-            $entrante = $pase->turnoEntrante->nombre ?? 'Turno Entrante';
+            $saliente = $pase->turnoSaliente->nombre ?? 'No registrado';
+            $entrante = $pase->turnoEntrante->nombre ?? 'No registrado';
             $resumenPase = "Relevo: {$saliente} → {$entrante}";
             if ($pase->requiere_vigilancia_especial) {
-                $resumenPase .= ' · Vigilancia especial: '.($pase->motivo_vigilancia ?: 'Indicada');
+                $resumenPase .= ' · Vigilancia especial'.($pase->motivo_vigilancia ? ': '.$pase->motivo_vigilancia : '');
             } elseif ($pase->resumen_turno) {
                 $resumenPase .= ' · '.$pase->resumen_turno;
             }
@@ -1505,11 +1505,11 @@ class FichaPaciente extends Component
                 'tipo_label' => 'Pase de turno',
                 'titulo' => 'Pase de Turno ('.$saliente.' → '.$entrante.')',
                 'resumen' => $resumenPase,
-                'descripcion' => $pase->resumen_turno ?: 'Relevo de guardia efectuado.',
-                'fecha' => $pase->fecha ? Carbon::parse($pase->fecha)->format('Y-m-d') : today()->toDateString(),
-                'hora' => $pase->created_at ? $pase->created_at->format('H:i') : 'Turno',
+                'descripcion' => $pase->resumen_turno ?: 'Sin resumen registrado.',
+                'fecha' => $pase->fecha ? Carbon::parse($pase->fecha)->format('Y-m-d') : null,
+                'hora' => $pase->created_at?->format('H:i') ?? '',
                 'timestamp' => $this->resolverTimestamp($pase->fecha, null, $pase->created_at),
-                'responsable' => $pase->enfermeroSaliente->name ?? 'Enfermero/a',
+                'responsable' => $pase->enfermeroSaliente->name ?? 'No registrado',
                 'estado_badge' => $pase->estado === 'RECIBIDO' ? 'CONFIRMADO' : 'ENTREGADO',
                 'badge' => $pase->estado === 'RECIBIDO' ? 'RECEPCIÓN CONFIRMADA' : 'ENTREGADO',
                 'badge_color' => 'indigo',
@@ -1520,7 +1520,7 @@ class FichaPaciente extends Component
 
         // 2. Alertas Clínicas
         foreach ($this->adultoMayor->alertas as $alerta) {
-            $resumenAlerta = $alerta->descripcion ?: 'Alerta clínica detectada';
+            $resumenAlerta = $alerta->descripcion ?: 'Sin descripción registrada';
 
             $esIncidente = in_array($alerta->prioridad, ['CRITICO', 'ALTO'])
                 || str_contains(strtoupper($alerta->tipo), 'INCIDENTE')
@@ -1532,10 +1532,10 @@ class FichaPaciente extends Component
                 'titulo' => 'Alerta: '.$alerta->tipo.' ['.$alerta->prioridad.']',
                 'resumen' => $resumenAlerta,
                 'descripcion' => $alerta->descripcion,
-                'fecha' => $alerta->fecha_hora ? $alerta->fecha_hora->format('Y-m-d') : today()->toDateString(),
+                'fecha' => $alerta->fecha_hora?->format('Y-m-d'),
                 'hora' => $alerta->fecha_hora ? $alerta->fecha_hora->format('H:i') : '',
                 'timestamp' => $alerta->fecha_hora,
-                'responsable' => $alerta->responsable?->usuario?->name ?? 'Sistema Clínico',
+                'responsable' => $alerta->responsable?->usuario?->name ?? 'No registrado',
                 'estado_badge' => $alerta->estado === 'CERRADA' ? 'CERRADA' : ($alerta->estado === 'EN_ATENCION' ? 'EN ATENCIÓN' : 'ABIERTA'),
                 'badge' => $alerta->estado,
                 'badge_color' => $alerta->estado === 'CERRADA' ? 'zinc' : ($alerta->prioridad === 'CRITICO' ? 'red' : 'amber'),
@@ -1557,13 +1557,13 @@ class FichaPaciente extends Component
                 'tipo' => 'SIGNOS',
                 'tipo_label' => 'Signos vitales',
                 'titulo' => 'Control de Signos Vitales',
-                'resumen' => $resumenSignos ?: 'Control hemodinámico registrado',
-                'descripcion' => $resumenSignos ?: 'Registro de control hemodinámico',
-                'fecha' => $signo->fecha ? Carbon::parse($signo->fecha)->format('Y-m-d') : today()->toDateString(),
+                'resumen' => $resumenSignos ?: 'Sin valores cuantitativos registrados',
+                'descripcion' => $resumenSignos ?: 'Sin valores cuantitativos registrados',
+                'fecha' => $signo->fecha ? Carbon::parse($signo->fecha)->format('Y-m-d') : null,
                 'hora' => $signo->hora ? substr($signo->hora, 0, 5) : ($signo->created_at ? $signo->created_at->format('H:i') : ''),
                 'timestamp' => $this->resolverTimestamp($signo->fecha, $signo->hora, $signo->created_at),
-                'responsable' => $signo->personal?->usuario?->name ?? 'Enfermero/a',
-                'estado_badge' => 'NORMAL',
+                'responsable' => $signo->personal?->usuario?->name ?? 'No registrado',
+                'estado_badge' => 'REGISTRADO',
                 'badge' => 'SIGNOS VITALES',
                 'badge_color' => 'emerald',
                 'icon' => 'ph-heartbeat',
@@ -1574,11 +1574,11 @@ class FichaPaciente extends Component
         // 4. Medicaciones y Administraciones
         foreach ($this->adultoMayor->administracionesMedicacion as $admin) {
             $adminOk = (bool) $admin->administrado;
-            $medNombre = $admin->medicacion->nombre_medicamento ?? 'Fármaco prescrito';
+            $medNombre = $admin->medicacion->nombre_medicamento ?? 'Medicamento no identificado';
             $dosis = $admin->medicacion?->dosis ? " {$admin->medicacion->dosis}" : '';
             $resumenMed = $adminOk
                 ? "{$medNombre}{$dosis} administrado".($admin->fecha_hora_administracion ? ' a las '.$admin->fecha_hora_administracion->format('H:i') : '')
-                : 'Omisión: '.($admin->motivo_omision ?: 'Rechazo / no suministrado');
+                : 'Omisión: '.($admin->motivo_omision ?: 'Motivo no registrado');
 
             $eventos->push([
                 'tipo' => 'MEDICACION',
@@ -1586,10 +1586,10 @@ class FichaPaciente extends Component
                 'titulo' => ($adminOk ? 'Medicación Administrada: ' : 'Medicación Omitida: ').$medNombre,
                 'resumen' => $resumenMed,
                 'descripcion' => $resumenMed,
-                'fecha' => ($admin->fecha_hora_administracion ?: $admin->fecha_hora_programada)?->format('Y-m-d') ?? today()->toDateString(),
+                'fecha' => ($admin->fecha_hora_administracion ?: $admin->fecha_hora_programada)?->format('Y-m-d'),
                 'hora' => ($admin->fecha_hora_administracion ?: $admin->fecha_hora_programada)?->format('H:i') ?? '',
                 'timestamp' => $admin->fecha_hora_administracion ?: $admin->fecha_hora_programada,
-                'responsable' => $admin->personal?->usuario?->name ?? 'Enfermero/a',
+                'responsable' => $admin->personal?->usuario?->name ?? 'No registrado',
                 'estado_badge' => $adminOk ? 'ADMINISTRADA' : 'OMITIDA',
                 'badge' => $adminOk ? 'ADMINISTRADA' : 'OMITIDA',
                 'badge_color' => $adminOk ? 'teal' : 'amber',
@@ -1610,18 +1610,18 @@ class FichaPaciente extends Component
         foreach ($tareasHistorial as $tarea) {
             $resumenTarea = $tarea->estado === 'REALIZADA'
                 ? "{$tarea->titulo} realizada".($tarea->resultado ? " · Resultado: {$tarea->resultado}" : '')
-                : "Omisión: {$tarea->titulo} · ".($tarea->motivo_omision ?: 'No ejecutada');
+                : "Omisión: {$tarea->titulo} · ".($tarea->motivo_omision ?: 'Motivo no registrado');
 
             $eventos->push([
                 'tipo' => 'TAREA',
                 'tipo_label' => 'Cuidados',
                 'titulo' => 'Tarea ['.($tarea->intervencion?->plan?->area?->nombre ?? 'Cuidado').']: '.$tarea->titulo,
                 'resumen' => $resumenTarea,
-                'descripcion' => ($tarea->resultado ?: 'Control ejecutado.').($tarea->motivo_omision ? " (Motivo omisión: {$tarea->motivo_omision})" : ''),
-                'fecha' => ($tarea->fecha_hora_ejecucion ?: $tarea->fecha_hora_programada)?->format('Y-m-d') ?? today()->toDateString(),
+                'descripcion' => ($tarea->resultado ?: 'Sin resultado registrado.').($tarea->motivo_omision ? " (Motivo omisión: {$tarea->motivo_omision})" : ''),
+                'fecha' => ($tarea->fecha_hora_ejecucion ?: $tarea->fecha_hora_programada)?->format('Y-m-d'),
                 'hora' => ($tarea->fecha_hora_ejecucion ?: $tarea->fecha_hora_programada)?->format('H:i') ?? '',
                 'timestamp' => $tarea->fecha_hora_ejecucion ?: $tarea->fecha_hora_programada,
-                'responsable' => $tarea->personal?->usuario?->name ?? 'Enfermero/a',
+                'responsable' => $tarea->personal?->usuario?->name ?? 'No registrado',
                 'estado_badge' => $tarea->estado,
                 'badge' => $tarea->estado,
                 'badge_color' => $tarea->estado === 'REALIZADA' ? 'blue' : 'rose',
@@ -1645,10 +1645,10 @@ class FichaPaciente extends Component
                 'titulo' => 'Evolución de Enfermería'.($esIncidente ? ' [ALERTA CLÍNICA]' : ''),
                 'resumen' => $resumenSeg,
                 'descripcion' => $seg->observacion ?: 'Seguimiento registrado en guardia',
-                'fecha' => $seg->fecha_hora?->format('Y-m-d') ?? today()->toDateString(),
+                'fecha' => $seg->fecha_hora?->format('Y-m-d'),
                 'hora' => $seg->fecha_hora?->format('H:i') ?? '',
                 'timestamp' => $seg->fecha_hora,
-                'responsable' => $seg->personal?->usuario?->name ?? 'Enfermero/a',
+                'responsable' => $seg->personal?->usuario?->name ?? 'No registrado',
                 'estado_badge' => $esIncidente ? 'ALERTA CLÍNICA' : 'REGISTRADO',
                 'badge' => $esIncidente ? 'ALERTA' : 'EVOLUCION',
                 'badge_color' => $esIncidente ? 'red' : 'purple',
@@ -1667,10 +1667,10 @@ class FichaPaciente extends Component
                 'titulo' => 'Evaluación Geriátrica Inicial',
                 'resumen' => $resumenEval,
                 'descripcion' => $eval->diagnostico_principal ?: ($eval->observaciones ?: 'Valoración clínica de ingreso'),
-                'fecha' => $eval->fecha_evaluacion ? Carbon::parse($eval->fecha_evaluacion)->format('Y-m-d') : today()->toDateString(),
-                'hora' => '10:00',
+                'fecha' => $eval->fecha_evaluacion ? Carbon::parse($eval->fecha_evaluacion)->format('Y-m-d') : $eval->created_at?->format('Y-m-d'),
+                'hora' => $eval->created_at?->format('H:i') ?? '',
                 'timestamp' => $this->resolverTimestamp($eval->fecha_evaluacion, null, $eval->created_at),
-                'responsable' => $eval->evaluador->name ?? 'Evaluador/a',
+                'responsable' => $eval->evaluador->name ?? 'No registrado',
                 'estado_badge' => 'COMPLETADA',
                 'badge' => 'VALORACION MEDICA',
                 'badge_color' => 'cyan',
@@ -1691,10 +1691,10 @@ class FichaPaciente extends Component
                 'titulo' => "Valoración Funcional (Barthel: {$val->barthel_total}, Katz: {$val->katz_total})",
                 'resumen' => $resumenVal,
                 'descripcion' => "Dependencia: {$val->nivel_dependencia} | Riesgo caída: {$val->riesgo_caida}",
-                'fecha' => $val->fecha_valoracion ? Carbon::parse($val->fecha_valoracion)->format('Y-m-d') : today()->toDateString(),
-                'hora' => '11:00',
+                'fecha' => $val->fecha_valoracion ? Carbon::parse($val->fecha_valoracion)->format('Y-m-d') : $val->created_at?->format('Y-m-d'),
+                'hora' => $val->created_at?->format('H:i') ?? '',
                 'timestamp' => $this->resolverTimestamp($val->fecha_valoracion, null, $val->created_at),
-                'responsable' => $val->registradoPor->name ?? ($val->evaluador->name ?? 'Evaluador/a') ?? 'Evaluador/a',
+                'responsable' => $val->registradoPor->name ?? ($val->evaluador->name ?? 'No registrado'),
                 'estado_badge' => 'COMPLETADA',
                 'badge' => 'VALORACION FUNCIONAL',
                 'badge_color' => 'sky',
@@ -1734,12 +1734,16 @@ class FichaPaciente extends Component
 
         if ($this->historialFechaDesde) {
             $desde = Carbon::parse($this->historialFechaDesde)->startOfDay();
-            $cronologia = $cronologia->filter(fn ($e) => Carbon::parse($e['timestamp'])->gte($desde));
+            $cronologia = $cronologia->filter(
+                fn ($e) => ! empty($e['timestamp']) && Carbon::parse($e['timestamp'])->gte($desde)
+            );
         }
 
         if ($this->historialFechaHasta) {
             $hasta = Carbon::parse($this->historialFechaHasta)->endOfDay();
-            $cronologia = $cronologia->filter(fn ($e) => Carbon::parse($e['timestamp'])->lte($hasta));
+            $cronologia = $cronologia->filter(
+                fn ($e) => ! empty($e['timestamp']) && Carbon::parse($e['timestamp'])->lte($hasta)
+            );
         }
 
         return $cronologia->values();
