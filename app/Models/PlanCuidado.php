@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Str;
+use LogicException;
 
 class PlanCuidado extends ModeloOperativo
 {
@@ -22,7 +23,6 @@ class PlanCuidado extends ModeloOperativo
         'cod_plan', 'cod_residente', 'cod_area', 'cod_personal', 'tipo_plan',
         'nombre', 'objetivo_general', 'prioridad', 'fecha_hora_apertura',
         'fecha_hora_cierre', 'estado', 'observacion',
-        'creado_por', 'nivel_cuidado', 'fecha_inicio', 'fecha_fin',
     ];
 
     protected function casts(): array
@@ -93,55 +93,11 @@ class PlanCuidado extends ModeloOperativo
                 $model->cod_plan = 'PLC_' . strtoupper(Str::random(10));
             }
 
-            if (empty($model->cod_area) || !\Illuminate\Support\Facades\DB::table('areas')->where('cod_area', $model->cod_area)->exists()) {
-                $existingArea = \Illuminate\Support\Facades\DB::table('areas')->first();
-                if (!$existingArea) {
-                    \Illuminate\Support\Facades\DB::table('areas')->insert([
-                        'cod_area' => 'ARE_ENF',
-                        'nombre' => 'Enfermería',
-                        'estado' => 'ACTIVO',
-                    ]);
-                    $model->cod_area = 'ARE_ENF';
-                } else {
-                    $model->cod_area = $existingArea->cod_area;
-                }
+            if (empty($model->cod_area)) {
+                throw new LogicException('El plan de cuidado requiere un área responsable explícita.');
             }
-
-            if (empty($model->cod_personal) || !\Illuminate\Support\Facades\DB::table('personal')->where('cod_personal', $model->cod_personal)->exists()) {
-                $personalCandidate = null;
-                $userCandidate = $model->attributes['creado_por'] ?? $model->cod_personal ?? auth()->id();
-                if ($userCandidate) {
-                    $personalCandidate = \Illuminate\Support\Facades\DB::table('personal')
-                        ->where('cod_usuario', $userCandidate)
-                        ->orWhere('cod_personal', $userCandidate)
-                        ->first();
-                }
-                if (!$personalCandidate) {
-                    $personalCandidate = \Illuminate\Support\Facades\DB::table('personal')->first();
-                }
-                if (!$personalCandidate) {
-                    $user = \App\Models\User::first() ?? \App\Models\User::forceCreate([
-                        'cod_usuario' => 'USU_SYS001',
-                        'nombres' => 'Sistema',
-                        'ap_paterno' => 'Admin',
-                        'correo' => 'sistema@test.com',
-                        'password' => bcrypt('secret'),
-                        'estado' => 'ACTIVO',
-                    ]);
-                    $codPer = 'PER_' . strtoupper(\Illuminate\Support\Str::random(7));
-                    \Illuminate\Support\Facades\DB::table('personal')->insert([
-                        'cod_personal' => $codPer,
-                        'cod_usuario' => $user->cod_usuario,
-                        'nombres' => $user->nombres ?? 'Personal',
-                        'apellido_paterno' => $user->ap_paterno ?? 'Turno',
-                        'numero_documento' => 'DOC_' . strtoupper(\Illuminate\Support\Str::random(6)),
-                        'profesion' => 'ENFERMERIA',
-                        'estado' => 'ACTIVO',
-                    ]);
-                    $model->cod_personal = $codPer;
-                } else {
-                    $model->cod_personal = $personalCandidate->cod_personal;
-                }
+            if (empty($model->cod_personal)) {
+                throw new LogicException('El plan de cuidado requiere un profesional responsable explícito.');
             }
             if (empty($model->tipo_plan)) {
                 $model->tipo_plan = 'ENFERMERIA';
@@ -156,15 +112,11 @@ class PlanCuidado extends ModeloOperativo
                 $model->prioridad = 'MEDIA';
             }
             if (empty($model->fecha_hora_apertura)) {
-                $model->fecha_hora_apertura = $model->attributes['fecha_inicio'] ?? now();
+                $model->fecha_hora_apertura = now();
             }
             if (empty($model->estado)) {
                 $model->estado = 'ACTIVO';
             }
-                        unset($model->attributes['creado_por']);
-            unset($model->attributes['nivel_cuidado']);
-            unset($model->attributes['fecha_inicio']);
-            unset($model->attributes['fecha_fin']);
         });
     }
 }

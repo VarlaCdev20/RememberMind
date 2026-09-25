@@ -134,10 +134,11 @@ class MisPacientesRedisenadaTest extends TestCase
 
         PlanCuidado::create([
             'cod_residente' => $this->residenteEstable->cod_residente,
-            'nivel_cuidado' => 'MODERADO',
+            'cod_area' => $this->area->cod_area,
+            'cod_personal' => $this->personal->cod_personal,
+            'prioridad' => 'MODERADO',
             'estado' => 'ACTIVO',
-            'fecha_inicio' => today()->subMonth()->toDateString(),
-            'creado_por' => $this->enfermero->cod_usuario,
+            'fecha_hora_apertura' => today()->subMonth(),
         ]);
 
         // Residente 2: Requiere Atención (tiene alerta crítica)

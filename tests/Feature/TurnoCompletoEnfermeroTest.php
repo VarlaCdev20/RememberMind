@@ -18,6 +18,7 @@ use App\Models\AsignacionPersonal;
 use App\Models\Atencion;
 use App\Models\Medicamento;
 use App\Models\Jornada;
+use App\Models\IntervencionCuidado;
 use App\Models\Personal;
 use App\Models\SignoVital;
 use App\Models\EjecucionCuidado;
@@ -171,25 +172,30 @@ class TurnoCompletoEnfermeroTest extends TestCase
 
         $plan = PlanCuidado::create([
             'cod_residente' => $pacienteAsignado->cod_residente,
+            'cod_area' => $areaEnfermeria->cod_area,
+            'cod_personal' => $personalEnfermero->cod_personal,
             'tipo_plan' => 'INICIAL',
-            'version' => 1,
-            'nivel_cuidado' => 'ESTANDAR',
+            'prioridad' => 'ESTANDAR',
             'estado' => 'ACTIVO',
-            'origen' => 'ADMISION',
-            'fecha_inicio' => today(),
+            'observacion' => 'ADMISION',
+            'fecha_hora_apertura' => today(),
+        ]);
+        $intervencion = IntervencionCuidado::create([
+            'cod_intervencion' => 'INT_FLUJO_MARCHA',
+            'cod_plan' => $plan->cod_plan,
+            'nombre' => 'Ejercicios de marcha asistida',
+            'descripcion' => 'Movilización asistida durante el turno.',
+            'prioridad' => 'MEDIA',
+            'estado' => 'ACTIVA',
         ]);
 
         $tarea = EjecucionCuidado::create([
-            'cod_plan' => $plan->cod_plan,
+            'cod_intervencion' => $intervencion->cod_intervencion,
             'cod_residente' => $pacienteAsignado->cod_residente,
-            'cod_turno' => $turnoManana->cod_turno,
-            'area' => 'MOVILIZACION',
-            'titulo' => 'Ejercicios de marcha asistida',
-            'fecha_programada' => today()->toDateString(),
-            'hora_programada' => '10:00:00',
-            'prioridad' => 'MEDIA',
+            'cod_jornada' => $jornadaManana->cod_jornada,
+            'cod_personal' => $personalEnfermero->cod_personal,
+            'fecha_hora_programada' => today()->setTime(10, 0),
             'estado' => 'PENDIENTE',
-            'registrado_por' => $enfermero->cod_usuario,
         ]);
 
         // Autenticar como enfermero del turno

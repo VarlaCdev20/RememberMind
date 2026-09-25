@@ -226,6 +226,8 @@ class EnfermeriaV2CorreccionCriticaTest extends TestCase
         $plan = \App\Models\PlanCuidado::query()->create([
             'cod_plan' => 'PLC_TEST_01',
             'cod_residente' => $residente->cod_residente,
+            'cod_area' => 'ARE_CRIT_TEST',
+            'cod_personal' => $enfermera->personal()->firstOrFail()->cod_personal,
             'estado' => 'ACTIVO',
         ]);
         $intervencion = \App\Models\IntervencionCuidado::query()->create([
@@ -582,6 +584,7 @@ class EnfermeriaV2CorreccionCriticaTest extends TestCase
         $planB = \App\Models\PlanCuidado::query()->create([
             'cod_plan' => 'PLC_CROSS_B',
             'cod_residente' => $residenteB->cod_residente,
+            'cod_area' => 'ARE_CRIT_TEST',
             'cod_personal' => $personal->cod_personal,
             'estado' => 'ACTIVO',
         ]);

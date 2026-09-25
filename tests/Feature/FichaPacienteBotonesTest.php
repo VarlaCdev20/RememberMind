@@ -20,6 +20,7 @@ use App\Models\PlanCuidado;
 use App\Models\AsignacionPersonal;
 use App\Models\SignoVital;
 use App\Models\EjecucionCuidado;
+use App\Models\IntervencionCuidado;
 use App\Models\TurnoEnfermeria;
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
@@ -228,24 +229,30 @@ class FichaPacienteBotonesTest extends TestCase
 
         $plan = PlanCuidado::create([
             'cod_residente' => $this->adulto->cod_residente,
-            'diagnostico_enfermeria' => 'Riesgo de deterioro de la integridad cutánea',
-            'objetivo' => 'Mantener piel intacta',
-            'fecha_inicio' => today()->toDateString(),
+            'cod_area' => Area::query()->firstOrFail()->cod_area,
+            'cod_personal' => $this->enfermero->personal()->firstOrFail()->cod_personal,
+            'nombre' => 'Riesgo de deterioro de la integridad cutánea',
+            'objetivo_general' => 'Mantener piel intacta',
+            'fecha_hora_apertura' => today(),
             'estado' => 'ACTIVO',
-            'creado_por' => $this->enfermero->cod_usuario,
         ]);
+        $intervencion = IntervencionCuidado::create([
+            'cod_intervencion' => 'INT_FICHA_TAREA',
+            'cod_plan' => $plan->cod_plan,
+            'nombre' => 'Cambio postural decúbito lateral',
+            'descripcion' => 'Cambio postural preventivo.',
+            'prioridad' => 'ALTA',
+            'estado' => 'ACTIVA',
+        ]);
+        $jornada = Jornada::query()->where('cod_turno', $this->turno->cod_turno)->firstOrFail();
 
         $tarea = EjecucionCuidado::create([
-            'cod_plan' => $plan->cod_plan,
+            'cod_intervencion' => $intervencion->cod_intervencion,
             'cod_residente' => $this->adulto->cod_residente,
-            'cod_turno' => $this->turno->cod_turno,
-            'titulo' => 'Cambio postural decúbito lateral',
-            'area' => 'PIEL',
-            'prioridad' => 'ALTA',
-            'fecha_programada' => today()->toDateString(),
-            'hora_programada' => '10:00:00',
+            'cod_jornada' => $jornada->cod_jornada,
+            'cod_personal' => $this->enfermero->personal()->firstOrFail()->cod_personal,
+            'fecha_hora_programada' => today()->setTime(10, 0),
             'estado' => 'PENDIENTE',
-            'registrado_por' => $this->enfermero->cod_usuario,
         ]);
 
         Livewire::test(FichaPaciente::class, ['adulto' => $this->adulto->cod_residente])

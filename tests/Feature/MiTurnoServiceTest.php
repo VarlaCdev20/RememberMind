@@ -612,13 +612,15 @@ class MiTurnoServiceTest extends TestCase
 
             'cod_residente' => $this->residenteAsignado->cod_residente,
 
-            'cod_usuario_creador' => $this->enfermeraUser->cod_usuario,
+            'cod_area' => $this->area->cod_area,
 
-            'titulo' => 'Plan de Prevención de Caídas',
+            'cod_personal' => $this->enfermeraPersonal->cod_personal,
+
+            'nombre' => 'Plan de Prevención de Caídas',
 
             'tipo_plan' => 'PREVENCION',
 
-            'fecha_inicio' => Carbon::today()->toDateString(),
+            'fecha_hora_apertura' => Carbon::today(),
 
             'estado' => 'ACTIVO',
 

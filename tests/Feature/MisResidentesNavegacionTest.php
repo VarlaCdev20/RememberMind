@@ -158,10 +158,11 @@ class MisResidentesNavegacionTest extends TestCase
 
         PlanCuidado::create([
             'cod_residente' => $this->residenteAsignado->cod_residente,
-            'nivel_cuidado' => 'MODERADO',
+            'cod_area' => $this->area->cod_area,
+            'cod_personal' => $this->personal->cod_personal,
+            'prioridad' => 'MODERADO',
             'estado' => 'ACTIVO',
-            'fecha_inicio' => today()->subMonth()->toDateString(),
-            'creado_por' => $this->enfermero->cod_usuario,
+            'fecha_hora_apertura' => today()->subMonth(),
         ]);
 
         SignoVital::create([
