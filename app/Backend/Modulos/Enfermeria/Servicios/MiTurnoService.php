@@ -355,9 +355,9 @@ class MiTurnoService
                 'ubicacion' => $this->formatearUbicacion($residente),
                 'iniciales' => $this->extraerIniciales($residente->nombre_completo),
                 'foto' => $residente->foto,
-                'estado_seguimiento' => 'ESTABLE',
+                'estado_seguimiento' => 'SIN_ALERTAS',
                 'estado_institucional' => strtoupper(trim((string)($residente->estado ?: 'ACTIVO'))),
-                'estado_label' => 'ESTABLE',
+                'estado_label' => 'SIN_ALERTAS',
                 'estado_operacional' => strtoupper(trim((string)($residente->estado ?: 'ACTIVO'))),
                 'supervision_label' => $supervisionLabel,
                 'movilidad_label' => $movilidadLabel,
@@ -385,7 +385,7 @@ class MiTurnoService
             $alertasRes = $alertas->where('cod_residente', $card['cod_residente']);
             $card['alertas_count'] = $alertasRes->filter(fn($a) => in_array(strtoupper(trim((string)$a->estado)), self::ESTADOS_ALERTA_ACTIVOS, true))->count();
             $tieneCritica = $alertasRes->contains(fn($a) => in_array(strtoupper(trim((string)$a->prioridad)), self::PRIORIDADES_CRITICAS, true) && in_array(strtoupper(trim((string)$a->estado)), self::ESTADOS_ALERTA_ACTIVOS, true));
-            $estadoSeg = $tieneCritica ? 'CRÍTICO' : ($card['alertas_count'] > 0 ? 'VIGILANCIA' : 'ESTABLE');
+            $estadoSeg = $tieneCritica ? 'CRÍTICO' : ($card['alertas_count'] > 0 ? 'VIGILANCIA' : 'SIN_ALERTAS');
             $card['estado_seguimiento'] = $estadoSeg;
             $card['estado_label'] = $estadoSeg;
         }
@@ -394,11 +394,6 @@ class MiTurnoService
         $agendaUnificada = $this->resolverAgendaProgramada($codResidentes, $jornadaPrincipal, $inicioTurno, $finTurno, $momentoActual);
         $progresoTurno = $this->calcularProgresoTurno($agendaUnificada);
         $estadoGeneral = $this->calcularEstadoGeneral($alertas, (int)($progresoTurno['retrasadas'] ?? 0), $alertaCritica, $momentoActual);
-
-        if (!$alertaCritica && ($progresoTurno['retrasadas'] ?? 0) === 0) {
-            $estadoGeneral['titulo'] = 'Turno en curso estable (Modo Consulta)';
-            $estadoGeneral['mensaje'] = 'Los residentes del turno activo se encuentran estables y con tareas en curso.';
-        }
 
         $distribucionCuidados = $this->resolverDistribucionCuidados($codResidentes, $agendaUnificada);
         $totalDist = (int)(collect($distribucionCuidados)->sum('total'));
@@ -1169,8 +1164,8 @@ class MiTurnoService
      * REGLAS:
      * CRÍTICO: existe alerta crítica activa o situación crítica.
      * VIGILANCIA: existen alertas relevantes no críticas O tareas retrasadas.
-     * ESTABLE: no existen alertas relevantes activas Y no existen tareas retrasadas.
-     * Nunca muestra ESTABLE si hay tareas vencidas.
+     * SIN ALERTAS: no existen alertas relevantes activas ni tareas retrasadas.
+     * La ausencia de alertas no se interpreta como estabilidad clínica.
      */
     private function calcularEstadoGeneral(Collection $alertas, int $tareasRetrasadas, ?Alerta $alertaCritica, Carbon $momentoActual): array
     {
@@ -1218,13 +1213,13 @@ class MiTurnoService
             ];
         }
 
-        // 3. Condición ESTABLE (sin alertas relevantes y sin tareas retrasadas)
+        // 3. Condición operativa neutral: no permite inferir estabilidad clínica.
         return [
-            'badge' => 'ESTABLE',
-            'titulo' => 'Sin alertas activas en tu turno',
-            'mensaje' => 'Todos los residentes asignados se encuentran con signos estables y cuidados al día.',
+            'badge' => 'SIN ALERTAS',
+            'titulo' => 'Sin alertas activas ni tareas vencidas',
+            'mensaje' => 'Este estado es operativo y no confirma estabilidad clínica; revise los registros de cada residente.',
             'tiempo' => $horaFormateada,
-            'tipo' => 'estable',
+            'tipo' => 'neutral',
         ];
     }
 
@@ -1342,7 +1337,7 @@ class MiTurnoService
                 }
             }
 
-            // Estado de salud derivado de alertas activas
+            // Estado operativo derivado de alertas activas. Su ausencia no acredita estabilidad clínica.
             $tieneCritica = $alertasRes->contains(function ($a) {
                 $p = strtoupper(trim((string)$a->prioridad));
                 $est = strtoupper(trim((string)$a->estado));
@@ -1350,7 +1345,7 @@ class MiTurnoService
             });
 
             $tieneVigilancia = $alertasCount > 0;
-            $estadoLabel = $tieneCritica ? 'CRÍTICO' : ($tieneVigilancia ? 'VIGILANCIA' : 'ESTABLE');
+            $estadoLabel = $tieneCritica ? 'CRÍTICO' : ($tieneVigilancia ? 'VIGILANCIA' : 'SIN_ALERTAS');
 
             $cards[] = [
                 'cod_residente' => $residente->cod_residente,

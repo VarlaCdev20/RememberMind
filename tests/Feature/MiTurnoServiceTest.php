@@ -434,11 +434,17 @@ class MiTurnoServiceTest extends TestCase
 
 
 
-        // Sin alertas -> ESTABLE
+        // Sin alertas -> estado operativo neutral, no estabilidad clínica inferida
 
         $dataSinAlertas = $service->obtenerDatosDashboard($this->enfermeraUser);
 
-        $this->assertEquals('ESTABLE', $dataSinAlertas['estado_general']['badge']);
+        $this->assertEquals('SIN ALERTAS', $dataSinAlertas['estado_general']['badge']);
+
+        $this->assertEquals('neutral', $dataSinAlertas['estado_general']['tipo']);
+
+        $this->assertStringContainsString('no confirma estabilidad clínica', $dataSinAlertas['estado_general']['mensaje']);
+
+        $this->assertSame('SIN_ALERTAS', $dataSinAlertas['residentes'][0]['estado_seguimiento']);
 
         $this->assertEquals(0, $dataSinAlertas['kpis']['total_registro']['numero']);
 
@@ -1396,11 +1402,11 @@ class MiTurnoServiceTest extends TestCase
 
 
 
-        // Sin tareas ni alertas -> ESTABLE
+        // Sin tareas ni alertas -> estado operativo neutral
 
         $dataInicial = $service->obtenerDatosDashboard($this->enfermeraUser);
 
-        $this->assertEquals('ESTABLE', $dataInicial['estado_general']['badge']);
+        $this->assertEquals('SIN ALERTAS', $dataInicial['estado_general']['badge']);
 
 
 

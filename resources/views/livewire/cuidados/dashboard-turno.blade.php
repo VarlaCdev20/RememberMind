@@ -266,17 +266,25 @@
 
             @else
 
-                {{-- CASO SIN ALERTAS: REFERENCIA EXACTA "ESTADO GENERAL" ESTABLE --}}
+                @php
+                    $estadoGeneral = $dashboard['estado_general'] ?? [];
+                    $estadoGeneralTipo = $estadoGeneral['tipo'] ?? 'neutral';
+                    $esVigilancia = $estadoGeneralTipo === 'vigilancia';
+                @endphp
 
                 <div>
 
-                    {{-- Encabezado: Icono, Estado General, Badge Estable --}}
+                    {{-- Estado operativo del turno, sin inferir condición clínica. --}}
 
                     <div class="flex items-center justify-between border-b border-[#8DA280]/35 dark:border-[#494139] pb-2">
 
                         <div class="flex items-center gap-1.5">
 
-                            <span class="flex h-6 w-6 items-center justify-center rounded bg-[#8DA280]/25 dark:bg-[#9BB391]/25 text-[#63775B] dark:text-[#9BB391] border border-[#8DA280]/40 shadow-2xs shrink-0">
+                            <span @class([
+                                'flex h-6 w-6 items-center justify-center rounded border shadow-2xs shrink-0',
+                                'bg-[#FFF1D6] text-[#966B24] border-[#E8C178]' => $esVigilancia,
+                                'bg-[#8DA280]/25 dark:bg-[#9BB391]/25 text-[#63775B] dark:text-[#9BB391] border-[#8DA280]/40' => ! $esVigilancia,
+                            ])>
 
                                 <i class="ph-bold ph-shield-check text-sm"></i>
 
@@ -300,9 +308,13 @@
 
                         </div>
 
-                        <span class="rounded bg-[#63775B] px-2 py-0.5 text-[9px] font-black uppercase tracking-wider text-white shadow-2xs shrink-0">
+                        <span @class([
+                            'rounded px-2 py-0.5 text-[9px] font-black uppercase tracking-wider text-white shadow-2xs shrink-0',
+                            'bg-[#966B24]' => $esVigilancia,
+                            'bg-[#63775B]' => ! $esVigilancia,
+                        ])>
 
-                            ESTABLE
+                            {{ $estadoGeneral['badge'] ?? 'SIN DATOS' }}
 
                         </span>
 
@@ -316,13 +328,13 @@
 
                         <p class="text-xs font-bold text-[#304060] dark:text-[#F2EBE3]">
 
-                            Sin alertas activas en tu turno
+                            {{ $estadoGeneral['titulo'] ?? 'Estado operativo no disponible' }}
 
                         </p>
 
                         <p class="mt-0.5 text-[10px] font-medium text-[#677084] dark:text-[#BDAE9F]">
 
-                            Todos los residentes asignados se encuentran con signos dentro de rango.
+                            {{ $estadoGeneral['mensaje'] ?? 'No existen datos suficientes para emitir un estado.' }}
 
                         </p>
 
@@ -332,7 +344,7 @@
 
 
 
-                {{-- Línea inferior con "Monitoreo al día" y hora --}}
+                {{-- Resumen operativo y hora de cálculo. --}}
 
                 <div class="pt-1.5 border-t border-[#8DA280]/30 dark:border-[#494139] flex items-center justify-between text-[11px] text-[#63775B] dark:text-[#9BB391] font-semibold">
 
@@ -340,11 +352,11 @@
 
                         <i class="ph-bold ph-check-circle text-xs text-[#63775B]"></i>
 
-                        <span>Monitoreo al día</span>
+                        <span>{{ $esVigilancia ? 'Requiere seguimiento' : 'Resumen operativo' }}</span>
 
                     </span>
 
-                    <span class="font-bold text-[#304060] dark:text-[#F0E8DE]">{{ now()->format('H:i') }} hrs</span>
+                    <span class="font-bold text-[#304060] dark:text-[#F0E8DE]">{{ $estadoGeneral['tiempo'] ?? now()->format('H:i \h\r\s') }}</span>
 
                 </div>
 
@@ -1139,15 +1151,16 @@
 
                                         {{-- Estado de seguimiento operativo vs institucional --}}
                                         @php
-                                            $estSeg = $residente['estado_seguimiento'] ?? ($residente['estado_label'] ?? 'ESTABLE');
+                                            $estSeg = $residente['estado_seguimiento'] ?? ($residente['estado_label'] ?? 'SIN_DATOS');
                                             $segColor = match(strtoupper(trim((string)$estSeg))) {
                                                 'CRÍTICO', 'CRITICO', 'REQUIERE_ATENCION' => 'bg-rose-100 text-rose-800 dark:bg-rose-900/50 dark:text-rose-200 border border-rose-200/80 dark:border-rose-800/60',
                                                 'VIGILANCIA' => 'bg-[#FFF1D6] text-[#966B24] border border-[#E8C178] dark:bg-[#D2A45E]/20 dark:text-[#E0B36D] dark:border-[#D2A45E]/40',
-                                                default => 'bg-[#63775B]/15 text-[#63775B] dark:text-[#9DB491]',
+                                                'SIN_ALERTAS' => 'bg-[#63775B]/15 text-[#63775B] dark:text-[#9DB491]',
+                                                default => 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-200',
                                             };
                                         @endphp
                                         <span class="px-1.5 py-0.5 rounded font-extrabold uppercase {{ $segColor }}" title="Estado de seguimiento">
-                                            {{ $estSeg }}
+                                            {{ str_replace('_', ' ', $estSeg) }}
                                         </span>
 
                                         <span class="px-1.5 py-0.5 rounded font-bold bg-[#F0E8DE] dark:bg-[#2D2924] border border-[#D5CABE]/50 dark:border-[#494139] text-[#677084] dark:text-[#A6B2C8]" title="Nivel de supervisión">

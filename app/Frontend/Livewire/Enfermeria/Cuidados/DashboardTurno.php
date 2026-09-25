@@ -461,7 +461,7 @@ class DashboardTurno extends Component
         $dashboard = $miTurnoService->obtenerDatosDashboard(Auth::user(), $this->filtroFecha);
         $residentesDashboard = collect($dashboard['residentes'] ?? []);
         $distribucionPacientes = [
-            'estable' => $residentesDashboard->where('estado_seguimiento', 'ESTABLE')->count(),
+            'sin_alertas' => $residentesDashboard->where('estado_seguimiento', 'SIN_ALERTAS')->count(),
             'vigilancia' => $residentesDashboard->where('estado_seguimiento', 'VIGILANCIA')->count(),
             'atencion' => $residentesDashboard->filter(
                 fn ($residente) => in_array($residente['estado_seguimiento'] ?? null, ['CRITICO', 'CRÍTICO', 'ATENCION'], true)
