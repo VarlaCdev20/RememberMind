@@ -346,19 +346,19 @@
                     Último registro
                 </span>
                 <span class="text-[11px] text-[var(--rm-text-muted)] block font-medium"
-                      x-text="resumenActivo.ultimo_registro_fecha || '12/09/2026 07:00'">
-                    12/09/2026 07:00
+                      x-text="resumenActivo.ultimo_registro_fecha || 'Sin registros'">
+                    Sin registros
                 </span>
 
                 <div class="flex items-baseline justify-between pt-1">
                     <span class="text-xl font-black text-[var(--rm-text-title)] tracking-tight"
                           x-text="resumenActivo.ultimo_fmt || resumenActivo.ultimo || '--'">
-                        120/78 mmHg
+                        --
                     </span>
                     <span class="inline-flex items-center rounded-md px-2 py-0.5 text-[10px] font-bold border"
-                          :class="resumenActivo.estado_badge || 'bg-emerald-100 text-emerald-800 border-emerald-200'"
-                          x-text="resumenActivo.estado || 'Normal'">
-                        Normal
+                          :class="resumenActivo.estado_badge || 'bg-slate-100 text-slate-700 border-slate-200'"
+                          x-text="resumenActivo.estado || 'Sin datos'">
+                        Sin datos
                     </span>
                 </div>
             </div>
@@ -1759,7 +1759,7 @@ document.addEventListener('alpine:init', () => {
                 return [
                     {
                         label: 'Sistólica',
-                        data: this.sistolica.length ? this.sistolica : [120, 122, 118, 125, 120, 119, 120],
+                        data: this.sistolica,
                         borderColor: '#EF4444',
                         backgroundColor: (context) => makeGradient(context, '#EF4444', isDark ? 0.25 : 0.15, 0.01),
                         borderWidth: 2.4,
@@ -1773,7 +1773,7 @@ document.addEventListener('alpine:init', () => {
                     },
                     {
                         label: 'Diastólica',
-                        data: this.diastolica.length ? this.diastolica : [78, 80, 76, 82, 79, 78, 78],
+                        data: this.diastolica,
                         borderColor: '#2563EB',
                         backgroundColor: (context) => makeGradient(context, '#2563EB', isDark ? 0.20 : 0.12, 0.01),
                         borderWidth: 2.4,
@@ -1789,17 +1789,17 @@ document.addEventListener('alpine:init', () => {
             }
 
             const mapData = {
-                'FC': { label: 'Frecuencia Cardíaca', data: this.fc, color: '#DC2626', fallback: [72, 75, 71, 74, 72, 73, 72] },
-                'SPO2': { label: 'Saturación SpO₂', data: this.spo2, color: '#059669', fallback: [97, 98, 97, 96, 98, 97, 97] },
-                'TEMP': { label: 'Temperatura', data: this.temp, color: '#EA580C', fallback: [36.5, 36.6, 36.4, 36.7, 36.5, 36.5, 36.5] },
-                'FR': { label: 'Frecuencia Respiratoria', data: this.fr, color: '#0891B2', fallback: [18, 19, 17, 18, 18, 18, 18] },
-                'DOLOR': { label: 'Dolor EVA', data: this.dolor, color: '#7C3AED', fallback: [2, 3, 2, 2, 1, 2, 2] },
-                'GLUCOSA': { label: 'Glucemia', data: this.glucosa, color: '#0284C7', fallback: [105, 110, 102, 115, 108, 104, 105] },
-                'PESO': { label: 'Peso Corporal', data: this.peso, color: '#475569', fallback: [68.5, 68.4, 68.6, 68.5, 68.5, 68.3, 68.5] },
+                'FC': { label: 'Frecuencia Cardíaca', data: this.fc, color: '#DC2626' },
+                'SPO2': { label: 'Saturación SpO₂', data: this.spo2, color: '#059669' },
+                'TEMP': { label: 'Temperatura', data: this.temp, color: '#EA580C' },
+                'FR': { label: 'Frecuencia Respiratoria', data: this.fr, color: '#0891B2' },
+                'DOLOR': { label: 'Dolor EVA', data: this.dolor, color: '#7C3AED' },
+                'GLUCOSA': { label: 'Glucemia', data: this.glucosa, color: '#0284C7' },
+                'PESO': { label: 'Peso Corporal', data: this.peso, color: '#475569' },
             };
 
             const cfg = mapData[metrica] || mapData['FC'];
-            const dataToUse = (cfg.data && cfg.data.length) ? cfg.data : cfg.fallback;
+            const dataToUse = cfg.data || [];
 
             return [{
                 label: cfg.label,
@@ -1828,8 +1828,8 @@ document.addEventListener('alpine:init', () => {
                 {
                     id: 'sparklineCanvasPA',
                     isPA: true,
-                    dataA: this.sistolica.length ? this.sistolica : [120, 122, 118, 125, 120, 119, 120],
-                    dataB: this.diastolica.length ? this.diastolica : [78, 80, 76, 82, 79, 78, 78],
+                    dataA: this.sistolica,
+                    dataB: this.diastolica,
                     colorA: '#EF4444',
                     colorB: '#2563EB',
                     yLimits: { min: 50, max: 160 }

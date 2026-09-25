@@ -274,16 +274,6 @@ class MisPacientes extends Component
             if (!empty($nomEnf)) {
                 $responsableTexto = "A cargo de: Enf. {$nomEnf}";
             }
-        } elseif ($turnoActual) {
-            // Fallback: si no hay asignación específica al residente, usar el usuario autenticado
-            $userAuth = Auth::user();
-            $persAuth = $userAuth?->personal;
-            $nomAuth = $persAuth ? trim($persAuth->nombres . ' ' . $persAuth->apellido_paterno) : '';
-            if (!empty($nomAuth)) {
-                $responsableTexto = "A cargo de: Enf. {$nomAuth}";
-            } else {
-                $responsableTexto = 'Enfermero/a de guardia';
-            }
         }
 
         if ($asigResidente && $asigResidente->jornada?->turno) {

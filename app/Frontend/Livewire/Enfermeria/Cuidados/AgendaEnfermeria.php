@@ -424,47 +424,6 @@ class AgendaEnfermeria extends Component
             }
         }
 
-        // Si no hay planes de cuidados creados (o en tests unitarios con datos mínimos), asegurar representación clínica
-        if ($itemsAgenda->isEmpty() && $residentes->isNotEmpty()) {
-            $ejemplosCuidados = [
-                ['Higiene y confort matutino', 'Aseo asistido, hidratación dérmica y cambio de ropa de cama.', 'ALTA', '08:00', 'Cada mañana'],
-                ['Movilización y prevención de UPP', 'Cambio postural a decúbito lateral y revisión de puntos de presión.', 'ALTA', '10:00', 'Cada 3 horas'],
-                ['Control de ingesta hídrica y nutrición', 'Verificación de deglución y suplementación prescrita.', 'MEDIA', '12:00', 'En almuerzo'],
-                ['Cuidado vesical y registro de diuresis', 'Higiene perineal y control de volumen urinario en turno.', 'MEDIA', '14:00', 'Cada turno'],
-                ['Revisión de vendaje y cura plana', 'Inspección de zona cutánea en miembro inferior.', 'BAJA', '16:00', 'Según pauta médica'],
-            ];
-
-            foreach ($residentes as $res) {
-                $habTexto = 'Hab. ' . ($res->cama?->habitacion?->numero ?? '101') . ' / Cama ' . ($res->cama?->numero ?? 'A');
-                $alertaRes = $alertasPorResidente->has($res->cod_residente);
-
-                foreach ($ejemplosCuidados as $idx => $e) {
-                    $esAlerta = ($idx === 0 && $alertaRes);
-                    $itemsAgenda->push([
-                        'id' => 'DEMO_' . $res->cod_residente . '_' . $idx,
-                        'cod_intervencion' => 'INT_' . $res->cod_residente . '_' . $idx,
-                        'cod_programacion' => 'PRG_' . $res->cod_residente . '_' . $idx,
-                        'cod_residente' => $res->cod_residente,
-                        'nombre_residente' => trim("{$res->nombres} {$res->apellido_paterno} {$res->apellido_materno}"),
-                        'iniciales' => strtoupper(substr((string)$res->nombres, 0, 1) . substr((string)($res->apellido_paterno ?? $res->ap_paterno ?? 'R'), 0, 1)),
-                        'ubicacion' => $habTexto,
-                        'nombre_intervencion' => $e[0],
-                        'descripcion' => $e[1],
-                        'nombre_plan' => 'Plan de Cuidado Integral de Enfermería',
-                        'prioridad' => $e[2],
-                        'frecuencia' => $e[4],
-                        'hora_programada' => $e[3],
-                        'estado' => $idx === 1 ? 'VENCIDA' : ($idx === 3 ? 'REALIZADA' : 'PENDIENTE'),
-                        'alerta_vinculada' => $esAlerta,
-                        'alerta_descripcion' => $esAlerta ? 'Riesgo clínico activo registrado en turno.' : null,
-                        'residente_con_alerta' => $alertaRes,
-                        'ejecucion' => null,
-                        'rank' => $esAlerta ? 1 : ($e[2] === 'ALTA' ? 2 : ($idx === 1 ? 3 : 4)),
-                    ]);
-                }
-            }
-        }
-
         // Ordenamiento Estricto Requerido
         $itemsAgenda = $itemsAgenda->sort(function ($a, $b) {
             if ($a['rank'] !== $b['rank']) {

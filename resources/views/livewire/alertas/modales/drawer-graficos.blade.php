@@ -5,11 +5,11 @@
     
     $puntos = $signosDrawer->take(8)->reverse()->values();
     $labels = $puntos->map(fn($s) => $s->fecha ? $s->fecha->format('d/m') . ($s->hora ? ' ' . substr($s->hora, 0, 5) : '') : 'Control')->values()->toArray();
-    $sisData = $puntos->map(fn($s) => (float)($s->presion_sistolica ?? 120))->values()->toArray();
-    $diaData = $puntos->map(fn($s) => (float)($s->presion_diastolica ?? 80))->values()->toArray();
-    $fcData = $puntos->map(fn($s) => (float)($s->frecuencia_cardiaca ?? 75))->values()->toArray();
-    $spo2Data = $puntos->map(fn($s) => (float)($s->saturacion ?? 96))->values()->toArray();
-    $tempData = $puntos->map(fn($s) => (float)($s->temperatura ?? 36.5))->values()->toArray();
+    $sisData = $puntos->map(fn($s) => $s->presion_sistolica !== null ? (float)$s->presion_sistolica : null)->values()->toArray();
+    $diaData = $puntos->map(fn($s) => $s->presion_diastolica !== null ? (float)$s->presion_diastolica : null)->values()->toArray();
+    $fcData = $puntos->map(fn($s) => $s->frecuencia_cardiaca !== null ? (float)$s->frecuencia_cardiaca : null)->values()->toArray();
+    $spo2Data = $puntos->map(fn($s) => $s->saturacion !== null ? (float)$s->saturacion : null)->values()->toArray();
+    $tempData = $puntos->map(fn($s) => $s->temperatura !== null ? (float)$s->temperatura : null)->values()->toArray();
 
     // Registros clínicos recientes para el timeline (Evoluciones / Valoraciones)
     $registrosTimeline = collect();
@@ -36,35 +36,6 @@
                 'badge' => 'bg-blue-100 text-blue-800 border-blue-200',
             ]);
         }
-    }
-    // Fallback de demostración si no existen registros previos
-    if ($registrosTimeline->isEmpty()) {
-        $registrosTimeline = collect([
-            [
-                'fecha' => now()->format('d/m/Y 08:00'),
-                'tipo' => 'Enfermería',
-                'profesional' => 'Lic. Ana Torres',
-                'resumen' => 'Residente estable, colaboradora, refiere buen descanso nocturno. Constantes basales dentro de límites esperados.',
-                'estado' => 'Estable',
-                'badge' => 'bg-emerald-100 text-emerald-800 border-emerald-200',
-            ],
-            [
-                'fecha' => now()->subDay()->format('d/m/Y 14:30'),
-                'tipo' => 'Médico',
-                'profesional' => 'Dr. Carlos Mendoza',
-                'resumen' => 'Evaluación hemodinámica sin signos de descompensación. Continúa con pauta medicamentosa activa.',
-                'estado' => 'Controlado',
-                'badge' => 'bg-blue-100 text-blue-800 border-blue-200',
-            ],
-            [
-                'fecha' => now()->subDays(2)->format('d/m/Y 10:15'),
-                'tipo' => 'Cuidado Integral',
-                'profesional' => 'Equipo de Cuidados',
-                'resumen' => 'Higiene y movilización asistida satisfactoria. Buena tolerancia alimentaria matutina.',
-                'estado' => 'Normal',
-                'badge' => 'bg-slate-100 text-slate-800 border-slate-200',
-            ]
-        ]);
     }
 @endphp
 <div class="fixed inset-0 z-50 overflow-hidden font-sans"
@@ -111,7 +82,7 @@
                 datasets = [
                     {
                         label: 'Sistólica',
-                        data: this.sisData.length ? this.sisData : [120, 122, 118, 125, 120, 122],
+                        data: this.sisData,
                         borderColor: '#EF4444',
                         backgroundColor: isDark ? 'rgba(239, 68, 68, 0.15)' : 'rgba(239, 68, 68, 0.10)',
                         borderWidth: 2.2,
@@ -122,7 +93,7 @@
                     },
                     {
                         label: 'Diastólica',
-                        data: this.diaData.length ? this.diaData : [80, 78, 76, 82, 79, 78],
+                        data: this.diaData,
                         borderColor: '#2563EB',
                         backgroundColor: isDark ? 'rgba(37, 99, 235, 0.12)' : 'rgba(37, 99, 235, 0.08)',
                         borderWidth: 2.2,
@@ -139,7 +110,7 @@
                 unit = 'lpm';
                 datasets = [{
                     label: 'Frecuencia Cardíaca',
-                    data: this.fcData.length ? this.fcData : [72, 75, 71, 74, 72, 73],
+                    data: this.fcData,
                     borderColor: '#F97316',
                     backgroundColor: isDark ? 'rgba(249, 115, 22, 0.18)' : 'rgba(249, 115, 22, 0.10)',
                     borderWidth: 2.2,
@@ -155,7 +126,7 @@
                 unit = '%';
                 datasets = [{
                     label: 'Saturación SpO₂',
-                    data: this.spo2Data.length ? this.spo2Data : [97, 98, 97, 96, 98, 97],
+                    data: this.spo2Data,
                     borderColor: '#10B981',
                     backgroundColor: isDark ? 'rgba(16, 185, 129, 0.18)' : 'rgba(16, 185, 129, 0.10)',
                     borderWidth: 2.2,
@@ -171,7 +142,7 @@
                 unit = '°C';
                 datasets = [{
                     label: 'Temperatura',
-                    data: this.tempData.length ? this.tempData : [36.5, 36.6, 36.4, 36.7, 36.5, 36.5],
+                    data: this.tempData,
                     borderColor: '#F59E0B',
                     backgroundColor: isDark ? 'rgba(245, 158, 11, 0.18)' : 'rgba(245, 158, 11, 0.10)',
                     borderWidth: 2.2,
@@ -193,7 +164,7 @@
             new Chart(canvas, {
                 type: 'line',
                 data: {
-                    labels: this.labels.length ? this.labels : ['1', '2', '3', '4', '5', '6'],
+                    labels: this.labels,
                     datasets: datasets
                 },
                 options: {
@@ -356,7 +327,7 @@
                                 <span class="text-[10px] text-[var(--rm-text-muted)] font-sans">mmHg</span>
                             </div>
                             <span class="text-[9.5px] font-semibold text-rose-600 mt-0.5 block">
-                                {{ ($ultSigno && $ultSigno->presion_sistolica >= 140) ? 'Elevada' : 'Normal' }}
+                                {{ ! $ultSigno?->presion_sistolica ? 'Sin datos' : ($ultSigno->presion_sistolica >= 140 ? 'Elevada' : 'Dentro de rango') }}
                             </span>
                         </div>
 
@@ -372,7 +343,9 @@
                                 </span>
                                 <span class="text-[10px] text-[var(--rm-text-muted)] font-sans">lpm</span>
                             </div>
-                            <span class="text-[9.5px] font-semibold text-emerald-600 mt-0.5 block">Normal</span>
+                            <span class="text-[9.5px] font-semibold text-emerald-600 mt-0.5 block">
+                                {{ ! $ultSigno?->frecuencia_cardiaca ? 'Sin datos' : (in_array((int) $ultSigno->frecuencia_cardiaca, range(60, 100), true) ? 'Dentro de rango' : 'Revisar') }}
+                            </span>
                         </div>
 
                         {{-- Saturación SpO2 --}}
@@ -387,7 +360,9 @@
                                 </span>
                                 <span class="text-[10px] text-[var(--rm-text-muted)] font-sans">SpO₂</span>
                             </div>
-                            <span class="text-[9.5px] font-semibold text-emerald-600 mt-0.5 block">Óptima</span>
+                            <span class="text-[9.5px] font-semibold text-emerald-600 mt-0.5 block">
+                                {{ ! $ultSigno?->saturacion ? 'Sin datos' : ((int) $ultSigno->saturacion >= 95 ? 'Adecuada' : 'Revisar') }}
+                            </span>
                         </div>
 
                         {{-- Temperatura --}}
@@ -402,7 +377,9 @@
                                 </span>
                                 <span class="text-[10px] text-[var(--rm-text-muted)] font-sans">C</span>
                             </div>
-                            <span class="text-[9.5px] font-semibold text-emerald-600 mt-0.5 block">Afebril</span>
+                            <span class="text-[9.5px] font-semibold text-emerald-600 mt-0.5 block">
+                                {{ ! $ultSigno?->temperatura ? 'Sin datos' : (((float) $ultSigno->temperatura >= 36 && (float) $ultSigno->temperatura <= 37.5) ? 'Afebril' : 'Revisar') }}
+                            </span>
                         </div>
                     </div>
                 </div>

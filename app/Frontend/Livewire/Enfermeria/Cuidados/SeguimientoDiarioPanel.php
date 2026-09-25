@@ -51,10 +51,8 @@ class SeguimientoDiarioPanel extends Component
         abort_unless(auth()->user()?->can('atenciones.ver'), 403);
         $this->filtroFecha = today()->toDateString();
 
-        $horaActual = now()->format('H:i:s');
-        $turnoActual = TurnoEnfermeria::whereTime('hora_inicio', '<=', $horaActual)
-            ->whereTime('hora_cierre', '>=', $horaActual)
-            ->first() ?? TurnoEnfermeria::first();
+        $turnoActual = app(\App\Backend\Modulos\Enfermeria\Servicios\TurnoEnfermeriaService::class)
+            ->obtenerTurnoActivo(Auth::user());
 
         if ($turnoActual) {
             $this->filtroTurno = (string) $turnoActual->cod_turno;

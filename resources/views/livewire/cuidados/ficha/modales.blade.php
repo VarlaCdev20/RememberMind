@@ -1158,20 +1158,8 @@
                         </div>
                         @endforeach
                     @else
-                        {{-- Ejemplo enriquecido si no hay en pivot --}}
-                        <div class="p-3.5 rounded-2xl border border-[var(--rm-border)] bg-[var(--rm-surface-alt)] flex items-center justify-between gap-3">
-                            <div class="flex items-center gap-3">
-                                <div class="h-10 w-10 rounded-xl bg-blue-100 dark:bg-blue-950 text-[#1E3A8A] flex items-center justify-center font-bold text-sm shrink-0">
-                                    <i class="ph-bold ph-user"></i>
-                                </div>
-                                <div>
-                                    <h5 class="font-bold text-xs text-[var(--rm-text-title)]">{{ $adultoMayor->contacto_emergencia_nombre ?: 'Hijo/a tutor' }}</h5>
-                                    <p class="text-[11px] text-[var(--rm-text-muted)] mt-0.5">Hijo/a · Tutor Legal acreditado</p>
-                                </div>
-                            </div>
-                            <span class="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
-                                Tutor Acreditado
-                            </span>
+                        <div class="rounded-2xl border border-dashed border-[var(--rm-border)] bg-[var(--rm-surface-alt)] p-4 text-center text-xs text-[var(--rm-text-muted)]">
+                            No existen familiares o apoderados registrados.
                         </div>
                     @endif
                 </div>

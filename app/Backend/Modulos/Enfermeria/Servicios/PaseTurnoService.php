@@ -203,16 +203,6 @@ class PaseTurnoService
             ->with(['residente.cama.habitacion'])
             ->get();
 
-        // Si no hay asignaciones en esa jornada específica pero es superadmin o demo, buscamos asignaciones activas hoy
-        if ($asignaciones->isEmpty()) {
-            $asignaciones = AsignacionResidenteJornada::where('cod_personal', $personalSaliente->cod_personal)
-                ->whereIn('estado', ['ACTIVO', 'ACTIVA'])
-                ->with(['residente.cama.habitacion'])
-                ->latest('fecha_hora')
-                ->take(15)
-                ->get();
-        }
-
         $codigosResidentes = $asignaciones->pluck('cod_residente')->unique()->values()->all();
 
         // 2. Para cada residente, buscar quién lo tiene asignado en la jornada entrante
