@@ -24,10 +24,12 @@ use App\Models\Residente;
 use App\Models\TurnoEnfermeria;
 use App\Models\User;
 use App\Backend\Modulos\Enfermeria\Servicios\AgendaTurnoService;
+use App\Backend\Modulos\Enfermeria\Servicios\CuidadosEnfermeriaService;
 use Database\Seeders\DatabaseSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 use Livewire\Livewire;
 use Tests\TestCase;
 
@@ -120,6 +122,36 @@ class ModuloEnfermeriaIntegralTest extends TestCase
     {
         Carbon::setTestNow();
         parent::tearDown();
+    }
+
+    public function test_hidratacion_sin_cantidad_se_rechaza_sin_inventar_200_ml(): void
+    {
+        try {
+            app(CuidadosEnfermeriaService::class)->registrar($this->residente->cod_residente, [
+                'tipo' => 'HIDRATACION',
+                'subtipo' => 'AGUA',
+            ], $this->enfermero);
+            $this->fail('Se esperaba validación por cantidad de hidratación ausente.');
+        } catch (ValidationException $exception) {
+            $this->assertArrayHasKey('cantidad_ml', $exception->errors());
+        }
+
+        $this->assertDatabaseCount('registros_hidratacion', 0);
+    }
+
+    public function test_valoracion_dolor_conserva_autoria_y_no_inventa_clasificacion(): void
+    {
+        $valoracion = app(CuidadosEnfermeriaService::class)->registrarDolor(
+            $this->residente->cod_residente,
+            'VALORACION',
+            6,
+            'Dolor referido durante la movilización.',
+            $this->enfermero
+        );
+
+        $this->assertSame($this->personal->cod_personal, $valoracion->cod_personal);
+        $this->assertNull($valoracion->ubicacion);
+        $this->assertNull($valoracion->tipo_dolor);
     }
 
     public function test_cuidado_firmado_valida_baja_ingesta_y_genera_alerta_por_cambio_basal(): void

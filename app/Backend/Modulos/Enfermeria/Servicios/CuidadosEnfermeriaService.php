@@ -3,6 +3,7 @@
 namespace App\Backend\Modulos\Enfermeria\Servicios;
 
 use App\Models\Alerta;
+use App\Models\AsignacionPersonal;
 use App\Models\Atencion;
 use App\Models\DispositivoClinico;
 use App\Models\Personal;
@@ -18,6 +19,7 @@ use App\Backend\Modulos\Enfermeria\Servicios\TurnoEnfermeriaService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 
 class CuidadosEnfermeriaService
 {
@@ -29,11 +31,29 @@ class CuidadosEnfermeriaService
         $datos = $this->validar($datos);
 
         $personal = $usuario->personal ?: Personal::where('cod_usuario', $usuario->cod_usuario)->first();
-        $codPersonal = $personal?->cod_personal ?: 'PER_' . strtoupper(Str::random(10));
-        $codArea = $personal?->cod_area ?: 'ARE_0004';
+        if (! $personal || ! in_array($personal->estado, ['ACTIVO', 'ACTIVA'], true)) {
+            throw ValidationException::withMessages([
+                'usuario' => 'El usuario no posee un registro de personal activo.',
+            ]);
+        }
 
         $miTurnoService = app(MiTurnoService::class);
-        $jornada = $personal ? $miTurnoService->resolverJornadaActual($personal, now()) : null;
+        $jornada = $miTurnoService->resolverJornadaActual($personal, now());
+        if (! $jornada) {
+            throw ValidationException::withMessages([
+                'jornada' => 'No existe una jornada activa asignada al personal.',
+            ]);
+        }
+
+        $asignacionArea = AsignacionPersonal::query()
+            ->where('cod_personal', $personal->cod_personal)
+            ->where('cod_jornada', $jornada->cod_jornada)
+            ->whereNotNull('cod_area')
+            ->latest('fecha_asignacion')
+            ->first();
+
+        $codPersonal = $personal->cod_personal;
+        $codArea = $asignacionArea?->cod_area;
         $codJornada = $jornada?->cod_jornada;
 
         $tipo = strtoupper(trim($datos['tipo']));
@@ -47,14 +67,14 @@ class CuidadosEnfermeriaService
                     'cod_residente' => $codResidente,
                     'cod_personal' => $codPersonal,
                     'cod_jornada' => $codJornada,
-                    'tipo_comida' => $datos['subtipo'] ?? 'PRINCIPAL',
+                    'tipo_comida' => $datos['subtipo'],
                     'porcentaje_consumido' => isset($datos['porcentaje']) ? (float) $datos['porcentaje'] : null,
                     'apetito' => $datos['estado_general'] ?? null,
                     'tolerancia' => $datos['tolerancia'] ?? null,
                     'dificultad_deglucion' => !empty($datos['presenta_dificultad']),
                     'fecha_hora' => now(),
                     'estado' => 'VIGENTE',
-                    'observacion' => $datos['observacion'] ?? $datos['motivo'] ?? 'Registro de alimentación.',
+                    'observacion' => $datos['observacion'] ?? $datos['motivo'] ?? null,
                 ]);
             } elseif ($tipo === 'HIDRATACION') {
                 $registro = RegistroHidratacion::create([
@@ -62,13 +82,13 @@ class CuidadosEnfermeriaService
                     'cod_residente' => $codResidente,
                     'cod_personal' => $codPersonal,
                     'cod_jornada' => $codJornada,
-                    'tipo_liquido' => $datos['subtipo'] ?? 'AGUA',
-                    'cantidad_ml' => (int) ($datos['cantidad_ml'] ?? 200),
+                    'tipo_liquido' => $datos['subtipo'],
+                    'cantidad_ml' => (int) $datos['cantidad_ml'],
                     'via' => 'ORAL',
                     'tolerancia' => $datos['tolerancia'] ?? null,
                     'fecha_hora' => now(),
                     'estado' => 'VIGENTE',
-                    'observacion' => $datos['observacion'] ?? $datos['motivo'] ?? 'Registro de hidratación.',
+                    'observacion' => $datos['observacion'] ?? $datos['motivo'] ?? null,
                 ]);
             } elseif ($tipo === 'ELIMINACION') {
                 $registro = RegistroEliminacion::create([
@@ -76,7 +96,7 @@ class CuidadosEnfermeriaService
                     'cod_residente' => $codResidente,
                     'cod_personal' => $codPersonal,
                     'cod_jornada' => $codJornada,
-                    'tipo_eliminacion' => $datos['subtipo'] ?? 'ORINA',
+                    'tipo_eliminacion' => $datos['subtipo'],
                     'consistencia' => $datos['consistencia'] ?? null,
                     'es_continente' => !empty($datos['es_continente']),
                     'usa_dispositivo' => !empty($datos['usa_dispositivo']),
@@ -84,7 +104,7 @@ class CuidadosEnfermeriaService
                     'dolor' => !empty($datos['presenta_dolor']),
                     'fecha_hora' => now(),
                     'estado' => 'VIGENTE',
-                    'observacion' => $datos['observacion'] ?? $datos['motivo'] ?? 'Registro de eliminación.',
+                    'observacion' => $datos['observacion'] ?? $datos['motivo'] ?? null,
                 ]);
             } elseif ($tipo === 'MOVILIDAD') {
                 $registro = RegistroMovilidad::create([
@@ -92,29 +112,39 @@ class CuidadosEnfermeriaService
                     'cod_residente' => $codResidente,
                     'cod_personal' => $codPersonal,
                     'cod_jornada' => $codJornada,
-                    'tipo_movilidad' => $datos['subtipo'] ?? 'CAMBIO_POSTURAL',
+                    'tipo_movilidad' => $datos['subtipo'],
                     'nivel_ayuda' => $datos['nivel_ayuda'] ?? null,
                     'ayuda_tecnica' => $datos['ayuda_tecnica'] ?? null,
                     'tolerancia' => $datos['tolerancia'] ?? null,
                     'fecha_hora' => now(),
                     'estado' => 'VIGENTE',
-                    'observacion' => $datos['observacion'] ?? $datos['motivo'] ?? 'Registro de movilidad.',
+                    'observacion' => $datos['observacion'] ?? $datos['motivo'] ?? null,
                 ]);
             } else {
+                if (! $codArea) {
+                    throw ValidationException::withMessages([
+                        'area' => 'La jornada activa no tiene un área asignada para registrar esta atención.',
+                    ]);
+                }
+
                 $registro = Atencion::create([
                     'cod_atencion' => 'ATN_' . strtoupper(Str::random(10)),
                     'cod_residente' => $codResidente,
                     'cod_area' => $codArea,
                     'cod_personal' => $codPersonal,
                     'tipo_atencion' => 'CUIDADO',
-                    'motivo' => $tipo . ' - ' . ($datos['subtipo'] ?? 'GENERAL'),
+                    'motivo' => $tipo.' - '.$datos['subtipo'],
                     'fecha_hora' => now(),
                     'estado' => 'REALIZADA',
-                    'observacion' => $datos['observacion'] ?? $datos['motivo'] ?? 'Cuidado asistencial de enfermería.',
+                    'observacion' => $datos['observacion'] ?? $datos['motivo'] ?? null,
                 ]);
             }
 
-            if (($datos['cambio_respecto_basal'] ?? null) === 'PEOR' || (($datos['tipo'] ?? null) === 'ALIMENTACION' && ($datos['porcentaje'] ?? 100) < config('enfermeria.porcentaje_baja_ingesta', 50))) {
+            $esBajaIngesta = $tipo === 'ALIMENTACION'
+                && isset($datos['porcentaje'])
+                && $datos['porcentaje'] < config('enfermeria.porcentaje_baja_ingesta', 50);
+
+            if (($datos['cambio_respecto_basal'] ?? null) === 'PEOR' || $esBajaIngesta) {
                 $this->alertas->crear($codResidente, [
                     'origen' => 'SEGUIMIENTO',
                     'tipo_alerta' => ($datos['cambio_respecto_basal'] ?? null) === 'PEOR' ? 'CAMBIO RESPECTO AL ESTADO BASAL' : 'BAJA INGESTA',
@@ -129,6 +159,7 @@ class CuidadosEnfermeriaService
 
     public function registrarDolor(string $codResidente, string $fase, int $intensidad, string $detalle, User $usuario, ?ValoracionDolor $valoracion = null, ?string $resultado = null): ValoracionDolor
     {
+        $this->turnos->autorizarMutacionEnfermeria($codResidente, 'atenciones.crear', $usuario);
         $fase = mb_strtoupper($fase);
         Validator::make(compact('fase', 'intensidad', 'detalle', 'resultado'), [
             'fase' => 'required|in:VALORACION,INTERVENCION,REEVALUACION',
@@ -138,16 +169,18 @@ class CuidadosEnfermeriaService
         ])->validate();
 
         $personal = $usuario->personal ?: Personal::where('cod_usuario', $usuario->cod_usuario)->first();
-        $codPersonal = $personal?->cod_personal ?: 'PER_' . strtoupper(Str::random(10));
+        if (! $personal || ! in_array($personal->estado, ['ACTIVO', 'ACTIVA'], true)) {
+            throw ValidationException::withMessages(['usuario' => 'El usuario no posee un registro de personal activo.']);
+        }
 
         return ValoracionDolor::create([
             'cod_valoracion_dolor' => 'VD_' . strtoupper(Str::random(10)),
             'cod_residente' => $codResidente,
-            'cod_personal' => $codPersonal,
+            'cod_personal' => $personal->cod_personal,
             'fecha_hora' => now(),
             'intensidad' => $intensidad,
-            'ubicacion' => 'General',
-            'tipo_dolor' => 'SOMATICO',
+            'ubicacion' => null,
+            'tipo_dolor' => null,
             'desencadenante' => $fase,
             'intervencion' => $detalle,
             'respuesta' => $resultado,
@@ -165,12 +198,14 @@ class CuidadosEnfermeriaService
         ])->validate();
 
         $personal = $usuario->personal ?: Personal::where('cod_usuario', $usuario->cod_usuario)->first();
-        $codPersonal = $personal?->cod_personal ?: 'PER_' . strtoupper(Str::random(10));
+        if (! $personal || ! in_array($personal->estado, ['ACTIVO', 'ACTIVA'], true)) {
+            throw ValidationException::withMessages(['usuario' => 'El usuario no posee un registro de personal activo.']);
+        }
 
         return DispositivoClinico::create([
             'cod_dispositivo' => 'DIS_' . strtoupper(Str::random(10)),
             'cod_residente' => $codResidente,
-            'cod_personal' => $codPersonal,
+            'cod_personal' => $personal->cod_personal,
             'tipo' => $datos['tipo'],
             'ubicacion' => $datos['ubicacion'] ?? null,
             'fecha_colocacion' => now(),
@@ -198,7 +233,7 @@ class CuidadosEnfermeriaService
             'tipo' => 'required|in:ALIMENTACION,HIDRATACION,ELIMINACION,HIGIENE,MOVILIDAD,SUENO,VALORACION_RAPIDA,PROCEDIMIENTO,DOLOR,DISPOSITIVO,OBSERVACION',
             'subtipo' => 'required|string|max:50',
             'porcentaje' => 'nullable|integer|in:0,25,50,75,100',
-            'cantidad_ml' => 'nullable|integer|min:1|max:10000',
+            'cantidad_ml' => 'required_if:tipo,HIDRATACION|nullable|integer|min:1|max:10000',
             'dolor' => 'nullable|integer|min:0|max:10',
             'nivel_ayuda' => 'nullable|string|max:30',
             'tolerancia' => 'nullable|string|max:30',
@@ -226,7 +261,7 @@ class CuidadosEnfermeriaService
             'agitacion' => 'nullable|boolean',
         ])->validate();
 
-        if ($validados['tipo'] === 'ALIMENTACION' && ($validados['porcentaje'] ?? 100) < config('enfermeria.porcentaje_baja_ingesta', 50)
+        if ($validados['tipo'] === 'ALIMENTACION' && isset($validados['porcentaje']) && $validados['porcentaje'] < config('enfermeria.porcentaje_baja_ingesta', 50)
             && mb_strlen(trim($validados['motivo'] ?? '')) < 3) {
             throw \Illuminate\Validation\ValidationException::withMessages(['motivo' => 'Indique el motivo de la baja ingesta.']);
         }
