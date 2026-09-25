@@ -63,25 +63,13 @@ class OcupacionCama extends ModeloOperativo
             }
 
             if (empty($ocupacion->cod_usuario_registro)) {
-                $ocupacion->cod_usuario_registro = auth()->user()?->cod_usuario ?? (\App\Models\User::first()?->cod_usuario ?? 'USU_0001');
+                throw new \LogicException('La ocupación requiere el usuario que registra la asignación.');
             }
             if (empty($ocupacion->fecha_hora_asignacion)) {
                 $ocupacion->fecha_hora_asignacion = now();
             }
-            if (empty($ocupacion->cod_admision) && !empty($ocupacion->cod_residente)) {
-                $adm = \App\Models\Admision::where('cod_residente', $ocupacion->cod_residente)->first();
-                if (!$adm) {
-                    $u = \App\Models\User::first();
-                    $adm = \App\Models\Admision::create([
-                        'cod_admision' => 'ADM_' . strtoupper(\Illuminate\Support\Str::random(10)),
-                        'cod_residente' => $ocupacion->cod_residente,
-                        'cod_usuario_registro' => $u?->cod_usuario ?? 'USU_0001',
-                        'fecha_hora_admision' => now(),
-                        'motivo_ingreso' => 'Ingreso institucional',
-                        'estado' => 'ACTIVA',
-                    ]);
-                }
-                $ocupacion->cod_admision = $adm->cod_admision;
+            if (empty($ocupacion->cod_admision)) {
+                throw new \LogicException('La ocupación requiere una admisión formal existente.');
             }
         });
         static::saving(function (self $ocupacion): void {

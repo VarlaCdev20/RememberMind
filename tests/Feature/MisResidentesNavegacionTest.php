@@ -13,6 +13,7 @@ use App\Models\Cama;
 use App\Models\Habitacion;
 use App\Models\Jornada;
 use App\Models\OcupacionCama;
+use App\Models\Admision;
 use App\Models\Personal;
 use App\Models\PlanCuidado;
 use App\Models\SignoVital;
@@ -137,11 +138,21 @@ class MisResidentesNavegacionTest extends TestCase
             'cod_est_adul' => 'EST_001',
         ]);
 
+        $admision = Admision::create([
+            'cod_admision' => 'ADM_NAV_001',
+            'cod_residente' => $this->residenteAsignado->cod_residente,
+            'cod_usuario_registro' => $this->enfermero->cod_usuario,
+            'fecha_hora_admision' => now(),
+            'motivo_ingreso' => 'Preparación del escenario clínico',
+            'estado' => 'ACTIVA',
+        ]);
+
         OcupacionCama::create([
             'cod_residente' => $this->residenteAsignado->cod_residente,
-            'cod_habitacion' => $hab->cod_habitacion,
             'cod_cama' => $cama->cod_cama,
-            'fecha_asignacion' => today()->toDateString(),
+            'cod_admision' => $admision->cod_admision,
+            'cod_usuario_registro' => $this->enfermero->cod_usuario,
+            'fecha_hora_asignacion' => now(),
             'estado' => 'ACTIVO',
         ]);
 

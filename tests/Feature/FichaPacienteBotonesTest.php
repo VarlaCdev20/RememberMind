@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Frontend\Livewire\Compartido\Clinica\FichaPaciente;
 use App\Models\AdministracionMedicacion;
 use App\Models\AdultoMayor;
+use App\Models\Admision;
 use App\Models\Alerta;
 use App\Models\OcupacionCama;
 use App\Models\AsignacionResidenteJornada;
@@ -86,11 +87,21 @@ class FichaPacienteBotonesTest extends TestCase
             'cod_est_adul' => 'EST_001',
         ]);
 
+        $admision = Admision::create([
+            'cod_admision' => 'ADM_FICHA_100',
+            'cod_residente' => $this->adulto->cod_residente,
+            'cod_usuario_registro' => $this->enfermero->cod_usuario,
+            'fecha_hora_admision' => now(),
+            'motivo_ingreso' => 'Preparación del escenario clínico',
+            'estado' => 'ACTIVA',
+        ]);
+
         OcupacionCama::create([
             'cod_residente' => $this->adulto->cod_residente,
-            'cod_habitacion' => $this->habitacion->cod_habitacion,
             'cod_cama' => $this->cama->cod_cama,
-            'fecha_asignacion' => today()->toDateString(),
+            'cod_admision' => $admision->cod_admision,
+            'cod_usuario_registro' => $this->enfermero->cod_usuario,
+            'fecha_hora_asignacion' => now(),
             'estado' => 'ACTIVO',
         ]);
 
