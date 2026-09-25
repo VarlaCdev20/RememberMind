@@ -1164,49 +1164,60 @@ class FichaPaciente extends Component
         $this->abrirEjecutarTarea($codTarea, 'OMITIDA');
     }
 
-    public function registrarCuidadoDirecto(string $nombreCuidado, string $resultado = 'REALIZADA', ?string $observaciones = null, bool $esPrn = false): void
+    public function registrarCuidadoDirecto(string $codIntervencion, string $resultado = 'REALIZADA', ?string $observaciones = null): void
     {
         abort_unless(Auth::check(), 401);
-        if (Auth::user()->hasRole('ENFERMEROS')) {
-            app(TurnoEnfermeriaService::class)->autorizarAccionPaciente($this->adultoMayor->cod_residente, Auth::user());
-        }
+        abort_unless(Auth::user()->can('ejecuciones_cuidado.gestionar'), 403);
+        validator(compact('resultado', 'observaciones'), [
+            'resultado' => 'required|in:REALIZADA,INCIDENCIA',
+            'observaciones' => 'required|string|min:10|max:2000',
+        ])->validate();
 
-        $tarea = EjecucionCuidado::where('cod_residente', $this->adultoMayor->cod_residente)
-            ->whereHas('intervencion', fn ($q) => $q
-                ->where('nombre', 'like', "%{$nombreCuidado}%")
-                ->orWhere('descripcion', 'like', "%{$nombreCuidado}%"))
+        $turno = app(TurnoEnfermeriaService::class)->autorizarMutacionPaciente(
+            $this->adultoMayor->cod_residente,
+            'ejecuciones_cuidado.gestionar',
+            Auth::user(),
+        );
+        $personal = app(\App\Backend\Modulos\Clinica\Servicios\ContextoClinicoService::class)
+            ->personalActivo(Auth::user());
+        $intervencion = \App\Models\IntervencionCuidado::query()
+            ->where('cod_intervencion', $codIntervencion)
+            ->whereIn('estado', ['ACTIVA', 'ACTIVO'])
+            ->whereHas('plan', fn ($query) => $query
+                ->where('cod_residente', $this->adultoMayor->cod_residente)
+                ->whereIn('estado', ['ACTIVO', 'ACTIVA']))
+            ->firstOrFail();
+        $jornada = Jornada::query()
+            ->where('cod_turno', $turno->cod_turno)
+            ->whereDate('fecha_jornada', today())
+            ->whereIn('estado', ['ABIERTA', 'ACTIVA'])
+            ->firstOrFail();
+
+        $tarea = EjecucionCuidado::query()
+            ->where('cod_residente', $this->adultoMayor->cod_residente)
+            ->where('cod_intervencion', $intervencion->cod_intervencion)
+            ->where('cod_jornada', $jornada->cod_jornada)
             ->whereIn('estado', ['PENDIENTE', 'EN_PROCESO'])
             ->first();
 
         if ($tarea) {
             $tarea->update([
                 'estado' => $resultado === 'INCIDENCIA' ? 'OMITIDA' : 'REALIZADA',
-                'resultado' => $observaciones ?: ($resultado === 'REALIZADA' ? 'Cuidado asistencial realizado conforme al protocolo.' : 'Incidencia detectada.'),
-                'motivo_omision' => $resultado === 'INCIDENCIA' ? ($observaciones ?: 'Incidencia registrada en turno.') : null,
-                'cod_personal' => Auth::user()->personal->cod_personal,
+                'resultado' => $observaciones,
+                'motivo_omision' => $resultado === 'INCIDENCIA' ? $observaciones : null,
+                'cod_personal' => $personal->cod_personal,
                 'fecha_hora_ejecucion' => now(),
             ]);
         } else {
-            $intervencion = $this->adultoMayor->planesCuidado()
-                ->where('estado', 'ACTIVO')
-                ->whereHas('intervenciones', fn ($q) => $q->where('estado', 'ACTIVA'))
-                ->with(['intervenciones' => fn ($q) => $q->where('estado', 'ACTIVA')])
-                ->first()?->intervenciones?->first();
-            $jornada = app(TurnoEnfermeriaService::class)->obtenerTurnoActivo(Auth::user());
-            $jornada = $jornada
-                ? Jornada::query()->where('cod_turno', $jornada->cod_turno)->whereDate('fecha_jornada', today())->whereIn('estado', ['ABIERTA', 'ACTIVA'])->first()
-                : null;
-            abort_unless($intervencion && $jornada && Auth::user()?->personal, 422, 'El cuidado requiere plan, intervención, jornada y personal V2 activos.');
-
             EjecucionCuidado::query()->create([
                 'cod_intervencion' => $intervencion->cod_intervencion,
                 'cod_residente' => $this->adultoMayor->cod_residente,
                 'cod_jornada' => $jornada->cod_jornada,
-                'cod_personal' => Auth::user()->personal->cod_personal,
+                'cod_personal' => $personal->cod_personal,
                 'fecha_hora_programada' => now(),
                 'fecha_hora_ejecucion' => now(),
-                'resultado' => $resultado === 'INCIDENCIA' ? 'INCIDENCIA' : 'REALIZADA',
-                'motivo_omision' => $resultado === 'INCIDENCIA' ? ($observaciones ?: 'Incidencia registrada en turno.') : null,
+                'resultado' => $observaciones,
+                'motivo_omision' => $resultado === 'INCIDENCIA' ? $observaciones : null,
                 'estado' => $resultado === 'INCIDENCIA' ? 'OMITIDA' : 'REALIZADA',
                 'observacion' => $observaciones,
             ]);
@@ -1216,7 +1227,7 @@ class FichaPaciente extends Component
         $this->dispatch('swal', [
             'icon' => $resultado === 'INCIDENCIA' ? 'warning' : 'success',
             'title' => $resultado === 'INCIDENCIA' ? 'Incidencia registrada' : 'Cuidado registrado',
-            'text' => "El cuidado '{$nombreCuidado}' se registró satisfactoriamente en la ficha del residente.",
+            'text' => "El cuidado '{$intervencion->nombre}' se registró satisfactoriamente en la ficha del residente.",
         ]);
     }
 
