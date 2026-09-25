@@ -2,8 +2,8 @@
 
 namespace App\Backend\Modulos\Enfermeria\Servicios;
 
+use App\Backend\Modulos\Clinica\Servicios\ContextoClinicoService;
 use App\Models\Incidente;
-use App\Models\Personal;
 use App\Models\User;
 use App\Backend\Modulos\Enfermeria\Servicios\LesionesEnfermeriaService;
 use App\Backend\Modulos\Alertas\Servicios\AlertasService;
@@ -18,7 +18,8 @@ class IncidentesEnfermeriaService
     public function __construct(
         private readonly TurnoEnfermeriaService $turnos,
         private readonly AlertasService $alertas,
-        private readonly LesionesEnfermeriaService $lesiones
+        private readonly LesionesEnfermeriaService $lesiones,
+        private readonly ContextoClinicoService $contextoClinico,
     ) {}
 
     public function registrar(string $codResidente, array $datos, User $usuario): Incidente
@@ -43,8 +44,8 @@ class IncidentesEnfermeriaService
             'lateralidad' => 'nullable|string|max:20',
         ])->validate();
 
-        $personal = $usuario->personal ?: Personal::where('cod_usuario', $usuario->cod_usuario)->first();
-        $codPersonal = $personal?->cod_personal ?: 'PER_' . strtoupper(Str::random(10));
+        $personal = $this->contextoClinico->personalActivo($usuario);
+        $codPersonal = $personal->cod_personal;
 
         $miTurnoService = app(MiTurnoService::class);
         $jornada = $personal ? $miTurnoService->resolverJornadaActual($personal, now()) : null;

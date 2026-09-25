@@ -120,6 +120,26 @@ class IncidentesEnfermeriaTest extends TestCase
             ->assertHasErrors(['fecha_incidente']);
     }
 
+    public function test_registro_incidente_no_usa_otro_personal_como_fallback(): void
+    {
+        $usuarioSinPersonal = User::factory()->create();
+        $fechaInc = Carbon::now()->subMinutes(10);
+
+        Livewire::actingAs($usuarioSinPersonal)
+            ->test(IncidentesPanel::class)
+            ->call('abrirModalRegistro')
+            ->set('cod_residente', $this->residente->cod_residente)
+            ->set('tipo_incidente', 'CAÍDA')
+            ->set('gravedad', 'ALTA')
+            ->set('fecha_incidente', $fechaInc->format('Y-m-d'))
+            ->set('hora_incidente', $fechaInc->format('H:i'))
+            ->set('descripcion', 'Incidente que no debe atribuirse a un profesional ajeno.')
+            ->call('registrarIncidente')
+            ->assertHasErrors(['error_general']);
+
+        $this->assertDatabaseCount('incidentes', 0);
+    }
+
     public function test_registro_incidente_exitoso_y_normalizacion_de_texto(): void
     {
         $fechaInc = Carbon::now()->subMinutes(15);

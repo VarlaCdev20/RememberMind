@@ -241,13 +241,11 @@ class IncidentesPanel extends Component
             return;
         }
 
-        // Obtener el personal autenticado
-        $codUsuario = $user->cod_usuario;
-        $personal = $user->personal ?: Personal::where('cod_usuario', $codUsuario)->first();
-        if (!$personal) {
-            $personal = Personal::where('estado', 'ACTIVO')->first();
-        }
-        $codPersonal = $personal ? $personal->cod_personal : null;
+        $personal = Personal::query()
+            ->where('cod_usuario', $user->cod_usuario)
+            ->where('estado', 'ACTIVO')
+            ->first();
+        $codPersonal = $personal?->cod_personal;
 
         if (!$codPersonal) {
             $this->addError('error_general', 'No se encontró un perfil de personal activo asociado.');
@@ -498,8 +496,14 @@ class IncidentesPanel extends Component
         try {
             $user = Auth::user();
             $codUsuario = $user->cod_usuario;
-            $personal = $user->personal ?: Personal::where('cod_usuario', $codUsuario)->first();
-            $codPersonal = $personal ? $personal->cod_personal : $incidente->cod_personal;
+            $personal = Personal::query()
+                ->where('cod_usuario', $codUsuario)
+                ->where('estado', 'ACTIVO')
+                ->first();
+            if (! $personal) {
+                throw new \LogicException('El usuario autenticado no tiene un perfil de personal activo.');
+            }
+            $codPersonal = $personal->cod_personal;
 
             // Prioridad según gravedad
             $prioridad = in_array($incidente->gravedad, ['ALTA', 'CRITICA']) ? 'ALTA' : 'MEDIA';
@@ -603,8 +607,15 @@ class IncidentesPanel extends Component
 
         $user = Auth::user();
         $codUsuario = $user->cod_usuario;
-        $personal = $user->personal ?: Personal::where('cod_usuario', $codUsuario)->first();
-        $codPersonal = $personal ? $personal->cod_personal : $incidente->cod_personal;
+        $personal = Personal::query()
+            ->where('cod_usuario', $codUsuario)
+            ->where('estado', 'ACTIVO')
+            ->first();
+        if (! $personal) {
+            $this->addError('derivacion_area_receptora', 'El usuario autenticado no tiene un perfil de personal activo.');
+            return;
+        }
+        $codPersonal = $personal->cod_personal;
 
         // Área de enfermería como solicitante
         $areaEnfermeria = Area::where('nombre', 'LIKE', '%ENFERMER%')
