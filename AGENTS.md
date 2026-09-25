@@ -36,7 +36,7 @@ php artisan migrate --seed   # run all migrations + seeders
 - `GET /` → welcome view
 - `GET /dashboard` → `DashboardController@index` (single-dashboard-per-role pattern)
 - All backend under `Route::prefix('admin')` with permission middleware
-- Livewire components organized by functional area under `app/Livewire/`
+- Livewire components organized by functional area under `app/Frontend/Livewire/`
 
 ### Seeder order matters
 `DatabaseSeeder` runs in this sequence:
