@@ -11,10 +11,6 @@ class AdministracionMedicacionPolicy
 {
     public function create(User $user): bool
     {
-        if (method_exists($user, 'hasRole') && $user->hasRole('SUPERADMINISTRADOR')) {
-            return true;
-        }
-
         // Si es enfermero y tiene personal registrado, y existen jornadas activas en el sistema,
         // verificar que esté en turno activo (con asignación a una jornada activa/abierta hoy)
         if (method_exists($user, 'hasRole') && $user->hasRole('ENFERMEROS') && $user->personal) {

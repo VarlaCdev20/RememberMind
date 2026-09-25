@@ -52,7 +52,7 @@ class AdultoGeneralSheet implements FromCollection, WithTitle, WithHeadings, Sho
         $edad = $a->fecha_nac ? \Carbon\Carbon::parse($a->fecha_nac)->age : '—';
 
         return collect([
-            ['Código expediente',       $a->cod_am],
+            ['Código expediente',       $a->cod_residente],
             ['Nombres',                 $a->nombres],
             ['Apellido paterno',        $a->ap_paterno],
             ['Apellido materno',        $a->ap_materno ?? '—'],

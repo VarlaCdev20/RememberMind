@@ -2,9 +2,9 @@
 
 namespace Tests\Feature;
 
-use App\Livewire\Cuidados\FichaPaciente;
-use App\Livewire\Cuidados\RegistrosEnfermeria;
-use App\Livewire\Cuidados\ReporteEnfermeria;
+use App\Frontend\Livewire\Compartido\Clinica\FichaPaciente;
+use App\Frontend\Livewire\Enfermeria\Cuidados\RegistrosEnfermeria;
+use App\Frontend\Livewire\Enfermeria\Cuidados\ReporteEnfermeria;
 use App\Models\AdministracionMedicacion;
 use App\Models\AdultoMayor;
 use App\Models\Area;
@@ -114,7 +114,7 @@ class EnfermeriaV2CorreccionCriticaTest extends TestCase
             $queries[] = strtolower($query->sql);
         });
 
-        $test = Livewire::test(RegistrosEnfermeria::class, ['codResidente' => $residente->cod_residente, 'codAm' => $residente->cod_residente]);
+        $test = Livewire::test(RegistrosEnfermeria::class, ['codResidente' => $residente->cod_residente]);
         $test->assertStatus(200);
 
         $tablasV1Prohibidas = [
@@ -141,7 +141,7 @@ class EnfermeriaV2CorreccionCriticaTest extends TestCase
         [$enfermera, , $residente] = $this->crearEscenario();
         $this->actingAs($enfermera);
 
-        Livewire::test(RegistrosEnfermeria::class, ['codResidente' => $residente->cod_residente, 'codAm' => $residente->cod_residente])
+        Livewire::test(RegistrosEnfermeria::class, ['codResidente' => $residente->cod_residente])
             ->set('seccion', 'DISPOSITIVOS')
             ->set('tipoDispositivo', 'SONDA_VESICAL')
             ->set('indicacionDispositivo', 'Drenaje urinario postoperatorio')
@@ -157,7 +157,7 @@ class EnfermeriaV2CorreccionCriticaTest extends TestCase
 
         $disp = DispositivoClinico::where('cod_residente', $residente->cod_residente)->firstOrFail();
 
-        Livewire::test(RegistrosEnfermeria::class, ['codResidente' => $residente->cod_residente, 'codAm' => $residente->cod_residente])
+        Livewire::test(RegistrosEnfermeria::class, ['codResidente' => $residente->cod_residente])
             ->set('seccion', 'DISPOSITIVOS')
             ->set('motivoRetiroDispositivo', 'Fin de indicacion medica')
             ->call('retirarDispositivo', $disp->cod_dispositivo)
@@ -185,7 +185,7 @@ class EnfermeriaV2CorreccionCriticaTest extends TestCase
             'fecha_hora_identificacion' => now(),
         ]);
 
-        Livewire::test(RegistrosEnfermeria::class, ['codResidente' => $residente->cod_residente, 'codAm' => $residente->cod_residente])
+        Livewire::test(RegistrosEnfermeria::class, ['codResidente' => $residente->cod_residente])
             ->set('seccion', 'INCIDENTES')
             ->set('lesionId', $herida->cod_herida)
             ->set('lesionMedible', true)
@@ -204,7 +204,7 @@ class EnfermeriaV2CorreccionCriticaTest extends TestCase
             'procedimiento' => 'Limpieza con suero fisiologico y parche',
         ]);
 
-        Livewire::test(RegistrosEnfermeria::class, ['codResidente' => $residente->cod_residente, 'codAm' => $residente->cod_residente])
+        Livewire::test(RegistrosEnfermeria::class, ['codResidente' => $residente->cod_residente])
             ->set('seccion', 'INCIDENTES')
             ->set('resultadoCierreLesion', 'Cicatrizacion completa')
             ->set('motivoCierreLesion', 'Alta de enfermeria')
@@ -237,7 +237,7 @@ class EnfermeriaV2CorreccionCriticaTest extends TestCase
         ]);
 
         // 1. Procedimiento general -> ejecuciones_cuidado
-        Livewire::test(RegistrosEnfermeria::class, ['codResidente' => $residente->cod_residente, 'codAm' => $residente->cod_residente])
+        Livewire::test(RegistrosEnfermeria::class, ['codResidente' => $residente->cod_residente])
             ->set('intervencionId', $intervencion->cod_intervencion)
             ->set('seccion', 'CUIDADOS')
             ->set('tipo', 'PROCEDIMIENTO')
@@ -254,7 +254,7 @@ class EnfermeriaV2CorreccionCriticaTest extends TestCase
         ]);
 
         // 2. Alimentacion -> registros_ingesta
-        Livewire::test(RegistrosEnfermeria::class, ['codResidente' => $residente->cod_residente, 'codAm' => $residente->cod_residente])
+        Livewire::test(RegistrosEnfermeria::class, ['codResidente' => $residente->cod_residente])
             ->set('seccion', 'CUIDADOS')
             ->set('tipo', 'ALIMENTACION')
             ->set('subtipo', 'Desayuno completo')
@@ -493,7 +493,7 @@ class EnfermeriaV2CorreccionCriticaTest extends TestCase
             'estado' => 'ACTIVA',
         ]);
 
-        $miTurnoService = app(\App\Services\Enfermeria\MiTurnoService::class);
+        $miTurnoService = app(\App\Backend\Modulos\Enfermeria\Servicios\MiTurnoService::class);
         $dashboard = $miTurnoService->obtenerDatosDashboard($enfermera);
 
         $card = collect($dashboard['residentes'])->firstWhere('cod_residente', $residente->cod_residente);

@@ -14,7 +14,7 @@ class SignoVital extends ModeloOperativo
      * de persistirlos; el modelo no acepta ni traduce atributos legacy.
      */
     protected $fillable = [
-        'cod_signo', 'cod_residente', 'cod_am', 'presion_arterial', 'cod_personal', 'cod_jornada', 'cod_atencion',
+        'cod_signo', 'cod_residente', 'presion_arterial', 'cod_personal', 'cod_jornada', 'cod_atencion',
         'fecha', 'hora', 'saturacion', 'glucosa', 'registrado_por',
         'fecha_hora', 'presion_sistolica', 'presion_diastolica',
         'frecuencia_cardiaca', 'frecuencia_respiratoria', 'temperatura',
@@ -26,12 +26,6 @@ class SignoVital extends ModeloOperativo
         return ['fecha_hora' => 'datetime'];
     }
 
-
-    public function setCodAmAttribute($value): void
-    {
-        $this->attributes['cod_residente'] = $value;
-    }
-
     protected static function booted(): void
     {
         static::creating(function (self $signo): void {
@@ -41,9 +35,7 @@ class SignoVital extends ModeloOperativo
             if (empty($signo->fecha_hora)) {
                 $signo->fecha_hora = now();
             }
-            if (empty($signo->cod_residente) && !empty($signo->getAttribute('cod_am'))) {
-                $signo->cod_residente = $signo->getAttribute('cod_am');
-            }
+
             if (empty($signo->cod_personal)) {
                 $personal = Personal::query()->first();
                 if (! $personal) {
@@ -159,11 +151,6 @@ class SignoVital extends ModeloOperativo
     public function getGlucosaAttribute(): mixed
     {
         return $this->glucemia;
-    }
-
-    public function getCodAmAttribute(): string
-    {
-        return (string) $this->cod_residente;
     }
 
     public function getPresionArterialAttribute(): ?string

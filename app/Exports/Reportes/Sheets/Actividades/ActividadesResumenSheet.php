@@ -2,7 +2,7 @@
 
 namespace App\Exports\Reportes\Sheets\Actividades;
 
-use App\Services\Reportes\ReporteDataService;
+use App\Backend\Modulos\Reportes\Servicios\ReporteDataService;
 use Maatwebsite\Excel\Concerns\FromArray;
 use Maatwebsite\Excel\Concerns\WithTitle;
 use Maatwebsite\Excel\Concerns\WithHeadings;

@@ -2,7 +2,7 @@
 
 namespace App\Exports\Reportes\Sheets\Familiares;
 
-use App\Services\Reportes\ReporteDataService;
+use App\Backend\Modulos\Reportes\Servicios\ReporteDataService;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithTitle;
 use Maatwebsite\Excel\Concerns\WithHeadings;
@@ -20,13 +20,13 @@ class FamiliaresVinculosSheet implements FromCollection, WithTitle, WithHeadings
 
     public function headings(): array
     {
-        return ['Código AM', 'Adulto Mayor', 'Familiar', 'Parentesco', 'Responsable', 'Estado'];
+        return ['Código', 'Adulto Mayor', 'Familiar', 'Parentesco', 'Responsable', 'Estado'];
     }
 
     public function collection()
     {
         return $this->service->vinculosLista(500)->map(fn($r) => [
-            $r->cod_am,
+            $r->cod_residente,
             $r->adulto,
             $r->familiar,
             $r->parentesco_vinculo,

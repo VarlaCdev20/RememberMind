@@ -26,12 +26,12 @@
                                             Cambiar personal
                                         </button>
                                     </div>
-                                    
+
                                     <div class="mt-2">
-                                        <livewire:identidad.personal-institucional-horarios 
-                                            :usuario-id="$usuarioSeleccionadoData->cod_usu" 
+                                        <livewire:identidad.personal-institucional-horarios
+                                            :usuario-id="$usuarioSeleccionadoData->cod_usuario"
                                             :abrir-formulario-inicial="true"
-                                            wire:key="horario-modal-{{ $usuarioSeleccionadoData->cod_usu }}" 
+                                            wire:key="horario-modal-{{ $usuarioSeleccionadoData->cod_usuario }}"
                                         />
                                     </div>
 
@@ -52,7 +52,7 @@
 
                             <div class="mt-4 max-h-[420px] space-y-2 overflow-y-auto pr-1">
                                 @forelse ($personalModal as $usuario)
-                                    <button type="button" wire:click="seleccionarUsuario('{{ $usuario->cod_usu }}')"
+                                    <button type="button" wire:click="seleccionarUsuario('{{ $usuario->cod_usuario }}')"
                                         class="w-full rounded-2xl border border-borde-suave bg-fondo-card/35 p-3 text-left transition hover:border-borde-focus hover:bg-fondo-card">
                                         <p class="text-sm font-black text-titulo">{{ $usuario->nombres }} {{ $usuario->ap_paterno }}</p>
                                         <p class="text-xs font-bold text-apoyo">{{ $usuario->correo }}</p>

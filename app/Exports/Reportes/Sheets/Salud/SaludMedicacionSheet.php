@@ -2,7 +2,7 @@
 
 namespace App\Exports\Reportes\Sheets\Salud;
 
-use App\Services\Reportes\ReporteDataService;
+use App\Backend\Modulos\Reportes\Servicios\ReporteDataService;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithTitle;
 use Maatwebsite\Excel\Concerns\WithHeadings;
@@ -20,13 +20,13 @@ class SaludMedicacionSheet implements FromCollection, WithTitle, WithHeadings, W
 
     public function headings(): array
     {
-        return ['Código AM', 'Nombre', 'Medicamento', 'Dosis', 'Frecuencia', 'Estado', 'Fecha Inicio', 'Fecha Fin'];
+        return ['Código', 'Nombre', 'Medicamento', 'Dosis', 'Frecuencia', 'Estado', 'Fecha Inicio', 'Fecha Fin'];
     }
 
     public function collection()
     {
         return $this->service->medicacionLista(500)->map(fn($r) => [
-            $r->cod_am,
+            $r->cod_residente,
             $r->nombre,
             $r->nombre_medicamento,
             $r->dosis,

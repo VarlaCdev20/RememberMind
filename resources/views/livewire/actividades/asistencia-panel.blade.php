@@ -204,7 +204,7 @@
  <section class="overflow-hidden rounded-[1.45rem] border border-borde-suave bg-fondo-panel shadow-md backdrop-blur-xl">
 
  {{-- Barra de filtros --}}
- <div class="border-b border-borde-suave bg-fondo-panel px-5 py-4">
+ <div class="rm-filter-bar border-b border-borde-suave px-5 py-4">
  <div class="flex flex-wrap items-end gap-3">
 
  {{-- Buscar adulto --}}
@@ -275,7 +275,7 @@
  <button
  type="button"
  wire:click="limpiarFiltros"
- class="inline-flex items-center gap-1.5 rounded-xl border border-borde-suave bg-fondo-panel px-3.5 py-2 text-xs font-bold text-apoyo transition hover:bg-fondo-app hover:text-titulo"
+ class="rm-filter-reset"
  >
  <i class="ph-bold ph-x text-xs"></i>
  Limpiar

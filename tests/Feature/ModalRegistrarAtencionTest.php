@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Livewire\Cuidados\FichaPaciente;
+use App\Frontend\Livewire\Compartido\Clinica\FichaPaciente;
 use App\Models\AdultoMayor;
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
@@ -41,7 +41,7 @@ class ModalRegistrarAtencionTest extends TestCase
 
     public function test_modal_central_registrar_atencion_contiene_estructura_y_8_opciones(): void
     {
-        Livewire::test(FichaPaciente::class, ['adulto' => $this->adulto->cod_am])
+        Livewire::test(FichaPaciente::class, ['adulto' => $this->adulto->cod_residente])
             // Botón principal
             ->assertSee('+ REGISTRAR ATENCIÓN')
             ->assertDontSee('openAtencion') // Dropdown antiguo eliminado
@@ -50,7 +50,7 @@ class ModalRegistrarAtencionTest extends TestCase
             ->assertSee('Selecciona el tipo de atención que deseas registrar.')
             // Contexto del residente
             ->assertSee('Florencia Beatriz Quispe Gutiérrez')
-            ->assertSee($this->adulto->cod_am)
+            ->assertSee($this->adulto->cod_residente)
             ->assertSee('Vigilancia')
             // Opción 1: Signos vitales
             ->assertSee('Signos vitales')

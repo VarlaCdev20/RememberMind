@@ -2,10 +2,10 @@
 
 namespace Tests\Feature;
 
-use App\Livewire\Identidad\PersonalInstitucionalPanel;
-use App\Livewire\Identidad\TurnosAsignacionesPanel;
-use App\Livewire\Identidad\UsuariosPanel;
-use App\Livewire\Reportes\ReportesAdultoPanel;
+use App\Frontend\Livewire\Administracion\Identidad\PersonalInstitucionalPanel;
+use App\Frontend\Livewire\Administracion\Identidad\TurnosAsignacionesPanel;
+use App\Frontend\Livewire\Administracion\Identidad\UsuariosPanel;
+use App\Frontend\Livewire\Compartido\Reportes\ReportesAdultoPanel;
 use App\Models\{AdultoMayor, SignoVital, User};
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -33,7 +33,7 @@ class VistasModularesTest extends TestCase
         Livewire::test(PersonalInstitucionalPanel::class)
             ->call('abrirModalNuevo')
             ->assertSet('modalGestionAbierto', true)
-            ->assertSeeLivewire(\App\Livewire\Identidad\PersonalInstitucionalForm::class)
+            ->assertSeeLivewire(\App\Frontend\Livewire\Administracion\Identidad\PersonalInstitucionalForm::class)
             ->call('cerrarModal')
             ->assertSet('modalGestionAbierto', false);
 
@@ -73,10 +73,10 @@ class VistasModularesTest extends TestCase
             'nombres' => 'Reporte Real', 'cod_est_adul' => 'EST_001', 'fecha_nac' => '1945-03-12',
         ]);
         SignoVital::create([
-            'cod_am' => $adulto->cod_am, 'fecha' => today(), 'hora' => '09:30:00',
+            'cod_residente' => $adulto->cod_residente, 'fecha' => today(), 'hora' => '09:30:00',
             'presion_sistolica' => 128, 'presion_diastolica' => 76,
             'frecuencia_cardiaca' => 72, 'frecuencia_respiratoria' => 18,
-            'temperatura' => 36.5, 'saturacion' => 96, 'registrado_por' => $user->cod_usu,
+            'temperatura' => 36.5, 'saturacion' => 96, 'registrado_por' => $user->cod_usuario,
         ]);
 
         Livewire::test(ReportesAdultoPanel::class, ['adultoMayor' => $adulto])

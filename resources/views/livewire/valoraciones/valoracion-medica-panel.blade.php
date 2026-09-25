@@ -12,7 +12,7 @@
     </div>
 
     {{-- BARRA DE FILTROS UNIFICADA FORMATO ALERTAS --}}
-    <section class="rounded-2xl bg-[#DED1C3] dark:bg-[#2C2723] border border-[#C7B9AA] dark:border-[#423B34] p-3 text-xs shadow-sm flex flex-col gap-2.5">
+    <section class="rm-filter-bar">
         <div class="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-2">
             {{-- Buscador Principal --}}
             <div class="lg:col-span-6 relative flex items-center">
@@ -62,9 +62,9 @@
             $hasFiltrosActivos = !empty($search) || !empty($filtroEstado) || !empty($filtroResult);
         @endphp
         @if($hasFiltrosActivos)
-            <div class="w-full flex flex-wrap items-center justify-between gap-2 pt-2.5 border-t border-[#C7B9AA]/60 dark:border-[#423B34] text-xs">
+            <div class="rm-filter-bar__active">
                 <div class="flex flex-wrap items-center gap-1.5">
-                    <span class="text-[11px] font-bold text-[#677084] dark:text-[#9A9084] flex items-center gap-1 mr-1">
+                    <span class="rm-filter-bar__active-label">
                         <i class="ph-bold ph-funnel text-xs"></i> Filtros activos:
                     </span>
                     @if(!empty($search))
@@ -141,13 +141,13 @@
                 <div class="grid gap-4 p-6 sm:grid-cols-2">
                     <label class="block sm:col-span-2">
                         <span class="text-xs font-bold text-parrafo">Paciente</span>
-                        <select wire:model="codAm" class="mt-1 w-full rounded-xl border border-borde/70 bg-fondo-panel p-2.5 text-xs">
+                        <select wire:model="codResidente" class="mt-1 w-full rounded-xl border border-borde/70 bg-fondo-panel p-2.5 text-xs">
                             <option value="">Seleccione...</option>
                             @foreach($adultos as $adulto)
-                                <option value="{{ $adulto->cod_am }}">{{ $adulto->nombres }} {{ $adulto->ap_paterno }}</option>
+                                <option value="{{ $adulto->cod_residente }}">{{ $adulto->nombres }} {{ $adulto->ap_paterno }}</option>
                             @endforeach
                         </select>
-                        @error('codAm') <span class="text-[10px] text-boton-acento">{{ $message }}</span> @enderror
+                        @error('codResidente') <span class="text-[10px] text-boton-acento">{{ $message }}</span> @enderror
                     </label>
                     <label class="block">
                         <span class="text-xs font-bold text-parrafo">Fecha</span>

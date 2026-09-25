@@ -11,7 +11,7 @@
         <div role="status" class="rounded-xl border border-estado-exitoBorde bg-estado-exitoBg px-4 py-3 text-sm font-semibold text-estado-exito">{{ session('mensaje') }}</div>
     @endif
 
-    <section class="rounded-2xl border border-borde bg-fondo-panel p-4 shadow-sm">
+    <section class="rm-filter-bar">
         <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             <label class="space-y-1 text-xs font-bold text-apoyo">Buscar
                 <input wire:model.live.debounce.300ms="search" class="rm-input w-full text-sm" placeholder="Tarea o residente">

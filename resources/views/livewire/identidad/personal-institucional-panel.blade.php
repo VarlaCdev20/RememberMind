@@ -341,7 +341,7 @@
 
                 <div class="rm-card border border-borde bg-fondo-card !p-0 shadow-sm">
                     <div class="p-3">
-                        <section class="rounded-2xl bg-[#DED1C3] dark:bg-[#2C2723] border border-[#C7B9AA] dark:border-[#423B34] p-3 text-xs shadow-sm flex flex-col gap-2.5">
+                        <section class="rm-filter-bar">
                             <div class="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-2 items-center">
                                 {{-- Buscador Principal --}}
                                 <div class="lg:col-span-4 relative flex items-center">
@@ -415,9 +415,9 @@
                                 $hasFiltrosActivos = !empty($busquedaResumen) || ($rubroResumen !== 'institucional') || !empty($estadoResumen) || !empty($turnoResumen);
                             @endphp
                             @if($hasFiltrosActivos)
-                                <div class="w-full flex flex-wrap items-center justify-between gap-2 pt-2.5 border-t border-[#C7B9AA]/60 dark:border-[#423B34] text-xs">
+                                <div class="rm-filter-bar__active">
                                     <div class="flex flex-wrap items-center gap-1.5">
-                                        <span class="text-[11px] font-bold text-[#677084] dark:text-[#9A9084] flex items-center gap-1 mr-1">
+                                        <span class="rm-filter-bar__active-label">
                                             <i class="ph-bold ph-funnel text-xs"></i> Filtros activos:
                                         </span>
                                         @if(!empty($busquedaResumen))
@@ -577,7 +577,7 @@
                                         @can('usuarios.ver')
                                             <button
                                                 type="button"
-                                                wire:click="abrirModalEdicion('{{ $usuario->cod_usu }}')"
+                                                wire:click="abrirModalEdicion('{{ $usuario->cod_usuario }}')"
                                                 class="flex h-8 items-center gap-1.5 rounded-lg bg-boton-acento px-3 text-[11px] font-black text-white shadow-sm transition-opacity hover:opacity-90"
                                             >
                                                 <i class="ph-bold ph-eye"></i>
@@ -588,7 +588,7 @@
                                         @can('usuarios.editar')
                                             <button
                                                 type="button"
-                                                wire:click="abrirModalEdicion('{{ $usuario->cod_usu }}')"
+                                                wire:click="abrirModalEdicion('{{ $usuario->cod_usuario }}')"
                                                 class="flex h-8 items-center gap-1.5 rounded-lg border border-borde bg-fondo-card px-3 text-[11px] font-black text-texto shadow-sm transition-colors hover:bg-fondo-hover hover:text-boton-acento"
                                             >
                                                 <i class="ph-bold ph-pencil-simple"></i>
@@ -598,7 +598,7 @@
 
                                         <button
                                             type="button"
-                                            wire:click="abrirHorariosPersonal('{{ $usuario->cod_usu }}')"
+                                            wire:click="abrirHorariosPersonal('{{ $usuario->cod_usuario }}')"
                                             class="flex h-8 items-center gap-1.5 rounded-lg border border-borde bg-fondo-card px-3 text-[11px] font-black text-texto shadow-sm transition-colors hover:bg-fondo-hover hover:text-estado-info"
                                         >
                                             <i class="ph-bold ph-calendar-plus"></i>
@@ -608,7 +608,7 @@
                                         @can('usuarios.cambiar_estado')
                                             <button
                                                 type="button"
-                                                wire:click="toggleEstado('{{ $usuario->cod_usu }}')"
+                                                wire:click="toggleEstado('{{ $usuario->cod_usuario }}')"
                                                 class="ml-auto flex h-8 w-8 items-center justify-center rounded-lg border border-borde bg-fondo-card text-apoyo shadow-sm transition-colors hover:bg-fondo-hover hover:text-estado-peligro"
                                                 title="{{ $estadoActivo ? 'Suspender' : 'Reactivar' }}"
                                             >
@@ -708,7 +708,7 @@
                                                     @can('usuarios.editar')
                                                         <button
                                                             type="button"
-                                                            wire:click="abrirModalEdicion('{{ $usuario->cod_usu }}')"
+                                                            wire:click="abrirModalEdicion('{{ $usuario->cod_usuario }}')"
                                                             class="tooltip-btn flex h-8 w-8 items-center justify-center rounded-lg border border-borde bg-fondo-card text-apoyo transition-colors hover:bg-fondo-hover hover:text-boton-acento"
                                                             title="Ver / editar"
                                                         >
@@ -718,7 +718,7 @@
 
                                                     <button
                                                         type="button"
-                                                        wire:click="abrirHorariosPersonal('{{ $usuario->cod_usu }}')"
+                                                        wire:click="abrirHorariosPersonal('{{ $usuario->cod_usuario }}')"
                                                         class="tooltip-btn flex h-8 w-8 items-center justify-center rounded-lg border border-borde bg-fondo-card text-apoyo transition-colors hover:bg-fondo-hover hover:text-estado-info"
                                                         title="Horarios"
                                                     >
@@ -728,7 +728,7 @@
                                                     @can('usuarios.cambiar_estado')
                                                         <button
                                                             type="button"
-                                                            wire:click="toggleEstado('{{ $usuario->cod_usu }}')"
+                                                            wire:click="toggleEstado('{{ $usuario->cod_usuario }}')"
                                                             class="tooltip-btn flex h-8 w-8 items-center justify-center rounded-lg border border-borde bg-fondo-card text-apoyo transition-colors hover:bg-fondo-hover hover:text-estado-peligro"
                                                             title="{{ $estadoActivo ? 'Suspender' : 'Reactivar' }}"
                                                         >

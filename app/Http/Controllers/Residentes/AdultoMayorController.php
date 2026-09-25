@@ -6,8 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Residentes\UpdateAdultoMayorRequest;
 use App\Models\AdultoMayor;
 use App\Models\AplicacionInstrumento;
-use App\Services\Reportes\AdultoMayorBitacoraService;
-use App\Services\Residentes\AdultoMayorService;
+use App\Backend\Modulos\Reportes\Servicios\AdultoMayorBitacoraService;
+use App\Backend\Modulos\Residentes\Servicios\AdultoMayorService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -344,7 +344,7 @@ class AdultoMayorController extends Controller
      */
     public function edit(AdultoMayor $adulto_mayor)
     {
-        $adulto = $this->adultoMayorService->obtenerDetalle($adulto_mayor->cod_am);
+        $adulto = $this->adultoMayorService->obtenerDetalle($adulto_mayor->cod_residente);
         $estadosAdulto = $this->adultoMayorService->obtenerEstados();
 
         return view('pages.adultos-mayores.edit', compact('adulto', 'estadosAdulto'));
@@ -355,9 +355,9 @@ class AdultoMayorController extends Controller
      */
     public function update(UpdateAdultoMayorRequest $request, AdultoMayor $adulto_mayor)
     {
-        $this->adultoMayorService->actualizarAdultoMayor($adulto_mayor->cod_am, $request->validated(), $request->file('foto'));
+        $this->adultoMayorService->actualizarAdultoMayor($adulto_mayor->cod_residente, $request->validated(), $request->file('foto'));
 
-        return redirect()->route('admin.adultos-mayores.show', $adulto_mayor->cod_am)
+        return redirect()->route('admin.adultos-mayores.show', $adulto_mayor->cod_residente)
             ->with('success', 'Ficha actualizada correctamente.');
     }
 
@@ -366,7 +366,7 @@ class AdultoMayorController extends Controller
      */
     public function archivar(Request $request, AdultoMayor $adulto_mayor)
     {
-        $this->adultoMayorService->archivar($adulto_mayor->cod_am, $request->motivo);
+        $this->adultoMayorService->archivar($adulto_mayor->cod_residente, $request->motivo);
 
         return redirect()->route('admin.adultos-mayores.index')
             ->with('success', 'Se archivó el registro del adulto mayor.');
@@ -377,7 +377,7 @@ class AdultoMayorController extends Controller
      */
     public function restaurar(AdultoMayor $adulto_mayor)
     {
-        $this->adultoMayorService->restaurar($adulto_mayor->cod_am);
+        $this->adultoMayorService->restaurar($adulto_mayor->cod_residente);
 
         return redirect()->route('admin.adultos-mayores.index')
             ->with('success', 'Se restauró el registro del adulto mayor.');
@@ -466,7 +466,7 @@ class AdultoMayorController extends Controller
 
     public function pdfEvaluacionGeriatrica(AdultoMayor $adulto_mayor, $evaluacionId)
     {
-        $adulto = $this->adultoMayorService->obtenerDetalle($adulto_mayor->cod_am);
+        $adulto = $this->adultoMayorService->obtenerDetalle($adulto_mayor->cod_residente);
         $adulto->edad = $this->adultoMayorService->calcularEdad($adulto->fecha_nac);
 
         $evaluacion = AplicacionInstrumento::where('cod_residente', $adulto_mayor->cod_residente)

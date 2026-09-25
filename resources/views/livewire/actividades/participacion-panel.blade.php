@@ -86,7 +86,7 @@
  </section>
 
  {{-- ── FILTROS ──────────────────────────────────────────────────────── --}}
- <section class="overflow-hidden rounded-[1.45rem] border border-borde-suave bg-fondo-panel shadow-sm backdrop-blur-xl">
+ <section class="rm-filter-bar overflow-hidden">
  <div class="border-b border-borde-suave bg-fondo-panel px-5 py-3">
  <div class="flex items-center gap-2">
  <i class="ph-bold ph-funnel text-apoyo text-base"></i>
@@ -136,7 +136,7 @@
  </div>
  <div>
  <button wire:click="limpiarFiltros"
- class="inline-flex items-center gap-1.5 rounded-xl border border-borde-suave bg-fondo-app px-3 py-2.5 text-xs font-bold text-apoyo transition hover:border-borde-focus hover:text-boton-acento">
+ class="rm-filter-reset">
  <i class="ph-bold ph-x text-xs"></i>
  Limpiar
  </button>
@@ -265,7 +265,7 @@
  @endcan
  {{-- Ir a ficha --}}
  @if($p->adultoMayor)
- <a href="{{ route('admin.adultos-mayores.show', ['adulto_mayor' => $p->cod_am]) }}"
+ <a href="{{ route('admin.adultos-mayores.show', ['adulto_mayor' => $p->cod_residente]) }}"
  title="Ver ficha del adulto mayor"
  class="flex h-7 w-7 items-center justify-center rounded-lg border border-estado-exitoBorde bg-estado-exitoBg text-estado-exito transition hover:border-estado-exitoBorde hover:bg-estado-exitoBg">
  <i class="ph-bold ph-arrow-square-out text-xs"></i>
@@ -353,15 +353,15 @@
  <form wire:submit.prevent="guardarActividad" class="p-5 space-y-4">
  <div>
  <label class="{{ $labelCls }}">Adulto mayor <span class="text-boton-acento">*</span></label>
- <select wire:model="codAm" class="{{ $inputCls }}">
+ <select wire:model="codResidente" class="{{ $inputCls }}">
  <option value="">Seleccione un adulto mayor...</option>
  @foreach($adultos as $adulto)
- <option value="{{ $adulto->cod_am }}">
+ <option value="{{ $adulto->cod_residente }}">
  {{ $adulto->ap_paterno }} {{ $adulto->ap_materno ?? '' }}, {{ $adulto->nombres }}
  </option>
  @endforeach
  </select>
- @error('codAm') <p class="{{ $errCls }}">{{ $message }}</p> @enderror
+ @error('codResidente') <p class="{{ $errCls }}">{{ $message }}</p> @enderror
  </div>
  <div>
  <label class="{{ $labelCls }}">Tipo de actividad <span class="text-boton-acento">*</span></label>
@@ -448,15 +448,15 @@
  <form wire:submit.prevent="actualizarActividad" class="p-5 space-y-4">
  <div>
  <label class="{{ $labelCls }}">Adulto mayor <span class="text-boton-acento">*</span></label>
- <select wire:model="codAm" class="{{ $inputCls }}">
+ <select wire:model="codResidente" class="{{ $inputCls }}">
  <option value="">Seleccione un adulto mayor...</option>
  @foreach($adultos as $adulto)
- <option value="{{ $adulto->cod_am }}">
+ <option value="{{ $adulto->cod_residente }}">
  {{ $adulto->ap_paterno }} {{ $adulto->ap_materno ?? '' }}, {{ $adulto->nombres }}
  </option>
  @endforeach
  </select>
- @error('codAm') <p class="{{ $errCls }}">{{ $message }}</p> @enderror
+ @error('codResidente') <p class="{{ $errCls }}">{{ $message }}</p> @enderror
  </div>
  <div>
  <label class="{{ $labelCls }}">Tipo de actividad <span class="text-boton-acento">*</span></label>
@@ -600,7 +600,7 @@
  {{-- Botones --}}
  <div class="flex flex-wrap justify-end gap-2.5 border-t border-borde-suave pt-4">
  @if($am)
- <a href="{{ route('admin.adultos-mayores.show', ['adulto_mayor' => $detalle->cod_am]) }}"
+ <a href="{{ route('admin.adultos-mayores.show', ['adulto_mayor' => $detalle->cod_residente]) }}"
  class="inline-flex items-center gap-1.5 rounded-xl border border-estado-exitoBorde bg-estado-exitoBg px-4 py-2 text-xs font-bold text-estado-exito transition hover:bg-estado-exitoBg">
  <i class="ph-bold ph-user text-xs"></i>
  Ver ficha

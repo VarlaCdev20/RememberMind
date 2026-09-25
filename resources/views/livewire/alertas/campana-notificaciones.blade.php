@@ -143,7 +143,7 @@
                 @php
                     $vencida = $recordatorio['estado'] === 'VENCIDA';
                     $adultoRec = $recordatorio['adulto'] ?? null;
-                    $codAmRec = $recordatorio['medicacion']?->cod_am ?? $adultoRec?->cod_am;
+                    $codResidenteRec = $recordatorio['medicacion']?->cod_residente ?? $adultoRec?->cod_residente;
                     $habNombre = $adultoRec?->habitacion?->nombre ?? ($adultoRec?->habitacion?->codigo ?? ($adultoRec?->cod_habitacion ? 'Hab. '.$adultoRec?->cod_habitacion : 'Sin habitación'));
                     $camaCodigo = $adultoRec?->cama?->codigo ?? ($adultoRec?->cod_cama ? 'Cama '.$adultoRec?->cod_cama : 'Sin cama');
                 @endphp
@@ -208,16 +208,16 @@
                     {{-- Botones de Acción --}}
                     <div class="flex items-center justify-between gap-1.5 pt-1 border-t border-borde/30">
                         <div class="flex items-center gap-1.5">
-                            @if($codAmRec)
+                            @if($codResidenteRec)
                                 <button type="button"
-                                   wire:click="verGraficos('{{ $codAmRec }}')"
+                                   wire:click="verGraficos('{{ $codResidenteRec }}')"
                                    class="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-[10px] font-bold bg-boton-principal hover:bg-boton-principalHover text-inverso shadow-sm transition active:scale-95 cursor-pointer"
                                    title="Ver gráficos clínicos en barra lateral">
                                     <i class="ph-bold ph-chart-line-up"></i>
                                     <span>Gráficos</span>
                                 </button>
                                 <button type="button"
-                                   wire:click="verUbicacion('{{ $codAmRec }}')"
+                                   wire:click="verUbicacion('{{ $codResidenteRec }}')"
                                    class="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-[10px] font-bold bg-fondo-card hover:bg-fondo-hover text-titulo border border-borde shadow-sm transition active:scale-95 cursor-pointer"
                                    title="Ver ubicación y ficha en barra lateral">
                                     <i class="ph-bold ph-bed text-boton-acento"></i>
@@ -225,7 +225,7 @@
                                 </button>
                             @endif
                         </div>
-                        <a href="{{ route('admin.salud-seguimiento.administracion', ['adulto' => $recordatorio['medicacion']->cod_am]) }}"
+                        <a href="{{ route('admin.salud-seguimiento.administracion', ['adulto' => $recordatorio['medicacion']->cod_residente]) }}"
                            class="inline-flex items-center gap-1 rounded-lg bg-boton-principal px-2.5 py-1 text-[10px] font-bold text-white shadow-sm transition hover:opacity-90 active:scale-95">
                             <i class="ph-bold ph-check-circle"></i>
                             <span>Registrar</span>
@@ -439,11 +439,11 @@
                             <span class="font-bold">{{ $alertaAct->tipo_alerta }}:</span> {{ $alertaAct->motivo }}
                         </p>
                         <div class="pt-1 flex items-center gap-2">
-                            <button type="button" wire:click="verGraficos('{{ $alertaAct->cod_am }}')" class="inline-flex items-center gap-1 text-[10px] font-bold text-boton-principal hover:underline cursor-pointer">
+                            <button type="button" wire:click="verGraficos('{{ $alertaAct->cod_residente }}')" class="inline-flex items-center gap-1 text-[10px] font-bold text-boton-principal hover:underline cursor-pointer">
                                 <i class="ph-bold ph-chart-line-up"></i> Ver Gráficos Clínicos
                             </button>
                             <span>·</span>
-                            <button type="button" wire:click="verUbicacion('{{ $alertaAct->cod_am }}')" class="inline-flex items-center gap-1 text-[10px] font-bold text-boton-acento hover:underline cursor-pointer">
+                            <button type="button" wire:click="verUbicacion('{{ $alertaAct->cod_residente }}')" class="inline-flex items-center gap-1 text-[10px] font-bold text-boton-acento hover:underline cursor-pointer">
                                 <i class="ph-bold ph-bed"></i> Ficha y Ubicación
                             </button>
                         </div>

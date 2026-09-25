@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Livewire\Cuidados\MisPacientes;
+use App\Frontend\Livewire\Enfermeria\Cuidados\MisPacientes;
 use App\Models\AdultoMayor;
 use App\Models\Alerta;
 use App\Models\OcupacionCama;
@@ -38,7 +38,7 @@ class MisPacientesRedisenadaTest extends TestCase
         $this->seed([ RolesAndPermissionsSeeder::class]);
 
         $this->enfermero = User::factory()->create([
-            'cod_usu' => 'USU_ENF01',
+            'cod_usuario' => 'USU_ENF01',
             'nombres' => 'Elena',
             'ap_paterno' => 'Vargas',
             'estado' => 'ACTIVO',
@@ -91,7 +91,7 @@ class MisPacientesRedisenadaTest extends TestCase
 
         // Residente 1: Estable
         $this->residenteEstable = AdultoMayor::factory()->create([
-            'cod_am' => 'AM_ESTABLE',
+            'cod_residente' => 'AM_ESTABLE',
             'nombres' => 'Pedro',
             'ap_paterno' => 'Gomez',
             'ap_materno' => 'Paredes',
@@ -102,7 +102,7 @@ class MisPacientesRedisenadaTest extends TestCase
         ]);
 
         OcupacionCama::create([
-            'cod_am' => $this->residenteEstable->cod_am,
+            'cod_residente' => $this->residenteEstable->cod_residente,
             'cod_habitacion' => $hab101->cod_habitacion,
             'cod_cama' => $camaA->cod_cama,
             'fecha_asignacion' => today()->toDateString(),
@@ -110,16 +110,16 @@ class MisPacientesRedisenadaTest extends TestCase
         ]);
 
         PlanCuidado::create([
-            'cod_am' => $this->residenteEstable->cod_am,
+            'cod_residente' => $this->residenteEstable->cod_residente,
             'nivel_cuidado' => 'MODERADO',
             'estado' => 'ACTIVO',
             'fecha_inicio' => today()->subMonth()->toDateString(),
-            'creado_por' => $this->enfermero->cod_usu,
+            'creado_por' => $this->enfermero->cod_usuario,
         ]);
 
         // Residente 2: Requiere Atención (tiene alerta crítica)
         $this->residenteCritico = AdultoMayor::factory()->create([
-            'cod_am' => 'AM_CRITICO',
+            'cod_residente' => 'AM_CRITICO',
             'nombres' => 'Luisa',
             'ap_paterno' => 'Morales',
             'ap_materno' => 'Rios',
@@ -130,7 +130,7 @@ class MisPacientesRedisenadaTest extends TestCase
         ]);
 
         OcupacionCama::create([
-            'cod_am' => $this->residenteCritico->cod_am,
+            'cod_residente' => $this->residenteCritico->cod_residente,
             'cod_habitacion' => $hab102->cod_habitacion,
             'cod_cama' => $camaB->cod_cama,
             'fecha_asignacion' => today()->toDateString(),
@@ -138,21 +138,21 @@ class MisPacientesRedisenadaTest extends TestCase
         ]);
 
         Alerta::create([
-            'cod_am' => $this->residenteCritico->cod_am,
+            'cod_residente' => $this->residenteCritico->cod_residente,
             'cod_turno' => $this->turno->cod_turno,
             'tipo_alerta' => 'SIGNOS',
             'nivel' => 'CRITICO',
             'origen' => 'SIGNOS',
             'motivo' => 'Presión arterial descompensada severa.',
             'estado' => 'ABIERTA',
-            'responsable_id' => $this->enfermero->cod_usu,
+            'responsable_id' => $this->enfermero->cod_usuario,
         ]);
 
         // Asignar ambos al enfermero en su turno
         AsignacionResidenteJornada::create([
             'cod_turno' => $this->turno->cod_turno,
-            'cod_am' => $this->residenteEstable->cod_am,
-            'cod_usu_enfermero' => $this->enfermero->cod_usu,
+            'cod_residente' => $this->residenteEstable->cod_residente,
+            'cod_usu_enfermero' => $this->enfermero->cod_usuario,
             'fecha_inicio' => today()->toDateString(),
             'nivel_supervision' => 'ESTANDAR',
             'motivo_asignacion' => 'Asignación de turno de prueba',
@@ -161,8 +161,8 @@ class MisPacientesRedisenadaTest extends TestCase
 
         AsignacionResidenteJornada::create([
             'cod_turno' => $this->turno->cod_turno,
-            'cod_am' => $this->residenteCritico->cod_am,
-            'cod_usu_enfermero' => $this->enfermero->cod_usu,
+            'cod_residente' => $this->residenteCritico->cod_residente,
+            'cod_usu_enfermero' => $this->enfermero->cod_usuario,
             'fecha_inicio' => today()->toDateString(),
             'nivel_supervision' => 'ESTANDAR',
             'motivo_asignacion' => 'Asignación de turno de prueba',
@@ -171,20 +171,20 @@ class MisPacientesRedisenadaTest extends TestCase
 
         // Signos para el residente estable
         SignoVital::create([
-            'cod_am' => $this->residenteEstable->cod_am,
+            'cod_residente' => $this->residenteEstable->cod_residente,
             'fecha' => today()->toDateString(),
             'hora' => '08:30:00',
             'presion_arterial' => '120/80',
             'frecuencia_cardiaca' => 72,
             'temperatura' => 36.5,
             'saturacion' => 98,
-            'registrado_por' => $this->enfermero->cod_usu,
+            'registrado_por' => $this->enfermero->cod_usuario,
             'estado' => 'VIGENTE',
         ]);
 
         // Seguimiento para el residente estable
         Atencion::create([
-            'cod_am' => $this->residenteEstable->cod_am,
+            'cod_residente' => $this->residenteEstable->cod_residente,
             'cod_turno' => $this->turno->cod_turno,
             'fecha' => today()->toDateString(),
             'hora' => '09:00:00',
@@ -194,7 +194,7 @@ class MisPacientesRedisenadaTest extends TestCase
             'sueno' => 'NORMAL',
             'incidente' => false,
             'requiere_medico' => false,
-            'registrado_por' => $this->enfermero->cod_usu,
+            'registrado_por' => $this->enfermero->cod_usuario,
         ]);
     }
 
@@ -265,14 +265,14 @@ class MisPacientesRedisenadaTest extends TestCase
         $this->actingAs($this->enfermero);
 
         Livewire::test(MisPacientes::class)
-            ->call('abrirRegistrarSignos', $this->residenteEstable->cod_am)
+            ->call('abrirRegistrarSignos', $this->residenteEstable->cod_residente)
             ->assertSet('modalSignos', true)
-            ->assertSet('modalCodAm', $this->residenteEstable->cod_am)
-            ->call('abrirRegistrarSeguimiento', $this->residenteEstable->cod_am)
+            ->assertSet('modalCodResidente', $this->residenteEstable->cod_residente)
+            ->call('abrirRegistrarSeguimiento', $this->residenteEstable->cod_residente)
             ->assertSet('modalSeguimiento', true)
-            ->call('abrirAdministrarMed', $this->residenteEstable->cod_am)
+            ->call('abrirAdministrarMed', $this->residenteEstable->cod_residente)
             ->assertSet('modalMed', true)
-            ->call('abrirReportarAlerta', $this->residenteEstable->cod_am)
+            ->call('abrirReportarAlerta', $this->residenteEstable->cod_residente)
             ->assertSet('modalAlerta', true);
     }
 }

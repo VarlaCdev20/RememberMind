@@ -70,7 +70,7 @@
     </header>
 
     {{-- BARRA DE FILTROS UNIFICADA FORMATO ALERTAS --}}
-    <section class="rounded-2xl bg-[#DED1C3] dark:bg-[#2C2723] border border-[#C7B9AA] dark:border-[#423B34] p-3 text-xs shadow-sm flex flex-col gap-2.5">
+    <section class="rm-filter-bar">
         <div class="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-2">
             {{-- Buscador Principal --}}
             <div class="lg:col-span-5 relative flex items-center">
@@ -123,9 +123,9 @@
             $hasFiltrosActivos = !empty($search) || ($filtroEstado !== 'TODOS');
         @endphp
         @if($hasFiltrosActivos)
-            <div class="w-full flex flex-wrap items-center justify-between gap-2 pt-2.5 border-t border-[#C7B9AA]/60 dark:border-[#423B34] text-xs">
+            <div class="rm-filter-bar__active">
                 <div class="flex flex-wrap items-center gap-1.5">
-                    <span class="text-[11px] font-bold text-[#677084] dark:text-[#9A9084] flex items-center gap-1 mr-1">
+                    <span class="rm-filter-bar__active-label">
                         <i class="ph-bold ph-funnel text-xs"></i> Filtros activos:
                     </span>
                     @if(!empty($search))
@@ -1187,7 +1187,7 @@
                 <button type="button">+ REGISTRAR ATENCIÓN</button>
                 <h3>Registrar atención clínica</h3>
                 <p>Selecciona el tipo de atención que deseas registrar.</p>
-                <span>{{ $modalCodAm ?? $codResidente ?? '' }}</span>
+                <span>{{ $modalCodResidente ?? $codResidente ?? '' }}</span>
                 <span>Vigilancia</span>
                 <div>Signos vitales - PA, FC, FR, SpO₂, Temperatura, Dolor, etc.</div>
                 <div>Cuidado de enfermería - Higiene, alimentación, hidratación, movilidad, eliminación, piel, etc.</div>

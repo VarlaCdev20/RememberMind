@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 
 use App\Http\Controllers\Admin\AdultosMayores\AdultoMayorActividadController;
 use App\Http\Controllers\Admin\Reportes\ReporteActividadesController;
@@ -44,47 +44,47 @@ use App\Http\Controllers\Residentes\RelacionResidenteController;
 use App\Http\Controllers\Residentes\ResidenteController;
 use App\Http\Controllers\Valoraciones\ValoracionProfesionalController;
 
-use App\Livewire\Admin\Actividades\ActividadesPanel;
-use App\Livewire\Admin\Actividades\AsistenciaPanel;
-use App\Livewire\Admin\Actividades\ParticipacionPanel;
-use App\Livewire\Admin\Actividades\ReportesActividadesPanel;
-use App\Livewire\Admin\Actividades\TiposActividadPanel;
-use App\Livewire\Admisiones\HabitacionesPanel;
-use App\Livewire\Admisiones\PreadmisionesPanel;
-use App\Livewire\Admisiones\PreadmisionWizard;
-use App\Livewire\Alertas\AlertasPanel;
-use App\Livewire\Alertas\AlertasPendientesPanel;
-use App\Livewire\Clinica\DashboardMedico;
-use App\Livewire\Clinica\PacientesSeguimientoPanel;
-use App\Livewire\Clinica\SaludFichaPanel;
-use App\Livewire\Clinica\SaludResumenPanel;
-use App\Livewire\Clinica\SaludSeguimientoListPanel;
-use App\Livewire\Clinica\SaludSignosPanel;
-use App\Livewire\Clinica\SignosVitalesPanel;
-use App\Livewire\Cuidados\AgendaEnfermeria;
-use App\Livewire\Cuidados\AsignacionTurnoPanel;
-use App\Livewire\Cuidados\DashboardTurno;
-use App\Livewire\Cuidados\FichaPaciente;
-use App\Livewire\Cuidados\IncidentesPanel;
-use App\Livewire\Cuidados\MisPacientes;
-use App\Livewire\Cuidados\PaseTurnoPanel;
-use App\Livewire\Cuidados\PlanCuidadoPanel;
-use App\Livewire\Cuidados\RegistrosEnfermeria;
-use App\Livewire\Cuidados\ReporteEnfermeria;
-use App\Livewire\Cuidados\SeguimientoDiarioPanel;
-use App\Livewire\Cuidados\TareasPlanPanel;
-use App\Livewire\Cuidados\TurnosEnfermeriaPanel;
-use App\Livewire\Identidad\PersonalInstitucionalPanel;
-use App\Livewire\Medicacion\SaludAdministracionMedicacionPanel;
-use App\Livewire\Medicacion\SaludMedicacionPanel;
-use App\Livewire\Reportes\ReportesInstitucionalesPanel;
-use App\Livewire\Residentes\RedApoyoPanel;
-use App\Livewire\Valoraciones\DashboardPsicologo;
-use App\Livewire\Valoraciones\EvaluacionesAreaPanel;
-use App\Livewire\Valoraciones\SaludEvaluacionesGeriatricasPanel;
-use App\Livewire\Valoraciones\SaludValoracionPanel;
-use App\Livewire\Valoraciones\ValoracionEnfermeriaPanel;
-use App\Livewire\Valoraciones\ValoracionMedicaPanel;
+use App\Frontend\Livewire\Administracion\Actividades\ActividadesPanel;
+use App\Frontend\Livewire\Administracion\Actividades\AsistenciaPanel;
+use App\Frontend\Livewire\Administracion\Actividades\ParticipacionPanel;
+use App\Frontend\Livewire\Administracion\Actividades\ReportesActividadesPanel;
+use App\Frontend\Livewire\Administracion\Actividades\TiposActividadPanel;
+use App\Frontend\Livewire\Admisiones\HabitacionesPanel;
+use App\Frontend\Livewire\Admisiones\PreadmisionesPanel;
+use App\Frontend\Livewire\Admisiones\PreadmisionWizard;
+use App\Frontend\Livewire\Compartido\Alertas\AlertasPanel;
+use App\Frontend\Livewire\Compartido\Alertas\AlertasPendientesPanel;
+use App\Frontend\Livewire\Medico\Clinica\DashboardMedico;
+use App\Frontend\Livewire\Medico\Clinica\PacientesSeguimientoPanel;
+use App\Frontend\Livewire\Compartido\Clinica\SaludFichaPanel;
+use App\Frontend\Livewire\Compartido\Clinica\SaludResumenPanel;
+use App\Frontend\Livewire\Compartido\Clinica\SaludSeguimientoListPanel;
+use App\Frontend\Livewire\Compartido\Clinica\SaludSignosPanel;
+use App\Frontend\Livewire\Compartido\Clinica\SignosVitalesPanel;
+use App\Frontend\Livewire\Enfermeria\Cuidados\AgendaEnfermeria;
+use App\Frontend\Livewire\Enfermeria\Cuidados\AsignacionTurnoPanel;
+use App\Frontend\Livewire\Enfermeria\Cuidados\DashboardTurno;
+use App\Frontend\Livewire\Compartido\Clinica\FichaPaciente;
+use App\Frontend\Livewire\Enfermeria\Cuidados\IncidentesPanel;
+use App\Frontend\Livewire\Enfermeria\Cuidados\MisPacientes;
+use App\Frontend\Livewire\Enfermeria\Cuidados\PaseTurnoPanel;
+use App\Frontend\Livewire\Enfermeria\Cuidados\PlanCuidadoPanel;
+use App\Frontend\Livewire\Enfermeria\Cuidados\RegistrosEnfermeria;
+use App\Frontend\Livewire\Enfermeria\Cuidados\ReporteEnfermeria;
+use App\Frontend\Livewire\Enfermeria\Cuidados\SeguimientoDiarioPanel;
+use App\Frontend\Livewire\Enfermeria\Cuidados\TareasPlanPanel;
+use App\Frontend\Livewire\Enfermeria\Cuidados\TurnosEnfermeriaPanel;
+use App\Frontend\Livewire\Administracion\Identidad\PersonalInstitucionalPanel;
+use App\Frontend\Livewire\Enfermeria\Medicacion\SaludAdministracionMedicacionPanel;
+use App\Frontend\Livewire\Medico\Medicacion\SaludMedicacionPanel;
+use App\Frontend\Livewire\Superadministrador\Reportes\ReportesInstitucionalesPanel;
+use App\Frontend\Livewire\Compartido\Residentes\RedApoyoPanel;
+use App\Frontend\Livewire\Psicologia\DashboardPsicologo;
+use App\Frontend\Livewire\Compartido\Valoraciones\EvaluacionesAreaPanel;
+use App\Frontend\Livewire\Compartido\Valoraciones\SaludEvaluacionesGeriatricasPanel;
+use App\Frontend\Livewire\Compartido\Valoraciones\SaludValoracionPanel;
+use App\Frontend\Livewire\Enfermeria\Valoraciones\ValoracionEnfermeriaPanel;
+use App\Frontend\Livewire\Medico\Valoraciones\ValoracionMedicaPanel;
 
 use Illuminate\Support\Facades\Route;
 
@@ -749,11 +749,11 @@ Route::middleware([
                         ->name('reportes');
 
                     // Ficha médica y clínica integrada por residente (unificada con FichaPaciente).
-                    Route::get('/residente/{adulto}', \App\Livewire\Cuidados\FichaPaciente::class)
+                    Route::get('/residente/{adulto}', \App\Frontend\Livewire\Compartido\Clinica\FichaPaciente::class)
                         ->name('residente.ficha');
 
                     // Compatibilidad con enlaces existentes que todavía usan /paciente/.
-                    Route::get('/paciente/{adulto}', \App\Livewire\Cuidados\FichaPaciente::class)
+                    Route::get('/paciente/{adulto}', \App\Frontend\Livewire\Compartido\Clinica\FichaPaciente::class)
                         ->name('paciente.ficha');
                 });
 

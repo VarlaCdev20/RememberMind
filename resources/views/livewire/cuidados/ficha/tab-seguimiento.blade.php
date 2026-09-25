@@ -584,7 +584,7 @@
             <div class="rounded-2xl border border-[var(--rm-border)] bg-[var(--rm-surface)] p-4 shadow-xs space-y-3">
 
                 {{-- Cabecera con Título, Subtítulo y Filtros Compactos en una misma zona --}}
-                <div class="space-y-3 border-b border-[var(--rm-border)] pb-3">
+                <div class="rm-filter-bar space-y-3">
                     <div class="flex items-center justify-between">
                         <div>
                             <h2 class="text-sm font-bold text-[var(--rm-text-title)] flex items-center gap-1.5">

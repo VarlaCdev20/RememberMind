@@ -61,7 +61,7 @@
  </section>
 
  {{-- B. SELECCIONAR PACIENTE --}}
- <section class="rounded-[1.6rem] border border-borde/65 bg-fondo-panel p-5 shadow-sm backdrop-blur-xl">
+ <section class="rm-filter-bar">
  <label class="mb-2 block text-[10px] font-bold uppercase tracking-widest text-apoyo">Seleccionar Paciente</label>
  <div class="grid gap-3 md:grid-cols-[1fr_1fr_auto]">
  <div>
@@ -77,7 +77,7 @@
  <option value="">Seleccione un adulto mayor</option>
  @foreach($pacientesSelector as $paciente)
  @php $nombrePaciente = trim("{$paciente->nombres} {$paciente->ap_paterno} {$paciente->ap_materno}"); @endphp
- <option value="{{ $paciente->cod_am }}">{{ $nombrePaciente ?: 'Adulto mayor' }}</option>
+ <option value="{{ $paciente->cod_residente }}">{{ $nombrePaciente ?: 'Adulto mayor' }}</option>
  @endforeach
  </select>
  </div>

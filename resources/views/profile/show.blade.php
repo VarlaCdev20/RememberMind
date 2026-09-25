@@ -309,7 +309,7 @@
         ];
 
         $semillaFrase = (
-            (string) $usuario->cod_usu
+            (string) $usuario->cod_usuario
             . '|'
             . now()->format('Y-m-d')
         );

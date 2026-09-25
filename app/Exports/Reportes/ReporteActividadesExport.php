@@ -2,7 +2,7 @@
 
 namespace App\Exports\Reportes;
 
-use App\Services\Reportes\ReporteDataService;
+use App\Backend\Modulos\Reportes\Servicios\ReporteDataService;
 use Maatwebsite\Excel\Concerns\WithMultipleSheets;
 
 class ReporteActividadesExport implements WithMultipleSheets

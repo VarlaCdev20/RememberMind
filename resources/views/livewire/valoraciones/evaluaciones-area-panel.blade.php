@@ -92,7 +92,7 @@
     @endif
 
     {{-- Filtros --}}
-    <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
+    <div class="rm-filter-bar flex flex-col gap-3 sm:flex-row sm:items-center">
         <div class="relative flex-1">
             <i class="ph-bold ph-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-apoyo"></i>
             <input wire:model.live.debounce.300ms="busqueda"
@@ -116,7 +116,7 @@
         </select>
         @if($busqueda || $filtroAlerta || $filtroInstrumento)
         <button wire:click="$set('busqueda', ''); $set('filtroAlerta', ''); $set('filtroInstrumento', '')"
-                class="flex items-center gap-1.5 rounded-xl border border-borde bg-fondo-card px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-parrafo transition hover:bg-fondo-panel">
+                class="rm-filter-reset">
             <i class="ph-bold ph-x"></i> Limpiar
         </button>
         @endif
@@ -188,7 +188,7 @@
                             {{ $eval->fecha_eval ? \Carbon\Carbon::parse($eval->fecha_eval)->format('d/m/Y') : '—' }}
                         </td>
                         <td class="px-5 py-3 text-center">
-                            <button wire:click="nuevaEvaluacion('{{ $eval->adulto?->cod_am }}')"
+                            <button wire:click="nuevaEvaluacion('{{ $eval->adulto?->cod_residente }}')"
                                     title="Nueva evaluación para este paciente"
                                     class="h-8 w-8 rounded-lg bg-fondo-panel text-parrafo hover:bg-boton-acento hover:text-white transition-colors flex items-center justify-center mx-auto">
                                 <i class="ph-bold ph-plus text-sm"></i>

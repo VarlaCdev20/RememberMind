@@ -2,8 +2,8 @@
 
 namespace Tests\Feature;
 
-use App\Livewire\Alertas\CampanaNotificaciones;
-use App\Livewire\Medicacion\SaludMedicacionPanel;
+use App\Frontend\Livewire\Compartido\Alertas\CampanaNotificaciones;
+use App\Frontend\Livewire\Medico\Medicacion\SaludMedicacionPanel;
 use App\Models\AdministracionMedicacion;
 use App\Models\AdultoMayor;
 use App\Models\Area;
@@ -14,7 +14,7 @@ use App\Models\Medicamento;
 use App\Models\Prescripcion;
 use App\Models\Turno;
 use App\Models\User;
-use App\Services\Medicacion\AgendaMedicacionService;
+use App\Backend\Modulos\Medicacion\Servicios\AgendaMedicacionService;
 use Carbon\Carbon;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -84,7 +84,7 @@ class AgendaMedicacionTest extends TestCase
         Carbon::setTestNow('2026-09-10 07:30:00');
 
         Livewire::test(SaludMedicacionPanel::class, ['adulto' => $this->adulto])
-            ->set('nuevo_cod_am', $this->adulto->cod_am)
+            ->set('nuevo_cod_residente', $this->adulto->cod_residente)
             ->set('nuevo_nombre', 'Losartán')
             ->set('nuevo_dosis', '50 mg')
             ->set('nuevo_frecuencia', 'Cada 24 horas')
@@ -107,7 +107,7 @@ class AgendaMedicacionTest extends TestCase
         Carbon::setTestNow('2026-09-10 07:30:00');
         $medicacion = $this->crearMedicacion('08:00');
 
-        $agenda = app(AgendaMedicacionService::class)->paraAdulto($this->adulto->cod_am);
+        $agenda = app(AgendaMedicacionService::class)->paraAdulto($this->adulto->cod_residente);
         $this->assertSame('PROXIMA', $agenda->first()['estado']);
 
         AdministracionMedicacion::create([
@@ -123,7 +123,7 @@ class AgendaMedicacionTest extends TestCase
             'estado' => 'FINALIZADO',
         ]);
 
-        $agenda = app(AgendaMedicacionService::class)->paraAdulto($this->adulto->cod_am);
+        $agenda = app(AgendaMedicacionService::class)->paraAdulto($this->adulto->cod_residente);
         $this->assertSame('ADMINISTRADA', $agenda->first()['estado']);
     }
 
@@ -154,7 +154,7 @@ class AgendaMedicacionTest extends TestCase
             ]);
         }
 
-        $agenda = app(AgendaMedicacionService::class)->paraAdulto($this->adulto->cod_am);
+        $agenda = app(AgendaMedicacionService::class)->paraAdulto($this->adulto->cod_residente);
 
         $this->assertSame(['00:00', '08:00', '16:00'], $agenda->pluck('hora')->all());
         $this->assertSame(['VENCIDA', 'PROXIMA', 'PENDIENTE'], $agenda->pluck('estado')->all());

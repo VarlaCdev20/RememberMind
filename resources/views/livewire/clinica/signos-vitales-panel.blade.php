@@ -1,7 +1,7 @@
 <div class="space-y-6 pb-8">
 
     {{-- BARRA DE FILTROS UNIFICADA FORMATO ALERTAS --}}
-    <section class="rounded-2xl bg-[#DED1C3] dark:bg-[#2C2723] border border-[#C7B9AA] dark:border-[#423B34] p-3 text-xs shadow-sm flex flex-col gap-2.5">
+    <section class="rm-filter-bar">
         <div class="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-2">
             {{-- Buscador Principal --}}
             <div class="lg:col-span-6 relative flex items-center">
@@ -50,9 +50,9 @@
             $hasFiltrosActivos = !empty($busqueda) || !empty($filtroAlerta) || !empty($filtroRegistro);
         @endphp
         @if($hasFiltrosActivos)
-            <div class="w-full flex flex-wrap items-center justify-between gap-2 pt-2.5 border-t border-[#C7B9AA]/60 dark:border-[#423B34] text-xs">
+            <div class="rm-filter-bar__active">
                 <div class="flex flex-wrap items-center gap-1.5">
-                    <span class="text-[11px] font-bold text-[#677084] dark:text-[#9A9084] flex items-center gap-1 mr-1">
+                    <span class="rm-filter-bar__active-label">
                         <i class="ph-bold ph-funnel text-xs"></i> Filtros activos:
                     </span>
                     @if(!empty($busqueda))
@@ -152,7 +152,7 @@
                 <tbody class="divide-y divide-borde/40">
                     @foreach($pacientesFiltrados as $pac)
                     @php
-                        $sv = $ultimosSignos[$pac->cod_am] ?? null;
+                        $sv = $ultimosSignos[$pac->cod_residente] ?? null;
                         $edad = $pac->fecha_nac ? \Carbon\Carbon::parse($pac->fecha_nac)->age : '—';
 
                         // Valores extraídos
@@ -166,13 +166,13 @@
                         $imc   = $sv?->imc ? (float)$sv->imc : null;
 
                         // Niveles de alerta por signo
-                        $lvlPA   = \App\Livewire\Clinica\SignosVitalesPanel::alertaPA($sist, $diast);
-                        $lvlFC   = \App\Livewire\Clinica\SignosVitalesPanel::alertaFC($fc);
-                        $lvlFR   = \App\Livewire\Clinica\SignosVitalesPanel::alertaFR($fr);
-                        $lvlTemp = \App\Livewire\Clinica\SignosVitalesPanel::alertaTemp($temp);
-                        $lvlSat  = \App\Livewire\Clinica\SignosVitalesPanel::alertaSPO2($sat);
-                        $lvlGluc = \App\Livewire\Clinica\SignosVitalesPanel::alertaGlucosa($gluc);
-                        $lvlGlobal = $sv ? \App\Livewire\Clinica\SignosVitalesPanel::nivelGlobal($sist, $diast, $fc, $fr, $temp, $sat, $gluc) : 'sin_dato';
+                        $lvlPA   = \App\Frontend\Livewire\Compartido\Clinica\SignosVitalesPanel::alertaPA($sist, $diast);
+                        $lvlFC   = \App\Frontend\Livewire\Compartido\Clinica\SignosVitalesPanel::alertaFC($fc);
+                        $lvlFR   = \App\Frontend\Livewire\Compartido\Clinica\SignosVitalesPanel::alertaFR($fr);
+                        $lvlTemp = \App\Frontend\Livewire\Compartido\Clinica\SignosVitalesPanel::alertaTemp($temp);
+                        $lvlSat  = \App\Frontend\Livewire\Compartido\Clinica\SignosVitalesPanel::alertaSPO2($sat);
+                        $lvlGluc = \App\Frontend\Livewire\Compartido\Clinica\SignosVitalesPanel::alertaGlucosa($gluc);
+                        $lvlGlobal = $sv ? \App\Frontend\Livewire\Compartido\Clinica\SignosVitalesPanel::nivelGlobal($sist, $diast, $fc, $fr, $temp, $sat, $gluc) : 'sin_dato';
 
                         // Función de clases de celda
                         $celdaClass = fn(string $lvl) => match($lvl) {
@@ -318,7 +318,7 @@
                         {{-- Acciones --}}
                         <td class="px-3 py-3">
                             <div class="flex items-center justify-center gap-1.5">
-                                <button wire:click="abrirRegistroSignos('{{ $pac->cod_am }}')"
+                                <button wire:click="abrirRegistroSignos('{{ $pac->cod_residente }}')"
                                         title="Registrar nuevos signos vitales"
                                         class="h-7 px-2 rounded-lg
                                                {{ $esHoy ? 'bg-fondo-panel text-apoyo hover:bg-[#C9654E]/10 hover:text-[#C9654E]' : 'bg-[#C9654E]/10 text-[#C9654E] hover:bg-[#C9654E] hover:text-white' }}
@@ -326,7 +326,7 @@
                                     <i class="ph-bold ph-plus text-xs"></i>
                                     Reg.
                                 </button>
-                                <button wire:click="abrirFicha('{{ $pac->cod_am }}')"
+                                <button wire:click="abrirFicha('{{ $pac->cod_residente }}')"
                                         title="Ver ficha clínica"
                                         class="h-7 w-7 rounded-lg bg-estado-infoBg text-estado-info hover:bg-estado-info hover:text-white transition flex items-center justify-center">
                                     <i class="ph-bold ph-folder-open text-xs"></i>

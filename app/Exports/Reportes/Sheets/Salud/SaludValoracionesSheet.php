@@ -2,7 +2,7 @@
 
 namespace App\Exports\Reportes\Sheets\Salud;
 
-use App\Services\Reportes\ReporteDataService;
+use App\Backend\Modulos\Reportes\Servicios\ReporteDataService;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithTitle;
 use Maatwebsite\Excel\Concerns\WithHeadings;
@@ -20,13 +20,13 @@ class SaludValoracionesSheet implements FromCollection, WithTitle, WithHeadings,
 
     public function headings(): array
     {
-        return ['Código AM', 'Nombre', 'Nivel Dependencia', 'Riesgo Caída', 'Índice Barthel', 'Fecha'];
+        return ['Código', 'Nombre', 'Nivel Dependencia', 'Riesgo Caída', 'Índice Barthel', 'Fecha'];
     }
 
     public function collection()
     {
         return $this->service->valoracionesLista(500)->map(fn($r) => [
-            $r->cod_am,
+            $r->cod_residente,
             $r->nombre,
             $r->nivel_dependencia,
             $r->riesgo_caida,

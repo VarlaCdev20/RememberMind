@@ -723,7 +723,7 @@
     {{-- ========================================================================= --}}
     {{-- 7. FILTROS PRIORITARIOS (FOCO EN 'POR ADMINISTRAR')                       --}}
     {{-- ========================================================================= --}}
-    <div class="flex flex-wrap items-center justify-between gap-3 pt-1">
+    <div class="rm-filter-bar flex flex-wrap items-center justify-between gap-3">
         <div class="inline-flex items-center gap-1.5 p-1 rounded-xl bg-[var(--rm-surface-alt)] border border-[var(--rm-border)] text-xs">
             {{-- Por administrar 2 (ACTIVO POR DEFECTO) --}}
             <button type="button"

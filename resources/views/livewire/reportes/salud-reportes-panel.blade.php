@@ -55,7 +55,7 @@
  <option value="">Seleccione un paciente...</option>
  <option value="TODOS">Todos los pacientes activos</option>
  @foreach($adultos as $adulto)
- <option value="{{ $adulto->cod_am }}">{{ $adulto->ap_paterno }} {{ $adulto->ap_materno }} {{ $adulto->nombres }}</option>
+ <option value="{{ $adulto->cod_residente }}">{{ $adulto->ap_paterno }} {{ $adulto->ap_materno }} {{ $adulto->nombres }}</option>
  @endforeach
  </select>
  @error('adultoSeleccionado') <span class="mt-1 flex items-center text-[10px] font-bold text-boton-acento"><i class="ph-bold ph-warning mr-1"></i>{{ $message }}</span> @enderror

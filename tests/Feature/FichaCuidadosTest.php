@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Livewire\Cuidados\FichaPaciente;
+use App\Frontend\Livewire\Compartido\Clinica\FichaPaciente;
 use App\Models\AdultoMayor;
 use App\Models\Area;
 use App\Models\Cama;
@@ -63,7 +63,7 @@ class FichaCuidadosTest extends TestCase
 
     public function test_pestana_cuidados_contiene_encabezado_y_6_kpis(): void
     {
-        Livewire::test(FichaPaciente::class, ['adulto' => $this->adulto->cod_am])
+        Livewire::test(FichaPaciente::class, ['adulto' => $this->adulto->cod_residente])
             ->call('cambiarTab', 'cuidados')
             ->assertSee('Plan de cuidados')
             ->assertSee('Cuidados asistenciales, confort y seguimiento diario')
@@ -81,7 +81,7 @@ class FichaCuidadosTest extends TestCase
 
     public function test_pestana_cuidados_contiene_filtros_tabla_y_bloques_prn_e_historico(): void
     {
-        Livewire::test(FichaPaciente::class, ['adulto' => $this->adulto->cod_am])
+        Livewire::test(FichaPaciente::class, ['adulto' => $this->adulto->cod_residente])
             ->call('cambiarTab', 'cuidados')
             ->assertSee('Todos')
             ->assertSee('Por turno')
@@ -147,7 +147,7 @@ class FichaCuidadosTest extends TestCase
             'estado' => 'ABIERTA',
         ]);
 
-        $component = Livewire::test(FichaPaciente::class, ['adulto' => $this->adulto->cod_am])
+        $component = Livewire::test(FichaPaciente::class, ['adulto' => $this->adulto->cod_residente])
             ->call('cambiarTab', 'cuidados')
             ->assertSee('PANEL LATERAL DE CONSULTA')
             ->assertSee('DETALLE DE CUIDADO')

@@ -113,16 +113,6 @@ public static array $areasEstaticas = [
      * continúa siendo cod_usuario; este alias no crea una columna legacy.
      */
 
-    public function setCodUsuAttribute($value): void
-    {
-        $this->attributes['cod_usuario'] = $value;
-    }
-
-    public function getCodUsuAttribute(): string
-    {
-        return (string) $this->cod_usuario;
-    }
-
     /**
      * Fortify y algunos componentes de Jetstream todavía consultan password.
      * La contraseña real permanece en usuarios.contrasena.

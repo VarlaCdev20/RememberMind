@@ -5,7 +5,7 @@
  @php
  $adultoObj = is_object($adulto ?? null) ? $adulto : null;
 
- $idAdulto = optional($adultoObj)->cod_am;
+ $idAdulto = optional($adultoObj)->cod_residente;
 
  $nombreCompleto = trim(
  (optional($adultoObj)->nombres ?? '') . ' ' .

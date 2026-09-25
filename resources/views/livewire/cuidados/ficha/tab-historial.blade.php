@@ -1,7 +1,7 @@
 {{-- TAB 7: HISTORIAL CLÍNICO (TRAYECTORIA CLÍNICA Y CUIDADOS DEL RESIDENTE) --}}
 <div class="space-y-6">
     {{-- CABECERA DE LA PESTAÑA HISTORIAL CLÍNICO --}}
-    <div class="rounded-3xl border border-borde rm-surface-card bg-fondo-panel p-5 shadow-sm">
+    <div class="rm-filter-bar">
         <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 border-b border-borde pb-4">
             <div>
                 <h2 class="text-base font-bold tracking-tight text-titulo flex items-center gap-2">
@@ -22,7 +22,7 @@
                     <input type="date" wire:model.live="historialFechaHasta" class="bg-transparent text-xs text-titulo border-none p-0 focus:ring-0 focus:outline-none" />
                 </div>
                 @if($historialFechaDesde || $historialFechaHasta || $historialFiltroTipo !== 'TODOS')
-                    <button type="button" wire:click="limpiarFiltrosHistorial" class="rounded-xl bg-slate-100 px-3 py-1.5 text-xs font-bold text-slate-700 hover:bg-slate-200 transition">
+                    <button type="button" wire:click="limpiarFiltrosHistorial" class="rm-filter-reset">
                         Limpiar filtros
                     </button>
                 @endif

@@ -24,7 +24,7 @@
  </div>
  </header>
 
- <form action="{{ route('admin.usuarios.update', $usuario->cod_usu) }}" method="POST" enctype="multipart/form-data"
+ <form action="{{ route('admin.usuarios.update', $usuario->cod_usuario) }}" method="POST" enctype="multipart/form-data"
  x-data="{
  paisDoc: @js(old('pais_documento', $usuario->pais_documento ?? 'Bolivia')),
  tipoDoc: @js(old('tipo_documento', $usuario->tipo_documento ?? 'CI')),
@@ -274,8 +274,8 @@
  <div class="grid gap-5 md:grid-cols-2">
  <div>
  <label class="mb-1.5 block text-[10px] font-bold uppercase tracking-widest text-titulo/60">Rol Institucional *</label>
- <select name="rol" x-model="rol" required {{ $usuario->cod_usu === 'USU_0001' ? 'disabled' : '' }}
- class="w-full rounded-2xl border border-borde-suave bg-fondo-card/40 px-5 py-3 text-sm font-bold outline-none transition focus:border-borde-focus focus:ring-4 focus:ring-borde-focus/10 {{ $usuario->cod_usu === 'USU_0001' ? 'opacity-60 cursor-not-allowed' : '' }}">
+ <select name="rol" x-model="rol" required {{ $usuario->cod_usuario === 'USU_0001' ? 'disabled' : '' }}
+ class="w-full rounded-2xl border border-borde-suave bg-fondo-card/40 px-5 py-3 text-sm font-bold outline-none transition focus:border-borde-focus focus:ring-4 focus:ring-borde-focus/10 {{ $usuario->cod_usuario === 'USU_0001' ? 'opacity-60 cursor-not-allowed' : '' }}">
  <option value="">Seleccione un rol...</option>
  @foreach($roles as $r)
  @php
@@ -288,7 +288,7 @@
  <option value="{{ $r->name }}" {{ $selected }}>{{ $displayName }}</option>
  @endforeach
  </select>
- @if($usuario->cod_usu === 'USU_0001')
+ @if($usuario->cod_usuario === 'USU_0001')
  <input type="hidden" name="rol" value="{{ $usuario->getRoleNames()->first() }}">
  <p class="mt-1 text-[9px] font-bold text-terracota uppercase italic"><i class="ph-bold ph-warning"></i> Perfil de Super Administrador: El rol no puede ser modificado.</p>
  @endif
@@ -345,23 +345,23 @@
  <div class="grid gap-5 md:grid-cols-2">
  <div>
  <label class="mb-1.5 block text-[10px] font-bold uppercase tracking-widest text-titulo/60">Estado del Usuario</label>
- <select name="estado" required {{ $usuario->cod_usu === 'USU_0001' ? 'disabled' : '' }}
- class="w-full rounded-2xl border border-borde-suave bg-fondo-card/40 px-5 py-3 text-sm font-bold outline-none transition focus:border-borde-focus {{ $usuario->cod_usu === 'USU_0001' ? 'opacity-60 cursor-not-allowed' : '' }}">
+ <select name="estado" required {{ $usuario->cod_usuario === 'USU_0001' ? 'disabled' : '' }}
+ class="w-full rounded-2xl border border-borde-suave bg-fondo-card/40 px-5 py-3 text-sm font-bold outline-none transition focus:border-borde-focus {{ $usuario->cod_usuario === 'USU_0001' ? 'opacity-60 cursor-not-allowed' : '' }}">
  <option value="ACTIVO" {{ old('estado', $usuario->estado) == 'ACTIVO' ? 'selected' : '' }}>ACTIVO</option>
  <option value="INACTIVO" {{ old('estado', $usuario->estado) == 'INACTIVO' ? 'selected' : '' }}>INACTIVO</option>
  <option value="ARCHIVADO" {{ old('estado', $usuario->estado) == 'ARCHIVADO' ? 'selected' : '' }}>ARCHIVADO</option>
  </select>
- @if($usuario->cod_usu === 'USU_0001') <input type="hidden" name="estado" value="{{ $usuario->estado }}"> @endif
+ @if($usuario->cod_usuario === 'USU_0001') <input type="hidden" name="estado" value="{{ $usuario->estado }}"> @endif
  </div>
 
  <div>
  <label class="mb-1.5 block text-[10px] font-bold uppercase tracking-widest text-titulo/60">Acceso al Sistema</label>
- <select name="acceso_sistema" required {{ $usuario->cod_usu === 'USU_0001' ? 'disabled' : '' }}
- class="w-full rounded-2xl border border-borde-suave bg-fondo-card/40 px-5 py-3 text-sm font-bold outline-none transition focus:border-borde-focus {{ $usuario->cod_usu === 'USU_0001' ? 'opacity-60 cursor-not-allowed' : '' }}">
+ <select name="acceso_sistema" required {{ $usuario->cod_usuario === 'USU_0001' ? 'disabled' : '' }}
+ class="w-full rounded-2xl border border-borde-suave bg-fondo-card/40 px-5 py-3 text-sm font-bold outline-none transition focus:border-borde-focus {{ $usuario->cod_usuario === 'USU_0001' ? 'opacity-60 cursor-not-allowed' : '' }}">
  <option value="HABILITADO" {{ old('acceso_sistema', $usuario->acceso_sistema) == 'HABILITADO' ? 'selected' : '' }}>HABILITADO</option>
  <option value="BLOQUEADO" {{ old('acceso_sistema', $usuario->acceso_sistema) == 'BLOQUEADO' ? 'selected' : '' }}>BLOQUEADO</option>
  </select>
- @if($usuario->cod_usu === 'USU_0001') <input type="hidden" name="acceso_sistema" value="{{ $usuario->acceso_sistema }}"> @endif
+ @if($usuario->cod_usuario === 'USU_0001') <input type="hidden" name="acceso_sistema" value="{{ $usuario->acceso_sistema }}"> @endif
  </div>
  </div>
  </section>

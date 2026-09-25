@@ -277,7 +277,7 @@
     @if($tabActivo === 'historial')
         <div class="space-y-4">
             {{-- Filtros del Historial --}}
-            <div class="flex flex-wrap items-center gap-3 rounded-2xl bg-[#DED1C3] dark:bg-[#2C2723] border border-[#C7B9AA] dark:border-[#423B34] p-3.5 text-xs">
+            <div class="rm-filter-bar flex flex-wrap items-center gap-3 text-xs">
                 <div class="relative w-full sm:w-64">
                     <i class="ph-bold ph-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-[#677084]"></i>
                     <input wire:model.live.debounce.300ms="searchHistorial" type="text"

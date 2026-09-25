@@ -116,7 +116,7 @@
  </section>
 
  {{-- FILTROS DE BÚSQUEDA Y VISTA --}}
- <section class="rounded-2xl rm-surface-glass p-4 no-print">
+ <section class="rm-filter-bar no-print">
  <div class="grid grid-cols-1 gap-4 md:grid-cols-4">
  {{-- Búsqueda --}}
  <div class="relative md:col-span-2">
@@ -814,7 +814,7 @@
  class="rm-input w-full">
  <option value="">-- Sin responsable asignado --</option>
  @foreach($responsablesDisponibles as $resp)
- <option value="{{ $resp->cod_usu }}">{{ $resp->name }}</option>
+ <option value="{{ $resp->cod_usuario }}">{{ $resp->name }}</option>
  @endforeach
  </select>
  @endif

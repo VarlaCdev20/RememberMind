@@ -185,7 +185,7 @@
     {{-- ========================================================================= --}}
     {{-- 3. BARRA DE FILTROS COMPACTA                                              --}}
     {{-- ========================================================================= --}}
-    <div class="rounded-2xl border border-[var(--rm-border)] bg-[var(--rm-surface)] p-3 shadow-2xs flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 text-xs">
+    <div class="rm-filter-bar flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 text-xs">
         {{-- Buscador --}}
         <div class="relative flex-1">
             <i class="ph-bold ph-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--rm-text-muted)] text-sm"></i>

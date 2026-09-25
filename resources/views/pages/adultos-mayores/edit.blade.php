@@ -1,7 +1,7 @@
 <x-sistema-layout>
  @php
  $adultoObj = is_object($adulto ?? null) ? $adulto : null;
- $idAdulto = optional($adultoObj)->cod_am;
+ $idAdulto = optional($adultoObj)->cod_residente;
 
  $fotoAdulto = optional($adultoObj)->foto ?? null;
  $fotoUrl = $fotoAdulto ? \Illuminate\Support\Facades\Storage::url($fotoAdulto) : null;

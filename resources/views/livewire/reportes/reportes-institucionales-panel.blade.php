@@ -39,7 +39,7 @@
  </div>
 
  <!-- ── SECCIÓN DE FILTROS ─────────────────────────────────── -->
- <div class="mb-8 rm-card-soft p-6 print:hidden">
+ <div class="rm-filter-bar mb-8 print:hidden">
  <h2 class="mb-4 text-xs font-bold uppercase tracking-widest text-apoyo flex items-center gap-2">
  <i class="ph-bold ph-funnel text-boton-acento"></i>
  Filtros de Análisis Institucional

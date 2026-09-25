@@ -2,8 +2,8 @@
 
 namespace Tests\Feature;
 
-use App\Livewire\Cuidados\DashboardTurno;
-use App\Livewire\Cuidados\MisPacientes;
+use App\Frontend\Livewire\Enfermeria\Cuidados\DashboardTurno;
+use App\Frontend\Livewire\Enfermeria\Cuidados\MisPacientes;
 use App\Models\AdultoMayor;
 use App\Models\Alerta;
 use App\Models\AreaInstitucional;
@@ -47,7 +47,7 @@ class MisResidentesNavegacionTest extends TestCase
 
         // Crear enfermero con rol y personal institucional
         $this->enfermero = User::factory()->create([
-            'cod_usu' => 'USU_ENF_NAV01',
+            'cod_usuario' => 'USU_ENF_NAV01',
             'nombres' => 'Mario',
             'ap_paterno' => 'Gutierrez',
             'ap_materno' => 'Ramos',
@@ -55,11 +55,11 @@ class MisResidentesNavegacionTest extends TestCase
         ]);
         $this->enfermero->assignRole('ENFERMEROS');
 
-        $this->personal = $this->enfermero->personal ?? Personal::where('cod_usuario', $this->enfermero->cod_usu)->first();
+        $this->personal = $this->enfermero->personal ?? Personal::where('cod_usuario', $this->enfermero->cod_usuario)->first();
         if (!$this->personal) {
             $this->personal = Personal::create([
                 'cod_personal' => 'PER_NAV01',
-                'cod_usuario' => $this->enfermero->cod_usu,
+                'cod_usuario' => $this->enfermero->cod_usuario,
                 'nombres' => 'Mario',
                 'apellido_paterno' => 'Gutierrez',
                 'apellido_materno' => 'Ramos',
@@ -126,7 +126,7 @@ class MisResidentesNavegacionTest extends TestCase
 
         // Residente 1: Asignado a este enfermero
         $this->residenteAsignado = AdultoMayor::factory()->create([
-            'cod_am' => 'AM_NAV_001',
+            'cod_residente' => 'AM_NAV_001',
             'cod_residente' => 'AM_NAV_001',
             'nombres' => 'Carlos',
             'ap_paterno' => 'Mendoza',
@@ -138,7 +138,7 @@ class MisResidentesNavegacionTest extends TestCase
         ]);
 
         OcupacionCama::create([
-            'cod_am' => $this->residenteAsignado->cod_am,
+            'cod_residente' => $this->residenteAsignado->cod_residente,
             'cod_habitacion' => $hab->cod_habitacion,
             'cod_cama' => $cama->cod_cama,
             'fecha_asignacion' => today()->toDateString(),
@@ -146,16 +146,15 @@ class MisResidentesNavegacionTest extends TestCase
         ]);
 
         PlanCuidado::create([
-            'cod_am' => $this->residenteAsignado->cod_am,
+            'cod_residente' => $this->residenteAsignado->cod_residente,
             'nivel_cuidado' => 'MODERADO',
             'estado' => 'ACTIVO',
             'fecha_inicio' => today()->subMonth()->toDateString(),
-            'creado_por' => $this->enfermero->cod_usu,
+            'creado_por' => $this->enfermero->cod_usuario,
         ]);
 
         SignoVital::create([
-            'cod_am' => $this->residenteAsignado->cod_am,
-            'cod_residente' => $this->residenteAsignado->cod_am,
+            'cod_residente' => $this->residenteAsignado->cod_residente,
             'fecha' => today()->toDateString(),
             'hora' => '08:00:00',
             'fecha_hora' => now()->subHours(2),
@@ -163,7 +162,7 @@ class MisResidentesNavegacionTest extends TestCase
             'frecuencia_cardiaca' => 75,
             'temperatura' => 36.6,
             'saturacion' => 98,
-            'registrado_por' => $this->enfermero->cod_usu,
+            'registrado_por' => $this->enfermero->cod_usuario,
             'estado' => 'VIGENTE',
         ]);
 
@@ -172,9 +171,8 @@ class MisResidentesNavegacionTest extends TestCase
             'cod_asignacion' => 'ARJ_NAV_01',
             'cod_jornada' => $this->jornada->cod_jornada,
             'cod_turno' => $this->turno->cod_turno,
-            'cod_am' => $this->residenteAsignado->cod_am,
-            'cod_residente' => $this->residenteAsignado->cod_am,
-            'cod_usu_enfermero' => $this->enfermero->cod_usu,
+            'cod_residente' => $this->residenteAsignado->cod_residente,
+            'cod_usu_enfermero' => $this->enfermero->cod_usuario,
             'cod_personal' => $this->personal->cod_personal,
             'fecha_inicio' => today()->toDateString(),
             'nivel_supervision' => 'ESTANDAR',
@@ -184,7 +182,7 @@ class MisResidentesNavegacionTest extends TestCase
 
         // Residente 2: Ajeno (no asignado a este enfermero)
         $this->residenteAjeno = AdultoMayor::factory()->create([
-            'cod_am' => 'AM_NAV_AJENO',
+            'cod_residente' => 'AM_NAV_AJENO',
             'cod_residente' => 'AM_NAV_AJENO',
             'nombres' => 'Benito',
             'ap_paterno' => 'Juarez',
@@ -206,7 +204,7 @@ class MisResidentesNavegacionTest extends TestCase
         $response = Livewire::actingAs($this->enfermero)
             ->test(DashboardTurno::class);
 
-        $expectedUrl = route('admin.enfermeria.pacientes', ['residente' => $this->residenteAsignado->cod_am]);
+        $expectedUrl = route('admin.enfermeria.pacientes', ['residente' => $this->residenteAsignado->cod_residente]);
 
         $response->assertStatus(200)
             ->assertSee($this->residenteAsignado->nombres)
@@ -245,12 +243,12 @@ class MisResidentesNavegacionTest extends TestCase
         Carbon::setTestNow(today()->setTime(9, 0));
 
         $component = Livewire::actingAs($this->enfermero)
-            ->test(MisPacientes::class, ['residente' => $this->residenteAsignado->cod_am]);
+            ->test(MisPacientes::class, ['residente' => $this->residenteAsignado->cod_residente]);
 
         $component->assertStatus(200);
 
         // Estado del componente
-        $this->assertEquals($this->residenteAsignado->cod_am, $component->get('residente'));
+        $this->assertEquals($this->residenteAsignado->cod_residente, $component->get('residente'));
         $this->assertFalse($component->get('esModoConsulta'));
         $this->assertTrue($component->get('esResidenteAsignado'));
 
@@ -275,12 +273,12 @@ class MisResidentesNavegacionTest extends TestCase
 
         // Intento de montaje directo con residente no asignado
         Livewire::actingAs($this->enfermero)
-            ->test(MisPacientes::class, ['residente' => $this->residenteAjeno->cod_am])
+            ->test(MisPacientes::class, ['residente' => $this->residenteAjeno->cod_residente])
             ->assertForbidden();
 
         // Intento de llamar al método seleccionarResidente con residente no asignado
         $comp = Livewire::actingAs($this->enfermero)->test(MisPacientes::class);
-        $comp->call('seleccionarResidente', $this->residenteAjeno->cod_am)
+        $comp->call('seleccionarResidente', $this->residenteAjeno->cod_residente)
             ->assertForbidden();
     }
 
@@ -294,18 +292,18 @@ class MisResidentesNavegacionTest extends TestCase
 
         // Crear otro enfermero de guardia nocturna activa y asignarle al residente
         $enfGuardia = User::factory()->create([
-            'cod_usu' => 'USU_GUARDIA_NOC',
+            'cod_usuario' => 'USU_GUARDIA_NOC',
             'nombres' => 'Patricia',
             'ap_paterno' => 'Rojas',
             'estado' => 'ACTIVO',
         ]);
         $enfGuardia->assignRole('ENFERMEROS');
 
-        $perGuardia = $enfGuardia->personal ?? Personal::where('cod_usuario', $enfGuardia->cod_usu)->first();
+        $perGuardia = $enfGuardia->personal ?? Personal::where('cod_usuario', $enfGuardia->cod_usuario)->first();
         if (!$perGuardia) {
             $perGuardia = Personal::create([
                 'cod_personal' => 'PER_GUARDIA_NOC',
-                'cod_usuario' => $enfGuardia->cod_usu,
+                'cod_usuario' => $enfGuardia->cod_usuario,
                 'nombres' => 'Patricia',
                 'apellido_paterno' => 'Rojas',
                 'numero_documento' => '77665544',
@@ -345,13 +343,13 @@ class MisResidentesNavegacionTest extends TestCase
             'cod_asignacion' => 'ARJ_NOC_01',
             'cod_jornada' => $jornadaNocturna->cod_jornada,
             'cod_personal' => $perGuardia->cod_personal,
-            'cod_residente' => $this->residenteAsignado->cod_am,
+            'cod_residente' => $this->residenteAsignado->cod_residente,
             'estado' => 'ACTIVA',
         ]);
 
         // El enfermero 1 (Mario, fuera de turno) abre a Carlos Mendoza
         $comp = Livewire::actingAs($this->enfermero)
-            ->test(MisPacientes::class, ['residente' => $this->residenteAsignado->cod_am]);
+            ->test(MisPacientes::class, ['residente' => $this->residenteAsignado->cod_residente]);
 
         $comp->assertStatus(200);
 
@@ -368,32 +366,32 @@ class MisResidentesNavegacionTest extends TestCase
 
         // Intentos de mutación arrojan 403 Forbidden en backend
         Livewire::actingAs($this->enfermero)
-            ->test(MisPacientes::class, ['residente' => $this->residenteAsignado->cod_am])
-            ->call('abrirRegistrarSignos', $this->residenteAsignado->cod_am)
+            ->test(MisPacientes::class, ['residente' => $this->residenteAsignado->cod_residente])
+            ->call('abrirRegistrarSignos', $this->residenteAsignado->cod_residente)
             ->assertForbidden();
 
         Livewire::actingAs($this->enfermero)
-            ->test(MisPacientes::class, ['residente' => $this->residenteAsignado->cod_am])
+            ->test(MisPacientes::class, ['residente' => $this->residenteAsignado->cod_residente])
             ->call('guardarSignos')
             ->assertForbidden();
 
         Livewire::actingAs($this->enfermero)
-            ->test(MisPacientes::class, ['residente' => $this->residenteAsignado->cod_am])
+            ->test(MisPacientes::class, ['residente' => $this->residenteAsignado->cod_residente])
             ->call('guardarSeguimiento')
             ->assertForbidden();
 
         Livewire::actingAs($this->enfermero)
-            ->test(MisPacientes::class, ['residente' => $this->residenteAsignado->cod_am])
+            ->test(MisPacientes::class, ['residente' => $this->residenteAsignado->cod_residente])
             ->call('guardarMed')
             ->assertForbidden();
 
         Livewire::actingAs($this->enfermero)
-            ->test(MisPacientes::class, ['residente' => $this->residenteAsignado->cod_am])
+            ->test(MisPacientes::class, ['residente' => $this->residenteAsignado->cod_residente])
             ->call('guardarAlerta')
             ->assertForbidden();
 
         Livewire::actingAs($this->enfermero)
-            ->test(MisPacientes::class, ['residente' => $this->residenteAsignado->cod_am])
+            ->test(MisPacientes::class, ['residente' => $this->residenteAsignado->cod_residente])
             ->call('guardarCuidado')
             ->assertForbidden();
     }
@@ -412,7 +410,7 @@ class MisResidentesNavegacionTest extends TestCase
 
         // Manipulación hacia un residente ajeno
         Livewire::actingAs($this->enfermero)
-            ->test(MisPacientes::class, ['residente' => $this->residenteAjeno->cod_am])
+            ->test(MisPacientes::class, ['residente' => $this->residenteAjeno->cod_residente])
             ->assertForbidden();
     }
 }

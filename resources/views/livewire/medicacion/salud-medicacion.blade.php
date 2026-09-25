@@ -31,11 +31,11 @@
                 @endif
 
                 @if($adulto)
-                    <button type="button" wire:click="verUbicacion('{{ $adulto->cod_am }}')" class="inline-flex items-center gap-2 rounded-xl border border-[var(--rm-border)] bg-[var(--rm-surface)] px-4 py-2.5 text-xs font-bold text-[var(--rm-text-muted)] shadow-sm transition hover:bg-fondo-hover hover:text-[var(--rm-text-body)] active:scale-95 cursor-pointer" title="Ver ficha y ubicación del residente">
+                    <button type="button" wire:click="verUbicacion('{{ $adulto->cod_residente }}')" class="inline-flex items-center gap-2 rounded-xl border border-[var(--rm-border)] bg-[var(--rm-surface)] px-4 py-2.5 text-xs font-bold text-[var(--rm-text-muted)] shadow-sm transition hover:bg-fondo-hover hover:text-[var(--rm-text-body)] active:scale-95 cursor-pointer" title="Ver ficha y ubicación del residente">
                         <i class="ph-bold ph-bed text-base text-[var(--rm-primary)]"></i>
                         <span>Ficha y Ubicación</span>
                     </button>
-                    <button type="button" wire:click="verGraficos('{{ $adulto->cod_am }}')" class="inline-flex items-center gap-2 rounded-xl border border-[var(--rm-border)] bg-[var(--rm-surface)] px-4 py-2.5 text-xs font-bold text-[var(--rm-text-muted)] shadow-sm transition hover:bg-fondo-hover hover:text-[var(--rm-text-body)] active:scale-95 cursor-pointer" title="Ver gráficos clínicos">
+                    <button type="button" wire:click="verGraficos('{{ $adulto->cod_residente }}')" class="inline-flex items-center gap-2 rounded-xl border border-[var(--rm-border)] bg-[var(--rm-surface)] px-4 py-2.5 text-xs font-bold text-[var(--rm-text-muted)] shadow-sm transition hover:bg-fondo-hover hover:text-[var(--rm-text-body)] active:scale-95 cursor-pointer" title="Ver gráficos clínicos">
                         <i class="ph-bold ph-chart-line-up text-base text-boton-acento"></i>
                         <span>Gráficos Clínicos</span>
                     </button>
@@ -78,10 +78,10 @@
                                         </label>
                                         <div class="relative">
                                             <i class="ph-bold ph-user absolute left-3.5 top-1/2 -translate-y-1/2 text-meta"></i>
-                                            <select wire:model="nuevo_cod_am" class="w-full rounded-xl border border-[var(--rm-border)]/70 bg-[var(--rm-bg-app)] py-2.5 pl-10 pr-4 text-xs font-bold text-[var(--rm-text-body)] outline-none transition appearance-none focus:border-[var(--rm-primary)] focus:ring-2 focus:ring-boton-principal/20">
+                                            <select wire:model="nuevo_cod_residente" class="w-full rounded-xl border border-[var(--rm-border)]/70 bg-[var(--rm-bg-app)] py-2.5 pl-10 pr-4 text-xs font-bold text-[var(--rm-text-body)] outline-none transition appearance-none focus:border-[var(--rm-primary)] focus:ring-2 focus:ring-boton-principal/20">
                                                 <option value="">-- Seleccione un residente --</option>
                                                 @foreach($adultos as $ad)
-                                                    <option value="{{ $ad->cod_am }}">{{ $ad->nombres }} {{ $ad->ap_paterno }} ({{ $ad->cod_am }})</option>
+                                                    <option value="{{ $ad->cod_residente }}">{{ $ad->nombres }} {{ $ad->ap_paterno }} ({{ $ad->cod_residente }})</option>
                                                 @endforeach
                                             </select>
                                         </div>
@@ -313,10 +313,10 @@
                 </label>
                 <div class="relative">
                     <i class="ph-bold ph-user-circle absolute left-3.5 top-1/2 -translate-y-1/2 text-meta"></i>
-                    <select wire:model.live="cod_am" class="w-full rounded-xl border border-[var(--rm-border)]/70 bg-[var(--rm-bg-app)] py-2.5 pl-10 pr-4 text-xs font-bold text-[var(--rm-text-body)] outline-none transition appearance-none focus:border-[var(--rm-primary)] focus:ring-2 focus:ring-boton-principal/20">
+                    <select wire:model.live="cod_residente" class="w-full rounded-xl border border-[var(--rm-border)]/70 bg-[var(--rm-bg-app)] py-2.5 pl-10 pr-4 text-xs font-bold text-[var(--rm-text-body)] outline-none transition appearance-none focus:border-[var(--rm-primary)] focus:ring-2 focus:ring-boton-principal/20">
                         <option value="">-- Todos los Residentes --</option>
                         @foreach($adultos as $ad)
-                            <option value="{{ $ad->cod_am }}">{{ $ad->nombres }} {{ $ad->ap_paterno }}</option>
+                            <option value="{{ $ad->cod_residente }}">{{ $ad->nombres }} {{ $ad->ap_paterno }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -348,7 +348,7 @@
                         </div>
                         
                         @if(auth()->user()?->hasAnyRole(['SUPERADMINISTRADOR', 'MEDICO GENERAL/GERIATRA']))
-                            <button type="button" wire:click="abrirFormularioPara('{{ $adulto->cod_am }}')" class="w-full inline-flex items-center justify-center gap-2 rounded-xl border border-[var(--rm-primary)] bg-[var(--rm-primary)] px-3 py-2 text-xs font-bold text-inverso shadow-sm transition hover:bg-[var(--rm-primary)]Hover active:scale-95">
+                            <button type="button" wire:click="abrirFormularioPara('{{ $adulto->cod_residente }}')" class="w-full inline-flex items-center justify-center gap-2 rounded-xl border border-[var(--rm-primary)] bg-[var(--rm-primary)] px-3 py-2 text-xs font-bold text-inverso shadow-sm transition hover:bg-[var(--rm-primary)]Hover active:scale-95">
                                 <i class="ph-bold ph-plus-circle text-sm"></i>
                                 <span>Prescribir para {{ strtok($adulto->nombres, ' ') }}</span>
                             </button>
@@ -397,13 +397,13 @@
         {{-- COLUMNA PRINCIPAL (FILTROS Y TABLA) --}}
         <div class="lg:col-span-2 space-y-6">
             {{-- FILTROS DE BÚSQUEDA --}}
-            <section class="rounded-[1.6rem] border border-[var(--rm-border)]/65 bg-[var(--rm-surface)] p-4 shadow-sm backdrop-blur-xl sm:p-5">
+            <section class="rm-filter-bar">
                 <div class="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                     <div>
                         <h3 class="text-xs font-black uppercase tracking-wider text-[var(--rm-text-body)]">Filtros de Búsqueda</h3>
                     </div>
                     @if($search !== '' || $filtroEstado !== '' || $filtroVia !== '')
-                        <button wire:click="limpiarFiltros" type="button" class="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-boton-acento transition hover:text-[var(--rm-text-body)]">
+                        <button wire:click="limpiarFiltros" type="button" class="rm-filter-reset">
                             <i class="ph-bold ph-x-circle"></i>
                             Limpiar filtros
                         </button>
@@ -562,14 +562,14 @@
                                         <td class="px-5 py-4 text-right">
                                             <div class="flex items-center justify-end gap-1.5">
                                                 @if(in_array($estado, ['ACTIVO', 'ACTIVA']))
-                                                    <button type="button" @click="$dispatch('abrirModalAdministracion', { cod_am: '{{ $med->cod_am }}', cod_med_adulto: '{{ $med->cod_med_adulto }}' })" class="inline-flex items-center gap-1.5 rounded-lg bg-[var(--rm-primary)] px-2.5 py-1.5 text-[9px] font-bold uppercase text-inverso shadow-sm transition hover:bg-[var(--rm-primary)]Hover active:scale-95" title="Registrar toma de medicación">
+                                                    <button type="button" @click="$dispatch('abrirModalAdministracion', { cod_residente: '{{ $med->cod_residente }}', cod_med_adulto: '{{ $med->cod_med_adulto }}' })" class="inline-flex items-center gap-1.5 rounded-lg bg-[var(--rm-primary)] px-2.5 py-1.5 text-[9px] font-bold uppercase text-inverso shadow-sm transition hover:bg-[var(--rm-primary)]Hover active:scale-95" title="Registrar toma de medicación">
                                                         <i class="ph-bold ph-check-square text-xs"></i>
                                                         Toma
                                                     </button>
                                                 @endif
 
                                                 @if(auth()->user()?->hasAnyRole(['SUPERADMINISTRADOR', 'MEDICO GENERAL/GERIATRA']))
-                                                    <button type="button" @click="$dispatch('abrirModalMedicacion', { cod_am: '{{ $med->cod_am }}', id_med: '{{ $med->cod_med_adulto }}' })" class="inline-flex items-center justify-center rounded-lg border border-[var(--rm-border)] bg-[var(--rm-surface)] p-1.5 text-[var(--rm-text-muted)] transition hover:bg-[var(--rm-bg-app)] hover:text-[var(--rm-text-body)] active:scale-95" title="Editar prescripción">
+                                                    <button type="button" @click="$dispatch('abrirModalMedicacion', { cod_residente: '{{ $med->cod_residente }}', id_med: '{{ $med->cod_med_adulto }}' })" class="inline-flex items-center justify-center rounded-lg border border-[var(--rm-border)] bg-[var(--rm-surface)] p-1.5 text-[var(--rm-text-muted)] transition hover:bg-[var(--rm-bg-app)] hover:text-[var(--rm-text-body)] active:scale-95" title="Editar prescripción">
                                                         <i class="ph-bold ph-pencil-simple"></i>
                                                     </button>
                                                 @endif
@@ -610,11 +610,11 @@
 
     {{-- MODALES AUXILIARES --}}
     @if($adulto)
-        <livewire:medicacion.medicacion-adulto-modal :cod_am="$adulto->cod_am" :key="'med-modal-'.$adulto->cod_am" />
-        <livewire:medicacion.administracion-medicacion-modal :cod_am="$adulto->cod_am" :key="'admin-modal-'.$adulto->cod_am" />
+        <livewire:medicacion.medicacion-adulto-modal :cod_residente="$adulto->cod_residente" :key="'med-modal-'.$adulto->cod_residente" />
+        <livewire:medicacion.administracion-medicacion-modal :cod_residente="$adulto->cod_residente" :key="'admin-modal-'.$adulto->cod_residente" />
     @else
-        <livewire:medicacion.medicacion-adulto-modal cod_am="" />
-        <livewire:medicacion.administracion-medicacion-modal cod_am="" />
+        <livewire:medicacion.medicacion-adulto-modal cod_residente="" />
+        <livewire:medicacion.administracion-medicacion-modal cod_residente="" />
     @endif
 
     {{-- Paneles Laterales Desplegables (Drawers) --}}

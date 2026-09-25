@@ -8,9 +8,9 @@ use App\Models\Personal;
 use App\Models\Residente;
 use App\Models\TurnoEnfermeria;
 use App\Models\User;
-use App\Livewire\Cuidados\AsignacionTurnoPanel;
-use App\Livewire\Cuidados\TurnosEnfermeriaPanel;
-use App\Services\Enfermeria\TurnoEnfermeriaService;
+use App\Frontend\Livewire\Enfermeria\Cuidados\AsignacionTurnoPanel;
+use App\Frontend\Livewire\Enfermeria\Cuidados\TurnosEnfermeriaPanel;
+use App\Backend\Modulos\Enfermeria\Servicios\TurnoEnfermeriaService;
 use Database\Seeders\DatabaseSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -110,7 +110,7 @@ class EnfermeriaV2Test extends TestCase
 
         Livewire::test(AsignacionTurnoPanel::class)
             ->call('abrirCrear')
-            ->set('codAm', $residente->cod_residente)
+            ->set('codResidente', $residente->cod_residente)
             ->set('codTurno', $turno->cod_turno)
             ->set('codEnfermero', $enfermera->cod_usuario)
             ->set('fechaInicio', today()->format('Y-m-d'))

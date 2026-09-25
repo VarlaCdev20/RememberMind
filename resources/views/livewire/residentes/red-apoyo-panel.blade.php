@@ -140,7 +140,8 @@
  </div>
  </section>
 
- <section class="grid gap-3 rounded-2xl border border-borde-suave bg-fondo-panel p-4 shadow-sm backdrop-blur-xl lg:grid-cols-[1.1fr_1fr_auto] lg:items-end w-full max-w-full min-w-0">
+ <section class="rm-filter-bar">
+ <div class="grid gap-3 lg:grid-cols-[1.1fr_1fr_auto] lg:items-end">
  <div>
  <label class="mb-1 block text-[10px] font-bold uppercase tracking-wider text-apoyo">Buscar adulto mayor</label>
  <div class="relative">
@@ -162,7 +163,7 @@
  >
  <option value="">Seleccione un adulto mayor</option>
  @foreach($adultos as $opcion)
- <option value="{{ $opcion['cod_am'] }}">{{ $opcion['nombre'] }} · {{ $opcion['edad'] }} · {{ $opcion['estado'] }}</option>
+ <option value="{{ $opcion['cod_residente'] }}">{{ $opcion['nombre'] }} · {{ $opcion['edad'] }} · {{ $opcion['estado'] }}</option>
  @endforeach
  </select>
  </div>
@@ -170,11 +171,12 @@
  <button
  type="button"
  wire:click="limpiarSeleccion"
- class="inline-flex h-11 items-center justify-center gap-2 rounded-xl border border-borde-suave bg-fondo-card/35 px-4 text-xs font-bold text-titulo transition hover:border-borde-focus"
+ class="rm-filter-reset inline-flex h-11 items-center justify-center gap-2"
  >
  <i class="ph-bold ph-broom"></i>
  Limpiar
  </button>
+ </div>
  </section>
 
 
@@ -338,7 +340,8 @@
  <p class="mt-1 text-xs font-bold text-apoyo">Consulta, filtros y acciones seguras sobre la red seleccionada.</p>
  </div>
 
- <div class="grid gap-2 sm:grid-cols-3 w-full max-w-full min-w-0">
+ <div class="rm-filter-bar">
+ <div class="grid gap-2 sm:grid-cols-3">
  <div class="relative">
  <i class="ph-bold ph-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-apoyo"></i>
  <input type="search" wire:model.live.debounce.300ms="buscarPersona" class="h-10 w-full rounded-xl border border-borde-suave bg-fondo-panel pl-9 pr-3 text-xs font-bold outline-none focus:border-borde-focus" placeholder="Buscar persona">
@@ -355,6 +358,7 @@
  <option value="ACTIVO">Activos</option>
  <option value="INACTIVO">Inactivos</option>
  </select>
+ </div>
  </div>
  </div>
 

@@ -55,7 +55,7 @@
     </div>
 
     {{-- BARRA DE FILTROS UNIFICADA FORMATO ALERTAS --}}
-    <section class="rounded-2xl bg-[#DED1C3] dark:bg-[#2C2723] border border-[#C7B9AA] dark:border-[#423B34] p-3 text-xs shadow-sm flex flex-col gap-2.5">
+    <section class="rm-filter-bar">
         <div class="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-2">
             {{-- Buscador Principal --}}
             <div class="lg:col-span-8 relative flex items-center">
@@ -96,9 +96,9 @@
             $hasFiltrosActivos = !empty($busqueda) || !empty($filtroEstado);
         @endphp
         @if($hasFiltrosActivos)
-            <div class="w-full flex flex-wrap items-center justify-between gap-2 pt-2.5 border-t border-[#C7B9AA]/60 dark:border-[#423B34] text-xs">
+            <div class="rm-filter-bar__active">
                 <div class="flex flex-wrap items-center gap-1.5">
-                    <span class="text-[11px] font-bold text-[#677084] dark:text-[#9A9084] flex items-center gap-1 mr-1">
+                    <span class="rm-filter-bar__active-label">
                         <i class="ph-bold ph-funnel text-xs"></i> Filtros activos:
                     </span>
                     @if(!empty($busqueda))
@@ -147,9 +147,9 @@
                 <tbody class="divide-y divide-borde/50">
                     @foreach($pacientes as $pac)
                     @php
-                        $sv = $ultimosSignos[$pac->cod_am] ?? null;
-                        $nota = $ultimasNotas[$pac->cod_am] ?? null;
-                        $meds = $cntMedicacion[$pac->cod_am] ?? 0;
+                        $sv = $ultimosSignos[$pac->cod_residente] ?? null;
+                        $nota = $ultimasNotas[$pac->cod_residente] ?? null;
+                        $meds = $cntMedicacion[$pac->cod_residente] ?? 0;
                         $edad = $pac->fecha_nacimiento ? \Carbon\Carbon::parse($pac->fecha_nacimiento)->age : '—';
                         $estadoStr = $pac->estado ?? '';
                         $estadoColor = match($estadoStr) {
@@ -231,17 +231,17 @@
                         </td>
                         <td class="px-5 py-3">
                             <div class="flex items-center justify-center gap-1.5">
-                                <button wire:click="abrirFicha('{{ $pac->cod_am }}')"
+                                <button wire:click="abrirFicha('{{ $pac->cod_residente }}')"
                                         title="Ver ficha clínica integrada"
                                         class="h-8 px-2.5 rounded-lg bg-estado-infoBg text-estado-info hover:bg-estado-info hover:text-white transition text-[10px] font-black uppercase tracking-wider flex items-center gap-1">
                                     <i class="ph-bold ph-folder-open text-sm"></i> Ficha
                                 </button>
-                                <button wire:click="nuevaNota('{{ $pac->cod_am }}')"
+                                <button wire:click="nuevaNota('{{ $pac->cod_residente }}')"
                                         title="Nueva nota de evolución"
                                         class="h-8 w-8 rounded-lg bg-estado-exitoBg text-estado-exito hover:bg-estado-exito hover:text-white transition flex items-center justify-center">
                                     <i class="ph-bold ph-note-pencil text-sm"></i>
                                 </button>
-                                <button wire:click="nuevosSignos('{{ $pac->cod_am }}')"
+                                <button wire:click="nuevosSignos('{{ $pac->cod_residente }}')"
                                         title="Registrar signos vitales"
                                         class="h-8 w-8 rounded-lg bg-fondo-panel text-parrafo hover:bg-boton-acento hover:text-white transition flex items-center justify-center">
                                     <i class="ph-bold ph-heartbeat text-sm"></i>

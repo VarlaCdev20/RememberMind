@@ -91,7 +91,7 @@
 
  {{-- SECCIÓN DE FILTROS AVANZADOS --}}
     {{-- SECCIÓN DE FILTROS AVANZADOS UNIFICADA FORMATO ALERTAS --}}
-    <section class="rounded-2xl bg-[#DED1C3] dark:bg-[#2C2723] border border-[#C7B9AA] dark:border-[#423B34] p-3 text-xs shadow-sm flex flex-col gap-2.5" x-show="tab !== 'alertas'">
+    <section class="rm-filter-bar" x-show="tab !== 'alertas'">
         <div class="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-2 items-center">
             {{-- Buscador Principal --}}
             <div class="lg:col-span-3 relative flex items-center">
@@ -162,9 +162,9 @@
             $hasFiltrosActivos = !empty($buscar) || !empty($estado) || !empty($genero) || !empty($rango_edad) || !empty($permanencia) || !empty($ciudad_municipio) || !empty($fecha_desde);
         @endphp
         @if($hasFiltrosActivos)
-            <div class="w-full flex flex-wrap items-center justify-between gap-2 pt-2.5 border-t border-[#C7B9AA]/60 dark:border-[#423B34] text-xs">
+            <div class="rm-filter-bar__active">
                 <div class="flex flex-wrap items-center gap-1.5">
-                    <span class="text-[11px] font-bold text-[#677084] dark:text-[#9A9084] flex items-center gap-1 mr-1">
+                    <span class="rm-filter-bar__active-label">
                         <i class="ph-bold ph-funnel text-xs"></i> Filtros activos:
                     </span>
                     @if(!empty($buscar))
@@ -302,10 +302,10 @@
  {{-- ACCIONES DE FICHA Y CAJÓN RÁPIDO --}}
  <div class="p-4 pt-1 mt-auto">
  <div class="flex gap-2">
- <a href="{{ route('admin.adultos-mayores.show', $adulto->cod_am) }}" class="flex-1 flex justify-center items-center rounded-xl bg-boton-principal py-2 text-inverso hover:bg-fondo-panel transition shadow-sm" title="Ver Ficha Integral">
+ <a href="{{ route('admin.adultos-mayores.show', $adulto->cod_residente) }}" class="flex-1 flex justify-center items-center rounded-xl bg-boton-principal py-2 text-inverso hover:bg-fondo-panel transition shadow-sm" title="Ver Ficha Integral">
  <i class="ph-bold ph-eye text-sm mr-1"></i> <span class="text-[9px] font-bold uppercase tracking-wider">Ficha Integral</span>
  </a>
- <button type="button" wire:click="editarAdultoMayor('{{ $adulto->cod_am }}')" class="flex h-9 w-9 justify-center items-center rounded-xl bg-estado-peligroBg border border-borde-focus text-boton-acento hover:bg-boton-acento hover:text-inverso transition" title="Editar Ficha">
+ <button type="button" wire:click="editarAdultoMayor('{{ $adulto->cod_residente }}')" class="flex h-9 w-9 justify-center items-center rounded-xl bg-estado-peligroBg border border-borde-focus text-boton-acento hover:bg-boton-acento hover:text-inverso transition" title="Editar Ficha">
  <i class="ph-bold ph-pencil-simple text-base"></i>
  </button>
  <div x-data="{ open: false }" class="relative">
@@ -316,7 +316,7 @@
  <p class="text-[9px] font-bold uppercase text-apoyo px-2 py-1 border-b border-borde-suave mb-1">Cambiar Estado:</p>
  @foreach($estadosAdulto as $est)
  @if(strtoupper($est->estado) !== $estado)
- <form method="POST" action="{{ route('admin.adultos-mayores.estado', $adulto->cod_am) }}" onsubmit="confirmarAccion(event, '¿Cambiar estado a {{ $est->estado }}?', 'Se registrará en el historial de estados de forma automática.')">
+ <form method="POST" action="{{ route('admin.adultos-mayores.estado', $adulto->cod_residente) }}" onsubmit="confirmarAccion(event, '¿Cambiar estado a {{ $est->estado }}?', 'Se registrará en el historial de estados de forma automática.')">
  @csrf @method('PATCH')
  <input type="hidden" name="cod_est_adul" value="{{ $est->cod_est_adul }}">
  <button type="submit" class="w-full text-left px-2.5 py-1.5 text-[10px] font-bold text-titulo hover:bg-fondo-panel rounded-lg transition">{{ $est->estado }}</button>
@@ -381,14 +381,14 @@
  </td>
  <td class="px-5 py-3.5">
  <div class="flex justify-end gap-1.5">
- <a href="{{ route('admin.adultos-mayores.show', $adulto->cod_am) }}" class="rounded-xl bg-boton-principal p-2 text-inverso hover:bg-fondo-panel transition" title="Ver Ficha Integral">
+ <a href="{{ route('admin.adultos-mayores.show', $adulto->cod_residente) }}" class="rounded-xl bg-boton-principal p-2 text-inverso hover:bg-fondo-panel transition" title="Ver Ficha Integral">
  <i class="ph-bold ph-eye text-sm"></i>
  </a>
  @if(strtoupper($adulto->estado_adulto) !== 'ARCHIVADO' && strtoupper($adulto->estado_adulto) !== 'INACTIVO')
- <button type="button" wire:click="editarAdultoMayor('{{ $adulto->cod_am }}')" class="rounded-xl bg-boton-acento p-2 text-inverso hover:bg-fondo-panel transition" title="Editar">
+ <button type="button" wire:click="editarAdultoMayor('{{ $adulto->cod_residente }}')" class="rounded-xl bg-boton-acento p-2 text-inverso hover:bg-fondo-panel transition" title="Editar">
  <i class="ph-bold ph-pencil-simple text-sm"></i>
  </button>
- <form method="POST" action="{{ route('admin.adultos-mayores.archivar', $adulto->cod_am) }}" onsubmit="confirmarAccion(event, '¿Archivar expediente de {{ $adulto->nombres }}?', 'El expediente pasará a la sección de archivados/inactivos.')">
+ <form method="POST" action="{{ route('admin.adultos-mayores.archivar', $adulto->cod_residente) }}" onsubmit="confirmarAccion(event, '¿Archivar expediente de {{ $adulto->nombres }}?', 'El expediente pasará a la sección de archivados/inactivos.')">
  @csrf @method('PATCH')
  <button type="submit" class="rounded-xl bg-fondo-panel text-parrafo border border-borde p-2 hover:bg-fondo-panel hover:text-inverso transition" title="Archivar expediente"><i class="ph-bold ph-archive text-sm"></i></button>
  </form>
@@ -396,7 +396,7 @@
  <button disabled class="rounded-xl bg-fondo-panel p-2 text-apoyo cursor-not-allowed border border-borde-suave">
  <i class="ph-bold ph-pencil-simple text-sm"></i>
  </button>
- <form method="POST" action="{{ route('admin.adultos-mayores.restaurar', $adulto->cod_am) }}" onsubmit="confirmarAccion(event, '¿Restaurar expediente de {{ $adulto->nombres }}?', 'El expediente volverá a ser catalogado como ACTIVO.')">
+ <form method="POST" action="{{ route('admin.adultos-mayores.restaurar', $adulto->cod_residente) }}" onsubmit="confirmarAccion(event, '¿Restaurar expediente de {{ $adulto->nombres }}?', 'El expediente volverá a ser catalogado como ACTIVO.')">
  @csrf @method('PATCH')
  <button type="submit" class="rounded-xl bg-estado-exitoBg p-2 text-inverso hover:bg-fondo-panel transition" title="Restaurar expediente"><i class="ph-bold ph-arrow-counter-clockwise text-sm"></i></button>
  </form>
@@ -439,7 +439,7 @@
  </div>
  
  <div class="mt-5 pt-3 border-t border-borde-suave flex gap-2">
- <a href="{{ route('admin.adultos-mayores.show', $adulto->cod_am) }}" class="flex-1 flex justify-center items-center rounded-xl bg-fondo-panel py-2 text-inverso hover:bg-boton-principal transition text-xs font-bold shadow-sm" title="Ver Expediente Completo">
+ <a href="{{ route('admin.adultos-mayores.show', $adulto->cod_residente) }}" class="flex-1 flex justify-center items-center rounded-xl bg-fondo-panel py-2 text-inverso hover:bg-boton-principal transition text-xs font-bold shadow-sm" title="Ver Expediente Completo">
  <i class="ph-bold ph-eye mr-1 text-sm"></i> Ver Ficha
  </a>
  <div x-data="{ open: false }" class="relative flex-1">
@@ -450,7 +450,7 @@
  <p class="text-[9px] font-bold uppercase text-apoyo px-2 py-1 border-b border-borde-suave mb-1">Cambiar Estado:</p>
  @foreach($estadosAdulto as $est)
  @if(strtoupper($est->estado) !== strtoupper($adulto->estado_adulto))
- <form method="POST" action="{{ route('admin.adultos-mayores.estado', $adulto->cod_am) }}" onsubmit="confirmarAccion(event, '¿Restaurar y cambiar estado a {{ $est->estado }}?', 'El expediente pasará nuevamente al censo activo.')">
+ <form method="POST" action="{{ route('admin.adultos-mayores.estado', $adulto->cod_residente) }}" onsubmit="confirmarAccion(event, '¿Restaurar y cambiar estado a {{ $est->estado }}?', 'El expediente pasará nuevamente al censo activo.')">
  @csrf @method('PATCH')
  <input type="hidden" name="cod_est_adul" value="{{ $est->cod_est_adul }}">
  <button type="submit" class="w-full text-left px-2.5 py-1.5 text-[10px] font-bold text-titulo hover:bg-fondo-panel rounded-lg transition">{{ $est->estado }}</button>
@@ -507,7 +507,7 @@
  </ul>
  </div>
  
- <a href="{{ route('admin.adultos-mayores.show', $adulto->cod_am) }}" class="mt-5 flex justify-center items-center rounded-xl bg-boton-principal py-2 text-inverso hover:bg-fondo-panel transition text-xs font-bold w-full shadow-sm">
+ <a href="{{ route('admin.adultos-mayores.show', $adulto->cod_residente) }}" class="mt-5 flex justify-center items-center rounded-xl bg-boton-principal py-2 text-inverso hover:bg-fondo-panel transition text-xs font-bold w-full shadow-sm">
  <i class="ph-bold ph-folder-open text-base mr-1.5"></i> Completar Expediente
  </a>
  </div>

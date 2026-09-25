@@ -2,10 +2,10 @@
 
 namespace Tests\Feature;
 
-use App\Livewire\Cuidados\DashboardTurno;
-use App\Livewire\Cuidados\FichaPaciente;
-use App\Livewire\Cuidados\MisPacientes;
-use App\Livewire\Cuidados\PaseTurnoPanel;
+use App\Frontend\Livewire\Enfermeria\Cuidados\DashboardTurno;
+use App\Frontend\Livewire\Compartido\Clinica\FichaPaciente;
+use App\Frontend\Livewire\Enfermeria\Cuidados\MisPacientes;
+use App\Frontend\Livewire\Enfermeria\Cuidados\PaseTurnoPanel;
 use App\Models\AdministracionMedicacion;
 use App\Models\AdultoMayor;
 use App\Models\Alerta;
@@ -19,7 +19,7 @@ use App\Models\SignoVital;
 use App\Models\EjecucionCuidado;
 use App\Models\TurnoEnfermeria;
 use App\Models\User;
-use App\Services\Enfermeria\TurnoEnfermeriaService;
+use App\Backend\Modulos\Enfermeria\Servicios\TurnoEnfermeriaService;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
@@ -50,7 +50,7 @@ class TurnoCompletoEnfermeroTest extends TestCase
         $pacienteAjeno = AdultoMayor::factory()->create(['cod_est_adul' => 'EST_001']);
 
         $this->actingAs($enfermero);
-        Livewire::test(FichaPaciente::class, ['adulto' => $pacienteAjeno->cod_am])
+        Livewire::test(FichaPaciente::class, ['adulto' => $pacienteAjeno->cod_residente])
             ->assertForbidden();
     }
 
@@ -106,24 +106,24 @@ class TurnoCompletoEnfermeroTest extends TestCase
 
         // 4. Asignar ÚNICAMENTE al pacienteAsignado en AsignacionResidenteJornada
         AsignacionResidenteJornada::create([
-            'cod_am' => $pacienteAsignado->cod_am,
+            'cod_residente' => $pacienteAsignado->cod_residente,
             'cod_turno' => $turnoManana->cod_turno,
-            'cod_usu_enfermero' => $enfermero->cod_usu,
+            'cod_usu_enfermero' => $enfermero->cod_usuario,
             'fecha_inicio' => today()->toDateString(),
             'nivel_supervision' => 'ESTANDAR',
             'estado' => 'ACTIVA',
             'motivo_asignacion' => 'Asignación de turno matutino',
-            'asignado_por' => $enfermero->cod_usu,
+            'asignado_por' => $enfermero->cod_usuario,
         ]);
         AsignacionPersonal::create([
             'cod_turno' => $turnoManana->cod_turno,
-            'cod_usuario' => $enfermero->cod_usu,
+            'cod_usuario' => $enfermero->cod_usuario,
             'fecha_hora_recepcion' => now(),
         ]);
 
         // Medicación y Plan de cuidados para pacienteAsignado
         $med = Prescripcion::create([
-            'cod_am' => $pacienteAsignado->cod_am,
+            'cod_residente' => $pacienteAsignado->cod_residente,
             'nombre_medicamento' => 'Enalapril 10mg',
             'dosis' => '1 comprimido',
             'frecuencia' => 'Cada 12 horas',
@@ -134,7 +134,7 @@ class TurnoCompletoEnfermeroTest extends TestCase
         ]);
 
         $plan = PlanCuidado::create([
-            'cod_am' => $pacienteAsignado->cod_am,
+            'cod_residente' => $pacienteAsignado->cod_residente,
             'tipo_plan' => 'INICIAL',
             'version' => 1,
             'nivel_cuidado' => 'ESTANDAR',
@@ -145,7 +145,7 @@ class TurnoCompletoEnfermeroTest extends TestCase
 
         $tarea = EjecucionCuidado::create([
             'cod_plan' => $plan->cod_plan,
-            'cod_am' => $pacienteAsignado->cod_am,
+            'cod_residente' => $pacienteAsignado->cod_residente,
             'cod_turno' => $turnoManana->cod_turno,
             'area' => 'MOVILIZACION',
             'titulo' => 'Ejercicios de marcha asistida',
@@ -153,7 +153,7 @@ class TurnoCompletoEnfermeroTest extends TestCase
             'hora_programada' => '10:00:00',
             'prioridad' => 'MEDIA',
             'estado' => 'PENDIENTE',
-            'registrado_por' => $enfermero->cod_usu,
+            'registrado_por' => $enfermero->cod_usuario,
         ]);
 
         // Autenticar como enfermero del turno
@@ -183,7 +183,7 @@ class TurnoCompletoEnfermeroTest extends TestCase
             ->assertSee('Ejercicios de marcha asistida');
 
         // ─── PASO 2: ABRIR FICHA DEL PACIENTE ASIGNADO ─────────────────────────
-        $ficha = Livewire::test(FichaPaciente::class, ['adulto' => $pacienteAsignado->cod_am])
+        $ficha = Livewire::test(FichaPaciente::class, ['adulto' => $pacienteAsignado->cod_residente])
             ->assertOk()
             ->assertSee('Juan Asignado');
 
@@ -326,38 +326,38 @@ class TurnoCompletoEnfermeroTest extends TestCase
         $paciente = AdultoMayor::factory()->create(['cod_est_adul' => 'EST_001']);
 
         AsignacionResidenteJornada::create([
-            'cod_am' => $paciente->cod_am,
+            'cod_residente' => $paciente->cod_residente,
             'cod_turno' => $turnoManana->cod_turno,
-            'cod_usu_enfermero' => $enfermero->cod_usu,
+            'cod_usu_enfermero' => $enfermero->cod_usuario,
             'fecha_inicio' => today()->toDateString(),
             'nivel_supervision' => 'ESTANDAR',
             'estado' => 'ACTIVA',
             'motivo_asignacion' => 'Asignación matutina',
-            'asignado_por' => $enfermero->cod_usu,
+            'asignado_por' => $enfermero->cod_usuario,
         ]);
         AsignacionResidenteJornada::create([
-            'cod_am' => $paciente->cod_am,
+            'cod_residente' => $paciente->cod_residente,
             'cod_turno' => $turnoTarde->cod_turno,
-            'cod_usu_enfermero' => $enfermeroReceptor->cod_usu,
+            'cod_usu_enfermero' => $enfermeroReceptor->cod_usuario,
             'fecha_inicio' => today()->toDateString(),
             'nivel_supervision' => 'ESTANDAR',
             'estado' => 'ACTIVA',
             'motivo_asignacion' => 'Asignación de relevo',
-            'asignado_por' => $enfermero->cod_usu,
+            'asignado_por' => $enfermero->cod_usuario,
         ]);
         AsignacionPersonal::create([
             'cod_turno' => $turnoManana->cod_turno,
-            'cod_usuario' => $enfermero->cod_usu,
+            'cod_usuario' => $enfermero->cod_usuario,
             'fecha_hora_recepcion' => now(),
         ]);
 
         $this->actingAs($enfermero);
         Livewire::test(PaseTurnoPanel::class)
             ->call('abrirGenerar')
-            ->set('codAm', $paciente->cod_am)
+            ->set('codResidente', $paciente->cod_residente)
             ->set('turnoSalienteId', $turnoManana->cod_turno)
             ->set('turnoEntranteId', $turnoTarde->cod_turno)
-            ->set('enfermeroEntranteId', $enfermeroReceptor->cod_usu)
+            ->set('enfermeroEntranteId', $enfermeroReceptor->cod_usuario)
             ->set('resumenTurno', 'Se entrega al residente con signos estables y controles del turno completados.')
             ->call('generarPase')
             ->assertHasNoErrors();
@@ -371,7 +371,7 @@ class TurnoCompletoEnfermeroTest extends TestCase
         Carbon::setTestNow('2026-09-10 16:00:00');
         AsignacionPersonal::create([
             'cod_turno' => $turnoTarde->cod_turno,
-            'cod_usuario' => $enfermeroReceptor->cod_usu,
+            'cod_usuario' => $enfermeroReceptor->cod_usuario,
             'fecha_hora_recepcion' => now(),
         ]);
         Livewire::test(PaseTurnoPanel::class)

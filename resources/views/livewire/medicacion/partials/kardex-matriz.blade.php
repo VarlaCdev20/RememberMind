@@ -2,7 +2,7 @@
     {{-- ==================================================
          1. BARRA DE FILTROS COMPACTA ÚNICA
          ================================================== --}}
-    <section x-data="{ masFiltros: false }" class="rounded-2xl bg-[#DED1C3] dark:bg-[#2C2723] border border-[#C7B9AA] dark:border-[#423B34] p-3 text-xs shadow-sm flex flex-col gap-2.5">
+    <section x-data="{ masFiltros: false }" class="rm-filter-bar">
         <div class="w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-12 gap-2 items-center text-xs">
             {{-- 1. Búsqueda rápida: residente o medicamento --}}
             <div class="lg:col-span-3 relative flex items-center">
@@ -131,9 +131,9 @@
         @endphp
 
         @if($chipsActivos)
-            <div class="pt-2 border-t border-[#C7B9AA]/60 dark:border-[#494139] flex flex-wrap items-center justify-between gap-2 text-xs">
+            <div class="rm-filter-bar__active">
                 <div class="flex flex-wrap items-center gap-1.5">
-                    <span class="text-[11px] font-bold text-[#677084] dark:text-[#BDAE9F]">Filtros activos:</span>
+                    <span class="rm-filter-bar__active-label">Filtros activos:</span>
 
                     @if(!empty($filtroKardexBusqueda))
                         <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-[6px] bg-[#E4D8CC] dark:bg-[#332F29] text-[11px] font-semibold text-[#304060] dark:text-[#EFE5DA] border border-[#C7B9AA] dark:border-[#494139]">

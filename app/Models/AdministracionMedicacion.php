@@ -44,11 +44,6 @@ class AdministracionMedicacion extends ModeloOperativo
         $this->attributes['cod_prescripcion'] = $value;
     }
 
-    public function setCodAmAttribute($value): void
-    {
-        $this->attributes['cod_residente'] = $value;
-    }
-
     public function setAdministradoAttribute($value): void
     {
         $this->attributes['resultado'] = $value ? 'ADMINISTRADA' : 'OMITIDA';
@@ -64,11 +59,6 @@ class AdministracionMedicacion extends ModeloOperativo
         return (string) $this->cod_prescripcion;
     }
 
-    public function getCodAmAttribute(): string
-    {
-        return (string) $this->cod_residente;
-    }
-
     protected static function booted(): void
     {
         static::creating(function (self $registro): void {
@@ -79,10 +69,7 @@ class AdministracionMedicacion extends ModeloOperativo
             if (empty($registro->cod_prescripcion) && !empty($rawMed)) {
                 $registro->cod_prescripcion = $rawMed;
             }
-            $rawAm = $registro->attributes['cod_am'] ?? $registro->attributes['cod_residente'] ?? null;
-            if (empty($registro->cod_residente) && !empty($rawAm)) {
-                $registro->cod_residente = $rawAm;
-            }
+
             if (empty($registro->cod_residente) && !empty($registro->cod_prescripcion)) {
                 $p = Prescripcion::find($registro->cod_prescripcion);
                 if ($p) {
@@ -90,10 +77,10 @@ class AdministracionMedicacion extends ModeloOperativo
                 }
             }
             if (empty($registro->cod_personal)) {
-                $codUsu = $registro->attributes['registrado_por'] ?? null;
+                $codUsuario = $registro->attributes['registrado_por'] ?? null;
                 $pers = null;
-                if ($codUsu) {
-                    $pers = Personal::where('cod_usuario', $codUsu)->first() ?? Personal::where('cod_personal', $codUsu)->first();
+                if ($codUsuario) {
+                    $pers = Personal::where('cod_usuario', $codUsuario)->first() ?? Personal::where('cod_personal', $codUsuario)->first();
                 }
                 $pers ??= auth()->user()?->personal ?? Personal::first();
                 if (!$pers) {
@@ -163,10 +150,7 @@ class AdministracionMedicacion extends ModeloOperativo
         });
 
         static::saving(function (self $registro): void {
-            $rawAm = $registro->attributes['cod_am'] ?? null;
-            if (empty($registro->cod_residente) && !empty($rawAm)) {
-                $registro->cod_residente = $rawAm;
-            }
+
             if (!empty($registro->cod_prescripcion)) {
                 $presc = Prescripcion::query()->whereKey($registro->cod_prescripcion)->first();
                 if ($presc) {

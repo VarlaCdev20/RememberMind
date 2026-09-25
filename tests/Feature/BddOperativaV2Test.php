@@ -205,6 +205,8 @@ class BddOperativaV2Test extends TestCase
         }
         $this->assertFalse($super->can('prescripciones.crear'));
         $this->assertFalse($super->can('diagnosticos.crear'));
+        $this->assertTrue($super->can('administraciones_medicacion.ver'));
+        $this->assertFalse(app(AdministracionMedicacionPolicy::class)->create($super));
     }
 
     public function test_dashboard_y_expediente_web_funcionan_con_modelos_v2(): void

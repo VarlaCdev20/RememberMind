@@ -10,8 +10,8 @@ use App\Models\Preadmision;
 use App\Models\ResidenteContacto;
 use App\Models\Turno;
 use App\Models\User;
-use App\Services\Documentos\DocumentacionUsuarioService;
-use App\Services\Identidad\GeneradorPlanillaEnfermeriaService;
+use App\Backend\Modulos\Documentos\Servicios\DocumentacionUsuarioService;
+use App\Backend\Modulos\Identidad\Servicios\GeneradorPlanillaEnfermeriaService;
 use Database\Seeders\DatabaseSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
@@ -100,7 +100,7 @@ class IntegracionAdaptadoresV2Test extends TestCase
         ]);
 
         $plaza = collect($resultado['enfermeros'])->firstWhere('codigo', 'E01');
-        $this->assertSame($enfermero->cod_usuario, $plaza['cod_usu']);
+        $this->assertSame($enfermero->cod_usuario, $plaza['cod_usuario']);
     }
 
     public function test_valoracion_inicial_es_dato_estructurado_de_preadmision(): void

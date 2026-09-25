@@ -288,7 +288,7 @@
  </section>
  @else
  <section class="space-y-4 animate-in fade-in duration-200">
-  <section class="rounded-2xl bg-[#DED1C3] dark:bg-[#2C2723] border border-[#C7B9AA] dark:border-[#423B34] p-3 text-xs shadow-sm flex flex-col gap-2.5">
+    <section class="rm-filter-bar">
      <div class="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between border-b border-[#C7B9AA]/50 dark:border-[#423B34] pb-2">
          <div>
              <span class="text-[10px] font-black uppercase tracking-[0.15em] text-[#A35A44] dark:text-[#D58C79]">{{ $contexto['titulo'] }}</span>
@@ -345,9 +345,9 @@
          $hasFiltrosActivos = !empty($search) || !empty($filtroEstado);
      @endphp
      @if($hasFiltrosActivos)
-         <div class="w-full flex flex-wrap items-center justify-between gap-2 pt-2.5 border-t border-[#C7B9AA]/60 dark:border-[#423B34] text-xs">
+            <div class="rm-filter-bar__active">
              <div class="flex flex-wrap items-center gap-1.5">
-                 <span class="text-[11px] font-bold text-[#677084] dark:text-[#9A9084] flex items-center gap-1 mr-1">
+                    <span class="rm-filter-bar__active-label">
                      <i class="ph-bold ph-funnel text-xs"></i> Filtros activos:
                  </span>
                  @if(!empty($search))
@@ -467,7 +467,7 @@
  </div>
 
  <div class="border-t border-borde/35 bg-fondo-panel p-4">
- <button wire:click="abrirExpediente('{{ $adulto->cod_am }}')" type="button" class="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-boton-principal px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-inverso shadow-[0_8px_18px_rgba(47,62,92,0.18)] transition hover:bg-fondo-panel active:scale-95">
+ <button wire:click="abrirExpediente('{{ $adulto->cod_residente }}')" type="button" class="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-boton-principal px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-inverso shadow-[0_8px_18px_rgba(47,62,92,0.18)] transition hover:bg-fondo-panel active:scale-95">
  <i class="ph-bold {{ $contexto['icono'] }}"></i>
  {{ $contexto['boton'] }}
  </button>
@@ -527,13 +527,13 @@
 
  <div class="relative z-10 flex-1 overflow-y-auto bg-fondo-panel p-4 sm:p-6">
   @if($seccionActiva === 'valoracion')
-  @livewire('valoraciones.salud-valoracion-panel', ['adulto' => $adultoSeleccionadoParaModal], key('val-'.$adultoSeleccionadoParaModal->cod_am))
+  @livewire('valoraciones.salud-valoracion-panel', ['adulto' => $adultoSeleccionadoParaModal], key('val-'.$adultoSeleccionadoParaModal->cod_residente))
   @elseif($seccionActiva === 'signos')
-  @livewire('clinica.salud-signos-panel', ['adulto' => $adultoSeleccionadoParaModal], key('signos-'.$adultoSeleccionadoParaModal->cod_am))
+  @livewire('clinica.salud-signos-panel', ['adulto' => $adultoSeleccionadoParaModal], key('signos-'.$adultoSeleccionadoParaModal->cod_residente))
   @elseif($seccionActiva === 'evaluaciones')
-  @livewire('valoraciones.salud-evaluaciones-geriatricas-panel', ['adulto' => $adultoSeleccionadoParaModal], key('eval-'.$adultoSeleccionadoParaModal->cod_am))
+  @livewire('valoraciones.salud-evaluaciones-geriatricas-panel', ['adulto' => $adultoSeleccionadoParaModal], key('eval-'.$adultoSeleccionadoParaModal->cod_residente))
   @elseif($seccionActiva === 'administracion')
-  @livewire('medicacion.salud-administracion-medicacion-panel', ['adulto' => $adultoSeleccionadoParaModal], key('adminmed-'.$adultoSeleccionadoParaModal->cod_am))
+  @livewire('medicacion.salud-administracion-medicacion-panel', ['adulto' => $adultoSeleccionadoParaModal], key('adminmed-'.$adultoSeleccionadoParaModal->cod_residente))
   @endif
  </div>
  </aside>

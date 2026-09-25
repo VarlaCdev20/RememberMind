@@ -605,7 +605,7 @@
  </p>
  </div>
  @can('usuarios.gestionar')
- @if($usuario->cod_usu !== auth()->id())
+ @if($usuario->cod_usuario !== auth()->id())
  <button type="button"
  wire:click="toggleAcceso"
  wire:confirm="¿Está seguro de cambiar el estado de acceso del usuario?"
@@ -645,7 +645,7 @@
  @if($activeTab === 'historial')
  <div class="space-y-6 animate-in fade-in duration-300">
  {{-- Filtros del historial --}}
- <section class="rounded-[1.5rem] border border-borde/45 bg-fondo-card/70 p-4 shadow-sm">
+ <section class="rm-filter-bar">
  <div class="grid items-end gap-3 sm:grid-cols-4">
  <div>
  <label class="mb-1 block text-[9px] font-bold uppercase tracking-widest text-meta">Acción</label>

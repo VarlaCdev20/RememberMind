@@ -62,7 +62,7 @@
  </div>
 
  {{-- BARRA DE FILTROS Y BÚSQUEDA --}}
- <section class="overflow-hidden rounded-[24px] border border-borde bg-fondo-panel p-4 shadow-[0_4px_14px_rgba(47,62,92,0.04)]">
+ <section class="rm-filter-bar overflow-hidden">
  <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
  {{-- Filtros Rápidos (Categorías) --}}
  <div class="flex flex-wrap items-center gap-1.5">

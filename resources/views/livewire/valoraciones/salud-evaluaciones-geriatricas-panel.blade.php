@@ -1,6 +1,6 @@
 <div class="space-y-5">
  @if($adulto)<x-residentes.navegacion-ficha :adulto="$adulto" />@endif
- @if(!$adulto?->cod_am)
+ @if(!$adulto?->cod_residente)
  <x-ui.empty-state icono="ph-user-focus" titulo="Seleccione un residente" texto="Elija un residente para consultar o registrar sus evaluaciones geriátricas." />
  @else
  <div class="mb-6 flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
@@ -26,10 +26,10 @@
  </p>
  </div>
  <div class="flex items-center gap-2">
-  <a href="{{ $adulto?->cod_am ? route('admin.adultos-mayores.show', ['adulto_mayor' => $adulto->cod_am]) : route('admin.adultos-mayores.index') }}" class="inline-flex items-center gap-2 rounded-xl border border-borde bg-fondo-card px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-parrafo transition hover:bg-fondo-panel">
+  <a href="{{ $adulto?->cod_residente ? route('admin.adultos-mayores.show', ['adulto_mayor' => $adulto->cod_residente]) : route('admin.adultos-mayores.index') }}" class="inline-flex items-center gap-2 rounded-xl border border-borde bg-fondo-card px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-parrafo transition hover:bg-fondo-panel">
  <i class="ph-bold ph-arrow-left"></i> Volver a Expediente
  </a>
- <button type="button" @click="$dispatch('evaluacion-geriatrica-abrir', { cod_am: '{{ $adulto->cod_am }}' })" class="inline-flex items-center justify-center gap-2 rounded-xl bg-boton-principal px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-inverso shadow-md transition hover:-translate-y-0.5 hover:bg-boton-principalHover active:scale-95">
+ <button type="button" @click="$dispatch('evaluacion-geriatrica-abrir', { cod_residente: '{{ $adulto->cod_residente }}' })" class="inline-flex items-center justify-center gap-2 rounded-xl bg-boton-principal px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-inverso shadow-md transition hover:-translate-y-0.5 hover:bg-boton-principalHover active:scale-95">
  <i class="ph-bold ph-plus-circle text-sm"></i> Registrar Evaluación
  </button>
  </div>
@@ -82,7 +82,7 @@
  </div>
 
  <div class="mt-4 pt-3 border-t border-borde flex justify-end gap-2">
-  <button type="button" @click="$dispatch('evaluacion-geriatrica-abrir', { cod_am: '{{ $adulto->cod_am }}', eval_id: '{{ $eval->cod_eval_ger }}' })" class="inline-flex items-center gap-1.5 rounded-lg bg-fondo-card border border-borde px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-parrafo transition hover:bg-fondo-panel">
+  <button type="button" @click="$dispatch('evaluacion-geriatrica-abrir', { cod_residente: '{{ $adulto->cod_residente }}', eval_id: '{{ $eval->cod_eval_ger }}' })" class="inline-flex items-center gap-1.5 rounded-lg bg-fondo-card border border-borde px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-parrafo transition hover:bg-fondo-panel">
  <i class="ph-bold ph-pencil-simple"></i> Editar
  </button>
  <!-- TODO: Implementar visor detallado si existe -->
@@ -99,7 +99,7 @@
  <p class="mt-2 text-sm font-semibold text-apoyo max-w-md">
  Comience registrando la primera valoración multidimensional para llevar el seguimiento preventivo del adulto mayor.
  </p>
- <button type="button" @click="$dispatch('evaluacion-geriatrica-abrir', { cod_am: '{{ $adulto->cod_am }}' })" class="mt-6 inline-flex items-center justify-center gap-2 rounded-xl bg-fondo-panel px-6 py-2.5 text-xs font-bold uppercase tracking-wider text-inverso shadow-md transition hover:-translate-y-0.5 hover:bg-fondo-panel active:scale-95">
+ <button type="button" @click="$dispatch('evaluacion-geriatrica-abrir', { cod_residente: '{{ $adulto->cod_residente }}' })" class="mt-6 inline-flex items-center justify-center gap-2 rounded-xl bg-fondo-panel px-6 py-2.5 text-xs font-bold uppercase tracking-wider text-inverso shadow-md transition hover:-translate-y-0.5 hover:bg-fondo-panel active:scale-95">
  <i class="ph-bold ph-plus-circle text-sm"></i> Registrar Evaluación
  </button>
  </div>
@@ -108,6 +108,6 @@
  </div>
 
  {{-- Modal Component --}}
- <livewire:valoraciones.evaluacion-geriatrica-modal :cod_am="$adulto->cod_am" />
+ <livewire:valoraciones.evaluacion-geriatrica-modal :cod_residente="$adulto->cod_residente" />
  @endif
 </div>

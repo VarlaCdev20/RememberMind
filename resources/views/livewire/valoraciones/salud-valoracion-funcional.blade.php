@@ -161,7 +161,7 @@
  </div>
 
  {{-- Filtros --}}
- <div class="mb-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
+ <div class="rm-filter-bar mb-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
  <select wire:model.live="filtroEstado" class="rm-select text-xs">
  <option value="">Todos los estados</option>
  <option value="VIGENTE">Vigente</option>

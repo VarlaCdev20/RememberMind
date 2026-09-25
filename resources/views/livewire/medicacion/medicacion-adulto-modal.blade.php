@@ -17,21 +17,21 @@
 
         <form wire:submit="guardar" id="formMedicacion" class="space-y-5">
             <!-- 1. Paciente Asignado -->
-            @if(empty($cod_am))
+            @if(empty($cod_residente))
                 <div class="rounded-[1.4rem] border border-borde bg-fondo-panel p-5 shadow-sm space-y-3">
                     <label class="block text-[10px] font-bold uppercase tracking-wider text-parrafo/70">
                         Adulto Mayor / Residente <span class="text-estado-peligro">*</span>
                     </label>
                     <div class="relative">
                         <i class="ph-bold ph-user absolute left-3.5 top-1/2 -translate-y-1/2 text-meta"></i>
-                        <select wire:model="cod_am" class="w-full rounded-xl border {{ $errors->has('cod_am') ? 'border-estado-peligroBorde' : 'border-borde' }} bg-fondo-app py-2.5 pl-10 pr-4 text-xs font-bold text-parrafo outline-none transition appearance-none focus:border-boton-principal focus:ring-2 focus:ring-boton-principal/20">
+                        <select wire:model="cod_residente" class="w-full rounded-xl border {{ $errors->has('cod_residente') ? 'border-estado-peligroBorde' : 'border-borde' }} bg-fondo-app py-2.5 pl-10 pr-4 text-xs font-bold text-parrafo outline-none transition appearance-none focus:border-boton-principal focus:ring-2 focus:ring-boton-principal/20">
                             <option value="">-- Seleccione un residente --</option>
                             @foreach($adultosDisponibles as $ad)
-                                <option value="{{ $ad->cod_am }}">{{ $ad->nombres }} {{ $ad->ap_paterno }} ({{ $ad->cod_am }})</option>
+                                <option value="{{ $ad->cod_residente }}">{{ $ad->nombres }} {{ $ad->ap_paterno }} ({{ $ad->cod_residente }})</option>
                             @endforeach
                         </select>
                     </div>
-                    @error('cod_am') <span class="mt-1 block text-[10px] font-bold text-estado-peligro">{{ $message }}</span> @enderror
+                    @error('cod_residente') <span class="mt-1 block text-[10px] font-bold text-estado-peligro">{{ $message }}</span> @enderror
                 </div>
             @endif
 

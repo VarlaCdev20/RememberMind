@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Livewire\Identidad\PersonalInstitucionalHorarios;
+use App\Frontend\Livewire\Administracion\Identidad\PersonalInstitucionalHorarios;
 use App\Models\AreaInstitucional;
 use App\Models\AsignacionPersonal;
 use App\Models\Personal;
@@ -24,7 +24,7 @@ class PersonalInstitucionalHorariosTest extends TestCase
         $turno = $this->crearTurno('TUR_0001', 'MANANA', '08:00:00', '16:00:00');
 
         Livewire::test(PersonalInstitucionalHorarios::class, [
-            'usuarioId' => $user->cod_usu,
+            'usuarioId' => $user->cod_usuario,
         ])
             ->set('f_cod_area', $area->cod_area)
             ->set('f_cod_turno', $turno->cod_turno)
@@ -52,7 +52,7 @@ class PersonalInstitucionalHorariosTest extends TestCase
         $turnoTarde = $this->crearTurno('TUR_0002', 'TARDE', '16:00:00', '22:00:00');
 
         Livewire::test(PersonalInstitucionalHorarios::class, [
-            'usuarioId' => $user->cod_usu,
+            'usuarioId' => $user->cod_usuario,
         ])
             ->set('f_cod_area', $area->cod_area)
             ->set('f_cod_turno', $turnoManana->cod_turno)
@@ -63,7 +63,7 @@ class PersonalInstitucionalHorariosTest extends TestCase
             ->assertHasNoErrors();
 
         $componente = Livewire::test(PersonalInstitucionalHorarios::class, [
-            'usuarioId' => $user->cod_usu,
+            'usuarioId' => $user->cod_usuario,
         ]);
 
         $asignacion = collect($componente->get('asignaciones'))->first();

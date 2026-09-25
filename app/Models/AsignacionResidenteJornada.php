@@ -11,7 +11,7 @@ class AsignacionResidenteJornada extends ModeloOperativo
 
     /** Columnas exactas de asignaciones_residente_jornada en PostgreSQL V2. */
     protected $fillable = [
-        'cod_asignacion', 'cod_residente', 'cod_am', 'cod_jornada', 'cod_turno', 'cod_personal', 'cod_usu_enfermero',
+        'cod_asignacion', 'cod_residente', 'cod_jornada', 'cod_turno', 'cod_personal', 'cod_usu_enfermero',
         'nivel_supervision', 'fecha_hora', 'estado', 'observacion',
     ];
 
@@ -29,9 +29,7 @@ class AsignacionResidenteJornada extends ModeloOperativo
             if (empty($asig->fecha_hora)) {
                 $asig->fecha_hora = now();
             }
-            if (empty($asig->cod_residente) && !empty($asig->getAttribute('cod_am'))) {
-                $asig->cod_residente = $asig->getAttribute('cod_am');
-            }
+
             if (empty($asig->cod_jornada)) {
                 $targetTurno = $asig->getAttribute('cod_turno') ?: (\App\Models\TurnoEnfermeria::first()?->cod_turno ?? 'TUR_001');
                 $j = \App\Models\Jornada::whereDate('fecha_jornada', today())->where('cod_turno', $targetTurno)->first();
@@ -69,12 +67,6 @@ class AsignacionResidenteJornada extends ModeloOperativo
                 $asig->cod_personal = $p->cod_personal;
             }
         });
-    }
-
-
-    public function setCodAmAttribute($value): void
-    {
-        $this->attributes['cod_residente'] = $value;
     }
 
     public function setCodUsuEnfermeroAttribute($value): void

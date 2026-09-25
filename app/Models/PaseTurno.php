@@ -49,17 +49,10 @@ class PaseTurno extends ModeloOperativo
         return new class($query) extends \Illuminate\Database\Eloquent\Builder {
             public function where($column, $operator = null, $value = null, $boolean = 'and')
             {
-                if ($column === 'cod_am') {
-                    $column = 'cod_residente';
-                }
+
                 return parent::where($column, $operator, $value, $boolean);
             }
         };
-    }
-
-    public function setCodAmAttribute($value): void
-    {
-        $this->attributes['cod_residente'] = $value;
     }
 
     public function residente(): BelongsTo

@@ -12,7 +12,7 @@ class FichaPacienteReporteController extends Controller
 {
     public function pdf($adulto_id)
     {
-        $adultoId = is_object($adulto_id) ? ($adulto_id->cod_residente ?? $adulto_id->cod_am) : $adulto_id;
+        $adultoId = is_object($adulto_id) ? $adulto_id->cod_residente : $adulto_id;
         $adultoMayor = Residente::with([
             'cama.habitacion',
             'asignacionTurnoActiva.turno',

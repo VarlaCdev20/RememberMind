@@ -11,7 +11,7 @@ class StoreValoracionFuncionalRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'cod_am'                => 'required|string|exists:residentes,cod_residente',
+            'cod_residente'         => 'required|string|exists:residentes,cod_residente',
             'fecha_valoracion'      => 'required|date',
             'come_solo'             => 'nullable|boolean',
             'se_bana_solo'          => 'nullable|boolean',
@@ -36,8 +36,8 @@ class StoreValoracionFuncionalRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'cod_am.required'            => 'El adulto mayor es obligatorio.',
-            'cod_am.exists'              => 'El adulto mayor seleccionado no existe.',
+            'cod_residente.required'     => 'El residente es obligatorio.',
+            'cod_residente.exists'       => 'El residente seleccionado no existe.',
             'fecha_valoracion.required'  => 'La fecha de valoración es obligatoria.',
             'nivel_dependencia.required' => 'El nivel de dependencia es obligatorio.',
             'nivel_dependencia.in'       => 'El nivel de dependencia debe ser: INDEPENDIENTE, DEPENDENCIA_PARCIAL, ALTA_DEPENDENCIA o SUPERVISION_PERMANENTE.',

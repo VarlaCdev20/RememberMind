@@ -14,15 +14,17 @@
         @endcan
     </div>
 
-    <div class="grid gap-3 rounded-2xl border border-borde bg-fondo-card p-4 md:grid-cols-3">
-        <input type="search" wire:model.live.debounce.400ms="search" placeholder="Buscar adulto mayor" class="rounded-xl border border-borde bg-fondo-panel px-4 py-2 text-sm text-parrafo">
-        <select wire:model.live="filtroTurno" class="rounded-xl border border-borde bg-fondo-panel px-4 py-2 text-sm text-parrafo">
-            <option value="">Todos los turnos</option>
-            @foreach($turnos as $turno)
-                <option value="{{ $turno->cod_turno }}">{{ $turno->nombre }} ({{ substr($turno->hora_inicio, 0, 5) }})</option>
-            @endforeach
-        </select>
-        <input type="date" wire:model.live="filtroFecha" class="rounded-xl border border-borde bg-fondo-panel px-4 py-2 text-sm text-parrafo">
+    <div class="rm-filter-bar">
+        <div class="grid gap-3 md:grid-cols-3">
+            <input type="search" wire:model.live.debounce.400ms="search" placeholder="Buscar adulto mayor" class="rounded-xl border border-borde bg-fondo-panel px-4 py-2 text-sm text-parrafo">
+            <select wire:model.live="filtroTurno" class="rounded-xl border border-borde bg-fondo-panel px-4 py-2 text-sm text-parrafo">
+                <option value="">Todos los turnos</option>
+                @foreach($turnos as $turno)
+                    <option value="{{ $turno->cod_turno }}">{{ $turno->nombre }} ({{ substr($turno->hora_inicio, 0, 5) }})</option>
+                @endforeach
+            </select>
+            <input type="date" wire:model.live="filtroFecha" class="rounded-xl border border-borde bg-fondo-panel px-4 py-2 text-sm text-parrafo">
+        </div>
     </div>
 
     <div class="overflow-hidden rounded-3xl border border-borde bg-fondo-card shadow-sm">
@@ -80,7 +82,7 @@
                 </div>
                 <div class="grid gap-3 md:grid-cols-3">
                     <label class="space-y-1 text-xs font-bold text-apoyo">Adulto mayor *
-                        <select wire:model.live="codAm" @disabled($editandoId) class="rm-select w-full text-sm"><option value="">Seleccione</option>@foreach($adultos as $adulto)<option value="{{ $adulto->cod_residente }}">{{ $adulto->nombres }} {{ $adulto->ap_paterno }}</option>@endforeach</select>
+                        <select wire:model.live="codResidente" @disabled($editandoId) class="rm-select w-full text-sm"><option value="">Seleccione</option>@foreach($adultos as $adulto)<option value="{{ $adulto->cod_residente }}">{{ $adulto->nombres }} {{ $adulto->ap_paterno }}</option>@endforeach</select>
                         @error('codResidente')<span class="text-xs text-estado-peligro">{{ $message }}</span>@enderror
                     </label>
                     <label class="space-y-1 text-xs font-bold text-apoyo">Turno *

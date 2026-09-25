@@ -32,8 +32,7 @@ class Alerta extends ModeloOperativo
         'fecha_hora_limite',
         'generacion',
         'estado',
-        'cod_am',
-        'nivel',
+                'nivel',
         'motivo',
         'responsable_id',
         'tipo_alerta',
@@ -79,9 +78,9 @@ class Alerta extends ModeloOperativo
         return $query->where('prioridad', 'CRITICO');
     }
 
-    public function scopePorAdulto($query, string $codAm)
+    public function scopePorAdulto($query, string $codResidente)
     {
-        return $query->where('cod_residente', $codAm);
+        return $query->where('cod_residente', $codResidente);
     }
 
     public function puedeCerrarse(): bool
@@ -108,9 +107,7 @@ class Alerta extends ModeloOperativo
                 $model->cod_alerta = 'ALA_' . strtoupper(Str::random(10));
             }
 
-            if (isset($model->attributes['cod_am']) && empty($model->cod_residente)) {
-                $model->cod_residente = $model->attributes['cod_am'];
-            }
+
 
             if (isset($model->attributes['nivel']) && empty($model->attributes['prioridad'])) {
                 $model->prioridad = $model->attributes['nivel'];
@@ -161,7 +158,7 @@ class Alerta extends ModeloOperativo
             }
 
             if (empty($model->cod_residente)) {
-                $model->cod_residente = $model->attributes['cod_am'] ?? Residente::value('cod_residente');
+                $model->cod_residente = Residente::value('cod_residente');
                 if (empty($model->cod_residente)) {
                     $res = Residente::first() ?? Residente::factory()->create();
                     $model->cod_residente = $res->cod_residente;

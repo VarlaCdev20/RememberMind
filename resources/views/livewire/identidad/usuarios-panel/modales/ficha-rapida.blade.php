@@ -155,7 +155,7 @@
  <footer class="shrink-0 border-t border-borde-suave bg-fondo-panel px-6 py-4 backdrop-blur-xl">
  <div class="flex flex-wrap items-center justify-center gap-2">
  <button type="button"
- wire:click="abrirVistaCompleta('{{ $usuarioFicha->cod_usu }}')"
+ wire:click="abrirVistaCompleta('{{ $usuarioFicha->cod_usuario }}')"
  class="inline-flex items-center gap-2 rounded-full bg-boton-principal px-5 py-2.5 text-[10px] font-bold text-inverso shadow-lg transition hover:bg-fondo-panel active:scale-95">
  <i class="ph-bold ph-eye"></i> Ver completo
  </button>
@@ -163,7 +163,7 @@
  @can('usuarios.editar')
  @if($usuarioFicha->estado === 'ACTIVO')
  <button type="button"
- wire:click="editarUsuario('{{ $usuarioFicha->cod_usu }}')"
+ wire:click="editarUsuario('{{ $usuarioFicha->cod_usuario }}')"
  onclick="@this.cerrarFichaRapida()"
  class="inline-flex items-center gap-2 rounded-full bg-boton-acento px-5 py-2.5 text-[10px] font-bold text-inverso shadow-lg transition hover:bg-fondo-panel active:scale-95">
  <i class="ph-bold ph-pencil-simple"></i> Editar
@@ -172,8 +172,8 @@
  @endcan
 
  @can('usuarios.cambiar_estado')
- @if($usuarioFicha->cod_usu !== auth()->id())
- <button wire:click="toggleEstado('{{ $usuarioFicha->cod_usu }}')"
+ @if($usuarioFicha->cod_usuario !== auth()->id())
+ <button wire:click="toggleEstado('{{ $usuarioFicha->cod_usuario }}')"
  wire:confirm="¿Desea cambiar el estado de este usuario?"
  class="inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-[10px] font-bold shadow-lg transition active:scale-95
  {{ $usuarioFicha->estado === 'ACTIVO'

@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Medicacion;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Medicacion\StoreAdministracionMedicacionRequest;
 use App\Models\AdultoMayor;
-use App\Services\Medicacion\RegistrarAdministracionMedicacionService;
+use App\Backend\Modulos\Medicacion\Servicios\RegistrarAdministracionMedicacionService;
 
 class AdultoMayorAdministracionMedicacionController extends Controller
 {
@@ -14,7 +14,7 @@ class AdultoMayorAdministracionMedicacionController extends Controller
         try {
             $datos = $request->validated();
             $registro = $servicio->registrarProgramada(
-                auth()->user(), $adulto_mayor->cod_am, $datos['cod_med_adulto'],
+                auth()->user(), $adulto_mayor->cod_residente, $datos['cod_med_adulto'],
                 $datos['hora_programada'], (bool) $datos['administrado'],
                 $datos['motivo_omision'] ?? null, $datos['observacion'] ?? null,
             );
@@ -32,10 +32,10 @@ class AdultoMayorAdministracionMedicacionController extends Controller
                     'administrado'   => $registro->administrado,
                     'fecha'          => $registro->fecha,
                 ])
-                ->log("{$tipoEvento} para el adulto mayor {$adulto_mayor->cod_am}.");
+                ->log("{$tipoEvento} para el adulto mayor {$adulto_mayor->cod_residente}.");
 
             return redirect()
-                ->route('admin.adultos-mayores.show', ['adulto_mayor' => $adulto_mayor->cod_am, 'tab' => 'medicacion'])
+                ->route('admin.adultos-mayores.show', ['adulto_mayor' => $adulto_mayor->cod_residente, 'tab' => 'medicacion'])
                 ->with('success', $tipoEvento . '.');
 
         } catch (\Exception $e) {

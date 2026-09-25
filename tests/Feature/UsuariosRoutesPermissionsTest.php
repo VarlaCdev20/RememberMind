@@ -19,7 +19,7 @@ class UsuariosRoutesPermissionsTest extends TestCase
         app(PermissionRegistrar::class)->forgetCachedPermissions();
 
         foreach (['usuarios.ver', 'usuarios.crear', 'usuarios.editar'] as $permission) {
-            Permission::create(['name' => $permission, 'guard_name' => 'web']);
+            Permission::findOrCreate($permission, 'web');
         }
     }
 

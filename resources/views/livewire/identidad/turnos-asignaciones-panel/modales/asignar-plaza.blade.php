@@ -37,7 +37,7 @@
                                     class="h-10 w-full rounded-xl border border-borde-suave bg-fondo-card/40 px-3 text-xs font-bold text-titulo outline-none focus:border-borde-focus">
                                     <option value="">Seleccione un enfermero...</option>
                                     @foreach (\App\Models\User::role('ENFERMEROS')->leftJoin('personal', 'usuarios.cod_usuario', '=', 'personal.cod_usuario')->where('usuarios.estado', 'ACTIVO')->orderBy('personal.nombres')->select('usuarios.*')->get() as $nurse)
-                                        <option value="{{ $nurse->cod_usu }}">{{ $nurse->name }} ({{ $nurse->cod_usu }})</option>
+                                        <option value="{{ $nurse->cod_usuario }}">{{ $nurse->name }} ({{ $nurse->cod_usuario }})</option>
                                     @endforeach
                                 </select>
                                 @error('enfermeroSeleccionado')

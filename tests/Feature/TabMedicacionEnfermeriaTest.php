@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Livewire\Cuidados\FichaPaciente;
+use App\Frontend\Livewire\Compartido\Clinica\FichaPaciente;
 use App\Models\AdultoMayor;
 use App\Models\AdministracionMedicacion;
 use App\Models\AsignacionResidenteJornada;
@@ -73,7 +73,7 @@ class TabMedicacionEnfermeriaTest extends TestCase
     {
         // A. Medicación futura (ej: 20:00)
         $medFuturo = Prescripcion::create([
-            'cod_am' => $this->adulto->cod_am,
+            'cod_residente' => $this->adulto->cod_residente,
             'nombre_medicamento' => 'Atorvastatina 20mg',
             'dosis' => '20 mg',
             'via_administracion' => 'Oral',
@@ -85,7 +85,7 @@ class TabMedicacionEnfermeriaTest extends TestCase
 
         // B. Medicación a la hora y C. Medicación atrasada (ej: 08:00 sin administrar)
         $medAtrasado = Prescripcion::create([
-            'cod_am' => $this->adulto->cod_am,
+            'cod_residente' => $this->adulto->cod_residente,
             'nombre_medicamento' => 'Paracetamol 1g',
             'dosis' => '1 g',
             'via_administracion' => 'Oral',
@@ -97,7 +97,7 @@ class TabMedicacionEnfermeriaTest extends TestCase
 
         // D. Medicación administrada (ej: Omeprazol 07:00)
         $medAdmin = Prescripcion::create([
-            'cod_am' => $this->adulto->cod_am,
+            'cod_residente' => $this->adulto->cod_residente,
             'nombre_medicamento' => 'Omeprazol 20mg',
             'dosis' => '20 mg',
             'via_administracion' => 'Oral',
@@ -121,7 +121,7 @@ class TabMedicacionEnfermeriaTest extends TestCase
 
         // E. Medicamento suspendido
         $medSusp = Prescripcion::create([
-            'cod_am' => $this->adulto->cod_am,
+            'cod_residente' => $this->adulto->cod_residente,
             'nombre_medicamento' => 'Digoxina 0.25mg',
             'dosis' => '0.25 mg',
             'via_administracion' => 'Oral',
@@ -133,7 +133,7 @@ class TabMedicacionEnfermeriaTest extends TestCase
 
         // F. Medicamento PRN
         $medPrn = Prescripcion::create([
-            'cod_am' => $this->adulto->cod_am,
+            'cod_residente' => $this->adulto->cod_residente,
             'nombre_medicamento' => 'Lactulosa 15ml',
             'dosis' => '15 ml',
             'via_administracion' => 'Oral',
@@ -146,7 +146,7 @@ class TabMedicacionEnfermeriaTest extends TestCase
         ]);
 
         // Probar renderizado completo de la pestaña
-        $test = Livewire::test(FichaPaciente::class, ['adulto' => $this->adulto->cod_am])
+        $test = Livewire::test(FichaPaciente::class, ['adulto' => $this->adulto->cod_residente])
             ->call('cambiarTab', 'medicacion')
             // Cabecera
             ->assertSee('MEDICACIÓN')
@@ -200,7 +200,7 @@ class TabMedicacionEnfermeriaTest extends TestCase
     public function test_medicacion_muestra_formato_am_pm_y_reloj_pc(): void
     {
         Prescripcion::create([
-            'cod_am' => $this->adulto->cod_am,
+            'cod_residente' => $this->adulto->cod_residente,
             'nombre_medicamento' => 'Paracetamol 1g',
             'dosis' => '1 g',
             'via_administracion' => 'Oral',
@@ -210,7 +210,7 @@ class TabMedicacionEnfermeriaTest extends TestCase
             'estado' => 'ACTIVO',
         ]);
 
-        Livewire::test(FichaPaciente::class, ['adulto' => $this->adulto->cod_am])
+        Livewire::test(FichaPaciente::class, ['adulto' => $this->adulto->cod_residente])
             ->call('cambiarTab', 'medicacion')
             // Cabecera con reloj PC y Turno AM/PM
             ->assertSee('Turno actual: 07:00 AM')
