@@ -14,6 +14,7 @@ export default {
         './resources/views/**/*.blade.php',
         './resources/frontend/scripts/**/*.js',
         './resources/frontend/scripts/**/*.blade.php',
+        './app/Frontend/Livewire/**/*.php',
     ],
 
     theme: {
