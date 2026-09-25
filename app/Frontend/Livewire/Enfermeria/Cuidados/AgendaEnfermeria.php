@@ -4,10 +4,10 @@ namespace App\Frontend\Livewire\Enfermeria\Cuidados;
 
 use App\Models\Alerta;
 use App\Models\AsignacionPersonal;
+use App\Models\AsignacionResidenteJornada;
 use App\Models\EjecucionCuidado;
 use App\Models\IntervencionCuidado;
 use App\Models\Jornada;
-use App\Models\Personal;
 use App\Models\PlanCuidado;
 use App\Models\ProgramacionCuidado;
 use App\Models\Residente;
@@ -150,13 +150,40 @@ class AgendaEnfermeria extends Component
         $this->procesandoRegistro = true;
 
         $user = Auth::user();
-        $codPersonal = $user?->personal?->cod_personal 
-            ?? Personal::where('cod_usuario', $user->cod_usuario)->value('cod_personal') 
-            ?? Personal::first()?->cod_personal 
-            ?? 'PER_0001';
+        $turno = app(TurnoEnfermeriaService::class)->autorizarMutacionEnfermeria(
+            $this->residenteId,
+            'ejecuciones_cuidado.crear',
+            $user,
+        );
+        $personal = $user?->personal()
+            ->where('estado', 'ACTIVO')
+            ->first();
+        abort_unless($personal, 409, 'El usuario no tiene un perfil de personal activo.');
 
-        $jornada = Jornada::whereDate('fecha_jornada', today())->first();
-        $codJornada = $jornada?->cod_jornada ?? 'JOR_DEFAULT';
+        $asignacion = AsignacionResidenteJornada::query()
+            ->with('jornada')
+            ->where('cod_residente', $this->residenteId)
+            ->where('cod_personal', $personal->cod_personal)
+            ->whereIn('estado', ['ACTIVA', 'ACTIVO', 'ASIGNADO'])
+            ->whereHas('jornada', fn ($query) => $query
+                ->where('cod_turno', $turno->cod_turno)
+                ->whereDate('fecha_jornada', today())
+                ->whereIn('estado', ['ABIERTA', 'ACTIVA', 'EN_CURSO']))
+            ->latest('fecha_hora')
+            ->first();
+        abort_unless($asignacion?->jornada, 409, 'No existe una jornada activa asignada para registrar el cuidado.');
+
+        $intervencionValida = IntervencionCuidado::query()
+            ->where('cod_intervencion', $this->intervencionId)
+            ->whereIn('estado', ['ACTIVA', 'ACTIVO'])
+            ->whereHas('plan', fn ($query) => $query
+                ->where('cod_residente', $this->residenteId)
+                ->whereIn('estado', ['ACTIVO', 'ACTIVA']))
+            ->exists();
+        abort_unless($intervencionValida, 422, 'La intervención no pertenece al plan activo del residente.');
+
+        $codPersonal = $personal->cod_personal;
+        $codJornada = $asignacion->cod_jornada;
 
         $horaProg = $this->datosModal['hora_programada'] ?? now()->format('H:i');
         $fechaHoraProgramada = Carbon::parse(today()->toDateString() . ' ' . $horaProg);
@@ -164,7 +191,8 @@ class AgendaEnfermeria extends Component
         // Idempotencia: evitar doble ejecución de la misma intervención y programación en el mismo turno
         $existente = EjecucionCuidado::where('cod_intervencion', $this->intervencionId)
             ->where('cod_residente', $this->residenteId)
-            ->whereDate('fecha_hora_programada', today())
+            ->where('cod_jornada', $codJornada)
+            ->where('fecha_hora_programada', $fechaHoraProgramada)
             ->first();
 
         if ($existente) {

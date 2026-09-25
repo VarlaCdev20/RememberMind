@@ -14,6 +14,7 @@ use App\Models\EjecucionCuidado;
 use App\Models\Herida;
 use App\Models\HistorialEstadoResidente;
 use App\Models\Incidente;
+use App\Models\IntervencionCuidado;
 use App\Models\Jornada;
 use App\Models\Personal;
 use App\Models\PlanCuidado;
@@ -198,5 +199,51 @@ class ModuloEnfermeriaIntegralTest extends TestCase
             'longitud' => 3.2,
             'ancho' => 1.5,
         ]);
+    }
+
+    public function test_agenda_registra_cuidados_en_la_jornada_real_sin_fallbacks(): void
+    {
+        $plan = PlanCuidado::create([
+            'cod_plan' => 'PLC_AGENDA_INT',
+            'cod_residente' => $this->residente->cod_residente,
+            'cod_area' => Area::query()->where('cod_area', 'ARE_TEST_INT')->value('cod_area'),
+            'cod_personal' => $this->personal->cod_personal,
+            'nombre' => 'Plan de movilidad',
+            'objetivo_general' => 'Mantener movilidad segura',
+            'fecha_hora_apertura' => now(),
+            'estado' => 'ACTIVO',
+        ]);
+        $intervencion = IntervencionCuidado::create([
+            'cod_intervencion' => 'INT_AGENDA_INT',
+            'cod_plan' => $plan->cod_plan,
+            'nombre' => 'Cambio postural',
+            'descripcion' => 'Realizar cambio postural según el horario indicado.',
+            'prioridad' => 'MEDIA',
+            'estado' => 'ACTIVA',
+        ]);
+
+        foreach (['08:00', '12:00'] as $hora) {
+            Livewire::test(AgendaEnfermeria::class)
+                ->call(
+                    'abrirModalRegistrar',
+                    $intervencion->cod_intervencion,
+                    $this->residente->cod_residente,
+                    null,
+                    $hora,
+                )
+                ->set('resultado', 'Satisfactorio')
+                ->call('registrarEjecucion')
+                ->assertHasNoErrors();
+        }
+
+        $this->assertDatabaseCount('ejecuciones_cuidado', 2);
+        $this->assertSame(
+            [$this->jornada->cod_jornada],
+            EjecucionCuidado::query()->pluck('cod_jornada')->unique()->values()->all(),
+        );
+        $this->assertSame(
+            [$this->personal->cod_personal],
+            EjecucionCuidado::query()->pluck('cod_personal')->unique()->values()->all(),
+        );
     }
 }
