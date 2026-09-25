@@ -1756,14 +1756,14 @@ class FichaPaciente extends Component
         $totalAdmin = $this->adultoMayor->administracionesMedicacion->count();
         $adminOk = $this->adultoMayor->administracionesMedicacion->where('administrado', true)->count();
         $adminOmitidas = $totalAdmin - $adminOk;
-        $adherenciaPct = $totalAdmin > 0 ? (int) round(($adminOk / $totalAdmin) * 100) : 100;
+        $adherenciaPct = $totalAdmin > 0 ? (int) round(($adminOk / $totalAdmin) * 100) : 0;
 
         // 3. Cumplimiento cuidados
         $totalTareas = EjecucionCuidado::where('cod_residente', $this->adultoMayor->cod_residente)->count();
         $tareasRealizadas = EjecucionCuidado::where('cod_residente', $this->adultoMayor->cod_residente)
             ->whereIn('estado', ['REALIZADA', 'EJECUTADA', 'COMPLETADA'])
             ->count();
-        $cumplimientoPct = $totalTareas > 0 ? (int) round(($tareasRealizadas / $totalTareas) * 100) : 100;
+        $cumplimientoPct = $totalTareas > 0 ? (int) round(($tareasRealizadas / $totalTareas) * 100) : 0;
 
         // 4. Seguimientos
         $totalSeguimientos = $this->adultoMayor->pasesTurno()->count();
@@ -1779,7 +1779,9 @@ class FichaPaciente extends Component
         if ($ultimaFuncional) {
             $ultimaValoracion = [
                 'instrumento' => 'Índice de Barthel',
-                'resultado' => ($ultimaFuncional->indice_barthel ?? $ultimaFuncional->barthel_total ?? 90).'/100 ('.($ultimaFuncional->nivel_dependencia ?? 'Dependencia moderada').')',
+                'resultado' => ($ultimaFuncional->indice_barthel ?? $ultimaFuncional->barthel_total) !== null
+                    ? ($ultimaFuncional->indice_barthel ?? $ultimaFuncional->barthel_total).'/100'.($ultimaFuncional->nivel_dependencia ? " ({$ultimaFuncional->nivel_dependencia})" : '')
+                    : 'Resultado no registrado',
                 'fecha' => $ultimaFuncional->fecha_valoracion ? Carbon::parse($ultimaFuncional->fecha_valoracion)->format('d/m/Y') : 'Reciente',
                 'evaluador' => $ultimaFuncional->registradoPor?->usuario?->name ?? 'Equipo Asistencial',
             ];
@@ -1929,6 +1931,7 @@ class FichaPaciente extends Component
         };
 
         // Resúmenes estructurados de cada métrica para el selector reactivo
+        $sinDatosBadge = 'bg-slate-100 text-slate-700 border-slate-200';
         $metricasInfo = [
             'PA' => [
                 'clave' => 'PA',
@@ -1936,15 +1939,15 @@ class FichaPaciente extends Component
                 'titulo_grafico' => 'PRESIÓN ARTERIAL',
                 'subtitulo' => 'Evolución de presión sistólica y diastólica con rangos de normalidad',
                 'unidad' => 'mmHg',
-                'ultimo' => ($ultPas && $ultPad) ? "{$ultPas}/{$ultPad}" : ($ultimoSigno?->presion_arterial ?: '120/78'),
-                'ultimo_fmt' => (($ultPas && $ultPad) ? "{$ultPas}/{$ultPad}" : ($ultimoSigno?->presion_arterial ?: '120/78')).' mmHg',
-                'estado' => ($ultPas >= 140 || $ultPad >= 90) ? 'Elevada' : (($ultPas < 90 && $ultPas !== null) ? 'Hipotensión' : 'Normal'),
-                'estado_badge' => ($ultPas >= 140 || $ultPad >= 90) ? 'bg-rose-100 text-rose-700 border-rose-200' : 'bg-emerald-100 text-emerald-800 border-emerald-200',
+                'ultimo' => ($ultPas !== null && $ultPad !== null) ? "{$ultPas}/{$ultPad}" : ($ultimoSigno?->presion_arterial ?: 'Sin datos'),
+                'ultimo_fmt' => ($ultPas !== null && $ultPad !== null) ? "{$ultPas}/{$ultPad} mmHg" : ($ultimoSigno?->presion_arterial ? "{$ultimoSigno->presion_arterial} mmHg" : 'Sin datos'),
+                'estado' => ($ultPas === null || $ultPad === null) ? 'Sin datos' : (($ultPas >= 140 || $ultPad >= 90) ? 'Elevada' : ($ultPas < 90 ? 'Hipotensión' : 'Normal')),
+                'estado_badge' => ($ultPas === null || $ultPad === null) ? $sinDatosBadge : (($ultPas >= 140 || $ultPad >= 90) ? 'bg-rose-100 text-rose-700 border-rose-200' : 'bg-emerald-100 text-emerald-800 border-emerald-200'),
                 'min' => "{$statsSistolica['min']}/{$statsDiastolica['min']}",
                 'max' => "{$statsSistolica['max']}/{$statsDiastolica['max']}",
                 'promedio' => "{$statsSistolica['avg']}/{$statsDiastolica['avg']}",
-                'variacion' => ($diffPas != 0 || $diffPad != 0) ? (($diffPas <= 0 ? '↓ ' : '↑ ').$signoDiff($diffPas).' / '.$signoDiff($diffPad).' mmHg') : '= Sin variación',
-                'tendencia' => (abs($diffPas) <= 5 && abs($diffPad) <= 5) ? 'Tendencia estable' : ($diffPas > 5 ? 'Tendencia ascendente' : 'Tendencia descendente'),
+                'variacion' => ($ultPas !== null && $prevPas !== null && $ultPad !== null && $prevPad !== null) ? (($diffPas != 0 || $diffPad != 0) ? (($diffPas <= 0 ? '↓ ' : '↑ ').$signoDiff($diffPas).' / '.$signoDiff($diffPad).' mmHg') : '= Sin variación') : 'Sin registros comparables',
+                'tendencia' => ($ultPas !== null && $prevPas !== null) ? ((abs($diffPas) <= 5 && abs($diffPad) <= 5) ? 'Tendencia estable' : ($diffPas > 5 ? 'Tendencia ascendente' : 'Tendencia descendente')) : 'Datos insuficientes',
                 'icon' => 'ph-heartbeat',
                 'color' => '#EF4444',
                 'sparkline' => ['sistolica' => $sistolica, 'diastolica' => $diastolica],
@@ -1955,15 +1958,15 @@ class FichaPaciente extends Component
                 'titulo_grafico' => 'FRECUENCIA CARDÍACA',
                 'subtitulo' => 'Ritmo cardíaco y variabilidad en reposo',
                 'unidad' => 'lpm',
-                'ultimo' => $ultimoSigno?->frecuencia_cardiaca ? (string) $ultimoSigno->frecuencia_cardiaca : '74',
-                'ultimo_fmt' => ($ultimoSigno?->frecuencia_cardiaca ? (string) $ultimoSigno->frecuencia_cardiaca : '74').' lpm',
-                'estado' => ($ultimoSigno && $ultimoSigno->frecuencia_cardiaca > 100) ? 'Taquicardia' : (($ultimoSigno && $ultimoSigno->frecuencia_cardiaca < 55) ? 'Bradicardia' : 'Normal'),
-                'estado_badge' => ($ultimoSigno && ($ultimoSigno->frecuencia_cardiaca > 100 || $ultimoSigno->frecuencia_cardiaca < 55)) ? 'bg-amber-100 text-amber-800 border-amber-200' : 'bg-emerald-100 text-emerald-800 border-emerald-200',
+                'ultimo' => $ultimoSigno?->frecuencia_cardiaca !== null ? (string) $ultimoSigno->frecuencia_cardiaca : 'Sin datos',
+                'ultimo_fmt' => $ultimoSigno?->frecuencia_cardiaca !== null ? "{$ultimoSigno->frecuencia_cardiaca} lpm" : 'Sin datos',
+                'estado' => $ultimoSigno?->frecuencia_cardiaca === null ? 'Sin datos' : (($ultimoSigno->frecuencia_cardiaca > 100) ? 'Taquicardia' : (($ultimoSigno->frecuencia_cardiaca < 55) ? 'Bradicardia' : 'Normal')),
+                'estado_badge' => $ultimoSigno?->frecuencia_cardiaca === null ? $sinDatosBadge : (($ultimoSigno->frecuencia_cardiaca > 100 || $ultimoSigno->frecuencia_cardiaca < 55) ? 'bg-amber-100 text-amber-800 border-amber-200' : 'bg-emerald-100 text-emerald-800 border-emerald-200'),
                 'min' => $statsFc['min'],
                 'max' => $statsFc['max'],
                 'promedio' => $statsFc['avg'],
-                'variacion' => ($ultimoSigno && $penultimoSigno && $ultimoSigno->frecuencia_cardiaca && $penultimoSigno->frecuencia_cardiaca) ? (($ultimoSigno->frecuencia_cardiaca - $penultimoSigno->frecuencia_cardiaca >= 0 ? '↑ +' : '↓ ').($ultimoSigno->frecuencia_cardiaca - $penultimoSigno->frecuencia_cardiaca).' lpm') : '= Estable',
-                'tendencia' => 'Tendencia estable',
+                'variacion' => ($ultimoSigno?->frecuencia_cardiaca !== null && $penultimoSigno?->frecuencia_cardiaca !== null) ? (($ultimoSigno->frecuencia_cardiaca - $penultimoSigno->frecuencia_cardiaca >= 0 ? '↑ +' : '↓ ').($ultimoSigno->frecuencia_cardiaca - $penultimoSigno->frecuencia_cardiaca).' lpm') : 'Sin registros comparables',
+                'tendencia' => ($ultimoSigno?->frecuencia_cardiaca !== null && $penultimoSigno?->frecuencia_cardiaca !== null) ? 'Tendencia calculada con registros reales' : 'Datos insuficientes',
                 'icon' => 'ph-activity',
                 'color' => '#F59E0B',
                 'sparkline' => $fc,
@@ -1974,15 +1977,15 @@ class FichaPaciente extends Component
                 'titulo_grafico' => 'SATURACIÓN DE OXÍGENO',
                 'subtitulo' => 'Oximetría de pulso y oxigenación tisular',
                 'unidad' => '% SpO₂',
-                'ultimo' => $ultimoSigno?->saturacion ? "{$ultimoSigno->saturacion}%" : '97%',
-                'ultimo_fmt' => ($ultimoSigno?->saturacion ? (string) $ultimoSigno->saturacion : '97').'% SpO₂',
-                'estado' => ($ultimoSigno && $ultimoSigno->saturacion < 92) ? 'Desaturación' : (($ultimoSigno && $ultimoSigno->saturacion < 95) ? 'Aceptable' : 'Normal'),
-                'estado_badge' => ($ultimoSigno && $ultimoSigno->saturacion < 92) ? 'bg-rose-100 text-rose-700 border-rose-200' : 'bg-emerald-100 text-emerald-800 border-emerald-200',
+                'ultimo' => $ultimoSigno?->saturacion !== null ? "{$ultimoSigno->saturacion}%" : 'Sin datos',
+                'ultimo_fmt' => $ultimoSigno?->saturacion !== null ? "{$ultimoSigno->saturacion}% SpO₂" : 'Sin datos',
+                'estado' => $ultimoSigno?->saturacion === null ? 'Sin datos' : (($ultimoSigno->saturacion < 92) ? 'Desaturación' : (($ultimoSigno->saturacion < 95) ? 'Aceptable' : 'Normal')),
+                'estado_badge' => $ultimoSigno?->saturacion === null ? $sinDatosBadge : (($ultimoSigno->saturacion < 92) ? 'bg-rose-100 text-rose-700 border-rose-200' : 'bg-emerald-100 text-emerald-800 border-emerald-200'),
                 'min' => $statsSpo2['min'],
                 'max' => $statsSpo2['max'],
                 'promedio' => $statsSpo2['avg'],
-                'variacion' => ($ultimoSigno && $penultimoSigno && $ultimoSigno->saturacion && $penultimoSigno->saturacion) ? (($ultimoSigno->saturacion - $penultimoSigno->saturacion >= 0 ? '↑ +' : '↓ ').($ultimoSigno->saturacion - $penultimoSigno->saturacion).'%') : '= Estable',
-                'tendencia' => 'Tendencia estable',
+                'variacion' => ($ultimoSigno?->saturacion !== null && $penultimoSigno?->saturacion !== null) ? (($ultimoSigno->saturacion - $penultimoSigno->saturacion >= 0 ? '↑ +' : '↓ ').($ultimoSigno->saturacion - $penultimoSigno->saturacion).'%') : 'Sin registros comparables',
+                'tendencia' => ($ultimoSigno?->saturacion !== null && $penultimoSigno?->saturacion !== null) ? 'Tendencia calculada con registros reales' : 'Datos insuficientes',
                 'icon' => 'ph-drop',
                 'color' => '#10B981',
                 'sparkline' => $spo2,
@@ -1993,15 +1996,15 @@ class FichaPaciente extends Component
                 'titulo_grafico' => 'TEMPERATURA CORPORAL',
                 'subtitulo' => 'Curva térmica y detección temprana de cuadros febriles',
                 'unidad' => '°C',
-                'ultimo' => $ultimoSigno?->temperatura ? "{$ultimoSigno->temperatura}°C" : '36.5°C',
-                'ultimo_fmt' => ($ultimoSigno?->temperatura ? (string) $ultimoSigno->temperatura : '36.5').' °C',
-                'estado' => ($ultimoSigno && $ultimoSigno->temperatura >= 38.0) ? 'Fiebre' : (($ultimoSigno && $ultimoSigno->temperatura >= 37.3) ? 'Febrícula' : 'Afebril'),
-                'estado_badge' => ($ultimoSigno && $ultimoSigno->temperatura >= 37.5) ? 'bg-amber-100 text-amber-800 border-amber-200' : 'bg-emerald-100 text-emerald-800 border-emerald-200',
+                'ultimo' => $ultimoSigno?->temperatura !== null ? "{$ultimoSigno->temperatura}°C" : 'Sin datos',
+                'ultimo_fmt' => $ultimoSigno?->temperatura !== null ? "{$ultimoSigno->temperatura} °C" : 'Sin datos',
+                'estado' => $ultimoSigno?->temperatura === null ? 'Sin datos' : (($ultimoSigno->temperatura >= 38.0) ? 'Fiebre' : (($ultimoSigno->temperatura >= 37.3) ? 'Febrícula' : 'Afebril')),
+                'estado_badge' => $ultimoSigno?->temperatura === null ? $sinDatosBadge : (($ultimoSigno->temperatura >= 37.5) ? 'bg-amber-100 text-amber-800 border-amber-200' : 'bg-emerald-100 text-emerald-800 border-emerald-200'),
                 'min' => $statsTemp['min'],
                 'max' => $statsTemp['max'],
                 'promedio' => $statsTemp['avg'],
-                'variacion' => ($ultimoSigno && $penultimoSigno && $ultimoSigno->temperatura && $penultimoSigno->temperatura) ? (($ultimoSigno->temperatura - $penultimoSigno->temperatura >= 0 ? '↑ +' : '↓ ').number_format($ultimoSigno->temperatura - $penultimoSigno->temperatura, 1).' °C') : '= Estable',
-                'tendencia' => 'Afebril y estable',
+                'variacion' => ($ultimoSigno?->temperatura !== null && $penultimoSigno?->temperatura !== null) ? (($ultimoSigno->temperatura - $penultimoSigno->temperatura >= 0 ? '↑ +' : '↓ ').number_format($ultimoSigno->temperatura - $penultimoSigno->temperatura, 1).' °C') : 'Sin registros comparables',
+                'tendencia' => ($ultimoSigno?->temperatura !== null && $penultimoSigno?->temperatura !== null) ? 'Tendencia calculada con registros reales' : 'Datos insuficientes',
                 'icon' => 'ph-thermometer',
                 'color' => '#EA580C',
                 'sparkline' => $temp,
@@ -2012,15 +2015,15 @@ class FichaPaciente extends Component
                 'titulo_grafico' => 'FRECUENCIA RESPIRATORIA',
                 'subtitulo' => 'Monitoreo ventilatorio y patrón respiratorio',
                 'unidad' => 'rpm',
-                'ultimo' => $ultimoSigno?->frecuencia_respiratoria ? (string) $ultimoSigno->frecuencia_respiratoria : '18',
-                'ultimo_fmt' => ($ultimoSigno?->frecuencia_respiratoria ? (string) $ultimoSigno->frecuencia_respiratoria : '18').' rpm',
-                'estado' => ($ultimoSigno && $ultimoSigno->frecuencia_respiratoria > 22) ? 'Taquipnea' : (($ultimoSigno && $ultimoSigno->frecuencia_respiratoria < 12) ? 'Bradipnea' : 'Eupnea'),
-                'estado_badge' => ($ultimoSigno && ($ultimoSigno->frecuencia_respiratoria > 22 || $ultimoSigno->frecuencia_respiratoria < 12)) ? 'bg-amber-100 text-amber-800 border-amber-200' : 'bg-emerald-100 text-emerald-800 border-emerald-200',
+                'ultimo' => $ultimoSigno?->frecuencia_respiratoria !== null ? (string) $ultimoSigno->frecuencia_respiratoria : 'Sin datos',
+                'ultimo_fmt' => $ultimoSigno?->frecuencia_respiratoria !== null ? "{$ultimoSigno->frecuencia_respiratoria} rpm" : 'Sin datos',
+                'estado' => $ultimoSigno?->frecuencia_respiratoria === null ? 'Sin datos' : (($ultimoSigno->frecuencia_respiratoria > 22) ? 'Taquipnea' : (($ultimoSigno->frecuencia_respiratoria < 12) ? 'Bradipnea' : 'Eupnea')),
+                'estado_badge' => $ultimoSigno?->frecuencia_respiratoria === null ? $sinDatosBadge : (($ultimoSigno->frecuencia_respiratoria > 22 || $ultimoSigno->frecuencia_respiratoria < 12) ? 'bg-amber-100 text-amber-800 border-amber-200' : 'bg-emerald-100 text-emerald-800 border-emerald-200'),
                 'min' => $statsFr['min'],
                 'max' => $statsFr['max'],
                 'promedio' => $statsFr['avg'],
-                'variacion' => ($ultimoSigno && $penultimoSigno && $ultimoSigno->frecuencia_respiratoria && $penultimoSigno->frecuencia_respiratoria) ? (($ultimoSigno->frecuencia_respiratoria - $penultimoSigno->frecuencia_respiratoria >= 0 ? '↑ +' : '↓ ').($ultimoSigno->frecuencia_respiratoria - $penultimoSigno->frecuencia_respiratoria).' rpm') : '= Estable',
-                'tendencia' => 'Patrón ventilatorio estable',
+                'variacion' => ($ultimoSigno?->frecuencia_respiratoria !== null && $penultimoSigno?->frecuencia_respiratoria !== null) ? (($ultimoSigno->frecuencia_respiratoria - $penultimoSigno->frecuencia_respiratoria >= 0 ? '↑ +' : '↓ ').($ultimoSigno->frecuencia_respiratoria - $penultimoSigno->frecuencia_respiratoria).' rpm') : 'Sin registros comparables',
+                'tendencia' => ($ultimoSigno?->frecuencia_respiratoria !== null && $penultimoSigno?->frecuencia_respiratoria !== null) ? 'Tendencia calculada con registros reales' : 'Datos insuficientes',
                 'icon' => 'ph-wind',
                 'color' => '#06B6D4',
                 'sparkline' => $fr,
@@ -2031,15 +2034,15 @@ class FichaPaciente extends Component
                 'titulo_grafico' => 'NIVEL DE DOLOR (ESCALA EVA)',
                 'subtitulo' => 'Monitoreo de dolor percibido y respuesta analgésica',
                 'unidad' => 'Escala 0-10',
-                'ultimo' => ($ultimoSigno && $ultimoSigno->dolor !== null) ? "{$ultimoSigno->dolor}/10" : (($ultimoSigno && $ultimoSigno->nivel_dolor !== null) ? "{$ultimoSigno->nivel_dolor}/10" : '0/10'),
-                'ultimo_fmt' => (($ultimoSigno && $ultimoSigno->dolor !== null) ? (string) $ultimoSigno->dolor : (($ultimoSigno && $ultimoSigno->nivel_dolor !== null) ? (string) $ultimoSigno->nivel_dolor : '0')).'/10',
-                'estado' => ($ultimoSigno && ($ultimoSigno->dolor ?? $ultimoSigno->nivel_dolor ?? 0) >= 4) ? 'Moderado' : (($ultimoSigno && ($ultimoSigno->dolor ?? $ultimoSigno->nivel_dolor ?? 0) > 0) ? 'Leve' : 'Sin dolor'),
-                'estado_badge' => ($ultimoSigno && ($ultimoSigno->dolor ?? $ultimoSigno->nivel_dolor ?? 0) >= 4) ? 'bg-amber-100 text-amber-800 border-amber-200' : 'bg-emerald-100 text-emerald-800 border-emerald-200',
+                'ultimo' => ($ultimoSigno?->dolor ?? $ultimoSigno?->nivel_dolor) !== null ? ($ultimoSigno->dolor ?? $ultimoSigno->nivel_dolor).'/10' : 'Sin datos',
+                'ultimo_fmt' => ($ultimoSigno?->dolor ?? $ultimoSigno?->nivel_dolor) !== null ? ($ultimoSigno->dolor ?? $ultimoSigno->nivel_dolor).'/10' : 'Sin datos',
+                'estado' => ($ultimoSigno?->dolor ?? $ultimoSigno?->nivel_dolor) === null ? 'Sin datos' : ((($ultimoSigno->dolor ?? $ultimoSigno->nivel_dolor) >= 4) ? 'Moderado' : ((($ultimoSigno->dolor ?? $ultimoSigno->nivel_dolor) > 0) ? 'Leve' : 'Sin dolor')),
+                'estado_badge' => ($ultimoSigno?->dolor ?? $ultimoSigno?->nivel_dolor) === null ? $sinDatosBadge : ((($ultimoSigno->dolor ?? $ultimoSigno->nivel_dolor) >= 4) ? 'bg-amber-100 text-amber-800 border-amber-200' : 'bg-emerald-100 text-emerald-800 border-emerald-200'),
                 'min' => $statsDolor['min'],
                 'max' => $statsDolor['max'],
                 'promedio' => $statsDolor['avg'],
-                'variacion' => ($ultimoSigno && $penultimoSigno && ($ultimoSigno->dolor ?? $ultimoSigno->nivel_dolor) !== null && ($penultimoSigno->dolor ?? $penultimoSigno->nivel_dolor) !== null) ? (($ultimoSigno->dolor ?? $ultimoSigno->nivel_dolor) - ($penultimoSigno->dolor ?? $penultimoSigno->nivel_dolor) >= 0 ? '↑ +' : '↓ ').(($ultimoSigno->dolor ?? $ultimoSigno->nivel_dolor) - ($penultimoSigno->dolor ?? $penultimoSigno->nivel_dolor)) : '= Controlado',
-                'tendencia' => 'Dolor bajo control clínico',
+                'variacion' => ($ultimoSigno && $penultimoSigno && ($ultimoSigno->dolor ?? $ultimoSigno->nivel_dolor) !== null && ($penultimoSigno->dolor ?? $penultimoSigno->nivel_dolor) !== null) ? (($ultimoSigno->dolor ?? $ultimoSigno->nivel_dolor) - ($penultimoSigno->dolor ?? $penultimoSigno->nivel_dolor) >= 0 ? '↑ +' : '↓ ').(($ultimoSigno->dolor ?? $ultimoSigno->nivel_dolor) - ($penultimoSigno->dolor ?? $penultimoSigno->nivel_dolor)) : 'Sin registros comparables',
+                'tendencia' => ($ultimoSigno?->dolor ?? $ultimoSigno?->nivel_dolor) !== null ? 'Basado en la última valoración registrada' : 'Datos insuficientes',
                 'icon' => 'ph-smiley-meh',
                 'color' => '#8B5CF6',
                 'sparkline' => $dolor,
@@ -2050,15 +2053,15 @@ class FichaPaciente extends Component
                 'titulo_grafico' => 'GLUCEMIA CAPILAR',
                 'subtitulo' => 'Control de glucosa en sangre en ayunas y postprandial',
                 'unidad' => 'mg/dL',
-                'ultimo' => $ultimoSigno?->glucosa ? "{$ultimoSigno->glucosa} mg/dL" : '98 mg/dL',
-                'ultimo_fmt' => ($ultimoSigno?->glucosa ? (string) $ultimoSigno->glucosa : '98').' mg/dL',
-                'estado' => ($ultimoSigno && $ultimoSigno->glucosa > 140) ? 'Hiperglucemia' : (($ultimoSigno && $ultimoSigno->glucosa < 70) ? 'Hipoglucemia' : 'Normal'),
-                'estado_badge' => ($ultimoSigno && ($ultimoSigno->glucosa > 140 || $ultimoSigno->glucosa < 70)) ? 'bg-amber-100 text-amber-800 border-amber-200' : 'bg-emerald-100 text-emerald-800 border-emerald-200',
+                'ultimo' => $ultimoSigno?->glucosa !== null ? "{$ultimoSigno->glucosa} mg/dL" : 'Sin datos',
+                'ultimo_fmt' => $ultimoSigno?->glucosa !== null ? "{$ultimoSigno->glucosa} mg/dL" : 'Sin datos',
+                'estado' => $ultimoSigno?->glucosa === null ? 'Sin datos' : (($ultimoSigno->glucosa > 140) ? 'Hiperglucemia' : (($ultimoSigno->glucosa < 70) ? 'Hipoglucemia' : 'Normal')),
+                'estado_badge' => $ultimoSigno?->glucosa === null ? $sinDatosBadge : (($ultimoSigno->glucosa > 140 || $ultimoSigno->glucosa < 70) ? 'bg-amber-100 text-amber-800 border-amber-200' : 'bg-emerald-100 text-emerald-800 border-emerald-200'),
                 'min' => $statsGlucosa['min'],
                 'max' => $statsGlucosa['max'],
                 'promedio' => $statsGlucosa['avg'],
-                'variacion' => '= Estable',
-                'tendencia' => 'Perfil glucémico controlado',
+                'variacion' => 'Sin registros comparables',
+                'tendencia' => $ultimoSigno?->glucosa !== null ? 'Basado en el último registro' : 'Datos insuficientes',
                 'icon' => 'ph-drop-half-bottom',
                 'color' => '#0284C7',
                 'sparkline' => $glucosa,
@@ -2069,15 +2072,15 @@ class FichaPaciente extends Component
                 'titulo_grafico' => 'PESO CORPORAL',
                 'subtitulo' => 'Monitoreo ponderal continuo',
                 'unidad' => 'kg',
-                'ultimo' => $ultimoSigno?->peso ? "{$ultimoSigno->peso} kg" : '68.5 kg',
-                'ultimo_fmt' => ($ultimoSigno?->peso ? (string) $ultimoSigno->peso : '68.5').' kg',
-                'estado' => 'Estable',
-                'estado_badge' => 'bg-emerald-100 text-emerald-800 border-emerald-200',
+                'ultimo' => $ultimoSigno?->peso !== null ? "{$ultimoSigno->peso} kg" : 'Sin datos',
+                'ultimo_fmt' => $ultimoSigno?->peso !== null ? "{$ultimoSigno->peso} kg" : 'Sin datos',
+                'estado' => $ultimoSigno?->peso === null ? 'Sin datos' : 'Registrado',
+                'estado_badge' => $ultimoSigno?->peso === null ? $sinDatosBadge : 'bg-blue-100 text-blue-800 border-blue-200',
                 'min' => $statsPeso['min'],
                 'max' => $statsPeso['max'],
                 'promedio' => $statsPeso['avg'],
-                'variacion' => '= Estable',
-                'tendencia' => 'Peso estable',
+                'variacion' => 'Sin registros comparables',
+                'tendencia' => $ultimoSigno?->peso !== null ? 'Basado en el último registro' : 'Datos insuficientes',
                 'icon' => 'ph-scales',
                 'color' => '#64748B',
                 'sparkline' => $peso,
@@ -2193,7 +2196,7 @@ class FichaPaciente extends Component
             }
         }
 
-        // Si no hay alteraciones patológicas, mostrar los últimos controles con estado normal para mantener riqueza visual
+        // Si no hay alteraciones, mostrar controles reales sin inferir valores ni diagnósticos.
         if ($eventosRelevantes->isEmpty() && $todosSignosOrdenados->isNotEmpty()) {
             foreach ($todosSignosOrdenados->reverse()->take(3) as $s) {
                 $fechaHoraFmt = '';
@@ -2205,10 +2208,15 @@ class FichaPaciente extends Component
                 $eventosRelevantes->push([
                     'fecha_hora' => $fechaHoraFmt ?: 'Reciente',
                     'evento' => 'Control hemodinámico de rutina',
-                    'motivo' => $s->observacion ?: 'Parámetros basales normales en rango de seguridad',
-                    'valor' => ($s->presion_arterial ?: '120/80').' · '.($s->frecuencia_cardiaca ? $s->frecuencia_cardiaca.' lpm' : 'Normocárdico'),
-                    'estado' => 'Normal',
-                    'badge_bg' => 'bg-emerald-100 text-emerald-800 border-emerald-200',
+                    'motivo' => $s->observacion ?: 'Control registrado sin observaciones adicionales.',
+                    'valor' => collect([
+                        $s->presion_arterial ? "{$s->presion_arterial} mmHg" : null,
+                        $s->frecuencia_cardiaca !== null ? "{$s->frecuencia_cardiaca} lpm" : null,
+                        $s->saturacion !== null ? "{$s->saturacion}% SpO₂" : null,
+                        $s->temperatura !== null ? "{$s->temperatura} °C" : null,
+                    ])->filter()->join(' · ') ?: 'Sin valores cuantitativos registrados',
+                    'estado' => 'Registrado',
+                    'badge_bg' => 'bg-blue-100 text-blue-800 border-blue-200',
                     'icon' => 'ph-check-circle',
                     'icon_color' => 'text-emerald-600',
                     'registro' => $s,
@@ -2220,10 +2228,10 @@ class FichaPaciente extends Component
         $resumenPeriodoActivo = $metricasInfo[$metricaActivaKey] ?? $metricasInfo['PA'];
         if ($ultimoSigno && $ultimoSigno->fecha) {
             $cUltFecha = $ultimoSigno->fecha instanceof Carbon ? $ultimoSigno->fecha : Carbon::parse(substr((string) $ultimoSigno->fecha, 0, 10));
-            $ultHoraFmt = $ultimoSigno->hora ? substr((string) $ultimoSigno->hora, 0, 5) : '08:00';
-            $resumenPeriodoActivo['ultimo_registro_fecha'] = $cUltFecha->format('d/m/Y').' '.$ultHoraFmt;
+            $ultHoraFmt = $ultimoSigno->hora ? substr((string) $ultimoSigno->hora, 0, 5) : null;
+            $resumenPeriodoActivo['ultimo_registro_fecha'] = trim($cUltFecha->format('d/m/Y').' '.($ultHoraFmt ?? ''));
         } else {
-            $resumenPeriodoActivo['ultimo_registro_fecha'] = now()->format('d/m/Y H:i');
+            $resumenPeriodoActivo['ultimo_registro_fecha'] = 'Sin registros';
         }
 
         return [

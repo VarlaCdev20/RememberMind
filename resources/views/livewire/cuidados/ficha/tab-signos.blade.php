@@ -40,9 +40,9 @@
         $pad = $s->presion_diastolica ?? (explode('/', $s->presion_arterial ?? '')[1] ?? null);
         $paStr = ($pas && $pad) ? "{$pas}/{$pad}" : ($s->presion_arterial ?: '--');
 
-        $estado = 'Normal';
-        $badgeClass = 'bg-emerald-100 text-emerald-800 border-emerald-200';
-        $criterioClinico = 'Constantes basales estables';
+        $estado = 'Registrado';
+        $badgeClass = 'bg-blue-100 text-blue-800 border-blue-200';
+        $criterioClinico = 'Control registrado';
 
         if ($pas && $pad && ($pas >= 140 || $pad >= 90)) {
             $estado = 'Elevada';
@@ -72,11 +72,13 @@
             $estado = 'Dolor';
             $badgeClass = 'bg-amber-100 text-amber-800 border-amber-200';
             $criterioClinico = "Dolor EVA " . ($s->dolor ?? $s->nivel_dolor) . "/10";
-        } else {
-            $criterioClinico = "Parámetros dentro de rango normal";
+        } elseif ($pas !== null || $pad !== null || $s->temperatura !== null || $s->saturacion !== null || $s->frecuencia_cardiaca !== null) {
+            $estado = 'Sin alertas automáticas';
+            $badgeClass = 'bg-emerald-100 text-emerald-800 border-emerald-200';
+            $criterioClinico = 'Los valores registrados no activaron los umbrales configurados';
         }
 
-        $obs = $s->observacion ?: ($s->observaciones ?: 'Control rutinario sin incidencias manifestadas.');
+        $obs = $s->observacion ?: ($s->observaciones ?: 'Sin observaciones registradas.');
 
         return [
             'id' => $s->cod_signo,
@@ -369,21 +371,21 @@
                     <span class="text-[9px] font-bold uppercase text-[var(--rm-text-muted)] block">Mínimo</span>
                     <span class="text-xs font-black text-[var(--rm-text-title)] mt-0.5 block"
                           x-text="resumenActivo.min || '--'">
-                        110/70
+                        --
                     </span>
                 </div>
                 <div class="rounded-lg bg-[var(--rm-surface-alt)]/60 border border-[var(--rm-border)]/60 p-2">
                     <span class="text-[9px] font-bold uppercase text-[var(--rm-text-muted)] block">Máximo</span>
                     <span class="text-xs font-black text-[var(--rm-text-title)] mt-0.5 block"
                           x-text="resumenActivo.max || '--'">
-                        148/92
+                        --
                     </span>
                 </div>
                 <div class="rounded-lg bg-[var(--rm-surface-alt)]/60 border border-[var(--rm-border)]/60 p-2">
                     <span class="text-[9px] font-bold uppercase text-[var(--rm-text-muted)] block">Promedio</span>
                     <span class="text-xs font-black text-[var(--rm-text-title)] mt-0.5 block"
                           x-text="resumenActivo.promedio || '--'">
-                        125/80
+                        --
                     </span>
                 </div>
             </div>
@@ -395,13 +397,13 @@
                 </span>
                 <div class="flex items-center justify-between">
                     <span class="text-xs font-bold text-[var(--rm-text-title)]"
-                          x-text="resumenActivo.variacion || '+2 mmHg vs toma previa'">
-                        +2 mmHg vs toma previa
+                          x-text="resumenActivo.variacion || 'Sin registros comparables'">
+                        Sin registros comparables
                     </span>
                     <span class="inline-flex items-center text-xs font-bold"
                           :class="(resumenActivo.variacion && resumenActivo.variacion.includes('-')) ? 'text-blue-600' : 'text-rose-600'">
                         <i class="ph-bold" :class="(resumenActivo.variacion && resumenActivo.variacion.includes('-')) ? 'ph-arrow-down' : 'ph-arrow-up'"></i>
-                        <span x-text="resumenActivo.tendencia || 'Estable'"></span>
+                        <span x-text="resumenActivo.tendencia || 'Datos insuficientes'"></span>
                     </span>
                 </div>
             </div>
@@ -436,15 +438,15 @@
                     <span class="text-xs font-bold text-[var(--rm-text-title)]">Presión art.</span>
                 </div>
                 <span class="text-[9px] font-bold px-1.5 py-0.2 rounded border"
-                      :class="metricasInfo['PA']?.estado_badge || 'bg-emerald-100 text-emerald-800 border-emerald-200'"
-                      x-text="metricasInfo['PA']?.estado || 'Normal'">
-                    Normal
+                      :class="metricasInfo['PA']?.estado_badge || 'bg-slate-100 text-slate-700 border-slate-200'"
+                      x-text="metricasInfo['PA']?.estado || 'Sin datos'">
+                    Sin datos
                 </span>
             </div>
             <div>
                 <span class="text-base font-black text-[var(--rm-text-title)] block"
-                      x-text="metricasInfo['PA']?.ultimo || '120/78'">
-                    120/78
+                      x-text="metricasInfo['PA']?.ultimo || 'Sin datos'">
+                    Sin datos
                 </span>
                 <span class="text-[10px] text-[var(--rm-text-muted)] font-medium">mmHg</span>
             </div>
@@ -467,15 +469,15 @@
                     <span class="text-xs font-bold text-[var(--rm-text-title)]">Frec. card.</span>
                 </div>
                 <span class="text-[9px] font-bold px-1.5 py-0.2 rounded border"
-                      :class="metricasInfo['FC']?.estado_badge || 'bg-emerald-100 text-emerald-800 border-emerald-200'"
-                      x-text="metricasInfo['FC']?.estado || 'Normal'">
-                    Normal
+                      :class="metricasInfo['FC']?.estado_badge || 'bg-slate-100 text-slate-700 border-slate-200'"
+                      x-text="metricasInfo['FC']?.estado || 'Sin datos'">
+                    Sin datos
                 </span>
             </div>
             <div>
                 <span class="text-base font-black text-[var(--rm-text-title)] block"
-                      x-text="metricasInfo['FC']?.ultimo || '72'">
-                    72
+                      x-text="metricasInfo['FC']?.ultimo || 'Sin datos'">
+                    Sin datos
                 </span>
                 <span class="text-[10px] text-[var(--rm-text-muted)] font-medium">lpm</span>
             </div>
@@ -498,15 +500,15 @@
                     <span class="text-xs font-bold text-[var(--rm-text-title)]">Saturación O₂</span>
                 </div>
                 <span class="text-[9px] font-bold px-1.5 py-0.2 rounded border"
-                      :class="metricasInfo['SPO2']?.estado_badge || 'bg-emerald-100 text-emerald-800 border-emerald-200'"
-                      x-text="metricasInfo['SPO2']?.estado || 'Normal'">
-                    Normal
+                      :class="metricasInfo['SPO2']?.estado_badge || 'bg-slate-100 text-slate-700 border-slate-200'"
+                      x-text="metricasInfo['SPO2']?.estado || 'Sin datos'">
+                    Sin datos
                 </span>
             </div>
             <div>
                 <span class="text-base font-black text-[var(--rm-text-title)] block"
-                      x-text="metricasInfo['SPO2']?.ultimo || '97%'">
-                    97%
+                      x-text="metricasInfo['SPO2']?.ultimo || 'Sin datos'">
+                    Sin datos
                 </span>
                 <span class="text-[10px] text-[var(--rm-text-muted)] font-medium">% SpO₂</span>
             </div>
@@ -529,15 +531,15 @@
                     <span class="text-xs font-bold text-[var(--rm-text-title)]">Temperatura</span>
                 </div>
                 <span class="text-[9px] font-bold px-1.5 py-0.2 rounded border"
-                      :class="metricasInfo['TEMP']?.estado_badge || 'bg-emerald-100 text-emerald-800 border-emerald-200'"
-                      x-text="metricasInfo['TEMP']?.estado || 'Afebril'">
-                    Afebril
+                      :class="metricasInfo['TEMP']?.estado_badge || 'bg-slate-100 text-slate-700 border-slate-200'"
+                      x-text="metricasInfo['TEMP']?.estado || 'Sin datos'">
+                    Sin datos
                 </span>
             </div>
             <div>
                 <span class="text-base font-black text-[var(--rm-text-title)] block"
-                      x-text="metricasInfo['TEMP']?.ultimo || '36.5°C'">
-                    36.5°C
+                      x-text="metricasInfo['TEMP']?.ultimo || 'Sin datos'">
+                    Sin datos
                 </span>
                 <span class="text-[10px] text-[var(--rm-text-muted)] font-medium">°C</span>
             </div>
@@ -560,15 +562,15 @@
                     <span class="text-xs font-bold text-[var(--rm-text-title)]">Frec. resp.</span>
                 </div>
                 <span class="text-[9px] font-bold px-1.5 py-0.2 rounded border"
-                      :class="metricasInfo['FR']?.estado_badge || 'bg-emerald-100 text-emerald-800 border-emerald-200'"
-                      x-text="metricasInfo['FR']?.estado || 'Eupnea'">
-                    Eupnea
+                      :class="metricasInfo['FR']?.estado_badge || 'bg-slate-100 text-slate-700 border-slate-200'"
+                      x-text="metricasInfo['FR']?.estado || 'Sin datos'">
+                    Sin datos
                 </span>
             </div>
             <div>
                 <span class="text-base font-black text-[var(--rm-text-title)] block"
-                      x-text="metricasInfo['FR']?.ultimo || '18'">
-                    18
+                      x-text="metricasInfo['FR']?.ultimo || 'Sin datos'">
+                    Sin datos
                 </span>
                 <span class="text-[10px] text-[var(--rm-text-muted)] font-medium">rpm</span>
             </div>
@@ -591,15 +593,15 @@
                     <span class="text-xs font-bold text-[var(--rm-text-title)]">Dolor EVA</span>
                 </div>
                 <span class="text-[9px] font-bold px-1.5 py-0.2 rounded border"
-                      :class="metricasInfo['DOLOR']?.estado_badge || 'bg-emerald-100 text-emerald-800 border-emerald-200'"
-                      x-text="metricasInfo['DOLOR']?.estado || 'Leve'">
-                    Leve
+                      :class="metricasInfo['DOLOR']?.estado_badge || 'bg-slate-100 text-slate-700 border-slate-200'"
+                      x-text="metricasInfo['DOLOR']?.estado || 'Sin datos'">
+                    Sin datos
                 </span>
             </div>
             <div>
                 <span class="text-base font-black text-[var(--rm-text-title)] block"
-                      x-text="metricasInfo['DOLOR']?.ultimo || '2/10'">
-                    2/10
+                      x-text="metricasInfo['DOLOR']?.ultimo || 'Sin datos'">
+                    Sin datos
                 </span>
                 <span class="text-[10px] text-[var(--rm-text-muted)] font-medium">Escala 0-10</span>
             </div>
@@ -1836,31 +1838,31 @@ document.addEventListener('alpine:init', () => {
                 },
                 {
                     id: 'sparklineCanvasFC',
-                    dataA: this.fc.length ? this.fc : [72, 75, 71, 74, 72, 73, 72],
+                    dataA: this.fc,
                     colorA: '#DC2626',
                     yLimits: { min: 50, max: 110 }
                 },
                 {
                     id: 'sparklineCanvasSPO2',
-                    dataA: this.spo2.length ? this.spo2 : [97, 98, 97, 96, 98, 97, 97],
+                    dataA: this.spo2,
                     colorA: '#059669',
                     yLimits: { min: 88, max: 100 }
                 },
                 {
                     id: 'sparklineCanvasTEMP',
-                    dataA: this.temp.length ? this.temp : [36.5, 36.6, 36.4, 36.7, 36.5, 36.5, 36.5],
+                    dataA: this.temp,
                     colorA: '#EA580C',
                     yLimits: { min: 35.0, max: 38.5 }
                 },
                 {
                     id: 'sparklineCanvasFR',
-                    dataA: this.fr.length ? this.fr : [18, 19, 17, 18, 18, 18, 18],
+                    dataA: this.fr,
                     colorA: '#0891B2',
                     yLimits: { min: 10, max: 26 }
                 },
                 {
                     id: 'sparklineCanvasDOLOR',
-                    dataA: this.dolor.length ? this.dolor : [2, 3, 2, 2, 1, 2, 2],
+                    dataA: this.dolor,
                     colorA: '#7C3AED',
                     yLimits: { min: 0, max: 10 }
                 },
