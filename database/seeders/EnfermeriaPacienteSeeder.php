@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\DB;
 use App\Models\User;
 use App\Models\Personal;
 use Carbon\Carbon;
+use Illuminate\Support\Str;
 
 class EnfermeriaPacienteSeeder extends Seeder
 {
@@ -72,14 +73,18 @@ class EnfermeriaPacienteSeeder extends Seeder
         );
 
         // 3. USUARIO Y PERSONAL ENFERMERA
-        $userEnf = User::updateOrCreate(
+        $passwordInicial = Str::password(24);
+        $userEnf = User::firstOrCreate(
             ['correo' => 'enfermera.elena@remembermind.com'],
             [
                 'cod_usuario' => 'USU_ENF_001',
-                'contrasena' => 'CasaAmandita123',
+                'contrasena' => $passwordInicial,
                 'estado' => 'ACTIVO',
             ]
         );
+        if ($userEnf->wasRecentlyCreated) {
+            $this->command?->warn("Credencial inicial de {$userEnf->correo}: {$passwordInicial}");
+        }
         $userEnf->assignRole('ENFERMEROS');
 
         $personalEnf = Personal::updateOrCreate(

@@ -5,20 +5,23 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use App\Models\Personal;
 use App\Models\User;
+use Illuminate\Support\Str;
 
 class AdminSeeder extends Seeder
 {
     public function run(): void
     {
         // 1. Administrador Principal Casa Amandita
-        $admin = User::updateOrCreate(
+        $adminPassword = Str::password(24);
+        $admin = User::firstOrCreate(
             ['correo' => 'admincasaamandita@gmail.com'],
             [
                 'cod_usuario' => 'USU_0001',
-                'contrasena'  => 'CasaAmandita123',
+                'contrasena'  => $adminPassword,
                 'estado'      => 'ACTIVO',
             ]
         );
+        $this->reportInitialPassword($admin, $adminPassword);
         $admin->assignRole('SUPERADMINISTRADOR');
 
         Personal::updateOrCreate(
@@ -35,14 +38,16 @@ class AdminSeeder extends Seeder
         );
 
         // 2. Usuario Desarrollador Carla Encinas
-        $dev = User::updateOrCreate(
+        $devPassword = Str::password(24);
+        $dev = User::firstOrCreate(
             ['correo' => 'carlaencinas78@gmail.com'],
             [
                 'cod_usuario' => 'USU_0002',
-                'contrasena'  => 'CasaAmandita123',
+                'contrasena'  => $devPassword,
                 'estado'      => 'ACTIVO',
             ]
         );
+        $this->reportInitialPassword($dev, $devPassword);
         $dev->assignRole('SUPERADMINISTRADOR');
 
         Personal::updateOrCreate(
@@ -59,14 +64,16 @@ class AdminSeeder extends Seeder
         );
 
         // 3. Usuario Enfermería Institucional
-        $enf = User::updateOrCreate(
+        $enfPassword = Str::password(24);
+        $enf = User::firstOrCreate(
             ['correo' => 'enfermeria@remembermind.com'],
             [
                 'cod_usuario' => 'USU_0003',
-                'contrasena'  => 'CasaAmandita123',
+                'contrasena'  => $enfPassword,
                 'estado'      => 'ACTIVO',
             ]
         );
+        $this->reportInitialPassword($enf, $enfPassword);
         $enf->assignRole('ENFERMEROS');
 
         Personal::updateOrCreate(
@@ -81,5 +88,12 @@ class AdminSeeder extends Seeder
                 'estado' => 'ACTIVO',
             ]
         );
+    }
+
+    private function reportInitialPassword(User $user, string $password): void
+    {
+        if ($user->wasRecentlyCreated) {
+            $this->command?->warn("Credencial inicial de {$user->correo}: {$password}");
+        }
     }
 }

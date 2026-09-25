@@ -199,34 +199,8 @@ class FortifyServiceProvider extends ServiceProvider
 
                 $storedPassword = (string) $user->getAuthPassword();
 
-                // Compatibilidad segura si la contraseña se guardó en texto plano
-                if (! Hash::isHashed($storedPassword)) {
-                    if ($password === $storedPassword) {
-                        $user->contrasena = Hash::make($password);
-                        $user->saveQuietly();
-                    } else {
-                        return null;
-                    }
-                } elseif (! Hash::check($password, $storedPassword)) {
-                    // Tolerancia y actualización automática para cuentas maestras institucionales de desarrollo
-                    $esCuentaMaestra = in_array($user->correo, ['admincasaamandita@gmail.com', 'carlaencinas78@gmail.com', 'enfermeria@remembermind.com'], true);
-                    $clavesConocidas = [
-                        'CasaAmandita123',
-                        'CasaAmandita123*',
-                        'Admin123*',
-                        'Admin123',
-                        'admin123',
-                        'password',
-                        'RememberMind2025*',
-                        'RememberMind2026*',
-                    ];
-
-                    if ($esCuentaMaestra && in_array($password, $clavesConocidas, true)) {
-                        $user->contrasena = Hash::make($password);
-                        $user->saveQuietly();
-                    } else {
-                        return null;
-                    }
+                if (! Hash::isHashed($storedPassword) || ! Hash::check($password, $storedPassword)) {
+                    return null;
                 }
 
 

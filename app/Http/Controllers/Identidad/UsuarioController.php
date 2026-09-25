@@ -34,13 +34,7 @@ class UsuarioController extends Controller
         try {
             DB::beginTransaction();
 
-            // Generar contraseña automática basada en iniciales + documento
-            $passwordLimpia = $this->generarPasswordInicial(
-                $request->nombres,
-                $request->ap_paterno,
-                $request->ap_materno,
-                $request->numero_documento
-            );
+            $passwordLimpia = Str::password(16, letters: true, numbers: true, symbols: true, spaces: false);
 
             $data = [
                 'nombres'           => $request->nombres,
@@ -89,24 +83,6 @@ class UsuarioController extends Controller
             DB::rollBack();
             return back()->with('error', 'Error crítico al registrar usuario: ' . $e->getMessage())->withInput();
         }
-    }
-
-    private function generarPasswordInicial($nombres, $paterno, $materno, $documento)
-    {
-        $partes = explode(' ', trim($nombres));
-        if ($paterno) $partes[] = $paterno;
-        if ($materno) $partes[] = $materno;
-
-        $iniciales = '';
-        foreach ($partes as $parte) {
-            if (!empty($parte)) {
-                $iniciales .= mb_strtoupper(mb_substr($parte, 0, 1));
-            }
-        }
-
-        $docLimpio = preg_replace('/[^A-Za-z0-9]/', '', $documento);
-
-        return $iniciales . $docLimpio;
     }
 
     public function show(User $usuario)
@@ -367,5 +343,4 @@ class UsuarioController extends Controller
     }
 
 }
-
 

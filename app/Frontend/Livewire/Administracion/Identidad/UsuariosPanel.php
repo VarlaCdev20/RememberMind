@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class UsuariosPanel extends Component
 {
@@ -1527,22 +1528,7 @@ class UsuariosPanel extends Component
 
     private function generarPasswordTemporal(): string
     {
-        $letras = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-        $numeros = '0123456789';
-        $simbolos = '@#$*!';
-        
-        $pass = '';
-        $pass .= $letras[rand(0, strlen($letras) - 1)];
-        $pass .= $letras[rand(0, strlen($letras) - 1)];
-        $pass .= $numeros[rand(0, strlen($numeros) - 1)];
-        $pass .= $simbolos[rand(0, strlen($simbolos) - 1)];
-        
-        $todos = $letras . $numeros . $simbolos;
-        for ($i = 0; $i < 7; $i++) {
-            $pass .= $todos[rand(0, strlen($todos) - 1)];
-        }
-        
-        return str_shuffle($pass);
+        return Str::password(16, letters: true, numbers: true, symbols: true, spaces: false);
     }
 
     public function regenerarPasswordTemporal()

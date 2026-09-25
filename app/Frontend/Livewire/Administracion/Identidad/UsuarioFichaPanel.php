@@ -12,6 +12,7 @@ use Livewire\WithFileUploads;
 use Livewire\WithPagination;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class UsuarioFichaPanel extends Component
 {
@@ -255,10 +256,7 @@ class UsuarioFichaPanel extends Component
             return;
         }
 
-        $nombres = strtoupper(preg_replace('/\s+/', '', $this->usuario->nombres ?? 'USU'));
-        $apPaterno = strtoupper(preg_replace('/\s+/', '', $this->usuario->ap_paterno ?? 'RM'));
-        $documento = preg_replace('/\D/', '', $this->usuario->numero_documento ?? '');
-        $tempPassword = substr($nombres, 0, 3) . substr($apPaterno, 0, 3) . ($documento ?: now()->format('His'));
+        $tempPassword = Str::password(16, letters: true, numbers: true, symbols: true, spaces: false);
 
         $this->usuario->update([
             'password' => \Illuminate\Support\Facades\Hash::make($tempPassword)
