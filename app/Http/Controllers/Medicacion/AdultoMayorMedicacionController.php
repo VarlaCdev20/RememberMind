@@ -2,24 +2,25 @@
 
 namespace App\Http\Controllers\Medicacion;
 
+use App\Backend\Modulos\Clinica\Servicios\ContextoClinicoService;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Medicacion\StoreMedicacionRequest;
 use App\Http\Requests\Medicacion\UpdateMedicacionRequest;
-use App\Models\Area;
 use App\Models\Atencion;
 use App\Models\HorarioPrescripcion;
 use App\Models\Medicamento;
-use App\Models\Personal;
 use App\Models\Prescripcion;
 use App\Models\Residente;
-use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class AdultoMayorMedicacionController extends Controller
 {
-    public function store(StoreMedicacionRequest $request, Residente $adulto_mayor)
-    {
+    public function store(
+        StoreMedicacionRequest $request,
+        Residente $adulto_mayor,
+        ContextoClinicoService $contextoClinico,
+    ) {
         try {
             DB::beginTransaction();
 
@@ -27,70 +28,68 @@ class AdultoMayorMedicacionController extends Controller
             $nombreMed = $datos['nombre_medicamento'];
 
             // 1. Resolver Medicamento
-            $medicamento = Medicamento::where('nombre_generico', 'ilike', $nombreMed)
-                ->orWhere('nombre_comercial', 'ilike', $nombreMed)
+            $nombreNormalizado = mb_strtolower($nombreMed);
+            $medicamento = Medicamento::query()
+                ->whereRaw('LOWER(nombre_generico) = ?', [$nombreNormalizado])
+                ->orWhereRaw('LOWER(nombre_comercial) = ?', [$nombreNormalizado])
                 ->first();
 
-            if (!$medicamento) {
+            if (! $medicamento) {
                 $medicamento = Medicamento::create([
-                    'cod_medicamento' => 'MED_' . strtoupper(Str::random(10)),
+                    'cod_medicamento' => 'MED_'.strtoupper(Str::random(10)),
                     'nombre_generico' => $nombreMed,
-                    'nombre_comercial'=> $nombreMed,
-                    'control_especial'=> false,
-                    'estado'          => 'ACTIVO',
+                    'nombre_comercial' => $nombreMed,
+                    'control_especial' => false,
+                    'estado' => 'ACTIVO',
                 ]);
             }
 
             // 2. Resolver Personal y Atención médica
-            $codPersonal = Personal::where('cod_usuario', auth()->user()->cod_usuario)->value('cod_personal')
-                ?? Personal::value('cod_personal')
-                ?? 'PER_0001';
+            $personal = $contextoClinico->personalActivo($request->user());
+            $codPersonal = $personal->cod_personal;
 
-            $atencion = Atencion::where('cod_residente', $adulto_mayor->cod_residente)->latest('fecha_hora')->first();
-            if (!$atencion) {
-                $codArea = Area::where('nombre', 'like', '%Med%')->value('cod_area') ?? 'ARE_0001';
-                $atencion = Atencion::create([
-                    'cod_atencion'  => 'ATN_' . strtoupper(Str::random(10)),
-                    'cod_residente' => $adulto_mayor->cod_residente,
-                    'cod_area'      => $codArea,
-                    'cod_personal'  => $codPersonal,
-                    'tipo_atencion' => 'CONSULTA',
-                    'motivo'        => 'Prescripción médica farmacológica',
-                    'fecha_hora'    => now(),
-                    'estado'        => 'COMPLETADA',
-                ]);
-            }
+            $codArea = $contextoClinico->areaAtencion($personal)->cod_area;
+            $atencion = Atencion::create([
+                'cod_atencion' => 'ATN_'.strtoupper(Str::random(10)),
+                'cod_residente' => $adulto_mayor->cod_residente,
+                'cod_area' => $codArea,
+                'cod_personal' => $codPersonal,
+                'tipo_atencion' => 'PRESCRIPCION_MEDICA',
+                'motivo' => 'Prescripción médica farmacológica',
+                'fecha_hora' => now(),
+                'estado' => 'COMPLETADA',
+            ]);
 
             // 3. Crear Prescripción V2
             $dosisNum = 1.0;
-            if (isset($datos['dosis']) && preg_match('/(\d+(?:\.\d+)?)/', (string)$datos['dosis'], $m)) {
+            if (isset($datos['dosis']) && preg_match('/(\d+(?:\.\d+)?)/', (string) $datos['dosis'], $m)) {
                 $dosisNum = (float) $m[1];
             }
 
-            $codPrescripcion = 'PRE_' . strtoupper(Str::random(10));
+            $codPrescripcion = 'PRE_'.strtoupper(Str::random(10));
             $prescripcion = Prescripcion::create([
-                'cod_prescripcion'        => $codPrescripcion,
-                'cod_residente'           => $adulto_mayor->cod_residente,
-                'cod_atencion'            => $atencion->cod_atencion,
-                'cod_medicamento'         => $medicamento->cod_medicamento,
-                'cod_personal'            => $codPersonal,
-                'dosis'                   => $dosisNum,
-                'unidad_dosis'            => 'unidad',
-                'via_administracion'      => $datos['via_administracion'] ?? 'ORAL',
-                'frecuencia'              => $datos['frecuencia'] ?? 'Cada 24 horas',
-                'indicacion'              => $nombreMed . ($datos['observacion'] ? " - {$datos['observacion']}" : ''),
-                'segun_necesidad'         => false,
+                'cod_prescripcion' => $codPrescripcion,
+                'cod_residente' => $adulto_mayor->cod_residente,
+                'cod_atencion' => $atencion->cod_atencion,
+                'cod_medicamento' => $medicamento->cod_medicamento,
+                'cod_personal' => $codPersonal,
+                'dosis' => $dosisNum,
+                'unidad_dosis' => 'unidad',
+                'via_administracion' => $datos['via_administracion'] ?? 'ORAL',
+                'frecuencia' => $datos['frecuencia'] ?? 'Cada 24 horas',
+                'indicacion' => $nombreMed.(! empty($datos['observacion']) ? " - {$datos['observacion']}" : ''),
+                'segun_necesidad' => false,
                 'fecha_hora_prescripcion' => now(),
-                'estado'                  => 'ACTIVA',
+                'estado' => 'ACTIVA',
             ]);
 
             // 4. Crear Horario si fue indicado
-            if (!empty($datos['hora_programada'])) {
+            if (! empty($datos['hora_programada'])) {
                 HorarioPrescripcion::create([
-                    'cod_horario_prescripcion' => 'HPR_' . strtoupper(Str::random(10)),
-                    'cod_prescripcion'         => $codPrescripcion,
-                    'hora_programada'          => substr($datos['hora_programada'], 0, 5),
-                    'estado'                   => 'ACTIVO',
+                    'cod_horario_prescripcion' => 'HPR_'.strtoupper(Str::random(10)),
+                    'cod_prescripcion' => $codPrescripcion,
+                    'hora_programada' => substr($datos['hora_programada'], 0, 5),
+                    'estado' => 'ACTIVO',
                 ]);
             }
 
@@ -102,8 +101,9 @@ class AdultoMayorMedicacionController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
+
             return redirect()->back()
-                ->with('error', 'Error al registrar medicación: ' . $e->getMessage())
+                ->with('error', 'Error al registrar medicación: '.$e->getMessage())
                 ->withInput();
         }
     }
@@ -116,27 +116,27 @@ class AdultoMayorMedicacionController extends Controller
 
             $datos = $request->validated();
             $dosisNum = $medicacion->dosis;
-            if (isset($datos['dosis']) && preg_match('/(\d+(?:\.\d+)?)/', (string)$datos['dosis'], $m)) {
+            if (isset($datos['dosis']) && preg_match('/(\d+(?:\.\d+)?)/', (string) $datos['dosis'], $m)) {
                 $dosisNum = (float) $m[1];
             }
 
             $medicacion->update([
-                'dosis'              => $dosisNum,
+                'dosis' => $dosisNum,
                 'via_administracion' => $datos['via_administracion'] ?? $medicacion->via_administracion,
-                'frecuencia'         => $datos['frecuencia'] ?? $medicacion->frecuencia,
-                'indicacion'         => $datos['nombre_medicamento'] ?? $medicacion->indicacion,
+                'frecuencia' => $datos['frecuencia'] ?? $medicacion->frecuencia,
+                'indicacion' => $datos['nombre_medicamento'] ?? $medicacion->indicacion,
             ]);
 
-            if (!empty($datos['hora_programada'])) {
+            if (! empty($datos['hora_programada'])) {
                 $horario = $medicacion->horarios()->first();
                 if ($horario) {
                     $horario->update(['hora_programada' => substr($datos['hora_programada'], 0, 5)]);
                 } else {
                     HorarioPrescripcion::create([
-                        'cod_horario_prescripcion' => 'HPR_' . strtoupper(Str::random(10)),
-                        'cod_prescripcion'         => $medicacion->cod_prescripcion,
-                        'hora_programada'          => substr($datos['hora_programada'], 0, 5),
-                        'estado'                   => 'ACTIVO',
+                        'cod_horario_prescripcion' => 'HPR_'.strtoupper(Str::random(10)),
+                        'cod_prescripcion' => $medicacion->cod_prescripcion,
+                        'hora_programada' => substr($datos['hora_programada'], 0, 5),
+                        'estado' => 'ACTIVO',
                     ]);
                 }
             }
@@ -145,12 +145,13 @@ class AdultoMayorMedicacionController extends Controller
 
             return redirect()
                 ->route('admin.adultos-mayores.show', ['adulto_mayor' => $adulto_mayor->cod_residente, 'tab' => 'medicacion'])
-                ->with('success', "Prescripción actualizada correctamente.");
+                ->with('success', 'Prescripción actualizada correctamente.');
 
         } catch (\Exception $e) {
             DB::rollBack();
+
             return redirect()->back()
-                ->with('error', 'Error al actualizar medicación: ' . $e->getMessage())
+                ->with('error', 'Error al actualizar medicación: '.$e->getMessage())
                 ->withInput();
         }
     }
@@ -159,9 +160,9 @@ class AdultoMayorMedicacionController extends Controller
     {
         $this->autorizarOrden($adulto_mayor, $medicacion, ['prescripciones.suspender']);
         $medicacion->update([
-            'estado'                 => 'SUSPENDIDA',
-            'fecha_hora_suspension'  => now(),
-            'motivo_suspension'      => 'Suspensión indicada por facultativo',
+            'estado' => 'SUSPENDIDA',
+            'fecha_hora_suspension' => now(),
+            'motivo_suspension' => 'Suspensión indicada por facultativo',
         ]);
 
         activity('Medicación')
@@ -172,14 +173,14 @@ class AdultoMayorMedicacionController extends Controller
 
         return redirect()
             ->route('admin.adultos-mayores.show', ['adulto_mayor' => $adulto_mayor->cod_residente, 'tab' => 'medicacion'])
-            ->with('success', "Prescripción suspendida.");
+            ->with('success', 'Prescripción suspendida.');
     }
 
     public function finalizar(Residente $adulto_mayor, Prescripcion $medicacion)
     {
         $this->autorizarOrden($adulto_mayor, $medicacion, ['prescripciones.editar']);
         $medicacion->update([
-            'estado'                => 'FINALIZADA',
+            'estado' => 'FINALIZADA',
             'fecha_hora_suspension' => now(),
         ]);
 
@@ -191,7 +192,7 @@ class AdultoMayorMedicacionController extends Controller
 
         return redirect()
             ->route('admin.adultos-mayores.show', ['adulto_mayor' => $adulto_mayor->cod_residente, 'tab' => 'medicacion'])
-            ->with('success', "Prescripción finalizada.");
+            ->with('success', 'Prescripción finalizada.');
     }
 
     public function archivar(Residente $adulto_mayor, Prescripcion $medicacion)
@@ -201,7 +202,7 @@ class AdultoMayorMedicacionController extends Controller
 
         return redirect()
             ->route('admin.adultos-mayores.show', ['adulto_mayor' => $adulto_mayor->cod_residente, 'tab' => 'medicacion'])
-            ->with('success', "Prescripción archivada.");
+            ->with('success', 'Prescripción archivada.');
     }
 
     public function restore(Residente $adulto_mayor, $medicacion)
@@ -212,7 +213,7 @@ class AdultoMayorMedicacionController extends Controller
 
         return redirect()
             ->route('admin.adultos-mayores.show', ['adulto_mayor' => $adulto_mayor->cod_residente, 'tab' => 'medicacion'])
-            ->with('success', "Prescripción reactivada.");
+            ->with('success', 'Prescripción reactivada.');
     }
 
     private function autorizarOrden(Residente $adulto, Prescripcion $medicacion, array $permisos): void
