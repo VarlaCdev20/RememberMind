@@ -366,7 +366,11 @@ class AdultoMayorController extends Controller
      */
     public function archivar(Request $request, AdultoMayor $adulto_mayor)
     {
-        $this->adultoMayorService->archivar($adulto_mayor->cod_residente, $request->motivo);
+        $this->adultoMayorService->archivar(
+            $adulto_mayor->cod_residente,
+            $request->user()->cod_usuario,
+            $request->motivo,
+        );
 
         return redirect()->route('admin.adultos-mayores.index')
             ->with('success', 'Se archivó el registro del adulto mayor.');
@@ -375,9 +379,12 @@ class AdultoMayorController extends Controller
     /**
      * Restaurar un registro.
      */
-    public function restaurar(AdultoMayor $adulto_mayor)
+    public function restaurar(Request $request, AdultoMayor $adulto_mayor)
     {
-        $this->adultoMayorService->restaurar($adulto_mayor->cod_residente);
+        $this->adultoMayorService->restaurar(
+            $adulto_mayor->cod_residente,
+            $request->user()->cod_usuario,
+        );
 
         return redirect()->route('admin.adultos-mayores.index')
             ->with('success', 'Se restauró el registro del adulto mayor.');
@@ -404,7 +411,7 @@ class AdultoMayorController extends Controller
             \App\Models\HistorialEstadoResidente::create([
                 'cod_historial_estado' => 'HER_' . strtoupper(\Illuminate\Support\Str::random(10)),
                 'cod_residente' => $adulto_mayor->cod_residente,
-                'cod_usuario_registro' => auth()->id() ?? \App\Models\User::value('cod_usuario'),
+                'cod_usuario_registro' => $request->user()->cod_usuario,
                 'estado_anterior' => $estadoAnterior ?? 'ACTIVO',
                 'estado_nuevo' => $nuevoEstado,
                 'fecha_hora' => now(),

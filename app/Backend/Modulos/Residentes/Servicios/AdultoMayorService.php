@@ -4,7 +4,6 @@ namespace App\Backend\Modulos\Residentes\Servicios;
 
 use App\Models\Residente;
 use App\Models\HistorialEstadoResidente;
-use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -184,50 +183,54 @@ class AdultoMayorService
     /**
      * Archivar un registro (desactivar).
      */
-    public function archivar($codResidente, $motivo = null)
+    public function archivar(string $codResidente, string $codUsuarioRegistro, ?string $motivo = null): Residente
     {
-        $residente = Residente::findOrFail($codResidente);
-        $anterior = $residente->estado;
-        $motivoTexto = $motivo ?? 'Archivado administrativamente';
+        return DB::transaction(function () use ($codResidente, $codUsuarioRegistro, $motivo) {
+            $residente = Residente::findOrFail($codResidente);
+            $anterior = $residente->estado;
+            $motivoTexto = $motivo ?? 'Archivado administrativamente';
 
-        $residente->estado = 'INACTIVO';
-        $residente->observacion = $motivoTexto;
-        $residente->save();
+            $residente->estado = 'INACTIVO';
+            $residente->observacion = $motivoTexto;
+            $residente->save();
 
-        HistorialEstadoResidente::create([
-            'cod_historial_estado' => 'HER_' . strtoupper(Str::random(10)),
-            'cod_residente' => $residente->cod_residente,
-            'cod_usuario_registro' => auth()->id() ?? User::value('cod_usuario'),
-            'estado_anterior' => $anterior,
-            'estado_nuevo' => 'INACTIVO',
-            'fecha_hora' => now(),
-            'motivo' => $motivoTexto,
-        ]);
+            HistorialEstadoResidente::create([
+                'cod_historial_estado' => 'HER_' . strtoupper(Str::random(10)),
+                'cod_residente' => $residente->cod_residente,
+                'cod_usuario_registro' => $codUsuarioRegistro,
+                'estado_anterior' => $anterior,
+                'estado_nuevo' => 'INACTIVO',
+                'fecha_hora' => now(),
+                'motivo' => $motivoTexto,
+            ]);
 
-        return $residente;
+            return $residente;
+        });
     }
 
     /**
      * Restaurar un registro.
      */
-    public function restaurar($codResidente)
+    public function restaurar(string $codResidente, string $codUsuarioRegistro): Residente
     {
-        $residente = Residente::findOrFail($codResidente);
-        $anterior = $residente->estado;
+        return DB::transaction(function () use ($codResidente, $codUsuarioRegistro) {
+            $residente = Residente::findOrFail($codResidente);
+            $anterior = $residente->estado;
 
-        $residente->estado = 'ACTIVO';
-        $residente->save();
+            $residente->estado = 'ACTIVO';
+            $residente->save();
 
-        HistorialEstadoResidente::create([
-            'cod_historial_estado' => 'HER_' . strtoupper(Str::random(10)),
-            'cod_residente' => $residente->cod_residente,
-            'cod_usuario_registro' => auth()->id() ?? User::value('cod_usuario'),
-            'estado_anterior' => $anterior,
-            'estado_nuevo' => 'ACTIVO',
-            'fecha_hora' => now(),
-            'motivo' => 'Restaurado administrativamente',
-        ]);
+            HistorialEstadoResidente::create([
+                'cod_historial_estado' => 'HER_' . strtoupper(Str::random(10)),
+                'cod_residente' => $residente->cod_residente,
+                'cod_usuario_registro' => $codUsuarioRegistro,
+                'estado_anterior' => $anterior,
+                'estado_nuevo' => 'ACTIVO',
+                'fecha_hora' => now(),
+                'motivo' => 'Restaurado administrativamente',
+            ]);
 
-        return $residente;
+            return $residente;
+        });
     }
 }
