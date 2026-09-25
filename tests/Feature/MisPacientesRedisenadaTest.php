@@ -179,7 +179,7 @@ class MisPacientesRedisenadaTest extends TestCase
             'origen' => 'SIGNOS',
             'motivo' => 'Presión arterial descompensada severa.',
             'estado' => 'ABIERTA',
-            'responsable_id' => $this->enfermero->cod_usuario,
+            'cod_personal_responsable' => $this->personal->cod_personal,
         ]);
 
         // Asignar ambos al enfermero en su turno
@@ -212,6 +212,7 @@ class MisPacientesRedisenadaTest extends TestCase
         // Signos para el residente estable
         SignoVital::create([
             'cod_residente' => $this->residenteEstable->cod_residente,
+            'cod_personal' => $this->personal->cod_personal,
             'fecha' => today()->toDateString(),
             'hora' => '08:30:00',
             'presion_arterial' => '120/80',

@@ -167,6 +167,7 @@ class MisResidentesNavegacionTest extends TestCase
 
         SignoVital::create([
             'cod_residente' => $this->residenteAsignado->cod_residente,
+            'cod_personal' => $this->personal->cod_personal,
             'fecha' => today()->toDateString(),
             'hora' => '08:00:00',
             'fecha_hora' => now()->subHours(2),

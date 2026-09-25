@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Str;
+use LogicException;
 
 class Alerta extends ModeloOperativo
 {
@@ -153,16 +154,8 @@ class Alerta extends ModeloOperativo
                 $model->descripcion = $model->titulo ?: 'Alerta sin descripción detallada';
             }
 
-            if (!empty($model->cod_personal_responsable) && !Personal::where('cod_personal', $model->cod_personal_responsable)->exists()) {
-                $model->cod_personal_responsable = null;
-            }
-
             if (empty($model->cod_residente)) {
-                $model->cod_residente = Residente::value('cod_residente');
-                if (empty($model->cod_residente)) {
-                    $res = Residente::first() ?? Residente::factory()->create();
-                    $model->cod_residente = $res->cod_residente;
-                }
+                throw new LogicException('La alerta requiere un residente explícito.');
             }
 
             if (isset($model->attributes['nivel']) && empty($model->prioridad)) {

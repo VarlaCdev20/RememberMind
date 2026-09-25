@@ -87,6 +87,7 @@ class MedicoFichaUnificadaTest extends TestCase
 
         SignoVital::create([
             'cod_residente' => $this->residente->cod_residente,
+            'cod_personal' => $this->medico->personal()->firstOrFail()->cod_personal,
             'fecha'              => today(),
             'hora'               => '08:00',
             'presion_sistolica'  => 120,

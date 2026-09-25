@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Str;
+use LogicException;
 
 class Incidente extends ModeloOperativo
 {
@@ -130,10 +131,7 @@ class Incidente extends ModeloOperativo
                 $registro->estado = 'ABIERTO';
             }
             if (empty($registro->cod_personal)) {
-                $pers = auth()->user()?->personal ?? Personal::first();
-                if ($pers) {
-                    $registro->cod_personal = $pers->cod_personal;
-                }
+                throw new LogicException('El incidente requiere el profesional responsable.');
             }
             $registro->attributes = array_intersect_key($registro->attributes, array_flip(static::$columnasValidas));
         });

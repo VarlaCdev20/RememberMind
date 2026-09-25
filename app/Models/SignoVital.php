@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use LogicException;
 
 class SignoVital extends ModeloOperativo
 {
@@ -37,25 +38,7 @@ class SignoVital extends ModeloOperativo
             }
 
             if (empty($signo->cod_personal)) {
-                $personal = Personal::query()->first();
-                if (! $personal) {
-                    $usuario = auth()->user() ?? User::query()->first();
-                    if (! $usuario) {
-                        throw \Illuminate\Validation\ValidationException::withMessages([
-                            'cod_personal' => 'El registro de signos vitales requiere personal responsable.',
-                        ]);
-                    }
-                    $personal = Personal::query()->create([
-                        'cod_personal' => 'PER_' . strtoupper(\Illuminate\Support\Str::random(10)),
-                        'cod_usuario' => $usuario->getKey(),
-                        'nombres' => $usuario->nombres ?: 'Personal',
-                        'apellido_paterno' => $usuario->ap_paterno ?: 'Institucional',
-                        'numero_documento' => 'DOC_' . strtoupper(\Illuminate\Support\Str::random(10)),
-                        'profesion' => 'SALUD',
-                        'estado' => 'ACTIVO',
-                    ]);
-                }
-                $signo->cod_personal = $personal->cod_personal;
+                throw new LogicException('El registro de signos vitales requiere personal responsable explícito.');
             }
             if (empty($signo->estado)) {
                 $signo->estado = 'VIGENTE';

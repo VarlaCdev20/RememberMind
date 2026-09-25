@@ -6,7 +6,7 @@ use App\Frontend\Livewire\Administracion\Identidad\PersonalInstitucionalPanel;
 use App\Frontend\Livewire\Administracion\Identidad\TurnosAsignacionesPanel;
 use App\Frontend\Livewire\Administracion\Identidad\UsuariosPanel;
 use App\Frontend\Livewire\Compartido\Reportes\ReportesAdultoPanel;
-use App\Models\{AdultoMayor, SignoVital, User};
+use App\Models\{AdultoMayor, Personal, SignoVital, User};
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
@@ -69,11 +69,20 @@ class VistasModularesTest extends TestCase
         $user = User::factory()->create();
         $user->assignRole('SUPERADMINISTRADOR');
         $this->actingAs($user);
+        $personal = Personal::create([
+            'cod_personal' => 'PER_REPORTE_REAL',
+            'cod_usuario' => $user->cod_usuario,
+            'nombres' => 'Responsable',
+            'apellido_paterno' => 'Reporte',
+            'numero_documento' => 'DOC-REPORTE-REAL',
+            'profesion' => 'MEDICO',
+            'estado' => 'ACTIVO',
+        ]);
         $adulto = AdultoMayor::factory()->create([
             'nombres' => 'Reporte Real', 'cod_est_adul' => 'EST_001', 'fecha_nac' => '1945-03-12',
         ]);
         SignoVital::create([
-            'cod_residente' => $adulto->cod_residente, 'fecha' => today(), 'hora' => '09:30:00',
+            'cod_residente' => $adulto->cod_residente, 'cod_personal' => $personal->cod_personal, 'fecha' => today(), 'hora' => '09:30:00',
             'presion_sistolica' => 128, 'presion_diastolica' => 76,
             'frecuencia_cardiaca' => 72, 'frecuencia_respiratoria' => 18,
             'temperatura' => 36.5, 'saturacion' => 96, 'registrado_por' => $user->cod_usuario,
