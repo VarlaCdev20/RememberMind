@@ -11,6 +11,7 @@ use App\Models\Admision;
 use App\Models\AsignacionResidenteJornada;
 use App\Models\Cama;
 use App\Models\Habitacion;
+use App\Models\Jornada;
 use App\Models\Prescripcion;
 use App\Models\PlanCuidado;
 use App\Models\Personal;
@@ -181,24 +182,30 @@ class MisPacientesRedisenadaTest extends TestCase
         ]);
 
         // Asignar ambos al enfermero en su turno
-        AsignacionResidenteJornada::create([
+        $jornada = Jornada::create([
+            'cod_jornada' => 'JOR_MIS_PACIENTES',
             'cod_turno' => $this->turno->cod_turno,
+            'fecha_jornada' => today(),
+            'estado' => 'ABIERTA',
+        ]);
+        AsignacionResidenteJornada::create([
             'cod_residente' => $this->residenteEstable->cod_residente,
-            'cod_usu_enfermero' => $this->enfermero->cod_usuario,
-            'fecha_inicio' => today()->toDateString(),
+            'cod_jornada' => $jornada->cod_jornada,
+            'cod_personal' => $this->personal->cod_personal,
+            'fecha_hora' => now(),
             'nivel_supervision' => 'ESTANDAR',
-            'motivo_asignacion' => 'Asignación de turno de prueba',
             'estado' => 'ACTIVA',
+            'observacion' => 'Asignación de turno de prueba',
         ]);
 
         AsignacionResidenteJornada::create([
-            'cod_turno' => $this->turno->cod_turno,
             'cod_residente' => $this->residenteCritico->cod_residente,
-            'cod_usu_enfermero' => $this->enfermero->cod_usuario,
-            'fecha_inicio' => today()->toDateString(),
+            'cod_jornada' => $jornada->cod_jornada,
+            'cod_personal' => $this->personal->cod_personal,
+            'fecha_hora' => now(),
             'nivel_supervision' => 'ESTANDAR',
-            'motivo_asignacion' => 'Asignación de turno de prueba',
             'estado' => 'ACTIVA',
+            'observacion' => 'Asignación de turno de prueba',
         ]);
 
         // Signos para el residente estable

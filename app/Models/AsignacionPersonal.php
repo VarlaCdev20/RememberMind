@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Str;
+use LogicException;
 
 class AsignacionPersonal extends ModeloOperativo
 {
@@ -16,7 +18,6 @@ class AsignacionPersonal extends ModeloOperativo
     protected $fillable = [
         'cod_asignacion_personal', 'cod_jornada', 'cod_personal', 'cod_area',
         'funcion', 'tipo_asignacion', 'fecha_asignacion', 'estado', 'observacion',
-        'cod_usuario', 'cod_turno', 'fecha_hora_recepcion',
     ];
 
     protected function casts(): array
@@ -24,14 +25,11 @@ class AsignacionPersonal extends ModeloOperativo
         return ['fecha_asignacion' => 'datetime'];
     }
 
-        protected static function booted(): void
+    protected static function booted(): void
     {
         static::creating(function (self $asig): void {
             if (empty($asig->cod_asignacion_personal)) {
-                $asig->cod_asignacion_personal = 'ASP_' . strtoupper(\Illuminate\Support\Str::random(10));
-            }
-            if (! empty($asig->attributes['fecha_hora_recepcion'])) {
-                $asig->fecha_asignacion = $asig->attributes['fecha_hora_recepcion'];
+                $asig->cod_asignacion_personal = 'ASP_'.Str::upper(Str::random(10));
             }
             if (empty($asig->fecha_asignacion)) {
                 $asig->fecha_asignacion = now();
@@ -42,53 +40,15 @@ class AsignacionPersonal extends ModeloOperativo
             if (empty($asig->tipo_asignacion)) {
                 $asig->tipo_asignacion = 'TURNO';
             }
-
-            // Resolver cod_personal desde cod_usuario si viene provisto
             if (empty($asig->cod_personal)) {
-                $codUsuario = $asig->attributes['cod_usuario'] ?? null;
-                if ($codUsuario) {
-                    $u = \App\Models\User::find($codUsuario);
-                    $asig->cod_personal = $u?->personal?->cod_personal;
-                }
+                throw new LogicException('La asignación de personal requiere un profesional explícito.');
             }
-            if (empty($asig->cod_personal)) {
-                $asig->cod_personal = \App\Models\Personal::first()?->cod_personal ?? 'PER_00000001';
-            }
-
-            // Resolver cod_jornada desde cod_turno si viene provisto
             if (empty($asig->cod_jornada)) {
-                $targetTurno = ($asig->attributes['cod_turno'] ?? null)
-                    ?: (\App\Models\Turno::first()?->cod_turno ?? 'TUR_001');
-                $j = \App\Models\Jornada::whereDate('fecha_jornada', today())->where('cod_turno', $targetTurno)->first();
-                if (!$j) {
-                    $j = \App\Models\Jornada::create([
-                        'cod_jornada' => 'JOR_' . strtoupper(\Illuminate\Support\Str::random(10)),
-                        'cod_turno' => $targetTurno,
-                        'fecha_jornada' => today(),
-                        'estado' => 'ACTIVA',
-                    ]);
-                }
-                $asig->cod_jornada = $j->cod_jornada;
+                throw new LogicException('La asignación de personal requiere una jornada explícita.');
             }
-
-            // Resolver cod_area si no viene provista
             if (empty($asig->cod_area)) {
-                $area = \App\Models\Area::first();
-                if (!$area) {
-                    $area = \App\Models\Area::create([
-                        'cod_area' => 'ARE_001',
-                        'nombre' => 'Área General',
-                        'estado' => 'ACTIVA',
-                    ]);
-                }
-                $asig->cod_area = $area->cod_area;
+                throw new LogicException('La asignación de personal requiere un área explícita.');
             }
-
-            unset(
-                $asig->attributes['cod_usuario'],
-                                $asig->attributes['cod_turno'],
-                $asig->attributes['fecha_hora_recepcion'],
-            );
         });
     }
 

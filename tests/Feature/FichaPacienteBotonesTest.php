@@ -14,6 +14,7 @@ use App\Models\OcupacionCama;
 use App\Models\AsignacionResidenteJornada;
 use App\Models\Cama;
 use App\Models\Habitacion;
+use App\Models\Jornada;
 use App\Models\Prescripcion;
 use App\Models\PlanCuidado;
 use App\Models\AsignacionPersonal;
@@ -58,6 +59,12 @@ class FichaPacienteBotonesTest extends TestCase
             'hora_fin' => '15:00:00',
             'orden' => 1,
             'estado' => 'ACTIVO',
+        ]);
+        $jornada = Jornada::create([
+            'cod_jornada' => 'JOR_FICHA_100',
+            'cod_turno' => $this->turno->cod_turno,
+            'fecha_jornada' => today(),
+            'estado' => 'ABIERTA',
         ]);
 
         $this->habitacion = Habitacion::create([
@@ -110,20 +117,23 @@ class FichaPacienteBotonesTest extends TestCase
 
         AsignacionResidenteJornada::create([
             'cod_residente' => $this->adulto->cod_residente,
-            'cod_turno' => $this->turno->cod_turno,
-            'cod_usu_enfermero' => $this->enfermero->cod_usuario,
-            'cod_usuario' => $this->enfermero->cod_usuario,
-            'fecha_inicio' => today()->toDateString(),
-            'motivo_asignacion' => 'Turno activo',
-            'asignado_por' => $this->enfermero->cod_usuario,
-            'fecha' => today()->toDateString(),
+            'cod_jornada' => $jornada->cod_jornada,
+            'cod_personal' => $this->enfermero->personal()->firstOrFail()->cod_personal,
+            'fecha_hora' => now(),
             'nivel_supervision' => 'MEDIO',
             'estado' => 'ACTIVO',
+            'observacion' => 'Turno activo',
+        ]);
+        $area = Area::create([
+            'cod_area' => 'ARE_FICHA_100',
+            'nombre' => 'Enfermería de ficha',
+            'estado' => 'ACTIVA',
         ]);
         AsignacionPersonal::create([
-            'cod_turno' => $this->turno->cod_turno,
-            'cod_usuario' => $this->enfermero->cod_usuario,
-            'fecha_hora_recepcion' => now(),
+            'cod_jornada' => $jornada->cod_jornada,
+            'cod_personal' => $this->enfermero->personal()->firstOrFail()->cod_personal,
+            'cod_area' => $area->cod_area,
+            'fecha_asignacion' => now(),
         ]);
     }
 

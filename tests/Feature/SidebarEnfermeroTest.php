@@ -4,6 +4,8 @@ namespace Tests\Feature;
 
 use App\Models\AdultoMayor;
 use App\Models\Alerta;
+use App\Models\Jornada;
+use App\Models\Personal;
 use App\Models\AsignacionResidenteJornada;
 use App\Models\TurnoEnfermeria;
 use App\Models\User;
@@ -79,14 +81,28 @@ class SidebarEnfermeroTest extends TestCase
         ]);
 
         $adulto = AdultoMayor::factory()->create(['cod_est_adul' => 'EST_001']);
+        $personal = Personal::create([
+            'cod_personal' => 'PER_SIDEBAR',
+            'cod_usuario' => $enfermero->cod_usuario,
+            'nombres' => 'Enfermero',
+            'apellido_paterno' => 'Sidebar',
+            'numero_documento' => 'SIDEBAR-01',
+            'profesion' => 'ENFERMERIA',
+            'estado' => 'ACTIVO',
+        ]);
+        $jornada = Jornada::create([
+            'cod_jornada' => 'JOR_SIDEBAR',
+            'cod_turno' => $turno->cod_turno,
+            'fecha_jornada' => today(),
+            'estado' => 'ABIERTA',
+        ]);
 
         // Asignar el residente al enfermero
         AsignacionResidenteJornada::create([
             'cod_residente' => $adulto->cod_residente,
-            'cod_turno' => $turno->cod_turno,
-            'cod_usu_enfermero' => $enfermero->cod_usuario,
-            'fecha_asignacion' => today(),
-            'fecha_inicio' => today(),
+            'cod_jornada' => $jornada->cod_jornada,
+            'cod_personal' => $personal->cod_personal,
+            'fecha_hora' => now(),
             'estado' => 'ACTIVO',
         ]);
 

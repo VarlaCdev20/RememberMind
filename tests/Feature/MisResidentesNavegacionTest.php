@@ -181,13 +181,11 @@ class MisResidentesNavegacionTest extends TestCase
         AsignacionResidenteJornada::create([
             'cod_asignacion' => 'ARJ_NAV_01',
             'cod_jornada' => $this->jornada->cod_jornada,
-            'cod_turno' => $this->turno->cod_turno,
             'cod_residente' => $this->residenteAsignado->cod_residente,
-            'cod_usu_enfermero' => $this->enfermero->cod_usuario,
             'cod_personal' => $this->personal->cod_personal,
-            'fecha_inicio' => today()->toDateString(),
+            'fecha_hora' => now(),
             'nivel_supervision' => 'ESTANDAR',
-            'motivo_asignacion' => 'Asignación de turno activo',
+            'observacion' => 'Asignación de turno activo',
             'estado' => 'ACTIVA',
         ]);
 

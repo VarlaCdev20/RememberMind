@@ -17,6 +17,8 @@ use App\Models\PlanCuidado;
 use App\Models\AsignacionPersonal;
 use App\Models\Atencion;
 use App\Models\Medicamento;
+use App\Models\Jornada;
+use App\Models\Personal;
 use App\Models\SignoVital;
 use App\Models\EjecucionCuidado;
 use App\Models\TurnoEnfermeria;
@@ -105,22 +107,34 @@ class TurnoCompletoEnfermeroTest extends TestCase
             'ap_paterno' => 'Gómez',
             'cod_est_adul' => 'EST_001',
         ]);
+        $jornadaManana = Jornada::create([
+            'cod_jornada' => 'JOR_FLUJO_MANANA',
+            'cod_turno' => $turnoManana->cod_turno,
+            'fecha_jornada' => today(),
+            'estado' => 'ABIERTA',
+        ]);
+        $personalEnfermero = $enfermero->personal()->firstOrFail();
+        $areaEnfermeria = Area::create([
+            'cod_area' => 'ARE_FLUJO_ENF',
+            'nombre' => 'Enfermería operativa',
+            'estado' => 'ACTIVA',
+        ]);
 
         // 4. Asignar ÚNICAMENTE al pacienteAsignado en AsignacionResidenteJornada
         AsignacionResidenteJornada::create([
             'cod_residente' => $pacienteAsignado->cod_residente,
-            'cod_turno' => $turnoManana->cod_turno,
-            'cod_usu_enfermero' => $enfermero->cod_usuario,
-            'fecha_inicio' => today()->toDateString(),
+            'cod_jornada' => $jornadaManana->cod_jornada,
+            'cod_personal' => $personalEnfermero->cod_personal,
+            'fecha_hora' => now(),
             'nivel_supervision' => 'ESTANDAR',
             'estado' => 'ACTIVA',
-            'motivo_asignacion' => 'Asignación de turno matutino',
-            'asignado_por' => $enfermero->cod_usuario,
+            'observacion' => 'Asignación de turno matutino',
         ]);
         AsignacionPersonal::create([
-            'cod_turno' => $turnoManana->cod_turno,
-            'cod_usuario' => $enfermero->cod_usuario,
-            'fecha_hora_recepcion' => now(),
+            'cod_jornada' => $jornadaManana->cod_jornada,
+            'cod_personal' => $personalEnfermero->cod_personal,
+            'cod_area' => $areaEnfermeria->cod_area,
+            'fecha_asignacion' => now(),
         ]);
 
         $atencion = Atencion::create([
@@ -345,32 +359,67 @@ class TurnoCompletoEnfermeroTest extends TestCase
         $enfermeroReceptor = User::factory()->create(['estado' => 'ACTIVO']);
         $enfermeroReceptor->assignRole('ENFERMEROS');
 
+        $personalSaliente = Personal::create([
+            'cod_personal' => 'PER_PASE_SALIENTE',
+            'cod_usuario' => $enfermero->cod_usuario,
+            'nombres' => 'Enfermero',
+            'apellido_paterno' => 'Saliente',
+            'numero_documento' => 'PASE-SALIENTE',
+            'profesion' => 'ENFERMERIA',
+            'estado' => 'ACTIVO',
+        ]);
+        $personalEntrante = Personal::create([
+            'cod_personal' => 'PER_PASE_ENTRANTE',
+            'cod_usuario' => $enfermeroReceptor->cod_usuario,
+            'nombres' => 'Enfermero',
+            'apellido_paterno' => 'Entrante',
+            'numero_documento' => 'PASE-ENTRANTE',
+            'profesion' => 'ENFERMERIA',
+            'estado' => 'ACTIVO',
+        ]);
+        $jornadaManana = Jornada::create([
+            'cod_jornada' => 'JOR_PASE_MANANA',
+            'cod_turno' => $turnoManana->cod_turno,
+            'fecha_jornada' => today(),
+            'estado' => 'ABIERTA',
+        ]);
+        $jornadaTarde = Jornada::create([
+            'cod_jornada' => 'JOR_PASE_TARDE',
+            'cod_turno' => $turnoTarde->cod_turno,
+            'fecha_jornada' => today(),
+            'estado' => 'ABIERTA',
+        ]);
+        $codArea = Area::create([
+            'cod_area' => 'ARE_PASE_ENF',
+            'nombre' => 'Enfermería de pases',
+            'estado' => 'ACTIVA',
+        ])->cod_area;
+
         $paciente = AdultoMayor::factory()->create(['cod_est_adul' => 'EST_001']);
 
         AsignacionResidenteJornada::create([
             'cod_residente' => $paciente->cod_residente,
-            'cod_turno' => $turnoManana->cod_turno,
-            'cod_usu_enfermero' => $enfermero->cod_usuario,
-            'fecha_inicio' => today()->toDateString(),
+            'cod_jornada' => $jornadaManana->cod_jornada,
+            'cod_personal' => $personalSaliente->cod_personal,
+            'fecha_hora' => now(),
             'nivel_supervision' => 'ESTANDAR',
             'estado' => 'ACTIVA',
-            'motivo_asignacion' => 'Asignación matutina',
-            'asignado_por' => $enfermero->cod_usuario,
+            'observacion' => 'Asignación matutina',
         ]);
         AsignacionResidenteJornada::create([
             'cod_residente' => $paciente->cod_residente,
-            'cod_turno' => $turnoTarde->cod_turno,
-            'cod_usu_enfermero' => $enfermeroReceptor->cod_usuario,
-            'fecha_inicio' => today()->toDateString(),
+            'cod_jornada' => $jornadaTarde->cod_jornada,
+            'cod_personal' => $personalEntrante->cod_personal,
+            'fecha_hora' => now(),
             'nivel_supervision' => 'ESTANDAR',
             'estado' => 'ACTIVA',
-            'motivo_asignacion' => 'Asignación de relevo',
-            'asignado_por' => $enfermero->cod_usuario,
+            'observacion' => 'Asignación de relevo',
         ]);
         AsignacionPersonal::create([
-            'cod_turno' => $turnoManana->cod_turno,
-            'cod_usuario' => $enfermero->cod_usuario,
-            'fecha_hora_recepcion' => now(),
+            'cod_jornada' => $jornadaManana->cod_jornada,
+            'cod_personal' => $personalSaliente->cod_personal,
+            'cod_area' => $codArea,
+            'fecha_asignacion' => now(),
         ]);
 
         $this->actingAs($enfermero);
@@ -392,9 +441,10 @@ class TurnoCompletoEnfermeroTest extends TestCase
         $this->actingAs($enfermeroReceptor);
         Carbon::setTestNow('2026-09-10 16:00:00');
         AsignacionPersonal::create([
-            'cod_turno' => $turnoTarde->cod_turno,
-            'cod_usuario' => $enfermeroReceptor->cod_usuario,
-            'fecha_hora_recepcion' => now(),
+            'cod_jornada' => $jornadaTarde->cod_jornada,
+            'cod_personal' => $personalEntrante->cod_personal,
+            'cod_area' => $codArea,
+            'fecha_asignacion' => now(),
         ]);
         Livewire::test(PaseTurnoPanel::class)
             ->call('recibirPase', $pase->cod_pase)
