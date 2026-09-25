@@ -1,17 +1,17 @@
 # RememberMind — Baseline congelado de Base de Datos Operativa
 
-**Estado:** CONGELADO  
-**Versión:** BDD Operativa V2  
-**Ámbito:** RememberMind — sistema residencial/geriátrico con seguimiento clínico y cognitivo  
-**Tablas operativas:** 69  
-**Entidad central:** `residentes`  
+**Estado:** CONGELADO
+**Versión:** BDD Operativa V2.1
+**Ámbito:** RememberMind — sistema residencial/geriátrico con seguimiento clínico y cognitivo
+**Tablas operativas:** 70
+**Entidad central:** `residentes`
 **Fuera de este baseline:** tablas técnicas de Laravel/Jetstream/Sanctum/Spatie y tablas futuras del sistema experto.
 
 ---
 
 ## 1. Regla de congelamiento y control de cambios
 
-Este documento y `REMEMBERMIND_BDD_69_TABLAS.md` constituyen la **fuente de verdad de la Base de Datos Operativa V2**.
+Este documento y `REMEMBERMIND_BDD_70_TABLAS.md` constituyen la **fuente de verdad de la Base de Datos Operativa V2.1** (conservándose `REMEMBERMIND_BDD_69_TABLAS.md` como histórico V2.0).
 
 ### REGLA OBLIGATORIA
 
@@ -76,10 +76,11 @@ Reglas:
 5. Una cama ocupada no puede asignarse a otro residente.
 6. Un residente no puede tener más de una ocupación de cama activa.
 7. No debe existir un CRUD que permita crear un residente saltándose este flujo institucional.
+8. En la fase de preadmisión, la valoración clínica integral de enfermería se registra en la tabla transaccional normalizada `valoraciones_enfermeria_preadmision` (relación 1:1 estricta con `preadmisiones`), habiéndose eliminado las estructuras no normalizadas / JSON.
 
 ---
 
-## 4. Clasificación de las 69 tablas
+## 4. Clasificación de las 70 tablas
 
 ### I. Tablas maestras — 11
 
@@ -95,54 +96,54 @@ Reglas:
 10. `medicamentos`
 11. `instrumentos`
 
-### II. Tablas transaccionales — 45
+### II. Tablas transaccionales — 46
 
 1. `jornadas`
 2. `preadmisiones`
-3. `admisiones`
-4. `historial_estados_residente`
-5. `documentos`
-6. `consentimientos`
-7. `atenciones`
-8. `notas_clinicas`
-9. `antecedentes_clinicos`
-10. `diagnosticos`
-11. `alergias`
-12. `seguros_residente`
-13. `dispositivos_clinicos`
-14. `signos_vitales`
-15. `valoraciones_dolor`
-16. `mediciones_antropometricas`
-17. `estudios_clinicos`
-18. `informes_estudio`
-19. `documentos_clinicos`
-20. `derivaciones`
-21. `incidentes`
-22. `indicaciones_clinicas`
-23. `controles_cognitivos`
-24. `registros_conductuales`
-25. `registros_sueno`
-26. `registros_ingesta`
-27. `registros_hidratacion`
-28. `registros_eliminacion`
-29. `registros_movilidad`
-30. `heridas`
-31. `curaciones_herida`
-32. `pases_turno`
-33. `planes_cuidado`
-34. `ejecuciones_cuidado`
-35. `prescripciones`
-36. `administraciones_medicacion`
-37. `aplicaciones_instrumento`
-38. `valoraciones_psicologicas`
-39. `valoraciones_nutricionales`
-40. `valoraciones_funcionales`
-41. `seguimientos_pedagogicos`
-42. `actividades`
-43. `visitas`
-44. `alertas`
-45. `eventos_alerta`
-
+3. `valoraciones_enfermeria_preadmision`
+4. `admisiones`
+5. `historial_estados_residente`
+6. `documentos`
+7. `consentimientos`
+8. `atenciones`
+9. `notas_clinicas`
+10. `antecedentes_clinicos`
+11. `diagnosticos`
+12. `alergias`
+13. `seguros_residente`
+14. `dispositivos_clinicos`
+15. `signos_vitales`
+16. `valoraciones_dolor`
+17. `mediciones_antropometricas`
+18. `estudios_clinicos`
+19. `informes_estudio`
+20. `documentos_clinicos`
+21. `derivaciones`
+22. `incidentes`
+23. `indicaciones_clinicas`
+24. `controles_cognitivos`
+25. `registros_conductuales`
+26. `registros_sueno`
+27. `registros_ingesta`
+28. `registros_hidratacion`
+29. `registros_eliminacion`
+30. `registros_movilidad`
+31. `heridas`
+32. `curaciones_herida`
+33. `pases_turno`
+34. `planes_cuidado`
+35. `ejecuciones_cuidado`
+36. `prescripciones`
+37. `administraciones_medicacion`
+38. `aplicaciones_instrumento`
+39. `valoraciones_psicologicas`
+40. `valoraciones_nutricionales`
+41. `valoraciones_funcionales`
+42. `seguimientos_pedagogicos`
+43. `actividades`
+44. `visitas`
+45. `alertas`
+46. `eventos_alerta`
 ### III. Tablas intermedias — 7
 
 1. `asignaciones_personal`
@@ -162,7 +163,7 @@ Reglas:
 5. `preguntas_instrumento`
 6. `opciones_pregunta`
 
-**Total: 11 + 45 + 7 + 6 = 69.**
+**Total: 11 + 46 + 7 + 6 = 70.**
 
 ---
 
@@ -285,7 +286,7 @@ Roles funcionales vigentes:
 
 ### Regla de SUPERADMINISTRADOR
 
-El `SUPERADMINISTRADOR` **puede VER toda la información del sistema**, incluidas las 69 tablas operativas y la auditoría.
+El `SUPERADMINISTRADOR` **puede VER toda la información del sistema**, incluidas las 70 tablas operativas y la auditoría.
 
 Esto **no significa** que, por ser superadministrador, tenga automáticamente competencia para crear o modificar registros clínicos. Las escrituras clínicas se controlan mediante permiso + Policy + competencia profesional + contexto del residente.
 
@@ -757,7 +758,7 @@ El proyecto soporta SQLite/MySQL/MariaDB/PostgreSQL según `config/database.php`
 
 La BDD V2 solo se considera implementada cuando:
 
-1. existen exactamente las 69 tablas operativas definidas en el documento de esquema;
+1. existen exactamente las 70 tablas operativas definidas en el documento de esquema (incorporando `valoraciones_enfermeria_preadmision` como tabla transaccional);
 2. las tablas técnicas necesarias de framework/paquetes funcionan;
 3. `php artisan migrate:fresh --seed` termina sin error;
 4. todas las FK e índices críticos existen;
@@ -777,6 +778,6 @@ La BDD V2 solo se considera implementada cuando:
 
 **ESTA BDD ESTÁ CONGELADA.**
 
-Toda propuesta posterior de cambio debe ser consultada antes de implementarse.  
+Toda propuesta posterior de cambio debe ser consultada antes de implementarse.
 El desarrollador o agente de IA puede detectar y documentar problemas, pero **NO está autorizado a cambiar el modelo congelado por iniciativa propia**.
 
