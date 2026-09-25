@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Livewire\Cuidados\FichaPaciente;
+use App\Frontend\Livewire\Compartido\Clinica\FichaPaciente;
 use App\Models\AdultoMayor;
 use App\Models\Prescripcion;
 use App\Models\SignoVital;
@@ -37,7 +37,7 @@ class MedicoFichaUnificadaTest extends TestCase
         ]);
 
         Prescripcion::create([
-            'cod_am'             => $this->residente->cod_am,
+            'cod_residente' => $this->residente->cod_residente,
             'nombre_medicamento' => 'Enalapril 10mg',
             'dosis'              => '1 comprimido',
             'frecuencia'         => 'DIARIA',
@@ -48,7 +48,7 @@ class MedicoFichaUnificadaTest extends TestCase
         ]);
 
         SignoVital::create([
-            'cod_am'             => $this->residente->cod_am,
+            'cod_residente' => $this->residente->cod_residente,
             'fecha'              => today(),
             'hora'               => '08:00',
             'presion_sistolica'  => 120,
@@ -56,7 +56,7 @@ class MedicoFichaUnificadaTest extends TestCase
             'frecuencia_cardiaca'=> 72,
             'saturacion'         => 97,
             'temperatura'        => 36.5,
-            'registrado_por'     => $this->medico->cod_usu,
+            'registrado_por'     => $this->medico->cod_usuario,
         ]);
     }
 
@@ -70,7 +70,7 @@ class MedicoFichaUnificadaTest extends TestCase
     {
         $this->actingAs($this->medico);
 
-        $response = $this->get(route('admin.medico.paciente.ficha', $this->residente->cod_am));
+        $response = $this->get(route('admin.medico.paciente.ficha', $this->residente->cod_residente));
         $response->assertOk();
         $response->assertSee('Aurelio');
         $response->assertSee('Valdivia');
@@ -80,7 +80,7 @@ class MedicoFichaUnificadaTest extends TestCase
     {
         $this->actingAs($this->medico);
 
-        Livewire::test(FichaPaciente::class, ['adulto' => $this->residente->cod_am])
+        Livewire::test(FichaPaciente::class, ['adulto' => $this->residente->cod_residente])
             ->assertOk()
             ->assertSee('Aurelio')
             ->assertSee('Valdivia')
@@ -100,7 +100,7 @@ class MedicoFichaUnificadaTest extends TestCase
             'ap_paterno'   => 'Sarmiento',
         ]);
 
-        $this->get(route('admin.medico.residente.ficha', $otroResidente->cod_am))
+        $this->get(route('admin.medico.residente.ficha', $otroResidente->cod_residente))
             ->assertOk()
             ->assertSee('Beatriz');
     }
@@ -115,7 +115,7 @@ class MedicoFichaUnificadaTest extends TestCase
             'ap_paterno'   => 'Sarmiento',
         ]);
 
-        Livewire::test(\App\Livewire\Cuidados\MisPacientes::class)
+        Livewire::test(\App\Frontend\Livewire\Enfermeria\Cuidados\MisPacientes::class)
             ->assertOk()
             ->assertSee('Aurelio')
             ->assertSee('Beatriz');

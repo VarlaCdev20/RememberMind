@@ -63,7 +63,6 @@ class Residente extends ModeloOperativo {
     public function asignacionTurnoActiva(): HasOne { return $this->hasOne(AsignacionResidenteJornada::class, 'cod_residente', 'cod_residente')->where('asignaciones_residente_jornada.estado', 'ACTIVA'); }
     public function cama(): HasOneThrough { return $this->hasOneThrough(Cama::class,OcupacionCama::class,'cod_residente','cod_cama','cod_residente','cod_cama')->whereIn('ocupaciones_cama.estado',['ACTIVA','ACTIVO']); }
     public function getHabitacionAttribute(): ?Habitacion { return $this->cama?->habitacion; }
-    public function getCodAmAttribute(): string { return (string) $this->cod_residente; }
     public function getApPaternoAttribute(): string { return (string) $this->apellido_paterno; }
     public function getApMaternoAttribute(): string { return (string) $this->apellido_materno; }
     public function getFechaNacAttribute() { return $this->fecha_nacimiento; }
@@ -85,7 +84,7 @@ class Residente extends ModeloOperativo {
     public function getEdadAttribute(): ?int { return $this->fecha_nacimiento?->age; }
     public function getEstadoAdultoAttribute(): string { return (string) ($this->attributes['estado'] ?? 'ACTIVO'); }
         public function getFichaResumenAttribute(): ?object {
-        return app(\App\Services\Clinica\FichaMedicaService::class)->obtenerFichaAgregada($this->cod_residente);
+        return app(\App\Backend\Modulos\Clinica\Servicios\FichaMedicaService::class)->obtenerFichaAgregada($this->cod_residente);
     }
     public function getFechaIngAttribute(): ?\Carbon\Carbon { $adm = $this->admisiones()->orderBy('fecha_hora_admision', 'asc')->first(); return $adm && $adm->fecha_hora_admision ? \Carbon\Carbon::parse($adm->fecha_hora_admision) : null; }
 

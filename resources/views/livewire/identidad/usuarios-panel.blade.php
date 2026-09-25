@@ -14,7 +14,7 @@
  }
 
  // Documentación
- $documentacionService = app(\App\Services\Documentos\DocumentacionUsuarioService::class);
+ $documentacionService = app(\App\Backend\Modulos\Documentos\Servicios\DocumentacionUsuarioService::class);
  $checklist = $documentacionService->obtenerChecklistUsuario($usuarioDetalle);
  $avance = $documentacionService->calcularAvanceDocumental($usuarioDetalle);
 
@@ -439,14 +439,14 @@
  
  <div class="pt-2 flex flex-col gap-2">
  <div class="pt-2 flex flex-col gap-2">
- <a href="{{ route('admin.usuarios.documentos.pdf', $usuarioDetalle->cod_usu) }}"
+ <a href="{{ route('admin.usuarios.documentos.pdf', $usuarioDetalle->cod_usuario) }}"
  target="_blank"
  class="w-full inline-flex h-9 items-center justify-center gap-1.5 rounded-xl bg-boton-principal text-inverso text-[10px] font-bold uppercase tracking-wider transition hover:bg-boton-acento active:scale-95 shadow-sm">
  <i class="ph-bold ph-printer"></i>
  Paquete Documental
  </a>
  <button type="button" 
- onclick="enviarPaqueteCorreo('{{ $usuarioDetalle->cod_usu }}', '{{ $usuarioDetalle->correo }}')"
+ onclick="enviarPaqueteCorreo('{{ $usuarioDetalle->cod_usuario }}', '{{ $usuarioDetalle->correo }}')"
  class="w-full inline-flex h-9 items-center justify-center gap-1.5 rounded-xl bg-fondo-panel text-[10px] font-bold text-parrafo border border-borde-fuerte transition hover:bg-boton-principal hover:text-inverso active:scale-95 shadow-sm">
  <i class="ph-bold ph-envelope"></i> Enviar Correo
  </button>
@@ -537,7 +537,7 @@
  </div>
 
  @php
- $docService = app(\App\Services\Documentos\DocumentosUsuarioService::class);
+ $docService = app(\App\Backend\Modulos\Documentos\Servicios\DocumentosUsuarioService::class);
  $docsInstitucionales = $docService->documentosGeneradosPorRol($rolKey);
  @endphp
 
@@ -558,15 +558,15 @@
  </div>
  </div>
  <div class="mt-auto pt-4 flex items-center gap-2">
- <a href="{{ route('admin.usuarios.documentos.ver', ['user' => $usuarioDetalle->cod_usu, 'documento' => $docInst['slug']]) }}" target="_blank"
+ <a href="{{ route('admin.usuarios.documentos.ver', ['user' => $usuarioDetalle->cod_usuario, 'documento' => $docInst['slug']]) }}" target="_blank"
  class="flex-1 h-8 bg-fondo-panel hover:bg-boton-principal text-parrafo hover:text-inverso text-[10px] font-bold uppercase rounded-lg flex items-center justify-center gap-1 transition">
  <i class="ph-bold ph-eye"></i> Ver
  </a>
- <a href="{{ route('admin.usuarios.documentos.imprimir', ['user' => $usuarioDetalle->cod_usu, 'documento' => $docInst['slug']]) }}" target="_blank"
+ <a href="{{ route('admin.usuarios.documentos.imprimir', ['user' => $usuarioDetalle->cod_usuario, 'documento' => $docInst['slug']]) }}" target="_blank"
  class="flex-1 h-8 bg-fondo-card border border-borde-suave hover:border-borde-focus text-parrafo hover:text-boton-acento text-[10px] font-bold uppercase rounded-lg flex items-center justify-center gap-1 transition">
  <i class="ph-bold ph-printer"></i> Imprimir
  </a>
- <a href="{{ route('admin.usuarios.documentos.documento-pdf', ['user' => $usuarioDetalle->cod_usu, 'documento' => $docInst['slug']]) }}" target="_blank" download
+ <a href="{{ route('admin.usuarios.documentos.documento-pdf', ['user' => $usuarioDetalle->cod_usuario, 'documento' => $docInst['slug']]) }}" target="_blank" download
  class="h-8 w-8 bg-boton-principal hover:bg-boton-acento text-inverso rounded-lg flex items-center justify-center transition">
  <i class="ph-bold ph-download-simple"></i>
  </a>
@@ -840,7 +840,7 @@
 </section>
 
     {{-- BARRA DE FILTROS UNIFICADA FORMATO ALERTAS --}}
-    <section class="mb-4 rounded-2xl bg-[#DED1C3] dark:bg-[#2C2723] border border-[#C7B9AA] dark:border-[#423B34] p-3 text-xs shadow-sm flex flex-col gap-2.5">
+    <section class="rm-filter-bar mb-4">
         <div class="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-2 items-center">
             {{-- Buscar --}}
             <div class="lg:col-span-3 relative flex items-center">
@@ -919,9 +919,9 @@
             $hasFiltrosActivos = !empty($search) || !empty($filtroRol) || !empty($filtroArea) || !empty($filtroEstado) || !empty($filtroGenero);
         @endphp
         @if($hasFiltrosActivos)
-            <div class="w-full flex flex-wrap items-center justify-between gap-2 pt-2.5 border-t border-[#C7B9AA]/60 dark:border-[#423B34] text-xs">
+            <div class="rm-filter-bar__active">
                 <div class="flex flex-wrap items-center gap-1.5">
-                    <span class="text-[11px] font-bold text-[#677084] dark:text-[#9A9084] flex items-center gap-1 mr-1">
+                    <span class="rm-filter-bar__active-label">
                         <i class="ph-bold ph-funnel text-xs"></i> Filtros activos:
                     </span>
                     @if(!empty($search))
@@ -1043,7 +1043,7 @@
  }
  @endphp
 
- <article wire:key="card-user-{{ $u->cod_usu }}"
+ <article wire:key="card-user-{{ $u->cod_usuario }}"
  class="group overflow-hidden rounded-[1.45rem] border border-transparent bg-fondo-panel shadow-[0_14px_30px_rgba(47,62,92,0.13)] transition-all duration-300 {{ $estaInactivo ? 'grayscale opacity-70 bg-fondo-panel' : 'hover:-translate-y-1 hover:shadow-[0_20px_38px_rgba(47,62,92,0.17)]' }}">
 
  <div class="h-1 w-full {{ $estaInactivo ? 'bg-fondo-panel' : 'bg-gradient-to-r from-[#E27D60] via-[#F2A08D] to-[#2F3E5C]/25' }}"></div>
@@ -1131,7 +1131,7 @@
  <div class="mt-3 flex items-center justify-center gap-1.5">
  {{-- Grupo principal --}}
  <button type="button"
- wire:click="abrirVistaCompleta('{{ $u->cod_usu }}')"
+ wire:click="abrirVistaCompleta('{{ $u->cod_usuario }}')"
  class="inline-flex h-8 items-center gap-1.5 rounded-full bg-boton-principal px-2.5 text-[9px] font-bold text-inverso shadow-sm transition hover:bg-fondo-panel active:scale-95"
  title="Ver ficha institucional">
  <i class="ph-bold ph-eye"></i>
@@ -1149,7 +1149,7 @@
  </button>
  @else
  <button type="button"
- wire:click="editarUsuario('{{ $u->cod_usu }}')"
+ wire:click="editarUsuario('{{ $u->cod_usuario }}')"
  class="inline-flex h-8 items-center gap-1.5 rounded-full bg-boton-acento px-2.5 text-[9px] font-bold text-inverso shadow-sm transition hover:bg-fondo-panel active:scale-95">
  <i class="ph-bold ph-pencil-simple"></i>
  Editar
@@ -1158,9 +1158,9 @@
  @endcan
 
  @can('usuarios.cambiar_estado')
- @if($u->cod_usu !== auth()->id())
+ @if($u->cod_usuario !== auth()->id())
  <button type="button"
- wire:click="toggleEstado('{{ $u->cod_usu }}')"
+ wire:click="toggleEstado('{{ $u->cod_usuario }}')"
  wire:confirm="¿Desea cambiar el estado de este usuario?"
  class="inline-flex h-8 items-center gap-1.5 rounded-full px-2.5 text-[9px] font-bold shadow-sm transition active:scale-95
  {{ $u->estado === 'ACTIVO'
@@ -1176,7 +1176,7 @@
  <span class="mx-0.5 h-5 w-px bg-fondo-panel"></span>
 
  <button type="button"
- wire:click="abrirFichaRapida('{{ $u->cod_usu }}')"
+ wire:click="abrirFichaRapida('{{ $u->cod_usuario }}')"
  class="inline-flex h-8 items-center gap-1.5 rounded-full bg-fondo-panel px-2.5 text-[9px] font-bold text-parrafo shadow-sm transition hover:bg-fondo-panel hover:text-inverso active:scale-95"
  title="Ficha rápida">
  <i class="ph-bold ph-clipboard-text"></i>
@@ -1261,7 +1261,7 @@
  @endphp
 
  <tr class="transition-all duration-200 {{ $estaInactivo ? 'bg-fondo-panel grayscale opacity-70' : 'hover:bg-fondo-panel' }}"
- wire:key="tabla-user-{{ $u->cod_usu }}">
+ wire:key="tabla-user-{{ $u->cod_usuario }}">
  <td class="px-5 py-4">
  <div class="flex min-w-0 items-center gap-3">
  <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-boton-principal text-sm font-bold text-inverso shadow-sm">
@@ -1323,7 +1323,7 @@
  <div class="flex items-center justify-center gap-1.5">
  {{-- Grupo principal --}}
  <button type="button"
- wire:click="abrirVistaCompleta('{{ $u->cod_usu }}')"
+ wire:click="abrirVistaCompleta('{{ $u->cod_usuario }}')"
  class="flex h-9 w-9 items-center justify-center rounded-xl bg-fondo-panel text-parrafo shadow-sm transition hover:bg-boton-principal hover:text-inverso active:scale-90"
  title="Ver ficha institucional">
  <i class="ph-bold ph-eye"></i>
@@ -1339,7 +1339,7 @@
  </button>
  @else
  <button type="button"
- wire:click="editarUsuario('{{ $u->cod_usu }}')"
+ wire:click="editarUsuario('{{ $u->cod_usuario }}')"
  class="flex h-9 w-9 items-center justify-center rounded-xl bg-fondo-panel text-boton-acento shadow-sm transition hover:bg-boton-acento hover:text-inverso active:scale-90"
  title="Editar">
  <i class="ph-bold ph-pencil-simple"></i>
@@ -1348,9 +1348,9 @@
  @endcan
 
  @can('usuarios.cambiar_estado')
- @if($u->cod_usu !== auth()->id())
+ @if($u->cod_usuario !== auth()->id())
  <button type="button"
- wire:click="toggleEstado('{{ $u->cod_usu }}')"
+ wire:click="toggleEstado('{{ $u->cod_usuario }}')"
  wire:confirm="¿Desea cambiar el estado de este usuario?"
  class="flex h-9 w-9 items-center justify-center rounded-xl shadow-sm transition active:scale-90
  {{ $u->estado === 'ACTIVO'
@@ -1366,7 +1366,7 @@
  <span class="mx-0.5 h-5 w-px bg-fondo-panel"></span>
 
  <button type="button"
- wire:click="abrirFichaRapida('{{ $u->cod_usu }}')"
+ wire:click="abrirFichaRapida('{{ $u->cod_usuario }}')"
  class="flex h-9 w-9 items-center justify-center rounded-xl bg-fondo-panel text-parrafo shadow-sm transition hover:bg-fondo-panel hover:text-inverso active:scale-90"
  title="Ficha rápida">
  <i class="ph-bold ph-clipboard-text"></i>

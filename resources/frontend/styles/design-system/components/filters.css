@@ -1,50 +1,266 @@
 /* ============================================================
    REMEMBERMIND DESIGN SYSTEM — COMPONENTS / FILTERS
-   Barra horizontal de filtros: Fondo Beige Translúcido
+   Patrón canónico basado en la barra compacta de Emergencias.
    ============================================================ */
 
-.rm-filter-bar {
+.rm-filter-bar.rm-filter-bar {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.625rem;
+    width: 100%;
+    padding: 0.75rem;
+    color: var(--color-parrafo);
+    background: color-mix(in srgb, var(--color-fondo-panel-alt) 92%, transparent);
+    border: 1px solid var(--color-borde-medio);
+    border-radius: 1rem;
+    box-shadow: var(--sombra-card);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+}
+
+.rm-filter-bar__controls,
+.rm-filter-group {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    align-items: center;
+    gap: 0.5rem;
+    width: 100%;
+}
+
+.rm-filter-bar :is(input:not([type='checkbox']):not([type='radio']):not([type='hidden']):not([type='submit']):not([type='button']):not([type='reset']), select),
+.rm-filter-control {
+    width: 100%;
+    min-height: 2.375rem;
+    padding: 0.5rem 0.75rem;
+    color: var(--color-input-texto);
+    font-size: 0.75rem;
+    font-weight: 600;
+    line-height: 1.25rem;
+    background: var(--color-input-bg);
+    border: 1px solid var(--color-input-borde);
+    border-radius: 0.75rem;
+    outline: none;
+    transition: border-color var(--motion-fast, 150ms) ease,
+                box-shadow var(--motion-fast, 150ms) ease,
+                background-color var(--motion-fast, 150ms) ease;
+}
+
+.rm-filter-bar :is(input:not([type='checkbox']):not([type='radio']):not([type='hidden']):not([type='submit']):not([type='button']):not([type='reset']), select):hover,
+.rm-filter-control:hover {
+    border-color: var(--color-input-borde-hover);
+}
+
+.rm-filter-bar :is(input:not([type='checkbox']):not([type='radio']):not([type='hidden']):not([type='submit']):not([type='button']):not([type='reset']), select):focus,
+.rm-filter-control:focus {
+    background: var(--color-fondo-input);
+    border-color: var(--color-input-borde-focus);
+    box-shadow: 0 0 0 3px var(--color-input-ring-focus);
+}
+
+.rm-filter-bar input::placeholder,
+.rm-filter-control::placeholder {
+    color: var(--color-input-placeholder);
+}
+
+.rm-filter-search {
+    position: relative;
+    min-width: 0;
+    width: 100%;
+}
+
+.rm-filter-search :is(input, .rm-filter-control) {
+    padding-left: 2.25rem;
+    padding-right: 2rem;
+}
+
+.rm-filter-search-icon {
+    position: absolute;
+    inset-block: 0;
+    left: 0;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    padding-left: 0.75rem;
+    color: var(--color-texto-apoyo);
+    pointer-events: none;
+}
+
+.rm-filter-clear {
+    position: absolute;
+    inset-block: 0;
+    right: 0;
+    z-index: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding-inline: 0.625rem;
+    color: var(--color-texto-apoyo);
+    transition: color var(--motion-fast, 150ms) ease;
+}
+
+.rm-filter-clear:hover {
+    color: var(--color-boton-acento);
+}
+
+.rm-filter-label {
+    display: block;
+    margin-bottom: 0.25rem;
+    color: var(--color-label);
+    font-size: 0.625rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.rm-filter-bar label {
+    color: var(--color-label);
+    font-size: 0.625rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.rm-filter-bar__active {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
-    gap: 10px 12px;
-    padding: 12px 14px;
-    background-color: rgba(250, 246, 240, 0.88);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(228, 214, 199, 0.80);
-    border-radius: 16px;
-    box-shadow: 0 4px 20px rgba(60, 45, 30, 0.04);
+    gap: 0.5rem;
+    width: 100%;
+    padding-top: 0.625rem;
+    color: var(--color-parrafo);
+    font-size: 0.75rem;
+    border-top: 1px solid var(--color-borde-medio);
 }
 
-.dark .rm-filter-bar {
-    background-color: rgba(26, 32, 44, 0.85);
-    border-color: rgba(55, 65, 81, 0.70);
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
-}
-
-.rm-filter-group {
-    display: flex;
-    flex-wrap: wrap;
+.rm-filter-bar__active-label {
+    display: inline-flex;
     align-items: center;
-    gap: 8px 10px;
-    flex: 1 1 auto;
+    gap: 0.25rem;
+    margin-right: 0.25rem;
+    color: var(--color-texto-apoyo);
+    font-size: 0.6875rem;
+    font-weight: 800;
 }
 
-.rm-filter-search {
-    min-width: 260px;
-    max-width: 420px;
-    flex: 1 1 auto;
+.rm-filter-chip,
+.rm-filter-bar__active > :first-child > span:not(.rm-filter-bar__active-label) {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    min-height: 1.625rem;
+    padding: 0.125rem 0.625rem;
+    color: var(--color-parrafo);
+    font-size: 0.6875rem;
+    font-weight: 700;
+    background: var(--color-fondo-panel);
+    border: 1px solid var(--color-borde-medio);
+    border-radius: 0.5rem;
 }
 
-.rm-filter-select {
-    min-width: 150px;
+.rm-filter-chip button,
+.rm-filter-bar__active > :first-child > span:not(.rm-filter-bar__active-label) button {
+    color: var(--color-texto-apoyo);
+    transition: color var(--motion-fast, 150ms) ease;
+}
+
+.rm-filter-chip button:hover,
+.rm-filter-bar__active > :first-child > span:not(.rm-filter-bar__active-label) button:hover {
+    color: var(--color-boton-acento);
+}
+
+.rm-filter-count,
+.rm-filter-bar__active > :last-child > span {
+    display: inline-flex;
+    align-items: center;
+    min-height: 1.625rem;
+    padding: 0.125rem 0.625rem;
+    color: var(--color-titulo);
+    font-size: 0.6875rem;
+    font-weight: 800;
+    background: var(--color-fondo-card-suave);
+    border: 1px solid var(--color-borde-suave);
+    border-radius: 9999px;
+}
+
+.rm-filter-reset,
+.rm-filter-bar__active > :last-child > button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.25rem;
+    min-height: 1.75rem;
+    padding: 0.25rem 0.625rem;
+    color: var(--color-boton-acento);
+    font-size: 0.75rem;
+    font-weight: 800;
+    background: color-mix(in srgb, var(--color-boton-acento) 12%, transparent);
+    border: 1px solid color-mix(in srgb, var(--color-boton-acento) 24%, transparent);
+    border-radius: 0.75rem;
+    transition: background-color var(--motion-fast, 150ms) ease,
+                border-color var(--motion-fast, 150ms) ease;
+}
+
+.rm-filter-reset:hover,
+.rm-filter-bar__active > :last-child > button:hover {
+    background: color-mix(in srgb, var(--color-boton-acento) 20%, transparent);
+    border-color: color-mix(in srgb, var(--color-boton-acento) 38%, transparent);
+}
+
+.rm-filter-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.375rem;
+    min-height: 2.375rem;
+    padding: 0.5rem 0.75rem;
+    color: var(--color-boton-fantasma-texto);
+    font-size: 0.75rem;
+    font-weight: 800;
+    background: var(--color-boton-fantasma-bg);
+    border: 1px solid var(--color-boton-fantasma-borde);
+    border-radius: 0.75rem;
+    transition: background-color var(--motion-fast, 150ms) ease,
+                color var(--motion-fast, 150ms) ease;
+}
+
+.rm-filter-toggle:hover,
+.rm-filter-toggle.is-active {
+    color: var(--color-boton-principal-texto);
+    background: var(--color-boton-principal);
 }
 
 .rm-filter-actions {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 0.5rem;
     flex-shrink: 0;
+}
+
+@media (min-width: 640px) {
+    .rm-filter-bar__controls,
+    .rm-filter-group {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (min-width: 1024px) {
+    .rm-filter-bar__controls,
+    .rm-filter-group {
+        grid-template-columns: repeat(12, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 639px) {
+    .rm-filter-bar__active,
+    .rm-filter-bar__active > :last-child {
+        align-items: stretch;
+        width: 100%;
+    }
+
+    .rm-filter-bar__active > :last-child {
+        display: flex;
+        justify-content: space-between;
+    }
 }

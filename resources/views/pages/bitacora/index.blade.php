@@ -26,7 +26,7 @@
  </div>
 
  {{-- FILTROS AVANZADOS --}}
- <div class="rounded-3xl border border-borde-suave bg-fondo-panel p-5 shadow-sm backdrop-blur-md">
+ <div class="rm-filter-bar">
  <form method="GET" action="{{ route('admin.bitacora.index') }}" class="space-y-4">
  <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-6">
  {{-- Búsqueda --}}
@@ -45,7 +45,7 @@
  <select name="usuario" class="w-full rounded-xl border-borde-suave bg-fondo-card/80 px-3 py-2 text-sm font-bold text-titulo focus:border-borde-focus focus:ring-4 focus:ring-borde-focus/10">
  <option value="">Todos</option>
  @foreach($usuarios as $u)
- <option value="{{ $u->cod_usu }}" @selected(request('usuario') == $u->cod_usu)>{{ $u->nombres }} {{ $u->ap_paterno }}</option>
+ <option value="{{ $u->cod_usuario }}" @selected(request('usuario') == ($u->cod_usuario))>{{ $u->nombres }} {{ $u->ap_paterno }}</option>
  @endforeach
  </select>
  </div>

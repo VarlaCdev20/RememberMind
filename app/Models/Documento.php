@@ -8,7 +8,6 @@ class Documento extends ModeloOperativo {
     public function anterior(): BelongsTo { return $this->belongsTo(self::class,'cod_documento_anterior','cod_documento'); }
     public function getCreatedAtColumn(): string { return 'cod_documento'; }
     public function getCodDocAttribute(): string { return (string) $this->cod_documento; }
-    public function getCodAmAttribute(): string { return (string) $this->cod_residente; }
     public function getObservacionesAttribute(): ?string { return $this->observacion; }
     public function getCodDocUsuAttribute(): string { return (string) $this->cod_documento; }
     public function getCodTipoDocAttribute(): string { return (string) $this->tipo_documento; }

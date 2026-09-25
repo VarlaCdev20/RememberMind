@@ -20,7 +20,7 @@
  </p>
  </div>
  <div class="flex items-center gap-2">
- <a href="{{ route('admin.adultos-mayores.show', ['adulto_mayor' => $adulto_mayor->cod_am, 'tab' => 'documentos']) }}" class="inline-flex items-center gap-2 rounded-xl border border-borde bg-fondo-card px-4 py-2 text-xs font-bold text-titulo transition hover:bg-fondo-panel">
+ <a href="{{ route('admin.adultos-mayores.show', ['adulto_mayor' => $adulto_mayor->cod_residente, 'tab' => 'documentos']) }}" class="inline-flex items-center gap-2 rounded-xl border border-borde bg-fondo-card px-4 py-2 text-xs font-bold text-titulo transition hover:bg-fondo-panel">
  <i class="ph-bold ph-arrow-left"></i> Volver a Ficha
  </a>
  <button type="button" @click="abrirRegistro()" class="inline-flex items-center gap-2 rounded-xl bg-boton-principal px-4 py-2 text-xs font-bold text-inverso shadow-sm transition hover:bg-fondo-panel">

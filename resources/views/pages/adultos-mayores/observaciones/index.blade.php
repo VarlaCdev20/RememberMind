@@ -11,12 +11,14 @@
             </p>
         @endif
 
-        <form method="GET" class="flex flex-wrap items-end gap-3">
-            <label class="flex-1 text-sm text-parrafo">
-                Buscar en notas y evolución
-                <x-input class="block w-full" name="buscar" value="{{ request('buscar') }}" />
-            </label>
-            <x-button>Buscar</x-button>
+        <form method="GET" class="rm-filter-bar">
+            <div class="grid items-end gap-3 sm:grid-cols-[1fr_auto]">
+                <label class="text-sm text-parrafo">
+                    Buscar en notas y evolución
+                    <x-input class="block w-full" name="buscar" value="{{ request('buscar') }}" />
+                </label>
+                <x-button>Buscar</x-button>
+            </div>
         </form>
 
         @include('pages.adultos-mayores.observaciones.partials.crear')

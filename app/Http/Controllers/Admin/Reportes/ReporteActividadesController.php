@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Admin\Reportes;
 
 use App\Http\Controllers\Controller;
-use App\Services\Reportes\ReporteDataService;
+use App\Backend\Modulos\Reportes\Servicios\ReporteDataService;
 use App\Exports\Reportes\ReporteActividadesExport;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Auth;

@@ -24,7 +24,7 @@ class PantallasConectadasTest extends TestCase
         foreach (Route::getRoutes() as $ruta) {
             if (!in_array('GET', $ruta->methods()) || !str_starts_with($ruta->uri(), 'admin/')) continue;
             if (preg_match('~(?:pdf|excel|csv|imprimir|/ver$|/documentos/[^/]+$)~', $ruta->uri())) continue;
-            $uri = str_replace(['{adulto_mayor}', '{adulto}', '{usuario}', '{user}'], [$adulto->cod_am, $adulto->cod_am, $user->cod_usu, $user->cod_usu], $ruta->uri());
+            $uri = str_replace(['{adulto_mayor}', '{adulto}', '{usuario}', '{user}'], [$adulto->cod_residente, $adulto->cod_residente, $user->cod_usuario, $user->cod_usuario], $ruta->uri());
             if (str_contains($uri, '{')) continue;
             try {
                 $response = $this->get('/'.$uri);

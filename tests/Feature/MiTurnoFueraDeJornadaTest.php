@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Livewire\Cuidados\DashboardTurno;
+use App\Frontend\Livewire\Enfermeria\Cuidados\DashboardTurno;
 use App\Models\AdministracionMedicacion;
 use App\Models\AdultoMayor;
 use App\Models\Alerta;
@@ -24,7 +24,7 @@ use App\Models\Residente;
 use App\Models\Turno;
 use App\Models\TurnoEnfermeria;
 use App\Models\User;
-use App\Services\Enfermeria\MiTurnoService;
+use App\Backend\Modulos\Enfermeria\Servicios\MiTurnoService;
 use Carbon\Carbon;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -554,7 +554,7 @@ class MiTurnoFueraDeJornadaTest extends TestCase
             ->assertForbidden();
 
         Livewire::test(DashboardTurno::class)
-            ->set('signoCodAm', $this->residenteCarlos->cod_residente)
+            ->set('signoCodResidente', $this->residenteCarlos->cod_residente)
             ->set('signoPresion', '120/80')
             ->call('guardarSignos')
             ->assertForbidden();

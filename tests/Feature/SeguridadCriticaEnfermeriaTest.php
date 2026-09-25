@@ -2,9 +2,9 @@
 
 namespace Tests\Feature;
 
-use App\Livewire\Alertas\AlertasPanel;
-use App\Livewire\Medicacion\MedicacionAdultoModal;
-use App\Livewire\Cuidados\PaseTurnoPanel;
+use App\Frontend\Livewire\Compartido\Alertas\AlertasPanel;
+use App\Frontend\Livewire\Medico\Medicacion\MedicacionAdultoModal;
+use App\Frontend\Livewire\Enfermeria\Cuidados\PaseTurnoPanel;
 use App\Models\AdultoMayor;
 use App\Models\Alerta;
 use App\Models\Area;
@@ -16,8 +16,8 @@ use App\Models\Prescripcion;
 use App\Models\AsignacionPersonal;
 use App\Models\TurnoEnfermeria;
 use App\Models\User;
-use App\Services\Enfermeria\TurnoEnfermeriaService;
-use App\Services\Medicacion\RegistrarAdministracionMedicacionService;
+use App\Backend\Modulos\Enfermeria\Servicios\TurnoEnfermeriaService;
+use App\Backend\Modulos\Medicacion\Servicios\RegistrarAdministracionMedicacionService;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
@@ -100,7 +100,7 @@ class SeguridadCriticaEnfermeriaTest extends TestCase
     {
         $this->enfermero->givePermissionTo('prescripciones.crear');
         Livewire::test(MedicacionAdultoModal::class)
-            ->call('abrirModalMedicacion', $this->residente->cod_am)
+            ->call('abrirModalMedicacion', $this->residente->cod_residente)
             ->assertForbidden();
     }
 
@@ -168,7 +168,7 @@ class SeguridadCriticaEnfermeriaTest extends TestCase
         ]);
         $noEnfermero = User::factory()->create(['estado' => 'ACTIVO']);
         $componente = Livewire::test(PaseTurnoPanel::class)
-            ->set('codAm', $this->residente->cod_residente)
+            ->set('codResidente', $this->residente->cod_residente)
             ->set('turnoSalienteId', $this->turno->cod_turno)
             ->set('turnoEntranteId', $entrante->cod_turno)
             ->set('enfermeroEntranteId', $noEnfermero->cod_usuario)

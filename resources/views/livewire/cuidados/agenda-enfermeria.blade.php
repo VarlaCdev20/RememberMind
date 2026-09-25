@@ -81,7 +81,7 @@
          ================================================== --}}
     @if($tab === 'agenda')
         {{-- Barra de Filtros Compacta de Agenda --}}
-        <section class="p-3 rounded-[14px] bg-[#F0E8DE] dark:bg-[#2C2924] border border-[#C7B9AA] dark:border-[#494139] shadow-2xs space-y-2">
+        <section class="rm-filter-bar">
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-12 gap-2 items-center text-xs">
                 {{-- Búsqueda --}}
                 <div class="lg:col-span-4 relative flex items-center">

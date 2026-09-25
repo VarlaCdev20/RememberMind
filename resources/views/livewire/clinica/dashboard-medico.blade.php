@@ -362,7 +362,7 @@
                         @if($alerta['sat']) · SpO2: {{ $alerta['sat'] }}% @endif
                     </div>
                 </div>
-                <a href="{{ route('admin.medico.paciente.ficha', $alerta['cod_am']) }}"
+                <a href="{{ route('admin.medico.paciente.ficha', $alerta['cod_residente']) }}"
                    class="shrink-0 flex h-7 w-7 items-center justify-center rounded-lg bg-estado-infoBg text-estado-info hover:bg-estado-info hover:text-white transition">
                     <i class="ph-bold ph-folder-open text-xs"></i>
                 </a>
@@ -449,17 +449,17 @@
                         <td class="px-5 py-3">
                             <div class="flex items-center justify-center gap-1.5">
                                 @if(in_array($pac->estado?->estado, ['VALORACION_MEDICA', 'PENDIENTE_VALORACION_MEDICA']))
-                                <button wire:click="iniciarValoracionMedica('{{ $pac->cod_am }}')"
+                                <button wire:click="iniciarValoracionMedica('{{ $pac->cod_residente }}')"
                                         class="h-8 px-3 rounded-lg bg-estado-advertencia text-white text-[10px] font-black uppercase tracking-wide hover:bg-estado-advertencia/80 transition whitespace-nowrap">
                                     <i class="ph-bold ph-stethoscope mr-1"></i>Valorar
                                 </button>
                                 @elseif($pac->estado?->estado === 'DECISION_ADMISION')
-                                <button wire:click="abrirDecisionAdmision('{{ $pac->cod_am }}')"
+                                <button wire:click="abrirDecisionAdmision('{{ $pac->cod_residente }}')"
                                         class="h-8 px-3 rounded-lg bg-estado-exito text-white text-[10px] font-black uppercase tracking-wide hover:bg-estado-exito/80 transition whitespace-nowrap">
                                     <i class="ph-bold ph-check-circle mr-1"></i>Dictamen
                                 </button>
                                 @endif
-                                <a href="{{ route('admin.medico.paciente.ficha', $pac->cod_am) }}"
+                                <a href="{{ route('admin.medico.paciente.ficha', $pac->cod_residente) }}"
                                    class="h-8 w-8 rounded-lg bg-estado-infoBg text-estado-info hover:bg-estado-info hover:text-white transition flex items-center justify-center">
                                     <i class="ph-bold ph-folder-open text-sm"></i>
                                 </a>
@@ -533,7 +533,7 @@
                     @endif
                     <p class="text-[10px] text-meta">Dr. {{ $nota['medico'] }}</p>
                 </div>
-                <a href="{{ route('admin.medico.paciente.ficha', $nota['cod_am']) }}"
+                <a href="{{ route('admin.medico.paciente.ficha', $nota['cod_residente']) }}"
                    class="shrink-0 flex h-7 w-7 items-center justify-center rounded-lg text-apoyo hover:bg-estado-infoBg hover:text-estado-info transition">
                     <i class="ph-bold ph-arrow-right text-xs"></i>
                 </a>

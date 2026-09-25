@@ -2,8 +2,8 @@
 
 namespace App\Http\Requests\Clinica;
 
-use App\Services\Clinica\ValidacionSignosVitalesService;
-use App\Services\Enfermeria\TurnoEnfermeriaService;
+use App\Backend\Modulos\Clinica\Servicios\ValidacionSignosVitalesService;
+use App\Backend\Modulos\Enfermeria\Servicios\TurnoEnfermeriaService;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreSignosVitalesRequest extends FormRequest
@@ -16,7 +16,8 @@ class StoreSignosVitalesRequest extends FormRequest
     protected function prepareForValidation(): void
     {
         if ($adulto = $this->route('adulto_mayor')) {
-            $this->merge(['cod_am' => $adulto->cod_am]);
+            $codRes = $adulto->cod_residente;
+            $this->merge(['cod_residente' => $codRes]);
         }
         if ($this->user()?->hasRole('ENFERMEROS')) {
             $this->merge(['fecha' => today()->toDateString(), 'hora' => now()->format('H:i')]);
@@ -51,7 +52,7 @@ class StoreSignosVitalesRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'cod_am'                  => 'required|string|exists:residentes,cod_residente',
+            'cod_residente'           => 'required|string|exists:residentes,cod_residente',
             'fecha'                   => 'required|date|before_or_equal:today',
             'hora'                    => 'required|date_format:H:i',
             'presion_arterial'        => 'nullable|string|max:20',
@@ -75,8 +76,8 @@ class StoreSignosVitalesRequest extends FormRequest
     public function messages(): array
     {
         return array_merge(ValidacionSignosVitalesService::mensajes(), [
-            'cod_am.required'        => 'El adulto mayor es obligatorio.',
-            'cod_am.exists'          => 'El adulto mayor seleccionado no existe.',
+            'cod_residente.required' => 'El residente es obligatorio.',
+            'cod_residente.exists'   => 'El residente seleccionado no existe.',
             'fecha.required'         => 'La fecha es obligatoria.',
             'fecha.before_or_equal'  => 'La fecha no puede ser futura.',
             'hora.required'          => 'La hora es obligatoria.',
@@ -112,15 +113,16 @@ class StoreSignosVitalesRequest extends FormRequest
             );
 
             // Verificar ámbito del enfermero
-            if ($this->user() && $this->input('cod_am')) {
+            $codResidente = $this->input('cod_residente');
+            if ($this->user() && $codResidente) {
                 try {
                     if ($this->user()->hasRole('ENFERMEROS')) {
                         app(TurnoEnfermeriaService::class)->autorizarMutacionPaciente(
-                            $this->input('cod_am'), 'signos_vitales.crear', $this->user()
+                            $codResidente, 'signos_vitales.crear', $this->user()
                         );
                     }
                 } catch (\Throwable $e) {
-                    $validator->errors()->add('cod_am', $e->getMessage());
+                    $validator->errors()->add('cod_residente', $e->getMessage());
                 }
             }
         });

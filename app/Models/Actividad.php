@@ -45,11 +45,6 @@ class Actividad extends ModeloOperativo
         return $this->cod_actividad;
     }
 
-    public function getCodAmAttribute(): ?string
-    {
-        return $this->participantes->first()?->cod_residente;
-    }
-
     public function getCodTipoActAttribute(): string
     {
         return $this->tipo;

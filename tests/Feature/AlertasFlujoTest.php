@@ -1,9 +1,9 @@
 <?php
 namespace Tests\Feature;
 
-use App\Livewire\Alertas\AlertasPanel;
+use App\Frontend\Livewire\Compartido\Alertas\AlertasPanel;
 use App\Models\{AdultoMayor, Alerta, User, SignoVital, Atencion};
-use App\Services\Alertas\DeteccionAlertasService;
+use App\Backend\Modulos\Alertas\Servicios\DeteccionAlertasService;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
@@ -28,10 +28,10 @@ class AlertasFlujoTest extends TestCase
         [$user, $adulto] = $this->preparar(['alertas.ver', 'alertas.gestionar']);
         $this->get(route('admin.enfermeria.alertas'))->assertOk()->assertSee('Detectar pendientes');
         $panel = Livewire::test(AlertasPanel::class)->call('abrirCrear')
-            ->set('codAm', $adulto->cod_am)->set('tipoAlerta', 'Revisión requerida')
+            ->set('codResidente', $adulto->cod_residente)->set('tipoAlerta', 'Revisión requerida')
             ->set('motivo', 'Se solicita seguimiento del residente.')->call('guardarAlerta')->assertHasNoErrors();
         $alerta = Alerta::sole();
-        $panel->call('verDetalle', $alerta->cod_alerta)->set('responsableId', $user->cod_usu)
+        $panel->call('verDetalle', $alerta->cod_alerta)->set('responsableId', $user->cod_usuario)
             ->call('asignarResponsable')->assertHasNoErrors()
             ->call('atenderAlerta', $alerta->cod_alerta)->set('accionTomada', 'Se inicia revisión presencial.')
             ->call('guardarAtencion')->assertHasNoErrors();
@@ -150,10 +150,10 @@ class AlertasFlujoTest extends TestCase
         $estadoOriginal = $adulto->cod_est_adul;
 
         Livewire::test(AlertasPanel::class)
-            ->call('verGraficos', $adulto->cod_am)
+            ->call('verGraficos', $adulto->cod_residente)
             ->assertSet('drawerGrafico', true)
-            ->assertSet('adultoDrawerId', $adulto->cod_am)
-            ->call('verUbicacion', $adulto->cod_am)
+            ->assertSet('adultoDrawerId', $adulto->cod_residente)
+            ->call('verUbicacion', $adulto->cod_residente)
             ->assertSet('drawerUbicacion', true)
             ->assertSet('drawerGrafico', false)
             ->call('cerrarDrawer')

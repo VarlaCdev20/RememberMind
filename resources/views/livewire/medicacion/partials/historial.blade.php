@@ -3,7 +3,7 @@
     {{-- ==================================================
          1. BARRA DE FILTROS ESPECÍFICA DE HISTORIAL
          ================================================== --}}
-    <section class="rounded-2xl bg-[#DED1C3] dark:bg-[#2C2723] border border-[#C7B9AA] dark:border-[#423B34] p-3 text-xs shadow-sm flex flex-col gap-2.5">
+    <section class="rm-filter-bar">
         
         {{-- Fila Principal: Búsqueda y Selectores Primarios --}}
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3 items-center">
@@ -126,9 +126,9 @@
         @endphp
 
         @if($historialChipsActivos)
-            <div class="w-full flex flex-wrap items-center justify-between gap-2 pt-2.5 border-t border-[#C7B9AA] dark:border-[#494139] text-xs">
+            <div class="rm-filter-bar__active">
                 <div class="flex flex-wrap items-center gap-1.5">
-                    <span class="text-[#677084] dark:text-[#BDAE9F] font-bold mr-1 text-[11px] uppercase tracking-wider">
+                    <span class="rm-filter-bar__active-label">
                         Filtros activos:
                     </span>
 

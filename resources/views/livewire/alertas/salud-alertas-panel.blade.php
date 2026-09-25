@@ -27,7 +27,7 @@
  </div>
  </section>
 
- <section class="rounded-[1.6rem] border border-borde/65 bg-fondo-panel p-4 shadow-sm backdrop-blur-xl sm:p-5">
+ <section class="rm-filter-bar">
  <div class="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
  <div>
  <h3 class="text-sm font-bold uppercase tracking-wider text-parrafo">Filtro clínico</h3>

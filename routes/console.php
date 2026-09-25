@@ -9,7 +9,7 @@ Artisan::command('inspire', function () {
 })->purpose('Display an inspiring quote');
 
 Schedule::call(function () {
-    $detector = app(\App\Services\Alertas\DeteccionAlertasService::class);
+    $detector = app(\App\Backend\Modulos\Alertas\Servicios\DeteccionAlertasService::class);
     $detector->detectar();
     $detector->detectarPreventivas();
 })->name('vigilancia-asistencial')->everyFiveMinutes()->withoutOverlapping();

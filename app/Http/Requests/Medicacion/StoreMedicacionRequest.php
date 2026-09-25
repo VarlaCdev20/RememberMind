@@ -16,14 +16,13 @@ class StoreMedicacionRequest extends FormRequest
     protected function prepareForValidation(): void
     {
         if ($adulto = $this->route('adulto_mayor')) {
-            $this->merge(['cod_am' => $adulto->cod_residente ?? $adulto->cod_am, 'cod_residente' => $adulto->cod_residente ?? $adulto->cod_am]);
+            $this->merge(['cod_residente' => $adulto->cod_residente]);
         }
     }
 
     public function rules(): array
     {
         return [
-            'cod_am'               => 'nullable|string',
             'cod_residente'        => 'nullable|string|exists:residentes,cod_residente',
             'nombre_medicamento'   => 'required|string|max:200',
             'dosis'                => 'required|string|max:100',
@@ -42,8 +41,8 @@ class StoreMedicacionRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'cod_am.required'             => 'El adulto mayor es obligatorio.',
-            'cod_am.exists'               => 'El adulto mayor seleccionado no existe.',
+            'cod_residente.required'      => 'El residente es obligatorio.',
+            'cod_residente.exists'        => 'El residente seleccionado no existe.',
             'nombre_medicamento.required' => 'El nombre del medicamento es obligatorio.',
             'nombre_medicamento.max'      => 'El nombre del medicamento no puede exceder 200 caracteres.',
             'dosis.required'              => 'La dosis es obligatoria.',

@@ -67,7 +67,7 @@
  </section>
 
  {{-- 2. SELECCIONAR ADULTO MAYOR --}}
- <section class="rounded-[1.6rem] border border-borde/65 bg-fondo-panel p-4 shadow-sm backdrop-blur-xl">
+ <section class="rm-filter-bar">
  <label class="mb-2 block text-[10px] font-bold uppercase tracking-widest text-apoyo">Seleccionar adulto mayor</label>
  <div class="grid gap-3 md:grid-cols-[1fr_1fr_auto]">
  <div>
@@ -83,7 +83,7 @@
  <option value="">Seleccione un adulto mayor</option>
  @foreach($pacientesSelector as $paciente)
  @php $nombrePaciente = trim("{$paciente->nombres} {$paciente->ap_paterno} {$paciente->ap_materno}"); @endphp
- <option value="{{ $paciente->cod_am }}">{{ $nombrePaciente ?: 'Adulto mayor' }}</option>
+ <option value="{{ $paciente->cod_residente }}">{{ $nombrePaciente ?: 'Adulto mayor' }}</option>
  @endforeach
  </select>
  </div>
@@ -142,10 +142,10 @@
  <section class="rounded-[1.6rem] border border-borde/45 bg-fondo-panel p-4 shadow-sm">
  <h4 class="mb-3 text-[10px] font-bold uppercase tracking-[0.18em] text-apoyo">Accesos Relacionados</h4>
  <div class="flex flex-col gap-2">
- <a href="{{ route('admin.salud-seguimiento.medicacion', $adulto->cod_am) }}" class="inline-flex items-center gap-2 rounded-xl border border-borde-suave bg-fondo-card px-3 py-2 text-[10px] font-bold uppercase tracking-wider text-parrafo transition hover:bg-fondo-app">
+ <a href="{{ route('admin.salud-seguimiento.medicacion', $adulto->cod_residente) }}" class="inline-flex items-center gap-2 rounded-xl border border-borde-suave bg-fondo-card px-3 py-2 text-[10px] font-bold uppercase tracking-wider text-parrafo transition hover:bg-fondo-app">
  <i class="ph-bold ph-pills text-boton-acento"></i> Ver medicación
  </a>
- <a href="{{ route('admin.salud-seguimiento.signos', $adulto->cod_am) }}" class="inline-flex items-center gap-2 rounded-xl border border-borde-suave bg-fondo-card px-3 py-2 text-[10px] font-bold uppercase tracking-wider text-parrafo transition hover:bg-fondo-app">
+ <a href="{{ route('admin.salud-seguimiento.signos', $adulto->cod_residente) }}" class="inline-flex items-center gap-2 rounded-xl border border-borde-suave bg-fondo-card px-3 py-2 text-[10px] font-bold uppercase tracking-wider text-parrafo transition hover:bg-fondo-app">
  <i class="ph-bold ph-heartbeat text-boton-acento"></i> Ver signos vitales
  </a>
  </div>

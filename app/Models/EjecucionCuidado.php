@@ -25,11 +25,7 @@ class EjecucionCuidado extends ModeloOperativo
                 $model->cod_ejecucion = 'EJE_' . $digits;
             }
 
-            // Mapear cod_am a cod_residente
-            if (!empty($model->attributes['cod_am']) && empty($model->attributes['cod_residente'])) {
-                $model->cod_residente = $model->attributes['cod_am'];
-            }
-            unset($model->attributes['cod_am']);
+
 
             // Si aún no hay cod_residente, resolver primer residente disponible
             if (empty($model->cod_residente)) {

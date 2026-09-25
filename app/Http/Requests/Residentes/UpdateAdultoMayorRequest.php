@@ -42,7 +42,7 @@ class UpdateAdultoMayorRequest extends FormRequest
     public function rules(): array
     {
         $adulto = $this->route('adulto_mayor');
-        $codAm = $adulto instanceof \App\Models\Residente ? $adulto->cod_residente : $adulto;
+        $codResidente = $adulto instanceof \App\Models\Residente ? $adulto->cod_residente : $adulto;
 
         return [
             // Identidad
@@ -56,7 +56,7 @@ class UpdateAdultoMayorRequest extends FormRequest
             // Regla compuesta única para ci + exp + comp, ignorando el actual
             'ci_unique' => [
                 Rule::unique('residentes', 'numero_documento')
-                    ->ignore($codAm, 'cod_residente')
+                    ->ignore($codResidente, 'cod_residente')
             ],
 
             'estado_civil' => ['required', 'string', 'in:SOLTERO/A,CASADO/A,VIUDO/A,DIVORCIADO/A,UNIÓN LIBRE,NO ESPECIFICADO'],

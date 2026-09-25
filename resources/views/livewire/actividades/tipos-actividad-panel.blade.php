@@ -153,7 +153,7 @@
  </section>
 
  {{-- ── FILTROS ──────────────────────────────────────────────────────── --}}
- <section class="overflow-hidden rounded-[1.45rem] border border-borde-suave bg-fondo-panel shadow-sm backdrop-blur-xl">
+ <section class="rm-filter-bar overflow-hidden">
  <div class="border-b border-borde-suave bg-fondo-panel px-5 py-3">
  <div class="flex items-center gap-2">
  <i class="ph-bold ph-funnel text-apoyo text-base"></i>
@@ -183,7 +183,7 @@
  </div>
  <div>
  <button wire:click="limpiarFiltros"
- class="inline-flex items-center gap-1.5 rounded-xl border border-borde-suave bg-fondo-app px-3 py-2.5 text-xs font-bold text-apoyo transition hover:border-borde-focus hover:text-boton-acento">
+ class="rm-filter-reset">
  <i class="ph-bold ph-x text-xs"></i>
  Limpiar
  </button>

@@ -11,7 +11,7 @@ class StoreFichaMedicaRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'cod_am'                    => 'required|string|exists:residentes,cod_residente',
+            'cod_residente'             => 'required|string|exists:residentes,cod_residente',
             'hipertension'              => 'nullable|boolean',
             'diabetes'                  => 'nullable|boolean',
             'problemas_cardiacos'       => 'nullable|boolean',
@@ -37,10 +37,10 @@ class StoreFichaMedicaRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'cod_am.required' => 'El adulto mayor es obligatorio.',
-            'cod_am.exists'   => 'El residente seleccionado no existe.',
-            'estado.required' => 'El estado de la ficha médica es obligatorio.',
-            'estado.in'       => 'El estado debe ser ACTIVO, ARCHIVADO o ANULADO.',
+            'cod_residente.required' => 'El residente es obligatorio.',
+            'cod_residente.exists'   => 'El residente seleccionado no existe.',
+            'estado.required'        => 'El estado de la ficha médica es obligatorio.',
+            'estado.in'              => 'El estado debe ser ACTIVO, ARCHIVADO o ANULADO.',
         ];
     }
 

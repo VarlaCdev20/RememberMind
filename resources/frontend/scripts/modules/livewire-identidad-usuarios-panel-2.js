@@ -1,5 +1,5 @@
 
- function enviarPaqueteCorreo(codUsu, correo) {
+ function enviarPaqueteCorreo(codUsuario, correo) {
  if(!correo) {
  Swal.fire({
  icon: 'warning',
@@ -33,7 +33,7 @@
  customClass: { popup: 'rounded-[1.5rem]' }
  });
 
- fetch(`/admin/usuarios/${codUsu}/documentos/enviar`, {
+ fetch(`/admin/usuarios/${codUsuario}/documentos/enviar`, {
  method: 'POST',
  headers: {
  'Content-Type': 'application/json',

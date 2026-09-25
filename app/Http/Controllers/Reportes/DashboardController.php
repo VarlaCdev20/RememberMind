@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Reportes;
 
 use App\Http\Controllers\Controller;
 
-use App\Services\Reportes\DashboardService;
+use App\Backend\Modulos\Reportes\Servicios\DashboardService;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Auth;
 

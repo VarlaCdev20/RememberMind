@@ -311,7 +311,7 @@
                                 <span>•</span>
                                 <span>CI: {{ $adultoDrawer->ci ?: 'Documento S/D' }}</span>
                                 <span>•</span>
-                                <span class="font-mono text-[11px]">{{ $adultoDrawer->cod_am }}</span>
+                                <span class="font-mono text-[11px]">{{ $adultoDrawer->cod_residente }}</span>
                             </div>
                         </div>
                     </div>
@@ -506,7 +506,7 @@
                                 <span>REGISTRO CLÍNICO</span>
                             </span>
                             @if(\Illuminate\Support\Facades\Route::has('admin.cuidados.pacientes.ficha'))
-                                <a href="{{ route('admin.cuidados.pacientes.ficha', $adultoDrawer->cod_am) }}"
+                                <a href="{{ route('admin.cuidados.pacientes.ficha', $adultoDrawer->cod_residente) }}"
                                    class="text-[10px] font-bold text-blue-700 hover:underline">
                                     Ver todos →
                                 </a>
@@ -601,14 +601,14 @@
             <footer class="rm-drawer-footer">
                 <div class="flex items-center gap-2">
                     <button type="button"
-                            wire:click="verUbicacion('{{ $adultoDrawer->cod_am }}')"
+                            wire:click="verUbicacion('{{ $adultoDrawer->cod_residente }}')"
                             class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-[var(--rm-border)] bg-[var(--rm-surface)] text-xs font-semibold text-[var(--rm-text-body)] hover:bg-[var(--rm-surface-alt)] transition cursor-pointer shadow-2xs">
                         <i class="ph-bold ph-bed text-sm text-[var(--rm-text-muted)]"></i>
                         <span>Ver ubicación y cama</span>
                     </button>
 
                     @if(\Illuminate\Support\Facades\Route::has('admin.cuidados.pacientes.ficha'))
-                        <a href="{{ route('admin.cuidados.pacientes.ficha', $adultoDrawer->cod_am) }}"
+                        <a href="{{ route('admin.cuidados.pacientes.ficha', $adultoDrawer->cod_residente) }}"
                            class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-[var(--rm-border)] bg-[var(--rm-surface)] text-xs font-semibold text-[var(--rm-text-body)] hover:bg-[var(--rm-surface-alt)] transition cursor-pointer shadow-2xs">
                             <i class="ph-bold ph-user-circle text-sm text-[var(--rm-text-muted)]"></i>
                             <span>Ver ficha médica</span>

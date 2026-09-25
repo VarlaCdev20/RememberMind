@@ -41,7 +41,7 @@ class AdultoMayorDocumentoController extends Controller
             ->performedOn($adulto_mayor)
             ->log("Se subió un documento para el adulto mayor: {$adulto_mayor->nombres}");
 
-        return redirect()->route('admin.adultos-mayores.documentos.index', $adulto_mayor->cod_am)->with('success', 'Documento subido correctamente.');
+        return redirect()->route('admin.adultos-mayores.documentos.index', $adulto_mayor->cod_residente)->with('success', 'Documento subido correctamente.');
     }
 
     public function archivo(Request $request, AdultoMayor $adulto_mayor, string $documento)
@@ -76,7 +76,7 @@ class AdultoMayorDocumentoController extends Controller
             'observacion' => $request->input('observaciones'),
         ]);
 
-        return redirect()->route('admin.adultos-mayores.documentos.index', $adulto_mayor->cod_am)->with('success', 'Metadatos del documento actualizados.');
+        return redirect()->route('admin.adultos-mayores.documentos.index', $adulto_mayor->cod_residente)->with('success', 'Metadatos del documento actualizados.');
     }
 
     public function destroy(AdultoMayor $adulto_mayor, $documento)
@@ -87,9 +87,9 @@ class AdultoMayorDocumentoController extends Controller
 
         activity('Adulto Mayor')
             ->performedOn($adulto_mayor)
-            ->log("Se archivó un documento (baja lógica) de la ficha {$adulto_mayor->cod_am}. Se conserva archivo físico.");
+            ->log("Se archivó un documento (baja lógica) de la ficha {$adulto_mayor->cod_residente}. Se conserva archivo físico.");
 
-        return redirect()->route('admin.adultos-mayores.documentos.index', $adulto_mayor->cod_am)->with('success', 'Documento archivado correctamente.');
+        return redirect()->route('admin.adultos-mayores.documentos.index', $adulto_mayor->cod_residente)->with('success', 'Documento archivado correctamente.');
     }
 
     public function restore(AdultoMayor $adulto_mayor, $id)
@@ -102,7 +102,7 @@ class AdultoMayorDocumentoController extends Controller
             ->withProperties(['cod_doc' => $id])
             ->log("Se restauró un documento previamente archivado.");
 
-        return redirect()->route('admin.adultos-mayores.documentos.index', $adulto_mayor->cod_am)
+        return redirect()->route('admin.adultos-mayores.documentos.index', $adulto_mayor->cod_residente)
             ->with('success', 'Documento restaurado correctamente.');
     }
 }

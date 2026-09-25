@@ -16,7 +16,7 @@ class AsignacionPersonal extends ModeloOperativo
     protected $fillable = [
         'cod_asignacion_personal', 'cod_jornada', 'cod_personal', 'cod_area',
         'funcion', 'tipo_asignacion', 'fecha_asignacion', 'estado', 'observacion',
-        'cod_usuario', 'cod_usu', 'cod_turno', 'fecha_hora_recepcion',
+        'cod_usuario', 'cod_turno', 'fecha_hora_recepcion',
     ];
 
     protected function casts(): array
@@ -43,11 +43,11 @@ class AsignacionPersonal extends ModeloOperativo
                 $asig->tipo_asignacion = 'TURNO';
             }
 
-            // Resolver cod_personal desde cod_usuario o cod_usu si viene provisto
+            // Resolver cod_personal desde cod_usuario si viene provisto
             if (empty($asig->cod_personal)) {
-                $codUsu = $asig->attributes['cod_usuario'] ?? $asig->attributes['cod_usu'] ?? null;
-                if ($codUsu) {
-                    $u = \App\Models\User::find($codUsu);
+                $codUsuario = $asig->attributes['cod_usuario'] ?? null;
+                if ($codUsuario) {
+                    $u = \App\Models\User::find($codUsuario);
                     $asig->cod_personal = $u?->personal?->cod_personal;
                 }
             }
@@ -86,8 +86,7 @@ class AsignacionPersonal extends ModeloOperativo
 
             unset(
                 $asig->attributes['cod_usuario'],
-                $asig->attributes['cod_usu'],
-                $asig->attributes['cod_turno'],
+                                $asig->attributes['cod_turno'],
                 $asig->attributes['fecha_hora_recepcion'],
             );
         });

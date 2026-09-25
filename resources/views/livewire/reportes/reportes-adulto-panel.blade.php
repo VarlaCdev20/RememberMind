@@ -1,6 +1,6 @@
 <div>
  {{-- Selector de Periodo y Filtros --}}
- <div class="mb-6 rounded-[24px] border border-borde bg-fondo-panel p-5 shadow-[0_12px_28px_rgba(47,62,92,0.05)] backdrop-blur-xl flex flex-col md:flex-row gap-4 items-end justify-between">
+ <div class="rm-filter-bar mb-6 flex flex-col md:flex-row gap-4 items-end justify-between">
  <div class="flex-1">
  <span class="text-[11px] font-bold uppercase tracking-[0.18em] text-parrafo">
  Análisis y Reportes
@@ -73,7 +73,7 @@
  'desc' => 'Consolidado general administrativo, red de apoyo y evolución.',
  'color' => '#2F3E5C',
  'bg' => 'bg-fondo-panel',
- 'url' => route('admin.adultos-mayores.reporte-individual', $adultoMayor->cod_am)
+ 'url' => route('admin.adultos-mayores.reporte-individual', $adultoMayor->cod_residente)
  ],
  [
  'icono' => 'ph-hand-pointing',
@@ -81,7 +81,7 @@
  'desc' => 'Historial de atenciones institucionales registradas en el periodo.',
  'color' => '#E27D60',
  'bg' => 'bg-estado-peligroBg',
- 'url' => route('admin.adultos-mayores.reportes.especifico', [$adultoMayor->cod_am, 'medico']) . $q
+ 'url' => route('admin.adultos-mayores.reportes.especifico', [$adultoMayor->cod_residente, 'medico']) . $q
  ],
  [
  'icono' => 'ph-pill',
@@ -89,7 +89,7 @@
  'desc' => 'Tratamientos y bitácora de tomas registradas en el periodo.',
  'color' => '#D9A27C',
  'bg' => 'bg-fondo-panel',
- 'url' => route('admin.adultos-mayores.reportes.especifico', [$adultoMayor->cod_am, 'medicacion']) . $q
+ 'url' => route('admin.adultos-mayores.reportes.especifico', [$adultoMayor->cod_residente, 'medicacion']) . $q
  ],
  [
  'icono' => 'ph-heartbeat',
@@ -97,7 +97,7 @@
  'desc' => 'Evolución registrada e historial de constantes vitales.',
  'color' => '#C45F4B',
  'bg' => 'bg-fondo-panel',
- 'url' => route('admin.adultos-mayores.reportes.especifico', [$adultoMayor->cod_am, 'signos']) . $q
+ 'url' => route('admin.adultos-mayores.reportes.especifico', [$adultoMayor->cod_residente, 'signos']) . $q
  ],
  [
  'icono' => 'ph-person-arms-spread',
@@ -105,7 +105,7 @@
  'desc' => 'Nivel de autonomía e indicadores funcionales institucionales.',
  'color' => '#8EA17D',
  'bg' => 'bg-fondo-panel',
- 'url' => route('admin.adultos-mayores.reportes.especifico', [$adultoMayor->cod_am, 'funcional']) . $q
+ 'url' => route('admin.adultos-mayores.reportes.especifico', [$adultoMayor->cod_residente, 'funcional']) . $q
  ],
  [
  'icono' => 'ph-brain',
@@ -113,7 +113,7 @@
  'desc' => 'Puntajes de tamizaje cognitivo y resultados interpretativos.',
  'color' => '#5B5F97',
  'bg' => 'bg-fondo-panel',
- 'url' => route('admin.adultos-mayores.reportes.especifico', [$adultoMayor->cod_am, 'cognitivo']) . $q
+ 'url' => route('admin.adultos-mayores.reportes.especifico', [$adultoMayor->cod_residente, 'cognitivo']) . $q
  ],
  ];
  @endphp

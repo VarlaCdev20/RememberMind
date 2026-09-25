@@ -65,16 +65,16 @@
  <div class="rounded-2xl border border-borde-suave bg-fondo-panel p-4 space-y-3 shadow-inner">
  <span class="text-[9px] font-bold uppercase tracking-widest text-apoyo block text-center">Gestión de Paquete Documental Institucional</span>
  <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
- <a href="{{ route('admin.usuarios.documentos.pdf', $usuarioPostRegistro->cod_usu) }}" target="_blank"
+ <a href="{{ route('admin.usuarios.documentos.pdf', $usuarioPostRegistro->cod_usuario) }}" target="_blank"
  class="inline-flex h-9 items-center justify-center gap-1.5 rounded-xl bg-fondo-panel text-xs font-bold text-parrafo border border-borde-fuerte transition hover:bg-boton-principal hover:text-inverso active:scale-95 shadow-sm">
  <i class="ph-bold ph-printer"></i> Imprimir
  </a>
- <a href="{{ route('admin.usuarios.documentos.pdf', $usuarioPostRegistro->cod_usu) }}" target="_blank" download="Paquete_Documental.pdf"
+ <a href="{{ route('admin.usuarios.documentos.pdf', $usuarioPostRegistro->cod_usuario) }}" target="_blank" download="Paquete_Documental.pdf"
  class="inline-flex h-9 items-center justify-center gap-1.5 rounded-xl bg-fondo-panel text-xs font-bold text-parrafo border border-borde-fuerte transition hover:bg-boton-principal hover:text-inverso active:scale-95 shadow-sm">
  <i class="ph-bold ph-download-simple"></i> Descargar PDF
  </a>
  <button type="button" 
- onclick="enviarPaqueteCorreo('{{ $usuarioPostRegistro->cod_usu }}', '{{ $usuarioPostRegistro->correo }}')"
+ onclick="enviarPaqueteCorreo('{{ $usuarioPostRegistro->cod_usuario }}', '{{ $usuarioPostRegistro->correo }}')"
  class="inline-flex h-9 items-center justify-center gap-1.5 rounded-xl bg-estado-peligroBg text-xs font-bold text-boton-acento border border-borde-focus transition hover:bg-boton-acento hover:text-inverso active:scale-95 shadow-sm">
  <i class="ph-bold ph-envelope"></i> Enviar Correo
  </button>
@@ -83,7 +83,7 @@
 
  @php
  if($usuarioPostRegistro) {
- $docServicePR = app(\App\Services\Documentos\DocumentosUsuarioService::class);
+ $docServicePR = app(\App\Backend\Modulos\Documentos\Servicios\DocumentosUsuarioService::class);
  $rolKeyPR = $usuarioPostRegistro->roles->first()?->name ?? 'sin_rol';
  $docsInstitucionalesPR = $docServicePR->documentosGeneradosPorRol($rolKeyPR);
  } else {
@@ -101,11 +101,11 @@
  <span class="text-[10px] font-bold text-parrafo uppercase">{{ $docInst['nombre'] }}</span>
  </div>
  <div class="flex gap-1">
- <a href="{{ route('admin.usuarios.documentos.ver', ['user' => $usuarioPostRegistro->cod_usu, 'documento' => $docInst['slug']]) }}" target="_blank"
+ <a href="{{ route('admin.usuarios.documentos.ver', ['user' => $usuarioPostRegistro->cod_usuario, 'documento' => $docInst['slug']]) }}" target="_blank"
  class="h-7 w-7 flex items-center justify-center rounded-lg bg-fondo-panel text-parrafo hover:bg-boton-principal hover:text-inverso transition">
  <i class="ph-bold ph-eye"></i>
  </a>
- <a href="{{ route('admin.usuarios.documentos.documento-pdf', ['user' => $usuarioPostRegistro->cod_usu, 'documento' => $docInst['slug']]) }}" target="_blank" download
+ <a href="{{ route('admin.usuarios.documentos.documento-pdf', ['user' => $usuarioPostRegistro->cod_usuario, 'documento' => $docInst['slug']]) }}" target="_blank" download
  class="h-7 w-7 flex items-center justify-center rounded-lg bg-estado-peligroBg text-boton-acento hover:bg-boton-acento hover:text-inverso transition">
  <i class="ph-bold ph-download-simple"></i>
  </a>

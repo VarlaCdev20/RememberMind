@@ -66,17 +66,17 @@
                         Adulto Mayor Asignado <span class="text-rose-500">*</span>
                     </label>
                     <select id="selectResidente"
-                        wire:model.live="codAm"
-                        class="rm-select text-xs @error('codAm') border-rose-500 dark:border-rose-500 @enderror">
+                        wire:model.live="codResidente"
+                        class="rm-select text-xs @error('codResidente') border-rose-500 dark:border-rose-500 @enderror">
                         <option value="">-- Seleccione un residente asistido --</option>
                         @foreach($adultos as $ad)
-                            <option value="{{ $ad->cod_am }}">
+                            <option value="{{ $ad->cod_residente }}">
                                 {{ $ad->ap_paterno }} {{ $ad->ap_materno }} {{ $ad->nombres }} 
                                 ({{ $ad->ubicacion_texto }})
                             </option>
                         @endforeach
                     </select>
-                    @error('codAm')
+                    @error('codResidente')
                         <span class="text-[11px] text-rose-600 dark:text-rose-400 font-semibold mt-1 flex items-center gap-1">
                             <i class="ph-bold ph-warning-circle"></i> {{ $message }}
                         </span>

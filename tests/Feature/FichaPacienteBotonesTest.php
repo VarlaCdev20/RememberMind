@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Livewire\Cuidados\FichaPaciente;
+use App\Frontend\Livewire\Compartido\Clinica\FichaPaciente;
 use App\Models\AdministracionMedicacion;
 use App\Models\AdultoMayor;
 use App\Models\Alerta;
@@ -41,7 +41,7 @@ class FichaPacienteBotonesTest extends TestCase
         $this->seed([ RolesAndPermissionsSeeder::class]);
 
         $this->enfermero = User::factory()->create([
-            'cod_usu' => 'USU_0099',
+            'cod_usuario' => 'USU_0099',
             'nombres' => 'Elena',
             'ap_paterno' => 'Salazar',
             'estado' => 'ACTIVO',
@@ -73,7 +73,7 @@ class FichaPacienteBotonesTest extends TestCase
         ]);
 
         $this->adulto = AdultoMayor::factory()->create([
-            'cod_am' => 'AM100',
+            'cod_residente' => 'AM100',
             'nombres' => 'Bernardo',
             'ap_paterno' => 'Pinto',
             'ap_materno' => 'Rios',
@@ -87,7 +87,7 @@ class FichaPacienteBotonesTest extends TestCase
         ]);
 
         OcupacionCama::create([
-            'cod_am' => $this->adulto->cod_am,
+            'cod_residente' => $this->adulto->cod_residente,
             'cod_habitacion' => $this->habitacion->cod_habitacion,
             'cod_cama' => $this->cama->cod_cama,
             'fecha_asignacion' => today()->toDateString(),
@@ -95,20 +95,20 @@ class FichaPacienteBotonesTest extends TestCase
         ]);
 
         AsignacionResidenteJornada::create([
-            'cod_am' => $this->adulto->cod_am,
+            'cod_residente' => $this->adulto->cod_residente,
             'cod_turno' => $this->turno->cod_turno,
-            'cod_usu_enfermero' => $this->enfermero->cod_usu,
-            'cod_usu' => $this->enfermero->cod_usu,
+            'cod_usu_enfermero' => $this->enfermero->cod_usuario,
+            'cod_usuario' => $this->enfermero->cod_usuario,
             'fecha_inicio' => today()->toDateString(),
             'motivo_asignacion' => 'Turno activo',
-            'asignado_por' => $this->enfermero->cod_usu,
+            'asignado_por' => $this->enfermero->cod_usuario,
             'fecha' => today()->toDateString(),
             'nivel_supervision' => 'MEDIO',
             'estado' => 'ACTIVO',
         ]);
         AsignacionPersonal::create([
             'cod_turno' => $this->turno->cod_turno,
-            'cod_usuario' => $this->enfermero->cod_usu,
+            'cod_usuario' => $this->enfermero->cod_usuario,
             'fecha_hora_recepcion' => now(),
         ]);
     }
@@ -123,7 +123,7 @@ class FichaPacienteBotonesTest extends TestCase
     {
         $this->actingAs($this->enfermero);
 
-        Livewire::test(FichaPaciente::class, ['adulto' => $this->adulto->cod_am])
+        Livewire::test(FichaPaciente::class, ['adulto' => $this->adulto->cod_residente])
             ->call('abrirModalSignos')
             ->assertSet('modalSignos', true)
             ->set('signoPA', '125/80')
@@ -139,7 +139,7 @@ class FichaPacienteBotonesTest extends TestCase
             ->assertSet('modalSignos', false);
 
         $this->assertDatabaseHas('signos_vitales', [
-            'cod_residente' => $this->adulto->cod_am,
+            'cod_residente' => $this->adulto->cod_residente,
             'presion_sistolica' => 125,
             'presion_diastolica' => 80,
             'frecuencia_cardiaca' => 74,
@@ -152,7 +152,7 @@ class FichaPacienteBotonesTest extends TestCase
         $this->actingAs($this->enfermero);
 
         $med = Prescripcion::create([
-            'cod_am' => $this->adulto->cod_am,
+            'cod_residente' => $this->adulto->cod_residente,
             'nombre_medicamento' => 'Metformina 850mg',
             'dosis' => '850 mg',
             'via_administracion' => 'Oral',
@@ -162,7 +162,7 @@ class FichaPacienteBotonesTest extends TestCase
             'estado' => 'ACTIVO',
         ]);
 
-        Livewire::test(FichaPaciente::class, ['adulto' => $this->adulto->cod_am])
+        Livewire::test(FichaPaciente::class, ['adulto' => $this->adulto->cod_residente])
             ->call('abrirModalMedicacion', $med->cod_med)
             ->assertSet('modalMed', true)
             ->set('medAccion', 'ADMINISTRAR')
@@ -172,7 +172,7 @@ class FichaPacienteBotonesTest extends TestCase
             ->assertSet('modalMed', false);
 
         $this->assertDatabaseHas('administraciones_medicacion', [
-            'cod_residente' => $this->adulto->cod_am,
+            'cod_residente' => $this->adulto->cod_residente,
             'resultado' => 'ADMINISTRADA',
         ]);
     }
@@ -182,17 +182,17 @@ class FichaPacienteBotonesTest extends TestCase
         $this->actingAs($this->enfermero);
 
         $plan = PlanCuidado::create([
-            'cod_am' => $this->adulto->cod_am,
+            'cod_residente' => $this->adulto->cod_residente,
             'diagnostico_enfermeria' => 'Riesgo de deterioro de la integridad cutánea',
             'objetivo' => 'Mantener piel intacta',
             'fecha_inicio' => today()->toDateString(),
             'estado' => 'ACTIVO',
-            'creado_por' => $this->enfermero->cod_usu,
+            'creado_por' => $this->enfermero->cod_usuario,
         ]);
 
         $tarea = EjecucionCuidado::create([
             'cod_plan' => $plan->cod_plan,
-            'cod_am' => $this->adulto->cod_am,
+            'cod_residente' => $this->adulto->cod_residente,
             'cod_turno' => $this->turno->cod_turno,
             'titulo' => 'Cambio postural decúbito lateral',
             'area' => 'PIEL',
@@ -200,10 +200,10 @@ class FichaPacienteBotonesTest extends TestCase
             'fecha_programada' => today()->toDateString(),
             'hora_programada' => '10:00:00',
             'estado' => 'PENDIENTE',
-            'registrado_por' => $this->enfermero->cod_usu,
+            'registrado_por' => $this->enfermero->cod_usuario,
         ]);
 
-        Livewire::test(FichaPaciente::class, ['adulto' => $this->adulto->cod_am])
+        Livewire::test(FichaPaciente::class, ['adulto' => $this->adulto->cod_residente])
             ->call('abrirModalTarea', $tarea->cod_tarea)
             ->assertSet('modalTarea', true)
             ->set('tareaEstadoAccion', 'REALIZADA')
@@ -219,7 +219,7 @@ class FichaPacienteBotonesTest extends TestCase
     {
         $this->actingAs($this->enfermero);
 
-        Livewire::test(FichaPaciente::class, ['adulto' => $this->adulto->cod_am])
+        Livewire::test(FichaPaciente::class, ['adulto' => $this->adulto->cod_residente])
             ->call('abrirModalSeguimiento')
             ->assertSet('modalSeguimiento', true)
             ->set('segEstado', 'ESTABLE')
@@ -232,7 +232,7 @@ class FichaPacienteBotonesTest extends TestCase
             ->assertSet('modalSeguimiento', false);
 
         $this->assertDatabaseHas('atenciones', [
-            'cod_residente' => $this->adulto->cod_am,
+            'cod_residente' => $this->adulto->cod_residente,
             'tipo_atencion' => 'SEGUIMIENTO_DIARIO',
         ]);
     }
@@ -241,7 +241,7 @@ class FichaPacienteBotonesTest extends TestCase
     {
         $this->actingAs($this->enfermero);
 
-        Livewire::test(FichaPaciente::class, ['adulto' => $this->adulto->cod_am])
+        Livewire::test(FichaPaciente::class, ['adulto' => $this->adulto->cod_residente])
             ->call('abrirModalIncidente')
             ->assertSet('modalIncidente', true)
             ->set('incidenteTipo', 'CAIDA')
@@ -252,7 +252,7 @@ class FichaPacienteBotonesTest extends TestCase
             ->assertSet('modalIncidente', false);
 
         $this->assertDatabaseHas('alertas', [
-            'cod_residente' => $this->adulto->cod_am,
+            'cod_residente' => $this->adulto->cod_residente,
             'prioridad' => 'ALTO',
             'estado' => 'ABIERTA',
         ]);
@@ -263,17 +263,17 @@ class FichaPacienteBotonesTest extends TestCase
         $this->actingAs($this->enfermero);
 
         $alerta = Alerta::create([
-            'cod_am' => $this->adulto->cod_am,
+            'cod_residente' => $this->adulto->cod_residente,
             'origen' => 'ENFERMERIA',
             'tipo_alerta' => 'CLINICA',
             'nivel' => 'ALTO',
             'motivo' => 'Fiebre persistente 38.5°C',
             'estado' => 'ABIERTA',
-            'registrado_por' => $this->enfermero->cod_usu,
+            'registrado_por' => $this->enfermero->cod_usuario,
         ]);
 
         // Atender alerta -> pasa a EN_ATENCION
-        Livewire::test(FichaPaciente::class, ['adulto' => $this->adulto->cod_am])
+        Livewire::test(FichaPaciente::class, ['adulto' => $this->adulto->cod_residente])
             ->call('abrirModalAtenderAlerta', $alerta->cod_alerta)
             ->assertSet('modalAtenderAlerta', true)
             ->set('accionTomadaAlerta', 'Medios físicos aplicados y aviso a médico de guardia')
@@ -284,7 +284,7 @@ class FichaPacienteBotonesTest extends TestCase
         $this->assertSame('EN_ATENCION', $alerta->fresh()->estado);
 
         // Cerrar alerta -> pasa a CERRADA
-        Livewire::test(FichaPaciente::class, ['adulto' => $this->adulto->cod_am])
+        Livewire::test(FichaPaciente::class, ['adulto' => $this->adulto->cod_residente])
             ->call('abrirModalCerrarAlerta', $alerta->cod_alerta)
             ->assertSet('modalCerrarAlerta', true)
             ->set('observacionCierreAlerta', 'Temperatura normalizada en 36.8°C tras medicación')

@@ -11,7 +11,7 @@ use App\Models\Personal;
 use App\Models\Residente;
 use App\Models\Turno;
 use App\Models\User;
-use App\Services\Enfermeria\PaseTurnoService;
+use App\Backend\Modulos\Enfermeria\Servicios\PaseTurnoService;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Validation\ValidationException;
@@ -533,7 +533,7 @@ class PaseTurnoReconstruidoTest extends TestCase
         // Actuamos como Rosa (Saliente)
         $this->actingAs($this->userSaliente);
 
-        $testable = Livewire::test(\App\Livewire\Cuidados\PaseTurnoPanel::class);
+        $testable = Livewire::test(\App\Frontend\Livewire\Enfermeria\Cuidados\PaseTurnoPanel::class);
 
         // Verificar datos contextuales automáticos en el componente
         $testable->assertSet('tabActivo', 'entrega')
@@ -567,7 +567,7 @@ class PaseTurnoReconstruidoTest extends TestCase
         // Ahora actuamos como Elena (Entrante)
         $this->actingAs($this->userEntrante1);
 
-        $testableReceptor = Livewire::test(\App\Livewire\Cuidados\PaseTurnoPanel::class);
+        $testableReceptor = Livewire::test(\App\Frontend\Livewire\Enfermeria\Cuidados\PaseTurnoPanel::class);
 
         // Elena ve en la sección de "Pases pendientes de recibir" el pase de Mario Gutiérrez
         $testableReceptor->assertSee('Mario Gutiérrez')

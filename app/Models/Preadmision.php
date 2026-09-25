@@ -194,11 +194,6 @@ class Preadmision extends ModeloOperativo
         return $this->procedencia;
     }
 
-    public function getCodAmGeneradoAttribute(): ?string
-    {
-        return $this->admision?->cod_residente;
-    }
-
     public function getDocumentosInicialesCompletosAttribute(): bool
     {
         return (int) ($this->documentos_count ?? $this->documentos()->count()) > 0;

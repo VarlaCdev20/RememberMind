@@ -1,7 +1,7 @@
 @props(['adulto'])
 
 @php
-    $codigo = data_get($adulto, 'cod_am');
+    $codigo = data_get($adulto, 'cod_residente');
     $enlace = static fn (string $nombre, array|string $parametros = []) => [
         'href' => route($nombre, $parametros),
         'activo' => request()->routeIs($nombre),

@@ -47,7 +47,7 @@
     </section>
 
     {{-- BARRA DE FILTROS UNIFICADA FORMATO ALERTAS --}}
-    <section class="rounded-2xl bg-[#DED1C3] dark:bg-[#2C2723] border border-[#C7B9AA] dark:border-[#423B34] p-3 text-xs shadow-sm flex flex-col gap-2.5">
+    <section class="rm-filter-bar">
         <div class="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-2 items-center">
             {{-- Buscador Principal --}}
             <div class="lg:col-span-3 relative flex items-center">
@@ -111,9 +111,9 @@
             $hasFiltrosActivos = !empty($search) || !empty($estado) || !empty($prioridad) || !empty($fecha_inicio) || !empty($fecha_fin);
         @endphp
         @if($hasFiltrosActivos)
-            <div class="w-full flex flex-wrap items-center justify-between gap-2 pt-2.5 border-t border-[#C7B9AA]/60 dark:border-[#423B34] text-xs">
+            <div class="rm-filter-bar__active">
                 <div class="flex flex-wrap items-center gap-1.5">
-                    <span class="text-[11px] font-bold text-[#677084] dark:text-[#9A9084] flex items-center gap-1 mr-1">
+                    <span class="rm-filter-bar__active-label">
                         <i class="ph-bold ph-funnel text-xs"></i> Filtros activos:
                     </span>
                     @if(!empty($search))
@@ -232,8 +232,8 @@
                                             <span class="text-xs font-semibold text-apoyo">Pendiente de revisión profesional</span>
                                         @endif
                                     @elseif ($preadmision->estado === 'APROBADA')
-                                        @if($preadmision->cod_am_generado)
-                                            <a wire:navigate href="{{ route('admin.adultos-mayores.show', $preadmision->cod_am_generado) }}" class="inline-flex items-center gap-1 rounded-lg bg-boton-acento px-3 py-1.5 text-[11px] font-bold text-boton-acentoTexto">Ver ficha</a>
+                                        @if($preadmision->admision?->cod_residente)
+                                            <a wire:navigate href="{{ route('admin.adultos-mayores.show', $preadmision->admision->cod_residente) }}" class="inline-flex items-center gap-1 rounded-lg bg-boton-acento px-3 py-1.5 text-[11px] font-bold text-boton-acentoTexto">Ver ficha</a>
                                         @else
                                             @if(auth()->user()?->hasAnyRole(['ADMINISTRADOR', 'SUPERADMINISTRADOR']))
                                                 <button wire:click="abrirAdmision('{{ $preadmision->cod_pre }}')" class="inline-flex items-center gap-1 rounded-lg bg-boton-acento px-3 py-1.5 text-[11px] font-bold text-boton-acentoTexto"><i class="ph ph-door-open"></i> Formalizar admisión</button>
@@ -242,7 +242,7 @@
                                             @endif
                                         @endif
                                     @elseif ($preadmision->estado === 'ADMITIDA')
-                                        <a wire:navigate href="{{ route('admin.adultos-mayores.show', $preadmision->cod_am_generado) }}" class="inline-flex items-center gap-1 rounded-lg bg-boton-acento px-3 py-1.5 text-[11px] font-bold text-boton-acentoTexto">Ver ficha del residente</a>
+                                        <a wire:navigate href="{{ route('admin.adultos-mayores.show', $preadmision->admision->cod_residente) }}" class="inline-flex items-center gap-1 rounded-lg bg-boton-acento px-3 py-1.5 text-[11px] font-bold text-boton-acentoTexto">Ver ficha del residente</a>
                                     @else
                                         <span class="text-xs text-estado-peligro">
                                             {{ optional($preadmision->fecha_rechazo)->format('d/m/Y H:i') }}
@@ -424,7 +424,7 @@
                     <ol class="mt-4 space-y-3 text-sm">
                         <li class="flex gap-3"><i class="ph-fill ph-check-circle text-estado-exito"></i><span><strong class="text-titulo">Solicitud registrada</strong><span class="block text-xs text-apoyo">No genera una ficha de residente.</span></span></li>
                         <li class="flex gap-3"><i class="ph-fill {{ in_array($solicitudDetalle->estado, ['APROBADA','ADMITIDA']) ? 'ph-check-circle text-estado-exito' : 'ph-circle text-apoyo' }}"></i><span><strong class="text-titulo">Revisión y decisión</strong><span class="block text-xs text-apoyo">Aprobar, rechazar o mantener pendiente.</span></span></li>
-                        <li class="flex gap-3"><i class="ph-fill {{ $solicitudDetalle->cod_am_generado ? 'ph-check-circle text-estado-exito' : 'ph-circle text-apoyo' }}"></i><span><strong class="text-titulo">Admisión y cama</strong><span class="block text-xs text-apoyo">Aquí se habilita al residente institucional.</span></span></li>
+                        <li class="flex gap-3"><i class="ph-fill {{ $solicitudDetalle->admision?->cod_residente ? 'ph-check-circle text-estado-exito' : 'ph-circle text-apoyo' }}"></i><span><strong class="text-titulo">Admisión y cama</strong><span class="block text-xs text-apoyo">Aquí se habilita al residente institucional.</span></span></li>
                     </ol>
                 </section>
             </div>

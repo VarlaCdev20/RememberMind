@@ -110,7 +110,7 @@ class BitacoraController extends Controller
         // Datos para filtros
         $usuarios = DB::table('usuarios')
             ->leftJoin('personal', 'usuarios.cod_usuario', '=', 'personal.cod_usuario')
-            ->select('usuarios.cod_usuario as cod_usu', 'personal.nombres', 'personal.apellido_paterno as ap_paterno')
+            ->select('usuarios.cod_usuario', 'personal.nombres', 'personal.apellido_paterno as ap_paterno')
             ->orderBy('personal.nombres')->get();
         
         $modulosRaw = DB::table('activity_log')->distinct()->pluck('log_name')->filter()->sort();

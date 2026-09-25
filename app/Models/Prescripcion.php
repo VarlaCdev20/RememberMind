@@ -22,7 +22,7 @@ class Prescripcion extends ModeloOperativo
         'via_administracion', 'frecuencia', 'indicacion', 'segun_necesidad',
         'fecha_hora_prescripcion', 'fecha_hora_suspension', 'motivo_suspension',
         'estado', 'observacion',
-        'cod_am', 'nombre_medicamento', 'hora_programada', 'fecha_inicio',
+        'nombre_medicamento', 'hora_programada', 'fecha_inicio',
     ];
 
     protected function casts(): array
@@ -87,11 +87,6 @@ class Prescripcion extends ModeloOperativo
         return (string) $this->cod_prescripcion;
     }
 
-    public function getCodAmAttribute(): string
-    {
-        return (string) $this->cod_residente;
-    }
-
     public function getNombreMedicamentoAttribute(): string
     {
         return (string) ($this->medicamento?->nombre_comercial
@@ -128,12 +123,6 @@ class Prescripcion extends ModeloOperativo
         return trim("{$this->personal->nombres} {$this->personal->apellido_paterno} {$this->personal->apellido_materno}");
     }
 
-    
-    public function setCodAmAttribute($value): void
-    {
-        $this->attributes['cod_residente'] = $value;
-    }
-
 
 
     public function setNombreMedicamentoAttribute($value): void
@@ -141,7 +130,7 @@ class Prescripcion extends ModeloOperativo
         $this->attributes['indicacion'] = $value;
     }
 
-    
+
     public function setDosisAttribute($value): void
     {
         if (is_string($value) && !is_numeric($value)) {
@@ -157,15 +146,13 @@ class Prescripcion extends ModeloOperativo
         $this->attributes['dosis'] = $value;
     }
 
-    
+
     public function newEloquentBuilder($query)
     {
         return new class($query) extends \Illuminate\Database\Eloquent\Builder {
             public function where($column, $operator = null, $value = null, $boolean = 'and')
             {
-                if ($column === 'cod_am') {
-                    $column = 'cod_residente';
-                }
+
                 return parent::where($column, $operator, $value, $boolean);
             }
         };
@@ -173,7 +160,7 @@ class Prescripcion extends ModeloOperativo
 
     protected static function booted(): void
     {
-        
+
         static::created(function (self $model) {
             $horaProg = $model->hora_programada_temp ?? $model->attributes['hora_programada'] ?? null;
             if ($horaProg) {
@@ -187,7 +174,7 @@ class Prescripcion extends ModeloOperativo
             }
         });
         static::creating(function (self $model) {
-            
+
             if (empty($model->fecha_hora_prescripcion)) {
                 $model->fecha_hora_prescripcion = $model->attributes['fecha_inicio'] ?? now();
             }
@@ -197,10 +184,7 @@ class Prescripcion extends ModeloOperativo
             if (empty($model->cod_prescripcion)) {
                 $model->cod_prescripcion = "PRS_" . strtoupper(\Illuminate\Support\Str::random(10));
             }
-            if (isset($model->attributes["cod_am"]) && empty($model->cod_residente)) {
-                $model->cod_residente = $model->attributes["cod_am"];
-                unset($model->attributes["cod_am"]);
-            }
+
             if (empty($model->cod_medicamento)) {
                 $nombreMed = $model->attributes["nombre_medicamento"] ?? $model->indicacion ?? "Medicamento";
                 $med = \App\Models\Medicamento::where("nombre_generico", $nombreMed)
@@ -234,10 +218,9 @@ class Prescripcion extends ModeloOperativo
                 }
                 $model->cod_atencion = $atencion->cod_atencion;
             }
-            
+
             unset(
-                $model->attributes['cod_am'],
-                $model->attributes['nombre_medicamento'],
+                                $model->attributes['nombre_medicamento'],
                 $model->attributes['hora_programada'],
                 $model->attributes['fecha_inicio']
             );

@@ -97,7 +97,7 @@
  {{-- ══════════════════════════════════════════════════════════════════ --}}
  {{-- FILTROS --}}
  {{-- ══════════════════════════════════════════════════════════════════ --}}
- <section class="overflow-hidden rounded-[1.45rem] border border-borde-suave bg-fondo-panel shadow-sm backdrop-blur-xl">
+ <section class="rm-filter-bar overflow-hidden">
  <div class="border-b border-borde-suave bg-fondo-panel px-5 py-3">
  <div class="flex items-center gap-2">
  <i class="ph-bold ph-funnel text-apoyo text-sm"></i>
@@ -178,7 +178,7 @@
  <button
  type="button"
  wire:click="limpiarFiltros"
- class="inline-flex items-center gap-1.5 rounded-xl border border-borde-suave bg-fondo-panel px-3.5 py-2 text-xs font-bold text-apoyo transition hover:bg-fondo-app"
+ class="rm-filter-reset"
  >
  <i class="ph-bold ph-x text-xs"></i>
  Limpiar

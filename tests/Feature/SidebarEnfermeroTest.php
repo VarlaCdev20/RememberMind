@@ -7,7 +7,7 @@ use App\Models\Alerta;
 use App\Models\AsignacionResidenteJornada;
 use App\Models\TurnoEnfermeria;
 use App\Models\User;
-use App\Services\Identidad\SidebarService;
+use App\Backend\Modulos\Identidad\Servicios\SidebarService;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -82,9 +82,9 @@ class SidebarEnfermeroTest extends TestCase
 
         // Asignar el residente al enfermero
         AsignacionResidenteJornada::create([
-            'cod_am' => $adulto->cod_am,
+            'cod_residente' => $adulto->cod_residente,
             'cod_turno' => $turno->cod_turno,
-            'cod_usu_enfermero' => $enfermero->cod_usu,
+            'cod_usu_enfermero' => $enfermero->cod_usuario,
             'fecha_asignacion' => today(),
             'fecha_inicio' => today(),
             'estado' => 'ACTIVO',
@@ -92,24 +92,24 @@ class SidebarEnfermeroTest extends TestCase
 
         // Crear 2 alertas activas
         Alerta::create([
-            'cod_am' => $adulto->cod_am,
+            'cod_residente' => $adulto->cod_residente,
             'cod_turno' => $turno->cod_turno,
             'origen' => 'MANUAL',
             'tipo_alerta' => 'CLINICA',
             'nivel' => 'ALTA',
             'motivo' => 'Presión arterial elevada',
-            'responsable_id' => $enfermero->cod_usu,
+            'responsable_id' => $enfermero->cod_usuario,
             'estado' => 'ABIERTA',
         ]);
 
         Alerta::create([
-            'cod_am' => $adulto->cod_am,
+            'cod_residente' => $adulto->cod_residente,
             'cod_turno' => $turno->cod_turno,
             'origen' => 'MANUAL',
             'tipo_alerta' => 'CONDUCTUAL',
             'nivel' => 'MEDIA',
             'motivo' => 'Desorientación temporoespacial',
-            'responsable_id' => $enfermero->cod_usu,
+            'responsable_id' => $enfermero->cod_usuario,
             'estado' => 'EN_ATENCION',
         ]);
 

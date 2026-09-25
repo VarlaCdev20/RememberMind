@@ -2,9 +2,9 @@
 
 namespace Tests\Feature;
 
-use App\Livewire\Cuidados\AgendaEnfermeria;
-use App\Livewire\Cuidados\FichaPaciente;
-use App\Livewire\Cuidados\RegistrosEnfermeria;
+use App\Frontend\Livewire\Enfermeria\Cuidados\AgendaEnfermeria;
+use App\Frontend\Livewire\Compartido\Clinica\FichaPaciente;
+use App\Frontend\Livewire\Enfermeria\Cuidados\RegistrosEnfermeria;
 use App\Models\Alerta;
 use App\Models\Area;
 use App\Models\AsignacionPersonal;
@@ -22,7 +22,7 @@ use App\Models\RegistroIngesta;
 use App\Models\Residente;
 use App\Models\TurnoEnfermeria;
 use App\Models\User;
-use App\Services\Enfermeria\AgendaTurnoService;
+use App\Backend\Modulos\Enfermeria\Servicios\AgendaTurnoService;
 use Database\Seeders\DatabaseSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;

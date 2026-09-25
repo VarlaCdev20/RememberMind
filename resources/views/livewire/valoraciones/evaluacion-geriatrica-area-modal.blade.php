@@ -35,17 +35,17 @@
                     <label class="block text-[10px] font-bold uppercase tracking-wider text-titulo/60 mb-1.5">
                         Adulto Mayor <span class="text-estado-peligro">*</span>
                     </label>
-                    <select wire:model.live="cod_am"
+                    <select wire:model.live="cod_residente"
                             class="w-full rounded-xl border border-borde-suave bg-fondo-card/80 px-4 py-2.5 text-sm font-bold text-titulo outline-none transition focus:border-borde-focus">
                         <option value="">-- Seleccionar Paciente --</option>
                         @foreach($pacientes as $pac)
-                        <option value="{{ $pac->cod_am }}"
-                                @if($cod_am === $pac->cod_am) selected @endif>
+                        <option value="{{ $pac->cod_residente }}"
+                                @if($cod_residente === $pac->cod_residente) selected @endif>
                             {{ $pac->nombres }} {{ $pac->ap_paterno }} — CI: {{ $pac->ci }}
                         </option>
                         @endforeach
                     </select>
-                    @error('cod_am')
+                    @error('cod_residente')
                     <span class="mt-1 block text-[10px] font-bold text-estado-peligro">{{ $message }}</span>
                     @enderror
                 </div>

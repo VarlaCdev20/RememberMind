@@ -36,13 +36,13 @@ class UpdateUsuarioRequest extends FormRequest
     public function rules(): array
     {
         $usuario = $this->route('usuario');
-        $codUsu = is_object($usuario) ? $usuario->cod_usu : $usuario;
+        $codUsuario = is_object($usuario) ? $usuario->cod_usuario : $usuario;
 
         return [
             'nombres'              => [
                 'required', 'string', 'min:2', 'max:100', 'regex:/^[\pL\s\-áéíóúÁÉÍÓÚñÑ]+$/u',
-                function ($attribute, $value, $fail) use ($codUsu) {
-                    $exists = \App\Models\Personal::where('nombres', $this->nombres)->where('apellido_paterno', $this->ap_paterno)->where('apellido_materno', $this->ap_materno)->where('cod_usuario', '!=', $codUsu)->exists();
+                function ($attribute, $value, $fail) use ($codUsuario) {
+                    $exists = \App\Models\Personal::where('nombres', $this->nombres)->where('apellido_paterno', $this->ap_paterno)->where('apellido_materno', $this->ap_materno)->where('cod_usuario', '!=', $codUsuario)->exists();
                     if ($exists) {
                         $fail('Ya existe un usuario con el mismo nombre completo. Verifique si se trata de la misma persona antes de continuar.');
                     }
@@ -54,7 +54,7 @@ class UpdateUsuarioRequest extends FormRequest
             'tipo_documento'       => ['required', 'string'],
             'numero_documento'     => [
                 'required', 'string', 'max:30', 
-                Rule::unique('personal', 'numero_documento')->ignore($codUsu, 'cod_usuario'),
+                Rule::unique('personal', 'numero_documento')->ignore($codUsuario, 'cod_usuario'),
                 function ($attribute, $value, $fail) {
                     $pais = $this->pais_documento;
                     $tipo = $this->tipo_documento;
@@ -120,7 +120,7 @@ class UpdateUsuarioRequest extends FormRequest
                 'required', 
                 'email', 
                 'max:150', 
-                Rule::unique('usuarios', 'correo')->ignore($codUsu, 'cod_usuario')
+                Rule::unique('usuarios', 'correo')->ignore($codUsuario, 'cod_usuario')
             ],
             'rol'                  => ['required', 'string', 'exists:roles,name'],
             'especialidad_salud'   => ['required_if:rol,ENFERMEROS,MEDICO GENERAL/GERIATRA,PSICOLOGO/A,PEDAGOGO,NUTRICIONISTA,FISIOTERAPEUTA', 'nullable', 'string'],

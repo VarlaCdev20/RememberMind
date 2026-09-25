@@ -1,7 +1,7 @@
 @if($mostrarFormulario)
  <div class="fixed inset-0 z-[2147483646] flex items-center justify-center bg-boton-principal/50 backdrop-blur-sm px-3 sm:px-4 transition-all duration-300">
  <div class="relative z-[2147483647] w-full max-w-4xl max-h-[92vh] overflow-hidden rounded-[24px] border border-borde-suave bg-fondo-app shadow-[0_20px_50px_rgba(0,0,0,0.5)] animate-in fade-in zoom-in duration-300 flex flex-col">
- 
+
  {{-- HEADER CON PROGRESO --}}
  <header class="relative border-b border-borde-suave bg-fondo-panel px-4 py-3 backdrop-blur-xl shrink-0">
  <div class="flex items-center justify-between gap-4 mb-2">
@@ -25,9 +25,9 @@
  {{-- Línea de fondo --}}
  <div class="absolute top-1/2 left-0 w-full h-1 bg-fondo-panel -translate-y-1/2 rounded-full"></div>
  {{-- Línea de progreso activa --}}
- <div class="absolute top-1/2 left-0 h-1 bg-boton-acento -translate-y-1/2 rounded-full transition-all duration-700 ease-out shadow-[0_0_8px_rgba(226,125,96,0.5)]" 
+ <div class="absolute top-1/2 left-0 h-1 bg-boton-acento -translate-y-1/2 rounded-full transition-all duration-700 ease-out shadow-[0_0_8px_rgba(226,125,96,0.5)]"
  style="width: {{ (($pasoFormulario - 1) / 4) * 100 }}%"></div>
- 
+
  {{-- Pasos --}}
  @php
  $pasosUsu = [
@@ -42,19 +42,19 @@
  @foreach($pasosUsu as $s => $p)
  <div class="relative flex flex-col items-center group">
  <div class="relative z-10 flex h-9 w-9 items-center justify-center rounded-xl border-2 transition-all duration-500
- {{ $pasoFormulario > $s ? 'bg-estado-exitoBg border-estado-exitoBorde text-inverso' : 
- ($pasoFormulario == $s ? 'bg-fondo-card border-borde-focus text-boton-acento shadow-lg scale-110' : 
+ {{ $pasoFormulario > $s ? 'bg-estado-exitoBg border-estado-exitoBorde text-inverso' :
+ ($pasoFormulario == $s ? 'bg-fondo-card border-borde-focus text-boton-acento shadow-lg scale-110' :
  'bg-fondo-app border-borde text-parrafo/30') }}">
- 
+
  <i class="ph-bold {{ $p['i'] }} text-base transition-all duration-500 {{ $pasoFormulario == $s ? 'scale-110' : '' }}"></i>
- 
+
  @if($pasoFormulario > $s)
  <div class="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-boton-principal text-inverso shadow-sm border border-borde-suave">
  <i class="ph-bold ph-check text-[8px]"></i>
  </div>
  @endif
  </div>
- <span class="absolute -bottom-7 whitespace-nowrap text-[8px] font-black uppercase tracking-tighter transition-all duration-500 
+ <span class="absolute -bottom-7 whitespace-nowrap text-[8px] font-black uppercase tracking-tighter transition-all duration-500
  {{ $pasoFormulario >= $s ? 'text-parrafo opacity-100' : 'text-parrafo/30 opacity-60' }} {{ $pasoFormulario == $s ? 'text-boton-acento -translate-y-0.5' : '' }}">
  {{ $p['l'] }}
  </span>
@@ -66,7 +66,7 @@
 
  {{-- CONTENIDO --}}
  <div class="flex-1 max-h-[62vh] overflow-y-auto custom-scrollbar px-4 py-3">
- 
+
  {{-- PASO 1: IDENTIDAD --}}
  @if($pasoFormulario === 1)
  <div class="space-y-4 animate-in slide-in-from-right-4 duration-300">
@@ -74,15 +74,15 @@
  <i class="ph-fill ph-identification-card text-xl text-boton-acento"></i>
  <h3 class="text-xs font-bold text-parrafo uppercase tracking-widest">Información Personal</h3>
  </div>
- 
+
  {{-- Contenedor de Fotografía y Carga --}}
  <div class="flex flex-col sm:flex-row items-center gap-5 bg-fondo-card/40 p-4 rounded-2xl border border-borde-suave">
  <div class="relative group">
  @if($foto_de_perfil_upload)
- <img src="{{ $foto_de_perfil_upload->temporaryUrl() }}" 
+ <img src="{{ $foto_de_perfil_upload->temporaryUrl() }}"
  class="h-24 w-24 rounded-[1.35rem] object-cover ring-4 ring-[#E27D60] shadow-md">
- @elseif($isEdit && $cod_usu && \App\Models\User::find($cod_usu)?->foto_de_perfil)
- <img src="{{ asset('storage/' . \App\Models\User::find($cod_usu)->foto_de_perfil) }}" 
+ @elseif($isEdit && ($cod_usuario ?? $usuarioId) && \App\Models\User::find($cod_usuario ?? $usuarioId)?->foto_de_perfil)
+ <img src="{{ asset('storage/' . \App\Models\User::find($cod_usuario ?? $usuarioId)->foto_de_perfil) }}"
  class="h-24 w-24 rounded-[1.35rem] object-cover ring-4 ring-[#2F3E5C]/30 shadow-md">
  @else
  <div class="flex h-24 w-24 items-center justify-center rounded-[1.35rem] bg-boton-principal text-3xl font-black text-inverso ring-4 ring-[#2F3E5C]/10 shadow-md uppercase">
@@ -102,8 +102,8 @@
  <i class="ph-bold ph-upload-simple"></i> Seleccionar foto
  <input type="file" wire:model="foto_de_perfil_upload" class="hidden" accept="image/*">
  </label>
- @error('foto_de_perfil_upload') 
- <span class="block text-[9px] font-bold text-boton-acento uppercase mt-1">{{ $message }}</span> 
+ @error('foto_de_perfil_upload')
+ <span class="block text-[9px] font-bold text-boton-acento uppercase mt-1">{{ $message }}</span>
  @enderror
  </div>
  </div>
@@ -230,7 +230,7 @@
  <span class="inline-flex items-center justify-center h-10 px-2 rounded-xl bg-fondo-panel border border-borde text-xs font-bold text-parrafo">
  {{ $codigo_telefono ?: '+??' }}
  </span>
- <input type="text" wire:model="telefono" 
+ <input type="text" wire:model="telefono"
  placeholder="{{ $pais_telefono && isset($paisesConfig[$pais_telefono]) ? $paisesConfig[$pais_telefono]['placeholder'] : 'Seleccione país...' }}"
  class="flex-1 h-10 rounded-xl border {{ $errors->has('telefono') ? 'border-borde-focus ring-4 ring-[#E27D60]/10' : 'border-borde focus:border-borde-fuerte' }} bg-fondo-card px-4 py-2 text-sm font-bold text-parrafo outline-none transition">
  </div>
@@ -534,7 +534,7 @@
  {{-- Perfil Familiar --}}
  @if($rol === 'FAMILIAR')
  <div class="md:col-span-2 grid gap-6 border-t border-borde-suave pt-4 animate-in fade-in duration-300">
- 
+
  {{-- Encabezado de la Sección --}}
  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-borde-suave pb-2">
  <div class="flex items-center gap-2">
@@ -555,7 +555,7 @@
  <i class="ph-bold ph-plus-circle text-boton-acento text-sm"></i>
  <h5 class="text-[9px] font-bold uppercase tracking-widest text-parrafo">Registro Rápido de Adulto Mayor</h5>
  </div>
- 
+
  <div class="grid gap-3 sm:grid-cols-2 md:grid-cols-3">
  <div>
  <label class="mb-1 block text-[8px] font-black uppercase tracking-widest text-apoyo">Nombres *</label>
@@ -604,7 +604,7 @@
  <div class="grid gap-4 sm:grid-cols-2 md:grid-cols-4 items-end">
  <div class="sm:col-span-2">
  <label class="mb-1 block text-[8px] font-black uppercase tracking-widest text-apoyo">Seleccionar Adulto Mayor *</label>
- <select wire:model="selected_cod_am" class="w-full h-10 rounded-xl border border-borde bg-fondo-card px-3 py-2 text-xs font-bold text-parrafo outline-none transition focus:border-borde-focus">
+ <select wire:model="selected_cod_residente" class="w-full h-10 rounded-xl border border-borde bg-fondo-card px-3 py-2 text-xs font-bold text-parrafo outline-none transition focus:border-borde-focus">
  <option value="">-- Seleccionar Adulto Mayor Disponible --</option>
  @foreach(\App\Models\Residente::whereIn('estado', ['ACTIVO', 'ADMITIDO'])->orderBy('apellido_paterno')->orderBy('nombres')->get() as $am)
  @php
@@ -612,10 +612,10 @@
  $adultoDocumento = $am->ci ? 'CI ' . trim(($am->ci ?? '') . ' ' . ($am->expedicion_ci ?? '')) : 'SIN DOCUMENTO REGISTRADO';
  $adultoEdad = $am->fecha_nac ? ' — ' . \Carbon\Carbon::parse($am->fecha_nac)->age . ' AÑOS' : '';
  @endphp
- <option value="{{ $am->cod_am }}">{{ mb_strtoupper($adultoNombre . ' — ' . $adultoDocumento . $adultoEdad, 'UTF-8') }}</option>
+ <option value="{{ $am->cod_residente }}">{{ mb_strtoupper($adultoNombre . ' — ' . $adultoDocumento . $adultoEdad, 'UTF-8') }}</option>
  @endforeach
  </select>
- @error('selected_cod_am') <span class="mt-1 block text-[8px] font-black text-boton-acento uppercase">{{ $message }}</span> @enderror
+ @error('selected_cod_residente') <span class="mt-1 block text-[8px] font-black text-boton-acento uppercase">{{ $message }}</span> @enderror
  </div>
  <div>
  <label class="mb-1 block text-[8px] font-black uppercase tracking-widest text-apoyo">Parentesco / Vínculo *</label>
@@ -653,7 +653,7 @@
  <label class="mb-1 block text-[8px] font-black uppercase tracking-widest text-apoyo">Notas / Observaciones del Vínculo</label>
  <input type="text" wire:model="selected_observaciones" placeholder="Ej. A cargo del seguimiento médico semanal" class="uppercase w-full h-10 rounded-xl border border-borde bg-fondo-card px-4 py-2 text-xs font-bold text-parrafo outline-none transition focus:border-borde-focus">
  </div>
- <button type="button" wire:click="vincularAdultoMayor" 
+ <button type="button" wire:click="vincularAdultoMayor"
  class="w-full h-10 rounded-xl bg-boton-principal text-inverso text-[8px] font-black uppercase tracking-widest transition hover:bg-boton-acento shadow-md flex items-center justify-center gap-1.5 active:scale-95">
  <i class="ph-bold ph-plus-circle text-xs"></i> Vincular Adulto
  </button>
@@ -664,7 +664,7 @@
  {{-- 3. LISTADO DE ADULTOS MAYORES VINCULADOS --}}
  <div class="space-y-2">
  <h5 class="text-[9px] font-bold uppercase tracking-widest text-parrafo/80 flex items-center gap-1.5">
- <i class="ph-bold ph-link text-boton-acento"></i> Adultos Mayores Vinculados a este Familiar 
+ <i class="ph-bold ph-link text-boton-acento"></i> Adultos Mayores Vinculados a este Familiar
  <span class="px-2 py-0.5 rounded-full bg-estado-peligroBg text-boton-acento text-[8px] font-black">
  {{ count($vinculosFamiliar) }}
  </span>
@@ -781,22 +781,22 @@
 
  <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 bg-fondo-panel border border-borde-suave p-4 rounded-2xl" x-data="{ showGenPass: false }">
  <div class="relative flex-1">
- <input :type="showGenPass ? 'text' : 'password'" 
- value="{{ $passwordTemporalVisual }}" 
+ <input :type="showGenPass ? 'text' : 'password'"
+ value="{{ $passwordTemporalVisual }}"
  readonly
  class="w-full h-11 rounded-xl border border-borde bg-fondo-card/70 pl-4 pr-24 py-2 text-sm font-mono font-black tracking-widest text-parrafo outline-none">
- 
+
  <div class="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
  <!-- Toggle eye button -->
- <button type="button" 
- @click="showGenPass = !showGenPass" 
+ <button type="button"
+ @click="showGenPass = !showGenPass"
  class="h-8 w-8 flex items-center justify-center rounded-lg text-apoyo hover:text-parrafo hover:bg-fondo-panel transition"
  title="Mostrar/Ocultar contraseña">
  <i class="ph-bold text-base" :class="showGenPass ? 'ph-eye-slash' : 'ph-eye'"></i>
  </button>
 
  <!-- Clipboard copy button -->
- <button type="button" 
+ <button type="button"
  onclick="navigator.clipboard.writeText('{{ $passwordTemporalVisual }}'); Swal.fire({ icon: 'success', title: 'Copiado', text: 'Contraseña temporal copiada al portapapeles.', timer: 2000, showConfirmButton: false, customClass: { popup: 'rounded-[1.5rem]' } })"
  class="h-8 w-8 flex items-center justify-center rounded-lg text-apoyo hover:text-parrafo hover:bg-fondo-panel transition"
  title="Copiar al portapapeles">
@@ -806,7 +806,7 @@
  </div>
 
  <!-- Regenerate button -->
- <button type="button" 
+ <button type="button"
  wire:click="regenerarPasswordTemporal"
  class="h-11 px-5 inline-flex items-center justify-center gap-2 rounded-xl bg-boton-acento text-[10px] font-bold uppercase text-inverso shadow-md shadow-[#E27D60]/20 hover:bg-fondo-panel active:scale-95 transition">
  <i class="ph-bold ph-arrows-clockwise text-sm"></i>
@@ -909,10 +909,10 @@
  <div class="rounded-xl bg-fondo-card/50 p-5 border border-borde-suave space-y-4">
  <div class="flex items-center gap-4">
  @if($foto_de_perfil_upload)
- <img src="{{ $foto_de_perfil_upload->temporaryUrl() }}" 
+ <img src="{{ $foto_de_perfil_upload->temporaryUrl() }}"
  class="h-16 w-16 rounded-[1.1rem] object-cover ring-2 ring-[#E27D60] shadow">
- @elseif($isEdit && $cod_usu && \App\Models\User::find($cod_usu)?->foto_de_perfil)
- <img src="{{ asset('storage/' . \App\Models\User::find($cod_usu)->foto_de_perfil) }}" 
+ @elseif($isEdit && ($cod_usuario ?? $usuarioId) && \App\Models\User::find($cod_usuario ?? $usuarioId)?->foto_de_perfil)
+ <img src="{{ asset('storage/' . \App\Models\User::find($cod_usuario ?? $usuarioId)->foto_de_perfil) }}"
  class="h-16 w-16 rounded-[1.1rem] object-cover ring-2 ring-[#2F3E5C]/30 shadow">
  @else
  <div class="flex h-16 w-16 items-center justify-center rounded-[1.1rem] bg-boton-principal text-xl font-extrabold text-inverso shadow uppercase">
@@ -1000,30 +1000,30 @@
 
  {{-- FOOTER FIJO --}}
  <footer class="border-t border-borde-suave bg-fondo-panel px-4 py-2.5 backdrop-blur-xl shrink-0 flex flex-col-reverse sm:flex-row items-center justify-between gap-2">
- <button type="button" wire:click="cerrarFormulario" 
+ <button type="button" wire:click="cerrarFormulario"
  class="w-full sm:w-auto px-6 py-2.5 rounded-xl border-2 border-borde-fuerte text-meta text-[9px] font-bold uppercase tracking-widest transition hover:bg-boton-principal hover:text-inverso active:scale-95 shadow-sm">
  Cancelar
  </button>
- 
+
  <div class="flex items-center gap-2 w-full sm:w-auto">
  @if($pasoFormulario > 1)
- <button type="button" wire:click="anteriorPaso" 
+ <button type="button" wire:click="anteriorPaso"
  class="flex-1 sm:flex-none px-5 py-2.5 rounded-xl border-2 border-borde-fuerte text-parrafo text-[9px] font-bold uppercase tracking-widest transition hover:bg-boton-principal hover:text-inverso active:scale-95">
  Anterior
  </button>
  @endif
 
  @if($pasoFormulario < 5)
- <button type="button" wire:click="siguientePaso" 
+ <button type="button" wire:click="siguientePaso"
  class="flex-1 sm:flex-none px-10 py-2.5 rounded-xl bg-boton-principal text-inverso text-[9px] font-bold uppercase tracking-widest shadow-xl shadow-[#2F3E5C]/20 transition hover:bg-boton-acento active:scale-95">
  Continuar <i class="ph-bold ph-arrow-right ml-1"></i>
  </button>
  @else
- <button type="button" wire:click="guardarUsuario" 
- wire:loading.attr="disabled" 
+ <button type="button" wire:click="guardarUsuario"
+ wire:loading.attr="disabled"
  wire:target="guardarUsuario"
  class="flex-1 sm:flex-none px-12 py-2.5 rounded-xl bg-boton-acento text-inverso text-[9px] font-bold uppercase tracking-widest shadow-xl shadow-[#E27D60]/20 transition hover:bg-boton-principal active:scale-95 disabled:opacity-70 inline-flex items-center justify-center gap-2 min-w-[140px]">
- 
+
  <!-- Spinner de Carga SVG Premium -->
  <span wire:loading wire:target="guardarUsuario" class="animate-spin h-3.5 w-3.5 text-inverso">
  <svg class="h-full w-full" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">

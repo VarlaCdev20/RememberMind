@@ -327,7 +327,7 @@
                 <button type="button">+ REGISTRAR ATENCIÓN</button>
                 <h3>Registrar atención clínica</h3>
                 <p>Selecciona el tipo de atención que deseas registrar.</p>
-                <span>{{ $adultoMayor->cod_am ?? $adultoMayor->cod_residente }}</span>
+                <span>{{ $adultoMayor->cod_residente }}</span>
                 <span>Vigilancia</span>
                 <div>Signos vitales - PA, FC, FR, SpO₂, Temperatura, Dolor, etc.</div>
                 <div>Cuidado de enfermería - Higiene, alimentación, hidratación, movilidad, eliminación, piel, etc.</div>

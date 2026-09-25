@@ -22,7 +22,7 @@ class PlanCuidado extends ModeloOperativo
         'cod_plan', 'cod_residente', 'cod_area', 'cod_personal', 'tipo_plan',
         'nombre', 'objetivo_general', 'prioridad', 'fecha_hora_apertura',
         'fecha_hora_cierre', 'estado', 'observacion',
-        'cod_am', 'creado_por', 'nivel_cuidado', 'fecha_inicio', 'fecha_fin',
+        'creado_por', 'nivel_cuidado', 'fecha_inicio', 'fecha_fin',
     ];
 
     protected function casts(): array
@@ -68,7 +68,7 @@ class PlanCuidado extends ModeloOperativo
         return $this->belongsTo(Personal::class, 'cod_personal', 'cod_personal');
     }
 
-    
+
     public function getCodAmAttribute(): string
     {
         return (string) ($this->attributes['cod_residente'] ?? '');
@@ -92,9 +92,7 @@ class PlanCuidado extends ModeloOperativo
             if (empty($model->cod_plan)) {
                 $model->cod_plan = 'PLC_' . strtoupper(Str::random(10));
             }
-            if (isset($model->attributes['cod_am']) && empty($model->cod_residente)) {
-                $model->cod_residente = $model->attributes['cod_am'];
-            }
+
             if (empty($model->cod_area) || !\Illuminate\Support\Facades\DB::table('areas')->where('cod_area', $model->cod_area)->exists()) {
                 $existingArea = \Illuminate\Support\Facades\DB::table('areas')->first();
                 if (!$existingArea) {
@@ -123,7 +121,7 @@ class PlanCuidado extends ModeloOperativo
                 }
                 if (!$personalCandidate) {
                     $user = \App\Models\User::first() ?? \App\Models\User::forceCreate([
-                        'cod_usu' => 'USU_SYS001',
+                        'cod_usuario' => 'USU_SYS001',
                         'nombres' => 'Sistema',
                         'ap_paterno' => 'Admin',
                         'correo' => 'sistema@test.com',
@@ -133,7 +131,7 @@ class PlanCuidado extends ModeloOperativo
                     $codPer = 'PER_' . strtoupper(\Illuminate\Support\Str::random(7));
                     \Illuminate\Support\Facades\DB::table('personal')->insert([
                         'cod_personal' => $codPer,
-                        'cod_usuario' => $user->cod_usu,
+                        'cod_usuario' => $user->cod_usuario,
                         'nombres' => $user->nombres ?? 'Personal',
                         'apellido_paterno' => $user->ap_paterno ?? 'Turno',
                         'numero_documento' => 'DOC_' . strtoupper(\Illuminate\Support\Str::random(6)),
@@ -163,8 +161,7 @@ class PlanCuidado extends ModeloOperativo
             if (empty($model->estado)) {
                 $model->estado = 'ACTIVO';
             }
-            unset($model->attributes['cod_am']);
-            unset($model->attributes['creado_por']);
+                        unset($model->attributes['creado_por']);
             unset($model->attributes['nivel_cuidado']);
             unset($model->attributes['fecha_inicio']);
             unset($model->attributes['fecha_fin']);

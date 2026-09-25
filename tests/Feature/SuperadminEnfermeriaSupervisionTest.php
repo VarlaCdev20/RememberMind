@@ -2,11 +2,11 @@
 
 namespace Tests\Feature;
 
-use App\Livewire\Cuidados\AgendaEnfermeria;
-use App\Livewire\Cuidados\FichaPaciente;
-use App\Livewire\Cuidados\MisPacientes;
-use App\Livewire\Medicacion\MedicacionAdultoModal;
-use App\Livewire\Medicacion\SaludMedicacionPanel;
+use App\Frontend\Livewire\Enfermeria\Cuidados\AgendaEnfermeria;
+use App\Frontend\Livewire\Compartido\Clinica\FichaPaciente;
+use App\Frontend\Livewire\Enfermeria\Cuidados\MisPacientes;
+use App\Frontend\Livewire\Medico\Medicacion\MedicacionAdultoModal;
+use App\Frontend\Livewire\Medico\Medicacion\SaludMedicacionPanel;
 use App\Models\AdultoMayor;
 use App\Models\Alerta;
 use App\Models\Area;
@@ -18,8 +18,8 @@ use App\Models\Medicamento;
 use App\Models\Prescripcion;
 use App\Models\TurnoEnfermeria;
 use App\Models\User;
-use App\Services\Enfermeria\AgendaTurnoService;
-use App\Services\Identidad\SidebarService;
+use App\Backend\Modulos\Enfermeria\Servicios\AgendaTurnoService;
+use App\Backend\Modulos\Identidad\Servicios\SidebarService;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
@@ -180,7 +180,7 @@ class SuperadminEnfermeriaSupervisionTest extends TestCase
             ->assertSee('Supervisión de residentes')
             ->assertSee('Elena')
             ->assertSee('Manuela');
-        Livewire::test(FichaPaciente::class, ['adulto' => $this->residenteDos->cod_am])
+        Livewire::test(FichaPaciente::class, ['adulto' => $this->residenteDos->cod_residente])
             ->assertSee('Manuela')
             ->assertSee('SATURACIÓN BAJA');
 
@@ -207,6 +207,14 @@ class SuperadminEnfermeriaSupervisionTest extends TestCase
         $this->assertContains('admin.enfermeria.reportes', $rutas);
     }
 
+    public function test_superadmin_puede_ver_administraciones_pero_no_crear_administracion_solo_por_su_rol(): void
+    {
+        $this->actingAs($this->superadmin);
+
+        $this->assertTrue($this->superadmin->can('administraciones_medicacion.ver'));
+        $this->assertFalse(app(\App\Policies\AdministracionMedicacionPolicy::class)->create($this->superadmin));
+    }
+
     public function test_enfermeria_puede_administrar_pero_no_crear_ni_modificar_ordenes_medicas(): void
     {
         $this->actingAs($this->enfermeroUno);
@@ -225,7 +233,7 @@ class SuperadminEnfermeriaSupervisionTest extends TestCase
             ->assertForbidden();
 
         Livewire::test(MedicacionAdultoModal::class)
-            ->call('abrirModalMedicacion', $this->residenteUno->cod_am)
+            ->call('abrirModalMedicacion', $this->residenteUno->cod_residente)
             ->assertForbidden();
 
         $this->assertDatabaseHas('prescripciones', [

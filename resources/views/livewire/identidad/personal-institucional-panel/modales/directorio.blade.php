@@ -1,7 +1,7 @@
 @if($mostrarDirectorio)
             <div class="mt-4">
                 <div class="rm-card flex flex-col overflow-hidden border border-borde bg-fondo-card !p-0 shadow-sm">
-                    <div class="border-b border-borde bg-fondo-hover/30 px-4 py-3" x-data="{ openFilters: false }">
+                    <div class="rm-filter-bar" x-data="{ openFilters: false }">
                         <div class="flex flex-col items-start justify-between gap-3 md:flex-row md:items-center">
                             <h3 class="flex items-center gap-2 text-sm font-black text-titulo">
                                 <div class="flex h-8 w-8 items-center justify-center rounded-xl border {{ $claseIconoDirectorio }} shadow-sm">
@@ -33,7 +33,7 @@
                                 <button
                                     type="button"
                                     wire:click="limpiarFiltros"
-                                    class="flex h-9 w-full items-center justify-center gap-1.5 rounded-lg border border-borde bg-fondo-card px-3 text-xs font-bold text-apoyo shadow-sm transition-colors hover:bg-fondo-hover hover:text-titulo sm:w-auto"
+                                    class="rm-filter-reset sm:w-auto"
                                 >
                                     <i class="ph-bold ph-broom text-base"></i>
                                     Limpiar
@@ -210,7 +210,7 @@
                                                 @can('usuarios.editar')
                                                     <button
                                                         type="button"
-                                                        wire:click="abrirModalEdicion('{{ $usuario->cod_usu }}')"
+                                                        wire:click="abrirModalEdicion('{{ $usuario->cod_usuario }}')"
                                                         class="tooltip-btn flex h-8 w-8 items-center justify-center rounded-lg border border-transparent text-apoyo shadow-sm transition-colors hover:border-borde-hover hover:bg-fondo-hover hover:text-boton-acento"
                                                         title="Ver / Editar ficha"
                                                     >
@@ -220,7 +220,7 @@
 
                                                 <button
                                                     type="button"
-                                                    wire:click="abrirHorariosPersonal('{{ $usuario->cod_usu }}')"
+                                                    wire:click="abrirHorariosPersonal('{{ $usuario->cod_usuario }}')"
                                                     class="tooltip-btn flex h-8 w-8 items-center justify-center rounded-lg border border-transparent text-apoyo shadow-sm transition-colors hover:border-borde-hover hover:bg-fondo-hover hover:text-estado-info"
                                                     title="Ver / asignar horarios"
                                                 >
@@ -230,7 +230,7 @@
                                                 @can('usuarios.cambiar_estado')
                                                     <button
                                                         type="button"
-                                                        wire:click="toggleEstado('{{ $usuario->cod_usu }}')"
+                                                        wire:click="toggleEstado('{{ $usuario->cod_usuario }}')"
                                                         class="tooltip-btn flex h-8 w-8 items-center justify-center rounded-lg border border-transparent text-apoyo shadow-sm transition-colors hover:border-borde-hover hover:bg-fondo-hover hover:text-estado-peligro"
                                                         title="{{ $estadoActivo ? 'Suspender' : 'Reactivar' }}"
                                                     >

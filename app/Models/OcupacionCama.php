@@ -15,7 +15,7 @@ class OcupacionCama extends ModeloOperativo
      * camas, admisiones ni usuarios desde eventos de Eloquent.
      */
     protected $fillable = [
-        'cod_ocupacion', 'cod_residente', 'cod_am', 'cod_cama', 'cod_admision',
+        'cod_ocupacion', 'cod_residente', 'cod_cama', 'cod_admision',
         'cod_usuario_registro', 'fecha_hora_asignacion', 'fecha_hora_liberacion',
         'motivo_liberacion', 'estado',
     ];
@@ -26,11 +26,6 @@ class OcupacionCama extends ModeloOperativo
             'fecha_hora_asignacion' => 'datetime',
             'fecha_hora_liberacion' => 'datetime',
         ];
-    }
-
-    public function setCodAmAttribute($value): void
-    {
-        $this->attributes['cod_residente'] = $value;
     }
 
     public function residente(): BelongsTo
@@ -66,9 +61,7 @@ class OcupacionCama extends ModeloOperativo
             if (empty($ocupacion->cod_ocupacion)) {
                 $ocupacion->cod_ocupacion = 'OCP_' . strtoupper(\Illuminate\Support\Str::random(10));
             }
-            if (empty($ocupacion->cod_residente) && !empty($ocupacion->getAttribute('cod_am'))) {
-                $ocupacion->cod_residente = $ocupacion->getAttribute('cod_am');
-            }
+
             if (empty($ocupacion->cod_usuario_registro)) {
                 $ocupacion->cod_usuario_registro = auth()->user()?->cod_usuario ?? (\App\Models\User::first()?->cod_usuario ?? 'USU_0001');
             }

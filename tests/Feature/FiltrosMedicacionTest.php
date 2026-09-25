@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Livewire\Medicacion\SaludAdministracionMedicacionPanel;
+use App\Frontend\Livewire\Enfermeria\Medicacion\SaludAdministracionMedicacionPanel;
 use App\Models\AdultoMayor;
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;

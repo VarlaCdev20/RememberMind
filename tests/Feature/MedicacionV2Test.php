@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Livewire\Medicacion\SaludMedicacionPanel;
+use App\Frontend\Livewire\Medico\Medicacion\SaludMedicacionPanel;
 use App\Models\AdultoMayor;
 use App\Models\Area;
 use App\Models\AsignacionResidenteJornada;
@@ -12,7 +12,7 @@ use App\Models\Personal;
 use App\Models\Residente;
 use App\Models\TurnoEnfermeria;
 use App\Models\User;
-use App\Services\Medicacion\RegistrarAdministracionMedicacionService;
+use App\Backend\Modulos\Medicacion\Servicios\RegistrarAdministracionMedicacionService;
 use Database\Seeders\DatabaseSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
@@ -34,7 +34,7 @@ class MedicacionV2Test extends TestCase
         $this->actingAs($medico);
 
         Livewire::test(SaludMedicacionPanel::class, ['adulto' => AdultoMayor::query()->findOrFail($residente->cod_residente)])
-            ->set('nuevo_cod_am', $residente->cod_residente)
+            ->set('nuevo_cod_residente', $residente->cod_residente)
             ->set('nuevo_nombre', 'Paracetamol')
             ->set('nuevo_dosis', '500 mg')
             ->set('nuevo_frecuencia', 'CADA 8 HORAS')
@@ -66,7 +66,7 @@ class MedicacionV2Test extends TestCase
         $hora = now()->format('H:i');
 
         Livewire::test(SaludMedicacionPanel::class, ['adulto' => AdultoMayor::query()->findOrFail($residente->cod_residente)])
-            ->set('nuevo_cod_am', $residente->cod_residente)
+            ->set('nuevo_cod_residente', $residente->cod_residente)
             ->set('nuevo_nombre', 'Losartan')
             ->set('nuevo_dosis', '50 mg')
             ->set('nuevo_frecuencia', 'CADA 24 HORAS')

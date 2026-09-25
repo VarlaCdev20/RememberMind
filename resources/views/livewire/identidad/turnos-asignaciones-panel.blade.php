@@ -78,7 +78,7 @@
         </section>
 
         {{-- FILTROS GENERALES FORMATO ALERTAS --}}
-        <section class="rounded-2xl bg-[#DED1C3] dark:bg-[#2C2723] border border-[#C7B9AA] dark:border-[#423B34] p-3 text-xs shadow-sm flex flex-col gap-2.5">
+        <section class="rm-filter-bar">
             <div class="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-2 items-center">
                 {{-- Buscador Principal --}}
                 <div class="lg:col-span-4 relative flex items-center">
@@ -154,9 +154,9 @@
                 $hasFiltrosActivos = !empty($busqueda) || !empty($filtroTipo) || !empty($filtroRol) || !empty($filtroArea) || !empty($filtroTurno) || !empty($filtroEstado);
             @endphp
             @if($hasFiltrosActivos)
-                <div class="w-full flex flex-wrap items-center justify-between gap-2 pt-2.5 border-t border-[#C7B9AA]/60 dark:border-[#423B34] text-xs">
+                <div class="rm-filter-bar__active">
                     <div class="flex flex-wrap items-center gap-1.5">
-                        <span class="text-[11px] font-bold text-[#677084] dark:text-[#9A9084] flex items-center gap-1 mr-1">
+                        <span class="rm-filter-bar__active-label">
                             <i class="ph-bold ph-funnel text-xs"></i> Filtros activos:
                         </span>
                         @if(!empty($busqueda))
@@ -481,7 +481,7 @@
                                                                         <div class="flex min-w-0 items-center gap-2">
                                                                             <span class="shrink-0 rounded-lg px-2 py-1 text-[10px] font-black {{ $asignacion['clase_familia'] ?? 'bg-fondo-card text-titulo' }}">{{ $asignacion['familia'] ?? 'Personal' }}</span>
                                                                             <div class="min-w-0">
-                                                                                @if ($asignacion['cod_usu'])
+                                                                                @if (!empty($asignacion['cod_usuario']))
                                                                                     <span class="block truncate text-titulo font-black">{{ $asignacion['nombre'] }}</span>
                                                                                     @if ($asignacion['es_reemplazo'])
                                                                                         <span class="block text-[9px] text-boton-acento">Reemplazo: {{ $asignacion['tipo_asignacion'] }}</span>
@@ -508,7 +508,7 @@
                                                                                     title="Asignar / Cambiar">
                                                                                     <i class="ph-bold ph-pencil-simple text-[10px]"></i>
                                                                                 </button>
-                                                                                @if($asignacion['cod_usu'])
+                                                                                @if(!empty($asignacion['cod_usuario']))
                                                                                     <button type="button" wire:click="desvincularPlaza('{{ $asignacion['codigo'] }}', '{{ $asignacion['fecha'] }}')"
                                                                                         class="inline-flex h-5 w-5 items-center justify-center rounded bg-estado-peligroBg text-estado-peligro hover:bg-estado-peligroBg/90 transition"
                                                                                         title="Desvincular">
@@ -534,7 +534,7 @@
                                                                     <div class="flex items-center justify-between gap-2">
                                                                         <div class="min-w-0">
                                                                             
-                                                                            @if ($asignacion['cod_usu'])
+                                                                            @if (!empty($asignacion['cod_usuario']))
                                                                                 <span class="truncate">{{ $asignacion['nombre'] }}</span>
                                                                             @else
                                                                                 <span class="italic font-normal">Disponible</span>
@@ -545,7 +545,7 @@
                                                                                 class="inline-flex h-5 w-5 items-center justify-center rounded bg-boton-acento text-inverso hover:bg-boton-acento/90 transition">
                                                                                 <i class="ph-bold ph-pencil-simple text-[10px]"></i>
                                                                             </button>
-                                                                            @if($asignacion['cod_usu'])
+                                                                            @if(!empty($asignacion['cod_usuario']))
                                                                                 <button type="button" wire:click="desvincularPlaza('{{ $asignacion['codigo'] }}', '{{ $asignacion['fecha'] }}')"
                                                                                     class="inline-flex h-5 w-5 items-center justify-center rounded bg-estado-peligroBg text-estado-peligro hover:bg-estado-peligroBg/90 transition">
                                                                                     <i class="ph-bold ph-trash text-[10px]"></i>
@@ -936,4 +936,3 @@
         @include('livewire.identidad.turnos-asignaciones-panel.modales.asignar-plaza')
     </div>
 </div>
-

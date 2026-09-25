@@ -6,7 +6,6 @@ class NotaClinica extends ModeloOperativo {
     protected function casts(): array{return ['fecha_hora'=>'datetime'];}
     public function atencion(): BelongsTo{return $this->belongsTo(Atencion::class,'cod_atencion','cod_atencion');}
     public function anterior(): BelongsTo{return $this->belongsTo(self::class,'cod_nota_anterior','cod_nota');}
-    public function getCodAmAttribute(): string{return (string) $this->cod_residente;}
     public function getFechaAttribute(): mixed{return $this->fecha_hora?->toDateString();}
     public function getHoraAttribute(): mixed{return $this->fecha_hora?->format('H:i:s');}
     public function getNotaAttribute(): string{return (string) $this->contenido;}

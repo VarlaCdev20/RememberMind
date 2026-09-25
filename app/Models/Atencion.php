@@ -83,11 +83,6 @@ class Atencion extends ModeloOperativo
         return (object)['nombre' => $this->attributes['tipo_atencion'] ?? 'General', 'tipo' => $this->attributes['tipo_atencion'] ?? 'General'];
     }
 
-    public function getCodAmAttribute(): string
-    {
-        return (string) $this->cod_residente;
-    }
-
     public function getCodAtenAdulAttribute(): string
     {
         return (string) $this->cod_atencion;
@@ -131,9 +126,7 @@ class Atencion extends ModeloOperativo
             if (empty($model->cod_atencion)) {
                 $model->cod_atencion = 'ATN_' . strtoupper(Str::random(10));
             }
-            if (isset($model->attributes['cod_am']) && empty($model->cod_residente)) {
-                $model->cod_residente = $model->attributes['cod_am'];
-            }
+
             if (isset($model->attributes['fecha_hora_atencion'])) {
                 if (empty($model->fecha_hora)) {
                     $model->fecha_hora = $model->attributes['fecha_hora_atencion'];
@@ -155,10 +148,10 @@ class Atencion extends ModeloOperativo
             }
 
             if (empty($model->cod_personal)) {
-                $codUsu = $model->attributes['registrado_por'] ?? null;
+                $codUsuario = $model->attributes['registrado_por'] ?? null;
                 $p = null;
-                if ($codUsu) {
-                    $p = Personal::where('cod_usuario', $codUsu)->first() ?? Personal::where('cod_personal', $codUsu)->first();
+                if ($codUsuario) {
+                    $p = Personal::where('cod_usuario', $codUsuario)->first() ?? Personal::where('cod_personal', $codUsuario)->first();
                 }
                 if (!$p) {
                     $p = Personal::first();
@@ -192,8 +185,7 @@ class Atencion extends ModeloOperativo
 
             // Descartar campos legacy que no pertenecen a la tabla atenciones
             unset($model->attributes['cod_seg_diario']);
-            unset($model->attributes['cod_am']);
-            unset($model->attributes['cod_turno']);
+                        unset($model->attributes['cod_turno']);
             unset($model->attributes['cod_plan']);
             unset($model->attributes['registrado_por']);
             unset($model->attributes['fecha']);

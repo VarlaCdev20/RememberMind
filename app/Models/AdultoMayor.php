@@ -13,17 +13,6 @@ class AdultoMayor extends Residente
 {
     use \Illuminate\Database\Eloquent\Factories\HasFactory;
 
-    
-        public function getCodAmAttribute(): string
-    {
-        return (string) ($this->attributes['cod_residente'] ?? $this->getKey());
-    }
-
-    public function setCodAmAttribute($value): void
-    {
-        $this->attributes['cod_residente'] = $value;
-    }
-
     public function familiares(): BelongsToMany
     {
         return $this->belongsToMany(Contacto::class, 'residentes_contactos', 'cod_residente', 'cod_contacto')

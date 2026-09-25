@@ -2,7 +2,7 @@
 
 namespace App\Exports\Reportes\Sheets\Adultos;
 
-use App\Services\Reportes\ReporteDataService;
+use App\Backend\Modulos\Reportes\Servicios\ReporteDataService;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithTitle;
 use Maatwebsite\Excel\Concerns\WithHeadings;
@@ -42,7 +42,7 @@ class AdultosListaSheet implements FromCollection, WithTitle, WithHeadings, With
     public function collection()
     {
         return $this->service->adultosListaCompleta(1000)->map(fn($r) => [
-            $r->cod_am,
+            $r->cod_residente,
             $r->nombre_completo,
             $r->ci,
             $r->genero,

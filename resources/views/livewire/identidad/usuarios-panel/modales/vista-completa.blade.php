@@ -231,7 +231,7 @@
  Cerrar
  </button>
  @if($usuarioVista->estado === 'ACTIVO')
- <button type="button" wire:click="editarUsuario('{{ $usuarioVista->cod_usu }}')" class="flex items-center gap-2 rounded-full bg-boton-acento px-6 py-2.5 text-xs font-bold text-inverso transition hover:bg-fondo-panel active:scale-95 shadow-lg">
+ <button type="button" wire:click="editarUsuario('{{ $usuarioVista->cod_usuario }}')" class="flex items-center gap-2 rounded-full bg-boton-acento px-6 py-2.5 text-xs font-bold text-inverso transition hover:bg-fondo-panel active:scale-95 shadow-lg">
  <i class="ph-bold ph-pencil-simple text-sm"></i> Editar
  </button>
  @endif

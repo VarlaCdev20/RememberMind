@@ -2,7 +2,7 @@
 
 namespace App\Exports;
 
-use App\Services\Reportes\AreasReportDataService;
+use App\Backend\Modulos\Reportes\Servicios\AreasReportDataService;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;

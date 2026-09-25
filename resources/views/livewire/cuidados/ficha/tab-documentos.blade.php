@@ -148,7 +148,7 @@
     {{-- ========================================================================= --}}
     {{-- 3. BARRA DE FILTROS                                                       --}}
     {{-- ========================================================================= --}}
-    <div class="p-3.5 rounded-2xl border border-[var(--rm-border)] bg-[var(--rm-surface)] shadow-2xs flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
+    <div class="rm-filter-bar flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
         
         {{-- Buscador reactivo --}}
         <div class="relative flex-1 min-w-[200px]">

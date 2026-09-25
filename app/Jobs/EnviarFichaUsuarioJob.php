@@ -8,9 +8,9 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use App\Models\User;
-use App\Services\Identidad\UsuarioFichaService;
-use App\Services\Documentos\DocumentacionUsuarioService;
-use App\Services\Reportes\ReportFileNameService;
+use App\Backend\Modulos\Identidad\Servicios\UsuarioFichaService;
+use App\Backend\Modulos\Documentos\Servicios\DocumentacionUsuarioService;
+use App\Backend\Modulos\Reportes\Servicios\ReportFileNameService;
 use App\Mail\UsuarioFichaAdjuntaMail;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
@@ -54,7 +54,7 @@ class EnviarFichaUsuarioJob implements ShouldQueue
             ];
 
             $fileNameService = app(ReportFileNameService::class);
-            $filename = $fileNameService->generate('expediente_' . $usuario->cod_usu, 'pdf');
+            $filename = $fileNameService->generate('expediente_' . $usuario->cod_usuario, 'pdf');
 
             // Generar PDF en memoria o usando DomPDF/Spatie
             $pdfContent = null;
@@ -90,7 +90,7 @@ class EnviarFichaUsuarioJob implements ShouldQueue
                 ->log("Se envió con éxito por correo la ficha institucional oficial al destinatario {$usuario->correo}.");
 
         } catch (\Exception $e) {
-            Log::error("Error en EnviarFichaUsuarioJob para usuario {$usuario->cod_usu}: " . $e->getMessage());
+            Log::error("Error en EnviarFichaUsuarioJob para usuario {$usuario->cod_usuario}: " . $e->getMessage());
             throw $e;
         }
     }

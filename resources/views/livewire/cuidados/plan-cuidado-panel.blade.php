@@ -13,14 +13,16 @@
         @endcan
     </div>
 
-    <div class="grid gap-3 rounded-2xl border border-borde bg-fondo-card p-4 md:grid-cols-2">
-        <input type="search" wire:model.live.debounce.400ms="search" placeholder="Buscar adulto mayor" class="rounded-xl border border-borde bg-fondo-panel px-4 py-2 text-sm text-parrafo">
-        <select wire:model.live="filtroEstado" class="rounded-xl border border-borde bg-fondo-panel px-4 py-2 text-sm text-parrafo">
-            <option value="">Todos los estados</option>
-            <option value="BORRADOR">Borrador</option>
-            <option value="ACTIVO">Activo</option>
-            <option value="CERRADO">Cerrado</option>
-        </select>
+    <div class="rm-filter-bar">
+        <div class="grid gap-3 md:grid-cols-2">
+            <input type="search" wire:model.live.debounce.400ms="search" placeholder="Buscar adulto mayor" class="rounded-xl border border-borde bg-fondo-panel px-4 py-2 text-sm text-parrafo">
+            <select wire:model.live="filtroEstado" class="rounded-xl border border-borde bg-fondo-panel px-4 py-2 text-sm text-parrafo">
+                <option value="">Todos los estados</option>
+                <option value="BORRADOR">Borrador</option>
+                <option value="ACTIVO">Activo</option>
+                <option value="CERRADO">Cerrado</option>
+            </select>
+        </div>
     </div>
 
     <div class="grid gap-4 lg:grid-cols-2">
@@ -58,7 +60,7 @@
             <form wire:submit.prevent="guardar" class="w-full max-w-3xl space-y-4 rounded-3xl border border-borde bg-fondo-card p-6 shadow-xl">
                 <div class="flex items-center justify-between"><h2 class="text-lg font-black text-titulo">Crear plan de cuidado</h2><button type="button" wire:click="cerrarModales" class="text-sm font-bold text-apoyo">Cerrar</button></div>
                 <div class="grid gap-3 md:grid-cols-2">
-                    <select wire:model="codAm" class="rounded-xl border border-borde bg-fondo-panel px-3 py-2 text-sm"><option value="">Adulto mayor</option>@foreach($adultos as $adulto)<option value="{{ $adulto->cod_residente }}">{{ $adulto->nombres }} {{ $adulto->ap_paterno }}</option>@endforeach</select>
+                    <select wire:model="codResidente" class="rounded-xl border border-borde bg-fondo-panel px-3 py-2 text-sm"><option value="">Adulto mayor</option>@foreach($adultos as $adulto)<option value="{{ $adulto->cod_residente }}">{{ $adulto->nombres }} {{ $adulto->ap_paterno }}</option>@endforeach</select>
                     <select wire:model="tipoPlan" class="rounded-xl border border-borde bg-fondo-panel px-3 py-2 text-sm"><option value="INICIAL">Inicial</option><option value="AJUSTE">Ajuste</option><option value="REEVALUACION">Reevaluación</option></select>
                     <select wire:model="nivelCuidado" class="rounded-xl border border-borde bg-fondo-panel px-3 py-2 text-sm"><option value="PREVENTIVO">Preventivo</option><option value="ESTANDAR">Estándar</option><option value="INTENSIVO">Intensivo</option><option value="PALIATIVO">Paliativo</option></select>
                     <select wire:model="estadoPlan" class="rounded-xl border border-borde bg-fondo-panel px-3 py-2 text-sm"><option value="BORRADOR">Borrador</option><option value="ACTIVO">Activo</option></select>

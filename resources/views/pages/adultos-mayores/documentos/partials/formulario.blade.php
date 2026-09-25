@@ -11,7 +11,7 @@
  </div>
 
  <div class="p-6 bg-fondo-card">
- <form :action="isEditingDoc ? '{{ url('admin/adultos-mayores/'.$adulto_mayor->cod_am.'/documentos') }}/' + docData.id : '{{ route('admin.adultos-mayores.documentos.store', $adulto_mayor->cod_am) }}'" method="POST" enctype="multipart/form-data" @submit="validarDocumento">
+ <form :action="isEditingDoc ? '{{ url('admin/adultos-mayores/'.$adulto_mayor->cod_residente.'/documentos') }}/' + docData.id : '{{ route('admin.adultos-mayores.documentos.store', $adulto_mayor->cod_residente) }}'" method="POST" enctype="multipart/form-data" @submit="validarDocumento">
  @csrf
  <template x-if="isEditingDoc">
  <input type="hidden" name="_method" value="PATCH">
@@ -19,7 +19,7 @@
  
  {{-- ID del adulto para el store --}}
  <input type="date" name="fecha_subida" x-model="docData.fecha_doc" aria-label="Fecha del documento">
- <input type="hidden" name="cod_am" value="{{ $adulto_mayor->cod_am }}">
+ <input type="hidden" name="cod_residente" value="{{ $adulto_mayor->cod_residente }}">
 
  <div class="space-y-4">
  <div>

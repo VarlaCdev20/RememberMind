@@ -83,7 +83,7 @@
  </section>
 
  {{-- ── FILTROS Y BÚSQUEDA ───────────────────────────────────────────── --}}
- <section class="overflow-hidden rounded-[1.45rem] border border-borde-suave bg-fondo-panel shadow-sm backdrop-blur-xl">
+ <section class="rm-filter-bar overflow-hidden">
  <div class="border-b border-borde-suave bg-fondo-panel px-5 py-3">
  <div class="flex items-center gap-2">
  <i class="ph-bold ph-funnel text-apoyo text-base"></i>
@@ -139,7 +139,7 @@
  {{-- Limpiar --}}
  <div>
  <button wire:click="limpiarFiltros"
- class="inline-flex items-center gap-1.5 rounded-xl border border-borde-suave bg-fondo-app px-3 py-2.5 text-xs font-bold text-apoyo transition hover:border-borde-focus hover:text-boton-acento">
+ class="rm-filter-reset">
  <i class="ph-bold ph-x text-xs"></i>
  Limpiar
  </button>
@@ -288,15 +288,15 @@
  {{-- Adulto Mayor --}}
  <div>
  <label class="{{ $labelCls }}">Adulto mayor <span class="text-boton-acento">*</span></label>
- <select wire:model="codAm" class="{{ $inputCls }}">
+ <select wire:model="codResidente" class="{{ $inputCls }}">
  <option value="">Seleccione un adulto mayor...</option>
  @foreach($adultos as $adulto)
- <option value="{{ $adulto->cod_am }}">
+ <option value="{{ $adulto->cod_residente }}">
  {{ $adulto->ap_paterno }} {{ $adulto->ap_materno ?? '' }}, {{ $adulto->nombres }}
  </option>
  @endforeach
  </select>
- @error('codAm') <p class="{{ $errCls }}">{{ $message }}</p> @enderror
+ @error('codResidente') <p class="{{ $errCls }}">{{ $message }}</p> @enderror
  </div>
  {{-- Tipo de Actividad --}}
  <div>
@@ -388,15 +388,15 @@
  {{-- Adulto Mayor --}}
  <div>
  <label class="{{ $labelCls }}">Adulto mayor <span class="text-boton-acento">*</span></label>
- <select wire:model="codAm" class="{{ $inputCls }}">
+ <select wire:model="codResidente" class="{{ $inputCls }}">
  <option value="">Seleccione un adulto mayor...</option>
  @foreach($adultos as $adulto)
- <option value="{{ $adulto->cod_am }}">
+ <option value="{{ $adulto->cod_residente }}">
  {{ $adulto->ap_paterno }} {{ $adulto->ap_materno ?? '' }}, {{ $adulto->nombres }}
  </option>
  @endforeach
  </select>
- @error('codAm') <p class="{{ $errCls }}">{{ $message }}</p> @enderror
+ @error('codResidente') <p class="{{ $errCls }}">{{ $message }}</p> @enderror
  </div>
  {{-- Tipo de Actividad --}}
  <div>

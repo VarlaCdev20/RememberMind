@@ -4,7 +4,7 @@ namespace App\Http\Requests\Medicacion;
 
 use App\Models\AdministracionMedicacion;
 use App\Models\Prescripcion;
-use App\Services\Enfermeria\TurnoEnfermeriaService;
+use App\Backend\Modulos\Enfermeria\Servicios\TurnoEnfermeriaService;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
 
@@ -20,7 +20,8 @@ class StoreAdministracionMedicacionRequest extends FormRequest
     protected function prepareForValidation(): void
     {
         if ($adulto = $this->route('adulto_mayor')) {
-            $this->merge(['cod_am' => $adulto->cod_am]);
+            $codRes = $adulto->cod_residente;
+            $this->merge(['cod_residente' => $codRes]);
         }
         if (!$this->has('administrado')) {
             $this->merge(['administrado' => false]);
@@ -33,18 +34,18 @@ class StoreAdministracionMedicacionRequest extends FormRequest
 
     public function rules(): array
     {
-        $codAm = $this->input('cod_am') ?: $this->route('adulto_mayor')?->cod_am;
+        $codRes = $this->input('cod_residente') ?: $this->route('adulto_mayor')?->cod_residente;
 
         return [
             'cod_med_adulto'   => [
                 'required',
                 'string',
                 \Illuminate\Validation\Rule::exists('prescripciones', 'cod_prescripcion')
-                    ->where('cod_residente', $codAm)
+                    ->where('cod_residente', $codRes)
                     ->whereIn('estado', ['ACTIVO', 'ACTIVA', 'VIGENTE'])
                     ->whereNull('deleted_at'),
             ],
-            'cod_am'           => 'required|string|exists:residentes,cod_residente',
+            'cod_residente'    => 'required|string|exists:residentes,cod_residente',
             'fecha'            => 'required|date|before_or_equal:today',
             'hora_programada'  => 'required|date_format:H:i',
             'hora_real'        => 'required_if:administrado,1,true|nullable|date_format:H:i',
@@ -60,8 +61,8 @@ class StoreAdministracionMedicacionRequest extends FormRequest
         return [
             'cod_med_adulto.required'    => 'La medicación es obligatoria.',
             'cod_med_adulto.exists'      => 'La medicación no existe, no pertenece al paciente o no está activa.',
-            'cod_am.required'            => 'El adulto mayor es obligatorio.',
-            'cod_am.exists'              => 'El adulto mayor seleccionado no existe.',
+            'cod_residente.required'     => 'El residente es obligatorio.',
+            'cod_residente.exists'       => 'El residente seleccionado no existe.',
             'fecha.required'             => 'La fecha es obligatoria.',
             'fecha.before_or_equal'      => 'La fecha no puede ser futura.',
             'hora_programada.required'   => 'La hora programada es obligatoria.',
@@ -77,19 +78,19 @@ class StoreAdministracionMedicacionRequest extends FormRequest
     public function withValidator($validator): void
     {
         $validator->after(function ($validator) {
-            $codAm = $this->input('cod_am');
+            $codRes = $this->input('cod_residente');
             $codMed = $this->input('cod_med_adulto');
             $fecha = $this->input('fecha');
             $horaProg = $this->input('hora_programada');
 
             // Verificar ámbito de enfermería
-            if ($codAm && Auth::check()) {
+            if ($codRes && Auth::check()) {
                 try {
                     app(TurnoEnfermeriaService::class)->autorizarMutacionPaciente(
-                        $codAm, 'administraciones_medicacion.crear', Auth::user()
+                        $codRes, 'administraciones_medicacion.crear', Auth::user()
                     );
                 } catch (\Throwable $e) {
-                    $validator->errors()->add('cod_am', $e->getMessage());
+                    $validator->errors()->add('cod_residente', $e->getMessage());
                 }
             }
 

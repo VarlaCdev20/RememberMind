@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Livewire\Cuidados\IncidentesPanel;
+use App\Frontend\Livewire\Enfermeria\Cuidados\IncidentesPanel;
 use App\Models\Alerta;
 use App\Models\Area;
 use App\Models\Contacto;

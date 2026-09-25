@@ -3,8 +3,8 @@
 namespace App\Exports;
 
 use App\Models\User;
-use App\Services\Identidad\UsuarioFichaService;
-use App\Services\Documentos\DocumentacionUsuarioService;
+use App\Backend\Modulos\Identidad\Servicios\UsuarioFichaService;
+use App\Backend\Modulos\Documentos\Servicios\DocumentacionUsuarioService;
 use Illuminate\Contracts\View\View;
 use Maatwebsite\Excel\Concerns\FromView;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;

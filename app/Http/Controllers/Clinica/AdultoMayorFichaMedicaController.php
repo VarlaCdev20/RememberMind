@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Clinica\StoreFichaMedicaRequest;
 use App\Http\Requests\Clinica\UpdateFichaMedicaRequest;
 use App\Models\Residente;
-use App\Services\Clinica\FichaMedicaService;
+use App\Backend\Modulos\Clinica\Servicios\FichaMedicaService;
 use Illuminate\Support\Facades\DB;
 
 class AdultoMayorFichaMedicaController extends Controller
