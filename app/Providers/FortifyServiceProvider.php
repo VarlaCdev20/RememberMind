@@ -2,10 +2,10 @@
 
 namespace App\Providers;
 
-use App\Actions\Identidad\Fortify\CreateNewUser;
-use App\Actions\Identidad\Fortify\ResetUserPassword;
-use App\Actions\Identidad\Fortify\UpdateUserPassword;
-use App\Actions\Identidad\Fortify\UpdateUserProfileInformation;
+use App\Backend\Modulos\Identidad\Acciones\Fortify\CreateNewUser;
+use App\Backend\Modulos\Identidad\Acciones\Fortify\ResetUserPassword;
+use App\Backend\Modulos\Identidad\Acciones\Fortify\UpdateUserPassword;
+use App\Backend\Modulos\Identidad\Acciones\Fortify\UpdateUserProfileInformation;
 use App\Http\Responses\LoginResponse as CustomLoginResponse;
 use App\Http\Responses\PasswordResetLinkResponse;
 use App\Models\User;

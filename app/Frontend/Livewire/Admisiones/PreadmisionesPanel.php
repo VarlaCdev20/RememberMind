@@ -2,7 +2,7 @@
 
 namespace App\Frontend\Livewire\Admisiones;
 
-use App\Actions\Admisiones\FormalizarAdmision;
+use App\Backend\Modulos\Admisiones\Acciones\FormalizarAdmision;
 use App\Models\Cama;
 use App\Models\Documento;
 use App\Models\Habitacion;

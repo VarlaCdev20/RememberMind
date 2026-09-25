@@ -1,5 +1,5 @@
 <?php
-namespace App\Actions\Identidad\Fortify;
+namespace App\Backend\Modulos\Identidad\Acciones\Fortify;
 use App\Models\User;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;

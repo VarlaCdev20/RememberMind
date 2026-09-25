@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Actions\Admisiones;
+namespace App\Backend\Modulos\Admisiones\Acciones;
 
 use App\Models\Admision;
 use App\Models\Cama;

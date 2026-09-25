@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Actions\Identidad\Fortify;
+namespace App\Backend\Modulos\Identidad\Acciones\Fortify;
 
 use Closure;
 use Illuminate\Contracts\Validation\Rule;

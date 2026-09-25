@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Admin\AdultosMayores;
+namespace App\Http\Controllers\Actividades;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Residentes\StoreActividadAdultoRequest;

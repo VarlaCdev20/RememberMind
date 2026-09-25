@@ -3,12 +3,13 @@
 ## Documentación vigente
 
 - [BDD Operativa V2.1 — baseline y 70 tablas](base-de-datos/README.md)
+- [Arquitectura y estructura de carpetas vigente](arquitectura/README.md)
 - [Auditoría](auditoria.md)
 - [Auditoría de roles y permisos](auditoria_roles_permisos.md)
 
 ## Documentación histórica
 
-Las carpetas `architecture-audit` y `refactorizacion-total` registran análisis y propuestas anteriores. Pueden servir como contexto histórico, pero no reemplazan el baseline congelado de la BDD Operativa V2.1.
+Las carpetas `architecture-audit` y `refactorizacion-total` registran análisis y propuestas anteriores. Pueden servir como contexto histórico, pero no reemplazan la arquitectura vigente ni el baseline congelado de la BDD Operativa V2.1.
 
 Cuando exista una contradicción sobre la base de datos, prevalecen:
 

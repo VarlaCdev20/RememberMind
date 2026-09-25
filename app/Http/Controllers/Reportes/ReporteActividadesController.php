@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Admin\Reportes;
+namespace App\Http\Controllers\Reportes;
 
 use App\Http\Controllers\Controller;
 use App\Backend\Modulos\Reportes\Servicios\ReporteDataService;

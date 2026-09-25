@@ -1,7 +1,7 @@
 <?php
 
-use App\Http\Controllers\Admin\AdultosMayores\AdultoMayorActividadController;
-use App\Http\Controllers\Admin\Reportes\ReporteActividadesController;
+use App\Http\Controllers\Actividades\AdultoMayorActividadController;
+use App\Http\Controllers\Reportes\ReporteActividadesController;
 use App\Http\Controllers\Clinica\AdultoMayorFichaMedicaController;
 use App\Http\Controllers\Clinica\AdultoMayorSignosVitalesController;
 use App\Http\Controllers\Documentos\AdultoMayorDocumentoController;

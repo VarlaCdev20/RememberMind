@@ -2,7 +2,7 @@
 
 namespace App\Providers;
 
-use App\Actions\Identidad\Jetstream\DeleteUser;
+use App\Backend\Modulos\Identidad\Acciones\Jetstream\DeleteUser;
 use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
 use Laravel\Jetstream\Jetstream;

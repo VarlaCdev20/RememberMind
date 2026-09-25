@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Actions\Admisiones\FormalizarAdmision;
+use App\Backend\Modulos\Admisiones\Acciones\FormalizarAdmision;
 use App\Models\AdministracionMedicacion;
 use App\Models\Admision;
 use App\Models\AplicacionInstrumento;
