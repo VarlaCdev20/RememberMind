@@ -236,7 +236,7 @@
  showCancelButton: true,
  confirmButtonText: 'Sí, cancelar',
  cancelButtonText: 'No'
- }).then(r => { if (r.isConfirmed) $wire.cancelarActividad({{ $actividad->cod_act_adul }}) })"
+ }).then(r => { if (r.isConfirmed) $wire.cancelarActividad(@js($actividad->cod_act_adul)) })"
  class="flex h-7 w-7 items-center justify-center rounded-lg border border-borde-focus bg-estado-peligroBg text-boton-acento transition hover:border-borde-focus hover:bg-estado-peligroBg">
  <i class="ph-bold ph-x-circle text-xs"></i>
  </button>

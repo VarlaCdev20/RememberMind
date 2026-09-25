@@ -2,6 +2,7 @@
 
 namespace App\Frontend\Livewire\Administracion\Actividades;
 
+use App\Backend\Modulos\Identidad\Servicios\ContextoLaboralService;
 use App\Models\Actividad;
 use App\Models\AdultoMayor;
 use App\Models\ParticipanteActividad;
@@ -77,7 +78,7 @@ class ParticipacionPanel extends Component
     {
         $a = Actividad::with('participantes')->findOrFail($id);
         $this->editandoId  = $id;
-        $this->codResidente       = $a->cod_residente ?? '';
+        $this->codResidente       = (string) ($a->participantes->first()?->cod_residente ?? '');
         $this->codTipoAct  = (string) $a->tipo;
         $this->fecha       = $a->fecha ? $a->fecha->format('Y-m-d') : '';
         $this->hora        = substr($a->hora ?? '', 0, 5);
@@ -103,6 +104,7 @@ class ParticipacionPanel extends Component
 
     public function guardarActividad(): void
     {
+        abort_unless(auth()->user()?->can('actividades.gestionar'), 403);
         $this->validate();
         [$personal, $area] = $this->contextoInstitucional();
         $actividad = Actividad::create([
@@ -128,6 +130,7 @@ class ParticipacionPanel extends Component
 
     public function actualizarActividad(): void
     {
+        abort_unless(auth()->user()?->can('actividades.gestionar'), 403);
         $this->validate();
         $a = Actividad::with('participantes')->findOrFail($this->editandoId);
         $a->update([
@@ -155,6 +158,7 @@ class ParticipacionPanel extends Component
 
     public function cancelarActividad(string $id): void
     {
+        abort_unless(auth()->user()?->can('actividades.gestionar'), 403);
         $a = Actividad::findOrFail($id);
         $a->update(['estado' => 'CANCELADA']);
         $this->dispatch('swal', ['icon' => 'success', 'title' => 'Actividad cancelada.']);
@@ -256,14 +260,13 @@ class ParticipacionPanel extends Component
 
     private function contextoInstitucional(): array
     {
-        $personal = auth()->user()?->personal;
-        $asignacion = $personal?->asignaciones()->where('estado', 'ACTIVO')->first();
-        if (! $personal || ! $asignacion) {
-            $personalFirst = \App\Models\Personal::first();
-            $areaFirst = \App\Models\Area::first();
-            return [$personalFirst?->cod_personal ?? 'PER_0001', $areaFirst?->cod_area ?? 'ARE_0001'];
+        try {
+            [$personal, $area] = app(ContextoLaboralService::class)->resolver(auth()->user());
+        } catch (\LogicException $exception) {
+            throw ValidationException::withMessages(['codTipoAct' => $exception->getMessage()]);
         }
-        return [$personal->cod_personal, $asignacion->cod_area];
+
+        return [$personal->cod_personal, $area->cod_area];
     }
 
     private function codigo(string $prefijo): string

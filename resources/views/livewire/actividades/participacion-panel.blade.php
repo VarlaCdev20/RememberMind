@@ -257,7 +257,7 @@
  showCancelButton: true,
  confirmButtonText: 'Sí, cancelar',
  cancelButtonText: 'No'
- }).then(r => { if (r.isConfirmed) $wire.cancelarParticipacion({{ $p->cod_act_adul }}) })"
+ }).then(r => { if (r.isConfirmed) $wire.cancelarActividad(@js($p->cod_act_adul)) })"
  class="flex h-7 w-7 items-center justify-center rounded-lg border border-borde-focus bg-estado-peligroBg text-boton-acento transition hover:border-borde-focus hover:bg-estado-peligroBg">
  <i class="ph-bold ph-x-circle text-xs"></i>
  </button>
@@ -265,7 +265,7 @@
  @endcan
  {{-- Ir a ficha --}}
  @if($p->adultoMayor)
- <a href="{{ route('admin.adultos-mayores.show', ['adulto_mayor' => $p->cod_residente]) }}"
+ <a href="{{ route('admin.adultos-mayores.show', ['adulto_mayor' => $p->adultoMayor->cod_residente]) }}"
  title="Ver ficha del adulto mayor"
  class="flex h-7 w-7 items-center justify-center rounded-lg border border-estado-exitoBorde bg-estado-exitoBg text-estado-exito transition hover:border-estado-exitoBorde hover:bg-estado-exitoBg">
  <i class="ph-bold ph-arrow-square-out text-xs"></i>
@@ -600,7 +600,7 @@
  {{-- Botones --}}
  <div class="flex flex-wrap justify-end gap-2.5 border-t border-borde-suave pt-4">
  @if($am)
- <a href="{{ route('admin.adultos-mayores.show', ['adulto_mayor' => $detalle->cod_residente]) }}"
+ <a href="{{ route('admin.adultos-mayores.show', ['adulto_mayor' => $am->cod_residente]) }}"
  class="inline-flex items-center gap-1.5 rounded-xl border border-estado-exitoBorde bg-estado-exitoBg px-4 py-2 text-xs font-bold text-estado-exito transition hover:bg-estado-exitoBg">
  <i class="ph-bold ph-user text-xs"></i>
  Ver ficha
