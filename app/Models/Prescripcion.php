@@ -186,37 +186,10 @@ class Prescripcion extends ModeloOperativo
             }
 
             if (empty($model->cod_medicamento)) {
-                $nombreMed = $model->attributes["nombre_medicamento"] ?? $model->indicacion ?? "Medicamento";
-                $med = \App\Models\Medicamento::where("nombre_generico", $nombreMed)
-                    ->orWhere("nombre_comercial", $nombreMed)
-                    ->first();
-                if (!$med) {
-                    $med = \App\Models\Medicamento::create([
-                        "cod_medicamento" => "MED_" . strtoupper(\Illuminate\Support\Str::random(8)),
-                        "nombre_generico" => $nombreMed,
-                        "nombre_comercial" => $nombreMed,
-                        "forma_farmaceutica" => "COMPRIMIDO",
-                        "concentracion" => "1 comp",
-                        "unidad" => "comp",
-                        "control_especial" => false,
-                        "via_predeterminada" => $model->via_administracion ?? "ORAL",
-                        "estado" => "ACTIVO",
-                    ]);
-                }
-                $model->cod_medicamento = $med->cod_medicamento;
+                throw new \LogicException('La prescripción requiere un medicamento del catálogo.');
             }
             if (empty($model->cod_atencion)) {
-                $atencion = \App\Models\Atencion::where("cod_residente", $model->cod_residente)->first();
-                if (!$atencion) {
-                    $atencion = \App\Models\Atencion::create([
-                        "cod_atencion" => "ATN_" . strtoupper(\Illuminate\Support\Str::random(8)),
-                        "cod_residente" => $model->cod_residente,
-                        "fecha_hora_atencion" => now(),
-                        "tipo_atencion" => "MEDICA",
-                        "estado" => "ACTIVA",
-                    ]);
-                }
-                $model->cod_atencion = $atencion->cod_atencion;
+                throw new \LogicException('La prescripción requiere una atención clínica existente.');
             }
 
             unset(
@@ -225,8 +198,7 @@ class Prescripcion extends ModeloOperativo
                 $model->attributes['fecha_inicio']
             );
             if (empty($model->cod_personal)) {
-                $pers = \App\Models\Personal::first();
-                $model->cod_personal = $pers?->cod_personal ?? "PER_0001";
+                throw new \LogicException('La prescripción requiere el profesional responsable.');
             }
             if (!isset($model->segun_necesidad)) {
                 $model->segun_necesidad = false;
@@ -248,17 +220,6 @@ class Prescripcion extends ModeloOperativo
             }
         });
 
-        static::created(function (self $model) {
-            $hora = $model->attributes["hora_programada"] ?? null;
-            if ($hora) {
-                \App\Models\HorarioPrescripcion::create([
-                    "cod_horario_prescripcion" => "HPR_" . strtoupper(\Illuminate\Support\Str::random(8)),
-                    "cod_prescripcion" => $model->cod_prescripcion,
-                    "hora_programada" => $hora,
-                    "estado" => "ACTIVO",
-                ]);
-            }
-        });
     }
 
 }

@@ -8,6 +8,7 @@ use App\Models\AdultoMayor;
 use App\Models\Admision;
 use App\Models\Area;
 use App\Models\Atencion;
+use App\Models\Medicamento;
 use App\Models\Alerta;
 use App\Models\OcupacionCama;
 use App\Models\AsignacionResidenteJornada;
@@ -177,6 +178,16 @@ class FichaPacienteBotonesTest extends TestCase
         $med = Prescripcion::create([
             'cod_residente' => $this->adulto->cod_residente,
             'cod_atencion' => $atencion->cod_atencion,
+            'cod_medicamento' => Medicamento::create([
+                'cod_medicamento' => 'MED_FICHA_100',
+                'nombre_generico' => 'Metformina',
+                'nombre_comercial' => 'Metformina 850mg',
+                'forma_farmaceutica' => 'COMPRIMIDO',
+                'concentracion' => '850 mg',
+                'control_especial' => false,
+                'estado' => 'ACTIVO',
+            ])->cod_medicamento,
+            'cod_personal' => $this->enfermero->personal()->firstOrFail()->cod_personal,
             'nombre_medicamento' => 'Metformina 850mg',
             'dosis' => '850 mg',
             'via_administracion' => 'Oral',

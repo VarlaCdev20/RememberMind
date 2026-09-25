@@ -9,6 +9,7 @@ use App\Models\Area;
 use App\Models\AsignacionResidenteJornada;
 use App\Models\Atencion;
 use App\Models\Jornada;
+use App\Models\Medicamento;
 use App\Models\Prescripcion;
 use App\Models\TurnoEnfermeria;
 use App\Models\User;
@@ -91,6 +92,8 @@ class TabMedicacionEnfermeriaTest extends TestCase
         $medFuturo = Prescripcion::create([
             'cod_residente' => $this->adulto->cod_residente,
             'cod_atencion' => $this->atencion->cod_atencion,
+            'cod_medicamento' => $this->medicamento('Atorvastatina 20mg')->cod_medicamento,
+            'cod_personal' => $this->enfermero->personal->cod_personal,
             'nombre_medicamento' => 'Atorvastatina 20mg',
             'dosis' => '20 mg',
             'via_administracion' => 'Oral',
@@ -104,6 +107,8 @@ class TabMedicacionEnfermeriaTest extends TestCase
         $medAtrasado = Prescripcion::create([
             'cod_residente' => $this->adulto->cod_residente,
             'cod_atencion' => $this->atencion->cod_atencion,
+            'cod_medicamento' => $this->medicamento('Paracetamol 1g')->cod_medicamento,
+            'cod_personal' => $this->enfermero->personal->cod_personal,
             'nombre_medicamento' => 'Paracetamol 1g',
             'dosis' => '1 g',
             'via_administracion' => 'Oral',
@@ -117,6 +122,8 @@ class TabMedicacionEnfermeriaTest extends TestCase
         $medAdmin = Prescripcion::create([
             'cod_residente' => $this->adulto->cod_residente,
             'cod_atencion' => $this->atencion->cod_atencion,
+            'cod_medicamento' => $this->medicamento('Omeprazol 20mg')->cod_medicamento,
+            'cod_personal' => $this->enfermero->personal->cod_personal,
             'nombre_medicamento' => 'Omeprazol 20mg',
             'dosis' => '20 mg',
             'via_administracion' => 'Oral',
@@ -142,6 +149,8 @@ class TabMedicacionEnfermeriaTest extends TestCase
         $medSusp = Prescripcion::create([
             'cod_residente' => $this->adulto->cod_residente,
             'cod_atencion' => $this->atencion->cod_atencion,
+            'cod_medicamento' => $this->medicamento('Digoxina 0.25mg')->cod_medicamento,
+            'cod_personal' => $this->enfermero->personal->cod_personal,
             'nombre_medicamento' => 'Digoxina 0.25mg',
             'dosis' => '0.25 mg',
             'via_administracion' => 'Oral',
@@ -155,6 +164,8 @@ class TabMedicacionEnfermeriaTest extends TestCase
         $medPrn = Prescripcion::create([
             'cod_residente' => $this->adulto->cod_residente,
             'cod_atencion' => $this->atencion->cod_atencion,
+            'cod_medicamento' => $this->medicamento('Lactulosa 15ml')->cod_medicamento,
+            'cod_personal' => $this->enfermero->personal->cod_personal,
             'nombre_medicamento' => 'Lactulosa 15ml',
             'dosis' => '15 ml',
             'via_administracion' => 'Oral',
@@ -223,6 +234,8 @@ class TabMedicacionEnfermeriaTest extends TestCase
         Prescripcion::create([
             'cod_residente' => $this->adulto->cod_residente,
             'cod_atencion' => $this->atencion->cod_atencion,
+            'cod_medicamento' => $this->medicamento('Paracetamol 1g')->cod_medicamento,
+            'cod_personal' => $this->enfermero->personal->cod_personal,
             'nombre_medicamento' => 'Paracetamol 1g',
             'dosis' => '1 g',
             'via_administracion' => 'Oral',
@@ -246,5 +259,18 @@ class TabMedicacionEnfermeriaTest extends TestCase
             // Evaluación de si se pasó de hora
             ->assertSee('relojPC.evaluarHorario', false)
             ->assertSee('Se pasó de hora', false);
+    }
+
+    private function medicamento(string $nombre): Medicamento
+    {
+        return Medicamento::query()->create([
+            'cod_medicamento' => 'MED_'.strtoupper(\Illuminate\Support\Str::random(8)),
+            'nombre_generico' => $nombre,
+            'nombre_comercial' => $nombre,
+            'forma_farmaceutica' => 'COMPRIMIDO',
+            'concentracion' => '1 unidad',
+            'control_especial' => false,
+            'estado' => 'ACTIVO',
+        ]);
     }
 }

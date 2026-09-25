@@ -7,6 +7,7 @@ use App\Models\AdultoMayor;
 use App\Models\Area;
 use App\Models\Atencion;
 use App\Models\Personal;
+use App\Models\Medicamento;
 use App\Models\Prescripcion;
 use App\Models\SignoVital;
 use App\Models\User;
@@ -65,6 +66,16 @@ class MedicoFichaUnificadaTest extends TestCase
         Prescripcion::create([
             'cod_residente' => $this->residente->cod_residente,
             'cod_atencion' => $atencion->cod_atencion,
+            'cod_medicamento' => Medicamento::create([
+                'cod_medicamento' => 'MED_MED_TEST',
+                'nombre_generico' => 'Enalapril',
+                'nombre_comercial' => 'Enalapril 10mg',
+                'forma_farmaceutica' => 'COMPRIMIDO',
+                'concentracion' => '10 mg',
+                'control_especial' => false,
+                'estado' => 'ACTIVO',
+            ])->cod_medicamento,
+            'cod_personal' => $personal->cod_personal,
             'nombre_medicamento' => 'Enalapril 10mg',
             'dosis'              => '1 comprimido',
             'frecuencia'         => 'DIARIA',

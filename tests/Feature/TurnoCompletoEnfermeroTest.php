@@ -16,6 +16,7 @@ use App\Models\PaseTurno;
 use App\Models\PlanCuidado;
 use App\Models\AsignacionPersonal;
 use App\Models\Atencion;
+use App\Models\Medicamento;
 use App\Models\SignoVital;
 use App\Models\EjecucionCuidado;
 use App\Models\TurnoEnfermeria;
@@ -135,6 +136,16 @@ class TurnoCompletoEnfermeroTest extends TestCase
         $med = Prescripcion::create([
             'cod_residente' => $pacienteAsignado->cod_residente,
             'cod_atencion' => $atencion->cod_atencion,
+            'cod_medicamento' => Medicamento::create([
+                'cod_medicamento' => 'MED_TURNO_TEST',
+                'nombre_generico' => 'Enalapril',
+                'nombre_comercial' => 'Enalapril 10mg',
+                'forma_farmaceutica' => 'COMPRIMIDO',
+                'concentracion' => '10 mg',
+                'control_especial' => false,
+                'estado' => 'ACTIVO',
+            ])->cod_medicamento,
+            'cod_personal' => $enfermero->personal()->firstOrFail()->cod_personal,
             'nombre_medicamento' => 'Enalapril 10mg',
             'dosis' => '1 comprimido',
             'frecuencia' => 'Cada 12 horas',
