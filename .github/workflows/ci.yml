@@ -55,6 +55,8 @@ jobs:
       - run: composer audit
       - name: Validate PHP syntax
         run: find app bootstrap config database routes tests -name '*.php' -print0 | xargs -0 -n1 php -l
+      - run: npm ci
+      - run: npm run build
       - name: Run PHP tests
         shell: bash
         run: |
@@ -78,7 +80,5 @@ jobs:
           fi
 
           exit "$status"
-      - run: npm ci
       - run: npm audit --omit=dev
       - run: npm test
-      - run: npm run build
