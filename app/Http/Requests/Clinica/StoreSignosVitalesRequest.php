@@ -64,7 +64,7 @@ class StoreSignosVitalesRequest extends FormRequest
             'saturacion'              => 'nullable|integer|min:' . ValidacionSignosVitalesService::SPO2_MIN . '|max:' . ValidacionSignosVitalesService::SPO2_MAX,
             'glucosa'                 => 'nullable|numeric|min:' . ValidacionSignosVitalesService::GLUCOSA_MIN,
             'peso'                    => 'nullable|numeric|min:' . ValidacionSignosVitalesService::PESO_MIN . '|max:' . ValidacionSignosVitalesService::PESO_MAX,
-            'talla'                   => 'nullable|numeric|min:0.5|max:' . ValidacionSignosVitalesService::TALLA_CM_MAX,
+            'talla'                   => 'nullable|numeric|min:' . ValidacionSignosVitalesService::TALLA_CM_MIN . '|max:' . ValidacionSignosVitalesService::TALLA_CM_MAX,
             'imc'                     => 'nullable|numeric|min:5|max:80',
             'dolor'                   => 'nullable|integer|min:' . ValidacionSignosVitalesService::DOLOR_MIN . '|max:' . ValidacionSignosVitalesService::DOLOR_MAX,
             'observacion'             => 'nullable|string|max:5000',

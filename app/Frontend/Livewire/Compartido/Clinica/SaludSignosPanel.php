@@ -599,8 +599,7 @@ class SaludSignosPanel extends Component
             return;
         }
 
-        $tallaMetros = (float) $this->talla > 3 ? (float) $this->talla / 100 : (float) $this->talla;
-        $this->imc = $tallaMetros > 0 ? round((float) $this->peso / ($tallaMetros * $tallaMetros), 2) : null;
+        $this->imc = ValidacionSignosVitalesService::calcularImc((float) $this->peso, (float) $this->talla);
     }
 
     private function aplicarFiltros(Collection $signos): Collection

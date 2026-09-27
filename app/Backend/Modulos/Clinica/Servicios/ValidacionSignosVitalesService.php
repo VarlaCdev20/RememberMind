@@ -37,8 +37,8 @@ class ValidacionSignosVitalesService
     public const DOLOR_MIN = 0;
     public const DOLOR_MAX = 10;
 
-    /**
-     * Normaliza la talla a centímetros (soporta metros entre 0.50 y 2.40).
+        /**
+     * Normaliza la talla canónica en centímetros (redondeo a 1 decimal).
      */
     public static function normalizarTalla(?float $talla): ?float
     {
@@ -46,16 +46,11 @@ class ValidacionSignosVitalesService
             return null;
         }
 
-        // Si se introdujo en metros (p. ej. 1.65)
-        if ($talla <= 2.5) {
-            return round($talla * 100, 1);
-        }
-
         return round($talla, 1);
     }
 
     /**
-     * Calcula estrictamente el IMC en servidor en base al peso (kg) y talla (cm o m).
+     * Calcula estrictamente el IMC en servidor convirtiendo la talla canonica (cm) a metros (kg/m²).
      */
     public static function calcularImc(?float $peso, ?float $talla): ?float
     {
@@ -86,7 +81,7 @@ class ValidacionSignosVitalesService
             'saturacion'              => 'nullable|integer|min:' . self::SPO2_MIN . '|max:' . self::SPO2_MAX,
             'glucosa'                 => 'nullable|numeric|min:' . self::GLUCOSA_MIN,
             'peso'                    => 'nullable|numeric|min:' . self::PESO_MIN . '|max:' . self::PESO_MAX,
-            'talla'                   => 'nullable|numeric|min:0.5|max:' . self::TALLA_CM_MAX,
+            'talla'                   => 'nullable|numeric|min:' . self::TALLA_CM_MIN . '|max:' . self::TALLA_CM_MAX,
             'dolor'                   => 'nullable|integer|min:' . self::DOLOR_MIN . '|max:' . self::DOLOR_MAX,
             'observacion'             => 'nullable|string|max:5000',
         ];
@@ -113,7 +108,7 @@ class ValidacionSignosVitalesService
             'glucosa.min'                 => 'La glucosa debe ser de al menos ' . self::GLUCOSA_MIN . ' mg/dL.',
             'peso.min'                    => 'El peso debe ser de al menos ' . self::PESO_MIN . ' kg.',
             'peso.max'                    => 'El peso no puede exceder ' . self::PESO_MAX . ' kg.',
-            'talla.min'                   => 'La talla debe ser válida (al menos 0.50 m o 50 cm).',
+            'talla.min'                   => 'La talla debe ser de al menos ' . self::TALLA_CM_MIN . ' cm.',
             'talla.max'                   => 'La talla no puede exceder ' . self::TALLA_CM_MAX . ' cm.',
             'dolor.min'                   => 'La escala de dolor va de 0 a 10.',
             'dolor.max'                   => 'La escala de dolor va de 0 a 10.',

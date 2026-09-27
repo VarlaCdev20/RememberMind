@@ -469,8 +469,8 @@
  @error('peso') <span class="mt-1 text-[10px] font-bold text-red-500">{{ $message }}</span> @enderror
  </div>
  <div>
- <label class="mb-1 block text-[11px] font-bold uppercase tracking-widest text-parrafo/55">Talla (m o cm)</label>
- <input type="number" step="0.01" wire:model.live.debounce.400ms="talla" min="0.5" max="250" placeholder="Ej. 1.65" class="w-full rounded-xl border {{ $errors->has('talla') ? 'border-red-500' : 'border-borde/70' }} bg-fondo-card px-3 py-2.5 text-xs font-bold text-parrafo outline-none transition focus:border-borde-focus focus:ring-2 focus:ring-[#E27D60]/15">
+ <label class="mb-1 block text-[11px] font-bold uppercase tracking-widest text-parrafo/55">Talla (cm)</label>
+ <input type="number" step="0.1" wire:model.live.debounce.400ms="talla" min="50" max="240" placeholder="Ej. 165" class="w-full rounded-xl border {{ $errors->has('talla') ? 'border-red-500' : 'border-borde/70' }} bg-fondo-card px-3 py-2.5 text-xs font-bold text-parrafo outline-none transition focus:border-borde-focus focus:ring-2 focus:ring-[#E27D60]/15">
  @error('talla') <span class="mt-1 text-[10px] font-bold text-red-500">{{ $message }}</span> @enderror
  </div>
  <div>
@@ -669,8 +669,8 @@
  @error('peso') <span class="mt-1 text-[10px] font-bold text-red-500">{{ $message }}</span> @enderror
  </div>
  <div>
- <label class="mb-1 block text-[11px] font-bold uppercase tracking-widest text-parrafo/55">Talla (m)</label>
- <input type="number" step="0.01" wire:model.live.debounce.400ms="talla" min="0.5" max="250" placeholder="1.65" class="w-full rounded-xl border {{ $errors->has('talla') ? 'border-red-500' : 'border-borde/70' }} bg-fondo-card px-3 py-2.5 text-xs font-bold text-parrafo">
+ <label class="mb-1 block text-[11px] font-bold uppercase tracking-widest text-parrafo/55">Talla (cm)</label>
+                        <input type="number" step="0.1" wire:model.live.debounce.400ms="talla" min="50" max="240" placeholder="165" class="w-full rounded-xl border {{ $errors->has('talla') ? 'border-red-500' : 'border-borde/70' }} bg-fondo-card px-3 py-2.5 text-xs font-bold text-parrafo">
  @error('talla') <span class="mt-1 text-[10px] font-bold text-red-500">{{ $message }}</span> @enderror
  </div>
  </div>

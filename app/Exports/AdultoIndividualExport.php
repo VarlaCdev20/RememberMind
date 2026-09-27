@@ -112,7 +112,7 @@ class SignosVitalesIndSheet implements FromCollection, WithTitle, WithHeadings, 
         return [
             'Fecha', 'Hora', 'Pres. Sistólica', 'Pres. Diastólica',
             'Frec. Cardíaca', 'Frec. Resp.', 'Temperatura (°C)',
-            'Saturación (%)', 'Glucosa', 'Peso (kg)', 'Talla (m)', 'IMC', 'Estado',
+            'Saturación (%)', 'Glucosa', 'Peso (kg)', 'Talla (cm)', 'IMC', 'Estado',
         ];
     }
 

@@ -151,7 +151,7 @@
                     </div>
                     <div>
                         <label class="mb-1 block text-[10px] font-bold text-apoyo">Talla (cm)</label>
-                        <input wire:model.live="talla" type="number" step="0.1" min="50" max="250" placeholder="cm"
+                        <input wire:model.live="talla" type="number" step="0.1" min="50" max="240" placeholder="165"
                                class="w-full rounded-xl border border-borde bg-fondo-panel px-3 py-2 text-sm font-bold text-titulo outline-none focus:border-borde-focus">
                     </div>
                     <div>

@@ -97,7 +97,7 @@
             'dolor_val' => ($s->dolor ?? $s->nivel_dolor) ?? '--',
             'glucosa' => $s->glucosa ? "{$s->glucosa} mg/dL" : '--',
             'peso' => $s->peso ? "{$s->peso} kg" : '--',
-            'talla' => $s->talla ? "{$s->talla} m" : '--',
+            'talla' => $s->talla ? "{$s->talla} cm" : '--',
             'imc' => $s->imc ?: '--',
             'posicion' => $s->posicion ?: 'Decúbito supino',
             'oxigeno' => $s->usa_oxigeno ? 'Sí (Oxigenoterapia activa)' : 'No (Aire ambiente)',
@@ -1444,7 +1444,7 @@ document.addEventListener('alpine:init', () => {
                     oxigeno: r.usa_oxigeno ? 'Sí' : 'No',
                     criterio: ev.evento || 'Alteración detectada',
                     observaciones: r.observacion || r.observaciones || 'Registro clínico con hallazgo reportado.',
-                    responsable: r.registrado_por || 'Equipo Asistencial',
+                    responsable: r.registrado_por || 'Profesional no registrado',
                     estado: ev.estado || 'Relevante',
                     badgeClass: ev.badge_bg || 'bg-amber-100 text-amber-800 border-amber-200',
                 };
