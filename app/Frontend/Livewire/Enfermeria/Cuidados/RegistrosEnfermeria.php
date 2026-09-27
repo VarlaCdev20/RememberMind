@@ -412,6 +412,13 @@ class RegistrosEnfermeria extends Component
     public function guardarDispositivo(): void
     {
         $this->autorizarMutacion($this->codResidente);
+        $this->validate([
+            'tipoDispositivo' => 'required|in:OXIGENO,SONDA_URINARIA,OSTOMIA,ALIMENTACION_ENTERAL,OTRO,SONDA_VESICAL',
+            'ubicacionDispositivo' => 'nullable|string|max:120',
+            'indicacionDispositivo' => 'required|string|min:5|max:1000',
+        ], [
+            'indicacionDispositivo.required' => 'Registre la indicación clínica del dispositivo.',
+        ]);
         $personal = Auth::user()?->personal;
         abort_unless($personal, 403, 'Personal clínico no vinculado.');
 
@@ -424,7 +431,7 @@ class RegistrosEnfermeria extends Component
             'descripcion' => $this->indicacionDispositivo ?: null,
             'fecha_colocacion' => now(),
             'estado' => 'ACTIVO',
-            'observacion' => 'Instalación asistencial de dispositivo.',
+            'observacion' => null,
         ]);
 
         $this->reset(['ubicacionDispositivo', 'indicacionDispositivo']);
@@ -434,11 +441,17 @@ class RegistrosEnfermeria extends Component
     public function retirarDispositivo(string $codigo): void
     {
         $this->autorizarMutacion($this->codResidente);
+        $this->validate([
+            'motivoRetiroDispositivo' => 'required|string|min:5|max:1000',
+        ], [
+            'motivoRetiroDispositivo.required' => 'El motivo del retiro es obligatorio.',
+        ]);
         $dispositivo = DispositivoClinico::where('cod_residente', $this->codResidente)->findOrFail($codigo);
+        abort_unless($dispositivo->estado === 'ACTIVO', 409, 'El dispositivo ya fue retirado.');
         $dispositivo->update([
             'estado' => 'RETIRADO',
             'fecha_retiro' => now(),
-            'observacion' => $this->motivoRetiroDispositivo ?: $dispositivo->observacion,
+            'observacion' => trim(($dispositivo->observacion ? $dispositivo->observacion.' | ' : '').'Retiro: '.$this->motivoRetiroDispositivo),
         ]);
 
         $this->motivoRetiroDispositivo = '';
@@ -448,11 +461,22 @@ class RegistrosEnfermeria extends Component
     public function guardarIncidente(): void
     {
         $this->autorizarMutacion($this->codResidente);
+        $this->validate([
+            'tipoIncidente' => 'required|in:CAIDA,GOLPE,ERROR_MEDICACION,LESION,CAMBIO_CLINICO,OTRO',
+            'lugarIncidente' => 'required|string|max:120',
+            'actividadPrevia' => 'nullable|string|max:500',
+            'testigo' => 'required_if:presenciado,true|nullable|string|max:120',
+            'descripcionIncidente' => 'required|string|min:10|max:2000',
+            'dolorIncidente' => 'nullable|integer|min:0|max:10',
+            'tipoLesion' => 'required_if:hayLesion,true|nullable|string|max:60',
+            'zonaLesion' => 'required_if:hayLesion,true|nullable|string|max:120',
+        ]);
         $personal = Auth::user()?->personal;
         abort_unless($personal, 403, 'Personal clínico no vinculado.');
 
         $miTurnoService = app(MiTurnoService::class);
         $jornada = $miTurnoService->resolverJornadaActual($personal, now());
+        abort_unless($jornada, 409, 'No existe una jornada profesional activa para firmar el incidente.');
 
         $medida = $this->movilidadPosterior ? 'Movilidad: '.$this->movilidadPosterior : null;
         $obs = [];
@@ -474,12 +498,12 @@ class RegistrosEnfermeria extends Component
             'cod_incidente' => 'INC_'.strtoupper(Str::random(10)),
             'cod_residente' => $this->codResidente,
             'cod_personal' => $personal->cod_personal,
-            'cod_jornada' => $jornada?->cod_jornada,
+            'cod_jornada' => $jornada->cod_jornada,
             'tipo_incidente' => mb_strtoupper(trim($this->tipoIncidente)),
-            'gravedad' => $this->dolorIncidente ? ($this->dolorIncidente >= 7 ? 'GRAVE' : ($this->dolorIncidente >= 4 ? 'MODERADA' : 'LEVE')) : 'MODERADA',
-            'lugar' => $this->lugarIncidente ?: 'Habitación',
+            'gravedad' => $this->dolorIncidente === null ? null : ($this->dolorIncidente >= 7 ? 'GRAVE' : ($this->dolorIncidente >= 4 ? 'MODERADA' : 'LEVE')),
+            'lugar' => $this->lugarIncidente,
             'fecha_hora' => now(),
-            'descripcion' => $this->descripcionIncidente ?: 'Incidente asistencial reportado en turno.',
+            'descripcion' => $this->descripcionIncidente,
             'medida_inmediata' => $medida,
             'requiere_medico' => (bool) $this->medicoInformado,
             'requiere_derivacion' => false,
@@ -493,7 +517,7 @@ class RegistrosEnfermeria extends Component
                 'cod_residente' => $this->codResidente,
                 'cod_personal' => $personal->cod_personal,
                 'tipo_herida' => mb_strtoupper(trim($this->tipoLesion)),
-                'ubicacion' => $this->zonaLesion ?: 'General',
+                'ubicacion' => $this->zonaLesion,
                 'causa' => 'Incidente: '.mb_strtoupper(trim($this->tipoIncidente)),
                 'fecha_hora_identificacion' => now(),
                 'estado' => 'ACTIVA',
@@ -509,7 +533,7 @@ class RegistrosEnfermeria extends Component
             'generacion' => 'AUTOMATICA',
             'prioridad' => mb_strtoupper(trim($this->tipoIncidente)) === 'CAIDA' ? 'ALTA' : 'MEDIA',
             'titulo' => 'Incidente reportado: '.mb_strtoupper(trim($this->tipoIncidente)),
-            'descripcion' => $this->descripcionIncidente ?: 'Incidente registrado.',
+            'descripcion' => $this->descripcionIncidente,
             'fecha_hora' => now(),
             'estado' => 'ABIERTA',
         ]);
@@ -522,7 +546,13 @@ class RegistrosEnfermeria extends Component
     public function seguimientoIncidente(): void
     {
         $this->autorizarMutacion($this->codResidente);
-        $incidente = Incidente::where('cod_residente', $this->codResidente)->findOrFail($this->incidenteId);
+        $this->validate([
+            'incidenteId' => 'required|string|max:20',
+            'seguimientoIncidente' => 'required|string|min:10|max:2000',
+        ]);
+        $incidente = Incidente::where('cod_residente', $this->codResidente)
+            ->whereIn('estado', ['ABIERTO', 'EN_SEGUIMIENTO'])
+            ->findOrFail($this->incidenteId);
         $incidente->update([
             'estado' => 'EN_SEGUIMIENTO',
             'observacion' => trim($incidente->observacion."\n".'['.now()->format('d/m/Y H:i').'] '.$this->seguimientoIncidente),
@@ -534,7 +564,14 @@ class RegistrosEnfermeria extends Component
     public function cerrarIncidente(): void
     {
         $this->autorizarMutacion($this->codResidente);
-        $incidente = Incidente::where('cod_residente', $this->codResidente)->findOrFail($this->incidenteId);
+        $this->validate([
+            'incidenteId' => 'required|string|max:20',
+            'evaluacionFinalIncidente' => 'required|string|min:10|max:2000',
+            'resultadoIncidente' => 'required|string|min:5|max:1000',
+        ]);
+        $incidente = Incidente::where('cod_residente', $this->codResidente)
+            ->whereIn('estado', ['ABIERTO', 'EN_SEGUIMIENTO'])
+            ->findOrFail($this->incidenteId);
         $incidente->update([
             'estado' => 'CERRADO',
             'observacion' => trim($incidente->observacion."\n[Cierre: ".$this->evaluacionFinalIncidente.' - '.$this->resultadoIncidente.']'),
@@ -546,17 +583,33 @@ class RegistrosEnfermeria extends Component
     public function guardarSeguimientoLesion(): void
     {
         $this->autorizarMutacion($this->codResidente);
+        $this->validate([
+            'lesionId' => 'required|string|max:20',
+            'largoLesion' => 'nullable|numeric|min:0|max:99999',
+            'anchoLesion' => 'nullable|numeric|min:0|max:99999',
+            'profundidadLesion' => 'nullable|numeric|min:0|max:99999',
+            'dolorLesion' => 'nullable|integer|min:0|max:10',
+            'aspectoLesion' => 'required|string|min:5|max:1000',
+            'accionLesion' => 'required|string|min:5|max:2000',
+            'observacionLesion' => 'nullable|string|max:2000',
+        ]);
         $personal = Auth::user()?->personal;
         abort_unless($personal, 403, 'Personal clínico no vinculado.');
 
+        $herida = Herida::query()
+            ->where('cod_residente', $this->codResidente)
+            ->where('estado', 'ACTIVA')
+            ->findOrFail($this->lesionId);
+
         $miTurnoService = app(MiTurnoService::class);
         $jornada = $miTurnoService->resolverJornadaActual($personal, now());
+        abort_unless($jornada, 409, 'No existe una jornada profesional activa para firmar la curación.');
 
         CuracionHerida::create([
             'cod_curacion' => 'CUR_'.strtoupper(Str::random(10)),
-            'cod_herida' => $this->lesionId,
+            'cod_herida' => $herida->cod_herida,
             'cod_personal' => $personal->cod_personal,
-            'cod_jornada' => $jornada?->cod_jornada,
+            'cod_jornada' => $jornada->cod_jornada,
             'fecha_hora' => now(),
             'longitud' => $this->largoLesion !== null ? (float) $this->largoLesion : null,
             'ancho' => $this->anchoLesion !== null ? (float) $this->anchoLesion : null,
@@ -564,7 +617,7 @@ class RegistrosEnfermeria extends Component
             'tejido' => $this->aspectoLesion ?: null,
             'exudado' => $this->exudadoLesion ?: null,
             'dolor' => $this->dolorLesion !== null ? (string) $this->dolorLesion : null,
-            'procedimiento' => $this->accionLesion ?: 'Curación y desinfección protocolar',
+            'procedimiento' => $this->accionLesion,
             'observacion' => $this->observacionLesion ?: null,
         ]);
 
@@ -576,7 +629,13 @@ class RegistrosEnfermeria extends Component
     public function cerrarLesion(string $codigo): void
     {
         $this->autorizarMutacion($this->codResidente);
-        $herida = Herida::where('cod_residente', $this->codResidente)->findOrFail($codigo);
+        $this->validate([
+            'resultadoCierreLesion' => 'required|string|min:5|max:1000',
+            'motivoCierreLesion' => 'required|string|min:5|max:1000',
+        ]);
+        $herida = Herida::where('cod_residente', $this->codResidente)
+            ->where('estado', 'ACTIVA')
+            ->findOrFail($codigo);
         $herida->update([
             'estado' => 'CERRADA',
             'fecha_hora_cierre' => now(),
@@ -590,6 +649,12 @@ class RegistrosEnfermeria extends Component
     public function guardarDolor(): void
     {
         $this->autorizarMutacion($this->codResidente);
+        $this->validate([
+            'faseDolor' => 'required|in:VALORACION,INTERVENCION,REEVALUACION',
+            'intensidadDolor' => 'required|integer|min:0|max:10',
+            'detalleDolor' => 'required|string|min:5|max:2000',
+            'resultadoDolor' => 'required_if:faseDolor,REEVALUACION|nullable|string|min:3|max:1000',
+        ]);
         $personal = Auth::user()?->personal;
         abort_unless($personal, 403, 'Personal clínico no vinculado.');
 
@@ -599,10 +664,10 @@ class RegistrosEnfermeria extends Component
             'cod_personal' => $personal->cod_personal,
             'fecha_hora' => now(),
             'intensidad' => (int) $this->intensidadDolor,
-            'ubicacion' => $this->detalleDolor ?: 'General',
+            'ubicacion' => $this->detalleDolor,
             'intervencion' => $this->resultadoDolor ?: null,
             'estado' => 'ACTIVA',
-            'observacion' => 'Valoración secuencial de dolor.',
+            'observacion' => null,
         ]);
 
         $this->reset(['valoracionDolorId', 'detalleDolor', 'resultadoDolor', 'intensidadDolor']);
@@ -613,9 +678,13 @@ class RegistrosEnfermeria extends Component
     public function rectificarCuidado(): void
     {
         $this->autorizarMutacion($this->codResidente);
+        $this->validate([
+            'registroRectificarId' => 'required|string|max:20',
+            'motivoRectificacion' => 'required|string|min:10|max:2000',
+        ]);
         $original = EjecucionCuidado::where('cod_residente', $this->codResidente)->findOrFail($this->registroRectificarId);
         $original->update([
-            'observacion' => trim($original->observacion.' [Rectificación: '.$this->motivoRectificacion.']'),
+            'observacion' => trim($original->observacion.' [Rectificación '.now()->format('d/m/Y H:i').' por '.Auth::user()->personal->cod_personal.': '.$this->motivoRectificacion.']'),
         ]);
 
         $this->reset(['registroRectificarId', 'motivoRectificacion']);

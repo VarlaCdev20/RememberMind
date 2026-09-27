@@ -218,6 +218,41 @@ class EnfermeriaV2CorreccionCriticaTest extends TestCase
         ]);
     }
 
+    public function test_curacion_no_admite_herida_de_otro_residente(): void
+    {
+        [$enfermera, $personal, $residente] = $this->crearEscenario();
+        $this->actingAs($enfermera);
+
+        $otroResidente = Residente::crearDesdeAdmision([
+            'cod_residente' => 'RES_HERIDA_AJENA',
+            'nombres' => 'Otra',
+            'apellido_paterno' => 'Persona',
+            'fecha_nacimiento' => '1940-01-01',
+            'estado' => 'ADMITIDO',
+        ]);
+        $heridaAjena = Herida::query()->create([
+            'cod_herida' => 'HER_AJENA_01',
+            'cod_residente' => $otroResidente->cod_residente,
+            'cod_personal' => $personal->cod_personal,
+            'tipo_herida' => 'LACERACION',
+            'ubicacion' => 'Antebrazo',
+            'fecha_hora_identificacion' => now(),
+            'estado' => 'ACTIVA',
+        ]);
+
+        Livewire::test(RegistrosEnfermeria::class, ['codResidente' => $residente->cod_residente])
+            ->set('lesionId', $heridaAjena->cod_herida)
+            ->set('aspectoLesion', 'Lecho limpio')
+            ->set('accionLesion', 'Limpieza con solución indicada')
+            ->call('guardarSeguimientoLesion')
+            ->assertNotFound();
+
+        $this->assertDatabaseMissing('curaciones_herida', [
+            'cod_herida' => $heridaAjena->cod_herida,
+            'cod_personal' => $personal->cod_personal,
+        ]);
+    }
+
     public function test_registros_enfermeria_cuidados_ejecutados_usan_ejecuciones_cuidado_y_seguimientos_v2(): void
     {
         [$enfermera, , $residente] = $this->crearEscenario();
