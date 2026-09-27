@@ -24,7 +24,16 @@ class SignoVital extends ModeloOperativo
 
     protected function casts(): array
     {
-        return ['fecha_hora' => 'datetime'];
+        return [
+            'fecha_hora' => 'datetime',
+            'presion_sistolica' => 'float',
+            'presion_diastolica' => 'float',
+            'frecuencia_cardiaca' => 'float',
+            'frecuencia_respiratoria' => 'float',
+            'temperatura' => 'float',
+            'saturacion_oxigeno' => 'float',
+            'glucemia' => 'float',
+        ];
     }
 
     protected static function booted(): void
