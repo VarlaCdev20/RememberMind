@@ -153,7 +153,7 @@
                 </div>
             </div>
 
-            <!-- 3. Historial de Intervenciones Clínicas (Timeline) -->
+            <!-- 3. Historial de Intervenciones Clínicas (Timeline Canónico) -->
             <div class="space-y-2">
                 <div class="flex items-center justify-between">
                     <span class="text-xs font-bold uppercase tracking-wider text-[var(--rm-text-title)] flex items-center gap-1.5">
@@ -163,31 +163,33 @@
                     <span class="text-[11px] text-[var(--rm-text-muted)] font-mono">Orden cronológico</span>
                 </div>
 
-                @if($detalle->eventos->isEmpty())
-                    <div class="text-center py-6 border border-dashed border-[var(--rm-border)] rounded-xl text-[var(--rm-text-muted)] text-xs font-medium bg-[var(--rm-surface-alt)]">
-                        No se han registrado intervenciones aún en esta alerta.
-                    </div>
-                @else
-                    <div class="space-y-2 max-h-52 overflow-y-auto pr-1">
-                        @foreach($detalle->eventos as $acc)
-                            <div class="p-2.5 rounded-xl bg-[var(--rm-surface-alt)] border border-[var(--rm-border)] text-xs space-y-1">
-                                <div class="flex items-center justify-between text-[11px]">
-                                    <span class="font-bold text-[var(--rm-text-title)] flex items-center gap-1.5">
-                                        <i class="ph ph-user-circle text-sm text-[var(--rm-primary)]"></i>
-                                        <span>{{ $acc->usuario?->name ?? 'Profesional Clínico' }}</span>
-                                        <span class="text-[var(--rm-text-muted)] font-normal">· {{ $acc->tipo_evento }}</span>
-                                    </span>
-                                    <span class="text-[var(--rm-text-muted)] font-mono">
-                                        {{ $acc->fecha_hora?->format('H:i') }} ({{ $acc->fecha_hora?->format('d/m/Y') }})
-                                    </span>
-                                </div>
-                                <p class="text-[var(--rm-text-body)] font-medium leading-relaxed pl-5">
-                                    {{ $acc->descripcion }}
-                                </p>
-                            </div>
-                        @endforeach
-                    </div>
-                @endif
+                @php
+                    $timelineItems = $detalle->eventos->sortBy('fecha_hora')->values()->map(function($acc) {
+                        $nombreActor = $acc->usuario?->name ?? 'Profesional Clínico';
+                        $fechaFormat = $acc->fecha_hora ? ($acc->fecha_hora->format('H:i') . ' (' . $acc->fecha_hora->format('d/m/Y') . ')') : '';
+                        $cambioEstado = ($acc->estado_anterior && $acc->estado_nuevo && $acc->estado_anterior !== $acc->estado_nuevo)
+                            ? "{$acc->estado_anterior} → {$acc->estado_nuevo}"
+                            : null;
+                        return [
+                            'id' => $acc->cod_evento_alerta,
+                            'actor' => $nombreActor,
+                            'tipo' => $acc->tipo_evento,
+                            'estado' => $cambioEstado,
+                            'fecha' => $fechaFormat,
+                            'descripcion' => $acc->descripcion,
+                            'variant' => match($acc->tipo_evento) {
+                                'CREACION' => 'info',
+                                'ATENCION', 'SEGUIMIENTO' => 'terracota',
+                                'CIERRE' => 'success',
+                                default => 'default',
+                            },
+                        ];
+                    })->toArray();
+                @endphp
+
+                <div class="max-h-60 overflow-y-auto pr-1">
+                    <x-patterns.timeline :items="$timelineItems" emptyMessage="No se han registrado intervenciones aún en esta alerta." />
+                </div>
             </div>
 
             <!-- 4. Formulario para Registrar Nueva Intervención (si la alerta no está cerrada) -->

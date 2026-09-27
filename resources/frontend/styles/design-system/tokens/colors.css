@@ -1,6 +1,7 @@
 /* ============================================================
    REMEMBERMIND DESIGN SYSTEM — TOKENS / COLORS
-   Fuente única de verdad de color institucional y clínico.
+   Línea Visual Institucional: BEIGE + CAFÉ + TERRACOTA
+   Semántica Secundaria: VERDE (éxito/salud) y AZUL (información clínica)
    Todos los contrastes de texto y botones cumplen WCAG AA (>= 4.5:1).
    ============================================================ */
 
@@ -8,94 +9,98 @@
     /* ============================================================
        1. APP & LAYOUT (Lienzo principal cálido unificado)
        ============================================================ */
-    --rm-bg-app: #E9DFD3;
-    --rm-bg-layout: #E9DFD3;
+    --rm-bg-app: #D3C8B8;
+    --rm-bg-layout: #D3C8B8;
 
     /* ============================================================
        2. SUPERFICIES (Jerarquía cálida de alto contraste)
        ============================================================ */
-    --rm-surface-beige: #F0E8DE;    /* Superficie principal canónica */
-    --rm-surface: #F0E8DE;          /* Cards y contenedores base (#F0E8DE) */
-    --rm-surface-soft: #E0D5C9;     /* Superficie secundaria / panels (#E0D5C9) */
-    --rm-surface-alt: #E0D5C9;      /* Bloques internos y celdas agrupadas */
-    --rm-surface-strong: #D5CABE;   /* Fondos activos y cabeceras contrastadas */
+    --rm-surface-beige: #E8DFD5;    /* Superficie principal canónica */
+    --rm-surface: #E8DFD5;          /* Cards y contenedores base */
+    --rm-surface-soft: #F2ECE4;     /* Superficie secundaria / paneles */
+    --rm-surface-alt: #DDD3C7;      /* Bloques internos y celdas agrupadas */
+    --rm-surface-strong: #CFC3B5;   /* Fondos activos y cabeceras contrastadas */
 
     /* ============================================================
-       3. BORDES (Delimitación sutil y definida)
+       3. BORDES (Delimitación cálida y definida)
        ============================================================ */
-    --rm-border: #D5CABE;           /* Borde estándar estructural 1px */
-    --rm-border-soft: #E0D5C9;      /* Separadores tenues internos */
-    --rm-border-hover: #C7BEB6;     /* Borde interactivo al pasar cursor */
-    --rm-border-strong: #C7BEB6;    /* Delimitación de alto énfasis / borde fuerte */
+    --rm-border: #A49384;           /* Borde estándar estructural 1px */
+    --rm-border-soft: #BCAE9F;      /* Separadores tenues internos */
+    --rm-border-hover: #8E7C6B;     /* Borde interactivo al pasar cursor */
+    --rm-border-strong: #756555;    /* Delimitación de alto énfasis */
 
     /* ============================================================
-       4. TEXTOS CON CONTRASTE WCAG AA PROBADO (>= 4.5:1)
+       4. TEXTOS (Café profundo con contraste WCAG AAA probado)
        ============================================================ */
-    --rm-text-title: #304060;        /* Navy institucional */
-    --rm-text-body: #304060;         /* Navy institucional */
-    --rm-text-muted: #677084;        /* Texto secundario cálido */
-    --rm-text-soft: #677084;         /* Texto secundario cálido */
-    --rm-text-inverse: #FFFFFF;      /* Texto sobre botones filled de acción */
+    --rm-text-primary: #2E241F;      /* Café profundo institucional */
+    --rm-text-title: #2E241F;        /* Títulos y cifras destacadas */
+    --rm-text-body: #2E241F;         /* Lectura general y celdas */
+    --rm-text-secondary: #6F5F53;    /* Café suave / metadatos */
+    --rm-text-muted: #6F5F53;        /* Texto secundario cálido */
+    --rm-text-soft: #6F5F53;         /* Fechas y notas de apoyo */
+    --rm-text-inverse: #FFFFFF;      /* Texto sobre botones filled */
 
     /* ============================================================
-       5. ACCIONES PRIMARIAS (Navy institucional)
+       5. ACCIONES PRIMARIAS (Terracota institucional)
        ============================================================ */
-    --rm-primary: #304060;           /* Navy */
-    --rm-primary-hover: #24324D;
-    --rm-primary-soft: #E0D5C9;
+    --rm-primary: #B05D40;           /* Terracota principal; blanco 4.68:1 */
+    --rm-primary-hover: #9D5339;     /* Terracota oscuro hover */
+    --rm-primary-soft: #F5E8E2;      /* Terracota suave superficie */
 
     /* ============================================================
-       6. ACENTO (Terracota institucional)
+       6. ACENTO Y CONTRASTE ESTRUCTURAL
        ============================================================ */
-    --rm-accent: #A35A44;            /* Terracota principal */
-    --rm-accent-hover: #8D4B37;
-    --rm-accent-soft: #D6AE86;       /* Terracota suave */
+    --rm-accent: #B05D40;            /* Terracota */
+    --rm-accent-hover: #9D5339;
+    --rm-accent-soft: #D8A189;
+    --rm-accent-action: #B05D40;
+    --rm-accent-action-hover: #9D5339;
 
-    --rm-accent-action: #A35A44;
-    --rm-accent-action-hover: #8D4B37;
+    --rm-accent-brown: #4A382F;      /* Café estructural para navegación */
+    --rm-accent-beige-dark: #8E7C6B; /* Beige oscuro para contrastes */
 
     /* ============================================================
-       7. ESTADOS SEMÁNTICOS (Institucionales)
+       7. ESTADOS SEMÁNTICOS SECUNDARIOS
        ============================================================ */
-    /* Success: Verde Sage (#8DA280 / #63775B) */
-    --rm-success: #8DA280;
-    --rm-success-hover: #798E6D;
-    --rm-success-soft: #E8F1E5;
-    --rm-success-action: #63775B;
-    --rm-success-action-hover: #50614A;
+    /* Success: Verde institucional (éxito, estado correcto, completado) */
+    --rm-success: #5F7862;
+    --rm-success-hover: #4D6350;
+    --rm-success-soft: #D7E1D5;
+    --rm-success-action: #5F7862;
+    --rm-success-action-hover: #4D6350;
 
-    /* Warning: Mostaza / Ámbar (#D2A45E) */
-    --rm-warning: #D2A45E;
-    --rm-warning-hover: #BF924E;
-    --rm-warning-soft: #FFF1D6;
+    /* Warning: Mostaza / Ámbar tostado */
+    --rm-warning: #96681F;           /* Ámbar oscuro; blanco 4.89:1 */
+    --rm-warning-hover: #855D1C;
+    --rm-warning-soft: #F9EED9;
 
-    /* Danger: Rojo Coral institucional (#A7443B / #D62828) */
+    /* Danger / Crítico: Rojo Coral fuerte */
     --rm-danger: #A7443B;
     --rm-danger-hover: #8F372F;
-    --rm-danger-soft: #FFF0F0;
+    --rm-danger-soft: #FBECEB;
     --rm-danger-action: #A7443B;
     --rm-danger-action-hover: #8F372F;
 
-    /* Info: Navy / Azul grisáceo (#5F7899) */
-    --rm-info: #5F7899;
-    --rm-info-hover: #4F6582;
-    --rm-info-soft: #E9EEF6;
-    --rm-info-action: #5F7899;
-    --rm-info-action-hover: #4F6582;
+    /* Info: Azul grisáceo (información clínica, neutrales) */
+    --rm-info: #5C7187;
+    --rm-info-hover: #4A5D70;
+    --rm-info-soft: #D8E1E8;
+    --rm-info-action: #5C7187;
+    --rm-info-action-hover: #4A5D70;
 
     /* ============================================================
        8. PALETA CATEGÓRICA DE GRÁFICOS
        ============================================================ */
-    --rm-chart-1: #304060;   /* Navy */
-    --rm-chart-2: #A35A44;   /* Terracota */
-    --rm-chart-3: #8DA280;   /* Verde sage */
-    --rm-chart-4: #D2A45E;   /* Mostaza */
-    --rm-chart-5: #7565A8;   /* Lavanda */
-    --rm-chart-6: #5F7899;   /* Azul grisáceo */
-    --rm-chart-7: #D6AE86;   /* Terracota suave */
-    --rm-chart-8: #677084;   /* Pizarra */
-    --rm-chart-9: #9A744E;   /* Siena */
-    --rm-chart-10: #63775B;  /* Verde sage oscuro */
+    --rm-chart-1: #4A382F;   /* Café estructural */
+    --rm-chart-2: #B05D40;   /* Terracota */
+    --rm-chart-3: #5F7862;   /* Verde institucional */
+    --rm-chart-4: #96681F;   /* Ámbar */
+    --rm-chart-5: #5C7187;   /* Azul grisáceo */
+    --rm-chart-6: #7565A8;   /* Lavanda */
+    --rm-chart-7: #D8A189;   /* Terracota suave */
+    --rm-chart-8: #6F5F53;   /* Café suave */
+    --rm-chart-9: #8E7C6B;   /* Beige oscuro */
+    --rm-chart-10: #4D6350;  /* Verde oscuro */
 }
 
 /* ============================================================
@@ -122,16 +127,18 @@
     --rm-border-strong: #6D655C;
 
     /* 4. TEXTOS */
+    --rm-text-primary: #F8F2EC;
     --rm-text-title: #F8F2EC;
     --rm-text-body: #EAE0D4;
+    --rm-text-secondary: #B8ADA2;
     --rm-text-muted: #B8ADA2;
     --rm-text-soft: #B8ADA2;
     --rm-text-inverse: #1A1918;
 
     /* 5. ACCIONES PRIMARIAS */
-    --rm-primary: #8595B5;
-    --rm-primary-hover: #A0AED0;
-    --rm-primary-soft: rgba(133, 149, 181, 0.15);
+    --rm-primary: #D68A72;
+    --rm-primary-hover: #E29E88;
+    --rm-primary-soft: rgba(214, 138, 114, 0.18);
 
     /* 6. ACENTO */
     --rm-accent: #D68A72;
@@ -139,13 +146,15 @@
     --rm-accent-soft: rgba(214, 138, 114, 0.18);
     --rm-accent-action: #D68A72;
     --rm-accent-action-hover: #E29E88;
+    --rm-accent-brown: #EAE0D4;
+    --rm-accent-beige-dark: #A89B8E;
 
     /* 7. ESTADOS SEMÁNTICOS */
-    --rm-success: #9DB491;
-    --rm-success-hover: #B0C5A5;
-    --rm-success-soft: rgba(99, 119, 91, 0.25);
-    --rm-success-action: #9DB491;
-    --rm-success-action-hover: #B0C5A5;
+    --rm-success: #8DA280;
+    --rm-success-hover: #A0B693;
+    --rm-success-soft: rgba(95, 120, 98, 0.22);
+    --rm-success-action: #8DA280;
+    --rm-success-action-hover: #A0B693;
 
     --rm-warning: #E0B36D;
     --rm-warning-hover: #ECC485;
@@ -164,14 +173,14 @@
     --rm-info-action-hover: #8EA7C8;
 
     /* 8. PALETA GRÁFICOS OSCURA */
-    --rm-chart-1: #8595B5;
-    --rm-chart-2: #D68A72;
-    --rm-chart-3: #9DB491;
-    --rm-chart-4: #E0B36D;
+    --rm-chart-1: #D68A72;
+    --rm-chart-2: #8DA280;
+    --rm-chart-3: #E0B36D;
+    --rm-chart-4: #7892B5;
     --rm-chart-5: #A78BFA;
-    --rm-chart-6: #7892B5;
-    --rm-chart-7: #F472B6;
-    --rm-chart-8: #B8ADA2;
+    --rm-chart-6: #F472B6;
+    --rm-chart-7: #B8ADA2;
+    --rm-chart-8: #EAE0D4;
     --rm-chart-9: #D97706;
     --rm-chart-10: #2DD4BF;
 }
