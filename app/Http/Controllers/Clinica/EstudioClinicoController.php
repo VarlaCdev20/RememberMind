@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Clinica;
 
+use App\Backend\Modulos\Clinica\Servicios\AutorizacionClinicaService;
 use App\Http\Controllers\Controller;
 use App\Models\Atencion;
 use App\Models\ComponenteEstudio;
@@ -20,6 +21,10 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class EstudioClinicoController extends Controller
 {
+    private const ROLES_SOLICITUD = ['MEDICO GENERAL/GERIATRA'];
+
+    public function __construct(private readonly AutorizacionClinicaService $autorizacion) {}
+
     public function index(Residente $residente): JsonResponse
     {
         $this->authorize('view', $residente);
@@ -32,9 +37,9 @@ class EstudioClinicoController extends Controller
 
     public function solicitar(Request $request, Residente $residente): JsonResponse
     {
-        $this->authorize('view', $residente);
-        abort_unless($request->user()->can('estudios_clinicos.crear'), 403);
-        $personal = $request->user()->personal()->where('estado', 'ACTIVO')->firstOrFail();
+        $personal = $this->autorizacion->autorizarMutacion(
+            $request->user(), $residente, 'estudios_clinicos.crear', self::ROLES_SOLICITUD,
+        );
         $datos = $request->validate([
             'cod_atencion' => ['required', 'exists:atenciones,cod_atencion'],
             'cod_tipo_estudio' => ['required', 'exists:tipos_estudio_clinico,cod_tipo_estudio'],
@@ -54,8 +59,11 @@ class EstudioClinicoController extends Controller
     public function resultados(Request $request, EstudioClinico $estudio): JsonResponse
     {
         $residente = $estudio->residente()->firstOrFail();
-        $this->authorize('view', $residente);
-        abort_unless($request->user()->can('resultados_estudio.crear'), 403);
+        $this->autorizacion->autorizarMutacion(
+            $request->user(), $residente, 'resultados_estudio.crear', self::ROLES_SOLICITUD,
+        );
+        abort_unless(in_array($estudio->estado, ['SOLICITADO', 'EN_PROCESO', 'REALIZADO'], true), 409,
+            'El estudio ya no admite registro de resultados.');
         $datos = $request->validate([
             'resultados' => ['required', 'array', 'min:1'],
             'resultados.*.cod_componente' => ['required', 'distinct', 'exists:componentes_estudio,cod_componente'],
@@ -71,14 +79,27 @@ class EstudioClinicoController extends Controller
         }
 
         $registros = DB::transaction(function () use ($estudio, $datos): array {
+            $estudioBloqueado = EstudioClinico::query()->lockForUpdate()->findOrFail($estudio->getKey());
+            abort_unless(in_array($estudioBloqueado->estado, ['SOLICITADO', 'EN_PROCESO', 'REALIZADO'], true), 409,
+                'El estudio ya no admite registro de resultados.');
+            $componentesSolicitados = collect($datos['resultados'])->pluck('cod_componente');
+            $yaRegistrados = ResultadoEstudio::query()
+                ->where('cod_estudio', $estudioBloqueado->cod_estudio)
+                ->whereIn('cod_componente', $componentesSolicitados)
+                ->lockForUpdate()
+                ->exists();
+            abort_if($yaRegistrados, 409,
+                'Un resultado clínico existente no puede sobrescribirse; registre una rectificación trazable.');
+
             $creados = [];
             foreach ($datos['resultados'] as $fila) {
-                $creados[] = ResultadoEstudio::query()->updateOrCreate(
-                    ['cod_estudio' => $estudio->cod_estudio, 'cod_componente' => $fila['cod_componente']],
-                    ['cod_resultado_estudio' => $this->codigo('RES'), ...$fila]
-                );
+                $creados[] = ResultadoEstudio::query()->create([
+                    'cod_resultado_estudio' => $this->codigo('RES'),
+                    'cod_estudio' => $estudioBloqueado->cod_estudio,
+                    ...$fila,
+                ]);
             }
-            $estudio->update(['fecha_realizacion' => now(), 'estado' => 'REALIZADO']);
+            $estudioBloqueado->update(['fecha_realizacion' => now(), 'estado' => 'REALIZADO']);
             return $creados;
         });
 
@@ -87,17 +108,20 @@ class EstudioClinicoController extends Controller
 
     public function informar(Request $request, EstudioClinico $estudio): JsonResponse
     {
-        $this->authorize('view', $estudio->residente()->firstOrFail());
-        abort_unless($request->user()->can('informes_estudio.crear'), 403);
-        $personal = $request->user()->personal()->where('estado', 'ACTIVO')->first();
+        $residente = $estudio->residente()->firstOrFail();
+        $personal = $this->autorizacion->autorizarMutacion(
+            $request->user(), $residente, 'informes_estudio.crear', self::ROLES_SOLICITUD,
+        );
+        abort_unless(in_array($estudio->estado, ['REALIZADO', 'INFORMADO'], true), 409,
+            'El estudio debe estar realizado antes de emitir un informe.');
         $datos = $request->validate([
-            'hallazgos' => ['nullable', 'string'], 'conclusion' => ['nullable', 'string'],
+            'hallazgos' => ['nullable', 'string'], 'conclusion' => ['required', 'string', 'min:5'],
             'recomendacion' => ['nullable', 'string'], 'origen' => ['required', 'in:INTERNO,EXTERNO'],
             'profesional_externo' => ['nullable', 'required_if:origen,EXTERNO', 'string', 'max:160'],
         ]);
         $informe = InformeEstudio::query()->create([
             'cod_informe_estudio' => $this->codigo('INF'), 'cod_estudio' => $estudio->cod_estudio,
-            'cod_personal' => $personal?->cod_personal, ...$datos, 'fecha_hora' => now(), 'estado' => 'VIGENTE',
+            'cod_personal' => $personal->cod_personal, ...$datos, 'fecha_hora' => now(), 'estado' => 'VIGENTE',
         ]);
 
         return response()->json($informe, 201);
@@ -105,11 +129,11 @@ class EstudioClinicoController extends Controller
 
     public function documento(Request $request, Residente $residente): JsonResponse
     {
-        $this->authorize('view', $residente);
-        abort_unless($request->user()->can('documentos_clinicos.crear'), 403);
-        $personal = $request->user()->personal()->where('estado', 'ACTIVO')->first();
+        $personal = $this->autorizacion->autorizarMutacion(
+            $request->user(), $residente, 'documentos_clinicos.crear', self::ROLES_SOLICITUD,
+        );
         $datos = $request->validate([
-            'archivo' => ['required', 'file', 'max:20480'], 'cod_estudio' => ['nullable', 'exists:estudios_clinicos,cod_estudio'],
+            'archivo' => ['required', 'file', 'mimes:pdf,jpg,jpeg,png,doc,docx', 'max:20480'], 'cod_estudio' => ['nullable', 'exists:estudios_clinicos,cod_estudio'],
             'cod_atencion' => ['nullable', 'exists:atenciones,cod_atencion'], 'tipo_documento' => ['required', 'string', 'max:60'],
             'titulo' => ['required', 'string', 'max:180'], 'descripcion' => ['nullable', 'string'],
             'origen' => ['nullable', 'string', 'max:20'], 'observacion' => ['nullable', 'string'],
@@ -124,7 +148,7 @@ class EstudioClinicoController extends Controller
         $ruta = $archivo->storeAs('documentos-clinicos/'.$residente->cod_residente, $codigo.'.'.$archivo->extension(), 'local');
         $documento = DocumentoClinico::query()->create([
             'cod_documento_clinico' => $codigo, 'cod_residente' => $residente->cod_residente,
-            'cod_personal' => $personal?->cod_personal, ...$datos, 'ruta_archivo' => $ruta,
+            'cod_personal' => $personal->cod_personal, ...$datos, 'ruta_archivo' => $ruta,
             'formato' => $archivo->getMimeType() ?: 'application/octet-stream', 'tamano_bytes' => $archivo->getSize(),
             'hash_archivo' => hash_file('sha256', $archivo->getRealPath()), 'fecha_hora' => now(), 'estado' => 'VIGENTE',
         ]);
@@ -143,15 +167,17 @@ class EstudioClinicoController extends Controller
 
     public function derivar(Request $request, Residente $residente): JsonResponse
     {
-        $this->authorize('view', $residente);
-        abort_unless($request->user()->can('derivaciones.crear'), 403);
-        $personal = $request->user()->personal()->where('estado', 'ACTIVO')->firstOrFail();
+        $personal = $this->autorizacion->autorizarMutacion(
+            $request->user(), $residente, 'derivaciones.crear', self::ROLES_SOLICITUD,
+        );
         $datos = $request->validate([
             'cod_area_solicitante' => ['required', 'exists:areas,cod_area'], 'cod_area_receptora' => ['required', 'different:cod_area_solicitante', 'exists:areas,cod_area'],
             'cod_personal_receptor' => ['nullable', 'exists:personal,cod_personal'], 'cod_atencion' => ['nullable', 'exists:atenciones,cod_atencion'],
             'motivo' => ['required', 'string'], 'prioridad' => ['nullable', 'string', 'max:20'],
         ]);
         $this->validarAtencion($datos['cod_atencion'] ?? null, $residente);
+        abort_unless($datos['cod_area_solicitante'] === $this->autorizacion->areaActiva($personal)->cod_area, 422,
+            'El área solicitante no corresponde a la asignación clínica vigente del profesional.');
         return response()->json(Derivacion::query()->create([
             'cod_derivacion' => $this->codigo('DER'), 'cod_residente' => $residente->cod_residente,
             'cod_personal_solicitante' => $personal->cod_personal, ...$datos,

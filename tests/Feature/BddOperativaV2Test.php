@@ -269,7 +269,8 @@ class BddOperativaV2Test extends TestCase
     {
         [$base, $residente] = $this->escenarioClinico();
         $medico = $this->usuarioRol('medico.estudios@test.local', 'MEDICO GENERAL/GERIATRA');
-        Personal::query()->create(['cod_personal'=>'PER_EST','cod_usuario'=>$medico->cod_usuario,'nombres'=>'Marta','apellido_paterno'=>'Soliz','numero_documento'=>'MED-EST','profesion'=>'MÉDICO','estado'=>'ACTIVO']);
+        $personal = Personal::query()->create(['cod_personal'=>'PER_EST','cod_usuario'=>$medico->cod_usuario,'nombres'=>'Marta','apellido_paterno'=>'Soliz','numero_documento'=>'MED-EST','profesion'=>'MÉDICO','estado'=>'ACTIVO']);
+        AsignacionPersonal::query()->create(['cod_asignacion_personal'=>'ASP_EST','cod_jornada'=>$base['jornada']->cod_jornada,'cod_personal'=>$personal->cod_personal,'cod_area'=>$base['area']->cod_area,'fecha_hora_asignacion'=>now(),'estado'=>'ACTIVA']);
         $atencion = Atencion::query()->create(['cod_atencion'=>'ATE_EST','cod_residente'=>$residente->cod_residente,'cod_area'=>$base['area']->cod_area,'cod_personal'=>$base['personal']->cod_personal,'tipo_atencion'=>'CONSULTA','fecha_hora'=>now(),'estado'=>'ABIERTA']);
         $tipo = TipoEstudioClinico::query()->create(['cod_tipo_estudio'=>'TES_1','nombre'=>'Hemograma','categoria'=>'LABORATORIO','requiere_componentes'=>true,'requiere_informe'=>true,'estado'=>'ACTIVO']);
         $otroTipo = TipoEstudioClinico::query()->create(['cod_tipo_estudio'=>'TES_2','nombre'=>'Química','categoria'=>'LABORATORIO','requiere_componentes'=>true,'requiere_informe'=>false,'estado'=>'ACTIVO']);
@@ -281,7 +282,9 @@ class BddOperativaV2Test extends TestCase
         $this->actingAs($medico)->postJson(route('admin.estudios.resultados', $codigo), ['resultados'=>[['cod_componente'=>$ajeno->cod_componente,'valor_numerico'=>95]]])->assertStatus(422);
         $this->assertDatabaseCount('resultados_estudio', 0);
         $this->actingAs($medico)->postJson(route('admin.estudios.resultados', $codigo), ['resultados'=>[['cod_componente'=>$componente->cod_componente,'valor_numerico'=>13.5]]])->assertCreated();
+        $this->actingAs($medico)->postJson(route('admin.estudios.resultados', $codigo), ['resultados'=>[['cod_componente'=>$componente->cod_componente,'valor_numerico'=>14.0]]])->assertStatus(409);
         $this->assertDatabaseHas('resultados_estudio', ['cod_estudio'=>$codigo,'cod_componente'=>$componente->cod_componente]);
+        $this->assertDatabaseMissing('resultados_estudio', ['cod_estudio'=>$codigo,'cod_componente'=>$componente->cod_componente,'valor_numerico'=>14.0]);
     }
 
     public function test_documento_clinico_se_guarda_en_disco_privado_y_valida_al_residente(): void
@@ -289,7 +292,8 @@ class BddOperativaV2Test extends TestCase
         Storage::fake('local');
         [$base, $residente] = $this->escenarioClinico();
         $medico = $this->usuarioRol('medico.documentos@test.local', 'MEDICO GENERAL/GERIATRA');
-        Personal::query()->create(['cod_personal'=>'PER_DOC','cod_usuario'=>$medico->cod_usuario,'nombres'=>'Daniel','apellido_paterno'=>'Vega','numero_documento'=>'MED-DOC','profesion'=>'MÉDICO','estado'=>'ACTIVO']);
+        $personal = Personal::query()->create(['cod_personal'=>'PER_DOC','cod_usuario'=>$medico->cod_usuario,'nombres'=>'Daniel','apellido_paterno'=>'Vega','numero_documento'=>'MED-DOC','profesion'=>'MÉDICO','estado'=>'ACTIVO']);
+        AsignacionPersonal::query()->create(['cod_asignacion_personal'=>'ASP_DOC','cod_jornada'=>$base['jornada']->cod_jornada,'cod_personal'=>$personal->cod_personal,'cod_area'=>$base['area']->cod_area,'fecha_hora_asignacion'=>now(),'estado'=>'ACTIVA']);
         $atencion = Atencion::query()->create(['cod_atencion'=>'ATE_DOC','cod_residente'=>$residente->cod_residente,'cod_area'=>$base['area']->cod_area,'cod_personal'=>$base['personal']->cod_personal,'tipo_atencion'=>'CONSULTA','fecha_hora'=>now(),'estado'=>'ABIERTA']);
 
         $respuesta = $this->actingAs($medico)->postJson(route('admin.documentos-clinicos.store', $residente), [
