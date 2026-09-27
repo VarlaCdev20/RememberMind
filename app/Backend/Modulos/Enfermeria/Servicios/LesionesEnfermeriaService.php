@@ -2,38 +2,42 @@
 
 namespace App\Backend\Modulos\Enfermeria\Servicios;
 
+use App\Backend\Modulos\Alertas\Servicios\AlertasService;
+use App\Backend\Modulos\Clinica\Servicios\ContextoClinicoService;
 use App\Models\CuracionHerida;
 use App\Models\Herida;
 use App\Models\Incidente;
-use App\Models\Personal;
 use App\Models\User;
-use App\Backend\Modulos\Alertas\Servicios\AlertasService;
-use App\Backend\Modulos\Enfermeria\Servicios\MiTurnoService;
-use App\Backend\Modulos\Enfermeria\Servicios\TurnoEnfermeriaService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 
 class LesionesEnfermeriaService
 {
-    public function __construct(private readonly TurnoEnfermeriaService $turnos, private readonly AlertasService $alertas) {}
+    public function __construct(
+        private readonly TurnoEnfermeriaService $turnos,
+        private readonly AlertasService $alertas,
+        private readonly ContextoClinicoService $contextoClinico,
+        private readonly MiTurnoService $miTurno,
+    ) {}
 
     public function registrar(string $codResidente, array $datos, User $usuario): Herida
     {
         $this->turnos->autorizarMutacionEnfermeria($codResidente, 'heridas.crear', $usuario);
         $datos = $this->validar($datos);
 
-        $personal = $usuario->personal ?: Personal::where('cod_usuario', $usuario->cod_usuario)->first();
-        $codPersonal = $personal?->cod_personal ?: 'PER_' . strtoupper(Str::random(10));
+        $personal = $this->contextoClinico->personalActivo($usuario);
+        $codPersonal = $personal->cod_personal;
 
         return DB::transaction(function () use ($codResidente, $datos, $usuario, $codPersonal) {
             $herida = Herida::create([
                 'cod_herida' => 'HER_' . strtoupper(Str::random(10)),
                 'cod_residente' => $codResidente,
                 'cod_personal' => $codPersonal,
-                'tipo_herida' => $datos['tipo'] ?? 'LEVE',
-                'ubicacion' => $datos['zona_corporal'] ?? 'General',
-                'causa' => $datos['causa_probable'] ?? 'Desconocida',
+                'tipo_herida' => $datos['tipo'],
+                'ubicacion' => $datos['zona_corporal'],
+                'causa' => $datos['causa_probable'] ?? null,
                 'clasificacion' => $datos['estadio_upp'] ?? null,
                 'fecha_hora_identificacion' => now(),
                 'estado' => 'ACTIVA',
@@ -41,10 +45,10 @@ class LesionesEnfermeriaService
             ]);
 
             $this->alertas->crear($codResidente, [
-                'origen' => 'LESION',
+                'origen' => 'INCIDENTE',
                 'tipo_alerta' => 'LESION DETECTADA',
                 'nivel' => 'MEDIO',
-                'motivo' => '[heridas:' . $herida->getKey() . '] ' . ($datos['tipo'] ?? 'Herida') . ' en ' . ($datos['zona_corporal'] ?? 'cuerpo'),
+                'motivo' => '[heridas:' . $herida->getKey() . '] ' . $datos['tipo'] . ' en ' . $datos['zona_corporal'],
             ], $usuario);
 
             return $herida;
@@ -54,8 +58,7 @@ class LesionesEnfermeriaService
     public function crearDesdeIncidente(Incidente $incidente, array $datos, User $usuario): Herida
     {
         return $this->registrar($incidente->cod_residente, $datos + [
-            'causa_probable' => 'Incidente: ' . $incidente->tipo,
-            'aspecto_inicial' => 'Lesión producida por incidente registrado.',
+            'causa_probable' => 'Incidente: ' . $incidente->tipo_incidente,
         ], $usuario);
     }
 
@@ -69,23 +72,30 @@ class LesionesEnfermeriaService
             'accion_realizada' => 'required|string|min:3|max:2000',
         ])->validate();
 
-        $personal = $usuario->personal ?: Personal::where('cod_usuario', $usuario->cod_usuario)->first();
-        $codPersonal = $personal?->cod_personal ?: 'PER_' . strtoupper(Str::random(10));
+        $personal = $this->contextoClinico->personalActivo($usuario);
+        $jornada = $this->miTurno->resolverJornadaActual($personal, now());
+        if (! $jornada) {
+            throw ValidationException::withMessages([
+                'jornada' => 'No existe una jornada activa asignada al personal clínico.',
+            ]);
+        }
 
-        $miTurnoService = app(MiTurnoService::class);
-        $jornada = $personal ? $miTurnoService->resolverJornadaActual($personal, now()) : null;
+        return DB::transaction(function () use ($herida, $datos, $personal, $jornada): CuracionHerida {
+            $bloqueada = Herida::query()->lockForUpdate()->findOrFail($herida->getKey());
+            abort_unless($bloqueada->estado === 'ACTIVA', 409, 'La lesión ya no admite seguimientos.');
 
-        return CuracionHerida::create([
-            'cod_curacion' => 'CUR_' . strtoupper(Str::random(10)),
-            'cod_herida' => $herida->getKey(),
-            'cod_personal' => $codPersonal,
-            'cod_jornada' => $jornada?->cod_jornada,
-            'fecha_hora' => now(),
-            'longitud' => $datos['largo_cm'] ?? null,
-            'ancho' => $datos['ancho_cm'] ?? null,
-            'procedimiento' => $datos['accion_realizada'],
-            'observacion' => $datos['aspecto'] ?? null,
-        ]);
+            return CuracionHerida::create([
+                'cod_curacion' => 'CUR_' . strtoupper(Str::random(10)),
+                'cod_herida' => $bloqueada->getKey(),
+                'cod_personal' => $personal->cod_personal,
+                'cod_jornada' => $jornada->cod_jornada,
+                'fecha_hora' => now(),
+                'longitud' => $datos['largo_cm'] ?? null,
+                'ancho' => $datos['ancho_cm'] ?? null,
+                'procedimiento' => $datos['accion_realizada'],
+                'observacion' => $datos['aspecto'] ?? null,
+            ]);
+        });
     }
 
     public function cerrar(Herida $herida, string $resultado, string $motivo, User $usuario): Herida
@@ -96,13 +106,17 @@ class LesionesEnfermeriaService
             'motivo' => 'required|string|min:5|max:2000',
         ])->validate();
 
-        $herida->update([
-            'estado' => 'CERRADA',
-            'fecha_hora_cierre' => now(),
-            'observacion' => trim(($herida->observacion ? $herida->observacion . ' | ' : '') . "Cierre: {$resultado} - {$motivo}"),
-        ]);
+        return DB::transaction(function () use ($herida, $resultado, $motivo): Herida {
+            $bloqueada = Herida::query()->lockForUpdate()->findOrFail($herida->getKey());
+            abort_unless($bloqueada->estado === 'ACTIVA', 409, 'La lesión ya está cerrada.');
+            $bloqueada->update([
+                'estado' => 'CERRADA',
+                'fecha_hora_cierre' => now(),
+                'observacion' => trim(($bloqueada->observacion ? $bloqueada->observacion . ' | ' : '') . "Cierre: {$resultado} - {$motivo}"),
+            ]);
 
-        return $herida->refresh();
+            return $bloqueada->refresh();
+        });
     }
 
     private function validar(array $datos): array

@@ -15,6 +15,10 @@ class ContextoClinicoService
             throw new LogicException('La operación clínica requiere un usuario autenticado.');
         }
 
+        if (strtoupper(trim((string) $usuario->estado)) !== 'ACTIVO') {
+            throw new LogicException('La operación clínica requiere una cuenta de usuario activa.');
+        }
+
         $personal = Personal::query()
             ->where('cod_usuario', $usuario->cod_usuario)
             ->where('estado', 'ACTIVO')
@@ -31,6 +35,9 @@ class ContextoClinicoService
     {
         $areaAsignada = $personal->asignaciones()
             ->whereIn('estado', ['ACTIVA', 'ACTIVO'])
+            ->whereHas('jornada', fn ($query) => $query
+                ->whereDate('fecha_jornada', today())
+                ->whereIn('estado', ['ABIERTA', 'ACTIVA', 'EN_CURSO']))
             ->whereHas('area', fn ($query) => $query->whereIn('estado', ['ACTIVA', 'ACTIVO']))
             ->with('area')
             ->latest('fecha_asignacion')
@@ -41,21 +48,6 @@ class ContextoClinicoService
             return $areaAsignada;
         }
 
-        $areaClinica = Area::query()
-            ->whereIn('estado', ['ACTIVA', 'ACTIVO'])
-            ->where(function ($query) {
-                $query->whereRaw('LOWER(nombre) LIKE ?', ['%medic%'])
-                    ->orWhereRaw('LOWER(nombre) LIKE ?', ['%médic%'])
-                    ->orWhereRaw('LOWER(nombre) LIKE ?', ['%clinic%'])
-                    ->orWhereRaw('LOWER(nombre) LIKE ?', ['%clínic%']);
-            })
-            ->orderBy('cod_area')
-            ->first();
-
-        if (! $areaClinica) {
-            throw new LogicException('No existe un área clínica activa para registrar la atención.');
-        }
-
-        return $areaClinica;
+        throw new LogicException('El personal no tiene un área clínica activa asignada para la jornada vigente.');
     }
 }

@@ -47,27 +47,27 @@ class ContextoClinicoIntegrityTest extends TestCase
         ]);
 
         $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('No existe un área clínica activa para registrar la atención.');
+        $this->expectExceptionMessage('El personal no tiene un área clínica activa asignada para la jornada vigente.');
 
         app(ContextoClinicoService::class)->areaAtencion($usuario->personal()->firstOrFail());
     }
 
-    public function test_resuelve_un_area_clinica_activa_cuando_no_hay_asignacion(): void
+    public function test_no_infiere_area_clinica_por_nombre_cuando_no_hay_asignacion(): void
     {
         $usuario = User::factory()->create([
             'nombres' => 'Marta',
             'ap_paterno' => 'Médica',
         ]);
-        $area = Area::query()->create([
+        Area::query()->create([
             'cod_area' => 'ARE_CLINICA_TEST',
             'nombre' => 'Área de atención médica',
             'estado' => 'ACTIVA',
         ]);
 
-        $resuelta = app(ContextoClinicoService::class)
-            ->areaAtencion($usuario->personal()->firstOrFail());
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('El personal no tiene un área clínica activa asignada para la jornada vigente.');
 
-        $this->assertTrue($resuelta->is($area));
+        app(ContextoClinicoService::class)->areaAtencion($usuario->personal()->firstOrFail());
     }
 
     public function test_prioriza_el_area_activa_asignada_al_profesional(): void
@@ -126,6 +126,28 @@ class ContextoClinicoIntegrityTest extends TestCase
         $area = Area::query()->create([
             'cod_area' => 'ARE_RECETA_TEST',
             'nombre' => 'Área médica de pruebas',
+            'estado' => 'ACTIVA',
+        ]);
+        $turno = Turno::query()->create([
+            'cod_turno' => 'TUR_RECETA_TEST',
+            'nombre' => 'Turno receta',
+            'hora_inicio' => '00:00',
+            'hora_cierre' => '23:59',
+            'orden' => 1,
+            'estado' => 'ACTIVO',
+        ]);
+        $jornada = Jornada::query()->create([
+            'cod_jornada' => 'JOR_RECETA_TEST',
+            'cod_turno' => $turno->cod_turno,
+            'fecha_jornada' => today(),
+            'estado' => 'ABIERTA',
+        ]);
+        AsignacionPersonal::query()->create([
+            'cod_asignacion_personal' => 'ASP_RECETA_TEST',
+            'cod_jornada' => $jornada->cod_jornada,
+            'cod_personal' => $medico->personal()->firstOrFail()->cod_personal,
+            'cod_area' => $area->cod_area,
+            'fecha_asignacion' => now(),
             'estado' => 'ACTIVA',
         ]);
         $residente = AdultoMayor::factory()->create();

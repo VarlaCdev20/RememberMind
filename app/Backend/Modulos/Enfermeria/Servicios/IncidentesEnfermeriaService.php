@@ -12,6 +12,7 @@ use App\Backend\Modulos\Enfermeria\Servicios\TurnoEnfermeriaService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 
 class IncidentesEnfermeriaService
 {
@@ -48,24 +49,32 @@ class IncidentesEnfermeriaService
         $codPersonal = $personal->cod_personal;
 
         $miTurnoService = app(MiTurnoService::class);
-        $jornada = $personal ? $miTurnoService->resolverJornadaActual($personal, now()) : null;
+        $jornada = $miTurnoService->resolverJornadaActual($personal, now());
+        if (! $jornada) {
+            throw ValidationException::withMessages([
+                'jornada' => 'No existe una jornada activa asignada al personal clínico.',
+            ]);
+        }
 
         return DB::transaction(function () use ($codResidente, $datos, $usuario, $codPersonal, $jornada) {
             $tipoNorm = strtoupper(trim($datos['tipo']));
-            $gravedad = $tipoNorm === 'CAIDA' ? 'ALTA' : ($datos['lesion'] ? 'MODERADA' : 'LEVE');
+            $dolor = $datos['dolor'] ?? null;
+            $gravedad = $dolor === null
+                ? null
+                : ($dolor >= 7 ? 'GRAVE' : ($dolor >= 4 ? 'MODERADA' : 'LEVE'));
 
             $incidente = Incidente::create([
                 'cod_incidente' => 'INC_' . strtoupper(Str::random(10)),
                 'cod_residente' => $codResidente,
                 'cod_personal' => $codPersonal,
-                'cod_jornada' => $jornada?->cod_jornada,
+                'cod_jornada' => $jornada->cod_jornada,
                 'tipo_incidente' => $tipoNorm,
                 'gravedad' => $gravedad,
-                'lugar' => $datos['lugar'] ?? null,
+                'lugar' => $datos['lugar'],
                 'fecha_hora' => now(),
                 'descripcion' => $datos['descripcion'],
-                'medida_inmediata' => $datos['movilidad_posterior'] ?? 'Atención inmediata brindada por enfermería.',
-                'requiere_medico' => (bool) ($datos['medico_informado'] ?? false),
+                'medida_inmediata' => $datos['movilidad_posterior'] ?? null,
+                'requiere_medico' => (bool) $datos['medico_informado'],
                 'requiere_derivacion' => false,
                 'estado' => 'ABIERTO',
                 'observacion' => !empty($datos['testigo']) ? 'Presenciado por: ' . $datos['testigo'] : null,
@@ -73,8 +82,8 @@ class IncidentesEnfermeriaService
 
             if ($datos['lesion']) {
                 $this->lesiones->crearDesdeIncidente($incidente, [
-                    'tipo' => $datos['tipo_lesion'] ?? 'HERIDA',
-                    'zona_corporal' => $datos['zona_lesion'] ?? 'General',
+                    'tipo' => $datos['tipo_lesion'],
+                    'zona_corporal' => $datos['zona_lesion'],
                     'lateralidad' => $datos['lateralidad'] ?? null,
                 ], $usuario);
             }

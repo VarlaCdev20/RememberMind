@@ -10,6 +10,7 @@ use App\Models\Alerta;
 use App\Models\Area;
 use App\Models\Atencion;
 use App\Models\HorarioPrescripcion;
+use App\Models\Herida;
 use App\Models\Medicamento;
 use App\Models\AsignacionResidenteJornada;
 use App\Models\Prescripcion;
@@ -17,6 +18,7 @@ use App\Models\AsignacionPersonal;
 use App\Models\TurnoEnfermeria;
 use App\Models\User;
 use App\Backend\Modulos\Enfermeria\Servicios\TurnoEnfermeriaService;
+use App\Backend\Modulos\Enfermeria\Servicios\LesionesEnfermeriaService;
 use App\Backend\Modulos\Medicacion\Servicios\RegistrarAdministracionMedicacionService;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -187,6 +189,56 @@ class SeguridadCriticaEnfermeriaTest extends TestCase
             'cod_residente' => $this->residente->cod_residente,
             'cod_personal_entrante' => $receptor->personal?->cod_personal,
         ]);
+    }
+
+    public function test_curacion_exige_jornada_profesional_y_no_fabrica_autoria(): void
+    {
+        $herida = Herida::query()->create([
+            'cod_herida' => 'HER_SEG_TRANS_01',
+            'cod_residente' => $this->residente->cod_residente,
+            'cod_personal' => $this->enfermero->personal->cod_personal,
+            'tipo_herida' => 'LACERACION',
+            'ubicacion' => 'Antebrazo',
+            'fecha_hora_identificacion' => now(),
+            'estado' => 'ACTIVA',
+        ]);
+
+        try {
+            app(LesionesEnfermeriaService::class)->registrarSeguimiento($herida, [
+                'aspecto' => 'Lecho limpio sin sangrado activo',
+                'accion_realizada' => 'Limpieza con solución indicada',
+            ], $this->enfermero);
+            $this->fail('Se permitió una curación sin jornada profesional activa.');
+        } catch (ValidationException $exception) {
+            $this->assertArrayHasKey('jornada', $exception->errors());
+        }
+
+        $this->assertDatabaseCount('curaciones_herida', 0);
+    }
+
+    public function test_cierre_de_lesion_es_atomico_y_no_se_repite(): void
+    {
+        $this->recibir($this->enfermero, $this->turno);
+        $herida = Herida::query()->create([
+            'cod_herida' => 'HER_SEG_TRANS_02',
+            'cod_residente' => $this->residente->cod_residente,
+            'cod_personal' => $this->enfermero->personal->cod_personal,
+            'tipo_herida' => 'LACERACION',
+            'ubicacion' => 'Antebrazo',
+            'fecha_hora_identificacion' => now(),
+            'estado' => 'ACTIVA',
+        ]);
+
+        $servicio = app(LesionesEnfermeriaService::class);
+        $servicio->cerrar($herida, 'CICATRIZADA', 'Evolución favorable confirmada', $this->enfermero);
+        $this->assertSame('CERRADA', $herida->fresh()->estado);
+
+        try {
+            $servicio->cerrar($herida, 'CICATRIZADA', 'Segundo cierre improcedente', $this->enfermero);
+            $this->fail('Se permitió cerrar dos veces la misma lesión.');
+        } catch (HttpException $exception) {
+            $this->assertSame(409, $exception->getStatusCode());
+        }
     }
 
     private function asignar(User $usuario, AdultoMayor $adulto, TurnoEnfermeria $turno): void
