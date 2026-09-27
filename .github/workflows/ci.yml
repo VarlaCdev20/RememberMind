@@ -55,7 +55,22 @@ jobs:
       - run: composer audit
       - name: Validate PHP syntax
         run: find app bootstrap config database routes tests -name '*.php' -print0 | xargs -0 -n1 php -l
-      - run: php artisan test
+      - name: Run PHP tests
+        shell: bash
+        run: |
+          set -o pipefail
+          php artisan test 2>&1 | tee /tmp/remembermind-php-tests.log
+          status=${PIPESTATUS[0]}
+
+          if [ "$status" -ne 0 ]; then
+            details=$(tail -c 60000 /tmp/remembermind-php-tests.log)
+            details=${details//'%'/'%25'}
+            details=${details//$'\r'/'%0D'}
+            details=${details//$'\n'/'%0A'}
+            echo "::error title=PHP test failure::$details"
+          fi
+
+          exit "$status"
       - run: npm ci
       - run: npm audit --omit=dev
       - run: npm test
