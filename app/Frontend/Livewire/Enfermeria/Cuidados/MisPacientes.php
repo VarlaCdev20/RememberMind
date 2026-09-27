@@ -902,11 +902,9 @@ class MisPacientes extends Component
                     ->orWhereLike('numero_documento', "%{$b}%")
                     ->orWhereLike('cod_residente', "%{$b}%")
                     ->orWhereHas('cama', function ($cq) use ($b) {
-                        $cq->whereLike('numero', "%{$b}%")
-                            ->orWhereLike('codigo', "%{$b}%")
+                        $cq->whereLike('codigo', "%{$b}%")
                             ->orWhereHas('habitacion', function ($hq) use ($b) {
-                                $hq->whereLike('numero', "%{$b}%")
-                                    ->orWhereLike('nombre', "%{$b}%")
+                                $hq->whereLike('nombre', "%{$b}%")
                                     ->orWhereLike('codigo', "%{$b}%");
                             });
                     });

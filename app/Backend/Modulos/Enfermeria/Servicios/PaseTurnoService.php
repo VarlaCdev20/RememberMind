@@ -440,7 +440,7 @@ class PaseTurnoService
 
         // 14. Conducta y Sueño
         $conducta = RegistroConductual::where('cod_residente', $codResidente)->latest('fecha_hora')->first();
-        $sueno = RegistroSueno::where('cod_residente', $codResidente)->latest('fecha_hora')->first();
+        $sueno = RegistroSueno::where('cod_residente', $codResidente)->latest('fecha')->first();
 
         return [
             'meds_administradas' => $medsAdministradas,

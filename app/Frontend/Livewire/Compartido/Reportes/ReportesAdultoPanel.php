@@ -38,10 +38,10 @@ class ReportesAdultoPanel extends Component
         ];
 
         // Evaluaciones Cognitivas Data
-        $evaluaciones = $this->adultoMayor->evaluacionesGeriatricas()->whereHas('instrumento', fn ($q) => $q->where('cod_area', 'ARE_COG'))
+        $evaluaciones = $this->adultoMayor->evaluacionesGeriatricas()->whereHas('instrumento', fn ($q) => $q->where('tipo', 'COGNITIVO'))
             ->with('instrumento')
-            ->whereBetween('fecha_eval', [$start, $end])
-            ->orderBy('fecha_eval')->get();
+            ->whereBetween('fecha_hora', [$start, $end])
+            ->orderBy('fecha_hora')->get();
             
         $this->chartCognitivo = [
             'labels' => $evaluaciones->map(fn($e) => $e->fecha_eval->format('d/m/Y') . ' (' . $e->instrumento?->siglas . ')')->toArray(),

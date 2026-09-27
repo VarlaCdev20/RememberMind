@@ -291,7 +291,7 @@ class IncidentesPanel extends Component
 
         // Obtener jornada activa si existe
         $jornadaActiva = Jornada::where('estado', 'ACTIVO')
-            ->whereDate('fecha', Carbon::today())
+            ->whereDate('fecha_jornada', Carbon::today())
             ->first();
         $codJornada = $jornadaActiva ? $jornadaActiva->cod_jornada : null;
 
