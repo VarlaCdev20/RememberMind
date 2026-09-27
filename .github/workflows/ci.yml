@@ -60,12 +60,17 @@ jobs:
         run: |
           set -o pipefail
           set +e
-          php artisan test 2>&1 | tee /tmp/remembermind-php-tests.log
+          php artisan test --compact --stop-on-failure 2>&1 | tee /tmp/remembermind-php-tests.log
           status=${PIPESTATUS[0]}
           set -e
 
           if [ "$status" -ne 0 ]; then
-            details=$(tail -c 12000 /tmp/remembermind-php-tests.log)
+            details=$(sed -r 's/\x1B\[[0-9;]*[mK]//g' /tmp/remembermind-php-tests.log \
+              | grep -aE 'FAIL|FAILED|Tests:|Exception|Error|Expected:|To contain:| at tests[/\\]' \
+              | tail -n 80)
+            if [ -z "$details" ]; then
+              details=$(tail -c 4000 /tmp/remembermind-php-tests.log)
+            fi
             details=${details//'%'/'%25'}
             details=${details//$'\r'/'%0D'}
             details=${details//$'\n'/'%0A'}
