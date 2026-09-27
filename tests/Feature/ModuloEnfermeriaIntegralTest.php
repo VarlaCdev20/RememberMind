@@ -278,4 +278,44 @@ class ModuloEnfermeriaIntegralTest extends TestCase
             EjecucionCuidado::query()->pluck('cod_personal')->unique()->values()->all(),
         );
     }
+
+    public function test_recepcion_de_turno_conserva_la_asignacion_y_area_formalizadas(): void
+    {
+        Livewire::test(AgendaEnfermeria::class)
+            ->set('observacionRecepcion', 'Recibo residentes y pendientes')
+            ->call('recibirTurno')
+            ->assertHasNoErrors();
+
+        $this->assertDatabaseHas('asignaciones_personal', [
+            'cod_asignacion_personal' => 'ASP_TEST_INT',
+            'cod_jornada' => $this->jornada->cod_jornada,
+            'cod_personal' => $this->personal->cod_personal,
+            'cod_area' => 'ARE_TEST_INT',
+        ]);
+        $this->assertStringContainsString(
+            'Recibo residentes y pendientes',
+            (string) AsignacionPersonal::findOrFail('ASP_TEST_INT')->observacion
+        );
+        $this->assertDatabaseMissing('asignaciones_personal', ['cod_area' => 'ARE_ENF']);
+    }
+
+    public function test_agenda_no_expone_residentes_si_el_enfermero_no_tiene_asignacion(): void
+    {
+        $usuarioSinTurno = User::factory()->create(['estado' => 'ACTIVO']);
+        $usuarioSinTurno->assignRole('ENFERMEROS');
+        Personal::create([
+            'cod_personal' => 'PER_SIN_TURNO',
+            'cod_usuario' => $usuarioSinTurno->cod_usuario,
+            'nombres' => 'Enfermero',
+            'apellido_paterno' => 'Sin Turno',
+            'numero_documento' => 'DOC-SIN-TURNO',
+            'profesion' => 'ENFERMERIA',
+            'estado' => 'ACTIVO',
+        ]);
+        $this->actingAs($usuarioSinTurno);
+
+        Livewire::test(AgendaEnfermeria::class)
+            ->assertDontSee($this->residente->nombres)
+            ->assertDontSee($this->residente->cod_residente);
+    }
 }

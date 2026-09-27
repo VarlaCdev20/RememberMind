@@ -246,33 +246,23 @@ class AgendaEnfermeria extends Component
         $jornada = Jornada::where('cod_turno', $turno->cod_turno)
             ->whereDate('fecha_jornada', today())
             ->first();
-        if (!$jornada) {
-            $jornada = Jornada::create([
-                'cod_jornada' => 'JOR_' . strtoupper(Str::random(10)),
-                'cod_turno' => $turno->cod_turno,
-                'cod_usuario_apertura' => Auth::user()->cod_usuario,
-                'fecha_jornada' => today(),
-                'estado' => 'ABIERTA',
-            ]);
-        }
+        abort_unless($jornada, 409, 'La jornada del turno no está formalizada. Contacte a administración.');
 
         DB::transaction(function () use ($jornada, $codPersonal) {
-            $existente = AsignacionPersonal::where('cod_jornada', $jornada->cod_jornada)
+            $asignacion = AsignacionPersonal::where('cod_jornada', $jornada->cod_jornada)
                 ->where('cod_personal', $codPersonal)
-                ->lockForUpdate()->exists();
-            if (!$existente) {
-                AsignacionPersonal::create([
-                    'cod_asignacion_personal' => 'ASP_' . strtoupper(Str::random(10)),
-                    'cod_jornada' => $jornada->cod_jornada,
-                    'cod_personal' => $codPersonal,
-                    'cod_area' => 'ARE_ENF',
-                    'funcion' => 'ENFERMERO_TURNO',
-                    'tipo_asignacion' => 'TURNO',
-                    'fecha_asignacion' => today(),
-                    'estado' => 'ACTIVA',
-                    'observacion' => $this->observacionRecepcion ?: 'Recepción de turno confirmada',
-                ]);
-            }
+                ->whereIn('estado', ['ACTIVA', 'ACTIVO'])
+                ->lockForUpdate()
+                ->first();
+            abort_unless($asignacion, 409, 'No existe una asignación institucional activa para recibir este turno.');
+
+            $notaRecepcion = trim($this->observacionRecepcion) ?: 'Recepción de turno confirmada';
+            $asignacion->update([
+                'observacion' => trim(implode(' | ', array_filter([
+                    $asignacion->observacion,
+                    $notaRecepcion.' por '.$codPersonal.' el '.now()->format('Y-m-d H:i'),
+                ]))),
+            ]);
         });
 
         $this->dispatch('swal', ['icon' => 'success', 'title' => 'Turno recibido', 'text' => 'La recepción quedó registrada con fecha, hora y responsable.']);
@@ -289,10 +279,6 @@ class AgendaEnfermeria extends Component
         $codigosResidentes = $esSuperAdmin
             ? $turnosService->obtenerPacientesAsignadosIds($user)
             : $turnosService->obtenerPacientesAsignadosIds($user, $turno?->cod_turno);
-
-        if (empty($codigosResidentes)) {
-            $codigosResidentes = Residente::pluck('cod_residente')->take(10)->all();
-        }
 
         $residentes = Residente::with(['cama.habitacion'])
             ->whereIn('cod_residente', $codigosResidentes)
