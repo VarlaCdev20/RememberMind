@@ -558,6 +558,15 @@ class TabMedicacionEnfermeriaTest extends TestCase
         ]);
     }
 
+    public function test_registro_directo_no_inventa_motivo_de_omision(): void
+    {
+        Livewire::test(FichaPaciente::class, ['adulto' => $this->adulto->cod_residente])
+            ->call('registrarAdministracionDirecta', 'PRESCRIPCION_NO_RELEVANTE', 'OMITIDA')
+            ->assertHasErrors(['motivo']);
+
+        $this->assertDatabaseCount('administraciones_medicacion', 0);
+    }
+
     public function test_medicacion_prn_se_registra_sin_horario_ficticio(): void
     {
         $prescPrn = Prescripcion::create([

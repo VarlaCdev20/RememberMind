@@ -275,6 +275,33 @@ class FrontendRestauradoV2Test extends TestCase
         ]);
     }
 
+    public function test_ficha_no_crea_documento_ficticio_sin_archivo_real(): void
+    {
+        Storage::fake('local');
+        $usuario = $this->superadministrador();
+        $residente = Residente::crearDesdeAdmision([
+            'cod_residente' => 'RES_DOC_SIN_ARCHIVO',
+            'nombres' => 'Rita',
+            'apellido_paterno' => 'Mendoza',
+            'fecha_nacimiento' => '1940-06-15',
+            'estado' => 'ADMITIDO',
+        ]);
+        $this->actingAs($usuario);
+
+        Livewire::test(FichaPaciente::class, ['adulto' => $residente->cod_residente])
+            ->set('nuevoDocNombre', 'Documento inexistente')
+            ->set('nuevoDocTipo', 'IDENTIDAD')
+            ->set('nuevoDocCategoria', 'PERSONAL')
+            ->set('nuevoDocFecha', today()->toDateString())
+            ->call('guardarNuevoDocumento')
+            ->assertHasErrors(['nuevoDocArchivo']);
+
+        $this->assertDatabaseMissing('documentos', [
+            'cod_residente' => $residente->cod_residente,
+            'nombre' => 'Documento inexistente',
+        ]);
+    }
+
     private function superadministrador(): User
     {
         $this->seed(RolesAndPermissionsSeeder::class);

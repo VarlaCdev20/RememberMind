@@ -227,26 +227,29 @@ class FichaPaciente extends Component
 
     public function guardarNuevoDocumento(): void
     {
+        abort_unless(
+            Auth::user()?->can('documentos.subir') || Auth::user()?->can('documentos.gestionar'),
+            403,
+            'No cuenta con permiso para incorporar documentos al expediente.',
+        );
+
         $this->validate([
             'nuevoDocNombre' => 'required|string|min:3|max:255',
-            'nuevoDocTipo' => 'required|string',
-            'nuevoDocCategoria' => 'required|string',
-            'nuevoDocFecha' => 'required|date',
+            'nuevoDocTipo' => 'required|string|max:50',
+            'nuevoDocCategoria' => 'required|in:CLINICO,ADMINISTRATIVO,IMAGEN,LEGAL,PERSONAL',
+            'nuevoDocFecha' => 'required|date|before_or_equal:today',
             'nuevoDocDescripcion' => 'nullable|string|max:1000',
             'nuevoDocObservaciones' => 'nullable|string|max:1000',
-            'nuevoDocArchivo' => 'nullable|file|mimes:pdf,jpg,jpeg,png,webp|max:15360', // 15MB
+            'nuevoDocArchivo' => 'required|file|mimes:pdf,jpg,jpeg,png,webp|max:15360', // 15MB
         ], [
             'nuevoDocNombre.required' => 'El nombre del documento es obligatorio.',
+            'nuevoDocArchivo.required' => 'Seleccione el archivo real que será incorporado al expediente.',
             'nuevoDocArchivo.mimes' => 'Solo se admiten archivos en formato PDF, JPG, PNG o WebP.',
             'nuevoDocArchivo.max' => 'El tamaño máximo del archivo no debe exceder los 15 MB.',
         ]);
 
-        $rutaArchivo = null;
-        if ($this->nuevoDocArchivo) {
-            $rutaArchivo = $this->nuevoDocArchivo->store('documentos/adultos-mayores', 'local');
-        } else {
-            $rutaArchivo = 'documentos/adultos-mayores/doc_'.time().'.pdf';
-        }
+        $hashArchivo = hash_file('sha256', $this->nuevoDocArchivo->getRealPath());
+        $rutaArchivo = $this->nuevoDocArchivo->store('documentos/adultos-mayores', 'local');
 
         $doc = Documento::create([
             'cod_documento' => 'DOC_'.Str::upper(Str::random(12)),
@@ -255,10 +258,8 @@ class FichaPaciente extends Component
             'nombre' => trim($this->nuevoDocNombre),
             'tipo_documento' => $this->nuevoDocTipo,
             'ruta_archivo' => $rutaArchivo,
-            'tipo_archivo' => $this->nuevoDocArchivo?->getMimeType() ?? 'application/pdf',
-            'hash_archivo' => $this->nuevoDocArchivo
-                ? hash_file('sha256', $this->nuevoDocArchivo->getRealPath())
-                : hash('sha256', $rutaArchivo),
+            'tipo_archivo' => $this->nuevoDocArchivo->getMimeType(),
+            'hash_archivo' => $hashArchivo,
             'fecha_validacion' => ($this->nuevoDocFecha ?: today()->toDateString()).' 00:00:00',
             'estado' => 'ACTIVO',
             'observacion' => $this->nuevoDocObservaciones ?: $this->nuevoDocDescripcion,
@@ -392,7 +393,7 @@ class FichaPaciente extends Component
 
     public string $nuevoEventoFechaHora = '';
 
-    public string $nuevoEventoLugar = 'Pasillo · 2° piso';
+    public string $nuevoEventoLugar = '';
 
     public string $nuevoEventoSeveridad = 'MODERADA';
 
@@ -402,13 +403,13 @@ class FichaPaciente extends Component
 
     public bool $nuevoEventoLesion = false;
 
-    public bool $nuevoEventoPresenciado = true;
+    public bool $nuevoEventoPresenciado = false;
 
     public string $nuevoEventoTestigo = '';
 
-    public string $nuevoEventoMovilidad = 'CON_AYUDA';
+    public string $nuevoEventoMovilidad = '';
 
-    public bool $nuevoEventoMedicoInformado = true;
+    public bool $nuevoEventoMedicoInformado = false;
 
     public bool $nuevoEventoFamiliarInformado = false;
 
@@ -592,18 +593,18 @@ class FichaPaciente extends Component
         $this->resetValidation();
         $this->nuevoEventoTipo = 'CAIDA';
         $this->nuevoEventoFechaHora = now()->format('Y-m-d\TH:i');
-        $this->nuevoEventoLugar = 'Pasillo · 2° piso';
+        $this->nuevoEventoLugar = '';
         $this->nuevoEventoSeveridad = 'MODERADA';
         $this->nuevoEventoDescripcion = '';
         $this->nuevoEventoDolor = 0;
         $this->nuevoEventoLesion = false;
-        $this->nuevoEventoPresenciado = true;
-        $this->nuevoEventoTestigo = Auth::user()->name ?? 'Enfermería';
-        $this->nuevoEventoMovilidad = 'CON_AYUDA';
-        $this->nuevoEventoMedicoInformado = true;
+        $this->nuevoEventoPresenciado = false;
+        $this->nuevoEventoTestigo = '';
+        $this->nuevoEventoMovilidad = '';
+        $this->nuevoEventoMedicoInformado = false;
         $this->nuevoEventoFamiliarInformado = false;
         $this->nuevoEventoRequiereSeguimiento = true;
-        $this->nuevoEventoFechaSeguimiento = now()->addDays(2)->format('Y-m-d\T08:00');
+        $this->nuevoEventoFechaSeguimiento = null;
         $this->modalRegistrarEvento = true;
     }
 
@@ -622,24 +623,22 @@ class FichaPaciente extends Component
         $personal = $user->personal;
         abort_unless($personal && strtoupper(trim((string) $personal->estado)) === 'ACTIVO', 403, 'Acción no permitida: Personal no vinculado o inactivo.');
 
-        abort_unless(
-            $user->can('incidentes.crear') || $user->can('atenciones.crear') || $user->hasAnyRole(['ENFERMEROS', 'SUPERADMINISTRADOR', 'MEDICO GENERAL/GERIATRA']),
-            403,
-            'No cuenta con el permiso requerido para registrar incidentes.'
-        );
-
         $codResidente = $this->adultoMayor->cod_residente ?? $this->adultoMayor->cod_residente;
-        app(TurnoEnfermeriaService::class)->autorizarAccionPaciente($codResidente, $user);
+        app(TurnoEnfermeriaService::class)->autorizarMutacionPaciente($codResidente, 'incidentes.crear', $user);
 
         $this->validate([
-            'nuevoEventoTipo' => 'required|string',
-            'nuevoEventoFechaHora' => 'required',
+            'nuevoEventoTipo' => 'required|in:CAIDA,LESION,INCIDENTE,COMPLICACION,OTRO',
+            'nuevoEventoFechaHora' => 'required|date|before_or_equal:now',
             'nuevoEventoLugar' => 'required|string|max:120',
-            'nuevoEventoDescripcion' => 'required|string|min:5',
+            'nuevoEventoSeveridad' => 'required|in:LEVE,MODERADA,GRAVE',
+            'nuevoEventoDescripcion' => 'required|string|min:10|max:2000',
+            'nuevoEventoDolor' => 'required|integer|min:0|max:10',
+            'nuevoEventoTestigo' => 'required_if:nuevoEventoPresenciado,true|nullable|string|max:120',
         ]);
 
         $miTurnoService = app(MiTurnoService::class);
         $jornada = $miTurnoService->resolverJornadaActual($personal, now());
+        abort_unless($jornada, 409, 'No existe una jornada profesional activa para firmar el evento clínico.');
 
         $medida = $this->nuevoEventoMovilidad ? 'Movilidad: '.$this->nuevoEventoMovilidad : null;
         $obs = [];
@@ -661,9 +660,9 @@ class FichaPaciente extends Component
             'cod_incidente' => 'INC_'.strtoupper(Str::random(10)),
             'cod_residente' => $codResidente,
             'cod_personal' => $personal->cod_personal,
-            'cod_jornada' => $jornada?->cod_jornada,
+            'cod_jornada' => $jornada->cod_jornada,
             'tipo_incidente' => mb_strtoupper(trim($this->nuevoEventoTipo)),
-            'gravedad' => $this->nuevoEventoDolor ? ($this->nuevoEventoDolor >= 7 ? 'GRAVE' : ($this->nuevoEventoDolor >= 4 ? 'MODERADA' : 'LEVE')) : 'MODERADA',
+            'gravedad' => $this->nuevoEventoSeveridad,
             'lugar' => trim($this->nuevoEventoLugar),
             'fecha_hora' => Carbon::parse($this->nuevoEventoFechaHora),
             'descripcion' => trim($this->nuevoEventoDescripcion),
@@ -1001,20 +1000,14 @@ class FichaPaciente extends Component
 
         $codResidente = $this->adultoMayor->cod_residente ?? $this->adultoMayor->cod_residente;
         if (empty($codMed)) {
-            $primerMed = Prescripcion::where('cod_residente', $codResidente)
-                ->whereIn('estado', ['ACTIVO', 'ACTIVA', 'VIGENTE'])
-                ->first();
-            if (! $primerMed) {
-                $this->tabActivo = 'medicacion';
-                $this->dispatch('swal', [
-                    'icon' => 'info',
-                    'title' => 'Medicación',
-                    'text' => 'El residente no tiene medicamentos activos prescritos para administrar.',
-                ]);
+            $this->tabActivo = 'medicacion';
+            $this->dispatch('swal', [
+                'icon' => 'info',
+                'title' => 'Seleccione una dosis',
+                'text' => 'Elija explícitamente la prescripción y el horario que va a registrar.',
+            ]);
 
-                return;
-            }
-            $codMed = $primerMed->cod_prescripcion;
+            return;
         }
 
         $med = Prescripcion::where('cod_residente', $codResidente)
@@ -1216,11 +1209,22 @@ class FichaPaciente extends Component
     {
         abort_unless(Auth::check(), 401);
 
+        $resultado = mb_strtoupper(trim($resultado));
+        validator([
+            'resultado' => $resultado,
+            'observaciones' => $observaciones,
+            'motivo' => $motivo,
+        ], [
+            'resultado' => 'required|in:ADMINISTRADA,ADMINISTRADO,OMITIDA,OMITIDO',
+            'observaciones' => 'nullable|string|max:1000',
+            'motivo' => 'required_unless:resultado,ADMINISTRADA,ADMINISTRADO|nullable|string|min:5|max:500',
+        ])->validate();
+
         $med = Prescripcion::where('cod_residente', $this->adultoMayor->cod_residente ?? $this->adultoMayor->cod_residente)
             ->where('cod_prescripcion', $codMed)
             ->firstOrFail();
 
-        $esAdmin = strtoupper($resultado) === 'ADMINISTRADA' || strtoupper($resultado) === 'ADMINISTRADO';
+        $esAdmin = in_array($resultado, ['ADMINISTRADA', 'ADMINISTRADO'], true);
         $horaProgramada = $med->hora_programada
             ? Carbon::parse($med->hora_programada)->format('H:i')
             : now()->format('H:i');
@@ -1231,8 +1235,8 @@ class FichaPaciente extends Component
             $med->cod_prescripcion,
             $horaProgramada,
             $esAdmin,
-            $esAdmin ? null : ($motivo ?: 'Demora u omisión asistencial justificada.'),
-            $observaciones ?: ($esAdmin ? 'Administración completada con buena tolerancia.' : 'Dosis no administrada.'),
+            $esAdmin ? null : $motivo,
+            $observaciones,
         );
 
         $this->dispatch('swal', [
