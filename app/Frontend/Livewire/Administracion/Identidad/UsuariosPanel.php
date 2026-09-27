@@ -127,15 +127,6 @@ class UsuariosPanel extends Component
     public bool $mostrarDropdownAdultosMayores = false;
     public $adultoMayorSeleccionadoLabel = '';
 
-    // Quick registration for Adulto Mayor
-    public $mostrarQuickRegAdulto = false;
-    public $quick_nombres = '';
-    public $quick_ap_paterno = '';
-    public $quick_ap_materno = '';
-    public $quick_ci = '';
-    public $quick_genero = 'MASCULINO';
-    public $quick_fecha_nac = '';
-
     // ── Paises y codigos ──
     public array $paisesConfig = [
         'Bolivia' => ['codigo' => '+591', 'doc' => 'CI', 'placeholder' => 'Ej. 70012345'],
@@ -579,7 +570,9 @@ class UsuariosPanel extends Component
 
     public function seleccionarAdultoMayor($codResidente): void
     {
-        $adultoMayor = \App\Models\AdultoMayor::where('cod_est_adul', 1)->where('cod_residente', $codResidente)->first();
+        $adultoMayor = \App\Models\AdultoMayor::whereIn('estado', ['ACTIVO', 'ADMITIDO'])
+            ->where('cod_residente', $codResidente)
+            ->first();
 
         if (!$adultoMayor) {
             $this->addError('selected_cod_residente', 'Seleccione un adulto mayor válido de la lista.');
@@ -608,7 +601,9 @@ class UsuariosPanel extends Component
     public function obtenerAdultoMayorSeleccionado()
     {
         return $this->selected_cod_residente
-            ? \App\Models\AdultoMayor::where('cod_est_adul', 1)->where('cod_residente', $this->selected_cod_residente)->first()
+            ? \App\Models\AdultoMayor::whereIn('estado', ['ACTIVO', 'ADMITIDO'])
+                ->where('cod_residente', $this->selected_cod_residente)
+                ->first()
             : null;
     }
 
@@ -953,7 +948,6 @@ class UsuariosPanel extends Component
             'calle', 'nro_domicilio', 'ap_paterno_emergencia', 'ap_materno_emergencia',
             'vinculosFamiliar', 'selected_cod_residente', 'selected_parentesco', 'selected_es_responsable', 'selected_observaciones',
             'busquedaAdultoMayor', 'adultosMayoresFiltrados', 'mostrarDropdownAdultosMayores', 'adultoMayorSeleccionadoLabel',
-            'mostrarQuickRegAdulto', 'quick_nombres', 'quick_ap_paterno', 'quick_ap_materno', 'quick_ci', 'quick_genero', 'quick_fecha_nac',
             'departamento_domicilio', 'municipio_domicilio', 'zona_domicilio',
             'otro_departamento', 'otro_municipio', 'otra_zona',
             'selected_responsable_salud', 'selected_responsable_economico'
@@ -1068,68 +1062,6 @@ class UsuariosPanel extends Component
                 'text' => "Se quitó a {$nombre} de la lista de vinculación."
             ]);
         }
-    }
-
-    public function registrarYVincularAdulto()
-    {
-        $this->validate([
-            'quick_nombres' => 'required|string|max:100',
-            'quick_ap_paterno' => 'required|string|max:100',
-            'quick_ap_materno' => 'nullable|string|max:100',
-            'quick_ci' => 'required|string|max:20|unique:residentes,numero_documento',
-            'quick_genero' => 'required|in:MASCULINO,FEMENINO,OTRO',
-            'quick_fecha_nac' => 'required|date|before:today',
-        ], [
-            'quick_nombres.required' => 'El nombre es obligatorio.',
-            'quick_ap_paterno.required' => 'El apellido paterno es obligatorio.',
-            'quick_ci.required' => 'El CI/Documento es obligatorio.',
-            'quick_ci.unique' => 'Ya existe un adulto mayor registrado con este número de CI/Documento.',
-            'quick_fecha_nac.required' => 'La fecha de nacimiento es obligatoria.',
-            'quick_fecha_nac.before' => 'La fecha de nacimiento debe ser anterior a hoy.',
-        ]);
-
-        // Registrar Adulto Mayor
-        $am = new \App\Models\AdultoMayor();
-        $am->nombres = $this->normalizarMayusculas($this->quick_nombres);
-        $am->ap_paterno = $this->normalizarMayusculas($this->quick_ap_paterno);
-        $am->ap_materno = $this->normalizarMayusculas($this->quick_ap_materno);
-        $am->ci = $this->normalizarMayusculas($this->quick_ci);
-        $am->genero = $this->normalizarMayusculas($this->quick_genero);
-        if (!empty($this->quick_fecha_nac)) {
-            $am->setAttribute('fecha_nac', \Carbon\Carbon::parse($this->quick_fecha_nac)->toDateString());
-        } else {
-            $am->setAttribute('fecha_nac', null);
-        }
-        $am->cod_est_adul = 1; // ACTIVO
-        $am->setAttribute('fecha_ing', \Carbon\Carbon::today()->toDateString());
-        $am->save();
-
-        $nombreCompleto = $this->obtenerEtiquetaAdultoMayor($am);
-        
-        // Agregar automáticamente a la lista de vinculación
-        $this->vinculosFamiliar[] = [
-            'cod_residente' => $am->cod_residente,
-            'nombres_completos' => $nombreCompleto,
-            'parentesco_vinculo' => $this->selected_parentesco,
-            'es_responsable' => $this->selected_es_responsable ? 'SI' : 'NO',
-            'responsable_salud' => $this->selected_responsable_salud ? 'SI' : 'NO',
-            'responsable_economico' => $this->selected_responsable_economico ? 'SI' : 'NO',
-            'observaciones' => $this->selected_observaciones ?? '',
-        ];
-
-        // Resetear campos quick reg
-        $this->quick_nombres = '';
-        $this->quick_ap_paterno = '';
-        $this->quick_ap_materno = '';
-        $this->quick_ci = '';
-        $this->quick_fecha_nac = '';
-        $this->mostrarQuickRegAdulto = false;
-
-        $this->dispatch('swal', [
-            'icon' => 'success',
-            'title' => 'Registro Exitoso',
-            'text' => "Se registró a {$nombreCompleto} y se vinculó automáticamente al familiar."
-        ]);
     }
 
     public function editarUsuario($cod_usuario)
@@ -2544,6 +2476,12 @@ class UsuariosPanel extends Component
                 'nombre' => $nombre,
             ]),
             'usuarioFicha' => $usuarioFichaModel,
+            'residentesDisponibles' => \App\Models\Residente::query()
+                ->whereIn('estado', ['ACTIVO', 'ADMITIDO'])
+                ->orderBy('apellido_paterno')
+                ->orderBy('apellido_materno')
+                ->orderBy('nombres')
+                ->get(),
         ]);
     }
 }

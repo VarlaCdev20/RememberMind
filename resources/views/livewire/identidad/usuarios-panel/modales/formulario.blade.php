@@ -541,72 +541,19 @@
  <i class="ph-fill ph-users-three text-lg text-boton-acento"></i>
  <h4 class="text-[10px] font-bold text-parrafo uppercase tracking-widest">Vinculacion con adulto mayor</h4>
  </div>
- <button type="button" wire:click="$toggle('mostrarQuickRegAdulto')"
- class="px-3 py-1 rounded-lg border border-borde-focus text-boton-acento text-[8px] font-black uppercase tracking-wider transition hover:bg-boton-acento hover:text-inverso active:scale-95 inline-flex items-center gap-1 shadow-sm">
- <i class="ph-bold {{ $mostrarQuickRegAdulto ? 'ph-caret-left' : 'ph-user-plus' }} text-xs"></i>
- {{ $mostrarQuickRegAdulto ? 'Volver a Selección' : 'Registrar Nuevo Adulto Mayor' }}
- </button>
+ <span class="text-[8px] font-bold uppercase tracking-wider text-apoyo">
+ Los residentes nuevos se registran únicamente mediante admisión formal
+ </span>
  </div>
 
- {{-- 1. FORMULARIO DE REGISTRO RÁPIDO (INLINE) --}}
- @if($mostrarQuickRegAdulto)
- <div class="p-4 rounded-2xl bg-fondo-panel border border-borde-suave space-y-4 animate-in slide-in-from-top-4 duration-300">
- <div class="flex items-center gap-2 border-b border-borde-suave pb-1.5">
- <i class="ph-bold ph-plus-circle text-boton-acento text-sm"></i>
- <h5 class="text-[9px] font-bold uppercase tracking-widest text-parrafo">Registro Rápido de Adulto Mayor</h5>
- </div>
-
- <div class="grid gap-3 sm:grid-cols-2 md:grid-cols-3">
- <div>
- <label class="mb-1 block text-[8px] font-black uppercase tracking-widest text-apoyo">Nombres *</label>
- <input type="text" wire:model="quick_nombres" placeholder="Nombres" class="uppercase w-full h-8 rounded-lg border border-borde bg-fondo-card px-3 py-1 text-xs font-bold text-parrafo outline-none transition focus:border-borde-focus">
- @error('quick_nombres') <span class="mt-1 block text-[8px] font-black text-boton-acento uppercase">{{ $message }}</span> @enderror
- </div>
- <div>
- <label class="mb-1 block text-[8px] font-black uppercase tracking-widest text-apoyo">Apellido Paterno *</label>
- <input type="text" wire:model="quick_ap_paterno" placeholder="Paterno" class="uppercase w-full h-8 rounded-lg border border-borde bg-fondo-card px-3 py-1 text-xs font-bold text-parrafo outline-none transition focus:border-borde-focus">
- @error('quick_ap_paterno') <span class="mt-1 block text-[8px] font-black text-boton-acento uppercase">{{ $message }}</span> @enderror
- </div>
- <div>
- <label class="mb-1 block text-[8px] font-black uppercase tracking-widest text-apoyo">Apellido Materno</label>
- <input type="text" wire:model="quick_ap_materno" placeholder="Materno" class="uppercase w-full h-8 rounded-lg border border-borde bg-fondo-card px-3 py-1 text-xs font-bold text-parrafo outline-none transition focus:border-borde-focus">
- @error('quick_ap_materno') <span class="mt-1 block text-[8px] font-black text-boton-acento uppercase">{{ $message }}</span> @enderror
- </div>
- <div>
- <label class="mb-1 block text-[8px] font-black uppercase tracking-widest text-apoyo">CI / Documento *</label>
- <input type="text" wire:model="quick_ci" placeholder="Ej. 1234567" class="uppercase w-full h-8 rounded-lg border border-borde bg-fondo-card px-3 py-1 text-xs font-bold text-parrafo outline-none transition focus:border-borde-focus">
- @error('quick_ci') <span class="mt-1 block text-[8px] font-black text-boton-acento uppercase">{{ $message }}</span> @enderror
- </div>
- <div>
- <label class="mb-1 block text-[8px] font-black uppercase tracking-widest text-apoyo">Género *</label>
- <select wire:model="quick_genero" class="w-full h-8 rounded-lg border border-borde bg-fondo-card px-2 py-1 text-xs font-bold text-parrafo outline-none transition focus:border-borde-focus">
- <option value="MASCULINO">MASCULINO</option>
- <option value="FEMENINO">FEMENINO</option>
- <option value="OTRO">OTRO</option>
- </select>
- @error('quick_genero') <span class="mt-1 block text-[8px] font-black text-boton-acento uppercase">{{ $message }}</span> @enderror
- </div>
- <div>
- <label class="mb-1 block text-[8px] font-black uppercase tracking-widest text-apoyo">Fecha Nacimiento *</label>
- <input type="date" wire:model="quick_fecha_nac" class="w-full h-8 rounded-lg border border-borde bg-fondo-card px-3 py-1 text-xs font-bold text-parrafo outline-none transition focus:border-borde-focus">
- @error('quick_fecha_nac') <span class="mt-1 block text-[8px] font-black text-boton-acento uppercase">{{ $message }}</span> @enderror
- </div>
- </div>
- <div class="flex justify-end gap-2 border-t border-borde/10 pt-2">
- <button type="button" wire:click="$set('mostrarQuickRegAdulto', false)" class="px-4 py-1.5 rounded-lg bg-fondo-panel text-parrafo text-[8px] font-black uppercase tracking-widest transition hover:bg-fondo-panel">Cancelar</button>
- <button type="button" wire:click="registrarYVincularAdulto" class="px-5 py-1.5 rounded-lg bg-boton-acento text-inverso text-[8px] font-black uppercase tracking-widest transition hover:bg-boton-principal shadow-sm">Registrar y Vincular</button>
- </div>
- </div>
-
- {{-- 2. SELECCIÓN DE ADULTO MAYOR EXISTENTE --}}
- @else
+ {{-- Selección de residente existente y formalmente admitido --}}
  <div class="p-4 rounded-2xl bg-fondo-panel border border-borde-suave space-y-4">
  <div class="grid gap-4 sm:grid-cols-2 md:grid-cols-4 items-end">
  <div class="sm:col-span-2">
  <label class="mb-1 block text-[8px] font-black uppercase tracking-widest text-apoyo">Seleccionar Adulto Mayor *</label>
  <select wire:model="selected_cod_residente" class="w-full h-10 rounded-xl border border-borde bg-fondo-card px-3 py-2 text-xs font-bold text-parrafo outline-none transition focus:border-borde-focus">
  <option value="">-- Seleccionar Adulto Mayor Disponible --</option>
- @foreach(\App\Models\Residente::whereIn('estado', ['ACTIVO', 'ADMITIDO'])->orderBy('apellido_paterno')->orderBy('nombres')->get() as $am)
+ @foreach($residentesDisponibles as $am)
  @php
  $adultoNombre = trim(($am->nombres ?? '') . ' ' . ($am->ap_paterno ?? '') . ' ' . ($am->ap_materno ?? ''));
  $adultoDocumento = $am->ci ? 'CI ' . trim(($am->ci ?? '') . ' ' . ($am->expedicion_ci ?? '')) : 'SIN DOCUMENTO REGISTRADO';
@@ -659,7 +606,6 @@
  </button>
  </div>
  </div>
- @endif
 
  {{-- 3. LISTADO DE ADULTOS MAYORES VINCULADOS --}}
  <div class="space-y-2">
