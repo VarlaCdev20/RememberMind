@@ -740,7 +740,7 @@ class MiTurnoServiceTest extends TestCase
 
             'hora_programada' => '08:00:00',
 
-            'dosis_programada' => '1 tableta',
+            'dosis_programada' => 1,
 
             'estado' => 'ACTIVO',
 
@@ -1188,7 +1188,7 @@ class MiTurnoServiceTest extends TestCase
 
             'hora_programada' => '12:00:00',
 
-            'dosis_programada' => '1 tableta',
+            'dosis_programada' => 1,
 
             'estado' => 'ACTIVO',
 
@@ -1492,7 +1492,7 @@ class MiTurnoServiceTest extends TestCase
 
             'hora_programada' => '08:00:00',
 
-            'dosis_programada' => '1 tableta',
+            'dosis_programada' => 1,
 
             'estado' => 'ACTIVO',
 

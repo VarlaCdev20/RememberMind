@@ -764,7 +764,7 @@ class MiTurnoAuditoriaCierreTest extends TestCase
             'cod_turno' => $this->turnoManana->cod_turno,
             'hora_programada' => '11:30:00',
             'frecuencia' => 'Mañana',
-            'dias_semana' => 'LUNES,MARTES,MIERCOLES,JUEVES,VIERNES,SABADO,DOMINGO',
+            'dias_semana' => null,
             'fecha_activacion' => Carbon::today()->toDateString(),
             'estado' => 'ACTIVO',
         ]);
