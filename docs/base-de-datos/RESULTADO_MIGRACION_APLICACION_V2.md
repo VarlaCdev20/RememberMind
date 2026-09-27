@@ -1,7 +1,14 @@
 # Resultado de migración de la aplicación a BDD V2
 
-Fecha: 18/09/2026  
+Fecha: 18/09/2026
 Rama: `REFAC_BDD`
+
+
+> [!NOTE]
+> **NOTA HISTÓRICA:**
+> Este documento registra la evidencia de ejecución técnica correspondiente a la **migración V2.0** (69 tablas operativas).
+> Posteriormente se aprobó formalmente la **BDD Operativa V2.1**, la cual incorpora la tabla transaccional número 70 (`valoraciones_enfermeria_preadmision`) y su correspondiente modelo de autoría clínica.
+> La fuente de verdad vigente se encuentra en [Baseline congelado V2.1 (70 tablas)](REMEMBERMIND_BDD_BASELINE_CONGELADO.md) y [Diccionario de las 70 tablas](REMEMBERMIND_BDD_70_TABLAS.md).
 
 ## Resumen de archivos
 

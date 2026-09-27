@@ -67,7 +67,7 @@ Por decisión formal de la dirección técnica y funcional de RememberMind:
 
 - **PostgreSQL:** Motor actualmente utilizado y auditado; implementa físicamente los CHECK canónicos de talla (`ck_val_enf_talla` y `ck_med_ant_talla`).
 - **SQLite:** Utilizado en pruebas automatizadas; la integridad equivalente se emula mediante triggers de inserción y actualización (`BEFORE INSERT` / `BEFORE UPDATE`).
-- **MySQL / MariaDB:** Mantienen compatibilidad declarada mediante la configuración Laravel y migraciones portables cuando corresponda, pero esta migración específica no garantiza paridad física de CHECK para talla (la integridad descansa en las reglas de validación de la capa de aplicación).
+- **MySQL / MariaDB:** No forman parte del baseline soportado. La configuración genérica de Laravel no implica compatibilidad con la BDD Operativa V2.1.
 
 ---
 

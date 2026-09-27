@@ -1,8 +1,15 @@
-# RememberMind — BDD Operativa V2: 69 tablas
+# RememberMind — HISTÓRICO — BDD Operativa V2.0: 69 tablas
 
-**Estado:** CONGELADO  
-**Documento complementario:** `REMEMBERMIND_BDD_BASELINE_CONGELADO.md`  
+**Estado:** HISTÓRICO (V2.0)
+**Documento complementario vigente:** `REMEMBERMIND_BDD_BASELINE_CONGELADO.md`
 **Entidad central:** `residentes`
+
+> [!WARNING]
+> **DOCUMENTO HISTÓRICO.**
+> La fuente de verdad vigente es la BDD Operativa V2.1 de 70 tablas (`REMEMBERMIND_BDD_BASELINE_CONGELADO.md` y `REMEMBERMIND_BDD_70_TABLAS.md`).
+> Este documento se conserva intacto para trazabilidad de la evolución arquitectónica (versión V2.0).
+
+
 
 > Este documento define las entidades, atributos, PK, FK y relaciones de la BDD operativa. No modificar sin consulta y aprobación previa.
 

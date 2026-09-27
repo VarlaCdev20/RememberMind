@@ -1,29 +1,47 @@
 # Base de datos de RememberMind
 
-Esta carpeta contiene la documentación canónica de la **BDD Operativa V2.1** (70 tablas operativas).
+Esta carpeta contiene la documentación canónica y oficial de la **BDD Operativa V2.1** (70 tablas operativas).
 
-## Fuente de verdad
+## Índice documental
 
-Los documentos deben leerse en este orden:
+### 1. Fuente de verdad vigente (V2.1 — CONGELADO)
 
-1. [Baseline congelado](REMEMBERMIND_BDD_BASELINE_CONGELADO.md): fija alcance, decisiones y reglas que no pueden alterarse sin aprobación (V2.1, 70 tablas).
-2. [Diccionario de las 70 tablas (V2.1)](REMEMBERMIND_BDD_70_TABLAS.md): define tablas, atributos, tipos, claves, restricciones y relaciones vigentes.
-3. [Diccionario histórico de 69 tablas (V2.0 Histórico)](REMEMBERMIND_BDD_69_TABLAS.md): conservado como referencia histórica previa a la normalización de valoraciones de enfermería.
+1. [Baseline congelado de Base de Datos Operativa](REMEMBERMIND_BDD_BASELINE_CONGELADO.md)
+   Fija el alcance formal, principios de arquitectura, clasificación canónica (11 maestras, 46 transaccionales, 7 intermedias, 6 auxiliares = 70 operativas), reglas de autorización y gobernanza estricta.
+2. [Diccionario de las 70 tablas (V2.1)](REMEMBERMIND_BDD_70_TABLAS.md)
+   Define exhaustivamente las 70 tablas operativas, atributos, tipos, claves primarias, foráneas, restricciones de integridad (`CHECK`), índices y relaciones vigentes.
 
-Ante cualquier diferencia con documentos anteriores de `docs/architecture-audit` o `docs/refactorizacion-total`, prevalecen el baseline y el diccionario vigente de 70 tablas.
+### 2. Decisiones de arquitectura
 
-## Reglas de mantenimiento
+- [Decisión de Arquitectura — BDD Operativa V2.1](DECISION_ARQUITECTURA_BDD_V2_1.md)
+  Documenta la incorporación formal de `valoraciones_enfermeria_preadmision` (tabla 70), el reemplazo definitivo de la columna temporal JSON y el endurecimiento del modelo de autoría clínica y técnica dual.
 
-- No cambiar nombres de tablas, columnas, PK, FK, nulabilidad, índices o cardinalidades sin aprobación explícita.
-- Las ampliaciones explicativas deben documentarse fuera de los dos archivos congelados.
-- Las tablas técnicas de Laravel, Jetstream, Sanctum y Spatie no forman parte de las 70 tablas operativas.
-- `residentes` es la entidad maestra y solo puede crearse mediante la admisión formal.
-- Spatie Activitylog continúa siendo la auditoría técnica; no se debe crear una auditoría paralela.
-- El sistema experto está fuera de esta fase.
+### 3. Documentación histórica (V2.0)
+
+- [Diccionario histórico de 69 tablas (V2.0 Histórico)](REMEMBERMIND_BDD_69_TABLAS.md)
+  Conservado exclusivamente como referencia y trazabilidad histórica previa a la incorporación de la tabla 70.
+- [Resultado de la migración a BDD V2](RESULTADO_MIGRACION_APLICACION_V2.md)
+  Registro histórico de la migración inicial de la capa de aplicación hacia el baseline V2.0.
+- [Inventario inicial y clasificación](INVENTARIO_MIGRACION_APLICACION.md)
+  Registro del inventario preliminar de componentes.
+
+Ante cualquier discrepancia con documentos históricos o de auditorías pasadas, **prevalecen de manera absoluta el Baseline Congelado y el Diccionario de las 70 tablas vigentes**.
+
+---
+
+## Reglas de gobernanza y mantenimiento
+
+- **BDD Congelada:** No se puede agregar, eliminar, fusionar, dividir, renombrar ni modificar tablas, atributos, PK, FK, cardinalidades ni reglas estructurales sin el proceso de aprobación y versionado correspondiente.
+- **Entidad central:** `residentes` es la entidad maestra principal del sistema. Solo se crea mediante la formalización de la admisión en una transacción atómica.
+- **Autoría clínica separada:** Se distingue estrictamente entre autor clínico (`personal`) y actor técnico (`usuarios`).
+- **Tablas técnicas excluidas:** Las tablas de Laravel, Jetstream, Fortify, Sanctum y Spatie Permission/Activitylog no forman parte del conteo de las 70 tablas operativas.
+- **Sistema experto:** Fuera del alcance de este baseline operativo.
+
+---
 
 ## Implementación Laravel
 
-La estructura operativa está distribuida en las siguientes migraciones:
+La estructura operativa está distribuida en las siguientes migraciones versionadas:
 
 - [`2026_09_18_000100_create_bdd_v2_core_tables.php`](../../database/migrations/2026_09_18_000100_create_bdd_v2_core_tables.php)
 - [`2026_09_18_000200_create_bdd_v2_clinical_tables.php`](../../database/migrations/2026_09_18_000200_create_bdd_v2_clinical_tables.php)
@@ -31,22 +49,7 @@ La estructura operativa está distribuida en las siguientes migraciones:
 - [`2026_09_18_000400_create_bdd_v2_professional_social_alert_tables.php`](../../database/migrations/2026_09_18_000400_create_bdd_v2_professional_social_alert_tables.php)
 - [`2026_09_24_000100_normalize_valoracion_enfermeria_preadmision.php`](../../database/migrations/2026_09_24_000100_normalize_valoracion_enfermeria_preadmision.php)
 - [`2026_09_24_000300_harden_v2_data_integrity.php`](../../database/migrations/2026_09_24_000300_harden_v2_data_integrity.php)
+- [`2026_09_25_000100_add_cod_personal_valorador_to_valoraciones_enfermeria_preadmision.php`](../../database/migrations/2026_09_25_000100_add_cod_personal_valorador_to_valoraciones_enfermeria_preadmision.php)
 
-El flujo transaccional de admisión se implementa en [`FormalizarAdmision.php`](../../app/Actions/Admisiones/FormalizarAdmision.php). La verificación automatizada del baseline se encuentra en [`BddOperativaV2Test.php`](../../tests/Feature/BddOperativaV2Test.php).
-
-## Migración de la capa de aplicación
-
-- [Inventario inicial y clasificación](INVENTARIO_MIGRACION_APLICACION.md)
-- [Resultado de la migración a BDD V2](RESULTADO_MIGRACION_APLICACION_V2.md)
-
-## Verificación
-
-Para validar una instalación limpia:
-
-```bash
-php artisan optimize:clear
-php artisan migrate:fresh --seed
-php artisan test
-```
-
-`migrate:fresh` solo debe ejecutarse en un entorno local o de pruebas con datos descartables. Nunca debe utilizarse contra producción.
+El flujo transaccional de admisión se implementa en [`FormalizarAdmision.php`](../../app/Backend/Modulos/Admisiones/Acciones/FormalizarAdmision.php).
+La verificación automatizada del baseline se encuentra en [`BddOperativaV2Test.php`](../../tests/Feature/BddOperativaV2Test.php) y [`ValoracionEnfermeriaAutoriaTest.php`](../../tests/Feature/ValoracionEnfermeriaAutoriaTest.php).

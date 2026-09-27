@@ -317,7 +317,9 @@ Todas las PK `cod_*` usan `string(20)` salvo decisión futura explícitamente ap
 
 - `cod_preadmision → preadmisiones.cod_preadmision UNIQUE`
 
-- `cod_usuario_registro → usuarios.cod_usuario NULL`
+- `cod_personal_valorador → personal.cod_personal NOT NULL` (personal institucional autorizado responsable del acto asistencial)
+
+- `cod_usuario_registro → usuarios.cod_usuario NOT NULL` (cuenta autenticada registradora técnica)
 
 
 **Atributos:**
@@ -374,7 +376,7 @@ Todas las PK `cod_*` usan `string(20)` salvo decisión futura explícitamente ap
 
 - `peso decimal(6,2) NULL`
 
-- `talla decimal(6,2) NULL`
+- `talla decimal(6,2) NULL` (unidad canónica: centímetros [cm], rango 50.0 a 240.0 cm)
 
 - `antecedentes_relevantes text NULL`
 
@@ -403,16 +405,19 @@ Todas las PK `cod_*` usan `string(20)` salvo decisión futura explícitamente ap
 
 **Relaciones:**
 
-- N:1 — 1 preadmisiones (relación 1 a 0..1 garantizada por `cod_preadmision UNIQUE`)
+- N:1 — 1 preadmisiones (relación 1 a 0..1 garantizada por `cod_preadmision UNIQUE NOT NULL`)
 
-- N:1 — 0..1 usuarios (usuario/personal de enfermería que registró la valoración vía `cod_usuario_registro`)
+- N:1 — 1 personal (personal institucional autorizado responsable del acto asistencial mediante `cod_personal_valorador NOT NULL`)
+
+- N:1 — 1 usuarios (cuenta autenticada registradora técnica mediante `cod_usuario_registro NOT NULL`)
 
 
 **Reglas/observaciones:**
 - Tabla normalizada transaccional incorporada en BDD V2.1 para sustituir la columna JSON legacy `valoracion_enfermeria` en `preadmisiones`.
-- Relación 1:1 estricta con `preadmisiones` vía clave foránea única (`cod_preadmision UNIQUE`).
+- Relación 1:1 estricta con `preadmisiones` vía clave foránea única (`cod_preadmision UNIQUE NOT NULL`).
+- Modelo de autoría dual estricto: separa la responsabilidad asistencial (`cod_personal_valorador` en `personal`) de la trazabilidad informática de acceso (`cod_usuario_registro` en `usuarios`). Ambas FK son obligatorias (`NOT NULL`) con cláusula `ON DELETE RESTRICT`. Prohibida cualquier consulta fallback o fabricación automática de responsables.
 - El borrado físico de la preadmisión está restringido (`restrictOnDelete`) mientras exista la valoración.
-- Validación de rango y consistencia clínica (checks): dolor (0-10), PA sistólica > PA diastólica, frecuencia cardíaca (1-300), respiratoria (1-100), temperatura (25-45), saturación (0-100), peso (20-300), talla (0.5-240).
+- Validación de rango y consistencia clínica (checks): dolor (0-10), PA sistólica > PA diastólica, frecuencia cardíaca (1-300), respiratoria (1-100), temperatura (25-45), saturación (0-100), peso (20-300), talla (50.0-240.0 cm, unidad canónica formalizada: centímetros).
 
 
 ## 9. `contactos` — Maestra
@@ -1147,7 +1152,7 @@ Todas las PK `cod_*` usan `string(20)` salvo decisión futura explícitamente ap
 
 - `peso decimal(6,2) NULL`
 
-- `talla decimal(5,2) NULL`
+- `talla decimal(5,2) NULL` (unidad canónica: centímetros [cm], rango 50.0 a 240.0 cm, restricción `ck_med_ant_talla`)
 
 - `imc decimal(5,2) NULL`
 
