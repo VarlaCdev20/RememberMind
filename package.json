@@ -1,10 +1,12 @@
 {
     "$schema": "https://www.schemastore.org/package.json",
+    "name": "remembermind",
     "private": true,
     "type": "module",
     "scripts": {
         "build": "vite build",
-        "dev": "vite"
+        "dev": "vite",
+        "test": "node --test \"tests/Frontend/**/*.test.js\""
     },
     "devDependencies": {
         "@tailwindcss/forms": "^0.5.7",

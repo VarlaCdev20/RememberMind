@@ -24,6 +24,7 @@ class RolesVistasPermisosMatrixTest extends TestCase
             'estado' => 'ACTIVO',
         ]);
         $user->assignRole($rol);
+
         return $user;
     }
 
@@ -120,5 +121,45 @@ class RolesVistasPermisosMatrixTest extends TestCase
         $this->assertTrue($medico->can('prescripciones.crear'));
         $this->assertTrue($medico->can('prescripciones.editar'));
         $this->assertTrue($medico->can('prescripciones.suspender'));
+    }
+
+    public function test_distribucion_institucional_de_atenciones_crear_y_escritura_clinica(): void
+    {
+        // 1. Roles clinicos autorizados para registrar atenciones en sus competencias
+        $medico = $this->crearUsuarioConRol('MEDICO GENERAL/GERIATRA');
+        $enfermero = $this->crearUsuarioConRol('ENFERMEROS');
+        $psicologo = $this->crearUsuarioConRol('PSICOLOGO/A');
+        $nutricionista = $this->crearUsuarioConRol('NUTRICIONISTA');
+        $fisioterapeuta = $this->crearUsuarioConRol('FISIOTERAPEUTA');
+        $pedagogo = $this->crearUsuarioConRol('PEDAGOGO');
+
+        $this->assertTrue($medico->can('atenciones.crear'), 'Medico debe tener atenciones.crear');
+        $this->assertTrue($medico->can('diagnosticos.crear'));
+        $this->assertTrue($enfermero->can('atenciones.crear'), 'Enfermero debe tener atenciones.crear');
+        $this->assertTrue($enfermero->can('signos_vitales.crear'));
+        $this->assertTrue($psicologo->can('atenciones.crear'), 'Psicologo debe tener atenciones.crear');
+        $this->assertTrue($psicologo->can('valoraciones_psicologicas.crear'));
+        $this->assertTrue($nutricionista->can('atenciones.crear'), 'Nutricionista debe tener atenciones.crear');
+        $this->assertTrue($nutricionista->can('valoraciones_nutricionales.crear'));
+        $this->assertTrue($fisioterapeuta->can('atenciones.crear'), 'Fisioterapeuta debe tener atenciones.crear');
+        $this->assertTrue($fisioterapeuta->can('valoraciones_funcionales.crear'));
+        $this->assertTrue($pedagogo->can('atenciones.crear'), 'Pedagogo debe tener atenciones.crear');
+        $this->assertTrue($pedagogo->can('seguimientos_pedagogicos.crear'));
+
+        // 2. Roles administrativos y familiares sin escritura clinica
+        $admin = $this->crearUsuarioConRol('ADMINISTRADOR');
+        $superadmin = $this->crearUsuarioConRol('SUPERADMINISTRADOR');
+        $familiar = $this->crearUsuarioConRol('FAMILIAR');
+
+        $this->assertFalse($admin->can('atenciones.crear'), 'Administrador no debe tener atenciones.crear');
+        $this->assertTrue($admin->can('atenciones.ver'), 'Administrador puede ver atenciones');
+        $this->assertFalse($admin->can('diagnosticos.crear'));
+
+        $this->assertFalse($superadmin->can('atenciones.crear'), 'Superadmin puro no debe tener atenciones.crear');
+        $this->assertTrue($superadmin->can('atenciones.ver'), 'Superadmin puede ver atenciones');
+        $this->assertFalse($superadmin->can('prescripciones.crear'));
+
+        $this->assertFalse($familiar->can('atenciones.crear'), 'Familiar no debe tener atenciones.crear');
+        $this->assertFalse($familiar->can('atenciones.ver'), 'Familiar no debe ver atenciones');
     }
 }

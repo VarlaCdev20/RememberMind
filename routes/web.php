@@ -1,70 +1,29 @@
 <?php
 
-use App\Http\Controllers\Actividades\AdultoMayorActividadController;
-use App\Http\Controllers\Reportes\ReporteActividadesController;
-use App\Http\Controllers\Clinica\AdultoMayorFichaMedicaController;
-use App\Http\Controllers\Clinica\AdultoMayorSignosVitalesController;
-use App\Http\Controllers\Documentos\AdultoMayorDocumentoController;
-use App\Http\Controllers\Documentos\DocumentosUsuarioController;
-use App\Http\Controllers\Identidad\UsuarioController;
-use App\Http\Controllers\Medicacion\AdultoMayorAdministracionMedicacionController;
-use App\Http\Controllers\Medicacion\AdultoMayorMedicacionController;
-use App\Http\Controllers\Admin\AreasAtencionController;
-use App\Http\Controllers\Reportes\AreaReporteController;
-use App\Http\Controllers\Reportes\BitacoraController;
-use App\Http\Controllers\Reportes\DashboardController;
-use App\Http\Controllers\Reportes\FichaPacienteReporteController;
-use App\Http\Controllers\Reportes\ReporteAdultosController;
-use App\Http\Controllers\Reportes\ReporteBitacoraController;
-use App\Http\Controllers\Reportes\ReporteEquipoController;
-use App\Http\Controllers\Reportes\ReporteFamiliaresController;
-use App\Http\Controllers\Reportes\ReporteInstitucionalController;
-use App\Http\Controllers\Reportes\ReporteSaludController;
-use App\Http\Controllers\Residentes\AdultoMayorAtencionController;
-use App\Http\Controllers\Residentes\AdultoMayorController;
-use App\Http\Controllers\Residentes\AdultoMayorFamiliarController;
-use App\Http\Controllers\Residentes\AdultoMayorObservacionController;
-use App\Http\Controllers\Residentes\ResumenFamiliaSocialController;
-use App\Http\Controllers\Valoraciones\AdultoMayorEvaluacionController;
-use App\Http\Controllers\Valoraciones\AdultoMayorValoracionFuncionalController;
-use App\Http\Controllers\Actividades\ActividadController;
-use App\Http\Controllers\Admisiones\AdmisionController;
-use App\Http\Controllers\Admisiones\InfraestructuraController;
-use App\Http\Controllers\Admisiones\PreadmisionController;
-use App\Http\Controllers\Alertas\AlertaController;
-use App\Http\Controllers\Clinica\EstudioClinicoController;
-use App\Http\Controllers\Clinica\ExpedienteClinicoController;
-use App\Http\Controllers\Cuidados\CuidadoController;
-use App\Http\Controllers\Documentos\DocumentoController;
-use App\Http\Controllers\Identidad\InstitucionalController;
-use App\Http\Controllers\Instrumentos\InstrumentoController;
-use App\Http\Controllers\Medicacion\MedicacionController;
-use App\Http\Controllers\Reportes\ReporteV2Controller;
-use App\Http\Controllers\Residentes\RelacionResidenteController;
-use App\Http\Controllers\Residentes\ResidenteController;
-use App\Http\Controllers\Valoraciones\ValoracionProfesionalController;
-
 use App\Frontend\Livewire\Administracion\Actividades\ActividadesPanel;
 use App\Frontend\Livewire\Administracion\Actividades\AsistenciaPanel;
 use App\Frontend\Livewire\Administracion\Actividades\ParticipacionPanel;
 use App\Frontend\Livewire\Administracion\Actividades\ReportesActividadesPanel;
 use App\Frontend\Livewire\Administracion\Actividades\TiposActividadPanel;
+use App\Frontend\Livewire\Administracion\Identidad\PersonalInstitucionalPanel;
 use App\Frontend\Livewire\Admisiones\HabitacionesPanel;
 use App\Frontend\Livewire\Admisiones\PreadmisionesPanel;
 use App\Frontend\Livewire\Admisiones\PreadmisionWizard;
 use App\Frontend\Livewire\Compartido\Alertas\AlertasPanel;
 use App\Frontend\Livewire\Compartido\Alertas\AlertasPendientesPanel;
-use App\Frontend\Livewire\Medico\Clinica\DashboardMedico;
-use App\Frontend\Livewire\Medico\Clinica\PacientesSeguimientoPanel;
+use App\Frontend\Livewire\Compartido\Clinica\FichaPaciente;
 use App\Frontend\Livewire\Compartido\Clinica\SaludFichaPanel;
 use App\Frontend\Livewire\Compartido\Clinica\SaludResumenPanel;
 use App\Frontend\Livewire\Compartido\Clinica\SaludSeguimientoListPanel;
 use App\Frontend\Livewire\Compartido\Clinica\SaludSignosPanel;
 use App\Frontend\Livewire\Compartido\Clinica\SignosVitalesPanel;
+use App\Frontend\Livewire\Compartido\Residentes\RedApoyoPanel;
+use App\Frontend\Livewire\Compartido\Valoraciones\EvaluacionesAreaPanel;
+use App\Frontend\Livewire\Compartido\Valoraciones\SaludEvaluacionesGeriatricasPanel;
+use App\Frontend\Livewire\Compartido\Valoraciones\SaludValoracionPanel;
 use App\Frontend\Livewire\Enfermeria\Cuidados\AgendaEnfermeria;
 use App\Frontend\Livewire\Enfermeria\Cuidados\AsignacionTurnoPanel;
 use App\Frontend\Livewire\Enfermeria\Cuidados\DashboardTurno;
-use App\Frontend\Livewire\Compartido\Clinica\FichaPaciente;
 use App\Frontend\Livewire\Enfermeria\Cuidados\IncidentesPanel;
 use App\Frontend\Livewire\Enfermeria\Cuidados\MisPacientes;
 use App\Frontend\Livewire\Enfermeria\Cuidados\PaseTurnoPanel;
@@ -74,18 +33,57 @@ use App\Frontend\Livewire\Enfermeria\Cuidados\ReporteEnfermeria;
 use App\Frontend\Livewire\Enfermeria\Cuidados\SeguimientoDiarioPanel;
 use App\Frontend\Livewire\Enfermeria\Cuidados\TareasPlanPanel;
 use App\Frontend\Livewire\Enfermeria\Cuidados\TurnosEnfermeriaPanel;
-use App\Frontend\Livewire\Administracion\Identidad\PersonalInstitucionalPanel;
 use App\Frontend\Livewire\Enfermeria\Medicacion\SaludAdministracionMedicacionPanel;
-use App\Frontend\Livewire\Medico\Medicacion\SaludMedicacionPanel;
-use App\Frontend\Livewire\Superadministrador\Reportes\ReportesInstitucionalesPanel;
-use App\Frontend\Livewire\Compartido\Residentes\RedApoyoPanel;
-use App\Frontend\Livewire\Psicologia\DashboardPsicologo;
-use App\Frontend\Livewire\Compartido\Valoraciones\EvaluacionesAreaPanel;
-use App\Frontend\Livewire\Compartido\Valoraciones\SaludEvaluacionesGeriatricasPanel;
-use App\Frontend\Livewire\Compartido\Valoraciones\SaludValoracionPanel;
 use App\Frontend\Livewire\Enfermeria\Valoraciones\ValoracionEnfermeriaPanel;
+use App\Frontend\Livewire\Medico\Clinica\DashboardMedico;
+use App\Frontend\Livewire\Medico\Clinica\PacientesSeguimientoPanel;
+use App\Frontend\Livewire\Medico\Medicacion\SaludMedicacionPanel;
 use App\Frontend\Livewire\Medico\Valoraciones\ValoracionMedicaPanel;
-
+use App\Frontend\Livewire\Psicologia\DashboardPsicologo;
+use App\Frontend\Livewire\Superadministrador\Reportes\ReportesInstitucionalesPanel;
+use App\Http\Controllers\Actividades\ActividadController;
+use App\Http\Controllers\Actividades\AdultoMayorActividadController;
+use App\Http\Controllers\Admin\AreasAtencionController;
+use App\Http\Controllers\Admisiones\AdmisionController;
+use App\Http\Controllers\Admisiones\InfraestructuraController;
+use App\Http\Controllers\Admisiones\PreadmisionController;
+use App\Http\Controllers\Alertas\AlertaController;
+use App\Http\Controllers\Clinica\AdultoMayorFichaMedicaController;
+use App\Http\Controllers\Clinica\AdultoMayorSignosVitalesController;
+use App\Http\Controllers\Clinica\EstudioClinicoController;
+use App\Http\Controllers\Clinica\ExpedienteClinicoController;
+use App\Http\Controllers\Cuidados\CuidadoController;
+use App\Http\Controllers\Documentos\AdultoMayorDocumentoController;
+use App\Http\Controllers\Documentos\DocumentoController;
+use App\Http\Controllers\Documentos\DocumentosUsuarioController;
+use App\Http\Controllers\Identidad\InstitucionalController;
+use App\Http\Controllers\Identidad\UsuarioController;
+use App\Http\Controllers\Instrumentos\InstrumentoController;
+use App\Http\Controllers\Medicacion\AdultoMayorAdministracionMedicacionController;
+use App\Http\Controllers\Medicacion\AdultoMayorMedicacionController;
+use App\Http\Controllers\Medicacion\MedicacionController;
+use App\Http\Controllers\Reportes\AreaReporteController;
+use App\Http\Controllers\Reportes\BitacoraController;
+use App\Http\Controllers\Reportes\DashboardController;
+use App\Http\Controllers\Reportes\FichaPacienteReporteController;
+use App\Http\Controllers\Reportes\ReporteActividadesController;
+use App\Http\Controllers\Reportes\ReporteAdultosController;
+use App\Http\Controllers\Reportes\ReporteBitacoraController;
+use App\Http\Controllers\Reportes\ReporteEquipoController;
+use App\Http\Controllers\Reportes\ReporteFamiliaresController;
+use App\Http\Controllers\Reportes\ReporteInstitucionalController;
+use App\Http\Controllers\Reportes\ReporteSaludController;
+use App\Http\Controllers\Reportes\ReporteV2Controller;
+use App\Http\Controllers\Residentes\AdultoMayorAtencionController;
+use App\Http\Controllers\Residentes\AdultoMayorController;
+use App\Http\Controllers\Residentes\AdultoMayorFamiliarController;
+use App\Http\Controllers\Residentes\AdultoMayorObservacionController;
+use App\Http\Controllers\Residentes\RelacionResidenteController;
+use App\Http\Controllers\Residentes\ResidenteController;
+use App\Http\Controllers\Residentes\ResumenFamiliaSocialController;
+use App\Http\Controllers\Valoraciones\AdultoMayorEvaluacionController;
+use App\Http\Controllers\Valoraciones\AdultoMayorValoracionFuncionalController;
+use App\Http\Controllers\Valoraciones\ValoracionProfesionalController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -227,7 +225,8 @@ Route::middleware([
                 ->group(function () {
                     Route::get('/', [DocumentosUsuarioController::class, 'preview'])->name('preview');
                     Route::get('/pdf', [DocumentosUsuarioController::class, 'paquetePdf'])->name('pdf');
-                    Route::post('/enviar', [DocumentosUsuarioController::class, 'enviarPaqueteCorreo'])->name('enviar');
+                    Route::post('/enviar', [DocumentosUsuarioController::class, 'enviarPaqueteCorreo'])
+                        ->middleware('permission:usuarios.editar|usuarios.crear')->name('enviar');
                     Route::get('/{documento}/ver', [DocumentosUsuarioController::class, 'verDocumento'])->name('ver');
                     Route::get('/{documento}/pdf', [DocumentosUsuarioController::class, 'pdfDocumento'])->name('documento-pdf');
                     Route::get('/{documento}/imprimir', [DocumentosUsuarioController::class, 'imprimirDocumento'])->name('imprimir');
@@ -241,7 +240,7 @@ Route::middleware([
                 ->middleware('permission:roles.ver')
                 ->name('roles-permisos.index');
 
-                        Route::get('/areas-atencion', [AreasAtencionController::class, 'index'])
+            Route::get('/areas-atencion', [AreasAtencionController::class, 'index'])
                 ->name('areas-atencion.index');
 
             Route::view('/areas-institucionales', 'pages.areas-institucionales.index')
@@ -749,11 +748,11 @@ Route::middleware([
                         ->name('reportes');
 
                     // Ficha médica y clínica integrada por residente (unificada con FichaPaciente).
-                    Route::get('/residente/{adulto}', \App\Frontend\Livewire\Compartido\Clinica\FichaPaciente::class)
+                    Route::get('/residente/{adulto}', FichaPaciente::class)
                         ->name('residente.ficha');
 
                     // Compatibilidad con enlaces existentes que todavía usan /paciente/.
-                    Route::get('/paciente/{adulto}', \App\Frontend\Livewire\Compartido\Clinica\FichaPaciente::class)
+                    Route::get('/paciente/{adulto}', FichaPaciente::class)
                         ->name('paciente.ficha');
                 });
 
@@ -934,7 +933,9 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
 
         Route::get('/residentes/{residente}/expediente', [ExpedienteClinicoController::class, 'index'])->middleware('permission:atenciones.ver')->name('expediente.index');
         Route::post('/residentes/{residente}/atenciones', [ExpedienteClinicoController::class, 'crearAtencion'])->middleware('permission:atenciones.crear')->name('atenciones.store');
-        Route::post('/residentes/{residente}/clinica/{tipo}', [ExpedienteClinicoController::class, 'registrar'])->name('clinica.store');
+        Route::post('/residentes/{residente}/clinica/{tipo}', [ExpedienteClinicoController::class, 'registrar'])
+            ->middleware('permission:notas_clinicas.crear|antecedentes_clinicos.crear|diagnosticos.crear|alergias.crear|signos_vitales.crear|valoraciones_dolor.crear|mediciones_antropometricas.crear|incidentes.crear|indicaciones_clinicas.crear')
+            ->name('clinica.store');
         Route::get('/residentes/{residente}/estudios', [EstudioClinicoController::class, 'index'])->middleware('permission:estudios_clinicos.ver')->name('estudios.index');
         Route::post('/residentes/{residente}/estudios', [EstudioClinicoController::class, 'solicitar'])->middleware('permission:estudios_clinicos.crear')->name('estudios.store');
         Route::post('/estudios/{estudio}/resultados', [EstudioClinicoController::class, 'resultados'])->middleware('permission:resultados_estudio.crear')->name('estudios.resultados');
@@ -944,7 +945,9 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
         Route::post('/residentes/{residente}/derivaciones', [EstudioClinicoController::class, 'derivar'])->middleware('permission:derivaciones.crear')->name('derivaciones.store');
 
         Route::get('/residentes/{residente}/cuidados', [CuidadoController::class, 'index'])->middleware('permission:planes_cuidado.ver')->name('cuidados.index');
-        Route::post('/residentes/{residente}/cuidados/{tipo}', [CuidadoController::class, 'registrar'])->name('cuidados.store');
+        Route::post('/residentes/{residente}/cuidados/{tipo}', [CuidadoController::class, 'registrar'])
+            ->middleware('permission:controles_cognitivos.crear|registros_conductuales.crear|registros_sueno.crear|registros_ingesta.crear|registros_hidratacion.crear|registros_eliminacion.crear|registros_movilidad.crear|heridas.crear')
+            ->name('cuidados.store');
         Route::post('/residentes/{residente}/planes', [CuidadoController::class, 'crearPlan'])->middleware('permission:planes_cuidado.crear')->name('planes.store');
         Route::post('/residentes/{residente}/asignaciones-jornada', [CuidadoController::class, 'asignarJornada'])->middleware('permission:asignaciones_residente_jornada.gestionar')->name('cuidados.asignaciones.store');
         Route::post('/residentes/{residente}/pases-turno', [CuidadoController::class, 'registrarPase'])->middleware('permission:pases_turno.crear')->name('cuidados.pases.store');
@@ -960,7 +963,9 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
 
         Route::get('/instrumentos', [InstrumentoController::class, 'index'])->middleware('permission:instrumentos.ver')->name('instrumentos.index');
         Route::post('/instrumentos/{instrumento}/residentes/{residente}', [InstrumentoController::class, 'aplicar'])->middleware('permission:aplicaciones_instrumento.crear')->name('instrumentos.aplicar');
-        Route::post('/residentes/{residente}/valoraciones/{tipo}', [ValoracionProfesionalController::class, 'registrar'])->name('valoraciones.store');
+        Route::post('/residentes/{residente}/valoraciones/{tipo}', [ValoracionProfesionalController::class, 'registrar'])
+            ->middleware('permission:valoraciones_psicologicas.crear|valoraciones_nutricionales.crear|valoraciones_funcionales.crear|seguimientos_pedagogicos.crear')
+            ->name('valoraciones.store');
         Route::post('/actividades', [ActividadController::class, 'store'])->middleware('permission:actividades.gestionar')->name('actividades.store');
         Route::post('/actividades/{actividad}/participantes', [ActividadController::class, 'participante'])->middleware('permission:actividades.gestionar')->name('actividades.participantes');
 
