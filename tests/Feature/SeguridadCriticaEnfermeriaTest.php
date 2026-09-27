@@ -106,6 +106,20 @@ class SeguridadCriticaEnfermeriaTest extends TestCase
             ->assertForbidden();
     }
 
+    public function test_enfermeria_no_se_autoasigna_residentes_desde_endpoint_administrativo(): void
+    {
+        $this->recibir($this->enfermero, $this->turno);
+        $jornada = AsignacionPersonal::query()
+            ->where('cod_personal', $this->enfermero->personal->cod_personal)
+            ->sole()
+            ->cod_jornada;
+
+        $this->postJson(route('admin.cuidados.asignaciones.store', $this->residente), [
+            'cod_jornada' => $jornada,
+            'cod_personal' => $this->enfermero->personal->cod_personal,
+        ])->assertForbidden();
+    }
+
     public function test_dosis_programada_se_resuelve_en_servidor_y_no_se_duplica(): void
     {
         $this->recibir($this->enfermero, $this->turno);
