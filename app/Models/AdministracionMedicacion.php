@@ -4,12 +4,13 @@ namespace App\Models;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 
 class AdministracionMedicacion extends ModeloOperativo
 {
     protected $table = 'administraciones_medicacion';
+
     protected $primaryKey = 'cod_administracion';
 
     protected function casts(): array
@@ -63,14 +64,14 @@ class AdministracionMedicacion extends ModeloOperativo
     {
         static::creating(function (self $registro): void {
             if (empty($registro->cod_administracion)) {
-                $registro->cod_administracion = 'ADM_' . strtoupper(Str::random(10));
+                $registro->cod_administracion = 'ADM_'.strtoupper(Str::random(10));
             }
             $rawMed = $registro->attributes['cod_med_adulto'] ?? $registro->attributes['cod_prescripcion'] ?? null;
-            if (empty($registro->cod_prescripcion) && !empty($rawMed)) {
+            if (empty($registro->cod_prescripcion) && ! empty($rawMed)) {
                 $registro->cod_prescripcion = $rawMed;
             }
 
-            if (empty($registro->cod_residente) && !empty($registro->cod_prescripcion)) {
+            if (empty($registro->cod_residente) && ! empty($registro->cod_prescripcion)) {
                 $p = Prescripcion::find($registro->cod_prescripcion);
                 if ($p) {
                     $registro->cod_residente = $p->cod_residente;
@@ -85,11 +86,11 @@ class AdministracionMedicacion extends ModeloOperativo
             if (empty($registro->fecha_hora_programada)) {
                 $fec = $registro->attributes['fecha'] ?? today()->toDateString();
                 $hora = $registro->attributes['hora_programada'] ?? '08:00';
-                $registro->fecha_hora_programada = Carbon::parse($fec . ' ' . $hora);
+                $registro->fecha_hora_programada = Carbon::parse($fec.' '.$hora);
             }
-            if (empty($registro->fecha_hora_administracion) && !empty($registro->attributes['hora_real'])) {
+            if (empty($registro->fecha_hora_administracion) && ! empty($registro->attributes['hora_real'])) {
                 $fec = $registro->attributes['fecha'] ?? today()->toDateString();
-                $registro->fecha_hora_administracion = Carbon::parse($fec . ' ' . $registro->attributes['hora_real']);
+                $registro->fecha_hora_administracion = Carbon::parse($fec.' '.$registro->attributes['hora_real']);
             }
             if (empty($registro->resultado) || $registro->resultado === 'ADMINISTRADA') {
                 $adm = $registro->attributes['administrado'] ?? null;
@@ -106,14 +107,14 @@ class AdministracionMedicacion extends ModeloOperativo
                 'cod_administracion', 'cod_prescripcion', 'cod_horario_prescripcion',
                 'cod_residente', 'cod_jornada', 'cod_personal', 'fecha_hora_programada',
                 'fecha_hora_administracion', 'resultado', 'dosis_administrada',
-                'motivo_omision', 'efecto_observado', 'reaccion_adversa', 'observacion', 'estado'
+                'motivo_omision', 'efecto_observado', 'reaccion_adversa', 'observacion', 'estado',
             ];
             $registro->attributes = array_intersect_key($registro->attributes, array_flip($validos));
         });
 
         static::saving(function (self $registro): void {
 
-            if (!empty($registro->cod_prescripcion)) {
+            if (! empty($registro->cod_prescripcion)) {
                 $presc = Prescripcion::query()->whereKey($registro->cod_prescripcion)->first();
                 if ($presc) {
                     $registro->cod_prescripcion = $presc->cod_prescripcion;
@@ -126,7 +127,7 @@ class AdministracionMedicacion extends ModeloOperativo
             if (! empty($registro->cod_prescripcion) && ! empty($registro->cod_residente)
                 && ! Prescripcion::query()->whereKey($registro->cod_prescripcion)
                     ->where('cod_residente', $registro->cod_residente)->exists()) {
-                throw \Illuminate\Validation\ValidationException::withMessages([
+                throw ValidationException::withMessages([
                     'cod_prescripcion' => 'La prescripción no corresponde al residente.',
                 ]);
             }
@@ -134,7 +135,7 @@ class AdministracionMedicacion extends ModeloOperativo
             if (! empty($registro->cod_horario_prescripcion) && ! empty($registro->cod_prescripcion)
                 && ! HorarioPrescripcion::query()->whereKey($registro->cod_horario_prescripcion)
                     ->where('cod_prescripcion', $registro->cod_prescripcion)->exists()) {
-                throw \Illuminate\Validation\ValidationException::withMessages([
+                throw ValidationException::withMessages([
                     'cod_horario_prescripcion' => 'El horario no corresponde a la prescripción indicada.',
                 ]);
             }

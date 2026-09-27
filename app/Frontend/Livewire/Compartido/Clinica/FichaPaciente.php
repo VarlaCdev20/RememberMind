@@ -3,6 +3,7 @@
 namespace App\Frontend\Livewire\Compartido\Clinica;
 
 use App\Backend\Modulos\Alertas\Servicios\AlertasService;
+use App\Backend\Modulos\Clinica\Servicios\ContextoClinicoService;
 use App\Backend\Modulos\Clinica\Servicios\EventosClinicosService;
 use App\Backend\Modulos\Clinica\Servicios\ResultadosEstudiosService;
 use App\Backend\Modulos\Clinica\Servicios\SignosVitalesService;
@@ -16,6 +17,7 @@ use App\Models\Atencion;
 use App\Models\Documento;
 use App\Models\EjecucionCuidado;
 use App\Models\Incidente;
+use App\Models\IntervencionCuidado;
 use App\Models\Jornada;
 use App\Models\Prescripcion;
 use App\Models\Residente;
@@ -1157,9 +1159,9 @@ class FichaPaciente extends Component
             'ejecuciones_cuidado.gestionar',
             Auth::user(),
         );
-        $personal = app(\App\Backend\Modulos\Clinica\Servicios\ContextoClinicoService::class)
+        $personal = app(ContextoClinicoService::class)
             ->personalActivo(Auth::user());
-        $intervencion = \App\Models\IntervencionCuidado::query()
+        $intervencion = IntervencionCuidado::query()
             ->where('cod_intervencion', $codIntervencion)
             ->whereIn('estado', ['ACTIVA', 'ACTIVO'])
             ->whereHas('plan', fn ($query) => $query

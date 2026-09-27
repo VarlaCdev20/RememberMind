@@ -2,29 +2,27 @@
 
 namespace Tests\Feature;
 
-use App\Frontend\Livewire\Enfermeria\Cuidados\DashboardTurno;
+use App\Backend\Modulos\Enfermeria\Servicios\TurnoEnfermeriaService;
 use App\Frontend\Livewire\Compartido\Clinica\FichaPaciente;
+use App\Frontend\Livewire\Enfermeria\Cuidados\DashboardTurno;
 use App\Frontend\Livewire\Enfermeria\Cuidados\MisPacientes;
 use App\Frontend\Livewire\Enfermeria\Cuidados\PaseTurnoPanel;
-use App\Models\AdministracionMedicacion;
 use App\Models\AdultoMayor;
 use App\Models\Alerta;
 use App\Models\Area;
-use App\Models\AsignacionResidenteJornada;
-use App\Models\Prescripcion;
-use App\Models\PaseTurno;
-use App\Models\PlanCuidado;
 use App\Models\AsignacionPersonal;
+use App\Models\AsignacionResidenteJornada;
 use App\Models\Atencion;
-use App\Models\Medicamento;
-use App\Models\Jornada;
-use App\Models\IntervencionCuidado;
-use App\Models\Personal;
-use App\Models\SignoVital;
 use App\Models\EjecucionCuidado;
+use App\Models\IntervencionCuidado;
+use App\Models\Jornada;
+use App\Models\Medicamento;
+use App\Models\PaseTurno;
+use App\Models\Personal;
+use App\Models\PlanCuidado;
+use App\Models\Prescripcion;
 use App\Models\TurnoEnfermeria;
 use App\Models\User;
-use App\Backend\Modulos\Enfermeria\Servicios\TurnoEnfermeriaService;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
@@ -49,7 +47,7 @@ class TurnoCompletoEnfermeroTest extends TestCase
 
     public function test_enfermero_sin_asignacion_recibe_403_al_intentar_operar(): void
     {
-        $this->seed([ RolesAndPermissionsSeeder::class]);
+        $this->seed([RolesAndPermissionsSeeder::class]);
         $enfermero = User::factory()->create(['estado' => 'ACTIVO']);
         $enfermero->assignRole('ENFERMEROS');
         $pacienteAjeno = AdultoMayor::factory()->create(['cod_est_adul' => 'EST_001']);
@@ -61,7 +59,7 @@ class TurnoCompletoEnfermeroTest extends TestCase
 
     public function test_flujo_completo_de_turno_de_enfermero_con_alcance_estricto(): void
     {
-        $this->seed([ RolesAndPermissionsSeeder::class]);
+        $this->seed([RolesAndPermissionsSeeder::class]);
 
         // 1. Crear turnos de enfermería
         $turnoManana = TurnoEnfermeria::create([
@@ -346,7 +344,7 @@ class TurnoCompletoEnfermeroTest extends TestCase
 
     public function test_generar_y_recibir_pase_de_turno(): void
     {
-        $this->seed([ RolesAndPermissionsSeeder::class]);
+        $this->seed([RolesAndPermissionsSeeder::class]);
 
         $turnoManana = TurnoEnfermeria::create([
             'orden' => 1,

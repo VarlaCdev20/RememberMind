@@ -2,26 +2,21 @@
 
 namespace App\Backend\Modulos\Enfermeria\Servicios;
 
-use App\Models\User;
-use App\Models\Personal;
-use App\Models\AsignacionPersonal;
-use App\Models\Jornada;
-use App\Models\Turno;
-use App\Models\Area;
-use App\Models\AsignacionResidenteJornada;
-use App\Models\Residente;
-use App\Models\Alerta;
-use App\Models\EventoAlerta;
-use App\Models\Prescripcion;
-use App\Models\HorarioPrescripcion;
 use App\Models\AdministracionMedicacion;
-use App\Models\PlanCuidado;
-use App\Models\IntervencionCuidado;
-use App\Models\ProgramacionCuidado;
+use App\Models\Alerta;
+use App\Models\Area;
+use App\Models\AsignacionPersonal;
+use App\Models\AsignacionResidenteJornada;
 use App\Models\EjecucionCuidado;
+use App\Models\Jornada;
+use App\Models\Personal;
+use App\Models\PlanCuidado;
+use App\Models\Prescripcion;
+use App\Models\Residente;
+use App\Models\Turno;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class MiTurnoService
@@ -35,12 +30,17 @@ class MiTurnoService
      * eventos_alerta.estado_nuevo: EN_ATENCION, CERRADA
      */
     public const ESTADOS_ALERTA_ACTIVOS = ['ABIERTA', 'EN_ATENCION', 'RECONOCIDA', 'ASIGNADA', 'PENDIENTE', 'ACTIVA', 'ACTIVO'];
+
     public const ESTADOS_ALERTA_RESUELTOS = ['CERRADA', 'RESUELTA', 'ATENDIDA', 'CANCELADA', 'INACTIVA'];
+
     public const PRIORIDADES_CRITICAS = ['CRITICO', 'CRITICA'];
+
     public const PRIORIDADES_ALTAS = ['ALTO', 'ALTA'];
+
     public const PRIORIDADES_RELEVANTES = ['CRITICO', 'CRITICA', 'ALTO', 'ALTA', 'MEDIO', 'MEDIA'];
 
     public const RESULTADOS_MEDICACION_RESUELTOS = ['ADMINISTRADA', 'ADMINISTRADO', 'REALIZADA', 'OMITIDA', 'OMITIDO', 'RECHAZADA', 'RECHAZADO'];
+
     public const RESULTADOS_CUIDADO_RESUELTOS = ['REALIZADA', 'COMPLETADA', 'OMITIDA', 'NO_REALIZADA'];
 
     /**
@@ -63,7 +63,7 @@ class MiTurnoService
 
         // Metadatos de usuario
         $primerNombre = $personal?->nombres ? explode(' ', trim($personal->nombres))[0] : ($user->nombres ? explode(' ', trim($user->nombres))[0] : 'Personal');
-        $apellidos = trim(($personal?->apellido_paterno ?? $user->apellido_paterno ?? '') . ' ' . ($personal?->apellido_materno ?? $user->apellido_materno ?? ''));
+        $apellidos = trim(($personal?->apellido_paterno ?? $user->apellido_paterno ?? '').' '.($personal?->apellido_materno ?? $user->apellido_materno ?? ''));
         $nombreCompleto = trim($personal ? "{$personal->nombres} {$apellidos}" : (string) $user->name);
         $nombreCompleto = $nombreCompleto !== '' ? $nombreCompleto : 'Personal no identificado';
 
@@ -72,7 +72,9 @@ class MiTurnoService
             if ($part !== '') {
                 $iniciales .= mb_strtoupper(mb_substr($part, 0, 1));
             }
-            if (mb_strlen($iniciales) >= 2) break;
+            if (mb_strlen($iniciales) >= 2) {
+                break;
+            }
         }
         $iniciales = $iniciales ?: '--';
 
@@ -97,16 +99,17 @@ class MiTurnoService
             $alertas = $this->resolverAlertasTurno($codResidentes, $inicioTurno, $finTurno);
             $kpisData = $this->calcularKpisAlertas($alertas);
             $alertaCritica = $alertas->first(function ($a) {
-                $p = strtoupper(trim((string)$a->prioridad));
-                $est = strtoupper(trim((string)$a->estado));
+                $p = strtoupper(trim((string) $a->prioridad));
+                $est = strtoupper(trim((string) $a->estado));
+
                 return in_array($p, self::PRIORIDADES_CRITICAS, true) && in_array($est, self::ESTADOS_ALERTA_ACTIVOS, true);
             });
 
             // Agenda unificada basada en la programación
-                        // Mapa de timestamps de asignación de cada residente cuando fue asignado a mitad del turno
+            // Mapa de timestamps de asignación de cada residente cuando fue asignado a mitad del turno
             $fechasAsignacionResidentes = [];
             foreach ($asigResidentes as $asig) {
-                if (!empty($asig->fecha_hora)) {
+                if (! empty($asig->fecha_hora)) {
                     $fechaHoraAsig = Carbon::parse($asig->fecha_hora);
                     if ($fechaHoraAsig->gt($inicioTurno)) {
                         $esReasignacion = AsignacionResidenteJornada::query()
@@ -130,25 +133,25 @@ class MiTurnoService
             $progresoTurno = $this->calcularProgresoTurno($agendaUnificada);
 
             // Estado General del turno
-            $estadoGeneral = $this->calcularEstadoGeneral($alertas, (int)($progresoTurno['retrasadas'] ?? 0), $alertaCritica, $momentoActual);
+            $estadoGeneral = $this->calcularEstadoGeneral($alertas, (int) ($progresoTurno['retrasadas'] ?? 0), $alertaCritica, $momentoActual);
 
             // Distribución de cuidados
             $distribucionCuidados = $this->resolverDistribucionCuidados($codResidentes, $agendaUnificada);
 
             // Formateo de tarjetas de residentes asignados con su información clínica real
             $nombreTurno = $turno?->nombre ? (str_starts_with(strtolower(trim($turno->nombre)), 'turno') ? trim($turno->nombre) : "Turno {$turno->nombre}") : "Jornada {$jornada->cod_jornada}";
-            $responsablePropio = $personal ? "A cargo de: Enf. {$primerNombre} " . ($personal->apellido_paterno ?? '') : "A cargo de: {$nombreCompleto}";
+            $responsablePropio = $personal ? "A cargo de: Enf. {$primerNombre} ".($personal->apellido_paterno ?? '') : "A cargo de: {$nombreCompleto}";
             $residentesCards = $this->formatearResidentesCards($asigResidentes, $alertas, trim($responsablePropio), $nombreTurno);
 
             // Formateo de stream de alertas recientes del turno
             $alertasRecientes = $this->formatearAlertasRecientes($alertas);
 
-            $totalDist = (int)(collect($distribucionCuidados)->sum('total'));
+            $totalDist = (int) (collect($distribucionCuidados)->sum('total'));
             $distribucionMap = [
-                'medicacion' => $totalDist > 0 ? (int)(collect($distribucionCuidados)->firstWhere('label', 'Medicación')['total'] ?? (collect($distribucionCuidados)->first(fn($i) => stripos($i['label'] ?? '', 'medic') !== false)['total'] ?? 0)) : null,
-                'signos' => $totalDist > 0 ? (int)(collect($distribucionCuidados)->first(fn($i) => stripos($i['label'] ?? '', 'signo') !== false)['total'] ?? 0) : null,
-                'higiene' => $totalDist > 0 ? (int)(collect($distribucionCuidados)->first(fn($i) => stripos($i['label'] ?? '', 'higien') !== false)['total'] ?? 0) : null,
-                'movilizacion' => $totalDist > 0 ? (int)(collect($distribucionCuidados)->first(fn($i) => stripos($i['label'] ?? '', 'movil') !== false)['total'] ?? 0) : null,
+                'medicacion' => $totalDist > 0 ? (int) (collect($distribucionCuidados)->firstWhere('label', 'Medicación')['total'] ?? (collect($distribucionCuidados)->first(fn ($i) => stripos($i['label'] ?? '', 'medic') !== false)['total'] ?? 0)) : null,
+                'signos' => $totalDist > 0 ? (int) (collect($distribucionCuidados)->first(fn ($i) => stripos($i['label'] ?? '', 'signo') !== false)['total'] ?? 0) : null,
+                'higiene' => $totalDist > 0 ? (int) (collect($distribucionCuidados)->first(fn ($i) => stripos($i['label'] ?? '', 'higien') !== false)['total'] ?? 0) : null,
+                'movilizacion' => $totalDist > 0 ? (int) (collect($distribucionCuidados)->first(fn ($i) => stripos($i['label'] ?? '', 'movil') !== false)['total'] ?? 0) : null,
             ];
 
             return [
@@ -298,7 +301,9 @@ class MiTurnoService
 
         foreach ($residentesAgrupados as $codRes => $asigs) {
             $residente = $asigs->first()?->residente;
-            if (!$residente) continue;
+            if (! $residente) {
+                continue;
+            }
 
             $codResidentes[] = $residente->cod_residente;
 
@@ -312,13 +317,13 @@ class MiTurnoService
                     $esEnfermero = $usuario && method_exists($usuario, 'hasRole') && $usuario->hasRole('ENFERMEROS');
 
                     if ($esEnfermero) {
-                        $nom = trim($asig->personal->nombres . ' ' . $asig->personal->apellido_paterno);
+                        $nom = trim($asig->personal->nombres.' '.$asig->personal->apellido_paterno);
                         $responsables[$asig->personal->cod_personal] = "Enf. {$nom}";
                     }
                 }
             }
-            $responsableTexto = !empty($responsables)
-                ? 'A cargo de: ' . implode(', ', array_values($responsables))
+            $responsableTexto = ! empty($responsables)
+                ? 'A cargo de: '.implode(', ', array_values($responsables))
                 : 'Sin enfermero asignado';
 
             $rawTurnoNombre = $asigs->first()?->jornada?->turno?->nombre;
@@ -326,8 +331,8 @@ class MiTurnoService
                 ? (str_starts_with(strtolower(trim($rawTurnoNombre)), 'turno') ? trim($rawTurnoNombre) : "Turno {$rawTurnoNombre}")
                 : 'Turno activo';
 
-            $supervisionRaw = strtoupper(trim((string)($asigs->pluck('nivel_supervision')->filter()->first() ?? '')));
-            $supervisionLabel = match($supervisionRaw) {
+            $supervisionRaw = strtoupper(trim((string) ($asigs->pluck('nivel_supervision')->filter()->first() ?? '')));
+            $supervisionLabel = match ($supervisionRaw) {
                 'BAJO', 'BAJA' => 'Supervisión baja',
                 'ALTO', 'ALTA', 'DIRECTA' => 'Supervisión alta',
                 'ESTANDAR', 'ESTÁNDAR', 'MEDIA' => 'Supervisión media',
@@ -335,12 +340,12 @@ class MiTurnoService
             };
 
             $edadStr = $residente->fecha_nacimiento
-                ? Carbon::parse($residente->fecha_nacimiento)->age . ' años'
+                ? Carbon::parse($residente->fecha_nacimiento)->age.' años'
                 : 'Edad no registrada';
 
             $movilidadLabel = 'Movilidad no registrada';
             $plan = $residente->planesCuidado?->first();
-            if ($plan && !empty($plan->objetivo_general)) {
+            if ($plan && ! empty($plan->objetivo_general)) {
                 $obj = strtolower($plan->objetivo_general);
                 if (str_contains($obj, 'independien') || str_contains($obj, 'autonom')) {
                     $movilidadLabel = 'Autónomo';
@@ -357,9 +362,9 @@ class MiTurnoService
                 'iniciales' => $this->extraerIniciales($residente->nombre_completo),
                 'foto' => $residente->foto,
                 'estado_seguimiento' => 'SIN_ALERTAS',
-                'estado_institucional' => strtoupper(trim((string)($residente->estado ?: 'ACTIVO'))),
+                'estado_institucional' => strtoupper(trim((string) ($residente->estado ?: 'ACTIVO'))),
                 'estado_label' => 'SIN_ALERTAS',
-                'estado_operacional' => strtoupper(trim((string)($residente->estado ?: 'ACTIVO'))),
+                'estado_operacional' => strtoupper(trim((string) ($residente->estado ?: 'ACTIVO'))),
                 'supervision_label' => $supervisionLabel,
                 'movilidad_label' => $movilidadLabel,
                 'alertas_count' => 0,
@@ -377,15 +382,16 @@ class MiTurnoService
         $alertas = $this->resolverAlertasTurno($codResidentes, $inicioTurno, $finTurno);
         $kpisData = $this->calcularKpisAlertas($alertas);
         $alertaCritica = $alertas->first(function ($a) {
-            $p = strtoupper(trim((string)$a->prioridad));
-            $est = strtoupper(trim((string)$a->estado));
+            $p = strtoupper(trim((string) $a->prioridad));
+            $est = strtoupper(trim((string) $a->estado));
+
             return in_array($p, self::PRIORIDADES_CRITICAS, true) && in_array($est, self::ESTADOS_ALERTA_ACTIVOS, true);
         });
 
         foreach ($residentesCards as &$card) {
             $alertasRes = $alertas->where('cod_residente', $card['cod_residente']);
-            $card['alertas_count'] = $alertasRes->filter(fn($a) => in_array(strtoupper(trim((string)$a->estado)), self::ESTADOS_ALERTA_ACTIVOS, true))->count();
-            $tieneCritica = $alertasRes->contains(fn($a) => in_array(strtoupper(trim((string)$a->prioridad)), self::PRIORIDADES_CRITICAS, true) && in_array(strtoupper(trim((string)$a->estado)), self::ESTADOS_ALERTA_ACTIVOS, true));
+            $card['alertas_count'] = $alertasRes->filter(fn ($a) => in_array(strtoupper(trim((string) $a->estado)), self::ESTADOS_ALERTA_ACTIVOS, true))->count();
+            $tieneCritica = $alertasRes->contains(fn ($a) => in_array(strtoupper(trim((string) $a->prioridad)), self::PRIORIDADES_CRITICAS, true) && in_array(strtoupper(trim((string) $a->estado)), self::ESTADOS_ALERTA_ACTIVOS, true));
             $estadoSeg = $tieneCritica ? 'CRÍTICO' : ($card['alertas_count'] > 0 ? 'VIGILANCIA' : 'SIN_ALERTAS');
             $card['estado_seguimiento'] = $estadoSeg;
             $card['estado_label'] = $estadoSeg;
@@ -394,15 +400,15 @@ class MiTurnoService
 
         $agendaUnificada = $this->resolverAgendaProgramada($codResidentes, $jornadaPrincipal, $inicioTurno, $finTurno, $momentoActual);
         $progresoTurno = $this->calcularProgresoTurno($agendaUnificada);
-        $estadoGeneral = $this->calcularEstadoGeneral($alertas, (int)($progresoTurno['retrasadas'] ?? 0), $alertaCritica, $momentoActual);
+        $estadoGeneral = $this->calcularEstadoGeneral($alertas, (int) ($progresoTurno['retrasadas'] ?? 0), $alertaCritica, $momentoActual);
 
         $distribucionCuidados = $this->resolverDistribucionCuidados($codResidentes, $agendaUnificada);
-        $totalDist = (int)(collect($distribucionCuidados)->sum('total'));
+        $totalDist = (int) (collect($distribucionCuidados)->sum('total'));
         $distribucionMap = [
-            'medicacion' => $totalDist > 0 ? (int)(collect($distribucionCuidados)->firstWhere('label', 'Medicación')['total'] ?? (collect($distribucionCuidados)->first(fn($i) => stripos($i['label'] ?? '', 'medic') !== false)['total'] ?? 0)) : null,
-            'signos' => $totalDist > 0 ? (int)(collect($distribucionCuidados)->first(fn($i) => stripos($i['label'] ?? '', 'signo') !== false)['total'] ?? 0) : null,
-            'higiene' => $totalDist > 0 ? (int)(collect($distribucionCuidados)->first(fn($i) => stripos($i['label'] ?? '', 'higien') !== false)['total'] ?? 0) : null,
-            'movilizacion' => $totalDist > 0 ? (int)(collect($distribucionCuidados)->first(fn($i) => stripos($i['label'] ?? '', 'movil') !== false)['total'] ?? 0) : null,
+            'medicacion' => $totalDist > 0 ? (int) (collect($distribucionCuidados)->firstWhere('label', 'Medicación')['total'] ?? (collect($distribucionCuidados)->first(fn ($i) => stripos($i['label'] ?? '', 'medic') !== false)['total'] ?? 0)) : null,
+            'signos' => $totalDist > 0 ? (int) (collect($distribucionCuidados)->first(fn ($i) => stripos($i['label'] ?? '', 'signo') !== false)['total'] ?? 0) : null,
+            'higiene' => $totalDist > 0 ? (int) (collect($distribucionCuidados)->first(fn ($i) => stripos($i['label'] ?? '', 'higien') !== false)['total'] ?? 0) : null,
+            'movilizacion' => $totalDist > 0 ? (int) (collect($distribucionCuidados)->first(fn ($i) => stripos($i['label'] ?? '', 'movil') !== false)['total'] ?? 0) : null,
         ];
 
         $alertasRecientes = $this->formatearAlertasRecientes($alertas);
@@ -463,13 +469,13 @@ class MiTurnoService
         ];
     }
 
-        public function validarSeguridadUsuario(User $user): void
+    public function validarSeguridadUsuario(User $user): void
     {
         if ($user->estado !== 'ACTIVO') {
             throw new HttpException(403, 'Usuario inactivo en el sistema.');
         }
 
-        if (!$user->hasRole('ENFERMEROS') && !$user->hasRole('SUPERADMINISTRADOR')) {
+        if (! $user->hasRole('ENFERMEROS') && ! $user->hasRole('SUPERADMINISTRADOR')) {
             throw new HttpException(403, 'Acceso denegado: El módulo de Mi turno requiere rol asistencial.');
         }
     }
@@ -490,12 +496,12 @@ class MiTurnoService
             ->whereIn('estado', ['ACTIVO', 'ACTIVA'])
             ->first();
 
-        if (!$personal) {
+        if (! $personal) {
             throw new HttpException(403, 'Personal no registrado.');
         }
 
         $jornada = $this->resolverJornadaActual($personal);
-        if (!$jornada) {
+        if (! $jornada) {
             throw new HttpException(403, 'Acceso denegado: No tienes una jornada activa en este momento.');
         }
 
@@ -506,7 +512,7 @@ class MiTurnoService
             ->whereIn('estado', ['ACTIVO', 'ACTIVA', 'ASIGNADO'])
             ->exists();
 
-        if (!$asignado) {
+        if (! $asignado) {
             throw new HttpException(403, 'Acceso denegado: El residente no está asignado a tu guardia actual.');
         }
 
@@ -541,10 +547,11 @@ class MiTurnoService
             ->with(['turno', 'asignacionesPersonal.personal.usuario'])
             ->get()
             ->filter(function (Jornada $jornada) use ($ahora) {
-                if (!$jornada->turno || empty($jornada->turno->hora_inicio)) {
+                if (! $jornada->turno || empty($jornada->turno->hora_inicio)) {
                     return false;
                 }
                 [$inicioTurno, $finTurno] = $this->calcularVentanaTurno($jornada);
+
                 return $ahora->gte($inicioTurno) && $ahora->lte($finTurno);
             })
             ->values();
@@ -552,7 +559,7 @@ class MiTurnoService
 
     public function resolverJornadaActual(?Personal $personal, ?Carbon $momentoActual = null): ?Jornada
     {
-        if (!$personal) {
+        if (! $personal) {
             return null;
         }
 
@@ -567,18 +574,18 @@ class MiTurnoService
 
         foreach ($asignaciones as $asig) {
             $jornada = $asig->jornada;
-            if (!$jornada) {
+            if (! $jornada) {
                 continue;
             }
 
             // 2. Estado real vigente de la jornada
-            $estadoJornada = strtoupper(trim((string)$jornada->estado));
-            if (!in_array($estadoJornada, ['ACTIVA', 'ABIERTA', 'EN_CURSO', 'ACTIVO'], true)) {
+            $estadoJornada = strtoupper(trim((string) $jornada->estado));
+            if (! in_array($estadoJornada, ['ACTIVA', 'ABIERTA', 'EN_CURSO', 'ACTIVO'], true)) {
                 continue;
             }
 
             $turno = $jornada->turno;
-            if (!$turno || empty($turno->hora_inicio)) {
+            if (! $turno || empty($turno->hora_inicio)) {
                 continue;
             }
 
@@ -603,8 +610,8 @@ class MiTurnoService
     {
         $turno = $jornada->turno;
         $fechaJornadaStr = Carbon::parse($jornada->fecha_jornada)->format('Y-m-d');
-        $horaInicio = trim((string)($turno?->hora_inicio ?? '07:00:00'));
-        $horaCierre = trim((string)($turno?->hora_cierre ?: ($turno?->hora_fin ?? '15:00:00')));
+        $horaInicio = trim((string) ($turno?->hora_inicio ?? '07:00:00'));
+        $horaCierre = trim((string) ($turno?->hora_cierre ?: ($turno?->hora_fin ?? '15:00:00')));
 
         $esNocturno = $horaCierre < $horaInicio;
 
@@ -621,7 +628,9 @@ class MiTurnoService
      */
     private function resolverAreaPersonal(?Personal $personal, ?Jornada $jornada): ?Area
     {
-        if (!$personal || !$jornada) return null;
+        if (! $personal || ! $jornada) {
+            return null;
+        }
 
         $asig = AsignacionPersonal::query()
             ->where('cod_personal', $personal->cod_personal)
@@ -638,7 +647,7 @@ class MiTurnoService
      */
     private function resolverAsignacionesResidentes(?Personal $personal, ?Jornada $jornada, bool $esSuperAdmin): Collection
     {
-        if (!$personal || !$jornada) {
+        if (! $personal || ! $jornada) {
             return collect();
         }
 
@@ -674,18 +683,18 @@ class MiTurnoService
                 // 1. Alertas actualmente activas (estaban activas al inicio o creadas durante el turno)
                 $q->whereIn('estado', self::ESTADOS_ALERTA_ACTIVOS)
                   // 2. Alertas creadas durante este turno
-                  ->orWhereBetween('fecha_hora', [$inicioTurno, $finTurno])
+                    ->orWhereBetween('fecha_hora', [$inicioTurno, $finTurno])
                   // 3. Alertas cerradas pero cuyo cierre ocurrió durante este turno
-                  ->orWhere(function ($sq) use ($inicioTurno, $finTurno) {
-                      $sq->whereIn('estado', self::ESTADOS_ALERTA_RESUELTOS)
-                         ->whereExists(function ($eq) use ($inicioTurno, $finTurno) {
-                             $eq->selectRaw('1')
-                                ->from('eventos_alerta')
-                                ->whereColumn('eventos_alerta.cod_alerta', 'alertas.cod_alerta')
-                                ->whereIn('tipo_evento', ['CIERRE', 'RESOLUCION', 'ATENCION'])
-                                ->whereBetween('fecha_hora', [$inicioTurno, $finTurno]);
-                         });
-                  });
+                    ->orWhere(function ($sq) use ($inicioTurno, $finTurno) {
+                        $sq->whereIn('estado', self::ESTADOS_ALERTA_RESUELTOS)
+                            ->whereExists(function ($eq) use ($inicioTurno, $finTurno) {
+                                $eq->selectRaw('1')
+                                    ->from('eventos_alerta')
+                                    ->whereColumn('eventos_alerta.cod_alerta', 'alertas.cod_alerta')
+                                    ->whereIn('tipo_evento', ['CIERRE', 'RESOLUCION', 'ATENCION'])
+                                    ->whereBetween('fecha_hora', [$inicioTurno, $finTurno]);
+                            });
+                    });
             })
             ->with(['residente.ocupacionesCama.cama.habitacion'])
             ->orderByDesc('fecha_hora')
@@ -725,10 +734,10 @@ class MiTurnoService
             ->whereIn('estado', ['ACTIVA', 'ACTIVO', 'VIGENTE'])
             ->where(function ($q) use ($inicioTurno) {
                 $q->whereNull('fecha_hora_suspension')
-                  ->orWhere('fecha_hora_suspension', '>', $inicioTurno);
+                    ->orWhere('fecha_hora_suspension', '>', $inicioTurno);
             })
             ->with([
-                'horarios' => fn($q) => $q->whereIn('estado', ['ACTIVO', 'ACTIVA']),
+                'horarios' => fn ($q) => $q->whereIn('estado', ['ACTIVO', 'ACTIVA']),
                 'medicamento',
                 'residente.ocupacionesCama.cama.habitacion',
             ])
@@ -739,13 +748,13 @@ class MiTurnoService
             ->whereIn('cod_residente', $codResidentes)
             ->where(function ($q) use ($jornada, $inicioTurno, $finTurno) {
                 $q->where('cod_jornada', $jornada->cod_jornada)
-                  ->orWhereBetween('fecha_hora_programada', [$inicioTurno, $finTurno]);
+                    ->orWhereBetween('fecha_hora_programada', [$inicioTurno, $finTurno]);
             })
             ->get();
 
         foreach ($prescripciones as $prescripcion) {
             // Regla: segun_necesidad = true no crea pendiente automático
-            if (!empty($prescripcion->segun_necesidad)) {
+            if (! empty($prescripcion->segun_necesidad)) {
                 continue;
             }
 
@@ -755,7 +764,7 @@ class MiTurnoService
 
             foreach ($prescripcion->horarios as $horario) {
                 // Regla: horario inactivo no genera tarea
-                if (!in_array(strtoupper(trim((string)$horario->estado)), ['ACTIVO', 'ACTIVA'], true)) {
+                if (! in_array(strtoupper(trim((string) $horario->estado)), ['ACTIVO', 'ACTIVA'], true)) {
                     continue;
                 }
 
@@ -769,7 +778,7 @@ class MiTurnoService
                 $fechaHoraProg = $this->resolverMomentoProgramado($fechaJornadaStr, $horario->hora_programada, $inicioTurno, $finTurno);
 
                 // Si la hora programada no cae dentro de esta guardia, continuar
-                if (!$fechaHoraProg || $fechaHoraProg->lt($inicioTurno) || $fechaHoraProg->gt($finTurno)) {
+                if (! $fechaHoraProg || $fechaHoraProg->lt($inicioTurno) || $fechaHoraProg->gt($finTurno)) {
                     continue;
                 }
 
@@ -783,10 +792,10 @@ class MiTurnoService
                 }
 
                 // Regla: prescripción todavía no iniciada no genera tarea (fecha de prescripción o inicio futura)
-                $fechaPrescDate = !empty($prescripcion->fecha_hora_prescripcion)
+                $fechaPrescDate = ! empty($prescripcion->fecha_hora_prescripcion)
                     ? Carbon::parse($prescripcion->fecha_hora_prescripcion)->toDateString()
                     : null;
-                $fechaInicioDate = !empty($prescripcion->fecha_inicio)
+                $fechaInicioDate = ! empty($prescripcion->fecha_inicio)
                     ? Carbon::parse($prescripcion->fecha_inicio)->toDateString()
                     : null;
 
@@ -798,12 +807,12 @@ class MiTurnoService
                 }
 
                 // Regla: prescripción suspendida antes del horario no genera tarea
-                if (!empty($prescripcion->fecha_hora_suspension) && Carbon::parse($prescripcion->fecha_hora_suspension)->lte($fechaHoraProg)) {
+                if (! empty($prescripcion->fecha_hora_suspension) && Carbon::parse($prescripcion->fecha_hora_suspension)->lte($fechaHoraProg)) {
                     continue;
                 }
 
                 // Regla: dias_semana incorrecto no genera tarea
-                if (!empty($horario->dias_semana) && !$this->correspondeDiaSemana($horario->dias_semana, $fechaHoraProg)) {
+                if (! empty($horario->dias_semana) && ! $this->correspondeDiaSemana($horario->dias_semana, $fechaHoraProg)) {
                     continue;
                 }
 
@@ -818,12 +827,13 @@ class MiTurnoService
                     if ($adm->cod_prescripcion !== $prescripcion->cod_prescripcion) {
                         return false;
                     }
-                    if (!empty($adm->cod_horario_prescripcion)) {
+                    if (! empty($adm->cod_horario_prescripcion)) {
                         return $adm->cod_horario_prescripcion === $horario->cod_horario_prescripcion;
                     }
                     if ($adm->fecha_hora_programada) {
                         return abs(Carbon::parse($adm->fecha_hora_programada)->diffInMinutes($fechaHoraProg)) <= 30;
                     }
+
                     return false;
                 });
 
@@ -832,10 +842,10 @@ class MiTurnoService
                 $detalleOmitida = null;
 
                 if ($adminReal) {
-                    $resAdm = strtoupper(trim((string)$adminReal->resultado));
-                    $estAdm = strtoupper(trim((string)$adminReal->estado));
+                    $resAdm = strtoupper(trim((string) $adminReal->resultado));
+                    $estAdm = strtoupper(trim((string) $adminReal->estado));
 
-                    if (in_array($resAdm, ['OMITIDA', 'OMITIDO', 'RECHAZADA', 'RECHAZADO'], true) || $estAdm === 'OMITIDA' || !empty($adminReal->motivo_omision)) {
+                    if (in_array($resAdm, ['OMITIDA', 'OMITIDO', 'RECHAZADA', 'RECHAZADO'], true) || $estAdm === 'OMITIDA' || ! empty($adminReal->motivo_omision)) {
                         $estado = 'REALIZADO';
                         $detalleOmitida = $adminReal->motivo_omision ?: 'Omitida justificadamente';
                     } elseif (in_array($resAdm, ['ADMINISTRADA', 'ADMINISTRADO', 'REALIZADA'], true) || $estAdm === 'REALIZADA' || $estAdm === 'REGISTRADA') {
@@ -851,7 +861,7 @@ class MiTurnoService
                     }
                 }
 
-                $claveMed = "MED_{$prescripcion->cod_prescripcion}_{$horario->cod_horario_prescripcion}_" . $fechaHoraProg->format('YmdHi');
+                $claveMed = "MED_{$prescripcion->cod_prescripcion}_{$horario->cod_horario_prescripcion}_".$fechaHoraProg->format('YmdHi');
                 $agenda[$claveMed] = [
                     'hora' => $horaStr,
                     'momento' => $fechaHoraProg->timestamp,
@@ -876,13 +886,13 @@ class MiTurnoService
             ->with([
                 'intervenciones' => function ($q) use ($jornada) {
                     $q->whereIn('estado', ['ACTIVO', 'ACTIVA', 'VIGENTE'])
-                      ->with(['programaciones' => function ($pq) use ($jornada) {
-                          $pq->whereIn('estado', ['ACTIVO', 'ACTIVA', 'VIGENTE'])
-                             ->where(function ($sq) use ($jornada) {
-                                 $sq->whereNull('cod_turno')
-                                    ->orWhere('cod_turno', $jornada->cod_turno);
-                             });
-                      }]);
+                        ->with(['programaciones' => function ($pq) use ($jornada) {
+                            $pq->whereIn('estado', ['ACTIVO', 'ACTIVA', 'VIGENTE'])
+                                ->where(function ($sq) use ($jornada) {
+                                    $sq->whereNull('cod_turno')
+                                        ->orWhere('cod_turno', $jornada->cod_turno);
+                                });
+                        }]);
                 },
                 'residente.ocupacionesCama.cama.habitacion',
             ])
@@ -893,22 +903,22 @@ class MiTurnoService
             ->whereIn('cod_residente', $codResidentes)
             ->where(function ($q) use ($jornada, $inicioTurno, $finTurno) {
                 $q->where('cod_jornada', $jornada->cod_jornada)
-                  ->orWhereBetween('fecha_hora_programada', [$inicioTurno, $finTurno])
-                  ->orWhereBetween('fecha_hora_ejecucion', [$inicioTurno, $finTurno]);
+                    ->orWhereBetween('fecha_hora_programada', [$inicioTurno, $finTurno])
+                    ->orWhereBetween('fecha_hora_ejecucion', [$inicioTurno, $finTurno]);
             })
             ->get();
 
         foreach ($planes as $plan) {
             // Regla: Plan vigente (y fecha de cierre si existe posterior)
-            if (!in_array(strtoupper(trim((string)$plan->estado)), ['ACTIVO', 'ACTIVA', 'VIGENTE'], true)) {
+            if (! in_array(strtoupper(trim((string) $plan->estado)), ['ACTIVO', 'ACTIVA', 'VIGENTE'], true)) {
                 continue;
             }
-            if (!empty($plan->fecha_hora_cierre) && Carbon::parse($plan->fecha_hora_cierre)->lt($inicioTurno)) {
+            if (! empty($plan->fecha_hora_cierre) && Carbon::parse($plan->fecha_hora_cierre)->lt($inicioTurno)) {
                 continue;
             }
 
-            $tipoPlan = strtoupper(trim((string)$plan->tipo_plan ?: 'CUIDADO'));
-            $icono = match(true) {
+            $tipoPlan = strtoupper(trim((string) $plan->tipo_plan ?: 'CUIDADO'));
+            $icono = match (true) {
                 str_contains($tipoPlan, 'SIGNO') || str_contains($tipoPlan, 'VITAL') => 'ph-heartbeat',
                 str_contains($tipoPlan, 'HIGIENE') => 'ph-drop',
                 str_contains($tipoPlan, 'MOVIL') => 'ph-arrows-clockwise',
@@ -917,13 +927,13 @@ class MiTurnoService
 
             foreach ($plan->intervenciones as $intervencion) {
                 // Regla: Intervención vigente
-                if (!in_array(strtoupper(trim((string)$intervencion->estado)), ['ACTIVO', 'ACTIVA', 'VIGENTE'], true)) {
+                if (! in_array(strtoupper(trim((string) $intervencion->estado)), ['ACTIVO', 'ACTIVA', 'VIGENTE'], true)) {
                     continue;
                 }
 
                 foreach ($intervencion->programaciones as $programacion) {
                     // Regla: Programación vigente
-                    if (!in_array(strtoupper(trim((string)$programacion->estado)), ['ACTIVO', 'ACTIVA', 'VIGENTE'], true)) {
+                    if (! in_array(strtoupper(trim((string) $programacion->estado)), ['ACTIVO', 'ACTIVA', 'VIGENTE'], true)) {
                         continue;
                     }
 
@@ -933,14 +943,14 @@ class MiTurnoService
                     }
 
                     // Regla: Corresponde a cod_turno cuando esté definido
-                    if (!empty($programacion->cod_turno) && $programacion->cod_turno !== $jornada->cod_turno) {
+                    if (! empty($programacion->cod_turno) && $programacion->cod_turno !== $jornada->cod_turno) {
                         continue;
                     }
 
                     $horaStr = Carbon::parse($programacion->hora_programada)->format('H:i');
                     $fechaHoraProg = $this->resolverMomentoProgramado($fechaJornadaStr, $programacion->hora_programada, $inicioTurno, $finTurno);
 
-                    if (!$fechaHoraProg || $fechaHoraProg->lt($inicioTurno) || $fechaHoraProg->gt($finTurno)) {
+                    if (! $fechaHoraProg || $fechaHoraProg->lt($inicioTurno) || $fechaHoraProg->gt($finTurno)) {
                         continue;
                     }
 
@@ -955,17 +965,17 @@ class MiTurnoService
                     $fechaProgDate = $fechaHoraProg->toDateString();
 
                     // Regla: fecha >= fecha_activacion
-                    if (!empty($programacion->fecha_activacion) && $fechaProgDate < Carbon::parse($programacion->fecha_activacion)->toDateString()) {
+                    if (! empty($programacion->fecha_activacion) && $fechaProgDate < Carbon::parse($programacion->fecha_activacion)->toDateString()) {
                         continue;
                     }
 
                     // Regla: fecha <= fecha_desactivacion cuando exista
-                    if (!empty($programacion->fecha_desactivacion) && $fechaProgDate > Carbon::parse($programacion->fecha_desactivacion)->toDateString()) {
+                    if (! empty($programacion->fecha_desactivacion) && $fechaProgDate > Carbon::parse($programacion->fecha_desactivacion)->toDateString()) {
                         continue;
                     }
 
                     // Regla: Corresponde a dias_semana
-                    if (!empty($programacion->dias_semana) && !$this->correspondeDiaSemana($programacion->dias_semana, $fechaHoraProg)) {
+                    if (! empty($programacion->dias_semana) && ! $this->correspondeDiaSemana($programacion->dias_semana, $fechaHoraProg)) {
                         continue;
                     }
 
@@ -983,6 +993,7 @@ class MiTurnoService
                         if ($ej->fecha_hora_programada) {
                             return abs(Carbon::parse($ej->fecha_hora_programada)->diffInMinutes($fechaHoraProg)) <= 30;
                         }
+
                         return false;
                     });
 
@@ -990,10 +1001,10 @@ class MiTurnoService
                     $detalleOmitida = null;
 
                     if ($ejecReal) {
-                        $resEj = strtoupper(trim((string)$ejecReal->resultado));
-                        $estEj = strtoupper(trim((string)$ejecReal->estado));
+                        $resEj = strtoupper(trim((string) $ejecReal->resultado));
+                        $estEj = strtoupper(trim((string) $ejecReal->estado));
 
-                        if (in_array($resEj, ['OMITIDA', 'NO_REALIZADA'], true) || $estEj === 'OMITIDA' || !empty($ejecReal->motivo_omision)) {
+                        if (in_array($resEj, ['OMITIDA', 'NO_REALIZADA'], true) || $estEj === 'OMITIDA' || ! empty($ejecReal->motivo_omision)) {
                             $estado = 'REALIZADO';
                             $detalleOmitida = $ejecReal->motivo_omision ?: 'Cuidado omitido justificadamente';
                         } elseif (in_array($resEj, ['REALIZADA', 'COMPLETADA'], true) || $estEj === 'REALIZADA' || $estEj === 'FINALIZADA') {
@@ -1010,7 +1021,7 @@ class MiTurnoService
                     }
 
                     $codProgId = $programacion->cod_programacion ?: ($programacion->cod_programacion_cuidado ?: 'PROG');
-                    $claveCuidado = "CUID_{$codProgId}_{$plan->cod_residente}_" . $fechaHoraProg->format('YmdHi');
+                    $claveCuidado = "CUID_{$codProgId}_{$plan->cod_residente}_".$fechaHoraProg->format('YmdHi');
                     if (isset($agenda[$claveCuidado])) {
                         continue;
                     }
@@ -1030,7 +1041,7 @@ class MiTurnoService
             }
         }
 
-                // C. EJECUCIONES DIRECTAS O HEREDADAS NO VINCULADAS A PROGRAMACIONES DE PLAN
+        // C. EJECUCIONES DIRECTAS O HEREDADAS NO VINCULADAS A PROGRAMACIONES DE PLAN
         foreach ($ejecuciones as $ejec) {
             $nombreAccion = $ejec->intervencion?->nombre ?: ($ejec->titulo ?? 'Cuidado Asistencial');
             $claveEjec = "EJEC_{$ejec->cod_ejecucion}";
@@ -1047,7 +1058,7 @@ class MiTurnoService
             }
 
             $progTime = $ejec->fecha_hora_programada ? Carbon::parse($ejec->fecha_hora_programada) : ($ejec->fecha_hora_ejecucion ? Carbon::parse($ejec->fecha_hora_ejecucion) : $inicioTurno);
-            $estado = in_array(strtoupper((string)$ejec->estado), ['REALIZADA', 'COMPLETADA', 'FINALIZADA']) ? 'REALIZADO' : 'PENDIENTE';
+            $estado = in_array(strtoupper((string) $ejec->estado), ['REALIZADA', 'COMPLETADA', 'FINALIZADA']) ? 'REALIZADO' : 'PENDIENTE';
             if ($estado === 'PENDIENTE' && $momentoActual->gt($progTime->copy()->addMinutes(60))) {
                 $estado = 'RETRASADO';
             }
@@ -1080,6 +1091,7 @@ class MiTurnoService
             if ($cmpAccion !== 0) {
                 return $cmpAccion;
             }
+
             return strcmp($a['residente'], $b['residente']);
         });
 
@@ -1116,20 +1128,21 @@ class MiTurnoService
         $total = $alertas->count();
 
         $criticasAltas = $alertas->filter(function ($a) {
-            $p = strtoupper(trim((string)$a->prioridad));
+            $p = strtoupper(trim((string) $a->prioridad));
+
             return in_array($p, array_merge(self::PRIORIDADES_CRITICAS, self::PRIORIDADES_ALTAS), true);
         })->count();
 
         $porAtender = $alertas->filter(function ($a) {
-            return strtoupper(trim((string)$a->estado)) === 'ABIERTA';
+            return strtoupper(trim((string) $a->estado)) === 'ABIERTA';
         })->count();
 
         $enAtencion = $alertas->filter(function ($a) {
-            return strtoupper(trim((string)$a->estado)) === 'EN_ATENCION';
+            return strtoupper(trim((string) $a->estado)) === 'EN_ATENCION';
         })->count();
 
         $resueltas = $alertas->filter(function ($a) {
-            return in_array(strtoupper(trim((string)$a->estado)), self::ESTADOS_ALERTA_RESUELTOS, true);
+            return in_array(strtoupper(trim((string) $a->estado)), self::ESTADOS_ALERTA_RESUELTOS, true);
         })->count();
 
         return [
@@ -1176,6 +1189,7 @@ class MiTurnoService
         if ($alertaCritica) {
             $nombreResidente = $alertaCritica->residente?->nombre_completo ?? 'Residente asignado';
             $tituloAlerta = $alertaCritica->titulo ?: ($alertaCritica->descripcion ?: 'Alerta crítica activa');
+
             return [
                 'badge' => 'CRÍTICO',
                 'titulo' => 'Atención crítica requerida',
@@ -1187,8 +1201,9 @@ class MiTurnoService
 
         // 2. Condición VIGILANCIA
         $alertasRelevantesActivas = $alertas->filter(function ($a) {
-            $est = strtoupper(trim((string)$a->estado));
-            $p = strtoupper(trim((string)$a->prioridad));
+            $est = strtoupper(trim((string) $a->estado));
+            $p = strtoupper(trim((string) $a->prioridad));
+
             return in_array($est, self::ESTADOS_ALERTA_ACTIVOS, true)
                 && in_array($p, self::PRIORIDADES_RELEVANTES, true);
         })->count();
@@ -1271,7 +1286,7 @@ class MiTurnoService
         }
 
         // Conteo de medicación programada en la agenda
-        $totalMedicacion = count(array_filter($agenda, fn($i) => $i['tipo'] === 'MEDICACION'));
+        $totalMedicacion = count(array_filter($agenda, fn ($i) => $i['tipo'] === 'MEDICACION'));
 
         // Conteo agrupado por planes_cuidado.tipo_plan
         $conteoPlanes = PlanCuidado::query()
@@ -1287,7 +1302,7 @@ class MiTurnoService
         ];
 
         foreach ($conteoPlanes as $tipo => $total) {
-            $nombreEtiqueta = ucfirst(strtolower(trim((string)$tipo)));
+            $nombreEtiqueta = ucfirst(strtolower(trim((string) $tipo)));
             $distribucion[] = [
                 'label' => $nombreEtiqueta ?: 'Cuidado general',
                 'total' => (int) $total,
@@ -1306,20 +1321,22 @@ class MiTurnoService
 
         foreach ($asigResidentes as $asig) {
             $residente = $asig->residente;
-            if (!$residente) continue;
+            if (! $residente) {
+                continue;
+            }
 
             $edadStr = $residente->fecha_nacimiento
-                ? Carbon::parse($residente->fecha_nacimiento)->age . ' años'
+                ? Carbon::parse($residente->fecha_nacimiento)->age.' años'
                 : 'Edad no registrada';
 
             $alertasRes = $alertas->where('cod_residente', $residente->cod_residente);
             $alertasCount = $alertasRes->filter(function ($a) {
-                return in_array(strtoupper(trim((string)$a->estado)), self::ESTADOS_ALERTA_ACTIVOS, true);
+                return in_array(strtoupper(trim((string) $a->estado)), self::ESTADOS_ALERTA_ACTIVOS, true);
             })->count();
 
             // Supervisión real desde la asignación de jornada
-            $supervisionRaw = strtoupper(trim((string)($asig->nivel_supervision ?? '')));
-            $supervisionLabel = match($supervisionRaw) {
+            $supervisionRaw = strtoupper(trim((string) ($asig->nivel_supervision ?? '')));
+            $supervisionLabel = match ($supervisionRaw) {
                 'BAJO', 'BAJA' => 'Supervisión baja',
                 'ALTO', 'ALTA', 'DIRECTA' => 'Supervisión alta',
                 'ESTANDAR', 'ESTÁNDAR', 'MEDIA' => 'Supervisión media',
@@ -1329,7 +1346,7 @@ class MiTurnoService
             // Movilidad real desde plan de cuidado o diagnóstico
             $movilidadLabel = 'Movilidad no registrada';
             $plan = $residente->planesCuidado?->first();
-            if ($plan && !empty($plan->objetivo_general)) {
+            if ($plan && ! empty($plan->objetivo_general)) {
                 $obj = strtolower($plan->objetivo_general);
                 if (str_contains($obj, 'independien') || str_contains($obj, 'autonom')) {
                     $movilidadLabel = 'Autónomo';
@@ -1340,8 +1357,9 @@ class MiTurnoService
 
             // Estado operativo derivado de alertas activas. Su ausencia no acredita estabilidad clínica.
             $tieneCritica = $alertasRes->contains(function ($a) {
-                $p = strtoupper(trim((string)$a->prioridad));
-                $est = strtoupper(trim((string)$a->estado));
+                $p = strtoupper(trim((string) $a->prioridad));
+                $est = strtoupper(trim((string) $a->estado));
+
                 return in_array($p, self::PRIORIDADES_CRITICAS, true) && in_array($est, self::ESTADOS_ALERTA_ACTIVOS, true);
             });
 
@@ -1356,9 +1374,9 @@ class MiTurnoService
                 'iniciales' => $this->extraerIniciales($residente->nombre_completo),
                 'foto' => $residente->foto,
                 'estado_seguimiento' => $estadoLabel,
-                'estado_institucional' => strtoupper(trim((string)($residente->estado ?: 'ACTIVO'))),
+                'estado_institucional' => strtoupper(trim((string) ($residente->estado ?: 'ACTIVO'))),
                 'estado_label' => $estadoLabel,
-                'estado_operacional' => strtoupper(trim((string)($residente->estado ?: 'ACTIVO'))),
+                'estado_operacional' => strtoupper(trim((string) ($residente->estado ?: 'ACTIVO'))),
                 'supervision_label' => $supervisionLabel,
                 'movilidad_label' => $movilidadLabel,
                 'alertas_count' => $alertasCount,
@@ -1377,7 +1395,7 @@ class MiTurnoService
     private function formatearAlertasRecientes(Collection $alertas): array
     {
         return $alertas->take(6)->map(function ($a) {
-            $prioridadRaw = strtoupper(trim((string)$a->prioridad));
+            $prioridadRaw = strtoupper(trim((string) $a->prioridad));
             $prioridadFormateada = in_array($prioridadRaw, self::PRIORIDADES_CRITICAS, true)
                 ? 'CRÍTICA'
                 : (in_array($prioridadRaw, self::PRIORIDADES_ALTAS, true) ? 'ALTA' : ($prioridadRaw ?: 'MEDIA'));
@@ -1388,7 +1406,7 @@ class MiTurnoService
                 'tiempo_relativo' => $a->fecha_hora ? Carbon::parse($a->fecha_hora)->diffForHumans() : 'Hace unos momentos',
                 'titulo' => $a->titulo ?: ($a->descripcion ?: 'Notificación clínica'),
                 'residente' => $a->residente?->nombre_completo ?? 'Residente asignado',
-                'estado' => strtoupper(trim((string)$a->estado)),
+                'estado' => strtoupper(trim((string) $a->estado)),
             ];
         })->values()->toArray();
     }
@@ -1398,12 +1416,12 @@ class MiTurnoService
      */
     public function formatearUbicacion(?Residente $residente): string
     {
-        if (!$residente) {
+        if (! $residente) {
             return 'Sin ubicación asignada';
         }
 
         $ocupacionesActivas = $residente->ocupacionesCama?->filter(function ($o) {
-            return in_array(strtoupper(trim((string)$o->estado)), ['ACTIVO', 'ACTIVA'], true);
+            return in_array(strtoupper(trim((string) $o->estado)), ['ACTIVO', 'ACTIVA'], true);
         });
 
         if ($ocupacionesActivas && $ocupacionesActivas->count() > 1) {
@@ -1416,6 +1434,7 @@ class MiTurnoService
             $cama = $ocupacion->cama;
             $habNumero = $cama->habitacion?->codigo ?: ($cama->habitacion?->numero ?? 'S/N');
             $camaCodigo = $cama->nombre ?: ($cama->codigo ?: ($cama->numero ?: $cama->cod_cama));
+
             return "Hab. {$habNumero} · Cama {$camaCodigo}";
         }
 
@@ -1426,9 +1445,14 @@ class MiTurnoService
     {
         $ini = '';
         foreach (explode(' ', trim($nombre)) as $p) {
-            if ($p !== '') $ini .= mb_strtoupper(mb_substr($p, 0, 1));
-            if (mb_strlen($ini) >= 2) break;
+            if ($p !== '') {
+                $ini .= mb_strtoupper(mb_substr($p, 0, 1));
+            }
+            if (mb_strlen($ini) >= 2) {
+                break;
+            }
         }
+
         return $ini ?: 'RE';
     }
 
@@ -1456,6 +1480,7 @@ class MiTurnoService
 
         $tokens = array_map(function ($t) {
             $clean = strtoupper(trim($t));
+
             return str_replace(['Á', 'É', 'Í', 'Ó', 'Ú'], ['A', 'E', 'I', 'O', 'U'], $clean);
         }, preg_split('/[,\|\s;\-\/]+/', $diasSemanaStr));
 

@@ -2,25 +2,26 @@
 
 namespace Tests\Feature;
 
+use App\Backend\Modulos\Medicacion\Servicios\AgendaMedicacionService;
+use App\Backend\Modulos\Medicacion\Servicios\RegistrarAdministracionMedicacionService;
 use App\Frontend\Livewire\Compartido\Clinica\FichaPaciente;
-use App\Models\AdultoMayor;
+use App\Frontend\Livewire\Medico\Medicacion\MedicacionAdultoModal;
 use App\Models\AdministracionMedicacion;
+use App\Models\AdultoMayor;
 use App\Models\Area;
 use App\Models\AsignacionResidenteJornada;
 use App\Models\Atencion;
 use App\Models\Jornada;
 use App\Models\Medicamento;
+use App\Models\Personal;
 use App\Models\Prescripcion;
 use App\Models\TurnoEnfermeria;
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use App\Backend\Modulos\Medicacion\Servicios\AgendaMedicacionService;
-use App\Backend\Modulos\Medicacion\Servicios\RegistrarAdministracionMedicacionService;
-use App\Frontend\Livewire\Medico\Medicacion\MedicacionAdultoModal;
-use App\Models\HorarioPrescripcion;
-use App\Models\Personal;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Livewire\Livewire;
 use Tests\TestCase;
@@ -30,14 +31,17 @@ class TabMedicacionEnfermeriaTest extends TestCase
     use RefreshDatabase;
 
     private User $enfermero;
+
     private AdultoMayor $adulto;
+
     private Jornada $jornada;
+
     private Atencion $atencion;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->seed([ RolesAndPermissionsSeeder::class]);
+        $this->seed([RolesAndPermissionsSeeder::class]);
 
         $this->enfermero = User::factory()->create([
             'estado' => 'ACTIVA',
@@ -95,7 +99,7 @@ class TabMedicacionEnfermeriaTest extends TestCase
 
     public function test_escenario_a_b_c_d_e_f_g_en_pestana_medicaciones(): void
     {
-        \Illuminate\Support\Carbon::setTestNow('2026-09-12 08:05:00');
+        Carbon::setTestNow('2026-09-12 08:05:00');
         $this->jornada->update(['fecha_jornada' => today()]);
         // A. Medicación futura (ej: 20:00)
         $medFuturo = Prescripcion::create([
@@ -267,7 +271,7 @@ class TabMedicacionEnfermeriaTest extends TestCase
     private function medicamento(string $nombre): Medicamento
     {
         return Medicamento::query()->create([
-            'cod_medicamento' => 'MED_'.strtoupper(\Illuminate\Support\Str::random(8)),
+            'cod_medicamento' => 'MED_'.strtoupper(Str::random(8)),
             'nombre_generico' => $nombre,
             'nombre_comercial' => $nombre,
             'forma_farmaceutica' => 'COMPRIMIDO',

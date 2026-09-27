@@ -3,24 +3,22 @@
 namespace Tests\Feature;
 
 use App\Frontend\Livewire\Compartido\Clinica\FichaPaciente;
-use App\Models\AdministracionMedicacion;
-use App\Models\AdultoMayor;
 use App\Models\Admision;
-use App\Models\Area;
-use App\Models\Atencion;
-use App\Models\Medicamento;
+use App\Models\AdultoMayor;
 use App\Models\Alerta;
-use App\Models\OcupacionCama;
-use App\Models\AsignacionResidenteJornada;
-use App\Models\Cama;
-use App\Models\Habitacion;
-use App\Models\Jornada;
-use App\Models\Prescripcion;
-use App\Models\PlanCuidado;
+use App\Models\Area;
 use App\Models\AsignacionPersonal;
-use App\Models\SignoVital;
+use App\Models\AsignacionResidenteJornada;
+use App\Models\Atencion;
+use App\Models\Cama;
 use App\Models\EjecucionCuidado;
+use App\Models\Habitacion;
 use App\Models\IntervencionCuidado;
+use App\Models\Jornada;
+use App\Models\Medicamento;
+use App\Models\OcupacionCama;
+use App\Models\PlanCuidado;
+use App\Models\Prescripcion;
 use App\Models\TurnoEnfermeria;
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
@@ -34,9 +32,13 @@ class FichaPacienteBotonesTest extends TestCase
     use RefreshDatabase;
 
     protected User $enfermero;
+
     protected AdultoMayor $adulto;
+
     protected TurnoEnfermeria $turno;
+
     protected Habitacion $habitacion;
+
     protected Cama $cama;
 
     protected function setUp(): void
@@ -44,7 +46,7 @@ class FichaPacienteBotonesTest extends TestCase
         parent::setUp();
         Carbon::setTestNow('2026-09-11 10:00:00');
 
-        $this->seed([ RolesAndPermissionsSeeder::class]);
+        $this->seed([RolesAndPermissionsSeeder::class]);
 
         $this->enfermero = User::factory()->create([
             'cod_usuario' => 'USU_0099',

@@ -25,7 +25,7 @@ class StoreSignosVitalesRequest extends FormRequest
         $sis = $this->input('presion_sistolica');
         $dia = $this->input('presion_diastolica');
 
-        if (($sis === null || $sis === '') && !empty($this->input('presion_arterial')) && str_contains($this->input('presion_arterial'), '/')) {
+        if (($sis === null || $sis === '') && ! empty($this->input('presion_arterial')) && str_contains($this->input('presion_arterial'), '/')) {
             $partes = explode('/', $this->input('presion_arterial'));
             if (isset($partes[0]) && is_numeric(trim($partes[0]))) {
                 $sis = (int) trim($partes[0]);
@@ -52,22 +52,22 @@ class StoreSignosVitalesRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'cod_residente'           => 'required|string|exists:residentes,cod_residente',
-            'fecha'                   => 'required|date|before_or_equal:today',
-            'hora'                    => 'required|date_format:H:i',
-            'presion_arterial'        => 'nullable|string|max:20',
-            'presion_sistolica'       => 'nullable|integer|min:' . ValidacionSignosVitalesService::PAS_MIN . '|max:' . ValidacionSignosVitalesService::PAS_MAX,
-            'presion_diastolica'      => 'nullable|integer|min:' . ValidacionSignosVitalesService::PAD_MIN . '|max:' . ValidacionSignosVitalesService::PAD_MAX,
-            'frecuencia_cardiaca'     => 'nullable|integer|min:' . ValidacionSignosVitalesService::FC_MIN . '|max:' . ValidacionSignosVitalesService::FC_MAX,
-            'frecuencia_respiratoria' => 'nullable|integer|min:' . ValidacionSignosVitalesService::FR_MIN . '|max:' . ValidacionSignosVitalesService::FR_MAX,
-            'temperatura'             => 'nullable|numeric|min:' . ValidacionSignosVitalesService::TEMP_MIN . '|max:' . ValidacionSignosVitalesService::TEMP_MAX,
-            'saturacion'              => 'nullable|integer|min:' . ValidacionSignosVitalesService::SPO2_MIN . '|max:' . ValidacionSignosVitalesService::SPO2_MAX,
-            'glucosa'                 => 'nullable|numeric|min:' . ValidacionSignosVitalesService::GLUCOSA_MIN,
-            'peso'                    => 'nullable|numeric|min:' . ValidacionSignosVitalesService::PESO_MIN . '|max:' . ValidacionSignosVitalesService::PESO_MAX,
-            'talla'                   => 'nullable|numeric|min:' . ValidacionSignosVitalesService::TALLA_CM_MIN . '|max:' . ValidacionSignosVitalesService::TALLA_CM_MAX,
-            'imc'                     => 'nullable|numeric|min:5|max:80',
-            'dolor'                   => 'nullable|integer|min:' . ValidacionSignosVitalesService::DOLOR_MIN . '|max:' . ValidacionSignosVitalesService::DOLOR_MAX,
-            'observacion'             => 'nullable|string|max:5000',
+            'cod_residente' => 'required|string|exists:residentes,cod_residente',
+            'fecha' => 'required|date|before_or_equal:today',
+            'hora' => 'required|date_format:H:i',
+            'presion_arterial' => 'nullable|string|max:20',
+            'presion_sistolica' => 'nullable|integer|min:'.ValidacionSignosVitalesService::PAS_MIN.'|max:'.ValidacionSignosVitalesService::PAS_MAX,
+            'presion_diastolica' => 'nullable|integer|min:'.ValidacionSignosVitalesService::PAD_MIN.'|max:'.ValidacionSignosVitalesService::PAD_MAX,
+            'frecuencia_cardiaca' => 'nullable|integer|min:'.ValidacionSignosVitalesService::FC_MIN.'|max:'.ValidacionSignosVitalesService::FC_MAX,
+            'frecuencia_respiratoria' => 'nullable|integer|min:'.ValidacionSignosVitalesService::FR_MIN.'|max:'.ValidacionSignosVitalesService::FR_MAX,
+            'temperatura' => 'nullable|numeric|min:'.ValidacionSignosVitalesService::TEMP_MIN.'|max:'.ValidacionSignosVitalesService::TEMP_MAX,
+            'saturacion' => 'nullable|integer|min:'.ValidacionSignosVitalesService::SPO2_MIN.'|max:'.ValidacionSignosVitalesService::SPO2_MAX,
+            'glucosa' => 'nullable|numeric|min:'.ValidacionSignosVitalesService::GLUCOSA_MIN,
+            'peso' => 'nullable|numeric|min:'.ValidacionSignosVitalesService::PESO_MIN.'|max:'.ValidacionSignosVitalesService::PESO_MAX,
+            'talla' => 'nullable|numeric|min:'.ValidacionSignosVitalesService::TALLA_CM_MIN.'|max:'.ValidacionSignosVitalesService::TALLA_CM_MAX,
+            'imc' => 'nullable|numeric|min:5|max:80',
+            'dolor' => 'nullable|integer|min:'.ValidacionSignosVitalesService::DOLOR_MIN.'|max:'.ValidacionSignosVitalesService::DOLOR_MAX,
+            'observacion' => 'nullable|string|max:5000',
             'confirmar_presion_atipica' => 'nullable|boolean',
             'motivo_rectificacion' => 'nullable|string|min:10|max:2000',
         ];
@@ -77,11 +77,11 @@ class StoreSignosVitalesRequest extends FormRequest
     {
         return array_merge(ValidacionSignosVitalesService::mensajes(), [
             'cod_residente.required' => 'El residente es obligatorio.',
-            'cod_residente.exists'   => 'El residente seleccionado no existe.',
-            'fecha.required'         => 'La fecha es obligatoria.',
-            'fecha.before_or_equal'  => 'La fecha no puede ser futura.',
-            'hora.required'          => 'La hora es obligatoria.',
-            'hora.date_format'       => 'La hora debe tener formato HH:MM.',
+            'cod_residente.exists' => 'El residente seleccionado no existe.',
+            'fecha.required' => 'La fecha es obligatoria.',
+            'fecha.before_or_equal' => 'La fecha no puede ser futura.',
+            'hora.required' => 'La hora es obligatoria.',
+            'hora.date_format' => 'La hora debe tener formato HH:MM.',
         ]);
     }
 

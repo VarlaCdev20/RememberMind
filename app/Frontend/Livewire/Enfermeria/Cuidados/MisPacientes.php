@@ -2,24 +2,25 @@
 
 namespace App\Frontend\Livewire\Enfermeria\Cuidados;
 
-use App\Models\AdministracionMedicacion;
-use App\Models\Residente;
-use App\Models\Alerta;
-use App\Models\Prescripcion;
-use App\Models\Atencion;
-use App\Models\TurnoEnfermeria;
-use App\Models\User;
-use App\Models\PaseTurno;
-use App\Models\SignoVital;
+use App\Backend\Modulos\Alertas\Servicios\AlertasService;
+use App\Backend\Modulos\Clinica\Servicios\SignosVitalesService;
+use App\Backend\Modulos\Enfermeria\Servicios\CuidadosEnfermeriaService;
+use App\Backend\Modulos\Enfermeria\Servicios\MiTurnoService;
 use App\Backend\Modulos\Enfermeria\Servicios\TurnoEnfermeriaService;
 use App\Backend\Modulos\Medicacion\Servicios\AgendaMedicacionService;
 use App\Backend\Modulos\Medicacion\Servicios\RegistrarAdministracionMedicacionService;
-use App\Backend\Modulos\Clinica\Servicios\SignosVitalesService;
-use App\Backend\Modulos\Alertas\Servicios\AlertasService;
-use App\Backend\Modulos\Enfermeria\Servicios\CuidadosEnfermeriaService;
+use App\Models\AdministracionMedicacion;
+use App\Models\Alerta;
+use App\Models\AsignacionResidenteJornada;
+use App\Models\Atencion;
+use App\Models\PaseTurno;
+use App\Models\Prescripcion;
+use App\Models\Residente;
+use App\Models\SignoVital;
+use App\Models\TurnoEnfermeria;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Url;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -29,57 +30,111 @@ class MisPacientes extends Component
     use WithPagination;
 
     public string $search = '';
+
     public string $filtroEstado = 'TODOS'; // 'TODOS' | 'ESTABLE' | 'VIGILANCIA' | 'REQUIERE_ATENCION'
+
     public string $filtroTurno = '';
+
     public string $filtroEnfermero = '';
+
     public string $filtroRapido = 'TODOS';
+
     public string $vistaModo = 'tabla'; // 'tabla' (Lista) | 'tarjetas' (Tarjetas)
 
     #[Url(as: 'residente')]
     public ?string $residente = null;
-    public bool $mostrarPanelDetalle = false;
-    public ?array $detalleResidente = null;
-    public bool $esModoConsulta = false;
-    public bool $esResidenteAsignado = false;
 
+    public bool $mostrarPanelDetalle = false;
+
+    public ?array $detalleResidente = null;
+
+    public bool $esModoConsulta = false;
+
+    public bool $esResidenteAsignado = false;
 
     protected ?TurnoEnfermeriaService $turnoService = null;
 
     // Modales rápidos operativos
     public bool $modalSignos = false;
+
     public ?string $modalCodResidente = null;
-    public string $signoPA = '', $signoFC = '', $signoFR = '', $signoTemp = '', $signoSat = '', $signoGlucosa = '', $signoObs = '';
+
+    public string $signoPA = '';
+
+    public string $signoFC = '';
+
+    public string $signoFR = '';
+
+    public string $signoTemp = '';
+
+    public string $signoSat = '';
+
+    public string $signoGlucosa = '';
+
+    public string $signoObs = '';
+
     public bool $signoConfirmarAtipico = false;
 
     public bool $modalSeguimiento = false;
-    public string $segEstado = '', $segAlimentacion = '', $segMovilidad = '', $segSueno = '';
-    public bool $segIncidente = false, $segRequiereMedico = false;
+
+    public string $segEstado = '';
+
+    public string $segAlimentacion = '';
+
+    public string $segMovilidad = '';
+
+    public string $segSueno = '';
+
+    public bool $segIncidente = false;
+
+    public bool $segRequiereMedico = false;
+
     public string $segObs = '';
 
     public bool $modalMed = false;
+
     public ?string $medCodMed = null;
+
     public bool $medAdministrado = true;
+
     public string $medMotivoOmision = '';
+
     public $medicacionesPaciente = [];
 
     public bool $modalAlerta = false;
-    public string $alertaTipo = 'INCIDENTE', $alertaNivel = 'ALTO', $alertaMotivo = '';
+
+    public string $alertaTipo = 'INCIDENTE';
+
+    public string $alertaNivel = 'ALTO';
+
+    public string $alertaMotivo = '';
 
     public bool $modalCuidado = false;
-    public string $cuidadoTipo = 'HIGIENE', $cuidadoSubtipo = 'GENERAL', $cuidadoObs = '';
+
+    public string $cuidadoTipo = 'HIGIENE';
+
+    public string $cuidadoSubtipo = 'GENERAL';
+
+    public string $cuidadoObs = '';
 
     public bool $modalDolor = false;
+
     public int $dolorIntensidad = 5;
+
     public string $dolorDetalle = '';
 
     public bool $modalProcedimiento = false;
-    public string $procTipo = 'CURACION', $procDetalle = '';
+
+    public string $procTipo = 'CURACION';
+
+    public string $procDetalle = '';
 
     protected function getTurnoService(): TurnoEnfermeriaService
     {
-        if (!$this->turnoService) {
+        if (! $this->turnoService) {
             $this->turnoService = app(TurnoEnfermeriaService::class);
         }
+
         return $this->turnoService;
     }
 
@@ -89,7 +144,7 @@ class MisPacientes extends Component
         $user = Auth::user();
 
         $turnoActual = $service->obtenerTurnoActivo($user);
-        $this->esModoConsulta = ($turnoActual === null) && !$service->esSuperAdmin($user);
+        $this->esModoConsulta = ($turnoActual === null) && ! $service->esSuperAdmin($user);
 
         if ($service->tieneLecturaClinicaGlobal($user)) {
             $this->filtroEnfermero = '';
@@ -101,23 +156,46 @@ class MisPacientes extends Component
             }
         }
 
-        if (!empty($this->residente)) {
+        if (! empty($this->residente)) {
             $this->seleccionarResidente($this->residente);
         }
     }
 
-    public function updatingSearch(): void { $this->resetPage(); }
-    public function updatingFiltroRapido(): void { $this->resetPage(); }
-    public function updatingFiltroTurno(): void { $this->resetPage(); }
-    public function updatingFiltroEnfermero(): void { $this->resetPage(); }
-    public function updatingFiltroEstado(): void { $this->resetPage(); }
-    public function updatingVistaModo(): void { $this->resetPage(); }
+    public function updatingSearch(): void
+    {
+        $this->resetPage();
+    }
 
-    
+    public function updatingFiltroRapido(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatingFiltroTurno(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatingFiltroEnfermero(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatingFiltroEstado(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatingVistaModo(): void
+    {
+        $this->resetPage();
+    }
+
     public function seleccionarResidente(?string $codResidente): void
     {
         if (empty($codResidente)) {
             $this->cerrarPanelDetalle();
+
             return;
         }
 
@@ -133,7 +211,7 @@ class MisPacientes extends Component
         $turnoActual = $service->obtenerTurnoActivo($user);
         $esSuperAdmin = $service->esSuperAdmin($user);
         $tieneLecturaClinicaGlobal = $service->tieneLecturaClinicaGlobal($user);
-        $this->esModoConsulta = ($turnoActual === null) && !$esSuperAdmin;
+        $this->esModoConsulta = ($turnoActual === null) && ! $esSuperAdmin;
 
         // Buscar residente por cod_residente
         $adulto = Residente::query()
@@ -145,7 +223,7 @@ class MisPacientes extends Component
             ])
             ->first();
 
-        if (!$adulto) {
+        if (! $adulto) {
             $this->cerrarPanelDetalle();
             abort(403, 'El residente solicitado no existe o no está disponible.');
         }
@@ -167,15 +245,15 @@ class MisPacientes extends Component
             $esPermitido = $esAsignadoAlUsuario;
         } else {
             // FUERA_DE_TURNO: Verificar si el residente está cubierto por alguna jornada de enfermería activa del sistema
-            $miTurnoService = app(\App\Backend\Modulos\Enfermeria\Servicios\MiTurnoService::class);
+            $miTurnoService = app(MiTurnoService::class);
             $jornadasActivas = $miTurnoService->resolverJornadasActivasSistema(Carbon::now());
             if ($jornadasActivas->isNotEmpty()) {
                 $codJornadasActivas = $jornadasActivas->pluck('cod_jornada')->all();
-                $esPermitido = \App\Models\AsignacionResidenteJornada::query()
+                $esPermitido = AsignacionResidenteJornada::query()
                     ->whereIn('cod_jornada', $codJornadasActivas)
                     ->where(function ($q) use ($codResidente, $codRes) {
                         $q->where('cod_residente', $codResidente)
-                          ->orWhere('cod_residente', $codRes);
+                            ->orWhere('cod_residente', $codRes);
                     })
                     ->whereIn('estado', ['ACTIVO', 'ACTIVA', 'ASIGNADO'])
                     ->exists();
@@ -183,7 +261,7 @@ class MisPacientes extends Component
             $esAsignadoAlUsuario = false;
         }
 
-        if (!$esPermitido) {
+        if (! $esPermitido) {
             $this->cerrarPanelDetalle();
             abort(403, 'No tiene autorización para acceder al residente indicado o no se encuentra asignado a su turno.');
         }
@@ -201,17 +279,17 @@ class MisPacientes extends Component
         $this->residente = null;
     }
 
-        protected function construirDetalleResidente(Residente $adulto, ?TurnoEnfermeria $turnoActual): array
+    protected function construirDetalleResidente(Residente $adulto, ?TurnoEnfermeria $turnoActual): array
     {
         $codRes = $adulto->cod_residente;
         $codResidente = $codRes;
 
         // 1. IDENTIFICACIÓN
-        $nombreCompleto = trim($adulto->nombres . ' ' . $adulto->apellido_paterno . ' ' . ($adulto->apellido_materno ?? ''));
+        $nombreCompleto = trim($adulto->nombres.' '.$adulto->apellido_paterno.' '.($adulto->apellido_materno ?? ''));
         if (empty($nombreCompleto)) {
             $nombreCompleto = $adulto->nombre_completo ?? 'Residente';
         }
-        $edadTexto = $adulto->edad_texto ?? ($adulto->fecha_nacimiento ? Carbon::parse($adulto->fecha_nacimiento)->age . ' años' : '79 años');
+        $edadTexto = $adulto->edad_texto ?? ($adulto->fecha_nacimiento ? Carbon::parse($adulto->fecha_nacimiento)->age.' años' : '79 años');
         $documento = $adulto->ci ?? ($adulto->numero_documento ?? 'Sin documento');
 
         $cama = $adulto->cama;
@@ -252,26 +330,26 @@ class MisPacientes extends Component
         $turnoNombre = $turnoActual ? ($turnoActual->nombre ?? 'Turno en curso') : 'Turno actual de guardia';
 
         // Buscar siempre en asignaciones_residente_jornada para obtener el responsable real del residente
-        $miTurnoService = app(\App\Backend\Modulos\Enfermeria\Servicios\MiTurnoService::class);
+        $miTurnoService = app(MiTurnoService::class);
         $jornadasActivas = $miTurnoService->resolverJornadasActivasSistema(Carbon::now());
         $codJornadasActivas = $jornadasActivas->pluck('cod_jornada')->all();
 
-        $asigQuery = \App\Models\AsignacionResidenteJornada::query()
+        $asigQuery = AsignacionResidenteJornada::query()
             ->where(function ($q) use ($codResidente, $codRes) {
                 $q->where('cod_residente', $codResidente)->orWhere('cod_residente', $codRes);
             })
             ->whereIn('estado', ['ACTIVO', 'ACTIVA', 'ASIGNADO'])
             ->with(['personal', 'jornada.turno']);
 
-        if (!empty($codJornadasActivas)) {
+        if (! empty($codJornadasActivas)) {
             $asigQuery->whereIn('cod_jornada', $codJornadasActivas);
         }
 
         $asigResidente = $asigQuery->orderByDesc('fecha_hora')->first();
 
         if ($asigResidente && $asigResidente->personal) {
-            $nomEnf = trim($asigResidente->personal->nombres . ' ' . $asigResidente->personal->apellido_paterno);
-            if (!empty($nomEnf)) {
+            $nomEnf = trim($asigResidente->personal->nombres.' '.$asigResidente->personal->apellido_paterno);
+            if (! empty($nomEnf)) {
                 $responsableTexto = "A cargo de: Enf. {$nomEnf}";
             }
         }
@@ -291,20 +369,20 @@ class MisPacientes extends Component
         $ultimosSignos = null;
         if ($ultimoSignoModel) {
             $fHora = Carbon::parse($ultimoSignoModel->fecha_hora);
-            $fechaHoraTexto = $fHora->isToday() ? ('Hoy ' . $fHora->format('H:i')) : $fHora->format('d/m/Y H:i');
+            $fechaHoraTexto = $fHora->isToday() ? ('Hoy '.$fHora->format('H:i')) : $fHora->format('d/m/Y H:i');
             $paLimpia = '—';
             if ($ultimoSignoModel->presion_sistolica && $ultimoSignoModel->presion_diastolica) {
-                $paLimpia = (int)$ultimoSignoModel->presion_sistolica . '/' . (int)$ultimoSignoModel->presion_diastolica;
+                $paLimpia = (int) $ultimoSignoModel->presion_sistolica.'/'.(int) $ultimoSignoModel->presion_diastolica;
             } elseif ($ultimoSignoModel->presion_arterial) {
                 $paLimpia = $ultimoSignoModel->presion_arterial;
             }
             $ultimosSignos = [
                 'pa' => $paLimpia,
-                'fc' => $ultimoSignoModel->frecuencia_cardiaca ? ((int)$ultimoSignoModel->frecuencia_cardiaca . ' lpm') : '—',
-                'fr' => $ultimoSignoModel->frecuencia_respiratoria ? ((int)$ultimoSignoModel->frecuencia_respiratoria . ' rpm') : '—',
-                'temp' => $ultimoSignoModel->temperatura ? (round((float)$ultimoSignoModel->temperatura, 1) . ' °C') : '—',
-                'sat' => $ultimoSignoModel->saturacion ? ((int)$ultimoSignoModel->saturacion . '%') : ($ultimoSignoModel->saturacion_oxigeno ? ((int)$ultimoSignoModel->saturacion_oxigeno . '%') : '—'),
-                'glucosa' => $ultimoSignoModel->glucemia ? (int)$ultimoSignoModel->glucemia : ($ultimoSignoModel->glucosa ?: '—'),
+                'fc' => $ultimoSignoModel->frecuencia_cardiaca ? ((int) $ultimoSignoModel->frecuencia_cardiaca.' lpm') : '—',
+                'fr' => $ultimoSignoModel->frecuencia_respiratoria ? ((int) $ultimoSignoModel->frecuencia_respiratoria.' rpm') : '—',
+                'temp' => $ultimoSignoModel->temperatura ? (round((float) $ultimoSignoModel->temperatura, 1).' °C') : '—',
+                'sat' => $ultimoSignoModel->saturacion ? ((int) $ultimoSignoModel->saturacion.'%') : ($ultimoSignoModel->saturacion_oxigeno ? ((int) $ultimoSignoModel->saturacion_oxigeno.'%') : '—'),
+                'glucosa' => $ultimoSignoModel->glucemia ? (int) $ultimoSignoModel->glucemia : ($ultimoSignoModel->glucosa ?: '—'),
                 'fecha_hora' => $fechaHoraTexto,
                 'observacion' => $ultimoSignoModel->observacion,
             ];
@@ -320,16 +398,16 @@ class MisPacientes extends Component
             $horaMed = $medPendiente['hora'];
             $tiempoRestante = '';
             try {
-                $horaCarbon = Carbon::parse(today()->toDateString() . ' ' . $horaMed);
+                $horaCarbon = Carbon::parse(today()->toDateString().' '.$horaMed);
                 $diffMin = (int) now()->diffInMinutes($horaCarbon, false);
                 if ($diffMin > 0 && $diffMin <= 60) {
                     $tiempoRestante = "En {$diffMin} min";
                 } elseif ($diffMin > 60) {
-                    $tiempoRestante = "En " . round($diffMin / 60, 1) . " hrs";
+                    $tiempoRestante = 'En '.round($diffMin / 60, 1).' hrs';
                 } elseif ($diffMin <= 0 && $diffMin >= -60) {
-                    $tiempoRestante = "Hace " . abs($diffMin) . " min";
+                    $tiempoRestante = 'Hace '.abs($diffMin).' min';
                 } else {
-                    $tiempoRestante = "Atrasada";
+                    $tiempoRestante = 'Atrasada';
                 }
             } catch (\Throwable $e) {
                 $tiempoRestante = '';
@@ -342,7 +420,7 @@ class MisPacientes extends Component
             }
 
             $nombreMed = $presc->medicamento?->nombre_generico ?: ($presc->nombre_medicamento ?: 'Medicamento');
-            $dosisMed = $presc->dosis ? ((float)$presc->dosis == (int)$presc->dosis ? (int)$presc->dosis : (float)$presc->dosis) . ' ' . ($presc->unidad_dosis ?: 'mg') : '50 mg';
+            $dosisMed = $presc->dosis ? ((float) $presc->dosis == (int) $presc->dosis ? (int) $presc->dosis : (float) $presc->dosis).' '.($presc->unidad_dosis ?: 'mg') : '50 mg';
             $proximaMed = [
                 'nombre' => $nombreMed,
                 'dosis' => $dosisMed,
@@ -355,7 +433,9 @@ class MisPacientes extends Component
             $prescActiva = Prescripcion::where('cod_residente', $codResidente)->whereIn('estado', ['ACTIVA', 'ACTIVO'])->where('segun_necesidad', false)->first();
             if ($prescActiva) {
                 $via = $prescActiva->via_administracion ?: 'VO';
-                if (stripos($via, 'oral') !== false) $via = 'VO';
+                if (stripos($via, 'oral') !== false) {
+                    $via = 'VO';
+                }
                 $proximaMed = [
                     'nombre' => $prescActiva->nombre_medicamento,
                     'dosis' => $prescActiva->dosis ?: 'Según indicación',
@@ -380,10 +460,10 @@ class MisPacientes extends Component
 
         if ($proximaAtencion) {
             $proximaAtencionTexto = $proximaAtencion->motivo ?: ($proximaAtencion->tipo_atencion ?: 'Atención programada');
-            $proximaAtencionHora = Carbon::parse($proximaAtencion->fecha_hora)->format('H:i') . ' · Hoy';
+            $proximaAtencionHora = Carbon::parse($proximaAtencion->fecha_hora)->format('H:i').' · Hoy';
         } elseif ($proximaMed) {
-            $proximaAtencionTexto = 'Administración de ' . $proximaMed['nombre'];
-            $proximaAtencionHora = $proximaMed['hora'] . ' · Hoy';
+            $proximaAtencionTexto = 'Administración de '.$proximaMed['nombre'];
+            $proximaAtencionHora = $proximaMed['hora'].' · Hoy';
         } elseif ($ultimoSignoModel && Carbon::parse($ultimoSignoModel->fecha_hora)->isToday()) {
             $proximaAtencionTexto = 'Seguimiento de guardia';
             $proximaAtencionHora = 'Continuo · Hoy';
@@ -396,15 +476,16 @@ class MisPacientes extends Component
             if ($fAl) {
                 $c = Carbon::parse($fAl);
                 if ($c->isToday()) {
-                    $tiempo .= 'hoy ' . $c->format('H:i');
+                    $tiempo .= 'hoy '.$c->format('H:i');
                 } elseif ($c->isYesterday()) {
-                    $tiempo .= 'ayer ' . $c->format('H:i');
+                    $tiempo .= 'ayer '.$c->format('H:i');
                 } else {
                     $tiempo .= $c->format('d/m H:i');
                 }
             } else {
                 $tiempo .= 'recientemente';
             }
+
             return [
                 'cod_alerta' => $al->cod_alerta,
                 'tipo' => $al->tipo_alerta ?? $al->tipo ?? 'Alerta clínica',
@@ -415,7 +496,7 @@ class MisPacientes extends Component
         })->values()->all();
 
         // Iniciales y Foto
-        $iniciales = strtoupper(substr($adulto->nombres ?: 'A', 0, 1) . substr($adulto->apellido_paterno ?: 'M', 0, 1));
+        $iniciales = strtoupper(substr($adulto->nombres ?: 'A', 0, 1).substr($adulto->apellido_paterno ?: 'M', 0, 1));
 
         return [
             'cod_residente' => $codRes,
@@ -438,7 +519,7 @@ class MisPacientes extends Component
             'alertas_count' => count($alertasList),
             'alertas' => $alertasList,
             'iniciales' => $iniciales,
-            'foto' => $adulto->foto ? asset('storage/' . $adulto->foto) : '',
+            'foto' => $adulto->foto ? asset('storage/'.$adulto->foto) : '',
         ];
     }
 
@@ -519,15 +600,18 @@ class MisPacientes extends Component
         ]);
         if (($this->segIncidente || $this->segRequiereMedico) && mb_strlen(trim($this->segObs)) < 15) {
             $this->addError('segObs', 'Describa la situación clínica y las medidas iniciales con al menos 15 caracteres.');
+
             return;
         }
-        if (!$turno) {
+        if (! $turno) {
             $this->addError('segObs', 'No existe un turno activo para registrar el seguimiento.');
+
             return;
         }
         if (Atencion::where('cod_residente', $this->modalCodResidente)->whereDate('fecha_hora', today())
             ->where('tipo_atencion', 'SEGUIMIENTO_DIARIO')->exists()) {
             $this->addError('segObs', 'Ya existe un seguimiento de este residente para el turno actual.');
+
             return;
         }
 
@@ -595,6 +679,7 @@ class MisPacientes extends Component
             ->first(fn (array $item) => $item['medicacion']->cod_prescripcion === $this->medCodMed && $item['registro'] === null);
         if (! $ocurrencia) {
             $this->addError('medCodMed', 'No existe una dosis programada pendiente para este medicamento hoy.');
+
             return;
         }
         app(RegistrarAdministracionMedicacionService::class)->registrarProgramada(
@@ -779,7 +864,7 @@ class MisPacientes extends Component
             'ocupacionActiva.cama.habitacion',
             'asignacionesTurno' => function ($q) {
                 $q->whereIn('estado', ['ACTIVO', 'ACTIVA'])
-                  ->with(['jornada.turno', 'personal.usuario']);
+                    ->with(['jornada.turno', 'personal.usuario']);
             },
             'planCuidadoActivo',
         ])->withCount([
@@ -791,11 +876,11 @@ class MisPacientes extends Component
             },
             'tareasActuales as tareas_pendientes_count' => function ($q) use ($fechaHoy) {
                 $q->whereIn('estado', ['PENDIENTE', 'EN_PROCESO'])
-                  ->whereDate('fecha_hora_programada', $fechaHoy);
+                    ->whereDate('fecha_hora_programada', $fechaHoy);
             },
             'tareasActuales as tareas_vencidas_count' => function ($q) use ($fechaHoy) {
                 $q->whereIn('estado', ['PENDIENTE', 'EN_PROCESO'])
-                  ->whereDate('fecha_hora_programada', '<', $fechaHoy);
+                    ->whereDate('fecha_hora_programada', '<', $fechaHoy);
             },
             'administracionesMedicacion as medicacion_hoy_count' => function ($q) use ($fechaHoy) {
                 $q->whereDate('fecha_hora_programada', $fechaHoy)->whereIn('resultado', ['ADMINISTRADA', 'ADMINISTRADO']);
@@ -812,39 +897,39 @@ class MisPacientes extends Component
             $b = trim($this->search);
             $pacientesQuery->where(function ($q) use ($b) {
                 $q->whereLike('nombres', "%{$b}%")
-                  ->orWhereLike('apellido_paterno', "%{$b}%")
-                  ->orWhereLike('apellido_materno', "%{$b}%")
-                  ->orWhereLike('numero_documento', "%{$b}%")
-                  ->orWhereLike('cod_residente', "%{$b}%")
-                  ->orWhereHas('cama', function ($cq) use ($b) {
-                      $cq->whereLike('numero', "%{$b}%")
-                         ->orWhereLike('codigo', "%{$b}%")
-                         ->orWhereHas('habitacion', function ($hq) use ($b) {
-                             $hq->whereLike('numero', "%{$b}%")
-                                ->orWhereLike('nombre', "%{$b}%")
-                                ->orWhereLike('codigo', "%{$b}%");
-                         });
-                  });
+                    ->orWhereLike('apellido_paterno', "%{$b}%")
+                    ->orWhereLike('apellido_materno', "%{$b}%")
+                    ->orWhereLike('numero_documento', "%{$b}%")
+                    ->orWhereLike('cod_residente', "%{$b}%")
+                    ->orWhereHas('cama', function ($cq) use ($b) {
+                        $cq->whereLike('numero', "%{$b}%")
+                            ->orWhereLike('codigo', "%{$b}%")
+                            ->orWhereHas('habitacion', function ($hq) use ($b) {
+                                $hq->whereLike('numero', "%{$b}%")
+                                    ->orWhereLike('nombre', "%{$b}%")
+                                    ->orWhereLike('codigo', "%{$b}%");
+                            });
+                    });
             });
         }
 
         // Filtro por estado clínico: TODOS / ESTABLE / VIGILANCIA / REQUIERE_ATENCION
         if ($this->filtroEstado === 'REQUIERE_ATENCION') {
-            $pacientesQuery->where(function ($q) use ($fechaHoy) {
+            $pacientesQuery->where(function ($q) {
                 $q->whereHas('alertas', function ($aq) {
                     $aq->whereIn('estado', ['ABIERTA', 'EN_ATENCION'])
-                       ->whereIn('prioridad', ['CRITICO', 'ALTO', 'CRITICA']);
+                        ->whereIn('prioridad', ['CRITICO', 'ALTO', 'CRITICA']);
                 });
             });
         } elseif ($this->filtroEstado === 'VIGILANCIA') {
             $pacientesQuery->whereDoesntHave('alertas', function ($aq) {
                 $aq->whereIn('estado', ['ABIERTA', 'EN_ATENCION'])
-                   ->whereIn('prioridad', ['CRITICO', 'ALTO', 'CRITICA']);
+                    ->whereIn('prioridad', ['CRITICO', 'ALTO', 'CRITICA']);
             })->where(function ($q) use ($fechaHoy) {
                 $q->whereHas('alertas', fn ($aq) => $aq->whereIn('estado', ['ABIERTA', 'EN_ATENCION']))
-                  ->orWhereHas('tareasActuales', fn ($tq) => $tq->whereIn('estado', ['PENDIENTE', 'EN_PROCESO'])->whereDate('fecha_hora_programada', '<', $fechaHoy))
-                  ->orWhereDoesntHave('signosVitales', fn ($vq) => $vq->whereDate('fecha_hora', $fechaHoy))
-                  ->orWhereDoesntHave('seguimientosDiarios', fn ($sq) => $sq->whereDate('fecha_hora', $fechaHoy));
+                    ->orWhereHas('tareasActuales', fn ($tq) => $tq->whereIn('estado', ['PENDIENTE', 'EN_PROCESO'])->whereDate('fecha_hora_programada', '<', $fechaHoy))
+                    ->orWhereDoesntHave('signosVitales', fn ($vq) => $vq->whereDate('fecha_hora', $fechaHoy))
+                    ->orWhereDoesntHave('seguimientosDiarios', fn ($sq) => $sq->whereDate('fecha_hora', $fechaHoy));
             });
         } elseif ($this->filtroEstado === 'ESTABLE') {
             $pacientesQuery->whereDoesntHave('alertas', fn ($aq) => $aq->whereIn('estado', ['ABIERTA', 'EN_ATENCION']))
@@ -941,15 +1026,15 @@ class MisPacientes extends Component
             }
 
             // Nivel de supervisión explícito (Regla 10)
-            $rawNivel = strtoupper(trim((string)($p->planCuidadoActivo?->nivel_cuidado ?? '')));
-            $p->supervision_label = match($rawNivel) {
+            $rawNivel = strtoupper(trim((string) ($p->planCuidadoActivo?->nivel_cuidado ?? '')));
+            $p->supervision_label = match ($rawNivel) {
                 'BAJO', 'BAJA', 'LEVE', 'MINIMO' => 'Supervisión baja',
                 'ALTO', 'ALTA', 'SEVERO', 'TOTAL', 'DEPENDIENTE' => 'Supervisión alta',
                 default => 'Supervisión no registrada',
             };
 
             // Movilidad explícita (Regla 11)
-            $movRaw = strtolower(trim((string)($p->movilidad ?? ($p->planCuidadoActivo?->tipo_cuidado ?? ''))));
+            $movRaw = strtolower(trim((string) ($p->movilidad ?? ($p->planCuidadoActivo?->tipo_cuidado ?? ''))));
             if (str_contains($movRaw, 'independien')) {
                 $p->movilidad_label = 'Movilidad independiente';
             } elseif (str_contains($movRaw, 'dispositiv') || str_contains($movRaw, 'baston') || str_contains($movRaw, 'andador')) {
@@ -962,16 +1047,16 @@ class MisPacientes extends Component
 
             // Próxima atención en la fila de lista
             $proxAten = $proximasAtenciones->get($p->cod_residente);
-            $proxMed  = $proximasMeds->get($p->cod_residente);
+            $proxMed = $proximasMeds->get($p->cod_residente);
             if ($proxAten) {
                 $p->proxima_atencion_texto = $proxAten->motivo ?: ($proxAten->tipo_atencion ?: 'Atención programada');
-                $p->proxima_atencion_hora  = \Carbon\Carbon::parse($proxAten->fecha_hora)->format('H:i');
+                $p->proxima_atencion_hora = Carbon::parse($proxAten->fecha_hora)->format('H:i');
             } elseif ($proxMed) {
-                $p->proxima_atencion_texto = 'Admin. ' . $proxMed['nombre'];
-                $p->proxima_atencion_hora  = $proxMed['hora'];
+                $p->proxima_atencion_texto = 'Admin. '.$proxMed['nombre'];
+                $p->proxima_atencion_hora = $proxMed['hora'];
             } else {
                 $p->proxima_atencion_texto = 'Control de signos';
-                $p->proxima_atencion_hora  = '—';
+                $p->proxima_atencion_hora = '—';
             }
         }
 

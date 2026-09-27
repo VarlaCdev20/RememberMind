@@ -2,12 +2,11 @@
 
 namespace App\Backend\Modulos\Enfermeria\Servicios;
 
-use App\Models\Residente;
+use App\Backend\Modulos\Medicacion\Servicios\AgendaMedicacionService;
 use App\Models\Alerta;
 use App\Models\EjecucionCuidado;
+use App\Models\Residente;
 use App\Models\User;
-use App\Backend\Modulos\Enfermeria\Servicios\TurnoEnfermeriaService;
-use App\Backend\Modulos\Medicacion\Servicios\AgendaMedicacionService;
 use Carbon\CarbonInterface;
 use Illuminate\Support\Collection;
 
@@ -51,7 +50,9 @@ class AgendaTurnoService
             'origen_id' => $dosis['medicacion']->cod_prescripcion,
             'tipo' => 'MEDICACION',
             'estado' => $dosis['estado'],
-            'prioridad' => match ($dosis['estado']) { 'VENCIDA' => 2, 'PROXIMA' => 5, 'PENDIENTE' => 7, default => 8 },
+            'prioridad' => match ($dosis['estado']) {
+                'VENCIDA' => 2, 'PROXIMA' => 5, 'PENDIENTE' => 7, default => 8
+            },
             'fecha_hora' => $dosis['programada'],
             'titulo' => $dosis['medicacion']->nombre_medicamento,
             'detalle' => trim($dosis['medicacion']->dosis.' · '.$dosis['medicacion']->via_administracion),
@@ -61,9 +62,10 @@ class AgendaTurnoService
         $tareas = EjecucionCuidado::whereIn('cod_residente', $enCentro)
             ->whereIn('estado', ['PENDIENTE', 'EN_PROCESO'])
             ->whereDate('fecha_hora_programada', '<=', $momento->toDateString())
-            ->get()->map(function ($tarea) use ($residentes, $momento) {
+            ->get()->map(function ($tarea) use ($residentes) {
                 $fechaHora = $tarea->fecha_hora_programada ? $tarea->fecha_hora_programada->copy() : now();
                 $vencida = $fechaHora->isPast();
+
                 return [
                     'id' => 'tarea-'.$tarea->cod_ejecucion,
                     'origen_id' => $tarea->cod_ejecucion,

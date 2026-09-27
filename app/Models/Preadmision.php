@@ -116,7 +116,7 @@ class Preadmision extends ModeloOperativo
             $valores = Arr::only($datos, $columnas);
             $valores['cod_usuario_registro'] = $datos['registrado_por'] ?? $datos['cod_usuario_registro'] ?? auth()->id() ?? $preadmision->cod_usuario_registro;
             $valores['cod_personal_valorador'] = $datos['cod_personal_valorador'] ?? null;
-            if (empty($valores['cod_personal_valorador']) && !empty($valores['cod_usuario_registro'])) {
+            if (empty($valores['cod_personal_valorador']) && ! empty($valores['cod_usuario_registro'])) {
                 $personal = Personal::where('cod_usuario', $valores['cod_usuario_registro'])->first();
                 if ($personal) {
                     $valores['cod_personal_valorador'] = $personal->cod_personal;

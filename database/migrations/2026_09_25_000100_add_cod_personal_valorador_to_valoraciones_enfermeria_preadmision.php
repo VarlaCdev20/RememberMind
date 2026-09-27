@@ -41,12 +41,12 @@ return new class extends Migration
         $pendientes = DB::table('valoraciones_enfermeria_preadmision')
             ->where(function ($q) {
                 $q->whereNull('cod_personal_valorador')
-                  ->orWhereNull('cod_usuario_registro');
+                    ->orWhereNull('cod_usuario_registro');
             })
             ->count();
 
         if ($pendientes > 0) {
-            throw new \RuntimeException(
+            throw new RuntimeException(
                 "Existen {$pendientes} registros en 'valoraciones_enfermeria_preadmision' sin autor clínico determinista o sin usuario registrador. Se detiene la migración para regularización manual."
             );
         }

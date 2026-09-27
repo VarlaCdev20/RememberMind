@@ -2,7 +2,7 @@
 
 namespace App\Backend\Modulos\Enfermeria\Servicios;
 
-use App\Models\Alerta;
+use App\Backend\Modulos\Alertas\Servicios\AlertasService;
 use App\Models\AsignacionPersonal;
 use App\Models\Atencion;
 use App\Models\DispositivoClinico;
@@ -14,9 +14,6 @@ use App\Models\RegistroMovilidad;
 use App\Models\RegistroSueno;
 use App\Models\User;
 use App\Models\ValoracionDolor;
-use App\Backend\Modulos\Alertas\Servicios\AlertasService;
-use App\Backend\Modulos\Enfermeria\Servicios\MiTurnoService;
-use App\Backend\Modulos\Enfermeria\Servicios\TurnoEnfermeriaService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
@@ -59,12 +56,12 @@ class CuidadosEnfermeriaService
 
         $tipo = strtoupper(trim($datos['tipo']));
 
-        return DB::transaction(function () use ($codResidente, $datos, $usuario, $personal, $codPersonal, $codArea, $codJornada, $tipo) {
+        return DB::transaction(function () use ($codResidente, $datos, $usuario, $codPersonal, $codArea, $codJornada, $tipo) {
             $registro = null;
 
             if ($tipo === 'ALIMENTACION') {
                 $registro = RegistroIngesta::create([
-                    'cod_ingesta' => 'ING_' . strtoupper(Str::random(10)),
+                    'cod_ingesta' => 'ING_'.strtoupper(Str::random(10)),
                     'cod_residente' => $codResidente,
                     'cod_personal' => $codPersonal,
                     'cod_jornada' => $codJornada,
@@ -72,14 +69,14 @@ class CuidadosEnfermeriaService
                     'porcentaje_consumido' => isset($datos['porcentaje']) ? (float) $datos['porcentaje'] : null,
                     'apetito' => $datos['estado_general'] ?? null,
                     'tolerancia' => $datos['tolerancia'] ?? null,
-                    'dificultad_deglucion' => !empty($datos['presenta_dificultad']),
+                    'dificultad_deglucion' => ! empty($datos['presenta_dificultad']),
                     'fecha_hora' => now(),
                     'estado' => 'VIGENTE',
                     'observacion' => $datos['observacion'] ?? $datos['motivo'] ?? null,
                 ]);
             } elseif ($tipo === 'HIDRATACION') {
                 $registro = RegistroHidratacion::create([
-                    'cod_hidratacion' => 'HID_' . strtoupper(Str::random(10)),
+                    'cod_hidratacion' => 'HID_'.strtoupper(Str::random(10)),
                     'cod_residente' => $codResidente,
                     'cod_personal' => $codPersonal,
                     'cod_jornada' => $codJornada,
@@ -93,23 +90,23 @@ class CuidadosEnfermeriaService
                 ]);
             } elseif ($tipo === 'ELIMINACION') {
                 $registro = RegistroEliminacion::create([
-                    'cod_eliminacion' => 'ELM_' . strtoupper(Str::random(10)),
+                    'cod_eliminacion' => 'ELM_'.strtoupper(Str::random(10)),
                     'cod_residente' => $codResidente,
                     'cod_personal' => $codPersonal,
                     'cod_jornada' => $codJornada,
                     'tipo_eliminacion' => $datos['subtipo'],
                     'consistencia' => $datos['consistencia'] ?? null,
-                    'es_continente' => !empty($datos['es_continente']),
-                    'usa_dispositivo' => !empty($datos['usa_dispositivo']),
-                    'dificultad' => !empty($datos['presenta_dificultad']),
-                    'dolor' => !empty($datos['presenta_dolor']),
+                    'es_continente' => ! empty($datos['es_continente']),
+                    'usa_dispositivo' => ! empty($datos['usa_dispositivo']),
+                    'dificultad' => ! empty($datos['presenta_dificultad']),
+                    'dolor' => ! empty($datos['presenta_dolor']),
                     'fecha_hora' => now(),
                     'estado' => 'VIGENTE',
                     'observacion' => $datos['observacion'] ?? $datos['motivo'] ?? null,
                 ]);
             } elseif ($tipo === 'MOVILIDAD') {
                 $registro = RegistroMovilidad::create([
-                    'cod_movilidad' => 'MOV_' . strtoupper(Str::random(10)),
+                    'cod_movilidad' => 'MOV_'.strtoupper(Str::random(10)),
                     'cod_residente' => $codResidente,
                     'cod_personal' => $codPersonal,
                     'cod_jornada' => $codJornada,
@@ -123,7 +120,7 @@ class CuidadosEnfermeriaService
                 ]);
             } elseif ($tipo === 'SUENO') {
                 $registro = RegistroSueno::create([
-                    'cod_registro_sueno' => 'RSU_' . strtoupper(Str::random(10)),
+                    'cod_registro_sueno' => 'RSU_'.strtoupper(Str::random(10)),
                     'cod_residente' => $codResidente,
                     'cod_personal' => $codPersonal,
                     'cod_jornada' => $codJornada,
@@ -144,7 +141,7 @@ class CuidadosEnfermeriaService
                 }
 
                 $registro = Atencion::create([
-                    'cod_atencion' => 'ATN_' . strtoupper(Str::random(10)),
+                    'cod_atencion' => 'ATN_'.strtoupper(Str::random(10)),
                     'cod_residente' => $codResidente,
                     'cod_area' => $codArea,
                     'cod_personal' => $codPersonal,
@@ -165,7 +162,7 @@ class CuidadosEnfermeriaService
                     'origen' => 'SEGUIMIENTO',
                     'tipo_alerta' => ($datos['cambio_respecto_basal'] ?? null) === 'PEOR' ? 'CAMBIO RESPECTO AL ESTADO BASAL' : 'BAJA INGESTA',
                     'nivel' => 'MEDIO',
-                    'motivo' => 'Alerta clínica: ' . ($datos['motivo'] ?? $datos['observacion'] ?? 'Requiere seguimiento de Enfermería.'),
+                    'motivo' => 'Alerta clínica: '.($datos['motivo'] ?? $datos['observacion'] ?? 'Requiere seguimiento de Enfermería.'),
                 ], $usuario);
             }
 
@@ -190,7 +187,7 @@ class CuidadosEnfermeriaService
         }
 
         return ValoracionDolor::create([
-            'cod_valoracion_dolor' => 'VD_' . strtoupper(Str::random(10)),
+            'cod_valoracion_dolor' => 'VD_'.strtoupper(Str::random(10)),
             'cod_residente' => $codResidente,
             'cod_personal' => $personal->cod_personal,
             'fecha_hora' => now(),
@@ -219,7 +216,7 @@ class CuidadosEnfermeriaService
         }
 
         return DispositivoClinico::create([
-            'cod_dispositivo' => 'DIS_' . strtoupper(Str::random(10)),
+            'cod_dispositivo' => 'DIS_'.strtoupper(Str::random(10)),
             'cod_residente' => $codResidente,
             'cod_personal' => $personal->cod_personal,
             'tipo' => $datos['tipo'],
@@ -238,7 +235,7 @@ class CuidadosEnfermeriaService
         $dispositivo->update([
             'estado' => 'RETIRADO',
             'fecha_retiro' => now(),
-            'observacion' => trim(($dispositivo->observacion ? $dispositivo->observacion . ' | ' : '') . 'Retiro: ' . $motivo),
+            'observacion' => trim(($dispositivo->observacion ? $dispositivo->observacion.' | ' : '').'Retiro: '.$motivo),
         ]);
     }
 
@@ -279,12 +276,13 @@ class CuidadosEnfermeriaService
 
         if ($validados['tipo'] === 'ALIMENTACION' && isset($validados['porcentaje']) && $validados['porcentaje'] < config('enfermeria.porcentaje_baja_ingesta', 50)
             && mb_strlen(trim($validados['motivo'] ?? '')) < 3) {
-            throw \Illuminate\Validation\ValidationException::withMessages(['motivo' => 'Indique el motivo de la baja ingesta.']);
+            throw ValidationException::withMessages(['motivo' => 'Indique el motivo de la baja ingesta.']);
         }
-        if (in_array($validados['tipo'], ['HIGIENE','PROCEDIMIENTO']) && in_array($validados['resultado'] ?? null, ['PARCIAL','NO_REALIZADO','CANCELADO'])
+        if (in_array($validados['tipo'], ['HIGIENE', 'PROCEDIMIENTO']) && in_array($validados['resultado'] ?? null, ['PARCIAL', 'NO_REALIZADO', 'CANCELADO'])
             && mb_strlen(trim($validados['motivo'] ?? '')) < 3) {
-            throw \Illuminate\Validation\ValidationException::withMessages(['motivo' => 'El motivo es obligatorio cuando el cuidado no fue completado.']);
+            throw ValidationException::withMessages(['motivo' => 'El motivo es obligatorio cuando el cuidado no fue completado.']);
         }
+
         return $validados;
     }
 }

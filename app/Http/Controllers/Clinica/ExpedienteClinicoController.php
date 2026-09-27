@@ -24,6 +24,7 @@ class ExpedienteClinicoController extends Controller
     public function index(Request $request, Residente $residente): JsonResponse
     {
         $this->authorize('view', $residente);
+
         return response()->json([
             'residente' => $residente,
             'atenciones' => Atencion::query()->whereBelongsTo($residente, 'residente')->with(['area', 'personal', 'notas'])->latest('fecha_hora')->get(),
@@ -45,6 +46,7 @@ class ExpedienteClinicoController extends Controller
         $personal = $request->user()->personal()->where('estado', 'ACTIVO')->firstOrFail();
         $datos = $request->validate(['cod_area' => ['required', 'exists:areas,cod_area'], 'tipo_atencion' => ['required', 'string', 'max:60'], 'motivo' => ['nullable', 'string'], 'observacion' => ['nullable', 'string']]);
         $atencion = Atencion::query()->create(['cod_atencion' => $this->codigo('ATE'), 'cod_residente' => $residente->cod_residente, 'cod_personal' => $personal->cod_personal, ...$datos, 'fecha_hora' => now(), 'estado' => 'ABIERTA']);
+
         return response()->json($atencion, 201);
     }
 
@@ -76,6 +78,7 @@ class ExpedienteClinicoController extends Controller
     private function definiciones(): array
     {
         $texto = ['nullable', 'string'];
+
         return [
             'nota' => ['modelo' => NotaClinica::class, 'pk' => 'cod_nota', 'prefijo' => 'NOT', 'permiso' => 'notas_clinicas.crear', 'reglas' => ['cod_atencion' => ['required', 'exists:atenciones,cod_atencion'], 'tipo_nota' => ['required', 'string', 'max:50'], 'contenido' => ['required', 'string']], 'valores' => ['fecha_hora' => now(), 'estado' => 'VIGENTE']],
             'antecedente' => ['modelo' => AntecedenteClinico::class, 'pk' => 'cod_antecedente', 'prefijo' => 'ANT', 'permiso' => 'antecedentes_clinicos.crear', 'reglas' => ['tipo_antecedente' => ['required', 'string', 'max:60'], 'descripcion' => ['required', 'string'], 'fecha_referencia' => ['nullable', 'date'], 'fuente_informacion' => ['nullable', 'string', 'max:80'], 'observacion' => $texto], 'valores' => ['estado' => 'ACTIVO']],
@@ -89,5 +92,8 @@ class ExpedienteClinicoController extends Controller
         ];
     }
 
-    private function codigo(string $prefijo): string { return $prefijo.'_'.Str::upper(Str::random(12)); }
+    private function codigo(string $prefijo): string
+    {
+        return $prefijo.'_'.Str::upper(Str::random(12));
+    }
 }

@@ -2,25 +2,36 @@
 
 namespace App\Frontend\Livewire\Enfermeria\Medicacion;
 
-use Livewire\Component;
-use App\Models\Prescripcion;
 use App\Backend\Modulos\Enfermeria\Servicios\TurnoEnfermeriaService;
 use App\Backend\Modulos\Medicacion\Servicios\RegistrarAdministracionMedicacionService;
+use App\Models\AdministracionMedicacion;
+use App\Models\Prescripcion;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Livewire\Component;
 
 class AdministracionMedicacionModal extends Component
 {
     public $showModal = false;
+
     public $cod_prescripcion = null;
+
     public $cod_residente;
+
     public $medicamento_nombre = '';
 
     public $fecha = '';
+
     public $hora_programada = '';
+
     public $hora_real = '';
+
     public $administrado = true;
+
     public $motivo_omision = '';
+
     public $efecto_observado = '';
+
     public $observacion = '';
 
     protected $listeners = ['abrirModalAdministracion'];
@@ -28,31 +39,31 @@ class AdministracionMedicacionModal extends Component
     public function rules()
     {
         return [
-            'cod_residente'   => 'required|exists:residentes,cod_residente',
+            'cod_residente' => 'required|exists:residentes,cod_residente',
             'cod_prescripcion' => 'required|exists:prescripciones,cod_prescripcion',
             'hora_programada' => 'required|date_format:H:i',
-            'administrado'    => 'required|boolean',
-            'motivo_omision'  => !$this->administrado ? 'required|string|min:5|max:255' : 'nullable|string|max:255',
-            'efecto_observado'=> 'nullable|string|max:255',
-            'observacion'     => 'nullable|string|max:255',
+            'administrado' => 'required|boolean',
+            'motivo_omision' => ! $this->administrado ? 'required|string|min:5|max:255' : 'nullable|string|max:255',
+            'efecto_observado' => 'nullable|string|max:255',
+            'observacion' => 'nullable|string|max:255',
         ];
     }
 
     public function messages()
     {
         return [
-            'fecha.required'             => 'La fecha es obligatoria.',
-            'cod_residente.required'            => 'El adulto mayor es obligatorio.',
-            'cod_residente.exists'              => 'El adulto mayor seleccionado no existe.',
+            'fecha.required' => 'La fecha es obligatoria.',
+            'cod_residente.required' => 'El adulto mayor es obligatorio.',
+            'cod_residente.exists' => 'El adulto mayor seleccionado no existe.',
             'cod_prescripcion.required' => 'La medicación es obligatoria.',
-            'cod_prescripcion.exists'   => 'La medicación seleccionada no existe.',
-            'fecha.before_or_equal'      => 'La fecha no puede ser futura.',
-            'hora_programada.required'   => 'La hora programada es obligatoria.',
-            'hora_programada.date_format'=> 'La hora programada debe tener formato HH:MM.',
-            'hora_real.required'         => 'La hora real de administración es obligatoria.',
-            'hora_real.date_format'      => 'La hora real debe tener formato HH:MM.',
-            'motivo_omision.required'    => 'Debe indicar el motivo de la omisión (mínimo 5 caracteres).',
-            'motivo_omision.min'         => 'El motivo de la omisión debe tener al menos 5 caracteres.',
+            'cod_prescripcion.exists' => 'La medicación seleccionada no existe.',
+            'fecha.before_or_equal' => 'La fecha no puede ser futura.',
+            'hora_programada.required' => 'La hora programada es obligatoria.',
+            'hora_programada.date_format' => 'La hora programada debe tener formato HH:MM.',
+            'hora_real.required' => 'La hora real de administración es obligatoria.',
+            'hora_real.date_format' => 'La hora real debe tener formato HH:MM.',
+            'motivo_omision.required' => 'Debe indicar el motivo de la omisión (mínimo 5 caracteres).',
+            'motivo_omision.min' => 'El motivo de la omisión debe tener al menos 5 caracteres.',
         ];
     }
 
@@ -65,19 +76,20 @@ class AdministracionMedicacionModal extends Component
 
         abort_unless(Auth::check(), 401);
         app(TurnoEnfermeriaService::class)->autorizarAccionPaciente($cod_residente, Auth::user());
-        
+
         $medicacion = Prescripcion::query()->with(['medicamento', 'horarios'])
             ->where('cod_prescripcion', $this->cod_prescripcion)
             ->where('cod_residente', $cod_residente)
             ->first();
 
-        if (!$medicacion) {
+        if (! $medicacion) {
             $this->addError('cod_prescripcion', 'El medicamento no pertenece al paciente.');
             $this->dispatch('swal', [
                 'icon' => 'error',
                 'title' => 'Error',
                 'text' => 'El medicamento no pertenece al paciente.',
             ]);
+
             return;
         }
 
@@ -87,13 +99,14 @@ class AdministracionMedicacionModal extends Component
                 'title' => 'Medicamento no activo',
                 'text' => 'No se puede administrar un medicamento inactivo o suspendido.',
             ]);
+
             return;
         }
 
         $this->medicamento_nombre = $medicacion->nombre_medicamento;
         $this->hora_programada = $hora_programada
-            ?: ($medicacion->hora_programada ? \Carbon\Carbon::parse($medicacion->hora_programada)->format('H:i') : now()->format('H:i'));
-        
+            ?: ($medicacion->hora_programada ? Carbon::parse($medicacion->hora_programada)->format('H:i') : now()->format('H:i'));
+
         $this->fecha = now()->format('Y-m-d');
         $this->hora_real = now()->format('H:i');
         $this->administrado = true;
@@ -144,7 +157,7 @@ class AdministracionMedicacionModal extends Component
         $icono = $this->administrado ? 'success' : 'warning';
 
         $this->cerrarModal();
-        
+
         $this->dispatch('administracion-actualizada');
         $this->dispatch('swal', [
             'icon' => $icono,
@@ -157,13 +170,13 @@ class AdministracionMedicacionModal extends Component
     {
         $administracionList = collect();
         if (($this->cod_residente) && app(TurnoEnfermeriaService::class)->esPacienteAsignado($this->cod_residente, Auth::user())) {
-            $administracionList = \App\Models\AdministracionMedicacion::with('medicacion.medicamento')
+            $administracionList = AdministracionMedicacion::with('medicacion.medicamento')
                 ->where('cod_residente', $this->cod_residente)
                 ->latest('fecha_hora_programada')->take(5)->get();
         }
 
         return view('livewire.medicacion.administracion-medicacion-modal', [
-            'administracionList' => $administracionList
+            'administracionList' => $administracionList,
         ]);
     }
 }

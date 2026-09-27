@@ -2,11 +2,11 @@
 
 namespace App\Frontend\Livewire\Medico\Medicacion;
 
-use App\Models\Residente;
 use App\Models\Atencion;
 use App\Models\HorarioPrescripcion;
 use App\Models\Medicamento;
 use App\Models\Prescripcion;
+use App\Models\Residente;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -17,21 +17,37 @@ use Livewire\Component;
 class MedicacionAdultoModal extends Component
 {
     public bool $showModal = false;
+
     public bool $isEditing = false;
+
     public ?string $cod_prescripcion = null;
+
     public string $cod_residente = '';
+
     public string $nombre_medicamento = '';
+
     public string $dosis = '';
+
     public string $frecuencia = '';
+
     public bool $es_prn = false;
+
     public string $condicion_prn = '';
+
     public ?int $intervalo_horas = null;
+
     public string $via_administracion = '';
+
     public string $hora_programada = '';
+
     public string $fecha_inicio = '';
+
     public string $fecha_fin = '';
+
     public string $medico_indica = '';
+
     public string $observacion = '';
+
     public string $estado = 'ACTIVO';
 
     protected $listeners = ['abrirModalMedicacion'];

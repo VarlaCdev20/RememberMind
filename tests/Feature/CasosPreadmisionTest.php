@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Personal;
 use App\Models\Preadmision;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -102,7 +103,7 @@ class CasosPreadmisionTest extends TestCase
     {
         $usuario = User::factory()->create(['estado' => 'ACTIVO']);
         $usuario->assignRole('SUPERADMINISTRADOR');
-        $personal = \App\Models\Personal::query()->create([
+        $personal = Personal::query()->create([
             'cod_personal' => 'PER_PRE_01',
             'cod_usuario' => $usuario->cod_usuario,
             'nombres' => 'ENFERMERA',

@@ -14,29 +14,53 @@ use Livewire\Component;
 class DashboardMedico extends Component
 {
     public string $seccion = 'dashboard';
+
     protected $queryString = ['seccion'];
+
     public $valoracionesPendientes = [];
+
     public int $totalResidentes = 0;
+
     public int $pendientesValoracion = 0;
+
     public int $enSeguimientoActivo = 0;
+
     public int $alertasCriticas = 0;
+
     public int $notasHoy = 0;
+
     public int $signosHoy = 0;
+
     public int $totalMedicacionActiva = 0;
+
     public array $chartEdad = [];
+
     public array $chartDiagnosticos = [];
+
     public array $chartDependencia = [];
+
     public array $chartImc = [];
+
     public array $chartTendencia = [];
+
     public array $chartEstados = [];
+
     public array $chartNotasTipo = [];
+
     public float|int $kpiPaMedia = 0;
+
     public float|int $kpiFcMedia = 0;
+
     public float|int $kpiSatMedia = 0;
+
     public int $kpiSinRegistroHoy = 0;
+
     public int $kpiAdvertenciaSignos = 0;
+
     public array $ultimosSignosDash = [];
+
     public array $alertasPacientes = [];
+
     public array $notasRecientes = [];
 
     protected $listeners = [
@@ -49,13 +73,18 @@ class DashboardMedico extends Component
     {
         abort_unless(auth()->user()->hasAnyRole(['SUPERADMINISTRADOR', 'MEDICO GENERAL/GERIATRA']), 403);
         $routeName = request()->route()?->getName() ?? '';
-        if ($routeName === 'admin.medico.valoraciones') $this->seccion = 'valoraciones';
-        if ($routeName === 'admin.medico.decisiones') $this->seccion = 'decisiones';
+        if ($routeName === 'admin.medico.valoraciones') {
+            $this->seccion = 'valoraciones';
+        }
+        if ($routeName === 'admin.medico.decisiones') {
+            $this->seccion = 'decisiones';
+        }
     }
 
     public function render()
     {
         $this->cargarDatosV2();
+
         return view('livewire.clinica.dashboard-medico')->layout('layouts.sistema');
     }
 

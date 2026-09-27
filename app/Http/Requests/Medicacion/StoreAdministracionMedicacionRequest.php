@@ -2,11 +2,11 @@
 
 namespace App\Http\Requests\Medicacion;
 
-use App\Models\AdministracionMedicacion;
-use App\Models\Prescripcion;
 use App\Backend\Modulos\Enfermeria\Servicios\TurnoEnfermeriaService;
+use App\Models\AdministracionMedicacion;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 
 class StoreAdministracionMedicacionRequest extends FormRequest
 {
@@ -23,7 +23,7 @@ class StoreAdministracionMedicacionRequest extends FormRequest
             $codRes = $adulto->cod_residente;
             $this->merge(['cod_residente' => $codRes]);
         }
-        if (!$this->has('administrado')) {
+        if (! $this->has('administrado')) {
             $this->merge(['administrado' => false]);
         }
         $this->merge([
@@ -40,38 +40,38 @@ class StoreAdministracionMedicacionRequest extends FormRequest
             'cod_prescripcion' => [
                 'required',
                 'string',
-                \Illuminate\Validation\Rule::exists('prescripciones', 'cod_prescripcion')
+                Rule::exists('prescripciones', 'cod_prescripcion')
                     ->where('cod_residente', $codRes)
                     ->whereIn('estado', ['ACTIVO', 'ACTIVA', 'VIGENTE'])
                     ->whereNull('deleted_at'),
             ],
-            'cod_residente'    => 'required|string|exists:residentes,cod_residente',
-            'fecha'            => 'required|date|before_or_equal:today',
-            'hora_programada'  => 'required|date_format:H:i',
-            'hora_real'        => 'required_if:administrado,1,true|nullable|date_format:H:i',
-            'administrado'     => 'required|boolean',
-            'motivo_omision'   => 'required_if:administrado,0,false|nullable|string|min:5|max:2000',
+            'cod_residente' => 'required|string|exists:residentes,cod_residente',
+            'fecha' => 'required|date|before_or_equal:today',
+            'hora_programada' => 'required|date_format:H:i',
+            'hora_real' => 'required_if:administrado,1,true|nullable|date_format:H:i',
+            'administrado' => 'required|boolean',
+            'motivo_omision' => 'required_if:administrado,0,false|nullable|string|min:5|max:2000',
             'efecto_observado' => 'nullable|string|max:2000',
-            'observacion'      => 'nullable|string|max:5000',
+            'observacion' => 'nullable|string|max:5000',
         ];
     }
 
     public function messages(): array
     {
         return [
-            'cod_prescripcion.required'  => 'La medicación es obligatoria.',
-            'cod_prescripcion.exists'    => 'La medicación no existe, no pertenece al paciente o no está activa.',
-            'cod_residente.required'     => 'El residente es obligatorio.',
-            'cod_residente.exists'       => 'El residente seleccionado no existe.',
-            'fecha.required'             => 'La fecha es obligatoria.',
-            'fecha.before_or_equal'      => 'La fecha no puede ser futura.',
-            'hora_programada.required'   => 'La hora programada es obligatoria.',
-            'hora_programada.date_format'=> 'La hora programada debe tener formato HH:MM.',
-            'hora_real.required_if'      => 'La hora real de administración es obligatoria cuando el medicamento es administrado.',
-            'hora_real.date_format'      => 'La hora real debe tener formato HH:MM.',
-            'administrado.required'      => 'Debe indicar si se administró el medicamento.',
+            'cod_prescripcion.required' => 'La medicación es obligatoria.',
+            'cod_prescripcion.exists' => 'La medicación no existe, no pertenece al paciente o no está activa.',
+            'cod_residente.required' => 'El residente es obligatorio.',
+            'cod_residente.exists' => 'El residente seleccionado no existe.',
+            'fecha.required' => 'La fecha es obligatoria.',
+            'fecha.before_or_equal' => 'La fecha no puede ser futura.',
+            'hora_programada.required' => 'La hora programada es obligatoria.',
+            'hora_programada.date_format' => 'La hora programada debe tener formato HH:MM.',
+            'hora_real.required_if' => 'La hora real de administración es obligatoria cuando el medicamento es administrado.',
+            'hora_real.date_format' => 'La hora real debe tener formato HH:MM.',
+            'administrado.required' => 'Debe indicar si se administró el medicamento.',
             'motivo_omision.required_if' => 'El motivo de omisión es obligatorio y debe tener al menos 5 caracteres.',
-            'motivo_omision.min'         => 'El motivo de omisión debe tener al menos 5 caracteres.',
+            'motivo_omision.min' => 'El motivo de omisión debe tener al menos 5 caracteres.',
         ];
     }
 

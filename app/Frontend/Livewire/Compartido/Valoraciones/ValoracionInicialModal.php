@@ -2,6 +2,7 @@
 
 namespace App\Frontend\Livewire\Compartido\Valoraciones;
 
+use App\Backend\Modulos\Clinica\Servicios\ValidacionSignosVitalesService;
 use App\Models\Preadmision;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
@@ -9,59 +10,92 @@ use Livewire\Component;
 class ValoracionInicialModal extends Component
 {
     public bool $isOpen = false;
+
     public $preadmision;
+
     public ?string $valoracionId = null;
 
     public $estado_general;
+
     public $nivel_conciencia;
+
     public $orientacion;
+
     public $comunicacion;
 
     // Orientación desglosada
     public $orientacion_persona = 'ORIENTADO';
+
     public $orientacion_tiempo = 'ORIENTADO';
+
     public $orientacion_espacio = 'ORIENTADO';
 
     public bool $hay_dolor = false;
+
     public $intensidad_dolor;
+
     public $ubicacion_dolor;
 
     public $movilidad;
+
     public $apoyo_movilidad;
+
     public $riesgo_caida;
 
     public $piel_estado;
+
     public bool $hay_heridas = false;
+
     public $ubicacion_heridas;
 
     public $higiene_ingreso;
+
     public $continencia_basica;
+
     public $alimentacion_aparente;
 
     // Signos Vitales
     public $pa_sistolica;
+
     public $pa_diastolica;
+
     public $frecuencia_cardiaca;
+
     public $frecuencia_respiratoria;
+
     public $temperatura;
+
     public $saturacion_oxigeno;
+
     public $peso;
+
     public $talla;
 
     // Detalles Clínicos Extendidos
     public $antecedentes_relevantes;
+
     public $medicacion_referida;
+
     public $alergias_referidas;
+
     public $dependencia_funcional = 'INDEPENDIENTE';
+
     public $riesgo_nutricional = 'SIN RIESGO';
+
     public $riesgo_cognitivo = 'SIN DETERIORO';
+
     public $necesidad_apoyo_inmediato = '';
+
     public $prioridad_sugerida = 'MEDIA';
+
     public bool $confirmacion_documentacion = false;
+
     public $comentarios_adicionales;
 
     public $signos_vitales_iniciales;
+
     public $observacion;
+
     public $recomendacion_enfermeria;
 
     protected $listeners = ['abrirValoracionInicial' => 'open'];
@@ -192,14 +226,14 @@ class ValoracionInicialModal extends Component
             'orientacion_espacio' => 'required',
             'movilidad' => 'required',
             'riesgo_caida' => 'required',
-            'pa_sistolica' => 'required|numeric|min:' . \App\Backend\Modulos\Clinica\Servicios\ValidacionSignosVitalesService::PAS_MIN . '|max:' . \App\Backend\Modulos\Clinica\Servicios\ValidacionSignosVitalesService::PAS_MAX,
-            'pa_diastolica' => 'required|numeric|min:' . \App\Backend\Modulos\Clinica\Servicios\ValidacionSignosVitalesService::PAD_MIN . '|max:' . \App\Backend\Modulos\Clinica\Servicios\ValidacionSignosVitalesService::PAD_MAX,
-            'frecuencia_cardiaca' => 'required|numeric|min:' . \App\Backend\Modulos\Clinica\Servicios\ValidacionSignosVitalesService::FC_MIN . '|max:' . \App\Backend\Modulos\Clinica\Servicios\ValidacionSignosVitalesService::FC_MAX,
-            'frecuencia_respiratoria' => 'required|numeric|min:' . \App\Backend\Modulos\Clinica\Servicios\ValidacionSignosVitalesService::FR_MIN . '|max:' . \App\Backend\Modulos\Clinica\Servicios\ValidacionSignosVitalesService::FR_MAX,
-            'temperatura' => 'required|numeric|min:' . \App\Backend\Modulos\Clinica\Servicios\ValidacionSignosVitalesService::TEMP_MIN . '|max:' . \App\Backend\Modulos\Clinica\Servicios\ValidacionSignosVitalesService::TEMP_MAX,
-            'saturacion_oxigeno' => 'required|numeric|min:' . \App\Backend\Modulos\Clinica\Servicios\ValidacionSignosVitalesService::SPO2_MIN . '|max:' . \App\Backend\Modulos\Clinica\Servicios\ValidacionSignosVitalesService::SPO2_MAX,
-            'peso' => 'nullable|numeric|min:' . \App\Backend\Modulos\Clinica\Servicios\ValidacionSignosVitalesService::PESO_MIN . '|max:' . \App\Backend\Modulos\Clinica\Servicios\ValidacionSignosVitalesService::PESO_MAX,
-            'talla' => 'nullable|numeric|min:' . \App\Backend\Modulos\Clinica\Servicios\ValidacionSignosVitalesService::TALLA_CM_MIN . '|max:' . \App\Backend\Modulos\Clinica\Servicios\ValidacionSignosVitalesService::TALLA_CM_MAX,
+            'pa_sistolica' => 'required|numeric|min:'.ValidacionSignosVitalesService::PAS_MIN.'|max:'.ValidacionSignosVitalesService::PAS_MAX,
+            'pa_diastolica' => 'required|numeric|min:'.ValidacionSignosVitalesService::PAD_MIN.'|max:'.ValidacionSignosVitalesService::PAD_MAX,
+            'frecuencia_cardiaca' => 'required|numeric|min:'.ValidacionSignosVitalesService::FC_MIN.'|max:'.ValidacionSignosVitalesService::FC_MAX,
+            'frecuencia_respiratoria' => 'required|numeric|min:'.ValidacionSignosVitalesService::FR_MIN.'|max:'.ValidacionSignosVitalesService::FR_MAX,
+            'temperatura' => 'required|numeric|min:'.ValidacionSignosVitalesService::TEMP_MIN.'|max:'.ValidacionSignosVitalesService::TEMP_MAX,
+            'saturacion_oxigeno' => 'required|numeric|min:'.ValidacionSignosVitalesService::SPO2_MIN.'|max:'.ValidacionSignosVitalesService::SPO2_MAX,
+            'peso' => 'nullable|numeric|min:'.ValidacionSignosVitalesService::PESO_MIN.'|max:'.ValidacionSignosVitalesService::PESO_MAX,
+            'talla' => 'nullable|numeric|min:'.ValidacionSignosVitalesService::TALLA_CM_MIN.'|max:'.ValidacionSignosVitalesService::TALLA_CM_MAX,
             'dependencia_funcional' => 'required',
             'riesgo_nutricional' => 'required',
             'riesgo_cognitivo' => 'required',
@@ -216,8 +250,9 @@ class ValoracionInicialModal extends Component
             $rules['ubicacion_heridas'] = 'required|min:5';
         }
 
-                if ((float)$this->pa_sistolica <= (float)$this->pa_diastolica) {
-            $this->addError('pa_sistolica', 'La presión sistólica (' . $this->pa_sistolica . ' mmHg) debe ser estrictamente mayor a la diastólica (' . $this->pa_diastolica . ' mmHg).');
+        if ((float) $this->pa_sistolica <= (float) $this->pa_diastolica) {
+            $this->addError('pa_sistolica', 'La presión sistólica ('.$this->pa_sistolica.' mmHg) debe ser estrictamente mayor a la diastólica ('.$this->pa_diastolica.' mmHg).');
+
             return;
         }
 
@@ -363,7 +398,7 @@ class ValoracionInicialModal extends Component
 
             $this->dispatch('swal', [
                 'title' => 'Error',
-                'text' => 'Ocurrio un error al guardar la valoracion: ' . $e->getMessage(),
+                'text' => 'Ocurrio un error al guardar la valoracion: '.$e->getMessage(),
                 'icon' => 'error',
             ]);
         }

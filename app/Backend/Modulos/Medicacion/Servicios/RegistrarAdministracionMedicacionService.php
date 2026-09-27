@@ -2,11 +2,11 @@
 
 namespace App\Backend\Modulos\Medicacion\Servicios;
 
+use App\Backend\Modulos\Enfermeria\Servicios\TurnoEnfermeriaService;
 use App\Models\AdministracionMedicacion;
 use App\Models\AsignacionResidenteJornada;
 use App\Models\Prescripcion;
 use App\Models\User;
-use App\Backend\Modulos\Enfermeria\Servicios\TurnoEnfermeriaService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;

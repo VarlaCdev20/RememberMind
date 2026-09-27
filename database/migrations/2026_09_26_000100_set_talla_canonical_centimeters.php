@@ -62,12 +62,12 @@ return new class extends Migration
             ->whereNotNull('talla')
             ->where(function ($q) {
                 $q->where('talla', '<', 50.0)
-                  ->orWhere('talla', '>', 240.0);
+                    ->orWhere('talla', '>', 240.0);
             })
             ->count();
 
         if ($fueraRangoPreadmision > 0) {
-            throw new \RuntimeException(
+            throw new RuntimeException(
                 "Existen {$fueraRangoPreadmision} registros en 'valoraciones_enfermeria_preadmision' con talla fuera del rango canonico (50.0 - 240.0 cm). Conforme a la politica de no conversion automatica de datos ambiguos, se detiene la migracion para regularizacion manual auditada."
             );
         }
@@ -76,12 +76,12 @@ return new class extends Migration
             ->whereNotNull('talla')
             ->where(function ($q) {
                 $q->where('talla', '<', 50.0)
-                  ->orWhere('talla', '>', 240.0);
+                    ->orWhere('talla', '>', 240.0);
             })
             ->count();
 
         if ($fueraRangoAntropometria > 0) {
-            throw new \RuntimeException(
+            throw new RuntimeException(
                 "Existen {$fueraRangoAntropometria} registros en 'mediciones_antropometricas' con talla fuera del rango canonico (50.0 - 240.0 cm). Conforme a la politica de no conversion automatica de datos ambiguos, se detiene la migracion para regularizacion manual auditada."
             );
         }

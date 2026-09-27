@@ -2,24 +2,26 @@
 
 namespace App\Frontend\Livewire\Medico\Clinica;
 
-use Livewire\Component;
-use Livewire\WithPagination;
 use App\Models\AdultoMayor;
 use App\Models\NotaClinica;
-use App\Models\SignoVital;
 use App\Models\Prescripcion;
+use App\Models\SignoVital;
+use Livewire\Component;
+use Livewire\WithPagination;
 
 class PacientesSeguimientoPanel extends Component
 {
     use WithPagination;
 
-    public string $busqueda     = '';
+    public string $busqueda = '';
+
     public string $filtroEstado = '';
-    public string $tab          = 'activos'; // activos | pendientes | historial | interconsultas
+
+    public string $tab = 'activos'; // activos | pendientes | historial | interconsultas
 
     protected $listeners = [
-        'nota-evolucion-guardada'  => '$refresh',
-        'signos-actualizados'      => '$refresh',
+        'nota-evolucion-guardada' => '$refresh',
+        'signos-actualizados' => '$refresh',
         'valoracion-barthel-guardada' => '$refresh',
     ];
 
@@ -27,7 +29,7 @@ class PacientesSeguimientoPanel extends Component
 
     public function mount(): void
     {
-        if (!auth()->user()->hasAnyRole(['SUPERADMINISTRADOR', 'MEDICO GENERAL/GERIATRA'])) {
+        if (! auth()->user()->hasAnyRole(['SUPERADMINISTRADOR', 'MEDICO GENERAL/GERIATRA'])) {
             abort(403);
         }
 
@@ -40,9 +42,20 @@ class PacientesSeguimientoPanel extends Component
         }
     }
 
-    public function updatingBusqueda(): void     { $this->resetPage(); }
-    public function updatingFiltroEstado(): void { $this->resetPage(); }
-    public function updatingTab(): void          { $this->resetPage(); }
+    public function updatingBusqueda(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatingFiltroEstado(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatingTab(): void
+    {
+        $this->resetPage();
+    }
 
     public function setTab(string $tab): void
     {
@@ -84,29 +97,28 @@ class PacientesSeguimientoPanel extends Component
 
     public function render()
     {
-        $estadosActivos    = ['ACTIVO', 'ADMITIDO', 'ASIGNADO', 'EN_SEGUIMIENTO_ACTIVO', 'OBSERVADO', 'SEGUIMIENTO_ESPECIAL'];
+        $estadosActivos = ['ACTIVO', 'ADMITIDO', 'ASIGNADO', 'EN_SEGUIMIENTO_ACTIVO', 'OBSERVADO', 'SEGUIMIENTO_ESPECIAL'];
         $estadosPendientes = ['VALORACION_MEDICA', 'DECISION_ADMISION'];
 
         $base = AdultoMayor::query();
 
         if ($this->busqueda) {
             $busq = trim($this->busqueda);
-            $base->where(fn($q) =>
-                $q->where('nombres', 'like', "%{$busq}%")
-                  ->orWhere('apellido_paterno', 'like', "%{$busq}%")
-                  ->orWhere('apellido_materno', 'like', "%{$busq}%")
-                  ->orWhere('numero_documento', 'like', "%{$busq}%")
+            $base->where(fn ($q) => $q->where('nombres', 'like', "%{$busq}%")
+                ->orWhere('apellido_paterno', 'like', "%{$busq}%")
+                ->orWhere('apellido_materno', 'like', "%{$busq}%")
+                ->orWhere('numero_documento', 'like', "%{$busq}%")
             );
         }
 
-        if (!empty($this->filtroEstado)) {
+        if (! empty($this->filtroEstado)) {
             $base->where('estado', $this->filtroEstado);
         } elseif ($this->tab === 'pendientes') {
             $base->whereIn('estado', $estadosPendientes);
         } elseif ($this->tab === 'interconsultas') {
             // Pacientes activos que tienen al menos 1 nota de tipo INTERCONSULTA
             $base->whereIn('estado', $estadosActivos)
-                 ->whereHas('notas', fn($q) => $q->where('tipo_nota', 'INTERCONSULTA')->where('estado', 'ACTIVO'));
+                ->whereHas('notas', fn ($q) => $q->where('tipo_nota', 'INTERCONSULTA')->where('estado', 'ACTIVO'));
         } elseif ($this->tab === 'historial') {
             // Todos los pacientes (sin filtro de estado), incluidos dados de alta/derivados
         } else {
@@ -120,7 +132,7 @@ class PacientesSeguimientoPanel extends Component
         $cntActivos = AdultoMayor::whereIn('estado', $estadosActivos)->count();
         $cntPendientes = AdultoMayor::whereIn('estado', $estadosPendientes)->count();
         $cntInterconsultas = AdultoMayor::whereIn('estado', $estadosActivos)
-            ->whereHas('notas', fn($q) => $q->where('tipo_nota', 'INTERCONSULTA')->where('estado', 'ACTIVO'))
+            ->whereHas('notas', fn ($q) => $q->where('tipo_nota', 'INTERCONSULTA')->where('estado', 'ACTIVO'))
             ->count();
 
         // Last vitals and notes per patient (keyed by cod_residente)

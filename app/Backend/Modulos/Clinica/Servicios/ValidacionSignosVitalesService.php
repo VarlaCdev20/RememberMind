@@ -10,34 +10,44 @@ class ValidacionSignosVitalesService
     // clínicos de alerta se evalúan por separado y no deben impedir registrar
     // una medición real tomada al residente.
     public const PAS_MIN = 1;
+
     public const PAS_MAX = 400;
+
     public const PAD_MIN = 1;
+
     public const PAD_MAX = 400;
 
     public const FC_MIN = 1;
+
     public const FC_MAX = 300;
 
     public const FR_MIN = 1;
+
     public const FR_MAX = 100;
 
     public const TEMP_MIN = 25.0;
+
     public const TEMP_MAX = 45.0;
 
     public const SPO2_MIN = 0;
+
     public const SPO2_MAX = 100;
 
     public const GLUCOSA_MIN = 0.0;
 
     public const PESO_MIN = 20.0;
+
     public const PESO_MAX = 300.0;
 
     public const TALLA_CM_MIN = 50.0;
+
     public const TALLA_CM_MAX = 240.0;
 
     public const DOLOR_MIN = 0;
+
     public const DOLOR_MAX = 10;
 
-        /**
+    /**
      * Normaliza la talla canónica en centímetros (redondeo a 1 decimal).
      */
     public static function normalizarTalla(?float $talla): ?float
@@ -54,16 +64,17 @@ class ValidacionSignosVitalesService
      */
     public static function calcularImc(?float $peso, ?float $talla): ?float
     {
-        if (!$peso || !$talla || $peso < self::PESO_MIN || $peso > self::PESO_MAX) {
+        if (! $peso || ! $talla || $peso < self::PESO_MIN || $peso > self::PESO_MAX) {
             return null;
         }
 
         $tallaCm = self::normalizarTalla($talla);
-        if (!$tallaCm || $tallaCm < self::TALLA_CM_MIN || $tallaCm > self::TALLA_CM_MAX) {
+        if (! $tallaCm || $tallaCm < self::TALLA_CM_MIN || $tallaCm > self::TALLA_CM_MAX) {
             return null;
         }
 
         $tallaM = $tallaCm / 100.0;
+
         return round($peso / ($tallaM * $tallaM), 1);
     }
 
@@ -73,17 +84,17 @@ class ValidacionSignosVitalesService
     public static function reglas(): array
     {
         return [
-            'presion_sistolica'       => 'nullable|integer|min:' . self::PAS_MIN . '|max:' . self::PAS_MAX,
-            'presion_diastolica'      => 'nullable|integer|min:' . self::PAD_MIN . '|max:' . self::PAD_MAX,
-            'frecuencia_cardiaca'     => 'nullable|integer|min:' . self::FC_MIN . '|max:' . self::FC_MAX,
-            'frecuencia_respiratoria' => 'nullable|integer|min:' . self::FR_MIN . '|max:' . self::FR_MAX,
-            'temperatura'             => 'nullable|numeric|min:' . self::TEMP_MIN . '|max:' . self::TEMP_MAX,
-            'saturacion'              => 'nullable|integer|min:' . self::SPO2_MIN . '|max:' . self::SPO2_MAX,
-            'glucosa'                 => 'nullable|numeric|min:' . self::GLUCOSA_MIN,
-            'peso'                    => 'nullable|numeric|min:' . self::PESO_MIN . '|max:' . self::PESO_MAX,
-            'talla'                   => 'nullable|numeric|min:' . self::TALLA_CM_MIN . '|max:' . self::TALLA_CM_MAX,
-            'dolor'                   => 'nullable|integer|min:' . self::DOLOR_MIN . '|max:' . self::DOLOR_MAX,
-            'observacion'             => 'nullable|string|max:5000',
+            'presion_sistolica' => 'nullable|integer|min:'.self::PAS_MIN.'|max:'.self::PAS_MAX,
+            'presion_diastolica' => 'nullable|integer|min:'.self::PAD_MIN.'|max:'.self::PAD_MAX,
+            'frecuencia_cardiaca' => 'nullable|integer|min:'.self::FC_MIN.'|max:'.self::FC_MAX,
+            'frecuencia_respiratoria' => 'nullable|integer|min:'.self::FR_MIN.'|max:'.self::FR_MAX,
+            'temperatura' => 'nullable|numeric|min:'.self::TEMP_MIN.'|max:'.self::TEMP_MAX,
+            'saturacion' => 'nullable|integer|min:'.self::SPO2_MIN.'|max:'.self::SPO2_MAX,
+            'glucosa' => 'nullable|numeric|min:'.self::GLUCOSA_MIN,
+            'peso' => 'nullable|numeric|min:'.self::PESO_MIN.'|max:'.self::PESO_MAX,
+            'talla' => 'nullable|numeric|min:'.self::TALLA_CM_MIN.'|max:'.self::TALLA_CM_MAX,
+            'dolor' => 'nullable|integer|min:'.self::DOLOR_MIN.'|max:'.self::DOLOR_MAX,
+            'observacion' => 'nullable|string|max:5000',
         ];
     }
 
@@ -93,25 +104,25 @@ class ValidacionSignosVitalesService
     public static function mensajes(): array
     {
         return [
-            'presion_sistolica.min'       => 'La presión sistólica debe ser de al menos ' . self::PAS_MIN . ' mmHg.',
-            'presion_sistolica.max'       => 'La presión sistólica no puede exceder ' . self::PAS_MAX . ' mmHg.',
-            'presion_diastolica.min'      => 'La presión diastólica debe ser de al menos ' . self::PAD_MIN . ' mmHg.',
-            'presion_diastolica.max'      => 'La presión diastólica no puede exceder ' . self::PAD_MAX . ' mmHg.',
-            'frecuencia_cardiaca.min'     => 'La frecuencia cardíaca debe ser de al menos ' . self::FC_MIN . ' bpm.',
-            'frecuencia_cardiaca.max'     => 'La frecuencia cardíaca no puede exceder ' . self::FC_MAX . ' bpm.',
-            'frecuencia_respiratoria.min' => 'La frecuencia respiratoria debe ser de al menos ' . self::FR_MIN . ' rpm.',
-            'frecuencia_respiratoria.max' => 'La frecuencia respiratoria no puede exceder ' . self::FR_MAX . ' rpm.',
-            'temperatura.min'             => 'La temperatura debe ser de al menos ' . self::TEMP_MIN . ' °C.',
-            'temperatura.max'             => 'La temperatura no puede exceder ' . self::TEMP_MAX . ' °C.',
-            'saturacion.min'              => 'La saturación de oxígeno debe ser de al menos ' . self::SPO2_MIN . '%.',
-            'saturacion.max'              => 'La saturación de oxígeno no puede exceder ' . self::SPO2_MAX . '%.',
-            'glucosa.min'                 => 'La glucosa debe ser de al menos ' . self::GLUCOSA_MIN . ' mg/dL.',
-            'peso.min'                    => 'El peso debe ser de al menos ' . self::PESO_MIN . ' kg.',
-            'peso.max'                    => 'El peso no puede exceder ' . self::PESO_MAX . ' kg.',
-            'talla.min'                   => 'La talla debe ser de al menos ' . self::TALLA_CM_MIN . ' cm.',
-            'talla.max'                   => 'La talla no puede exceder ' . self::TALLA_CM_MAX . ' cm.',
-            'dolor.min'                   => 'La escala de dolor va de 0 a 10.',
-            'dolor.max'                   => 'La escala de dolor va de 0 a 10.',
+            'presion_sistolica.min' => 'La presión sistólica debe ser de al menos '.self::PAS_MIN.' mmHg.',
+            'presion_sistolica.max' => 'La presión sistólica no puede exceder '.self::PAS_MAX.' mmHg.',
+            'presion_diastolica.min' => 'La presión diastólica debe ser de al menos '.self::PAD_MIN.' mmHg.',
+            'presion_diastolica.max' => 'La presión diastólica no puede exceder '.self::PAD_MAX.' mmHg.',
+            'frecuencia_cardiaca.min' => 'La frecuencia cardíaca debe ser de al menos '.self::FC_MIN.' bpm.',
+            'frecuencia_cardiaca.max' => 'La frecuencia cardíaca no puede exceder '.self::FC_MAX.' bpm.',
+            'frecuencia_respiratoria.min' => 'La frecuencia respiratoria debe ser de al menos '.self::FR_MIN.' rpm.',
+            'frecuencia_respiratoria.max' => 'La frecuencia respiratoria no puede exceder '.self::FR_MAX.' rpm.',
+            'temperatura.min' => 'La temperatura debe ser de al menos '.self::TEMP_MIN.' °C.',
+            'temperatura.max' => 'La temperatura no puede exceder '.self::TEMP_MAX.' °C.',
+            'saturacion.min' => 'La saturación de oxígeno debe ser de al menos '.self::SPO2_MIN.'%.',
+            'saturacion.max' => 'La saturación de oxígeno no puede exceder '.self::SPO2_MAX.'%.',
+            'glucosa.min' => 'La glucosa debe ser de al menos '.self::GLUCOSA_MIN.' mg/dL.',
+            'peso.min' => 'El peso debe ser de al menos '.self::PESO_MIN.' kg.',
+            'peso.max' => 'El peso no puede exceder '.self::PESO_MAX.' kg.',
+            'talla.min' => 'La talla debe ser de al menos '.self::TALLA_CM_MIN.' cm.',
+            'talla.max' => 'La talla no puede exceder '.self::TALLA_CM_MAX.' cm.',
+            'dolor.min' => 'La escala de dolor va de 0 a 10.',
+            'dolor.max' => 'La escala de dolor va de 0 a 10.',
         ];
     }
 
@@ -148,7 +159,7 @@ class ValidacionSignosVitalesService
             return $valor !== null && $valor !== '';
         });
 
-        if (!$tieneAlMenosUna) {
+        if (! $tieneAlMenosUna) {
             $validator->errors()->add(
                 $campoErrorGeneral,
                 'Debe registrar al menos un signo vital o medición real.'

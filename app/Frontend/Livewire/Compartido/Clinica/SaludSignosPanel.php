@@ -2,62 +2,93 @@
 
 namespace App\Frontend\Livewire\Compartido\Clinica;
 
+use App\Backend\Modulos\Clinica\Servicios\SignosVitalesService;
+use App\Backend\Modulos\Clinica\Servicios\ValidacionSignosVitalesService;
+use App\Backend\Modulos\Enfermeria\Servicios\TurnoEnfermeriaService;
+use App\Models\Residente;
+use App\Models\SignoVital;
 use Carbon\Carbon;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 use Livewire\Component;
 use Livewire\WithPagination;
-use App\Models\Residente;
-use App\Models\SignoVital;
-use App\Backend\Modulos\Clinica\Servicios\ValidacionSignosVitalesService;
-use App\Backend\Modulos\Clinica\Servicios\SignosVitalesService;
-use App\Backend\Modulos\Enfermeria\Servicios\TurnoEnfermeriaService;
 
 class SaludSignosPanel extends Component
 {
     use WithPagination;
 
     public ?Residente $adulto = null;
+
     public string $adultoSeleccionado = '';
+
     public string $buscarPaciente = '';
 
     public bool $modalFormulario = false;
+
     public bool $modalPresion = false;
+
     public bool $modalCardiaca = false;
+
     public bool $modalTemperatura = false;
+
     public bool $modalPeso = false;
+
     public bool $modalObservacion = false;
 
     public bool $modalDetalle = false;
+
     public bool $modalAnular = false;
 
     public ?string $signoId = null;
+
     public string $fecha = '';
+
     public string $hora = '';
+
     public ?int $presion_sistolica = null;
+
     public ?int $presion_diastolica = null;
+
     public ?int $frecuencia_cardiaca = null;
+
     public ?int $frecuencia_respiratoria = null;
+
     public mixed $temperatura = null;
+
     public ?int $saturacion = null;
+
     public mixed $glucosa = null;
+
     public mixed $peso = null;
+
     public mixed $talla = null;
+
     public mixed $imc = null;
+
     public ?int $dolor = null;
+
     public string $observacion = '';
+
     public string $motivoRectificacion = '';
 
     public ?string $signoIdAnular = null;
+
     public string $motivoAnulacion = '';
+
     public ?string $signoDetalleId = null;
 
     public string $fechaDesde = '';
+
     public string $fechaHasta = '';
+
     public string $parametro = 'todos';
+
     public string $estadoClinico = 'todos';
+
     public string $responsable = 'todos';
+
     public string $grafica = 'presion';
+
     public int $perPage = 10;
 
     public bool $guardarConfirmado = false;
@@ -114,7 +145,7 @@ class SaludSignosPanel extends Component
 
         return view('livewire.clinica.salud-signos-panel', [
             'adulto' => $this->adulto,
-            'historial' => $this->adulto ? $this->paginarColeccion($signosFiltrados) : new \Illuminate\Pagination\LengthAwarePaginator([], 0, $this->perPage),
+            'historial' => $this->adulto ? $this->paginarColeccion($signosFiltrados) : new LengthAwarePaginator([], 0, $this->perPage),
             'signosFiltrados' => $signosFiltrados,
             'ultimoVigente' => $ultimoVigente,
             'totalVigentes' => $totalVigentes,
@@ -142,21 +173,23 @@ class SaludSignosPanel extends Component
                 'title' => 'Seleccione un paciente',
                 'text' => 'Seleccione un adulto mayor antes de buscar.',
             ]);
+
             return;
         }
 
         $adultoExistente = Residente::find($this->adultoSeleccionado);
-        if (!$adultoExistente) {
+        if (! $adultoExistente) {
             $this->dispatch('swal', [
                 'icon' => 'error',
                 'title' => 'No encontrado',
                 'text' => 'El adulto mayor seleccionado no existe.',
             ]);
+
             return;
         }
 
         $this->cargarAdulto($this->adultoSeleccionado);
-        
+
         if ($this->adulto->signosVitales()->count() === 0) {
             $this->dispatch('swal', [
                 'icon' => 'info',
@@ -196,7 +229,7 @@ class SaludSignosPanel extends Component
     private function obtenerPacientesSelector()
     {
         $query = Residente::query()
-                        ->withCount('signosVitales')
+            ->withCount('signosVitales')
             ->orderBy('nombres')
             ->orderBy('apellido_paterno');
         if (auth()->user()?->hasRole('ENFERMEROS')) {
@@ -204,7 +237,7 @@ class SaludSignosPanel extends Component
         }
 
         if (trim($this->buscarPaciente) !== '') {
-            $busqueda = '%' . trim($this->buscarPaciente) . '%';
+            $busqueda = '%'.trim($this->buscarPaciente).'%';
             $query->where(function ($subQuery) use ($busqueda) {
                 $subQuery->where('cod_residente', 'like', $busqueda)
                     ->orWhere('nombres', 'like', $busqueda)
@@ -225,7 +258,7 @@ class SaludSignosPanel extends Component
             'nombre' => $nombre !== '' ? $nombre : 'Adulto mayor',
             'codigo' => $this->adulto->cod_residente,
             'estado' => optional($this->adulto->estado)->estado ?? 'Sin estado',
-            'edad' => $this->adulto->fecha_nac ? $this->adulto->fecha_nac->age . ' años' : 'Edad no registrada',
+            'edad' => $this->adulto->fecha_nac ? $this->adulto->fecha_nac->age.' años' : 'Edad no registrada',
             'ci' => $this->adulto->ci ?: 'S/D',
             'ultimo_control' => $ultimoVigente ? $this->formatearFechaHora($ultimoVigente) : 'Sin controles',
             'registros' => $baseSignos->count(),
@@ -268,8 +301,8 @@ class SaludSignosPanel extends Component
 
     public function abrirFormularioNuevo(): void
     {
-        abort_if(!$this->adulto, 403, 'Debe seleccionar un paciente antes de registrar signos vitales.');
-        abort_if(!auth()->user()->can('signos_vitales.crear'), 403);
+        abort_if(! $this->adulto, 403, 'Debe seleccionar un paciente antes de registrar signos vitales.');
+        abort_if(! auth()->user()->can('signos_vitales.crear'), 403);
         $this->limpiarFormulario();
         $this->modalFormulario = true;
     }
@@ -277,10 +310,10 @@ class SaludSignosPanel extends Component
     public function abrirFormularioEditar(string $id): void
     {
         abort_if(auth()->user()?->hasRole('ENFERMEROS'), 403, 'Los registros clínicos firmados se rectifican; no se editan.');
-        abort_if(!auth()->user()->can('signos_vitales.editar'), 403);
+        abort_if(! auth()->user()->can('signos_vitales.editar'), 403);
 
         $signo = SignoVital::findOrFail($id);
-        abort_if(!$this->adulto || $signo->cod_residente !== $this->adulto->cod_residente, 403);
+        abort_if(! $this->adulto || $signo->cod_residente !== $this->adulto->cod_residente, 403);
 
         if ($signo->estado === 'ANULADO') {
             $this->dispatch('swal', [
@@ -288,6 +321,7 @@ class SaludSignosPanel extends Component
                 'title' => 'No permitido',
                 'text' => 'No se puede editar un registro anulado.',
             ]);
+
             return;
         }
 
@@ -318,17 +352,18 @@ class SaludSignosPanel extends Component
 
     public function guardar(): void
     {
-        abort_if(!$this->adulto, 403, 'Paciente no seleccionado.');
+        abort_if(! $this->adulto, 403, 'Paciente no seleccionado.');
         $esRectificacion = $this->signoId !== null;
         $permiso = $esRectificacion ? 'signos_vitales.editar' : 'signos_vitales.crear';
         abort_unless(auth()->user()->can($permiso), 403);
 
         $alertas = $this->detectarAlertas();
-        if (!empty($alertas) && !$this->guardarConfirmado) {
+        if (! empty($alertas) && ! $this->guardarConfirmado) {
             $this->dispatch('signos-confirmar-alertas', [
                 'titulo' => 'Valores fuera del rango referencial',
                 'texto' => 'Se detectaron valores que requieren revisión del personal de salud. Verifique la información antes de guardar.',
             ]);
+
             return;
         }
         $this->guardarConfirmado = false;
@@ -338,7 +373,7 @@ class SaludSignosPanel extends Component
             'frecuencia_cardiaca' => $this->frecuencia_cardiaca, 'frecuencia_respiratoria' => $this->frecuencia_respiratoria,
             'temperatura' => $this->temperatura, 'saturacion' => $this->saturacion, 'glucosa' => $this->glucosa,
             'peso' => $this->peso, 'talla' => $this->talla, 'dolor' => $this->dolor, 'observacion' => $this->observacion,
-            'valor_atipico_confirmado' => !empty($alertas),
+            'valor_atipico_confirmado' => ! empty($alertas),
         ];
         $servicio = app(SignosVitalesService::class);
         if ($esRectificacion) {
@@ -351,7 +386,7 @@ class SaludSignosPanel extends Component
         $this->cerrarFormulario();
         $this->resetPage();
         $this->dispatch('swal', [
-            'icon' => !empty($alertas) ? 'warning' : 'success',
+            'icon' => ! empty($alertas) ? 'warning' : 'success',
             'title' => $esRectificacion ? 'Rectificación registrada' : 'Registro guardado',
             'text' => $esRectificacion ? 'El registro original se conserva sin modificaciones.' : 'Los signos vitales se guardaron correctamente.',
         ]);
@@ -359,7 +394,7 @@ class SaludSignosPanel extends Component
 
     public function confirmarGuardarConAlertas(): void
     {
-        abort_if(!$this->adulto, 403, 'Paciente no seleccionado.');
+        abort_if(! $this->adulto, 403, 'Paciente no seleccionado.');
         $this->guardarConfirmado = true;
         $this->guardar();
     }
@@ -367,15 +402,15 @@ class SaludSignosPanel extends Component
     public function abrirAnular(string $id): void
     {
         abort_if(auth()->user()?->hasRole('ENFERMEROS'), 403, 'Los registros firmados se rectifican; no se eliminan ni restauran desde Enfermería.');
-        abort_if(!auth()->user()->can('signos_vitales.anular'), 403);
+        abort_if(! auth()->user()->can('signos_vitales.anular'), 403);
         $this->dispatch('signos-confirmar-anulacion', ['id' => $id]);
     }
 
     public function anularConMotivo(string $id, string $motivo): void
     {
         abort_if(auth()->user()?->hasRole('ENFERMEROS'), 403, 'Los registros firmados se rectifican; no se eliminan ni restauran desde Enfermería.');
-        abort_if(!$this->adulto, 403, 'Paciente no seleccionado.');
-        abort_if(!auth()->user()->can('signos_vitales.anular'), 403);
+        abort_if(! $this->adulto, 403, 'Paciente no seleccionado.');
+        abort_if(! auth()->user()->can('signos_vitales.anular'), 403);
 
         $motivo = trim($motivo);
 
@@ -385,6 +420,7 @@ class SaludSignosPanel extends Component
                 'title' => 'Motivo requerido',
                 'text' => 'El motivo de anulación debe tener al menos 10 caracteres.',
             ]);
+
             return;
         }
 
@@ -411,8 +447,8 @@ class SaludSignosPanel extends Component
     public function confirmarAnular(): void
     {
         abort_if(auth()->user()?->hasRole('ENFERMEROS'), 403, 'Los registros firmados se rectifican; no se eliminan ni restauran desde Enfermería.');
-        abort_if(!$this->adulto, 403, 'Paciente no seleccionado.');
-        abort_if(!auth()->user()->can('signos_vitales.anular'), 403);
+        abort_if(! $this->adulto, 403, 'Paciente no seleccionado.');
+        abort_if(! auth()->user()->can('signos_vitales.anular'), 403);
 
         $this->validateOnly('motivoAnulacion', [
             'motivoAnulacion' => 'required|string|min:10|max:500',
@@ -446,8 +482,8 @@ class SaludSignosPanel extends Component
     public function restaurarRegistro(string $id): void
     {
         abort_if(auth()->user()?->hasRole('ENFERMEROS'), 403, 'Los registros firmados se rectifican; no se eliminan ni restauran desde Enfermería.');
-        abort_if(!$this->adulto, 403, 'Paciente no seleccionado.');
-        abort_if(!auth()->user()->can('signos_vitales.anular'), 403);
+        abort_if(! $this->adulto, 403, 'Paciente no seleccionado.');
+        abort_if(! auth()->user()->can('signos_vitales.anular'), 403);
 
         $signo = SignoVital::findOrFail($id);
         abort_if($signo->cod_residente !== $this->adulto->cod_residente, 403);
@@ -469,40 +505,40 @@ class SaludSignosPanel extends Component
 
     public function abrirFormularioPresion(): void
     {
-        abort_if(!$this->adulto, 403, 'Debe seleccionar un paciente antes de registrar signos vitales.');
-        abort_if(!auth()->user()->can('signos_vitales.crear'), 403);
+        abort_if(! $this->adulto, 403, 'Debe seleccionar un paciente antes de registrar signos vitales.');
+        abort_if(! auth()->user()->can('signos_vitales.crear'), 403);
         $this->limpiarFormulario();
         $this->modalPresion = true;
     }
 
     public function abrirFormularioCardiaca(): void
     {
-        abort_if(!$this->adulto, 403, 'Debe seleccionar un paciente antes de registrar signos vitales.');
-        abort_if(!auth()->user()->can('signos_vitales.crear'), 403);
+        abort_if(! $this->adulto, 403, 'Debe seleccionar un paciente antes de registrar signos vitales.');
+        abort_if(! auth()->user()->can('signos_vitales.crear'), 403);
         $this->limpiarFormulario();
         $this->modalCardiaca = true;
     }
 
     public function abrirFormularioTemperatura(): void
     {
-        abort_if(!$this->adulto, 403, 'Debe seleccionar un paciente antes de registrar signos vitales.');
-        abort_if(!auth()->user()->can('signos_vitales.crear'), 403);
+        abort_if(! $this->adulto, 403, 'Debe seleccionar un paciente antes de registrar signos vitales.');
+        abort_if(! auth()->user()->can('signos_vitales.crear'), 403);
         $this->limpiarFormulario();
         $this->modalTemperatura = true;
     }
 
     public function abrirFormularioPeso(): void
     {
-        abort_if(!$this->adulto, 403, 'Debe seleccionar un paciente antes de registrar signos vitales.');
-        abort_if(!auth()->user()->can('signos_vitales.crear'), 403);
+        abort_if(! $this->adulto, 403, 'Debe seleccionar un paciente antes de registrar signos vitales.');
+        abort_if(! auth()->user()->can('signos_vitales.crear'), 403);
         $this->limpiarFormulario();
         $this->modalPeso = true;
     }
 
     public function abrirFormularioObservacion(): void
     {
-        abort_if(!$this->adulto, 403, 'Debe seleccionar un paciente antes de registrar signos vitales.');
-        abort_if(!auth()->user()->can('signos_vitales.crear'), 403);
+        abort_if(! $this->adulto, 403, 'Debe seleccionar un paciente antes de registrar signos vitales.');
+        abort_if(! auth()->user()->can('signos_vitales.crear'), 403);
         $this->limpiarFormulario();
         $this->modalObservacion = true;
     }
@@ -584,18 +620,11 @@ class SaludSignosPanel extends Component
         return $alertas;
     }
 
-
-
-
-
-
-
-
-
     private function calcularImcVisual(): void
     {
-        if (!$this->peso || !$this->talla || (float) $this->peso <= 0 || (float) $this->talla <= 0) {
+        if (! $this->peso || ! $this->talla || (float) $this->peso <= 0 || (float) $this->talla <= 0) {
             $this->imc = null;
+
             return;
         }
 
@@ -618,7 +647,7 @@ class SaludSignosPanel extends Component
                     return false;
                 }
 
-                if (!$this->cumpleFiltroParametro($signo)) {
+                if (! $this->cumpleFiltroParametro($signo)) {
                     return false;
                 }
 
@@ -696,7 +725,7 @@ class SaludSignosPanel extends Component
         $ultimo = $registros->first();
         $previo = $registros->get(1);
 
-        if (!$ultimo) {
+        if (! $ultimo) {
             return $this->metricaSinDatos('Presión arterial', 'mmHg', 'ph-heartbeat');
         }
 
@@ -727,7 +756,7 @@ class SaludSignosPanel extends Component
         $ultimo = $registros->first();
         $previo = $registros->get(1);
 
-        if (!$ultimo) {
+        if (! $ultimo) {
             return $this->metricaSinDatos($label, $unidad, $icono);
         }
 
@@ -745,9 +774,9 @@ class SaludSignosPanel extends Component
             'status_key' => $estado['key'],
             'status_label' => $estado['label'],
             'variation' => $this->variacionNumerica($ultimo->{$campo}, $previo?->{$campo}, $tolerancia, $unidad, $decimales),
-            'avg' => $valores->isNotEmpty() ? number_format($valores->avg(), $decimales) . " {$unidad}" : 'S/D',
-            'min' => $valores->isNotEmpty() ? number_format($valores->min(), $decimales) . " {$unidad}" : 'S/D',
-            'max' => $valores->isNotEmpty() ? number_format($valores->max(), $decimales) . " {$unidad}" : 'S/D',
+            'avg' => $valores->isNotEmpty() ? number_format($valores->avg(), $decimales)." {$unidad}" : 'S/D',
+            'min' => $valores->isNotEmpty() ? number_format($valores->min(), $decimales)." {$unidad}" : 'S/D',
+            'max' => $valores->isNotEmpty() ? number_format($valores->max(), $decimales)." {$unidad}" : 'S/D',
         ];
     }
 
@@ -787,7 +816,7 @@ class SaludSignosPanel extends Component
             'ultima_medicion' => $baseSignos->firstWhere('estado', 'VIGENTE')
                 ? $this->formatearFechaHora($baseSignos->firstWhere('estado', 'VIGENTE'))
                 : 'Sin registros',
-            'sin_medicion_reciente' => !$baseSignos->firstWhere('estado', 'VIGENTE')
+            'sin_medicion_reciente' => ! $baseSignos->firstWhere('estado', 'VIGENTE')
                 || $baseSignos->firstWhere('estado', 'VIGENTE')->fecha->lt(now()->subDays(7)),
         ];
     }
@@ -830,11 +859,11 @@ class SaludSignosPanel extends Component
     private function construirChartData(Collection $signos): array
     {
         $ordenados = $signos
-            ->sortBy(fn ($signo) => $signo->fecha->format('Ymd') . $signo->hora_formateada)
+            ->sortBy(fn ($signo) => $signo->fecha->format('Ymd').$signo->hora_formateada)
             ->values();
 
         $serie = $ordenados->slice(max(0, $ordenados->count() - 24))->values();
-        $labels = $serie->map(fn ($signo) => $signo->fecha->format('d/m') . ' ' . $signo->hora_formateada)->all();
+        $labels = $serie->map(fn ($signo) => $signo->fecha->format('d/m').' '.$signo->hora_formateada)->all();
         $estados = $signos->map(fn ($signo) => $this->analizarRegistro($signo)['key']);
 
         return [
@@ -952,7 +981,7 @@ class SaludSignosPanel extends Component
         for ($i = 0; $i < 6; $i++) {
             $desde = $inicio->copy()->addWeeks($i);
             $hasta = $desde->copy()->endOfWeek();
-            $labels[] = $desde->format('d/m') . ' - ' . $hasta->format('d/m');
+            $labels[] = $desde->format('d/m').' - '.$hasta->format('d/m');
             $data[] = $signos
                 ->filter(fn ($signo) => $signo->fecha->betweenIncluded($desde, $hasta))
                 ->count();
@@ -1138,7 +1167,7 @@ class SaludSignosPanel extends Component
 
     private function variacionPresion(?SignoVital $ultimo, ?SignoVital $previo): string
     {
-        if (!$ultimo || !$previo || $previo->presion_sistolica === null) {
+        if (! $ultimo || ! $previo || $previo->presion_sistolica === null) {
             return 'Sin dato previo';
         }
 
@@ -1150,7 +1179,7 @@ class SaludSignosPanel extends Component
 
         return $delta > 0
             ? "Subió {$delta} mmHg en sistólica"
-            : 'Bajó ' . abs($delta) . ' mmHg en sistólica';
+            : 'Bajó '.abs($delta).' mmHg en sistólica';
     }
 
     private function variacionNumerica($actual, $previo, float $tolerancia, string $unidad, int $decimales): string
@@ -1178,7 +1207,7 @@ class SaludSignosPanel extends Component
             return 'S/D';
         }
 
-        return round($registros->avg('presion_sistolica')) . '/' . round($registros->avg('presion_diastolica')) . ' mmHg';
+        return round($registros->avg('presion_sistolica')).'/'.round($registros->avg('presion_diastolica')).' mmHg';
     }
 
     private function minMaxPresion(Collection $registros, string $modo): string
@@ -1195,6 +1224,6 @@ class SaludSignosPanel extends Component
 
     private function formatearFechaHora(SignoVital $signo): string
     {
-        return $signo->fecha->format('d/m/Y') . ' ' . $signo->hora_formateada;
+        return $signo->fecha->format('d/m/Y').' '.$signo->hora_formateada;
     }
 }

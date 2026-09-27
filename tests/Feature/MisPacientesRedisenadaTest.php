@@ -3,19 +3,18 @@
 namespace Tests\Feature;
 
 use App\Frontend\Livewire\Enfermeria\Cuidados\MisPacientes;
+use App\Models\Admision;
 use App\Models\AdultoMayor;
 use App\Models\Alerta;
 use App\Models\Area;
-use App\Models\OcupacionCama;
-use App\Models\Admision;
 use App\Models\AsignacionResidenteJornada;
+use App\Models\Atencion;
 use App\Models\Cama;
 use App\Models\Habitacion;
 use App\Models\Jornada;
-use App\Models\Prescripcion;
-use App\Models\PlanCuidado;
+use App\Models\OcupacionCama;
 use App\Models\Personal;
-use App\Models\Atencion;
+use App\Models\PlanCuidado;
 use App\Models\SignoVital;
 use App\Models\TurnoEnfermeria;
 use App\Models\User;
@@ -23,7 +22,6 @@ use Carbon\Carbon;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
-use Spatie\Permission\Models\Role;
 use Tests\TestCase;
 
 class MisPacientesRedisenadaTest extends TestCase
@@ -31,17 +29,22 @@ class MisPacientesRedisenadaTest extends TestCase
     use RefreshDatabase;
 
     private User $enfermero;
+
     private Area $area;
+
     private Personal $personal;
+
     private TurnoEnfermeria $turno;
+
     private AdultoMayor $residenteEstable;
+
     private AdultoMayor $residenteCritico;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->seed([ RolesAndPermissionsSeeder::class]);
+        $this->seed([RolesAndPermissionsSeeder::class]);
 
         $this->enfermero = User::factory()->create([
             'cod_usuario' => 'USU_ENF01',

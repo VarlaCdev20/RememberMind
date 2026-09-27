@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers\Medicacion;
 
+use App\Backend\Modulos\Medicacion\Servicios\RegistrarAdministracionMedicacionService;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Medicacion\StoreAdministracionMedicacionRequest;
 use App\Models\AdultoMayor;
-use App\Backend\Modulos\Medicacion\Servicios\RegistrarAdministracionMedicacionService;
 
 class AdultoMayorAdministracionMedicacionController extends Controller
 {
@@ -29,18 +29,18 @@ class AdultoMayorAdministracionMedicacionController extends Controller
                 ->event($registro->administrado ? 'administrado' : 'omitido')
                 ->withProperties([
                     'cod_prescripcion' => $registro->cod_prescripcion,
-                    'administrado'   => $registro->administrado,
-                    'fecha'          => $registro->fecha,
+                    'administrado' => $registro->administrado,
+                    'fecha' => $registro->fecha,
                 ])
                 ->log("{$tipoEvento} para el adulto mayor {$adulto_mayor->cod_residente}.");
 
             return redirect()
                 ->route('admin.adultos-mayores.show', ['adulto_mayor' => $adulto_mayor->cod_residente, 'tab' => 'medicacion'])
-                ->with('success', $tipoEvento . '.');
+                ->with('success', $tipoEvento.'.');
 
         } catch (\Exception $e) {
             return redirect()->back()
-                ->with('error', 'Error al registrar administración: ' . $e->getMessage())
+                ->with('error', 'Error al registrar administración: '.$e->getMessage())
                 ->withInput();
         }
     }

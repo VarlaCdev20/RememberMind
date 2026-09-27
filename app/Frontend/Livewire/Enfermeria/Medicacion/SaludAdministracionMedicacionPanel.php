@@ -2,25 +2,27 @@
 
 namespace App\Frontend\Livewire\Enfermeria\Medicacion;
 
-use Livewire\Component;
-use App\Models\AdultoMayor;
-use App\Models\AdministracionMedicacion;
-use App\Models\Alergia;
-use App\Models\Medicamento;
-use App\Models\Prescripcion;
-use App\Models\Residente;
 use App\Backend\Modulos\Enfermeria\Servicios\TurnoEnfermeriaService;
 use App\Backend\Modulos\Medicacion\Servicios\AgendaMedicacionService;
 use App\Backend\Modulos\Medicacion\Servicios\RegistrarAdministracionMedicacionService;
+use App\Models\AdministracionMedicacion;
+use App\Models\AdultoMayor;
+use App\Models\Alergia;
+use App\Models\AsignacionResidenteJornada;
+use App\Models\Medicamento;
+use App\Models\Prescripcion;
+use App\Models\Residente;
 use Carbon\Carbon;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
+use Livewire\Component;
 
 class SaludAdministracionMedicacionPanel extends Component
 {
     public ?AdultoMayor $adulto = null;
+
     public ?string $filtroResidenteId = null;
+
     public string $buscarResidente = '';
 
     // Navegación interna (Kardex es la vista principal)
@@ -28,61 +30,90 @@ class SaludAdministracionMedicacionPanel extends Component
 
     // Drawer lateral de dosis (360-440px)
     public bool $drawerDosisAbierto = false;
+
     public bool $drawerAbierto = false;
+
     public string $drawerPaso = 'detalle';
+
     public ?string $selectedPrescripcionId = null;
+
     public ?string $selectedHora = null;
+
     public ?string $selectedResidenteId = null;
+
     public array $dosisDetalle = [];
 
     // Formulario de acciones dentro del drawer
     public string $observacionEnfermeria = '';
+
     public string $motivoOmision = '';
+
     public bool $mostrarFormularioOmision = false;
 
     // Modales flotantes medianos centrados para Administrar y Registrar Omisión
     public bool $modalAdministrarAbierto = false;
+
     public bool $modalOmisionAbierto = false;
 
     // Campos formulario Administrar
     public string $formDosisAdministrada = '';
+
     public string $formDosisPrescritaValor = '';
+
     public string $formUnidadDosis = 'mg';
+
     public string $formEfectoObservado = '';
+
     public string $formReaccionAdversa = '';
+
     public string $formObservacionAdmin = '';
 
     // Campos formulario Registrar Omisión
     public string $formMotivoOmision = '';
+
     public string $formObservacionOmision = '';
 
     // Modal flotante maestro de Medicamento
     public bool $modalMedicamentoAbierto = false;
+
     public array $medicamentoFicha = [];
 
     // Filtros de la pestaña Historial
     public string $filtroHistorialResidente = '';
+
     public string $filtroHistorialMedicamento = '';
+
     public string $filtroHistorialFecha = '';
+
     public string $filtroHistorialResultado = '';
 
     // Filtros propios de la pestaña Kardex
     public string $filtroKardexBusqueda = '';
+
     public string $filtroKardexEstado = '';
+
     public string $filtroKardexHorario = '';
+
     public string $filtroKardexResidente = '';
+
     public string $filtroKardexVia = '';
+
     public string $filtroKardexPrn = '';
+
     public string $filtroKardexFecha = '';
 
     // Filtros propios de la pestaña Historial
     public string $filtroHistorialBusqueda = '';
+
     public string $filtroHistorialVia = '';
+
     public string $filtroHistorialFechaDesde = '';
+
     public string $filtroHistorialFechaHasta = '';
 
     // Estado de turno y modo consulta
     public bool $esModoConsulta = false;
+
     public ?string $turnoNombre = null;
 
     protected $listeners = [
@@ -95,7 +126,7 @@ class SaludAdministracionMedicacionPanel extends Component
         $user = Auth::user();
         abort_unless($user, 401);
         abort_unless($user->canAny([
-            'prescripciones.ver', 'administraciones_medicacion.ver', 'enfermeria.ver_dashboard'
+            'prescripciones.ver', 'administraciones_medicacion.ver', 'enfermeria.ver_dashboard',
         ]), 403);
 
         if ($adulto) {
@@ -111,13 +142,15 @@ class SaludAdministracionMedicacionPanel extends Component
     protected function verificarTurnoYPermisos(): void
     {
         $user = Auth::user();
-        if (!$user) return;
+        if (! $user) {
+            return;
+        }
 
         $turnosService = app(TurnoEnfermeriaService::class);
         $turnoActivo = $turnosService->obtenerTurnoActivo($user, today()->toDateString());
 
         if ($turnoActivo) {
-            $this->turnoNombre = $turnoActivo->nombre . ' (' . substr((string)$turnoActivo->hora_inicio, 0, 5) . ' - ' . substr((string)$turnoActivo->hora_cierre, 0, 5) . ')';
+            $this->turnoNombre = $turnoActivo->nombre.' ('.substr((string) $turnoActivo->hora_inicio, 0, 5).' - '.substr((string) $turnoActivo->hora_cierre, 0, 5).')';
         } else {
             $this->turnoNombre = 'Sin turno activo asignado';
         }
@@ -125,9 +158,9 @@ class SaludAdministracionMedicacionPanel extends Component
         // Si es enfermero sin turno o sin asignación, entra en modo consulta
         if ($user->hasRole('SUPERADMINISTRADOR')) {
             $this->esModoConsulta = false;
-        } elseif ($user->hasRole('ENFERMEROS') && !$turnoActivo) {
+        } elseif ($user->hasRole('ENFERMEROS') && ! $turnoActivo) {
             $this->esModoConsulta = true;
-        } elseif (!$user->can('administraciones_medicacion.crear')) {
+        } elseif (! $user->can('administraciones_medicacion.crear')) {
             $this->esModoConsulta = true;
         }
     }
@@ -198,9 +231,9 @@ class SaludAdministracionMedicacionPanel extends Component
         $this->drawerAbierto = false;
 
         $dosisRaw = $this->dosisDetalle['prescripcion']['dosis'] ?? '';
-        preg_match('/([0-9]+(\.[0-9]+)?)/', (string)$dosisRaw, $matches);
+        preg_match('/([0-9]+(\.[0-9]+)?)/', (string) $dosisRaw, $matches);
         $dosisNum = $matches[1] ?? '1';
-        $dosisNum = is_numeric($dosisNum) ? (string)((float)$dosisNum) : $dosisNum;
+        $dosisNum = is_numeric($dosisNum) ? (string) ((float) $dosisNum) : $dosisNum;
         $this->formDosisPrescritaValor = $dosisNum;
         $this->formDosisAdministrada = $dosisNum;
         $this->formUnidadDosis = $this->dosisDetalle['prescripcion']['unidad'] ?? 'mg';
@@ -254,7 +287,7 @@ class SaludAdministracionMedicacionPanel extends Component
 
     public function guardarAdministracion(): void
     {
-        $user = \Illuminate\Support\Facades\Auth::user();
+        $user = Auth::user();
         abort_unless($user, 401);
         abort_unless($user->can('administraciones_medicacion.crear'), 403);
 
@@ -264,36 +297,38 @@ class SaludAdministracionMedicacionPanel extends Component
                 'title' => 'Modo solo lectura',
                 'text' => 'No puede registrar administraciones fuera de su jornada laboral o sin un turno activo.',
             ]);
+
             return;
         }
 
-        $prescripcion = \App\Models\Prescripcion::query()
+        $prescripcion = Prescripcion::query()
             ->whereKey($this->selectedPrescripcionId)
             ->first();
 
         if (! $prescripcion) {
             $this->addError('formDosisAdministrada', 'La prescripción seleccionada no existe.');
+
             return;
         }
 
         $rules = [
             'formDosisAdministrada' => 'required|numeric|min:0.001',
-            'formEfectoObservado'   => 'nullable|string|max:500',
-            'formReaccionAdversa'   => 'nullable|string|max:500',
-            'formObservacionAdmin'  => 'nullable|string|max:1000',
+            'formEfectoObservado' => 'nullable|string|max:500',
+            'formReaccionAdversa' => 'nullable|string|max:500',
+            'formObservacionAdmin' => 'nullable|string|max:1000',
         ];
 
         $messages = [
             'formDosisAdministrada.required' => 'La dosis administrada es obligatoria.',
-            'formDosisAdministrada.numeric'  => 'La dosis administrada debe ser un valor numérico.',
-            'formDosisAdministrada.min'      => 'La dosis administrada debe ser mayor a 0.',
-            'formEfectoObservado.max'        => 'El efecto observado no puede exceder 500 caracteres.',
-            'formReaccionAdversa.max'        => 'La reacción adversa no puede exceder 500 caracteres.',
-            'formObservacionAdmin.max'       => 'La observación no puede exceder 1000 caracteres.',
+            'formDosisAdministrada.numeric' => 'La dosis administrada debe ser un valor numérico.',
+            'formDosisAdministrada.min' => 'La dosis administrada debe ser mayor a 0.',
+            'formEfectoObservado.max' => 'El efecto observado no puede exceder 500 caracteres.',
+            'formReaccionAdversa.max' => 'La reacción adversa no puede exceder 500 caracteres.',
+            'formObservacionAdmin.max' => 'La observación no puede exceder 1000 caracteres.',
         ];
 
         $dPresc = (float) ($prescripcion?->dosis ?? 0);
-        $dAdmin = (float)$this->formDosisAdministrada;
+        $dAdmin = (float) $this->formDosisAdministrada;
         $dosisDifiere = ($dPresc > 0 && abs($dAdmin - $dPresc) > 0.001);
 
         $this->validate($rules, $messages);
@@ -312,23 +347,25 @@ class SaludAdministracionMedicacionPanel extends Component
         $codResidente = $this->selectedResidenteId;
 
         // Validación backend: horario válido
-        if (empty($hora) || !preg_match('/^\d{2}:\d{2}$/', $hora)) {
+        if (empty($hora) || ! preg_match('/^\d{2}:\d{2}$/', $hora)) {
             $this->addError('formDosisAdministrada', 'El horario programado de la dosis no es válido.');
+
             return;
         }
 
         // Validación backend: residente asignado al turno (si el personal tiene asignaciones vigentes y no es superadmin)
-        if (!$user->hasRole('SUPERADMINISTRADOR') && $codResidente && $user->personal) {
-            $tieneAsignaciones = \App\Models\AsignacionResidenteJornada::where('cod_personal', $user->personal->cod_personal)
+        if (! $user->hasRole('SUPERADMINISTRADOR') && $codResidente && $user->personal) {
+            $tieneAsignaciones = AsignacionResidenteJornada::where('cod_personal', $user->personal->cod_personal)
                 ->where('estado', 'ACTIVA')
                 ->exists();
             if ($tieneAsignaciones) {
-                $asignado = app(\App\Backend\Modulos\Enfermeria\Servicios\TurnoEnfermeriaService::class)
+                $asignado = app(TurnoEnfermeriaService::class)
                     ->obtenerPacientesAsignadosQuery($user)
                     ->where('residentes.cod_residente', $codResidente)
                     ->exists();
-                if (!$asignado) {
+                if (! $asignado) {
                     $this->addError('formDosisAdministrada', 'El residente no se encuentra asignado a su turno actual.');
+
                     return;
                 }
             }
@@ -338,17 +375,19 @@ class SaludAdministracionMedicacionPanel extends Component
             // Validación backend: prescripción médica activa
             if ($prescripcion->estado !== 'ACTIVA') {
                 $this->addError('formDosisAdministrada', 'La prescripción médica no se encuentra activa.');
+
                 return;
             }
 
             // Validación backend: residente coincide con la prescripción
             if ($prescripcion->cod_residente && $codResidente && $prescripcion->cod_residente !== $codResidente) {
                 $this->addError('formDosisAdministrada', 'La prescripción no corresponde al residente asignado.');
+
                 return;
             }
 
             // Validación backend: no duplicidad en el horario
-            $duplicada = \App\Models\AdministracionMedicacion::where('cod_prescripcion', $prescripcion->cod_prescripcion)
+            $duplicada = AdministracionMedicacion::where('cod_prescripcion', $prescripcion->cod_prescripcion)
                 ->where('cod_residente', $codResidente ?: $prescripcion->cod_residente)
                 ->whereDate('fecha_hora_programada', today())
                 ->whereTime('fecha_hora_programada', $hora)
@@ -356,11 +395,12 @@ class SaludAdministracionMedicacionPanel extends Component
 
             if ($duplicada) {
                 $this->addError('formDosisAdministrada', 'Esta dosis ya cuenta con un registro en el horario programado.');
+
                 return;
             }
 
             try {
-                app(\App\Backend\Modulos\Medicacion\Servicios\RegistrarAdministracionMedicacionService::class)->registrarProgramada(
+                app(RegistrarAdministracionMedicacionService::class)->registrarProgramada(
                     $user,
                     $codResidente,
                     $prescripcion->cod_prescripcion,
@@ -372,15 +412,17 @@ class SaludAdministracionMedicacionPanel extends Component
                     $dAdmin,
                     $this->formReaccionAdversa ?: null
                 );
-            } catch (\Illuminate\Validation\ValidationException $e) {
+            } catch (ValidationException $e) {
                 $errores = $e->errors();
                 $primerError = reset($errores)[0] ?? 'Error al registrar administración.';
                 $this->addError('formDosisAdministrada', $primerError);
                 $this->dispatch('swal', ['icon' => 'error', 'title' => 'No se pudo registrar', 'text' => $primerError]);
+
                 return;
             } catch (\Throwable $t) {
                 $this->addError('formDosisAdministrada', $t->getMessage());
                 $this->dispatch('swal', ['icon' => 'error', 'title' => 'Error de registro', 'text' => $t->getMessage()]);
+
                 return;
             }
         }
@@ -397,7 +439,7 @@ class SaludAdministracionMedicacionPanel extends Component
 
     public function guardarOmision(): void
     {
-        $user = \Illuminate\Support\Facades\Auth::user();
+        $user = Auth::user();
         abort_unless($user, 401);
         abort_unless($user->can('administraciones_medicacion.crear'), 403);
 
@@ -407,21 +449,22 @@ class SaludAdministracionMedicacionPanel extends Component
                 'title' => 'Modo solo lectura',
                 'text' => 'No puede registrar omisiones fuera de su turno activo.',
             ]);
+
             return;
         }
 
         $rules = [
-            'formMotivoOmision'      => 'required|string|min:5|max:255',
+            'formMotivoOmision' => 'required|string|min:5|max:255',
             'formObservacionOmision' => 'nullable|string|max:1000',
         ];
 
         $messages = [
             'formMotivoOmision.required' => 'Debe indicar un motivo de omisión clínica válido.',
-            'formMotivoOmision.min'      => 'El motivo de omisión debe tener al menos 5 caracteres.',
+            'formMotivoOmision.min' => 'El motivo de omisión debe tener al menos 5 caracteres.',
             'formObservacionOmision.max' => 'La justificación detallada no puede exceder 1000 caracteres.',
         ];
 
-        $motivo = trim((string)$this->formMotivoOmision);
+        $motivo = trim((string) $this->formMotivoOmision);
         $requiereDetalle = ($motivo === 'OTRO' || str_contains($motivo, 'verbal') || str_contains($motivo, 'contraindicado'));
 
         if ($requiereDetalle) {
@@ -436,16 +479,17 @@ class SaludAdministracionMedicacionPanel extends Component
         $hora = $this->selectedHora;
         $codResidente = $this->selectedResidenteId;
 
-        $prescripcion = \App\Models\Prescripcion::where('cod_prescripcion', $codPrescripcion)->first();
+        $prescripcion = Prescripcion::where('cod_prescripcion', $codPrescripcion)->first();
 
         if (! $prescripcion) {
             $this->addError('formMotivoOmision', 'La prescripción seleccionada no existe.');
+
             return;
         }
 
         if ($prescripcion) {
             try {
-                app(\App\Backend\Modulos\Medicacion\Servicios\RegistrarAdministracionMedicacionService::class)->registrarProgramada(
+                app(RegistrarAdministracionMedicacionService::class)->registrarProgramada(
                     $user,
                     $codResidente,
                     $prescripcion->cod_prescripcion,
@@ -454,15 +498,17 @@ class SaludAdministracionMedicacionPanel extends Component
                     $motivo,
                     $this->formObservacionOmision ?: null
                 );
-            } catch (\Illuminate\Validation\ValidationException $e) {
+            } catch (ValidationException $e) {
                 $errores = $e->errors();
                 $primerError = reset($errores)[0] ?? 'Error al registrar omisión.';
                 $this->addError('formMotivoOmision', $primerError);
                 $this->dispatch('swal', ['icon' => 'error', 'title' => 'No se pudo registrar', 'text' => $primerError]);
+
                 return;
             } catch (\Throwable $t) {
                 $this->addError('formMotivoOmision', $t->getMessage());
                 $this->dispatch('swal', ['icon' => 'error', 'title' => 'Error de registro', 'text' => $t->getMessage()]);
+
                 return;
             }
         }
@@ -500,7 +546,7 @@ class SaludAdministracionMedicacionPanel extends Component
             ->where('cod_prescripcion', $codPrescripcion)
             ->first();
 
-        if (!$prescripcion) {
+        if (! $prescripcion) {
             $this->selectedPrescripcionId = null;
             $this->selectedResidenteId = null;
             $this->dosisDetalle = [];
@@ -509,6 +555,7 @@ class SaludAdministracionMedicacionPanel extends Component
                 'title' => 'Prescripción no disponible',
                 'text' => 'La prescripción seleccionada no existe o ya no está disponible.',
             ]);
+
             return;
         }
 
@@ -518,7 +565,7 @@ class SaludAdministracionMedicacionPanel extends Component
 
         // Horario específico de la dosis
         $horario = $prescripcion->horarios->first(function ($h) {
-            return substr((string)$h->hora_programada, 0, 5) === $this->selectedHora;
+            return substr((string) $h->hora_programada, 0, 5) === $this->selectedHora;
         }) ?? $prescripcion->horarios->first();
 
         // Registro de administración para esta dosis hoy si ya se efectuó
@@ -533,7 +580,7 @@ class SaludAdministracionMedicacionPanel extends Component
 
         // Determinar estado actual de la dosis
         $ahora = now();
-        $fechaHoraProg = Carbon::parse(today()->toDateString() . ' ' . $this->selectedHora);
+        $fechaHoraProg = Carbon::parse(today()->toDateString().' '.$this->selectedHora);
         if ($registroHoy) {
             $estadoDosis = $registroHoy->administrado ? 'ADMINISTRADA' : 'OMITIDA';
         } elseif ($fechaHoraProg->isPast()) {
@@ -547,7 +594,7 @@ class SaludAdministracionMedicacionPanel extends Component
         // Alergias reales del residente
         $alergiasReales = $residente?->alergias ?? collect();
         $alergiasTexto = $alergiasReales->isNotEmpty()
-            ? $alergiasReales->map(fn ($a) => "{$a->sustancia}" . ($a->reaccion ? " ({$a->reaccion})" : ''))->implode(', ')
+            ? $alergiasReales->map(fn ($a) => "{$a->sustancia}".($a->reaccion ? " ({$a->reaccion})" : ''))->implode(', ')
             : 'Sin alergias medicamentosas registradas';
 
         // Última administración histórica para seguimiento
@@ -563,7 +610,7 @@ class SaludAdministracionMedicacionPanel extends Component
         $camaTexto = $camaObj?->nombre ?? ($camaObj?->numero ? "Cama {$camaObj->numero}" : 'Sin cama');
 
         $edadCalculada = $residente?->fecha_nacimiento
-            ? Carbon::parse($residente->fecha_nacimiento)->age . ' años'
+            ? Carbon::parse($residente->fecha_nacimiento)->age.' años'
             : ($residente?->edad ? "{$residente->edad} años" : 'Edad no reg.');
 
         $this->dosisDetalle = [
@@ -587,7 +634,7 @@ class SaludAdministracionMedicacionPanel extends Component
                 'edad' => $edadCalculada,
                 'habitacion' => $habTexto,
                 'cama' => $camaTexto,
-                'iniciales' => $residente ? strtoupper(substr((string)$residente->nombres, 0, 1) . substr((string)$residente->apellido_paterno, 0, 1)) : 'RM',
+                'iniciales' => $residente ? strtoupper(substr((string) $residente->nombres, 0, 1).substr((string) $residente->apellido_paterno, 0, 1)) : 'RM',
             ],
 
             // B. MEDICAMENTO
@@ -595,14 +642,14 @@ class SaludAdministracionMedicacionPanel extends Component
                 'nombre_destacado' => $medicamento?->nombre_comercial ?: ($medicamento?->nombre_generico ?: ($prescripcion->nombre_medicamento ?: 'Medicamento')),
                 'concentracion' => $medicamento?->concentracion ?: ($prescripcion->dosis ? "{$prescripcion->dosis} {$prescripcion->unidad_dosis}" : ''),
                 'forma' => $medicamento?->forma_farmaceutica ?: 'Comprimido',
-                'via' => ucfirst(strtolower((string)($prescripcion->via_administracion ?: ($medicamento?->via_predeterminada ?: 'Vía oral')))),
+                'via' => ucfirst(strtolower((string) ($prescripcion->via_administracion ?: ($medicamento?->via_predeterminada ?: 'Vía oral')))),
             ],
 
             // C. PRESCRIPCIÓN
             'prescripcion' => [
                 'dosis' => $prescripcion->dosis ? "{$prescripcion->dosis} {$prescripcion->unidad_dosis}" : '1 dosis',
                 'unidad' => $prescripcion->unidad_dosis ?: 'mg',
-                'via' => ucfirst(strtolower((string)$prescripcion->via_administracion)),
+                'via' => ucfirst(strtolower((string) $prescripcion->via_administracion)),
                 'frecuencia' => $prescripcion->frecuencia ?: 'Cada 8 horas',
                 'indicacion' => $prescripcion->indicacion ?: ($prescripcion->observacion ?: 'Tratamiento según indicación médica'),
                 'segun_necesidad' => $prescripcion->segun_necesidad ? 'Sí (PRN)' : 'No',
@@ -629,7 +676,7 @@ class SaludAdministracionMedicacionPanel extends Component
             // F. SEGUIMIENTO
             'seguimiento' => [
                 'ultima_admin' => $ultimaAdmin ? ($ultimaAdmin->fecha_hora_administracion?->format('d/m/Y - H:i') ?? $ultimaAdmin->fecha_hora_programada?->format('d/m/Y - H:i')) : 'Sin administraciones previas',
-                'proxima_dosis' => Carbon::parse(today()->toDateString() . ' ' . $this->selectedHora)->addDay()->format('d/m/Y - H:i'),
+                'proxima_dosis' => Carbon::parse(today()->toDateString().' '.$this->selectedHora)->addDay()->format('d/m/Y - H:i'),
                 'resultado' => $ultimaAdmin?->resultado ?? 'N/A',
                 'dosis_administrada' => $ultimaAdmin?->dosis_administrada ? "{$ultimaAdmin->dosis_administrada} {$prescripcion->unidad_dosis}" : 'N/A',
                 'efecto_observado' => $ultimaAdmin?->efecto_observado ?: 'Sin efecto adverso observado',
@@ -638,12 +685,16 @@ class SaludAdministracionMedicacionPanel extends Component
             ],
         ];
 
-        $this->drawerDosisAbierto = true; $this->drawerAbierto = true; $this->drawerPaso = 'detalle';
+        $this->drawerDosisAbierto = true;
+        $this->drawerAbierto = true;
+        $this->drawerPaso = 'detalle';
     }
 
     public function cerrarDrawerDosis(): void
     {
-        $this->drawerDosisAbierto = false; $this->drawerAbierto = false; $this->drawerPaso = 'detalle';
+        $this->drawerDosisAbierto = false;
+        $this->drawerAbierto = false;
+        $this->drawerPaso = 'detalle';
         $this->selectedPrescripcionId = null;
         $this->selectedHora = null;
         $this->mostrarFormularioOmision = false;
@@ -653,7 +704,9 @@ class SaludAdministracionMedicacionPanel extends Component
     public function abrirModalMedicamento(?string $codMedicamento = null): void
     {
         $codMed = $codMedicamento ?: ($this->dosisDetalle['cod_medicamento'] ?? null);
-        if (!$codMed) return;
+        if (! $codMed) {
+            return;
+        }
 
         $med = Medicamento::query()->where('cod_medicamento', $codMed)->first();
 
@@ -666,7 +719,7 @@ class SaludAdministracionMedicacionPanel extends Component
                 'unidad' => $med->unidad ?: 'No especificada',
                 'via_predeterminada' => $med->via_predeterminada ?: 'No especificada',
                 'control_especial' => $med->control_especial ? 'Sí' : 'No',
-                'estado' => ucfirst(strtolower((string)$med->estado)),
+                'estado' => ucfirst(strtolower((string) $med->estado)),
                 'observacion' => $med->observacion ?: 'Información farmacológica ampliada no registrada.',
             ];
         } else {
@@ -703,6 +756,7 @@ class SaludAdministracionMedicacionPanel extends Component
                 'title' => 'Modo solo lectura',
                 'text' => 'No puede registrar administraciones fuera de su jornada laboral o sin un turno activo.',
             ]);
+
             return;
         }
 
@@ -728,10 +782,12 @@ class SaludAdministracionMedicacionPanel extends Component
                 $primerError = reset($errores)[0] ?? 'Error al registrar administración.';
                 $this->addError('administracion_error', $primerError);
                 $this->dispatch('swal', ['icon' => 'error', 'title' => 'No se pudo registrar', 'text' => $primerError]);
+
                 return;
             } catch (\Throwable $t) {
                 $this->addError('administracion_error', $t->getMessage());
                 $this->dispatch('swal', ['icon' => 'error', 'title' => 'Error de registro', 'text' => $t->getMessage()]);
+
                 return;
             }
         }
@@ -770,11 +826,13 @@ class SaludAdministracionMedicacionPanel extends Component
                 'title' => 'Modo solo lectura',
                 'text' => 'No puede registrar omisiones fuera de su turno activo.',
             ]);
+
             return;
         }
 
         if (mb_strlen(trim($this->motivoOmision)) < 5) {
             $this->addError('motivoOmision', 'Debe indicar un motivo de omisión claro de al menos 5 caracteres.');
+
             return;
         }
 
@@ -800,10 +858,12 @@ class SaludAdministracionMedicacionPanel extends Component
                 $primerError = reset($errores)[0] ?? 'Error al registrar omisión.';
                 $this->addError('motivoOmision', $primerError);
                 $this->dispatch('swal', ['icon' => 'error', 'title' => 'No se pudo registrar', 'text' => $primerError]);
+
                 return;
             } catch (\Throwable $t) {
                 $this->addError('motivoOmision', $t->getMessage());
                 $this->dispatch('swal', ['icon' => 'error', 'title' => 'Error', 'text' => $t->getMessage()]);
+
                 return;
             }
         }
@@ -840,20 +900,20 @@ class SaludAdministracionMedicacionPanel extends Component
         } else {
             $query = $turnosService->obtenerPacientesAsignadosQuery($user);
             if ($this->buscarResidente) {
-                $buscar = '%' . trim($this->buscarResidente) . '%';
+                $buscar = '%'.trim($this->buscarResidente).'%';
                 $query->where(function ($q) use ($buscar) {
                     $q->where('nombres', 'like', $buscar)
-                      ->orWhere('ap_paterno', 'like', $buscar)
-                      ->orWhere('ap_materno', 'like', $buscar);
+                        ->orWhere('ap_paterno', 'like', $buscar)
+                        ->orWhere('ap_materno', 'like', $buscar);
                 });
             }
-            $residentes = $query->with(['ocupacionActiva.cama.habitacion', 'alergias' => fn($q) => $q->where('estado', 'ACTIVO')])->get();
+            $residentes = $query->with(['ocupacionActiva.cama.habitacion', 'alergias' => fn ($q) => $q->where('estado', 'ACTIVO')])->get();
 
             // Si el usuario no tiene pacientes asignados en turno (ej. Superadmin supervisando o turno sin asignar)
-            if ($residentes->isEmpty() && ($user->hasRole('SUPERADMINISTRADOR') || !$this->buscarResidente)) {
+            if ($residentes->isEmpty() && ($user->hasRole('SUPERADMINISTRADOR') || ! $this->buscarResidente)) {
                 $residentes = AdultoMayor::query()
                     ->whereNotIn('estado', ['ARCHIVADO', 'FALLECIDO', 'INACTIVO'])
-                    ->with(['ocupacionActiva.cama.habitacion', 'alergias' => fn($q) => $q->where('estado', 'ACTIVO')])
+                    ->with(['ocupacionActiva.cama.habitacion', 'alergias' => fn ($q) => $q->where('estado', 'ACTIVO')])
                     ->orderBy('nombres')
                     ->take(15)
                     ->get();
@@ -866,7 +926,7 @@ class SaludAdministracionMedicacionPanel extends Component
         $horasKardex = ['07:00', '08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00', '21:00', '22:00'];
 
         // 3. Agenda de dosis de hoy desde el servicio institucional
-        $fechaKardex = !empty($this->filtroKardexFecha) ? \Carbon\Carbon::parse($this->filtroKardexFecha) : today();
+        $fechaKardex = ! empty($this->filtroKardexFecha) ? Carbon::parse($this->filtroKardexFecha) : today();
         $agendaDosis = $agendaService->paraAdultos($codigosResidentes, $fechaKardex);
 
         // Mapear dosis por residente y hora para la matriz
@@ -881,10 +941,15 @@ class SaludAdministracionMedicacionPanel extends Component
             $hora = $item['hora'];
             $estado = $item['estado']; // ADMINISTRADA, VENCIDA, PROXIMA, PENDIENTE, OMITIDA
 
-            if ($estado === 'ADMINISTRADA') $conteoAdministradas++;
-            elseif (in_array($estado, ['VENCIDA', 'RETRASADA'])) $conteoRetrasadas++;
-            elseif ($estado === 'OMITIDA') $conteoOmitidas++;
-            else $conteoPendientes++;
+            if ($estado === 'ADMINISTRADA') {
+                $conteoAdministradas++;
+            } elseif (in_array($estado, ['VENCIDA', 'RETRASADA'])) {
+                $conteoRetrasadas++;
+            } elseif ($estado === 'OMITIDA') {
+                $conteoOmitidas++;
+            } else {
+                $conteoPendientes++;
+            }
 
             if ($codRes) {
                 $matrizKardex[$codRes][$hora][] = [
@@ -892,7 +957,7 @@ class SaludAdministracionMedicacionPanel extends Component
                     'cod_prescripcion' => $item['medicacion']->cod_prescripcion,
                     'cod_residente' => $codRes,
                     'nombre_corto' => $item['medicacion']->nombre_medicamento,
-                    'dosis' => ($item['horario']->dosis_programada ?? $item['medicacion']->dosis) . ' ' . ($item['medicacion']->unidad_dosis ?: 'mg'),
+                    'dosis' => ($item['horario']->dosis_programada ?? $item['medicacion']->dosis).' '.($item['medicacion']->unidad_dosis ?: 'mg'),
                     'hora' => $hora,
                     'estado' => $estado === 'VENCIDA' ? 'RETRASADA' : $estado,
                 ];
@@ -911,13 +976,14 @@ class SaludAdministracionMedicacionPanel extends Component
 
         // 5. Pestaña Próximas Dosis: orden cronológico priorizando retrasadas y próximas
         $proximasDosis = $agendaDosis->sortBy(function ($item) {
-            $prioridad = match($item['estado']) {
+            $prioridad = match ($item['estado']) {
                 'VENCIDA', 'RETRASADA' => 1,
                 'PROXIMA' => 2,
                 'PENDIENTE' => 3,
                 default => 4,
             };
-            return $prioridad . '_' . $item['hora'];
+
+            return $prioridad.'_'.$item['hora'];
         })->values();
 
         // 6. Pestaña Omisiones: no administraciones justificadas (excluyendo RECHAZADA)
@@ -944,10 +1010,10 @@ class SaludAdministracionMedicacionPanel extends Component
             $queryHistorial->whereDate('fecha_hora_programada', $this->filtroHistorialFecha);
         }
         if ($this->filtroHistorialMedicamento) {
-            $buscMed = '%' . trim($this->filtroHistorialMedicamento) . '%';
+            $buscMed = '%'.trim($this->filtroHistorialMedicamento).'%';
             $queryHistorial->whereHas('prescripcion.medicamento', function ($q) use ($buscMed) {
                 $q->where('nombre_generico', 'like', $buscMed)
-                  ->orWhere('nombre_comercial', 'like', $buscMed);
+                    ->orWhere('nombre_comercial', 'like', $buscMed);
             });
         }
 
@@ -963,7 +1029,7 @@ class SaludAdministracionMedicacionPanel extends Component
             $habTexto = $hab?->nombre ?? ($hab?->numero ? "Hab. {$hab->numero}" : 'Sin habitación');
             $estadoRaw = $item['estado'];
 
-            $estadoTexto = match($estadoRaw) {
+            $estadoTexto = match ($estadoRaw) {
                 'ADMINISTRADA' => 'Administrada',
                 'VENCIDA', 'RETRASADA' => 'Con retraso',
                 'OMITIDA' => 'Omitida',
@@ -976,13 +1042,13 @@ class SaludAdministracionMedicacionPanel extends Component
                 'hora_12h' => $item['hora_12h'] ?? $item['hora'],
                 'cod_residente' => $res?->cod_residente,
                 'nombre_residente' => $res ? trim("{$res->nombres} {$res->apellido_paterno} {$res->apellido_materno}") : 'Residente',
-                'iniciales' => $res ? strtoupper(substr((string)$res->nombres, 0, 1) . substr((string)($res->apellido_paterno ?? $res->ap_paterno ?? 'R'), 0, 1)) : 'RM',
+                'iniciales' => $res ? strtoupper(substr((string) $res->nombres, 0, 1).substr((string) ($res->apellido_paterno ?? $res->ap_paterno ?? 'R'), 0, 1)) : 'RM',
                 'habitacion' => $habTexto,
                 'medicamento' => $med?->nombre_generico ?: ($presc->nombre_medicamento ?: 'Medicamento'),
-                'dosis' => ($item['horario']->dosis_programada ?? $presc->dosis) . ' ' . ($presc->unidad_dosis ?: 'mg'),
-                'via' => ucfirst(strtolower((string)($presc->via_administracion ?: 'Vía oral'))),
-                'via_raw' => strtoupper(trim((string)($presc->via_administracion ?: 'ORAL'))),
-                'es_prn' => (bool)($presc->es_condicional ?? $presc->prn ?? false),
+                'dosis' => ($item['horario']->dosis_programada ?? $presc->dosis).' '.($presc->unidad_dosis ?: 'mg'),
+                'via' => ucfirst(strtolower((string) ($presc->via_administracion ?: 'Vía oral'))),
+                'via_raw' => strtoupper(trim((string) ($presc->via_administracion ?: 'ORAL'))),
+                'es_prn' => (bool) ($presc->es_condicional ?? $presc->prn ?? false),
                 'estado' => $estadoTexto,
                 'estado_raw' => $estadoRaw,
                 'cod_prescripcion' => $presc->cod_prescripcion,
@@ -990,8 +1056,8 @@ class SaludAdministracionMedicacionPanel extends Component
             ]);
         }
 
-                // Filtros específicos y combinables de Kardex
-        if (!empty($this->filtroKardexBusqueda)) {
+        // Filtros específicos y combinables de Kardex
+        if (! empty($this->filtroKardexBusqueda)) {
             $busq = mb_strtolower(trim($this->filtroKardexBusqueda));
             $dosisHoy = $dosisHoy->filter(function ($d) use ($busq) {
                 return str_contains(mb_strtolower($d['nombre_residente'] ?? ''), $busq) ||
@@ -999,7 +1065,7 @@ class SaludAdministracionMedicacionPanel extends Component
             });
         }
 
-        if (!empty($this->filtroKardexEstado)) {
+        if (! empty($this->filtroKardexEstado)) {
             $dosisHoy = $dosisHoy->filter(function ($d) {
                 $stRaw = $d['estado_raw'] ?? '';
                 if ($this->filtroKardexEstado === 'ADMINISTRADA') {
@@ -1012,24 +1078,29 @@ class SaludAdministracionMedicacionPanel extends Component
                     return in_array($stRaw, ['PENDIENTE', 'PROGRAMADA', 'PROXIMA']);
                 }
                 if ($this->filtroKardexEstado === 'PROXIMA') {
-                    if ($stRaw === 'PROXIMA') return true;
+                    if ($stRaw === 'PROXIMA') {
+                        return true;
+                    }
                     if (in_array($stRaw, ['PENDIENTE', 'PROGRAMADA'])) {
                         try {
-                            $horaDosis = \Carbon\Carbon::createFromFormat('H:i', substr($d['hora'], 0, 5));
+                            $horaDosis = Carbon::createFromFormat('H:i', substr($d['hora'], 0, 5));
                             $ahora = now();
                             $limite = now()->addHours(3);
+
                             return $horaDosis->greaterThanOrEqualTo($ahora->copy()->subMinutes(30)) && $horaDosis->lessThanOrEqualTo($limite);
                         } catch (\Throwable $e) {
                             return true;
                         }
                     }
+
                     return false;
                 }
+
                 return true;
             });
         }
 
-        if (!empty($this->filtroKardexHorario)) {
+        if (! empty($this->filtroKardexHorario)) {
             $dosisHoy = $dosisHoy->filter(function ($d) {
                 $h = (int) substr($d['hora'], 0, 2);
                 if ($this->filtroKardexHorario === 'MANANA') {
@@ -1041,22 +1112,23 @@ class SaludAdministracionMedicacionPanel extends Component
                 if ($this->filtroKardexHorario === 'NOCHE') {
                     return $h >= 19 || $h < 6;
                 }
+
                 return str_starts_with($d['hora'], $this->filtroKardexHorario);
             });
         }
 
-        if (!empty($this->filtroKardexResidente)) {
+        if (! empty($this->filtroKardexResidente)) {
             $dosisHoy = $dosisHoy->where('cod_residente', $this->filtroKardexResidente);
         }
 
-        if (!empty($this->filtroKardexVia)) {
+        if (! empty($this->filtroKardexVia)) {
             $viaFiltro = strtoupper(trim($this->filtroKardexVia));
             $dosisHoy = $dosisHoy->filter(function ($d) use ($viaFiltro) {
                 return str_contains(strtoupper($d['via_raw'] ?? $d['via']), $viaFiltro);
             });
         }
 
-        if (!empty($this->filtroKardexPrn)) {
+        if (! empty($this->filtroKardexPrn)) {
             if ($this->filtroKardexPrn === 'PRN') {
                 $dosisHoy = $dosisHoy->where('es_prn', true);
             } elseif ($this->filtroKardexPrn === 'FIJO') {
@@ -1066,17 +1138,31 @@ class SaludAdministracionMedicacionPanel extends Component
 
         $dosisHoy = $dosisHoy->sort(function ($a, $b) {
             $rank = function ($d) {
-                if (!empty($d['tiene_alerta_clinica'])) return 1;
+                if (! empty($d['tiene_alerta_clinica'])) {
+                    return 1;
+                }
                 $st = $d['estado_raw'] ?? '';
-                if (in_array($st, ['VENCIDA', 'RETRASADA'])) return 2;
-                if (in_array($st, ['PROXIMA', 'PENDIENTE', 'PROGRAMADA'])) return 3;
-                if (in_array($st, ['OMITIDA', 'RECHAZADA'])) return 4;
-                if (in_array($st, ['ADMINISTRADA', 'ADMINISTRADO'])) return 5;
+                if (in_array($st, ['VENCIDA', 'RETRASADA'])) {
+                    return 2;
+                }
+                if (in_array($st, ['PROXIMA', 'PENDIENTE', 'PROGRAMADA'])) {
+                    return 3;
+                }
+                if (in_array($st, ['OMITIDA', 'RECHAZADA'])) {
+                    return 4;
+                }
+                if (in_array($st, ['ADMINISTRADA', 'ADMINISTRADO'])) {
+                    return 5;
+                }
+
                 return 6;
             };
             $rA = $rank($a);
             $rB = $rank($b);
-            if ($rA !== $rB) return $rA <=> $rB;
+            if ($rA !== $rB) {
+                return $rA <=> $rB;
+            }
+
             return strcmp($a['hora'], $b['hora']);
         })->values();
 
@@ -1093,7 +1179,7 @@ class SaludAdministracionMedicacionPanel extends Component
             'proximasDosis' => $proximasDosis,
             'omisiones' => $omisiones,
             'historial' => $historial,
-            'fechaCabecera' => 'Hoy, ' . today()->translatedFormat('d \d\e F \d\e Y'),
+            'fechaCabecera' => 'Hoy, '.today()->translatedFormat('d \d\e F \d\e Y'),
             'modalAdministrarAbierto' => $this->modalAdministrarAbierto,
             'modalOmisionAbierto' => $this->modalOmisionAbierto,
             'formDosisAdministrada' => $this->formDosisAdministrada,

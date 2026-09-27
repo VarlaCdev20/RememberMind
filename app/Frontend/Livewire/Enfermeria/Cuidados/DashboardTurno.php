@@ -2,25 +2,25 @@
 
 namespace App\Frontend\Livewire\Enfermeria\Cuidados;
 
-use App\Models\AdministracionMedicacion;
-use App\Models\Residente;
-use App\Models\Alerta;
-use App\Models\Prescripcion;
-use App\Models\PaseTurno;
-use App\Models\Preadmision;
-use App\Models\Atencion;
-use App\Models\SignoVital;
-use App\Models\EjecucionCuidado;
-use App\Models\TurnoEnfermeria;
-use App\Backend\Modulos\Enfermeria\Servicios\TurnoEnfermeriaService;
-use App\Backend\Modulos\Clinica\Servicios\SignosVitalesService;
 use App\Backend\Modulos\Alertas\Servicios\AlertasService;
-use App\Backend\Modulos\Medicacion\Servicios\RegistrarAdministracionMedicacionService;
+use App\Backend\Modulos\Clinica\Servicios\SignosVitalesService;
+use App\Backend\Modulos\Enfermeria\Servicios\MiTurnoService;
+use App\Backend\Modulos\Enfermeria\Servicios\TurnoEnfermeriaService;
 use App\Backend\Modulos\Medicacion\Servicios\AgendaMedicacionService;
+use App\Backend\Modulos\Medicacion\Servicios\RegistrarAdministracionMedicacionService;
+use App\Models\AdministracionMedicacion;
+use App\Models\Alerta;
+use App\Models\AsignacionPersonal;
+use App\Models\AsignacionResidenteJornada;
+use App\Models\Atencion;
+use App\Models\EjecucionCuidado;
+use App\Models\Prescripcion;
+use App\Models\Residente;
+use App\Models\TurnoEnfermeria;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Gate;
 use Livewire\Component;
 
 class DashboardTurno extends Component
@@ -34,50 +34,80 @@ class DashboardTurno extends Component
     ];
 
     public $turnoActual;
+
     public $turnosActivos = [];
+
     public $pacientesAsignadosIds = [];
+
     public $filtroEnfermeroId;
+
     public $filtroFecha;
 
     // Modales de acciones operativas rápidas
     public bool $modalOmitirTarea = false;
+
     public ?string $tareaOmitirId = null;
+
     public string $motivoOmisionTarea = '';
 
     public bool $modalOmitirMed = false;
+
     public ?string $medOmitirId = null;
+
     public ?string $medOmitirCodResidente = null;
+
     public ?string $medOmitirHora = null;
+
     public string $motivoOmisionMed = '';
 
     public bool $modalAtenderAlerta = false;
+
     public ?string $alertaAccionId = null;
+
     public string $accionTomadaAlerta = '';
 
     public bool $modalCerrarAlerta = false;
+
     public string $observacionCierreAlerta = '';
 
     // Modal rápido de signos vitales
     public bool $modalSignos = false;
+
     public ?string $signoCodResidente = null;
+
     public string $signoPresion = '';
+
     public string $signoFC = '';
+
     public string $signoFR = '';
+
     public string $signoTemp = '';
+
     public string $signoSat = '';
+
     public string $signoGlucosa = '';
+
     public string $signoDolor = '';
+
     public string $signoObservacion = '';
 
     // Modal rápido de seguimiento
     public bool $modalSeguimiento = false;
+
     public ?string $segCodResidente = null;
+
     public string $segEstadoGeneral = '';
+
     public string $segAlimentacion = '';
+
     public string $segMovilidad = '';
+
     public string $segSueno = '';
+
     public bool $segIncidente = false;
+
     public bool $segRequiereMedico = false;
+
     public string $segObservacion = '';
 
     public function mount()
@@ -87,12 +117,12 @@ class DashboardTurno extends Component
         $this->loadTurnoActual();
     }
 
-        public function asegurarModoOperativo(?string $codResidente = null, ?string $permiso = null): void
+    public function asegurarModoOperativo(?string $codResidente = null, ?string $permiso = null): void
     {
         // 1. Usuario autenticado y cuenta activa
         $user = Auth::user();
         abort_unless($user, 403, 'Acción no permitida: Usuario no autenticado.');
-        abort_unless(strtoupper(trim((string)$user->estado)) === 'ACTIVO', 403, 'Acción no permitida: Cuenta de usuario no activa.');
+        abort_unless(strtoupper(trim((string) $user->estado)) === 'ACTIVO', 403, 'Acción no permitida: Cuenta de usuario no activa.');
 
         // 2. Personal institucional vinculado
         $personal = $user->personal;
@@ -100,8 +130,8 @@ class DashboardTurno extends Component
 
         // 3. Jornada activa actual en tiempo real
         // Si la jornada terminó mientras la pantalla estaba abierta, resolverJornadaActual retornará null
-        $miTurnoService = app(\App\Backend\Modulos\Enfermeria\Servicios\MiTurnoService::class);
-        $ahora = \Carbon\Carbon::now();
+        $miTurnoService = app(MiTurnoService::class);
+        $ahora = Carbon::now();
         $jornadaActual = $miTurnoService->resolverJornadaActual($personal, $ahora);
         abort_unless($jornadaActual, 403, 'Acción no permitida: Usuario fuera de turno en modo consulta o su jornada ha finalizado.');
 
@@ -116,7 +146,7 @@ class DashboardTurno extends Component
 
         // 5. Residente asignado en la jornada activa (SIN bypass de Superadministrador para mutaciones clinicas)
         if ($codResidente) {
-            $esAsignado = \App\Models\AsignacionResidenteJornada::query()
+            $esAsignado = AsignacionResidenteJornada::query()
                 ->where('cod_jornada', $jornadaActual->cod_jornada)
                 ->where('cod_personal', $personal->cod_personal)
                 ->where('cod_residente', $codResidente)
@@ -164,7 +194,7 @@ class DashboardTurno extends Component
         $this->dispatch('swal', [
             'icon' => 'success',
             'title' => 'Tarea completada',
-            'text' => "La tarea fue marcada como realizada.",
+            'text' => 'La tarea fue marcada como realizada.',
         ]);
     }
 
@@ -214,7 +244,7 @@ class DashboardTurno extends Component
     public function administrarMed(string $codPrescripcion, string $codResidente, ?string $horaProgramada = null)
     {
         $this->asegurarModoOperativo($codResidente, 'administraciones_medicacion.crear');
-        abort_unless(\Illuminate\Support\Facades\Gate::forUser(Auth::user())->allows('create', \App\Models\AdministracionMedicacion::class), 403);
+        abort_unless(Gate::forUser(Auth::user())->allows('create', AdministracionMedicacion::class), 403);
         if (! $horaProgramada) {
             $ocurrencia = app(AgendaMedicacionService::class)->paraAdulto($codResidente)
                 ->first(fn (array $item) => $item['medicacion']->cod_prescripcion === $codPrescripcion);
@@ -406,15 +436,17 @@ class DashboardTurno extends Component
 
         if (($this->segIncidente || $this->segRequiereMedico) && mb_strlen(trim($this->segObservacion)) < 15) {
             $this->addError('segObservacion', 'Describa la situación clínica y las medidas iniciales con al menos 15 caracteres.');
+
             return;
         }
-        if (!$this->turnoActual) {
+        if (! $this->turnoActual) {
             $this->addError('segObservacion', 'No existe un turno activo para registrar el seguimiento.');
+
             return;
         }
         $personal = Auth::user()?->personal;
         abort_unless($personal, 422, 'El usuario no está vinculado a personal clínico.');
-        $asignacionArea = \App\Models\AsignacionPersonal::query()
+        $asignacionArea = AsignacionPersonal::query()
             ->where('cod_personal', $personal->cod_personal)
             ->whereIn('estado', ['ACTIVA', 'ACTIVO'])
             ->latest('fecha_asignacion')
@@ -426,6 +458,7 @@ class DashboardTurno extends Component
             ->where('cod_personal', $personal->cod_personal)
             ->where('tipo_atencion', 'SEGUIMIENTO_ENFERMERIA')->exists()) {
             $this->addError('segObservacion', 'Ya existe un seguimiento de este residente para el turno y la fecha seleccionados.');
+
             return;
         }
 
@@ -457,7 +490,7 @@ class DashboardTurno extends Component
 
     public function render()
     {
-        $miTurnoService = app(\App\Backend\Modulos\Enfermeria\Servicios\MiTurnoService::class);
+        $miTurnoService = app(MiTurnoService::class);
         $dashboard = $miTurnoService->obtenerDatosDashboard(Auth::user(), $this->filtroFecha);
         $residentesDashboard = collect($dashboard['residentes'] ?? []);
         $distribucionPacientes = [

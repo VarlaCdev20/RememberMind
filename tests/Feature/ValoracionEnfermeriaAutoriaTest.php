@@ -14,6 +14,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
 use Livewire\Livewire;
+use Spatie\Permission\Models\Role;
+use Spatie\Permission\PermissionRegistrar;
 use Tests\TestCase;
 
 class ValoracionEnfermeriaAutoriaTest extends TestCase
@@ -34,7 +36,7 @@ class ValoracionEnfermeriaAutoriaTest extends TestCase
         $admin = User::where('correo', 'admincasaamandita@gmail.com')->firstOrFail();
 
         return Preadmision::create([
-            'cod_preadmision' => 'PRE_' . strtoupper(Str::random(10)),
+            'cod_preadmision' => 'PRE_'.strtoupper(Str::random(10)),
             'cod_usuario_registro' => $admin->cod_usuario,
             'nombres' => 'Juan',
             'apellido_paterno' => 'Perez',
@@ -106,9 +108,9 @@ class ValoracionEnfermeriaAutoriaTest extends TestCase
     public function test_2_rol_enfermeros_sin_permiso_registrar_es_rechazado(): void
     {
         $enfermero = User::where('correo', 'enfermeria@remembermind.com')->firstOrFail();
-        $role = \Spatie\Permission\Models\Role::findByName('ENFERMEROS');
+        $role = Role::findByName('ENFERMEROS');
         $role->revokePermissionTo('valoracion_enfermeria.registrar');
-        app(\Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
+        app(PermissionRegistrar::class)->forgetCachedPermissions();
 
         $this->assertTrue($enfermero->hasRole('ENFERMEROS'));
         $this->assertFalse($enfermero->can('valoracion_enfermeria.registrar'));

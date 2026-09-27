@@ -3,7 +3,6 @@
 namespace Tests\Feature;
 
 use App\Backend\Modulos\Clinica\Servicios\ValidacionSignosVitalesService;
-use App\Models\Personal;
 use App\Models\Preadmision;
 use App\Models\Residente;
 use App\Models\User;
@@ -122,7 +121,7 @@ class TallaCanonicaTest extends TestCase
         $this->assertNotNull($personal);
 
         $preadmision = Preadmision::create([
-            'cod_preadmision' => 'PRE_' . strtoupper(Str::random(10)),
+            'cod_preadmision' => 'PRE_'.strtoupper(Str::random(10)),
             'cod_usuario_registro' => $enfermero->cod_usuario,
             'nombres' => 'Residente',
             'apellido_paterno' => 'Prueba',
@@ -135,7 +134,7 @@ class TallaCanonicaTest extends TestCase
         // Intento con talla = 1.65 m (debe fallar por la restricción CHECK de motor / trigger)
         $this->expectException(QueryException::class);
         DB::table('valoraciones_enfermeria_preadmision')->insert([
-            'cod_valoracion_enfermeria' => 'VAL_TEST_' . Str::random(5),
+            'cod_valoracion_enfermeria' => 'VAL_TEST_'.Str::random(5),
             'cod_preadmision' => $preadmision->cod_preadmision,
             'cod_personal_valorador' => $personal->cod_personal,
             'cod_usuario_registro' => $enfermero->cod_usuario,
@@ -151,7 +150,7 @@ class TallaCanonicaTest extends TestCase
         $this->assertNotNull($personal);
 
         $residente = Residente::crearDesdeAdmision([
-            'cod_residente' => 'RES_TEST_' . Str::random(5),
+            'cod_residente' => 'RES_TEST_'.Str::random(5),
             'nombres' => 'Juan',
             'apellido_paterno' => 'Perez',
             'fecha_nacimiento' => '1945-01-01',
@@ -161,7 +160,7 @@ class TallaCanonicaTest extends TestCase
         // Intento con talla = 1.70 (en metros) debe fallar por check ck_med_ant_talla
         $this->expectException(QueryException::class);
         DB::table('mediciones_antropometricas')->insert([
-            'cod_medicion' => 'MED_TEST_' . Str::random(5),
+            'cod_medicion' => 'MED_TEST_'.Str::random(5),
             'cod_residente' => $residente->cod_residente,
             'cod_personal' => $personal->cod_personal,
             'fecha_hora' => now(),
@@ -176,14 +175,14 @@ class TallaCanonicaTest extends TestCase
         $this->assertNotNull($personal);
 
         $residente = Residente::crearDesdeAdmision([
-            'cod_residente' => 'RES_TEST_' . Str::random(5),
+            'cod_residente' => 'RES_TEST_'.Str::random(5),
             'nombres' => 'Juan',
             'apellido_paterno' => 'Perez',
             'fecha_nacimiento' => '1945-01-01',
             'estado' => 'ACTIVO',
         ]);
 
-        $codMed = 'MED_TEST_' . Str::random(5);
+        $codMed = 'MED_TEST_'.Str::random(5);
         DB::table('mediciones_antropometricas')->insert([
             'cod_medicion' => $codMed,
             'cod_residente' => $residente->cod_residente,

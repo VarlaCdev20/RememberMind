@@ -3,15 +3,15 @@
 namespace App\Exports;
 
 use App\Models\AdultoMayor;
+use Carbon\Carbon;
 use Maatwebsite\Excel\Concerns\FromCollection;
-use Maatwebsite\Excel\Concerns\WithMultipleSheets;
-use Maatwebsite\Excel\Concerns\WithTitle;
-use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
+use Maatwebsite\Excel\Concerns\WithHeadings;
+use Maatwebsite\Excel\Concerns\WithMultipleSheets;
 use Maatwebsite\Excel\Concerns\WithStyles;
-use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
+use Maatwebsite\Excel\Concerns\WithTitle;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
-use PhpOffice\PhpSpreadsheet\Style\Color;
+use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
 class AdultoIndividualExport implements WithMultipleSheets
 {
@@ -32,7 +32,7 @@ class AdultoIndividualExport implements WithMultipleSheets
 // ─────────────────────────────────────────────────────────────
 // Hoja 1: Datos Generales
 // ─────────────────────────────────────────────────────────────
-class AdultoGeneralSheet implements FromCollection, WithTitle, WithHeadings, ShouldAutoSize, WithStyles
+class AdultoGeneralSheet implements FromCollection, ShouldAutoSize, WithHeadings, WithStyles, WithTitle
 {
     public function __construct(private AdultoMayor $adulto) {}
 
@@ -49,16 +49,16 @@ class AdultoGeneralSheet implements FromCollection, WithTitle, WithHeadings, Sho
     public function collection()
     {
         $a = $this->adulto;
-        $edad = $a->fecha_nac ? \Carbon\Carbon::parse($a->fecha_nac)->age : '—';
+        $edad = $a->fecha_nac ? Carbon::parse($a->fecha_nac)->age : '—';
 
         return collect([
             ['Código expediente',       $a->cod_residente],
             ['Nombres',                 $a->nombres],
             ['Apellido paterno',        $a->ap_paterno],
             ['Apellido materno',        $a->ap_materno ?? '—'],
-            ['C.I.',                    $a->ci . ($a->complemento_ci ? '-' . $a->complemento_ci : '') . ' ' . $a->expedicion_ci],
+            ['C.I.',                    $a->ci.($a->complemento_ci ? '-'.$a->complemento_ci : '').' '.$a->expedicion_ci],
             ['Fecha de nacimiento',     $a->fecha_nac ? $a->fecha_nac->format('d/m/Y') : '—'],
-            ['Edad',                    $edad . ' años'],
+            ['Edad',                    $edad.' años'],
             ['Género',                  $a->genero ?? '—'],
             ['Estado civil',            $a->estado_civil ?? '—'],
             ['Grupo sanguíneo',         $a->grupo_sanguineo ?? '—'],
@@ -89,8 +89,8 @@ class AdultoGeneralSheet implements FromCollection, WithTitle, WithHeadings, Sho
     {
         return [
             1 => ['font' => ['bold' => true, 'color' => ['rgb' => 'FFFFFF']],
-                  'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => '2F3E5C']]],
-            'A'=> ['font' => ['bold' => true]],
+                'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => '2F3E5C']]],
+            'A' => ['font' => ['bold' => true]],
         ];
     }
 }
@@ -98,7 +98,7 @@ class AdultoGeneralSheet implements FromCollection, WithTitle, WithHeadings, Sho
 // ─────────────────────────────────────────────────────────────
 // Hoja 2: Signos Vitales
 // ─────────────────────────────────────────────────────────────
-class SignosVitalesIndSheet implements FromCollection, WithTitle, WithHeadings, ShouldAutoSize, WithStyles
+class SignosVitalesIndSheet implements FromCollection, ShouldAutoSize, WithHeadings, WithStyles, WithTitle
 {
     public function __construct(private AdultoMayor $adulto) {}
 
@@ -121,7 +121,7 @@ class SignosVitalesIndSheet implements FromCollection, WithTitle, WithHeadings, 
         return $this->adulto->signosVitales()
             ->orderByDesc('fecha')
             ->get()
-            ->map(fn($s) => [
+            ->map(fn ($s) => [
                 $s->fecha ? $s->fecha->format('d/m/Y') : '—',
                 $s->horaFormateada,
                 $s->presion_sistolica,
@@ -142,7 +142,7 @@ class SignosVitalesIndSheet implements FromCollection, WithTitle, WithHeadings, 
     {
         return [
             1 => ['font' => ['bold' => true, 'color' => ['rgb' => 'FFFFFF']],
-                  'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => 'C45F4B']]],
+                'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => 'C45F4B']]],
         ];
     }
 }
@@ -150,7 +150,7 @@ class SignosVitalesIndSheet implements FromCollection, WithTitle, WithHeadings, 
 // ─────────────────────────────────────────────────────────────
 // Hoja 3: Medicación
 // ─────────────────────────────────────────────────────────────
-class MedicacionesIndSheet implements FromCollection, WithTitle, WithHeadings, ShouldAutoSize, WithStyles
+class MedicacionesIndSheet implements FromCollection, ShouldAutoSize, WithHeadings, WithStyles, WithTitle
 {
     public function __construct(private AdultoMayor $adulto) {}
 
@@ -173,16 +173,16 @@ class MedicacionesIndSheet implements FromCollection, WithTitle, WithHeadings, S
         return $this->adulto->medicaciones()
             ->orderByDesc('created_at')
             ->get()
-            ->map(fn($m) => [
+            ->map(fn ($m) => [
                 $m->nombre_medicamento,
                 $m->dosis,
                 $m->frecuencia,
                 $m->via_administracion,
-                $m->hora_programada ? substr((string)$m->hora_programada, 0, 5) : '—',
+                $m->hora_programada ? substr((string) $m->hora_programada, 0, 5) : '—',
                 $m->fecha_inicio ? $m->fecha_inicio->format('d/m/Y') : '—',
-                $m->fecha_fin    ? $m->fecha_fin->format('d/m/Y')    : '—',
-                $m->medico_indica   ?? '—',
-                $m->observacion     ?? '—',
+                $m->fecha_fin ? $m->fecha_fin->format('d/m/Y') : '—',
+                $m->medico_indica ?? '—',
+                $m->observacion ?? '—',
                 $m->estado,
             ]);
     }
@@ -191,7 +191,7 @@ class MedicacionesIndSheet implements FromCollection, WithTitle, WithHeadings, S
     {
         return [
             1 => ['font' => ['bold' => true, 'color' => ['rgb' => 'FFFFFF']],
-                  'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => '617453']]],
+                'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => '617453']]],
         ];
     }
 }
@@ -199,7 +199,7 @@ class MedicacionesIndSheet implements FromCollection, WithTitle, WithHeadings, S
 // ─────────────────────────────────────────────────────────────
 // Hoja 4: Valoración Funcional
 // ─────────────────────────────────────────────────────────────
-class ValoracionesIndSheet implements FromCollection, WithTitle, WithHeadings, ShouldAutoSize, WithStyles
+class ValoracionesIndSheet implements FromCollection, ShouldAutoSize, WithHeadings, WithStyles, WithTitle
 {
     public function __construct(private AdultoMayor $adulto) {}
 
@@ -223,22 +223,22 @@ class ValoracionesIndSheet implements FromCollection, WithTitle, WithHeadings, S
         return $this->adulto->valoracionesFuncionales()
             ->orderByDesc('fecha_valoracion')
             ->get()
-            ->map(fn($v) => [
+            ->map(fn ($v) => [
                 $v->fecha_valoracion ? $v->fecha_valoracion->format('d/m/Y') : '—',
                 $v->indice_barthel,
                 $v->nivel_dependencia ?? '—',
-                $v->riesgo_caida      ?? '—',
-                $v->come_solo         ? 'Sí' : 'No',
-                $v->se_bana_solo      ? 'Sí' : 'No',
-                $v->se_viste_solo     ? 'Sí' : 'No',
-                $v->va_bano_solo      ? 'Sí' : 'No',
-                $v->camina_solo       ? 'Sí' : 'No',
-                $v->usa_baston        ? 'Sí' : 'No',
-                $v->usa_andador       ? 'Sí' : 'No',
-                $v->usa_silla_ruedas  ? 'Sí' : 'No',
-                $v->baja_vision       ? 'Sí' : 'No',
-                $v->baja_audicion     ? 'Sí' : 'No',
-                $v->estado            ?? '—',
+                $v->riesgo_caida ?? '—',
+                $v->come_solo ? 'Sí' : 'No',
+                $v->se_bana_solo ? 'Sí' : 'No',
+                $v->se_viste_solo ? 'Sí' : 'No',
+                $v->va_bano_solo ? 'Sí' : 'No',
+                $v->camina_solo ? 'Sí' : 'No',
+                $v->usa_baston ? 'Sí' : 'No',
+                $v->usa_andador ? 'Sí' : 'No',
+                $v->usa_silla_ruedas ? 'Sí' : 'No',
+                $v->baja_vision ? 'Sí' : 'No',
+                $v->baja_audicion ? 'Sí' : 'No',
+                $v->estado ?? '—',
             ]);
     }
 
@@ -246,7 +246,7 @@ class ValoracionesIndSheet implements FromCollection, WithTitle, WithHeadings, S
     {
         return [
             1 => ['font' => ['bold' => true, 'color' => ['rgb' => 'FFFFFF']],
-                  'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => '5B5F97']]],
+                'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => '5B5F97']]],
         ];
     }
 }
@@ -254,7 +254,7 @@ class ValoracionesIndSheet implements FromCollection, WithTitle, WithHeadings, S
 // ─────────────────────────────────────────────────────────────
 // Hoja 5: Evaluaciones Cognitivas
 // ─────────────────────────────────────────────────────────────
-class EvaluacionesCognitivasIndSheet implements FromCollection, WithTitle, WithHeadings, ShouldAutoSize, WithStyles
+class EvaluacionesCognitivasIndSheet implements FromCollection, ShouldAutoSize, WithHeadings, WithStyles, WithTitle
 {
     public function __construct(private AdultoMayor $adulto) {}
 
@@ -277,7 +277,7 @@ class EvaluacionesCognitivasIndSheet implements FromCollection, WithTitle, WithH
             ->with(['tipoEvaluacion', 'personalSalud'])
             ->orderByDesc('fecha_eval')
             ->get()
-            ->map(fn($e) => [
+            ->map(fn ($e) => [
                 $e->fecha_eval ? $e->fecha_eval->format('d/m/Y') : '—',
                 $e->tipoEvaluacion?->nombre ?? '—',
                 $e->puntaje_total,
@@ -292,7 +292,7 @@ class EvaluacionesCognitivasIndSheet implements FromCollection, WithTitle, WithH
     {
         return [
             1 => ['font' => ['bold' => true, 'color' => ['rgb' => 'FFFFFF']],
-                  'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => '2F3E5C']]],
+                'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => '2F3E5C']]],
         ];
     }
 }
