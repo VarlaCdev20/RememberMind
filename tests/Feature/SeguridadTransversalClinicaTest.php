@@ -6,6 +6,9 @@ use App\Models\Area;
 use App\Models\AsignacionPersonal;
 use App\Models\Atencion;
 use App\Models\Jornada;
+use App\Models\Instrumento;
+use App\Models\OpcionPregunta;
+use App\Models\PreguntaInstrumento;
 use App\Models\Residente;
 use App\Models\Turno;
 use App\Models\User;
@@ -73,6 +76,56 @@ class SeguridadTransversalClinicaTest extends TestCase
         ])->assertForbidden();
 
         $this->assertDatabaseCount('valoraciones_psicologicas', 0);
+    }
+
+    public function test_instrumento_calcula_puntaje_desde_la_opcion_activa(): void
+    {
+        [$psicologa, $residente, $atencion] = $this->escenarioPsicologia(true);
+        $instrumento = Instrumento::query()->create([
+            'cod_instrumento' => 'INS_SEG_SCORE',
+            'codigo' => 'SEG-1',
+            'nombre' => 'Escala segura',
+            'tipo' => 'COGNITIVO',
+            'estado' => 'ACTIVO',
+        ]);
+        $pregunta = PreguntaInstrumento::query()->create([
+            'cod_pregunta' => 'PRE_SEG_SCORE',
+            'cod_instrumento' => $instrumento->cod_instrumento,
+            'codigo' => 'P1',
+            'enunciado' => '¿Respuesta observada?',
+            'tipo_respuesta' => 'OPCION',
+            'puntaje_maximo' => 2,
+            'orden' => 1,
+            'estado' => 'ACTIVA',
+        ]);
+        $opcion = OpcionPregunta::query()->create([
+            'cod_opcion' => 'OPC_SEG_SCORE',
+            'cod_pregunta' => $pregunta->cod_pregunta,
+            'nombre' => 'Adecuada',
+            'valor' => 'SI',
+            'puntaje' => 2,
+            'orden' => 1,
+            'estado' => 'ACTIVO',
+        ]);
+
+        $respuesta = $this->actingAs($psicologa)->postJson(route('admin.instrumentos.aplicar', [$instrumento, $residente]), [
+            'cod_atencion' => $atencion->cod_atencion,
+            'puntaje_total' => 999,
+            'puntaje_maximo' => 999,
+            'respuestas' => [[
+                'cod_pregunta' => $pregunta->cod_pregunta,
+                'cod_opcion' => $opcion->cod_opcion,
+                'puntaje' => 999,
+            ]],
+        ])->assertCreated();
+
+        $this->assertSame(2, (int) $respuesta->json('puntaje_total'));
+        $this->assertSame(2, (int) $respuesta->json('puntaje_maximo'));
+        $this->assertDatabaseHas('respuestas_instrumento', [
+            'cod_aplicacion' => $respuesta->json('cod_aplicacion'),
+            'cod_pregunta' => $pregunta->cod_pregunta,
+            'puntaje' => 2,
+        ]);
     }
 
     /** @return array{User, Residente, Atencion, Area, Jornada} */
