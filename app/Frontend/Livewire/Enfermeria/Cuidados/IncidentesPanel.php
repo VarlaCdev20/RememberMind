@@ -2,6 +2,7 @@
 
 namespace App\Frontend\Livewire\Enfermeria\Cuidados;
 
+use App\Backend\Modulos\Enfermeria\Servicios\TurnoEnfermeriaService;
 use App\Models\Alerta;
 use App\Models\Area;
 use App\Models\Derivacion;
@@ -185,6 +186,9 @@ class IncidentesPanel extends Component
     // ==========================================
     public function seleccionarResidente(string $codResidente): void
     {
+        if (Auth::user()?->hasRole('ENFERMEROS')) {
+            app(TurnoEnfermeriaService::class)->autorizarAccionPaciente($codResidente, Auth::user());
+        }
         $this->cod_residente = $codResidente;
         $this->residenteSeleccionado = Residente::with([
             'cama.habitacion',
@@ -289,11 +293,13 @@ class IncidentesPanel extends Component
             return;
         }
 
-        // Obtener jornada activa si existe
-        $jornadaActiva = Jornada::where('estado', 'ACTIVO')
+        $turnoActivo = app(TurnoEnfermeriaService::class)
+            ->autorizarMutacionPaciente($this->cod_residente, 'incidentes.crear', $user);
+        $jornadaActiva = Jornada::where('cod_turno', $turnoActivo->cod_turno)
+            ->whereIn('estado', ['ABIERTA', 'ACTIVA', 'EN_CURSO'])
             ->whereDate('fecha_jornada', Carbon::today())
-            ->first();
-        $codJornada = $jornadaActiva ? $jornadaActiva->cod_jornada : null;
+            ->firstOrFail();
+        $codJornada = $jornadaActiva->cod_jornada;
 
         // Normalización backend
         $tipoNormalizado = Str::upper(preg_replace('/\s+/', ' ', trim($tipoFinal)));
@@ -444,6 +450,7 @@ class IncidentesPanel extends Component
 
         $incidente = Incidente::find($this->incidenteSeleccionadoId);
         if (!$incidente) return;
+        $this->autorizarMutacionIncidente($incidente);
 
         $estadoAnterior = $incidente->estado;
         $incidente->estado = $this->nuevo_estado;
@@ -480,6 +487,7 @@ class IncidentesPanel extends Component
 
         $incidente = Incidente::with(['residente', 'personal'])->find($id);
         if (!$incidente) return;
+        $this->autorizarMutacionIncidente($incidente);
 
         // Comprobar si ya tiene una alerta activa vinculada
         $alertaExistente = Alerta::where('modulo', 'INCIDENTES')
@@ -604,6 +612,7 @@ class IncidentesPanel extends Component
 
         $incidente = Incidente::find($this->incidenteSeleccionadoId);
         if (!$incidente) return;
+        $this->autorizarMutacionIncidente($incidente);
 
         $user = Auth::user();
         $codUsuario = $user->cod_usuario;
@@ -617,11 +626,15 @@ class IncidentesPanel extends Component
         }
         $codPersonal = $personal->cod_personal;
 
-        // Área de enfermería como solicitante
-        $areaEnfermeria = Area::where('nombre', 'LIKE', '%ENFERMER%')
-            ->orWhere('nombre', 'LIKE', '%SALUD%')
-            ->first();
-        $codAreaSolicitante = $areaEnfermeria ? $areaEnfermeria->cod_area : $this->derivacion_area_receptora;
+        $codAreaSolicitante = $personal->asignaciones()
+            ->whereIn('estado', ['ACTIVA', 'ACTIVO'])
+            ->whereHas('jornada', fn ($query) => $query->whereDate('fecha_jornada', today()))
+            ->latest('fecha_asignacion')
+            ->value('cod_area');
+        if (! $codAreaSolicitante) {
+            $this->addError('derivacion_area_receptora', 'El personal no tiene un área institucional activa en la jornada actual.');
+            return;
+        }
 
         DB::beginTransaction();
         try {
@@ -673,10 +686,18 @@ class IncidentesPanel extends Component
     // ==========================================
     public function render()
     {
+        $turnos = app(TurnoEnfermeriaService::class);
+        $usuario = Auth::user();
+        $restringirPorAsignacion = (bool) $usuario?->hasRole('ENFERMEROS');
+        $residentesAsignados = $restringirPorAsignacion
+            ? $turnos->obtenerPacientesAsignadosIds($usuario)
+            : [];
+
         // 1. Query para Residentes disponibles en el selector
         $residentesQuery = Residente::query()
             ->with(['cama.habitacion', 'ocupacionActiva'])
-            ->where('estado', 'ACTIVO');
+            ->whereIn('estado', ['ACTIVO', 'ADMITIDO'])
+            ->when($restringirPorAsignacion, fn ($residentes) => $residentes->whereIn('cod_residente', $residentesAsignados));
 
         if (!empty($this->searchResidente)) {
             $s = '%' . trim($this->searchResidente) . '%';
@@ -695,7 +716,8 @@ class IncidentesPanel extends Component
                 'residente.cama.habitacion',
                 'personal.usuario',
                 'alertaAsociada'
-            ]);
+            ])
+            ->when($restringirPorAsignacion, fn ($incidentes) => $incidentes->whereIn('cod_residente', $residentesAsignados));
 
         // Filtro texto: residente, tipo, descripción
         if (!empty($this->search)) {
@@ -770,5 +792,13 @@ class IncidentesPanel extends Component
             'residentesDisponibles' => $residentesDisponibles,
             'areasDisponibles' => $areasDisponibles
         ])->layout(request()->routeIs('admin.enfermeria.*') ? 'layouts.enfermeria' : 'layouts.sistema');
+    }
+
+    private function autorizarMutacionIncidente(Incidente $incidente): void
+    {
+        if (Auth::user()?->hasRole('ENFERMEROS')) {
+            app(TurnoEnfermeriaService::class)
+                ->autorizarMutacionPaciente($incidente->cod_residente, 'incidentes.crear', Auth::user());
+        }
     }
 }

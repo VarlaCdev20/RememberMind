@@ -5,13 +5,17 @@ namespace Tests\Feature;
 use App\Frontend\Livewire\Enfermeria\Cuidados\IncidentesPanel;
 use App\Models\Alerta;
 use App\Models\Area;
+use App\Models\AsignacionPersonal;
+use App\Models\AsignacionResidenteJornada;
 use App\Models\Contacto;
 use App\Models\Derivacion;
 use App\Models\EventoAlerta;
 use App\Models\Incidente;
+use App\Models\Jornada;
 use App\Models\Personal;
 use App\Models\Residente;
 use App\Models\ResidenteContacto;
+use App\Models\TurnoEnfermeria;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -35,9 +39,10 @@ class IncidentesEnfermeriaTest extends TestCase
 
         // Crear permisos y roles
         Permission::firstOrCreate(['name' => 'enfermeria.ver_dashboard', 'guard_name' => 'web']);
+        Permission::firstOrCreate(['name' => 'incidentes.crear', 'guard_name' => 'web']);
         Role::firstOrCreate(['name' => 'SUPERADMINISTRADOR', 'guard_name' => 'web']);
         $roleEnfermero = Role::firstOrCreate(['name' => 'ENFERMEROS', 'guard_name' => 'web']);
-        $roleEnfermero->givePermissionTo('enfermeria.ver_dashboard');
+        $roleEnfermero->givePermissionTo(['enfermeria.ver_dashboard', 'incidentes.crear']);
 
         // Crear usuario con Personal automático mediante Factory
         $this->user = User::factory()->create([
@@ -67,6 +72,40 @@ class IncidentesEnfermeriaTest extends TestCase
             'nombre' => 'MEDICINA GENERAL',
             'descripcion' => 'Área médica',
             'estado' => 'ACTIVO'
+        ]);
+
+        $turno = TurnoEnfermeria::create([
+            'cod_turno' => 'TUR_INC_TEST',
+            'nombre' => 'Turno incidentes',
+            'hora_inicio' => '00:00:00',
+            'hora_fin' => '23:59:59',
+            'orden' => 1,
+            'estado' => 'ACTIVO',
+        ]);
+        $jornada = Jornada::create([
+            'cod_jornada' => 'JOR_INC_TEST',
+            'cod_turno' => $turno->cod_turno,
+            'fecha_jornada' => today(),
+            'estado' => 'ABIERTA',
+        ]);
+        AsignacionPersonal::create([
+            'cod_asignacion_personal' => 'ASP_INC_TEST',
+            'cod_jornada' => $jornada->cod_jornada,
+            'cod_personal' => $this->personal->cod_personal,
+            'cod_area' => $this->area->cod_area,
+            'funcion' => 'ENFERMERO_TURNO',
+            'tipo_asignacion' => 'TURNO',
+            'fecha_asignacion' => now(),
+            'estado' => 'ACTIVA',
+        ]);
+        AsignacionResidenteJornada::create([
+            'cod_asignacion' => 'ARJ_INC_TEST',
+            'cod_residente' => $this->residente->cod_residente,
+            'cod_jornada' => $jornada->cod_jornada,
+            'cod_personal' => $this->personal->cod_personal,
+            'nivel_supervision' => 'ESTANDAR',
+            'fecha_hora' => now(),
+            'estado' => 'ACTIVA',
         ]);
     }
 
@@ -138,6 +177,34 @@ class IncidentesEnfermeriaTest extends TestCase
             ->assertHasErrors(['error_general']);
 
         $this->assertDatabaseCount('incidentes', 0);
+    }
+
+    public function test_enfermero_no_puede_ver_ni_registrar_incidentes_de_un_residente_no_asignado(): void
+    {
+        $noAsignado = Residente::crearDesdeAdmision([
+            'cod_residente' => 'RES_NO_ASIGNADO',
+            'nombres' => 'Residente Oculto',
+            'apellido_paterno' => 'Seguridad',
+            'fecha_nacimiento' => '1940-01-01',
+            'estado' => 'ADMITIDO',
+        ]);
+        $fechaIncidente = now()->subMinutes(5);
+
+        Livewire::actingAs($this->user)
+            ->test(IncidentesPanel::class)
+            ->assertDontSee($noAsignado->nombres)
+            ->set('cod_residente', $noAsignado->cod_residente)
+            ->set('tipo_incidente', 'CAÍDA')
+            ->set('gravedad', 'ALTA')
+            ->set('fecha_incidente', $fechaIncidente->format('Y-m-d'))
+            ->set('hora_incidente', $fechaIncidente->format('H:i'))
+            ->set('descripcion', 'Intento de registro sobre un residente ajeno al turno.')
+            ->call('registrarIncidente')
+            ->assertForbidden();
+
+        $this->assertDatabaseMissing('incidentes', [
+            'cod_residente' => $noAsignado->cod_residente,
+        ]);
     }
 
     public function test_registro_incidente_exitoso_y_normalizacion_de_texto(): void
