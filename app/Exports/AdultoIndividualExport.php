@@ -273,18 +273,18 @@ class EvaluacionesCognitivasIndSheet implements FromCollection, ShouldAutoSize, 
 
     public function collection()
     {
-        return $this->adulto->evaluacionesCognitivas()
-            ->with(['tipoEvaluacion', 'personalSalud'])
-            ->orderByDesc('fecha_eval')
+        return $this->adulto->evaluacionesGeriatricas()
+            ->with(['instrumento', 'evaluador'])
+            ->orderByDesc('fecha_hora')
             ->get()
             ->map(fn ($e) => [
-                $e->fecha_eval ? $e->fecha_eval->format('d/m/Y') : '—',
-                $e->tipoEvaluacion?->nombre ?? '—',
+                $e->fecha_hora ? $e->fecha_hora->format('d/m/Y') : '—',
+                $e->instrumento?->nombre ?? '—',
                 $e->puntaje_total,
                 $e->puntaje_maximo,
-                $e->resultado_interpretacion ?? '—',
-                $e->nivel_riesgo ?? '—',
-                $e->personalSalud?->nombres ?? '—',
+                $e->interpretacion ?? '—',
+                $e->clasificacion ?? '—',
+                $e->evaluador?->nombres ?? '—',
             ]);
     }
 

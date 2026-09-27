@@ -2,14 +2,18 @@
 
 namespace App\Frontend\Livewire\Administracion\Identidad;
 
+use App\Backend\Modulos\Identidad\Servicios\GeneradorPlanillaEnfermeriaService;
 use App\Models\Area;
 use App\Models\AsignacionPersonal;
+use App\Models\Jornada;
+use App\Models\Personal;
 use App\Models\TurnoInstitucional;
 use App\Models\User;
-use App\Backend\Modulos\Identidad\Servicios\GeneradorPlanillaEnfermeriaService;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use Illuminate\View\View;
 use Livewire\Component;
 use Spatie\Permission\Models\Role;
@@ -56,12 +60,19 @@ class TurnosAsignacionesPanel extends Component
     */
 
     public string $busqueda = '';
+
     public string $filtroTipo = '';
+
     public string $filtroRol = '';
+
     public string $filtroArea = '';
+
     public string $filtroTurno = '';
+
     public string $filtroEstado = '';
+
     public string $vistaCalendario = 'semana';
+
     public string $fechaSeleccionada = '';
 
     /*
@@ -71,7 +82,9 @@ class TurnosAsignacionesPanel extends Component
     */
 
     public bool $modalAbierto = false;
+
     public string $busquedaModal = '';
+
     public ?string $usuarioSeleccionado = null;
 
     /*
@@ -92,35 +105,58 @@ class TurnosAsignacionesPanel extends Component
     */
 
     public string $vistaPlanilla = 'semanal';
+
     public string $fechaInicioPlanilla = '';
+
     public int $cantidadSemanas = 1;
+
     public int $saltoSemanal = 1;
+
     public ?string $trabajadorFiltro = null;
+
     public ?string $turnoFiltroPlanilla = null;
+
     public ?string $grupoFiltroPlanilla = null;
 
     public bool $mostrarApoyo = true;
+
     public bool $mostrarDescanso = true;
+
     public bool $mostrarGrupos = false;
+
     public bool $soloConflictos = false;
+
     public bool $usarUsuariosReales = true;
 
     // Plaza assignment properties
     public bool $modalAsignarPlazaAbierto = false;
+
     public string $plazaSeleccionada = '';
+
     public string $fechaSeleccionadaPlaza = '';
+
     public string $enfermeroSeleccionado = '';
+
     public string $tipoAsignacion = 'TITULAR';
+
     public string $motivoAsignacion = '';
 
     public array $planillaEnfermeria = [];
+
     public array $resumenPlanilla = [];
+
     public array $cargaLaboral = [];
+
     public array $alertasPlanilla = [];
+
     public array $vistaSemanal = [];
+
     public ?array $vistaHoy = null;
+
     public array $vistaPorEnfermero = [];
+
     public array $equilibrioPlanilla = [];
+
     public array $filtrosPlanilla = [];
 
     protected $listeners = [
@@ -696,7 +732,7 @@ class TurnosAsignacionesPanel extends Component
         });
 
         return [
-            'titulo' => $inicio->locale('es')->translatedFormat('d M') . ' - ' . $inicio->copy()->addDays(6)->locale('es')->translatedFormat('d M Y'),
+            'titulo' => $inicio->locale('es')->translatedFormat('d M').' - '.$inicio->copy()->addDays(6)->locale('es')->translatedFormat('d M Y'),
             'dias' => $dias,
             'bloques' => self::BLOQUES,
         ];
@@ -1117,12 +1153,13 @@ class TurnosAsignacionesPanel extends Component
 
         if ($codUsuario) {
             $user = User::find($codUsuario);
-            if (!$user || !$user->hasRole('ENFERMEROS') || $user->estado !== 'ACTIVO') {
+            if (! $user || ! $user->hasRole('ENFERMEROS') || $user->estado !== 'ACTIVO') {
                 $this->dispatch('mostrarAlerta', [
                     'type' => 'error',
                     'title' => 'Enfermero no válido',
                     'message' => 'El usuario seleccionado debe tener el rol de ENFERMEROS y estar ACTIVO.',
                 ]);
+
                 return;
             }
 
@@ -1134,37 +1171,43 @@ class TurnosAsignacionesPanel extends Component
                     'type' => 'error', 'title' => 'Enfermero ocupado',
                     'message' => 'El enfermero ya tiene otra asignación para esa fecha.',
                 ]);
+
                 return;
             }
         }
 
-        $anteriores = AsignacionPersonal::where('funcion', 'PLAZA:'.$plaza)->where('estado', 'ACTIVA')
-            ->whereHas('jornada', fn ($q) => $q->whereDate('fecha_jornada', $fecha))->get();
-        foreach ($anteriores as $anterior) {
-            $anterior->update(['estado' => 'ANULADA']);
-        }
-
+        $personal = null;
+        $areaId = null;
         if ($tipo !== 'DESCANSO' && $codUsuario) {
             $personal = User::findOrFail($codUsuario)->personal;
             abort_unless($personal, 422, 'El usuario no tiene ficha de personal V2.');
+            $areaId = $this->resolverAreaAsignacionEnfermeria($personal);
+        }
+
+        DB::transaction(function () use ($plaza, $fecha, $tipo, $personal, $areaId, $motivo): void {
+            AsignacionPersonal::where('funcion', 'PLAZA:'.$plaza)->where('estado', 'ACTIVA')
+                ->whereHas('jornada', fn ($q) => $q->whereDate('fecha_jornada', $fecha))
+                ->update(['estado' => 'ANULADA']);
+
+            if ($tipo === 'DESCANSO' || ! $personal || ! $areaId) {
+                return;
+            }
+
             $turnoCodigo = $this->turnoCodigoParaPlaza($plaza, $fecha);
             $turnoId = match ($turnoCodigo) {
                 'MANANA' => 'TUR_0001', 'TARDE' => 'TUR_0002', 'NOCHE' => 'TUR_0003', default => 'TUR_0004',
             };
-            $jornada = \App\Models\Jornada::firstOrCreate(
+            $jornada = Jornada::firstOrCreate(
                 ['cod_turno' => $turnoId, 'fecha_jornada' => $fecha],
-                ['cod_jornada' => 'JOR_'.strtoupper(\Illuminate\Support\Str::random(10)), 'estado' => 'ACTIVA']
+                ['cod_jornada' => 'JOR_'.Str::upper(Str::random(10)), 'estado' => 'ACTIVA']
             );
-            $areaId = $personal->asignaciones()->where('estado', 'ACTIVA')->value('cod_area')
-                ?: Area::where('nombre', 'like', '%ENFERMER%')->value('cod_area')
-                ?: Area::value('cod_area');
-            abort_unless($areaId, 422, 'No existe un área institucional para la asignación.');
+
             AsignacionPersonal::create([
                 'cod_jornada' => $jornada->cod_jornada, 'cod_personal' => $personal->cod_personal, 'cod_area' => $areaId,
                 'funcion' => 'PLAZA:'.$plaza, 'tipo_asignacion' => $tipo, 'fecha_asignacion' => now(),
                 'estado' => 'ACTIVA', 'observacion' => $motivo,
             ]);
-        }
+        });
 
         $this->modalAsignarPlazaAbierto = false;
         $this->generarPlanillaEnfermeria(silencioso: true);
@@ -1197,14 +1240,50 @@ class TurnosAsignacionesPanel extends Component
     {
         foreach ($this->planillaEnfermeria as $semana) {
             foreach ($semana['dias'] ?? [] as $dia) {
-                if (($dia['fecha'] ?? null) !== $fecha) continue;
+                if (($dia['fecha'] ?? null) !== $fecha) {
+                    continue;
+                }
                 foreach ($dia['turnos'] ?? [] as $codigo => $turno) {
                     foreach ($turno['asignaciones'] ?? [] as $asignacion) {
-                        if (($asignacion['codigo'] ?? null) === $plaza) return $codigo;
+                        if (($asignacion['codigo'] ?? null) === $plaza) {
+                            return $codigo;
+                        }
                     }
                 }
             }
         }
+
         return 'APOYO';
+    }
+
+    private function resolverAreaAsignacionEnfermeria(Personal $personal): string
+    {
+        $codigosAsignados = $personal->asignaciones()
+            ->where('estado', 'ACTIVA')
+            ->distinct()
+            ->pluck('cod_area')
+            ->filter()
+            ->values();
+
+        if ($codigosAsignados->count() === 1) {
+            return (string) $codigosAsignados->sole();
+        }
+
+        $areasEnfermeria = Area::query()
+            ->whereIn('estado', ['ACTIVA', 'ACTIVO'])
+            ->get(['cod_area', 'nombre'])
+            ->filter(fn (Area $area): bool => str_contains(
+                Str::upper(Str::ascii((string) $area->nombre)),
+                'ENFERMER'
+            ))
+            ->values();
+
+        abort_unless(
+            $areasEnfermeria->count() === 1,
+            422,
+            'La asignación requiere un área de Enfermería única y explícita; revise la configuración institucional.'
+        );
+
+        return (string) $areasEnfermeria->sole()->cod_area;
     }
 }

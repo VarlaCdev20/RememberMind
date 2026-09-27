@@ -2,24 +2,32 @@
 
 namespace Tests\Feature;
 
+use App\Backend\Modulos\Documentos\Servicios\DocumentacionUsuarioService;
+use App\Backend\Modulos\Identidad\Servicios\GeneradorPlanillaEnfermeriaService;
+use App\Exports\AdultoIndividualExport;
+use App\Frontend\Livewire\Administracion\Identidad\TurnosAsignacionesPanel;
+use App\Models\AdultoMayor;
+use App\Models\AplicacionInstrumento;
 use App\Models\Area;
 use App\Models\AsignacionPersonal;
 use App\Models\Contacto;
+use App\Models\Instrumento;
 use App\Models\Jornada;
+use App\Models\Personal;
 use App\Models\Preadmision;
+use App\Models\Residente;
 use App\Models\ResidenteContacto;
 use App\Models\Turno;
 use App\Models\User;
-use App\Backend\Modulos\Documentos\Servicios\DocumentacionUsuarioService;
-use App\Backend\Modulos\Identidad\Servicios\GeneradorPlanillaEnfermeriaService;
 use Database\Seeders\DatabaseSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Spatie\Permission\Models\Permission;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Tests\TestCase;
 
 class IntegracionAdaptadoresV2Test extends TestCase
@@ -56,7 +64,7 @@ class IntegracionAdaptadoresV2Test extends TestCase
     public function test_contactos_y_vinculos_familiares_usan_relaciones_v2(): void
     {
         $usuario = User::where('correo', 'admincasaamandita@gmail.com')->firstOrFail();
-        $residente = \App\Models\Residente::crearDesdeAdmision([
+        $residente = Residente::crearDesdeAdmision([
             'cod_residente' => 'RES_TEST_V2', 'nombres' => 'Julia', 'apellido_paterno' => 'Flores',
             'fecha_nacimiento' => '1940-01-01', 'estado' => 'ADMITIDO',
         ]);
@@ -101,6 +109,79 @@ class IntegracionAdaptadoresV2Test extends TestCase
 
         $plaza = collect($resultado['enfermeros'])->firstWhere('codigo', 'E01');
         $this->assertSame($enfermero->cod_usuario, $plaza['cod_usuario']);
+    }
+
+    public function test_exportacion_cognitiva_consulta_relaciones_y_columnas_canonicas_v2(): void
+    {
+        $personal = Personal::query()->where('cod_personal', 'PER_0001')->firstOrFail();
+        $residenteCreado = Residente::crearDesdeAdmision([
+            'cod_residente' => 'RES_EXPORT_V2',
+            'nombres' => 'Elena',
+            'apellido_paterno' => 'Mamani',
+            'fecha_nacimiento' => '1942-04-10',
+            'estado' => 'ADMITIDO',
+        ]);
+        $residente = AdultoMayor::findOrFail($residenteCreado->cod_residente);
+        $instrumento = Instrumento::create([
+            'cod_instrumento' => 'INS_EXPORT_V2',
+            'codigo' => 'COG-EXPORT-V2',
+            'nombre' => 'Evaluación cognitiva V2',
+            'tipo' => 'COGNITIVO',
+            'puntaje_maximo' => 30,
+            'estado' => 'ACTIVO',
+        ]);
+        AplicacionInstrumento::create([
+            'cod_aplicacion' => 'APL_EXPORT_V2',
+            'cod_instrumento' => $instrumento->cod_instrumento,
+            'cod_residente' => $residente->cod_residente,
+            'cod_personal' => $personal->cod_personal,
+            'fecha_hora' => '2026-09-26 10:30:00',
+            'puntaje_total' => 24,
+            'puntaje_maximo' => 30,
+            'clasificacion' => 'PREVENTIVO',
+            'interpretacion' => 'Requiere seguimiento',
+            'estado' => 'COMPLETADA',
+        ]);
+
+        $filas = (new AdultoIndividualExport($residente))->sheets()[4]->collection();
+
+        $this->assertSame('26/09/2026', $filas->first()[0]);
+        $this->assertSame('Evaluación cognitiva V2', $filas->first()[1]);
+        $this->assertSame('Requiere seguimiento', $filas->first()[4]);
+        $this->assertSame('PREVENTIVO', $filas->first()[5]);
+        $this->assertSame($personal->nombres, $filas->first()[6]);
+    }
+
+    public function test_asignacion_de_enfermeria_rechaza_un_area_arbitraria(): void
+    {
+        $usuario = User::factory()->create();
+        $personal = Personal::create([
+            'cod_personal' => 'PER_AREA_EXPLICITA',
+            'cod_usuario' => $usuario->cod_usuario,
+            'nombres' => 'Rosa',
+            'apellido_paterno' => 'Quispe',
+            'numero_documento' => 'CI-AREA-EXPLICITA',
+            'profesion' => 'ENFERMERIA',
+            'estado' => 'ACTIVO',
+        ]);
+        Area::create([
+            'cod_area' => 'ARE_NO_ENFERMERIA',
+            'nombre' => 'Administración institucional',
+            'estado' => 'ACTIVA',
+        ]);
+
+        $metodo = new \ReflectionMethod(TurnosAsignacionesPanel::class, 'resolverAreaAsignacionEnfermeria');
+
+        try {
+            $metodo->invoke(new TurnosAsignacionesPanel, $personal);
+            $this->fail('La asignación no debe elegir la primera área disponible.');
+        } catch (\ReflectionException $excepcion) {
+            throw $excepcion;
+        } catch (\Throwable $excepcion) {
+            $causa = $excepcion instanceof \ReflectionException ? $excepcion : ($excepcion->getPrevious() ?? $excepcion);
+            $this->assertInstanceOf(HttpException::class, $causa);
+            $this->assertSame(422, $causa->getStatusCode());
+        }
     }
 
     public function test_valoracion_inicial_es_dato_estructurado_de_preadmision(): void

@@ -2,9 +2,8 @@
 
 namespace App\Frontend\Livewire\Compartido\Clinica;
 
-use Carbon\Carbon;
-use Livewire\Component;
 use App\Models\AdultoMayor;
+use Livewire\Component;
 
 class SaludResumenPanel extends Component
 {
@@ -64,7 +63,7 @@ class SaludResumenPanel extends Component
             ->take(3)
             ->get();
 
-        // 9. Evaluación cognitiva más reciente (columna real: fecha_eval)
+        // 9. Evaluación cognitiva más reciente (columna canónica V2: fecha_hora)
         $evaluacionCognitiva = $this->adulto->evaluacionesGeriatricas()
             ->latest('fecha_hora')
             ->first();
@@ -72,10 +71,10 @@ class SaludResumenPanel extends Component
         // ── Alertas orientativas ─────────────────────────────────
         $alertas = collect();
 
-        if (!$fichaMedica) {
+        if (! $fichaMedica) {
             $alertas->push([
-                'tipo'    => 'Ficha Médica',
-                'nivel'   => 'atencion',
+                'tipo' => 'Ficha Médica',
+                'nivel' => 'atencion',
                 'mensaje' => 'No se ha registrado una ficha médica activa. Seguimiento pendiente.',
             ]);
         }
@@ -85,10 +84,10 @@ class SaludResumenPanel extends Component
                 ->where('resultado', 'ADMINISTRADA')
                 ->latest('fecha_hora_administracion')
                 ->first();
-            if (!$ultimaToma || $ultimaToma->fecha_hora_administracion?->diffInDays(now()) >= 1) {
+            if (! $ultimaToma || $ultimaToma->fecha_hora_administracion?->diffInDays(now()) >= 1) {
                 $alertas->push([
-                    'tipo'    => 'Administración Pendiente',
-                    'nivel'   => 'atencion',
+                    'tipo' => 'Administración Pendiente',
+                    'nivel' => 'atencion',
                     'mensaje' => 'Alerta orientativa: hay medicación activa sin registro de administración confirmada en las últimas 24 horas. Requiere revisión.',
                 ]);
             }
@@ -96,8 +95,8 @@ class SaludResumenPanel extends Component
 
         if ($dosisOmitidas->isNotEmpty()) {
             $alertas->push([
-                'tipo'    => 'Tomas No Administradas',
-                'nivel'   => 'requiere_revision',
+                'tipo' => 'Tomas No Administradas',
+                'nivel' => 'requiere_revision',
                 'mensaje' => 'Se registran tomas sin administrar recientemente. Requiere revisión.',
             ]);
         }
@@ -105,41 +104,41 @@ class SaludResumenPanel extends Component
         if ($valoracionFuncional) {
             if (in_array($valoracionFuncional->nivel_funcional, ['DEPENDENCIA_ALTA', 'SUPERVISION_PERMANENTE'])) {
                 $alertas->push([
-                    'tipo'    => 'Dependencia Elevada',
-                    'nivel'   => 'atencion',
+                    'tipo' => 'Dependencia Elevada',
+                    'nivel' => 'atencion',
                     'mensaje' => 'Se registra nivel de dependencia elevado en la valoración funcional. Seguimiento pendiente.',
                 ]);
             }
 
         }
 
-        if (!$ultimoSigno || $ultimoSigno->fecha_hora?->diffInDays(now()) > 7) {
+        if (! $ultimoSigno || $ultimoSigno->fecha_hora?->diffInDays(now()) > 7) {
             $alertas->push([
-                'tipo'    => 'Signos Vitales',
-                'nivel'   => 'seguimiento',
+                'tipo' => 'Signos Vitales',
+                'nivel' => 'seguimiento',
                 'mensaje' => 'No se han registrado signos vitales en los últimos 7 días. Seguimiento pendiente.',
             ]);
         }
 
         if ($evaluacionCognitiva && $evaluacionCognitiva->fecha_hora?->diffInMonths(now()) >= 6) {
             $alertas->push([
-                'tipo'    => 'Evaluación Cognitiva',
-                'nivel'   => 'seguimiento',
+                'tipo' => 'Evaluación Cognitiva',
+                'nivel' => 'seguimiento',
                 'mensaje' => 'Alerta orientativa: la última evaluación cognitiva tiene más de 6 meses. Seguimiento pendiente.',
             ]);
         }
 
         return view('livewire.clinica.salud-resumen-panel', [
-            'fichaMedica'          => $fichaMedica,
-            'medicacionActiva'     => $medicacionActiva,
+            'fichaMedica' => $fichaMedica,
+            'medicacionActiva' => $medicacionActiva,
             'ultimaAdministracion' => $ultimaAdministracion,
-            'dosisOmitidas'        => $dosisOmitidas,
-            'ultimoSigno'          => $ultimoSigno,
-            'valoracionFuncional'  => $valoracionFuncional,
-            'alertas'              => $alertas,
-            'observaciones'        => $observaciones,
-            'atenciones'           => $atenciones,
-            'evaluacionCognitiva'  => $evaluacionCognitiva,
+            'dosisOmitidas' => $dosisOmitidas,
+            'ultimoSigno' => $ultimoSigno,
+            'valoracionFuncional' => $valoracionFuncional,
+            'alertas' => $alertas,
+            'observaciones' => $observaciones,
+            'atenciones' => $atenciones,
+            'evaluacionCognitiva' => $evaluacionCognitiva,
         ])->layout('layouts.sistema');
     }
 }
