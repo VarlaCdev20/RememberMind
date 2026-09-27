@@ -3,6 +3,7 @@
 namespace App\Backend\Modulos\Clinica\Servicios;
 
 use App\Backend\Modulos\Enfermeria\Servicios\TurnoEnfermeriaService;
+use App\Models\Area;
 use App\Models\Personal;
 use App\Models\Residente;
 use App\Models\User;
@@ -43,5 +44,14 @@ class AutorizacionClinicaService
         }
 
         return $personal;
+    }
+
+    public function areaActiva(Personal $personal): Area
+    {
+        try {
+            return $this->contexto->areaAtencion($personal);
+        } catch (LogicException $excepcion) {
+            abort(403, $excepcion->getMessage());
+        }
     }
 }

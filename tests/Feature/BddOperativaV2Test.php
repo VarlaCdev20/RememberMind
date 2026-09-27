@@ -223,10 +223,11 @@ class BddOperativaV2Test extends TestCase
 
     public function test_registro_clinico_toma_el_personal_del_usuario_autenticado(): void
     {
-        $datos = $this->escenarioAdmision();
-        $residente = app(FormalizarAdmision::class)->ejecutar($datos['preadmision'], ['cod_cama'=>$datos['cama']->cod_cama,'cod_contacto'=>$datos['contacto']->cod_contacto], $datos['usuario']);
+        [$datos, $residente] = $this->escenarioClinico();
         $enfermera = $this->usuarioRol('enfermera.v2@test.local', 'ENFERMEROS');
         $personal = Personal::query()->create(['cod_personal'=>'PER_ENF','cod_usuario'=>$enfermera->cod_usuario,'nombres'=>'Elena','apellido_paterno'=>'Rojas','numero_documento'=>'ENF-1','profesion'=>'ENFERMERA','estado'=>'ACTIVO']);
+        AsignacionPersonal::query()->create(['cod_asignacion_personal'=>'ASP_ENF_REG','cod_jornada'=>$datos['jornada']->cod_jornada,'cod_personal'=>$personal->cod_personal,'cod_area'=>$datos['area']->cod_area,'fecha_hora_asignacion'=>now(),'estado'=>'ACTIVA']);
+        AsignacionResidenteJornada::query()->create(['cod_asignacion_residente'=>'ASR_ENF_REG','cod_jornada'=>$datos['jornada']->cod_jornada,'cod_residente'=>$residente->cod_residente,'cod_personal'=>$personal->cod_personal,'fecha_hora_asignacion'=>now(),'estado'=>'ACTIVA']);
 
         $this->actingAs($enfermera)->postJson(route('admin.clinica.store', [$residente, 'signo-vital']), [
             'cod_personal'=>'PER_FALSO','temperatura'=>36.8,'saturacion_oxigeno'=>97,
