@@ -684,8 +684,8 @@ class UsuariosPanel extends Component
     {
         $rules = [
             'nombres' => ['required', 'string', 'max:255', 'regex:/^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s\-]+$/u'],
-            'ap_paterno' => ['required_without:ap_materno', 'nullable', 'string', 'max:100', 'regex:/^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s\-]+$/u'],
-            'ap_materno' => ['required_without:ap_paterno', 'nullable', 'string', 'max:100', 'regex:/^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s\-]+$/u'],
+            'ap_paterno' => ['required', 'string', 'max:80', 'regex:/^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s\-]+$/u'],
+            'ap_materno' => ['nullable', 'string', 'max:80', 'regex:/^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s\-]+$/u'],
             'fecha_nacimiento' => [
                 'required', 
                 'date', 
@@ -711,7 +711,7 @@ class UsuariosPanel extends Component
             'genero' => ['required', 'string', 'in:FEMENINO,MASCULINO'],
             'pais_documento' => ['required', 'string'],
             'tipo_documento' => ['required', 'string'],
-            'numero_documento' => ['required', 'string', 'max:50'],
+            'numero_documento' => ['required', 'string', 'max:30'],
             'correo' => [
                 'required',
                 'string',
@@ -779,8 +779,7 @@ class UsuariosPanel extends Component
         return array_merge([
             'nombres.required' => 'Por favor, escriba los nombres del usuario.',
             'nombres.regex' => 'El nombre solo puede contener letras y espacios.',
-            'ap_paterno.required_without' => 'Falta registrar al menos un apellido (paterno o materno) para el usuario.',
-            'ap_materno.required_without' => 'Falta registrar al menos un apellido (paterno o materno) para el usuario.',
+            'ap_paterno.required' => 'Falta registrar el apellido paterno requerido por la identidad institucional.',
             'fecha_nacimiento.required' => 'Debe ingresar la fecha de nacimiento del usuario.',
             'fecha_nacimiento.date' => 'Debe ingresar una fecha de nacimiento válida.',
             'genero.required' => 'Debe seleccionar el género del usuario.',
@@ -1265,6 +1264,8 @@ class UsuariosPanel extends Component
 
             $this->validate([
                 'nombres' => ['required', 'string', 'max:255', 'regex:/^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s\-]+$/u'],
+                'ap_paterno' => ['required', 'string', 'max:80', 'regex:/^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s\-]+$/u'],
+                'ap_materno' => ['nullable', 'string', 'max:80', 'regex:/^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s\-]+$/u'],
                 'fecha_nacimiento' => [
                     'required', 
                     'date', 
@@ -1290,14 +1291,8 @@ class UsuariosPanel extends Component
                 'genero' => ['required', 'string', 'in:FEMENINO,MASCULINO'],
                 'pais_documento' => ['required', 'string'],
                 'tipo_documento' => ['required', 'string'],
-                'numero_documento' => ['required', 'string', 'max:50'],
+                'numero_documento' => ['required', 'string', 'max:30'],
             ], $this->messages());
-
-            if (empty($this->ap_paterno) && empty($this->ap_materno)) {
-                $this->addError('ap_paterno', 'Debe registrar al menos un apellido (paterno o materno).');
-                $this->addError('ap_materno', 'Debe registrar al menos un apellido (paterno o materno).');
-                return;
-            }
 
             if (mb_strtoupper((string) $this->pais_documento, 'UTF-8') === 'BOLIVIA' && $this->tipo_documento === 'CI') {
                 if (!preg_match('/^\d+$/', $this->numero_documento) || strlen($this->numero_documento) < 5 || strlen($this->numero_documento) > 10) {
@@ -1505,12 +1500,6 @@ class UsuariosPanel extends Component
         $rules = $this->rules();
         $this->validate($rules);
 
-        if (empty($this->ap_paterno) && empty($this->ap_materno)) {
-            $this->addError('ap_paterno', 'Debe registrar al menos un apellido (paterno o materno).');
-            $this->addError('ap_materno', 'Debe registrar al menos un apellido (paterno o materno).');
-            return;
-        }
-
         if (mb_strtoupper((string) $this->pais_documento, 'UTF-8') === 'BOLIVIA' && $this->tipo_documento === 'CI') {
             if (!preg_match('/^\d+$/', $this->numero_documento) || strlen($this->numero_documento) < 5 || strlen($this->numero_documento) > 10) {
                 $this->addError('numero_documento', 'Para Bolivia el CI debe ser numérico y tener entre 5 y 10 dígitos.');
@@ -1681,13 +1670,12 @@ class UsuariosPanel extends Component
     private function guardarSubModelos(User $usuario)
     {
         if ($this->rol === 'FAMILIAR') {
-            $hayResponsable = collect($this->vinculosFamiliar)->contains(fn($v) => $v['es_responsable'] === 'SI');
             $fam = \App\Models\Contacto::updateOrCreate(
                 ['cod_usuario' => $usuario->cod_usuario],
                 [
                     'cod_contacto' => \App\Models\Contacto::where('cod_usuario', $usuario->cod_usuario)->value('cod_contacto') ?: ('CON_' . strtoupper(\Illuminate\Support\Str::random(10))),
-                    'nombres' => $this->nombres ?: 'FAMILIAR',
-                    'apellido_paterno' => $this->ap_paterno ?: 'SIN APELLIDO',
+                    'nombres' => $this->nombres,
+                    'apellido_paterno' => $this->ap_paterno,
                     'apellido_materno' => $this->ap_materno,
                     'numero_documento' => $this->numero_documento,
                     'telefono' => $this->telefono,
@@ -1705,13 +1693,13 @@ class UsuariosPanel extends Component
                 ['cod_usuario' => $usuario->cod_usuario],
                 [
                     'cod_personal' => \App\Models\Personal::where('cod_usuario', $usuario->cod_usuario)->value('cod_personal') ?: ('PER_' . strtoupper(\Illuminate\Support\Str::random(10))),
-                    'nombres' => $this->nombres ?: 'USUARIO',
-                    'apellido_paterno' => $this->ap_paterno ?: 'INSTITUCIONAL',
+                    'nombres' => $this->nombres,
+                    'apellido_paterno' => $this->ap_paterno,
                     'apellido_materno' => $this->ap_materno,
-                    'numero_documento' => $this->numero_documento ?: ('DOC-' . strtoupper(\Illuminate\Support\Str::random(6))),
-                    'profesion' => $this->rol ?: 'PERSONAL',
-                    'fecha_ingreso' => $this->fecha_ingreso ?: now()->toDateString(),
-                    'estado' => $usuario->estado ?: 'ACTIVO',
+                    'numero_documento' => $this->numero_documento,
+                    'profesion' => $this->rol,
+                    'fecha_ingreso' => $this->fecha_ingreso,
+                    'estado' => $usuario->estado,
                 ]
             );
         }

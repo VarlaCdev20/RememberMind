@@ -38,4 +38,28 @@ class UsuariosResidentesV2Test extends TestCase
 
         $this->assertFalse(method_exists(UsuariosPanel::class, 'registrarYVincularAdulto'));
     }
+
+    public function test_identidad_incompleta_se_rechaza_sin_generar_apellidos_o_documentos_de_respaldo(): void
+    {
+        $this->seed(RolesAndPermissionsSeeder::class);
+        $usuario = User::factory()->create();
+        $usuario->assignRole('SUPERADMINISTRADOR');
+        $this->actingAs($usuario);
+
+        Livewire::test(UsuariosPanel::class)
+            ->set('nombres', 'Ana')
+            ->set('ap_paterno', null)
+            ->set('ap_materno', 'Quispe')
+            ->set('fecha_nacimiento', now()->subYears(30)->toDateString())
+            ->set('genero', 'FEMENINO')
+            ->set('pais_documento', 'PERU')
+            ->set('tipo_documento', 'PASAPORTE')
+            ->set('numero_documento', str_repeat('1', 31))
+            ->call('siguientePaso')
+            ->assertHasErrors(['ap_paterno', 'numero_documento']);
+
+        $fuente = file_get_contents(app_path('Frontend/Livewire/Administracion/Identidad/UsuariosPanel.php'));
+        $this->assertStringNotContainsString("'numero_documento' => \$this->numero_documento ?:", $fuente);
+        $this->assertStringNotContainsString("'apellido_paterno' => \$this->ap_paterno ?:", $fuente);
+    }
 }
