@@ -309,7 +309,7 @@ class AlertasPanel extends Component
         $this->adultoDrawerId = $codResidente;
         $this->adultoDrawer = AdultoMayor::with([
             'cama.habitacion',
-            'alertas' => fn ($q) => $q->latest()->take(5),
+            'alertas' => fn ($q) => $q->orderByDesc('fecha_hora')->take(5),
         ])->find($codResidente);
 
         $this->drawerUbicacion = true;

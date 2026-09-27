@@ -579,7 +579,7 @@ class PreadmisionesPanel extends Component
         ];
 
         return view('livewire.admisiones.preadmisiones-panel', [
-            'preadmisiones' => $query->orderByDesc('fecha_solicitud')->orderByDesc('created_at')->paginate(10),
+            'preadmisiones' => $query->orderByDesc('fecha_solicitud')->orderByDesc('cod_preadmision')->paginate(10),
             'metricas' => $metricas,
             'habitacionesAdmision' => Habitacion::query()
                 ->withCount([
