@@ -25,7 +25,6 @@ export default defineConfig({
             input: [
                 'resources/frontend/styles/app.css',
                 'resources/frontend/scripts/app.js',
-                'resources/frontend/styles/design-system/index.css',
             ],
             refresh: true,
         }),

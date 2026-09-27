@@ -1,7 +1,3 @@
-@push('styles')
-    @vite('resources/frontend/styles/design-system/index.css')
-@endpush
-
 <div class="rm-pilot-alertas rm-page-layout font-sans">
     {{-- Encabezado Institucional Canónico --}}
     <header class="rm-page-header">
