@@ -85,7 +85,6 @@
                     <option value="OBSERVADO">En Observación</option>
                     <option value="SEGUIMIENTO_ESPECIAL">Seguimiento Especial</option>
                     <option value="ADMITIDO">Admitido</option>
-                    <option value="PENDIENTE_VALORACION_MEDICA">Pendiente Valoración</option>
                     <option value="DECISION_ADMISION">Decisión Admisión</option>
                 </select>
             </div>
@@ -155,7 +154,6 @@
                         $estadoColor = match($estadoStr) {
                             'ACTIVO' => 'bg-estado-exitoBg text-estado-exito',
                             'SEGUIMIENTO_ESPECIAL' => 'bg-estado-advertenciaBg text-estado-advertencia',
-                            'PENDIENTE_VALORACION_MEDICA' => 'bg-estado-advertenciaBg text-estado-advertencia',
                             'DECISION_ADMISION' => 'bg-estado-infoBg text-estado-info',
                             'OBSERVADO' => 'bg-boton-acento/10 text-boton-acento',
                             default => 'bg-fondo-panel text-apoyo',

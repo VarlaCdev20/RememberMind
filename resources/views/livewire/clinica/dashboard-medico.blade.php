@@ -407,10 +407,9 @@
                 <tbody class="divide-y divide-borde/50">
                     @foreach($valoracionesPendientes as $pac)
                     @php
-                        $estadoColor = match($pac->estado?->estado) {
-                            'VALORACION_MEDICA'           => 'bg-estado-advertenciaBg text-estado-advertencia',
-                            'PENDIENTE_VALORACION_MEDICA' => 'bg-estado-errorBg text-estado-error',
-                            'DECISION_ADMISION'           => 'bg-estado-infoBg text-estado-info',
+                        $estadoColor = match($pac->estado?->estado ?? $pac->estado) {
+                            'VALORACION_MEDICA' => 'bg-estado-advertenciaBg text-estado-advertencia',
+                            'DECISION_ADMISION' => 'bg-estado-infoBg text-estado-info',
                             default => 'bg-fondo-panel text-apoyo',
                         };
                     @endphp
@@ -448,7 +447,7 @@
                         </td>
                         <td class="px-5 py-3">
                             <div class="flex items-center justify-center gap-1.5">
-                                @if(in_array($pac->estado?->estado, ['VALORACION_MEDICA', 'PENDIENTE_VALORACION_MEDICA']))
+                                @if(($pac->estado?->estado ?? $pac->estado) === 'VALORACION_MEDICA')
                                 <button wire:click="iniciarValoracionMedica('{{ $pac->cod_residente }}')"
                                         class="h-8 px-3 rounded-lg bg-estado-advertencia text-white text-[10px] font-black uppercase tracking-wide hover:bg-estado-advertencia/80 transition whitespace-nowrap">
                                     <i class="ph-bold ph-stethoscope mr-1"></i>Valorar

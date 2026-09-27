@@ -61,7 +61,7 @@ class DashboardMedico extends Component
 
     private function cargarDatosV2(): void
     {
-        $pendientes = ['PENDIENTE_VALORACION_MEDICA', 'DECISION_ADMISION', 'VALORACION_MEDICA'];
+        $pendientes = ['VALORACION_MEDICA', 'DECISION_ADMISION'];
         $this->valoracionesPendientes = AdultoMayor::query()
             ->whereIn('estado', $pendientes)
             ->orderBy('apellido_paterno')

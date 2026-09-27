@@ -85,7 +85,7 @@ class PacientesSeguimientoPanel extends Component
     public function render()
     {
         $estadosActivos    = ['ACTIVO', 'ADMITIDO', 'ASIGNADO', 'EN_SEGUIMIENTO_ACTIVO', 'OBSERVADO', 'SEGUIMIENTO_ESPECIAL'];
-        $estadosPendientes = ['PENDIENTE_VALORACION_MEDICA', 'VALORACION_MEDICA', 'DECISION_ADMISION'];
+        $estadosPendientes = ['VALORACION_MEDICA', 'DECISION_ADMISION'];
 
         $base = AdultoMayor::query();
 

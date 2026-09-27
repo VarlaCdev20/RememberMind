@@ -158,7 +158,7 @@
                             </div>
                             <div class="rm-drawer-def-item">
                                 <span class="rm-drawer-def-label">Médico tratante:</span>
-                                <span class="rm-drawer-def-value">{{ $adultoDrawer->medico_tratante ?? 'Dr. de Cabecera' }}</span>
+                                <span class="rm-drawer-def-value">{{ $adultoDrawer->medico_tratante ?? 'No registrado' }}</span>
                             </div>
                             <div class="rm-drawer-def-item">
                                 <span class="rm-drawer-def-label">Nivel de cuidado:</span>

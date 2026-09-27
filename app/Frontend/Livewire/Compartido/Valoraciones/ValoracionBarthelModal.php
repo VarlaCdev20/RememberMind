@@ -189,7 +189,7 @@ class ValoracionBarthelModal extends Component
     public function guardar(): void
     {
         abort_unless(Auth::check(), 401);
-        app(TurnoEnfermeriaService::class)->autorizarMutacionEnfermeria($this->cod_residente, 'valoracion_enfermeria.crear', Auth::user());
+        app(TurnoEnfermeriaService::class)->autorizarMutacionEnfermeria($this->cod_residente, 'valoracion_enfermeria.registrar', Auth::user());
 
         $this->recalcular();
         $this->validate();

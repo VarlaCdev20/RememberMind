@@ -444,7 +444,7 @@
                         <div class="rm-drawer-def-list">
                             <div class="rm-drawer-def-item">
                                 <span class="rm-drawer-def-label">Estado general:</span>
-                                <span class="rm-drawer-def-value">{{ $adultoDrawer->estado_humano ?? 'Estable' }}</span>
+                                <span class="rm-drawer-def-value">{{ $adultoDrawer->estado_humano ?? 'Sin evaluación registrada' }}</span>
                             </div>
                             <div class="rm-drawer-def-item">
                                 <span class="rm-drawer-def-label">Nivel de cuidado:</span>
@@ -552,12 +552,12 @@
                                             {{ $s->temperatura ? $s->temperatura.'°C' : '--' }}
                                         </td>
                                         <td class="whitespace-nowrap">
-                                            <span class="inline-flex items-center px-1.5 py-0.2 rounded text-[9px] font-bold border {{ ($s->presion_sistolica && $s->presion_sistolica >= 140) ? 'bg-rose-100 text-rose-800 border-rose-200' : 'bg-emerald-100 text-emerald-800 border-emerald-200' }}">
-                                                {{ ($s->presion_sistolica && $s->presion_sistolica >= 140) ? 'Elevada' : 'Normal' }}
+                                            <span class="inline-flex items-center px-1.5 py-0.2 rounded text-[9px] font-bold border border-[var(--rm-border)] text-[var(--rm-text-muted)]">
+                                                Registrada
                                             </span>
                                         </td>
-                                        <td class="text-[10px] text-[var(--rm-text-muted)] truncate max-w-[110px]" title="{{ $s->registradoPor->name ?? 'Equipo Asistencial' }}">
-                                            {{ $s->registradoPor->name ?? 'Enfermería' }}
+                                        <td class="text-[10px] text-[var(--rm-text-muted)] truncate max-w-[110px]" title="{{ $s->registradoPor->name ?? 'Profesional no registrado' }}">
+                                            {{ $s->registradoPor->name ?? 'Profesional no registrado' }}
                                         </td>
                                     </tr>
                                 @empty
