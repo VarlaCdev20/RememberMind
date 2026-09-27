@@ -2,18 +2,25 @@
 
 namespace App\Http\Controllers\Medicacion;
 
+use App\Backend\Modulos\Clinica\Servicios\AutorizacionClinicaService;
+use App\Backend\Modulos\Medicacion\Servicios\RegistrarAdministracionMedicacionService;
 use App\Http\Controllers\Controller;
-use App\Models\AdministracionMedicacion;
 use App\Models\Atencion;
 use App\Models\HorarioPrescripcion;
 use App\Models\Prescripcion;
 use App\Models\Residente;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class MedicacionController extends Controller
 {
+    public function __construct(
+        private readonly AutorizacionClinicaService $autorizacion,
+        private readonly RegistrarAdministracionMedicacionService $administraciones,
+    ) {}
+
     public function index(Request $request, Residente $residente): JsonResponse
     {
         $this->authorize('view', $residente);
@@ -22,9 +29,10 @@ class MedicacionController extends Controller
 
     public function prescribir(Request $request, Residente $residente): JsonResponse
     {
-        $this->authorize('view', $residente);
         $this->authorize('create', Prescripcion::class);
-        $personal = $request->user()->personal()->where('estado', 'ACTIVO')->firstOrFail();
+        $personal = $this->autorizacion->autorizarMutacion(
+            $request->user(), $residente, 'prescripciones.crear', ['MEDICO GENERAL/GERIATRA'],
+        );
         $datos = $request->validate([
             'cod_atencion' => ['required', 'exists:atenciones,cod_atencion'], 'cod_medicamento' => ['required', 'exists:medicamentos,cod_medicamento'],
             'dosis' => ['nullable', 'numeric', 'min:0'], 'unidad_dosis' => ['nullable', 'string', 'max:30'],
@@ -36,40 +44,86 @@ class MedicacionController extends Controller
         abort_unless(Atencion::query()->whereKey($datos['cod_atencion'])->where('cod_residente', $residente->cod_residente)->exists(), 422, 'La atención no pertenece al residente.');
         $horarios = $datos['horarios'] ?? [];
         unset($datos['horarios']);
-        $prescripcion = Prescripcion::query()->create(['cod_prescripcion' => $this->codigo('PRE'), 'cod_residente' => $residente->cod_residente, 'cod_personal' => $personal->cod_personal, ...$datos, 'fecha_hora_prescripcion' => now(), 'estado' => 'ACTIVA']);
-        foreach ($horarios as $horario) {
-            HorarioPrescripcion::query()->create(['cod_horario_prescripcion' => $this->codigo('HPR'), 'cod_prescripcion' => $prescripcion->cod_prescripcion, ...$horario, 'estado' => 'ACTIVO']);
-        }
+        abort_if(! $datos['segun_necesidad'] && $horarios === [], 422,
+            'Una prescripción programada requiere al menos un horario.');
+        $prescripcion = DB::transaction(function () use ($residente, $personal, $datos, $horarios): Prescripcion {
+            $prescripcion = Prescripcion::query()->create(['cod_prescripcion' => $this->codigo('PRE'), 'cod_residente' => $residente->cod_residente, 'cod_personal' => $personal->cod_personal, ...$datos, 'fecha_hora_prescripcion' => now(), 'estado' => 'ACTIVA']);
+            foreach ($horarios as $horario) {
+                HorarioPrescripcion::query()->create(['cod_horario_prescripcion' => $this->codigo('HPR'), 'cod_prescripcion' => $prescripcion->cod_prescripcion, ...$horario, 'estado' => 'ACTIVO']);
+            }
+
+            return $prescripcion;
+        });
         return response()->json($prescripcion->load('horarios'), 201);
     }
 
     public function suspender(Request $request, Prescripcion $prescripcion): JsonResponse
     {
-        $this->authorize('view', $prescripcion->residente()->firstOrFail());
+        $residente = $prescripcion->residente()->firstOrFail();
         $this->authorize('update', $prescripcion);
-        $personal = $request->user()->personal()->where('estado', 'ACTIVO')->firstOrFail();
-        $datos = $request->validate(['motivo_suspension' => ['required', 'string']]);
-        $prescripcion->update([...$datos, 'cod_personal_suspension' => $personal->cod_personal, 'fecha_hora_suspension' => now(), 'estado' => 'SUSPENDIDA']);
+        $personal = $this->autorizacion->autorizarMutacion(
+            $request->user(), $residente, 'prescripciones.suspender', ['MEDICO GENERAL/GERIATRA'],
+        );
+        $datos = $request->validate(['motivo_suspension' => ['required', 'string', 'min:5', 'max:10000']]);
+        $prescripcion = DB::transaction(function () use ($prescripcion, $personal, $datos): Prescripcion {
+            $bloqueada = Prescripcion::query()->lockForUpdate()->findOrFail($prescripcion->getKey());
+            abort_unless(in_array($bloqueada->estado, ['ACTIVA', 'ACTIVO'], true), 409,
+                'La prescripción ya no se encuentra activa.');
+            $bloqueada->update([...$datos, 'cod_personal_suspension' => $personal->cod_personal, 'fecha_hora_suspension' => now(), 'estado' => 'SUSPENDIDA']);
+
+            return $bloqueada;
+        });
         return response()->json($prescripcion->fresh());
     }
 
     public function administrar(Request $request, Prescripcion $prescripcion): JsonResponse
     {
-        $this->authorize('view', $prescripcion->residente()->firstOrFail());
-        $this->authorize('create', AdministracionMedicacion::class);
-        abort_if($prescripcion->estado !== 'ACTIVA', 409, 'La prescripción no está activa.');
-        $personal = $request->user()->personal()->where('estado', 'ACTIVO')->firstOrFail();
+        $residente = $prescripcion->residente()->firstOrFail();
+        $this->autorizacion->autorizarMutacion(
+            $request->user(), $residente, 'administraciones_medicacion.crear', ['ENFERMEROS'],
+        );
         $datos = $request->validate([
             'cod_horario_prescripcion' => ['nullable', 'exists:horarios_prescripcion,cod_horario_prescripcion'],
-            'cod_jornada' => ['required', 'exists:jornadas,cod_jornada'], 'fecha_hora_programada' => ['nullable', 'date'],
-            'fecha_hora_administracion' => ['nullable', 'date'], 'resultado' => ['required', 'string', 'max:40'],
-            'dosis_administrada' => ['nullable', 'numeric', 'min:0'], 'motivo_omision' => ['nullable', 'required_if:resultado,OMITIDA', 'string'],
+            'resultado' => ['required', 'in:ADMINISTRADA,OMITIDA'],
+            'dosis_administrada' => ['nullable', 'numeric', 'min:0'], 'motivo_omision' => ['nullable', 'required_if:resultado,OMITIDA', 'string', 'min:5'],
             'efecto_observado' => ['nullable', 'string'], 'reaccion_adversa' => ['nullable', 'string'], 'observacion' => ['nullable', 'string'],
+            'motivo_clinico' => ['nullable', 'required_without:cod_horario_prescripcion', 'string', 'min:5'],
+            'valoracion_previa' => ['nullable', 'required_without:cod_horario_prescripcion', 'string', 'min:5'],
+            'intensidad_previa' => ['nullable', 'required_without:cod_horario_prescripcion', 'integer', 'between:0,10'],
         ]);
-        if (! empty($datos['cod_horario_prescripcion'])) {
-            abort_unless(HorarioPrescripcion::query()->whereKey($datos['cod_horario_prescripcion'])->where('cod_prescripcion', $prescripcion->cod_prescripcion)->exists(), 422, 'El horario no corresponde a la prescripción.');
+        if (empty($datos['cod_horario_prescripcion'])) {
+            abort_unless($prescripcion->segun_necesidad && $datos['resultado'] === 'ADMINISTRADA', 422,
+                'Una administración sin horario solo es válida para una prescripción PRN activa.');
+            $registro = $this->administraciones->registrarPrn(
+                $request->user(),
+                $residente->cod_residente,
+                $prescripcion->cod_prescripcion,
+                $datos['motivo_clinico'],
+                $datos['valoracion_previa'],
+                $datos['intensidad_previa'],
+                $datos['efecto_observado'] ?? null,
+            );
+        } else {
+            $horario = HorarioPrescripcion::query()
+                ->whereKey($datos['cod_horario_prescripcion'])
+                ->where('cod_prescripcion', $prescripcion->cod_prescripcion)
+                ->whereIn('estado', ['ACTIVO', 'ACTIVA'])
+                ->first();
+            abort_unless($horario, 422, 'El horario no corresponde a la prescripción activa.');
+            $registro = $this->administraciones->registrarProgramada(
+                $request->user(),
+                $residente->cod_residente,
+                $prescripcion->cod_prescripcion,
+                $horario->hora_programada,
+                $datos['resultado'] === 'ADMINISTRADA',
+                $datos['motivo_omision'] ?? null,
+                $datos['observacion'] ?? null,
+                $datos['efecto_observado'] ?? null,
+                $datos['dosis_administrada'] ?? null,
+                $datos['reaccion_adversa'] ?? null,
+            );
         }
-        $registro = AdministracionMedicacion::query()->create(['cod_administracion' => $this->codigo('ADM'), 'cod_prescripcion' => $prescripcion->cod_prescripcion, 'cod_residente' => $prescripcion->cod_residente, 'cod_personal' => $personal->cod_personal, ...$datos, 'estado' => 'REGISTRADA']);
+
         return response()->json($registro, 201);
     }
 

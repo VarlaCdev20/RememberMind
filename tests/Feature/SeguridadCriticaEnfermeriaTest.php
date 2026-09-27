@@ -126,6 +126,37 @@ class SeguridadCriticaEnfermeriaTest extends TestCase
         ));
     }
 
+    public function test_endpoint_de_administracion_deriva_jornada_y_hora_en_el_servidor(): void
+    {
+        $this->recibir($this->enfermero, $this->turno);
+        $orden = $this->orden(['hora_programada' => '08:00']);
+        $horario = $orden->horarios()->sole();
+        $jornada = AsignacionResidenteJornada::query()
+            ->where('cod_residente', $this->residente->cod_residente)
+            ->where('cod_personal', $this->enfermero->personal->cod_personal)
+            ->sole()
+            ->cod_jornada;
+
+        $datos = [
+            'cod_horario_prescripcion' => $horario->cod_horario_prescripcion,
+            'cod_jornada' => 'JOR_NO_AUTORIZADA',
+            'fecha_hora_programada' => now()->addDays(3)->toDateTimeString(),
+            'fecha_hora_administracion' => now()->subDays(2)->toDateTimeString(),
+            'resultado' => 'ADMINISTRADA',
+            'dosis_administrada' => 500,
+        ];
+
+        $this->postJson(route('admin.administraciones.store', $orden), $datos)->assertCreated();
+        $this->assertDatabaseHas('administraciones_medicacion', [
+            'cod_prescripcion' => $orden->cod_prescripcion,
+            'cod_jornada' => $jornada,
+            'cod_personal' => $this->enfermero->personal->cod_personal,
+            'resultado' => 'ADMINISTRADA',
+        ]);
+        $this->postJson(route('admin.administraciones.store', $orden), $datos)->assertUnprocessable();
+        $this->assertDatabaseCount('administraciones_medicacion', 1);
+    }
+
     public function test_prn_exige_valoracion_e_intensidad_y_conserva_trazabilidad(): void
     {
         $this->recibir($this->enfermero, $this->turno);
