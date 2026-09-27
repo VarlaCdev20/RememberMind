@@ -42,12 +42,13 @@ class RegistrarAdministracionMedicacionService
                 && $item['hora'] === $hora);
 
         $this->exigir($ocurrencia !== null, 'La dosis no corresponde a un horario activo de hoy.');
-        $this->exigir($ocurrencia['registro'] === null, 'Esta dosis ya tiene una administración u omisión registrada.', 'cod_med_adulto');
+        $this->exigir($ocurrencia['registro'] === null, 'Esta dosis ya tiene una administración u omisión registrada.', 'cod_prescripcion');
         if (! $administrada) {
             $this->exigir(mb_strlen(trim((string) $motivoOmision)) >= 5, 'Debe registrar un motivo de omisión de al menos 5 caracteres.');
         }
 
         $personal = $usuario->personal;
+        $this->exigir($personal !== null, 'El usuario autenticado no tiene un personal institucional asociado.', 'personal');
         $asignacion = AsignacionResidenteJornada::query()
             ->with('jornada')
             ->where('cod_residente', $codResidente)
@@ -88,7 +89,7 @@ class RegistrarAdministracionMedicacionService
                 ->whereDate('fecha_hora_programada', today())
                 ->lockForUpdate()
                 ->exists();
-            $this->exigir(! $duplicada, 'Esta dosis ya tiene una administración u omisión registrada.', 'cod_med_adulto');
+            $this->exigir(! $duplicada, 'Esta dosis ya tiene una administración u omisión registrada.', 'cod_prescripcion');
 
             return AdministracionMedicacion::query()->create([
                 'cod_administracion' => 'ADM_'.Str::upper(Str::random(12)),
@@ -133,9 +134,11 @@ class RegistrarAdministracionMedicacionService
             ->where('segun_necesidad', true)->first();
         $this->exigir($prescripcion !== null, 'La orden PRN no pertenece al residente o no está activa.');
 
+        $personal = $usuario->personal;
+        $this->exigir($personal !== null, 'El usuario autenticado no tiene un personal institucional asociado.', 'personal');
         $asignacion = AsignacionResidenteJornada::query()
             ->where('cod_residente', $codResidente)
-            ->where('cod_personal', $usuario->personal->cod_personal)
+            ->where('cod_personal', $personal->cod_personal)
             ->whereIn('estado', ['ACTIVA', 'ACTIVO'])
             ->whereHas('jornada', fn ($query) => $query->whereDate('fecha_jornada', today())
                 ->where('cod_turno', $turno->cod_turno)->whereIn('estado', ['ABIERTA', 'ACTIVA']))
@@ -146,7 +149,7 @@ class RegistrarAdministracionMedicacionService
             'cod_prescripcion' => $prescripcion->cod_prescripcion,
             'cod_residente' => $codResidente,
             'cod_jornada' => $asignacion->cod_jornada,
-            'cod_personal' => $usuario->personal->cod_personal,
+            'cod_personal' => $personal->cod_personal,
             'fecha_hora_programada' => now(),
             'fecha_hora_administracion' => now(),
             'resultado' => 'ADMINISTRADA',

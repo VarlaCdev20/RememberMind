@@ -607,7 +607,7 @@ class SaludAdministracionMedicacionPanel extends Component
                 'indicacion' => $prescripcion->indicacion ?: ($prescripcion->observacion ?: 'Tratamiento según indicación médica'),
                 'segun_necesidad' => $prescripcion->segun_necesidad ? 'Sí (PRN)' : 'No',
                 'fecha' => $prescripcion->fecha_hora_prescripcion?->format('d/m/Y H:i') ?? 'N/A',
-                'prescriptor' => $prescripcion->medico_indica ?: ($prescripcion->personal ? trim("{$prescripcion->personal->nombres} {$prescripcion->personal->apellido_paterno}") : 'Dr. Médico Asignado'),
+                'prescriptor' => $prescripcion->medico_indica ?: ($prescripcion->personal ? trim("{$prescripcion->personal->nombres} {$prescripcion->personal->apellido_paterno}") : 'Prescriptor no registrado'),
                 'estado' => $prescripcion->estado ?: 'ACTIVA',
             ],
 

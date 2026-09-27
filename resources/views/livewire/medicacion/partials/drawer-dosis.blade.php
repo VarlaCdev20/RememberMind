@@ -129,7 +129,7 @@
 
                         <div class="grid grid-cols-2 gap-y-1.5 text-xs pt-1">
                             <span class="text-[#677084] dark:text-[#BDAE9F]">Prescrito por:</span>
-                            <span class="font-[600] text-[#304060] dark:text-[#EFE5DA] text-right truncate">{{ $dosisDetalle['prescripcion']['prescriptor'] ?? 'Dra. Carla Encinas' }}</span>
+                            <span class="font-[600] text-[#304060] dark:text-[#EFE5DA] text-right truncate">{{ $dosisDetalle['prescripcion']['prescriptor'] ?? 'Prescriptor no registrado' }}</span>
 
                             <span class="text-[#677084] dark:text-[#BDAE9F]">Programación del Horario:</span>
                             <span class="font-mono font-[700] text-[#304060] dark:text-[#EFE5DA] text-right">{{ $dosisDetalle['programacion']['hora_programada'] ?? $dosisDetalle['hora'] ?? '08:00' }}</span>

@@ -37,7 +37,7 @@ class StoreAdministracionMedicacionRequest extends FormRequest
         $codRes = $this->input('cod_residente') ?: $this->route('adulto_mayor')?->cod_residente;
 
         return [
-            'cod_med_adulto'   => [
+            'cod_prescripcion' => [
                 'required',
                 'string',
                 \Illuminate\Validation\Rule::exists('prescripciones', 'cod_prescripcion')
@@ -59,8 +59,8 @@ class StoreAdministracionMedicacionRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'cod_med_adulto.required'    => 'La medicación es obligatoria.',
-            'cod_med_adulto.exists'      => 'La medicación no existe, no pertenece al paciente o no está activa.',
+            'cod_prescripcion.required'  => 'La medicación es obligatoria.',
+            'cod_prescripcion.exists'    => 'La medicación no existe, no pertenece al paciente o no está activa.',
             'cod_residente.required'     => 'El residente es obligatorio.',
             'cod_residente.exists'       => 'El residente seleccionado no existe.',
             'fecha.required'             => 'La fecha es obligatoria.',
@@ -79,7 +79,7 @@ class StoreAdministracionMedicacionRequest extends FormRequest
     {
         $validator->after(function ($validator) {
             $codRes = $this->input('cod_residente');
-            $codMed = $this->input('cod_med_adulto');
+            $codMed = $this->input('cod_prescripcion');
             $fecha = $this->input('fecha');
             $horaProg = $this->input('hora_programada');
 
@@ -104,7 +104,7 @@ class StoreAdministracionMedicacionRequest extends FormRequest
 
                 if ($duplicado) {
                     $validator->errors()->add(
-                        'cod_med_adulto',
+                        'cod_prescripcion',
                         'Ya existe un registro de administración u omisión para esta medicación en la fecha y hora programada.'
                     );
                 }

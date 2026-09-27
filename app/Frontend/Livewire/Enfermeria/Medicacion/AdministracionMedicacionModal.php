@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Auth;
 class AdministracionMedicacionModal extends Component
 {
     public $showModal = false;
-    public $cod_med_adulto = null;
+    public $cod_prescripcion = null;
     public $cod_residente;
     public $medicamento_nombre = '';
 
@@ -29,7 +29,7 @@ class AdministracionMedicacionModal extends Component
     {
         return [
             'cod_residente'   => 'required|exists:residentes,cod_residente',
-            'cod_med_adulto'  => 'required|exists:prescripciones,cod_prescripcion',
+            'cod_prescripcion' => 'required|exists:prescripciones,cod_prescripcion',
             'hora_programada' => 'required|date_format:H:i',
             'administrado'    => 'required|boolean',
             'motivo_omision'  => !$this->administrado ? 'required|string|min:5|max:255' : 'nullable|string|max:255',
@@ -44,8 +44,8 @@ class AdministracionMedicacionModal extends Component
             'fecha.required'             => 'La fecha es obligatoria.',
             'cod_residente.required'            => 'El adulto mayor es obligatorio.',
             'cod_residente.exists'              => 'El adulto mayor seleccionado no existe.',
-            'cod_med_adulto.required'    => 'La medicación es obligatoria.',
-            'cod_med_adulto.exists'      => 'La medicación seleccionada no existe.',
+            'cod_prescripcion.required' => 'La medicación es obligatoria.',
+            'cod_prescripcion.exists'   => 'La medicación seleccionada no existe.',
             'fecha.before_or_equal'      => 'La fecha no puede ser futura.',
             'hora_programada.required'   => 'La hora programada es obligatoria.',
             'hora_programada.date_format'=> 'La hora programada debe tener formato HH:MM.',
@@ -56,23 +56,23 @@ class AdministracionMedicacionModal extends Component
         ];
     }
 
-    public function abrirModalAdministracion($cod_residente, $cod_med_adulto, ?string $hora_programada = null)
+    public function abrirModalAdministracion($cod_residente, $cod_prescripcion, ?string $hora_programada = null)
     {
         abort_unless(auth()->user()?->can('administraciones_medicacion.crear'), 403);
         $this->resetValidation();
         $this->cod_residente = $cod_residente;
-        $this->cod_med_adulto = $cod_med_adulto;
+        $this->cod_prescripcion = $cod_prescripcion;
 
         abort_unless(Auth::check(), 401);
         app(TurnoEnfermeriaService::class)->autorizarAccionPaciente($cod_residente, Auth::user());
         
         $medicacion = Prescripcion::query()->with(['medicamento', 'horarios'])
-            ->where('cod_prescripcion', $cod_med_adulto)
+            ->where('cod_prescripcion', $this->cod_prescripcion)
             ->where('cod_residente', $cod_residente)
             ->first();
 
         if (!$medicacion) {
-            $this->addError('cod_med_adulto', 'El medicamento no pertenece al paciente.');
+            $this->addError('cod_prescripcion', 'El medicamento no pertenece al paciente.');
             $this->dispatch('swal', [
                 'icon' => 'error',
                 'title' => 'Error',
@@ -132,7 +132,7 @@ class AdministracionMedicacionModal extends Component
         app(RegistrarAdministracionMedicacionService::class)->registrarProgramada(
             Auth::user(),
             ($this->cod_residente),
-            $this->cod_med_adulto,
+            $this->cod_prescripcion,
             $this->hora_programada,
             (bool) $this->administrado,
             $this->motivo_omision,

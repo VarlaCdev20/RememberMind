@@ -562,28 +562,28 @@
                                         <td class="px-5 py-4 text-right">
                                             <div class="flex items-center justify-end gap-1.5">
                                                 @if(in_array($estado, ['ACTIVO', 'ACTIVA']))
-                                                    <button type="button" @click="$dispatch('abrirModalAdministracion', { cod_residente: '{{ $med->cod_residente }}', cod_med_adulto: '{{ $med->cod_med_adulto }}' })" class="inline-flex items-center gap-1.5 rounded-lg bg-[var(--rm-primary)] px-2.5 py-1.5 text-[9px] font-bold uppercase text-inverso shadow-sm transition hover:bg-[var(--rm-primary)]Hover active:scale-95" title="Registrar toma de medicación">
+                                                    <button type="button" @click="$dispatch('abrirModalAdministracion', { cod_residente: '{{ $med->cod_residente }}', cod_prescripcion: '{{ $med->cod_prescripcion }}' })" class="inline-flex items-center gap-1.5 rounded-lg bg-[var(--rm-primary)] px-2.5 py-1.5 text-[9px] font-bold uppercase text-inverso shadow-sm transition hover:bg-[var(--rm-primary)]Hover active:scale-95" title="Registrar toma de medicación">
                                                         <i class="ph-bold ph-check-square text-xs"></i>
                                                         Toma
                                                     </button>
                                                 @endif
 
                                                 @if(auth()->user()?->hasAnyRole(['SUPERADMINISTRADOR', 'MEDICO GENERAL/GERIATRA']))
-                                                    <button type="button" @click="$dispatch('abrirModalMedicacion', { cod_residente: '{{ $med->cod_residente }}', id_med: '{{ $med->cod_med_adulto }}' })" class="inline-flex items-center justify-center rounded-lg border border-[var(--rm-border)] bg-[var(--rm-surface)] p-1.5 text-[var(--rm-text-muted)] transition hover:bg-[var(--rm-bg-app)] hover:text-[var(--rm-text-body)] active:scale-95" title="Editar prescripción">
+                                                    <button type="button" @click="$dispatch('abrirModalMedicacion', { cod_residente: '{{ $med->cod_residente }}', id_med: '{{ $med->cod_prescripcion }}' })" class="inline-flex items-center justify-center rounded-lg border border-[var(--rm-border)] bg-[var(--rm-surface)] p-1.5 text-[var(--rm-text-muted)] transition hover:bg-[var(--rm-bg-app)] hover:text-[var(--rm-text-body)] active:scale-95" title="Editar prescripción">
                                                         <i class="ph-bold ph-pencil-simple"></i>
                                                     </button>
                                                 @endif
 
                                                 @if(in_array($estado, ['ACTIVO', 'ACTIVA']) && auth()->user()?->hasAnyRole(['SUPERADMINISTRADOR', 'MEDICO GENERAL/GERIATRA']))
                                                     <button type="button"
-                                                        wire:click="suspenderMedicamento('{{ $med->cod_med_adulto }}')"
+                                                        wire:click="suspenderMedicamento('{{ $med->cod_prescripcion }}')"
                                                         wire:confirm="¿Seguro que desea suspender la medicación '{{ $med->nombre_medicamento }}'?"
                                                         class="inline-flex items-center justify-center rounded-lg border border-[var(--rm-border)]-focus bg-estado-peligroBg p-1.5 text-boton-acento transition hover:bg-boton-acento hover:text-inverso active:scale-95 cursor-pointer"
                                                         title="Suspender medicamento">
                                                         <i class="ph-bold ph-pause-circle"></i>
                                                     </button>
                                                     <button type="button"
-                                                        wire:click="finalizarMedicamento('{{ $med->cod_med_adulto }}')"
+                                                        wire:click="finalizarMedicamento('{{ $med->cod_prescripcion }}')"
                                                         wire:confirm="¿Seguro que desea finalizar el tratamiento de '{{ $med->nombre_medicamento }}'?"
                                                         class="inline-flex items-center justify-center rounded-lg border border-[var(--rm-border)]-fuerte bg-[var(--rm-surface)] p-1.5 text-[var(--rm-text-body)]/80 transition hover:bg-[var(--rm-primary)] hover:text-inverso active:scale-95 cursor-pointer"
                                                         title="Finalizar tratamiento">

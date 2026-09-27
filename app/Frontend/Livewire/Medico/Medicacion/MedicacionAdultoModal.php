@@ -18,7 +18,7 @@ class MedicacionAdultoModal extends Component
 {
     public bool $showModal = false;
     public bool $isEditing = false;
-    public ?string $cod_med_adulto = null;
+    public ?string $cod_prescripcion = null;
     public string $cod_residente = '';
     public string $nombre_medicamento = '';
     public string $dosis = '';
@@ -61,7 +61,7 @@ class MedicacionAdultoModal extends Component
         $this->resetValidation();
         $this->cod_residente = (string) $cod_residente;
         $this->isEditing = filled($id_med);
-        $this->cod_med_adulto = $id_med ? (string) $id_med : null;
+        $this->cod_prescripcion = $id_med ? (string) $id_med : null;
         if ($this->isEditing) {
             $this->cargarDatos();
         } else {
@@ -82,7 +82,7 @@ class MedicacionAdultoModal extends Component
     public function cargarDatos(): void
     {
         $prescripcion = Prescripcion::query()->with(['medicamento', 'horarios', 'personal'])
-            ->where('cod_residente', $this->cod_residente)->findOrFail($this->cod_med_adulto);
+            ->where('cod_residente', $this->cod_residente)->findOrFail($this->cod_prescripcion);
         $this->nombre_medicamento = $prescripcion->nombre_medicamento;
         $this->dosis = trim($prescripcion->dosis.' '.$prescripcion->unidad_dosis);
         $this->frecuencia = (string) $prescripcion->frecuencia;
@@ -102,7 +102,7 @@ class MedicacionAdultoModal extends Component
 
     public function resetCampos(): void
     {
-        $this->cod_med_adulto = null;
+        $this->cod_prescripcion = null;
         $this->nombre_medicamento = '';
         $this->dosis = '';
         $this->frecuencia = '';
@@ -148,7 +148,7 @@ class MedicacionAdultoModal extends Component
 
             if ($this->isEditing) {
                 $prescripcion = Prescripcion::query()->where('cod_residente', $this->cod_residente)
-                    ->findOrFail($this->cod_med_adulto);
+                    ->findOrFail($this->cod_prescripcion);
             } else {
                 $atencion = Atencion::query()->where('cod_residente', $this->cod_residente)
                     ->where('cod_personal', $personal->cod_personal)

@@ -126,7 +126,7 @@
                             <div>
                                 <span class="font-medium text-[#677084] dark:text-[#BDAE9F]">Médico prescriptor:</span>
                                 <span class="font-semibold text-[#304060] dark:text-[#EFE5DA]">
-                                    {{ $dosisDetalle['prescripcion']['prescriptor'] ?? 'Dr. Médico Asignado' }}
+                                    {{ $dosisDetalle['prescripcion']['prescriptor'] ?? 'Prescriptor no registrado' }}
                                 </span>
                             </div>
 
@@ -143,7 +143,7 @@
                             <div class="flex items-center gap-2 text-[#677084] dark:text-[#BDAE9F]">
                                 <i class="ph-bold ph-user-circle text-sm text-[#A35A44]"></i>
                                 <span>Profesional responsable:</span>
-                                <strong class="text-[#304060] dark:text-[#EFE5DA]">{{ auth()->user()?->name ?? 'Elena' }}</strong>
+                                <strong class="text-[#304060] dark:text-[#EFE5DA]">{{ auth()->user()?->name ?? 'Usuario no identificado' }}</strong>
                                 <span class="text-[10px] text-[#677084] dark:text-[#BDAE9F]">({{ auth()->user()?->profesion ?? 'ENFERMERO' }})</span>
                             </div>
                             <div class="text-[11px] text-[#677084] dark:text-[#BDAE9F]">

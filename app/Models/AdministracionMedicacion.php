@@ -130,6 +130,14 @@ class AdministracionMedicacion extends ModeloOperativo
                     'cod_prescripcion' => 'La prescripción no corresponde al residente.',
                 ]);
             }
+
+            if (! empty($registro->cod_horario_prescripcion) && ! empty($registro->cod_prescripcion)
+                && ! HorarioPrescripcion::query()->whereKey($registro->cod_horario_prescripcion)
+                    ->where('cod_prescripcion', $registro->cod_prescripcion)->exists()) {
+                throw \Illuminate\Validation\ValidationException::withMessages([
+                    'cod_horario_prescripcion' => 'El horario no corresponde a la prescripción indicada.',
+                ]);
+            }
         });
     }
 

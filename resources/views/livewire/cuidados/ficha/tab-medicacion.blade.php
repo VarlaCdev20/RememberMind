@@ -24,10 +24,10 @@
 
     if ($adultoMayor->medicaciones && $adultoMayor->medicaciones->count() > 0) {
         foreach ($adultoMayor->medicaciones as $idx => $m) {
-            $tomasMed = isset($agendaMedicacion) ? $agendaMedicacion->where('medicacion.cod_med_adulto', $m->cod_med_adulto) : collect();
+            $tomasMed = isset($agendaMedicacion) ? $agendaMedicacion->where('medicacion.cod_prescripcion', $m->cod_prescripcion) : collect();
             $proximaToma = $tomasMed->first(fn ($t) => empty($t['registro']));
             $registroHoy = $tomasMed->first(fn ($t) => !empty($t['registro']))['registro'] ?? null;
-            $ultAdmin = $administracionesHistorico->where('cod_med_adulto', $m->cod_med_adulto)->first();
+            $ultAdmin = $administracionesHistorico->where('cod_prescripcion', $m->cod_prescripcion)->first();
 
             $horaProg = $m->hora_programada ? ($m->hora_programada instanceof \Carbon\CarbonInterface ? $m->hora_programada->format('H:i') : substr((string)$m->hora_programada, 0, 5)) : null;
             
@@ -41,7 +41,7 @@
             if ($registroHoy || ($ultAdmin && ($ultAdmin->administrado ?? false))) {
                 $urgencia = 5; // ADMINISTRADA
                 $estadoHoy = 'Administrada';
-                $minutosBadge = $ultAdmin?->hora_real ? 'Administrada ' . substr((string)$ultAdmin->hora_real, 0, 5) : 'Administrada';
+                $minutosBadge = $ultAdmin?->fecha_hora_administracion ? 'Administrada ' . $ultAdmin->fecha_hora_administracion->format('H:i') : 'Administrada';
                 $badgeColor = 'bg-emerald-50 text-emerald-800 border-emerald-200';
                 $filaColor = 'bg-emerald-50/30 hover:bg-emerald-50/50';
             } elseif (in_array(strtoupper($m->estado ?? ''), ['SUSPENDIDA', 'SUSPENDIDO', 'INACTIVO'])) {
@@ -65,7 +65,7 @@
             }
 
             $listaItems->push([
-                'id' => $m->cod_med_adulto,
+                'id' => $m->cod_prescripcion,
                 'nombre' => $m->nombre_medicamento,
                 'presentacion' => 'Comprimidos / Vía ' . ucfirst(strtolower($m->via_administracion ?: 'Oral')),
                 'dosis' => $m->dosis ?: '1 dosis',
@@ -114,17 +114,17 @@
         foreach ($administracionesHistorico as $adm) {
             $esAdm = (bool) $adm->administrado;
             $resTxt = $adm->resultado ?: ($esAdm ? 'ADMINISTRADA' : 'OMITIDA');
-            $fecStr = $adm->fecha ? ($adm->fecha instanceof \Carbon\CarbonInterface ? $adm->fecha->format('d/m/Y') : substr((string)$adm->fecha, 0, 10)) : 'Sin fecha';
-            $horStr = $adm->hora_real ? substr((string)$adm->hora_real, 0, 5) : ($adm->hora_programada ? substr((string)$adm->hora_programada, 0, 5) : 'Sin hora');
+            $fecStr = $adm->fecha_hora_administracion ? $adm->fecha_hora_administracion->format('d/m/Y') : ($adm->fecha_hora_programada ? $adm->fecha_hora_programada->format('d/m/Y') : 'Sin fecha');
+            $horStr = $adm->fecha_hora_administracion ? $adm->fecha_hora_administracion->format('H:i') : ($adm->fecha_hora_programada ? $adm->fecha_hora_programada->format('H:i') : 'Sin hora');
 
             $historicoAdminLista->push([
                 'fechaHora' => "{$fecStr} {$horStr}",
                 'medicamento' => $adm->medicacion?->nombre_medicamento ?: 'Medicación prescrita',
-                'dosis' => $adm->medicacion?->dosis ?: '1 dosis',
+                'dosis' => $adm->dosis_administrada ?: ($adm->medicacion?->dosis ?: '1 dosis'),
                 'via' => ucfirst(strtolower($adm->medicacion?->via_administracion ?: 'Oral')),
                 'resultado' => $resTxt,
                 'badgeClass' => $esAdm ? 'bg-emerald-50 text-emerald-800 border-emerald-200' : 'bg-amber-50 text-amber-800 border-amber-200',
-                'administradoPor' => $adm->registrador?->name ?: 'Enfermero/a',
+                'administradoPor' => $adm->personal ? trim("{$adm->personal->nombres} {$adm->personal->apellido_paterno}") : 'Enfermero/a',
                 'observaciones' => $adm->observacion ?: ($adm->motivo_omision ?: 'Registro asistencial en expediente.'),
             ]);
         }
@@ -137,6 +137,8 @@
     $conteoOmitidas = $historicoAdminLista->where('resultado', 'OMITIDA')->count();
     $totalProgramadas = $listaOrdenada->count();
     $adherencia = $totalProgramadas > 0 ? (int) round(($conteoAdministradas / $totalProgramadas) * 100) : 0;
+    $conteoPrn = $listaOrdenada->where('es_prn', true)->count();
+    $conteoSuspendidas = $listaOrdenada->where('estadoHoy', 'Suspendida')->count();
 @endphp
 
 <div x-data="{
@@ -438,7 +440,7 @@
                     :class="filtroPrioritario === 'por_administrar' ? 'bg-[#1E3A8A] text-white shadow-2xs font-black' : 'text-[var(--rm-text-muted)] hover:text-[var(--rm-text-title)] font-bold'"
                     class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition cursor-pointer">
                 <span>Por administrar</span>
-                <span class="px-1.5 py-0.2 rounded-full text-[10px]" :class="filtroPrioritario === 'por_administrar' ? 'bg-rose-500 text-white' : 'bg-rose-100 text-rose-800'">2</span>
+                <span class="px-1.5 py-0.2 rounded-full text-[10px]" :class="filtroPrioritario === 'por_administrar' ? 'bg-rose-500 text-white' : 'bg-rose-100 text-rose-800'">{{ $conteoPrioritarias }}</span>
             </button>
 
             {{-- Próximas 3 --}}
@@ -447,7 +449,7 @@
                     :class="filtroPrioritario === 'proximas' ? 'bg-[#1E3A8A] text-white shadow-2xs font-black' : 'text-[var(--rm-text-muted)] hover:text-[var(--rm-text-title)] font-bold'"
                     class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition cursor-pointer">
                 <span>Próximas</span>
-                <span class="px-1.5 py-0.2 rounded-full text-[10px]" :class="filtroPrioritario === 'proximas' ? 'bg-[#F0E8DE]/20 text-white' : 'bg-amber-100 text-amber-800'">3</span>
+                <span class="px-1.5 py-0.2 rounded-full text-[10px]" :class="filtroPrioritario === 'proximas' ? 'bg-[#F0E8DE]/20 text-white' : 'bg-amber-100 text-amber-800'">{{ $conteoProximas }}</span>
             </button>
 
             {{-- Administradas 4 --}}
@@ -456,7 +458,7 @@
                     :class="filtroPrioritario === 'administradas' ? 'bg-[#1E3A8A] text-white shadow-2xs font-black' : 'text-[var(--rm-text-muted)] hover:text-[var(--rm-text-title)] font-bold'"
                     class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition cursor-pointer">
                 <span>Administradas</span>
-                <span class="px-1.5 py-0.2 rounded-full text-[10px]" :class="filtroPrioritario === 'administradas' ? 'bg-[#F0E8DE]/20 text-white' : 'bg-emerald-100 text-emerald-800'">4</span>
+                <span class="px-1.5 py-0.2 rounded-full text-[10px]" :class="filtroPrioritario === 'administradas' ? 'bg-[#F0E8DE]/20 text-white' : 'bg-emerald-100 text-emerald-800'">{{ $conteoAdministradas }}</span>
             </button>
 
             {{-- PRN 1 --}}
@@ -465,7 +467,7 @@
                     :class="filtroPrioritario === 'prn' ? 'bg-[#1E3A8A] text-white shadow-2xs font-black' : 'text-[var(--rm-text-muted)] hover:text-[var(--rm-text-title)] font-bold'"
                     class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition cursor-pointer">
                 <span>PRN</span>
-                <span class="px-1.5 py-0.2 rounded-full text-[10px]" :class="filtroPrioritario === 'prn' ? 'bg-[#F0E8DE]/20 text-white' : 'bg-blue-100 text-blue-800'">1</span>
+                <span class="px-1.5 py-0.2 rounded-full text-[10px]" :class="filtroPrioritario === 'prn' ? 'bg-[#F0E8DE]/20 text-white' : 'bg-blue-100 text-blue-800'">{{ $conteoPrn }}</span>
             </button>
 
             {{-- Suspendidas 0 --}}
@@ -474,7 +476,7 @@
                     :class="filtroPrioritario === 'suspendidas' ? 'bg-[#1E3A8A] text-white shadow-2xs font-black' : 'text-[var(--rm-text-muted)] hover:text-[var(--rm-text-title)] font-bold'"
                     class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition cursor-pointer">
                 <span>Suspendidas</span>
-                <span class="px-1.5 py-0.2 rounded-full text-[10px]" :class="filtroPrioritario === 'suspendidas' ? 'bg-[#F0E8DE]/20 text-white' : 'bg-slate-200 text-slate-700'">0</span>
+                <span class="px-1.5 py-0.2 rounded-full text-[10px]" :class="filtroPrioritario === 'suspendidas' ? 'bg-[#F0E8DE]/20 text-white' : 'bg-slate-200 text-slate-700'">{{ $conteoSuspendidas }}</span>
             </button>
         </div>
 

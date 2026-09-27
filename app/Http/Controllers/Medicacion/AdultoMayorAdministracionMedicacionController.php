@@ -14,7 +14,7 @@ class AdultoMayorAdministracionMedicacionController extends Controller
         try {
             $datos = $request->validated();
             $registro = $servicio->registrarProgramada(
-                auth()->user(), $adulto_mayor->cod_residente, $datos['cod_med_adulto'],
+                auth()->user(), $adulto_mayor->cod_residente, $datos['cod_prescripcion'],
                 $datos['hora_programada'], (bool) $datos['administrado'],
                 $datos['motivo_omision'] ?? null, $datos['observacion'] ?? null,
             );
@@ -28,7 +28,7 @@ class AdultoMayorAdministracionMedicacionController extends Controller
                 ->performedOn($registro)
                 ->event($registro->administrado ? 'administrado' : 'omitido')
                 ->withProperties([
-                    'cod_med_adulto' => $registro->cod_med_adulto,
+                    'cod_prescripcion' => $registro->cod_prescripcion,
                     'administrado'   => $registro->administrado,
                     'fecha'          => $registro->fecha,
                 ])
