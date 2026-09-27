@@ -201,10 +201,18 @@ class TurnoEnfermeriaService
     public function autorizarMutacionPaciente(string|Residente $adulto, string $permiso, ?User $user = null): TurnoEnfermeria
     {
         $user ??= Auth::user();
+        abort_unless($user && strtoupper((string) $user->estado) === 'ACTIVO', 403,
+            'La cuenta de usuario no se encuentra activa.');
         abort_unless($user?->hasRole('ENFERMEROS'), 403,
             'La acción está reservada al personal de Enfermería.');
         $permisoValido = $user->can($permiso);
         abort_unless($permisoValido, 403, 'No cuenta con el permiso requerido para esta acción.');
+
+        if (! $user->relationLoaded('personal')) {
+            $user->load('personal');
+        }
+        abort_unless($user->personal && strtoupper((string) $user->personal->estado) === 'ACTIVO', 403,
+            'No cuenta con un registro de personal activo.');
 
         $turno = $this->obtenerTurnoActivo($user);
         abort_unless($turno, 403, 'No tiene un turno de Enfermería vigente en este momento.');

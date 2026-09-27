@@ -7,6 +7,8 @@ use App\Models\AdministracionMedicacion;
 use App\Models\Admision;
 use App\Models\AplicacionInstrumento;
 use App\Models\Area;
+use App\Models\AsignacionPersonal;
+use App\Models\AsignacionResidenteJornada;
 use App\Models\Atencion;
 use App\Models\Cama;
 use App\Models\ComponenteEstudio;
@@ -245,15 +247,21 @@ class BddOperativaV2Test extends TestCase
 
     public function test_alerta_conserva_historial_de_eventos(): void
     {
-        $datos = $this->escenarioAdmision();
-        $residente = app(FormalizarAdmision::class)->ejecutar($datos['preadmision'], ['cod_cama'=>$datos['cama']->cod_cama,'cod_contacto'=>$datos['contacto']->cod_contacto], $datos['usuario']);
+        [$datos, $residente] = $this->escenarioClinico();
         $admin = User::query()->where('correo', 'admincasaamandita@gmail.com')->firstOrFail();
+        $enfermera = $this->usuarioRol('enfermera.alertas@test.local', 'ENFERMEROS');
+        $personal = Personal::query()->create(['cod_personal'=>'PER_ALERTA','cod_usuario'=>$enfermera->cod_usuario,'nombres'=>'Elena','apellido_paterno'=>'Rojas','numero_documento'=>'ENF-ALERTA','profesion'=>'ENFERMERA','estado'=>'ACTIVO']);
+        AsignacionPersonal::query()->create(['cod_asignacion_personal'=>'ASP_ALERTA','cod_jornada'=>$datos['jornada']->cod_jornada,'cod_personal'=>$personal->cod_personal,'cod_area'=>$datos['area']->cod_area,'fecha_hora_asignacion'=>now(),'estado'=>'ACTIVA']);
+        AsignacionResidenteJornada::query()->create(['cod_asignacion_residente'=>'ASR_ALERTA','cod_jornada'=>$datos['jornada']->cod_jornada,'cod_residente'=>$residente->cod_residente,'cod_personal'=>$personal->cod_personal,'fecha_hora_asignacion'=>now(),'estado'=>'ACTIVA']);
 
-        $respuesta = $this->actingAs($admin)->postJson(route('admin.alertas.store', $residente), ['tipo'=>'OPERATIVA','prioridad'=>'MEDIA','titulo'=>'Seguimiento','descripcion'=>'Revisión requerida'])->assertCreated();
+        $this->actingAs($admin)->postJson(route('admin.alertas.store', $residente), ['tipo'=>'OPERATIVA','prioridad'=>'MEDIO','titulo'=>'Seguimiento','descripcion'=>'Revisión requerida'])->assertForbidden();
+        $this->flushSession();
+        $respuesta = $this->actingAs($enfermera)->postJson(route('admin.alertas.store', $residente), ['tipo'=>'OPERATIVA','prioridad'=>'MEDIO','titulo'=>'Seguimiento','descripcion'=>'Revisión requerida'])->assertCreated();
         $codigo = $respuesta->json('cod_alerta');
-        $this->actingAs($admin)->patchJson(route('admin.alertas.estado', $codigo), ['estado'=>'CERRADA','descripcion'=>'Atendida'])->assertOk();
+        $this->actingAs($enfermera)->patchJson(route('admin.alertas.estado', $codigo), ['estado'=>'CERRADA','descripcion'=>'Atendida'])->assertOk();
+        $this->actingAs($enfermera)->patchJson(route('admin.alertas.estado', $codigo), ['estado'=>'RECONOCIDA','descripcion'=>'Reapertura'])->assertStatus(409);
         $this->assertDatabaseCount('eventos_alerta', 2);
-        $this->assertDatabaseHas('alertas', ['cod_alerta'=>$codigo,'estado'=>'CERRADA']);
+        $this->assertDatabaseHas('alertas', ['cod_alerta'=>$codigo,'cod_personal_responsable'=>$personal->cod_personal,'estado'=>'CERRADA']);
     }
 
     public function test_estudios_rechazan_componentes_ajenos_y_aceptan_los_propios(): void
