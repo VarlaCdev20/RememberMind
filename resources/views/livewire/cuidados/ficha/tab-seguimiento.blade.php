@@ -16,7 +16,7 @@
                 <h2 id="seguimiento-title" class="mt-1 text-xl font-black text-titulo">Seguimiento clínico</h2>
                 <p class="mt-1 text-sm text-parrafo">Información consolidada únicamente desde registros clínicos persistidos.</p>
             </div>
-            @can('seguimiento_clinico.crear')
+            @can('atenciones.crear')
                 <button type="button" wire:click="abrirModalSeguimiento"
                     class="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-700 px-4 py-2.5 text-sm font-bold text-white hover:bg-blue-800">
                     <i class="ph-bold ph-plus-circle"></i>
@@ -93,7 +93,7 @@
                 <h3 class="font-black text-titulo">Cronología clínica</h3>
                 <p class="mt-1 text-xs text-parrafo">Los filtros no alteran ni infieren el contenido de los registros.</p>
             </div>
-            <div class="grid gap-2 sm:grid-cols-3">
+            <div class="rm-filter-bar grid gap-2 sm:grid-cols-3">
                 <label class="text-xs font-semibold text-parrafo">Tipo
                     <select wire:model.live="historialFiltroTipo" class="mt-1 w-full rounded-lg border-borde bg-fondo-base text-sm text-titulo">
                         <option value="TODOS">Todos</option><option value="SIGNOS">Signos vitales</option><option value="MEDICACION">Medicación</option><option value="CUIDADOS">Cuidados</option><option value="SEGUIMIENTO">Seguimientos</option><option value="VALORACIONES">Valoraciones</option><option value="PASES">Pases de turno</option><option value="ALERTAS">Alertas</option><option value="INCIDENTES">Incidentes</option>

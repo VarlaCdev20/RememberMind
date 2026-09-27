@@ -94,7 +94,7 @@
 
                     <h1 class="mt-1 text-lg sm:text-[20px] font-black text-[#304060] dark:text-[#F0E8DE] tracking-tight leading-tight">
 
-                        Buenos días, <span class="font-extrabold text-[#243B6B] dark:text-white">{{ $dashboard['usuario']['nombres'] ?? (Auth::user()->nombres ?? 'Elena') }}</span>
+                        Buenos días, <span class="font-extrabold text-[#243B6B] dark:text-white">{{ $dashboard['usuario']['nombres'] ?? (Auth::user()->nombres ?? 'Personal') }}</span>
 
                     </h1>
 
@@ -1164,7 +1164,7 @@
                                         </span>
 
                                         <span class="px-1.5 py-0.5 rounded font-bold bg-[#F0E8DE] dark:bg-[#2D2924] border border-[#D5CABE]/50 dark:border-[#494139] text-[#677084] dark:text-[#A6B2C8]" title="Nivel de supervisión">
-                                            {{ $residente['supervision_label'] ?? 'Supervisión moderada' }}
+                                            {{ $residente['supervision_label'] ?? 'Supervisión no registrada' }}
                                         </span>
 
                                         @if(!empty($residente['estado_institucional'] ?? $residente['estado_operacional']))
@@ -1197,7 +1197,7 @@
 
                                         <span class="px-1.5 py-0.2 rounded font-bold bg-[#F0E8DE] dark:bg-[#2D2924] border border-[#D5CABE]/50 dark:border-[#494139] text-[#677084] dark:text-[#A6B2C8]">
 
-                                            {{ $residente['movilidad_label'] ?? 'Movilidad asistida' }}
+                                            {{ $residente['movilidad_label'] ?? 'Movilidad no registrada' }}
 
                                         </span>
 

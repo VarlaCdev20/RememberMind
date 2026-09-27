@@ -11,7 +11,9 @@ use App\Models\TurnoEnfermeria;
 use App\Models\User;
 use App\Backend\Modulos\Identidad\Servicios\SidebarService;
 use Database\Seeders\RolesAndPermissionsSeeder;
+use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
 class SidebarEnfermeroTest extends TestCase
@@ -22,6 +24,9 @@ class SidebarEnfermeroTest extends TestCase
     {
         parent::setUp();
         $this->seed([RolesAndPermissionsSeeder::class]);
+        if (DB::getDriverName() === 'sqlite') {
+            DB::statement('PRAGMA foreign_keys = ON;');
+        }
     }
 
     public function test_sidebar_enfermero_tiene_estructura_simplificada(): void
@@ -106,7 +111,7 @@ class SidebarEnfermeroTest extends TestCase
             'estado' => 'ACTIVO',
         ]);
 
-        // Crear 2 alertas activas
+        // Crear 2 alertas activas con personal válido (una con columna canónica y otra vía adaptador)
         Alerta::create([
             'cod_residente' => $adulto->cod_residente,
             'cod_turno' => $turno->cod_turno,
@@ -114,7 +119,7 @@ class SidebarEnfermeroTest extends TestCase
             'tipo_alerta' => 'CLINICA',
             'nivel' => 'ALTA',
             'motivo' => 'Presión arterial elevada',
-            'responsable_id' => $enfermero->cod_usuario,
+            'cod_personal_responsable' => $personal->cod_personal,
             'estado' => 'ABIERTA',
         ]);
 
@@ -125,8 +130,33 @@ class SidebarEnfermeroTest extends TestCase
             'tipo_alerta' => 'CONDUCTUAL',
             'nivel' => 'MEDIA',
             'motivo' => 'Desorientación temporoespacial',
-            'responsable_id' => $enfermero->cod_usuario,
+            'responsable_id' => $personal->cod_personal,
             'estado' => 'EN_ATENCION',
+        ]);
+
+        // Alerta cerrada del mismo residente no debe sumarse al badge activo
+        Alerta::create([
+            'cod_residente' => $adulto->cod_residente,
+            'cod_turno' => $turno->cod_turno,
+            'origen' => 'MANUAL',
+            'tipo_alerta' => 'CLINICA',
+            'nivel' => 'BAJA',
+            'motivo' => 'Alerta ya resuelta',
+            'cod_personal_responsable' => $personal->cod_personal,
+            'estado' => 'CERRADA',
+        ]);
+
+        // Alerta de otro residente no asignado a la jornada no debe sumarse al badge
+        $otroAdulto = AdultoMayor::factory()->create(['cod_est_adul' => 'EST_001']);
+        Alerta::create([
+            'cod_residente' => $otroAdulto->cod_residente,
+            'cod_turno' => $turno->cod_turno,
+            'origen' => 'MANUAL',
+            'tipo_alerta' => 'CLINICA',
+            'nivel' => 'ALTA',
+            'motivo' => 'Alerta de paciente no asignado',
+            'cod_personal_responsable' => $personal->cod_personal,
+            'estado' => 'ABIERTA',
         ]);
 
         $sidebarService = app(SidebarService::class);
@@ -137,6 +167,57 @@ class SidebarEnfermeroTest extends TestCase
         $itemAlertas = collect($secContinuidad['items'])->firstWhere('label', 'Alertas');
         $this->assertNotNull($itemAlertas);
         $this->assertSame('2', $itemAlertas['badge']);
+    }
+
+    public function test_usuario_enfermero_sin_personal_no_provoca_creacion_automatica_de_personal(): void
+    {
+        $enfermero = User::factory()->create(['estado' => 'ACTIVO']);
+        $enfermero->assignRole('ENFERMEROS');
+        $this->actingAs($enfermero);
+
+        $this->assertNull($enfermero->personal);
+        $this->assertSame(0, Personal::where('cod_usuario', $enfermero->cod_usuario)->count());
+
+        $sidebarService = app(SidebarService::class);
+        $sidebar = $sidebarService->getSidebar();
+
+        // El servicio no debe fabricar Personal como fallback
+        $this->assertSame(0, Personal::where('cod_usuario', $enfermero->cod_usuario)->count());
+        $secContinuidad = collect($sidebar)->firstWhere('title', 'Continuidad');
+        $itemAlertas = collect($secContinuidad['items'])->firstWhere('label', 'Alertas');
+        $this->assertNull($itemAlertas['badge']);
+    }
+
+    public function test_cod_usuario_usado_como_cod_personal_responsable_es_rechazado_por_fk(): void
+    {
+        $enfermero = User::factory()->create(['estado' => 'ACTIVO']);
+        $adulto = AdultoMayor::factory()->create(['cod_est_adul' => 'EST_001']);
+
+        // cod_usuario pertenece a usuarios, no a personal
+        $this->expectException(QueryException::class);
+
+        Alerta::create([
+            'cod_residente' => $adulto->cod_residente,
+            'cod_personal_responsable' => $enfermero->cod_usuario,
+            'tipo' => 'CLINICA',
+            'descripcion' => 'Intento inválido de usar cod_usuario como FK de personal',
+            'estado' => 'ABIERTA',
+        ]);
+    }
+
+    public function test_personal_inexistente_como_responsable_es_rechazado_por_fk(): void
+    {
+        $adulto = AdultoMayor::factory()->create(['cod_est_adul' => 'EST_001']);
+
+        $this->expectException(QueryException::class);
+
+        Alerta::create([
+            'cod_residente' => $adulto->cod_residente,
+            'cod_personal_responsable' => 'PER_INEXISTENTE',
+            'tipo' => 'CLINICA',
+            'descripcion' => 'Intento con personal inexistente',
+            'estado' => 'ABIERTA',
+        ]);
     }
 
     public function test_render_sidebar_enfermero_en_dashboard(): void

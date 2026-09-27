@@ -231,7 +231,7 @@ class TurnoCompletoEnfermeroTest extends TestCase
 
         $ficha->call('abrirModalSignos')->assertSet('modalSignos', true)
             ->call('cerrarModalSignos')->assertSet('modalSignos', false)
-            ->call('abrirModalMedicacion', $med->cod_med_adulto)->assertSet('modalMed', true)
+            ->call('abrirModalMedicacion', $med->cod_prescripcion)->assertSet('modalMed', true)
             ->call('cerrarModalMedicacion')->assertSet('modalMed', false)
             ->call('abrirModalSeguimiento')->assertSet('modalSeguimiento', true)
             ->call('cerrarModalSeguimiento')->assertSet('modalSeguimiento', false)
@@ -257,7 +257,7 @@ class TurnoCompletoEnfermeroTest extends TestCase
         ]);
 
         // ─── PASO 4: OMITIR MEDICACIÓN (CON MOTIVO REAL) ──────────────────────
-        $ficha->call('abrirAdministrarMed', $med->cod_med_adulto)
+        $ficha->call('abrirAdministrarMed', $med->cod_prescripcion)
             ->set('medAccion', 'OMITIR')
             ->set('medAdministrado', false)
             ->set('medMotivoOmision', 'Paciente presenta náuseas y rechaza la toma oral matutina')
@@ -280,6 +280,10 @@ class TurnoCompletoEnfermeroTest extends TestCase
 
         // ─── PASO 6: REGISTRAR SEGUIMIENTO CON INCIDENTE / MÉDICO ─────────────
         $ficha->call('abrirRegistrarSeguimiento')
+            ->set('segEstado', 'VIGILANCIA')
+            ->set('segAlimentacion', 'PARCIAL')
+            ->set('segMovilidad', 'ASISTIDA')
+            ->set('segSueno', 'INTERRUMPIDO')
             ->set('segObs', 'Se observa marcha inestable y náuseas post-ingesta. Se solicita revisión médica.')
             ->set('segRequiereMedico', true)
             ->set('segIncidente', true)

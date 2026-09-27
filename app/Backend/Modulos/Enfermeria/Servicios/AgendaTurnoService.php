@@ -48,7 +48,7 @@ class AgendaTurnoService
 
         $dosis = $this->medicacion->paraAdultos($enCentro, $momento)->map(fn (array $dosis) => [
             'id' => 'medicacion-'.$dosis['id'],
-            'origen_id' => $dosis['medicacion']->cod_med_adulto,
+            'origen_id' => $dosis['medicacion']->cod_prescripcion,
             'tipo' => 'MEDICACION',
             'estado' => $dosis['estado'],
             'prioridad' => match ($dosis['estado']) { 'VENCIDA' => 2, 'PROXIMA' => 5, 'PENDIENTE' => 7, default => 8 },

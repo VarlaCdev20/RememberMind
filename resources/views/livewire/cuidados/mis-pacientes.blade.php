@@ -227,7 +227,7 @@
                                     {{ $paciente->estado_label }}
                                 </span>
                                 <span class="text-xs font-bold text-[#677084] dark:text-[#A6B2C8] truncate">
-                                    {{ $paciente->supervision_label ?? 'Supervisión moderada' }}
+                                    {{ $paciente->supervision_label ?? 'Supervisión no registrada' }}
                                 </span>
                             </div>
 
@@ -707,30 +707,47 @@
                     <div>
                         <label class="font-bold text-[#304060] dark:text-[#F0E8DE] block mb-0.5">Estado general</label>
                         <select wire:model="segEstado" class="w-full h-8.5 rounded-xl border border-[#D5CABE] px-2 bg-[#F0E8DE] dark:bg-[#222527]">
+                            <option value="">Seleccione el estado observado</option>
                             <option value="ESTABLE">Estable / Compensado</option>
-                            <option value="OBSERVACION">En Observación</option>
-                            <option value="DESCOMPENSADO">Descompensado / Alerta</option>
+                            <option value="VIGILANCIA">En vigilancia</option>
+                            <option value="DELICADO">Delicado</option>
+                            <option value="CRITICO">Crítico</option>
                         </select>
                     </div>
                     <div>
                         <label class="font-bold text-[#304060] dark:text-[#F0E8DE] block mb-0.5">Alimentación / Apetito</label>
                         <select wire:model="segAlimentacion" class="w-full h-8.5 rounded-xl border border-[#D5CABE] px-2 bg-[#F0E8DE] dark:bg-[#222527]">
+                            <option value="">Seleccione la ingesta observada</option>
                             <option value="COMPLETA">Completa / Buena</option>
                             <option value="PARCIAL">Parcial</option>
-                            <option value="ESCASA">Escasa / Rechazo</option>
+                            <option value="RECHAZADA">Rechazada</option>
+                            <option value="AYUNO">Ayuno indicado</option>
                         </select>
                     </div>
                     <div>
                         <label class="font-bold text-[#304060] dark:text-[#F0E8DE] block mb-0.5">Movilidad / Actividad</label>
                         <select wire:model="segMovilidad" class="w-full h-8.5 rounded-xl border border-[#D5CABE] px-2 bg-[#F0E8DE] dark:bg-[#222527]">
+                            <option value="">Seleccione la movilidad observada</option>
                             <option value="INDEPENDIENTE">Independiente</option>
                             <option value="ASISTIDA">Asistida con apoyo</option>
-                            <option value="REPOSO">En Reposo / Cama</option>
+                            <option value="SILLA_RUEDAS">Silla de ruedas</option>
+                            <option value="ENCAMADO">Encamado</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="font-bold text-[#304060] dark:text-[#F0E8DE] block mb-0.5">Patrón de sueño</label>
+                        <select wire:model="segSueno" class="w-full h-8.5 rounded-xl border border-[#D5CABE] px-2 bg-[#F0E8DE] dark:bg-[#222527]">
+                            <option value="">Seleccione el patrón observado</option>
+                            <option value="NORMAL">Normal</option>
+                            <option value="INTERRUMPIDO">Interrumpido</option>
+                            <option value="INSOMNIO">Insomnio</option>
+                            <option value="SOMNOLENCIA">Somnolencia</option>
                         </select>
                     </div>
                     <div>
                         <label class="font-bold text-[#304060] dark:text-[#F0E8DE] block mb-0.5">Notas de evolución</label>
                         <textarea wire:model="segObs" rows="2" placeholder="Observaciones clínicas relevantes..." class="w-full rounded-xl border border-[#D5CABE] p-2 text-xs bg-[#F0E8DE] dark:bg-[#222527]"></textarea>
+                        @error('segObs') <span class="text-rose-600 text-[11px] font-bold block mt-1">{{ $message }}</span> @enderror
                     </div>
                 </div>
                 <div class="flex items-center justify-end gap-2 pt-2 border-t border-[#D5CABE]/50">

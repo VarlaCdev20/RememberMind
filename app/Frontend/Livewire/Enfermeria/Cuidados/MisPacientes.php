@@ -52,7 +52,7 @@ class MisPacientes extends Component
     public bool $signoConfirmarAtipico = false;
 
     public bool $modalSeguimiento = false;
-    public string $segEstado = 'ESTABLE', $segAlimentacion = 'COMPLETA', $segMovilidad = 'INDEPENDIENTE', $segSueno = 'NORMAL';
+    public string $segEstado = '', $segAlimentacion = '', $segMovilidad = '', $segSueno = '';
     public bool $segIncidente = false, $segRequiereMedico = false;
     public string $segObs = '';
 
@@ -233,9 +233,9 @@ class MisPacientes extends Component
 
         $alertasCriticasCount = $alertasActivas->whereIn('prioridad', ['CRITICO', 'ALTO', 'CRITICA'])->count();
 
-        $estadoSeguimiento = 'ESTABLE';
-        $estadoColor = 'emerald';
-        $estadoHumano = 'Estable';
+        $estadoSeguimiento = 'SIN_ALERTAS';
+        $estadoColor = 'slate';
+        $estadoHumano = 'Sin alertas activas';
 
         if ($alertasCriticasCount > 0) {
             $estadoSeguimiento = 'REQUIERE_ATENCION';
@@ -488,10 +488,10 @@ class MisPacientes extends Component
         abort_unless(auth()->user()?->can('atenciones.crear'), 403);
         $this->getTurnoService()->autorizarAccionPaciente($codResidente);
         $this->modalCodResidente = $codResidente;
-        $this->segEstado = 'ESTABLE';
-        $this->segAlimentacion = 'COMPLETA';
-        $this->segMovilidad = 'INDEPENDIENTE';
-        $this->segSueno = 'NORMAL';
+        $this->segEstado = '';
+        $this->segAlimentacion = '';
+        $this->segMovilidad = '';
+        $this->segSueno = '';
         $this->segIncidente = false;
         $this->segRequiereMedico = false;
         $this->segObs = '';
@@ -515,7 +515,7 @@ class MisPacientes extends Component
             'segAlimentacion' => 'required|in:COMPLETA,PARCIAL,RECHAZADA,AYUNO',
             'segMovilidad' => 'required|in:INDEPENDIENTE,ASISTIDA,SILLA_RUEDAS,ENCAMADO',
             'segSueno' => 'required|in:NORMAL,INTERRUMPIDO,INSOMNIO,SOMNOLENCIA',
-            'segObs' => 'nullable|string|max:1000',
+            'segObs' => 'required|string|min:10|max:1000',
         ]);
         if (($this->segIncidente || $this->segRequiereMedico) && mb_strlen(trim($this->segObs)) < 15) {
             $this->addError('segObs', 'Describa la situación clínica y las medidas iniciales con al menos 15 caracteres.');
@@ -542,7 +542,7 @@ class MisPacientes extends Component
             'motivo' => $this->segEstado,
             'fecha_hora' => now(),
             'estado' => 'FINALIZADA',
-            'observacion' => filled($this->segObs) ? trim($this->segObs) : 'Seguimiento registrado desde Mis Pacientes.',
+            'observacion' => trim($this->segObs),
         ]);
 
         $this->modalSeguimiento = false;
@@ -565,7 +565,7 @@ class MisPacientes extends Component
             ->where('segun_necesidad', false)
             ->get();
         $primerMed = $this->medicacionesPaciente->first();
-        $this->medCodMed = $primerMed?->cod_prescripcion ?? ($primerMed?->cod_med_adulto ?? '');
+        $this->medCodMed = $primerMed?->cod_prescripcion ?? '';
         $this->medAdministrado = true;
         $this->medMotivoOmision = '';
         $this->modalMed = true;
@@ -592,7 +592,7 @@ class MisPacientes extends Component
         ]);
 
         $ocurrencia = app(AgendaMedicacionService::class)->paraAdulto($this->modalCodResidente)
-            ->first(fn (array $item) => $item['medicacion']->cod_med_adulto === $this->medCodMed && $item['registro'] === null);
+            ->first(fn (array $item) => $item['medicacion']->cod_prescripcion === $this->medCodMed && $item['registro'] === null);
         if (! $ocurrencia) {
             $this->addError('medCodMed', 'No existe una dosis programada pendiente para este medicamento hoy.');
             return;
@@ -935,9 +935,9 @@ class MisPacientes extends Component
                 $p->estado_color = 'amber';
                 $p->estado_label = 'Vigilancia';
             } else {
-                $p->codigo_estado = 'ESTABLE';
-                $p->estado_color = 'emerald';
-                $p->estado_label = 'Estable';
+                $p->codigo_estado = 'SIN_ALERTAS';
+                $p->estado_color = 'slate';
+                $p->estado_label = 'Sin alertas activas';
             }
 
             // Nivel de supervisión explícito (Regla 10)
@@ -945,7 +945,7 @@ class MisPacientes extends Component
             $p->supervision_label = match($rawNivel) {
                 'BAJO', 'BAJA', 'LEVE', 'MINIMO' => 'Supervisión baja',
                 'ALTO', 'ALTA', 'SEVERO', 'TOTAL', 'DEPENDIENTE' => 'Supervisión alta',
-                default => 'Supervisión moderada',
+                default => 'Supervisión no registrada',
             };
 
             // Movilidad explícita (Regla 11)
@@ -957,7 +957,7 @@ class MisPacientes extends Component
             } elseif (str_contains($movRaw, 'caida')) {
                 $p->movilidad_label = 'Riesgo de caída';
             } else {
-                $p->movilidad_label = 'Movilidad asistida';
+                $p->movilidad_label = 'Movilidad no registrada';
             }
 
             // Próxima atención en la fila de lista

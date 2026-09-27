@@ -72,10 +72,10 @@ class DashboardTurno extends Component
     // Modal rápido de seguimiento
     public bool $modalSeguimiento = false;
     public ?string $segCodResidente = null;
-    public string $segEstadoGeneral = 'ESTABLE';
-    public string $segAlimentacion = 'COMPLETA';
-    public string $segMovilidad = 'INDEPENDIENTE';
-    public string $segSueno = 'NORMAL';
+    public string $segEstadoGeneral = '';
+    public string $segAlimentacion = '';
+    public string $segMovilidad = '';
+    public string $segSueno = '';
     public bool $segIncidente = false;
     public bool $segRequiereMedico = false;
     public string $segObservacion = '';
@@ -211,17 +211,17 @@ class DashboardTurno extends Component
 
     // ─── ACCIONES DE MEDICACIÓN ──────────────────────────────────────
 
-    public function administrarMed(string $codMedAdulto, string $codResidente, ?string $horaProgramada = null)
+    public function administrarMed(string $codPrescripcion, string $codResidente, ?string $horaProgramada = null)
     {
         $this->asegurarModoOperativo($codResidente, 'administraciones_medicacion.crear');
         abort_unless(\Illuminate\Support\Facades\Gate::forUser(Auth::user())->allows('create', \App\Models\AdministracionMedicacion::class), 403);
         if (! $horaProgramada) {
             $ocurrencia = app(AgendaMedicacionService::class)->paraAdulto($codResidente)
-                ->first(fn (array $item) => $item['medicacion']->cod_med_adulto === $codMedAdulto);
+                ->first(fn (array $item) => $item['medicacion']->cod_prescripcion === $codPrescripcion);
             $horaProgramada = $ocurrencia['hora'] ?? '';
         }
         app(RegistrarAdministracionMedicacionService::class)->registrarProgramada(
-            Auth::user(), $codResidente, $codMedAdulto, $horaProgramada, true,
+            Auth::user(), $codResidente, $codPrescripcion, $horaProgramada, true,
             null, 'Administrada desde la agenda del turno.'
         );
 
@@ -232,16 +232,16 @@ class DashboardTurno extends Component
         ]);
     }
 
-    public function abrirOmitirMed(string $codMedAdulto, string $codResidente, ?string $horaProgramada = null)
+    public function abrirOmitirMed(string $codPrescripcion, string $codResidente, ?string $horaProgramada = null)
     {
         $this->asegurarModoOperativo($codResidente, 'administraciones_medicacion.crear');
         app(TurnoEnfermeriaService::class)->autorizarAccionPaciente($codResidente, Auth::user());
-        abort_unless(Prescripcion::where('cod_prescripcion', $codMedAdulto)->where('cod_residente', $codResidente)
+        abort_unless(Prescripcion::where('cod_prescripcion', $codPrescripcion)->where('cod_residente', $codResidente)
             ->whereIn('estado', ['ACTIVO', 'ACTIVA', 'VIGENTE'])->exists(), 404);
-        $this->medOmitirId = $codMedAdulto;
+        $this->medOmitirId = $codPrescripcion;
         $this->medOmitirCodResidente = $codResidente;
         $ocurrencia = app(AgendaMedicacionService::class)->paraAdulto($codResidente)
-            ->first(fn (array $item) => $item['medicacion']->cod_med_adulto === $codMedAdulto && $item['registro'] === null);
+            ->first(fn (array $item) => $item['medicacion']->cod_prescripcion === $codPrescripcion && $item['registro'] === null);
         $this->medOmitirHora = $horaProgramada ?: ($ocurrencia['hora'] ?? null);
         $this->motivoOmisionMed = '';
         $this->modalOmitirMed = true;
@@ -382,10 +382,10 @@ class DashboardTurno extends Component
         $this->asegurarModoOperativo($codResidente, 'atenciones.crear');
         app(TurnoEnfermeriaService::class)->autorizarAccionPaciente($codResidente, Auth::user());
         $this->segCodResidente = $codResidente;
-        $this->segEstadoGeneral = 'ESTABLE';
-        $this->segAlimentacion = 'COMPLETA';
-        $this->segMovilidad = 'INDEPENDIENTE';
-        $this->segSueno = 'NORMAL';
+        $this->segEstadoGeneral = '';
+        $this->segAlimentacion = '';
+        $this->segMovilidad = '';
+        $this->segSueno = '';
         $this->segIncidente = false;
         $this->segRequiereMedico = false;
         $this->segObservacion = '';
@@ -401,7 +401,7 @@ class DashboardTurno extends Component
             'segAlimentacion' => 'required|in:COMPLETA,PARCIAL,RECHAZADA,AYUNO',
             'segMovilidad' => 'required|in:INDEPENDIENTE,ASISTIDA,SILLA_RUEDAS,ENCAMADO',
             'segSueno' => 'required|in:NORMAL,INTERRUMPIDO,INSOMNIO,SOMNOLENCIA',
-            'segObservacion' => 'nullable|string|max:1000',
+            'segObservacion' => 'required|string|min:10|max:1000',
         ]);
 
         if (($this->segIncidente || $this->segRequiereMedico) && mb_strlen(trim($this->segObservacion)) < 15) {
@@ -437,7 +437,7 @@ class DashboardTurno extends Component
             'tipo_atencion' => 'SEGUIMIENTO_ENFERMERIA',
             'motivo' => "Estado: {$this->segEstadoGeneral}; alimentación: {$this->segAlimentacion}; movilidad: {$this->segMovilidad}; sueño: {$this->segSueno}",
             'estado' => 'FINALIZADA',
-            'observacion' => $this->segObservacion ?: 'Seguimiento registrado desde cola de turno.',
+            'observacion' => trim($this->segObservacion),
         ]);
 
         $this->modalSeguimiento = false;

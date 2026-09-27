@@ -62,9 +62,10 @@ class MiTurnoService
             ->first();
 
         // Metadatos de usuario
-        $primerNombre = $personal?->nombres ? explode(' ', trim($personal->nombres))[0] : ($user->nombres ? explode(' ', trim($user->nombres))[0] : 'Elena');
+        $primerNombre = $personal?->nombres ? explode(' ', trim($personal->nombres))[0] : ($user->nombres ? explode(' ', trim($user->nombres))[0] : 'Personal');
         $apellidos = trim(($personal?->apellido_paterno ?? $user->apellido_paterno ?? '') . ' ' . ($personal?->apellido_materno ?? $user->apellido_materno ?? ''));
-        $nombreCompleto = $personal ? "{$personal->nombres} {$apellidos}" : ($user->name ?: 'Elena Salazar');
+        $nombreCompleto = trim($personal ? "{$personal->nombres} {$apellidos}" : (string) $user->name);
+        $nombreCompleto = $nombreCompleto !== '' ? $nombreCompleto : 'Personal no identificado';
 
         $iniciales = '';
         foreach (explode(' ', $nombreCompleto) as $part) {
@@ -73,7 +74,7 @@ class MiTurnoService
             }
             if (mb_strlen($iniciales) >= 2) break;
         }
-        $iniciales = $iniciales ?: 'ES';
+        $iniciales = $iniciales ?: '--';
 
         // 3. Resolver si el usuario autenticado tiene jornada activa en este momento
         $jornada = $this->resolverJornadaActual($personal, $momentoActual);
@@ -163,17 +164,17 @@ class MiTurnoService
                     'nombres' => $primerNombre,
                     'rol' => $user->roles->first()?->name ?? 'ENFERMEROS',
                     'iniciales' => $iniciales,
-                    'area_nombre' => $area?->nombre ?? 'Sector General',
+                    'area_nombre' => $area?->nombre ?? 'Área no asignada',
                 ],
                 'jornada' => [
                     'cod_jornada' => $jornada->cod_jornada,
                     'nombre' => $nombreTurno,
-                    'hora_inicio' => $turno?->hora_inicio ? Carbon::parse($turno->hora_inicio)->format('H:i') : '07:00',
-                    'hora_fin' => $turno?->hora_cierre ? Carbon::parse($turno->hora_cierre)->format('H:i') : '15:00',
+                    'hora_inicio' => $turno?->hora_inicio ? Carbon::parse($turno->hora_inicio)->format('H:i') : null,
+                    'hora_fin' => $turno?->hora_cierre ? Carbon::parse($turno->hora_cierre)->format('H:i') : null,
                     'activa' => true,
                     'fecha' => Carbon::parse($jornada->fecha_jornada)->format('Y-m-d'),
                     'fecha_humana' => ucfirst(Carbon::parse($jornada->fecha_jornada)->locale('es')->translatedFormat('l, d \d\e F \d\e Y')),
-                    'area_nombre' => $area?->nombre ?? 'Sector General',
+                    'area_nombre' => $area?->nombre ?? 'Área no asignada',
                 ],
                 'kpis' => $kpisData,
                 'estado_general' => $estadoGeneral,
@@ -337,7 +338,7 @@ class MiTurnoService
                 ? Carbon::parse($residente->fecha_nacimiento)->age . ' años'
                 : 'Edad no registrada';
 
-            $movilidadLabel = 'Movilidad asistida';
+            $movilidadLabel = 'Movilidad no registrada';
             $plan = $residente->planesCuidado?->first();
             if ($plan && !empty($plan->objetivo_general)) {
                 $obj = strtolower($plan->objetivo_general);
@@ -424,12 +425,12 @@ class MiTurnoService
             'jornada' => [
                 'cod_jornada' => $jornadaPrincipal->cod_jornada,
                 'nombre' => $turnoPrincipal?->nombre ? (str_starts_with(strtolower(trim($turnoPrincipal->nombre)), 'turno') ? trim($turnoPrincipal->nombre) : "Turno {$turnoPrincipal->nombre}") : "Jornada {$jornadaPrincipal->cod_jornada}",
-                'hora_inicio' => $turnoPrincipal?->hora_inicio ? Carbon::parse($turnoPrincipal->hora_inicio)->format('H:i') : '07:00',
-                'hora_fin' => $turnoPrincipal?->hora_cierre ? Carbon::parse($turnoPrincipal->hora_cierre)->format('H:i') : '15:00',
+                'hora_inicio' => $turnoPrincipal?->hora_inicio ? Carbon::parse($turnoPrincipal->hora_inicio)->format('H:i') : null,
+                'hora_fin' => $turnoPrincipal?->hora_cierre ? Carbon::parse($turnoPrincipal->hora_cierre)->format('H:i') : null,
                 'activa' => true,
                 'fecha' => Carbon::parse($jornadaPrincipal->fecha_jornada)->format('Y-m-d'),
                 'fecha_humana' => ucfirst(Carbon::parse($jornadaPrincipal->fecha_jornada)->locale('es')->translatedFormat('l, d \d\e F \d\e Y')),
-                'area_nombre' => $areaPrincipal?->nombre ?? 'Sector General',
+                'area_nombre' => $areaPrincipal?->nombre ?? 'Área no asignada',
             ],
             'kpis' => $kpisData,
             'estado_general' => $estadoGeneral,
@@ -1326,7 +1327,7 @@ class MiTurnoService
             };
 
             // Movilidad real desde plan de cuidado o diagnóstico
-            $movilidadLabel = 'Movilidad asistida';
+            $movilidadLabel = 'Movilidad no registrada';
             $plan = $residente->planesCuidado?->first();
             if ($plan && !empty($plan->objetivo_general)) {
                 $obj = strtolower($plan->objetivo_general);
