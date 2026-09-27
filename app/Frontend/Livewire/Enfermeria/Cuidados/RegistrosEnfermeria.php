@@ -21,6 +21,7 @@ use App\Models\ValoracionDolor;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Url;
 use Livewire\Component;
 
@@ -231,8 +232,32 @@ class RegistrosEnfermeria extends Component
 
         $miTurnoService = app(MiTurnoService::class);
         $jornada = $miTurnoService->resolverJornadaActual($personal, now());
+        if (! $jornada) {
+            throw ValidationException::withMessages([
+                'jornada' => 'No existe una jornada activa asignada al personal clínico.',
+            ]);
+        }
 
         $tipoNorm = strtoupper(trim($this->tipo));
+
+        $reglas = [
+            'tipo' => 'required|in:ALIMENTACION,HIDRATACION,ELIMINACION,HIGIENE,MOVILIDAD,SUENO,VALORACION_RAPIDA,PROCEDIMIENTO',
+            'subtipo' => 'required|string|max:60',
+            'porcentaje' => 'nullable|integer|in:0,25,50,75,100',
+            'cantidadMl' => 'required_if:tipo,HIDRATACION|nullable|integer|min:1|max:10000',
+            'cantidadDespertares' => 'nullable|integer|min:0|max:30',
+            'dolor' => 'nullable|integer|min:0|max:10',
+            'motivo' => 'nullable|string|max:2000',
+            'observacion' => 'nullable|string|max:5000',
+            'intervencionId' => in_array($tipoNorm, ['ALIMENTACION', 'HIDRATACION', 'ELIMINACION', 'MOVILIDAD', 'SUENO'], true)
+                ? 'nullable|string|max:20'
+                : 'required|string|max:20',
+        ];
+        $this->validate($reglas, [
+            'subtipo.required' => 'Describa el cuidado realmente realizado.',
+            'cantidadMl.required_if' => 'Registre la cantidad real administrada en mililitros.',
+            'intervencionId.required' => 'Seleccione la intervención vigente del plan de cuidados.',
+        ]);
 
         if ($tipoNorm === 'ALIMENTACION' && $this->porcentaje !== null && $this->porcentaje < 50 && empty(trim($this->motivo))) {
             $this->addError('motivo', 'Indique el motivo de la baja ingesta.');
@@ -246,67 +271,67 @@ class RegistrosEnfermeria extends Component
                     'cod_ingesta' => 'ING_'.strtoupper(Str::random(10)),
                     'cod_residente' => $this->codResidente,
                     'cod_personal' => $personal->cod_personal,
-                    'cod_jornada' => $jornada?->cod_jornada,
-                    'tipo_comida' => $this->subtipo ?: 'PRINCIPAL',
+                    'cod_jornada' => $jornada->cod_jornada,
+                    'tipo_comida' => $this->subtipo,
                     'porcentaje_consumido' => $this->porcentaje !== null ? (float) $this->porcentaje : null,
                     'apetito' => $this->estadoGeneral ?: null,
                     'tolerancia' => $this->tolerancia ?: null,
                     'dificultad_deglucion' => (bool) $this->presentaDificultad,
                     'fecha_hora' => now(),
                     'estado' => 'VIGENTE',
-                    'observacion' => $this->observacion ?: $this->motivo ?: 'Registro de alimentación firmado.',
+                    'observacion' => $this->observacion ?: $this->motivo ?: null,
                 ]);
             } elseif ($tipoNorm === 'HIDRATACION') {
                 RegistroHidratacion::create([
                     'cod_hidratacion' => 'HID_'.strtoupper(Str::random(10)),
                     'cod_residente' => $this->codResidente,
                     'cod_personal' => $personal->cod_personal,
-                    'cod_jornada' => $jornada?->cod_jornada,
-                    'cantidad_ml' => $this->cantidadMl ? (float) $this->cantidadMl : 0,
-                    'tipo_liquido' => $this->subtipo ?: 'AGUA',
+                    'cod_jornada' => $jornada->cod_jornada,
+                    'cantidad_ml' => (float) $this->cantidadMl,
+                    'tipo_liquido' => $this->subtipo,
                     'tolerancia' => $this->tolerancia ?: null,
                     'fecha_hora' => now(),
                     'estado' => 'VIGENTE',
-                    'observacion' => $this->observacion ?: $this->motivo ?: 'Registro de hidratación firmado.',
+                    'observacion' => $this->observacion ?: $this->motivo ?: null,
                 ]);
             } elseif ($tipoNorm === 'ELIMINACION') {
                 RegistroEliminacion::create([
                     'cod_eliminacion' => 'ELI_'.strtoupper(Str::random(10)),
                     'cod_residente' => $this->codResidente,
                     'cod_personal' => $personal->cod_personal,
-                    'cod_jornada' => $jornada?->cod_jornada,
-                    'tipo_eliminacion' => $this->subtipo ?: 'DIURESIS',
+                    'cod_jornada' => $jornada->cod_jornada,
+                    'tipo_eliminacion' => $this->subtipo,
                     'caracteristica' => $this->consistencia ?: null,
-                    'continencia' => $this->esContinente ? 'CONTINENTE' : 'INCONTINENTE',
+                    'continencia' => $this->esContinente === null ? null : ($this->esContinente ? 'CONTINENTE' : 'INCONTINENTE'),
                     'fecha_hora' => now(),
                     'estado' => 'VIGENTE',
-                    'observacion' => $this->observacion ?: $this->motivo ?: 'Registro de eliminación firmado.',
+                    'observacion' => $this->observacion ?: $this->motivo ?: null,
                 ]);
             } elseif ($tipoNorm === 'MOVILIDAD') {
                 RegistroMovilidad::create([
                     'cod_movilidad' => 'MOV_'.strtoupper(Str::random(10)),
                     'cod_residente' => $this->codResidente,
                     'cod_personal' => $personal->cod_personal,
-                    'cod_jornada' => $jornada?->cod_jornada,
+                    'cod_jornada' => $jornada->cod_jornada,
                     'tipo_apoyo' => $this->nivelAyuda ?: null,
                     'dispositivo' => $this->ayudaTecnica ?: null,
                     'marcha' => $this->estadoGeneral ?: null,
                     'fecha_hora' => now(),
                     'estado' => 'VIGENTE',
-                    'observacion' => $this->observacion ?: $this->motivo ?: 'Registro de movilidad firmado.',
+                    'observacion' => $this->observacion ?: $this->motivo ?: null,
                 ]);
             } elseif ($tipoNorm === 'SUENO') {
                 RegistroSueno::create([
                     'cod_registro_sueno' => 'RSU_'.strtoupper(Str::random(10)),
                     'cod_residente' => $this->codResidente,
                     'cod_personal' => $personal->cod_personal,
-                    'cod_jornada' => $jornada?->cod_jornada,
+                    'cod_jornada' => $jornada->cod_jornada,
                     'fecha' => today()->toDateString(),
-                    'despertares' => $this->cantidadDespertares !== null ? (int) $this->cantidadDespertares : 0,
+                    'despertares' => $this->cantidadDespertares !== null ? (int) $this->cantidadDespertares : null,
                     'insomnio' => (bool) $this->agitacion,
-                    'calidad' => $this->calidad ?: 'NORMAL',
+                    'calidad' => $this->calidad ?: null,
                     'estado' => 'VIGENTE',
-                    'observacion' => $this->observacion ?: $this->motivo ?: 'Registro de descanso/sueño firmado.',
+                    'observacion' => $this->observacion ?: $this->motivo ?: null,
                 ]);
             } else {
                 // HIGIENE, PROCEDIMIENTO y cuidados generales
@@ -317,21 +342,13 @@ class RegistrosEnfermeria extends Component
                             ->whereIn('estado', ['ACTIVO', 'ACTIVA', 'VIGENTE']);
                     });
 
-                if (! empty($this->intervencionId)) {
-                    $intervencion = (clone $queryIntervencion)->where('cod_intervencion', $this->intervencionId)->first();
-                    if (! $intervencion) {
-                        $intervencionOtroResidente = IntervencionCuidado::where('cod_intervencion', $this->intervencionId)->first();
-                        if ($intervencionOtroResidente) {
-                            abort(422, 'La intervención seleccionada no pertenece al plan de cuidados activo del residente.');
-                        }
-                        abort(422, 'Intervención de cuidado no válida o no activa.');
-                    }
-                } else {
-                    $intervencion = $queryIntervencion->first();
-                }
-
+                $intervencion = $queryIntervencion->where('cod_intervencion', $this->intervencionId)->first();
                 if (! $intervencion) {
-                    abort(422, 'El residente no cuenta con un plan de cuidados activo con intervenciones vigentes para este cuidado.');
+                    $intervencionOtroResidente = IntervencionCuidado::where('cod_intervencion', $this->intervencionId)->first();
+                    if ($intervencionOtroResidente) {
+                        abort(422, 'La intervención seleccionada no pertenece al plan de cuidados activo del residente.');
+                    }
+                    abort(422, 'Intervención de cuidado no válida o no activa.');
                 }
 
                 $codIntervencion = $intervencion->cod_intervencion;
@@ -341,7 +358,7 @@ class RegistrosEnfermeria extends Component
                     'cod_ejecucion' => 'EJC_'.strtoupper(Str::random(10)),
                     'cod_residente' => $this->codResidente,
                     'cod_personal' => $personal->cod_personal,
-                    'cod_jornada' => $jornada?->cod_jornada,
+                    'cod_jornada' => $jornada->cod_jornada,
                     'fecha_hora_programada' => now(),
                     'fecha_hora_ejecucion' => now(),
                     'resultado' => $this->resultado ?: 'REALIZADA',
@@ -357,10 +374,10 @@ class RegistrosEnfermeria extends Component
                     'cod_personal' => $personal->cod_personal,
                     'fecha_hora' => now(),
                     'intensidad' => (int) $this->dolor,
-                    'ubicacion' => 'General / Control asistencial',
-                    'tipo_dolor' => 'EVALUACION_RUTINA',
+                    'ubicacion' => null,
+                    'tipo_dolor' => null,
                     'estado' => 'ACTIVA',
-                    'observacion' => 'Registrado durante control de cuidado.',
+                    'observacion' => null,
                 ]);
             }
 

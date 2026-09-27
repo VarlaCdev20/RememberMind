@@ -29,6 +29,7 @@ use App\Models\User;
 use Database\Seeders\DatabaseSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 use Livewire\Livewire;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Tests\TestCase;
@@ -272,6 +273,68 @@ class EnfermeriaV2CorreccionCriticaTest extends TestCase
             'porcentaje_consumido' => 75,
             'estado' => 'VIGENTE',
         ]);
+    }
+
+    public function test_registro_clinico_rechaza_hidratacion_sin_cantidad_real(): void
+    {
+        [$enfermera, , $residente] = $this->crearEscenario();
+        $this->actingAs($enfermera);
+
+        Livewire::test(RegistrosEnfermeria::class, ['codResidente' => $residente->cod_residente])
+            ->set('tipo', 'HIDRATACION')
+            ->set('subtipo', 'AGUA')
+            ->call('guardarCuidado')
+            ->assertHasErrors(['cantidadMl']);
+
+        $this->assertDatabaseCount('registros_hidratacion', 0);
+    }
+
+    public function test_registro_clinico_no_selecciona_una_intervencion_automaticamente(): void
+    {
+        [$enfermera, $personal, $residente] = $this->crearEscenario();
+        $this->actingAs($enfermera);
+
+        $plan = \App\Models\PlanCuidado::query()->create([
+            'cod_plan' => 'PLC_NO_AUTO',
+            'cod_residente' => $residente->cod_residente,
+            'cod_area' => 'ARE_CRIT_TEST',
+            'cod_personal' => $personal->cod_personal,
+            'estado' => 'ACTIVO',
+        ]);
+        \App\Models\IntervencionCuidado::query()->create([
+            'cod_intervencion' => 'INT_NO_AUTO',
+            'cod_plan' => $plan->cod_plan,
+            'nombre' => 'Intervención que no debe inferirse',
+            'descripcion' => 'Intervención activa disponible para selección explícita.',
+            'estado' => 'ACTIVA',
+        ]);
+
+        Livewire::test(RegistrosEnfermeria::class, ['codResidente' => $residente->cod_residente])
+            ->set('tipo', 'PROCEDIMIENTO')
+            ->set('subtipo', 'Procedimiento observado')
+            ->call('guardarCuidado')
+            ->assertHasErrors(['intervencionId']);
+
+        $this->assertDatabaseCount('ejecuciones_cuidado', 0);
+    }
+
+    public function test_registro_clinico_rechaza_firma_sin_jornada_profesional_activa(): void
+    {
+        [$enfermera, $personal, $residente] = $this->crearEscenario();
+        $this->actingAs($enfermera);
+
+        AsignacionPersonal::query()
+            ->where('cod_personal', $personal->cod_personal)
+            ->update(['estado' => 'INACTIVO']);
+
+        Livewire::test(RegistrosEnfermeria::class, ['codResidente' => $residente->cod_residente])
+            ->set('tipo', 'ALIMENTACION')
+            ->set('subtipo', 'DESAYUNO')
+            ->set('porcentaje', 75)
+            ->call('guardarCuidado')
+            ->assertHasErrors(['jornada']);
+
+        $this->assertDatabaseCount('registros_ingesta', 0);
     }
 
     public function test_guardar_nuevo_evento_registra_en_incidentes_v2_asocia_residente_y_personal_y_no_usa_v1(): void
@@ -624,8 +687,8 @@ class EnfermeriaV2CorreccionCriticaTest extends TestCase
         $component->tipo = 'HIGIENE';
         $component->subtipo = 'Aseo matutino';
 
-        $this->expectException(HttpException::class);
-        $this->expectExceptionMessage('El residente no cuenta con un plan de cuidados activo');
+        $this->expectException(ValidationException::class);
+        $this->expectExceptionMessage('Seleccione la intervención vigente del plan de cuidados.');
 
         $component->guardarCuidado();
 
