@@ -91,22 +91,22 @@ class Residente extends ModeloOperativo {
     /** Devuelve "Hab. X" o "Sin habitación asignada" */
     public function getHabitacionTextoAttribute(): string
     {
-        $num = $this->cama?->habitacion?->numero;
+        $num = $this->cama?->habitacion?->codigo ?? $this->cama?->habitacion?->nombre;
         return $num ? "Hab. {$num}" : "Sin ubicación asignada";
     }
 
     /** Devuelve "Cama Y" o "" si no existe */
     public function getCamaTextoAttribute(): string
     {
-        $num = $this->cama?->numero ?? $this->cama?->codigo ?? null;
+        $num = $this->cama?->codigo;
         return $num ? "Cama {$num}" : "";
     }
 
     /** Devuelve "Hab. X · Cama Y" formateado para enfermería */
     public function getUbicacionFormateadaAttribute(): string
     {
-        $hab  = $this->cama?->habitacion?->numero;
-        $cama = $this->cama?->numero ?? $this->cama?->codigo ?? null;
+        $hab = $this->cama?->habitacion?->codigo ?? $this->cama?->habitacion?->nombre;
+        $cama = $this->cama?->codigo;
         if (!$hab && !$cama) return "Sin ubicación asignada";
         if (!$cama) return "Hab. {$hab}";
         return "Hab. {$hab} · Cama {$cama}";

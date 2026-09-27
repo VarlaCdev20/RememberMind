@@ -1432,8 +1432,8 @@ class MiTurnoService
 
         if ($ocupacion && $ocupacion->cama) {
             $cama = $ocupacion->cama;
-            $habNumero = $cama->habitacion?->codigo ?: ($cama->habitacion?->numero ?? 'S/N');
-            $camaCodigo = $cama->nombre ?: ($cama->codigo ?: ($cama->numero ?: $cama->cod_cama));
+            $habNumero = $cama->habitacion?->codigo ?: ($cama->habitacion?->nombre ?: 'S/N');
+            $camaCodigo = $cama->codigo ?: $cama->cod_cama;
 
             return "Hab. {$habNumero} · Cama {$camaCodigo}";
         }

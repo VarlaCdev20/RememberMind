@@ -92,8 +92,8 @@ class AgendaEnfermeria extends Component
 
         $habTexto = 'Sin asignar';
         if ($residente?->cama?->habitacion) {
-            $habTexto = 'Hab. ' . ($residente->cama->habitacion->numero ?? $residente->cama->habitacion->nombre) . 
-                        ' / Cama ' . ($residente->cama->numero ?? $residente->cama->nombre ?? 'A');
+            $habTexto = 'Hab. '.($residente->cama->habitacion->codigo ?? $residente->cama->habitacion->nombre).
+                        ' / Cama '.($residente->cama->codigo ?? 'Sin asignar');
         }
 
         $this->datosModal = [
@@ -337,8 +337,8 @@ class AgendaEnfermeria extends Component
 
             $habTexto = 'Sin asignar';
             if ($residente->cama?->habitacion) {
-                $habTexto = 'Hab. ' . ($residente->cama->habitacion->numero ?? $residente->cama->habitacion->nombre) . 
-                            ' / Cama ' . ($residente->cama->numero ?? $residente->cama->nombre ?? 'A');
+                $habTexto = 'Hab. '.($residente->cama->habitacion->codigo ?? $residente->cama->habitacion->nombre).
+                            ' / Cama '.($residente->cama->codigo ?? 'Sin asignar');
             }
 
             foreach ($plan->intervenciones as $intervencion) {

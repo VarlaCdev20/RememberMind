@@ -294,9 +294,9 @@ class MisPacientes extends Component
 
         $cama = $adulto->cama;
         $hab = $cama?->habitacion;
-        $numHab = $hab ? ($hab->numero ?? $hab->codigo) : '';
+        $numHab = $hab ? ($hab->codigo ?? $hab->nombre) : '';
         $habitacionTexto = $numHab ? (str_starts_with(strtolower($numHab), 'hab') ? $numHab : "Hab. {$numHab}") : 'Sin habitación';
-        $numCama = $cama ? ($cama->numero ?? $cama->codigo) : '';
+        $numCama = $cama?->codigo ?? '';
         $camaTexto = $numCama ? (str_starts_with(strtolower($numCama), 'cama') ? $numCama : "Cama {$numCama}") : 'Sin cama';
         $ubicacionFormateada = $hab ? "{$habitacionTexto} · {$camaTexto}" : ($adulto->ubicacion_formateada ?: 'Ubicación no asignada');
 

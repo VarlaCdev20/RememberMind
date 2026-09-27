@@ -606,8 +606,8 @@ class SaludAdministracionMedicacionPanel extends Component
 
         $camaObj = $residente?->ocupacionActiva?->cama;
         $habObj = $camaObj?->habitacion;
-        $habTexto = $habObj?->nombre ?? ($habObj?->numero ? "Hab. {$habObj->numero}" : 'Sin habitación');
-        $camaTexto = $camaObj?->nombre ?? ($camaObj?->numero ? "Cama {$camaObj->numero}" : 'Sin cama');
+        $habTexto = $habObj?->nombre ?? ($habObj?->codigo ? "Hab. {$habObj->codigo}" : 'Sin habitación');
+        $camaTexto = $camaObj?->codigo ? "Cama {$camaObj->codigo}" : 'Sin cama';
 
         $edadCalculada = $residente?->fecha_nacimiento
             ? Carbon::parse($residente->fecha_nacimiento)->age.' años'
@@ -1026,7 +1026,7 @@ class SaludAdministracionMedicacionPanel extends Component
             $med = $presc?->medicamento;
             $cama = $res?->ocupacionActiva?->cama;
             $hab = $cama?->habitacion;
-            $habTexto = $hab?->nombre ?? ($hab?->numero ? "Hab. {$hab->numero}" : 'Sin habitación');
+            $habTexto = $hab?->nombre ?? ($hab?->codigo ? "Hab. {$hab->codigo}" : 'Sin habitación');
             $estadoRaw = $item['estado'];
 
             $estadoTexto = match ($estadoRaw) {
