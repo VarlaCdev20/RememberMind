@@ -339,13 +339,13 @@ class FichaPaciente extends Component
 
     public bool $modalSeguimiento = false;
 
-    public string $segEstado = 'ESTABLE';
+    public string $segEstado = '';
 
-    public string $segAlimentacion = 'COMPLETA';
+    public string $segAlimentacion = '';
 
-    public string $segMovilidad = 'INDEPENDIENTE';
+    public string $segMovilidad = '';
 
-    public string $segSueno = 'NORMAL';
+    public string $segSueno = '';
 
     public bool $segIncidente = false;
 
@@ -881,6 +881,7 @@ class FichaPaciente extends Component
     public function getGraficoEvolucionEstudiosProperty(): array
     {
         return app(ResultadosEstudiosService::class)->obtenerDatosGrafico(
+            $this->adultoMayor,
             $this->parametroGraficoEstudio,
             $this->filtroPeriodoEstudio
         );
@@ -888,7 +889,7 @@ class FichaPaciente extends Component
 
     public function getRangosReferenciaParametroProperty(): array
     {
-        return app(ResultadosEstudiosService::class)->obtenerRangosReferencia($this->parametroGraficoEstudio);
+        return app(ResultadosEstudiosService::class)->obtenerRangosReferencia($this->adultoMayor, $this->parametroGraficoEstudio);
     }
 
     // ── Computed Properties: Documentación ──────────────────────────────────
@@ -1279,11 +1280,10 @@ class FichaPaciente extends Component
     public function abrirRegistrarSeguimiento(): void
     {
         app(TurnoEnfermeriaService::class)->autorizarAccionPaciente($this->adultoMayor, Auth::user());
-        $this->reset(['segObs', 'segIncidente', 'segRequiereMedico']);
-        $this->segEstado = 'ESTABLE';
-        $this->segAlimentacion = 'COMPLETA';
-        $this->segMovilidad = 'INDEPENDIENTE';
-        $this->segSueno = 'NORMAL';
+        $this->reset([
+            'segEstado', 'segAlimentacion', 'segMovilidad', 'segSueno',
+            'segObs', 'segIncidente', 'segRequiereMedico',
+        ]);
         $this->modalSeguimiento = true;
     }
 
@@ -1765,7 +1765,7 @@ class FichaPaciente extends Component
                     ? ($ultimaFuncional->indice_barthel ?? $ultimaFuncional->barthel_total).'/100'.($ultimaFuncional->nivel_dependencia ? " ({$ultimaFuncional->nivel_dependencia})" : '')
                     : 'Resultado no registrado',
                 'fecha' => $ultimaFuncional->fecha_valoracion ? Carbon::parse($ultimaFuncional->fecha_valoracion)->format('d/m/Y') : 'Reciente',
-                'evaluador' => $ultimaFuncional->registradoPor?->usuario?->name ?? 'Equipo Asistencial',
+                'evaluador' => $ultimaFuncional->registradoPor?->usuario?->name ?? 'Profesional no registrado',
             ];
         } elseif ($ultimaMedica) {
             $ultimaValoracion = [

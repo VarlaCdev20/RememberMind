@@ -568,7 +568,7 @@
             <div class="p-3 rounded-xl bg-[var(--rm-surface-alt)] border border-[var(--rm-border)] flex flex-wrap items-center justify-between gap-2 text-xs">
                 <div class="flex items-center gap-2 text-[var(--rm-text-muted)]">
                     <i class="ph-bold ph-user-circle text-sm text-[#1E3A8A]"></i>
-                    <span>Profesional: <strong class="text-[var(--rm-text-title)]">{{ auth()->user()?->name ?? 'Equipo Asistencial' }}</strong></span>
+                    <span>Profesional: <strong class="text-[var(--rm-text-title)]">{{ auth()->user()?->name ?? 'No identificado' }}</strong></span>
                     <span>·</span>
                     <span class="text-[10px] font-bold uppercase bg-[var(--rm-surface)] px-2 py-0.5 rounded border border-[var(--rm-border)] text-[var(--rm-text-muted)]">{{ auth()->user()?->roles->first()?->name ?? 'Enfermería' }}</span>
                 </div>
@@ -584,6 +584,7 @@
                 <div>
                     <label class="font-bold text-[var(--rm-text-title)] block mb-1">Estado General *</label>
                     <select wire:model="segEstado" class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-surface-alt)] py-2 px-3 text-xs text-[var(--rm-text-title)] font-medium focus:ring-1 focus:ring-[#1E3A8A]">
+                        <option value="">Seleccione el estado observado</option>
                         <option value="ESTABLE">Estable</option>
                         <option value="VIGILANCIA">En Vigilancia</option>
                         <option value="DELICADO">Delicado</option>
@@ -595,6 +596,7 @@
                 <div>
                     <label class="font-bold text-[var(--rm-text-title)] block mb-1">Alimentación / Ingesta</label>
                     <select wire:model="segAlimentacion" class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-surface-alt)] py-2 px-3 text-xs text-[var(--rm-text-title)] font-medium focus:ring-1 focus:ring-[#1E3A8A]">
+                        <option value="">Seleccione la ingesta observada</option>
                         <option value="COMPLETA">Completa / Buena ingesta</option>
                         <option value="PARCIAL">Parcial / Regular</option>
                         <option value="RECHAZADA">Rechazada</option>
@@ -606,6 +608,7 @@
                 <div>
                     <label class="font-bold text-[var(--rm-text-title)] block mb-1">Movilidad Funcional</label>
                     <select wire:model="segMovilidad" class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-surface-alt)] py-2 px-3 text-xs text-[var(--rm-text-title)] font-medium focus:ring-1 focus:ring-[#1E3A8A]">
+                        <option value="">Seleccione la movilidad observada</option>
                         <option value="INDEPENDIENTE">Independiente / Autónoma</option>
                         <option value="ASISTIDA">Asistida con apoyo</option>
                         <option value="SILLA_RUEDAS">Silla de ruedas</option>
@@ -617,6 +620,7 @@
                 <div>
                     <label class="font-bold text-[var(--rm-text-title)] block mb-1">Patrón de Descanso / Sueño</label>
                     <select wire:model="segSueno" class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-surface-alt)] py-2 px-3 text-xs text-[var(--rm-text-title)] font-medium focus:ring-1 focus:ring-[#1E3A8A]">
+                        <option value="">Seleccione el patrón observado</option>
                         <option value="NORMAL">Normal / Reparador</option>
                         <option value="INTERRUMPIDO">Interrumpido / Inquieto</option>
                         <option value="INSOMNIO">Insomnio persistente</option>
