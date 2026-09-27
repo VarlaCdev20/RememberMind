@@ -77,6 +77,7 @@ class AppServiceProvider extends ServiceProvider
         \Livewire\Livewire::component('alertas.campana-notificaciones', \App\Frontend\Livewire\Compartido\Alertas\CampanaNotificaciones::class);
         \Livewire\Livewire::component('alertas.salud-alertas-panel', \App\Frontend\Livewire\Compartido\Alertas\SaludAlertasPanel::class);
         \Livewire\Livewire::component('alertas.alertas-panel', \App\Frontend\Livewire\Compartido\Alertas\AlertasPanel::class);
+        \Livewire\Livewire::component('features.alertas.historial-alerta', \App\Frontend\Livewire\Features\Alertas\HistorialAlerta::class);
         \Livewire\Livewire::component('medicacion.medicacion-adulto-modal', \App\Frontend\Livewire\Medico\Medicacion\MedicacionAdultoModal::class);
         \Livewire\Livewire::component('medicacion.salud-medicacion-panel', \App\Frontend\Livewire\Medico\Medicacion\SaludMedicacionPanel::class);
         \Livewire\Livewire::component('medicacion.administracion-medicacion-modal', \App\Frontend\Livewire\Enfermeria\Medicacion\AdministracionMedicacionModal::class);
