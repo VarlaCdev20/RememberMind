@@ -68,6 +68,7 @@ class Preadmision extends ModeloOperativo
             'cod_preadmision',
             'cod_usuario_registro',
         ]);
+        $datos['cod_personal_valorador'] = $registro->cod_personal_valorador;
         $datos['registrado_por'] = $registro->cod_usuario_registro;
         $datos['fecha_hora'] = $registro->fecha_hora?->toIso8601String();
         $datos['orientacion'] = sprintf(
@@ -113,7 +114,14 @@ class Preadmision extends ModeloOperativo
             ];
 
             $valores = Arr::only($datos, $columnas);
-            $valores['cod_usuario_registro'] = $datos['registrado_por'] ?? auth()->id();
+            $valores['cod_usuario_registro'] = $datos['registrado_por'] ?? $datos['cod_usuario_registro'] ?? auth()->id() ?? $preadmision->cod_usuario_registro;
+            $valores['cod_personal_valorador'] = $datos['cod_personal_valorador'] ?? null;
+            if (empty($valores['cod_personal_valorador']) && !empty($valores['cod_usuario_registro'])) {
+                $personal = Personal::where('cod_usuario', $valores['cod_usuario_registro'])->first();
+                if ($personal) {
+                    $valores['cod_personal_valorador'] = $personal->cod_personal;
+                }
+            }
             $valores['fecha_hora'] = $datos['fecha_hora'] ?? now();
 
             $registro = $preadmision->valoracionEnfermeriaRegistro()->first();

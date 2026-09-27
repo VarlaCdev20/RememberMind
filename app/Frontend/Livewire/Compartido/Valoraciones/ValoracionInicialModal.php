@@ -199,7 +199,7 @@ class ValoracionInicialModal extends Component
             'temperatura' => 'required|numeric|min:' . \App\Backend\Modulos\Clinica\Servicios\ValidacionSignosVitalesService::TEMP_MIN . '|max:' . \App\Backend\Modulos\Clinica\Servicios\ValidacionSignosVitalesService::TEMP_MAX,
             'saturacion_oxigeno' => 'required|numeric|min:' . \App\Backend\Modulos\Clinica\Servicios\ValidacionSignosVitalesService::SPO2_MIN . '|max:' . \App\Backend\Modulos\Clinica\Servicios\ValidacionSignosVitalesService::SPO2_MAX,
             'peso' => 'nullable|numeric|min:' . \App\Backend\Modulos\Clinica\Servicios\ValidacionSignosVitalesService::PESO_MIN . '|max:' . \App\Backend\Modulos\Clinica\Servicios\ValidacionSignosVitalesService::PESO_MAX,
-            'talla' => 'nullable|numeric|min:0.5|max:' . \App\Backend\Modulos\Clinica\Servicios\ValidacionSignosVitalesService::TALLA_CM_MAX,
+            'talla' => 'nullable|numeric|min:' . \App\Backend\Modulos\Clinica\Servicios\ValidacionSignosVitalesService::TALLA_CM_MIN . '|max:' . \App\Backend\Modulos\Clinica\Servicios\ValidacionSignosVitalesService::TALLA_CM_MAX,
             'dependencia_funcional' => 'required',
             'riesgo_nutricional' => 'required',
             'riesgo_cognitivo' => 'required',
@@ -219,6 +219,35 @@ class ValoracionInicialModal extends Component
                 if ((float)$this->pa_sistolica <= (float)$this->pa_diastolica) {
             $this->addError('pa_sistolica', 'La presión sistólica (' . $this->pa_sistolica . ' mmHg) debe ser estrictamente mayor a la diastólica (' . $this->pa_diastolica . ' mmHg).');
             return;
+        }
+
+        // 1. Validaciones estrictas de dominio clnico y autorizacin
+        $user = auth()->user();
+        if (! $user || $user->estado !== 'ACTIVO') {
+            abort(403, 'Usuario no autenticado o inactivo.');
+        }
+
+        if (! $user->hasRole('ENFERMEROS')) {
+            abort(403, 'El usuario no posee el rol institucional de ENFERMEROS.');
+        }
+
+        $personal = $user->personal;
+        if (! $personal) {
+            abort(403, 'El usuario no tiene un profesional institucional asociado.');
+        }
+
+        if ($personal->estado !== 'ACTIVO') {
+            abort(403, 'El profesional asociado no se encuentra activo.');
+        }
+
+        $esEdicion = ! empty($this->valoracionId);
+        $permiso = $esEdicion ? 'valoracion_enfermeria.editar' : 'valoracion_enfermeria.registrar';
+        if (! $user->can($permiso)) {
+            abort(403, "No posee el permiso [{$permiso}] requerido para la operacin.");
+        }
+
+        if (! $this->preadmision || $this->preadmision->estado !== 'PENDIENTE') {
+            abort(422, 'La preadmisin no se encuentra en un estado admisible para valoracin de enfermera.');
         }
 
         $this->validate($rules, [
@@ -292,11 +321,12 @@ class ValoracionInicialModal extends Component
                 'confirmacion_documentacion' => (bool) $this->confirmacion_documentacion,
                 'comentarios_adicionales' => $this->comentarios_adicionales,
                 'recomendacion_enfermeria' => $this->recomendacion_enfermeria,
-                'registrado_por' => auth()->id(),
+                'cod_personal_valorador' => $personal->cod_personal,
+                'registrado_por' => $user->cod_usuario,
             ];
 
             $this->preadmision->update([
-                'estado' => 'PENDIENTE_VALORACION_MEDICA',
+                'estado' => 'PENDIENTE',
                 'prioridad' => $this->prioridad_sugerida,
                 'valoracion_enfermeria' => $valoracion,
             ]);
@@ -306,6 +336,8 @@ class ValoracionInicialModal extends Component
                 ->performedOn($this->preadmision)
                 ->withProperties([
                     'cod_preadmision' => $this->preadmision->cod_preadmision,
+                    'cod_personal_valorador' => $personal->cod_personal,
+                    'cod_usuario_registro' => $user->cod_usuario,
                     'estado_general' => $this->estado_general,
                     'orientacion' => $orientacionCombinada,
                     'movilidad' => $this->movilidad,

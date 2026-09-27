@@ -34,6 +34,11 @@ class ValoracionEnfermeriaPreadmision extends ModeloOperativo
         return $this->belongsTo(Preadmision::class, 'cod_preadmision', 'cod_preadmision');
     }
 
+    public function personalValorador(): BelongsTo
+    {
+        return $this->belongsTo(Personal::class, 'cod_personal_valorador', 'cod_personal');
+    }
+
     public function usuarioRegistro(): BelongsTo
     {
         return $this->belongsTo(User::class, 'cod_usuario_registro', 'cod_usuario');

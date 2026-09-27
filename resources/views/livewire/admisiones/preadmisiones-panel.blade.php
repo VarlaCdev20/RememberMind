@@ -72,12 +72,8 @@
             <div class="lg:col-span-3">
                 <select wire:model.live="estado" class="w-full rounded-xl border border-[#C7B9AA] dark:border-[#4E463E] bg-[#F0E8DE] dark:bg-[#211E1B] py-2 px-3 text-xs font-medium text-[#304060] dark:text-[#E8DFD5] focus:border-[#A35A44] focus:outline-none h-[38px]">
                     <option value="">Todos los estados</option>
-                    <option value="PENDIENTE">Pendiente de revisión</option>
-                    <option value="PREADMISION_ASIGNADA">Preadmisión asignada</option>
-                    <option value="PENDIENTE_VALORACION_MEDICA">Pend. valoración médica</option>
-                    <option value="VALORACION_MEDICA_FINALIZADA">Val. médica finalizada</option>
+                    <option value="PENDIENTE">Pendiente</option>
                     <option value="APROBADA">Aprobada</option>
-                    <option value="ADMITIDA">Admitida</option>
                     <option value="RECHAZADA">Rechazada</option>
                 </select>
             </div>

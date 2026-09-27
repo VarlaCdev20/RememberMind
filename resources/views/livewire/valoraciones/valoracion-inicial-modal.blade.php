@@ -138,7 +138,7 @@
 
                             <div>
                                 <label class="block text-xs font-bold text-label mb-0.5">Talla (cm) <span class="text-apoyo font-medium">(Opcional)</span></label>
-                                <input type="number" wire:model="talla" placeholder="165" class="w-full rounded-lg border-input-borde bg-input-bg text-input-texto focus:border-input-bordeFocus focus:ring-input-ringFocus text-xs py-1.5 shadow-sm">
+                                <input type="number" wire:model="talla" min="50" max="240" step="0.1" placeholder="165" class="w-full rounded-lg border-input-borde bg-input-bg text-input-texto focus:border-input-bordeFocus focus:ring-input-ringFocus text-xs py-1.5 shadow-sm">
                                 @error('talla') <span class="text-estado-peligro text-[10px] font-medium mt-1 block">{{ $message }}</span> @enderror
                             </div>
                         </div>

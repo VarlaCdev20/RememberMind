@@ -78,6 +78,7 @@ class RolesAndPermissionsSeeder extends Seeder
             'valoraciones_psicologicas.crear','valoraciones_nutricionales.crear',
             'valoraciones_funcionales.crear','valoraciones_funcionales.editar','seguimientos_pedagogicos.crear','actividades.gestionar',
             'visitas.gestionar','alertas.gestionar',
+            'valoracion_enfermeria.registrar','valoracion_enfermeria.editar',
         ], $permisosCompatibilidadLectura, $permisosCompatibilidadInstitucional);
 
         $permisos = array_values(array_unique($permisos));
@@ -114,7 +115,7 @@ class RolesAndPermissionsSeeder extends Seeder
             'registros_','heridas','curaciones_herida','planes_cuidado','prescripciones',
             'horarios_prescripcion.ver','administraciones_medicacion','aplicaciones_instrumento',
             'valoraciones_','alertas.ver',
-        ]), ['salud.ver', 'valoracion_medica.ver']))));
+        ]), ['salud.ver', 'valoracion_medica.ver', 'valoracion_enfermeria.ver']))));
 
         $roles['ENFERMEROS']->syncPermissions(array_values(array_unique(array_merge($this->permitir($permisos, [
             'residentes.ver','ocupaciones_cama.ver','atenciones.ver','atenciones.crear','atenciones.editar','notas_clinicas','antecedentes_clinicos.ver',
@@ -124,7 +125,7 @@ class RolesAndPermissionsSeeder extends Seeder
             'intervenciones_cuidado.ver','programaciones_cuidado.ver','ejecuciones_cuidado',
             'prescripciones.ver','horarios_prescripcion.ver','administraciones_medicacion','alertas',
         ]), [
-            'salud.ver', 'turnos.ver', 'valoracion_enfermeria.ver',
+            'salud.ver', 'turnos.ver', 'valoracion_enfermeria.ver', 'valoracion_enfermeria.registrar', 'valoracion_enfermeria.editar',
             'enfermeria.ver_dashboard', 'enfermeria.ver_pacientes_asignados',
             'enfermeria.ver_ficha_paciente',
         ]))));
