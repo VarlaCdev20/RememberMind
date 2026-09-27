@@ -33,26 +33,22 @@
                 <tr>
                     <th class="px-4 py-3">Fecha</th>
                     <th class="px-4 py-3">Adulto mayor</th>
-                    <th class="px-4 py-3">Turno</th>
+                    <th class="px-4 py-3">Profesional</th>
                     <th class="px-4 py-3">Estado general</th>
-                    <th class="px-4 py-3">Plan</th>
-                    <th class="px-4 py-3">Alertas</th>
+                    <th class="px-4 py-3">Tipo</th>
+                    <th class="px-4 py-3">Observación</th>
                     <th class="px-4 py-3 text-right">Acciones</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-borde/60">
                 @forelse($seguimientos as $seg)
                     <tr class="hover:bg-fondo-hover/60">
-                        <td class="px-4 py-3 font-bold text-parrafo">{{ optional($seg->fecha)->format('d/m/Y') }}<br><span class="text-xs text-apoyo">{{ substr($seg->hora_inicio ?? '', 0, 5) }} - {{ substr($seg->hora_fin ?? '', 0, 5) ?: '—' }}</span></td>
-                        <td class="px-4 py-3 font-black text-titulo">{{ $seg->adultoMayor?->nombres }} {{ $seg->adultoMayor?->ap_paterno }}</td>
-                        <td class="px-4 py-3 text-parrafo">{{ $seg->turno?->nombre ?? '—' }}</td>
-                        <td class="px-4 py-3 text-parrafo">{{ $seg->estado_general ?? 'Sin observación' }}</td>
-                        <td class="px-4 py-3 text-parrafo">{{ $seg->plan?->tipo_plan ?? 'Sin plan vinculado' }}</td>
-                        <td class="px-4 py-3 text-xs font-bold text-apoyo">
-                            @if($seg->incidente) Incidente @endif
-                            @if($seg->requiere_medico) {{ $seg->incidente ? ' / ' : '' }}Requiere médico @endif
-                            @if(!$seg->incidente && !$seg->requiere_medico) Sin alertas @endif
-                        </td>
+                        <td class="px-4 py-3 font-bold text-parrafo">{{ $seg->fecha_hora?->format('d/m/Y') }}<br><span class="text-xs text-apoyo">{{ $seg->fecha_hora?->format('H:i') }}</span></td>
+                        <td class="px-4 py-3 font-black text-titulo">{{ $seg->adultoMayor?->nombres }} {{ $seg->adultoMayor?->apellido_paterno }}</td>
+                        <td class="px-4 py-3 text-parrafo">{{ $seg->personal?->nombres }} {{ $seg->personal?->apellido_paterno }}</td>
+                        <td class="px-4 py-3 text-parrafo">{{ \Illuminate\Support\Str::after((string) $seg->motivo, 'SEGUIMIENTO_DIARIO:') ?: 'No registrado' }}</td>
+                        <td class="px-4 py-3 text-parrafo">Seguimiento V2.1</td>
+                        <td class="max-w-xs px-4 py-3 text-xs font-medium text-apoyo">{{ \Illuminate\Support\Str::limit($seg->observacion, 120) }}</td>
                         <td class="px-4 py-3 text-right">
                             @can('atenciones.editar')
                                 <button type="button" wire:click="abrirEditar('{{ $seg->cod_seg_diario }}')" class="rm-btn-secondary px-3 py-1.5 text-xs font-bold">
@@ -80,22 +76,17 @@
                     </div>
                     <button type="button" wire:click="cerrarModales" class="text-sm font-bold text-apoyo">Cerrar</button>
                 </div>
-                <div class="grid gap-3 md:grid-cols-3">
+                <div class="grid gap-3 md:grid-cols-2">
                     <label class="space-y-1 text-xs font-bold text-apoyo">Adulto mayor *
                         <select wire:model.live="codResidente" @disabled($editandoId) class="rm-select w-full text-sm"><option value="">Seleccione</option>@foreach($adultos as $adulto)<option value="{{ $adulto->cod_residente }}">{{ $adulto->nombres }} {{ $adulto->ap_paterno }}</option>@endforeach</select>
                         @error('codResidente')<span class="text-xs text-estado-peligro">{{ $message }}</span>@enderror
                     </label>
-                    <label class="space-y-1 text-xs font-bold text-apoyo">Turno *
-                        <select wire:model="codTurno" class="rm-select w-full text-sm"><option value="">Seleccione</option>@foreach($turnos as $turno)<option value="{{ $turno->cod_turno }}">{{ $turno->nombre }}</option>@endforeach</select>
+                    <label class="space-y-1 text-xs font-bold text-apoyo">Turno clínico vigente *
+                        <select wire:model="codTurno" disabled class="rm-select w-full text-sm disabled:opacity-70"><option value="">Sin turno vigente</option>@foreach($turnos as $turno)<option value="{{ $turno->cod_turno }}">{{ $turno->nombre }}</option>@endforeach</select>
                         @error('codTurno')<span class="text-xs text-estado-peligro">{{ $message }}</span>@enderror
-                    </label>
-                    <label class="space-y-1 text-xs font-bold text-apoyo">Plan de cuidados
-                        <select wire:model="codPlan" class="rm-select w-full text-sm"><option value="">Sin plan vinculado</option>@foreach($planes->where('cod_residente', $codResidente) as $plan)<option value="{{ $plan->cod_plan }}">{{ $plan->tipo_plan }} · versión {{ $plan->version }}</option>@endforeach</select>
-                        @error('codPlan')<span class="text-xs text-estado-peligro">{{ $message }}</span>@enderror
                     </label>
                     <label class="space-y-1 text-xs font-bold text-apoyo">Fecha *<input type="date" max="{{ today()->format('Y-m-d') }}" wire:model="fecha" class="rm-input w-full text-sm">@error('fecha')<span class="text-xs text-estado-peligro">{{ $message }}</span>@enderror</label>
                     <label class="space-y-1 text-xs font-bold text-apoyo">Hora de inicio *<input type="time" wire:model="horaInicio" class="rm-input w-full text-sm">@error('horaInicio')<span class="text-xs text-estado-peligro">{{ $message }}</span>@enderror</label>
-                    <label class="space-y-1 text-xs font-bold text-apoyo">Hora de finalización<input type="time" wire:model="horaFin" class="rm-input w-full text-sm">@error('horaFin')<span class="text-xs text-estado-peligro">{{ $message }}</span>@enderror</label>
                 </div>
 
                 @php
@@ -112,9 +103,21 @@
                     ];
                 @endphp
                 <div class="grid gap-3 md:grid-cols-3">
+                    <label class="space-y-1 text-xs font-bold text-apoyo">Comida observada *
+                        <select wire:model="tipoComida" class="rm-select w-full text-sm">
+                            <option value="">Seleccione una opción</option>
+                            <option value="DESAYUNO">Desayuno</option><option value="MEDIA_MANANA">Media mañana</option>
+                            <option value="ALMUERZO">Almuerzo</option><option value="MERIENDA">Merienda</option>
+                            <option value="CENA">Cena</option><option value="COLACION">Colación</option>
+                        </select>
+                        @error('tipoComida')<span class="text-xs text-estado-peligro">{{ $message }}</span>@enderror
+                    </label>
                     @foreach($selects as $campo => [$etiqueta, $opciones])
                         <label class="space-y-1 text-xs font-bold text-apoyo">{{ $etiqueta }}
                             <select wire:model="{{ $campo }}" class="rm-select w-full text-sm">
+                                @unless(array_key_exists('', $opciones))
+                                    <option value="">Seleccione una opción</option>
+                                @endunless
                                 @foreach($opciones as $valor => $texto)<option value="{{ $valor }}">{{ $texto }}</option>@endforeach
                             </select>
                             @error($campo)<span class="text-xs text-estado-peligro">{{ $message }}</span>@enderror
@@ -124,10 +127,18 @@
                         <input type="number" min="0" max="100" step="1" wire:model="porcentajeAlimentacion" class="rm-input w-full text-sm">
                         @error('porcentajeAlimentacion')<span class="text-xs text-estado-peligro">{{ $message }}</span>@enderror
                     </label>
+                    <label class="space-y-1 text-xs font-bold text-apoyo">Tipo de líquido *
+                        <input type="text" maxlength="60" wire:model="tipoLiquido" placeholder="Ej.: agua, infusión" class="rm-input w-full text-sm">
+                        @error('tipoLiquido')<span class="text-xs text-estado-peligro">{{ $message }}</span>@enderror
+                    </label>
+                    <label class="space-y-1 text-xs font-bold text-apoyo">Cantidad hidratación (ml) *
+                        <input type="number" min="1" max="10000" step="1" wire:model="cantidadHidratacionMl" class="rm-input w-full text-sm">
+                        @error('cantidadHidratacionMl')<span class="text-xs text-estado-peligro">{{ $message }}</span>@enderror
+                    </label>
                 </div>
 
                 <div class="grid gap-3 rounded-2xl border border-borde bg-fondo-panel p-4 md:grid-cols-3">
-                    @foreach(['incidente'=>'Ocurrió un incidente', 'requiereMedico'=>'Requiere evaluación médica', 'confusionObservable'=>'Confusión observable', 'repitePreguntas'=>'Repite preguntas', 'intentoCaminarSolo'=>'Intentó caminar sin ayuda'] as $campo => $etiqueta)
+                    @foreach(['incidente'=>'Generar alerta de incidente', 'requiereMedico'=>'Generar solicitud de evaluación médica', 'confusionObservable'=>'Confusión observable', 'repitePreguntas'=>'Repite preguntas', 'intentoCaminarSolo'=>'Intentó caminar sin ayuda'] as $campo => $etiqueta)
                         <label class="flex items-center gap-2 text-sm font-bold text-parrafo"><x-checkbox wire:model="{{ $campo }}" /> {{ $etiqueta }}</label>
                     @endforeach
                 </div>

@@ -11,6 +11,7 @@ use App\Models\RegistroEliminacion;
 use App\Models\RegistroHidratacion;
 use App\Models\RegistroIngesta;
 use App\Models\RegistroMovilidad;
+use App\Models\RegistroSueno;
 use App\Models\User;
 use App\Models\ValoracionDolor;
 use App\Backend\Modulos\Alertas\Servicios\AlertasService;
@@ -112,11 +113,26 @@ class CuidadosEnfermeriaService
                     'cod_residente' => $codResidente,
                     'cod_personal' => $codPersonal,
                     'cod_jornada' => $codJornada,
-                    'tipo_movilidad' => $datos['subtipo'],
-                    'nivel_ayuda' => $datos['nivel_ayuda'] ?? null,
-                    'ayuda_tecnica' => $datos['ayuda_tecnica'] ?? null,
-                    'tolerancia' => $datos['tolerancia'] ?? null,
+                    'marcha' => $datos['subtipo'],
+                    'tipo_apoyo' => $datos['nivel_ayuda'] ?? null,
+                    'dispositivo' => $datos['ayuda_tecnica'] ?? null,
+                    'fatiga' => $datos['tolerancia'] ?? null,
                     'fecha_hora' => now(),
+                    'estado' => 'VIGENTE',
+                    'observacion' => $datos['observacion'] ?? $datos['motivo'] ?? null,
+                ]);
+            } elseif ($tipo === 'SUENO') {
+                $registro = RegistroSueno::create([
+                    'cod_registro_sueno' => 'RSU_' . strtoupper(Str::random(10)),
+                    'cod_residente' => $codResidente,
+                    'cod_personal' => $codPersonal,
+                    'cod_jornada' => $codJornada,
+                    'fecha' => today(),
+                    'despertares' => $datos['cantidad_despertares'] ?? null,
+                    'insomnio' => ($datos['calidad'] ?? null) === 'INSOMNIO',
+                    'somnolencia_diurna' => ($datos['calidad'] ?? null) === 'SOMNOLENCIA',
+                    'agitacion_nocturna' => ! empty($datos['agitacion']),
+                    'calidad' => $datos['calidad'] ?? $datos['subtipo'],
                     'estado' => 'VIGENTE',
                     'observacion' => $datos['observacion'] ?? $datos['motivo'] ?? null,
                 ]);
