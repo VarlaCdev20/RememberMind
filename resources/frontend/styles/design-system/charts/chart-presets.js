@@ -35,7 +35,7 @@ export function rmDoughnutChartConfig(labels, data, colors, customOptions = {}) 
                 borderColor: borderColors,
                 borderWidth: 2,
                 hoverOffset: 6,
-                hoverBorderColor: '#FFFFFF',
+                hoverBorderColor: rmGetCss('--rm-surface-raised') || rmGetCss('--rm-surface') || '#F4EFE8',
                 hoverBorderWidth: 2.5,
             }]
         },
@@ -88,7 +88,7 @@ export function rmBarHorizontalChartConfig(labels, data, colors, customOptions =
             },
             ticks: {
                 color: axisTextColor,
-                font: { family: 'Inter, system-ui, sans-serif', size: 10.5, weight: '600' },
+                font: { family: 'Outfit, Nunito, system-ui, sans-serif', size: 10.5, weight: '600' },
                 precision: 0,
                 stepSize: 1,
             },
@@ -100,8 +100,8 @@ export function rmBarHorizontalChartConfig(labels, data, colors, customOptions =
                 drawBorder: false,
             },
             ticks: {
-                color: isDark ? '#FFFFFF' : '#1E293B',
-                font: { family: 'Inter, system-ui, sans-serif', size: 11.5, weight: '700' },
+                color: axisTitleColor,
+                font: { family: 'Outfit, Nunito, system-ui, sans-serif', size: 11.5, weight: '700' },
                 padding: 8,
             },
             ...(customOptions.scales?.y || {}),
@@ -118,8 +118,8 @@ export function rmBarHorizontalChartConfig(labels, data, colors, customOptions =
             anchor: 'end',
             align: 'right',
             offset: 8,
-            color: isDark ? '#FFFFFF' : '#0F172A',
-            font: { family: 'Outfit, Inter, system-ui, sans-serif', size: 11.5, weight: '800' },
+            color: axisTitleColor,
+            font: { family: 'Outfit, Nunito, system-ui, sans-serif', size: 11.5, weight: '800' },
             formatter: function(value) {
                 return value;
             },
@@ -130,8 +130,8 @@ export function rmBarHorizontalChartConfig(labels, data, colors, customOptions =
             ...base.plugins.tooltip,
             padding: 10,
             cornerRadius: 8,
-            titleFont: { family: 'Inter, system-ui, sans-serif', size: 12, weight: '700' },
-            bodyFont: { family: 'Inter, system-ui, sans-serif', size: 11.5, weight: '500' },
+            titleFont: { family: 'Outfit, Nunito, system-ui, sans-serif', size: 12, weight: '700' },
+            bodyFont: { family: 'Outfit, Nunito, system-ui, sans-serif', size: 11.5, weight: '500' },
             callbacks: {
                 label: function(context) {
                     const raw = context.raw || 0;
@@ -187,7 +187,7 @@ export function rmAreaChartConfig(labels, datasets, customOptions = {}) {
                 pointRadius: 4,
                 pointHoverRadius: 6.5,
                 pointBorderWidth: 2,
-                pointBackgroundColor: rmIsDark() ? '#1E293B' : '#FFFFFF',
+                pointBackgroundColor: rmGetCss('--rm-surface-raised') || rmGetCss('--rm-surface') || '#F4EFE8',
                 borderWidth: 2.5,
                 ...ds,
             }))

@@ -11,6 +11,25 @@
  $spo2Data = $puntos->map(fn($s) => $s->saturacion !== null ? (float)$s->saturacion : null)->values()->toArray();
  $tempData = $puntos->map(fn($s) => $s->temperatura !== null ? (float)$s->temperatura : null)->values()->toArray();
 
+ $alergiasTexto = collect($adultoDrawer->alergias ?? [])
+  ->map(function ($alergia) {
+   if (is_string($alergia)) {
+    return trim($alergia);
+   }
+
+   $sustancia = trim((string) ($alergia->sustancia ?? ''));
+   $reaccion = trim((string) ($alergia->reaccion ?? ''));
+
+   return $sustancia !== '' ? $sustancia.($reaccion !== '' ? " ({$reaccion})" : '') : null;
+  })
+  ->filter()
+  ->implode(', ');
+
+ $diagnosticosTexto = collect($adultoDrawer->diagnosticos ?? [])
+  ->map(fn($diagnostico) => trim((string) ($diagnostico->diagnostico ?? $diagnostico->nombre ?? $diagnostico->descripcion ?? '')))
+  ->filter()
+  ->implode(', ');
+
  // Registros clínicos recientes para el timeline (Evoluciones / Valoraciones)
  $registrosTimeline = collect();
  if ($adultoDrawer->valoracionesEnfermeria && $adultoDrawer->valoracionesEnfermeria->count()) {
@@ -42,6 +61,8 @@
  role="dialog"
  aria-modal="true"
  aria-labelledby="drawer-graficos-title"
+ tabindex="-1"
+ x-init="$nextTick(() => $el.focus({ preventScroll: true }))"
  x-data="{
  tab: 'presion',
  labels: @js($labels),
@@ -67,9 +88,12 @@
   const canvas = document.getElementById('chart-drawer-evolucion');
   if (!canvas) return;
 
-  const isDark = document.documentElement.classList.contains('dark');
-  const gridColor = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(224,212,198,0.40)';
-  const axisTextColor = isDark ? '#94A3B8' : '#64748B';
+  const rootStyles = getComputedStyle(document.documentElement);
+  const css = (token, fallback) => rootStyles.getPropertyValue(token).trim() || fallback;
+  const gridColor = css('--rm-chart-grid', 'rgba(80,71,65,.12)');
+  const axisTextColor = css('--rm-chart-axis-text', '#665C55');
+  const surfaceRaised = css('--rm-chart-tooltip-bg', '#F0E7DE');
+  const tooltipText = css('--rm-chart-tooltip-text', '#342E2A');
 
   let datasets = [];
   let yMin = undefined;
@@ -83,8 +107,8 @@
    {
    label: 'Sistólica',
    data: this.sisData,
-   borderColor: '#EF4444',
-   backgroundColor: isDark ? 'rgba(239, 68, 68, 0.15)' : 'rgba(239, 68, 68, 0.10)',
+   borderColor: css('--rm-chart-2', '#527DAA'),
+   backgroundColor: 'rgba(82, 125, 170, 0.12)',
    borderWidth: 2.2,
    pointRadius: 4,
    pointHoverRadius: 6,
@@ -94,8 +118,8 @@
    {
    label: 'Diastólica',
    data: this.diaData,
-   borderColor: '#2563EB',
-   backgroundColor: isDark ? 'rgba(37, 99, 235, 0.12)' : 'rgba(37, 99, 235, 0.08)',
+   borderColor: css('--rm-chart-4', '#6F92BC'),
+   backgroundColor: 'rgba(162, 194, 236, 0.10)',
    borderWidth: 2.2,
    pointRadius: 4,
    pointHoverRadius: 6,
@@ -111,8 +135,8 @@
   datasets = [{
    label: 'Frecuencia Cardíaca',
    data: this.fcData,
-   borderColor: '#F97316',
-   backgroundColor: isDark ? 'rgba(249, 115, 22, 0.18)' : 'rgba(249, 115, 22, 0.10)',
+   borderColor: css('--rm-chart-5', '#8A7A70'),
+   backgroundColor: 'rgba(138, 122, 112, 0.11)',
    borderWidth: 2.2,
    pointRadius: 4,
    pointHoverRadius: 6,
@@ -127,8 +151,8 @@
   datasets = [{
    label: 'Saturación SpO₂',
    data: this.spo2Data,
-   borderColor: '#10B981',
-   backgroundColor: isDark ? 'rgba(16, 185, 129, 0.18)' : 'rgba(16, 185, 129, 0.10)',
+   borderColor: css('--rm-chart-1', '#4F895E'),
+   backgroundColor: 'rgba(173, 235, 178, 0.14)',
    borderWidth: 2.2,
    pointRadius: 4,
    pointHoverRadius: 6,
@@ -143,8 +167,8 @@
   datasets = [{
    label: 'Temperatura',
    data: this.tempData,
-   borderColor: '#A56B42',
-   backgroundColor: isDark ? 'rgba(165, 107, 66, 0.18)' : 'rgba(165, 107, 66, 0.10)',
+   borderColor: css('--rm-chart-6', '#A89789'),
+   backgroundColor: 'rgba(168, 151, 137, 0.12)',
    borderWidth: 2.2,
    pointRadius: 4,
    pointHoverRadius: 6,
@@ -170,7 +194,7 @@
   options: {
    responsive: true,
    maintainAspectRatio: false,
-   animation: { duration: 600, easing: 'easeOutQuart' },
+   animation: { duration: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 600, easing: 'easeOutQuart' },
    interaction: { mode: 'index', intersect: false },
    scales: {
    x: {
@@ -178,7 +202,7 @@
     grid: { color: gridColor, drawBorder: false },
     ticks: {
     color: axisTextColor,
-    font: { family: 'Inter, system-ui, sans-serif', size: 10, weight: '600' },
+    font: { family: 'Outfit, Nunito Sans, system-ui, sans-serif', size: 10, weight: '600' },
     maxRotation: 0,
     }
    },
@@ -189,7 +213,7 @@
     grid: { color: gridColor, drawBorder: false },
     ticks: {
     color: axisTextColor,
-    font: { family: 'Inter, system-ui, sans-serif', size: 10, weight: '600' },
+    font: { family: 'Outfit, Nunito Sans, system-ui, sans-serif', size: 10, weight: '600' },
     stepSize: yStep,
     callback: (val) => val + ' ' + unit
     }
@@ -203,22 +227,22 @@
     offset: 3,
     borderRadius: 4,
     padding: 2,
-    backgroundColor: isDark ? 'rgba(15, 23, 42, 0.85)' : 'rgba(255, 255, 255, 0.88)',
+    backgroundColor: surfaceRaised,
     borderColor: (ctx) => ctx.dataset.borderColor,
     borderWidth: 1,
     color: (ctx) => ctx.dataset.borderColor,
-    font: { size: 9.5, weight: 'bold', family: 'Inter, sans-serif' },
+    font: { size: 9.5, weight: 'bold', family: 'Outfit, Nunito Sans, sans-serif' },
     formatter: (v) => v !== null && v !== undefined ? v : ''
    },
    tooltip: {
     enabled: true,
-    backgroundColor: isDark ? 'rgba(15, 23, 42, 0.96)' : 'rgba(17, 24, 39, 0.96)',
-    titleColor: '#FFFFFF',
-    bodyColor: '#F8FAFC',
+    backgroundColor: surfaceRaised,
+    titleColor: tooltipText,
+    bodyColor: tooltipText,
     padding: 10,
     cornerRadius: 8,
-    titleFont: { size: 11, weight: '700' },
-    bodyFont: { size: 11, weight: '500' },
+    titleFont: { family: 'Outfit, Nunito Sans, sans-serif', size: 11, weight: '700' },
+    bodyFont: { family: 'Outfit, Nunito Sans, sans-serif', size: 11, weight: '500' },
     callbacks: {
     label: (c) => ` ${c.dataset.label}: ${c.parsed.y} ${unit}`
     }
@@ -234,8 +258,8 @@
  <div class="rm-drawer-backdrop" wire:click="cerrarDrawer"></div>
 
  {{-- 2. CONTENEDOR DESLIZANTE NÍTIDO (680-760px) --}}
- <div class="pointer-events-none fixed inset-y-0 right-0 z-50 flex max-w-full pl-6 sm:pl-10">
- <div class="pointer-events-auto flex h-full w-screen max-w-[760px] md:w-[740px] transform flex-col overflow-hidden rm-drawer transition duration-300 ease-in-out">
+ <div class="pointer-events-none fixed inset-y-0 right-0 z-50 flex max-w-full pl-4 sm:inset-y-3 sm:right-3 sm:pl-10">
+ <div class="pointer-events-auto flex h-full w-screen max-w-[760px] transform flex-col overflow-hidden rm-drawer transition duration-300 ease-in-out md:w-[740px]">
 
   {{-- HEADER FIJO (Badge de Consulta + Título + Subtítulo + Botón X) --}}
   <header class="rm-drawer-header">
@@ -385,8 +409,8 @@
   </div>
 
   {{-- 5. GRÁFICO DE TENDENCIA (Tabs + Chart.js Interactivo) --}}
-  <div class="rm-drawer-card space-y-3">
-   <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-[var(--rm-border)]/60 pb-2">
+  <div class="rm-drawer-card rm-chart-card rm-chart-glass space-y-3">
+   <div class="rm-chart-header flex-col sm:flex-row sm:items-center">
    <span class="rm-drawer-section">
     <i class="ph-bold ph-chart-line text-blue-600 text-sm"></i>
     <span>CURVA DE TENDENCIA TEMPORAL</span>
@@ -422,7 +446,7 @@
    </div>
 
    {{-- Canvas del Gráfico --}}
-   <div class="w-full h-44 sm:h-48 relative" wire:ignore>
+   <div class="rm-chart-body w-full h-44 sm:h-48 relative" wire:ignore>
    <canvas id="chart-drawer-evolucion"></canvas>
    </div>
   </div>
@@ -448,22 +472,22 @@
     </div>
     <div class="rm-drawer-def-item">
     <span class="rm-drawer-def-label">Nivel de cuidado:</span>
-    <span class="rm-drawer-def-value">{{ $adultoDrawer->nivel_cuidado ?? 'Nivel III - Dependencia moderada' }}</span>
+    <span class="rm-drawer-def-value">{{ $adultoDrawer->planCuidadoActivo?->nivel_cuidado ?: 'Sin nivel registrado' }}</span>
     </div>
     <div class="rm-drawer-def-item">
     <span class="rm-drawer-def-label">Riesgo de caídas:</span>
-    <span class="rm-drawer-def-value text-[var(--rm-warning)] font-bold">Moderado (Downton: 3)</span>
+    <span class="rm-drawer-def-value text-[var(--rm-warning)] font-bold">Sin cálculo disponible</span>
     </div>
     <div class="rm-drawer-def-item">
     <span class="rm-drawer-def-label">Diagnóstico ppal:</span>
-    <span class="rm-drawer-def-value truncate max-w-[170px]" title="{{ $adultoDrawer->patologias ?? 'Hipertensión Arterial / Demencia Leve' }}">
-     {{ $adultoDrawer->patologias ?? 'Hipertensión / Demencia' }}
+    <span class="rm-drawer-def-value truncate max-w-[170px]" title="{{ $diagnosticosTexto ?: 'Sin diagnóstico principal registrado' }}">
+     {{ $diagnosticosTexto ?: 'Sin diagnóstico principal registrado' }}
     </span>
     </div>
     <div class="rm-drawer-def-item">
     <span class="rm-drawer-def-label">Alergias:</span>
     <span class="rm-drawer-def-value text-rose-600 font-bold">
-     {{ $adultoDrawer->alergias ?? 'Sin alergias conocidas' }}
+     {{ $alergiasTexto ?: 'Sin alergias conocidas' }}
     </span>
     </div>
     <div class="rm-drawer-def-item">

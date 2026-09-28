@@ -18,27 +18,29 @@ $badgeNivel = [
 ];
 @endphp
 
-<div class="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-6">
+<div class="rm-dashboard-kpi-grid">
     @foreach($kpis as $kpi)
         @php
             $estilo = $estilosColor[$kpi['color']] ?? $estilosColor['azul-profundo'];
             $badgeClass = $badgeNivel[$kpi['nivel']] ?? $badgeNivel['normal'];
         @endphp
 
-        <div class="rounded-2xl border border-[var(--rm-border)] bg-[var(--rm-surface)] p-4 shadow-xs transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md flex flex-col justify-between">
-            <div class="mb-3 flex items-center justify-between">
-                <div class="flex h-9 w-9 items-center justify-center rounded-xl {{ $estilo['bg'] }}">
+        <div class="min-w-0 h-[116px] min-h-[108px] max-h-[120px] rounded-2xl border border-[var(--rm-border)] bg-[var(--rm-surface)] p-3 shadow-xs transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md flex flex-col justify-between">
+            <div class="mb-1.5 flex min-w-0 items-start justify-between gap-2">
+                <div class="flex h-8 w-8 items-center justify-center rounded-xl {{ $estilo['bg'] }}">
                     <i class="ph-bold {{ $kpi['icono'] }} text-lg"></i>
                 </div>
-                <span class="rounded-lg {{ $badgeClass }} px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider">
-                    {{ $kpi['badge'] }}
-                </span>
+                @if(($kpi['nivel'] ?? 'normal') !== 'normal')
+                    <span class="max-w-[8rem] rounded-lg {{ $badgeClass }} px-2 py-0.5 text-center text-[10px] font-bold uppercase leading-tight tracking-wider">
+                        {{ $kpi['badge'] }}
+                    </span>
+                @endif
             </div>
 
             <div>
-                <p class="text-2xl font-extrabold tracking-tight {{ $estilo['val'] }}">{{ $kpi['valor'] }}</p>
-                <p class="mt-0.5 text-[11px] font-bold text-[var(--rm-text-primary)] truncate">{{ $kpi['titulo'] }}</p>
-                <p class="text-[10px] font-semibold text-[var(--rm-text-muted)] truncate">{{ $kpi['subtitulo'] }}</p>
+                <p class="text-[30px] font-extrabold tracking-tight leading-none {{ $estilo['val'] }}">{{ $kpi['valor'] }}</p>
+                <p class="mt-0.5 text-[11px] font-bold leading-tight text-[var(--rm-text-primary)]">{{ $kpi['titulo'] }}</p>
+                <p class="mt-0.5 text-[10px] font-semibold leading-tight text-[var(--rm-text-muted)]">{{ $kpi['subtitulo'] }}</p>
             </div>
         </div>
     @endforeach

@@ -1026,7 +1026,7 @@
                         </div>
                         <div class="col-span-2">
                             <span class="text-[10.5px] text-[var(--rm-text-muted)] block">Alergias Conocidas</span>
-                            <span class="font-bold text-[var(--rm-text-title)]">{{ $adultoMayor->alergias ?: ($adultoMayor->alergiasClinicas?->pluck('sustancia')->implode(', ') ?: ($adultoMayor->alergiasRegistradas?->pluck('sustancia')->implode(', ') ?: 'Sin alergias medicamentosas o alimentarias reportadas.')) }}</span>
+                            <span class="font-bold text-[var(--rm-text-title)]">{{ $alergiasConocidas->isNotEmpty() ? $alergiasTexto : 'Sin alergias medicamentosas o alimentarias reportadas.' }}</span>
                         </div>
                         <div class="col-span-2">
                             <span class="text-[10.5px] text-[var(--rm-text-muted)] block">Dieta y Restricciones</span>

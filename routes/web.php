@@ -633,6 +633,10 @@ Route::middleware([
                         ->middleware('permission:atenciones.ver')
                         ->name('registros');
 
+                    Route::get('/seguimiento', SeguimientoDiarioPanel::class)
+                        ->middleware('permission:atenciones.ver')
+                        ->name('seguimiento');
+
                     Route::get('/incidentes', IncidentesPanel::class)
                         ->middleware('permission:enfermeria.ver_dashboard|incidentes.ver|atenciones.ver')
                         ->name('incidentes');

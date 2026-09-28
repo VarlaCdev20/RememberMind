@@ -1,0 +1,47 @@
+/* ============================================================
+   REMEMBERMIND — PUENTE DE PALETA HEREDADA
+   Redirige utilidades arbitrarias históricas al contrato semántico.
+   Debe desaparecer gradualmente conforme cada vista migre a rm-*.
+   ============================================================ */
+
+/* Azul heredado -> azul clínico sereno. */
+:where([class*="text-[#1E3A8A]"], [class*="text-[#2F3E5C]"]) { color: var(--rm-clinical-strong) !important; }
+:where([class*="bg-[#1E3A8A]"], [class*="bg-[#2F3E5C]"]) { background-color: var(--rm-clinical-strong) !important; }
+:where([class*="border-[#1E3A8A]"], [class*="border-[#2F3E5C]"]) { border-color: var(--rm-clinical-strong) !important; }
+:where([class*="ring-[#1E3A8A]"], [class*="ring-[#2F3E5C]"]) { --tw-ring-color: color-mix(in srgb, var(--rm-clinical) 34%, transparent) !important; }
+
+/* Terracotas de acción anteriores -> menta institucional. */
+:where([class*="text-[#A85847]"], [class*="text-[#E27D60]"], [class*="text-[#8DA280]"]) { color: var(--rm-action-primary) !important; }
+:where([class*="bg-[#A85847]"], [class*="bg-[#E27D60]"], [class*="bg-[#8DA280]"]) { background-color: var(--rm-action-primary) !important; }
+:where([class*="border-[#A85847]"], [class*="border-[#E27D60]"], [class*="border-[#8DA280]"]) { border-color: var(--rm-action-primary) !important; }
+:where([class*="ring-[#A85847]"], [class*="ring-[#E27D60]"], [class*="ring-[#8DA280]"]) { --tw-ring-color: color-mix(in srgb, var(--rm-action-primary) 34%, transparent) !important; }
+
+/* Superficies cálidas anteriores -> escala arena canónica. */
+:where([class*="bg-[#F0E8DE]"], [class*="bg-[#F7F2EC]"], [class*="bg-[#F5EBE1]"]) { background-color: var(--rm-surface-raised) !important; }
+:where([class*="bg-[#2D2924]"], [class*="bg-[#34302A]"], [class*="bg-[#1E1B18]"]) { background-color: var(--rm-surface) !important; }
+:where([class*="border-[#D5CABE]"], [class*="border-[#494139]"]) { border-color: var(--rm-border-soft) !important; }
+
+/* Texto histórico -> jerarquía tipográfica accesible. */
+:where([class*="text-[#304060]"], [class*="text-[#1E293B]"], [class*="text-[#0F172A]"]) { color: var(--rm-text-primary) !important; }
+:where([class*="text-[#677084]"], [class*="text-[#64748B]"], [class*="text-[#334155]"]) { color: var(--rm-text-secondary) !important; }
+:where([class*="text-[#A6B2C8]"], [class*="text-[#94A3B8]"], [class*="text-[#6B7280]"]) { color: var(--rm-text-muted) !important; }
+:where([class*="text-[#FFFFFF]"]) { color: var(--rm-text-on-primary) !important; }
+
+/* La acción salvia del landing utiliza tinta oscura; corrige utilidades legacy blancas. */
+.rm-depth-canvas :where(
+    [class*="bg-[var(--rm-action-primary)]"][class*="text-white"],
+    [class*="bg-[var(--rm-primary)]"][class*="text-white"]
+) { color: var(--rm-text-on-primary) !important; }
+
+/* Estados clínicos: coral solo para peligro; menta para evolución favorable. */
+:where([class*="text-[#B33A3A]"], [class*="text-[#EF4444]"], [class*="text-[#E57373]"], [class*="text-[#D62828]"]) { color: var(--rm-danger) !important; }
+:where([class*="bg-[#B33A3A]"], [class*="bg-[#EF4444]"], [class*="bg-[#E57373]"], [class*="bg-[#D62828]"]) { background-color: var(--rm-danger) !important; }
+:where([class*="border-[#B33A3A]"], [class*="border-[#EF4444]"], [class*="border-[#E57373]"], [class*="border-[#D62828]"]) { border-color: var(--rm-danger) !important; }
+
+:where([class*="text-[#3F7D5A]"], [class*="text-[#0D9488]"], [class*="text-[#71876A]"]) { color: var(--rm-success) !important; }
+:where([class*="bg-[#3F7D5A]"], [class*="bg-[#0D9488]"], [class*="bg-[#71876A]"]) { background-color: var(--rm-success) !important; }
+:where([class*="border-[#3F7D5A]"], [class*="border-[#0D9488]"], [class*="border-[#71876A]"]) { border-color: var(--rm-success) !important; }
+
+/* El antiguo coral claro deja de ser decorativo y pasa a menta suave. */
+:where([class*="text-[#E89E8D]"]) { color: var(--rm-action-primary-hover) !important; }
+:where([class*="bg-[#E89E8D]"]) { background-color: var(--rm-action-primary-soft) !important; }

@@ -394,6 +394,19 @@ PAGE HEADER → KPIS → VISUALIZACIÓN / GRÁFICOS → FILTER BAR → LISTADO /
 - Mantener los botones de acción principal en 40px o superior.
 - Garantizar que todo microtexto sea de al menos `11px`.
 
+### Composición canónica de formularios
+
+Los formularios interactivos se construyen con componentes Blade agnósticos del dominio:
+
+- `<x-ui.modal-livewire>` para el contenedor, cabecera accesible y pie fijo.
+- `<x-ui.form-section>` para agrupar información relacionada y numerar pasos.
+- `<x-ui.field>` para etiqueta, ayuda, requisito y error de validación.
+- `<x-ui.choice-card>` para opciones excluyentes de alta relevancia operativa.
+- `<x-ui.callout>` para información, advertencias y errores multimodales.
+- `<x-ui.action-button>` para acciones con jerarquía semántica.
+
+Las vistas clínicas de referencia son los formularios de creación, atención y cierre de alertas, la administración de medicación y el registro de signos vitales. Las nuevas vistas deben componer estas primitivas en vez de repetir paletas, radios, sombras o mensajes de error.
+
 ---
 
 ## 23. Anti-Patrones (Prohibiciones)

@@ -2,54 +2,39 @@
  @if($adulto)
  <x-residentes.navegacion-ficha :adulto="$adulto" />
  @endif
- {{-- 1. CABECERA Y BOTON DE APARTADO --}}
- <section class="rounded-[1.6rem] border border-[var(--rm-border)]/65 bg-[var(--rm-surface)] p-5 shadow-sm backdrop-blur-xl sm:p-6">
- <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
- <div class="space-y-1">
- <div class="inline-flex items-center gap-2 rounded-full border border-[var(--rm-border)]/70 bg-[var(--rm-bg-app)] px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-[var(--rm-text-muted)]">
-  <i class="ph-bold ph-pill text-[var(--rm-primary)]"></i>
-  <span>Módulo Clínico Farmacológico</span>
- </div>
- <h1 class="text-2xl font-black tracking-tight text-[var(--rm-text-body)] sm:text-3xl">
-  Gestión y Prescripción de Medicación
- </h1>
- <p class="text-xs font-bold text-[var(--rm-text-muted)] sm:text-sm">
-  @if($adulto)
-  Tratamientos y tomas activas para <span class="font-black text-[var(--rm-text-body)]">{{ $adulto->nombres }} {{ $adulto->ap_paterno }} {{ $adulto->ap_materno }}</span>
-  @else
-  Control integral de fármacos, horarios y recetas para todos los residentes del centro.
-  @endif
- </p>
- </div>
-
- <div class="flex flex-wrap items-center gap-2.5">
+ {{-- 1. CABECERA Y ACCIONES DEL MÓDULO --}}
+ <x-ui.page-header
+  title="Gestión y prescripción de medicación"
+  :subtitle="$adulto
+   ? 'Tratamientos y tomas activas para ' . $adulto->nombres . ' ' . $adulto->ap_paterno . ' ' . $adulto->ap_materno
+   : 'Control integral de fármacos, horarios y recetas para todos los residentes del centro.'"
+  overline="Módulo clínico farmacológico"
+  icon="ph-pill">
  @if(auth()->user()?->hasAnyRole(['SUPERADMINISTRADOR', 'MEDICO GENERAL/GERIATRA']))
-  <button wire:click="toggleFormularioCrear" type="button" class="inline-flex items-center gap-2 rounded-xl border border-[var(--rm-primary)] bg-[var(--rm-primary)] px-4 py-2.5 text-xs font-black text-inverso shadow-sm transition hover:bg-[var(--rm-primary)]Hover hover:shadow active:scale-95">
-  <i class="ph-bold {{ $mostrarFormularioCrear ? 'ph-x' : 'ph-plus-circle' }} text-base"></i>
-  <span>{{ $mostrarFormularioCrear ? 'Cerrar formulario' : 'Prescribir medicamento' }}</span>
-  </button>
+  <x-ui.action-button
+   variant="primary"
+   size="sm"
+   :icono="$mostrarFormularioCrear ? 'ph-x' : 'ph-plus-circle'"
+   wire:click="toggleFormularioCrear">
+   {{ $mostrarFormularioCrear ? 'Cerrar formulario' : 'Prescribir medicamento' }}
+  </x-ui.action-button>
  @endif
 
  @if($adulto)
-  <button type="button" wire:click="verUbicacion('{{ $adulto->cod_residente }}')" class="inline-flex items-center gap-2 rounded-xl border border-[var(--rm-border)] bg-[var(--rm-surface)] px-4 py-2.5 text-xs font-bold text-[var(--rm-text-muted)] shadow-sm transition hover:bg-[var(--rm-surface-soft)] hover:text-[var(--rm-text-body)] active:scale-95 cursor-pointer" title="Ver ficha y ubicación del residente">
-  <i class="ph-bold ph-bed text-base text-[var(--rm-primary)]"></i>
-  <span>Ficha y Ubicación</span>
-  </button>
-  <button type="button" wire:click="verGraficos('{{ $adulto->cod_residente }}')" class="inline-flex items-center gap-2 rounded-xl border border-[var(--rm-border)] bg-[var(--rm-surface)] px-4 py-2.5 text-xs font-bold text-[var(--rm-text-muted)] shadow-sm transition hover:bg-[var(--rm-surface-soft)] hover:text-[var(--rm-text-body)] active:scale-95 cursor-pointer" title="Ver gráficos clínicos">
-  <i class="ph-bold ph-chart-line-up text-base text-boton-acento"></i>
-  <span>Gráficos Clínicos</span>
-  </button>
+  <x-ui.action-button variant="secondary" size="sm" icono="ph-bed" wire:click="verUbicacion('{{ $adulto->cod_residente }}')" title="Ver ficha y ubicación del residente">
+   Ficha y ubicación
+  </x-ui.action-button>
+  <x-ui.action-button variant="secondary" size="sm" icono="ph-chart-line-up" wire:click="verGraficos('{{ $adulto->cod_residente }}')" title="Ver gráficos clínicos">
+   Gráficos clínicos
+  </x-ui.action-button>
  @endif
- </div>
- </div>
- </section>
+ </x-ui.page-header>
 
  {{-- MENSAJE DE CONFIRMACIÓN --}}
  @if (session()->has('mensaje_exito'))
- <div class="flex items-center gap-3 rounded-2xl border border-[var(--rm-success)] bg-[var(--rm-success-soft)] p-4 text-xs font-bold text-[var(--rm-success)] shadow-sm">
- <i class="ph-bold ph-check-circle text-xl flex-shrink-0"></i>
- <span class="flex-1">{{ session('mensaje_exito') }}</span>
- </div>
+ <x-ui.callout variant="success" title="Medicación actualizada">
+  {{ session('mensaje_exito') }}
+ </x-ui.callout>
  @endif
 
  {{-- 2. MODAL FLOTANTE: PRESCRIBIR / AGREGAR MEDICAMENTO --}}

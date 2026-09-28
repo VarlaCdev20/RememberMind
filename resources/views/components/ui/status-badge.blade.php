@@ -30,6 +30,9 @@
         'EN_REVISION' => 'En Revisión',
         'EN_ATENCION' => 'En Atención',
         'CRITICO', 'CRÍTICO' => 'Crítico',
+        'ALTO' => 'Alto',
+        'MEDIO' => 'Medio',
+        'BAJO' => 'Bajo',
         'ALERTA' => 'Alerta',
         'ERROR' => 'Error',
         'FALLECIDO' => 'Fallecido',
@@ -52,11 +55,11 @@
                 => 'rm-badge-primary',
             'ACTIVO', 'ACTIVA', 'ESTABLE', 'VIGENTE', 'DISPONIBLE', 'EXITO', 'RESUELTA', 'RESUELTO', 'ADMINISTRADO', 'ADMINISTRADA'
                 => 'rm-badge-success',
-            'VIGILANCIA', 'PENDIENTE', 'SUSPENDIDO', 'SUSPENDIDA', 'EN_REVISION', 'ABIERTA', 'ABIERTO'
+            'VIGILANCIA', 'PENDIENTE', 'SUSPENDIDO', 'SUSPENDIDA', 'EN_REVISION', 'ABIERTA', 'ABIERTO', 'MEDIO'
                 => 'rm-badge-warning',
             'CRITICO', 'CRÍTICO', 'ALTO', 'ALERTA', 'ERROR', 'FALLECIDO', 'RETIRADO'
                 => 'rm-badge-danger',
-            'EN_ATENCION', 'TRASLADADO', 'SEGUIMIENTO_ESPECIAL', 'INFORMATIVO', 'PRESCRITO', 'PROGRAMADO'
+            'EN_ATENCION', 'TRASLADADO', 'SEGUIMIENTO_ESPECIAL', 'INFORMATIVO', 'PRESCRITO', 'PROGRAMADO', 'BAJO'
                 => 'rm-badge-info',
             default
                 => 'rm-badge-neutral',

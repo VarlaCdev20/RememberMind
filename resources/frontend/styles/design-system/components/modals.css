@@ -63,6 +63,23 @@
     box-sizing: border-box;
 }
 
+.rm-modal-panel {
+    isolation: isolate;
+}
+
+.rm-modal-panel::before {
+    content: '';
+    position: absolute;
+    z-index: -1;
+    width: 220px;
+    height: 220px;
+    top: -150px;
+    right: -100px;
+    border-radius: 9999px;
+    background: radial-gradient(circle, color-mix(in srgb, var(--rm-action-primary) 12%, transparent), transparent 70%);
+    pointer-events: none;
+}
+
 @media (max-height: 700px) {
     .rm-modal {
         max-height: calc(100vh - 20px);

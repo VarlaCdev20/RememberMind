@@ -522,7 +522,7 @@
                 }
 
             @endif
-        " class="
+        " data-auth-scene class="
             relative
             min-h-screen
             overflow-hidden
@@ -557,7 +557,9 @@
         {{-- ================================================================
         DECORACIÓN
         ================================================================= --}}
-        <div class="
+        <div data-auth-layer="-0.7" class="
+                auth-parallax-layer
+                auth-ambient-orb
                 pointer-events-none
                 absolute
                 left-[-14rem]
@@ -569,7 +571,9 @@
                 blur-[110px]
             "></div>
 
-        <div class="
+        <div data-auth-layer="0.55" class="
+                auth-parallax-layer
+                auth-ambient-orb
                 pointer-events-none
                 absolute
                 right-[-16rem]
@@ -581,7 +585,9 @@
                 blur-[120px]
             "></div>
 
-        <div class="
+        <div data-auth-layer="-0.35" class="
+                auth-parallax-layer
+                auth-ambient-orb
                 pointer-events-none
                 absolute
                 right-[24%]
@@ -734,7 +740,8 @@
                 sm:py-8
             ">
 
-            <section class="
+            <section data-auth-card class="
+                    auth-login-card
                     relative
                     grid
                     w-full
@@ -803,7 +810,8 @@
 
 
                     {{-- Marca --}}
-                    <div class="
+                    <div data-auth-layer="0.18" class="
+                            auth-parallax-layer
                             relative
                             z-10
                             flex
@@ -817,7 +825,7 @@
     )
                             }}" alt="
                                 Centro Geriátrico
-                                Jardín de los Recuerdos
+                                Los Almendros
                             " class="
                                 h-12
                                 w-auto
@@ -837,7 +845,7 @@
                                 ">
                                 CENTRO GERIÁTRICO
                                 <br>
-                                JARDÍN DE LOS RECUERDOS
+                                LOS ALMENDROS
                             </h1>
 
 
@@ -858,7 +866,8 @@
 
 
                     {{-- Presentación --}}
-                    <div class="
+                    <div data-auth-layer="0.12" class="
+                            auth-parallax-layer
                             relative
                             z-10
                             mt-10
@@ -930,7 +939,8 @@
 
 
                     {{-- Cards --}}
-                    <div class="
+                    <div data-auth-layer="0.08" class="
+                            auth-parallax-layer
                             relative
                             z-10
                             mt-8

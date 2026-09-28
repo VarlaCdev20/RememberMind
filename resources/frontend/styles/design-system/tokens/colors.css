@@ -1,6 +1,6 @@
 /* ============================================================
    REMEMBERMIND DESIGN SYSTEM — TOKENS SEMÁNTICOS
-   Jerarquía: café-taupe/capuchino/greige + eucalipto primary
+   Jerarquía: arena/café grisáceo + menta clínica + azul sereno
    ============================================================ */
 
 :root {
@@ -9,55 +9,56 @@
       1. FONDOS ESTRUCTURALES — Jerarquía descendente
       sidebar (#AE9C8F) → bg-app → surface-soft → surface → raised
       ============================================================ */
-   --rm-bg-app: #CFC5BA;           /* app background neutral cálido */
-   --rm-bg-shell: #C6B8AA;         /* sidebar neutral estructurado */
+   --rm-bg-app: #CFC5BA;           /* taupe cálido del landing */
+   --rm-bg-shell: #C9C2BB;         /* café grisáceo estructurado */
    --rm-bg-layout: var(--rm-bg-app);
 
    /* Topbar */
-   --rm-topbar-bg: #D2C6BC;        /* surface-muted — topbar */
-   --rm-topbar-search-bg: #DDD1C6; /* input-bg — search */
+   --rm-topbar-bg: #D2C6BC;        /* neutro cálido — topbar */
+   --rm-topbar-search-bg: #DDD4CC; /* pergamino grisáceo — search */
 
    /* ============================================================
       2. SUPERFICIES — Escala con ΔL ≈ 7-8 entre niveles
       ============================================================ */
-   --rm-surface: #E5DDD5;          /* card/panel neutral */
-   --rm-surface-soft: #D9CDC2;     /* subpanel / filter bar */
-   --rm-surface-muted: #D2C6BC;    /* wrappers intermedios */
-   --rm-surface-raised: #EEE8E2;   /* modales y superficies elevadas */
+   --rm-surface: #E5DDD5;          /* card/panel del landing */
+   --rm-surface-soft: #D9CDC2;     /* subpanel cálido */
+   --rm-surface-muted: #D2C6BC;    /* wrapper gris café */
+   --rm-surface-raised: #EEE8E2;   /* elevado, nunca blanco */
 
    --rm-surface-alt: var(--rm-surface-soft);
-   --rm-surface-strong: #C6B8AA;   /* capuchino medio */
+   --rm-surface-strong: #AAA09A;   /* arcilla grisácea del landing */
    --rm-surface-beige: var(--rm-surface);
 
    /* ============================================================
       3. TEXTO — Contraste real entre niveles
       ============================================================ */
-   --rm-text-primary: #302925;     /* café profundo — títulos */
-   --rm-text-title: #302925;
-   --rm-text-body: #4C403A;        /* café medio — párrafos */
-   --rm-text-secondary: #66584F;   /* taupe texto — subtítulos */
-   --rm-text-muted: #81736A;       /* taupe suave — metadata */
-   --rm-text-soft: #8A786E;        /* L≈50 — hints */
-   --rm-text-on-primary: #F7F4F1;  /* L≈96 — sobre eucalipto */
-   --rm-text-inverse: #FFFFFF;
+   --rm-text-primary: #48423E;     /* tinta cálida del landing */
+   --rm-text-title: #48423E;
+   --rm-text-body: #5D5752;        /* café grisáceo — párrafos */
+   --rm-text-secondary: #716A65;   /* subtítulos */
+   --rm-text-muted: #716A65;       /* metadata con contraste AA */
+   --rm-text-soft: #7A736E;
+   --rm-text-on-primary: #34453A;
+   --rm-text-inverse: #F4EEE8;
 
    /* ============================================================
       4. BORDES — Sutiles, apoyo de sombra
       ============================================================ */
-   --rm-border: #A8998E;
-   --rm-border-soft: #C2B6AC;
-   --rm-border-hover: #75665C;
-   --rm-border-strong: #8D7D72;
+   --rm-border: #B9AFA7;
+   --rm-border-soft: #D0C6BE;
+   --rm-border-hover: #8D837C;
+   --rm-border-strong: #A49A92;
 
    --rm-divider: rgba(47, 40, 36, .10);
 
    /* ============================================================
       5. ACCIÓN PRIMARY — Eucalipto
       ============================================================ */
-   --rm-action-primary: #8FA17F;
-   --rm-action-primary-hover: #758A69;
-   --rm-action-primary-active: #65775B;
-   --rm-action-primary-soft: #DCE5D7;
+   --rm-action-primary: #A9C1AA;
+   --rm-action-primary-hover: #9AB69D;
+   --rm-action-primary-active: #88A68C;
+   --rm-action-primary-ink: #536B5A;
+   --rm-action-primary-soft: #E2EBE3;
 
    --rm-primary: var(--rm-action-primary);
    --rm-primary-hover: var(--rm-action-primary-hover);
@@ -73,17 +74,17 @@
    /* ============================================================
       6. FOCUS & SELECTED
       ============================================================ */
-   --rm-focus: #7F8F73;
-   --rm-focus-ring: 0 0 0 3px rgba(119, 134, 109, .22);
+   --rm-focus: #527DAA;
+   --rm-focus-ring: 0 0 0 3px rgba(82, 125, 170, .28);
    --rm-disabled-opacity: 0.55;
 
-   --rm-selected-bg: #8FA17F;
-   --rm-selected-hover: #758A69;
-   --rm-selected-text: #F7F4F1;
+   --rm-selected-bg: #A9C1AA;
+   --rm-selected-hover: #9AB69D;
+   --rm-selected-text: #34453A;
    --rm-selected-text-soft: var(--rm-text-primary);
-   --rm-selected-icon: #F7F4F1;
-   --rm-selected-border: #65775B;
-   --rm-selected-soft: #DCE5D7;
+   --rm-selected-icon: #34453A;
+   --rm-selected-border: #88A68C;
+   --rm-selected-soft: #E2EBE3;
 
    /* ============================================================
       7. SIDEBAR — Taupe/capuchino
@@ -94,11 +95,11 @@
    --rm-nav-text-hover: #2F2824;
    --rm-nav-border: var(--rm-border-soft);
 
-   --rm-nav-selected: #8FA17F;
-   --rm-nav-selected-hover: #758A69;
-   --rm-nav-selected-text: #F7F4F1;
-   --rm-nav-selected-icon: #F7F4F1;
-   --rm-nav-selected-border: #65775B;
+   --rm-nav-selected: #A9C1AA;
+   --rm-nav-selected-hover: #9AB69D;
+   --rm-nav-selected-text: #34453A;
+   --rm-nav-selected-icon: #34453A;
+   --rm-nav-selected-border: #88A68C;
 
    /* ============================================================
       8. TOPBAR
@@ -110,10 +111,10 @@
    /* ============================================================
       9. BOTONES
       ============================================================ */
-   --rm-button-primary-bg: #8FA17F;
-   --rm-button-primary-text: #F7F4F1;
-   --rm-button-primary-hover: #758A69;
-   --rm-button-primary-active: #65775B;
+   --rm-button-primary-bg: #A9C1AA;
+   --rm-button-primary-text: #34453A;
+   --rm-button-primary-hover: #9AB69D;
+   --rm-button-primary-active: #88A68C;
 
    --rm-button-secondary-bg: var(--rm-surface-raised);
    --rm-button-secondary-text: #3B312C;
@@ -126,18 +127,18 @@
       10. INPUTS
       ============================================================ */
    --rm-input-bg: var(--rm-earth-150); /* #DDD1C6 primitive dedicada — no autorreferencia */
-   --rm-input-border: #A8998E;     /* border directo para inputs */
+   --rm-input-border: #B2A397;     /* border directo para inputs */
    --rm-input-text: #3B312C;
-   --rm-input-placeholder: #81736A;
-   --rm-input-focus-border: #758A69;
-   --rm-input-focus-ring: rgba(143, 161, 127, .18); /* focus ring sutil */
+   --rm-input-placeholder: #665C55;
+   --rm-input-focus-border: #527DAA;
+   --rm-input-focus-ring: rgba(82, 125, 170, .20); /* foco azul reconocible */
 
    /* ============================================================
       11. CARDS
       ============================================================ */
    --rm-card-bg: var(--rm-surface);
    --rm-card-border: rgba(76, 64, 58, .15);
-   --rm-card-selected-bg: #DCE5D7;
+   --rm-card-selected-bg: #E2EBE3;
 
    /* ============================================================
       12. FILTROS
@@ -153,7 +154,7 @@
    --rm-table-header-bg: var(--rm-surface-soft);
    --rm-table-row-bg: var(--rm-surface);
    --rm-table-row-hover: var(--rm-surface-soft);
-   --rm-table-row-selected: #D4DDD0;
+   --rm-table-row-selected: #E2EBE3;
    --rm-table-border: var(--rm-border-soft);
    --rm-table-text: #3B312C;
    --rm-table-metadata: #7A695D;
@@ -204,10 +205,10 @@
    /* ============================================================
       17. ESTADOS SEMÁNTICOS (WCAG AA)
       ============================================================ */
-   --rm-danger: #B94E40;
-   --rm-danger-hover: #A03D30;
+   --rm-danger: #98594F;
+   --rm-danger-hover: #7F4942;
    --rm-danger-strong: var(--rm-coral-700);
-   --rm-danger-soft: #EDD0CB;
+   --rm-danger-soft: #E7C6BD;
    --rm-danger-action: var(--rm-danger);
    --rm-danger-action-hover: var(--rm-danger-hover);
 
@@ -219,25 +220,25 @@
    --rm-warning-strong: var(--rm-copper-700);
    --rm-warning-soft: #EBD8C8;
 
-   --rm-status-stable: #6F8A68;
-   --rm-status-stable-soft: #DCE7D3;
+   --rm-status-stable: #536B5A;
+   --rm-status-stable-soft: #E2EBE3;
 
    --rm-status-attention: var(--rm-info);
-   --rm-status-attention-soft: #CCD9E1;
+   --rm-status-attention-soft: #DCE8F7;
 
-   --rm-success: #64805F;
-   --rm-success-hover: #50694C;
-   --rm-success-soft: #DDE8DA;
-   --rm-success-strong: #3F573C;
+   --rm-success: #536B5A;
+   --rm-success-hover: #465B4C;
+   --rm-success-soft: #E2EBE3;
+   --rm-success-strong: #34453A;
    --rm-success-action: var(--rm-success);
    --rm-success-action-hover: var(--rm-success-hover);
 
-   --rm-info: #577C93;
-   --rm-info-secondary: #6C85A0;
-   --rm-info-hover: #446479;
+   --rm-info: #355D86;
+   --rm-info-secondary: #496F9A;
+   --rm-info-hover: #294C70;
    --rm-info-strong: var(--rm-blue-700);
-   --rm-info-soft: #D8E4EB;
-   --rm-info-secondary-soft: #D6E0E8;
+   --rm-info-soft: #DCE8F7;
+   --rm-info-secondary-soft: #E7EFF9;
    --rm-info-action: var(--rm-info);
    --rm-info-action-hover: var(--rm-info-hover);
 
@@ -424,198 +425,207 @@
    /* ============================================================
       1. FONDOS ESTRUCTURALES
       ============================================================ */
-   --rm-bg-app: #1F1B19;
-   --rm-bg-shell: #29231F;
-   --rm-bg-layout: #1F1B19;
+   --rm-bg-app: #07141C;
+   --rm-bg-shell: #0A1821;
+   --rm-bg-layout: #081720;
 
-   --rm-topbar-bg: #28221F;
-   --rm-topbar-search-bg: #39312D;
-   --rm-topbar-border: #443A34;
-   --rm-topbar-text: #F3ECE6;
+   --rm-topbar-bg: #0C1B24;
+   --rm-topbar-search-bg: #10232D;
+   --rm-topbar-border: #203844;
+   --rm-topbar-text: #EDF5F7;
 
    /* ============================================================
       2. SUPERFICIES
       ============================================================ */
-   --rm-surface: #302925;
-   --rm-surface-soft: #39312D;
-   --rm-surface-muted: #26211E;
-   --rm-surface-raised: #403732;
+   --rm-surface: #10212B;
+   --rm-surface-soft: #142832;
+   --rm-surface-muted: #0D1C25;
+   --rm-surface-raised: #192E39;
 
    --rm-surface-alt: var(--rm-surface-soft);
-   --rm-surface-strong: #1C1815;
+   --rm-surface-strong: #061117;
    --rm-surface-beige: var(--rm-surface);
 
    /* ============================================================
       3. TEXTO — Café cálido, nunca blanco puro
       ============================================================ */
-   --rm-text-primary: #F3ECE6;
-   --rm-text-title: #F3ECE6;
-   --rm-text-body: #E1D6CE;
-   --rm-text-secondary: #C5B8AF;
-   --rm-text-muted: #A89A90;
-   --rm-text-soft: #8F8177;
-   --rm-text-on-primary: #2F2824;
-   --rm-text-inverse: #F3ECE6;
+   --rm-text-primary: #EDF5F7;
+   --rm-text-title: #F3F8FA;
+   --rm-text-body: #C9D6DB;
+   --rm-text-secondary: #A8BAC2;
+   --rm-text-muted: #7F959F;
+   --rm-text-soft: #6D828C;
+   --rm-text-on-primary: #07141C;
+   --rm-text-inverse: #F3F8FA;
 
    /* ============================================================
       4. BORDES
       ============================================================ */
-   --rm-border: #554941;
-   --rm-border-soft: #443A34;
-   --rm-border-hover: #706157;
-   --rm-border-strong: #8A786E;
+   --rm-border: #29424E;
+   --rm-border-soft: #203844;
+   --rm-border-hover: #3D6070;
+   --rm-border-strong: #527483;
 
-   --rm-divider: rgba(235, 225, 216, .10);
+   --rm-divider: rgba(179, 212, 224, .11);
 
    /* ============================================================
-      5. ACCIÓN PRIMARY — Eucalipto (igual institucional)
+      5. ACCIÓN PRIMARY — Menta clínica luminosa en modo oscuro
       ============================================================ */
-   --rm-action-primary: #91A083;
-   --rm-action-primary-hover: #A3B095;
-   --rm-action-primary-active: #77866D;
-   --rm-action-primary-soft: rgba(145, 160, 131, .22);
+   --rm-action-primary: #A9C792;
+   --rm-action-primary-hover: #BEDAA7;
+   --rm-action-primary-active: #8EAF78;
+   --rm-action-primary-ink: #CDE5B9;
+   --rm-action-primary-soft: rgba(169, 199, 146, .14);
 
    --rm-primary: var(--rm-action-primary);
    --rm-primary-hover: var(--rm-action-primary-hover);
    --rm-primary-active: var(--rm-action-primary-active);
    --rm-primary-soft: var(--rm-action-primary-soft);
 
-   --rm-accent: var(--rm-action-primary);
-   --rm-accent-hover: var(--rm-action-primary-hover);
-   --rm-accent-soft: var(--rm-action-primary-soft);
-   --rm-accent-action: var(--rm-action-primary);
-   --rm-accent-action-hover: var(--rm-action-primary-hover);
+   --rm-accent: #F28A32;
+   --rm-accent-hover: #FFA34F;
+   --rm-accent-soft: rgba(242, 138, 50, .16);
+   --rm-accent-action: #F28A32;
+   --rm-accent-action-hover: #FFA34F;
 
    /* ============================================================
       6. FOCUS & SELECTED
       ============================================================ */
-   --rm-focus: #A3B095;
-   --rm-focus-ring: 0 0 0 3px rgba(145, 160, 131, .30);
+   --rm-focus: #35BDF2;
+   --rm-focus-ring: 0 0 0 3px rgba(53, 189, 242, .28);
    --rm-disabled-opacity: 0.45;
 
    /* Selected: café oscuro sobre eucalipto (fondo dark) */
-   --rm-selected-bg: #91A083;
-   --rm-selected-hover: #A3B095;
-   --rm-selected-text: #2F2824;
-   --rm-selected-text-soft: #2F2824;
-   --rm-selected-icon: #2F2824;
-   --rm-selected-border: #65745D;
-   --rm-selected-soft: rgba(145, 160, 131, .22);
+   --rm-selected-bg: #17271F;
+   --rm-selected-hover: #203429;
+   --rm-selected-text: #D2E8B8;
+   --rm-selected-text-soft: #C4DDA9;
+   --rm-selected-icon: #B9D590;
+   --rm-selected-border: #7FA45E;
+   --rm-selected-soft: rgba(146, 181, 103, .13);
 
    /* ============================================================
       7. SIDEBAR DARK
       ============================================================ */
    --rm-nav-bg: transparent;
-   --rm-nav-text: #DED3CB;
-   --rm-nav-hover: #39312D;
-   --rm-nav-text-hover: #FFFFFF;
-   --rm-nav-border: #443A34;
+   --rm-nav-text: #AFC0C7;
+   --rm-nav-hover: #122630;
+   --rm-nav-text-hover: #F0F7F9;
+   --rm-nav-border: #1E3540;
 
-   --rm-nav-selected: #91A083;
-   --rm-nav-selected-hover: #A3B095;
-   --rm-nav-selected-text: #2F2824;
-   --rm-nav-selected-icon: #2F2824;
-   --rm-nav-selected-border: #65745D;
+   --rm-nav-selected: #A9C792;
+   --rm-nav-selected-hover: #BEDAA7;
+   --rm-nav-selected-text: #D8EBBF;
+   --rm-nav-selected-icon: #B9D590;
+   --rm-nav-selected-border: #7FA45E;
 
    /* ============================================================
       8. BOTONES DARK
       ============================================================ */
-   --rm-button-primary-bg: #91A083;
-   --rm-button-primary-text: #2F2824;
-   --rm-button-primary-hover: #A3B095;
-   --rm-button-primary-active: #77866D;
+   --rm-button-primary-bg: #A9C792;
+   --rm-button-primary-text: #07141C;
+   --rm-button-primary-hover: #BEDAA7;
+   --rm-button-primary-active: #8EAF78;
 
-   --rm-button-secondary-bg: #403732;
-   --rm-button-secondary-text: #E1D6CE;
-   --rm-button-secondary-border: #554941;
-   --rm-button-secondary-hover-bg: #39312D;
+   --rm-button-secondary-bg: #172A34;
+   --rm-button-secondary-text: #D5E1E5;
+   --rm-button-secondary-border: #29424E;
+   --rm-button-secondary-hover-bg: #1D3540;
 
-   --rm-button-ghost-text: #C5B8AF;
+   --rm-button-ghost-text: #A8BAC2;
 
    /* ============================================================
       9. INPUTS DARK
       ============================================================ */
-   --rm-input-bg: #39312D;
-   --rm-input-border: #554941;
-   --rm-input-text: #F3ECE6;
-   --rm-input-placeholder: #A89A90;
-   --rm-input-focus-border: #A3B095;
-   --rm-input-focus-ring: rgba(145, 160, 131, .30);
+   --rm-input-bg: #0F2029;
+   --rm-input-border: #29424E;
+   --rm-input-text: #EDF5F7;
+   --rm-input-placeholder: #718892;
+   --rm-input-focus-border: #35BDF2;
+   --rm-input-focus-ring: rgba(53, 189, 242, .22);
 
    /* ============================================================
       10. CARDS DARK
       ============================================================ */
-   --rm-card-bg: #302925;
-   --rm-card-border: rgba(235, 225, 216, .10);
-   --rm-card-selected-bg: rgba(145, 160, 131, .22);
+   --rm-card-bg: #10212B;
+   --rm-card-border: rgba(130, 178, 196, .15);
+   --rm-card-selected-bg: rgba(169, 199, 146, .13);
 
    /* ============================================================
       11. FILTROS DARK
       ============================================================ */
-   --rm-filter-bar-bg: #39312D;
-   --rm-chip-active-bg: rgba(145, 160, 131, .22);
-   --rm-chip-active-text: #A3B095;
+   --rm-filter-bar-bg: #0D1C25;
+   --rm-chip-active-bg: rgba(53, 189, 242, .13);
+   --rm-chip-active-text: #8DDCFA;
 
    /* ============================================================
       12. TABLAS DARK
       ============================================================ */
-   --rm-table-container-bg: #302925;
-   --rm-table-header-bg: #39312D;
-   --rm-table-row-bg: #302925;
-   --rm-table-row-hover: #39312D;
-   --rm-table-row-selected: rgba(145, 160, 131, .18);
-   --rm-table-border: #443A34;
-   --rm-table-text: #E1D6CE;
-   --rm-table-metadata: #A89A90;
+   --rm-table-container-bg: #0E1E27;
+   --rm-table-header-bg: #142832;
+   --rm-table-row-bg: #10212B;
+   --rm-table-row-hover: #162D38;
+   --rm-table-row-selected: rgba(53, 189, 242, .10);
+   --rm-table-border: #1E3540;
+   --rm-table-text: #D7E3E7;
+   --rm-table-metadata: #8096A0;
 
    /* ============================================================
       13. MODAL DARK
       ============================================================ */
-   --rm-modal-bg: #302925;
-   --rm-modal-border: #554941;
-   --rm-modal-overlay: rgba(0, 0, 0, .68);
+   --rm-modal-bg: #10212B;
+   --rm-modal-border: #29424E;
+   --rm-modal-overlay: rgba(2, 9, 13, .78);
 
    /* ============================================================
       14. TABS DARK
       ============================================================ */
-   --rm-tab-text-default: #C5B8AF;
-   --rm-tab-text-selected: #A3B095;
-   --rm-tab-underline-selected: #91A083;
-   --rm-tab-soft-selected-bg: rgba(145, 160, 131, .18);
+   --rm-tab-text-default: #98ACB5;
+   --rm-tab-text-selected: #8DDCFA;
+   --rm-tab-underline-selected: #35BDF2;
+   --rm-tab-soft-selected-bg: rgba(53, 189, 242, .12);
 
    /* ============================================================
       15. ESTADOS SEMÁNTICOS DARK — mantener colores clínicos
       ============================================================ */
-   --rm-danger-soft: rgba(179, 72, 57, .20);
-   --rm-warning-soft: rgba(165, 107, 66, .20);
-   --rm-success-soft: rgba(95, 125, 91, .22);
-   --rm-info-soft: rgba(76, 113, 137, .22);
+   --rm-danger: #FF4D67;
+   --rm-danger-hover: #FF6B80;
+   --rm-danger-soft: rgba(255, 77, 103, .15);
+   --rm-warning: #F5B72E;
+   --rm-warning-hover: #FFD05A;
+   --rm-warning-soft: rgba(245, 183, 46, .14);
+   --rm-success: #20C997;
+   --rm-success-hover: #43D9AC;
+   --rm-success-soft: rgba(32, 201, 151, .14);
+   --rm-info: #35BDF2;
+   --rm-info-hover: #63D0F7;
+   --rm-info-soft: rgba(53, 189, 242, .14);
 
-   --rm-clinical: #6B91AF;
-   --rm-clinical-strong: #8DB3D1;
-   --rm-clinical-soft: rgba(79, 115, 144, .25);
-   --rm-cyan: #4EA3AC;
-   --rm-cyan-soft: rgba(61, 139, 147, .22);
-   --rm-violet: #A98EBA;
-   --rm-violet-soft: rgba(146, 118, 162, .22);
+   --rm-clinical: #4EA8FF;
+   --rm-clinical-strong: #79BEFF;
+   --rm-clinical-soft: rgba(78, 168, 255, .16);
+   --rm-cyan: #2CC7D3;
+   --rm-cyan-soft: rgba(44, 199, 211, .15);
+   --rm-violet: #A78BFA;
+   --rm-violet-soft: rgba(167, 139, 250, .16);
 
 
    /* ============================================================
       16. GRÁFICOS DARK — solo grid/labels/tooltip
       ============================================================ */
-   --rm-chart-grid: rgba(243, 236, 230, .10);
-   --rm-chart-label: #C5B8AF;
-   --rm-chart-tooltip-bg: #403732;
+   --rm-chart-grid: rgba(111, 157, 175, .13);
+   --rm-chart-label: #9DB2BB;
+   --rm-chart-tooltip-bg: #172C37;
 
    /* ============================================================
       17. SOMBRAS DARK — más opacas
       ============================================================ */
    --rm-shadow-xs:
-      0 1px 2px rgba(0, 0, 0, .14);
+      0 1px 2px rgba(0, 0, 0, .24);
    --rm-shadow-sm:
-      0 2px 8px rgba(0, 0, 0, .22);
+      0 4px 12px rgba(0, 0, 0, .30);
    --rm-shadow-md:
-      0 8px 22px rgba(0, 0, 0, .32);
+      0 10px 28px rgba(0, 0, 0, .40);
    --rm-shadow-lg:
       0 16px 38px rgba(0, 0, 0, .42);
    --rm-shadow-overlay:

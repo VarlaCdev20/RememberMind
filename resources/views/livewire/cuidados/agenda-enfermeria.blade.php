@@ -1,5 +1,5 @@
 <!-- rm-filter-bar -->
-<div class="space-y-4 font-sans bg-[[var(--rm-surface)] dark:bg-[[var(--rm-surface-soft)] p-3 sm:p-5 rounded-2xl">
+<div class="space-y-4 font-sans bg-[var(--rm-surface)] dark:bg-[var(--rm-surface-soft)] p-3 sm:p-5 rounded-2xl">
     {{-- ==================================================
          1. CABECERA INSTITUCIONAL Y NAVEGACIÓN DE TURNO
          ================================================== --}}
@@ -37,12 +37,12 @@
             @if(!$esSuperAdmin && $turno && !$recepcion)
                 <button type="button" 
                         wire:click="recibirTurno" 
-                        class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-[var(--rm-action-primary)] hover:bg-[[var(--rm-success)] text-white shadow-2xs transition cursor-pointer">
+                        class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-[var(--rm-action-primary)] hover:bg-[var(--rm-success)] text-white shadow-2xs transition cursor-pointer">
                     <i class="ph ph-handshake text-sm"></i>
                     <span>Recibir turno</span>
                 </button>
             @elseif($recepcion)
-                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold bg-[[var(--rm-success-soft)] dark:bg-[var(--rm-action-primary-soft)] text-[[var(--rm-success)] dark:text-[[var(--rm-success)] border border-[[var(--rm-success-soft)] dark:border-[var(--rm-action-primary)]/40">
+                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold bg-[var(--rm-success-soft)] dark:bg-[var(--rm-action-primary-soft)] text-[var(--rm-success)] dark:text-[var(--rm-success)] border border-[var(--rm-success-soft)] dark:border-[var(--rm-action-primary)]/40">
                     <i class="ph ph-check-circle"></i>
                     <span>Recibido</span>
                 </span>
@@ -149,30 +149,30 @@
                     // Tratamiento de Ficha
                     if ($esAlerta) {
                         // Alerta activa relacionada: TODA la ficha a tratamiento rojo suave
-                        $cardClass = 'bg-[var(--rm-danger-soft)] dark:bg-[[var(--rm-danger)] border-l-4 border-l-[var(--rm-danger)] border-y border-r border-[var(--rm-warning-soft)] dark:border-[[var(--rm-danger)] shadow-xs';
+                        $cardClass = 'bg-[var(--rm-danger-soft)] dark:bg-[var(--rm-danger)] border-l-4 border-l-[var(--rm-danger)] border-y border-r border-[var(--rm-warning-soft)] dark:border-[var(--rm-danger)] shadow-xs';
                         $badgeEstado = 'bg-[var(--rm-danger-soft)] dark:bg-[var(--rm-danger-soft)] text-[var(--rm-danger)] dark:text-[var(--rm-warning-soft)] border border-[var(--rm-warning-soft)]';
                     } elseif ($esPrioridadAlta) {
                         // Prioridad alta sin alerta: destacar en terracota, no rojo completo
                         $cardClass = 'bg-[var(--rm-surface)] dark:bg-[var(--rm-surface)] border-l-4 border-l-[var(--rm-warning)] border border-[var(--rm-border)] dark:border-[var(--rm-border)] shadow-2xs';
                         $badgeEstado = match($item['estado']) {
                             'VENCIDA' => 'bg-[var(--rm-danger-soft)] text-[var(--rm-danger)] border border-[var(--rm-warning-soft)]',
-                            'REALIZADA' => 'bg-[[var(--rm-success-soft)] text-[[var(--rm-success)] border border-[[var(--rm-success-soft)]',
+                            'REALIZADA' => 'bg-[var(--rm-success-soft)] text-[var(--rm-success)] border border-[var(--rm-success-soft)]',
                             'NO_REALIZADA' => 'bg-[var(--rm-danger-soft)] text-[var(--rm-danger)] border border-[var(--rm-warning-soft)]',
-                            default => 'bg-[[var(--rm-warning-soft)] text-[[var(--rm-warning)] border border-[[var(--rm-warning-soft)]',
+                            default => 'bg-[var(--rm-warning-soft)] text-[var(--rm-warning)] border border-[var(--rm-warning-soft)]',
                         };
                     } elseif ($esVencida) {
                         $cardClass = 'bg-[var(--rm-surface)] dark:bg-[var(--rm-surface)] border-l-4 border-l-[var(--rm-danger)] border border-[var(--rm-border)] dark:border-[var(--rm-border)] shadow-2xs';
                         $badgeEstado = 'bg-[var(--rm-danger-soft)] text-[var(--rm-danger)] border border-[var(--rm-warning-soft)]';
                     } elseif ($esRealizada) {
                         $cardClass = 'opacity-75 bg-[var(--rm-surface)]/70 dark:bg-[var(--rm-surface)]/70 border-l-4 border-l-[var(--rm-action-primary)] border border-[var(--rm-border)] dark:border-[var(--rm-border)] hover:opacity-100 transition-opacity';
-                        $badgeEstado = 'bg-[[var(--rm-success-soft)] text-[[var(--rm-success)] border border-[[var(--rm-success-soft)]';
+                        $badgeEstado = 'bg-[var(--rm-success-soft)] text-[var(--rm-success)] border border-[var(--rm-success-soft)]';
                     } elseif ($esNoRealizada) {
                         $cardClass = 'opacity-85 bg-[var(--rm-surface)] dark:bg-[var(--rm-surface)] border-l-4 border-l-[var(--rm-danger)] border border-[var(--rm-border)] dark:border-[var(--rm-border)]';
                         $badgeEstado = 'bg-[var(--rm-danger-soft)] text-[var(--rm-danger)] border border-[var(--rm-warning-soft)]';
                     } else {
                         // Pendiente
                         $cardClass = 'bg-[var(--rm-surface)] dark:bg-[var(--rm-surface)] border-l-4 border-l-[var(--rm-warning)] border border-[var(--rm-border)] dark:border-[var(--rm-border)] hover:bg-[var(--rm-surface-soft)]/40 shadow-2xs';
-                        $badgeEstado = 'bg-[[var(--rm-warning-soft)] text-[[var(--rm-warning)] border border-[[var(--rm-warning-soft)]';
+                        $badgeEstado = 'bg-[var(--rm-warning-soft)] text-[var(--rm-warning)] border border-[var(--rm-warning-soft)]';
                     }
                 @endphp
 
@@ -267,7 +267,7 @@
                                     <span>Registrar</span>
                                 </button>
                             @else
-                                <span class="text-[11px] font-semibold text-[var(--rm-action-primary)] dark:text-[[var(--rm-success)] inline-flex items-center gap-1">
+                                <span class="text-[11px] font-semibold text-[var(--rm-action-primary)] dark:text-[var(--rm-success)] inline-flex items-center gap-1">
                                     <i class="ph ph-check-circle"></i>
                                     <span>Firmada</span>
                                 </span>
@@ -367,7 +367,7 @@
 
                                     {{-- Resultado --}}
                                     <td class="px-2.5 py-2 text-center whitespace-nowrap">
-                                        <span class="inline-flex items-center px-2 py-0.5 rounded-[5px] text-[10.5px] font-[700] {{ $esOmitida ? 'bg-[var(--rm-danger-soft)] text-[var(--rm-danger)] border border-[var(--rm-warning-soft)]' : 'bg-[[var(--rm-success-soft)] text-[[var(--rm-success)] border border-[[var(--rm-success-soft)]' }}">
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded-[5px] text-[10.5px] font-[700] {{ $esOmitida ? 'bg-[var(--rm-danger-soft)] text-[var(--rm-danger)] border border-[var(--rm-warning-soft)]' : 'bg-[var(--rm-success-soft)] text-[var(--rm-success)] border border-[var(--rm-success-soft)]' }}">
                                             {{ $ej->resultado ?? ($esOmitida ? 'No realizada' : 'Realizada') }}
                                         </span>
                                     </td>
@@ -380,7 +380,7 @@
                                         @if(!empty($ej->observacion))
                                             <span class="block">{{ $ej->observacion }}</span>
                                         @elseif(empty($ej->motivo_omision))
-                                            <span class="italic text-[[var(--rm-text-muted)]">Sin observaciones registradas</span>
+                                            <span class="italic text-[var(--rm-text-muted)]">Sin observaciones registradas</span>
                                         @endif
                                     </td>
 

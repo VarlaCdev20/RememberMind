@@ -1,0 +1,103 @@
+/* ============================================================
+   REMEMBERMIND — CONTRATO GLOBAL DE DENSIDAD
+   Normaliza vistas heredadas sin alterar la landing pública.
+   ============================================================ */
+
+.rm-depth-canvas {
+    font-size: var(--rm-font-size-body);
+}
+
+.rm-depth-canvas > div {
+    width: 100%;
+    max-width: var(--rm-page-max-width);
+    margin-inline: auto;
+}
+
+.rm-depth-canvas :where(.rm-card, .rm-clinical-card, .rm-chart-card, .rm-table-wrapper, .rm-form-section) {
+    border-radius: var(--rm-radius-card);
+}
+
+.rm-depth-canvas :where(.rm-card, .rm-clinical-card, .rm-form-section):not(.rm-card-metric) {
+    min-height: 0;
+}
+
+.rm-depth-canvas :where(.rm-chart-card, .rm-chart-body.is-lg):not(.rm-ficha-detalles *) {
+    max-height: var(--rm-panel-max-height);
+}
+
+.rm-depth-canvas :where(h2, .rm-section-title) {
+    font-size: min(var(--rm-font-size-section), 20px);
+}
+
+.rm-depth-canvas :where(h3, .rm-card-title, .rm-chart-title) {
+    font-size: min(var(--rm-font-size-card-title), 15px);
+}
+
+.rm-depth-canvas :where(button, input, select):not([type="checkbox"]):not([type="radio"]):not(.rm-btn-sm):not(.rm-btn-icon-sm):not(.rm-ficha-detalles *) {
+    min-height: min(var(--rm-control-md), 40px);
+}
+
+/* Puente de densidad para utilidades antiguas todavía presentes. */
+.rm-depth-canvas [class~="text-5xl"],
+.rm-depth-canvas [class~="text-6xl"] {
+    font-size: var(--rm-font-size-page) !important;
+    line-height: var(--rm-line-height-tight) !important;
+}
+
+.rm-depth-canvas .rm-role-hero [class~="text-5xl"],
+.rm-depth-canvas .rm-role-hero [class~="text-6xl"] {
+    font-size: var(--rm-font-size-dashboard) !important;
+}
+
+.rm-depth-canvas [class~="p-10"] {
+    padding: var(--rm-card-padding) !important;
+}
+
+.rm-depth-canvas [class~="py-10"] {
+    padding-block: var(--rm-card-padding) !important;
+}
+
+.rm-depth-canvas [class~="min-h-[400px]"] {
+    min-height: 0 !important;
+}
+
+.rm-depth-canvas [class~="rounded-3xl"],
+.rm-depth-canvas [class~="rounded-[2rem]"] {
+    border-radius: var(--rm-radius-card) !important;
+}
+
+/* El sistema no usa blanco puro como superficie. */
+.rm-depth-canvas [class~="bg-white"],
+.rm-depth-canvas [class~="bg-white/80"],
+.rm-depth-canvas [class~="bg-white/90"],
+.rm-depth-canvas [class~="bg-white/95"] {
+    background-color: var(--rm-surface-raised) !important;
+}
+
+/* Verde claro para superficies; salvia profunda para texto e iconografía. */
+.rm-depth-canvas [class*="text-[var(--rm-action-primary)]"] {
+    color: var(--rm-action-primary-ink) !important;
+}
+
+@media (max-width: 639px) {
+    .rm-page-header {
+        min-height: auto;
+        padding: var(--rm-space-4);
+    }
+
+    .rm-role-hero {
+        height: var(--rm-dashboard-hero-height, 260px);
+        min-height: 240px;
+        max-height: 270px;
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .rm-role-hero__content { z-index: 2; padding: 1rem; }
+    .rm-role-hero__description,
+    .rm-role-hero__meta { display: none; }
+    .rm-role-hero__actions { flex-wrap: nowrap; overflow-x: auto; padding-bottom: .2rem; scrollbar-width: none; }
+    .rm-role-hero__actions::-webkit-scrollbar { display: none; }
+    .rm-role-hero__actions > * { flex: 0 0 auto; }
+    .rm-role-hero__visual { position: absolute; inset: 0 0 0 52%; z-index: 0; min-height: 100%; opacity: .34; }
+    .rm-role-hero__quote { display: none; }
+}

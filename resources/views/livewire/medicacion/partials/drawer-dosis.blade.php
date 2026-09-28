@@ -21,7 +21,7 @@
  </div>
 
  {{-- Panel Deslizante (Ancho óptimo 390-420px) --}}
- <div class="fixed inset-y-0 right-0 flex max-w-full pl-6">
+ <div class="fixed inset-y-0 right-0 flex max-w-full pl-4 sm:inset-y-3 sm:right-3 sm:pl-8">
  <div
  x-show="$wire.drawerDosisAbierto"
  x-transition:enter="transform transition ease-out duration-250"
@@ -30,7 +30,7 @@
  x-transition:leave="transform transition ease-in duration-200"
  x-transition:leave-start="translate-x-0"
  x-transition:leave-end="translate-x-full"
- class="w-screen max-w-[410px] bg-[var(--rm-surface-soft)] border-l border-[var(--rm-border-soft)] shadow-[0_8px_30px_rgba(48,64,96,0.12)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.5)] flex flex-col justify-between transition-colors">
+ class="rm-drawer w-screen max-w-[410px] flex flex-col justify-between overflow-hidden transition-colors">
 
  {{-- Header Drawer --}}
  <div class="px-5 py-4 border-b border-[var(--rm-border-soft)] flex items-center justify-between bg-[var(--rm-surface-soft)] shrink-0">

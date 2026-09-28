@@ -1,63 +1,43 @@
-<div class="relative mx-auto max-w-7xl space-y-5 overflow-hidden rounded-3xl border border-borde/70 bg-fondo-panel p-3 text-parrafo shadow-[var(--rm-shadow-overlay)] backdrop-blur-xl sm:p-5 lg:p-6">
- <div class="pointer-events-none absolute inset-0 dash-noise opacity-[0.04]"></div>
- <div class="pointer-events-none absolute inset-x-0 top-0 h-48 bg-gradient-to-b from-[var(--rm-surface-raised)]/70 to-transparent"></div>
- <div class="pointer-events-none absolute -right-24 top-16 h-72 w-72 rounded-full bg-estado-peligroBg blur-3xl"></div>
- <div class="pointer-events-none absolute -left-24 bottom-20 h-72 w-72 rounded-full bg-estado-exitoBg blur-3xl"></div>
-
+<div class="rm-page-layout relative mx-auto max-w-7xl space-y-5 text-[var(--rm-text-primary)]">
  <div class="relative z-10 space-y-5">
  @if($seccionActiva === 'resumen')
  {{-- ENCABEZADO PRINCIPAL --}}
- <section class="overflow-hidden rounded-3xl border border-borde/80 bg-[var(--rm-surface)] shadow-[var(--rm-shadow-lg)]">
- <div class="h-1.5 w-full bg-gradient-to-r from-[var(--rm-danger)] via-[var(--rm-warning)] to-[var(--rm-action-primary)]"></div>
- <div class="p-5 sm:p-6">
- <div class="flex flex-col gap-5 xl:flex-row xl:items-start xl:justify-between">
- <div class="max-w-3xl">
- <span class="inline-flex items-center gap-2 rounded-full border border-borde-focus bg-estado-peligroBg px-3 py-1 text-[10px] font-bold uppercase tracking-[0.22em] text-boton-acento">
- <i class="ph-bold ph-heartbeat text-sm"></i>
- CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS · Área clínico asistencial
- </span>
- <h1 class="mt-3 text-2xl font-black tracking-tight text-parrafo sm:text-3xl">
- Salud y Seguimiento
- </h1>
- <p class="mt-2 max-w-2xl text-sm font-bold leading-relaxed text-parrafo/72">
- Panel institucional para revisar fichas médicas, signos vitales, valoraciones funcionales,
- medicación, administraciones y alertas preventivas de los adultos mayores.
- </p>
- <div class="mt-4 flex flex-wrap gap-2">
- @can('atenciones.crear')
- <button wire:click="cambiarSeccion('ficha')" type="button" class="inline-flex items-center justify-center gap-2 rounded-xl bg-boton-acento px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-inverso shadow-[0_10px_24px_rgba(226,125,96,0.25)] transition hover:-translate-y-0.5 hover:bg-fondo-panel active:scale-95">
- <i class="ph-bold ph-plus-circle text-sm"></i>
- Nuevo registro de salud
- </button>
- @endcan
- <button wire:click="cambiarSeccion('reportes')" type="button" class="inline-flex items-center justify-center gap-2 rounded-xl border border-borde/80 bg-fondo-panel px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-parrafo shadow-sm transition hover:bg-fondo-panel active:scale-95">
- <i class="ph-bold ph-chart-bar text-sm"></i>
- Reportes
- </button>
- </div>
- </div>
+ <x-ui.page-header
+  overline="Área clínico asistencial"
+  title="Salud y seguimiento"
+  subtitle="Revisión integral de fichas médicas, controles, valoraciones, medicación y alertas preventivas."
+  icon="ph-heartbeat"
+ >
+  @can('atenciones.crear')
+   <x-ui.action-button variant="primary" size="sm" icono="ph-plus-circle" wire:click="cambiarSeccion('ficha')">
+    Nuevo registro de salud
+   </x-ui.action-button>
+  @endcan
+  <x-ui.action-button variant="secondary" size="sm" icono="ph-chart-bar" wire:click="cambiarSeccion('reportes')">
+   Reportes
+  </x-ui.action-button>
+ </x-ui.page-header>
 
- <div class="grid w-full grid-cols-2 gap-3 sm:grid-cols-3 xl:max-w-xl">
+ <section class="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-6" aria-label="Indicadores de seguimiento clínico">
  @php
  $metricasHeader = [
- ['label' => 'Seguimientos activos', 'valor' => $stats['seguimientos_activos'] ?? 0, 'icono' => 'ph-users-three', 'color' => 'text-parrafo', 'bg' => 'bg-fondo-panel'],
- ['label' => 'Alertas pendientes', 'valor' => $stats['alertas_pendientes'] ?? 0, 'icono' => 'ph-warning-circle', 'color' => 'text-boton-acento', 'bg' => 'bg-estado-peligroBg'],
- ['label' => 'Medicaciones activas', 'valor' => $stats['medicaciones_activas'] ?? 0, 'icono' => 'ph-pill', 'color' => 'text-estado-exito', 'bg' => 'bg-estado-exitoBg'],
- ['label' => 'Controles recientes', 'valor' => $stats['signos_recientes'] ?? 0, 'icono' => 'ph-activity', 'color' => 'text-parrafo', 'bg' => 'bg-fondo-panel'],
- ['label' => 'Valoraciones registradas', 'valor' => $stats['valoraciones'] ?? 0, 'icono' => 'ph-person-simple-walk', 'color' => 'text-parrafo', 'bg' => 'bg-fondo-panel'],
- ['label' => 'Controles de hoy', 'valor' => $stats['controles_hoy'] ?? 0, 'icono' => 'ph-calendar-check', 'color' => 'text-boton-acento', 'bg' => 'bg-fondo-panel'],
+ ['label' => 'Seguimientos activos', 'valor' => $stats['seguimientos_activos'] ?? 0, 'icono' => 'ph-users-three', 'variant' => 'primary'],
+ ['label' => 'Alertas pendientes', 'valor' => $stats['alertas_pendientes'] ?? 0, 'icono' => 'ph-warning-circle', 'variant' => 'danger'],
+ ['label' => 'Medicaciones activas', 'valor' => $stats['medicaciones_activas'] ?? 0, 'icono' => 'ph-pill', 'variant' => 'success'],
+ ['label' => 'Controles recientes', 'valor' => $stats['signos_recientes'] ?? 0, 'icono' => 'ph-activity', 'variant' => 'info'],
+ ['label' => 'Valoraciones registradas', 'valor' => $stats['valoraciones'] ?? 0, 'icono' => 'ph-person-simple-walk', 'variant' => 'clinical'],
+ ['label' => 'Controles de hoy', 'valor' => $stats['controles_hoy'] ?? 0, 'icono' => 'ph-calendar-check', 'variant' => 'warning'],
  ];
  @endphp
  @foreach($metricasHeader as $metrica)
- <div class="relative overflow-hidden rounded-2xl border border-borde/55 {{ $metrica['bg'] }} p-3.5 shadow-sm backdrop-blur-md">
- <i class="ph-bold {{ $metrica['icono'] }} absolute right-3 top-3 text-2xl text-parrafo/10"></i>
- <p class="pr-7 text-[10px] font-bold uppercase leading-tight tracking-[0.12em] text-apoyo">{{ $metrica['label'] }}</p>
- <p class="mt-2 text-2xl font-black leading-none {{ $metrica['color'] }}">{{ $metrica['valor'] }}</p>
- </div>
+  <x-ui.metric-card
+   :etiqueta="$metrica['label']"
+   :valor="$metrica['valor']"
+   :icono="$metrica['icono']"
+   :variant="$metrica['variant']"
+   class="p-3.5"
+  />
  @endforeach
- </div>
- </div>
- </div>
  </section>
 
  {{-- TABS --}}
@@ -492,13 +472,13 @@
 
  {{-- MODAL LATERAL DE EXPEDIENTE INDIVIDUAL --}}
  @if($adultoSeleccionadoParaModal)
- <div class="fixed inset-0 z-[100] flex justify-end">
- <div class="absolute inset-0 bg-fondo-panel backdrop-blur-md" wire:click="cerrarExpediente"></div>
+ <div class="fixed inset-0 z-[var(--rm-z-drawer,500)] overflow-hidden font-sans" role="dialog" aria-modal="true" aria-labelledby="expediente-seguimiento-title">
+ <div class="rm-drawer-backdrop" wire:click="cerrarExpediente"></div>
 
- <aside class="salud-slide-panel relative flex h-full w-full max-w-5xl flex-col overflow-hidden border-l border-borde/70 bg-fondo-app shadow-[-22px_0_60px_rgba(47,62,92,0.28)] sm:rounded-l-[2rem]">
+ <div class="pointer-events-none fixed inset-y-0 right-0 z-[var(--rm-z-drawer,500)] flex max-w-full pl-4 sm:inset-y-3 sm:right-3 sm:pl-10">
+ <aside class="salud-slide-panel rm-drawer rm-drawer-wide pointer-events-auto relative flex h-full flex-col overflow-hidden">
  <div class="pointer-events-none absolute inset-0 dash-noise opacity-[0.035]"></div>
- <div class="pointer-events-none absolute -left-20 -top-20 h-64 w-64 rounded-full bg-estado-peligroBg blur-3xl"></div>
- <div class="relative z-10 flex items-center justify-between border-b border-borde bg-fondo-panel px-5 py-4 backdrop-blur-xl sm:px-7">
+ <div class="rm-drawer-header relative z-10 flex-row items-center justify-between px-5 py-4 sm:px-7">
  <div class="flex min-w-0 items-center gap-4">
  <div class="h-12 w-12 shrink-0 overflow-hidden rounded-2xl border-[3px] border-borde bg-boton-principal shadow-sm">
  @if($adultoSeleccionadoParaModal->foto)
@@ -514,18 +494,18 @@
  <i class="ph-bold {{ $contexto['icono'] }}"></i>
  {{ $contexto['titulo'] }}
  </span>
- <h2 class="mt-1 truncate text-lg font-extrabold text-parrafo">
+ <h2 id="expediente-seguimiento-title" class="mt-1 truncate text-lg font-extrabold text-[var(--rm-text-primary)]">
  {{ $adultoSeleccionadoParaModal->nombres }} {{ $adultoSeleccionadoParaModal->ap_paterno }} {{ $adultoSeleccionadoParaModal->ap_materno }}
  </h2>
  <p class="text-[10px] font-bold uppercase tracking-wider text-parrafo/45">{{ $adultoSeleccionadoParaModal->ci ? 'CI '.$adultoSeleccionadoParaModal->ci : 'Documento no registrado' }}</p>
  </div>
  </div>
- <button wire:click="cerrarExpediente" type="button" class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-borde bg-fondo-panel text-parrafo shadow-sm transition hover:bg-boton-acento hover:text-inverso active:scale-95">
+ <button wire:click="cerrarExpediente" type="button" class="rm-btn-icon rm-btn-icon-sm shrink-0" aria-label="Cerrar expediente">
  <i class="ph-bold ph-x text-lg"></i>
  </button>
  </div>
 
- <div class="relative z-10 flex-1 overflow-y-auto bg-fondo-panel p-4 sm:p-6">
+ <div class="rm-drawer-body relative z-10 flex-1 overflow-y-auto p-4 sm:p-6">
  @if($seccionActiva === 'valoracion')
  @livewire('valoraciones.salud-valoracion-panel', ['adulto' => $adultoSeleccionadoParaModal], key('val-'.$adultoSeleccionadoParaModal->cod_residente))
  @elseif($seccionActiva === 'signos')
@@ -537,6 +517,7 @@
  @endif
  </div>
  </aside>
+ </div>
  </div>
  @endif
 </div>

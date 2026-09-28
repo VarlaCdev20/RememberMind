@@ -1,31 +1,26 @@
 <x-sistema-layout>
+    @if(($infoRol['es_admin'] ?? false) === true)
+        <div class="rm-dashboard-composition">
+            <x-ui.encabezado-dashboard :saludo="$saludo ?? []" />
+            <x-ui.kpis-dashboard :kpis="$kpisInstitucionales ?? []" />
 
-    {{-- Zona 1: Encabezado personalizado y estado institucional --}}
-    <x-ui.encabezado-dashboard :saludo="$saludo ?? []" />
+            <div class="grid gap-4 2xl:grid-cols-[1.15fr_.85fr]">
+                <x-ui.seccion-graficos-dashboard />
+                <x-ui.panel-salud-dashboard :resumen="$resumenSalud ?? []" />
+            </div>
 
-    {{-- Zona 2: KPIs institucionales macro --}}
-    <x-ui.kpis-dashboard :kpis="$kpisInstitucionales ?? []" />
+            <div class="grid gap-4 xl:grid-cols-3">
+                <x-ui.panel-alertas-dashboard :alertas="$alertasEstructuradas ?? []" />
+                <x-ui.panel-actividades-dashboard :actividades="$actividadesDashboard ?? []" />
+                <x-ui.panel-equipo-institucional :equipo="$equipoInstitucional ?? []" :redFamiliar="$redFamiliar ?? []" />
+            </div>
 
-    {{-- Zona 3: Centro de Mando / Hub de Módulos (Todas las Vistas como Botones) --}}
-    <x-ui.hub-modulos-dashboard />
-
-    {{-- Zona 4: Vigilancia Clínica y Alertas Prioritarias --}}
-    <div class="grid gap-4 xl:grid-cols-2">
-        <x-ui.panel-alertas-dashboard :alertas="$alertasEstructuradas ?? []" />
-        <x-ui.panel-salud-dashboard :resumen="$resumenSalud ?? []" />
-    </div>
-
-    {{-- Zona 5: Operativa Asistencial Diaria y Equipo Institucional --}}
-    <div class="grid gap-4 xl:grid-cols-[1.35fr_1fr]">
-        <x-ui.panel-actividades-dashboard :actividades="$actividadesDashboard ?? []" />
-        <x-ui.panel-equipo-institucional :equipo="$equipoInstitucional ?? []" :redFamiliar="$redFamiliar ?? []" />
-    </div>
-
-    {{-- Zona 6: Analítica y Gráficas de Tendencia --}}
-    <x-ui.seccion-graficos-dashboard />
-
-    {{-- Zona 7: Trazabilidad y Auditoría Forense Reciente --}}
-    <x-ui.tabla-bitacora-dashboard :registros="$bitacoraDashboard ?? []" />
+            <x-ui.hub-modulos-dashboard />
+            <x-ui.tabla-bitacora-dashboard :registros="$bitacoraDashboard ?? []" />
+        </div>
+    @else
+        <x-ui.role-workspace-dashboard :perfil="$perfilDashboardRol ?? []" :saludo="$saludo ?? []" />
+    @endif
 
     <script>
 const rmDatosc535f32d75d9 = @json($adultosPorEstado ?? ['labels' => [], 'data' => [], 'colores' => []]);

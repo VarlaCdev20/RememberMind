@@ -32,6 +32,7 @@
 @import './components/alerts.css';
 @import './components/charts.css';
 @import './components/empty-states.css';
+@import './components/legacy-palette-bridge.css';
 
 /* 3. PATRONES */
 @import './patterns/module-page.css';
@@ -39,3 +40,6 @@
 @import './patterns/resident-summary.css';
 @import './patterns/clinical-table.css';
 @import './patterns/clinical-detail.css';
+@import './patterns/depth-canvas.css';
+@import './patterns/system-density.css';
+@import './patterns/nursing-module.css';

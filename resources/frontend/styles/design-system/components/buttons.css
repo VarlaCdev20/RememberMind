@@ -45,26 +45,26 @@
     --rm-button-ghost-hover-bg: var(--rm-surface-soft);
 
     /* Success: Verde Cuidados */
-    --rm-button-success-bg: var(--rm-success);
+    --rm-button-success-bg: var(--rm-action-primary);
     --rm-button-success-text: var(--rm-text-on-primary);
-    --rm-button-success-hover: var(--rm-success-hover);
+    --rm-button-success-hover: var(--rm-action-primary-hover);
     --rm-button-success-border: transparent;
 
     /* Danger: Coral / Rojo Tierra */
     --rm-button-danger-bg: var(--rm-danger);
-    --rm-button-danger-text: var(--rm-text-on-primary);
+    --rm-button-danger-text: var(--rm-text-inverse);
     --rm-button-danger-hover: var(--rm-danger-hover);
     --rm-button-danger-border: transparent;
 
     /* Warning: Cobre Institucional */
     --rm-button-warning-bg: var(--rm-warning);
-    --rm-button-warning-text: var(--rm-text-on-primary);
+    --rm-button-warning-text: var(--rm-text-primary);
     --rm-button-warning-hover: var(--rm-warning-hover);
     --rm-button-warning-border: transparent;
 
     /* Info: Azul Informativo */
     --rm-button-info-bg: var(--rm-info);
-    --rm-button-info-text: var(--rm-text-on-primary);
+    --rm-button-info-text: var(--rm-text-inverse);
     --rm-button-info-hover: var(--rm-info-hover);
     --rm-button-info-border: transparent;
 
@@ -301,9 +301,41 @@
 }
 
 .rm-btn-accent {
-    background-color: var(--rm-button-primary-bg);
-    color: var(--rm-button-primary-text);
+    background-color: var(--rm-accent-action);
+    color: var(--rm-text-on-primary);
 }
 .rm-btn-accent:hover:not(:disabled) {
-    background-color: var(--rm-button-primary-hover);
+    background-color: var(--rm-accent-action-hover);
 }
+
+/* Acciones compactas de tablas clínicas: área táctil uniforme y lectura por color. */
+.rm-action-btn {
+    width: var(--rm-control-height, 40px);
+    height: var(--rm-control-height, 40px);
+    min-width: var(--rm-control-height, 40px);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--rm-border-soft);
+    border-radius: 10px;
+    background: var(--rm-surface-soft);
+    color: var(--rm-text-secondary);
+    transition: background-color .18s ease, border-color .18s ease, color .18s ease, transform .18s ease;
+}
+
+.rm-action-btn:hover:not(:disabled) {
+    transform: translateY(-1px);
+    border-color: var(--rm-border-hover);
+    background: var(--rm-surface-raised);
+    color: var(--rm-text-primary);
+}
+
+.rm-action-btn:focus-visible {
+    outline: 3px solid var(--rm-focus-ring);
+    outline-offset: 2px;
+}
+
+.rm-action-btn-atender { color: var(--rm-info); }
+.rm-action-btn-drawer { color: var(--rm-clinical); }
+.rm-action-btn-ubicacion { color: var(--rm-success); }
+.rm-action-btn-more { color: var(--rm-text-muted); }

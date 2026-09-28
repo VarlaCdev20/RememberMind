@@ -42,9 +42,9 @@
  <x-layout.navbar-sistema />
 
  {{-- Área Principal de Contenido --}}
- <main class="relative min-h-screen pb-8 pt-6 transition-all duration-300 ease-in-out"
- :class="sidebarCollapsed ? 'lg:ml-[82px]' : 'lg:ml-[280px]'">
- <div class="mx-auto max-w-[1540px] space-y-4 px-4 pb-8 sm:px-5 lg:px-6">
+ <main class="rm-depth-canvas relative min-w-0 min-h-[calc(100vh-64px)] pb-6 pt-6 transition-all duration-300 ease-in-out"
+ :class="sidebarCollapsed ? 'lg:ml-[76px]' : 'lg:ml-[248px]'">
+ <div class="mx-auto min-w-0 max-w-[1440px] space-y-6 px-4 pb-6 sm:px-6">
  {{ $slot }}
  </div>
  </main>

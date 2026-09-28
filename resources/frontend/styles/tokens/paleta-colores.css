@@ -6,8 +6,8 @@
        ============================================================ */
 
    /* Marca principal */
-   --rm-terracota: #A35A44;
-   --rm-terracota-hover: #8D4B37;
+   --rm-terracota: #C77969;
+   --rm-terracota-hover: #98594F;
    --rm-salmon: #D6AE86;
    --rm-salmon-soft: #F3CFC2;
    --rm-naranja: #D2A45E;
@@ -18,16 +18,16 @@
    /* Azul institucional */
    --rm-azul-profundo: #304060;
    --rm-azul-profundo-hover: #24324D;
-   --rm-azul-clinico: #90AFCB;
-   --rm-azul-tecnico: #5B7C9D;
+   --rm-azul-clinico: #A2C2EC;
+   --rm-azul-tecnico: #355D86;
 
    /* Verde geriátrico / salud */
-   --rm-verde-salud: #63775B;
-   --rm-verde-salud-hover: #326646;
-   --rm-verde-suave: #8DA280;
-   --rm-verde-oliva: #5F7358;
-   --rm-verde-menta: #DCE8DD;
-   --rm-fondo-salud: #DCE8DD;
+   --rm-verde-salud: #6F8B74;
+   --rm-verde-salud-hover: #536B5A;
+   --rm-verde-suave: #A9C1AA;
+   --rm-verde-oliva: #6F8B74;
+   --rm-verde-menta: #C8D8C7;
+   --rm-fondo-salud: #E2EBE3;
 
    /* Cognitivo */
    --rm-morado-cognitivo: #9B8AC7;
@@ -42,11 +42,11 @@
    --rm-neutro-700: #5B6273;
    --rm-neutro-600: #737785;
    --rm-neutro-500: #928C84;
-   --rm-neutro-400: #B8A99B;
-   --rm-neutro-300: #CDBEAF;
-   --rm-neutro-200: #DDD2C6;
-   --rm-neutro-100: #d1b090;
-   --rm-neutro-50: #edd4b7;
+   --rm-neutro-400: #AAA09A;
+   --rm-neutro-300: #C9C2BB;
+   --rm-neutro-200: #CFC5BA;
+   --rm-neutro-100: #E5DDD5;
+   --rm-neutro-50: #EEE8E2;
 
    --rm-neutro-borde-alt: #C7B8A8;
    --rm-neutro-card-alt: #EEE6DD;
@@ -78,38 +78,38 @@
    --rm-fondo-tabla: var(--rm-surface, #E5DDD5);
 
    /* Estados */
-   --rm-success-bg: var(--rm-success-soft, #DDE8DA);
-   --rm-success: #64805F;
-   --rm-success-border: #AFCBB8;
+   --rm-success-bg: var(--rm-success-soft, #E2EBE3);
+   --rm-success: #536B5A;
+   --rm-success-border: #A9C1AA;
 
    --rm-warning-bg: var(--rm-warning-soft, #EBD8C8);
    --rm-warning: #B2764C;
    --rm-warning-border: #E9C88F;
 
-   --rm-danger-bg: var(--rm-danger-soft, #EDD0CB);
-   --rm-danger: #B94E40;
-   --rm-danger-border: #E7A08E;
+   --rm-danger-bg: var(--rm-danger-soft, #E7C6BD);
+   --rm-danger: #98594F;
+   --rm-danger-border: #C77969;
 
-   --rm-info-bg: var(--rm-info-soft, #D8E4EB);
-   --rm-info: #577C93;
-   --rm-info-border: #B8CBD8;
+   --rm-info-bg: var(--rm-info-soft, #DCE8F7);
+   --rm-info: #355D86;
+   --rm-info-border: #A2C2EC;
 
    /* Botones */
-   --rm-btn-primary: #304060;
-   --rm-btn-primary-hover: #24324D;
-   --rm-btn-primary-text: #FFF8F1;
+   --rm-btn-primary: #A9C1AA;
+   --rm-btn-primary-hover: #9AB69D;
+   --rm-btn-primary-text: #34453A;
 
-   --rm-btn-accent: #A35A44;
-   --rm-btn-accent-hover: #8D4B37;
-   --rm-btn-accent-text: #FFF8F1;
+   --rm-btn-accent: #A9C1AA;
+   --rm-btn-accent-hover: #9AB69D;
+   --rm-btn-accent-text: #34453A;
 
    --rm-btn-secondary: #F0E8DE;
    --rm-btn-secondary-hover: #E0D5C9;
    --rm-btn-secondary-text: #304060;
 
-   --rm-btn-success: #3F7D5A;
-   --rm-btn-success-hover: #326646;
-   --rm-btn-success-text: #FFF8F1;
+   --rm-btn-success: #A9C1AA;
+   --rm-btn-success-hover: #9AB69D;
+   --rm-btn-success-text: #34453A;
 
    /* Bordes */
    --rm-borde-suave: rgba(91, 98, 115, 0.14);

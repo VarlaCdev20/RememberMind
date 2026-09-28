@@ -296,6 +296,9 @@ class AlertasPanel extends Component
         $this->adultoDrawerId = $codResidente;
         $this->adultoDrawer = AdultoMayor::with([
             'cama.habitacion',
+            'alergias' => fn ($q) => $q->whereIn('estado', ['ACTIVA', 'ACTIVO']),
+            'diagnosticos' => fn ($q) => $q->whereIn('estado', ['ACTIVO', 'CONFIRMADO']),
+            'planCuidadoActivo',
             'signosVitales' => fn ($q) => $q->where('estado', '!=', 'ANULADO')->latest('fecha_hora')->take(10),
         ])->find($codResidente);
 

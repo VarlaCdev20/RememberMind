@@ -1,5 +1,5 @@
 <!-- rm-filter-bar -->
-<div class="space-y-6 font-sans text-[var(--rm-clinical)] dark:text-[[var(--rm-text-primary)]" style="font-family: 'Outfit', sans-serif;">
+<div class="space-y-6 font-sans text-[var(--rm-clinical)] dark:text-[var(--rm-text-primary)]" style="font-family: 'Outfit', sans-serif;">
 
     {{-- CABECERA CLÍNICA INSTITUCIONAL --}}
     <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between rounded-2xl bg-[var(--rm-surface)] dark:bg-[var(--rm-surface)] border border-[var(--rm-border)] dark:border-[var(--rm-text-body)] p-5 sm:p-6 shadow-sm">
@@ -12,7 +12,7 @@
                     <h1 class="text-2xl font-black tracking-tight text-[var(--rm-clinical)] dark:text-[var(--rm-surface)]">
                         Incidentes
                     </h1>
-                    <p class="text-xs font-medium text-[var(--rm-text-secondary)] dark:text-[[var(--rm-text-primary)]">
+                    <p class="text-xs font-medium text-[var(--rm-text-secondary)] dark:text-[var(--rm-text-primary)]">
                         Registro y seguimiento de eventos relacionados con la atención del residente
                     </p>
                 </div>
@@ -30,7 +30,7 @@
 
     {{-- NOTIFICACIONES Y MENSAJES FLASH --}}
     @if(session()->has('mensaje'))
-        <div class="flex items-center justify-between rounded-xl bg-[var(--rm-action-primary-soft)] border border-[var(--rm-action-primary)]/40 px-4 py-3 text-xs font-bold text-[var(--rm-action-primary)] dark:text-[[var(--rm-success)]">
+        <div class="flex items-center justify-between rounded-xl bg-[var(--rm-action-primary-soft)] border border-[var(--rm-action-primary)]/40 px-4 py-3 text-xs font-bold text-[var(--rm-action-primary)] dark:text-[var(--rm-success)]">
             <div class="flex items-center gap-2">
                 <i class="ph-bold ph-check-circle text-base"></i>
                 <span>{{ session('mensaje') }}</span>
@@ -42,7 +42,7 @@
     @endif
 
     @if(session()->has('error'))
-        <div class="flex items-center justify-between rounded-xl bg-[var(--rm-danger-soft)] border border-[var(--rm-danger)]/40 px-4 py-3 text-xs font-bold text-[var(--rm-danger)] dark:text-[[var(--rm-danger)]">
+        <div class="flex items-center justify-between rounded-xl bg-[var(--rm-danger-soft)] border border-[var(--rm-danger)]/40 px-4 py-3 text-xs font-bold text-[var(--rm-danger)] dark:text-[var(--rm-danger)]">
             <div class="flex items-center gap-2">
                 <i class="ph-bold ph-warning-circle text-base"></i>
                 <span>{{ session('error') }}</span>
@@ -54,12 +54,12 @@
     @endif
 
     @if(session()->has('info'))
-        <div class="flex items-center justify-between rounded-xl bg-[var(--rm-warning-soft)] border border-[var(--rm-warning)]/40 px-4 py-3 text-xs font-bold text-[[var(--rm-warning)] dark:text-[[var(--rm-warning)]">
+        <div class="flex items-center justify-between rounded-xl bg-[var(--rm-warning-soft)] border border-[var(--rm-warning)]/40 px-4 py-3 text-xs font-bold text-[var(--rm-warning)] dark:text-[var(--rm-warning)]">
             <div class="flex items-center gap-2">
                 <i class="ph-bold ph-info text-base"></i>
                 <span>{{ session('info') }}</span>
             </div>
-            <button type="button" onclick="this.parentElement.remove()" class="text-[[var(--rm-warning)] hover:opacity-75">
+            <button type="button" onclick="this.parentElement.remove()" class="text-[var(--rm-warning)] hover:opacity-75">
                 <i class="ph-bold ph-x text-sm"></i>
             </button>
         </div>
@@ -88,7 +88,7 @@
             <div class="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-2">
                 {{-- Búsqueda textual --}}
                 <div class="lg:col-span-3 relative flex items-center">
-                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-[var(--rm-text-secondary)] dark:text-[[var(--rm-text-muted)]">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-[var(--rm-text-secondary)] dark:text-[var(--rm-text-muted)]">
                         <i class="ph-bold ph-magnifying-glass text-base"></i>
                     </span>
                     <input type="text"
@@ -122,9 +122,9 @@
                     <select wire:model.live="filtro_gravedad" class="w-full rounded-xl border border-[var(--rm-border)] dark:border-[var(--rm-border)] bg-[var(--rm-surface)] dark:bg-[var(--rm-text-primary)] py-2 px-3 text-xs font-medium text-[var(--rm-clinical)] dark:text-[var(--rm-surface-soft)] focus:border-[var(--rm-warning)] focus:outline-none h-[38px]">
                         <option value="">Todas las gravedades</option>
                         <option value="BAJA">🟢 Baja</option>
-                        <option value="MEDIA">⚡ Media</option>
-                        <option value="ALTA">⚠️ Alta</option>
-                        <option value="CRITICA">🚨 Crítica</option>
+                        <option value="MEDIA">Media</option>
+                        <option value="ALTA">Alta</option>
+                        <option value="CRITICA">Crítica</option>
                     </select>
                 </div>
 
@@ -159,7 +159,7 @@
             @if($hasFiltrosActivos)
                 <div class="w-full flex flex-wrap items-center justify-between gap-2 pt-2.5 border-t border-[var(--rm-border)]/60 dark:border-[var(--rm-text-body)] text-xs">
                     <div class="flex flex-wrap items-center gap-1.5">
-                        <span class="text-[11px] font-bold text-[var(--rm-text-secondary)] dark:text-[[var(--rm-text-muted)] flex items-center gap-1 mr-1">
+                        <span class="text-[11px] font-bold text-[var(--rm-text-secondary)] dark:text-[var(--rm-text-muted)] flex items-center gap-1 mr-1">
                             <i class="ph-bold ph-funnel text-xs"></i> Filtros activos:
                         </span>
 
@@ -178,28 +178,28 @@
                         @endif
 
                         @if(!empty($filtro_gravedad))
-                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[var(--rm-danger-soft)] border border-[var(--rm-danger)]/30 text-[11px] font-bold text-[[var(--rm-danger)] dark:text-[[var(--rm-danger)]">
+                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[var(--rm-danger-soft)] border border-[var(--rm-danger)]/30 text-[11px] font-bold text-[var(--rm-danger)] dark:text-[var(--rm-danger)]">
                                 <span>Gravedad: {{ $filtro_gravedad }}</span>
                                 <button type="button" wire:click="limpiarFiltro('filtro_gravedad')" class="hover:text-[var(--rm-warning)] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
                             </span>
                         @endif
 
                         @if(!empty($filtro_estado))
-                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[var(--rm-warning-soft)] border border-[var(--rm-warning)]/30 text-[11px] font-bold text-[[var(--rm-warning)] dark:text-[[var(--rm-warning)]">
+                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[var(--rm-warning-soft)] border border-[var(--rm-warning)]/30 text-[11px] font-bold text-[var(--rm-warning)] dark:text-[var(--rm-warning)]">
                                 <span>Estado: {{ $filtro_estado }}</span>
                                 <button type="button" wire:click="limpiarFiltro('filtro_estado')" class="hover:text-[var(--rm-warning)] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
                             </span>
                         @endif
 
                         @if(!empty($fecha_desde))
-                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[var(--rm-action-primary-soft)] border border-[var(--rm-action-primary)]/30 text-[11px] font-bold text-[[var(--rm-success)] dark:text-[[var(--rm-success)]">
+                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[var(--rm-action-primary-soft)] border border-[var(--rm-action-primary)]/30 text-[11px] font-bold text-[var(--rm-success)] dark:text-[var(--rm-success)]">
                                 <span>Desde: {{ $fecha_desde }}</span>
                                 <button type="button" wire:click="limpiarFiltro('fecha_desde')" class="hover:text-[var(--rm-warning)] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
                             </span>
                         @endif
 
                         @if(!empty($fecha_hasta))
-                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[var(--rm-action-primary-soft)] border border-[var(--rm-action-primary)]/30 text-[11px] font-bold text-[[var(--rm-success)] dark:text-[[var(--rm-success)]">
+                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[var(--rm-action-primary-soft)] border border-[var(--rm-action-primary)]/30 text-[11px] font-bold text-[var(--rm-success)] dark:text-[var(--rm-success)]">
                                 <span>Hasta: {{ $fecha_hasta }}</span>
                                 <button type="button" wire:click="limpiarFiltro('fecha_hasta')" class="hover:text-[var(--rm-warning)] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
                             </span>
@@ -248,7 +248,7 @@
                                 $esCerrado = $inc->estado === 'CERRADO';
                                 $esSeguimiento = $inc->estado === 'EN_SEGUIMIENTO';
                             @endphp
-                            <tr class="transition-colors {{ $esGraveOUrgente && !$esCerrado ? 'bg-[var(--rm-danger-soft)] dark:bg-[[var(--rm-danger)] border-l-4 border-l-[var(--rm-danger)]' : 'hover:bg-[[var(--rm-surface)]/50 dark:hover:bg-[[var(--rm-surface-soft)]/50' }}">
+                            <tr class="transition-colors {{ $esGraveOUrgente && !$esCerrado ? 'bg-[var(--rm-danger-soft)] dark:bg-[var(--rm-danger)] border-l-4 border-l-[var(--rm-danger)]' : 'hover:bg-[var(--rm-surface)]/50 dark:hover:bg-[var(--rm-surface-soft)]/50' }}">
                                 {{-- Fecha / Hora --}}
                                 <td class="py-3.5 px-4 whitespace-nowrap">
                                     <div class="font-bold text-[var(--rm-clinical)] dark:text-[var(--rm-surface)]">
@@ -307,11 +307,11 @@
                                             CRÍTICA
                                         </span>
                                     @elseif($inc->gravedad === 'ALTA')
-                                        <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-black uppercase tracking-wider bg-[var(--rm-danger-soft)] text-[var(--rm-danger)] dark:text-[[var(--rm-danger)] border border-[var(--rm-danger)]/40">
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-black uppercase tracking-wider bg-[var(--rm-danger-soft)] text-[var(--rm-danger)] dark:text-[var(--rm-danger)] border border-[var(--rm-danger)]/40">
                                             ALTA
                                         </span>
                                     @elseif($inc->gravedad === 'MEDIA')
-                                        <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-black uppercase tracking-wider bg-[var(--rm-warning-soft)] text-[[var(--rm-warning)] dark:text-[[var(--rm-warning)] border border-[var(--rm-warning)]/40">
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-black uppercase tracking-wider bg-[var(--rm-warning-soft)] text-[var(--rm-warning)] dark:text-[var(--rm-warning)] border border-[var(--rm-warning)]/40">
                                             MEDIA
                                         </span>
                                     @else
@@ -324,11 +324,11 @@
                                 {{-- Estado --}}
                                 <td class="py-3.5 px-4 text-center whitespace-nowrap">
                                     @if($inc->estado === 'CERRADO')
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[var(--rm-action-primary-soft)] text-[var(--rm-action-primary)] dark:text-[[var(--rm-success)] border border-[var(--rm-action-primary)]/40">
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[var(--rm-action-primary-soft)] text-[var(--rm-action-primary)] dark:text-[var(--rm-success)] border border-[var(--rm-action-primary)]/40">
                                             ● Cerrado
                                         </span>
                                     @elseif($inc->estado === 'EN_SEGUIMIENTO')
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[var(--rm-warning-soft)] text-[[var(--rm-warning)] dark:text-[[var(--rm-warning)] border border-[var(--rm-warning)]/40">
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[var(--rm-warning-soft)] text-[var(--rm-warning)] dark:text-[var(--rm-warning)] border border-[var(--rm-warning)]/40">
                                             ● En seguimiento
                                         </span>
                                     @elseif($inc->estado === 'ANULADO')
@@ -448,7 +448,7 @@
                     @php
                         $esGrave = in_array($inc->gravedad, ['ALTA', 'CRITICA']);
                     @endphp
-                    <div class="rounded-2xl bg-[var(--rm-surface)] dark:bg-[var(--rm-surface)] border {{ $esGrave ? 'border-[var(--rm-danger)]/60 bg-[var(--rm-danger-soft)]/80 dark:bg-[[var(--rm-danger)]/80' : 'border-[var(--rm-border)] dark:border-[var(--rm-text-body)]' }} p-4 sm:p-5 shadow-sm space-y-3">
+                    <div class="rounded-2xl bg-[var(--rm-surface)] dark:bg-[var(--rm-surface)] border {{ $esGrave ? 'border-[var(--rm-danger)]/60 bg-[var(--rm-danger-soft)]/80 dark:bg-[var(--rm-danger)]/80' : 'border-[var(--rm-border)] dark:border-[var(--rm-text-body)]' }} p-4 sm:p-5 shadow-sm space-y-3">
                         {{-- Cabecera de la ficha cronológica --}}
                         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-[var(--rm-border)]/50 dark:border-[var(--rm-text-body)] pb-3">
                             <div class="flex flex-wrap items-center gap-2">
@@ -479,11 +479,11 @@
                                         CRÍTICA
                                     </span>
                                 @elseif($inc->gravedad === 'ALTA')
-                                    <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-black uppercase bg-[var(--rm-danger-soft)] text-[var(--rm-danger)] dark:text-[[var(--rm-danger)] border border-[var(--rm-danger)]/40">
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-black uppercase bg-[var(--rm-danger-soft)] text-[var(--rm-danger)] dark:text-[var(--rm-danger)] border border-[var(--rm-danger)]/40">
                                         ALTA
                                     </span>
                                 @elseif($inc->gravedad === 'MEDIA')
-                                    <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-black uppercase bg-[var(--rm-warning-soft)] text-[[var(--rm-warning)] dark:text-[[var(--rm-warning)] border border-[var(--rm-warning)]/40">
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-black uppercase bg-[var(--rm-warning-soft)] text-[var(--rm-warning)] dark:text-[var(--rm-warning)] border border-[var(--rm-warning)]/40">
                                         MEDIA
                                     </span>
                                 @else
@@ -494,11 +494,11 @@
 
                                 {{-- Estado --}}
                                 @if($inc->estado === 'CERRADO')
-                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-bold bg-[var(--rm-action-primary-soft)] text-[var(--rm-action-primary)] dark:text-[[var(--rm-success)] border border-[var(--rm-action-primary)]/40">
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-bold bg-[var(--rm-action-primary-soft)] text-[var(--rm-action-primary)] dark:text-[var(--rm-success)] border border-[var(--rm-action-primary)]/40">
                                         ● Cerrado
                                     </span>
                                 @elseif($inc->estado === 'EN_SEGUIMIENTO')
-                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-bold bg-[var(--rm-warning-soft)] text-[[var(--rm-warning)] dark:text-[[var(--rm-warning)] border border-[var(--rm-warning)]/40">
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-bold bg-[var(--rm-warning-soft)] text-[var(--rm-warning)] dark:text-[var(--rm-warning)] border border-[var(--rm-warning)]/40">
                                         ● En seguimiento
                                     </span>
                                 @else
@@ -514,7 +514,7 @@
                             {{-- Descripción principal --}}
                             <div class="md:col-span-7 space-y-1">
                                 <span class="font-bold text-[var(--rm-text-secondary)] dark:text-[var(--rm-text-muted)] block">Descripción del evento:</span>
-                                <p class="text-[var(--rm-clinical)] dark:text-[var(--rm-surface-soft)] leading-relaxed bg-[var(--rm-surface)] dark:bg-[[var(--rm-surface-soft)] p-2.5 rounded-xl border border-[var(--rm-border)]/40 dark:border-[var(--rm-text-body)]">
+                                <p class="text-[var(--rm-clinical)] dark:text-[var(--rm-surface-soft)] leading-relaxed bg-[var(--rm-surface)] dark:bg-[var(--rm-surface-soft)] p-2.5 rounded-xl border border-[var(--rm-border)]/40 dark:border-[var(--rm-text-body)]">
                                     {{ $inc->descripcion }}
                                 </p>
                             </div>
@@ -522,7 +522,7 @@
                             {{-- Medida inmediata tomada --}}
                             <div class="md:col-span-5 space-y-1">
                                 <span class="font-bold text-[var(--rm-warning)] dark:text-[var(--rm-warning)] block">Medida inmediata realizada:</span>
-                                <p class="text-[var(--rm-clinical)] dark:text-[var(--rm-surface-soft)] leading-relaxed bg-[var(--rm-surface-soft)]/50 dark:bg-[[var(--rm-surface-soft)] p-2.5 rounded-xl border border-[var(--rm-border)]/40 dark:border-[var(--rm-text-body)]">
+                                <p class="text-[var(--rm-clinical)] dark:text-[var(--rm-surface-soft)] leading-relaxed bg-[var(--rm-surface-soft)]/50 dark:bg-[var(--rm-surface-soft)] p-2.5 rounded-xl border border-[var(--rm-border)]/40 dark:border-[var(--rm-text-body)]">
                                     {{ $inc->medida_inmediata ?: 'Sin medida inmediata especificada.' }}
                                 </p>
                             </div>
@@ -569,7 +569,7 @@
 
                         {{-- Observación / Trazabilidad si existe --}}
                         @if($inc->observacion)
-                            <div class="rounded-xl bg-[var(--rm-surface-soft)]/50 dark:bg-[[var(--rm-surface-soft)]/50 p-2 text-[11px] text-[var(--rm-text-secondary)] dark:text-[[var(--rm-text-primary)] border border-[var(--rm-border)]/30">
+                            <div class="rounded-xl bg-[var(--rm-surface-soft)]/50 dark:bg-[var(--rm-surface-soft)]/50 p-2 text-[11px] text-[var(--rm-text-secondary)] dark:text-[var(--rm-text-primary)] border border-[var(--rm-border)]/30">
                                 <span class="font-bold text-[var(--rm-clinical)] dark:text-[var(--rm-surface)]">Trazabilidad / Observación:</span>
                                 <p class="whitespace-pre-line mt-0.5">{{ $inc->observacion }}</p>
                             </div>
@@ -696,7 +696,7 @@
                                 </div>
                                 <div>
                                     <span class="text-[10px] uppercase font-bold text-[var(--rm-text-secondary)] block">Contexto de Jornada:</span>
-                                    <span class="font-semibold text-xs text-[var(--rm-action-primary)] dark:text-[[var(--rm-success)]">
+                                    <span class="font-semibold text-xs text-[var(--rm-action-primary)] dark:text-[var(--rm-success)]">
                                         Turno activo registrado
                                     </span>
                                 </div>
@@ -747,7 +747,7 @@
 
                         {{-- Especificar si es "OTRO" --}}
                         @if($tipo_incidente === 'OTRO')
-                            <div class="space-y-1 bg-[var(--rm-surface)] dark:bg-[[var(--rm-surface-soft)] p-3 rounded-xl border border-[var(--rm-warning)]/40">
+                            <div class="space-y-1 bg-[var(--rm-surface)] dark:bg-[var(--rm-surface-soft)] p-3 rounded-xl border border-[var(--rm-warning)]/40">
                                 <label class="font-bold text-[var(--rm-warning)] dark:text-[var(--rm-warning)]">Especifique el tipo de incidente * (Máximo 60 caracteres)</label>
                                 <input wire:model="tipo_incidente_otro"
                                     type="text"
@@ -876,7 +876,7 @@
 
                         {{-- Banner condicional suave si requiere seguimiento --}}
                         @if(in_array($gravedad, ['ALTA', 'CRITICA']) || $requiere_medico || $requiere_derivacion)
-                            <div class="rounded-xl bg-[var(--rm-danger-soft)] dark:bg-[[var(--rm-danger)] border border-[var(--rm-danger)]/40 p-3 flex items-start gap-2.5 text-[var(--rm-danger)] dark:text-[[var(--rm-danger)]">
+                            <div class="rounded-xl bg-[var(--rm-danger-soft)] dark:bg-[var(--rm-danger)] border border-[var(--rm-danger)]/40 p-3 flex items-start gap-2.5 text-[var(--rm-danger)] dark:text-[var(--rm-danger)]">
                                 <i class="ph-bold ph-warning-circle text-lg shrink-0 mt-0.5"></i>
                                 <div>
                                     <div class="font-bold text-xs">Requiere seguimiento adicional</div>
@@ -964,7 +964,7 @@
 
                     {{-- Bloque Alerta Activa si existe --}}
                     @if($alertaVinculada)
-                        <div class="rounded-xl bg-[var(--rm-danger-soft)] dark:bg-[[var(--rm-danger)] border border-[var(--rm-danger)]/60 p-4 space-y-1.5 text-[var(--rm-danger)] dark:text-[[var(--rm-danger)]">
+                        <div class="rounded-xl bg-[var(--rm-danger-soft)] dark:bg-[var(--rm-danger)] border border-[var(--rm-danger)]/60 p-4 space-y-1.5 text-[var(--rm-danger)] dark:text-[var(--rm-danger)]">
                             <div class="flex items-center justify-between">
                                 <span class="font-black text-xs flex items-center gap-1.5">
                                     <i class="ph-bold ph-bell-ringing"></i> Alerta Activa Vinculada ({{ $alertaVinculada->cod_alerta }})
@@ -1010,7 +1010,7 @@
                         </div>
                         <div>
                             <span class="text-[10px] uppercase font-bold text-[var(--rm-text-secondary)] block">Gravedad:</span>
-                            <span class="font-bold text-xs {{ in_array($incidenteDetalle->gravedad, ['ALTA', 'CRITICA']) ? 'text-[var(--rm-danger)]' : 'text-[[var(--rm-warning)]' }}">
+                            <span class="font-bold text-xs {{ in_array($incidenteDetalle->gravedad, ['ALTA', 'CRITICA']) ? 'text-[var(--rm-danger)]' : 'text-[var(--rm-warning)]' }}">
                                 {{ $incidenteDetalle->gravedad }}
                             </span>
                         </div>
@@ -1033,7 +1033,7 @@
                         <span class="font-bold text-xs uppercase tracking-wider text-[var(--rm-warning)] dark:text-[var(--rm-warning)] block">
                             Descripción Completa del Evento:
                         </span>
-                        <div class="rounded-xl bg-[var(--rm-surface)] dark:bg-[[var(--rm-surface-soft)] p-3.5 border border-[var(--rm-border)]/40 text-xs leading-relaxed text-[var(--rm-clinical)] dark:text-[var(--rm-surface-soft)] whitespace-pre-line">
+                        <div class="rounded-xl bg-[var(--rm-surface)] dark:bg-[var(--rm-surface-soft)] p-3.5 border border-[var(--rm-border)]/40 text-xs leading-relaxed text-[var(--rm-clinical)] dark:text-[var(--rm-surface-soft)] whitespace-pre-line">
                             {{ $incidenteDetalle->descripcion }}
                         </div>
                     </div>
@@ -1043,7 +1043,7 @@
                         <span class="font-bold text-xs uppercase tracking-wider text-[var(--rm-warning)] dark:text-[var(--rm-warning)] block">
                             Medida Inmediata Realizada:
                         </span>
-                        <div class="rounded-xl bg-[var(--rm-surface-soft)]/50 dark:bg-[[var(--rm-surface-soft)] p-3.5 border border-[var(--rm-border)]/40 text-xs leading-relaxed text-[var(--rm-clinical)] dark:text-[var(--rm-surface-soft)] whitespace-pre-line">
+                        <div class="rounded-xl bg-[var(--rm-surface-soft)]/50 dark:bg-[var(--rm-surface-soft)] p-3.5 border border-[var(--rm-border)]/40 text-xs leading-relaxed text-[var(--rm-clinical)] dark:text-[var(--rm-surface-soft)] whitespace-pre-line">
                             {{ $incidenteDetalle->medida_inmediata ?: 'Sin medida inmediata registrada.' }}
                         </div>
                     </div>
@@ -1070,7 +1070,7 @@
                             <span class="font-bold text-xs uppercase tracking-wider text-[var(--rm-text-secondary)] dark:text-[var(--rm-text-muted)] block">
                                 Historial de Trazabilidad y Observaciones:
                             </span>
-                            <div class="rounded-xl bg-[var(--rm-surface-soft)]/60 dark:bg-[[var(--rm-surface-soft)] p-3 border border-[var(--rm-border)]/40 text-xs text-[var(--rm-clinical)] dark:text-[var(--rm-surface-soft)] whitespace-pre-line">
+                            <div class="rounded-xl bg-[var(--rm-surface-soft)]/60 dark:bg-[var(--rm-surface-soft)] p-3 border border-[var(--rm-border)]/40 text-xs text-[var(--rm-clinical)] dark:text-[var(--rm-surface-soft)] whitespace-pre-line">
                                 {{ $incidenteDetalle->observacion }}
                             </div>
                         </div>
@@ -1099,7 +1099,7 @@
                                         </div>
                                         @if($ce['telefono'] && $ce['telefono'] !== 'Sin teléfono')
                                             <a href="tel:{{ preg_replace('/[^0-9+]/', '', $ce['telefono']) }}"
-                                                class="inline-flex items-center gap-1 rounded-lg bg-[var(--rm-action-primary)] hover:bg-[[var(--rm-success)] text-white px-2.5 py-1 text-xs font-bold transition">
+                                                class="inline-flex items-center gap-1 rounded-lg bg-[var(--rm-action-primary)] hover:bg-[var(--rm-success)] text-white px-2.5 py-1 text-xs font-bold transition">
                                                 <i class="ph-bold ph-phone text-xs"></i> Llamar
                                             </a>
                                         @endif
@@ -1287,7 +1287,7 @@
 
                         @if($ultimoRequiereMedico)
                             <button wire:click="solicitarValoracionMedica('{{ $ultimoCodIncidente }}')"
-                                class="w-full flex items-center justify-center gap-2 rounded-xl bg-[var(--rm-danger)] hover:bg-[[var(--rm-danger)] text-white py-2 px-3 text-xs font-bold transition">
+                                class="w-full flex items-center justify-center gap-2 rounded-xl bg-[var(--rm-danger)] hover:bg-[var(--rm-danger)] text-white py-2 px-3 text-xs font-bold transition">
                                 <i class="ph-bold ph-first-aid text-sm"></i> Solicitar valoración médica
                             </button>
                         @endif

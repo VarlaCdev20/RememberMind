@@ -1,46 +1,33 @@
 <div class="space-y-6 pb-8">
 
- {{-- ══════════════════════════════════════════════════════
-  ENCABEZADO
- ══════════════════════════════════════════════════════ --}}
- <div class="flex flex-col gap-4 border-b border-borde pb-5 md:flex-row md:items-center md:justify-between">
- <div class="flex items-center gap-4">
-  <div class="flex h-14 w-14 items-center justify-center rounded-2xl bg-boton-acento/10 text-boton-acento shadow-sm">
-  <i class="ph-fill ph-stethoscope text-3xl"></i>
-  </div>
-  <div>
-  <h2 class="text-2xl font-black tracking-tight text-titulo">
-   @if($seccion === 'valoraciones') Valoraciones Médicas Pendientes
-   @elseif($seccion === 'decisiones') Decisiones de Admisión
-   @else Panel Médico General
-   @endif
-  </h2>
-  <p class="text-sm font-semibold text-apoyo"
-   x-data="{ hora: '' }"
-   x-init="
-   const fmt = () => {
-    const n = new Date();
-    hora = n.toLocaleDateString('es-BO', { weekday:'long', day:'numeric', month:'long', year:'numeric' })
-    + ' · ' + n.toLocaleTimeString('es-BO', { hour:'2-digit', minute:'2-digit' });
-   };
-   fmt(); setInterval(fmt, 30000);
-   "
-   x-text="hora">
-  </p>
-  </div>
- </div>
- <div class="flex flex-wrap items-center gap-2">
-  <a href="{{ route('admin.medico.pacientes.observacion') }}"
-  class="rm-btn-secondary h-9 px-4 flex items-center gap-1.5 text-xs">
-  <i class="ph-bold ph-users-three text-sm"></i> Seguimiento
+ @php
+  $tituloMedico = match($seccion) {
+   'valoraciones' => 'Valoraciones pendientes',
+   'decisiones' => 'Decisiones de admisión',
+   default => 'Cuidar con evidencia',
+  };
+ @endphp
+ <x-ui.role-dashboard-hero
+  eyebrow="MEDICINA Y SEGUIMIENTO CLÍNICO"
+  :title="$tituloMedico"
+  highlight="es decidir con humanidad"
+  description="Revisa el estado clínico, prioriza valoraciones y toma decisiones con una visión longitudinal de cada residente."
+  :image="asset('images/FOTOS CENTRO DE ADULTOS MAYORES/593542266_1360929526044966_7396297662771591420_n.jpg')"
+  image-alt="Profesional de salud acompañando a residentes durante una actividad"
+  quote="La atención clínica también empieza por escuchar"
+  :meta="[
+   ['icon' => 'ph-users-three', 'label' => $totalResidentes . ' residentes activos'],
+   ['icon' => 'ph-first-aid-kit', 'label' => $pendientesValoracion . ' valoraciones pendientes'],
+   ['icon' => 'ph-warning-circle', 'label' => $alertasCriticas . ' alertas prioritarias'],
+  ]"
+ >
+  <a href="{{ route('admin.medico.pacientes.observacion') }}" class="rm-btn-primary min-h-9 px-3.5 text-xs">
+   <i class="ph-bold ph-users-three"></i><span>Ver seguimiento</span>
   </a>
-  <button onclick="window.location.reload()"
-   class="rm-btn-secondary h-9 px-4 flex items-center gap-1.5 text-xs">
-  <i class="ph-bold ph-arrows-clockwise text-sm"></i>
-  <span class="hidden sm:inline">Actualizar</span>
+  <button type="button" onclick="window.location.reload()" class="rm-btn-secondary min-h-9 px-3.5 text-xs">
+   <i class="ph-bold ph-arrows-clockwise"></i><span>Actualizar</span>
   </button>
- </div>
- </div>
+ </x-ui.role-dashboard-hero>
 
  {{-- ══════════════════════════════════════════════════════
   KPIs — 6 TARJETAS
@@ -48,7 +35,7 @@
  <div class="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
  {{-- 1. Residentes activos --}}
  <a href="{{ route('admin.medico.pacientes.observacion') }}"
-  class="group flex flex-col gap-2 rounded-2xl border border-borde bg-fondo-card p-4 shadow-sm hover:border-estado-info hover:shadow-md transition">
+  class="rm-role-kpi group flex flex-col gap-2 rounded-2xl border border-borde bg-fondo-card p-4 shadow-sm hover:border-estado-info hover:shadow-md transition">
   <div class="flex items-center justify-between">
   <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-estado-infoBg text-estado-info group-hover:scale-110 transition">
    <i class="ph-bold ph-users text-lg"></i>
@@ -62,7 +49,7 @@
  </a>
 
  {{-- 2. Pendientes valoración --}}
- <div class="flex flex-col gap-2 rounded-2xl border {{ $pendientesValoracion > 0 ? 'border-estado-advertencia bg-estado-advertenciaBg/30' : 'border-borde bg-fondo-card' }} p-4 shadow-sm transition">
+ <div class="rm-role-kpi flex flex-col gap-2 rounded-2xl border {{ $pendientesValoracion > 0 ? 'border-estado-advertencia bg-estado-advertenciaBg/30' : 'border-borde bg-fondo-card' }} p-4 shadow-sm transition">
   <div class="flex items-center justify-between">
   <div class="flex h-10 w-10 items-center justify-center rounded-xl {{ $pendientesValoracion > 0 ? 'bg-estado-advertencia text-white animate-pulse' : 'bg-estado-advertenciaBg text-estado-advertencia' }}">
    <i class="ph-bold ph-hourglass text-lg"></i>
@@ -78,7 +65,7 @@
  </div>
 
  {{-- 3. Seguimiento activo --}}
- <div class="flex flex-col gap-2 rounded-2xl border border-borde bg-fondo-card p-4 shadow-sm">
+ <div class="rm-role-kpi flex flex-col gap-2 rounded-2xl border border-borde bg-fondo-card p-4 shadow-sm">
   <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-estado-exitoBg text-estado-exito">
   <i class="ph-bold ph-user-check text-lg"></i>
   </div>
@@ -89,7 +76,7 @@
  </div>
 
  {{-- 4. Alertas críticas --}}
- <div class="flex flex-col gap-2 rounded-2xl border {{ $alertasCriticas > 0 ? 'border-estado-error bg-estado-errorBg/20' : 'border-borde bg-fondo-card' }} p-4 shadow-sm">
+ <div class="rm-role-kpi flex flex-col gap-2 rounded-2xl border {{ $alertasCriticas > 0 ? 'border-estado-error bg-estado-errorBg/20' : 'border-borde bg-fondo-card' }} p-4 shadow-sm">
   <div class="flex h-10 w-10 items-center justify-center rounded-xl {{ $alertasCriticas > 0 ? 'bg-estado-error text-white' : 'bg-fondo-panel text-apoyo' }}">
   <i class="ph-bold ph-warning-circle text-lg"></i>
   </div>
@@ -100,7 +87,7 @@
  </div>
 
  {{-- 5. Notas hoy --}}
- <div class="flex flex-col gap-2 rounded-2xl border border-borde bg-fondo-card p-4 shadow-sm">
+ <div class="rm-role-kpi flex flex-col gap-2 rounded-2xl border border-borde bg-fondo-card p-4 shadow-sm">
   <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-boton-acento/10 text-boton-acento">
   <i class="ph-bold ph-note-pencil text-lg"></i>
   </div>
@@ -111,7 +98,7 @@
  </div>
 
  {{-- 6. Medicación activa --}}
- <div class="flex flex-col gap-2 rounded-2xl border border-borde bg-fondo-card p-4 shadow-sm">
+ <div class="rm-role-kpi flex flex-col gap-2 rounded-2xl border border-borde bg-fondo-card p-4 shadow-sm">
   <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-estado-exitoBg text-estado-exito">
   <i class="ph-bold ph-pill text-lg"></i>
   </div>

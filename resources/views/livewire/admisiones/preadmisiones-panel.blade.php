@@ -83,9 +83,9 @@
   <select wire:model.live="prioridad" class="w-full rounded-xl border border-[var(--rm-border-soft)] bg-[var(--rm-input-bg)] py-2 px-3 text-xs font-medium text-[var(--rm-text-primary)] focus:border-[var(--rm-focus)] focus:outline-none h-[38px]">
    <option value="">Prioridad (Todas)</option>
    <option value="BAJA">🟢 Baja</option>
-   <option value="MEDIA">⚡ Media</option>
-   <option value="ALTA">⚠️ Alta</option>
-   <option value="CRITICA">🚨 Crítica</option>
+   <option value="MEDIA">Media</option>
+   <option value="ALTA">Alta</option>
+   <option value="CRITICA">Crítica</option>
   </select>
   </div>
 

@@ -37,7 +37,10 @@ import {
     rmCreateBarGradient,
     rmBaseChartOptions,
     rmDoughnutDefaults,
+    rmInstallGlobalChartTheme,
 } from '../styles/design-system/charts/chart-theme.js';
+
+rmInstallGlobalChartTheme(Chart);
 
 import {
     rmDoughnutChartConfig,
@@ -95,6 +98,7 @@ window.RMCharts = {
     createBarGradient: rmCreateBarGradient,
     baseOptions: rmBaseChartOptions,
     doughnutDefaults: rmDoughnutDefaults,
+    installGlobalTheme: rmInstallGlobalChartTheme,
 
     // Presets canónicos
     presets: {
@@ -124,3 +128,6 @@ import './utilities/modo-oscuro.js';
 
 import documentosAdulto from './modules/documentos-adulto.js';
 window.documentosAdulto = documentosAdulto;
+
+import './modules/auth-login-parallax.js';
+import './modules/app-depth-motion.js';

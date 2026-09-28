@@ -12,6 +12,56 @@
             text-shadow: 0 10px 26px rgba(47, 62, 92, 0.18);
         }
 
+        .auth-parallax-layer {
+            --auth-parallax-x: 0px;
+            --auth-parallax-y: 0px;
+            transform: translate3d(var(--auth-parallax-x), var(--auth-parallax-y), 0);
+            will-change: transform;
+            transition: transform 900ms cubic-bezier(.2, .75, .25, 1);
+        }
+
+        .auth-login-card {
+            --auth-card-x: 0px;
+            --auth-card-y: 0px;
+            --auth-card-rx: 0deg;
+            --auth-card-ry: 0deg;
+            transform: perspective(1400px)
+                translate3d(var(--auth-card-x), var(--auth-card-y), 0)
+                rotateX(var(--auth-card-rx))
+                rotateY(var(--auth-card-ry));
+            transform-style: preserve-3d;
+            will-change: transform;
+            transition: transform 950ms cubic-bezier(.2, .75, .25, 1), box-shadow 450ms ease;
+        }
+
+        .auth-login-card:hover {
+            box-shadow: 0 32px 85px rgba(47, 62, 92, .17);
+        }
+
+        .auth-login-card:focus-within {
+            --auth-card-rx: 0deg !important;
+            --auth-card-ry: 0deg !important;
+        }
+
+        .auth-ambient-orb {
+            animation: authAmbientDrift 14s ease-in-out infinite alternate;
+        }
+
+        .auth-ambient-orb:nth-of-type(2) {
+            animation-delay: -5s;
+            animation-duration: 18s;
+        }
+
+        .auth-ambient-orb:nth-of-type(3) {
+            animation-delay: -9s;
+            animation-duration: 16s;
+        }
+
+        @keyframes authAmbientDrift {
+            0% { opacity: .76; filter: saturate(.92); }
+            100% { opacity: 1; filter: saturate(1.08); }
+        }
+
         @keyframes floatAuth {
 
             0%,
@@ -27,4 +77,18 @@
         .float-auth {
             animation: floatAuth 7s ease-in-out infinite;
         }
-    
+
+        .float-auth:nth-of-type(2) { animation-delay: -2.4s; }
+        .float-auth:nth-of-type(3) { animation-delay: -4.8s; }
+
+        @media (prefers-reduced-motion: reduce) {
+            .auth-parallax-layer,
+            .auth-login-card,
+            .auth-ambient-orb,
+            .float-auth {
+                animation: none !important;
+                transform: none !important;
+                transition-duration: .01ms !important;
+            }
+        }
+

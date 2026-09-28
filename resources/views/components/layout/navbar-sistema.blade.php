@@ -1,9 +1,9 @@
 <nav
- class="header-institucional sticky top-0 z-30 px-5 py-2.5 backdrop-blur-xl transition-all duration-300 ease-in-out"
- :class="sidebarCollapsed ? 'lg:ml-[82px]' : 'lg:ml-[280px]'"
+ class="header-institucional sticky top-0 z-30 flex h-[64px] min-h-[64px] items-center px-3 sm:px-6 backdrop-blur-xl transition-all duration-300 ease-in-out"
+ :class="sidebarCollapsed ? 'lg:ml-[76px]' : 'lg:ml-[248px]'"
 >
- <div class="flex items-center justify-between gap-4">
- <div class="flex items-center gap-3">
+ <div class="flex min-w-0 items-center justify-between gap-2 sm:gap-4">
+ <div class="flex min-w-0 items-center gap-2 sm:gap-3">
  <button
  type="button"
  @click="$dispatch('toggle-sidebar')"
@@ -14,15 +14,15 @@
  </button>
 
  <img src="{{ asset('storage/imagenes/LOGO.png') }}"
- alt="CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS"
- class="hidden sm:block h-9 w-auto object-contain shrink-0">
+ alt="CENTRO GERIÁTRICO LOS ALMENDROS"
+ class="block h-9 w-auto shrink-0 object-contain lg:hidden">
 
- <div class="min-w-0">
+ <div class="hidden min-w-0">
  <p class="text-xs font-bold uppercase tracking-[0.22em] text-modulo-salud">
  RememberMind
  </p>
- <h1 class="max-w-[230px] text-[11px] font-bold uppercase leading-[1.05] text-titulo sm:text-xs">
- CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS
+ <h1 class="hidden max-w-[230px] text-[11px] font-bold uppercase leading-[1.05] text-titulo min-[420px]:block sm:text-xs">
+ CENTRO GERIÁTRICO LOS ALMENDROS
  </h1>
  </div>
  </div>
@@ -38,7 +38,7 @@
  </div>
  </div>
 
- <div class="flex items-center gap-2">
+ <div class="flex shrink-0 items-center gap-1 sm:gap-2">
  {{-- Botón modo oscuro --}}
  <button
  type="button"
@@ -102,7 +102,7 @@
  </div>
  </div>
 
- <div class="mt-3 md:hidden">
+ <div class="hidden">
  <div class="relative">
  <i class="ph-bold ph-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-meta"></i>
  <input

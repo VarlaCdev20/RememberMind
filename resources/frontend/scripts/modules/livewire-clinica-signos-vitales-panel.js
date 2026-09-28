@@ -25,6 +25,11 @@
             const isDark = window.RMCharts?.isDark() || false;
             const axisTextColor = window.RMCharts ? window.RMCharts.getCss('--rm-chart-axis-text') : '#64748B';
             const gridColor = window.RMCharts ? window.RMCharts.getCss('--rm-chart-grid') : 'rgba(224,212,198,0.35)';
+            const blue = window.RMCharts?.getCss('--rm-chart-2') || '#527DAA';
+            const blueSoft = window.RMCharts?.getCss('--rm-chart-4') || '#6F92BC';
+            const mint = window.RMCharts?.getCss('--rm-chart-1') || '#4F895E';
+            const pointSurface = window.RMCharts?.getCss('--rm-surface-raised') || '#F0E7DE';
+            const translucent = (color, alpha) => window.RMCharts?.hexToRgba(color, alpha) || color;
 
             const config = {
                 type: 'line',
@@ -34,13 +39,13 @@
                         {
                             label: 'PA Sistólica (mmHg)',
                             data: data.pa,
-                            borderColor: '#7565A8',
-                            backgroundColor: 'rgba(117,101,168,0.16)',
+                            borderColor: blue,
+                            backgroundColor: translucent(blue, 0.16),
                             borderWidth: 2.5,
                             pointRadius: 4,
                             pointHoverRadius: 6,
-                            pointBackgroundColor: isDark ? '#1E293B' : '#FFFFFF',
-                            pointBorderColor: '#7565A8',
+                            pointBackgroundColor: pointSurface,
+                            pointBorderColor: blue,
                             tension: 0.38,
                             fill: true,
                             yAxisID: 'yPA',
@@ -48,12 +53,12 @@
                         {
                             label: 'FC (bpm)',
                             data: data.fc,
-                            borderColor: '#D9745B',
-                            backgroundColor: 'rgba(217,116,91,0.12)',
+                            borderColor: mint,
+                            backgroundColor: translucent(mint, 0.12),
                             borderWidth: 2,
                             pointRadius: 3.5,
-                            pointBackgroundColor: isDark ? '#1E293B' : '#FFFFFF',
-                            pointBorderColor: '#D9745B',
+                            pointBackgroundColor: pointSurface,
+                            pointBorderColor: mint,
                             tension: 0.38,
                             borderDash: [4, 3],
                             yAxisID: 'yPA',
@@ -61,12 +66,12 @@
                         {
                             label: 'SpO₂ (%)',
                             data: data.sat,
-                            borderColor: '#4E8CA6',
-                            backgroundColor: 'rgba(78,140,166,0.14)',
+                            borderColor: blueSoft,
+                            backgroundColor: translucent(blueSoft, 0.14),
                             borderWidth: 2.5,
                             pointRadius: 3.5,
-                            pointBackgroundColor: isDark ? '#1E293B' : '#FFFFFF',
-                            pointBorderColor: '#4E8CA6',
+                            pointBackgroundColor: pointSurface,
+                            pointBorderColor: blueSoft,
                             tension: 0.38,
                             fill: true,
                             yAxisID: 'ySat',
@@ -94,9 +99,11 @@
                             intersect: false,
                             cornerRadius: 8,
                             padding: 10,
-                            backgroundColor: isDark ? '#0F172A' : '#1E293B',
-                            titleColor: '#F8FAFC',
-                            bodyColor: '#F8FAFC',
+                            backgroundColor: window.RMCharts?.getCss('--rm-chart-tooltip-bg') || '#F0E7DE',
+                            titleColor: window.RMCharts?.getCss('--rm-chart-tooltip-text') || '#342E2A',
+                            bodyColor: window.RMCharts?.getCss('--rm-chart-tooltip-text') || '#342E2A',
+                            borderColor: window.RMCharts?.getCss('--rm-chart-tooltip-border') || '#C9BAAC',
+                            borderWidth: 1,
                         },
                         datalabels: { display: false },
                     },
@@ -107,7 +114,7 @@
                             min: 50,
                             max: 200,
                             grid: { color: gridColor, drawBorder: false },
-                            ticks: { font: { size: 10 }, color: '#7565A8' },
+                            ticks: { font: { size: 10 }, color: blue },
                         },
                         ySat: {
                             type: 'linear',
@@ -117,7 +124,7 @@
                             grid: { display: false },
                             ticks: {
                                 font: { size: 10 },
-                                color: '#4E8CA6',
+                                color: blueSoft,
                                 callback: (v) => v + '%'
                             },
                         },

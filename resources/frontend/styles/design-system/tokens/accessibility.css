@@ -51,3 +51,33 @@
         scroll-behavior: auto !important;
     }
 }
+
+/* Refuerza separación y foco sin cambiar la composición en alto contraste. */
+@media (prefers-contrast: more) {
+    :root {
+        --rm-border: var(--rm-border-strong);
+        --rm-border-soft: var(--rm-border);
+        --rm-focus-ring-width: 3px;
+    }
+
+    .rm-card,
+    .rm-chart-card,
+    .rm-modal,
+    .rm-drawer {
+        border-width: 2px;
+    }
+}
+
+@media (forced-colors: active) {
+    :focus-visible {
+        outline-color: Highlight !important;
+    }
+
+    .rm-card,
+    .rm-chart-card,
+    .rm-modal,
+    .rm-drawer,
+    .rm-btn {
+        border: 1px solid CanvasText;
+    }
+}

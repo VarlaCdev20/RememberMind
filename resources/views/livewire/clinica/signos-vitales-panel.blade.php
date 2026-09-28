@@ -27,10 +27,10 @@
   <select wire:model.live="filtroAlerta"
    class="w-full rounded-xl border border-[var(--rm-border-soft)] bg-[var(--rm-input-bg)] py-2 px-3 text-xs font-medium text-[var(--rm-text-primary)] focus:border-[var(--rm-focus)] focus:outline-none h-[38px]">
    <option value="">Todas las alertas (Global)</option>
-   <option value="critico">🚨 Críticos</option>
-   <option value="advertencia">⚠️ Advertencia</option>
-   <option value="normal">✅ Normales</option>
-   <option value="sin_dato">⚪ Sin datos</option>
+   <option value="critico">Críticos</option>
+   <option value="advertencia">Advertencia</option>
+   <option value="normal">Normales</option>
+   <option value="sin_dato">Sin datos</option>
   </select>
   </div>
 

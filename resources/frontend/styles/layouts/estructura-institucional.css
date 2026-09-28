@@ -35,10 +35,29 @@
     }
 
     .sidebar-institucional {
-        border-right: 1px solid var(--color-borde-suave);
-        background: var(--color-sidebar-bg);
+        border-right: 1px solid color-mix(in srgb, var(--color-borde-suave) 72%, transparent);
+        background:
+            linear-gradient(
+                180deg,
+                color-mix(in srgb, var(--color-sidebar-bg) 82%, transparent) 0%,
+                color-mix(in srgb, var(--color-sidebar-bg) 68%, transparent) 100%
+            );
         color: var(--color-sidebar-texto);
-        box-shadow: var(--sombra-sidebar);
+        box-shadow:
+            14px 0 42px rgba(47, 40, 36, 0.09),
+            inset -1px 0 rgba(255, 255, 255, 0.18);
+        backdrop-filter: blur(24px) saturate(1.14);
+        -webkit-backdrop-filter: blur(24px) saturate(1.14);
+    }
+
+    .sidebar-brand-glass {
+        background: color-mix(in srgb, var(--rm-surface) 62%, transparent);
+        border-color: color-mix(in srgb, var(--rm-border-soft) 76%, transparent);
+        box-shadow:
+            0 10px 26px rgba(47, 40, 36, 0.07),
+            inset 0 1px rgba(255, 255, 255, 0.22);
+        backdrop-filter: blur(16px) saturate(1.08);
+        -webkit-backdrop-filter: blur(16px) saturate(1.08);
     }
 
     .dropdown-institucional {

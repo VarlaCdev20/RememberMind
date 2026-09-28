@@ -1,11 +1,11 @@
 {{-- TOPBAR UNIFICADO DE ENFERMERÍA (IDÉNTICO A SUPERADMIN) --}}
 <header
     id="topbar-enfermeria"
-    class="sticky top-0 z-30 flex h-[74px] min-h-[72px] max-h-[76px] w-full items-center justify-between border-b border-[var(--rm-border)] bg-[var(--rm-topbar-bg)] px-4 sm:px-6 shadow-xs backdrop-blur-md transition-all duration-300 ease-in-out"
-    :class="sidebarCollapsed ? 'lg:pl-[96px]' : 'lg:pl-[276px]'">
+    class="sticky top-0 z-30 flex h-[64px] min-h-[64px] max-h-[64px] w-full items-center justify-between border-b border-[var(--rm-border)] bg-[var(--rm-topbar-bg)] px-3 sm:px-6 shadow-xs backdrop-blur-md transition-all duration-300 ease-in-out"
+    :class="sidebarCollapsed ? 'lg:pl-[92px]' : 'lg:pl-[264px]'">
 
     {{-- LADO IZQUIERDO: LOGO INSTITUCIONAL + REMEMBERMIND + CENTRO GERIÁTRICO --}}
-    <div class="flex items-center gap-3.5 shrink-0">
+    <div class="flex min-w-0 items-center gap-2 sm:gap-3.5 shrink-0">
         {{-- Botón Móvil para abrir sidebar --}}
         <button type="button"
                 @click="sidebarOpen = true"
@@ -19,16 +19,16 @@
            class="flex items-center gap-3 transition-opacity duration-200 hover:opacity-90 min-w-0"
            title="Centro Geriátrico Jardín de los Recuerdos">
             <img src="{{ asset('storage/imagenes/LOGO.png') }}"
-                 alt="CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS"
-                 class="h-10 w-auto object-contain shrink-0"
+                 alt="CENTRO GERIÁTRICO LOS ALMENDROS"
+                 class="h-9 w-auto object-contain shrink-0 sm:h-10"
                  onerror="this.onerror=null; this.src='{{ asset('images/logo.png') }}';">
 
-            <div class="min-w-0">
+            <div class="hidden min-w-0 min-[560px]:block">
                 <p class="text-[12px] font-[800] uppercase tracking-[0.2em] text-[var(--rm-action-primary)] font-outfit leading-none mb-1">
                     RememberMind
                 </p>
                 <h1 class="text-[11px] font-[700] uppercase leading-[1.1] text-[var(--rm-text-primary)] font-outfit max-w-[240px]">
-                    CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS
+                    CENTRO GERIÁTRICO LOS ALMENDROS
                 </h1>
             </div>
         </a>
@@ -46,7 +46,7 @@
     </div>
 
     {{-- LADO DERECHO: MODO OSCURO + NOTIFICACIONES + PERFIL --}}
-    <div class="flex items-center gap-2.5 sm:gap-3 shrink-0">
+    <div class="flex items-center gap-1 sm:gap-3 shrink-0">
         {{-- Botón Modo Claro / Oscuro --}}
         <button type="button"
                 @click.stop="toggleDarkMode()"
@@ -66,7 +66,7 @@
                     $conteoAlertasTop = $alertasCount ?? 3;
                 @endphp
                 @if($conteoAlertasTop > 0)
-                    <span class="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-[var(--rm-danger)] text-[9.5px] font-black text-[var(--rm-text-on-primary)] ring-2 ring-[var(--rm-surface)]">
+                    <span class="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-[var(--rm-danger)] text-[9.5px] font-black text-[var(--rm-text-inverse)] ring-2 ring-[var(--rm-surface)]">
                         {{ $conteoAlertasTop }}
                     </span>
                 @endif
@@ -85,7 +85,7 @@
                 type="button"
                 @click="abierto = !abierto"
                 @click.outside="abierto = false"
-                class="flex items-center gap-2.5 rounded-full border border-[var(--rm-border)] bg-[var(--rm-surface)] py-1 pl-1.5 pr-3 shadow-xs transition-all hover:bg-[var(--rm-surface-soft)] active:scale-95 cursor-pointer"
+                class="flex items-center gap-1 rounded-full border border-[var(--rm-border)] bg-[var(--rm-surface)] py-1 pl-1 pr-1.5 shadow-xs transition-all hover:bg-[var(--rm-surface-soft)] active:scale-95 cursor-pointer sm:gap-2.5 sm:pl-1.5 sm:pr-3"
                 aria-label="Abrir menú de usuario">
 
                 {{-- Avatar Circular --}}
@@ -103,7 +103,7 @@
                     </p>
                 </div>
 
-                <i class="ph-bold ph-caret-down text-xs text-[var(--rm-text-secondary)] transition-transform duration-200"
+                <i class="hidden ph-bold ph-caret-down text-xs text-[var(--rm-text-secondary)] transition-transform duration-200 sm:block"
                    :class="abierto ? 'rotate-180' : ''"></i>
             </button>
 

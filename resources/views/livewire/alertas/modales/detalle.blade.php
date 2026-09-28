@@ -22,52 +22,22 @@
  default => 'rm-badge-neutral'
  };
 @endphp
-<div class="rm-modal-backdrop"
- role="dialog"
- aria-modal="true"
- aria-labelledby="modal-detalle-title"
- x-data
- x-on:keydown.escape.window="$wire.cerrarModales()">
- <!-- Backdrop dismiss -->
- <div class="fixed inset-0" wire:click="cerrarModales"></div>
-
- <!-- Modal Expediente Clínico LG / XL -->
- <div class="rm-modal rm-modal-lg z-10 font-sans" @click.stop>
- <!-- Header (#F7F0E9) -->
- <div class="rm-modal-header shrink-0">
-  <div class="flex items-center gap-3">
-  <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--rm-surface-alt)] text-[var(--rm-primary)] border border-[var(--rm-border)] shadow-xs">
-   <i class="ph-bold ph-clipboard-text text-xl"></i>
+<x-ui.modal-livewire
+ id="modalDetalleAlerta"
+ wire:model="modalDetalle"
+ maxWidth="xl"
+ closeMethod="cerrarModales"
+ badge="Dossier clínico"
+ title="Detalle de la alerta"
+ subtitle="Registro asistencial, evolución y trazabilidad de la atención"
+>
+ <x-slot name="icon">
+  <span class="flex h-9 w-9 items-center justify-center rounded-xl border border-[var(--rm-border)] bg-[var(--rm-surface-alt)] text-[var(--rm-action-primary)] shadow-xs">
+   <i class="ph-bold ph-clipboard-text text-lg" aria-hidden="true"></i>
   </span>
-  <div>
-   <div class="flex items-center gap-2 flex-wrap">
-   <div class="flex items-center gap-2 mb-1">
-   <span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-[var(--rm-surface-muted)] text-slate-800 border border-slate-300 shadow-xs flex items-center gap-1">
-    <i class="ph-bold ph-folder-open"></i> Dossier de Expediente Completo
-   </span>
-   </div>
-   <h3 id="modal-detalle-title" class="rm-modal-title text-base font-bold text-[var(--rm-text-title)]">
-    Detalle de la alerta
-   </h3>
-   <span class="rm-badge {{ $badgeEstadoClass }}">
-    {{ $estadoTexto }}
-   </span>
-   </div>
-   <p class="text-xs text-[var(--rm-text-muted)] mt-0.5">
-   Registro clínico asistencial y trazabilidad médica
-   </p>
-  </div>
-  </div>
-  <button type="button"
-  wire:click="cerrarModales"
-  aria-label="Cerrar expediente"
-  class="rm-btn-icon text-[var(--rm-text-muted)] hover:text-[var(--rm-text-title)] transition cursor-pointer">
-  <i class="ph ph-x text-lg"></i>
-  </button>
- </div>
+ </x-slot>
 
- <!-- Body (#FBF7F2) -->
- <div class="rm-modal-body flex-1 min-h-0 overflow-y-auto space-y-3.5 text-xs">
+ <div class="space-y-3.5 text-xs">
   @if (session()->has('mensaje'))
   <div class="rm-alert rm-alert-success flex items-center justify-between">
    <span>{{ session('mensaje') }}</span>
@@ -95,7 +65,10 @@
    </div>
   </div>
 
-  <div class="flex items-center gap-2">
+  <div class="flex flex-wrap items-center justify-end gap-2">
+   <span class="rm-badge {{ $badgeEstadoClass }}">
+    {{ $estadoTexto }}
+   </span>
    <button type="button"
    wire:click="verGraficos('{{ $detalle->cod_residente }}')"
    class="rm-btn rm-btn-sm rm-btn-secondary text-xs cursor-pointer shadow-xs">
@@ -222,9 +195,9 @@
   @endif
  </div>
 
- <!-- Footer (#F7F0E9) -->
- <div class="rm-modal-footer shrink-0 justify-between">
-  <div>
+ <x-slot name="footer">
+  <div class="flex w-full flex-col-reverse gap-2 sm:flex-row sm:items-center sm:justify-between">
+   <div>
   @if($detalle && $detalle->puedeCerrarse())
    @can('alertas.gestionar')
    <button type="button"
@@ -237,7 +210,7 @@
   @endif
   </div>
 
-  <div class="flex items-center gap-2">
+   <div class="flex flex-col-reverse gap-2 sm:flex-row sm:items-center">
   <button type="button"
    wire:click="cerrarModales"
    class="rm-btn rm-btn-ghost cursor-pointer">
@@ -254,8 +227,8 @@
    </button>
    @endcan
   @endif
+   </div>
   </div>
- </div>
- </div>
-</div>
+ </x-slot>
+</x-ui.modal-livewire>
 @endif

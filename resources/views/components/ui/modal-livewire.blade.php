@@ -5,6 +5,9 @@
     'closeMethod' => 'cerrarModal',
     'footer' => null,
     'icon' => null,
+    'subtitle' => null,
+    'badge' => null,
+    'showValidation' => true,
 ])
 
 @php
@@ -57,13 +60,21 @@ $modalId = $id ?: 'modal-'.\Illuminate\Support\Str::slug((string) ($attributes->
         class="rm-modal-panel relative w-full my-auto flex flex-col max-h-[calc(100vh-2rem)] sm:max-h-[calc(100vh-3rem)] transform overflow-hidden transition-all bg-[var(--rm-modal-bg,var(--rm-surface))] border border-[var(--rm-modal-border,var(--rm-border))] rounded-[var(--rm-radius-modal,20px)] shadow-[var(--rm-shadow-overlay)] {{ $maxWidthClass }}"
     >
         <!-- Header -->
-        <header class="rm-modal-header shrink-0 flex items-center justify-between px-5 sm:px-6 py-4 bg-[var(--rm-surface-soft)] border-b border-[var(--rm-border-soft)]">
-            <h3 id="{{ $modalId }}-titulo" class="text-lg sm:text-xl font-extrabold text-[var(--rm-text-primary)] flex items-center gap-2.5 truncate">
-                @if(isset($icon) && $icon)
-                    {{ $icon }}
+        <header class="rm-modal-header shrink-0 flex items-start justify-between gap-4 px-5 sm:px-6 py-4 bg-[var(--rm-surface-soft)] border-b border-[var(--rm-border-soft)]">
+            <div class="min-w-0">
+                @if($badge)
+                    <p class="mb-1 text-[var(--rm-font-size-meta)] font-extrabold uppercase tracking-[var(--rm-letter-spacing-wide)] text-[var(--rm-action-primary)]">{{ $badge }}</p>
                 @endif
-                {{ $title }}
-            </h3>
+                <h3 id="{{ $modalId }}-titulo" class="text-lg sm:text-xl font-extrabold text-[var(--rm-text-primary)] flex items-center gap-2.5 leading-tight">
+                    @if(isset($icon) && $icon)
+                        {{ $icon }}
+                    @endif
+                    {{ $title }}
+                </h3>
+                @if($subtitle)
+                    <p class="mt-1 text-xs font-medium text-[var(--rm-text-secondary)]">{{ $subtitle }}</p>
+                @endif
+            </div>
             <button type="button" @click="$wire.{{ $closeMethod }}()" class="rm-btn-icon rm-btn-icon-sm text-[var(--rm-text-secondary)] hover:text-[var(--rm-text-primary)]" aria-label="Cerrar modal">
                 <i class="ph-bold ph-x text-base"></i>
             </button>
@@ -71,6 +82,9 @@ $modalId = $id ?: 'modal-'.\Illuminate\Support\Str::slug((string) ($attributes->
 
         <!-- Body (con scroll) -->
         <div class="rm-modal-body flex-1 min-h-0 overflow-y-auto px-5 sm:px-6 py-4 sm:py-5">
+            @if($showValidation)
+                <x-validation-errors class="mb-4" />
+            @endif
             {{ $slot }}
         </div>
 

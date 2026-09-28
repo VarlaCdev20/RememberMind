@@ -3,9 +3,11 @@
     $esMiTurno = request()->routeIs('admin.enfermeria.dashboard*') || request()->routeIs('admin.enfermeria.mi-turno*');
     $esMisResidentes = request()->routeIs('admin.enfermeria.pacientes*') || request()->routeIs('admin.enfermeria.residentes*');
     $esCuidados = request()->routeIs('admin.enfermeria.agenda*') || request()->routeIs('admin.enfermeria.tareas*') || request()->routeIs('admin.enfermeria.cuidados*');
+    $esRegistros = request()->routeIs('admin.enfermeria.registros*');
+    $esSeguimiento = request()->routeIs('admin.enfermeria.seguimiento*') || request()->routeIs('admin.seguimiento-diario.*');
     $esMedicacion = request()->routeIs('admin.enfermeria.medicacion*') || request()->routeIs('admin.salud-seguimiento.medicacion*');
     $esPaseTurno = request()->routeIs('admin.enfermeria.pase-turno*');
-    $esIncidentes = request()->routeIs('admin.enfermeria.registros*') || request()->routeIs('admin.enfermeria.incidentes*');
+    $esIncidentes = request()->routeIs('admin.enfermeria.incidentes*');
     $esAlertas = request()->routeIs('admin.enfermeria.alertas*');
 @endphp
 
@@ -13,7 +15,7 @@
        class="fixed inset-y-0 left-0 z-50 flex h-screen flex-col border-r border-[var(--rm-border)] bg-[var(--rm-bg-shell)] text-[var(--rm-nav-text)] transition-all duration-300 ease-in-out lg:translate-x-0"
        :class="[
            sidebarOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full',
-           sidebarCollapsed ? 'w-[80px] min-w-[80px]' : 'w-[260px] min-w-[260px]'
+           sidebarCollapsed ? 'w-[76px] min-w-[76px]' : 'w-[248px] min-w-[248px]'
        ]"
        aria-label="Navegación principal de ENFERMERÍA">
 
@@ -28,14 +30,14 @@
     </button>
 
     {{-- Bloque Superior Institucional --}}
-    <div class="h-[74px] shrink-0 flex items-center border-b border-[var(--rm-border)] bg-[var(--rm-bg-shell)] transition-all duration-300"
+    <div class="h-[64px] shrink-0 flex items-center border-b border-[var(--rm-border)] bg-[var(--rm-bg-shell)] transition-all duration-300"
          :class="sidebarCollapsed ? 'justify-center px-2' : 'justify-between px-[18px]'">
         <a href="{{ route('admin.enfermeria.dashboard') }}"
            class="flex items-center gap-3 transition-opacity duration-200 hover:opacity-95 min-w-0"
            :class="sidebarCollapsed ? 'justify-center' : ''"
            title="Centro Geriátrico Jardín de los Recuerdos">
             <img src="{{ asset('storage/imagenes/LOGO.png') }}"
-                 alt="CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS"
+                 alt="CENTRO GERIÁTRICO LOS ALMENDROS"
                  class="h-9 w-auto object-contain shrink-0"
                  onerror="this.onerror=null; this.src='{{ asset('images/logo.png') }}';">
             <div class="min-w-0 flex-1 overflow-hidden transition-all duration-300"
@@ -47,7 +49,7 @@
                  x-transition:leave-start="opacity-100 translate-x-0"
                  x-transition:leave-end="opacity-0 -translate-x-2">
                 <span class="block font-[700] text-[12px] leading-[1.08] text-[var(--rm-text-primary)] uppercase font-outfit whitespace-nowrap">
-                    CENTRO GERIÁTRICO<br>JARDÍN DE LOS RECUERDOS
+                    CENTRO GERIÁTRICO<br>LOS ALMENDROS
                 </span>
                 <span class="block text-[11px] font-[700] tracking-[0.05em] text-[var(--rm-action-primary)] uppercase font-outfit mt-0.5">
                     REMEMBERMIND
@@ -136,6 +138,30 @@
                 </div>
             </a>
 
+            {{-- REGISTROS CLÍNICOS --}}
+            <a href="{{ route('admin.enfermeria.registros') }}"
+               title="Registros clínicos"
+               aria-label="Registros clínicos"
+               class="group relative flex h-[48px] items-center rounded-[12px] text-[13.5px] font-[700] uppercase font-outfit transition-all duration-150 {{ $esRegistros ? 'bg-[var(--rm-nav-selected)] text-[var(--rm-nav-selected-text)] shadow-xs before:absolute before:left-0 before:top-2.5 before:bottom-2.5 before:w-[3.5px] before:rounded-full before:bg-[var(--rm-action-primary-hover)]' : 'text-[var(--rm-nav-text)] hover:bg-[var(--rm-nav-hover)] hover:text-[var(--rm-text-primary)]' }}"
+               :class="sidebarCollapsed ? 'justify-center px-0' : 'justify-between px-[14px]'">
+                <div class="flex items-center gap-3" :class="sidebarCollapsed ? 'justify-center' : ''">
+                    <i class="ph-bold ph-clipboard-text text-[21px] shrink-0"></i>
+                    <span x-show="!sidebarCollapsed" class="whitespace-nowrap">REGISTROS</span>
+                </div>
+            </a>
+
+            {{-- SEGUIMIENTO LONGITUDINAL --}}
+            <a href="{{ route('admin.enfermeria.seguimiento') }}"
+               title="Seguimiento diario"
+               aria-label="Seguimiento diario"
+               class="group relative flex h-[48px] items-center rounded-[12px] text-[13.5px] font-[700] uppercase font-outfit transition-all duration-150 {{ $esSeguimiento ? 'bg-[var(--rm-nav-selected)] text-[var(--rm-nav-selected-text)] shadow-xs before:absolute before:left-0 before:top-2.5 before:bottom-2.5 before:w-[3.5px] before:rounded-full before:bg-[var(--rm-action-primary-hover)]' : 'text-[var(--rm-nav-text)] hover:bg-[var(--rm-nav-hover)] hover:text-[var(--rm-text-primary)]' }}"
+               :class="sidebarCollapsed ? 'justify-center px-0' : 'justify-between px-[14px]'">
+                <div class="flex items-center gap-3" :class="sidebarCollapsed ? 'justify-center' : ''">
+                    <i class="ph-bold ph-chart-line-up text-[21px] shrink-0"></i>
+                    <span x-show="!sidebarCollapsed" class="whitespace-nowrap">SEGUIMIENTO</span>
+                </div>
+            </a>
+
             {{-- MEDICACIÓN --}}
             <a href="{{ Route::has('admin.enfermeria.medicacion') ? route('admin.enfermeria.medicacion') : (Route::has('admin.salud-seguimiento.medicacion.index') ? route('admin.salud-seguimiento.medicacion.index') : '#') }}"
                title="Medicación"
@@ -201,7 +227,7 @@
                     @endif
                 </div>
                 @if($conteoAlertas > 0)
-                    <span x-show="!sidebarCollapsed" class="inline-flex items-center justify-center w-[21px] h-[21px] rounded-full bg-[var(--rm-danger)] text-[var(--rm-text-on-primary)] text-[10.5px] font-[700] shrink-0 ml-auto shadow-2xs">
+                    <span x-show="!sidebarCollapsed" class="inline-flex items-center justify-center w-[21px] h-[21px] rounded-full bg-[var(--rm-danger)] text-[var(--rm-text-inverse)] text-[10.5px] font-[700] shrink-0 ml-auto shadow-2xs">
                         {{ $conteoAlertas }}
                     </span>
                 @endif

@@ -12,6 +12,7 @@
     --rm-space-2: 8px; /* pequeño */
     --rm-space-3: 12px; /* pequeño medio */
     --rm-space-4: 16px; /* estándar */
+    --rm-space-card: 18px; /* padding de tarjeta */
     --rm-space-5: 20px; /* medio */
     --rm-space-6: 24px; /* sección */
     --rm-space-8: 32px; /* amplio */
@@ -22,9 +23,10 @@
     /* ------------------------------------------------------------
        2. TOKENS CANÓNICOS DE DENSIDAD OPERATIVA
        ------------------------------------------------------------ */
-    --rm-page-gap: var(--rm-space-5);
-    --rm-section-gap: var(--rm-space-4);
-    --rm-card-padding: var(--rm-space-4);
+    --rm-page-gap: var(--rm-space-6);
+    --rm-section-gap: var(--rm-space-6);
+    --rm-grid-gap: var(--rm-space-4);
+    --rm-card-padding: var(--rm-space-card);
     --rm-card-padding-compact: var(--rm-space-3);
 
     --rm-table-row-height: 48px;
@@ -32,5 +34,5 @@
 
     --rm-chart-height-sm: 240px;
     --rm-chart-height-md: 280px;
-    --rm-chart-height-lg: 360px;
+    --rm-chart-height-lg: 340px;
 }

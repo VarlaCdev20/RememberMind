@@ -112,7 +112,7 @@
     </style>
 </head>
 
-<body class="h-full bg-[var(--rm-bg-app)] text-[var(--rm-text-primary)] antialiased selection:bg-[var(--rm-action-primary)] selection:text-[var(--rm-text-on-primary)] transition-colors duration-200"
+<body class="rm-nursing-shell h-full bg-[var(--rm-bg-app)] text-[var(--rm-text-primary)] antialiased selection:bg-[var(--rm-action-primary)] selection:text-[var(--rm-text-on-primary)] transition-colors duration-200"
       x-data="{
           sidebarOpen: false,
           sidebarCollapsed: localStorage.getItem('remembermind-sidebar-collapsed') === 'true',
@@ -172,9 +172,9 @@
         {{-- ========================================================= --}}
         {{-- CONTENIDO PRINCIPAL: ANCHO EXACTO Y ESPACIADO             --}}
         {{-- ========================================================= --}}
-        <main class="min-h-[calc(100vh-74px)] pb-10 transition-all duration-300 ease-in-out"
-              :class="sidebarCollapsed ? 'lg:pl-[80px]' : 'lg:pl-[260px]'">
-            <div class="mx-auto max-w-[1600px] px-3.5 sm:px-5 lg:px-6 pt-4 animate-fade-in-up">
+        <main class="rm-depth-canvas min-h-[calc(100vh-64px)] pb-6 transition-all duration-300 ease-in-out"
+              :class="sidebarCollapsed ? 'lg:pl-[76px]' : 'lg:pl-[248px]'">
+            <div class="mx-auto max-w-[1440px] px-4 sm:px-6 pt-6 animate-fade-in-up">
                 {{ $slot }}
             </div>
         </main>
@@ -183,7 +183,7 @@
     <x-ui.sweetalert />
 
     @stack('modals')
-    @livewireStyles
+    @livewireScripts
     @stack('scripts')
 </body>
 

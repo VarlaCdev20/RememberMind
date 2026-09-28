@@ -3,6 +3,43 @@ import forms from '@tailwindcss/forms';
 import typography from '@tailwindcss/typography';
 import animated from 'tailwindcss-animated';
 
+const rmColor = (channels) => `rgb(${channels} / <alpha-value>)`;
+
+const rmMint = {
+    50: rmColor('226 245 229'), 100: rmColor('203 239 208'), 200: rmColor('173 235 178'),
+    300: rmColor('139 212 149'), 400: rmColor('109 182 122'), 500: rmColor('79 137 94'),
+    600: rmColor('62 111 76'), 700: rmColor('49 88 62'), 800: rmColor('39 74 51'),
+    900: rmColor('32 62 43'), 950: rmColor('24 48 33'),
+};
+
+const rmBlue = {
+    50: rmColor('231 239 249'), 100: rmColor('220 232 247'), 200: rmColor('162 194 236'),
+    300: rmColor('126 162 205'), 400: rmColor('111 146 188'), 500: rmColor('82 125 170'),
+    600: rmColor('53 93 134'), 700: rmColor('41 76 112'), 800: rmColor('34 63 94'),
+    900: rmColor('29 53 80'), 950: rmColor('22 42 65'),
+};
+
+const rmCoral = {
+    50: rmColor('251 238 236'), 100: rmColor('247 213 209'), 200: rmColor('245 178 170'),
+    300: rmColor('245 140 129'), 400: rmColor('243 111 99'), 500: rmColor('201 79 69'),
+    600: rmColor('183 66 57'), 700: rmColor('159 53 46'), 800: rmColor('132 43 38'),
+    900: rmColor('109 36 31'), 950: rmColor('79 25 22'),
+};
+
+const rmWarm = {
+    50: rmColor('240 231 222'), 100: rmColor('231 221 211'), 200: rmColor('220 207 195'),
+    300: rmColor('201 186 172'), 400: rmColor('189 175 162'), 500: rmColor('168 151 137'),
+    600: rmColor('138 122 112'), 700: rmColor('102 92 85'), 800: rmColor('80 71 65'),
+    900: rmColor('52 46 42'), 950: rmColor('39 34 31'),
+};
+
+const rmWarning = {
+    50: rmColor('247 240 233'), 100: rmColor('239 222 207'), 200: rmColor('230 199 174'),
+    300: rmColor('211 163 128'), 400: rmColor('190 130 87'), 500: rmColor('169 104 67'),
+    600: rmColor('147 82 50'), 700: rmColor('121 65 42'), 800: rmColor('99 55 39'),
+    900: rmColor('81 47 35'), 950: rmColor('53 29 22'),
+};
+
 /** @type {import('tailwindcss').Config} */
 export default {
     darkMode: 'class',
@@ -26,6 +63,28 @@ export default {
             },
 
             colors: {
+                /* Familias heredadas redirigidas al contrato institucional. */
+                gray: rmWarm,
+                slate: rmWarm,
+                zinc: rmWarm,
+                neutral: rmWarm,
+                stone: rmWarm,
+                green: rmMint,
+                emerald: rmMint,
+                teal: rmMint,
+                blue: rmBlue,
+                sky: rmBlue,
+                cyan: rmBlue,
+                indigo: rmBlue,
+                violet: rmBlue,
+                purple: rmBlue,
+                red: rmCoral,
+                rose: rmCoral,
+                pink: rmCoral,
+                orange: rmWarning,
+                amber: rmWarning,
+                yellow: rmWarning,
+
                 /* Legacy temporal */
                 terracota: 'var(--rm-terracota)',
                 'terracota-dark': 'var(--rm-terracota-hover)',

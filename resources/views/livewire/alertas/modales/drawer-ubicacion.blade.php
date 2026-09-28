@@ -9,8 +9,8 @@
  <div class="rm-drawer-backdrop" wire:click="cerrarDrawer"></div>
 
  {{-- 2. Contenedor Deslizante Lateral Nítido (680-760px) --}}
- <div class="pointer-events-none fixed inset-y-0 right-0 z-50 flex max-w-full pl-6 sm:pl-10">
- <div class="pointer-events-auto flex h-full w-screen max-w-[760px] md:w-[740px] transform flex-col overflow-hidden rm-drawer transition duration-300 ease-in-out">
+ <div class="pointer-events-none fixed inset-y-0 right-0 z-50 flex max-w-full pl-4 sm:inset-y-3 sm:right-3 sm:pl-10">
+ <div class="pointer-events-auto flex h-full w-screen max-w-[760px] transform flex-col overflow-hidden rm-drawer transition duration-300 ease-in-out md:w-[740px]">
 
   {{-- HEADER FIJO (Badge de Ubicación + Título + Subtítulo + Botón X) --}}
   <header class="rm-drawer-header">

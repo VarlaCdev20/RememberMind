@@ -30,6 +30,7 @@ class RegistrarAdministracionMedicacionService
         ?string $efectoObservado = null,
         mixed $dosisAdministrada = null,
         ?string $reaccionAdversa = null,
+        ?string $fechaHoraAdministracion = null,
     ): AdministracionMedicacion {
         $turno = $this->turnos->autorizarMutacionPaciente(
             $codResidente,
@@ -70,6 +71,7 @@ class RegistrarAdministracionMedicacionService
             $efectoObservado,
             $dosisAdministrada,
             $reaccionAdversa,
+            $fechaHoraAdministracion,
             $personal,
             $asignacion,
             $ocurrencia,
@@ -99,7 +101,9 @@ class RegistrarAdministracionMedicacionService
                 'cod_jornada' => $asignacion->cod_jornada,
                 'cod_personal' => $personal->cod_personal,
                 'fecha_hora_programada' => $programada,
-                'fecha_hora_administracion' => $administrada ? now() : null,
+                'fecha_hora_administracion' => $administrada
+                    ? ($fechaHoraAdministracion ? Carbon::parse($fechaHoraAdministracion) : now())
+                    : null,
                 'resultado' => $administrada ? 'ADMINISTRADA' : 'OMITIDA',
                 'dosis_administrada' => $administrada
                     ? ($dosisAdministrada !== null ? $dosisAdministrada : ($ocurrencia['horario']->dosis_programada ?? $prescripcion->dosis))

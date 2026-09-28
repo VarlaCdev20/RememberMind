@@ -7,9 +7,9 @@
     /* ------------------------------------------------------------
        1. ALTURAS DE CONTROLES
        ------------------------------------------------------------ */
-    --rm-control-sm: 38px; /* control pequeño */
-    --rm-control-md: 44px; /* control mediano */
-    --rm-control-lg: 48px; /* control grande */
+    --rm-control-sm: 36px; /* control pequeño */
+    --rm-control-md: 40px; /* control estándar */
+    --rm-control-lg: 44px; /* control destacado */
 
     /* Aliases para compatibilidad */
     --rm-control-height: var(--rm-control-md);

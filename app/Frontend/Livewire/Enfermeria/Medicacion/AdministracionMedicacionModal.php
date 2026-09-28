@@ -20,6 +20,18 @@ class AdministracionMedicacionModal extends Component
 
     public $medicamento_nombre = '';
 
+    public $dosis_prescrita = '';
+
+    public $unidad_dosis = '';
+
+    public $via_administracion = '';
+
+    public $frecuencia = '';
+
+    public $indicacion = '';
+
+    public $medico_prescriptor = '';
+
     public $fecha = '';
 
     public $hora_programada = '';
@@ -32,6 +44,10 @@ class AdministracionMedicacionModal extends Component
 
     public $efecto_observado = '';
 
+    public $dosis_administrada = '';
+
+    public $reaccion_adversa = '';
+
     public $observacion = '';
 
     protected $listeners = ['abrirModalAdministracion'];
@@ -41,11 +57,15 @@ class AdministracionMedicacionModal extends Component
         return [
             'cod_residente' => 'required|exists:residentes,cod_residente',
             'cod_prescripcion' => 'required|exists:prescripciones,cod_prescripcion',
+            'fecha' => 'required|date|date_equals:today',
             'hora_programada' => 'required|date_format:H:i',
+            'hora_real' => $this->administrado ? 'required|date_format:H:i' : 'nullable|date_format:H:i',
             'administrado' => 'required|boolean',
+            'dosis_administrada' => $this->administrado ? 'required|numeric|min:0.001|max:9999999.999' : 'nullable|numeric|min:0.001|max:9999999.999',
             'motivo_omision' => ! $this->administrado ? 'required|string|min:5|max:255' : 'nullable|string|max:255',
-            'efecto_observado' => 'nullable|string|max:255',
-            'observacion' => 'nullable|string|max:255',
+            'efecto_observado' => 'nullable|string|max:2000',
+            'reaccion_adversa' => 'nullable|string|max:2000',
+            'observacion' => 'nullable|string|max:2000',
         ];
     }
 
@@ -57,11 +77,14 @@ class AdministracionMedicacionModal extends Component
             'cod_residente.exists' => 'El adulto mayor seleccionado no existe.',
             'cod_prescripcion.required' => 'La medicación es obligatoria.',
             'cod_prescripcion.exists' => 'La medicación seleccionada no existe.',
-            'fecha.before_or_equal' => 'La fecha no puede ser futura.',
+            'fecha.date_equals' => 'La administración programada corresponde al turno de hoy.',
             'hora_programada.required' => 'La hora programada es obligatoria.',
             'hora_programada.date_format' => 'La hora programada debe tener formato HH:MM.',
             'hora_real.required' => 'La hora real de administración es obligatoria.',
             'hora_real.date_format' => 'La hora real debe tener formato HH:MM.',
+            'dosis_administrada.required' => 'Registre la dosis efectivamente administrada.',
+            'dosis_administrada.numeric' => 'La dosis administrada debe ser numérica.',
+            'dosis_administrada.min' => 'La dosis administrada debe ser mayor que cero.',
             'motivo_omision.required' => 'Debe indicar el motivo de la omisión (mínimo 5 caracteres).',
             'motivo_omision.min' => 'El motivo de la omisión debe tener al menos 5 caracteres.',
         ];
@@ -104,6 +127,12 @@ class AdministracionMedicacionModal extends Component
         }
 
         $this->medicamento_nombre = $medicacion->nombre_medicamento;
+        $this->dosis_prescrita = (string) ($medicacion->dosis ?? '');
+        $this->unidad_dosis = (string) ($medicacion->unidad_dosis ?? '');
+        $this->via_administracion = (string) ($medicacion->via_administracion ?? '');
+        $this->frecuencia = (string) ($medicacion->frecuencia ?? '');
+        $this->indicacion = (string) ($medicacion->indicacion ?? '');
+        $this->medico_prescriptor = (string) ($medicacion->medico_indica ?? 'Profesional prescriptor');
         $this->hora_programada = $hora_programada
             ?: ($medicacion->hora_programada ? Carbon::parse($medicacion->hora_programada)->format('H:i') : now()->format('H:i'));
 
@@ -112,6 +141,8 @@ class AdministracionMedicacionModal extends Component
         $this->administrado = true;
         $this->motivo_omision = '';
         $this->efecto_observado = '';
+        $this->dosis_administrada = (string) ($medicacion->horarios->firstWhere('estado', 'ACTIVO')?->dosis_programada ?? $medicacion->dosis ?? '');
+        $this->reaccion_adversa = '';
         $this->observacion = '';
 
         $this->showModal = true;
@@ -142,6 +173,12 @@ class AdministracionMedicacionModal extends Component
 
         $this->validate();
 
+        if ($this->administrado && Carbon::createFromFormat('Y-m-d H:i', $this->fecha.' '.$this->hora_real)->isFuture()) {
+            $this->addError('hora_real', 'La fecha y hora de administración no pueden estar en el futuro.');
+
+            return;
+        }
+
         app(RegistrarAdministracionMedicacionService::class)->registrarProgramada(
             Auth::user(),
             ($this->cod_residente),
@@ -151,6 +188,9 @@ class AdministracionMedicacionModal extends Component
             $this->motivo_omision,
             $this->observacion,
             $this->efecto_observado,
+            $this->dosis_administrada !== '' ? $this->dosis_administrada : null,
+            $this->reaccion_adversa,
+            $this->administrado ? $this->fecha.' '.$this->hora_real : null,
         );
 
         $mensaje = $this->administrado ? 'Administración registrada correctamente.' : 'Omisión registrada correctamente.';

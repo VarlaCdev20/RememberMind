@@ -22,11 +22,11 @@
     $resolvedActions = $actions ?? $slot;
 @endphp
 
-<header class="rm-page-header mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+<header {{ $attributes->class(['rm-page-header']) }}>
     <div class="flex items-center gap-3.5 min-w-0">
         @if($resolvedIcon)
-            <span class="flex h-12 w-12 shrink-0 items-center justify-center rounded-[var(--rm-radius-card,16px)] {{ $color }} text-[var(--rm-text-on-primary)] shadow-[var(--rm-shadow-sm)] transition-transform duration-200 hover:scale-105">
-                <i class="ph-bold {{ $resolvedIcon }} text-2xl"></i>
+            <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-[var(--rm-radius-card,16px)] {{ $color }} text-[var(--rm-text-on-primary)] shadow-[var(--rm-shadow-sm)] transition-transform duration-200 hover:scale-105">
+                <i class="ph-bold {{ $resolvedIcon }} text-xl"></i>
             </span>
         @endif
 
@@ -38,13 +38,13 @@
             @endif
 
             @if($resolvedTitle)
-                <h1 class="text-2xl sm:text-3xl font-extrabold text-[var(--rm-text-primary)] leading-tight tracking-tight truncate">
+                <h1 class="text-2xl sm:text-[30px] font-extrabold text-[var(--rm-text-primary)] leading-tight tracking-tight break-words">
                     {{ $resolvedTitle }}
                 </h1>
             @endif
 
             @if($resolvedSubtitle)
-                <p class="text-xs sm:text-sm font-medium text-[var(--rm-text-secondary)] mt-1 leading-snug">
+                <p class="text-xs font-medium text-[var(--rm-text-secondary)] mt-1 leading-snug">
                     {{ $resolvedSubtitle }}
                 </p>
             @endif
@@ -52,7 +52,7 @@
     </div>
 
     @if($resolvedActions && trim($resolvedActions) !== '')
-        <div class="flex shrink-0 flex-wrap items-center gap-2.5">
+        <div class="flex w-full flex-wrap items-center gap-2.5 lg:w-auto lg:justify-end">
             {{ $resolvedActions }}
         </div>
     @endif

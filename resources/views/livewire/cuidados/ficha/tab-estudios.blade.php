@@ -245,15 +245,15 @@
             {{-- 4.1 GRÁFICO DE EVOLUCIÓN DE PARÁMETROS CLAVE + VALORES DE REFERENCIA --}}
             <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-stretch">
                 {{-- Gráfico Temporal Line/Area --}}
-                <div class="md:col-span-8 rounded-3xl border border-[var(--rm-border)] bg-[var(--rm-surface)] p-4 sm:p-5 shadow-sm space-y-3.5">
-                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-[var(--rm-border)]/60 pb-3">
+                <div class="md:col-span-8 rm-chart-card rm-chart-glass space-y-3.5">
+                    <div class="rm-chart-header flex-col sm:flex-row sm:items-center">
                         <div class="flex items-center gap-2">
                             <i class="ph-bold ph-chart-line-up text-[#1E3A8A] text-base"></i>
-                            <h3 class="text-xs sm:text-sm font-black text-[var(--rm-text-title)] uppercase tracking-wider">
+                            <h3 class="rm-chart-title">
                                 Evolución de parámetros clave
                             </h3>
                         </div>
-                        <span class="text-[11px] font-bold text-[var(--rm-text-muted)] font-mono">
+                        <span class="rm-chart-kpi-badge">
                             Últimos 6 meses
                         </span>
                     </div>
@@ -280,7 +280,7 @@
                     </div>
 
                     {{-- Canvas del Gráfico Line/Area --}}
-                    <div class="h-48 sm:h-52 w-full relative" wire:ignore>
+                    <div class="rm-chart-body h-48 sm:h-52 w-full relative" style="height: 13rem; min-height: 12rem; max-height: 13rem;" wire:ignore>
                         <canvas id="chartEvolucionEstudiosCanvas"></canvas>
                     </div>
 
@@ -729,17 +729,20 @@ function moduloResultadosEstudios(config) {
             }
 
             const isDark = document.documentElement.classList.contains('dark');
-            const mainColor = this.color || '#1E3A8A';
+            const chartToken = (name, fallback) => window.RMCharts?.getCss(name) || fallback;
+            const mainColor = chartToken('--rm-chart-2', '#527DAA');
+            const pointSurface = chartToken('--rm-surface-raised', '#F0E7DE');
+            const translucent = (color, alpha) => window.RMCharts?.hexToRgba(color, alpha) || color;
 
             // Gradiente vertical translúcido elegante
             const fillGrad = (context) => {
                 const chart = context.chart;
                 const { ctx: cCtx, chartArea } = chart;
-                if (!chartArea) return 'rgba(30, 58, 138, 0.15)';
+                if (!chartArea) return translucent(mainColor, 0.15);
                 const grad = cCtx.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
-                grad.addColorStop(0, isDark ? 'rgba(96, 165, 250, 0.35)' : 'rgba(30, 58, 138, 0.25)');
-                grad.addColorStop(0.7, isDark ? 'rgba(96, 165, 250, 0.08)' : 'rgba(30, 58, 138, 0.05)');
-                grad.addColorStop(1, 'rgba(30, 58, 138, 0.00)');
+                grad.addColorStop(0, translucent(mainColor, isDark ? 0.35 : 0.25));
+                grad.addColorStop(0.7, translucent(mainColor, isDark ? 0.08 : 0.05));
+                grad.addColorStop(1, translucent(mainColor, 0));
                 return grad;
             };
 
@@ -757,11 +760,11 @@ function moduloResultadosEstudios(config) {
                         fill: true,
                         pointRadius: 4,
                         pointHoverRadius: 6.5,
-                        pointBackgroundColor: isDark ? '#0F172A' : '#FFFFFF',
+                        pointBackgroundColor: pointSurface,
                         pointBorderColor: mainColor,
                         pointBorderWidth: 2,
                         pointHoverBackgroundColor: mainColor,
-                        pointHoverBorderColor: '#FFFFFF',
+                        pointHoverBorderColor: pointSurface,
                         pointHoverBorderWidth: 2,
                     }]
                 },
@@ -774,10 +777,10 @@ function moduloResultadosEstudios(config) {
                         legend: { display: false },
                         datalabels: { display: false },
                         tooltip: {
-                            backgroundColor: isDark ? 'rgba(15, 23, 42, 0.95)' : 'rgba(30, 41, 59, 0.92)',
-                            titleColor: '#FFFFFF',
-                            bodyColor: '#F8FAFC',
-                            borderColor: isDark ? 'rgba(255, 255, 255, 0.12)' : 'rgba(0, 0, 0, 0.08)',
+                            backgroundColor: chartToken('--rm-chart-tooltip-bg', '#F0E7DE'),
+                            titleColor: chartToken('--rm-chart-tooltip-text', '#342E2A'),
+                            bodyColor: chartToken('--rm-chart-tooltip-text', '#342E2A'),
+                            borderColor: chartToken('--rm-chart-tooltip-border', '#C9BAAC'),
                             borderWidth: 1,
                             padding: { top: 6, right: 10, bottom: 6, left: 10 },
                             cornerRadius: 8,
@@ -797,18 +800,18 @@ function moduloResultadosEstudios(config) {
                             grid: { display: false },
                             ticks: {
                                 font: { family: 'Outfit, Inter, sans-serif', size: 10.5, weight: '600' },
-                                color: isDark ? '#94A3B8' : '#64748B'
+                                color: chartToken('--rm-chart-axis-text', '#6B5F57')
                             }
                         },
                         y: {
                             beginAtZero: false,
                             grid: {
-                                color: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.05)',
+                                color: chartToken('--rm-chart-grid', 'rgba(80, 71, 65, 0.12)'),
                                 drawBorder: false
                             },
                             ticks: {
                                 font: { family: 'Outfit, Inter, sans-serif', size: 10.5 },
-                                color: isDark ? '#94A3B8' : '#64748B',
+                                color: chartToken('--rm-chart-axis-text', '#6B5F57'),
                                 callback: (v) => `${v}`
                             }
                         }

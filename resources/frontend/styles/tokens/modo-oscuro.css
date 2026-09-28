@@ -383,11 +383,23 @@
 
 .dark .sidebar-institucional,
 [data-theme="dark"] .sidebar-institucional {
-    background: var(--color-sidebar-bg);
-    border-color: var(--color-borde-suave);
+    background:
+        linear-gradient(
+            180deg,
+            color-mix(in srgb, var(--color-sidebar-bg) 78%, transparent) 0%,
+            color-mix(in srgb, var(--color-sidebar-bg) 64%, transparent) 100%
+        );
+    border-color: color-mix(in srgb, var(--color-borde-suave) 68%, transparent);
     color: var(--color-sidebar-texto);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(24px) saturate(1.12);
+    -webkit-backdrop-filter: blur(24px) saturate(1.12);
+}
+
+.dark .sidebar-brand-glass,
+[data-theme="dark"] .sidebar-brand-glass {
+    background: color-mix(in srgb, var(--rm-surface) 56%, transparent);
+    border-color: color-mix(in srgb, var(--rm-border-soft) 70%, transparent);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.18);
 }
 
 .dark .panel-institucional,

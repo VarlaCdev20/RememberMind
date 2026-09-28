@@ -10,7 +10,7 @@
  </div>
 
  {{-- Grid principal: 6 métricas base --}}
- <div class="grid grid-cols-2 gap-3 sm:grid-cols-3">
+ <div class="rm-dashboard-metric-grid">
 
  <div class="rm-metric-card">
  <div class="rm-metric-label">Fichas médicas activas</div>
@@ -67,7 +67,7 @@
  </div>
 
  {{-- Tira de métricas adicionales --}}
- <div class="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
+ <div class="rm-dashboard-detail-grid mt-3">
 
  <div class="flex items-center gap-2 rounded-xl border border-borde bg-fondo-hover px-3 py-2">
  <i class="ph-fill ph-heartbeat text-base text-meta"></i>

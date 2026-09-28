@@ -35,6 +35,7 @@ class DashboardService
                 'alertasAdministrativas'          => $this->generarAlertasInteligentes(),
                 'modulos'                         => $this->obtenerModulosInstitucionales(),
                 'bitacoraDashboard'               => $this->obtenerBitacoraAuditoria(),
+                'perfilDashboardRol'              => $this->obtenerPerfilDashboardRol($usuario),
                 'infoRol'                         => [
                     'es_admin'   => $esAdmin,
                     'es_salud'   => $esSalud,
@@ -81,6 +82,92 @@ class DashboardService
         $fecha = ucfirst(now()->translatedFormat('l, d \d\e F \d\e Y'));
 
         return compact('nombre', 'rolLegible', 'saludo', 'fecha');
+    }
+
+    /**
+     * Presentación y áreas funcionales del panel genérico por rol.
+     * No fabrica datos clínicos: describe competencias y enlaza únicamente
+     * rutas existentes cuya autorización continúa protegida por middleware.
+     */
+    public function obtenerPerfilDashboardRol($usuario): array
+    {
+        $rol = $usuario->getRoleNames()->first() ?? 'USUARIO';
+
+        $comun = [
+            'eyebrow' => 'CENTRO GERIÁTRICO LOS ALMENDROS',
+            'title' => 'Tu jornada,',
+            'highlight' => 'organizada con propósito',
+            'description' => 'Consulta tus áreas de trabajo y accede a las funciones autorizadas para tu perfil institucional.',
+            'image' => 'images/FOTOS CENTRO DE ADULTOS MAYORES/489963938_1158744422930145_8442506970304201426_n.jpg',
+            'quote' => 'Cada especialidad aporta bienestar',
+            'areas' => [],
+            'accesos' => [],
+        ];
+
+        $perfiles = [
+            'NUTRICIONISTA' => [
+                'title' => 'Nutrir hoy,',
+                'highlight' => 'es fortalecer el mañana',
+                'description' => 'Organiza la valoración nutricional, las mediciones antropométricas y el seguimiento de ingesta e hidratación.',
+                'image' => 'images/FOTOS CENTRO DE ADULTOS MAYORES/569897738_1324313409706578_2951129905561208154_n.jpg',
+                'quote' => 'Alimentar también es acompañar',
+                'areas' => [
+                    ['icon' => 'ph-bowl-food', 'title' => 'Valoración nutricional', 'copy' => 'Estado nutricional y necesidades individuales.'],
+                    ['icon' => 'ph-ruler', 'title' => 'Antropometría', 'copy' => 'Peso, talla y evolución de medidas.'],
+                    ['icon' => 'ph-drop', 'title' => 'Ingesta e hidratación', 'copy' => 'Seguimiento de consumo y tolerancia.'],
+                    ['icon' => 'ph-notebook', 'title' => 'Plan de cuidado', 'copy' => 'Indicaciones y objetivos interdisciplinarios.'],
+                ],
+            ],
+            'FISIOTERAPEUTA' => [
+                'title' => 'Moverse hoy,',
+                'highlight' => 'es conservar autonomía',
+                'description' => 'Prioriza movilidad, dolor, funcionalidad y prevención de caídas con una lectura clara de cada residente.',
+                'image' => 'images/FOTOS CENTRO DE ADULTOS MAYORES/577031711_1337134741757778_4846830420773518569_n.jpg',
+                'quote' => 'Cada movimiento cuenta',
+                'areas' => [
+                    ['icon' => 'ph-person-arms-spread', 'title' => 'Movilidad', 'copy' => 'Marcha, transferencias y asistencia requerida.'],
+                    ['icon' => 'ph-activity', 'title' => 'Funcionalidad', 'copy' => 'Capacidad y progreso terapéutico.'],
+                    ['icon' => 'ph-first-aid', 'title' => 'Dolor', 'copy' => 'Valoración y respuesta al tratamiento.'],
+                    ['icon' => 'ph-shield-check', 'title' => 'Prevención', 'copy' => 'Riesgo de caídas y entorno seguro.'],
+                ],
+            ],
+            'PEDAGOGO' => [
+                'title' => 'Estimular hoy,',
+                'highlight' => 'es mantener capacidades',
+                'description' => 'Planifica experiencias educativas y cognitivas adaptadas a los intereses, ritmos y habilidades de cada residente.',
+                'image' => 'images/FOTOS CENTRO DE ADULTOS MAYORES/558487013_1337134818424437_2282337776297854403_n.jpg',
+                'quote' => 'Aprender mantiene viva la curiosidad',
+                'areas' => [
+                    ['icon' => 'ph-brain', 'title' => 'Estimulación cognitiva', 'copy' => 'Atención, memoria y funciones ejecutivas.'],
+                    ['icon' => 'ph-pencil-line', 'title' => 'Seguimiento pedagógico', 'copy' => 'Objetivos y evolución individual.'],
+                    ['icon' => 'ph-palette', 'title' => 'Talleres', 'copy' => 'Actividades significativas y participación.'],
+                    ['icon' => 'ph-users-three', 'title' => 'Integración social', 'copy' => 'Vínculos, expresión y convivencia.'],
+                ],
+            ],
+            'FAMILIAR' => [
+                'title' => 'Acompañar cerca,',
+                'highlight' => 'incluso a la distancia',
+                'description' => 'Consulta la información compartida por el centro y mantente conectado con las actividades y el bienestar de tu familiar.',
+                'image' => 'images/FOTOS CENTRO DE ADULTOS MAYORES/600320307_1368093028661949_6493928930338402983_n.jpg',
+                'quote' => 'La familia también forma parte del cuidado',
+                'areas' => [
+                    ['icon' => 'ph-heart', 'title' => 'Bienestar', 'copy' => 'Información autorizada del residente vinculado.'],
+                    ['icon' => 'ph-calendar-check', 'title' => 'Actividades', 'copy' => 'Participación y experiencias del centro.'],
+                    ['icon' => 'ph-users', 'title' => 'Visitas', 'copy' => 'Organización del acompañamiento familiar.'],
+                    ['icon' => 'ph-file-text', 'title' => 'Documentos', 'copy' => 'Documentación y consentimientos disponibles.'],
+                ],
+            ],
+        ];
+
+        $perfil = array_replace($comun, $perfiles[$rol] ?? []);
+        $perfil['rol'] = $rol;
+        $perfil['accesos'] = [
+            ['route' => 'admin.residentes.index', 'permission' => 'residentes.ver', 'icon' => 'ph-users-three', 'label' => $rol === 'FAMILIAR' ? 'Mi familiar' : 'Residentes'],
+            ['route' => 'admin.actividades.index', 'permission' => 'actividades.ver', 'icon' => 'ph-calendar-check', 'label' => 'Actividades'],
+            ['route' => 'profile.show', 'permission' => null, 'icon' => 'ph-user-circle', 'label' => 'Mi perfil'],
+        ];
+
+        return $perfil;
     }
 
     public function obtenerKpisInstitucionales(): array

@@ -1,25 +1,33 @@
-<div class="space-y-5" x-data="{ activeTab: @entangle('tabActivo'), modalSelectorAtencion: false, modalExportar: false, drawerExpediente: false, drawerFamilia: false }" @keydown.escape.window="modalSelectorAtencion = false; modalExportar = false; drawerExpediente = false; drawerFamilia = false">
-    {{-- MENSAJES DE NOTIFICACIÓN CLÍNICA --}}
-    @if(session()->has('success'))
-        <div class="flex items-center gap-2 rounded-2xl bg-emerald-50 border border-emerald-200 p-4 text-xs font-bold text-emerald-800 shadow-sm">
-            <i class="ph-bold ph-check-circle text-base text-emerald-600"></i>
-            <span>{{ session('success') }}</span>
-        </div>
-    @endif
+@php
+    /*
+     * Datos clínicos listos para presentación. Las relaciones Eloquent nunca se
+     * imprimen directamente: se convierten en etiquetas legibles y consistentes.
+     */
+    $diagnosticosActivos = collect($adultoMayor->diagnosticos ?? [])
+        ->map(fn ($diagnostico) => trim((string) data_get($diagnostico, 'nombre')))
+        ->filter()
+        ->unique()
+        ->values();
 
-    @if(session()->has('error'))
-        <div class="flex items-center gap-2 rounded-2xl bg-rose-50 border border-rose-200 p-4 text-xs font-bold text-rose-800 shadow-sm">
-            <i class="ph-bold ph-warning-octagon text-base text-rose-600"></i>
-            <span>{{ session('error') }}</span>
-        </div>
-    @endif
+    $alergiasConocidas = collect($adultoMayor->alergias ?? [])
+        ->map(fn ($alergia) => trim((string) data_get($alergia, 'sustancia')))
+        ->filter()
+        ->unique()
+        ->values();
 
-    @if(session()->has('warning'))
-        <div class="flex items-center gap-2 rounded-2xl bg-amber-50 border border-amber-200 p-4 text-xs font-bold text-amber-800 shadow-sm">
-            <i class="ph-bold ph-warning text-base text-amber-600"></i>
-            <span>{{ session('warning') }}</span>
-        </div>
-    @endif
+    $antecedentesRelevantes = collect($adultoMayor->antecedentesClinicos ?? [])
+        ->map(fn ($antecedente) => trim((string) data_get($antecedente, 'descripcion')))
+        ->filter()
+        ->unique()
+        ->values();
+
+    $alergiasTexto = $alergiasConocidas->isNotEmpty()
+        ? $alergiasConocidas->join(', ')
+        : 'Sin alergias conocidas';
+@endphp
+
+<div class="rm-clinical-workspace rm-ficha-detalles" x-data="{ activeTab: @entangle('tabActivo'), modalSelectorAtencion: false, modalExportar: false, drawerExpediente: false, drawerFamilia: false }" @keydown.escape.window="modalSelectorAtencion = false; modalExportar = false; drawerExpediente = false; drawerFamilia = false">
+    <x-ui.toast />
 
     {{-- CABECERA INSTITUCIONAL CLÍNICA (Encabezado + Card Residente + Tabs) --}}
     @include('livewire.cuidados.ficha.cabecera')

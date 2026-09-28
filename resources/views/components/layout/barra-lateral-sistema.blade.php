@@ -5,15 +5,13 @@
         '-translate-x-full lg:translate-x-0',
 
         sidebarCollapsed ?
-        'lg:w-[82px]' :
-        'lg:w-[280px]'
+        'lg:w-[76px]' :
+        'lg:w-[248px]'
     ]"
-    class="sidebar-institucional fixed left-0 top-0 z-50 flex h-screen w-[280px] flex-col
+    class="sidebar-institucional fixed left-0 top-0 z-50 flex h-screen w-[248px] flex-col
 
         border-r
         border-[var(--rm-border-soft)]
-
-        bg-[var(--rm-bg-shell)]
 
         shadow-[6px_0_24px_rgba(47,40,36,0.06)]
 
@@ -76,7 +74,7 @@
          ============================================================ --}}
     <div class="shrink-0 px-3 pb-2 pt-4">
 
-        <div class="
+        <div class="sidebar-brand-glass
                 flex
                 min-h-[64px]
                 items-center
@@ -85,8 +83,6 @@
 
                 border
                 border-[var(--rm-border-soft)]
-
-                bg-[var(--rm-surface)]
 
                 px-3
                 py-2.5
@@ -118,7 +114,7 @@
 
                         shadow-[0_1px_4px_rgba(47,40,36,0.06)]
                     ">
-                    <img src="{{ asset('storage/imagenes/LOGO.png') }}" alt="CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS"
+                    <img src="{{ asset('storage/imagenes/LOGO.png') }}" alt="CENTRO GERIÁTRICO LOS ALMENDROS"
                         class="
                             h-8
                             w-8
@@ -149,7 +145,7 @@
                             text-[var(--rm-coffee-950)]
                         ">
                         CENTRO GERIÁTRICO<br>
-                        JARDÍN DE LOS RECUERDOS
+                        LOS ALMENDROS
                     </h2>
 
                     <p

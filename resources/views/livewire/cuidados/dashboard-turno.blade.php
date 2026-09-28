@@ -28,13 +28,13 @@
 
         {{-- HERO PRINCIPAL COMPACTO Y EDITORIAL (8 COLS) --}}
 
-        <div class="group lg:col-span-8 rounded-2xl border border-[var(--rm-border)] hover:border-[var(--rm-clinical)]/60 dark:border-[var(--rm-border)] dark:hover:border-[var(--rm-border)] bg-[var(--rm-surface)] dark:bg-[var(--rm-surface)] shadow-sm hover:shadow-md overflow-hidden flex flex-col sm:flex-row min-h-[142px] lg:h-[148px] transition-all duration-200 ease-out">
+        <div class="rm-role-hero group lg:col-span-8">
 
 
 
             {{-- LADO IZQUIERDO: TEXTO CLÍNICO REFINADO (64%) --}}
 
-            <div class="w-full sm:w-[64%] p-3.5 sm:p-4 flex flex-col justify-between z-10">
+            <div class="rm-role-hero__content">
 
                 <div>
 
@@ -70,7 +70,7 @@
 
                         @else
 
-                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-[var(--rm-surface)] text-[var(--rm-warning)] border border-[[var(--rm-warning)] dark:bg-[var(--rm-warning-soft)] dark:text-[var(--rm-warning)] dark:border-[var(--rm-warning)]/40 font-black uppercase tracking-wider text-[9.5px]">
+                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-[var(--rm-surface)] text-[var(--rm-warning)] border border-[var(--rm-warning)] dark:bg-[var(--rm-warning-soft)] dark:text-[var(--rm-warning)] dark:border-[var(--rm-warning)]/40 font-black uppercase tracking-wider text-[9.5px]">
 
                                 <i class="ph-bold ph-clock text-xs"></i>
 
@@ -92,21 +92,20 @@
 
 
 
-                    <h1 class="mt-1 text-lg sm:text-[20px] font-black text-[var(--rm-clinical)] dark:text-[var(--rm-surface)] tracking-tight leading-tight">
+                    <p class="mt-2 text-[11px] font-extrabold uppercase tracking-[0.18em] text-[var(--rm-text-secondary)]">
+                        Buen día, {{ $dashboard['usuario']['nombres'] ?? (Auth::user()->nombres ?? 'equipo de Enfermería') }}
+                    </p>
 
-                        Buenos días, <span class="font-extrabold text-[var(--rm-clinical)] dark:text-white">{{ $dashboard['usuario']['nombres'] ?? (Auth::user()->nombres ?? 'Elena') }}</span>
-
+                    <h1 class="rm-role-hero__title !mt-1.5">
+                        <span>Cuidar hoy,</span>
+                        <span class="rm-role-hero__highlight">es más vida mañana</span>
                     </h1>
 
 
 
                     {{-- LEMA MOTIVACIONAL CLÍNICO --}}
 
-                    <p class="mt-0.5 text-xs font-semibold text-[var(--rm-action-primary)] dark:text-[var(--rm-action-primary)] italic flex items-center gap-1">
-
-                        <span class="text-[var(--rm-warning)] font-black text-sm not-italic">“</span>Tu labor hace la diferencia<span class="text-[var(--rm-warning)] font-black text-sm not-italic">”</span>
-
-                    </p>
+                    <p class="rm-role-hero__description !mt-2">Tu dedicación deja huella en cada cuidado, registro y momento de acompañamiento.</p>
 
                 </div>
 
@@ -124,7 +123,7 @@
 
                     </div>
 
-                    <span class="text-[[var(--rm-text-primary)] dark:text-[var(--rm-text-body)]">|</span>
+                    <span class="text-[var(--rm-text-primary)] dark:text-[var(--rm-text-body)]">|</span>
 
                     <div class="flex items-center gap-1 text-[var(--rm-action-primary)] dark:text-[var(--rm-action-primary)] font-bold">
 
@@ -142,23 +141,24 @@
 
             {{-- LADO DERECHO: FOTOGRAFÍA INSTITUCIONAL REAL DE MANOS (36%) --}}
 
-            <div class="w-full sm:w-[36%] relative min-h-[120px] sm:min-h-full overflow-hidden shrink-0 border-t sm:border-t-0 sm:border-l border-[var(--rm-border)]/50 dark:border-[var(--rm-border)] bg-[[var(--rm-surface-soft)]">
+            <div class="rm-role-hero__visual">
 
-                <img src="{{ asset('storage/imagenes/ENFERMERIA/manos.png') }}"
+                <img src="{{ asset('images/FOTOS CENTRO DE ADULTOS MAYORES/577031711_1337134741757778_4846830420773518569_n.jpg') }}"
 
-                     alt="Atención y cuidado humano en RememberMind"
+                     alt="Profesional de Enfermería acompañando a una residente"
 
-                     class="w-full h-full object-cover object-center transform group-hover:scale-105 transition-transform duration-500 ease-out"
-
-                     loading="eager"
-
-                     onerror="this.onerror=null; this.src='{{ asset('images/dashboard/manos.png') }}';">
+                     class="rm-role-hero__image object-center"
+                     loading="eager">
 
 
 
                 {{-- Transición sutil en el borde izquierdo para fundir armónicamente --}}
 
-                <div class="absolute inset-y-0 left-0 w-6 bg-gradient-to-r from-[var(--rm-surface)] to-transparent dark:from-[[var(--rm-surface-soft)] pointer-events-none hidden sm:block"></div>
+                <div class="rm-role-hero__veil"></div>
+                <div class="rm-role-hero__quote">
+                    <i class="ph-fill ph-leaf"></i>
+                    <span>Tu labor hace la diferencia</span>
+                </div>
 
             </div>
 
@@ -168,7 +168,7 @@
 
         {{-- PANEL ESTADO GENERAL (4 COLS) --}}
 
-        <div class="lg:col-span-4 rounded-2xl border border-[var(--rm-border)] dark:border-[var(--rm-border)] bg-[var(--rm-surface)] dark:bg-[var(--rm-surface)] shadow-sm overflow-hidden flex flex-col justify-between min-h-[142px] lg:h-[148px] transition-all duration-200 ease-out p-3.5 sm:p-4">
+        <div class="rm-clinical-card lg:col-span-4 flex min-h-full flex-col justify-between p-4 sm:p-5">
 
             @php
 
@@ -276,7 +276,7 @@
 
                         <div class="flex items-center gap-1.5">
 
-                            <span class="flex h-6 w-6 items-center justify-center rounded bg-[var(--rm-action-primary)]/25 dark:bg-[[var(--rm-surface-soft)]/25 text-[var(--rm-action-primary)] dark:text-[var(--rm-action-primary)] border border-[var(--rm-action-primary)]/40 shadow-2xs shrink-0">
+                            <span class="flex h-6 w-6 items-center justify-center rounded bg-[var(--rm-action-primary)]/25 dark:bg-[var(--rm-surface-soft)]/25 text-[var(--rm-action-primary)] dark:text-[var(--rm-action-primary)] border border-[var(--rm-action-primary)]/40 shadow-2xs shrink-0">
 
                                 <i class="ph-bold ph-shield-check text-sm"></i>
 
@@ -284,7 +284,7 @@
 
                             <div>
 
-                                <h2 class="text-[11px] font-black uppercase tracking-wider text-[var(--rm-clinical)] dark:text-[[var(--rm-text-primary)]">
+                                <h2 class="text-[11px] font-black uppercase tracking-wider text-[var(--rm-clinical)] dark:text-[var(--rm-text-primary)]">
 
                                     ESTADO GENERAL
 
@@ -314,7 +314,7 @@
 
                     <div class="mt-2 rounded-lg border border-[var(--rm-border)]/40 dark:border-[var(--rm-border)] bg-[var(--rm-surface)]/70 dark:bg-[var(--rm-surface)]/60 p-2 text-center">
 
-                        <p class="text-xs font-bold text-[var(--rm-clinical)] dark:text-[[var(--rm-text-primary)]">
+                        <p class="text-xs font-bold text-[var(--rm-clinical)] dark:text-[var(--rm-text-primary)]">
 
                             Sin alertas activas en tu turno
 
@@ -492,7 +492,7 @@
 
                 </span>
 
-                <span class="flex h-7 w-7 items-center justify-center rounded-lg bg-[var(--rm-warning-soft)] dark:bg-[var(--rm-warning)]/30 text-[var(--rm-warning)] dark:text-[var(--rm-warning)] transition-transform duration-200 group-hover:scale-105 border border-[[var(--rm-warning)]/60 dark:border-[var(--rm-warning)]/40">
+                <span class="flex h-7 w-7 items-center justify-center rounded-lg bg-[var(--rm-warning-soft)] dark:bg-[var(--rm-warning)]/30 text-[var(--rm-warning)] dark:text-[var(--rm-warning)] transition-transform duration-200 group-hover:scale-105 border border-[var(--rm-warning)]/60 dark:border-[var(--rm-warning)]/40">
 
                     <i class="ph-bold ph-clock text-base"></i>
 
@@ -718,7 +718,7 @@
 
                         if (str_contains($estado, 'complet') || str_contains($estado, 'realiz')) {
 
-                            $badgeClase = 'bg-[var(--rm-surface-soft)] text-[var(--rm-action-primary)] border border-[[var(--rm-success-soft)] dark:bg-[var(--rm-action-primary)]/25 dark:text-[var(--rm-action-primary)] dark:border-[var(--rm-action-primary)]';
+                            $badgeClase = 'bg-[var(--rm-surface-soft)] text-[var(--rm-action-primary)] border border-[var(--rm-success-soft)] dark:bg-[var(--rm-action-primary)]/25 dark:text-[var(--rm-action-primary)] dark:border-[var(--rm-action-primary)]';
 
                             $iconoEstado = 'ph-check-circle text-[var(--rm-action-primary)] dark:text-[var(--rm-action-primary)]';
 
@@ -734,7 +734,7 @@
 
                         } else {
 
-                            $badgeClase = 'bg-[var(--rm-surface)] text-[var(--rm-warning)] border border-[[var(--rm-warning)] dark:bg-[var(--rm-warning-soft)] dark:text-[var(--rm-warning)] dark:border-[var(--rm-warning)]/40';
+                            $badgeClase = 'bg-[var(--rm-surface)] text-[var(--rm-warning)] border border-[var(--rm-warning)] dark:bg-[var(--rm-warning-soft)] dark:text-[var(--rm-warning)] dark:border-[var(--rm-warning)]/40';
 
                             $iconoEstado = 'ph-clock text-[var(--rm-warning)] dark:text-[var(--rm-warning)]';
 
@@ -842,11 +842,11 @@
 
         {{-- PROGRESO DEL TURNO Y DISTRIBUCIÓN (5 COLS): GRÁFICAS INTEGRADAS Y CONTRASTADAS --}}
 
-        <section class="lg:col-span-5 rounded-2xl border border-[var(--rm-border)] hover:border-[var(--rm-clinical)]/60 dark:border-[var(--rm-border)] dark:hover:border-[var(--rm-border)] bg-[var(--rm-surface)] dark:bg-[var(--rm-surface)] p-3.5 sm:p-4 shadow-sm hover:shadow-md space-y-3 transition-all duration-200 ease-out" aria-label="Progreso del turno">
+        <section class="lg:col-span-5 rm-chart-card rm-chart-glass space-y-3" aria-label="Progreso del turno">
 
             {{-- Título con Ícono Contextual --}}
 
-            <div class="flex items-center justify-between border-b border-[var(--rm-border)]/40 dark:border-[var(--rm-border)] pb-2">
+            <div class="rm-chart-header">
 
                 <div class="flex items-center gap-2">
 
@@ -858,13 +858,13 @@
 
                     <div>
 
-                        <h2 class="text-sm sm:text-base font-black text-[var(--rm-clinical)] dark:text-[var(--rm-surface)] tracking-tight leading-tight">
+                        <h2 class="rm-chart-title">
 
                             {{ ($dashboard['modo'] ?? '') === 'FUERA_DE_TURNO' ? 'Progreso del turno en curso' : 'Progreso del turno' }}
 
                         </h2>
 
-                        <p class="text-[11px] font-semibold text-[var(--rm-text-secondary)] dark:text-[var(--rm-text-muted)]">
+                        <p class="rm-chart-subtitle">
 
                             {{ ($dashboard['modo'] ?? '') === 'FUERA_DE_TURNO' ? 'Cumplimiento del turno activo' : 'Cumplimiento de tareas operativas' }}
 
@@ -890,7 +890,7 @@
 
             {{-- Bloque Donut: Grosor Óptimo y Colores Vivos --}}
 
-            <div class="rounded-xl border border-[var(--rm-border)]/40 dark:border-[var(--rm-border)] bg-[var(--rm-surface)]/70 dark:bg-[var(--rm-surface)]/80 p-3 shadow-2xs">
+            <div class="rounded-xl border border-[var(--rm-border)]/60 bg-[var(--rm-surface-alt)]/55 p-3">
 
                 @php
 
@@ -909,7 +909,7 @@
 
 
 
-                <div class="h-36 sm:h-40 relative w-full flex items-center justify-center">
+                <div class="rm-chart-body h-36 sm:h-40 relative w-full flex items-center justify-center" style="height: 10rem; min-height: 9rem; max-height: 10rem;">
 
                     <canvas id="graficoCumplimientoTurno"></canvas>
 
@@ -963,7 +963,7 @@
 
             {{-- Bloque Distribución de Cuidados --}}
 
-            <div class="rounded-xl border border-[var(--rm-border)]/40 dark:border-[var(--rm-border)] bg-[var(--rm-surface)]/70 dark:bg-[var(--rm-surface)]/80 p-3 shadow-2xs">
+            <div class="rounded-xl border border-[var(--rm-border)]/60 bg-[var(--rm-surface-alt)]/55 p-3">
 
                 <div class="flex items-center justify-between text-xs font-extrabold text-[var(--rm-clinical)] dark:text-[var(--rm-surface)] mb-1">
 
@@ -973,7 +973,7 @@
 
                 </div>
 
-                <div class="h-36 sm:h-40 relative w-full flex items-center justify-center">
+                <div class="rm-chart-body h-36 sm:h-40 relative w-full flex items-center justify-center" style="height: 10rem; min-height: 9rem; max-height: 10rem;">
 
                     <canvas id="graficoDistribucionTurno"></canvas>
 
@@ -1077,7 +1077,7 @@
 
                     <a href="{{ $rutaFicha }}"
 
-                       class="group/res block rounded-xl border border-[var(--rm-border)]/40 dark:border-[var(--rm-border)] bg-[var(--rm-surface)]/70 dark:bg-[var(--rm-surface)]/80 p-2.5 hover:bg-[var(--rm-surface)] dark:hover:bg-[var(--rm-surface)] hover:border-[var(--rm-clinical)]/60 dark:hover:border-[[var(--rm-clinical-soft)]/60 hover:shadow-xs transition-all duration-150">
+                       class="group/res block rounded-xl border border-[var(--rm-border)]/40 dark:border-[var(--rm-border)] bg-[var(--rm-surface)]/70 dark:bg-[var(--rm-surface)]/80 p-2.5 hover:bg-[var(--rm-surface)] dark:hover:bg-[var(--rm-surface)] hover:border-[var(--rm-clinical)]/60 dark:hover:border-[var(--rm-clinical-soft)]/60 hover:shadow-xs transition-all duration-150">
 
                         <div class="flex items-center justify-between gap-3">
 
@@ -1123,7 +1123,7 @@
 
                                         {{ $residente['edad'] ?? '80 años' }} ·
 
-                                        <span class="font-bold text-[var(--rm-clinical)] dark:text-[[var(--rm-text-primary)]">
+                                        <span class="font-bold text-[var(--rm-clinical)] dark:text-[var(--rm-text-primary)]">
 
                                             {{ $residente['ubicacion'] ?? ($residente['cama_texto'] ?? 'Hab. 102 · Cama A') }}
 
@@ -1142,7 +1142,7 @@
                                             $estSeg = $residente['estado_seguimiento'] ?? ($residente['estado_label'] ?? 'ESTABLE');
                                             $segColor = match(strtoupper(trim((string)$estSeg))) {
                                                 'CRÍTICO', 'CRITICO', 'REQUIERE_ATENCION' => 'bg-rose-100 text-rose-800 dark:bg-rose-900/50 dark:text-rose-200 border border-rose-200/80 dark:border-rose-800/60',
-                                                'VIGILANCIA' => 'bg-[var(--rm-surface)] text-[var(--rm-warning)] border border-[[var(--rm-warning)] dark:bg-[var(--rm-warning-soft)] dark:text-[var(--rm-warning)] dark:border-[var(--rm-warning)]/40',
+                                                'VIGILANCIA' => 'bg-[var(--rm-surface)] text-[var(--rm-warning)] border border-[var(--rm-warning)] dark:bg-[var(--rm-warning-soft)] dark:text-[var(--rm-warning)] dark:border-[var(--rm-warning)]/40',
                                                 default => 'bg-[var(--rm-action-primary-soft)] text-[var(--rm-action-primary)] dark:text-[var(--rm-action-primary)]',
                                             };
                                         @endphp
@@ -1162,7 +1162,7 @@
 
                                         @if(!empty($residente['turno_actual']))
 
-                                            <span class="px-1.5 py-0.2 rounded font-bold bg-[var(--rm-surface)] text-[var(--rm-warning)] border border-[[var(--rm-warning)] dark:bg-[var(--rm-warning-soft)] dark:text-[var(--rm-warning)] dark:border-[var(--rm-warning)]/40">
+                                            <span class="px-1.5 py-0.2 rounded font-bold bg-[var(--rm-surface)] text-[var(--rm-warning)] border border-[var(--rm-warning)] dark:bg-[var(--rm-warning-soft)] dark:text-[var(--rm-warning)] dark:border-[var(--rm-warning)]/40">
 
                                                 {{ $residente['turno_actual'] }}
 
@@ -1202,7 +1202,7 @@
 
                                         @else
 
-                                            <span class="inline-flex items-center gap-0.5 px-1.5 py-0.2 rounded font-semibold text-[var(--rm-action-primary)] dark:text-[var(--rm-action-primary)] bg-[var(--rm-surface-soft)] dark:bg-[var(--rm-action-primary)]/25 border border-[[var(--rm-success-soft)]/60 dark:border-[var(--rm-action-primary)]/40">
+                                            <span class="inline-flex items-center gap-0.5 px-1.5 py-0.2 rounded font-semibold text-[var(--rm-action-primary)] dark:text-[var(--rm-action-primary)] bg-[var(--rm-surface-soft)] dark:bg-[var(--rm-action-primary)]/25 border border-[var(--rm-success-soft)]/60 dark:border-[var(--rm-action-primary)]/40">
 
                                                 <i class="ph-bold ph-check text-[10px]"></i>
 
@@ -1324,7 +1324,7 @@
 
                             $bordeLeft = 'border-l-[3.5px] border-l-[var(--rm-warning)] bg-[var(--rm-surface)]/60 hover:bg-[var(--rm-surface)] dark:bg-[var(--rm-warning-soft)] dark:hover:bg-[var(--rm-warning)]/25';
 
-                            $badgeStyle = 'bg-[var(--rm-surface)] text-[var(--rm-warning)] border border-[[var(--rm-warning)] dark:bg-[var(--rm-warning-soft)] dark:text-[var(--rm-warning)] dark:border-[var(--rm-warning)]/40';
+                            $badgeStyle = 'bg-[var(--rm-surface)] text-[var(--rm-warning)] border border-[var(--rm-warning)] dark:bg-[var(--rm-warning-soft)] dark:text-[var(--rm-warning)] dark:border-[var(--rm-warning)]/40';
 
                             $iconoAlerta = 'ph-warning text-[var(--rm-warning)] dark:text-[var(--rm-warning)]';
 

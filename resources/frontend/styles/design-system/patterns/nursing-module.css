@@ -1,0 +1,347 @@
+/* ============================================================
+   REMEMBERMIND — WORKSPACE CLÍNICO DE ENFERMERÍA
+   Capa de normalización para vistas heredadas y componentes nuevos.
+   La ficha del residente y Alertas definen la referencia visual.
+   ============================================================ */
+
+.rm-nursing-shell {
+    --rm-clinical-page-gap: 24px;
+    --rm-clinical-grid-gap: 16px;
+    --rm-clinical-card-padding: 18px;
+    --rm-clinical-control-height: 40px;
+    color: var(--rm-text-primary);
+    background: var(--rm-bg-app);
+}
+
+.rm-nursing-shell main {
+    font-family: var(--rm-font-family);
+}
+
+.rm-nursing-shell main > div > :first-child,
+.rm-clinical-workspace {
+    width: 100%;
+}
+
+.rm-clinical-workspace {
+    display: flex;
+    flex-direction: column;
+    gap: var(--rm-clinical-page-gap);
+}
+
+/* La ficha recupera la composición de DETALLES_ENF. Conserva las superficies
+   y acentos definidos por los tokens actuales, también en modo oscuro. */
+.rm-ficha-detalles .rm-clinical-summary-grid {
+    gap: 20px;
+}
+
+.rm-ficha-detalles .rm-clinical-card {
+    background: linear-gradient(155deg, var(--rm-surface-raised), var(--rm-surface));
+    border-color: var(--rm-border);
+    box-shadow: var(--rm-shadow-sm);
+}
+
+.rm-ficha-detalles .rm-clinical-card__header {
+    border-color: var(--rm-border-soft);
+}
+
+.rm-ficha-detalles .rm-chart-card {
+    max-height: none;
+}
+
+.rm-ficha-detalles .rm-chart-body.is-lg {
+    height: 18rem;
+    min-height: 18rem;
+    max-height: 18rem;
+}
+
+/* Superficies consistentes incluso en pantallas heredadas. */
+.rm-nursing-shell main :is(.rounded-2xl, .rounded-3xl).border:not(.rm-ficha-detalles *),
+.rm-nursing-shell main :is(.enf-card, .rm-card, .rm-panel, .rm-section-card):not(.rm-ficha-detalles *) {
+    border-radius: var(--rm-radius-card) !important;
+    border-color: var(--rm-border) !important;
+    background-color: var(--rm-surface) !important;
+    box-shadow: var(--rm-shadow-sm) !important;
+}
+
+.rm-nursing-shell main .rounded-3xl:not(.rm-ficha-detalles *) {
+    border-radius: var(--rm-radius-panel) !important;
+}
+
+.rm-nursing-shell main :is(h1, h2, h3, h4):not(.rm-ficha-detalles *) {
+    font-family: var(--rm-font-title);
+    color: var(--rm-text-title);
+    text-wrap: balance;
+}
+
+.rm-nursing-shell main h1:not(.rm-ficha-detalles *) { font-size: min(30px, var(--rm-font-page-title)); }
+.rm-nursing-shell main h2:not(.rm-ficha-detalles *) { font-size: var(--rm-font-section-title); }
+.rm-nursing-shell main h3:not(.rm-ficha-detalles *) { font-size: var(--rm-font-card-title); }
+
+/* Controles: mismo alto, foco y lectura en todos los CRUD clínicos. */
+.rm-nursing-shell main :is(input, select, textarea):not([type="checkbox"]):not([type="radio"]):not([type="range"]):not(.rm-ficha-detalles *) {
+    min-height: var(--rm-clinical-control-height);
+    border-radius: var(--rm-radius-input) !important;
+    border-color: var(--rm-input-border) !important;
+    background-color: var(--rm-input-bg) !important;
+    color: var(--rm-input-text) !important;
+    font-size: var(--rm-font-size-body);
+}
+
+.rm-nursing-shell main textarea:not(.rm-ficha-detalles *) {
+    min-height: 96px;
+    line-height: var(--rm-line-height-normal);
+}
+
+.rm-nursing-shell main :is(input, select, textarea):focus-visible {
+    border-color: var(--rm-input-focus-border) !important;
+    box-shadow: var(--rm-focus-ring) !important;
+    outline: none;
+}
+
+.rm-nursing-shell main :is(input, select, textarea)[aria-invalid="true"] {
+    border-color: var(--rm-danger) !important;
+    background: color-mix(in srgb, var(--rm-danger) 7%, var(--rm-input-bg)) !important;
+}
+
+.rm-nursing-shell main button:not(.rm-ficha-detalles *),
+.rm-nursing-shell main [role="button"]:not(.rm-ficha-detalles *) {
+    min-height: 40px;
+}
+
+.rm-nursing-shell main :is(.rm-btn-icon, .rm-action-btn, [aria-label]):not(.rm-btn):not(.rm-ficha-detalles *) {
+    min-width: 40px;
+}
+
+/* Tablas clínicas compactas y legibles. */
+.rm-nursing-shell main table:not(.rm-ficha-detalles *) {
+    width: 100%;
+    border-collapse: collapse;
+    color: var(--rm-text-primary);
+    font-size: var(--rm-font-size-table);
+}
+
+.rm-nursing-shell main table:not(.rm-ficha-detalles *) thead {
+    background: var(--rm-table-header-bg);
+}
+
+.rm-nursing-shell main table:not(.rm-ficha-detalles *) th {
+    padding: 10px 14px;
+    color: var(--rm-text-secondary);
+    font-size: var(--rm-font-size-meta);
+    font-weight: var(--rm-font-weight-extrabold);
+    letter-spacing: var(--rm-letter-spacing-wide);
+    text-transform: uppercase;
+}
+
+.rm-nursing-shell main table:not(.rm-ficha-detalles *) td {
+    padding: 11px 14px;
+    border-top: 1px solid var(--rm-table-border);
+    vertical-align: middle;
+}
+
+.rm-nursing-shell main table:not(.rm-ficha-detalles *) tbody tr:hover {
+    background: var(--rm-table-row-hover);
+}
+
+/* Cabecera contextual persistente del residente. */
+.rm-clinical-resident-context {
+    position: relative;
+    display: block;
+    padding: var(--rm-clinical-card-padding);
+    overflow: hidden;
+    border: 1px solid var(--rm-border);
+    border-radius: var(--rm-radius-panel);
+    background:
+        radial-gradient(circle at 92% 0%, color-mix(in srgb, var(--rm-action-primary) 10%, transparent), transparent 36%),
+        var(--rm-surface);
+    box-shadow: var(--rm-shadow-sm);
+}
+
+.rm-clinical-resident-context::before {
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 4px;
+    content: "";
+    background: linear-gradient(180deg, var(--rm-action-primary), var(--rm-clinical));
+}
+
+.rm-resident-clinical-facts {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+}
+
+.rm-resident-clinical-fact {
+    min-width: 0;
+    padding: 10px 12px;
+    border: 1px solid var(--rm-border-soft);
+    border-radius: var(--rm-radius-input);
+    background: var(--rm-surface-soft);
+}
+
+.rm-resident-clinical-fact > span:first-child {
+    display: block;
+    margin-bottom: 2px;
+    color: var(--rm-text-muted);
+    font-size: var(--rm-font-size-meta);
+    font-weight: var(--rm-font-weight-bold);
+    letter-spacing: var(--rm-letter-spacing-wide);
+    text-transform: uppercase;
+}
+
+.rm-resident-clinical-fact > strong {
+    display: block;
+    overflow: hidden;
+    color: var(--rm-text-primary);
+    font-size: var(--rm-font-size-label);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Timeline longitudinal para registros observacionales. */
+.rm-clinical-timeline {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+.rm-clinical-timeline::before {
+    position: absolute;
+    top: 14px;
+    bottom: 14px;
+    left: 11px;
+    width: 1px;
+    content: "";
+    background: var(--rm-border);
+}
+
+.rm-clinical-timeline-item {
+    position: relative;
+    display: grid;
+    grid-template-columns: 24px minmax(0, 1fr);
+    gap: 12px;
+    padding: 0 0 18px;
+}
+
+.rm-clinical-timeline-dot {
+    z-index: 1;
+    width: 10px;
+    height: 10px;
+    margin: 6px 0 0 6px;
+    border: 2px solid var(--rm-surface);
+    border-radius: 999px;
+    background: var(--rm-action-primary);
+    box-shadow: 0 0 0 2px var(--rm-action-primary-soft);
+}
+
+.rm-clinical-timeline-content {
+    padding: 10px 12px;
+    border: 1px solid var(--rm-border-soft);
+    border-radius: var(--rm-radius-input);
+    background: var(--rm-surface-soft);
+}
+
+/* Drawer-formulario: cabecera y acciones permanecen visibles. */
+.rm-clinical-drawer-form {
+    display: flex;
+    min-height: 100%;
+    flex-direction: column;
+}
+
+.rm-clinical-drawer-form .rm-form-actions {
+    position: sticky;
+    bottom: -20px;
+    z-index: 2;
+    margin: auto -20px -20px;
+    padding: 14px 20px;
+    background: color-mix(in srgb, var(--rm-surface) 94%, transparent);
+    backdrop-filter: blur(12px);
+}
+
+/* Puente para formularios heredados grandes: se comportan como drawer sin
+   alterar su estado Livewire ni la lógica de permisos. Los diálogos breves
+   max-w-sm/md/2xl conservan presentación modal centrada. */
+@media (min-width: 768px) {
+    .rm-nursing-shell main .fixed.inset-0 > :is(
+        [class*="max-w-3xl"],
+        [class*="max-w-4xl"],
+        [class*="max-w-5xl"],
+        [class*="max-w-6xl"]
+    ) {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        bottom: 12px;
+        width: min(760px, calc(100vw - 48px));
+        max-width: 760px !important;
+        max-height: calc(100vh - 24px) !important;
+        margin: 0 !important;
+        overflow-y: auto;
+        border-radius: var(--rm-radius-modal) !important;
+        box-shadow: var(--rm-shadow-overlay) !important;
+    }
+}
+
+.rm-clinical-readonly-order {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 8px;
+    padding: 14px;
+    border: 1px solid var(--rm-info-border);
+    border-radius: var(--rm-radius-card);
+    background: color-mix(in srgb, var(--rm-info-soft) 70%, var(--rm-surface));
+}
+
+.rm-clinical-readonly-order dt {
+    color: var(--rm-text-muted);
+    font-size: var(--rm-font-size-meta);
+    font-weight: var(--rm-font-weight-bold);
+    text-transform: uppercase;
+}
+
+.rm-clinical-readonly-order dd {
+    margin-top: 2px;
+    color: var(--rm-text-primary);
+    font-size: var(--rm-font-size-label);
+    font-weight: var(--rm-font-weight-bold);
+}
+
+/* Loading y feedback sin saltos de composición. */
+.rm-nursing-shell [wire\:loading] {
+    color: var(--rm-text-secondary);
+}
+
+.rm-nursing-shell .rm-clinical-loading {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.rm-nursing-shell .rm-clinical-loading::before {
+    width: 14px;
+    height: 14px;
+    content: "";
+    border: 2px solid var(--rm-border);
+    border-top-color: var(--rm-action-primary);
+    border-radius: 999px;
+    animation: rm-nursing-spin .7s linear infinite;
+}
+
+@keyframes rm-nursing-spin { to { transform: rotate(360deg); } }
+
+@media (max-width: 1023px) {
+    .rm-clinical-readonly-order { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 639px) {
+    .rm-nursing-shell { --rm-clinical-page-gap: 16px; --rm-clinical-card-padding: 14px; }
+    .rm-resident-clinical-facts,
+    .rm-clinical-readonly-order { grid-template-columns: 1fr; }
+    .rm-nursing-shell main table th,
+    .rm-nursing-shell main table td { padding-inline: 10px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .rm-clinical-loading::before { animation-duration: 1.5s; }
+}

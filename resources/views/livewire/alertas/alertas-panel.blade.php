@@ -1,70 +1,55 @@
 <div class="rm-pilot-alertas rm-page-layout font-sans">
  {{-- Encabezado Institucional Canónico --}}
- <header class="rm-page-header">
- <div class="flex items-center gap-4">
-  <span class="flex h-12 w-12 items-center justify-center rounded-2xl bg-[var(--rm-danger-action)] text-white shadow-md">
-  <i class="ph ph-shield-warning text-2xl"></i>
-  </span>
-  <div class="rm-page-title-group">
-  <h1 class="rm-page-title text-slate-800 dark:text-slate-100">
-   Alertas clínicas y cuidados
-  </h1>
-  <p class="rm-page-subtitle text-slate-600 dark:text-slate-400">
-   Monitoreo continuo de alertas clínicas, signos vitales, administración de fármacos y eventos asistenciales en Jardín de los Recuerdos.
-  </p>
-  </div>
- </div>
-
- <div class="flex flex-wrap items-center gap-2.5">
+ <x-ui.page-header
+  title="Alertas clínicas y cuidados"
+  subtitle="Monitoreo continuo de alertas clínicas, signos vitales, administración de fármacos y eventos asistenciales en Los Almendros."
+  overline="Centro de control asistencial"
+  icon="ph-shield-warning"
+  color="bg-[var(--rm-danger-action)]">
   @can('alertas.gestionar')
-  <button type="button"
+  <x-ui.action-button
+   variant="accent"
+   size="sm"
+   icono="ph-plus-circle"
    wire:click="abrirCrear"
-   class="rm-btn rm-btn-accent cursor-pointer">
-   <i class="ph ph-plus-circle text-lg"></i>
-   <span>Registrar alerta</span>
-  </button>
+   class="cursor-pointer">
+   Registrar alerta
+  </x-ui.action-button>
 
-  <button type="button"
+  <x-ui.action-button
+   variant="secondary"
+   size="sm"
    wire:click="detectarAlertas"
    wire:loading.attr="disabled"
-   class="rm-btn rm-btn-secondary cursor-pointer">
+   class="cursor-pointer">
    <i class="ph ph-arrows-clockwise text-lg" wire:loading.class="animate-spin" wire:target="detectarAlertas"></i>
    <span wire:loading.remove wire:target="detectarAlertas">Detectar pendientes</span>
    <span wire:loading wire:target="detectarAlertas">Analizando...</span>
-  </button>
+  </x-ui.action-button>
   @endcan
 
-  <button type="button"
-  wire:click="$refresh"
-  title="Actualizar datos"
-  class="rm-btn-icon cursor-pointer">
-  <i class="ph ph-arrow-clockwise text-lg" wire:loading.class="animate-spin" wire:target="$refresh"></i>
-  </button>
- </div>
- </header>
+  <x-ui.action-button
+   variant="icon"
+   size="sm"
+   wire:click="$refresh"
+   title="Actualizar datos"
+   aria-label="Actualizar datos"
+   class="cursor-pointer">
+   <i class="ph ph-arrow-clockwise text-lg" wire:loading.class="animate-spin" wire:target="$refresh"></i>
+  </x-ui.action-button>
+ </x-ui.page-header>
 
  {{-- Notificación Flash Institucional --}}
  @if (session()->has('mensaje'))
- <div x-data="{ show: true }"
-  x-show="show"
-  x-transition
-  class="rm-alert rm-alert-success flex items-center justify-between">
-  <div class="flex items-center gap-3">
-  <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--rm-state-success-border)] text-white">
-   <i class="ph ph-check-circle text-lg"></i>
-  </span>
-  <span class="text-sm font-semibold text-[var(--rm-state-success-text)]">{{ session('mensaje') }}</span>
-  </div>
-  <button type="button" @click="show = false" class="text-[var(--rm-state-success-text)] opacity-70 hover:opacity-100 transition cursor-pointer">
-  <i class="ph ph-x text-lg"></i>
-  </button>
- </div>
+ <x-ui.callout variant="success" title="Operación completada">
+  {{ session('mensaje') }}
+ </x-ui.callout>
  @endif
 
  <x-validation-errors class="mb-2" />
 
  {{-- TARJETAS KPI: BASE CÁLIDA (var(--rm-surface)) + MODO OSCURO --}}
- <section class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-5 gap-3.5">
+ <section class="rm-kpi-grid">
  {{-- Card 1: Total Alertas --}}
  <div wire:click="limpiarFiltros"
   class="rm-card-metric rm-card-interactive cursor-pointer border-l-[3px] border-l-[var(--rm-action-primary)]">
@@ -228,7 +213,7 @@
                         parseInt(niveles.MEDIO) || 0,
                         parseInt(niveles.BAJO) || 0
                     ],
-                    [sem.danger, sem.warningHigh, sem.warning, sem.info]
+                    [sem.danger, sem.warningHigh, sem.info, sem.success]
                 );
 
                 window.RMCharts.init('alertas_nivel', 'chartAlertasNivel', config, () => this.renderGraficoNivel());
@@ -271,7 +256,7 @@
                         parseInt(estados.EN_ATENCION) || 0,
                         parseInt(estados.CERRADA) || 0
                     ],
-                    [sem.warning, sem.info, sem.success]
+                    [sem.info, sem.primary, sem.success]
                 );
 
                 window.RMCharts.init('alertas_estado', 'chartAlertasEstado', config, () => this.renderGraficoEstado());
@@ -371,7 +356,7 @@
             <div class="relative rm-chart-body is-md" style="height: 220px; width: 100%;">
                 <canvas id="chartAlertasEstado"></canvas>
                 <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                    <span class="text-xl font-extrabold text-[var(--rm-success)] dark:text-[var(--rm-success-soft)]">
+                    <span class="text-xl font-extrabold text-[var(--rm-success)]">
                         {{ ($conteos['total'] ?? 0) > 0 ? round((($conteos['cerradas'] ?? 0) / $conteos['total']) * 100) : 0 }}%
                     </span>
                     <span class="text-[10px] font-semibold text-[var(--rm-text-muted)] dark:text-slate-400 uppercase tracking-wider">
@@ -418,10 +403,10 @@
             <div class="lg:col-span-2">
                 <select wire:model.live="filtroNivel" class="w-full rounded-xl border border-[var(--rm-border)]  bg-[var(--rm-input-bg)]  py-2 px-3 text-xs font-medium text-[var(--rm-text-primary)] focus:border-[var(--rm-primary)] focus:ring-1 focus:ring-[var(--rm-primary)] focus:outline-none h-[38px]">
                     <option value="">Todos los niveles</option>
-                    <option value="CRITICO">🚨 Crítico</option>
-                    <option value="ALTO">⚠️ Alto</option>
-                    <option value="MEDIO">⚡ Medio</option>
-                    <option value="BAJO">⚪ Bajo</option>
+                    <option value="CRITICO">Crítico</option>
+                    <option value="ALTO">Alto</option>
+                    <option value="MEDIO">Medio</option>
+                    <option value="BAJO">Bajo</option>
                 </select>
             </div>
 
@@ -520,8 +505,8 @@
 
     {{-- TABLA ASISTENCIAL MEDIANA + MODO OSCURO + PIE DE PAGINACIÓN INSTITUCIONAL --}}
     <section class="rm-table-wrapper">
-        <div class="w-full overflow-hidden">
-            <table class="rm-table w-full table-fixed">
+        <div class="w-full overflow-x-auto overscroll-x-contain">
+            <table class="rm-table w-full min-w-[980px] table-fixed">
                 <thead class="rm-table-header">
                     <tr>
                         <th class="w-[23%] text-left font-bold">Residente y Ubicación</th>
@@ -535,43 +520,12 @@
                 <tbody class="text-xs">
                     @forelse($alertas as $alerta)
                         @php
-                            $nivelBadge = match($alerta->prioridad) {
-                                'CRITICO' => 'bg-[var(--rm-danger)] text-[var(--rm-text-inverse)] shadow-xs',
-                                'ALTO' => 'bg-[var(--rm-warning)] text-white shadow-xs',
-                                'MEDIO' => 'bg-[var(--rm-warning)] text-[var(--rm-text-on-primary)] shadow-xs',
-                                'BAJO' => 'bg-[var(--rm-status-stable)] text-[var(--rm-text-on-primary)] shadow-xs',
-                                default => 'bg-[var(--rm-text-muted)] text-[var(--rm-text-inverse)]'
-                            };
                             $nivelTexto = match($alerta->prioridad) {
                                 'CRITICO' => 'Crítico',
                                 'ALTO' => 'Alto',
                                 'MEDIO' => 'Medio',
                                 'BAJO' => 'Bajo',
                                 default => $alerta->prioridad
-                            };
-                            $origenBadge = match($alerta->modulo) {
-                                'SIGNOS' => 'bg-rose-100 text-rose-800 dark:bg-rose-950/70 dark:text-rose-300 border-rose-200 dark:border-rose-800',
-                                'MEDICACION' => 'bg-purple-100 text-purple-800 dark:bg-purple-950/70 dark:text-purple-300 border-purple-200 dark:border-purple-800',
-                                'INCIDENTE' => 'bg-[var(--rm-status-high-soft)] text-[var(--rm-status-high)] border-[var(--rm-status-high)]/40',
-                                'MANUAL' => 'bg-blue-100 text-blue-800 dark:bg-blue-950/70 dark:text-blue-300 border-blue-200 dark:border-blue-800',
-                                'PLAN' => 'bg-teal-100 text-teal-800 dark:bg-teal-950/70 dark:text-teal-300 border-teal-200 dark:border-teal-800',
-                                'SEGUIMIENTO' => 'bg-cyan-100 text-cyan-800 dark:bg-cyan-950/70 dark:text-cyan-300 border-cyan-200 dark:border-cyan-800',
-                                'SOLICITUD_MEDICA' => 'bg-indigo-100 text-indigo-800 dark:bg-indigo-950/70 dark:text-indigo-300 border-indigo-200 dark:border-indigo-800',
-                                'FICHA' => 'bg-[var(--rm-warning-soft)] text-[var(--rm-warning-strong)] dark:bg-[var(--rm-warning-soft)]/20 dark:text-[var(--rm-warning-soft)] border-[var(--rm-warning)]/30 dark:border-[var(--rm-warning)]/30',
-                                'VALORACION' => 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/70 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800',
-                                default => 'bg-[var(--rm-surface-soft)] text-slate-800 dark:bg-slate-800 dark:text-slate-300 border-slate-200 '
-                            };
-                            $estadoBadge = match($alerta->estado) {
-                                'ABIERTA' => 'bg-[var(--rm-warning-soft)]/20 text-[var(--rm-warning-strong)] dark:text-[var(--rm-warning-soft)] border-[var(--rm-warning)]/40/20 dark:border-[var(--rm-warning)]/30',
-                                'EN_ATENCION' => 'bg-blue-500/10 text-blue-800 dark:text-blue-300 border-blue-400/30 dark:border-blue-600/30',
-                                'CERRADA' => 'bg-emerald-500/10 text-emerald-800 dark:text-emerald-300 border-emerald-400/30 dark:border-emerald-600/30',
-                                default => 'bg-[var(--rm-surface-raised)]0/10 text-slate-700 dark:text-slate-300 border-slate-400/30 dark:border-slate-600/30'
-                            };
-                            $estadoDot = match($alerta->estado) {
-                                'ABIERTA' => 'bg-[var(--rm-warning)]',
-                                'EN_ATENCION' => 'bg-blue-500',
-                                'CERRADA' => 'bg-emerald-500',
-                                default => 'bg-slate-400'
                             };
                             $estadoTexto = match($alerta->estado) {
                                 'ABIERTA' => 'Por Atender',
@@ -602,12 +556,8 @@
                             {{-- Columna 2: Clasificación y Nivel --}}
                             <td class="px-2 py-2">
                                 <div class="flex flex-col gap-1 items-start">
-                                    <span class="px-2 py-0.5 rounded-md text-[10px] font-extrabold uppercase tracking-wider {{ $nivelBadge }}">
-                                        {{ $nivelTexto }}
-                                    </span>
-                                    <span class="px-2 py-0.5 rounded-md text-[9.5px] font-semibold uppercase border {{ $origenBadge }}">
-                                        {{ $alerta->modulo }}
-                                    </span>
+                                    <x-ui.status-badge :estado="$alerta->prioridad" :label="$nivelTexto" />
+                                    <x-ui.status-badge :estado="$alerta->modulo" variant="clinical" class="text-[9.5px]" />
                                 </div>
                             </td>
 
@@ -636,10 +586,7 @@
 
                             {{-- Columna 5: Estado (Badge chiquito con reborde sutil y dot de pulso) --}}
                             <td class="px-1.5 py-2 text-center whitespace-nowrap">
-                                <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-medium border {{ $estadoBadge }}">
-                                    <span class="w-1.5 h-1.5 rounded-full {{ $estadoDot }} shrink-0"></span>
-                                    <span>{{ $estadoTexto }}</span>
-                                </span>
+                                <x-ui.status-badge :estado="$alerta->estado" :label="$estadoTexto" />
                             </td>
 
                             {{-- Columna 6: Acciones (Principales + Menú Secundario) --}}
@@ -703,7 +650,7 @@
                                                 <button type="button"
                                                     wire:click="cerrarAlerta('{{ $alerta->cod_alerta }}'); open = false;"
                                                     class="w-full flex items-center gap-2 px-3 py-2 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 text-left font-medium transition cursor-pointer border-t border-slate-100 /60">
-                                                    <i class="ph ph-check-circle text-sm text-[var(--rm-success)] dark:text-[var(--rm-success-soft)]"></i>
+                                                    <i class="ph ph-check-circle text-sm text-[var(--rm-success)]"></i>
                                                     <span>Finalizar / Cerrar alerta</span>
                                                 </button>
                                             @endif

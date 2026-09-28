@@ -16,14 +16,14 @@
     --rm-card-border: var(--rm-border-soft); /* borde */
     --rm-card-radius: var(--rm-radius-lg); /* radio */
     --rm-card-shadow: var(--rm-shadow-sm); /* sombra */
-    --rm-card-padding: var(--rm-space-5); /* padding */
+    --rm-card-padding: var(--rm-space-card); /* padding 18px */
     --rm-card-hover-shadow: var(--rm-shadow-md); /* hover */
     --rm-card-selected-bg: var(--rm-action-primary-soft); /* seleccionada */
 
     /* Metric Card Component Tokens */
     --rm-metric-bg: var(--rm-surface);
     --rm-metric-border: var(--rm-border);
-    --rm-metric-radius: var(--rm-radius-xl);
+    --rm-metric-radius: var(--rm-radius-card);
     --rm-metric-accent-width: 3px;
     --rm-metric-accent-danger: var(--rm-danger);
     --rm-metric-accent-warning: var(--rm-warning);
@@ -126,12 +126,13 @@
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    padding: var(--rm-space-4);
+    padding: var(--rm-card-padding);
     background-color: var(--rm-card-bg);
     border: 1px solid var(--rm-card-border);
     border-radius: var(--rm-card-radius);
     box-shadow: var(--rm-card-shadow);
-    min-height: 88px;
+    min-height: 108px;
+    max-height: 120px;
     box-sizing: border-box;
     transition: var(--rm-transition-all);
 }

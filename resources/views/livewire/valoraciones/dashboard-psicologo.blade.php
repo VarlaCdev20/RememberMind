@@ -1,27 +1,27 @@
 <div class="space-y-6">
 
- {{-- Encabezado --}}
- <div class="flex flex-col gap-4 border-b border-borde pb-5 md:flex-row md:items-center md:justify-between">
- <div class="flex items-center gap-3">
-  <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-boton-acento/10 text-boton-acento">
-  <i class="ph-fill ph-brain text-3xl"></i>
-  </div>
-  <div>
-  <h2 class="text-2xl font-black tracking-tight text-titulo">Dashboard Psicología</h2>
-  <p class="text-sm font-semibold text-apoyo">Evaluaciones geriátricas multidimensionales</p>
-  </div>
- </div>
- <div class="flex items-center gap-2">
-  <button wire:click="$refresh" class="rm-btn-secondary h-10 px-4">
-  <i class="ph-bold ph-arrows-clockwise text-lg"></i>
-  <span class="hidden sm:inline">Actualizar</span>
+ <x-ui.role-dashboard-hero
+  eyebrow="PSICOLOGÍA Y BIENESTAR EMOCIONAL"
+  title="Comprender hoy"
+  highlight="es acompañar mejor mañana"
+  description="Organiza las evaluaciones cognitivas, afectivas y sociales para acompañar la historia, capacidades y bienestar de cada residente."
+  :image="asset('images/FOTOS CENTRO DE ADULTOS MAYORES/558487013_1337134818424437_2282337776297854403_n.jpg')"
+  image-alt="Profesional acompañando a un residente durante una actividad cognitiva"
+  quote="Cada recuerdo merece tiempo y presencia"
+  :meta="[
+   ['icon' => 'ph-users-three', 'label' => $totalPacientes . ' residentes'],
+   ['icon' => 'ph-clipboard-text', 'label' => $totalEvaluaciones . ' evaluaciones'],
+   ['icon' => 'ph-brain', 'label' => '5 áreas de valoración'],
+  ]"
+ >
+  <button type="button" wire:click="$refresh" class="rm-btn-primary min-h-9 px-3.5 text-xs">
+   <i class="ph-bold ph-arrows-clockwise"></i><span>Actualizar panel</span>
   </button>
- </div>
- </div>
+ </x-ui.role-dashboard-hero>
 
  {{-- Stats globales --}}
  <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
- <div class="flex items-center gap-4 rounded-2xl border border-borde bg-fondo-card p-5 shadow-sm">
+ <div class="rm-role-kpi flex items-center gap-4 rounded-2xl border border-borde bg-fondo-card p-5 shadow-sm">
   <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-estado-infoBg text-estado-info">
   <i class="ph-bold ph-users text-2xl"></i>
   </div>
@@ -30,7 +30,7 @@
   <p class="text-3xl font-black text-titulo">{{ $totalPacientes }}</p>
   </div>
  </div>
- <div class="flex items-center gap-4 rounded-2xl border border-borde bg-fondo-card p-5 shadow-sm">
+ <div class="rm-role-kpi flex items-center gap-4 rounded-2xl border border-borde bg-fondo-card p-5 shadow-sm">
   <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-estado-exitoBg text-estado-exito">
   <i class="ph-bold ph-list-checks text-2xl"></i>
   </div>
@@ -39,7 +39,7 @@
   <p class="text-3xl font-black text-titulo">{{ $totalEvaluaciones }}</p>
   </div>
  </div>
- <div class="flex items-center gap-4 rounded-2xl border border-borde bg-fondo-card p-5 shadow-sm">
+ <div class="rm-role-kpi flex items-center gap-4 rounded-2xl border border-borde bg-fondo-card p-5 shadow-sm">
   <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-estado-peligroBg text-estado-peligro">
   <i class="ph-bold ph-warning-circle text-2xl"></i>
   </div>
@@ -56,7 +56,7 @@
  <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
   @foreach($statsPorArea as $codArea => $area)
   <a href="{{ route($area['ruta']) }}"
-  class="group flex flex-col gap-3 rounded-2xl border border-borde bg-fondo-card p-5 shadow-sm transition hover:-translate-y-0.5 hover:border-borde hover:shadow-md">
+  class="rm-role-kpi group flex flex-col gap-3 rounded-2xl border border-borde bg-fondo-card p-5 shadow-sm transition hover:-translate-y-0.5 hover:border-borde hover:shadow-md">
   <div class="flex items-center justify-between">
    <div class="flex h-11 w-11 items-center justify-center rounded-xl {{ $area['color_bg'] }} {{ $area['color_txt'] }}">
    <i class="ph-bold {{ $area['icono'] }} text-2xl"></i>

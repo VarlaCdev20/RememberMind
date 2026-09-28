@@ -1,7 +1,7 @@
 <style>
     .custom-timeline-scroll {
         scrollbar-width: thin;
-        scrollbar-color: rgba(30, 58, 138, 0.35) rgba(241, 245, 249, 0.6);
+        scrollbar-color: color-mix(in srgb, var(--rm-chart-2) 35%, transparent) color-mix(in srgb, var(--rm-surface-alt) 60%, transparent);
         scroll-behavior: smooth;
     }
     .custom-timeline-scroll::-webkit-scrollbar {
@@ -12,12 +12,12 @@
         border-radius: 9999px;
     }
     .custom-timeline-scroll::-webkit-scrollbar-thumb {
-        background-color: rgba(30, 58, 138, 0.35);
+        background-color: color-mix(in srgb, var(--rm-chart-2) 35%, transparent);
         border-radius: 9999px;
         transition: background-color 0.2s ease;
     }
     .custom-timeline-scroll::-webkit-scrollbar-thumb:hover {
-        background-color: #1E3A8A;
+        background-color: var(--rm-chart-2);
     }
     .dark .custom-timeline-scroll {
         scrollbar-color: rgba(148, 163, 184, 0.4) rgba(30, 41, 59, 0.6);
@@ -171,33 +171,33 @@
         </div>
 
         {{-- GRÁFICO 1: EVENTOS POR MES (BAR CHART - 4 cols en lg) --}}
-        <div class="lg:col-span-4 p-4 rounded-2xl border border-[var(--rm-border)] bg-[var(--rm-surface)] shadow-2xs flex flex-col justify-between space-y-2">
-            <div class="flex items-center justify-between">
+        <div class="lg:col-span-4 rm-chart-card rm-chart-glass flex flex-col justify-between">
+            <div class="rm-chart-header">
                 <div>
-                    <h3 class="text-xs font-black text-[var(--rm-text-title)] uppercase tracking-wider flex items-center gap-1.5">
+                    <h3 class="rm-chart-title">
                         <i class="ph-bold ph-chart-bar text-[#1E3A8A] text-sm"></i>
                         <span>Eventos por mes</span>
                     </h3>
-                    <p class="text-[10.5px] text-[var(--rm-text-muted)]">Últimos 6 meses</p>
+                    <p class="rm-chart-subtitle">Últimos 6 meses</p>
                 </div>
-                <span class="text-[10.5px] font-mono font-bold text-[var(--rm-text-muted)]">
+                <span class="rm-chart-kpi-badge">
                     Total: {{ array_sum($porMes['data']) }}
                 </span>
             </div>
-            <div class="h-32 w-full relative wire:ignore">
+            <div class="rm-chart-body h-32 w-full relative wire:ignore" style="height: 8rem; min-height: 8rem; max-height: 8rem;">
                 <canvas id="chartEventosPorMesCanvas"></canvas>
             </div>
         </div>
 
         {{-- GRÁFICO 2: EVENTOS POR TIPO (DONUT CHART - 3 cols en lg) --}}
-        <div class="lg:col-span-3 p-4 rounded-2xl border border-[var(--rm-border)] bg-[var(--rm-surface)] shadow-2xs flex flex-col justify-between space-y-2">
-            <div class="flex items-center justify-between">
+        <div class="lg:col-span-3 rm-chart-card rm-chart-glass flex flex-col justify-between">
+            <div class="rm-chart-header">
                 <div>
-                    <h3 class="text-xs font-black text-[var(--rm-text-title)] uppercase tracking-wider flex items-center gap-1.5">
+                    <h3 class="rm-chart-title">
                         <i class="ph-bold ph-chart-pie-slice text-[#1E3A8A] text-sm"></i>
                         <span>Eventos por tipo</span>
                     </h3>
-                    <p class="text-[10.5px] text-[var(--rm-text-muted)]">Distribución clínica</p>
+                    <p class="rm-chart-subtitle">Distribución clínica</p>
                 </div>
             </div>
 
@@ -954,8 +954,11 @@ function moduloEventosClinicos(config) {
                 }
 
                 const isDark = document.documentElement.classList.contains('dark') || document.documentElement.getAttribute('data-theme') === 'dark';
-                const textColor = isDark ? '#E2E8F0' : '#475569';
-                const gridColor = isDark ? 'rgba(255, 255, 255, 0.06)' : 'rgba(0, 0, 0, 0.04)';
+                const chartToken = (name, fallback) => window.RMCharts?.getCss(name) || fallback;
+                const textColor = chartToken('--rm-chart-axis-text', '#6B5F57');
+                const gridColor = chartToken('--rm-chart-grid', 'rgba(80, 71, 65, 0.12)');
+                const blue = chartToken('--rm-chart-2', '#527DAA');
+                const blueHover = chartToken('--rm-chart-7', '#355D86');
 
                 this.chartMesesInstance = new Chart(ctxMeses, {
                     type: 'bar',
@@ -964,9 +967,9 @@ function moduloEventosClinicos(config) {
                         datasets: [{
                             label: 'Eventos',
                             data: this.mesesData,
-                            backgroundColor: 'rgba(30, 58, 138, 0.72)',
-                            hoverBackgroundColor: 'rgba(30, 58, 138, 0.92)',
-                            borderColor: '#1E3A8A',
+                            backgroundColor: window.RMCharts?.hexToRgba(blue, 0.72) || blue,
+                            hoverBackgroundColor: window.RMCharts?.hexToRgba(blueHover, 0.92) || blueHover,
+                            borderColor: blue,
                             borderWidth: 1.5,
                             borderRadius: 6,
                             maxBarThickness: 24,
@@ -980,7 +983,11 @@ function moduloEventosClinicos(config) {
                             legend: { display: false },
                             datalabels: { display: false },
                             tooltip: {
-                                backgroundColor: isDark ? '#0F172A' : '#1E293B',
+                                backgroundColor: chartToken('--rm-chart-tooltip-bg', '#F0E7DE'),
+                                titleColor: chartToken('--rm-chart-tooltip-text', '#342E2A'),
+                                bodyColor: chartToken('--rm-chart-tooltip-text', '#342E2A'),
+                                borderColor: chartToken('--rm-chart-tooltip-border', '#C9BAAC'),
+                                borderWidth: 1,
                                 titleFont: { family: 'Outfit', size: 11, weight: 'bold' },
                                 bodyFont: { family: 'Outfit', size: 11 },
                                 padding: 8,
@@ -1019,21 +1026,24 @@ function moduloEventosClinicos(config) {
                     try { this.chartTipoInstance.destroy(); } catch (e) {}
                 }
 
+                const chartToken = (name, fallback) => window.RMCharts?.getCss(name) || fallback;
+                const eventPalette = [
+                    chartToken('--rm-chart-2', '#527DAA'),
+                    chartToken('--rm-chart-6', '#A89789'),
+                    chartToken('--rm-chart-3', '#78B985'),
+                    chartToken('--rm-chart-10', '#C94F45'),
+                    chartToken('--rm-chart-9', '#BDAFA2'),
+                ];
+
                 this.chartTipoInstance = new Chart(ctxTipo, {
                     type: 'doughnut',
                     data: {
                         labels: this.tipoLabels,
                         datasets: [{
                             data: this.tipoData,
-                            backgroundColor: [
-                                '#1E3A8A', // Caídas (Azul oscuro institucional)
-                                '#F59E0B', // Lesiones (Ámbar)
-                                '#3B82F6', // Incidentes (Azul brillante)
-                                '#F43F5E', // Complicaciones (Coral/Rojo)
-                                '#94A3B8', // Otros (Gris suave)
-                            ],
+                            backgroundColor: eventPalette,
                             borderWidth: 2,
-                            borderColor: document.documentElement.classList.contains('dark') ? '#1E293B' : '#FFFFFF',
+                            borderColor: chartToken('--rm-surface-raised', '#F0E7DE'),
                             hoverOffset: 4,
                         }]
                     },
@@ -1046,6 +1056,11 @@ function moduloEventosClinicos(config) {
                             legend: { display: false },
                             datalabels: { display: false },
                             tooltip: {
+                                backgroundColor: chartToken('--rm-chart-tooltip-bg', '#F0E7DE'),
+                                titleColor: chartToken('--rm-chart-tooltip-text', '#342E2A'),
+                                bodyColor: chartToken('--rm-chart-tooltip-text', '#342E2A'),
+                                borderColor: chartToken('--rm-chart-tooltip-border', '#C9BAAC'),
+                                borderWidth: 1,
                                 titleFont: { family: 'Outfit', size: 11, weight: 'bold' },
                                 bodyFont: { family: 'Outfit', size: 11 },
                                 callbacks: {

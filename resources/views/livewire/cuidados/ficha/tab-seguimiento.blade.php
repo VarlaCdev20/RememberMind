@@ -740,16 +740,16 @@
 
         {{-- 2. COLUMNA DERECHA (40/42%): PERFIL GERIÁTRICO MULTIDIMENSIONAL --}}
         <div class="lg:col-span-5 space-y-3">
-            <div class="rounded-2xl border border-[var(--rm-border)] bg-[var(--rm-surface)] p-4 shadow-xs space-y-3">
+            <div class="rm-chart-card rm-chart-glass space-y-3">
 
                 {{-- Header del Radar --}}
-                <div class="flex items-start justify-between border-b border-[var(--rm-border)] pb-2.5">
+                <div class="rm-chart-header items-start">
                     <div>
-                        <h3 class="text-sm font-bold text-[var(--rm-text-title)] flex items-center gap-1.5">
+                        <h3 class="rm-chart-title">
                             <i class="ph-bold ph-chart-polar text-[#1E3A8A]"></i>
                             <span>Perfil Geriátrico Multidimensional</span>
                         </h3>
-                        <p class="text-[11px] text-[var(--rm-text-muted)]">
+                        <p class="rm-chart-subtitle">
                             Comparativa de áreas de valoración
                         </p>
                     </div>
@@ -786,7 +786,7 @@
                     </div>
 
                     {{-- Gráfico Radar Grande --}}
-                    <div class="relative w-full h-[280px] max-w-[340px] mx-auto flex items-center justify-center" wire:ignore>
+                    <div class="rm-chart-body is-lg relative w-full h-[280px] max-w-[340px] mx-auto flex items-center justify-center" wire:ignore>
                         <canvas id="perfilGeriatricoRadar"></canvas>
                     </div>
 
@@ -835,16 +835,16 @@
 
         {{-- 7. PARTE INFERIOR IZQUIERDA: TENDENCIAS CLÍNICAS --}}
         <div class="lg:col-span-7 space-y-3">
-            <div class="rounded-2xl border border-[var(--rm-border)] bg-[var(--rm-surface)] p-4 shadow-xs space-y-3">
+            <div class="rm-chart-card rm-chart-glass space-y-3">
 
                 {{-- Header con Selector de Parámetro Único --}}
-                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-[var(--rm-border)] pb-2.5">
+                <div class="rm-chart-header flex-col sm:flex-row sm:items-center">
                     <div>
-                        <h3 class="text-sm font-bold text-[var(--rm-text-title)] flex items-center gap-1.5">
+                        <h3 class="rm-chart-title">
                             <i class="ph-bold ph-chart-line-up text-[#1E3A8A]"></i>
                             <span>Tendencias Clínicas</span>
                         </h3>
-                        <p class="text-[11px] text-[var(--rm-text-muted)]">
+                        <p class="rm-chart-subtitle">
                             Evolución de parámetros en el tiempo
                         </p>
                     </div>
@@ -870,7 +870,7 @@
                 </div>
 
                 {{-- Gráfico de área/línea interactivo --}}
-                <div class="relative w-full h-[240px] pt-1" wire:ignore>
+                <div class="rm-chart-body relative w-full h-[240px] pt-1" style="height: 15rem; min-height: 15rem; max-height: 15rem;" wire:ignore>
                     <canvas id="tendenciasClinicasChart"></canvas>
                 </div>
 
@@ -1286,8 +1286,13 @@ function evolucionClinicaApp(config) {
             }
 
             const isDark = document.documentElement.classList.contains('dark');
-            const gridColor = isDark ? 'rgba(255, 255, 255, 0.12)' : 'rgba(215, 200, 185, 0.55)';
-            const labelColor = isDark ? '#E2E8F0' : '#1E293B';
+            const chartToken = (name, fallback) => window.RMCharts?.getCss(name) || fallback;
+            const gridColor = chartToken('--rm-chart-grid', 'rgba(80, 71, 65, 0.12)');
+            const labelColor = chartToken('--rm-chart-axis-text', '#6B5F57');
+            const blue = chartToken('--rm-chart-2', '#527DAA');
+            const mint = chartToken('--rm-chart-1', '#4F895E');
+            const pointSurface = chartToken('--rm-surface-raised', '#F0E7DE');
+            const translucent = (color, alpha) => window.RMCharts?.hexToRgba(color, alpha) || color;
             const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
             const self = this;
@@ -1304,32 +1309,32 @@ function evolucionClinicaApp(config) {
                         {
                             label: 'Actual',
                             data: actualData,
-                            backgroundColor: 'rgba(30, 58, 138, 0.35)', // Azul oscuro translúcido
-                            borderColor: '#1E3A8A',
+                            backgroundColor: translucent(blue, 0.35),
+                            borderColor: blue,
                             borderWidth: 2.5,
-                            pointBackgroundColor: '#1E3A8A',
-                            pointBorderColor: '#F5EBE1',
+                            pointBackgroundColor: blue,
+                            pointBorderColor: pointSurface,
                             pointBorderWidth: 1.5,
                             pointRadius: 4.5,
                             pointHoverRadius: 7.5,
-                            pointHoverBackgroundColor: '#F5EBE1',
-                            pointHoverBorderColor: '#1E3A8A',
+                            pointHoverBackgroundColor: pointSurface,
+                            pointHoverBorderColor: blue,
                             pointHoverBorderWidth: 2.5,
                         },
                         {
                             label: 'Anterior',
                             data: compData,
-                            backgroundColor: 'rgba(13, 148, 136, 0.25)', // Verde/turquesa translúcido
-                            borderColor: '#0D9488',
+                            backgroundColor: translucent(mint, 0.25),
+                            borderColor: mint,
                             borderWidth: 2,
                             borderDash: [4, 4],
-                            pointBackgroundColor: '#0D9488',
-                            pointBorderColor: '#F5EBE1',
+                            pointBackgroundColor: mint,
+                            pointBorderColor: pointSurface,
                             pointBorderWidth: 1.5,
                             pointRadius: 4,
                             pointHoverRadius: 7,
-                            pointHoverBackgroundColor: '#F5EBE1',
-                            pointHoverBorderColor: '#0D9488',
+                            pointHoverBackgroundColor: pointSurface,
+                            pointHoverBorderColor: mint,
                             pointHoverBorderWidth: 2,
                         }
                     ]
@@ -1348,7 +1353,7 @@ function evolucionClinicaApp(config) {
                             ticks: {
                                 stepSize: 2,
                                 display: true,
-                                color: isDark ? '#94A3B8' : '#64748B',
+                                color: labelColor,
                                 backdropColor: 'transparent',
                                 font: { size: 9, family: 'Inter, system-ui, sans-serif' }
                             },
@@ -1364,10 +1369,10 @@ function evolucionClinicaApp(config) {
                         datalabels: { display: false },
                         legend: { display: false },
                         tooltip: {
-                            backgroundColor: isDark ? 'rgba(15, 23, 42, 0.96)' : 'rgba(245, 235, 225, 0.98)',
-                            titleColor: isDark ? '#F8FAFC' : '#0F172A',
-                            bodyColor: isDark ? '#CBD5E1' : '#334155',
-                            borderColor: isDark ? '#334155' : '#E2D6C8',
+                            backgroundColor: chartToken('--rm-chart-tooltip-bg', '#F0E7DE'),
+                            titleColor: chartToken('--rm-chart-tooltip-text', '#342E2A'),
+                            bodyColor: chartToken('--rm-chart-tooltip-text', '#342E2A'),
+                            borderColor: chartToken('--rm-chart-tooltip-border', '#C9BAAC'),
                             borderWidth: 1,
                             padding: 10,
                             boxPadding: 4,
@@ -1454,13 +1459,19 @@ function evolucionClinicaApp(config) {
             }
 
             const isDark = document.documentElement.classList.contains('dark');
-            const gridColor = isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(215, 200, 185, 0.45)';
-            const labelColor = isDark ? '#94A3B8' : '#64748B';
+            const chartToken = (name, fallback) => window.RMCharts?.getCss(name) || fallback;
+            const gridColor = chartToken('--rm-chart-grid', 'rgba(80, 71, 65, 0.12)');
+            const labelColor = chartToken('--rm-chart-axis-text', '#6B5F57');
+            const blue = chartToken('--rm-chart-2', '#527DAA');
+            const blueSoft = chartToken('--rm-chart-4', '#6F92BC');
+            const mint = chartToken('--rm-chart-1', '#4F895E');
+            const coral = chartToken('--rm-chart-10', '#C94F45');
+            const translucent = (color, alpha) => window.RMCharts?.hexToRgba(color, alpha) || color;
             const ctx = canvas.getContext('2d');
 
             const gradient = ctx.createLinearGradient(0, 0, 0, 240);
-            gradient.addColorStop(0, 'rgba(30, 58, 138, 0.28)');
-            gradient.addColorStop(1, 'rgba(30, 58, 138, 0.01)');
+            gradient.addColorStop(0, translucent(blue, 0.28));
+            gradient.addColorStop(1, translucent(blue, 0.01));
 
             const labels = this.tendenciasData.fechas || [];
             let datasets = [];
@@ -1470,33 +1481,33 @@ function evolucionClinicaApp(config) {
 
             if (this.metricaSeleccionada === 'PA') {
                 const gradDia = ctx.createLinearGradient(0, 0, 0, 240);
-                gradDia.addColorStop(0, 'rgba(13, 148, 136, 0.22)');
-                gradDia.addColorStop(1, 'rgba(13, 148, 136, 0.01)');
+                gradDia.addColorStop(0, translucent(blueSoft, 0.22));
+                gradDia.addColorStop(1, translucent(blueSoft, 0.01));
 
                 datasets = [
                     {
                         label: 'Sistólica (PAS)',
                         data: this.tendenciasData.PA_Sis || [],
-                        borderColor: '#1E3A8A',
+                        borderColor: blue,
                         backgroundColor: gradient,
                         fill: true,
                         tension: 0.35,
                         borderWidth: 2.5,
                         pointRadius: 3.5,
                         pointHoverRadius: 6,
-                        pointBackgroundColor: '#1E3A8A',
+                        pointBackgroundColor: blue,
                     },
                     {
                         label: 'Diastólica (PAD)',
                         data: this.tendenciasData.PA_Dia || [],
-                        borderColor: '#0D9488',
+                        borderColor: blueSoft,
                         backgroundColor: gradDia,
                         fill: true,
                         tension: 0.35,
                         borderWidth: 2,
                         pointRadius: 3,
                         pointHoverRadius: 5.5,
-                        pointBackgroundColor: '#0D9488',
+                        pointBackgroundColor: blueSoft,
                     }
                 ];
                 yMin = 50;
@@ -1506,14 +1517,14 @@ function evolucionClinicaApp(config) {
                 datasets = [{
                     label: 'Frecuencia Cardíaca',
                     data: this.tendenciasData.FC || [],
-                    borderColor: '#1E3A8A',
+                    borderColor: mint,
                     backgroundColor: gradient,
                     fill: true,
                     tension: 0.35,
                     borderWidth: 2.5,
                     pointRadius: 3.5,
                     pointHoverRadius: 6,
-                    pointBackgroundColor: '#1E3A8A',
+                    pointBackgroundColor: mint,
                 }];
                 yMin = 40;
                 yMax = 130;
@@ -1522,14 +1533,14 @@ function evolucionClinicaApp(config) {
                 datasets = [{
                     label: 'Saturación O₂',
                     data: this.tendenciasData.SpO2 || [],
-                    borderColor: '#1E3A8A',
+                    borderColor: blueSoft,
                     backgroundColor: gradient,
                     fill: true,
                     tension: 0.35,
                     borderWidth: 2.5,
                     pointRadius: 3.5,
                     pointHoverRadius: 6,
-                    pointBackgroundColor: '#1E3A8A',
+                    pointBackgroundColor: blueSoft,
                 }];
                 yMin = 85;
                 yMax = 100;
@@ -1538,14 +1549,14 @@ function evolucionClinicaApp(config) {
                 datasets = [{
                     label: 'Temperatura Corporal',
                     data: this.tendenciasData.Temp || [],
-                    borderColor: '#1E3A8A',
+                    borderColor: blue,
                     backgroundColor: gradient,
                     fill: true,
                     tension: 0.35,
                     borderWidth: 2.5,
                     pointRadius: 3.5,
                     pointHoverRadius: 6,
-                    pointBackgroundColor: '#1E3A8A',
+                    pointBackgroundColor: blue,
                 }];
                 yMin = 35.0;
                 yMax = 39.5;
@@ -1554,14 +1565,14 @@ function evolucionClinicaApp(config) {
                 datasets = [{
                     label: 'Dolor (Escala EVA)',
                     data: this.tendenciasData.Dolor || [],
-                    borderColor: '#E11D48',
-                    backgroundColor: 'rgba(225, 29, 72, 0.12)',
+                    borderColor: coral,
+                    backgroundColor: translucent(coral, 0.12),
                     fill: true,
                     tension: 0.3,
                     borderWidth: 2.5,
                     pointRadius: 4,
                     pointHoverRadius: 6,
-                    pointBackgroundColor: '#E11D48',
+                    pointBackgroundColor: coral,
                 }];
                 yMin = 0;
                 yMax = 10;
@@ -1570,14 +1581,14 @@ function evolucionClinicaApp(config) {
                 datasets = [{
                     label: 'Peso Corporal',
                     data: this.tendenciasData.Peso || [],
-                    borderColor: '#1E3A8A',
+                    borderColor: chartToken('--rm-chart-5', '#8A7A70'),
                     backgroundColor: gradient,
                     fill: true,
                     tension: 0.35,
                     borderWidth: 2.5,
                     pointRadius: 3.5,
                     pointHoverRadius: 6,
-                    pointBackgroundColor: '#1E3A8A',
+                    pointBackgroundColor: chartToken('--rm-chart-5', '#8A7A70'),
                 }];
                 yMin = 40;
                 yMax = 100;
@@ -1625,15 +1636,15 @@ function evolucionClinicaApp(config) {
                             position: 'top',
                             labels: {
                                 boxWidth: 12,
-                                color: isDark ? '#E2E8F0' : '#1E293B',
+                                color: labelColor,
                                 font: { size: 11, weight: '600' }
                             }
                         },
                         tooltip: {
-                            backgroundColor: isDark ? 'rgba(15, 23, 42, 0.95)' : 'rgba(245, 235, 225, 0.98)',
-                            titleColor: isDark ? '#F8FAFC' : '#0F172A',
-                            bodyColor: isDark ? '#CBD5E1' : '#334155',
-                            borderColor: isDark ? '#334155' : '#E2D6C8',
+                            backgroundColor: chartToken('--rm-chart-tooltip-bg', '#F0E7DE'),
+                            titleColor: chartToken('--rm-chart-tooltip-text', '#342E2A'),
+                            bodyColor: chartToken('--rm-chart-tooltip-text', '#342E2A'),
+                            borderColor: chartToken('--rm-chart-tooltip-border', '#C9BAAC'),
                             borderWidth: 1,
                             padding: 9,
                             boxPadding: 4,

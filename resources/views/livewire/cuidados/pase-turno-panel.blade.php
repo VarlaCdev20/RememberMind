@@ -1,5 +1,5 @@
 <!-- rm-filter-bar -->
-<div class="space-y-6 font-sans text-[var(--rm-clinical)] dark:text-[[var(--rm-text-primary)]" style="font-family: 'Outfit', sans-serif;">
+<div class="space-y-6 font-sans text-[var(--rm-clinical)] dark:text-[var(--rm-text-primary)]" style="font-family: 'Outfit', sans-serif;">
 
     {{-- CABECERA INSTITUCIONAL --}}
     <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between rounded-2xl bg-[var(--rm-surface)] dark:bg-[var(--rm-surface)] border border-[var(--rm-border)] dark:border-[var(--rm-text-body)] p-5 sm:p-6 shadow-sm">
@@ -12,7 +12,7 @@
                     <h1 class="text-2xl font-black tracking-tight text-[var(--rm-clinical)] dark:text-[var(--rm-surface)]">
                         Pases de turno <span class="sr-only">Pase de Turno</span>
                     </h1>
-                    <p class="text-xs font-medium text-[var(--rm-text-secondary)] dark:text-[[var(--rm-text-primary)]">
+                    <p class="text-xs font-medium text-[var(--rm-text-secondary)] dark:text-[var(--rm-text-primary)]">
                         Continuidad de cuidados y comunicación entre jornadas
                     </p>
                 </div>
@@ -36,7 +36,7 @@
 
     {{-- MENSAJES FLASH --}}
     @if(session()->has('mensaje'))
-        <div class="flex items-center justify-between rounded-xl bg-[var(--rm-action-primary-soft)] border border-[var(--rm-action-primary)]/40 px-4 py-3 text-xs font-bold text-[var(--rm-action-primary)] dark:text-[[var(--rm-success)]">
+        <div class="flex items-center justify-between rounded-xl bg-[var(--rm-action-primary-soft)] border border-[var(--rm-action-primary)]/40 px-4 py-3 text-xs font-bold text-[var(--rm-action-primary)] dark:text-[var(--rm-success)]">
             <div class="flex items-center gap-2">
                 <i class="ph-bold ph-check-circle text-base"></i>
                 <span>{{ session('mensaje') }}</span>
@@ -134,7 +134,7 @@
                             </div>
 
                             <button wire:click="abrirRevisarPase('{{ $paseRec->cod_pase }}')"
-                                class="w-full flex items-center justify-center gap-1.5 rounded-lg bg-[var(--rm-action-primary)] hover:bg-[[var(--rm-success)] text-white py-1.5 text-xs font-bold transition">
+                                class="w-full flex items-center justify-center gap-1.5 rounded-lg bg-[var(--rm-action-primary)] hover:bg-[var(--rm-success)] text-white py-1.5 text-xs font-bold transition">
                                 <i class="ph-bold ph-check-square"></i> Revisar y recibir pase
                             </button>
                         </div>
@@ -184,7 +184,7 @@
                         $esBorrador = $pase && $pase->esBorrador();
                     @endphp
 
-                    <div class="rounded-2xl bg-[var(--rm-surface)] dark:bg-[var(--rm-surface)] border {{ $esCritico ? 'border-[var(--rm-danger)]/70 bg-[[var(--rm-danger-soft)]/80 dark:bg-[[var(--rm-danger)]/80' : 'border-[var(--rm-border)] dark:border-[var(--rm-text-body)]' }} p-4 sm:p-5 shadow-sm space-y-3 flex flex-col justify-between">
+                    <div class="rounded-2xl bg-[var(--rm-surface)] dark:bg-[var(--rm-surface)] border {{ $esCritico ? 'border-[var(--rm-danger)]/70 bg-[var(--rm-danger-soft)]/80 dark:bg-[var(--rm-danger)]/80' : 'border-[var(--rm-border)] dark:border-[var(--rm-text-body)]' }} p-4 sm:p-5 shadow-sm space-y-3 flex flex-col justify-between">
                         <div class="space-y-2">
                             {{-- Cabecera Tarjeta: Residente y Ubicación --}}
                             <div class="flex items-start justify-between gap-2">
@@ -207,7 +207,7 @@
                                         ● Entregado
                                     </span>
                                 @elseif($esBorrador)
-                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-black uppercase bg-[var(--rm-warning-soft)] text-[[var(--rm-warning)] border border-[var(--rm-warning)]/40">
+                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-black uppercase bg-[var(--rm-warning-soft)] text-[var(--rm-warning)] border border-[var(--rm-warning)]/40">
                                         ✎ Borrador
                                     </span>
                                 @else
@@ -222,7 +222,7 @@
                                 <span class="text-[10px] uppercase font-bold text-[var(--rm-text-secondary)] dark:text-[var(--rm-text-muted)] block">
                                     Enfermero/a receptor/a (Jornada entrante):
                                 </span>
-                                <span class="font-bold {{ $item['tiene_receptor'] ? 'text-[var(--rm-clinical)] dark:text-[var(--rm-surface)]' : 'text-[[var(--rm-warning)] italic' }}">
+                                <span class="font-bold {{ $item['tiene_receptor'] ? 'text-[var(--rm-clinical)] dark:text-[var(--rm-surface)]' : 'text-[var(--rm-warning)] italic' }}">
                                     {{ $item['nombre_receptor'] }}
                                 </span>
                             </div>
@@ -320,7 +320,7 @@
                         </thead>
                         <tbody class="divide-y divide-[var(--rm-border)]/40 text-[var(--rm-clinical)] dark:text-[var(--rm-surface-soft)]">
                             @forelse($historialPases as $hPase)
-                                <tr class="hover:bg-[[var(--rm-surface)]/50 transition">
+                                <tr class="hover:bg-[var(--rm-surface)]/50 transition">
                                     <td class="py-3 px-4 whitespace-nowrap">
                                         <div class="font-bold">{{ \Carbon\Carbon::parse($hPase->fecha_hora)->format('d/m/Y H:i') }}</div>
                                         @if($hPase->fecha_hora_recepcion)
@@ -344,7 +344,7 @@
                                         @elseif($hPase->esEntregado())
                                             <span class="px-2 py-0.5 rounded-full text-[10px] font-black uppercase bg-[var(--rm-warning-soft)] text-[var(--rm-warning)]">Entregado</span>
                                         @else
-                                            <span class="px-2 py-0.5 rounded-full text-[10px] font-black uppercase bg-[var(--rm-warning-soft)] text-[[var(--rm-warning)]">Borrador</span>
+                                            <span class="px-2 py-0.5 rounded-full text-[10px] font-black uppercase bg-[var(--rm-warning-soft)] text-[var(--rm-warning)]">Borrador</span>
                                         @endif
                                     </td>
                                     <td class="py-3 px-4 text-right whitespace-nowrap">
@@ -405,14 +405,14 @@
                     {{-- ========================================== --}}
                     {{-- ZONA IZQUIERDA: CONTEXTO DEL TURNO (READONLY) --}}
                     {{-- ========================================== --}}
-                    <div class="lg:col-span-6 p-5 space-y-4 border-b lg:border-b-0 lg:border-r border-[var(--rm-border)] bg-[[var(--rm-surface)] dark:bg-[[var(--rm-surface-soft)] overflow-y-auto max-h-[70vh]">
+                    <div class="lg:col-span-6 p-5 space-y-4 border-b lg:border-b-0 lg:border-r border-[var(--rm-border)] bg-[var(--rm-surface)] dark:bg-[var(--rm-surface-soft)] overflow-y-auto max-h-[70vh]">
                         <div class="flex items-center gap-1.5 text-xs font-black uppercase tracking-wider text-[var(--rm-warning)]">
                             <i class="ph-bold ph-activity text-sm"></i> Contexto clínico real de la guardia (Solo lectura)
                         </div>
 
                         {{-- 1. Alertas e Incidentes --}}
                         @if(!empty($contextoClinico['alertas']) || !empty($contextoClinico['incidentes']))
-                            <div class="space-y-2 rounded-xl bg-[[var(--rm-danger-soft)] border border-[var(--rm-danger)]/40 p-3">
+                            <div class="space-y-2 rounded-xl bg-[var(--rm-danger-soft)] border border-[var(--rm-danger)]/40 p-3">
                                 <span class="font-bold text-[11px] text-[var(--rm-danger)] block uppercase tracking-wider">
                                     Alertas e Incidentes Activos
                                 </span>
@@ -614,7 +614,7 @@
 
                 <div class="p-5 space-y-4 text-xs max-h-[70vh] overflow-y-auto">
                     {{-- Ficha del Pase Entregado --}}
-                    <div class="space-y-2 rounded-xl bg-[[var(--rm-surface)] border border-[var(--rm-border)] p-3.5">
+                    <div class="space-y-2 rounded-xl bg-[var(--rm-surface)] border border-[var(--rm-border)] p-3.5">
                         <div>
                             <span class="text-[10px] uppercase font-bold text-[var(--rm-text-secondary)] block">Estado general:</span>
                             <span class="font-bold text-[var(--rm-clinical)]">{{ $paseSeleccionado->estado_general ?: 'Sin especificar' }}</span>
@@ -658,7 +658,7 @@
                         Cancelar
                     </button>
                     <button wire:click="confirmarRecepcion"
-                        class="rounded-xl bg-[var(--rm-action-primary)] hover:bg-[[var(--rm-success)] text-white px-5 py-2 text-xs font-bold transition">
+                        class="rounded-xl bg-[var(--rm-action-primary)] hover:bg-[var(--rm-success)] text-white px-5 py-2 text-xs font-bold transition">
                         ✓ Confirmar recepción de guardia
                     </button>
                 </div>
@@ -704,7 +704,7 @@
 
                     <div>
                         <span class="font-bold text-[var(--rm-clinical)] block">Resumen Clínico:</span>
-                        <p class="text-[var(--rm-clinical)] whitespace-pre-line leading-relaxed bg-[[var(--rm-surface)] p-3 rounded-xl border border-[var(--rm-border)]/40">{{ $paseSeleccionado->resumen }}</p>
+                        <p class="text-[var(--rm-clinical)] whitespace-pre-line leading-relaxed bg-[var(--rm-surface)] p-3 rounded-xl border border-[var(--rm-border)]/40">{{ $paseSeleccionado->resumen }}</p>
                     </div>
 
                     @if($paseSeleccionado->pendientes)

@@ -15,19 +15,20 @@
 
    /* Escala Tipográfica Estándar */
    --rm-font-size-page: 30px;
-   --rm-font-size-section: 22px;
-   --rm-font-size-card: 17px;        /* 16-18px para cards */
-   --rm-font-size-card-title: 17px;  /* 16-18px para cards */
-   --rm-font-size-body-lg: 16px;     /* 15-16px para body */
-   --rm-font-size-body: 15px;        /* 15-16px para body */
-   --rm-font-size-table: 14px;       /* 13-14px para tablas y metadatos normales */
-   --rm-font-size-label: 13px;       /* 13-14px para tablas y metadatos normales */
-   --rm-font-size-meta: 13px;        /* 13-14px para tablas y metadatos normales */
+   --rm-font-size-dashboard: 34px;
+   --rm-font-size-section: 20px;
+   --rm-font-size-card: 15px;
+   --rm-font-size-card-title: 15px;
+   --rm-font-size-body-lg: 14px;
+   --rm-font-size-body: 14px;
+   --rm-font-size-table: 14px;
+   --rm-font-size-label: 12px;
+   --rm-font-size-meta: 12px;
    --rm-font-size-compact: 12px;     /* 11-12px para badges y labels compactos */
    --rm-font-size-badge: 11px;       /* 11-12px para badges y labels compactos */
    --rm-font-size-micro: 10px;       /* 10px solo para metadata excepcional */
    --rm-font-size-button: 14px;
-   --rm-font-size-kpi: 32px;
+   --rm-font-size-kpi: 30px;
 
    /* Pesos */
    --rm-font-weight-regular: 400;

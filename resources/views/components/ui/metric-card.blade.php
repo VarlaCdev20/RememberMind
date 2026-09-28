@@ -50,7 +50,7 @@
     $resolvedBorderColor = $colorBorde ?? 'border-[var(--rm-border-soft)]';
 @endphp
 
-<div {{ $attributes->merge(['class' => "rm-card-metric rounded-[var(--rm-radius-card,16px)] border {$resolvedBorderColor} {$resolvedBgColor} {$variantBorderAccent} p-4 shadow-[var(--rm-shadow-sm)]"]) }}>
+<div {{ $attributes->merge(['class' => "rm-card-metric rounded-[var(--rm-radius-card,16px)] border {$resolvedBorderColor} {$resolvedBgColor} {$variantBorderAccent} p-[18px] shadow-[var(--rm-shadow-sm)]"]) }}>
     <div class="flex items-center justify-between gap-2 mb-2">
         <p class="rm-metric-label">{{ $etiqueta }}</p>
         @if($icono)
@@ -60,7 +60,7 @@
         @endif
     </div>
 
-    <p class="rm-metric-value text-2xl sm:text-3xl font-extrabold {{ $resolvedValueColor }} leading-tight">
+    <p class="rm-metric-value text-[30px] font-extrabold {{ $resolvedValueColor }} leading-tight">
         {{ $valor }}
     </p>
 

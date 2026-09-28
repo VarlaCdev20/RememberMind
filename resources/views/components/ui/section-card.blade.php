@@ -22,7 +22,7 @@
     $resolvedActions = $actions ?? $acciones;
 @endphp
 
-<section {{ $attributes->merge(['class' => 'rm-card bg-[var(--rm-surface)] border border-[var(--rm-border)] rounded-[var(--rm-radius-card,16px)] shadow-[var(--rm-shadow-sm)] p-4 sm:p-5 transition-all']) }}>
+<section {{ $attributes->merge(['class' => 'rm-card bg-[var(--rm-surface)] border border-[var(--rm-border)] rounded-[var(--rm-radius-card,16px)] shadow-[var(--rm-shadow-sm)] p-[18px] sm:p-5 transition-all']) }}>
     @if($resolvedTitle || $resolvedIcon || $resolvedActions)
         <header class="flex items-center justify-between gap-3 pb-3 mb-4 border-b border-[var(--rm-border-soft)]">
             <div class="flex items-center gap-3 min-w-0">
@@ -33,7 +33,7 @@
                 @endif
                 <div class="min-w-0">
                     @if($resolvedTitle)
-                        <h3 class="text-base sm:text-lg font-bold text-[var(--rm-text-primary)] leading-tight truncate">
+                        <h3 class="text-[15px] font-bold text-[var(--rm-text-primary)] leading-tight truncate">
                             {{ $resolvedTitle }}
                         </h3>
                     @endif

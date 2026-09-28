@@ -109,7 +109,7 @@
 @endphp
 
 {{-- GRID DE 3 COLUMNAS EXACTO COMO LA IMAGEN --}}
-<div class="grid grid-cols-1 lg:grid-cols-3 gap-5 items-start">
+<div class="rm-clinical-summary-grid">
 
     {{-- ========================================================================= --}}
     {{-- COLUMNA IZQUIERDA                                                         --}}
@@ -117,10 +117,10 @@
     <div class="space-y-5">
 
         {{-- 1. INFORMACIÓN CLÍNICA --}}
-        <div class="rounded-2xl border border-[var(--rm-border)] bg-[var(--rm-surface-beige)] p-4 sm:p-5 shadow-sm space-y-3.5">
-            <div class="flex items-center justify-between border-b border-[var(--rm-border)] pb-2.5">
-                <h3 class="text-xs font-black uppercase tracking-wider text-[var(--rm-text-title)] flex items-center gap-2">
-                    <i class="ph-bold ph-identification-card text-[#1E3A8A] dark:text-blue-400 text-sm"></i>
+        <div class="rm-clinical-card space-y-3.5">
+            <div class="rm-clinical-card__header">
+                <h3 class="rm-clinical-card__title">
+                    <i class="ph-bold ph-identification-card text-[var(--rm-action-primary)] text-sm"></i>
                     <span>Información clínica</span>
                     <span class="sr-only">Información Clínica Relevante</span>
                 </h3>
@@ -128,29 +128,20 @@
                    class="rm-btn-secondary h-7 px-2.5 text-[11px] rounded-lg font-semibold inline-flex items-center gap-1 transition">
                     <i class="ph-bold ph-pencil-simple text-xs"></i>
                     <span>Editar</span>
-                </a>
+                </button>
             </div>
 
             <div class="space-y-3 text-xs">
                 {{-- Diagnósticos activos --}}
                 <div>
                     <span class="text-[11px] font-bold text-[var(--rm-text-title)] flex items-center gap-1.5 mb-1.5">
-                        <i class="ph-bold ph-stethoscope text-blue-600"></i>
+                        <i class="ph-bold ph-stethoscope text-[var(--rm-action-primary)]"></i>
                         <span>Diagnósticos activos</span>
                     </span>
-                    @php
-                        $diagnosticos = [];
-                        if (!empty($adultoMayor->diagnosticos)) {
-                            $diagnosticos = is_array($adultoMayor->diagnosticos) ? $adultoMayor->diagnosticos : array_filter(array_map('trim', explode(',', $adultoMayor->diagnosticos)));
-                        } elseif (!empty($adultoMayor->enfermedades_previas)) {
-                            $diagnosticos = array_filter(array_map('trim', explode(',', $adultoMayor->enfermedades_previas)));
-                        }
-                    @endphp
-
-                    @if(!empty($diagnosticos))
+                    @if($diagnosticosActivos->isNotEmpty())
                         <div class="flex flex-wrap gap-1.5">
-                            @foreach($diagnosticos as $diag)
-                                <span class="inline-flex items-center rounded-lg bg-blue-50/90 dark:bg-blue-950/40 px-2.5 py-1 text-xs font-semibold text-[#1E3A8A] dark:text-blue-300 border border-blue-200/90 dark:border-blue-900/60">
+                            @foreach($diagnosticosActivos as $diag)
+                                <span class="inline-flex items-center rounded-lg border border-[var(--rm-info)]/25 bg-[var(--rm-info-soft)] px-2.5 py-1 text-xs font-semibold text-[var(--rm-info-strong)]">
                                     {{ $diag }}
                                 </span>
                             @endforeach
@@ -163,13 +154,13 @@
                 {{-- Alergias --}}
                 <div class="border-t border-[var(--rm-border-soft)] pt-2.5">
                     <span class="text-[11px] font-bold text-[var(--rm-text-title)] flex items-center gap-1.5 mb-1.5">
-                        <i class="ph-bold ph-warning-circle text-rose-600"></i>
+                        <i class="ph-bold ph-warning-circle text-[var(--rm-danger)]"></i>
                         <span>Alergias</span>
                     </span>
-                    @if(!empty($adultoMayor->alergias))
-                        <div class="rounded-xl bg-rose-50/80 dark:bg-rose-950/30 border border-rose-200/80 dark:border-rose-900/60 p-2 text-xs text-rose-800 dark:text-rose-300 font-semibold flex items-center gap-1.5">
-                            <i class="ph-bold ph-warning text-rose-600 text-sm shrink-0"></i>
-                            <span>{{ $adultoMayor->alergias }}</span>
+                    @if($alergiasConocidas->isNotEmpty())
+                        <div class="flex items-center gap-1.5 rounded-xl border border-[var(--rm-danger)]/25 bg-[var(--rm-danger-soft)] p-2 text-xs font-semibold text-[var(--rm-danger-strong)]">
+                            <i class="ph-bold ph-warning text-[var(--rm-danger)] text-sm shrink-0"></i>
+                            <span>{{ $alergiasTexto }}</span>
                         </div>
                     @else
                         <p class="text-[11px] text-[var(--rm-text-muted)]">Sin alergias conocidas reportadas.</p>
@@ -179,14 +170,18 @@
                 {{-- Antecedentes relevantes --}}
                 <div class="border-t border-[var(--rm-border-soft)] pt-2.5">
                     <span class="text-[11px] font-bold text-[var(--rm-text-title)] flex items-center gap-1.5 mb-1.5">
-                        <i class="ph-bold ph-clock-counter-clockwise text-indigo-600"></i>
+                        <i class="ph-bold ph-clock-counter-clockwise text-[var(--rm-info)]"></i>
                         <span>Antecedentes relevantes</span>
                     </span>
-                    @php $antecedentes = $adultoMayor->antecedentes_medicos ?? $adultoMayor->antecedentes ?? null; @endphp
-                    @if(!empty($antecedentes))
-                        <p class="text-xs text-[var(--rm-text-body)] leading-relaxed bg-[var(--rm-surface-alt)] p-2.5 rounded-xl border border-[var(--rm-border-soft)]">
-                            {{ $antecedentes }}
-                        </p>
+                    @if($antecedentesRelevantes->isNotEmpty())
+                        <ul class="space-y-1.5 rounded-xl border border-[var(--rm-border-soft)] bg-[var(--rm-surface-alt)] p-2.5 text-xs text-[var(--rm-text-body)]">
+                            @foreach($antecedentesRelevantes->take(3) as $antecedente)
+                                <li class="flex items-start gap-1.5 leading-relaxed">
+                                    <i class="ph-fill ph-dot-outline mt-0.5 text-[var(--rm-action-primary)]"></i>
+                                    <span>{{ $antecedente }}</span>
+                                </li>
+                            @endforeach
+                        </ul>
                     @else
                         <p class="text-[11px] text-[var(--rm-text-muted)] italic">Sin antecedentes patológicos relevantes registrados.</p>
                     @endif
@@ -211,7 +206,7 @@
                 {{-- Contacto de emergencia --}}
                 <div class="border-t border-[var(--rm-border-soft)] pt-2.5">
                     <span class="text-[11px] font-bold text-[var(--rm-text-title)] flex items-center gap-1.5 mb-1.5">
-                        <i class="ph-bold ph-phone-call text-emerald-600"></i>
+                        <i class="ph-bold ph-phone-call text-[var(--rm-success)]"></i>
                         <span>Contacto de emergencia</span>
                     </span>
                     @if($adultoMayor->contacto_emergencia_nombre)
@@ -220,7 +215,7 @@
                                 <span class="font-bold text-[var(--rm-text-title)] block truncate">{{ $adultoMayor->contacto_emergencia_nombre }}</span>
                                 <span class="text-[10px] text-[var(--rm-text-muted)] block">{{ $adultoMayor->contacto_emergencia_parentesco ?: 'Contacto' }}</span>
                             </div>
-                            <span class="font-semibold text-emerald-700 dark:text-emerald-400 text-xs shrink-0 flex items-center gap-1">
+                            <span class="flex shrink-0 items-center gap-1 text-xs font-semibold text-[var(--rm-success-strong)]">
                                 <i class="ph-bold ph-phone"></i> {{ $adultoMayor->contacto_emergencia_celular ?: 's/n' }}
                             </span>
                         </div>
@@ -232,10 +227,10 @@
         </div>
 
         {{-- 2. ÚLTIMA EVOLUCIÓN --}}
-        <div class="rounded-2xl border border-[var(--rm-border)] bg-[var(--rm-surface-beige)] p-4 sm:p-5 shadow-sm space-y-3">
-            <div class="flex items-center justify-between border-b border-[var(--rm-border)] pb-2.5">
-                <h3 class="text-xs font-black uppercase tracking-wider text-[var(--rm-text-title)] flex items-center gap-2">
-                    <i class="ph-bold ph-note-pencil text-blue-600 text-sm"></i>
+        <div class="rm-clinical-card space-y-3">
+            <div class="rm-clinical-card__header">
+                <h3 class="rm-clinical-card__title">
+                    <i class="ph-bold ph-note-pencil text-[var(--rm-action-primary)] text-sm"></i>
                     <span>Última evolución</span>
                 </h3>
                 <button type="button"
@@ -258,10 +253,10 @@
         </div>
 
         {{-- 3. ALERTAS ACTIVAS --}}
-        <div class="rounded-2xl border border-[var(--rm-border)] bg-[var(--rm-surface-beige)] p-4 sm:p-5 shadow-sm space-y-3">
-            <div class="flex items-center justify-between border-b border-[var(--rm-border)] pb-2.5">
-                <h3 class="text-xs font-black uppercase tracking-wider text-[var(--rm-text-title)] flex items-center gap-2">
-                    <i class="ph-bold ph-warning-octagon text-rose-600 text-sm"></i>
+        <div class="rm-clinical-card space-y-3">
+            <div class="rm-clinical-card__header">
+                <h3 class="rm-clinical-card__title">
+                    <i class="ph-bold ph-warning-octagon text-[var(--rm-danger)] text-sm"></i>
                     <span>Alertas activas</span>
                 </h3>
                 <button type="button"
@@ -275,19 +270,17 @@
             <div class="space-y-2 text-xs">
                 @if($alertasAct->count() > 0)
                     @foreach($alertasAct->take(2) as $al)
-                        <div class="p-2.5 rounded-xl bg-rose-50/70 dark:bg-rose-950/30 border border-rose-200/80 dark:border-rose-900/60 flex items-center justify-between gap-2">
+                        <div class="rm-action-item border-[var(--rm-danger)]/25 bg-[var(--rm-danger-soft)]">
                             <div class="min-w-0 pr-1">
-                                <span class="font-bold text-rose-900 dark:text-rose-200 block truncate">{{ $al->tipo_alerta ?? $al->motivo ?? $al->tipo }}</span>
-                                <span class="text-[10px] text-rose-700 dark:text-rose-400 block">{{ $al->origen ?? 'Enfermería' }}</span>
+                                <span class="block truncate font-bold text-[var(--rm-danger-strong)]">{{ $al->tipo_alerta ?? $al->motivo ?? $al->tipo }}</span>
+                                <span class="block text-[10px] text-[var(--rm-danger)]">{{ $al->origen ?? 'Enfermería' }}</span>
                             </div>
-                            <span class="text-[9px] font-black uppercase text-rose-800 dark:text-rose-200 bg-rose-100 dark:bg-rose-900/60 px-1.5 py-0.5 rounded shrink-0">
-                                {{ $al->nivel ?? $al->prioridad }}
-                            </span>
+                            <x-ui.status-badge :estado="$al->nivel ?? $al->prioridad" class="shrink-0" />
                         </div>
                     @endforeach
                 @else
-                    <div class="rounded-xl bg-emerald-50/60 dark:bg-emerald-950/20 border border-emerald-200/60 dark:border-emerald-900/40 p-3 text-xs text-emerald-800 dark:text-emerald-300 flex items-center gap-2">
-                        <i class="ph-bold ph-shield-check text-emerald-600 text-base shrink-0"></i>
+                    <div class="flex items-center gap-2 rounded-xl border border-[var(--rm-success)]/25 bg-[var(--rm-success-soft)] p-3 text-xs text-[var(--rm-success-strong)]">
+                        <i class="ph-bold ph-shield-check text-[var(--rm-success)] text-base shrink-0"></i>
                         <span>Sin alertas clínicas activas en este momento. Paciente estable.</span>
                     </div>
                 @endif
@@ -302,23 +295,20 @@
     <div class="space-y-5">
 
         {{-- 1. ESTADO ACTUAL --}}
-        <div class="rounded-2xl border border-[var(--rm-border)] bg-[var(--rm-surface-beige)] p-4 sm:p-5 shadow-sm space-y-3.5">
-            <div class="flex items-center justify-between border-b border-[var(--rm-border)] pb-2.5">
-                <h3 class="text-xs font-black uppercase tracking-wider text-[var(--rm-text-title)] flex items-center gap-2">
-                    <i class="ph-bold ph-activity text-emerald-600 text-sm"></i>
+        <div class="rm-clinical-card space-y-3.5">
+            <div class="rm-clinical-card__header">
+                <h3 class="rm-clinical-card__title">
+                    <i class="ph-bold ph-activity text-[var(--rm-action-primary)] text-sm"></i>
                     <span>Estado actual</span>
                     <span class="sr-only">Estado Clínico Actual</span>
                 </h3>
-                <span class="inline-flex items-center gap-1 rounded-full bg-emerald-50 dark:bg-emerald-950/40 px-2.5 py-0.5 text-xs font-black text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-900/60">
-                    <span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
-                    <span>Estable</span>
-                </span>
+                <x-ui.status-badge estado="ESTABLE" />
             </div>
 
             {{-- 8 Indicadores Clínicos --}}
             <div class="grid grid-cols-2 gap-2 text-xs">
                 {{-- Estado general --}}
-                <div class="p-2.5 rounded-xl bg-[var(--rm-surface-alt)] border border-[var(--rm-border-soft)]">
+                <div class="rm-data-tile">
                     <span class="text-[10px] font-bold text-[var(--rm-text-muted)] uppercase block">Estado general</span>
                     <span class="text-xs font-bold text-[var(--rm-text-title)] mt-0.5 block">
                         {{ $adultoMayor->estado_humano ?? 'Estable' }}
@@ -326,7 +316,7 @@
                 </div>
 
                 {{-- Nivel de cuidado --}}
-                <div class="p-2.5 rounded-xl bg-[var(--rm-surface-alt)] border border-[var(--rm-border-soft)]">
+                <div class="rm-data-tile">
                     <span class="text-[10px] font-bold text-[var(--rm-text-muted)] uppercase block">Nivel de cuidado</span>
                     <span class="text-xs font-bold text-[var(--rm-text-title)] mt-0.5 block truncate">
                         {{ $adultoMayor->nivel_cuidado ?: 'Intermedio' }}
@@ -334,23 +324,23 @@
                 </div>
 
                 {{-- Dependencia (Barthel) --}}
-                <div class="p-2.5 rounded-xl bg-[var(--rm-surface-alt)] border border-[var(--rm-border-soft)]">
+                <div class="rm-data-tile">
                     <span class="text-[10px] font-bold text-[var(--rm-text-muted)] uppercase block">Dependencia</span>
-                    <span class="text-xs font-black text-[#1E3A8A] dark:text-blue-400 mt-0.5 block">
+                    <span class="mt-0.5 block text-xs font-black text-[var(--rm-info)]">
                         {{ $ultFunc->barthel_total ?? 90 }} / 100
                     </span>
                 </div>
 
                 {{-- Riesgo de caídas --}}
-                <div class="p-2.5 rounded-xl bg-[var(--rm-surface-alt)] border border-[var(--rm-border-soft)]">
+                <div class="rm-data-tile">
                     <span class="text-[10px] font-bold text-[var(--rm-text-muted)] uppercase block">Riesgo de caídas</span>
-                    <span class="text-xs font-bold text-amber-700 dark:text-amber-400 mt-0.5 block">
+                    <span class="mt-0.5 block text-xs font-bold text-[var(--rm-warning-strong)]">
                         {{ $ultFunc->riesgo_caida ?? 'Bajo' }}
                     </span>
                 </div>
 
                 {{-- Riesgo de UPP --}}
-                <div class="p-2.5 rounded-xl bg-[var(--rm-surface-alt)] border border-[var(--rm-border-soft)]">
+                <div class="rm-data-tile">
                     <span class="text-[10px] font-bold text-[var(--rm-text-muted)] uppercase block">Riesgo de UPP</span>
                     <span class="text-xs font-bold text-[var(--rm-text-title)] mt-0.5 block">
                         {{ $ultFunc->riesgo_upp ?? 'Sin riesgo' }}
@@ -358,7 +348,7 @@
                 </div>
 
                 {{-- Estado cognitivo --}}
-                <div class="p-2.5 rounded-xl bg-[var(--rm-surface-alt)] border border-[var(--rm-border-soft)]">
+                <div class="rm-data-tile">
                     <span class="text-[10px] font-bold text-[var(--rm-text-muted)] uppercase block">Estado cognitivo</span>
                     <span class="text-xs font-bold text-[var(--rm-text-title)] mt-0.5 block">
                         Conservado
@@ -366,7 +356,7 @@
                 </div>
 
                 {{-- Estado nutricional --}}
-                <div class="p-2.5 rounded-xl bg-[var(--rm-surface-alt)] border border-[var(--rm-border-soft)]">
+                <div class="rm-data-tile">
                     <span class="text-[10px] font-bold text-[var(--rm-text-muted)] uppercase block">Estado nutricional</span>
                     <span class="text-xs font-bold text-[var(--rm-text-title)] mt-0.5 block truncate">
                         {{ $ultSeg && $ultSeg->alimentacion ? ucfirst(strtolower($ultSeg->alimentacion)) : 'Normal' }}
@@ -374,9 +364,9 @@
                 </div>
 
                 {{-- Dolor actual --}}
-                <div class="p-2.5 rounded-xl bg-[var(--rm-surface-alt)] border border-[var(--rm-border-soft)]">
+                <div class="rm-data-tile">
                     <span class="text-[10px] font-bold text-[var(--rm-text-muted)] uppercase block">Dolor actual</span>
-                    <span class="text-xs font-black text-emerald-700 dark:text-emerald-400 mt-0.5 block">
+                    <span class="mt-0.5 block text-xs font-black text-[var(--rm-success-strong)]">
                         {{ $ultimoSigno && $ultimoSigno->nivel_dolor !== null ? $ultimoSigno->nivel_dolor . '/10' : '0/10 (Sin dolor)' }}
                     </span>
                 </div>
@@ -384,10 +374,10 @@
         </div>
 
         {{-- 2. PLAN DE CUIDADOS --}}
-        <div class="rounded-2xl border border-[var(--rm-border)] bg-[var(--rm-surface-beige)] p-4 sm:p-5 shadow-sm space-y-3.5">
-            <div class="flex items-center justify-between border-b border-[var(--rm-border)] pb-2.5">
-                <h3 class="text-xs font-black uppercase tracking-wider text-[var(--rm-text-title)] flex items-center gap-2">
-                    <i class="ph-bold ph-hand-heart text-teal-600 text-sm"></i>
+        <div class="rm-clinical-card space-y-3.5">
+            <div class="rm-clinical-card__header">
+                <h3 class="rm-clinical-card__title">
+                    <i class="ph-bold ph-hand-heart text-[var(--rm-action-primary)] text-sm"></i>
                     <span>Plan de cuidados</span>
                 </h3>
                 <button type="button"
@@ -404,7 +394,7 @@
                     <svg class="w-16 h-16 transform -rotate-90" viewBox="0 0 36 36">
                         <path class="text-[var(--rm-border-soft)]" stroke-width="3.5" stroke="currentColor" fill="none"
                               d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-                        <path class="text-teal-600 transition-all duration-500" stroke-dasharray="60, 100" stroke-width="3.5" stroke-linecap="round" stroke="currentColor" fill="none"
+                        <path class="text-[var(--rm-action-primary)] transition-all duration-500" stroke-dasharray="60, 100" stroke-width="3.5" stroke-linecap="round" stroke="currentColor" fill="none"
                               d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
                     </svg>
                     <div class="absolute flex flex-col items-center justify-center">
@@ -426,35 +416,35 @@
         </div>
 
         {{-- 3. RESUMEN DEL DÍA --}}
-        <div class="rounded-2xl border border-[var(--rm-border)] bg-[var(--rm-surface-beige)] p-4 sm:p-5 shadow-sm space-y-3">
-            <div class="flex items-center justify-between border-b border-[var(--rm-border)] pb-2.5">
-                <h3 class="text-xs font-black uppercase tracking-wider text-[var(--rm-text-title)] flex items-center gap-2">
-                    <i class="ph-bold ph-sun text-amber-600 text-sm"></i>
+        <div class="rm-clinical-card space-y-3">
+            <div class="rm-clinical-card__header">
+                <h3 class="rm-clinical-card__title">
+                    <i class="ph-bold ph-sun text-[var(--rm-action-primary)] text-sm"></i>
                     <span>Resumen del día</span>
                 </h3>
                 <span class="text-[10px] font-semibold text-[var(--rm-text-muted)]">Hoy</span>
             </div>
 
             <div class="grid grid-cols-2 gap-2 text-xs">
-                <div class="p-2.5 rounded-xl bg-[var(--rm-surface-alt)] border border-[var(--rm-border-soft)]">
+                <div class="rm-data-tile">
                     <span class="text-[10px] font-bold text-[var(--rm-text-muted)] uppercase block">Alimentación</span>
                     <span class="text-xs font-bold text-[var(--rm-text-title)] mt-0.5 block truncate">
                         {{ $ultSeg && $ultSeg->alimentacion ? ucfirst(strtolower($ultSeg->alimentacion)) : 'Aceptación completa' }}
                     </span>
                 </div>
-                <div class="p-2.5 rounded-xl bg-[var(--rm-surface-alt)] border border-[var(--rm-border-soft)]">
+                <div class="rm-data-tile">
                     <span class="text-[10px] font-bold text-[var(--rm-text-muted)] uppercase block">Hidratación</span>
                     <span class="text-xs font-bold text-[var(--rm-text-title)] mt-0.5 block truncate">
                         Adecuada (1.200 mL)
                     </span>
                 </div>
-                <div class="p-2.5 rounded-xl bg-[var(--rm-surface-alt)] border border-[var(--rm-border-soft)]">
+                <div class="rm-data-tile">
                     <span class="text-[10px] font-bold text-[var(--rm-text-muted)] uppercase block">Movilidad</span>
                     <span class="text-xs font-bold text-[var(--rm-text-title)] mt-0.5 block truncate">
                         {{ $ultSeg && $ultSeg->movilidad ? ucfirst(strtolower(str_replace('_', ' ', $ultSeg->movilidad))) : 'Paseo asistido' }}
                     </span>
                 </div>
-                <div class="p-2.5 rounded-xl bg-[var(--rm-surface-alt)] border border-[var(--rm-border-soft)]">
+                <div class="rm-data-tile">
                     <span class="text-[10px] font-bold text-[var(--rm-text-muted)] uppercase block">Higiene</span>
                     <span class="text-xs font-bold text-[var(--rm-text-title)] mt-0.5 block truncate">
                         Completada matutina
@@ -471,10 +461,10 @@
     <div class="space-y-5">
 
         {{-- 1. TENDENCIAS CLÍNICAS (ÚLTIMOS 7 DÍAS) --}}
-        <div class="rounded-2xl border border-[var(--rm-border)] bg-[var(--rm-surface-beige)] p-4 sm:p-5 shadow-sm space-y-3" x-data="{ metrica: 'pa' }">
-            <div class="flex items-center justify-between border-b border-[var(--rm-border)] pb-2.5">
-                <h3 class="text-xs font-black uppercase tracking-wider text-[var(--rm-text-title)] flex items-center gap-2">
-                    <i class="ph-bold ph-chart-line-up text-[#1E3A8A] dark:text-blue-400 text-sm"></i>
+        <div class="rm-clinical-card space-y-3" x-data="{ metrica: 'pa' }">
+            <div class="rm-clinical-card__header">
+                <h3 class="rm-clinical-card__title">
+                    <i class="ph-bold ph-chart-line-up text-[var(--rm-action-primary)] text-sm"></i>
                     <span>Tendencias clínicas</span>
                     <span class="sr-only">Tendencias y Próximas Acciones</span>
                 </h3>
@@ -487,25 +477,25 @@
             <div class="flex items-center gap-1 p-1 rounded-xl bg-[var(--rm-surface-alt)] border border-[var(--rm-border-soft)] text-xs">
                 <button type="button"
                         @click="metrica = 'pa'"
-                        :class="metrica === 'pa' ? 'bg-[#1E3A8A] text-white shadow-xs font-bold' : 'text-[var(--rm-text-body)] hover:text-[var(--rm-text-title)] font-medium'"
+                        :class="metrica === 'pa' ? 'bg-[var(--rm-action-primary)] text-[var(--rm-text-on-primary)] shadow-xs font-bold' : 'text-[var(--rm-text-body)] hover:text-[var(--rm-text-title)] font-medium'"
                         class="flex-1 py-1 text-[10.5px] rounded-lg transition text-center truncate">
                     PA
                 </button>
                 <button type="button"
                         @click="metrica = 'fc'"
-                        :class="metrica === 'fc' ? 'bg-[#1E3A8A] text-white shadow-xs font-bold' : 'text-[var(--rm-text-body)] hover:text-[var(--rm-text-title)] font-medium'"
+                        :class="metrica === 'fc' ? 'bg-[var(--rm-action-primary)] text-[var(--rm-text-on-primary)] shadow-xs font-bold' : 'text-[var(--rm-text-body)] hover:text-[var(--rm-text-title)] font-medium'"
                         class="flex-1 py-1 text-[10.5px] rounded-lg transition text-center truncate">
                     FC
                 </button>
                 <button type="button"
                         @click="metrica = 'spo2'"
-                        :class="metrica === 'spo2' ? 'bg-[#1E3A8A] text-white shadow-xs font-bold' : 'text-[var(--rm-text-body)] hover:text-[var(--rm-text-title)] font-medium'"
+                        :class="metrica === 'spo2' ? 'bg-[var(--rm-action-primary)] text-[var(--rm-text-on-primary)] shadow-xs font-bold' : 'text-[var(--rm-text-body)] hover:text-[var(--rm-text-title)] font-medium'"
                         class="flex-1 py-1 text-[10.5px] rounded-lg transition text-center truncate">
                     SpO₂
                 </button>
                 <button type="button"
                         @click="metrica = 'temp'"
-                        :class="metrica === 'temp' ? 'bg-[#1E3A8A] text-white shadow-xs font-bold' : 'text-[var(--rm-text-body)] hover:text-[var(--rm-text-title)] font-medium'"
+                        :class="metrica === 'temp' ? 'bg-[var(--rm-action-primary)] text-[var(--rm-text-on-primary)] shadow-xs font-bold' : 'text-[var(--rm-text-body)] hover:text-[var(--rm-text-title)] font-medium'"
                         class="flex-1 py-1 text-[10.5px] rounded-lg transition text-center truncate">
                     Temp
                 </button>
@@ -522,14 +512,14 @@
                         {{-- Tab PA --}}
                         <div x-show="metrica === 'pa'">
                             <div class="flex items-center justify-between text-[10px] font-semibold text-[var(--rm-text-muted)] mb-1">
-                                <span class="flex items-center gap-1"><span class="h-2 w-2 rounded-full bg-blue-600"></span> Sistólica</span>
-                                <span class="flex items-center gap-1"><span class="h-2 w-2 rounded-full bg-teal-500"></span> Diastólica</span>
+                                <span class="flex items-center gap-1"><span class="h-2 w-2 rounded-full bg-[var(--rm-info)]"></span> Sistólica</span>
+                                <span class="flex items-center gap-1"><span class="h-2 w-2 rounded-full bg-[var(--rm-action-primary)]"></span> Diastólica</span>
                             </div>
                             <svg viewBox="0 0 {{ $width }} {{ $height }}" class="w-full h-24 overflow-visible">
                                 <defs>
                                     <linearGradient id="gradPaSisExact" x1="0" y1="0" x2="0" y2="1">
-                                        <stop offset="0%" stop-color="#2563eb" stop-opacity="0.22" />
-                                        <stop offset="100%" stop-color="#2563eb" stop-opacity="0.02" />
+                                        <stop offset="0%" stop-color="var(--rm-info)" stop-opacity="0.22" />
+                                        <stop offset="100%" stop-color="var(--rm-info)" stop-opacity="0.02" />
                                     </linearGradient>
                                 </defs>
                                 <line x1="{{ $paddingX }}" y1="{{ $paddingY }}" x2="{{ $width - $paddingX }}" y2="{{ $paddingY }}" stroke="currentColor" class="text-[var(--rm-border-soft)]" stroke-dasharray="2 2" />
@@ -537,12 +527,12 @@
                                 <line x1="{{ $paddingX }}" y1="{{ $height - $paddingY }}" x2="{{ $width - $paddingX }}" y2="{{ $height - $paddingY }}" stroke="currentColor" class="text-[var(--rm-border-soft)]" stroke-dasharray="2 2" />
 
                                 <polygon points="{{ $paddingX }},{{ $height - $paddingY }} {{ $sisPoly }} {{ $width - $paddingX }},{{ $height - $paddingY }}" fill="url(#gradPaSisExact)" />
-                                <polyline fill="none" stroke="#2563eb" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" points="{{ $sisPoly }}" />
-                                <polyline fill="none" stroke="#14b8a6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" points="{{ $diaPoly }}" />
+                                <polyline fill="none" stroke="var(--rm-info)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" points="{{ $sisPoly }}" />
+                                <polyline fill="none" stroke="var(--rm-action-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" points="{{ $diaPoly }}" />
 
                                 @foreach($sisPoints as $pt)
                                     @php list($px, $py) = explode(',', $pt); @endphp
-                                    <circle cx="{{ $px }}" cy="{{ $py }}" r="3" fill="#2563eb" stroke="#ffffff" stroke-width="1.5" />
+                                    <circle cx="{{ $px }}" cy="{{ $py }}" r="3" fill="var(--rm-info)" stroke="var(--rm-surface-raised)" stroke-width="1.5" />
                                 @endforeach
                             </svg>
                         </div>
@@ -550,14 +540,14 @@
                         {{-- Tab FC --}}
                         <div x-show="metrica === 'fc'" x-cloak>
                             <div class="flex items-center justify-between text-[10px] font-semibold text-[var(--rm-text-muted)] mb-1">
-                                <span class="flex items-center gap-1"><span class="h-2 w-2 rounded-full bg-rose-500"></span> Frecuencia Cardíaca</span>
-                                <span class="text-rose-600 font-bold">bpm</span>
+                                <span class="flex items-center gap-1"><span class="h-2 w-2 rounded-full bg-[var(--rm-danger)]"></span> Frecuencia cardíaca</span>
+                                <span class="font-bold text-[var(--rm-danger)]">bpm</span>
                             </div>
                             <svg viewBox="0 0 {{ $width }} {{ $height }}" class="w-full h-24 overflow-visible">
                                 <defs>
                                     <linearGradient id="gradFcExact" x1="0" y1="0" x2="0" y2="1">
-                                        <stop offset="0%" stop-color="#f43f5e" stop-opacity="0.22" />
-                                        <stop offset="100%" stop-color="#f43f5e" stop-opacity="0.02" />
+                                        <stop offset="0%" stop-color="var(--rm-danger)" stop-opacity="0.22" />
+                                        <stop offset="100%" stop-color="var(--rm-danger)" stop-opacity="0.02" />
                                     </linearGradient>
                                 </defs>
                                 <line x1="{{ $paddingX }}" y1="{{ $paddingY }}" x2="{{ $width - $paddingX }}" y2="{{ $paddingY }}" stroke="currentColor" class="text-[var(--rm-border-soft)]" stroke-dasharray="2 2" />
@@ -565,11 +555,11 @@
                                 <line x1="{{ $paddingX }}" y1="{{ $height - $paddingY }}" x2="{{ $width - $paddingX }}" y2="{{ $height - $paddingY }}" stroke="currentColor" class="text-[var(--rm-border-soft)]" stroke-dasharray="2 2" />
 
                                 <polygon points="{{ $paddingX }},{{ $height - $paddingY }} {{ $fcPoly }} {{ $width - $paddingX }},{{ $height - $paddingY }}" fill="url(#gradFcExact)" />
-                                <polyline fill="none" stroke="#f43f5e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" points="{{ $fcPoly }}" />
+                                <polyline fill="none" stroke="var(--rm-danger)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" points="{{ $fcPoly }}" />
 
                                 @foreach($fcPoints as $pt)
                                     @php list($px, $py) = explode(',', $pt); @endphp
-                                    <circle cx="{{ $px }}" cy="{{ $py }}" r="3" fill="#f43f5e" stroke="#ffffff" stroke-width="1.5" />
+                                    <circle cx="{{ $px }}" cy="{{ $py }}" r="3" fill="var(--rm-danger)" stroke="var(--rm-surface-raised)" stroke-width="1.5" />
                                 @endforeach
                             </svg>
                         </div>
@@ -577,14 +567,14 @@
                         {{-- Tab SpO2 --}}
                         <div x-show="metrica === 'spo2'" x-cloak>
                             <div class="flex items-center justify-between text-[10px] font-semibold text-[var(--rm-text-muted)] mb-1">
-                                <span class="flex items-center gap-1"><span class="h-2 w-2 rounded-full bg-emerald-500"></span> Saturación SpO₂</span>
-                                <span class="text-emerald-600 font-bold">%</span>
+                                <span class="flex items-center gap-1"><span class="h-2 w-2 rounded-full bg-[var(--rm-success)]"></span> Saturación SpO₂</span>
+                                <span class="font-bold text-[var(--rm-success)]">%</span>
                             </div>
                             <svg viewBox="0 0 {{ $width }} {{ $height }}" class="w-full h-24 overflow-visible">
                                 <defs>
                                     <linearGradient id="gradSpo2Exact" x1="0" y1="0" x2="0" y2="1">
-                                        <stop offset="0%" stop-color="#10b981" stop-opacity="0.22" />
-                                        <stop offset="100%" stop-color="#10b981" stop-opacity="0.02" />
+                                        <stop offset="0%" stop-color="var(--rm-success)" stop-opacity="0.22" />
+                                        <stop offset="100%" stop-color="var(--rm-success)" stop-opacity="0.02" />
                                     </linearGradient>
                                 </defs>
                                 <line x1="{{ $paddingX }}" y1="{{ $paddingY }}" x2="{{ $width - $paddingX }}" y2="{{ $paddingY }}" stroke="currentColor" class="text-[var(--rm-border-soft)]" stroke-dasharray="2 2" />
@@ -592,11 +582,11 @@
                                 <line x1="{{ $paddingX }}" y1="{{ $height - $paddingY }}" x2="{{ $width - $paddingX }}" y2="{{ $height - $paddingY }}" stroke="currentColor" class="text-[var(--rm-border-soft)]" stroke-dasharray="2 2" />
 
                                 <polygon points="{{ $paddingX }},{{ $height - $paddingY }} {{ $spo2Poly }} {{ $width - $paddingX }},{{ $height - $paddingY }}" fill="url(#gradSpo2Exact)" />
-                                <polyline fill="none" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" points="{{ $spo2Poly }}" />
+                                <polyline fill="none" stroke="var(--rm-success)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" points="{{ $spo2Poly }}" />
 
                                 @foreach($spo2Points as $pt)
                                     @php list($px, $py) = explode(',', $pt); @endphp
-                                    <circle cx="{{ $px }}" cy="{{ $py }}" r="3" fill="#10b981" stroke="#ffffff" stroke-width="1.5" />
+                                    <circle cx="{{ $px }}" cy="{{ $py }}" r="3" fill="var(--rm-success)" stroke="var(--rm-surface-raised)" stroke-width="1.5" />
                                 @endforeach
                             </svg>
                         </div>
@@ -604,14 +594,14 @@
                         {{-- Tab Temp --}}
                         <div x-show="metrica === 'temp'" x-cloak>
                             <div class="flex items-center justify-between text-[10px] font-semibold text-[var(--rm-text-muted)] mb-1">
-                                <span class="flex items-center gap-1"><span class="h-2 w-2 rounded-full bg-amber-500"></span> Temperatura</span>
-                                <span class="text-amber-600 font-bold">°C</span>
+                                <span class="flex items-center gap-1"><span class="h-2 w-2 rounded-full bg-[var(--rm-warning)]"></span> Temperatura</span>
+                                <span class="font-bold text-[var(--rm-warning)]">°C</span>
                             </div>
                             <svg viewBox="0 0 {{ $width }} {{ $height }}" class="w-full h-24 overflow-visible">
                                 <defs>
                                     <linearGradient id="gradTempExact" x1="0" y1="0" x2="0" y2="1">
-                                        <stop offset="0%" stop-color="#d97706" stop-opacity="0.22" />
-                                        <stop offset="100%" stop-color="#d97706" stop-opacity="0.02" />
+                                        <stop offset="0%" stop-color="var(--rm-warning)" stop-opacity="0.22" />
+                                        <stop offset="100%" stop-color="var(--rm-warning)" stop-opacity="0.02" />
                                     </linearGradient>
                                 </defs>
                                 <line x1="{{ $paddingX }}" y1="{{ $paddingY }}" x2="{{ $width - $paddingX }}" y2="{{ $paddingY }}" stroke="currentColor" class="text-[var(--rm-border-soft)]" stroke-dasharray="2 2" />
@@ -619,11 +609,11 @@
                                 <line x1="{{ $paddingX }}" y1="{{ $height - $paddingY }}" x2="{{ $width - $paddingX }}" y2="{{ $height - $paddingY }}" stroke="currentColor" class="text-[var(--rm-border-soft)]" stroke-dasharray="2 2" />
 
                                 <polygon points="{{ $paddingX }},{{ $height - $paddingY }} {{ $tempPoly }} {{ $width - $paddingX }},{{ $height - $paddingY }}" fill="url(#gradTempExact)" />
-                                <polyline fill="none" stroke="#d97706" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" points="{{ $tempPoly }}" />
+                                <polyline fill="none" stroke="var(--rm-warning)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" points="{{ $tempPoly }}" />
 
                                 @foreach($tempPoints as $pt)
                                     @php list($px, $py) = explode(',', $pt); @endphp
-                                    <circle cx="{{ $px }}" cy="{{ $py }}" r="3" fill="#d97706" stroke="#ffffff" stroke-width="1.5" />
+                                    <circle cx="{{ $px }}" cy="{{ $py }}" r="3" fill="var(--rm-warning)" stroke="var(--rm-surface-raised)" stroke-width="1.5" />
                                 @endforeach
                             </svg>
                         </div>
@@ -643,15 +633,15 @@
                             </div>
                             <div class="p-1 rounded-lg bg-[var(--rm-surface-alt)] border border-[var(--rm-border-soft)]">
                                 <span class="text-[9px] font-bold text-[var(--rm-text-muted)] uppercase block">FC</span>
-                                <span class="text-xs font-black text-rose-600 block">{{ $ultimoSigno->frecuencia_cardiaca ?: '—' }}</span>
+                                <span class="block text-xs font-black text-[var(--rm-danger)]">{{ $ultimoSigno->frecuencia_cardiaca ?: '—' }}</span>
                             </div>
                             <div class="p-1 rounded-lg bg-[var(--rm-surface-alt)] border border-[var(--rm-border-soft)]">
                                 <span class="text-[9px] font-bold text-[var(--rm-text-muted)] uppercase block">SpO₂</span>
-                                <span class="text-xs font-black text-emerald-600 block">{{ ($ultimoSigno->saturacion_oxigeno ?? $ultimoSigno->saturacion) ? ($ultimoSigno->saturacion_oxigeno ?? $ultimoSigno->saturacion) . '%' : '—' }}</span>
+                                <span class="block text-xs font-black text-[var(--rm-success)]">{{ ($ultimoSigno->saturacion_oxigeno ?? $ultimoSigno->saturacion) ? ($ultimoSigno->saturacion_oxigeno ?? $ultimoSigno->saturacion) . '%' : '—' }}</span>
                             </div>
                             <div class="p-1 rounded-lg bg-[var(--rm-surface-alt)] border border-[var(--rm-border-soft)]">
                                 <span class="text-[9px] font-bold text-[var(--rm-text-muted)] uppercase block">Temp</span>
-                                <span class="text-xs font-black text-amber-600 block">{{ $ultimoSigno->temperatura ? $ultimoSigno->temperatura . ' °C' : '—' }}</span>
+                                <span class="block text-xs font-black text-[var(--rm-warning)]">{{ $ultimoSigno->temperatura ? $ultimoSigno->temperatura . ' °C' : '—' }}</span>
                             </div>
                         </div>
                     </div>
@@ -663,83 +653,75 @@
             </div>
 
             {{-- 2. PRÓXIMAS ACCIONES --}}
-        <div class="rounded-2xl border border-[var(--rm-border)] bg-[var(--rm-surface-beige)] p-4 sm:p-5 shadow-sm space-y-3">
-            <div class="flex items-center justify-between border-b border-[var(--rm-border)] pb-2.5">
-                <h3 class="text-xs font-black uppercase tracking-wider text-[var(--rm-text-title)] flex items-center gap-2">
-                    <i class="ph-bold ph-calendar-check text-indigo-600 text-sm"></i>
+        <div class="rm-clinical-card space-y-3">
+            <div class="rm-clinical-card__header">
+                <h3 class="rm-clinical-card__title">
+                    <i class="ph-bold ph-calendar-check text-[var(--rm-action-primary)] text-sm"></i>
                     <span>Próximas acciones</span>
                 </h3>
                 <button type="button" @click="activeTab = 'cuidados'; $wire.cambiarTab('cuidados')"
                    class="rm-btn-secondary h-7 px-2.5 text-[11px] rounded-lg font-semibold inline-flex items-center gap-1 transition">
                     <span>Ver todas</span>
                     <i class="ph-bold ph-arrow-right text-[10px]"></i>
-                </a>
+                </button>
             </div>
 
             <div class="space-y-2 text-xs">
                 {{-- Item 1: Control de signos vitales --}}
-                <div class="p-2.5 rounded-xl bg-[var(--rm-surface-alt)] border border-[var(--rm-border-soft)] flex items-center justify-between">
+                <div class="rm-action-item">
                     <div class="flex items-center gap-2 min-w-0 pr-2">
-                        <i class="ph-bold ph-heartbeat text-rose-500 text-base shrink-0"></i>
+                        <i class="ph-bold ph-heartbeat text-[var(--rm-danger)] text-base shrink-0"></i>
                         <div class="truncate">
                             <span class="font-bold text-[var(--rm-text-title)] block truncate">Control de signos vitales</span>
                             <span class="text-[10px] text-[var(--rm-text-muted)] block">10:00 • Turno mañana</span>
                         </div>
                     </div>
-                    <span class="text-[10px] font-bold text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/50 px-2 py-0.5 rounded border border-amber-200 dark:border-amber-900/60 shrink-0">
-                        Pendiente
-                    </span>
+                    <x-ui.status-badge estado="PENDIENTE" class="shrink-0" />
                 </div>
 
                 {{-- Item 2: Administración de medicación --}}
-                <div class="p-2.5 rounded-xl bg-[var(--rm-surface-alt)] border border-[var(--rm-border-soft)] flex items-center justify-between">
+                <div class="rm-action-item">
                     <div class="flex items-center gap-2 min-w-0 pr-2">
-                        <i class="ph-bold ph-pill text-emerald-500 text-base shrink-0"></i>
+                        <i class="ph-bold ph-pill text-[var(--rm-success)] text-base shrink-0"></i>
                         <div class="truncate">
                             <span class="font-bold text-[var(--rm-text-title)] block truncate">Administración de medicación</span>
                             <span class="text-[10px] text-[var(--rm-text-muted)] block">12:00 • Toma programada</span>
                         </div>
                     </div>
-                    <span class="text-[10px] font-bold text-blue-700 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/50 px-2 py-0.5 rounded border border-blue-200 dark:border-blue-900/60 shrink-0">
-                        Programada
-                    </span>
+                    <x-ui.status-badge estado="PROGRAMADO" label="Programada" class="shrink-0" />
                 </div>
 
                 {{-- Item 3: Terapia física --}}
-                <div class="p-2.5 rounded-xl bg-[var(--rm-surface-alt)] border border-[var(--rm-border-soft)] flex items-center justify-between">
+                <div class="rm-action-item">
                     <div class="flex items-center gap-2 min-w-0 pr-2">
-                        <i class="ph-bold ph-person-simple-walk text-indigo-500 text-base shrink-0"></i>
+                        <i class="ph-bold ph-person-simple-walk text-[var(--rm-info)] text-base shrink-0"></i>
                         <div class="truncate">
                             <span class="font-bold text-[var(--rm-text-title)] block truncate">Terapia física y movilidad</span>
                             <span class="text-[10px] text-[var(--rm-text-muted)] block">15:30 • Sesión motriz</span>
                         </div>
                     </div>
-                    <span class="text-[10px] font-bold text-blue-700 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/50 px-2 py-0.5 rounded border border-blue-200 dark:border-blue-900/60 shrink-0">
-                        Programada
-                    </span>
+                    <x-ui.status-badge estado="PROGRAMADO" label="Programada" class="shrink-0" />
                 </div>
 
                 {{-- Item 4: Valoración médica --}}
-                <div class="p-2.5 rounded-xl bg-[var(--rm-surface-alt)] border border-[var(--rm-border-soft)] flex items-center justify-between">
+                <div class="rm-action-item">
                     <div class="flex items-center gap-2 min-w-0 pr-2">
-                        <i class="ph-bold ph-stethoscope text-sky-500 text-base shrink-0"></i>
+                        <i class="ph-bold ph-stethoscope text-[var(--rm-clinical)] text-base shrink-0"></i>
                         <div class="truncate">
                             <span class="font-bold text-[var(--rm-text-title)] block truncate">Valoración médica</span>
                             <span class="text-[10px] text-[var(--rm-text-muted)] block">17:00 • Ronda clínica</span>
                         </div>
                     </div>
-                    <span class="text-[10px] font-bold text-blue-700 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/50 px-2 py-0.5 rounded border border-blue-200 dark:border-blue-900/60 shrink-0">
-                        Programada
-                    </span>
+                    <x-ui.status-badge estado="PROGRAMADO" label="Programada" class="shrink-0" />
                 </div>
             </div>
         </div>
 
         {{-- 3. NOTAS RELEVANTES --}}
-        <div class="rounded-2xl border border-[var(--rm-border)] bg-[var(--rm-surface-beige)] p-4 sm:p-5 shadow-sm space-y-3">
-            <div class="flex items-center justify-between border-b border-[var(--rm-border)] pb-2.5">
-                <h3 class="text-xs font-black uppercase tracking-wider text-[var(--rm-text-title)] flex items-center gap-2">
-                    <i class="ph-bold ph-bookmarks text-purple-600 text-sm"></i>
+        <div class="rm-clinical-card space-y-3">
+            <div class="rm-clinical-card__header">
+                <h3 class="rm-clinical-card__title">
+                    <i class="ph-bold ph-bookmarks text-[var(--rm-action-primary)] text-sm"></i>
                     <span>Notas relevantes</span>
                 </h3>
                 <button type="button"
@@ -753,7 +735,7 @@
             <div class="space-y-2 text-xs">
                 <div class="p-2.5 rounded-xl bg-[var(--rm-surface-alt)] border border-[var(--rm-border-soft)] space-y-1">
                     <div class="flex items-center justify-between text-[10px] text-[var(--rm-text-muted)]">
-                        <span class="font-bold text-purple-700 dark:text-purple-400">Terapia Ocupacional</span>
+                        <span class="font-bold text-[var(--rm-action-primary)]">Terapia ocupacional</span>
                         <span>Ayer 16:00</span>
                     </div>
                     <p class="text-[var(--rm-text-body)] text-xs leading-relaxed">
@@ -763,7 +745,7 @@
 
                 <div class="p-2.5 rounded-xl bg-[var(--rm-surface-alt)] border border-[var(--rm-border-soft)] space-y-1">
                     <div class="flex items-center justify-between text-[10px] text-[var(--rm-text-muted)]">
-                        <span class="font-bold text-blue-700 dark:text-blue-400">Fisioterapia</span>
+                        <span class="font-bold text-[var(--rm-action-primary)]">Fisioterapia</span>
                         <span>10 Sep 11:30</span>
                     </div>
                     <p class="text-[var(--rm-text-body)] text-xs leading-relaxed">

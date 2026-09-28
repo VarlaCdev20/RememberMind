@@ -1,11 +1,11 @@
 @php
  $estadoBadge = [
- 'normal' => 'border-estado-exitoBorde bg-estado-exitoBg text-estado-exito',
- 'observacion' => 'border-estado-advertenciaBorde bg-estado-advertenciaBg text-parrafo',
- 'fuera_rango' => 'border-borde-focus bg-estado-peligroBg text-parrafo',
- 'requiere_revision' => 'border-borde bg-fondo-panel text-parrafo',
- 'sin_datos' => 'border-borde/55 bg-fondo-panel text-meta',
- 'anulado' => 'border-borde bg-fondo-panel text-parrafo',
+ 'normal' => ['card' => 'border-[var(--rm-success)]/45 bg-[var(--rm-success-soft)]', 'text' => 'text-[var(--rm-success-strong)]'],
+ 'observacion' => ['card' => 'border-[var(--rm-warning)]/45 bg-[var(--rm-warning-soft)]', 'text' => 'text-[var(--rm-warning-strong)]'],
+ 'fuera_rango' => ['card' => 'border-[var(--rm-danger)]/45 bg-[var(--rm-danger-soft)]', 'text' => 'text-[var(--rm-danger-strong)]'],
+ 'requiere_revision' => ['card' => 'border-[var(--rm-info)]/45 bg-[var(--rm-info-soft)]', 'text' => 'text-[var(--rm-info-strong)]'],
+ 'sin_datos' => ['card' => 'border-[var(--rm-border)] bg-[var(--rm-surface-soft)]', 'text' => 'text-[var(--rm-text-muted)]'],
+ 'anulado' => ['card' => 'border-[var(--rm-border)] bg-[var(--rm-surface-muted)]', 'text' => 'text-[var(--rm-text-secondary)]'],
  ];
 
  $estadoIcono = [
@@ -30,38 +30,25 @@
 <div class="space-y-4">
  @if($adulto)<x-residentes.navegacion-ficha :adulto="$adulto" />@endif
  {{-- A. CABECERA DEL SUBMÓDULO --}}
- <section class="overflow-hidden rounded-[1.6rem] border border-borde/65 bg-fondo-panel shadow-sm backdrop-blur-xl">
- <div class="h-1.5 w-full bg-gradient-to-r from-[var(--rm-accent-terracotta)] via-[var(--rm-warning)] to-[var(--rm-action-primary)]"></div>
- <div class="flex flex-col gap-4 p-4 sm:flex-row sm:items-center sm:justify-between">
- <div class="flex items-center gap-3">
- <span class="flex h-12 w-12 items-center justify-center rounded-2xl border border-borde/55 bg-fondo-panel text-boton-acento shadow-sm">
- <i class="ph-bold ph-activity text-2xl"></i>
- </span>
- <div>
- <h2 class="text-xl font-extrabold tracking-tight text-parrafo">Signos Vitales</h2>
- <p class="mt-1 text-xs font-bold leading-relaxed text-parrafo/62">
- Monitoreo, control y análisis de parámetros vitales del adulto mayor.
- </p>
- </div>
- </div>
-
- <div class="flex items-center gap-3">
- <a href="{{ route('admin.salud-seguimiento.reportes') }}" class="inline-flex items-center justify-center gap-2 rounded-xl border border-borde bg-fondo-panel px-4 py-2 text-xs font-bold uppercase tracking-wider text-parrafo transition hover:bg-fondo-app active:scale-95">
- <i class="ph-bold ph-file-chart text-sm"></i>
- Generar Reporte
- </a>
- @can('signos_vitales.crear')
- <button type="button" wire:click="abrirFormularioNuevo" class="inline-flex items-center justify-center gap-2 rounded-xl bg-boton-acento px-5 py-2.5 text-xs font-bold uppercase tracking-wider text-inverso shadow-[0_10px_22px_rgba(226,125,96,0.24)] transition hover:-translate-y-0.5 hover:bg-fondo-panel active:scale-95">
- <i class="ph-bold ph-plus-circle text-sm"></i>
- Registrar Signos Vitales
- </button>
- @endcan
- </div>
- </div>
- </section>
+ <x-ui.page-header
+  overline="Seguimiento clínico"
+  title="Signos vitales"
+  subtitle="Monitoreo, control y análisis de parámetros vitales del residente."
+  icon="ph-activity"
+ >
+  <a href="{{ route('admin.salud-seguimiento.reportes') }}" class="rm-btn rm-btn-secondary rm-btn-sm">
+   <i class="ph-bold ph-file-chart" aria-hidden="true"></i>
+   Generar reporte
+  </a>
+  @can('signos_vitales.crear')
+   <x-ui.action-button variant="primary" size="sm" icono="ph-plus-circle" wire:click="abrirFormularioNuevo">
+    Registrar signos vitales
+   </x-ui.action-button>
+  @endcan
+ </x-ui.page-header>
 
  {{-- B. SELECCIONAR PACIENTE --}}
- <section class="rm-filter-bar">
+ <x-ui.filter-bar>
  <label class="mb-2 block text-[10px] font-bold uppercase tracking-widest text-apoyo">Seleccionar Paciente</label>
  <div class="grid gap-3 md:grid-cols-[1fr_1fr_auto]">
  <div>
@@ -89,7 +76,7 @@
  </button>
  </div>
  </div>
- </section>
+ </x-ui.filter-bar>
 
  @if($adulto)
  {{-- C. CARD DEL PACIENTE SELECCIONADO --}}
@@ -127,7 +114,7 @@
  {{-- D. CARDS DE SIGNOS VITALES --}}
  <section class="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
  @forelse($metricas as $metrica)
- <div class="relative overflow-hidden rounded-[1.4rem] border {{ $estadoBadge[$metrica['status_key']] ?? 'bg-fondo-card' }} p-3 shadow-sm backdrop-blur-md">
+ <div class="relative overflow-hidden rounded-[var(--rm-radius-card)] border {{ $estadoBadge[$metrica['status_key']]['card'] ?? 'border-[var(--rm-border)] bg-[var(--rm-surface)]' }} p-3 shadow-[var(--rm-shadow-sm)] backdrop-blur-md">
  <i class="ph-bold {{ $metrica['icon'] }} absolute right-3 top-3 text-2xl opacity-10"></i>
  <p class="pr-7 text-[10px] font-bold uppercase tracking-widest text-apoyo">{{ $metrica['label'] }}</p>
  <div class="mt-2 flex items-baseline gap-1">
@@ -156,12 +143,12 @@
  {{-- F. GRÁFICA Y REPORTE LADO A LADO --}}
  <section class="grid gap-4 lg:grid-cols-[1.8fr_1fr]">
  <!-- Gráfica Principal -->
- <div class="rounded-[1.6rem] border border-borde/65 bg-fondo-card p-4 shadow-sm"
+ <div class="rm-chart-card rm-chart-glass"
  x-data="{ chartKey: '{{ $chartKey }}', payload: @js($chartData) }"
  x-init="$watch('chartKey', () => window.rmSignosVitalesMainChart($el, payload)); window.rmSignosVitalesMainChart($el, payload);">
 
- <div class="mb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
- <h3 class="text-sm font-bold uppercase tracking-wider text-parrafo">Evolución Clínica</h3>
+ <div class="rm-chart-header flex-col sm:flex-row sm:items-center">
+ <h3 class="rm-chart-title">Evolución Clínica</h3>
  <select wire:model.live="grafica" class="rounded-xl border border-borde/70 bg-fondo-app py-1.5 pl-3 pr-8 text-xs font-bold text-parrafo outline-none">
  @foreach($graficaOpciones as $val => $label)
  <option value="{{ $val }}">{{ $label }}</option>
@@ -170,11 +157,11 @@
  </div>
 
  @if(!empty($chartData['main']['datasets']))
- <div class="relative h-56 w-full">
+ <div class="rm-chart-body relative h-56 w-full" style="height: 14rem; min-height: 14rem; max-height: 14rem;">
  <canvas data-chart="main"></canvas>
  </div>
  @else
- <div class="flex h-56 w-full flex-col items-center justify-center rounded-xl border border-dashed border-borde-suave bg-fondo-panel text-meta">
+ <div class="rm-chart-empty flex h-56 w-full flex-col items-center justify-center">
  <i class="ph-bold ph-chart-line text-3xl"></i>
  <p class="mt-2 text-[10px] font-bold uppercase tracking-widest">Información insuficiente para graficar</p>
  </div>

@@ -18,7 +18,7 @@ $parentescos = $redFamiliar['parentescos'] ?? [];
  Estructura operativa
  </span>
  <h2 class="text-lg font-extrabold text-titulo">Equipo institucional</h2>
- <p class="text-xs font-bold text-meta">Distribución del capital humano de CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS.</p>
+ <p class="text-xs font-bold text-meta">Distribución del capital humano del CENTRO GERIÁTRICO LOS ALMENDROS.</p>
  </div>
 
  <div class="grid gap-3 sm:grid-cols-2">

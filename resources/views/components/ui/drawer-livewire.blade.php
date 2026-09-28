@@ -15,6 +15,7 @@
         'lg' => 'w-screen max-w-[var(--rm-drawer-lg,640px)]',
         default => 'w-screen max-w-[var(--rm-drawer-md,480px)] md:w-[740px] md:max-w-[760px]',
     };
+    $drawerId = 'drawer-'.\Illuminate\Support\Str::slug((string) ($attributes->wire('model')->value() ?: $title));
 @endphp
 
 <div x-data="{ show: @entangle($attributes->wire('model')) }" x-show="show" x-cloak
@@ -22,7 +23,7 @@
     {{-- Backdrop estándar del Design System --}}
     <div class="rm-drawer-backdrop fixed inset-0 bg-[var(--rm-modal-overlay,rgba(51,39,31,0.55))] backdrop-blur-xs transition-opacity" @click="$wire.{{ $closeMethod }}()"></div>
 
-    <div class="pointer-events-none fixed inset-y-0 right-0 z-[var(--rm-z-drawer,500)] flex max-w-full pl-6 sm:pl-10">
+    <div class="pointer-events-none fixed inset-y-0 right-0 z-[var(--rm-z-drawer,500)] flex max-w-full pl-4 sm:inset-y-3 sm:right-3 sm:pl-10">
         <aside x-show="show"
                x-transition:enter="transition ease-out duration-300"
                x-transition:enter-start="translate-x-full"
@@ -30,7 +31,13 @@
                x-transition:leave="transition ease-in duration-200"
                x-transition:leave-start="translate-x-0"
                x-transition:leave-end="translate-x-full"
-               class="pointer-events-auto rm-drawer flex h-full {{ $resolvedWidth }} flex-col bg-[var(--rm-surface)] border-l border-[var(--rm-border)] shadow-[var(--rm-shadow-lg)]">
+               id="{{ $drawerId }}"
+               role="dialog"
+               aria-modal="true"
+               aria-labelledby="{{ $drawerId }}-title"
+               tabindex="-1"
+               x-effect="if (show) $nextTick(() => $el.focus({ preventScroll: true }))"
+               class="pointer-events-auto rm-drawer flex h-full {{ $resolvedWidth }} flex-col overflow-hidden rounded-l-[var(--rm-radius-modal)] border border-[var(--rm-border)] bg-[var(--rm-surface)] shadow-[var(--rm-shadow-overlay)] sm:rounded-[var(--rm-radius-modal)]">
 
             {{-- Header Fijo con Badge de Consulta --}}
             <header class="rm-drawer-header p-4 sm:p-5 border-b border-[var(--rm-border-soft)] bg-[var(--rm-surface-soft)]">
@@ -48,7 +55,7 @@
                                     <i class="ph-bold {{ $icon }}"></i>
                                 </span>
                             @endif
-                            <h2 class="text-base sm:text-lg font-bold text-[var(--rm-text-primary)] truncate">{{ $title }}</h2>
+                            <h2 id="{{ $drawerId }}-title" class="text-base sm:text-lg font-bold text-[var(--rm-text-primary)] leading-tight">{{ $title }}</h2>
                         </div>
                         @if($subtitle)
                             <p class="text-xs text-[var(--rm-text-secondary)] truncate">{{ $subtitle }}</p>

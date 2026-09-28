@@ -1,7 +1,7 @@
 {{--
  Componente: ui/action-button
  Variantes: primary, secondary, ghost, success, danger, info, icon
- Tamaños: sm (38px), md (44px default), lg (48px)
+ Tamaños: sm (36px), md (40px default), lg (44px)
  Consume el contrato de tokens V2: --rm-button-*
 --}}
 @props([

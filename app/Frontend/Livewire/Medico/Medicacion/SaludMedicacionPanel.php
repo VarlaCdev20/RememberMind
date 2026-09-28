@@ -239,6 +239,9 @@ class SaludMedicacionPanel extends Component
     {
         $this->adultoDrawer = AdultoMayor::query()->with([
             'ocupacionActiva.cama.habitacion',
+            'alergias' => fn ($query) => $query->whereIn('estado', ['ACTIVA', 'ACTIVO']),
+            'diagnosticos' => fn ($query) => $query->whereIn('estado', ['ACTIVO', 'CONFIRMADO']),
+            'planCuidadoActivo',
             'signosVitales' => fn ($query) => $query->where('estado', '!=', 'ANULADO')->latest('fecha_hora')->take(10),
         ])->find($codResidente);
         $this->signosDrawer = $this->adultoDrawer?->signosVitales ?? collect();

@@ -18,6 +18,12 @@ export function rmIsDark() {
         || document.documentElement.dataset.theme === 'dark';
 }
 
+export function rmPrefersReducedMotion() {
+    return typeof window !== 'undefined'
+        && typeof window.matchMedia === 'function'
+        && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+}
+
 export function rmHexToRgba(hex, alpha = 1) {
     if (!hex) return `rgba(100, 116, 139, ${alpha})`;
     if (hex.startsWith('rgba') || hex.startsWith('rgb')) {
@@ -41,10 +47,10 @@ export function rmChartPalette() {
         const val = rmGetCss(`--rm-chart-${i + 1}`);
         if (val) return val;
         const fallbacks = [
-            '#344D7A', '#D9745B', '#5F9271', '#C9913E', '#7565A8',
-            '#4E8CA6', '#A85C73', '#7B879A', '#9A744E', '#568A80'
+            '#4F895E', '#527DAA', '#78B985', '#6F92BC', '#8A7A70',
+            '#A89789', '#355D86', '#6A7562', '#AAA09A', '#C77969'
         ];
-        return fallbacks[i] || '#344D7A';
+        return fallbacks[i] || '#527DAA';
     });
 }
 
@@ -56,40 +62,156 @@ export function rmChartPaletteAlpha(alpha = 0.85) {
 export function rmChartSemanticColors() {
     const isDark = rmIsDark();
     return {
-        danger:      rmGetCss('--rm-chart-danger')      || (isDark ? '#F87171' : '#E5534B'),
-        dangerSoft:  rmGetCss('--rm-chart-danger-soft')  || (isDark ? 'rgba(248,113,113,0.18)' : '#FDE8E7'),
+        danger:      rmGetCss('--rm-chart-danger')      || (isDark ? '#D59A8D' : '#98594F'),
+        dangerSoft:  rmGetCss('--rm-chart-danger-soft')  || (isDark ? 'rgba(243,111,99,0.18)' : '#F7D5D1'),
         warningHigh: rmGetCss('--rm-chart-warning-high') || (isDark ? '#FB923C' : '#E67A22'),
         warning:     rmGetCss('--rm-chart-warning')      || (isDark ? '#FBBF24' : '#D9822B'),
         warningSoft: rmGetCss('--rm-chart-warning-soft')  || (isDark ? 'rgba(251,191,36,0.18)' : '#FEF3E2'),
-        success:     rmGetCss('--rm-chart-success')      || (isDark ? '#34D399' : '#2D8A6E'),
-        successSoft: rmGetCss('--rm-chart-success-soft')  || (isDark ? 'rgba(52,211,153,0.18)' : '#E6F5EE'),
-        info:        rmGetCss('--rm-chart-info')         || (isDark ? '#60A5FA' : '#2563EB'),
-        infoSoft:    rmGetCss('--rm-chart-info-soft')    || (isDark ? 'rgba(96,165,250,0.18)' : '#EFF6FF'),
+        success:     rmGetCss('--rm-chart-success')      || (isDark ? '#C8D8C7' : '#6F8B74'),
+        successSoft: rmGetCss('--rm-chart-success-soft')  || (isDark ? 'rgba(173,235,178,0.18)' : '#CBEFD0'),
+        info:        rmGetCss('--rm-chart-info')         || (isDark ? '#A2C2EC' : '#527DAA'),
+        infoSoft:    rmGetCss('--rm-chart-info-soft')    || (isDark ? 'rgba(162,194,236,0.18)' : '#DCE8F7'),
         neutral:     rmGetCss('--rm-chart-neutral')      || (isDark ? '#94A3B8' : '#64748B'),
     };
 }
 
 // --- Mapeo ESTABLE: Origen Clínico -> Token Permanente ---
 export const CLINICAL_ORIGINS_MAP = {
-    SIGNOS:           { name: 'Signos Vitales',   token: '--rm-chart-6', fallback: '#F43F5E' }, // Vivid Rose
-    MEDICACION:       { name: 'Medicación',       token: '--rm-chart-2', fallback: '#8B5CF6' }, // Vivid Purple
-    INCIDENTE:        { name: 'Incidentes',       token: '--rm-chart-7', fallback: '#F97316' }, // Vivid Orange
-    SOLICITUD_MEDICA: { name: 'Solicitud Médica', token: '--rm-chart-5', fallback: '#06B6D4' }, // Vivid Cyan
-    PLAN:             { name: 'Plan Cuidados',    token: '--rm-chart-1', fallback: '#0EA5E9' }, // Sky Blue
-    SEGUIMIENTO:      { name: 'Seguimiento',      token: '--rm-chart-3', fallback: '#14B8A6' }, // Teal
-    VALORACION:       { name: 'Valoración',       token: '--rm-chart-4', fallback: '#10B981' }, // Emerald
-    FICHA:            { name: 'Ficha Clínica',    token: '--rm-chart-10',fallback: '#F59E0B' }, // Amber
-    MANUAL:           { name: 'Manual',           token: '--rm-chart-8', fallback: '#6366F1' }, // Indigo
-    SISTEMA:          { name: 'Sistema',          token: '--rm-chart-9', fallback: '#64748B' }, // Slate
-    USUARIO:          { name: 'Usuario',          token: '--rm-chart-5', fallback: '#8B5CF6' }, // Purple
+    SIGNOS:           { name: 'Signos Vitales',   token: '--rm-chart-2', fallback: '#527DAA' },
+    MEDICACION:       { name: 'Medicación',       token: '--rm-chart-1', fallback: '#4F895E' },
+    INCIDENTE:        { name: 'Incidentes',       token: '--rm-chart-10', fallback: '#C77969' },
+    SOLICITUD_MEDICA: { name: 'Solicitud Médica', token: '--rm-chart-7', fallback: '#355D86' },
+    PLAN:             { name: 'Plan Cuidados',    token: '--rm-chart-3', fallback: '#78B985' },
+    SEGUIMIENTO:      { name: 'Seguimiento',      token: '--rm-chart-4', fallback: '#6F92BC' },
+    VALORACION:       { name: 'Valoración',       token: '--rm-chart-8', fallback: '#6A7562' },
+    FICHA:            { name: 'Ficha Clínica',    token: '--rm-chart-5', fallback: '#8A7A70' },
+    MANUAL:           { name: 'Manual',           token: '--rm-chart-6', fallback: '#A89789' },
+    SISTEMA:          { name: 'Sistema',          token: '--rm-chart-9', fallback: '#BDAFA2' },
+    USUARIO:          { name: 'Usuario',          token: '--rm-chart-4', fallback: '#6F92BC' },
 };
 
 export function rmGetOriginColor(origenKey) {
     const meta = CLINICAL_ORIGINS_MAP[origenKey];
     if (meta) {
-        return meta.fallback || rmGetCss(meta.token) || '#344D7A';
+        return rmGetCss(meta.token) || meta.fallback || '#527DAA';
     }
-    return '#344D7A';
+    return '#527DAA';
+}
+
+function rmResolveDatasetGlowColor(dataset, datasetIndex) {
+    const candidates = [dataset?.borderColor, dataset?.backgroundColor]
+        .flatMap(value => Array.isArray(value) ? value : [value]);
+    const explicit = candidates.find(value => typeof value === 'string' && value !== 'transparent');
+
+    if (explicit) return explicit;
+
+    const paletteIndex = (datasetIndex % 10) + 1;
+    return rmGetCss(`--rm-chart-${paletteIndex}`) || rmGetCss('--rm-chart-2') || '#A2C2EC';
+}
+
+const rmDarkNeonGlowPlugin = {
+    id: 'rmDarkNeonGlow',
+
+    beforeDatasetDraw(chart, args, pluginOptions) {
+        if (!rmIsDark() || pluginOptions?.enabled === false || !chart?.ctx) return;
+
+        const dataset = chart.data?.datasets?.[args.index];
+        const color = rmResolveDatasetGlowColor(dataset, args.index);
+        const isSparkline = chart.canvas?.closest?.('.rm-sparkline, .is-sparkline');
+
+        chart.ctx.save();
+        chart.ctx.shadowColor = rmHexToRgba(color, .16);
+        chart.ctx.shadowBlur = isSparkline ? 2 : 4;
+        chart.ctx.shadowOffsetX = 0;
+        chart.ctx.shadowOffsetY = 0;
+        args.meta.$rmNeonGlowActive = true;
+    },
+
+    afterDatasetDraw(chart, args) {
+        if (!args.meta?.$rmNeonGlowActive || !chart?.ctx) return;
+
+        chart.ctx.restore();
+        args.meta.$rmNeonGlowActive = false;
+    },
+};
+
+/**
+ * Instala el lenguaje visual institucional sobre cualquier instancia Chart.js,
+ * incluidas las gráficas heredadas que todavía no consumen los presets RMCharts.
+ */
+export function rmInstallGlobalChartTheme(Chart) {
+    if (!Chart || Chart.__rmClinicalThemeInstalled) return;
+
+    Chart.register(rmDarkNeonGlowPlugin);
+
+    const applyDefaults = () => {
+        const isDark = rmIsDark();
+        const axisText = rmGetCss('--rm-chart-axis-text') || (isDark ? '#C5B8AF' : '#695F59');
+        const grid = rmGetCss('--rm-chart-grid') || (isDark ? 'rgba(255,255,255,.08)' : 'rgba(64,42,32,.12)');
+        const tooltipBg = rmGetCss('--rm-chart-tooltip-bg') || (isDark ? '#403732' : '#F4EEE8');
+        const tooltipText = rmGetCss('--rm-chart-tooltip-text') || (isDark ? '#F8F4EF' : '#302923');
+        const tooltipBorder = rmGetCss('--rm-chart-tooltip-border') || grid;
+
+        Chart.defaults.color = axisText;
+        Chart.defaults.borderColor = grid;
+        Chart.defaults.font.family = "Outfit, 'Nunito Sans', Inter, system-ui, sans-serif";
+        Chart.defaults.font.size = 11;
+        Chart.defaults.responsive = true;
+        Chart.defaults.maintainAspectRatio = false;
+        const reduceMotion = rmPrefersReducedMotion();
+        Chart.defaults.animation.duration = reduceMotion ? 0 : 800;
+        Chart.defaults.animation.easing = 'easeOutQuart';
+        Chart.defaults.interaction.mode = 'index';
+        Chart.defaults.interaction.intersect = false;
+
+        Chart.defaults.elements.line.borderWidth = 2.4;
+        Chart.defaults.elements.line.tension = .36;
+        Chart.defaults.elements.point.radius = 3.5;
+        Chart.defaults.elements.point.hoverRadius = 6;
+        Chart.defaults.elements.point.borderWidth = 2;
+        Chart.defaults.elements.bar.borderRadius = 7;
+        Chart.defaults.elements.bar.borderSkipped = false;
+        Chart.defaults.elements.arc.borderWidth = 2;
+
+        Chart.defaults.plugins.legend.labels.color = axisText;
+        Chart.defaults.plugins.legend.labels.usePointStyle = true;
+        Chart.defaults.plugins.legend.labels.pointStyle = 'circle';
+        Chart.defaults.plugins.legend.labels.padding = 14;
+        Chart.defaults.plugins.legend.labels.font = {
+            family: "Outfit, 'Nunito Sans', Inter, system-ui, sans-serif",
+            size: 11,
+            weight: '600',
+        };
+
+        Object.assign(Chart.defaults.plugins.tooltip, {
+            backgroundColor: tooltipBg,
+            titleColor: tooltipText,
+            bodyColor: tooltipText,
+            borderColor: tooltipBorder,
+            borderWidth: 1,
+            cornerRadius: 12,
+            padding: 11,
+            boxPadding: 5,
+            usePointStyle: true,
+            titleFont: { family: "Outfit, 'Nunito Sans', sans-serif", size: 12, weight: '700' },
+            bodyFont: { family: "Outfit, 'Nunito Sans', sans-serif", size: 11, weight: '500' },
+        });
+
+        if (Chart.defaults.plugins.datalabels) {
+            Chart.defaults.plugins.datalabels.display = false;
+        }
+    };
+
+    applyDefaults();
+    Chart.__rmClinicalThemeInstalled = true;
+
+    if (typeof MutationObserver !== 'undefined') {
+        const observer = new MutationObserver(() => {
+            applyDefaults();
+            Object.values(Chart.instances || {}).forEach((instance) => instance?.update?.('none'));
+        });
+        observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class', 'data-theme'] });
+    }
 }
 
 export function rmGetOriginLabel(origenKey) {
@@ -137,7 +259,7 @@ export function rmBaseChartOptions(overrides = {}) {
         responsive: true,
         maintainAspectRatio: false,
         animation: {
-            duration: 900,
+            duration: rmPrefersReducedMotion() ? 0 : 700,
             easing: 'easeOutQuart',
         },
         transitions: {
@@ -155,7 +277,7 @@ export function rmBaseChartOptions(overrides = {}) {
             legend: {
                 display: false,
                 labels: {
-                    font: { family: 'Inter, system-ui, sans-serif', size: 11, weight: '500' },
+                    font: { family: "Outfit, 'Nunito Sans', Inter, system-ui, sans-serif", size: 11, weight: '600' },
                     color: axisTextColor,
                     usePointStyle: true,
                     pointStyle: 'circle',
@@ -168,10 +290,10 @@ export function rmBaseChartOptions(overrides = {}) {
                 bodyColor: tooltipText,
                 borderColor: tooltipBorder,
                 borderWidth: 1,
-                cornerRadius: 8,
-                padding: { top: 8, right: 12, bottom: 8, left: 12 },
-                titleFont: { family: 'Inter, system-ui, sans-serif', size: 11, weight: '600' },
-                bodyFont: { family: 'Inter, system-ui, sans-serif', size: 11, weight: '400' },
+                cornerRadius: 12,
+                padding: { top: 10, right: 12, bottom: 10, left: 12 },
+                titleFont: { family: "Outfit, 'Nunito Sans', sans-serif", size: 12, weight: '700' },
+                bodyFont: { family: "Outfit, 'Nunito Sans', sans-serif", size: 11, weight: '500' },
                 boxPadding: 4,
                 displayColors: true,
             },
@@ -184,14 +306,14 @@ export function rmBaseChartOptions(overrides = {}) {
                 grid: { color: gridColor, drawBorder: false },
                 ticks: {
                     color: axisTextColor,
-                    font: { family: 'Inter, system-ui, sans-serif', size: 10, weight: '500' },
+                    font: { family: "Outfit, 'Nunito Sans', sans-serif", size: 10, weight: '600' },
                 },
             },
             y: {
                 grid: { color: gridColor, drawBorder: false },
                 ticks: {
                     color: axisTextColor,
-                    font: { family: 'Inter, system-ui, sans-serif', size: 10, weight: '500' },
+                    font: { family: "Outfit, 'Nunito Sans', sans-serif", size: 10, weight: '600' },
                 },
             },
         },

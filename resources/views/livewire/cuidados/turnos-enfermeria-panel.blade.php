@@ -7,7 +7,7 @@
 <div class="min-h-screen bg-fondo-panel px-4 py-5 sm:px-6 lg:px-8" x-data @keydown.window.escape="$wire.cerrarModales()">
 <div class="mx-auto max-w-4xl space-y-5">
 <section class="overflow-hidden rounded-[1.65rem] border border-borde-suave bg-fondo-panel shadow-lg">
-    <div class="h-1.5 bg-gradient-to-r from-[var(--rm-action-primary)] via-[[var(--rm-warning)] to-[var(--rm-accent-terracotta)]"></div>
+    <div class="h-1.5 bg-gradient-to-r from-[var(--rm-action-primary)] via-[var(--rm-warning)] to-[var(--rm-accent-terracotta)]"></div>
     <div class="flex items-center justify-between p-5 sm:p-7">
         <div>
             <h1 class="text-2xl font-black text-titulo">Turnos de Enfermería</h1>
@@ -63,7 +63,7 @@
 @if($modalTurno)
 <div class="fixed inset-0 z-50 flex items-center justify-center p-4" style="background: rgba(47,62,92,0.55)" wire:click.self="cerrarModales">
     <div class="w-full max-w-md overflow-hidden rounded-[1.45rem] border border-borde-suave bg-fondo-panel shadow-2xl">
-        <div class="h-1 bg-gradient-to-r from-[var(--rm-action-primary)] via-[[var(--rm-warning)] to-[var(--rm-accent-terracotta)]"></div>
+        <div class="h-1 bg-gradient-to-r from-[var(--rm-action-primary)] via-[var(--rm-warning)] to-[var(--rm-accent-terracotta)]"></div>
         <div class="flex items-center justify-between border-b border-borde-suave px-5 py-4">
             <h3 class="text-sm font-bold text-titulo">{{ $editandoId ? 'Editar turno' : 'Nuevo turno' }}</h3>
             <button wire:click="cerrarModales" class="flex h-8 w-8 items-center justify-center rounded-xl border border-borde-suave text-apoyo hover:text-boton-acento transition"><i class="ph-bold ph-x text-sm"></i></button>

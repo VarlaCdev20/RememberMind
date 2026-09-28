@@ -73,7 +73,10 @@ class RolesVistasPermisosMatrixTest extends TestCase
         $nutricionista = $this->crearUsuarioConRol('NUTRICIONISTA');
 
         $response = $this->actingAs($nutricionista)->get(route('dashboard'));
-        $response->assertOk();
+        $response->assertOk()
+            ->assertSee('Valoración nutricional')
+            ->assertSee('Antropometría')
+            ->assertDontSee('Centro de Mando Institucional');
     }
 
     public function test_administrador_tiene_permisos_para_sus_vistas_asignadas(): void

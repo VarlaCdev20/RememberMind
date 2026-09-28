@@ -236,19 +236,19 @@
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch">
 
         {{-- GRÁFICO PRINCIPAL CON NÚMEROS EN LOS PUNTOS (75% - 9 columnas) --}}
-        <div class="lg:col-span-9 rounded-2xl border border-[var(--rm-border)] bg-[var(--rm-surface)] p-4 shadow-2xs flex flex-col justify-between">
-            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-[var(--rm-border)]/60 pb-3">
+        <div class="lg:col-span-9 rm-chart-card rm-chart-glass flex flex-col justify-between">
+            <div class="rm-chart-header flex-col sm:flex-row sm:items-center">
                 <div>
                     <div class="flex items-center gap-2">
                         <span class="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-50 text-[#1E3A8A] border border-blue-200 text-sm">
                             <i class="ph-bold" :class="metricasInfo[metricaActiva]?.icon || 'ph-chart-line'"></i>
                         </span>
-                        <h3 class="text-xs sm:text-sm font-black text-[var(--rm-text-title)] tracking-tight uppercase"
+                        <h3 class="rm-chart-title"
                             x-text="metricasInfo[metricaActiva]?.titulo_grafico || 'PRESIÓN ARTERIAL'">
                             PRESIÓN ARTERIAL
                         </h3>
                     </div>
-                    <p class="text-[11px] text-[var(--rm-text-muted)] mt-0.5"
+                    <p class="rm-chart-subtitle"
                        x-text="metricasInfo[metricaActiva]?.subtitulo || 'Evolución con valores numéricos y rangos de normalidad'">
                         Evolución de constantes vitales con valores numéricos y rangos de normalidad
                     </p>
@@ -280,12 +280,12 @@
                 <div class="flex items-center gap-4">
                     <template x-if="metricaActiva === 'PA'">
                         <div class="flex flex-wrap items-center gap-3">
-                            <span class="inline-flex items-center gap-1.5 font-bold text-rose-600">
-                                <span class="h-2 w-2 rounded-full bg-[#EF4444]"></span>
+                            <span class="inline-flex items-center gap-1.5 font-bold text-[var(--rm-chart-2)]">
+                                <span class="h-2 w-2 rounded-full bg-[var(--rm-chart-2)]"></span>
                                 Sistólica (mmHg)
                             </span>
-                            <span class="inline-flex items-center gap-1.5 font-bold text-blue-600">
-                                <span class="h-2 w-2 rounded-full bg-[#2563EB]"></span>
+                            <span class="inline-flex items-center gap-1.5 font-bold text-[var(--rm-chart-4)]">
+                                <span class="h-2 w-2 rounded-full bg-[var(--rm-chart-4)]"></span>
                                 Diastólica (mmHg)
                             </span>
                             <span class="inline-flex items-center gap-1.5 text-[var(--rm-text-muted)] italic font-medium">
@@ -323,7 +323,7 @@
             </div>
 
             {{-- Contenedor del Chart.js Principal con wire:ignore --}}
-            <div class="relative w-full h-64 sm:h-72 mt-2" wire:ignore>
+            <div class="rm-chart-body is-lg relative w-full h-64 sm:h-72 mt-2" wire:ignore>
                 <canvas id="signosVitalesMainCanvas" x-ref="mainChartCanvas" class="w-full h-full"></canvas>
             </div>
         </div>
@@ -1490,6 +1490,9 @@ document.addEventListener('alpine:init', () => {
 
             const self = this;
             const isDark = document.documentElement.classList.contains('dark');
+            const chartToken = (name, fallback) => window.RMCharts?.getCss(name) || fallback;
+            const chartGrid = chartToken('--rm-chart-grid-strong', 'rgba(80, 71, 65, 0.22)');
+            const chartSuccess = chartToken('--rm-chart-3', '#78B985');
             const datasets = this.getDatasetsForMetrica(this.metricaActiva, isDark);
             const scalesConfig = this.getScalesForMetrica(this.metricaActiva, isDark);
 
@@ -1510,7 +1513,7 @@ document.addEventListener('alpine:init', () => {
                         ctx.lineTo(x, bottomY);
                         ctx.setLineDash([4, 4]);
                         ctx.lineWidth = 1.2;
-                        ctx.strokeStyle = isDark ? 'rgba(255, 255, 255, 0.40)' : 'rgba(30, 58, 138, 0.40)';
+                        ctx.strokeStyle = chartGrid;
                         ctx.stroke();
                         ctx.restore();
                     }
@@ -1532,11 +1535,11 @@ document.addEventListener('alpine:init', () => {
 
                     ctx.save();
                     // Franja verde suave de normalidad
-                    ctx.fillStyle = isDark ? 'rgba(16, 185, 129, 0.06)' : 'rgba(16, 185, 129, 0.08)';
+                    ctx.fillStyle = window.RMCharts?.hexToRgba(chartSuccess, isDark ? 0.06 : 0.08) || chartSuccess;
                     ctx.fillRect(chartArea.left, yHigh, chartArea.width, yLow - yHigh);
 
                     // Límites punteados
-                    ctx.strokeStyle = isDark ? 'rgba(16, 185, 129, 0.30)' : 'rgba(16, 185, 129, 0.35)';
+                    ctx.strokeStyle = window.RMCharts?.hexToRgba(chartSuccess, isDark ? 0.30 : 0.35) || chartSuccess;
                     ctx.lineWidth = 1;
                     ctx.setLineDash([4, 4]);
 
@@ -1589,17 +1592,15 @@ document.addEventListener('alpine:init', () => {
                             return 'end';
                         },
                         offset: 5,
-                        backgroundColor: () => {
-                            return isDark ? 'rgba(15, 23, 42, 0.90)' : 'rgba(255, 255, 255, 0.92)';
-                        },
+                        backgroundColor: chartToken('--rm-chart-tooltip-bg', '#F0E7DE'),
                         borderColor: (context) => {
-                            return context.dataset.borderColor || '#1E3A8A';
+                            return context.dataset.borderColor || chartToken('--rm-chart-2', '#527DAA');
                         },
                         borderWidth: 1.2,
                         borderRadius: 5,
                         padding: { top: 2, bottom: 2, left: 5, right: 5 },
                         color: (context) => {
-                            return isDark ? '#F1F5F9' : '#0F172A';
+                            return chartToken('--rm-chart-tooltip-text', '#342E2A');
                         },
                         font: {
                             size: 10,
@@ -1620,9 +1621,11 @@ document.addEventListener('alpine:init', () => {
 
                     tooltip: {
                         enabled: true,
-                        backgroundColor: isDark ? 'rgba(15, 23, 42, 0.96)' : 'rgba(17, 24, 39, 0.96)',
-                        titleColor: '#FFFFFF',
-                        bodyColor: '#F3F4F6',
+                        backgroundColor: chartToken('--rm-chart-tooltip-bg', '#F0E7DE'),
+                        titleColor: chartToken('--rm-chart-tooltip-text', '#342E2A'),
+                        bodyColor: chartToken('--rm-chart-tooltip-text', '#342E2A'),
+                        borderColor: chartToken('--rm-chart-tooltip-border', '#C9BAAC'),
+                        borderWidth: 1,
                         padding: 12,
                         cornerRadius: 10,
                         displayColors: true,
@@ -1707,8 +1710,8 @@ document.addEventListener('alpine:init', () => {
         },
 
         getScalesForMetrica(metrica, isDark) {
-            const gridColor = isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)';
-            const tickColor = isDark ? '#94A3B8' : '#64748B';
+            const gridColor = window.RMCharts?.getCss('--rm-chart-grid') || 'rgba(80, 71, 65, 0.12)';
+            const tickColor = window.RMCharts?.getCss('--rm-chart-axis-text') || '#6B5F57';
 
             let yLimits = { suggestedMin: 50, suggestedMax: 160 };
             if (metrica === 'FC') yLimits = { suggestedMin: 50, suggestedMax: 110 };
@@ -1745,6 +1748,18 @@ document.addEventListener('alpine:init', () => {
         },
 
         getDatasetsForMetrica(metrica, isDark) {
+            const chartToken = (name, fallback) => window.RMCharts?.getCss(name) || fallback;
+            const colors = {
+                mint: chartToken('--rm-chart-1', '#4F895E'),
+                blue: chartToken('--rm-chart-2', '#527DAA'),
+                mintSoft: chartToken('--rm-chart-3', '#78B985'),
+                blueSoft: chartToken('--rm-chart-4', '#6F92BC'),
+                mocha: chartToken('--rm-chart-5', '#8A7A70'),
+                warm: chartToken('--rm-chart-6', '#A89789'),
+                blueDeep: chartToken('--rm-chart-7', '#355D86'),
+                coral: chartToken('--rm-chart-10', '#C94F45'),
+                pointBorder: chartToken('--rm-surface-raised', '#F0E7DE'),
+            };
             const makeGradient = (ctx, colorHex, alphaTop = 0.22, alphaBottom = 0.0) => {
                 const chart = ctx.chart;
                 const { ctx: c, chartArea } = chart;
@@ -1760,13 +1775,13 @@ document.addEventListener('alpine:init', () => {
                     {
                         label: 'Sistólica',
                         data: this.sistolica.length ? this.sistolica : [120, 122, 118, 125, 120, 119, 120],
-                        borderColor: '#EF4444',
-                        backgroundColor: (context) => makeGradient(context, '#EF4444', isDark ? 0.25 : 0.15, 0.01),
+                        borderColor: colors.blue,
+                        backgroundColor: (context) => makeGradient(context, colors.blue, isDark ? 0.25 : 0.15, 0.01),
                         borderWidth: 2.4,
                         pointRadius: 4.5,
                         pointHoverRadius: 7,
-                        pointBackgroundColor: '#EF4444',
-                        pointBorderColor: '#FFFFFF',
+                        pointBackgroundColor: colors.blue,
+                        pointBorderColor: colors.pointBorder,
                         pointBorderWidth: 1.5,
                         tension: 0.35,
                         fill: false,
@@ -1774,13 +1789,13 @@ document.addEventListener('alpine:init', () => {
                     {
                         label: 'Diastólica',
                         data: this.diastolica.length ? this.diastolica : [78, 80, 76, 82, 79, 78, 78],
-                        borderColor: '#2563EB',
-                        backgroundColor: (context) => makeGradient(context, '#2563EB', isDark ? 0.20 : 0.12, 0.01),
+                        borderColor: colors.blueSoft,
+                        backgroundColor: (context) => makeGradient(context, colors.blueSoft, isDark ? 0.20 : 0.12, 0.01),
                         borderWidth: 2.4,
                         pointRadius: 4.5,
                         pointHoverRadius: 7,
-                        pointBackgroundColor: '#2563EB',
-                        pointBorderColor: '#FFFFFF',
+                        pointBackgroundColor: colors.blueSoft,
+                        pointBorderColor: colors.pointBorder,
                         pointBorderWidth: 1.5,
                         tension: 0.35,
                         fill: false,
@@ -1789,13 +1804,13 @@ document.addEventListener('alpine:init', () => {
             }
 
             const mapData = {
-                'FC': { label: 'Frecuencia Cardíaca', data: this.fc, color: '#DC2626', fallback: [72, 75, 71, 74, 72, 73, 72] },
-                'SPO2': { label: 'Saturación SpO₂', data: this.spo2, color: '#059669', fallback: [97, 98, 97, 96, 98, 97, 97] },
-                'TEMP': { label: 'Temperatura', data: this.temp, color: '#EA580C', fallback: [36.5, 36.6, 36.4, 36.7, 36.5, 36.5, 36.5] },
-                'FR': { label: 'Frecuencia Respiratoria', data: this.fr, color: '#0891B2', fallback: [18, 19, 17, 18, 18, 18, 18] },
-                'DOLOR': { label: 'Dolor EVA', data: this.dolor, color: '#7C3AED', fallback: [2, 3, 2, 2, 1, 2, 2] },
-                'GLUCOSA': { label: 'Glucemia', data: this.glucosa, color: '#0284C7', fallback: [105, 110, 102, 115, 108, 104, 105] },
-                'PESO': { label: 'Peso Corporal', data: this.peso, color: '#475569', fallback: [68.5, 68.4, 68.6, 68.5, 68.5, 68.3, 68.5] },
+                'FC': { label: 'Frecuencia Cardíaca', data: this.fc, color: colors.mint, fallback: [72, 75, 71, 74, 72, 73, 72] },
+                'SPO2': { label: 'Saturación SpO₂', data: this.spo2, color: colors.mintSoft, fallback: [97, 98, 97, 96, 98, 97, 97] },
+                'TEMP': { label: 'Temperatura', data: this.temp, color: colors.warm, fallback: [36.5, 36.6, 36.4, 36.7, 36.5, 36.5, 36.5] },
+                'FR': { label: 'Frecuencia Respiratoria', data: this.fr, color: colors.blueDeep, fallback: [18, 19, 17, 18, 18, 18, 18] },
+                'DOLOR': { label: 'Dolor EVA', data: this.dolor, color: colors.coral, fallback: [2, 3, 2, 2, 1, 2, 2] },
+                'GLUCOSA': { label: 'Glucemia', data: this.glucosa, color: colors.blue, fallback: [105, 110, 102, 115, 108, 104, 105] },
+                'PESO': { label: 'Peso Corporal', data: this.peso, color: colors.mocha, fallback: [68.5, 68.4, 68.6, 68.5, 68.5, 68.3, 68.5] },
             };
 
             const cfg = mapData[metrica] || mapData['FC'];
@@ -1810,7 +1825,7 @@ document.addEventListener('alpine:init', () => {
                 pointRadius: 4.5,
                 pointHoverRadius: 7,
                 pointBackgroundColor: cfg.color,
-                pointBorderColor: '#FFFFFF',
+                pointBorderColor: colors.pointBorder,
                 pointBorderWidth: 1.5,
                 tension: 0.35,
                 fill: true,
@@ -1823,6 +1838,16 @@ document.addEventListener('alpine:init', () => {
         renderSparklines() {
             const isDark = document.documentElement.classList.contains('dark');
             const self = this;
+            const chartToken = (name, fallback) => window.RMCharts?.getCss(name) || fallback;
+            const colors = {
+                mint: chartToken('--rm-chart-1', '#4F895E'),
+                blue: chartToken('--rm-chart-2', '#527DAA'),
+                mintSoft: chartToken('--rm-chart-3', '#78B985'),
+                blueSoft: chartToken('--rm-chart-4', '#6F92BC'),
+                warm: chartToken('--rm-chart-6', '#A89789'),
+                blueDeep: chartToken('--rm-chart-7', '#355D86'),
+                coral: chartToken('--rm-chart-10', '#C94F45'),
+            };
 
             const cards = [
                 {
@@ -1830,38 +1855,38 @@ document.addEventListener('alpine:init', () => {
                     isPA: true,
                     dataA: this.sistolica.length ? this.sistolica : [120, 122, 118, 125, 120, 119, 120],
                     dataB: this.diastolica.length ? this.diastolica : [78, 80, 76, 82, 79, 78, 78],
-                    colorA: '#EF4444',
-                    colorB: '#2563EB',
+                    colorA: colors.blue,
+                    colorB: colors.blueSoft,
                     yLimits: { min: 50, max: 160 }
                 },
                 {
                     id: 'sparklineCanvasFC',
                     dataA: this.fc.length ? this.fc : [72, 75, 71, 74, 72, 73, 72],
-                    colorA: '#DC2626',
+                    colorA: colors.mint,
                     yLimits: { min: 50, max: 110 }
                 },
                 {
                     id: 'sparklineCanvasSPO2',
                     dataA: this.spo2.length ? this.spo2 : [97, 98, 97, 96, 98, 97, 97],
-                    colorA: '#059669',
+                    colorA: colors.mintSoft,
                     yLimits: { min: 88, max: 100 }
                 },
                 {
                     id: 'sparklineCanvasTEMP',
                     dataA: this.temp.length ? this.temp : [36.5, 36.6, 36.4, 36.7, 36.5, 36.5, 36.5],
-                    colorA: '#EA580C',
+                    colorA: colors.warm,
                     yLimits: { min: 35.0, max: 38.5 }
                 },
                 {
                     id: 'sparklineCanvasFR',
                     dataA: this.fr.length ? this.fr : [18, 19, 17, 18, 18, 18, 18],
-                    colorA: '#0891B2',
+                    colorA: colors.blueDeep,
                     yLimits: { min: 10, max: 26 }
                 },
                 {
                     id: 'sparklineCanvasDOLOR',
                     dataA: this.dolor.length ? this.dolor : [2, 3, 2, 2, 1, 2, 2],
-                    colorA: '#7C3AED',
+                    colorA: colors.coral,
                     yLimits: { min: 0, max: 10 }
                 },
             ];

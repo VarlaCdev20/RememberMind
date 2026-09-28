@@ -371,17 +371,17 @@ $estilosPaleta = [
                    mod.categoria.toLowerCase().includes(term);
         }
     }"
-    class="card-interactiva borde-verde-suave rounded-3xl border bg-fondo-panel p-5 sm:p-6 shadow-sm space-y-5 backdrop-blur-xl"
+    class="card-interactiva borde-verde-suave min-w-0 rounded-3xl border bg-fondo-panel p-4 sm:p-6 shadow-sm space-y-5 backdrop-blur-xl"
     aria-label="Centro de Mando y Vistas del Sistema"
 >
     {{-- CABECERA DEL HUB --}}
     <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 border-b border-borde pb-5">
         <div class="space-y-1">
-            <div class="flex items-center gap-2">
+            <div class="flex flex-wrap items-center gap-2">
                 <span class="flex h-8 w-8 items-center justify-center rounded-xl bg-boton-acento/10 text-boton-acento font-black border border-boton-acento/20 text-base shadow-2xs">
                     <i class="ph-bold ph-squares-four"></i>
                 </span>
-                <h2 class="text-lg font-black text-titulo tracking-tight">
+                <h2 class="min-w-0 text-base font-black text-titulo tracking-tight min-[420px]:text-lg">
                     Centro de Mando Institucional
                 </h2>
                 <span class="rm-badge-neutral text-[10.5px]">
@@ -417,7 +417,7 @@ $estilosPaleta = [
     </div>
 
     {{-- BARRA DE PESTAÑAS / FILTROS POR CATEGORÍA --}}
-    <div class="flex flex-wrap items-center gap-2 pt-0.5">
+    <div class="rm-mobile-scroll-row pt-0.5" aria-label="Categorías de módulos">
         <button
             type="button"
             @click="tabActivo = 'todos'"
