@@ -13,7 +13,7 @@
 
  @if($fichasMedicas->isNotEmpty() || $signosVitales->count() > 0 || $medicaciones->count() > 0 || $valoracionesFuncionales->count() > 0)
  <div class="space-y-6">
- 
+
  {{-- Ficha Médica --}}
  <div>
  <span class="block text-xs font-bold uppercase tracking-wide text-apoyo mb-3">Ficha Médica</span>
@@ -93,7 +93,7 @@
  @if($valoracionesFuncionales->count() > 0)
  @php $ultimaVal = $valoracionesFuncionales->first(); @endphp
  <div class="rounded-xl border border-borde-suave bg-fondo-card p-4">
- <p class="text-lg font-extrabold text-amber-600">{{ $ultimaVal->resultado_dependencia ?? 'N/D' }}</p>
+ <p class="text-lg font-extrabold text-[var(--rm-warning)]">{{ $ultimaVal->resultado_dependencia ?? 'N/D' }}</p>
  <p class="text-xs font-bold text-apoyo mt-1">Puntaje: {{ $ultimaVal->puntaje_total ?? '--' }}/100</p>
  </div>
  @else

@@ -14,12 +14,12 @@
  $medLabels = $medGrupos->keys()->values()->toArray();
  $medCounts = $medGrupos->map(fn($group) => $group->count())->values()->toArray();
  $medColors = collect($medLabels)->map(fn($l) => match(strtoupper((string)$l)) {
- 'ACTIVO' => '#617453',
- 'PAUSADO' => '#E2A45F',
- 'EN REVISION' => '#5B5F97',
- 'SUSPENDIDO' => '#E27D60',
- 'FINALIZADO' => '#CBBBAA',
- default => '#9B8EA0',
+ 'ACTIVO' => 'var(--rm-success)',
+ 'PAUSADO' => 'var(--rm-warning)',
+ 'EN REVISION' => 'var(--rm-violet)',
+ 'SUSPENDIDO' => 'var(--rm-danger)',
+ 'FINALIZADO' => 'var(--rm-surface-muted)',
+ default => 'var(--rm-text-muted)',
  })->toArray();
 
  // Valoración funcional: índice Barthel histórico
@@ -52,7 +52,7 @@
 <div class="space-y-6">
 
  {{-- ── Header ────────────────────────────────────────────── --}}
- <div class="rounded-[24px] border border-borde bg-gradient-to-br from-[#2F3E5C] to-[#4A5D8A] p-6 text-inverso">
+ <div class="rounded-[24px] border border-borde bg-gradient-to-br from-[var(--rm-clinical)] to-[#4A5D8A] p-6 text-inverso">
  <div class="flex items-center justify-between">
  <div class="flex items-center gap-4">
  <div class="flex h-14 w-14 items-center justify-center rounded-2xl bg-fondo-card/10">

@@ -14,9 +14,9 @@
 
  // Tema de CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS para alertas (botones color #BC6C25)
  const swalAmandita = Swal.mixin({
- confirmButtonColor: '#BC6C25',
- cancelButtonColor: '#6B7280',
- iconColor: '#BC6C25',
+ confirmButtonColor: '#8FA17F',
+ cancelButtonColor: '#C6B5A5',
+ iconColor: '#8FA17F',
  focusConfirm: false,
  });
 
@@ -50,7 +50,7 @@
  title:"{{ session('info') }}"
  });
  @endif
- 
+
  @if(session('status'))
  Toast.fire({
  icon: 'success',
@@ -71,7 +71,7 @@
  // Escuchar el evento de post-registro interactivo
  window.addEventListener('mostrar-post-registro', function(event) {
  const data = event.detail[0] || event.detail;
- 
+
  let credentialsHtml = '';
  if (data.credenciales_enviadas) {
  credentialsHtml = `
@@ -207,7 +207,7 @@
  window.confirmarAccion = function(event, titulo, texto = 'Esta acción quedará registrada en el historial institucional.', confirmText = 'Sí, confirmar') {
  event.preventDefault();
  const form = event.target || event.currentTarget;
- 
+
  window.SwalAmandita.fire({
  title: titulo,
  text: texto,
@@ -234,7 +234,7 @@
  window.procesarFormulario = function(event) {
  const form = event.target || event.currentTarget;
  const submitBtns = document.querySelectorAll('button[type="submit"][form="' + form.id + '"], ' + '#' + form.id + ' button[type="submit"]');
- 
+
  submitBtns.forEach(btn => {
  btn.disabled = true;
  btn.innerHTML = '<i class="ph-bold ph-spinner animate-spin mr-1"></i> Guardando...';

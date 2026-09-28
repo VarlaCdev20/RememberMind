@@ -1,26 +1,26 @@
 <x-app-layout>
  <div class="relative min-h-screen overflow-hidden bg-fondo-app px-4 py-5 font-outfit text-titulo sm:px-6" x-data="userRegistration()">
- 
+
  {{-- Script SweetAlert2 --}}
  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
- 
+
  {{-- Fondo con trama institucional (Coherencia con Adulto Mayor) --}}
  <div class="pointer-events-none fixed inset-0 opacity-[0.045] z-0"
  style="background-image: radial-gradient(#2F3E5C 1.2px, transparent 1.2px); background-size: 28px 28px;">
  </div>
 
  <main class="relative z-10 mx-auto max-w-5xl space-y-6">
- 
+
  {{-- HEADER INSTITUCIONAL --}}
  <header class="rounded-2xl border border-borde-suave bg-fondo-panel p-6 shadow-[0_14px_32px_rgba(47,62,92,0.12)] backdrop-blur-xl">
  <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
  <div>
- <nav class="mb-2 flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-terracota">
+ <nav class="mb-2 flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[var(--rm-action-primary)]">
  <a href="{{ route('admin.usuarios.index') }}" class="transition hover:text-titulo">Usuarios</a>
  <i class="ph-bold ph-caret-right text-[8px]"></i>
  <span>Registro Institucional</span>
  </nav>
- <h1 class="text-2xl font-black text-titulo">Registro de <span class="text-terracota">Personal</span></h1>
+ <h1 class="text-2xl font-black text-titulo">Registro de <span class="text-[var(--rm-action-primary)]">Personal</span></h1>
  <p class="mt-1 text-sm font-bold text-titulo/60">Asistente de registro institucional para personal administrativo y de salud.</p>
  </div>
  <div class="flex items-center gap-4">
@@ -28,13 +28,13 @@
  <div class="flex flex-col items-end">
  <span class="text-[10px] font-bold uppercase tracking-tighter text-titulo/40">Completitud</span>
  <div class="flex items-center gap-2">
- <span class="text-lg font-extrabold text-terracota" x-text="completionPercentage + '%'"></span>
+ <span class="text-lg font-extrabold text-[var(--rm-action-primary)]" x-text="completionPercentage + '%'"></span>
  <div class="h-2 w-24 overflow-hidden rounded-full bg-fondo-panel">
  <div class="h-full bg-boton-acento transition-all duration-500" :style="'width: ' + completionPercentage + '%'"></div>
  </div>
  </div>
  </div>
- <a href="{{ route('admin.usuarios.index') }}" 
+ <a href="{{ route('admin.usuarios.index') }}"
  class="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-fondo-app text-titulo transition hover:bg-boton-principal hover:text-inverso active:scale-95">
  <i class="ph-bold ph-arrow-left"></i>
  </a>
@@ -47,7 +47,7 @@
  <template x-for="n in 6" :key="n">
  <div class="flex items-center" :class="n < 6 ? 'flex-1' : ''">
  <div class="flex h-8 w-8 items-center justify-center rounded-full border-2 transition-all duration-300"
- :class="step === n ? 'border-terracota bg-boton-acento text-inverso shadow-lg shadow-terracota/20' : 
+ :class="step === n ? 'border-[var(--rm-action-primary)] bg-boton-acento text-inverso shadow-md shadow-[var(--rm-action-primary)]/20' :
  (step > n ? 'border-estado-exitoBorde bg-estado-exitoBg text-inverso' : 'border-borde-suave bg-fondo-card/50 text-meta')">
  <span class="text-xs font-bold" x-text="n"></span>
  </div>
@@ -57,19 +57,19 @@
  </template>
  </div>
  <div class="mt-2 flex justify-between px-1 text-[9px] font-bold uppercase tracking-widest text-titulo/40">
- <span :class="step === 1 ? 'text-terracota' : ''">Identidad</span>
- <span :class="step === 2 ? 'text-terracota' : ''">Documento</span>
- <span :class="step === 3 ? 'text-terracota' : ''">Contacto</span>
- <span :class="step === 4 ? 'text-terracota' : ''">Rol</span>
- <span :class="step === 5 ? 'text-terracota' : ''">Seguridad</span>
- <span :class="step === 6 ? 'text-terracota' : ''">Confirmar</span>
+ <span :class="step === 1 ? 'text-[var(--rm-action-primary)]' : ''">Identidad</span>
+ <span :class="step === 2 ? 'text-[var(--rm-action-primary)]' : ''">Documento</span>
+ <span :class="step === 3 ? 'text-[var(--rm-action-primary)]' : ''">Contacto</span>
+ <span :class="step === 4 ? 'text-[var(--rm-action-primary)]' : ''">Rol</span>
+ <span :class="step === 5 ? 'text-[var(--rm-action-primary)]' : ''">Seguridad</span>
+ <span :class="step === 6 ? 'text-[var(--rm-action-primary)]' : ''">Confirmar</span>
  </div>
  </div>
  </header>
 
  <form action="{{ route('admin.usuarios.store') }}" method="POST" enctype="multipart/form-data" id="registrationForm" @submit.prevent="confirmSubmit()">
  @csrf
- 
+
  {{-- Alertas Globales --}}
  @if(session('error'))
  <div class="mb-6 rounded-2xl border-2 border-red-200 bg-red-50 p-4 shadow-sm animate-pulse">
@@ -101,8 +101,8 @@
  </label>
  </div>
  <h3 class="text-lg font-extrabold leading-tight text-titulo" x-text="fullName() || 'Nombre del Usuario'"></h3>
- <p class="mt-1 text-[10px] font-bold uppercase tracking-widest text-terracota" x-text="rolDisplay()"></p>
- 
+ <p class="mt-1 text-[10px] font-bold uppercase tracking-widest text-[var(--rm-action-primary)]" x-text="rolDisplay()"></p>
+
  <div class="mt-6 w-full space-y-3 border-t border-borde-suave pt-6">
  <div class="flex justify-between text-[10px] font-bold">
  <span class="text-titulo/40 uppercase">Género</span>
@@ -127,7 +127,7 @@
  <div class="lg:col-span-2 space-y-6">
  <div class="rounded-3xl border border-borde-suave bg-fondo-panel p-8 shadow-sm">
  <div class="mb-6 flex items-center gap-3">
- <i class="ph-fill ph-user-circle text-2xl text-terracota"></i>
+ <i class="ph-fill ph-user-circle text-2xl text-[var(--rm-action-primary)]"></i>
  <h2 class="text-lg font-extrabold text-titulo">Datos de Identidad</h2>
  </div>
 
@@ -170,7 +170,7 @@
  <div>
  <label class="mb-1.5 block text-[10px] font-bold uppercase tracking-widest text-titulo/60">Edad Calculada</label>
  <div class="flex items-center gap-3 w-full rounded-2xl border border-borde-suave bg-fondo-panel px-5 py-3 text-sm font-bold text-titulo/70 shadow-inner">
- <i class="ph-bold ph-calendar text-terracota"></i>
+ <i class="ph-bold ph-calendar text-[var(--rm-action-primary)]"></i>
  <span x-text="calculateAgeText()"></span>
  </div>
  <p class="mt-1.5 text-[9px] font-bold text-titulo/40 italic">La edad se autogenera desde la fecha de nacimiento.</p>
@@ -198,7 +198,7 @@
  <section x-show="step === 2" x-transition.opacity.duration.400ms class="space-y-6">
  <div class="rounded-3xl border border-borde-suave bg-fondo-panel p-8 shadow-sm">
  <div class="mb-6 flex items-center gap-3">
- <i class="ph-fill ph-identification-card text-2xl text-terracota"></i>
+ <i class="ph-fill ph-identification-card text-2xl text-[var(--rm-action-primary)]"></i>
  <h2 class="text-lg font-extrabold text-titulo">Documentación Oficial</h2>
  </div>
 
@@ -255,7 +255,7 @@
  <section x-show="step === 3" x-transition.opacity.duration.400ms class="space-y-6">
  <div class="rounded-3xl border border-borde-suave bg-fondo-panel p-8 shadow-sm">
  <div class="mb-6 flex items-center gap-3">
- <i class="ph-fill ph-envelope-simple-open text-2xl text-terracota"></i>
+ <i class="ph-fill ph-envelope-simple-open text-2xl text-[var(--rm-action-primary)]"></i>
  <h2 class="text-lg font-extrabold text-titulo">Canales de Contacto</h2>
  </div>
 
@@ -299,7 +299,7 @@
  <section x-show="step === 4" x-transition.opacity.duration.400ms class="space-y-6">
  <div class="rounded-3xl border border-borde-suave bg-fondo-panel p-8 shadow-sm">
  <div class="mb-6 flex items-center gap-3">
- <i class="ph-fill ph-briefcase text-2xl text-terracota"></i>
+ <i class="ph-fill ph-briefcase text-2xl text-[var(--rm-action-primary)]"></i>
  <h2 class="text-lg font-extrabold text-titulo">Perfil Institucional</h2>
  </div>
 
@@ -362,7 +362,7 @@
  <section x-show="step === 5" x-transition.opacity.duration.400ms class="space-y-6">
  <div class="rounded-3xl border border-borde-suave bg-fondo-panel p-8 shadow-sm">
  <div class="mb-6 flex items-center gap-3">
- <i class="ph-fill ph-shield-check text-2xl text-terracota"></i>
+ <i class="ph-fill ph-shield-check text-2xl text-[var(--rm-action-primary)]"></i>
  <h2 class="text-lg font-extrabold text-titulo">Seguridad y Acceso</h2>
  </div>
 
@@ -380,7 +380,7 @@
  <div>
  <label class="mb-1.5 block text-[10px] font-bold uppercase tracking-widest text-titulo/60">Acceso Sistema Inicial</label>
  <div class="flex items-center gap-2 rounded-2xl border border-borde-suave bg-fondo-panel px-5 py-3 text-sm font-bold text-titulo shadow-inner">
- <i class="ph-bold ph-lock-key-open text-terracota"></i>
+ <i class="ph-bold ph-lock-key-open text-[var(--rm-action-primary)]"></i>
  <span>HABILITADO</span>
  <input type="hidden" name="acceso_sistema" value="HABILITADO">
  </div>
@@ -390,11 +390,11 @@
  <div class="md:col-span-2 rounded-2xl border border-borde-suave bg-boton-principal/5 p-6">
  <div class="flex items-center justify-between mb-4">
  <span class="text-[10px] font-bold uppercase tracking-widest text-titulo/60">Contraseña Inicial Autogenerada</span>
- <span class="rounded-full bg-boton-acento/10 px-3 py-1 text-[9px] font-bold text-terracota">BASADA EN IDENTIDAD</span>
+ <span class="rounded-full bg-boton-acento/10 px-3 py-1 text-[9px] font-bold text-[var(--rm-action-primary)]">BASADA EN IDENTIDAD</span>
  </div>
  <div class="flex items-center gap-4">
  <div class="flex-1 rounded-xl bg-fondo-card px-5 py-4 text-center">
- <span class="text-2xl font-black tracking-[0.3em] text-terracota" x-text="passwordPreview()"></span>
+ <span class="text-2xl font-black tracking-[0.3em] text-[var(--rm-action-primary)]" x-text="passwordPreview()"></span>
  </div>
  <div class="h-14 w-14 flex items-center justify-center rounded-xl bg-boton-principal text-inverso shadow-lg">
  <i class="ph-bold ph-lock-key text-2xl"></i>
@@ -413,7 +413,7 @@
  <section x-show="step === 6" x-transition.opacity.duration.400ms class="space-y-6">
  <div class="rounded-3xl border border-borde-suave bg-fondo-panel p-8 shadow-sm">
  <div class="mb-6 flex items-center gap-3">
- <i class="ph-fill ph-check-square text-2xl text-terracota"></i>
+ <i class="ph-fill ph-check-square text-2xl text-[var(--rm-action-primary)]"></i>
  <h2 class="text-lg font-extrabold text-titulo">Confirmación de Registro</h2>
  </div>
 
@@ -429,7 +429,7 @@
  </div>
  <div>
  <p class="text-sm font-bold text-titulo" x-text="fullName()"></p>
- <p class="text-[10px] font-bold text-terracota" x-text="rolDisplay()"></p>
+ <p class="text-[10px] font-bold text-[var(--rm-action-primary)]" x-text="rolDisplay()"></p>
  </div>
  </div>
  <div class="grid grid-cols-2 gap-x-4 gap-y-3 pt-2">
@@ -461,8 +461,8 @@
  class="w-full rounded-2xl border border-borde-suave bg-fondo-card/50 px-5 py-3 text-sm font-bold uppercase outline-none transition focus:border-borde-focus"
  placeholder="NOTAS ADICIONALES..."></textarea>
  </div>
- <div class="rounded-xl bg-boton-acento/10 p-4 border border-terracota/20">
- <p class="text-[10px] font-bold text-terracota text-center leading-relaxed">
+ <div class="rounded-xl bg-boton-acento/10 p-4 border border-[var(--rm-action-primary)]/20">
+ <p class="text-[10px] font-bold text-[var(--rm-action-primary)] text-center leading-relaxed">
  Al presionar"Registrar Usuario" se crearán las credenciales y el acceso institucional.
  Revise que toda la información sea correcta.
  </p>
@@ -479,7 +479,7 @@
  <i class="ph-bold ph-arrow-left"></i> Anterior
  </button>
  <div x-show="step === 1" class="w-full sm:w-auto"></div> {{-- Espaciador --}}
- 
+
  <div class="flex gap-4">
  <button type="button" x-show="step < 6" @click="nextStep()"
  class="w-full sm:w-auto flex items-center justify-center gap-2 rounded-full bg-boton-principal px-12 py-3 text-[10px] font-bold uppercase tracking-widest text-inverso shadow-xl transition hover:bg-boton-acento active:scale-95">

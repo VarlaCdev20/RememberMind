@@ -4,7 +4,7 @@
  <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
  <div>
  <h1 class="text-2xl font-black text-titulo">
- <i class="ph-bold ph-activity mr-2 text-terracota"></i>
+ <i class="ph-bold ph-activity mr-2 text-[var(--rm-action-primary)]"></i>
  Centro de Auditoría
  </h1>
  <p class="mt-1 text-sm font-medium text-titulo/60">
@@ -12,12 +12,12 @@
  </p>
  </div>
  <div class="flex items-center gap-2 p-1 bg-fondo-panel rounded-xl">
- <button @click="vista = 'timeline'" 
+ <button @click="vista = 'timeline'"
  :class="vista === 'timeline' ? 'bg-fondo-card text-titulo shadow-sm' : 'text-titulo/50 hover:text-titulo'"
  class="flex items-center gap-2 px-4 py-1.5 rounded-lg text-xs font-bold transition-all">
  <i class="ph-bold ph-clock-counter-clockwise"></i> Línea de Tiempo
  </button>
- <button @click="vista = 'table'" 
+ <button @click="vista = 'table'"
  :class="vista === 'table' ? 'bg-fondo-card text-titulo shadow-sm' : 'text-titulo/50 hover:text-titulo'"
  class="flex items-center gap-2 px-4 py-1.5 rounded-lg text-xs font-bold transition-all">
  <i class="ph-bold ph-table"></i> Tabla Detallada
@@ -93,7 +93,7 @@
  </div>
 
  {{-- CONTENIDO DINÁMICO --}}
- 
+
  {{-- VISTA: LINEA DE TIEMPO --}}
  <div x-show="vista === 'timeline'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0" class="space-y-4">
  @php $currentDate = null; @endphp
@@ -112,14 +112,14 @@
  <div class="group relative flex gap-6 pl-4 sm:pl-10">
  {{-- Línea conectora --}}
  <div class="absolute left-[2.45rem] top-0 h-full w-0.5 bg-fondo-panel group-last:h-12 hidden sm:block"></div>
- 
+
  {{-- Punto de tiempo --}}
  <div class="relative z-10 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl {{ $log->modulo_info['dot'] }} text-inverso shadow-lg shadow-black/10 transition group-hover:scale-110">
  <i class="ph-bold {{ $log->modulo_info['icono'] }} text-lg"></i>
  </div>
 
  {{-- Card del evento --}}
- <div class="flex-1 rounded-2xl border border-borde-suave bg-fondo-card/80 p-4 shadow-sm transition hover:border-terracota/30 hover:bg-fondo-card hover:shadow-md">
+ <div class="flex-1 rounded-2xl border border-borde-suave bg-fondo-card/80 p-4 shadow-sm transition hover:border-[var(--rm-action-primary)]/30 hover:bg-fondo-card hover:shadow-md">
  <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
  <div class="space-y-1">
  <div class="flex items-center gap-2">
@@ -137,7 +137,7 @@
  <div class="flex items-center gap-3 shrink-0 border-l border-borde-suave pl-4">
  <div class="text-right">
  <p class="text-[10px] font-bold text-titulo">{{ $log->causer_nombre }}</p>
- <p class="text-[9px] font-bold text-terracota uppercase tracking-widest">{{ $log->causer_rol }}</p>
+ <p class="text-[9px] font-bold text-[var(--rm-action-primary)] uppercase tracking-widest">{{ $log->causer_rol }}</p>
  </div>
  <div class="h-8 w-8 rounded-full bg-boton-principal/10 flex items-center justify-center text-titulo font-bold text-[10px]">
  {{ substr($log->causer_nombre, 0, 1) }}
@@ -193,7 +193,7 @@
  </div>
  <div>
  <p class="text-xs font-bold text-titulo">{{ $log->causer_nombre }}</p>
- <p class="text-[10px] font-bold text-terracota uppercase tracking-widest">{{ $log->causer_rol }}</p>
+ <p class="text-[10px] font-bold text-[var(--rm-action-primary)] uppercase tracking-widest">{{ $log->causer_rol }}</p>
  </div>
  </div>
  </td>

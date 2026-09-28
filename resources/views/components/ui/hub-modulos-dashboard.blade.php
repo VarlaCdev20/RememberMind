@@ -344,8 +344,8 @@ $estilosPaleta = [
         'glow' => 'hover:shadow-purple-500/10',
     ],
     'ambar' => [
-        'bg_icono' => 'bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-900/60',
-        'hover_border' => 'hover:border-amber-300 dark:hover:border-amber-700',
+        'bg_icono' => 'bg-[var(--rm-warning-soft)] dark:bg-[var(--rm-warning-soft)]/20 text-[var(--rm-warning)] dark:text-[var(--rm-warning-soft)] border border-[var(--rm-warning)]/30 dark:border-[var(--rm-warning)]/30',
+        'hover_border' => 'hover:border-[var(--rm-warning)]/30 dark:hover:border-[var(--rm-warning)]',
         'glow' => 'hover:shadow-amber-500/10',
     ],
     'indigo' => [
@@ -371,7 +371,7 @@ $estilosPaleta = [
                    mod.categoria.toLowerCase().includes(term);
         }
     }"
-    class="card-interactiva borde-verde-suave rounded-[2rem] border bg-fondo-panel p-5 sm:p-6 shadow-sm space-y-5 backdrop-blur-xl"
+    class="card-interactiva borde-verde-suave rounded-3xl border bg-fondo-panel p-5 sm:p-6 shadow-sm space-y-5 backdrop-blur-xl"
     aria-label="Centro de Mando y Vistas del Sistema"
 >
     {{-- CABECERA DEL HUB --}}
@@ -429,7 +429,7 @@ $estilosPaleta = [
             <i class="ph-bold ph-grid-four text-sm"></i>
             <span>Todos</span>
             <span class="text-[10px] px-1.5 py-0.2 rounded-full opacity-80"
-                  :class="tabActivo === 'todos' ? 'bg-white/20 text-white' : 'bg-fondo-hover text-apoyo'">
+                  :class="tabActivo === 'todos' ? 'bg-[var(--rm-surface-raised)]/20 text-white' : 'bg-fondo-hover text-apoyo'">
                 {{ count($modulos) }}
             </span>
         </button>
@@ -438,14 +438,14 @@ $estilosPaleta = [
             type="button"
             @click="tabActivo = 'residentes'"
             :class="tabActivo === 'residentes'
-                ? 'bg-blue-600 text-white shadow-sm font-black'
+                ? 'bg-[var(--rm-action-primary)] text-[var(--rm-text-on-primary)] shadow-sm font-black'
                 : 'bg-fondo-card text-apoyo hover:text-titulo hover:bg-fondo-hover border border-borde font-bold'"
             class="px-3.5 py-1.5 rounded-xl text-xs transition cursor-pointer flex items-center gap-2"
         >
             <i class="ph-bold ph-users-four text-sm"></i>
             <span>Residentes y Camas</span>
             <span class="text-[10px] px-1.5 py-0.2 rounded-full opacity-80"
-                  :class="tabActivo === 'residentes' ? 'bg-white/20 text-white' : 'bg-fondo-hover text-apoyo'">
+                  :class="tabActivo === 'residentes' ? 'bg-[var(--rm-surface-raised)]/20 text-white' : 'bg-fondo-hover text-apoyo'">
                 4
             </span>
         </button>
@@ -454,14 +454,14 @@ $estilosPaleta = [
             type="button"
             @click="tabActivo = 'medico'"
             :class="tabActivo === 'medico'
-                ? 'bg-emerald-600 text-white shadow-sm font-black'
+                ? 'bg-[var(--rm-action-primary)] text-[var(--rm-text-on-primary)] shadow-sm font-black'
                 : 'bg-fondo-card text-apoyo hover:text-titulo hover:bg-fondo-hover border border-borde font-bold'"
             class="px-3.5 py-1.5 rounded-xl text-xs transition cursor-pointer flex items-center gap-2"
         >
             <i class="ph-bold ph-stethoscope text-sm"></i>
             <span>Medicina y Farmacia</span>
             <span class="text-[10px] px-1.5 py-0.2 rounded-full opacity-80"
-                  :class="tabActivo === 'medico' ? 'bg-white/20 text-white' : 'bg-fondo-hover text-apoyo'">
+                  :class="tabActivo === 'medico' ? 'bg-[var(--rm-surface-raised)]/20 text-white' : 'bg-fondo-hover text-apoyo'">
                 7
             </span>
         </button>
@@ -477,7 +477,7 @@ $estilosPaleta = [
             <i class="ph-bold ph-first-aid text-sm"></i>
             <span>Enfermería y Cuidados</span>
             <span class="text-[10px] px-1.5 py-0.2 rounded-full opacity-80"
-                  :class="tabActivo === 'enfermeria' ? 'bg-white/20 text-white' : 'bg-fondo-hover text-apoyo'">
+                  :class="tabActivo === 'enfermeria' ? 'bg-[var(--rm-surface-raised)]/20 text-white' : 'bg-fondo-hover text-apoyo'">
                 12
             </span>
         </button>
@@ -493,7 +493,7 @@ $estilosPaleta = [
             <i class="ph-bold ph-brain text-sm"></i>
             <span>Especialidades</span>
             <span class="text-[10px] px-1.5 py-0.2 rounded-full opacity-80"
-                  :class="tabActivo === 'especialidades' ? 'bg-white/20 text-white' : 'bg-fondo-hover text-apoyo'">
+                  :class="tabActivo === 'especialidades' ? 'bg-[var(--rm-surface-raised)]/20 text-white' : 'bg-fondo-hover text-apoyo'">
                 7
             </span>
         </button>
@@ -502,14 +502,14 @@ $estilosPaleta = [
             type="button"
             @click="tabActivo = 'administracion'"
             :class="tabActivo === 'administracion'
-                ? 'bg-indigo-600 text-white shadow-sm font-black'
+                ? 'bg-[var(--rm-action-primary)] text-[var(--rm-text-on-primary)] shadow-sm font-black'
                 : 'bg-fondo-card text-apoyo hover:text-titulo hover:bg-fondo-hover border border-borde font-bold'"
             class="px-3.5 py-1.5 rounded-xl text-xs transition cursor-pointer flex items-center gap-2"
         >
             <i class="ph-bold ph-shield-check text-sm"></i>
             <span>Administración y Auditoría</span>
             <span class="text-[10px] px-1.5 py-0.2 rounded-full opacity-80"
-                  :class="tabActivo === 'administracion' ? 'bg-white/20 text-white' : 'bg-fondo-hover text-apoyo'">
+                  :class="tabActivo === 'administracion' ? 'bg-[var(--rm-surface-raised)]/20 text-white' : 'bg-fondo-hover text-apoyo'">
                 7
             </span>
         </button>

@@ -1,5 +1,5 @@
-<div class="p-6 md:p-8 space-y-8 relative min-h-screen bg-transparent print:bg-white print:p-0 print:space-y-4" 
- x-data="{ printListenerAdded: false }" 
+<div class="p-6 md:p-8 space-y-8 relative min-h-screen bg-transparent print:bg-[var(--rm-surface-raised)] print:p-0 print:space-y-4"
+ x-data="{ printListenerAdded: false }"
  x-init="if(!printListenerAdded) { window.addEventListener('print-window', () => window.print()); printListenerAdded = true; }">
 
  {{-- CSS Estilos para Impresión y Marca de Agua en Pantalla/Impresora --}}
@@ -38,10 +38,10 @@
 
  {{-- AVISO TEMPORAL DE PERMISOS --}}
  @if(!auth()->user()->can('areas.reportes'))
- <div class="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-xs font-bold text-amber-800 shadow-sm flex items-center gap-2.5 no-print">
- <i class="ph-bold ph-warning-octagon text-lg text-amber-600 shrink-0"></i>
+ <div class="rounded-2xl border border-[var(--rm-warning)]/30 bg-[var(--rm-warning-soft)] p-4 text-xs font-bold text-[var(--rm-warning-strong)] shadow-sm flex items-center gap-2.5 no-print">
+ <i class="ph-bold ph-warning-octagon text-lg text-[var(--rm-warning)] shrink-0"></i>
  <div>
- No tienes el permiso <code class="bg-amber-100 px-1 py-0.5 rounded text-amber-900 font-mono">areas.reportes</code> asignado en la sesión de base de datos actual. Por esta razón, los botones y secciones de reportes estarán ocultos. Contacta al administrador o ejecuta el Seeder de Permisos.
+ No tienes el permiso <code class="bg-[var(--rm-warning-soft)] px-1 py-0.5 rounded text-[var(--rm-warning-strong)] font-mono">areas.reportes</code> asignado en la sesión de base de datos actual. Por esta razón, los botones y secciones de reportes estarán ocultos. Contacta al administrador o ejecuta el Seeder de Permisos.
  </div>
  </div>
  @endif
@@ -161,22 +161,22 @@
  $colorAccent = $area->color ?? '#2F3E5C';
  @endphp
  <div class="group relative rounded-3xl transition-all duration-300 hover:-translate-y-1 rm-card overflow-hidden border-2 border-transparent hover:border-borde-suave flex flex-col {{ $esInactiva ? 'opacity-70 grayscale bg-[var(--surface-soft)]' : '' }}">
- 
+
  {{-- PORTADA BORDE A BORDE --}}
  <div class="relative h-36 w-full shrink-0 overflow-hidden bg-[var(--surface-soft)]">
  @if($area->imagen_area)
- <img src="{{ \Illuminate\Support\Facades\Storage::url($area->imagen_area) }}" 
- alt="{{ $area->nombre }}" 
+ <img src="{{ \Illuminate\Support\Facades\Storage::url($area->imagen_area) }}"
+ alt="{{ $area->nombre }}"
  class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105">
  @else
  {{-- Fallback degradado --}}
- <div class="h-full w-full flex items-center justify-center transition-transform duration-500 group-hover:scale-105" 
+ <div class="h-full w-full flex items-center justify-center transition-transform duration-500 group-hover:scale-105"
  style="background: linear-gradient(135deg, {{ $colorAccent }} 0%, #D5C7B9 100%)">
  <i class="ph-bold {{ $this->obtenerIconoTipo($area->tipo_area) }} text-inverso text-5xl opacity-40"></i>
  </div>
  @endif
  <div class="absolute inset-0 bg-gradient-to-t from-black/55 via-black/10 to-transparent"></div>
- 
+
  {{-- Badge Tipo y Estado encima de la imagen --}}
  <div class="absolute top-4 left-4 flex flex-wrap gap-2">
  <span class="inline-block rounded-full bg-fondo-card/95 px-2.5 py-0.5 text-[8px] font-black uppercase tracking-wider text-titulo shadow-sm">
@@ -221,7 +221,7 @@
  </p>
  </div>
  </div>
- 
+
  {{-- Contador Personal --}}
  <div class="text-right">
  <p class="text-[9px] font-bold text-parrafo uppercase tracking-wider">Personal</p>
@@ -297,21 +297,21 @@
  <div class="pointer-events-none fixed inset-y-0 right-0 flex max-w-full pl-10">
  <div class="pointer-events-auto w-screen max-w-5xl transform rm-modal-panel transition duration-500 ease-in-out">
  <div class="flex h-full flex-col bg-fondo-card">
- 
+
  {{-- Portada Ficha Borde a Borde --}}
  <div class="relative h-48 shrink-0 overflow-hidden bg-[var(--surface-soft)]">
  @if($areaSeleccionada->imagen_area)
- <img src="{{ \Illuminate\Support\Facades\Storage::url($areaSeleccionada->imagen_area) }}" 
- alt="{{ $areaSeleccionada->nombre }}" 
+ <img src="{{ \Illuminate\Support\Facades\Storage::url($areaSeleccionada->imagen_area) }}"
+ alt="{{ $areaSeleccionada->nombre }}"
  class="h-full w-full object-cover">
  @else
- <div class="h-full w-full flex items-center justify-center" 
+ <div class="h-full w-full flex items-center justify-center"
  style="background: linear-gradient(135deg, {{ $areaSeleccionada->color ?? '#2F3E5C' }} 0%, #D5C7B9 100%)">
  <i class="ph-bold {{ $this->obtenerIconoTipo($areaSeleccionada->tipo_area) }} text-inverso text-6xl opacity-30"></i>
  </div>
  @endif
  <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent"></div>
- 
+
  <button type="button"
  wire:click="cerrarFicha"
  class="absolute top-4 right-4 flex h-8 w-8 items-center justify-center rounded-full bg-black/40 text-inverso hover:bg-fondo-card hover:text-titulo transition duration-200">
@@ -334,7 +334,7 @@
  @endphp
 
  {{-- Cuerpo Ficha - Distribuido en Grid de 2 Columnas en Desktop --}}
- <div class="flex-1 overflow-y-auto bg-transparent p-6 space-y-6" 
+ <div class="flex-1 overflow-y-auto bg-transparent p-6 space-y-6"
  x-data="{
  activeChart: null,
  rolChart: null,
@@ -428,11 +428,11 @@
  });
  }
  }
- }" 
+ }"
  x-init="$nextTick(() => initAreaCharts())">
- 
+
  <div class="grid grid-cols-1 lg:grid-cols-[1.1fr_0.9fr] gap-8">
- 
+
  {{-- COLUMNA IZQUIERDA: INFORMACIÓN Y PERSONAL --}}
  <div class="space-y-6">
  {{-- INFORMACIÓN DEL ÁREA --}}
@@ -495,7 +495,7 @@
  @if($areaSeleccionada->observaciones)
  <div class="space-y-2">
  <h4 class="text-[11px] font-bold uppercase tracking-[0.18em] text-apoyo">OBSERVACIONES</h4>
- <p class="text-xs font-semibold text-meta bg-fondo-panel p-3 rounded-2xl border border-orange-200/50 leading-relaxed italic">"{{ $areaSeleccionada->observaciones }}"
+ <p class="text-xs font-semibold text-meta bg-fondo-panel p-3 rounded-2xl border border-[var(--rm-border)]/50 leading-relaxed italic">"{{ $areaSeleccionada->observaciones }}"
  </p>
  </div>
  @endif
@@ -545,7 +545,7 @@
  {{-- GRÁFICAS DE EVOLUCIÓN --}}
  <div class="space-y-4">
  <h4 class="text-[11px] font-bold uppercase tracking-[0.18em] text-apoyo">GRÁFICAS DEL ÁREA</h4>
- 
+
  @if($totalUsuarios > 0)
  {{-- Gráfico Dona Activos vs Inactivos --}}
  <div class="bg-fondo-card p-4 rounded-2xl border border-borde-suave shadow-sm">
@@ -585,7 +585,7 @@
  @endif
  </div>
  </div>
- 
+
  </div>
 
  {{-- REPORTES DEL ÁREA --}}
@@ -666,7 +666,7 @@
  <div class="rm-modal-overlay" wire:click="cerrarFormulario"></div>
 
  <div class="relative w-full max-w-2xl rounded-[2.2rem] rm-modal-panel p-6 transform transition-all duration-300">
- 
+
  {{-- Encabezado Modal --}}
  <header class="flex items-center justify-between pb-4 border-b border-borde-suave">
  <div>
@@ -683,7 +683,7 @@
  {{-- Formulario --}}
  <form wire:submit.prevent="guardarArea" class="mt-4 space-y-4">
  <div class="grid grid-cols-1 gap-4 md:grid-cols-2 max-h-[60vh] overflow-y-auto p-1 pr-2 [scrollbar-width:thin] [scrollbar-color:#C7B5A3_transparent]">
- 
+
  {{-- ── SECCIÓN 1: IDENTIDAD DEL ÁREA ── --}}
  <div class="space-y-4 md:col-span-2">
  <h4 class="text-[10px] font-bold text-boton-acento uppercase tracking-widest border-b border-borde-focus pb-1">1. Identidad del Área</h4>
@@ -862,7 +862,7 @@
 
  {{-- Contenedor del Modal --}}
  <div class="relative w-full max-w-4xl rounded-[2.2rem] rm-modal-panel p-6 transform transition-all duration-300 print:shadow-none print:border-none print:p-0 print:m-0 print:max-w-none">
- 
+
  {{-- Encabezado Modal --}}
  <header class="flex items-center justify-between pb-4 border-b border-borde-suave no-print">
  <div>
@@ -938,7 +938,7 @@
  areaLineChart: null,
  initReportCharts() {
  const type = '{{ $reporteTipo }}';
- 
+
  // Destroy everything first
  if (this.generalChartUsr) this.generalChartUsr.destroy();
  if (this.generalChartType) this.generalChartType.destroy();
@@ -1199,7 +1199,7 @@
  {{-- GRÁFICAS GENERALES --}}
  <div class="space-y-4 no-print">
  <h4 class="text-[11px] font-bold uppercase tracking-[0.18em] text-apoyo">GRÁFICAS ANALÍTICAS GENERALES</h4>
- 
+
  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
  {{-- Barras: usuarios por area --}}
  <div class="rm-chart-card rm-chart-glass">
@@ -1262,7 +1262,7 @@
  <th class="p-3 text-center">Estado</th>
  </tr>
  </thead>
- <tbody class="divide-y divide-[#C7B5A3]/30">
+ <tbody class="divide-y divide-[var(--rm-border)]/30">
  @foreach($reporteData['areas'] as $rep)
  <tr class="hover:bg-fondo-panel">
  <td class="p-3 font-black text-titulo">{{ $rep['nombre'] }}</td>
@@ -1286,7 +1286,7 @@
  <div class="space-y-2">
  <h4 class="text-[11px] font-bold uppercase tracking-[0.18em] text-apoyo">OBSERVACIONES</h4>
  <div class="bg-fondo-panel border-l-4 border-borde-focus p-4 rounded-r-xl text-xs font-semibold text-meta space-y-2 leading-relaxed">
- <p><strong>Estatus de Liderazgo:</strong> 
+ <p><strong>Estatus de Liderazgo:</strong>
  @php $sinResp = collect($reporteData['areas'])->where('responsable_id', null); @endphp
  @if($sinResp->count() > 0)
  Se detectan {{ $sinResp->count() }} áreas sin un responsable asignado ({{ implode(', ', $sinResp->pluck('nombre')->toArray()) }}). Se sugiere regularizar la asignación a la brevedad.
@@ -1322,7 +1322,7 @@
  <div class="bg-fondo-panel p-4 rounded-xl border border-borde-suave space-y-2 text-xs font-semibold text-titulo">
  <p><strong>Tipo de Área:</strong> {{ $reporteData['area']['tipo_area'] }}</p>
  <p><strong>Estado:</strong> {{ $reporteData['area']['estado'] }}</p>
- <p><strong>Responsable:</strong> 
+ <p><strong>Responsable:</strong>
  @if($reporteData['area']['responsable'])
  {{ $reporteData['area']['responsable']['name'] }}
  @else
@@ -1363,7 +1363,7 @@
  {{-- GRÁFICAS DE ÁREA EN REPORTE --}}
  <div class="space-y-4 no-print">
  <h4 class="text-[11px] font-bold uppercase tracking-[0.18em] text-apoyo">GRÁFICAS DEL ÁREA</h4>
- 
+
  @if($reporteData['totalUsuarios'] > 0)
  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
  {{-- Dona activos vs inactivos --}}
@@ -1409,7 +1409,7 @@
  <th class="p-3 text-center" style="width: 15%;">Último Acceso</th>
  </tr>
  </thead>
- <tbody class="divide-y divide-[#C7B5A3]/30">
+ <tbody class="divide-y divide-[var(--rm-border)]/30">
  @foreach($reporteData['area']['usuarios'] as $u)
  @php
  $cargoEspecialidad = 'Sin Asignar';

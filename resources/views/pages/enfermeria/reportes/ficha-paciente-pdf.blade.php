@@ -6,29 +6,29 @@
     <style>
         body { font-family: 'Helvetica', 'Arial', sans-serif; font-size: 12px; color: #333; }
         .header { text-align: center; margin-bottom: 20px; border-bottom: 2px solid #3b82f6; padding-bottom: 10px; }
-        .title { font-size: 18px; font-weight: bold; color: #1e3a8a; margin: 0; }
+        .title { font-size: 18px; font-weight: bold; color: var(--rm-action-primary); margin: 0; }
         .subtitle { font-size: 12px; color: #64748b; margin-top: 5px; }
-        
+
         .section { margin-bottom: 15px; }
         .section-title { font-size: 14px; font-weight: bold; background-color: #f1f5f9; padding: 5px; margin-bottom: 10px; border-left: 4px solid #3b82f6; }
-        
+
         table { width: 100%; border-collapse: collapse; margin-bottom: 10px; }
         th, td { padding: 6px; border: 1px solid #e2e8f0; text-align: left; }
         th { background-color: #f8fafc; font-weight: bold; color: #475569; }
-        
+
         .timeline { width: 100%; display: table; margin-bottom: 20px; }
         .timeline-step { display: table-cell; text-align: center; font-size: 10px; padding: 5px; border-top: 2px solid #e2e8f0; }
         .timeline-step.active { border-top-color: #10b981; color: #047857; font-weight: bold; }
-        
+
         .badges { display: inline-block; padding: 3px 6px; border-radius: 4px; font-size: 10px; font-weight: bold; }
         .badge-green { background-color: #d1fae5; color: #065f46; }
         .badge-red { background-color: #fee2e2; color: #991b1b; }
         .badge-blue { background-color: #dbeafe; color: #1e40af; }
         .badge-yellow { background-color: #fef3c7; color: #92400e; }
-        
+
         .row { width: 100%; }
         .col-half { width: 48%; display: inline-block; vertical-align: top; }
-        
+
         .page-break { page-break-after: always; }
     </style>
 </head>
@@ -107,7 +107,7 @@
                     @endif
                 </table>
             </div>
-            
+
             <!-- Resumen de Tareas -->
             <div class="section">
                 <div class="section-title">Resumen de Tareas (Plan Activo)</div>

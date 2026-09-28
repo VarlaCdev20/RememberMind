@@ -99,13 +99,13 @@
  isEditing: false,
  isViewing: false,
  recordData: {},
- abrir(nombre, data = null, edit = false, view = false) { 
+ abrir(nombre, data = null, edit = false, view = false) {
  this.modal = nombre;
  this.recordData = data || {};
  this.isEditing = edit;
  this.isViewing = view;
  },
- cerrar() { 
+ cerrar() {
  this.modal = null;
  this.recordData = {};
  this.isEditing = false;
@@ -128,15 +128,15 @@
  </div>
  <div class="flex flex-col gap-1 rounded-xl bg-fondo-panel p-3 border border-borde">
  <span class="text-xs font-bold uppercase tracking-wide text-apoyo">Red de Apoyo</span>
- <span class="text-xs font-bold {{ $totalFamiliares > 0 ? 'text-parrafo' : 'text-amber-600' }}">{{ $totalFamiliares > 0 ? 'Registrada' : 'Pendiente' }}</span>
+ <span class="text-xs font-bold {{ $totalFamiliares > 0 ? 'text-parrafo' : 'text-[var(--rm-warning)]' }}">{{ $totalFamiliares > 0 ? 'Registrada' : 'Pendiente' }}</span>
  </div>
  <div class="flex flex-col gap-1 rounded-xl bg-fondo-panel p-3 border border-borde">
  <span class="text-xs font-bold uppercase tracking-wide text-apoyo">Documentos</span>
- <span class="text-xs font-bold {{ $totalDocumentos > 0 ? 'text-parrafo' : 'text-amber-600' }}">{{ $totalDocumentos > 0 ? 'Registrados' : 'Pendientes' }}</span>
+ <span class="text-xs font-bold {{ $totalDocumentos > 0 ? 'text-parrafo' : 'text-[var(--rm-warning)]' }}">{{ $totalDocumentos > 0 ? 'Registrados' : 'Pendientes' }}</span>
  </div>
  <div class="flex flex-col gap-1 rounded-xl bg-fondo-panel p-3 border border-borde">
  <span class="text-xs font-bold uppercase tracking-wide text-apoyo">Salud</span>
- <span class="text-xs font-bold {{ $fichasMedicas->isNotEmpty() ? 'text-parrafo' : 'text-amber-600' }}">{{ $fichasMedicas->isNotEmpty() ? 'Con datos' : 'Sin datos' }}</span>
+ <span class="text-xs font-bold {{ $fichasMedicas->isNotEmpty() ? 'text-parrafo' : 'text-[var(--rm-warning)]' }}">{{ $fichasMedicas->isNotEmpty() ? 'Con datos' : 'Sin datos' }}</span>
  </div>
  <div class="flex flex-col gap-1 rounded-xl bg-fondo-panel p-3 border border-borde">
  <span class="text-xs font-bold uppercase tracking-wide text-apoyo">Cognitivo</span>
@@ -151,12 +151,12 @@
 
  {{-- 3 y 4. Layout 2 Columnas: Carpetas y Contenido --}}
  <div class="flex flex-col lg:flex-row gap-6">
- 
+
  {{-- Columna Izquierda: Menú de Carpetas --}}
  <div class="w-full lg:w-[280px] shrink-0">
  <div class="rounded-[24px] border border-borde bg-fondo-card p-3 shadow-sm flex flex-col gap-1">
  <h3 class="px-3 py-2 text-xs font-bold uppercase tracking-wide text-apoyo">Índice del Expediente</h3>
- 
+
  @php
  $carpetas = [
  ['id' => 'identificacion', 'icon' => 'ph-identification-card', 'label' => 'Identificación', 'status' => 'Completa'],
@@ -171,7 +171,7 @@
  @endphp
 
  @foreach($carpetas as $carpeta)
- <button type="button" @click="carpetaActiva = '{{ $carpeta['id'] }}'" 
+ <button type="button" @click="carpetaActiva = '{{ $carpeta['id'] }}'"
  class="flex items-center justify-between rounded-xl px-4 py-3 text-left transition"
  :class="carpetaActiva === '{{ $carpeta['id'] }}' ? 'bg-fondo-panel shadow-sm border border-borde-suave text-titulo' : 'text-apoyo hover:bg-fondo-panel border border-transparent'">
  <div class="flex items-center gap-3">
@@ -189,7 +189,7 @@
  <div x-show="carpetaActiva === 'identificacion'" x-transition style="display: none;">
  @include('pages.adultos-mayores.show.carpetas._identificacion')
  </div>
- 
+
  <div x-show="carpetaActiva === 'red_apoyo'" x-transition style="display: none;">
  @include('pages.adultos-mayores.show.carpetas._red-apoyo')
  </div>

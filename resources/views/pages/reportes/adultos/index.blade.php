@@ -21,7 +21,7 @@
  <a href="{{ route('admin.reportes.adultos.pdf') }}" class="rm-btn rm-btn-pdf">Descargar PDF</a>
  <a href="{{ route('admin.reportes.adultos.excel') }}" class="rm-btn rm-btn-excel">Exportar Excel</a>
  @endcan
- <a href="{{ route('dashboard') }}" class="rm-btn" style="background:#C7B5A3;color:#2F3E5C;margin-left:6px;">&#8592; Volver</a>
+ <a href="{{ route('dashboard') }}" class="rm-btn" style="background:var(--rm-surface-soft);color:var(--rm-clinical);margin-left:6px;">&#8592; Volver</a>
 </div>
 @endunless
 
@@ -243,9 +243,9 @@
  </td>
  <td style="text-align:center;">
  @if(strtolower($am->genero ?? '') === 'm')
- <span style="color:#2F3E5C; font-weight:bold;" title="Masculino">M</span>
+ <span style="color:var(--rm-clinical); font-weight:bold;" title="Masculino">M</span>
  @elseif(strtolower($am->genero ?? '') === 'f')
- <span style="color:#E97A5F; font-weight:bold;" title="Femenino">F</span>
+ <span style="color:var(--rm-accent-terracotta); font-weight:bold;" title="Femenino">F</span>
  @else
  {{ $am->genero ?? '—' }}
  @endif
@@ -253,8 +253,8 @@
  <td>
  <span style="
  display:inline-block; padding:2px 7px; border-radius:3px; font-size:8pt; font-weight:bold;
- background:{{ strtolower($am->nombre_estado ?? '') === 'activo' ? '#ECFDF5' : '#FEF3EE' }};
- color:{{ strtolower($am->nombre_estado ?? '') === 'activo' ? '#065f46' : '#991b1b' }};">
+ background:{{ strtolower($am->nombre_estado ?? '') === 'activo' ? 'var(--rm-success-soft)' : 'var(--rm-danger-soft)' }};
+ color:{{ strtolower($am->nombre_estado ?? '') === 'activo' ? 'var(--rm-success)' : 'var(--rm-danger)' }};">
  {{ $am->nombre_estado ?? '—' }}
  </span>
  </td>
@@ -262,16 +262,16 @@
  <td>{{ $am->tipo_ing ?? '—' }}</td>
  <td style="text-align:center;">
  @if($am->tiene_familiar)
- <span style="color:#065f46; font-weight:bold;">&#10003;</span>
+ <span style="color:var(--rm-success); font-weight:bold;">&#10003;</span>
  @else
- <span style="color:#991b1b;">&#8212;</span>
+ <span style="color:var(--rm-danger);">&#8212;</span>
  @endif
  </td>
  <td style="text-align:center;">
  @if($am->tiene_ficha)
- <span style="color:#065f46; font-weight:bold;">&#10003;</span>
+ <span style="color:var(--rm-success); font-weight:bold;">&#10003;</span>
  @else
- <span style="color:#991b1b;">&#8212;</span>
+ <span style="color:var(--rm-danger);">&#8212;</span>
  @endif
  </td>
  <td style="white-space:nowrap; font-size:8.5pt;">
@@ -410,7 +410,7 @@
                             position: 'bottom',
                             labels: {
                                 font: { size: 11, weight: 'bold' },
-                                color: '#2F3E5C',
+                                color: 'var(--rm-clinical)',
                                 padding: 12,
                                 usePointStyle: true,
                                 pointStyle: 'circle',
@@ -418,8 +418,8 @@
                         },
                         tooltip: {
                             backgroundColor: 'rgba(47, 62, 92, 0.92)',
-                            titleColor: '#F3ECE4',
-                            bodyColor: '#F3ECE4',
+                            titleColor: 'var(--rm-text-primary)',
+                            bodyColor: 'var(--rm-text-primary)',
                             padding: 10,
                             cornerRadius: 10,
                             callbacks: {
@@ -468,7 +468,7 @@
                             position: 'bottom',
                             labels: {
                                 font: { size: 11, weight: 'bold' },
-                                color: '#2F3E5C',
+                                color: 'var(--rm-clinical)',
                                 padding: 12,
                                 usePointStyle: true,
                                 pointStyle: 'circle',
@@ -476,8 +476,8 @@
                         },
                         tooltip: {
                             backgroundColor: 'rgba(47, 62, 92, 0.92)',
-                            titleColor: '#F3ECE4',
-                            bodyColor: '#F3ECE4',
+                            titleColor: 'var(--rm-text-primary)',
+                            bodyColor: 'var(--rm-text-primary)',
                             padding: 10,
                             cornerRadius: 10,
                             callbacks: {
@@ -528,8 +528,8 @@
                         legend: { display: false },
                         tooltip: {
                             backgroundColor: 'rgba(47, 62, 92, 0.92)',
-                            titleColor: '#F3ECE4',
-                            bodyColor: '#F3ECE4',
+                            titleColor: 'var(--rm-text-primary)',
+                            bodyColor: 'var(--rm-text-primary)',
                             padding: 10,
                             cornerRadius: 10,
                             callbacks: {
@@ -544,14 +544,14 @@
                             beginAtZero: true,
                             ticks: {
                                 precision: 0,
-                                color: '#2F3E5C',
+                                color: 'var(--rm-clinical)',
                                 font: { size: 11, weight: 'bold' },
                             },
                             grid: { color: 'rgba(47, 62, 92, 0.08)' }
                         },
                         y: {
                             ticks: {
-                                color: '#2F3E5C',
+                                color: 'var(--rm-clinical)',
                                 font: { size: 11, weight: 'bold' },
                             },
                             grid: { display: false }

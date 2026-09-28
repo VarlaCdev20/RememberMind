@@ -1,6 +1,6 @@
 <div class="space-y-6">
  <section class="overflow-hidden rounded-[1.6rem] border border-borde/65 bg-fondo-panel shadow-sm backdrop-blur-xl">
- <div class="h-1.5 w-full bg-gradient-to-r from-[#E27D60] via-[#D9A05B] to-[#8DA280]"></div>
+ <div class="h-1.5 w-full bg-gradient-to-r from-[#E27D60] via-[var(--rm-warning)] to-[#8DA280]"></div>
  <div class="grid gap-4 p-5 lg:grid-cols-[1fr_auto] lg:items-end">
  <div>
  <span class="text-[10px] font-bold uppercase tracking-[0.2em] text-boton-acento">Monitoreo preventivo</span>

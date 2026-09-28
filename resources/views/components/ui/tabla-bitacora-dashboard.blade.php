@@ -18,7 +18,7 @@
  @endcan
  </div>
 
- <div class="overflow-x-auto rounded-[1.4rem] border border-borde-suave">
+ <div class="overflow-x-auto rounded-2xl border border-borde-suave">
  <table class="min-w-full text-left text-sm rm-table">
  <thead class="rm-table-header">
  <tr>

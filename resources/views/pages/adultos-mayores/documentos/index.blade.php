@@ -41,7 +41,7 @@
  </div>
  <div class="rounded-[24px] border border-borde bg-fondo-card p-5 shadow-sm">
  <p class="text-xs font-bold uppercase tracking-wide text-apoyo">Archivados</p>
- <p class="text-2xl font-black text-amber-600 mt-1">{{ $documentosArchivados->count() }}</p>
+ <p class="text-2xl font-black text-[var(--rm-warning)] mt-1">{{ $documentosArchivados->count() }}</p>
  </div>
  </div>
 
@@ -50,7 +50,7 @@
  <div class="px-6 py-4 border-b border-borde bg-fondo-panel">
  <h2 class="text-sm font-bold text-titulo uppercase tracking-widest">Documentos del Expediente</h2>
  </div>
- 
+
  <div class="overflow-x-auto">
  <table class="w-full text-left text-sm text-titulo">
  <thead class="bg-fondo-panel text-xs font-bold uppercase tracking-wide text-apoyo">
@@ -90,7 +90,7 @@
  </td>
  <td class="px-6 py-4">
  @if(($doc->estado === 'ARCHIVADO'))
- <span class="text-xs font-bold text-amber-600">ARCHIVADO</span>
+ <span class="text-xs font-bold text-[var(--rm-warning)]">ARCHIVADO</span>
  @else
  <span class="text-xs font-bold text-parrafo">ACTIVO</span>
  @endif
@@ -100,7 +100,7 @@
  @if(($doc->estado === 'ARCHIVADO'))
  <form action="{{ route('admin.adultos-mayores.documentos.restore', ['adulto_mayor' => $adulto_mayor->cod_residente, 'documento' => $doc->cod_documento]) }}" method="POST" class="inline">
  @csrf @method('PATCH')
- <button type="submit" class="rounded-lg p-2 text-amber-600 hover:bg-amber-50" title="Restaurar Documento">
+ <button type="submit" class="rounded-lg p-2 text-[var(--rm-warning)] hover:bg-[var(--rm-warning-soft)]" title="Restaurar Documento">
  <i class="ph-bold ph-arrow-u-up-left text-lg"></i>
  </button>
  </form>

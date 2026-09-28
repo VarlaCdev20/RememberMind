@@ -12,14 +12,14 @@
     $canvasId = $id ?? ('rm-sparkline-' . \Illuminate\Support\Str::random(8));
 
     $colorMap = [
-        'danger' => '#F43F5E',
-        'warning' => '#F59E0B',
-        'success' => '#10B981',
-        'info' => '#0EA5E9',
-        'primary' => '#344D7A',
-        'terracota' => '#D9745B',
-        'sage' => '#5F9271',
-        'purple' => '#8B5CF6',
+        'danger' => 'var(--rm-danger)',
+        'warning' => 'var(--rm-warning)',
+        'success' => 'var(--rm-success)',
+        'info' => 'var(--rm-clinical)',
+        'primary' => 'var(--rm-action-primary)',
+        'terracota' => 'var(--rm-danger)',
+        'sage' => 'var(--rm-success)',
+        'purple' => 'var(--rm-clinical)',
     ];
     $resolvedColor = $colorMap[$color] ?? $color;
 @endphp

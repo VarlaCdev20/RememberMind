@@ -5,7 +5,7 @@
  {{-- CABECERA --}}
  {{-- ══════════════════════════════════════════════════════════════════ --}}
  <section class="overflow-hidden rounded-[1.65rem] border border-borde-suave bg-fondo-panel shadow-[0_20px_58px_rgba(47,62,92,0.13)] backdrop-blur-xl">
- <div class="h-1.5 bg-gradient-to-r from-[#E27D60] via-[#D9A05B] to-[#8DA280]"></div>
+ <div class="h-1.5 bg-gradient-to-r from-[var(--rm-accent-terracotta)] via-[var(--rm-warning)] to-[var(--rm-action-primary)]"></div>
  <div class="p-5 sm:p-7">
  <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
 
@@ -119,7 +119,7 @@
  type="text"
  wire:model.live.debounce.400ms="buscar"
  placeholder="Nombre o apellido..."
- class="w-full rounded-xl border border-borde-suave bg-fondo-panel py-2 pl-8 pr-3 text-xs font-bold text-titulo placeholder-[#2F3E5C]/35 focus:border-estado-advertenciaBorde focus:outline-none focus:ring-2 focus:ring-[#D9A05B]/20"
+ class="w-full rounded-xl border border-borde-suave bg-fondo-panel py-2 pl-8 pr-3 text-xs font-bold text-titulo placeholder-[var(--rm-text-muted)] focus:border-estado-advertenciaBorde focus:outline-none focus:ring-2 focus:ring-[var(--rm-warning)]/20"
  >
  </div>
  </div>
@@ -129,7 +129,7 @@
  <label class="mb-1 block text-[10px] font-bold uppercase tracking-[0.1em] text-apoyo">Tipo de actividad</label>
  <select
  wire:model.live="filtroTipo"
- class="w-full rounded-xl border border-borde-suave bg-fondo-panel py-2 px-3 text-xs font-bold text-titulo focus:border-estado-advertenciaBorde focus:outline-none focus:ring-2 focus:ring-[#D9A05B]/20"
+ class="w-full rounded-xl border border-borde-suave bg-fondo-panel py-2 px-3 text-xs font-bold text-titulo focus:border-estado-advertenciaBorde focus:outline-none focus:ring-2 focus:ring-[var(--rm-warning)]/20"
  >
  <option value="">Todos los tipos</option>
  @foreach($tipos as $t)
@@ -143,7 +143,7 @@
  <label class="mb-1 block text-[10px] font-bold uppercase tracking-[0.1em] text-apoyo">Estado</label>
  <select
  wire:model.live="filtroEstado"
- class="w-full rounded-xl border border-borde-suave bg-fondo-panel py-2 px-3 text-xs font-bold text-titulo focus:border-estado-advertenciaBorde focus:outline-none focus:ring-2 focus:ring-[#D9A05B]/20"
+ class="w-full rounded-xl border border-borde-suave bg-fondo-panel py-2 px-3 text-xs font-bold text-titulo focus:border-estado-advertenciaBorde focus:outline-none focus:ring-2 focus:ring-[var(--rm-warning)]/20"
  >
  <option value="">Todos los estados</option>
  <option value="PROGRAMADA">Programada / Pendiente</option>
@@ -159,7 +159,7 @@
  <input
  type="date"
  wire:model.live="fechaDesde"
- class="w-full rounded-xl border border-borde-suave bg-fondo-panel py-2 px-3 text-xs font-bold text-titulo focus:border-estado-advertenciaBorde focus:outline-none focus:ring-2 focus:ring-[#D9A05B]/20"
+ class="w-full rounded-xl border border-borde-suave bg-fondo-panel py-2 px-3 text-xs font-bold text-titulo focus:border-estado-advertenciaBorde focus:outline-none focus:ring-2 focus:ring-[var(--rm-warning)]/20"
  >
  </div>
 
@@ -169,7 +169,7 @@
  <input
  type="date"
  wire:model.live="fechaHasta"
- class="w-full rounded-xl border border-borde-suave bg-fondo-panel py-2 px-3 text-xs font-bold text-titulo focus:border-estado-advertenciaBorde focus:outline-none focus:ring-2 focus:ring-[#D9A05B]/20"
+ class="w-full rounded-xl border border-borde-suave bg-fondo-panel py-2 px-3 text-xs font-bold text-titulo focus:border-estado-advertenciaBorde focus:outline-none focus:ring-2 focus:ring-[var(--rm-warning)]/20"
  >
  </div>
 
@@ -385,8 +385,8 @@
  ? round($item['total'] / $chartTipo['maximo'] * 100)
  : 0;
  $barColor = match($i % 5) {
- 0 => '#7A68B0', 1 => '#8DA280', 2 => '#D9A05B',
- 3 => '#E27D60', default => '#2F3E5C',
+ 0 => 'var(--rm-violet)', 1 => 'var(--rm-action-primary)', 2 => 'var(--rm-warning)',
+ 3 => 'var(--rm-accent-terracotta)', default => 'var(--rm-clinical)',
  };
  @endphp
  <div class="flex items-center gap-3">
@@ -436,7 +436,7 @@
  <th class="px-4 py-3 text-left text-[10px] font-bold uppercase tracking-[0.1em] text-apoyo">Observación</th>
  </tr>
  </thead>
- <tbody class="divide-y divide-[#C7B5A3]/20">
+ <tbody class="divide-y divide-[var(--rm-border)]/30">
  @forelse($preview as $r)
  @php
  $norm = \App\Models\Actividad::normalizarEstado($r->estado);

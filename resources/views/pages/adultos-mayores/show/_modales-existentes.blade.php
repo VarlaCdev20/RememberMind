@@ -1,6 +1,6 @@
 <template x-if="modal">
  <div class="fixed inset-0 z-50 flex items-center justify-center rm-modal-overlay p-4" x-transition.opacity>
- <div 
+ <div
  x-data="{
  errors: {},
  cargando: false,
@@ -44,7 +44,7 @@
  title: 'Formulario incompleto',
  text: 'Revise los campos marcados antes de continuar.',
  confirmButtonText: 'Entendido',
- confirmButtonColor: '#6873A6'
+ confirmButtonColor: '#4F7390'
  });
  return;
  }
@@ -56,8 +56,8 @@
  showCancelButton: true,
  confirmButtonText: 'Confirmar',
  cancelButtonText: 'Cancelar',
- confirmButtonColor: '#6873A6',
- cancelButtonColor: '#D5C7B9',
+ confirmButtonColor: '#4F7390',
+ cancelButtonColor: '#C2B6AC',
  }).then((result) => {
  if (result.isConfirmed) {
  this.cargando = true;
@@ -108,7 +108,7 @@
  title: 'Formulario incompleto',
  text: 'Revise los campos marcados antes de continuar.',
  confirmButtonText: 'Entendido',
- confirmButtonColor: '#9A7B60'
+ confirmButtonColor: '#B26A4A'
  });
  return;
  }
@@ -120,8 +120,8 @@
  showCancelButton: true,
  confirmButtonText: 'Confirmar',
  cancelButtonText: 'Cancelar',
- confirmButtonColor: '#9A7B60',
- cancelButtonColor: '#D5C7B9',
+ confirmButtonColor: '#B26A4A',
+ cancelButtonColor: '#C2B6AC',
  }).then((result) => {
  if (result.isConfirmed) {
  this.cargando = true;
@@ -165,7 +165,7 @@
  title: 'Formulario incompleto',
  text: 'Revise los campos marcados antes de continuar.',
  confirmButtonText: 'Entendido',
- confirmButtonColor: '#D9A27C'
+ confirmButtonColor: '#B57A38'
  });
  return;
  }
@@ -177,8 +177,8 @@
  showCancelButton: true,
  confirmButtonText: 'Confirmar',
  cancelButtonText: 'Cancelar',
- confirmButtonColor: '#D9A27C',
- cancelButtonColor: '#D5C7B9',
+ confirmButtonColor: '#B57A38',
+ cancelButtonColor: '#C2B6AC',
  }).then((result) => {
  if (result.isConfirmed) {
  this.cargando = true;
@@ -217,11 +217,11 @@
  <div class="max-h-[72vh] overflow-y-auto p-5">
  {{-- Mensajes de Error de Validación --}}
  @if($errors->any())
- <div class="mb-4 rounded-xl border border-terracota/30 bg-boton-acento/10 p-4">
- <p class="mb-2 text-xs font-bold uppercase tracking-widest text-terracota">
+ <div class="mb-4 rounded-xl border border-[var(--rm-action-primary)]/30 bg-boton-acento/10 p-4">
+ <p class="mb-2 text-xs font-bold uppercase tracking-widest text-[var(--rm-action-primary)]">
  <i class="ph-bold ph-warning-circle mr-1"></i> Errores de validación
  </p>
- <ul class="list-inside list-disc text-xs font-bold text-terracota/80">
+ <ul class="list-inside list-disc text-xs font-bold text-[var(--rm-action-primary)]/80">
  @foreach($errors->all() as $error)
  <li>{{ $error }}</li>
  @endforeach
@@ -237,17 +237,17 @@
  <input type="hidden" name="estado" value="ACTIVO">
  <div class="md:col-span-2">
  <label class="mb-1 block text-[10px] font-bold uppercase text-apoyo">Nombre completo del Familiar</label>
- <input name="nombre_nuevo" :value="recordData.usuario?.name || recordData.nombres || ''" :disabled="isViewing" required class="w-full rounded-xl border {{ $errors->has('nombre_nuevo') ? 'border-terracota bg-boton-acento/5' : 'border-borde-suave bg-fondo-panel' }} px-4 py-3 text-sm font-bold outline-none focus:border-borde-focus" placeholder="Ej. Juan Pérez">
- @error('nombre_nuevo') <span class="mt-1 block text-xs font-bold text-terracota">{{ $message }}</span> @enderror
+ <input name="nombre_nuevo" :value="recordData.usuario?.name || recordData.nombres || ''" :disabled="isViewing" required class="w-full rounded-xl border {{ $errors->has('nombre_nuevo') ? 'border-[var(--rm-action-primary)] bg-boton-acento/5' : 'border-borde-suave bg-fondo-panel' }} px-4 py-3 text-sm font-bold outline-none focus:border-borde-focus" placeholder="Ej. Juan Pérez">
+ @error('nombre_nuevo') <span class="mt-1 block text-xs font-bold text-[var(--rm-action-primary)]">{{ $message }}</span> @enderror
  </div>
  <div class="md:col-span-2">
  <label class="mb-1 block text-[10px] font-bold uppercase text-apoyo">Correo Electrónico (Opcional)</label>
- <input name="email_nuevo" type="email" :value="recordData.usuario?.email || recordData.email || ''" :disabled="isViewing" class="w-full rounded-xl border {{ $errors->has('email_nuevo') ? 'border-terracota bg-boton-acento/5' : 'border-borde-suave bg-fondo-panel' }} px-4 py-3 text-sm font-bold outline-none focus:border-borde-focus" placeholder="ejemplo@correo.com">
- @error('email_nuevo') <span class="mt-1 block text-xs font-bold text-terracota">{{ $message }}</span> @enderror
+ <input name="email_nuevo" type="email" :value="recordData.usuario?.email || recordData.email || ''" :disabled="isViewing" class="w-full rounded-xl border {{ $errors->has('email_nuevo') ? 'border-[var(--rm-action-primary)] bg-boton-acento/5' : 'border-borde-suave bg-fondo-panel' }} px-4 py-3 text-sm font-bold outline-none focus:border-borde-focus" placeholder="ejemplo@correo.com">
+ @error('email_nuevo') <span class="mt-1 block text-xs font-bold text-[var(--rm-action-primary)]">{{ $message }}</span> @enderror
  </div>
  <div>
  <label class="mb-1 block text-[10px] font-bold uppercase text-apoyo">Parentesco</label>
- <select name="parentesco_vinculo" :value="recordData.pivot?.parentesco_vinculo || recordData.parentesco_vinculo || ''" :disabled="isViewing" required class="w-full rounded-xl border {{ $errors->has('parentesco_vinculo') ? 'border-terracota bg-boton-acento/5' : 'border-borde-suave bg-fondo-panel' }} px-4 py-3 text-sm font-bold outline-none focus:border-borde-focus">
+ <select name="parentesco_vinculo" :value="recordData.pivot?.parentesco_vinculo || recordData.parentesco_vinculo || ''" :disabled="isViewing" required class="w-full rounded-xl border {{ $errors->has('parentesco_vinculo') ? 'border-[var(--rm-action-primary)] bg-boton-acento/5' : 'border-borde-suave bg-fondo-panel' }} px-4 py-3 text-sm font-bold outline-none focus:border-borde-focus">
  <option value="">Seleccione parentesco</option>
  <option value="Hijo/a">Hijo/a</option>
  <option value="Conyuge">Cónyuge</option>
@@ -257,30 +257,30 @@
  <option value="Tutor Legal">Tutor Legal</option>
  <option value="Otro">Otro</option>
  </select>
- @error('parentesco_vinculo') <span class="mt-1 block text-xs font-bold text-terracota">{{ $message }}</span> @enderror
+ @error('parentesco_vinculo') <span class="mt-1 block text-xs font-bold text-[var(--rm-action-primary)]">{{ $message }}</span> @enderror
  </div>
  <div>
  <label class="mb-1 block text-[10px] font-bold uppercase text-apoyo">Nivel de Responsabilidad</label>
- <select name="es_responsable" :value="recordData.pivot?.es_responsable ? '1' : '0'" :disabled="isViewing" required class="w-full rounded-xl border {{ $errors->has('es_responsable') ? 'border-terracota bg-boton-acento/5' : 'border-borde-suave bg-fondo-panel' }} px-4 py-3 text-sm font-bold outline-none focus:border-borde-focus">
+ <select name="es_responsable" :value="recordData.pivot?.es_responsable ? '1' : '0'" :disabled="isViewing" required class="w-full rounded-xl border {{ $errors->has('es_responsable') ? 'border-[var(--rm-action-primary)] bg-boton-acento/5' : 'border-borde-suave bg-fondo-panel' }} px-4 py-3 text-sm font-bold outline-none focus:border-borde-focus">
  <option value="0">Contacto referencial</option>
  <option value="1">Responsable principal (Firma autorizado)</option>
  </select>
- @error('es_responsable') <span class="mt-1 block text-xs font-bold text-terracota">{{ $message }}</span> @enderror
+ @error('es_responsable') <span class="mt-1 block text-xs font-bold text-[var(--rm-action-primary)]">{{ $message }}</span> @enderror
  </div>
  <div class="md:col-span-2">
  <label class="mb-1 block text-[10px] font-bold uppercase text-apoyo">Observaciones del vínculo / Horarios de visita</label>
- <textarea name="observaciones" :value="recordData.pivot?.observaciones || recordData.observaciones || ''" :disabled="isViewing" class="w-full rounded-xl border {{ $errors->has('observaciones') ? 'border-terracota bg-boton-acento/5' : 'border-borde-suave bg-fondo-panel' }} px-4 py-3 text-sm font-bold outline-none focus:border-borde-focus" rows="3" placeholder="Restricciones de visita, observaciones médicas que el familiar deba conocer, etc."></textarea>
- @error('observaciones') <span class="mt-1 block text-xs font-bold text-terracota">{{ $message }}</span> @enderror
+ <textarea name="observaciones" :value="recordData.pivot?.observaciones || recordData.observaciones || ''" :disabled="isViewing" class="w-full rounded-xl border {{ $errors->has('observaciones') ? 'border-[var(--rm-action-primary)] bg-boton-acento/5' : 'border-borde-suave bg-fondo-panel' }} px-4 py-3 text-sm font-bold outline-none focus:border-borde-focus" rows="3" placeholder="Restricciones de visita, observaciones médicas que el familiar deba conocer, etc."></textarea>
+ @error('observaciones') <span class="mt-1 block text-xs font-bold text-[var(--rm-action-primary)]">{{ $message }}</span> @enderror
  </div>
  </form>
 
  {{-- Observación --}}
- <form 
- id="form-observacion" 
- method="POST" 
- :action="isEditing ? `{{ route('admin.adultos-mayores.observaciones.update', [$idAdulto, 'ID']) }}`.replace('ID', recordData.cod_obs_adul) : `{{ route('admin.adultos-mayores.observaciones.store', $idAdulto) }}`" 
- x-show="modal === 'observacion'" 
- class="grid gap-4 md:grid-cols-2" 
+ <form
+ id="form-observacion"
+ method="POST"
+ :action="isEditing ? `{{ route('admin.adultos-mayores.observaciones.update', [$idAdulto, 'ID']) }}`.replace('ID', recordData.cod_obs_adul) : `{{ route('admin.adultos-mayores.observaciones.store', $idAdulto) }}`"
+ x-show="modal === 'observacion'"
+ class="grid gap-4 md:grid-cols-2"
  @submit="validarObservacion"
  >
  @csrf
@@ -343,7 +343,7 @@
 
  {{-- Descripción del formulario --}}
  <div class="rounded-xl bg-fondo-panel border border-borde-suave p-3 text-xs font-bold leading-5 text-titulo/70">
- <i class="ph-fill ph-stethoscope mr-1 text-terracota"></i>
+ <i class="ph-fill ph-stethoscope mr-1 text-[var(--rm-action-primary)]"></i>
  Registra una atención registrada al adulto mayor. Este registro forma parte del seguimiento histórico de salud y cuidados.
  </div>
 
@@ -507,12 +507,12 @@
  </form>
 
  {{-- Actividad --}}
- <form 
- id="form-actividad" 
- method="POST" 
- :action="isEditing ? `{{ route('admin.adultos-mayores.actividades.update', [$idAdulto, 'ID']) }}`.replace('ID', recordData.cod_act_adul) : `{{ route('admin.adultos-mayores.actividades.store', $idAdulto) }}`" 
- x-show="modal === 'actividad'" 
- class="grid gap-4 md:grid-cols-2" 
+ <form
+ id="form-actividad"
+ method="POST"
+ :action="isEditing ? `{{ route('admin.adultos-mayores.actividades.update', [$idAdulto, 'ID']) }}`.replace('ID', recordData.cod_act_adul) : `{{ route('admin.adultos-mayores.actividades.store', $idAdulto) }}`"
+ x-show="modal === 'actividad'"
+ class="grid gap-4 md:grid-cols-2"
  @submit="validarActividad"
  >
  @csrf
@@ -567,24 +567,24 @@
  </form>
 
  {{-- Documento --}}
- <form 
- id="form-documento" 
- method="POST" 
+ <form
+ id="form-documento"
+ method="POST"
  :action="isEditing ? `{{ route('admin.adultos-mayores.documentos.update', [$idAdulto, 'ID']) }}`.replace('ID', recordData.cod_documento) : `{{ route('admin.adultos-mayores.documentos.store', $idAdulto) }}`"
- enctype="multipart/form-data" 
- x-show="modal === 'documento'" 
- class="grid gap-4 md:grid-cols-2" 
+ enctype="multipart/form-data"
+ x-show="modal === 'documento'"
+ class="grid gap-4 md:grid-cols-2"
  @submit="validarDocumento"
  >
  @csrf
  <input type="hidden" name="_method" :value="isEditing ? 'PATCH' : 'POST'">
  <div class="md:col-span-2">
  <label class="mb-1 block text-[10px] font-bold uppercase text-apoyo">Título del Documento *</label>
- <input 
- name="nom_doc" 
- :value="recordData.nom_doc || ''" 
- :disabled="isViewing" 
- class="w-full rounded-xl border bg-fondo-panel px-4 py-3 text-sm font-bold outline-none focus:border-borde-focus" 
+ <input
+ name="nom_doc"
+ :value="recordData.nom_doc || ''"
+ :disabled="isViewing"
+ class="w-full rounded-xl border bg-fondo-panel px-4 py-3 text-sm font-bold outline-none focus:border-borde-focus"
  :class="errors.nom_doc ? 'border-rose-500 ring-4 ring-rose-500/10' : 'border-borde-suave'"
  placeholder="Ej. Resultados de laboratorio completo"
  >
@@ -594,10 +594,10 @@
  </div>
  <div>
  <label class="mb-1 block text-[10px] font-bold uppercase text-apoyo">Categoría del Expediente *</label>
- <select 
- name="tipo_doc" 
- :value="recordData.tipo_doc || ''" 
- :disabled="isViewing" 
+ <select
+ name="tipo_doc"
+ :value="recordData.tipo_doc || ''"
+ :disabled="isViewing"
  class="w-full rounded-xl border bg-fondo-panel px-4 py-3 text-sm font-bold outline-none focus:border-borde-focus"
  :class="errors.tipo_doc ? 'border-rose-500 ring-4 ring-rose-500/10' : 'border-borde-suave'"
  >
@@ -615,11 +615,11 @@
  </div>
  <div>
  <label class="mb-1 block text-[10px] font-bold uppercase text-apoyo">Fecha del Documento *</label>
- <input 
- type="date" 
- name="fecha_doc" 
- :value="recordData.fecha_doc?.split(' ')[0] || '{{ now()->format('Y-m-d') }}'" 
- :disabled="isViewing" 
+ <input
+ type="date"
+ name="fecha_doc"
+ :value="recordData.fecha_doc?.split(' ')[0] || '{{ now()->format('Y-m-d') }}'"
+ :disabled="isViewing"
  class="w-full rounded-xl border bg-fondo-panel px-4 py-3 text-sm font-bold outline-none focus:border-borde-focus"
  :class="errors.fecha_doc ? 'border-rose-500 ring-4 ring-rose-500/10' : 'border-borde-suave'"
  >
@@ -631,9 +631,9 @@
  <label class="mb-1 block text-[10px] font-bold uppercase text-apoyo">
  Archivo (PDF, JPG, JPEG, PNG) <span x-show="!isEditing">*</span>
  </label>
- <input 
- type="file" 
- name="archivo" 
+ <input
+ type="file"
+ name="archivo"
  class="w-full rounded-xl border bg-fondo-panel px-4 py-2.5 text-sm font-bold text-titulo outline-none file:mr-4 file:rounded-lg file:border-0 file:bg-boton-principal file:px-3 file:py-1.5 file:text-xs file:font-black file:text-inverso hover:file:bg-fondo-panel"
  :class="errors.archivo ? 'border-rose-500 ring-4 ring-rose-500/10' : 'border-borde-suave'"
  >
@@ -643,13 +643,13 @@
  </div>
  <div class="md:col-span-2">
  <label class="mb-1 block text-[10px] font-bold uppercase text-apoyo">Observaciones adicionales (Opcional)</label>
- <textarea 
- name="observaciones" 
+ <textarea
+ name="observaciones"
  :value="recordData.observacion || ''"
- :disabled="isViewing" 
- class="w-full rounded-xl border bg-fondo-panel px-4 py-3 text-sm font-bold outline-none focus:border-borde-focus" 
+ :disabled="isViewing"
+ class="w-full rounded-xl border bg-fondo-panel px-4 py-3 text-sm font-bold outline-none focus:border-borde-focus"
  :class="errors.observaciones ? 'border-rose-500 ring-4 ring-rose-500/10' : 'border-borde-suave'"
- rows="2" 
+ rows="2"
  placeholder="Ej. El familiar entregó los originales al administrador..."
  ></textarea>
  <template x-if="errors.observaciones">

@@ -6,7 +6,7 @@
  Volver a Fichas Médicas
  </a>
  </div>
- 
+
  <div class="space-y-4">
  @php
  $patologias = [
@@ -29,7 +29,7 @@
 
  {{-- 1. CABECERA CLÍNICA --}}
  <section class="overflow-hidden rounded-[1.6rem] border border-borde/65 bg-fondo-panel shadow-sm backdrop-blur-xl">
- <div class="h-1.5 w-full bg-gradient-to-r from-[#E27D60] via-[#D9A05B] to-[#8DA280]"></div>
+ <div class="h-1.5 w-full bg-gradient-to-r from-[var(--rm-accent-terracotta)] via-[var(--rm-warning)] to-[var(--rm-action-primary)]"></div>
  <div class="flex flex-col gap-4 p-4 sm:flex-row sm:items-center sm:justify-between">
  <div class="flex items-center gap-3">
  <span class="flex h-12 w-12 items-center justify-center rounded-2xl border border-borde/55 bg-fondo-panel text-boton-acento shadow-sm">
@@ -73,13 +73,13 @@
  <div>
  <div class="relative">
  <i class="ph-bold ph-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-meta"></i>
- <input type="text" wire:model.live.debounce.350ms="buscarPaciente" placeholder="Buscar por nombre o apellido..." class="w-full rounded-xl border border-borde/70 bg-fondo-card py-2.5 pl-10 pr-4 text-xs font-bold text-parrafo outline-none transition placeholder:text-meta focus:border-borde-focus focus:ring-2 focus:ring-[#E27D60]/15">
+ <input type="text" wire:model.live.debounce.350ms="buscarPaciente" placeholder="Buscar por nombre o apellido..." class="w-full rounded-xl border border-borde/70 bg-fondo-card py-2.5 pl-10 pr-4 text-xs font-bold text-parrafo outline-none transition placeholder:text-meta focus:border-borde-focus focus:ring-2 focus:ring-[var(--rm-action-primary)]/20">
  </div>
  </div>
  <div>
  <div class="relative w-full">
  <i class="ph-bold ph-user absolute left-3.5 top-1/2 -translate-y-1/2 text-meta"></i>
- <select wire:model="adultoSeleccionado" class="w-full rounded-xl border border-borde/70 bg-fondo-card py-2.5 pl-10 pr-4 text-xs font-bold text-parrafo outline-none transition appearance-none focus:border-borde-focus focus:ring-2 focus:ring-[#E27D60]/15">
+ <select wire:model="adultoSeleccionado" class="w-full rounded-xl border border-borde/70 bg-fondo-card py-2.5 pl-10 pr-4 text-xs font-bold text-parrafo outline-none transition appearance-none focus:border-borde-focus focus:ring-2 focus:ring-[var(--rm-action-primary)]/20">
  <option value="">Seleccione un adulto mayor</option>
  @foreach($pacientesSelector as $paciente)
  @php $nombrePaciente = trim("{$paciente->nombres} {$paciente->ap_paterno} {$paciente->ap_materno}"); @endphp
@@ -98,7 +98,7 @@
 
  @if($adulto)
  <div class="grid gap-4 lg:grid-cols-[1fr_2.5fr]">
- 
+
  {{-- 3. PANEL DE ESTADO Y PACIENTE --}}
  <div class="space-y-4">
  <section class="rounded-[1.6rem] border border-estado-exitoBorde bg-estado-exitoBg p-4 shadow-sm backdrop-blur-xl relative overflow-hidden">
@@ -137,7 +137,7 @@
  </div>
  </div>
  </section>
- 
+
  {{-- 9. ACCESOS RELACIONADOS --}}
  <section class="rounded-[1.6rem] border border-borde/45 bg-fondo-panel p-4 shadow-sm">
  <h4 class="mb-3 text-[10px] font-bold uppercase tracking-[0.18em] text-apoyo">Accesos Relacionados</h4>
@@ -154,7 +154,7 @@
 
  {{-- ZONA DERECHA: CARDS MEDICAS Y TABS --}}
  <div class="space-y-4">
- 
+
  {{-- 4. CARDS MEDICAS PRINCIPALES --}}
  <div class="grid grid-cols-2 gap-3 sm:grid-cols-4">
  <div class="rounded-2xl border border-borde/45 bg-fondo-panel p-3 shadow-sm flex flex-col justify-between h-full">
@@ -210,7 +210,7 @@
  @if($fichaActiva)
  {{-- 5. TABS DE FICHA MEDICA --}}
  <div x-data="{ tab: 'resumen' }" class="rounded-[1.6rem] border border-borde/65 bg-fondo-panel p-5 shadow-sm backdrop-blur-xl min-h-[400px]">
- 
+
  <nav class="flex flex-wrap gap-2 mb-6 border-b border-borde/35 pb-4">
  <button @click="tab = 'resumen'" :class="tab === 'resumen' ? 'bg-boton-principal text-inverso shadow-sm' : 'bg-transparent text-apoyo hover:bg-fondo-panel'" class="rounded-xl px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider transition">Resumen Base</button>
  <button @click="tab = 'datos'" :class="tab === 'datos' ? 'bg-boton-principal text-inverso shadow-sm' : 'bg-transparent text-apoyo hover:bg-fondo-panel'" class="rounded-xl px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider transition">Datos Generales</button>
@@ -418,7 +418,7 @@
  <th class="px-4 py-3">Responsable</th>
  </tr>
  </thead>
- <tbody class="divide-y divide-[#C7B5A3]/25">
+ <tbody class="divide-y divide-[var(--rm-border)]/25">
  @foreach($historialFichas as $hist)
  <tr class="hover:bg-fondo-panel transition">
  <td class="px-4 py-3">
@@ -451,11 +451,11 @@
  <x-slot name="icon"><i class="ph-bold ph-file-text text-boton-acento"></i></x-slot>
  <form wire:submit.prevent="save" id="formGeneral">
  <p class="mb-4 text-xs font-bold text-apoyo">Se iniciará el expediente clínico base. Posteriormente podrá usar las pestañas para actualizar secciones específicas.</p>
- 
+
  <div class="grid gap-4 md:grid-cols-2">
  <div class="md:col-span-2">
  <label class="mb-1.5 block text-[10px] font-bold uppercase tracking-widest text-apoyo">Observación Médica General</label>
- <textarea wire:model="observacion_medica" rows="4" class="w-full rounded-xl border border-borde bg-fondo-card p-3 text-xs font-bold text-parrafo outline-none transition focus:border-borde-focus focus:ring-2 focus:ring-[#E27D60]/15"></textarea>
+ <textarea wire:model="observacion_medica" rows="4" class="w-full rounded-xl border border-borde bg-fondo-card p-3 text-xs font-bold text-parrafo outline-none transition focus:border-borde-focus focus:ring-2 focus:ring-[var(--rm-action-primary)]/20"></textarea>
  </div>
  @if(!$fichaActiva)
  <div class="md:col-span-2 rounded-xl border border-borde-focus bg-estado-peligroBg p-3">
@@ -478,11 +478,11 @@
  <div class="grid gap-4">
  <div>
  <label class="mb-1.5 block text-[10px] font-bold uppercase tracking-widest text-apoyo">Antecedentes Quirúrgicos (Cirugías previas)</label>
- <textarea wire:model="cirugias" rows="4" placeholder="Ej. Apendicectomía en 2010..." class="w-full rounded-xl border border-borde bg-fondo-card p-3 text-xs font-bold text-parrafo outline-none transition focus:border-borde-focus focus:ring-2 focus:ring-[#E27D60]/15"></textarea>
+ <textarea wire:model="cirugias" rows="4" placeholder="Ej. Apendicectomía en 2010..." class="w-full rounded-xl border border-borde bg-fondo-card p-3 text-xs font-bold text-parrafo outline-none transition focus:border-borde-focus focus:ring-2 focus:ring-[var(--rm-action-primary)]/20"></textarea>
  </div>
  <div>
  <label class="mb-1.5 block text-[10px] font-bold uppercase tracking-widest text-apoyo">Hospitalizaciones</label>
- <textarea wire:model="hospitalizaciones" rows="4" placeholder="Detalles de hospitalizaciones anteriores..." class="w-full rounded-xl border border-borde bg-fondo-card p-3 text-xs font-bold text-parrafo outline-none transition focus:border-borde-focus focus:ring-2 focus:ring-[#E27D60]/15"></textarea>
+ <textarea wire:model="hospitalizaciones" rows="4" placeholder="Detalles de hospitalizaciones anteriores..." class="w-full rounded-xl border border-borde bg-fondo-card p-3 text-xs font-bold text-parrafo outline-none transition focus:border-borde-focus focus:ring-2 focus:ring-[var(--rm-action-primary)]/20"></textarea>
  </div>
  </div>
  </form>
@@ -498,7 +498,7 @@
  <form wire:submit.prevent="save" id="formAlergias">
  <div>
  <label class="mb-1.5 block text-[10px] font-bold uppercase tracking-widest text-apoyo">Alergias (Medicamentosas, alimentarias u otras)</label>
- <textarea wire:model="alergias" rows="5" placeholder="Especifique las alergias o deje en blanco si no hay." class="w-full rounded-xl border border-borde bg-fondo-card p-3 text-xs font-bold text-parrafo outline-none transition focus:border-borde-focus focus:ring-2 focus:ring-[#E27D60]/15"></textarea>
+ <textarea wire:model="alergias" rows="5" placeholder="Especifique las alergias o deje en blanco si no hay." class="w-full rounded-xl border border-borde bg-fondo-card p-3 text-xs font-bold text-parrafo outline-none transition focus:border-borde-focus focus:ring-2 focus:ring-[var(--rm-action-primary)]/20"></textarea>
  </div>
  </form>
  <x-slot name="footer">
@@ -551,11 +551,11 @@
  <div class="grid gap-4">
  <div>
  <label class="mb-1.5 block text-[10px] font-bold uppercase tracking-widest text-apoyo">Restricciones Alimentarias / Dieta Especial</label>
- <textarea wire:model="restricciones_alimentarias" rows="3" placeholder="Ej. Dieta blanda, baja en sodio..." class="w-full rounded-xl border border-borde bg-fondo-card p-3 text-xs font-bold text-parrafo outline-none transition focus:border-borde-focus focus:ring-2 focus:ring-[#E27D60]/15"></textarea>
+ <textarea wire:model="restricciones_alimentarias" rows="3" placeholder="Ej. Dieta blanda, baja en sodio..." class="w-full rounded-xl border border-borde bg-fondo-card p-3 text-xs font-bold text-parrafo outline-none transition focus:border-borde-focus focus:ring-2 focus:ring-[var(--rm-action-primary)]/20"></textarea>
  </div>
  <div>
  <label class="mb-1.5 block text-[10px] font-bold uppercase tracking-widest text-apoyo">Observaciones Generales de la Ficha</label>
- <textarea wire:model="observacion_medica" rows="4" placeholder="Notas médicas y de cuidado..." class="w-full rounded-xl border border-borde bg-fondo-card p-3 text-xs font-bold text-parrafo outline-none transition focus:border-borde-focus focus:ring-2 focus:ring-[#E27D60]/15"></textarea>
+ <textarea wire:model="observacion_medica" rows="4" placeholder="Notas médicas y de cuidado..." class="w-full rounded-xl border border-borde bg-fondo-card p-3 text-xs font-bold text-parrafo outline-none transition focus:border-borde-focus focus:ring-2 focus:ring-[var(--rm-action-primary)]/20"></textarea>
  </div>
  </div>
  </form>

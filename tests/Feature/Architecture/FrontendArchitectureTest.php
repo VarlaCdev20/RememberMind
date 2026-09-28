@@ -135,4 +135,30 @@ class FrontendArchitectureTest extends TestCase
             $this->assertFileExists($tokenPath, "El token canónico {$tokenFile} debe existir en el Design System.");
         }
     }
+
+    /**
+     * Protege que las primitivas UI normalizadas no contengan colores HEX hardcodeados.
+     */
+    public function test_componentes_ui_canonicos_no_contienen_colores_hex_hardcodeados(): void
+    {
+        $componentes = [
+            'action-button.blade.php',
+            'status-badge.blade.php',
+            'section-card.blade.php',
+            'filter-bar.blade.php',
+            'page-header.blade.php',
+        ];
+
+        foreach ($componentes as $componente) {
+            $path = resource_path("views/components/ui/{$componente}");
+            $this->assertFileExists($path, "El componente UI {$componente} debe existir.");
+
+            $contenido = File::get($path);
+            $this->assertDoesNotMatchRegularExpression(
+                '/#[0-9a-fA-F]{3,8}\b/',
+                $contenido,
+                "El componente UI {$componente} no debe contener colores HEX hardcodeados."
+            );
+        }
+    }
 }

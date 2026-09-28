@@ -3,17 +3,17 @@
  {{-- Fondo con ruido y puntos --}}
  <div class="dash-noise pointer-events-none fixed inset-0 z-[60] opacity-[0.14] mix-blend-overlay"></div>
  <div class="dash-dots pointer-events-none fixed inset-0 z-0 opacity-[0.03]"></div>
- 
+
  <main class="relative z-10 mx-auto max-w-5xl px-4 pb-12 pt-8 sm:px-6 lg:px-8">
  <header class="mb-8 flex items-center justify-between">
  <div>
- <nav class="mb-2 flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] text-terracota">
+ <nav class="mb-2 flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--rm-action-primary)]">
  <a href="{{ route('admin.usuarios.index') }}" class="transition hover:text-titulo">Usuarios</a>
  <i class="ph-bold ph-caret-right text-[8px]"></i>
  <span>Edición Institucional</span>
  </nav>
  <h1 class="text-3xl font-black text-titulo sm:text-4xl">
- Editar <span class="text-terracota">Usuario</span>
+ Editar <span class="text-[var(--rm-action-primary)]">Usuario</span>
  </h1>
  <p class="mt-2 text-xs font-bold text-titulo/50">Actualice la información del perfil de {{ $usuario->name }}.</p>
  </div>
@@ -33,7 +33,7 @@
  fechaNac: @js(old('fecha_nacimiento', $usuario->fecha_nacimiento ? (is_string($usuario->fecha_nacimiento) ? $usuario->fecha_nacimiento : $usuario->fecha_nacimiento->format('Y-m-d')) : '')),
  fotoPreview: null,
  errors: {},
- 
+
  paisesDoc: {
  'Bolivia': ['CI'],
  'Brasil': ['CPF', 'RG', 'PASAPORTE'],
@@ -49,7 +49,7 @@
  'Perú': '+51', 'Chile': '+56', 'Colombia': '+57',
  'México': '+52', 'Otro': ''
  },
- 
+
  init() {
  this.$watch('paisDoc', (val) => {
  if (!this.paisesDoc[val].includes(this.tipoDoc)) {
@@ -157,7 +157,7 @@
  <div>
  <label class="mb-1.5 block text-[10px] font-bold uppercase tracking-widest text-titulo/60">Edad Calculada</label>
  <div class="flex h-[46px] items-center gap-3 rounded-2xl border border-borde-suave bg-boton-principal/5 px-5 py-3 text-sm font-bold text-titulo/70 shadow-inner">
- <i class="ph-bold ph-calendar text-terracota"></i>
+ <i class="ph-bold ph-calendar text-[var(--rm-action-primary)]"></i>
  <span x-text="calculateAgeText()"></span>
  </div>
  </div>
@@ -206,7 +206,7 @@
 
  <div x-show="paisDoc === 'Bolivia' && tipoDoc === 'CI'">
  <label class="mb-1.5 block text-[10px] font-bold uppercase tracking-widest text-titulo/60">Expedido en</label>
- <select name="expedido" 
+ <select name="expedido"
  class="w-full rounded-2xl border border-borde-suave bg-fondo-card/40 px-5 py-3 text-sm font-bold outline-none transition focus:border-borde-focus">
  <option value="">Seleccionar...</option>
  @foreach(['LP', 'CBBA', 'SCZ', 'OR', 'PT', 'CH', 'TJ', 'BN', 'PD'] as $exp)
@@ -290,7 +290,7 @@
  </select>
  @if($usuario->cod_usuario === 'USU_0001')
  <input type="hidden" name="rol" value="{{ $usuario->getRoleNames()->first() }}">
- <p class="mt-1 text-[9px] font-bold text-terracota uppercase italic"><i class="ph-bold ph-warning"></i> Perfil de Super Administrador: El rol no puede ser modificado.</p>
+ <p class="mt-1 text-[9px] font-bold text-[var(--rm-action-primary)] uppercase italic"><i class="ph-bold ph-warning"></i> Perfil de Super Administrador: El rol no puede ser modificado.</p>
  @endif
  </div>
 
@@ -371,7 +371,7 @@
  <div class="grid gap-6 md:grid-cols-2">
  <div>
  <label class="mb-4 flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-titulo/60">
- <i class="ph-bold ph-camera text-base text-terracota"></i> Foto de Perfil Institucional
+ <i class="ph-bold ph-camera text-base text-[var(--rm-action-primary)]"></i> Foto de Perfil Institucional
  </label>
  <div class="flex items-center gap-6">
  <div class="relative">
@@ -400,7 +400,7 @@
  </div>
  <div>
  <label class="mb-1.5 block text-[10px] font-bold uppercase tracking-widest text-titulo/60">Observaciones Institucionales Internas</label>
- <textarea name="observaciones" rows="3" 
+ <textarea name="observaciones" rows="3"
  class="w-full rounded-2xl border border-borde-suave bg-fondo-card/40 px-5 py-3 text-sm font-bold uppercase outline-none transition focus:border-borde-focus">{{ old('observaciones', $usuario->observaciones) }}</textarea>
  </div>
  </div>
@@ -408,11 +408,11 @@
 
  {{-- BOTONES DE ACCIÓN --}}
  <div class="mt-8 flex flex-col-reverse gap-4 sm:flex-row sm:justify-end">
- <a href="{{ route('admin.usuarios.index') }}" 
+ <a href="{{ route('admin.usuarios.index') }}"
  class="flex items-center justify-center gap-2 rounded-full border-2 border-borde-suave px-10 py-4 text-xs font-bold uppercase tracking-widest text-titulo transition hover:bg-fondo-panel active:scale-95">
  <i class="ph-bold ph-x"></i> Cancelar
  </a>
- <button type="submit" 
+ <button type="submit"
  class="flex items-center justify-center gap-2 rounded-full bg-boton-principal px-12 py-4 text-xs font-bold uppercase tracking-widest text-inverso shadow-xl transition hover:bg-boton-acento active:scale-95">
  <i class="ph-bold ph-floppy-disk"></i> Guardar Cambios
  </button>

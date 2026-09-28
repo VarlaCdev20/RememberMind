@@ -44,7 +44,7 @@ class TabMedicacionEnfermeriaTest extends TestCase
         $this->seed([RolesAndPermissionsSeeder::class]);
 
         $this->enfermero = User::factory()->create([
-            'estado' => 'ACTIVA',
+            'estado' => 'ACTIVO',
             'nombres' => 'Laura',
             'ap_paterno' => 'González',
         ]);
@@ -408,7 +408,7 @@ class TabMedicacionEnfermeriaTest extends TestCase
 
     public function test_enfermeria_no_puede_crear_ni_modificar_orden_medica(): void
     {
-        $enfermeroPuro = User::factory()->create(['estado' => 'ACTIVA']);
+        $enfermeroPuro = User::factory()->create(['estado' => 'ACTIVO']);
         $enfermeroPuro->assignRole('ENFERMEROS');
 
         $this->assertFalse(Gate::forUser($enfermeroPuro)->allows('create', Prescripcion::class));
@@ -435,7 +435,7 @@ class TabMedicacionEnfermeriaTest extends TestCase
 
     public function test_usuario_sin_personal_no_fabrica_personal_en_administracion(): void
     {
-        $userSinPersonal = User::factory()->create(['estado' => 'ACTIVA']);
+        $userSinPersonal = User::factory()->create(['estado' => 'ACTIVO']);
         $userSinPersonal->assignRole('ENFERMEROS');
 
         $this->assertNull($userSinPersonal->personal);
@@ -471,7 +471,7 @@ class TabMedicacionEnfermeriaTest extends TestCase
 
     public function test_falta_de_jornada_no_fabrica_jornada_y_es_rechazada(): void
     {
-        $enfermeroOtro = User::factory()->create(['estado' => 'ACTIVA']);
+        $enfermeroOtro = User::factory()->create(['estado' => 'ACTIVO']);
         $enfermeroOtro->assignRole('ENFERMEROS');
         Personal::create([
             'cod_personal' => 'PER_OTRO_MED',

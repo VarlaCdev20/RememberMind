@@ -1,5 +1,5 @@
 @php
- $inputCls = 'w-full rounded-xl border border-borde-suave bg-fondo-app px-3 py-2.5 text-sm font-bold text-titulo outline-none ring-[#E27D60]/25 transition focus:border-borde-focus focus:ring-2';
+ $inputCls = 'w-full rounded-xl border border-borde-suave bg-fondo-app px-3 py-2.5 text-sm font-bold text-titulo outline-none ring-[var(--rm-accent-terracotta)]/25 transition focus:border-borde-focus focus:ring-2';
  $labelCls = 'block text-[10px] font-bold uppercase tracking-[0.15em] text-apoyo mb-1.5';
  $errCls = 'mt-1 text-[10px] font-bold text-boton-acento';
 @endphp
@@ -11,7 +11,7 @@
 
  {{-- ── CABECERA ─────────────────────────────────────────────────────── --}}
  <section class="overflow-hidden rounded-[1.65rem] border border-borde-suave bg-fondo-panel shadow-[0_20px_58px_rgba(47,62,92,0.13)] backdrop-blur-xl">
- <div class="h-1.5 bg-gradient-to-r from-[#E27D60] via-[#D9A05B] to-[#8DA280]"></div>
+ <div class="h-1.5 bg-gradient-to-r from-[var(--rm-accent-terracotta)] via-[var(--rm-warning)] to-[var(--rm-action-primary)]"></div>
  <div class="flex flex-col gap-4 p-5 sm:p-7 lg:flex-row lg:items-center lg:justify-between">
  <div class="max-w-3xl">
  <span class="inline-flex items-center gap-2 rounded-full border border-borde-focus bg-estado-peligroBg px-3 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-boton-acento">
@@ -185,7 +185,7 @@
  <th class="pb-2.5 text-left font-black uppercase tracking-[0.12em] text-apoyo">Acciones</th>
  </tr>
  </thead>
- <tbody class="divide-y divide-[#C7B5A3]/25">
+ <tbody class="divide-y divide-[var(--rm-border)]/30">
  @foreach($actividades as $actividad)
  @php
  $ne = \App\Models\Actividad::normalizarEstado($actividad->estado ?? '');
@@ -267,7 +267,7 @@
  style="background: rgba(47,62,92,0.50)"
  wire:click.self="cerrarModales">
  <div class="w-full max-w-xl overflow-hidden rounded-[1.45rem] border border-borde-suave bg-fondo-panel shadow-2xl">
- <div class="h-1 bg-gradient-to-r from-[#E27D60] via-[#D9A05B] to-[#8DA280]"></div>
+ <div class="h-1 bg-gradient-to-r from-[var(--rm-accent-terracotta)] via-[var(--rm-warning)] to-[var(--rm-action-primary)]"></div>
  {{-- Header --}}
  <div class="flex items-center justify-between border-b border-borde-suave bg-fondo-panel px-5 py-4">
  <div class="flex items-center gap-2.5">
@@ -367,7 +367,7 @@
  style="background: rgba(47,62,92,0.50)"
  wire:click.self="cerrarModales">
  <div class="w-full max-w-xl overflow-hidden rounded-[1.45rem] border border-borde-suave bg-fondo-panel shadow-2xl">
- <div class="h-1 bg-gradient-to-r from-[#D9A05B] via-[#E27D60] to-[#8DA280]"></div>
+ <div class="h-1 bg-gradient-to-r from-[var(--rm-warning)] via-[var(--rm-accent-terracotta)] to-[var(--rm-action-primary)]"></div>
  {{-- Header --}}
  <div class="flex items-center justify-between border-b border-borde-suave bg-fondo-panel px-5 py-4">
  <div class="flex items-center gap-2.5">
@@ -470,7 +470,7 @@
  style="background: rgba(47,62,92,0.50)"
  wire:click.self="cerrarModales">
  <div class="w-full max-w-lg overflow-hidden rounded-[1.45rem] border border-borde-suave bg-fondo-panel shadow-2xl">
- <div class="h-1 bg-gradient-to-r from-[#8DA280] via-[#D9A05B] to-[#E27D60]"></div>
+ <div class="h-1 bg-gradient-to-r from-[var(--rm-action-primary)] via-[var(--rm-warning)] to-[var(--rm-accent-terracotta)]"></div>
  {{-- Header --}}
  <div class="flex items-center justify-between border-b border-borde-suave bg-fondo-panel px-5 py-4">
  <div class="flex items-center gap-2.5">

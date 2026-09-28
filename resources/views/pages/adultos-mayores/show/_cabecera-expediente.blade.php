@@ -1,12 +1,12 @@
 {{-- ENCABEZADO PRINCIPAL ADMINISTRATIVO --}}
 <section class="overflow-hidden rounded-[24px] border border-borde bg-fondo-panel shadow-sm backdrop-blur-xl mb-4">
- <div class="h-1.5 w-full bg-gradient-to-r from-[#E27D60] via-[#D9A27C] to-[#8EA17D]"></div>
+ <div class="h-1.5 w-full bg-gradient-to-r from-[var(--rm-accent-terracotta)] via-[var(--rm-warning)] to-[var(--rm-action-primary)]"></div>
  <div class="p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
  <div class="flex items-center gap-4">
  @if($fotoUrl)
  <img src="{{ $fotoUrl }}" alt="Foto" class="h-16 w-16 rounded-[16px] border-2 border-white object-cover shadow-sm">
  @else
- <div class="flex h-16 w-16 items-center justify-center rounded-[16px] bg-gradient-to-br from-[#4E5D8A] to-[#6873A6] text-2xl font-black text-inverso shadow-sm">
+ <div class="flex h-16 w-16 items-center justify-center rounded-[16px] bg-gradient-to-br from-[#4E5D8A] to-[#4F7390] text-2xl font-black text-inverso shadow-sm">
  {{ $iniciales ?: 'AM' }}
  </div>
  @endif
@@ -26,7 +26,7 @@
  @php
  $isExpedienteCompleto = $fichasMedicas->isNotEmpty() && $totalEvaluaciones > 0 && $totalDocumentos > 0 && $totalFamiliares > 0;
  @endphp
- <span class="inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs font-bold uppercase tracking-wide {{ $isExpedienteCompleto ? 'bg-fondo-panel text-parrafo' : 'bg-amber-600/20 text-amber-700' }}">
+ <span class="inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs font-bold uppercase tracking-wide {{ $isExpedienteCompleto ? 'bg-fondo-panel text-parrafo' : 'bg-[var(--rm-warning)]/20 text-[var(--rm-warning-strong)]' }}">
  Expediente {{ $isExpedienteCompleto ? 'Completo' : 'Pendiente' }}
  </span>
  </div>

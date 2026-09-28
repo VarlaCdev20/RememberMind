@@ -135,7 +135,7 @@
     }
 
     .dark .rm-alert-action {
-        color: #F4A261;
+        color: var(--rm-warning);
         opacity: 1;
     }
 

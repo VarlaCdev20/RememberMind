@@ -288,7 +288,7 @@ class SidebarServiceTest extends TestCase
 
         // El accordion tiene abierta la sección Usuarios y accesos (índice 1)
         $response->assertSee('openSection: 1', false);
-        $response->assertSee('border-l-4 border-boton-acento', false);
+        $response->assertSee('border-[var(--rm-nav-selected-border)]', false);
     }
 
     public function test_layout_desktop_y_accordion_en_superadmin_residentes(): void

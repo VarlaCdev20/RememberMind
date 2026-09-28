@@ -31,9 +31,9 @@
 
 :root {
     /* Familias tipográficas */
-    --font-principal: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    --font-titulos: 'Outfit', 'Inter', system-ui, sans-serif;
-    --font-sistema: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --font-principal: 'Nunito Sans', 'Segoe UI', Arial, sans-serif;
+    --font-titulos: 'Nunito Sans', 'Segoe UI', Arial, sans-serif;
+    --font-sistema: 'Nunito Sans', 'Segoe UI', Arial, sans-serif;
 
     /* Pesos tipográficos */
     --font-light: 300;

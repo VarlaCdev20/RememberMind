@@ -1,6 +1,6 @@
 <div class="relative mx-auto max-w-7xl space-y-6 py-6 px-4 sm:px-6 lg:px-8">
  {{-- ENCABEZADO --}}
- <section class="overflow-hidden rounded-[24px] border border-borde bg-fondo-panel shadow-[0_12px_28px_rgba(47,62,92,0.08)] backdrop-blur-xl">
+ <section class="overflow-hidden rounded-3xl border border-borde bg-fondo-panel shadow-[0_12px_28px_rgba(47,62,92,0.08)] backdrop-blur-xl">
  <div class="h-1 w-full bg-gradient-to-r from-[#E27D60] via-[#D9A27C] to-[#8DA280]"></div>
  <div class="p-6">
  <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
@@ -25,37 +25,37 @@
  {{-- TARJETAS DE INDICADORES REALES --}}
  <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-7">
  {{-- Total --}}
- <div class="rounded-[18px] border border-borde-suave bg-fondo-panel p-4 shadow-xs">
+ <div class="rounded-2xl border border-borde-suave bg-fondo-panel p-4 shadow-xs">
  <p class="text-[9px] font-bold uppercase tracking-[0.15em] text-apoyo">Total Alertas</p>
  <p class="mt-1.5 text-2xl font-black text-boton-acento">{{ $conteos['total'] }}</p>
  </div>
  {{-- Red de Apoyo --}}
- <div class="rounded-[18px] border border-borde-suave bg-fondo-panel p-4 shadow-xs">
+ <div class="rounded-2xl border border-borde-suave bg-fondo-panel p-4 shadow-xs">
  <p class="text-[9px] font-bold uppercase tracking-[0.15em] text-apoyo">Red de Apoyo</p>
  <p class="mt-1.5 text-2xl font-black text-titulo">{{ $conteos['red_de_apoyo'] }}</p>
  </div>
  {{-- Documentos --}}
- <div class="rounded-[18px] border border-borde-suave bg-fondo-panel p-4 shadow-xs">
+ <div class="rounded-2xl border border-borde-suave bg-fondo-panel p-4 shadow-xs">
  <p class="text-[9px] font-bold uppercase tracking-[0.15em] text-apoyo">Documentos</p>
  <p class="mt-1.5 text-2xl font-black text-titulo">{{ $conteos['documentacion'] }}</p>
  </div>
  {{-- Salud --}}
- <div class="rounded-[18px] border border-borde-suave bg-fondo-panel p-4 shadow-xs">
+ <div class="rounded-2xl border border-borde-suave bg-fondo-panel p-4 shadow-xs">
  <p class="text-[9px] font-bold uppercase tracking-[0.15em] text-apoyo">Salud y Cuidados</p>
  <p class="mt-1.5 text-2xl font-black text-titulo">{{ $conteos['salud_y_cuidados'] }}</p>
  </div>
  {{-- Evaluaciones --}}
- <div class="rounded-[18px] border border-borde-suave bg-fondo-panel p-4 shadow-xs">
+ <div class="rounded-2xl border border-borde-suave bg-fondo-panel p-4 shadow-xs">
  <p class="text-[9px] font-bold uppercase tracking-[0.15em] text-apoyo">Evaluaciones</p>
  <p class="mt-1.5 text-2xl font-black text-parrafo">{{ $conteos['evaluaciones'] }}</p>
  </div>
  {{-- Seguimiento --}}
- <div class="rounded-[18px] border border-borde-suave bg-fondo-panel p-4 shadow-xs">
+ <div class="rounded-2xl border border-borde-suave bg-fondo-panel p-4 shadow-xs">
  <p class="text-[9px] font-bold uppercase tracking-[0.15em] text-apoyo">Seguimiento</p>
  <p class="mt-1.5 text-2xl font-black text-estado-exito">{{ $conteos['seguimiento'] }}</p>
  </div>
  {{-- Estado --}}
- <div class="rounded-[18px] border border-borde-suave bg-fondo-panel p-4 shadow-xs">
+ <div class="rounded-2xl border border-borde-suave bg-fondo-panel p-4 shadow-xs">
  <p class="text-[9px] font-bold uppercase tracking-[0.15em] text-apoyo">Institucional</p>
  <p class="mt-1.5 text-2xl font-black text-slate-500">{{ $conteos['estado_institucional'] }}</p>
  </div>
@@ -67,7 +67,7 @@
  {{-- Filtros Rápidos (Categorías) --}}
  <div class="flex flex-wrap items-center gap-1.5">
  <span class="text-[10px] font-bold uppercase tracking-widestá text-apoyo mr-1">Filtrar:</span>
- 
+
  @php
  $filtros = [
  ['valor' => 'todas', 'label' => 'Todas'],

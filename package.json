@@ -20,6 +20,7 @@
     },
     "dependencies": {
         "@fontsource/inter": "^5.2.8",
+        "@fontsource/nunito-sans": "^5.3.0",
         "@fontsource/outfit": "^5.2.8",
         "aos": "^2.3.4",
         "axios": "^1.20.0",

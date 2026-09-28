@@ -2,7 +2,7 @@
  @php
  $colorClasses = [
  'emerald' => ['card' => 'border-emerald-200/70 bg-emerald-50/70', 'icon' => 'bg-emerald-100 text-emerald-700', 'badge' => 'bg-emerald-100 text-emerald-700'],
- 'amber' => ['card' => 'border-amber-200/70 bg-amber-50/70', 'icon' => 'bg-amber-100 text-amber-700', 'badge' => 'bg-amber-100 text-amber-700'],
+ 'amber' => ['card' => 'border-[var(--rm-warning)]/30/70 bg-[var(--rm-warning-soft)]/70', 'icon' => 'bg-[var(--rm-warning-soft)] text-[var(--rm-warning-strong)]', 'badge' => 'bg-[var(--rm-warning-soft)] text-[var(--rm-warning-strong)]'],
  'salmon' => ['card' => 'border-borde-focus bg-estado-peligroBg', 'icon' => 'bg-estado-peligroBg text-parrafo', 'badge' => 'bg-estado-peligroBg text-parrafo'],
  'blue' => ['card' => 'border-sky-200/70 bg-sky-50/70', 'icon' => 'bg-sky-100 text-sky-700', 'badge' => 'bg-sky-100 text-sky-700'],
  'green' => ['card' => 'border-estado-exitoBorde bg-estado-exitoBg', 'icon' => 'bg-estado-exitoBg text-parrafo', 'badge' => 'bg-estado-exitoBg text-parrafo'],
@@ -13,13 +13,13 @@
 
  $priorityClasses = [
  'Alta' => 'bg-rose-100 text-rose-700 border-rose-200',
- 'Media' => 'bg-amber-100 text-amber-700 border-amber-200',
+ 'Media' => 'bg-[var(--rm-warning-soft)] text-[var(--rm-warning-strong)] border-[var(--rm-warning)]/30',
  'Baja' => 'bg-emerald-100 text-emerald-700 border-emerald-200',
  ];
 
  $nivelColor = [
  'emerald' => 'bg-emerald-100 text-emerald-700 border-emerald-200',
- 'amber' => 'bg-amber-100 text-amber-700 border-amber-200',
+ 'amber' => 'bg-[var(--rm-warning-soft)] text-[var(--rm-warning-strong)] border-[var(--rm-warning)]/30',
  'rose' => 'bg-rose-100 text-rose-700 border-rose-200',
  ][$estadoSocial['nivel']['color']] ?? 'bg-fondo-app text-titulo border-borde-suave';
 
@@ -31,7 +31,7 @@
  <section class="min-h-[calc(100vh-7rem)] bg-fondo-panel px-3 py-4 text-titulo sm:px-4 lg:px-5">
  <div class="mx-auto max-w-[1480px] space-y-4">
  <div class="overflow-hidden rounded-2xl border border-borde-suave bg-fondo-panel shadow-[0_16px_42px_rgba(47,62,92,0.12)] backdrop-blur-xl">
- <div class="h-1.5 bg-gradient-to-r from-[#E27D60] via-[#D9A05B] to-[#8DA280]"></div>
+ <div class="h-1.5 bg-gradient-to-r from-[var(--rm-accent-terracotta)] via-[var(--rm-warning)] to-[var(--rm-action-primary)]"></div>
  <div class="flex flex-col gap-4 p-5 lg:flex-row lg:items-center lg:justify-between">
  <div class="flex min-w-0 items-start gap-4">
  <span class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-fondo-panel text-boton-acento shadow-sm">
@@ -273,7 +273,7 @@
  <h2 class="text-base font-extrabold text-titulo">Red de apoyo por completar</h2>
  <p class="mt-1 text-xs font-bold text-apoyo">Adultos mayores con vinculos, responsables o contactos pendientes.</p>
  </div>
- <span class="rounded-full bg-amber-100 px-2.5 py-1 text-xs font-bold text-amber-700">{{ $redIncompleta->count() }} casos</span>
+ <span class="rounded-full bg-[var(--rm-warning-soft)] px-2.5 py-1 text-xs font-bold text-[var(--rm-warning-strong)]">{{ $redIncompleta->count() }} casos</span>
  </div>
 
  <div class="overflow-hidden rounded-xl border border-borde-suave">

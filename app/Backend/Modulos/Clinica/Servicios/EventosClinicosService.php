@@ -2,6 +2,7 @@
 
 namespace App\Backend\Modulos\Clinica\Servicios;
 
+use App\Models\Alerta;
 use App\Models\Incidente;
 use App\Models\Residente;
 use Illuminate\Support\Collection;
@@ -15,13 +16,103 @@ class EventosClinicosService
      */
     public function obtenerEventos(Residente $residente): Collection
     {
-        return Incidente::query()
+        $incidentes = Incidente::query()
             ->where('cod_residente', $residente->cod_residente)
             ->with('registrador.usuario')
             ->latest('fecha_hora')
             ->get()
-            ->map(fn (Incidente $incidente) => $this->normalizar($incidente, $residente))
+            ->map(fn (Incidente $incidente) => $this->normalizar($incidente, $residente));
+
+        $codigosIncidente = $incidentes->pluck('id')->all();
+        $alertas = Alerta::query()
+            ->where('cod_residente', $residente->cod_residente)
+            ->with(['responsable.usuario', 'eventos.usuario'])
+            ->latest('fecha_hora')
+            ->get()
+            ->reject(fn (Alerta $alerta) => $alerta->modulo === 'INCIDENTES'
+                && in_array($alerta->cod_registro, $codigosIncidente, true))
+            ->map(fn (Alerta $alerta) => $this->normalizarAlerta($alerta, $residente));
+
+        return $incidentes
+            ->concat($alertas)
+            ->sortByDesc('fecha_hora_carbon')
             ->values();
+    }
+
+    private function normalizarAlerta(Alerta $alerta, Residente $residente): array
+    {
+        $tipo = $this->resolverTipo($alerta->tipo);
+        $estado = $this->resolverEstado($alerta->estado);
+        $fechaHora = $alerta->fecha_hora;
+        $eventoCierre = $alerta->eventos
+            ->where('tipo_evento', 'CIERRE')
+            ->sortByDesc('fecha_hora')
+            ->first();
+        $profesional = $alerta->responsable?->usuario?->name
+            ?? $eventoCierre?->usuario?->name
+            ?? 'No registrado';
+        $habitacion = $residente->cama?->habitacion?->nombre
+            ?? $residente->ocupacionActiva?->cama?->habitacion?->nombre;
+
+        return [
+            'id' => 'alerta-'.$alerta->cod_alerta,
+            'fecha_hora_carbon' => $fechaHora,
+            'fecha' => $fechaHora?->translatedFormat('d M Y') ?? 'Fecha no registrada',
+            'hora' => $fechaHora?->format('H:i') ?? '',
+            'tipo' => $tipo,
+            'tipo_label' => $this->etiquetaTipo($tipo),
+            'titulo' => $alerta->titulo ?: 'Alerta clínica',
+            'icono' => $this->iconoTipo($tipo),
+            'color_dot' => $this->colorPunto($estado),
+            'descripcion_resumida' => $alerta->descripcion ?: 'Sin descripción registrada.',
+            'descripcion_completa' => $alerta->descripcion ?: 'Sin descripción registrada.',
+            'profesional_nombre' => $profesional,
+            'profesional_rol' => $alerta->responsable?->profesion ?: 'No registrado',
+            'estado' => $estado,
+            'estado_badge' => Str::headline(Str::lower($estado)),
+            'estado_color' => $this->colorEstado($estado),
+            'lugar' => 'No registrado',
+            'piso' => $habitacion ? ($residente->cama?->habitacion?->piso ?? 'No registrado') : 'No registrado',
+            'habitacion' => $habitacion ?: 'No registrada',
+            'severidad' => $alerta->prioridad ?: 'No registrada',
+            'conclusion_inicial' => 'Sin conclusión registrada.',
+            'proxima_evaluacion_fecha' => $alerta->fecha_hora_limite?->format('d/m/Y H:i') ?? 'No registrada',
+            'proxima_evaluacion_responsable' => $profesional,
+            'plan_seguimiento' => [],
+            'valoracion' => [
+                'estado_general' => 'No registrado',
+                'nivel_conciencia' => 'No registrado',
+                'dolor_eva' => null,
+                'signos_vitales' => 'No registrados en esta alerta',
+                'movilidad' => 'No registrada',
+                'lesiones_encontradas' => 'No registradas',
+                'evaluacion_neuro' => 'No registrada',
+            ],
+            'intervenciones' => $alerta->eventos
+                ->whereIn('tipo_evento', ['ATENCION', 'INTERVENCION', 'SEGUIMIENTO'])
+                ->map(fn ($evento) => [
+                    'hora' => $evento->fecha_hora?->format('H:i') ?? '',
+                    'accion' => $evento->descripcion,
+                    'profesional' => $evento->usuario?->name ?? 'No registrado',
+                ])->values()->all(),
+            'seguimiento' => [
+                'estado_actual' => Str::headline(Str::lower($estado)),
+                'proxima_reevaluacion' => $alerta->fecha_hora_limite?->format('d/m/Y H:i') ?? 'No registrada',
+                'responsable' => $profesional,
+                'acciones_pendientes' => [],
+            ],
+            'documentos' => [],
+            'trazabilidad' => $alerta->eventos->sortBy('fecha_hora')->map(fn ($evento) => [
+                'fecha_hora' => $evento->fecha_hora?->format('d/m/Y H:i') ?? 'Fecha no registrada',
+                'usuario' => $evento->usuario?->name ?? 'No registrado',
+                'accion' => $evento->descripcion,
+            ])->values()->all(),
+            'resolucion' => $estado === 'RESUELTO' ? [
+                'fecha' => $eventoCierre?->fecha_hora?->format('d/m/Y H:i') ?? '',
+                'profesional' => $eventoCierre?->usuario?->name ?? $profesional,
+                'descripcion' => $eventoCierre?->descripcion ?: 'Sin detalle de cierre registrado.',
+            ] : null,
+        ];
     }
 
     private function normalizar(Incidente $incidente, Residente $residente): array

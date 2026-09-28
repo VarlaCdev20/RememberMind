@@ -11,7 +11,7 @@
             {{ $emptyMessage }}
         </div>
     @elseif(!empty($items))
-        <div class="relative pl-6 sm:pl-8 space-y-4 before:absolute before:left-3 before:top-2 before:bottom-2 before:w-0.5 before:bg-[var(--rm-border-soft)] dark:before:bg-stone-700">
+        <div class="relative pl-6 sm:pl-8 space-y-4 before:absolute before:left-3 before:top-2 before:bottom-2 before:w-0.5 before:bg-[var(--rm-border-soft)] dark:before:bg-[var(--rm-text-muted)]">
             @foreach($items as $item)
                 @php
                     $variant = $item['variant'] ?? 'default';

@@ -871,7 +871,7 @@
                                 rounded-xl
                                 border
                                 border-boton-acento/25
-                                bg-[var(--surface-card)]
+                                bg-[var(--rm-surface)]
                                 px-3
                                 py-1.5
                                 text-xs
@@ -943,7 +943,7 @@
                                 rounded-2xl
                                 border
                                 border-borde-suave
-                                bg-[var(--surface-card)]
+                                bg-[var(--rm-surface)]
                                 p-4
                                 shadow-card
                                 backdrop-blur-md
@@ -991,7 +991,7 @@
                                 rounded-2xl
                                 border
                                 border-borde-suave
-                                bg-[var(--surface-card)]
+                                bg-[var(--rm-surface)]
                                 p-4
                                 shadow-card
                                 backdrop-blur-md
@@ -1910,7 +1910,7 @@
                                         rounded-2xl
                                         border
                                         border-borde-suave
-                                        bg-[var(--surface-card)]
+                                        bg-[var(--rm-surface)]
                                         p-4
                                         shadow-card
                                         backdrop-blur-md

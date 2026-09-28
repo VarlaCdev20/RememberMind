@@ -31,7 +31,7 @@
  
  {{-- LOGO DE LA CASA --}}
  <div class="flex justify-center mb-6">
- <div class="flex h-14 w-14 items-center justify-center rounded-2xl bg-boton-acento text-inverso font-black shadow-lg shadow-[#E27D60]/20">
+ <div class="flex h-14 w-14 items-center justify-center rounded-2xl bg-boton-acento text-inverso font-black shadow-lg shadow-md">
  <span class="text-2xl font-outfit">C</span>
  </div>
  </div>
@@ -54,7 +54,7 @@
  </p>
 
  {{-- BOTÓN REGRESAR --}}
- <a href="/dashboard" class="inline-flex items-center gap-2.5 bg-boton-principal hover:bg-boton-acento text-inverso text-xs font-bold uppercase tracking-wider px-8 py-4 rounded-full shadow-lg shadow-[#2F3E5C]/15 transition duration-300 active:scale-95">
+ <a href="/dashboard" class="inline-flex items-center gap-2.5 bg-boton-principal hover:bg-boton-acento text-inverso text-xs font-bold uppercase tracking-wider px-8 py-4 rounded-full shadow-lg shadow-md transition duration-300 active:scale-95">
  <i class="ph-bold ph-arrow-left text-base"></i>
  Volver al panel principal
  </a>

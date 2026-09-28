@@ -1,4 +1,4 @@
-<div x-data="{ vista: 'cards' }">
+<div x-data="{ vista: 'cards' }" class="rm-pilot-usuarios rm-page-layout font-sans">
  @if($modoVista === 'detalle' && $usuarioDetalle)
  @php
  $rolKey = $usuarioDetalle->roles->first()?->name;
@@ -38,7 +38,7 @@
  if (!empty($usuarioDetalle->referencia_domicilio)) {
  $partesDireccion[] ="REF.:" . mb_strtoupper($usuarioDetalle->referencia_domicilio, 'UTF-8');
  }
- 
+
  if (empty($partesDireccion)) {
  $direccionCompleta = !empty($usuarioDetalle->direccion) ? mb_strtoupper($usuarioDetalle->direccion, 'UTF-8') : 'SIN DIRECCIÓN REGISTRADA';
  } else {
@@ -51,8 +51,8 @@
  {{-- CABECERA CON ACCIÓN DE RETORNO --}}
  <header class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between rounded-[1.6rem] border border-borde/55 bg-fondo-panel px-6 py-5 shadow-sm backdrop-blur-xl">
  <div class="flex items-center gap-3">
- <button type="button" 
- wire:click="volverAlListadoUsuarios" 
+ <button type="button"
+ wire:click="volverAlListadoUsuarios"
  class="flex h-10 w-10 items-center justify-center rounded-xl bg-fondo-card/80 border border-borde-suave text-parrafo transition hover:bg-boton-principal hover:text-inverso active:scale-95">
  <i class="ph-bold ph-arrow-left text-lg"></i>
  </button>
@@ -63,14 +63,14 @@
  </div>
  <div class="flex flex-wrap items-center gap-2">
  @can('usuarios.editar')
- <button type="button" 
+ <button type="button"
  wire:click="abrirEdicionDesdeDetalle"
  class="inline-flex h-10 items-center gap-2 rounded-full bg-boton-acento px-5 text-xs font-bold text-inverso shadow-sm transition hover:bg-fondo-panel active:scale-95">
  <i class="ph-bold ph-pencil-simple"></i>
  Editar Usuario
  </button>
  @endcan
- <button type="button" 
+ <button type="button"
  wire:click="volverAlListadoUsuarios"
  class="inline-flex h-10 items-center gap-2 rounded-full bg-fondo-card/60 border border-borde-suave px-5 text-xs font-bold text-parrafo transition hover:bg-fondo-card active:scale-95">
  <i class="ph-bold ph-list"></i>
@@ -89,7 +89,7 @@
  <i class="ph-bold ph-user text-4xl text-parrafo/35"></i>
  @endif
  </div>
- 
+
  <div class="flex-1 text-center md:text-left space-y-2">
  <div class="flex flex-wrap items-center justify-center md:justify-start gap-2">
  <h3 class="text-xl font-extrabold text-parrafo uppercase">{{ $usuarioDetalle->nombres }} {{ $usuarioDetalle->ap_paterno }} {{ $usuarioDetalle->ap_materno }}</h3>
@@ -97,7 +97,7 @@
  {{ $rolDisplay }}
  </span>
  </div>
- 
+
  <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs pt-2">
  <div>
  <span class="font-black text-meta uppercase tracking-wide block">Estado del Perfil:</span>
@@ -312,7 +312,7 @@
  <div>
  <span class="font-black text-meta uppercase tracking-wider block">Contacto de Emergencia:</span>
  <span class="font-bold text-parrafo uppercase">
- {{ $usuarioDetalle->contacto_emergencia ?: 'No registrado' }} 
+ {{ $usuarioDetalle->contacto_emergencia ?: 'No registrado' }}
  @if($usuarioDetalle->ap_paterno_emergencia || $usuarioDetalle->ap_materno_emergencia)
  {{ $usuarioDetalle->ap_paterno_emergencia }} {{ $usuarioDetalle->ap_materno_emergencia }}
  @endif
@@ -340,7 +340,7 @@
  <h4 class="flex items-center gap-2 border-b border-borde-suave pb-2 text-xs font-bold uppercase tracking-widest text-boton-acento">
  <i class="ph-bold ph-user-gear text-lg"></i> Perfil Institucional
  </h4>
- 
+
  @if(in_array($rolKey, ['SUPERADMINISTRADOR', 'ADMINISTRADOR']))
  <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 text-xs">
  <div>
@@ -354,10 +354,10 @@
  <div>
  <span class="font-black text-meta uppercase tracking-wider block">Fecha de Ingreso:</span>
  <span class="font-bold text-parrafo">
-  @php
-   $fechaIngresoAdmin = $usuarioDetalle->personalAdmin->fecha_ingreso ?? $usuarioDetalle->created_at ?? null;
-  @endphp
-  {{ $fechaIngresoAdmin ? \Carbon\Carbon::parse($fechaIngresoAdmin)->format('d/m/Y') : 'No registrada' }}
+ @php
+ $fechaIngresoAdmin = $usuarioDetalle->personalAdmin->fecha_ingreso ?? $usuarioDetalle->created_at ?? null;
+ @endphp
+ {{ $fechaIngresoAdmin ? \Carbon\Carbon::parse($fechaIngresoAdmin)->format('d/m/Y') : 'No registrada' }}
  </span>
  </div>
  </div>
@@ -379,10 +379,10 @@
  <div>
  <span class="font-black text-meta uppercase tracking-wider block">Fecha de Ingreso:</span>
  <span class="font-bold text-parrafo">
-  @php
-   $fechaIngresoSalud = $usuarioDetalle->personalSalud->fecha_ingreso ?? $usuarioDetalle->created_at ?? null;
-  @endphp
-  {{ $fechaIngresoSalud ? \Carbon\Carbon::parse($fechaIngresoSalud)->format('d/m/Y') : 'No registrada' }}
+ @php
+ $fechaIngresoSalud = $usuarioDetalle->personalSalud->fecha_ingreso ?? $usuarioDetalle->created_at ?? null;
+ @endphp
+ {{ $fechaIngresoSalud ? \Carbon\Carbon::parse($fechaIngresoSalud)->format('d/m/Y') : 'No registrada' }}
  </span>
  </div>
  </div>
@@ -417,7 +417,7 @@
  <h4 class="flex items-center gap-2 border-b border-borde-suave pb-2 text-xs font-bold uppercase tracking-widest text-boton-acento">
  <i class="ph-bold ph-files text-lg"></i> Documentación del Usuario
  </h4>
- 
+
  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-xs">
  <div class="space-y-3">
  <div>
@@ -436,7 +436,7 @@
  <span class="font-bold text-boton-acento">{{ $usuarioDetalle->created_at->addHours(48)->format('d/m/Y H:i') }}</span>
  </div>
  @endif
- 
+
  <div class="pt-2 flex flex-col gap-2">
  <div class="pt-2 flex flex-col gap-2">
  <a href="{{ route('admin.usuarios.documentos.pdf', $usuarioDetalle->cod_usuario) }}"
@@ -445,13 +445,13 @@
  <i class="ph-bold ph-printer"></i>
  Paquete Documental
  </a>
- <button type="button" 
+ <button type="button"
  onclick="enviarPaqueteCorreo('{{ $usuarioDetalle->cod_usuario }}', '{{ $usuarioDetalle->correo }}')"
  class="w-full inline-flex h-9 items-center justify-center gap-1.5 rounded-xl bg-fondo-panel text-[10px] font-bold text-parrafo border border-borde-fuerte transition hover:bg-boton-principal hover:text-inverso active:scale-95 shadow-sm">
  <i class="ph-bold ph-envelope"></i> Enviar Correo
  </button>
  <button type="button"
- @click="Swal.fire({ icon: 'info', title: '¿Cómo subir?', text: 'Seleccione el ícono de subida en la lista de requisitos a la derecha para cargar el archivo correspondiente.', confirmButtonColor: '#2F3E5C', customClass: { popup: 'rounded-[1.5rem]' } })"
+ @click="Swal.fire({ icon: 'info', title: '¿Cómo subir?', text: 'Seleccione el ícono de subida en la lista de requisitos a la derecha para cargar el archivo correspondiente.', confirmButtonColor: 'var(--rm-earth-900)', customClass: { popup: 'rounded-[1.5rem]' } })"
  class="w-full inline-flex h-9 items-center justify-center gap-1.5 rounded-xl bg-fondo-card text-xs font-bold text-boton-acento border border-borde-focus transition hover:bg-boton-acento hover:text-inverso active:scale-95 shadow-md mt-2">
  <i class="ph-bold ph-upload-simple"></i>
  Subir Requisitos
@@ -459,7 +459,7 @@
  </div>
  </div>
  </div>
- 
+
  <div class="md:col-span-2">
  <span class="font-black text-meta uppercase tracking-wider block mb-2">Lista de Requisitos Obligatorios:</span>
  <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -509,7 +509,7 @@
  <i class="ph-bold ph-eye text-xs"></i>
  </a>
  @endcan
- 
+
  <!-- Reemplazar documento -->
  @canany(['documentos.subir', 'documentos.gestionar'])
  <button type="button" wire:click="abrirModalSubirDoc('{{ $item['cod_tipo_doc'] }}')"
@@ -630,7 +630,7 @@
  <h4 class="flex items-center gap-2 border-b border-borde-suave pb-2 text-xs font-bold uppercase tracking-widest text-boton-acento">
  <i class="ph-bold ph-users-three text-lg"></i> Vinculación Familiar
  </h4>
- 
+
  @if($famDetalle && $famDetalle->adultosMayores->isNotEmpty())
  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
  @foreach($famDetalle->adultosMayores as $am)
@@ -654,11 +654,11 @@
 
  // Format Adulto Mayor CI and Age
  $nombreAm = trim("{$am->nombres} {$am->ap_paterno} {$am->ap_materno}");
- $documentoAm = !empty($am->ci) 
- ?"CI" . $am->ci ."" . ($am->expedicion_ci ?: '') 
+ $documentoAm = !empty($am->ci)
+ ?"CI" . $am->ci ."" . ($am->expedicion_ci ?: '')
  :"SIN DOCUMENTO REGISTRADO";
- $edadAm = $am->fecha_nac 
- ? \Carbon\Carbon::parse($am->fecha_nac)->age ." AÑOS" 
+ $edadAm = $am->fecha_nac
+ ? \Carbon\Carbon::parse($am->fecha_nac)->age ." AÑOS"
  :"EDAD NO REGISTRADA";
  $amLabel ="{$nombreAm} — {$documentoAm} — {$edadAm}";
  @endphp
@@ -709,14 +709,14 @@
  @endif
  </div>\n\n {{-- BOTÓN VOLVER ARRIBA / ACCIONES PIE --}}
  <div class="flex items-center justify-between border-t border-borde-suave pt-4">
- <button type="button" 
- wire:click="volverAlListadoUsuarios" 
+ <button type="button"
+ wire:click="volverAlListadoUsuarios"
  class="inline-flex h-9 items-center gap-2 rounded-xl bg-fondo-panel px-4 text-xs font-bold text-parrafo transition hover:bg-boton-principal hover:text-inverso active:scale-95">
  <i class="ph-bold ph-arrow-left"></i>
  Volver al Listado
  </button>
- <button type="button" 
- onclick="window.scrollTo({top: 0, behavior: 'smooth'})" 
+ <button type="button"
+ onclick="window.scrollTo({top: 0, behavior: 'smooth'})"
  class="inline-flex h-9 items-center gap-2 rounded-xl bg-fondo-card/60 border border-borde-suave px-4 text-xs font-bold text-parrafo transition hover:bg-fondo-card active:scale-95">
  <i class="ph-bold ph-arrow-up"></i>
  Ir arriba
@@ -726,674 +726,597 @@
 
  @else
 
- {{-- ENCABEZADO LIMPIO Y MÁS DELGADO --}}
- <header class="mb-5 rounded-[1.6rem] border border-borde/55 bg-fondo-panel px-6 py-5 shadow-[0_10px_26px_rgba(47,62,92,0.07)] backdrop-blur-xl">
- <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+ {{-- ENCABEZADO INSTITUCIONAL CANÓNICO --}}
+ <header class="rm-page-header mb-5 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
  <div class="flex items-center gap-4">
- <div class="hidden h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-boton-principal text-inverso shadow-lg shadow-[#2F3E5C]/15 sm:flex">
- <i class="ph-bold ph-users-three text-xl"></i>
- </div>
-
- <div>
- <p class="text-[10px] font-bold uppercase tracking-[0.28em] text-boton-acento">
- Gestión institucional
- </p>
-
- <h1 class="mt-1 text-3xl font-black tracking-tight text-parrafo md:text-[2.3rem]">
- Usuarios del <span class="text-boton-acento">sistema</span>
- </h1>
-
- <p class="mt-1 max-w-2xl text-sm font-semibold leading-6 text-parrafo/58">
- Administra cuentas, accesos y perfiles autorizados dentro de CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS.
- </p>
- </div>
+  <span class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[var(--rm-primary)] text-[var(--rm-text-on-primary)] shadow-md">
+  <i class="ph-bold ph-users-three text-2xl"></i>
+  </span>
+  <div class="rm-page-title-group min-w-0">
+  <p class="text-xs font-bold uppercase tracking-[0.2em] text-[var(--rm-primary)]">
+   Gestión institucional
+  </p>
+  <h1 class="rm-page-title text-[var(--rm-text-primary)] font-black text-2xl sm:text-3xl leading-tight tracking-tight">
+   Usuarios del <span class="text-[var(--rm-primary)]">sistema</span>
+  </h1>
+  <p class="rm-page-subtitle text-[var(--rm-text-secondary)] font-semibold text-xs sm:text-sm mt-0.5 leading-snug">
+   Administra cuentas, accesos y perfiles autorizados dentro del Centro Geriátrico Jardín de los Recuerdos.
+  </p>
+  </div>
  </div>
 
  @can('usuarios.crear')
- <button type="button"
- wire:click="crearUsuario"
- class="inline-flex items-center justify-center gap-2 rounded-full bg-boton-acento px-6 py-3 text-sm font-bold text-inverso shadow-lg shadow-[#E27D60]/20 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl active:translate-y-0 active:scale-95">
- <i class="ph-bold ph-plus-circle text-lg"></i>
- Nuevo usuario
- </button>
+  <div class="flex shrink-0 items-center gap-2.5">
+  <button type="button"
+   wire:click="crearUsuario"
+   class="rm-btn rm-btn-accent cursor-pointer shadow-md">
+   <i class="ph-bold ph-plus-circle text-lg"></i>
+   <span>Nuevo usuario</span>
+  </button>
+  </div>
  @endcan
- </div>
  </header>
 
- {{-- MÉTRICAS PRINCIPALES --}}
+ {{-- MÉTRICAS PRINCIPALES (KPIS) --}}
  <section class="mb-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
- <article class="rounded-[1.35rem] border border-borde bg-fondo-panel p-5 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:bg-fondo-panel hover:shadow-md">
- <div class="flex items-center justify-between">
- <div>
- <p class="text-[10px] font-bold uppercase tracking-[0.22em] text-parrafo/42">
- Usuarios registrados
- </p>
- <p class="mt-2 text-2xl font-black text-parrafo">
- {{ method_exists($usuarios, 'total') ? $usuarios->total() : $usuarios->count() }}
- </p>
+ <div class="rm-card-metric border-l-4 border-l-[var(--rm-primary)]">
+  <div class="flex items-center justify-between">
+  <span class="rm-metric-label">Usuarios registrados</span>
+  <span class="flex h-9 w-9 items-center justify-center rounded-xl bg-[var(--rm-surface-soft)] text-[var(--rm-primary)]">
+   <i class="ph-bold ph-users text-lg"></i>
+  </span>
+  </div>
+  <p class="rm-metric-value mt-2">
+  {{ method_exists($usuarios, 'total') ? $usuarios->total() : $usuarios->count() }}
+  </p>
+  <div class="rm-metric-meta mt-1">
+  <span>Total de cuentas en la base institucional</span>
+  </div>
  </div>
 
- <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-fondo-panel text-parrafo">
- <i class="ph-bold ph-users text-xl"></i>
- </div>
- </div>
- </article>
-
- <article class="rounded-[1.35rem] border border-borde bg-fondo-panel p-5 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:bg-fondo-panel hover:shadow-md">
- <div class="flex items-center justify-between">
- <div>
- <p class="text-[10px] font-bold uppercase tracking-[0.22em] text-parrafo/42">
- Activos
- </p>
- <p class="mt-2 text-2xl font-black text-estado-exito">
- {{ $usuarios->filter(fn($u) => $u->estado === 'ACTIVO')->count() }}
- </p>
+ <div class="rm-card-metric border-l-4 border-l-[var(--rm-success)]">
+  <div class="flex items-center justify-between">
+  <span class="rm-metric-label text-[var(--rm-success)]">Usuarios Activos</span>
+  <span class="flex h-9 w-9 items-center justify-center rounded-xl bg-[var(--rm-success-soft)] text-[var(--rm-success)]">
+   <i class="ph-bold ph-user-check text-lg"></i>
+  </span>
+  </div>
+  <p class="rm-metric-value mt-2 text-[var(--rm-success)]">
+  {{ $usuarios->filter(fn($u) => $u->estado === 'ACTIVO')->count() }}
+  </p>
+  <div class="rm-metric-meta mt-1">
+  <span>Habilitados para operar en la plataforma</span>
+  </div>
  </div>
 
- <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-estado-exitoBg text-estado-exito">
- <i class="ph-bold ph-user-check text-xl"></i>
+ <div class="rm-card-metric border-l-4 border-l-[var(--rm-border)]">
+  <div class="flex items-center justify-between">
+  <span class="rm-metric-label">Usuarios Inactivos</span>
+  <span class="flex h-9 w-9 items-center justify-center rounded-xl bg-[var(--rm-surface-soft)] text-[var(--rm-text-secondary)]">
+   <i class="ph-bold ph-user-minus text-lg"></i>
+  </span>
+  </div>
+  <p class="rm-metric-value mt-2 text-[var(--rm-text-secondary)]">
+  {{ $usuarios->filter(fn($u) => $u->estado !== 'ACTIVO')->count() }}
+  </p>
+  <div class="rm-metric-meta mt-1">
+  <span>Cuentas suspendidas o bloqueadas</span>
+  </div>
  </div>
- </div>
- </article>
-
- <article class="rounded-[1.35rem] border border-borde bg-fondo-panel p-5 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:bg-fondo-panel hover:shadow-md">
- <div class="flex items-center justify-between">
- <div>
- <p class="text-[10px] font-bold uppercase tracking-[0.22em] text-parrafo/42">
- Inactivos
- </p>
- <p class="mt-2 text-2xl font-black text-parrafo">
- {{ $usuarios->filter(fn($u) => $u->estado !== 'ACTIVO')->count() }}
- </p>
- </div>
-
- <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-fondo-panel text-parrafo">
- <i class="ph-bold ph-user-minus text-xl"></i>
- </div>
- </div>
- </article>
  </section>
 
- {{-- VISTAS --}}
-<section class="mb-4">
- <div class="inline-flex max-w-full flex-wrap items-center gap-2 rounded-[1.3rem] bg-fondo-panel px-2 py-2 shadow-[0_10px_24px_rgba(47,62,92,0.10)] backdrop-blur-md">
- <button type="button"
- @click="vista = 'cards'"
- :class="vista === 'cards'
- ? 'bg-boton-principal text-inverso shadow-[0_8px_18px_rgba(47,62,92,0.20)]'
- : 'text-parrafo/72 hover:bg-fondo-card/45 hover:text-parrafo'"
- class="inline-flex h-9 items-center gap-2 rounded-xl px-4 text-[11px] font-bold transition-all duration-300 hover:-translate-y-0.5 active:scale-95">
- <i class="ph-bold ph-identification-card text-sm"></i>
- Vista tarjetas
- </button>
+ {{-- SELECTOR DE VISTAS --}}
+ <section class="mb-4">
+ <div class="inline-flex max-w-full flex-wrap items-center gap-1.5 rounded-2xl bg-[var(--rm-surface-soft)] border border-[var(--rm-border-soft)] p-1.5 shadow-xs">
+  <button type="button"
+  @click="vista = 'cards'"
+  :class="vista === 'cards'
+   ? 'bg-[var(--rm-primary)] text-[var(--rm-text-on-primary)] shadow-xs'
+   : 'text-[var(--rm-text-secondary)] hover:bg-[var(--rm-surface)] hover:text-[var(--rm-text-primary)]'"
+  class="inline-flex h-9 items-center gap-2 rounded-xl px-4 text-xs font-bold transition cursor-pointer">
+  <i class="ph-bold ph-identification-card text-base"></i>
+  Vista tarjetas
+  </button>
 
- <button type="button"
- @click="vista = 'table'"
- :class="vista === 'table'
- ? 'bg-boton-principal text-inverso shadow-[0_8px_18px_rgba(47,62,92,0.20)]'
- : 'text-parrafo/72 hover:bg-fondo-card/45 hover:text-parrafo'"
- class="inline-flex h-9 items-center gap-2 rounded-xl px-4 text-[11px] font-bold transition-all duration-300 hover:-translate-y-0.5 active:scale-95">
- <i class="ph-bold ph-table text-sm"></i>
- Tabla compacta
- </button>
+  <button type="button"
+  @click="vista = 'table'"
+  :class="vista === 'table'
+   ? 'bg-[var(--rm-primary)] text-[var(--rm-text-on-primary)] shadow-xs'
+   : 'text-[var(--rm-text-secondary)] hover:bg-[var(--rm-surface)] hover:text-[var(--rm-text-primary)]'"
+  class="inline-flex h-9 items-center gap-2 rounded-xl px-4 text-xs font-bold transition cursor-pointer">
+  <i class="ph-bold ph-table text-base"></i>
+  Tabla compacta
+  </button>
  </div>
-</section>
+ </section>
 
-    {{-- BARRA DE FILTROS UNIFICADA FORMATO ALERTAS --}}
-    <section class="rm-filter-bar mb-4">
-        <div class="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-2 items-center">
-            {{-- Buscar --}}
-            <div class="lg:col-span-3 relative flex items-center">
-                <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-[#677084] dark:text-[#9A9084]">
-                    <i class="ph-bold ph-magnifying-glass text-base"></i>
-                </span>
-                <input type="text"
-                    wire:model.defer="search"
-                    placeholder="Nombre o correo..."
-                    class="w-full rounded-xl border border-[#C7B9AA] dark:border-[#423B34] bg-[#F0E8DE] dark:bg-[#26221F] py-2 pl-9 pr-8 text-xs font-medium text-[#304060] dark:text-[#F3EAE1] placeholder-[#677084] dark:placeholder-[#8C8276] focus:border-[#A35A44] focus:outline-none h-[38px]">
-                @if($search !== '')
-                    <button type="button"
-                        wire:click="$set('search', ''); $wire.aplicarFiltros();"
-                        class="absolute inset-y-0 right-0 flex items-center pr-2.5 text-[#677084] hover:text-[#A35A44] cursor-pointer"
-                        title="Limpiar búsqueda">
-                        <i class="ph-bold ph-x-circle text-base"></i>
-                    </button>
-                @endif
-            </div>
+ {{-- BARRA DE FILTROS CANÓNICA FORMATO ALERTAS --}}
+ <x-ui.filter-bar class="mb-4">
+ <div class="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-2 items-center">
+  {{-- Buscar --}}
+  <div class="lg:col-span-3 relative flex items-center">
+  <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-[var(--rm-text-secondary)]">
+   <i class="ph-bold ph-magnifying-glass text-base"></i>
+  </span>
+  <input type="text"
+   wire:model.defer="search"
+   wire:keydown.enter="aplicarFiltros"
+   placeholder="Buscar por nombre o correo..."
+   class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-input-bg)] py-2 pl-9 pr-8 text-xs font-medium text-[var(--rm-text-primary)] placeholder-[var(--rm-text-secondary)] focus:border-[var(--rm-primary)] focus:ring-1 focus:ring-[var(--rm-primary)] focus:outline-none h-[44px]">
+  @if($search !== '')
+   <button type="button"
+   wire:click="$set('search', ''); $wire.aplicarFiltros();"
+   class="absolute inset-y-0 right-0 flex items-center pr-2.5 text-[var(--rm-text-secondary)] hover:text-[var(--rm-primary)] cursor-pointer"
+   title="Limpiar búsqueda">
+   <i class="ph-bold ph-x-circle text-base"></i>
+   </button>
+  @endif
+  </div>
 
-            {{-- Rol --}}
-            <div class="lg:col-span-2">
-                <select wire:model.defer="filtroRol"
-                    class="w-full rounded-xl border border-[#C7B9AA] dark:border-[#4E463E] bg-[#F0E8DE] dark:bg-[#211E1B] py-2 px-3 text-xs font-medium text-[#304060] dark:text-[#E8DFD5] focus:border-[#A35A44] focus:outline-none h-[38px]">
-                    <option value="">Todos los roles</option>
-                    @foreach($roles as $r)
-                        <option value="{{ $r->name }}">{{ strtoupper(str_replace('_', ' ', $r->name)) }}</option>
-                    @endforeach
-                </select>
-            </div>
+  {{-- Rol --}}
+  <div class="lg:col-span-2">
+  <select wire:model.defer="filtroRol"
+   class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-input-bg)] py-2 px-3 text-xs font-medium text-[var(--rm-text-primary)] focus:border-[var(--rm-primary)] focus:ring-1 focus:ring-[var(--rm-primary)] focus:outline-none h-[44px] cursor-pointer">
+   <option value="">Todos los roles</option>
+   @foreach($roles as $r)
+   <option value="{{ $r->name }}">{{ strtoupper(str_replace('_', ' ', $r->name)) }}</option>
+   @endforeach
+  </select>
+  </div>
 
-            {{-- Área --}}
-            <div class="lg:col-span-2">
-                <select wire:model.defer="filtroArea"
-                    class="w-full rounded-xl border border-[#C7B9AA] dark:border-[#4E463E] bg-[#F0E8DE] dark:bg-[#211E1B] py-2 px-3 text-xs font-medium text-[#304060] dark:text-[#E8DFD5] focus:border-[#A35A44] focus:outline-none h-[38px]">
-                    <option value="">Todas las áreas</option>
-                    @foreach($areas as $ar)
-                        <option value="{{ $ar->cod_area }}">{{ $ar->nombre }}</option>
-                    @endforeach
-                </select>
-            </div>
+  {{-- Área --}}
+  <div class="lg:col-span-2">
+  <select wire:model.defer="filtroArea"
+   class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-input-bg)] py-2 px-3 text-xs font-medium text-[var(--rm-text-primary)] focus:border-[var(--rm-primary)] focus:ring-1 focus:ring-[var(--rm-primary)] focus:outline-none h-[44px] cursor-pointer">
+   <option value="">Todas las áreas</option>
+   @foreach($areas as $ar)
+   <option value="{{ $ar->cod_area }}">{{ $ar->nombre }}</option>
+   @endforeach
+  </select>
+  </div>
 
-            {{-- Estado --}}
-            <div class="lg:col-span-2">
-                <select wire:model.defer="filtroEstado"
-                    class="w-full rounded-xl border border-[#C7B9AA] dark:border-[#4E463E] bg-[#F0E8DE] dark:bg-[#211E1B] py-2 px-3 text-xs font-medium text-[#304060] dark:text-[#E8DFD5] focus:border-[#A35A44] focus:outline-none h-[38px]">
-                    <option value="">Todos los estados</option>
-                    <option value="ACTIVO">Activos</option>
-                    <option value="INACTIVO">Inactivos</option>
-                </select>
-            </div>
+  {{-- Estado --}}
+  <div class="lg:col-span-2">
+  <select wire:model.defer="filtroEstado"
+   class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-input-bg)] py-2 px-3 text-xs font-medium text-[var(--rm-text-primary)] focus:border-[var(--rm-primary)] focus:ring-1 focus:ring-[var(--rm-primary)] focus:outline-none h-[44px] cursor-pointer">
+   <option value="">Todos los estados</option>
+   <option value="ACTIVO">Activos</option>
+   <option value="INACTIVO">Inactivos</option>
+  </select>
+  </div>
 
-            {{-- Género --}}
-            <div class="lg:col-span-2">
-                <select wire:model.defer="filtroGenero"
-                    class="w-full rounded-xl border border-[#C7B9AA] dark:border-[#4E463E] bg-[#F0E8DE] dark:bg-[#211E1B] py-2 px-3 text-xs font-medium text-[#304060] dark:text-[#E8DFD5] focus:border-[#A35A44] focus:outline-none h-[38px]">
-                    <option value="">Todos los géneros</option>
-                    <option value="FEMENINO">Femenino</option>
-                    <option value="MASCULINO">Masculino</option>
-                </select>
-            </div>
+  {{-- Género --}}
+  <div class="lg:col-span-2">
+  <select wire:model.defer="filtroGenero"
+   class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-input-bg)] py-2 px-3 text-xs font-medium text-[var(--rm-text-primary)] focus:border-[var(--rm-primary)] focus:ring-1 focus:ring-[var(--rm-primary)] focus:outline-none h-[44px] cursor-pointer">
+   <option value="">Todos los géneros</option>
+   <option value="FEMENINO">Femenino</option>
+   <option value="MASCULINO">Masculino</option>
+  </select>
+  </div>
 
-            {{-- Botón Aplicar --}}
-            <div class="lg:col-span-1 flex justify-end">
-                <button type="button"
-                    wire:click="aplicarFiltros"
-                    class="w-full h-[38px] inline-flex items-center justify-center gap-1 rounded-xl bg-[#A35A44] text-white hover:bg-[#884A39] transition font-bold cursor-pointer"
-                    title="Aplicar filtros">
-                    <i class="ph-bold ph-funnel text-base"></i>
-                </button>
-            </div>
-        </div>
+  {{-- Botón Aplicar --}}
+  <div class="lg:col-span-1 flex justify-end">
+  <button type="button"
+   wire:click="aplicarFiltros"
+   class="w-full h-[44px] inline-flex items-center justify-center gap-1.5 rounded-xl bg-[var(--rm-primary)] hover:bg-[var(--rm-primary-hover)] text-white font-bold text-xs shadow-xs transition cursor-pointer"
+   title="Aplicar filtros">
+   <i class="ph-bold ph-funnel text-base"></i>
+   <span class="lg:hidden">Filtrar</span>
+  </button>
+  </div>
+ </div>
 
-        {{-- Fila de chips de filtros activos --}}
-        @php
-            $hasFiltrosActivos = !empty($search) || !empty($filtroRol) || !empty($filtroArea) || !empty($filtroEstado) || !empty($filtroGenero);
-        @endphp
-        @if($hasFiltrosActivos)
-            <div class="rm-filter-bar__active">
-                <div class="flex flex-wrap items-center gap-1.5">
-                    <span class="rm-filter-bar__active-label">
-                        <i class="ph-bold ph-funnel text-xs"></i> Filtros activos:
-                    </span>
-                    @if(!empty($search))
-                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[#F0E8DE] dark:bg-[#211E1B] border border-[#C7B9AA] dark:border-[#4E463E] text-[11px] font-semibold text-[#304060] dark:text-[#F3EAE1]">
-                            <span>Búsqueda: "{{ Str::limit($search, 16) }}"</span>
-                            <button type="button" wire:click="$set('search', ''); $wire.aplicarFiltros();" class="hover:text-[#A35A44] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
-                        </span>
-                    @endif
-                    @if(!empty($filtroRol))
-                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[#304060]/10 dark:bg-[#F3EAE1]/10 border border-[#C7B9AA] text-[11px] font-bold text-[#304060] dark:text-[#F3EAE1]">
-                            <span>Rol: {{ strtoupper(str_replace('_', ' ', $filtroRol)) }}</span>
-                            <button type="button" wire:click="$set('filtroRol', ''); $wire.aplicarFiltros();" class="hover:text-[#A35A44] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
-                        </span>
-                    @endif
-                    @if(!empty($filtroArea))
-                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[#71876A]/15 border border-[#71876A]/30 text-[11px] font-bold text-[#495B44] dark:text-[#9FB897]">
-                            <span>Área filtrada</span>
-                            <button type="button" wire:click="$set('filtroArea', ''); $wire.aplicarFiltros();" class="hover:text-[#A35A44] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
-                        </span>
-                    @endif
-                    @if(!empty($filtroEstado))
-                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[#D2A45E]/15 border border-[#D2A45E]/30 text-[11px] font-bold text-[#8C6422] dark:text-[#E2BD7E]">
-                            <span>Estado: {{ $filtroEstado }}</span>
-                            <button type="button" wire:click="$set('filtroEstado', ''); $wire.aplicarFiltros();" class="hover:text-[#A35A44] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
-                        </span>
-                    @endif
-                    @if(!empty($filtroGenero))
-                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[#304060]/10 dark:bg-[#F3EAE1]/10 border border-[#C7B9AA] text-[11px] font-bold text-[#304060] dark:text-[#F3EAE1]">
-                            <span>Género: {{ $filtroGenero === 'FEMENINO' ? 'Fem.' : 'Masc.' }}</span>
-                            <button type="button" wire:click="$set('filtroGenero', ''); $wire.aplicarFiltros();" class="hover:text-[#A35A44] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
-                        </span>
-                    @endif
-                </div>
-                <div class="flex items-center gap-2.5">
-                    <span class="text-[11px] px-2.5 py-0.5 rounded-full font-bold bg-[#304060]/10 dark:bg-[#F3EAE1]/10 text-[#304060] dark:text-[#F3EAE1]">
-                        {{ $usuarios->total() ?? count($usuarios) }} coincidentes
-                    </span>
-                    <button type="button"
-                        wire:click="limpiarFiltros"
-                        class="inline-flex items-center gap-1 rounded-xl bg-[#A35A44]/15 hover:bg-[#A35A44]/25 text-[#A35A44] dark:text-[#D58C79] py-1 px-2.5 text-xs font-bold transition cursor-pointer">
-                        <i class="ph-bold ph-arrow-counter-clockwise"></i>
-                        <span>Limpiar filtros</span>
-                    </button>
-                </div>
-            </div>
-        @endif
-    </section>
+ {{-- Fila de chips de filtros activos --}}
+ @php
+  $hasFiltrosActivos = !empty($search) || !empty($filtroRol) || !empty($filtroArea) || !empty($filtroEstado) || !empty($filtroGenero);
+ @endphp
+ @if($hasFiltrosActivos)
+  <div class="rm-filter-bar__active mt-3 pt-2.5 border-t border-[var(--rm-border-soft)] flex flex-wrap items-center justify-between gap-2">
+  <div class="flex flex-wrap items-center gap-1.5">
+   <span class="rm-filter-bar__active-label text-xs font-bold text-[var(--rm-text-secondary)] flex items-center gap-1">
+   <i class="ph-bold ph-funnel text-xs text-[var(--rm-primary)]"></i> Filtros activos:
+   </span>
+   @if(!empty($search))
+   <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[var(--rm-surface-soft)] border border-[var(--rm-border)] text-xs font-semibold text-[var(--rm-text-primary)]">
+    <span>Búsqueda: "{{ Str::limit($search, 16) }}"</span>
+    <button type="button" wire:click="$set('search', ''); $wire.aplicarFiltros();" class="hover:text-[var(--rm-primary)] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
+   </span>
+   @endif
+   @if(!empty($filtroRol))
+   <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[var(--rm-surface-soft)] border border-[var(--rm-border)] text-xs font-bold text-[var(--rm-primary)]">
+    <span>Rol: {{ strtoupper(str_replace('_', ' ', $filtroRol)) }}</span>
+    <button type="button" wire:click="$set('filtroRol', ''); $wire.aplicarFiltros();" class="hover:text-[var(--rm-primary)] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
+   </span>
+   @endif
+   @if(!empty($filtroArea))
+   <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[var(--rm-olive-soft)]/30 border border-[var(--rm-olive)]/40 text-xs font-bold text-[var(--rm-olive-strong)]">
+    <span>Área filtrada</span>
+    <button type="button" wire:click="$set('filtroArea', ''); $wire.aplicarFiltros();" class="hover:text-[var(--rm-primary)] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
+   </span>
+   @endif
+   @if(!empty($filtroEstado))
+   <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[var(--rm-surface-soft)] border border-[var(--rm-border)] text-xs font-bold text-[var(--rm-text-primary)]">
+    <span>Estado: {{ $filtroEstado }}</span>
+    <button type="button" wire:click="$set('filtroEstado', ''); $wire.aplicarFiltros();" class="hover:text-[var(--rm-primary)] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
+   </span>
+   @endif
+   @if(!empty($filtroGenero))
+   <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[var(--rm-surface-soft)] border border-[var(--rm-border)] text-xs font-bold text-[var(--rm-text-primary)]">
+    <span>Género: {{ $filtroGenero === 'FEMENINO' ? 'Fem.' : 'Masc.' }}</span>
+    <button type="button" wire:click="$set('filtroGenero', ''); $wire.aplicarFiltros();" class="hover:text-[var(--rm-primary)] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
+   </span>
+   @endif
+  </div>
+  <div class="flex items-center gap-2.5">
+   <span class="text-xs px-2.5 py-0.5 rounded-full font-bold bg-[var(--rm-surface-soft)] text-[var(--rm-text-secondary)]">
+   {{ method_exists($usuarios, 'total') ? $usuarios->total() : count($usuarios) }} coincidentes
+   </span>
+   <button type="button"
+   wire:click="limpiarFiltros"
+   class="inline-flex items-center gap-1 rounded-xl bg-[var(--rm-primary)]/10 hover:bg-[var(--rm-primary)]/20 text-[var(--rm-primary)] py-1 px-2.5 text-xs font-bold transition cursor-pointer">
+   <i class="ph-bold ph-arrow-counter-clockwise"></i>
+   <span>Limpiar filtros</span>
+   </button>
+  </div>
+  </div>
+ @endif
+ </x-ui.filter-bar>
 
  {{-- CONTENIDO PRINCIPAL --}}
  <section class="relative">
- <div wire:loading.delay wire:target="aplicarFiltros,limpiarFiltros,toggleEstado,abrirFichaRapida,abrirVistaCompleta,editarUsuario" class="absolute inset-0 z-[60] flex items-center justify-center rounded-[2rem] bg-fondo-card/45 backdrop-blur-sm">
- <div class="flex items-center gap-3 rounded-full bg-fondo-card px-5 py-3 shadow-lg">
- <i class="ph-bold ph-spinner animate-spin text-2xl text-boton-acento"></i>
- <span class="text-xs font-bold uppercase tracking-widest text-parrafo">
- Cargando
- </span>
- </div>
+ <div wire:loading.delay wire:target="aplicarFiltros,limpiarFiltros,toggleEstado,abrirFichaRapida,abrirVistaCompleta,editarUsuario" class="absolute inset-0 z-[60] flex items-center justify-center rounded-[2rem] bg-[var(--rm-surface)]/60 backdrop-blur-sm">
+  <div class="flex items-center gap-3 rounded-full bg-[var(--rm-surface)] border border-[var(--rm-border)] px-5 py-3 shadow-lg">
+  <i class="ph-bold ph-spinner animate-spin text-2xl text-[var(--rm-primary)]"></i>
+  <span class="text-xs font-bold uppercase tracking-widest text-[var(--rm-text-primary)]">
+   Cargando
+  </span>
+  </div>
  </div>
 
- {{-- VISTA TARJETAS --}}
+ {{-- VISTA TARJETAS: REUTILIZANDO <x-patterns.entity-card> --}}
  <div x-show="vista === 'cards'" x-transition.opacity.duration.200ms>
- <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
- @forelse($usuarios as $u)
- @php
- $roleName = $u->getRoleNames()->first() ?? 'sin_rol';
- $roleKey = strtolower($roleName);
- $estaInactivo = $u->estado !== 'ACTIVO';
+  <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+  @forelse($usuarios as $u)
+   @php
+   $roleName = $u->getRoleNames()->first() ?? 'sin_rol';
+   $roleKey = strtolower($roleName);
+   $estaInactivo = $u->estado !== 'ACTIVO';
 
- $nombreCompleto = trim(($u->nombres ?? '') . ' ' . ($u->ap_paterno ?? '') . ' ' . ($u->ap_materno ?? ''));
- $nombreCompleto = $nombreCompleto !== '' ? $nombreCompleto : ($u->correo ?? 'Usuario sin nombre');
+   $nombreCompleto = trim(($u->nombres ?? '') . ' ' . ($u->ap_paterno ?? '') . ' ' . ($u->ap_materno ?? ''));
+   $nombreCompleto = $nombreCompleto !== '' ? $nombreCompleto : ($u->correo ?? 'Usuario sin nombre');
 
- $inicial = mb_substr(trim($u->nombres ?? $nombreCompleto), 0, 1);
+   $inicial = mb_substr(trim($u->nombres ?? $nombreCompleto), 0, 1);
 
- $areaDisplay = $u->areaInstitucional?->nombre ?? match($roleKey) {
- 'super_admin', 'admin' => 'Administración del sistema',
- 'enfermeros', 'medico general/geriatra', 'psicologo/a', 'pedagogo', 'nutricionista', 'fisioterapeuta' => 'Área de salud',
- 'superadministrador', 'administrador' => 'Área administrativa',
- 'FAMILIAR' => 'Familiar autorizado',
- default => 'Sin área asignada'
- };
+   $areaDisplay = $u->areaInstitucional?->nombre ?? match($roleKey) {
+    'super_admin', 'admin' => 'Administración del sistema',
+    'enfermeros', 'medico general/geriatra', 'psicologo/a', 'pedagogo', 'nutricionista', 'fisioterapeuta' => 'Área de salud',
+    'superadministrador', 'administrador' => 'Área administrativa',
+    'FAMILIAR' => 'Familiar autorizado',
+    default => 'Sin área asignada'
+   };
 
- $perfilDetalle = match($roleKey) {
- 'enfermeros', 'medico general/geriatra', 'psicologo/a', 'pedagogo', 'nutricionista', 'fisioterapeuta' => data_get($u, 'personalSalud.especialidad.nombre')
- ?? data_get($u, 'personalSalud.especialidad')
- ?? 'Personal de salud',
- 'superadministrador', 'administrador' => data_get($u, 'personalAdmin.cargoAdmin.nombre')
- ?? $u->personalAdmin?->cargo
- ?? 'Personal administrativo',
- 'super_admin', 'admin' => 'Administrador del sistema',
- 'FAMILIAR' => 'Familiar autorizado',
- default => strtoupper(str_replace('_', ' ', $roleName))
- };
+   $perfilDetalle = match($roleKey) {
+    'enfermeros', 'medico general/geriatra', 'psicologo/a', 'pedagogo', 'nutricionista', 'fisioterapeuta' => data_get($u, 'personalSalud.especialidad.nombre')
+    ?? data_get($u, 'personalSalud.especialidad')
+    ?? 'Personal de salud',
+    'superadministrador', 'administrador' => data_get($u, 'personalAdmin.cargoAdmin.nombre')
+    ?? $u->personalAdmin?->cargo
+    ?? 'Personal administrativo',
+    'super_admin', 'admin' => 'Administrador del sistema',
+    'FAMILIAR' => 'Familiar autorizado',
+    default => strtoupper(str_replace('_', ' ', $roleName))
+   };
 
- $areaClass = match($roleKey) {
- 'super_admin', 'admin' => 'bg-fondo-panel text-parrafo border-borde-fuerte',
- 'enfermeros', 'medico general/geriatra', 'psicologo/a', 'pedagogo', 'nutricionista', 'fisioterapeuta' => 'bg-estado-exitoBg text-estado-exito border-estado-exitoBorde',
- 'superadministrador', 'administrador' => 'bg-estado-peligroBg text-boton-acento border-borde-focus',
- 'FAMILIAR' => 'bg-fondo-panel text-parrafo border-borde',
- default => 'bg-fondo-panel text-parrafo/55 border-borde-suave'
- };
+   $ultimoAcceso = $u->ultimo_acceso ?? null;
 
- $perfilClass = match($roleKey) {
- 'super_admin', 'admin' => 'bg-fondo-panel text-parrafo border-borde-fuerte',
- 'enfermeros', 'medico general/geriatra', 'psicologo/a', 'pedagogo', 'nutricionista', 'fisioterapeuta' => 'bg-estado-exitoBg text-estado-exito border-estado-exitoBorde',
- 'superadministrador', 'administrador' => 'bg-estado-peligroBg text-boton-acento border-borde-focus',
- 'FAMILIAR' => 'bg-fondo-panel text-parrafo border-borde',
- default => 'bg-fondo-panel text-parrafo/55 border-borde-suave'
- };
+   $fotoUsuario = null;
+   if (!empty($u->foto_de_perfil)) {
+    $fotoUsuario = \Illuminate\Support\Facades\Storage::url($u->foto_de_perfil);
+   } elseif (!empty($u->profile_photo_path)) {
+    $fotoUsuario = \Illuminate\Support\Facades\Storage::url($u->profile_photo_path);
+   } elseif (!empty($u->profile_photo_url)) {
+    $fotoUsuario = $u->profile_photo_url;
+   }
+   @endphp
 
- $ultimoAcceso = $u->ultimo_acceso ?? null;
+   <x-patterns.entity-card
+   wire:key="card-user-{{ $u->cod_usuario }}"
+   :interactive="!$estaInactivo"
+   :accent="$estaInactivo ? null : 'terracota'"
+   class="{{ $estaInactivo ? 'opacity-70 grayscale bg-[var(--rm-surface-soft)]' : '' }}">
 
- $fotoUsuario = null;
- if (!empty($u->foto_de_perfil)) {
- $fotoUsuario = \Illuminate\Support\Facades\Storage::url($u->foto_de_perfil);
- } elseif (!empty($u->profile_photo_path)) {
- $fotoUsuario = \Illuminate\Support\Facades\Storage::url($u->profile_photo_path);
- } elseif (!empty($u->profile_photo_url)) {
- $fotoUsuario = $u->profile_photo_url;
- }
- @endphp
+   <x-slot:avatar>
+    <div class="relative">
+    @if($fotoUsuario)
+     <img src="{{ $fotoUsuario }}" alt="Foto de {{ $nombreCompleto }}"
+      class="h-14 w-14 rounded-2xl object-cover ring-2 ring-[var(--rm-border)] shadow-sm">
+    @else
+     <div class="flex h-14 w-14 items-center justify-center rounded-2xl bg-[var(--rm-surface-alt)] text-lg font-black text-[var(--rm-primary)] ring-2 ring-[var(--rm-border)] shadow-sm uppercase">
+     {{ strtoupper($inicial) }}
+     </div>
+    @endif
+    <span class="absolute -bottom-1 -right-1 h-3.5 w-3.5 rounded-full border-2 border-[var(--rm-surface)] {{ $u->estado === 'ACTIVO' ? 'bg-[var(--rm-success)]' : 'bg-[var(--rm-border)]' }}"></span>
+    </div>
+   </x-slot:avatar>
 
- <article wire:key="card-user-{{ $u->cod_usuario }}"
- class="group overflow-hidden rounded-[1.45rem] border border-transparent bg-fondo-panel shadow-[0_14px_30px_rgba(47,62,92,0.13)] transition-all duration-300 {{ $estaInactivo ? 'grayscale opacity-70 bg-fondo-panel' : 'hover:-translate-y-1 hover:shadow-[0_20px_38px_rgba(47,62,92,0.17)]' }}">
+   <x-slot:title>
+    <h3 class="font-bold text-sm sm:text-base text-[var(--rm-text-primary)] leading-tight uppercase truncate" title="{{ $nombreCompleto }}">
+    {{ $nombreCompleto }}
+    </h3>
+   </x-slot:title>
 
- <div class="h-1 w-full {{ $estaInactivo ? 'bg-fondo-panel' : 'bg-gradient-to-r from-[#E27D60] via-[#F2A08D] to-[#2F3E5C]/25' }}"></div>
+   <x-slot:subtitle>
+    <p class="text-xs text-[var(--rm-text-secondary)] lowercase truncate" title="{{ $u->correo }}">
+    {{ $u->correo ?: 'Sin correo registrado' }}
+    </p>
+   </x-slot:subtitle>
 
- <div class="p-3">
- {{-- Estado --}}
- <div class="mb-2 flex justify-end">
- @if($u->estado === 'ACTIVO')
- <span class="inline-flex items-center gap-1.5 rounded-full bg-estado-exitoBg px-2.5 py-1 text-[9px] font-bold uppercase text-estado-exito">
- <span class="h-1.5 w-1.5 rounded-full bg-estado-exitoBg"></span>
- Activo
- </span>
- @else
- <span class="inline-flex items-center gap-1.5 rounded-full bg-fondo-panel px-2.5 py-1 text-[9px] font-bold uppercase text-meta">
- <span class="h-1.5 w-1.5 rounded-full bg-fondo-panel"></span>
- Inactivo
- </span>
- @endif
+   <x-slot:status>
+    <span class="rm-badge text-[10px] font-extrabold px-2.5 py-0.5 rounded-full {{ $u->estado === 'ACTIVO' ? 'bg-[var(--rm-success-soft)] text-[var(--rm-success)] border border-[var(--rm-success)]' : 'bg-[var(--rm-surface-alt)] text-[var(--rm-text-secondary)] border border-[var(--rm-border)]' }}">
+    {{ $u->estado === 'ACTIVO' ? 'Activo' : 'Inactivo' }}
+    </span>
+   </x-slot:status>
+
+   {{-- Detalle de Área y Cargo --}}
+   <div class="space-y-1.5 pt-1">
+    <div class="flex items-center justify-between rounded-xl px-2.5 py-1.5 bg-[var(--rm-surface-soft)] border border-[var(--rm-border-soft)] text-xs">
+    <span class="text-[10px] font-bold uppercase tracking-wider text-[var(--rm-text-secondary)]">Área</span>
+    <span class="font-bold text-[var(--rm-text-primary)] truncate max-w-[140px]" title="{{ $areaDisplay }}">{{ $areaDisplay }}</span>
+    </div>
+    <div class="flex items-center justify-between rounded-xl px-2.5 py-1.5 bg-[var(--rm-surface-soft)] border border-[var(--rm-border-soft)] text-xs">
+    <span class="text-[10px] font-bold uppercase tracking-wider text-[var(--rm-text-secondary)]">Cargo</span>
+    <span class="font-bold text-[var(--rm-text-primary)] uppercase truncate max-w-[140px]" title="{{ $perfilDetalle }}">{{ $perfilDetalle }}</span>
+    </div>
+   </div>
+
+   <x-slot:metadata>
+    <div class="flex items-center justify-between text-xs text-[var(--rm-text-secondary)]">
+    <span class="inline-flex items-center gap-1 font-medium">
+     <i class="ph-bold ph-clock"></i> Último acceso:
+    </span>
+    <span class="font-bold text-[var(--rm-text-primary)]">
+     {{ $ultimoAcceso ? \Carbon\Carbon::parse($ultimoAcceso)->format('d/m/Y H:i') : 'Sin registro' }}
+    </span>
+    </div>
+   </x-slot:metadata>
+
+   <x-slot:actions>
+    <button type="button"
+    wire:click="abrirVistaCompleta('{{ $u->cod_usuario }}')"
+    class="inline-flex h-8 items-center gap-1 rounded-xl bg-[var(--rm-surface-soft)] border border-[var(--rm-border)] px-2.5 text-xs font-bold text-[var(--rm-text-primary)] hover:bg-[var(--rm-surface-alt)] transition cursor-pointer"
+    title="Ver ficha institucional">
+    <i class="ph-bold ph-eye"></i>
+    <span>Ver</span>
+    </button>
+
+    @can('usuarios.editar')
+    @if($estaInactivo)
+     <button type="button" disabled
+     class="inline-flex h-8 cursor-not-allowed items-center gap-1 rounded-xl bg-[var(--rm-surface-soft)] border border-[var(--rm-border-soft)] px-2.5 text-xs font-bold text-[var(--rm-text-secondary)] opacity-60"
+     title="Active el usuario para poder editarlo">
+     <i class="ph-bold ph-lock"></i>
+     <span>Editar</span>
+     </button>
+    @else
+     <button type="button"
+     wire:click="editarUsuario('{{ $u->cod_usuario }}')"
+     class="inline-flex h-8 items-center gap-1 rounded-xl bg-[var(--rm-primary)] text-[var(--rm-text-on-primary)] px-2.5 text-xs font-bold hover:bg-[var(--rm-primary-hover)] transition shadow-xs cursor-pointer">
+     <i class="ph-bold ph-pencil-simple"></i>
+     <span>Editar</span>
+     </button>
+    @endif
+    @endcan
+
+    @can('usuarios.cambiar_estado')
+    @if($u->cod_usuario !== auth()->id())
+     <button type="button"
+     wire:click="toggleEstado('{{ $u->cod_usuario }}')"
+     wire:confirm="¿Desea cambiar el estado de este usuario?"
+     class="inline-flex h-8 items-center gap-1 rounded-xl px-2.5 text-xs font-bold transition cursor-pointer {{ $u->estado === 'ACTIVO' ? 'bg-[var(--rm-surface-soft)] border border-[var(--rm-border)] text-[var(--rm-danger)] hover:bg-[var(--rm-danger-soft)]' : 'bg-[var(--rm-success-soft)] border border-[var(--rm-success)] text-[var(--rm-success)]' }}"
+     title="{{ $u->estado === 'ACTIVO' ? 'Inactivar usuario' : 'Activar usuario' }}">
+     <i class="ph-bold {{ $u->estado === 'ACTIVO' ? 'ph-user-minus' : 'ph-user-plus' }}"></i>
+     <span>{{ $u->estado === 'ACTIVO' ? 'Inactivar' : 'Activar' }}</span>
+     </button>
+    @endif
+    @endcan
+
+    <button type="button"
+    wire:click="abrirFichaRapida('{{ $u->cod_usuario }}')"
+    class="inline-flex h-8 items-center gap-1 rounded-xl bg-[var(--rm-surface-soft)] border border-[var(--rm-border)] px-2.5 text-xs font-bold text-[var(--rm-text-secondary)] hover:text-[var(--rm-text-primary)] hover:bg-[var(--rm-surface-alt)] transition cursor-pointer"
+    title="Ficha rápida">
+    <i class="ph-bold ph-clipboard-text"></i>
+    <span>Ficha</span>
+    </button>
+   </x-slot:actions>
+   </x-patterns.entity-card>
+  @empty
+   <div class="col-span-full py-12 text-center">
+   <div class="mx-auto flex max-w-md flex-col items-center">
+    <div class="flex h-16 w-16 items-center justify-center rounded-3xl bg-[var(--rm-surface-soft)] border border-[var(--rm-border)] text-[var(--rm-text-secondary)]">
+    <i class="ph-bold ph-users-three text-3xl"></i>
+    </div>
+    <h3 class="mt-4 text-base font-extrabold text-[var(--rm-text-primary)] uppercase">
+    No se encontraron usuarios
+    </h3>
+    <p class="mt-1 text-xs font-semibold text-[var(--rm-text-secondary)]">
+    Ajusta los filtros de búsqueda o registra un nuevo usuario institucional.
+    </p>
+   </div>
+   </div>
+  @endforelse
+  </div>
  </div>
 
- {{-- Foto centrada cuadrada --}}
- <div class="flex flex-col items-center text-center">
- <div class="relative">
- @if($fotoUsuario)
- <img
- src="{{ $fotoUsuario }}"
- alt="Foto de {{ $nombreCompleto }}"
- class="h-24 w-24 rounded-[1.35rem] object-cover ring-[3px] ring-[#E6DDD3]/80 shadow-[0_10px_22px_rgba(47,62,92,0.16)] transition-all duration-300 {{ $estaInactivo ? '' : 'group-hover:scale-105' }}"
- >
- @else
- <div class="flex h-24 w-24 items-center justify-center rounded-[1.35rem] bg-boton-principal text-3xl font-black text-inverso ring-[3px] ring-[#E6DDD3]/80 shadow-[0_10px_22px_rgba(47,62,92,0.16)]">
- {{ strtoupper($inicial) }}
- </div>
- @endif
-
- <span class="absolute -bottom-1 -right-1 h-4 w-4 rounded-full border-[3px] border-borde {{ $u->estado === 'ACTIVO' ? 'bg-estado-exitoBg' : 'bg-fondo-panel' }}"></span>
- </div>
-
- <h3 class="mt-2.5 line-clamp-2 text-sm font-bold uppercase leading-5 text-parrafo">
- {{ $nombreCompleto }}
- </h3>
-
- <p class="mt-0.5 max-w-full truncate text-xs font-bold lowercase text-parrafo/55">
- {{ $u->correo ?: 'Sin correo registrado' }}
- </p>
- </div>
-
- {{-- Info compacta --}}
- <div class="mt-3 space-y-2">
- <div class="rounded-xl border px-3 py-2 {{ $areaClass }}">
- <p class="text-[9px] font-bold uppercase tracking-[0.16em] opacity-60">
- Área
- </p>
- <p class="mt-0.5 truncate text-xs font-bold">
- {{ $areaDisplay }}
- </p>
- </div>
-
- <div class="rounded-xl border px-3 py-2 {{ $perfilClass }}">
- <p class="text-[9px] font-bold uppercase tracking-[0.16em] opacity-60">
- Perfil institucional
- </p>
- <p class="mt-0.5 truncate text-xs font-bold uppercase">
- {{ $perfilDetalle }}
- </p>
- </div>
-
- <div class="rounded-xl border border-borde bg-fondo-panel/75 px-3 py-2">
- <p class="text-[9px] font-bold uppercase tracking-[0.16em] text-parrafo/35">
- Último acceso
- </p>
- @if($ultimoAcceso)
- <p class="mt-0.5 text-xs font-bold text-parrafo">
- {{ \Carbon\Carbon::parse($ultimoAcceso)->format('d/m/Y H:i') }}
- </p>
- @else
- <p class="mt-0.5 text-xs font-bold text-parrafo/45">
- Sin registro
- </p>
- @endif
- </div>
- </div>
-
- {{-- Acciones --}}
- <div class="mt-3 flex items-center justify-center gap-1.5">
- {{-- Grupo principal --}}
- <button type="button"
- wire:click="abrirVistaCompleta('{{ $u->cod_usuario }}')"
- class="inline-flex h-8 items-center gap-1.5 rounded-full bg-boton-principal px-2.5 text-[9px] font-bold text-inverso shadow-sm transition hover:bg-fondo-panel active:scale-95"
- title="Ver ficha institucional">
- <i class="ph-bold ph-eye"></i>
- Ver
- </button>
-
- @can('usuarios.editar')
- @if($estaInactivo)
- <button type="button"
- disabled
- title="Active el usuario para poder editarlo"
- class="inline-flex h-8 cursor-not-allowed items-center gap-1.5 rounded-full bg-fondo-panel px-2.5 text-[9px] font-bold text-meta">
- <i class="ph-bold ph-lock"></i>
- Editar
- </button>
- @else
- <button type="button"
- wire:click="editarUsuario('{{ $u->cod_usuario }}')"
- class="inline-flex h-8 items-center gap-1.5 rounded-full bg-boton-acento px-2.5 text-[9px] font-bold text-inverso shadow-sm transition hover:bg-fondo-panel active:scale-95">
- <i class="ph-bold ph-pencil-simple"></i>
- Editar
- </button>
- @endif
- @endcan
-
- @can('usuarios.cambiar_estado')
- @if($u->cod_usuario !== auth()->id())
- <button type="button"
- wire:click="toggleEstado('{{ $u->cod_usuario }}')"
- wire:confirm="¿Desea cambiar el estado de este usuario?"
- class="inline-flex h-8 items-center gap-1.5 rounded-full px-2.5 text-[9px] font-bold shadow-sm transition active:scale-95
- {{ $u->estado === 'ACTIVO'
- ? 'bg-fondo-panel text-parrafo hover:bg-fondo-panel hover:text-inverso'
- : 'bg-estado-exitoBg text-estado-exito hover:bg-estado-exitoBg hover:text-inverso' }}">
- <i class="ph-bold {{ $u->estado === 'ACTIVO' ? 'ph-user-minus' : 'ph-user-plus' }}"></i>
- {{ $u->estado === 'ACTIVO' ? 'Inactivar' : 'Activar' }}
- </button>
- @endif
- @endcan
-
- {{-- Separador + Ficha rápida --}}
- <span class="mx-0.5 h-5 w-px bg-fondo-panel"></span>
-
- <button type="button"
- wire:click="abrirFichaRapida('{{ $u->cod_usuario }}')"
- class="inline-flex h-8 items-center gap-1.5 rounded-full bg-fondo-panel px-2.5 text-[9px] font-bold text-parrafo shadow-sm transition hover:bg-fondo-panel hover:text-inverso active:scale-95"
- title="Ficha rápida">
- <i class="ph-bold ph-clipboard-text"></i>
- Ficha
- </button>
- </div>
- </div>
- </article>
- @empty
- <div class="col-span-full py-8 text-center">
- <div class="mx-auto flex max-w-md flex-col items-center">
- <div class="flex h-16 w-16 items-center justify-center rounded-3xl bg-fondo-panel text-parrafo/35">
- <i class="ph-bold ph-users-three text-3xl"></i>
- </div>
- <h3 class="mt-4 text-lg font-extrabold text-parrafo">
- No se encontraron usuarios
- </h3>
- <p class="mt-2 text-sm font-semibold text-parrafo/45">
- Ajusta los filtros o registra un nuevo usuario institucional.
- </p>
- </div>
- </div>
- @endforelse
- </div>
- </div>
-
- {{-- VISTA TABLA COMPACTA --}}
+ {{-- VISTA TABLA COMPACTA ACCESIBLE --}}
  <div x-show="vista === 'table'" x-transition.opacity.duration.200ms>
- <div class="overflow-hidden rounded-[1.8rem] bg-fondo-panel border border-borde/45 shadow-[0_14px_30px_rgba(47,62,92,0.12)] backdrop-blur-md">
- <table class="w-full table-fixed text-left text-sm">
- <thead class="bg-fondo-panel text-[10px] uppercase tracking-[0.18em] text-parrafo/55">
- <tr>
- <th class="w-[30%] px-5 py-4 font-black">Usuario</th>
- <th class="w-[28%] px-5 py-4 font-black">Perfil institucional</th>
- <th class="w-[14%] px-5 py-4 font-black">Estado</th>
- <th class="w-[14%] px-5 py-4 font-black">Último acceso</th>
- <th class="w-[14%] px-5 py-4 text-center font-black">Acciones</th>
- </tr>
- </thead>
+  <div class="overflow-hidden rounded-[1.4rem] bg-[var(--rm-surface)] border border-[var(--rm-border)] shadow-xs">
+  <table class="w-full table-fixed text-left text-sm">
+   <thead class="bg-[var(--rm-surface-soft)] text-xs uppercase tracking-wider text-[var(--rm-text-secondary)] border-b border-[var(--rm-border)]">
+   <tr>
+    <th class="w-[32%] px-5 py-3.5 font-bold">Usuario</th>
+    <th class="w-[28%] px-5 py-3.5 font-bold">Perfil institucional</th>
+    <th class="w-[14%] px-5 py-3.5 font-bold">Estado</th>
+    <th class="w-[14%] px-5 py-3.5 font-bold">Último acceso</th>
+    <th class="w-[12%] px-5 py-3.5 text-center font-bold">Acciones</th>
+   </tr>
+   </thead>
 
- <tbody class="divide-y divide-[#E7DDD1] bg-fondo-card/50">
- @forelse($usuarios as $u)
- @php
- $roleName = $u->getRoleNames()->first() ?? 'sin_rol';
- $roleKey = strtolower($roleName);
- $estaInactivo = $u->estado !== 'ACTIVO';
+   <tbody class="divide-y divide-[var(--rm-border-soft)] bg-[var(--rm-surface)]">
+   @forelse($usuarios as $u)
+    @php
+    $roleName = $u->getRoleNames()->first() ?? 'sin_rol';
+    $roleKey = strtolower($roleName);
+    $estaInactivo = $u->estado !== 'ACTIVO';
 
- $nombreCompleto = trim(($u->nombres ?? '') . ' ' . ($u->ap_paterno ?? '') . ' ' . ($u->ap_materno ?? ''));
- $nombreCompleto = $nombreCompleto !== '' ? $nombreCompleto : ($u->correo ?? 'Usuario sin nombre');
+    $nombreCompleto = trim(($u->nombres ?? '') . ' ' . ($u->ap_paterno ?? '') . ' ' . ($u->ap_materno ?? ''));
+    $nombreCompleto = $nombreCompleto !== '' ? $nombreCompleto : ($u->correo ?? 'Usuario sin nombre');
 
- $inicial = mb_substr(trim($u->nombres ?? $nombreCompleto), 0, 1);
+    $inicial = mb_substr(trim($u->nombres ?? $nombreCompleto), 0, 1);
 
- $areaDisplay = $u->areaInstitucional?->nombre ?? match($roleKey) {
- 'super_admin', 'admin' => 'Administración del sistema',
- 'enfermeros', 'medico general/geriatra', 'psicologo/a', 'pedagogo', 'nutricionista', 'fisioterapeuta' => 'Área de salud',
- 'superadministrador', 'administrador' => 'Área administrativa',
- 'FAMILIAR' => 'Familiar autorizado',
- default => 'Sin área asignada'
- };
+    $areaDisplay = $u->areaInstitucional?->nombre ?? match($roleKey) {
+     'super_admin', 'admin' => 'Administración del sistema',
+     'enfermeros', 'medico general/geriatra', 'psicologo/a', 'pedagogo', 'nutricionista', 'fisioterapeuta' => 'Área de salud',
+     'superadministrador', 'administrador' => 'Área administrativa',
+     'FAMILIAR' => 'Familiar autorizado',
+     default => 'Sin área asignada'
+    };
 
- $perfilDetalle = match($roleKey) {
- 'enfermeros', 'medico general/geriatra', 'psicologo/a', 'pedagogo', 'nutricionista', 'fisioterapeuta' => data_get($u, 'personalSalud.especialidad.nombre')
- ?? data_get($u, 'personalSalud.especialidad')
- ?? 'Personal de salud',
- 'superadministrador', 'administrador' => data_get($u, 'personalAdmin.cargoAdmin.nombre')
- ?? $u->personalAdmin?->cargo
- ?? 'Personal administrativo',
- 'super_admin', 'admin' => 'Administrador del sistema',
- 'FAMILIAR' => 'Familiar autorizado',
- default => strtoupper(str_replace('_', ' ', $roleName))
- };
+    $perfilDetalle = match($roleKey) {
+     'enfermeros', 'medico general/geriatra', 'psicologo/a', 'pedagogo', 'nutricionista', 'fisioterapeuta' => data_get($u, 'personalSalud.especialidad.nombre')
+     ?? data_get($u, 'personalSalud.especialidad')
+     ?? 'Personal de salud',
+     'superadministrador', 'administrador' => data_get($u, 'personalAdmin.cargoAdmin.nombre')
+     ?? $u->personalAdmin?->cargo
+     ?? 'Personal administrativo',
+     'super_admin', 'admin' => 'Administrador del sistema',
+     'FAMILIAR' => 'Familiar autorizado',
+     default => strtoupper(str_replace('_', ' ', $roleName))
+    };
 
- $areaClass = match($roleKey) {
- 'super_admin', 'admin' => 'bg-fondo-panel text-parrafo border-borde-fuerte',
- 'enfermeros', 'medico general/geriatra', 'psicologo/a', 'pedagogo', 'nutricionista', 'fisioterapeuta' => 'bg-estado-exitoBg text-estado-exito border-estado-exitoBorde',
- 'superadministrador', 'administrador' => 'bg-estado-peligroBg text-boton-acento border-borde-focus',
- 'FAMILIAR' => 'bg-fondo-panel text-parrafo border-borde',
- default => 'bg-fondo-panel text-parrafo/55 border-borde-suave'
- };
+    $ultimoAcceso = $u->ultimo_acceso ?? null;
+    @endphp
 
- $ultimoAcceso = $u->ultimo_acceso ?? null;
- @endphp
+    <tr class="transition-all duration-150 {{ $estaInactivo ? 'opacity-65 grayscale bg-[var(--rm-surface-soft)]' : 'hover:bg-[var(--rm-surface-soft)]' }}"
+    wire:key="tabla-user-{{ $u->cod_usuario }}">
+    <td class="px-5 py-3.5">
+     <div class="flex min-w-0 items-center gap-3">
+     <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[var(--rm-surface-alt)] text-xs font-black text-[var(--rm-primary)] border border-[var(--rm-border)] shadow-xs">
+      {{ strtoupper($inicial) }}
+     </div>
+     <div class="min-w-0">
+      <p class="truncate font-bold text-sm text-[var(--rm-text-primary)]">
+      {{ $nombreCompleto }}
+      </p>
+      <p class="truncate text-xs font-medium text-[var(--rm-text-secondary)]">
+      {{ $u->correo ?: 'Sin correo registrado' }}
+      </p>
+     </div>
+     </div>
+    </td>
 
- <tr class="transition-all duration-200 {{ $estaInactivo ? 'bg-fondo-panel grayscale opacity-70' : 'hover:bg-fondo-panel' }}"
- wire:key="tabla-user-{{ $u->cod_usuario }}">
- <td class="px-5 py-4">
- <div class="flex min-w-0 items-center gap-3">
- <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-boton-principal text-sm font-bold text-inverso shadow-sm">
- {{ strtoupper($inicial) }}
- </div>
- <div class="min-w-0">
- <p class="truncate font-black text-parrafo">
- {{ $nombreCompleto }}
- </p>
- <p class="truncate text-xs font-semibold text-meta">
- {{ $u->correo ?: 'Sin correo registrado' }}
- </p>
- </div>
- </div>
- </td>
+    <td class="px-5 py-3.5">
+     <div class="space-y-0.5">
+     <span class="inline-flex max-w-full rounded-full border border-[var(--rm-border-soft)] bg-[var(--rm-surface-soft)] px-2.5 py-0.5 text-[10px] font-bold text-[var(--rm-text-primary)] uppercase">
+      {{ $areaDisplay }}
+     </span>
+     <p class="truncate text-xs font-medium text-[var(--rm-text-secondary)]">
+      {{ $perfilDetalle }}
+     </p>
+     </div>
+    </td>
 
- <td class="px-5 py-4">
- <div class="space-y-1">
- <span class="inline-flex max-w-full rounded-full border px-3 py-1 text-[10px] font-bold uppercase {{ $areaClass }}">
- {{ $areaDisplay }}
- </span>
+    <td class="px-5 py-3.5">
+     <span class="inline-block rounded-full px-2.5 py-0.5 text-[10px] font-extrabold uppercase {{ $u->estado === 'ACTIVO' ? 'bg-[var(--rm-success-soft)] text-[var(--rm-success)] border border-[var(--rm-success)]' : 'bg-[var(--rm-surface-alt)] text-[var(--rm-text-secondary)] border border-[var(--rm-border)]' }}">
+     {{ $u->estado === 'ACTIVO' ? 'Activo' : 'Inactivo' }}
+     </span>
+    </td>
 
- <p class="truncate text-xs font-semibold text-parrafo/55">
- {{ $perfilDetalle }}
- </p>
- </div>
- </td>
+    <td class="px-5 py-3.5">
+     @if($ultimoAcceso)
+     <div class="leading-tight">
+      <p class="font-bold text-xs text-[var(--rm-text-primary)]">
+      {{ \Carbon\Carbon::parse($ultimoAcceso)->format('d/m/Y') }}
+      </p>
+      <p class="text-[11px] font-medium text-[var(--rm-text-secondary)]">
+      {{ \Carbon\Carbon::parse($ultimoAcceso)->format('H:i') }}
+      </p>
+     </div>
+     @else
+     <p class="text-xs font-medium text-[var(--rm-text-secondary)]">
+      Sin registro
+     </p>
+     @endif
+    </td>
 
- <td class="px-5 py-4">
- @if($u->estado === 'ACTIVO')
- <span class="rounded-full bg-estado-exitoBg px-3 py-1 text-[10px] font-bold uppercase text-estado-exito">
- Activo
- </span>
- @else
- <span class="rounded-full bg-fondo-panel px-3 py-1 text-[10px] font-bold uppercase text-meta">
- Inactivo
- </span>
- @endif
- </td>
+    <td class="px-5 py-3.5">
+     <div class="flex items-center justify-center gap-1">
+     <button type="button"
+      wire:click="abrirVistaCompleta('{{ $u->cod_usuario }}')"
+      class="flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--rm-surface-soft)] border border-[var(--rm-border)] text-[var(--rm-text-primary)] hover:bg-[var(--rm-surface-alt)] transition cursor-pointer"
+      title="Ver ficha institucional">
+      <i class="ph-bold ph-eye text-sm"></i>
+     </button>
 
- <td class="px-5 py-4">
- @if($ultimoAcceso)
- <div class="leading-4">
- <p class="font-black text-parrafo">
- {{ \Carbon\Carbon::parse($ultimoAcceso)->format('d/m/Y') }}
- </p>
- <p class="text-[10px] font-semibold text-parrafo/45">
- {{ \Carbon\Carbon::parse($ultimoAcceso)->format('H:i') }}
- </p>
- </div>
- @else
- <p class="text-[11px] font-semibold text-parrafo/45">
- Sin registro
- </p>
- @endif
- </td>
+     @can('usuarios.editar')
+      @if($estaInactivo)
+      <button type="button" disabled
+       class="flex h-8 w-8 cursor-not-allowed items-center justify-center rounded-lg bg-[var(--rm-surface-soft)] text-[var(--rm-text-secondary)] opacity-50"
+       title="Active el usuario para poder editarlo">
+       <i class="ph-bold ph-lock text-sm"></i>
+      </button>
+      @else
+      <button type="button"
+       wire:click="editarUsuario('{{ $u->cod_usuario }}')"
+       class="flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--rm-primary)] text-[var(--rm-text-on-primary)] hover:bg-[var(--rm-primary-hover)] transition cursor-pointer shadow-xs"
+       title="Editar">
+       <i class="ph-bold ph-pencil-simple text-sm"></i>
+      </button>
+      @endif
+     @endcan
 
- <td class="px-5 py-4">
- <div class="flex items-center justify-center gap-1.5">
- {{-- Grupo principal --}}
- <button type="button"
- wire:click="abrirVistaCompleta('{{ $u->cod_usuario }}')"
- class="flex h-9 w-9 items-center justify-center rounded-xl bg-fondo-panel text-parrafo shadow-sm transition hover:bg-boton-principal hover:text-inverso active:scale-90"
- title="Ver ficha institucional">
- <i class="ph-bold ph-eye"></i>
- </button>
+     @can('usuarios.cambiar_estado')
+      @if($u->cod_usuario !== auth()->id())
+      <button type="button"
+       wire:click="toggleEstado('{{ $u->cod_usuario }}')"
+       wire:confirm="¿Desea cambiar el estado de este usuario?"
+       class="flex h-8 w-8 items-center justify-center rounded-lg transition cursor-pointer {{ $u->estado === 'ACTIVO' ? 'bg-[var(--rm-surface-soft)] border border-[var(--rm-border)] text-[var(--rm-danger)] hover:bg-[var(--rm-danger-soft)]' : 'bg-[var(--rm-success-soft)] border border-[var(--rm-success)] text-[var(--rm-success)]' }}"
+       title="{{ $u->estado === 'ACTIVO' ? 'Inactivar usuario' : 'Activar usuario' }}">
+       <i class="ph-bold {{ $u->estado === 'ACTIVO' ? 'ph-user-minus' : 'ph-user-plus' }} text-sm"></i>
+      </button>
+      @endif
+     @endcan
 
- @can('usuarios.editar')
- @if($estaInactivo)
- <button type="button"
- disabled
- class="flex h-9 w-9 cursor-not-allowed items-center justify-center rounded-xl bg-fondo-panel text-meta shadow-sm"
- title="Active el usuario para poder editarlo">
- <i class="ph-bold ph-lock"></i>
- </button>
- @else
- <button type="button"
- wire:click="editarUsuario('{{ $u->cod_usuario }}')"
- class="flex h-9 w-9 items-center justify-center rounded-xl bg-fondo-panel text-boton-acento shadow-sm transition hover:bg-boton-acento hover:text-inverso active:scale-90"
- title="Editar">
- <i class="ph-bold ph-pencil-simple"></i>
- </button>
- @endif
- @endcan
-
- @can('usuarios.cambiar_estado')
- @if($u->cod_usuario !== auth()->id())
- <button type="button"
- wire:click="toggleEstado('{{ $u->cod_usuario }}')"
- wire:confirm="¿Desea cambiar el estado de este usuario?"
- class="flex h-9 w-9 items-center justify-center rounded-xl shadow-sm transition active:scale-90
- {{ $u->estado === 'ACTIVO'
- ? 'bg-fondo-panel text-parrafo hover:bg-fondo-panel hover:text-inverso'
- : 'bg-estado-exitoBg text-estado-exito hover:bg-estado-exitoBg hover:text-inverso' }}"
- title="{{ $u->estado === 'ACTIVO' ? 'Inactivar usuario' : 'Activar usuario' }}">
- <i class="ph-bold {{ $u->estado === 'ACTIVO' ? 'ph-user-minus' : 'ph-user-plus' }}"></i>
- </button>
- @endif
- @endcan
-
- {{-- Separador + Ficha --}}
- <span class="mx-0.5 h-5 w-px bg-fondo-panel"></span>
-
- <button type="button"
- wire:click="abrirFichaRapida('{{ $u->cod_usuario }}')"
- class="flex h-9 w-9 items-center justify-center rounded-xl bg-fondo-panel text-parrafo shadow-sm transition hover:bg-fondo-panel hover:text-inverso active:scale-90"
- title="Ficha rápida">
- <i class="ph-bold ph-clipboard-text"></i>
- </button>
- </div>
- </td>
- </tr>
- @empty
- <tr>
- <td colspan="5" class="px-6 py-14 text-center text-parrafo/45 font-bold">
- No se encontraron usuarios.
- </td>
- </tr>
- @endforelse
- </tbody>
- </table>
- </div>
+     <button type="button"
+      wire:click="abrirFichaRapida('{{ $u->cod_usuario }}')"
+      class="flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--rm-surface-soft)] border border-[var(--rm-border)] text-[var(--rm-text-secondary)] hover:text-[var(--rm-text-primary)] hover:bg-[var(--rm-surface-alt)] transition cursor-pointer"
+      title="Ficha rápida">
+      <i class="ph-bold ph-clipboard-text text-sm"></i>
+     </button>
+     </div>
+    </td>
+    </tr>
+   @empty
+    <tr>
+    <td colspan="5" class="px-6 py-12 text-center text-xs font-bold text-[var(--rm-text-secondary)]">
+     No se encontraron usuarios.
+    </td>
+    </tr>
+   @endforelse
+   </tbody>
+  </table>
+  </div>
  </div>
 
  @if($usuarios->hasPages())
- <div class="mt-5 flex justify-center">
- <div class="rounded-2xl border border-borde bg-fondo-card/75 px-4 py-3 shadow-sm">
- {{ $usuarios->links() }}
- </div>
- </div>
+  <div class="mt-5 flex justify-center">
+  <div class="rounded-2xl border border-[var(--rm-border)] bg-[var(--rm-surface-soft)] px-4 py-3 shadow-xs">
+   {{ $usuarios->links() }}
+  </div>
+  </div>
  @endif
  </section>
+
  @endif
 
  {{-- MODAL FUERA DEL CONTENEDOR DEL PANEL --}}

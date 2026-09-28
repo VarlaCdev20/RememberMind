@@ -1,13 +1,13 @@
 {{-- Vista: Gestión de Turnos de Enfermería --}}
 @php
-    $inputCls = 'w-full rounded-xl border border-borde-suave bg-fondo-app px-3 py-2 text-xs font-bold text-titulo outline-none transition focus:border-borde-focus focus:ring-2 focus:ring-[#E27D60]/20';
+    $inputCls = 'w-full rounded-xl border border-borde-suave bg-fondo-app px-3 py-2 text-xs font-bold text-titulo outline-none transition focus:border-borde-focus focus:ring-2 focus:ring-[var(--rm-accent-terracotta)]/20';
     $labelCls = 'block text-[10px] font-bold uppercase tracking-[0.15em] text-apoyo mb-1';
     $errCls   = 'mt-1 text-[10px] font-bold text-boton-acento';
 @endphp
 <div class="min-h-screen bg-fondo-panel px-4 py-5 sm:px-6 lg:px-8" x-data @keydown.window.escape="$wire.cerrarModales()">
 <div class="mx-auto max-w-4xl space-y-5">
 <section class="overflow-hidden rounded-[1.65rem] border border-borde-suave bg-fondo-panel shadow-lg">
-    <div class="h-1.5 bg-gradient-to-r from-[#8DA280] via-[#D9A05B] to-[#E27D60]"></div>
+    <div class="h-1.5 bg-gradient-to-r from-[var(--rm-action-primary)] via-[[var(--rm-warning)] to-[var(--rm-accent-terracotta)]"></div>
     <div class="flex items-center justify-between p-5 sm:p-7">
         <div>
             <h1 class="text-2xl font-black text-titulo">Turnos de Enfermería</h1>
@@ -30,7 +30,7 @@
         <p class="text-sm font-bold text-apoyo">Sin turnos registrados. Ejecute el seeder TurnosEnfermeriaSeeder.</p>
     </div>
     @else
-    <div class="divide-y divide-[#C7B5A3]/20">
+    <div class="divide-y divide-[var(--rm-border)]/20">
         @foreach($turnos as $t)
         <div class="flex items-center justify-between px-5 py-4 hover:bg-fondo-panel transition">
             <div class="flex items-center gap-4">
@@ -63,7 +63,7 @@
 @if($modalTurno)
 <div class="fixed inset-0 z-50 flex items-center justify-center p-4" style="background: rgba(47,62,92,0.55)" wire:click.self="cerrarModales">
     <div class="w-full max-w-md overflow-hidden rounded-[1.45rem] border border-borde-suave bg-fondo-panel shadow-2xl">
-        <div class="h-1 bg-gradient-to-r from-[#8DA280] via-[#D9A05B] to-[#E27D60]"></div>
+        <div class="h-1 bg-gradient-to-r from-[var(--rm-action-primary)] via-[[var(--rm-warning)] to-[var(--rm-accent-terracotta)]"></div>
         <div class="flex items-center justify-between border-b border-borde-suave px-5 py-4">
             <h3 class="text-sm font-bold text-titulo">{{ $editandoId ? 'Editar turno' : 'Nuevo turno' }}</h3>
             <button wire:click="cerrarModales" class="flex h-8 w-8 items-center justify-center rounded-xl border border-borde-suave text-apoyo hover:text-boton-acento transition"><i class="ph-bold ph-x text-sm"></i></button>

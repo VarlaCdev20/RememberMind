@@ -13,7 +13,7 @@
 
  @if($actividadesLista->count() > 0)
  <div class="space-y-6">
- 
+
  <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 text-center">
  <div class="rounded-xl border border-borde-suave bg-fondo-panel p-3">
  <span class="block text-xs font-bold uppercase tracking-wide text-apoyo mb-1">Actividades Asignadas</span>
@@ -47,7 +47,7 @@
  <p class="text-sm font-bold text-titulo truncate">{{ optional($act->tipoActividad)->tipo ?? 'Actividad' }}</p>
  <p class="text-xs font-bold text-apoyo mt-0.5">{{ \Carbon\Carbon::parse($act->fecha)->format('d/m/Y') }} {{ $act->hora ? ' • '.substr($act->hora, 0, 5) : '' }}</p>
  </div>
- <span class="shrink-0 inline-block px-2 py-0.5 rounded text-xs font-bold uppercase tracking-wide {{ in_array($act->estado, ['COMPLETADA', 'REALIZADA']) ? 'bg-fondo-panel text-parrafo' : 'bg-amber-100 text-amber-700' }}">
+ <span class="shrink-0 inline-block px-2 py-0.5 rounded text-xs font-bold uppercase tracking-wide {{ in_array($act->estado, ['COMPLETADA', 'REALIZADA']) ? 'bg-fondo-panel text-parrafo' : 'bg-[var(--rm-warning-soft)] text-[var(--rm-warning-strong)]' }}">
  {{ $act->estado ?? 'PROGRAMADA' }}
  </span>
  </div>

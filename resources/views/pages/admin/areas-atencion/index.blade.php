@@ -86,7 +86,7 @@
                 >
                     <i class="ph-bold ph-first-aid text-sm"></i>
                     <span>Enfermería y Supervisión</span>
-                    <span class="rounded-full bg-white/20 px-1.5 py-0.2 text-[9.5px]">15</span>
+                    <span class="rounded-full bg-[var(--rm-surface-raised)]/20 px-1.5 py-0.2 text-[9.5px]">15</span>
                 </button>
 
                 <button
@@ -117,7 +117,7 @@
                     type="button"
                     @click="tabActiva = 'nutricion'"
                     :class="tabActiva === 'nutricion'
-                        ? 'bg-amber-600 text-white shadow-sm font-black'
+                        ? 'bg-[var(--rm-warning)] text-white shadow-sm font-black'
                         : 'text-apoyo hover:text-titulo hover:bg-fondo-hover font-bold'"
                     class="px-3 py-1.5 rounded-xl text-xs transition-all whitespace-nowrap cursor-pointer flex items-center gap-1.5 shrink-0"
                 >
@@ -496,13 +496,13 @@
                     class="rounded-3xl border border-borde bg-fondo-card/60 p-5 sm:p-6 shadow-card space-y-5 transition-all"
                 >
                     <div class="flex items-start gap-3.5 border-b border-borde pb-4">
-                        <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-amber-500/10 text-amber-600 dark:text-amber-400 text-xl border border-amber-500/20">
+                        <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[var(--rm-warning-soft)]/20 text-[var(--rm-warning)] dark:text-[var(--rm-warning-soft)] text-xl border border-[var(--rm-warning)]/30">
                             <i class="ph-bold {{ $nut['icono'] }}"></i>
                         </span>
                         <div class="space-y-1">
                             <div class="flex flex-wrap items-center gap-2">
                                 <h2 class="text-lg font-black text-titulo">{{ $nut['nombre'] }}</h2>
-                                <span class="rounded-full bg-amber-500/10 px-2.5 py-0.5 text-[10px] font-black uppercase text-amber-700 dark:text-amber-300 border border-amber-500/20">
+                                <span class="rounded-full bg-[var(--rm-warning-soft)]/20 px-2.5 py-0.5 text-[10px] font-black uppercase text-[var(--rm-warning-strong)] dark:text-[var(--rm-warning-soft)] border border-[var(--rm-warning)]/30">
                                     Rol: {{ $nut['rol_principal'] }}
                                 </span>
                             </div>
@@ -517,24 +517,24 @@
                                 $url = $routeExists ? route($v['ruta']) : '#';
                             @endphp
                             <div x-show="matchesSearch({{ json_encode($v) }})" class="h-full">
-                                <a wire:navigate href="{{ $url }}" class="group relative flex flex-col justify-between h-full p-4 rounded-2xl border border-borde bg-fondo-card hover:bg-fondo-hover hover:border-amber-500/40 hover:shadow-md transition-all duration-300 hover:-translate-y-0.5">
+                                <a wire:navigate href="{{ $url }}" class="group relative flex flex-col justify-between h-full p-4 rounded-2xl border border-borde bg-fondo-card hover:bg-fondo-hover hover:border-[var(--rm-warning)]/30 hover:shadow-md transition-all duration-300 hover:-translate-y-0.5">
                                     <div class="space-y-2">
                                         <div class="flex items-start justify-between gap-2">
-                                            <span class="flex h-8 w-8 items-center justify-center rounded-xl bg-amber-500/10 text-amber-600 text-sm">
+                                            <span class="flex h-8 w-8 items-center justify-center rounded-xl bg-[var(--rm-warning-soft)]/20 text-[var(--rm-warning)] text-sm">
                                                 <i class="ph-bold {{ $v['icono'] }}"></i>
                                             </span>
-                                            <span class="rounded-full bg-amber-500/10 px-2 py-0.5 text-[9px] font-black uppercase tracking-wider text-amber-700 dark:text-amber-300 border border-amber-500/20">
+                                            <span class="rounded-full bg-[var(--rm-warning-soft)]/20 px-2 py-0.5 text-[9px] font-black uppercase tracking-wider text-[var(--rm-warning-strong)] dark:text-[var(--rm-warning-soft)] border border-[var(--rm-warning)]/30">
                                                 {{ $v['tipo'] }}
                                             </span>
                                         </div>
                                         <div class="space-y-0.5">
-                                            <h4 class="text-xs sm:text-sm font-black text-titulo group-hover:text-amber-600 transition-colors">{{ $v['titulo'] }}</h4>
+                                            <h4 class="text-xs sm:text-sm font-black text-titulo group-hover:text-[var(--rm-warning)] transition-colors">{{ $v['titulo'] }}</h4>
                                             <p class="text-[11px] text-apoyo">{{ $v['subtitulo'] }}</p>
                                         </div>
                                     </div>
                                     <div class="pt-2.5 mt-2 border-t border-borde/60 flex items-center justify-between text-[10px]">
                                         <span class="font-bold text-apoyo uppercase">Acceder</span>
-                                        <span class="font-black text-amber-600 flex items-center gap-1"><span>Ir</span><i class="ph-bold ph-caret-right text-[10px]"></i></span>
+                                        <span class="font-black text-[var(--rm-warning)] flex items-center gap-1"><span>Ir</span><i class="ph-bold ph-caret-right text-[10px]"></i></span>
                                     </div>
                                 </a>
                             </div>
@@ -559,7 +559,7 @@
                         <div class="space-y-1">
                             <div class="flex flex-wrap items-center gap-2">
                                 <h2 class="text-lg font-black text-titulo">{{ $ter['nombre'] }}</h2>
-                                <span class="rounded-full bg-blue-500/10 px-2.5 py-0.5 text-[10px] font-black uppercase text-blue-700 dark:text-blue-300 border border-blue-500/20">
+                                <span class="rounded-full bg-blue-500/10 px-2.5 py-0.5 text-[10px] font-black uppercase text-[var(--rm-action-primary-hover)] dark:text-blue-300 border border-blue-500/20">
                                     Roles: {{ $ter['rol_principal'] }} / PEDAGOGO
                                 </span>
                             </div>
@@ -580,7 +580,7 @@
                                             <span class="flex h-8 w-8 items-center justify-center rounded-xl bg-blue-500/10 text-blue-600 text-sm">
                                                 <i class="ph-bold {{ $v['icono'] }}"></i>
                                             </span>
-                                            <span class="rounded-full bg-blue-500/10 px-2 py-0.5 text-[9px] font-black uppercase tracking-wider text-blue-700 dark:text-blue-300 border border-blue-500/20">
+                                            <span class="rounded-full bg-blue-500/10 px-2 py-0.5 text-[9px] font-black uppercase tracking-wider text-[var(--rm-action-primary-hover)] dark:text-blue-300 border border-blue-500/20">
                                                 {{ $v['tipo'] }}
                                             </span>
                                         </div>
@@ -792,10 +792,10 @@
                         </tr>
                         <tr class="hover:bg-fondo-hover/40 transition">
                             <td class="py-3 px-4 font-bold text-titulo flex items-center gap-2">
-                                <span class="h-2 w-2 rounded-full bg-amber-500"></span>
+                                <span class="h-2 w-2 rounded-full bg-[var(--rm-warning)]"></span>
                                 <span>Nutrición y Dietética</span>
                             </td>
-                            <td class="py-3 px-4 text-amber-600 dark:text-amber-400 font-bold">NUTRICIONISTA</td>
+                            <td class="py-3 px-4 text-[var(--rm-warning)] dark:text-[var(--rm-warning-soft)] font-bold">NUTRICIONISTA</td>
                             <td class="py-3 px-4 text-apoyo">Valoración Nutricional (MNA, MUST), Seguimiento Antropométrico, Curvas de Peso e IMC</td>
                             <td class="py-3 px-4 text-apoyo">Alertas Nutricionales y de Hidratación</td>
                             <td class="py-3 px-4 text-center">

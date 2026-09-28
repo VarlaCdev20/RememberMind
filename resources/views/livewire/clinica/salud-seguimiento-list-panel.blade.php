@@ -1,14 +1,14 @@
-<div class="relative mx-auto max-w-7xl space-y-5 overflow-hidden rounded-[2rem] border border-borde/70 bg-fondo-panel p-3 text-parrafo shadow-[0_22px_70px_rgba(47,62,92,0.16)] backdrop-blur-xl sm:p-5 lg:p-6">
+<div class="relative mx-auto max-w-7xl space-y-5 overflow-hidden rounded-3xl border border-borde/70 bg-fondo-panel p-3 text-parrafo shadow-[var(--rm-shadow-overlay)] backdrop-blur-xl sm:p-5 lg:p-6">
  <div class="pointer-events-none absolute inset-0 dash-noise opacity-[0.04]"></div>
- <div class="pointer-events-none absolute inset-x-0 top-0 h-48 bg-gradient-to-b from-[#F8F3ED]/70 to-transparent"></div>
+ <div class="pointer-events-none absolute inset-x-0 top-0 h-48 bg-gradient-to-b from-[var(--rm-surface-raised)]/70 to-transparent"></div>
  <div class="pointer-events-none absolute -right-24 top-16 h-72 w-72 rounded-full bg-estado-peligroBg blur-3xl"></div>
  <div class="pointer-events-none absolute -left-24 bottom-20 h-72 w-72 rounded-full bg-estado-exitoBg blur-3xl"></div>
 
  <div class="relative z-10 space-y-5">
  @if($seccionActiva === 'resumen')
  {{-- ENCABEZADO PRINCIPAL --}}
- <section class="overflow-hidden rounded-[1.75rem] border border-borde/80 bg-gradient-to-br from-[#E6DDD3]/95 via-[#F3ECE4]/92 to-[#D5C7B9]/85 shadow-[0_18px_46px_rgba(47,62,92,0.13)]">
- <div class="h-1.5 w-full bg-gradient-to-r from-[#E27D60] via-[#D9A05B] to-[#8DA280]"></div>
+ <section class="overflow-hidden rounded-3xl border border-borde/80 bg-[var(--rm-surface)] shadow-[var(--rm-shadow-lg)]">
+ <div class="h-1.5 w-full bg-gradient-to-r from-[var(--rm-danger)] via-[var(--rm-warning)] to-[var(--rm-action-primary)]"></div>
  <div class="p-5 sm:p-6">
  <div class="flex flex-col gap-5 xl:flex-row xl:items-start xl:justify-between">
  <div class="max-w-3xl">
@@ -76,12 +76,12 @@
  'alertas' => ['label' => 'Alertas clinicas', 'icon' => 'ph-warning-circle', 'permission' => 'alertas.ver'],
  'reportes' => ['label' => 'Reportes clínicos', 'icon' => 'ph-chart-bar', 'permission' => 'reportes.ver'],
  ];
- 
+
  $tabs = array_filter($tabsRaw, function($tab) {
-     if (auth()->user()->hasRole('SUPERADMINISTRADOR')) return true;
-     
-     $hasPerm = auth()->user()->can($tab['permission']);
-     return $hasPerm;
+ if (auth()->user()->hasRole('SUPERADMINISTRADOR')) return true;
+
+ $hasPerm = auth()->user()->can($tab['permission']);
+ return $hasPerm;
  });
  @endphp
 
@@ -122,9 +122,9 @@
 
  <div class="grid gap-4 md:grid-cols-3">
  @foreach([
- ['label' => 'Cobertura de fichas', 'valor' => $porcentajeFichas, 'icono' => 'ph-file-text', 'color' => '#E27D60'],
- ['label' => 'Medicacion activa', 'valor' => $porcentajeMedicacion, 'icono' => 'ph-pill', 'color' => '#63775B'],
- ['label' => 'Controles 7 dias', 'valor' => $porcentajeControles, 'icono' => 'ph-activity', 'color' => '#2F3E5C'],
+ ['label' => 'Cobertura de fichas', 'valor' => $porcentajeFichas, 'icono' => 'ph-file-text', 'color' => 'var(--rm-danger)'],
+ ['label' => 'Medicacion activa', 'valor' => $porcentajeMedicacion, 'icono' => 'ph-pill', 'color' => 'var(--rm-success)'],
+ ['label' => 'Controles 7 dias', 'valor' => $porcentajeControles, 'icono' => 'ph-activity', 'color' => 'var(--rm-info)'],
  ] as $barra)
  <div class="rounded-2xl border border-borde/45 bg-fondo-panel p-4">
  <div class="mb-3 flex items-center justify-between gap-2">
@@ -280,103 +280,103 @@
  </section>
  @elseif($seccionActiva === 'nutricion')
  <section class="space-y-5 animate-in fade-in duration-200">
-     <div class="rounded-[1.6rem] border border-dashed border-borde/70 bg-fondo-panel p-12 text-center shadow-inner">
-         <i class="ph-bold ph-apple-pod text-4xl text-parrafo/25"></i>
-         <h3 class="mt-3 text-base font-extrabold text-parrafo">Modulo de Nutricion en desarrollo</h3>
-         <p class="mt-1 text-xs font-bold text-parrafo/55">Proximamente podras gestionar los planes nutricionales desde aqui.</p>
-     </div>
+ <div class="rounded-[1.6rem] border border-dashed border-borde/70 bg-fondo-panel p-12 text-center shadow-inner">
+  <i class="ph-bold ph-apple-pod text-4xl text-parrafo/25"></i>
+  <h3 class="mt-3 text-base font-extrabold text-parrafo">Modulo de Nutricion en desarrollo</h3>
+  <p class="mt-1 text-xs font-bold text-parrafo/55">Proximamente podras gestionar los planes nutricionales desde aqui.</p>
+ </div>
  </section>
  @else
  <section class="space-y-4 animate-in fade-in duration-200">
-    <section class="rm-filter-bar">
-     <div class="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between border-b border-[#C7B9AA]/50 dark:border-[#423B34] pb-2">
-         <div>
-             <span class="text-[10px] font-black uppercase tracking-[0.15em] text-[#A35A44] dark:text-[#D58C79]">{{ $contexto['titulo'] }}</span>
-             <h2 class="text-sm font-extrabold text-[#304060] dark:text-[#F3EAE1]">Seleccionar expediente clínico</h2>
-         </div>
-     </div>
+ <section class="rm-filter-bar">
+ <div class="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between border-b border-[var(--rm-border-soft)] pb-2">
+  <div>
+  <span class="text-[10px] font-black uppercase tracking-[0.15em] text-[var(--rm-action-primary)] ">{{ $contexto['titulo'] }}</span>
+  <h2 class="text-sm font-extrabold text-[var(--rm-text-primary)] ">Seleccionar expediente clínico</h2>
+  </div>
+ </div>
 
-     {{-- GRID ESTRUCTURAL DE FILTROS UNIFICADA --}}
-     <div class="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-2 items-center">
-         {{-- Buscador Principal --}}
-         <div class="lg:col-span-7 relative flex items-center">
-             <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-[#677084] dark:text-[#9A9084]">
-                 <i class="ph-bold ph-magnifying-glass text-base"></i>
-             </span>
-             <input type="text"
-                    wire:model.live.debounce.300ms="search"
-                    placeholder="Buscar por nombre, apellido o documento..."
-                    class="w-full rounded-xl border border-[#C7B9AA] dark:border-[#423B34] bg-[#F0E8DE] dark:bg-[#26221F] py-2 pl-9 pr-8 text-xs font-medium text-[#304060] dark:text-[#F3EAE1] placeholder-[#677084] dark:placeholder-[#8C8276] focus:border-[#A35A44] focus:outline-none h-[38px]">
-             @if(!empty($search))
-                 <button type="button"
-                         wire:click="limpiarFiltro('search')"
-                         class="absolute inset-y-0 right-0 flex items-center pr-2.5 text-[#677084] hover:text-[#A35A44] cursor-pointer"
-                         title="Limpiar búsqueda">
-                     <i class="ph-bold ph-x-circle text-base"></i>
-                 </button>
-             @endif
-         </div>
+ {{-- GRID ESTRUCTURAL DE FILTROS UNIFICADA --}}
+ <div class="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-2 items-center">
+  {{-- Buscador Principal --}}
+  <div class="lg:col-span-7 relative flex items-center">
+  <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-[var(--rm-text-muted)]">
+   <i class="ph-bold ph-magnifying-glass text-base"></i>
+  </span>
+  <input type="text"
+   wire:model.live.debounce.300ms="search"
+   placeholder="Buscar por nombre, apellido o documento..."
+   class="w-full rounded-xl border border-[var(--rm-border-soft)] bg-[var(--rm-input-bg)] py-2 pl-9 pr-8 text-xs font-medium text-[var(--rm-text-primary)] placeholder-[var(--rm-input-placeholder)] focus:border-[var(--rm-focus)] focus:outline-none h-[38px]">
+  @if(!empty($search))
+   <button type="button"
+    wire:click="limpiarFiltro('search')"
+    class="absolute inset-y-0 right-0 flex items-center pr-2.5 text-[var(--rm-text-muted)] hover:text-[var(--rm-action-primary)] cursor-pointer"
+    title="Limpiar búsqueda">
+   <i class="ph-bold ph-x-circle text-base"></i>
+   </button>
+  @endif
+  </div>
 
-         {{-- Filtro Estado del Paciente --}}
-         <div class="lg:col-span-4">
-             <select wire:model.live="filtroEstado"
-                     class="w-full rounded-xl border border-[#C7B9AA] dark:border-[#4E463E] bg-[#F0E8DE] dark:bg-[#211E1B] py-2 px-3 text-xs font-medium text-[#304060] dark:text-[#E8DFD5] focus:border-[#A35A44] focus:outline-none h-[38px]">
-                 <option value="">Todos los estados clínicos</option>
-                 <option value="ACTIVO">Activo</option>
-                 <option value="OBSERVADO">En Observación</option>
-                 <option value="SEGUIMIENTO_ESPECIAL">Seguimiento Especial</option>
-                 <option value="ADMITIDO">Admitido</option>
-             </select>
-         </div>
+  {{-- Filtro Estado del Paciente --}}
+  <div class="lg:col-span-4">
+  <select wire:model.live="filtroEstado"
+   class="w-full rounded-xl border border-[var(--rm-border-soft)] bg-[var(--rm-input-bg)] py-2 px-3 text-xs font-medium text-[var(--rm-text-primary)] focus:border-[var(--rm-focus)] focus:outline-none h-[38px]">
+   <option value="">Todos los estados clínicos</option>
+   <option value="ACTIVO">Activo</option>
+   <option value="OBSERVADO">En Observación</option>
+   <option value="SEGUIMIENTO_ESPECIAL">Seguimiento Especial</option>
+   <option value="ADMITIDO">Admitido</option>
+  </select>
+  </div>
 
-         {{-- Botón de refresco --}}
-         <div class="lg:col-span-1 flex justify-end">
-             <button type="button"
-                     wire:click="$refresh"
-                     title="Actualizar datos"
-                     class="w-full h-[38px] flex items-center justify-center rounded-xl border border-[#C7B9AA] dark:border-[#4E463E] bg-[#F0E8DE] dark:bg-[#211E1B] text-[#304060] dark:text-[#E8DFD5] hover:text-[#A35A44] transition cursor-pointer">
-                 <i class="ph-bold ph-arrows-clockwise text-base"></i>
-             </button>
-         </div>
-     </div>
+  {{-- Botón de refresco --}}
+  <div class="lg:col-span-1 flex justify-end">
+  <button type="button"
+   wire:click="$refresh"
+   title="Actualizar datos"
+   class="w-full h-[38px] flex items-center justify-center rounded-xl border border-[var(--rm-border-soft)] bg-[var(--rm-surface-soft)] text-[var(--rm-text-primary)] hover:text-[var(--rm-action-primary)] transition cursor-pointer">
+   <i class="ph-bold ph-arrows-clockwise text-base"></i>
+  </button>
+  </div>
+ </div>
 
-     {{-- Fila de chips de filtros activos --}}
-     @php
-         $hasFiltrosActivos = !empty($search) || !empty($filtroEstado);
-     @endphp
-     @if($hasFiltrosActivos)
-            <div class="rm-filter-bar__active">
-             <div class="flex flex-wrap items-center gap-1.5">
-                    <span class="rm-filter-bar__active-label">
-                     <i class="ph-bold ph-funnel text-xs"></i> Filtros activos:
-                 </span>
-                 @if(!empty($search))
-                     <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[#F0E8DE] dark:bg-[#211E1B] border border-[#C7B9AA] dark:border-[#4E463E] text-[11px] font-semibold text-[#304060] dark:text-[#F3EAE1]">
-                         <span>Búsqueda: "{{ Str::limit($search, 18) }}"</span>
-                         <button type="button" wire:click="limpiarFiltro('search')" class="hover:text-[#A35A44] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
-                     </span>
-                 @endif
-                 @if(!empty($filtroEstado))
-                     <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[#D2A45E]/15 border border-[#D2A45E]/30 text-[11px] font-bold text-[#8C6422] dark:text-[#E2BD7E]">
-                         <span>Estado: {{ str_replace('_', ' ', $filtroEstado) }}</span>
-                         <button type="button" wire:click="limpiarFiltro('filtroEstado')" class="hover:text-[#A35A44] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
-                     </span>
-                 @endif
-             </div>
-             <div class="flex items-center gap-2.5">
-                 <span class="text-[11px] px-2.5 py-0.5 rounded-full font-bold bg-[#304060]/10 dark:bg-[#F3EAE1]/10 text-[#304060] dark:text-[#F3EAE1]">
-                     {{ $adultos->total() ?? count($adultos) }} coincidentes
-                 </span>
-                 <button type="button"
-                         wire:click="limpiarFiltros"
-                         class="inline-flex items-center gap-1 rounded-xl bg-[#A35A44]/15 hover:bg-[#A35A44]/25 text-[#A35A44] dark:text-[#D58C79] py-1 px-2.5 text-xs font-bold transition cursor-pointer">
-                     <i class="ph-bold ph-arrow-counter-clockwise"></i>
-                     <span>Limpiar filtros</span>
-                 </button>
-             </div>
-         </div>
-     @endif
-  </section>
+ {{-- Fila de chips de filtros activos --}}
+ @php
+  $hasFiltrosActivos = !empty($search) || !empty($filtroEstado);
+ @endphp
+ @if($hasFiltrosActivos)
+  <div class="rm-filter-bar__active">
+  <div class="flex flex-wrap items-center gap-1.5">
+   <span class="rm-filter-bar__active-label">
+   <i class="ph-bold ph-funnel text-xs"></i> Filtros activos:
+   </span>
+   @if(!empty($search))
+   <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[var(--rm-surface-soft)] border border-[var(--rm-border-soft)] text-[11px] font-semibold text-[var(--rm-text-primary)]">
+    <span>Búsqueda: "{{ Str::limit($search, 18) }}"</span>
+    <button type="button" wire:click="limpiarFiltro('search')" class="hover:text-[var(--rm-action-primary)] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
+   </span>
+   @endif
+   @if(!empty($filtroEstado))
+   <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[var(--rm-warning)]/15 border border-[var(--rm-warning)]/30 text-[11px] font-bold text-[var(--rm-warning-strong)] dark:text-[var(--rm-warning-soft)]">
+    <span>Estado: {{ str_replace('_', ' ', $filtroEstado) }}</span>
+    <button type="button" wire:click="limpiarFiltro('filtroEstado')" class="hover:text-[var(--rm-action-primary)] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
+   </span>
+   @endif
+  </div>
+  <div class="flex items-center gap-2.5">
+   <span class="text-[11px] px-2.5 py-0.5 rounded-full font-bold bg-[var(--rm-text-primary)]/10 text-[var(--rm-text-primary)]">
+   {{ $adultos->total() ?? count($adultos) }} coincidentes
+   </span>
+   <button type="button"
+    wire:click="limpiarFiltros"
+    class="inline-flex items-center gap-1 rounded-xl bg-[var(--rm-action-primary-soft)] hover:bg-[var(--rm-action-primary-soft)] text-[var(--rm-action-primary)] py-1 px-2.5 text-xs font-bold transition cursor-pointer">
+   <i class="ph-bold ph-arrow-counter-clockwise"></i>
+   <span>Limpiar filtros</span>
+   </button>
+  </div>
+  </div>
+ @endif
+ </section>
  </div>
 
  <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
@@ -392,8 +392,8 @@
  @endphp
 
  <article class="group relative overflow-hidden rounded-[1.55rem] border border-borde bg-fondo-panel shadow-sm backdrop-blur-xl transition duration-300 hover:-translate-y-1 hover:border-borde-focus hover:shadow-[0_18px_38px_rgba(47,62,92,0.14)]">
- <div class="h-1.5 w-full bg-gradient-to-r from-[#E27D60] via-[#D9A05B] to-[#8DA280]"></div>
- <div class="relative bg-gradient-to-b from-[#D5C7B9]/72 to-[#E6DDD3]/30 px-5 pb-5 pt-4 text-center">
+ <div class="h-1.5 w-full bg-gradient-to-r from-[var(--rm-danger)] via-[var(--rm-warning)] to-[var(--rm-action-primary)]"></div>
+ <div class="relative bg-gradient-to-b from-[var(--rm-border-soft)]/50 to-[var(--rm-surface-soft)]/30 px-5 pb-5 pt-4 text-center">
  <div class="mb-3 flex items-center justify-between gap-2">
  <span class="rounded-full border px-2.5 py-1 text-xs font-bold uppercase tracking-wide {{ $estadoClase }}">{{ $estadoTexto }}</span>
  <span class="rounded-full border border-borde/45 bg-fondo-panel px-2.5 py-1 text-xs font-bold uppercase tracking-wide text-parrafo/55">{{ $adulto->edad ?? 'Edad no registrada' }}{{ $adulto->edad ? ' años' : '' }}</span>
@@ -403,7 +403,7 @@
  @if($adulto->foto)
  <img src="{{ Storage::url($adulto->foto) }}" alt="{{ $adulto->nombres }}" class="h-full w-full object-cover">
  @else
- <div class="flex h-full w-full items-center justify-center bg-gradient-to-br from-[#2F3E5C] to-[#5B5F97] text-xl font-extrabold text-inverso">
+ <div class="flex h-full w-full items-center justify-center bg-gradient-to-br from-[var(--rm-coffee-800)] to-[var(--rm-coffee-600)] text-xl font-extrabold text-inverso">
  {{ substr($adulto->nombres, 0, 1) }}{{ substr($adulto->ap_paterno, 0, 1) }}
  </div>
  @endif
@@ -504,7 +504,7 @@
  @if($adultoSeleccionadoParaModal->foto)
  <img src="{{ Storage::url($adultoSeleccionadoParaModal->foto) }}" alt="{{ $adultoSeleccionadoParaModal->nombres }}" class="h-full w-full object-cover">
  @else
- <div class="flex h-full w-full items-center justify-center bg-gradient-to-br from-[#2F3E5C] to-[#5B5F97] text-sm font-bold text-inverso">
+ <div class="flex h-full w-full items-center justify-center bg-gradient-to-br from-[var(--rm-coffee-800)] to-[var(--rm-coffee-600)] text-sm font-bold text-inverso">
  {{ substr($adultoSeleccionadoParaModal->nombres, 0, 1) }}{{ substr($adultoSeleccionadoParaModal->ap_paterno, 0, 1) }}
  </div>
  @endif
@@ -526,15 +526,15 @@
  </div>
 
  <div class="relative z-10 flex-1 overflow-y-auto bg-fondo-panel p-4 sm:p-6">
-  @if($seccionActiva === 'valoracion')
-  @livewire('valoraciones.salud-valoracion-panel', ['adulto' => $adultoSeleccionadoParaModal], key('val-'.$adultoSeleccionadoParaModal->cod_residente))
-  @elseif($seccionActiva === 'signos')
-  @livewire('clinica.salud-signos-panel', ['adulto' => $adultoSeleccionadoParaModal], key('signos-'.$adultoSeleccionadoParaModal->cod_residente))
-  @elseif($seccionActiva === 'evaluaciones')
-  @livewire('valoraciones.salud-evaluaciones-geriatricas-panel', ['adulto' => $adultoSeleccionadoParaModal], key('eval-'.$adultoSeleccionadoParaModal->cod_residente))
-  @elseif($seccionActiva === 'administracion')
-  @livewire('medicacion.salud-administracion-medicacion-panel', ['adulto' => $adultoSeleccionadoParaModal], key('adminmed-'.$adultoSeleccionadoParaModal->cod_residente))
-  @endif
+ @if($seccionActiva === 'valoracion')
+ @livewire('valoraciones.salud-valoracion-panel', ['adulto' => $adultoSeleccionadoParaModal], key('val-'.$adultoSeleccionadoParaModal->cod_residente))
+ @elseif($seccionActiva === 'signos')
+ @livewire('clinica.salud-signos-panel', ['adulto' => $adultoSeleccionadoParaModal], key('signos-'.$adultoSeleccionadoParaModal->cod_residente))
+ @elseif($seccionActiva === 'evaluaciones')
+ @livewire('valoraciones.salud-evaluaciones-geriatricas-panel', ['adulto' => $adultoSeleccionadoParaModal], key('eval-'.$adultoSeleccionadoParaModal->cod_residente))
+ @elseif($seccionActiva === 'administracion')
+ @livewire('medicacion.salud-administracion-medicacion-panel', ['adulto' => $adultoSeleccionadoParaModal], key('adminmed-'.$adultoSeleccionadoParaModal->cod_residente))
+ @endif
  </div>
  </aside>
  </div>

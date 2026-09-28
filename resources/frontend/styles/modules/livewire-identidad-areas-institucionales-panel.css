@@ -4,7 +4,7 @@
  display: none !important;
  }
  .print-area {
- background: white !important;
+ background: var(--rm-surface-raised) !important;
  box-shadow: none !important;
  color: #2F3E5C !important;
  padding: 0 !important;
@@ -14,7 +14,7 @@
  page-break-before: always;
  }
  body {
- background: white !important;
+ background: var(--rm-surface-raised) !important;
  }
  }
  

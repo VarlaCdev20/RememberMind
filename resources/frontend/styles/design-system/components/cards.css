@@ -1,34 +1,64 @@
 /* ============================================================
    REMEMBERMIND DESIGN SYSTEM — COMPONENTS / CARDS
-   Contenedores modulares cálidos y no hospitalarios.
-   DENSIDAD COMPACTA: Padding 14px, KPIs ~105px de altura.
+   Tarjetas estructuradas, paneles de contenido y bloques KPI normalizados:
+   - Superficies cálidas de beige institucional (var(--rm-surface))
+   - Bordes estructurales (var(--rm-card-border))
+   - Radios semánticos: var(--rm-card-radius)
+   - Sombras orgánicas sutiles (var(--rm-card-shadow) a var(--rm-card-hover-shadow))
+   - Estados: default, hover, selected, inactive, disabled
    ============================================================ */
 
-.rm-card,
-.rm-card-beige {
-    background-color: var(--rm-surface-beige, var(--rm-surface));
-    border: 1px solid var(--rm-border);
-    border-radius: var(--rm-radius-card, 14px);
-    box-shadow: var(--rm-shadow-sm);
-    transition: var(--rm-transition-all);
+:root {
+    /* ------------------------------------------------------------
+       CONTRATO DE TARJETAS
+       ------------------------------------------------------------ */
+    --rm-card-bg: var(--rm-surface); /* fondo */
+    --rm-card-border: var(--rm-border-soft); /* borde */
+    --rm-card-radius: var(--rm-radius-lg); /* radio */
+    --rm-card-shadow: var(--rm-shadow-sm); /* sombra */
+    --rm-card-padding: var(--rm-space-5); /* padding */
+    --rm-card-hover-shadow: var(--rm-shadow-md); /* hover */
+    --rm-card-selected-bg: var(--rm-action-primary-soft); /* seleccionada */
+
+    /* Metric Card Component Tokens */
+    --rm-metric-bg: var(--rm-surface);
+    --rm-metric-border: var(--rm-border);
+    --rm-metric-radius: var(--rm-radius-xl);
+    --rm-metric-accent-width: 3px;
+    --rm-metric-accent-danger: var(--rm-danger);
+    --rm-metric-accent-warning: var(--rm-warning);
+    --rm-metric-accent-info: var(--rm-info);
+    --rm-metric-accent-success: var(--rm-success);
+    --rm-metric-accent-clinical: var(--rm-clinical);
+    --rm-metric-accent-primary: var(--rm-action-primary);
+
+}
+
+.rm-card {
     display: flex;
     flex-direction: column;
     position: relative;
+    background-color: var(--rm-card-bg);
+    border: 1px solid var(--rm-card-border);
+    border-radius: var(--rm-card-radius);
+    box-shadow: var(--rm-card-shadow);
     overflow: hidden;
+    transition: var(--rm-transition-all);
+    box-sizing: border-box;
 }
 
-/* Cabecera, Cuerpo y Footer Compactos */
 .rm-card-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 10px 14px;
+    gap: var(--rm-space-3);
+    padding: var(--rm-space-3) var(--rm-card-padding);
     border-bottom: 1px solid var(--rm-border-soft);
     background-color: var(--rm-surface-soft);
 }
 
 .rm-card-body {
-    padding: var(--rm-card-padding, 14px);
+    padding: var(--rm-card-padding);
     flex: 1 1 auto;
 }
 
@@ -36,19 +66,26 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 10px 14px;
+    padding: var(--rm-space-3) var(--rm-card-padding);
     border-top: 1px solid var(--rm-border-soft);
-    background-color: var(--rm-surface-alt);
+    background-color: var(--rm-surface-soft);
 }
 
 /* Variantes */
 .rm-card-default {
-    background-color: var(--rm-surface);
+    background-color: var(--rm-card-bg);
+    border-color: var(--rm-card-border);
 }
 
 .rm-card-soft {
     background-color: var(--rm-surface-soft);
     border-color: var(--rm-border-soft);
+}
+
+.rm-card-raised {
+    background-color: var(--rm-surface-raised);
+    border-color: var(--rm-card-border);
+    box-shadow: var(--rm-card-hover-shadow);
 }
 
 .rm-card-interactive {
@@ -57,55 +94,109 @@
 
 .rm-card-interactive:hover {
     border-color: var(--rm-border-hover);
-    box-shadow: var(--rm-shadow-md);
+    box-shadow: var(--rm-card-hover-shadow);
     transform: translateY(-1px);
 }
 
-/* Variante Métrica / KPI Compacta (100–110px de altura) */
+/* Estados */
+.rm-card.is-selected,
+.rm-card-selected {
+    background-color: var(--rm-card-selected-bg);
+    border-color: var(--rm-action-primary) !important;
+    box-shadow: 0 0 0 2px var(--rm-action-primary), var(--rm-card-hover-shadow) !important;
+}
+
+.rm-card.is-inactive,
+.rm-card-inactive {
+    opacity: 0.70;
+    background-color: var(--rm-surface-muted);
+}
+
+.rm-card:disabled,
+.rm-card[aria-disabled="true"] {
+    opacity: var(--rm-state-disabled-opacity);
+    cursor: not-allowed;
+    pointer-events: none;
+    box-shadow: none !important;
+    transform: none !important;
+}
+
+/* Variante Métrica / KPI Compacta */
 .rm-card-metric {
-    padding: 10px 14px;
-    background-color: rgba(254, 251, 246, 0.55);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(228, 214, 199, 0.55);
-    border-radius: 14px;
-    box-shadow: 0 4px 20px rgba(60, 45, 30, 0.04);
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    min-height: 82px;
+    padding: var(--rm-space-4);
+    background-color: var(--rm-card-bg);
+    border: 1px solid var(--rm-card-border);
+    border-radius: var(--rm-card-radius);
+    box-shadow: var(--rm-card-shadow);
+    min-height: 88px;
     box-sizing: border-box;
+    transition: var(--rm-transition-all);
 }
 
-.dark .rm-card-metric {
-    background-color: rgba(20, 28, 36, 0.50);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border-color: rgba(255, 255, 255, 0.08);
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+
+.rm-card-metric.is-danger {
+    border-left: var(--rm-metric-accent-width) solid var(--rm-metric-accent-danger) !important;
+}
+.rm-card-metric.is-warning {
+    border-left: var(--rm-metric-accent-width) solid var(--rm-metric-accent-warning) !important;
+}
+.rm-card-metric.is-info {
+    border-left: var(--rm-metric-accent-width) solid var(--rm-metric-accent-info) !important;
+}
+.rm-card-metric.is-success {
+    border-left: var(--rm-metric-accent-width) solid var(--rm-metric-accent-success) !important;
+}
+.rm-card-metric.is-clinical {
+    border-left: var(--rm-metric-accent-width) solid var(--rm-metric-accent-clinical) !important;
+}
+.rm-card-metric.is-primary {
+    border-left: var(--rm-metric-accent-width) solid var(--rm-metric-accent-primary) !important;
+}
+
+.rm-card-metric:hover {
+    box-shadow: var(--rm-card-hover-shadow);
 }
 
 .rm-card-metric .rm-metric-label {
-    font-size: 10.5px;
-    font-weight: 700;
+    font-size: var(--rm-font-size-meta);
+    font-weight: var(--rm-font-weight-bold);
     text-transform: uppercase;
-    letter-spacing: 0.03em;
-    color: var(--rm-text-muted);
+    letter-spacing: var(--rm-letter-spacing-wide);
+    color: var(--rm-text-secondary);
 }
 
 .rm-card-metric .rm-metric-value {
-    font-family: var(--rm-font-title);
-    font-size: 21px;
-    font-weight: 700;
-    color: var(--rm-text-title);
-    line-height: 1.05;
-    margin: 1px 0;
+    font-family: var(--rm-font-family);
+    font-size: var(--rm-font-size-kpi);
+    font-weight: var(--rm-font-weight-extrabold);
+    color: var(--rm-text-primary);
+    line-height: 1.1;
+    margin: var(--rm-space-1) 0;
 }
 
 .rm-card-metric .rm-metric-meta {
-    font-size: 10.5px;
-    color: var(--rm-text-soft);
+    font-size: var(--rm-font-size-meta);
+    color: var(--rm-text-secondary);
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: var(--rm-space-1);
+}
+
+/* Modo oscuro */
+.dark .rm-card {
+    background-color: var(--rm-surface);
+    border-color: var(--rm-border);
+}
+
+.dark .rm-card-soft {
+    background-color: var(--rm-surface-soft);
+    border-color: var(--rm-border-soft);
+}
+
+.dark .rm-card-metric {
+    background-color: var(--rm-surface);
+    border-color: var(--rm-border);
 }

@@ -5,7 +5,7 @@
 </style>
  @if($adulto)<x-residentes.navegacion-ficha :adulto="$adulto" />@endif
  <section class="overflow-hidden rounded-[1.6rem] border border-borde/65 bg-fondo-panel shadow-sm backdrop-blur-xl">
- <div class="h-1.5 w-full bg-gradient-to-r from-[#E27D60] via-[#D9A05B] to-[#8DA280]"></div>
+ <div class="h-1.5 w-full bg-gradient-to-r from-[var(--rm-accent-terracotta)] via-[var(--rm-warning)] to-[var(--rm-action-primary)]"></div>
  <div class="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between">
  <div class="flex items-center gap-3">
  <span class="flex h-12 w-12 items-center justify-center rounded-2xl border border-borde/55 bg-fondo-panel text-boton-acento shadow-sm">
@@ -55,7 +55,7 @@
  @endif
 
  @if(in_array($vigente->nivel_dependencia, ['ALTA_DEPENDENCIA', 'SUPERVISION_PERMANENTE']))
- <div class="flex items-start gap-3 rounded-2xl border border-amber-200 bg-amber-50 px-5 py-4">
+ <div class="flex items-start gap-3 rounded-2xl border border-[var(--rm-warning)]/30 bg-[var(--rm-warning-soft)] px-5 py-4">
  <i class="ph-bold ph-wheelchair text-xl text-estado-advertencia mt-0.5 shrink-0"></i>
  <div>
  <p class="text-sm font-bold text-estado-advertencia">Dependencia funcional alta, requiere seguimiento.</p>
@@ -65,11 +65,11 @@
  @endif
 
  @if($vigente->indice_barthel !== null && $vigente->indice_barthel < 40)
- <div class="flex items-start gap-3 rounded-2xl border border-orange-200 bg-orange-50 px-5 py-4">
- <i class="ph-bold ph-chart-bar-decreasing text-xl text-orange-500 mt-0.5 shrink-0"></i>
+ <div class="flex items-start gap-3 rounded-2xl border border-[var(--rm-warning)]/40 bg-[var(--rm-warning-soft)] px-5 py-4">
+ <i class="ph-bold ph-chart-bar-decreasing text-xl text-[var(--rm-warning)] mt-0.5 shrink-0"></i>
  <div>
- <p class="text-sm font-bold text-orange-700">Índice funcional bajo (Barthel {{ $vigente->indice_barthel }}/100), requiere revisión.</p>
- <p class="text-xs font-bold text-orange-600/70 mt-0.5">Este aviso no constituye diagnóstico médico.</p>
+ <p class="text-sm font-bold text-[var(--rm-status-high)]">Índice funcional bajo (Barthel {{ $vigente->indice_barthel }}/100), requiere revisión.</p>
+ <p class="text-xs font-bold text-[var(--rm-warning)] mt-0.5">Este aviso no constituye diagnóstico médico.</p>
  </div>
  </div>
  @endif
@@ -390,7 +390,7 @@
  'va_bano_solo' => 'Va al baño solo',
  'camina_solo' => 'Camina solo',
  ] as $campo => $etiqueta)
- <label class="flex cursor-pointer items-center gap-2.5 rounded-xl border border-borde-suave px-3 py-2.5 transition hover:border-terracota/40 hover:bg-fondo-panel">
+ <label class="flex cursor-pointer items-center gap-2.5 rounded-xl border border-borde-suave px-3 py-2.5 transition hover:border-[var(--rm-action-primary)]/40 hover:bg-fondo-panel">
  <input wire:model="{{ $campo }}" type="checkbox" class="h-4 w-4 rounded border-borde text-boton-acento focus:ring-borde-focus">
  <span class="text-xs font-bold text-titulo">{{ $etiqueta }}</span>
  </label>
@@ -407,7 +407,7 @@
  'usa_andador' => 'Usa andador',
  'usa_silla_ruedas' => 'Usa silla de ruedas',
  ] as $campo => $etiqueta)
- <label class="flex cursor-pointer items-center gap-2.5 rounded-xl border border-borde-suave px-3 py-2.5 transition hover:border-terracota/40 hover:bg-fondo-panel">
+ <label class="flex cursor-pointer items-center gap-2.5 rounded-xl border border-borde-suave px-3 py-2.5 transition hover:border-[var(--rm-action-primary)]/40 hover:bg-fondo-panel">
  <input wire:model="{{ $campo }}" type="checkbox" class="h-4 w-4 rounded border-borde text-boton-acento focus:ring-borde-focus">
  <span class="text-xs font-bold text-titulo">{{ $etiqueta }}</span>
  </label>
@@ -428,7 +428,7 @@
  'se_asusta_facil' => 'Se asusta fácilmente',
  'necesita_supervision' => 'Necesita supervisión',
  ] as $campo => $etiqueta)
- <label class="flex cursor-pointer items-center gap-2.5 rounded-xl border border-borde-suave px-3 py-2.5 transition hover:border-terracota/40 hover:bg-fondo-panel">
+ <label class="flex cursor-pointer items-center gap-2.5 rounded-xl border border-borde-suave px-3 py-2.5 transition hover:border-[var(--rm-action-primary)]/40 hover:bg-fondo-panel">
  <input wire:model="{{ $campo }}" type="checkbox" class="h-4 w-4 rounded border-borde text-boton-acento focus:ring-borde-focus">
  <span class="text-xs font-bold text-titulo">{{ $etiqueta }}</span>
  </label>

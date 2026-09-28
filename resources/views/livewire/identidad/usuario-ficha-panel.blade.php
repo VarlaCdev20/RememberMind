@@ -6,12 +6,12 @@
  <div class="flex flex-col items-center gap-5 text-center sm:flex-row sm:text-left">
  <div class="relative">
  @if($usuario->foto_de_perfil)
- <img src="{{ \Illuminate\Support\Facades\Storage::url($usuario->foto_de_perfil) }}" 
- alt="{{ $usuario->name }}" 
+ <img src="{{ \Illuminate\Support\Facades\Storage::url($usuario->foto_de_perfil) }}"
+ alt="{{ $usuario->name }}"
  class="h-28 w-28 rounded-[2rem] object-cover ring-4 ring-white shadow-xl">
  @elseif($usuario->profile_photo_url)
- <img src="{{ $usuario->profile_photo_url }}" 
- alt="{{ $usuario->name }}" 
+ <img src="{{ $usuario->profile_photo_url }}"
+ alt="{{ $usuario->name }}"
  class="h-28 w-28 rounded-[2rem] object-cover ring-4 ring-white shadow-xl">
  @else
  <div class="flex h-28 w-28 items-center justify-center rounded-[2rem] bg-boton-principal text-4xl font-black text-inverso ring-4 ring-white shadow-xl">
@@ -20,7 +20,7 @@
  @endif
  <span class="absolute -bottom-1 -right-1 h-6 w-6 rounded-full border-4 border-borde {{ $usuario->estado === 'ACTIVO' ? 'bg-estado-exitoBg' : 'bg-fondo-panel' }}"></span>
  </div>
- 
+
  <div>
  <span class="text-[9px] font-bold uppercase tracking-[0.3em] text-boton-acento">
  Expediente digital
@@ -28,7 +28,7 @@
  <h1 class="mt-1 text-2xl font-black tracking-tight text-parrafo sm:text-3xl leading-none">
  {{ $usuario->nombres }} <span class="text-boton-acento">{{ $usuario->ap_paterno }} {{ $usuario->ap_materno }}</span>
  </h1>
- 
+
  <div class="mt-3 flex flex-wrap justify-center gap-2 sm:justify-start">
  <span class="inline-flex items-center gap-1 rounded-full bg-fondo-panel px-3.5 py-1 text-[10px] font-bold uppercase text-parrafo">
  <i class="ph-bold ph-shield-star"></i> {{ $nombre_rol }}
@@ -47,7 +47,7 @@
  <span class="text-boton-acento font-extrabold">{{ $avance_documental['porcentaje_avance'] }}%</span>
  </div>
  <div class="h-3 w-full rounded-full bg-fondo-panel overflow-hidden shadow-inner">
- <div class="h-full bg-gradient-to-r from-[#E27D60] to-[#8DA280] transition-all duration-1000 shadow-md"
+ <div class="h-full bg-gradient-to-r from-[var(--rm-accent-terracotta)] to-[var(--rm-action-primary)] transition-all duration-1000 shadow-md"
  style="width: {{ $avance_documental['porcentaje_avance'] }}%"></div>
  </div>
  <p class="mt-2 text-[9px] font-bold text-parrafo/55 uppercase tracking-wide text-center">
@@ -76,8 +76,8 @@
  <button type="button"
  wire:click="setTab('{{ $t }}')"
  class="flex h-10 items-center gap-2 rounded-xl px-4 text-xs font-bold uppercase tracking-wider transition-all duration-300 active:scale-95
- {{ $activeTab === $t 
- ? 'bg-boton-principal text-inverso shadow-md shadow-[#2F3E5C]/15' 
+ {{ $activeTab === $t
+ ? 'bg-boton-principal text-inverso shadow-md shadow-sm'
  : 'text-parrafo/65 hover:bg-fondo-card/40 hover:text-parrafo' }}">
  <i class="ph-bold {{ $info['i'] }} text-base"></i>
  {{ $info['l'] }}
@@ -202,7 +202,7 @@
  <h3 class="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-boton-acento">
  <i class="ph-bold ph-buildings text-lg"></i> Asignación Física & Área
  </h3>
- 
+
  <div class="rounded-2xl border border-borde-suave bg-fondo-panel p-5 flex items-start gap-4">
  <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-fondo-panel text-parrafo shadow-inner">
  <i class="ph-bold ph-tree-structure text-2xl"></i>
@@ -228,7 +228,7 @@
  </div>
  <div class="min-w-0">
  <p class="text-[9px] font-bold uppercase tracking-widest text-parrafo/45">Cargo de Desempeño</p>
- 
+
  @if($usuario->hasAnyRole(['ENFERMEROS', 'MEDICO GENERAL/GERIATRA', 'PSICOLOGO/A', 'PEDAGOGO', 'NUTRICIONISTA', 'FISIOTERAPEUTA']))
  <p class="mt-1 text-base font-extrabold text-parrafo uppercase truncate">{{ $usuario->personalSalud?->especialidad?->nombre ?? 'Sin Especialidad' }}</p>
  @if($usuario->personalSalud?->fecha_ing)
@@ -259,7 +259,7 @@
  <h3 class="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-boton-acento">
  <i class="ph-bold ph-link text-lg"></i> Adulto(s) Mayor(es) Vinculado(s)
  </h3>
- 
+
  @php
  $familiar = $usuario->familiares->first();
  $vinculos = $familiar ? $familiar->adultosMayores : collect();
@@ -286,7 +286,7 @@
  <th class="px-5 py-3.5 font-black">Observaciones</th>
  </tr>
  </thead>
- <tbody class="divide-y divide-[#E7DDD1]">
+ <tbody class="divide-y divide-[var(--rm-border-soft)]">
  @foreach($vinculos as $v)
  <tr class="hover:bg-fondo-panel">
  <td class="px-5 py-4">
@@ -360,7 +360,7 @@
  <th class="px-5 py-3.5 text-center font-black w-[30%]">Acciones</th>
  </tr>
  </thead>
- <tbody class="divide-y divide-[#E7DDD1]">
+ <tbody class="divide-y divide-[var(--rm-border-soft)]">
  @forelse($checklist as $item)
  <tr class="hover:bg-fondo-panel">
  <td class="px-5 py-4">
@@ -539,7 +539,7 @@
  <th class="px-5 py-3.5 font-black">Registrado Por</th>
  </tr>
  </thead>
- <tbody class="divide-y divide-[#E7DDD1]">
+ <tbody class="divide-y divide-[var(--rm-border-soft)]">
  @forelse($historial_horarios as $h)
  <tr class="hover:bg-fondo-panel">
  <td class="px-5 py-4">
@@ -610,7 +610,7 @@
  wire:click="toggleAcceso"
  wire:confirm="¿Está seguro de cambiar el estado de acceso del usuario?"
  class="mt-4 inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-[10px] font-bold uppercase text-inverso shadow-md transition hover:-translate-y-0.5 active:translate-y-0
- {{ $usuario->acceso_sistema === 'HABILITADO' ? 'bg-boton-acento shadow-[#E27D60]/10 hover:bg-fondo-panel' : 'bg-estado-exitoBg shadow-[#8DA280]/10 hover:bg-fondo-panel' }}">
+ {{ $usuario->acceso_sistema === 'HABILITADO' ? 'bg-boton-acento shadow-2xs hover:bg-fondo-panel' : 'bg-estado-exitoBg shadow-[#8DA280]/10 hover:bg-fondo-panel' }}">
  <i class="ph-bold {{ $usuario->acceso_sistema === 'HABILITADO' ? 'ph-user-minus' : 'ph-user-plus' }} text-sm"></i>
  {{ $usuario->acceso_sistema === 'HABILITADO' ? 'Bloquear Acceso' : 'Habilitar Acceso' }}
  </button>
@@ -749,7 +749,7 @@
  </div>
  @can('usuarios.reportes.pdf')
  <a href="{{ route('admin.usuarios.ficha.pdf', $usuario) }}" target="_blank"
- class="inline-flex items-center justify-center gap-2 rounded-xl bg-boton-principal py-3 text-xs font-bold uppercase text-inverso shadow-md shadow-[#2F3E5C]/15 transition hover:-translate-y-0.5 active:translate-y-0 text-center">
+ class="inline-flex items-center justify-center gap-2 rounded-xl bg-boton-principal py-3 text-xs font-bold uppercase text-inverso shadow-md shadow-sm transition hover:-translate-y-0.5 active:translate-y-0 text-center">
  <i class="ph-bold ph-printer text-base"></i> Descargar Reporte PDF
  </a>
  @endcan
@@ -837,7 +837,7 @@
  Cancelar
  </button>
  <button type="submit"
- class="rounded-xl bg-boton-principal px-6 py-2.5 text-[10px] font-bold uppercase text-inverso shadow-md shadow-[#2F3E5C]/15 transition hover:bg-boton-acento">
+ class="rounded-xl bg-boton-principal px-6 py-2.5 text-[10px] font-bold uppercase text-inverso shadow-md shadow-sm transition hover:bg-boton-acento">
  <span wire:loading.remove wire:target="archivoSubida">Confirmar Carga</span>
  <span wire:loading wire:target="archivoSubida"><i class="ph-bold ph-spinner animate-spin"></i> Subiendo...</span>
  </button>

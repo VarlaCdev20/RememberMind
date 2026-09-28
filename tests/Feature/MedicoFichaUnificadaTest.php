@@ -119,12 +119,14 @@ class MedicoFichaUnificadaTest extends TestCase
     {
         $this->actingAs($this->medico);
 
-        Livewire::test(FichaPaciente::class, ['adulto' => $this->residente->cod_residente])
+        $ficha = Livewire::test(FichaPaciente::class, ['adulto' => $this->residente->cod_residente])
             ->assertOk()
             ->assertSee('Aurelio')
             ->assertSee('Valdivia')
+            ->assertSee('ÁREA MÉDICA Y CLÍNICA');
+
+        $ficha->call('cambiarTab', 'medicacion')
             ->assertSee('Enalapril 10mg')
-            ->assertSee('ÁREA MÉDICA Y CLÍNICA')
             ->assertSee('Nueva Prescripción');
     }
 

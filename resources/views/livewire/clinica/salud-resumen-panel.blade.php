@@ -8,7 +8,7 @@ $estadoTexto = $adulto->estado?->estado ?? 'Sin estado';
 </style>
  @if($adulto)<x-residentes.navegacion-ficha :adulto="$adulto" />@endif
  <section class="overflow-hidden rounded-[1.6rem] border border-borde/65 bg-fondo-panel shadow-sm backdrop-blur-xl">
- <div class="h-1.5 w-full bg-gradient-to-r from-[#E27D60] via-[#D9A05B] to-[#8DA280]"></div>
+ <div class="h-1.5 w-full bg-gradient-to-r from-[var(--rm-accent-terracotta)] via-[var(--rm-warning)] to-[var(--rm-action-primary)]"></div>
  <div class="p-5">
  <span class="text-[10px] font-bold uppercase tracking-[0.2em] text-boton-acento">Resumen individual</span>
  <h2 class="mt-1 text-xl font-extrabold tracking-tight text-parrafo">Panel clínico-asistencial</h2>
@@ -25,7 +25,7 @@ $estadoTexto = $adulto->estado?->estado ?? 'Sin estado';
  {{-- Tarjeta de perfil --}}
  <div class="overflow-hidden rounded-2xl border border-borde-suave bg-fondo-card shadow-sm">
  <div class="h-20 w-full bg-gradient-to-br from-terracota/80 to-azul-profundo/80 relative">
- <div class="absolute inset-0 opacity-20 bg-[radial-gradient(#ffffff_1px,transparent_1px)] [background-size:16px_16px]"></div>
+ <div class="absolute inset-0 opacity-20 bg-[radial-gradient(var(--rm-surface-raised)_1px,transparent_1px)] [background-size:16px_16px]"></div>
  </div>
  <div class="relative px-5 pb-5 pt-10 flex flex-col items-center">
  <div class="absolute -top-10 left-1/2 -translate-x-1/2">
@@ -35,7 +35,7 @@ $estadoTexto = $adulto->estado?->estado ?? 'Sin estado';
  alt="{{ $adulto->nombres }}"
  class="h-full w-full object-cover">
  @else
- <div class="flex h-full w-full items-center justify-center bg-gradient-to-br from-[#E6DDD3] to-[#C7B5A3]">
+ <div class="flex h-full w-full items-center justify-center bg-gradient-to-br from-[var(--rm-surface)] to-[var(--rm-surface-soft)]">
  <span class="text-2xl font-black text-meta">
  {{ mb_strtoupper(mb_substr($adulto->nombres, 0, 1)) }}
  </span>
@@ -93,7 +93,7 @@ $estadoTexto = $adulto->estado?->estado ?? 'Sin estado';
  Alertas de Seguimiento
  </h3>
  @if(count($alertas) > 0)
- <span class="ml-auto rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-bold text-estado-advertencia">
+ <span class="ml-auto rounded-full bg-[var(--rm-warning-soft)] px-2 py-0.5 text-[10px] font-bold text-estado-advertencia">
  {{ count($alertas) }}
  </span>
  @endif
@@ -104,9 +104,9 @@ $estadoTexto = $adulto->estado?->estado ?? 'Sin estado';
  @php
  $esReq = $alerta['nivel'] === 'requiere_revision';
  $esAt = $alerta['nivel'] === 'atencion';
- $bg = $esReq ? 'bg-orange-50 border-orange-200' : ($esAt ? 'bg-amber-50 border-amber-200' : 'bg-blue-50 border-blue-200');
- $icon = $esReq ? 'ph-warning-octagon text-orange-500' : ($esAt ? 'ph-warning text-estado-advertencia' : 'ph-info text-blue-500');
- $text = $esReq ? 'text-orange-700' : ($esAt ? 'text-estado-advertencia' : 'text-blue-700');
+ $bg = $esReq ? 'bg-[var(--rm-status-high-soft)] border-[var(--rm-status-high)]/40' : ($esAt ? 'bg-[var(--rm-warning-soft)] border-[var(--rm-warning)]/30' : 'bg-blue-50 border-blue-200');
+ $icon = $esReq ? 'ph-warning-octagon text-[var(--rm-status-high)]' : ($esAt ? 'ph-warning text-estado-advertencia' : 'ph-info text-blue-500');
+ $text = $esReq ? 'text-[var(--rm-status-high)]' : ($esAt ? 'text-estado-advertencia' : 'text-[var(--rm-action-primary-hover)]');
  @endphp
  <div class="rounded-xl p-3 border {{ $bg }}">
  <div class="flex items-center gap-1.5 mb-1">
@@ -361,7 +361,7 @@ $estadoTexto = $adulto->estado?->estado ?? 'Sin estado';
  <th class="px-5 py-3 text-right">Estado</th>
  </tr>
  </thead>
- <tbody class="divide-y divide-[#C7B5A3]/20">
+ <tbody class="divide-y divide-[var(--rm-border)]/20">
  @forelse($medicacionActiva->take(5) as $med)
  <tr class="hover:bg-fondo-panel/50 transition-colors">
  <td class="px-5 py-3 font-bold">{{ $med->nombre_medicamento }}</td>
@@ -401,7 +401,7 @@ $estadoTexto = $adulto->estado?->estado ?? 'Sin estado';
  @if($ultimaAdministracion->administrado)
  <span class="text-estado-exito">Administrada</span>
  @else
- <span class="text-orange-600">No administrada</span>
+ <span class="text-[var(--rm-warning)]">No administrada</span>
  @if($ultimaAdministracion->motivo_omision)
  ({{ \Illuminate\Support\Str::limit($ultimaAdministracion->motivo_omision, 40) }})
  @endif
@@ -518,7 +518,7 @@ $estadoTexto = $adulto->estado?->estado ?? 'Sin estado';
  $riesgo = strtoupper((string) $valoracionFuncional->riesgo_caida);
  $riesgoBadge = match($riesgo) {
  'ALTO' => 'bg-rose-100 text-estado-peligro border-rose-200',
- 'MEDIO' => 'bg-amber-100 text-estado-advertencia border-amber-200',
+ 'MEDIO' => 'bg-[var(--rm-warning-soft)] text-estado-advertencia border-[var(--rm-warning)]/30',
  default => 'bg-emerald-100 text-estado-exito border-emerald-200',
  };
  $depLabels = [
@@ -558,7 +558,7 @@ $estadoTexto = $adulto->estado?->estado ?? 'Sin estado';
  </div>
  @if($barthelTexto)
  <div class="w-full bg-fondo-panel rounded-full h-1.5 mt-2">
- <div class="h-1.5 rounded-full {{ $barthel < 40 ? 'bg-rose-500' : ($barthel < 61 ? 'bg-amber-500' : 'bg-emerald-500') }}"
+ <div class="h-1.5 rounded-full {{ $barthel < 40 ? 'bg-rose-500' : ($barthel < 61 ? 'bg-[var(--rm-warning-soft)]0' : 'bg-emerald-500') }}"
  style="width: {{ min($barthel, 100) }}%"></div>
  </div>
  <p class="text-[10px] text-apoyo font-bold mt-1.5">{{ $barthelTexto }}</p>
@@ -647,7 +647,7 @@ $estadoTexto = $adulto->estado?->estado ?? 'Sin estado';
  {{ strtoupper($evaluacionCognitiva->nivel_riesgo) === 'ALTO'
  ? 'bg-rose-50 text-estado-peligro border-rose-200'
  : (strtoupper($evaluacionCognitiva->nivel_riesgo) === 'MEDIO'
- ? 'bg-amber-50 text-estado-advertencia border-amber-200'
+ ? 'bg-[var(--rm-warning-soft)] text-estado-advertencia border-[var(--rm-warning)]/30'
  : 'bg-emerald-50 text-estado-exito border-emerald-200') }}">
  {{ $evaluacionCognitiva->nivel_riesgo }}
  </span>

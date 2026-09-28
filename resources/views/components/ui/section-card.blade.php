@@ -1,39 +1,64 @@
 {{--
  Componente: ui/section-card
- Uso: <x-ui.section-card titulo="Datos del turno"> ... contenido ... </x-ui.section-card>
+ Contrato V2: title, subtitle opcional, actions opcional, body (slot), footer opcional.
+ Agnóstico de dominio, utiliza tokens de superficie, borde y tipografía V2.
 --}}
 @props([
     'titulo' => null,
     'subtitulo' => null,
+    'title' => null,
+    'subtitle' => null,
     'icono' => null,
+    'icon' => null,
     'acciones' => null,
+    'actions' => null,
+    'footer' => null,
 ])
 
-<div {{ $attributes->merge(['class' => 'rounded-2xl border border-[#D5CABE] dark:border-[#51483F] bg-[#F0E8DE] dark:bg-[#201E1C] p-4 sm:p-5 shadow-[0_6px_18px_rgba(70,55,45,0.05)]']) }}>
-    @if($titulo || $icono || $acciones)
-        <div class="flex items-center justify-between gap-3 pb-3 mb-4 border-b border-[#D5CABE]/60 dark:border-[#51483F]/60">
-            <div class="flex items-center gap-2.5">
-                @if($icono)
-                    <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#A35A44]/10 text-[#A35A44] dark:bg-[#A35A44]/20 dark:text-[#D6AE86]">
-                        <i class="ph-bold {{ $icono }} text-base"></i>
+@php
+    $resolvedTitle = $title ?? $titulo;
+    $resolvedSubtitle = $subtitle ?? $subtitulo;
+    $resolvedIcon = $icon ?? $icono;
+    $resolvedActions = $actions ?? $acciones;
+@endphp
+
+<section {{ $attributes->merge(['class' => 'rm-card bg-[var(--rm-surface)] border border-[var(--rm-border)] rounded-[var(--rm-radius-card,16px)] shadow-[var(--rm-shadow-sm)] p-4 sm:p-5 transition-all']) }}>
+    @if($resolvedTitle || $resolvedIcon || $resolvedActions)
+        <header class="flex items-center justify-between gap-3 pb-3 mb-4 border-b border-[var(--rm-border-soft)]">
+            <div class="flex items-center gap-3 min-w-0">
+                @if($resolvedIcon)
+                    <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[var(--rm-action-primary)]/10 text-[var(--rm-action-primary)] border border-[var(--rm-action-primary)]/20 text-base shadow-2xs">
+                        <i class="ph-bold {{ $resolvedIcon }}"></i>
                     </div>
                 @endif
-                <div>
-                    @if($titulo)
-                        <h3 class="text-sm sm:text-base font-bold text-[#304060] dark:text-[#E9DFD3]">{{ $titulo }}</h3>
+                <div class="min-w-0">
+                    @if($resolvedTitle)
+                        <h3 class="text-base sm:text-lg font-bold text-[var(--rm-text-primary)] leading-tight truncate">
+                            {{ $resolvedTitle }}
+                        </h3>
                     @endif
-                    @if($subtitulo)
-                        <p class="text-[11px] sm:text-xs text-[#677084] dark:text-[#C7BEB6]">{{ $subtitulo }}</p>
+                    @if($resolvedSubtitle)
+                        <p class="text-xs sm:text-sm font-medium text-[var(--rm-text-secondary)] mt-0.5 leading-snug truncate">
+                            {{ $resolvedSubtitle }}
+                        </p>
                     @endif
                 </div>
             </div>
-            @if($acciones)
-                <div class="flex items-center gap-2">
-                    {{ $acciones }}
+            @if($resolvedActions)
+                <div class="flex items-center gap-2 shrink-0">
+                    {{ $resolvedActions }}
                 </div>
             @endif
-        </div>
+        </header>
     @endif
 
-    {{ $slot }}
-</div>
+    <div class="rm-card-content flex-1">
+        {{ $slot }}
+    </div>
+
+    @if(isset($footer) && $footer)
+        <footer class="mt-4 pt-3 border-t border-[var(--rm-border-soft)] flex items-center justify-between gap-3 text-xs text-[var(--rm-text-secondary)]">
+            {{ $footer }}
+        </footer>
+    @endif
+</section>

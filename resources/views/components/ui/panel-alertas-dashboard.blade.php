@@ -8,7 +8,7 @@ $estilosNivel = [
 ];
 @endphp
 
-<div class="card-interactiva borde-verde-suave rounded-[2rem] border p-5">
+<div class="card-interactiva borde-verde-suave rounded-3xl border p-5">
  <h2 class="text-lg font-extrabold text-titulo">Alertas administrativas</h2>
  <p class="mb-4 text-xs font-bold text-meta">Pendientes de revisión institucional</p>
 
@@ -19,7 +19,7 @@ $estilosNivel = [
  $estilo = $estilosNivel[$nivel] ?? $estilosNivel['INFORMATIVA'];
  @endphp
 
- <li class="card-interactiva rounded-[1.4rem] border border-transparent p-3 transition hover:-translate-y-0.5 hover:bg-fondo-hover">
+ <li class="card-interactiva rounded-2xl border border-transparent p-3 transition hover:-translate-y-0.5 hover:bg-fondo-hover">
  <div class="flex items-start gap-2">
  <i class="ph-bold {{ $alerta['icono'] ?? 'ph-info' }} mt-0.5 shrink-0 text-base {{ $estilo['icono_color'] }}"></i>
  <div class="min-w-0 flex-1">
@@ -42,7 +42,7 @@ $estilosNivel = [
  </div>
  </li>
  @empty
- <li class="rounded-[1.4rem] bg-fondo-card p-4 text-sm font-bold text-apoyo">
+ <li class="rounded-2xl bg-fondo-card p-4 text-sm font-bold text-apoyo">
  Sin alertas pendientes.
  </li>
  @endforelse

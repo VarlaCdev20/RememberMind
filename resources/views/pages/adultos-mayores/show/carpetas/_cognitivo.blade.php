@@ -13,7 +13,7 @@
 
  @if($evaluacionesLista->count() > 0)
  <div class="space-y-6">
- 
+
  <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
  <div class="rounded-xl border border-borde-suave bg-fondo-panel p-3">
  <span class="block text-xs font-bold uppercase tracking-wide text-apoyo mb-1">Pruebas Totales</span>
@@ -21,7 +21,7 @@
  </div>
  <div class="rounded-xl border border-borde-suave bg-fondo-panel p-3">
  <span class="block text-xs font-bold uppercase tracking-wide text-apoyo mb-1">Deterioro Detectado</span>
- <p class="text-xl font-extrabold {{ $evaluacionesLista->whereIn('nivel_riesgo', ['MEDIO', 'ALTO', 'MODERADO'])->count() > 0 ? 'text-amber-600' : 'text-parrafo' }}">
+ <p class="text-xl font-extrabold {{ $evaluacionesLista->whereIn('nivel_riesgo', ['MEDIO', 'ALTO', 'MODERADO'])->count() > 0 ? 'text-[var(--rm-warning)]' : 'text-parrafo' }}">
  {{ $evaluacionesLista->whereIn('nivel_riesgo', ['MEDIO', 'ALTO', 'MODERADO'])->count() }}
  </p>
  </div>
@@ -40,7 +40,7 @@
  @if($latest > $previous)
  <span class="text-parrafo"><i class="ph-bold ph-trend-up"></i> Mejora</span>
  @elseif($latest < $previous)
- <span class="text-amber-600"><i class="ph-bold ph-trend-down"></i> Declive</span>
+ <span class="text-[var(--rm-warning)]"><i class="ph-bold ph-trend-down"></i> Declive</span>
  @else
  <span class="text-apoyo"><i class="ph-bold ph-minus"></i> Estable</span>
  @endif
@@ -56,7 +56,7 @@
  $riesgo = strtoupper($ultima->nivel_riesgo ?? 'NORMAL');
  $colorRiesgo = match($riesgo) {
  'ALTO' => 'text-red-600',
- 'MEDIO', 'MODERADO' => 'text-amber-600',
+ 'MEDIO', 'MODERADO' => 'text-[var(--rm-warning)]',
  default => 'text-parrafo',
  };
  @endphp

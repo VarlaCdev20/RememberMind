@@ -436,6 +436,10 @@ class FichaPaciente extends Component
     {
         $this->adultoMayor = Residente::with([
             'ocupacionActiva.cama.habitacion',
+            'admisiones',
+            'familiares',
+            'alergias' => fn ($q) => $q->whereIn('estado', ['ACTIVA', 'ACTIVO'])->orderByDesc('fecha_hora'),
+            'seguros' => fn ($q) => $q->whereIn('estado', ['ACTIVO', 'ACTIVA']),
             'asignacionesJornada.jornada.turno',
             'asignacionesJornada.personal.usuario',
             'atenciones',

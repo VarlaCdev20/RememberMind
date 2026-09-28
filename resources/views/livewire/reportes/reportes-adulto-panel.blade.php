@@ -34,23 +34,23 @@
 
  {{-- Indicadores rápidos en el rango --}}
  <div class="grid gap-3 mb-6 sm:grid-cols-2 lg:grid-cols-4">
- <div class="rounded-[18px] border border-borde-suave bg-fondo-panel p-4 shadow-xs">
+ <div class="rounded-2xl border border-borde-suave bg-fondo-panel p-4 shadow-xs">
  <p class="text-[9px] font-bold uppercase tracking-[0.15em] text-apoyo">Reportes Disponibles</p>
  <p class="mt-1 text-xl font-extrabold text-titulo">6</p>
  </div>
- <div class="rounded-[18px] border border-borde-suave bg-fondo-panel p-4 shadow-xs">
+ <div class="rounded-2xl border border-borde-suave bg-fondo-panel p-4 shadow-xs">
  <p class="text-[9px] font-bold uppercase tracking-[0.15em] text-apoyo">Registros Signos Vitales</p>
  <p class="mt-1 text-xl font-extrabold text-parrafo">
  {{ count($chartSignos['fc'] ?? []) }}
  </p>
  </div>
- <div class="rounded-[18px] border border-borde-suave bg-fondo-panel p-4 shadow-xs">
+ <div class="rounded-2xl border border-borde-suave bg-fondo-panel p-4 shadow-xs">
  <p class="text-[9px] font-bold uppercase tracking-[0.15em] text-apoyo">Evaluaciones Registradas</p>
  <p class="mt-1 text-xl font-extrabold text-parrafo">
  {{ count($chartCognitivo['puntajes'] ?? []) }}
  </p>
  </div>
- <div class="rounded-[18px] border border-borde-suave bg-fondo-panel p-4 shadow-xs">
+ <div class="rounded-2xl border border-borde-suave bg-fondo-panel p-4 shadow-xs">
  <p class="text-[9px] font-bold uppercase tracking-[0.15em] text-apoyo">Anexo de Trazabilidad</p>
  <span class="mt-1.5 inline-flex items-center rounded-md bg-fondo-panel border border-borde px-2 py-0.5 text-[10px] font-bold text-parrafo">
  ACTIVO
@@ -71,7 +71,7 @@
  'icono' => 'ph-files',
  'titulo' => 'Ficha Integral del Adulto Mayor',
  'desc' => 'Consolidado general administrativo, red de apoyo y evolución.',
- 'color' => '#2F3E5C',
+ 'color' => 'var(--rm-clinical)',
  'bg' => 'bg-fondo-panel',
  'url' => route('admin.adultos-mayores.reporte-individual', $adultoMayor->cod_residente)
  ],
@@ -79,7 +79,7 @@
  'icono' => 'ph-hand-pointing',
  'titulo' => 'Reporte de Atenciones',
  'desc' => 'Historial de atenciones institucionales registradas en el periodo.',
- 'color' => '#E27D60',
+ 'color' => 'var(--rm-accent-terracotta)',
  'bg' => 'bg-estado-peligroBg',
  'url' => route('admin.adultos-mayores.reportes.especifico', [$adultoMayor->cod_residente, 'medico']) . $q
  ],
@@ -87,7 +87,7 @@
  'icono' => 'ph-pill',
  'titulo' => 'Reporte de Medicación',
  'desc' => 'Tratamientos y bitácora de tomas registradas en el periodo.',
- 'color' => '#D9A27C',
+ 'color' => 'var(--rm-warning)',
  'bg' => 'bg-fondo-panel',
  'url' => route('admin.adultos-mayores.reportes.especifico', [$adultoMayor->cod_residente, 'medicacion']) . $q
  ],
@@ -95,7 +95,7 @@
  'icono' => 'ph-heartbeat',
  'titulo' => 'Reporte Signos Vitales',
  'desc' => 'Evolución registrada e historial de constantes vitales.',
- 'color' => '#C45F4B',
+ 'color' => 'var(--rm-danger)',
  'bg' => 'bg-fondo-panel',
  'url' => route('admin.adultos-mayores.reportes.especifico', [$adultoMayor->cod_residente, 'signos']) . $q
  ],
@@ -103,7 +103,7 @@
  'icono' => 'ph-person-arms-spread',
  'titulo' => 'Valoración Funcional',
  'desc' => 'Nivel de autonomía e indicadores funcionales institucionales.',
- 'color' => '#8EA17D',
+ 'color' => 'var(--rm-action-primary)',
  'bg' => 'bg-fondo-panel',
  'url' => route('admin.adultos-mayores.reportes.especifico', [$adultoMayor->cod_residente, 'funcional']) . $q
  ],
@@ -111,7 +111,7 @@
  'icono' => 'ph-brain',
  'titulo' => 'Reporte de Evaluaciones',
  'desc' => 'Puntajes de tamizaje cognitivo y resultados interpretativos.',
- 'color' => '#5B5F97',
+ 'color' => 'var(--rm-violet)',
  'bg' => 'bg-fondo-panel',
  'url' => route('admin.adultos-mayores.reportes.especifico', [$adultoMayor->cod_residente, 'cognitivo']) . $q
  ],
@@ -153,7 +153,7 @@
  <span class="h-2 w-2 rounded-full bg-fondo-panel"></span>
  Evolución de Signos Vitales
  </h4>
- 
+
  @if(empty($chartSignos['fc'] ?? []))
  <div class="flex flex-col items-center justify-center py-16 text-center border-2 border-dashed border-borde-suave rounded-xl bg-fondo-panel min-h-[260px]">
  <i class="ph-bold ph-heartbeat text-3xl text-apoyo mb-2"></i>
@@ -165,28 +165,28 @@
  x-data="{ chart: null }"
  x-init="
  chart = new Chart($refs.canvasSignos, {
-                                    type: 'line',
-                                    data: {
-                                        labels: @js($chartSignos['labels']),
-                                        datasets: [
-                                            { label: 'Frecuencia Cardíaca', data: @js($chartSignos['fc']), borderColor: '#D9745B', backgroundColor: 'rgba(217,116,91,0.14)', tension: 0.38, fill: true, pointRadius: 4, pointHoverRadius: 6, borderWidth: 2.5 },
-                                            { label: 'Saturación O2', data: @js($chartSignos['sat']), borderColor: '#4E8CA6', backgroundColor: 'rgba(78,140,166,0.10)', tension: 0.38, fill: true, pointRadius: 3.5, borderWidth: 2 },
-                                            { label: 'Temperatura', data: @js($chartSignos['temp']), borderColor: '#5F9271', backgroundColor: 'transparent', tension: 0.38, pointRadius: 3.5, borderWidth: 2 }
-                                        ]
-                                    },
-                                    options: { 
-                                        responsive: true, 
-                                        maintainAspectRatio: false,
-                                        animation: { duration: 950, easing: 'easeOutQuart' },
-                                        plugins: { 
-                                            legend: { position: 'bottom', labels: { boxWidth: 10, font: { family: 'Inter', size: 10, weight: 'bold' } } } 
-                                        },
-                                        scales: {
-                                            y: { beginAtZero: false, grid: { color: 'rgba(224,212,198,0.35)' }, ticks: { font: { size: 9 } } },
-                                            x: { grid: { display: false }, ticks: { font: { size: 9 } } }
-                                        } 
-                                    }
-                                });
+     type: 'line',
+     data: {
+     labels: @js($chartSignos['labels']),
+     datasets: [
+      { label: 'Frecuencia Cardíaca', data: @js($chartSignos['fc']), borderColor: 'var(--rm-danger)', backgroundColor: 'rgba(217,116,91,0.14)', tension: 0.38, fill: true, pointRadius: 4, pointHoverRadius: 6, borderWidth: 2.5 },
+      { label: 'Saturación O2', data: @js($chartSignos['sat']), borderColor: 'var(--rm-clinical)', backgroundColor: 'rgba(78,140,166,0.10)', tension: 0.38, fill: true, pointRadius: 3.5, borderWidth: 2 },
+      { label: 'Temperatura', data: @js($chartSignos['temp']), borderColor: 'var(--rm-success)', backgroundColor: 'transparent', tension: 0.38, pointRadius: 3.5, borderWidth: 2 }
+     ]
+     },
+     options: {
+     responsive: true,
+     maintainAspectRatio: false,
+     animation: { duration: 950, easing: 'easeOutQuart' },
+     plugins: {
+      legend: { position: 'bottom', labels: { boxWidth: 10, font: { family: 'Inter', size: 10, weight: 'bold' } } }
+     },
+     scales: {
+      y: { beginAtZero: false, grid: { color: 'rgba(224,212,198,0.35)' }, ticks: { font: { size: 9 } } },
+      x: { grid: { display: false }, ticks: { font: { size: 9 } } }
+     }
+     }
+    });
 
  $watch('$wire.chartSignos', value => {
  if (value && value.labels && value.labels.length > 0) {
@@ -221,35 +221,35 @@
  x-data="{ chart: null }"
  x-init="
  chart = new Chart($refs.canvasCognitivo, {
-                                    type: 'bar',
-                                    data: {
-                                        labels: @js($chartCognitivo['labels']),
-                                        datasets: [
-                                            {
-                                                label: 'Puntaje Obtenido',
-                                                data: @js($chartCognitivo['puntajes']),
-                                                backgroundColor: 'rgba(117,101,168,0.78)',
-                                                borderColor: '#7565A8',
-                                                borderWidth: 1.5,
-                                                borderRadius: 8,
-                                                barPercentage: 0.86,
-                                                categoryPercentage: 0.90
-                                            }
-                                        ]
-                                    },
-                                    options: { 
-                                        responsive: true, 
-                                        maintainAspectRatio: false,
-                                        animation: { duration: 950, easing: 'easeOutQuart' },
-                                        plugins: { 
-                                            legend: { position: 'bottom', labels: { boxWidth: 10, font: { family: 'Inter', size: 10, weight: 'bold' } } } 
-                                        },
-                                        scales: {
-                                            y: { beginAtZero: true, grid: { color: 'rgba(224,212,198,0.35)' }, ticks: { precision: 0, font: { size: 9 } } },
-                                            x: { grid: { display: false }, ticks: { font: { size: 9 } } }
-                                        } 
-                                    }
-                                });
+     type: 'bar',
+     data: {
+     labels: @js($chartCognitivo['labels']),
+     datasets: [
+      {
+      label: 'Puntaje Obtenido',
+      data: @js($chartCognitivo['puntajes']),
+      backgroundColor: 'rgba(117,101,168,0.78)',
+      borderColor: 'var(--rm-violet)',
+      borderWidth: 1.5,
+      borderRadius: 8,
+      barPercentage: 0.86,
+      categoryPercentage: 0.90
+      }
+     ]
+     },
+     options: {
+     responsive: true,
+     maintainAspectRatio: false,
+     animation: { duration: 950, easing: 'easeOutQuart' },
+     plugins: {
+      legend: { position: 'bottom', labels: { boxWidth: 10, font: { family: 'Inter', size: 10, weight: 'bold' } } }
+     },
+     scales: {
+      y: { beginAtZero: true, grid: { color: 'rgba(224,212,198,0.35)' }, ticks: { precision: 0, font: { size: 9 } } },
+      x: { grid: { display: false }, ticks: { font: { size: 9 } } }
+     }
+     }
+    });
 
  $watch('$wire.chartCognitivo', value => {
  if (value && value.labels && value.labels.length > 0) {

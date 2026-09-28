@@ -121,6 +121,8 @@
                     {{-- Edad, Fecha de Nacimiento, Código AM, Habitación, Cama --}}
                     <div class="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-[var(--rm-text-body)]">
                         <span><strong>{{ $adultoMayor->edad_texto }}</strong> ({{ $adultoMayor->fecha_nac ? \Carbon\Carbon::parse($adultoMayor->fecha_nac)->format('d/m/Y') : 'Sin fecha nac.' }})</span>
+                <span class="text-[var(--rm-border)]">|</span>
+                <span>Ingreso: <strong class="text-[var(--rm-text-title)]">{{ $adultoMayor->fecha_ingreso ? \Carbon\Carbon::parse($adultoMayor->fecha_ingreso)->format('d/m/Y') : ($adultoMayor->admisiones?->first()?->fecha_hora_admision?->format('d/m/Y') ?: ($adultoMayor->fecha_ing?->format('d/m/Y') ?: 'N/D')) }}</strong></span>
                         <span class="text-[var(--rm-border)]">•</span>
                         <span>Código AM: <strong class="text-[var(--rm-text-title)]">{{ $adultoMayor->cod_residente }}</strong></span>
                         <span class="text-[var(--rm-border)]">•</span>
@@ -167,7 +169,7 @@
                     <div class="p-2.5 rounded-xl bg-[var(--rm-surface-soft)] border border-[var(--rm-border-soft)]">
                         <span class="text-[10px] font-bold text-[var(--rm-text-muted)] uppercase tracking-wider block">Alergias</span>
                         <span class="text-xs font-bold text-rose-700 dark:text-rose-400 mt-0.5 truncate block" title="{{ $adultoMayor->alergias ?: 'Sin alergias' }}">
-                            {{ $adultoMayor->alergias ?: 'Sin alergias conocidas' }}
+                            {{ $adultoMayor->alergias ?: ($adultoMayor->alergiasClinicas?->pluck('sustancia')->implode(', ') ?: 'Sin alergias conocidas') }}
                         </span>
                     </div>
 
@@ -175,7 +177,7 @@
                     <div class="p-2.5 rounded-xl bg-[var(--rm-surface-soft)] border border-[var(--rm-border-soft)]">
                         <span class="text-[10px] font-bold text-[var(--rm-text-muted)] uppercase tracking-wider block">Grupo sanguíneo</span>
                         <span class="text-xs font-black text-[var(--rm-text-title)] mt-0.5 block">
-                            {{ $adultoMayor->grupo_sanguineo ? $adultoMayor->grupo_sanguineo . ($adultoMayor->factor_rh ?: '+') : 'No def.' }}
+                            {{ $adultoMayor->grupo_sanguineo ? $adultoMayor->grupo_sanguineo . ($adultoMayor->factor_rh ? ' ' . $adultoMayor->factor_rh : '+') : 'No def.' }}
                         </span>
                     </div>
 
@@ -183,7 +185,7 @@
                     <div class="p-2.5 rounded-xl bg-[var(--rm-surface-soft)] border border-[var(--rm-border-soft)]">
                         <span class="text-[10px] font-bold text-[var(--rm-text-muted)] uppercase tracking-wider block">Seguro de salud</span>
                         <span class="text-xs font-bold text-[var(--rm-text-title)] mt-0.5 truncate block" title="{{ $adultoMayor->seguro_salud ?: 'Particular' }}">
-                            {{ $adultoMayor->seguro_salud ?: 'Particular / No reg.' }}
+                            {{ $adultoMayor->seguro_salud ?: ($adultoMayor->seguros?->first()?->entidad ?: ($adultoMayor->seguros?->first()?->entidad ?: 'Particular / No reg.')) }}
                         </span>
                     </div>
 
@@ -191,7 +193,7 @@
                     <div class="p-2.5 rounded-xl bg-[var(--rm-surface-soft)] border border-[var(--rm-border-soft)]">
                         <span class="text-[10px] font-bold text-[var(--rm-text-muted)] uppercase tracking-wider block">Contacto de emergencia</span>
                         <span class="text-xs font-bold text-[var(--rm-text-title)] mt-0.5 truncate block" title="{{ $adultoMayor->contacto_emergencia_nombre }} ({{ $adultoMayor->contacto_emergencia_celular }})">
-                            {{ $adultoMayor->contacto_emergencia_nombre ? $adultoMayor->contacto_emergencia_nombre . ' (' . ($adultoMayor->contacto_emergencia_celular ?: 's/n') . ')' : 'Sin contacto' }}
+                            @php $cEmerg = $adultoMayor->contactos?->first() ?? $adultoMayor->residentesContactos?->first()?->contacto; $cNom = $adultoMayor->contacto_emergencia_nombre ?: ($cEmerg ? ($cEmerg->nombres . ' ' . $cEmerg->apellido_paterno) : null); $cCel = $adultoMayor->contacto_emergencia_celular ?: ($cEmerg ? $cEmerg->celular : null); @endphp{{ $cNom ? $cNom . ' (' . ($cCel ?: 's/n') . ')' : 'Sin contacto' }}
                         </span>
                     </div>
                 </div>

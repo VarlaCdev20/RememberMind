@@ -327,7 +327,7 @@
                 <button type="button">+ REGISTRAR ATENCIÓN</button>
                 <h3>Registrar atención clínica</h3>
                 <p>Selecciona el tipo de atención que deseas registrar.</p>
-                <span>{{ $adultoMayor->cod_residente }}</span>
+                <span>{{ $adultoMayor->cod_am ?? $adultoMayor->cod_residente }}</span>
                 <span>Vigilancia</span>
                 <div>Signos vitales - PA, FC, FR, SpO₂, Temperatura, Dolor, etc.</div>
                 <div>Cuidado de enfermería - Higiene, alimentación, hidratación, movilidad, eliminación, piel, etc.</div>
@@ -568,7 +568,7 @@
             <div class="p-3 rounded-xl bg-[var(--rm-surface-alt)] border border-[var(--rm-border)] flex flex-wrap items-center justify-between gap-2 text-xs">
                 <div class="flex items-center gap-2 text-[var(--rm-text-muted)]">
                     <i class="ph-bold ph-user-circle text-sm text-[#1E3A8A]"></i>
-                    <span>Profesional: <strong class="text-[var(--rm-text-title)]">{{ auth()->user()?->name ?? 'No identificado' }}</strong></span>
+                    <span>Profesional: <strong class="text-[var(--rm-text-title)]">{{ auth()->user()?->name ?? 'Equipo Asistencial' }}</strong></span>
                     <span>·</span>
                     <span class="text-[10px] font-bold uppercase bg-[var(--rm-surface)] px-2 py-0.5 rounded border border-[var(--rm-border)] text-[var(--rm-text-muted)]">{{ auth()->user()?->roles->first()?->name ?? 'Enfermería' }}</span>
                 </div>
@@ -584,7 +584,6 @@
                 <div>
                     <label class="font-bold text-[var(--rm-text-title)] block mb-1">Estado General *</label>
                     <select wire:model="segEstado" class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-surface-alt)] py-2 px-3 text-xs text-[var(--rm-text-title)] font-medium focus:ring-1 focus:ring-[#1E3A8A]">
-                        <option value="">Seleccione el estado observado</option>
                         <option value="ESTABLE">Estable</option>
                         <option value="VIGILANCIA">En Vigilancia</option>
                         <option value="DELICADO">Delicado</option>
@@ -596,7 +595,6 @@
                 <div>
                     <label class="font-bold text-[var(--rm-text-title)] block mb-1">Alimentación / Ingesta</label>
                     <select wire:model="segAlimentacion" class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-surface-alt)] py-2 px-3 text-xs text-[var(--rm-text-title)] font-medium focus:ring-1 focus:ring-[#1E3A8A]">
-                        <option value="">Seleccione la ingesta observada</option>
                         <option value="COMPLETA">Completa / Buena ingesta</option>
                         <option value="PARCIAL">Parcial / Regular</option>
                         <option value="RECHAZADA">Rechazada</option>
@@ -608,7 +606,6 @@
                 <div>
                     <label class="font-bold text-[var(--rm-text-title)] block mb-1">Movilidad Funcional</label>
                     <select wire:model="segMovilidad" class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-surface-alt)] py-2 px-3 text-xs text-[var(--rm-text-title)] font-medium focus:ring-1 focus:ring-[#1E3A8A]">
-                        <option value="">Seleccione la movilidad observada</option>
                         <option value="INDEPENDIENTE">Independiente / Autónoma</option>
                         <option value="ASISTIDA">Asistida con apoyo</option>
                         <option value="SILLA_RUEDAS">Silla de ruedas</option>
@@ -620,7 +617,6 @@
                 <div>
                     <label class="font-bold text-[var(--rm-text-title)] block mb-1">Patrón de Descanso / Sueño</label>
                     <select wire:model="segSueno" class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-surface-alt)] py-2 px-3 text-xs text-[var(--rm-text-title)] font-medium focus:ring-1 focus:ring-[#1E3A8A]">
-                        <option value="">Seleccione el patrón observado</option>
                         <option value="NORMAL">Normal / Reparador</option>
                         <option value="INTERRUMPIDO">Interrumpido / Inquieto</option>
                         <option value="INSOMNIO">Insomnio persistente</option>
@@ -1022,19 +1018,19 @@
                     <div class="grid grid-cols-2 gap-3 text-xs">
                         <div>
                             <span class="text-[10.5px] text-[var(--rm-text-muted)] block">Grupo Sanguíneo</span>
-                            <span class="font-bold text-rose-700">{{ $adultoMayor->grupo_sanguineo ? $adultoMayor->grupo_sanguineo . ($adultoMayor->factor_rh ?: '+') : 'No definido' }}</span>
+                            <span class="font-bold text-rose-700">{{ $adultoMayor->grupo_sanguineo ? $adultoMayor->grupo_sanguineo . ($adultoMayor->factor_rh ? ' ' . $adultoMayor->factor_rh : '+') : 'No definido' }}</span>
                         </div>
                         <div>
                             <span class="text-[10.5px] text-[var(--rm-text-muted)] block">Seguro de Salud</span>
-                            <span class="font-bold text-[var(--rm-text-title)]">{{ $adultoMayor->seguro_salud ?: 'Particular / Sin cobertura' }}</span>
+                            <span class="font-bold text-[var(--rm-text-title)]">{{ $adultoMayor->seguro_salud ?: ($adultoMayor->seguros?->first()?->entidad ?: ($adultoMayor->seguros?->first()?->entidad ?: 'Particular / Sin cobertura')) }}</span>
                         </div>
                         <div class="col-span-2">
                             <span class="text-[10.5px] text-[var(--rm-text-muted)] block">Alergias Conocidas</span>
-                            <span class="font-bold text-[var(--rm-text-title)]">{{ $adultoMayor->alergias ?: 'Sin alergias medicamentosas o alimentarias reportadas.' }}</span>
+                            <span class="font-bold text-[var(--rm-text-title)]">{{ $adultoMayor->alergias ?: ($adultoMayor->alergiasClinicas?->pluck('sustancia')->implode(', ') ?: ($adultoMayor->alergiasRegistradas?->pluck('sustancia')->implode(', ') ?: 'Sin alergias medicamentosas o alimentarias reportadas.')) }}</span>
                         </div>
                         <div class="col-span-2">
                             <span class="text-[10.5px] text-[var(--rm-text-muted)] block">Dieta y Restricciones</span>
-                            <span class="font-bold text-[var(--rm-text-title)]">{{ $adultoMayor->tipo_dieta ?: 'Dieta normal blanda para adulto mayor, hidratación monitorizada.' }}</span>
+                            <span class="font-bold text-[var(--rm-text-title)]">{{ $adultoMayor->tipo_dieta ?: 'Sin prescripción dietética específica.' }}</span>
                         </div>
                     </div>
                 </div>
@@ -1121,7 +1117,7 @@
                     </div>
                     <div class="flex items-center justify-between gap-3 pt-1">
                         <div>
-                            <h4 class="text-sm font-black text-[var(--rm-text-title)]">{{ $adultoMayor->contacto_emergencia_nombre ?: 'Familiar de Referencia' }}</h4>
+                            <h4 class="text-sm font-black text-[var(--rm-text-title)]">{{ $adultoMayor->contacto_emergencia_nombre ?: (($adultoMayor->contactos?->first() ?? $adultoMayor->residentesContactos?->first()?->contacto) ? (($adultoMayor->contactos?->first() ?? $adultoMayor->residentesContactos?->first()?->contacto)->nombres . ' ' . ($adultoMayor->contactos?->first() ?? $adultoMayor->residentesContactos?->first()?->contacto)->apellido_paterno) : 'Sin contacto de emergencia registrado') }}</h4>
                             <p class="text-xs text-[var(--rm-text-muted)] mt-0.5">{{ $adultoMayor->contacto_emergencia_parentesco ?: 'Apoderado Legal / Familiar directo' }}</p>
                         </div>
                         @if($adultoMayor->contacto_emergencia_celular)
@@ -1162,8 +1158,20 @@
                         </div>
                         @endforeach
                     @else
-                        <div class="rounded-2xl border border-dashed border-[var(--rm-border)] bg-[var(--rm-surface-alt)] p-4 text-center text-xs text-[var(--rm-text-muted)]">
-                            No existen familiares o apoderados registrados.
+                        {{-- Ejemplo enriquecido si no hay en pivot --}}
+                        <div class="p-3.5 rounded-2xl border border-[var(--rm-border)] bg-[var(--rm-surface-alt)] flex items-center justify-between gap-3">
+                            <div class="flex items-center gap-3">
+                                <div class="h-10 w-10 rounded-xl bg-blue-100 dark:bg-blue-950 text-[#1E3A8A] flex items-center justify-center font-bold text-sm shrink-0">
+                                    <i class="ph-bold ph-user"></i>
+                                </div>
+                                <div>
+                                    <h5 class="font-bold text-xs text-[var(--rm-text-title)]">{{ $adultoMayor->contacto_emergencia_nombre ?: 'Hijo/a tutor' }}</h5>
+                                    <p class="text-[11px] text-[var(--rm-text-muted)] mt-0.5">Hijo/a · Tutor Legal acreditado</p>
+                                </div>
+                            </div>
+                            <span class="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
+                                Tutor Acreditado
+                            </span>
                         </div>
                     @endif
                 </div>

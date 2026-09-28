@@ -12,7 +12,7 @@ $responsables = $redFamiliar['responsables'] ?? 0;
 $parentescos = $redFamiliar['parentescos'] ?? [];
 @endphp
 
-<div class="rm-card rounded-[2rem] p-5">
+<div class="rm-card rounded-3xl p-5">
  <div class="mb-4">
  <span class="text-[11px] font-bold uppercase tracking-widest text-boton-acento">
  Estructura operativa
@@ -24,7 +24,7 @@ $parentescos = $redFamiliar['parentescos'] ?? [];
  <div class="grid gap-3 sm:grid-cols-2">
 
  {{-- Personal de Salud --}}
- <div class="rounded-[1.5rem] border border-borde bg-fondo-hover p-3">
+ <div class="rounded-2xl border border-borde bg-fondo-hover p-3">
  <div class="mb-2 flex items-center gap-2">
  <div class="flex h-8 w-8 items-center justify-center rounded-xl bg-modulo-cognitivoFondo text-modulo-cognitivoTexto">
  <i class="ph-fill ph-stethoscope text-base"></i>
@@ -61,7 +61,7 @@ $parentescos = $redFamiliar['parentescos'] ?? [];
  </div>
 
  {{-- Personal Administrativo --}}
- <div class="rounded-[1.5rem] border border-borde bg-fondo-hover p-3">
+ <div class="rounded-2xl border border-borde bg-fondo-hover p-3">
  <div class="mb-2 flex items-center gap-2">
  <div class="flex h-8 w-8 items-center justify-center rounded-xl bg-estado-advertencia-bg text-boton-acento">
  <i class="ph-fill ph-briefcase text-base"></i>
@@ -94,7 +94,7 @@ $parentescos = $redFamiliar['parentescos'] ?? [];
  </div>
 
  {{-- Red familiar --}}
- <div class="mt-3 rounded-[1.5rem] border border-borde bg-fondo-hover p-3">
+ <div class="mt-3 rounded-2xl border border-borde bg-fondo-hover p-3">
  <div class="mb-2 flex items-center gap-2">
  <div class="flex h-7 w-7 items-center justify-center rounded-lg bg-estado-advertencia-bg text-estado-advertencia-texto">
  <i class="ph-fill ph-house-line text-sm"></i>

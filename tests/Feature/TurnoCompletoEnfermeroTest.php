@@ -202,8 +202,10 @@ class TurnoCompletoEnfermeroTest extends TestCase
         $this->get(route('dashboard'))->assertRedirect(route('admin.enfermeria.dashboard'));
         $this->get(route('admin.enfermeria.dashboard'))->assertOk()->assertSee('Juan Asignado');
         $this->get(route('admin.enfermeria.pacientes'))->assertOk()->assertSee('Juan Asignado');
-        $this->get(route('admin.enfermeria.pacientes.ficha', $pacienteAsignado))->assertOk()
-            ->assertSee('Juan Asignado')->assertSee('Registrar signos')->assertSee('Enalapril 10mg');
+        $this->get(route('admin.enfermeria.pacientes.ficha', ['adulto' => $pacienteAsignado, 'tab' => 'signos']))->assertOk()
+            ->assertSee('Juan Asignado')->assertSee('Registrar signos');
+        $this->get(route('admin.enfermeria.pacientes.ficha', ['adulto' => $pacienteAsignado, 'tab' => 'medicacion']))->assertOk()
+            ->assertSee('Juan Asignado')->assertSee('Enalapril 10mg');
         $this->get(route('admin.enfermeria.pase-turno'))->assertOk()->assertSee('Pase de Turno');
         $this->get(route('admin.alertas-clinicas.index'))->assertOk()->assertSee('Alertas clínicas');
 

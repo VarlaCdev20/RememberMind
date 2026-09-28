@@ -20,8 +20,9 @@ export default {
     theme: {
         extend: {
             fontFamily: {
-                sans: ['Inter', ...defaultTheme.fontFamily.sans],
-                outfit: ['Outfit', 'sans-serif'],
+                sans: ['"Nunito Sans"', 'sans-serif', ...defaultTheme.fontFamily.sans],
+                outfit: ['"Nunito Sans"', 'sans-serif'],
+                nunito: ['"Nunito Sans"', 'sans-serif'],
             },
 
             colors: {

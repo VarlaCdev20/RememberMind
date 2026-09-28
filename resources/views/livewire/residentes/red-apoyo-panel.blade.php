@@ -93,7 +93,7 @@
 
  <div class="mx-auto w-full max-w-[1480px] min-w-0 space-y-5">
  <section class="overflow-hidden rounded-[1.45rem] border border-borde-suave bg-fondo-panel shadow-[0_16px_46px_rgba(47,62,92,0.12)] backdrop-blur-xl">
- <div class="h-1.5 bg-gradient-to-r from-[#E27D60] via-[#D9A05B] to-[#8DA280]"></div>
+ <div class="h-1.5 bg-gradient-to-r from-[var(--rm-accent-terracotta)] via-[var(--rm-warning)] to-[var(--rm-action-primary)]"></div>
  <div class="flex flex-col gap-4 p-5 xl:flex-row xl:items-end xl:justify-between">
  <div class="max-w-3xl">
  <span class="inline-flex items-center gap-2 rounded-full border border-borde-focus bg-estado-peligroBg px-3 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-boton-acento">
@@ -207,7 +207,7 @@
  </div>
  </div>
  @else
- <div x-data="window.redApoyoTree()" 
+ <div x-data="window.redApoyoTree()"
  x-init="init()"
  x-ref="container"
  class="relative w-full min-h-[420px] max-h-[520px] rounded-2xl border border-slate-200/70 bg-fondo-panel shadow-sm overflow-y-auto overflow-x-hidden px-2 py-6 md:p-6 flex flex-col items-center justify-start"
@@ -215,12 +215,12 @@
  <!-- Capa SVG para líneas conectadas -->
  <svg class="absolute inset-0 w-full h-full pointer-events-none z-0">
  <template x-for="(line, index) in lines" :key="index">
- <path :d="line.d" 
- fill="none" 
- :stroke="line.color" 
- :stroke-width="line.stroke" 
- stroke-linecap="round" 
- :stroke-dasharray="line.dashed ? '6,6' : 'none'" 
+ <path :d="line.d"
+ fill="none"
+ :stroke="line.color"
+ :stroke-width="line.stroke"
+ stroke-linecap="round"
+ :stroke-dasharray="line.dashed ? '6,6' : 'none'"
  class="transition-all duration-300"
  />
  </template>
@@ -228,9 +228,9 @@
 
  <!-- Capa HTML Nodos -->
  <div class="relative z-10 flex flex-col items-center w-full max-w-full pb-8">
- 
+
  <!-- Nivel 0: Adulto Mayor -->
- <button type="button" id="nodo-adulto" 
+ <button type="button" id="nodo-adulto"
  wire:click.stop="verDetalleAdulto"
  @click="seleccionarNodo('adulto', '{{ $adulto->cod_residente }}')"
  class="flex flex-col items-center group cursor-pointer transition-transform hover:scale-105 border-none bg-transparent"
@@ -257,11 +257,11 @@
  @else
  <!-- Nivel 1 & 2: Familiares Agrupados -->
  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 w-full mt-10 max-w-full lg:max-w-6xl relative z-10 px-1 md:px-4">
- 
+
  <!-- Grupo 1: Familia Directa (Cónyuge, Hijos -> Nietos) -->
  <div class="flex flex-col items-center justify-start gap-4 border-t-[3px] border-slate-300/60 pt-6 relative mt-4 md:mt-0 min-w-0 w-full">
  <span class="absolute -top-3 bg-fondo-panel px-3 py-0.5 text-[9px] font-bold text-slate-500 rounded-full border border-slate-200/60 shadow-sm">FAMILIA DIRECTA</span>
- 
+
  <div class="flex flex-wrap justify-center gap-3 max-w-full w-full">
  @foreach(array_merge($gruposFamiliares['conyuge'], $gruposFamiliares['hijos']) as $fam)
  @include('livewire.residentes.partials._nodo-familiar', ['fam' => $fam])
@@ -286,7 +286,7 @@
  <!-- Grupo 2: Hermanos -> Sobrinos -->
  <div class="flex flex-col items-center justify-start gap-4 border-t-[3px] border-slate-300/60 pt-6 relative mt-6 md:mt-0 min-w-0 w-full">
  <span class="absolute -top-3 bg-fondo-panel px-3 py-0.5 text-[9px] font-bold text-slate-500 rounded-full border border-slate-200/60 shadow-sm">HERMANOS/AS</span>
- 
+
  <div class="flex flex-wrap justify-center gap-3 max-w-full w-full">
  @foreach($gruposFamiliares['hermanos'] as $fam)
  @include('livewire.residentes.partials._nodo-familiar', ['fam' => $fam])
@@ -311,7 +311,7 @@
  <!-- Grupo 3: Otros Contactos -->
  <div class="flex flex-col items-center justify-start gap-4 border-t-[3px] border-slate-300/60 pt-6 relative mt-6 md:mt-0 min-w-0 w-full">
  <span class="absolute -top-3 bg-fondo-panel px-3 py-0.5 text-[9px] font-bold text-slate-500 rounded-full border border-slate-200/60 shadow-sm">OTROS / CONTACTOS</span>
- 
+
  <div class="flex flex-wrap justify-center gap-3 max-w-full w-full">
  @foreach($gruposFamiliares['otros'] as $fam)
  @include('livewire.residentes.partials._nodo-familiar', ['fam' => $fam])
@@ -383,7 +383,7 @@
  <th class="px-4 py-3 text-right">Acciones</th>
  </tr>
  </thead>
- <tbody class="divide-y divide-[#C7B5A3]/45 bg-fondo-card/25">
+ <tbody class="divide-y divide-[var(--rm-border)]/45 bg-fondo-card/25">
  @forelse($personasListado as $persona)
  <?php $personaNodeKey = 'familiar-' . $persona['cod_fam']; ?>
  <tr class="transition hover:bg-fondo-card/45">
@@ -405,10 +405,10 @@
  <span class="rounded-full px-2.5 py-1 text-[10px] font-bold {{ $persona['responsable'] ? 'bg-estado-peligroBg text-parrafo' : 'bg-fondo-app text-apoyo' }}">{{ $persona['responsable'] ? 'Sí' : 'No' }}</span>
  </td>
  <td class="px-4 py-3">
- <span class="rounded-full px-2.5 py-1 text-[10px] font-bold {{ $persona['emergencia'] ? 'bg-amber-100 text-amber-700' : 'bg-fondo-app text-apoyo' }}">{{ $persona['emergencia'] ? 'Sí' : 'No' }}</span>
+ <span class="rounded-full px-2.5 py-1 text-[10px] font-bold {{ $persona['emergencia'] ? 'bg-[var(--rm-warning-soft)] text-[var(--rm-warning-strong)]' : 'bg-fondo-app text-apoyo' }}">{{ $persona['emergencia'] ? 'Sí' : 'No' }}</span>
  </td>
  <td class="px-4 py-3">
- <span class="rounded-full px-2.5 py-1 text-[10px] font-bold {{ $persona['estado'] === 'ACTIVO' ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-600' }}">{{ $persona['estado_badge'] }}</span>
+ <span class="rounded-full px-2.5 py-1 text-[10px] font-bold {{ $persona['estado'] === 'ACTIVO' ? 'bg-emerald-100 text-emerald-700' : 'bg-[var(--rm-surface-soft)] text-slate-600' }}">{{ $persona['estado_badge'] }}</span>
  </td>
  <td class="px-4 py-3 text-xs font-bold text-apoyo">{{ $persona['actualizado'] }}</td>
  <td class="px-4 py-3">
@@ -428,7 +428,7 @@
  </button>
  @endif
  @if(!$persona['emergencia'])
- <button type="button" @click="confirmarRed({{ $persona['vinculo_id'] }}, 'emergencia')" class="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-100 text-amber-700 transition hover:bg-amber-500 hover:text-inverso" title="Marcar emergencia">
+ <button type="button" @click="confirmarRed({{ $persona['vinculo_id'] }}, 'emergencia')" class="flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--rm-warning-soft)] text-[var(--rm-warning-strong)] transition hover:bg-[var(--rm-warning-soft)]0 hover:text-inverso" title="Marcar emergencia">
  <i class="ph-bold ph-phone-call"></i>
  </button>
  @endif
@@ -566,11 +566,11 @@
  <div class="grid gap-2">
  <label class="flex items-center justify-between rounded-xl border border-borde-suave bg-fondo-card/35 px-4 py-3 text-sm font-bold text-titulo">
  Responsable principal
- <input wire:model="form.es_responsable" type="checkbox" class="h-5 w-5 rounded border-borde-suave text-boton-acento focus:ring-[#E27D60]">
+ <input wire:model="form.es_responsable" type="checkbox" class="h-5 w-5 rounded border-borde-suave text-boton-acento focus:ring-[var(--rm-danger)]">
  </label>
  <label class="flex items-center justify-between rounded-xl border border-borde-suave bg-fondo-card/35 px-4 py-3 text-sm font-bold text-titulo">
  Contacto de emergencia
- <input wire:model="form.es_contacto_emergencia" type="checkbox" class="h-5 w-5 rounded border-borde-suave text-boton-acento focus:ring-[#E27D60]">
+ <input wire:model="form.es_contacto_emergencia" type="checkbox" class="h-5 w-5 rounded border-borde-suave text-boton-acento focus:ring-[var(--rm-danger)]">
  </label>
  </div>
 
@@ -608,15 +608,15 @@
  <i class="ph-bold ph-x text-lg"></i>
  </button>
  </div>
- 
+
  <div class="overflow-y-auto p-5 sm:p-6 bg-fondo-panel">
  <div class="flex flex-col sm:flex-row items-center sm:items-start gap-5">
- <div class="flex h-20 w-20 shrink-0 items-center justify-center rounded-[1.25rem] shadow-sm text-2xl font-black 
- {{ $detalleVinculo['tipo'] === 'adulto' ? 'bg-boton-principal text-inverso border-2 border-borde' : 
+ <div class="flex h-20 w-20 shrink-0 items-center justify-center rounded-[1.25rem] shadow-sm text-2xl font-black
+ {{ $detalleVinculo['tipo'] === 'adulto' ? 'bg-boton-principal text-inverso border-2 border-borde' :
  'bg-estado-peligroBg text-parrafo border-2 border-borde-focus' }}">
  {{ strtoupper(mb_substr($detalleVinculo['nombre_completo'], 0, 1)) }}
  </div>
- 
+
  <div class="flex-1 text-center sm:text-left min-w-0">
  <h3 class="text-lg font-extrabold text-titulo truncate max-w-full">{{ $detalleVinculo['nombre_completo'] }}</h3>
  <div class="mt-1 flex flex-wrap items-center justify-center sm:justify-start gap-2">
@@ -624,11 +624,11 @@
  {{ $detalleVinculo['parentesco'] ?? ($detalleVinculo['tipo'] === 'adulto' ? 'Adulto Mayor' : 'Familiar') }}
  </span>
  @if($detalleVinculo['tipo'] === 'adulto' && isset($detalleVinculo['edad']))
- <span class="rounded-full bg-slate-100 px-2.5 py-0.5 text-[11px] font-bold text-slate-600">
+ <span class="rounded-full bg-[var(--rm-surface-soft)] px-2.5 py-0.5 text-[11px] font-bold text-slate-600">
  {{ $detalleVinculo['edad'] }}
  </span>
  @endif
- <span class="rounded-full px-2.5 py-0.5 text-[11px] font-bold {{ ($detalleVinculo['estado'] ?? '') === 'ACTIVO' ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-200 text-slate-600' }}">
+ <span class="rounded-full px-2.5 py-0.5 text-[11px] font-bold {{ ($detalleVinculo['estado'] ?? '') === 'ACTIVO' ? 'bg-emerald-100 text-emerald-700' : 'bg-[var(--rm-surface-muted)] text-slate-600' }}">
  {{ $detalleVinculo['estado_badge'] ?? ($detalleVinculo['estado'] ?? 'ACTIVO') }}
  </span>
  </div>
@@ -715,7 +715,7 @@
  </div>
  <div class="col-span-1 sm:col-span-2 mt-2">
  <p class="text-[10px] font-bold uppercase text-slate-400">Observación del vínculo</p>
- <p class="mt-1 rounded-xl bg-slate-50 border border-slate-100 p-3 text-sm font-bold leading-relaxed text-titulo">
+ <p class="mt-1 rounded-xl bg-[var(--rm-surface-raised)] border border-slate-100 p-3 text-sm font-bold leading-relaxed text-titulo">
  {{ $detalleVinculo['observacion'] }}
  </p>
  </div>
@@ -732,21 +732,21 @@
  @elseif(($detalleVinculo['celular'] ?? 'No registrado') === 'No registrado')
  <span class="inline-block rounded-full bg-rose-100 px-3 py-1 text-xs font-bold text-rose-700">Sin teléfono registrado</span>
  @elseif($detalleVinculo['incompleto'] ?? false)
- <span class="inline-block rounded-full bg-amber-100 px-3 py-1 text-xs font-bold text-amber-700">Información incompleta</span>
+ <span class="inline-block rounded-full bg-[var(--rm-warning-soft)] px-3 py-1 text-xs font-bold text-[var(--rm-warning-strong)]">Información incompleta</span>
  @else
  <span class="inline-block rounded-full bg-sky-100 px-3 py-1 text-xs font-bold text-sky-700">Perfil en orden</span>
  @endif
  @else
- <span class="inline-block rounded-full bg-slate-200 px-3 py-1 text-xs font-bold text-slate-600">Revisar datos de contacto (Inactivo)</span>
+ <span class="inline-block rounded-full bg-[var(--rm-surface-muted)] px-3 py-1 text-xs font-bold text-slate-600">Revisar datos de contacto (Inactivo)</span>
  @endif
  </div>
  </div>
  </div>
- 
+
  <div class="bg-fondo-card border-t border-slate-200/70 p-4 flex justify-between gap-3 items-center">
  <div>
  @if($detalleVinculo['tipo'] === 'FAMILIAR' && auth()->user()->can('residentes_contactos.gestionar'))
- <button type="button" wire:click="editarVinculo({{ $detalleVinculo['vinculo_id'] }})" class="inline-flex h-10 items-center justify-center gap-2 rounded-xl bg-slate-100 border border-slate-200 px-4 text-xs font-bold text-slate-700 transition hover:bg-slate-200">
+ <button type="button" wire:click="editarVinculo({{ $detalleVinculo['vinculo_id'] }})" class="inline-flex h-10 items-center justify-center gap-2 rounded-xl bg-[var(--rm-surface-soft)] border border-slate-200 px-4 text-xs font-bold text-slate-700 transition hover:bg-[var(--rm-surface-muted)]">
  <i class="ph-bold ph-pencil-simple text-sm"></i>
  Editar vínculo
  </button>

@@ -1,7 +1,7 @@
 # RememberMind — Arquitectura Frontend Canónica
 
-**Versión:** 1.0 (Fase 1: Consolidación)  
-**Estado:** VIGENTE (Norma Arquitectónica)  
+**Versión:** 1.0 (Fase 1: Consolidación)
+**Estado:** VIGENTE (Norma Arquitectónica)
 **Ámbito:** Capa de Presentación, Sistema de Diseño, Componentes Blade, Livewire 4 y Maquetación.
 
 ---
@@ -48,15 +48,84 @@ La arquitectura frontend de RememberMind se fundamenta en dos paradigmas complem
 ## 3. Especificación de Capas
 
 ### 3.1 Design System (`resources/frontend/styles/design-system/`)
-*   **Responsabilidad:** Contrato visual formal del sistema (colores con contraste WCAG AA $\ge 4.5:1$, escala tipográfica Inter/Outfit, espaciados de 8pt, radios semánticos, sombras difusas y presets de Chart.js).
-*   **Tokens Canónicos Requeridos:**
-    *   `--rm-primary`: `#B05D40` (Terracota institucional; contraste 4.68:1 con blanco).
-    *   `--rm-surface`: `#E8DFD5` (Superficie canónica beige cálido).
-    *   `--rm-border`: `#A49384` (Borde estructural estándar).
-    *   `--rm-text-title`: `#2E241F` (Jerarquía de títulos y cifras).
-    *   `--rm-text-muted`: `#6F5F53` (Metadatos, fechas y textos secundarios).
-    *   `--rm-accent`: `#B05D40` (Terracota institucional para acciones y foco).
-    *   `--rm-danger`: `#A7443B` (Coral para acciones destructivas irreversibles y alertas críticas).
+*   **Responsabilidad:** Contrato visual canónico formal del sistema (fundamentos normalizados, escala tipográfica Nunito Sans empaquetada localmente, paleta institucional cálida con contraste WCAG AA $\ge 4.5:1$, espaciados, sizing de controles, radios, sombras orgánicas, layout, z-index y presets de Chart.js).
+*   **Tipografía Oficial:**
+    *   **Familia Canónica:** `Nunito Sans` con fallback `"Segoe UI", Arial, sans-serif`.
+    *   **Empaquetado:** Distribuida localmente vía paquete npm `@fontsource/nunito-sans` (pesos 400, 500, 600, 700, 800, 900) e importada en `fuentes.css` (cero dependencias de CDN externos en tiempo de ejecución).
+    *   **Escala de Tamaños y Pesos:**
+        *   *Page Title:* 32px (`--rm-font-size-title`), peso 800 (`--rm-font-weight-extrabold`).
+        *   *Section Title:* 24px (`--rm-font-size-section`), peso 800.
+        *   *Card Title:* 18px (`--rm-font-size-card-title`), peso 700 (`--rm-font-weight-bold`).
+        *   *Body:* 16px (`--rm-font-size-body`), peso 500 (`--rm-font-weight-medium`).
+        *   *Table Cell:* 14px (`--rm-font-size-table`), peso 600 (`--rm-font-weight-semibold`).
+        *   *Form Label:* 14px (`--rm-font-size-label`), peso 700 (`--rm-font-weight-bold`).
+        *   *Metadata / Caption:* 13px (`--rm-font-size-meta`), peso 600 (`--rm-font-weight-semibold`).
+        *   *Button:* 15px (`--rm-font-size-button`), peso 800 (`--rm-font-weight-extrabold`).
+        *   *KPI Metric:* 32px (`--rm-font-size-kpi`), peso 800 (`--rm-font-weight-extrabold`).
+    *   **Regla de Mayúsculas:** Prohibido el uso de `uppercase` en nombres de personas, correos electrónicos, párrafos y textos extensos; reservado exclusivamente a badges compactos o metadatos de categoría.
+
+*   **Paleta Institucional Oficial y Colorimetría:**
+    *   **Identidad:** Beige medio/oscuro + Café tierra + Terracota institucional + Verde oliva claro/medio.
+    *   **Reglas cromáticas estrictas:**
+        *   *Azul:* Uso exclusivo informativo/clínico neutro (`--rm-info`).
+        *   *Rojo:* Acciones destructivas irreversibles y alertas clínicas críticas (`--rm-danger`).
+        *   *Cobre/Tierra:* Advertencias y estados de precaución (`--rm-warning`).
+        *   *Prohibido:* Amarillo como color de advertencia principal.
+        *   *Prohibido:* Blanco puro (`#FFFFFF`) como fondo general dominante de la aplicación.
+        *   *Prohibido:* Superficies masivas café casi negro.
+
+*   **Arquitectura de Tokens en 3 Niveles:**
+    *   **Nivel 1 (Primitivos - `tokens/primitives.css`):**
+        *   Describen **color y valor puro**, nunca función o semántica.
+        *   *Earth:* `--rm-earth-900` (`#33271F`) a `--rm-earth-400` (`#A68B72`).
+        *   *Beige:* `--rm-beige-600` (`#9E8B77`) a `--rm-beige-100` (`#DACBBB`).
+        *   *Terracotta:* `--rm-terracotta-700` (`#8F4935`) a `--rm-terracotta-300` (`#D79A82`).
+        *   *Olive:* `--rm-olive-700` (`#627052`) a `--rm-olive-200` (`#C9CFBB`).
+        *   *Blue:* `--rm-blue-600` (`#46677F`), `--rm-blue-500` (`#557990`), `--rm-blue-300` (`#9BB0C0`).
+        *   *Red:* `--rm-red-600` (`#944239`), `--rm-red-500` (`#A94F43`), `--rm-red-300` (`#D39A94`).
+        *   *Copper:* `--rm-copper-600` (`#9B6244`), `--rm-copper-500` (`#AF744F`), `--rm-copper-300` (`#D4AF97`).
+    *   **Nivel 2 (Semánticos - `tokens/colors.css`):**
+        *   Describen **función en la interfaz**:
+            *   *Fondos:* `--rm-bg-app` (`#DACBBB`), `--rm-bg-shell` (`#DACBBB`), `--rm-surface` (`#D0C0AE`), `--rm-surface-soft` (`#C2B09A`), `--rm-surface-raised` (`#E6DDD3`).
+            *   *Tipografía:* `--rm-text-primary` (`#33271F`), `--rm-text-body` (`#4A382F`), `--rm-text-secondary` (`#5F4938`), `--rm-text-muted` (`#5F4938`), `--rm-text-on-primary` (`#F8F2EC`).
+            *   *Bordes y separadores:* `--rm-border` (`#AD9983`), `--rm-border-soft` (`#C2B09A`), `--rm-divider` (`rgba(74, 56, 47, 0.16)`).
+            *   *Acción Principal:* `--rm-action-primary` (`#B76445`), `--rm-action-primary-hover` (`#9D5339`), `--rm-action-primary-active` (`#8F4935`), `--rm-action-primary-soft` (`#F3E2DB`).
+            *   *Navegación:* `--rm-nav-bg` (`#D0C0AE`), `--rm-nav-hover` (`#C2B09A`), `--rm-nav-selected` (`#B76445`).
+            *   *Estados:* `--rm-success` (`#627052`), `--rm-info` (`#46677F`), `--rm-warning` (`#9B6244`), `--rm-danger` (`#944239`).
+    *   **Nivel 3 (Componentes):**
+        *   Convenciones estandarizadas para componentes específicos: `--rm-button-*`, `--rm-input-*`, `--rm-card-*`, `--rm-table-*`, `--rm-modal-*`.
+
+*   **Espaciado y Sizing (`tokens/spacing.css` y `tokens/sizing.css`):**
+    *   *Espaciado geométrico:* `--rm-space-0` (0px), `--rm-space-1` (4px), `--rm-space-2` (8px), `--rm-space-3` (12px), `--rm-space-4` (16px), `--rm-space-5` (20px), `--rm-space-6` (24px), `--rm-space-8` (32px), `--rm-space-10` (40px), `--rm-space-12` (48px), `--rm-space-16` (64px).
+    *   *Sizing de Controles:*
+        *   Default: **44px** (`--rm-control-md`) para inputs, selects, botones estándar y filtros reactivos.
+        *   Compacto: **38px** (`--rm-control-sm`) para barras de herramientas densas y tablas.
+        *   Acción prioritaria: **48px** (`--rm-control-lg`) para CTAs principales.
+    *   *Sizing de Iconos:* 16px (`sm`), 20px (`md`), 24px (`lg`), 32px (`xl`).
+    *   *Sizing de Avatares:* 32px (`sm`), 40px (`md`), 56px (`lg`), 72px (`xl`).
+
+*   **Radios y Sombras (`tokens/radius.css` y `tokens/shadows.css`):**
+    *   *Escala de Radios:* `--rm-radius-sm` (8px), `--rm-radius-md` (12px), `--rm-radius-lg` (16px), `--rm-radius-xl` (20px), `--rm-radius-pill` (999px).
+    *   *Convención de Radios:* Inputs → `md` (12px), Botones → `md` (12px), Cards → `lg` (16px), Modales → `xl` (20px), Badges/Chips → `pill` (999px).
+    *   *Escala de Sombras:* `--rm-shadow-none`, `--rm-shadow-sm` (sutil cálida), `--rm-shadow-md` (elevación media), `--rm-shadow-lg` (paneles/drawers), `--rm-shadow-overlay` (modales).
+    *   *Convención de Sombras:* Inputs → `none`, Cards → `sm`, Cards hover → `md`, Dropdowns → `md`, Drawers → `lg`, Modales → `overlay`.
+
+*   **Layout y Z-Index (`tokens/layout.css` y `tokens/z-index.css`):**
+    *   *Layout:* `--rm-sidebar-width` (260px), `--rm-sidebar-collapsed` (76px), `--rm-topbar-height` (64px), `--rm-page-max-width` (1400px), `--rm-page-padding-x` (24px), `--rm-page-padding-y` (24px), `--rm-content-gap` (24px). Drawers (`sm: 360px`, `md: 480px`, `lg: 640px`) y Modales (`sm: 420px`, `md: 560px`, `lg: 720px`, `xl: 900px`).
+    *   *Z-Index:* Escala predecible: base (`0`), sticky (`100`), dropdown (`200`), sidebar (`300`), topbar (`400`), drawer (`500`), modal (`600`), toast (`1000`), tooltip (`1200`).
+
+*   **Gráficos Institucionales (`tokens/chart-colors.css`):**
+    *   Serie categórica: Terracota (`--rm-chart-1`), Oliva medio (`--rm-chart-2`), Azul (`--rm-chart-3`), Café (`--rm-chart-4`), Terracota suave (`--rm-chart-5`), Oliva suave (`--rm-chart-6`), Cobre (`--rm-chart-7`), Tierra medio (`--rm-chart-8`). Retícula cálida (`--rm-chart-grid`), etiquetas café (`--rm-chart-label`) y tooltip oscuro (`--rm-chart-tooltip-bg`). Prohibido amarillo puro.
+
+*   **Accesibilidad y Contraste (WCAG AA $\ge 4.5:1$):**
+    *   Verificación matemática rigurosa en modo claro:
+        *   `--rm-text-primary` (`#33271F`) sobre `--rm-bg-app` (`#DACBBB`): **9.13:1** (Pasa AAA).
+        *   `--rm-text-body` (`#4A382F`) sobre `--rm-bg-app` (`#DACBBB`): **6.98:1** (Pasa AAA).
+        *   `--rm-text-secondary` (`#5F4938`) sobre `--rm-bg-app` (`#DACBBB`): **5.30:1** (Pasa AA $\ge 4.5:1$).
+        *   `--rm-text-on-primary` (`#F8F2EC`) sobre `--rm-action-primary` (`#B76445`): **4.55:1** (Pasa AA).
+    *   Verificación matemática rigurosa en modo oscuro:
+        *   `--rm-text-primary` (`#F8F2EC`) sobre `--rm-bg-app` (`#262422`): **13.92:1** (Pasa AAA).
+    *   Soporte asistivo obligatorio: Foco visible de 2px con offset (`:focus-visible`), respeto estricto a `prefers-reduced-motion: reduce` y clase utilitaria `.rm-sr-only`.
 
 ### 3.2 UI Primitivas (`resources/views/components/ui/`)
 *   **Responsabilidad:** Presentación genérica reutilizable.

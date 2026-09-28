@@ -1,6 +1,6 @@
 @props(['resumen' => []])
 
-<div class="rm-card rounded-[2rem] p-5">
+<div class="rm-card rounded-3xl p-5">
  <div class="mb-4">
  <span class="text-[11px] font-bold uppercase tracking-widest text-modulo-salud">
  Módulo de salud

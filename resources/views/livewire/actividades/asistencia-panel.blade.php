@@ -45,7 +45,7 @@
  {{-- CABECERA --}}
  {{-- ══════════════════════════════════════════════════════════════════ --}}
  <section class="overflow-hidden rounded-[1.65rem] border border-borde-suave bg-fondo-panel shadow-[0_20px_58px_rgba(47,62,92,0.13)] backdrop-blur-xl">
- <div class="h-1.5 bg-gradient-to-r from-[#E27D60] via-[#D9A05B] to-[#8DA280]"></div>
+ <div class="h-1.5 bg-gradient-to-r from-[var(--rm-accent-terracotta)] via-[var(--rm-warning)] to-[var(--rm-action-primary)]"></div>
  <div class="p-5 sm:p-7">
  <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
 
@@ -216,7 +216,7 @@
  type="text"
  wire:model.live.debounce.300ms="search"
  placeholder="Buscar por nombre..."
- class="w-full rounded-xl border border-borde-suave bg-fondo-panel py-2 pl-8 pr-3 text-xs font-bold text-titulo placeholder-[#2F3E5C]/35 focus:border-estado-advertenciaBorde focus:outline-none focus:ring-2 focus:ring-[#D9A05B]/20"
+ class="w-full rounded-xl border border-borde-suave bg-fondo-panel py-2 pl-8 pr-3 text-xs font-bold text-titulo placeholder-[var(--rm-text-muted)] focus:border-estado-advertenciaBorde focus:outline-none focus:ring-2 focus:ring-[var(--rm-warning)]/20"
  >
  </div>
  </div>
@@ -226,7 +226,7 @@
  <label class="mb-1 block text-[10px] font-bold uppercase tracking-[0.1em] text-apoyo">Tipo</label>
  <select
  wire:model.live="filtroTipo"
- class="w-full rounded-xl border border-borde-suave bg-fondo-panel py-2 px-3 text-xs font-bold text-titulo focus:border-estado-advertenciaBorde focus:outline-none focus:ring-2 focus:ring-[#D9A05B]/20"
+ class="w-full rounded-xl border border-borde-suave bg-fondo-panel py-2 px-3 text-xs font-bold text-titulo focus:border-estado-advertenciaBorde focus:outline-none focus:ring-2 focus:ring-[var(--rm-warning)]/20"
  >
  <option value="">Todos los tipos</option>
  @foreach($tipos as $t)
@@ -240,7 +240,7 @@
  <label class="mb-1 block text-[10px] font-bold uppercase tracking-[0.1em] text-apoyo">Estado</label>
  <select
  wire:model.live="filtroEstado"
- class="w-full rounded-xl border border-borde-suave bg-fondo-panel py-2 px-3 text-xs font-bold text-titulo focus:border-estado-advertenciaBorde focus:outline-none focus:ring-2 focus:ring-[#D9A05B]/20"
+ class="w-full rounded-xl border border-borde-suave bg-fondo-panel py-2 px-3 text-xs font-bold text-titulo focus:border-estado-advertenciaBorde focus:outline-none focus:ring-2 focus:ring-[var(--rm-warning)]/20"
  >
  <option value="">Todos los estados</option>
  <option value="PROGRAMADA">Programada / Pendiente</option>
@@ -256,7 +256,7 @@
  <input
  type="date"
  wire:model.live="filtroFechaDesde"
- class="w-full rounded-xl border border-borde-suave bg-fondo-panel py-2 px-3 text-xs font-bold text-titulo focus:border-estado-advertenciaBorde focus:outline-none focus:ring-2 focus:ring-[#D9A05B]/20"
+ class="w-full rounded-xl border border-borde-suave bg-fondo-panel py-2 px-3 text-xs font-bold text-titulo focus:border-estado-advertenciaBorde focus:outline-none focus:ring-2 focus:ring-[var(--rm-warning)]/20"
  >
  </div>
 
@@ -266,7 +266,7 @@
  <input
  type="date"
  wire:model.live="filtroFechaHasta"
- class="w-full rounded-xl border border-borde-suave bg-fondo-panel py-2 px-3 text-xs font-bold text-titulo focus:border-estado-advertenciaBorde focus:outline-none focus:ring-2 focus:ring-[#D9A05B]/20"
+ class="w-full rounded-xl border border-borde-suave bg-fondo-panel py-2 px-3 text-xs font-bold text-titulo focus:border-estado-advertenciaBorde focus:outline-none focus:ring-2 focus:ring-[var(--rm-warning)]/20"
  >
  </div>
 
@@ -300,7 +300,7 @@
  <th class="px-4 py-3 text-left text-[10px] font-bold uppercase tracking-[0.12em] text-apoyo">Acciones</th>
  </tr>
  </thead>
- <tbody class="divide-y divide-[#C7B5A3]/22">
+ <tbody class="divide-y divide-[var(--rm-border)]/30">
 
  @if($registros->isEmpty())
  <tr>
@@ -508,7 +508,7 @@
  <div class="relative w-full max-w-2xl max-h-[85vh] overflow-y-auto overflow-x-hidden rounded-[1.45rem] border border-borde-suave bg-fondo-app shadow-2xl">
 
  {{-- Gradiente superior --}}
- <div class="h-1.5 bg-gradient-to-r from-[#E27D60] via-[#D9A05B] to-[#8DA280]"></div>
+ <div class="h-1.5 bg-gradient-to-r from-[var(--rm-accent-terracotta)] via-[var(--rm-warning)] to-[var(--rm-action-primary)]"></div>
 
  {{-- Encabezado modal --}}
  <div class="flex items-start justify-between p-5 sm:p-6">
@@ -640,7 +640,7 @@
  <div class="absolute inset-0 bg-fondo-panel backdrop-blur-sm"></div>
  <div class="relative w-full max-w-lg max-h-[85vh] overflow-y-auto overflow-x-hidden rounded-[1.45rem] border border-borde-suave bg-fondo-app shadow-2xl">
 
- <div class="h-1.5 bg-gradient-to-r from-[#E27D60] via-[#D9A05B] to-[#8DA280]"></div>
+ <div class="h-1.5 bg-gradient-to-r from-[var(--rm-accent-terracotta)] via-[var(--rm-warning)] to-[var(--rm-action-primary)]"></div>
 
  <div class="flex items-start justify-between p-5 sm:p-6">
  <div>
@@ -673,7 +673,7 @@
  wire:model="estado"
  @class([
  'w-full rounded-xl border bg-fondo-panel px-3 py-2.5 text-sm font-bold text-titulo',
- 'focus:border-estado-advertenciaBorde focus:outline-none focus:ring-2 focus:ring-[#D9A05B]/20',
+ 'focus:border-estado-advertenciaBorde focus:outline-none focus:ring-2 focus:ring-[var(--rm-warning)]/20',
  'border-borde-focus' => $errors->has('estado'),
  'border-borde-suave' => !$errors->has('estado'),
  ])
@@ -700,7 +700,7 @@
  placeholder="Notas adicionales sobre el resultado de la actividad..."
  @class([
  'w-full resize-none rounded-xl border bg-fondo-panel px-3 py-2.5 text-sm font-bold text-titulo',
- 'placeholder-[#2F3E5C]/35 focus:border-estado-advertenciaBorde focus:outline-none focus:ring-2 focus:ring-[#D9A05B]/20',
+ 'placeholder-[var(--rm-text-muted)] focus:border-estado-advertenciaBorde focus:outline-none focus:ring-2 focus:ring-[var(--rm-warning)]/20',
  'border-borde-focus' => $errors->has('obs'),
  'border-borde-suave' => !$errors->has('obs'),
  ])

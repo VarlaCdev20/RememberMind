@@ -1,38 +1,51 @@
 /* ============================================================
-   REMEMBERMIND DESIGN SYSTEM — TOKENS / TYPOGRAPHY
-   Títulos: Outfit | UI y Cuerpo: Inter
-   Escala compacta / operativa (WCAG AA probado, mín. 11px).
+   REMEMBERMIND — TYPOGRAPHY
+   Jerarquía Tipográfica Oficial (Capa 1 & 2 de la Arquitectura)
    ============================================================ */
 
 :root {
-    /* Familias Tipográficas */
-    --rm-font-title: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    --rm-font-ui: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    --rm-font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 
-    /* Escala Tipográfica Compacta / Operativa */
-    --rm-font-page-title: 24px;     /* Título de pantalla / módulo principal */
-    --rm-font-section-title: 16px;  /* Título de sección / panel grande */
-    --rm-font-card-title: 15px;     /* Cabecera de tarjeta / modal / widget */
-    --rm-font-body: 13px;           /* Cuerpo de texto / campos de entrada */
-    --rm-font-table: 13px;          /* Celdas de tabla clínica */
-    --rm-font-label: 11.5px;        /* Etiquetas de formulario / metadatos */
-    --rm-font-badge: 11px;          /* Badges de estado / pills (mínimo absoluto) */
+   --rm-font-family:
+      "Nunito Sans",
+      system-ui,
+      -apple-system,
+      BlinkMacSystemFont,
+      "Segoe UI",
+      sans-serif;
 
-    /* Pesos */
-    --rm-font-weight-regular: 400;
-    --rm-font-weight-medium: 500;
-    --rm-font-weight-semibold: 600;
-    --rm-font-weight-bold: 700;
+   /* Escala Tipográfica Estándar */
+   --rm-font-size-page: 30px;
+   --rm-font-size-section: 22px;
+   --rm-font-size-card: 17px;        /* 16-18px para cards */
+   --rm-font-size-card-title: 17px;  /* 16-18px para cards */
+   --rm-font-size-body-lg: 16px;     /* 15-16px para body */
+   --rm-font-size-body: 15px;        /* 15-16px para body */
+   --rm-font-size-table: 14px;       /* 13-14px para tablas y metadatos normales */
+   --rm-font-size-label: 13px;       /* 13-14px para tablas y metadatos normales */
+   --rm-font-size-meta: 13px;        /* 13-14px para tablas y metadatos normales */
+   --rm-font-size-compact: 12px;     /* 11-12px para badges y labels compactos */
+   --rm-font-size-badge: 11px;       /* 11-12px para badges y labels compactos */
+   --rm-font-size-micro: 10px;       /* 10px solo para metadata excepcional */
+   --rm-font-size-button: 14px;
+   --rm-font-size-kpi: 32px;
 
-    /* Alturas de Línea */
-    --rm-line-height-tight: 1.25;
-    --rm-line-height-normal: 1.40;
-    --rm-line-height-relaxed: 1.55;
+   /* Pesos */
+   --rm-font-weight-regular: 400;
+   --rm-font-weight-medium: 500;
+   --rm-font-weight-semibold: 600;
+   --rm-font-weight-bold: 700;
+   --rm-font-weight-extrabold: 800;
+   --rm-font-weight-black: 900;
 
-    /* Espaciado entre Caracteres */
-    --rm-letter-spacing-tight: -0.015em;
-    --rm-letter-spacing-normal: 0em;
-    --rm-letter-spacing-wide: 0.03em;
-    --rm-letter-spacing-wider: 0.06em;
+   /* Alturas de línea */
+   --rm-line-height-tight: 1.15;
+   --rm-line-height-title: 1.22;
+   --rm-line-height-body: 1.5;
+   --rm-line-height-relaxed: 1.65;
+
+   /* Espaciado de letras */
+   --rm-letter-spacing-tight: -0.018em;
+   --rm-letter-spacing-normal: 0;
+   --rm-letter-spacing-wide: .035em;
+   --rm-letter-spacing-wider: .05em;
 }

@@ -2,7 +2,7 @@
  <section class="min-h-[calc(100vh-7rem)] bg-fondo-panel px-4 py-5 text-titulo sm:px-6 lg:px-8">
  <div class="mx-auto max-w-6xl space-y-5">
  <div class="overflow-hidden rounded-[1.45rem] border border-borde-suave bg-fondo-panel shadow-[0_16px_46px_rgba(47,62,92,0.12)] backdrop-blur-xl">
- <div class="h-1.5 bg-gradient-to-r from-[#E27D60] via-[#D9A05B] to-[#8DA280]"></div>
+ <div class="h-1.5 bg-gradient-to-r from-[var(--rm-accent-terracotta)] via-[var(--rm-warning)] to-[var(--rm-action-primary)]"></div>
  <div class="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between">
  <div class="max-w-3xl">
  <span class="inline-flex items-center gap-2 rounded-full border border-borde-focus bg-estado-peligroBg px-3 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-boton-acento">

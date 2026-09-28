@@ -1,4 +1,4 @@
-<div class="relative z-10 space-y-6 py-8 antialiased text-parrafo print:bg-white print:py-0"
+<div class="relative z-10 space-y-6 py-8 antialiased text-parrafo print:bg-[var(--rm-surface-raised)] print:py-0"
  x-data="reporteGraficas()"
  x-init="initCharts()"
 >

@@ -12,4 +12,5 @@ class Contacto extends ModeloOperativo {
     public function getCodFamAttribute(): string { return (string) $this->cod_contacto; }
     public function getParentescoAttribute(): string { return 'FAMILIAR'; }
     public function getObservacionesAttribute(): ?string { return $this->observacion; }
+    public function getNombreCompletoAttribute(): string { return trim("{$this->nombres} {$this->apellido_paterno} {$this->apellido_materno}"); }
 }

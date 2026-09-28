@@ -29,7 +29,7 @@
     {{-- Tipografía Oficial Google Fonts (Outfit) --}}
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wght@0,6..12,200..1000;1,6..12,200..1000&display=swap" rel="stylesheet">
 
     {{-- Phosphor Icons Oficial --}}
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
@@ -42,7 +42,7 @@
 
     <style>
         body {
-            font-family: 'Outfit', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-family: 'Nunito Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
         }
@@ -51,48 +51,10 @@
             --glow-primary: rgba(113, 135, 106, 0.08);
             --glow-warm: rgba(163, 90, 68, 0.04);
 
-            /* Superadmin & Enfermería Unified Canonical Palette - Light Mode */
-            --rm-bg-app: #E9DFD3;
-            --rm-surface: #F0E8DE;
-            --rm-surface-alt: #F7F1EA;
-            --rm-surface-highlight: #E5D8CB;
-            --rm-border: #D5CABE;
-            --rm-border-strong: #C4B4A4;
-            --rm-text-primary: #304060;
-            --rm-text-secondary: #677084;
-            --rm-text-muted: #8F8275;
-            --rm-navy: #304060;
-            --rm-terracotta: #A35A44;
-            --rm-terracotta-soft: #D6AE86;
-            --rm-sage: #71876A;
-            --rm-sage-dark: #597053;
-            --rm-amber: #D2A45E;
-            --rm-amber-soft: #E8C988;
-            --rm-coral: #C85D52;
-            --rm-coral-soft: #E8988E;
+            /* Paleta unificada heredada de Design System V2 */
         }
 
-        .dark {
-            /* Superadmin & Enfermería Unified Canonical Palette - Dark Mode */
-            --rm-bg-app: #24211D;
-            --rm-surface: #2D2924;
-            --rm-surface-alt: #332F29;
-            --rm-surface-highlight: #3D3830;
-            --rm-border: #494139;
-            --rm-border-strong: #5A5147;
-            --rm-text-primary: #EFE4D8;
-            --rm-text-secondary: #BDAE9F;
-            --rm-text-muted: #8D8073;
-            --rm-navy: #EFE4D8;
-            --rm-terracotta: #C47B63;
-            --rm-terracotta-soft: #D6AE86;
-            --rm-sage: #93A587;
-            --rm-sage-dark: #A8B99E;
-            --rm-amber: #D1A25C;
-            --rm-amber-soft: #E5BA79;
-            --rm-coral: #D47167;
-            --rm-coral-soft: #E8988E;
-        }
+        /* Modo oscuro manejado canónicamente por design-system/tokens/colors.css */
 
         /* Utilidad para barra de scroll estilizada */
         .custom-scrollbar::-webkit-scrollbar {
@@ -105,20 +67,20 @@
         }
 
         .custom-scrollbar::-webkit-scrollbar-thumb {
-            background: #D5CABE;
+            background: var(--rm-border);
             border-radius: 9999px;
         }
 
         .dark .custom-scrollbar::-webkit-scrollbar-thumb {
-            background: #403A32;
+            background: var(--rm-surface-raised);
         }
 
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-            background: #B8A896;
+            background: var(--rm-border-hover);
         }
 
         .dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-            background: #50493F;
+            background: var(--rm-border-strong);
         }
 
         /* Animación suave de entrada */
@@ -150,7 +112,7 @@
     </style>
 </head>
 
-<body class="h-full bg-[#E9DFD3] dark:bg-[#24211D] text-[#304060] dark:text-[#EFE4D8] antialiased selection:bg-[#71876A] selection:text-white transition-colors duration-200"
+<body class="h-full bg-[var(--rm-bg-app)] text-[var(--rm-text-primary)] antialiased selection:bg-[var(--rm-action-primary)] selection:text-[var(--rm-text-on-primary)] transition-colors duration-200"
       x-data="{
           sidebarOpen: false,
           sidebarCollapsed: localStorage.getItem('remembermind-sidebar-collapsed') === 'true',
@@ -182,7 +144,7 @@
       }"
       @remembermind:theme-changed.window="darkMode = $event.detail.isDark">
 
-    <div class="min-h-screen bg-[#E9DFD3] dark:bg-[#24211D] transition-colors duration-200">
+    <div class="min-h-screen bg-[var(--rm-bg-app)] transition-colors duration-200">
 
         {{-- Backdrop para móviles / tablets --}}
         <div x-show="sidebarOpen"
@@ -193,7 +155,7 @@
              x-transition:leave-start="opacity-100"
              x-transition:leave-end="opacity-0"
              @click="sidebarOpen = false"
-             class="fixed inset-0 z-40 bg-[#304060]/50 dark:bg-black/75 backdrop-blur-xs lg:hidden"
+             class="fixed inset-0 z-40 bg-[var(--rm-modal-overlay,rgba(64,42,32,0.45))] backdrop-blur-xs lg:hidden"
              style="display: none;"
              aria-hidden="true"></div>
 

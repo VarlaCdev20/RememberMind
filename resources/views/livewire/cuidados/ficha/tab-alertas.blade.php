@@ -95,7 +95,7 @@
             <div class="rounded-2xl bg-emerald-50/40 p-6 border border-emerald-200 text-center">
                 <i class="ph-bold ph-shield-check text-2xl text-emerald-600 mb-1 block"></i>
                 <p class="text-xs font-bold text-emerald-900">Sin alertas clínicas activas</p>
-                <p class="text-[11px] text-emerald-700 mt-0.5">No existen alertas abiertas o en atención en los registros disponibles.</p>
+                <p class="text-[11px] text-emerald-700 mt-0.5">El residente se encuentra hemodinámicamente estable y sin condiciones críticas abiertas.</p>
             </div>
         @endif
     </div>

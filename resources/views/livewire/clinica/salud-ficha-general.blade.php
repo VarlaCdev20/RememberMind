@@ -1,7 +1,7 @@
 <div class="space-y-5 animate-in fade-in duration-300">
  {{-- CABECERA CLÍNICA GENERAL --}}
  <section class="overflow-hidden rounded-[1.6rem] border border-borde/65 bg-fondo-panel shadow-sm backdrop-blur-xl">
- <div class="h-1.5 w-full bg-gradient-to-r from-[#E27D60] via-[#D9A05B] to-[#8DA280]"></div>
+ <div class="h-1.5 w-full bg-gradient-to-r from-[var(--rm-accent-terracotta)] via-[var(--rm-warning)] to-[var(--rm-action-primary)]"></div>
  <div class="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between">
  <div class="flex items-center gap-4">
  <span class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-borde/55 bg-fondo-panel text-boton-acento shadow-sm">
@@ -14,7 +14,7 @@
  </p>
  </div>
  </div>
- 
+
  <div class="flex items-center gap-3">
  <span class="inline-flex items-center gap-2 rounded-xl border border-borde/45 bg-fondo-card/60 px-4 py-2 text-[10px] font-bold uppercase tracking-wider text-parrafo">
  <i class="ph-bold ph-calendar-check text-boton-acento"></i>
@@ -84,7 +84,7 @@
  <div class="grid gap-4 md:grid-cols-[1fr_auto]">
  <div class="relative">
  <i class="ph-bold ph-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-meta"></i>
- <input type="text" wire:model.live.debounce.300ms="searchGeneral" placeholder="Buscar residente por nombre, apellido o CI..." class="w-full rounded-xl border border-borde/70 bg-fondo-card py-2.5 pl-10 pr-4 text-xs font-bold text-parrafo outline-none transition placeholder:text-meta focus:border-borde-focus focus:ring-2 focus:ring-[#E27D60]/15">
+ <input type="text" wire:model.live.debounce.300ms="searchGeneral" placeholder="Buscar residente por nombre, apellido o CI..." class="w-full rounded-xl border border-borde/70 bg-fondo-card py-2.5 pl-10 pr-4 text-xs font-bold text-parrafo outline-none transition placeholder:text-meta focus:border-borde-focus focus:ring-2 focus:ring-[var(--rm-action-primary)]/20">
  </div>
  <div class="flex gap-2 overflow-x-auto pb-1 md:pb-0">
  <button wire:click="$set('filtroEstado', 'todas')" class="whitespace-nowrap rounded-xl border {{ $filtroEstado === 'todas' ? 'border-borde-fuerte bg-boton-principal text-inverso shadow-sm' : 'border-borde/70 bg-fondo-card text-parrafo' }} px-4 py-2 text-[10px] font-bold uppercase tracking-wider transition hover:bg-fondo-app">
@@ -114,7 +114,7 @@
  <th class="px-5 py-4 text-right">Acciones</th>
  </tr>
  </thead>
- <tbody class="divide-y divide-[#C7B5A3]/25">
+ <tbody class="divide-y divide-[var(--rm-border)]/25">
  @forelse($pacientes as $paciente)
  @php
  $ficha = $paciente->fichaResumen;
@@ -126,7 +126,7 @@
  @if($paciente->foto)
  <img src="{{ Storage::url($paciente->foto) }}" alt="{{ $paciente->nombres }}" class="h-full w-full object-cover">
  @else
- <div class="flex h-full w-full items-center justify-center bg-gradient-to-br from-[#2F3E5C] to-[#5B5F97] text-[10px] font-bold text-inverso">
+ <div class="flex h-full w-full items-center justify-center bg-gradient-to-br from-[var(--rm-clinical)] to-[var(--rm-violet)] text-[10px] font-bold text-inverso">
  {{ substr($paciente->nombres, 0, 1) }}{{ substr($paciente->ap_paterno, 0, 1) }}
  </div>
  @endif
@@ -187,7 +187,7 @@
  </tbody>
  </table>
  </div>
- 
+
  @if($pacientes->hasPages())
  <div class="border-t border-borde-suave bg-fondo-panel p-4">
  {{ $pacientes->links() }}

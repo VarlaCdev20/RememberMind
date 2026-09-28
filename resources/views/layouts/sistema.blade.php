@@ -10,7 +10,7 @@
 
  <link rel="preconnect" href="https://fonts.bunny.net">
  <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700,800,900&display=swap" rel="stylesheet" />
- <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap"
+ <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wght@0,6..12,200..1000;1,6..12,200..1000&display=swap"
  rel="stylesheet">
 
  <script defer src="https://unpkg.com/@phosphor-icons/web"></script>
@@ -26,7 +26,7 @@
  <x-banner />
 
  <div x-data="{ sidebarOpen: false, sidebarCollapsed: false }"
- class="rm-bg-app relative min-h-screen overflow-x-hidden font-outfit text-titulo selection:bg-boton-acento selection:text-inverso">
+ class="rm-bg-app relative min-h-screen overflow-x-hidden font-sans text-titulo selection:bg-[var(--rm-action-primary)] selection:text-[var(--rm-text-on-primary)]">
  {{-- Fondos estéticos --}}
  <div class="rm-texture-dots pointer-events-none fixed inset-0 z-0 opacity-40"></div>
  <div class="rm-mouse-light pointer-events-none fixed inset-0 z-40"></div>

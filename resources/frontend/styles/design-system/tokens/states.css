@@ -3,17 +3,30 @@
    Semántica de estados visuales.
    PRINCIPIO ARQUITECTÓNICO:
    El Design System NO define ni interpreta reglas clínicas.
-   El dominio clínico determina la severidad (ej. severity = danger);
-   el Design System únicamente representa visualmente el estado.
-   Todo estado combina icono + texto + color (no depender solo de color).
+   El dominio clínico determina la severidad; el Design System
+   únicamente representa visualmente el estado.
    ============================================================ */
 
 :root {
-    /* Estados Semánticos de Interacción */
+    /* ------------------------------------------------------------
+       1. ESTADOS DE INTERACCIÓN Y SELECCIÓN
+       ------------------------------------------------------------ */
+    --rm-state-hover-bg: #EFE6DB; /* fondo hover */
+    --rm-state-selected-bg: var(--rm-action-primary-soft); /* seleccionado */
+    --rm-state-selected-border: var(--rm-action-primary); /* borde seleccionado */
+    --rm-state-disabled-opacity: .55; /* deshabilitado */
+
+    --rm-focus-color: var(--rm-action-primary); /* color de foco */
+    --rm-focus-ring: 0 0 0 3px rgba(143,161,127,.28); /* anillo de foco */
+
+    /* Alias para compatibilidad */
+    --rm-focus: var(--rm-focus-color);
     --rm-state-hover-opacity: 0.88;
     --rm-state-active-opacity: 0.95;
-    --rm-state-disabled-opacity: 0.55;
 
+    /* ------------------------------------------------------------
+       2. ESTADOS SEMÁNTICOS DE RETROALIMENTACIÓN
+       ------------------------------------------------------------ */
     /* Estado Success / Normal */
     --rm-state-success-text: #2F593B;
     --rm-state-success-bg: var(--rm-success-soft);
@@ -39,7 +52,7 @@
     --rm-state-neutral-bg: var(--rm-surface-alt);
     --rm-state-neutral-border: var(--rm-border);
 
-    /* Fondos de Fila para Tablas Clínicas (consumidos en patterns) */
+    /* Fondos de Fila para Tablas Clínicas */
     --rm-row-danger-bg: rgba(167, 68, 59, 0.05);
     --rm-row-warning-bg: rgba(201, 154, 75, 0.05);
 }

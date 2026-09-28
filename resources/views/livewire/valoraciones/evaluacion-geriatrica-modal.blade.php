@@ -3,18 +3,18 @@
  {{-- Overlay"Indestructible" --}}
  <div class="fixed inset-0 z-[2147483646] flex items-center justify-center overflow-y-auto bg-slate-900/40 p-4 backdrop-blur-sm sm:p-6"
  x-data x-init="document.body.style.overflow = 'hidden'" x-on:destroy="document.body.style.overflow = 'auto'">
- 
+
  {{-- Modal Container --}}
- <div class="relative w-full max-w-2xl rounded-[24px] border border-borde-suave bg-fondo-app shadow-[0_32px_64px_-12px_rgba(0,0,0,0.5)] flex flex-col max-h-[90vh]">
- 
+ <div class="relative w-full max-w-2xl rounded-3xl border border-borde-suave bg-fondo-app shadow-[0_32px_64px_-12px_rgba(0,0,0,0.5)] flex flex-col max-h-[90vh]">
+
  {{-- Header --}}
  <div class="flex items-center justify-between border-b border-borde-suave p-4 sm:px-8">
  <div class="flex items-center gap-3">
- <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-boton-acento/10 text-terracota shadow-inner">
+ <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-boton-acento/10 text-[var(--rm-action-primary)] shadow-inner">
  <i class="ph-fill ph-brain text-2xl"></i>
  </div>
  <div>
- <span class="text-[9px] font-bold uppercase tracking-widest text-terracota/70">Suite Geriátrica</span>
+ <span class="text-[9px] font-bold uppercase tracking-widest text-[var(--rm-action-primary)]/70">Suite Geriátrica</span>
  <h2 class="text-lg font-extrabold text-titulo">Registrar Evaluación Geriátrica Integral</h2>
  </div>
  </div>
@@ -25,7 +25,7 @@
 
  {{-- Form Content Scrollable --}}
  <form wire:submit.prevent="guardar" class="flex-1 overflow-y-auto p-6 sm:px-8 space-y-5 custom-scrollbar">
- 
+
  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
  {{-- Área --}}
  <div>
@@ -57,7 +57,7 @@
  <div class="rounded-2xl border border-borde-suave bg-fondo-panel p-4 space-y-2 text-xs font-semibold text-titulo/80">
  <div class="flex items-center justify-between">
  <span class="font-black text-titulo text-sm">{{ $instrumentoSeleccionado->nombre }}</span>
- <span class="rounded-lg bg-boton-acento/10 px-2 py-0.5 text-[10px] font-bold text-terracota uppercase tracking-widest">{{ $instrumentoSeleccionado->tipo_resultado }}</span>
+ <span class="rounded-lg bg-boton-acento/10 px-2 py-0.5 text-[10px] font-bold text-[var(--rm-action-primary)] uppercase tracking-widest">{{ $instrumentoSeleccionado->tipo_resultado }}</span>
  </div>
  <p class="text-titulo/70 leading-relaxed text-[11px]">{{ $instrumentoSeleccionado->descripcion }}</p>
  <div class="flex flex-wrap gap-4 pt-2 border-t border-borde-suave">
@@ -109,7 +109,7 @@
  Puntaje / Valor Numérico
  @endif
  </label>
- <input type="number" step="0.01" wire:model="puntaje_total" 
+ <input type="number" step="0.01" wire:model="puntaje_total"
  @disabled($instrumentoSeleccionado && in_array($instrumentoSeleccionado->tipo_resultado, ['CUALITATIVO', 'FRACCION_VISUAL']))
  class="w-full rounded-xl border border-borde-suave bg-fondo-card/80 px-4 py-2.5 text-sm font-bold text-titulo outline-none transition focus:border-borde-focus disabled:opacity-50"
  placeholder="{{ ($instrumentoSeleccionado && in_array($instrumentoSeleccionado->tipo_resultado, ['CUALITATIVO', 'FRACCION_VISUAL'])) ? 'No aplica' : 'Ej: 24' }}">
@@ -119,7 +119,7 @@
  {{-- Categoría del Resultado --}}
  <div>
  <label class="block text-[10px] font-bold uppercase tracking-wider text-titulo/60 mb-1.5">Categoría / Resultado Clínico</label>
- <input type="text" wire:model="categoria_resultado" class="w-full rounded-xl border border-borde-suave bg-fondo-card/80 px-4 py-2.5 text-sm font-bold text-titulo outline-none transition focus:border-borde-focus" 
+ <input type="text" wire:model="categoria_resultado" class="w-full rounded-xl border border-borde-suave bg-fondo-card/80 px-4 py-2.5 text-sm font-bold text-titulo outline-none transition focus:border-borde-focus"
  placeholder="Ej: Deterioro cognitivo leve, 20/40, Normal">
  @error('categoria_resultado') <span class="text-[10px] font-bold text-red-600 mt-1 block">{{ $message }}</span> @enderror
  </div>
@@ -140,7 +140,7 @@
  {{-- Nivel de Riesgo (Opcional) --}}
  <div>
  <label class="block text-[10px] font-bold uppercase tracking-wider text-titulo/60 mb-1.5">Nivel de Riesgo (Opcional)</label>
- <input type="text" wire:model="nivel_riesgo" class="w-full rounded-xl border border-borde-suave bg-fondo-card/80 px-4 py-2.5 text-sm font-bold text-titulo outline-none transition focus:border-borde-focus" 
+ <input type="text" wire:model="nivel_riesgo" class="w-full rounded-xl border border-borde-suave bg-fondo-card/80 px-4 py-2.5 text-sm font-bold text-titulo outline-none transition focus:border-borde-focus"
  placeholder="Ej: Sin riesgo, Dependiente moderado">
  @error('nivel_riesgo') <span class="text-[10px] font-bold text-red-600 mt-1 block">{{ $message }}</span> @enderror
  </div>

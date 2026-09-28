@@ -72,11 +72,11 @@ class UnificacionShellEnfermeriaTest extends TestCase
         // Medicación
         $responseMed = $this->actingAs($this->enfermero)->get(route('admin.enfermeria.medicacion'));
         $responseMed->assertStatus(200);
-        $responseMed->assertSee('bg-[#8FA685]', false);
+        $responseMed->assertSee('bg-[var(--rm-nav-selected)]', false);
 
         // Mi Turno
         $responseTurno = $this->actingAs($this->enfermero)->get(route('admin.enfermeria.dashboard'));
         $responseTurno->assertStatus(200);
-        $responseTurno->assertSee('bg-[#8FA685]', false);
+        $responseTurno->assertSee('bg-[var(--rm-nav-selected)]', false);
     }
 }

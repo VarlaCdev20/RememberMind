@@ -46,7 +46,7 @@
  aria-label="Cambiar modo claro u oscuro"
  class="rm-btn-icon"
  >
- <span data-theme-icon>🌙</span>
+ <i class="ph-bold ph-moon text-lg" data-theme-icon data-icon-dark="ph-bold ph-sun text-lg" data-icon-light="ph-bold ph-moon text-lg"></i>
  </button>
 
  @auth

@@ -1,4 +1,4 @@
-<section class="rm-card rounded-[2rem] p-5 backdrop-blur-xl">
+<section class="rm-card rounded-3xl p-5 backdrop-blur-xl">
  <div class="mb-4 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
  <div>
  <span class="text-[11px] font-bold uppercase tracking-widest text-boton-acento">

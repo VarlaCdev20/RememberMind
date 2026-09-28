@@ -1,10 +1,27 @@
-﻿/* ============================================================
-   REMEMBERMIND DESIGN SYSTEM - TOKENS / CHART-COLORS
-   Variables semanticas, reticulas, ejes y transparencias para Chart.js.
-   Consume los 10 colores categoricos de colors.css (no duplicados).
+/* ============================================================
+   REMEMBERMIND DESIGN SYSTEM — TOKENS / CHART-COLORS
+   Serie recomendada oficial:
+   1. Eucalipto: #8FA17F
+   2. Verde: #5F7D5B
+   3. Azul: #4C7189
+   4. Mocha: #A98F7B
+   5. Cobre: #A56B42
+   6. Coral: #B34839
+   7. Taupe: #A69484
+   8. Azul secundario: #6C85A0
+   PROHIBIDO: Amarillo chillón.
    ============================================================ */
 
 :root {
+    --rm-chart-1: #8FA17F; /* eucalipto */
+    --rm-chart-2: #577C93; /* azul clinico */
+    --rm-chart-3: #B2764C; /* cobre */
+    --rm-chart-4: #B94E40; /* coral */
+    --rm-chart-5: #7C91AA; /* azul suave */
+    --rm-chart-6: #9E806F; /* mocha calido */
+    --rm-chart-7: #64805F; /* verde exito */
+    --rm-chart-8: #9276A2; /* lavanda / purpura */
+
     --rm-chart-danger:       var(--rm-danger);
     --rm-chart-danger-soft:  var(--rm-danger-soft);
     --rm-chart-warning:      var(--rm-warning);
@@ -15,40 +32,51 @@
     --rm-chart-info-soft:    var(--rm-info-soft);
     --rm-chart-neutral:      var(--rm-text-muted);
 
-    --rm-chart-warning-high: #E67A22;
+    --rm-chart-warning-high: #A56B42;
 
     --rm-chart-fill-strong:  0.38;
     --rm-chart-fill-medium:  0.18;
-    --rm-chart-fill-soft:    0.02;
+    --rm-chart-fill-soft:    0.04;
     --rm-chart-fill-donut:   0.88;
     --rm-chart-fill-radar:   0.17;
 
-    --rm-chart-grid:           rgba(224, 212, 198, 0.35);
-    --rm-chart-grid-strong:    rgba(200, 188, 173, 0.50);
-    --rm-chart-axis-text:      #64748B;
-    --rm-chart-axis-title:     #1E293B;
+    --rm-chart-grid: rgba(64,42,32,.12); /* cuadrícula */
+    --rm-chart-grid-strong:    rgba(64, 42, 32, 0.22);
+    --rm-chart-axis-text:      var(--rm-text-secondary);
+    --rm-chart-axis-title:     var(--rm-text-primary);
+    --rm-chart-label: var(--rm-text-secondary); /* etiquetas */
 
-    --rm-chart-tooltip-bg:     #1E293B;
-    --rm-chart-tooltip-text:   #F8FAFC;
-    --rm-chart-tooltip-border: rgba(226, 232, 240, 0.20);
+    --rm-chart-tooltip-bg: var(--rm-surface-raised); /* tooltip */
+    --rm-chart-tooltip-text:   var(--rm-text-primary);
+    --rm-chart-tooltip-border: var(--rm-border-soft);
 }
 
 .dark,
 [data-theme="dark"] {
-    --rm-chart-warning-high: #FB923C;
+    --rm-chart-1: #8FA17F; /* eucalipto */
+    --rm-chart-2: #577C93; /* azul clinico */
+    --rm-chart-3: #B2764C; /* cobre */
+    --rm-chart-4: #B94E40; /* coral */
+    --rm-chart-5: #7C91AA; /* azul suave */
+    --rm-chart-6: #9E806F; /* mocha calido */
+    --rm-chart-7: #64805F; /* verde exito */
+    --rm-chart-8: #9276A2; /* lavanda / purpura */
+
+    --rm-chart-warning-high: #A56B42;
 
     --rm-chart-fill-strong:  0.32;
     --rm-chart-fill-medium:  0.14;
-    --rm-chart-fill-soft:    0.02;
+    --rm-chart-fill-soft:    0.03;
     --rm-chart-fill-donut:   0.85;
     --rm-chart-fill-radar:   0.15;
 
-    --rm-chart-grid:           rgba(255, 255, 255, 0.06);
-    --rm-chart-grid-strong:    rgba(255, 255, 255, 0.10);
-    --rm-chart-axis-text:      #94A3B8;
-    --rm-chart-axis-title:     #F8FAFC;
+    --rm-chart-grid:           rgba(255, 255, 255, 0.08);
+    --rm-chart-grid-strong:    rgba(255, 255, 255, 0.14);
+    --rm-chart-axis-text:      var(--rm-text-secondary);
+    --rm-chart-axis-title:     var(--rm-text-primary);
+    --rm-chart-label:          var(--rm-text-secondary);
 
-    --rm-chart-tooltip-bg:     #0F172A;
-    --rm-chart-tooltip-text:   #F1F5F9;
-    --rm-chart-tooltip-border: rgba(255, 255, 255, 0.12);
+    --rm-chart-tooltip-bg:     var(--rm-surface-raised);
+    --rm-chart-tooltip-text:   var(--rm-text-primary);
+    --rm-chart-tooltip-border: var(--rm-border-soft);
 }

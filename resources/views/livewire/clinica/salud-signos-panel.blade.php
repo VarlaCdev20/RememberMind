@@ -31,7 +31,7 @@
  @if($adulto)<x-residentes.navegacion-ficha :adulto="$adulto" />@endif
  {{-- A. CABECERA DEL SUBMÓDULO --}}
  <section class="overflow-hidden rounded-[1.6rem] border border-borde/65 bg-fondo-panel shadow-sm backdrop-blur-xl">
- <div class="h-1.5 w-full bg-gradient-to-r from-[#E27D60] via-[#D9A05B] to-[#8DA280]"></div>
+ <div class="h-1.5 w-full bg-gradient-to-r from-[var(--rm-accent-terracotta)] via-[var(--rm-warning)] to-[var(--rm-action-primary)]"></div>
  <div class="flex flex-col gap-4 p-4 sm:flex-row sm:items-center sm:justify-between">
  <div class="flex items-center gap-3">
  <span class="flex h-12 w-12 items-center justify-center rounded-2xl border border-borde/55 bg-fondo-panel text-boton-acento shadow-sm">
@@ -67,13 +67,13 @@
  <div>
  <div class="relative">
  <i class="ph-bold ph-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-meta"></i>
- <input type="text" wire:model.live.debounce.350ms="buscarPaciente" placeholder="Buscar por nombre o apellido..." class="w-full rounded-xl border border-borde/70 bg-fondo-card py-3 pl-10 pr-4 text-xs font-bold text-parrafo outline-none transition placeholder:text-meta focus:border-borde-focus focus:ring-2 focus:ring-[#E27D60]/15">
+ <input type="text" wire:model.live.debounce.350ms="buscarPaciente" placeholder="Buscar por nombre o apellido..." class="w-full rounded-xl border border-borde/70 bg-fondo-card py-3 pl-10 pr-4 text-xs font-bold text-parrafo outline-none transition placeholder:text-meta focus:border-borde-focus focus:ring-2 focus:ring-[var(--rm-action-primary)]/20">
  </div>
  </div>
  <div>
  <div class="relative w-full">
  <i class="ph-bold ph-user absolute left-3.5 top-1/2 -translate-y-1/2 text-meta"></i>
- <select wire:model="adultoSeleccionado" class="w-full rounded-xl border border-borde/70 bg-fondo-card py-3 pl-10 pr-4 text-xs font-bold text-parrafo outline-none transition appearance-none focus:border-borde-focus focus:ring-2 focus:ring-[#E27D60]/15">
+ <select wire:model="adultoSeleccionado" class="w-full rounded-xl border border-borde/70 bg-fondo-card py-3 pl-10 pr-4 text-xs font-bold text-parrafo outline-none transition appearance-none focus:border-borde-focus focus:ring-2 focus:ring-[var(--rm-action-primary)]/20">
  <option value="">Seleccione un adulto mayor</option>
  @foreach($pacientesSelector as $paciente)
  @php $nombrePaciente = trim("{$paciente->nombres} {$paciente->ap_paterno} {$paciente->ap_materno}"); @endphp
@@ -159,7 +159,7 @@
  <div class="rounded-[1.6rem] border border-borde/65 bg-fondo-card p-4 shadow-sm"
  x-data="{ chartKey: '{{ $chartKey }}', payload: @js($chartData) }"
  x-init="$watch('chartKey', () => window.rmSignosVitalesMainChart($el, payload)); window.rmSignosVitalesMainChart($el, payload);">
- 
+
  <div class="mb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
  <h3 class="text-sm font-bold uppercase tracking-wider text-parrafo">Evolución Clínica</h3>
  <select wire:model.live="grafica" class="rounded-xl border border-borde/70 bg-fondo-app py-1.5 pl-3 pr-8 text-xs font-bold text-parrafo outline-none">
@@ -192,7 +192,7 @@
  <div class="rounded-xl border border-borde-suave bg-fondo-card/60 p-4 mb-4">
  <p class="text-xs font-bold text-parrafo/80 leading-relaxed">{{ $reporteClinico['mensaje'] }}</p>
  </div>
- 
+
  <div class="space-y-3 text-[11px] font-bold text-apoyo">
  <div class="flex justify-between border-b border-borde-suave pb-2">
  <span>Último valor ({{ $reporteClinico['metrica']['label'] ?? '' }})</span>
@@ -256,7 +256,7 @@
  <h3 class="text-sm font-bold uppercase tracking-wider text-parrafo flex items-center gap-2">
  <i class="ph-bold ph-list-numbers"></i> Historial de Registros
  </h3>
- 
+
  <!-- Filtros simples si los hay -->
  <div class="flex items-center gap-2">
  <select wire:model.live="perPage" class="rounded-lg border border-borde/70 bg-fondo-card py-1 pl-2 pr-6 text-[10px] font-bold text-parrafo outline-none">
@@ -282,7 +282,7 @@
  <th class="px-4 py-3 text-right">Acciones</th>
  </tr>
  </thead>
- <tbody class="divide-y divide-[#C7B5A3]/30 bg-fondo-card">
+ <tbody class="divide-y divide-[var(--rm-border)]/30 bg-fondo-card">
  @forelse($historial as $signo)
  @php
  $estadoClases = $signo->estado === 'VIGENTE' ? '' : 'opacity-60 bg-fondo-app';
@@ -335,7 +335,7 @@
  </tbody>
  </table>
  </div>
- 
+
  @if(method_exists($historial, 'hasPages') && $historial->hasPages())
  <div class="border-t border-borde-suave bg-fondo-app px-4 py-3">
  {{ $historial->links() }}
@@ -387,12 +387,12 @@
  </div>
  <div>
  <label class="mb-1 block text-[11px] font-bold uppercase tracking-widest text-parrafo/55">Fecha *</label>
- <input type="date" wire:model="fecha" class="w-full rounded-xl border {{ $errors->has('fecha') ? 'border-red-500' : 'border-borde/70' }} bg-fondo-card px-3 py-2.5 text-xs font-bold text-parrafo outline-none transition focus:border-borde-focus focus:ring-2 focus:ring-[#E27D60]/15">
+ <input type="date" wire:model="fecha" class="w-full rounded-xl border {{ $errors->has('fecha') ? 'border-red-500' : 'border-borde/70' }} bg-fondo-card px-3 py-2.5 text-xs font-bold text-parrafo outline-none transition focus:border-borde-focus focus:ring-2 focus:ring-[var(--rm-action-primary)]/20">
  @error('fecha') <span class="mt-1 text-[10px] font-bold text-red-500">{{ $message }}</span> @enderror
  </div>
  <div>
  <label class="mb-1 block text-[11px] font-bold uppercase tracking-widest text-parrafo/55">Hora *</label>
- <input type="time" wire:model="hora" class="w-full rounded-xl border {{ $errors->has('hora') ? 'border-red-500' : 'border-borde/70' }} bg-fondo-card px-3 py-2.5 text-xs font-bold text-parrafo outline-none transition focus:border-borde-focus focus:ring-2 focus:ring-[#E27D60]/15">
+ <input type="time" wire:model="hora" class="w-full rounded-xl border {{ $errors->has('hora') ? 'border-red-500' : 'border-borde/70' }} bg-fondo-card px-3 py-2.5 text-xs font-bold text-parrafo outline-none transition focus:border-borde-focus focus:ring-2 focus:ring-[var(--rm-action-primary)]/20">
  @error('hora') <span class="mt-1 text-[10px] font-bold text-red-500">{{ $message }}</span> @enderror
  </div>
  </div>
@@ -409,12 +409,12 @@
  <div class="grid gap-4 md:grid-cols-2">
  <div>
  <label class="mb-1 block text-[11px] font-bold uppercase tracking-widest text-parrafo/55">Sistólica (mmHg)</label>
- <input type="number" wire:model.live.debounce.400ms="presion_sistolica" min="60" max="250" placeholder="Ej. 120" class="w-full rounded-xl border {{ $errors->has('presion_sistolica') ? 'border-red-500' : 'border-borde/70' }} bg-fondo-card px-3 py-2.5 text-xs font-bold text-parrafo outline-none transition focus:border-borde-focus focus:ring-2 focus:ring-[#E27D60]/15">
+ <input type="number" wire:model.live.debounce.400ms="presion_sistolica" min="60" max="250" placeholder="Ej. 120" class="w-full rounded-xl border {{ $errors->has('presion_sistolica') ? 'border-red-500' : 'border-borde/70' }} bg-fondo-card px-3 py-2.5 text-xs font-bold text-parrafo outline-none transition focus:border-borde-focus focus:ring-2 focus:ring-[var(--rm-action-primary)]/20">
  @error('presion_sistolica') <span class="mt-1 text-[10px] font-bold text-red-500">{{ $message }}</span> @enderror
  </div>
  <div>
  <label class="mb-1 block text-[11px] font-bold uppercase tracking-widest text-parrafo/55">Diastólica (mmHg)</label>
- <input type="number" wire:model.live.debounce.400ms="presion_diastolica" min="40" max="160" placeholder="Ej. 80" class="w-full rounded-xl border {{ $errors->has('presion_diastolica') ? 'border-red-500' : 'border-borde/70' }} bg-fondo-card px-3 py-2.5 text-xs font-bold text-parrafo outline-none transition focus:border-borde-focus focus:ring-2 focus:ring-[#E27D60]/15">
+ <input type="number" wire:model.live.debounce.400ms="presion_diastolica" min="40" max="160" placeholder="Ej. 80" class="w-full rounded-xl border {{ $errors->has('presion_diastolica') ? 'border-red-500' : 'border-borde/70' }} bg-fondo-card px-3 py-2.5 text-xs font-bold text-parrafo outline-none transition focus:border-borde-focus focus:ring-2 focus:ring-[var(--rm-action-primary)]/20">
  @error('presion_diastolica') <span class="mt-1 text-[10px] font-bold text-red-500">{{ $message }}</span> @enderror
  </div>
  </div>
@@ -432,22 +432,22 @@
  <div class="grid gap-4 md:grid-cols-2">
  <div>
  <label class="mb-1 block text-[11px] font-bold uppercase tracking-widest text-parrafo/55">Frecuencia Cardaca (lpm)</label>
- <input type="number" wire:model.live.debounce.400ms="frecuencia_cardiaca" min="30" max="220" placeholder="Ej. 72" class="w-full rounded-xl border {{ $errors->has('frecuencia_cardiaca') ? 'border-red-500' : 'border-borde/70' }} bg-fondo-card px-3 py-2.5 text-xs font-bold text-parrafo outline-none transition focus:border-borde-focus focus:ring-2 focus:ring-[#E27D60]/15">
+ <input type="number" wire:model.live.debounce.400ms="frecuencia_cardiaca" min="30" max="220" placeholder="Ej. 72" class="w-full rounded-xl border {{ $errors->has('frecuencia_cardiaca') ? 'border-red-500' : 'border-borde/70' }} bg-fondo-card px-3 py-2.5 text-xs font-bold text-parrafo outline-none transition focus:border-borde-focus focus:ring-2 focus:ring-[var(--rm-action-primary)]/20">
  @error('frecuencia_cardiaca') <span class="mt-1 text-[10px] font-bold text-red-500">{{ $message }}</span> @enderror
  </div>
  <div>
  <label class="mb-1 block text-[11px] font-bold uppercase tracking-widest text-parrafo/55">Saturación O2 (%)</label>
- <input type="number" wire:model.live.debounce.400ms="saturacion" min="0" max="100" placeholder="Ej. 97" class="w-full rounded-xl border {{ $errors->has('saturacion') ? 'border-red-500' : 'border-borde/70' }} bg-fondo-card px-3 py-2.5 text-xs font-bold text-parrafo outline-none transition focus:border-borde-focus focus:ring-2 focus:ring-[#E27D60]/15">
+ <input type="number" wire:model.live.debounce.400ms="saturacion" min="0" max="100" placeholder="Ej. 97" class="w-full rounded-xl border {{ $errors->has('saturacion') ? 'border-red-500' : 'border-borde/70' }} bg-fondo-card px-3 py-2.5 text-xs font-bold text-parrafo outline-none transition focus:border-borde-focus focus:ring-2 focus:ring-[var(--rm-action-primary)]/20">
  @error('saturacion') <span class="mt-1 text-[10px] font-bold text-red-500">{{ $message }}</span> @enderror
  </div>
  <div>
  <label class="mb-1 block text-[11px] font-bold uppercase tracking-widest text-parrafo/55">Temperatura (°C)</label>
- <input type="number" step="0.1" wire:model.live.debounce.400ms="temperatura" min="30" max="45" placeholder="Ej. 36.5" class="w-full rounded-xl border {{ $errors->has('temperatura') ? 'border-red-500' : 'border-borde/70' }} bg-fondo-card px-3 py-2.5 text-xs font-bold text-parrafo outline-none transition focus:border-borde-focus focus:ring-2 focus:ring-[#E27D60]/15">
+ <input type="number" step="0.1" wire:model.live.debounce.400ms="temperatura" min="30" max="45" placeholder="Ej. 36.5" class="w-full rounded-xl border {{ $errors->has('temperatura') ? 'border-red-500' : 'border-borde/70' }} bg-fondo-card px-3 py-2.5 text-xs font-bold text-parrafo outline-none transition focus:border-borde-focus focus:ring-2 focus:ring-[var(--rm-action-primary)]/20">
  @error('temperatura') <span class="mt-1 text-[10px] font-bold text-red-500">{{ $message }}</span> @enderror
  </div>
  <div>
  <label class="mb-1 block text-[11px] font-bold uppercase tracking-widest text-parrafo/55">Frecuencia Resp. (rpm)</label>
- <input type="number" wire:model.live.debounce.400ms="frecuencia_respiratoria" min="5" max="60" placeholder="Ej. 18" class="w-full rounded-xl border {{ $errors->has('frecuencia_respiratoria') ? 'border-red-500' : 'border-borde/70' }} bg-fondo-card px-3 py-2.5 text-xs font-bold text-parrafo outline-none transition focus:border-borde-focus focus:ring-2 focus:ring-[#E27D60]/15">
+ <input type="number" wire:model.live.debounce.400ms="frecuencia_respiratoria" min="5" max="60" placeholder="Ej. 18" class="w-full rounded-xl border {{ $errors->has('frecuencia_respiratoria') ? 'border-red-500' : 'border-borde/70' }} bg-fondo-card px-3 py-2.5 text-xs font-bold text-parrafo outline-none transition focus:border-borde-focus focus:ring-2 focus:ring-[var(--rm-action-primary)]/20">
  @error('frecuencia_respiratoria') <span class="mt-1 text-[10px] font-bold text-red-500">{{ $message }}</span> @enderror
  </div>
  </div>
@@ -465,12 +465,12 @@
  <div class="grid gap-4 md:grid-cols-3">
  <div>
  <label class="mb-1 block text-[11px] font-bold uppercase tracking-widest text-parrafo/55">Peso (kg)</label>
- <input type="number" step="0.1" wire:model.live.debounce.400ms="peso" min="20" max="250" placeholder="Ej. 65.0" class="w-full rounded-xl border {{ $errors->has('peso') ? 'border-red-500' : 'border-borde/70' }} bg-fondo-card px-3 py-2.5 text-xs font-bold text-parrafo outline-none transition focus:border-borde-focus focus:ring-2 focus:ring-[#E27D60]/15">
+ <input type="number" step="0.1" wire:model.live.debounce.400ms="peso" min="20" max="250" placeholder="Ej. 65.0" class="w-full rounded-xl border {{ $errors->has('peso') ? 'border-red-500' : 'border-borde/70' }} bg-fondo-card px-3 py-2.5 text-xs font-bold text-parrafo outline-none transition focus:border-borde-focus focus:ring-2 focus:ring-[var(--rm-action-primary)]/20">
  @error('peso') <span class="mt-1 text-[10px] font-bold text-red-500">{{ $message }}</span> @enderror
  </div>
  <div>
  <label class="mb-1 block text-[11px] font-bold uppercase tracking-widest text-parrafo/55">Talla (cm)</label>
- <input type="number" step="0.1" wire:model.live.debounce.400ms="talla" min="50" max="240" placeholder="Ej. 165" class="w-full rounded-xl border {{ $errors->has('talla') ? 'border-red-500' : 'border-borde/70' }} bg-fondo-card px-3 py-2.5 text-xs font-bold text-parrafo outline-none transition focus:border-borde-focus focus:ring-2 focus:ring-[#E27D60]/15">
+ <input type="number" step="0.1" wire:model.live.debounce.400ms="talla" min="50" max="240" placeholder="Ej. 165" class="w-full rounded-xl border {{ $errors->has('talla') ? 'border-red-500' : 'border-borde/70' }} bg-fondo-card px-3 py-2.5 text-xs font-bold text-parrafo outline-none transition focus:border-borde-focus focus:ring-2 focus:ring-[var(--rm-action-primary)]/20">
  @error('talla') <span class="mt-1 text-[10px] font-bold text-red-500">{{ $message }}</span> @enderror
  </div>
  <div>
@@ -489,7 +489,7 @@
  <div x-show="paso === 5" x-transition.opacity.duration.300ms style="display: none;">
  <div class="rounded-[1.4rem] border border-borde/65 bg-fondo-panel p-5 shadow-sm backdrop-blur-xl">
  <h4 class="mb-4 text-sm font-bold uppercase tracking-wider text-parrafo">5. Observaciones Finales</h4>
- 
+
  @if(!empty($alertasFormulario))
  <div class="mb-4 rounded-xl border border-red-300 bg-red-50 p-4">
  <p class="mb-2 text-xs font-bold uppercase tracking-wider text-red-700"><i class="ph-fill ph-warning text-sm"></i> Valores fuera del rango referencial</p>
@@ -504,7 +504,7 @@
  <div class="grid gap-4">
  <div>
  <label class="mb-1 block text-[11px] font-bold uppercase tracking-widest text-parrafo/55">Observación / Nota (Opcional)</label>
- <textarea wire:model="observacion" rows="3" placeholder="Contexto de la medición, detalles adicionales..." class="w-full rounded-xl border border-borde/70 bg-fondo-card px-3 py-2.5 text-xs font-bold text-parrafo outline-none transition focus:border-borde-focus focus:ring-2 focus:ring-[#E27D60]/15"></textarea>
+ <textarea wire:model="observacion" rows="3" placeholder="Contexto de la medición, detalles adicionales..." class="w-full rounded-xl border border-borde/70 bg-fondo-card px-3 py-2.5 text-xs font-bold text-parrafo outline-none transition focus:border-borde-focus focus:ring-2 focus:ring-[var(--rm-action-primary)]/20"></textarea>
  @error('observacion') <span class="mt-1 text-[10px] font-bold text-red-500">{{ $message }}</span> @enderror
  </div>
  </div>
@@ -670,7 +670,7 @@
  </div>
  <div>
  <label class="mb-1 block text-[11px] font-bold uppercase tracking-widest text-parrafo/55">Talla (cm)</label>
-                        <input type="number" step="0.1" wire:model.live.debounce.400ms="talla" min="50" max="240" placeholder="165" class="w-full rounded-xl border {{ $errors->has('talla') ? 'border-red-500' : 'border-borde/70' }} bg-fondo-card px-3 py-2.5 text-xs font-bold text-parrafo">
+   <input type="number" step="0.1" wire:model.live.debounce.400ms="talla" min="50" max="240" placeholder="165" class="w-full rounded-xl border {{ $errors->has('talla') ? 'border-red-500' : 'border-borde/70' }} bg-fondo-card px-3 py-2.5 text-xs font-bold text-parrafo">
  @error('talla') <span class="mt-1 text-[10px] font-bold text-red-500">{{ $message }}</span> @enderror
  </div>
  </div>

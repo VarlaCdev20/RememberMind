@@ -1,6 +1,6 @@
 <div class="space-y-6">
  <section class="overflow-hidden rounded-[1.6rem] border border-borde/65 bg-fondo-panel shadow-sm backdrop-blur-xl">
- <div class="h-1.5 w-full bg-gradient-to-r from-[#E27D60] via-[#D9A05B] to-[#8DA280]"></div>
+ <div class="h-1.5 w-full bg-gradient-to-r from-[var(--rm-accent-terracotta)] via-[var(--rm-warning)] to-[var(--rm-action-primary)]"></div>
  <div class="p-5">
  <span class="text-[10px] font-bold uppercase tracking-[0.2em] text-boton-acento">Documentación institucional</span>
  <h2 class="mt-1 text-xl font-extrabold tracking-tight text-parrafo">Reportes de salud</h2>
@@ -51,7 +51,7 @@
  <div class="grid gap-4 md:grid-cols-2">
  <div>
  <label class="mb-1.5 block text-[10px] font-bold uppercase tracking-widest text-apoyo">Adulto mayor</label>
- <select wire:model="adultoSeleccionado" class="w-full rounded-xl border border-borde/65 bg-fondo-panel px-3 py-2.5 text-xs font-bold text-parrafo outline-none transition focus:border-borde-focus focus:ring-2 focus:ring-[#E27D60]/15">
+ <select wire:model="adultoSeleccionado" class="w-full rounded-xl border border-borde/65 bg-fondo-panel px-3 py-2.5 text-xs font-bold text-parrafo outline-none transition focus:border-borde-focus focus:ring-2 focus:ring-[var(--rm-accent-terracotta)]/15">
  <option value="">Seleccione un paciente...</option>
  <option value="TODOS">Todos los pacientes activos</option>
  @foreach($adultos as $adulto)
@@ -63,7 +63,7 @@
 
  <div>
  <label class="mb-1.5 block text-[10px] font-bold uppercase tracking-widest text-apoyo">Tipo de reporte</label>
- <select wire:model="tipoReporte" class="w-full rounded-xl border border-borde/65 bg-fondo-panel px-3 py-2.5 text-xs font-bold text-parrafo outline-none transition focus:border-borde-focus focus:ring-2 focus:ring-[#E27D60]/15">
+ <select wire:model="tipoReporte" class="w-full rounded-xl border border-borde/65 bg-fondo-panel px-3 py-2.5 text-xs font-bold text-parrafo outline-none transition focus:border-borde-focus focus:ring-2 focus:ring-[var(--rm-accent-terracotta)]/15">
  <option value="">Seleccione el tipo...</option>
  <option value="individual">Ficha de salud individual</option>
  <option value="medicacion">Control de tratamientos</option>
@@ -79,11 +79,11 @@
  <div class="grid gap-4 border-t border-borde/35 pt-5 md:grid-cols-2">
  <div>
  <label class="mb-1.5 block text-[10px] font-bold uppercase tracking-widest text-apoyo">Fecha inicio</label>
- <input type="date" wire:model="fechaInicio" class="w-full rounded-xl border border-borde/65 bg-fondo-panel px-3 py-2.5 text-xs font-bold text-parrafo outline-none transition focus:border-borde-focus focus:ring-2 focus:ring-[#E27D60]/15">
+ <input type="date" wire:model="fechaInicio" class="w-full rounded-xl border border-borde/65 bg-fondo-panel px-3 py-2.5 text-xs font-bold text-parrafo outline-none transition focus:border-borde-focus focus:ring-2 focus:ring-[var(--rm-accent-terracotta)]/15">
  </div>
  <div>
  <label class="mb-1.5 block text-[10px] font-bold uppercase tracking-widest text-apoyo">Fecha fin</label>
- <input type="date" wire:model="fechaFin" class="w-full rounded-xl border border-borde/65 bg-fondo-panel px-3 py-2.5 text-xs font-bold text-parrafo outline-none transition focus:border-borde-focus focus:ring-2 focus:ring-[#E27D60]/15">
+ <input type="date" wire:model="fechaFin" class="w-full rounded-xl border border-borde/65 bg-fondo-panel px-3 py-2.5 text-xs font-bold text-parrafo outline-none transition focus:border-borde-focus focus:ring-2 focus:ring-[var(--rm-accent-terracotta)]/15">
  </div>
  </div>
 

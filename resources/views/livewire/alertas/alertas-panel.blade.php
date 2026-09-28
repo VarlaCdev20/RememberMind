@@ -1,185 +1,185 @@
 <div class="rm-pilot-alertas rm-page-layout font-sans">
-    {{-- Encabezado Institucional Canónico --}}
-    <header class="rm-page-header">
-        <div class="flex items-center gap-4">
-            <span class="flex h-12 w-12 items-center justify-center rounded-2xl bg-[var(--rm-danger-action)] text-white shadow-md">
-                <i class="ph ph-shield-warning text-2xl"></i>
-            </span>
-            <div class="rm-page-title-group">
-                <h1 class="rm-page-title text-slate-800 dark:text-slate-100">
-                    Alertas clínicas y cuidados
-                </h1>
-                <p class="rm-page-subtitle text-slate-600 dark:text-slate-400">
-                    Monitoreo continuo de alertas clínicas, signos vitales, administración de fármacos y eventos asistenciales en Jardín de los Recuerdos.
-                </p>
-            </div>
-        </div>
+ {{-- Encabezado Institucional Canónico --}}
+ <header class="rm-page-header">
+ <div class="flex items-center gap-4">
+  <span class="flex h-12 w-12 items-center justify-center rounded-2xl bg-[var(--rm-danger-action)] text-white shadow-md">
+  <i class="ph ph-shield-warning text-2xl"></i>
+  </span>
+  <div class="rm-page-title-group">
+  <h1 class="rm-page-title text-slate-800 dark:text-slate-100">
+   Alertas clínicas y cuidados
+  </h1>
+  <p class="rm-page-subtitle text-slate-600 dark:text-slate-400">
+   Monitoreo continuo de alertas clínicas, signos vitales, administración de fármacos y eventos asistenciales en Jardín de los Recuerdos.
+  </p>
+  </div>
+ </div>
 
-        <div class="flex flex-wrap items-center gap-2.5">
-            @can('alertas.gestionar')
-                <button type="button"
-                    wire:click="abrirCrear"
-                    class="rm-btn rm-btn-accent cursor-pointer">
-                    <i class="ph ph-plus-circle text-lg"></i>
-                    <span>Registrar alerta</span>
-                </button>
+ <div class="flex flex-wrap items-center gap-2.5">
+  @can('alertas.gestionar')
+  <button type="button"
+   wire:click="abrirCrear"
+   class="rm-btn rm-btn-accent cursor-pointer">
+   <i class="ph ph-plus-circle text-lg"></i>
+   <span>Registrar alerta</span>
+  </button>
 
-                <button type="button"
-                    wire:click="detectarAlertas"
-                    wire:loading.attr="disabled"
-                    class="rm-btn rm-btn-secondary cursor-pointer">
-                    <i class="ph ph-arrows-clockwise text-lg" wire:loading.class="animate-spin" wire:target="detectarAlertas"></i>
-                    <span wire:loading.remove wire:target="detectarAlertas">Detectar pendientes</span>
-                    <span wire:loading wire:target="detectarAlertas">Analizando...</span>
-                </button>
-            @endcan
+  <button type="button"
+   wire:click="detectarAlertas"
+   wire:loading.attr="disabled"
+   class="rm-btn rm-btn-secondary cursor-pointer">
+   <i class="ph ph-arrows-clockwise text-lg" wire:loading.class="animate-spin" wire:target="detectarAlertas"></i>
+   <span wire:loading.remove wire:target="detectarAlertas">Detectar pendientes</span>
+   <span wire:loading wire:target="detectarAlertas">Analizando...</span>
+  </button>
+  @endcan
 
-            <button type="button"
-                wire:click="$refresh"
-                title="Actualizar datos"
-                class="rm-btn-icon cursor-pointer">
-                <i class="ph ph-arrow-clockwise text-lg" wire:loading.class="animate-spin" wire:target="$refresh"></i>
-            </button>
-        </div>
-    </header>
+  <button type="button"
+  wire:click="$refresh"
+  title="Actualizar datos"
+  class="rm-btn-icon cursor-pointer">
+  <i class="ph ph-arrow-clockwise text-lg" wire:loading.class="animate-spin" wire:target="$refresh"></i>
+  </button>
+ </div>
+ </header>
 
-    {{-- Notificación Flash Institucional --}}
-    @if (session()->has('mensaje'))
-        <div x-data="{ show: true }"
-             x-show="show"
-             x-transition
-             class="rm-alert rm-alert-success flex items-center justify-between">
-            <div class="flex items-center gap-3">
-                <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--rm-state-success-border)] text-white">
-                    <i class="ph ph-check-circle text-lg"></i>
-                </span>
-                <span class="text-sm font-semibold text-[var(--rm-state-success-text)]">{{ session('mensaje') }}</span>
-            </div>
-            <button type="button" @click="show = false" class="text-[var(--rm-state-success-text)] opacity-70 hover:opacity-100 transition cursor-pointer">
-                <i class="ph ph-x text-lg"></i>
-            </button>
-        </div>
-    @endif
+ {{-- Notificación Flash Institucional --}}
+ @if (session()->has('mensaje'))
+ <div x-data="{ show: true }"
+  x-show="show"
+  x-transition
+  class="rm-alert rm-alert-success flex items-center justify-between">
+  <div class="flex items-center gap-3">
+  <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--rm-state-success-border)] text-white">
+   <i class="ph ph-check-circle text-lg"></i>
+  </span>
+  <span class="text-sm font-semibold text-[var(--rm-state-success-text)]">{{ session('mensaje') }}</span>
+  </div>
+  <button type="button" @click="show = false" class="text-[var(--rm-state-success-text)] opacity-70 hover:opacity-100 transition cursor-pointer">
+  <i class="ph ph-x text-lg"></i>
+  </button>
+ </div>
+ @endif
 
-    <x-validation-errors class="mb-2" />
+ <x-validation-errors class="mb-2" />
 
-    {{-- TARJETAS KPI: BASE CÁLIDA (#FBF7F2) + MODO OSCURO --}}
-    <section class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-5 gap-3.5">
-        {{-- Card 1: Total Alertas --}}
-        <div wire:click="limpiarFiltros"
-            class="rm-card-metric rm-card-interactive cursor-pointer border-l-4 border-l-[var(--rm-primary)]">
-            <div class="flex items-center justify-between">
-                <span class="rm-metric-label">Total Registro</span>
-                <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--rm-surface-alt)] dark:bg-slate-800 text-[var(--rm-primary)] dark:text-blue-400">
-                    <i class="ph ph-bell text-lg"></i>
-                </span>
-            </div>
-            <div class="mt-1 flex items-baseline justify-between gap-2">
-                <span class="rm-metric-value">{{ $conteos['total'] ?? 0 }}</span>
-                <div class="w-20 h-7 shrink-0 pointer-events-none">
-                    <x-ui.sparkline :id="'spark-kpi-total'" :data="[max(1, ($conteos['total'] ?? 0) - 3), max(1, ($conteos['total'] ?? 0) - 1), max(1, ($conteos['total'] ?? 0) - 2), max(1, ($conteos['total'] ?? 0) - 1), ($conteos['total'] ?? 0)]" color="primary" height="28px" />
-                </div>
-            </div>
-            <div class="rm-metric-meta justify-between">
-                <span>Alertas en sistema</span>
-                <span class="font-semibold underline underline-offset-2">Ver todas</span>
-            </div>
-        </div>
+ {{-- TARJETAS KPI: BASE CÁLIDA (var(--rm-surface)) + MODO OSCURO --}}
+ <section class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-5 gap-3.5">
+ {{-- Card 1: Total Alertas --}}
+ <div wire:click="limpiarFiltros"
+  class="rm-card-metric rm-card-interactive cursor-pointer border-l-[3px] border-l-[var(--rm-action-primary)]">
+  <div class="flex items-center justify-between">
+  <span class="rm-metric-label">Total Registro</span>
+  <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--rm-action-primary-soft)] text-[var(--rm-action-primary)] border border-[var(--rm-action-primary)]/20">
+   <i class="ph ph-bell text-lg"></i>
+  </span>
+  </div>
+  <div class="mt-1 flex items-baseline justify-between gap-2">
+  <span class="rm-metric-value">{{ $conteos['total'] ?? 0 }}</span>
+  <div class="w-20 h-7 shrink-0 pointer-events-none">
+   <x-ui.sparkline :id="'spark-kpi-total'" :data="[max(1, ($conteos['total'] ?? 0) - 3), max(1, ($conteos['total'] ?? 0) - 1), max(1, ($conteos['total'] ?? 0) - 2), max(1, ($conteos['total'] ?? 0) - 1), ($conteos['total'] ?? 0)]" color="primary" height="28px" />
+  </div>
+  </div>
+  <div class="rm-metric-meta justify-between">
+  <span>Alertas en sistema</span>
+  <span class="font-semibold underline underline-offset-2">Ver todas</span>
+  </div>
+ </div>
 
-        {{-- Card 2: Críticas y Altas --}}
-        <div wire:click="setFiltroRapido('filtroNivel', 'CRITICO')"
-            class="rm-card-metric rm-card-interactive cursor-pointer border-l-[3px] border-l-rose-500/80 {{ $filtroNivel === 'CRITICO' ? 'ring-1 ring-rose-500/40 bg-rose-500/5' : '' }}">
-            <div class="flex items-center justify-between">
-                <div class="flex items-center gap-1.5">
-                    <span class="relative flex h-2.5 w-2.5">
-                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[var(--rm-danger-action)] opacity-75"></span>
-                        <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-[var(--rm-danger-action)]"></span>
-                    </span>
-                    <span class="rm-metric-label text-[var(--rm-danger-action)]">Críticas y Altas</span>
-                </div>
-                <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--rm-state-danger-bg)] text-[var(--rm-danger-action)]">
-                    <i class="ph ph-warning-octagon text-lg"></i>
-                </span>
-            </div>
-            <div class="mt-1 flex items-baseline justify-between gap-2">
-                <span class="rm-metric-value text-[var(--rm-danger-action)]">
-                    {{ ($conteos['criticas'] ?? 0) + ($conteos['altas'] ?? 0) }}
-                </span>
-                <div class="w-20 h-7 shrink-0 pointer-events-none">
-                    <x-ui.sparkline :id="'spark-kpi-criticas'" :data="[max(0, ($conteos['criticas'] ?? 0) - 2), max(0, ($conteos['criticas'] ?? 0) + 1), max(0, ($conteos['criticas'] ?? 0) - 1), ($conteos['criticas'] ?? 0)]" color="danger" height="28px" />
-                </div>
-            </div>
-            <div class="rm-metric-meta justify-between text-[var(--rm-text-soft)]">
-                <span class="font-medium text-[var(--rm-danger-action)]">{{ $conteos['criticas'] ?? 0 }} críticas</span>
-                <span>{{ $conteos['altas'] ?? 0 }} altas</span>
-            </div>
-        </div>
+ {{-- Card 2: Críticas y Altas --}}
+ <div wire:click="setFiltroRapido('filtroNivel', 'CRITICO')"
+  class="rm-card-metric rm-card-interactive cursor-pointer border-l-[3px] border-l-[var(--rm-danger)] {{ $filtroNivel === 'CRITICO' ? 'ring-1 ring-[var(--rm-danger)]/40 bg-[var(--rm-danger-soft)]/20' : '' }}">
+  <div class="flex items-center justify-between">
+  <div class="flex items-center gap-1.5">
+   <span class="relative flex h-2.5 w-2.5">
+   <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[var(--rm-danger-action)] opacity-75"></span>
+   <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-[var(--rm-danger-action)]"></span>
+   </span>
+   <span class="rm-metric-label text-[var(--rm-danger-action)]">Críticas y Altas</span>
+  </div>
+  <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--rm-danger-soft)] text-[var(--rm-danger)] border border-[var(--rm-danger)]/20">
+   <i class="ph ph-warning-octagon text-lg"></i>
+  </span>
+  </div>
+  <div class="mt-1 flex items-baseline justify-between gap-2">
+  <span class="rm-metric-value text-[var(--rm-danger-action)]">
+   {{ ($conteos['criticas'] ?? 0) + ($conteos['altas'] ?? 0) }}
+  </span>
+  <div class="w-20 h-7 shrink-0 pointer-events-none">
+   <x-ui.sparkline :id="'spark-kpi-criticas'" :data="[max(0, ($conteos['criticas'] ?? 0) - 2), max(0, ($conteos['criticas'] ?? 0) + 1), max(0, ($conteos['criticas'] ?? 0) - 1), ($conteos['criticas'] ?? 0)]" color="danger" height="28px" />
+  </div>
+  </div>
+  <div class="rm-metric-meta justify-between text-[var(--rm-text-soft)]">
+  <span class="font-medium text-[var(--rm-danger-action)]">{{ $conteos['criticas'] ?? 0 }} críticas</span>
+  <span>{{ $conteos['altas'] ?? 0 }} altas</span>
+  </div>
+ </div>
 
-        {{-- Card 3: Por Atender --}}
-        <div wire:click="setFiltroRapido('filtroEstado', 'ABIERTA')"
-            class="rm-card-metric rm-card-interactive cursor-pointer border-l-2 border-l-amber-500/60 {{ $filtroEstado === 'ABIERTA' ? 'ring-1 ring-amber-500/25 bg-amber-500/5' : '' }}">
-            <div class="flex items-center justify-between">
-                <span class="rm-metric-label text-[#8F5C00] dark:text-amber-400">Por Atender</span>
-                <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--rm-state-warning-bg)] text-[#8F5C00] dark:text-amber-400">
-                    <i class="ph ph-clock-countdown text-lg"></i>
-                </span>
-            </div>
-            <div class="mt-1 flex items-baseline justify-between gap-2">
-                <span class="rm-metric-value text-[#8F5C00] dark:text-amber-400">{{ $conteos['abiertas'] ?? 0 }}</span>
-                <div class="w-20 h-7 shrink-0 pointer-events-none">
-                    <x-ui.sparkline :id="'spark-kpi-abiertas'" :data="[max(0, ($conteos['abiertas'] ?? 0) + 2), max(0, ($conteos['abiertas'] ?? 0) + 1), max(0, ($conteos['abiertas'] ?? 0)), ($conteos['abiertas'] ?? 0)]" color="warning" height="28px" />
-                </div>
-            </div>
-            <div class="rm-metric-meta text-[var(--rm-text-soft)]">
-                <i class="ph ph-hourglass-high"></i>
-                <span>Abiertas sin atención</span>
-            </div>
-        </div>
+ {{-- Card 3: Por Atender --}}
+ <div wire:click="setFiltroRapido('filtroEstado', 'ABIERTA')"
+  class="rm-card-metric rm-card-interactive cursor-pointer border-l-[3px] border-l-[var(--rm-warning)] {{ $filtroEstado === 'ABIERTA' ? 'ring-1 ring-[var(--rm-warning)]/40 bg-[var(--rm-warning-soft)]/20' : '' }}">
+  <div class="flex items-center justify-between">
+  <span class="rm-metric-label text-[var(--rm-warning)]">Por Atender</span>
+  <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--rm-warning-soft)] text-[var(--rm-warning)] border border-[var(--rm-warning)]/20">
+   <i class="ph ph-clock-countdown text-lg"></i>
+  </span>
+  </div>
+  <div class="mt-1 flex items-baseline justify-between gap-2">
+  <span class="rm-metric-value text-[var(--rm-warning)]">{{ $conteos['abiertas'] ?? 0 }}</span>
+  <div class="w-20 h-7 shrink-0 pointer-events-none">
+   <x-ui.sparkline :id="'spark-kpi-abiertas'" :data="[max(0, ($conteos['abiertas'] ?? 0) + 2), max(0, ($conteos['abiertas'] ?? 0) + 1), max(0, ($conteos['abiertas'] ?? 0)), ($conteos['abiertas'] ?? 0)]" color="warning" height="28px" />
+  </div>
+  </div>
+  <div class="rm-metric-meta text-[var(--rm-text-soft)]">
+  <i class="ph ph-hourglass-high"></i>
+  <span>Abiertas sin atención</span>
+  </div>
+ </div>
 
-        {{-- Card 4: En Atención --}}
-        <div wire:click="setFiltroRapido('filtroEstado', 'EN_ATENCION')"
-            class="rm-card-metric rm-card-interactive cursor-pointer border-l-[3px] border-l-blue-500/80 {{ $filtroEstado === 'EN_ATENCION' ? 'ring-1 ring-blue-500/40 bg-blue-500/5' : '' }}">
-            <div class="flex items-center justify-between">
-                <span class="rm-metric-label text-[var(--rm-info-action)]">En Atención</span>
-                <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--rm-state-info-bg)] text-[var(--rm-info-action)]">
-                    <i class="ph ph-first-aid text-lg"></i>
-                </span>
-            </div>
-            <div class="mt-1 flex items-baseline justify-between gap-2">
-                <span class="rm-metric-value text-[var(--rm-info-action)]">{{ $conteos['en_atencion'] ?? 0 }}</span>
-                <div class="w-20 h-7 shrink-0 pointer-events-none">
-                    <x-ui.sparkline :id="'spark-kpi-atencion'" :data="[max(0, ($conteos['en_atencion'] ?? 0) - 1), max(0, ($conteos['en_atencion'] ?? 0) + 1), max(0, ($conteos['en_atencion'] ?? 0)), ($conteos['en_atencion'] ?? 0)]" color="info" height="28px" />
-                </div>
-            </div>
-            <div class="rm-metric-meta text-[var(--rm-text-soft)]">
-                <i class="ph ph-arrows-clockwise"></i>
-                <span>Protocolo en curso</span>
-            </div>
-        </div>
+ {{-- Card 4: En Atención --}}
+ <div wire:click="setFiltroRapido('filtroEstado', 'EN_ATENCION')"
+  class="rm-card-metric rm-card-interactive cursor-pointer border-l-[3px] border-l-[var(--rm-info)] {{ $filtroEstado === 'EN_ATENCION' ? 'ring-1 ring-[var(--rm-info)]/40 bg-[var(--rm-info-soft)]/20' : '' }}">
+  <div class="flex items-center justify-between">
+  <span class="rm-metric-label text-[var(--rm-info-action)]">En Atención</span>
+  <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--rm-info-soft)] text-[var(--rm-info)] border border-[var(--rm-info)]/20">
+   <i class="ph ph-first-aid text-lg"></i>
+  </span>
+  </div>
+  <div class="mt-1 flex items-baseline justify-between gap-2">
+  <span class="rm-metric-value text-[var(--rm-info-action)]">{{ $conteos['en_atencion'] ?? 0 }}</span>
+  <div class="w-20 h-7 shrink-0 pointer-events-none">
+   <x-ui.sparkline :id="'spark-kpi-atencion'" :data="[max(0, ($conteos['en_atencion'] ?? 0) - 1), max(0, ($conteos['en_atencion'] ?? 0) + 1), max(0, ($conteos['en_atencion'] ?? 0)), ($conteos['en_atencion'] ?? 0)]" color="info" height="28px" />
+  </div>
+  </div>
+  <div class="rm-metric-meta text-[var(--rm-text-soft)]">
+  <i class="ph ph-arrows-clockwise"></i>
+  <span>Protocolo en curso</span>
+  </div>
+ </div>
 
-        {{-- Card 5: Resueltas --}}
-        <div wire:click="setFiltroRapido('filtroEstado', 'CERRADA')"
-            class="rm-card-metric rm-card-interactive cursor-pointer border-l-[3px] border-l-emerald-500/80 {{ $filtroEstado === 'CERRADA' ? 'ring-1 ring-emerald-500/40 bg-emerald-500/5' : '' }}">
-            <div class="flex items-center justify-between">
-                <span class="rm-metric-label text-[var(--rm-success-action)]">Resueltas</span>
-                <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--rm-state-success-bg)] text-[var(--rm-success-action)]">
-                    <i class="ph ph-check-circle text-lg"></i>
-                </span>
-            </div>
-            <div class="mt-1 flex items-baseline justify-between gap-2">
-                <span class="rm-metric-value text-[var(--rm-success-action)]">{{ $conteos['cerradas'] ?? 0 }}</span>
-                <div class="w-20 h-7 shrink-0 pointer-events-none">
-                    <x-ui.sparkline :id="'spark-kpi-cerradas'" :data="[max(0, ($conteos['cerradas'] ?? 0) - 3), max(0, ($conteos['cerradas'] ?? 0) - 2), max(0, ($conteos['cerradas'] ?? 0) - 1), ($conteos['cerradas'] ?? 0)]" color="success" height="28px" />
-                </div>
-            </div>
-            <div class="rm-metric-meta text-[var(--rm-text-soft)]">
-                <i class="ph ph-archive-box"></i>
-                <span>Historial conservado</span>
-            </div>
-        </div>
-    </section>
+ {{-- Card 5: Resueltas --}}
+ <div wire:click="setFiltroRapido('filtroEstado', 'CERRADA')"
+  class="rm-card-metric rm-card-interactive cursor-pointer border-l-[3px] border-l-[var(--rm-success)] {{ $filtroEstado === 'CERRADA' ? 'ring-1 ring-[var(--rm-success)]/40 bg-[var(--rm-success-soft)]/20' : '' }}">
+  <div class="flex items-center justify-between">
+  <span class="rm-metric-label text-[var(--rm-success-action)]">Resueltas</span>
+  <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--rm-success-soft)] text-[var(--rm-success)] border border-[var(--rm-success)]/20">
+   <i class="ph ph-check-circle text-lg"></i>
+  </span>
+  </div>
+  <div class="mt-1 flex items-baseline justify-between gap-2">
+  <span class="rm-metric-value text-[var(--rm-success-action)]">{{ $conteos['cerradas'] ?? 0 }}</span>
+  <div class="w-20 h-7 shrink-0 pointer-events-none">
+   <x-ui.sparkline :id="'spark-kpi-cerradas'" :data="[max(0, ($conteos['cerradas'] ?? 0) - 3), max(0, ($conteos['cerradas'] ?? 0) - 2), max(0, ($conteos['cerradas'] ?? 0) - 1), ($conteos['cerradas'] ?? 0)]" color="success" height="28px" />
+  </div>
+  </div>
+  <div class="rm-metric-meta text-[var(--rm-text-soft)]">
+  <i class="ph ph-archive-box"></i>
+  <span>Historial conservado</span>
+  </div>
+ </div>
+ </section>
 
-    {{-- Script Chart.js — RememberMind Chart Design System --}}
+ {{-- Script Chart.js — RememberMind Chart Design System --}}
 <script>
     window.alertasDashboardComponent = function(chartData, conteos) {
         return {
@@ -371,7 +371,7 @@
             <div class="relative rm-chart-body is-md" style="height: 220px; width: 100%;">
                 <canvas id="chartAlertasEstado"></canvas>
                 <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                    <span class="text-xl font-extrabold text-emerald-600 dark:text-emerald-400">
+                    <span class="text-xl font-extrabold text-[var(--rm-success)] dark:text-[var(--rm-success-soft)]">
                         {{ ($conteos['total'] ?? 0) > 0 ? round((($conteos['cerradas'] ?? 0) / $conteos['total']) * 100) : 0 }}%
                     </span>
                     <span class="text-[10px] font-semibold text-[var(--rm-text-muted)] dark:text-slate-400 uppercase tracking-wider">
@@ -383,21 +383,21 @@
     </section>
 
         {{-- BARRA DE FILTROS UNIFICADA: ESTRUCTURA DE EMERGENCIAS + VISTA DE INCIDENTES --}}
-    <section class="rm-filter-bar">
+    <x-ui.filter-bar class="mb-4">
         <div class="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-2">
             {{-- Búsqueda textual --}}
             <div class="lg:col-span-4 relative flex items-center">
-                <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-[#677084] dark:text-[#9A9084]">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-[var(--rm-text-secondary)]">
                     <i class="ph-bold ph-magnifying-glass text-base"></i>
                 </span>
                 <input type="text"
                     wire:model.live.debounce.300ms="search"
                     placeholder="Buscar por residente, diagnóstico o motivo..."
-                    class="w-full rounded-xl border border-[#C7B9AA] dark:border-[#423B34] bg-[#F0E8DE] dark:bg-[#26221F] py-2 pl-9 pr-8 text-xs font-medium text-[#304060] dark:text-[#F3EAE1] placeholder-[#677084] dark:placeholder-[#8C8276] focus:border-[#A35A44] focus:outline-none h-[38px]" />
+                    class="w-full rounded-xl border border-[var(--rm-border)]  bg-[var(--rm-input-bg)]  py-2 pl-9 pr-8 text-xs font-medium text-[var(--rm-text-primary)] placeholder-[var(--rm-text-secondary)] focus:border-[var(--rm-primary)] focus:ring-1 focus:ring-[var(--rm-primary)] focus:outline-none h-[38px]" />
                 @if($search !== '')
                     <button type="button"
                         wire:click="limpiarFiltro('search')"
-                        class="absolute inset-y-0 right-0 flex items-center pr-2.5 text-[#677084] hover:text-[#A35A44] cursor-pointer"
+                        class="absolute inset-y-0 right-0 flex items-center pr-2.5 text-[var(--rm-text-secondary)] hover:text-[var(--rm-primary)] cursor-pointer"
                         title="Limpiar búsqueda">
                         <i class="ph-bold ph-x-circle text-base"></i>
                     </button>
@@ -406,7 +406,7 @@
 
             {{-- Filtro Estado --}}
             <div class="lg:col-span-2">
-                <select wire:model.live="filtroEstado" class="w-full rounded-xl border border-[#C7B9AA] dark:border-[#4E463E] bg-[#F0E8DE] dark:bg-[#211E1B] py-2 px-3 text-xs font-medium text-[#304060] dark:text-[#E8DFD5] focus:border-[#A35A44] focus:outline-none h-[38px]">
+                <select wire:model.live="filtroEstado" class="w-full rounded-xl border border-[var(--rm-border)]  bg-[var(--rm-input-bg)]  py-2 px-3 text-xs font-medium text-[var(--rm-text-primary)] focus:border-[var(--rm-primary)] focus:ring-1 focus:ring-[var(--rm-primary)] focus:outline-none h-[38px]">
                     <option value="ABIERTA">Abierta / Pendiente (Inicial)</option>
                     <option value="EN_ATENCION">En Atención</option>
                     <option value="CERRADA">Cerrada / Resuelta</option>
@@ -416,7 +416,7 @@
 
             {{-- Filtro Nivel --}}
             <div class="lg:col-span-2">
-                <select wire:model.live="filtroNivel" class="w-full rounded-xl border border-[#C7B9AA] dark:border-[#4E463E] bg-[#F0E8DE] dark:bg-[#211E1B] py-2 px-3 text-xs font-medium text-[#304060] dark:text-[#E8DFD5] focus:border-[#A35A44] focus:outline-none h-[38px]">
+                <select wire:model.live="filtroNivel" class="w-full rounded-xl border border-[var(--rm-border)]  bg-[var(--rm-input-bg)]  py-2 px-3 text-xs font-medium text-[var(--rm-text-primary)] focus:border-[var(--rm-primary)] focus:ring-1 focus:ring-[var(--rm-primary)] focus:outline-none h-[38px]">
                     <option value="">Todos los niveles</option>
                     <option value="CRITICO">🚨 Crítico</option>
                     <option value="ALTO">⚠️ Alto</option>
@@ -427,7 +427,7 @@
 
             {{-- Filtro Origen --}}
             <div class="lg:col-span-2">
-                <select wire:model.live="filtroOrigen" class="w-full rounded-xl border border-[#C7B9AA] dark:border-[#4E463E] bg-[#F0E8DE] dark:bg-[#211E1B] py-2 px-3 text-xs font-medium text-[#304060] dark:text-[#E8DFD5] focus:border-[#A35A44] focus:outline-none h-[38px]">
+                <select wire:model.live="filtroOrigen" class="w-full rounded-xl border border-[var(--rm-border)]  bg-[var(--rm-input-bg)]  py-2 px-3 text-xs font-medium text-[var(--rm-text-primary)] focus:border-[var(--rm-primary)] focus:ring-1 focus:ring-[var(--rm-primary)] focus:outline-none h-[38px]">
                     <option value="">Todos los orígenes</option>
                     <option value="SIGNOS">Signos Vitales</option>
                     <option value="MEDICACION">Medicación</option>
@@ -443,7 +443,7 @@
 
             {{-- Filtro Residente --}}
             <div class="lg:col-span-2">
-                <select wire:model.live="filtroAdulto" class="w-full rounded-xl border border-[#C7B9AA] dark:border-[#4E463E] bg-[#F0E8DE] dark:bg-[#211E1B] py-2 px-3 text-xs font-medium text-[#304060] dark:text-[#E8DFD5] focus:border-[#A35A44] focus:outline-none h-[38px]">
+                <select wire:model.live="filtroAdulto" class="w-full rounded-xl border border-[var(--rm-border)]  bg-[var(--rm-input-bg)]  py-2 px-3 text-xs font-medium text-[var(--rm-text-primary)] focus:border-[var(--rm-primary)] focus:ring-1 focus:ring-[var(--rm-primary)] focus:outline-none h-[38px]">
                     <option value="">Todos los residentes</option>
                     @foreach($adultos as $ad)
                         <option value="{{ $ad->cod_residente }}">
@@ -466,57 +466,57 @@
                     </span>
 
                     @if(!empty($search))
-                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[#F0E8DE] dark:bg-[#211E1B] border border-[#C7B9AA] dark:border-[#4E463E] text-[11px] font-semibold text-[#304060] dark:text-[#F3EAE1]">
+                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[var(--rm-surface-alt)] border border-[var(--rm-border)] text-[11px] font-semibold text-[var(--rm-text-primary)]">
                             <span>Búsqueda: "{{ Str::limit($search, 16) }}"</span>
-                            <button type="button" wire:click="limpiarFiltro('search')" class="hover:text-[#A35A44] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
+                            <button type="button" wire:click="limpiarFiltro('search')" class="hover:text-[var(--rm-primary)] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
                         </span>
                     @endif
 
                     @if($filtroEstado !== 'ABIERTA')
-                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[#D2A45E]/15 border border-[#D2A45E]/30 text-[11px] font-bold text-[#8C6422] dark:text-[#E2BD7E]">
+                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[var(--rm-warning-soft)] border border-[var(--rm-warning)] text-[11px] font-bold text-[var(--rm-warning)]">
                             <span>Estado: {{ $filtroEstado === 'EN_ATENCION' ? 'En Atención' : ($filtroEstado === 'CERRADA' ? 'Cerrada' : 'Todos') }}</span>
-                            <button type="button" wire:click="limpiarFiltro('filtroEstado')" class="hover:text-[#A35A44] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
+                            <button type="button" wire:click="limpiarFiltro('filtroEstado')" class="hover:text-[var(--rm-primary)] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
                         </span>
                     @endif
 
                     @if(!empty($filtroNivel))
-                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[#C85D52]/15 border border-[#C85D52]/30 text-[11px] font-bold text-[#8C2C22] dark:text-[#FFA399]">
+                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[var(--rm-primary-soft)] border border-[var(--rm-primary)] text-[11px] font-bold text-[var(--rm-primary)]">
                             <span>Nivel: {{ $filtroNivel }}</span>
-                            <button type="button" wire:click="limpiarFiltro('filtroNivel')" class="hover:text-[#A35A44] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
+                            <button type="button" wire:click="limpiarFiltro('filtroNivel')" class="hover:text-[var(--rm-primary)] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
                         </span>
                     @endif
 
                     @if(!empty($filtroOrigen))
-                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[#304060]/10 dark:bg-[#F3EAE1]/10 border border-[#C7B9AA] text-[11px] font-bold text-[#304060] dark:text-[#F3EAE1]">
+                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[var(--rm-info-soft)] border border-[var(--rm-info)] text-[11px] font-bold text-[var(--rm-info)]">
                             <span>Origen: {{ $filtroOrigen }}</span>
-                            <button type="button" wire:click="limpiarFiltro('filtroOrigen')" class="hover:text-[#A35A44] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
+                            <button type="button" wire:click="limpiarFiltro('filtroOrigen')" class="hover:text-[var(--rm-primary)] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
                         </span>
                     @endif
 
                     @if(!empty($filtroAdulto))
                         @php $adFiltrado = $adultos->firstWhere('cod_residente', $filtroAdulto); @endphp
-                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[#71876A]/15 border border-[#71876A]/30 text-[11px] font-bold text-[#495B44] dark:text-[#9FB897]">
+                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[var(--rm-surface-alt)] border border-[var(--rm-border)] text-[11px] font-bold text-[var(--rm-text-primary)]">
                             <span>Residente: {{ $adFiltrado ? $adFiltrado->ap_paterno : 'Filtrado' }}</span>
-                            <button type="button" wire:click="limpiarFiltro('filtroAdulto')" class="hover:text-[#A35A44] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
+                            <button type="button" wire:click="limpiarFiltro('filtroAdulto')" class="hover:text-[var(--rm-primary)] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
                         </span>
                     @endif
                 </div>
 
                 <div class="flex items-center gap-2.5">
-                    <span class="text-[11px] px-2.5 py-0.5 rounded-full font-bold bg-[#304060]/10 dark:bg-[#F3EAE1]/10 text-[#304060] dark:text-[#F3EAE1]">
+                    <span class="text-[11px] px-2.5 py-0.5 rounded-full font-bold bg-[var(--rm-surface-alt)] text-[var(--rm-text-secondary)] border border-[var(--rm-border-soft)]">
                         {{ $alertas->total() }} coincidentes
                     </span>
 
                     <button type="button"
                         wire:click="limpiarFiltros"
-                        class="inline-flex items-center gap-1 rounded-xl bg-[#A35A44]/15 hover:bg-[#A35A44]/25 text-[#A35A44] dark:text-[#D58C79] py-1 px-2.5 text-xs font-bold transition cursor-pointer">
+                        class="inline-flex items-center gap-1 rounded-xl bg-[var(--rm-primary-soft)] hover:bg-[var(--rm-primary)] hover:text-white text-[var(--rm-primary)] border border-[var(--rm-primary)]/30 py-1 px-2.5 text-xs font-bold transition cursor-pointer">
                         <i class="ph-bold ph-arrow-counter-clockwise"></i>
                         <span>Limpiar filtros</span>
                     </button>
                 </div>
             </div>
         @endif
-    </section>
+    </x-ui.filter-bar>
 
     {{-- TABLA ASISTENCIAL MEDIANA + MODO OSCURO + PIE DE PAGINACIÓN INSTITUCIONAL --}}
     <section class="rm-table-wrapper">
@@ -536,11 +536,11 @@
                     @forelse($alertas as $alerta)
                         @php
                             $nivelBadge = match($alerta->prioridad) {
-                                'CRITICO' => 'bg-rose-600 text-white shadow-xs shadow-rose-600/30',
-                                'ALTO' => 'bg-amber-500 text-white shadow-xs shadow-amber-500/30',
-                                'MEDIO' => 'bg-blue-600 text-white shadow-xs shadow-blue-600/30',
-                                'BAJO' => 'bg-emerald-600 text-white shadow-xs shadow-emerald-600/30',
-                                default => 'bg-slate-500 text-white'
+                                'CRITICO' => 'bg-[var(--rm-danger)] text-[var(--rm-text-inverse)] shadow-xs',
+                                'ALTO' => 'bg-[var(--rm-warning)] text-white shadow-xs',
+                                'MEDIO' => 'bg-[var(--rm-warning)] text-[var(--rm-text-on-primary)] shadow-xs',
+                                'BAJO' => 'bg-[var(--rm-status-stable)] text-[var(--rm-text-on-primary)] shadow-xs',
+                                default => 'bg-[var(--rm-text-muted)] text-[var(--rm-text-inverse)]'
                             };
                             $nivelTexto = match($alerta->prioridad) {
                                 'CRITICO' => 'Crítico',
@@ -552,23 +552,23 @@
                             $origenBadge = match($alerta->modulo) {
                                 'SIGNOS' => 'bg-rose-100 text-rose-800 dark:bg-rose-950/70 dark:text-rose-300 border-rose-200 dark:border-rose-800',
                                 'MEDICACION' => 'bg-purple-100 text-purple-800 dark:bg-purple-950/70 dark:text-purple-300 border-purple-200 dark:border-purple-800',
-                                'INCIDENTE' => 'bg-orange-100 text-orange-800 dark:bg-orange-950/70 dark:text-orange-300 border-orange-200 dark:border-orange-800',
+                                'INCIDENTE' => 'bg-[var(--rm-status-high-soft)] text-[var(--rm-status-high)] border-[var(--rm-status-high)]/40',
                                 'MANUAL' => 'bg-blue-100 text-blue-800 dark:bg-blue-950/70 dark:text-blue-300 border-blue-200 dark:border-blue-800',
                                 'PLAN' => 'bg-teal-100 text-teal-800 dark:bg-teal-950/70 dark:text-teal-300 border-teal-200 dark:border-teal-800',
                                 'SEGUIMIENTO' => 'bg-cyan-100 text-cyan-800 dark:bg-cyan-950/70 dark:text-cyan-300 border-cyan-200 dark:border-cyan-800',
                                 'SOLICITUD_MEDICA' => 'bg-indigo-100 text-indigo-800 dark:bg-indigo-950/70 dark:text-indigo-300 border-indigo-200 dark:border-indigo-800',
-                                'FICHA' => 'bg-amber-100 text-amber-800 dark:bg-amber-950/70 dark:text-amber-300 border-amber-200 dark:border-amber-800',
+                                'FICHA' => 'bg-[var(--rm-warning-soft)] text-[var(--rm-warning-strong)] dark:bg-[var(--rm-warning-soft)]/20 dark:text-[var(--rm-warning-soft)] border-[var(--rm-warning)]/30 dark:border-[var(--rm-warning)]/30',
                                 'VALORACION' => 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/70 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800',
-                                default => 'bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-300 border-slate-200 dark:border-slate-700'
+                                default => 'bg-[var(--rm-surface-soft)] text-slate-800 dark:bg-slate-800 dark:text-slate-300 border-slate-200 '
                             };
                             $estadoBadge = match($alerta->estado) {
-                                'ABIERTA' => 'bg-amber-500/10 text-amber-800 dark:text-amber-300 border-amber-400/20 dark:border-amber-500/20',
+                                'ABIERTA' => 'bg-[var(--rm-warning-soft)]/20 text-[var(--rm-warning-strong)] dark:text-[var(--rm-warning-soft)] border-[var(--rm-warning)]/40/20 dark:border-[var(--rm-warning)]/30',
                                 'EN_ATENCION' => 'bg-blue-500/10 text-blue-800 dark:text-blue-300 border-blue-400/30 dark:border-blue-600/30',
                                 'CERRADA' => 'bg-emerald-500/10 text-emerald-800 dark:text-emerald-300 border-emerald-400/30 dark:border-emerald-600/30',
-                                default => 'bg-slate-500/10 text-slate-700 dark:text-slate-300 border-slate-400/30 dark:border-slate-600/30'
+                                default => 'bg-[var(--rm-surface-raised)]0/10 text-slate-700 dark:text-slate-300 border-slate-400/30 dark:border-slate-600/30'
                             };
                             $estadoDot = match($alerta->estado) {
-                                'ABIERTA' => 'bg-amber-500',
+                                'ABIERTA' => 'bg-[var(--rm-warning)]',
                                 'EN_ATENCION' => 'bg-blue-500',
                                 'CERRADA' => 'bg-emerald-500',
                                 default => 'bg-slate-400'
@@ -584,7 +584,7 @@
                             {{-- Columna 1: Residente y Ubicación --}}
                             <td class="px-2.5 py-2">
                                 <div class="flex items-center gap-2">
-                                    <div class="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[var(--rm-surface-alt)] dark:bg-slate-800 border border-[var(--rm-border)] dark:border-slate-700 text-[var(--rm-text-title)] dark:text-slate-200 font-extrabold text-[11px] shadow-2xs">
+                                    <div class="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[var(--rm-surface-alt)] dark:bg-slate-800 border border-[var(--rm-border)]  text-[var(--rm-text-title)] dark:text-slate-200 font-extrabold text-[11px] shadow-2xs">
                                         {{ substr($alerta->adultoMayor?->nombres ?? 'R', 0, 1) }}{{ substr($alerta->adultoMayor?->ap_paterno ?? 'M', 0, 1) }}
                                     </div>
                                     <div class="min-w-0 flex-1">
@@ -687,13 +687,13 @@
                                              x-transition:leave="transition ease-in duration-75"
                                              x-transition:leave-start="transform opacity-100 scale-100"
                                              x-transition:leave-end="transform opacity-0 scale-95"
-                                             class="absolute right-0 z-50 mt-1 w-48 origin-top-right rounded-xl border border-[var(--rm-border)] dark:border-slate-700 bg-[#FBF8F5] dark:bg-slate-800 shadow-xl py-1 text-xs focus:outline-none"
+                                             class="absolute right-0 z-50 mt-1 w-48 origin-top-right rounded-xl border border-[var(--rm-border)]  bg-[var(--rm-surface)]  shadow-xl py-1 text-xs focus:outline-none"
                                              style="display: none;">
-                                            
+
                                             {{-- Ver Expediente / Detalle --}}
                                             <button type="button"
                                                 wire:click="verDetalle('{{ $alerta->cod_alerta }}'); open = false;"
-                                                class="w-full flex items-center gap-2 px-3 py-2 text-slate-700 dark:text-slate-200 hover:bg-[#F7EFE6] dark:hover:bg-slate-700/70 text-left font-medium transition cursor-pointer">
+                                                class="w-full flex items-center gap-2 px-3 py-2 text-slate-700 dark:text-slate-200 hover:bg-[var(--rm-surface-soft)] dark:hover:bg-slate-700/70 text-left font-medium transition cursor-pointer">
                                                 <i class="ph ph-file-text text-sm text-slate-500 dark:text-slate-400"></i>
                                                 <span>Ver expediente clínico</span>
                                             </button>
@@ -702,8 +702,8 @@
                                             @if($alerta->estado !== 'CERRADA')
                                                 <button type="button"
                                                     wire:click="cerrarAlerta('{{ $alerta->cod_alerta }}'); open = false;"
-                                                    class="w-full flex items-center gap-2 px-3 py-2 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 text-left font-medium transition cursor-pointer border-t border-slate-100 dark:border-slate-700/60">
-                                                    <i class="ph ph-check-circle text-sm text-emerald-600 dark:text-emerald-400"></i>
+                                                    class="w-full flex items-center gap-2 px-3 py-2 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 text-left font-medium transition cursor-pointer border-t border-slate-100 /60">
+                                                    <i class="ph ph-check-circle text-sm text-[var(--rm-success)] dark:text-[var(--rm-success-soft)]"></i>
                                                     <span>Finalizar / Cerrar alerta</span>
                                                 </button>
                                             @endif
@@ -716,7 +716,7 @@
                         <tr>
                             <td colspan="6" class="px-6 py-12 text-center text-slate-500 dark:text-slate-400">
                                 <div class="flex flex-col items-center justify-center gap-2">
-                                    <span class="flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-400 text-2xl">
+                                    <span class="flex h-12 w-12 items-center justify-center rounded-2xl bg-[var(--rm-surface-soft)] dark:bg-slate-800 text-slate-400 text-2xl">
                                         <i class="ph ph-bell-slash"></i>
                                     </span>
                                     <div class="font-bold text-slate-700 dark:text-slate-300 text-sm">
@@ -728,7 +728,7 @@
                                     @if($search || $filtroEstado || $filtroNivel || $filtroOrigen || $filtroAdulto)
                                         <button type="button"
                                             wire:click="limpiarFiltros"
-                                            class="mt-2 px-4 py-2 rounded-xl text-xs font-bold text-white bg-slate-800 hover:bg-slate-900 transition cursor-pointer">
+                                            class="mt-2 px-4 py-2 rounded-xl text-xs font-bold text-white bg-[var(--rm-text-primary)] hover:bg-[var(--rm-text-body)] transition cursor-pointer">
                                             Restablecer filtros
                                         </button>
                                     @endif
@@ -741,7 +741,7 @@
         </div>
 
         {{-- PIE DE TABLA: RESUMEN, SELECTOR POR PÁGINA Y NAVEGACIÓN INSTITUCIONAL --}}
-        <div class="rm-pagination-bar px-3.5 py-2 border-t border-[var(--rm-border-soft)] dark:border-slate-700/60 bg-[var(--rm-surface-soft)]/90 dark:bg-slate-900/90 flex flex-col sm:flex-row items-center justify-between gap-2.5 text-xs">
+        <div class="rm-pagination-bar px-3.5 py-2 border-t border-[var(--rm-border-soft)] /60 bg-[var(--rm-surface-soft)]/90 dark:bg-slate-900/90 flex flex-col sm:flex-row items-center justify-between gap-2.5 text-xs">
             {{-- Lado Izquierdo: Resumen numérico y selector por página --}}
             <div class="flex flex-wrap items-center gap-2.5 text-[var(--rm-text-muted)] dark:text-slate-400">
                 <div class="text-[11.5px]">
@@ -758,7 +758,7 @@
 
                 <div class="flex items-center gap-1.5 text-[11.5px]">
                     <span>Mostrar</span>
-                    <select wire:model.live="perPage" class="h-7 py-0 px-2 text-xs font-semibold rounded-md bg-[#FBF8F5] dark:bg-slate-800 border border-[var(--rm-border)] dark:border-slate-700 text-slate-700 dark:text-slate-200 cursor-pointer outline-none">
+                    <select wire:model.live="perPage" class="h-7 py-0 px-2 text-xs font-semibold rounded-md bg-[var(--rm-input-bg)]  border border-[var(--rm-border)]  text-slate-700 dark:text-slate-200 cursor-pointer outline-none">
                         <option value="10">10</option>
                         <option value="15">15</option>
                         <option value="25">25</option>
@@ -773,12 +773,12 @@
                 <nav role="navigation" aria-label="Paginación" class="flex items-center gap-1">
                     {{-- Botón Anterior --}}
                     @if ($alertas->onFirstPage())
-                        <span class="h-7 px-2 rounded-md border border-slate-200/80 dark:border-slate-800 text-slate-400 dark:text-slate-600 bg-slate-100/40 dark:bg-slate-900/30 cursor-not-allowed flex items-center gap-1 font-medium text-[11px]">
+                        <span class="h-7 px-2 rounded-md border border-slate-200/80 dark:border-slate-800 text-slate-400 dark:text-slate-600 bg-[var(--rm-surface-soft)]/40 dark:bg-slate-900/30 cursor-not-allowed flex items-center gap-1 font-medium text-[11px]">
                             <i class="ph ph-caret-left text-xs"></i>
                             <span class="hidden md:inline">Anterior</span>
                         </span>
                     @else
-                        <button type="button" wire:click="previousPage" wire:loading.attr="disabled" class="h-7 px-2 rounded-md border border-[var(--rm-border)] dark:border-slate-700 text-slate-700 dark:text-slate-200 bg-[#FBF8F5] dark:bg-slate-800 hover:bg-[#F2E8DD] dark:hover:bg-slate-700 transition flex items-center gap-1 font-medium text-[11px] cursor-pointer">
+                        <button type="button" wire:click="previousPage" wire:loading.attr="disabled" class="h-7 px-2 rounded-md border border-[var(--rm-border)]  text-slate-700 dark:text-slate-200 bg-[var(--rm-surface)]  hover:bg-[var(--rm-surface-alt)] dark:hover:bg-slate-700 transition flex items-center gap-1 font-medium text-[11px] cursor-pointer">
                             <i class="ph ph-caret-left text-xs"></i>
                             <span class="hidden md:inline">Anterior</span>
                         </button>
@@ -788,11 +788,11 @@
                     <div class="flex items-center gap-1">
                         @foreach ($alertas->getUrlRange(max(1, $alertas->currentPage() - 2), min($alertas->lastPage(), $alertas->currentPage() + 2)) as $page => $url)
                             @if ($page == $alertas->currentPage())
-                                <span class="min-w-[28px] h-7 px-1.5 flex items-center justify-center rounded-md bg-[#B35E43] dark:bg-[#C26D52] text-white font-bold text-xs shadow-2xs">
+                                <span class="min-w-[28px] h-7 px-1.5 flex items-center justify-center rounded-md bg-[var(--rm-primary)] text-white font-bold text-xs shadow-2xs">
                                     {{ $page }}
                                 </span>
                             @else
-                                <button type="button" wire:click="gotoPage({{ $page }})" class="min-w-[28px] h-7 px-1.5 flex items-center justify-center rounded-md border border-[var(--rm-border)] dark:border-slate-700 bg-[#FBF8F5] dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-[#F2E8DD] dark:hover:bg-slate-700 font-medium text-xs transition cursor-pointer">
+                                <button type="button" wire:click="gotoPage({{ $page }})" class="min-w-[28px] h-7 px-1.5 flex items-center justify-center rounded-md border border-[var(--rm-border)]  bg-[var(--rm-surface)]  text-slate-700 dark:text-slate-200 hover:bg-[var(--rm-surface-alt)] dark:hover:bg-slate-700 font-medium text-xs transition cursor-pointer">
                                     {{ $page }}
                                 </button>
                             @endif
@@ -801,12 +801,12 @@
 
                     {{-- Botón Siguiente --}}
                     @if ($alertas->hasMorePages())
-                        <button type="button" wire:click="nextPage" wire:loading.attr="disabled" class="h-7 px-2 rounded-md border border-[var(--rm-border)] dark:border-slate-700 text-slate-700 dark:text-slate-200 bg-[#FBF8F5] dark:bg-slate-800 hover:bg-[#F2E8DD] dark:hover:bg-slate-700 transition flex items-center gap-1 font-medium text-[11px] cursor-pointer">
+                        <button type="button" wire:click="nextPage" wire:loading.attr="disabled" class="h-7 px-2 rounded-md border border-[var(--rm-border)]  text-slate-700 dark:text-slate-200 bg-[var(--rm-surface)]  hover:bg-[var(--rm-surface-alt)] dark:hover:bg-slate-700 transition flex items-center gap-1 font-medium text-[11px] cursor-pointer">
                             <span class="hidden md:inline">Siguiente</span>
                             <i class="ph ph-caret-right text-xs"></i>
                         </button>
                     @else
-                        <span class="h-7 px-2 rounded-md border border-slate-200/80 dark:border-slate-800 text-slate-400 dark:text-slate-600 bg-slate-100/40 dark:bg-slate-900/30 cursor-not-allowed flex items-center gap-1 font-medium text-[11px]">
+                        <span class="h-7 px-2 rounded-md border border-slate-200/80 dark:border-slate-800 text-slate-400 dark:text-slate-600 bg-[var(--rm-surface-soft)]/40 dark:bg-slate-900/30 cursor-not-allowed flex items-center gap-1 font-medium text-[11px]">
                             <span class="hidden md:inline">Siguiente</span>
                             <i class="ph ph-caret-right text-xs"></i>
                         </span>

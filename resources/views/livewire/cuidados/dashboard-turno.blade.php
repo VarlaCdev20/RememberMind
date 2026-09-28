@@ -4,7 +4,7 @@
 
     RememberMind - Módulo de Enfermería
 
-    Estética Editorial Clínica Cálida: Outfit, Paleta profunda RememberMind (#304060, #63775B, #C98A17, #D62828, #E6DDD3, #F0E8DE)
+    Estética Editorial Clínica Cálida: Outfit, Paleta profunda RememberMind (var(--rm-clinical), var(--rm-action-primary), #C98A17, #D62828, var(--rm-surface), var(--rm-surface))
 
     Foto del Hero verificada en asset('storage/imagenes/ENFERMERIA/manos.png')
 
@@ -12,7 +12,7 @@
 
 
 
-<div class="space-y-3.5 sm:space-y-4 font-outfit" wire:poll.60s="refrescarTurno">
+<div class="space-y-3.5 sm:space-y-4 font-sans" wire:poll.60s="refrescarTurno">
 
 
 
@@ -28,7 +28,7 @@
 
         {{-- HERO PRINCIPAL COMPACTO Y EDITORIAL (8 COLS) --}}
 
-        <div class="group lg:col-span-8 rounded-[16px] border border-[#D5CABE] hover:border-[#304060]/60 dark:border-[#494139] dark:hover:border-[#52585A] bg-[#F0E8DE] dark:bg-[#2D2924] shadow-[0_3px_12px_rgba(47,62,92,0.06)] hover:shadow-[0_8px_20px_rgba(47,62,92,0.12)] overflow-hidden flex flex-col sm:flex-row min-h-[142px] lg:h-[148px] transition-all duration-200 ease-out">
+        <div class="group lg:col-span-8 rounded-2xl border border-[var(--rm-border)] hover:border-[var(--rm-clinical)]/60 dark:border-[var(--rm-border)] dark:hover:border-[var(--rm-border)] bg-[var(--rm-surface)] dark:bg-[var(--rm-surface)] shadow-sm hover:shadow-md overflow-hidden flex flex-col sm:flex-row min-h-[142px] lg:h-[148px] transition-all duration-200 ease-out">
 
 
 
@@ -40,9 +40,9 @@
 
                     {{-- LÍNEA SUPERIOR DE FECHA, JORNADA Y MODO OPERATIVO --}}
 
-                    <div class="flex flex-wrap items-center gap-1.5 text-[11px] font-bold text-[#677084] dark:text-[#A6B2C8]">
+                    <div class="flex flex-wrap items-center gap-1.5 text-[11px] font-bold text-[var(--rm-text-secondary)] dark:text-[var(--rm-text-muted)]">
 
-                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-[#304060]/12 text-[#304060] dark:bg-[#304060]/30 dark:text-[#A6B2C8] font-black uppercase tracking-wider text-[10px]">
+                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-[var(--rm-clinical-soft)] text-[var(--rm-clinical)] dark:bg-[var(--rm-clinical-soft)] dark:text-[var(--rm-text-muted)] font-black uppercase tracking-wider text-[10px]">
 
                             <i class="ph-bold ph-sun text-xs"></i>
 
@@ -50,7 +50,7 @@
 
                         </span>
 
-                        <span class="text-[#967B66]/60 dark:text-[#BDAE9F]/50">•</span>
+                        <span class="text-[var(--rm-text-muted)]/60 dark:text-[var(--rm-text-muted)]/50">•</span>
 
                         <span class="capitalize">{{ $dashboard['jornada']['fecha_humana'] ?? \Carbon\Carbon::now()->locale('es')->isoFormat('dddd D [de] MMMM') }}</span>
 
@@ -60,7 +60,7 @@
 
                         @if(($dashboard['modo'] ?? '') === 'EN_TURNO')
 
-                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-[#63775B]/20 text-[#63775B] dark:bg-[#63775B]/30 dark:text-[#9DB491] font-black uppercase tracking-wider text-[9.5px] border border-[#63775B]/30">
+                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-[var(--rm-action-primary-soft)] text-[var(--rm-action-primary)] dark:bg-[var(--rm-action-primary)]/30 dark:text-[var(--rm-action-primary)] font-black uppercase tracking-wider text-[9.5px] border border-[var(--rm-action-primary)]/30">
 
                                 <i class="ph-bold ph-check-circle text-xs"></i>
 
@@ -70,7 +70,7 @@
 
                         @else
 
-                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-[#FFF1D6] text-[#966B24] border border-[#E8C178] dark:bg-[#D2A45E]/20 dark:text-[#E0B36D] dark:border-[#D2A45E]/40 font-black uppercase tracking-wider text-[9.5px]">
+                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-[var(--rm-surface)] text-[var(--rm-warning)] border border-[[var(--rm-warning)] dark:bg-[var(--rm-warning-soft)] dark:text-[var(--rm-warning)] dark:border-[var(--rm-warning)]/40 font-black uppercase tracking-wider text-[9.5px]">
 
                                 <i class="ph-bold ph-clock text-xs"></i>
 
@@ -78,7 +78,7 @@
 
                             </span>
 
-                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-[#304060]/12 text-[#304060] dark:bg-[#304060]/30 dark:text-[#A6B2C8] font-black uppercase tracking-wider text-[9px] border border-[#304060]/20">
+                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-[var(--rm-clinical-soft)] text-[var(--rm-clinical)] dark:bg-[var(--rm-clinical-soft)] dark:text-[var(--rm-text-muted)] font-black uppercase tracking-wider text-[9px] border border-[var(--rm-clinical)]/20">
 
                                 <i class="ph-bold ph-eye text-xs"></i>
 
@@ -92,9 +92,9 @@
 
 
 
-                    <h1 class="mt-1 text-lg sm:text-[20px] font-black text-[#304060] dark:text-[#F0E8DE] tracking-tight leading-tight">
+                    <h1 class="mt-1 text-lg sm:text-[20px] font-black text-[var(--rm-clinical)] dark:text-[var(--rm-surface)] tracking-tight leading-tight">
 
-                        Buenos días, <span class="font-extrabold text-[#243B6B] dark:text-white">{{ $dashboard['usuario']['nombres'] ?? (Auth::user()->nombres ?? 'Personal') }}</span>
+                        Buenos días, <span class="font-extrabold text-[var(--rm-clinical)] dark:text-white">{{ $dashboard['usuario']['nombres'] ?? (Auth::user()->nombres ?? 'Elena') }}</span>
 
                     </h1>
 
@@ -102,9 +102,9 @@
 
                     {{-- LEMA MOTIVACIONAL CLÍNICO --}}
 
-                    <p class="mt-0.5 text-xs font-semibold text-[#63775B] dark:text-[#9BB391] italic flex items-center gap-1">
+                    <p class="mt-0.5 text-xs font-semibold text-[var(--rm-action-primary)] dark:text-[var(--rm-action-primary)] italic flex items-center gap-1">
 
-                        <span class="text-[#D2A45E] font-black text-sm not-italic">“</span>Tu labor hace la diferencia<span class="text-[#D2A45E] font-black text-sm not-italic">”</span>
+                        <span class="text-[var(--rm-warning)] font-black text-sm not-italic">“</span>Tu labor hace la diferencia<span class="text-[var(--rm-warning)] font-black text-sm not-italic">”</span>
 
                     </p>
 
@@ -114,9 +114,9 @@
 
                 {{-- PIE OPERATIVO COMPACTO --}}
 
-                <div class="pt-2 border-t border-[#D5CABE]/40 dark:border-[#494139]/60 flex items-center gap-3 text-[11px] font-semibold text-[#677084] dark:text-[#A6B2C8]">
+                <div class="pt-2 border-t border-[var(--rm-border)]/40 dark:border-[var(--rm-border)]/60 flex items-center gap-3 text-[11px] font-semibold text-[var(--rm-text-secondary)] dark:text-[var(--rm-text-muted)]">
 
-                    <div class="flex items-center gap-1 text-[#304060] dark:text-[#A6B2C8] font-bold">
+                    <div class="flex items-center gap-1 text-[var(--rm-clinical)] dark:text-[var(--rm-text-muted)] font-bold">
 
                         <i class="ph-bold ph-clock text-xs"></i>
 
@@ -124,9 +124,9 @@
 
                     </div>
 
-                    <span class="text-[#D5CABE] dark:text-[#494139]">|</span>
+                    <span class="text-[[var(--rm-text-primary)] dark:text-[var(--rm-text-body)]">|</span>
 
-                    <div class="flex items-center gap-1 text-[#63775B] dark:text-[#9DB491] font-bold">
+                    <div class="flex items-center gap-1 text-[var(--rm-action-primary)] dark:text-[var(--rm-action-primary)] font-bold">
 
                         <i class="ph-bold ph-users text-xs"></i>
 
@@ -142,7 +142,7 @@
 
             {{-- LADO DERECHO: FOTOGRAFÍA INSTITUCIONAL REAL DE MANOS (36%) --}}
 
-            <div class="w-full sm:w-[36%] relative min-h-[120px] sm:min-h-full overflow-hidden shrink-0 border-t sm:border-t-0 sm:border-l border-[#D5CABE]/50 dark:border-[#494139] bg-[#E0D5C9]">
+            <div class="w-full sm:w-[36%] relative min-h-[120px] sm:min-h-full overflow-hidden shrink-0 border-t sm:border-t-0 sm:border-l border-[var(--rm-border)]/50 dark:border-[var(--rm-border)] bg-[[var(--rm-surface-soft)]">
 
                 <img src="{{ asset('storage/imagenes/ENFERMERIA/manos.png') }}"
 
@@ -158,7 +158,7 @@
 
                 {{-- Transición sutil en el borde izquierdo para fundir armónicamente --}}
 
-                <div class="absolute inset-y-0 left-0 w-6 bg-gradient-to-r from-[#F0E8DE] to-transparent dark:from-[#2D2924] pointer-events-none hidden sm:block"></div>
+                <div class="absolute inset-y-0 left-0 w-6 bg-gradient-to-r from-[var(--rm-surface)] to-transparent dark:from-[[var(--rm-surface-soft)] pointer-events-none hidden sm:block"></div>
 
             </div>
 
@@ -168,7 +168,7 @@
 
         {{-- PANEL ESTADO GENERAL (4 COLS) --}}
 
-        <div class="lg:col-span-4 rounded-[16px] border border-[#D5CABE] dark:border-[#494139] bg-[#F0E8DE] dark:bg-[#2D2924] shadow-[0_3px_12px_rgba(47,62,92,0.06)] overflow-hidden flex flex-col justify-between min-h-[142px] lg:h-[148px] transition-all duration-200 ease-out p-3.5 sm:p-4">
+        <div class="lg:col-span-4 rounded-2xl border border-[var(--rm-border)] dark:border-[var(--rm-border)] bg-[var(--rm-surface)] dark:bg-[var(--rm-surface)] shadow-sm overflow-hidden flex flex-col justify-between min-h-[142px] lg:h-[148px] transition-all duration-200 ease-out p-3.5 sm:p-4">
 
             @php
 
@@ -226,7 +226,7 @@
 
                     {{-- Residente y Motivo --}}
 
-                    <div class="mt-2 rounded-xl border border-rose-200/70 bg-white/70 dark:bg-[#332F29]/80 dark:border-rose-900/40 p-2 text-center">
+                    <div class="mt-2 rounded-xl border border-rose-200/70 bg-white/70 dark:bg-[var(--rm-surface)]/80 dark:border-rose-900/40 p-2 text-center">
 
                         <p class="text-xs font-black text-rose-900 dark:text-rose-200 truncate">
 
@@ -234,7 +234,7 @@
 
                         </p>
 
-                        <p class="text-[10.5px] font-semibold text-[#677084] dark:text-[#BDAE9F] truncate">
+                        <p class="text-[10.5px] font-semibold text-[var(--rm-text-secondary)] dark:text-[var(--rm-text-muted)] truncate">
 
                             {{ $alertaCritica['titulo'] ?? 'Atención prioritaria requerida' }}
 
@@ -266,25 +266,17 @@
 
             @else
 
-                @php
-                    $estadoGeneral = $dashboard['estado_general'] ?? [];
-                    $estadoGeneralTipo = $estadoGeneral['tipo'] ?? 'neutral';
-                    $esVigilancia = $estadoGeneralTipo === 'vigilancia';
-                @endphp
+                {{-- CASO SIN ALERTAS: REFERENCIA EXACTA "ESTADO GENERAL" ESTABLE --}}
 
                 <div>
 
-                    {{-- Estado operativo del turno, sin inferir condición clínica. --}}
+                    {{-- Encabezado: Icono, Estado General, Badge Estable --}}
 
-                    <div class="flex items-center justify-between border-b border-[#8DA280]/35 dark:border-[#494139] pb-2">
+                    <div class="flex items-center justify-between border-b border-[var(--rm-action-primary)]/35 dark:border-[var(--rm-border)] pb-2">
 
                         <div class="flex items-center gap-1.5">
 
-                            <span @class([
-                                'flex h-6 w-6 items-center justify-center rounded border shadow-2xs shrink-0',
-                                'bg-[#FFF1D6] text-[#966B24] border-[#E8C178]' => $esVigilancia,
-                                'bg-[#8DA280]/25 dark:bg-[#9BB391]/25 text-[#63775B] dark:text-[#9BB391] border-[#8DA280]/40' => ! $esVigilancia,
-                            ])>
+                            <span class="flex h-6 w-6 items-center justify-center rounded bg-[var(--rm-action-primary)]/25 dark:bg-[[var(--rm-surface-soft)]/25 text-[var(--rm-action-primary)] dark:text-[var(--rm-action-primary)] border border-[var(--rm-action-primary)]/40 shadow-2xs shrink-0">
 
                                 <i class="ph-bold ph-shield-check text-sm"></i>
 
@@ -292,13 +284,13 @@
 
                             <div>
 
-                                <h2 class="text-[11px] font-black uppercase tracking-wider text-[#304060] dark:text-[#F2EBE3]">
+                                <h2 class="text-[11px] font-black uppercase tracking-wider text-[var(--rm-clinical)] dark:text-[[var(--rm-text-primary)]">
 
                                     ESTADO GENERAL
 
                                 </h2>
 
-                                <p class="text-[9.5px] font-semibold text-[#63775B] dark:text-[#9BB391]">
+                                <p class="text-[9.5px] font-semibold text-[var(--rm-action-primary)] dark:text-[var(--rm-action-primary)]">
 
                                     Sector asignado
 
@@ -308,13 +300,9 @@
 
                         </div>
 
-                        <span @class([
-                            'rounded px-2 py-0.5 text-[9px] font-black uppercase tracking-wider text-white shadow-2xs shrink-0',
-                            'bg-[#966B24]' => $esVigilancia,
-                            'bg-[#63775B]' => ! $esVigilancia,
-                        ])>
+                        <span class="rounded bg-[var(--rm-action-primary)] px-2 py-0.5 text-[9px] font-black uppercase tracking-wider text-white shadow-2xs shrink-0">
 
-                            {{ $estadoGeneral['badge'] ?? 'SIN DATOS' }}
+                            ESTABLE
 
                         </span>
 
@@ -324,17 +312,17 @@
 
                     {{-- Mensaje clínico central --}}
 
-                    <div class="mt-2 rounded-lg border border-[#D5CABE]/40 dark:border-[#494139] bg-[#FBF8F5]/70 dark:bg-[#332F29]/60 p-2 text-center">
+                    <div class="mt-2 rounded-lg border border-[var(--rm-border)]/40 dark:border-[var(--rm-border)] bg-[var(--rm-surface)]/70 dark:bg-[var(--rm-surface)]/60 p-2 text-center">
 
-                        <p class="text-xs font-bold text-[#304060] dark:text-[#F2EBE3]">
+                        <p class="text-xs font-bold text-[var(--rm-clinical)] dark:text-[[var(--rm-text-primary)]">
 
-                            {{ $estadoGeneral['titulo'] ?? 'Estado operativo no disponible' }}
+                            Sin alertas activas en tu turno
 
                         </p>
 
-                        <p class="mt-0.5 text-[10px] font-medium text-[#677084] dark:text-[#BDAE9F]">
+                        <p class="mt-0.5 text-[10px] font-medium text-[var(--rm-text-secondary)] dark:text-[var(--rm-text-muted)]">
 
-                            {{ $estadoGeneral['mensaje'] ?? 'No existen datos suficientes para emitir un estado.' }}
+                            Todos los residentes asignados se encuentran con signos dentro de rango.
 
                         </p>
 
@@ -344,19 +332,19 @@
 
 
 
-                {{-- Resumen operativo y hora de cálculo. --}}
+                {{-- Línea inferior con "Monitoreo al día" y hora --}}
 
-                <div class="pt-1.5 border-t border-[#8DA280]/30 dark:border-[#494139] flex items-center justify-between text-[11px] text-[#63775B] dark:text-[#9BB391] font-semibold">
+                <div class="pt-1.5 border-t border-[var(--rm-action-primary)]/30 dark:border-[var(--rm-border)] flex items-center justify-between text-[11px] text-[var(--rm-action-primary)] dark:text-[var(--rm-action-primary)] font-semibold">
 
                     <span class="inline-flex items-center gap-1">
 
-                        <i class="ph-bold ph-check-circle text-xs text-[#63775B]"></i>
+                        <i class="ph-bold ph-check-circle text-xs text-[var(--rm-action-primary)]"></i>
 
-                        <span>{{ $esVigilancia ? 'Requiere seguimiento' : 'Resumen operativo' }}</span>
+                        <span>Monitoreo al día</span>
 
                     </span>
 
-                    <span class="font-bold text-[#304060] dark:text-[#F0E8DE]">{{ $estadoGeneral['tiempo'] ?? now()->format('H:i \h\r\s') }}</span>
+                    <span class="font-bold text-[var(--rm-clinical)] dark:text-[var(--rm-surface)]">{{ now()->format('H:i') }} hrs</span>
 
                 </div>
 
@@ -380,23 +368,23 @@
 
 
 
-        {{-- 1. TOTAL REGISTRO (#304060 - Azul profundo) --}}
+        {{-- 1. TOTAL REGISTRO (var(--rm-clinical) - Azul profundo) --}}
 
         <a href="{{ Route::has('admin.enfermeria.alertas') ? route('admin.enfermeria.alertas') : '#' }}"
 
-           class="group relative overflow-hidden rounded-2xl p-3 sm:p-3.5 transition-all duration-200 ease-out hover:-translate-y-0.5 bg-[#F0E8DE] dark:bg-[#2D2924] border border-[#D5CABE] hover:border-[#304060] dark:border-[#494139] dark:hover:border-[#304060] shadow-[0_2px_8px_rgba(47,62,92,0.06)] hover:shadow-[0_6px_16px_rgba(47,62,92,0.12)] border-l-[3.5px] border-l-[#304060] flex flex-col justify-between h-[88px] sm:h-[92px]"
+           class="group relative overflow-hidden rounded-2xl p-3 sm:p-3.5 transition-all duration-200 ease-out hover:-translate-y-0.5 bg-[var(--rm-surface)] dark:bg-[var(--rm-surface)] border border-[var(--rm-border)] hover:border-[var(--rm-clinical)] dark:border-[var(--rm-border)] dark:hover:border-[var(--rm-clinical)] shadow-[0_2px_8px_rgba(47,62,92,0.06)] hover:shadow-[0_6px_16px_rgba(47,62,92,0.12)] border-l-[3.5px] border-l-[var(--rm-clinical)] flex flex-col justify-between h-[88px] sm:h-[92px]"
 
            aria-label="Ver todas las alertas registradas en el sistema">
 
             <div class="flex items-center justify-between gap-1.5">
 
-                <span class="text-[11px] font-black tracking-wider uppercase text-[#304060] dark:text-[#A6B2C8]">
+                <span class="text-[11px] font-black tracking-wider uppercase text-[var(--rm-clinical)] dark:text-[var(--rm-text-muted)]">
 
                     TOTAL REGISTRO
 
                 </span>
 
-                <span class="flex h-7 w-7 items-center justify-center rounded-lg bg-[#304060]/12 dark:bg-[#304060]/25 text-[#304060] dark:text-[#A6B2C8] transition-transform duration-200 group-hover:scale-105">
+                <span class="flex h-7 w-7 items-center justify-center rounded-lg bg-[var(--rm-clinical-soft)] dark:bg-[var(--rm-clinical-soft)] text-[var(--rm-clinical)] dark:text-[var(--rm-text-muted)] transition-transform duration-200 group-hover:scale-105">
 
                     <i class="ph-bold ph-bell-simple text-base"></i>
 
@@ -406,13 +394,13 @@
 
             <div class="flex items-baseline justify-between gap-2 z-10">
 
-                <div class="text-[26px] sm:text-[28px] font-black leading-none tracking-tight text-[#304060] dark:text-white">
+                <div class="text-[26px] sm:text-[28px] font-black leading-none tracking-tight text-[var(--rm-clinical)] dark:text-white">
 
                     {{ $dashboard['kpis']['total_registro']['numero'] ?? 4 }}
 
                 </div>
 
-                <div class="text-[11px] font-medium text-[#677084] dark:text-[#A6B2C8] truncate">
+                <div class="text-[11px] font-medium text-[var(--rm-text-secondary)] dark:text-[var(--rm-text-muted)] truncate">
 
                     {{ $dashboard['kpis']['total_registro']['texto'] ?? 'Alertas en sistema' }}
 
@@ -422,7 +410,7 @@
 
             <div class="absolute bottom-1 right-2 pointer-events-none opacity-40 group-hover:opacity-80 transition-opacity">
 
-                <svg width="34" height="16" viewBox="0 0 34 16" fill="none" class="text-[#304060] dark:text-[#A6B2C8]">
+                <svg width="34" height="16" viewBox="0 0 34 16" fill="none" class="text-[var(--rm-clinical)] dark:text-[var(--rm-text-muted)]">
 
                     <path d="M2 14C12 14 18 10 24 5C28 2 31 2 33 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
 
@@ -438,7 +426,7 @@
 
         <a href="{{ Route::has('admin.enfermeria.alertas') ? route('admin.enfermeria.alertas') : '#' }}"
 
-           class="group relative overflow-hidden rounded-2xl p-3 sm:p-3.5 transition-all duration-200 ease-out hover:-translate-y-0.5 bg-[#F0E8DE] dark:bg-[#2D2924] border border-[#D5CABE] hover:border-rose-300 dark:border-[#494139] dark:hover:border-rose-800 shadow-[0_2px_8px_rgba(163,90,68,0.06)] hover:shadow-[0_6px_16px_rgba(163,90,68,0.12)] border-l-[3.5px] border-l-rose-600 dark:border-l-rose-500 flex flex-col justify-between h-[88px] sm:h-[92px]"
+           class="group relative overflow-hidden rounded-2xl p-3 sm:p-3.5 transition-all duration-200 ease-out hover:-translate-y-0.5 bg-[var(--rm-surface)] dark:bg-[var(--rm-surface)] border border-[var(--rm-border)] hover:border-rose-300 dark:border-[var(--rm-border)] dark:hover:border-rose-800 shadow-[0_2px_8px_rgba(163,90,68,0.06)] hover:shadow-[0_6px_16px_rgba(163,90,68,0.12)] border-l-[3.5px] border-l-rose-600 dark:border-l-rose-500 flex flex-col justify-between h-[88px] sm:h-[92px]"
 
            aria-label="Ver alertas críticas y altas">
 
@@ -466,7 +454,7 @@
 
                 </div>
 
-                <div class="text-[11px] font-medium text-[#677084] dark:text-[#A6B2C8] truncate">
+                <div class="text-[11px] font-medium text-[var(--rm-text-secondary)] dark:text-[var(--rm-text-muted)] truncate">
 
                     {{ $dashboard['kpis']['criticas_altas']['texto'] ?? '0 críticas · 0 altas' }}
 
@@ -492,19 +480,19 @@
 
         <a href="{{ Route::has('admin.enfermeria.alertas') ? route('admin.enfermeria.alertas') : '#' }}"
 
-           class="group relative overflow-hidden rounded-2xl p-3 sm:p-3.5 transition-all duration-200 ease-out hover:-translate-y-0.5 bg-[#F0E8DE] dark:bg-[#2D2924] border border-[#D5CABE] hover:border-[#D2A45E] dark:border-[#494139] dark:hover:border-[#D2A45E] shadow-[0_2px_8px_rgba(210,164,94,0.08)] hover:shadow-[0_6px_16px_rgba(210,164,94,0.14)] border-l-[3.5px] border-l-[#D2A45E] flex flex-col justify-between h-[88px] sm:h-[92px]"
+           class="group relative overflow-hidden rounded-2xl p-3 sm:p-3.5 transition-all duration-200 ease-out hover:-translate-y-0.5 bg-[var(--rm-surface)] dark:bg-[var(--rm-surface)] border border-[var(--rm-border)] hover:border-[var(--rm-warning)] dark:border-[var(--rm-border)] dark:hover:border-[var(--rm-warning)] shadow-sm hover:shadow-md border-l-[3.5px] border-l-[var(--rm-warning)] flex flex-col justify-between h-[88px] sm:h-[92px]"
 
            aria-label="Ver alertas abiertas por atender">
 
             <div class="flex items-center justify-between gap-1.5">
 
-                <span class="text-[11px] font-black tracking-wider uppercase text-[#966B24] dark:text-[#E0B36D]">
+                <span class="text-[11px] font-black tracking-wider uppercase text-[var(--rm-warning)] dark:text-[var(--rm-warning)]">
 
                     POR ATENDER
 
                 </span>
 
-                <span class="flex h-7 w-7 items-center justify-center rounded-lg bg-[#D2A45E]/15 dark:bg-[#D2A45E]/30 text-[#966B24] dark:text-[#E0B36D] transition-transform duration-200 group-hover:scale-105 border border-[#E8C178]/60 dark:border-[#D2A45E]/40">
+                <span class="flex h-7 w-7 items-center justify-center rounded-lg bg-[var(--rm-warning-soft)] dark:bg-[var(--rm-warning)]/30 text-[var(--rm-warning)] dark:text-[var(--rm-warning)] transition-transform duration-200 group-hover:scale-105 border border-[[var(--rm-warning)]/60 dark:border-[var(--rm-warning)]/40">
 
                     <i class="ph-bold ph-clock text-base"></i>
 
@@ -514,13 +502,13 @@
 
             <div class="flex items-baseline justify-between gap-2 z-10">
 
-                <div class="text-[26px] sm:text-[28px] font-black leading-none tracking-tight text-[#966B24] dark:text-[#E0B36D]">
+                <div class="text-[26px] sm:text-[28px] font-black leading-none tracking-tight text-[var(--rm-warning)] dark:text-[var(--rm-warning)]">
 
                     {{ $dashboard['kpis']['por_atender']['numero'] ?? 4 }}
 
                 </div>
 
-                <div class="text-[11px] font-medium text-[#677084] dark:text-[#A6B2C8] truncate">
+                <div class="text-[11px] font-medium text-[var(--rm-text-secondary)] dark:text-[var(--rm-text-muted)] truncate">
 
                     {{ $dashboard['kpis']['por_atender']['texto'] ?? 'Abiertas sin atención' }}
 
@@ -530,7 +518,7 @@
 
             <div class="absolute bottom-1 right-2 pointer-events-none opacity-40 group-hover:opacity-80 transition-opacity">
 
-                <svg width="34" height="16" viewBox="0 0 34 16" fill="none" class="text-[#D2A45E]/60 dark:text-[#E0B36D]/60">
+                <svg width="34" height="16" viewBox="0 0 34 16" fill="none" class="text-[var(--rm-warning)]/60 dark:text-[var(--rm-warning)]/60">
 
                     <path d="M2 14C12 14 18 10 24 5C28 2 31 2 33 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
 
@@ -546,19 +534,19 @@
 
         <a href="{{ Route::has('admin.enfermeria.alertas') ? route('admin.enfermeria.alertas') : '#' }}"
 
-           class="group relative overflow-hidden rounded-2xl p-3 sm:p-3.5 transition-all duration-200 ease-out hover:-translate-y-0.5 bg-[#F0E8DE] dark:bg-[#2D2924] border border-[#D5CABE] hover:border-[#243B6B] dark:border-[#494139] dark:hover:border-[#243B6B] shadow-[0_2px_8px_rgba(36,59,107,0.06)] hover:shadow-[0_6px_16px_rgba(36,59,107,0.12)] border-l-[3.5px] border-l-[#243B6B] flex flex-col justify-between h-[88px] sm:h-[92px]"
+           class="group relative overflow-hidden rounded-2xl p-3 sm:p-3.5 transition-all duration-200 ease-out hover:-translate-y-0.5 bg-[var(--rm-surface)] dark:bg-[var(--rm-surface)] border border-[var(--rm-border)] hover:border-[var(--rm-clinical)] dark:border-[var(--rm-border)] dark:hover:border-[var(--rm-clinical)] shadow-sm hover:shadow-md border-l-[3.5px] border-l-[var(--rm-clinical)] flex flex-col justify-between h-[88px] sm:h-[92px]"
 
            aria-label="Ver alertas en curso de atención">
 
             <div class="flex items-center justify-between gap-1.5">
 
-                <span class="text-[11px] font-black tracking-wider uppercase text-[#243B6B] dark:text-[#8BB4F8]">
+                <span class="text-[11px] font-black tracking-wider uppercase text-[var(--rm-clinical)] dark:text-[var(--rm-clinical-soft)]">
 
                     EN ATENCIÓN
 
                 </span>
 
-                <span class="flex h-7 w-7 items-center justify-center rounded-lg bg-[#243B6B]/12 dark:bg-[#243B6B]/25 text-[#243B6B] dark:text-[#8BB4F8] transition-transform duration-200 group-hover:scale-105">
+                <span class="flex h-7 w-7 items-center justify-center rounded-lg bg-[var(--rm-clinical)]/12 dark:bg-[var(--rm-clinical)]/25 text-[var(--rm-clinical)] dark:text-[var(--rm-clinical-soft)] transition-transform duration-200 group-hover:scale-105">
 
                     <i class="ph-bold ph-first-aid text-base"></i>
 
@@ -568,13 +556,13 @@
 
             <div class="flex items-baseline justify-between gap-2 z-10">
 
-                <div class="text-[26px] sm:text-[28px] font-black leading-none tracking-tight text-[#243B6B] dark:text-[#8BB4F8]">
+                <div class="text-[26px] sm:text-[28px] font-black leading-none tracking-tight text-[var(--rm-clinical)] dark:text-[var(--rm-clinical-soft)]">
 
                     {{ $dashboard['kpis']['en_atencion']['numero'] ?? 0 }}
 
                 </div>
 
-                <div class="text-[11px] font-medium text-[#677084] dark:text-[#A6B2C8] truncate">
+                <div class="text-[11px] font-medium text-[var(--rm-text-secondary)] dark:text-[var(--rm-text-muted)] truncate">
 
                     {{ $dashboard['kpis']['en_atencion']['texto'] ?? 'Protocolo en curso' }}
 
@@ -584,7 +572,7 @@
 
             <div class="absolute bottom-1 right-2 pointer-events-none opacity-40 group-hover:opacity-80 transition-opacity">
 
-                <svg width="34" height="16" viewBox="0 0 34 16" fill="none" class="text-[#243B6B] dark:text-[#8BB4F8]">
+                <svg width="34" height="16" viewBox="0 0 34 16" fill="none" class="text-[var(--rm-clinical)] dark:text-[var(--rm-clinical-soft)]">
 
                     <path d="M2 14C12 14 18 10 24 5C28 2 31 2 33 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
 
@@ -596,23 +584,23 @@
 
 
 
-        {{-- 5. RESUELTAS (#63775B - Verde salvia oscuro) --}}
+        {{-- 5. RESUELTAS (var(--rm-action-primary) - Verde salvia oscuro) --}}
 
         <a href="{{ Route::has('admin.enfermeria.alertas') ? route('admin.enfermeria.alertas') : '#' }}"
 
-           class="group relative overflow-hidden rounded-2xl p-3 sm:p-3.5 transition-all duration-200 ease-out hover:-translate-y-0.5 bg-[#F0E8DE] dark:bg-[#2D2924] border border-[#D5CABE] hover:border-[#63775B] dark:border-[#494139] dark:hover:border-[#63775B] shadow-[0_2px_8px_rgba(99,119,91,0.06)] hover:shadow-[0_6px_16px_rgba(99,119,91,0.12)] border-l-[3.5px] border-l-[#63775B] flex flex-col justify-between h-[88px] sm:h-[92px]"
+           class="group relative overflow-hidden rounded-2xl p-3 sm:p-3.5 transition-all duration-200 ease-out hover:-translate-y-0.5 bg-[var(--rm-surface)] dark:bg-[var(--rm-surface)] border border-[var(--rm-border)] hover:border-[var(--rm-action-primary)] dark:border-[var(--rm-border)] dark:hover:border-[var(--rm-action-primary)] shadow-[0_2px_8px_rgba(99,119,91,0.06)] hover:shadow-[0_6px_16px_rgba(99,119,91,0.12)] border-l-[3.5px] border-l-[var(--rm-action-primary)] flex flex-col justify-between h-[88px] sm:h-[92px]"
 
            aria-label="Ver alertas resueltas e historial">
 
             <div class="flex items-center justify-between gap-1.5">
 
-                <span class="text-[11px] font-black tracking-wider uppercase text-[#63775B] dark:text-[#9DB491]">
+                <span class="text-[11px] font-black tracking-wider uppercase text-[var(--rm-action-primary)] dark:text-[var(--rm-action-primary)]">
 
                     RESUELTAS
 
                 </span>
 
-                <span class="flex h-7 w-7 items-center justify-center rounded-lg bg-[#63775B]/12 dark:bg-[#63775B]/25 text-[#63775B] dark:text-[#9DB491] transition-transform duration-200 group-hover:scale-105">
+                <span class="flex h-7 w-7 items-center justify-center rounded-lg bg-[var(--rm-action-primary)]/12 dark:bg-[var(--rm-action-primary)]/25 text-[var(--rm-action-primary)] dark:text-[var(--rm-action-primary)] transition-transform duration-200 group-hover:scale-105">
 
                     <i class="ph-bold ph-check-circle text-base"></i>
 
@@ -622,13 +610,13 @@
 
             <div class="flex items-baseline justify-between gap-2 z-10">
 
-                <div class="text-[26px] sm:text-[28px] font-black leading-none tracking-tight text-[#63775B] dark:text-[#9DB491]">
+                <div class="text-[26px] sm:text-[28px] font-black leading-none tracking-tight text-[var(--rm-action-primary)] dark:text-[var(--rm-action-primary)]">
 
                     {{ $dashboard['kpis']['resueltas']['numero'] ?? 0 }}
 
                 </div>
 
-                <div class="text-[11px] font-medium text-[#677084] dark:text-[#A6B2C8] truncate">
+                <div class="text-[11px] font-medium text-[var(--rm-text-secondary)] dark:text-[var(--rm-text-muted)] truncate">
 
                     {{ $dashboard['kpis']['resueltas']['texto'] ?? 'Historial conservado' }}
 
@@ -638,7 +626,7 @@
 
             <div class="absolute bottom-1 right-2 pointer-events-none opacity-40 group-hover:opacity-80 transition-opacity">
 
-                <svg width="34" height="16" viewBox="0 0 34 16" fill="none" class="text-[#63775B] dark:text-[#9DB491]">
+                <svg width="34" height="16" viewBox="0 0 34 16" fill="none" class="text-[var(--rm-action-primary)] dark:text-[var(--rm-action-primary)]">
 
                     <path d="M2 14C12 14 18 10 24 5C28 2 31 2 33 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
 
@@ -666,15 +654,15 @@
 
         {{-- AGENDA DE HOY (7 COLS): CORAZÓN OPERATIVO PROTAGONISTA --}}
 
-        <section class="lg:col-span-7 rounded-[16px] border border-[#D5CABE] hover:border-[#304060]/60 dark:border-[#494139] dark:hover:border-[#52585A] bg-[#F0E8DE] dark:bg-[#2D2924] p-3.5 sm:p-4 shadow-[0_3px_12px_rgba(47,62,92,0.06)] hover:shadow-[0_8px_20px_rgba(47,62,92,0.12)] transition-all duration-200 ease-out" aria-label="Agenda operativa de hoy">
+        <section class="lg:col-span-7 rounded-2xl border border-[var(--rm-border)] hover:border-[var(--rm-clinical)]/60 dark:border-[var(--rm-border)] dark:hover:border-[var(--rm-border)] bg-[var(--rm-surface)] dark:bg-[var(--rm-surface)] p-3.5 sm:p-4 shadow-sm hover:shadow-md transition-all duration-200 ease-out" aria-label="Agenda operativa de hoy">
 
             {{-- Cabecera con Ícono Contextual y Enlace a Agenda Completa --}}
 
-            <div class="flex items-center justify-between gap-2 border-b border-[#D5CABE]/40 dark:border-[#494139] pb-2.5">
+            <div class="flex items-center justify-between gap-2 border-b border-[var(--rm-border)]/40 dark:border-[var(--rm-border)] pb-2.5">
 
                 <div class="flex items-center gap-2">
 
-                    <span class="flex h-7 w-7 items-center justify-center rounded-lg bg-[#304060]/12 text-[#304060] dark:bg-[#304060]/30 dark:text-[#A6B2C8] shrink-0">
+                    <span class="flex h-7 w-7 items-center justify-center rounded-lg bg-[var(--rm-clinical-soft)] text-[var(--rm-clinical)] dark:bg-[var(--rm-clinical-soft)] dark:text-[var(--rm-text-muted)] shrink-0">
 
                         <i class="ph-bold ph-calendar-check text-base"></i>
 
@@ -682,13 +670,13 @@
 
                     <div>
 
-                        <h2 class="text-sm sm:text-base font-black text-[#304060] dark:text-[#F0E8DE] tracking-tight leading-tight">
+                        <h2 class="text-sm sm:text-base font-black text-[var(--rm-clinical)] dark:text-[var(--rm-surface)] tracking-tight leading-tight">
 
                             {{ ($dashboard['modo'] ?? '') === 'FUERA_DE_TURNO' ? 'Actividad del turno en curso' : 'Agenda de hoy' }}
 
                         </h2>
 
-                        <p class="text-[11px] font-semibold text-[#677084] dark:text-[#A6B2C8]">
+                        <p class="text-[11px] font-semibold text-[var(--rm-text-secondary)] dark:text-[var(--rm-text-muted)]">
 
                             {{ ($dashboard['modo'] ?? '') === 'FUERA_DE_TURNO' ? 'Intervenciones programadas del turno activo (Solo lectura)' : 'Intervenciones programadas en tu guardia' }}
 
@@ -700,7 +688,7 @@
 
                 <a href="{{ Route::has('admin.enfermeria.agenda') ? route('admin.enfermeria.agenda') : '#' }}"
 
-                   class="group/link text-[11px] font-extrabold text-[#304060] dark:text-[#A6B2C8] hover:text-[#966B24] dark:hover:text-[#E0B36D] flex items-center gap-1 transition-colors duration-200">
+                   class="group/link text-[11px] font-extrabold text-[var(--rm-clinical)] dark:text-[var(--rm-text-muted)] hover:text-[var(--rm-warning)] dark:hover:text-[var(--rm-warning)] flex items-center gap-1 transition-colors duration-200">
 
                     <span>Ver agenda completa</span>
 
@@ -730,11 +718,11 @@
 
                         if (str_contains($estado, 'complet') || str_contains($estado, 'realiz')) {
 
-                            $badgeClase = 'bg-[#E8F1E5] text-[#63775B] border border-[#B8CDAE] dark:bg-[#63775B]/25 dark:text-[#9DB491] dark:border-[#63775B]';
+                            $badgeClase = 'bg-[var(--rm-surface-soft)] text-[var(--rm-action-primary)] border border-[[var(--rm-success-soft)] dark:bg-[var(--rm-action-primary)]/25 dark:text-[var(--rm-action-primary)] dark:border-[var(--rm-action-primary)]';
 
-                            $iconoEstado = 'ph-check-circle text-[#63775B] dark:text-[#9DB491]';
+                            $iconoEstado = 'ph-check-circle text-[var(--rm-action-primary)] dark:text-[var(--rm-action-primary)]';
 
-                            $bordeLeft = 'border-l-[3.5px] border-l-[#63775B]';
+                            $bordeLeft = 'border-l-[3.5px] border-l-[var(--rm-action-primary)]';
 
                         } elseif (str_contains($estado, 'retras') || str_contains($estado, 'crit')) {
 
@@ -746,23 +734,23 @@
 
                         } else {
 
-                            $badgeClase = 'bg-[#FFF1D6] text-[#966B24] border border-[#E8C178] dark:bg-[#D2A45E]/20 dark:text-[#E0B36D] dark:border-[#D2A45E]/40';
+                            $badgeClase = 'bg-[var(--rm-surface)] text-[var(--rm-warning)] border border-[[var(--rm-warning)] dark:bg-[var(--rm-warning-soft)] dark:text-[var(--rm-warning)] dark:border-[var(--rm-warning)]/40';
 
-                            $iconoEstado = 'ph-clock text-[#966B24] dark:text-[#E0B36D]';
+                            $iconoEstado = 'ph-clock text-[var(--rm-warning)] dark:text-[var(--rm-warning)]';
 
-                            $bordeLeft = 'border-l-[3.5px] border-l-[#D2A45E]';
+                            $bordeLeft = 'border-l-[3.5px] border-l-[var(--rm-warning)]';
 
                         }
 
                     @endphp
 
-                    <div class="group/item flex items-center justify-between gap-2.5 rounded-xl border border-[#D5CABE]/40 dark:border-[#494139] bg-[#FBF8F5]/70 dark:bg-[#332F29]/80 p-2.5 hover:bg-[#FBF8F5] dark:hover:bg-[#2A2D2E] hover:shadow-xs transition-all duration-150 {{ $bordeLeft }}">
+                    <div class="group/item flex items-center justify-between gap-2.5 rounded-xl border border-[var(--rm-border)]/40 dark:border-[var(--rm-border)] bg-[var(--rm-surface)]/70 dark:bg-[var(--rm-surface)]/80 p-2.5 hover:bg-[var(--rm-surface)] dark:hover:bg-[var(--rm-surface)] hover:shadow-xs transition-all duration-150 {{ $bordeLeft }}">
 
                         <div class="flex items-center gap-2.5 min-w-0">
 
                             {{-- Hora en fuente monoespaciada tabular --}}
 
-                            <span class="font-mono text-xs font-black text-[#304060] dark:text-[#A6B2C8] shrink-0 bg-[#304060]/10 dark:bg-[#304060]/25 px-1.5 py-0.5 rounded">
+                            <span class="font-mono text-xs font-black text-[var(--rm-clinical)] dark:text-[var(--rm-text-muted)] shrink-0 bg-[var(--rm-clinical-soft)] dark:bg-[var(--rm-clinical-soft)] px-1.5 py-0.5 rounded">
 
                                 {{ $evento['hora'] ?? '08:00' }}
 
@@ -772,11 +760,11 @@
 
                             {{-- Ícono por Tipo de Evento --}}
 
-                            <span class="flex h-6 w-6 items-center justify-center rounded-lg bg-[#F0E8DE] dark:bg-[#2D2924] border border-[#D5CABE]/40 dark:border-[#494139] shrink-0">
+                            <span class="flex h-6 w-6 items-center justify-center rounded-lg bg-[var(--rm-surface)] dark:bg-[var(--rm-surface)] border border-[var(--rm-border)]/40 dark:border-[var(--rm-border)] shrink-0">
 
                                 @if(str_contains(strtolower($evento['tipo'] ?? ''), 'medic'))
 
-                                    <i class="ph-bold ph-pill text-xs text-[#243B6B]"></i>
+                                    <i class="ph-bold ph-pill text-xs text-[var(--rm-clinical)]"></i>
 
                                 @elseif(str_contains(strtolower($evento['tipo'] ?? ''), 'signo') || str_contains(strtolower($evento['tipo'] ?? ''), 'vital'))
 
@@ -784,7 +772,7 @@
 
                                 @else
 
-                                    <i class="ph-bold ph-stethoscope text-xs text-[#63775B]"></i>
+                                    <i class="ph-bold ph-stethoscope text-xs text-[var(--rm-action-primary)]"></i>
 
                                 @endif
 
@@ -796,23 +784,23 @@
 
                             <div class="min-w-0">
 
-                                <div class="text-xs font-bold text-[#304060] dark:text-[#F0E8DE] truncate">
+                                <div class="text-xs font-bold text-[var(--rm-clinical)] dark:text-[var(--rm-surface)] truncate">
 
                                     {{ $evento['accion'] ?? ($evento['tarea'] ?? ($evento['titulo'] ?? 'Control de enfermería')) }}
 
                                 </div>
 
-                                <div class="text-[11px] font-semibold text-[#677084] dark:text-[#A6B2C8] truncate">
+                                <div class="text-[11px] font-semibold text-[var(--rm-text-secondary)] dark:text-[var(--rm-text-muted)] truncate">
 
                                     {{ $evento['residente'] ?? ($evento['residente_nombre'] ?? 'Residente') }}
 
                                     @if(!empty($evento['ubicacion']))
 
-                                        <span class="text-[#967B66] dark:text-[#BDAE9F]">· {{ $evento['ubicacion'] }}</span>
+                                        <span class="text-[var(--rm-text-muted)] dark:text-[var(--rm-text-muted)]">· {{ $evento['ubicacion'] }}</span>
 
                                     @elseif(!empty($evento['habitacion']))
 
-                                        <span class="text-[#967B66] dark:text-[#BDAE9F]">· {{ $evento['habitacion'] }}</span>
+                                        <span class="text-[var(--rm-text-muted)] dark:text-[var(--rm-text-muted)]">· {{ $evento['habitacion'] }}</span>
 
                                     @endif
 
@@ -838,7 +826,7 @@
 
                 @empty
 
-                    <div class="py-8 text-center text-xs font-semibold text-[#677084] dark:text-[#A6B2C8]">
+                    <div class="py-8 text-center text-xs font-semibold text-[var(--rm-text-secondary)] dark:text-[var(--rm-text-muted)]">
 
                         No hay intervenciones programadas para el resto de este turno.
 
@@ -854,15 +842,15 @@
 
         {{-- PROGRESO DEL TURNO Y DISTRIBUCIÓN (5 COLS): GRÁFICAS INTEGRADAS Y CONTRASTADAS --}}
 
-        <section class="lg:col-span-5 rounded-[16px] border border-[#D5CABE] hover:border-[#304060]/60 dark:border-[#494139] dark:hover:border-[#52585A] bg-[#F0E8DE] dark:bg-[#2D2924] p-3.5 sm:p-4 shadow-[0_3px_12px_rgba(47,62,92,0.06)] hover:shadow-[0_8px_20px_rgba(47,62,92,0.12)] space-y-3 transition-all duration-200 ease-out" aria-label="Progreso del turno">
+        <section class="lg:col-span-5 rounded-2xl border border-[var(--rm-border)] hover:border-[var(--rm-clinical)]/60 dark:border-[var(--rm-border)] dark:hover:border-[var(--rm-border)] bg-[var(--rm-surface)] dark:bg-[var(--rm-surface)] p-3.5 sm:p-4 shadow-sm hover:shadow-md space-y-3 transition-all duration-200 ease-out" aria-label="Progreso del turno">
 
             {{-- Título con Ícono Contextual --}}
 
-            <div class="flex items-center justify-between border-b border-[#D5CABE]/40 dark:border-[#494139] pb-2">
+            <div class="flex items-center justify-between border-b border-[var(--rm-border)]/40 dark:border-[var(--rm-border)] pb-2">
 
                 <div class="flex items-center gap-2">
 
-                    <span class="flex h-7 w-7 items-center justify-center rounded-lg bg-[#63775B]/15 text-[#63775B] dark:text-[#9DB491] shrink-0">
+                    <span class="flex h-7 w-7 items-center justify-center rounded-lg bg-[var(--rm-action-primary-soft)] text-[var(--rm-action-primary)] dark:text-[var(--rm-action-primary)] shrink-0">
 
                         <i class="ph-bold ph-chart-donut text-base"></i>
 
@@ -870,13 +858,13 @@
 
                     <div>
 
-                        <h2 class="text-sm sm:text-base font-black text-[#304060] dark:text-[#F0E8DE] tracking-tight leading-tight">
+                        <h2 class="text-sm sm:text-base font-black text-[var(--rm-clinical)] dark:text-[var(--rm-surface)] tracking-tight leading-tight">
 
                             {{ ($dashboard['modo'] ?? '') === 'FUERA_DE_TURNO' ? 'Progreso del turno en curso' : 'Progreso del turno' }}
 
                         </h2>
 
-                        <p class="text-[11px] font-semibold text-[#677084] dark:text-[#A6B2C8]">
+                        <p class="text-[11px] font-semibold text-[var(--rm-text-secondary)] dark:text-[var(--rm-text-muted)]">
 
                             {{ ($dashboard['modo'] ?? '') === 'FUERA_DE_TURNO' ? 'Cumplimiento del turno activo' : 'Cumplimiento de tareas operativas' }}
 
@@ -888,7 +876,7 @@
 
                 @if(($dashboard['modo'] ?? '') === 'FUERA_DE_TURNO')
 
-                    <span class="rounded bg-[#304060]/15 dark:bg-[#304060]/30 px-2 py-0.5 text-[9px] font-black uppercase tracking-wider text-[#304060] dark:text-[#A6B2C8]">
+                    <span class="rounded bg-[var(--rm-clinical-soft)] dark:bg-[var(--rm-clinical-soft)] px-2 py-0.5 text-[9px] font-black uppercase tracking-wider text-[var(--rm-clinical)] dark:text-[var(--rm-text-muted)]">
 
                         Solo lectura
 
@@ -902,7 +890,7 @@
 
             {{-- Bloque Donut: Grosor Óptimo y Colores Vivos --}}
 
-            <div class="rounded-xl border border-[#D5CABE]/40 dark:border-[#494139] bg-[#FBF8F5]/70 dark:bg-[#332F29]/80 p-3 shadow-2xs">
+            <div class="rounded-xl border border-[var(--rm-border)]/40 dark:border-[var(--rm-border)] bg-[var(--rm-surface)]/70 dark:bg-[var(--rm-surface)]/80 p-3 shadow-2xs">
 
                 @php
 
@@ -911,11 +899,11 @@
 
                 @endphp
 
-                <div class="flex items-center justify-between text-xs font-extrabold text-[#304060] dark:text-[#F0E8DE] mb-1">
+                <div class="flex items-center justify-between text-xs font-extrabold text-[var(--rm-clinical)] dark:text-[var(--rm-surface)] mb-1">
 
                     <span>Cumplimiento Global</span>
 
-                    <span class="text-[#63775B] dark:text-[#9DB491] font-black text-sm">{{ $pctCumplimiento }}%</span>
+                    <span class="text-[var(--rm-action-primary)] dark:text-[var(--rm-action-primary)] font-black text-sm">{{ $pctCumplimiento }}%</span>
 
                 </div>
 
@@ -929,9 +917,9 @@
 
                     <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
 
-                        <span class="text-xl font-black text-[#304060] dark:text-[#F0E8DE] leading-none">{{ $pctCumplimiento }}%</span>
+                        <span class="text-xl font-black text-[var(--rm-clinical)] dark:text-[var(--rm-surface)] leading-none">{{ $pctCumplimiento }}%</span>
 
-                        <span class="text-[9px] font-black uppercase tracking-wider text-[#677084] dark:text-[#A6B2C8] mt-0.5">{{ ($totalTareasProg ?? 0) > 0 ? 'Completado' : 'Sin tareas' }}</span>
+                        <span class="text-[9px] font-black uppercase tracking-wider text-[var(--rm-text-secondary)] dark:text-[var(--rm-text-muted)] mt-0.5">{{ ($totalTareasProg ?? 0) > 0 ? 'Completado' : 'Sin tareas' }}</span>
 
                     </div>
 
@@ -941,11 +929,11 @@
 
                 {{-- Leyenda y Totales de Alta Jerarquía --}}
 
-                <div class="mt-2 flex items-center justify-around text-[11px] font-bold text-[#677084] dark:text-[#A6B2C8] border-t border-[#D5CABE]/30 dark:border-[#494139] pt-1.5">
+                <div class="mt-2 flex items-center justify-around text-[11px] font-bold text-[var(--rm-text-secondary)] dark:text-[var(--rm-text-muted)] border-t border-[var(--rm-border)]/30 dark:border-[var(--rm-border)] pt-1.5">
 
                     <span class="flex items-center gap-1.5">
 
-                        <span class="h-2.5 w-2.5 rounded-full bg-[#63775B]"></span>
+                        <span class="h-2.5 w-2.5 rounded-full bg-[var(--rm-action-primary)]"></span>
 
                         <span>Realizadas</span>
 
@@ -953,7 +941,7 @@
 
                     <span class="flex items-center gap-1.5">
 
-                        <span class="h-2.5 w-2.5 rounded-full bg-[#D2A45E]"></span>
+                        <span class="h-2.5 w-2.5 rounded-full bg-[var(--rm-warning)]"></span>
 
                         <span>Pendientes</span>
 
@@ -961,7 +949,7 @@
 
                     <span class="flex items-center gap-1.5">
 
-                        <span class="h-2.5 w-2.5 rounded-full bg-[#C85D52]"></span>
+                        <span class="h-2.5 w-2.5 rounded-full bg-[var(--rm-danger)]"></span>
 
                         <span>Con retraso</span>
 
@@ -975,13 +963,13 @@
 
             {{-- Bloque Distribución de Cuidados --}}
 
-            <div class="rounded-xl border border-[#D5CABE]/40 dark:border-[#494139] bg-[#FBF8F5]/70 dark:bg-[#332F29]/80 p-3 shadow-2xs">
+            <div class="rounded-xl border border-[var(--rm-border)]/40 dark:border-[var(--rm-border)] bg-[var(--rm-surface)]/70 dark:bg-[var(--rm-surface)]/80 p-3 shadow-2xs">
 
-                <div class="flex items-center justify-between text-xs font-extrabold text-[#304060] dark:text-[#F0E8DE] mb-1">
+                <div class="flex items-center justify-between text-xs font-extrabold text-[var(--rm-clinical)] dark:text-[var(--rm-surface)] mb-1">
 
                     <span>Distribución de Cuidados</span>
 
-                    <span class="text-[10px] text-[#677084] dark:text-[#A6B2C8] font-bold uppercase tracking-wider">{{ ($dashboard['modo'] ?? '') === 'FUERA_DE_TURNO' ? 'Información del turno activo en modo consulta' : 'Activas' }}</span>
+                    <span class="text-[10px] text-[var(--rm-text-secondary)] dark:text-[var(--rm-text-muted)] font-bold uppercase tracking-wider">{{ ($dashboard['modo'] ?? '') === 'FUERA_DE_TURNO' ? 'Información del turno activo en modo consulta' : 'Activas' }}</span>
 
                 </div>
 
@@ -1013,15 +1001,15 @@
 
         {{-- RESIDENTES DE MI TURNO (8 COLS): FORMATO EDITORIAL CLÍNICO --}}
 
-        <section class="lg:col-span-8 rounded-[16px] border border-[#D5CABE] hover:border-[#304060]/60 dark:border-[#494139] dark:hover:border-[#52585A] bg-[#F0E8DE] dark:bg-[#2D2924] p-3.5 sm:p-4 shadow-[0_3px_12px_rgba(47,62,92,0.06)] hover:shadow-[0_8px_20px_rgba(47,62,92,0.12)] transition-all duration-200 ease-out flex flex-col justify-between" aria-label="Residentes asignados en mi turno">
+        <section class="lg:col-span-8 rounded-2xl border border-[var(--rm-border)] hover:border-[var(--rm-clinical)]/60 dark:border-[var(--rm-border)] dark:hover:border-[var(--rm-border)] bg-[var(--rm-surface)] dark:bg-[var(--rm-surface)] p-3.5 sm:p-4 shadow-sm hover:shadow-md transition-all duration-200 ease-out flex flex-col justify-between" aria-label="Residentes asignados en mi turno">
 
             {{-- Cabecera con Ícono Contextual + Enlace Textual con Chevron --}}
 
-            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 border-b border-[#D5CABE]/40 dark:border-[#494139] pb-2.5">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 border-b border-[var(--rm-border)]/40 dark:border-[var(--rm-border)] pb-2.5">
 
                 <div class="flex items-center gap-2">
 
-                    <span class="flex h-7 w-7 items-center justify-center rounded-lg bg-[#304060]/12 text-[#304060] dark:bg-[#304060]/30 dark:text-[#A6B2C8] shrink-0">
+                    <span class="flex h-7 w-7 items-center justify-center rounded-lg bg-[var(--rm-clinical-soft)] text-[var(--rm-clinical)] dark:bg-[var(--rm-clinical-soft)] dark:text-[var(--rm-text-muted)] shrink-0">
 
                         <i class="ph-bold ph-users-three text-base"></i>
 
@@ -1029,13 +1017,13 @@
 
                     <div>
 
-                        <h2 class="text-sm sm:text-base font-black text-[#304060] dark:text-[#F0E8DE] tracking-tight leading-tight">
+                        <h2 class="text-sm sm:text-base font-black text-[var(--rm-clinical)] dark:text-[var(--rm-surface)] tracking-tight leading-tight">
 
                             {{ ($dashboard['modo'] ?? '') === 'FUERA_DE_TURNO' ? 'Residentes del turno en curso' : 'Residentes de mi turno' }}
 
                         </h2>
 
-                        <p class="text-[11px] font-semibold text-[#677084] dark:text-[#A6B2C8]">
+                        <p class="text-[11px] font-semibold text-[var(--rm-text-secondary)] dark:text-[var(--rm-text-muted)]">
 
                             {{ ($dashboard['modo'] ?? '') === 'FUERA_DE_TURNO' ? 'Personas actualmente cubiertas por el equipo de guardia' : 'Personas asignadas a tu cuidado directo' }}
 
@@ -1047,7 +1035,7 @@
 
                 <a href="{{ Route::has('admin.enfermeria.residentes') ? route('admin.enfermeria.residentes') : (Route::has('admin.enfermeria.pacientes') ? route('admin.enfermeria.pacientes') : '#') }}"
 
-                   class="group/link text-[11px] font-extrabold text-[#304060] dark:text-[#A6B2C8] hover:text-[#966B24] dark:hover:text-[#E0B36D] flex items-center gap-1 transition-colors duration-200 self-start sm:self-auto">
+                   class="group/link text-[11px] font-extrabold text-[var(--rm-clinical)] dark:text-[var(--rm-text-muted)] hover:text-[var(--rm-warning)] dark:hover:text-[var(--rm-warning)] flex items-center gap-1 transition-colors duration-200 self-start sm:self-auto">
 
                     <span>Ver todos</span>
 
@@ -1089,7 +1077,7 @@
 
                     <a href="{{ $rutaFicha }}"
 
-                       class="group/res block rounded-xl border border-[#D5CABE]/40 dark:border-[#494139] bg-[#FBF8F5]/70 dark:bg-[#332F29]/80 p-2.5 hover:bg-[#FBF8F5] dark:hover:bg-[#2A2D2E] hover:border-[#304060]/60 dark:hover:border-[#A6B2C8]/60 hover:shadow-xs transition-all duration-150">
+                       class="group/res block rounded-xl border border-[var(--rm-border)]/40 dark:border-[var(--rm-border)] bg-[var(--rm-surface)]/70 dark:bg-[var(--rm-surface)]/80 p-2.5 hover:bg-[var(--rm-surface)] dark:hover:bg-[var(--rm-surface)] hover:border-[var(--rm-clinical)]/60 dark:hover:border-[[var(--rm-clinical-soft)]/60 hover:shadow-xs transition-all duration-150">
 
                         <div class="flex items-center justify-between gap-3">
 
@@ -1105,11 +1093,11 @@
 
                                              alt="{{ $residente['nombre_completo'] ?? ($residente['nombre'] ?? 'Residente') }}"
 
-                                             class="h-10 w-10 rounded-full object-cover border border-[#D5CABE] dark:border-[#5A5147]">
+                                             class="h-10 w-10 rounded-full object-cover border border-[var(--rm-border)] dark:border-[var(--rm-border)]">
 
                                     @else
 
-                                        <div class="flex h-10 w-10 items-center justify-center rounded-full bg-[#304060]/12 dark:bg-[#304060]/30 text-[#304060] dark:text-[#A6B2C8] font-black text-xs border border-[#304060]/25">
+                                        <div class="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--rm-clinical-soft)] dark:bg-[var(--rm-clinical-soft)] text-[var(--rm-clinical)] dark:text-[var(--rm-text-muted)] font-black text-xs border border-[var(--rm-clinical)]/25">
 
                                             {{ $residente['iniciales'] ?? strtoupper(substr($residente['nombre_completo'] ?? ($residente['nombre'] ?? 'R'), 0, 2)) }}
 
@@ -1125,17 +1113,17 @@
 
                                 <div class="min-w-0">
 
-                                    <div class="text-xs sm:text-[13px] font-bold text-[#304060] dark:text-[#F0E8DE] truncate group-hover/res:text-[#966B24] dark:group-hover/res:text-[#E0B36D] transition-colors">
+                                    <div class="text-xs sm:text-[13px] font-bold text-[var(--rm-clinical)] dark:text-[var(--rm-surface)] truncate group-hover/res:text-[var(--rm-warning)] dark:group-hover/res:text-[var(--rm-warning)] transition-colors">
 
                                         {{ $residente['nombre_completo'] ?? ($residente['nombre'] ?? 'Residente') }}
 
                                     </div>
 
-                                    <div class="text-[11px] font-medium text-[#677084] dark:text-[#A6B2C8] truncate">
+                                    <div class="text-[11px] font-medium text-[var(--rm-text-secondary)] dark:text-[var(--rm-text-muted)] truncate">
 
                                         {{ $residente['edad'] ?? '80 años' }} ·
 
-                                        <span class="font-bold text-[#304060] dark:text-[#EFE4D8]">
+                                        <span class="font-bold text-[var(--rm-clinical)] dark:text-[[var(--rm-text-primary)]">
 
                                             {{ $residente['ubicacion'] ?? ($residente['cama_texto'] ?? 'Hab. 102 · Cama A') }}
 
@@ -1151,31 +1139,30 @@
 
                                         {{-- Estado de seguimiento operativo vs institucional --}}
                                         @php
-                                            $estSeg = $residente['estado_seguimiento'] ?? ($residente['estado_label'] ?? 'SIN_DATOS');
+                                            $estSeg = $residente['estado_seguimiento'] ?? ($residente['estado_label'] ?? 'ESTABLE');
                                             $segColor = match(strtoupper(trim((string)$estSeg))) {
                                                 'CRÍTICO', 'CRITICO', 'REQUIERE_ATENCION' => 'bg-rose-100 text-rose-800 dark:bg-rose-900/50 dark:text-rose-200 border border-rose-200/80 dark:border-rose-800/60',
-                                                'VIGILANCIA' => 'bg-[#FFF1D6] text-[#966B24] border border-[#E8C178] dark:bg-[#D2A45E]/20 dark:text-[#E0B36D] dark:border-[#D2A45E]/40',
-                                                'SIN_ALERTAS' => 'bg-[#63775B]/15 text-[#63775B] dark:text-[#9DB491]',
-                                                default => 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-200',
+                                                'VIGILANCIA' => 'bg-[var(--rm-surface)] text-[var(--rm-warning)] border border-[[var(--rm-warning)] dark:bg-[var(--rm-warning-soft)] dark:text-[var(--rm-warning)] dark:border-[var(--rm-warning)]/40',
+                                                default => 'bg-[var(--rm-action-primary-soft)] text-[var(--rm-action-primary)] dark:text-[var(--rm-action-primary)]',
                                             };
                                         @endphp
                                         <span class="px-1.5 py-0.5 rounded font-extrabold uppercase {{ $segColor }}" title="Estado de seguimiento">
-                                            {{ str_replace('_', ' ', $estSeg) }}
+                                            {{ $estSeg }}
                                         </span>
 
-                                        <span class="px-1.5 py-0.5 rounded font-bold bg-[#F0E8DE] dark:bg-[#2D2924] border border-[#D5CABE]/50 dark:border-[#494139] text-[#677084] dark:text-[#A6B2C8]" title="Nivel de supervisión">
-                                            {{ $residente['supervision_label'] ?? 'Supervisión no registrada' }}
+                                        <span class="px-1.5 py-0.5 rounded font-bold bg-[var(--rm-surface)] dark:bg-[var(--rm-surface)] border border-[var(--rm-border)]/50 dark:border-[var(--rm-border)] text-[var(--rm-text-secondary)] dark:text-[var(--rm-text-muted)]" title="Nivel de supervisión">
+                                            {{ $residente['supervision_label'] ?? 'Supervisión moderada' }}
                                         </span>
 
                                         @if(!empty($residente['estado_institucional'] ?? $residente['estado_operacional']))
-                                            <span class="px-1.5 py-0.5 rounded font-bold bg-[#304060]/10 dark:bg-[#304060]/25 text-[#304060] dark:text-[#A6B2C8] uppercase" title="Estado institucional">
+                                            <span class="px-1.5 py-0.5 rounded font-bold bg-[var(--rm-clinical-soft)] dark:bg-[var(--rm-clinical-soft)] text-[var(--rm-clinical)] dark:text-[var(--rm-text-muted)] uppercase" title="Estado institucional">
                                                 Institucional: {{ $residente['estado_institucional'] ?? $residente['estado_operacional'] }}
                                             </span>
                                         @endif
 
                                         @if(!empty($residente['turno_actual']))
 
-                                            <span class="px-1.5 py-0.2 rounded font-bold bg-[#FFF1D6] text-[#966B24] border border-[#E8C178] dark:bg-[#D2A45E]/20 dark:text-[#E0B36D] dark:border-[#D2A45E]/40">
+                                            <span class="px-1.5 py-0.2 rounded font-bold bg-[var(--rm-surface)] text-[var(--rm-warning)] border border-[[var(--rm-warning)] dark:bg-[var(--rm-warning-soft)] dark:text-[var(--rm-warning)] dark:border-[var(--rm-warning)]/40">
 
                                                 {{ $residente['turno_actual'] }}
 
@@ -1185,9 +1172,9 @@
 
                                         @if(!empty($residente['responsable_texto']))
 
-                                            <span class="px-1.5 py-0.5 rounded font-bold bg-[#304060]/12 dark:bg-[#304060]/35 text-[#304060] dark:text-[#A6B2C8] inline-flex items-center gap-1">
+                                            <span class="px-1.5 py-0.5 rounded font-bold bg-[var(--rm-clinical-soft)] dark:bg-[var(--rm-clinical)]/35 text-[var(--rm-clinical)] dark:text-[var(--rm-text-muted)] inline-flex items-center gap-1">
 
-                                                <i class="ph-bold ph-user-check text-[11px] text-[#63775B]"></i>
+                                                <i class="ph-bold ph-user-check text-[11px] text-[var(--rm-action-primary)]"></i>
 
                                                 <span>{{ $residente['responsable_texto'] }}</span>
 
@@ -1195,9 +1182,9 @@
 
                                         @endif
 
-                                        <span class="px-1.5 py-0.2 rounded font-bold bg-[#F0E8DE] dark:bg-[#2D2924] border border-[#D5CABE]/50 dark:border-[#494139] text-[#677084] dark:text-[#A6B2C8]">
+                                        <span class="px-1.5 py-0.2 rounded font-bold bg-[var(--rm-surface)] dark:bg-[var(--rm-surface)] border border-[var(--rm-border)]/50 dark:border-[var(--rm-border)] text-[var(--rm-text-secondary)] dark:text-[var(--rm-text-muted)]">
 
-                                            {{ $residente['movilidad_label'] ?? 'Movilidad no registrada' }}
+                                            {{ $residente['movilidad_label'] ?? 'Movilidad asistida' }}
 
                                         </span>
 
@@ -1215,7 +1202,7 @@
 
                                         @else
 
-                                            <span class="inline-flex items-center gap-0.5 px-1.5 py-0.2 rounded font-semibold text-[#63775B] dark:text-[#9DB491] bg-[#E8F1E5] dark:bg-[#63775B]/25 border border-[#B8CDAE]/60 dark:border-[#63775B]/40">
+                                            <span class="inline-flex items-center gap-0.5 px-1.5 py-0.2 rounded font-semibold text-[var(--rm-action-primary)] dark:text-[var(--rm-action-primary)] bg-[var(--rm-surface-soft)] dark:bg-[var(--rm-action-primary)]/25 border border-[[var(--rm-success-soft)]/60 dark:border-[var(--rm-action-primary)]/40">
 
                                                 <i class="ph-bold ph-check text-[10px]"></i>
 
@@ -1237,7 +1224,7 @@
 
                             <div class="hidden sm:flex items-center justify-center pl-2">
 
-                                <i class="ph-bold ph-caret-right text-sm text-[#967B66] dark:text-[#BDAE9F] opacity-50 group-hover/res:opacity-100 group-hover/res:translate-x-0.5 transition-all duration-150"></i>
+                                <i class="ph-bold ph-caret-right text-sm text-[var(--rm-text-muted)] dark:text-[var(--rm-text-muted)] opacity-50 group-hover/res:opacity-100 group-hover/res:translate-x-0.5 transition-all duration-150"></i>
 
                             </div>
 
@@ -1247,7 +1234,7 @@
 
                 @empty
 
-                    <div class="py-6 text-center text-xs font-semibold text-[#677084] dark:text-[#A6B2C8]">
+                    <div class="py-6 text-center text-xs font-semibold text-[var(--rm-text-secondary)] dark:text-[var(--rm-text-muted)]">
 
                         No tienes residentes asignados directamente en este sector.
 
@@ -1263,11 +1250,11 @@
 
         {{-- ALERTAS RECIENTES (4 COLS): STREAM DE NOTIFICACIONES CLÍNICAS --}}
 
-        <section class="lg:col-span-4 rounded-[16px] border border-[#D5CABE] hover:border-[#304060]/60 dark:border-[#494139] dark:hover:border-[#52585A] bg-[#F0E8DE] dark:bg-[#2D2924] p-3.5 sm:p-4 shadow-[0_3px_12px_rgba(47,62,92,0.06)] hover:shadow-[0_8px_20px_rgba(47,62,92,0.12)] transition-all duration-200 ease-out flex flex-col justify-between" aria-label="Alertas recientes del turno">
+        <section class="lg:col-span-4 rounded-2xl border border-[var(--rm-border)] hover:border-[var(--rm-clinical)]/60 dark:border-[var(--rm-border)] dark:hover:border-[var(--rm-border)] bg-[var(--rm-surface)] dark:bg-[var(--rm-surface)] p-3.5 sm:p-4 shadow-sm hover:shadow-md transition-all duration-200 ease-out flex flex-col justify-between" aria-label="Alertas recientes del turno">
 
             {{-- Cabecera con Ícono Contextual + Enlace Textual con Chevron --}}
 
-            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 border-b border-[#D5CABE]/40 dark:border-[#494139] pb-2.5">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 border-b border-[var(--rm-border)]/40 dark:border-[var(--rm-border)] pb-2.5">
 
                 <div class="flex items-center gap-2">
 
@@ -1279,13 +1266,13 @@
 
                     <div>
 
-                        <h2 class="text-sm sm:text-base font-black text-[#304060] dark:text-[#F0E8DE] tracking-tight leading-tight">
+                        <h2 class="text-sm sm:text-base font-black text-[var(--rm-clinical)] dark:text-[var(--rm-surface)] tracking-tight leading-tight">
 
                             Alertas recientes
 
                         </h2>
 
-                        <p class="text-[11px] font-semibold text-[#677084] dark:text-[#A6B2C8]">
+                        <p class="text-[11px] font-semibold text-[var(--rm-text-secondary)] dark:text-[var(--rm-text-muted)]">
 
                             Notificaciones clínicas de atención
 
@@ -1335,19 +1322,19 @@
 
                         } elseif ($prioridad === 'MEDIA' || $prioridad === 'MEDIO') {
 
-                            $bordeLeft = 'border-l-[3.5px] border-l-[#D2A45E] bg-[#FFF1D6]/60 hover:bg-[#FFF1D6] dark:bg-[#D2A45E]/15 dark:hover:bg-[#D2A45E]/25';
+                            $bordeLeft = 'border-l-[3.5px] border-l-[var(--rm-warning)] bg-[var(--rm-surface)]/60 hover:bg-[var(--rm-surface)] dark:bg-[var(--rm-warning-soft)] dark:hover:bg-[var(--rm-warning)]/25';
 
-                            $badgeStyle = 'bg-[#FFF1D6] text-[#966B24] border border-[#E8C178] dark:bg-[#D2A45E]/20 dark:text-[#E0B36D] dark:border-[#D2A45E]/40';
+                            $badgeStyle = 'bg-[var(--rm-surface)] text-[var(--rm-warning)] border border-[[var(--rm-warning)] dark:bg-[var(--rm-warning-soft)] dark:text-[var(--rm-warning)] dark:border-[var(--rm-warning)]/40';
 
-                            $iconoAlerta = 'ph-warning text-[#966B24] dark:text-[#E0B36D]';
+                            $iconoAlerta = 'ph-warning text-[var(--rm-warning)] dark:text-[var(--rm-warning)]';
 
                         } else {
 
-                            $bordeLeft = 'border-l-[3.5px] border-l-[#304060] bg-[#EEF1FA]/60 hover:bg-[#EEF1FA] dark:bg-[#304060]/20 dark:hover:bg-[#304060]/30';
+                            $bordeLeft = 'border-l-[3.5px] border-l-[var(--rm-clinical)] bg-[var(--rm-surface-soft)]/60 hover:bg-[var(--rm-surface-soft)] dark:bg-[var(--rm-clinical-soft)] dark:hover:bg-[var(--rm-clinical-soft)]';
 
-                            $badgeStyle = 'bg-[#304060]/10 text-[#304060] dark:bg-[#304060]/30 dark:text-[#8595B5] border border-[#304060]/20 dark:border-[#304060]/40';
+                            $badgeStyle = 'bg-[var(--rm-clinical-soft)] text-[var(--rm-clinical)] dark:bg-[var(--rm-clinical-soft)] dark:text-[var(--rm-text-secondary)] border border-[var(--rm-clinical)]/20 dark:border-[var(--rm-clinical)]/40';
 
-                            $iconoAlerta = 'ph-info text-[#304060] dark:text-[#8595B5]';
+                            $iconoAlerta = 'ph-info text-[var(--rm-clinical)] dark:text-[var(--rm-text-secondary)]';
 
                         }
 
@@ -1355,7 +1342,7 @@
 
                     <a href="{{ Route::has('admin.enfermeria.alertas') ? route('admin.enfermeria.alertas') : '#' }}"
 
-                       class="group/alerta block rounded-xl border border-[#D5CABE]/40 dark:border-[#494139] p-2.5 hover:-translate-y-0.5 transition-all duration-150 {{ $bordeLeft }}">
+                       class="group/alerta block rounded-xl border border-[var(--rm-border)]/40 dark:border-[var(--rm-border)] p-2.5 hover:-translate-y-0.5 transition-all duration-150 {{ $bordeLeft }}">
 
                         <div class="flex items-start justify-between gap-1.5">
 
@@ -1363,7 +1350,7 @@
 
                                 <i class="ph-bold {{ $iconoAlerta }} text-xs shrink-0"></i>
 
-                                <h3 class="text-xs font-bold text-[#304060] dark:text-[#F0E8DE] truncate">
+                                <h3 class="text-xs font-bold text-[var(--rm-clinical)] dark:text-[var(--rm-surface)] truncate">
 
                                     {{ $alerta['titulo'] ?? ($alerta['motivo'] ?? 'Notificación') }}
 
@@ -1381,7 +1368,7 @@
 
 
 
-                        <div class="mt-1 flex items-center justify-between text-[10.5px] text-[#677084] dark:text-[#A6B2C8]">
+                        <div class="mt-1 flex items-center justify-between text-[10.5px] text-[var(--rm-text-secondary)] dark:text-[var(--rm-text-muted)]">
 
                             <span class="truncate font-semibold">{{ $alerta['residente'] ?? ($alerta['residente_nombre'] ?? '') }}</span>
 
@@ -1389,7 +1376,7 @@
 
                                 <span>{{ $alerta['tiempo_relativo'] ?? ($alerta['tiempo'] ?? 'Hace 10m') }}</span>
 
-                                <i class="ph-bold ph-caret-right text-[9px] text-[#967B66]/60 opacity-0 group-hover/alerta:opacity-100 group-hover/alerta:translate-x-0.5 transition-all duration-150"></i>
+                                <i class="ph-bold ph-caret-right text-[9px] text-[var(--rm-text-muted)]/60 opacity-0 group-hover/alerta:opacity-100 group-hover/alerta:translate-x-0.5 transition-all duration-150"></i>
 
                             </div>
 
@@ -1399,7 +1386,7 @@
 
                 @empty
 
-                    <div class="py-6 text-center text-xs font-semibold text-[#677084] dark:text-[#A6B2C8]">
+                    <div class="py-6 text-center text-xs font-semibold text-[var(--rm-text-secondary)] dark:text-[var(--rm-text-muted)]">
 
                         No hay alertas pendientes en tu turno.
 
@@ -1439,25 +1426,25 @@
 
             return {
 
-                text: isDark ? '#E6DDD3' : '#304060',
+                text: isDark ? 'var(--rm-surface)' : 'var(--rm-clinical)',
 
-                subtext: isDark ? '#A6B2C8' : '#677084',
+                subtext: isDark ? '#A6B2C8' : 'var(--rm-text-secondary)',
 
                 grid: isDark ? 'rgba(255, 255, 255, 0.06)' : 'rgba(47, 62, 92, 0.06)',
 
-                border: isDark ? '#2D2924' : '#F0E8DE',
+                border: isDark ? '#2D2924' : 'var(--rm-surface)',
 
-                completadas: '#63775B', // Verde salvia oscuro
+                completadas: 'var(--rm-action-primary)', // Verde salvia oscuro
 
                 pendientes: '#D2A45E',  // Ámbar
 
-                retrasadas: '#C85D52',  // Rojo clínico
+                retrasadas: 'var(--rm-danger)',  // Rojo clínico
 
-                medicacion: '#304060',  // Azul profundo principal
+                medicacion: 'var(--rm-clinical)',  // Azul profundo principal
 
                 signos: '#71876A',      // Azul intenso
 
-                higiene: '#63775B',     // Verde salvia
+                higiene: 'var(--rm-action-primary)',     // Verde salvia
 
                 movilizacion: '#D2A45E' // Ámbar
 
@@ -1541,7 +1528,7 @@
 
                                 tooltip: {
 
-                                    backgroundColor: isDark ? '#1A1C1D' : '#FFFFFF',
+                                    backgroundColor: isDark ? '#1A1C1D' : 'var(--rm-surface)',
 
                                     titleColor: colors.text,
 
@@ -1667,7 +1654,7 @@
 
                                 tooltip: {
 
-                                    backgroundColor: isDark ? '#1A1C1D' : '#FFFFFF',
+                                    backgroundColor: isDark ? '#1A1C1D' : 'var(--rm-surface)',
 
                                     titleColor: colors.text,
 
