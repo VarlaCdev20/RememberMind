@@ -1,0 +1,55 @@
+/* ============================================================
+   REMEMBERMIND DESIGN SYSTEM — TOKENS / MOTION
+   Transiciones explícitas, fluidas y respetuosas con accesibilidad.
+   ============================================================ */
+
+:root {
+    /* ------------------------------------------------------------
+       DURACIONES NORMALIZADAS V2
+       ------------------------------------------------------------ */
+    --rm-duration-fast: 150ms;
+    --rm-duration-normal: 200ms;
+    --rm-duration-slow: 300ms;
+
+    /* ------------------------------------------------------------
+       TIMING FUNCTIONS NORMALIZADAS V2
+       ------------------------------------------------------------ */
+    --rm-ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+
+    /* Curvas complementarias y de retrocompatibilidad */
+    --rm-ease-default: var(--rm-ease-standard);
+    --rm-ease-in: cubic-bezier(0.4, 0, 1, 1);
+    --rm-ease-out: cubic-bezier(0, 0, 0.2, 1);
+
+    /* Transiciones preensambladas */
+    --rm-transition-color: color var(--rm-duration-fast) var(--rm-ease-standard),
+                           background-color var(--rm-duration-fast) var(--rm-ease-standard),
+                           border-color var(--rm-duration-fast) var(--rm-ease-standard);
+
+    --rm-transition-all: color var(--rm-duration-normal) var(--rm-ease-standard),
+                         background-color var(--rm-duration-normal) var(--rm-ease-standard),
+                         border-color var(--rm-duration-normal) var(--rm-ease-standard),
+                         box-shadow var(--rm-duration-normal) var(--rm-ease-standard),
+                         transform var(--rm-duration-normal) var(--rm-ease-standard),
+                         opacity var(--rm-duration-normal) var(--rm-ease-standard);
+}
+
+/* ------------------------------------------------------------
+   ACCESIBILIDAD: PREFERS-REDUCED-MOTION
+   ------------------------------------------------------------ */
+@media (prefers-reduced-motion: reduce) {
+    :root {
+        --rm-duration-fast: 0.01ms;
+        --rm-duration-normal: 0.01ms;
+        --rm-duration-slow: 0.01ms;
+    }
+
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}

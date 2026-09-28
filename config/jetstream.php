@@ -62,7 +62,7 @@ return [
         // Features::profilePhotos(),
         // Features::api(),
         // Features::teams(['invitations' => true]),
-        Features::accountDeletion(),
+        // La cuenta se inactiva; el borrado físico no forma parte del baseline.
     ],
 
     /*

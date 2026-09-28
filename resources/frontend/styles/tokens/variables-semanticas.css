@@ -1,0 +1,68 @@
+/* ============================================================
+   REMEMBERMIND — TOKENS SEMÁNTICOS (CAPA DE COMPATIBILIDAD V1 / BRIDGE)
+   Paleta: Café Tierra + Crema + Taupe + Mocha + Eucalipto/Oliva Claro
+   ============================================================ */
+
+:root {
+    /* Superficies y Fondos Base */
+    --color-fondo-app: var(--rm-bg-app, #CFC5BA);
+    --color-fondo-panel: var(--rm-surface, #E5DDD5);
+    --color-fondo-panel-alt: var(--rm-surface-soft, #D9CDC2);
+    --color-fondo-card: var(--rm-surface, #E5DDD5);
+    --color-fondo-card-suave: var(--rm-surface-soft, #D9CDC2);
+    --color-fondo-card-hover: var(--rm-surface-soft, #D9CDC2);
+    --color-fondo-input: var(--rm-input-bg, #DDD1C6);
+
+    /* Navegación y Shell */
+    --color-sidebar-bg: var(--rm-bg-shell, #C6B8AA);
+    --color-sidebar-texto: var(--rm-nav-text, #4C403A);
+
+    /* Cabecera / Topbar */
+    --color-header-bg: var(--rm-topbar-bg, #D2C6BC);
+    --color-header-borde: var(--rm-border, #A8998E);
+    --color-header-texto: var(--rm-text-primary, #302925);
+
+    /* Controles de Formulario e Inputs */
+    --color-input-bg: var(--rm-input-bg, #DDD1C6);
+    --color-input-borde: var(--rm-input-border, #A8998E);
+    --color-input-borde-hover: var(--rm-border-hover, #8E7D71);
+    --color-input-borde-focus: var(--rm-focus, #91A083);
+    --color-input-ring-focus: rgba(143, 161, 127, 0.35);
+    --color-input-texto: var(--rm-text-primary, #302925);
+    --color-input-placeholder: var(--rm-text-secondary, #66584F);
+
+    /* Tipografía y Textos */
+    --color-titulo: var(--rm-text-primary, #302925);
+    --color-subtitulo: var(--rm-text-secondary, #66584F);
+    --color-parrafo: var(--rm-text-body, #4C403A);
+    --color-texto-principal: var(--rm-text-primary, #302925);
+    --color-texto-secundario: var(--rm-text-secondary, #66584F);
+    --color-texto-apoyo: var(--rm-text-secondary, #66584F);
+    --color-texto-muted: var(--rm-text-muted, #81736A);
+    --color-label: var(--rm-text-primary, #302925);
+
+    /* Acciones y Botones */
+    --color-boton-principal: var(--rm-action-primary, #8FA17F);
+    --color-boton-principal-hover: var(--rm-action-primary-hover, #758A69);
+    --color-boton-principal-texto: var(--rm-text-on-primary, #F7F4F1);
+    --color-boton-secundario: var(--rm-surface, #E5DDD5);
+    --color-boton-secundario-texto: var(--rm-text-primary, #302925);
+    --color-boton-secundario-borde: var(--rm-border, #A8998E);
+    --color-boton-fantasma-bg: transparent;
+    --color-boton-fantasma-texto: var(--rm-text-secondary, #66584F);
+    --color-boton-fantasma-borde: transparent;
+    --color-boton-acento: var(--rm-action-primary, #8FA17F);
+    --color-boton-acento-hover: var(--rm-action-primary-hover, #758A69);
+
+    /* Bordes y Separadores */
+    --color-borde-general: var(--rm-border, #A8998E);
+    --color-borde-medio: var(--rm-border, #A8998E);
+    --color-borde-suave: var(--rm-border-soft, #C2B6AC);
+    --color-borde-fuerte: var(--rm-border-strong, #8D7D72);
+
+    /* Sombras Orgánicas */
+    --sombra-sm: var(--rm-shadow-sm, 0 1px 3px rgba(64, 42, 32, 0.08));
+    --sombra-card: var(--rm-shadow-card, 0 2px 8px -1px rgba(64, 42, 32, 0.10));
+    --sombra-md: var(--rm-shadow-md, 0 4px 12px -2px rgba(64, 42, 32, 0.12));
+    --sombra-lg: var(--rm-shadow-lg, 0 12px 24px -4px rgba(64, 42, 32, 0.15));
+}

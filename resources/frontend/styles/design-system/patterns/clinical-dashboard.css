@@ -1,0 +1,64 @@
+/* ============================================================
+   REMEMBERMIND DESIGN SYSTEM — PATTERNS / CLINICAL DASHBOARD
+   Tableros de guardia, semáforo de criticidad y colas asistenciales.
+   ============================================================ */
+
+.rm-clinical-triage {
+    display: flex;
+    align-items: center;
+    gap: var(--rm-space-2);
+    padding: var(--rm-space-2) var(--rm-space-3);
+    border-radius: var(--rm-radius-input);
+    font-size: var(--rm-font-label);
+    font-weight: var(--rm-font-weight-semibold);
+}
+
+.rm-clinical-triage-critical {
+    background-color: var(--rm-state-danger-bg);
+    color: var(--rm-state-danger-text);
+    border: 1px solid var(--rm-state-danger-border);
+}
+
+.rm-clinical-triage-warning {
+    background-color: var(--rm-state-warning-bg);
+    color: var(--rm-state-warning-text);
+    border: 1px solid var(--rm-state-warning-border);
+}
+
+.rm-clinical-triage-stable {
+    background-color: var(--rm-state-success-bg);
+    color: var(--rm-state-success-text);
+    border: 1px solid var(--rm-state-success-border);
+}
+
+/* Cola de Cuidados y Turnos */
+.rm-shift-timeline {
+    display: flex;
+    flex-direction: column;
+    gap: var(--rm-space-3);
+    position: relative;
+}
+
+.rm-shift-item {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--rm-space-3);
+    padding: var(--rm-space-3);
+    border-radius: var(--rm-radius-card);
+    background-color: var(--rm-surface);
+    border: 1px solid var(--rm-border);
+    transition: var(--rm-transition-all);
+}
+
+.rm-shift-item:hover {
+    border-color: var(--rm-border-hover);
+    box-shadow: var(--rm-shadow-sm);
+}
+
+.rm-shift-time {
+    font-family: var(--rm-font-mono);
+    font-size: var(--rm-font-label);
+    font-weight: var(--rm-font-weight-bold);
+    color: var(--rm-text-title);
+    min-width: 48px;
+}

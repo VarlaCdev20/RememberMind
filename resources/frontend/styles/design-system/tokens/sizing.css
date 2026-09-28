@@ -1,0 +1,35 @@
+/* ============================================================
+   REMEMBERMIND DESIGN SYSTEM — TOKENS / SIZING
+   Dimensiones estándar para controles interactivos, iconos y avatares.
+   ============================================================ */
+
+:root {
+    /* ------------------------------------------------------------
+       1. ALTURAS DE CONTROLES
+       ------------------------------------------------------------ */
+    --rm-control-sm: 36px; /* control pequeño */
+    --rm-control-md: 40px; /* control estándar */
+    --rm-control-lg: 44px; /* control destacado */
+
+    /* Aliases para compatibilidad */
+    --rm-control-height: var(--rm-control-md);
+    --rm-control-height-sm: var(--rm-control-sm);
+    --rm-control-height-lg: var(--rm-control-lg);
+
+    /* ------------------------------------------------------------
+       2. DIMENSIONES DE ICONOS
+       ------------------------------------------------------------ */
+    --rm-icon-sm: 16px; /* icono pequeño */
+    --rm-icon-md: 20px; /* icono mediano */
+    --rm-icon-lg: 24px; /* icono grande */
+    --rm-icon-xl: 32px; /* icono extra grande */
+
+    /* ------------------------------------------------------------
+       3. DIMENSIONES DE AVATARES Y MONOGRAMAS
+       ------------------------------------------------------------ */
+    --rm-avatar-sm: 32px; /* avatar pequeño */
+    --rm-avatar-md: 40px; /* avatar mediano */
+    --rm-avatar-lg: 56px; /* avatar grande */
+    --rm-avatar-xl: 72px; /* avatar extra grande */
+    --rm-avatar-2xl: 96px; /* avatar destacado */
+}

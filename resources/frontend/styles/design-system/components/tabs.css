@@ -1,0 +1,131 @@
+/* ============================================================
+   REMEMBERMIND DESIGN SYSTEM — COMPONENTS / TABS
+   Navegación horizontal normalizada:
+   Paleta Tierra + Eucalipto/Oliva Claro
+   ============================================================ */
+
+:root {
+    /* ------------------------------------------------------------
+       CONTRATO DE TABS (PESTAÑAS)
+       ------------------------------------------------------------ */
+    --rm-tab-text: var(--rm-text-secondary); /* texto */
+    --rm-tab-active-text: var(--rm-action-primary-active); /* activa */
+    --rm-tab-active-border: var(--rm-action-primary); /* indicador */
+    --rm-tab-active-bg: transparent; /* fondo */
+
+    /* Aliases para compatibilidad */
+    --rm-tab-text-default: var(--rm-tab-text);
+    --rm-tab-text-selected: var(--rm-tab-active-text);
+    --rm-tab-underline-selected: var(--rm-tab-active-border);
+
+    /* Clinical Navigation Tabs (Ficha Clínica) */
+    --rm-tab-clinical-color: var(--rm-action-primary-hover);
+    --rm-tab-clinical-border: var(--rm-action-primary);
+    --rm-tab-clinical-bg: var(--rm-surface-soft);
+    --rm-tab-clinical-color-inactive: var(--rm-text-muted);
+
+}
+
+.rm-tabs {
+    display: flex;
+    align-items: center;
+    gap: var(--rm-space-2);
+    padding: var(--rm-space-1);
+    background-color: var(--rm-surface);
+    border: 1px solid var(--rm-border);
+    border-radius: var(--rm-radius-button);
+    overflow-x: auto;
+    user-select: none;
+    box-sizing: border-box;
+}
+
+.rm-tab-item {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--rm-space-2);
+    padding: var(--rm-space-2) var(--rm-space-4);
+    border-radius: var(--rm-radius-button);
+    font-family: var(--rm-font-family);
+    font-size: var(--rm-font-size-table);
+    font-weight: var(--rm-font-weight-bold);
+    color: var(--rm-tab-text);
+    background-color: transparent;
+    border: 1px solid transparent;
+    transition: var(--rm-transition-all);
+    cursor: pointer;
+    white-space: nowrap;
+    text-decoration: none;
+    outline: none;
+}
+
+.rm-tab-item:hover:not(:disabled):not(.is-disabled) {
+    color: var(--rm-text-primary);
+    background-color: var(--rm-surface-soft);
+}
+
+.rm-tab-item-active,
+.rm-tab-item[aria-selected="true"],
+.rm-tab-item.is-selected {
+    color: var(--rm-tab-active-text) !important;
+    background-color: var(--rm-tab-active-bg) !important;
+    border-color: var(--rm-tab-active-border) !important;
+    box-shadow: none;
+}
+
+.rm-tab-item:disabled,
+.rm-tab-item[aria-disabled="true"],
+.rm-tab-item.is-disabled {
+    opacity: var(--rm-state-disabled-opacity);
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+.rm-tab-badge {
+    padding: 2px 8px;
+    border-radius: var(--rm-radius-pill);
+    font-size: var(--rm-font-size-meta);
+    font-weight: var(--rm-font-weight-extrabold);
+    background-color: var(--rm-surface-soft);
+    color: inherit;
+}
+
+
+/* Variante Underline Line Tabs (Canónica en Ficha Clínica) */
+.rm-tabs-line {
+    display: flex;
+    align-items: center;
+    gap: var(--rm-space-1);
+    border-bottom: 1px solid var(--rm-border);
+    overflow-x: auto;
+}
+
+.rm-tab-line-item {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--rm-space-2);
+    padding: var(--rm-space-2) var(--rm-space-4);
+    border-top-left-radius: var(--rm-radius-lg);
+    border-top-right-radius: var(--rm-radius-lg);
+    border-bottom: 2px solid transparent;
+    font-size: var(--rm-font-size-table);
+    font-weight: var(--rm-font-weight-bold);
+    color: var(--rm-text-muted);
+    background-color: transparent;
+    transition: var(--rm-transition-all);
+    cursor: pointer;
+    white-space: nowrap;
+    text-decoration: none;
+}
+
+.rm-tab-line-item:hover {
+    color: var(--rm-text-primary);
+    background-color: var(--rm-surface-soft);
+}
+
+.rm-tab-line-item.is-active,
+.rm-tab-line-item[aria-selected="true"] {
+    color: var(--rm-action-primary-hover) !important;
+    border-bottom-color: var(--rm-action-primary) !important;
+    background-color: var(--rm-surface-soft) !important;
+    font-weight: var(--rm-font-weight-extrabold) !important;
+}

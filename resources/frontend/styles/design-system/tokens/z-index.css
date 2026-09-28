@@ -1,0 +1,17 @@
+/* ============================================================
+   REMEMBERMIND DESIGN SYSTEM V2 — TOKENS / Z-INDEX
+   Escala de apilamiento vertical controlada para evitar colisiones.
+   ============================================================ */
+
+:root {
+    --rm-z-base: 0;                 /* Contenido normal de página */
+    --rm-z-sticky: 100;             /* Cabeceras de tabla fijas y filtros sticky */
+    --rm-z-dropdown: 200;           /* Menús desplegables, autocompletes y popovers */
+    --rm-z-topbar: 300;             /* Barra superior institucional fija */
+    --rm-z-sidebar: 400;            /* Menú lateral o drawer de navegación móvil */
+    --rm-z-drawer: 500;             /* Paneles laterales contextuales */
+    --rm-z-modal-backdrop: 990;     /* Fondo oscurecedor de diálogo modal */
+    --rm-z-modal: 1000;             /* Ventana modal centrada */
+    --rm-z-toast: 1100;             /* Notificaciones flotantes y feedback temporal */
+    --rm-z-tooltip: 1200;           /* Tooltips flotantes de alta prioridad */
+}

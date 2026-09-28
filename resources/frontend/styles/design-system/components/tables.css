@@ -1,0 +1,146 @@
+/* ============================================================
+   REMEMBERMIND DESIGN SYSTEM — COMPONENTS / TABLES
+   Patrón de tablas clínicas y operativas normalizado:
+   - Tipografía oficial: Nunito Sans 14–15px / 600 (var(--rm-font-size-table))
+   - Densidades: regular (44px min-height) y compact (38px min-height)
+   - Cabecera: uppercase selectivo con contraste alto
+   - Datos de personas: NO uppercase global
+   - Estados: hover, selected, inactive, empty
+   ============================================================ */
+
+:root {
+    /* ------------------------------------------------------------
+       CONTRATO DE TABLAS
+       ------------------------------------------------------------ */
+    --rm-table-bg: var(--rm-surface); /* fondo */
+    --rm-table-header-bg: var(--rm-surface-soft); /* encabezado */
+    --rm-table-border: var(--rm-border-soft); /* borde */
+    --rm-table-row-hover: var(--rm-surface-soft); /* hover */
+    --rm-table-row-selected: var(--rm-action-primary-soft); /* seleccionada */
+    --rm-table-cell-padding-y: 12px; /* padding vertical */
+    --rm-table-cell-padding-x: 16px; /* padding horizontal */
+
+    /* Alias para compatibilidad */
+    --rm-table-row-bg: var(--rm-table-bg);
+}
+
+/* Contenedor de Tabla */
+.rm-table-container,
+.rm-table-wrapper,
+.rm-table-card {
+    width: 100%;
+    overflow: hidden;
+    background-color: var(--rm-table-bg);
+    border: 1px solid var(--rm-border);
+    border-radius: var(--rm-radius-card);
+    box-shadow: var(--rm-shadow-sm);
+    transition: var(--rm-transition-all);
+}
+
+.rm-table {
+    width: 100%;
+    text-align: left;
+    border-collapse: collapse;
+    font-family: var(--rm-font-family);
+    font-size: var(--rm-font-size-table);
+    font-weight: var(--rm-font-weight-semibold);
+    color: var(--rm-text-primary);
+}
+
+/* Cabecera */
+.rm-table thead,
+.rm-table-header {
+    background-color: var(--rm-table-header-bg);
+    border-bottom: 1px solid var(--rm-border);
+}
+
+.rm-table thead th,
+.rm-table-header th {
+    padding: var(--rm-table-cell-padding-y) var(--rm-table-cell-padding-x);
+    font-family: var(--rm-font-family);
+    font-size: var(--rm-font-size-meta);
+    font-weight: var(--rm-font-weight-extrabold);
+    text-transform: uppercase;
+    letter-spacing: var(--rm-letter-spacing-wide);
+    color: var(--rm-text-primary);
+    white-space: nowrap;
+}
+
+/* Filas y celdas */
+.rm-table tbody tr,
+.rm-table-row {
+    border-bottom: 1px solid var(--rm-table-border);
+    background-color: var(--rm-table-row-bg);
+    transition: background-color var(--rm-duration-fast) var(--rm-ease-standard);
+    min-height: 44px;
+}
+
+.rm-table tbody td,
+.rm-table-cell {
+    padding: var(--rm-table-cell-padding-y) var(--rm-table-cell-padding-x);
+    vertical-align: middle;
+    color: var(--rm-text-primary);
+    text-transform: none; /* Regla estricta: NO uppercase global */
+}
+
+/* Hover de fila */
+.rm-table tbody tr:hover,
+.rm-table-row:hover {
+    background-color: var(--rm-table-row-hover);
+}
+
+/* Fila seleccionada */
+.rm-table tbody tr.is-selected,
+.rm-table-row.is-selected {
+    background-color: var(--rm-table-row-selected) !important;
+    border-color: var(--rm-action-primary);
+}
+
+/* Fila inactiva */
+.rm-table tbody tr.is-inactive,
+.rm-table-row.is-inactive {
+    opacity: 0.65;
+    background-color: var(--rm-surface-muted);
+}
+
+/* Densidad Compacta */
+.rm-table-compact tbody td,
+.rm-table.is-compact tbody td {
+    padding: var(--rm-space-2) var(--rm-space-3);
+    min-height: 38px;
+    font-size: var(--rm-font-size-meta);
+}
+
+.rm-table-compact thead th,
+.rm-table.is-compact thead th {
+    padding: var(--rm-space-2) var(--rm-space-3);
+    font-size: 12px;
+}
+
+/* Estado Vacío de Tabla */
+.rm-table-empty {
+    padding: var(--rm-space-10) var(--rm-space-5);
+    text-align: center;
+    color: var(--rm-text-secondary);
+}
+
+/* Modo oscuro */
+.dark .rm-table-container,
+.dark .rm-table-wrapper {
+    background-color: var(--rm-surface);
+    border-color: var(--rm-border);
+}
+
+.dark .rm-table thead th {
+    background-color: var(--rm-surface-soft);
+    color: var(--rm-text-primary);
+}
+
+.dark .rm-table tbody tr {
+    background-color: var(--rm-surface);
+    border-bottom-color: var(--rm-border-soft);
+}
+
+.dark .rm-table tbody tr:hover {
+    background-color: var(--rm-surface-soft);
+}

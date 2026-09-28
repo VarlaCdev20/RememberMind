@@ -1,0 +1,83 @@
+/* ============================================================
+   REMEMBERMIND DESIGN SYSTEM — TOKENS / ACCESSIBILITY
+   Garantiza foco visible, respeto a lectores de pantalla y soporte asistivo.
+   ============================================================ */
+
+:root {
+    --rm-focus-ring-color: var(--rm-accent);
+    --rm-focus-ring-offset: 2px;
+    --rm-focus-ring-width: 2px;
+}
+
+/* Foco de teclado perceptible y accesible */
+:focus-visible {
+    outline: var(--rm-focus-ring-width) solid var(--rm-focus-ring-color) !important;
+    outline-offset: var(--rm-focus-ring-offset) !important;
+}
+
+/* Estados deshabilitados:
+   NOTA ARQUITECTÓNICA: [aria-disabled="true"] comunica el estado a tecnologías asistivas.
+   La lógica en Blade/Livewire/DOM debe ser quien impida materialmente la acción
+   (atributo disabled, validación y autorización del backend).
+   CSS aplica pointer-events: none y opacidad como refuerzo visual, nunca como control de seguridad. */
+:disabled,
+[aria-disabled="true"] {
+    cursor: not-allowed !important;
+    opacity: var(--rm-state-disabled-opacity) !important;
+    pointer-events: none;
+}
+
+/* Ocultación visual para lectores de pantalla */
+.rm-sr-only {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    padding: 0 !important;
+    margin: -1px !important;
+    overflow: hidden !important;
+    clip: rect(0, 0, 0, 0) !important;
+    white-space: nowrap !important;
+    border: 0 !important;
+}
+
+/* Respeto de preferencias de movimiento reducido */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}
+
+/* Refuerza separación y foco sin cambiar la composición en alto contraste. */
+@media (prefers-contrast: more) {
+    :root {
+        --rm-border: var(--rm-border-strong);
+        --rm-border-soft: var(--rm-border);
+        --rm-focus-ring-width: 3px;
+    }
+
+    .rm-card,
+    .rm-chart-card,
+    .rm-modal,
+    .rm-drawer {
+        border-width: 2px;
+    }
+}
+
+@media (forced-colors: active) {
+    :focus-visible {
+        outline-color: Highlight !important;
+    }
+
+    .rm-card,
+    .rm-chart-card,
+    .rm-modal,
+    .rm-drawer,
+    .rm-btn {
+        border: 1px solid CanvasText;
+    }
+}

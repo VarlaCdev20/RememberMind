@@ -1,0 +1,172 @@
+/* ============================================================
+   REMEMBERMIND DESIGN SYSTEM — COMPONENTS / MODALS
+   Modales Unificados con la misma jerarquía de superficies:
+   - Contenedor cálido: var(--rm-modal-bg)
+   - Header marcado: var(--rm-surface-soft)
+   - Body suave: var(--rm-surface)
+   - Footer claro y limpio: var(--rm-surface-soft)
+   - Bordes: var(--rm-modal-border)
+   - Totalmente integrado en altura (max-height: calc(100vh - 32px))
+   ============================================================ */
+
+:root {
+    /* ------------------------------------------------------------
+       CONTRATO DE MODALES
+       ------------------------------------------------------------ */
+    --rm-modal-bg: var(--rm-surface-raised); /* fondo modal */
+    --rm-modal-radius: var(--rm-radius-xl); /* radio */
+    --rm-modal-shadow: var(--rm-shadow-overlay); /* sombra */
+    --rm-modal-border: var(--rm-border-soft); /* borde */
+
+    --rm-modal-sm: 420px;
+    --rm-modal-md: 560px;
+    --rm-modal-lg: 720px;
+    --rm-modal-xl: 900px;
+}
+
+.rm-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--rm-modal-overlay, rgba(64, 42, 32, 0.45));
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    padding: var(--rm-space-4);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+}
+
+@media (max-height: 800px) {
+    .rm-modal-backdrop {
+        align-items: flex-start;
+        padding-top: var(--rm-space-3);
+        padding-bottom: var(--rm-space-3);
+    }
+}
+
+.rm-modal {
+    width: 100%;
+    margin: auto 0;
+    background-color: var(--rm-modal-bg);
+    border: 1px solid var(--rm-modal-border);
+    border-radius: var(--rm-modal-radius);
+    box-shadow: var(--rm-modal-shadow);
+    display: flex;
+    flex-direction: column;
+    max-height: calc(100vh - 32px);
+    position: relative;
+    overflow: hidden;
+    animation: rm-modal-in var(--rm-duration-normal) var(--rm-ease-out);
+    box-sizing: border-box;
+}
+
+.rm-modal-panel {
+    isolation: isolate;
+}
+
+.rm-modal-panel::before {
+    content: '';
+    position: absolute;
+    z-index: -1;
+    width: 220px;
+    height: 220px;
+    top: -150px;
+    right: -100px;
+    border-radius: 9999px;
+    background: radial-gradient(circle, color-mix(in srgb, var(--rm-action-primary) 12%, transparent), transparent 70%);
+    pointer-events: none;
+}
+
+@media (max-height: 700px) {
+    .rm-modal {
+        max-height: calc(100vh - 20px);
+    }
+}
+
+/* Tamaños */
+.rm-modal-sm { max-width: var(--rm-modal-sm); }
+.rm-modal-md { max-width: var(--rm-modal-md); }
+.rm-modal-lg { max-width: var(--rm-modal-lg); }
+.rm-modal-xl { max-width: var(--rm-modal-xl); }
+
+/* Partes del Modal Compacto y Totalmente Accesible */
+.rm-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--rm-space-3) var(--rm-space-5);
+    border-bottom: 1px solid var(--rm-modal-border);
+    background-color: var(--rm-surface-soft);
+    flex-shrink: 0;
+}
+
+.rm-modal-title {
+    font-family: var(--rm-font-family);
+    font-size: var(--rm-font-size-card);
+    font-weight: var(--rm-font-weight-bold);
+    color: var(--rm-text-primary);
+    letter-spacing: var(--rm-letter-spacing-tight);
+}
+
+.rm-modal-body {
+    padding: var(--rm-space-5);
+    overflow-y: auto;
+    flex: 1 1 auto;
+    min-height: 0;
+    background-color: var(--rm-surface);
+    overscroll-behavior: contain;
+}
+
+.rm-modal-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--rm-space-2);
+    padding: var(--rm-space-3) var(--rm-space-5);
+    border-top: 1px solid var(--rm-modal-border);
+    background-color: var(--rm-surface-soft);
+    flex-shrink: 0;
+}
+
+@keyframes rm-modal-in {
+    from {
+        opacity: 0;
+        transform: translateY(8px) scale(0.98);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* ============================================================
+   MODO OSCURO - MODALES
+   ============================================================ */
+.dark .rm-modal {
+    background-color: var(--rm-surface-raised);
+    border-color: var(--rm-border-soft);
+    box-shadow: var(--rm-modal-shadow);
+    color: var(--rm-text-primary);
+}
+
+.dark .rm-modal-header {
+    background-color: var(--rm-surface-soft);
+    border-color: var(--rm-border-soft);
+}
+
+.dark .rm-modal-title {
+    color: var(--rm-text-primary);
+}
+
+.dark .rm-modal-body {
+    background-color: var(--rm-surface);
+    color: var(--rm-text-body);
+}
+
+.dark .rm-modal-footer {
+    background-color: var(--rm-surface-soft);
+    border-color: var(--rm-border-soft);
+}

@@ -1,0 +1,643 @@
+<?php
+
+namespace App\Frontend\Livewire\Admisiones;
+
+use App\Mail\PreadmisionDocumentosPendientesMail;
+use App\Models\Contacto;
+use App\Models\Documento;
+use App\Models\Preadmision;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
+use Livewire\Component;
+use Livewire\WithFileUploads;
+
+class PreadmisionWizard extends Component
+{
+    use WithFileUploads;
+
+    public int $paso = 1;
+
+    public int $totalPasos = 5;
+
+    // Paso 1: Identidad
+    public string $nombres = '';
+
+    public string $ap_paterno = '';
+
+    public string $ap_materno = '';
+
+    public string $ci = '';
+
+    public string $expedicion_ci = '';
+
+    public string $fecha_nac = '';
+
+    public string $genero = '';
+
+    public string $estado_civil = 'NO ESPECIFICADO';
+
+    public string $telefono = '';
+
+    public string $celular = '';
+
+    // Paso 2: Dirección
+    public string $departamento_residencia = '';
+
+    public string $ciudad_municipio = '';
+
+    public string $zona = '';
+
+    public string $calle = '';
+
+    public string $direccion_referencia = '';
+
+    // Paso 3: Familiar
+    public string $familiar_nombres = '';
+
+    public string $familiar_ap_paterno = '';
+
+    public string $familiar_ap_materno = '';
+
+    public string $familiar_ci = '';
+
+    public string $familiar_parentesco = '';
+
+    public string $familiar_celular = '';
+
+    public string $familiar_correo = '';
+
+    public string $familiar_direccion = '';
+
+    // Paso 4: Caso
+    public string $motivo_ingreso = '';
+
+    public string $procedencia_ingreso = '';
+
+    public string $tipo_ingreso = 'REGULAR';
+
+    public string $permanencia = 'PERMANENTE';
+
+    public string $prioridad = 'MEDIA';
+
+    public string $descripcion_caso = '';
+
+    // Paso 5: Documentos subidos
+    public $doc_ci_adulto;
+
+    public $doc_ci_familiar;
+
+    public $doc_solicitud_ingreso;
+
+    // Documentos marcados para entregar en 48h
+    public array $docs_pendientes_48h = [];
+
+    public bool $guardadoExitoso = false;
+
+    public function mount(): void
+    {
+        abort_unless(auth()->user()?->can('admisiones.crear'), 403);
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────────
+    // CONFIGURACIÓN DE DOCUMENTOS
+    // ─────────────────────────────────────────────────────────────────────────────
+
+    public function configuracionDocumentos(): array
+    {
+        return [
+            [
+                'tipo' => 'CI_ADULTO',
+                'nombre' => 'CI del adulto mayor',
+                'descripcion' => 'Cédula de identidad vigente',
+                'grupo' => 'solicitante',
+                'bloquea_avance' => true,
+                'permite_48h' => false,
+                'requiere_firma' => false,
+                'es_generado_sistema' => false,
+                'obligatorio' => true,
+                'propiedad' => 'doc_ci_adulto',
+            ],
+            [
+                'tipo' => 'CI_FAMILIAR',
+                'nombre' => 'CI del familiar responsable',
+                'descripcion' => 'Documento del tutor o responsable',
+                'grupo' => 'solicitante',
+                'bloquea_avance' => true,
+                'permite_48h' => false,
+                'requiere_firma' => false,
+                'es_generado_sistema' => false,
+                'obligatorio' => true,
+                'propiedad' => 'doc_ci_familiar',
+            ],
+            [
+                'tipo' => 'SOLICITUD_INGRESO',
+                'nombre' => 'Solicitud inicial de ingreso',
+                'descripcion' => 'Formulario de solicitud firmado',
+                'grupo' => 'solicitante',
+                'bloquea_avance' => false,
+                'permite_48h' => true,
+                'requiere_firma' => true,
+                'es_generado_sistema' => false,
+                'obligatorio' => true,
+                'propiedad' => 'doc_solicitud_ingreso',
+            ],
+            [
+                'tipo' => 'FICHA_PREADMISION',
+                'nombre' => 'Ficha institucional de preadmisión',
+                'descripcion' => 'Ficha con datos completos del caso',
+                'grupo' => 'institucional',
+                'bloquea_avance' => false,
+                'permite_48h' => false,
+                'requiere_firma' => true,
+                'es_generado_sistema' => true,
+                'obligatorio' => true,
+                'vista_pdf' => 'pdf.preadmision.ficha',
+                'archivo_pdf' => 'ficha-preadmision.pdf',
+            ],
+            [
+                'tipo' => 'AUTORIZACION_VALORACION',
+                'nombre' => 'Autorización de valoración inicial',
+                'descripcion' => 'Autorización para evaluación médica y de enfermería',
+                'grupo' => 'institucional',
+                'bloquea_avance' => false,
+                'permite_48h' => false,
+                'requiere_firma' => true,
+                'es_generado_sistema' => true,
+                'obligatorio' => true,
+                'vista_pdf' => 'pdf.preadmision.autorizacion-valoracion',
+                'archivo_pdf' => 'autorizacion-valoracion.pdf',
+            ],
+            [
+                'tipo' => 'CONSENTIMIENTO_DATOS',
+                'nombre' => 'Consentimiento de tratamiento de datos',
+                'descripcion' => 'Autorización de tratamiento de datos personales',
+                'grupo' => 'institucional',
+                'bloquea_avance' => false,
+                'permite_48h' => false,
+                'requiere_firma' => true,
+                'es_generado_sistema' => true,
+                'obligatorio' => true,
+                'vista_pdf' => 'pdf.preadmision.consentimiento-datos',
+                'archivo_pdf' => 'consentimiento-datos.pdf',
+            ],
+            [
+                'tipo' => 'ACTA_RECEPCION_DOCUMENTOS',
+                'nombre' => 'Acta de recepción de documentos',
+                'descripcion' => 'Constancia de documentos recibidos',
+                'grupo' => 'institucional',
+                'bloquea_avance' => false,
+                'permite_48h' => false,
+                'requiere_firma' => false,
+                'es_generado_sistema' => true,
+                'obligatorio' => true,
+                'vista_pdf' => 'pdf.preadmision.acta-recepcion',
+                'archivo_pdf' => 'acta-recepcion.pdf',
+            ],
+        ];
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────────
+    // NAVEGACIÓN
+    // ─────────────────────────────────────────────────────────────────────────────
+
+    public function siguiente(): void
+    {
+        if ($this->paso === 5) {
+            $this->validarPaso5();
+
+            return;
+        }
+
+        $this->validarPasoActual();
+
+        if ($this->paso < $this->totalPasos) {
+            $this->paso++;
+        }
+    }
+
+    public function anterior(): void
+    {
+        if ($this->paso > 1) {
+            $this->paso--;
+        }
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────────
+    // VALIDACIÓN PASO 5
+    // ─────────────────────────────────────────────────────────────────────────────
+
+    private function validarPaso5(): void
+    {
+        $bloqueantes = [];
+
+        foreach ($this->configuracionDocumentos() as $doc) {
+            if (! $doc['bloquea_avance'] || $doc['es_generado_sistema']) {
+                continue;
+            }
+
+            $propiedad = $doc['propiedad'];
+
+            if (empty($this->$propiedad)) {
+                $bloqueantes[] = $doc['nombre'];
+            }
+        }
+
+        if (! empty($bloqueantes)) {
+            $this->dispatch('swal', [
+                'icon' => 'warning',
+                'title' => 'Documentación obligatoria pendiente',
+                'text' => 'Debe subir los siguientes documentos para continuar: '.implode(', ', $bloqueantes).'.',
+            ]);
+
+            return;
+        }
+
+        foreach ($this->configuracionDocumentos() as $doc) {
+            if (! $doc['permite_48h'] || $doc['es_generado_sistema']) {
+                continue;
+            }
+
+            $propiedad = $doc['propiedad'];
+            $tipo = $doc['tipo'];
+
+            if (empty($this->$propiedad)) {
+                if (! in_array($tipo, $this->docs_pendientes_48h, true)) {
+                    $this->docs_pendientes_48h[] = $tipo;
+                }
+            } else {
+                $this->docs_pendientes_48h = array_values(
+                    array_filter($this->docs_pendientes_48h, fn ($t) => $t !== $tipo)
+                );
+            }
+        }
+
+        $this->paso++;
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────────
+    // CONFIRMACIÓN FINAL
+    // ─────────────────────────────────────────────────────────────────────────────
+
+    public function confirmarPreadmision(): void
+    {
+        if ($this->guardadoExitoso) {
+            return;
+        }
+
+        $this->validate($this->rules(), $this->mensajesValidacion());
+
+        try {
+            DB::beginTransaction();
+
+            $hayPendientes48h = ! empty($this->docs_pendientes_48h);
+            $fechaLimite48h = now()->addHours(48);
+
+            $contacto = Contacto::create([
+                'cod_contacto' => 'CTO_'.Str::upper(Str::random(12)),
+                'nombres' => $this->normalizar($this->familiar_nombres),
+                'apellido_paterno' => $this->normalizar($this->familiar_ap_paterno),
+                'apellido_materno' => $this->normalizar($this->familiar_ap_materno),
+                'numero_documento' => trim($this->familiar_ci) ?: null,
+                'celular' => trim($this->familiar_celular),
+                'correo' => trim($this->familiar_correo) ?: null,
+                'direccion' => $this->normalizar($this->familiar_direccion),
+                'estado' => 'ACTIVO',
+            ]);
+
+            $preadmision = Preadmision::create([
+                'cod_preadmision' => 'PRE_'.Str::upper(Str::random(12)),
+                'cod_contacto' => $contacto->cod_contacto,
+                'cod_usuario_registro' => auth()->user()->cod_usuario,
+                'estado' => 'PENDIENTE',
+                'fecha_solicitud' => now(),
+
+                'nombres' => $this->normalizar($this->nombres),
+                'apellido_paterno' => $this->normalizar($this->ap_paterno),
+                'apellido_materno' => $this->normalizar($this->ap_materno),
+                'numero_documento' => trim($this->ci),
+                'expedicion_documento' => $this->expedicion_ci,
+                'fecha_nacimiento' => $this->fecha_nac,
+                'genero' => $this->genero,
+                'estado_civil' => $this->estado_civil,
+                'telefono' => trim($this->celular ?: $this->telefono) ?: null,
+                'direccion' => implode(', ', array_filter([
+                    $this->normalizar($this->departamento_residencia),
+                    $this->normalizar($this->ciudad_municipio),
+                    $this->normalizar($this->zona),
+                    $this->normalizar($this->calle),
+                    $this->normalizar($this->direccion_referencia),
+                ])),
+
+                'motivo_ingreso' => $this->motivo_ingreso,
+                'procedencia' => $this->procedencia_ingreso,
+                'tipo_ingreso' => $this->tipo_ingreso,
+                'permanencia' => $this->permanencia,
+                'prioridad' => $this->prioridad,
+                'descripcion_caso' => $this->normalizar($this->descripcion_caso),
+            ]);
+
+            $docsPendientesNombres = [];
+
+            foreach ($this->configuracionDocumentos() as $docConfig) {
+                if ($docConfig['es_generado_sistema']) {
+                    continue;
+                }
+
+                $tipo = $docConfig['tipo'];
+                $propiedad = $docConfig['propiedad'];
+                $archivo = $this->$propiedad;
+                $esPendiente48h = in_array($tipo, $this->docs_pendientes_48h, true) && empty($archivo);
+
+                if (! empty($archivo) && ! is_string($archivo)) {
+                    $path = $archivo->store("preadmisiones/{$preadmision->cod_pre}", 'public');
+
+                    Documento::create([
+                        'cod_documento' => 'DOC_'.Str::upper(Str::random(12)),
+                        'cod_preadmision' => $preadmision->cod_preadmision,
+                        'cod_contacto' => $contacto->cod_contacto,
+                        'tipo_documento' => $tipo,
+                        'nombre' => $archivo->getClientOriginalName(),
+                        'ruta_archivo' => $path,
+                        'tipo_archivo' => $archivo->getMimeType() ?: 'application/octet-stream',
+                        'hash_archivo' => hash_file('sha256', Storage::disk('public')->path($path)),
+                        'estado' => 'VIGENTE',
+                        'observacion' => $docConfig['grupo'],
+                    ]);
+                } elseif ($esPendiente48h) {
+                    $docsPendientesNombres[] = $docConfig['nombre'];
+                }
+            }
+
+            $dirPdf = "preadmisiones/{$preadmision->cod_pre}/institucionales";
+            Storage::disk('public')->makeDirectory($dirPdf);
+
+            $todosGenerados = true;
+
+            foreach ($this->configuracionDocumentos() as $docConfig) {
+                if (! $docConfig['es_generado_sistema']) {
+                    continue;
+                }
+
+                $archivoPdf = null;
+                $estadoDoc = 'PENDIENTE_FIRMA';
+
+                try {
+                    $pdf = Pdf::loadView($docConfig['vista_pdf'], [
+                        'preadmision' => $preadmision,
+                        'fecha' => now()->format('d/m/Y H:i'),
+                    ]);
+
+                    $filePath = "{$dirPdf}/{$docConfig['archivo_pdf']}";
+                    Storage::disk('public')->put($filePath, $pdf->output());
+
+                    $archivoPdf = $filePath;
+                    $estadoDoc = 'GENERADO';
+                } catch (\Throwable) {
+                    $todosGenerados = false;
+                }
+
+                if ($archivoPdf) {
+                    Documento::create([
+                        'cod_documento' => 'DOC_'.Str::upper(Str::random(12)),
+                        'cod_preadmision' => $preadmision->cod_preadmision,
+                        'cod_contacto' => $contacto->cod_contacto,
+                        'tipo_documento' => $docConfig['tipo'],
+                        'nombre' => $docConfig['nombre'],
+                        'ruta_archivo' => $archivoPdf,
+                        'tipo_archivo' => 'application/pdf',
+                        'hash_archivo' => hash_file('sha256', Storage::disk('public')->path($archivoPdf)),
+                        'estado' => 'VIGENTE',
+                        'observacion' => 'Generado por el sistema al confirmar la preadmisión.',
+                    ]);
+                }
+            }
+
+            if (! empty($docsPendientesNombres) && ! empty($preadmision->familiar_correo)) {
+                try {
+                    Mail::to($preadmision->familiar_correo)
+                        ->send(new PreadmisionDocumentosPendientesMail(
+                            $preadmision,
+                            $docsPendientesNombres,
+                            $fechaLimite48h->format('d/m/Y H:i')
+                        ));
+                } catch (\Throwable) {
+                    // El correo no bloquea el flujo de preadmisión.
+                }
+            }
+
+            activity('Admisiones')
+                ->causedBy(auth()->user())
+                ->performedOn($preadmision)
+                ->log('Solicitud de preadmisión registrada y pendiente de revisión.');
+
+            DB::commit();
+
+            $textoExito = 'La solicitud quedó pendiente de revisión. Todavía no se creó un residente institucional.';
+
+            if (! empty($docsPendientesNombres)) {
+                $textoExito .= ' Se notificó al familiar sobre los documentos pendientes en 48 horas.';
+            }
+
+            $this->dispatch('swal', [
+                'title' => 'Preadmisión registrada',
+                'text' => $textoExito,
+                'icon' => 'success',
+            ]);
+
+            $this->guardadoExitoso = true;
+        } catch (\Throwable $e) {
+            DB::rollBack();
+
+            $this->dispatch('swal', [
+                'title' => 'Error al guardar',
+                'text' => 'No se pudo registrar la preadmisión: '.$e->getMessage(),
+                'icon' => 'error',
+            ]);
+        }
+    }
+
+    public function nuevaPreadmision(): void
+    {
+        $this->reset([
+            'paso',
+            'nombres',
+            'ap_paterno',
+            'ap_materno',
+            'ci',
+            'expedicion_ci',
+            'fecha_nac',
+            'genero',
+            'estado_civil',
+            'telefono',
+            'celular',
+            'departamento_residencia',
+            'ciudad_municipio',
+            'zona',
+            'calle',
+            'direccion_referencia',
+            'familiar_nombres',
+            'familiar_ap_paterno',
+            'familiar_ap_materno',
+            'familiar_ci',
+            'familiar_parentesco',
+            'familiar_celular',
+            'familiar_correo',
+            'familiar_direccion',
+            'motivo_ingreso',
+            'procedencia_ingreso',
+            'tipo_ingreso',
+            'permanencia',
+            'prioridad',
+            'descripcion_caso',
+            'doc_ci_adulto',
+            'doc_ci_familiar',
+            'doc_solicitud_ingreso',
+            'docs_pendientes_48h',
+            'guardadoExitoso',
+        ]);
+
+        $this->paso = 1;
+        $this->estado_civil = 'NO ESPECIFICADO';
+        $this->tipo_ingreso = 'REGULAR';
+        $this->permanencia = 'PERMANENTE';
+        $this->prioridad = 'MEDIA';
+
+        $this->resetValidation();
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────────
+    // RENDER
+    // ─────────────────────────────────────────────────────────────────────────────
+
+    public function render()
+    {
+        $docsConfig = $this->configuracionDocumentos();
+
+        $docsSolicitante = array_filter(
+            $docsConfig,
+            fn ($d) => ! $d['es_generado_sistema']
+        );
+
+        $docsInstitucionales = array_filter(
+            $docsConfig,
+            fn ($d) => $d['es_generado_sistema']
+        );
+
+        return view('livewire.admisiones.preadmision-wizard', [
+            'docsSolicitante' => array_values($docsSolicitante),
+            'docsInstitucionales' => array_values($docsInstitucionales),
+        ])->layout('layouts.sistema');
+    }
+
+    // VALIDACIONES DEL FORMULARIO
+
+    private function validarPasoActual(): void
+    {
+        $this->validate(match ($this->paso) {
+            1 => [
+                'nombres' => ['required', 'string', 'min:2', 'max:100'],
+                'ap_paterno' => ['required', 'string', 'min:2', 'max:80'],
+                'ap_materno' => ['nullable', 'string', 'min:2', 'max:80'],
+                'ci' => ['required', 'string', 'max:20', 'unique:preadmisiones,numero_documento'],
+                'expedicion_ci' => ['required', 'string', 'max:10'],
+                'fecha_nac' => ['required', 'date', 'before_or_equal:'.now()->subYears(60)->format('Y-m-d')],
+                'genero' => ['required', 'string'],
+                'estado_civil' => ['required', 'string', 'max:50'],
+                'telefono' => ['nullable', 'regex:/^[0-9+()\-\s]{7,20}$/'],
+                'celular' => ['nullable', 'regex:/^[0-9+()\-\s]{7,20}$/'],
+            ],
+            2 => [
+                'departamento_residencia' => ['required', 'string'],
+                'ciudad_municipio' => ['required', 'string', 'min:2'],
+                'zona' => ['required', 'string', 'min:2'],
+                'calle' => ['required', 'string', 'min:2'],
+            ],
+            3 => [
+                'familiar_nombres' => ['required', 'string', 'min:2'],
+                'familiar_ap_paterno' => ['required', 'string', 'min:2', 'max:80'],
+                'familiar_ci' => ['required', 'string', 'max:20'],
+                'familiar_parentesco' => ['required', 'string'],
+                'familiar_celular' => ['required', 'regex:/^[0-9+()\-\s]{7,20}$/'],
+                'familiar_correo' => ['nullable', 'email', 'max:140'],
+                'familiar_direccion' => ['required', 'string', 'min:5', 'max:255'],
+            ],
+            4 => [
+                'motivo_ingreso' => ['required', 'string'],
+                'procedencia_ingreso' => ['required', 'string'],
+                'tipo_ingreso' => ['required', 'string'],
+                'permanencia' => ['required', 'string'],
+                'prioridad' => ['required', 'string'],
+                'descripcion_caso' => ['required', 'string', 'min:10', 'max:2000'],
+            ],
+            default => [],
+        }, $this->mensajesValidacion());
+    }
+
+    private function rules(): array
+    {
+        $solicitudRule = in_array('SOLICITUD_INGRESO', $this->docs_pendientes_48h, true)
+            ? ['nullable']
+            : ['required', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:5120'];
+
+        return [
+            'nombres' => ['required', 'string', 'min:2', 'max:100'],
+            'ap_paterno' => ['required', 'string', 'min:2', 'max:80'],
+            'ap_materno' => ['nullable', 'string', 'min:2', 'max:80'],
+            'ci' => ['required', 'string', 'max:20', 'unique:preadmisiones,numero_documento'],
+            'expedicion_ci' => ['required', 'string', 'max:10'],
+            'fecha_nac' => ['required', 'date', 'before_or_equal:'.now()->subYears(60)->format('Y-m-d')],
+            'genero' => ['required', 'string'],
+            'estado_civil' => ['required', 'string', 'max:50'],
+            'telefono' => ['nullable', 'regex:/^[0-9+()\-\s]{7,20}$/'],
+            'celular' => ['nullable', 'regex:/^[0-9+()\-\s]{7,20}$/'],
+            'departamento_residencia' => ['required', 'string'],
+            'ciudad_municipio' => ['required', 'string'],
+            'zona' => ['required', 'string'],
+            'calle' => ['required', 'string'],
+            'familiar_nombres' => ['required', 'string', 'min:2'],
+            'familiar_ap_paterno' => ['required', 'string', 'min:2', 'max:80'],
+            'familiar_ci' => ['required', 'string', 'max:20'],
+            'familiar_parentesco' => ['required', 'string'],
+            'familiar_celular' => ['required', 'regex:/^[0-9+()\-\s]{7,20}$/'],
+            'familiar_correo' => ['nullable', 'email', 'max:140'],
+            'familiar_direccion' => ['required', 'string', 'min:5', 'max:255'],
+            'motivo_ingreso' => ['required', 'string'],
+            'procedencia_ingreso' => ['required', 'string'],
+            'tipo_ingreso' => ['required', 'string'],
+            'permanencia' => ['required', 'string'],
+            'prioridad' => ['required', 'string'],
+            'descripcion_caso' => ['required', 'string', 'min:10', 'max:2000'],
+            'doc_ci_adulto' => ['required', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:5120'],
+            'doc_ci_familiar' => ['required', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:5120'],
+            'doc_solicitud_ingreso' => $solicitudRule,
+        ];
+    }
+
+    private function mensajesValidacion(): array
+    {
+        return [
+            'required' => 'Este campo es obligatorio.',
+            'string' => 'El formato ingresado no es válido.',
+            'min' => 'Debe contener al menos :min caracteres.',
+            'max' => 'No debe exceder los :max caracteres.',
+            'unique' => 'Este valor ya se encuentra registrado.',
+            'date' => 'Debe ser una fecha válida.',
+            'before_or_equal' => 'La fecha no cumple con el requisito de edad mínima.',
+            'file' => 'Debe seleccionar un archivo válido.',
+            'mimes' => 'El archivo debe ser de tipo: :values.',
+            'exists' => 'El registro seleccionado no es válido.',
+            'email' => 'Ingrese un correo electrónico válido.',
+            'regex' => 'Ingrese un número de teléfono válido.',
+        ];
+    }
+
+    private function normalizar(?string $value): ?string
+    {
+        $value = trim((string) $value);
+
+        return $value === '' ? null : mb_strtoupper($value, 'UTF-8');
+    }
+}

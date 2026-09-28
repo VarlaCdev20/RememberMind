@@ -1,0 +1,91 @@
+/* ============================================================
+   REMEMBERMIND — PRIMITIVES
+   Valores físicos inmutables de base (Capa 1 de la Arquitectura)
+   ============================================================ */
+
+:root {
+
+   /* Cacao / café */
+   --rm-coffee-950: #2F2824;
+   --rm-coffee-900: #3B312C;
+   --rm-coffee-800: #4C403A;
+   --rm-coffee-700: #5E5049;
+   --rm-coffee-600: #6A5B52;
+   --rm-coffee-500: #7A695D;
+
+   /* Mocha / capuchino */
+   --rm-mocha-700: #78685F;
+   --rm-mocha-600: #8A786E;
+   --rm-mocha-500: #A59386;
+   --rm-mocha-400: #AE9C8F;
+   --rm-mocha-300: #BEADA2;
+   --rm-mocha-200: #CDBEB4;
+
+   /* Taupe */
+   --rm-taupe-700: #71625A;
+   --rm-taupe-600: #83736A;
+   --rm-taupe-500: #99877D;
+   --rm-taupe-400: #AB9B91;
+   --rm-taupe-300: #C2B4AA;
+   --rm-taupe-200: #D1C6BA;
+
+   /* Fondos */
+   --rm-earth-400: #AAA09A;
+   --rm-earth-300: #C9C2BB;
+   --rm-earth-200: #CFC5BA;
+   --rm-earth-150: #DDD4CC; /* Primitive dedicada para inputs/filtros */
+   --rm-earth-100: #E5DDD5;
+   --rm-earth-50:  #EEE8E2;
+
+   /* Salvia clínica — escala tomada de la identidad visual del landing. */
+   --rm-eucalyptus-800: #536B5A;
+   --rm-eucalyptus-700: #6F8B74;
+   --rm-eucalyptus-600: #88A68C;
+   --rm-eucalyptus-500: #A9C1AA;
+   --rm-eucalyptus-400: #BACABA;
+   --rm-eucalyptus-300: #C8D8C7;
+   --rm-eucalyptus-200: #D7E4D8;
+   --rm-eucalyptus-100: #E2EBE3;
+
+   /* Azul Clínico (Contrato Canónico) */
+   --rm-blue-clinical-700: #355D86; /* clinical strong */
+   --rm-blue-clinical-600: #527DAA; /* clinical base accesible */
+   --rm-blue-clinical-100: #DCE8F7; /* clinical soft, derivado de #A2C2EC */
+   --rm-blue-clinical-legacy: #1E3A8A; /* Valor auditado original de Ficha Clínica */
+
+   /* Estados clínicos */
+   --rm-green-700: #536B5A;
+   --rm-green-600: #6F8B74;
+   --rm-green-200: #E2EBE3;
+
+   --rm-blue-700: #355D86;
+   --rm-blue-600: #527DAA;
+   --rm-blue-200: #DCE8F7;
+
+   --rm-copper-700: #895535;
+   --rm-copper-600: #A56B42;
+   --rm-copper-200: #E9D4C5;
+
+   --rm-coral-700: #98594F;
+   --rm-coral-600: #C77969;
+   --rm-coral-200: #E7C6BD;
+
+   /* Monitoreo y Especialidades */
+   --rm-cyan-700: #2C6C73;
+   --rm-cyan-600: #3D8B93;
+   --rm-cyan-200: #D8ECEE;
+
+   --rm-violet-700: #7A5F89;
+   --rm-violet-600: #9276A2;
+   --rm-violet-200: #EADBEE;
+
+   /* Compatibilidad oliva */
+   --rm-olive-800: var(--rm-eucalyptus-800);
+   --rm-olive-700: var(--rm-eucalyptus-700);
+   --rm-olive-600: var(--rm-eucalyptus-600);
+   --rm-olive-500: var(--rm-eucalyptus-500);
+   --rm-olive-400: var(--rm-eucalyptus-400);
+   --rm-olive-300: var(--rm-eucalyptus-300);
+   --rm-olive-200: var(--rm-eucalyptus-200);
+   --rm-olive-100: var(--rm-eucalyptus-100);
+}

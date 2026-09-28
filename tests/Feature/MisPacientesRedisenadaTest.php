@@ -1,0 +1,327 @@
+<?php
+
+namespace Tests\Feature;
+
+use App\Frontend\Livewire\Enfermeria\Cuidados\MisPacientes;
+use App\Models\Admision;
+use App\Models\AdultoMayor;
+use App\Models\Alerta;
+use App\Models\Area;
+use App\Models\AsignacionResidenteJornada;
+use App\Models\Atencion;
+use App\Models\Cama;
+use App\Models\Habitacion;
+use App\Models\Jornada;
+use App\Models\OcupacionCama;
+use App\Models\Personal;
+use App\Models\PlanCuidado;
+use App\Models\SignoVital;
+use App\Models\TurnoEnfermeria;
+use App\Models\User;
+use Carbon\Carbon;
+use Database\Seeders\RolesAndPermissionsSeeder;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Livewire\Livewire;
+use Tests\TestCase;
+
+class MisPacientesRedisenadaTest extends TestCase
+{
+    use RefreshDatabase;
+
+    private User $enfermero;
+
+    private Area $area;
+
+    private Personal $personal;
+
+    private TurnoEnfermeria $turno;
+
+    private AdultoMayor $residenteEstable;
+
+    private AdultoMayor $residenteCritico;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->seed([RolesAndPermissionsSeeder::class]);
+
+        $this->enfermero = User::factory()->create([
+            'cod_usuario' => 'USU_ENF01',
+            'nombres' => 'Elena',
+            'ap_paterno' => 'Vargas',
+            'estado' => 'ACTIVO',
+        ]);
+        $this->enfermero->assignRole('ENFERMEROS');
+
+        $this->area = Area::create([
+            'cod_area' => 'ARE_ENF_TEST',
+            'nombre' => 'Enfermería de prueba',
+            'estado' => 'ACTIVA',
+        ]);
+        $this->personal = $this->enfermero->personal()->firstOrFail();
+
+        $this->turno = TurnoEnfermeria::create([
+            'cod_turno' => 'TUR_MANANA',
+            'nombre' => 'Turno Mañana',
+            'hora_inicio' => '07:00:00',
+            'hora_fin' => '15:00:00',
+            'tipo' => 'MANANA',
+            'orden' => 1,
+            'estado' => 'ACTIVO',
+            'fecha' => today()->toDateString(),
+            'activo' => true,
+        ]);
+
+        $hab101 = Habitacion::create([
+            'nombre' => 'Habitación 101',
+            'numero' => '101',
+            'codigo' => 'HAB-101',
+            'tipo' => 'DOBLE',
+            'estado' => 'ACTIVA',
+            'capacidad' => 2,
+        ]);
+
+        $camaA = Cama::create([
+            'cod_habitacion' => $hab101->cod_habitacion,
+            'numero' => '1',
+            'codigo' => 'CAMA-101A',
+            'estado' => 'OCUPADA',
+        ]);
+
+        $hab102 = Habitacion::create([
+            'nombre' => 'Habitación 102',
+            'numero' => '102',
+            'codigo' => 'HAB-102',
+            'tipo' => 'DOBLE',
+            'estado' => 'ACTIVA',
+            'capacidad' => 2,
+        ]);
+
+        $camaB = Cama::create([
+            'cod_habitacion' => $hab102->cod_habitacion,
+            'numero' => '2',
+            'codigo' => 'CAMA-102B',
+            'estado' => 'OCUPADA',
+        ]);
+
+        // Residente 1: Estable
+        $this->residenteEstable = AdultoMayor::factory()->create([
+            'cod_residente' => 'AM_ESTABLE',
+            'nombres' => 'Pedro',
+            'ap_paterno' => 'Gomez',
+            'ap_materno' => 'Paredes',
+            'ci' => '1234567',
+            'fecha_nac' => Carbon::now()->subYears(75)->toDateString(),
+            'genero' => 'MASCULINO',
+            'cod_est_adul' => 'EST_001',
+        ]);
+
+        $admisionEstable = Admision::create([
+            'cod_admision' => 'ADM_PAC_EST',
+            'cod_residente' => $this->residenteEstable->cod_residente,
+            'cod_usuario_registro' => $this->enfermero->cod_usuario,
+            'fecha_hora_admision' => now(),
+            'motivo_ingreso' => 'Preparación del escenario clínico',
+            'estado' => 'ACTIVA',
+        ]);
+
+        OcupacionCama::create([
+            'cod_residente' => $this->residenteEstable->cod_residente,
+            'cod_cama' => $camaA->cod_cama,
+            'cod_admision' => $admisionEstable->cod_admision,
+            'cod_usuario_registro' => $this->enfermero->cod_usuario,
+            'fecha_hora_asignacion' => now(),
+            'estado' => 'ACTIVO',
+        ]);
+
+        PlanCuidado::create([
+            'cod_residente' => $this->residenteEstable->cod_residente,
+            'cod_area' => $this->area->cod_area,
+            'cod_personal' => $this->personal->cod_personal,
+            'prioridad' => 'MODERADO',
+            'estado' => 'ACTIVO',
+            'fecha_hora_apertura' => today()->subMonth(),
+        ]);
+
+        // Residente 2: Requiere Atención (tiene alerta crítica)
+        $this->residenteCritico = AdultoMayor::factory()->create([
+            'cod_residente' => 'AM_CRITICO',
+            'nombres' => 'Luisa',
+            'ap_paterno' => 'Morales',
+            'ap_materno' => 'Rios',
+            'ci' => '7654321',
+            'fecha_nac' => Carbon::now()->subYears(82)->toDateString(),
+            'genero' => 'FEMENINO',
+            'cod_est_adul' => 'EST_001',
+        ]);
+
+        $admisionCritico = Admision::create([
+            'cod_admision' => 'ADM_PAC_CRI',
+            'cod_residente' => $this->residenteCritico->cod_residente,
+            'cod_usuario_registro' => $this->enfermero->cod_usuario,
+            'fecha_hora_admision' => now(),
+            'motivo_ingreso' => 'Preparación del escenario clínico',
+            'estado' => 'ACTIVA',
+        ]);
+
+        OcupacionCama::create([
+            'cod_residente' => $this->residenteCritico->cod_residente,
+            'cod_cama' => $camaB->cod_cama,
+            'cod_admision' => $admisionCritico->cod_admision,
+            'cod_usuario_registro' => $this->enfermero->cod_usuario,
+            'fecha_hora_asignacion' => now(),
+            'estado' => 'ACTIVO',
+        ]);
+
+        Alerta::create([
+            'cod_residente' => $this->residenteCritico->cod_residente,
+            'cod_turno' => $this->turno->cod_turno,
+            'tipo_alerta' => 'SIGNOS',
+            'nivel' => 'CRITICO',
+            'origen' => 'SIGNOS',
+            'motivo' => 'Presión arterial descompensada severa.',
+            'estado' => 'ABIERTA',
+            'cod_personal_responsable' => $this->personal->cod_personal,
+        ]);
+
+        // Asignar ambos al enfermero en su turno
+        $jornada = Jornada::create([
+            'cod_jornada' => 'JOR_MIS_PACIENTES',
+            'cod_turno' => $this->turno->cod_turno,
+            'fecha_jornada' => today(),
+            'estado' => 'ABIERTA',
+        ]);
+        AsignacionResidenteJornada::create([
+            'cod_residente' => $this->residenteEstable->cod_residente,
+            'cod_jornada' => $jornada->cod_jornada,
+            'cod_personal' => $this->personal->cod_personal,
+            'fecha_hora' => now(),
+            'nivel_supervision' => 'ESTANDAR',
+            'estado' => 'ACTIVA',
+            'observacion' => 'Asignación de turno de prueba',
+        ]);
+
+        AsignacionResidenteJornada::create([
+            'cod_residente' => $this->residenteCritico->cod_residente,
+            'cod_jornada' => $jornada->cod_jornada,
+            'cod_personal' => $this->personal->cod_personal,
+            'fecha_hora' => now(),
+            'nivel_supervision' => 'ESTANDAR',
+            'estado' => 'ACTIVA',
+            'observacion' => 'Asignación de turno de prueba',
+        ]);
+
+        // Signos para el residente estable
+        SignoVital::create([
+            'cod_residente' => $this->residenteEstable->cod_residente,
+            'cod_personal' => $this->personal->cod_personal,
+            'fecha' => today()->toDateString(),
+            'hora' => '08:30:00',
+            'presion_arterial' => '120/80',
+            'frecuencia_cardiaca' => 72,
+            'temperatura' => 36.5,
+            'saturacion' => 98,
+            'registrado_por' => $this->enfermero->cod_usuario,
+            'estado' => 'VIGENTE',
+        ]);
+
+        // Seguimiento para el residente estable
+        Atencion::create([
+            'cod_residente' => $this->residenteEstable->cod_residente,
+            'cod_area' => $this->area->cod_area,
+            'cod_personal' => $this->personal->cod_personal,
+            'cod_turno' => $this->turno->cod_turno,
+            'fecha' => today()->toDateString(),
+            'hora' => '09:00:00',
+            'estado_general' => 'ESTABLE',
+            'alimentacion' => 'COMPLETA',
+            'movilidad' => 'INDEPENDIENTE',
+            'sueno' => 'NORMAL',
+            'incidente' => false,
+            'requiere_medico' => false,
+        ]);
+    }
+
+    public function test_cabecera_institucional_y_vista_por_defecto_tabla(): void
+    {
+        $this->actingAs($this->enfermero);
+
+        Livewire::test(MisPacientes::class)
+            ->assertSee('Mis pacientes')
+            ->assertSee('Residentes asignados a tu turno actual')
+            ->assertSee('Pedro Gomez')
+            ->assertSee('Luisa Morales')
+            ->assertSee('HAB-101')
+            ->assertSee('HAB-102')
+            ->assertSee('75 años')
+            ->assertSee('82 años')
+            ->assertSee('MODERADO')
+            ->assertSee('PA 120/80')
+            ->assertSet('vistaModo', 'tabla');
+    }
+
+    public function test_filtro_por_estado_clinico(): void
+    {
+        $this->actingAs($this->enfermero);
+
+        // Al filtrar REQUIERE_ATENCION, solo Luisa debe aparecer
+        Livewire::test(MisPacientes::class)
+            ->set('filtroEstado', 'REQUIERE_ATENCION')
+            ->assertSee('Luisa Morales')
+            ->assertDontSee('Pedro Gomez');
+
+        // Al filtrar ESTABLE, solo Pedro debe aparecer
+        Livewire::test(MisPacientes::class)
+            ->set('filtroEstado', 'ESTABLE')
+            ->assertSee('Pedro Gomez')
+            ->assertDontSee('Luisa Morales');
+    }
+
+    public function test_busqueda_por_nombre_o_habitacion(): void
+    {
+        $this->actingAs($this->enfermero);
+
+        Livewire::test(MisPacientes::class)
+            ->set('search', 'Luisa')
+            ->assertSee('Luisa Morales')
+            ->assertDontSee('Pedro Gomez')
+            ->set('search', '101')
+            ->assertSee('Pedro Gomez')
+            ->assertDontSee('Luisa Morales');
+    }
+
+    public function test_conmutador_de_vista_lista_y_tarjetas(): void
+    {
+        $this->actingAs($this->enfermero);
+
+        Livewire::test(MisPacientes::class)
+            ->assertSet('vistaModo', 'tabla')
+            ->set('vistaModo', 'tarjetas')
+            ->assertSee('Pedro Gomez')
+            ->assertSee('Luisa Morales')
+            ->assertSee('Últimos Signos')
+            ->assertSee('Tareas de Turno')
+            ->assertSee('Seguimiento');
+    }
+
+    public function test_apertura_de_modales_de_accion_rapida(): void
+    {
+        $this->actingAs($this->enfermero);
+
+        Livewire::test(MisPacientes::class)
+            ->call('abrirRegistrarSignos', $this->residenteEstable->cod_residente)
+            ->assertSet('modalSignos', true)
+            ->assertSet('modalCodResidente', $this->residenteEstable->cod_residente)
+            ->call('abrirRegistrarSeguimiento', $this->residenteEstable->cod_residente)
+            ->assertSet('modalSeguimiento', true)
+            ->assertSet('segEstado', '')
+            ->assertSet('segAlimentacion', '')
+            ->assertSet('segMovilidad', '')
+            ->assertSet('segSueno', '')
+            ->call('abrirAdministrarMed', $this->residenteEstable->cod_residente)
+            ->assertSet('modalMed', true)
+            ->call('abrirReportarAlerta', $this->residenteEstable->cod_residente)
+            ->assertSet('modalAlerta', true);
+    }
+}

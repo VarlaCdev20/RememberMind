@@ -1,0 +1,28 @@
+/* ============================================================
+   REMEMBERMIND DESIGN SYSTEM — TOKENS / RADIUS
+   Definición balanceada y compacta para interfaces de centro geriátrico.
+   Nivel 1 (Escala) + Nivel 3 (Convenciones de Componente).
+   ============================================================ */
+
+:root {
+    /* ------------------------------------------------------------
+       NIVEL 1: ESCALA PRIMITIVA / BASE NORMALIZADA
+       ------------------------------------------------------------ */
+    --rm-radius-sm: 8px; /* radio pequeño */
+    --rm-radius-md: 12px; /* radio mediano */
+    --rm-radius-lg: 16px; /* radio grande */
+    --rm-radius-xl: 20px; /* radio extra grande */
+    --rm-radius-pill: 9999px; /* píldora */
+
+    /* ------------------------------------------------------------
+       NIVEL 3: CONVENCIONES DE COMPONENTE
+       ------------------------------------------------------------ */
+    --rm-radius-input: var(--rm-radius-md); /* campo */
+    --rm-radius-button: var(--rm-radius-md); /* botón */
+    --rm-radius-card: var(--rm-radius-lg); /* tarjeta */
+    --rm-radius-modal: var(--rm-radius-xl); /* modal */
+    --rm-radius-badge: var(--rm-radius-pill); /* badge */
+
+    /* Alias de retrocompatibilidad */
+    --rm-radius-panel: var(--rm-radius-lg);
+}

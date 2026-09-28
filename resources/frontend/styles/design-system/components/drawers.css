@@ -1,0 +1,352 @@
+/* ============================================================
+   REMEMBERMIND DESIGN SYSTEM — COMPONENTS / DRAWERS
+   GOLDEN REFERENCE PARA TODOS LOS PANELES LATERALES / DRAWERS
+   Reglas Globales:
+   - Claros, clínicos, cálidos, compactos, 100% NÍTITOS.
+   - APP → BACKDROP OSCURO SUAVE → PANEL LATERAL NÍTIDO.
+   - Scroll exclusivo en el BODY (Header y Footer siempre fijos/stickies).
+   - Reutilización de tokens globales de RememberMind.
+   ============================================================ */
+
+:root {
+    /* ------------------------------------------------------------
+       CONTRATO DE DRAWERS (PANELES LATERALES)
+       ------------------------------------------------------------ */
+    --rm-drawer-bg: var(--rm-surface-raised); /* fondo panel */
+    --rm-drawer-shadow: var(--rm-shadow-lg); /* sombra */
+
+    --rm-drawer-sm: 360px;
+    --rm-drawer-md: 480px;
+    --rm-drawer-lg: 640px;
+}
+
+/* 1. Backdrop / Overlay de fondo */
+.rm-drawer-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    background: var(--rm-modal-overlay, rgba(64, 42, 32, 0.45));
+    backdrop-filter: blur(0.5px);
+    -webkit-backdrop-filter: blur(0.5px);
+    transition: opacity 0.25s ease;
+}
+
+/* 2. Estructura Principal del Drawer (100% NÍTIDO, CÁLIDO Y CLÍNICO) */
+.rm-drawer {
+    position: relative;
+    z-index: 50;
+    background: var(--rm-drawer-bg) !important;
+    background-color: var(--rm-drawer-bg) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    filter: none !important;
+    border: 1px solid var(--rm-border-soft);
+    border-radius: var(--rm-radius-modal);
+    box-shadow: var(--rm-shadow-overlay);
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: var(--rm-drawer-lg);
+    max-width: 100vw;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    box-sizing: border-box;
+}
+
+@media (max-width: 1024px) {
+    .rm-drawer {
+        width: 80vw;
+        max-width: 85vw;
+    }
+}
+
+@media (max-width: 640px) {
+    .rm-drawer {
+        width: 100vw;
+        max-width: 100vw;
+        border-radius: var(--rm-radius-modal) 0 0 var(--rm-radius-modal);
+    }
+}
+
+/* Variaciones de ancho estándar */
+.rm-drawer-sm { width: var(--rm-drawer-sm); max-width: 100vw; }
+.rm-drawer-md { width: var(--rm-drawer-md); max-width: 100vw; }
+.rm-drawer-lg { width: var(--rm-drawer-lg); max-width: 100vw; }
+.rm-drawer-xl { width: var(--rm-drawer-lg); max-width: 100vw; }
+.rm-drawer-wide { width: min(100vw, 64rem); max-width: 100vw; }
+
+/* 3. Encabezado Fijo del Drawer */
+.rm-drawer-header {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: var(--rm-space-3) var(--rm-space-5);
+    border-bottom: 1px solid var(--rm-border-soft);
+    background-color: var(--rm-surface-soft) !important;
+    flex-shrink: 0;
+}
+
+.rm-drawer-header-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--rm-space-3);
+}
+
+.rm-drawer-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: var(--rm-font-size-meta);
+    font-weight: var(--rm-font-weight-extrabold);
+    text-transform: uppercase;
+    letter-spacing: var(--rm-letter-spacing-wide);
+    padding: 2px 8px;
+    border-radius: var(--rm-radius-pill);
+    background-color: var(--rm-action-primary-soft);
+    color: var(--rm-action-primary-active);
+    border: 1px solid var(--rm-action-primary);
+}
+
+.rm-drawer-title {
+    font-family: var(--rm-font-family);
+    font-size: var(--rm-font-size-card);
+    font-weight: var(--rm-font-weight-bold);
+    color: var(--rm-text-primary);
+    line-height: var(--rm-line-height-tight);
+}
+
+.rm-drawer-subtitle {
+    font-size: var(--rm-font-size-meta);
+    color: var(--rm-text-secondary);
+}
+
+/* 4. Cuerpo Scrolleable Exclusivo del Drawer */
+.rm-drawer-body {
+    padding: var(--rm-space-4) var(--rm-space-5);
+    overflow-y: auto;
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--rm-space-4);
+    overscroll-behavior: contain;
+    background-color: var(--rm-surface);
+}
+
+/* 5. Tarjeta Contextual de Residente / Paciente */
+.rm-drawer-resident {
+    background-color: var(--rm-surface-soft) !important;
+    border: 1px solid var(--rm-border-soft);
+    border-radius: var(--rm-radius-card);
+    padding: var(--rm-space-3) var(--rm-space-4);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--rm-space-3);
+    box-shadow: var(--rm-shadow-sm);
+}
+
+/* 6. Títulos de Sección */
+.rm-drawer-section {
+    font-size: var(--rm-font-size-meta);
+    font-weight: var(--rm-font-weight-extrabold);
+    text-transform: uppercase;
+    letter-spacing: var(--rm-letter-spacing-wide);
+    color: var(--rm-text-primary);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* 7. Fila de Métricas Clínicas (4 Columnas) */
+.rm-drawer-metrics {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--rm-space-2);
+}
+
+@media (max-width: 640px) {
+    .rm-drawer-metrics {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+.rm-drawer-metric-card {
+    background-color: var(--rm-surface) !important;
+    border: 1px solid var(--rm-border-soft);
+    border-radius: var(--rm-radius-card);
+    padding: var(--rm-space-2) var(--rm-space-3);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: relative;
+    overflow: hidden;
+    box-shadow: var(--rm-shadow-sm);
+}
+
+.rm-drawer-metric-card.metric-danger {
+    border-bottom: 2.5px solid var(--rm-danger);
+}
+
+.rm-drawer-metric-card.metric-warning {
+    border-bottom: 2.5px solid var(--rm-warning);
+}
+
+.rm-drawer-metric-card.metric-success {
+    border-bottom: 2.5px solid var(--rm-success);
+}
+
+.rm-drawer-metric-card.metric-info {
+    border-bottom: 2.5px solid var(--rm-info);
+}
+
+/* 8. Tarjetas y Bloques Internos */
+.rm-drawer-card {
+    background-color: var(--rm-surface) !important;
+    border: 1px solid var(--rm-border-soft);
+    border-radius: var(--rm-radius-card);
+    padding: var(--rm-space-4);
+    box-shadow: var(--rm-shadow-sm);
+    transition: border-color 0.2s ease;
+}
+
+.rm-drawer-card-highlight {
+    background-color: var(--rm-surface-soft) !important;
+    border: 1px solid var(--rm-border-soft);
+    border-radius: var(--rm-radius-card);
+    padding: var(--rm-space-4);
+    box-shadow: var(--rm-shadow-sm);
+}
+
+/* 9. Bloque Doble: Detalle Clínico + Registro Clínico (2 Columnas) */
+.rm-drawer-clinical-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--rm-space-3);
+}
+
+@media (max-width: 680px) {
+    .rm-drawer-clinical-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Formato Definición Etiqueta -> Valor */
+.rm-drawer-def-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--rm-space-2);
+    font-size: var(--rm-font-size-meta);
+}
+
+.rm-drawer-def-item {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--rm-space-2);
+    padding-bottom: 6px;
+    border-bottom: 1px dashed var(--rm-border-soft);
+}
+
+.rm-drawer-def-item:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.rm-drawer-def-label {
+    color: var(--rm-text-muted);
+    font-weight: var(--rm-font-weight-medium);
+    white-space: nowrap;
+}
+
+.rm-drawer-def-value {
+    color: var(--rm-text-primary);
+    font-weight: var(--rm-font-weight-bold);
+    text-align: right;
+}
+
+/* 10. Timeline Compacto de Registros Clínicos */
+.rm-drawer-timeline {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    position: relative;
+    padding-left: 12px;
+    border-left: 1.5px solid var(--rm-border-soft);
+}
+
+.rm-drawer-timeline-item {
+    position: relative;
+    font-size: var(--rm-font-size-meta);
+}
+
+.rm-drawer-timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -17px;
+    top: 4px;
+    width: 8px;
+    height: 8px;
+    border-radius: var(--rm-radius-pill);
+    background: var(--rm-action-primary);
+    border: 2px solid var(--rm-surface-soft);
+}
+
+/* 11. Tabla Compacta del Drawer */
+.rm-drawer-table {
+    width: 100%;
+    font-size: var(--rm-font-size-meta);
+    border-collapse: collapse;
+}
+
+.rm-drawer-table th {
+    background: var(--rm-surface-soft);
+    color: var(--rm-text-muted);
+    font-weight: var(--rm-font-weight-extrabold);
+    text-transform: uppercase;
+    font-size: 10px;
+    padding: 7px 10px;
+    text-align: left;
+    border-bottom: 1px solid var(--rm-border-soft);
+}
+
+.rm-drawer-table td {
+    padding: 7px 10px;
+    border-bottom: 1px solid var(--rm-border-soft);
+    color: var(--rm-text-body);
+}
+
+/* 12. Pie Fijo del Drawer */
+.rm-drawer-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--rm-space-3) var(--rm-space-5);
+    border-top: 1px solid var(--rm-border-soft);
+    background-color: var(--rm-surface-soft) !important;
+    flex-shrink: 0;
+    gap: 10px;
+}
+
+/* Modo oscuro */
+.dark .rm-drawer {
+    background-color: var(--rm-drawer-bg) !important;
+    border-color: var(--rm-border-soft);
+    box-shadow: var(--rm-drawer-shadow);
+    color: var(--rm-text-primary);
+}
+
+.dark .rm-drawer-header {
+    background-color: var(--rm-surface-soft) !important;
+    border-color: var(--rm-border-soft);
+}
+
+.dark .rm-drawer-body {
+    background-color: var(--rm-surface);
+}
+
+.dark .rm-drawer-footer {
+    background-color: var(--rm-surface-soft) !important;
+    border-color: var(--rm-border-soft);
+}

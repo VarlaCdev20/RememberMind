@@ -1,0 +1,321 @@
+<?php
+
+namespace Tests\Feature;
+
+use App\Frontend\Livewire\Enfermeria\Cuidados\AgendaEnfermeria;
+use App\Frontend\Livewire\Compartido\Clinica\FichaPaciente;
+use App\Frontend\Livewire\Enfermeria\Cuidados\RegistrosEnfermeria;
+use App\Models\Alerta;
+use App\Models\Area;
+use App\Models\AsignacionPersonal;
+use App\Models\AsignacionResidenteJornada;
+use App\Models\CuracionHerida;
+use App\Models\EjecucionCuidado;
+use App\Models\Herida;
+use App\Models\HistorialEstadoResidente;
+use App\Models\Incidente;
+use App\Models\IntervencionCuidado;
+use App\Models\Jornada;
+use App\Models\Personal;
+use App\Models\PlanCuidado;
+use App\Models\Prescripcion;
+use App\Models\RegistroIngesta;
+use App\Models\Residente;
+use App\Models\TurnoEnfermeria;
+use App\Models\User;
+use App\Backend\Modulos\Enfermeria\Servicios\AgendaTurnoService;
+use App\Backend\Modulos\Enfermeria\Servicios\CuidadosEnfermeriaService;
+use Database\Seeders\DatabaseSeeder;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
+use Livewire\Livewire;
+use Tests\TestCase;
+
+class ModuloEnfermeriaIntegralTest extends TestCase
+{
+    use RefreshDatabase;
+
+    private User $enfermero;
+    private Personal $personal;
+    private Residente $residente;
+    private TurnoEnfermeria $turno;
+    private Jornada $jornada;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        Carbon::setTestNow('2026-09-11 10:00:00');
+        $this->seed(DatabaseSeeder::class);
+
+        $this->enfermero = User::factory()->create([
+            'cod_usuario' => 'USU_TEST_INT',
+            'estado' => 'ACTIVO',
+        ]);
+        $this->enfermero->assignRole('ENFERMEROS');
+
+        $this->personal = Personal::create([
+            'cod_personal' => 'PER_TEST_INT',
+            'cod_usuario' => $this->enfermero->cod_usuario,
+            'nombres' => 'Enfermero',
+            'apellido_paterno' => 'Test',
+            'numero_documento' => 'DOC_TEST_INT',
+            'profesion' => 'Enfermero',
+            'estado' => 'ACTIVO',
+        ]);
+
+        $this->turno = TurnoEnfermeria::create([
+            'cod_turno' => 'TUR_001',
+            'orden' => 1,
+            'nombre' => 'Mañana',
+            'hora_inicio' => '07:00',
+            'hora_fin' => '15:00',
+            'estado' => 'ACTIVO',
+        ]);
+
+        $this->jornada = Jornada::create([
+            'cod_jornada' => 'JOR_TEST_INT',
+            'cod_turno' => $this->turno->cod_turno,
+            'cod_usuario_apertura' => $this->enfermero->cod_usuario,
+            'fecha_jornada' => today(),
+            'estado' => 'ABIERTA',
+        ]);
+
+        $area = Area::firstOrCreate(
+            ['cod_area' => 'ARE_TEST_INT'],
+            ['nombre' => 'Enfermería integral', 'descripcion' => 'Área clínica de prueba', 'estado' => 'ACTIVO']
+        );
+        AsignacionPersonal::create([
+            'cod_asignacion_personal' => 'ASP_TEST_INT',
+            'cod_jornada' => $this->jornada->cod_jornada,
+            'cod_personal' => $this->personal->cod_personal,
+            'cod_area' => $area->cod_area,
+            'funcion' => 'ENFERMERO',
+            'tipo_asignacion' => 'TURNO',
+            'fecha_asignacion' => today(),
+            'estado' => 'ACTIVO',
+        ]);
+
+        $this->residente = Residente::crearDesdeAdmision([
+            'cod_residente' => 'RES_TEST_INT',
+            'nombres' => 'Rosa',
+            'apellido_paterno' => 'Mamani',
+            'fecha_nacimiento' => '1945-05-10',
+            'estado' => 'ADMITIDO',
+        ]);
+
+        AsignacionResidenteJornada::create([
+            'cod_asignacion' => 'ARJ_TEST_INT',
+            'cod_residente' => $this->residente->cod_residente,
+            'cod_jornada' => $this->jornada->cod_jornada,
+            'cod_personal' => $this->personal->cod_personal,
+            'nivel_supervision' => 'ALTO',
+            'fecha_hora' => now(),
+            'estado' => 'ACTIVA',
+        ]);
+
+        $this->actingAs($this->enfermero);
+    }
+
+    protected function tearDown(): void
+    {
+        Carbon::setTestNow();
+        parent::tearDown();
+    }
+
+    public function test_hidratacion_sin_cantidad_se_rechaza_sin_inventar_200_ml(): void
+    {
+        try {
+            app(CuidadosEnfermeriaService::class)->registrar($this->residente->cod_residente, [
+                'tipo' => 'HIDRATACION',
+                'subtipo' => 'AGUA',
+            ], $this->enfermero);
+            $this->fail('Se esperaba validación por cantidad de hidratación ausente.');
+        } catch (ValidationException $exception) {
+            $this->assertArrayHasKey('cantidad_ml', $exception->errors());
+        }
+
+        $this->assertDatabaseCount('registros_hidratacion', 0);
+    }
+
+    public function test_valoracion_dolor_conserva_autoria_y_no_inventa_clasificacion(): void
+    {
+        $valoracion = app(CuidadosEnfermeriaService::class)->registrarDolor(
+            $this->residente->cod_residente,
+            'VALORACION',
+            6,
+            'Dolor referido durante la movilización.',
+            $this->enfermero
+        );
+
+        $this->assertSame($this->personal->cod_personal, $valoracion->cod_personal);
+        $this->assertNull($valoracion->ubicacion);
+        $this->assertNull($valoracion->tipo_dolor);
+    }
+
+    public function test_cuidado_firmado_valida_baja_ingesta_y_genera_alerta_por_cambio_basal(): void
+    {
+        $componente = Livewire::test(RegistrosEnfermeria::class, ['codResidente' => $this->residente->cod_residente])
+            ->set('codResidente', $this->residente->cod_residente)
+            ->set('tipo', 'ALIMENTACION')
+            ->set('subtipo', 'DESAYUNO')
+            ->set('porcentaje', 25)
+            ->call('guardarCuidado')
+            ->assertHasErrors(['motivo']);
+
+        $componente->set('motivo', 'Rechazo persistente de alimentos.')
+            ->set('cambioBasal', 'PEOR')
+            ->call('guardarCuidado')
+            ->assertHasNoErrors();
+
+        $this->assertDatabaseHas('registros_ingesta', [
+            'cod_residente' => $this->residente->cod_residente,
+            'porcentaje_consumido' => 25,
+            'estado' => 'VIGENTE',
+        ]);
+
+        $this->assertDatabaseHas('alertas', [
+            'cod_residente' => $this->residente->cod_residente,
+            'tipo' => 'CAMBIO RESPECTO AL ESTADO BASAL',
+            'estado' => 'ABIERTA',
+        ]);
+    }
+
+    public function test_caida_crea_incidente_lesion_y_alerta_con_datos_obligatorios(): void
+    {
+        Livewire::test(RegistrosEnfermeria::class, ['codResidente' => $this->residente->cod_residente])
+            ->set('codResidente', $this->residente->cod_residente)
+            ->set('tipoIncidente', 'CAIDA')
+            ->set('lugarIncidente', 'Baño')
+            ->set('descripcionIncidente', 'Residente encontrado en el piso durante la higiene.')
+            ->set('presenciado', true)
+            ->set('testigo', 'Auxiliar de turno')
+            ->set('hayLesion', true)
+            ->set('tipoLesion', 'HEMATOMA')
+            ->set('zonaLesion', 'Brazo izquierdo')
+            ->set('medicoInformado', true)
+            ->call('guardarIncidente')
+            ->assertHasNoErrors();
+
+        $this->assertDatabaseHas('incidentes', [
+            'cod_residente' => $this->residente->cod_residente,
+            'tipo_incidente' => 'CAIDA',
+            'requiere_medico' => true,
+        ]);
+
+        $this->assertDatabaseHas('heridas', [
+            'cod_residente' => $this->residente->cod_residente,
+            'tipo_herida' => 'HEMATOMA',
+            'ubicacion' => 'Brazo izquierdo',
+        ]);
+
+        $this->assertDatabaseHas('alertas', [
+            'cod_residente' => $this->residente->cod_residente,
+            'tipo' => 'CAIDA',
+        ]);
+
+        $herida = Herida::where('cod_residente', $this->residente->cod_residente)->firstOrFail();
+
+        Livewire::test(RegistrosEnfermeria::class, ['codResidente' => $this->residente->cod_residente])
+            ->set('lesionId', $herida->cod_herida)
+            ->set('largoLesion', 3.2)
+            ->set('anchoLesion', 1.5)
+            ->set('aspectoLesion', 'Hematoma violáceo sin sangrado activo.')
+            ->set('accionLesion', 'Aplicación de frío local y vigilancia.')
+            ->call('guardarSeguimientoLesion')
+            ->assertHasNoErrors();
+
+        $this->assertDatabaseHas('curaciones_herida', [
+            'cod_herida' => $herida->cod_herida,
+            'longitud' => 3.2,
+            'ancho' => 1.5,
+        ]);
+    }
+
+    public function test_agenda_registra_cuidados_en_la_jornada_real_sin_fallbacks(): void
+    {
+        $plan = PlanCuidado::create([
+            'cod_plan' => 'PLC_AGENDA_INT',
+            'cod_residente' => $this->residente->cod_residente,
+            'cod_area' => Area::query()->where('cod_area', 'ARE_TEST_INT')->value('cod_area'),
+            'cod_personal' => $this->personal->cod_personal,
+            'nombre' => 'Plan de movilidad',
+            'objetivo_general' => 'Mantener movilidad segura',
+            'fecha_hora_apertura' => now(),
+            'estado' => 'ACTIVO',
+        ]);
+        $intervencion = IntervencionCuidado::create([
+            'cod_intervencion' => 'INT_AGENDA_INT',
+            'cod_plan' => $plan->cod_plan,
+            'nombre' => 'Cambio postural',
+            'descripcion' => 'Realizar cambio postural según el horario indicado.',
+            'prioridad' => 'MEDIA',
+            'estado' => 'ACTIVA',
+        ]);
+
+        foreach (['08:00', '12:00'] as $hora) {
+            Livewire::test(AgendaEnfermeria::class)
+                ->call(
+                    'abrirModalRegistrar',
+                    $intervencion->cod_intervencion,
+                    $this->residente->cod_residente,
+                    null,
+                    $hora,
+                )
+                ->set('resultado', 'Satisfactorio')
+                ->call('registrarEjecucion')
+                ->assertHasNoErrors();
+        }
+
+        $this->assertDatabaseCount('ejecuciones_cuidado', 2);
+        $this->assertSame(
+            [$this->jornada->cod_jornada],
+            EjecucionCuidado::query()->pluck('cod_jornada')->unique()->values()->all(),
+        );
+        $this->assertSame(
+            [$this->personal->cod_personal],
+            EjecucionCuidado::query()->pluck('cod_personal')->unique()->values()->all(),
+        );
+    }
+
+    public function test_recepcion_de_turno_conserva_la_asignacion_y_area_formalizadas(): void
+    {
+        Livewire::test(AgendaEnfermeria::class)
+            ->set('observacionRecepcion', 'Recibo residentes y pendientes')
+            ->call('recibirTurno')
+            ->assertHasNoErrors();
+
+        $this->assertDatabaseHas('asignaciones_personal', [
+            'cod_asignacion_personal' => 'ASP_TEST_INT',
+            'cod_jornada' => $this->jornada->cod_jornada,
+            'cod_personal' => $this->personal->cod_personal,
+            'cod_area' => 'ARE_TEST_INT',
+        ]);
+        $this->assertStringContainsString(
+            'Recibo residentes y pendientes',
+            (string) AsignacionPersonal::findOrFail('ASP_TEST_INT')->observacion
+        );
+        $this->assertDatabaseMissing('asignaciones_personal', ['cod_area' => 'ARE_ENF']);
+    }
+
+    public function test_agenda_no_expone_residentes_si_el_enfermero_no_tiene_asignacion(): void
+    {
+        $usuarioSinTurno = User::factory()->create(['estado' => 'ACTIVO']);
+        $usuarioSinTurno->assignRole('ENFERMEROS');
+        Personal::create([
+            'cod_personal' => 'PER_SIN_TURNO',
+            'cod_usuario' => $usuarioSinTurno->cod_usuario,
+            'nombres' => 'Enfermero',
+            'apellido_paterno' => 'Sin Turno',
+            'numero_documento' => 'DOC-SIN-TURNO',
+            'profesion' => 'ENFERMERIA',
+            'estado' => 'ACTIVO',
+        ]);
+        $this->actingAs($usuarioSinTurno);
+
+        Livewire::test(AgendaEnfermeria::class)
+            ->assertDontSee($this->residente->nombres)
+            ->assertDontSee($this->residente->cod_residente);
+    }
+}

@@ -1,305 +1,1343 @@
-<aside
-    @toggle-sidebar.window="sidebarOpen = !sidebarOpen"
+<aside id="sidebar" @toggle-sidebar.window="sidebarOpen = !sidebarOpen"
     :class="[
-        sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0',
-        sidebarCollapsed ? 'lg:w-[82px]' : 'lg:w-[240px]'
+        sidebarOpen ?
+        'translate-x-0' :
+        '-translate-x-full lg:translate-x-0',
+
+        sidebarCollapsed ?
+        'lg:w-[76px]' :
+        'lg:w-[248px]'
     ]"
-    class="fixed left-0 top-0 z-50 flex h-screen w-[240px] flex-col border-r border-[#C7B5A3]/70 bg-[#E6DDD3]/95 shadow-[18px_0_55px_rgba(47,62,92,0.12)] backdrop-blur-xl transition-all duration-300 ease-in-out"
->
-    {{-- BOTÓN COLAPSAR --}}
-    <button
-        type="button"
-        @click="sidebarCollapsed = !sidebarCollapsed"
-        class="absolute -right-4 top-8 hidden h-8 w-8 items-center justify-center rounded-full border border-[#C7B5A3] bg-[#E6DDD3] text-azul-profundo shadow-md transition-all duration-300 hover:bg-terracota hover:text-white active:scale-90 lg:flex"
-        aria-label="Contraer o expandir menú lateral"
-    >
-        <i
-            class="ph-bold ph-caret-left text-sm transition-transform duration-300"
-            :class="sidebarCollapsed ? 'rotate-180' : ''"
-        ></i>
+    class="sidebar-institucional fixed left-0 top-0 z-50 flex h-screen w-[248px] flex-col
+
+        border-r
+        border-[var(--rm-border-soft)]
+
+        shadow-[6px_0_24px_rgba(47,40,36,0.06)]
+
+        transition-all
+        duration-300
+        ease-in-out
+    "
+    aria-label="Barra lateral de navegación">
+
+    {{-- ============================================================
+         BOTÓN COLAPSAR
+         ============================================================ --}}
+    <button type="button" @click="sidebarCollapsed = !sidebarCollapsed"
+        class="
+            absolute
+            -right-4
+            top-7
+            z-20
+
+            hidden
+            h-8
+            w-8
+            items-center
+            justify-center
+
+            rounded-full
+
+            border
+            border-[var(--rm-border-soft)]
+
+            bg-[var(--rm-surface-raised)]
+
+            text-[var(--rm-text-secondary)]
+
+            shadow-[var(--rm-shadow-sm)]
+
+            transition-all
+            duration-200
+
+            hover:border-[var(--rm-eucalyptus-500)]
+            hover:bg-[var(--rm-eucalyptus-100)]
+            hover:text-[var(--rm-coffee-950)]
+
+            lg:flex
+        "
+        aria-label="Contraer o expandir menú lateral">
+        <i class="
+                ph-bold
+                ph-caret-left
+                text-sm
+                transition-transform
+                duration-300
+            "
+            :class="sidebarCollapsed ? 'rotate-180' : ''"></i>
     </button>
 
-    {{-- HEADER --}}
-    <div class="shrink-0 px-3 pt-4">
-        <div
-            class="flex items-center rounded-[1.35rem] bg-[#D5C7B9]/40 px-3 py-3 shadow-inner transition-all duration-300"
-            :class="sidebarCollapsed ? 'justify-center' : 'justify-between'"
-        >
+
+    {{-- ============================================================
+         HEADER
+         ============================================================ --}}
+    <div class="shrink-0 px-3 pb-2 pt-4">
+
+        <div class="sidebar-brand-glass
+                flex
+                min-h-[64px]
+                items-center
+
+                rounded-2xl
+
+                border
+                border-[var(--rm-border-soft)]
+
+                px-3
+                py-2.5
+
+                shadow-[0_2px_8px_rgba(47,40,36,0.045)]
+
+                transition-all
+                duration-300
+            "
+            :class="sidebarCollapsed
+                ?
+                'justify-center px-2' :
+                'justify-between'">
+
             <div class="flex min-w-0 items-center gap-3">
-                <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-terracota text-white font-black shadow-md transition-all duration-500 hover:rotate-6">
-                    <span class="text-xl">C</span>
-                </div>
 
                 <div
-                    x-show="!sidebarCollapsed"
-                    x-transition.opacity.duration.300ms
-                    class="min-w-0"
-                >
-                    <h2 class="truncate text-lg font-black text-azul-profundo leading-tight">
-                        Casa Amandita
+                    class="
+                        flex
+                        h-10
+                        w-10
+                        shrink-0
+                        items-center
+                        justify-center
+
+                        rounded-xl
+
+                        bg-[var(--rm-surface-raised)]
+
+                        shadow-[0_1px_4px_rgba(47,40,36,0.06)]
+                    ">
+                    <img src="{{ asset('storage/imagenes/LOGO.png') }}" alt="CENTRO GERIÁTRICO LOS ALMENDROS"
+                        class="
+                            h-8
+                            w-8
+                            rounded-lg
+                            object-contain
+
+                            transition-transform
+                            duration-300
+
+                            hover:scale-105
+                        ">
+                </div>
+
+
+                <div x-show="!sidebarCollapsed" x-transition.opacity.duration.200ms class="min-w-0">
+
+                    <h2
+                        class="
+                            max-w-[185px]
+
+                            text-[11px]
+                            font-extrabold
+                            uppercase
+
+                            leading-[1.12]
+                            tracking-[0.035em]
+
+                            text-[var(--rm-coffee-950)]
+                        ">
+                        CENTRO GERIÁTRICO<br>
+                        LOS ALMENDROS
                     </h2>
-                    <p class="truncate text-[11px] font-black uppercase tracking-widest text-terracota">
+
+                    <p
+                        class="
+                            mt-1
+                            truncate
+
+                            text-[9.5px]
+                            font-extrabold
+                            uppercase
+
+                            tracking-[0.14em]
+
+                            text-[var(--rm-eucalyptus-700)]
+                        ">
                         RememberMind
                     </p>
+
                 </div>
+
             </div>
 
-            <button
-                @click="sidebarOpen = false"
-                class="flex h-8 w-8 items-center justify-center rounded-full bg-[#E6DDD3] text-azul-profundo transition hover:bg-terracota hover:text-white lg:hidden"
-                aria-label="Cerrar menú lateral"
-            >
+
+            {{-- Cerrar sidebar móvil --}}
+            <button type="button" @click="sidebarOpen = false"
+                class="
+                    flex
+                    h-8
+                    w-8
+                    items-center
+                    justify-center
+
+                    rounded-lg
+
+                    text-[var(--rm-text-secondary)]
+
+                    transition
+
+                    hover:bg-[var(--rm-earth-100)]
+                    hover:text-[var(--rm-text-primary)]
+
+                    lg:hidden
+                "
+                aria-label="Cerrar menú lateral">
                 <i class="ph-bold ph-x"></i>
             </button>
+
         </div>
+
     </div>
 
-    {{-- MENÚ --}}
-    <div class="mt-5 flex-1 overflow-y-auto px-3 pb-6 [scrollbar-width:thin] [scrollbar-color:#C7B5A3_transparent]">
+
+    {{-- ============================================================
+         MENÚ
+         ============================================================ --}}
+    <div
+        class="
+            mt-1
+            flex-1
+            overflow-y-auto
+
+            px-3
+            pb-4
+
+            [scrollbar-width:thin]
+            [scrollbar-color:var(--rm-taupe-400)_transparent]
+        ">
+
         @php
-            $safeUrl = function (?string $route, string $fallback = '#') {
+            $safeUrl = function (?string $route, string $fallback = 'javascript:void(0)') {
                 return $route && Route::has($route) ? route($route) : $fallback;
             };
 
             $isDisabled = function (?string $route) {
-                return ! $route || ! Route::has($route);
+                return !$route || !Route::has($route);
             };
 
             $isActiveItem = function (array $item) {
-                if (isset($item['route']) && $item['route'] && request()->routeIs($item['route'] . '*')) {
-                    return true;
+                if (isset($item['route']) && $item['route']) {
+                    if (request()->routeIs($item['route'])) {
+                        return true;
+                    }
+
+                    $base = preg_replace('/\.index$/', '.*', $item['route']);
+
+                    if ($base !== $item['route'] && request()->routeIs($base)) {
+                        return true;
+                    }
                 }
+
                 return false;
             };
 
             $isActiveSection = function (array $section) use ($isActiveItem) {
                 if (isset($section['items'])) {
                     foreach ($section['items'] as $item) {
-                        if ($isActiveItem($item)) return true;
+                        if ($isActiveItem($item)) {
+                            return true;
+                        }
                     }
                 }
+
                 return false;
             };
-
-            $sections = [
-                [
-                    'title' => 'Inicio',
-                    'icon' => 'ph-house',
-                    'route' => 'dashboard',
-                ],
-                [
-                    'title' => 'Administración',
-                    'icon' => 'ph-gear-six',
-                    'items' => [
-                        ['label' => 'Usuarios', 'route' => 'admin.usuarios.index'],
-                        ['label' => 'Roles y permisos', 'route' => null],
-                        ['label' => 'Personal institucional', 'route' => null],
-                        ['label' => 'Áreas institucionales', 'route' => null],
-                        ['label' => 'Turnos y asignaciones', 'route' => null],
-                        ['label' => 'Bitácora y auditoría', 'route' => 'admin.bitacora.index'],
-                    ],
-                ],
-                [
-                    'title' => 'Adultos Mayores',
-                    'icon' => 'ph-users-four',
-                    'items' => [
-                        ['label' => 'Lista general', 'route' => 'admin.adultos-mayores.index'],
-                        ['label' => 'Registro', 'route' => null],
-                        ['label' => 'Expedientes', 'route' => null],
-                        ['label' => 'Estados institucionales', 'route' => null],
-                        ['label' => 'Documentación', 'route' => null],
-                        ['label' => 'Reportes', 'route' => null],
-                    ],
-                ],
-                [
-                    'title' => 'Salud y Seguimiento',
-                    'icon' => 'ph-heartbeat',
-                    'items' => [
-                        ['label' => 'Ficha médica', 'route' => null],
-                        ['label' => 'Medicación', 'route' => null],
-                        ['label' => 'Adm. de Medicación', 'route' => null],
-                        ['label' => 'Signos vitales', 'route' => null],
-                        ['label' => 'Valoración funcional', 'route' => null],
-                        ['label' => 'Observación diaria', 'route' => null],
-                        ['label' => 'Atenciones e incidentes', 'route' => null],
-                        ['label' => 'Evaluación cognitiva', 'route' => null],
-                    ],
-                ],
-                [
-                    'title' => 'Familia y Social',
-                    'icon' => 'ph-house-line',
-                    'items' => [
-                        ['label' => 'Familiares', 'route' => null],
-                        ['label' => 'Responsables', 'route' => null],
-                        ['label' => 'Contactos de emergencia', 'route' => null],
-                        ['label' => 'Autorizaciones', 'route' => null],
-                        ['label' => 'Visitas', 'route' => null],
-                        ['label' => 'Comunicaciones', 'route' => null],
-                        ['label' => 'Ficha social', 'route' => null],
-                    ],
-                ],
-                [
-                    'title' => 'Actividades',
-                    'icon' => 'ph-calendar-check',
-                    'items' => [
-                        ['label' => 'Actividades', 'route' => null],
-                        ['label' => 'Tipos de actividades', 'route' => null],
-                        ['label' => 'Participación', 'route' => null],
-                        ['label' => 'Asistencia', 'route' => null],
-                        ['label' => 'Reportes', 'route' => null],
-                    ],
-                ],
-                [
-                    'title' => 'Voluntariado',
-                    'icon' => 'ph-hand-heart',
-                    'items' => [
-                        ['label' => 'Voluntarios', 'route' => null],
-                        ['label' => 'Disponibilidad', 'route' => null],
-                        ['label' => 'Asignaciones', 'route' => null],
-                        ['label' => 'Asistencia', 'route' => null],
-                        ['label' => 'Reportes', 'route' => null],
-                    ],
-                ],
-            ];
         @endphp
 
-        <nav class="space-y-2">
-            @foreach($sections as $section)
+
+        @inject('sidebarService', 'App\Backend\Modulos\Identidad\Servicios\SidebarService')
+
+
+        @php
+            $sections = $sidebarService->getSidebar();
+
+            $initialOpen = null;
+
+            foreach ($sections as $idx => $sec) {
+                if (!isset($sec['route']) && !empty($sec['items'])) {
+                    $sActive = false;
+
+                    foreach ($sec['items'] as $it) {
+                        if ($isActiveItem($it)) {
+                            $sActive = true;
+                            break;
+                        }
+                    }
+
+                    if ($sActive) {
+                        $initialOpen = $idx;
+                        break;
+                    }
+
+                    if (!empty($sec['default_expanded']) && $initialOpen === null) {
+                        $initialOpen = $idx;
+                    }
+                }
+            }
+        @endphp
+
+
+        <nav x-data="{
+            openSection: {{ $initialOpen !== null ? $initialOpen : 'null' }},
+            search: ''
+        }" class="space-y-1">
+
+            {{-- ====================================================
+                 BUSCADOR
+                 ==================================================== --}}
+            <div x-show="!sidebarCollapsed" class="mb-4 px-1 pt-1">
+
+                <div class="relative flex items-center">
+
+                    <i
+                        class="
+                            ph-bold
+                            ph-magnifying-glass
+
+                            pointer-events-none
+
+                            absolute
+                            left-3
+
+                            text-sm
+
+                            text-[var(--rm-text-muted)]
+                        "></i>
+
+
+                    <input type="text" x-model="search" placeholder="Buscar módulo..."
+                        class="
+                            h-10
+                            w-full
+
+                            rounded-xl
+
+                            border
+                            border-[var(--rm-border-soft)]
+
+                            bg-[var(--rm-input-bg)]
+
+                            pl-9
+                            pr-8
+
+                            text-[12px]
+                            font-semibold
+
+                            text-[var(--rm-text-body)]
+
+                            outline-none
+
+                            transition-all
+                            duration-200
+
+                            placeholder:font-medium
+                            placeholder:text-[var(--rm-text-muted)]
+
+                            hover:border-[var(--rm-border)]
+
+                            focus:border-[var(--rm-eucalyptus-600)]
+                            focus:bg-[var(--rm-surface-raised)]
+                            focus:ring-4
+                            focus:ring-[rgba(119,134,109,0.10)]
+                        ">
+
+
+                    <button x-show="search.length > 0" @click="search = ''" type="button"
+                        class="
+                            absolute
+                            right-2
+
+                            flex
+                            h-6
+                            w-6
+                            items-center
+                            justify-center
+
+                            rounded-md
+
+                            text-[var(--rm-text-muted)]
+
+                            transition
+
+                            hover:bg-[var(--rm-earth-100)]
+                            hover:text-[var(--rm-text-primary)]
+                        "
+                        title="Limpiar búsqueda">
+                        <i class="ph-bold ph-x text-xs"></i>
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            {{-- ====================================================
+                 SECCIONES
+                 ==================================================== --}}
+            @foreach ($sections as $section)
                 @php
-                    $isDirect = isset($section['route']);
-                    $isSectionActive = $isDirect 
-                        ? (request()->routeIs($section['route'] . '*'))
+                    $isDirect = isset($section['route']) && !empty($section['route']);
+
+                    $isSectionActive = $isDirect
+                        ? request()->routeIs($section['route']) ||
+                            (preg_replace('/\.index$/', '.*', $section['route']) !== $section['route'] &&
+                                request()->routeIs(preg_replace('/\.index$/', '.*', $section['route'])))
                         : $isActiveSection($section);
+
+                    $url = $isDirect ? $safeUrl($section['route']) : '#';
+
+                    $group = $section['group'] ?? null;
+
+                    $prevGroup =
+                        $loop->index > 0 && isset($sections[$loop->index - 1]['group'])
+                            ? $sections[$loop->index - 1]['group']
+                            : null;
+
+                    $itemsJson = json_encode(strtolower(implode(' ', array_column($section['items'] ?? [], 'label'))));
+
+                    $titleJson = json_encode(strtolower($section['title']));
                 @endphp
 
-                @if($isDirect)
-                    <div class="group/section relative">
-                        @php
-                            $disabled = $isDisabled($section['route']);
-                            $url = $safeUrl($section['route']);
-                        @endphp
-                        <a
-                            href="{{ $url }}"
-                            @if($disabled) title="Próximamente" @else title="{{ $section['title'] }}" @endif
-                            class="flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-sm font-black transition-all duration-300
-                            {{ $isSectionActive ? 'bg-[#D5C7B9] text-terracota shadow-sm' : 'text-azul-profundo/80 hover:bg-[#D5C7B9]/50 hover:text-terracota' }}"
-                            :class="sidebarCollapsed ? 'justify-center px-0' : ''"
-                        >
-                            <div class="flex items-center gap-3">
-                                <i class="ph-bold {{ $section['icon'] }} text-xl shrink-0 transition-all duration-300
-                                    {{ $isSectionActive ? 'text-terracota' : 'text-azul-profundo/60 group-hover/section:text-terracota group-hover/section:rotate-3' }}"></i>
-                                <span
-                                    x-show="!sidebarCollapsed"
-                                    x-transition.opacity.duration.300ms
-                                    class="text-xs uppercase tracking-[0.15em] font-black"
-                                >
+
+                {{-- ================================================
+                     GRUPO / CATEGORÍA
+                     ================================================ --}}
+                @if (!empty($group) && $group !== $prevGroup)
+                    <div class="
+                            px-3
+                            pb-1.5
+                            pt-4
+                        "
+                        x-show="
+                            !sidebarCollapsed
+                            && search === ''
+                        ">
+
+                        <span
+                            class="
+                                select-none
+
+                                text-[9.5px]
+                                font-extrabold
+                                uppercase
+
+                                tracking-[0.17em]
+
+                                text-[var(--rm-text-secondary)]
+                            ">
+                            {{ $group }}
+                        </span>
+
+                    </div>
+                @endif
+
+
+                {{-- ================================================
+                     SECCIÓN CON LINK DIRECTO
+                     ================================================ --}}
+                @if ($isDirect)
+                    <div class="
+                            group/section
+                            relative
+                        "
+                        x-show="
+                            search === ''
+                            || {{ $titleJson }}.includes(
+                                search.toLowerCase()
+                            )
+                        ">
+
+                        <a wire:navigate href="{{ $url }}"
+                            class="
+                                flex
+                                min-h-[44px]
+                                items-center
+                                justify-between
+
+                                rounded-xl
+
+                                border
+
+                                px-3
+                                py-2.5
+
+                                text-sm
+
+                                transition-all
+                                duration-200
+
+                                {{ $isSectionActive
+                                    ? '
+                                                                        border-[var(--rm-nav-selected-border)]
+                                                                        bg-[var(--rm-nav-selected)]
+                                                                        text-[var(--rm-nav-selected-text)]
+                                                                        shadow-[0_4px_12px_rgba(86,99,79,0.14)]
+                                                                      '
+                                    : '
+                                                                        border-transparent
+                                                                        text-[var(--rm-nav-text)]
+                                                                        hover:bg-[var(--rm-nav-hover)]
+                                                                        hover:text-[var(--rm-nav-text-hover)]
+                                                                      ' }}
+                            "
+                            :class="sidebarCollapsed
+                                ?
+                                'justify-center px-0' :
+                                ''"
+                            title="{{ $section['title'] }}">
+
+                            <div
+                                class="
+                                    flex
+                                    min-w-0
+                                    items-center
+                                    gap-3
+                                ">
+
+                                <i
+                                    class="
+                                        ph-bold
+                                        {{ $section['icon'] }}
+
+                                        shrink-0
+
+                                        text-[19px]
+
+                                        transition-all
+                                        duration-200
+
+                                        {{ $isSectionActive
+                                            ? 'text-[var(--rm-nav-selected-icon)]'
+                                            : 'text-[var(--rm-text-secondary)] group-hover/section:text-[var(--rm-coffee-950)]' }}
+                                    "></i>
+
+
+                                <span x-show="!sidebarCollapsed" x-transition.opacity.duration.200ms
+                                    class="
+                                        truncate
+
+                                        text-[12px]
+                                        font-extrabold
+                                        uppercase
+
+                                        tracking-[0.055em]
+                                    ">
                                     {{ $section['title'] }}
                                 </span>
-                            </div>
-                        </a>
-                        
-                        {{-- DIVISOR EN MODO COLAPSADO --}}
-                        <div class="mx-auto h-px w-8 bg-[#C7B5A3]/40 my-2" x-show="sidebarCollapsed"></div>
 
-                        {{-- TOOLTIP CUANDO ESTÁ COLAPSADO --}}
-                        <div
-                            x-show="sidebarCollapsed"
-                            class="pointer-events-none absolute left-full z-50 ml-4 hidden whitespace-nowrap rounded-lg bg-azul-profundo px-3 py-2 text-[11px] font-black text-white shadow-2xl transition-all group-hover/section:block"
-                        >
+                            </div>
+
+
+                            @if (!empty($section['badge']))
+                                <span x-show="!sidebarCollapsed"
+                                    class="
+                                        inline-flex
+                                        min-w-5
+                                        shrink-0
+                                        items-center
+                                        justify-center
+
+                                        rounded-full
+
+                                        border
+                                        border-[var(--rm-coral-200)]
+
+                                        bg-[var(--rm-danger-soft)]
+
+                                        px-1.5
+                                        py-0.5
+
+                                        text-[9px]
+                                        font-extrabold
+
+                                        text-[var(--rm-danger)]
+                                    ">
+                                    {{ $section['badge'] }}
+                                </span>
+                            @endif
+
+                        </a>
+
+
+                        {{-- DIVISOR EN MODO COLAPSADO --}}
+                        <div class="
+                                mx-auto
+                                my-2
+
+                                h-px
+                                w-8
+
+                                bg-[var(--rm-border-soft)]
+                            "
+                            x-show="sidebarCollapsed"></div>
+
+
+                        {{-- TOOLTIP MODO COLAPSADO --}}
+                        <div x-show="sidebarCollapsed"
+                            class="
+                                pointer-events-none
+
+                                absolute
+                                left-full
+                                top-1/2
+                                z-50
+
+                                ml-3
+
+                                hidden
+
+                                -translate-y-1/2
+
+                                whitespace-nowrap
+
+                                rounded-xl
+
+                                bg-[var(--rm-coffee-900)]
+
+                                px-3
+                                py-2
+
+                                text-[11px]
+                                font-bold
+
+                                text-white
+
+                                shadow-[var(--rm-shadow-md)]
+
+                                group-hover/section:block
+                            ">
+
                             {{ $section['title'] }}
+
+
+                            @if (!empty($section['badge']))
+                                <span
+                                    class="
+                                        ml-1.5
+
+                                        rounded-full
+
+                                        bg-[var(--rm-danger)]
+
+                                        px-1.5
+
+                                        text-[9px]
+                                        text-white
+                                    ">
+                                    {{ $section['badge'] }}
+                                </span>
+                            @endif
+
                         </div>
+
                     </div>
                 @else
-                    <div x-data="{ expanded: {{ $isSectionActive ? 'true' : 'false' }} }" class="group/section relative">
+                    {{-- ================================================
+                         SECCIÓN ACORDEÓN
+                         ================================================ --}}
+                    <div class="
+                            group/section
+                            relative
+                        "
+                        x-show="
+                            search === ''
+                            || {{ $titleJson }}.includes(
+                                search.toLowerCase()
+                            )
+                            || {{ $itemsJson }}.includes(
+                                search.toLowerCase()
+                            )
+                        ">
+
                         {{-- HEADER DE SECCIÓN --}}
-                        <button
-                            @click="expanded = !expanded"
-                            class="flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-sm font-black transition-all duration-300
-                            {{ $isSectionActive ? 'bg-[#D5C7B9] text-terracota shadow-sm' : 'text-azul-profundo/80 hover:bg-[#D5C7B9]/50 hover:text-terracota' }}"
-                            :class="sidebarCollapsed ? 'justify-center px-0' : ''"
-                        >
-                            <div class="flex items-center gap-3">
-                                <i class="ph-bold {{ $section['icon'] }} text-xl shrink-0 transition-all duration-300
-                                    {{ $isSectionActive ? 'text-terracota' : 'text-azul-profundo/60 group-hover/section:text-terracota group-hover/section:rotate-3' }}"></i>
-                                <span
-                                    x-show="!sidebarCollapsed"
-                                    x-transition.opacity.duration.300ms
-                                    class="text-xs uppercase tracking-[0.15em] font-black"
-                                >
+                        <button type="button"
+                            @click="
+                                openSection =
+                                    (
+                                        openSection === {{ $loop->index }}
+                                    )
+                                        ? null
+                                        : {{ $loop->index }}
+                            "
+                            class="
+                                flex
+                                min-h-[44px]
+                                w-full
+
+                                items-center
+                                justify-between
+
+                                rounded-xl
+
+                                border
+
+                                px-3
+                                py-2.5
+
+                                text-sm
+
+                                transition-all
+                                duration-200
+
+                                {{ $isSectionActive
+                                    ? '
+                                                                        border-[rgba(101,116,93,0.30)]
+                                                                        bg-[rgba(145,160,131,0.22)]
+                                                                        text-[var(--rm-coffee-950)]
+                                                                      '
+                                    : '
+                                                                        border-transparent
+                                                                        text-[var(--rm-nav-text)]
+                                                                        hover:bg-[var(--rm-nav-hover)]
+                                                                        hover:text-[var(--rm-nav-text-hover)]
+                                                                      ' }}
+                            "
+                            :class="sidebarCollapsed
+                                ?
+                                'justify-center px-0' :
+                                ''">
+
+                            <div
+                                class="
+                                    flex
+                                    min-w-0
+                                    items-center
+                                    gap-3
+                                ">
+
+                                <i
+                                    class="
+                                        ph-bold
+                                        {{ $section['icon'] }}
+
+                                        shrink-0
+
+                                        text-[19px]
+
+                                        transition-colors
+                                        duration-200
+
+                                        {{ $isSectionActive
+                                            ? 'text-[var(--rm-eucalyptus-700)]'
+                                            : 'text-[var(--rm-text-secondary)] group-hover/section:text-[var(--rm-coffee-950)]' }}
+                                    "></i>
+
+
+                                <span x-show="!sidebarCollapsed" x-transition.opacity.duration.200ms
+                                    class="
+                                        truncate
+
+                                        text-[12px]
+                                        font-extrabold
+                                        uppercase
+
+                                        tracking-[0.055em]
+                                    ">
                                     {{ $section['title'] }}
                                 </span>
+
                             </div>
 
-                            <i
-                                x-show="!sidebarCollapsed"
-                                class="ph-bold ph-caret-down text-[10px] transition-transform duration-500"
-                                :class="expanded ? 'rotate-180 text-terracota' : 'text-azul-profundo/40'"
-                            ></i>
+
+                            <div class="
+                                    flex
+                                    items-center
+                                    gap-2
+                                "
+                                x-show="!sidebarCollapsed">
+
+                                @if (!empty($section['badge']))
+                                    <span
+                                        class="
+                                            inline-flex
+                                            min-w-5
+                                            shrink-0
+                                            items-center
+                                            justify-center
+
+                                            rounded-full
+
+                                            border
+                                            border-[var(--rm-coral-200)]
+
+                                            bg-[var(--rm-danger-soft)]
+
+                                            px-1.5
+                                            py-0.5
+
+                                            text-[9px]
+                                            font-extrabold
+
+                                            text-[var(--rm-danger)]
+                                        ">
+                                        {{ $section['badge'] }}
+                                    </span>
+                                @endif
+
+
+                                <i class="
+                                        ph-bold
+                                        ph-caret-down
+
+                                        text-[10px]
+
+                                        text-[var(--rm-text-muted)]
+
+                                        transition-transform
+                                        duration-300
+                                    "
+                                    :class="(
+                                        openSection === {{ $loop->index }} ||
+                                        (
+                                            search !== '' &&
+                                            {{ $itemsJson }}.includes(
+                                                search.toLowerCase()
+                                            )
+                                        )
+                                    ) ?
+                                    'rotate-180' :
+                                    ''"></i>
+
+                            </div>
+
                         </button>
 
-                        {{-- ITEMS DE SECCIÓN --}}
-                        <div
-                            x-show="expanded && !sidebarCollapsed"
-                            x-transition:enter="transition ease-out duration-300"
-                            x-transition:enter-start="opacity-0 -translate-y-2"
-                            x-transition:enter-end="opacity-100 translate-y-0"
-                            class="mt-1 space-y-0.5 pl-10"
-                        >
-                            @foreach($section['items'] as $item)
+
+                        {{-- ============================================
+                             SUBITEMS
+                             ============================================ --}}
+                        <div x-show="
+                                (
+                                    openSection === {{ $loop->index }}
+                                    || (
+                                        search !== ''
+                                        && {{ $itemsJson }}.includes(
+                                            search.toLowerCase()
+                                        )
+                                    )
+                                )
+                                && !sidebarCollapsed
+                            "
+                            x-transition:enter="
+                                transition
+                                ease-out
+                                duration-200
+                            "
+                            x-transition:enter-start="
+                                opacity-0
+                                -translate-y-1
+                            "
+                            x-transition:enter-end="
+                                opacity-100
+                                translate-y-0
+                            "
+                            class="
+                                mt-1
+                                space-y-1
+                                pl-4
+                            ">
+
+                            @foreach ($section['items'] as $item)
                                 @php
                                     $active = $isActiveItem($item);
+
                                     $disabled = $isDisabled($item['route']);
+
                                     $url = $safeUrl($item['route']);
+
+                                    $labelJson = json_encode(strtolower($item['label']));
                                 @endphp
 
-                                <a
-                                    href="{{ $url }}"
-                                    @if($disabled) title="Próximamente" @else title="{{ $item['label'] }}" @endif
-                                    class="group/item relative flex items-center gap-2.5 rounded-lg py-2 text-sm font-black transition-all duration-300
-                                    {{ $active
-                                        ? 'text-terracota'
-                                        : 'text-azul-profundo/60 hover:text-terracota hover:translate-x-1'
-                                    }}
-                                    {{ $disabled ? 'opacity-40 cursor-not-allowed grayscale' : '' }}
+
+                                <a wire:navigate href="{{ $url }}"
+                                    x-show="
+                                        search === ''
+                                        || {{ $labelJson }}.includes(
+                                            search.toLowerCase()
+                                        )
+                                        || {{ $titleJson }}.includes(
+                                            search.toLowerCase()
+                                        )
                                     "
-                                >
-                                    @if($active)
-                                        <span class="absolute -left-4 top-1/2 -translate-y-1/2 h-1.5 w-1.5 rounded-full bg-terracota shadow-[0_0_8px_rgba(233,122,95,0.6)]"></span>
+                                    @if ($disabled) title="Próximamente"
+                                    @else
+                                        title="{{ $item['label'] }}" @endif
+                                    class="
+                                        group/item
+                                        relative
+
+                                        flex
+                                        min-h-[38px]
+                                        items-center
+                                        justify-between
+                                        gap-2.5
+
+                                        rounded-xl
+
+                                        border
+
+                                        px-3
+                                        py-2
+
+                                        transition-all
+                                        duration-200
+
+                                        {{ $active
+                                            ? '
+                                                                                        border-[var(--rm-nav-selected-border)]
+                                                                                        bg-[var(--rm-nav-selected)]
+                                                                                        text-[var(--rm-nav-selected-text)]
+                                                                                        shadow-[0_3px_10px_rgba(86,99,79,0.12)]
+                                                                                      '
+                                            : '
+                                                                                        border-transparent
+                                                                                        text-[var(--rm-text-secondary)]
+                                                                                        hover:bg-[rgba(255,255,255,0.18)]
+                                                                                        hover:text-[var(--rm-coffee-950)]
+                                                                                      ' }}
+
+                                        {{ $disabled
+                                            ? '
+                                                                                        cursor-not-allowed
+                                                                                        opacity-40
+                                                                                        grayscale
+                                                                                      '
+                                            : '' }}
+                                    ">
+
+                                    <div
+                                        class="
+                                            flex
+                                            min-w-0
+                                            items-center
+                                            gap-2
+                                        ">
+
+                                        <span
+                                            class="
+                                                h-1.5
+                                                w-1.5
+                                                shrink-0
+
+                                                rounded-full
+
+                                                {{ $active ? 'bg-[var(--rm-coffee-950)] opacity-70' : 'bg-[var(--rm-taupe-500)] opacity-40' }}
+                                            "></span>
+
+
+                                        <span
+                                            class="
+                                                truncate
+
+                                                text-[11.5px]
+                                                font-bold
+                                                uppercase
+
+                                                tracking-[0.055em]
+                                            ">
+                                            {{ $item['label'] }}
+                                        </span>
+
+                                    </div>
+
+
+                                    @if (!empty($item['badge']))
+                                        <span
+                                            class="
+                                                inline-flex
+                                                min-w-5
+                                                shrink-0
+                                                items-center
+                                                justify-center
+
+                                                rounded-full
+
+                                                border
+                                                border-[var(--rm-coral-200)]
+
+                                                bg-[var(--rm-danger-soft)]
+
+                                                px-1.5
+
+                                                text-[9px]
+                                                font-extrabold
+
+                                                text-[var(--rm-danger)]
+                                            ">
+                                            {{ $item['badge'] }}
+                                        </span>
                                     @endif
 
-                                    <span class="truncate">{{ $item['label'] }}</span>
                                 </a>
                             @endforeach
-                        </div>
-                        
-                        {{-- DIVISOR EN MODO COLAPSADO --}}
-                        <div class="mx-auto h-px w-8 bg-[#C7B5A3]/40 my-2" x-show="sidebarCollapsed"></div>
 
-                        {{-- TOOLTIP CUANDO ESTÁ COLAPSADO --}}
-                        <div
-                            x-show="sidebarCollapsed"
-                            class="pointer-events-none absolute left-full z-50 ml-4 hidden whitespace-nowrap rounded-lg bg-azul-profundo px-3 py-2 text-[11px] font-black text-white shadow-2xl transition-all group-hover/section:block"
-                        >
-                            {{ $section['title'] }}
                         </div>
+
+
+                        {{-- DIVISOR MODO COLAPSADO --}}
+                        <div class="
+                                mx-auto
+                                my-2
+
+                                h-px
+                                w-8
+
+                                bg-[var(--rm-border-soft)]
+                            "
+                            x-show="sidebarCollapsed"></div>
+
+
+                        {{-- ============================================
+                             FLYOUT COLAPSADO
+                             ============================================ --}}
+                        <div x-show="sidebarCollapsed"
+                            class="
+                                pointer-events-none
+
+                                absolute
+                                left-full
+                                top-0
+                                z-50
+
+                                ml-3
+
+                                hidden
+                                min-w-[220px]
+
+                                rounded-2xl
+
+                                border
+                                border-[var(--rm-border-soft)]
+
+                                bg-[var(--rm-surface-raised)]
+
+                                p-3
+
+                                shadow-[var(--rm-shadow-lg)]
+
+                                group-hover/section:block
+                                group-hover/section:pointer-events-auto
+                            ">
+
+                            <div
+                                class="
+                                    mb-2
+
+                                    flex
+                                    items-center
+                                    gap-2
+
+                                    border-b
+                                    border-[var(--rm-border-soft)]
+
+                                    pb-2
+                                ">
+
+                                <i
+                                    class="
+                                        ph-bold
+                                        {{ $section['icon'] }}
+
+                                        text-base
+
+                                        text-[var(--rm-eucalyptus-700)]
+                                    "></i>
+
+
+                                <span
+                                    class="
+                                        text-[11px]
+                                        font-extrabold
+                                        uppercase
+
+                                        tracking-[0.07em]
+
+                                        text-[var(--rm-coffee-950)]
+                                    ">
+                                    {{ $section['title'] }}
+                                </span>
+
+                            </div>
+
+
+                            <div class="space-y-1">
+
+                                @foreach ($section['items'] as $item)
+                                    @php
+                                        $active = $isActiveItem($item);
+
+                                        $url = $safeUrl($item['route']);
+                                    @endphp
+
+
+                                    <a wire:navigate href="{{ $url }}"
+                                        class="
+                                            flex
+                                            min-h-[36px]
+                                            items-center
+                                            justify-between
+
+                                            rounded-lg
+
+                                            px-2.5
+                                            py-1.5
+
+                                            transition
+
+                                            {{ $active
+                                                ? '
+                                                                                                bg-[var(--rm-nav-selected)]
+                                                                                                text-[var(--rm-nav-selected-text)]
+                                                                                              '
+                                                : '
+                                                                                                text-[var(--rm-text-secondary)]
+                                                                                                hover:bg-[var(--rm-earth-100)]
+                                                                                                hover:text-[var(--rm-text-primary)]
+                                                                                              ' }}
+                                        ">
+
+                                        <span
+                                            class="
+                                                truncate
+
+                                                text-[11px]
+                                                font-bold
+                                                uppercase
+
+                                                tracking-[0.05em]
+                                            ">
+                                            {{ $item['label'] }}
+                                        </span>
+
+
+                                        @if (!empty($item['badge']))
+                                            <span
+                                                class="
+                                                    rounded-full
+
+                                                    bg-[var(--rm-danger-soft)]
+
+                                                    px-1.5
+
+                                                    text-[9px]
+                                                    font-bold
+
+                                                    text-[var(--rm-danger)]
+                                                ">
+                                                {{ $item['badge'] }}
+                                            </span>
+                                        @endif
+
+                                    </a>
+                                @endforeach
+
+                            </div>
+
+                        </div>
+
                     </div>
                 @endif
             @endforeach
+
         </nav>
+
     </div>
 
-    {{-- FOOTER --}}
-    <div class="shrink-0 border-t border-[#C7B5A3]/40 p-3">
-        <a
-            href="#"
-            class="group flex items-center gap-3 rounded-xl px-3 py-3 text-[15px] font-black text-azul-profundo/70 transition-all duration-300 hover:bg-terracota hover:text-white active:scale-95"
-            :class="sidebarCollapsed ? 'justify-center px-0' : ''"
-        >
-            <i class="ph-bold ph-question text-xl shrink-0 group-hover:rotate-12 transition-transform"></i>
+
+    {{-- ============================================================
+         FOOTER
+         ============================================================ --}}
+    <div
+        class="
+            shrink-0
+            space-y-2
+
+            border-t
+            border-[rgba(94,80,73,0.13)]
+
+            p-3
+        ">
+
+        @php
+            $currentUser = auth()->user();
+
+            $userRole = $currentUser ? $currentUser->getRoleNames()->first() ?? 'USUARIO' : null;
+        @endphp
+
+
+        {{-- ================================================
+             TARJETA DEL USUARIO
+             ================================================ --}}
+        @if ($currentUser)
+            <div class="px-1" x-show="!sidebarCollapsed">
+
+                <div
+                    class="
+                        flex
+                        items-center
+                        gap-2.5
+
+                        rounded-xl
+
+                        border
+                        border-[rgba(94,80,73,0.16)]
+
+                        bg-[rgba(247,243,240,0.46)]
+
+                        p-2.5
+                    ">
+
+                    <div
+                        class="
+                            flex
+                            h-8
+                            w-8
+                            shrink-0
+                            items-center
+                            justify-center
+
+                            rounded-full
+
+                            bg-[var(--rm-eucalyptus-300)]
+
+                            text-[12px]
+                            font-extrabold
+
+                            text-[var(--rm-coffee-950)]
+                        ">
+                        {{ strtoupper(substr($currentUser->nombres ?? 'U', 0, 1)) }}
+                    </div>
+
+
+                    <div class="min-w-0 flex-1">
+
+                        <p
+                            class="
+                                truncate
+
+                                text-[11.5px]
+                                font-extrabold
+                                uppercase
+
+                                leading-tight
+
+                                text-[var(--rm-coffee-950)]
+                            ">
+                            {{ $currentUser->nombres }}
+                        </p>
+
+
+                        <span
+                            class="
+                                mt-1
+
+                                inline-flex
+                                items-center
+                                gap-1.5
+
+                                text-[8.5px]
+                                font-extrabold
+                                uppercase
+
+                                tracking-[0.08em]
+
+                                text-[var(--rm-green-700)]
+                            ">
+
+                            <span
+                                class="
+                                    h-1.5
+                                    w-1.5
+
+                                    rounded-full
+
+                                    bg-[var(--rm-success)]
+                                "></span>
+
+                            {{ $userRole ?? 'ACTIVO' }}
+
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+        @endif
+
+
+        {{-- ================================================
+             CENTRO DE AYUDA
+             ================================================ --}}
+        <button type="button"
+            class="
+                group
+
+                flex
+                min-h-[42px]
+                w-full
+                items-center
+                gap-3
+
+                rounded-xl
+
+                border
+                border-transparent
+
+                px-3
+                py-2
+
+                text-[11px]
+                font-extrabold
+                uppercase
+
+                tracking-[0.05em]
+
+                text-[var(--rm-text-secondary)]
+
+                transition-all
+                duration-200
+
+                hover:border-[rgba(101,116,93,0.20)]
+                hover:bg-[var(--rm-eucalyptus-200)]
+                hover:text-[var(--rm-coffee-950)]
+
+                active:scale-[0.99]
+            "
+            :class="sidebarCollapsed
+                ?
+                'justify-center px-0' :
+                ''">
+
+            <i
+                class="
+                    ph-bold
+                    ph-question
+
+                    shrink-0
+
+                    text-base
+
+                    transition-transform
+
+                    group-hover:rotate-6
+                "></i>
+
 
             <span x-show="!sidebarCollapsed" x-transition.opacity.duration.200ms>
-                Centro de Ayuda
+                Centro de ayuda
             </span>
-        </a>
+
+        </button>
+
     </div>
+
 </aside>

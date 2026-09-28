@@ -1,0 +1,71 @@
+/* ============================================================
+   REMEMBERMIND DESIGN SYSTEM — COMPONENTS / ALERTS
+   Avisos y banners de severidad clínica estructurados.
+   ============================================================ */
+
+.rm-alert {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--rm-space-3);
+    padding: var(--rm-space-3) var(--rm-space-4);
+    border-radius: var(--rm-radius-input);
+    border: 1px solid transparent;
+    font-family: var(--rm-font-ui);
+    font-size: var(--rm-font-table);
+    line-height: var(--rm-line-height-normal);
+}
+
+.rm-alert-icon {
+    flex-shrink: 0;
+    margin-top: 2px;
+    font-size: 16px;
+}
+
+.rm-alert-content {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.rm-alert-title {
+    font-weight: var(--rm-font-weight-bold);
+    font-size: var(--rm-font-table);
+    text-transform: uppercase;
+    letter-spacing: var(--rm-letter-spacing-wide);
+}
+
+.rm-alert-desc {
+    color: inherit;
+    opacity: 0.92;
+}
+
+.rm-alert-action {
+    flex-shrink: 0;
+    margin-left: auto;
+}
+
+/* Variantes */
+.rm-alert-success {
+    background-color: var(--rm-state-success-bg);
+    border-color: var(--rm-state-success-border);
+    color: var(--rm-state-success-text);
+}
+
+.rm-alert-warning {
+    background-color: var(--rm-state-warning-bg);
+    border-color: var(--rm-state-warning-border);
+    color: var(--rm-state-warning-text);
+}
+
+.rm-alert-danger {
+    background-color: var(--rm-state-danger-bg);
+    border-color: var(--rm-state-danger-border);
+    color: var(--rm-state-danger-text);
+}
+
+.rm-alert-info {
+    background-color: var(--rm-state-info-bg);
+    border-color: var(--rm-state-info-border);
+    color: var(--rm-state-info-text);
+}

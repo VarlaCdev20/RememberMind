@@ -1,0 +1,81 @@
+@layer components {
+
+    .rm-card,
+    .rm-card-soft,
+    .rm-card-warm,
+    .rm-modal-panel,
+    .rm-empty-state {
+        font-family: var(--font-body);
+    }
+
+    .rm-card,
+    .rm-card-soft,
+    .rm-card-warm {
+        border: 1px solid var(--color-borde-general);
+        border-radius: 1rem;
+        background:
+            radial-gradient(circle at top right, rgba(217, 121, 95, 0.045), transparent 14rem),
+            var(--surface-card);
+        color: var(--color-parrafo);
+        box-shadow: var(--sombra-card);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        transition:
+            transform 180ms ease,
+            box-shadow 180ms ease,
+            border-color 180ms ease,
+            background-color 180ms ease;
+    }
+
+    .rm-card-soft {
+        background:
+            radial-gradient(circle at top right, rgba(41, 58, 89, 0.035), transparent 14rem),
+            var(--surface-card-soft);
+    }
+
+    .rm-card-warm {
+        background:
+            radial-gradient(circle at top right, rgba(217, 121, 95, 0.06), transparent 14rem),
+            var(--surface-card-warm);
+    }
+
+    .rm-card:hover,
+    .rm-card-soft:hover,
+    .rm-card-warm:hover {
+        border-color: rgba(217, 121, 95, 0.24);
+        box-shadow: var(--sombra-card-hover);
+    }
+
+    .rm-card-section {
+        padding: 1.25rem;
+    }
+
+    .rm-page-header {
+        margin-bottom: 1.25rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        gap: 0.75rem;
+        border-bottom: 1px solid var(--color-borde-suave);
+        padding-bottom: 1rem;
+    }
+
+    .rm-section-title {
+        color: var(--color-titulo);
+        font-family: var(--font-section-title);
+        font-size: 1.25rem;
+        font-weight: var(--font-extrabold);
+        line-height: var(--leading-title);
+        letter-spacing: var(--tracking-tight);
+        text-transform: uppercase;
+    }
+
+    .rm-section-subtitle {
+        margin-top: 0.125rem;
+        color: var(--color-subtitulo);
+        font-family: var(--font-body);
+        font-size: 0.875rem;
+        font-weight: var(--font-semibold);
+        line-height: var(--leading-normal);
+    }
+}

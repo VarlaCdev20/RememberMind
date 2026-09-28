@@ -4,6 +4,8 @@ namespace Tests\Feature;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Tests\TestCase;
 
 class AuthenticationTest extends TestCase
@@ -22,7 +24,7 @@ class AuthenticationTest extends TestCase
         $user = User::factory()->create();
 
         $response = $this->post('/login', [
-            'email' => $user->email,
+            'correo' => $user->correo,
             'password' => 'password',
         ]);
 
@@ -35,10 +37,44 @@ class AuthenticationTest extends TestCase
         $user = User::factory()->create();
 
         $this->post('/login', [
-            'email' => $user->email,
+            'correo' => $user->correo,
             'password' => 'wrong-password',
         ]);
 
         $this->assertGuest();
+    }
+
+    public function test_known_legacy_passwords_do_not_bypass_authentication(): void
+    {
+        $user = User::factory()->create([
+            'correo' => 'admincasaamandita@gmail.com',
+            'contrasena' => 'ClaveActualSegura123!',
+        ]);
+
+        $this->post('/login', [
+            'correo' => $user->correo,
+            'password' => 'CasaAmandita123',
+        ]);
+
+        $this->assertGuest();
+        $this->assertTrue(Hash::check('ClaveActualSegura123!', $user->fresh()->getAuthPassword()));
+    }
+
+    public function test_plaintext_passwords_are_rejected_instead_of_migrated_during_login(): void
+    {
+        DB::table('usuarios')->insert([
+            'cod_usuario' => 'USU_PLAINTEXT',
+            'correo' => 'plaintext@example.test',
+            'contrasena' => 'ClaveSinHash123!',
+            'estado' => 'ACTIVO',
+        ]);
+
+        $this->post('/login', [
+            'correo' => 'plaintext@example.test',
+            'password' => 'ClaveSinHash123!',
+        ]);
+
+        $this->assertGuest();
+        $this->assertSame('ClaveSinHash123!', DB::table('usuarios')->where('cod_usuario', 'USU_PLAINTEXT')->value('contrasena'));
     }
 }

@@ -1,58 +1,107 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# RememberMind
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Sistema web de gestión integral para residencia geriátrica, seguimiento clínico, funcional y cognitivo.
 
-## About Laravel
+## Objetivo
+Proporcionar una plataforma integral, robusta y segura para el registro, atención, supervisión clínica y gestión de residentes geriátricos, asegurando trazabilidad médica, control riguroso de fármacos, alertas oportunas y soporte a la toma de decisiones multidisciplinarias.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Stack tecnológico
+- **Backend:** PHP 8.3+, Laravel 13, Fortify, Sanctum
+- **Frontend:** Livewire 4, Alpine.js, Tailwind CSS 3, Chart.js, GSAP, AOS
+- **Base de Datos:** PostgreSQL (entorno principal de desarrollo y producción), SQLite `:memory:` (testing automatizado)
+- **Permisos y Auditoría:** Spatie Laravel Permission 7.3, Spatie Activitylog 4.12
+- **Reportes:** Barryvdh DomPDF 3.1, Spatie Laravel PDF 2.8, Maatwebsite Excel 3.1
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Requisitos
+- PHP 8.3 o superior con extensiones activas (`pdo_pgsql`, `pdo_sqlite`, `intl`, `mbstring`, `openssl`, `curl`, `gd` o `imagick`)
+- Composer 2+
+- Node.js 20+ y npm
+- PostgreSQL 15+
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
-
-## Learning Laravel
-
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
-
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
-
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
-
-## Agentic Development
-
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
-
+## Instalación
 ```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+composer install
+npm ci
+cp .env.example .env
+php artisan key:generate
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+## Variables de entorno
+Configurar en `.env` los parámetros de conexión PostgreSQL:
+```env
+DB_CONNECTION=pgsql
+DB_HOST=127.0.0.1
+DB_PORT=5432
+DB_DATABASE=remembermind
+DB_USERNAME=postgres
+DB_PASSWORD=tu_password
+```
 
-## Contributing
+## Base de datos
+BDD Operativa V2.1 — 70 tablas operativas congeladas y normalizadas:
+- Consultar siempre la documentación oficial en `docs/base-de-datos/`.
+- Prohibida la mutación estructural sin autorización previa.
+- Todas las entidades emplean nomenclatura estandarizada `cod_<entidad>`.
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+## Migraciones
+```bash
+php artisan migrate --seed
+```
 
-## Code of Conduct
+## Ejecución
+```bash
+composer dev
+```
+O ejecutando los servicios por separado:
+```bash
+php artisan serve
+npm run dev
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+## Compilación frontend
+```bash
+npm run build
+```
 
-## Security Vulnerabilities
+## Pruebas
+```bash
+# Suite completa de tests PHP (SQLite en memoria)
+composer test
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+# Tests específicos de verificación
+php artisan test --filter=BddOperativaV2Test
 
-## License
+# Tests frontend JavaScript (runner nativo node:test)
+npm test
+```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## Roles principales
+- **Superadministrador:** Configuración institucional, gestión de accesos y supervisión global.
+- **Administrador:** Gestión operativa de admisiones, personal y residentes.
+- **Médico:** Valoraciones médicas integrales, diagnósticos, órdenes médicas y evolución clínica.
+- **Enfermero / Personal de Cuidado:** Administración de medicación, registro de signos vitales, notas de enfermería y pases de turno.
+- **Psicólogo / Fisioterapeuta / Nutricionista / Pedagogo:** Valoraciones y planes de intervención especializada.
+- **Familiar:** Consulta protegida del estado y avances de su residente asignado (con estricto control anti-IDOR).
+
+## Arquitectura
+- `app/Backend/Modulos/`: Servicios y casos de uso organizados por módulo (`Admisiones`, `Alertas`, `Clinica`, `Identidad`, `Medicacion`, `Reportes`).
+- `app/Frontend/Livewire/`: Componentes reactivos por dominio funcional.
+- `app/Models/`: Modelos Eloquent normalizados bajo esquema V2 (`cod_usuario`, `cod_residente`).
+- `resources/frontend/`: Estilos (`styles/`) y scripts (`scripts/`).
+- `resources/views/`: Vistas Blade y plantillas modulares.
+
+## Documentación
+- [Índice General](docs/README.md)
+- [Arquitectura Vigente](docs/arquitectura/README.md)
+- [Base de Datos Operativa V2.1 (70 Tablas)](docs/base-de-datos/README.md)
+- [Auditoría del Sistema](docs/auditoria.md)
+
+## Seguridad
+- Autenticación estricta mediante `correo` y verificación de `estado === 'ACTIVO'`.
+- Registro público deshabilitado institucionalmente.
+- Control de acceso granular por roles y permisos (RBAC Spatie).
+- Documentación clínica almacenada en disco privado (`storage/app/private/`).
+- Integridad referencial con validación exhaustiva de llaves foráneas.
+
+## Estado del proyecto
+Esquema V2.1 operativo, arquitectura modular consolidada, suite de pruebas automatizadas al 100% de aprobación.

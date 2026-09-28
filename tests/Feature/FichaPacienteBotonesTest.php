@@ -1,0 +1,355 @@
+<?php
+
+namespace Tests\Feature;
+
+use App\Frontend\Livewire\Compartido\Clinica\FichaPaciente;
+use App\Models\Admision;
+use App\Models\AdultoMayor;
+use App\Models\Alerta;
+use App\Models\Area;
+use App\Models\AsignacionPersonal;
+use App\Models\AsignacionResidenteJornada;
+use App\Models\Atencion;
+use App\Models\Cama;
+use App\Models\EjecucionCuidado;
+use App\Models\Habitacion;
+use App\Models\IntervencionCuidado;
+use App\Models\Jornada;
+use App\Models\Medicamento;
+use App\Models\OcupacionCama;
+use App\Models\PlanCuidado;
+use App\Models\Prescripcion;
+use App\Models\TurnoEnfermeria;
+use App\Models\User;
+use Database\Seeders\RolesAndPermissionsSeeder;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Carbon;
+use Livewire\Livewire;
+use Tests\TestCase;
+
+class FichaPacienteBotonesTest extends TestCase
+{
+    use RefreshDatabase;
+
+    protected User $enfermero;
+
+    protected AdultoMayor $adulto;
+
+    protected TurnoEnfermeria $turno;
+
+    protected Habitacion $habitacion;
+
+    protected Cama $cama;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        Carbon::setTestNow('2026-09-11 10:00:00');
+
+        $this->seed([RolesAndPermissionsSeeder::class]);
+
+        $this->enfermero = User::factory()->create([
+            'cod_usuario' => 'USU_0099',
+            'nombres' => 'Elena',
+            'ap_paterno' => 'Salazar',
+            'estado' => 'ACTIVO',
+        ]);
+        $this->enfermero->assignRole('ENFERMEROS');
+
+        $this->turno = TurnoEnfermeria::create([
+            'nombre' => 'Turno Mañana',
+            'hora_inicio' => '07:00:00',
+            'hora_fin' => '15:00:00',
+            'orden' => 1,
+            'estado' => 'ACTIVO',
+        ]);
+        $jornada = Jornada::create([
+            'cod_jornada' => 'JOR_FICHA_100',
+            'cod_turno' => $this->turno->cod_turno,
+            'fecha_jornada' => today(),
+            'estado' => 'ABIERTA',
+        ]);
+
+        $this->habitacion = Habitacion::create([
+            'nombre' => 'Habitación 202',
+            'codigo' => 'H-202',
+            'numero' => '202',
+            'tipo' => 'INDIVIDUAL',
+            'capacidad' => 1,
+            'estado' => 'ACTIVA',
+        ]);
+
+        $this->cama = Cama::create([
+            'cod_habitacion' => $this->habitacion->cod_habitacion,
+            'codigo' => 'C-202-A',
+            'numero' => 'A',
+            'estado' => 'OCUPADA',
+        ]);
+
+        $this->adulto = AdultoMayor::factory()->create([
+            'cod_residente' => 'AM100',
+            'nombres' => 'Bernardo',
+            'ap_paterno' => 'Pinto',
+            'ap_materno' => 'Rios',
+            'ci' => '4455667',
+            'fecha_nac' => '1940-02-20',
+            'genero' => 'MASCULINO',
+            'alergias' => 'Ibuprofeno',
+            'cod_habitacion' => $this->habitacion->cod_habitacion,
+            'cod_cama' => $this->cama->cod_cama,
+            'cod_est_adul' => 'EST_001',
+        ]);
+
+        $admision = Admision::create([
+            'cod_admision' => 'ADM_FICHA_100',
+            'cod_residente' => $this->adulto->cod_residente,
+            'cod_usuario_registro' => $this->enfermero->cod_usuario,
+            'fecha_hora_admision' => now(),
+            'motivo_ingreso' => 'Preparación del escenario clínico',
+            'estado' => 'ACTIVA',
+        ]);
+
+        OcupacionCama::create([
+            'cod_residente' => $this->adulto->cod_residente,
+            'cod_cama' => $this->cama->cod_cama,
+            'cod_admision' => $admision->cod_admision,
+            'cod_usuario_registro' => $this->enfermero->cod_usuario,
+            'fecha_hora_asignacion' => now(),
+            'estado' => 'ACTIVO',
+        ]);
+
+        AsignacionResidenteJornada::create([
+            'cod_residente' => $this->adulto->cod_residente,
+            'cod_jornada' => $jornada->cod_jornada,
+            'cod_personal' => $this->enfermero->personal()->firstOrFail()->cod_personal,
+            'fecha_hora' => now(),
+            'nivel_supervision' => 'MEDIO',
+            'estado' => 'ACTIVO',
+            'observacion' => 'Turno activo',
+        ]);
+        $area = Area::create([
+            'cod_area' => 'ARE_FICHA_100',
+            'nombre' => 'Enfermería de ficha',
+            'estado' => 'ACTIVA',
+        ]);
+        AsignacionPersonal::create([
+            'cod_jornada' => $jornada->cod_jornada,
+            'cod_personal' => $this->enfermero->personal()->firstOrFail()->cod_personal,
+            'cod_area' => $area->cod_area,
+            'fecha_asignacion' => now(),
+        ]);
+    }
+
+    protected function tearDown(): void
+    {
+        Carbon::setTestNow();
+        parent::tearDown();
+    }
+
+    public function test_modal_registrar_signos_vitales_completo(): void
+    {
+        $this->actingAs($this->enfermero);
+
+        Livewire::test(FichaPaciente::class, ['adulto' => $this->adulto->cod_residente])
+            ->call('abrirModalSignos')
+            ->assertSet('modalSignos', true)
+            ->set('signoPA', '125/80')
+            ->set('signoFC', '74')
+            ->set('signoFR', '16')
+            ->set('signoTemp', '36.6')
+            ->set('signoSat', '98')
+            ->set('signoGlucosa', '110')
+            ->set('signoDolor', 1)
+            ->set('signoObs', 'Control matutino sin novedades')
+            ->call('guardarSignos')
+            ->assertHasNoErrors()
+            ->assertSet('modalSignos', false);
+
+        $this->assertDatabaseHas('signos_vitales', [
+            'cod_residente' => $this->adulto->cod_residente,
+            'presion_sistolica' => 125,
+            'presion_diastolica' => 80,
+            'frecuencia_cardiaca' => 74,
+            'temperatura' => 36.6,
+        ]);
+    }
+
+    public function test_modal_administrar_medicacion_completo(): void
+    {
+        $this->actingAs($this->enfermero);
+
+        $atencion = Atencion::create([
+            'cod_residente' => $this->adulto->cod_residente,
+            'cod_area' => Area::query()->firstOrFail()->cod_area,
+            'cod_personal' => $this->enfermero->personal()->firstOrFail()->cod_personal,
+            'tipo_atencion' => 'PRESCRIPCION_MEDICA',
+            'motivo' => 'Preparación del escenario de medicación',
+            'fecha_hora' => now(),
+            'estado' => 'FINALIZADA',
+        ]);
+
+        $med = Prescripcion::create([
+            'cod_residente' => $this->adulto->cod_residente,
+            'cod_atencion' => $atencion->cod_atencion,
+            'cod_medicamento' => Medicamento::create([
+                'cod_medicamento' => 'MED_FICHA_100',
+                'nombre_generico' => 'Metformina',
+                'nombre_comercial' => 'Metformina 850mg',
+                'forma_farmaceutica' => 'COMPRIMIDO',
+                'concentracion' => '850 mg',
+                'control_especial' => false,
+                'estado' => 'ACTIVO',
+            ])->cod_medicamento,
+            'cod_personal' => $this->enfermero->personal()->firstOrFail()->cod_personal,
+            'nombre_medicamento' => 'Metformina 850mg',
+            'dosis' => '850 mg',
+            'via_administracion' => 'Oral',
+            'frecuencia' => 'Cada 12 horas',
+            'hora_programada' => '08:00',
+            'fecha_inicio' => today()->toDateString(),
+            'estado' => 'ACTIVO',
+        ]);
+
+        Livewire::test(FichaPaciente::class, ['adulto' => $this->adulto->cod_residente])
+            ->call('abrirModalMedicacion', $med->cod_med)
+            ->assertSet('modalMed', true)
+            ->set('medAccion', 'ADMINISTRAR')
+            ->set('medEfectoObs', 'Tolerancia digestiva adecuada')
+            ->call('guardarMedicacion')
+            ->assertHasNoErrors()
+            ->assertSet('modalMed', false);
+
+        $this->assertDatabaseHas('administraciones_medicacion', [
+            'cod_residente' => $this->adulto->cod_residente,
+            'resultado' => 'ADMINISTRADA',
+        ]);
+    }
+
+    public function test_modal_tarea_cuidados_completar(): void
+    {
+        $this->actingAs($this->enfermero);
+
+        $plan = PlanCuidado::create([
+            'cod_residente' => $this->adulto->cod_residente,
+            'cod_area' => Area::query()->firstOrFail()->cod_area,
+            'cod_personal' => $this->enfermero->personal()->firstOrFail()->cod_personal,
+            'nombre' => 'Riesgo de deterioro de la integridad cutánea',
+            'objetivo_general' => 'Mantener piel intacta',
+            'fecha_hora_apertura' => today(),
+            'estado' => 'ACTIVO',
+        ]);
+        $intervencion = IntervencionCuidado::create([
+            'cod_intervencion' => 'INT_FICHA_TAREA',
+            'cod_plan' => $plan->cod_plan,
+            'nombre' => 'Cambio postural decúbito lateral',
+            'descripcion' => 'Cambio postural preventivo.',
+            'prioridad' => 'ALTA',
+            'estado' => 'ACTIVA',
+        ]);
+        $jornada = Jornada::query()->where('cod_turno', $this->turno->cod_turno)->firstOrFail();
+
+        $tarea = EjecucionCuidado::create([
+            'cod_intervencion' => $intervencion->cod_intervencion,
+            'cod_residente' => $this->adulto->cod_residente,
+            'cod_jornada' => $jornada->cod_jornada,
+            'cod_personal' => $this->enfermero->personal()->firstOrFail()->cod_personal,
+            'fecha_hora_programada' => today()->setTime(10, 0),
+            'estado' => 'PENDIENTE',
+        ]);
+
+        Livewire::test(FichaPaciente::class, ['adulto' => $this->adulto->cod_residente])
+            ->call('abrirModalTarea', $tarea->cod_tarea)
+            ->assertSet('modalTarea', true)
+            ->set('tareaEstadoAccion', 'REALIZADA')
+            ->set('tareaResultado', 'Cambio realizado a decúbito izquierdo')
+            ->call('guardarTarea')
+            ->assertHasNoErrors()
+            ->assertSet('modalTarea', false);
+
+        $this->assertSame('REALIZADA', $tarea->fresh()->estado);
+    }
+
+    public function test_modal_seguimiento_diario_completo(): void
+    {
+        $this->actingAs($this->enfermero);
+
+        Livewire::test(FichaPaciente::class, ['adulto' => $this->adulto->cod_residente])
+            ->call('abrirModalSeguimiento')
+            ->assertSet('modalSeguimiento', true)
+            ->assertSet('segEstado', '')
+            ->assertSet('segAlimentacion', '')
+            ->assertSet('segMovilidad', '')
+            ->assertSet('segSueno', '')
+            ->set('segEstado', 'ESTABLE')
+            ->set('segAlimentacion', 'COMPLETA')
+            ->set('segMovilidad', 'INDEPENDIENTE')
+            ->set('segSueno', 'NORMAL')
+            ->set('segObs', 'Desayuno completo, deambula por el patio')
+            ->call('guardarSeguimiento')
+            ->assertHasNoErrors()
+            ->assertSet('modalSeguimiento', false);
+
+        $this->assertDatabaseHas('atenciones', [
+            'cod_residente' => $this->adulto->cod_residente,
+            'tipo_atencion' => 'SEGUIMIENTO_DIARIO',
+        ]);
+    }
+
+    public function test_modal_reportar_incidente_genera_alerta(): void
+    {
+        $this->actingAs($this->enfermero);
+
+        Livewire::test(FichaPaciente::class, ['adulto' => $this->adulto->cod_residente])
+            ->call('abrirModalIncidente')
+            ->assertSet('modalIncidente', true)
+            ->set('incidenteTipo', 'CAIDA')
+            ->set('incidenteNivel', 'ALTO')
+            ->set('incidenteMotivo', 'Tropiezo al incorporarse de la cama sin asistencia')
+            ->call('guardarIncidente')
+            ->assertHasNoErrors()
+            ->assertSet('modalIncidente', false);
+
+        $this->assertDatabaseHas('alertas', [
+            'cod_residente' => $this->adulto->cod_residente,
+            'prioridad' => 'ALTO',
+            'estado' => 'ABIERTA',
+        ]);
+    }
+
+    public function test_atender_y_cerrar_alerta(): void
+    {
+        $this->actingAs($this->enfermero);
+
+        $alerta = Alerta::create([
+            'cod_residente' => $this->adulto->cod_residente,
+            'origen' => 'ENFERMERIA',
+            'tipo_alerta' => 'CLINICA',
+            'nivel' => 'ALTO',
+            'motivo' => 'Fiebre persistente 38.5°C',
+            'estado' => 'ABIERTA',
+            'registrado_por' => $this->enfermero->cod_usuario,
+        ]);
+
+        // Atender alerta -> pasa a EN_ATENCION
+        Livewire::test(FichaPaciente::class, ['adulto' => $this->adulto->cod_residente])
+            ->call('abrirModalAtenderAlerta', $alerta->cod_alerta)
+            ->assertSet('modalAtenderAlerta', true)
+            ->set('accionTomadaAlerta', 'Medios físicos aplicados y aviso a médico de guardia')
+            ->call('guardarAtenderAlerta')
+            ->assertHasNoErrors()
+            ->assertSet('modalAtenderAlerta', false);
+
+        $this->assertSame('EN_ATENCION', $alerta->fresh()->estado);
+
+        // Cerrar alerta -> pasa a CERRADA
+        Livewire::test(FichaPaciente::class, ['adulto' => $this->adulto->cod_residente])
+            ->call('abrirModalCerrarAlerta', $alerta->cod_alerta)
+            ->assertSet('modalCerrarAlerta', true)
+            ->set('observacionCierreAlerta', 'Temperatura normalizada en 36.8°C tras medicación')
+            ->call('guardarCerrarAlerta')
+            ->assertHasNoErrors()
+            ->assertSet('modalCerrarAlerta', false);
+
+        $this->assertSame('CERRADA', $alerta->fresh()->estado);
+    }
+}

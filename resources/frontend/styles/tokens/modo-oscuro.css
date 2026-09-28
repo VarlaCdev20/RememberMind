@@ -1,0 +1,552 @@
+/* ============================================================
+   REMEMBERMIND
+   MODO OSCURO — BRIDGE LEGACY
+
+   Los tokens --rm-* son ahora definidos por:
+   resources/frontend/styles/design-system/tokens/colors.css
+   (bloque .dark / [data-theme="dark"])
+
+   Este archivo mantiene:
+   1. --color-* bridge (compatibilidad V1)
+   2. Estilos de componentes específicos (.rm-modal-panel, .sidebar-institucional, etc.)
+   3. Estilos utilitarios (scrollbar, hr, option)
+
+   NO redefine --rm-* (esos vienen del design system)
+   ============================================================ */
+
+
+/* ============================================================
+   1. ACTIVACIÓN DEL MODO OSCURO — BRIDGE --color-* desde --rm-*
+   ============================================================ */
+
+.dark,
+[data-theme="dark"] {
+    color-scheme: dark;
+
+    /* Superficies — bridge desde --rm-* */
+    --color-fondo-app: var(--rm-bg-app);
+    --color-fondo-layout: var(--rm-bg-layout);
+
+    --color-fondo-panel: var(--rm-surface);
+    --color-fondo-panel-alt: var(--rm-surface-soft);
+    --color-fondo-panel-fuerte: var(--rm-surface-muted);
+
+    --color-fondo-card: var(--rm-card-bg);
+    --color-fondo-card-suave: var(--rm-surface-soft);
+    --color-fondo-card-calido: var(--rm-surface-soft);
+    --color-fondo-card-hover: var(--rm-surface-soft);
+
+    --color-fondo-input: var(--rm-input-bg);
+    --color-fondo-tabla: var(--rm-table-container-bg);
+    --color-fondo-hover: var(--rm-surface-soft);
+
+    --color-fondo-empty: var(--rm-surface-muted);
+    --color-fondo-empty-icon: rgba(145, 160, 131, .14);
+
+    /* ========================================================
+       3. SUPERFICIES TRANSLÚCIDAS
+       ======================================================== */
+
+    --surface-card: var(--rm-card-bg);
+    --surface-card-soft: var(--rm-surface-soft);
+    --surface-card-warm: var(--rm-surface-soft);
+
+    --surface-panel: var(--rm-surface);
+    --surface-panel-strong: var(--rm-surface-muted);
+
+    --surface-header: var(--rm-topbar-bg);
+    --surface-sidebar: var(--rm-bg-shell);
+
+
+    /* ========================================================
+       4. TEXTOS
+       ======================================================== */
+
+    --color-titulo: var(--rm-text-title);
+    --color-subtitulo: var(--rm-text-secondary);
+    --color-parrafo: var(--rm-text-body);
+
+    --color-texto-principal: var(--rm-text-primary);
+    --color-texto-secundario: var(--rm-text-secondary);
+    --color-texto-apoyo: var(--rm-text-muted);
+    --color-texto-suave: var(--rm-text-soft);
+    --color-texto-muted: var(--rm-text-muted);
+
+    --color-label: var(--rm-text-body);
+    --color-label-suave: var(--rm-text-secondary);
+    --color-meta: var(--rm-text-soft);
+    --color-placeholder: var(--rm-input-placeholder);
+
+    --color-texto-inverso: var(--rm-text-inverse);
+
+
+    /* ========================================================
+       5. BORDES Y DIVISORES
+       ======================================================== */
+
+    --color-borde-general: var(--rm-border);
+    --color-borde-suave: var(--rm-border-soft);
+    --color-borde-medio: var(--rm-border);
+    --color-borde-fuerte: var(--rm-border-strong);
+    --color-borde-dashed: var(--rm-border);
+
+    --color-borde-focus: var(--rm-focus);
+    --color-borde-error: var(--rm-danger);
+    --color-borde-success: var(--rm-success);
+    --color-borde-warning: var(--rm-warning);
+    --color-borde-info: var(--rm-info);
+
+
+    /* ========================================================
+       6. BOTONES
+       ======================================================== */
+
+    --color-boton-principal: var(--rm-button-primary-bg);
+    --color-boton-principal-hover: var(--rm-button-primary-hover);
+    --color-boton-principal-texto: var(--rm-button-primary-text);
+
+    --color-boton-acento: var(--rm-action-primary);
+    --color-boton-acento-hover: var(--rm-action-primary-hover);
+    --color-boton-acento-texto: var(--rm-text-on-primary);
+
+    --color-boton-secundario: var(--rm-button-secondary-bg);
+    --color-boton-secundario-hover: var(--rm-button-secondary-hover-bg);
+    --color-boton-secundario-texto: var(--rm-button-secondary-text);
+    --color-boton-secundario-borde: var(--rm-button-secondary-border);
+
+    --color-boton-fantasma-bg: transparent;
+    --color-boton-fantasma-hover: var(--rm-action-primary-soft);
+    --color-boton-fantasma-texto: var(--rm-text-body);
+    --color-boton-fantasma-borde: var(--rm-border-soft);
+
+    --color-boton-icono-bg: var(--rm-surface-raised);
+    --color-boton-icono-hover: var(--rm-action-primary);
+    --color-boton-icono-texto: var(--rm-text-secondary);
+    --color-boton-icono-texto-hover: var(--rm-text-on-primary);
+
+
+    /* ========================================================
+       7. SIDEBAR / HEADER / NAVEGACIÓN
+       ======================================================== */
+
+    --color-sidebar-bg: var(--rm-bg-shell);
+    --color-sidebar-header-bg: rgba(255, 255, 255, .045);
+
+    --color-sidebar-texto: var(--rm-nav-text);
+    --color-sidebar-texto-hover: var(--rm-nav-text-hover);
+    --color-sidebar-texto-muted: var(--rm-text-muted);
+
+    --color-sidebar-seccion-texto: var(--rm-text-secondary);
+    --color-sidebar-seccion-hover-bg: var(--rm-nav-hover);
+
+    --color-sidebar-seccion-activa-bg: var(--rm-nav-selected-soft, rgba(145,160,131,.18));
+    --color-sidebar-seccion-activa-texto: var(--rm-nav-selected-text);
+
+    --color-sidebar-item-activo: var(--rm-nav-selected);
+    --color-sidebar-item-activo-bg: var(--rm-nav-selected);
+    --color-sidebar-item-activo-borde: var(--rm-nav-selected-border);
+
+    --color-header-bg: var(--rm-topbar-bg);
+    --color-header-texto: var(--rm-topbar-text);
+    --color-header-borde: var(--rm-topbar-border);
+
+
+    /* ========================================================
+       8. MÓDULOS DEL SISTEMA (conservar identidad visual)
+       ======================================================== */
+
+    --color-modulo-adulto-mayor: #9EC5E8;
+    --color-modulo-adulto-mayor-hover: #B5D5F0;
+    --color-modulo-adulto-mayor-fondo: rgba(76, 113, 137, .18);
+
+    --color-modulo-salud: #7ED6CB;
+    --color-modulo-salud-hover: #9BE3DA;
+    --color-modulo-salud-suave: #9BE3DA;
+    --color-modulo-salud-fondo: rgba(95, 125, 91, .18);
+
+    --color-modulo-cognitivo: #C8B8F2;
+    --color-modulo-cognitivo-hover: #D8CCFF;
+    --color-modulo-cognitivo-texto: #C8B8F2;
+    --color-modulo-cognitivo-fondo: rgba(200, 184, 242, .14);
+
+    --color-modulo-reportes: #9EC5E8;
+    --color-modulo-reportes-fondo: rgba(76, 113, 137, .18);
+
+    --color-modulo-alertas: #F4A261;
+    --color-modulo-alertas-texto: #F4A261;
+    --color-modulo-alertas-fondo: rgba(165, 107, 66, .18);
+
+    --color-modulo-bitacora: #B8C0CC;
+    --color-modulo-bitacora-fondo: rgba(184, 192, 204, .12);
+
+    --color-modulo-apoyo: #A8C090;
+    --color-modulo-apoyo-texto: #BBD5A4;
+    --color-modulo-apoyo-fondo: rgba(95, 125, 91, .18);
+
+    --color-modulo-administrativo: #F2B49F;
+    --color-modulo-administrativo-fondo: rgba(179, 72, 57, .14);
+
+
+    /* ========================================================
+       9. ESTADOS GENERALES
+       ======================================================== */
+
+    --color-estado-exito-bg: var(--rm-success-soft);
+    --color-estado-exito-texto: var(--rm-success);
+    --color-estado-exito-borde: var(--rm-success);
+
+    --color-estado-advertencia-bg: var(--rm-warning-soft);
+    --color-estado-advertencia-texto: var(--rm-warning);
+    --color-estado-advertencia-borde: var(--rm-warning);
+
+    --color-estado-peligro-bg: var(--rm-danger-soft);
+    --color-estado-peligro-texto: var(--rm-danger);
+    --color-estado-peligro-borde: var(--rm-danger);
+
+    --color-estado-info-bg: var(--rm-info-soft);
+    --color-estado-info-texto: var(--rm-info);
+    --color-estado-info-borde: var(--rm-info);
+
+    --color-estado-neutral-bg: var(--rm-surface-soft);
+    --color-estado-neutral-texto: var(--rm-text-secondary);
+    --color-estado-neutral-borde: var(--rm-border-soft);
+
+    --color-estado-restaurado-bg: rgba(200, 184, 242, .14);
+    --color-estado-restaurado-texto: #C8B8F2;
+    --color-estado-restaurado-borde: rgba(200, 184, 242, .30);
+
+
+    /* ========================================================
+       10. SIGNOS VITALES / SALUD
+       ======================================================== */
+
+    --color-signo-normal-bg: var(--rm-success-soft);
+    --color-signo-normal-texto: var(--rm-success);
+    --color-signo-normal-borde: var(--rm-success);
+
+    --color-signo-observacion-bg: var(--rm-warning-soft);
+    --color-signo-observacion-texto: var(--rm-warning);
+    --color-signo-observacion-borde: var(--rm-warning);
+
+    --color-signo-critico-bg: var(--rm-danger-soft);
+    --color-signo-critico-texto: var(--rm-danger);
+    --color-signo-critico-borde: var(--rm-danger);
+
+    --color-signo-sin-datos-bg: var(--rm-surface-soft);
+    --color-signo-sin-datos-texto: var(--rm-text-muted);
+    --color-signo-sin-datos-borde: var(--rm-border-soft);
+
+
+    /* ========================================================
+       11. KPI / DASHBOARD
+       ======================================================== */
+
+    --color-kpi-residentes-texto: #9EC5E8;
+    --color-kpi-residentes-bg: rgba(76, 113, 137, .18);
+    --color-kpi-salud-texto: #7ED6CB;
+    --color-kpi-salud-bg: rgba(95, 125, 91, .18);
+    --color-kpi-cognitivo-texto: #C8B8F2;
+    --color-kpi-cognitivo-bg: rgba(200, 184, 242, .14);
+    --color-kpi-alertas-texto: #F4A261;
+    --color-kpi-alertas-bg: rgba(165, 107, 66, .18);
+    --color-kpi-actividades-texto: var(--rm-action-primary);
+    --color-kpi-actividades-bg: var(--rm-action-primary-soft);
+    --color-kpi-apoyo-texto: #A8C090;
+    --color-kpi-apoyo-bg: rgba(95, 125, 91, .18);
+
+
+    /* ========================================================
+       12. INPUTS / FORM
+       ======================================================== */
+
+    --color-input-bg: var(--rm-input-bg);
+    --color-input-borde: var(--rm-input-border);
+    --color-input-borde-hover: var(--rm-border-hover);
+    --color-input-borde-focus: var(--rm-input-focus-border);
+    --color-input-ring-focus: var(--rm-input-focus-ring);
+    --color-input-texto: var(--rm-input-text);
+    --color-input-placeholder: var(--rm-input-placeholder);
+    --color-input-bg-disabled: var(--rm-surface-muted);
+
+
+    /* ========================================================
+       13. MODAL
+       ======================================================== */
+
+    --color-modal-overlay: var(--rm-modal-overlay);
+    --color-modal-bg: var(--rm-modal-bg);
+    --color-modal-borde: var(--rm-modal-border);
+    --color-modal-header-borde: var(--rm-border-soft);
+    --color-modal-footer-borde: var(--rm-border-soft);
+    --color-modal-titulo: var(--rm-text-title);
+    --color-modal-texto: var(--rm-text-body);
+
+
+    /* ========================================================
+       14. TABLA
+       ======================================================== */
+
+    --color-tabla-header-bg: var(--rm-table-header-bg);
+    --color-tabla-header-texto: var(--rm-text-primary);
+    --color-tabla-header-borde: var(--rm-border-soft);
+    --color-tabla-row-borde: var(--rm-border-soft);
+    --color-tabla-row-hover: var(--rm-table-row-hover);
+    --color-tabla-cell-label: var(--rm-text-body);
+    --color-tabla-cell-meta: var(--rm-text-muted);
+
+
+    /* ========================================================
+       15. SCROLLBAR / UTILITARIOS
+       ======================================================== */
+
+    --color-scrollbar-thumb: var(--rm-border);
+    --color-scrollbar-thumb-hover: var(--rm-border-hover);
+    --color-scrollbar-track: var(--rm-surface-muted);
+
+    /* Sombras bridge */
+    --sombra-card: var(--rm-shadow-sm);
+    --sombra-card-hover: var(--rm-shadow-md);
+    --sombra-panel: var(--rm-shadow-md);
+    --sombra-sidebar: 6px 0 24px rgba(0, 0, 0, .28);
+    --sombra-modal: var(--rm-shadow-overlay);
+}
+
+
+/* ============================================================
+   20. MODALES Y PANELES DE COMPONENTES EN MODO OSCURO
+   (Estilos de estructura, no tokens — consumen --color-* bridge)
+   ============================================================ */
+
+.dark .rm-modal-overlay,
+[data-theme="dark"] .rm-modal-overlay {
+    background: var(--color-modal-overlay);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+.dark .rm-modal-panel,
+.dark .modal-institucional,
+[data-theme="dark"] .rm-modal-panel,
+[data-theme="dark"] .modal-institucional {
+    border-color: var(--color-modal-borde);
+    background: var(--color-modal-bg);
+    color: var(--color-modal-texto);
+    box-shadow: var(--sombra-modal);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+}
+
+.dark .rm-input,
+.dark .rm-select,
+.dark .rm-textarea,
+[data-theme="dark"] .rm-input,
+[data-theme="dark"] .rm-select,
+[data-theme="dark"] .rm-textarea {
+    background: var(--color-input-bg);
+    color: var(--color-input-texto);
+    border-color: var(--color-input-borde);
+}
+
+.dark .rm-input::placeholder,
+.dark .rm-select::placeholder,
+.dark .rm-textarea::placeholder,
+[data-theme="dark"] .rm-input::placeholder,
+[data-theme="dark"] .rm-select::placeholder,
+[data-theme="dark"] .rm-textarea::placeholder {
+    color: var(--color-input-placeholder);
+}
+
+.dark .rm-input:focus,
+.dark .rm-select:focus,
+.dark .rm-textarea:focus,
+[data-theme="dark"] .rm-input:focus,
+[data-theme="dark"] .rm-select:focus,
+[data-theme="dark"] .rm-textarea:focus {
+    border-color: var(--color-input-borde-focus);
+    box-shadow: 0 0 0 3px var(--color-input-ring-focus);
+    outline: none;
+}
+
+
+/* ============================================================
+   21. COMPONENTES BASE EN MODO OSCURO
+   ============================================================ */
+
+.dark .header-institucional,
+[data-theme="dark"] .header-institucional {
+    background: var(--color-header-bg);
+    border-color: var(--color-header-borde);
+    color: var(--color-header-texto);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+}
+
+.dark .sidebar-institucional,
+[data-theme="dark"] .sidebar-institucional {
+    background:
+        linear-gradient(
+            180deg,
+            color-mix(in srgb, var(--color-sidebar-bg) 78%, transparent) 0%,
+            color-mix(in srgb, var(--color-sidebar-bg) 64%, transparent) 100%
+        );
+    border-color: color-mix(in srgb, var(--color-borde-suave) 68%, transparent);
+    color: var(--color-sidebar-texto);
+    backdrop-filter: blur(24px) saturate(1.12);
+    -webkit-backdrop-filter: blur(24px) saturate(1.12);
+}
+
+.dark .sidebar-brand-glass,
+[data-theme="dark"] .sidebar-brand-glass {
+    background: color-mix(in srgb, var(--rm-surface) 56%, transparent);
+    border-color: color-mix(in srgb, var(--rm-border-soft) 70%, transparent);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.18);
+}
+
+.dark .panel-institucional,
+.dark .card-interactiva,
+.dark .rm-card,
+.dark .rm-card-soft,
+.dark .rm-card-warm,
+[data-theme="dark"] .panel-institucional,
+[data-theme="dark"] .card-interactiva,
+[data-theme="dark"] .rm-card,
+[data-theme="dark"] .rm-card-soft,
+[data-theme="dark"] .rm-card-warm {
+    border-color: var(--color-borde-general);
+    color: var(--color-parrafo);
+    box-shadow: var(--sombra-card);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+.dark .panel-institucional:hover,
+.dark .card-interactiva:hover,
+.dark .rm-card:hover,
+.dark .rm-card-soft:hover,
+.dark .rm-card-warm:hover,
+[data-theme="dark"] .panel-institucional:hover,
+[data-theme="dark"] .card-interactiva:hover,
+[data-theme="dark"] .rm-card:hover,
+[data-theme="dark"] .rm-card-soft:hover,
+[data-theme="dark"] .rm-card-warm:hover {
+    border-color: var(--rm-border-hover);
+    box-shadow: var(--sombra-card-hover);
+}
+
+
+/* ============================================================
+   22. TABLAS Y SELECTS NATIVOS
+   ============================================================ */
+
+.dark option,
+[data-theme="dark"] option {
+    background: var(--rm-surface-raised);
+    color: var(--rm-text-primary);
+}
+
+.dark hr,
+[data-theme="dark"] hr {
+    border-color: var(--color-borde-suave);
+}
+
+.dark *,
+[data-theme="dark"] * {
+    scrollbar-color: var(--color-scrollbar-thumb) var(--color-scrollbar-track);
+}
+
+.dark *::-webkit-scrollbar-track,
+[data-theme="dark"] *::-webkit-scrollbar-track {
+    background: var(--color-scrollbar-track);
+}
+
+.dark *::-webkit-scrollbar-thumb,
+[data-theme="dark"] *::-webkit-scrollbar-thumb {
+    background-color: var(--color-scrollbar-thumb);
+}
+
+.dark *::-webkit-scrollbar-thumb:hover,
+[data-theme="dark"] *::-webkit-scrollbar-thumb:hover {
+    background-color: var(--color-scrollbar-thumb-hover);
+}
+
+
+/* ============================================================
+   23. LANDING / WELCOME EN MODO OSCURO
+   ============================================================ */
+
+.dark .welcome-page,
+[data-theme="dark"] .welcome-page {
+    --welcome-fondo: var(--color-fondo-app);
+    --welcome-titulo: #F4EFE8;
+    --welcome-texto: #EAE6DF;
+    --welcome-muted: #C7CED8;
+    --welcome-borde: rgba(255, 248, 241, 0.12);
+
+    --welcome-card: rgba(43, 54, 66, 0.30);
+    --welcome-card-strong: rgba(43, 54, 66, 0.44);
+    --welcome-card-border: rgba(255, 248, 241, 0.14);
+
+    --welcome-acento: #F4A261;
+    --welcome-acento-hover: #F7B7A3;
+
+    --welcome-primario: #F4A261;
+    --welcome-primario-hover: #F7B7A3;
+
+    --welcome-secundario: rgba(43, 54, 66, 0.42);
+    --welcome-secundario-hover: rgba(58, 70, 82, 0.56);
+
+    --welcome-boton-texto: #231A16;
+
+    --welcome-panel: rgba(36, 48, 58, 0.52);
+    --welcome-card-shadow: var(--sombra-card);
+    --welcome-panel-shadow: var(--sombra-panel);
+}
+
+
+/* ============================================================
+   24. COMPATIBILIDAD SIN BACKDROP-FILTER
+   ============================================================ */
+
+@supports not ((backdrop-filter: blur(10px)) or (-webkit-backdrop-filter: blur(10px))) {
+
+    .dark,
+    [data-theme="dark"] {
+        --color-fondo-card: rgba(43, 54, 66, 0.88);
+        --color-fondo-card-suave: rgba(43, 54, 66, 0.82);
+        --color-fondo-panel: rgba(36, 48, 58, 0.88);
+        --color-modal-bg: rgba(36, 48, 58, 0.94);
+        --surface-card: rgba(43, 54, 66, 0.88);
+        --surface-panel: rgba(36, 48, 58, 0.88);
+    }
+}
+
+
+/* ============================================================
+   25. RESPONSIVE
+   ============================================================ */
+
+@media (max-width: 640px) {
+
+    .dark .rm-modal-panel,
+    .dark .modal-institucional,
+    [data-theme="dark"] .rm-modal-panel,
+    [data-theme="dark"] .modal-institucional {
+        background: rgba(36, 48, 58, 0.86);
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
+    }
+
+    .dark .rm-card,
+    .dark .rm-card-soft,
+    .dark .rm-card-warm,
+    .dark .panel-institucional,
+    .dark .card-interactiva,
+    [data-theme="dark"] .rm-card,
+    [data-theme="dark"] .rm-card-soft,
+    [data-theme="dark"] .rm-card-warm,
+    [data-theme="dark"] .panel-institucional,
+    [data-theme="dark"] .card-interactiva {
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
+    }
+}

@@ -1,0 +1,33 @@
+<?php
+
+namespace App\Http\Requests\Residentes;
+
+use Illuminate\Foundation\Http\FormRequest;
+
+class StoreActividadAdultoRequest extends FormRequest
+{
+    public function authorize(): bool
+    {
+        return true;
+    }
+
+    public function rules(): array
+    {
+        return [
+            'fecha' => 'required|date',
+            'hora' => 'required|date_format:H:i',
+            'cod_tipo_act' => 'required|string|max:60',
+            'obs' => 'nullable|string|max:2000',
+            'estado' => 'required|in:PROGRAMADA,EN_CURSO,REALIZADA,FINALIZADA,CANCELADA,ANULADA,ACTIVA',
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'fecha.required' => 'La fecha es obligatoria.',
+            'hora.required' => 'La hora es obligatoria.',
+            'cod_tipo_act.required' => 'El tipo de actividad es obligatorio.',
+        ];
+    }
+}
