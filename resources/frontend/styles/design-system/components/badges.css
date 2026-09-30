@@ -13,9 +13,9 @@
 
 :root {
     --rm-badge-radius: var(--rm-radius-pill);
-    --rm-badge-height: 22px;
-    --rm-badge-font-size: var(--rm-font-size-badge);
-    --rm-badge-font-weight: var(--rm-font-weight-bold);
+    --rm-badge-height: 24px;
+    --rm-badge-font-size: var(--rm-text-xs);
+    --rm-badge-font-weight: var(--rm-weight-bold);
 
     --rm-badge-danger-bg: var(--rm-danger-soft);
     --rm-badge-danger-text: var(--rm-danger);
@@ -33,13 +33,12 @@
     display: inline-flex;
     align-items: center;
     gap: var(--rm-space-1);
-    padding: var(--rm-space-1) var(--rm-space-3);
+    min-height: var(--rm-badge-height);
+    padding: 2px 9px;
     border-radius: var(--rm-radius-pill);
     font-family: var(--rm-font-family);
-    font-size: var(--rm-font-size-meta);
-    font-weight: var(--rm-font-weight-bold);
-    text-transform: uppercase;
-    letter-spacing: var(--rm-letter-spacing-wide);
+    font-size: var(--rm-badge-font-size);
+    font-weight: var(--rm-badge-font-weight);
     line-height: var(--rm-line-height-tight);
     border: 1px solid transparent;
     white-space: nowrap;
@@ -65,8 +64,8 @@
 
 /* 2. Success / Éxito: Verde */
 .rm-badge-success {
-    background-color: var(--rm-success-soft);
-    color: var(--rm-coffee-900);
+    background-color: var(--rm-success-bg);
+    color: var(--rm-success-strong);
     border-color: color-mix(in srgb, var(--rm-success) 35%, transparent);
 }
 .rm-badge-success .rm-badge-dot {
@@ -75,8 +74,8 @@
 
 /* 3. Info / Información: Azul */
 .rm-badge-info {
-    background-color: var(--rm-info-soft);
-    color: var(--rm-coffee-900);
+    background-color: var(--rm-info-bg);
+    color: var(--rm-info-strong);
     border-color: color-mix(in srgb, var(--rm-info) 35%, transparent);
 }
 .rm-badge-info .rm-badge-dot {
@@ -85,8 +84,8 @@
 
 /* 4. Warning / Advertencia: Cobre (Cero Amarillo Fluorescente) */
 .rm-badge-warning {
-    background-color: var(--rm-warning-soft);
-    color: var(--rm-coffee-900);
+    background-color: var(--rm-warning-bg);
+    color: var(--rm-warning-strong);
     border-color: color-mix(in srgb, var(--rm-warning) 35%, transparent);
 }
 .rm-badge-warning .rm-badge-dot {
@@ -94,12 +93,14 @@
 }
 
 /* 5. Danger / Peligro: Coral */
-.rm-badge-danger {
-    background-color: var(--rm-danger-soft);
-    color: var(--rm-coffee-900);
+.rm-badge-danger,
+.rm-badge-critical {
+    background-color: var(--rm-critical-bg);
+    color: var(--rm-critical);
     border-color: color-mix(in srgb, var(--rm-danger) 35%, transparent);
 }
-.rm-badge-danger .rm-badge-dot {
+.rm-badge-danger .rm-badge-dot,
+.rm-badge-critical .rm-badge-dot {
     background-color: var(--rm-danger);
 }
 
@@ -141,12 +142,14 @@
     background-color: var(--rm-warning);
 }
 
-.dark .rm-badge-danger {
+.dark .rm-badge-danger,
+.dark .rm-badge-critical {
     background-color: color-mix(in srgb, var(--rm-danger) 22%, transparent);
     color: var(--rm-text-primary);
     border-color: color-mix(in srgb, var(--rm-danger) 45%, transparent);
 }
-.dark .rm-badge-danger .rm-badge-dot {
+.dark .rm-badge-danger .rm-badge-dot,
+.dark .rm-badge-critical .rm-badge-dot {
     background-color: var(--rm-danger);
 }
 

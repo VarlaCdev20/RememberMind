@@ -12,11 +12,12 @@
  'titulo' => 'Sin resultados',
  'texto' => 'No hay registros que mostrar en este momento.',
  'color' => 'text-meta',
+ 'compact' => false,
 ])
 
-<div class="rm-empty-state {{ $attributes->get('class') }}">
+<div class="rm-empty-state {{ $compact ? 'rm-empty-state--compact' : '' }} {{ $attributes->get('class') }}">
  <div class="rm-empty-state-icon">
- <i class="ph-bold {{ $icono }} text-3xl {{ $color }}"></i>
+ <i class="ph-bold {{ $icono }} text-3xl {{ $compact ? '' : $color }}" aria-hidden="true"></i>
  </div>
  <h3 class="rm-empty-state-title">{{ $titulo }}</h3>
  <p class="rm-empty-state-text">{{ $texto }}</p>

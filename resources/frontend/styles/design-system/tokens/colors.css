@@ -20,9 +20,10 @@
    /* ============================================================
       2. SUPERFICIES — Escala con ΔL ≈ 7-8 entre niveles
       ============================================================ */
-   --rm-surface: #E5DDD5;          /* card/panel del landing */
-   --rm-surface-soft: #D9CDC2;     /* subpanel cálido */
-   --rm-surface-muted: #D2C6BC;    /* wrapper gris café */
+   --rm-surface-main: #EBE3DD;
+   --rm-surface: var(--rm-surface-main);
+   --rm-surface-soft: #E4DAD4;
+   --rm-surface-muted: #DDD3CC;
    --rm-surface-raised: #EEE8E2;   /* elevado, nunca blanco */
 
    --rm-surface-alt: var(--rm-surface-soft);
@@ -32,12 +33,14 @@
    /* ============================================================
       3. TEXTO — Contraste real entre niveles
       ============================================================ */
-   --rm-text-primary: #48423E;     /* tinta cálida del landing */
-   --rm-text-title: #48423E;
-   --rm-text-body: #5D5752;        /* café grisáceo — párrafos */
-   --rm-text-secondary: #716A65;   /* subtítulos */
-   --rm-text-muted: #716A65;       /* metadata con contraste AA */
+   --rm-text-primary: #302C2A;
+   --rm-text-title: var(--rm-text-primary);
+   --rm-text-body: #625B57;
+   --rm-text-secondary: #625B57;
+   --rm-text-muted: #817873;
    --rm-text-soft: #7A736E;
+   --rm-text-on-dark: #EEE5DF;
+   --rm-text-on-dark-soft: #DCCFC7;
    --rm-text-on-primary: #34453A;
    --rm-text-inverse: #F4EEE8;
 
@@ -45,7 +48,8 @@
       4. BORDES — Sutiles, apoyo de sombra
       ============================================================ */
    --rm-border: #B9AFA7;
-   --rm-border-soft: #D0C6BE;
+   --rm-border-soft: rgba(120, 101, 91, .10);
+   --rm-border-medium: rgba(120, 101, 91, .18);
    --rm-border-hover: #8D837C;
    --rm-border-strong: #A49A92;
 
@@ -74,8 +78,8 @@
    /* ============================================================
       6. FOCUS & SELECTED
       ============================================================ */
-   --rm-focus: #527DAA;
-   --rm-focus-ring: 0 0 0 3px rgba(82, 125, 170, .28);
+   --rm-focus: var(--rm-sky-500);
+   --rm-focus-ring: 0 0 0 3px rgba(83, 151, 184, .28);
    --rm-disabled-opacity: 0.55;
 
    --rm-selected-bg: #A9C1AA;
@@ -89,6 +93,14 @@
    /* ============================================================
       7. SIDEBAR — Taupe/capuchino
       ============================================================ */
+   --rm-sidebar-bg: var(--rm-mocha-300);
+   --rm-sidebar-hover: var(--rm-mocha-200);
+   --rm-sidebar-active: var(--rm-taupe-200);
+   --rm-sidebar-border: var(--rm-taupe-500);
+   --rm-sidebar-text: var(--rm-coffee-950);
+   --rm-sidebar-text-soft: var(--rm-coffee-700);
+   --rm-sidebar-indicator: var(--rm-mint-700);
+
    --rm-nav-bg: transparent;
    --rm-nav-text: #4C403A;
    --rm-nav-hover: rgba(255, 255, 255, .28);
@@ -205,20 +217,20 @@
    /* ============================================================
       17. ESTADOS SEMÁNTICOS (WCAG AA)
       ============================================================ */
-   --rm-danger: #98594F;
-   --rm-danger-hover: #7F4942;
-   --rm-danger-strong: var(--rm-coral-700);
-   --rm-danger-soft: #E7C6BD;
-   --rm-danger-action: var(--rm-danger);
-   --rm-danger-action-hover: var(--rm-danger-hover);
+   --rm-danger: var(--rm-danger-500);
+   --rm-danger-hover: var(--rm-danger-700);
+   --rm-danger-strong: var(--rm-danger-700);
+   --rm-danger-soft: var(--rm-danger-50);
+   --rm-danger-action: var(--rm-danger-700);
+   --rm-danger-action-hover: var(--rm-danger-500);
 
    --rm-status-high: #D47A4D;
    --rm-status-high-soft: #F0C6AE;
 
-   --rm-warning: #B2764C;
-   --rm-warning-hover: #98603A;
-   --rm-warning-strong: var(--rm-copper-700);
-   --rm-warning-soft: #EBD8C8;
+   --rm-warning: var(--rm-coral-500);
+   --rm-warning-hover: var(--rm-coral-700);
+   --rm-warning-strong: var(--rm-coral-700);
+   --rm-warning-soft: var(--rm-coral-50);
 
    --rm-status-stable: #536B5A;
    --rm-status-stable-soft: #E2EBE3;
@@ -226,21 +238,28 @@
    --rm-status-attention: var(--rm-info);
    --rm-status-attention-soft: #DCE8F7;
 
-   --rm-success: #536B5A;
-   --rm-success-hover: #465B4C;
-   --rm-success-soft: #E2EBE3;
-   --rm-success-strong: #34453A;
-   --rm-success-action: var(--rm-success);
-   --rm-success-action-hover: var(--rm-success-hover);
+   --rm-success: var(--rm-mint-500);
+   --rm-success-hover: var(--rm-mint-700);
+   --rm-success-soft: var(--rm-mint-50);
+   --rm-success-strong: var(--rm-mint-700);
+   --rm-success-action: var(--rm-mint-700);
+   --rm-success-action-hover: var(--rm-mint-500);
 
-   --rm-info: #355D86;
+   --rm-info: var(--rm-sky-500);
    --rm-info-secondary: #496F9A;
    --rm-info-hover: #294C70;
-   --rm-info-strong: var(--rm-blue-700);
-   --rm-info-soft: #DCE8F7;
+   --rm-info-strong: var(--rm-sky-700);
+   --rm-info-soft: var(--rm-sky-50);
    --rm-info-secondary-soft: #E7EFF9;
-   --rm-info-action: var(--rm-info);
+   --rm-info-action: var(--rm-sky-700);
    --rm-info-action-hover: var(--rm-info-hover);
+
+   /* Semántica estable para los componentes de las siguientes fases. */
+   --rm-success-bg: var(--rm-mint-50);
+   --rm-info-bg: var(--rm-sky-50);
+   --rm-warning-bg: var(--rm-coral-50);
+   --rm-critical-bg: var(--rm-danger-50);
+   --rm-critical: var(--rm-danger-500);
 
    /* ============================================================
       18. LEGACY BRIDGE (compatibilidad V1)
@@ -438,6 +457,7 @@
       2. SUPERFICIES
       ============================================================ */
    --rm-surface: #10212B;
+   --rm-surface-main: var(--rm-surface);
    --rm-surface-soft: #142832;
    --rm-surface-muted: #0D1C25;
    --rm-surface-raised: #192E39;
@@ -507,6 +527,14 @@
    /* ============================================================
       7. SIDEBAR DARK
       ============================================================ */
+   --rm-sidebar-bg: var(--rm-bg-shell);
+   --rm-sidebar-hover: var(--rm-surface-soft);
+   --rm-sidebar-active: var(--rm-surface-raised);
+   --rm-sidebar-border: var(--rm-border-soft);
+   --rm-sidebar-text: var(--rm-text-primary);
+   --rm-sidebar-text-soft: var(--rm-text-secondary);
+   --rm-sidebar-indicator: var(--rm-action-primary);
+
    --rm-nav-bg: transparent;
    --rm-nav-text: #AFC0C7;
    --rm-nav-hover: #122630;
@@ -591,15 +619,20 @@
    --rm-danger: #FF4D67;
    --rm-danger-hover: #FF6B80;
    --rm-danger-soft: rgba(255, 77, 103, .15);
-   --rm-warning: #F5B72E;
-   --rm-warning-hover: #FFD05A;
-   --rm-warning-soft: rgba(245, 183, 46, .14);
+   --rm-warning: #EB9186;
+   --rm-warning-hover: #F2CAC4;
+   --rm-warning-soft: rgba(235, 145, 134, .16);
    --rm-success: #20C997;
    --rm-success-hover: #43D9AC;
    --rm-success-soft: rgba(32, 201, 151, .14);
    --rm-info: #35BDF2;
    --rm-info-hover: #63D0F7;
    --rm-info-soft: rgba(53, 189, 242, .14);
+   --rm-success-bg: var(--rm-success-soft);
+   --rm-info-bg: var(--rm-info-soft);
+   --rm-warning-bg: var(--rm-warning-soft);
+   --rm-critical-bg: var(--rm-danger-soft);
+   --rm-critical: var(--rm-danger);
 
    --rm-clinical: #4EA8FF;
    --rm-clinical-strong: #79BEFF;

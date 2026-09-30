@@ -5,13 +5,27 @@
 
 :root {
 
-   --rm-font-family:
-      "Nunito Sans",
-      system-ui,
-      -apple-system,
-      BlinkMacSystemFont,
-      "Segoe UI",
-      sans-serif;
+   --rm-font-display: "Nunito Sans", system-ui, sans-serif;
+   --rm-font-body: "Inter", system-ui, sans-serif;
+   --rm-font-title: var(--rm-font-display);
+
+   --rm-font-family: var(--rm-font-body);
+
+   /* Escala de uso futuro; los componentes existentes conservan sus tamaños. */
+   --rm-text-xs: 12px;
+   --rm-text-sm: 13px;
+   --rm-text-base: 14px;
+   --rm-text-md: 15px;
+   --rm-text-lg: 17px;
+   --rm-text-xl: 20px;
+   --rm-text-2xl: 26px;
+   --rm-text-3xl: 32px;
+   --rm-text-kpi: 36px;
+
+   --rm-weight-regular: 400;
+   --rm-weight-medium: 500;
+   --rm-weight-semibold: 600;
+   --rm-weight-bold: 700;
 
    /* Escala Tipográfica Estándar */
    --rm-font-size-page: 30px;
@@ -50,3 +64,12 @@
    --rm-letter-spacing-wide: .035em;
    --rm-letter-spacing-wider: .05em;
 }
+
+/* Jerarquía semántica opt-in para componentes de la fase 2. */
+.rm-heading-page { font: 700 clamp(26px, 2.2vw, 32px)/1.2 var(--rm-font-display); color: var(--rm-text-primary); }
+.rm-heading-section { font: 700 var(--rm-text-xl)/1.25 var(--rm-font-display); color: var(--rm-text-primary); }
+.rm-heading-card { font: 700 var(--rm-text-lg)/1.3 var(--rm-font-display); color: var(--rm-text-primary); }
+.rm-body { font: 400 var(--rm-text-base)/1.5 var(--rm-font-body); color: var(--rm-text-primary); }
+.rm-body-sm { font: 400 var(--rm-text-sm)/1.45 var(--rm-font-body); color: var(--rm-text-secondary); }
+.rm-caption { font: 400 var(--rm-text-xs)/1.4 var(--rm-font-body); color: var(--rm-text-secondary); }
+.rm-kpi-value { font: 700 var(--rm-text-kpi)/1.1 var(--rm-font-display); color: var(--rm-text-primary); }

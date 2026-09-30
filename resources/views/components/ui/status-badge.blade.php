@@ -33,6 +33,8 @@
         'ALTO' => 'Alto',
         'MEDIO' => 'Medio',
         'BAJO' => 'Bajo',
+        'COMPLETADO', 'COMPLETADA' => 'Completado',
+        'VENCIDO', 'VENCIDA' => 'Vencido',
         'ALERTA' => 'Alerta',
         'ERROR' => 'Error',
         'FALLECIDO' => 'Fallecido',
@@ -48,18 +50,18 @@
         'info', 'informacion', 'información' => 'rm-badge-info',
         'warning', 'advertencia' => 'rm-badge-warning',
         'clinical' => 'rm-badge-clinical',
-        'danger', 'peligro' => 'rm-badge-danger',
+        'danger', 'peligro', 'critical', 'critico', 'crítico' => 'rm-badge-critical',
         'neutral' => 'rm-badge-neutral',
         default => match($valor) {
             'PRIMARY', 'PRINCIPAL', 'INSTITUCIONAL'
                 => 'rm-badge-primary',
-            'ACTIVO', 'ACTIVA', 'ESTABLE', 'VIGENTE', 'DISPONIBLE', 'EXITO', 'RESUELTA', 'RESUELTO', 'ADMINISTRADO', 'ADMINISTRADA'
+            'ACTIVO', 'ACTIVA', 'ESTABLE', 'VIGENTE', 'DISPONIBLE', 'EXITO', 'RESUELTA', 'RESUELTO', 'ADMINISTRADO', 'ADMINISTRADA', 'COMPLETADO', 'COMPLETADA', 'BAJO'
                 => 'rm-badge-success',
-            'VIGILANCIA', 'PENDIENTE', 'SUSPENDIDO', 'SUSPENDIDA', 'EN_REVISION', 'ABIERTA', 'ABIERTO', 'MEDIO'
+            'VIGILANCIA', 'SUSPENDIDO', 'SUSPENDIDA', 'EN_REVISION', 'ABIERTA', 'ABIERTO', 'MEDIO'
                 => 'rm-badge-warning',
-            'CRITICO', 'CRÍTICO', 'ALTO', 'ALERTA', 'ERROR', 'FALLECIDO', 'RETIRADO'
-                => 'rm-badge-danger',
-            'EN_ATENCION', 'TRASLADADO', 'SEGUIMIENTO_ESPECIAL', 'INFORMATIVO', 'PRESCRITO', 'PROGRAMADO', 'BAJO'
+            'CRITICO', 'CRÍTICO', 'ALTO', 'ALERTA', 'ERROR', 'FALLECIDO', 'RETIRADO', 'VENCIDO', 'VENCIDA'
+                => 'rm-badge-critical',
+            'EN_ATENCION', 'TRASLADADO', 'SEGUIMIENTO_ESPECIAL', 'INFORMATIVO', 'PRESCRITO', 'PROGRAMADO', 'PENDIENTE'
                 => 'rm-badge-info',
             default
                 => 'rm-badge-neutral',

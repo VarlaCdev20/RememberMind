@@ -5,6 +5,9 @@ namespace App\Frontend\Livewire\Enfermeria\Cuidados;
 use App\Backend\Modulos\Alertas\Servicios\AlertasService;
 use App\Backend\Modulos\Clinica\Servicios\SignosVitalesService;
 use App\Backend\Modulos\Enfermeria\Servicios\MiTurnoService;
+use App\Backend\Modulos\Enfermeria\Servicios\DashboardComplementosService;
+use App\Backend\Modulos\Enfermeria\Servicios\TendenciaIncidentesService;
+use App\Backend\Modulos\Enfermeria\Servicios\TendenciaOcupacionService;
 use App\Backend\Modulos\Enfermeria\Servicios\TurnoEnfermeriaService;
 use App\Backend\Modulos\Medicacion\Servicios\AgendaMedicacionService;
 use App\Backend\Modulos\Medicacion\Servicios\RegistrarAdministracionMedicacionService;
@@ -492,6 +495,11 @@ class DashboardTurno extends Component
     {
         $miTurnoService = app(MiTurnoService::class);
         $dashboard = $miTurnoService->obtenerDatosDashboard(Auth::user(), $this->filtroFecha);
+        $incidentesTendencia = ($dashboard['estado'] ?? null) === 'SIN_JORNADA_ACTIVA'
+            ? null
+            : app(TendenciaIncidentesService::class)->resumir(
+                array_column($dashboard['residentes'] ?? [], 'cod_residente')
+            );
         $residentesDashboard = collect($dashboard['residentes'] ?? []);
         $distribucionPacientes = [
             'sin_alertas' => $residentesDashboard->where('estado_seguimiento', 'SIN_ALERTAS')->count(),
@@ -501,13 +509,30 @@ class DashboardTurno extends Component
             )->count(),
         ];
 
+        $camas = DB::table('camas')
+            ->leftJoin('ocupaciones_cama', function ($join) {
+                $join->on('ocupaciones_cama.cod_cama', '=', 'camas.cod_cama')
+                    ->where('ocupaciones_cama.estado', '=', 'ACTIVA')
+                    ->whereNull('ocupaciones_cama.fecha_hora_liberacion');
+            })
+            ->where('camas.estado', 'ACTIVA')
+            ->selectRaw('COUNT(DISTINCT camas.cod_cama) AS total, COUNT(DISTINCT ocupaciones_cama.cod_cama) AS ocupadas')
+            ->first();
+        $camasTurno = ($camas?->total ?? 0) > 0
+            ? ['ocupadas' => (int) $camas->ocupadas, 'total' => (int) $camas->total]
+            : null;
+
         return view('livewire.cuidados.dashboard-turno', [
             'dashboard' => $dashboard,
+            'complementos' => app(DashboardComplementosService::class)->resumir($dashboard, Auth::user()),
+            'incidentesTendencia' => $incidentesTendencia,
+            'tendenciaOcupacion' => app(TendenciaOcupacionService::class)->ultimosSieteDias(),
+            'camasTurno' => $camasTurno,
             'stats' => [
                 'pacientes' => count($dashboard['residentes']),
                 'alertas_activas' => ($dashboard['kpis']['por_atender']['numero'] ?? 0) + ($dashboard['kpis']['en_atencion']['numero'] ?? 0),
                 'alertas_criticas' => $dashboard['kpis']['criticas_altas']['numero'] ?? 0,
-                'medicacion_pendiente' => $dashboard['estado_tareas']['pendientes'] ?? 0,
+                'medicacion_pendiente' => $dashboard['medicacion_turno']['pendientes'] ?? null,
                 'tareas_pendientes' => $dashboard['estado_tareas']['pendientes'] ?? 0,
                 'tareas_vencidas' => $dashboard['estado_tareas']['retrasadas'] ?? 0,
                 'signos_pendientes' => 0,

@@ -5,6 +5,37 @@
 
 :root {
 
+   /* Paleta base de la fase de tokens. Los componentes usan aliases semánticos. */
+   --rm-chocolate-50: #EEE6E0;
+   --rm-chocolate-100: #E1D5CD;
+   --rm-chocolate-200: #D2C0B5;
+   --rm-chocolate-300: #BFA79A;
+   --rm-chocolate-400: #A98D7E;
+   --rm-chocolate-500: #927567;
+   --rm-chocolate-600: #7C6257;
+
+   --rm-mint-50: #DDEEE7;
+   --rm-mint-100: #CBE5DC;
+   --rm-mint-300: #83C8B0;
+   --rm-mint-500: #3E9C7E;
+   --rm-mint-700: #276E5A;
+
+   --rm-sky-50: #E0EBF0;
+   --rm-sky-100: #CADFE8;
+   --rm-sky-300: #8DBCD1;
+   --rm-sky-500: #5397B8;
+   --rm-sky-700: #356B85;
+
+   --rm-coral-50: #F6DEDA;
+   --rm-coral-100: #F2CAC4;
+   --rm-coral-300: #EB9186;
+   --rm-coral-500: #DE675D;
+
+   --rm-danger-50: #F6D7D5;
+   --rm-danger-100: #EFC6C3;
+   --rm-danger-500: #D94C47;
+   --rm-danger-700: #A93634;
+
    /* Cacao / café */
    --rm-coffee-950: #2F2824;
    --rm-coffee-900: #3B312C;

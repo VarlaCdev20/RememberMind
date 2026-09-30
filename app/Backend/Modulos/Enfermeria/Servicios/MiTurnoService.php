@@ -129,6 +129,8 @@ class MiTurnoService
             // Agenda unificada basada en la programación
             $agendaUnificada = $this->resolverAgendaProgramada($codResidentes, $jornada, $inicioTurno, $finTurno, $momentoActual, $fechasAsignacionResidentes);
 
+            $medicacionTurno = $this->resumirMedicacionTurno($agendaUnificada);
+
             // Progreso del turno
             $progresoTurno = $this->calcularProgresoTurno($agendaUnificada);
 
@@ -142,6 +144,8 @@ class MiTurnoService
             $nombreTurno = $turno?->nombre ? (str_starts_with(strtolower(trim($turno->nombre)), 'turno') ? trim($turno->nombre) : "Turno {$turno->nombre}") : "Jornada {$jornada->cod_jornada}";
             $responsablePropio = $personal ? "A cargo de: Enf. {$primerNombre} ".($personal->apellido_paterno ?? '') : "A cargo de: {$nombreCompleto}";
             $residentesCards = $this->formatearResidentesCards($asigResidentes, $alertas, trim($responsablePropio), $nombreTurno);
+            $pacientesTurno = $this->prepararPacientesTurno($residentesCards, $agendaUnificada, $momentoActual);
+            $alertasPrioritarias = $this->formatearAlertasPrioritarias($alertas);
 
             // Formateo de stream de alertas recientes del turno
             $alertasRecientes = $this->formatearAlertasRecientes($alertas);
@@ -191,6 +195,8 @@ class MiTurnoService
                 ] : null,
                 'agenda' => array_slice($agendaUnificada, 0, 10),
                 'agenda_hoy' => array_slice($agendaUnificada, 0, 10),
+                'agenda_resumen' => $this->prepararAgendaResumen($agendaUnificada),
+                'medicacion_turno' => $medicacionTurno,
                 'estado_tareas' => $progresoTurno,
                 'progreso' => [
                     'completadas' => $progresoTurno['realizadas'],
@@ -205,6 +211,9 @@ class MiTurnoService
                     collect($distribucionCuidados)->pluck('total', 'label')->toArray()
                 ),
                 'residentes' => $residentesCards,
+                'pacientes_turno' => $pacientesTurno,
+                'alertas_prioritarias' => $alertasPrioritarias,
+                'alertas_pendientes_count' => (int) $kpisData['por_atender']['numero'],
                 'alertas' => count($alertasRecientes),
                 'alertas_recientes' => $alertasRecientes,
             ];
@@ -227,10 +236,15 @@ class MiTurnoService
                 'estado' => 'SIN_JORNADA_ACTIVA',
                 'jornada' => null,
                 'residentes' => [],
+                'pacientes_turno' => [],
                 'agenda' => [],
                 'agenda_hoy' => [],
+                'agenda_resumen' => [],
+                'medicacion_turno' => null,
                 'alertas' => 0,
                 'alertas_recientes' => [],
+                'alertas_prioritarias' => [],
+                'alertas_pendientes_count' => 0,
                 'progreso' => null,
                 'alerta_critica' => null,
                 'estado_tareas' => [
@@ -399,6 +413,10 @@ class MiTurnoService
         unset($card);
 
         $agendaUnificada = $this->resolverAgendaProgramada($codResidentes, $jornadaPrincipal, $inicioTurno, $finTurno, $momentoActual);
+        // En consulta se muestran únicamente residentes del turno activo del equipo.
+        $pacientesTurno = $this->prepararPacientesTurno($residentesCards, $agendaUnificada, $momentoActual);
+        $alertasPrioritarias = $this->formatearAlertasPrioritarias($alertas);
+        $medicacionTurno = $this->resumirMedicacionTurno($agendaUnificada);
         $progresoTurno = $this->calcularProgresoTurno($agendaUnificada);
         $estadoGeneral = $this->calcularEstadoGeneral($alertas, (int) ($progresoTurno['retrasadas'] ?? 0), $alertaCritica, $momentoActual);
 
@@ -450,6 +468,8 @@ class MiTurnoService
             ] : null,
             'agenda' => array_slice($agendaUnificada, 0, 10),
             'agenda_hoy' => array_slice($agendaUnificada, 0, 10),
+            'agenda_resumen' => $this->prepararAgendaResumen($agendaUnificada),
+            'medicacion_turno' => $medicacionTurno,
             'estado_tareas' => $progresoTurno,
             'progreso' => [
                 'completadas' => $progresoTurno['realizadas'],
@@ -464,6 +484,9 @@ class MiTurnoService
                 collect($distribucionCuidados)->pluck('total', 'label')->toArray()
             ),
             'residentes' => $residentesCards,
+            'pacientes_turno' => $pacientesTurno,
+            'alertas_prioritarias' => $alertasPrioritarias,
+            'alertas_pendientes_count' => (int) $kpisData['por_atender']['numero'],
             'alertas' => count($alertasRecientes),
             'alertas_recientes' => $alertasRecientes,
         ];
@@ -873,6 +896,7 @@ class MiTurnoService
                     'cod_residente' => $prescripcion->cod_residente,
                     'estado' => $estado,
                     'detalle_omision' => $detalleOmitida,
+                    'tiene_horario_programado' => true,
                 ];
             }
         }
@@ -1036,6 +1060,7 @@ class MiTurnoService
                         'cod_residente' => $plan->cod_residente,
                         'estado' => $estado,
                         'detalle_omision' => $detalleOmitida,
+                        'tiene_horario_programado' => true,
                     ];
                 }
             }
@@ -1074,6 +1099,7 @@ class MiTurnoService
                 'cod_residente' => $ejec->cod_residente,
                 'estado' => $estado,
                 'detalle_omision' => $ejec->motivo_omision,
+                'tiene_horario_programado' => $ejec->fecha_hora_programada !== null,
             ];
         }
 
@@ -1096,6 +1122,46 @@ class MiTurnoService
         });
 
         return $agendaArray;
+    }
+
+    /** Vista compacta de la misma agenda que alimenta el KPI de medicación. */
+    public function prepararAgendaResumen(array $agenda, int $limite = 5): array
+    {
+        $programados = array_values(array_filter($agenda, fn (array $item) =>
+            ($item['tiene_horario_programado'] ?? false)
+            && isset($item['momento'], $item['hora'])
+        ));
+
+        $prioridad = ['RETRASADO' => 0, 'PRÓXIMO' => 1, 'PENDIENTE' => 2, 'REALIZADO' => 3];
+        usort($programados, fn (array $a, array $b) =>
+            (($prioridad[$a['estado'] ?? ''] ?? 4) <=> ($prioridad[$b['estado'] ?? ''] ?? 4))
+            ?: (($a['momento'] ?? 0) <=> ($b['momento'] ?? 0))
+            ?: strcmp((string) ($a['accion'] ?? ''), (string) ($b['accion'] ?? ''))
+            ?: strcmp((string) ($a['residente'] ?? ''), (string) ($b['residente'] ?? ''))
+        );
+
+        return array_map(static fn (array $item) => [
+            'time' => $item['hora'],
+            'datetime' => Carbon::createFromTimestamp($item['momento'], config('app.timezone'))->toIso8601String(),
+            'title' => $item['accion'] ?? '',
+            'patient' => ($item['residente'] ?? null) === 'Residente asignado' ? null : ($item['residente'] ?? null),
+            'type' => $item['tipo'] ?? 'CUIDADO',
+            'icon' => $item['icono'] ?? 'ph-stethoscope',
+            'status' => $item['estado'] ?? 'PENDIENTE',
+            'omission' => $item['detalle_omision'] ?? null,
+        ], array_slice($programados, 0, max(0, $limite)));
+    }
+
+    /** Resume únicamente las dosis programadas para la jornada, antes de recortar la agenda visual. */
+    private function resumirMedicacionTurno(array $agenda): array
+    {
+        $medicaciones = array_filter($agenda, fn ($item) => ($item['tipo'] ?? null) === 'MEDICACION');
+
+        return [
+            'total' => count($medicaciones),
+            'pendientes' => count(array_filter($medicaciones, fn ($item) => in_array($item['estado'] ?? null, ['PENDIENTE', 'PRÓXIMO', 'RETRASADO'], true))),
+            'retrasadas' => count(array_filter($medicaciones, fn ($item) => ($item['estado'] ?? null) === 'RETRASADO')),
+        ];
     }
 
     /**
@@ -1387,6 +1453,79 @@ class MiTurnoService
         }
 
         return $cards;
+    }
+
+    /** Alertas ABIERTAS sin atención: misma definición que el KPI «por atender». */
+    private function formatearAlertasPrioritarias(Collection $alertas): array
+    {
+        $orden = ['CRITICO' => 0, 'CRITICA' => 0, 'ALTO' => 1, 'ALTA' => 1,
+            'MEDIO' => 2, 'MEDIA' => 2, 'BAJO' => 3, 'BAJA' => 3];
+
+        return $alertas
+            ->filter(fn ($a) => strtoupper(trim((string) $a->estado)) === 'ABIERTA')
+            ->sort(function ($a, $b) use ($orden) {
+                $prioridadA = $orden[strtoupper(trim((string) $a->prioridad))] ?? 4;
+                $prioridadB = $orden[strtoupper(trim((string) $b->prioridad))] ?? 4;
+
+                return ($prioridadA <=> $prioridadB)
+                    ?: (($a->fecha_hora?->timestamp ?? PHP_INT_MAX) <=> ($b->fecha_hora?->timestamp ?? PHP_INT_MAX))
+                    ?: strcmp((string) $a->cod_alerta, (string) $b->cod_alerta);
+            })
+            ->take(4)
+            ->map(function ($a) {
+                $ubicacion = $this->formatearUbicacion($a->residente);
+
+                return [
+                    'cod_alerta' => $a->cod_alerta,
+                    'paciente' => $a->residente?->nombre_completo ?? 'Residente no disponible',
+                    'habitacion' => str_starts_with($ubicacion, 'Hab.') ? $ubicacion : null,
+                    'tipo' => $a->tipo,
+                    'descripcion' => $a->descripcion ?: $a->titulo,
+                    'prioridad' => strtoupper(trim((string) $a->prioridad)),
+                    'tiempo' => $a->fecha_hora?->diffForHumans(),
+                    'estado' => strtoupper(trim((string) $a->estado)),
+                ];
+            })->values()->all();
+    }
+
+    /** Prepara solo residentes asignados; la agenda ya está cargada y ordenada por el servicio. */
+    private function prepararPacientesTurno(array $residentes, array $agenda, Carbon $ahora): array
+    {
+        $proximas = [];
+        foreach ($agenda as $atencion) {
+            $codigo = $atencion['cod_residente'] ?? null;
+            $momento = $atencion['momento'] ?? null;
+            if (! $codigo || ! is_numeric($momento) || (int) $momento < $ahora->timestamp
+                || ! in_array($atencion['estado'] ?? '', ['PENDIENTE', 'PRÓXIMO'], true)) {
+                continue;
+            }
+            if (! isset($proximas[$codigo]) || (int) $momento < $proximas[$codigo]['momento']) {
+                $proximas[$codigo] = [
+                    'momento' => (int) $momento,
+                    'hora' => $atencion['hora'] ?? Carbon::createFromTimestamp((int) $momento)->format('H:i'),
+                    'tipo' => $atencion['accion'] ?? $atencion['tipo'] ?? 'Atención programada',
+                ];
+            }
+        }
+
+        foreach ($residentes as &$residente) {
+            $residente['proxima_atencion'] = $proximas[$residente['cod_residente']] ?? null;
+            // No se infiere diagnóstico cognitivo ni nivel de riesgo desde alertas o supervisión.
+            $residente['estado_cognitivo'] = null;
+            $residente['riesgo'] = null;
+        }
+        unset($residente);
+
+        usort($residentes, function ($a, $b) {
+            $momentoA = $a['proxima_atencion']['momento'] ?? PHP_INT_MAX;
+            $momentoB = $b['proxima_atencion']['momento'] ?? PHP_INT_MAX;
+
+            return ($momentoA <=> $momentoB)
+                ?: (($b['alertas_count'] ?? 0) <=> ($a['alertas_count'] ?? 0))
+                ?: strcmp($a['nombre_completo'] ?? '', $b['nombre_completo'] ?? '');
+        });
+
+        return array_slice($residentes, 0, 5);
     }
 
     /**
