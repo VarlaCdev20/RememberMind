@@ -1,6 +1,45 @@
 # RememberMind — Codex setup
 
-This pack is prepared for the `REFAC_BDD` V2 line.
+This configuration is prepared for the V2 line based on `REFAC_BDD` and the working branch `codex/agents-md`.
+
+## Functional orientation
+
+Before substantial normal-system work, Codex should use:
+
+```text
+docs/REMEMBERMIND_MAPA_MAESTRO.md
+```
+
+as the current functional map of RememberMind.
+
+The map defines the normal operational product: institution, personnel, admission, resident care, daily health follow-up, medication, longitudinal history, charts/comparison, alerts, shift continuity, family access and traceability.
+
+The future expert system is intentionally separate. Do not mix semantic-network reasoning, decision trees, multicriteria inference or expert prediction into normal operational tasks unless a future expert-system document/module explicitly requests it.
+
+## Current functional role model
+
+RememberMind currently uses 10 functional roles:
+
+```text
+SUPERADMINISTRADOR
+GERENTE
+ADMINISTRADOR
+ENFERMEROS
+MEDICO GENERAL/GERIATRA
+PSICOLOGO/A
+PEDAGOGO
+NUTRICIONISTA
+FISIOTERAPEUTA
+FAMILIAR
+```
+
+`VOLUNTARIO` is outside current scope.
+
+Gerente and Administrador are distinct:
+- Gerente: personnel/staffing/HR-oriented management supported by the current model.
+- Administrador: daily institutional operation, admission, beds, residents, documents, journeys/assignments, visits and administrative follow-up.
+
+Roles/permissions belong to Spatie technical tables and do not change the frozen 69-table operational schema.
 
 ## Included instruction hierarchy
 
@@ -28,63 +67,83 @@ The upstream UI/UX Pro Max skill is installed separately with:
 scripts/setup-codex.ps1
 ```
 
+## Instruction responsibilities
+
+```text
+AGENTS.md
+→ always-on global rules
+
+app/AGENTS.md
+→ Laravel backend, security, roles, transactions, longitudinal/alert behavior
+
+database/AGENTS.md
+→ frozen 69-table operational V2 model
+
+resources/AGENTS.md
+→ forms, validation, charts, alerts, dashboards, responsive UX
+
+tests/AGENTS.md
+→ executable verification and regressions
+
+docs/REMEMBERMIND_MAPA_MAESTRO.md
+→ what the normal product must become and how its flows connect
+
+SKILL.md
+→ how Codex should perform specialized work
+```
+
 ## Why `.agents/skills`
 
-Current OpenAI Codex guidance uses portable project-local skills under:
+Project-local skills are stored under:
 
 ```text
 .agents/skills/<skill-name>/SKILL.md
 ```
 
-Codex discovers `AGENTS.md` hierarchically from the repo root toward the working directory. The root file therefore contains global invariants while nested files contain scoped rules.
+The root `AGENTS.md` contains global invariants while nested files contain scoped rules.
 
-## Apply the pack safely
+## Install / update local checkout
 
-Start from a safe local branch based on `REFAC_BDD`:
+From the RememberMind repository:
 
-```powershell
-git status
+```bash
 git fetch origin
-git checkout REFAC_BDD
-git pull origin REFAC_BDD
-git checkout -b codex/setup-remembermind
+git switch codex/agents-md
+git pull origin codex/agents-md
 ```
 
-Copy the **contents of the `repo/` directory in this pack into the RememberMind repository root**.
+If the local branch does not exist yet:
 
-This intentionally replaces the stale root `AGENTS.md` that still references V1 identity such as `cod_usu`.
-
-Then inspect:
-
-```powershell
-git status
-git diff -- AGENTS.md app/AGENTS.md database/AGENTS.md resources/AGENTS.md tests/AGENTS.md
+```bash
+git fetch origin
+git switch --track origin/codex/agents-md
 ```
 
-## Install UI/UX Pro Max for Codex
+## Install UI/UX Pro Max from Git Bash
 
-Run from the RememberMind repository root:
+From Git Bash:
+
+```bash
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File "$(pwd -W)/scripts/setup-codex.ps1"
+```
+
+From PowerShell instead:
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\scripts\setup-codex.ps1
-```
-
-The upstream CLI supports:
-
-```text
-uipro init --ai codex
 ```
 
 The setup script intentionally does not use `--force`. If `.agents/skills/ui-ux-pro-max/SKILL.md` already exists it is left untouched.
 
 ## Verify skills
 
-```powershell
-Test-Path .\.agents\skills\ui-ux-pro-max\SKILL.md
-Get-ChildItem .\.agents\skills -Directory
+Git Bash:
+
+```bash
+ls .agents/skills
 ```
 
-Expected local skills:
+Expected RememberMind/project UI skills include:
 
 ```text
 remembermind-module-delivery
@@ -95,19 +154,58 @@ remembermind-release-check
 ui-ux-pro-max
 ```
 
+Other installed design skills may also appear and are not a problem.
+
+## Recommended Codex workflow
+
+For a normal module:
+
+```text
+1. Read the applicable AGENTS files.
+2. Read docs/REMEMBERMIND_MAPA_MAESTRO.md.
+3. Inspect the real V2 implementation.
+4. Consult the frozen DB baseline if persistence is involved.
+5. Reconstruct the real institutional/clinical workflow.
+6. Implement end-to-end.
+7. Run security/UI/database specialized reviews when relevant.
+8. Test and build.
+9. Run release check.
+10. Commit locally when complete; do not push without explicit instruction.
+```
+
 ## Smoke prompts in Codex
 
-```text
-$remembermind-database-audit verifica que la BDD actual siga el baseline congelado sin modificarla.
-```
+Database:
 
 ```text
-$remembermind-ui-review revisa el formulario de admisión y usa $ui-ux-pro-max para validación, modales, glassmorphism y responsive.
+$remembermind-database-audit verifica que la BDD operativa actual siga el baseline congelado de 69 tablas, que Gerente esté tratado como rol Spatie y que no se mezcle persistencia futura del sistema experto.
 ```
 
+UI:
+
 ```text
-$remembermind-module-delivery completa el módulo de preadmisiones respetando el flujo V2.
+$remembermind-ui-review revisa el seguimiento diario de un residente: formularios completos, labels/unidades, validaciones, historial, gráficas, antes/después, alertas y responsive usando $ui-ux-pro-max.
 ```
+
+Operational module:
+
+```text
+$remembermind-module-delivery completa el módulo de preadmisiones respetando el flujo V2 y el mapa maestro, sin introducir lógica del futuro sistema experto.
+```
+
+Alerts:
+
+```text
+$remembermind-module-delivery revisa el flujo normal de alertas: creación por reglas aprobadas, deduplicación, eventos de ciclo de vida, responsable, atención y notificaciones externas seguras.
+```
+
+Security:
+
+```text
+$remembermind-security-review revisa la separación de permisos entre Gerente, Administrador, personal clínico y Familiar en el flujo actual.
+```
+
+Release:
 
 ```text
 $remembermind-release-check verifica la tarea actual antes del commit local.
@@ -117,34 +215,24 @@ $remembermind-release-check verifica la tarea actual antes del commit local.
 
 Use the project commands:
 
-```powershell
+```bash
 composer test
 npm run build
 ```
 
 For DB reconstruction, only on a confirmed disposable development/testing DB:
 
-```powershell
+```bash
 php artisan migrate:fresh --seed
 ```
 
 Never run destructive DB reset against unknown/shared/real data.
 
-## Commit locally
-
-After reviewing and verifying:
-
-```powershell
-git status
-git diff
-git add AGENTS.md app/AGENTS.md database/AGENTS.md resources/AGENTS.md tests/AGENTS.md .agents/skills scripts/setup-codex.ps1 CODEX_SETUP.md codex-pack-manifest.json
-git commit -m "chore(codex): configure RememberMind agents and skills"
-```
-
-Do not push unless explicitly intended.
-
 ## Important
 
-- The frozen DB baseline remains authoritative for schema.
+- The frozen 69-table DB baseline remains authoritative for operational schema.
+- `docs/REMEMBERMIND_MAPA_MAESTRO.md` is the functional reference for the normal system.
+- The future expert system will have its own document/design and must not be silently mixed into operational code.
+- Clinical alert rules must not be invented by developers; approved evidence/context is required.
 - External UI/UX Pro Max advice does not override RememberMind rules or its canonical Design System.
 - Update UI/UX Pro Max intentionally; do not blindly regenerate it with `--force`.
