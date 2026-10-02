@@ -9,6 +9,8 @@ Tests must prove:
 - incorrect operations are rejected;
 - authorization boundaries hold;
 - institutional/clinical invariants hold;
+- longitudinal history is preserved;
+- alert lifecycle is correct;
 - persistence is consistent;
 - regressions are detectable.
 
@@ -18,7 +20,17 @@ A green suite is not an excuse to preserve an obsolete rule.
 
 If a test conflicts with a higher-authority current source, update the test rather than distorting correct V2 behavior.
 
+For current functional behavior of the normal system, use `docs/REMEMBERMIND_MAPA_MAESTRO.md` together with root/scoped AGENTS. For frozen DB structure, the baseline files remain authoritative.
+
 Never weaken Policy, validation, FK, state rules or business invariants merely to make a test pass.
+
+## Normal system vs expert system
+
+Ordinary tests must not assume the presence of semantic-network inference, decision-tree prediction, multicriteria reasoning or autonomous treatment recommendations.
+
+The normal system may test deterministic operational/clinical alerts from explicit approved rules.
+
+Expert-system tests will belong to that future module/document and must be separated from ordinary operational behavior.
 
 ## Official invariants to keep covered
 
@@ -33,10 +45,29 @@ Maintain tests for at least:
 8. duplicate study-component result is rejected when prohibited;
 9. ordinary physical deletion of clinical history is rejected;
 10. Superadmin can read all required operational data;
-11. Administrator does not gain clinical write merely by role;
-12. Nursing does not prescribe;
-13. Family only sees authorized information for linked residents;
-14. VOLUNTARIO is absent from current scope.
+11. Gerente does not gain clinical write merely by role;
+12. Administrador does not gain clinical write merely by role;
+13. Nursing does not prescribe;
+14. Family only sees authorized information for linked residents;
+15. VOLUNTARIO is absent from current scope.
+
+## Active role model
+
+Current functional role set has 10 roles:
+- SUPERADMINISTRADOR;
+- GERENTE;
+- ADMINISTRADOR;
+- ENFERMEROS;
+- MEDICO GENERAL/GERIATRA;
+- PSICOLOGO/A;
+- PEDAGOGO;
+- NUTRICIONISTA;
+- FISIOTERAPEUTA;
+- FAMILIAR.
+
+Role/permission seed tests should reflect this current decision without adding business schema tables.
+
+Gerente and Administrador require distinct authorization tests where their responsibilities differ.
 
 ## Positive and negative testing
 
@@ -46,6 +77,7 @@ Example:
 - Médico can create a prescription when authorized.
 - Enfermería cannot prescribe.
 - Administrador cannot prescribe merely by role.
+- Gerente cannot prescribe merely by role.
 - Family cannot prescribe/access unrelated resident.
 - Missing permission/state/competence is denied when relevant.
 
@@ -86,10 +118,82 @@ Keep prescribing and administration separate.
 Cover:
 - authorized medical prescription;
 - Nursing denial for prescription creation/change;
+- Gerente/Administrador denial for prescription creation merely by role;
 - authorized administration;
 - same-resident prescription invariant;
 - relevant invalid/inactive state;
 - duplicate/idempotency risk when applicable.
+
+Ordinary operational tests must not expect autonomous medication recommendations.
+
+## Longitudinal clinical data
+
+For relevant health/care modules, verify that new records append history rather than overwrite prior observations.
+
+Cover chronology and resident association for appropriate modules such as:
+- vital signs;
+- pain;
+- anthropometrics;
+- cognition;
+- behavior;
+- sleep;
+- intake/hydration/elimination;
+- mobility;
+- wounds/curations;
+- professional evaluations.
+
+When an API/component feeds a chart, test server-side behavior such as:
+- correct resident scope;
+- authorized access;
+- chronological ordering;
+- bounded date range/pagination as designed;
+- no leakage of another resident's data.
+
+Do not use PHPUnit to pretend it visually verified the chart itself.
+
+## Clinical validation
+
+Where approved rules exist, test separately:
+- format/type validation;
+- impossible/implausible input rejection or confirmation behavior;
+- clinically unusual but plausible measurements being preserved correctly;
+- deterministic warning/alert generation;
+- absence of invented thresholds.
+
+Do not encode a clinical threshold into a test unless the project has an approved rule/source for it.
+
+If a personalized objective/range exists in the implemented model, cover authorized configuration and its effect without assuming age alone defines normality.
+
+## Alerts
+
+`alertas` and `eventos_alerta` require lifecycle tests.
+
+Cover as applicable:
+- deterministic creation from an approved normal-system trigger;
+- no duplicate unresolved alert on retry/refresh;
+- correct resident/context;
+- allowed transitions;
+- recognition;
+- assignment;
+- attention;
+- closure/annulment;
+- event history preservation;
+- unauthorized actor denial.
+
+Do not overwrite prior event records to make the latest state easier to assert.
+
+## External alert notifications
+
+When email/WhatsApp integration exists, use fakes/mocks at the provider boundary.
+
+Test:
+- internal alert persists even if channel delivery fails;
+- retries do not create duplicate business alerts;
+- successful/failed delivery metadata behaves as designed;
+- sensitive payload is minimized;
+- authorization remains inside RememberMind for detailed access.
+
+Do not call real external providers in the test suite.
 
 ## Professional authorship
 
@@ -127,12 +231,13 @@ Meaningful transitions need:
 
 Repeated request/double submit should not create duplicates where domain uniqueness matters.
 
-## Clinical history and alerts
+## Clinical history and correction
 
 Keep history immutable in tests:
 - corrections do not erase original clinical record;
 - physical ordinary delete is rejected;
-- alert state progression preserves `eventos_alerta` history rather than overwriting it.
+- longitudinal measurement history remains available after newer records;
+- alert progression preserves `eventos_alerta` history rather than overwriting it.
 
 ## Instruments/studies/consents/activities
 
@@ -151,6 +256,7 @@ Do not include copyrighted clinical instrument content merely to test infrastruc
 Maintain tests that validate:
 - exactly 69 operational tables;
 - technical package/framework tables excluded from the count;
+- future expert-system tables remain outside the operational count;
 - key V2 names/columns exist;
 - important V1 tables/columns are absent;
 - critical FK/UNIQUE behavior works.
@@ -179,6 +285,8 @@ Factories should generate valid domain state by default. Intentionally invalid s
 
 Use seeders when the scenario truly depends on common roles/permissions/catalogs; do not make every small test depend on a huge opaque seed unnecessarily.
 
+Role seeders should include the owner-approved 10-role model and exclude `VOLUNTARIO` unless the owner changes scope.
+
 ## Test structure
 
 Prefer one clear behavior per test and readable Arrange → Act → Assert flow.
@@ -204,7 +312,7 @@ tests/Feature/
   Residentes/
   Medicacion/
   Alertas/
-  Instrumentos/
+  Seguimiento/
   Autorizacion/
   Database/
   Livewire/
@@ -260,7 +368,9 @@ Especially preserve regressions for:
 - resident lifecycle;
 - bed occupancy;
 - medication;
-- history deletion.
+- history deletion;
+- alert duplication/lifecycle;
+- Gerente/Administrador permission separation.
 
 ## Livewire/UI contracts
 
@@ -270,9 +380,10 @@ Use Livewire tests for server-side component behavior:
 - actions;
 - authorization;
 - filters/pagination;
+- longitudinal query behavior;
 - emitted notification state where part of the contract.
 
-Do not use PHPUnit to pretend it verified CSS, contrast, glassmorphism or actual responsive behavior.
+Do not use PHPUnit to pretend it verified CSS, contrast, glassmorphism, actual chart readability or responsive behavior.
 
 Frontend work also needs build/visual/UX review as described in `resources/AGENTS.md`.
 
@@ -291,10 +402,11 @@ Cross-cutting/high-risk change:
 
 Run full suite particularly when changing:
 - auth/permissions/Policies shared broadly;
+- role/permission seeders;
 - base Model behavior;
 - admission;
 - DB/migrations;
-- role/permission seeders;
+- alert infrastructure;
 - shared middleware;
 - broad V1 cleanup.
 
@@ -318,7 +430,7 @@ Classify:
 - obsolete test;
 - environment problem.
 
-Fix current-change failures. Correct obsolete tests when higher-authority V2 sources prove them outdated. Report unrelated pre-existing/environment failures precisely.
+Fix current-change failures. Correct obsolete tests when higher-authority V2/current functional sources prove them outdated. Report unrelated pre-existing/environment failures precisely.
 
 Do not `skip`/`markTestSkipped` merely to obtain green.
 
@@ -335,7 +447,10 @@ A testing task is complete when:
 - expectation matches current authoritative behavior;
 - positive path exists where relevant;
 - meaningful negatives exist;
+- longitudinal/history behavior is tested where relevant;
+- alert lifecycle/deduplication is tested where relevant;
 - no real/sensitive data is used;
 - no V1 dependency is introduced;
+- no accidental expert-system behavior is assumed in normal operational tests;
 - related suite passes;
 - any unverified portion is explicitly reported.
