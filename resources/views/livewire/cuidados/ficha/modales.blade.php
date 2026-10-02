@@ -327,7 +327,7 @@
                 <button type="button">+ REGISTRAR ATENCIÓN</button>
                 <h3>Registrar atención clínica</h3>
                 <p>Selecciona el tipo de atención que deseas registrar.</p>
-                <span>{{ $adultoMayor->cod_am ?? $adultoMayor->cod_residente }}</span>
+                <span>{{ $adultoMayor->cod_residente }}</span>
                 <span>Vigilancia</span>
                 <div>Signos vitales - PA, FC, FR, SpO₂, Temperatura, Dolor, etc.</div>
                 <div>Cuidado de enfermería - Higiene, alimentación, hidratación, movilidad, eliminación, piel, etc.</div>
@@ -388,7 +388,7 @@
                     <label class="font-bold text-[var(--rm-text-body)] block mb-1">Nivel de Dolor (Escala EVA 0 a 10)</label>
                     <div class="flex items-center gap-3">
                         <input type="range" min="0" max="10" wire:model.live="signoDolor" class="w-full accent-blue-600" />
-                        <span class="font-black text-sm px-2.5 py-1 rounded-lg border border-[var(--rm-border)] bg-[var(--rm-surface-alt)] text-[var(--rm-text-title)] min-w-[3rem] text-center">
+                        <span class="font-bold text-sm px-2.5 py-1 rounded-lg border border-[var(--rm-border)] bg-[var(--rm-surface-alt)] text-[var(--rm-text-title)] min-w-[3rem] text-center">
                             {{ $signoDolor ?? 0 }}/10
                         </span>
                     </div>
@@ -465,7 +465,7 @@
 
                 @if($medEsPrn && $medAccion === 'ADMINISTRAR')
                     <div class="rounded-xl border border-estado-advertenciaBorde bg-estado-advertenciaBg p-3 space-y-3">
-                        <p class="text-xs font-black text-[var(--rm-text-title)]">PRN · {{ $medCondicionPrn }}</p>
+                        <p class="text-xs font-bold text-[var(--rm-text-title)]">PRN · {{ $medCondicionPrn }}</p>
                         <label class="block font-bold text-[var(--rm-text-body)]">Síntoma o motivo actual *<textarea wire:model="medMotivoPrn" rows="2" class="rm-input mt-1 w-full text-xs"></textarea>@error('medMotivoPrn')<span class="text-estado-peligro text-[10px] font-bold">{{ $message }}</span>@enderror</label>
                         <label class="block font-bold text-[var(--rm-text-body)]">Valoración previa *<textarea wire:model="medValoracionPrevia" rows="2" class="rm-input mt-1 w-full text-xs"></textarea>@error('medValoracionPrevia')<span class="text-estado-peligro text-[10px] font-bold">{{ $message }}</span>@enderror</label>
                         <label class="block font-bold text-[var(--rm-text-body)]">Intensidad 0–10<input wire:model="medIntensidadPrevia" type="number" min="0" max="10" class="rm-input mt-1 w-full text-xs"></label>
@@ -551,7 +551,7 @@
             {{-- Cabecera del Modal --}}
             <div class="flex items-start justify-between border-b border-[var(--rm-border)] pb-3">
                 <div class="flex items-center gap-3">
-                    <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--rm-surface-alt)] text-[#1E3A8A] border border-[var(--rm-border)] shadow-xs">
+                    <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--rm-surface-alt)] text-[var(--rm-action-primary)] border border-[var(--rm-border)] shadow-xs">
                         <i class="ph-bold ph-clipboard-text text-xl"></i>
                     </span>
                     <div>
@@ -567,7 +567,7 @@
             {{-- Bloque de Trazabilidad Automática --}}
             <div class="p-3 rounded-xl bg-[var(--rm-surface-alt)] border border-[var(--rm-border)] flex flex-wrap items-center justify-between gap-2 text-xs">
                 <div class="flex items-center gap-2 text-[var(--rm-text-muted)]">
-                    <i class="ph-bold ph-user-circle text-sm text-[#1E3A8A]"></i>
+                    <i class="ph-bold ph-user-circle text-sm text-[var(--rm-action-primary)]"></i>
                     <span>Profesional: <strong class="text-[var(--rm-text-title)]">{{ auth()->user()?->name ?? 'Equipo Asistencial' }}</strong></span>
                     <span>·</span>
                     <span class="text-[10px] font-bold uppercase bg-[var(--rm-surface)] px-2 py-0.5 rounded border border-[var(--rm-border)] text-[var(--rm-text-muted)]">{{ auth()->user()?->roles->first()?->name ?? 'Enfermería' }}</span>
@@ -583,7 +583,7 @@
                 {{-- Estado General --}}
                 <div>
                     <label class="font-bold text-[var(--rm-text-title)] block mb-1">Estado General *</label>
-                    <select wire:model="segEstado" class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-surface-alt)] py-2 px-3 text-xs text-[var(--rm-text-title)] font-medium focus:ring-1 focus:ring-[#1E3A8A]">
+                    <select wire:model="segEstado" class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-surface-alt)] py-2 px-3 text-xs text-[var(--rm-text-title)] font-medium focus:ring-1 focus:ring-[var(--rm-action-primary)]">
                         <option value="ESTABLE">Estable</option>
                         <option value="VIGILANCIA">En Vigilancia</option>
                         <option value="DELICADO">Delicado</option>
@@ -594,7 +594,7 @@
                 {{-- Alimentación / Ingesta --}}
                 <div>
                     <label class="font-bold text-[var(--rm-text-title)] block mb-1">Alimentación / Ingesta</label>
-                    <select wire:model="segAlimentacion" class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-surface-alt)] py-2 px-3 text-xs text-[var(--rm-text-title)] font-medium focus:ring-1 focus:ring-[#1E3A8A]">
+                    <select wire:model="segAlimentacion" class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-surface-alt)] py-2 px-3 text-xs text-[var(--rm-text-title)] font-medium focus:ring-1 focus:ring-[var(--rm-action-primary)]">
                         <option value="COMPLETA">Completa / Buena ingesta</option>
                         <option value="PARCIAL">Parcial / Regular</option>
                         <option value="RECHAZADA">Rechazada</option>
@@ -605,7 +605,7 @@
                 {{-- Movilidad Funcional --}}
                 <div>
                     <label class="font-bold text-[var(--rm-text-title)] block mb-1">Movilidad Funcional</label>
-                    <select wire:model="segMovilidad" class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-surface-alt)] py-2 px-3 text-xs text-[var(--rm-text-title)] font-medium focus:ring-1 focus:ring-[#1E3A8A]">
+                    <select wire:model="segMovilidad" class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-surface-alt)] py-2 px-3 text-xs text-[var(--rm-text-title)] font-medium focus:ring-1 focus:ring-[var(--rm-action-primary)]">
                         <option value="INDEPENDIENTE">Independiente / Autónoma</option>
                         <option value="ASISTIDA">Asistida con apoyo</option>
                         <option value="SILLA_RUEDAS">Silla de ruedas</option>
@@ -616,7 +616,7 @@
                 {{-- Patrón de Descanso / Sueño --}}
                 <div>
                     <label class="font-bold text-[var(--rm-text-title)] block mb-1">Patrón de Descanso / Sueño</label>
-                    <select wire:model="segSueno" class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-surface-alt)] py-2 px-3 text-xs text-[var(--rm-text-title)] font-medium focus:ring-1 focus:ring-[#1E3A8A]">
+                    <select wire:model="segSueno" class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-surface-alt)] py-2 px-3 text-xs text-[var(--rm-text-title)] font-medium focus:ring-1 focus:ring-[var(--rm-action-primary)]">
                         <option value="NORMAL">Normal / Reparador</option>
                         <option value="INTERRUMPIDO">Interrumpido / Inquieto</option>
                         <option value="INSOMNIO">Insomnio persistente</option>
@@ -639,7 +639,7 @@
                 {{-- Observación / Nota de Evolución Clínica --}}
                 <div class="col-span-1 sm:col-span-2">
                     <label class="font-bold text-[var(--rm-text-title)] block mb-1">Evolución Clínica y Observaciones Asistenciales *</label>
-                    <textarea wire:model="segObs" rows="3" placeholder="Detalle de cambios observados, respuesta al tratamiento, estado de ánimo y acciones realizadas..." class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-surface-alt)] p-3 text-xs text-[var(--rm-text-title)] focus:ring-1 focus:ring-[#1E3A8A]"></textarea>
+                    <textarea wire:model="segObs" rows="3" placeholder="Detalle de cambios observados, respuesta al tratamiento, estado de ánimo y acciones realizadas..." class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-surface-alt)] p-3 text-xs text-[var(--rm-text-title)] focus:ring-1 focus:ring-[var(--rm-action-primary)]"></textarea>
                     @error('segObs') <span class="text-rose-600 text-[11px] font-bold block mt-1">{{ $message }}</span> @enderror
                 </div>
             </div>
@@ -655,7 +655,7 @@
                     <button type="button" wire:click="cerrarModalSeguimiento" class="px-4 py-2 rounded-xl border border-[var(--rm-border)] bg-[var(--rm-surface-alt)] text-xs font-bold text-[var(--rm-text-title)] hover:bg-[var(--rm-border)] transition">
                         Cancelar
                     </button>
-                    <button type="button" wire:click="guardarSeguimiento" wire:loading.attr="disabled" class="px-4 py-2 rounded-xl bg-[#1E3A8A] hover:bg-[#172554] text-xs font-bold text-white shadow-xs transition inline-flex items-center gap-1.5">
+                    <button type="button" wire:click="guardarSeguimiento" wire:loading.attr="disabled" class="px-4 py-2 rounded-xl bg-[var(--rm-action-primary)] hover:bg-[var(--rm-action-primary-hover)] text-xs font-bold text-white shadow-xs transition inline-flex items-center gap-1.5">
                         <i class="ph-bold ph-check" wire:loading.remove wire:target="guardarSeguimiento"></i>
                         <span wire:loading.remove wire:target="guardarSeguimiento">Registrar evolución</span>
                         <span wire:loading wire:target="guardarSeguimiento">Guardando...</span>
@@ -796,11 +796,11 @@
         {{-- Header --}}
         <div class="flex items-start justify-between border-b border-[var(--rm-border)] pb-4">
             <div class="flex items-center gap-3">
-                <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-blue-50 text-[#1E3A8A] border border-blue-200">
+                <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-blue-50 text-[var(--rm-action-primary)] border border-blue-200">
                     <i class="ph-bold ph-download-simple text-2xl"></i>
                 </span>
                 <div>
-                    <h3 class="text-base sm:text-lg font-black text-[var(--rm-text-title)]">Exportar Ficha e Informes</h3>
+                    <h3 class="text-base sm:text-lg font-bold text-[var(--rm-text-title)]">Exportar Ficha e Informes</h3>
                     <p class="text-xs text-[var(--rm-text-muted)] mt-0.5">Residente: {{ $adultoMayor->nombres }} {{ $adultoMayor->ap_paterno }} · CI: {{ $adultoMayor->ci }}</p>
                 </div>
             </div>
@@ -816,7 +816,7 @@
             {{-- Opción 1: Ficha Médica Completa --}}
             <div class="p-3.5 rounded-2xl border border-[var(--rm-border)] bg-[var(--rm-surface-alt)] hover:border-blue-300 hover:bg-blue-50/20 transition flex flex-col justify-between gap-3">
                 <div class="flex items-start gap-2.5">
-                    <span class="p-2 rounded-xl bg-blue-100 text-[#1E3A8A] shrink-0">
+                    <span class="p-2 rounded-xl bg-blue-100 text-[var(--rm-action-primary)] shrink-0">
                         <i class="ph-bold ph-file-pdf text-xl"></i>
                     </span>
                     <div>
@@ -826,7 +826,7 @@
                 </div>
                 <button type="button"
                         onclick="window.print()"
-                        class="w-full py-2 px-3 rounded-xl bg-[#1E3A8A] text-white font-bold text-xs hover:bg-blue-900 transition flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs">
+                        class="w-full py-2 px-3 rounded-xl bg-[var(--rm-action-primary)] text-white font-bold text-xs hover:bg-[var(--rm-action-primary-hover)] transition flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs">
                     <i class="ph-bold ph-printer"></i>
                     <span>Imprimir / Guardar PDF</span>
                 </button>
@@ -946,10 +946,10 @@
                         EXPEDIENTE CLÍNICO INTEGRAL
                     </span>
                     <div class="flex items-center gap-2 pt-0.5">
-                        <span class="flex h-8 w-8 items-center justify-center rounded-xl bg-blue-50 text-[#1E3A8A] border border-blue-200 text-base shadow-2xs">
+                        <span class="flex h-8 w-8 items-center justify-center rounded-xl bg-blue-50 text-[var(--rm-action-primary)] border border-blue-200 text-base shadow-2xs">
                             <i class="ph-bold ph-identification-card"></i>
                         </span>
-                        <h2 class="text-lg font-black text-[var(--rm-text-title)]">{{ $adultoMayor->nombres }} {{ $adultoMayor->ap_paterno }} {{ $adultoMayor->ap_materno }}</h2>
+                        <h2 class="text-lg font-bold text-[var(--rm-text-title)]">{{ $adultoMayor->nombres }} {{ $adultoMayor->ap_paterno }} {{ $adultoMayor->ap_materno }}</h2>
                     </div>
                     <p class="text-xs text-[var(--rm-text-muted)]">Código: {{ $adultoMayor->cod_residente }} · CI: {{ $adultoMayor->ci }}</p>
                 </div>
@@ -964,7 +964,7 @@
             <div class="rm-drawer-body flex-1 overflow-y-auto p-5 space-y-4 text-xs">
                 {{-- Bloque Ubicación Habitacional --}}
                 <div class="p-4 rounded-2xl bg-amber-50/60 dark:bg-amber-950/20 border border-amber-200/80 dark:border-amber-900/60 space-y-2">
-                    <span class="text-[10px] font-black uppercase text-amber-800 dark:text-amber-300 tracking-wider block">Ubicación y Censo Activo</span>
+                    <span class="text-[10px] font-bold uppercase text-amber-800 dark:text-amber-300 tracking-wider block">Ubicación y Censo Activo</span>
                     <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 text-xs">
                         <div>
                             <span class="text-[10.5px] text-[var(--rm-text-muted)] block">Habitación</span>
@@ -972,18 +972,18 @@
                         </div>
                         <div>
                             <span class="text-[10.5px] text-[var(--rm-text-muted)] block">Cama</span>
-                            <span class="font-bold text-[var(--rm-text-title)]">{{ $adultoMayor->cama?->numero ?? 'Sin asignar' }}</span>
+                            <span class="font-bold text-[var(--rm-text-title)]">{{ $adultoMayor->cama?->codigo ?? 'Sin asignar' }}</span>
                         </div>
                         <div>
                             <span class="text-[10.5px] text-[var(--rm-text-muted)] block">Estado Residente</span>
-                            <span class="font-bold text-emerald-700">{{ $adultoMayor->estado?->estado ?? 'ACTIVO' }}</span>
+                            <span class="font-bold text-emerald-700">{{ $adultoMayor->estado ?: 'No registrado' }}</span>
                         </div>
                     </div>
                 </div>
 
                 {{-- Datos Demográficos y Civiles --}}
                 <div class="p-4 rounded-2xl bg-[var(--rm-surface-alt)] border border-[var(--rm-border)] space-y-3">
-                    <span class="text-[10.5px] font-black uppercase text-[var(--rm-text-muted)] tracking-wider block">Filiación y Datos Personales</span>
+                    <span class="text-[10.5px] font-bold uppercase text-[var(--rm-text-muted)] tracking-wider block">Filiación y Datos Personales</span>
                     <div class="grid grid-cols-2 gap-3 text-xs">
                         <div>
                             <span class="text-[10.5px] text-[var(--rm-text-muted)] block">Fecha de Nacimiento</span>
@@ -995,7 +995,7 @@
                         </div>
                         <div>
                             <span class="text-[10.5px] text-[var(--rm-text-muted)] block">Lugar de Nacimiento</span>
-                            <span class="font-bold text-[var(--rm-text-title)]">{{ $adultoMayor->lugar_nacimiento ?? 'Bolivia' }}</span>
+                            <span class="font-bold text-[var(--rm-text-title)]">No registrado</span>
                         </div>
                         <div>
                             <span class="text-[10.5px] text-[var(--rm-text-muted)] block">Estado Civil</span>
@@ -1003,26 +1003,26 @@
                         </div>
                         <div>
                             <span class="text-[10.5px] text-[var(--rm-text-muted)] block">Ocupación Anterior</span>
-                            <span class="font-bold text-[var(--rm-text-title)]">{{ $adultoMayor->ocupacion_anterior ?? 'Jubilado/a' }}</span>
+                            <span class="font-bold text-[var(--rm-text-title)]">No registrado</span>
                         </div>
                         <div>
                             <span class="text-[10.5px] text-[var(--rm-text-muted)] block">Fecha de Ingreso</span>
-                            <span class="font-bold text-[var(--rm-text-title)]">{{ $adultoMayor->created_at ? $adultoMayor->created_at->format('d/m/Y') : '10/01/2026' }}</span>
+                            <span class="font-bold text-[var(--rm-text-title)]">{{ $admisionInicial?->fecha_hora_admision?->format('d/m/Y') ?: 'No registrada' }}</span>
                         </div>
                     </div>
                 </div>
 
                 {{-- Datos de Salud y Cobertura --}}
                 <div class="p-4 rounded-2xl bg-[var(--rm-surface-alt)] border border-[var(--rm-border)] space-y-3">
-                    <span class="text-[10.5px] font-black uppercase text-[var(--rm-text-muted)] tracking-wider block">Perfil de Salud de Base</span>
+                    <span class="text-[10.5px] font-bold uppercase text-[var(--rm-text-muted)] tracking-wider block">Perfil de Salud de Base</span>
                     <div class="grid grid-cols-2 gap-3 text-xs">
                         <div>
                             <span class="text-[10.5px] text-[var(--rm-text-muted)] block">Grupo Sanguíneo</span>
-                            <span class="font-bold text-rose-700">{{ $adultoMayor->grupo_sanguineo ? $adultoMayor->grupo_sanguineo . ($adultoMayor->factor_rh ? ' ' . $adultoMayor->factor_rh : '+') : 'No definido' }}</span>
+                            <span class="font-bold text-rose-700">{{ $grupoSanguineo ?: 'No registrado' }}</span>
                         </div>
                         <div>
                             <span class="text-[10.5px] text-[var(--rm-text-muted)] block">Seguro de Salud</span>
-                            <span class="font-bold text-[var(--rm-text-title)]">{{ $adultoMayor->seguro_salud ?: ($adultoMayor->seguros?->first()?->entidad ?: ($adultoMayor->seguros?->first()?->entidad ?: 'Particular / Sin cobertura')) }}</span>
+                            <span class="font-bold text-[var(--rm-text-title)]">{{ $seguroActivo?->entidad ?: 'No registrado' }}</span>
                         </div>
                         <div class="col-span-2">
                             <span class="text-[10.5px] text-[var(--rm-text-muted)] block">Alergias Conocidas</span>
@@ -1030,7 +1030,7 @@
                         </div>
                         <div class="col-span-2">
                             <span class="text-[10.5px] text-[var(--rm-text-muted)] block">Dieta y Restricciones</span>
-                            <span class="font-bold text-[var(--rm-text-title)]">{{ $adultoMayor->tipo_dieta ?: 'Sin prescripción dietética específica.' }}</span>
+                            <span class="font-bold text-[var(--rm-text-title)]">Sin registro dietético estructurado</span>
                         </div>
                     </div>
                 </div>
@@ -1093,7 +1093,7 @@
                         <span class="flex h-8 w-8 items-center justify-center rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-200 text-base shadow-2xs">
                             <i class="ph-bold ph-users-three"></i>
                         </span>
-                        <h2 class="text-lg font-black text-[var(--rm-text-title)]">Contactos Familiares</h2>
+                        <h2 class="text-lg font-bold text-[var(--rm-text-title)]">Contactos Familiares</h2>
                     </div>
                     <p class="text-xs text-[var(--rm-text-muted)]">Residente: {{ $adultoMayor->nombres }} {{ $adultoMayor->ap_paterno }}</p>
                 </div>
@@ -1109,7 +1109,7 @@
                 {{-- Contacto Principal de Emergencia --}}
                 <div class="p-4 rounded-2xl bg-rose-50/70 dark:bg-rose-950/20 border border-rose-200 dark:border-rose-900/60 space-y-2.5">
                     <div class="flex items-center justify-between">
-                        <span class="text-[10.5px] font-black uppercase text-rose-800 dark:text-rose-300 tracking-wider flex items-center gap-1.5">
+                        <span class="text-[10.5px] font-bold uppercase text-rose-800 dark:text-rose-300 tracking-wider flex items-center gap-1.5">
                             <i class="ph-bold ph-phone-call text-sm"></i>
                             Contacto Principal de Emergencia
                         </span>
@@ -1117,14 +1117,14 @@
                     </div>
                     <div class="flex items-center justify-between gap-3 pt-1">
                         <div>
-                            <h4 class="text-sm font-black text-[var(--rm-text-title)]">{{ $adultoMayor->contacto_emergencia_nombre ?: (($adultoMayor->contactos?->first() ?? $adultoMayor->residentesContactos?->first()?->contacto) ? (($adultoMayor->contactos?->first() ?? $adultoMayor->residentesContactos?->first()?->contacto)->nombres . ' ' . ($adultoMayor->contactos?->first() ?? $adultoMayor->residentesContactos?->first()?->contacto)->apellido_paterno) : 'Sin contacto de emergencia registrado') }}</h4>
-                            <p class="text-xs text-[var(--rm-text-muted)] mt-0.5">{{ $adultoMayor->contacto_emergencia_parentesco ?: 'Apoderado Legal / Familiar directo' }}</p>
+                            <h4 class="text-sm font-bold text-[var(--rm-text-title)]">{{ $contactoEmergencia?->nombre_completo ?: 'Sin contacto de emergencia designado' }}</h4>
+                            <p class="text-xs text-[var(--rm-text-muted)] mt-0.5">{{ $contactoEmergencia?->pivot?->parentesco ?: 'Sin parentesco registrado' }}</p>
                         </div>
-                        @if($adultoMayor->contacto_emergencia_celular)
-                        <a href="tel:{{ $adultoMayor->contacto_emergencia_celular }}"
+                        @if($contactoEmergencia?->celular || $contactoEmergencia?->telefono)
+                        <a href="tel:{{ $contactoEmergencia->celular ?: $contactoEmergencia->telefono }}"
                            class="px-3 py-2 rounded-xl bg-emerald-600 text-white font-bold text-xs hover:bg-emerald-700 transition inline-flex items-center gap-1.5 shadow-2xs">
                             <i class="ph-bold ph-phone"></i>
-                            <span>{{ $adultoMayor->contacto_emergencia_celular }}</span>
+                            <span>{{ $contactoEmergencia->celular ?: $contactoEmergencia->telefono }}</span>
                         </a>
                         @else
                         <span class="text-xs text-[var(--rm-text-muted)] italic">Teléfono no registrado</span>
@@ -1134,13 +1134,13 @@
 
                 {{-- Listado de Familiares Registrados --}}
                 <div class="space-y-3">
-                    <h4 class="font-black text-[var(--rm-text-title)] uppercase text-[11px] tracking-wider text-[var(--rm-text-muted)]">Familiares y Apoderados Registrados</h4>
+                    <h4 class="font-bold text-[var(--rm-text-title)] uppercase text-[11px] tracking-wider text-[var(--rm-text-muted)]">Familiares y Apoderados Registrados</h4>
                     
-                    @if($adultoMayor->familiares && $adultoMayor->familiares->count() > 0)
-                        @foreach($adultoMayor->familiares as $fam)
+                    @if($familiaresActivos->isNotEmpty())
+                        @foreach($familiaresActivos as $fam)
                         <div class="p-3.5 rounded-2xl border border-[var(--rm-border)] bg-[var(--rm-surface-alt)] flex items-center justify-between gap-3">
                             <div class="flex items-center gap-3">
-                                <div class="h-10 w-10 rounded-xl bg-blue-100 dark:bg-blue-950 text-[#1E3A8A] flex items-center justify-center font-bold text-sm shrink-0">
+                                <div class="h-10 w-10 rounded-xl bg-blue-100 dark:bg-blue-950 text-[var(--rm-action-primary)] flex items-center justify-center font-bold text-sm shrink-0">
                                     <i class="ph-bold ph-user"></i>
                                 </div>
                                 <div>
@@ -1158,29 +1158,25 @@
                         </div>
                         @endforeach
                     @else
-                        {{-- Ejemplo enriquecido si no hay en pivot --}}
                         <div class="p-3.5 rounded-2xl border border-[var(--rm-border)] bg-[var(--rm-surface-alt)] flex items-center justify-between gap-3">
                             <div class="flex items-center gap-3">
-                                <div class="h-10 w-10 rounded-xl bg-blue-100 dark:bg-blue-950 text-[#1E3A8A] flex items-center justify-center font-bold text-sm shrink-0">
+                                <div class="h-10 w-10 rounded-xl bg-blue-100 dark:bg-blue-950 text-[var(--rm-action-primary)] flex items-center justify-center font-bold text-sm shrink-0">
                                     <i class="ph-bold ph-user"></i>
                                 </div>
                                 <div>
-                                    <h5 class="font-bold text-xs text-[var(--rm-text-title)]">{{ $adultoMayor->contacto_emergencia_nombre ?: 'Hijo/a tutor' }}</h5>
-                                    <p class="text-[11px] text-[var(--rm-text-muted)] mt-0.5">Hijo/a · Tutor Legal acreditado</p>
+                                    <h5 class="font-bold text-xs text-[var(--rm-text-title)]">No registrado</h5>
+                                    <p class="text-[11px] text-[var(--rm-text-muted)] mt-0.5">No existen familiares activos registrados.</p>
                                 </div>
                             </div>
-                            <span class="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
-                                Tutor Acreditado
-                            </span>
                         </div>
                     @endif
                 </div>
 
                 {{-- Frecuencia de Visitas y Acompañamiento --}}
                 <div class="p-4 rounded-2xl bg-[var(--rm-surface-alt)] border border-[var(--rm-border)] space-y-2">
-                    <span class="text-[10.5px] font-black uppercase text-[var(--rm-text-muted)] tracking-wider block">Régimen de Visitas</span>
+                    <span class="text-[10.5px] font-bold uppercase text-[var(--rm-text-muted)] tracking-wider block">Régimen de Visitas</span>
                     <p class="text-xs text-[var(--rm-text-body)] leading-relaxed">
-                        Visitas autorizadas en horario diurno (14:00 – 18:00). Acompañamiento presencial permitido fines de semana y festivos.
+                        No existe un régimen de visitas registrado para este residente.
                     </p>
                 </div>
             </div>

@@ -447,6 +447,8 @@ class MiTurnoServiceTest extends TestCase
         $this->assertSame('SIN_ALERTAS', $dataSinAlertas['residentes'][0]['estado_seguimiento']);
 
         $this->assertEquals(0, $dataSinAlertas['kpis']['total_registro']['numero']);
+        $this->assertSame(0, $dataSinAlertas['alertas_pendientes_count']);
+        $this->assertSame([], $dataSinAlertas['alertas_prioritarias']);
 
 
 
@@ -513,6 +515,10 @@ class MiTurnoServiceTest extends TestCase
         $this->assertEquals(1, $dataConAlertas['kpis']['criticas_altas']['numero']);
 
         $this->assertEquals(1, $dataConAlertas['kpis']['por_atender']['numero']);
+        $this->assertSame(1, $dataConAlertas['alertas_pendientes_count']);
+        $this->assertCount(1, $dataConAlertas['alertas_prioritarias']);
+        $this->assertSame($this->residenteAsignado->nombre_completo, $dataConAlertas['alertas_prioritarias'][0]['paciente']);
+        $this->assertCount(1, $dataConAlertas['pacientes_turno']);
 
         $this->assertContains($dataConAlertas['estado_general']['badge'], ['CRÍTICO', 'VIGILANCIA']);
 
@@ -588,7 +594,7 @@ class MiTurnoServiceTest extends TestCase
 
             ->assertSee('Carlos Mendoza Paredes')
 
-            ->assertSee('Mañana');
+            ->assertSee('Pacientes del turno');
 
 
 
@@ -1508,6 +1514,8 @@ class MiTurnoServiceTest extends TestCase
 
         $this->assertEquals(1, $dataConVencida['estado_tareas']['retrasadas']);
 
+        $this->assertSame(['total' => 1, 'pendientes' => 1, 'retrasadas' => 1], $dataConVencida['medicacion_turno']);
+
         // El estado general NO debe ser ESTABLE, sino VIGILANCIA
 
         $this->assertNotEquals('ESTABLE', $dataConVencida['estado_general']['badge']);
@@ -1516,4 +1524,50 @@ class MiTurnoServiceTest extends TestCase
 
     }
 
+    public function test_tendencia_incidentes_usa_solo_residentes_asignados_y_limites_locales(): void
+    {
+        $crear = function (string $codigo, string $residente, Carbon $fecha): void {
+            DB::table('incidentes')->insert([
+                'cod_incidente' => $codigo,
+                'cod_residente' => $residente,
+                'cod_personal' => $this->enfermeraPersonal->cod_personal,
+                'cod_jornada' => $this->jornada->cod_jornada,
+                'tipo_incidente' => 'CAÍDA',
+                'fecha_hora' => $fecha,
+                'descripcion' => 'Registro de prueba',
+                'requiere_medico' => false,
+                'requiere_derivacion' => false,
+                'estado' => 'ABIERTO',
+            ]);
+        };
+
+        $hoy = Carbon::today();
+        $crear('INC_TREND_01', $this->residenteAsignado->cod_residente, $hoy->copy()->subDays(6));
+        $crear('INC_TREND_02', $this->residenteAsignado->cod_residente, $hoy->copy()->subDays(7)->endOfDay());
+        $crear('INC_TREND_03', $this->residenteAjeno->cod_residente, $hoy->copy()->setTime(9, 0));
+
+        $resumen = app(\App\Backend\Modulos\Enfermeria\Servicios\TendenciaIncidentesService::class)
+            ->resumir([$this->residenteAsignado->cod_residente], \Carbon\CarbonImmutable::instance($hoy));
+
+        $this->assertSame(1, $resumen['total_periodo']);
+        $this->assertSame(1, $resumen['total_anterior']);
+        $this->assertSame(0, $resumen['variacion']);
+        $this->assertSame(1, $resumen['datasets'][0]['data'][0]);
+
+        Auth::login($this->enfermeraUser);
+        Livewire::test(\App\Frontend\Livewire\Enfermeria\Cuidados\DashboardTurno::class)
+            ->assertSee('Total semanal')
+            ->assertSee('Caída')
+            ->assertSee('Últimos 7 días · residentes de mi turno');
+    }
+
+    public function test_dashboard_sin_jornada_distingue_incidentes_no_disponibles_de_cero(): void
+    {
+        $this->jornada->update(['estado' => 'CERRADA']);
+        Auth::login($this->enfermeraUser);
+
+        Livewire::test(\App\Frontend\Livewire\Enfermeria\Cuidados\DashboardTurno::class)
+            ->assertSee('La evolución aparecerá con un turno activo.')
+            ->assertDontSee('Sin incidentes registrados en los últimos 7 días.');
+    }
 }

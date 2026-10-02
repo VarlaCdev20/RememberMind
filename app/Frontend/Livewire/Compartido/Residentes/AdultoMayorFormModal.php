@@ -2,11 +2,10 @@
 
 namespace App\Frontend\Livewire\Compartido\Residentes;
 
-use App\Models\Residente;
 use App\Backend\Modulos\Residentes\Servicios\AdultoMayorService;
+use App\Models\Residente;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Validation\Rule;
 use Livewire\Component;
 use Livewire\WithFileUploads;
@@ -48,50 +47,84 @@ class AdultoMayorFormModal extends Component
 
     // Estado del modal
     public $mostrar = false;
+
     public $adultoId = null;
+
     public $paso = 1;
+
     public $totalPasos = 6;
+
     public $isEdit = false;
 
     // Campos del formulario
     public $foto;
+
     public $fotoExistente;
+
     public $nombres;
+
     public $ap_paterno;
+
     public $ap_materno;
+
     public $ci;
+
     public $complemento_ci;
+
     public $expedicion_ci;
+
     public $estado_civil;
 
     public $fecha_nac;
+
     public $genero;
+
     public $grupo_sanguineo;
+
     public $alergias = 'NINGUNA';
+
     public $seguro_salud;
+
     public $nivel_educat;
 
     public $tiene_celular = true;
+
     public $celular;
+
     public $sabe_usar_whatsapp = false;
+
     public $telefono_fijo;
+
     public $departamento_residencia;
+
     public $ciudad_municipio;
+
     public $zona;
+
     public $calle;
 
     public $contacto_emergencia_nombre;
+
     public $contacto_emergencia_parentesco;
+
     public $contacto_emergencia_celular;
+
     public $contacto_emergencia_direccion;
+
     public $responsable_principal = false;
+
     public $autorizado_informacion_medica = false;
 
     public $fecha_ing;
+
     public $hora_ing;
+
     public $tipo_ing;
+
     public $permanencia;
+
     public $cod_est_adul;
+
     public $observaciones;
 
     public $consentimiento_datos = false;
@@ -105,11 +138,12 @@ class AdultoMayorFormModal extends Component
         $this->fecha_ing = date('Y-m-d');
         $this->hora_ing = date('H:i');
 
-$this->cod_est_adul = 'ACTIVO';
+        $this->cod_est_adul = 'ACTIVO';
     }
 
     public function abrir($adultoId)
     {
+        $this->autorizarGestion();
         $this->resetForm();
         $this->adultoId = $adultoId;
         $this->mostrar = true;
@@ -166,7 +200,7 @@ $this->cod_est_adul = 'ACTIVO';
         $this->hora_ing = date('H:i');
         $this->tiene_celular = true;
 
-$this->cod_est_adul = 'ACTIVO';
+        $this->cod_est_adul = 'ACTIVO';
 
         $this->resetErrorBag();
         $this->resetValidation();
@@ -174,7 +208,32 @@ $this->cod_est_adul = 'ACTIVO';
 
     private function cargarAdulto()
     {
-        $adulto = Residente::findOrFail($this->adultoId);
+        $adulto = Residente::with([
+            'alergias' => fn ($query) => $query->whereIn('estado', ['ACTIVO', 'ACTIVA'])->orderByDesc('fecha_hora'),
+            'seguros' => fn ($query) => $query->whereIn('estado', ['ACTIVO', 'ACTIVA']),
+            'familiares' => fn ($query) => $query->wherePivotIn('estado', ['ACTIVO', 'ACTIVA']),
+            'admisiones' => fn ($query) => $query->orderBy('fecha_hora_admision'),
+        ])->findOrFail($this->adultoId);
+
+        $segurosActivos = $adulto->seguros;
+        if ($segurosActivos->count() > 1) {
+            throw IlluminateValidationValidationException::withMessages([
+                'seguro_salud' => 'El residente tiene más de un seguro activo. Corrija la inconsistencia antes de editar el expediente.',
+            ]);
+        }
+
+        $contactosEmergencia = $adulto->familiares->filter(
+            fn ($contacto) => (bool) $contacto->pivot?->contacto_emergencia
+        );
+        if ($contactosEmergencia->count() > 1) {
+            throw IlluminateValidationValidationException::withMessages([
+                'contacto_emergencia_nombre' => 'El residente tiene más de un contacto de emergencia activo. Corrija la inconsistencia antes de editar el expediente.',
+            ]);
+        }
+
+        $contactoEmergencia = $contactosEmergencia->first()
+            ?? $adulto->familiares->first(fn ($contacto) => (bool) $contacto->pivot?->responsable_principal);
+        $admision = $adulto->admisiones->first();
 
         $this->nombres = $adulto->nombres;
         $this->ap_paterno = $adulto->apellido_paterno;
@@ -186,34 +245,40 @@ $this->cod_est_adul = 'ACTIVO';
 
         $this->fecha_nac = $adulto->fecha_nacimiento ? Carbon::parse($adulto->fecha_nacimiento)->format('Y-m-d') : null;
         $this->genero = $adulto->genero;
-        $this->grupo_sanguineo = $adulto->grupo_sanguineo;
-        $this->alergias = 'NINGUNA';
-        $this->seguro_salud = 'SUS';
-        $this->nivel_educat = $adulto->nivel_educativo ?? 'NO ESPECIFICADO';
+        $grupoBase = rtrim((string) $adulto->grupo_sanguineo, '+-');
+        $factorRh = $adulto->factor_rh ?: (
+            preg_match('/([+-])$/', (string) $adulto->grupo_sanguineo, $factorEncontrado)
+                ? $factorEncontrado[1]
+                : null
+        );
+        $this->grupo_sanguineo = $grupoBase && $factorRh ? $grupoBase.$factorRh : null;
+        $this->alergias = $adulto->alergias->pluck('sustancia')->filter()->join(', ') ?: 'NINGUNA';
+        $this->seguro_salud = $segurosActivos->first()?->entidad;
+        $this->nivel_educat = $adulto->nivel_educativo;
 
         $this->tiene_celular = (bool) ($adulto->celular || $adulto->telefono);
         $this->celular = $adulto->celular ?? $adulto->telefono;
         $this->sabe_usar_whatsapp = false;
         $this->telefono_fijo = $adulto->telefono;
-        $this->departamento_residencia = 'LA PAZ';
-        $this->ciudad_municipio = 'La Paz';
-        $this->zona = 'Central';
+        $this->departamento_residencia = null;
+        $this->ciudad_municipio = null;
+        $this->zona = null;
         $this->calle = $adulto->direccion ?? '';
 
-        $this->contacto_emergencia_nombre = 'Familiar Registrado';
-        $this->contacto_emergencia_parentesco = 'HIJO/A';
-        $this->contacto_emergencia_celular = '70000000';
-        $this->contacto_emergencia_direccion = '';
-        $this->responsable_principal = false;
-        $this->autorizado_informacion_medica = false;
+        $this->contacto_emergencia_nombre = $contactoEmergencia?->nombre_completo;
+        $this->contacto_emergencia_parentesco = $contactoEmergencia?->pivot?->parentesco;
+        $this->contacto_emergencia_celular = $contactoEmergencia?->celular ?: $contactoEmergencia?->telefono;
+        $this->contacto_emergencia_direccion = $contactoEmergencia?->direccion;
+        $this->responsable_principal = (bool) $contactoEmergencia?->pivot?->responsable_principal;
+        $this->autorizado_informacion_medica = (bool) $contactoEmergencia?->pivot?->autoriza_informacion;
 
-        $this->fecha_ing = $adulto->fecha_ing ? Carbon::parse($adulto->fecha_ing)->format('Y-m-d') : date('Y-m-d');
-        $this->hora_ing = date('H:i');
-        $this->tipo_ing = 'REGULAR';
-        $this->permanencia = 'PERMANENTE';
+        $this->fecha_ing = $admision?->fecha_hora_admision?->format('Y-m-d');
+        $this->hora_ing = $admision?->fecha_hora_admision?->format('H:i');
+        $this->tipo_ing = $admision?->tipo_ingreso;
+        $this->permanencia = null;
         $this->cod_est_adul = $adulto->estado;
         $this->observaciones = $adulto->observacion;
-        $this->consentimiento_datos = true;
+        $this->consentimiento_datos = false;
 
         $this->fotoExistente = $adulto->foto;
     }
@@ -239,6 +304,7 @@ $this->cod_est_adul = 'ACTIVO';
         }
 
         $digits = preg_replace('/\D+/', '', $value);
+
         return $digits === '' ? null : $digits;
     }
 
@@ -279,7 +345,7 @@ $this->cod_est_adul = 'ACTIVO';
         $this->permanencia = $this->toUpperText($this->permanencia);
         $this->observaciones = $this->toUpperText($this->observaciones);
 
-        if (!$this->tiene_celular) {
+        if (! $this->tiene_celular) {
             $this->celular = null;
             $this->sabe_usar_whatsapp = false;
         }
@@ -287,7 +353,7 @@ $this->cod_est_adul = 'ACTIVO';
 
     public function getEdadProperty()
     {
-        if (!$this->fecha_nac) {
+        if (! $this->fecha_nac) {
             return null;
         }
 
@@ -413,8 +479,8 @@ $this->cod_est_adul = 'ACTIVO';
                     'fecha_nac' => [
                         'required',
                         'date',
-                        'after_or_equal:' . now()->subYears(120)->format('Y-m-d'),
-                        'before_or_equal:' . now()->subYears(60)->format('Y-m-d'),
+                        'after_or_equal:'.now()->subYears(120)->format('Y-m-d'),
+                        'before_or_equal:'.now()->subYears(60)->format('Y-m-d'),
                     ],
                     'genero' => ['required', 'string', 'in:MASCULINO,FEMENINO,OTRO'],
                     'grupo_sanguineo' => ['required', 'string', 'in:A+,A-,B+,B-,AB+,AB-,O+,O-'],
@@ -430,16 +496,16 @@ $this->cod_est_adul = 'ACTIVO';
                     'celular' => ['nullable', 'required_if:tiene_celular,true', 'string', 'regex:/^[67][0-9]{7}$/'],
                     'sabe_usar_whatsapp' => ['boolean'],
                     'telefono_fijo' => ['nullable', 'string', 'regex:/^[2-4][0-9]{6,7}$/'],
-                    'departamento_residencia' => ['required', 'string', 'in:LA PAZ,SANTA CRUZ,COCHABAMBA,ORURO,POTOSÍ,CHUQUISACA,TARIJA,BENI,PANDO'],
-                    'ciudad_municipio' => ['required', 'string', 'min:2', 'max:100'],
-                    'zona' => ['required', 'string', 'min:2', 'max:100'],
+                    'departamento_residencia' => ['nullable', 'string', 'in:LA PAZ,SANTA CRUZ,COCHABAMBA,ORURO,POTOSÍ,CHUQUISACA,TARIJA,BENI,PANDO'],
+                    'ciudad_municipio' => ['nullable', 'string', 'min:2', 'max:100'],
+                    'zona' => ['nullable', 'string', 'min:2', 'max:100'],
                     'calle' => ['required', 'string', 'min:3', 'max:150'],
                 ];
                 break;
 
             case 4:
                 $rules = [
-                    'contacto_emergencia_nombre' => ['required', 'string', 'min:3', 'max:150', 'regex:/^[\pL\s\'-]+$/u'],
+                    'contacto_emergencia_nombre' => ['required', 'string', 'min:3', 'max:150', 'regex:/^[\pL\'-]+(?:\s+[\pL\'-]+)+$/u'],
                     'contacto_emergencia_parentesco' => ['required', 'string', 'in:HIJO/A,CÓNYUGE,NIETO/A,SOBRINO/A,HERMANO/A,TUTOR LEGAL,OTRO'],
                     'contacto_emergencia_celular' => ['required', 'string', 'regex:/^[67][0-9]{7}$/', 'different:celular'],
                     'contacto_emergencia_direccion' => ['nullable', 'string', 'max:200'],
@@ -453,7 +519,7 @@ $this->cod_est_adul = 'ACTIVO';
                     'fecha_ing' => ['required', 'date', 'after_or_equal:fecha_nac', 'before_or_equal:today'],
                     'hora_ing' => ['nullable'],
                     'tipo_ing' => ['required', 'string', 'in:REGULAR,DERIVADO,EMERGENCIA,OTRO'],
-                    'permanencia' => ['required', 'string', 'in:PERMANENTE,TEMPORAL,EVENTUAL'],
+                    'permanencia' => ['nullable', 'string', 'in:PERMANENTE,TEMPORAL,EVENTUAL'],
                     'observaciones' => ['nullable', 'string', 'max:1500'],
                 ];
                 break;
@@ -470,15 +536,17 @@ $this->cod_est_adul = 'ACTIVO';
 
     public function guardar()
     {
+        $this->autorizarGestion();
         $this->validarPaso();
 
         if ($this->edad !== null && $this->edad < 60) {
             $this->paso = 2;
             $this->addError('fecha_nac', 'El adulto mayor debe tener 60 anos o mas para ser registrado.');
+
             return;
         }
 
-$codEst = 'ACTIVO';
+        $codEst = 'ACTIVO';
 
         $data = [
             'nombres' => $this->nombres,
@@ -492,7 +560,6 @@ $codEst = 'ACTIVO';
             'fecha_nac' => $this->fecha_nac,
             'genero' => $this->genero,
             'grupo_sanguineo' => $this->grupo_sanguineo,
-            'alergias' => $this->alergias ?: 'NINGUNA',
             'seguro_salud' => $this->seguro_salud,
             'nivel_educat' => $this->nivel_educat,
 
@@ -546,9 +613,14 @@ $codEst = 'ACTIVO';
             $this->dispatch('swal', [
                 'icon' => 'error',
                 'title' => 'Error',
-                'text' => 'Ocurrio un error al guardar: ' . $e->getMessage(),
+                'text' => 'Ocurrio un error al guardar: '.$e->getMessage(),
             ]);
         }
+    }
+
+    private function autorizarGestion(): void
+    {
+        abort_unless(auth()->user()?->estado === 'ACTIVO' && auth()->user()->can('residentes.gestionar'), 403);
     }
 
     public function render()

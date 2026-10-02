@@ -3,6 +3,7 @@
 namespace App\Frontend\Livewire\Medico\Valoraciones;
 
 use App\Backend\Modulos\Clinica\Servicios\ContextoClinicoService;
+use App\Backend\Modulos\Identidad\Servicios\RolePreviewService;
 use App\Models\Atencion;
 use App\Models\HistorialEstadoResidente;
 use App\Models\NotaClinica;
@@ -107,6 +108,7 @@ class ValoracionMedicaPanel extends Component
 
     public function abrirCrear(): void
     {
+        abort_unless($this->puedeRegistrar(), 403);
         $this->reset('editandoId', 'codResidente', 'diagnosticosReferidos', 'antecedentesRelevantes', 'medicacionActualResumen', 'alergiasReferidas', 'condicionMedicaGeneral', 'estadoNeurologicoBasico', 'nivelDependenciaSugerido', 'resultadoAdmision', 'motivoDecision', 'recomendacionMedica');
         $this->fecha = today()->format('Y-m-d');
         $this->hora = now()->format('H:i');
@@ -122,6 +124,8 @@ class ValoracionMedicaPanel extends Component
 
     public function guardar(): void
     {
+        abort_unless($this->puedeRegistrar(), 403);
+
         $this->validate([
             'codResidente' => 'required|exists:residentes,cod_residente',
             'fecha' => 'required|date',
@@ -212,6 +216,17 @@ class ValoracionMedicaPanel extends Component
         $this->modalForm = false;
         $this->reset('editandoId', 'codResidente', 'fecha', 'hora', 'resultadoAdmision', 'motivoDecision', 'estadoForm');
         $this->dispatch('swal', ['icon' => 'success', 'title' => 'Valoración médica guardada correctamente.']);
+    }
+
+    public function puedeRegistrar(): bool
+    {
+        $usuario = Auth::user();
+
+        return $usuario?->estado === 'ACTIVO'
+            && $usuario->hasRole('MEDICO GENERAL/GERIATRA')
+            && $usuario->can('atenciones.crear')
+            && $usuario->can('notas_clinicas.crear')
+            && ! app(RolePreviewService::class)->isActive($usuario);
     }
 
     public function cerrarModales(): void

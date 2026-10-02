@@ -523,7 +523,7 @@
     {{-- Tabla de Vinculados --}}
     @if(count($vinculosFamiliar) > 0)
     <div class="overflow-x-auto rounded-xl border border-[var(--rm-border-soft)] bg-[var(--rm-surface)] mt-3">
-     <table class="w-full text-left text-xs">
+     <table class="rm-data-table rm-data-table--actions w-full text-left text-xs">
      <thead class="bg-[var(--rm-surface-soft)] font-bold uppercase tracking-wider text-[var(--rm-text-secondary)] border-b border-[var(--rm-border-soft)]">
       <tr>
       <th class="px-3 py-2.5">Adulto Mayor</th>

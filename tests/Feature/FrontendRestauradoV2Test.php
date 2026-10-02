@@ -37,7 +37,7 @@ class FrontendRestauradoV2Test extends TestCase
         $this->actingAs($usuario)
             ->get('/dashboard')
             ->assertOk()
-            ->assertSee('Centro de Mando');
+            ->assertSee('bajo supervisión global');
     }
 
     public function test_modulos_visuales_principales_no_responden_con_error_de_servidor(): void
@@ -45,7 +45,6 @@ class FrontendRestauradoV2Test extends TestCase
         $usuario = $this->superadministrador();
 
         $this->actingAs($usuario);
-        $this->withoutExceptionHandling();
 
         $rutas = [
             '/admin/usuarios',
@@ -86,7 +85,6 @@ class FrontendRestauradoV2Test extends TestCase
     {
         $usuario = $this->superadministrador();
         $this->actingAs($usuario);
-        $this->withoutExceptionHandling();
 
         $rutas = collect(Route::getRoutes()->getRoutes())
             ->filter(fn ($ruta) => in_array('GET', $ruta->methods(), true))
@@ -114,7 +112,7 @@ class FrontendRestauradoV2Test extends TestCase
     public function test_wizard_original_registra_preadmision_contacto_y_documentos_en_v2(): void
     {
         Storage::fake('public');
-        $usuario = $this->superadministrador();
+        $usuario = $this->administrador();
         $this->actingAs($usuario);
 
         $componente = app(PreadmisionWizard::class);
@@ -201,7 +199,7 @@ class FrontendRestauradoV2Test extends TestCase
 
     public function test_modal_original_guarda_aplicacion_de_instrumento_v2(): void
     {
-        $usuario = $this->superadministrador();
+        $usuario = $this->usuarioConRol('PSICOLOGO/A');
         Personal::create([
             'cod_personal' => 'PER_EVAL_V2',
             'cod_usuario' => $usuario->cod_usuario,
@@ -248,7 +246,7 @@ class FrontendRestauradoV2Test extends TestCase
     public function test_ficha_original_guarda_documento_administrativo_v2(): void
     {
         Storage::fake('local');
-        $usuario = $this->superadministrador();
+        $usuario = $this->administrador();
         $residente = Residente::crearDesdeAdmision([
             'cod_residente' => 'RES_DOC_V2',
             'nombres' => 'Rita',
@@ -278,7 +276,7 @@ class FrontendRestauradoV2Test extends TestCase
     public function test_ficha_no_crea_documento_ficticio_sin_archivo_real(): void
     {
         Storage::fake('local');
-        $usuario = $this->superadministrador();
+        $usuario = $this->administrador();
         $residente = Residente::crearDesdeAdmision([
             'cod_residente' => 'RES_DOC_SIN_ARCHIVO',
             'nombres' => 'Rita',
@@ -304,10 +302,19 @@ class FrontendRestauradoV2Test extends TestCase
 
     private function superadministrador(): User
     {
+        return $this->usuarioConRol('SUPERADMINISTRADOR');
+    }
+
+    private function administrador(): User
+    {
+        return $this->usuarioConRol('ADMINISTRADOR');
+    }
+
+    private function usuarioConRol(string $rol): User
+    {
         $this->seed(RolesAndPermissionsSeeder::class);
-        $rol = Role::findOrCreate('SUPERADMINISTRADOR', 'web');
-        $usuario = User::factory()->create();
-        $usuario->assignRole($rol);
+        $usuario = User::factory()->create(['estado' => 'ACTIVO']);
+        $usuario->assignRole(Role::findOrCreate($rol, 'web'));
 
         return $usuario;
     }

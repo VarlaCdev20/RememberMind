@@ -23,7 +23,7 @@
 
  {{-- Tabla Continua con Proporciones Estables y Scroll Horizontal Responsivo --}}
  <div class="w-full overflow-hidden">
- <table class="w-full table-auto text-left border-collapse">
+ <table class="rm-data-table rm-data-table--actions w-full table-auto text-left border-collapse">
  <thead>
  <tr class="bg-[var(--rm-surface-soft)] text-[11px] font-[700] text-[var(--rm-text-muted)] uppercase tracking-wider border-b border-[var(--rm-border-soft)]">
   <th class="px-2.5 py-2.5 w-[65px] text-center">Hora</th>

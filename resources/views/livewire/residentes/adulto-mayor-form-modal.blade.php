@@ -244,9 +244,11 @@
  </div>
 
  <div class="col-span-full space-y-2">
- <label class="text-xs font-bold uppercase tracking-widest text-titulo/50">Alergias Conocidas *</label>
- <textarea wire:model="alergias" rows="3" placeholder="Especifique o deje 'Ninguna'..." class="w-full resize-none rounded-3xl border-2 {{ $errors->has('alergias') ? 'border-[var(--rm-action-primary)]/50 bg-boton-acento/5' : 'border-transparent bg-fondo-card' }} px-6 py-4 text-sm font-bold text-titulo shadow-sm outline-none transition focus:border-borde-focus/30 focus:ring-4 focus:ring-borde-focus/10"></textarea>
- @error('alergias') <span class="text-xs font-bold text-[var(--rm-action-primary)] uppercase tracking-tight">{{ $message }}</span> @enderror
+ <label class="text-xs font-bold uppercase tracking-widest text-titulo/50">Alergias Conocidas</label>
+ <div class="w-full rounded-3xl border-2 border-transparent bg-fondo-card px-6 py-4 text-sm font-bold text-titulo shadow-sm">
+ {{ $alergias ?: 'NINGUNA' }}
+ </div>
+ <p class="text-xs text-titulo/50">La actualización de alergias se realiza desde el expediente clínico y exige identificación del profesional responsable.</p>
  </div>
  </div>
  @endif

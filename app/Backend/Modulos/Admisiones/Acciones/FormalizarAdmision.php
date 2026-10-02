@@ -11,6 +11,7 @@ use App\Models\OcupacionCama;
 use App\Models\Preadmision;
 use App\Models\Residente;
 use App\Models\ResidenteContacto;
+use App\Models\SeguroResidente;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -121,6 +122,19 @@ class FormalizarAdmision
                 'estado' => 'VIGENTE',
                 'observacion' => $datos['observacion_consentimiento'] ?? null,
             ]);
+
+            if (! empty($datos['seguro_entidad'])) {
+                SeguroResidente::query()->create([
+                    'cod_seguro' => $this->codigo('SEG'),
+                    'cod_residente' => $residente->cod_residente,
+                    'entidad' => $datos['seguro_entidad'],
+                    'plan' => $datos['seguro_plan'] ?? null,
+                    'numero_afiliacion' => $datos['seguro_afiliacion'] ?? null,
+                    'titular' => $datos['seguro_titular'] ?? null,
+                    'cobertura' => $datos['seguro_cobertura'] ?? null,
+                    'estado' => 'ACTIVO',
+                ]);
+            }
 
             $solicitud->update(['estado' => 'ADMITIDA']);
 

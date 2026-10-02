@@ -13,13 +13,13 @@
     --rm-textura-grid-size-md: 28px;
     --rm-textura-grid-size-lg: 44px;
 
-    --rm-textura-dot-size: 20px;
-    --rm-textura-dot-radius: 1px;
+    --rm-textura-dot-size: 22px;
+    --rm-textura-dot-radius: 1.25px;
 
-    --rm-textura-linea: rgba(41, 58, 89, 0.045);
-    --rm-textura-linea-suave: rgba(41, 58, 89, 0.028);
-    --rm-textura-punto: rgba(217, 121, 95, 0.13);
-    --rm-textura-punto-suave: rgba(41, 58, 89, 0.065);
+    --rm-textura-linea: rgba(47, 62, 92, 0.055);
+    --rm-textura-linea-suave: rgba(47, 62, 92, 0.035);
+    --rm-textura-punto: rgba(48, 44, 42, 0.16);
+    --rm-textura-punto-suave: rgba(47, 62, 92, 0.09);
 
     --rm-textura-radial-terracota: rgba(217, 121, 95, 0.115);
     --rm-textura-radial-salud: rgba(63, 125, 90, 0.075);
@@ -37,7 +37,25 @@
    FONDOS GENERALES
    ============================================================ */
 
-.rm-bg-app {
+.rm-bg-app,
+.rm-bg-layout,
+.rm-bg-module,
+.rm-bg-warm,
+.rm-depth-canvas,
+.bg-app-institucional,
+.rm-shell,
+[data-rm-main] {
+    background-color: var(--rm-bg-app);
+    background-image:
+        radial-gradient(ellipse 75% 55% at 94% 0%, rgba(255, 248, 240, 0.52) 0%, transparent 65%),
+        radial-gradient(ellipse 65% 50% at 6% 100%, color-mix(in srgb, var(--rm-action-primary) 9%, transparent) 0%, transparent 65%),
+        radial-gradient(circle at 50% 20%, rgba(255, 255, 255, 0.25) 0%, transparent 70%),
+        radial-gradient(circle at center, rgba(48, 44, 42, 0.16) 1.25px, transparent 1.25px);
+    background-size: 100% 100%, 100% 100%, 100% 100%, 22px 22px;
+    background-attachment: fixed;
+}
+
+.old-rm-bg-app {
     background:
         radial-gradient(circle at 10% 8%, rgba(217, 121, 95, 0.12), transparent 28rem),
         radial-gradient(circle at 90% 10%, rgba(63, 125, 90, 0.075), transparent 30rem),
@@ -46,18 +64,24 @@
 }
 
 .rm-bg-layout {
-    background:
+    background-color: var(--rm-bg-app);
+    background-image:
         radial-gradient(circle at 12% 16%, rgba(217, 121, 95, 0.105), transparent 26rem),
         radial-gradient(circle at 86% 10%, rgba(63, 125, 90, 0.068), transparent 28rem),
         radial-gradient(circle at 78% 86%, rgba(155, 138, 199, 0.055), transparent 26rem),
-        linear-gradient(135deg, var(--color-fondo-app), var(--color-fondo-layout));
+        radial-gradient(circle at center, rgba(48, 44, 42, 0.16) 1.25px, transparent 1.25px);
+    background-size: 100% 100%, 100% 100%, 100% 100%, 22px 22px;
+    background-attachment: fixed;
 }
 
 .rm-bg-module {
-    background:
+    background-color: var(--rm-bg-app);
+    background-image:
         radial-gradient(circle at top right, rgba(217, 121, 95, 0.075), transparent 26rem),
         radial-gradient(circle at bottom left, rgba(41, 58, 89, 0.045), transparent 22rem),
-        var(--color-fondo-layout);
+        radial-gradient(circle at center, rgba(48, 44, 42, 0.16) 1.25px, transparent 1.25px);
+    background-size: 100% 100%, 100% 100%, 22px 22px;
+    background-attachment: fixed;
 }
 
 .rm-bg-clean {
@@ -65,15 +89,21 @@
 }
 
 .rm-bg-warm {
-    background:
+    background-color: var(--rm-bg-app);
+    background-image:
         radial-gradient(circle at 12% 10%, rgba(217, 121, 95, 0.10), transparent 24rem),
-        var(--color-fondo-layout);
+        radial-gradient(circle at center, rgba(48, 44, 42, 0.16) 1.25px, transparent 1.25px);
+    background-size: 100% 100%, 22px 22px;
+    background-attachment: fixed;
 }
 
 .rm-bg-soft-light {
-    background:
+    background-color: var(--rm-bg-app);
+    background-image:
         radial-gradient(circle at top, rgba(255, 248, 241, 0.52), transparent 24rem),
-        var(--color-fondo-layout);
+        radial-gradient(circle at center, rgba(48, 44, 42, 0.16) 1.25px, transparent 1.25px);
+    background-size: 100% 100%, 22px 22px;
+    background-attachment: fixed;
 }
 
 /* ============================================================
@@ -82,7 +112,7 @@
 
 .rm-texture-dots {
     background-image:
-        radial-gradient(circle, var(--rm-textura-punto) var(--rm-textura-dot-radius), transparent var(--rm-textura-dot-radius));
+        radial-gradient(circle at center, var(--rm-textura-punto) var(--rm-textura-dot-radius), transparent var(--rm-textura-dot-radius));
     background-size: var(--rm-textura-dot-size) var(--rm-textura-dot-size);
 }
 
@@ -480,8 +510,8 @@
 [data-theme="dark"] {
     --rm-textura-linea: rgba(255, 255, 255, 0.055);
     --rm-textura-linea-suave: rgba(255, 255, 255, 0.035);
-    --rm-textura-punto: rgba(244, 162, 97, 0.14);
-    --rm-textura-punto-suave: rgba(255, 255, 255, 0.08);
+    --rm-textura-punto: rgba(226, 232, 240, 0.14);
+    --rm-textura-punto-suave: rgba(226, 232, 240, 0.08);
 
     --rm-textura-radial-terracota: rgba(244, 162, 97, 0.12);
     --rm-textura-radial-salud: rgba(126, 214, 203, 0.10);
@@ -495,7 +525,38 @@
 }
 
 .dark .rm-bg-app,
-[data-theme="dark"] .rm-bg-app {
+[data-theme="dark"] .rm-bg-app,
+.dark .rm-bg-layout,
+[data-theme="dark"] .rm-bg-layout,
+.dark .rm-bg-module,
+[data-theme="dark"] .rm-bg-module,
+.dark .rm-bg-warm,
+[data-theme="dark"] .rm-bg-warm,
+.dark .rm-depth-canvas,
+[data-theme="dark"] .rm-depth-canvas,
+.dark .bg-app-institucional,
+[data-theme="dark"] .bg-app-institucional,
+.dark .rm-shell,
+[data-theme="dark"] .rm-shell,
+.dark [data-rm-main],
+[data-theme="dark"] [data-rm-main] {
+    background-color: var(--rm-bg-app);
+    background-image:
+        radial-gradient(ellipse 75% 55% at 94% 0%, rgba(53, 189, 242, 0.06) 0%, transparent 65%),
+        radial-gradient(ellipse 65% 50% at 6% 100%, rgba(32, 201, 151, 0.05) 0%, transparent 65%),
+        radial-gradient(circle at center, rgba(226, 232, 240, 0.16) 1.25px, transparent 1.25px);
+    background-size: 100% 100%, 100% 100%, 22px 22px;
+    background-attachment: fixed;
+}
+
+.dark .rm-texture-dots,
+[data-theme="dark"] .rm-texture-dots {
+    background-image:
+        radial-gradient(circle at center, rgba(226, 232, 240, 0.16) 1.25px, transparent 1.25px);
+    background-size: 22px 22px;
+}
+
+.old-rm-bg-app {
     background:
         radial-gradient(circle at 88% 8%, rgba(53, 189, 242, 0.075), transparent 31rem),
         radial-gradient(circle at 12% 92%, rgba(32, 201, 151, 0.05), transparent 28rem),
@@ -534,9 +595,12 @@
     .rm-bg-layout,
     .rm-bg-app,
     .rm-bg-module {
-        background:
+        background-color: var(--color-fondo-layout);
+        background-image:
             radial-gradient(circle at 16% 8%, rgba(217, 121, 95, 0.07), transparent 18rem),
-            var(--color-fondo-layout);
+            radial-gradient(circle at center, rgba(48, 44, 42, 0.16) 1.25px, transparent 1.25px);
+        background-size: 100% 100%, 22px 22px;
+        background-attachment: fixed;
     }
 
     .rm-texture-grid,

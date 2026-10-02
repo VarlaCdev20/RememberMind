@@ -2,6 +2,7 @@
 
 namespace App\Backend\Modulos\Medicacion\Servicios;
 
+use App\Backend\Modulos\Enfermeria\Servicios\MiTurnoService;
 use App\Models\AdministracionMedicacion;
 use App\Models\HorarioPrescripcion;
 use App\Models\Prescripcion;
@@ -43,13 +44,18 @@ class AgendaMedicacionService
             ->groupBy(fn (AdministracionMedicacion $registro) => $this->clave(
                 $registro->cod_prescripcion,
                 $registro->fecha_hora_programada,
+                $registro->cod_horario_prescripcion,
             ));
 
         return $prescripciones->flatMap(function (Prescripcion $prescripcion) use ($administraciones, $ahora, $fecha) {
-            return $prescripcion->horarios->map(function (HorarioPrescripcion $horario) use ($prescripcion, $administraciones, $ahora, $fecha) {
+            return $prescripcion->horarios
+                ->filter(fn (HorarioPrescripcion $horario) => ! filled($horario->dias_semana)
+                    || strtoupper(trim($horario->dias_semana)) === 'TODOS'
+                    || app(MiTurnoService::class)->correspondeDiaSemana($horario->dias_semana, $ahora))
+                ->map(function (HorarioPrescripcion $horario) use ($prescripcion, $administraciones, $ahora, $fecha) {
                 $hora = $this->normalizarHora($horario->hora_programada);
                 $programada = Carbon::parse("{$fecha} {$hora}", $ahora->timezone);
-                $registro = $administraciones->get($this->clave($prescripcion->cod_prescripcion, $hora))?->first();
+                $registro = $administraciones->get($this->clave($prescripcion->cod_prescripcion, $hora, $horario->cod_horario_prescripcion))?->first();
 
                 if ($registro) {
                     $estado = $registro->administrado ? 'ADMINISTRADA' : 'OMITIDA';
@@ -74,7 +80,7 @@ class AgendaMedicacionService
                     'estado' => $estado,
                     'minutos' => (int) $ahora->diffInMinutes($programada, false),
                 ];
-            });
+                });
         })->sortBy('programada')->values();
     }
 
@@ -90,9 +96,9 @@ class AgendaMedicacionService
             ->values();
     }
 
-    private function clave(string $codPrescripcion, mixed $hora): string
+    private function clave(string $codPrescripcion, mixed $hora, ?string $codHorario): string
     {
-        return $codPrescripcion.'|'.$this->normalizarHora($hora);
+        return $codPrescripcion.'|'.$codHorario.'|'.$this->normalizarHora($hora);
     }
 
     private function normalizarHora(mixed $hora): string

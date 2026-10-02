@@ -11,7 +11,7 @@
 </section>
 
  {{-- BARRA DE FILTROS UNIFICADA FORMATO ALERTAS --}}
- <section class="rm-filter-bar">
+ <x-ui.filter-bar class="mb-4">
  <div class="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-2 items-center">
   {{-- Buscador Principal --}}
   <div class="lg:col-span-6 relative flex items-center">
@@ -61,43 +61,41 @@
  @endphp
  @if($hasFiltrosActivos)
   <div class="rm-filter-bar__active">
-  <div class="flex flex-wrap items-center gap-1.5">
-   <span class="rm-filter-bar__active-label">
-   <i class="ph-bold ph-funnel text-xs"></i> Filtros activos:
-   </span>
-   @if(!empty($search))
-   <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[var(--rm-surface-soft)] border border-[var(--rm-border-soft)] text-[11px] font-semibold text-[var(--rm-text-primary)]">
-    <span>Búsqueda: "{{ Str::limit($search, 16) }}"</span>
-    <button type="button" wire:click="$set('search', '')" class="hover:text-[var(--rm-action-primary)] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
-   </span>
-   @endif
-   @if(!empty($filtroTipo))
-   <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[var(--rm-text-primary)]/10 border border-[var(--rm-border-soft)] text-[11px] font-bold text-[var(--rm-text-primary)]">
-    <span>Tipo: {{ $filtroTipo }}</span>
-    <button type="button" wire:click="$set('filtroTipo', '')" class="hover:text-[var(--rm-action-primary)] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
-   </span>
-   @endif
-   @if(!empty($filtroEstado))
-   <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[var(--rm-warning)]/15 border border-[var(--rm-warning)]/30 text-[11px] font-bold text-[var(--rm-warning-strong)] dark:text-[var(--rm-warning-soft)]">
-    <span>Estado: {{ $filtroEstado }}</span>
-    <button type="button" wire:click="$set('filtroEstado', '')" class="hover:text-[var(--rm-action-primary)] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
-   </span>
-   @endif
-  </div>
-  <div class="flex items-center gap-2.5">
-   <span class="text-[11px] px-2.5 py-0.5 rounded-full font-bold bg-[var(--rm-text-primary)]/10 text-[var(--rm-text-primary)]">
-   {{ count($habitaciones) }} habitaciones
-   </span>
-   <button type="button"
-   wire:click="$set('search', ''); $set('filtroTipo', ''); $set('filtroEstado', '');"
-   class="inline-flex items-center gap-1 rounded-xl bg-[var(--rm-action-primary-soft)] hover:bg-[var(--rm-action-primary-soft)] text-[var(--rm-action-primary)] py-1 px-2.5 text-xs font-bold transition cursor-pointer">
-   <i class="ph-bold ph-arrow-counter-clockwise"></i>
-   <span>Limpiar filtros</span>
-   </button>
-  </div>
+   <div class="rm-filter-scroll">
+    <span class="rm-filter-bar__active-label">
+     <i class="ph-bold ph-funnel text-xs"></i> Filtros activos:
+    </span>
+    @if(!empty($search))
+     <span class="rm-filter-chip rm-filter-chip--search">
+      <i class="ph-bold ph-magnifying-glass text-xs"></i>
+      <span>B?squeda: "{{ Str::limit($search, 16) }}"</span>
+      <button type="button" wire:click="$set('search', '')" title="Quitar filtro"><i class="ph-bold ph-x text-xs"></i></button>
+     </span>
+    @endif
+    @if(!empty($filtroTipo))
+     <span class="rm-filter-chip rm-filter-chip--clinical">
+      <i class="ph-bold ph-door text-xs"></i>
+      <span>Tipo: {{ $filtroTipo }}</span>
+      <button type="button" wire:click="$set('filtroTipo', '')" title="Quitar filtro"><i class="ph-bold ph-x text-xs"></i></button>
+     </span>
+    @endif
+    @if(!empty($filtroEstado))
+     <span class="rm-filter-chip {{ $filtroEstado === 'DISPONIBLE' ? 'rm-filter-chip--success' : ($filtroEstado === 'OCUPADA' ? 'rm-filter-chip--danger' : 'rm-filter-chip--warning') }}">
+      <span class="w-1.5 h-1.5 rounded-full {{ $filtroEstado === 'DISPONIBLE' ? 'bg-[var(--rm-action-primary)]' : ($filtroEstado === 'OCUPADA' ? 'bg-[var(--rm-danger)]' : 'bg-[var(--rm-status-high)]') }}"></span>
+      <span>Estado: {{ $filtroEstado }}</span>
+      <button type="button" wire:click="$set('filtroEstado', '')" title="Quitar filtro"><i class="ph-bold ph-x text-xs"></i></button>
+     </span>
+    @endif
+    <button type="button"
+     wire:click="$set('search', ''); $set('filtroTipo', ''); $set('filtroEstado', '');"
+     class="rm-filter-bar__clear-btn">
+     <i class="ph-bold ph-arrow-counter-clockwise text-xs"></i>
+     <span>Limpiar filtros</span>
+    </button>
+   </div>
   </div>
  @endif
- </section>
+</x-ui.filter-bar>
 
 <section class="grid gap-4 lg:grid-cols-2 xl:grid-cols-3">
 @forelse($habitaciones as $habitacion)

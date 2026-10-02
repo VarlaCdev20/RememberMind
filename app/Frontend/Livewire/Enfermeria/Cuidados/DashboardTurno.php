@@ -11,6 +11,7 @@ use App\Backend\Modulos\Enfermeria\Servicios\TendenciaOcupacionService;
 use App\Backend\Modulos\Enfermeria\Servicios\TurnoEnfermeriaService;
 use App\Backend\Modulos\Medicacion\Servicios\AgendaMedicacionService;
 use App\Backend\Modulos\Medicacion\Servicios\RegistrarAdministracionMedicacionService;
+use App\Backend\Modulos\Reportes\Servicios\DashboardPhotoRotation;
 use App\Models\AdministracionMedicacion;
 use App\Models\Alerta;
 use App\Models\AsignacionPersonal;
@@ -37,6 +38,10 @@ class DashboardTurno extends Component
     ];
 
     public $turnoActual;
+
+    public string $welcomeImage = '';
+
+    public string $welcomeSecondaryImage = '';
 
     public $turnosActivos = [];
 
@@ -115,6 +120,8 @@ class DashboardTurno extends Component
 
     public function mount()
     {
+        [$this->welcomeImage, $this->welcomeSecondaryImage] = app(DashboardPhotoRotation::class)->pair('enfermeria');
+
         $this->filtroEnfermeroId = Auth::user()?->cod_usuario ?? '';
         $this->filtroFecha = Carbon::now()->toDateString();
         $this->loadTurnoActual();

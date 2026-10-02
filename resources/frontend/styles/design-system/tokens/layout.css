@@ -7,21 +7,21 @@
     /* ------------------------------------------------------------
        1. SHELL Y NAVEGACIÓN
        ------------------------------------------------------------ */
-    --rm-sidebar-width: 248px;          /* Ancho estándar del menú lateral */
+    --rm-sidebar-width: 232px;          /* Ancho estándar del menú lateral */
     --rm-sidebar-collapsed: 76px;       /* Ancho colapsado en modo compacto */
-    --rm-topbar-height: 64px;           /* Altura fija de la barra superior */
+    --rm-topbar-height: 60px;           /* Altura fija de la barra superior */
 
     /* ------------------------------------------------------------
        2. CONTENEDOR DE PÁGINA
        ------------------------------------------------------------ */
-    --rm-page-max-width: 1440px;        /* Ancho máximo recomendado de contenido */
-    --rm-page-padding-x: 24px;          /* Relleno horizontal de pantalla */
-    --rm-page-padding-y: 24px;          /* Relleno vertical de pantalla */
-    --rm-content-gap: 24px;             /* Separación entre secciones operativas */
-    --rm-grid-gap: 16px;                /* Separación interna de grids */
-    --rm-page-header-height: 90px;       /* Cabecera compacta de vistas internas */
-    --rm-dashboard-hero-height: 260px;   /* Hero exclusivo de dashboards */
-    --rm-panel-max-height: 340px;        /* Panel visual de lectura rápida */
+    --rm-page-max-width: 1360px;        /* Ancho máximo de contenido */
+    --rm-page-padding-x: 20px;          /* Relleno horizontal de pantalla */
+    --rm-page-padding-y: 16px;          /* Relleno vertical de pantalla */
+    --rm-content-gap: 16px;             /* Separación entre secciones operativas */
+    --rm-grid-gap: 12px;                /* Separación interna de grids */
+    --rm-page-header-height: 76px;      /* Cabecera de vistas internas */
+    --rm-dashboard-hero-height: 204px;  /* Hero exclusivo de dashboards */
+    --rm-panel-max-height: 300px;       /* Panel visual de lectura rápida */
 
     /* ------------------------------------------------------------
        3. ANCHOS DE DRAWERS (Paneles Laterales Deslizables)

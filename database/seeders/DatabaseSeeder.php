@@ -10,7 +10,7 @@ class DatabaseSeeder extends Seeder
     {
         $this->call(RolesAndPermissionsSeeder::class);
 
-        if (app()->environment('testing') || filter_var(env('SEED_DEMO_ACCOUNTS', false), FILTER_VALIDATE_BOOL)) {
+        if (app()->environment('testing') || (app()->environment('local') && filter_var(env('SEED_SAMPLE_ACCOUNTS', false), FILTER_VALIDATE_BOOL))) {
             $this->call(AdminSeeder::class);
         }
     }

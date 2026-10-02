@@ -167,7 +167,7 @@
 
   <!-- 4. Formulario para Registrar Nueva Intervención (si la alerta no está cerrada) -->
   @if($detalle->puedeCerrarse())
-  @can('alertas.gestionar')
+  @canany(['alertas.gestionar', 'alertas.seguimiento'])
    <div class="p-3 rounded-xl bg-[var(--rm-surface)] border border-[var(--rm-border)] space-y-2">
    <label for="nuevaIntervencionInput" class="block text-xs font-bold uppercase tracking-wider text-[var(--rm-text-title)]">
     Agregar Nota de Evolución o Intervención
@@ -191,7 +191,7 @@
     <span class="text-xs text-[var(--rm-danger-action)] font-medium block">{{ $message }}</span>
    @enderror
    </div>
-  @endcan
+  @endcanany
   @endif
  </div>
 
@@ -199,14 +199,14 @@
   <div class="flex w-full flex-col-reverse gap-2 sm:flex-row sm:items-center sm:justify-between">
    <div>
   @if($detalle && $detalle->puedeCerrarse())
-   @can('alertas.gestionar')
+    @canany(['alertas.gestionar', 'alertas.cerrar'])
    <button type="button"
     wire:click="cerrarAlerta('{{ $detalle->cod_alerta }}')"
     class="rm-btn rm-btn-sm rm-btn-success cursor-pointer shadow-xs">
     <i class="ph ph-archive-box text-base"></i>
     <span>Cerrar y Archivar Alerta</span>
    </button>
-   @endcan
+    @endcanany
   @endif
   </div>
 
@@ -218,14 +218,14 @@
   </button>
 
   @if($detalle && $detalle->estado === 'ABIERTA')
-   @can('alertas.gestionar')
+    @canany(['alertas.gestionar', 'alertas.seguimiento'])
    <button type="button"
     wire:click="atenderAlerta('{{ $detalle->cod_alerta }}')"
     class="rm-btn rm-btn-accent cursor-pointer shadow-xs">
     <i class="ph-bold ph-stethoscope text-base"></i>
     <span>Atender Alerta</span>
    </button>
-   @endcan
+    @endcanany
   @endif
    </div>
   </div>

@@ -94,100 +94,112 @@
  </div>
  </section>
 
- {{-- ══════════════════════════════════════════════════════════════════ --}}
- {{-- FILTROS --}}
- {{-- ══════════════════════════════════════════════════════════════════ --}}
- <section class="rm-filter-bar overflow-hidden">
- <div class="border-b border-borde-suave bg-fondo-panel px-5 py-3">
- <div class="flex items-center gap-2">
- <i class="ph-bold ph-funnel text-apoyo text-sm"></i>
- <h2 class="text-xs font-bold uppercase tracking-[0.15em] text-titulo">Filtros de reporte</h2>
- @if($hasFiltros)
- <span class="ml-1 rounded-full bg-estado-advertenciaBg px-2 py-0.5 text-[9px] font-bold text-estado-advertencia">Activos</span>
- @endif
- </div>
- </div>
- <div class="p-4 sm:p-5">
- <div class="flex flex-wrap items-end gap-3">
+     {{-- ══════════════════════════════════════════════════════════════════ --}}
+    {{-- FILTROS DE REPORTE FORMATO ALERTAS                                 --}}
+    {{-- ══════════════════════════════════════════════════════════════════ --}}
+    <x-ui.filter-bar class="mb-4">
+        <div class="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-2 items-center">
+            {{-- Buscar adulto --}}
+            <div class="lg:col-span-3 relative flex items-center">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-[var(--rm-text-secondary)]">
+                    <i class="ph-bold ph-magnifying-glass text-base"></i>
+                </span>
+                <input type="text"
+                    wire:model.live.debounce.400ms="buscar"
+                    placeholder="Buscar por nombre o apellido..."
+                    class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-input-bg)] py-2 pl-9 pr-8 text-xs font-medium text-[var(--rm-text-primary)] placeholder-[var(--rm-text-secondary)] focus:border-[var(--rm-primary)] focus:ring-1 focus:ring-[var(--rm-primary)] focus:outline-none h-[38px]" />
+                @if(!empty($buscar))
+                    <button type="button"
+                        wire:click="$set('buscar', '')"
+                        class="absolute inset-y-0 right-0 flex items-center pr-2.5 text-[var(--rm-text-secondary)] hover:text-[var(--rm-primary)] cursor-pointer"
+                        title="Limpiar búsqueda">
+                        <i class="ph-bold ph-x-circle text-base"></i>
+                    </button>
+                @endif
+            </div>
 
- {{-- Buscar adulto --}}
- <div class="min-w-0 flex-1 basis-44">
- <label class="mb-1 block text-[10px] font-bold uppercase tracking-[0.1em] text-apoyo">Buscar adulto mayor</label>
- <div class="relative">
- <i class="ph-bold ph-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-sm text-apoyo"></i>
- <input
- type="text"
- wire:model.live.debounce.400ms="buscar"
- placeholder="Nombre o apellido..."
- class="w-full rounded-xl border border-borde-suave bg-fondo-panel py-2 pl-8 pr-3 text-xs font-bold text-titulo placeholder-[var(--rm-text-muted)] focus:border-estado-advertenciaBorde focus:outline-none focus:ring-2 focus:ring-[var(--rm-warning)]/20"
- >
- </div>
- </div>
+            {{-- Tipo --}}
+            <div class="lg:col-span-3">
+                <select wire:model.live="filtroTipo"
+                    class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-input-bg)] py-2 px-3 text-xs font-medium text-[var(--rm-text-primary)] focus:border-[var(--rm-primary)] focus:ring-1 focus:ring-[var(--rm-primary)] focus:outline-none h-[38px]">
+                    <option value="">Todos los tipos</option>
+                    @foreach($tipos as $t)
+                        <option value="{{ $t->cod_tipo_act }}">{{ $t->tipo }}</option>
+                    @endforeach
+                </select>
+            </div>
 
- {{-- Tipo --}}
- <div class="basis-40">
- <label class="mb-1 block text-[10px] font-bold uppercase tracking-[0.1em] text-apoyo">Tipo de actividad</label>
- <select
- wire:model.live="filtroTipo"
- class="w-full rounded-xl border border-borde-suave bg-fondo-panel py-2 px-3 text-xs font-bold text-titulo focus:border-estado-advertenciaBorde focus:outline-none focus:ring-2 focus:ring-[var(--rm-warning)]/20"
- >
- <option value="">Todos los tipos</option>
- @foreach($tipos as $t)
- <option value="{{ $t->cod_tipo_act }}">{{ $t->tipo }}</option>
- @endforeach
- </select>
- </div>
+            {{-- Estado --}}
+            <div class="lg:col-span-2">
+                <select wire:model.live="filtroEstado"
+                    class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-input-bg)] py-2 px-3 text-xs font-medium text-[var(--rm-text-primary)] focus:border-[var(--rm-primary)] focus:ring-1 focus:ring-[var(--rm-primary)] focus:outline-none h-[38px]">
+                    <option value="">Todos los estados</option>
+                    <option value="PROGRAMADA">Programada / Pendiente</option>
+                    <option value="REALIZADA">Realizada / Cumplida</option>
+                    <option value="CANCELADA">Cancelada / Anulada</option>
+                    <option value="REPROGRAMADA">Reprogramada</option>
+                </select>
+            </div>
 
- {{-- Estado --}}
- <div class="basis-36">
- <label class="mb-1 block text-[10px] font-bold uppercase tracking-[0.1em] text-apoyo">Estado</label>
- <select
- wire:model.live="filtroEstado"
- class="w-full rounded-xl border border-borde-suave bg-fondo-panel py-2 px-3 text-xs font-bold text-titulo focus:border-estado-advertenciaBorde focus:outline-none focus:ring-2 focus:ring-[var(--rm-warning)]/20"
- >
- <option value="">Todos los estados</option>
- <option value="PROGRAMADA">Programada / Pendiente</option>
- <option value="REALIZADA">Realizada / Cumplida</option>
- <option value="CANCELADA">Cancelada / Anulada</option>
- <option value="REPROGRAMADA">Reprogramada</option>
- </select>
- </div>
+            {{-- Fecha desde --}}
+            <div class="lg:col-span-2">
+                <input type="date"
+                    wire:model.live="fechaDesde"
+                    class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-input-bg)] py-2 px-3 text-xs font-medium text-[var(--rm-text-primary)] focus:border-[var(--rm-primary)] focus:ring-1 focus:ring-[var(--rm-primary)] focus:outline-none h-[38px]" />
+            </div>
 
- {{-- Fecha desde --}}
- <div class="basis-36">
- <label class="mb-1 block text-[10px] font-bold uppercase tracking-[0.1em] text-apoyo">Fecha desde</label>
- <input
- type="date"
- wire:model.live="fechaDesde"
- class="w-full rounded-xl border border-borde-suave bg-fondo-panel py-2 px-3 text-xs font-bold text-titulo focus:border-estado-advertenciaBorde focus:outline-none focus:ring-2 focus:ring-[var(--rm-warning)]/20"
- >
- </div>
+            {{-- Fecha hasta --}}
+            <div class="lg:col-span-2">
+                <input type="date"
+                    wire:model.live="fechaHasta"
+                    class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-input-bg)] py-2 px-3 text-xs font-medium text-[var(--rm-text-primary)] focus:border-[var(--rm-primary)] focus:ring-1 focus:ring-[var(--rm-primary)] focus:outline-none h-[38px]" />
+            </div>
+        </div>
 
- {{-- Fecha hasta --}}
- <div class="basis-36">
- <label class="mb-1 block text-[10px] font-bold uppercase tracking-[0.1em] text-apoyo">Fecha hasta</label>
- <input
- type="date"
- wire:model.live="fechaHasta"
- class="w-full rounded-xl border border-borde-suave bg-fondo-panel py-2 px-3 text-xs font-bold text-titulo focus:border-estado-advertenciaBorde focus:outline-none focus:ring-2 focus:ring-[var(--rm-warning)]/20"
- >
- </div>
-
- {{-- Limpiar --}}
- <div class="shrink-0">
- <button
- type="button"
- wire:click="limpiarFiltros"
- class="rm-filter-reset"
- >
- <i class="ph-bold ph-x text-xs"></i>
- Limpiar
- </button>
- </div>
-
- </div>
- </div>
- </section>
+        @if($hasFiltros)
+            <div class="rm-filter-bar__active">
+                <div class="flex flex-wrap items-center gap-1.5">
+                    <span class="rm-filter-bar__active-label">
+                        <i class="ph-bold ph-funnel text-xs"></i> Filtros activos:
+                    </span>
+                    @if(!empty($buscar))
+                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[var(--rm-surface-alt)] border border-[var(--rm-border)] text-[11px] font-semibold text-[var(--rm-text-primary)]">
+                            <span>Búsqueda: "{{ Str::limit($buscar, 16) }}"</span>
+                            <button type="button" wire:click="$set('buscar', '')" class="hover:text-[var(--rm-primary)] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
+                        </span>
+                    @endif
+                    @if(!empty($filtroTipo))
+                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[var(--rm-surface-alt)] border border-[var(--rm-border)] text-[11px] font-semibold text-[var(--rm-text-primary)]">
+                            <span>Tipo seleccionado</span>
+                            <button type="button" wire:click="$set('filtroTipo', '')" class="hover:text-[var(--rm-primary)] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
+                        </span>
+                    @endif
+                    @if(!empty($filtroEstado))
+                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[var(--rm-surface-alt)] border border-[var(--rm-border)] text-[11px] font-semibold text-[var(--rm-text-primary)]">
+                            <span>Estado: {{ $filtroEstado }}</span>
+                            <button type="button" wire:click="$set('filtroEstado', '')" class="hover:text-[var(--rm-primary)] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
+                        </span>
+                    @endif
+                    @if(!empty($fechaDesde))
+                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[var(--rm-surface-alt)] border border-[var(--rm-border)] text-[11px] font-semibold text-[var(--rm-text-primary)]">
+                            <span>Desde: {{ $fechaDesde }}</span>
+                            <button type="button" wire:click="$set('fechaDesde', '')" class="hover:text-[var(--rm-primary)] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
+                        </span>
+                    @endif
+                    @if(!empty($fechaHasta))
+                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[var(--rm-surface-alt)] border border-[var(--rm-border)] text-[11px] font-semibold text-[var(--rm-text-primary)]">
+                            <span>Hasta: {{ $fechaHasta }}</span>
+                            <button type="button" wire:click="$set('fechaHasta', '')" class="hover:text-[var(--rm-primary)] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
+                        </span>
+                    @endif
+                </div>
+                <button type="button" wire:click="limpiarFiltros" class="rm-filter-bar__clear-btn">
+                    <i class="ph-bold ph-arrow-counter-clockwise text-xs"></i>
+                    Limpiar filtros
+                </button>
+            </div>
+        @endif
+    </x-ui.filter-bar>
 
  {{-- ══════════════════════════════════════════════════════════════════ --}}
  {{-- MÉTRICAS (8 cards) --}}
@@ -425,7 +437,7 @@
  </div>
 
  <div class="w-full overflow-x-auto" wire:loading.class="opacity-50">
- <table class="min-w-[700px] w-full border-collapse text-sm">
+ <table class="rm-data-table min-w-[700px] w-full border-collapse text-sm">
  <thead>
  <tr class="border-b border-borde-suave bg-fondo-panel">
  <th class="px-4 py-3 text-left text-[10px] font-bold uppercase tracking-[0.1em] text-apoyo">Adulto mayor</th>

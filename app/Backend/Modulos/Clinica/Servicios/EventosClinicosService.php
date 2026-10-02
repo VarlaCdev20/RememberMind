@@ -12,7 +12,7 @@ class EventosClinicosService
 {
     /**
      * Normaliza exclusivamente incidentes persistidos. No completa campos clínicos
-     * ausentes ni agrega eventos de demostración.
+     * ausentes ni agrega eventos artificiales.
      */
     public function obtenerEventos(Residente $residente): Collection
     {

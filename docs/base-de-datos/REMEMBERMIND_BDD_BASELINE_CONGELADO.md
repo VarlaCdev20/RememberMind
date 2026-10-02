@@ -200,18 +200,22 @@ Toda operación sensible sobre la base de datos exige la comprobación simultán
 El rol `SUPERADMINISTRADOR` posee privilegios de lectura global sobre las 70 tablas operativas y la bitácora técnica con fines de auditoría y soporte. **No recibe privilegios automáticos de escritura clínica ni puede alterar actos asistenciales** por el mero hecho de su condición administrativa. Para intervenir clínicamente, requeriría contar con la condición de personal activo y los permisos profesionales específicos.
 
 `RM-AUTH-003` — **Restricción de escritura clínica para ADMINISTRADOR**
-El rol `ADMINISTRADOR` gestiona la operativa institucional, usuarios, personal, áreas, turnos, contratos y preadmisiones. **Carece de facultades para registrar, modificar o anular diagnósticos, prescripciones, valoraciones clínicas, notas asistenciales o administraciones farmacológicas**.
+El rol `ADMINISTRADOR`, mostrado como **Administración**, coordina la operación diaria: preadmisiones, admisiones, alojamiento, jornadas, asignaciones, documentación, visitas, actividades, alertas e incidentes. No administra cuentas ni sustituye la dirección de personal de Gerencia. **Carece de facultades para registrar, modificar o anular diagnósticos, prescripciones, valoraciones clínicas, notas asistenciales o administraciones farmacológicas**.
+
+`RM-AUTH-004` — **Separación de GERENTE y ADMINISTRADOR**
+El rol `GERENTE` dirige la institución y gestiona personal, áreas, turnos maestros, planificación y cobertura. El rol `ADMINISTRADOR` ejecuta y coordina la operación diaria. Ninguno obtiene competencia clínica por su rol. Esta modificación funcional fue aprobada expresamente por la responsable del proyecto y no altera la estructura de la BDD Operativa V2.1.
 
 ---
 
 ## 11. Matriz conceptual de profesiones y roles activos
 
-Los roles institucionales formalmente activos son 9:
+Los roles institucionales formalmente activos son 10:
 
 | Rol Canónico | Competencia Principal | Escritura Clínica Autorizada | Prescribe |
 | :--- | :--- | :--- | :---: |
 | `SUPERADMINISTRADOR` | Auditoría, supervisión técnica, soporte global | Ninguna por rol administrativo | NO |
-| `ADMINISTRADOR` | Gestión institucional, RRHH, infraestructura, flujo admisiones | Administrativa exclusivamente | NO |
+| `GERENTE` | Dirección institucional, personal, áreas, turnos, planificación y cobertura | Ninguna por rol institucional | NO |
+| `ADMINISTRADOR` / Administración | Operación diaria, admisiones, alojamiento, jornadas, documentos y alertas | Administrativa exclusivamente | NO |
 | `MEDICO GENERAL/GERIATRA` | Evaluación integral, diagnóstico, plan médico, prescripción | Integral médica, indicaciones, recetas, estudios | **SÍ** |
 | `ENFERMEROS` | Cuidados continuos, signos vitales, administración de fármacos | Valoración preadmisión, signos, cuidados, administración, notas | NO |
 | `PSICOLOGO/A` | Evaluación cognitiva, conductual y salud mental | Atenciones, valoraciones psicológicas, instrumentos cognitivos | NO |

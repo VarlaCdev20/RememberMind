@@ -55,7 +55,7 @@
  </div>
 
  {{-- BARRA DE FILTROS UNIFICADA FORMATO ALERTAS --}}
- <section class="rm-filter-bar">
+ <x-ui.filter-bar class="mb-4">
  <div class="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-2">
   {{-- Buscador Principal --}}
   <div class="lg:col-span-8 relative flex items-center">
@@ -126,13 +126,13 @@
   </div>
   </div>
  @endif
- </section>
+ </x-ui.filter-bar>
 
  {{-- Tabla --}}
  <div class="rounded-3xl border border-borde bg-fondo-card shadow-sm overflow-hidden">
  @if($pacientes->count() > 0)
  <div class="overflow-x-auto">
-  <table class="w-full text-left text-sm whitespace-nowrap">
+  <table class="rm-data-table rm-data-table--actions w-full text-left text-sm whitespace-nowrap">
   <thead class="bg-fondo-panel text-[10px] font-bold uppercase tracking-wider text-apoyo">
    <tr>
    <th class="px-5 py-3">Paciente</th>
@@ -235,21 +235,27 @@
    </td>
    <td class="px-5 py-3">
     <div class="flex items-center justify-center gap-1.5">
+    @can('atenciones.ver')
     <button wire:click="abrirFicha('{{ $pac->cod_residente }}')"
      title="Ver ficha clínica integrada"
      class="h-8 px-2.5 rounded-lg bg-estado-infoBg text-estado-info hover:bg-estado-info hover:text-white transition text-[10px] font-black uppercase tracking-wider flex items-center gap-1">
      <i class="ph-bold ph-folder-open text-sm"></i> Ficha
     </button>
+    @endcan
+    @if($this->puedeEscribir('notas_clinicas.crear'))
     <button wire:click="nuevaNota('{{ $pac->cod_residente }}')"
      title="Nueva nota de evolución"
      class="h-8 w-8 rounded-lg bg-estado-exitoBg text-estado-exito hover:bg-estado-exito hover:text-white transition flex items-center justify-center">
      <i class="ph-bold ph-note-pencil text-sm"></i>
     </button>
+    @endif
+    @if($this->puedeEscribir('signos_vitales.crear'))
     <button wire:click="nuevosSignos('{{ $pac->cod_residente }}')"
      title="Registrar signos vitales"
      class="h-8 w-8 rounded-lg bg-fondo-panel text-parrafo hover:bg-boton-acento hover:text-white transition flex items-center justify-center">
      <i class="ph-bold ph-heartbeat text-sm"></i>
     </button>
+    @endif
     </div>
    </td>
    </tr>

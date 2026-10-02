@@ -13,6 +13,16 @@
     --rm-depth-scroll: 0px;
 }
 
+/* La capa aislada del contenido debe subir sobre la barra al abrir un diálogo. */
+.rm-shell [data-rm-main]:has(
+    .jetstream-modal:not([style*="display: none"]),
+    .rm-modal-shell.is-open,
+    .rm-drawer-shell.is-open,
+    .fixed.inset-0:is(.z-40, .z-50, [class*="z-["]):not([style*="display: none"])
+) {
+    z-index: var(--rm-z-modal-backdrop, 990);
+}
+
 .rm-depth-canvas::before,
 .rm-depth-canvas::after {
     content: '';

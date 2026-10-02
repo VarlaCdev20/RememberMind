@@ -38,77 +38,104 @@
  </div>
  </div>
 
- <!-- ── SECCIÓN DE FILTROS ─────────────────────────────────── -->
- <div class="rm-filter-bar mb-8 print:hidden">
- <h2 class="mb-4 text-xs font-bold uppercase tracking-widest text-apoyo flex items-center gap-2">
- <i class="ph-bold ph-funnel text-boton-acento"></i>
- Filtros de Análisis Institucional
- </h2>
- <div class="grid gap-4 sm:grid-cols-2 md:grid-cols-4">
- <!-- Rango de Fecha: Desde -->
- <div class="flex flex-col gap-1.5">
- <label for="fechaDesde" class="text-[10px] font-bold uppercase tracking-wider text-apoyo">
- Fecha Ingreso Desde
- </label>
- <input
- type="date"
- id="fechaDesde"
- wire:model.live="fechaDesde"
- class="rounded-xl border border-borde bg-fondo-panel px-3.5 py-2.5 text-xs font-bold text-titulo focus:border-borde-focus focus:outline-none focus:ring-1 focus:ring-borde-focus"
- />
- </div>
+     <!-- ── SECCIÓN DE FILTROS FORMATO ALERTAS ─────────────────── -->
+    <x-ui.filter-bar class="mb-8 print:hidden">
+        <div class="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-2 items-center">
+            <!-- Rango de Fecha: Desde -->
+            <div class="lg:col-span-3">
+                <input
+                    type="date"
+                    id="fechaDesde"
+                    wire:model.live="fechaDesde"
+                    title="Fecha Ingreso Desde"
+                    class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-input-bg)] py-2 px-3 text-xs font-medium text-[var(--rm-text-primary)] focus:border-[var(--rm-primary)] focus:ring-1 focus:ring-[var(--rm-primary)] focus:outline-none h-[38px]"
+                />
+            </div>
 
- <!-- Rango de Fecha: Hasta -->
- <div class="flex flex-col gap-1.5">
- <label for="fechaHasta" class="text-[10px] font-bold uppercase tracking-wider text-apoyo">
- Fecha Ingreso Hasta
- </label>
- <input
- type="date"
- id="fechaHasta"
- wire:model.live="fechaHasta"
- class="rounded-xl border border-borde bg-fondo-panel px-3.5 py-2.5 text-xs font-bold text-titulo focus:border-borde-focus focus:outline-none focus:ring-1 focus:ring-borde-focus"
- />
- </div>
+            <!-- Rango de Fecha: Hasta -->
+            <div class="lg:col-span-3">
+                <input
+                    type="date"
+                    id="fechaHasta"
+                    wire:model.live="fechaHasta"
+                    title="Fecha Ingreso Hasta"
+                    class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-input-bg)] py-2 px-3 text-xs font-medium text-[var(--rm-text-primary)] focus:border-[var(--rm-primary)] focus:ring-1 focus:ring-[var(--rm-primary)] focus:outline-none h-[38px]"
+                />
+            </div>
 
- <!-- Estado Institucional -->
- <div class="flex flex-col gap-1.5">
- <label for="filtroEstado" class="text-[10px] font-bold uppercase tracking-wider text-apoyo">
- Estado Institucional
- </label>
- <select
- id="filtroEstado"
- wire:model.live="filtroEstado"
- class="rounded-xl border border-borde bg-fondo-panel px-3.5 py-2.5 text-xs font-bold text-titulo focus:border-borde-focus focus:outline-none focus:ring-1 focus:ring-borde-focus"
- >
- <option value="todos">Todos los estados</option>
- @foreach($estadosList as $est)
- <option value="{{ $est->cod_est_adul }}">{{ $est->estado }}</option>
- @endforeach
- </select>
- </div>
+            <!-- Estado Institucional -->
+            <div class="lg:col-span-3">
+                <select
+                    id="filtroEstado"
+                    wire:model.live="filtroEstado"
+                    class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-input-bg)] py-2 px-3 text-xs font-medium text-[var(--rm-text-primary)] focus:border-[var(--rm-primary)] focus:ring-1 focus:ring-[var(--rm-primary)] focus:outline-none h-[38px]"
+                >
+                    <option value="todos">Todos los estados</option>
+                    @foreach($estadosList as $est)
+                        <option value="{{ $est->cod_est_adul }}">{{ $est->estado }}</option>
+                    @endforeach
+                </select>
+            </div>
 
- <!-- Tipo de Reporte Específico -->
- <div class="flex flex-col gap-1.5">
- <label for="tipoReporte" class="text-[10px] font-bold uppercase tracking-wider text-apoyo">
- Sección / Categoría
- </label>
- <select
- id="tipoReporte"
- wire:model.live="tipoReporte"
- class="rounded-xl border border-borde bg-fondo-panel px-3.5 py-2.5 text-xs font-bold text-titulo focus:border-borde-focus focus:outline-none focus:ring-1 focus:ring-borde-focus"
- >
- <option value="general">1. Reporte General</option>
- <option value="documental">2. Reporte Documental</option>
- <option value="red_de_apoyo">3. Red de Apoyo</option>
- <option value="salud">4. Salud y Cuidados</option>
- <option value="evaluaciones">5. Evaluaciones Geriátricas</option>
- <option value="seguimiento">6. Seguimiento Institucional</option>
- <option value="trazabilidad">7. Trazabilidad</option>
- </select>
- </div>
- </div>
- </div>
+            <!-- Tipo de Reporte Específico -->
+            <div class="lg:col-span-3">
+                <select
+                    id="tipoReporte"
+                    wire:model.live="tipoReporte"
+                    class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-input-bg)] py-2 px-3 text-xs font-medium text-[var(--rm-text-primary)] focus:border-[var(--rm-primary)] focus:ring-1 focus:ring-[var(--rm-primary)] focus:outline-none h-[38px]"
+                >
+                    <option value="general">1. Reporte General</option>
+                    <option value="documental">2. Reporte Documental</option>
+                    <option value="red_de_apoyo">3. Red de Apoyo</option>
+                    <option value="salud">4. Salud y Cuidados</option>
+                    <option value="evaluaciones">5. Evaluaciones Geriátricas</option>
+                    <option value="seguimiento">6. Seguimiento Institucional</option>
+                    <option value="trazabilidad">7. Trazabilidad</option>
+                </select>
+            </div>
+        </div>
+
+        @php
+            $hasFiltrosActivos = !empty($fechaDesde) || !empty($fechaHasta) || ($filtroEstado !== 'todos') || ($tipoReporte !== 'general');
+        @endphp
+        @if($hasFiltrosActivos)
+            <div class="rm-filter-bar__active">
+                <div class="flex flex-wrap items-center gap-1.5">
+                    <span class="rm-filter-bar__active-label">
+                        <i class="ph-bold ph-funnel text-xs"></i> Filtros activos:
+                    </span>
+                    @if(!empty($fechaDesde))
+                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[var(--rm-surface-alt)] border border-[var(--rm-border)] text-[11px] font-semibold text-[var(--rm-text-primary)]">
+                            <span>Desde: {{ $fechaDesde }}</span>
+                            <button type="button" wire:click="$set('fechaDesde', '')" class="hover:text-[var(--rm-primary)] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
+                        </span>
+                    @endif
+                    @if(!empty($fechaHasta))
+                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[var(--rm-surface-alt)] border border-[var(--rm-border)] text-[11px] font-semibold text-[var(--rm-text-primary)]">
+                            <span>Hasta: {{ $fechaHasta }}</span>
+                            <button type="button" wire:click="$set('fechaHasta', '')" class="hover:text-[var(--rm-primary)] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
+                        </span>
+                    @endif
+                    @if($filtroEstado !== 'todos')
+                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[var(--rm-surface-alt)] border border-[var(--rm-border)] text-[11px] font-semibold text-[var(--rm-text-primary)]">
+                            <span>Estado seleccionado</span>
+                            <button type="button" wire:click="$set('filtroEstado', 'todos')" class="hover:text-[var(--rm-primary)] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
+                        </span>
+                    @endif
+                    @if($tipoReporte !== 'general')
+                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[var(--rm-surface-alt)] border border-[var(--rm-border)] text-[11px] font-semibold text-[var(--rm-text-primary)]">
+                            <span>Sección: {{ $tipoReporte }}</span>
+                            <button type="button" wire:click="$set('tipoReporte', 'general')" class="hover:text-[var(--rm-primary)] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
+                        </span>
+                    @endif
+                </div>
+                <button type="button" wire:click="$set('fechaDesde', ''); $set('fechaHasta', ''); $set('filtroEstado', 'todos'); $set('tipoReporte', 'general')" class="rm-filter-bar__clear-btn">
+                    <i class="ph-bold ph-arrow-counter-clockwise text-xs"></i>
+                    Limpiar filtros
+                </button>
+            </div>
+        @endif
+    </x-ui.filter-bar>
 
  <!-- ── TARJETAS DE INDICADORES SUPERIORES ───────────────── -->
  <div class="mb-8 grid gap-4 grid-cols-2 md:grid-cols-6 print:grid-cols-3 print:gap-2">
@@ -455,96 +482,135 @@
  </div>
  </div>
 
- <!-- COLUMNA DE GRÁFICAS (Derecha) -->
- <div class="space-y-6">
- <div class="rm-chart-card rm-chart-glass p-6 print:break-before-page">
- <h3 class="text-xs font-bold uppercase tracking-widest text-titulo border-b border-borde-suave pb-3 mb-6">
- Análisis Visual Real
- </h3>
+ <!-- COLUMNA DE GR?FICAS FORMATO UNIFICADO ENFERMER?A (Derecha) -->
+        <div class="space-y-6">
+            @if($stats['total'] === 0)
+                <div class="rm-chart-card rm-chart-glass p-8 text-center">
+                    <x-ui.empty-state compact icono="ph-chart-line" titulo="Sin datos para graficar" texto="No hay registros suficientes en el periodo seleccionado para generar las m?tricas visuales." />
+                </div>
+            @else
+                <!-- Gr?ficas del Reporte General -->
+                @if($tipoReporte === 'general')
+                    <div class="rm-chart-card rm-chart-glass space-y-3">
+                        <div class="rm-chart-header">
+                            <div>
+                                <h3 class="rm-chart-title">Estado Institucional</h3>
+                                <p class="rm-chart-subtitle">Residentes activos, egresados y temporalidades</p>
+                            </div>
+                            <span class="rm-chart-kpi-badge">
+                                <i class="ph-bold ph-chart-donut text-xs text-[var(--rm-action-primary)]"></i> Estados
+                            </span>
+                        </div>
+                        <div class="rm-chart-body is-sm relative w-full" wire:ignore>
+                            <canvas id="chartEstados"></canvas>
+                        </div>
+                    </div>
 
- @if($stats['total'] === 0)
- <div class="py-8 text-center text-xs font-bold text-meta">
- Sin datos suficientes para generar esta gráfica.
- </div>
- @else
- <!-- Gráficas del Reporte General -->
- @if($tipoReporte === 'general')
- <div class="space-y-8">
- <div class="flex flex-col gap-2">
- <span class="text-[10px] font-bold uppercase tracking-wider text-apoyo">Estado Institucional</span>
- <div class="relative h-48 w-full">
- <canvas id="chartEstados"></canvas>
- </div>
- </div>
- <div class="flex flex-col gap-2">
- <span class="text-[10px] font-bold uppercase tracking-wider text-apoyo">Rangos de Edad</span>
- <div class="relative h-48 w-full">
- <canvas id="chartEdades"></canvas>
- </div>
- </div>
- </div>
+                    <div class="rm-chart-card rm-chart-glass space-y-3">
+                        <div class="rm-chart-header">
+                            <div>
+                                <h3 class="rm-chart-title">Rangos de Edad</h3>
+                                <p class="rm-chart-subtitle">Estratificaci?n decenal de residentes</p>
+                            </div>
+                            <span class="rm-chart-kpi-badge">
+                                <i class="ph-bold ph-chart-bar text-xs text-[var(--rm-clinical)]"></i> Edades
+                            </span>
+                        </div>
+                        <div class="rm-chart-body is-sm relative w-full" wire:ignore>
+                            <canvas id="chartEdades"></canvas>
+                        </div>
+                    </div>
 
- <!-- Gráficas del Reporte Documental -->
- @elseif($tipoReporte === 'documental')
- <div class="flex flex-col gap-2">
- <span class="text-[10px] font-bold uppercase tracking-wider text-apoyo">Expedientes Digitalizados</span>
- <div class="relative h-56 w-full">
- <canvas id="chartDocumentos"></canvas>
- </div>
- </div>
+                <!-- Gr?ficas del Reporte Documental -->
+                @elseif($tipoReporte === 'documental')
+                    <div class="rm-chart-card rm-chart-glass space-y-3">
+                        <div class="rm-chart-header">
+                            <div>
+                                <h3 class="rm-chart-title">Expedientes Digitalizados</h3>
+                                <p class="rm-chart-subtitle">Volumen de documentaci?n por tipo de archivo</p>
+                            </div>
+                            <span class="rm-chart-kpi-badge">
+                                <i class="ph-bold ph-files text-xs text-[var(--rm-warning)]"></i> Documentos
+                            </span>
+                        </div>
+                        <div class="rm-chart-body is-md relative w-full" wire:ignore>
+                            <canvas id="chartDocumentos"></canvas>
+                        </div>
+                    </div>
 
- <!-- Gráficas del Reporte de Red de Apoyo -->
- @elseif($tipoReporte === 'red_de_apoyo')
- <div class="py-12 text-center text-xs font-bold text-meta">
- Sin datos suficientes para generar esta gráfica.
- </div>
+                <!-- Gr?ficas del Reporte de Red de Apoyo -->
+                @elseif($tipoReporte === 'red_de_apoyo')
+                    <div class="rm-chart-card rm-chart-glass p-8 text-center">
+                        <x-ui.empty-state compact icono="ph-users-three" titulo="Red de Apoyo" texto="Sin datos suficientes para generar esta gr?fica en el periodo." />
+                    </div>
 
- <!-- Gráficas del Reporte de Salud -->
- @elseif($tipoReporte === 'salud')
- <div class="py-12 text-center text-xs font-bold text-meta">
- Sin datos suficientes para generar esta gráfica.
- </div>
+                <!-- Gr?ficas del Reporte de Salud -->
+                @elseif($tipoReporte === 'salud')
+                    <div class="rm-chart-card rm-chart-glass p-8 text-center">
+                        <x-ui.empty-state compact icono="ph-heartbeat" titulo="Reporte de Salud" texto="Sin datos suficientes para generar esta gr?fica en el periodo." />
+                    </div>
 
- <!-- Gráficas del Reporte de Evaluaciones -->
- @elseif($tipoReporte === 'evaluaciones')
- <div class="space-y-8">
- <div class="flex flex-col gap-2">
- <span class="text-[10px] font-bold uppercase tracking-wider text-apoyo">Niveles de Alerta</span>
- <div class="relative h-48 w-full">
- <canvas id="chartNiveles"></canvas>
- </div>
- </div>
- <div class="flex flex-col gap-2">
- <span class="text-[10px] font-bold uppercase tracking-wider text-apoyo">Áreas Geriátricas Evaluadas</span>
- <div class="relative h-48 w-full">
- <canvas id="chartAreas"></canvas>
- </div>
- </div>
- </div>
+                <!-- Gr?ficas del Reporte de Evaluaciones -->
+                @elseif($tipoReporte === 'evaluaciones')
+                    <div class="rm-chart-card rm-chart-glass space-y-3">
+                        <div class="rm-chart-header">
+                            <div>
+                                <h3 class="rm-chart-title">Niveles de Alerta</h3>
+                                <p class="rm-chart-subtitle">Severidad de observaciones registradas</p>
+                            </div>
+                            <span class="rm-chart-kpi-badge">
+                                <i class="ph-bold ph-bell-ringing text-xs text-[var(--rm-danger)]"></i> Alertas
+                            </span>
+                        </div>
+                        <div class="rm-chart-body is-sm relative w-full" wire:ignore>
+                            <canvas id="chartNiveles"></canvas>
+                        </div>
+                    </div>
 
- <!-- Gráficas de Seguimiento -->
- @elseif($tipoReporte === 'seguimiento')
- <div class="flex flex-col gap-2">
- <span class="text-[10px] font-bold uppercase tracking-wider text-apoyo">Eventos de Seguimiento</span>
- <div class="relative h-56 w-full">
- <canvas id="chartSeguimiento"></canvas>
- </div>
- </div>
+                    <div class="rm-chart-card rm-chart-glass space-y-3">
+                        <div class="rm-chart-header">
+                            <div>
+                                <h3 class="rm-chart-title">?reas Geri?tricas Evaluadas</h3>
+                                <p class="rm-chart-subtitle">Frecuencia por dimensi?n cl?nica</p>
+                            </div>
+                            <span class="rm-chart-kpi-badge">
+                                <i class="ph-bold ph-activity text-xs text-[var(--rm-clinical)]"></i> ?reas
+                            </span>
+                        </div>
+                        <div class="rm-chart-body is-sm relative w-full" wire:ignore>
+                            <canvas id="chartAreas"></canvas>
+                        </div>
+                    </div>
 
- <!-- Gráficas de Trazabilidad -->
- @elseif($tipoReporte === 'trazabilidad')
- <div class="py-12 text-center text-xs font-bold text-meta">
- Sin datos suficientes para generar esta gráfica.
- </div>
- @endif
- @endif
- </div>
- </div>
+                <!-- Gr?ficas de Seguimiento -->
+                @elseif($tipoReporte === 'seguimiento')
+                    <div class="rm-chart-card rm-chart-glass space-y-3">
+                        <div class="rm-chart-header">
+                            <div>
+                                <h3 class="rm-chart-title">Eventos de Seguimiento</h3>
+                                <p class="rm-chart-subtitle">Evoluci?n y frecuencia de notas cl?nicas</p>
+                            </div>
+                            <span class="rm-chart-kpi-badge">
+                                <i class="ph-bold ph-clipboard-text text-xs text-[var(--rm-action-primary)]"></i> Seguimiento
+                            </span>
+                        </div>
+                        <div class="rm-chart-body is-md relative w-full" wire:ignore>
+                            <canvas id="chartSeguimiento"></canvas>
+                        </div>
+                    </div>
 
- </div>
- </div>
+                <!-- Gr?ficas de Trazabilidad -->
+                @elseif($tipoReporte === 'trazabilidad')
+                    <div class="rm-chart-card rm-chart-glass p-8 text-center">
+                        <x-ui.empty-state compact icono="ph-clock-counter-clockwise" titulo="Trazabilidad" texto="Sin datos suficientes para generar esta gr?fica en el periodo." />
+                    </div>
+                @endif
+            @endif
+        </div>
+    </div>
+</div>
 
- <!-- ── FOOTER DE FIRMA INSTITUCIONAL PARA IMPRESIÓN ──────── -->
+<!-- ── FOOTER DE FIRMA INSTITUCIONAL PARA IMPRESIÓN ──────── -->
  <div class="hidden print:block mt-20 text-center border-t border-slate-300 pt-8">
  <p class="text-xs font-bold uppercase tracking-widest text-slate-800">
  RememberMind — Suite de Gestión"CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS"
@@ -617,7 +683,9 @@
                             options: {
                                 responsive: true,
                                 maintainAspectRatio: false,
-                                cutout: '58%',
+                                cutout: '64%',
+                        borderRadius: 6,
+                        spacing: 3,
                                 animation: {
                                     duration: 1000,
                                     easing: 'easeOutQuart',
@@ -688,7 +756,9 @@
                             options: {
                                 responsive: true,
                                 maintainAspectRatio: false,
-                                cutout: '58%',
+                                cutout: '64%',
+                        borderRadius: 6,
+                        spacing: 3,
                                 animation: {
                                     duration: 1000,
                                     easing: 'easeOutQuart',

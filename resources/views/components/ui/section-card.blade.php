@@ -13,6 +13,9 @@
     'acciones' => null,
     'actions' => null,
     'footer' => null,
+    'variant' => 'default',
+    'count' => null,
+    'interactive' => false,
 ])
 
 @php
@@ -22,34 +25,9 @@
     $resolvedActions = $actions ?? $acciones;
 @endphp
 
-<section {{ $attributes->merge(['class' => 'rm-card bg-[var(--rm-surface)] border border-[var(--rm-border)] rounded-[var(--rm-radius-card,16px)] shadow-[var(--rm-shadow-sm)] p-[18px] sm:p-5 transition-all']) }}>
+<section {{ $attributes->class(['rm-card rm-surface--'.(in_array($variant, ['default', 'soft', 'mint', 'sky', 'coral'], true) ? $variant : 'default'), 'rm-card--interactive' => $interactive]) }}>
     @if($resolvedTitle || $resolvedIcon || $resolvedActions)
-        <header class="flex items-center justify-between gap-3 pb-3 mb-4 border-b border-[var(--rm-border-soft)]">
-            <div class="flex items-center gap-3 min-w-0">
-                @if($resolvedIcon)
-                    <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[var(--rm-action-primary)]/10 text-[var(--rm-action-primary)] border border-[var(--rm-action-primary)]/20 text-base shadow-2xs">
-                        <i class="ph-bold {{ $resolvedIcon }}"></i>
-                    </div>
-                @endif
-                <div class="min-w-0">
-                    @if($resolvedTitle)
-                        <h3 class="text-[15px] font-bold text-[var(--rm-text-primary)] leading-tight truncate">
-                            {{ $resolvedTitle }}
-                        </h3>
-                    @endif
-                    @if($resolvedSubtitle)
-                        <p class="text-xs sm:text-sm font-medium text-[var(--rm-text-secondary)] mt-0.5 leading-snug truncate">
-                            {{ $resolvedSubtitle }}
-                        </p>
-                    @endif
-                </div>
-            </div>
-            @if($resolvedActions)
-                <div class="flex items-center gap-2 shrink-0">
-                    {{ $resolvedActions }}
-                </div>
-            @endif
-        </header>
+        <x-ui.section-header class="rm-card__section-header" :title="$resolvedTitle ?? ''" :subtitle="$resolvedSubtitle" :icon="$resolvedIcon" :count="$count" :actions="$resolvedActions" />
     @endif
 
     <div class="rm-card-content flex-1">

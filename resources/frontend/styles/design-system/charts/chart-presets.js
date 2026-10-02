@@ -34,6 +34,8 @@ export function rmDoughnutChartConfig(labels, data, colors, customOptions = {}) 
                 backgroundColor: translucentBg,
                 borderColor: borderColors,
                 borderWidth: 2,
+                borderRadius: 6,
+                spacing: 3,
                 hoverOffset: 6,
                 hoverBorderColor: rmGetCss('--rm-surface-raised') || rmGetCss('--rm-surface') || '#F4EFE8',
                 hoverBorderWidth: 2.5,
@@ -41,7 +43,7 @@ export function rmDoughnutChartConfig(labels, data, colors, customOptions = {}) 
         },
         options: {
             ...defaults,
-            cutout: '58%', // Anillo grueso con cuerpo y presencia
+            cutout: '64%', // Anillo grueso y armonioso con presencia cl?nica
             plugins: {
                 ...defaults.plugins,
                 tooltip: {

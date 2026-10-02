@@ -30,7 +30,7 @@ class DocumentacionFichaTest extends TestCase
             'nombres' => 'Elena',
             'ap_paterno' => 'Rojas',
         ]);
-        $this->usuario->assignRole('SUPERADMINISTRADOR');
+        $this->usuario->assignRole('ADMINISTRADOR');
         $this->actingAs($this->usuario);
 
         $this->residente = AdultoMayor::factory()->create([

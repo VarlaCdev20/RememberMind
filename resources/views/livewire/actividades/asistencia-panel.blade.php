@@ -198,96 +198,121 @@
 
  </div>
 
- {{-- ══════════════════════════════════════════════════════════════════ --}}
- {{-- TABLA + FILTROS --}}
- {{-- ══════════════════════════════════════════════════════════════════ --}}
- <section class="overflow-hidden rounded-[1.45rem] border border-borde-suave bg-fondo-panel shadow-md backdrop-blur-xl">
+     {{-- ══════════════════════════════════════════════════════════════════ --}}
+    {{-- FILTROS DE ASISTENCIA FORMATO ALERTAS                              --}}
+    {{-- ══════════════════════════════════════════════════════════════════ --}}
+    <x-ui.filter-bar class="mb-4">
+        <div class="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-2 items-center">
+            {{-- Buscar adulto --}}
+            <div class="lg:col-span-3 relative flex items-center">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-[var(--rm-text-secondary)]">
+                    <i class="ph-bold ph-magnifying-glass text-base"></i>
+                </span>
+                <input type="text"
+                    wire:model.live.debounce.300ms="search"
+                    placeholder="Buscar por nombre..."
+                    class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-input-bg)] py-2 pl-9 pr-8 text-xs font-medium text-[var(--rm-text-primary)] placeholder-[var(--rm-text-secondary)] focus:border-[var(--rm-primary)] focus:ring-1 focus:ring-[var(--rm-primary)] focus:outline-none h-[38px]" />
+                @if(!empty($search))
+                    <button type="button"
+                        wire:click="$set('search', '')"
+                        class="absolute inset-y-0 right-0 flex items-center pr-2.5 text-[var(--rm-text-secondary)] hover:text-[var(--rm-primary)] cursor-pointer"
+                        title="Limpiar búsqueda">
+                        <i class="ph-bold ph-x-circle text-base"></i>
+                    </button>
+                @endif
+            </div>
 
- {{-- Barra de filtros --}}
- <div class="rm-filter-bar border-b border-borde-suave px-5 py-4">
- <div class="flex flex-wrap items-end gap-3">
+            {{-- Tipo --}}
+            <div class="lg:col-span-3">
+                <select wire:model.live="filtroTipo"
+                    class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-input-bg)] py-2 px-3 text-xs font-medium text-[var(--rm-text-primary)] focus:border-[var(--rm-primary)] focus:ring-1 focus:ring-[var(--rm-primary)] focus:outline-none h-[38px]">
+                    <option value="">Todos los tipos</option>
+                    @foreach($tipos as $t)
+                        <option value="{{ $t->cod_tipo_act }}">{{ $t->tipo }}</option>
+                    @endforeach
+                </select>
+            </div>
 
- {{-- Buscar adulto --}}
- <div class="min-w-0 flex-1 basis-48">
- <label class="mb-1 block text-[10px] font-bold uppercase tracking-[0.1em] text-apoyo">Adulto mayor</label>
- <div class="relative">
- <i class="ph-bold ph-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-sm text-apoyo"></i>
- <input
- type="text"
- wire:model.live.debounce.300ms="search"
- placeholder="Buscar por nombre..."
- class="w-full rounded-xl border border-borde-suave bg-fondo-panel py-2 pl-8 pr-3 text-xs font-bold text-titulo placeholder-[var(--rm-text-muted)] focus:border-estado-advertenciaBorde focus:outline-none focus:ring-2 focus:ring-[var(--rm-warning)]/20"
- >
- </div>
- </div>
+            {{-- Estado --}}
+            <div class="lg:col-span-2">
+                <select wire:model.live="filtroEstado"
+                    class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-input-bg)] py-2 px-3 text-xs font-medium text-[var(--rm-text-primary)] focus:border-[var(--rm-primary)] focus:ring-1 focus:ring-[var(--rm-primary)] focus:outline-none h-[38px]">
+                    <option value="">Todos los estados</option>
+                    <option value="PROGRAMADA">Programada / Pendiente</option>
+                    <option value="REALIZADA">Realizada / Cumplida</option>
+                    <option value="CANCELADA">Cancelada / Anulada</option>
+                    <option value="REPROGRAMADA">Reprogramada</option>
+                </select>
+            </div>
 
- {{-- Tipo --}}
- <div class="basis-40">
- <label class="mb-1 block text-[10px] font-bold uppercase tracking-[0.1em] text-apoyo">Tipo</label>
- <select
- wire:model.live="filtroTipo"
- class="w-full rounded-xl border border-borde-suave bg-fondo-panel py-2 px-3 text-xs font-bold text-titulo focus:border-estado-advertenciaBorde focus:outline-none focus:ring-2 focus:ring-[var(--rm-warning)]/20"
- >
- <option value="">Todos los tipos</option>
- @foreach($tipos as $t)
- <option value="{{ $t->cod_tipo_act }}">{{ $t->tipo }}</option>
- @endforeach
- </select>
- </div>
+            {{-- Fecha desde --}}
+            <div class="lg:col-span-2">
+                <input type="date"
+                    wire:model.live="filtroFechaDesde"
+                    class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-input-bg)] py-2 px-3 text-xs font-medium text-[var(--rm-text-primary)] focus:border-[var(--rm-primary)] focus:ring-1 focus:ring-[var(--rm-primary)] focus:outline-none h-[38px]" />
+            </div>
 
- {{-- Estado --}}
- <div class="basis-36">
- <label class="mb-1 block text-[10px] font-bold uppercase tracking-[0.1em] text-apoyo">Estado</label>
- <select
- wire:model.live="filtroEstado"
- class="w-full rounded-xl border border-borde-suave bg-fondo-panel py-2 px-3 text-xs font-bold text-titulo focus:border-estado-advertenciaBorde focus:outline-none focus:ring-2 focus:ring-[var(--rm-warning)]/20"
- >
- <option value="">Todos los estados</option>
- <option value="PROGRAMADA">Programada / Pendiente</option>
- <option value="REALIZADA">Realizada / Cumplida</option>
- <option value="CANCELADA">Cancelada / Anulada</option>
- <option value="REPROGRAMADA">Reprogramada</option>
- </select>
- </div>
+            {{-- Fecha hasta --}}
+            <div class="lg:col-span-2">
+                <input type="date"
+                    wire:model.live="filtroFechaHasta"
+                    class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-input-bg)] py-2 px-3 text-xs font-medium text-[var(--rm-text-primary)] focus:border-[var(--rm-primary)] focus:ring-1 focus:ring-[var(--rm-primary)] focus:outline-none h-[38px]" />
+            </div>
+        </div>
 
- {{-- Fecha desde --}}
- <div class="basis-36">
- <label class="mb-1 block text-[10px] font-bold uppercase tracking-[0.1em] text-apoyo">Desde</label>
- <input
- type="date"
- wire:model.live="filtroFechaDesde"
- class="w-full rounded-xl border border-borde-suave bg-fondo-panel py-2 px-3 text-xs font-bold text-titulo focus:border-estado-advertenciaBorde focus:outline-none focus:ring-2 focus:ring-[var(--rm-warning)]/20"
- >
- </div>
+        @php
+            $hasFiltrosActivos = !empty($search) || !empty($filtroTipo) || !empty($filtroEstado) || !empty($filtroFechaDesde) || !empty($filtroFechaHasta);
+        @endphp
+        @if($hasFiltrosActivos)
+            <div class="rm-filter-bar__active">
+                <div class="flex flex-wrap items-center gap-1.5">
+                    <span class="rm-filter-bar__active-label">
+                        <i class="ph-bold ph-funnel text-xs"></i> Filtros activos:
+                    </span>
+                    @if(!empty($search))
+                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[var(--rm-surface-alt)] border border-[var(--rm-border)] text-[11px] font-semibold text-[var(--rm-text-primary)]">
+                            <span>Búsqueda: "{{ Str::limit($search, 16) }}"</span>
+                            <button type="button" wire:click="$set('search', '')" class="hover:text-[var(--rm-primary)] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
+                        </span>
+                    @endif
+                    @if(!empty($filtroTipo))
+                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[var(--rm-surface-alt)] border border-[var(--rm-border)] text-[11px] font-semibold text-[var(--rm-text-primary)]">
+                            <span>Tipo seleccionado</span>
+                            <button type="button" wire:click="$set('filtroTipo', '')" class="hover:text-[var(--rm-primary)] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
+                        </span>
+                    @endif
+                    @if(!empty($filtroEstado))
+                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[var(--rm-surface-alt)] border border-[var(--rm-border)] text-[11px] font-semibold text-[var(--rm-text-primary)]">
+                            <span>Estado: {{ $filtroEstado }}</span>
+                            <button type="button" wire:click="$set('filtroEstado', '')" class="hover:text-[var(--rm-primary)] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
+                        </span>
+                    @endif
+                    @if(!empty($filtroFechaDesde))
+                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[var(--rm-surface-alt)] border border-[var(--rm-border)] text-[11px] font-semibold text-[var(--rm-text-primary)]">
+                            <span>Desde: {{ $filtroFechaDesde }}</span>
+                            <button type="button" wire:click="$set('filtroFechaDesde', '')" class="hover:text-[var(--rm-primary)] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
+                        </span>
+                    @endif
+                    @if(!empty($filtroFechaHasta))
+                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[var(--rm-surface-alt)] border border-[var(--rm-border)] text-[11px] font-semibold text-[var(--rm-text-primary)]">
+                            <span>Hasta: {{ $filtroFechaHasta }}</span>
+                            <button type="button" wire:click="$set('filtroFechaHasta', '')" class="hover:text-[var(--rm-primary)] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
+                        </span>
+                    @endif
+                </div>
+                <button type="button" wire:click="limpiarFiltros" class="rm-filter-bar__clear-btn">
+                    <i class="ph-bold ph-arrow-counter-clockwise text-xs"></i>
+                    Limpiar filtros
+                </button>
+            </div>
+        @endif
+    </x-ui.filter-bar>
 
- {{-- Fecha hasta --}}
- <div class="basis-36">
- <label class="mb-1 block text-[10px] font-bold uppercase tracking-[0.1em] text-apoyo">Hasta</label>
- <input
- type="date"
- wire:model.live="filtroFechaHasta"
- class="w-full rounded-xl border border-borde-suave bg-fondo-panel py-2 px-3 text-xs font-bold text-titulo focus:border-estado-advertenciaBorde focus:outline-none focus:ring-2 focus:ring-[var(--rm-warning)]/20"
- >
- </div>
-
- {{-- Limpiar --}}
- <div class="shrink-0">
- <button
- type="button"
- wire:click="limpiarFiltros"
- class="rm-filter-reset"
- >
- <i class="ph-bold ph-x text-xs"></i>
- Limpiar
- </button>
- </div>
-
- </div>
- </div>
+    <section class="overflow-hidden rounded-[1.45rem] border border-borde-suave bg-fondo-panel shadow-md backdrop-blur-xl">
 
  {{-- Tabla --}}
  <div class="w-full overflow-x-auto" wire:loading.class="opacity-50">
- <table class="min-w-[900px] w-full border-collapse text-sm">
+ <table class="rm-data-table rm-data-table--actions min-w-[900px] w-full border-collapse text-sm">
  <thead>
  <tr class="border-b border-borde-suave bg-fondo-panel">
  <th class="px-4 py-3 text-left text-[10px] font-bold uppercase tracking-[0.12em] text-apoyo">Adulto mayor</th>

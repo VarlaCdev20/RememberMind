@@ -15,15 +15,14 @@ class TurnoEnfermeriaService
     public function esSuperAdmin(?User $user = null): bool
     {
         $user ??= Auth::user();
-        return (bool) $user?->hasAnyRole(['SUPERADMINISTRADOR', 'ADMINISTRADOR']);
+        return (bool) $user?->hasRole('SUPERADMINISTRADOR');
     }
 
     public function esPersonalClinicoAutorizado(?User $user = null): bool
     {
         $user ??= Auth::user();
         return (bool) $user?->hasAnyRole([
-            'SUPERADMINISTRADOR', 'ADMINISTRADOR', 'ENFERMEROS',
-            'MEDICO GENERAL/GERIATRA', 'PSICOLOGO/A', 'NUTRICIONISTA',
+            'ENFERMEROS', 'MEDICO GENERAL/GERIATRA', 'PSICOLOGO/A', 'NUTRICIONISTA',
             'FISIOTERAPEUTA', 'PEDAGOGO',
         ]);
     }

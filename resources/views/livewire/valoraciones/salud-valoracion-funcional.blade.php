@@ -160,23 +160,87 @@
  @endcan
  </div>
 
- {{-- Filtros --}}
- <div class="rm-filter-bar mb-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
- <select wire:model.live="filtroEstado" class="rm-select text-xs">
- <option value="">Todos los estados</option>
- <option value="VIGENTE">Vigente</option>
- <option value="HISTORICA">Histórica</option>
- <option value="ANULADA">Anulada</option>
- </select>
- <select wire:model.live="filtroRiesgo" class="rm-select text-xs">
- <option value="">Todo riesgo</option>
- <option value="BAJO">Bajo</option>
- <option value="MEDIO">Medio</option>
- <option value="ALTO">Alto</option>
- </select>
- <input wire:model.live.debounce.400ms="fechaDesde" type="date" class="rm-input text-xs" placeholder="Desde">
- <input wire:model.live.debounce.400ms="fechaHasta" type="date" class="rm-input text-xs" placeholder="Hasta">
- </div>
+     {{-- Filtros --}}
+    <x-ui.filter-bar class="mb-5">
+        <div class="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-2 items-center">
+            {{-- Filtro Estado --}}
+            <div class="lg:col-span-3">
+                <select wire:model.live="filtroEstado"
+                    class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-input-bg)] py-2 px-3 text-xs font-medium text-[var(--rm-text-primary)] focus:border-[var(--rm-primary)] focus:ring-1 focus:ring-[var(--rm-primary)] focus:outline-none h-[38px]">
+                    <option value="">Todos los estados</option>
+                    <option value="VIGENTE">Vigente</option>
+                    <option value="HISTORICA">Histórica</option>
+                    <option value="ANULADA">Anulada</option>
+                </select>
+            </div>
+
+            {{-- Filtro Riesgo --}}
+            <div class="lg:col-span-3">
+                <select wire:model.live="filtroRiesgo"
+                    class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-input-bg)] py-2 px-3 text-xs font-medium text-[var(--rm-text-primary)] focus:border-[var(--rm-primary)] focus:ring-1 focus:ring-[var(--rm-primary)] focus:outline-none h-[38px]">
+                    <option value="">Todo riesgo</option>
+                    <option value="BAJO">Bajo</option>
+                    <option value="MEDIO">Medio</option>
+                    <option value="ALTO">Alto</option>
+                </select>
+            </div>
+
+            {{-- Fecha Desde --}}
+            <div class="lg:col-span-3">
+                <input wire:model.live.debounce.400ms="fechaDesde"
+                    type="date"
+                    class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-input-bg)] py-2 px-3 text-xs font-medium text-[var(--rm-text-primary)] focus:border-[var(--rm-primary)] focus:ring-1 focus:ring-[var(--rm-primary)] focus:outline-none h-[38px]" />
+            </div>
+
+            {{-- Fecha Hasta --}}
+            <div class="lg:col-span-3">
+                <input wire:model.live.debounce.400ms="fechaHasta"
+                    type="date"
+                    class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-input-bg)] py-2 px-3 text-xs font-medium text-[var(--rm-text-primary)] focus:border-[var(--rm-primary)] focus:ring-1 focus:ring-[var(--rm-primary)] focus:outline-none h-[38px]" />
+            </div>
+        </div>
+
+        @php
+            $hasFiltrosActivos = !empty($filtroEstado) || !empty($filtroRiesgo) || !empty($fechaDesde) || !empty($fechaHasta);
+        @endphp
+        @if($hasFiltrosActivos)
+            <div class="rm-filter-bar__active">
+                <div class="flex flex-wrap items-center gap-1.5">
+                    <span class="rm-filter-bar__active-label">
+                        <i class="ph-bold ph-funnel text-xs"></i> Filtros activos:
+                    </span>
+                    @if(!empty($filtroEstado))
+                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[var(--rm-surface-alt)] border border-[var(--rm-border)] text-[11px] font-semibold text-[var(--rm-text-primary)]">
+                            <span>Estado: {{ $filtroEstado }}</span>
+                            <button type="button" wire:click="$set('filtroEstado', '')" class="hover:text-[var(--rm-primary)] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
+                        </span>
+                    @endif
+                    @if(!empty($filtroRiesgo))
+                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[var(--rm-surface-alt)] border border-[var(--rm-border)] text-[11px] font-semibold text-[var(--rm-text-primary)]">
+                            <span>Riesgo: {{ $filtroRiesgo }}</span>
+                            <button type="button" wire:click="$set('filtroRiesgo', '')" class="hover:text-[var(--rm-primary)] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
+                        </span>
+                    @endif
+                    @if(!empty($fechaDesde))
+                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[var(--rm-surface-alt)] border border-[var(--rm-border)] text-[11px] font-semibold text-[var(--rm-text-primary)]">
+                            <span>Desde: {{ $fechaDesde }}</span>
+                            <button type="button" wire:click="$set('fechaDesde', '')" class="hover:text-[var(--rm-primary)] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
+                        </span>
+                    @endif
+                    @if(!empty($fechaHasta))
+                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[var(--rm-surface-alt)] border border-[var(--rm-border)] text-[11px] font-semibold text-[var(--rm-text-primary)]">
+                            <span>Hasta: {{ $fechaHasta }}</span>
+                            <button type="button" wire:click="$set('fechaHasta', '')" class="hover:text-[var(--rm-primary)] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
+                        </span>
+                    @endif
+                </div>
+                <button type="button" wire:click="$set('filtroEstado', ''); $set('filtroRiesgo', ''); $set('fechaDesde', ''); $set('fechaHasta', '')" class="rm-filter-bar__clear-btn">
+                    <i class="ph-bold ph-arrow-counter-clockwise text-xs"></i>
+                    Limpiar filtros
+                </button>
+            </div>
+        @endif
+    </x-ui.filter-bar>
 
  {{-- Tabla --}}
  @if($valoraciones->isEmpty())
@@ -194,7 +258,7 @@
  </x-ui.empty-state>
  @else
  <div class="overflow-hidden rounded-2xl border border-borde-suave">
- <table class="rm-table">
+ <table class="rm-data-table rm-data-table--actions rm-table">
  <thead class="rm-table-header">
  <tr>
  <th>Fecha</th>

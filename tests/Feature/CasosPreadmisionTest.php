@@ -5,7 +5,9 @@ namespace Tests\Feature;
 use App\Models\Personal;
 use App\Models\Preadmision;
 use App\Models\User;
+use App\Frontend\Livewire\Admisiones\PreadmisionesPanel;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Livewire\Livewire;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\PermissionRegistrar;
@@ -38,6 +40,69 @@ class CasosPreadmisionTest extends TestCase
         $user->assignRole('SUPERADMINISTRADOR');
         $response = $this->actingAs($user)->get(route('admin.admisiones.preadmisiones'));
         $response->assertStatus(200);
+    }
+
+    public function test_estado_y_orden_comparten_la_unica_barra_de_filtros(): void
+    {
+        $user = User::factory()->create(['estado' => 'ACTIVO']);
+        $user->assignRole('SUPERADMINISTRADOR');
+
+        $html = $this->actingAs($user)->get(route('admin.admisiones.preadmisiones'))->assertOk()->getContent();
+        $this->assertSame(1, substr_count($html, 'aria-label="Filtrar preadmisiones"'));
+        $this->assertStringNotContainsString('class="rm-pre-states"', $html);
+        $this->assertStringContainsString('wire:model.live="estado"', $html);
+        $this->assertStringContainsString('wire:model.live="orden"', $html);
+        $this->assertStringContainsString('Aprobadas (0)', $html);
+
+        Livewire::test(PreadmisionesPanel::class)
+            ->set('estado', 'APROBADA')
+            ->set('orden', 'antiguas')
+            ->call('limpiarFiltros')
+            ->assertSet('estado', '')
+            ->assertSet('orden', 'recientes');
+
+        $rechazadas = $this->get(route('admin.admisiones.preadmisiones.rechazadas'))->assertOk()->getContent();
+        $this->assertStringContainsString('Filtrar por estado de preadmisión', $rechazadas);
+        $this->assertStringContainsString('Rechazadas (0)', $rechazadas);
+    }
+
+    public function test_expediente_y_sus_pestanas_se_abren_sin_crear_datos(): void
+    {
+        $user = User::factory()->create(['estado' => 'ACTIVO']);
+        $user->assignRole('SUPERADMINISTRADOR');
+        $solicitud = Preadmision::create([
+            'cod_preadmision' => 'PRE_UI_001',
+            'cod_usuario_registro' => $user->cod_usuario,
+            'estado' => 'PENDIENTE',
+            'fecha_solicitud' => '2026-09-25 09:12:00',
+            'nombres' => 'MARIO',
+            'apellido_paterno' => 'GUTIERREZ',
+            'numero_documento' => '2384912',
+            'fecha_nacimiento' => '1946-01-01',
+            'motivo_ingreso' => 'CUIDADO_INTEGRAL',
+            'prioridad' => 'MEDIA',
+        ]);
+
+        $this->actingAs($user);
+        $this->get(route('admin.admisiones.preadmisiones', ['solicitud' => $solicitud->cod_preadmision, 'tab' => 'documentos']))
+            ->assertOk()
+            ->assertSee('Expediente de preadmisión')
+            ->assertSee('No hay documentos registrados');
+
+        Livewire::test(PreadmisionesPanel::class)
+            ->call('verDetalle', $solicitud->cod_preadmision)
+            ->assertSet('modalDetalle', true)
+            ->assertSee('Expediente de preadmisión')
+            ->call('revisarSolicitud')
+            ->assertSet('panelModo', 'revision')
+            ->assertSee('Aprobar preadmisión')
+            ->call('volverAlResumen')
+            ->call('cambiarPanelTab', 'documentos')
+            ->assertSee('No hay documentos registrados')
+            ->call('cambiarPanelTab', 'historial')
+            ->assertSee('Solicitud registrada')
+            ->call('cerrarDetalle')
+            ->assertSet('modalDetalle', false);
     }
 
     public function test_usuario_sin_permiso_recibe_403_al_intentar_ver_casos(): void

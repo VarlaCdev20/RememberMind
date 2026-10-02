@@ -912,56 +912,56 @@
   $hasFiltrosActivos = !empty($search) || !empty($filtroRol) || !empty($filtroArea) || !empty($filtroEstado) || !empty($filtroGenero);
  @endphp
  @if($hasFiltrosActivos)
-  <div class="rm-filter-bar__active mt-3 pt-2.5 border-t border-[var(--rm-border-soft)] flex flex-wrap items-center justify-between gap-2">
-  <div class="flex flex-wrap items-center gap-1.5">
-   <span class="rm-filter-bar__active-label text-xs font-bold text-[var(--rm-text-secondary)] flex items-center gap-1">
-   <i class="ph-bold ph-funnel text-xs text-[var(--rm-primary)]"></i> Filtros activos:
-   </span>
-   @if(!empty($search))
-   <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[var(--rm-surface-soft)] border border-[var(--rm-border)] text-xs font-semibold text-[var(--rm-text-primary)]">
-    <span>Búsqueda: "{{ Str::limit($search, 16) }}"</span>
-    <button type="button" wire:click="$set('search', ''); $wire.aplicarFiltros();" class="hover:text-[var(--rm-primary)] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
-   </span>
-   @endif
-   @if(!empty($filtroRol))
-   <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[var(--rm-surface-soft)] border border-[var(--rm-border)] text-xs font-bold text-[var(--rm-primary)]">
-    <span>Rol: {{ strtoupper(str_replace('_', ' ', $filtroRol)) }}</span>
-    <button type="button" wire:click="$set('filtroRol', ''); $wire.aplicarFiltros();" class="hover:text-[var(--rm-primary)] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
-   </span>
-   @endif
-   @if(!empty($filtroArea))
-   <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[var(--rm-olive-soft)]/30 border border-[var(--rm-olive)]/40 text-xs font-bold text-[var(--rm-olive-strong)]">
-    <span>Área filtrada</span>
-    <button type="button" wire:click="$set('filtroArea', ''); $wire.aplicarFiltros();" class="hover:text-[var(--rm-primary)] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
-   </span>
-   @endif
-   @if(!empty($filtroEstado))
-   <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[var(--rm-surface-soft)] border border-[var(--rm-border)] text-xs font-bold text-[var(--rm-text-primary)]">
-    <span>Estado: {{ $filtroEstado }}</span>
-    <button type="button" wire:click="$set('filtroEstado', ''); $wire.aplicarFiltros();" class="hover:text-[var(--rm-primary)] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
-   </span>
-   @endif
-   @if(!empty($filtroGenero))
-   <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[var(--rm-surface-soft)] border border-[var(--rm-border)] text-xs font-bold text-[var(--rm-text-primary)]">
-    <span>Género: {{ $filtroGenero === 'FEMENINO' ? 'Fem.' : 'Masc.' }}</span>
-    <button type="button" wire:click="$set('filtroGenero', ''); $wire.aplicarFiltros();" class="hover:text-[var(--rm-primary)] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
-   </span>
-   @endif
-  </div>
-  <div class="flex items-center gap-2.5">
-   <span class="text-xs px-2.5 py-0.5 rounded-full font-bold bg-[var(--rm-surface-soft)] text-[var(--rm-text-secondary)]">
-   {{ method_exists($usuarios, 'total') ? $usuarios->total() : count($usuarios) }} coincidentes
-   </span>
-   <button type="button"
-   wire:click="limpiarFiltros"
-   class="inline-flex items-center gap-1 rounded-xl bg-[var(--rm-primary)]/10 hover:bg-[var(--rm-primary)]/20 text-[var(--rm-primary)] py-1 px-2.5 text-xs font-bold transition cursor-pointer">
-   <i class="ph-bold ph-arrow-counter-clockwise"></i>
-   <span>Limpiar filtros</span>
-   </button>
-  </div>
+  <div class="rm-filter-bar__active">
+   <div class="rm-filter-scroll">
+    <span class="rm-filter-bar__active-label">
+     <i class="ph-bold ph-funnel text-xs"></i> Filtros activos:
+    </span>
+    @if(!empty($search))
+     <span class="rm-filter-chip rm-filter-chip--search">
+      <i class="ph-bold ph-magnifying-glass text-xs"></i>
+      <span>B?squeda: "{{ Str::limit($search, 16) }}"</span>
+      <button type="button" wire:click="$set('search', ''); $wire.aplicarFiltros();" title="Quitar filtro"><i class="ph-bold ph-x text-xs"></i></button>
+     </span>
+    @endif
+    @if(!empty($filtroRol))
+     <span class="rm-filter-chip rm-filter-chip--clinical">
+      <i class="ph-bold ph-identification-badge text-xs"></i>
+      <span>Rol: {{ strtoupper(str_replace('_', ' ', $filtroRol)) }}</span>
+      <button type="button" wire:click="$set('filtroRol', ''); $wire.aplicarFiltros();" title="Quitar filtro"><i class="ph-bold ph-x text-xs"></i></button>
+     </span>
+    @endif
+    @if(!empty($filtroArea))
+     <span class="rm-filter-chip rm-filter-chip--success">
+      <i class="ph-bold ph-buildings text-xs"></i>
+      <span>?rea filtrada</span>
+      <button type="button" wire:click="$set('filtroArea', ''); $wire.aplicarFiltros();" title="Quitar filtro"><i class="ph-bold ph-x text-xs"></i></button>
+     </span>
+    @endif
+    @if(!empty($filtroEstado))
+     <span class="rm-filter-chip {{ $filtroEstado === 'ACTIVO' ? 'rm-filter-chip--success' : 'rm-filter-chip--warning' }}">
+      <span class="w-1.5 h-1.5 rounded-full {{ $filtroEstado === 'ACTIVO' ? 'bg-[var(--rm-action-primary)]' : 'bg-[var(--rm-status-high)]' }}"></span>
+      <span>Estado: {{ $filtroEstado }}</span>
+      <button type="button" wire:click="$set('filtroEstado', ''); $wire.aplicarFiltros();" title="Quitar filtro"><i class="ph-bold ph-x text-xs"></i></button>
+     </span>
+    @endif
+    @if(!empty($filtroGenero))
+     <span class="rm-filter-chip rm-filter-chip--info">
+      <i class="ph-bold ph-gender-intersex text-xs"></i>
+      <span>G?nero: {{ $filtroGenero === 'FEMENINO' ? 'Fem.' : 'Masc.' }}</span>
+      <button type="button" wire:click="$set('filtroGenero', ''); $wire.aplicarFiltros();" title="Quitar filtro"><i class="ph-bold ph-x text-xs"></i></button>
+     </span>
+    @endif
+    <button type="button"
+     wire:click="limpiarFiltros"
+     class="rm-filter-bar__clear-btn">
+     <i class="ph-bold ph-arrow-counter-clockwise text-xs"></i>
+     <span>Limpiar filtros</span>
+    </button>
+   </div>
   </div>
  @endif
- </x-ui.filter-bar>
+</x-ui.filter-bar>
 
  {{-- CONTENIDO PRINCIPAL --}}
  <section class="relative">
@@ -1151,7 +1151,7 @@
  {{-- VISTA TABLA COMPACTA ACCESIBLE --}}
  <div x-show="vista === 'table'" x-transition.opacity.duration.200ms>
   <div class="overflow-hidden rounded-[1.4rem] bg-[var(--rm-surface)] border border-[var(--rm-border)] shadow-xs">
-  <table class="w-full table-fixed text-left text-sm">
+  <table class="rm-data-table rm-data-table--actions w-full table-fixed text-left text-sm">
    <thead class="bg-[var(--rm-surface-soft)] text-xs uppercase tracking-wider text-[var(--rm-text-secondary)] border-b border-[var(--rm-border)]">
    <tr>
     <th class="w-[32%] px-5 py-3.5 font-bold">Usuario</th>

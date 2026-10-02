@@ -163,28 +163,28 @@ class FrontendArchitectureTest extends TestCase
         $density = File::get(resource_path('frontend/styles/design-system/patterns/system-density.css'));
 
         foreach ([
-            '--rm-sidebar-width: 248px',
+            '--rm-sidebar-width: 232px',
             '--rm-sidebar-collapsed: 76px',
-            '--rm-topbar-height: 64px',
-            '--rm-page-max-width: 1440px',
-            '--rm-page-padding-x: 24px',
-            '--rm-page-padding-y: 24px',
-            '--rm-grid-gap: 16px',
-            '--rm-page-header-height: 90px',
-            '--rm-dashboard-hero-height: 260px',
-            '--rm-panel-max-height: 340px',
+            '--rm-topbar-height: 60px',
+            '--rm-page-max-width: 1360px',
+            '--rm-page-padding-x: 20px',
+            '--rm-page-padding-y: 16px',
+            '--rm-grid-gap: 12px',
+            '--rm-page-header-height: 76px',
+            '--rm-dashboard-hero-height: 204px',
+            '--rm-panel-max-height: 300px',
         ] as $token) {
             $this->assertStringContainsString($token, $layout);
         }
 
-        $this->assertStringContainsString('--rm-page-gap: var(--rm-space-6)', $spacing);
+        $this->assertStringContainsString('--rm-page-gap: var(--rm-space-4)', $spacing);
         $this->assertStringContainsString('--rm-card-padding: var(--rm-space-card)', $spacing);
-        $this->assertStringContainsString('--rm-font-size-dashboard: 34px', $typography);
-        $this->assertStringContainsString('--rm-font-size-section: 20px', $typography);
+        $this->assertStringContainsString('--rm-font-size-dashboard: 30px', $typography);
+        $this->assertStringContainsString('--rm-font-size-section: 18px', $typography);
         $this->assertStringContainsString('--rm-font-size-card-title: 15px', $typography);
         $this->assertStringContainsString('--rm-font-size-body: 14px', $typography);
         $this->assertStringContainsString('--rm-font-size-meta: 12px', $typography);
-        $this->assertStringContainsString('--rm-font-size-kpi: 30px', $typography);
+        $this->assertStringContainsString('--rm-font-size-kpi: 27px', $typography);
         $this->assertStringContainsString('--rm-control-md: 40px', $sizing);
         $this->assertStringContainsString('[class~="text-5xl"]', $density);
         $this->assertStringContainsString('[class~="min-h-[400px]"]', $density);
@@ -334,16 +334,23 @@ class FrontendArchitectureTest extends TestCase
 
         $this->assertStringContainsString('rm-role-hero', $componente);
         $this->assertStringContainsString('<x-ui.role-dashboard-hero', $encabezadoAdmin);
-        $this->assertStringContainsString('rm-role-hero', $enfermeria);
+        $this->assertStringContainsString('<x-ui.dashboard-welcome-header', $enfermeria);
+        $this->assertStringNotContainsString('rm-role-hero', $enfermeria);
         $this->assertStringContainsString('<x-ui.role-dashboard-hero', $medicina);
         $this->assertStringContainsString('<x-ui.role-dashboard-hero', $psicologia);
         $this->assertStringContainsString('<x-ui.role-dashboard-hero', $workspaceRol);
         $this->assertStringContainsString('storage/imagenes/LOGO.png', $componente);
         $this->assertStringContainsString('rm-role-focus', $workspaceRol);
 
-        foreach ([$encabezadoAdmin, $enfermeria, $medicina, $psicologia] as $dashboard) {
+        foreach ([$encabezadoAdmin, $medicina, $psicologia] as $dashboard) {
             $this->assertStringContainsString('images/FOTOS CENTRO DE ADULTOS MAYORES/', $dashboard);
         }
+        $this->assertStringContainsString(':image="$welcomeImage"', $enfermeria);
+        $this->assertStringContainsString(':secondary-image="$welcomeSecondaryImage"', $enfermeria);
+        $this->assertStringContainsString('rotation-context=', $medicina);
+        $this->assertStringContainsString('rotation-context=', $psicologia);
+        $this->assertStringContainsString('rotation-context=', $workspaceRol);
+        $this->assertStringContainsString('images/FOTOS CENTRO DE ADULTOS MAYORES/', File::get(app_path('Backend/Modulos/Reportes/Servicios/DashboardPhotoRotation.php')));
 
         $this->assertStringContainsString('rm-role-kpi', $medicina);
         $this->assertStringContainsString('rm-role-kpi', $psicologia);

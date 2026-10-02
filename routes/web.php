@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 use App\Frontend\Livewire\Administracion\Actividades\ActividadesPanel;
 use App\Frontend\Livewire\Administracion\Actividades\AsistenciaPanel;
@@ -57,6 +57,7 @@ use App\Http\Controllers\Documentos\AdultoMayorDocumentoController;
 use App\Http\Controllers\Documentos\DocumentoController;
 use App\Http\Controllers\Documentos\DocumentosUsuarioController;
 use App\Http\Controllers\Identidad\InstitucionalController;
+use App\Http\Controllers\Identidad\RolePreviewController;
 use App\Http\Controllers\Identidad\UsuarioController;
 use App\Http\Controllers\Instrumentos\InstrumentoController;
 use App\Http\Controllers\Medicacion\AdultoMayorAdministracionMedicacionController;
@@ -104,6 +105,7 @@ Route::get('/', function () {
 
 Route::middleware([
     'auth:sanctum',
+    'cuenta.activa',
     config('jetstream.auth_session'),
     'verified',
 ])->group(function () {
@@ -122,6 +124,8 @@ Route::middleware([
     |
     */
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::post('/ver-como-rol', [RolePreviewController::class, 'store'])->name('role-preview.store');
+    Route::delete('/ver-como-rol', [RolePreviewController::class, 'destroy'])->name('role-preview.destroy');
 
     /*
     |--------------------------------------------------------------------------
@@ -140,12 +144,28 @@ Route::middleware([
             */
             Route::prefix('administracion')
                 ->name('administracion.')
+                ->middleware('permission:admisiones.ver_dashboard')
                 ->group(function () {
-                    Route::get('/dashboard', [DashboardController::class, 'index'])
+                    Route::get('/dashboard', \App\Http\Controllers\Administracion\CentroCoordinacionController::class)
                         ->name('dashboard');
 
-                    Route::get('/', [DashboardController::class, 'index'])
+                    Route::get('/', \App\Http\Controllers\Administracion\CentroCoordinacionController::class)
                         ->name('index');
+
+                    Route::get('/residentes/{residente}', [\App\Http\Controllers\Administracion\ResidenteAdministrativoController::class, 'show'])
+                        ->middleware('permission:residentes.ver')->name('residentes.show');
+                    Route::get('/buscar', \App\Http\Controllers\Administracion\BuscarAdministracionController::class)
+                        ->name('buscar');
+
+                    foreach ([
+                        'admisiones', 'residentes', 'habitaciones', 'ocupacion',
+                        'jornadas', 'asignaciones', 'contactos', 'documentacion',
+                        'consentimientos', 'seguros', 'actividades', 'visitas',
+                        'alertas', 'incidentes', 'reportes',
+                    ] as $modulo) {
+                        Route::get('/'.$modulo, [\App\Http\Controllers\Administracion\OperacionController::class, 'index'])
+                            ->defaults('modulo', $modulo)->name($modulo);
+                    }
                 });
 
             Route::get('vistas-extra', function () {
@@ -241,6 +261,7 @@ Route::middleware([
                 ->name('roles-permisos.index');
 
             Route::get('/areas-atencion', [AreasAtencionController::class, 'index'])
+                ->middleware('permission:areas.ver')
                 ->name('areas-atencion.index');
 
             Route::view('/areas-institucionales', 'pages.areas-institucionales.index')
@@ -348,35 +369,35 @@ Route::middleware([
             |
             */
             Route::prefix('adultos-mayores/{adulto_mayor}')
-                ->middleware('permission:residentes.ver')
+                ->middleware(['permission:residentes.ver', \App\Http\Middleware\AutorizarResidenteVinculado::class])
                 ->name('adultos-mayores.')
                 ->group(function () {
 
                     // Familiares
-                    Route::get('/familiares', [AdultoMayorFamiliarController::class, 'index'])->name('familiares.index');
+                    Route::get('/familiares', [AdultoMayorFamiliarController::class, 'index'])->middleware('permission:residentes_contactos.ver')->name('familiares.index');
                     Route::post('/familiares', [AdultoMayorFamiliarController::class, 'store'])->middleware('permission:residentes_contactos.gestionar')->name('familiares.store');
                     Route::patch('/familiares/{familiar}', [AdultoMayorFamiliarController::class, 'update'])->middleware('permission:residentes_contactos.gestionar')->name('familiares.update');
                     Route::delete('/familiares/{familiar}', [AdultoMayorFamiliarController::class, 'destroy'])->middleware('permission:residentes_contactos.gestionar')->name('familiares.destroy');
                     Route::patch('/familiares/{familiar}/restaurar', [AdultoMayorFamiliarController::class, 'restore'])->middleware('permission:residentes_contactos.gestionar')->name('familiares.restore');
 
                     // Observaciones
-                    Route::get('/observaciones', [AdultoMayorObservacionController::class, 'index'])->name('observaciones.index');
+                    Route::get('/observaciones', [AdultoMayorObservacionController::class, 'index'])->middleware('permission:notas_clinicas.ver')->name('observaciones.index');
                     Route::post('/observaciones', [AdultoMayorObservacionController::class, 'store'])->middleware('permission:notas_clinicas.crear')->name('observaciones.store');
                     Route::patch('/observaciones/{observacion}', [AdultoMayorObservacionController::class, 'update'])->middleware('permission:notas_clinicas.editar')->name('observaciones.update');
                     Route::delete('/observaciones/{observacion}', [AdultoMayorObservacionController::class, 'destroy'])->middleware('permission:notas_clinicas.anular')->name('observaciones.destroy');
                     Route::patch('/observaciones/{observacion}/restaurar', [AdultoMayorObservacionController::class, 'restore'])->middleware('permission:notas_clinicas.editar')->name('observaciones.restore');
 
                     // Atenciones / Consultas base
-                    Route::get('/atenciones', [AdultoMayorAtencionController::class, 'index'])->name('atenciones.index');
+                    Route::get('/atenciones', [AdultoMayorAtencionController::class, 'index'])->middleware('permission:atenciones.ver')->name('atenciones.index');
                     Route::post('/atenciones', [AdultoMayorAtencionController::class, 'store'])->middleware('permission:atenciones.crear')->name('atenciones.store');
                     Route::patch('/atenciones/{atencion}', [AdultoMayorAtencionController::class, 'update'])->middleware('permission:atenciones.editar')->name('atenciones.update');
                     Route::delete('/atenciones/{atencion}', [AdultoMayorAtencionController::class, 'destroy'])->middleware('permission:atenciones.anular')->name('atenciones.destroy');
                     Route::patch('/atenciones/{atencion}/restaurar', [AdultoMayorAtencionController::class, 'restore'])->middleware('permission:atenciones.editar')->name('atenciones.restore');
 
                     // Evaluaciones cognitivas
-                    Route::get('/evaluaciones', [AdultoMayorEvaluacionController::class, 'index'])->name('evaluaciones.index');
+                    Route::get('/evaluaciones', [AdultoMayorEvaluacionController::class, 'index'])->middleware('permission:aplicaciones_instrumento.ver')->name('evaluaciones.index');
                     Route::post('/evaluaciones', [AdultoMayorEvaluacionController::class, 'store'])->middleware('permission:aplicaciones_instrumento.crear')->name('evaluaciones.store');
-                    Route::get('/evaluaciones/{evaluacion}', [AdultoMayorEvaluacionController::class, 'show'])->name('evaluaciones.show');
+                    Route::get('/evaluaciones/{evaluacion}', [AdultoMayorEvaluacionController::class, 'show'])->middleware('permission:aplicaciones_instrumento.ver')->name('evaluaciones.show');
                     Route::delete('/evaluaciones/{evaluacion}', [AdultoMayorEvaluacionController::class, 'destroy'])->middleware('permission:aplicaciones_instrumento.anular')->name('evaluaciones.destroy');
                     Route::patch('/evaluaciones/{evaluacion}/restaurar', [AdultoMayorEvaluacionController::class, 'restore'])->middleware('permission:aplicaciones_instrumento.editar')->name('evaluaciones.restore');
 
@@ -396,8 +417,8 @@ Route::middleware([
                     Route::patch('/actividades/{actividad}/restaurar', [AdultoMayorActividadController::class, 'restore'])->middleware('permission:actividades.gestionar')->name('actividades.restore');
 
                     // Documentos
-                    Route::get('/documentos', [AdultoMayorDocumentoController::class, 'index'])->name('documentos.index');
-                    Route::get('/documentos/{documento}/archivo', [AdultoMayorDocumentoController::class, 'archivo'])->name('documentos.archivo');
+                    Route::get('/documentos', [AdultoMayorDocumentoController::class, 'index'])->middleware('permission:documentos.ver')->name('documentos.index');
+                    Route::get('/documentos/{documento}/archivo', [AdultoMayorDocumentoController::class, 'archivo'])->middleware('permission:documentos.ver')->name('documentos.archivo');
                     Route::post('/documentos', [AdultoMayorDocumentoController::class, 'store'])->middleware('permission:documentos.gestionar')->name('documentos.store');
                     Route::patch('/documentos/{documento}', [AdultoMayorDocumentoController::class, 'update'])->middleware('permission:documentos.gestionar')->name('documentos.update');
                     Route::delete('/documentos/{documento}', [AdultoMayorDocumentoController::class, 'destroy'])->middleware('permission:documentos.gestionar')->name('documentos.destroy');
@@ -910,7 +931,7 @@ Route::middleware([
 | sin reemplazar ninguna pantalla existente.
 |
 */
-Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified'])
+Route::middleware(['auth:sanctum', 'cuenta.activa', config('jetstream.auth_session'), 'verified'])
     ->prefix('admin')
     ->name('admin.')
     ->group(function (): void {
@@ -925,14 +946,14 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
         Route::post('/habitaciones', [InfraestructuraController::class, 'habitacion'])->middleware('permission:habitaciones.gestionar')->name('habitaciones.store');
         Route::post('/habitaciones/{habitacion}/camas', [InfraestructuraController::class, 'cama'])->middleware('permission:camas.gestionar')->name('camas.store');
 
-        Route::prefix('institucional')->name('institucional.')->middleware('role:SUPERADMINISTRADOR|ADMINISTRADOR')->group(function (): void {
+        Route::prefix('institucional')->name('institucional.')->group(function (): void {
             Route::get('/usuarios', [InstitucionalController::class, 'usuarios'])->middleware('permission:usuarios.ver')->name('usuarios');
             Route::post('/usuarios', [InstitucionalController::class, 'guardarUsuario'])->middleware('permission:usuarios.gestionar')->name('usuarios.store');
             Route::post('/personal', [InstitucionalController::class, 'guardarPersonal'])->middleware('permission:personal.gestionar')->name('personal.store');
             Route::post('/areas', [InstitucionalController::class, 'guardarArea'])->middleware('permission:areas.gestionar')->name('areas.store');
             Route::post('/turnos', [InstitucionalController::class, 'guardarTurno'])->middleware('permission:turnos.gestionar')->name('turnos.store');
             Route::post('/jornadas', [InstitucionalController::class, 'abrirJornada'])->middleware('permission:jornadas.gestionar')->name('jornadas.store');
-            Route::post('/jornadas/{jornada}/personal', [InstitucionalController::class, 'asignarPersonal'])->middleware('permission:jornadas.gestionar')->name('jornadas.personal');
+            Route::post('/jornadas/{jornada}/personal', [InstitucionalController::class, 'asignarPersonal'])->middleware('permission:asignaciones_personal.gestionar')->name('jornadas.personal');
         });
 
         Route::get('/residentes/{residente}/expediente', [ExpedienteClinicoController::class, 'index'])->middleware('permission:atenciones.ver')->name('expediente.index');
@@ -975,7 +996,9 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
 
         Route::get('/alertas', [AlertaController::class, 'index'])->middleware('permission:alertas.ver')->name('alertas.index');
         Route::post('/residentes/{residente}/alertas', [AlertaController::class, 'store'])->middleware('permission:alertas.gestionar')->name('alertas.store');
-        Route::patch('/alertas/{alerta}/estado', [AlertaController::class, 'cambiarEstado'])->middleware('permission:alertas.gestionar')->name('alertas.estado');
+        Route::patch('/alertas/{alerta}/estado', [AlertaController::class, 'cambiarEstado'])
+            ->middleware('permission:alertas.gestionar|alertas.reconocer|alertas.asignar|alertas.seguimiento|alertas.cerrar')
+            ->name('alertas.estado');
 
         Route::post('/residentes/{residente}/documentos', [DocumentoController::class, 'store'])->middleware('permission:documentos.gestionar')->name('documentos.store');
         Route::get('/residentes/{residente}/relaciones', [RelacionResidenteController::class, 'index'])->middleware('permission:residentes_contactos.ver')->name('residentes.relaciones');
@@ -986,3 +1009,12 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
         Route::get('/residentes/{residente}/reporte.pdf', [ReporteV2Controller::class, 'residentePdf'])->middleware('permission:residentes.ver')->name('reportes.residente');
         Route::get('/reportes/residentes.csv', [ReporteV2Controller::class, 'residentesCsv'])->middleware('permission:residentes.ver')->name('reportes.residentes');
     });
+
+if (app()->environment('local')) {
+    Route::get('/local-login-enfermeria', function () {
+        $u = \App\Models\User::where('correo', 'enfermeria@remembermind.com')->first();
+        auth()->login($u);
+        request()->session()->regenerate();
+        return redirect('/admin/enfermeria/pacientes');
+    });
+}

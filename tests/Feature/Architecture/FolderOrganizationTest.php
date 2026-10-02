@@ -26,6 +26,21 @@ class FolderOrganizationTest extends TestCase
         $this->assertNamespacesMatchPath(app_path('Http/Controllers'), 'App\\Http\\Controllers');
     }
 
+    public function test_el_backend_no_depende_de_componentes_frontend(): void
+    {
+        foreach (File::allFiles(app_path('Backend')) as $file) {
+            if ($file->getExtension() !== 'php') {
+                continue;
+            }
+
+            $this->assertStringNotContainsString(
+                'App\\Frontend\\',
+                File::get($file->getPathname()),
+                "El backend {$file->getRelativePathname()} depende del frontend.",
+            );
+        }
+    }
+
     private function assertNamespacesMatchPath(string $root, string $rootNamespace): void
     {
         foreach (File::allFiles($root) as $file) {

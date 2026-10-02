@@ -341,7 +341,7 @@
 
   <div class="rm-card border border-borde bg-fondo-card !p-0 shadow-sm">
    <div class="p-3">
-   <section class="rm-filter-bar">
+   <x-ui.filter-bar class="mb-4">
     <div class="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-2 items-center">
     {{-- Buscador Principal --}}
     <div class="lg:col-span-4 relative flex items-center">
@@ -455,7 +455,7 @@
      </div>
     </div>
     @endif
-   </section>
+   </x-ui.filter-bar>
    </div>
 
    <div class="flex flex-col gap-2 border-b border-borde px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
@@ -631,7 +631,7 @@
    </div>
    @else
    <div class="overflow-x-auto">
-    <table class="w-full min-w-[900px] text-left">
+    <table class="rm-data-table rm-data-table--actions w-full min-w-[900px] text-left">
     <thead class="border-b border-borde bg-fondo text-[10px] font-black uppercase tracking-wider text-apoyo">
      <tr>
      <th class="px-4 py-3">Personal</th>
@@ -1199,7 +1199,7 @@
    </div>
 
    <div class="overflow-x-auto">
-   <table class="w-full min-w-[880px] text-left">
+   <table class="rm-data-table rm-data-table--actions w-full min-w-[880px] text-left">
     <thead class="border-b border-borde bg-fondo text-[10px] font-black uppercase tracking-wider text-apoyo">
     <tr>
      <th class="px-4 py-3">Indicador</th>

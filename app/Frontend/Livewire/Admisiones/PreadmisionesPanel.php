@@ -4,7 +4,6 @@ namespace App\Frontend\Livewire\Admisiones;
 
 use App\Backend\Modulos\Admisiones\Acciones\FormalizarAdmision;
 use App\Models\Cama;
-use App\Models\Documento;
 use App\Models\Habitacion;
 use App\Models\Preadmision;
 use Illuminate\Validation\ValidationException;
@@ -27,14 +26,6 @@ class PreadmisionesPanel extends Component
 
     public bool $soloRechazadas = false;
 
-    public bool $modalDocumentos = false;
-
-    public ?string $codPreSeleccionada = null;
-
-    public array $documentosModal = [];
-
-    public bool $modalRechazo = false;
-
     public ?string $codPreRechazo = null;
 
     public string $motivo_rechazo = '';
@@ -43,11 +34,23 @@ class PreadmisionesPanel extends Component
 
     public bool $modalDetalle = false;
 
+    public string $solicitud = '';
+
+    public string $panelTab = 'resumen';
+
+    public string $panelModo = 'detalle';
+
+    public string $orden = 'recientes';
+
     public ?Preadmision $solicitudDetalle = null;
 
     public bool $modalAdmision = false;
 
+    public int $pasoAdmision = 1;
+
     public ?string $codPreAdmision = null;
+
+    public ?string $residenteAdmitidoCodigo = null;
 
     public string $cama_id = '';
 
@@ -59,25 +62,15 @@ class PreadmisionesPanel extends Component
 
     public string $nivel_educativo = '';
 
-    public string $grupo_sanguineo = '';
+    public string $seguro_entidad = '';
 
-    public string $factor_rh = '';
+    public string $seguro_plan = '';
 
-    public string $alergias = '';
+    public string $seguro_afiliacion = '';
 
-    public string $seguro_salud = '';
+    public string $seguro_titular = '';
 
-    public array $antecedentes = [];
-
-    public string $restricciones_alimentarias = '';
-
-    public string $hospitalizaciones = '';
-
-    public string $cirugias = '';
-
-    public string $observacion_medica = '';
-
-    public bool $usa_whatsapp = false;
+    public string $seguro_cobertura = '';
 
     public bool $autoriza_informacion_medica = false;
 
@@ -89,6 +82,9 @@ class PreadmisionesPanel extends Component
         'search' => ['except' => ''],
         'estado' => ['except' => ''],
         'prioridad' => ['except' => ''],
+        'fecha_inicio' => ['except' => ''],
+        'fecha_fin' => ['except' => ''],
+        'solicitud' => ['except' => ''],
     ];
 
     public function mount(): void
@@ -97,6 +93,14 @@ class PreadmisionesPanel extends Component
 
         if ($this->soloRechazadas) {
             $this->estado = 'RECHAZADA';
+        }
+
+        $codigo = request()->query('solicitud');
+        if (is_string($codigo) && $codigo !== '') {
+            $this->verDetalle($codigo);
+            if (request()->query('tab') === 'documentos') {
+                $this->panelTab = 'documentos';
+            }
         }
     }
 
@@ -123,6 +127,7 @@ class PreadmisionesPanel extends Component
             'prioridad',
             'fecha_inicio',
             'fecha_fin',
+            'orden',
         ]);
 
         if ($this->soloRechazadas) {
@@ -134,42 +139,27 @@ class PreadmisionesPanel extends Component
 
     public function verDocumentos(string $codPre): void
     {
-        $this->codPreSeleccionada = $codPre;
-
-        $this->documentosModal = Documento::where('cod_preadmision', $codPre)
-            ->orderBy('nombre')
-            ->get()
-            ->map(fn (Documento $documento) => [
-                'nombre_documento' => $documento->nombre,
-                'archivo_path' => $documento->ruta_archivo,
-                'estado' => $documento->estado,
-                'grupo_documento' => 'institucional',
-                'es_generado_sistema' => false,
-                'fecha_limite_entrega' => $documento->fecha_vencimiento,
-            ])
-            ->toArray();
-
-        $this->modalDocumentos = true;
+        $this->verDetalle($codPre);
+        $this->panelTab = 'documentos';
     }
 
     public function cerrarModalDocumentos(): void
     {
-        $this->modalDocumentos = false;
-        $this->codPreSeleccionada = null;
-        $this->documentosModal = [];
+        $this->cerrarDetalle();
     }
 
     public function abrirModalRechazo(string $codPre): void
     {
+        $this->verDetalle($codPre);
         $this->codPreRechazo = $codPre;
         $this->motivo_rechazo = '';
         $this->observacion_rechazo = '';
-        $this->modalRechazo = true;
+        $this->panelModo = 'rechazo';
     }
 
     public function cerrarModalRechazo(): void
     {
-        $this->modalRechazo = false;
+        $this->panelModo = 'revision';
         $this->codPreRechazo = null;
         $this->motivo_rechazo = '';
         $this->observacion_rechazo = '';
@@ -185,12 +175,38 @@ class PreadmisionesPanel extends Component
             ->with(['contacto', 'documentos', 'admision.residente'])
             ->findOrFail($codPre);
         $this->modalDetalle = true;
+        $this->solicitud = $codPre;
+        $this->panelTab = 'resumen';
+        $this->panelModo = 'detalle';
+    }
+
+    public function cambiarPanelTab(string $tab): void
+    {
+        abort_unless(in_array($tab, ['resumen', 'documentos', 'historial'], true), 404);
+        $this->panelTab = $tab;
+        $this->panelModo = 'detalle';
+    }
+
+    public function revisarSolicitud(): void
+    {
+        abort_unless($this->solicitudDetalle && $this->solicitudDetalle->estado === 'PENDIENTE', 404);
+        abort_unless(auth()->user()?->hasAnyRole(['MEDICO GENERAL/GERIATRA', 'ADMINISTRADOR', 'SUPERADMINISTRADOR']), 403);
+        $this->panelModo = 'revision';
+    }
+
+    public function volverAlResumen(): void
+    {
+        $this->panelModo = 'detalle';
+        $this->panelTab = 'resumen';
     }
 
     public function cerrarDetalle(): void
     {
         $this->modalDetalle = false;
+        $this->solicitud = '';
         $this->solicitudDetalle = null;
+        $this->panelModo = 'detalle';
+        $this->dispatch('preadmision-panel-closed');
     }
 
     public function aprobar(string $codPre): void
@@ -218,6 +234,11 @@ class PreadmisionesPanel extends Component
             'motivo_rechazo' => null,
         ]);
 
+        if ($this->solicitudDetalle?->getKey() === $codPre) {
+            $this->solicitudDetalle = $preadmision->load(['contacto', 'documentos', 'admision.residente']);
+            $this->panelModo = 'detalle';
+        }
+
         activity('Admisiones')->causedBy(auth()->user())->performedOn($preadmision)
             ->log('Solicitud de preadmisión aprobada; queda pendiente formalizar el ingreso.');
 
@@ -240,22 +261,20 @@ class PreadmisionesPanel extends Component
         }
 
         $this->resetValidation();
+        $this->cerrarDetalle();
+        $this->residenteAdmitidoCodigo = null;
         $this->codPreAdmision = $solicitud->cod_preadmision;
         $this->habitacion_id = '';
         $this->cama_id = '';
         $this->fecha_ingreso = now()->toDateString();
         $this->hora_ingreso = now()->format('H:i');
         $this->nivel_educativo = '';
-        $this->grupo_sanguineo = '';
-        $this->factor_rh = '';
-        $this->alergias = '';
-        $this->seguro_salud = '';
-        $this->antecedentes = [];
-        $this->restricciones_alimentarias = '';
-        $this->hospitalizaciones = '';
-        $this->cirugias = '';
-        $this->observacion_medica = '';
-        $this->usa_whatsapp = false;
+        $this->seguro_entidad = '';
+        $this->seguro_plan = '';
+        $this->seguro_afiliacion = '';
+        $this->seguro_titular = '';
+        $this->seguro_cobertura = '';
+        $this->pasoAdmision = 1;
         $this->autoriza_informacion_medica = false;
         $this->consentimiento_datos = false;
         $this->observaciones_admision = '';
@@ -275,28 +294,29 @@ class PreadmisionesPanel extends Component
         $this->resetValidation(['habitacion_id', 'cama_id']);
     }
 
+    public function irPasoAdmision(int $paso): void
+    {
+        abort_unless($this->modalAdmision && $this->codPreAdmision, 404);
+        $this->pasoAdmision = max(1, min(7, $paso));
+    }
+
     public function formalizarAdmision(FormalizarAdmision $formalizar): void
     {
         abort_unless(auth()->user()?->hasAnyRole(['ADMINISTRADOR', 'SUPERADMINISTRADOR']), 403);
 
-        $datos = $this->validate([
+        try {
+            $datos = $this->validate([
             'codPreAdmision' => ['required', 'exists:preadmisiones,cod_preadmision'],
             'habitacion_id' => ['required', 'exists:habitaciones,cod_habitacion'],
             'cama_id' => ['required', 'exists:camas,cod_cama'],
             'fecha_ingreso' => ['required', 'date', 'before_or_equal:today'],
             'hora_ingreso' => ['required', 'date_format:H:i'],
             'nivel_educativo' => ['nullable', 'string', 'max:100'],
-            'grupo_sanguineo' => ['nullable', 'in:A,B,AB,O,DESCONOCIDO'],
-            'factor_rh' => ['nullable', 'in:+,-,DESCONOCIDO'],
-            'alergias' => ['required', 'string', 'min:3', 'max:2000'],
-            'seguro_salud' => ['required', 'string', 'min:2', 'max:100'],
-            'antecedentes' => ['array'],
-            'antecedentes.*' => ['in:HIPERTENSION,DIABETES,PROBLEMAS_CARDIACOS,ACV,PARKINSON,EPILEPSIA,ALZHEIMER,DEPRESION,ANSIEDAD,PROBLEMAS_SUENO,PROBLEMAS_VISUALES,PROBLEMAS_AUDITIVOS,DOLOR_CRONICO'],
-            'restricciones_alimentarias' => ['nullable', 'string', 'max:2000'],
-            'hospitalizaciones' => ['nullable', 'string', 'max:3000'],
-            'cirugias' => ['nullable', 'string', 'max:3000'],
-            'observacion_medica' => ['nullable', 'string', 'max:3000'],
-            'usa_whatsapp' => ['boolean'],
+            'seguro_entidad' => ['nullable', 'string', 'max:120', 'required_with:seguro_plan,seguro_afiliacion,seguro_titular,seguro_cobertura'],
+            'seguro_plan' => ['nullable', 'string', 'max:100'],
+            'seguro_afiliacion' => ['nullable', 'string', 'max:80'],
+            'seguro_titular' => ['nullable', 'string', 'max:160'],
+            'seguro_cobertura' => ['nullable', 'string', 'max:3000'],
             'autoriza_informacion_medica' => ['accepted'],
             'consentimiento_datos' => ['accepted'],
             'observaciones_admision' => ['nullable', 'string', 'max:3000'],
@@ -309,37 +329,42 @@ class PreadmisionesPanel extends Component
             'in' => 'Seleccione una opción válida.',
             'min' => 'Ingrese al menos :min caracteres.',
             'max' => 'No exceda los :max caracteres.',
-        ]);
+            ]);
+        } catch (ValidationException $e) {
+            $campos = array_keys($e->errors());
+            $this->pasoAdmision = count(array_intersect($campos, ['seguro_entidad', 'seguro_plan', 'seguro_afiliacion', 'seguro_titular', 'seguro_cobertura'])) ? 5
+                : (count(array_intersect($campos, ['habitacion_id', 'cama_id', 'fecha_ingreso', 'hora_ingreso'])) ? 6
+                    : (count(array_intersect($campos, ['autoriza_informacion_medica', 'consentimiento_datos'])) ? 4 : 1));
+            throw $e;
+        }
 
         try {
             $solicitud = Preadmision::query()->findOrFail($this->codPreAdmision);
+            if (! $solicitud->cod_contacto) {
+                $this->pasoAdmision = 2;
+                throw ValidationException::withMessages(['contacto' => 'La preadmisión necesita un contacto responsable antes de formalizar.']);
+            }
+            if (! Cama::query()->whereKey($datos['cama_id'])->where('cod_habitacion', $datos['habitacion_id'])->exists()) {
+                $this->pasoAdmision = 6;
+                throw ValidationException::withMessages(['cama_id' => 'La cama no corresponde a la habitación seleccionada.']);
+            }
             $adulto = $formalizar->ejecutar($solicitud, [
                 'cod_cama' => $datos['cama_id'],
                 'cod_contacto' => $solicitud->cod_contacto,
                 'fecha_hora_admision' => $datos['fecha_ingreso'].' '.$datos['hora_ingreso'],
                 'nivel_educativo' => $datos['nivel_educativo'] ?: null,
-                'grupo_sanguineo' => $datos['grupo_sanguineo'] ?: null,
-                'factor_rh' => $datos['factor_rh'] ?: null,
                 'observacion' => $datos['observaciones_admision'] ?: null,
                 'autoriza_informacion' => (bool) $datos['autoriza_informacion_medica'],
                 'tipo_consentimiento' => 'ADMISION',
                 'firma_residente' => false,
+                'seguro_entidad' => $datos['seguro_entidad'] ?: null,
+                'seguro_plan' => $datos['seguro_plan'] ?: null,
+                'seguro_afiliacion' => $datos['seguro_afiliacion'] ?: null,
+                'seguro_titular' => $datos['seguro_titular'] ?: null,
+                'seguro_cobertura' => $datos['seguro_cobertura'] ?: null,
             ], auth()->user());
-            $service = app(\App\Backend\Modulos\Clinica\Servicios\FichaMedicaService::class);
-            $datosFicha = [
-                'alergias' => $datos['alergias'] ?? '',
-                'cirugias' => $datos['cirugias'] ?? '',
-                'hospitalizaciones' => $datos['hospitalizaciones'] ?? '',
-                'restricciones_alimentarias' => $datos['restricciones_alimentarias'] ?? '',
-                'observacion_medica' => $datos['observacion_medica'] ?? '',
-            ];
-            foreach ($datos['antecedentes'] ?? [] as $ant) {
-                $campo = strtolower($ant);
-                $datosFicha[$campo] = true;
-            }
-            $service->guardarFicha($adulto->cod_residente, $datosFicha, auth()->user()?->cod_usuario);
-
             $this->cerrarAdmision();
+            $this->residenteAdmitidoCodigo = $adulto->cod_residente;
             $this->dispatch('swal', [
                 'title' => 'Admisión completada',
                 'text' => trim("{$adulto->nombres} {$adulto->apellido_paterno} {$adulto->apellido_materno}").' ya figura como residente institucional y tiene cama asignada.',
@@ -377,6 +402,11 @@ class PreadmisionesPanel extends Component
             'fecha_revision' => now(),
             'cod_usuario_revision' => auth()->id(),
         ]);
+
+        if ($this->solicitudDetalle?->getKey() === $preadmision->getKey()) {
+            $this->solicitudDetalle = $preadmision->load(['contacto', 'documentos', 'admision.residente']);
+            $this->panelModo = 'detalle';
+        }
 
         activity('Admisiones')
             ->causedBy(auth()->user())
@@ -547,7 +577,11 @@ class PreadmisionesPanel extends Component
             });
         }
 
-        if ($this->estado !== '') {
+        if ($this->estado === 'ADMITIDA') {
+            $query->where(fn ($q) => $q->where('estado', 'ADMITIDA')->orWhereHas('admision'));
+        } elseif ($this->estado === 'PENDIENTE') {
+            $query->whereNotIn('estado', ['APROBADA', 'ADMITIDA', 'RECHAZADA']);
+        } elseif ($this->estado !== '') {
             $query->where('estado', $this->estado);
         }
 
@@ -579,7 +613,7 @@ class PreadmisionesPanel extends Component
         ];
 
         return view('livewire.admisiones.preadmisiones-panel', [
-            'preadmisiones' => $query->orderByDesc('fecha_solicitud')->orderByDesc('cod_preadmision')->paginate(10),
+            'preadmisiones' => $query->orderBy('fecha_solicitud', $this->orden === 'antiguas' ? 'asc' : 'desc')->orderBy('cod_preadmision', $this->orden === 'antiguas' ? 'asc' : 'desc')->paginate(10),
             'metricas' => $metricas,
             'habitacionesAdmision' => Habitacion::query()
                 ->withCount([
@@ -594,7 +628,7 @@ class PreadmisionesPanel extends Component
                     ->each(fn (Cama $cama) => $cama->estado === 'ACTIVA' && ! $cama->asignacionesActivas->count() ? $cama->setAttribute('estado', 'DISPONIBLE') : null)
                 : collect(),
             'solicitudAdmision' => $this->codPreAdmision
-                ? Preadmision::query()->find($this->codPreAdmision)
+                ? Preadmision::query()->with(['contacto', 'documentos'])->find($this->codPreAdmision)
                 : null,
         ])->layout('layouts.sistema');
     }

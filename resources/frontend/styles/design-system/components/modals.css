@@ -1,7 +1,7 @@
 /* ============================================================
-   REMEMBERMIND DESIGN SYSTEM — COMPONENTS / MODALS
-   Modales Unificados con la misma jerarquía de superficies:
-   - Contenedor cálido: var(--rm-modal-bg)
+   REMEMBERMIND DESIGN SYSTEM -- COMPONENTS / MODALS
+   Modales Unificados con la misma jerarquia de superficies:
+   - Contenedor calido: var(--rm-modal-bg)
    - Header marcado: var(--rm-surface-soft)
    - Body suave: var(--rm-surface)
    - Footer claro y limpio: var(--rm-surface-soft)
@@ -13,80 +13,330 @@
     /* ------------------------------------------------------------
        CONTRATO DE MODALES
        ------------------------------------------------------------ */
-    --rm-modal-bg: var(--rm-surface-raised); /* fondo modal */
-    --rm-modal-radius: var(--rm-radius-xl); /* radio */
-    --rm-modal-shadow: var(--rm-shadow-overlay); /* sombra */
+    --rm-modal-bg: var(--rm-surface-main); /* fondo modal */
+    --rm-modal-radius: 18px; /* radio acogedor y moderno */
+    --rm-modal-shadow: var(--rm-shadow-overlay); /* sombra con profundidad multicapa */
     --rm-modal-border: var(--rm-border-soft); /* borde */
 
     --rm-modal-sm: 420px;
-    --rm-modal-md: 560px;
-    --rm-modal-lg: 720px;
+    --rm-modal-md: 620px;
+    --rm-modal-lg: 860px;
     --rm-modal-xl: 900px;
 }
 
-.rm-modal-backdrop {
-    position: fixed;
-    inset: 0;
-    z-index: 50;
+.rm-modal-shell {
+    z-index: var(--rm-z-modal, 1000);
+    overscroll-behavior: contain;
+}
+
+/* El modal Jetstream comparte el contrato de alto del resto del sistema. */
+.jetstream-modal {
+    z-index: var(--rm-z-modal, 1000);
+    overscroll-behavior: contain;
+}
+
+.jetstream-modal__panel {
     display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: var(--rm-modal-overlay, rgba(64, 42, 32, 0.45));
-    backdrop-filter: blur(6px);
-    -webkit-backdrop-filter: blur(6px);
-    padding: var(--rm-space-4);
+    flex-direction: column;
+    max-height: calc(100dvh - 32px);
+    margin: auto;
+}
+
+.jetstream-modal__panel > :first-child {
+    min-height: 0;
     overflow-y: auto;
     overscroll-behavior: contain;
 }
 
-@media (max-height: 800px) {
-    .rm-modal-backdrop {
-        align-items: flex-start;
-        padding-top: var(--rm-space-3);
-        padding-bottom: var(--rm-space-3);
-    }
+.jetstream-modal__panel > :last-child:not(:first-child) {
+    flex: none;
 }
 
-.rm-modal {
-    width: 100%;
-    margin: auto 0;
-    background-color: var(--rm-modal-bg);
-    border: 1px solid var(--rm-modal-border);
-    border-radius: var(--rm-modal-radius);
-    box-shadow: var(--rm-modal-shadow);
-    display: flex;
-    flex-direction: column;
-    max-height: calc(100vh - 32px);
-    position: relative;
-    overflow: hidden;
-    animation: rm-modal-in var(--rm-duration-normal) var(--rm-ease-out);
-    box-sizing: border-box;
+.rm-modal-shell__overlay {
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(ellipse at center, rgba(48, 44, 42, 0.42) 0%, rgba(24, 22, 21, 0.68) 100%);
+    backdrop-filter: blur(8px) saturate(125%);
+    -webkit-backdrop-filter: blur(8px) saturate(125%);
+    transition: opacity 220ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.dark .rm-modal-shell__overlay,
+[data-theme= dark] .rm-modal-shell__overlay {
+    background: radial-gradient(ellipse at center, rgba(8, 18, 24, 0.70) 0%, rgba(3, 8, 12, 0.88) 100%);
+    backdrop-filter: blur(10px) saturate(135%);
+    -webkit-backdrop-filter: blur(10px) saturate(135%);
 }
 
 .rm-modal-panel {
+    max-height: calc(100dvh - 32px);
+    overflow: hidden;
+    background-color: var(--rm-modal-bg);
+    background-image:
+        radial-gradient(circle at 100% 0%, rgba(217, 121, 95, 0.035), transparent 45%),
+        radial-gradient(circle at center, rgba(48, 44, 42, 0.05) 1px, transparent 1px);
+    background-size: 100% 100%, 20px 20px;
+    border: 1px solid var(--rm-modal-border);
+    border-top: 1px solid rgba(255, 255, 255, 0.85);
+    border-radius: var(--rm-modal-radius);
+    box-shadow:
+        0 4px 6px -1px rgba(32, 28, 26, 0.08),
+        0 18px 42px -6px rgba(32, 28, 26, 0.22),
+        0 36px 72px -12px rgba(32, 28, 26, 0.16);
     isolation: isolate;
+    transform-origin: center center;
+    transition: transform 240ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 240ms ease;
 }
 
+.dark .rm-modal-panel,
+[data-theme=dark] .rm-modal-panel {
+    background-image:
+        radial-gradient(circle at 100% 0%, rgba(56, 189, 248, 0.04), transparent 45%),
+        radial-gradient(circle at center, rgba(226, 232, 240, 0.065) 1px, transparent 1px);
+    background-size: 100% 100%, 20px 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.14);
+    box-shadow:
+        0 4px 6px -1px rgba(0, 0, 0, 0.4),
+        0 24px 56px -8px rgba(0, 0, 0, 0.7),
+        0 40px 80px -12px rgba(0, 0, 0, 0.5);
+}
+
+/* Atmosfera luminosa interactiva en la cabecera */
 .rm-modal-panel::before {
-    content: '';
-    position: absolute;
-    z-index: -1;
-    width: 220px;
-    height: 220px;
-    top: -150px;
-    right: -100px;
-    border-radius: 9999px;
-    background: radial-gradient(circle, color-mix(in srgb, var(--rm-action-primary) 12%, transparent), transparent 70%);
-    pointer-events: none;
+    content: ;
+ position: absolute;
+ top: 0;
+ left: 0;
+ right: 0;
+ height: 120px;
+ background: radial-gradient(ellipse 70% 100% at 50% -20%, color-mix(in srgb, var(--rm-action-primary) 14%, transparent), transparent 70%);
+ pointer-events: none;
+ z-index: 0;
+}
+
+.rm-modal-panel__title {
+ color: var(--rm-text-primary);
+ font-size: clamp(16px, 1.7vw, 18px);
+ font-weight: 800;
+ font-family: var(--rm-font-display);
+ letter-spacing: -0.015em;
+ position: relative;
+ z-index: 1;
+}
+
+/* Boton cerrar interactivo con rotacion suave y respuesta tactil */
+.rm-modal-panel__close {
+ display: inline-flex;
+ align-items: center;
+ justify-content: center;
+ width: 36px;
+ height: 36px;
+ min-width: 36px;
+ border-radius: 50%;
+ border: 1px solid transparent;
+ background: transparent;
+ color: var(--rm-text-secondary);
+ cursor: pointer;
+ transition: transform 220ms cubic-bezier(0.16, 1, 0.3, 1), background-color 180ms ease, color 180ms ease, border-color 180ms ease;
+ position: relative;
+ z-index: 1;
+}
+
+.rm-modal-panel__close:hover {
+ background: var(--rm-surface-raised);
+ border-color: var(--rm-border-soft);
+ color: var(--rm-text-primary);
+ transform: rotate(90deg) scale(1.08);
+}
+
+.rm-modal-panel__close:active {
+ transform: rotate(90deg) scale(0.92);
+}
+
+.rm-modal-panel__close:focus-visible {
+ outline: 2px solid var(--rm-focus);
+ outline-offset: 2px;
+}
+
+.rm-modal-header__heading {
+ display: flex;
+ align-items: flex-start;
+ gap: 10px;
+ min-width: 0;
+ position: relative;
+ z-index: 1;
+}
+
+/* Boton volver interactivo con desplazamiento haptico */
+.rm-modal-panel__back {
+ display: inline-flex;
+ align-items: center;
+ justify-content: center;
+ width: 36px;
+ height: 36px;
+ min-width: 36px;
+ border-radius: 50%;
+ border: 1px solid transparent;
+ flex: none;
+ color: var(--rm-text-secondary);
+ cursor: pointer;
+ transition: transform 180ms cubic-bezier(0.16, 1, 0.3, 1), background-color 180ms ease, color 180ms ease, border-color 180ms ease;
+}
+
+.rm-modal-panel__back:hover {
+ color: var(--rm-action-primary-ink);
+ background: var(--rm-action-primary-soft);
+ border-color: var(--rm-border-soft);
+ transform: translateX(-3px);
+}
+
+.rm-modal-panel__back:active {
+ transform: translateX(-5px) scale(0.94);
+}
+
+.rm-modal-panel__back:focus-visible {
+ outline: 2px solid var(--rm-focus);
+ outline-offset: 2px;
+}
+
+.rm-modal-context {
+ border-bottom: 1px solid var(--rm-modal-border);
+ background: var(--rm-surface-soft);
+ position: relative;
+ z-index: 1;
+}
+
+.rm-modal-header__actions {
+ display: flex;
+ align-items: center;
+ gap: 6px;
+ flex: none;
+ position: relative;
+ z-index: 1;
+}
+
+/* Drag Handle tactil */
+.rm-modal-panel__drag-handle {
+ display: inline-flex;
+ align-items: center;
+ justify-content: center;
+ gap: 5px;
+ min-width: 72px;
+ height: 34px;
+ padding: 0 10px;
+ border: 1px solid var(--rm-border-soft);
+ border-radius: var(--rm-radius-input);
+ background: var(--rm-surface-raised);
+ color: var(--rm-text-secondary);
+ font-size: 16px;
+ cursor: grab;
+ touch-action: none;
+ user-select: none;
+ transition: transform 150ms ease, border-color 150ms ease, background-color 150ms ease, color 150ms ease;
+}
+
+.rm-modal-panel__drag-handle span {
+ font-size: 11px;
+ font-weight: 750;
+ font-family: var(--rm-font-display);
+}
+
+.rm-modal-panel__drag-handle:hover {
+ border-color: var(--rm-selected-border);
+ color: var(--rm-action-primary-ink);
+ background: var(--rm-action-primary-soft);
+ transform: translateY(-1px);
+}
+
+.rm-modal-panel__drag-handle:active {
+ cursor: grabbing;
+ transform: scale(0.97);
+}
+
+.rm-modal-panel__drag-handle:focus-visible {
+ outline: 2px solid var(--rm-focus);
+ outline-offset: 2px;
+}
+
+.rm-modal-panel--danger .rm-modal-header {
+ border-top: 3px solid var(--rm-critical);
+}
+
+/* Transiciones cinematograficas y fluidas */
+.rm-modal-panel--enter {
+ transition: opacity 240ms cubic-bezier(0.16, 1, 0.3, 1), transform 240ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.rm-modal-panel--leave {
+ transition: opacity 180ms ease, transform 180ms ease;
+}
+
+.rm-modal-panel--closed {
+ opacity: 0;
+ transform: scale(0.95) translateY(12px);
+}
+
+.rm-modal-panel--open {
+ opacity: 1;
+ transform: scale(1) translateY(0);
+}
+
+@media (max-width: 640px) {
+ .rm-modal-panel { max-height: calc(100dvh - 16px); }
+ .rm-modal-panel__drag-handle { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+ .rm-modal-panel--enter, .rm-modal-panel--leave { transition-duration: 0.01ms; }
+}
+
+.rm-modal-backdrop {
+ position: fixed;
+ inset: 0;
+ z-index: 50;
+ display: flex;
+ align-items: center;
+ justify-content: center;
+ background: radial-gradient(ellipse at center, rgba(48, 44, 42, 0.42) 0%, rgba(24, 22, 21, 0.68) 100%);
+ backdrop-filter: blur(8px) saturate(125%);
+ -webkit-backdrop-filter: blur(8px) saturate(125%);
+ padding: var(--rm-space-4);
+ overflow-y: auto;
+ overscroll-behavior: contain;
+}
+
+@media (max-height: 800px) {
+ .rm-modal-backdrop {
+ align-items: flex-start;
+ padding-top: var(--rm-space-3);
+ padding-bottom: var(--rm-space-3);
+ }
+}
+
+.rm-modal {
+ width: 100%;
+ margin: auto 0;
+ background-color: var(--rm-modal-bg);
+ border: 1px solid var(--rm-modal-border);
+ border-top: 1px solid rgba(255, 255, 255, 0.85);
+ border-radius: var(--rm-modal-radius);
+ box-shadow: var(--rm-modal-shadow);
+ display: flex;
+ flex-direction: column;
+ max-height: calc(100vh - 32px);
+ position: relative;
+ overflow: hidden;
+ animation: rm-modal-in 240ms cubic-bezier(0.16, 1, 0.3, 1);
+ box-sizing: border-box;
 }
 
 @media (max-height: 700px) {
-    .rm-modal {
-        max-height: calc(100vh - 20px);
-    }
+ .rm-modal {
+ max-height: calc(100vh - 20px);
+ }
 }
 
-/* Tamaños */
+/* Tamanos */
 .rm-modal-sm { max-width: var(--rm-modal-sm); }
 .rm-modal-md { max-width: var(--rm-modal-md); }
 .rm-modal-lg { max-width: var(--rm-modal-lg); }
@@ -94,79 +344,117 @@
 
 /* Partes del Modal Compacto y Totalmente Accesible */
 .rm-modal-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: var(--rm-space-3) var(--rm-space-5);
-    border-bottom: 1px solid var(--rm-modal-border);
-    background-color: var(--rm-surface-soft);
-    flex-shrink: 0;
+ display: flex;
+ align-items: center;
+ justify-content: space-between;
+ padding: 12px 18px;
+ border-bottom: 1px solid var(--rm-modal-border);
+ background-color: var(--rm-surface-soft);
+ flex-shrink: 0;
+ position: relative;
+ z-index: 1;
 }
 
 .rm-modal-title {
-    font-family: var(--rm-font-family);
-    font-size: var(--rm-font-size-card);
-    font-weight: var(--rm-font-weight-bold);
-    color: var(--rm-text-primary);
-    letter-spacing: var(--rm-letter-spacing-tight);
+ font-family: var(--rm-font-display);
+ font-size: 15px;
+ font-weight: 750;
+ color: var(--rm-text-primary);
+ letter-spacing: -0.015em;
 }
 
 .rm-modal-body {
-    padding: var(--rm-space-5);
-    overflow-y: auto;
-    flex: 1 1 auto;
-    min-height: 0;
-    background-color: var(--rm-surface);
-    overscroll-behavior: contain;
+ padding: 16px 18px;
+ overflow-y: auto;
+ flex: 1 1 auto;
+ min-height: 0;
+ background-color: var(--rm-surface);
+ overscroll-behavior: contain;
+ scrollbar-width: thin;
+ scrollbar-color: var(--rm-border-soft) transparent;
+}
+
+.rm-modal-body::-webkit-scrollbar {
+ width: 5px;
+ height: 5px;
+}
+
+.rm-modal-body::-webkit-scrollbar-track {
+ background: transparent;
+}
+
+.rm-modal-body::-webkit-scrollbar-thumb {
+ background: var(--rm-border-soft);
+ border-radius: 9999px;
+}
+
+.rm-modal-body::-webkit-scrollbar-thumb:hover {
+ background: var(--rm-border-hover);
 }
 
 .rm-modal-footer {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: var(--rm-space-2);
-    padding: var(--rm-space-3) var(--rm-space-5);
-    border-top: 1px solid var(--rm-modal-border);
-    background-color: var(--rm-surface-soft);
-    flex-shrink: 0;
+ display: flex;
+ align-items: center;
+ justify-content: space-between;
+ gap: var(--rm-space-2);
+ padding: 12px 18px;
+ border-top: 1px solid var(--rm-modal-border);
+ background-color: var(--rm-surface-soft);
+ flex-shrink: 0;
+}
+
+.rm-modal-footer button,
+.rm-modal-footer a {
+ transition: transform 160ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 160ms ease, background-color 160ms ease, border-color 160ms ease;
+}
+
+.rm-modal-footer button:hover,
+.rm-modal-footer a:hover {
+ transform: translateY(-1px);
+}
+
+.rm-modal-footer button:active,
+.rm-modal-footer a:active {
+ transform: translateY(0) scale(0.98);
 }
 
 @keyframes rm-modal-in {
-    from {
-        opacity: 0;
-        transform: translateY(8px) scale(0.98);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-    }
+ from {
+ opacity: 0;
+ transform: translateY(12px) scale(0.95);
+ }
+ to {
+ opacity: 1;
+ transform: translateY(0) scale(1);
+ }
 }
 
 /* ============================================================
-   MODO OSCURO - MODALES
-   ============================================================ */
+ MODO OSCURO - MODALES
+ ============================================================ */
 .dark .rm-modal {
-    background-color: var(--rm-surface-raised);
-    border-color: var(--rm-border-soft);
-    box-shadow: var(--rm-modal-shadow);
-    color: var(--rm-text-primary);
+ background-color: var(--rm-surface-raised);
+ border-color: var(--rm-border-soft);
+ border-top-color: rgba(255, 255, 255, 0.12);
+ box-shadow: var(--rm-modal-shadow);
+ color: var(--rm-text-primary);
 }
 
 .dark .rm-modal-header {
-    background-color: var(--rm-surface-soft);
-    border-color: var(--rm-border-soft);
+ background-color: var(--rm-surface-soft);
+ border-color: var(--rm-border-soft);
 }
 
 .dark .rm-modal-title {
-    color: var(--rm-text-primary);
+ color: var(--rm-text-primary);
 }
 
 .dark .rm-modal-body {
-    background-color: var(--rm-surface);
-    color: var(--rm-text-body);
+ background-color: var(--rm-surface);
+ color: var(--rm-text-body);
 }
 
 .dark .rm-modal-footer {
-    background-color: var(--rm-surface-soft);
-    border-color: var(--rm-border-soft);
+ background-color: var(--rm-surface-soft);
+ border-color: var(--rm-border-soft);
 }

@@ -76,7 +76,7 @@
  <h3 class="text-sm font-bold uppercase tracking-widest">Censo de Residentes</h3>
  </div>
  <div class="overflow-x-auto">
- <table class="w-full text-left">
+ <table class="rm-data-table w-full text-left">
  <thead>
  <tr class="text-[10px] font-bold uppercase tracking-widest text-apoyo border-b border-borde">
  <th class="px-8 py-4">Residente</th>

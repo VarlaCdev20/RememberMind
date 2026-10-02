@@ -237,7 +237,9 @@ class IntegracionAdaptadoresV2Test extends TestCase
             }
         }
 
-        $faltantes = $usados->filter()->unique()->diff(Permission::pluck('name'))->values()->all();
+        // Las habilidades de Policy (por ejemplo, viewAny) no son permisos Spatie.
+        $faltantes = $usados->filter(fn ($permiso) => is_string($permiso) && str_contains($permiso, '.'))
+            ->unique()->diff(Permission::pluck('name'))->values()->all();
         $this->assertSame([], $faltantes, 'Hay comprobaciones con permisos no registrados.');
     }
 }

@@ -20,14 +20,14 @@ class AdminSeeder extends Seeder
      */
     public function run(): void
     {
-        if (! app()->environment('testing') && ! filter_var(env('SEED_DEMO_ACCOUNTS', false), FILTER_VALIDATE_BOOL)) {
-            $this->command?->warn('AdminSeeder omitido: las cuentas de demostración requieren SEED_DEMO_ACCOUNTS=true.');
+        if (! app()->environment('testing') && (! app()->environment('local') || ! filter_var(env('SEED_SAMPLE_ACCOUNTS', false), FILTER_VALIDATE_BOOL))) {
+            $this->command?->warn('AdminSeeder omitido: las cuentas de ejemplo requieren SEED_SAMPLE_ACCOUNTS=true en local.');
 
             return;
         }
 
         $cuentas = [
-            // 1. Superadministrador - Direccion General Casa Amandita
+            // 1. Superadministrador - cuenta histórica de soporte técnico
             [
                 'correo' => 'admincasaamandita@gmail.com',
                 'cod_usuario' => 'USU_0001',
@@ -215,6 +215,24 @@ class AdminSeeder extends Seeder
                     'celular' => '70012345',
                     'correo' => 'familiar@remembermind.com',
                     'direccion' => 'Av. Arce #2450',
+                    'estado' => 'ACTIVO',
+                ],
+            ],
+
+            // 11. Gerencia - Dirección institucional
+            [
+                'correo' => 'gerencia@remembermind.com',
+                'cod_usuario' => 'USU_0011',
+                'rol' => 'GERENTE',
+                'tipo_entidad' => 'personal',
+                'entidad' => [
+                    'cod_personal' => 'PER_0010',
+                    'nombres' => 'DIRECCION',
+                    'apellido_paterno' => 'INSTITUCIONAL',
+                    'numero_documento' => 'GER-0001',
+                    'profesion' => 'GERENCIA INSTITUCIONAL',
+                    'especialidad' => 'GESTION Y PLANIFICACION',
+                    'fecha_ingreso' => '2024-01-01',
                     'estado' => 'ACTIVO',
                 ],
             ],

@@ -35,10 +35,12 @@
   class="inline-flex items-center gap-2 rounded-xl border border-borde bg-fondo-card px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-parrafo transition hover:bg-fondo-panel">
   <i class="ph-bold ph-arrow-left"></i> Volver
   </a>
+  @can('aplicaciones_instrumento.crear')
   <button wire:click="nuevaEvaluacion()"
    class="inline-flex items-center gap-2 rounded-xl bg-boton-principal px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-inverso shadow-sm transition hover:-translate-y-0.5 hover:shadow-md active:scale-95">
   <i class="ph-bold ph-plus-circle text-sm"></i> Nueva Evaluación
   </button>
+  @endcan
  </div>
  </div>
 
@@ -91,42 +93,92 @@
  </div>
  @endif
 
- {{-- Filtros --}}
- <div class="rm-filter-bar flex flex-col gap-3 sm:flex-row sm:items-center">
- <div class="relative flex-1">
-  <i class="ph-bold ph-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-apoyo"></i>
-  <input wire:model.live.debounce.300ms="busqueda"
-   type="text"
-   placeholder="Buscar por nombre del paciente o CI..."
-   class="w-full rounded-xl border border-borde bg-fondo-card py-2.5 pl-10 pr-4 text-sm font-semibold text-titulo placeholder-apoyo outline-none transition focus:border-borde-focus">
- </div>
- <select wire:model.live="filtroAlerta"
-  class="rounded-xl border border-borde bg-fondo-card px-4 py-2.5 text-sm font-bold text-titulo outline-none transition focus:border-borde-focus">
-  <option value="">Todos los niveles</option>
-  <option value="NORMAL">Normal</option>
-  <option value="PREVENTIVO">Preventivo</option>
-  <option value="CRITICO">Crítico</option>
- </select>
- <select wire:model.live="filtroInstrumento"
-  class="rounded-xl border border-borde bg-fondo-card px-4 py-2.5 text-sm font-bold text-titulo outline-none transition focus:border-borde-focus">
-  <option value="">Todos los instrumentos</option>
-  @foreach($instrumentos as $inst)
-  <option value="{{ $inst->cod_instrumento }}">{{ $inst->siglas }} — {{ $inst->nombre }}</option>
-  @endforeach
- </select>
- @if($busqueda || $filtroAlerta || $filtroInstrumento)
- <button wire:click="$set('busqueda', ''); $set('filtroAlerta', ''); $set('filtroInstrumento', '')"
-  class="rm-filter-reset">
-  <i class="ph-bold ph-x"></i> Limpiar
- </button>
- @endif
- </div>
+     {{-- Filtros --}}
+    <x-ui.filter-bar class="mb-4">
+        <div class="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-2 items-center">
+            {{-- Búsqueda textual --}}
+            <div class="lg:col-span-6 relative flex items-center">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-[var(--rm-text-secondary)]">
+                    <i class="ph-bold ph-magnifying-glass text-base"></i>
+                </span>
+                <input wire:model.live.debounce.300ms="busqueda"
+                    type="text"
+                    placeholder="Buscar por nombre del paciente o CI..."
+                    class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-input-bg)] py-2 pl-9 pr-8 text-xs font-medium text-[var(--rm-text-primary)] placeholder-[var(--rm-text-secondary)] focus:border-[var(--rm-primary)] focus:ring-1 focus:ring-[var(--rm-primary)] focus:outline-none h-[38px]" />
+                @if(!empty($busqueda))
+                    <button type="button"
+                        wire:click="$set('busqueda', '')"
+                        class="absolute inset-y-0 right-0 flex items-center pr-2.5 text-[var(--rm-text-secondary)] hover:text-[var(--rm-primary)] cursor-pointer"
+                        title="Limpiar búsqueda">
+                        <i class="ph-bold ph-x-circle text-base"></i>
+                    </button>
+                @endif
+            </div>
+
+            {{-- Filtro Alerta --}}
+            <div class="lg:col-span-3">
+                <select wire:model.live="filtroAlerta"
+                    class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-input-bg)] py-2 px-3 text-xs font-medium text-[var(--rm-text-primary)] focus:border-[var(--rm-primary)] focus:ring-1 focus:ring-[var(--rm-primary)] focus:outline-none h-[38px]">
+                    <option value="">Todos los niveles</option>
+                    <option value="NORMAL">Normal</option>
+                    <option value="PREVENTIVO">Preventivo</option>
+                    <option value="CRITICO">Crítico</option>
+                </select>
+            </div>
+
+            {{-- Filtro Instrumento --}}
+            <div class="lg:col-span-3">
+                <select wire:model.live="filtroInstrumento"
+                    class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-input-bg)] py-2 px-3 text-xs font-medium text-[var(--rm-text-primary)] focus:border-[var(--rm-primary)] focus:ring-1 focus:ring-[var(--rm-primary)] focus:outline-none h-[38px]">
+                    <option value="">Todos los instrumentos</option>
+                    @foreach($instrumentos as $inst)
+                        <option value="{{ $inst->cod_instrumento }}">{{ $inst->siglas }} — {{ $inst->nombre }}</option>
+                    @endforeach
+                </select>
+            </div>
+        </div>
+
+        @php
+            $hasFiltrosActivos = !empty($busqueda) || !empty($filtroAlerta) || !empty($filtroInstrumento);
+        @endphp
+        @if($hasFiltrosActivos)
+            <div class="rm-filter-bar__active">
+                <div class="flex flex-wrap items-center gap-1.5">
+                    <span class="rm-filter-bar__active-label">
+                        <i class="ph-bold ph-funnel text-xs"></i> Filtros activos:
+                    </span>
+                    @if(!empty($busqueda))
+                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[var(--rm-surface-alt)] border border-[var(--rm-border)] text-[11px] font-semibold text-[var(--rm-text-primary)]">
+                            <span>Búsqueda: "{{ Str::limit($busqueda, 16) }}"</span>
+                            <button type="button" wire:click="$set('busqueda', '')" class="hover:text-[var(--rm-primary)] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
+                        </span>
+                    @endif
+                    @if(!empty($filtroAlerta))
+                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[var(--rm-surface-alt)] border border-[var(--rm-border)] text-[11px] font-semibold text-[var(--rm-text-primary)]">
+                            <span>Alerta: {{ $filtroAlerta }}</span>
+                            <button type="button" wire:click="$set('filtroAlerta', '')" class="hover:text-[var(--rm-primary)] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
+                        </span>
+                    @endif
+                    @if(!empty($filtroInstrumento))
+                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[var(--rm-surface-alt)] border border-[var(--rm-border)] text-[11px] font-semibold text-[var(--rm-text-primary)]">
+                            <span>Instrumento seleccionado</span>
+                            <button type="button" wire:click="$set('filtroInstrumento', '')" class="hover:text-[var(--rm-primary)] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
+                        </span>
+                    @endif
+                </div>
+                <button type="button" wire:click="$set('busqueda', ''); $set('filtroAlerta', ''); $set('filtroInstrumento', '')" class="rm-filter-bar__clear-btn">
+                    <i class="ph-bold ph-arrow-counter-clockwise text-xs"></i>
+                    Limpiar filtros
+                </button>
+            </div>
+        @endif
+    </x-ui.filter-bar>
 
  {{-- Tabla de evaluaciones --}}
  <div class="rounded-3xl border border-borde bg-fondo-card shadow-sm overflow-hidden">
  @if($evaluaciones->count() > 0)
  <div class="overflow-x-auto">
-  <table class="w-full text-left text-sm whitespace-nowrap">
+  <table class="rm-data-table rm-data-table--actions w-full text-left text-sm whitespace-nowrap">
   <thead class="bg-fondo-panel text-[10px] font-bold uppercase tracking-wider text-apoyo">
    <tr>
    <th class="px-5 py-3">Paciente</th>
@@ -136,7 +188,7 @@
    <th class="px-5 py-3">Nivel Alerta</th>
    <th class="px-5 py-3">Evaluador</th>
    <th class="px-5 py-3">Fecha</th>
-   <th class="px-5 py-3 text-center">Acción</th>
+   @can('aplicaciones_instrumento.crear')<th class="px-5 py-3 text-center">Acción</th>@endcan
    </tr>
   </thead>
   <tbody class="divide-y divide-borde/50">
@@ -187,6 +239,7 @@
    <td class="px-5 py-3 text-xs font-medium text-apoyo">
     {{ $eval->fecha_eval ? \Carbon\Carbon::parse($eval->fecha_eval)->format('d/m/Y') : '—' }}
    </td>
+   @can('aplicaciones_instrumento.crear')
    <td class="px-5 py-3 text-center">
     <button wire:click="nuevaEvaluacion('{{ $eval->adulto?->cod_residente }}')"
      title="Nueva evaluación para este paciente"
@@ -194,6 +247,7 @@
     <i class="ph-bold ph-plus text-sm"></i>
     </button>
    </td>
+   @endcan
    </tr>
    @endforeach
   </tbody>
@@ -220,7 +274,7 @@
    Registra la primera evaluación de <strong>{{ $nombreArea }}</strong> para un adulto mayor.
   @endif
   </p>
-  @if(!$busqueda && !$filtroAlerta && !$filtroInstrumento)
+  @if(!$busqueda && !$filtroAlerta && !$filtroInstrumento && auth()->user()?->can('aplicaciones_instrumento.crear'))
   <button wire:click="nuevaEvaluacion()"
    class="mt-5 inline-flex items-center gap-2 rounded-xl bg-boton-principal px-5 py-2.5 text-xs font-bold uppercase tracking-wider text-inverso shadow-md transition hover:-translate-y-0.5 active:scale-95">
   <i class="ph-bold ph-plus-circle text-sm"></i> Nueva Evaluación
@@ -257,6 +311,8 @@
  </div>
 
  {{-- Modal de nueva evaluación --}}
+ @can('aplicaciones_instrumento.crear')
  @livewire('valoraciones.evaluacion-geriatrica-area-modal')
+ @endcan
 
 </div>

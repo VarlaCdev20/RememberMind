@@ -41,7 +41,8 @@ class RolesVistasPermisosMatrixTest extends TestCase
         $admin = $this->crearUsuarioConRol('ADMINISTRADOR');
 
         $response = $this->actingAs($admin)->get(route('dashboard'));
-        $response->assertOk();
+        $response->assertRedirect(route('admin.administracion.dashboard'));
+        $this->get(route('admin.administracion.dashboard'))->assertOk();
     }
 
     public function test_medico_se_redirige_a_dashboard_medico_y_no_enfermeria(): void
@@ -89,7 +90,7 @@ class RolesVistasPermisosMatrixTest extends TestCase
         $this->get(route('admin.habitaciones.index'))->assertOk();
         $this->get(route('admin.turnos-enfermeria.index'))->assertOk();
         $this->get(route('admin.actividades.index'))->assertOk();
-        $this->get(route('admin.usuarios.index'))->assertOk();
+        $this->get(route('admin.usuarios.index'))->assertForbidden();
     }
 
     public function test_medico_tiene_permisos_y_endpoints_v2_clinicos(): void
@@ -155,7 +156,7 @@ class RolesVistasPermisosMatrixTest extends TestCase
         $familiar = $this->crearUsuarioConRol('FAMILIAR');
 
         $this->assertFalse($admin->can('atenciones.crear'), 'Administrador no debe tener atenciones.crear');
-        $this->assertTrue($admin->can('atenciones.ver'), 'Administrador puede ver atenciones');
+        $this->assertFalse($admin->can('atenciones.ver'), 'Administrador no consulta atenciones clínicas');
         $this->assertFalse($admin->can('diagnosticos.crear'));
 
         $this->assertFalse($superadmin->can('atenciones.crear'), 'Superadmin puro no debe tener atenciones.crear');

@@ -63,7 +63,7 @@ class EnfermeriaV2Test extends TestCase
     public function test_superadministrador_conserva_lectura_pero_no_escribe_como_enfermeria(): void
     {
         [, $residente] = $this->escenarioAsignado();
-        $super = User::query()->where('correo', 'admincasaamandita@gmail.com')->firstOrFail();
+        $super = User::query()->where('correo', 'carlaencinas78@gmail.com')->firstOrFail();
         $service = app(TurnoEnfermeriaService::class);
 
         $this->assertTrue($service->esPacienteAsignado($residente, $super));
@@ -73,8 +73,8 @@ class EnfermeriaV2Test extends TestCase
 
     public function test_panel_restaurado_gestiona_turnos_en_la_tabla_v2(): void
     {
-        $super = User::query()->where('correo', 'admincasaamandita@gmail.com')->firstOrFail();
-        $this->actingAs($super);
+        $gerente = User::query()->where('correo', 'gerencia@remembermind.com')->firstOrFail();
+        $this->actingAs($gerente);
 
         Livewire::test(TurnosEnfermeriaPanel::class)
             ->call('abrirCrear')
@@ -96,7 +96,7 @@ class EnfermeriaV2Test extends TestCase
     public function test_panel_restaurado_asigna_residente_a_jornada_v2_sin_modificar_su_cama(): void
     {
         [$enfermera, , $turno] = $this->escenarioAsignado();
-        $super = User::query()->where('correo', 'admincasaamandita@gmail.com')->firstOrFail();
+        $admin = User::query()->where('correo', 'administracion@remembermind.com')->firstOrFail();
         $residente = Residente::crearDesdeAdmision([
             'cod_residente' => 'RES_ASIGNACION_PANEL',
             'nombres' => 'Julia',
@@ -106,7 +106,7 @@ class EnfermeriaV2Test extends TestCase
         ]);
         $ocupacionesAntes = $residente->ocupacionesCama()->count();
 
-        $this->actingAs($super);
+        $this->actingAs($admin);
 
         Livewire::test(AsignacionTurnoPanel::class)
             ->call('abrirCrear')

@@ -268,7 +268,7 @@
  </section>
  @else
  <section class="space-y-4 animate-in fade-in duration-200">
- <section class="rm-filter-bar">
+ <x-ui.filter-bar class="mb-4">
  <div class="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between border-b border-[var(--rm-border-soft)] pb-2">
   <div>
   <span class="text-[10px] font-black uppercase tracking-[0.15em] text-[var(--rm-action-primary)] ">{{ $contexto['titulo'] }}</span>
@@ -356,7 +356,7 @@
   </div>
   </div>
  @endif
- </section>
+ </x-ui.filter-bar>
  </div>
 
  <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">

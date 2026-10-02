@@ -4,7 +4,7 @@
         width: 100%;
         text-align: left;
         font-family: var(--font-ui);
-        font-size: 0.875rem;
+        font-size: 0.8125rem;
     }
 
     .rm-table-header {
@@ -19,7 +19,7 @@
     }
 
     .rm-table-header th {
-        padding: 0.5rem 1rem;
+        padding: 0.4rem 0.75rem;
     }
 
     .rm-table-row {
@@ -34,13 +34,13 @@
     }
 
     .rm-table-row td {
-        padding: 0.625rem 1rem;
+        padding: 0.45rem 0.75rem;
     }
 
     .rm-table-cell-label {
         color: var(--color-tabla-cell-label);
         font-family: var(--font-body);
-        font-size: var(--text-sm);
+        font-size: 0.8125rem;
         font-weight: var(--font-bold);
     }
 

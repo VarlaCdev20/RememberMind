@@ -20,13 +20,23 @@ class FiltrosDisenoUnificadoTest extends TestCase
             }
 
             $contenido = file_get_contents($archivo->getPathname());
+            $rutaRelativa = str_replace('\\', '/', str_replace($directorio.DIRECTORY_SEPARATOR, '', $archivo->getPathname()));
+
+            // La búsqueda global del encabezado no es una barra de filtros de pantalla.
+            if ($rutaRelativa === 'components/layout/topbar-enfermeria.blade.php') {
+                continue;
+            }
+
             $tieneFiltroReactivo = preg_match(
                 '/wire:model[^\r\n]*(?:filtro|buscar|search)|name=["\'][^"\']*(?:buscar|filtro|search)/i',
                 $contenido
             ) === 1;
 
-            if ($tieneFiltroReactivo && ! str_contains($contenido, 'rm-filter-bar')) {
-                $sinBarraCanonica[] = str_replace($directorio.DIRECTORY_SEPARATOR, '', $archivo->getPathname());
+            $usaBarraCanonica = str_contains($contenido, '<x-ui.filter-bar')
+                || str_contains($contenido, 'rm-filter-bar');
+
+            if ($tieneFiltroReactivo && ! $usaBarraCanonica) {
+                $sinBarraCanonica[] = $rutaRelativa;
             }
         }
 
@@ -43,8 +53,8 @@ class FiltrosDisenoUnificadoTest extends TestCase
         $componente = file_get_contents(resource_path('views/components/ui/filter-bar.blade.php'));
 
         $this->assertStringContainsString('.rm-filter-bar.rm-filter-bar', $css);
-        $this->assertStringContainsString('var(--color-input-bg)', $css);
-        $this->assertStringContainsString('var(--color-input-borde-focus)', $css);
+        $this->assertStringContainsString('var(--rm-input-bg)', $css);
+        $this->assertStringContainsString('var(--rm-primary)', $css);
         $this->assertDoesNotMatchRegularExpression('/#[0-9a-f]{3,8}\b/i', $css);
         $this->assertStringContainsString('rm-filter-bar', $componente);
     }

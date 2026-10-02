@@ -6,6 +6,7 @@ use App\Backend\Modulos\Enfermeria\Servicios\TurnoEnfermeriaService;
 use App\Models\AdministracionMedicacion;
 use App\Models\AsignacionResidenteJornada;
 use App\Models\Prescripcion;
+use App\Models\HorarioPrescripcion;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -31,6 +32,7 @@ class RegistrarAdministracionMedicacionService
         mixed $dosisAdministrada = null,
         ?string $reaccionAdversa = null,
         ?string $fechaHoraAdministracion = null,
+        ?string $codHorario = null,
     ): AdministracionMedicacion {
         $turno = $this->turnos->autorizarMutacionPaciente(
             $codResidente,
@@ -40,7 +42,8 @@ class RegistrarAdministracionMedicacionService
         $hora = $this->normalizarHora($horaOcurrencia);
         $ocurrencia = $this->agenda->paraAdulto($codResidente)
             ->first(fn (array $item) => $item['medicacion']->cod_prescripcion === $codPrescripcion
-                && $item['hora'] === $hora);
+                && $item['hora'] === $hora
+                && ($codHorario === null || $item['horario']->cod_horario_prescripcion === $codHorario));
 
         $this->exigir($ocurrencia !== null, 'La dosis no corresponde a un horario activo de hoy.');
         $this->exigir($ocurrencia['registro'] === null, 'Esta dosis ya tiene una administración u omisión registrada.', 'cod_prescripcion');
@@ -75,19 +78,31 @@ class RegistrarAdministracionMedicacionService
             $personal,
             $asignacion,
             $ocurrencia,
+            $codHorario,
         ): AdministracionMedicacion {
             $prescripcion = Prescripcion::query()
                 ->whereKey($codPrescripcion)
                 ->where('cod_residente', $codResidente)
                 ->whereIn('estado', ['ACTIVA', 'ACTIVO'])
+                ->where('segun_necesidad', false)
+                ->where('fecha_hora_prescripcion', '<=', now())
                 ->lockForUpdate()
                 ->first();
             $this->exigir($prescripcion !== null, 'La prescripción no pertenece al residente o ya no está activa.');
 
+            $horario = HorarioPrescripcion::query()
+                ->whereKey($ocurrencia['horario']->cod_horario_prescripcion)
+                ->where('cod_prescripcion', $prescripcion->cod_prescripcion)
+                ->where('estado', 'ACTIVO')
+                ->lockForUpdate()
+                ->first();
+            $this->exigir($horario !== null && ($codHorario === null || $horario->cod_horario_prescripcion === $codHorario),
+                'El horario programado no corresponde a la prescripción activa.', 'cod_horario_prescripcion');
+
             $programada = Carbon::parse(today()->toDateString().' '.$hora);
             $duplicada = AdministracionMedicacion::query()
                 ->where('cod_prescripcion', $codPrescripcion)
-                ->where('cod_horario_prescripcion', $ocurrencia['horario']->cod_horario_prescripcion)
+                ->where('cod_horario_prescripcion', $horario->cod_horario_prescripcion)
                 ->whereDate('fecha_hora_programada', today())
                 ->lockForUpdate()
                 ->exists();
@@ -96,7 +111,7 @@ class RegistrarAdministracionMedicacionService
             return AdministracionMedicacion::query()->create([
                 'cod_administracion' => 'ADM_'.Str::upper(Str::random(12)),
                 'cod_prescripcion' => $prescripcion->cod_prescripcion,
-                'cod_horario_prescripcion' => $ocurrencia['horario']->cod_horario_prescripcion,
+                'cod_horario_prescripcion' => $horario->cod_horario_prescripcion,
                 'cod_residente' => $codResidente,
                 'cod_jornada' => $asignacion->cod_jornada,
                 'cod_personal' => $personal->cod_personal,
@@ -106,7 +121,7 @@ class RegistrarAdministracionMedicacionService
                     : null,
                 'resultado' => $administrada ? 'ADMINISTRADA' : 'OMITIDA',
                 'dosis_administrada' => $administrada
-                    ? ($dosisAdministrada !== null ? $dosisAdministrada : ($ocurrencia['horario']->dosis_programada ?? $prescripcion->dosis))
+                    ? ($dosisAdministrada !== null ? $dosisAdministrada : ($horario->dosis_programada ?? $prescripcion->dosis))
                     : null,
                 'motivo_omision' => $administrada ? null : trim((string) $motivoOmision),
                 'efecto_observado' => filled($efectoObservado) ? trim((string) $efectoObservado) : null,

@@ -545,7 +545,7 @@
    </div>
 
    <div class="rounded-xl border border-[var(--rm-border)] overflow-hidden shadow-2xs">
-   <table class="rm-drawer-table">
+   <table class="rm-data-table rm-drawer-table">
     <thead>
     <tr>
      <th>Fecha / Hora</th>

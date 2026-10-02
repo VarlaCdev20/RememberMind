@@ -82,71 +82,119 @@
  @endforeach
  </section>
 
- {{-- ── FILTROS Y BÚSQUEDA ───────────────────────────────────────────── --}}
- <section class="rm-filter-bar overflow-hidden">
- <div class="border-b border-borde-suave bg-fondo-panel px-5 py-3">
- <div class="flex items-center gap-2">
- <i class="ph-bold ph-funnel text-apoyo text-base"></i>
- <span class="text-[10px] font-bold uppercase tracking-[0.15em] text-titulo">Filtros y búsqueda</span>
- </div>
- </div>
- <div class="p-4">
- <div class="flex flex-wrap gap-3 items-end">
- {{-- Búsqueda --}}
- <div class="min-w-[180px] flex-1">
- <label class="{{ $labelCls }}">Buscar adulto mayor</label>
- <div class="relative">
- <span class="pointer-events-none absolute inset-y-0 left-3 flex items-center text-apoyo">
- <i class="ph-bold ph-magnifying-glass text-sm"></i>
- </span>
- <input wire:model.live.debounce.300ms="search"
- type="text" placeholder="Nombre o apellido..."
- class="{{ $inputCls }} pl-8" />
- </div>
- </div>
- {{-- Tipo --}}
- <div class="min-w-[160px] flex-1">
- <label class="{{ $labelCls }}">Tipo de actividad</label>
- <select wire:model.live="filtroTipo" class="{{ $inputCls }}">
- <option value="">Todos los tipos</option>
- @foreach($tipos as $tipo)
- <option value="{{ $tipo->cod_tipo_act }}">{{ $tipo->tipo }}</option>
- @endforeach
- </select>
- </div>
- {{-- Estado --}}
- <div class="min-w-[140px] flex-1">
- <label class="{{ $labelCls }}">Estado</label>
- <select wire:model.live="filtroEstado" class="{{ $inputCls }}">
- <option value="">Todos los estados</option>
- <option value="PROGRAMADA">Programada</option>
- <option value="REALIZADA">Realizada</option>
- <option value="COMPLETADA">Completada</option>
- <option value="CANCELADA">Cancelada</option>
- <option value="REPROGRAMADA">Reprogramada</option>
- </select>
- </div>
- {{-- Fecha desde --}}
- <div class="min-w-[140px]">
- <label class="{{ $labelCls }}">Desde</label>
- <input wire:model.live="filtroFechaDesde" type="date" class="{{ $inputCls }}" />
- </div>
- {{-- Fecha hasta --}}
- <div class="min-w-[140px]">
- <label class="{{ $labelCls }}">Hasta</label>
- <input wire:model.live="filtroFechaHasta" type="date" class="{{ $inputCls }}" />
- </div>
- {{-- Limpiar --}}
- <div>
- <button wire:click="limpiarFiltros"
- class="rm-filter-reset">
- <i class="ph-bold ph-x text-xs"></i>
- Limpiar
- </button>
- </div>
- </div>
- </div>
- </section>
+     {{-- ── FILTROS Y BÚSQUEDA ───────────────────────────────────────────── --}}
+    <x-ui.filter-bar class="mb-4">
+        <div class="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-2 items-center">
+            {{-- Búsqueda textual --}}
+            <div class="lg:col-span-3 relative flex items-center">
+                <span class="rm-filter-search-icon absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-[var(--rm-text-secondary)]">
+                    <i class="ph-bold ph-magnifying-glass text-base"></i>
+                </span>
+                <input wire:model.live.debounce.300ms="search"
+                    type="text"
+                    placeholder="Buscar adulto mayor..."
+                    class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-input-bg)] py-2 pl-9 pr-8 text-xs font-medium text-[var(--rm-text-primary)] placeholder-[var(--rm-text-secondary)] focus:border-[var(--rm-primary)] focus:ring-1 focus:ring-[var(--rm-primary)] focus:outline-none h-[38px]" />
+                @if(!empty($search))
+                    <button type="button"
+                        wire:click="$set('search', '')"
+                        class="rm-filter-clear absolute inset-y-0 right-0 flex items-center pr-2.5 text-[var(--rm-text-secondary)] hover:text-[var(--rm-danger)] cursor-pointer"
+                        title="Limpiar búsqueda">
+                        <i class="ph-bold ph-x-circle text-base"></i>
+                    </button>
+                @endif
+            </div>
+
+            {{-- Tipo de actividad --}}
+            <div class="lg:col-span-3">
+                <select wire:model.live="filtroTipo"
+                    class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-input-bg)] py-2 px-3 text-xs font-medium text-[var(--rm-text-primary)] focus:border-[var(--rm-primary)] focus:ring-1 focus:ring-[var(--rm-primary)] focus:outline-none h-[38px]">
+                    <option value="">Todos los tipos</option>
+                    @foreach($tipos as $tipo)
+                        <option value="{{ $tipo->cod_tipo_act }}">{{ $tipo->tipo }}</option>
+                    @endforeach
+                </select>
+            </div>
+
+            {{-- Estado --}}
+            <div class="lg:col-span-2">
+                <select wire:model.live="filtroEstado"
+                    class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-input-bg)] py-2 px-3 text-xs font-medium text-[var(--rm-text-primary)] focus:border-[var(--rm-primary)] focus:ring-1 focus:ring-[var(--rm-primary)] focus:outline-none h-[38px]">
+                    <option value="">Todos los estados</option>
+                    <option value="PROGRAMADA">Programada</option>
+                    <option value="REALIZADA">Realizada</option>
+                    <option value="COMPLETADA">Completada</option>
+                    <option value="CANCELADA">Cancelada</option>
+                    <option value="REPROGRAMADA">Reprogramada</option>
+                </select>
+            </div>
+
+            {{-- Fecha Desde --}}
+            <div class="lg:col-span-2">
+                <input wire:model.live="filtroFechaDesde"
+                    type="date"
+                    class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-input-bg)] py-2 px-3 text-xs font-medium text-[var(--rm-text-primary)] focus:border-[var(--rm-primary)] focus:ring-1 focus:ring-[var(--rm-primary)] focus:outline-none h-[38px]" />
+            </div>
+
+            {{-- Fecha Hasta --}}
+            <div class="lg:col-span-2">
+                <input wire:model.live="filtroFechaHasta"
+                    type="date"
+                    class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-input-bg)] py-2 px-3 text-xs font-medium text-[var(--rm-text-primary)] focus:border-[var(--rm-primary)] focus:ring-1 focus:ring-[var(--rm-primary)] focus:outline-none h-[38px]" />
+            </div>
+        </div>
+
+        @php
+            $hasFiltrosActivos = !empty($search) || !empty($filtroTipo) || !empty($filtroEstado) || !empty($filtroFechaDesde) || !empty($filtroFechaHasta);
+        @endphp
+        @if($hasFiltrosActivos)
+            <div class="rm-filter-bar__active">
+                <div class="rm-filter-scroll">
+                    <span class="rm-filter-bar__active-label">
+                        <i class="ph-bold ph-funnel text-xs"></i> Filtros activos:
+                    </span>
+                    @if(!empty($search))
+                        <span class="rm-filter-chip rm-filter-chip--search">
+                            <i class="ph-bold ph-magnifying-glass text-xs"></i>
+                            <span>B?squeda: "{{ Str::limit($search, 16) }}"</span>
+                            <button type="button" wire:click="$set('search', '')" title="Quitar filtro"><i class="ph-bold ph-x text-xs"></i></button>
+                        </span>
+                    @endif
+                    @if(!empty($filtroTipo))
+                        <span class="rm-filter-chip rm-filter-chip--clinical">
+                            <i class="ph-bold ph-tag text-xs"></i>
+                            <span>Tipo seleccionado</span>
+                            <button type="button" wire:click="$set('filtroTipo', '')" title="Quitar filtro"><i class="ph-bold ph-x text-xs"></i></button>
+                        </span>
+                    @endif
+                    @if(!empty($filtroEstado))
+                        <span class="rm-filter-chip {{ $filtroEstado === 'COMPLETADA' || $filtroEstado === 'REALIZADA' ? 'rm-filter-chip--success' : ($filtroEstado === 'CANCELADA' ? 'rm-filter-chip--danger' : 'rm-filter-chip--warning') }}">
+                            <span class="w-1.5 h-1.5 rounded-full {{ $filtroEstado === 'COMPLETADA' || $filtroEstado === 'REALIZADA' ? 'bg-[var(--rm-action-primary)]' : ($filtroEstado === 'CANCELADA' ? 'bg-[var(--rm-danger)]' : 'bg-[var(--rm-status-high)]') }}"></span>
+                            <span>Estado: {{ $filtroEstado }}</span>
+                            <button type="button" wire:click="$set('filtroEstado', '')" title="Quitar filtro"><i class="ph-bold ph-x text-xs"></i></button>
+                        </span>
+                    @endif
+                    @if(!empty($filtroFechaDesde))
+                        <span class="rm-filter-chip rm-filter-chip--info">
+                            <i class="ph-bold ph-calendar text-xs"></i>
+                            <span>Desde: {{ $filtroFechaDesde }}</span>
+                            <button type="button" wire:click="$set('filtroFechaDesde', '')" title="Quitar filtro"><i class="ph-bold ph-x text-xs"></i></button>
+                        </span>
+                    @endif
+                    @if(!empty($filtroFechaHasta))
+                        <span class="rm-filter-chip rm-filter-chip--info">
+                            <i class="ph-bold ph-calendar text-xs"></i>
+                            <span>Hasta: {{ $filtroFechaHasta }}</span>
+                            <button type="button" wire:click="$set('filtroFechaHasta', '')" title="Quitar filtro"><i class="ph-bold ph-x text-xs"></i></button>
+                        </span>
+                    @endif
+                    <button type="button" wire:click="limpiarFiltros" class="rm-filter-bar__clear-btn">
+                        <i class="ph-bold ph-arrow-counter-clockwise text-xs"></i>
+                        <span>Limpiar filtros</span>
+                    </button>
+                </div>
+            </div>
+        @endif
+    </x-ui.filter-bar>
 
  {{-- ── TABLA DE ACTIVIDADES ─────────────────────────────────────────── --}}
  @php /** @var \Illuminate\Pagination\LengthAwarePaginator $actividades */ @endphp
@@ -173,7 +221,7 @@
  @else
  <div class="overflow-x-auto" wire:loading.class="opacity-50 transition-opacity"
  wire:target="search,filtroTipo,filtroEstado,filtroFechaDesde,filtroFechaHasta">
- <table class="w-full min-w-[700px] text-xs">
+ <table class="rm-data-table rm-data-table--actions w-full min-w-[700px] text-xs">
  <thead>
  <tr class="border-b border-borde-suave">
  <th class="pb-2.5 text-left font-black uppercase tracking-[0.12em] text-apoyo">Adulto mayor</th>

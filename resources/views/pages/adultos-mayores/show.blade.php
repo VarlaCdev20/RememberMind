@@ -87,9 +87,21 @@
  $totalEvaluaciones = count($evaluacionesLista);
  $totalAsignaciones = count($asignacionesLista);
 
+ $permisosCarpetas = [
+ 'identificacion' => 'residentes.ver',
+ 'red_apoyo' => 'residentes_contactos.ver',
+ 'documentos' => 'documentos.ver',
+ 'salud' => 'atenciones.ver',
+ 'cognitivo' => 'aplicaciones_instrumento.ver',
+ 'participacion' => 'actividades.ver',
+ 'historial' => 'notas_clinicas.ver',
+ 'reportes' => 'reportes.individual',
+ ];
+
  $tabSolicitada = request('tab', 'identificacion');
  $tabInicial = ['familiares'=>'red_apoyo','evaluaciones'=>'cognitivo','atenciones'=>'salud','medicacion'=>'salud','observaciones'=>'historial'][$tabSolicitada] ?? $tabSolicitada;
  if (!in_array($tabInicial, ['identificacion','red_apoyo','documentos','salud','cognitivo','participacion','historial','reportes'])) $tabInicial = 'identificacion';
+ if (!auth()->user()?->can($permisosCarpetas[$tabInicial])) $tabInicial = 'identificacion';
 @endphp
 
  <div
@@ -119,6 +131,7 @@
  <x-residentes.navegacion-ficha :adulto="$adulto" />
 
  {{-- 2. Estado del Expediente --}}
+ @can('atenciones.ver')
  <div class="mb-6 rounded-[24px] border border-borde bg-fondo-card p-5 shadow-sm">
  <h3 class="mb-4 text-xs font-bold uppercase tracking-widest text-apoyo">Estado de completitud del expediente</h3>
  <div class="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-6">
@@ -148,6 +161,7 @@
  </div>
  </div>
  </div>
+ @endcan
 
  {{-- 3 y 4. Layout 2 Columnas: Carpetas y Contenido --}}
  <div class="flex flex-col lg:flex-row gap-6">
@@ -171,6 +185,7 @@
  @endphp
 
  @foreach($carpetas as $carpeta)
+ @if(auth()->user()?->can($permisosCarpetas[$carpeta['id']]))
  <button type="button" @click="carpetaActiva = '{{ $carpeta['id'] }}'"
  class="flex items-center justify-between rounded-xl px-4 py-3 text-left transition"
  :class="carpetaActiva === '{{ $carpeta['id'] }}' ? 'bg-fondo-panel shadow-sm border border-borde-suave text-titulo' : 'text-apoyo hover:bg-fondo-panel border border-transparent'">
@@ -180,6 +195,7 @@
  </div>
  <span class="text-[10px] font-bold text-apoyo">{{ $carpeta['status'] }}</span>
  </button>
+ @endif
  @endforeach
  </div>
  </div>
@@ -191,37 +207,57 @@
  </div>
 
  <div x-show="carpetaActiva === 'red_apoyo'" x-transition style="display: none;">
+ @can('residentes_contactos.ver')
  @include('pages.adultos-mayores.show.carpetas._red-apoyo')
+ @endcan
  </div>
 
  <div x-show="carpetaActiva === 'documentos'" x-transition style="display: none;">
+ @can('documentos.ver')
  @include('pages.adultos-mayores.show.carpetas._documentos')
+ @endcan
  </div>
 
  <div x-show="carpetaActiva === 'salud'" x-transition style="display: none;">
+ @can('atenciones.ver')
  @include('pages.adultos-mayores.show.carpetas._salud')
+ @endcan
  </div>
 
  <div x-show="carpetaActiva === 'cognitivo'" x-transition style="display: none;">
+ @can('aplicaciones_instrumento.ver')
  @include('pages.adultos-mayores.show.carpetas._cognitivo')
+ @endcan
  </div>
 
  <div x-show="carpetaActiva === 'participacion'" x-transition style="display: none;">
+ @can('actividades.ver')
  @include('pages.adultos-mayores.show.carpetas._participacion')
+ @endcan
  </div>
 
  <div x-show="carpetaActiva === 'historial'" x-transition style="display: none;">
+ @can('notas_clinicas.ver')
  @include('pages.adultos-mayores.show.carpetas._historial')
+ @endcan
  </div>
 
  <div x-show="carpetaActiva === 'reportes'" x-transition style="display: none;">
+ @can('reportes.individual')
  @include('pages.adultos-mayores.show.carpetas._reportes')
+ @endcan
  </div>
  </div>
  </div>
 
  {{-- Modales Antiguos --}}
+ @if(auth()->user()?->canAny([
+     'residentes_contactos.gestionar', 'notas_clinicas.crear', 'notas_clinicas.editar',
+     'atenciones.crear', 'atenciones.editar', 'aplicaciones_instrumento.crear',
+     'actividades.gestionar', 'documentos.gestionar',
+ ]))
  @include('pages.adultos-mayores.show._modales-existentes')
+ @endif
 
  </div> {{-- fin x-data principal --}}
 </x-sistema-layout>

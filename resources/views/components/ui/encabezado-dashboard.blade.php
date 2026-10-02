@@ -35,11 +35,13 @@ $acciones = array_slice($acciones, 0, 3);
 @endphp
 
 <x-ui.role-dashboard-hero
+    personal-greeting
     :eyebrow="$rolLegible . ' · visión institucional'"
     :title="$saludoTexto . ', ' . $nombre"
     highlight="Gestionar bien también es cuidar"
     description="Supervisa la operación del centro, prioriza lo importante y acompaña al equipo desde una lectura clara y humana."
     :image="asset('images/FOTOS CENTRO DE ADULTOS MAYORES/595693419_1366687118802540_7877864884520394638_n.jpg')"
+    rotation-context="administracion"
     image-alt="Residentes y equipo durante una experiencia cultural del centro"
     quote="Cada decisión protege una historia"
     :meta="[

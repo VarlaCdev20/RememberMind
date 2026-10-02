@@ -6,6 +6,7 @@
   highlight="es acompañar mejor mañana"
   description="Organiza las evaluaciones cognitivas, afectivas y sociales para acompañar la historia, capacidades y bienestar de cada residente."
   :image="asset('images/FOTOS CENTRO DE ADULTOS MAYORES/558487013_1337134818424437_2282337776297854403_n.jpg')"
+  rotation-context="psicologia"
   image-alt="Profesional acompañando a un residente durante una actividad cognitiva"
   quote="Cada recuerdo merece tiempo y presencia"
   :meta="[
@@ -96,7 +97,7 @@
 
  @if($evaluacionesRecientes->count() > 0)
  <div class="overflow-x-auto">
-  <table class="w-full text-left text-sm whitespace-nowrap">
+  <table class="rm-data-table w-full text-left text-sm whitespace-nowrap">
   <thead class="bg-fondo-panel text-[10px] font-bold uppercase tracking-wider text-apoyo">
    <tr>
    <th class="px-5 py-3">Paciente</th>

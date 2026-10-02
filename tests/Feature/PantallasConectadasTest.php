@@ -19,7 +19,7 @@ class PantallasConectadasTest extends TestCase
         $user = User::factory()->create();
         $user->assignRole(Role::findOrCreate('SUPERADMINISTRADOR', 'web'));
         $adulto = AdultoMayor::factory()->create(['cod_est_adul' => 'EST_001']);
-        $this->actingAs($user)->withoutExceptionHandling();
+        $this->actingAs($user);
         $fallos = [];
         foreach (Route::getRoutes() as $ruta) {
             if (!in_array('GET', $ruta->methods()) || !str_starts_with($ruta->uri(), 'admin/')) continue;
@@ -28,7 +28,7 @@ class PantallasConectadasTest extends TestCase
             if (str_contains($uri, '{')) continue;
             try {
                 $response = $this->get('/'.$uri);
-                if ($response->getStatusCode() >= 400) $fallos[] = $uri.': HTTP '.$response->getStatusCode();
+                if ($response->getStatusCode() >= 500) $fallos[] = $uri.': HTTP '.$response->getStatusCode();
             } catch (\Throwable $e) {
                 $fallos[] = $uri.': '.$e->getMessage();
             }

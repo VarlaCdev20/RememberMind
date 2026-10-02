@@ -9,26 +9,32 @@ use App\Backend\Modulos\Enfermeria\Servicios\MiTurnoService;
 use App\Backend\Modulos\Enfermeria\Servicios\TurnoEnfermeriaService;
 use App\Backend\Modulos\Medicacion\Servicios\AgendaMedicacionService;
 use App\Backend\Modulos\Medicacion\Servicios\RegistrarAdministracionMedicacionService;
+use App\Backend\Modulos\Identidad\Servicios\RolePreviewService;
 use App\Models\AdministracionMedicacion;
 use App\Models\Alerta;
 use App\Models\AsignacionResidenteJornada;
 use App\Models\Atencion;
+use App\Models\EjecucionCuidado;
 use App\Models\PaseTurno;
 use App\Models\Prescripcion;
 use App\Models\Residente;
 use App\Models\SignoVital;
 use App\Models\TurnoEnfermeria;
-use App\Models\User;
 use Carbon\Carbon;
+use Illuminate\Database\QueryException;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Url;
+use Livewire\Attributes\Locked;
 use Livewire\Component;
 use Livewire\WithPagination;
+use Illuminate\Validation\ValidationException;
 
 class MisPacientes extends Component
 {
     use WithPagination;
 
+    #[Url(as: 'buscar')]
     public string $search = '';
 
     public string $filtroEstado = 'TODOS'; // 'TODOS' | 'ESTABLE' | 'VIGILANCIA' | 'REQUIERE_ATENCION'
@@ -39,14 +45,34 @@ class MisPacientes extends Component
 
     public string $filtroRapido = 'TODOS';
 
-    public string $vistaModo = 'tabla'; // 'tabla' (Lista) | 'tarjetas' (Tarjetas)
+    public string $vistaModo = 'tarjetas'; // 'tabla' (Lista) | 'tarjetas' (Tarjetas)
+
+    public string $filtroHabitacion = '';
+
+    public string $orden = 'NOMBRE_ASC';
 
     #[Url(as: 'residente')]
     public ?string $residente = null;
 
     public bool $mostrarPanelDetalle = false;
 
+    public bool $mostrarSelectorModal = false;
+
+    public bool $tieneMedicacionProgramadaPendiente = false;
+
+    public int $cantidadMedicacionProgramadaPendiente = 0;
+
     public ?array $detalleResidente = null;
+
+    public string $drawerPaso = 'resident-summary';
+
+    public ?string $registroTipo = null;
+
+    public array $registroInicial = [];
+
+    public bool $confirmarDescarte = false;
+
+    public ?string $accionDescarte = null;
 
     public bool $esModoConsulta = false;
 
@@ -60,6 +86,18 @@ class MisPacientes extends Component
     public ?string $modalCodResidente = null;
 
     public string $signoPA = '';
+
+    public string $signoSis = '';
+
+    public string $signoDia = '';
+
+    #[Locked]
+    public array $signosHistorial = [];
+
+    #[Locked]
+    public array $signosContextoTurno = [];
+
+    public bool $signosIntentoGuardar = false;
 
     public string $signoFC = '';
 
@@ -99,6 +137,21 @@ class MisPacientes extends Component
 
     public string $medMotivoOmision = '';
 
+    public string $medResultado = 'ADMINISTRADA';
+
+    public string $medFechaHoraReal = '';
+
+    public string $medDosisAdministrada = '';
+
+    public string $medObservacion = '';
+
+    public array $medOpcionesProgramadas = [];
+
+    public array $medDetalleProgramado = [];
+
+    #[Locked]
+    public ?string $medOcurrenciaSeleccionada = null;
+
     public $medicacionesPaciente = [];
 
     public bool $modalAlerta = false;
@@ -117,11 +170,67 @@ class MisPacientes extends Component
 
     public string $cuidadoObs = '';
 
+    public string $ingestaTipoComida = '';
+
+    public string $ingestaPorcentaje = '';
+
+    public string $ingestaCantidadMl = '';
+
+    public string $ingestaTolerancia = '';
+
+    public bool $ingestaDificultadDeglucion = false;
+
+    public string $ingestaObservacion = '';
+
+    public string $elimTipo = '';
+
+    public string $elimCantidadUrinaria = '';
+
+    public string $elimCaracteristicaUrinaria = '';
+
+    public string $elimContinenciaUrinaria = '';
+
+    public string $elimCantidadIntestinal = '';
+
+    public string $elimCaracteristicaIntestinal = '';
+
+    public string $elimContinenciaIntestinal = '';
+
+    public string $elimObservacion = '';
+
+    public string $movMarcha = '';
+
+    public string $movTraslado = '';
+
+    public string $movTipoApoyo = '';
+
+    public string $movEquilibrio = '';
+
+    public string $movFatiga = '';
+
+    public string $movRiesgoCaida = '';
+
+    public string $movObservacion = '';
+
     public bool $modalDolor = false;
 
     public int $dolorIntensidad = 5;
 
     public string $dolorDetalle = '';
+
+    public string $dolorFechaHora = '';
+
+    public string $dolorEva = '';
+
+    public string $dolorUbicacion = '';
+
+    public string $dolorDuracionValor = '';
+
+    public string $dolorDuracionUnidad = '';
+
+    public string $dolorDesencadenante = '';
+
+    public string $dolorIntervencion = '';
 
     public bool $modalProcedimiento = false;
 
@@ -191,10 +300,29 @@ class MisPacientes extends Component
         $this->resetPage();
     }
 
+    public function updatingFiltroHabitacion(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatingOrden(): void
+    {
+        $this->resetPage();
+    }
+
+    public function limpiarFiltros(): void
+    {
+        $this->search = '';
+        $this->filtroEstado = 'TODOS';
+        $this->filtroHabitacion = '';
+        $this->orden = 'NOMBRE_ASC';
+        $this->resetPage();
+    }
+
     public function seleccionarResidente(?string $codResidente): void
     {
         if (empty($codResidente)) {
-            $this->cerrarPanelDetalle();
+            $this->cerrarPanelAhora();
 
             return;
         }
@@ -224,7 +352,7 @@ class MisPacientes extends Component
             ->first();
 
         if (! $adulto) {
-            $this->cerrarPanelDetalle();
+            $this->cerrarPanelAhora();
             abort(403, 'El residente solicitado no existe o no está disponible.');
         }
 
@@ -262,7 +390,7 @@ class MisPacientes extends Component
         }
 
         if (! $esPermitido) {
-            $this->cerrarPanelDetalle();
+            $this->cerrarPanelAhora();
             abort(403, 'No tiene autorización para acceder al residente indicado o no se encuentra asignado a su turno.');
         }
 
@@ -270,26 +398,245 @@ class MisPacientes extends Component
         $this->esResidenteAsignado = $esAsignadoAlUsuario;
         $this->detalleResidente = $this->construirDetalleResidente($adulto, $turnoActual);
         $this->mostrarPanelDetalle = true;
+        $this->mostrarSelectorModal = false;
+        $this->tieneMedicacionProgramadaPendiente = false;
+        $this->cantidadMedicacionProgramadaPendiente = 0;
+        $this->drawerPaso = 'resident-summary';
+        $this->registroTipo = null;
+        $this->registroInicial = [];
+        $this->signosHistorial = [];
+        $this->signosContextoTurno = [];
+        $this->signosIntentoGuardar = false;
+        $this->confirmarDescarte = false;
+        $this->accionDescarte = null;
+        $this->dispatch('resident-directory-opened');
     }
 
     public function cerrarPanelDetalle(): void
     {
+        if ($this->drawerPaso === 'register-form' && $this->formularioModificado()) {
+            $this->solicitarDescarte('cerrar');
+
+            return;
+        }
+
+        $this->cerrarPanelAhora();
+    }
+
+    private function cerrarPanelAhora(): void
+    {
         $this->mostrarPanelDetalle = false;
+        $this->mostrarSelectorModal = false;
+        $this->tieneMedicacionProgramadaPendiente = false;
+        $this->cantidadMedicacionProgramadaPendiente = 0;
         $this->detalleResidente = null;
         $this->residente = null;
+        $this->drawerPaso = 'resident-summary';
+        $this->limpiarRegistroEnPanel();
+    }
+
+    public function mostrarSelectorRegistro(): void
+    {
+        abort_unless($this->mostrarPanelDetalle && $this->detalleResidente && $this->puedeRegistrar(), 403);
+        $this->actualizarMedicacionProgramadaPendiente($this->detalleResidente['cod_residente']);
+        $this->drawerPaso = 'register-selector';
+        $this->mostrarPanelDetalle = false;
+        $this->mostrarSelectorModal = true;
+        $this->confirmarDescarte = false;
+        $this->dispatch('resident-directory-selector-opened');
+    }
+
+    public function puedeRegistrar(): bool
+    {
+        $usuario = auth()->user();
+
+        return ! $this->esModoConsulta
+            && $this->esResidenteAsignado
+            && $usuario?->estado === 'ACTIVO'
+            && ! app(RolePreviewService::class)->isActive($usuario)
+            && (bool) $usuario->canAny([
+                'signos_vitales.crear', 'administraciones_medicacion.crear',
+                'valoraciones_dolor.crear', 'registros_ingesta.crear',
+                'registros_eliminacion.crear', 'registros_movilidad.crear',
+                'atenciones.crear',
+            ]);
+    }
+
+    public function cerrarSelectorRegistro(): void
+    {
+        abort_unless($this->mostrarSelectorModal && $this->detalleResidente, 403);
+
+        if ($this->confirmarDescarte) {
+            $this->cancelarDescarte();
+
+            return;
+        }
+
+        if ($this->drawerPaso === 'register-form' && $this->formularioModificado()) {
+            $this->solicitarDescarte('cerrar');
+
+            return;
+        }
+
+        $this->cerrarFlujoRegistro();
+    }
+
+    private function cerrarFlujoRegistro(): void
+    {
+        $this->limpiarRegistroEnPanel();
+        $this->mostrarSelectorModal = false;
+        $this->mostrarPanelDetalle = true;
+        $this->drawerPaso = 'resident-summary';
+        $this->dispatch('resident-directory-selector-closed');
+    }
+
+    public function abrirFormularioRegistro(string $tipo): void
+    {
+        abort_unless($this->mostrarSelectorModal && $this->detalleResidente && $this->drawerPaso === 'register-selector', 403);
+        $codResidente = $this->detalleResidente['cod_residente'];
+
+        match ($tipo) {
+            'signos' => $this->abrirRegistrarSignos($codResidente),
+            'medicacion' => $this->prepararAdministracionProgramada($codResidente),
+            'dolor' => $this->abrirRegistrarDolor($codResidente),
+            'alimentacion' => $this->abrirRegistrarCuidado($codResidente, 'ALIMENTACION'),
+            'eliminacion' => $this->abrirRegistrarCuidado($codResidente, 'ELIMINACION'),
+            'movilidad' => $this->abrirRegistrarCuidado($codResidente, 'MOVILIDAD'),
+            'seguimiento' => $this->abrirRegistrarSeguimiento($codResidente),
+            'procedimiento' => $this->abrirRegistrarProcedimiento($codResidente),
+            default => abort(422, 'Tipo de registro no disponible.'),
+        };
+
+        $this->registroTipo = $tipo;
+        $this->registroInicial = $this->estadoFormularioRegistro();
+        $this->drawerPaso = 'register-form';
+        $this->confirmarDescarte = false;
+        $this->resetValidation();
+        $this->dispatch('resident-directory-step-changed');
+    }
+
+    public function volverPanelDetalle(): void
+    {
+        if ($this->confirmarDescarte) {
+            $this->cancelarDescarte();
+
+            return;
+        }
+
+        if ($this->drawerPaso === 'register-form') {
+            if ($this->formularioModificado()) {
+                $this->solicitarDescarte('volver');
+
+                return;
+            }
+
+            $this->limpiarRegistroEnPanel();
+            $this->drawerPaso = 'register-selector';
+            $this->actualizarMedicacionProgramadaPendiente($this->detalleResidente['cod_residente']);
+            $this->dispatch('resident-directory-selector-opened');
+
+            return;
+        }
+
+        if ($this->drawerPaso === 'register-selector') {
+            $this->cerrarSelectorRegistro();
+        }
+    }
+
+    public function cancelarDescarte(): void
+    {
+        $this->confirmarDescarte = false;
+        $this->accionDescarte = null;
+    }
+
+    public function descartarCambios(): void
+    {
+        abort_unless($this->confirmarDescarte, 409);
+        $accion = $this->accionDescarte;
+        $this->limpiarRegistroEnPanel();
+
+        if ($accion === 'cerrar') {
+            $this->cerrarFlujoRegistro();
+
+            return;
+        }
+
+        $this->drawerPaso = 'register-selector';
+        $this->actualizarMedicacionProgramadaPendiente($this->detalleResidente['cod_residente']);
+        $this->dispatch('resident-directory-selector-opened');
+    }
+
+    private function actualizarMedicacionProgramadaPendiente(string $codResidente): void
+    {
+        $this->cantidadMedicacionProgramadaPendiente = auth()->user()?->can('administraciones_medicacion.crear')
+            ? app(AgendaMedicacionService::class)->paraAdulto($codResidente)
+                ->filter(fn (array $item) => $item['registro'] === null)->count()
+            : 0;
+        $this->tieneMedicacionProgramadaPendiente = $this->cantidadMedicacionProgramadaPendiente > 0;
+    }
+
+    private function solicitarDescarte(string $accion): void
+    {
+        $this->confirmarDescarte = true;
+        $this->accionDescarte = $accion;
+        $this->dispatch('resident-directory-step-changed');
+    }
+
+    private function formularioModificado(): bool
+    {
+        return $this->registroInicial !== $this->estadoFormularioRegistro();
+    }
+
+    private function estadoFormularioRegistro(): array
+    {
+        $campos = match ($this->registroTipo) {
+            'signos' => ['signoSis', 'signoDia', 'signoFC', 'signoFR', 'signoTemp', 'signoSat', 'signoGlucosa', 'signoObs'],
+            'medicacion' => ['medCodMed', 'medAdministrado', 'medMotivoOmision', 'medResultado', 'medFechaHoraReal', 'medDosisAdministrada', 'medObservacion', 'medOcurrenciaSeleccionada'],
+            'dolor' => ['dolorFechaHora', 'dolorEva', 'dolorUbicacion', 'dolorDuracionValor', 'dolorDuracionUnidad', 'dolorDesencadenante', 'dolorIntervencion'],
+            'alimentacion' => ['ingestaTipoComida', 'ingestaPorcentaje', 'ingestaCantidadMl', 'ingestaTolerancia', 'ingestaDificultadDeglucion', 'ingestaObservacion'],
+            'eliminacion' => ['elimTipo', 'elimCantidadUrinaria', 'elimCaracteristicaUrinaria', 'elimContinenciaUrinaria', 'elimCantidadIntestinal', 'elimCaracteristicaIntestinal', 'elimContinenciaIntestinal', 'elimObservacion'],
+            'movilidad' => ['movMarcha', 'movTraslado', 'movTipoApoyo', 'movEquilibrio', 'movFatiga', 'movRiesgoCaida', 'movObservacion'],
+            'seguimiento' => ['segEstado', 'segAlimentacion', 'segMovilidad', 'segSueno', 'segIncidente', 'segRequiereMedico', 'segObs'],
+            'procedimiento' => ['procTipo', 'procDetalle'],
+            'alerta' => ['alertaTipo', 'alertaNivel', 'alertaMotivo'],
+            default => [],
+        };
+
+        return collect($campos)->mapWithKeys(fn (string $campo) => [$campo => $this->{$campo}])->all();
+    }
+
+    private function limpiarRegistroEnPanel(): void
+    {
+        $campos = array_keys($this->estadoFormularioRegistro());
+        if ($campos !== []) {
+            $this->reset(...$campos);
+        }
+        $this->registroTipo = null;
+        $this->registroInicial = [];
+        $this->signosHistorial = [];
+        $this->signosContextoTurno = [];
+        $this->signosIntentoGuardar = false;
+        $this->confirmarDescarte = false;
+        $this->accionDescarte = null;
+        $this->modalCodResidente = null;
+        $this->medOpcionesProgramadas = [];
+        $this->medDetalleProgramado = [];
+        $this->reset(['modalSignos', 'modalSeguimiento', 'modalMed', 'modalAlerta', 'modalCuidado', 'modalDolor', 'modalProcedimiento']);
+        $this->resetValidation();
     }
 
     protected function construirDetalleResidente(Residente $adulto, ?TurnoEnfermeria $turnoActual): array
     {
         $codRes = $adulto->cod_residente;
         $codResidente = $codRes;
+        $usuario = Auth::user();
 
         // 1. IDENTIFICACIÓN
         $nombreCompleto = trim($adulto->nombres.' '.$adulto->apellido_paterno.' '.($adulto->apellido_materno ?? ''));
         if (empty($nombreCompleto)) {
             $nombreCompleto = $adulto->nombre_completo ?? 'Residente';
         }
-        $edadTexto = $adulto->edad_texto ?? ($adulto->fecha_nacimiento ? Carbon::parse($adulto->fecha_nacimiento)->age.' años' : '79 años');
+        $edadTexto = $adulto->fecha_nacimiento ? Carbon::parse($adulto->fecha_nacimiento)->age.' años' : null;
         $documento = $adulto->ci ?? ($adulto->numero_documento ?? 'Sin documento');
 
         $cama = $adulto->cama;
@@ -359,12 +706,12 @@ class MisPacientes extends Component
         }
 
         // 2. ÚLTIMOS SIGNOS VITALES (resumen del último registro real)
-        $ultimoSignoModel = SignoVital::query()
-            ->where(function ($q) use ($codResidente, $codRes) {
-                $q->where('cod_residente', $codResidente)->orWhere('cod_residente', $codRes);
-            })
-            ->orderByDesc('fecha_hora')
-            ->first();
+        $ultimoSignoModel = $usuario?->can('signos_vitales.ver')
+            ? SignoVital::query()
+                ->where('cod_residente', $codResidente)
+                ->orderByDesc('fecha_hora')
+                ->first()
+            : null;
 
         $ultimosSignos = null;
         if ($ultimoSignoModel) {
@@ -389,7 +736,9 @@ class MisPacientes extends Component
         }
 
         // 3. PRÓXIMA MEDICACIÓN (bloque muy visible)
-        $agendaMeds = app(AgendaMedicacionService::class)->paraAdulto($codResidente);
+        $agendaMeds = $usuario?->can('prescripciones.ver')
+            ? app(AgendaMedicacionService::class)->paraAdulto($codResidente)
+            : collect();
         $medsPendientes = $agendaMeds->filter(fn ($item) => empty($item['registro']));
         $proximaMed = null;
 
@@ -414,13 +763,13 @@ class MisPacientes extends Component
             }
 
             $presc = $medPendiente['medicacion'];
-            $via = $presc->via_administracion ?: 'VO';
+            $via = $presc->via_administracion ?: 'Vía no registrada';
             if (stripos($via, 'oral') !== false) {
                 $via = 'VO';
             }
 
             $nombreMed = $presc->medicamento?->nombre_generico ?: ($presc->nombre_medicamento ?: 'Medicamento');
-            $dosisMed = $presc->dosis ? ((float) $presc->dosis == (int) $presc->dosis ? (int) $presc->dosis : (float) $presc->dosis).' '.($presc->unidad_dosis ?: 'mg') : '50 mg';
+            $dosisMed = $presc->dosis ? ((float) $presc->dosis == (int) $presc->dosis ? (int) $presc->dosis : (float) $presc->dosis).' '.($presc->unidad_dosis ?: '') : 'Dosis no registrada';
             $proximaMed = [
                 'nombre' => $nombreMed,
                 'dosis' => $dosisMed,
@@ -428,18 +777,18 @@ class MisPacientes extends Component
                 'via' => $via,
                 'tiempo_restante' => $tiempoRestante,
             ];
-        } else {
+        } elseif ($usuario?->can('prescripciones.ver')) {
             // Verificar prescripciones activas
             $prescActiva = Prescripcion::where('cod_residente', $codResidente)->whereIn('estado', ['ACTIVA', 'ACTIVO'])->where('segun_necesidad', false)->first();
             if ($prescActiva) {
-                $via = $prescActiva->via_administracion ?: 'VO';
+                $via = $prescActiva->via_administracion ?: 'Vía no registrada';
                 if (stripos($via, 'oral') !== false) {
                     $via = 'VO';
                 }
                 $proximaMed = [
                     'nombre' => $prescActiva->nombre_medicamento,
-                    'dosis' => $prescActiva->dosis ?: 'Según indicación',
-                    'hora' => 'Según horario',
+                    'dosis' => $prescActiva->dosis ?: 'Dosis no registrada',
+                    'hora' => null,
                     'via' => $via,
                     'tiempo_restante' => 'Prescripción activa',
                 ];
@@ -455,22 +804,19 @@ class MisPacientes extends Component
             ->orderBy('fecha_hora')
             ->first();
 
-        $proximaAtencionTexto = 'Control de signos';
-        $proximaAtencionHora = '10:00 · Hoy';
+        $proximaAtencionTexto = null;
+        $proximaAtencionHora = null;
 
         if ($proximaAtencion) {
             $proximaAtencionTexto = $proximaAtencion->motivo ?: ($proximaAtencion->tipo_atencion ?: 'Atención programada');
             $proximaAtencionHora = Carbon::parse($proximaAtencion->fecha_hora)->format('H:i').' · Hoy';
-        } elseif ($proximaMed) {
+        } elseif ($proximaMed && $proximaMed['hora']) {
             $proximaAtencionTexto = 'Administración de '.$proximaMed['nombre'];
             $proximaAtencionHora = $proximaMed['hora'].' · Hoy';
-        } elseif ($ultimoSignoModel && Carbon::parse($ultimoSignoModel->fecha_hora)->isToday()) {
-            $proximaAtencionTexto = 'Seguimiento de guardia';
-            $proximaAtencionHora = 'Continuo · Hoy';
         }
 
         // 5. ALERTAS ACTIVAS
-        $alertasList = $alertasActivas->map(function ($al) {
+        $alertasList = ($usuario?->can('alertas.ver') ? $alertasActivas : collect())->map(function ($al) {
             $tiempo = 'Reportada ';
             $fAl = $al->fecha_hora ?? ($al->created_at ?? null);
             if ($fAl) {
@@ -498,6 +844,45 @@ class MisPacientes extends Component
         // Iniciales y Foto
         $iniciales = strtoupper(substr($adulto->nombres ?: 'A', 0, 1).substr($adulto->apellido_paterno ?: 'M', 0, 1));
 
+        $medicacion = $usuario?->can('prescripciones.ver')
+            ? $adulto->prescripciones()->whereIn('estado', ['ACTIVA', 'ACTIVO', 'VIGENTE'])
+                ->with(['medicamento', 'horarios' => fn ($q) => $q->whereIn('estado', ['ACTIVO', 'ACTIVA'])])
+                ->limit(8)->get()
+                ->map(fn ($item) => [
+                    'nombre' => $item->medicamento?->nombre_generico ?: ($item->nombre_medicamento ?: 'Medicamento registrado'),
+                    'dosis' => trim((string) $item->dosis.' '.(string) $item->unidad_dosis),
+                    'via' => $item->via_administracion,
+                    'frecuencia' => $item->frecuencia,
+                    'horarios' => $item->horarios->pluck('hora_programada')->filter()->implode(', '),
+                    'ultima_administracion' => $usuario?->can('administraciones_medicacion.ver')
+                        ? $item->administraciones()->orderByDesc('fecha_hora_programada')->first()?->resultado
+                        : null,
+                ])->all()
+            : [];
+        $cuidados = $usuario?->can('planes_cuidado.ver')
+            ? $adulto->ejecucionesCuidado()->whereIn('estado', ['PENDIENTE', 'EN_PROCESO'])
+                ->with('intervencion')->orderBy('fecha_hora_programada')->limit(8)->get()
+                ->map(fn ($item) => [
+                    'nombre' => $item->intervencion?->nombre ?: 'Cuidado programado',
+                    'fecha' => $item->fecha_hora_programada?->format('d/m/Y H:i'),
+                    'estado' => $item->estado,
+                ])->all()
+            : [];
+        $observaciones = $usuario?->can('notas_clinicas.ver')
+            ? $adulto->notasClinicas()->orderByDesc('fecha_hora')->limit(5)->get()
+                ->map(fn ($item) => [
+                    'contenido' => $item->contenido,
+                    'fecha' => $item->fecha_hora?->format('d/m/Y H:i'),
+                ])->all()
+            : [];
+        $historial = $usuario?->can('atenciones.ver')
+            ? $adulto->atenciones()->orderByDesc('fecha_hora')->limit(6)->get()
+                ->map(fn ($item) => [
+                    'tipo' => $item->tipo_atencion?->nombre ?: 'Atención registrada',
+                    'fecha' => $item->fecha_hora?->format('d/m/Y H:i'),
+                ])->all()
+            : [];
+
         return [
             'cod_residente' => $codRes,
             'cod_residente' => $codRes,
@@ -520,6 +905,13 @@ class MisPacientes extends Component
             'alertas' => $alertasList,
             'iniciales' => $iniciales,
             'foto' => $adulto->foto ? asset('storage/'.$adulto->foto) : '',
+            'fecha_ingreso' => $adulto->admisiones()->orderBy('fecha_hora_admision')->first()?->fecha_hora_admision,
+            'plan_nombre' => $usuario?->can('planes_cuidado.ver') ? $adulto->planCuidadoActivo?->nombre : null,
+            'plan_prioridad' => $usuario?->can('planes_cuidado.ver') ? $adulto->planCuidadoActivo?->prioridad : null,
+            'medicacion' => $medicacion,
+            'cuidados' => $cuidados,
+            'observaciones' => $observaciones,
+            'historial' => $historial,
         ];
     }
 
@@ -532,6 +924,26 @@ class MisPacientes extends Component
         $this->getTurnoService()->autorizarAccionPaciente($codResidente);
         $this->modalCodResidente = $codResidente;
         $this->reset(['signoPA', 'signoFC', 'signoFR', 'signoTemp', 'signoSat', 'signoGlucosa', 'signoObs', 'signoConfirmarAtipico']);
+        $this->reset(['signoSis', 'signoDia']);
+        $this->signosIntentoGuardar = false;
+        $turnoSignos = $this->getTurnoService()->obtenerTurnoActivo(auth()->user());
+        $finTurnoSignos = $turnoSignos?->hora_cierre ?: $turnoSignos?->hora_fin;
+        $this->signosContextoTurno = [
+            'nombre' => $turnoSignos?->nombre ?? 'Sin turno activo',
+            'horario' => $turnoSignos?->hora_inicio && $finTurnoSignos
+                ? substr((string) $turnoSignos->hora_inicio, 0, 5).'–'.substr((string) $finTurnoSignos, 0, 5)
+                : null,
+        ];
+        $this->signosHistorial = auth()->user()?->can('signos_vitales.ver') ? SignoVital::query()->porResidente($codResidente)->vigentes()
+            ->orderByDesc('fecha_hora')->limit(30)
+            ->get(['fecha_hora', 'presion_sistolica', 'presion_diastolica', 'frecuencia_cardiaca', 'frecuencia_respiratoria', 'temperatura', 'saturacion_oxigeno', 'glucemia'])
+            ->map(fn (SignoVital $signo) => [
+                'fecha' => $signo->fecha_hora?->timezone(config('app.timezone'))->format('d/m H:i'),
+                'sis' => $signo->presion_sistolica, 'dia' => $signo->presion_diastolica,
+                'fc' => $signo->frecuencia_cardiaca, 'fr' => $signo->frecuencia_respiratoria,
+                'temp' => $signo->temperatura, 'sat' => $signo->saturacion_oxigeno,
+                'glucosa' => $signo->glucemia,
+            ])->all() : [];
         $this->modalSignos = true;
     }
 
@@ -543,6 +955,45 @@ class MisPacientes extends Component
     public function guardarSignos(): void
     {
         abort_if($this->esModoConsulta, 403, 'Operación no permitida en modo consulta / fuera de turno.');
+        abort_if($this->mostrarSelectorModal && $this->drawerPaso !== 'register-form', 403);
+        if ($this->drawerPaso === 'register-form') {
+            abort_unless($this->mostrarSelectorModal && $this->registroTipo === 'signos'
+                && $this->detalleResidente && $this->modalCodResidente === $this->detalleResidente['cod_residente'], 403);
+            $this->signosIntentoGuardar = true;
+            $this->resetValidation();
+            try {
+                app(SignosVitalesService::class)->registrarDesdeNuevoRegistro($this->modalCodResidente, [
+                    'presion_sistolica' => $this->signoSis,
+                    'presion_diastolica' => $this->signoDia,
+                    'frecuencia_cardiaca' => $this->signoFC,
+                    'frecuencia_respiratoria' => $this->signoFR,
+                    'temperatura' => $this->signoTemp,
+                    'saturacion_oxigeno' => $this->signoSat,
+                    'glucemia' => $this->signoGlucosa,
+                    'observacion' => $this->signoObs,
+                ], Auth::user());
+            } catch (ValidationException $exception) {
+                foreach ($exception->errors() as $campo => $mensajes) {
+                    $this->addError($campo, $mensajes[0]);
+                }
+                $this->dispatch('signos-validacion-fallida');
+                return;
+            } catch (QueryException $exception) {
+                report($exception);
+                $this->addError('signos_guardado', 'No se pudo guardar el registro. Conservamos los datos para que vuelvas a intentarlo.');
+                return;
+            }
+
+            $this->cerrarFlujoRegistro();
+            if ($this->residente) {
+                $this->seleccionarResidente($this->residente);
+            }
+            $this->dispatch('signos-actualizados');
+            $this->dispatch('rm-toast', ['icon' => 'success', 'title' => 'Signos registrados correctamente.']);
+
+            return;
+        }
+
         app(SignosVitalesService::class)->registrar($this->modalCodResidente, [
             'presion_arterial' => $this->signoPA,
             'frecuencia_cardiaca' => $this->signoFC,
@@ -560,7 +1011,7 @@ class MisPacientes extends Component
             $this->seleccionarResidente($this->residente);
         }
         $this->dispatch('signos-actualizados');
-        $this->dispatch('swal', ['icon' => 'success', 'title' => 'Signos registrados', 'text' => 'Control de signos guardado correctamente.']);
+        $this->dispatch('rm-toast', ['icon' => 'success', 'title' => 'Signos registrados correctamente.']);
     }
 
     public function abrirRegistrarSeguimiento(string $codResidente): void
@@ -635,7 +1086,7 @@ class MisPacientes extends Component
             $this->seleccionarResidente($this->residente);
         }
         $this->dispatch('seguimiento-guardado');
-        $this->dispatch('swal', ['icon' => 'success', 'title' => 'Seguimiento guardado', 'text' => 'El registro diario fue guardado con éxito.']);
+        $this->dispatch('rm-toast', ['icon' => 'success', 'title' => 'Seguimiento registrado correctamente.']);
     }
 
     public function abrirAdministrarMed(string $codResidente): void
@@ -655,6 +1106,75 @@ class MisPacientes extends Component
         $this->modalMed = true;
     }
 
+    private function prepararAdministracionProgramada(string $codResidente): void
+    {
+        abort_if($this->esModoConsulta, 403, 'No tiene un turno activo para registrar medicación.');
+        $this->getTurnoService()->autorizarMutacionPaciente($codResidente, 'administraciones_medicacion.crear', Auth::user());
+        $this->modalCodResidente = $codResidente;
+        $this->medOpcionesProgramadas = app(AgendaMedicacionService::class)->paraAdulto($codResidente)
+            ->filter(fn (array $item) => $item['registro'] === null)
+            ->map(fn (array $item) => [
+                'cod_horario' => $item['horario']->cod_horario_prescripcion,
+                'medicamento' => $item['medicacion']->medicamento?->nombre_comercial
+                    ?: $item['medicacion']->medicamento?->nombre_generico,
+                'hora' => $item['hora'],
+                'dosis' => $item['horario']->dosis_programada ?? $item['medicacion']->dosis,
+                'unidad' => $item['medicacion']->unidad_dosis,
+            ])->values()->all();
+        abort_if($this->medOpcionesProgramadas === [], 422, 'No hay dosis programadas pendientes para este residente.');
+        $this->medOcurrenciaSeleccionada = null;
+        $this->medDetalleProgramado = [];
+        $this->medCodMed = null;
+        $this->medResultado = 'ADMINISTRADA';
+        $this->medFechaHoraReal = now()->format('Y-m-d\TH:i');
+        $this->medDosisAdministrada = '';
+        $this->medMotivoOmision = '';
+        $this->medObservacion = '';
+        $this->modalMed = false;
+    }
+
+    public function seleccionarOcurrenciaMed(string $codHorario): void
+    {
+        abort_unless($this->mostrarSelectorModal && $this->drawerPaso === 'register-form'
+            && $this->registroTipo === 'medicacion' && $this->detalleResidente
+            && $this->modalCodResidente === $this->detalleResidente['cod_residente'], 403);
+        $this->getTurnoService()->autorizarMutacionPaciente($this->modalCodResidente, 'administraciones_medicacion.crear', Auth::user());
+        $ocurrencia = app(AgendaMedicacionService::class)->paraAdulto($this->modalCodResidente)
+            ->first(fn (array $item) => $item['registro'] === null
+                && $item['horario']->cod_horario_prescripcion === $codHorario);
+        abort_unless($ocurrencia, 422, 'La dosis programada no está disponible para este residente.');
+
+        $prescripcion = $ocurrencia['medicacion'];
+        $medicamento = $prescripcion->medicamento;
+        $this->medOcurrenciaSeleccionada = $codHorario;
+        $this->medCodMed = $prescripcion->cod_prescripcion;
+        $this->medDetalleProgramado = [
+            'medicamento' => $medicamento?->nombre_comercial ?: $medicamento?->nombre_generico,
+            'presentacion' => trim(($medicamento?->concentracion ?? '').' · '.($medicamento?->forma_farmaceutica ?? ''), ' ·'),
+            'dosis_prescrita' => $prescripcion->dosis,
+            'dosis_programada' => $ocurrencia['horario']->dosis_programada,
+            'unidad' => $prescripcion->unidad_dosis,
+            'via' => $prescripcion->via_administracion,
+            'frecuencia' => $prescripcion->frecuencia,
+            'hora' => $ocurrencia['hora'],
+        ];
+        $this->medDosisAdministrada = (string) ($ocurrencia['horario']->dosis_programada ?? $prescripcion->dosis ?? '');
+        $this->medFechaHoraReal = now()->format('Y-m-d\TH:i');
+        $this->medResultado = 'ADMINISTRADA';
+        $this->medMotivoOmision = '';
+        $this->resetValidation();
+    }
+
+    public function updatedMedResultado(string $valor): void
+    {
+        if ($valor === 'ADMINISTRADA') {
+            $this->medMotivoOmision = '';
+            $this->medFechaHoraReal = now()->format('Y-m-d\TH:i');
+        } elseif ($valor === 'OMITIDA') {
+            $this->medFechaHoraReal = '';
+        }
+    }
+
     public function abrirModalMed(string $codResidente): void
     {
         $this->abrirAdministrarMed($codResidente);
@@ -663,6 +1183,67 @@ class MisPacientes extends Component
     public function guardarMed(): void
     {
         abort_if($this->esModoConsulta, 403, 'Operación no permitida en modo consulta / fuera de turno.');
+        abort_if($this->mostrarSelectorModal && $this->drawerPaso !== 'register-form', 403);
+        if ($this->drawerPaso === 'register-form') {
+            abort_unless($this->mostrarSelectorModal && $this->registroTipo === 'medicacion'
+                && $this->detalleResidente && $this->modalCodResidente === $this->detalleResidente['cod_residente'], 403);
+            $this->getTurnoService()->autorizarMutacionPaciente($this->modalCodResidente, 'administraciones_medicacion.crear', Auth::user());
+            $this->medMotivoOmision = trim($this->medMotivoOmision);
+            $this->medObservacion = trim($this->medObservacion);
+            $this->validate([
+                'medOcurrenciaSeleccionada' => 'required|string',
+                'medResultado' => 'required|in:ADMINISTRADA,OMITIDA',
+                'medFechaHoraReal' => $this->medResultado === 'ADMINISTRADA' ? 'required|date_format:Y-m-d\TH:i' : 'nullable',
+                'medDosisAdministrada' => $this->medResultado === 'ADMINISTRADA'
+                    ? 'required|numeric|decimal:0,3|between:0.001,9999999.999' : 'nullable',
+                'medMotivoOmision' => $this->medResultado === 'OMITIDA'
+                    ? 'required|string|min:5|max:500' : 'nullable',
+                'medObservacion' => 'nullable|string|max:2000',
+            ], [
+                'medOcurrenciaSeleccionada.required' => 'Selecciona una dosis programada.',
+                'medResultado.in' => 'Selecciona un estado válido.',
+                'medFechaHoraReal.required' => 'Ingresa la fecha y hora de administración.',
+                'medFechaHoraReal.date_format' => 'Ingresa una fecha y hora de administración válidas.',
+                'medDosisAdministrada.required' => 'Ingresa la dosis administrada.',
+                'medDosisAdministrada.numeric' => 'Ingresa una dosis numérica válida.',
+                'medDosisAdministrada.decimal' => 'La dosis admite como máximo tres decimales.',
+                'medDosisAdministrada.between' => 'La dosis debe ser mayor que cero y caber en la BDD.',
+                'medMotivoOmision.required' => 'Indica el motivo de la no administración.',
+                'medMotivoOmision.min' => 'El motivo debe tener al menos 5 caracteres.',
+                'medObservacion.max' => 'Las observaciones no pueden superar 2000 caracteres.',
+            ]);
+            $ocurrencia = app(AgendaMedicacionService::class)->paraAdulto($this->modalCodResidente)
+                ->first(fn (array $item) => $item['registro'] === null
+                    && $item['horario']->cod_horario_prescripcion === $this->medOcurrenciaSeleccionada
+                    && $item['medicacion']->cod_prescripcion === $this->medCodMed);
+            if (! $ocurrencia) {
+                $this->addError('medOcurrenciaSeleccionada', 'La dosis ya no está pendiente o no pertenece a este residente.');
+                return;
+            }
+            if ($this->medResultado === 'ADMINISTRADA') {
+                $momento = Carbon::createFromFormat('!Y-m-d\TH:i', $this->medFechaHoraReal, config('app.timezone'));
+                if ($momento->toDateString() !== now()->toDateString() || $momento->isFuture()) {
+                    $this->addError('medFechaHoraReal', 'La administración debe registrarse con una fecha y hora válida de hoy.');
+                    return;
+                }
+            }
+            app(RegistrarAdministracionMedicacionService::class)->registrarProgramada(
+                Auth::user(), $this->modalCodResidente, $ocurrencia['medicacion']->cod_prescripcion,
+                $ocurrencia['hora'], $this->medResultado === 'ADMINISTRADA',
+                $this->medResultado === 'OMITIDA' ? $this->medMotivoOmision : null,
+                $this->medObservacion, null,
+                $this->medResultado === 'ADMINISTRADA' ? $this->medDosisAdministrada : null,
+                null, $this->medResultado === 'ADMINISTRADA' ? $momento->format('Y-m-d H:i') : null,
+                $this->medOcurrenciaSeleccionada,
+            );
+            $this->cerrarFlujoRegistro();
+            if ($this->residente) {
+                $this->seleccionarResidente($this->residente);
+            }
+            $this->dispatch('medicacion-registrada');
+            $this->dispatch('rm-toast', ['icon' => 'success', 'title' => 'Medicación registrada en el expediente.']);
+            return;
+        }
         abort_unless(auth()->user()?->can('administraciones_medicacion.crear'), 403);
         $this->getTurnoService()->autorizarMutacionPaciente($this->modalCodResidente, 'administraciones_medicacion.crear', Auth::user());
         $this->validate([
@@ -693,7 +1274,7 @@ class MisPacientes extends Component
             $this->seleccionarResidente($this->residente);
         }
         $this->dispatch('medicacion-registrada');
-        $this->dispatch('swal', ['icon' => 'success', 'title' => 'Medicación registrada', 'text' => 'Toma registrada en el expediente.']);
+        $this->dispatch('rm-toast', ['icon' => 'success', 'title' => 'Medicación registrada en el expediente.']);
     }
 
     public function abrirReportarAlerta(string $codResidente): void
@@ -727,25 +1308,107 @@ class MisPacientes extends Component
             $this->seleccionarResidente($this->residente);
         }
         $this->dispatch('alerta-creada');
-        $this->dispatch('swal', ['icon' => 'warning', 'title' => 'Alerta creada', 'text' => 'La alerta fue enviada al monitor del turno y campana.']);
+        $this->dispatch('rm-toast', ['icon' => 'warning', 'title' => 'Alerta enviada al monitor del turno.']);
     }
 
     public function abrirRegistrarCuidado(string $codResidente, string $tipo = 'HIGIENE', string $subtipo = 'GENERAL'): void
     {
         abort_if($this->esModoConsulta, 403, 'Operación no permitida en modo consulta / fuera de turno.');
-        abort_unless(auth()->user()?->can('atenciones.crear'), 403);
+        $permiso = match (strtoupper(trim($tipo))) {
+            'ALIMENTACION' => 'registros_ingesta.crear',
+            'ELIMINACION' => 'registros_eliminacion.crear',
+            'MOVILIDAD' => 'registros_movilidad.crear',
+            default => 'atenciones.crear',
+        };
+        abort_unless(auth()->user()?->can($permiso), 403);
         $this->getTurnoService()->autorizarAccionPaciente($codResidente);
         $this->modalCodResidente = $codResidente;
         $tipoUpper = strtoupper(trim($tipo));
         $this->cuidadoTipo = in_array($tipoUpper, ['HIGIENE', 'ALIMENTACION', 'MOVILIDAD', 'ELIMINACION', 'PIEL'], true) ? $tipoUpper : 'HIGIENE';
         $this->cuidadoSubtipo = $subtipo ?: 'GENERAL';
         $this->cuidadoObs = '';
+        if ($this->cuidadoTipo === 'ALIMENTACION') {
+            $this->reset(['ingestaTipoComida', 'ingestaPorcentaje', 'ingestaCantidadMl', 'ingestaTolerancia', 'ingestaDificultadDeglucion', 'ingestaObservacion']);
+        }
+        if ($this->cuidadoTipo === 'ELIMINACION') {
+            $this->reset(['elimTipo', 'elimCantidadUrinaria', 'elimCaracteristicaUrinaria', 'elimContinenciaUrinaria', 'elimCantidadIntestinal', 'elimCaracteristicaIntestinal', 'elimContinenciaIntestinal', 'elimObservacion']);
+        }
+        if ($this->cuidadoTipo === 'MOVILIDAD') {
+            $this->reset(['movMarcha', 'movTraslado', 'movTipoApoyo', 'movEquilibrio', 'movFatiga', 'movRiesgoCaida', 'movObservacion']);
+        }
         $this->modalCuidado = true;
+    }
+
+    public function updatedElimTipo(): void
+    {
+        $this->reset(['elimCantidadUrinaria', 'elimCaracteristicaUrinaria', 'elimContinenciaUrinaria', 'elimCantidadIntestinal', 'elimCaracteristicaIntestinal', 'elimContinenciaIntestinal']);
+        $this->resetValidation();
     }
 
     public function guardarCuidado(): void
     {
         abort_if($this->esModoConsulta, 403, 'Operación no permitida en modo consulta / fuera de turno.');
+        if ($this->drawerPaso === 'register-form' && $this->registroTipo === 'alimentacion') {
+            abort_unless($this->mostrarSelectorModal && $this->detalleResidente
+                && $this->modalCodResidente === $this->detalleResidente['cod_residente'], 403);
+            app(CuidadosEnfermeriaService::class)->registrarAlimentacion($this->modalCodResidente, [
+                'tipo_comida' => $this->ingestaTipoComida,
+                'porcentaje_consumido' => $this->ingestaPorcentaje === '' ? null : $this->ingestaPorcentaje,
+                'cantidad_ml' => $this->ingestaCantidadMl === '' ? null : $this->ingestaCantidadMl,
+                'tolerancia' => $this->ingestaTolerancia === '' ? null : $this->ingestaTolerancia,
+                'dificultad_deglucion' => $this->ingestaDificultadDeglucion,
+                'observacion' => $this->ingestaObservacion,
+            ], Auth::user());
+            $this->cerrarFlujoRegistro();
+            if ($this->residente) {
+                $this->seleccionarResidente($this->residente);
+            }
+            $this->dispatch('cuidado-registrado');
+            $this->dispatch('rm-toast', ['icon' => 'success', 'title' => 'Cuidado de alimentación guardado.']);
+
+            return;
+        }
+        if ($this->drawerPaso === 'register-form' && $this->registroTipo === 'eliminacion') {
+            abort_unless($this->mostrarSelectorModal && $this->detalleResidente
+                && $this->modalCodResidente === $this->detalleResidente['cod_residente'], 403);
+            $esUrinaria = $this->elimTipo === 'URINARIA';
+            app(CuidadosEnfermeriaService::class)->registrarEliminacion($this->modalCodResidente, [
+                'tipo_eliminacion' => $this->elimTipo,
+                'cantidad' => $esUrinaria ? $this->elimCantidadUrinaria : $this->elimCantidadIntestinal,
+                'caracteristica' => $esUrinaria ? $this->elimCaracteristicaUrinaria : $this->elimCaracteristicaIntestinal,
+                'continencia' => $esUrinaria ? $this->elimContinenciaUrinaria : $this->elimContinenciaIntestinal,
+                'observacion' => $this->elimObservacion,
+            ], Auth::user());
+            $this->cerrarFlujoRegistro();
+            if ($this->residente) {
+                $this->seleccionarResidente($this->residente);
+            }
+            $this->dispatch('cuidado-registrado');
+            $this->dispatch('rm-toast', ['icon' => 'success', 'title' => 'Cuidado de eliminación guardado.']);
+
+            return;
+        }
+        if ($this->drawerPaso === 'register-form' && $this->registroTipo === 'movilidad') {
+            abort_unless($this->mostrarSelectorModal && $this->detalleResidente
+                && $this->modalCodResidente === $this->detalleResidente['cod_residente'], 403);
+            app(CuidadosEnfermeriaService::class)->registrarMovilidad($this->modalCodResidente, [
+                'marcha' => $this->movMarcha,
+                'traslado' => $this->movTraslado === '' ? null : $this->movTraslado,
+                'tipo_apoyo' => $this->movTipoApoyo === '' ? null : $this->movTipoApoyo,
+                'equilibrio' => $this->movEquilibrio === '' ? null : $this->movEquilibrio,
+                'fatiga' => $this->movFatiga === '' ? null : $this->movFatiga,
+                'riesgo_caida' => $this->movRiesgoCaida === '' ? null : $this->movRiesgoCaida,
+                'observacion' => $this->movObservacion,
+            ], Auth::user());
+            $this->cerrarFlujoRegistro();
+            if ($this->residente) {
+                $this->seleccionarResidente($this->residente);
+            }
+            $this->dispatch('cuidado-registrado');
+            $this->dispatch('rm-toast', ['icon' => 'success', 'title' => 'Cuidado de movilidad guardado.']);
+
+            return;
+        }
         abort_unless(auth()->user()?->can('atenciones.crear'), 403);
         $this->validate([
             'cuidadoTipo' => 'required|in:HIGIENE,ALIMENTACION,MOVILIDAD,ELIMINACION,PIEL',
@@ -765,23 +1428,52 @@ class MisPacientes extends Component
             $this->seleccionarResidente($this->residente);
         }
         $this->dispatch('cuidado-registrado');
-        $this->dispatch('swal', ['icon' => 'success', 'title' => 'Cuidado registrado', 'text' => 'El cuidado asistencial fue registrado correctamente.']);
+        $this->dispatch('rm-toast', ['icon' => 'success', 'title' => 'Cuidado registrado correctamente.']);
     }
 
     public function abrirRegistrarDolor(string $codResidente, int $intensidad = 5): void
     {
         abort_if($this->esModoConsulta, 403, 'Operación no permitida en modo consulta / fuera de turno.');
-        abort_unless(auth()->user()?->can('atenciones.crear'), 403);
+        abort_unless(auth()->user()?->can('valoraciones_dolor.crear'), 403);
         $this->getTurnoService()->autorizarAccionPaciente($codResidente);
         $this->modalCodResidente = $codResidente;
         $this->dolorIntensidad = max(0, min(10, $intensidad));
         $this->dolorDetalle = '';
+        $this->dolorFechaHora = now()->format('Y-m-d\TH:i');
+        $this->dolorEva = '';
+        $this->dolorUbicacion = '';
+        $this->dolorDuracionValor = '';
+        $this->dolorDuracionUnidad = '';
+        $this->dolorDesencadenante = '';
+        $this->dolorIntervencion = '';
         $this->modalDolor = true;
     }
 
     public function guardarDolor(): void
     {
         abort_if($this->esModoConsulta, 403, 'Operación no permitida en modo consulta / fuera de turno.');
+        abort_if($this->mostrarSelectorModal && $this->drawerPaso !== 'register-form', 403);
+        if ($this->drawerPaso === 'register-form') {
+            abort_unless($this->mostrarSelectorModal && $this->registroTipo === 'dolor'
+                && $this->detalleResidente && $this->modalCodResidente === $this->detalleResidente['cod_residente'], 403);
+            app(CuidadosEnfermeriaService::class)->registrarValoracionDolor($this->modalCodResidente, [
+                'fecha_hora' => $this->dolorFechaHora,
+                'intensidad' => $this->dolorEva,
+                'ubicacion' => $this->dolorUbicacion,
+                'duracion_valor' => $this->dolorDuracionValor,
+                'duracion_unidad' => $this->dolorDuracionUnidad,
+                'desencadenante' => $this->dolorDesencadenante,
+                'intervencion' => $this->dolorIntervencion,
+            ], Auth::user());
+            $this->cerrarFlujoRegistro();
+            if ($this->residente) {
+                $this->seleccionarResidente($this->residente);
+            }
+            $this->dispatch('dolor-registrado');
+            $this->dispatch('rm-toast', ['icon' => 'success', 'title' => 'Valoración del dolor guardada.']);
+
+            return;
+        }
         abort_unless(auth()->user()?->can('atenciones.crear'), 403);
         $this->validate([
             'dolorIntensidad' => 'required|integer|min:0|max:10',
@@ -802,7 +1494,7 @@ class MisPacientes extends Component
             $this->seleccionarResidente($this->residente);
         }
         $this->dispatch('dolor-registrado');
-        $this->dispatch('swal', ['icon' => 'success', 'title' => 'Dolor registrado', 'text' => 'Valoración del síntoma guardada correctamente.']);
+        $this->dispatch('rm-toast', ['icon' => 'success', 'title' => 'Valoración del dolor guardada.']);
     }
 
     public function abrirRegistrarProcedimiento(string $codResidente, string $tipo = 'CURACION'): void
@@ -838,7 +1530,7 @@ class MisPacientes extends Component
             $this->seleccionarResidente($this->residente);
         }
         $this->dispatch('procedimiento-registrado');
-        $this->dispatch('swal', ['icon' => 'success', 'title' => 'Procedimiento registrado', 'text' => 'El procedimiento o control fue registrado correctamente.']);
+        $this->dispatch('rm-toast', ['icon' => 'success', 'title' => 'Procedimiento registrado correctamente.']);
     }
 
     // ─── RENDER ─────────────────────────────────────────────────────
@@ -849,18 +1541,21 @@ class MisPacientes extends Component
         $service = $this->getTurnoService();
         $user = Auth::user();
         $esSuperAdmin = $service->esSuperAdmin($user);
-        $esSupervisor = $esSuperAdmin;
         $tieneLecturaClinicaGlobal = $service->tieneLecturaClinicaGlobal($user);
+        $turnoActual = $service->obtenerTurnoActivo($user);
 
         // Asegurar que enfermero estándar no pueda burlar el filtro
         $enfermeroEfectivo = $tieneLecturaClinicaGlobal ? $this->filtroEnfermero : (string) $user?->cod_usuario;
         $turnoEfectivo = $this->filtroTurno ?: null;
 
+        $errorCarga = false;
+        try {
         $pacientesQuery = $service->obtenerPacientesAsignadosQuery(
             $user,
             $turnoEfectivo,
             $enfermeroEfectivo ?: null
         )->with([
+            'cama.habitacion',
             'ocupacionActiva.cama.habitacion',
             'asignacionesTurno' => function ($q) {
                 $q->whereIn('estado', ['ACTIVO', 'ACTIVA'])
@@ -894,21 +1589,26 @@ class MisPacientes extends Component
         ]);
 
         if (trim($this->search) !== '') {
-            $b = trim($this->search);
-            $pacientesQuery->where(function ($q) use ($b) {
-                $q->whereLike('nombres', "%{$b}%")
-                    ->orWhereLike('apellido_paterno', "%{$b}%")
-                    ->orWhereLike('apellido_materno', "%{$b}%")
-                    ->orWhereLike('numero_documento', "%{$b}%")
-                    ->orWhereLike('cod_residente', "%{$b}%")
-                    ->orWhereHas('cama', function ($cq) use ($b) {
-                        $cq->whereLike('codigo', "%{$b}%")
-                            ->orWhereHas('habitacion', function ($hq) use ($b) {
-                                $hq->whereLike('nombre', "%{$b}%")
-                                    ->orWhereLike('codigo', "%{$b}%");
-                            });
+            foreach (preg_split('/\s+/', trim($this->search)) as $termino) {
+                $pacientesQuery->where(function ($q) use ($termino) {
+                    $q->whereLike('nombres', "%{$termino}%")
+                        ->orWhereLike('apellido_paterno', "%{$termino}%")
+                        ->orWhereLike('apellido_materno', "%{$termino}%")
+                        ->orWhereLike('numero_documento', "%{$termino}%")
+                        ->orWhereLike('cod_residente', "%{$termino}%")
+                        ->orWhereHas('cama', function ($cq) use ($termino) {
+                            $cq->whereLike('codigo', "%{$termino}%")
+                                ->orWhereHas('habitacion', function ($hq) use ($termino) {
+                                    $hq->whereLike('nombre', "%{$termino}%")
+                                        ->orWhereLike('codigo', "%{$termino}%");
+                                });
                     });
-            });
+                });
+            }
+        }
+
+        if ($this->filtroHabitacion !== '') {
+            $pacientesQuery->whereHas('cama.habitacion', fn ($q) => $q->where('codigo', $this->filtroHabitacion));
         }
 
         // Filtro por estado clínico: TODOS / ESTABLE / VIGILANCIA / REQUIERE_ATENCION
@@ -950,7 +1650,21 @@ class MisPacientes extends Component
         }
 
         // Obtener pacientes paginados
-        $pacientes = $pacientesQuery->orderBy('nombres')->paginate(12);
+        if (in_array($this->orden, ['HAB_ASC', 'HAB_DESC'], true)) {
+            $direccion = $this->orden === 'HAB_DESC' ? 'desc' : 'asc';
+            $pacientesQuery->orderBy(
+                \App\Models\Habitacion::query()
+                    ->select('habitaciones.codigo')
+                    ->join('camas', 'camas.cod_habitacion', '=', 'habitaciones.cod_habitacion')
+                    ->join('ocupaciones_cama', 'ocupaciones_cama.cod_cama', '=', 'camas.cod_cama')
+                    ->whereColumn('ocupaciones_cama.cod_residente', 'residentes.cod_residente')
+                    ->whereIn('ocupaciones_cama.estado', ['ACTIVA', 'ACTIVO'])
+                    ->limit(1),
+                $direccion
+            );
+        }
+        $pacientesQuery->orderBy('nombres', $this->orden === 'NOMBRE_DESC' ? 'desc' : 'asc');
+        $pacientes = $pacientesQuery->paginate(12);
 
         // Pre-cargar datos detallados de los pacientes paginados (signos recientes, medicación pendiente)
         $codResidentes = $pacientes->pluck('cod_residente')->filter()->values();
@@ -960,9 +1674,25 @@ class MisPacientes extends Component
         $adminMedsHoy = collect();
         $seguimientosHoy = collect();
         $proximasAtenciones = collect();
-        $proximasMeds = collect();
+        $proximosCuidados = collect();
 
         if ($codResidentes->isNotEmpty()) {
+            $proximasAtenciones = Atencion::query()
+                ->whereIn('cod_residente', $codResidentes)
+                ->where('fecha_hora', '>=', now())
+                ->orderBy('fecha_hora')
+                ->get()
+                ->groupBy('cod_residente')
+                ->map(fn ($atenciones) => $atenciones->first());
+            $proximosCuidados = EjecucionCuidado::query()
+                ->whereIn('cod_residente', $codResidentes)
+                ->whereIn('estado', ['PENDIENTE', 'EN_PROCESO'])
+                ->where('fecha_hora_programada', '>=', now())
+                ->with('intervencion')
+                ->orderBy('fecha_hora_programada')
+                ->get()
+                ->groupBy('cod_residente')
+                ->map(fn ($cuidados) => $cuidados->first());
             $ultimosSignos = SignoVital::whereIn('cod_residente', $codResidentes)
                 ->orderByDesc('fecha_hora')
                 ->get()
@@ -1045,16 +1775,16 @@ class MisPacientes extends Component
 
             // Próxima atención en la fila de lista
             $proxAten = $proximasAtenciones->get($p->cod_residente);
-            $proxMed = $proximasMeds->get($p->cod_residente);
-            if ($proxAten) {
+            $proxCuidado = $proximosCuidados->get($p->cod_residente);
+            if ($proxCuidado && (! $proxAten || $proxCuidado->fecha_hora_programada <= $proxAten->fecha_hora)) {
+                $p->proxima_atencion_texto = $proxCuidado->intervencion?->nombre ?: 'Cuidado programado';
+                $p->proxima_atencion_hora = $proxCuidado->fecha_hora_programada?->format('d/m H:i');
+            } elseif ($proxAten) {
                 $p->proxima_atencion_texto = $proxAten->motivo ?: ($proxAten->tipo_atencion ?: 'Atención programada');
                 $p->proxima_atencion_hora = Carbon::parse($proxAten->fecha_hora)->format('H:i');
-            } elseif ($proxMed) {
-                $p->proxima_atencion_texto = 'Admin. '.$proxMed['nombre'];
-                $p->proxima_atencion_hora = $proxMed['hora'];
             } else {
-                $p->proxima_atencion_texto = 'Control de signos';
-                $p->proxima_atencion_hora = '—';
+                $p->proxima_atencion_texto = null;
+                $p->proxima_atencion_hora = null;
             }
         }
 
@@ -1063,7 +1793,7 @@ class MisPacientes extends Component
             $user,
             $turnoEfectivo,
             $enfermeroEfectivo ?: null
-        ))->withCount([
+        ))->with('cama.habitacion')->withCount([
             'alertas as alertas_activas_count' => fn ($q) => $q->whereIn('estado', ['ABIERTA', 'EN_ATENCION']),
             'alertas as alertas_criticas_count' => fn ($q) => $q->whereIn('estado', ['ABIERTA', 'EN_ATENCION'])->whereIn('prioridad', ['CRITICO', 'ALTO', 'CRITICA']),
             'tareasActuales as tareas_pendientes_count' => function ($q) use ($fechaHoy) {
@@ -1102,15 +1832,30 @@ class MisPacientes extends Component
             }
         }
 
-        return view('livewire.cuidados.mis-pacientes', [
+        $habitaciones = $baseParaStats
+            ->map(fn ($p) => $p->cama?->habitacion?->codigo)
+            ->filter()
+            ->unique()
+            ->sort()
+            ->values();
+        } catch (QueryException $exception) {
+            report($exception);
+            $errorCarga = true;
+            $pacientes = new LengthAwarePaginator([], 0, 12);
+            $stats = ['total' => 0, 'requiere_atencion' => 0, 'vigilancia' => 0, 'estable' => 0];
+            $habitaciones = collect();
+        }
+
+        return view('livewire.cuidados.mis-residentes-directorio', [
             'pacientes' => $pacientes,
             'esModoConsulta' => $this->esModoConsulta,
             'esResidenteAsignado' => $this->esResidenteAsignado,
             'detalleResidente' => $this->detalleResidente,
             'stats' => $stats,
-            'turnos' => TurnoEnfermeria::activos()->get(),
-            'enfermeros' => User::role('ENFERMEROS')->where('estado', 'ACTIVO')->with('personal')->get(),
+            'habitaciones' => $habitaciones,
+            'errorCarga' => $errorCarga,
             'esSuperAdmin' => $esSuperAdmin,
+            'turnoActual' => $turnoActual,
         ])->layout('layouts.enfermeria');
     }
 }

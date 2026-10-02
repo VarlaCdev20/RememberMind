@@ -1,28 +1,30 @@
 <div>
- {{-- Selector de Periodo y Filtros --}}
- <div class="rm-filter-bar mb-6 flex flex-col md:flex-row gap-4 items-end justify-between">
- <div class="flex-1">
- <span class="text-[11px] font-bold uppercase tracking-[0.18em] text-parrafo">
- Análisis y Reportes
- </span>
- <h3 class="text-base font-extrabold text-titulo mt-1 mb-1">
- Ficha y Reportes de Evolución
- </h3>
- <p class="text-[11px] font-bold text-apoyo leading-relaxed">
- Seleccione el rango de fechas para actualizar en tiempo real los análisis gráficos y registros de evolución.
- </p>
- </div>
- <div class="flex flex-wrap items-center gap-3 w-full md:w-auto shrink-0">
- <div class="w-[140px]">
- <label class="block text-[9px] font-bold uppercase text-apoyo mb-1 tracking-wider">Desde</label>
- <input type="date" wire:model.live="fecha_inicio" class="w-full rounded-xl border border-borde-suave bg-fondo-card/45 px-3 py-1.5 text-xs font-bold text-titulo outline-none hover:bg-fondo-card transition">
- </div>
- <div class="w-[140px]">
- <label class="block text-[9px] font-bold uppercase text-apoyo mb-1 tracking-wider">Hasta</label>
- <input type="date" wire:model.live="fecha_fin" class="w-full rounded-xl border border-borde-suave bg-fondo-card/45 px-3 py-1.5 text-xs font-bold text-titulo outline-none hover:bg-fondo-card transition">
- </div>
- </div>
- </div>
+     {{-- Selector de Periodo y Filtros --}}
+    <x-ui.filter-bar class="mb-6">
+        <div class="w-full flex flex-col md:flex-row gap-4 items-center justify-between">
+            <div class="flex-1">
+                <span class="text-[11px] font-bold uppercase tracking-[0.18em] text-[var(--rm-text-primary)]">
+                    Análisis y Reportes
+                </span>
+                <h3 class="text-base font-extrabold text-[var(--rm-text-primary)] mt-0.5">
+                    Ficha y Reportes de Evolución
+                </h3>
+                <p class="text-[11px] font-medium text-[var(--rm-text-secondary)]">
+                    Seleccione el rango de fechas para actualizar en tiempo real los análisis gráficos y registros de evolución.
+                </p>
+            </div>
+            <div class="flex flex-wrap items-center gap-2 w-full md:w-auto shrink-0">
+                <div class="w-[140px]">
+                    <label class="block text-[10px] font-bold uppercase text-[var(--rm-text-secondary)] mb-1 tracking-wider">Desde</label>
+                    <input type="date" wire:model.live="fecha_inicio" class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-input-bg)] px-3 text-xs font-medium text-[var(--rm-text-primary)] focus:border-[var(--rm-primary)] focus:ring-1 focus:ring-[var(--rm-primary)] focus:outline-none h-[38px]">
+                </div>
+                <div class="w-[140px]">
+                    <label class="block text-[10px] font-bold uppercase text-[var(--rm-text-secondary)] mb-1 tracking-wider">Hasta</label>
+                    <input type="date" wire:model.live="fecha_fin" class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-input-bg)] px-3 text-xs font-medium text-[var(--rm-text-primary)] focus:border-[var(--rm-primary)] focus:ring-1 focus:ring-[var(--rm-primary)] focus:outline-none h-[38px]">
+                </div>
+            </div>
+        </div>
+    </x-ui.filter-bar>
 
  {{-- Alerta de fecha inconsistente --}}
  @if($fecha_inicio && $fecha_fin && $fecha_inicio > $fecha_fin)
@@ -161,7 +163,7 @@
  <p class="text-[10px] font-bold text-apoyo mt-0.5">Registre constantes vitales en el rango de fechas seleccionado.</p>
  </div>
  @else
- <div class="relative h-64 w-full"
+ <div class="rm-chart-body is-md relative w-full" wire:ignore
  x-data="{ chart: null }"
  x-init="
  chart = new Chart($refs.canvasSignos, {
@@ -217,7 +219,7 @@
  <p class="text-[10px] font-bold text-apoyo mt-0.5">Registre valoraciones de tamizaje cognitivo en el rango seleccionado.</p>
  </div>
  @else
- <div class="relative h-64 w-full"
+ <div class="rm-chart-body is-md relative w-full" wire:ignore
  x-data="{ chart: null }"
  x-init="
  chart = new Chart($refs.canvasCognitivo, {

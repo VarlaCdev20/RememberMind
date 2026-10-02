@@ -6,7 +6,7 @@
 - HTTPS válido y `APP_DEBUG=false`.
 - Secretos inyectados por el entorno; nunca versionados.
 - Base de datos y almacenamiento privado con backups cifrados.
-- `SEED_DEMO_ACCOUNTS=false`. Los usuarios se crean únicamente mediante el flujo institucional autorizado.
+- `SEED_SAMPLE_ACCOUNTS=false`. Los usuarios se crean únicamente mediante el flujo institucional autorizado.
 - Worker de colas supervisado y tareas programadas ejecutadas cada minuto.
 
 ## Liberación

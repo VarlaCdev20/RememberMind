@@ -76,7 +76,7 @@
             $criterioClinico = "Parámetros dentro de rango normal";
         }
 
-        $obs = $s->observacion ?: ($s->observaciones ?: 'Control rutinario sin incidencias manifestadas.');
+        $obs = $s->observacion ?: ($s->observaciones ?: 'Sin observación registrada.');
 
         return [
             'id' => $s->cod_signo,
@@ -97,11 +97,11 @@
             'peso' => $s->peso ? "{$s->peso} kg" : '--',
             'talla' => $s->talla ? "{$s->talla} m" : '--',
             'imc' => $s->imc ?: '--',
-            'posicion' => $s->posicion ?: 'Decúbito supino',
+            'posicion' => $s->posicion ?: 'No registrada',
             'oxigeno' => $s->usa_oxigeno ? 'Sí (Oxigenoterapia activa)' : 'No (Aire ambiente)',
             'criterio' => $criterioClinico,
             'observaciones' => $obs,
-            'responsable' => $s->registradoPor->name ?? ($s->profesional->name ?? 'Equipo de Enfermería'),
+            'responsable' => $s->registradoPor->name ?? ($s->profesional->name ?? 'No registrado'),
             'estado' => $estado,
             'badgeClass' => $badgeClass,
         ];
@@ -137,7 +137,7 @@
     <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between border-b border-[var(--rm-border)] pb-3">
         <div>
             <div class="flex items-center gap-2">
-                <h2 class="text-sm sm:text-base font-black text-[var(--rm-text-title)] tracking-tight uppercase">
+                <h2 class="text-sm sm:text-base font-bold text-[var(--rm-text-title)] tracking-tight uppercase">
                     SIGNOS VITALES
                 </h2>
                 <span class="inline-flex items-center gap-1 rounded-full bg-blue-50 px-2 py-0.5 text-[10px] font-bold text-blue-700 border border-blue-200">
@@ -157,7 +157,7 @@
             <button type="button"
                     wire:click="abrirModalSignos"
                     wire:loading.attr="disabled"
-                    class="inline-flex items-center gap-2 rounded-xl bg-[#1E3A8A] px-3.5 py-2 text-xs font-bold text-white shadow-xs hover:bg-blue-900 transition active:scale-98 cursor-pointer">
+                    class="inline-flex items-center gap-2 rounded-xl bg-[var(--rm-action-primary)] px-3.5 py-2 text-xs font-bold text-white shadow-xs hover:bg-blue-900 transition active:scale-98 cursor-pointer">
                 <i class="ph-bold ph-plus text-sm"></i>
                 <span>+ Registrar signos vitales</span>
             </button>
@@ -221,7 +221,7 @@
                                 wire:click="abrirModalSignos"
                                 @click="menuCabecera = false;"
                                 class="w-full text-left px-3.5 py-2 flex items-center gap-2 text-[var(--rm-text-body)] hover:bg-[var(--rm-surface-alt)] hover:text-[var(--rm-text-title)] transition cursor-pointer">
-                            <i class="ph-bold ph-plus-circle text-[#1E3A8A] text-sm"></i>
+                            <i class="ph-bold ph-plus-circle text-[var(--rm-action-primary)] text-sm"></i>
                             <span>Registrar nueva medición</span>
                         </button>
                     </div>
@@ -240,7 +240,7 @@
             <div class="rm-chart-header flex-col sm:flex-row sm:items-center">
                 <div>
                     <div class="flex items-center gap-2">
-                        <span class="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-50 text-[#1E3A8A] border border-blue-200 text-sm">
+                        <span class="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-50 text-[var(--rm-action-primary)] border border-blue-200 text-sm">
                             <i class="ph-bold" :class="metricasInfo[metricaActiva]?.icon || 'ph-chart-line'"></i>
                         </span>
                         <h3 class="rm-chart-title"
@@ -266,7 +266,7 @@
                         <button type="button"
                                 @click="cambiarPeriodo('{{ $perKey }}')"
                                 :class="periodoActivo === '{{ $perKey }}'
-                                    ? 'bg-[#1E3A8A] text-white shadow-2xs font-bold'
+                                    ? 'bg-[var(--rm-action-primary)] text-white shadow-2xs font-bold'
                                     : 'text-[var(--rm-text-muted)] hover:text-[var(--rm-text-title)] hover:bg-[var(--rm-surface)] font-medium'"
                                 class="px-2.5 py-1 text-[11px] rounded-lg transition cursor-pointer">
                             {{ $perLabel }}
@@ -296,8 +296,8 @@
                     </template>
                     <template x-if="metricaActiva !== 'PA'">
                         <span class="inline-flex items-center gap-1.5 font-bold"
-                              :style="`color: ${metricasInfo[metricaActiva]?.color || '#1E3A8A'}`">
-                            <span class="h-2 w-2 rounded-full" :style="`background-color: ${metricasInfo[metricaActiva]?.color || '#1E3A8A'}`"></span>
+                              :style="`color: ${metricasInfo[metricaActiva]?.color || '#634A35'}`">
+                            <span class="h-2 w-2 rounded-full" :style="`background-color: ${metricasInfo[metricaActiva]?.color || '#634A35'}`"></span>
                             <span x-text="`${metricasInfo[metricaActiva]?.nombre} (${metricasInfo[metricaActiva]?.unidad})`"></span>
                         </span>
                     </template>
@@ -336,7 +336,7 @@
                 </h3>
                 <span class="inline-flex items-center gap-1 text-[10px] font-bold text-[var(--rm-text-muted)] bg-[var(--rm-surface-alt)] px-2 py-0.5 rounded-md border border-[var(--rm-border)]">
                     <span x-text="periodoActivo === '24h' ? '24h' : (periodoActivo === '7d' ? '7 días' : (periodoActivo === '30d' ? '30 días' : '3 meses'))"></span>
-                    <i class="ph-bold ph-caret-down text-[9px]"></i>
+                    <i class="ph-bold ph-caret-down text-[10px]"></i>
                 </span>
             </div>
 
@@ -346,19 +346,19 @@
                     Último registro
                 </span>
                 <span class="text-[11px] text-[var(--rm-text-muted)] block font-medium"
-                      x-text="resumenActivo.ultimo_registro_fecha || '12/09/2026 07:00'">
-                    12/09/2026 07:00
+                      x-text="resumenActivo.ultimo_registro_fecha || 'Sin registros'">
+                    Sin registros
                 </span>
 
                 <div class="flex items-baseline justify-between pt-1">
-                    <span class="text-xl font-black text-[var(--rm-text-title)] tracking-tight"
+                    <span class="text-xl font-bold text-[var(--rm-text-title)] tracking-tight"
                           x-text="resumenActivo.ultimo_fmt || resumenActivo.ultimo || '--'">
                         120/78 mmHg
                     </span>
                     <span class="inline-flex items-center rounded-md px-2 py-0.5 text-[10px] font-bold border"
-                          :class="resumenActivo.estado_badge || 'bg-emerald-100 text-emerald-800 border-emerald-200'"
-                          x-text="resumenActivo.estado || 'Normal'">
-                        Normal
+                          :class="resumenActivo.estado_badge || 'bg-slate-100 text-slate-700 border-slate-200'"
+                          x-text="resumenActivo.estado || 'Sin datos'">
+                        Sin datos
                     </span>
                 </div>
             </div>
@@ -366,22 +366,22 @@
             {{-- Bloque: Mínimo · Máximo · Promedio --}}
             <div class="grid grid-cols-3 gap-1.5 text-center">
                 <div class="rounded-lg bg-[var(--rm-surface-alt)]/60 border border-[var(--rm-border)]/60 p-2">
-                    <span class="text-[9px] font-bold uppercase text-[var(--rm-text-muted)] block">Mínimo</span>
-                    <span class="text-xs font-black text-[var(--rm-text-title)] mt-0.5 block"
+                    <span class="text-[10px] font-bold uppercase text-[var(--rm-text-muted)] block">Mínimo</span>
+                    <span class="text-xs font-bold text-[var(--rm-text-title)] mt-0.5 block"
                           x-text="resumenActivo.min || '--'">
                         110/70
                     </span>
                 </div>
                 <div class="rounded-lg bg-[var(--rm-surface-alt)]/60 border border-[var(--rm-border)]/60 p-2">
-                    <span class="text-[9px] font-bold uppercase text-[var(--rm-text-muted)] block">Máximo</span>
-                    <span class="text-xs font-black text-[var(--rm-text-title)] mt-0.5 block"
+                    <span class="text-[10px] font-bold uppercase text-[var(--rm-text-muted)] block">Máximo</span>
+                    <span class="text-xs font-bold text-[var(--rm-text-title)] mt-0.5 block"
                           x-text="resumenActivo.max || '--'">
                         148/92
                     </span>
                 </div>
                 <div class="rounded-lg bg-[var(--rm-surface-alt)]/60 border border-[var(--rm-border)]/60 p-2">
-                    <span class="text-[9px] font-bold uppercase text-[var(--rm-text-muted)] block">Promedio</span>
-                    <span class="text-xs font-black text-[var(--rm-text-title)] mt-0.5 block"
+                    <span class="text-[10px] font-bold uppercase text-[var(--rm-text-muted)] block">Promedio</span>
+                    <span class="text-xs font-bold text-[var(--rm-text-title)] mt-0.5 block"
                           x-text="resumenActivo.promedio || '--'">
                         125/80
                     </span>
@@ -435,14 +435,14 @@
                     </span>
                     <span class="text-xs font-bold text-[var(--rm-text-title)]">Presión art.</span>
                 </div>
-                <span class="text-[9px] font-bold px-1.5 py-0.2 rounded border"
+                <span class="text-[10px] font-bold px-1.5 py-0.5 rounded border"
                       :class="metricasInfo['PA']?.estado_badge || 'bg-emerald-100 text-emerald-800 border-emerald-200'"
                       x-text="metricasInfo['PA']?.estado || 'Normal'">
                     Normal
                 </span>
             </div>
             <div>
-                <span class="text-base font-black text-[var(--rm-text-title)] block"
+                <span class="text-base font-bold text-[var(--rm-text-title)] block"
                       x-text="metricasInfo['PA']?.ultimo || '120/78'">
                     120/78
                 </span>
@@ -466,14 +466,14 @@
                     </span>
                     <span class="text-xs font-bold text-[var(--rm-text-title)]">Frec. card.</span>
                 </div>
-                <span class="text-[9px] font-bold px-1.5 py-0.2 rounded border"
+                <span class="text-[10px] font-bold px-1.5 py-0.5 rounded border"
                       :class="metricasInfo['FC']?.estado_badge || 'bg-emerald-100 text-emerald-800 border-emerald-200'"
                       x-text="metricasInfo['FC']?.estado || 'Normal'">
                     Normal
                 </span>
             </div>
             <div>
-                <span class="text-base font-black text-[var(--rm-text-title)] block"
+                <span class="text-base font-bold text-[var(--rm-text-title)] block"
                       x-text="metricasInfo['FC']?.ultimo || '72'">
                     72
                 </span>
@@ -497,14 +497,14 @@
                     </span>
                     <span class="text-xs font-bold text-[var(--rm-text-title)]">Saturación O₂</span>
                 </div>
-                <span class="text-[9px] font-bold px-1.5 py-0.2 rounded border"
+                <span class="text-[10px] font-bold px-1.5 py-0.5 rounded border"
                       :class="metricasInfo['SPO2']?.estado_badge || 'bg-emerald-100 text-emerald-800 border-emerald-200'"
                       x-text="metricasInfo['SPO2']?.estado || 'Normal'">
                     Normal
                 </span>
             </div>
             <div>
-                <span class="text-base font-black text-[var(--rm-text-title)] block"
+                <span class="text-base font-bold text-[var(--rm-text-title)] block"
                       x-text="metricasInfo['SPO2']?.ultimo || '97%'">
                     97%
                 </span>
@@ -528,14 +528,14 @@
                     </span>
                     <span class="text-xs font-bold text-[var(--rm-text-title)]">Temperatura</span>
                 </div>
-                <span class="text-[9px] font-bold px-1.5 py-0.2 rounded border"
+                <span class="text-[10px] font-bold px-1.5 py-0.5 rounded border"
                       :class="metricasInfo['TEMP']?.estado_badge || 'bg-emerald-100 text-emerald-800 border-emerald-200'"
                       x-text="metricasInfo['TEMP']?.estado || 'Afebril'">
                     Afebril
                 </span>
             </div>
             <div>
-                <span class="text-base font-black text-[var(--rm-text-title)] block"
+                <span class="text-base font-bold text-[var(--rm-text-title)] block"
                       x-text="metricasInfo['TEMP']?.ultimo || '—'">
                     —
                 </span>
@@ -559,14 +559,14 @@
                     </span>
                     <span class="text-xs font-bold text-[var(--rm-text-title)]">Frec. resp.</span>
                 </div>
-                <span class="text-[9px] font-bold px-1.5 py-0.2 rounded border"
+                <span class="text-[10px] font-bold px-1.5 py-0.5 rounded border"
                       :class="metricasInfo['FR']?.estado_badge || 'bg-emerald-100 text-emerald-800 border-emerald-200'"
                       x-text="metricasInfo['FR']?.estado || 'Eupnea'">
                     Eupnea
                 </span>
             </div>
             <div>
-                <span class="text-base font-black text-[var(--rm-text-title)] block"
+                <span class="text-base font-bold text-[var(--rm-text-title)] block"
                       x-text="metricasInfo['FR']?.ultimo || '18'">
                     18
                 </span>
@@ -590,14 +590,14 @@
                     </span>
                     <span class="text-xs font-bold text-[var(--rm-text-title)]">Dolor EVA</span>
                 </div>
-                <span class="text-[9px] font-bold px-1.5 py-0.2 rounded border"
+                <span class="text-[10px] font-bold px-1.5 py-0.5 rounded border"
                       :class="metricasInfo['DOLOR']?.estado_badge || 'bg-emerald-100 text-emerald-800 border-emerald-200'"
                       x-text="metricasInfo['DOLOR']?.estado || 'Leve'">
                     Leve
                 </span>
             </div>
             <div>
-                <span class="text-base font-black text-[var(--rm-text-title)] block"
+                <span class="text-base font-bold text-[var(--rm-text-title)] block"
                       x-text="metricasInfo['DOLOR']?.ultimo || '2/10'">
                     2/10
                 </span>
@@ -643,7 +643,7 @@
                         </div>
                         <div class="flex items-baseline justify-between pt-0.5">
                             <span class="text-xs font-bold text-[var(--rm-text-title)]">{{ $ev['evento'] }}</span>
-                            <span class="text-xs font-black text-rose-600 font-mono">{{ $ev['valor'] }}</span>
+                            <span class="text-xs font-bold text-rose-600 font-mono">{{ $ev['valor'] }}</span>
                         </div>
                         <p class="text-[11px] text-[var(--rm-text-muted)] leading-tight">{{ $ev['motivo'] ?? ($ev['registro']->observacion ?? ($ev['registro']->observaciones ?? ($ev['evento'] ?? 'Hallazgo hemodinámico reportado.'))) }}</p>
                     </div>
@@ -681,9 +681,9 @@
             </div>
 
             <div class="rm-table-container max-h-[420px] overflow-y-auto">
-                <table class="rm-table text-xs w-full">
+                <table class="rm-data-table rm-table text-xs w-full">
                     <thead class="sticky top-0 bg-[var(--rm-surface)] z-10 shadow-2xs">
-                        <tr class="border-b border-[var(--rm-border)] text-[10px] font-black uppercase text-[var(--rm-text-muted)]">
+                        <tr class="border-b border-[var(--rm-border)] text-[10px] font-bold uppercase text-[var(--rm-text-muted)]">
                             <th class="py-2.5 px-3 text-left whitespace-nowrap">Fecha / Hora</th>
                             <th class="py-2.5 px-2 text-left whitespace-nowrap">PA (mmHg)</th>
                             <th class="py-2.5 px-2 text-left whitespace-nowrap">FC (lpm)</th>
@@ -747,7 +747,7 @@
 
                                 {{-- Estado badge --}}
                                 <td class="py-2.5 px-2 text-center whitespace-nowrap">
-                                    <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[9.5px] font-bold border {{ $item['badgeClass'] }}">
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-bold border {{ $item['badgeClass'] }}">
                                         {{ $item['estado'] }}
                                     </span>
                                 </td>
@@ -757,7 +757,7 @@
                                     <button type="button"
                                             @click.stop="abrirDrawer({{ json_encode($item) }})"
                                             title="Ver detalle completo"
-                                            class="p-1 rounded-md hover:bg-[var(--rm-surface)] hover:text-[#1E3A8A] transition cursor-pointer">
+                                            class="p-1 rounded-md hover:bg-[var(--rm-surface)] hover:text-[var(--rm-action-primary)] transition cursor-pointer">
                                         <i class="ph-bold ph-dots-three-vertical text-sm"></i>
                                     </button>
                                 </td>
@@ -801,11 +801,11 @@
             {{-- Encabezado --}}
             <div class="flex items-start justify-between border-b border-[var(--rm-border)] pb-3.5">
                 <div class="flex items-center gap-3">
-                    <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50 text-[#1E3A8A] border border-blue-200 shadow-2xs">
+                    <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50 text-[var(--rm-action-primary)] border border-blue-200 shadow-2xs">
                         <i class="ph-bold ph-sliders-horizontal text-xl"></i>
                     </span>
                     <div>
-                        <h3 class="text-sm font-black uppercase tracking-tight text-[var(--rm-text-title)]">
+                        <h3 class="text-sm font-bold uppercase tracking-tight text-[var(--rm-text-title)]">
                             Configurar Rangos Clínicos de Normalidad
                         </h3>
                         <p class="text-xs text-[var(--rm-text-muted)] mt-0.5">
@@ -897,7 +897,7 @@
                         </div>
                         <div class="flex flex-col items-center justify-center p-1.5 rounded-lg bg-[var(--rm-surface)] border border-[var(--rm-border)] text-[10.5px] text-[var(--rm-text-muted)]">
                             <span>Rango normal</span>
-                            <span class="font-black text-emerald-600 dark:text-emerald-400">≥ <span x-text="rangos.spo2_min"></span>%</span>
+                            <span class="font-bold text-emerald-600 dark:text-emerald-400">≥ <span x-text="rangos.spo2_min"></span>%</span>
                         </div>
                     </div>
                 </div>
@@ -960,7 +960,7 @@
                     </button>
                     <button type="button"
                             @click="guardarRangos()"
-                            class="inline-flex items-center gap-1.5 px-4 py-1.5 text-xs font-bold text-white bg-[#1E3A8A] hover:bg-blue-900 rounded-xl transition cursor-pointer shadow-xs">
+                            class="inline-flex items-center gap-1.5 px-4 py-1.5 text-xs font-bold text-white bg-[var(--rm-action-primary)] hover:bg-blue-900 rounded-xl transition cursor-pointer shadow-xs">
                         <i class="ph-bold ph-check text-sm"></i>
                         <span>Guardar rangos</span>
                     </button>
@@ -1007,7 +1007,7 @@
                                 PANEL LATERAL DE CONSULTA
                             </span>
                             <div class="flex items-center gap-2 pt-0.5">
-                                <span class="flex h-7 w-7 items-center justify-center rounded-lg bg-[var(--rm-surface)] text-[#1E3A8A] border border-[var(--rm-border)] text-sm shadow-2xs">
+                                <span class="flex h-7 w-7 items-center justify-center rounded-lg bg-[var(--rm-surface)] text-[var(--rm-action-primary)] border border-[var(--rm-border)] text-sm shadow-2xs">
                                     <i class="ph-bold ph-heartbeat"></i>
                                 </span>
                                 <h3 class="rm-drawer-title">DETALLE DEL CONTROL HEMODINÁMICO</h3>
@@ -1028,7 +1028,7 @@
                     {{-- Card del Residente (Horizontal Compacta Golden Reference) --}}
                     <div class="rm-drawer-resident">
                         <div class="flex items-center gap-3 min-w-0">
-                            <div class="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl bg-[#1E3A8A] text-white font-black text-sm shadow-xs">
+                            <div class="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl bg-[var(--rm-action-primary)] text-white font-bold text-sm shadow-xs">
                                 {{ substr($adultoMayor->nombres, 0, 1) }}{{ substr($adultoMayor->ap_paterno, 0, 1) }}
                             </div>
                             <div class="min-w-0">
@@ -1050,7 +1050,7 @@
                             </span>
                             <div class="mt-1 flex items-center justify-end gap-1.5">
                                 <span class="text-[10.5px] text-[var(--rm-text-muted)]">Estado:</span>
-                                <span class="inline-flex items-center gap-1 px-2 py-0.2 rounded-full text-[10px] font-bold border {{ $adultoMayor->estado_badge_color }}">
+                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold border {{ $adultoMayor->estado_badge_color }}">
                                     <span class="h-1.5 w-1.5 rounded-full bg-current"></span>
                                     {{ $adultoMayor->estado_humano }}
                                 </span>
@@ -1070,7 +1070,7 @@
                                     <span class="text-xs font-semibold text-[var(--rm-text-body)]"
                                           x-text="`${registroActivo.fecha} · ${registroActivo.hora}`"></span>
                                 </div>
-                                <div class="text-base font-black text-[var(--rm-text-title)]"
+                                <div class="text-base font-bold text-[var(--rm-text-title)]"
                                      x-text="`Presión Arterial: ${registroActivo.pa} mmHg`"></div>
                                 <div class="text-[11px] text-[var(--rm-text-muted)] font-medium"
                                      x-text="`Criterio: ${registroActivo.criterio || 'Monitoreo estándar'}`"></div>
@@ -1079,7 +1079,7 @@
                             {{-- Profesional Responsable --}}
                             <div class="rm-drawer-card flex items-center justify-between">
                                 <div class="flex items-center gap-2.5">
-                                    <div class="h-8 w-8 rounded-full bg-[#1E3A8A] text-white flex items-center justify-center font-bold text-xs">
+                                    <div class="h-8 w-8 rounded-full bg-[var(--rm-action-primary)] text-white flex items-center justify-center font-bold text-xs">
                                         <i class="ph-bold ph-user"></i>
                                     </div>
                                     <div>
@@ -1428,8 +1428,8 @@ document.addEventListener('alpine:init', () => {
                 const pad = r.presion_diastolica || (r.presion_arterial ? r.presion_arterial.split('/')[1] : null);
                 this.registroActivo = {
                     id: r.cod_signo,
-                    fecha: r.fecha ? (typeof r.fecha === 'string' ? r.fecha.substring(0, 10) : '') : 'Reciente',
-                    hora: r.hora ? (typeof r.hora === 'string' ? r.hora.substring(0, 5) : '') : '08:00',
+                    fecha: r.fecha ? (typeof r.fecha === 'string' ? r.fecha.substring(0, 10) : '') : 'No registrada',
+                    hora: r.hora ? (typeof r.hora === 'string' ? r.hora.substring(0, 5) : '') : '',
                     pa: (pas && pad) ? `${pas}/${pad}` : (r.presion_arterial || '--'),
                     fc: r.frecuencia_cardiaca || '--',
                     spo2: r.saturacion ? `${r.saturacion}%` : '--',
@@ -1438,11 +1438,11 @@ document.addEventListener('alpine:init', () => {
                     dolor: (r.dolor !== null && r.dolor !== undefined) ? `${r.dolor}/10` : '--',
                     glucosa: r.glucosa ? `${r.glucosa} mg/dL` : '--',
                     peso: r.peso ? `${r.peso} kg` : '--',
-                    posicion: r.posicion || 'Decúbito supino',
+                    posicion: r.posicion || 'No registrada',
                     oxigeno: r.usa_oxigeno ? 'Sí' : 'No',
                     criterio: ev.evento || 'Alteración detectada',
-                    observaciones: r.observacion || r.observaciones || 'Registro clínico con hallazgo reportado.',
-                    responsable: r.registrado_por || 'Equipo Asistencial',
+                    observaciones: r.observacion || r.observaciones || 'Sin observaciones registradas.',
+                    responsable: r.registrado_por || 'Responsable no registrado',
                     estado: ev.estado || 'Relevante',
                     badgeClass: ev.badge_bg || 'bg-amber-100 text-amber-800 border-amber-200',
                 };
@@ -1458,7 +1458,7 @@ document.addEventListener('alpine:init', () => {
                     dolor: '--',
                     glucosa: '--',
                     peso: '--',
-                    posicion: 'Decúbito supino',
+                    posicion: 'No registrada',
                     oxigeno: 'No',
                     criterio: ev.evento,
                     observaciones: `Evento detectado: ${ev.evento} con valor de ${ev.valor}.`,
@@ -1774,7 +1774,7 @@ document.addEventListener('alpine:init', () => {
                 return [
                     {
                         label: 'Sistólica',
-                        data: this.sistolica.length ? this.sistolica : [120, 122, 118, 125, 120, 119, 120],
+                        data: this.sistolica,
                         borderColor: colors.blue,
                         backgroundColor: (context) => makeGradient(context, colors.blue, isDark ? 0.25 : 0.15, 0.01),
                         borderWidth: 2.4,
@@ -1788,7 +1788,7 @@ document.addEventListener('alpine:init', () => {
                     },
                     {
                         label: 'Diastólica',
-                        data: this.diastolica.length ? this.diastolica : [78, 80, 76, 82, 79, 78, 78],
+                        data: this.diastolica,
                         borderColor: colors.blueSoft,
                         backgroundColor: (context) => makeGradient(context, colors.blueSoft, isDark ? 0.20 : 0.12, 0.01),
                         borderWidth: 2.4,
@@ -1804,13 +1804,13 @@ document.addEventListener('alpine:init', () => {
             }
 
             const mapData = {
-                'FC': { label: 'Frecuencia Cardíaca', data: this.fc, color: colors.mint, fallback: [72, 75, 71, 74, 72, 73, 72] },
-                'SPO2': { label: 'Saturación SpO₂', data: this.spo2, color: colors.mintSoft, fallback: [97, 98, 97, 96, 98, 97, 97] },
-                'TEMP': { label: 'Temperatura', data: this.temp, color: colors.warm, fallback: [36.5, 36.6, 36.4, 36.7, 36.5, 36.5, 36.5] },
-                'FR': { label: 'Frecuencia Respiratoria', data: this.fr, color: colors.blueDeep, fallback: [18, 19, 17, 18, 18, 18, 18] },
-                'DOLOR': { label: 'Dolor EVA', data: this.dolor, color: colors.coral, fallback: [2, 3, 2, 2, 1, 2, 2] },
-                'GLUCOSA': { label: 'Glucemia', data: this.glucosa, color: colors.blue, fallback: [105, 110, 102, 115, 108, 104, 105] },
-                'PESO': { label: 'Peso Corporal', data: this.peso, color: colors.mocha, fallback: [68.5, 68.4, 68.6, 68.5, 68.5, 68.3, 68.5] },
+                'FC': { label: 'Frecuencia Cardíaca', data: this.fc, color: colors.mint, fallback: [] },
+                'SPO2': { label: 'Saturación SpO₂', data: this.spo2, color: colors.mintSoft, fallback: [] },
+                'TEMP': { label: 'Temperatura', data: this.temp, color: colors.warm, fallback: [] },
+                'FR': { label: 'Frecuencia Respiratoria', data: this.fr, color: colors.blueDeep, fallback: [] },
+                'DOLOR': { label: 'Dolor EVA', data: this.dolor, color: colors.coral, fallback: [] },
+                'GLUCOSA': { label: 'Glucemia', data: this.glucosa, color: colors.blue, fallback: [] },
+                'PESO': { label: 'Peso Corporal', data: this.peso, color: colors.mocha, fallback: [] },
             };
 
             const cfg = mapData[metrica] || mapData['FC'];
@@ -1853,39 +1853,39 @@ document.addEventListener('alpine:init', () => {
                 {
                     id: 'sparklineCanvasPA',
                     isPA: true,
-                    dataA: this.sistolica.length ? this.sistolica : [120, 122, 118, 125, 120, 119, 120],
-                    dataB: this.diastolica.length ? this.diastolica : [78, 80, 76, 82, 79, 78, 78],
+                    dataA: this.sistolica,
+                    dataB: this.diastolica,
                     colorA: colors.blue,
                     colorB: colors.blueSoft,
                     yLimits: { min: 50, max: 160 }
                 },
                 {
                     id: 'sparklineCanvasFC',
-                    dataA: this.fc.length ? this.fc : [72, 75, 71, 74, 72, 73, 72],
+                    dataA: this.fc,
                     colorA: colors.mint,
                     yLimits: { min: 50, max: 110 }
                 },
                 {
                     id: 'sparklineCanvasSPO2',
-                    dataA: this.spo2.length ? this.spo2 : [97, 98, 97, 96, 98, 97, 97],
+                    dataA: this.spo2,
                     colorA: colors.mintSoft,
                     yLimits: { min: 88, max: 100 }
                 },
                 {
                     id: 'sparklineCanvasTEMP',
-                    dataA: this.temp.length ? this.temp : [36.5, 36.6, 36.4, 36.7, 36.5, 36.5, 36.5],
+                    dataA: this.temp,
                     colorA: colors.warm,
                     yLimits: { min: 35.0, max: 38.5 }
                 },
                 {
                     id: 'sparklineCanvasFR',
-                    dataA: this.fr.length ? this.fr : [18, 19, 17, 18, 18, 18, 18],
+                    dataA: this.fr,
                     colorA: colors.blueDeep,
                     yLimits: { min: 10, max: 26 }
                 },
                 {
                     id: 'sparklineCanvasDOLOR',
-                    dataA: this.dolor.length ? this.dolor : [2, 3, 2, 2, 1, 2, 2],
+                    dataA: this.dolor,
                     colorA: colors.coral,
                     yLimits: { min: 0, max: 10 }
                 },

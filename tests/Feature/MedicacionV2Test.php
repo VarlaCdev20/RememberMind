@@ -101,7 +101,7 @@ class MedicacionV2Test extends TestCase
     public function test_pantalla_restaurada_de_medicacion_carga_con_un_residente_v2(): void
     {
         [, $residente] = $this->escenarioMedico();
-        $super = User::query()->where('correo', 'admincasaamandita@gmail.com')->firstOrFail();
+        $super = User::query()->where('correo', 'carlaencinas78@gmail.com')->firstOrFail();
 
         $this->actingAs($super)
             ->get(route('admin.salud-seguimiento.medicacion', ['adulto' => $residente->cod_residente]))

@@ -9,8 +9,8 @@
 .rm-page-layout {
     display: flex;
     flex-direction: column;
-    gap: var(--rm-page-gap, 24px);
-    padding-bottom: var(--rm-space-6, 24px);
+    gap: var(--rm-page-gap, 16px);
+    padding-bottom: var(--rm-space-4, 16px);
     width: 100%;
 }
 
@@ -18,13 +18,13 @@
 .rm-page-header {
     display: flex;
     flex-direction: column;
-    gap: 10px;
-    padding: 8px 18px;
+    gap: 8px;
+    padding: 8px 14px;
     background-color: var(--rm-surface-soft);
     border: 1px solid var(--rm-border);
     border-radius: var(--rm-radius-panel, 16px);
     box-shadow: var(--rm-shadow-sm);
-    min-height: var(--rm-page-header-height, 90px);
+    min-height: var(--rm-page-header-height, 76px);
 }
 
 .rm-page-header h1 { line-height: 1.05; }
@@ -46,7 +46,7 @@
 
 .rm-page-title {
     font-family: var(--rm-font-title);
-    font-size: min(var(--rm-font-size-page, 30px), 30px);
+    font-size: var(--rm-font-size-page, 27px);
     font-weight: var(--rm-font-weight-bold);
     color: var(--rm-text-title);
     margin: 0;
@@ -131,6 +131,8 @@
 
 /* Dashboard editorial por rol ------------------------------------------- */
 .rm-role-hero {
+    --rm-role-hero-title-ink: var(--rm-mint-700);
+    --rm-role-hero-accent: var(--rm-mint-500);
     position: relative;
     display: grid;
     min-width: 0;
@@ -161,7 +163,9 @@
     display: flex;
     min-width: 0;
     flex-direction: column;
+    align-items: center;
     justify-content: center;
+    text-align: center;
     padding: clamp(1rem, 2vw, 1.65rem);
 }
 
@@ -169,10 +173,10 @@
     display: flex;
     align-items: center;
     gap: .55rem;
-    color: var(--rm-text-secondary);
-    font-size: .66rem;
+    color: var(--rm-action-primary-ink);
+    font-size: .75rem;
     font-weight: 850;
-    letter-spacing: .2em;
+    letter-spacing: .1em;
     text-transform: uppercase;
 }
 
@@ -182,30 +186,39 @@
 .rm-role-hero__title {
     max-width: 100%;
     margin-top: .55rem;
-    color: var(--rm-text-title);
-    font-size: clamp(1.65rem, 2.15vw, var(--rm-font-size-dashboard, 34px));
-    font-weight: 900;
-    letter-spacing: -.045em;
-    line-height: .98;
-    text-shadow: 0 1px 0 color-mix(in srgb, var(--rm-surface-raised) 64%, transparent), 0 9px 22px color-mix(in srgb, var(--rm-text-title) 10%, transparent);
+    color: var(--rm-role-hero-title-ink);
+    font-family: var(--rm-font-emphasis);
+    font-size: clamp(34px, 2.75vw, 42px);
+    font-weight: 800;
+    letter-spacing: -.025em;
+    line-height: 1.08;
+    text-wrap: balance;
 }
 
 .rm-role-hero__title > span { display: block; }
-.rm-role-hero__highlight { color: var(--rm-action-primary-ink); }
+.rm-role-hero__title > span:first-child { color: var(--rm-text-primary); font-size: .5em; font-weight: 650; line-height: 1.2; letter-spacing: -.015em; }
+.rm-role-hero__title::after { content: ''; display: block; width: 86px; height: 3px; margin: 9px auto 0; border-radius: var(--rm-radius-pill); background: var(--rm-role-hero-accent); }
+.rm-role-hero__highlight { margin-top: 3px; color: var(--rm-role-hero-title-ink); font-size: 1em; font-weight: 800; line-height: 1.08; letter-spacing: -.025em; }
+.rm-role-hero--personal .rm-role-hero__title > span:first-child { color: var(--rm-role-hero-title-ink); font-size: 1em; font-weight: 800; line-height: 1.08; letter-spacing: -.025em; }
+.rm-role-hero--personal .rm-role-hero__highlight { color: var(--rm-text-primary); font-size: .58em; font-weight: 650; line-height: 1.2; letter-spacing: -.015em; }
+.dark .rm-role-hero,
+[data-theme="dark"] .rm-role-hero { --rm-role-hero-title-ink: var(--rm-mint-100); --rm-role-hero-accent: var(--rm-mint-300); }
 
 .rm-role-hero__description {
     max-width: 58ch;
     margin-top: .45rem;
-    color: var(--rm-text-body);
-    font-size: clamp(.78rem, 1.25vw, .94rem);
-    font-weight: 560;
+    color: var(--rm-text-primary);
+    font-size: clamp(.85rem, 1.25vw, .96rem);
+    font-weight: 550;
     line-height: 1.4;
+    text-wrap: pretty;
 }
 
 .rm-role-hero__meta,
 .rm-role-hero__actions {
     display: flex;
     flex-wrap: wrap;
+    justify-content: center;
     gap: .55rem;
     margin-top: .55rem;
 }
@@ -263,25 +276,25 @@
 .rm-role-hero__leaf--one { left: 1rem; bottom: -1rem; font-size: 5rem; transform: rotate(-24deg); }
 .rm-role-hero__leaf--two { left: 48%; top: 1rem; font-size: 2rem; transform: rotate(32deg); }
 
-.rm-dashboard-composition { display: grid; gap: 1rem; }
+.rm-dashboard-composition { display: grid; gap: var(--rm-space-4); }
 .rm-dashboard-kicker { margin: 0 0 .25rem; color: var(--rm-action-primary-ink); font-size: .64rem; font-weight: 900; letter-spacing: .18em; }
 .rm-role-focus,
-.rm-role-access { border: 1px solid var(--rm-border-soft); border-radius: var(--rm-radius-card); background: var(--rm-surface); box-shadow: var(--rm-shadow-sm); }
-.rm-role-focus { padding: clamp(1rem, 2vw, 1.5rem); }
+.rm-role-access { border: 1px solid var(--rm-border); border-radius: var(--rm-radius-card); background: var(--rm-surface); box-shadow: var(--rm-shadow-sm); }
+.rm-role-focus { padding: var(--rm-space-card); }
 .rm-role-focus__heading { display: flex; align-items: flex-end; justify-content: space-between; gap: 1rem; margin-bottom: 1rem; }
 .rm-role-focus__heading h2,
 .rm-role-access h2 { margin: 0; color: var(--rm-text-title); font-size: 1.1rem; font-weight: 900; letter-spacing: -.02em; }
 .rm-role-focus__heading > span { border: 1px solid var(--rm-border); border-radius: 999px; background: var(--rm-surface-soft); padding: .35rem .65rem; color: var(--rm-text-secondary); font-size: .68rem; font-weight: 800; }
 .rm-role-focus__grid { display: grid; grid-template-columns: repeat(1, minmax(0, 1fr)); gap: .75rem; }
-.rm-role-focus__card { display: flex; min-width: 0; align-items: flex-start; gap: .8rem; border: 1px solid var(--rm-border-soft); border-radius: 1rem; background: var(--rm-surface-alt); padding: 1rem; transition: transform var(--rm-duration-fast) var(--rm-ease-standard), box-shadow var(--rm-duration-fast) var(--rm-ease-standard); }
+.rm-role-focus__card { display: flex; min-width: 0; align-items: flex-start; gap: var(--rm-space-3); border: 1px solid var(--rm-border); border-radius: var(--rm-radius-card); background: var(--rm-surface-soft); padding: var(--rm-space-card); transition: transform var(--rm-duration-fast) var(--rm-ease-standard), box-shadow var(--rm-duration-fast) var(--rm-ease-standard); }
 .rm-role-focus__card:hover { transform: translateY(-2px); box-shadow: var(--rm-shadow-sm); }
 .rm-role-focus__card > span { width: 2.5rem; height: 2.5rem; display: grid; place-items: center; flex: 0 0 2.5rem; border-radius: .8rem; background: var(--rm-action-primary-soft); color: var(--rm-action-primary-ink); font-size: 1.15rem; }
 .rm-role-focus__card h3 { margin: 0; color: var(--rm-text-title); font-size: .82rem; font-weight: 900; }
 .rm-role-focus__card p { margin: .2rem 0 0; color: var(--rm-text-secondary); font-size: .72rem; line-height: 1.45; }
-.rm-role-access { display: grid; gap: 1rem; padding: clamp(1rem, 2vw, 1.5rem); }
+.rm-role-access { display: grid; gap: var(--rm-space-3); padding: var(--rm-space-card); }
 .rm-role-access > div:first-child > p:last-child { max-width: 58ch; margin: .35rem 0 0; color: var(--rm-text-secondary); font-size: .75rem; }
 .rm-role-access__links { display: flex; flex-wrap: wrap; align-items: center; gap: .6rem; }
-.rm-role-access__links a { min-height: 2.65rem; display: inline-flex; align-items: center; gap: .5rem; border: 1px solid var(--rm-border); border-radius: .85rem; background: var(--rm-surface-alt); padding: .55rem .75rem; color: var(--rm-text-title); font-size: .72rem; font-weight: 850; transition: transform var(--rm-duration-fast), border-color var(--rm-duration-fast); }
+.rm-role-access__links a { min-height: var(--rm-control-md); display: inline-flex; align-items: center; gap: .5rem; border: 1px solid var(--rm-border); border-radius: var(--rm-radius-button); background: var(--rm-surface-soft); padding: .5rem .75rem; color: var(--rm-text-title); font-size: .72rem; font-weight: 850; transition: transform var(--rm-duration-fast), border-color var(--rm-duration-fast); }
 .rm-role-access__links a:hover { transform: translateY(-2px); border-color: var(--rm-action-primary); }
 .rm-role-access__links a > i:first-child { color: var(--rm-action-primary-ink); font-size: 1rem; }
 .rm-role-access__links a > i:last-child { color: var(--rm-text-muted); }
@@ -298,13 +311,13 @@
 }
 
 @media (min-width: 768px) {
-    .rm-role-hero { grid-template-columns: minmax(0, 1.15fr) minmax(18rem, .85fr); height: var(--rm-dashboard-hero-height, 260px); min-height: 240px; max-height: 270px; }
+    .rm-role-hero { grid-template-columns: minmax(0, 1.15fr) minmax(18rem, .85fr); min-height: 240px; }
     .rm-role-hero__content { padding: 1rem; }
-    .rm-role-hero__title { margin-top: .35rem; font-size: clamp(1.55rem, 2.15vw, 1.95rem); line-height: 1; }
-    .rm-role-hero__description { margin-top: .35rem; font-size: .75rem; line-height: 1.35; }
+    .rm-role-hero__title { margin-top: .35rem; }
+    .rm-role-hero__description { margin-top: .35rem; }
     .rm-role-hero__meta,
     .rm-role-hero__actions { gap: .4rem; margin-top: .35rem; }
-    .rm-role-hero__chip { min-height: 1.75rem; padding: .25rem .6rem; font-size: .65rem; }
+    .rm-role-hero__chip { min-height: 1.75rem; padding: .25rem .6rem; font-size: .72rem; }
     .rm-role-hero__visual { min-height: 100%; clip-path: ellipse(82% 90% at 82% 50%); }
     .rm-role-hero__visual::before {
         content: "";
@@ -315,6 +328,19 @@
         border-radius: 48% 52% 42% 58% / 58% 40% 60% 42%;
         pointer-events: none;
     }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .rm-role-hero__title::after { animation: rm-role-hero-accent-enter .8s .3s cubic-bezier(.2, .75, .25, 1) both; }
+    .rm-role-hero__logo { animation: rm-role-hero-logo-breathe 4s ease-in-out infinite; }
+}
+@keyframes rm-role-hero-accent-enter {
+    from { opacity: 0; transform: scaleX(.3); }
+    to { opacity: 1; transform: scaleX(1); }
+}
+@keyframes rm-role-hero-logo-breathe {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-2px); }
 }
 
 @media (prefers-reduced-motion: reduce) {

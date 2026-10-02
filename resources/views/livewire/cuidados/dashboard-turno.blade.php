@@ -4,7 +4,8 @@
             :usuario="Auth::user()"
             :estado="$dashboard['estado'] ?? null"
             :modo="$dashboard['modo'] ?? null"
-            image="images/FOTOS CENTRO DE ADULTOS MAYORES/621786801_1404497435021508_7880315777607437580_n.jpg"
+            :image="$welcomeImage"
+            :secondary-image="$welcomeSecondaryImage"
         />
 
 @php
@@ -54,13 +55,9 @@
         label="Medicamentos pendientes"
         :description="$medicacionPendiente === null ? 'Sin métrica disponible' : 'Del turno actual'"
         :href="$enTurno && Route::has('admin.enfermeria.medicacion') && auth()->user()?->can('enfermeria.ver_dashboard') ? route('admin.enfermeria.medicacion') : null" />
-    <x-ui.card variant="soft" class="rm-nursing-dashboard__message rm-nursing-message" aria-labelledby="nursing-message-title">
-        <div>
-            <h2 id="nursing-message-title">Pequeños cuidados,<br>grandes momentos</h2>
-            <p>Tu labor hace la diferencia<br>cada día.</p>
-        </div>
-        <span class="rm-nursing-message__ornament" aria-hidden="true"><i class="ph-bold ph-heartbeat"></i></span>
-    </x-ui.card>
+    <div class="rm-nursing-dashboard__message rm-nursing-message" aria-labelledby="nursing-message-title">
+        <h2 id="nursing-message-title">Pequeños cuidados,<br>grandes momentos</h2>
+    </div>
 
 @php
             $alertasPendientes = $dashboard['alertas_prioritarias'] ?? [];

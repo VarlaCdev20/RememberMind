@@ -253,10 +253,9 @@ class MiTurnoFueraDeJornadaTest extends TestCase
 
         // Livewire frontend aprobado
         Livewire::test(DashboardTurno::class)
-            ->assertSee('FUERA DE TURNO')
-            ->assertSee('MODO CONSULTA / SOLO LECTURA')
+            ->assertSee('Turno activo del equipo · solo lectura')
             ->assertSee('Carlos Mendoza')
-            ->assertDontSee('MI TURNO / ACTIVO');
+            ->assertDontSee('Asignados a mi turno activo');
     }
 
     /**
@@ -337,8 +336,7 @@ class MiTurnoFueraDeJornadaTest extends TestCase
 
     /**
      * 4. Graficas corresponden al turno actualmente activo:
-     * - Muestra 'Progreso del turno en curso' y 'Solo lectura'.
-     * - NO lo llama 'Tu progreso'.
+     * - Muestra contexto de consulta y agenda del equipo, sin progreso duplicado.
      * - Calcula el progreso con los residentes asignados a las jornadas activas.
      */
     public function test_graficas_corresponden_al_turno_activo_en_modo_solo_lectura(): void
@@ -411,9 +409,10 @@ class MiTurnoFueraDeJornadaTest extends TestCase
         $this->assertEquals(100, $datos['estado_tareas']['porcentaje']);
 
         Livewire::test(DashboardTurno::class)
-            ->assertSee('Progreso del turno en curso')
-            ->assertSee('Solo lectura')
-            ->assertSee('Actividad del turno en curso')
+            ->assertSee('Turno del equipo disponible en modo consulta.')
+            ->assertSee('Pacientes del turno')
+            ->assertSee('Agenda de medicación y cuidados')
+            ->assertSee('Turno del equipo · solo lectura')
             ->assertDontSee('Tu progreso');
     }
 
@@ -533,10 +532,10 @@ class MiTurnoFueraDeJornadaTest extends TestCase
         $this->assertTrue(Gate::forUser($this->robertoUser)->allows('create', AdministracionMedicacion::class));
 
         Livewire::test(DashboardTurno::class)
-            ->assertSee('MI TURNO / ACTIVO')
+            ->assertSee('Asignados a mi turno activo')
             ->assertSee('Beatriz Castro')
             ->assertDontSee('Carlos Mendoza')
-            ->assertSee('Progreso del turno')
+            ->assertSee('Cuidados y seguimiento de tu turno.')
             ->assertDontSee('FUERA DE TURNO');
     }
 
@@ -771,8 +770,8 @@ class MiTurnoFueraDeJornadaTest extends TestCase
         $this->assertNotEquals($cardCarlos['estado_institucional'], $cardCarlos['estado_seguimiento']);
 
         Livewire::test(DashboardTurno::class)
-            ->assertSee('Institucional: ACTIVO')
-            ->assertSee('CRÍTICO');
+            ->assertSee('Carlos Mendoza')
+            ->assertSee('Sin clasificar');
     }
 
     /**

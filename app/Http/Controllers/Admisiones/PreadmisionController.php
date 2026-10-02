@@ -14,8 +14,11 @@ class PreadmisionController extends Controller
 {
     public function index(Request $request): JsonResponse|View
     {
-        $preadmisiones = Preadmision::query()->latest('fecha_solicitud')->paginate(20);
-        return $request->expectsJson() ? response()->json($preadmisiones) : view('pages.preadmisiones.index', compact('preadmisiones'));
+        if ($request->expectsJson()) {
+            return response()->json(Preadmision::query()->latest('fecha_solicitud')->paginate(20));
+        }
+
+        return view('pages.preadmisiones.index');
     }
 
     public function store(Request $request): JsonResponse

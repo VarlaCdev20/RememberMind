@@ -212,7 +212,7 @@
  {{-- ══ TABLA DE ASIGNACIONES ══ --}}
  @if(count($asignaciones) > 0)
  <div class="bg-[var(--rm-surface-soft)] rounded-2xl border border-borde overflow-x-auto">
-  <table class="w-full min-w-[760px] text-left text-sm">
+  <table class="rm-data-table rm-data-table--actions w-full min-w-[760px] text-left text-sm">
   <thead class="bg-fondo-tabla text-apoyo uppercase text-[10px] font-bold tracking-wider">
    <tr>
    <th class="px-4 py-3">Turno / Área</th>

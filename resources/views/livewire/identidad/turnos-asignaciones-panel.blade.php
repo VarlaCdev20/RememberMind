@@ -44,11 +44,6 @@
    <i class="ph-bold ph-arrows-clockwise text-sm" wire:loading.class="animate-spin" wire:target="$refresh"></i>
    Actualizar
    </button>
-   <button type="button" wire:click="exportarCalendario"
-   class="inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-borde-suave bg-fondo-card/45 px-4 text-[11px] font-bold uppercase tracking-wider text-titulo transition hover:-translate-y-0.5 hover:bg-fondo-card">
-   <i class="ph-bold ph-download-simple text-sm"></i>
-   Exportar
-   </button>
    @can('turnos.asignar')
    <button type="button" wire:click="abrirNuevaAsignacion"
     class="inline-flex h-10 items-center justify-center gap-2 rounded-xl bg-boton-acento px-4 text-[11px] font-bold uppercase tracking-wider text-inverso shadow-sm transition hover:-translate-y-0.5 hover:bg-boton-acento/90">
@@ -78,7 +73,7 @@
  </section>
 
  {{-- FILTROS GENERALES FORMATO ALERTAS --}}
- <section class="rm-filter-bar">
+ <x-ui.filter-bar class="mb-4">
   <div class="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-2 items-center">
   {{-- Buscador Principal --}}
   <div class="lg:col-span-4 relative flex items-center">
@@ -206,7 +201,7 @@
    </div>
   </div>
   @endif
- </section>
+ </x-ui.filter-bar>
 
  {{-- CONTROLES DE VISTA PRINCIPAL --}}
  <section class="flex flex-col gap-3 rounded-2xl border border-borde-suave bg-fondo-panel p-3 shadow-sm xl:flex-row xl:items-center xl:justify-between">
@@ -445,7 +440,7 @@
     <p class="mt-1 text-xs font-bold text-apoyo">Mañana 06:00-14:00, tarde 14:00-22:00 y noche 22:00-06:00.</p>
    </div>
    <div class="overflow-x-auto">
-    <table class="min-w-[1180px] w-full text-left text-sm">
+    <table class="rm-data-table min-w-[1180px] w-full text-left text-sm">
     <thead class="bg-fondo-panel text-[10px] font-black uppercase tracking-wider text-apoyo">
      <tr>
      <th class="w-[130px] px-4 py-3">Día</th>
@@ -503,6 +498,7 @@
          <div class="flex flex-col items-end gap-1 shrink-0">
           <span class="text-[9px] text-apoyo font-bold">8h</span>
           <div class="flex gap-1">
+          @can('turnos.asignar')
           <button type="button" wire:click="abrirAsignarPlaza('{{ $asignacion['codigo'] }}', '{{ $asignacion['fecha'] }}')"
            class="inline-flex h-5 w-5 items-center justify-center rounded bg-boton-acento text-inverso hover:bg-boton-acento/90 transition"
            title="Asignar / Cambiar">
@@ -515,6 +511,7 @@
            <i class="ph-bold ph-trash text-[10px]"></i>
            </button>
           @endif
+          @endcan
           </div>
          </div>
          </div>
@@ -541,6 +538,7 @@
           @endif
          </div>
          <div class="flex gap-1 shrink-0">
+          @can('turnos.asignar')
           <button type="button" wire:click="abrirAsignarPlaza('{{ $asignacion['codigo'] }}', '{{ $asignacion['fecha'] }}')"
           class="inline-flex h-5 w-5 items-center justify-center rounded bg-boton-acento text-inverso hover:bg-boton-acento/90 transition">
           <i class="ph-bold ph-pencil-simple text-[10px]"></i>
@@ -551,6 +549,7 @@
            <i class="ph-bold ph-trash text-[10px]"></i>
           </button>
           @endif
+          @endcan
          </div>
          </div>
         </div>
@@ -567,10 +566,12 @@
         @forelse(($dia['turnos']['DESCANSO']['asignaciones'] ?? []) as $asignacion)
         <div class="inline-flex items-center gap-1 rounded-xl border border-borde-suave bg-fondo-hover px-2 py-1 text-xs font-bold text-apoyo">
          <span>{{ $asignacion['nombre'] ?? 'Personal no identificado' }}</span>
+         @can('turnos.asignar')
          <button type="button" wire:click="abrirAsignarPlaza('{{ $asignacion['codigo'] }}', '{{ $asignacion['fecha'] }}')"
          class="text-boton-principal hover:text-boton-acento transition">
          <i class="ph-bold ph-pencil-simple text-[10px]"></i>
          </button>
+         @endcan
         </div>
         @empty
         <span class="rounded-xl border border-dashed border-borde-suave p-2 text-[11px] font-bold text-apoyo">Sin descanso</span>
@@ -667,7 +668,7 @@
     <p class="mt-1 text-xs font-bold text-apoyo">Detalle semanal por trabajador.</p>
     </div>
     <div class="overflow-x-auto">
-    <table class="min-w-[920px] w-full text-left text-sm">
+    <table class="rm-data-table min-w-[920px] w-full text-left text-sm">
      <thead class="bg-fondo-panel text-[10px] font-black uppercase tracking-wider text-apoyo">
      <tr>
       <th class="px-4 py-3">Enfermero</th>
@@ -711,7 +712,7 @@
     <p class="mt-1 text-xs font-bold text-apoyo">Control de jornadas, descansos, noches y horas acumuladas.</p>
    </div>
    <div class="overflow-x-auto">
-    <table class="min-w-[1120px] w-full text-left text-sm">
+    <table class="rm-data-table min-w-[1120px] w-full text-left text-sm">
     <thead class="bg-fondo-panel text-[10px] font-black uppercase tracking-wider text-apoyo">
      <tr>
      <th class="px-4 py-3">Enfermero</th>
@@ -930,9 +931,11 @@
  </section>
 
  {{-- MODAL DE NUEVA ASIGNACIÓN / SELECCIÓN DE USUARIO --}}
+ @can('turnos.asignar')
  @include('livewire.identidad.turnos-asignaciones-panel.modales.turno')
 
  {{-- MODAL DE ASIGNACIÓN DE ENFERMERO A PLAZA --}}
  @include('livewire.identidad.turnos-asignaciones-panel.modales.asignar-plaza')
+ @endcan
  </div>
 </div>

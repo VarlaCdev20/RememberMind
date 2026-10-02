@@ -2,15 +2,25 @@
 
 namespace App\Http\Controllers\Residentes;
 
-use App\Http\Controllers\Controller;
-use App\Http\Requests\Residentes\UpdateAdultoMayorRequest;
-use App\Models\AdultoMayor;
-use App\Models\AplicacionInstrumento;
 use App\Backend\Modulos\Reportes\Servicios\AdultoMayorBitacoraService;
 use App\Backend\Modulos\Residentes\Servicios\AdultoMayorService;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\Residentes\UpdateAdultoMayorRequest;
+use App\Models\Actividad;
+use App\Models\AdultoMayor;
+use App\Models\AplicacionInstrumento;
+use App\Models\Area;
+use App\Models\Atencion;
+use App\Models\Documento;
+use App\Models\HistorialEstadoResidente;
+use App\Models\Instrumento;
+use App\Models\NotaClinica;
+use App\Models\Residente;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
+use Spatie\Activitylog\Models\Activity;
 
 class AdultoMayorController extends Controller
 {
@@ -31,14 +41,16 @@ class AdultoMayorController extends Controller
      */
     public function index(Request $request)
     {
+        $this->authorize('viewAny', Residente::class);
         return view('pages.adultos-mayores.index');
     }
 
     /**
      * Display the specified resource.
      */
-        public function show(AdultoMayor $adulto_mayor)
+    public function show(AdultoMayor $adulto_mayor)
     {
+        $this->authorize('view', Residente::query()->findOrFail($adulto_mayor->cod_residente));
         $adulto = $this->adultoMayorService->obtenerDetalle($adulto_mayor->cod_residente);
 
         // Contactos / Familiares
@@ -67,7 +79,7 @@ class AdultoMayorController extends Controller
 
         $evaluacionesGeriatricasActivas = $evaluacionesActivas;
         $evaluacionesGeriatricasAnuladas = collect();
-        $areasGeriatricas = \App\Models\Area::where('estado', 'ACTIVO')->get();
+        $areasGeriatricas = Area::where('estado', 'ACTIVO')->get();
 
         // FASE 3: Módulos médicos V2
         $fichasMedicas = $adulto->atenciones()->orderByDesc('fecha_hora')->get();
@@ -78,21 +90,21 @@ class AdultoMayorController extends Controller
         $historialEstados = $adulto->historialEstados()->orderByDesc('fecha_hora')->get();
 
         $estadosAdulto = $this->adultoMayorService->obtenerEstados();
-                $tiposAtenciones = collect([
-            (object)['cod_tipo_aten' => 'MEDICA', 'tipo' => 'Médica', 'descripcion' => 'Consulta y control médico'],
-            (object)['cod_tipo_aten' => 'ENFERMERIA', 'tipo' => 'Enfermería', 'descripcion' => 'Cuidados y signos vitales'],
-            (object)['cod_tipo_aten' => 'PSICOLOGIA', 'tipo' => 'Psicológica', 'descripcion' => 'Evaluación y apoyo emocional'],
-            (object)['cod_tipo_aten' => 'NUTRICION', 'tipo' => 'Nutricional', 'descripcion' => 'Control dietético y peso'],
-            (object)['cod_tipo_aten' => 'FISIOTERAPIA', 'tipo' => 'Fisioterapia', 'descripcion' => 'Rehabilitación física'],
-            (object)['cod_tipo_aten' => 'SOCIAL', 'tipo' => 'Trabajo Social', 'descripcion' => 'Vínculo familiar y social'],
+        $tiposAtenciones = collect([
+            (object) ['cod_tipo_aten' => 'MEDICA', 'tipo' => 'Médica', 'descripcion' => 'Consulta y control médico'],
+            (object) ['cod_tipo_aten' => 'ENFERMERIA', 'tipo' => 'Enfermería', 'descripcion' => 'Cuidados y signos vitales'],
+            (object) ['cod_tipo_aten' => 'PSICOLOGIA', 'tipo' => 'Psicológica', 'descripcion' => 'Evaluación y apoyo emocional'],
+            (object) ['cod_tipo_aten' => 'NUTRICION', 'tipo' => 'Nutricional', 'descripcion' => 'Control dietético y peso'],
+            (object) ['cod_tipo_aten' => 'FISIOTERAPIA', 'tipo' => 'Fisioterapia', 'descripcion' => 'Rehabilitación física'],
+            (object) ['cod_tipo_aten' => 'SOCIAL', 'tipo' => 'Trabajo Social', 'descripcion' => 'Vínculo familiar y social'],
         ]);
-        $tiposEvaluaciones = \App\Models\Instrumento::where('estado', 'ACTIVO')->get();
+        $tiposEvaluaciones = Instrumento::where('estado', 'ACTIVO')->get();
         $tiposActividades = collect([
-            (object)['cod_tipo_act' => 'RECREATIVA', 'tipo' => 'Recreativa'],
-            (object)['cod_tipo_act' => 'COGNITIVA', 'tipo' => 'Cognitiva'],
-            (object)['cod_tipo_act' => 'FISICA', 'tipo' => 'Física'],
-            (object)['cod_tipo_act' => 'CULTURAL', 'tipo' => 'Cultural'],
-            (object)['cod_tipo_act' => 'TERAPEUTICA', 'tipo' => 'Terapéutica'],
+            (object) ['cod_tipo_act' => 'RECREATIVA', 'tipo' => 'Recreativa'],
+            (object) ['cod_tipo_act' => 'COGNITIVA', 'tipo' => 'Cognitiva'],
+            (object) ['cod_tipo_act' => 'FISICA', 'tipo' => 'Física'],
+            (object) ['cod_tipo_act' => 'CULTURAL', 'tipo' => 'Cultural'],
+            (object) ['cod_tipo_act' => 'TERAPEUTICA', 'tipo' => 'Terapéutica'],
         ]);
 
         // Bitácora escalable desde Spatie Activitylog
@@ -131,7 +143,7 @@ class AdultoMayorController extends Controller
         ));
     }
 
-        public function reporteIndividual(Request $request, AdultoMayor $adulto_mayor)
+    public function reporteIndividual(Request $request, AdultoMayor $adulto_mayor)
     {
         $format = $request->query('format', 'html');
 
@@ -163,8 +175,8 @@ class AdultoMayorController extends Controller
         $valoracionesFuncionales = $adulto->valoracionesFuncionales()->orderByDesc('fecha_hora')->get();
         $historialEstados = $adulto->historialEstados()->orderByDesc('fecha_hora')->get();
 
-        $bitacora = \Spatie\Activitylog\Models\Activity::where('subject_id', $adulto->cod_residente)
-            ->orWhere('description', 'like', '%' . $adulto->cod_residente . '%')
+        $bitacora = Activity::where('subject_id', $adulto->cod_residente)
+            ->orWhere('description', 'like', '%'.$adulto->cod_residente.'%')
             ->orderByDesc('created_at')
             ->take(50)
             ->get();
@@ -205,7 +217,8 @@ class AdultoMayorController extends Controller
 
         if ($format === 'pdf') {
             $pdf = Pdf::loadView('pages.adultos-mayores.reportes.pdf_individual', $viewData)->setPaper('a4', 'portrait');
-            $nombreArchivo = \Illuminate\Support\Str::slug($adulto->nombre_completo, '_');
+            $nombreArchivo = Str::slug($adulto->nombre_completo, '_');
+
             return $pdf->download("Expediente_Integral_{$nombreArchivo}.pdf");
         }
 
@@ -234,6 +247,7 @@ class AdultoMayorController extends Controller
             if ($endDate) {
                 $query->where($dateColumn, '<=', Carbon::parse($endDate)->endOfDay());
             }
+
             return $query;
         };
 
@@ -265,6 +279,7 @@ class AdultoMayorController extends Controller
 
         if ($format === 'pdf') {
             $pdf = Pdf::loadView('pages.adultos-mayores.reportes.pdf_especifico', $viewData);
+
             return $pdf->download("reporte_{$tipo}_{$adulto->cod_residente}.pdf");
         }
 
@@ -273,16 +288,16 @@ class AdultoMayorController extends Controller
 
     public function reporteGeneral()
     {
-        $adultos = \App\Models\Residente::all();
+        $adultos = Residente::all();
 
-        $totalObservaciones = \App\Models\NotaClinica::count();
-        $totalAtenciones = \App\Models\Atencion::count();
-        $totalActividades = \App\Models\Actividad::count();
-        $totalDocumentos = \App\Models\Documento::count();
-        $totalEvaluaciones = \App\Models\AplicacionInstrumento::count();
+        $totalObservaciones = NotaClinica::count();
+        $totalAtenciones = Atencion::count();
+        $totalActividades = Actividad::count();
+        $totalDocumentos = Documento::count();
+        $totalEvaluaciones = AplicacionInstrumento::count();
 
         $hace30Dias = now()->subDays(30);
-        $sinSeguimiento = \App\Models\Residente::whereDoesntHave('observaciones', function ($q) use ($hace30Dias) {
+        $sinSeguimiento = Residente::whereDoesntHave('observaciones', function ($q) use ($hace30Dias) {
             $q->where('fecha_hora', '>=', $hace30Dias);
         })->whereDoesntHave('atenciones', function ($q) use ($hace30Dias) {
             $q->where('fecha_hora', '>=', $hace30Dias);
@@ -301,7 +316,7 @@ class AdultoMayorController extends Controller
             'doc_totales' => $totalDocumentos,
             'eval_totales' => $totalEvaluaciones,
             'sin_seguimiento' => $sinSeguimiento,
-            'ultimos_adultos' => \App\Models\Residente::orderByDesc('cod_residente')->take(5)->get(),
+            'ultimos_adultos' => Residente::orderByDesc('cod_residente')->take(5)->get(),
         ];
 
         return view('pages.adultos-mayores.reportes.general', compact('adultos', 'stats'));
@@ -309,10 +324,10 @@ class AdultoMayorController extends Controller
 
     public function reporteInstitucional()
     {
-        $adultos = \App\Models\Residente::all();
-        $totalAtenciones = \App\Models\Atencion::count();
-        $totalActividades = \App\Models\Actividad::count();
-        $totalEvaluaciones = \App\Models\AplicacionInstrumento::count();
+        $adultos = Residente::all();
+        $totalAtenciones = Atencion::count();
+        $totalActividades = Actividad::count();
+        $totalEvaluaciones = AplicacionInstrumento::count();
 
         $stats = [
             'poblacion' => $adultos->count(),
@@ -327,13 +342,13 @@ class AdultoMayorController extends Controller
 
     public function reporteBienestar()
     {
-        $adultos = \App\Models\Residente::all();
-        $totalEvaluaciones = \App\Models\AplicacionInstrumento::count();
+        $adultos = Residente::all();
+        $totalEvaluaciones = AplicacionInstrumento::count();
 
         $distribucionRiesgo = [
             'bajo' => \Illuminate\Support\Facades\DB::table('registros_movilidad')->where('riesgo_caida', 'BAJO')->count(),
             'medio' => \Illuminate\Support\Facades\DB::table('registros_movilidad')->where('riesgo_caida', 'MEDIO')->count(),
-            'alto' => \Illuminate\Support\Facades\DB::table('registros_movilidad')->where('riesgo_caida', 'ALTO')->count(),
+            'alto' => \Illuminate\Support\Facades\DB::table('registros_movilidad')->whereIn('riesgo_caida', ['ALTO', 'INTENTO_CAMINAR_SOLO'])->count(),
         ];
 
         return view('pages.adultos-mayores.reportes.bienestar', compact('distribucionRiesgo', 'totalEvaluaciones'));
@@ -344,6 +359,7 @@ class AdultoMayorController extends Controller
      */
     public function edit(AdultoMayor $adulto_mayor)
     {
+        abort_unless(auth()->user()?->can('residentes.gestionar'), 403);
         $adulto = $this->adultoMayorService->obtenerDetalle($adulto_mayor->cod_residente);
         $estadosAdulto = $this->adultoMayorService->obtenerEstados();
 
@@ -393,7 +409,7 @@ class AdultoMayorController extends Controller
     /**
      * Cambiar estado directamente y registrar historial_estados_residente.
      */
-    public function cambiarEstado(\Illuminate\Http\Request $request, AdultoMayor $adulto_mayor)
+    public function cambiarEstado(Request $request, AdultoMayor $adulto_mayor)
     {
         try {
             \DB::beginTransaction();
@@ -401,15 +417,15 @@ class AdultoMayorController extends Controller
             $estadoAnterior = $adulto_mayor->estado;
             $nuevoEstado = $request->input('estado') ?? $request->input('cod_est_adul') ?? 'ACTIVO';
             if (is_numeric($nuevoEstado)) {
-                $nuevoEstado = ((int)$nuevoEstado === 2 || (int)$nuevoEstado === 3) ? 'INACTIVO' : 'ACTIVO';
+                $nuevoEstado = ((int) $nuevoEstado === 2 || (int) $nuevoEstado === 3) ? 'INACTIVO' : 'ACTIVO';
             }
 
             $adulto_mayor->estado = $nuevoEstado;
             $adulto_mayor->observacion = $request->motivo ?? $adulto_mayor->observacion;
             $adulto_mayor->save();
 
-            \App\Models\HistorialEstadoResidente::create([
-                'cod_historial_estado' => 'HER_' . strtoupper(\Illuminate\Support\Str::random(10)),
+            HistorialEstadoResidente::create([
+                'cod_historial_estado' => 'HER_'.strtoupper(Str::random(10)),
                 'cod_residente' => $adulto_mayor->cod_residente,
                 'cod_usuario_registro' => $request->user()->cod_usuario,
                 'estado_anterior' => $estadoAnterior ?? 'ACTIVO',

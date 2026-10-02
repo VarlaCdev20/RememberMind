@@ -196,12 +196,13 @@ class BddOperativaV2Test extends TestCase
         $ajeno = $this->usuarioRol('familiar.ajeno@test.local','FAMILIAR');
         $this->assertFalse(Gate::forUser($ajeno)->allows('view', $residente));
         $this->assertFalse(Role::query()->where('name','VOLUNTARIO')->exists());
-        $this->assertCount(9, Role::all());
+        $this->assertCount(10, Role::all());
+        $this->assertTrue(Role::query()->where('name', 'GERENTE')->exists());
     }
 
     public function test_superadministrador_puede_ver_todas_las_tablas_operativas(): void
     {
-        $super = User::query()->where('correo','admincasaamandita@gmail.com')->firstOrFail();
+        $super = User::query()->where('correo','carlaencinas78@gmail.com')->firstOrFail();
         foreach ($this->tablasOperativas() as $tabla) {
             $this->assertTrue($super->can($tabla.'.ver'), "Falta lectura de {$tabla}");
         }
@@ -215,9 +216,9 @@ class BddOperativaV2Test extends TestCase
     {
         $datos = $this->escenarioAdmision();
         $residente = app(FormalizarAdmision::class)->ejecutar($datos['preadmision'], ['cod_cama'=>$datos['cama']->cod_cama,'cod_contacto'=>$datos['contacto']->cod_contacto], $datos['usuario']);
-        $super = User::query()->where('correo', 'admincasaamandita@gmail.com')->firstOrFail();
+        $super = User::query()->where('correo', 'carlaencinas78@gmail.com')->firstOrFail();
 
-        $this->actingAs($super)->get('/dashboard')->assertOk()->assertSee('Centro de Mando');
+        $this->actingAs($super)->get('/dashboard')->assertOk()->assertSee('bajo supervisión global');
         $this->actingAs($super)->get(route('admin.residentes.show', $residente))->assertOk()->assertSee($residente->cod_residente);
     }
 
@@ -249,7 +250,7 @@ class BddOperativaV2Test extends TestCase
     public function test_alerta_conserva_historial_de_eventos(): void
     {
         [$datos, $residente] = $this->escenarioClinico();
-        $admin = User::query()->where('correo', 'admincasaamandita@gmail.com')->firstOrFail();
+        $admin = User::query()->where('correo', 'administracion@remembermind.com')->firstOrFail();
         $enfermera = $this->usuarioRol('enfermera.alertas@test.local', 'ENFERMEROS');
         $personal = Personal::query()->create(['cod_personal'=>'PER_ALERTA','cod_usuario'=>$enfermera->cod_usuario,'nombres'=>'Elena','apellido_paterno'=>'Rojas','numero_documento'=>'ENF-ALERTA','profesion'=>'ENFERMERA','estado'=>'ACTIVO']);
         AsignacionPersonal::query()->create(['cod_asignacion_personal'=>'ASP_ALERTA','cod_jornada'=>$datos['jornada']->cod_jornada,'cod_personal'=>$personal->cod_personal,'cod_area'=>$datos['area']->cod_area,'fecha_hora_asignacion'=>now(),'estado'=>'ACTIVA']);
@@ -308,7 +309,7 @@ class BddOperativaV2Test extends TestCase
     public function test_rutas_de_lectura_v2_responden_sin_dependencias_legacy(): void
     {
         [$base, $residente] = $this->escenarioClinico();
-        $super = User::query()->where('correo', 'admincasaamandita@gmail.com')->firstOrFail();
+        $super = User::query()->where('correo', 'carlaencinas78@gmail.com')->firstOrFail();
 
         $this->get('/')->assertOk()->assertSee('RememberMind');
         $this->actingAs($super)->get('/dashboard')->assertOk();

@@ -6,14 +6,14 @@
         $alertasCerradas = $adultoMayor->alertas->where('estado', 'CERRADA');
     @endphp
 
-    <div class="rounded-3xl border border-borde rm-surface-card bg-fondo-panel p-5 shadow-sm space-y-4">
-        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-borde pb-3">
+    <div class="rounded-3xl border border-[var(--rm-border)]  bg-[var(--rm-surface)] p-5 shadow-sm space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-[var(--rm-border)] pb-3">
             <div>
-                <h2 class="text-xs font-black uppercase tracking-wider text-titulo flex items-center gap-2">
+                <h2 class="text-xs font-bold uppercase tracking-wider text-[var(--rm-text-primary)] flex items-center gap-2">
                     <i class="ph-bold ph-warning-octagon text-rose-600 text-sm"></i>
                     <span>Alertas Clínicas Activas</span>
                 </h2>
-                <p class="text-xs text-apoyo mt-0.5">Situaciones de vigilancia prioritaria que requieren intervención asistencial.</p>
+                <p class="text-xs text-[var(--rm-text-secondary)] mt-0.5">Situaciones de vigilancia prioritaria que requieren intervención asistencial.</p>
             </div>
             <span class="rounded-full px-3 py-1 text-xs font-bold self-start sm:self-auto {{ $alertasActivas->count() > 0 ? 'bg-rose-100 text-rose-800 border border-rose-300 animate-pulse' : 'bg-emerald-50 text-emerald-700 border border-emerald-200' }}">
                 {{ $alertasActivas->count() }} {{ $alertasActivas->count() === 1 ? 'alerta activa' : 'alertas activas' }}
@@ -31,22 +31,22 @@
                         <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
                             <div class="space-y-1.5 min-w-0">
                                 <div class="flex flex-wrap items-center gap-2">
-                                    <span class="rounded-full px-2 py-0.5 text-[10px] font-black uppercase {{ $esAbierta ? 'bg-rose-600 text-white' : 'bg-amber-600 text-white' }}">
+                                    <span class="rounded-full px-2 py-0.5 text-[11px] font-bold uppercase {{ $esAbierta ? 'bg-rose-600 text-white' : 'bg-amber-600 text-white' }}">
                                         {{ $al->estado }}
                                     </span>
-                                    <span class="rounded-md px-2 py-0.5 text-[10px] font-bold uppercase {{ in_array(strtoupper($al->prioridad), ['ALTO', 'CRITICO']) ? 'bg-rose-100 text-rose-800' : 'bg-slate-100 text-slate-700' }}">
+                                    <span class="rounded-md px-2 py-0.5 text-[11px] font-bold uppercase {{ in_array(strtoupper($al->prioridad), ['ALTO', 'CRITICO']) ? 'bg-rose-100 text-rose-800' : 'bg-slate-100 text-slate-700' }}">
                                         Nivel {{ $al->prioridad }}
                                     </span>
-                                    <span class="text-xs font-bold text-titulo">
+                                    <span class="text-xs font-bold text-[var(--rm-text-primary)]">
                                         {{ $al->tipo }}
                                     </span>
                                 </div>
 
-                                <p class="text-xs font-medium text-parrafo leading-relaxed">
+                                <p class="text-xs font-medium text-[var(--rm-text-body)] leading-relaxed">
                                     {{ $al->descripcion }}
                                 </p>
 
-                                <div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-apoyo pt-1">
+                                <div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-[var(--rm-text-secondary)] pt-1">
                                     <span>Detectada: <strong>{{ $al->fecha_hora?->format('d/m/Y H:i') ?? 'Reciente' }}</strong></span>
                                     <span>·</span>
                                     <span>Origen: <strong>{{ $al->modulo ?? 'Sistema Clínico' }}</strong></span>
@@ -58,11 +58,11 @@
 
                                 {{-- Acciones Realizadas hasta el momento --}}
                                 @if($al->eventos->isNotEmpty())
-                                    <div class="mt-2 rounded-xl bg-[#F0E8DE]/80 p-2.5 border border-borde text-xs space-y-1">
-                                        <span class="font-bold text-titulo text-[11px] block">Acciones registradas:</span>
+                                    <div class="mt-2 rounded-xl bg-[var(--rm-surface-soft)] p-2.5 border border-[var(--rm-border)] text-xs space-y-1">
+                                        <span class="font-bold text-[var(--rm-text-primary)] text-[11px] block">Acciones registradas:</span>
                                         @foreach($al->eventos->sortBy('fecha_hora') as $evento)
-                                            <p class="text-parrafo text-[11px]">
-                                                · {{ $evento->descripcion }} <span class="text-apoyo">({{ $evento->fecha_hora?->format('H:i') }})</span>
+                                            <p class="text-[var(--rm-text-body)] text-[11px]">
+                                                · {{ $evento->descripcion }} <span class="text-[var(--rm-text-secondary)]">({{ $evento->fecha_hora?->format('H:i') }})</span>
                                             </p>
                                         @endforeach
                                     </div>
@@ -101,24 +101,24 @@
     </div>
 
     {{-- 2. HISTORIAL DE ALERTAS CERRADAS (HISTÓRICO AUDITADO) --}}
-    <div class="rounded-3xl border border-borde rm-surface-card bg-fondo-panel p-5 shadow-sm space-y-4">
-        <div class="flex items-center justify-between border-b border-borde pb-3">
+    <div class="rounded-3xl border border-[var(--rm-border)]  bg-[var(--rm-surface)] p-5 shadow-sm space-y-4">
+        <div class="flex items-center justify-between border-b border-[var(--rm-border)] pb-3">
             <div>
-                <h2 class="text-xs font-black uppercase tracking-wider text-titulo flex items-center gap-2">
+                <h2 class="text-xs font-bold uppercase tracking-wider text-[var(--rm-text-primary)] flex items-center gap-2">
                     <i class="ph-bold ph-clock-counter-clockwise text-blue-600 text-sm"></i>
                     <span>Historial de Alertas Resueltas</span>
                 </h2>
-                <p class="text-xs text-apoyo mt-0.5">Registro auditado de alertas atendidas, cerradas o anuladas.</p>
+                <p class="text-xs text-[var(--rm-text-secondary)] mt-0.5">Registro auditado de alertas atendidas, cerradas o anuladas.</p>
             </div>
-            <span class="text-xs font-bold text-apoyo">
+            <span class="text-xs font-bold text-[var(--rm-text-secondary)]">
                 Total: {{ $alertasCerradas->count() }} resueltas
             </span>
         </div>
 
         <div class="overflow-x-auto">
-            <table class="w-full text-left text-xs">
+            <table class="rm-data-table rm-data-table--actions w-full text-left text-xs">
                 <thead>
-                    <tr class="border-b border-borde text-[10px] font-black uppercase text-apoyo">
+                    <tr class="border-b border-[var(--rm-border)] text-[11px] font-bold uppercase text-[var(--rm-text-secondary)]">
                         <th class="py-2.5 px-3">Fecha / Hora</th>
                         <th class="py-2.5 px-3">Tipo / Motivo</th>
                         <th class="py-2.5 px-3">Prioridad</th>
@@ -132,46 +132,46 @@
                         @php
                             $eventoCierre = $alc->eventos->where('tipo_evento', 'CIERRE')->sortByDesc('fecha_hora')->first();
                         @endphp
-                        <tr class="hover:bg-fondo-card/60 transition">
-                            <td class="py-3 px-3 whitespace-nowrap font-medium text-titulo">
+                        <tr class="hover:bg-[var(--rm-surface-soft)]/60 transition">
+                            <td class="py-3 px-3 whitespace-nowrap font-medium text-[var(--rm-text-primary)]">
                                 {{ $alc->fecha_hora?->format('d/m/Y') }}
-                                <span class="text-apoyo block text-[10px]">{{ $alc->fecha_hora?->format('H:i') }}</span>
+                                <span class="text-[var(--rm-text-secondary)] block text-[11px]">{{ $alc->fecha_hora?->format('H:i') }}</span>
                             </td>
 
-                            <td class="py-3 px-3 font-bold text-titulo max-w-[200px]">
+                            <td class="py-3 px-3 font-bold text-[var(--rm-text-primary)] max-w-[200px]">
                                 {{ $alc->tipo }}
-                                <span class="text-parrafo font-normal text-[11px] block truncate" title="{{ $alc->descripcion }}">
+                                <span class="text-[var(--rm-text-body)] font-normal text-[11px] block truncate" title="{{ $alc->descripcion }}">
                                     {{ $alc->descripcion }}
                                 </span>
                             </td>
 
                             <td class="py-3 px-3 whitespace-nowrap">
-                                <span class="rounded px-2 py-0.5 text-[10px] font-bold bg-fondo-card text-parrafo border border-borde">
+                                <span class="rounded px-2 py-0.5 text-[11px] font-bold bg-[var(--rm-surface-soft)] text-[var(--rm-text-body)] border border-[var(--rm-border)]">
                                     {{ $alc->prioridad }}
                                 </span>
                             </td>
 
-                            <td class="py-3 px-3 text-parrafo max-w-[260px]">
+                            <td class="py-3 px-3 text-[var(--rm-text-body)] max-w-[260px]">
                                 @if($eventoCierre)
-                                    <span class="text-titulo font-medium block">{{ $eventoCierre->descripcion }}</span>
+                                    <span class="text-[var(--rm-text-primary)] font-medium block">{{ $eventoCierre->descripcion }}</span>
                                 @else
-                                    <span class="text-[10px] text-apoyo">Cerrada tras resolución clínica</span>
+                                    <span class="text-[11px] text-[var(--rm-text-secondary)]">Cerrada tras resolución clínica</span>
                                 @endif
                             </td>
 
                             <td class="py-3 px-3 whitespace-nowrap">
-                                <span class="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-bold text-slate-700 border border-slate-200">
+                                <span class="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-bold text-slate-700 border border-slate-200">
                                     <i class="ph-bold ph-check"></i> CERRADA
                                 </span>
                             </td>
 
-                            <td class="py-3 px-3 whitespace-nowrap text-apoyo font-medium">
+                            <td class="py-3 px-3 whitespace-nowrap text-[var(--rm-text-secondary)] font-medium">
                                 {{ $eventoCierre?->usuario?->name ?? $alc->responsable?->name ?? 'Enfermería' }}
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="py-8 text-center text-xs text-apoyo italic">
+                            <td colspan="6" class="py-8 text-center text-xs text-[var(--rm-text-secondary)] italic">
                                 No se registran alertas históricas cerradas para este residente.
                             </td>
                         </tr>

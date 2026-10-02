@@ -148,7 +148,8 @@ class FichaCuidadosTest extends TestCase
 
         // Probar registro directo mediante Livewire
         $component->call('registrarCuidadoDirecto', $this->intervencion->cod_intervencion, 'REALIZADA', 'Toleró deambulación asistida sin mareos')
-            ->assertDispatched('swal');
+            ->assertDispatched('swal')
+            ->assertSee('Toleró deambulación asistida sin mareos');
 
         $this->assertDatabaseHas('ejecuciones_cuidado', [
             'cod_intervencion' => $this->intervencion->cod_intervencion,

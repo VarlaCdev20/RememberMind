@@ -1,43 +1,43 @@
-/* Composición del dashboard de Enfermería. El contenido clínico se conserva en su vista. */
+﻿/* Composición del dashboard de Enfermería. El contenido clínico se conserva en su vista. */
 .rm-nursing-dashboard {
     --rm-font-page-title: var(--rm-font-size-page);
     --rm-font-section-title: var(--rm-font-size-card);
     --rm-font-card-title: var(--rm-font-size-card);
     display: grid;
     grid-template-columns: repeat(12, minmax(0, 1fr));
-    gap: var(--rm-space-4);
+    gap: var(--rm-space-3);
     align-items: stretch;
     width: 100%;
     min-width: 0;
     margin-inline: auto;
-    background: var(--rm-bg-app);
+    background: transparent;
 }
 
 .rm-nursing-dashboard__contents { display: contents; }
 .rm-nursing-dashboard > :not(.rm-nursing-dashboard__contents),
 .rm-nursing-dashboard__contents > * { min-width: 0; }
 
-.rm-nursing-dashboard__welcome { grid-column: 1 / -1; min-height: 160px; }
+.rm-nursing-dashboard__welcome { grid-column: 1 / -1; min-height: 140px; }
 
-.rm-nursing-dashboard__kpi { grid-column: span 2; min-height: 116px; }
+.rm-nursing-dashboard__kpi { grid-column: span 2; min-height: 92px; }
 .rm-nursing-dashboard__kpi .rm-metric-card__value { font-size: var(--rm-font-size-kpi); }
-.rm-nursing-dashboard__message { grid-column: span 4; min-height: 116px; padding: var(--rm-space-4); }
-.rm-nursing-dashboard__alerts { grid-column: span 4; min-height: 320px; }
-.rm-nursing-dashboard__patients { grid-column: span 8; min-height: 320px; }
+.rm-nursing-dashboard__message { grid-column: span 4; min-height: 92px; padding: var(--rm-space-3); }
+.rm-nursing-dashboard__alerts { grid-column: span 4; min-height: 260px; }
+.rm-nursing-dashboard__patients { grid-column: span 8; min-height: 260px; }
 .rm-nursing-dashboard__incidents,
-.rm-nursing-dashboard__incident-bars { grid-column: span 6; min-height: 320px; }
+.rm-nursing-dashboard__incident-bars { grid-column: span 6; min-height: 280px; }
 .rm-nursing-dashboard__distribution,
 .rm-nursing-dashboard__occupancy,
-.rm-nursing-dashboard__schedule { grid-column: span 3; min-height: 260px; }
-.rm-nursing-dashboard__tasks { grid-column: span 3; min-height: 260px; }
-.rm-nursing-dashboard__activity-bars { grid-column: span 4; min-height: 260px; }
-.rm-nursing-dashboard__occupancy-trend { grid-column: span 8; min-height: 260px; }
+.rm-nursing-dashboard__schedule { grid-column: span 3; min-height: 230px; }
+.rm-nursing-dashboard__tasks { grid-column: span 3; min-height: 230px; }
+.rm-nursing-dashboard__activity-bars { grid-column: span 4; min-height: 230px; }
+.rm-nursing-dashboard__occupancy-trend { grid-column: span 8; min-height: 230px; }
 .rm-nursing-dashboard__location,
-.rm-nursing-dashboard__notes { grid-column: span 6; min-height: 260px; }
+.rm-nursing-dashboard__notes { grid-column: span 6; min-height: 230px; }
 
 .rm-nursing-dashboard__schedule,
 .rm-nursing-dashboard__patients,
-.rm-nursing-dashboard__alerts { padding: var(--rm-space-4); }
+.rm-nursing-dashboard__alerts { padding: var(--rm-space-card); }
 .rm-nursing-dashboard__incidents,
 .rm-nursing-dashboard__incident-bars,
 .rm-nursing-dashboard__distribution,
@@ -46,7 +46,7 @@
 .rm-nursing-dashboard__occupancy-trend,
 .rm-nursing-dashboard__tasks,
 .rm-nursing-dashboard__location,
-.rm-nursing-dashboard__notes { padding: var(--rm-space-4); }
+.rm-nursing-dashboard__notes { padding: var(--rm-space-card); }
 .rm-nursing-dashboard__incidents h2,
 .rm-nursing-dashboard__incident-bars h2,
 .rm-nursing-dashboard__distribution h2,
@@ -274,44 +274,32 @@ a.rm-turn-task__title:hover { text-decoration: underline; }
     .rm-priority-alert__top { align-items: flex-start; }
 }
 
-.rm-nursing-message { flex-direction: row; align-items: center; justify-content: space-between; gap: var(--rm-space-3); }
-.rm-nursing-message h2 { margin: 0; color: var(--rm-text-primary); font: var(--rm-weight-bold) var(--rm-text-xl)/1.2 var(--rm-font-display); }
-.rm-nursing-message p { max-width: 260px; margin: var(--rm-space-2) 0 0; color: var(--rm-text-secondary); font: var(--rm-weight-medium) var(--rm-text-sm)/1.4 var(--rm-font-body); }
-.rm-nursing-message__ornament { display: grid; place-items: center; flex: 0 0 64px; width: 64px; height: 64px; border-radius: 50%; background: var(--rm-mint-100); color: var(--rm-mint-500); opacity: .5; transform: rotate(-24deg); }
-.rm-nursing-message__ornament i { font-size: 30px; }
+.rm-nursing-message { display: flex; align-items: center; justify-content: center; border: 0; background: transparent; box-shadow: none; text-align: center; }
+.rm-nursing-shell main .rm-nursing-message h2 { margin: 0; color: var(--rm-text-primary); font: 400 clamp(25px, 2.1vw, 30px)/.95 var(--rm-font-handwritten); letter-spacing: 0; }
 
 /* Bienvenida clínica: fotografía documental, profundidad serena y estado legible. */
 .rm-nursing-welcome {
+    --rm-welcome-name-ink: var(--rm-mint-700);
+    --rm-welcome-name-accent: var(--rm-mint-500);
     position: relative;
     display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(300px, 35%);
+    grid-template-columns: minmax(0, 1fr) minmax(300px, 42%);
     grid-template-rows: minmax(0, 1fr) auto;
     align-items: stretch;
-    gap: var(--rm-space-3) var(--rm-space-6);
-    min-height: 224px;
-    max-height: 270px;
-    padding: var(--rm-space-5) var(--rm-space-6);
-    border-color: var(--rm-border-soft);
+    gap: var(--rm-space-2) var(--rm-space-5);
+    min-height: 190px;
+    max-height: none;
+    padding: var(--rm-space-4) var(--rm-space-5);
+    border-color: var(--rm-border);
     border-radius: var(--rm-radius-lg);
     overflow: hidden;
     isolation: isolate;
-    background: radial-gradient(circle at 26% 95%, color-mix(in srgb, var(--rm-action-primary) 13%, transparent), transparent 43%), var(--rm-surface-main);
+    background: var(--rm-surface-main);
 }
 .rm-nursing-welcome--long-name { max-height: none; }
-.rm-nursing-welcome::before {
-    content: '';
-    position: absolute;
-    width: 260px;
-    height: 260px;
-    left: -110px;
-    bottom: -194px;
-    border: 1px solid color-mix(in srgb, var(--rm-action-primary) 38%, transparent);
-    border-radius: 50%;
-    pointer-events: none;
-}
 .rm-nursing-welcome__intro { display: flex; align-items: center; justify-content: center; min-width: 0; position: relative; z-index: 1; }
 .rm-nursing-welcome__copy { min-width: 0; width: 100%; text-align: center; }
-.rm-nursing-welcome__role { display: inline-flex; align-items: center; gap: var(--rm-space-2); margin-bottom: var(--rm-space-3); color: var(--rm-action-primary-ink); font: var(--rm-weight-bold) var(--rm-text-xs)/1.2 var(--rm-font-body); letter-spacing: var(--rm-letter-spacing-wide); text-transform: uppercase; }
+.rm-nursing-welcome__role { display: inline-flex; align-items: center; gap: var(--rm-space-2); margin-bottom: var(--rm-space-2); color: var(--rm-action-primary-ink); font: var(--rm-weight-bold) var(--rm-text-xs)/1.2 var(--rm-font-body); letter-spacing: var(--rm-letter-spacing-wide); text-transform: uppercase; }
 .rm-nursing-welcome__role i { display: grid; place-items: center; width: 29px; height: 29px; border-radius: 9px; background: var(--rm-action-primary-soft); font-size: 17px; letter-spacing: 0; }
 .rm-nursing-shell main .rm-nursing-welcome__copy h1 {
     display: flex;
@@ -323,18 +311,21 @@ a.rm-turn-task__title:hover { text-decoration: underline; }
     font-family: var(--rm-font-display);
     overflow-wrap: break-word;
 }
-.rm-nursing-welcome__greeting { color: var(--rm-text-secondary); font-size: clamp(16px, 1.35vw, 18px); font-weight: var(--rm-weight-bold); line-height: 1.2; letter-spacing: -.015em; }
-.rm-nursing-welcome__name { color: var(--rm-action-primary-ink); font-size: clamp(30px, 2.7vw, 36px); font-weight: 900; line-height: 1.08; letter-spacing: -.02em; text-wrap: balance; }
-.rm-nursing-welcome--long-name .rm-nursing-welcome__name { font-size: clamp(28px, 2.4vw, 34px); }
+.rm-nursing-welcome__greeting { color: var(--rm-text-primary); font-size: clamp(17px, 1.4vw, 20px); font-weight: var(--rm-weight-semibold); line-height: 1.2; letter-spacing: -.015em; }
+.rm-nursing-welcome__name { color: var(--rm-welcome-name-ink); font-family: var(--rm-font-emphasis); font-size: clamp(34px, 2.75vw, 42px); font-weight: 800; line-height: 1.08; letter-spacing: -.025em; text-wrap: balance; }
+.rm-nursing-welcome__name::after { content: ''; display: block; width: 86px; height: 3px; margin: 9px auto 0; border-radius: var(--rm-radius-pill); background: var(--rm-welcome-name-accent); }
+.dark .rm-nursing-welcome,
+[data-theme="dark"] .rm-nursing-welcome { --rm-welcome-name-ink: var(--rm-mint-100); --rm-welcome-name-accent: var(--rm-mint-300); }
+.rm-nursing-welcome--long-name .rm-nursing-welcome__name { font-size: clamp(30px, 2.35vw, 36px); }
 .rm-nursing-welcome__context {
     display: flex;
     align-items: flex-start;
     justify-content: center;
     gap: var(--rm-space-2);
     max-width: 680px;
-    margin: var(--rm-space-3) auto 0;
-    color: var(--rm-text-secondary);
-    font: var(--rm-weight-semibold) 15px/1.4 var(--rm-font-body);
+    margin: var(--rm-space-2) auto 0;
+    color: var(--rm-text-primary);
+    font: var(--rm-weight-medium) 15px/1.4 var(--rm-font-body);
     text-align: center;
 }
 .rm-nursing-welcome__context i { flex: 0 0 20px; color: var(--rm-action-primary-ink); font-size: 19px; line-height: 1.1; }
@@ -344,9 +335,9 @@ a.rm-turn-task__title:hover { text-decoration: underline; }
     grid-row: 1 / span 2;
     align-self: stretch;
     width: 100%;
-    min-height: 184px;
-    max-height: 222px;
-    padding: 0 0 0 14px;
+    min-height: 158px;
+    max-height: 188px;
+    padding: 0 0 0 10px;
 }
 .rm-nursing-welcome__visual::before {
     content: '';
@@ -385,12 +376,13 @@ a.rm-turn-task__title:hover { text-decoration: underline; }
     box-shadow: var(--rm-shadow-raised);
 }
 .rm-nursing-welcome__image-detail img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 32%; }
+.rm-nursing-welcome__image-icon { position: absolute; top: 10px; right: 10px; display: grid; place-items: center; width: 34px; height: 34px; border: 1px solid color-mix(in srgb, var(--rm-surface) 75%, transparent); border-radius: var(--rm-radius-sm); background: color-mix(in srgb, var(--rm-surface) 92%, transparent); color: var(--rm-action-primary-ink); font-size: 19px; box-shadow: var(--rm-shadow-sm); }
 .rm-nursing-welcome__tools { grid-column: 1; grid-row: 2; min-width: 0; position: relative; z-index: 1; }
 .rm-nursing-welcome__tools-row { display: flex; align-items: center; justify-content: center; min-width: 0; }
-.rm-nursing-welcome__clock { display: flex; align-items: baseline; justify-content: center; flex-wrap: wrap; gap: var(--rm-space-2); min-width: 0; padding-top: var(--rm-space-3); border-top: 1px solid var(--rm-border-medium); }
-.rm-nursing-welcome__clock > span { color: var(--rm-text-secondary); font: var(--rm-weight-semibold) var(--rm-text-xs)/1.25 var(--rm-font-body); }
-.rm-nursing-welcome__clock > strong { color: var(--rm-action-primary-ink); font: var(--rm-weight-bold) 20px/1.08 var(--rm-font-display); }
-.rm-nursing-welcome__clock > small { color: var(--rm-text-muted); font: var(--rm-weight-medium) var(--rm-text-xs)/1.25 var(--rm-font-body); }
+.rm-nursing-welcome__clock { display: flex; align-items: baseline; justify-content: center; flex-wrap: wrap; gap: var(--rm-space-2); min-width: 0; padding-top: var(--rm-space-2); border-top: 1px solid var(--rm-border-medium); }
+.rm-nursing-welcome__clock > span { color: var(--rm-text-primary); font: var(--rm-weight-semibold) var(--rm-text-xs)/1.25 var(--rm-font-body); }
+.rm-nursing-welcome__clock > strong { color: var(--rm-action-primary-ink); font: var(--rm-weight-bold) 19px/1.08 var(--rm-font-display); }
+.rm-nursing-welcome__clock > small { color: var(--rm-text-secondary); font: var(--rm-weight-medium) var(--rm-text-xs)/1.25 var(--rm-font-body); }
 
 @media (prefers-reduced-motion: no-preference) {
     .rm-nursing-welcome__intro { animation: rm-welcome-enter .55s cubic-bezier(.2, .75, .25, 1) both; }
@@ -398,6 +390,8 @@ a.rm-turn-task__title:hover { text-decoration: underline; }
     .rm-nursing-welcome__tools { animation: rm-welcome-enter .55s .16s cubic-bezier(.2, .75, .25, 1) both; }
     .rm-nursing-welcome__image img { transition: transform .65s cubic-bezier(.2, .75, .25, 1); }
     .rm-nursing-welcome__image-detail { animation: rm-welcome-float 7s ease-in-out infinite; }
+    .rm-nursing-welcome__role i { animation: rm-welcome-icon-breathe 4s ease-in-out infinite; }
+    .rm-nursing-welcome__name::after { animation: rm-welcome-accent-enter .8s .3s cubic-bezier(.2, .75, .25, 1) both; }
 }
 @media (prefers-reduced-motion: no-preference) and (hover: hover) {
     .rm-nursing-welcome:hover .rm-nursing-welcome__image img { transform: scale(1.045); }
@@ -412,10 +406,18 @@ a.rm-turn-task__title:hover { text-decoration: underline; }
     0%, 100% { transform: translateY(0); }
     50% { transform: translateY(-5px); }
 }
+@keyframes rm-welcome-icon-breathe {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-2px); }
+}
+@keyframes rm-welcome-accent-enter {
+    from { opacity: 0; transform: scaleX(.3); }
+    to { opacity: 1; transform: scaleX(1); }
+}
 
 @media (min-width: 1200px) and (max-width: 1439px) {
     .rm-nursing-welcome { gap: var(--rm-space-2) var(--rm-space-4); }
-    .rm-nursing-welcome__name { font-size: 34px; }
+    .rm-nursing-welcome__name { font-size: 36px; }
     .rm-nursing-dashboard__distribution,
     .rm-nursing-dashboard__occupancy,
     .rm-nursing-dashboard__schedule,
@@ -431,6 +433,8 @@ a.rm-turn-task__title:hover { text-decoration: underline; }
 
 @media (min-width: 992px) and (max-width: 1199px) {
     .rm-nursing-welcome { grid-template-columns: minmax(0, 1fr) minmax(225px, 38%); max-height: none; }
+    .rm-nursing-welcome__name { font-size: 36px; }
+    .rm-nursing-welcome--long-name .rm-nursing-welcome__name { font-size: 32px; }
     .rm-nursing-welcome__image-detail { width: 84px; height: 84px; }
     .rm-nursing-dashboard__kpi { grid-column: span 3; }
     .rm-nursing-dashboard__message { grid-column: 1 / -1; }
@@ -450,10 +454,10 @@ a.rm-turn-task__title:hover { text-decoration: underline; }
 
 @media (min-width: 768px) and (max-width: 991px) {
     .rm-nursing-welcome { grid-template-columns: minmax(0, 1fr) minmax(180px, 32%); max-height: none; padding-inline: var(--rm-space-4); gap: var(--rm-space-2); }
-    .rm-nursing-welcome__visual { min-height: 168px; }
+    .rm-nursing-welcome__visual { min-height: 158px; }
     .rm-nursing-welcome__image-detail { display: none; }
     .rm-nursing-welcome__name,
-    .rm-nursing-welcome--long-name .rm-nursing-welcome__name { font-size: 29px; }
+    .rm-nursing-welcome--long-name .rm-nursing-welcome__name { font-size: 32px; }
     .rm-nursing-welcome__tools-row { flex-wrap: wrap; }
     .rm-nursing-dashboard { grid-template-columns: repeat(6, minmax(0, 1fr)); }
     .rm-nursing-dashboard__kpi { grid-column: span 3; }
@@ -480,7 +484,7 @@ a.rm-turn-task__title:hover { text-decoration: underline; }
     .rm-nursing-welcome__tools { grid-row: 3; }
     .rm-nursing-welcome__tools-row { justify-content: center; }
     .rm-nursing-welcome__name,
-    .rm-nursing-welcome--long-name .rm-nursing-welcome__name { font-size: 28px; }
+    .rm-nursing-welcome--long-name .rm-nursing-welcome__name { font-size: 32px; }
     .rm-nursing-dashboard { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--rm-space-3); }
     .rm-nursing-dashboard > :not(.rm-nursing-dashboard__contents),
     .rm-nursing-dashboard__contents > * { grid-column: 1 / -1; }
@@ -510,16 +514,14 @@ a.rm-turn-task__title:hover { text-decoration: underline; }
 @media (max-width: 479px) {
     .rm-nursing-welcome__visual { height: 96px; min-height: 96px; }
     .rm-nursing-welcome__name,
-    .rm-nursing-welcome--long-name .rm-nursing-welcome__name { font-size: 25px; }
+    .rm-nursing-welcome--long-name .rm-nursing-welcome__name { font-size: 29px; }
     .rm-nursing-welcome__tools-row { gap: var(--rm-space-2); }
 }
 
 /* Modo claro: relieve cálido y respuesta de baja intensidad, sin cambiar la semántica clínica. */
 :root:not(.dark):not([data-theme="dark"]) .rm-nursing-dashboard .rm-nursing-welcome {
-    background:
-        radial-gradient(220px circle at var(--rm-nursing-glint-x, 24%) var(--rm-nursing-glint-y, 30%), color-mix(in srgb, var(--rm-chart-3) 25%, transparent), transparent 90%),
-        linear-gradient(135deg, var(--rm-surface-raised), var(--rm-surface-main) 70%);
-    box-shadow: inset 0 1px color-mix(in srgb, var(--rm-surface-raised) 70%, transparent), var(--rm-shadow-sm);
+    background: linear-gradient(110deg, color-mix(in srgb, var(--rm-surface-raised) 65%, var(--rm-action-primary-soft)), var(--rm-surface-main) 72%);
+    box-shadow: var(--rm-shadow-sm);
 }
 :root:not(.dark):not([data-theme="dark"]) .rm-nursing-dashboard .rm-nursing-module:not(.rm-chart-card) {
     background:

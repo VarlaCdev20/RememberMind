@@ -79,31 +79,73 @@
  </div>
  </div>
 
- {{-- FILTROS Y BÚSQUEDA --}}
- <section class="rm-filter-bar">
- <div class="grid gap-4 md:grid-cols-[1fr_auto]">
- <div class="relative">
- <i class="ph-bold ph-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-meta"></i>
- <input type="text" wire:model.live.debounce.300ms="searchGeneral" placeholder="Buscar residente por nombre, apellido o CI..." class="w-full rounded-xl border border-borde/70 bg-fondo-card py-2.5 pl-10 pr-4 text-xs font-bold text-parrafo outline-none transition placeholder:text-meta focus:border-borde-focus focus:ring-2 focus:ring-[var(--rm-action-primary)]/20">
- </div>
- <div class="flex gap-2 overflow-x-auto pb-1 md:pb-0">
- <button wire:click="$set('filtroEstado', 'todas')" class="whitespace-nowrap rounded-xl border {{ $filtroEstado === 'todas' ? 'border-borde-fuerte bg-boton-principal text-inverso shadow-sm' : 'border-borde/70 bg-fondo-card text-parrafo' }} px-4 py-2 text-[10px] font-bold uppercase tracking-wider transition hover:bg-fondo-app">
- Todas
- </button>
- <button wire:click="$set('filtroEstado', 'con_ficha')" class="whitespace-nowrap rounded-xl border {{ $filtroEstado === 'con_ficha' ? 'border-estado-exitoBorde bg-estado-exitoBg text-inverso shadow-sm' : 'border-borde/70 bg-fondo-card text-estado-exito' }} px-4 py-2 text-[10px] font-bold uppercase tracking-wider transition hover:bg-fondo-app">
- Registradas
- </button>
- <button wire:click="$set('filtroEstado', 'sin_ficha')" class="whitespace-nowrap rounded-xl border {{ $filtroEstado === 'sin_ficha' ? 'border-borde bg-fondo-panel text-inverso shadow-sm' : 'border-borde/70 bg-fondo-card text-parrafo' }} px-4 py-2 text-[10px] font-bold uppercase tracking-wider transition hover:bg-fondo-app">
- Sin Ficha
- </button>
- </div>
- </div>
- </section>
+     {{-- FILTROS Y BÚSQUEDA FORMATO ALERTAS --}}
+    <x-ui.filter-bar class="mb-4">
+        <div class="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-2 items-center">
+            {{-- Búsqueda textual --}}
+            <div class="lg:col-span-8 relative flex items-center">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-[var(--rm-text-secondary)]">
+                    <i class="ph-bold ph-magnifying-glass text-base"></i>
+                </span>
+                <input type="text"
+                    wire:model.live.debounce.300ms="searchGeneral"
+                    placeholder="Buscar residente por nombre, apellido o CI..."
+                    class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-input-bg)] py-2 pl-9 pr-8 text-xs font-medium text-[var(--rm-text-primary)] placeholder-[var(--rm-text-secondary)] focus:border-[var(--rm-primary)] focus:ring-1 focus:ring-[var(--rm-primary)] focus:outline-none h-[38px]">
+                @if(!empty($searchGeneral))
+                    <button type="button"
+                        wire:click="$set('searchGeneral', '')"
+                        class="absolute inset-y-0 right-0 flex items-center pr-2.5 text-[var(--rm-text-secondary)] hover:text-[var(--rm-primary)] cursor-pointer"
+                        title="Limpiar búsqueda">
+                        <i class="ph-bold ph-x-circle text-base"></i>
+                    </button>
+                @endif
+            </div>
+
+            {{-- Selector Estado Ficha --}}
+            <div class="lg:col-span-4">
+                <select wire:model.live="filtroEstado"
+                    class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-input-bg)] py-2 px-3 text-xs font-medium text-[var(--rm-text-primary)] focus:border-[var(--rm-primary)] focus:ring-1 focus:ring-[var(--rm-primary)] focus:outline-none h-[38px]">
+                    <option value="todas">Todas las fichas</option>
+                    <option value="con_ficha">Registradas</option>
+                    <option value="sin_ficha">Sin Ficha</option>
+                </select>
+            </div>
+        </div>
+
+        @php
+            $hasFiltrosActivos = !empty($searchGeneral) || ($filtroEstado !== 'todas');
+        @endphp
+        @if($hasFiltrosActivos)
+            <div class="rm-filter-bar__active">
+                <div class="flex flex-wrap items-center gap-1.5">
+                    <span class="rm-filter-bar__active-label">
+                        <i class="ph-bold ph-funnel text-xs"></i> Filtros activos:
+                    </span>
+                    @if(!empty($searchGeneral))
+                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[var(--rm-surface-alt)] border border-[var(--rm-border)] text-[11px] font-semibold text-[var(--rm-text-primary)]">
+                            <span>Búsqueda: "{{ Str::limit($searchGeneral, 16) }}"</span>
+                            <button type="button" wire:click="$set('searchGeneral', '')" class="hover:text-[var(--rm-primary)] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
+                        </span>
+                    @endif
+                    @if($filtroEstado !== 'todas')
+                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[var(--rm-surface-alt)] border border-[var(--rm-border)] text-[11px] font-semibold text-[var(--rm-text-primary)]">
+                            <span>Estado: {{ $filtroEstado === 'con_ficha' ? 'Registradas' : 'Sin Ficha' }}</span>
+                            <button type="button" wire:click="$set('filtroEstado', 'todas')" class="hover:text-[var(--rm-primary)] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
+                        </span>
+                    @endif
+                </div>
+                <button type="button" wire:click="$set('searchGeneral', ''); $set('filtroEstado', 'todas')" class="rm-filter-bar__clear-btn">
+                    <i class="ph-bold ph-arrow-counter-clockwise text-xs"></i>
+                    Limpiar filtros
+                </button>
+            </div>
+        @endif
+    </x-ui.filter-bar>
 
  {{-- LISTADO DE FICHAS MÉDICAS --}}
  <section class="overflow-hidden rounded-[1.6rem] border border-borde/65 bg-fondo-card shadow-sm">
  <div class="overflow-x-auto">
- <table class="w-full text-left text-sm text-parrafo">
+ <table class="rm-data-table rm-data-table--actions w-full text-left text-sm text-parrafo">
  <thead class="border-b border-borde/45 bg-fondo-panel text-[9px] font-bold uppercase tracking-wider text-apoyo">
  <tr>
  <th class="px-5 py-4">Adulto Mayor</th>

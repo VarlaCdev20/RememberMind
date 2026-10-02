@@ -2,6 +2,7 @@
 
 namespace App\Frontend\Livewire\Compartido\Clinica;
 
+use App\Backend\Modulos\Clinica\Servicios\ClasificacionSignosVitalesService;
 use Livewire\Component;
 use App\Models\Residente;
 use App\Models\SignoVital;
@@ -64,75 +65,6 @@ class SignosVitalesPanel extends Component
         $this->redirect(route('admin.medico.paciente.ficha', $codResidente));
     }
 
-    // ── Clasificador de alerta por signo ──────────────────────────────────
-
-    public static function alertaPA(?int $sist, ?int $diast): string
-    {
-        if (!$sist) return 'sin_dato';
-        if ($sist >= 180 || $diast >= 110) return 'critico';
-        if ($sist >= 160 || $sist < 90 || $diast >= 100) return 'advertencia';
-        return 'normal';
-    }
-
-    public static function alertaFC(?int $fc): string
-    {
-        if (!$fc) return 'sin_dato';
-        if ($fc > 130 || $fc < 40) return 'critico';
-        if ($fc > 100 || $fc < 50) return 'advertencia';
-        return 'normal';
-    }
-
-    public static function alertaFR(?int $fr): string
-    {
-        if (!$fr) return 'sin_dato';
-        if ($fr > 30 || $fr < 8) return 'critico';
-        if ($fr > 22 || $fr < 12) return 'advertencia';
-        return 'normal';
-    }
-
-    public static function alertaTemp(?float $t): string
-    {
-        if (!$t) return 'sin_dato';
-        if ($t >= 39.0 || $t < 35.0) return 'critico';
-        if ($t >= 37.8 || $t < 36.0) return 'advertencia';
-        return 'normal';
-    }
-
-    public static function alertaSPO2(?int $sat): string
-    {
-        if (!$sat) return 'sin_dato';
-        if ($sat < 90) return 'critico';
-        if ($sat < 95) return 'advertencia';
-        return 'normal';
-    }
-
-    public static function alertaGlucosa(?float $g): string
-    {
-        if (!$g) return 'sin_dato';
-        if ($g > 300 || $g < 60) return 'critico';
-        if ($g > 180 || $g < 70) return 'advertencia';
-        return 'normal';
-    }
-
-    public static function nivelGlobal(
-        ?int $sist, ?int $diast, ?int $fc, ?int $fr,
-        ?float $t, ?int $sat, ?float $gluc
-    ): string {
-        $alertas = [
-            self::alertaPA($sist, $diast),
-            self::alertaFC($fc),
-            self::alertaFR($fr),
-            self::alertaTemp($t),
-            self::alertaSPO2($sat),
-            self::alertaGlucosa($gluc),
-        ];
-
-        if (in_array('critico', $alertas, true)) return 'critico';
-        if (in_array('advertencia', $alertas, true)) return 'advertencia';
-        if (in_array('normal', $alertas, true)) return 'normal';
-        return 'sin_dato';
-    }
-
     public function render()
     {
         $hoy = today()->toDateString();
@@ -161,6 +93,11 @@ class SignosVitalesPanel extends Component
             ->unique('cod_residente')
             ->keyBy('cod_residente');
 
+        $nivelesPorResidente = $ultimosSignos->map(
+            fn (SignoVital $signo) => ClasificacionSignosVitalesService::evaluarRegistro($signo)
+        );
+        $leyendaAvisos = ClasificacionSignosVitalesService::leyendaAvisos();
+
         // ── KPIs de monitoreo global ──────────────────────────────────────
         $conSignos = $ultimosSignos->values();
         $kpiPaMedia  = $conSignos->filter(fn($sv) => $sv->presion_sistolica > 0)->avg('presion_sistolica');
@@ -175,17 +112,12 @@ class SignosVitalesPanel extends Component
         foreach ($todosLosPacientes as $pac) {
             $sv = $ultimosSignos[$pac->cod_residente] ?? null;
             if (!$sv) { $kpiSinDatos++; continue; }
-            $nivel = self::nivelGlobal(
-                $sv->presion_sistolica, $sv->presion_diastolica,
-                $sv->frecuencia_cardiaca, $sv->frecuencia_respiratoria,
-                $sv->temperatura ? (float)$sv->temperatura : null,
-                $sv->saturacion,
-                $sv->glucosa ? (float)$sv->glucosa : null
-            );
+            $nivel = $nivelesPorResidente[$pac->cod_residente]['global'];
             match($nivel) {
                 'critico'     => $kpiCriticos++,
                 'advertencia' => $kpiAdvertencia++,
-                default       => $kpiNormales++,
+                'normal'      => $kpiNormales++,
+                default       => $kpiSinDatos++,
             };
         }
 
@@ -197,16 +129,8 @@ class SignosVitalesPanel extends Component
         // ── Filtro por nivel de alerta ────────────────────────────────────
         $pacientesFiltrados = $todosLosPacientes;
         if ($this->filtroAlerta !== '') {
-            $pacientesFiltrados = $pacientesFiltrados->filter(function($pac) use ($ultimosSignos) {
-                $sv = $ultimosSignos[$pac->cod_residente] ?? null;
-                if (!$sv) return $this->filtroAlerta === 'sin_dato';
-                $nivel = self::nivelGlobal(
-                    $sv->presion_sistolica, $sv->presion_diastolica,
-                    $sv->frecuencia_cardiaca, $sv->frecuencia_respiratoria,
-                    $sv->temperatura ? (float)$sv->temperatura : null,
-                    $sv->saturacion,
-                    $sv->glucosa ? (float)$sv->glucosa : null
-                );
+            $pacientesFiltrados = $pacientesFiltrados->filter(function($pac) use ($nivelesPorResidente) {
+                $nivel = $nivelesPorResidente[$pac->cod_residente]['global'] ?? 'sin_dato';
                 return $nivel === $this->filtroAlerta;
             })->values();
         }
@@ -225,17 +149,9 @@ class SignosVitalesPanel extends Component
         }
 
         // Ordenar: críticos primero, luego advertencia, luego normal
-        $pacientesFiltrados = $pacientesFiltrados->sortBy(function($pac) use ($ultimosSignos) {
-            $sv = $ultimosSignos[$pac->cod_residente] ?? null;
-            if (!$sv) return 99;
-            $nivel = self::nivelGlobal(
-                $sv->presion_sistolica, $sv->presion_diastolica,
-                $sv->frecuencia_cardiaca, $sv->frecuencia_respiratoria,
-                $sv->temperatura ? (float)$sv->temperatura : null,
-                $sv->saturacion,
-                $sv->glucosa ? (float)$sv->glucosa : null
-            );
-            return match($nivel) { 'critico' => 0, 'advertencia' => 1, default => 2 };
+        $pacientesFiltrados = $pacientesFiltrados->sortBy(function($pac) use ($nivelesPorResidente) {
+            $nivel = $nivelesPorResidente[$pac->cod_residente]['global'] ?? 'sin_dato';
+            return match($nivel) { 'critico' => 0, 'advertencia' => 1, 'normal' => 2, default => 99 };
         })->values();
 
         // ── Tendencia 7 días ──────────────────────────────────────────────
@@ -275,7 +191,7 @@ class SignosVitalesPanel extends Component
         ];
 
         return view('livewire.clinica.signos-vitales-panel', compact(
-            'pacientesFiltrados', 'ultimosSignos', 'hoy',
+            'pacientesFiltrados', 'ultimosSignos', 'nivelesPorResidente', 'leyendaAvisos', 'hoy',
             'kpiPaMedia', 'kpiFcMedia', 'kpiSatMedia',
             'kpiCriticos', 'kpiAdvertencia', 'kpiNormales', 'kpiSinDatos', 'kpiSinRegistroHoy',
             'chartTendencia7d', 'chartDistPA'

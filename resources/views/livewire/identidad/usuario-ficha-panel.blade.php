@@ -277,7 +277,7 @@
  </div>
  @else
  <div class="overflow-hidden rounded-2xl border border-borde-suave bg-fondo-card shadow-sm">
- <table class="w-full text-left text-xs">
+ <table class="rm-data-table w-full text-left text-xs">
  <thead class="bg-fondo-panel text-[9px] uppercase tracking-widest text-meta border-b border-borde/45">
  <tr>
  <th class="px-5 py-3.5 font-black">Adulto Mayor</th>
@@ -351,7 +351,7 @@
 
  {{-- Tabla de Documentos --}}
  <div class="overflow-hidden rounded-2xl border border-borde-suave bg-fondo-card shadow-sm">
- <table class="w-full text-left text-xs">
+ <table class="rm-data-table rm-data-table--actions w-full text-left text-xs">
  <thead class="bg-fondo-panel text-[9px] uppercase tracking-widest text-meta border-b border-borde/45">
  <tr>
  <th class="px-5 py-3.5 font-black w-[40%]">Documento / Tipo</th>
@@ -529,7 +529,7 @@
  </h3>
 
  <div class="overflow-hidden rounded-2xl border border-borde-suave bg-fondo-card shadow-sm">
- <table class="w-full text-left text-xs">
+ <table class="rm-data-table w-full text-left text-xs">
  <thead class="bg-fondo-panel text-[9px] uppercase tracking-widest text-meta border-b border-borde/45">
  <tr>
  <th class="px-5 py-3.5 font-black">Turno / Horario</th>
@@ -644,42 +644,72 @@
  {{-- TAB 6: HISTORIAL DE ACTIVIDAD --}}
  @if($activeTab === 'historial')
  <div class="space-y-6 animate-in fade-in duration-300">
- {{-- Filtros del historial --}}
- <section class="rm-filter-bar">
- <div class="grid items-end gap-3 sm:grid-cols-4">
- <div>
- <label class="mb-1 block text-[9px] font-bold uppercase tracking-widest text-meta">Acción</label>
- <select wire:model.live="filtroAccion"
- class="h-9 w-full rounded-xl border border-borde/65 bg-fondo-panel px-3 text-xs font-bold text-parrafo">
- <option value="">Todos los eventos</option>
- <option value="registro">Registros</option>
- <option value="edicion">Ediciones</option>
- <option value="documentacion">Documentación</option>
- <option value="seguridad">Seguridad</option>
- <option value="reportes">Reportes</option>
- </select>
- </div>
- <div>
- <label class="mb-1 block text-[9px] font-bold uppercase tracking-widest text-meta">Desde</label>
- <input type="date"
- wire:model.live="filtroFechaDesde"
- class="h-9 w-full rounded-xl border border-borde/65 bg-fondo-panel px-3 text-xs font-bold text-parrafo">
- </div>
- <div>
- <label class="mb-1 block text-[9px] font-bold uppercase tracking-widest text-meta">Hasta</label>
- <input type="date"
- wire:model.live="filtroFechaHasta"
- class="h-9 w-full rounded-xl border border-borde/65 bg-fondo-panel px-3 text-xs font-bold text-parrafo">
- </div>
- <div class="flex gap-2">
- <button type="button"
- wire:click="$reset('filtroAccion', 'filtroFechaDesde', 'filtroFechaHasta')"
- class="h-9 flex-1 rounded-xl bg-fondo-panel text-parrafo text-[10px] font-bold uppercase tracking-wider transition hover:bg-boton-acento hover:text-inverso active:scale-95 shadow-sm">
- Restablecer
- </button>
- </div>
- </div>
- </section>
+     {{-- Filtros del historial --}}
+    <x-ui.filter-bar class="mb-4">
+        <div class="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-2 items-center">
+            {{-- Acción --}}
+            <div class="lg:col-span-4">
+                <select wire:model.live="filtroAccion"
+                    class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-input-bg)] py-2 px-3 text-xs font-medium text-[var(--rm-text-primary)] focus:border-[var(--rm-primary)] focus:ring-1 focus:ring-[var(--rm-primary)] focus:outline-none h-[38px]">
+                    <option value="">Todos los eventos</option>
+                    <option value="registro">Registros</option>
+                    <option value="edicion">Ediciones</option>
+                    <option value="documentacion">Documentación</option>
+                    <option value="seguridad">Seguridad</option>
+                    <option value="reportes">Reportes</option>
+                </select>
+            </div>
+
+            {{-- Desde --}}
+            <div class="lg:col-span-4">
+                <input type="date"
+                    wire:model.live="filtroFechaDesde"
+                    class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-input-bg)] py-2 px-3 text-xs font-medium text-[var(--rm-text-primary)] focus:border-[var(--rm-primary)] focus:ring-1 focus:ring-[var(--rm-primary)] focus:outline-none h-[38px]">
+            </div>
+
+            {{-- Hasta --}}
+            <div class="lg:col-span-4">
+                <input type="date"
+                    wire:model.live="filtroFechaHasta"
+                    class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-input-bg)] py-2 px-3 text-xs font-medium text-[var(--rm-text-primary)] focus:border-[var(--rm-primary)] focus:ring-1 focus:ring-[var(--rm-primary)] focus:outline-none h-[38px]">
+            </div>
+        </div>
+
+        @php
+            $hasFiltrosActivos = !empty($filtroAccion) || !empty($filtroFechaDesde) || !empty($filtroFechaHasta);
+        @endphp
+        @if($hasFiltrosActivos)
+            <div class="rm-filter-bar__active">
+                <div class="flex flex-wrap items-center gap-1.5">
+                    <span class="rm-filter-bar__active-label">
+                        <i class="ph-bold ph-funnel text-xs"></i> Filtros activos:
+                    </span>
+                    @if(!empty($filtroAccion))
+                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[var(--rm-surface-alt)] border border-[var(--rm-border)] text-[11px] font-semibold text-[var(--rm-text-primary)]">
+                            <span>Acción: {{ $filtroAccion }}</span>
+                            <button type="button" wire:click="$set('filtroAccion', '')" class="hover:text-[var(--rm-primary)] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
+                        </span>
+                    @endif
+                    @if(!empty($filtroFechaDesde))
+                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[var(--rm-surface-alt)] border border-[var(--rm-border)] text-[11px] font-semibold text-[var(--rm-text-primary)]">
+                            <span>Desde: {{ $filtroFechaDesde }}</span>
+                            <button type="button" wire:click="$set('filtroFechaDesde', '')" class="hover:text-[var(--rm-primary)] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
+                        </span>
+                    @endif
+                    @if(!empty($filtroFechaHasta))
+                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[var(--rm-surface-alt)] border border-[var(--rm-border)] text-[11px] font-semibold text-[var(--rm-text-primary)]">
+                            <span>Hasta: {{ $filtroFechaHasta }}</span>
+                            <button type="button" wire:click="$set('filtroFechaHasta', '')" class="hover:text-[var(--rm-primary)] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
+                        </span>
+                    @endif
+                </div>
+                <button type="button" wire:click="$set('filtroAccion', ''); $set('filtroFechaDesde', ''); $set('filtroFechaHasta', '')" class="rm-filter-bar__clear-btn">
+                    <i class="ph-bold ph-arrow-counter-clockwise text-xs"></i>
+                    Limpiar filtros
+                </button>
+            </div>
+        @endif
+    </x-ui.filter-bar>
 
  <section class="rounded-[2rem] border border-borde/45 bg-fondo-card/70 p-6 shadow-sm space-y-6">
  <h3 class="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-apoyo">

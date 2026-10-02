@@ -26,13 +26,18 @@
     if ($totalPtsPa >= 2) {
         foreach ($sisData as $idx => $val) {
             $x = $paddingX + ($idx * ($usableW / max(1, $totalPtsPa - 1)));
-            $valSis = $val ?? 120;
+            if ($val === null) {
+                continue;
+            }
+            $valSis = $val;
             $ySis = $height - $paddingY - ((($valSis - 70) / 110) * $usableH);
             $sisPoints[] = round($x, 1) . ',' . round($ySis, 1);
 
-            $valDia = $diaData[$idx] ?? 80;
-            $yDia = $height - $paddingY - ((($valDia - 50) / 90) * $usableH);
-            $diaPoints[] = round($x, 1) . ',' . round($yDia, 1);
+            $valDia = $diaData[$idx] ?? null;
+            if ($valDia !== null) {
+                $yDia = $height - $paddingY - ((($valDia - 50) / 90) * $usableH);
+                $diaPoints[] = round($x, 1) . ',' . round($yDia, 1);
+            }
         }
         $ultimoSis = end($sisData);
         $ultimoDia = end($diaData);
@@ -57,7 +62,10 @@
     if ($totalPtsFc >= 2) {
         foreach ($fcData as $idx => $val) {
             $x = $paddingX + ($idx * ($usableW / max(1, $totalPtsFc - 1)));
-            $valFc = $val ?? 72;
+            if ($val === null) {
+                continue;
+            }
+            $valFc = $val;
             $yFc = $height - $paddingY - ((($valFc - 50) / 70) * $usableH);
             $fcPoints[] = round($x, 1) . ',' . round($yFc, 1);
         }
@@ -73,7 +81,10 @@
     if ($totalPtsSpo2 >= 2) {
         foreach ($spo2Data as $idx => $val) {
             $x = $paddingX + ($idx * ($usableW / max(1, $totalPtsSpo2 - 1)));
-            $valSpo2 = $val ?? 98;
+            if ($val === null) {
+                continue;
+            }
+            $valSpo2 = $val;
             $ySpo2 = $height - $paddingY - ((($valSpo2 - 88) / 12) * $usableH);
             $spo2Points[] = round($x, 1) . ',' . round($ySpo2, 1);
         }
@@ -89,7 +100,10 @@
     if ($totalPtsTemp >= 2) {
         foreach ($tempData as $idx => $val) {
             $x = $paddingX + ($idx * ($usableW / max(1, $totalPtsTemp - 1)));
-            $valTemp = $val ?? 36.5;
+            if ($val === null) {
+                continue;
+            }
+            $valTemp = $val;
             $yTemp = $height - $paddingY - ((($valTemp - 35.0) / 4.0) * $usableH);
             $tempPoints[] = round($x, 1) . ',' . round($yTemp, 1);
         }
@@ -99,10 +113,28 @@
 
     // Relaciones clave
     $ultSeg = $adultoMayor->pasesTurno()->first();
-    $ultFunc = $adultoMayor->valoracionesFuncionales->sortByDesc('fecha_valoracion')->first();
+    $ultFunc = $adultoMayor->valoracionesFuncionales->sortByDesc('fecha_hora')->first();
+    $ultControlCognitivo = $adultoMayor->controlesCognitivos->sortByDesc('fecha_hora')->first();
+    $ultDolor = $adultoMayor->valoracionesDolor->sortByDesc('fecha_hora')->first();
     $plan = $adultoMayor->planCuidadoActivo;
-    $proxAdmin = $adultoMayor->administracionesMedicacion->where('administrado', false)->take(3);
-    $proxTareas = $adultoMayor->ejecucionesCuidado()->whereIn('estado', ['PENDIENTE', 'PROGRAMADA'])->take(3)->get();
+    $proxAdmin = $adultoMayor->administracionesMedicacion
+        ->filter(fn ($a) => $a->fecha_hora_programada && $a->fecha_hora_programada->gte(now()) && ! $a->fecha_hora_administracion && ! in_array($a->estado, ['OMITIDA', 'ANULADA', 'CANCELADA'], true))
+        ->sortBy('fecha_hora_programada')
+        ->take(3);
+    $proxTareas = $adultoMayor->ejecucionesCuidado
+        ->filter(fn ($e) => $e->fecha_hora_programada && $e->fecha_hora_programada->gte(now()) && in_array($e->estado, ['PENDIENTE', 'PROGRAMADA', 'EN_PROCESO'], true))
+        ->sortBy('fecha_hora_programada')
+        ->take(3);
+    $proxActividades = $adultoMayor->actividades
+        ->filter(fn ($a) => $a->fecha_hora && $a->fecha_hora->gte(now()) && ! in_array($a->estado, ['CANCELADA', 'ANULADA', 'FINALIZADA', 'REALIZADA'], true))
+        ->sortBy('fecha_hora')
+        ->take(3);
+    $notasRelevantes = $adultoMayor->notasClinicas->take(2);
+    $ingestaHoy = $adultoMayor->registrosIngesta->first(fn ($r) => $r->fecha_hora?->isToday());
+    $hidratacionHoy = $adultoMayor->registrosHidratacion->filter(fn ($r) => $r->fecha_hora?->isToday());
+    $hidratacionHoyMl = $hidratacionHoy->sum(fn ($r) => (float) $r->cantidad_ml);
+    $movilidadHoy = $adultoMayor->registrosMovilidad->first(fn ($r) => $r->fecha_hora?->isToday());
+    $asignacionActiva = $adultoMayor->asignacionesJornada->first(fn ($a) => in_array($a->estado, ['ACTIVA', 'ACTIVO'], true));
     $alertasAct = $adultoMayor->alertas->whereIn('estado', ['ABIERTA', 'EN_ATENCION']);
     $totalTareasHoy = $adultoMayor->ejecucionesCuidado()->whereDate('fecha_hora_programada', today())->count();
     $tareasCompletadasHoy = $adultoMayor->ejecucionesCuidado()->whereDate('fecha_hora_programada', today())->whereIn('estado', ['REALIZADA', 'EJECUTADA', 'COMPLETADA'])->count();
@@ -191,14 +223,14 @@
                 <div class="grid grid-cols-2 gap-2 border-t border-[var(--rm-border-soft)] pt-2.5">
                     <div class="p-2 rounded-xl bg-[var(--rm-surface-alt)] border border-[var(--rm-border-soft)]">
                         <span class="text-[10px] font-bold text-[var(--rm-text-muted)] uppercase block">Grupo sanguíneo</span>
-                        <span class="text-xs font-black text-[var(--rm-text-title)] mt-0.5 block">
-                            {{ $adultoMayor->grupo_sanguineo ? $adultoMayor->grupo_sanguineo . ($adultoMayor->factor_rh ?: '+') : 'No def.' }}
+                        <span class="text-xs font-bold text-[var(--rm-text-title)] mt-0.5 block">
+                            {{ $grupoSanguineo ?: 'No registrado' }}
                         </span>
                     </div>
                     <div class="p-2 rounded-xl bg-[var(--rm-surface-alt)] border border-[var(--rm-border-soft)]">
                         <span class="text-[10px] font-bold text-[var(--rm-text-muted)] uppercase block">Seguro de salud</span>
-                        <span class="text-xs font-bold text-[var(--rm-text-title)] mt-0.5 block truncate" title="{{ $adultoMayor->seguro_salud ?: 'Particular' }}">
-                            {{ $adultoMayor->seguro_salud ?: 'Particular' }}
+                        <span class="text-xs font-bold text-[var(--rm-text-title)] mt-0.5 block truncate" title="{{ $seguroActivo?->entidad ?: 'No registrado' }}">
+                            {{ $seguroActivo?->entidad ?: 'No registrado' }}
                         </span>
                     </div>
                 </div>
@@ -209,14 +241,14 @@
                         <i class="ph-bold ph-phone-call text-[var(--rm-success)]"></i>
                         <span>Contacto de emergencia</span>
                     </span>
-                    @if($adultoMayor->contacto_emergencia_nombre)
+                    @if($contactoEmergencia)
                         <div class="p-2.5 rounded-xl bg-[var(--rm-surface-alt)] border border-[var(--rm-border-soft)] flex items-center justify-between">
                             <div class="min-w-0 pr-2">
-                                <span class="font-bold text-[var(--rm-text-title)] block truncate">{{ $adultoMayor->contacto_emergencia_nombre }}</span>
-                                <span class="text-[10px] text-[var(--rm-text-muted)] block">{{ $adultoMayor->contacto_emergencia_parentesco ?: 'Contacto' }}</span>
+                                <span class="font-bold text-[var(--rm-text-title)] block truncate">{{ $contactoEmergencia->nombre_completo }}</span>
+                                <span class="text-[10px] text-[var(--rm-text-muted)] block">{{ $contactoEmergencia->pivot?->parentesco ?: 'Contacto' }}</span>
                             </div>
                             <span class="flex shrink-0 items-center gap-1 text-xs font-semibold text-[var(--rm-success-strong)]">
-                                <i class="ph-bold ph-phone"></i> {{ $adultoMayor->contacto_emergencia_celular ?: 's/n' }}
+                                <i class="ph-bold ph-phone"></i> {{ $contactoEmergencia->celular ?: ($contactoEmergencia->telefono ?: 'No registrado') }}
                             </span>
                         </div>
                     @else
@@ -243,12 +275,18 @@
 
             <div class="space-y-2 text-xs">
                 <div class="flex items-center justify-between text-[11px] text-[var(--rm-text-muted)]">
-                    <span class="flex items-center gap-1"><i class="ph-bold ph-calendar"></i> {{ $ultSeg ? ($ultSeg->fecha ? \Carbon\Carbon::parse($ultSeg->fecha)->format('d/m/Y') : 'Hoy') . ' ' . substr($ultSeg->hora_inicio ?? '08:30', 0, 5) : 'Hoy 08:30' }}</span>
-                    <span class="font-medium text-[var(--rm-text-title)]">{{ $ultSeg?->turno?->enfermero?->name ?? 'Enf. Turno Mañana' }}</span>
+                    <span class="flex items-center gap-1"><i class="ph-bold ph-calendar"></i> {{ $ultSeg?->fecha_hora?->format('d/m/Y H:i') ?? 'Sin evolución registrada' }}</span>
+                    <span class="font-medium text-[var(--rm-text-title)]">{{ $ultSeg?->personalSaliente?->usuario?->name ?? 'Responsable no registrado' }}</span>
                 </div>
-                <p class="text-[var(--rm-text-body)] bg-[var(--rm-surface-alt)] p-3 rounded-xl border border-[var(--rm-border-soft)] leading-relaxed">
-                    {{ $ultSeg?->observaciones ?: 'Evolución clínica dentro de parámetros habituales. Residente tranquilo, colaborador en las actividades de la jornada y con adecuada tolerancia oral.' }}
-                </p>
+                @if($ultSeg)
+                    <p class="text-[var(--rm-text-body)] bg-[var(--rm-surface-alt)] p-3 rounded-xl border border-[var(--rm-border-soft)] leading-relaxed">
+                        {{ $ultSeg->resumen ?: 'Sin resumen clínico registrado.' }}
+                    </p>
+                @else
+                    <p class="text-[var(--rm-text-muted)] bg-[var(--rm-surface-alt)] p-3 rounded-xl border border-[var(--rm-border-soft)] leading-relaxed italic">
+                        No existen pases de turno registrados para este residente.
+                    </p>
+                @endif
             </div>
         </div>
 
@@ -273,7 +311,7 @@
                         <div class="rm-action-item border-[var(--rm-danger)]/25 bg-[var(--rm-danger-soft)]">
                             <div class="min-w-0 pr-1">
                                 <span class="block truncate font-bold text-[var(--rm-danger-strong)]">{{ $al->tipo_alerta ?? $al->motivo ?? $al->tipo }}</span>
-                                <span class="block text-[10px] text-[var(--rm-danger)]">{{ $al->origen ?? 'Enfermería' }}</span>
+                                <span class="block text-[10px] text-[var(--rm-danger)]">{{ $al->origen ?: 'Origen no registrado' }}</span>
                             </div>
                             <x-ui.status-badge :estado="$al->nivel ?? $al->prioridad" class="shrink-0" />
                         </div>
@@ -281,7 +319,7 @@
                 @else
                     <div class="flex items-center gap-2 rounded-xl border border-[var(--rm-success)]/25 bg-[var(--rm-success-soft)] p-3 text-xs text-[var(--rm-success-strong)]">
                         <i class="ph-bold ph-shield-check text-[var(--rm-success)] text-base shrink-0"></i>
-                        <span>Sin alertas clínicas activas en este momento. Paciente estable.</span>
+                        <span>Sin alertas clínicas activas registradas.</span>
                     </div>
                 @endif
             </div>
@@ -302,7 +340,7 @@
                     <span>Estado actual</span>
                     <span class="sr-only">Estado Clínico Actual</span>
                 </h3>
-                <x-ui.status-badge estado="ESTABLE" />
+                <x-ui.status-badge :estado="$ultSeg ? 'REGISTRADO' : 'SIN_REGISTRO'" :label="$ultSeg ? 'Con evolución' : 'Sin registro'" />
             </div>
 
             {{-- 8 Indicadores Clínicos --}}
@@ -311,7 +349,7 @@
                 <div class="rm-data-tile">
                     <span class="text-[10px] font-bold text-[var(--rm-text-muted)] uppercase block">Estado general</span>
                     <span class="text-xs font-bold text-[var(--rm-text-title)] mt-0.5 block">
-                        {{ $adultoMayor->estado_humano ?? 'Estable' }}
+                        {{ $ultSeg?->estado_general ?: 'No registrado' }}
                     </span>
                 </div>
 
@@ -319,15 +357,15 @@
                 <div class="rm-data-tile">
                     <span class="text-[10px] font-bold text-[var(--rm-text-muted)] uppercase block">Nivel de cuidado</span>
                     <span class="text-xs font-bold text-[var(--rm-text-title)] mt-0.5 block truncate">
-                        {{ $adultoMayor->nivel_cuidado ?: 'Intermedio' }}
+                        {{ $asignacionActiva?->nivel_supervision ?: 'No registrado' }}
                     </span>
                 </div>
 
                 {{-- Dependencia (Barthel) --}}
                 <div class="rm-data-tile">
                     <span class="text-[10px] font-bold text-[var(--rm-text-muted)] uppercase block">Dependencia</span>
-                    <span class="mt-0.5 block text-xs font-black text-[var(--rm-info)]">
-                        {{ $ultFunc->barthel_total ?? 90 }} / 100
+                    <span class="mt-0.5 block text-xs font-bold text-[var(--rm-info)]">
+                        {{ $ultFunc?->indice_barthel !== null ? $ultFunc->indice_barthel.' / 100' : 'No registrado' }}
                     </span>
                 </div>
 
@@ -335,15 +373,15 @@
                 <div class="rm-data-tile">
                     <span class="text-[10px] font-bold text-[var(--rm-text-muted)] uppercase block">Riesgo de caídas</span>
                     <span class="mt-0.5 block text-xs font-bold text-[var(--rm-warning-strong)]">
-                        {{ $ultFunc->riesgo_caida ?? 'Bajo' }}
+                        {{ $movilidadHoy?->riesgo_caida ?: 'No registrado' }}
                     </span>
                 </div>
 
                 {{-- Riesgo de UPP --}}
                 <div class="rm-data-tile">
-                    <span class="text-[10px] font-bold text-[var(--rm-text-muted)] uppercase block">Riesgo de UPP</span>
+                    <span class="text-[10px] font-bold text-[var(--rm-text-muted)] uppercase block">Supervisión funcional</span>
                     <span class="text-xs font-bold text-[var(--rm-text-title)] mt-0.5 block">
-                        {{ $ultFunc->riesgo_upp ?? 'Sin riesgo' }}
+                        {{ $ultFunc ? ($ultFunc->necesita_supervision ? 'Requerida' : 'No requerida') : 'No registrado' }}
                     </span>
                 </div>
 
@@ -351,7 +389,7 @@
                 <div class="rm-data-tile">
                     <span class="text-[10px] font-bold text-[var(--rm-text-muted)] uppercase block">Estado cognitivo</span>
                     <span class="text-xs font-bold text-[var(--rm-text-title)] mt-0.5 block">
-                        Conservado
+                        {{ $ultControlCognitivo ? ($ultControlCognitivo->cambio_cognitivo ? 'Cambio observado' : 'Sin cambio observado') : 'No registrado' }}
                     </span>
                 </div>
 
@@ -359,15 +397,15 @@
                 <div class="rm-data-tile">
                     <span class="text-[10px] font-bold text-[var(--rm-text-muted)] uppercase block">Estado nutricional</span>
                     <span class="text-xs font-bold text-[var(--rm-text-title)] mt-0.5 block truncate">
-                        {{ $ultSeg && $ultSeg->alimentacion ? ucfirst(strtolower($ultSeg->alimentacion)) : 'Normal' }}
+                        {{ $ingestaHoy?->apetito ?: ($ingestaHoy?->tolerancia ?: 'No registrado') }}
                     </span>
                 </div>
 
                 {{-- Dolor actual --}}
                 <div class="rm-data-tile">
                     <span class="text-[10px] font-bold text-[var(--rm-text-muted)] uppercase block">Dolor actual</span>
-                    <span class="mt-0.5 block text-xs font-black text-[var(--rm-success-strong)]">
-                        {{ $ultimoSigno && $ultimoSigno->nivel_dolor !== null ? $ultimoSigno->nivel_dolor . '/10' : '0/10 (Sin dolor)' }}
+                    <span class="mt-0.5 block text-xs font-bold text-[var(--rm-success-strong)]">
+                        {{ $ultDolor?->intensidad !== null ? $ultDolor->intensidad.'/10' : 'No registrado' }}
                     </span>
                 </div>
             </div>
@@ -394,22 +432,22 @@
                     <svg class="w-16 h-16 transform -rotate-90" viewBox="0 0 36 36">
                         <path class="text-[var(--rm-border-soft)]" stroke-width="3.5" stroke="currentColor" fill="none"
                               d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-                        <path class="text-[var(--rm-action-primary)] transition-all duration-500" stroke-dasharray="60, 100" stroke-width="3.5" stroke-linecap="round" stroke="currentColor" fill="none"
+                        <path class="text-[var(--rm-action-primary)] transition-all duration-500" stroke-dasharray="{{ $totalTareasHoy > 0 ? round(($tareasCompletadasHoy / $totalTareasHoy) * 100) : 0 }}, 100" stroke-width="3.5" stroke-linecap="round" stroke="currentColor" fill="none"
                               d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
                     </svg>
                     <div class="absolute flex flex-col items-center justify-center">
-                        <span class="text-xs font-black text-[var(--rm-text-title)]">3/5</span>
-                        <span class="text-[8px] font-bold text-[var(--rm-text-muted)] uppercase">Hoy</span>
+                        <span class="text-xs font-bold text-[var(--rm-text-title)]">{{ $tareasCompletadasHoy }}/{{ $totalTareasHoy }}</span>
+                        <span class="text-[10px] font-bold text-[var(--rm-text-muted)] uppercase">Hoy</span>
                     </div>
                 </div>
 
                 {{-- Lista de objetivos/cuidados --}}
                 <div class="min-w-0 space-y-1.5 flex-1">
                     <p class="font-bold text-[var(--rm-text-title)] truncate">
-                        {{ $plan?->diagnostico_enfermeria ?? $plan?->nombre ?? 'Plan Geriátrico de Confort y Prevención' }}
+                        {{ $plan?->nombre ?: 'Sin plan de cuidados activo' }}
                     </p>
                     <p class="text-[11px] text-[var(--rm-text-body)] line-clamp-2">
-                        {{ $plan?->objetivo ?? 'Mantenimiento de autonomía motriz, hidratación continua y prevención de caídas.' }}
+                        {{ $plan?->objetivo_general ?: 'No se registró un objetivo de cuidado activo.' }}
                     </p>
                 </div>
             </div>
@@ -429,25 +467,25 @@
                 <div class="rm-data-tile">
                     <span class="text-[10px] font-bold text-[var(--rm-text-muted)] uppercase block">Alimentación</span>
                     <span class="text-xs font-bold text-[var(--rm-text-title)] mt-0.5 block truncate">
-                        {{ $ultSeg && $ultSeg->alimentacion ? ucfirst(strtolower($ultSeg->alimentacion)) : 'Aceptación completa' }}
+                        {{ $ingestaHoy ? (($ingestaHoy->porcentaje_consumido !== null ? $ingestaHoy->porcentaje_consumido.'% · ' : '').($ingestaHoy->tolerancia ?: ($ingestaHoy->apetito ?: 'Registrada'))) : 'No registrada' }}
                     </span>
                 </div>
                 <div class="rm-data-tile">
                     <span class="text-[10px] font-bold text-[var(--rm-text-muted)] uppercase block">Hidratación</span>
                     <span class="text-xs font-bold text-[var(--rm-text-title)] mt-0.5 block truncate">
-                        Adecuada (1.200 mL)
+                        {{ $hidratacionHoy->isNotEmpty() ? number_format($hidratacionHoyMl, 0, ',', '.').' mL' : 'No registrada' }}
                     </span>
                 </div>
                 <div class="rm-data-tile">
                     <span class="text-[10px] font-bold text-[var(--rm-text-muted)] uppercase block">Movilidad</span>
                     <span class="text-xs font-bold text-[var(--rm-text-title)] mt-0.5 block truncate">
-                        {{ $ultSeg && $ultSeg->movilidad ? ucfirst(strtolower(str_replace('_', ' ', $ultSeg->movilidad))) : 'Paseo asistido' }}
+                        {{ $movilidadHoy?->marcha ?: ($movilidadHoy?->tipo_apoyo ?: 'No registrada') }}
                     </span>
                 </div>
                 <div class="rm-data-tile">
-                    <span class="text-[10px] font-bold text-[var(--rm-text-muted)] uppercase block">Higiene</span>
+                    <span class="text-[10px] font-bold text-[var(--rm-text-muted)] uppercase block">Autonomía en higiene</span>
                     <span class="text-xs font-bold text-[var(--rm-text-title)] mt-0.5 block truncate">
-                        Completada matutina
+                        {{ $ultFunc?->higiene_autonoma ?: 'No registrada' }}
                     </span>
                 </div>
             </div>
@@ -624,24 +662,24 @@
                 @if($ultimoSigno)
                     <div class="space-y-1.5 border-t border-[var(--rm-border-soft)] pt-2 text-xs">
                         <div class="flex items-center justify-between text-[11px] text-[var(--rm-text-muted)]">
-                            <span>Último registro: <strong>{{ ($ultimoSigno->fecha ? \Carbon\Carbon::parse($ultimoSigno->fecha)->format('d/m/Y') : ($ultimoSigno->fecha_hora ? \Carbon\Carbon::parse($ultimoSigno->fecha_hora)->format('d/m/Y') : 'Hoy')) }} {{ substr($ultimoSigno->hora ?? '08:00', 0, 5) }}</strong></span>
+                            <span>Último registro: <strong>{{ $ultimoSigno->fecha_hora?->format('d/m/Y H:i') ?? (($ultimoSigno->fecha ? \Carbon\Carbon::parse($ultimoSigno->fecha)->format('d/m/Y') : 'Fecha no registrada').' '.substr((string) ($ultimoSigno->hora ?? ''), 0, 5)) }}</strong></span>
                         </div>
                         <div class="grid grid-cols-4 gap-1.5 text-center pt-0.5">
                             <div class="p-1 rounded-lg bg-[var(--rm-surface-alt)] border border-[var(--rm-border-soft)]">
-                                <span class="text-[9px] font-bold text-[var(--rm-text-muted)] uppercase block">PA</span>
-                                <span class="text-xs font-black text-[var(--rm-text-title)] block">{{ $ultimoSigno->presion_arterial ?: ($ultimoSigno->presion_sistolica ? $ultimoSigno->presion_sistolica . '/' . $ultimoSigno->presion_diastolica : '—') }}</span>
+                                <span class="text-[10px] font-bold text-[var(--rm-text-muted)] uppercase block">PA</span>
+                                <span class="text-xs font-bold text-[var(--rm-text-title)] block">{{ $ultimoSigno->presion_arterial ?: ($ultimoSigno->presion_sistolica ? $ultimoSigno->presion_sistolica . '/' . $ultimoSigno->presion_diastolica : '—') }}</span>
                             </div>
                             <div class="p-1 rounded-lg bg-[var(--rm-surface-alt)] border border-[var(--rm-border-soft)]">
-                                <span class="text-[9px] font-bold text-[var(--rm-text-muted)] uppercase block">FC</span>
-                                <span class="block text-xs font-black text-[var(--rm-danger)]">{{ $ultimoSigno->frecuencia_cardiaca ?: '—' }}</span>
+                                <span class="text-[10px] font-bold text-[var(--rm-text-muted)] uppercase block">FC</span>
+                                <span class="block text-xs font-bold text-[var(--rm-danger)]">{{ $ultimoSigno->frecuencia_cardiaca ?: '—' }}</span>
                             </div>
                             <div class="p-1 rounded-lg bg-[var(--rm-surface-alt)] border border-[var(--rm-border-soft)]">
-                                <span class="text-[9px] font-bold text-[var(--rm-text-muted)] uppercase block">SpO₂</span>
-                                <span class="block text-xs font-black text-[var(--rm-success)]">{{ ($ultimoSigno->saturacion_oxigeno ?? $ultimoSigno->saturacion) ? ($ultimoSigno->saturacion_oxigeno ?? $ultimoSigno->saturacion) . '%' : '—' }}</span>
+                                <span class="text-[10px] font-bold text-[var(--rm-text-muted)] uppercase block">SpO₂</span>
+                                <span class="block text-xs font-bold text-[var(--rm-success)]">{{ ($ultimoSigno->saturacion_oxigeno ?? $ultimoSigno->saturacion) ? ($ultimoSigno->saturacion_oxigeno ?? $ultimoSigno->saturacion) . '%' : '—' }}</span>
                             </div>
                             <div class="p-1 rounded-lg bg-[var(--rm-surface-alt)] border border-[var(--rm-border-soft)]">
-                                <span class="text-[9px] font-bold text-[var(--rm-text-muted)] uppercase block">Temp</span>
-                                <span class="block text-xs font-black text-[var(--rm-warning)]">{{ $ultimoSigno->temperatura ? $ultimoSigno->temperatura . ' °C' : '—' }}</span>
+                                <span class="text-[10px] font-bold text-[var(--rm-text-muted)] uppercase block">Temp</span>
+                                <span class="block text-xs font-bold text-[var(--rm-warning)]">{{ $ultimoSigno->temperatura ? $ultimoSigno->temperatura . ' °C' : '—' }}</span>
                             </div>
                         </div>
                     </div>
@@ -667,53 +705,50 @@
             </div>
 
             <div class="space-y-2 text-xs">
-                {{-- Item 1: Control de signos vitales --}}
-                <div class="rm-action-item">
-                    <div class="flex items-center gap-2 min-w-0 pr-2">
-                        <i class="ph-bold ph-heartbeat text-[var(--rm-danger)] text-base shrink-0"></i>
-                        <div class="truncate">
-                            <span class="font-bold text-[var(--rm-text-title)] block truncate">Control de signos vitales</span>
-                            <span class="text-[10px] text-[var(--rm-text-muted)] block">10:00 • Turno mañana</span>
+                @foreach($proxTareas as $tarea)
+                    <div class="rm-action-item">
+                        <div class="flex items-center gap-2 min-w-0 pr-2">
+                            <i class="ph-bold ph-hand-heart text-[var(--rm-info)] text-base shrink-0"></i>
+                            <div class="truncate">
+                                <span class="font-bold text-[var(--rm-text-title)] block truncate">{{ $tarea->intervencion?->nombre ?: 'Intervención de cuidado' }}</span>
+                                <span class="text-[10px] text-[var(--rm-text-muted)] block">{{ $tarea->fecha_hora_programada->format('d/m/Y H:i') }}</span>
+                            </div>
                         </div>
+                        <x-ui.status-badge :estado="$tarea->estado" class="shrink-0" />
                     </div>
-                    <x-ui.status-badge estado="PENDIENTE" class="shrink-0" />
-                </div>
+                @endforeach
 
-                {{-- Item 2: Administración de medicación --}}
-                <div class="rm-action-item">
-                    <div class="flex items-center gap-2 min-w-0 pr-2">
-                        <i class="ph-bold ph-pill text-[var(--rm-success)] text-base shrink-0"></i>
-                        <div class="truncate">
-                            <span class="font-bold text-[var(--rm-text-title)] block truncate">Administración de medicación</span>
-                            <span class="text-[10px] text-[var(--rm-text-muted)] block">12:00 • Toma programada</span>
+                @foreach($proxAdmin as $administracion)
+                    <div class="rm-action-item">
+                        <div class="flex items-center gap-2 min-w-0 pr-2">
+                            <i class="ph-bold ph-pill text-[var(--rm-success)] text-base shrink-0"></i>
+                            <div class="truncate">
+                                <span class="font-bold text-[var(--rm-text-title)] block truncate">{{ $administracion->medicacion?->medicamento?->nombre ?: 'Medicación prescrita' }}</span>
+                                <span class="text-[10px] text-[var(--rm-text-muted)] block">{{ $administracion->fecha_hora_programada->format('d/m/Y H:i') }}</span>
+                            </div>
                         </div>
+                        <x-ui.status-badge :estado="$administracion->estado ?: 'PROGRAMADA'" class="shrink-0" />
                     </div>
-                    <x-ui.status-badge estado="PROGRAMADO" label="Programada" class="shrink-0" />
-                </div>
+                @endforeach
 
-                {{-- Item 3: Terapia física --}}
-                <div class="rm-action-item">
-                    <div class="flex items-center gap-2 min-w-0 pr-2">
-                        <i class="ph-bold ph-person-simple-walk text-[var(--rm-info)] text-base shrink-0"></i>
-                        <div class="truncate">
-                            <span class="font-bold text-[var(--rm-text-title)] block truncate">Terapia física y movilidad</span>
-                            <span class="text-[10px] text-[var(--rm-text-muted)] block">15:30 • Sesión motriz</span>
+                @foreach($proxActividades as $actividad)
+                    <div class="rm-action-item">
+                        <div class="flex items-center gap-2 min-w-0 pr-2">
+                            <i class="ph-bold ph-calendar-check text-[var(--rm-action-primary)] text-base shrink-0"></i>
+                            <div class="truncate">
+                                <span class="font-bold text-[var(--rm-text-title)] block truncate">{{ $actividad->nombre }}</span>
+                                <span class="text-[10px] text-[var(--rm-text-muted)] block">{{ $actividad->fecha_hora->format('d/m/Y H:i') }}{{ $actividad->lugar ? ' · '.$actividad->lugar : '' }}</span>
+                            </div>
                         </div>
+                        <x-ui.status-badge :estado="$actividad->estado" class="shrink-0" />
                     </div>
-                    <x-ui.status-badge estado="PROGRAMADO" label="Programada" class="shrink-0" />
-                </div>
+                @endforeach
 
-                {{-- Item 4: Valoración médica --}}
-                <div class="rm-action-item">
-                    <div class="flex items-center gap-2 min-w-0 pr-2">
-                        <i class="ph-bold ph-stethoscope text-[var(--rm-clinical)] text-base shrink-0"></i>
-                        <div class="truncate">
-                            <span class="font-bold text-[var(--rm-text-title)] block truncate">Valoración médica</span>
-                            <span class="text-[10px] text-[var(--rm-text-muted)] block">17:00 • Ronda clínica</span>
-                        </div>
-                    </div>
-                    <x-ui.status-badge estado="PROGRAMADO" label="Programada" class="shrink-0" />
-                </div>
+                @if($proxTareas->isEmpty() && $proxAdmin->isEmpty() && $proxActividades->isEmpty())
+                    <p class="rounded-xl border border-[var(--rm-border-soft)] bg-[var(--rm-surface-alt)] p-3 text-center text-[var(--rm-text-muted)]">
+                        No existen acciones futuras programadas.
+                    </p>
+                @endif
             </div>
         </div>
 
@@ -733,25 +768,19 @@
             </div>
 
             <div class="space-y-2 text-xs">
-                <div class="p-2.5 rounded-xl bg-[var(--rm-surface-alt)] border border-[var(--rm-border-soft)] space-y-1">
-                    <div class="flex items-center justify-between text-[10px] text-[var(--rm-text-muted)]">
-                        <span class="font-bold text-[var(--rm-action-primary)]">Terapia ocupacional</span>
-                        <span>Ayer 16:00</span>
+                @forelse($notasRelevantes as $nota)
+                    <div class="p-2.5 rounded-xl bg-[var(--rm-surface-alt)] border border-[var(--rm-border-soft)] space-y-1">
+                        <div class="flex items-center justify-between gap-2 text-[10px] text-[var(--rm-text-muted)]">
+                            <span class="font-bold text-[var(--rm-action-primary)]">{{ $nota->tipo_nota ?: 'Nota clínica' }}</span>
+                            <span class="shrink-0">{{ $nota->fecha_hora?->format('d/m/Y H:i') ?? 'Fecha no registrada' }}</span>
+                        </div>
+                        <p class="text-[var(--rm-text-body)] text-xs leading-relaxed">{{ $nota->contenido }}</p>
                     </div>
-                    <p class="text-[var(--rm-text-body)] text-xs leading-relaxed">
-                        Participa con entusiasmo en el taller de memoria y estimulación cognitiva. Buena sociabilización con compañeros.
+                @empty
+                    <p class="rounded-xl border border-[var(--rm-border-soft)] bg-[var(--rm-surface-alt)] p-3 text-center text-[var(--rm-text-muted)]">
+                        No existen notas clínicas vigentes.
                     </p>
-                </div>
-
-                <div class="p-2.5 rounded-xl bg-[var(--rm-surface-alt)] border border-[var(--rm-border-soft)] space-y-1">
-                    <div class="flex items-center justify-between text-[10px] text-[var(--rm-text-muted)]">
-                        <span class="font-bold text-[var(--rm-action-primary)]">Fisioterapia</span>
-                        <span>10 Sep 11:30</span>
-                    </div>
-                    <p class="text-[var(--rm-text-body)] text-xs leading-relaxed">
-                        Ejercicios de fortalecimiento en extremidades inferiores completados sin fatiga ni dolor articular.
-                    </p>
-                </div>
+                @endforelse
             </div>
         </div>
 

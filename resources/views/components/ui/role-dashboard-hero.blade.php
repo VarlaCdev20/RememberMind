@@ -4,12 +4,20 @@
     'highlight' => null,
     'description' => null,
     'image',
+    'rotationContext' => null,
+    'personalGreeting' => false,
     'imageAlt' => 'Acompañamiento a residentes del centro geriátrico',
     'quote' => 'Historias que siguen floreciendo',
     'meta' => [],
 ])
 
-<section {{ $attributes->class(['rm-role-hero']) }}>
+@php
+    $heroImage = $rotationContext
+        ? app(\App\Backend\Modulos\Reportes\Servicios\DashboardPhotoRotation::class)->heroImage($rotationContext, $image)
+        : $image;
+@endphp
+
+<section {{ $attributes->class(['rm-role-hero', 'rm-role-hero--personal' => $personalGreeting]) }}>
     <div class="rm-role-hero__content">
         <div class="rm-role-hero__eyebrow">
             <img src="{{ asset('storage/imagenes/LOGO.png') }}" alt="" class="rm-role-hero__logo">
@@ -45,7 +53,7 @@
     </div>
 
     <div class="rm-role-hero__visual">
-        <img src="{{ $image }}" alt="{{ $imageAlt }}" class="rm-role-hero__image" loading="eager">
+        <img src="{{ $heroImage }}" alt="{{ $rotationContext ? 'Actividades y acompañamiento de residentes en Los Almendros' : $imageAlt }}" class="rm-role-hero__image" loading="eager">
         <div class="rm-role-hero__veil" aria-hidden="true"></div>
         <div class="rm-role-hero__quote">
             <i class="ph-bold ph-heartbeat"></i>

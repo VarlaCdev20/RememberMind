@@ -38,7 +38,14 @@ class AlertasPanel extends Component
     {
         $user = auth()->user();
         abort_unless($user, 401);
-        abort_unless($user->can($accion === 'ver' ? 'alertas.ver' : 'alertas.gestionar'), 403);
+        $permiso = match ($accion) {
+            'ver' => 'alertas.ver',
+            'asignar' => 'alertas.asignar',
+            'atender' => 'alertas.seguimiento',
+            'cerrar' => 'alertas.cerrar',
+            default => 'alertas.gestionar',
+        };
+        abort_unless($user->canAny([$permiso, 'alertas.gestionar']), 403);
     }
 
     public function updated($campo): void
@@ -164,7 +171,7 @@ class AlertasPanel extends Component
 
     public function asignarResponsable(): void
     {
-        $this->comprobarPermiso('atender');
+        $this->comprobarPermiso('asignar');
         $this->validate(['responsableId' => 'required|exists:usuarios,cod_usuario'], [
             'responsableId.required' => 'Debe seleccionar un profesional responsable.',
             'responsableId.exists' => 'El profesional seleccionado no es válido.',
@@ -350,7 +357,7 @@ class AlertasPanel extends Component
             ->when($this->filtroAdulto, fn ($q) => $q->where('cod_residente', $this->filtroAdulto))
             ->with(['adultoMayor.cama.habitacion', 'responsable']);
 
-        if (!$turnoService->esSuperAdmin(auth()->user())) {
+        if (!auth()->user()?->hasAnyRole(['SUPERADMINISTRADOR', 'GERENTE', 'ADMINISTRADOR'])) {
             $alertasQuery = $turnoService->acotarAlertasQuery($alertasQuery, auth()->user());
         }
 

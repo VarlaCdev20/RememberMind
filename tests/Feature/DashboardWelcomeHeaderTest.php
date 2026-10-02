@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Frontend\Livewire\Enfermeria\Cuidados\DashboardTurno;
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -81,5 +82,35 @@ class DashboardWelcomeHeaderTest extends TestCase
         $html = Blade::render('<x-ui.dashboard-welcome-header :usuario="$usuario" />', compact('usuario'));
 
         $this->assertStringContainsString('Bienvenido, Rosa María de los Ángeles Choque', $html);
+    }
+
+    public function test_las_dos_fotos_cambian_en_cada_recarga_y_se_mantienen_al_actualizar_el_turno(): void
+    {
+        $this->actingAs(User::factory()->create());
+        session()->start();
+        session()->forget('nursing_dashboard_welcome_photo_index');
+
+        $crearDashboard = static function (): DashboardTurno {
+            $dashboard = new class extends DashboardTurno
+            {
+                public function loadTurnoActual() {}
+            };
+            $dashboard->mount();
+
+            return $dashboard;
+        };
+
+        $primero = $crearDashboard();
+        $fotosIniciales = [$primero->welcomeImage, $primero->welcomeSecondaryImage];
+        $primero->refrescarTurno();
+        $this->assertSame($fotosIniciales, [$primero->welcomeImage, $primero->welcomeSecondaryImage]);
+
+        $segundo = $crearDashboard();
+        $this->assertNotSame($fotosIniciales[0], $segundo->welcomeImage);
+        $this->assertNotSame($fotosIniciales[1], $segundo->welcomeSecondaryImage);
+
+        $tercero = $crearDashboard();
+        $this->assertNotSame($segundo->welcomeImage, $tercero->welcomeImage);
+        $this->assertNotSame($segundo->welcomeSecondaryImage, $tercero->welcomeSecondaryImage);
     }
 }

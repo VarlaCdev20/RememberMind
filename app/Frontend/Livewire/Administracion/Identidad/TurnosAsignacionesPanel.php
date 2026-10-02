@@ -182,6 +182,7 @@ class TurnosAsignacionesPanel extends Component
 
     public function abrirNuevaAsignacion(): void
     {
+        $this->autorizarAsignacion();
         $this->modalAbierto = true;
         $this->usuarioSeleccionado = null;
         $this->busquedaModal = '';
@@ -189,6 +190,7 @@ class TurnosAsignacionesPanel extends Component
 
     public function seleccionarUsuario(string $codUsuario): void
     {
+        $this->autorizarAsignacion();
         $this->usuarioSeleccionado = $codUsuario;
         $this->modalAbierto = true;
     }
@@ -245,15 +247,6 @@ class TurnosAsignacionesPanel extends Component
             'filtroArea',
             'filtroTurno',
             'filtroEstado',
-        ]);
-    }
-
-    public function exportarCalendario(): void
-    {
-        $this->dispatch('mostrarAlerta', [
-            'type' => 'info',
-            'title' => 'Exportación no disponible',
-            'message' => 'El botón queda preparado visualmente para conectar el backend de exportación.',
         ]);
     }
 
@@ -1110,6 +1103,7 @@ class TurnosAsignacionesPanel extends Component
 
     public function abrirAsignarPlaza(string $plaza, string $fecha): void
     {
+        $this->autorizarAsignacion();
         $this->plazaSeleccionada = $plaza;
         $this->fechaSeleccionadaPlaza = $fecha;
         $this->enfermeroSeleccionado = '';
@@ -1135,6 +1129,7 @@ class TurnosAsignacionesPanel extends Component
 
     public function guardarAsignacionPlaza(): void
     {
+        $this->autorizarAsignacion();
         $this->validate([
             'plazaSeleccionada' => 'required|string',
             'enfermeroSeleccionado' => 'required_unless:tipoAsignacion,DESCANSO|nullable|string',
@@ -1221,6 +1216,7 @@ class TurnosAsignacionesPanel extends Component
 
     public function desvincularPlaza(string $plaza, string $fecha): void
     {
+        $this->autorizarAsignacion();
         $asignaciones = AsignacionPersonal::where('funcion', 'PLAZA:'.$plaza)->where('estado', 'ACTIVA')
             ->whereHas('jornada', fn ($q) => $q->whereDate('fecha_jornada', $fecha))->get();
         foreach ($asignaciones as $asignacion) {
@@ -1234,6 +1230,11 @@ class TurnosAsignacionesPanel extends Component
             'title' => 'Desvinculación exitosa',
             'message' => "Se liberó la plaza {$plaza} de la asignación.",
         ]);
+    }
+
+    private function autorizarAsignacion(): void
+    {
+        abort_unless(auth()->user()?->estado === 'ACTIVO' && auth()->user()->can('turnos.asignar'), 403);
     }
 
     private function turnoCodigoParaPlaza(string $plaza, string $fecha): string

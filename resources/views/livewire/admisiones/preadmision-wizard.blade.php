@@ -1,13 +1,13 @@
-<div class="fixed inset-0 z-[100] flex items-center justify-center bg-[var(--color-modal-overlay)] p-4 backdrop-blur-sm transition-opacity">
- <div x-data="{ isDirty: false }" x-on:input="isDirty = true" x-on:change="isDirty = true" class="max-w-4xl mx-auto w-full max-h-[90vh] flex flex-col p-4 bg-fondo-card rounded-2xl shadow-2xl border border-borde/30 relative overflow-hidden">
+<div class="rm-modal-shell rm-admin-wizard-shell fixed inset-0 flex items-center justify-center p-4">
+ <div x-data="{ isDirty: false }" x-on:input="isDirty = true" x-on:change="isDirty = true" role="dialog" aria-modal="true" aria-labelledby="admin-preadmission-title" class="rm-modal-panel rm-admin-wizard relative mx-auto flex w-full max-w-4xl flex-col overflow-hidden">
  <!-- Header -->
- <div class="flex items-start justify-between mb-4 border-b border-borde/50 pb-3">
+ <div class="rm-modal-header rm-admin-wizard__header flex items-start justify-between">
   <div class="flex items-center gap-3">
   <div class="flex h-10 w-10 items-center justify-center rounded-2xl bg-boton-acento/10 text-boton-acento shadow-inner border border-boton-acento/20">
    <i class="ph-fill ph-file-plus text-xl"></i>
   </div>
   <div>
-   <h3 class="text-lg font-black text-titulo leading-tight">Registrar Preadmisión</h3>
+   <h3 id="admin-preadmission-title" class="rm-modal-panel__title leading-tight">Registrar Preadmisión</h3>
    <p class="text-xs font-semibold text-apoyo mt-0.5">Registre los datos de la persona solicitante y su responsable. El residente se creará únicamente al formalizar la admisión.</p>
   </div>
   </div>
@@ -40,7 +40,7 @@
    window.location.href = '{{ route('admin.admisiones.preadmisiones') }}';
    }
   }
-  " class="w-8 h-8 flex items-center justify-center rounded-full bg-fondo text-apoyo hover:bg-estado-peligroBg hover:text-estado-peligro transition-colors">
+  " class="rm-btn-icon rm-modal-panel__close" aria-label="Cerrar formulario de preadmisión">
   <i class="ph-bold ph-x text-xl"></i>
   </button>
  </div>
@@ -65,7 +65,7 @@
  @endphp
 
  <!-- Stepper Compacto -->
- <div class="mb-3">
+ <div class="rm-admin-wizard__steps">
   <div class="relative flex items-center justify-between w-full pb-3">
   <!-- Linea de fondo -->
   <div class="absolute left-5 right-5 top-4 transform -translate-y-1/2 h-[3px] bg-borde/40 rounded-full z-0"></div>
@@ -114,7 +114,7 @@
  </div>
 
  <!-- Form Body -->
- <div class="flex-1 overflow-y-auto overflow-x-hidden pr-2 space-y-2 pb-2 custom-scrollbar">
+ <div class="rm-modal-body rm-admin-wizard__body flex-1 min-h-0 overflow-y-auto overflow-x-hidden space-y-2 custom-scrollbar">
  @if($guardadoExitoso)
   <div class="space-y-3 rounded-2xl border border-estado-exitoBorde bg-estado-exitoBg p-5">
   <div class="flex items-start gap-3">
@@ -442,7 +442,7 @@
   </div>
 
   {{-- Documentos del Solicitante --}}
-  <div class="space-y-2 bg-fondo/30 p-3 md:p-4 rounded-lg border border-borde/60">
+  <div class="rm-admin-wizard__group space-y-2 p-3 md:p-4">
    <div class="flex items-center gap-2 pb-3 border-b border-borde/50">
    <div class="w-7 h-7 rounded-full bg-boton-acento/10 text-boton-acento flex items-center justify-center">
     <i class="ph-bold ph-folder-user text-lg"></i>
@@ -526,7 +526,7 @@
   </div>
 
   {{-- Documentos Institucionales Autogenerados --}}
-  <div class="space-y-2 bg-fondo/30 p-3 md:p-4 rounded-lg border border-borde/60">
+  <div class="rm-admin-wizard__group space-y-2 p-3 md:p-4">
    <div class="flex items-center gap-2 pb-3 border-b border-borde/50">
    <div class="w-7 h-7 rounded-full bg-estado-infoBg text-estado-info flex items-center justify-center">
     <i class="ph-bold ph-file-pdf text-lg"></i>
@@ -564,10 +564,10 @@
  </div>
 
  <!-- Botonera -->
- <div class="flex items-center justify-between pt-3 mt-3 border-t border-borde/60 bg-fondo-card sticky bottom-0 z-10 pb-1">
+ <div class="rm-modal-footer rm-admin-wizard__footer flex items-center justify-between">
  <div>
   @if ($paso > 1)
-  <button type="button" wire:click="anterior" wire:loading.attr="disabled" class="px-4 py-2 text-sm font-bold border-2 border-borde rounded-xl text-titulo hover:bg-fondo-hover hover:border-apoyo/30 transition-all disabled:opacity-50 flex items-center gap-2">
+  <button type="button" wire:click="anterior" wire:loading.attr="disabled" class="rm-btn-secondary flex items-center gap-2">
    <i class="ph-bold ph-arrow-left"></i>
    Atras
   </button>
@@ -601,24 +601,24 @@
     window.location.href = '{{ route('admin.admisiones.preadmisiones') }}';
    }
    }
-  " class="px-4 py-2 text-sm font-bold text-apoyo hover:text-estado-peligro hover:bg-estado-peligroBg rounded-xl transition-all">
+  " class="rm-btn-secondary">
    Cancelar
   </button>
   @endif
  </div>
 
  @if ($guardadoExitoso)
-  <a wire:navigate href="{{ route('admin.admisiones.preadmisiones') }}" class="bg-boton-acento hover:bg-boton-acentoHover text-inverso px-5 py-2 rounded-xl text-sm font-bold shadow-lg shadow-boton-acento/20 transition-all flex items-center gap-2">
+  <a wire:navigate href="{{ route('admin.admisiones.preadmisiones') }}" class="rm-btn-primary flex items-center gap-2">
   <i class="ph-bold ph-arrow-square-out"></i>
   Volver al panel
   </a>
  @elseif ($paso < $totalPasos)
-  <button type="button" wire:click="siguiente" wire:loading.attr="disabled" class="bg-boton-acento hover:bg-boton-acentoHover text-inverso px-5 py-2 rounded-xl text-sm font-bold shadow-lg shadow-boton-acento/20 transition-all flex items-center gap-2 disabled:opacity-50">
+  <button type="button" wire:click="siguiente" wire:loading.attr="disabled" class="rm-btn-primary flex items-center gap-2">
   <span wire:loading.remove wire:target="siguiente">Siguiente <i class="ph-bold ph-arrow-right"></i></span>
   <span wire:loading wire:target="siguiente"><i class="ph-bold ph-spinner animate-spin"></i> Validando...</span>
   </button>
  @else
-  <button type="button" wire:click="confirmarPreadmision" wire:loading.attr="disabled" class="bg-estado-exito hover:bg-estado-exito/90 text-inverso px-5 py-2 rounded-xl text-sm font-bold shadow-lg shadow-estado-exito/30 transition-all flex items-center gap-2 disabled:opacity-50">
+  <button type="button" wire:click="confirmarPreadmision" wire:loading.attr="disabled" class="rm-btn-success flex items-center gap-2">
   <span wire:loading.remove wire:target="confirmarPreadmision"><i class="ph-bold ph-check-circle text-lg"></i> Confirmar preadmision</span>
   <span wire:loading wire:target="confirmarPreadmision"><i class="ph-bold ph-spinner animate-spin text-lg"></i> Guardando...</span>
   </button>

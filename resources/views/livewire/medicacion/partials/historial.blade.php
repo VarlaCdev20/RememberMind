@@ -3,7 +3,7 @@
  {{-- ==================================================
  1. BARRA DE FILTROS ESPECÍFICA DE HISTORIAL
  ================================================== --}}
- <section class="rm-filter-bar">
+ <x-ui.filter-bar class="mb-4">
 
  {{-- Fila Principal: Búsqueda y Selectores Primarios --}}
  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3 items-center">
@@ -212,7 +212,7 @@
  </div>
  </div>
  @endif
- </section>
+ </x-ui.filter-bar>
 
  {{-- ==================================================
  2. CONTENEDOR PRINCIPAL: BITÁCORA CLÍNICA

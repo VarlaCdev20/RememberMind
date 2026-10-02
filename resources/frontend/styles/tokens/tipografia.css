@@ -31,9 +31,9 @@
 
 :root {
     /* Familias tipográficas */
-    --font-principal: 'Nunito Sans', 'Segoe UI', Arial, sans-serif;
-    --font-titulos: 'Nunito Sans', 'Segoe UI', Arial, sans-serif;
-    --font-sistema: 'Nunito Sans', 'Segoe UI', Arial, sans-serif;
+    --font-principal: var(--rm-font-body);
+    --font-titulos: var(--rm-font-display);
+    --font-sistema: var(--rm-font-body);
 
     /* Pesos tipográficos */
     --font-light: 300;

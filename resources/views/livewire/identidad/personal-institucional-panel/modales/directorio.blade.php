@@ -1,7 +1,7 @@
 @if($mostrarDirectorio)
   <div class="mt-4">
   <div class="rm-card flex flex-col overflow-hidden border border-borde bg-fondo-card !p-0 shadow-sm">
-   <div class="rm-filter-bar" x-data="{ openFilters: false }">
+   <x-ui.filter-bar x-data="{ openFilters: false }" class="mb-4">
    <div class="flex flex-col items-start justify-between gap-3 md:flex-row md:items-center">
     <h3 class="flex items-center gap-2 text-sm font-black text-titulo">
     <div class="flex h-8 w-8 items-center justify-center rounded-xl border {{ $claseIconoDirectorio }} shadow-sm">
@@ -82,10 +82,10 @@
     </select>
     </div>
    </div>
-   </div>
+   </x-ui.filter-bar>
 
    <div class="overflow-x-auto">
-   <table class="w-full min-w-[920px] text-left">
+   <table class="rm-data-table rm-data-table--actions w-full min-w-[920px] text-left">
     <thead class="border-y border-borde bg-fondo-hover/50 text-[10px] font-bold uppercase tracking-wider text-apoyo">
     <tr>
      <th class="px-4 py-3">Personal</th>

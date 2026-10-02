@@ -423,9 +423,12 @@ class FichaPaciente extends Component
 
         $this->cargarAdulto($codRes);
 
-        // Control de acceso unificado vía TurnoEnfermeriaService
-        $service = app(TurnoEnfermeriaService::class);
-        $service->autorizarAccionPaciente($this->adultoMayor, Auth::user());
+        // Administración y Gerencia consultan el expediente por sus permisos
+        // institucionales; las mutaciones clínicas conservan sus propios guards.
+        $user = Auth::user();
+        if (! $user?->hasAnyRole(['ADMINISTRADOR', 'GERENTE']) || ! $user->can('residentes.ver')) {
+            app(TurnoEnfermeriaService::class)->autorizarAccionPaciente($this->adultoMayor, $user);
+        }
 
         if (request()->query('tab')) {
             $this->tabActivo = request()->query('tab');
@@ -445,7 +448,16 @@ class FichaPaciente extends Component
             'asignacionesJornada.jornada.turno',
             'asignacionesJornada.personal.usuario',
             'atenciones',
+            'pasesTurno.personalSaliente.usuario',
+            'notasClinicas' => fn ($q) => $q->whereNotIn('estado', ['ANULADA', 'ANULADO', 'INACTIVA', 'INACTIVO'])->orderByDesc('fecha_hora')->take(10),
+            'actividades' => fn ($q) => $q->orderBy('fecha_hora')->take(20),
             'signosVitales' => fn ($q) => $q->orderByDesc('fecha_hora')->take(60),
+            'ejecucionesCuidado' => fn ($q) => $q->with('intervencion')->orderBy('fecha_hora_programada')->take(30),
+            'registrosIngesta' => fn ($q) => $q->orderByDesc('fecha_hora')->take(10),
+            'registrosHidratacion' => fn ($q) => $q->orderByDesc('fecha_hora')->take(30),
+            'registrosMovilidad' => fn ($q) => $q->orderByDesc('fecha_hora')->take(10),
+            'controlesCognitivos' => fn ($q) => $q->orderByDesc('fecha_hora')->take(10),
+            'valoracionesDolor' => fn ($q) => $q->orderByDesc('fecha_hora')->take(10),
             'medicaciones' => fn ($q) => $q->with(['medicamento', 'horarios'])->where('estado', 'ACTIVA'),
             'administracionesMedicacion' => fn ($q) => $q->with('medicacion.medicamento')->orderByDesc('fecha_hora_programada')->take(30),
             'alertas' => fn ($q) => $q->with('eventos.usuario')->orderByDesc('fecha_hora')->take(25),

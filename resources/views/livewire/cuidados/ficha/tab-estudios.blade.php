@@ -45,15 +45,15 @@
     <div class="rounded-3xl border border-[var(--rm-border)] bg-[var(--rm-surface)] p-4 sm:p-5 shadow-sm">
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div class="flex items-start sm:items-center gap-3">
-                <div class="h-11 w-11 rounded-2xl bg-[#1E3A8A]/10 dark:bg-blue-500/20 text-[#1E3A8A] dark:text-blue-400 flex items-center justify-center shrink-0 border border-[#1E3A8A]/20">
+                <div class="h-11 w-11 rounded-2xl bg-[var(--rm-action-primary)]/10 dark:bg-blue-500/20 text-[var(--rm-action-primary)] dark:text-blue-400 flex items-center justify-center shrink-0 border border-[var(--rm-action-primary)]/20">
                     <i class="ph-bold ph-flask text-2xl"></i>
                 </div>
                 <div>
                     <div class="flex items-center gap-2 flex-wrap">
-                        <h2 class="text-sm sm:text-base font-black text-[var(--rm-text-title)] tracking-tight uppercase">
+                        <h2 class="text-sm sm:text-base font-bold text-[var(--rm-text-title)] tracking-tight uppercase">
                             RESULTADOS Y ESTUDIOS CLÍNICOS
                         </h2>
-                        <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-blue-50 text-[#1E3A8A] dark:bg-blue-950/50 dark:text-blue-300 border border-blue-200 dark:border-blue-900/50">
+                        <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-blue-50 text-[var(--rm-action-primary)] dark:bg-blue-950/50 dark:text-blue-300 border border-blue-200 dark:border-blue-900/50">
                             Diagnóstico y Seguimiento
                         </span>
                     </div>
@@ -91,7 +91,7 @@
                 @endphp
                 <button type="button"
                         wire:click="setSubtabEstudio('{{ $sKey }}')"
-                        class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-bold transition cursor-pointer shrink-0 {{ $activo ? 'bg-[#1E3A8A] text-white shadow-xs' : 'bg-[var(--rm-surface-alt)] text-[var(--rm-text-body)] hover:text-[var(--rm-text-title)] border border-[var(--rm-border)]' }}">
+                        class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-bold transition cursor-pointer shrink-0 {{ $activo ? 'bg-[var(--rm-action-primary)] text-white shadow-xs' : 'bg-[var(--rm-surface-alt)] text-[var(--rm-text-body)] hover:text-[var(--rm-text-title)] border border-[var(--rm-border)]' }}">
                     <i class="ph-bold {{ $sData['icon'] }} text-xs"></i>
                     <span>{{ $sData['label'] }}</span>
                     <span class="px-1.5 py-0.2 rounded-full text-[10px] font-mono {{ $activo ? 'bg-[#F0E8DE]/20 text-white' : 'bg-slate-200/70 dark:bg-slate-700 text-[var(--rm-text-muted)]' }}">
@@ -112,9 +112,9 @@
                 <span class="text-[11px] font-bold text-[var(--rm-text-muted)] uppercase tracking-wider">
                     Estudios registrados
                 </span>
-                <i class="ph-bold ph-folder-simple text-[#1E3A8A] text-sm"></i>
+                <i class="ph-bold ph-folder-simple text-[var(--rm-action-primary)] text-sm"></i>
             </div>
-            <div class="text-xl sm:text-2xl font-black text-[var(--rm-text-title)] tracking-tight font-mono">
+            <div class="text-xl sm:text-2xl font-bold text-[var(--rm-text-title)] tracking-tight font-mono">
                 {{ $metricas['total'] }}
             </div>
             <p class="text-[11px] text-[var(--rm-text-muted)]">Historial acumulado</p>
@@ -128,7 +128,7 @@
                 </span>
                 <i class="ph-bold ph-check-circle text-emerald-600 text-sm"></i>
             </div>
-            <div class="text-xl sm:text-2xl font-black text-emerald-900 dark:text-emerald-200 tracking-tight font-mono">
+            <div class="text-xl sm:text-2xl font-bold text-emerald-900 dark:text-emerald-200 tracking-tight font-mono">
                 {{ $metricas['normales'] }} <span class="text-xs font-normal text-emerald-700 dark:text-emerald-400">({{ $metricas['normales_pct'] }}%)</span>
             </div>
             <p class="text-[11px] text-emerald-700 dark:text-emerald-400">Valores dentro de rango</p>
@@ -142,7 +142,7 @@
                 </span>
                 <i class="ph-bold ph-warning-octagon text-rose-600 text-sm"></i>
             </div>
-            <div class="text-xl sm:text-2xl font-black text-rose-900 dark:text-rose-200 tracking-tight font-mono">
+            <div class="text-xl sm:text-2xl font-bold text-rose-900 dark:text-rose-200 tracking-tight font-mono">
                 {{ $metricas['fuera_rango'] }}
             </div>
             <p class="text-[11px] text-rose-700 dark:text-rose-400">Alto o bajo respecto al corte</p>
@@ -156,7 +156,7 @@
                 </span>
                 <i class="ph-bold ph-clock-counter-clockwise text-amber-600 text-sm"></i>
             </div>
-            <div class="text-xl sm:text-2xl font-black text-amber-900 dark:text-amber-200 tracking-tight font-mono">
+            <div class="text-xl sm:text-2xl font-bold text-amber-900 dark:text-amber-200 tracking-tight font-mono">
                 {{ $metricas['seguimiento'] }}
             </div>
             <p class="text-[11px] text-amber-700 dark:text-amber-400">Atención médica prioritaria</p>
@@ -168,9 +168,9 @@
                 <span class="text-[11px] font-bold text-[var(--rm-text-muted)] uppercase tracking-wider">
                     Último estudio
                 </span>
-                <i class="ph-bold ph-calendar text-[#1E3A8A] text-sm"></i>
+                <i class="ph-bold ph-calendar text-[var(--rm-action-primary)] text-sm"></i>
             </div>
-            <div class="text-xs font-black text-[var(--rm-text-title)] truncate mt-0.5" title="{{ $metricas['ultimo_estudio']['tipo_texto'] ?? 'Estudio clínico' }}">
+            <div class="text-xs font-bold text-[var(--rm-text-title)] truncate mt-0.5" title="{{ $metricas['ultimo_estudio']['tipo_texto'] ?? 'Estudio clínico' }}">
                 {{ $metricas['ultimo_estudio']['tipo_texto'] ?? 'Estudio clínico' }}
             </div>
             <div class="flex items-center justify-between text-[10.5px] text-[var(--rm-text-muted)] font-mono">
@@ -183,25 +183,32 @@
     </div>
 
     {{-- ========================================================================= --}}
-    {{-- 3. BARRA DE FILTROS COMPACTA                                              --}}
-    {{-- ========================================================================= --}}
-    <div class="rm-filter-bar rounded-2xl border border-[var(--rm-border)] bg-[var(--rm-surface)] p-3 shadow-2xs flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 text-xs">
-        {{-- Buscador --}}
-        <div class="relative flex-1">
-            <i class="ph-bold ph-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--rm-text-muted)] text-sm"></i>
-            <input type="text"
-                   wire:model.live.debounce.300ms="filtroBusquedaEstudio"
-                   placeholder="Buscar estudios, pruebas o resultados..."
-                   class="w-full pl-9 pr-3.5 py-2 rounded-xl border border-[var(--rm-border)] bg-[var(--rm-surface-alt)] text-[var(--rm-text-title)] placeholder-[var(--rm-text-muted)] text-xs focus:ring-1 focus:ring-[#1E3A8A] focus:border-[#1E3A8A] outline-hidden transition">
-        </div>
+        {{-- 3. BARRA DE FILTROS FORMATO ALERTAS                                     --}}
+    <x-ui.filter-bar class="mb-4">
+        <div class="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-2 items-center">
+            {{-- Buscador --}}
+            <div class="lg:col-span-6 relative flex items-center">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-[var(--rm-text-secondary)]">
+                    <i class="ph-bold ph-magnifying-glass text-base"></i>
+                </span>
+                <input type="text"
+                    wire:model.live.debounce.300ms="filtroBusquedaEstudio"
+                    placeholder="Buscar estudios, pruebas o resultados..."
+                    class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-input-bg)] py-2 pl-9 pr-8 text-xs font-medium text-[var(--rm-text-primary)] placeholder-[var(--rm-text-secondary)] focus:border-[var(--rm-primary)] focus:ring-1 focus:ring-[var(--rm-primary)] focus:outline-none h-[38px]">
+                @if(!empty($filtroBusquedaEstudio))
+                    <button type="button"
+                        wire:click="$set('filtroBusquedaEstudio', '')"
+                        class="absolute inset-y-0 right-0 flex items-center pr-2.5 text-[var(--rm-text-secondary)] hover:text-[var(--rm-primary)] cursor-pointer"
+                        title="Limpiar búsqueda">
+                        <i class="ph-bold ph-x-circle text-base"></i>
+                    </button>
+                @endif
+            </div>
 
-        {{-- Selectores de Tipo y Período --}}
-        <div class="flex items-center gap-2 flex-wrap">
             {{-- Selector de Tipo --}}
-            <div class="flex items-center gap-1.5">
-                <span class="text-[11px] font-bold text-[var(--rm-text-muted)] hidden sm:inline">Tipo:</span>
+            <div class="lg:col-span-3">
                 <select wire:model.live="subtabEstudio"
-                        class="px-2.5 py-2 rounded-xl border border-[var(--rm-border)] bg-[var(--rm-surface-alt)] text-[var(--rm-text-title)] text-xs font-semibold focus:ring-1 focus:ring-[#1E3A8A] outline-hidden cursor-pointer">
+                    class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-input-bg)] py-2 px-3 text-xs font-medium text-[var(--rm-text-primary)] focus:border-[var(--rm-primary)] focus:ring-1 focus:ring-[var(--rm-primary)] focus:outline-none h-[38px]">
                     <option value="TODOS">Todos los tipos</option>
                     <option value="LABORATORIO">Laboratorio</option>
                     <option value="IMAGEN">Imágenes</option>
@@ -211,10 +218,9 @@
             </div>
 
             {{-- Selector de Período --}}
-            <div class="flex items-center gap-1.5">
-                <span class="text-[11px] font-bold text-[var(--rm-text-muted)] hidden sm:inline">Período:</span>
+            <div class="lg:col-span-3">
                 <select wire:model.live="filtroPeriodoEstudio"
-                        class="px-2.5 py-2 rounded-xl border border-[var(--rm-border)] bg-[var(--rm-surface-alt)] text-[var(--rm-text-title)] text-xs font-semibold focus:ring-1 focus:ring-[#1E3A8A] outline-hidden cursor-pointer">
+                    class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-input-bg)] py-2 px-3 text-xs font-medium text-[var(--rm-text-primary)] focus:border-[var(--rm-primary)] focus:ring-1 focus:ring-[var(--rm-primary)] focus:outline-none h-[38px]">
                     <option value="30d">30 días</option>
                     <option value="3m">3 meses</option>
                     <option value="6m">Últimos 6 meses</option>
@@ -222,15 +228,43 @@
                     <option value="todos">Todo</option>
                 </select>
             </div>
-
-            <button type="button"
-                    wire:click="$refresh"
-                    class="px-3.5 py-2 rounded-xl bg-[#1E3A8A] text-white font-bold text-xs hover:bg-[#1E3A8A]/90 transition flex items-center gap-1.5 shadow-2xs cursor-pointer">
-                <i class="ph-bold ph-funnel text-xs"></i>
-                <span>Filtrar</span>
-            </button>
         </div>
-    </div>
+
+        @php
+            $hasFiltrosActivos = !empty($filtroBusquedaEstudio) || ($subtabEstudio !== 'TODOS') || ($filtroPeriodoEstudio !== '30d');
+        @endphp
+        @if($hasFiltrosActivos)
+            <div class="rm-filter-bar__active">
+                <div class="flex flex-wrap items-center gap-1.5">
+                    <span class="rm-filter-bar__active-label">
+                        <i class="ph-bold ph-funnel text-xs"></i> Filtros activos:
+                    </span>
+                    @if(!empty($filtroBusquedaEstudio))
+                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[var(--rm-surface-alt)] border border-[var(--rm-border)] text-[11px] font-semibold text-[var(--rm-text-primary)]">
+                            <span>Búsqueda: "{{ Str::limit($filtroBusquedaEstudio, 16) }}"</span>
+                            <button type="button" wire:click="$set('filtroBusquedaEstudio', '')" class="hover:text-[var(--rm-primary)] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
+                        </span>
+                    @endif
+                    @if($subtabEstudio !== 'TODOS')
+                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[var(--rm-surface-alt)] border border-[var(--rm-border)] text-[11px] font-semibold text-[var(--rm-text-primary)]">
+                            <span>Tipo: {{ $subtabEstudio }}</span>
+                            <button type="button" wire:click="$set('subtabEstudio', 'TODOS')" class="hover:text-[var(--rm-primary)] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
+                        </span>
+                    @endif
+                    @if($filtroPeriodoEstudio !== '30d')
+                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[var(--rm-surface-alt)] border border-[var(--rm-border)] text-[11px] font-semibold text-[var(--rm-text-primary)]">
+                            <span>Período: {{ $filtroPeriodoEstudio }}</span>
+                            <button type="button" wire:click="$set('filtroPeriodoEstudio', '30d')" class="hover:text-[var(--rm-primary)] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
+                        </span>
+                    @endif
+                </div>
+                <button type="button" wire:click="$set('filtroBusquedaEstudio', ''); $set('subtabEstudio', 'TODOS'); $set('filtroPeriodoEstudio', '30d')" class="rm-filter-bar__clear-btn">
+                    <i class="ph-bold ph-arrow-counter-clockwise text-xs"></i>
+                    Limpiar filtros
+                </button>
+            </div>
+        @endif
+    </x-ui.filter-bar>
 
     {{-- ========================================================================= --}}
     {{-- 4. ÁREA PRINCIPAL — DOS COLUMNAS (70-72% IZQUIERDA / 28-30% DERECHA)     --}}
@@ -248,7 +282,7 @@
                 <div class="md:col-span-8 rm-chart-card rm-chart-glass space-y-3.5">
                     <div class="rm-chart-header flex-col sm:flex-row sm:items-center">
                         <div class="flex items-center gap-2">
-                            <i class="ph-bold ph-chart-line-up text-[#1E3A8A] text-base"></i>
+                            <i class="ph-bold ph-chart-line-up text-[var(--rm-action-primary)] text-base"></i>
                             <h3 class="rm-chart-title">
                                 Evolución de parámetros clave
                             </h3>
@@ -273,7 +307,7 @@
                         @foreach($paramsClave as $pKey => $pLabel)
                             <button type="button"
                                     wire:click="setParametroGraficoEstudio('{{ $pKey }}')"
-                                    class="px-2.5 py-1 rounded-xl text-xs font-bold transition cursor-pointer whitespace-nowrap {{ $parametroGraficoEstudio === $pKey ? 'bg-[#1E3A8A] text-white shadow-2xs' : 'bg-[var(--rm-surface-alt)] text-[var(--rm-text-body)] hover:text-[var(--rm-text-title)] border border-[var(--rm-border)]' }}">
+                                    class="px-2.5 py-1 rounded-xl text-xs font-bold transition cursor-pointer whitespace-nowrap {{ $parametroGraficoEstudio === $pKey ? 'bg-[var(--rm-action-primary)] text-white shadow-2xs' : 'bg-[var(--rm-surface-alt)] text-[var(--rm-text-body)] hover:text-[var(--rm-text-title)] border border-[var(--rm-border)]' }}">
                                 {{ $pLabel }}
                             </button>
                         @endforeach
@@ -301,8 +335,8 @@
                     <div>
                         <div class="flex items-center justify-between border-b border-[var(--rm-border)]/60 pb-2.5">
                             <div class="flex items-center gap-1.5">
-                                <i class="ph-bold ph-scales text-[#1E3A8A] text-sm"></i>
-                                <h4 class="text-xs font-black text-[var(--rm-text-title)] uppercase tracking-wider">
+                                <i class="ph-bold ph-scales text-[var(--rm-action-primary)] text-sm"></i>
+                                <h4 class="text-xs font-bold text-[var(--rm-text-title)] uppercase tracking-wider">
                                     Valores de referencia
                                 </h4>
                             </div>
@@ -310,8 +344,8 @@
 
                         <div class="mt-2.5 space-y-2">
                             <div class="p-2 rounded-xl bg-blue-50/70 dark:bg-blue-950/30 border border-blue-200/60 dark:border-blue-900/40">
-                                <span class="text-[10px] uppercase tracking-wider font-bold text-[#1E3A8A] dark:text-blue-300 block">Parámetro</span>
-                                <span class="text-xs font-black text-[var(--rm-text-title)] block">{{ $rangosParam['nombre'] }}</span>
+                                <span class="text-[10px] uppercase tracking-wider font-bold text-[var(--rm-action-primary)] dark:text-blue-300 block">Parámetro</span>
+                                <span class="text-xs font-bold text-[var(--rm-text-title)] block">{{ $rangosParam['nombre'] }}</span>
                             </div>
 
                             <div class="space-y-1.5">
@@ -320,7 +354,7 @@
                                         <span class="font-bold text-[11px] {{ $clasif['color'] }}">
                                             {{ $clasif['etiqueta'] }}
                                         </span>
-                                        <span class="font-mono text-[10.5px] font-black text-[var(--rm-text-title)]">
+                                        <span class="font-mono text-[10.5px] font-bold text-[var(--rm-text-title)]">
                                             {{ $clasif['rango'] }}
                                         </span>
                                     </div>
@@ -340,8 +374,8 @@
             <div class="rounded-3xl border border-[var(--rm-border)] bg-[var(--rm-surface)] p-4 sm:p-5 shadow-sm space-y-4">
                 <div class="flex items-center justify-between border-b border-[var(--rm-border)] pb-3">
                     <div class="flex items-center gap-2">
-                        <i class="ph-bold ph-table text-[#1E3A8A] text-base"></i>
-                        <h3 class="text-xs sm:text-sm font-black text-[var(--rm-text-title)] uppercase tracking-wider">
+                        <i class="ph-bold ph-table text-[var(--rm-action-primary)] text-base"></i>
+                        <h3 class="text-xs sm:text-sm font-bold text-[var(--rm-text-title)] uppercase tracking-wider">
                             Lista de estudios y resultados
                         </h3>
                     </div>
@@ -360,8 +394,8 @@
                     </div>
                 @else
                     <div class="max-h-[580px] overflow-y-auto custom-timeline-scroll border border-[var(--rm-border)]/60 rounded-2xl">
-                        <table class="w-full text-left text-xs border-collapse">
-                            <thead class="sticky top-0 z-10 bg-[var(--rm-surface-alt)] text-[var(--rm-text-muted)] font-black text-[10.5px] uppercase tracking-wider border-b border-[var(--rm-border)]">
+                        <table class="rm-data-table rm-data-table--actions w-full text-left text-xs border-collapse">
+                            <thead class="sticky top-0 z-10 bg-[var(--rm-surface-alt)] text-[var(--rm-text-muted)] font-bold text-[10.5px] uppercase tracking-wider border-b border-[var(--rm-border)]">
                                 <tr>
                                     <th class="py-3 px-3.5">Fecha</th>
                                     <th class="py-3 px-3.5">Estudio / Prueba</th>
@@ -378,16 +412,16 @@
                                         $esSeleccionado = ($estudioActivo['id'] ?? '') === $est['id'];
                                     @endphp
                                     <tr wire:click="seleccionarEstudio('{{ $est['id'] }}')"
-                                        class="transition cursor-pointer {{ $esSeleccionado ? 'bg-blue-50/75 dark:bg-blue-950/40 text-[var(--rm-text-title)] ring-1 ring-[#1E3A8A]/30' : 'hover:bg-[var(--rm-surface-alt)]/60 text-[var(--rm-text-body)]' }}">
+                                        class="transition cursor-pointer {{ $esSeleccionado ? 'bg-blue-50/75 dark:bg-blue-950/40 text-[var(--rm-text-title)] ring-1 ring-[var(--rm-action-primary)]/30' : 'hover:bg-[var(--rm-surface-alt)]/60 text-[var(--rm-text-body)]' }}">
                                         {{-- Fecha --}}
                                         <td class="py-3 px-3.5 whitespace-nowrap font-mono text-[11px]">
-                                            <span class="font-black text-[var(--rm-text-title)]">{{ $est['fecha'] }}</span>
+                                            <span class="font-bold text-[var(--rm-text-title)]">{{ $est['fecha'] }}</span>
                                             <span class="block text-[10px] text-[var(--rm-text-muted)]">{{ $est['hora'] }}</span>
                                         </td>
 
                                         {{-- Estudio / Prueba --}}
                                         <td class="py-3 px-3.5">
-                                            <span class="font-black text-[var(--rm-text-title)] block leading-snug">
+                                            <span class="font-bold text-[var(--rm-text-title)] block leading-snug">
                                                 {{ $est['titulo'] }}
                                             </span>
                                             <span class="text-[10.5px] text-[var(--rm-text-muted)] block truncate max-w-[180px]">
@@ -403,7 +437,7 @@
                                         </td>
 
                                         {{-- Resultado --}}
-                                        <td class="py-3 px-3.5 whitespace-nowrap font-mono font-black text-xs text-[var(--rm-text-title)]">
+                                        <td class="py-3 px-3.5 whitespace-nowrap font-mono font-bold text-xs text-[var(--rm-text-title)]">
                                             {{ $est['resultado_valor'] }} <span class="text-[10px] font-normal text-[var(--rm-text-muted)]">{{ $est['resultado_unidad'] }}</span>
                                         </td>
 
@@ -424,7 +458,7 @@
                                         <td class="py-3 px-3.5 whitespace-nowrap text-right">
                                             <button type="button"
                                                     wire:click.stop="seleccionarEstudio('{{ $est['id'] }}')"
-                                                    class="px-2.5 py-1 rounded-lg font-extrabold text-[11px] transition inline-flex items-center gap-1 {{ $esSeleccionado ? 'bg-[#1E3A8A] text-white shadow-2xs' : 'bg-blue-50 text-[#1E3A8A] dark:bg-blue-950/50 dark:text-blue-300 border border-blue-200 dark:border-blue-900/50 hover:bg-blue-100' }}">
+                                                    class="px-2.5 py-1 rounded-lg font-extrabold text-[11px] transition inline-flex items-center gap-1 {{ $esSeleccionado ? 'bg-[var(--rm-action-primary)] text-white shadow-2xs' : 'bg-blue-50 text-[var(--rm-action-primary)] dark:bg-blue-950/50 dark:text-blue-300 border border-blue-200 dark:border-blue-900/50 hover:bg-blue-100' }}">
                                                 <span>Ver</span>
                                                 <i class="ph-bold ph-caret-right text-[10px]"></i>
                                             </button>
@@ -453,7 +487,7 @@
                 {{-- Encabezado del Detalle --}}
                 <div class="border-b border-[var(--rm-border)] pb-3.5 space-y-2">
                     <div class="flex items-center justify-between gap-2">
-                        <span class="text-[10.5px] font-black uppercase tracking-wider text-[var(--rm-text-muted)]">
+                        <span class="text-[10.5px] font-bold uppercase tracking-wider text-[var(--rm-text-muted)]">
                             Detalles del resultado
                         </span>
                         <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold border {{ $estudioActivo['estado_color'] }}">
@@ -462,7 +496,7 @@
                         </span>
                     </div>
 
-                    <h3 class="text-base font-black text-[var(--rm-text-title)] tracking-tight">
+                    <h3 class="text-base font-bold text-[var(--rm-text-title)] tracking-tight">
                         {{ $estudioActivo['titulo'] }}
                     </h3>
 
@@ -472,7 +506,7 @@
                             <span class="text-[10px] font-bold text-[var(--rm-text-muted)] uppercase tracking-wider block">
                                 Valor registrado
                             </span>
-                            <div class="text-xl sm:text-2xl font-black text-[#1E3A8A] dark:text-blue-400 tracking-tight font-mono">
+                            <div class="text-xl sm:text-2xl font-bold text-[var(--rm-action-primary)] dark:text-blue-400 tracking-tight font-mono">
                                 {{ $estudioActivo['resultado_valor'] }} <span class="text-xs font-bold text-[var(--rm-text-muted)]">{{ $estudioActivo['resultado_unidad'] }}</span>
                             </div>
                         </div>
@@ -489,7 +523,7 @@
 
                 {{-- Información del Estudio --}}
                 <div class="space-y-2 text-xs">
-                    <span class="text-[11px] font-black uppercase tracking-wider text-[var(--rm-text-title)] block">
+                    <span class="text-[11px] font-bold uppercase tracking-wider text-[var(--rm-text-title)] block">
                         Información del estudio
                     </span>
                     <div class="grid grid-cols-2 gap-2 text-[11px]">
@@ -519,7 +553,7 @@
 
                 {{-- Observaciones Clínicas --}}
                 <div class="space-y-1.5 text-xs">
-                    <span class="text-[11px] font-black uppercase tracking-wider text-[var(--rm-text-title)] block">
+                    <span class="text-[11px] font-bold uppercase tracking-wider text-[var(--rm-text-title)] block">
                         Observaciones clínicas
                     </span>
                     <div class="p-3 rounded-2xl bg-blue-50/60 dark:bg-blue-950/20 border border-blue-200/60 dark:border-blue-900/40 text-[11.5px] text-[var(--rm-text-body)] leading-relaxed">
@@ -530,7 +564,7 @@
                 {{-- Hallazgos y Conclusión (especialmente para Imagen y Cardiológico) --}}
                 @if(!empty($estudioActivo['hallazgos']))
                     <div class="space-y-1.5 text-xs">
-                        <span class="text-[11px] font-black uppercase tracking-wider text-[var(--rm-text-title)] block">
+                        <span class="text-[11px] font-bold uppercase tracking-wider text-[var(--rm-text-title)] block">
                             Hallazgos diagnósticos
                         </span>
                         <div class="p-3 rounded-2xl bg-[var(--rm-surface-alt)] border border-[var(--rm-border)] text-[11.5px] text-[var(--rm-text-body)] leading-relaxed">
@@ -548,7 +582,7 @@
                 @if(!empty($estudioActivo['historico_valores']))
                     <div class="space-y-2 text-xs pt-1 border-t border-[var(--rm-border)]/60">
                         <div class="flex items-center justify-between">
-                            <span class="text-[11px] font-black uppercase tracking-wider text-[var(--rm-text-title)]">
+                            <span class="text-[11px] font-bold uppercase tracking-wider text-[var(--rm-text-title)]">
                                 Evolución histórica
                             </span>
                             <span class="text-[10.5px] font-mono text-[var(--rm-text-muted)]">
@@ -559,7 +593,7 @@
                             @foreach($estudioActivo['historico_valores'] as $hVal)
                                 <div class="p-2 rounded-xl bg-[var(--rm-surface-alt)] border border-[var(--rm-border)] text-center">
                                     <span class="text-[9.5px] text-[var(--rm-text-muted)] font-mono block">{{ $hVal['periodo'] }}</span>
-                                    <span class="text-xs font-black text-[var(--rm-text-title)] font-mono">{{ $hVal['valor'] }}</span>
+                                    <span class="text-xs font-bold text-[var(--rm-text-title)] font-mono">{{ $hVal['valor'] }}</span>
                                 </div>
                             @endforeach
                         </div>
@@ -568,7 +602,7 @@
 
                 {{-- Documentos / Informes Asociados (PDF) --}}
                 <div class="pt-2 border-t border-[var(--rm-border)]/60 space-y-2">
-                    <span class="text-[11px] font-black uppercase tracking-wider text-[var(--rm-text-title)] block">
+                    <span class="text-[11px] font-bold uppercase tracking-wider text-[var(--rm-text-title)] block">
                         Informe clínico asociado
                     </span>
                     @if($estudioActivo['tiene_documento'])
@@ -585,7 +619,7 @@
                             <div class="flex items-center gap-2 pt-1">
                                 <button type="button"
                                         onclick="alert('Abriendo visor de documento: {{ $estudioActivo['nombre_documento'] }}')"
-                                        class="flex-1 py-1.5 px-2.5 rounded-xl bg-[#1E3A8A] text-white font-bold text-xs hover:bg-[#1E3A8A]/90 transition flex items-center justify-center gap-1 shadow-2xs cursor-pointer">
+                                        class="flex-1 py-1.5 px-2.5 rounded-xl bg-[var(--rm-action-primary)] text-white font-bold text-xs hover:bg-[var(--rm-action-primary)]/90 transition flex items-center justify-center gap-1 shadow-2xs cursor-pointer">
                                     <i class="ph-bold ph-eye text-xs"></i>
                                     <span>Ver informe</span>
                                 </button>
@@ -636,7 +670,7 @@ function moduloResultadosEstudios(config) {
         labels: config.labels || [],
         data: config.data || [],
         fechas: config.fechas || [],
-        color: config.color || '#1E3A8A',
+        color: config.color || '#634A35',
         unidad: config.unidad || '',
         nombre: config.nombre || '',
         rangoMin: config.rangoMin || 0,

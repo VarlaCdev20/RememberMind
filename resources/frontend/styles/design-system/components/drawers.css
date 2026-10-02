@@ -12,19 +12,23 @@
     /* ------------------------------------------------------------
        CONTRATO DE DRAWERS (PANELES LATERALES)
        ------------------------------------------------------------ */
-    --rm-drawer-bg: var(--rm-surface-raised); /* fondo panel */
-    --rm-drawer-shadow: var(--rm-shadow-lg); /* sombra */
+    --rm-drawer-bg: var(--rm-surface-main); /* fondo panel */
+    --rm-drawer-shadow: var(--rm-shadow-floating); /* sombra */
 
     --rm-drawer-sm: 360px;
-    --rm-drawer-md: 480px;
+    --rm-drawer-md: 460px;
     --rm-drawer-lg: 640px;
 }
+
+.rm-drawer-shell { z-index: var(--rm-z-drawer, 500); }
+.rm-drawer-shell__position { z-index: 1; }
+.rm-drawer__close { width: 44px; height: 44px; min-width: 44px; }
 
 /* 1. Backdrop / Overlay de fondo */
 .rm-drawer-backdrop {
     position: fixed;
     inset: 0;
-    z-index: 50;
+    z-index: 0;
     background: var(--rm-modal-overlay, rgba(64, 42, 32, 0.45));
     backdrop-filter: blur(0.5px);
     -webkit-backdrop-filter: blur(0.5px);
@@ -34,19 +38,19 @@
 /* 2. Estructura Principal del Drawer (100% NÍTIDO, CÁLIDO Y CLÍNICO) */
 .rm-drawer {
     position: relative;
-    z-index: 50;
+    z-index: 1;
     background: var(--rm-drawer-bg) !important;
     background-color: var(--rm-drawer-bg) !important;
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
     filter: none !important;
     border: 1px solid var(--rm-border-soft);
-    border-radius: var(--rm-radius-modal);
-    box-shadow: var(--rm-shadow-overlay);
+    border-radius: var(--rm-radius-2xl) 0 0 var(--rm-radius-2xl);
+    box-shadow: var(--rm-shadow-floating);
     display: flex;
     flex-direction: column;
     height: 100%;
-    width: var(--rm-drawer-lg);
+    width: var(--rm-drawer-md);
     max-width: 100vw;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -55,8 +59,8 @@
 
 @media (max-width: 1024px) {
     .rm-drawer {
-        width: 80vw;
-        max-width: 85vw;
+        width: 75vw;
+        max-width: 75vw;
     }
 }
 
@@ -64,7 +68,8 @@
     .rm-drawer {
         width: 100vw;
         max-width: 100vw;
-        border-radius: var(--rm-radius-modal) 0 0 var(--rm-radius-modal);
+        height: 100dvh;
+        border-radius: 0;
     }
 }
 
@@ -75,12 +80,24 @@
 .rm-drawer-xl { width: var(--rm-drawer-lg); max-width: 100vw; }
 .rm-drawer-wide { width: min(100vw, 64rem); max-width: 100vw; }
 
+@media (max-width: 1024px) {
+    .rm-drawer-sm, .rm-drawer-md, .rm-drawer-lg, .rm-drawer-xl, .rm-drawer-wide { width: 75vw; max-width: 75vw; }
+}
+
+@media (max-width: 640px) {
+    .rm-drawer-sm, .rm-drawer-md, .rm-drawer-lg, .rm-drawer-xl, .rm-drawer-wide { width: 100vw; max-width: 100vw; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .rm-drawer, .rm-drawer-backdrop { transition-duration: 0.01ms !important; }
+}
+
 /* 3. Encabezado Fijo del Drawer */
 .rm-drawer-header {
     display: flex;
     flex-direction: column;
     gap: 4px;
-    padding: var(--rm-space-3) var(--rm-space-5);
+    padding: var(--rm-space-3) var(--rm-space-4);
     border-bottom: 1px solid var(--rm-border-soft);
     background-color: var(--rm-surface-soft) !important;
     flex-shrink: 0;
@@ -123,7 +140,7 @@
 
 /* 4. Cuerpo Scrolleable Exclusivo del Drawer */
 .rm-drawer-body {
-    padding: var(--rm-space-4) var(--rm-space-5);
+    padding: var(--rm-space-3) var(--rm-space-4);
     overflow-y: auto;
     flex: 1 1 auto;
     min-height: 0;
@@ -206,7 +223,7 @@
     background-color: var(--rm-surface) !important;
     border: 1px solid var(--rm-border-soft);
     border-radius: var(--rm-radius-card);
-    padding: var(--rm-space-4);
+    padding: var(--rm-space-3);
     box-shadow: var(--rm-shadow-sm);
     transition: border-color 0.2s ease;
 }
@@ -215,7 +232,7 @@
     background-color: var(--rm-surface-soft) !important;
     border: 1px solid var(--rm-border-soft);
     border-radius: var(--rm-radius-card);
-    padding: var(--rm-space-4);
+    padding: var(--rm-space-3);
     box-shadow: var(--rm-shadow-sm);
 }
 

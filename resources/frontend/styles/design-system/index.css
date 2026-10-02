@@ -43,4 +43,11 @@
 @import './patterns/depth-canvas.css';
 @import './patterns/system-density.css';
 @import './patterns/nursing-module.css';
+@import './patterns/resident-directory.css';
 @import './patterns/nursing-dashboard-layout.css';
+@import './patterns/admin-dashboard-layout.css';
+@import './patterns/admin-visual-redesign.css';
+@import './patterns/admin-workspace-consistency.css';
+@import './patterns/admin-preadmissions.css';
+@import './patterns/admin-resident-panel.css';
+@import './patterns/unified-data-tables.css';

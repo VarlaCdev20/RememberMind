@@ -249,7 +249,7 @@ class ValoracionEnfermeriaAutoriaTest extends TestCase
      */
     public function test_7_superadministrador_puro_puede_ver_pero_no_registra(): void
     {
-        $superadmin = User::where('correo', 'admincasaamandita@gmail.com')->firstOrFail();
+        $superadmin = User::where('correo', 'carlaencinas78@gmail.com')->firstOrFail();
 
         $this->assertTrue($superadmin->can('valoracion_enfermeria.ver'), 'Superadmin conserva lectura.');
         $this->assertFalse($superadmin->can('valoracion_enfermeria.registrar'), 'Superadmin no tiene registrar.');
@@ -269,7 +269,7 @@ class ValoracionEnfermeriaAutoriaTest extends TestCase
      */
     public function test_8_superadministrador_puro_no_edita(): void
     {
-        $superadmin = User::where('correo', 'admincasaamandita@gmail.com')->firstOrFail();
+        $superadmin = User::where('correo', 'carlaencinas78@gmail.com')->firstOrFail();
         $this->assertFalse($superadmin->can('valoracion_enfermeria.editar'));
 
         $enfermero = User::where('correo', 'enfermeria@remembermind.com')->firstOrFail();
@@ -293,7 +293,7 @@ class ValoracionEnfermeriaAutoriaTest extends TestCase
     public function test_9_delete_siempre_rechazado_por_politica(): void
     {
         $enfermero = User::where('correo', 'enfermeria@remembermind.com')->firstOrFail();
-        $superadmin = User::where('correo', 'admincasaamandita@gmail.com')->firstOrFail();
+        $superadmin = User::where('correo', 'carlaencinas78@gmail.com')->firstOrFail();
         $preadmision = $this->crearPreadmision('PENDIENTE');
 
         $valoracion = ValoracionEnfermeriaPreadmision::create([

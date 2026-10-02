@@ -13,7 +13,7 @@ class RolesAndPermissionsSeeder extends Seeder
     {
         app(PermissionRegistrar::class)->forgetCachedPermissions();
         $rolesActivos = [
-            'SUPERADMINISTRADOR', 'ADMINISTRADOR', 'ENFERMEROS', 'MEDICO GENERAL/GERIATRA',
+            'SUPERADMINISTRADOR', 'GERENTE', 'ADMINISTRADOR', 'ENFERMEROS', 'MEDICO GENERAL/GERIATRA',
             'PSICOLOGO/A', 'PEDAGOGO', 'NUTRICIONISTA', 'FISIOTERAPEUTA', 'FAMILIAR',
         ];
         Role::query()->whereNotIn('name', $rolesActivos)->delete();
@@ -43,6 +43,7 @@ class RolesAndPermissionsSeeder extends Seeder
             'valoracion_enfermeria.ver', 'valoracion_medica.ver',
             'enfermeria.ver_dashboard', 'enfermeria.ver_pacientes_asignados',
             'enfermeria.ver_ficha_paciente',
+            'asignacion_turno.ver', 'asignaciones.ver',
             'reportes.ver', 'reportes.institucional',
             'reportes.exportar_pdf', 'reportes.individual', 'bitacora.ver',
         ];
@@ -51,7 +52,7 @@ class RolesAndPermissionsSeeder extends Seeder
             'usuarios.crear', 'usuarios.editar', 'usuarios.cambiar_estado',
             'usuarios.reportes.pdf', 'usuarios.reportes.excel',
             'areas.crear', 'areas.editar', 'areas.cambiar_estado',
-            'turnos.asignar', 'turnos.finalizar',
+            'turnos.crear', 'turnos.editar', 'turnos.cambiar_estado', 'turnos.asignar', 'turnos.finalizar',
             'habitaciones.crear', 'habitaciones.editar',
             'camas.crear', 'camas.editar',
             'documentos.subir', 'documentos.archivar',
@@ -59,10 +60,12 @@ class RolesAndPermissionsSeeder extends Seeder
         ];
         $permisos = array_merge($permisos, [
             'auditoria.ver', 'usuarios.gestionar', 'personal.gestionar', 'areas.gestionar', 'turnos.gestionar',
-            'jornadas.gestionar', 'preadmisiones.crear', 'preadmisiones.revisar', 'admisiones.formalizar',
-            'residentes.gestionar', 'residentes_contactos.gestionar',
+            'jornadas.gestionar', 'asignaciones_personal.gestionar',
+            'preadmisiones.crear', 'preadmisiones.revisar', 'admisiones.formalizar',
+            'residentes.gestionar', 'residentes.actualizar_administrativo', 'residentes_contactos.gestionar',
             'habitaciones.gestionar', 'camas.gestionar', 'contactos.gestionar', 'documentos.gestionar',
-            'consentimientos.gestionar', 'atenciones.crear', 'notas_clinicas.crear', 'diagnosticos.crear',
+            'ocupaciones_cama.gestionar', 'documentos.validar', 'consentimientos.gestionar',
+            'atenciones.crear', 'notas_clinicas.crear', 'diagnosticos.crear',
             'antecedentes_clinicos.crear', 'alergias.crear', 'signos_vitales.crear',
             'valoraciones_dolor.crear', 'mediciones_antropometricas.crear', 'estudios_clinicos.crear',
             'resultados_estudio.crear', 'informes_estudio.crear', 'documentos_clinicos.crear',
@@ -77,7 +80,8 @@ class RolesAndPermissionsSeeder extends Seeder
             'aplicaciones_instrumento.crear', 'aplicaciones_instrumento.editar', 'aplicaciones_instrumento.anular',
             'valoraciones_psicologicas.crear', 'valoraciones_nutricionales.crear',
             'valoraciones_funcionales.crear', 'valoraciones_funcionales.editar', 'seguimientos_pedagogicos.crear', 'actividades.gestionar',
-            'visitas.gestionar', 'alertas.gestionar',
+            'visitas.gestionar', 'alertas.gestionar', 'alertas.reconocer', 'alertas.asignar',
+            'alertas.seguimiento', 'alertas.cerrar',
             'valoracion_enfermeria.registrar', 'valoracion_enfermeria.editar',
         ], $permisosCompatibilidadLectura, $permisosCompatibilidadInstitucional);
 
@@ -90,22 +94,52 @@ class RolesAndPermissionsSeeder extends Seeder
 
         $roles = collect($rolesActivos)->mapWithKeys(fn (string $nombre) => [$nombre => Role::findOrCreate($nombre, 'web')]);
 
-        $roles['SUPERADMINISTRADOR']->syncPermissions(array_values(array_unique(array_merge($this->permitir($permisos, [
-            '.ver', 'usuarios.gestionar', 'personal.gestionar', 'areas.gestionar', 'turnos.gestionar',
-            'jornadas.gestionar', 'preadmisiones.crear', 'preadmisiones.revisar', 'admisiones.formalizar',
-            'residentes.gestionar', 'residentes_contactos.gestionar',
-            'habitaciones.gestionar', 'camas.gestionar', 'contactos.gestionar', 'documentos.gestionar',
-            'consentimientos.gestionar', 'actividades.gestionar', 'visitas.gestionar', 'alertas.gestionar',
-            'auditoria.ver',
-        ]), $permisosCompatibilidadLectura, $permisosCompatibilidadInstitucional))));
+        // Autoridad técnica global: lectura transversal y administración de
+        // sistema, institución, residencia y operación. Se excluye de forma
+        // deliberada toda escritura clínica, que exige competencia profesional.
+        $roles['SUPERADMINISTRADOR']->syncPermissions(array_values(array_unique(array_merge(
+            $this->permitir($permisos, [
+                '.ver', 'usuarios.gestionar', 'usuarios.crear', 'usuarios.editar',
+                'usuarios.cambiar_estado', 'usuarios.reportes', 'roles', 'auditoria.ver', 'bitacora.ver',
+                'personal.gestionar', 'areas.gestionar', 'turnos.gestionar',
+                'jornadas.gestionar', 'asignaciones_personal.gestionar',
+                'preadmisiones.crear', 'preadmisiones.revisar', 'admisiones.formalizar',
+                'residentes.actualizar_administrativo', 'residentes_contactos.gestionar',
+                'habitaciones.gestionar', 'camas.gestionar', 'ocupaciones_cama.gestionar',
+                'contactos.gestionar', 'documentos.gestionar', 'documentos.validar',
+                'consentimientos.gestionar', 'actividades.gestionar', 'visitas.gestionar',
+                'alertas.gestionar', 'alertas.reconocer', 'alertas.asignar',
+                'alertas.seguimiento', 'alertas.cerrar',
+            ]),
+            $permisosCompatibilidadLectura,
+            $permisosCompatibilidadInstitucional
+        ))));
+
+        // Dirección institucional: personal, organización, planificación maestra
+        // y lectura de los indicadores necesarios para conducir la residencia.
+        $roles['GERENTE']->syncPermissions(array_values(array_unique(array_merge($this->permitir($permisos, [
+            'personal', 'areas', 'turnos', 'jornadas.ver', 'asignaciones_personal.ver',
+            'residentes.ver', 'habitaciones.ver', 'camas.ver', 'ocupaciones_cama.ver',
+            'preadmisiones.ver', 'admisiones.ver', 'alertas.ver', 'incidentes.ver',
+            'reportes.ver', 'reportes.institucional',
+        ]), [
+            'personal_institucional.ver', 'areas.reportes', 'turnos.crear', 'turnos.editar',
+            'turnos.cambiar_estado', 'asignacion_turno.ver', 'asignaciones.ver',
+        ]))));
 
         $roles['ADMINISTRADOR']->syncPermissions(array_values(array_unique(array_merge($this->permitir($permisos, [
-            'usuarios', 'personal', 'areas', 'turnos', 'jornadas', 'asignaciones_personal', 'preadmisiones',
-            'admisiones', 'residentes.ver', 'residentes.gestionar', 'contactos', 'residentes_contactos', 'habitaciones', 'camas',
+            'personal.ver', 'areas.ver', 'turnos.ver', 'jornadas', 'asignaciones_personal', 'preadmisiones',
+            'admisiones', 'residentes.ver', 'residentes.gestionar', 'residentes.actualizar_administrativo',
+            'contactos', 'residentes_contactos', 'habitaciones', 'camas',
             'ocupaciones_cama', 'documentos', 'consentimientos', 'seguros_residente', 'actividades', 'visitas',
-            'alertas.ver', 'alertas.gestionar', 'incidentes.ver', 'auditoria.ver', 'atenciones.ver', 'planes_cuidado.ver',
-            'ejecuciones_cuidado.ver', 'pases_turno.ver',
-        ]), $permisosCompatibilidadLectura, $permisosCompatibilidadInstitucional))));
+            'alertas.ver', 'alertas.reconocer', 'alertas.asignar', 'alertas.seguimiento', 'alertas.cerrar',
+            'incidentes.ver',
+        ]), [
+            'admisiones.ver_dashboard', 'admisiones.crear', 'asignacion_turno.ver', 'asignaciones.ver',
+            'turnos.asignar', 'turnos.finalizar',
+            'reportes.ver', 'reportes.institucional', 'reportes.exportar_pdf', 'reportes.individual',
+            'documentos.subir', 'documentos.archivar',
+        ]))));
 
         $roles['MEDICO GENERAL/GERIATRA']->syncPermissions(array_values(array_unique(array_merge($this->permitir($permisos, [
             'residentes.ver', 'atenciones', 'notas_clinicas', 'antecedentes_clinicos', 'diagnosticos', 'alergias',
@@ -121,7 +155,7 @@ class RolesAndPermissionsSeeder extends Seeder
             'residentes.ver', 'ocupaciones_cama.ver', 'atenciones.ver', 'atenciones.crear', 'atenciones.editar', 'notas_clinicas', 'antecedentes_clinicos.ver',
             'diagnosticos.ver', 'alergias.ver', 'dispositivos_clinicos', 'signos_vitales', 'valoraciones_dolor',
             'estudios_clinicos.ver', 'resultados_estudio.ver', 'indicaciones_clinicas.ver', 'incidentes',
-            'asignaciones_residente_jornada', 'controles_cognitivos', 'registros_', 'heridas', 'curaciones_herida', 'pases_turno', 'planes_cuidado',
+            'asignaciones_residente_jornada', 'controles_cognitivos', 'registros_', 'registros_ingesta.crear', 'registros_hidratacion.crear', 'registros_eliminacion.crear', 'registros_movilidad.crear', 'heridas', 'curaciones_herida', 'pases_turno', 'planes_cuidado',
             'intervenciones_cuidado.ver', 'programaciones_cuidado.ver', 'ejecuciones_cuidado',
             'prescripciones.ver', 'horarios_prescripcion.ver', 'administraciones_medicacion', 'alertas',
         ]), [

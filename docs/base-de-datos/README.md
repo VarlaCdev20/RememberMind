@@ -4,6 +4,8 @@ Esta carpeta contiene la documentación canónica y oficial de la **BDD Operativ
 
 ## Índice documental
 
+- [Datos ficticios para desarrollo local](SEEDERS_LOCALES.md): carga explícita e idempotente de las 70 tablas operativas, restringida a local/testing.
+
 ### 1. Fuente de verdad vigente (V2.1 — CONGELADO)
 
 1. [Baseline congelado de Base de Datos Operativa](REMEMBERMIND_BDD_BASELINE_CONGELADO.md)

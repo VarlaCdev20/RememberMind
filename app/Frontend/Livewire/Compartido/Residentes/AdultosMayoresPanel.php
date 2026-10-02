@@ -40,6 +40,7 @@ class AdultosMayoresPanel extends Component
 
     public function editarAdultoMayor($cod_residente)
     {
+        abort_unless(auth()->user()?->estado === 'ACTIVO' && auth()->user()->can('residentes.gestionar'), 403);
         $this->dispatch('adulto-mayor-form-abrir', adultoId: $cod_residente);
     }
 

@@ -61,48 +61,93 @@
  </div>
  </div>
 
- {{-- BARRA DE FILTROS Y BÚSQUEDA --}}
- <section class="rm-filter-bar overflow-hidden">
- <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
- {{-- Filtros Rápidos (Categorías) --}}
- <div class="flex flex-wrap items-center gap-1.5">
- <span class="text-[10px] font-bold uppercase tracking-widestá text-apoyo mr-1">Filtrar:</span>
+     {{-- BARRA DE FILTROS Y BÚSQUEDA FORMATO ALERTAS (DESPLAZABLE Y CON COLORCITOS) --}}
+    <x-ui.filter-bar class="mb-4">
+        <div class="w-full flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+            {{-- Filtros Rápidos Desplazables (Categorías) --}}
+            <div class="flex items-center gap-2 min-w-0 flex-1">
+                <span class="text-[10px] font-extrabold uppercase tracking-widest text-[var(--rm-text-secondary)] shrink-0 flex items-center gap-1">
+                    <i class="ph-bold ph-funnel text-xs text-[var(--rm-primary)]"></i> Filtrar:
+                </span>
+                @php
+                    $filtros = [
+                        ['valor' => 'todas', 'label' => 'Todas', 'icon' => 'ph-circles-four'],
+                        ['valor' => 'red_de_apoyo', 'label' => 'Red de Apoyo', 'icon' => 'ph-users-three'],
+                        ['valor' => 'documentacion', 'label' => 'Documentos', 'icon' => 'ph-files'],
+                        ['valor' => 'salud_y_cuidados', 'label' => 'Salud y Cuidados', 'icon' => 'ph-heartbeat'],
+                        ['valor' => 'evaluaciones', 'label' => 'Evaluaciones', 'icon' => 'ph-clipboard-text'],
+                        ['valor' => 'seguimiento', 'label' => 'Seguimiento', 'icon' => 'ph-pulse'],
+                        ['valor' => 'estado_institucional', 'label' => 'Institucional', 'icon' => 'ph-buildings'],
+                    ];
+                @endphp
 
- @php
- $filtros = [
- ['valor' => 'todas', 'label' => 'Todas'],
- ['valor' => 'red_de_apoyo', 'label' => 'Red de Apoyo'],
- ['valor' => 'documentacion', 'label' => 'Documentos'],
- ['valor' => 'salud_y_cuidados', 'label' => 'Salud y Cuidados'],
- ['valor' => 'evaluaciones', 'label' => 'Evaluaciones'],
- ['valor' => 'seguimiento', 'label' => 'Seguimiento'],
- ['valor' => 'estado_institucional', 'label' => 'Institucional'],
- ];
- @endphp
+                <div class="rm-filter-pills flex-1">
+                    @foreach($filtros as $f)
+                        <button
+                            type="button"
+                            wire:click="$set('filtroCategoria', '{{ $f['valor'] }}')"
+                            class="rm-filter-pill {{ $filtroCategoria === $f['valor'] ? 'is-active' : '' }}"
+                        >
+                            <i class="ph-bold {{ $f['icon'] }} text-xs"></i>
+                            <span>{{ $f['label'] }}</span>
+                        </button>
+                    @endforeach
+                </div>
+            </div>
 
- @foreach($filtros as $f)
- <button
- type="button"
- wire:click="$set('filtroCategoria', '{{ $f['valor'] }}')"
- class="rounded-lg px-3 py-1.5 text-[10px] font-bold transition active:scale-95 {{ $filtroCategoria === $f['valor'] ? 'bg-boton-principal text-inverso shadow-xs' : 'bg-fondo-panel text-apoyo hover:bg-fondo-panel' }}"
- >
- {{ $f['label'] }}
- </button>
- @endforeach
- </div>
+            {{-- Buscador reactivo para escribir --}}
+            <div class="relative flex items-center w-full md:w-72 shrink-0">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-[var(--rm-text-secondary)]">
+                    <i class="ph-bold ph-magnifying-glass text-base"></i>
+                </span>
+                <input
+                    type="text"
+                    wire:model.live.debounce.300ms="buscar"
+                    placeholder="Escriba para buscar..."
+                    class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-input-bg)] py-2 pl-9 pr-8 text-xs font-medium text-[var(--rm-text-primary)] placeholder-[var(--rm-text-secondary)] focus:border-[var(--rm-primary)] focus:ring-1 focus:ring-[var(--rm-primary)] focus:outline-none h-[38px] transition"
+                />
+                @if(!empty($buscar))
+                    <button type="button"
+                        wire:click="$set('buscar', '')"
+                        class="absolute inset-y-0 right-0 flex items-center pr-2.5 text-[var(--rm-text-secondary)] hover:text-[var(--rm-danger)] cursor-pointer"
+                        title="Limpiar búsqueda">
+                        <i class="ph-bold ph-x-circle text-base"></i>
+                    </button>
+                @endif
+            </div>
+        </div>
 
- {{-- Buscador reactivo --}}
- <div class="flex items-center gap-2 rounded-xl border border-borde-suave bg-fondo-card/45 px-3 py-1.5 shrink-0">
- <i class="ph-bold ph-magnifying-glass text-xs text-apoyo"></i>
- <input
- type="text"
- wire:model.live="buscar"
- placeholder="Buscar adulto mayor..."
- class="bg-transparent text-xs font-bold text-titulo outline-none placeholder:text-apoyo w-full md:w-48"
- >
- </div>
- </div>
- </section>
+        @php
+            $hasFiltrosActivos = !empty($buscar) || ($filtroCategoria !== 'todas');
+        @endphp
+        @if($hasFiltrosActivos)
+            <div class="rm-filter-bar__active">
+                <div class="rm-filter-scroll">
+                    <span class="rm-filter-bar__active-label">
+                        <i class="ph-bold ph-funnel text-xs"></i> Filtros activos:
+                    </span>
+                    @if(!empty($buscar))
+                        <span class="rm-filter-chip rm-filter-chip--search">
+                            <i class="ph-bold ph-magnifying-glass text-xs"></i>
+                            <span>Búsqueda: "{{ Str::limit($buscar, 16) }}"</span>
+                            <button type="button" wire:click="$set('buscar', '')" title="Quitar filtro"><i class="ph-bold ph-x text-xs"></i></button>
+                        </span>
+                    @endif
+                    @if($filtroCategoria !== 'todas')
+                        <span class="rm-filter-chip rm-filter-chip--clinical">
+                            <i class="ph-bold ph-tag text-xs"></i>
+                            <span>Categoría: {{ str_replace('_', ' ', $filtroCategoria) }}</span>
+                            <button type="button" wire:click="$set('filtroCategoria', 'todas')" title="Quitar filtro"><i class="ph-bold ph-x text-xs"></i></button>
+                        </span>
+                    @endif
+                </div>
+                <button type="button" wire:click="$set('buscar', ''); $set('filtroCategoria', 'todas')" class="rm-filter-bar__clear-btn">
+                    <i class="ph-bold ph-arrow-counter-clockwise text-xs"></i>
+                    <span>Limpiar filtros</span>
+                </button>
+            </div>
+        @endif
+    </x-ui.filter-bar>
 
  {{-- LISTADO DE ALERTAS --}}
  <main class="space-y-4">

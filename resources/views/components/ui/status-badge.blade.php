@@ -26,6 +26,11 @@
         'DISPONIBLE' => 'Disponible',
         'VIGILANCIA' => 'Vigilancia',
         'PENDIENTE' => 'Pendiente',
+        'APROBADA' => 'Aprobada',
+        'RECHAZADA' => 'Rechazada',
+        'ADMITIDA' => 'Admitida',
+        'ADMITIDO' => 'Admitido',
+        'OCUPADA' => 'Ocupada',
         'SUSPENDIDO', 'SUSPENDIDA' => 'Suspendido',
         'EN_REVISION' => 'En Revisión',
         'EN_ATENCION' => 'En Atención',
@@ -55,13 +60,13 @@
         default => match($valor) {
             'PRIMARY', 'PRINCIPAL', 'INSTITUCIONAL'
                 => 'rm-badge-primary',
-            'ACTIVO', 'ACTIVA', 'ESTABLE', 'VIGENTE', 'DISPONIBLE', 'EXITO', 'RESUELTA', 'RESUELTO', 'ADMINISTRADO', 'ADMINISTRADA', 'COMPLETADO', 'COMPLETADA', 'BAJO'
+            'ACTIVO', 'ACTIVA', 'ESTABLE', 'VIGENTE', 'DISPONIBLE', 'APROBADA', 'ADMITIDA', 'ADMITIDO', 'EXITO', 'RESUELTA', 'RESUELTO', 'ADMINISTRADO', 'ADMINISTRADA', 'COMPLETADO', 'COMPLETADA', 'BAJO'
                 => 'rm-badge-success',
-            'VIGILANCIA', 'SUSPENDIDO', 'SUSPENDIDA', 'EN_REVISION', 'ABIERTA', 'ABIERTO', 'MEDIO'
+            'VIGILANCIA', 'SUSPENDIDO', 'SUSPENDIDA', 'EN_REVISION', 'PENDIENTE', 'ABIERTA', 'ABIERTO', 'OCUPADA', 'MEDIO'
                 => 'rm-badge-warning',
-            'CRITICO', 'CRÍTICO', 'ALTO', 'ALERTA', 'ERROR', 'FALLECIDO', 'RETIRADO', 'VENCIDO', 'VENCIDA'
+            'CRITICO', 'CRÍTICO', 'ALTO', 'RECHAZADA', 'ALERTA', 'ERROR', 'FALLECIDO', 'RETIRADO', 'VENCIDO', 'VENCIDA'
                 => 'rm-badge-critical',
-            'EN_ATENCION', 'TRASLADADO', 'SEGUIMIENTO_ESPECIAL', 'INFORMATIVO', 'PRESCRITO', 'PROGRAMADO', 'PENDIENTE'
+            'EN_ATENCION', 'TRASLADADO', 'SEGUIMIENTO_ESPECIAL', 'INFORMATIVO', 'PRESCRITO', 'PROGRAMADO'
                 => 'rm-badge-info',
             default
                 => 'rm-badge-neutral',

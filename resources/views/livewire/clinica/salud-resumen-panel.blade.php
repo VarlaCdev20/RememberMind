@@ -352,7 +352,7 @@ $estadoTexto = $adulto->estado?->estado ?? 'Sin estado';
  </div>
  </div>
  <div>
- <table class="w-full text-left text-xs text-titulo">
+ <table class="rm-data-table w-full text-left text-xs text-titulo">
  <thead class="bg-fondo-panel text-[10px] font-bold uppercase text-apoyo">
  <tr>
  <th class="px-5 py-3">Medicamento</th>

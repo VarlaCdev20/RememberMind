@@ -69,3 +69,37 @@
     border-color: var(--rm-state-info-border);
     color: var(--rm-state-info-text);
 }
+
+/* Feedback temporal compartido por los layouts institucionales. */
+.swal2-container.swal2-top-end { top: 64px !important; z-index: var(--rm-z-toast, 1100) !important; }
+.swal2-popup.rm-toast {
+    width: min(380px, calc(100vw - 32px));
+    min-height: 52px;
+    padding: 12px 16px;
+    background: var(--rm-surface-main);
+    color: var(--rm-text-primary);
+    border: 1px solid var(--rm-border-soft);
+    border-left: 4px solid var(--rm-info);
+    border-radius: var(--rm-radius-lg);
+    box-shadow: var(--rm-shadow-floating);
+    font-family: var(--rm-font-ui);
+}
+.swal2-popup.rm-toast:has(.swal2-success) { background: var(--rm-success-bg); border-left-color: var(--rm-success); }
+.swal2-popup.rm-toast:has(.swal2-info) { background: var(--rm-info-bg); border-left-color: var(--rm-info); }
+.swal2-popup.rm-toast:has(.swal2-warning) { background: var(--rm-warning-bg); border-left-color: var(--rm-warning); }
+.swal2-popup.rm-toast:has(.swal2-error) { background: var(--rm-critical-bg); border-left-color: var(--rm-critical); }
+.swal2-popup.rm-toast .swal2-title { color: var(--rm-text-primary); font-size: 14px; line-height: 1.4; font-weight: 600; }
+.swal2-popup.rm-toast .swal2-close { color: var(--rm-text-secondary); width: 40px; height: 40px; }
+.swal2-popup.rm-toast .swal2-close:focus-visible { outline: 2px solid var(--rm-action-primary); outline-offset: 2px; }
+.rm-toast-show { animation: rm-toast-enter 220ms ease-out both; }
+.rm-toast-hide { animation: rm-toast-exit 160ms ease-in both; }
+@keyframes rm-toast-enter { from { opacity: 0; transform: translateX(16px); } to { opacity: 1; transform: translateX(0); } }
+@keyframes rm-toast-exit { from { opacity: 1; transform: translateX(0); } to { opacity: 0; transform: translateX(8px); } }
+@media (max-width: 640px) {
+    .swal2-container.swal2-top-end { align-items: center !important; }
+    @keyframes rm-toast-enter { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes rm-toast-exit { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(-4px); } }
+}
+@media (prefers-reduced-motion: reduce) {
+    .rm-toast-show, .rm-toast-hide { animation: none; }
+}

@@ -32,7 +32,7 @@
  {{-- A. CABECERA DEL SUBMÓDULO --}}
  <x-ui.page-header
   overline="Seguimiento clínico"
-  title="Signos vitales"
+  title="Signos Vitales"
   subtitle="Monitoreo, control y análisis de parámetros vitales del residente."
   icon="ph-activity"
  >
@@ -47,35 +47,49 @@
   @endcan
  </x-ui.page-header>
 
- {{-- B. SELECCIONAR PACIENTE --}}
- <x-ui.filter-bar>
- <label class="mb-2 block text-[10px] font-bold uppercase tracking-widest text-apoyo">Seleccionar Paciente</label>
- <div class="grid gap-3 md:grid-cols-[1fr_1fr_auto]">
- <div>
- <div class="relative">
- <i class="ph-bold ph-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-meta"></i>
- <input type="text" wire:model.live.debounce.350ms="buscarPaciente" placeholder="Buscar por nombre o apellido..." class="w-full rounded-xl border border-borde/70 bg-fondo-card py-3 pl-10 pr-4 text-xs font-bold text-parrafo outline-none transition placeholder:text-meta focus:border-borde-focus focus:ring-2 focus:ring-[var(--rm-action-primary)]/20">
- </div>
- </div>
- <div>
- <div class="relative w-full">
- <i class="ph-bold ph-user absolute left-3.5 top-1/2 -translate-y-1/2 text-meta"></i>
- <select wire:model="adultoSeleccionado" class="w-full rounded-xl border border-borde/70 bg-fondo-card py-3 pl-10 pr-4 text-xs font-bold text-parrafo outline-none transition appearance-none focus:border-borde-focus focus:ring-2 focus:ring-[var(--rm-action-primary)]/20">
- <option value="">Seleccione un adulto mayor</option>
- @foreach($pacientesSelector as $paciente)
- @php $nombrePaciente = trim("{$paciente->nombres} {$paciente->ap_paterno} {$paciente->ap_materno}"); @endphp
- <option value="{{ $paciente->cod_residente }}">{{ $nombrePaciente ?: 'Adulto mayor' }}</option>
- @endforeach
- </select>
- </div>
- </div>
- <div>
- <button wire:click="buscarPacienteAction" type="button" class="inline-flex h-full w-full items-center justify-center gap-2 rounded-xl bg-boton-principal px-6 text-xs font-bold uppercase tracking-wider text-inverso shadow-sm transition hover:bg-fondo-panel active:scale-95">
- <i class="ph-bold ph-magnifying-glass"></i>
- Buscar
- </button>
- </div>
- </div>
+ {{-- B. SELECCIONAR PACIENTE FORMATO ALERTAS --}}
+ <x-ui.filter-bar class="mb-4">
+  <div class="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-2 items-center">
+   {{-- Búsqueda textual --}}
+   <div class="lg:col-span-5 relative flex items-center">
+    <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-[var(--rm-text-secondary)]">
+     <i class="ph-bold ph-magnifying-glass text-base"></i>
+    </span>
+    <input type="text"
+     wire:model.live.debounce.350ms="buscarPaciente"
+     placeholder="Buscar por nombre o apellido..."
+     class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-input-bg)] py-2 pl-9 pr-8 text-xs font-medium text-[var(--rm-text-primary)] placeholder-[var(--rm-text-secondary)] focus:border-[var(--rm-primary)] focus:ring-1 focus:ring-[var(--rm-primary)] focus:outline-none h-[38px]" />
+    @if(!empty($buscarPaciente))
+     <button type="button"
+      wire:click="$set('buscarPaciente', '')"
+      class="absolute inset-y-0 right-0 flex items-center pr-2.5 text-[var(--rm-text-secondary)] hover:text-[var(--rm-primary)] cursor-pointer"
+      title="Limpiar búsqueda">
+      <i class="ph-bold ph-x-circle text-base"></i>
+     </button>
+    @endif
+   </div>
+
+   {{-- Selector de Residente --}}
+   <div class="lg:col-span-5">
+    <select wire:model="adultoSeleccionado"
+     class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-input-bg)] py-2 px-3 text-xs font-medium text-[var(--rm-text-primary)] focus:border-[var(--rm-primary)] focus:ring-1 focus:ring-[var(--rm-primary)] focus:outline-none h-[38px] cursor-pointer">
+     <option value="">Seleccione un adulto mayor</option>
+     @foreach($pacientesSelector as $paciente)
+      @php $nombrePaciente = trim("{$paciente->nombres} {$paciente->ap_paterno} {$paciente->ap_materno}"); @endphp
+      <option value="{{ $paciente->cod_residente }}">{{ $nombrePaciente ?: 'Adulto mayor' }}</option>
+     @endforeach
+    </select>
+   </div>
+
+   {{-- Botón de Acción --}}
+   <div class="lg:col-span-2">
+    <button wire:click="buscarPacienteAction" type="button"
+     class="inline-flex h-[38px] w-full items-center justify-center gap-1.5 rounded-xl bg-[var(--rm-action-primary)] hover:bg-[var(--rm-action-primary-hover)] px-4 text-xs font-bold text-white shadow-xs transition cursor-pointer">
+     <i class="ph-bold ph-magnifying-glass"></i>
+     <span>Buscar</span>
+    </button>
+   </div>
+  </div>
  </x-ui.filter-bar>
 
  @if($adulto)
@@ -255,7 +269,7 @@
  </div>
 
  <div class="overflow-x-auto">
- <table class="w-full text-left text-sm text-parrafo">
+ <table class="rm-data-table rm-data-table--actions w-full text-left text-sm text-parrafo">
  <thead class="bg-fondo-app text-[9px] font-bold uppercase tracking-widest text-apoyo border-b border-borde-suave">
  <tr>
  <th class="px-4 py-3">Fecha y Hora</th>

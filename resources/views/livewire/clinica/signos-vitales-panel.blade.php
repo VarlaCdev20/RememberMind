@@ -1,7 +1,7 @@
 <div class="space-y-6 pb-8">
 
  {{-- BARRA DE FILTROS UNIFICADA FORMATO ALERTAS --}}
- <section class="rm-filter-bar">
+ <x-ui.filter-bar class="mb-4">
  <div class="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-2">
   {{-- Buscador Principal --}}
   <div class="lg:col-span-6 relative flex items-center">
@@ -87,21 +87,21 @@
   </div>
   </div>
  @endif
- </section>
+ </x-ui.filter-bar>
 
  {{-- ══════════════════════════════════════════════════════════════
   LEYENDA DE RANGOS
  ══════════════════════════════════════════════════════════════ --}}
  <div class="flex flex-wrap gap-4 rounded-2xl border border-borde bg-fondo-panel px-5 py-3 text-[10px] font-semibold">
  <div class="flex items-center gap-1.5 text-apoyo uppercase tracking-wider font-black">
-  <i class="ph-bold ph-info text-sm"></i> Rangos normales:
+  <i class="ph-bold ph-info text-sm"></i> Criterios de aviso orientativos:
  </div>
- <div class="flex items-center gap-1"><span class="h-2 w-2 rounded-full bg-[var(--rm-info)]"></span> PA sistólica: 90–140 mmHg</div>
- <div class="flex items-center gap-1"><span class="h-2 w-2 rounded-full bg-[var(--rm-warning)]"></span> FC: 60–100 bpm</div>
- <div class="flex items-center gap-1"><span class="h-2 w-2 rounded-full bg-estado-info"></span> SpO₂: ≥ 95%</div>
- <div class="flex items-center gap-1"><span class="h-2 w-2 rounded-full bg-estado-exito"></span> Temp: 36.0–37.5°C</div>
- <div class="flex items-center gap-1"><span class="h-2 w-2 rounded-full bg-[var(--rm-warning)]"></span> Glucosa: 70–180 mg/dL</div>
- <div class="flex items-center gap-1"><span class="h-2 w-2 rounded-full bg-[var(--rm-danger)]"></span> FR: 12–20 rpm</div>
+ <div class="flex items-center gap-1"><span class="h-2 w-2 rounded-full bg-[var(--rm-info)]"></span> {{ $leyendaAvisos['pa'] }}</div>
+ <div class="flex items-center gap-1"><span class="h-2 w-2 rounded-full bg-[var(--rm-warning)]"></span> {{ $leyendaAvisos['fc'] }}</div>
+ <div class="flex items-center gap-1"><span class="h-2 w-2 rounded-full bg-estado-info"></span> {{ $leyendaAvisos['saturacion'] }}</div>
+ <div class="flex items-center gap-1"><span class="h-2 w-2 rounded-full bg-estado-exito"></span> {{ $leyendaAvisos['temperatura'] }}</div>
+ <div class="flex items-center gap-1"><span class="h-2 w-2 rounded-full bg-[var(--rm-warning)]"></span> {{ $leyendaAvisos['glucosa'] }}</div>
+ <div class="flex items-center gap-1"><span class="h-2 w-2 rounded-full bg-[var(--rm-danger)]"></span> {{ $leyendaAvisos['fr'] }}</div>
  </div>
 
  {{-- ══════════════════════════════════════════════════════════════
@@ -110,7 +110,7 @@
  <div class="rounded-3xl border border-borde bg-fondo-card shadow-sm overflow-hidden">
  @if($pacientesFiltrados->count() > 0)
  <div class="overflow-x-auto">
-  <table class="w-full text-left text-xs whitespace-nowrap">
+  <table class="rm-data-table rm-data-table--actions w-full text-left text-xs whitespace-nowrap">
   <thead class="bg-fondo-panel text-[10px] font-bold uppercase tracking-wider text-apoyo">
    <tr>
    <th class="px-4 py-3 min-w-[170px]">Paciente</th>
@@ -165,14 +165,15 @@
    $gluc = $sv?->glucosa ? (float)$sv->glucosa : null;
    $imc = $sv?->imc ? (float)$sv->imc : null;
 
-   // Niveles de alerta por signo
-   $lvlPA = \App\Frontend\Livewire\Compartido\Clinica\SignosVitalesPanel::alertaPA($sist, $diast);
-   $lvlFC = \App\Frontend\Livewire\Compartido\Clinica\SignosVitalesPanel::alertaFC($fc);
-   $lvlFR = \App\Frontend\Livewire\Compartido\Clinica\SignosVitalesPanel::alertaFR($fr);
-   $lvlTemp = \App\Frontend\Livewire\Compartido\Clinica\SignosVitalesPanel::alertaTemp($temp);
-   $lvlSat = \App\Frontend\Livewire\Compartido\Clinica\SignosVitalesPanel::alertaSPO2($sat);
-   $lvlGluc = \App\Frontend\Livewire\Compartido\Clinica\SignosVitalesPanel::alertaGlucosa($gluc);
-   $lvlGlobal = $sv ? \App\Frontend\Livewire\Compartido\Clinica\SignosVitalesPanel::nivelGlobal($sist, $diast, $fc, $fr, $temp, $sat, $gluc) : 'sin_dato';
+   // Clasificación preparada por el componente.
+   $niveles = $nivelesPorResidente[$pac->cod_residente] ?? [];
+   $lvlPA = $niveles['pa'] ?? 'sin_dato';
+   $lvlFC = $niveles['fc'] ?? 'sin_dato';
+   $lvlFR = $niveles['fr'] ?? 'sin_dato';
+   $lvlTemp = $niveles['temperatura'] ?? 'sin_dato';
+   $lvlSat = $niveles['saturacion'] ?? 'sin_dato';
+   $lvlGluc = $niveles['glucosa'] ?? 'sin_dato';
+   $lvlGlobal = $niveles['global'] ?? 'sin_dato';
 
    // Función de clases de celda
    $celdaClass = fn(string $lvl) => match($lvl) {

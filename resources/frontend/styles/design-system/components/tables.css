@@ -17,8 +17,8 @@
     --rm-table-border: var(--rm-border-soft); /* borde */
     --rm-table-row-hover: var(--rm-surface-soft); /* hover */
     --rm-table-row-selected: var(--rm-action-primary-soft); /* seleccionada */
-    --rm-table-cell-padding-y: 12px; /* padding vertical */
-    --rm-table-cell-padding-x: 16px; /* padding horizontal */
+    --rm-table-cell-padding-y: 7px; /* padding vertical */
+    --rm-table-cell-padding-x: 12px; /* padding horizontal */
 
     /* Alias para compatibilidad */
     --rm-table-row-bg: var(--rm-table-bg);
@@ -32,7 +32,7 @@
     overflow: hidden;
     background-color: var(--rm-table-bg);
     border: 1px solid var(--rm-border);
-    border-radius: var(--rm-radius-card);
+    border-radius: 12px;
     box-shadow: var(--rm-shadow-sm);
     transition: var(--rm-transition-all);
 }
@@ -42,8 +42,8 @@
     text-align: left;
     border-collapse: collapse;
     font-family: var(--rm-font-family);
-    font-size: var(--rm-font-size-table);
-    font-weight: var(--rm-font-weight-semibold);
+    font-size: 13px;
+    font-weight: 500;
     color: var(--rm-text-primary);
 }
 
@@ -58,8 +58,9 @@
 .rm-table-header th {
     padding: var(--rm-table-cell-padding-y) var(--rm-table-cell-padding-x);
     font-family: var(--rm-font-family);
-    font-size: var(--rm-font-size-meta);
-    font-weight: var(--rm-font-weight-extrabold);
+    font-family: var(--rm-font-display);
+    font-size: 11px;
+    font-weight: 750;
     text-transform: uppercase;
     letter-spacing: var(--rm-letter-spacing-wide);
     color: var(--rm-text-primary);
@@ -72,7 +73,7 @@
     border-bottom: 1px solid var(--rm-table-border);
     background-color: var(--rm-table-row-bg);
     transition: background-color var(--rm-duration-fast) var(--rm-ease-standard);
-    min-height: 44px;
+    min-height: 36px;
 }
 
 .rm-table tbody td,
@@ -86,7 +87,7 @@
 /* Hover de fila */
 .rm-table tbody tr:hover,
 .rm-table-row:hover {
-    background-color: var(--rm-table-row-hover);
+    background-color: color-mix(in srgb, var(--rm-primary) 5%, var(--rm-table-row-hover));
 }
 
 /* Fila seleccionada */
@@ -107,14 +108,14 @@
 .rm-table-compact tbody td,
 .rm-table.is-compact tbody td {
     padding: var(--rm-space-2) var(--rm-space-3);
-    min-height: 38px;
-    font-size: var(--rm-font-size-meta);
+    min-height: 30px;
+    font-size: 11.5px;
 }
 
 .rm-table-compact thead th,
 .rm-table.is-compact thead th {
     padding: var(--rm-space-2) var(--rm-space-3);
-    font-size: 12px;
+    font-size: 10.5px;
 }
 
 /* Estado Vacío de Tabla */

@@ -45,9 +45,9 @@ class UnificacionShellEnfermeriaTest extends TestCase
 
             // 1. Sidebar institucional oficial unificado
             $response->assertSee('id="sidebar-enfermeria"', false);
-            $response->assertSee('REMEMBERMIND');
-            $response->assertSee('JARDÍN DE LOS RECUERDOS');
-            $response->assertSee('BUSCAR MÓDULO...');
+            $response->assertSee('RememberMind');
+            $response->assertSee('ENFERMERÍA');
+            $response->assertDontSee('BUSCAR MÓDULO...');
 
             // 2. Navegación en mayúsculas estandarizada
             $response->assertSee('MI TURNO');
@@ -61,10 +61,22 @@ class UnificacionShellEnfermeriaTest extends TestCase
             $response->assertSee('ALERTAS');
 
             // 3. Topbar institucional compartido
-            $response->assertSee('Buscar residente, habitación o diagnóstico...');
+            $response->assertSee('data-rm-topbar="nursing"', false);
+            $response->assertDontSee('Buscar residente, habitación o diagnóstico...');
+            $response->assertSee('name="buscar"', false);
+            $response->assertSee('action="'.route('admin.enfermeria.pacientes').'"', false);
             $response->assertSee('toggleDarkMode()', false);
             $response->assertSee('remembermind-theme', false);
         }
+    }
+
+    public function test_la_busqueda_del_topbar_conserva_el_termino_en_mis_residentes(): void
+    {
+        $response = $this->actingAs($this->enfermero)
+            ->get(route('admin.enfermeria.pacientes', ['buscar' => 'Elena']));
+
+        $response->assertStatus(200);
+        $response->assertSee('value="Elena"', false);
     }
 
     public function test_item_activo_se_marca_segun_la_ruta_en_el_sidebar(): void
@@ -72,11 +84,11 @@ class UnificacionShellEnfermeriaTest extends TestCase
         // Medicación
         $responseMed = $this->actingAs($this->enfermero)->get(route('admin.enfermeria.medicacion'));
         $responseMed->assertStatus(200);
-        $responseMed->assertSee('bg-[var(--rm-nav-selected)]', false);
+        $responseMed->assertSee('aria-current="page"', false);
 
         // Mi Turno
         $responseTurno = $this->actingAs($this->enfermero)->get(route('admin.enfermeria.dashboard'));
         $responseTurno->assertStatus(200);
-        $responseTurno->assertSee('bg-[var(--rm-nav-selected)]', false);
+        $responseTurno->assertSee('aria-current="page"', false);
     }
 }

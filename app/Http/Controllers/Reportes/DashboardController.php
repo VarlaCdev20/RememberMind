@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Reportes;
 
 use App\Http\Controllers\Controller;
 
+use App\Backend\Modulos\Identidad\Servicios\RolePreviewService;
+use App\Backend\Modulos\Identidad\Servicios\VisibilidadNavegacion;
 use App\Backend\Modulos\Reportes\Servicios\DashboardService;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Auth;
@@ -29,23 +31,42 @@ class DashboardController extends Controller
     /**
      * Punto de entrada principal del dashboard.
      */
-    public function index()
+    public function index(RolePreviewService $rolePreview, VisibilidadNavegacion $visibilidadNavegacion)
     {
         $usuario = Auth::user();
+        $previewRole = $rolePreview->activeRole($usuario);
 
         // 1. Auditoría institucional (Evento en ESPAÑOL con contexto extendido)
         $this->registrarAcceso($usuario);
+        $previewDashboard = match ($previewRole) {
+            'ADMINISTRADOR' => 'admin.administracion.dashboard',
+            'MEDICO GENERAL/GERIATRA' => 'admin.medico.dashboard',
+            'ENFERMEROS' => 'admin.enfermeria.dashboard',
+            'PSICOLOGO/A' => 'admin.psicologia.dashboard',
+            default => null,
+        };
+
+        if ($previewDashboard && $visibilidadNavegacion->puedeVerRuta($previewDashboard) && ! request()->routeIs($previewDashboard)) {
+            return redirect()->route($previewDashboard);
+        }
+
         // 2. Redirección basada en rol
-        if ($usuario->hasRole('MEDICO GENERAL/GERIATRA') || (!$usuario->hasAnyRole(['SUPERADMINISTRADOR', 'ADMINISTRADOR', 'superadmin', 'admin']) && $usuario->can('valoracion_medica.ver'))) {
+        if (! $rolePreview->isActive($usuario) && $visibilidadNavegacion->puedeVerRuta('admin.medico.dashboard') && ($usuario->hasRole('MEDICO GENERAL/GERIATRA') || (!$usuario->hasAnyRole(['SUPERADMINISTRADOR', 'ADMINISTRADOR', 'superadmin', 'admin']) && $usuario->can('valoracion_medica.ver')))) {
             return redirect()->route('admin.medico.dashboard');
         }
 
-        if ($usuario->hasRole('ENFERMEROS') || (!$usuario->hasAnyRole(['SUPERADMINISTRADOR', 'ADMINISTRADOR', 'superadmin', 'admin']) && $usuario->can('enfermeria.ver_dashboard'))) {
+        if (! $rolePreview->isActive($usuario) && $visibilidadNavegacion->puedeVerRuta('admin.enfermeria.dashboard') && ($usuario->hasRole('ENFERMEROS') || (!$usuario->hasAnyRole(['SUPERADMINISTRADOR', 'ADMINISTRADOR', 'superadmin', 'admin']) && $usuario->can('enfermeria.ver_dashboard')))) {
             return redirect()->route('admin.enfermeria.dashboard');
         }
 
-        if ($usuario->hasRole('PSICOLOGO/A')) {
+        if (! $rolePreview->isActive($usuario) && $visibilidadNavegacion->puedeVerRuta('admin.psicologia.dashboard') && $usuario->hasRole('PSICOLOGO/A')) {
             return redirect()->route('admin.psicologia.dashboard');
+        }
+
+        if ($visibilidadNavegacion->puedeVerRuta('admin.administracion.dashboard')
+            && ($previewRole === 'ADMINISTRADOR' || (! $rolePreview->isActive($usuario) && $usuario->hasRole('ADMINISTRADOR')))
+            && ! request()->routeIs('admin.administracion.*')) {
+            return redirect()->route('admin.administracion.dashboard');
         }
 
         // 3. Obtención de datos (Optimizado mediante Caché en el Servicio)

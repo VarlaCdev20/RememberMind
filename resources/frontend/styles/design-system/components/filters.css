@@ -1,32 +1,64 @@
 /* ============================================================
    REMEMBERMIND DESIGN SYSTEM — COMPONENTS / FILTERS
-   Patrón canónico basado en la barra compacta de filtros.
+   Patrón canónico unificado con dinamismo, UX táctil y cromática armónica.
    ============================================================ */
 
 :root {
     /* ------------------------------------------------------------
-       CONTRATO DE FILTROS / FILTER BAR
+       CONTRATO DE FILTROS / FILTER BAR (UNIFICADO FORMATO ALERTAS)
        ------------------------------------------------------------ */
-    --rm-filter-bg: var(--rm-surface-soft); /* fondo */
-    --rm-filter-control-bg: var(--rm-input-bg); /* control */
-    --rm-filter-border: var(--rm-border-soft); /* borde */
-    --rm-filter-active-bg: var(--rm-action-primary-soft); /* activo */
-    --rm-filter-focus: var(--rm-action-primary); /* foco */
+    --rm-filter-bg: var(--rm-surface-main);
+    --rm-filter-control-bg: var(--rm-input-bg);
+    --rm-filter-control-height: 38px;
+    --rm-filter-border: var(--rm-border-soft);
+    --rm-filter-active-bg: var(--rm-action-primary-soft);
+    --rm-filter-focus: var(--rm-action-primary);
 }
 
+/* ============================================================
+   1. CONTENEDOR PRINCIPAL (.rm-filter-bar)
+   ============================================================ */
 .rm-filter-bar.rm-filter-bar {
     display: flex;
     flex-direction: column;
     align-items: stretch;
-    gap: var(--rm-space-2, 0.625rem);
+    gap: 10px;
     width: 100%;
-    padding: var(--rm-space-3, 0.75rem);
-    color: var(--rm-text-body, var(--color-parrafo));
-    background: var(--rm-filter-bg);
+    padding: 11px 15px;
+    color: var(--rm-text-primary);
+    background-color: var(--rm-filter-bg);
+    background-image:
+        radial-gradient(circle at 100% 0%, var(--rm-card-trama-glow, rgba(169, 193, 170, 0.08)), transparent 45%),
+        radial-gradient(circle at center, rgba(48, 44, 42, 0.05) 1px, transparent 1px);
+    background-size: 100% 100%, 20px 20px;
     border: 1px solid var(--rm-filter-border);
-    border-radius: var(--rm-radius-card, 1rem);
-    box-shadow: var(--rm-shadow-sm, var(--sombra-card));
+    border-radius: 14px;
+    box-shadow: 0 1px 3px rgba(48, 44, 42, 0.04), 0 2px 8px -2px rgba(48, 44, 42, 0.03);
     box-sizing: border-box;
+    transition: border-color 0.22s cubic-bezier(0.16, 1, 0.3, 1),
+                box-shadow 0.22s cubic-bezier(0.16, 1, 0.3, 1),
+                background-color 0.22s ease;
+}
+
+/* Estado de interacción al enfocar cualquier control interno */
+.rm-filter-bar.rm-filter-bar:focus-within {
+    border-color: color-mix(in srgb, var(--rm-primary) 42%, var(--rm-filter-border));
+    box-shadow: 0 4px 18px -2px color-mix(in srgb, var(--rm-primary) 16%, transparent),
+                0 1px 3px rgba(48, 44, 42, 0.04);
+}
+
+:is(.dark, [data-theme="dark"]) .rm-filter-bar.rm-filter-bar {
+    background-color: var(--rm-surface-main);
+    background-image:
+        radial-gradient(circle at 100% 0%, rgba(162, 194, 236, 0.05), transparent 45%),
+        radial-gradient(circle at center, rgba(226, 232, 240, 0.065) 1px, transparent 1px);
+    background-size: 100% 100%, 20px 20px;
+    border-color: var(--rm-border);
+}
+
+:is(.dark, [data-theme="dark"]) .rm-filter-bar.rm-filter-bar:focus-within {
+    border-color: color-mix(in srgb, var(--rm-primary) 50%, var(--rm-border));
+    box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.3);
 }
 
 .rm-filter-bar__controls,
@@ -38,43 +70,108 @@
     width: 100%;
 }
 
-.rm-filter-bar :is(input:not([type='checkbox']):not([type='radio']):not([type='hidden']):not([type='submit']):not([type='button']):not([type='reset']), select),
+/* ============================================================
+   2. CONTROLES DE ENTRADA (INPUTS, SELECTS) — EXPERIENCIA PARA ESCRIBIR
+   ============================================================ */
+.rm-filter-bar :is(input:where(:not([type='checkbox']):not([type='radio']):not([type='hidden']):not([type='submit']):not([type='button']):not([type='reset'])), select),
 .rm-filter-control {
     width: 100%;
-    min-height: var(--rm-control-md, 44px);
-    padding: var(--rm-space-2) var(--rm-space-3);
-    color: var(--rm-text-body, var(--color-input-texto));
-    font-family: var(--rm-font-family);
-    font-size: var(--rm-font-size-table, 14px);
-    font-weight: var(--rm-font-weight-semibold, 600);
+    min-height: var(--rm-filter-control-height, 38px);
+    height: var(--rm-filter-control-height, 38px);
+    padding: 0 12px;
+    color: var(--rm-text-primary);
+    font-family: var(--rm-font-body);
+    font-size: 12px;
+    font-weight: 500;
     line-height: 1.25rem;
-    background: var(--rm-filter-control-bg, var(--color-input-bg));
-    border: 1px solid var(--rm-filter-border, var(--color-input-borde));
-    border-radius: var(--rm-radius-md, 0.75rem);
+    background: var(--rm-filter-control-bg, var(--rm-input-bg));
+    border: 1px solid var(--rm-filter-border, var(--rm-border));
+    border-radius: 12px;
     outline: none;
     box-sizing: border-box;
-    transition: border-color var(--rm-duration-fast, 150ms) ease,
-                box-shadow var(--rm-duration-fast, 150ms) ease,
-                background-color var(--rm-duration-fast, 150ms) ease;
+    transition: border-color var(--rm-duration-fast, 150ms) cubic-bezier(0.16, 1, 0.3, 1),
+                box-shadow var(--rm-duration-fast, 150ms) cubic-bezier(0.16, 1, 0.3, 1),
+                background-color var(--rm-duration-fast, 150ms) ease,
+                transform 0.15s ease;
 }
 
-.rm-filter-bar :is(input:not([type='checkbox']):not([type='radio']):not([type='hidden']):not([type='submit']):not([type='button']):not([type='reset']), select):hover,
+.rm-filter-bar :is(input:where(:not([type='checkbox']):not([type='radio']):not([type='hidden']):not([type='submit']):not([type='button']):not([type='reset'])), select):hover,
 .rm-filter-control:hover {
     border-color: var(--rm-border-hover, var(--color-input-borde-hover));
+    background-color: color-mix(in srgb, var(--rm-surface-raised) 75%, var(--rm-filter-control-bg, var(--rm-input-bg)));
 }
 
-.rm-filter-bar :is(input:not([type='checkbox']):not([type='radio']):not([type='hidden']):not([type='submit']):not([type='button']):not([type='reset']), select):focus,
+.rm-filter-bar :is(input:where(:not([type='checkbox']):not([type='radio']):not([type='hidden']):not([type='submit']):not([type='button']):not([type='reset'])), select):focus,
 .rm-filter-control:focus {
-    background: var(--rm-filter-control-bg, var(--color-fondo-input));
-    border-color: var(--rm-filter-focus, var(--color-input-borde-focus)) !important;
-    box-shadow: 0 0 0 3px color-mix(in srgb, var(--rm-filter-focus) 28%, transparent) !important;
+    background: var(--rm-surface-raised, rgb(255 255 255)) !important;
+    border-color: var(--rm-primary) !important;
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--rm-primary) 22%, transparent),
+                0 2px 8px -2px color-mix(in srgb, var(--rm-primary) 20%, transparent) !important;
+}
+
+/* Una selección aplicada permanece visible incluso después de perder el foco. */
+.rm-filter-bar [data-rm-filter-tone="blue"] {
+    --rm-filter-tone-accent: var(--rm-clinical);
+}
+
+.rm-filter-bar [data-rm-filter-tone="violet"] {
+    --rm-filter-tone-accent: var(--rm-violet);
+}
+
+.rm-filter-bar [data-rm-filter-tone="teal"] {
+    --rm-filter-tone-accent: var(--rm-cyan);
+}
+
+.rm-filter-bar [data-rm-filter-tone="green"] {
+    --rm-filter-tone-accent: var(--rm-action-primary-active);
+}
+
+.rm-filter-bar [data-rm-filter-tone="orange"] {
+    --rm-filter-tone-accent: var(--rm-status-high);
+}
+
+.rm-filter-bar.rm-filter-bar :is(
+    select:has(option:checked:not(:first-child)),
+    input[placeholder]:not(:placeholder-shown),
+    [data-rm-filter-active="true"]
+):not(:disabled):not([aria-invalid="true"]),
+.rm-filter-control[data-rm-filter-active="true"]:not(:disabled):not([aria-invalid="true"]) {
+    background: color-mix(in srgb, var(--rm-filter-tone-accent, var(--rm-action-primary)) 25%, var(--rm-surface-main)) !important;
+    border: 2px solid var(--rm-filter-tone-accent, var(--rm-action-primary-active)) !important;
+    color: color-mix(in srgb, var(--rm-filter-tone-accent, var(--rm-action-primary-ink)) 60%, var(--rm-text-primary)) !important;
+    font-weight: 700 !important;
+    box-shadow: inset 3px 0 0 var(--rm-filter-tone-accent, var(--rm-action-primary-active)),
+                0 0 0 1px color-mix(in srgb, var(--rm-filter-tone-accent, var(--rm-action-primary)) 35%, transparent) !important;
+}
+
+.rm-filter-bar.rm-filter-bar :is(
+    select:has(option:checked:not(:first-child)),
+    input[placeholder]:not(:placeholder-shown),
+    [data-rm-filter-active="true"]
+):not(:disabled):not([aria-invalid="true"]):focus,
+.rm-filter-control[data-rm-filter-active="true"]:not(:disabled):not([aria-invalid="true"]):focus {
+    background: color-mix(in srgb, var(--rm-filter-tone-accent, var(--rm-action-primary)) 25%, var(--rm-surface-main)) !important;
+    border-color: var(--rm-filter-tone-accent, var(--rm-action-primary-active)) !important;
+    box-shadow: inset 3px 0 0 var(--rm-filter-tone-accent, var(--rm-action-primary-active)),
+                0 0 0 3px color-mix(in srgb, var(--rm-focus) 38%, transparent) !important;
+}
+
+.rm-filter-bar :is(.rm-filter-search, .relative):has(input[data-rm-filter-active="true"]) > :is(.rm-filter-search-icon, span.pointer-events-none) {
+    color: var(--rm-clinical-strong);
 }
 
 .rm-filter-bar input::placeholder,
 .rm-filter-control::placeholder {
     color: var(--rm-input-placeholder, var(--color-input-placeholder));
+    font-weight: 400;
+    transition: color 0.18s ease;
 }
 
+.rm-filter-bar input:focus::placeholder {
+    color: color-mix(in srgb, var(--rm-input-placeholder) 60%, transparent);
+}
+
+/* Indicador dinámico de búsqueda y escritura */
 .rm-filter-search {
     position: relative;
     min-width: 0;
@@ -86,7 +183,8 @@
     padding-right: 2rem;
 }
 
-.rm-filter-search-icon {
+.rm-filter-search-icon,
+.rm-filter-bar .relative > span.pointer-events-none {
     position: absolute;
     inset-block: 0;
     left: 0;
@@ -96,45 +194,45 @@
     padding-left: 0.75rem;
     color: var(--rm-text-secondary, var(--color-texto-apoyo));
     pointer-events: none;
+    transition: color 0.18s ease, transform 0.18s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.rm-filter-clear {
+.rm-filter-bar .relative:focus-within > span.pointer-events-none {
+    color: var(--rm-primary) !important;
+    transform: scale(1.08);
+}
+
+/* Botón de borrado reactivo al escribir */
+.rm-filter-clear,
+.rm-filter-bar button[title*="Limpiar"] {
     position: absolute;
     inset-block: 0;
     right: 0;
-    z-index: 1;
+    z-index: 2;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     padding-inline: 0.625rem;
     color: var(--rm-text-secondary, var(--color-texto-apoyo));
-    transition: color var(--rm-duration-fast, 150ms) ease;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    animation: rmPopIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.rm-filter-clear:hover {
-    color: var(--rm-filter-focus, var(--color-boton-acento));
+.rm-filter-clear:hover,
+.rm-filter-bar button[title*="Limpiar"]:hover {
+    color: var(--rm-danger, rgb(217 121 95)) !important;
+    transform: scale(1.15) rotate(90deg);
 }
 
-.rm-filter-label {
-    display: block;
-    margin-bottom: 0.25rem;
-    color: var(--rm-text-primary, var(--color-label));
-    font-family: var(--rm-font-family);
-    font-size: var(--rm-font-size-meta, 13px);
-    font-weight: var(--rm-font-weight-bold, 700);
-    letter-spacing: var(--rm-letter-spacing-wide, 0.04em);
-    text-transform: uppercase;
+@keyframes rmPopIn {
+    0% { transform: scale(0.65); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
 }
 
-.rm-filter-bar label {
-    color: var(--rm-text-primary, var(--color-label));
-    font-family: var(--rm-font-family);
-    font-size: var(--rm-font-size-meta, 13px);
-    font-weight: var(--rm-font-weight-bold, 700);
-    letter-spacing: var(--rm-letter-spacing-wide, 0.04em);
-    text-transform: uppercase;
-}
-
+/* ============================================================
+   3. FILA DE FILTROS ACTIVOS — DESPLAZABLE Y CON COLORCITOS
+   ============================================================ */
 .rm-filter-bar__active {
     display: flex;
     flex-wrap: wrap;
@@ -142,117 +240,255 @@
     justify-content: space-between;
     gap: var(--rm-space-2, 0.5rem);
     width: 100%;
-    padding-top: var(--rm-space-2, 0.625rem);
+    padding-top: 8px;
     color: var(--rm-text-body, var(--color-parrafo));
     font-size: var(--rm-font-size-meta, 13px);
-    border-top: 1px solid var(--rm-filter-border, var(--color-borde-medio));
+    border-top: 1px solid color-mix(in srgb, var(--rm-filter-border) 80%, transparent);
 }
 
+/* Contenedor desplazable suave para chips en móvil/tablet/desktop */
+.rm-filter-bar__active > :first-child,
+.rm-filter-scroll,
+.rm-filter-bar__active-chips {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    white-space: nowrap;
+    scrollbar-width: thin;
+    scrollbar-color: color-mix(in srgb, var(--rm-primary) 35%, transparent) transparent;
+    max-width: 100%;
+    min-width: 0;
+    flex: 1 1 auto;
+    padding-block: 2px;
+}
+
+.rm-filter-bar__active > :first-child::-webkit-scrollbar,
+.rm-filter-scroll::-webkit-scrollbar,
+.rm-filter-bar__active-chips::-webkit-scrollbar {
+    height: 3px;
+}
+
+.rm-filter-bar__active > :first-child::-webkit-scrollbar-thumb,
+.rm-filter-scroll::-webkit-scrollbar-thumb,
+.rm-filter-bar__active-chips::-webkit-scrollbar-thumb {
+    background: color-mix(in srgb, var(--rm-primary) 40%, var(--rm-border));
+    border-radius: 9999px;
+}
+
+/* Etiqueta / Badge "Filtros activos:" con acento de color */
 .rm-filter-bar__active-label {
     display: inline-flex;
     align-items: center;
-    gap: 0.25rem;
-    margin-right: 0.25rem;
-    color: var(--rm-text-secondary, var(--color-texto-apoyo));
-    font-size: var(--rm-font-size-meta, 13px);
-    font-weight: var(--rm-font-weight-bold, 700);
+    gap: 0.35rem;
+    padding: 0.22rem 0.55rem;
+    background: color-mix(in srgb, var(--rm-primary) 16%, var(--rm-surface-main));
+    border: 1px solid color-mix(in srgb, var(--rm-primary) 32%, transparent);
+    border-radius: 8px;
+    color: var(--rm-action-primary-ink, var(--rm-text-primary));
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.02em;
+    flex-shrink: 0;
+    user-select: none;
 }
 
+.rm-filter-bar__active-label i {
+    color: var(--rm-action-primary-ink, var(--rm-primary));
+    font-size: 12px;
+}
+
+/* ============================================================
+   4. CHIPS DE FILTRO CON COLORCITOS ARMÓNICOS
+   ============================================================ */
 .rm-filter-chip,
-.rm-filter-bar__active > :first-child > span:not(.rm-filter-bar__active-label) {
+.rm-filter-bar__active span.inline-flex:not(.rm-filter-bar__active-label) {
     display: inline-flex;
     align-items: center;
-    gap: 0.25rem;
+    gap: 0.35rem;
     min-height: 1.625rem;
-    padding: 0.125rem 0.625rem;
-    color: var(--rm-text-primary);
-    font-size: var(--rm-font-size-meta, 13px);
-    font-weight: var(--rm-font-weight-semibold, 600);
-    background: var(--rm-filter-active-bg);
-    border: 1px solid var(--rm-filter-border);
-    border-radius: var(--rm-radius-sm, 0.5rem);
+    padding: 0.15rem 0.65rem;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--rm-action-primary-ink);
+    background: color-mix(in srgb, var(--rm-action-primary) 21%, var(--rm-surface-main));
+    border: 1px solid var(--rm-action-primary-active);
+    border-radius: 9px;
+    transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 1px 2px rgba(48, 44, 42, 0.03);
+    flex-shrink: 0;
+    user-select: none;
+}
+
+.rm-filter-chip:hover,
+.rm-filter-bar__active span.inline-flex:not(.rm-filter-bar__active-label):hover {
+    transform: translateY(-1px);
+    box-shadow: 0 3px 8px -2px rgba(48, 44, 42, 0.08);
+}
+
+.rm-filter-bar.rm-filter-bar .rm-filter-bar__active [data-rm-filter-tone]:is(.rm-filter-chip, span.inline-flex):not([class*="rm-filter-chip--"]) {
+    background: color-mix(in srgb, var(--rm-filter-tone-accent) 22%, var(--rm-surface-main)) !important;
+    border-color: var(--rm-filter-tone-accent) !important;
+    color: color-mix(in srgb, var(--rm-filter-tone-accent) 60%, var(--rm-text-primary)) !important;
 }
 
 .rm-filter-chip button,
-.rm-filter-bar__active > :first-child > span:not(.rm-filter-bar__active-label) button {
-    color: var(--rm-text-secondary, var(--color-texto-apoyo));
-    transition: color var(--rm-duration-fast, 150ms) ease;
+.rm-filter-bar__active span.inline-flex:not(.rm-filter-bar__active-label) button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 14px;
+    height: 14px;
+    border-radius: 9999px;
+    color: currentColor;
+    opacity: 0.75;
+    transition: all 0.18s ease;
+    cursor: pointer;
 }
 
 .rm-filter-chip button:hover,
-.rm-filter-bar__active > :first-child > span:not(.rm-filter-bar__active-label) button:hover {
-    color: var(--rm-filter-focus, var(--color-boton-acento));
+.rm-filter-bar__active span.inline-flex:not(.rm-filter-bar__active-label) button:hover {
+    opacity: 1;
+    transform: scale(1.2) rotate(90deg);
 }
 
-.rm-filter-count,
-.rm-filter-bar__active > :last-child > span {
-    display: inline-flex;
-    align-items: center;
-    min-height: 1.625rem;
-    padding: 0.125rem 0.625rem;
-    color: var(--rm-text-primary, var(--color-titulo));
-    font-size: var(--rm-font-size-meta, 13px);
-    font-weight: var(--rm-font-weight-extrabold, 800);
-    background: var(--rm-surface-soft, var(--color-fondo-card-suave));
-    border: 1px solid var(--rm-filter-border, var(--color-borde-suave));
-    border-radius: var(--rm-radius-pill, 9999px);
+/* Chips temáticos con "colorcitos" */
+.rm-filter-chip--search {
+    background: color-mix(in srgb, var(--rm-clinical) 14%, var(--rm-surface-main)) !important;
+    border: 1px solid color-mix(in srgb, var(--rm-clinical) 32%, transparent) !important;
+    color: var(--rm-clinical-strong, var(--rm-text-primary)) !important;
 }
 
-.rm-filter-reset,
-.rm-filter-bar__active > :last-child > button {
+.rm-filter-chip--danger,
+.rm-filter-chip--critico {
+    background: color-mix(in srgb, var(--rm-danger) 14%, var(--rm-surface-main)) !important;
+    border: 1px solid color-mix(in srgb, var(--rm-danger) 32%, transparent) !important;
+    color: var(--rm-danger-strong, var(--rm-danger)) !important;
+}
+
+.rm-filter-chip--warning,
+.rm-filter-chip--preventivo,
+.rm-filter-chip--observacion {
+    background: color-mix(in srgb, var(--rm-status-high) 14%, var(--rm-surface-main)) !important;
+    border: 1px solid color-mix(in srgb, var(--rm-status-high) 32%, transparent) !important;
+    color: var(--rm-status-high, var(--rm-text-primary)) !important;
+}
+
+.rm-filter-chip--success,
+.rm-filter-chip--estable,
+.rm-filter-chip--normal {
+    background: color-mix(in srgb, var(--rm-action-primary) 18%, var(--rm-surface-main)) !important;
+    border: 1px solid color-mix(in srgb, var(--rm-action-primary) 36%, transparent) !important;
+    color: var(--rm-action-primary-ink, var(--rm-text-primary)) !important;
+}
+
+.rm-filter-chip--info,
+.rm-filter-chip--clinical {
+    background: color-mix(in srgb, var(--rm-cyan) 14%, var(--rm-surface-main)) !important;
+    border: 1px solid color-mix(in srgb, var(--rm-cyan) 32%, transparent) !important;
+    color: var(--rm-cyan-strong, var(--rm-text-primary)) !important;
+}
+
+/* ============================================================
+   5. BOTÓN LIMPIAR FILTROS INTERACTIVO
+   ============================================================ */
+.rm-filter-bar__clear-btn,
+.rm-filter-reset {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 0.25rem;
-    min-height: 1.75rem;
-    padding: 0.25rem 0.625rem;
-    color: var(--rm-text-secondary);
-    font-size: var(--rm-font-size-meta, 13px);
-    font-weight: var(--rm-font-weight-bold, 700);
-    background: transparent;
-    border: 1px solid var(--rm-filter-border);
-    border-radius: var(--rm-radius-md, 0.75rem);
-    transition: background-color var(--rm-duration-fast, 150ms) ease,
-                border-color var(--rm-duration-fast, 150ms) ease;
+    gap: 0.35rem;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 0.28rem 0.65rem;
+    border-radius: 10px;
+    border: 1px solid color-mix(in srgb, var(--rm-status-high) 28%, var(--rm-border));
+    background: color-mix(in srgb, var(--rm-status-high) 8%, var(--rm-surface-main));
+    color: var(--rm-status-high, var(--rm-danger));
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    flex-shrink: 0;
+    user-select: none;
 }
 
-.rm-filter-reset:hover,
-.rm-filter-bar__active > :last-child > button:hover {
-    background: var(--rm-filter-bg);
-    border-color: var(--rm-border-hover);
-    color: var(--rm-text-primary);
+.rm-filter-bar__clear-btn:hover,
+.rm-filter-reset:hover {
+    background: color-mix(in srgb, var(--rm-danger) 16%, var(--rm-surface-main));
+    border-color: var(--rm-danger);
+    color: var(--rm-danger);
+    transform: translateY(-1px);
+    box-shadow: 0 3px 10px -2px color-mix(in srgb, var(--rm-danger) 28%, transparent);
 }
 
-.rm-filter-toggle {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.375rem;
-    min-height: var(--rm-control-md, 44px);
-    padding: 0.5rem 0.75rem;
-    color: var(--rm-text-primary);
-    font-size: var(--rm-font-size-table, 14px);
-    font-weight: var(--rm-font-weight-bold, 700);
-    background: transparent;
-    border: 1px solid var(--rm-filter-border);
-    border-radius: var(--rm-radius-md, 0.75rem);
-    transition: background-color var(--rm-duration-fast, 150ms) ease,
-                color var(--rm-duration-fast, 150ms) ease;
+.rm-filter-bar__clear-btn:hover i,
+.rm-filter-reset:hover i {
+    transform: rotate(-180deg);
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.rm-filter-toggle:hover,
-.rm-filter-toggle.is-active {
-    color: var(--rm-text-on-primary);
-    background: var(--rm-filter-focus);
+.rm-filter-bar__clear-btn:active,
+.rm-filter-reset:active {
+    transform: scale(0.96);
 }
 
-.rm-filter-actions {
+/* ============================================================
+   6. PÍLDORAS Y CATEGORÍAS DESPLAZABLES (.rm-filter-pills)
+   ============================================================ */
+.rm-filter-pills {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: 0.4rem;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    white-space: nowrap;
+    scrollbar-width: none;
+    padding-block: 2px;
+}
+
+.rm-filter-pills::-webkit-scrollbar {
+    display: none;
+}
+
+.rm-filter-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.35rem 0.75rem;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 700;
+    border: 1px solid var(--rm-border);
+    background: var(--rm-surface-alt);
+    color: var(--rm-text-secondary);
+    cursor: pointer;
+    transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+    user-select: none;
     flex-shrink: 0;
 }
 
+.rm-filter-pill:hover {
+    background: var(--rm-surface-raised);
+    color: var(--rm-text-primary);
+    border-color: var(--rm-border-hover);
+    transform: translateY(-1px);
+}
+
+.rm-filter-pill.is-active,
+.rm-filter-pill--active {
+    background: var(--rm-action-primary);
+    color: var(--rm-text-inverse, rgb(255 255 255));
+    border-color: var(--rm-action-primary-hover);
+    box-shadow: 0 2px 8px -1px color-mix(in srgb, var(--rm-action-primary) 40%, transparent);
+    transform: translateY(-1px);
+}
+
+/* ============================================================
+   7. RESPONSIVIDAD
+   ============================================================ */
 @media (min-width: 640px) {
     .rm-filter-bar__controls,
     .rm-filter-group {
@@ -268,14 +504,16 @@
 }
 
 @media (max-width: 639px) {
-    .rm-filter-bar__active,
-    .rm-filter-bar__active > :last-child {
+    .rm-filter-bar__active {
+        flex-direction: column;
         align-items: stretch;
-        width: 100%;
+        gap: 0.625rem;
     }
 
     .rm-filter-bar__active > :last-child {
         display: flex;
+        align-items: center;
         justify-content: space-between;
+        width: 100%;
     }
 }

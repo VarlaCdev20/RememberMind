@@ -2,20 +2,25 @@
 
 namespace App\Frontend\Livewire\Compartido\Clinica;
 
-use Livewire\Component;
-use Livewire\WithPagination;
 use App\Models\AdultoMayor;
-use App\Models\AdministracionMedicacion;
+use App\Models\Alerta;
+use App\Models\Atencion;
 use App\Models\Prescripcion;
 use App\Models\SignoVital;
+use App\Models\ValoracionFuncional;
+use Livewire\Component;
+use Livewire\WithPagination;
 
 class SaludSeguimientoListPanel extends Component
 {
     use WithPagination;
 
     public $search = '';
+
     public string $filtroEstado = '';
+
     public string $seccionActiva = 'resumen';
+
     public ?AdultoMayor $adultoSeleccionadoParaModal = null;
 
     protected $queryString = [
@@ -76,9 +81,11 @@ class SaludSeguimientoListPanel extends Component
     protected function validarPermisoSeccion()
     {
         $user = auth()->user();
-        if ($user->hasRole('SUPERADMINISTRADOR')) return;
+        if ($user->hasRole('SUPERADMINISTRADOR')) {
+            return;
+        }
 
-        $permitido = match($this->seccionActiva) {
+        $permitido = match ($this->seccionActiva) {
             'ficha' => $user->can('atenciones.ver'),
             'signos' => $user->can('signos_vitales.ver'),
             'medicacion' => $user->can('prescripciones.ver'),
@@ -91,7 +98,7 @@ class SaludSeguimientoListPanel extends Component
             default => true, // resumen
         };
 
-        if (!$permitido) {
+        if (! $permitido) {
             $this->seccionActiva = 'resumen';
         }
     }
@@ -138,7 +145,7 @@ class SaludSeguimientoListPanel extends Component
             ];
         } elseif ($this->seccionActiva === 'signos') {
             $context = [
-                'titulo' => 'Signos vitales',
+                'titulo' => 'Signos Vitales',
                 'descripcion' => 'Seleccione un adulto mayor para registrar o revisar controles de signos vitales.',
                 'boton' => 'Registrar signos vitales',
                 'ruta_destino' => 'admin.salud-seguimiento.signos',
@@ -169,21 +176,31 @@ class SaludSeguimientoListPanel extends Component
     {
         $query = AdultoMayor::query()
             ->with([
-                'fichasMedicas' => function($q) { $q->latest('fecha_hora')->limit(1); },
-                'medicaciones' => function($q) { $q->whereIn('estado', ['ACTIVA', 'ACTIVO']); },
-                'valoracionesFuncionales' => function($q) { $q->latest('fecha_hora')->limit(1); },
-                'signosVitales' => function($q) { $q->where('estado', '!=', 'ANULADO')->latest('fecha_hora')->limit(1); },
-                'administracionesMedicacion' => function($q) { $q->latest('fecha_hora_programada')->limit(3); },
+                'fichasMedicas' => function ($q) {
+                    $q->latest('fecha_hora')->limit(1);
+                },
+                'medicaciones' => function ($q) {
+                    $q->whereIn('estado', ['ACTIVA', 'ACTIVO']);
+                },
+                'valoracionesFuncionales' => function ($q) {
+                    $q->latest('fecha_hora')->limit(1);
+                },
+                'signosVitales' => function ($q) {
+                    $q->where('estado', '!=', 'ANULADO')->latest('fecha_hora')->limit(1);
+                },
+                'administracionesMedicacion' => function ($q) {
+                    $q->latest('fecha_hora_programada')->limit(3);
+                },
             ])
             ->where(function ($q) {
                 $term = trim($this->search);
                 $q->where('nombres', 'like', "%{$term}%")
-                  ->orWhere('apellido_paterno', 'like', "%{$term}%")
-                  ->orWhere('apellido_materno', 'like', "%{$term}%")
-                  ->orWhere('numero_documento', 'like', "%{$term}%");
+                    ->orWhere('apellido_paterno', 'like', "%{$term}%")
+                    ->orWhere('apellido_materno', 'like', "%{$term}%")
+                    ->orWhere('numero_documento', 'like', "%{$term}%");
             });
 
-        if (!empty($this->filtroEstado)) {
+        if (! empty($this->filtroEstado)) {
             $query->where('estado', $this->filtroEstado);
         }
 
@@ -191,15 +208,15 @@ class SaludSeguimientoListPanel extends Component
 
         $stats = [
             'seguimientos_activos' => AdultoMayor::whereNotIn('estado', ['ARCHIVADO', 'INACTIVO'])->count(),
-            'total_fichas' => \App\Models\Atencion::count(),
-            'signos_recientes' => \App\Models\SignoVital::where('fecha_hora', '>=', now()->subDays(7))->count(),
-            'medicaciones_activas' => \App\Models\Prescripcion::whereIn('estado', ['ACTIVA', 'ACTIVO'])->count(),
-            'controles_hoy' => \App\Models\SignoVital::whereDate('fecha_hora', today())->count(),
-            'valoraciones' => \App\Models\ValoracionFuncional::where('fecha_hora', '>=', now()->subDays(30))->count(),
-            'alertas_pendientes' => \App\Models\Alerta::whereIn('estado', ['ABIERTA', 'EN_ATENCION'])->count(),
+            'total_fichas' => Atencion::count(),
+            'signos_recientes' => SignoVital::where('fecha_hora', '>=', now()->subDays(7))->count(),
+            'medicaciones_activas' => Prescripcion::whereIn('estado', ['ACTIVA', 'ACTIVO'])->count(),
+            'controles_hoy' => SignoVital::whereDate('fecha_hora', today())->count(),
+            'valoraciones' => ValoracionFuncional::where('fecha_hora', '>=', now()->subDays(30))->count(),
+            'alertas_pendientes' => Alerta::whereIn('estado', ['ABIERTA', 'EN_ATENCION'])->count(),
             'adultos_sin_ficha' => 0,
         ];
-        
+
         return view('livewire.clinica.salud-seguimiento-list-panel', [
             'adultos' => $adultos,
             'contexto' => $this->getContext(),

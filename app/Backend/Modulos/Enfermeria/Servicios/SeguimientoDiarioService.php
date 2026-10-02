@@ -124,7 +124,7 @@ final class SeguimientoDiarioService
                     'tipo_apoyo' => $datos['tipo_apoyo'] ?: ($datos['movilidad'] === 'INDEPENDIENTE' ? null : $datos['movilidad']),
                     'dispositivo' => $datos['dispositivo'] ?: null,
                     'fatiga' => $datos['fatiga'] ?: null,
-                    'riesgo_caida' => $datos['riesgo_caida'] ?: ($datos['intento_caminar_solo'] ? 'ALTO' : null),
+                    'riesgo_caida' => $datos['riesgo_caida'] ?: ($datos['intento_caminar_solo'] ? 'INTENTO_CAMINAR_SOLO' : null),
                     'observacion' => $datos['observacion'],
                     'estado' => 'VIGENTE',
                 ]
@@ -271,7 +271,7 @@ final class SeguimientoDiarioService
             'tipo_apoyo' => $movilidad?->tipo_apoyo,
             'dispositivo' => $movilidad?->dispositivo,
             'fatiga' => $movilidad?->fatiga,
-            'riesgo_caida' => $movilidad?->riesgo_caida,
+            'riesgo_caida' => $movilidad?->riesgo_caida === 'INTENTO_CAMINAR_SOLO' ? null : $movilidad?->riesgo_caida,
             'intento_caminar_solo' => $movilidad?->riesgo_caida === 'INTENTO_CAMINAR_SOLO',
             'sueno' => $sueno?->calidad,
             'horas_sueno' => $sueno?->horas_sueno,

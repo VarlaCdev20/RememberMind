@@ -51,7 +51,7 @@ config/
 database/
   migrations/                    # evolución incremental y restricciones
   seeders/Catalogs/               # mínimos de producto idempotentes
-  seeders/Demo/                   # nunca requeridos en producción
+  seeders/Local/                  # ejemplos exclusivos de local/testing
   factories/                     # datos ficticios coherentes para pruebas
 tests/
   Feature/<Modulo>/              # HTTP + Livewire + scope + archivos
@@ -129,4 +129,3 @@ Transacciones cortas de DB, bloqueos en orden estable (estancia→camas ordenada
 No fijar cobertura porcentual artificial. Cada invariante anterior necesita prueba observable, incluyendo llamada Livewire directa, HTTP y PostgreSQL para constraints/concurrencia. SQLite en memoria puede seguir para tests rápidos compatibles; no prueba ILIKE, rangos, locks o triggers PostgreSQL. Suite PostgreSQL usa BD desechable separada con guardia que rechaza host/nombre de producción. Probar migración con snapshot anonimizado y manifiesto; no tests que solo repiten getters ni snapshots masivos de HTML.
 
 Migrar referencia a namespaces/clases exige morph map estable y adaptación de jobs/logs. Rutas api.php no se activan por defecto ni se introduce API clínica porque existan tokens Sanctum. Mantener frontend tecnológico y optimizar únicamente formularios, navegación, reutilización, accesibilidad y carga de datos.
-

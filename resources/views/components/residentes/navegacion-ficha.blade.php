@@ -1,4 +1,5 @@
 @props(['adulto'])
+@inject('visibilidadNavegacion', 'App\Backend\Modulos\Identidad\Servicios\VisibilidadNavegacion')
 
 @php
     $codigo = data_get($adulto, 'cod_residente');
@@ -17,12 +18,12 @@
             <i class="ph-bold ph-identification-card"></i> Expediente 360°
         </a>
 
-        @can('enfermeria.ver_ficha_paciente')
+        @if($visibilidadNavegacion->puedeVerRuta('admin.enfermeria.pacientes.ficha', 'enfermeria.ver_ficha_paciente'))
             @php $ficha360 = $enlace('admin.enfermeria.pacientes.ficha', $codigo); @endphp
             <a href="{{ $ficha360['href'] }}" @class(['rm-patient-nav-link', 'is-active' => $ficha360['activo']])>
                 <i class="ph-bold ph-first-aid-kit"></i> Atención de Enfermería
             </a>
-        @endcan
+        @endif
 
         @can('salud.ver')
             @foreach([
@@ -30,10 +31,12 @@
                 ['medicacion', 'ph-pill', 'Medicamentos'], ['administracion', 'ph-check-circle', 'Administraciones'],
                 ['valoracion', 'ph-clipboard-text', 'Valoración funcional'], ['evaluaciones-geriatricas', 'ph-brain', 'VGI'],
             ] as [$ruta, $icono, $texto])
+                @if($visibilidadNavegacion->puedeVerRuta('admin.salud-seguimiento.'.$ruta))
                 @php $item = $enlace('admin.salud-seguimiento.'.$ruta, $codigo); @endphp
                 <a href="{{ $item['href'] }}" @class(['rm-patient-nav-link', 'is-active' => $item['activo']])>
                     <i class="ph-bold {{ $icono }}"></i> {{ $texto }}
                 </a>
+                @endif
             @endforeach
         @endcan
 
@@ -42,19 +45,21 @@
                 ['atenciones', 'ph-stethoscope', 'Atenciones'], ['observaciones', 'ph-note-pencil', 'Notas y evolución'],
                 ['documentos', 'ph-folder-open', 'Documentos'],
             ] as [$ruta, $icono, $texto])
+                @if($visibilidadNavegacion->puedeVerRuta('admin.adultos-mayores.'.$ruta.'.index'))
                 @php $item = $enlace('admin.adultos-mayores.'.$ruta.'.index', $codigo); @endphp
                 <a href="{{ $item['href'] }}" @class(['rm-patient-nav-link', 'is-active' => $item['activo']])>
                     <i class="ph-bold {{ $icono }}"></i> {{ $texto }}
                 </a>
+                @endif
             @endforeach
         @endcan
 
-        @can('residentes_contactos.ver')
+        @if($visibilidadNavegacion->puedeVerRuta('admin.familia-social.red-apoyo', 'residentes_contactos.ver'))
             @php $red = $enlace('admin.familia-social.red-apoyo', ['adulto' => $codigo]); @endphp
             <a href="{{ $red['href'] }}" @class(['rm-patient-nav-link', 'is-active' => $red['activo']])>
                 <i class="ph-bold ph-users-three"></i> Red de apoyo
             </a>
-        @endcan
+        @endif
     </div>
 </nav>
 @endif

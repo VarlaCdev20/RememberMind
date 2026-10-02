@@ -48,6 +48,7 @@ class EvaluacionGeriatricaAreaModal extends Component
 
     public function mount(): void
     {
+        $this->autorizarCreacion();
         $this->fecha_eval = date('Y-m-d');
         $this->hora_eval = date('H:i');
         $this->pacientes = AdultoMayor::whereIn('estado', ['ACTIVO', 'ADMITIDO'])
@@ -57,6 +58,7 @@ class EvaluacionGeriatricaAreaModal extends Component
 
     public function abrir(array $data): void
     {
+        $this->autorizarCreacion();
         $this->resetForm();
         $this->cod_residente = $data['cod_residente'] ?? null;
 
@@ -135,6 +137,7 @@ class EvaluacionGeriatricaAreaModal extends Component
 
     public function guardar(): void
     {
+        $this->autorizarCreacion();
         $this->validate();
 
         try {
@@ -172,6 +175,11 @@ class EvaluacionGeriatricaAreaModal extends Component
                 'message' => 'Ocurrió un error: '.$e->getMessage(),
             ]);
         }
+    }
+
+    private function autorizarCreacion(): void
+    {
+        abort_unless(auth()->user()?->estado === 'ACTIVO' && auth()->user()->can('aplicaciones_instrumento.crear'), 403);
     }
 
     private function resetForm(): void

@@ -75,6 +75,40 @@ class AlertasFlujoTest extends TestCase
         $this->assertSame('CERRADA', $alerta->fresh()->estado);
     }
 
+    public function test_control_sin_mediciones_no_genera_alerta_clinica(): void
+    {
+        [$user, $adulto] = $this->preparar(['alertas.ver', 'alertas.gestionar']);
+        SignoVital::create([
+            'cod_residente' => $adulto->cod_residente,
+            'cod_personal' => $user->personal->cod_personal,
+            'fecha_hora' => today()->setTime(10, 0),
+            'estado' => 'VIGENTE',
+        ]);
+
+        $this->assertSame(0, app(DeteccionAlertasService::class)->detectar());
+        $this->assertDatabaseMissing('alertas', ['cod_residente' => $adulto->cod_residente, 'modulo' => 'SIGNOS']);
+    }
+
+    public function test_la_alerta_preventiva_considera_controles_vigentes(): void
+    {
+        [$user, $adulto] = $this->preparar(['alertas.ver', 'alertas.gestionar']);
+        SignoVital::create([
+            'cod_residente' => $adulto->cod_residente,
+            'cod_personal' => $user->personal->cod_personal,
+            'fecha_hora' => today()->setTime(10, 0),
+            'saturacion_oxigeno' => 91.5,
+            'estado' => 'VIGENTE',
+        ]);
+
+        app(DeteccionAlertasService::class)->detectarPreventivas($adulto->cod_residente);
+
+        $this->assertDatabaseHas('alertas', [
+            'cod_residente' => $adulto->cod_residente,
+            'modulo' => 'SIGNOS',
+            'tipo' => 'SIGNOS FUERA DE RANGO',
+        ]);
+    }
+
     public function test_usuario_no_autorizado_no_puede_atender_ni_cerrar(): void
     {
         [, $adulto] = $this->preparar(['alertas.ver']);

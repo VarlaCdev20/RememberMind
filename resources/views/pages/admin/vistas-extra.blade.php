@@ -19,17 +19,17 @@
 
         @foreach($grupos as $titulo => $vistas)
             <section class="rm-card overflow-hidden">
-                <header class="border-b border-borde bg-fondo-hover px-5 py-4">
-                    <h2 class="text-sm font-black uppercase tracking-wider text-titulo">{{ $titulo }}</h2>
+                <header class="border-b border-[var(--rm-border)] bg-[var(--rm-surface-soft)] px-5 py-4">
+                    <h2 class="text-sm font-black uppercase tracking-wider text-[var(--rm-text-primary)]">{{ $titulo }}</h2>
                 </header>
                 <div class="overflow-x-auto">
-                    <table class="rm-table min-w-full">
+                    <table class="rm-data-table rm-data-table--actions rm-table min-w-full">
                         <thead class="rm-table-header"><tr><th>Vista</th><th>Motivo de revisión</th><th class="text-right">Acción</th></tr></thead>
                         <tbody>
                             @foreach($vistas as [$nombre, $ruta, $motivo])
                                 <tr class="rm-table-row">
-                                    <td class="font-bold text-titulo">{{ $nombre }}</td>
-                                    <td class="text-apoyo">{{ $motivo }}</td>
+                                    <td class="font-bold text-[var(--rm-text-primary)]">{{ $nombre }}</td>
+                                    <td class="text-[var(--rm-text-secondary)]">{{ $motivo }}</td>
                                     <td class="text-right"><a class="rm-btn-secondary" href="{{ route($ruta) }}">Revisar</a></td>
                                 </tr>
                             @endforeach
@@ -39,7 +39,7 @@
             </section>
         @endforeach
 
-        <div class="rounded-2xl border border-estado-advertenciaBorde bg-estado-advertenciaBg p-4 text-sm font-semibold text-parrafo">
+        <div class="rounded-2xl border border-estado-advertenciaBorde bg-estado-advertenciaBg p-4 text-sm font-semibold text-[var(--rm-text-secondary)]">
             Ninguna vista de este listado se elimina automáticamente. La decisión queda registrada para una limpieza posterior.
         </div>
     </div>

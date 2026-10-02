@@ -2,13 +2,13 @@
 
 namespace App\Frontend\Livewire\Medico\Medicacion;
 
+use App\Backend\Modulos\Enfermeria\Servicios\TurnoEnfermeriaService;
+use App\Backend\Modulos\Medicacion\Servicios\AgendaMedicacionService;
 use App\Models\AdultoMayor;
 use App\Models\Atencion;
 use App\Models\HorarioPrescripcion;
 use App\Models\Medicamento;
 use App\Models\Prescripcion;
-use App\Backend\Modulos\Enfermeria\Servicios\TurnoEnfermeriaService;
-use App\Backend\Modulos\Medicacion\Servicios\AgendaMedicacionService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -21,24 +21,43 @@ class SaludMedicacionPanel extends Component
     use WithPagination;
 
     public ?AdultoMayor $adulto = null;
+
     public string $cod_residente = '';
+
     public string $search = '';
+
     public string $filtroEstado = '';
+
     public string $filtroVia = '';
+
     public bool $mostrarFormularioCrear = false;
+
     public bool $drawerUbicacion = false;
+
     public bool $drawerGrafico = false;
+
     public ?AdultoMayor $adultoDrawer = null;
+
     public mixed $signosDrawer = [];
+
     public string $nuevo_cod_residente = '';
+
     public string $nuevo_nombre = '';
+
     public string $nuevo_dosis = '';
+
     public string $nuevo_frecuencia = 'CADA 12 HORAS';
+
     public string $nuevo_via = 'ORAL';
+
     public string $nuevo_hora = '08:00';
+
     public string $nuevo_fecha_inicio = '';
+
     public ?string $nuevo_fecha_fin = null;
+
     public string $nuevo_medico = '';
+
     public string $nuevo_observacion = '';
 
     protected $listeners = [
@@ -55,7 +74,6 @@ class SaludMedicacionPanel extends Component
 
         $this->adulto = $adulto instanceof AdultoMayor ? $adulto : AdultoMayor::query()->find($adulto);
         abort_unless($this->adulto, 404);
-        $this->cod_residente = $this->adulto->cod_residente;
         $this->cod_residente = $this->adulto->cod_residente;
         $this->autorizarResidente($this->adulto);
     }
@@ -78,7 +96,6 @@ class SaludMedicacionPanel extends Component
         $this->autorizarGestionOrden();
         $this->adulto = AdultoMayor::query()->findOrFail($codResidente);
         $this->autorizarResidente($this->adulto);
-        $this->cod_residente = $codResidente;
         $this->cod_residente = $codResidente;
         $this->nuevo_cod_residente = $codResidente;
         $this->nuevo_fecha_inicio = now()->toDateString();
@@ -175,7 +192,6 @@ class SaludMedicacionPanel extends Component
 
         $this->adulto = $residente;
         $this->cod_residente = $residente->cod_residente;
-        $this->cod_residente = $residente->cod_residente;
         $this->reset(['nuevo_nombre', 'nuevo_dosis', 'nuevo_observacion', 'nuevo_fecha_fin']);
         $this->mostrarFormularioCrear = false;
         session()->flash('mensaje_exito', 'Medicamento '.$prescripcion->nombre_medicamento.' prescrito correctamente.');
@@ -191,9 +207,20 @@ class SaludMedicacionPanel extends Component
         $this->resetPage();
     }
 
-    public function updatingSearch(): void { $this->resetPage(); }
-    public function updatingFiltroEstado(): void { $this->resetPage(); }
-    public function updatingFiltroVia(): void { $this->resetPage(); }
+    public function updatingSearch(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatingFiltroEstado(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatingFiltroVia(): void
+    {
+        $this->resetPage();
+    }
 
     public function limpiarFiltros(): void
     {

@@ -33,17 +33,19 @@
  </div>
  </div>
  <div class="flex flex-wrap items-center gap-2">
- <a href="{{ route('admin.adultos-mayores.index') }}" class="rounded-xl border border-borde-suave bg-fondo-card/50 px-4 py-2 text-xs font-bold transition hover:bg-fondo-card text-titulo">
+ <a href="{{ auth()->user()?->can('viewAny', \App\Models\Residente::class) ? route('admin.adultos-mayores.index') : route('dashboard') }}" class="rounded-xl border border-borde-suave bg-fondo-card/50 px-4 py-2 text-xs font-bold transition hover:bg-fondo-card text-titulo">
  <i class="ph-bold ph-arrow-left"></i> Volver
  </a>
- @if($idAdulto)
+ @if($idAdulto && auth()->user()?->can('residentes.gestionar'))
  <a href="{{ route('admin.adultos-mayores.edit', $idAdulto) }}" class="rounded-xl bg-fondo-card px-4 py-2 text-xs font-bold text-titulo border border-borde-suave shadow-sm transition hover:bg-fondo-panel">
  <i class="ph-bold ph-pencil-simple"></i> Editar datos
  </a>
  @endif
+ @can('reportes.individual')
  <a href="{{ route('admin.adultos-mayores.reporte-individual', $idAdulto) }}" class="rounded-xl bg-boton-principal px-4 py-2 text-xs font-bold text-inverso shadow-sm transition hover:bg-fondo-panel">
  <i class="ph-bold ph-printer"></i> Imprimir
  </a>
+ @endcan
  </div>
  </div>
 </section>

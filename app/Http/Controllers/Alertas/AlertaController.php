@@ -53,11 +53,23 @@ class AlertaController extends Controller
 
     public function cambiarEstado(Request $request, Alerta $alerta): JsonResponse
     {
-        $this->turnos->autorizarMutacionEnfermeria($alerta->cod_residente, 'alertas.gestionar', $request->user());
         $datos = $request->validate([
             'estado' => ['required', 'in:RECONOCIDA,ASIGNADA,EN_ATENCION,ATENDIDA,CERRADA,ANULADA'],
             'descripcion' => ['required', 'string', 'min:5', 'max:10000'],
         ]);
+        $usuario = $request->user();
+        $permiso = match ($datos['estado']) {
+            'RECONOCIDA' => 'alertas.reconocer',
+            'ASIGNADA' => 'alertas.asignar',
+            'EN_ATENCION', 'ATENDIDA' => 'alertas.seguimiento',
+            'CERRADA', 'ANULADA' => 'alertas.cerrar',
+        };
+
+        if ($usuario->hasRole('ADMINISTRADOR')) {
+            abort_unless($usuario->can($permiso), 403);
+        } else {
+            $this->turnos->autorizarMutacionEnfermeria($alerta->cod_residente, 'alertas.gestionar', $usuario);
+        }
 
         $alerta = DB::transaction(function () use ($request, $alerta, $datos): Alerta {
             $bloqueada = Alerta::query()->lockForUpdate()->findOrFail($alerta->getKey());

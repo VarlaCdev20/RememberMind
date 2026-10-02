@@ -5,9 +5,9 @@
    ============================================================ */
 
 .rm-nursing-shell {
-    --rm-clinical-page-gap: 24px;
-    --rm-clinical-grid-gap: 16px;
-    --rm-clinical-card-padding: 18px;
+    --rm-clinical-page-gap: 16px;
+    --rm-clinical-grid-gap: 12px;
+    --rm-clinical-card-padding: 14px;
     --rm-clinical-control-height: 40px;
     color: var(--rm-text-primary);
     background: var(--rm-bg-app);
@@ -73,7 +73,7 @@
     text-wrap: balance;
 }
 
-.rm-nursing-shell main h1:not(.rm-ficha-detalles *) { font-size: min(30px, var(--rm-font-page-title)); }
+.rm-nursing-shell main h1:not(.rm-ficha-detalles *) { font-size: min(28px, var(--rm-font-page-title)); }
 .rm-nursing-shell main h2:not(.rm-ficha-detalles *) { font-size: var(--rm-font-section-title); }
 .rm-nursing-shell main h3:not(.rm-ficha-detalles *) { font-size: var(--rm-font-card-title); }
 
@@ -125,7 +125,7 @@
 }
 
 .rm-nursing-shell main table:not(.rm-ficha-detalles *) th {
-    padding: 10px 14px;
+    padding: 8px 12px;
     color: var(--rm-text-secondary);
     font-size: var(--rm-font-size-meta);
     font-weight: var(--rm-font-weight-extrabold);
@@ -134,7 +134,7 @@
 }
 
 .rm-nursing-shell main table:not(.rm-ficha-detalles *) td {
-    padding: 11px 14px;
+    padding: 9px 12px;
     border-top: 1px solid var(--rm-table-border);
     vertical-align: middle;
 }
@@ -335,7 +335,7 @@
 }
 
 @media (max-width: 639px) {
-    .rm-nursing-shell { --rm-clinical-page-gap: 16px; --rm-clinical-card-padding: 14px; }
+    .rm-nursing-shell { --rm-clinical-page-gap: 12px; --rm-clinical-card-padding: 12px; }
     .rm-resident-clinical-facts,
     .rm-clinical-readonly-order { grid-template-columns: 1fr; }
     .rm-nursing-shell main table th,

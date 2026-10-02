@@ -19,7 +19,7 @@
  </div>
 
  <div class="overflow-x-auto rounded-2xl border border-borde-suave">
- <table class="min-w-full text-left text-sm rm-table">
+ <table class="rm-data-table min-w-full text-left text-sm rm-table">
  <thead class="rm-table-header">
  <tr>
  <th class="px-4 py-3 font-black">Fecha</th>

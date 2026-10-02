@@ -129,5 +129,8 @@ import './utilities/modo-oscuro.js';
 import documentosAdulto from './modules/documentos-adulto.js';
 window.documentosAdulto = documentosAdulto;
 
+import './modules/signos-vitales-registro.js';
+import './modules/filter-selection.js';
+
 import './modules/auth-login-parallax.js';
 import './modules/app-depth-motion.js';

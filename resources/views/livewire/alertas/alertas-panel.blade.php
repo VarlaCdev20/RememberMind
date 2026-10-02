@@ -439,63 +439,68 @@
             </div>
         </div>
 
-        {{-- Fila de chips de filtros activos --}}
+        {{-- Fila de chips de filtros activos (desplazable y con colorcitos) --}}
         @php
             $hasFiltrosActivos = !empty($search) || ($filtroEstado !== 'ABIERTA') || !empty($filtroNivel) || !empty($filtroOrigen) || !empty($filtroAdulto);
         @endphp
         @if($hasFiltrosActivos)
             <div class="rm-filter-bar__active">
-                <div class="flex flex-wrap items-center gap-1.5">
+                <div class="rm-filter-scroll">
                     <span class="rm-filter-bar__active-label">
                         <i class="ph-bold ph-funnel text-xs"></i> Filtros activos:
                     </span>
 
                     @if(!empty($search))
-                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[var(--rm-surface-alt)] border border-[var(--rm-border)] text-[11px] font-semibold text-[var(--rm-text-primary)]">
+                        <span class="rm-filter-chip rm-filter-chip--search">
+                            <i class="ph-bold ph-magnifying-glass text-xs"></i>
                             <span>Búsqueda: "{{ Str::limit($search, 16) }}"</span>
-                            <button type="button" wire:click="limpiarFiltro('search')" class="hover:text-[var(--rm-primary)] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
+                            <button type="button" wire:click="limpiarFiltro('search')" title="Quitar filtro"><i class="ph-bold ph-x text-xs"></i></button>
                         </span>
                     @endif
 
                     @if($filtroEstado !== 'ABIERTA')
-                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[var(--rm-warning-soft)] border border-[var(--rm-warning)] text-[11px] font-bold text-[var(--rm-warning)]">
+                        <span class="rm-filter-chip {{ $filtroEstado === 'EN_ATENCION' ? 'rm-filter-chip--warning' : ($filtroEstado === 'CERRADA' ? 'rm-filter-chip--success' : 'rm-filter-chip--danger') }}">
+                            <span class="w-1.5 h-1.5 rounded-full {{ $filtroEstado === 'EN_ATENCION' ? 'bg-[var(--rm-status-high)]' : ($filtroEstado === 'CERRADA' ? 'bg-[var(--rm-action-primary)]' : 'bg-[var(--rm-danger)]') }}"></span>
                             <span>Estado: {{ $filtroEstado === 'EN_ATENCION' ? 'En Atención' : ($filtroEstado === 'CERRADA' ? 'Cerrada' : 'Todos') }}</span>
-                            <button type="button" wire:click="limpiarFiltro('filtroEstado')" class="hover:text-[var(--rm-primary)] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
+                            <button type="button" wire:click="limpiarFiltro('filtroEstado')" title="Quitar filtro"><i class="ph-bold ph-x text-xs"></i></button>
                         </span>
                     @endif
 
                     @if(!empty($filtroNivel))
-                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[var(--rm-primary-soft)] border border-[var(--rm-primary)] text-[11px] font-bold text-[var(--rm-primary)]">
+                        <span class="rm-filter-chip {{ in_array($filtroNivel, ['CRITICO', 'ALTO']) ? 'rm-filter-chip--danger' : 'rm-filter-chip--warning' }}">
+                            <i class="ph-bold ph-warning-circle text-xs"></i>
                             <span>Nivel: {{ $filtroNivel }}</span>
-                            <button type="button" wire:click="limpiarFiltro('filtroNivel')" class="hover:text-[var(--rm-primary)] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
+                            <button type="button" wire:click="limpiarFiltro('filtroNivel')" title="Quitar filtro"><i class="ph-bold ph-x text-xs"></i></button>
                         </span>
                     @endif
 
                     @if(!empty($filtroOrigen))
-                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[var(--rm-info-soft)] border border-[var(--rm-info)] text-[11px] font-bold text-[var(--rm-info)]">
+                        <span class="rm-filter-chip rm-filter-chip--clinical">
+                            <i class="ph-bold ph-tag text-xs"></i>
                             <span>Origen: {{ $filtroOrigen }}</span>
-                            <button type="button" wire:click="limpiarFiltro('filtroOrigen')" class="hover:text-[var(--rm-primary)] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
+                            <button type="button" wire:click="limpiarFiltro('filtroOrigen')" title="Quitar filtro"><i class="ph-bold ph-x text-xs"></i></button>
                         </span>
                     @endif
 
                     @if(!empty($filtroAdulto))
                         @php $adFiltrado = $adultos->firstWhere('cod_residente', $filtroAdulto); @endphp
-                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[var(--rm-surface-alt)] border border-[var(--rm-border)] text-[11px] font-bold text-[var(--rm-text-primary)]">
+                        <span class="rm-filter-chip rm-filter-chip--info">
+                            <i class="ph-bold ph-user text-xs"></i>
                             <span>Residente: {{ $adFiltrado ? $adFiltrado->ap_paterno : 'Filtrado' }}</span>
-                            <button type="button" wire:click="limpiarFiltro('filtroAdulto')" class="hover:text-[var(--rm-primary)] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
+                            <button type="button" wire:click="limpiarFiltro('filtroAdulto')" title="Quitar filtro"><i class="ph-bold ph-x text-xs"></i></button>
                         </span>
                     @endif
                 </div>
 
-                <div class="flex items-center gap-2.5">
+                <div class="flex items-center gap-2 shrink-0">
                     <span class="text-[11px] px-2.5 py-0.5 rounded-full font-bold bg-[var(--rm-surface-alt)] text-[var(--rm-text-secondary)] border border-[var(--rm-border-soft)]">
                         {{ $alertas->total() }} coincidentes
                     </span>
 
                     <button type="button"
                         wire:click="limpiarFiltros"
-                        class="inline-flex items-center gap-1 rounded-xl bg-[var(--rm-primary-soft)] hover:bg-[var(--rm-primary)] hover:text-white text-[var(--rm-primary)] border border-[var(--rm-primary)]/30 py-1 px-2.5 text-xs font-bold transition cursor-pointer">
-                        <i class="ph-bold ph-arrow-counter-clockwise"></i>
+                        class="rm-filter-bar__clear-btn">
+                        <i class="ph-bold ph-arrow-counter-clockwise text-xs"></i>
                         <span>Limpiar filtros</span>
                     </button>
                 </div>
@@ -506,7 +511,7 @@
     {{-- TABLA ASISTENCIAL MEDIANA + MODO OSCURO + PIE DE PAGINACIÓN INSTITUCIONAL --}}
     <section class="rm-table-wrapper">
         <div class="w-full overflow-x-auto overscroll-x-contain">
-            <table class="rm-table w-full min-w-[980px] table-fixed">
+            <table class="rm-data-table rm-data-table--actions rm-table w-full min-w-[980px] table-fixed">
                 <thead class="rm-table-header">
                     <tr>
                         <th class="w-[23%] text-left font-bold">Residente y Ubicación</th>

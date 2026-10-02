@@ -14,15 +14,15 @@
     /* ------------------------------------------------------------
        CONTRATO DE BOTONES
        ------------------------------------------------------------ */
-    --rm-button-height: var(--rm-control-md); /* altura */
+    --rm-button-height: var(--rm-control-lg); /* altura estándar: 44px */
     --rm-button-height-sm: var(--rm-control-sm);
-    --rm-button-height-lg: var(--rm-control-lg);
+    --rm-button-height-lg: 48px;
     --rm-button-radius: var(--rm-radius-md); /* radio */
     --rm-button-gap: var(--rm-space-2); /* espacio icono-texto */
     --rm-button-padding-x: var(--rm-space-4); /* padding */
 
     --rm-button-font-size: var(--rm-font-size-button);
-    --rm-button-font-weight: var(--rm-font-weight-extrabold);
+    --rm-button-font-weight: var(--rm-weight-semibold);
 
     /* Primary: Verde oliva claro institucional */
     --rm-button-primary-bg: var(--rm-action-primary); /* fondo principal */
@@ -32,8 +32,8 @@
     --rm-button-primary-border: transparent;
 
     /* Secondary: Superficie cálida con borde visible */
-    --rm-button-secondary-bg: var(--rm-surface); /* fondo secundario */
-    --rm-button-secondary-border: var(--rm-border); /* borde secundario */
+    --rm-button-secondary-bg: var(--rm-surface-soft); /* fondo secundario */
+    --rm-button-secondary-border: var(--rm-border-soft); /* borde secundario */
     --rm-button-secondary-text: var(--rm-text-primary); /* texto secundario */
     --rm-button-secondary-hover-bg: var(--rm-surface-soft);
     --rm-button-secondary-hover-border: var(--rm-border-hover);
@@ -51,7 +51,7 @@
     --rm-button-success-border: transparent;
 
     /* Danger: Coral / Rojo Tierra */
-    --rm-button-danger-bg: var(--rm-danger);
+    --rm-button-danger-bg: var(--rm-critical);
     --rm-button-danger-text: var(--rm-text-inverse);
     --rm-button-danger-hover: var(--rm-danger-hover);
     --rm-button-danger-border: transparent;
@@ -70,13 +70,14 @@
 
     /* Clinical: Azul Clínico Oficial */
     --rm-button-clinical-bg: var(--rm-clinical);
-    --rm-button-clinical-text: #FFFFFF;
+    --rm-button-clinical-text: var(--rm-text-inverse, rgb(255 255 255));
     --rm-button-clinical-hover: var(--rm-clinical-strong);
     --rm-button-clinical-border: transparent;
 
     /* Icon button */
-    --rm-button-icon-size: var(--rm-control-md);
+    --rm-button-icon-size: var(--rm-control-lg);
     --rm-button-icon-sm-size: var(--rm-control-sm);
+    --rm-button-icon-lg-size: 48px;
 }
 
 .rm-btn {
@@ -84,7 +85,7 @@
     align-items: center;
     justify-content: center;
     gap: var(--rm-button-gap);
-    font-family: var(--rm-font-family);
+    font-family: var(--rm-font-display);
     font-size: var(--rm-button-font-size);
     font-weight: var(--rm-button-font-weight);
     line-height: 1.25;
@@ -103,12 +104,13 @@
 }
 
 .rm-btn:focus-visible {
-    outline: 2px solid var(--rm-focus-color) !important;
+    outline: 2px solid var(--rm-focus-ring-color) !important;
     outline-offset: 2px !important;
 }
 
 .rm-btn:disabled,
-.rm-btn[aria-disabled="true"] {
+.rm-btn[aria-disabled="true"],
+.rm-btn[aria-busy="true"] {
     opacity: var(--rm-state-disabled-opacity);
     cursor: not-allowed;
     pointer-events: none;
@@ -151,7 +153,6 @@
 .rm-btn-primary:hover:not(:disabled) {
     background-color: var(--rm-button-primary-hover);
     box-shadow: var(--rm-shadow-md);
-    transform: translateY(-1px);
 }
 
 .rm-btn-primary:active:not(:disabled) {
@@ -172,7 +173,6 @@
     border-color: var(--rm-button-secondary-hover-border);
     color: var(--rm-button-secondary-text);
     box-shadow: var(--rm-shadow-md);
-    transform: translateY(-1px);
 }
 
 .rm-btn-secondary:active:not(:disabled) {
@@ -202,7 +202,6 @@
 .rm-btn-success:hover:not(:disabled) {
     background-color: var(--rm-button-success-hover);
     box-shadow: var(--rm-shadow-md);
-    transform: translateY(-1px);
 }
 
 /* 5. Danger (Coral / Rojo Tierra) */
@@ -216,7 +215,6 @@
 .rm-btn-danger:hover:not(:disabled) {
     background-color: var(--rm-button-danger-hover);
     box-shadow: var(--rm-shadow-md);
-    transform: translateY(-1px);
 }
 
 /* 5.1 Warning (Cobre) */
@@ -270,7 +268,6 @@
     border-color: var(--rm-border-hover);
     color: var(--rm-text-primary);
     box-shadow: var(--rm-shadow-md);
-    transform: translateY(-1px);
 }
 
 .rm-btn-icon-sm {
@@ -280,13 +277,29 @@
     border-radius: var(--rm-radius-sm);
 }
 
+.rm-btn-icon-lg { width: var(--rm-button-icon-lg-size); height: var(--rm-button-icon-lg-size); min-height: var(--rm-button-icon-lg-size); }
+.rm-btn-icon--ghost { background: transparent; border-color: transparent; }
+.rm-btn-icon--soft { background: var(--rm-surface-soft); border-color: var(--rm-border-soft); }
+.rm-btn-icon--critical { background: var(--rm-critical-bg); border-color: color-mix(in srgb, var(--rm-critical) 25%, transparent); color: var(--rm-critical); }
+.rm-btn-icon--critical:hover:not(:disabled) { background: color-mix(in srgb, var(--rm-critical) 18%, var(--rm-surface)); color: var(--rm-critical); }
+.rm-btn-icon i, .rm-btn-icon svg { color: currentColor; }
+
+.rm-btn:active:not(:disabled):not([aria-busy="true"]) { transform: scale(.98); transition-duration: var(--rm-duration-fast); }
+
 /* Estado de carga */
 .rm-btn.is-loading,
-.rm-btn[wire\:loading] {
+.rm-btn[aria-busy="true"] {
     position: relative;
     pointer-events: none;
-    opacity: 0.85;
+    opacity: .7;
 }
+
+.rm-btn__spinner { display: none; width: 17px; height: 17px; flex: 0 0 17px; border: 2px solid currentColor; border-right-color: transparent; border-radius: 50%; animation: rmButtonSpin .9s linear infinite; }
+.rm-btn.is-loading .rm-btn__spinner, .rm-btn[aria-busy="true"] .rm-btn__spinner { display: inline-block; }
+.rm-btn__spinner--wire { display: none; }
+.rm-btn.is-loading .rm-btn__spinner--wire { display: inline-block; }
+@keyframes rmButtonSpin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .rm-btn__spinner { animation: none; border-right-color: currentColor; } }
 
 /* Alias de compatibilidad V1 */
 

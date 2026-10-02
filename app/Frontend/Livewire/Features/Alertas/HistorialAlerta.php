@@ -19,7 +19,7 @@ class HistorialAlerta extends Component
 
     public function guardarAccion(AlertasService $service): void
     {
-        abort_unless(auth()->user()?->can('alertas.gestionar'), 403);
+        abort_unless(auth()->user()?->canAny(['alertas.gestionar', 'alertas.seguimiento']), 403);
 
         $this->validate([
             'accion' => 'required|string|min:5|max:10000',

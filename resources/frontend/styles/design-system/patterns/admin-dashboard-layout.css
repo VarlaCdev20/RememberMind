@@ -1,0 +1,62 @@
+.rm-admin-page { display: grid; gap: var(--rm-space-4); min-width: 0; color: var(--rm-text-primary); }
+.rm-admin-page__heading { padding: var(--rm-space-5); }
+.rm-admin-page__heading h1 { margin: var(--rm-space-1) 0; color: var(--rm-text-primary); }
+.rm-admin-page__heading p { margin-block: var(--rm-space-1); color: var(--rm-text-secondary); }
+.rm-admin-page__filters { display: flex; align-items: center; flex-wrap: wrap; gap: var(--rm-space-2); }
+.rm-admin-page__filters input[type=search] { flex: 1 1 230px; }
+.rm-admin-page__filters input[type=text] { flex: 0 1 170px; }
+.rm-admin-page__tabs { display: flex; flex-wrap: wrap; gap: var(--rm-space-2); }
+.rm-admin-page__tabs a {
+    padding: var(--rm-space-2) var(--rm-space-3);
+    border: 1px solid var(--rm-border-soft);
+    border-radius: var(--rm-radius-sm);
+    background: var(--rm-surface);
+    color: var(--rm-text-secondary);
+    font-weight: 700;
+    text-decoration: none;
+}
+.rm-admin-page__tabs a[aria-current=page] { border-color: var(--rm-action-primary); background: var(--rm-action-primary-soft); color: var(--rm-action-primary-ink); }
+.rm-admin-page__action { justify-self: start; }
+.rm-admin-page__table-card { padding: var(--rm-space-4); min-width: 0; }
+.rm-admin-page__table-scroll { overflow-x: auto; margin-top: var(--rm-space-3); }
+.rm-admin-page__code { display: block; margin-top: var(--rm-space-1); color: var(--rm-text-muted); font-size: var(--rm-text-xs); }
+.rm-admin-page__link { display: inline-flex; align-items: center; gap: var(--rm-space-1); color: var(--rm-action-primary-ink); font-size: var(--rm-text-sm); font-weight: 700; }
+.rm-admin-page__pagination { margin-top: var(--rm-space-3); }
+.rm-admin-page__reports { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--rm-space-4); }
+.rm-admin-page__reports > * { padding: var(--rm-space-4); }
+.rm-admin-page__preadmission-metrics { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--rm-space-4); }
+.rm-admin-page__loading { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--rm-space-4); }
+@media (max-width: 800px) { .rm-admin-page__reports { grid-template-columns: 1fr; } }
+@media (max-width: 800px) { .rm-admin-page__preadmission-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 600px) { .rm-admin-page__preadmission-metrics, .rm-admin-page__loading { grid-template-columns: 1fr; } }
+.rm-admin-resident__hero { display: flex; align-items: center; gap: var(--rm-space-4); }
+.rm-admin-resident__avatar { display: grid; flex: 0 0 72px; width: 72px; height: 72px; place-items: center; overflow: hidden; border-radius: 50%; background: var(--rm-action-primary-soft); color: var(--rm-action-primary-ink); font: 800 24px/1 var(--rm-font-display); }
+.rm-admin-resident__avatar img { width: 100%; height: 100%; object-fit: cover; }
+.rm-admin-resident__facts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--rm-space-4); }
+.rm-admin-resident__facts > * { padding: var(--rm-space-4); }
+.rm-admin-resident__facts p { margin: var(--rm-space-3) 0 var(--rm-space-1); font-weight: 700; }
+.rm-admin-resident__facts small { color: var(--rm-text-secondary); }
+.rm-admin-resident__tabs { display: flex; gap: var(--rm-space-2); overflow-x: auto; padding-bottom: var(--rm-space-1); }
+.rm-admin-resident__tabs a { flex: 0 0 auto; padding: var(--rm-space-2) var(--rm-space-3); border-radius: var(--rm-radius-sm); border: 1px solid var(--rm-border-soft); background: var(--rm-surface); color: var(--rm-text-secondary); font-weight: 700; text-decoration: none; }
+.rm-admin-resident__tabs a[aria-current=page] { border-color: var(--rm-action-primary); background: var(--rm-action-primary-soft); color: var(--rm-action-primary-ink); }
+.rm-admin-resident__summary { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--rm-space-3); margin: var(--rm-space-3) 0 0; }
+.rm-admin-resident__summary > div { padding: var(--rm-space-3); border: 1px solid var(--rm-border-soft); border-radius: var(--rm-radius-sm); background: var(--rm-surface-soft); }
+.rm-admin-resident__summary dt { color: var(--rm-text-secondary); font-size: var(--rm-text-xs); }
+.rm-admin-resident__summary dd { margin: var(--rm-space-1) 0 0; font-weight: 700; }
+@media (max-width: 600px) { .rm-admin-resident__facts, .rm-admin-resident__summary { grid-template-columns: 1fr; } .rm-admin-resident__hero { align-items: flex-start; } }
+.rm-admin-admission__steps { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: var(--rm-space-1); }
+.rm-admin-admission__steps button { display: grid; justify-items: center; gap: var(--rm-space-1); min-width: 0; padding: var(--rm-space-2); border: 1px solid var(--rm-border-soft); border-radius: var(--rm-radius-sm); background: var(--rm-surface); color: var(--rm-text-secondary); font-size: var(--rm-text-xs); font-weight: 700; cursor: pointer; }
+.rm-admin-admission__steps button span { display: grid; place-items: center; width: 1.7rem; height: 1.7rem; border-radius: 50%; background: var(--rm-surface-soft); }
+.rm-admin-admission__steps button[aria-current=step] { border-color: var(--rm-name-mint); background: var(--rm-action-primary-soft); color: var(--rm-action-primary-ink); }
+.rm-admin-admission__steps button[aria-current=step] span { background: var(--rm-name-mint); color: var(--rm-text-primary); }
+.rm-admin-admission__steps button:focus-visible { outline: 2px solid var(--rm-focus); outline-offset: 2px; }
+.rm-admin-admission__facts, .rm-admin-admission__fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--rm-space-3); }
+.rm-admin-admission__facts > div { padding: var(--rm-space-3); border: 1px solid var(--rm-border-soft); border-radius: var(--rm-radius-sm); background: var(--rm-surface-soft); }
+.rm-admin-admission__facts dt { color: var(--rm-text-secondary); font-size: var(--rm-text-xs); }
+.rm-admin-admission__facts dd { margin-top: var(--rm-space-1); color: var(--rm-text-primary); font-weight: 700; }
+.rm-admin-admission__field, .rm-admin-admission__fields label { display: grid; gap: var(--rm-space-1); color: var(--rm-text-secondary); font-size: var(--rm-text-sm); font-weight: 700; }
+.rm-admin-admission__field { margin-top: var(--rm-space-3); }
+.rm-admin-admission__wide { grid-column: 1 / -1; }
+.rm-admin-admission__document { display: flex; justify-content: space-between; align-items: center; gap: var(--rm-space-2); padding: var(--rm-space-2) 0; border-bottom: 1px solid var(--rm-border-soft); }
+@media (max-width: 800px) { .rm-admin-admission__steps { grid-template-columns: 1fr; } .rm-admin-admission__steps button { display: flex; justify-content: flex-start; align-items: center; } }
+@media (max-width: 600px) { .rm-admin-admission__facts, .rm-admin-admission__fields { grid-template-columns: 1fr; } }

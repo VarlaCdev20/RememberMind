@@ -2,7 +2,7 @@
  {{-- ==================================================
  1. BARRA DE FILTROS COMPACTA ÚNICA
  ================================================== --}}
- <section x-data="{ masFiltros: false }" class="rm-filter-bar">
+ <x-ui.filter-bar x-data="{ masFiltros: false }" class="mb-4">
  <div class="w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-12 gap-2 items-center text-xs">
  {{-- 1. Búsqueda rápida: residente o medicamento --}}
  <div class="lg:col-span-3 relative flex items-center">
@@ -178,7 +178,7 @@
  </div>
  </div>
  @endif
- </section>
+ </x-ui.filter-bar>
 
  {{-- ==================================================
  2. TABLA KARDEX DIRECTA (SIN CONTENEDORES ANIDADOS)
@@ -207,7 +207,7 @@
 
  {{-- Tabla de Dosis del Turno --}}
  <div class="w-full overflow-x-auto">
- <table class="w-full table-auto text-left border-collapse min-w-[700px]">
+ <table class="rm-data-table rm-data-table--actions w-full table-auto text-left border-collapse min-w-[700px]">
  <thead>
   <tr class="bg-[var(--rm-surface-soft)] text-[10.5px] font-[700] text-[var(--rm-text-muted)] uppercase tracking-wider border-b border-[var(--rm-border-soft)]">
   <th class="px-2.5 py-2 w-[65px] text-center">Hora</th>

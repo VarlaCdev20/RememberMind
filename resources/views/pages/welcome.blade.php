@@ -16,7 +16,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="Cuidado integral, memoria activa y acompañamiento humano para adultos mayores en el Centro Geriátrico Los Almendros.">
     <meta name="theme-color" content="#c8d8c7">
-    <title>Centro Geriátrico Los Almendros</title>
+    <title>Centro Geriátrico Los Almendros | RememberMind</title>
     @vite(['resources/frontend/styles/app.css', 'resources/frontend/scripts/app.js'])
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <style>{!! file_get_contents(resource_path('frontend/styles/modules/pages-welcome.css')) !!}</style>

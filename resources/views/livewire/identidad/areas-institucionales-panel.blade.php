@@ -115,43 +115,92 @@
  </div>
  </section>
 
- {{-- FILTROS DE BÚSQUEDA Y VISTA --}}
- <section class="rm-filter-bar no-print">
- <div class="grid grid-cols-1 gap-4 md:grid-cols-4">
- {{-- Búsqueda --}}
- <div class="relative md:col-span-2">
- <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-parrafo">
- <i class="ph-bold ph-magnifying-glass"></i>
- </span>
- <input type="text"
- wire:model.live.debounce.300ms="search"
- placeholder="Buscar por nombre o tipo..."
- class="rm-input w-full pl-10">
- </div>
+ {{-- FILTROS DE BÚSQUEDA Y VISTA FORMATO ALERTAS --}}
+ <x-ui.filter-bar class="mb-4 no-print">
+  <div class="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-2 items-center">
+   {{-- Búsqueda textual --}}
+   <div class="lg:col-span-6 relative flex items-center">
+    <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-[var(--rm-text-secondary)]">
+     <i class="ph-bold ph-magnifying-glass text-base"></i>
+    </span>
+    <input type="text"
+     wire:model.live.debounce.300ms="search"
+     placeholder="Buscar por nombre o tipo..."
+     class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-input-bg)] py-2 pl-9 pr-8 text-xs font-medium text-[var(--rm-text-primary)] placeholder-[var(--rm-text-secondary)] focus:border-[var(--rm-primary)] focus:ring-1 focus:ring-[var(--rm-primary)] focus:outline-none h-[38px]" />
+    @if($search !== '')
+     <button type="button"
+      wire:click="$set('search', '')"
+      class="absolute inset-y-0 right-0 flex items-center pr-2.5 text-[var(--rm-text-secondary)] hover:text-[var(--rm-primary)] cursor-pointer"
+      title="Limpiar búsqueda">
+      <i class="ph-bold ph-x-circle text-base"></i>
+     </button>
+    @endif
+   </div>
 
- {{-- Tipo de Área --}}
- <div>
- <select wire:model.live="filtroTipo"
- class="rm-select w-full">
- <option value="">-- Todos los tipos --</option>
- <option value="Administrativa">Administrativa</option>
- <option value="Salud">Salud</option>
- <option value="Social">Social</option>
- <option value="Soporte">Soporte</option>
- </select>
- </div>
+   {{-- Tipo de Área --}}
+   <div class="lg:col-span-3">
+    <select wire:model.live="filtroTipo"
+     class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-input-bg)] py-2 px-3 text-xs font-medium text-[var(--rm-text-primary)] focus:border-[var(--rm-primary)] focus:ring-1 focus:ring-[var(--rm-primary)] focus:outline-none h-[38px] cursor-pointer">
+     <option value="">Todos los tipos</option>
+     <option value="Administrativa">Administrativa</option>
+     <option value="Salud">Salud</option>
+     <option value="Social">Social</option>
+     <option value="Soporte">Soporte</option>
+    </select>
+   </div>
 
- {{-- Estado --}}
- <div>
- <select wire:model.live="filtroEstado"
- class="rm-select w-full">
- <option value="">-- Todos los estados --</option>
- <option value="ACTIVA">Áreas Activas</option>
- <option value="INACTIVA">Áreas Inactivas</option>
- </select>
- </div>
- </div>
- </section>
+   {{-- Estado --}}
+   <div class="lg:col-span-3">
+    <select wire:model.live="filtroEstado"
+     class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-input-bg)] py-2 px-3 text-xs font-medium text-[var(--rm-text-primary)] focus:border-[var(--rm-primary)] focus:ring-1 focus:ring-[var(--rm-primary)] focus:outline-none h-[38px] cursor-pointer">
+     <option value="">Todos los estados</option>
+     <option value="ACTIVA">Áreas Activas</option>
+     <option value="INACTIVA">Áreas Inactivas</option>
+    </select>
+   </div>
+  </div>
+
+  {{-- Fila de chips de filtros activos --}}
+  @php
+   $hasFiltrosArea = !empty($search) || !empty($filtroTipo) || !empty($filtroEstado);
+  @endphp
+  @if($hasFiltrosArea)
+   <div class="rm-filter-bar__active">
+    <div class="flex flex-wrap items-center gap-1.5">
+     <span class="rm-filter-bar__active-label">
+      <i class="ph-bold ph-funnel text-xs"></i> Filtros activos:
+     </span>
+     @if(!empty($search))
+      <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[var(--rm-surface-alt)] border border-[var(--rm-border)] text-[11px] font-semibold text-[var(--rm-text-primary)]">
+       <span>Búsqueda: "{{ Str::limit($search, 16) }}"</span>
+       <button type="button" wire:click="$set('search', '')" class="hover:text-[var(--rm-primary)] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
+      </span>
+     @endif
+     @if(!empty($filtroTipo))
+      <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[var(--rm-primary-soft)] border border-[var(--rm-primary)] text-[11px] font-bold text-[var(--rm-primary)]">
+       <span>Tipo: {{ $filtroTipo }}</span>
+       <button type="button" wire:click="$set('filtroTipo', '')" class="hover:text-[var(--rm-primary)] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
+      </span>
+     @endif
+     @if(!empty($filtroEstado))
+      <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[var(--rm-warning-soft)] border border-[var(--rm-warning)] text-[11px] font-bold text-[var(--rm-warning)]">
+       <span>Estado: {{ $filtroEstado }}</span>
+       <button type="button" wire:click="$set('filtroEstado', '')" class="hover:text-[var(--rm-primary)] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
+      </span>
+     @endif
+    </div>
+
+    <div class="flex items-center gap-2.5">
+     <button type="button"
+      wire:click="$set('search', ''); $set('filtroTipo', ''); $set('filtroEstado', '');"
+      class="inline-flex items-center gap-1 rounded-xl bg-[var(--rm-primary-soft)] hover:bg-[var(--rm-primary)] hover:text-white text-[var(--rm-primary)] border border-[var(--rm-primary)]/30 py-1 px-2.5 text-xs font-bold transition cursor-pointer">
+      <i class="ph-bold ph-arrow-counter-clockwise"></i>
+      <span>Limpiar filtros</span>
+     </button>
+    </div>
+   </div>
+  @endif
+ </x-ui.filter-bar>
 
  {{-- GRID PRINCIPAL DE CARDS --}}
  <section class="grid grid-cols-1 md:grid-cols-3 gap-6 no-print">
@@ -1252,7 +1301,7 @@
  {{-- Tabla de Áreas --}}
  <div class="space-y-2">
  <h4 class="text-[11px] font-bold uppercase tracking-[0.18em] text-apoyo">INFORMACIÓN GENERAL</h4>
- <table class="w-full text-left text-xs border border-borde-suave rounded-xl overflow-hidden bg-fondo-card">
+ <table class="rm-data-table w-full text-left text-xs border border-borde-suave rounded-xl overflow-hidden bg-fondo-card">
  <thead>
  <tr class="bg-fondo-app text-titulo font-black border-b border-borde-suave">
  <th class="p-3">Área Institucional</th>
@@ -1399,7 +1448,7 @@
  <div class="space-y-2">
  <h4 class="text-[11px] font-bold uppercase tracking-[0.18em] text-apoyo">PERSONAL VINCULADO</h4>
  @if(count($reporteData['area']['usuarios']) > 0)
- <table class="w-full text-left text-xs border border-borde-suave rounded-xl overflow-hidden bg-fondo-card">
+ <table class="rm-data-table w-full text-left text-xs border border-borde-suave rounded-xl overflow-hidden bg-fondo-card">
  <thead>
  <tr class="bg-fondo-app text-titulo font-black border-b border-borde-suave">
  <th class="p-3" style="width: 30%;">Nombre Completo</th>

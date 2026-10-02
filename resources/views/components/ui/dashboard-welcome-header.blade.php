@@ -47,11 +47,12 @@
 
     <div class="rm-nursing-welcome__visual">
         <div class="rm-nursing-welcome__image">
-            <img src="{{ asset($image) }}" alt="Profesionales acompañan a residentes durante una actividad en Los Almendros" loading="eager" decoding="async" fetchpriority="high">
+            <img src="{{ asset($image) }}" alt="Actividad y acompañamiento en Los Almendros" loading="eager" decoding="async" fetchpriority="high">
         </div>
         <div class="rm-nursing-welcome__image-detail">
-            <img src="{{ asset($secondaryImage) }}" alt="Atención cercana durante una actividad cognitiva" loading="lazy" decoding="async">
+            <img src="{{ asset($secondaryImage) }}" alt="Momentos de cuidado y convivencia en Los Almendros" loading="lazy" decoding="async">
         </div>
+        <span class="rm-nursing-welcome__image-icon" aria-hidden="true"><i class="ph-bold ph-stethoscope"></i></span>
     </div>
 
     <div class="rm-nursing-welcome__tools"

@@ -23,9 +23,11 @@
  <a href="{{ route('admin.adultos-mayores.show', ['adulto_mayor' => $adulto_mayor->cod_residente, 'tab' => 'documentos']) }}" class="inline-flex items-center gap-2 rounded-xl border border-borde bg-fondo-card px-4 py-2 text-xs font-bold text-titulo transition hover:bg-fondo-panel">
  <i class="ph-bold ph-arrow-left"></i> Volver a Ficha
  </a>
+ @can('documentos.gestionar')
  <button type="button" @click="abrirRegistro()" class="inline-flex items-center gap-2 rounded-xl bg-boton-principal px-4 py-2 text-xs font-bold text-inverso shadow-sm transition hover:bg-fondo-panel">
  <i class="ph-bold ph-upload-simple text-base"></i> Registrar Documento
  </button>
+ @endcan
  </div>
  </div>
 
@@ -52,7 +54,7 @@
  </div>
 
  <div class="overflow-x-auto">
- <table class="w-full text-left text-sm text-titulo">
+ <table class="rm-data-table rm-data-table--actions w-full text-left text-sm text-titulo">
  <thead class="bg-fondo-panel text-xs font-bold uppercase tracking-wide text-apoyo">
  <tr>
  <th class="px-6 py-4">Documento</th>
@@ -98,16 +100,19 @@
  <td class="px-6 py-4 text-right">
  <div class="flex justify-end gap-2">
  @if(($doc->estado === 'ARCHIVADO'))
+ @can('documentos.gestionar')
  <form action="{{ route('admin.adultos-mayores.documentos.restore', ['adulto_mayor' => $adulto_mayor->cod_residente, 'documento' => $doc->cod_documento]) }}" method="POST" class="inline">
  @csrf @method('PATCH')
  <button type="submit" class="rounded-lg p-2 text-[var(--rm-warning)] hover:bg-[var(--rm-warning-soft)]" title="Restaurar Documento">
  <i class="ph-bold ph-arrow-u-up-left text-lg"></i>
  </button>
  </form>
+ @endcan
  @else
  <a href="{{ route('admin.adultos-mayores.documentos.archivo', [$adulto_mayor->cod_residente, $doc->cod_documento]) }}" target="_blank" class="rounded-lg p-2 text-apoyo hover:bg-fondo-panel hover:text-titulo" title="Ver/Descargar">
  <i class="ph-bold ph-download-simple text-lg"></i>
  </a>
+ @can('documentos.gestionar')
  <button type="button" @click='abrirEdicion(@json($doc))' class="rounded-lg p-2 text-apoyo hover:bg-fondo-panel hover:text-titulo" title="Editar Información">
  <i class="ph-bold ph-pencil-simple text-lg"></i>
  </button>
@@ -117,6 +122,7 @@
  <i class="ph-bold ph-archive text-lg"></i>
  </button>
  </form>
+ @endcan
  @endif
  </div>
  </td>
@@ -137,6 +143,8 @@
  </div>
 
  {{-- MODAL DE REGISTRO / EDICIÓN --}}
+ @can('documentos.gestionar')
  @include('pages.adultos-mayores.documentos.partials.formulario')
+ @endcan
  </div>
 </x-sistema-layout>

@@ -4,8 +4,27 @@
     }
 
     body {
-        background: var(--color-fondo-app);
-        color: var(--color-parrafo);
+        background-color: var(--rm-bg-app);
+        background-image:
+            radial-gradient(ellipse 75% 55% at 94% 0%, rgba(255, 248, 240, 0.52) 0%, transparent 65%),
+            radial-gradient(ellipse 65% 50% at 6% 100%, color-mix(in srgb, var(--rm-action-primary) 9%, transparent) 0%, transparent 65%),
+            radial-gradient(circle at 50% 20%, rgba(255, 255, 255, 0.25) 0%, transparent 70%),
+            radial-gradient(circle at center, rgba(48, 44, 42, 0.16) 1.25px, transparent 1.25px);
+        background-size: 100% 100%, 100% 100%, 100% 100%, 22px 22px;
+        background-attachment: fixed;
+        color: var(--rm-text-primary);
+        font-family: var(--rm-font-body);
+    }
+
+    .dark body,
+    [data-theme="dark"] body {
+        background-color: var(--rm-bg-app);
+        background-image:
+            radial-gradient(ellipse 75% 55% at 94% 0%, rgba(53, 189, 242, 0.06) 0%, transparent 65%),
+            radial-gradient(ellipse 65% 50% at 6% 100%, rgba(32, 201, 151, 0.05) 0%, transparent 65%),
+            radial-gradient(circle at center, rgba(226, 232, 240, 0.16) 1.25px, transparent 1.25px);
+        background-size: 100% 100%, 100% 100%, 22px 22px;
+        background-attachment: fixed;
     }
 
     [x-cloak] {

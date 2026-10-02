@@ -21,8 +21,12 @@
  <!-- Livewire Styles -->
  @livewireStyles
  </head>
- <body class="antialiased">
+ <body class="relative min-h-screen overflow-x-hidden bg-[var(--rm-bg-app)] antialiased">
+        <div class="rm-texture-dots pointer-events-none fixed inset-0 z-0"></div>
+        <div class="rm-mouse-light pointer-events-none fixed inset-0 z-0"></div>
+        <div class="relative z-10 min-h-screen">
  {{ $slot }}
+        </div>
 
  <x-ui.sweetalert />
  @livewireScripts

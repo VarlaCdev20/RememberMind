@@ -2,6 +2,7 @@
 
 namespace App\Frontend\Livewire\Medico\Clinica;
 
+use App\Backend\Modulos\Identidad\Servicios\RolePreviewService;
 use App\Models\AdultoMayor;
 use App\Models\NotaClinica;
 use App\Models\Prescripcion;
@@ -82,17 +83,30 @@ class PacientesSeguimientoPanel extends Component
 
     public function abrirFicha(string $codResidente): void
     {
+        abort_unless(auth()->user()?->can('atenciones.ver'), 403);
         $this->redirect(route('admin.medico.paciente.ficha', $codResidente));
     }
 
     public function nuevaNota(string $codResidente): void
     {
+        abort_unless($this->puedeEscribir('notas_clinicas.crear'), 403);
         $this->dispatch('abrir-nota-evolucion', cod_residente: $codResidente);
     }
 
     public function nuevosSignos(string $codResidente): void
     {
+        abort_unless($this->puedeEscribir('signos_vitales.crear'), 403);
         $this->dispatch('abrir-signos-vitales-medico', cod_residente: $codResidente);
+    }
+
+    public function puedeEscribir(string $permiso): bool
+    {
+        $usuario = auth()->user();
+
+        return $usuario?->estado === 'ACTIVO'
+            && $usuario->hasRole('MEDICO GENERAL/GERIATRA')
+            && $usuario->can($permiso)
+            && ! app(RolePreviewService::class)->isActive($usuario);
     }
 
     public function render()

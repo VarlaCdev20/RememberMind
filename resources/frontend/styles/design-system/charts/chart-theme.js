@@ -165,13 +165,15 @@ export function rmInstallGlobalChartTheme(Chart) {
         Chart.defaults.interaction.intersect = false;
 
         Chart.defaults.elements.line.borderWidth = 2.4;
-        Chart.defaults.elements.line.tension = .36;
+        Chart.defaults.elements.line.tension = .38;
         Chart.defaults.elements.point.radius = 3.5;
-        Chart.defaults.elements.point.hoverRadius = 6;
+        Chart.defaults.elements.point.hoverRadius = 6.5;
         Chart.defaults.elements.point.borderWidth = 2;
-        Chart.defaults.elements.bar.borderRadius = 7;
+        Chart.defaults.elements.bar.borderRadius = 8;
         Chart.defaults.elements.bar.borderSkipped = false;
         Chart.defaults.elements.arc.borderWidth = 2;
+        Chart.defaults.elements.arc.borderRadius = 6;
+        Chart.defaults.elements.arc.spacing = 3;
 
         Chart.defaults.plugins.legend.labels.color = axisText;
         Chart.defaults.plugins.legend.labels.usePointStyle = true;
@@ -326,7 +328,7 @@ export function rmDoughnutDefaults() {
     delete base.scales;
     return {
         ...base,
-        cutout: '58%',
+        cutout: '64%',
         animation: {
             duration: 950,
             easing: 'easeOutQuart',

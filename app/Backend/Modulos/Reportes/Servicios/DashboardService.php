@@ -2,80 +2,70 @@
 
 namespace App\Backend\Modulos\Reportes\Servicios;
 
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Cache;
-use Carbon\Carbon;
-use App\Models\User;
+use App\Backend\Modulos\Identidad\Servicios\RolePreviewService;
 use App\Models\Personal;
+use App\Models\User;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 
 class DashboardService
 {
+    public function __construct(private readonly RolePreviewService $rolePreview) {}
+
     public function obtenerDatosDashboard($usuario): array
     {
-        $claveCache = 'dashboard_' . $usuario->cod_usuario;
+        $rolEfectivo = $this->rolePreview->activeRole($usuario);
+        $perfil = $rolEfectivo ?? $usuario->getRoleNames()->sort()->implode('|');
+        $claveCache = 'dashboard_roles_v2_'.$usuario->cod_usuario.'_'.md5($perfil);
 
-        return Cache::remember($claveCache, 60, function () use ($usuario) {
-            $esAdmin = $usuario->hasRole(['SUPERADMINISTRADOR', 'ADMINISTRADOR']);
-            $esSalud = $usuario->hasRole(['ENFERMEROS', 'MEDICO GENERAL/GERIATRA']);
+        return Cache::remember($claveCache, 60, function () use ($usuario, $rolEfectivo) {
+            $rol = $rolEfectivo ?? $usuario->getRoleNames()->first();
+            $esSalud = in_array($rol, ['ENFERMEROS', 'MEDICO GENERAL/GERIATRA'], true);
 
             return [
-                'saludo'                          => $this->obtenerSaludoUsuario($usuario),
-                'kpisInstitucionales'             => $this->obtenerKpisInstitucionales(),
-                'resumenSalud'                    => $this->obtenerResumenSalud(),
-                'alertasEstructuradas'            => $this->obtenerAlertasEstructuradas(),
-                'equipoInstitucional'             => $this->obtenerEquipoInstitucional(),
-                'adultosPorEstado'                => $this->obtenerAdultosPorEstado(),
-                'distribucionEquipoInstitucional' => $this->obtenerDistribucionEquipoInstitucional(),
-                'redFamiliar'                     => $this->obtenerRedFamiliar(),
-                'estadisticas'                    => $this->obtenerEstadisticas($usuario),
-                'usuariosPorRol'                  => $this->obtenerDistribucionRoles(),
-                'actividadMensual'                => $this->obtenerActividadMensual(),
-                'usuariosDashboard'               => $this->obtenerListaUsuarios(),
-                'actividadesDashboard'            => $this->obtenerUltimasActividades(),
-                'alertasAdministrativas'          => $this->generarAlertasInteligentes(),
-                'modulos'                         => $this->obtenerModulosInstitucionales(),
-                'bitacoraDashboard'               => $this->obtenerBitacoraAuditoria(),
-                'perfilDashboardRol'              => $this->obtenerPerfilDashboardRol($usuario),
-                'infoRol'                         => [
-                    'es_admin'   => $esAdmin,
-                    'es_salud'   => $esSalud,
-                    'nombre_rol' => $usuario->getRoleNames()->first() ?? 'Usuario',
+                'saludo' => $this->obtenerSaludoUsuario($usuario, $rol),
+                'perfilDashboardRol' => $this->obtenerPerfilDashboardRol($usuario, $rol),
+                'infoRol' => [
+                    'es_salud' => $esSalud,
+                    'nombre_rol' => $rol ?? 'Usuario',
                 ],
             ];
         });
     }
 
-    public function obtenerSaludoUsuario($usuario): array
+    public function obtenerSaludoUsuario($usuario, ?string $rolEfectivo = null): array
     {
         $partes = array_filter([
-            $usuario->nombres    ?? null,
+            $usuario->nombres ?? null,
             $usuario->ap_paterno ?? null,
             $usuario->ap_materno ?? null,
         ]);
 
-        $nombre = !empty($partes)
+        $nombre = ! empty($partes)
             ? trim(implode(' ', $partes))
             : ($usuario->name ?? $usuario->correo ?? 'Usuario del sistema');
 
         $rolesLegibles = [
-            'SUPERADMINISTRADOR'      => 'Superadministrador',
-            'ADMINISTRADOR'           => 'Administrador',
-            'ENFERMEROS'              => 'Enfermero/a',
+            'SUPERADMINISTRADOR' => 'Superadministrador',
+            'ADMINISTRADOR' => 'Administración',
+            'GERENTE' => 'Gerente',
+            'ENFERMEROS' => 'Enfermero/a',
             'MEDICO GENERAL/GERIATRA' => 'Médico',
-            'PSICOLOGO/A'             => 'Psicólogo/a',
-            'PEDAGOGO'                => 'Pedagogo/a',
-            'NUTRICIONISTA'           => 'Nutricionista',
-            'FISIOTERAPEUTA'          => 'Fisioterapeuta',
-            'FAMILIAR'                => 'Familiar',
+            'PSICOLOGO/A' => 'Psicólogo/a',
+            'PEDAGOGO' => 'Pedagogo/a',
+            'NUTRICIONISTA' => 'Nutricionista',
+            'FISIOTERAPEUTA' => 'Fisioterapeuta',
+            'FAMILIAR' => 'Familiar',
         ];
-        $rolClave   = $usuario->getRoleNames()->first();
+        $rolClave = $rolEfectivo ?? $usuario->getRoleNames()->first();
         $rolLegible = $rolesLegibles[$rolClave] ?? 'Usuario del sistema';
 
-        $hora   = (int) now()->format('H');
-        $saludo = match(true) {
+        $hora = (int) now()->format('H');
+        $saludo = match (true) {
             $hora < 12 => 'Buenos días',
             $hora < 19 => 'Buenas tardes',
-            default    => 'Buenas noches',
+            default => 'Buenas noches',
         };
 
         Carbon::setLocale('es');
@@ -89,9 +79,9 @@ class DashboardService
      * No fabrica datos clínicos: describe competencias y enlaza únicamente
      * rutas existentes cuya autorización continúa protegida por middleware.
      */
-    public function obtenerPerfilDashboardRol($usuario): array
+    public function obtenerPerfilDashboardRol($usuario, ?string $rolEfectivo = null): array
     {
-        $rol = $usuario->getRoleNames()->first() ?? 'USUARIO';
+        $rol = $rolEfectivo ?? $usuario->getRoleNames()->first() ?? 'USUARIO';
 
         $comun = [
             'eyebrow' => 'CENTRO GERIÁTRICO LOS ALMENDROS',
@@ -102,9 +92,113 @@ class DashboardService
             'quote' => 'Cada especialidad aporta bienestar',
             'areas' => [],
             'accesos' => [],
+            'indicadores' => $this->obtenerIndicadoresPorRol($rol),
         ];
 
         $perfiles = [
+            'SUPERADMINISTRADOR' => [
+                'title' => 'RememberMind completo,',
+                'highlight' => 'bajo supervisión global',
+                'description' => 'Supervisa sistema, institución, residencia, operación y actividad clínica. La información clínica es de lectura salvo competencia profesional adicional.',
+                'quote' => 'Autoridad técnica con trazabilidad y reglas de negocio',
+                'areas' => [
+                    ['icon' => 'ph-shield-check', 'title' => 'Sistema', 'copy' => 'Usuarios, roles, seguridad y auditoría.'],
+                    ['icon' => 'ph-buildings', 'title' => 'Institución', 'copy' => 'Personal, áreas, turnos, jornadas y cobertura.'],
+                    ['icon' => 'ph-house-line', 'title' => 'Residencia y operación', 'copy' => 'Admisiones, ocupación, documentos, actividades y alertas.'],
+                    ['icon' => 'ph-first-aid-kit', 'title' => 'Supervisión clínica', 'copy' => 'Lectura agregada sin atribuir competencia profesional.'],
+                ],
+                'accesos' => [
+                    ['route' => 'admin.usuarios.index', 'permission' => 'usuarios.ver', 'icon' => 'ph-users-three', 'label' => 'Usuarios'],
+                    ['route' => 'admin.adultos-mayores.index', 'permission' => 'residentes.ver', 'icon' => 'ph-house-line', 'label' => 'Residentes'],
+                    ['route' => 'admin.personal-institucional', 'permission' => 'personal_institucional.ver', 'icon' => 'ph-identification-badge', 'label' => 'Personal'],
+                    ['route' => 'admin.bitacora.index', 'permission' => 'bitacora.ver', 'icon' => 'ph-scroll', 'label' => 'Auditoría'],
+                    ['route' => 'admin.alertas-clinicas.index', 'permission' => 'alertas.ver', 'icon' => 'ph-warning', 'label' => 'Alertas'],
+                    ['route' => 'admin.reportes.institucional.preview', 'permission' => 'reportes.institucional', 'icon' => 'ph-chart-bar', 'label' => 'Reportes'],
+                ],
+            ],
+            'GERENTE' => [
+                'title' => 'Dirección institucional,',
+                'highlight' => 'con visión de cobertura',
+                'description' => 'Conduce personal, áreas, turnos y planificación general con indicadores institucionales de consulta.',
+                'quote' => 'Planificar es cuidar la capacidad institucional',
+                'areas' => [
+                    ['icon' => 'ph-identification-badge', 'title' => 'Personal', 'copy' => 'Incorporación, profesión, especialidad y vigencia.'],
+                    ['icon' => 'ph-buildings', 'title' => 'Áreas', 'copy' => 'Distribución institucional del equipo.'],
+                    ['icon' => 'ph-clock', 'title' => 'Turnos', 'copy' => 'Configuración de turnos maestros.'],
+                    ['icon' => 'ph-chart-line-up', 'title' => 'Cobertura', 'copy' => 'Planificación y disponibilidad futura.'],
+                ],
+                'accesos' => [
+                    ['route' => 'admin.personal-institucional', 'permission' => 'personal_institucional.ver', 'icon' => 'ph-identification-badge', 'label' => 'Personal'],
+                    ['route' => 'admin.turnos-asignaciones.index', 'permission' => 'turnos.ver', 'icon' => 'ph-clock', 'label' => 'Turnos'],
+                    ['route' => 'admin.reportes.institucional.preview', 'permission' => 'reportes.institucional', 'icon' => 'ph-chart-bar', 'label' => 'Reportes gerenciales'],
+                ],
+            ],
+            'ADMINISTRADOR' => [
+                'title' => 'Operación diaria,',
+                'highlight' => 'coordinada de principio a fin',
+                'description' => 'Gestiona admisiones, alojamiento, jornadas, asignaciones, documentación, visitas y alertas operativas.',
+                'quote' => 'Coordinar bien convierte la planificación en cuidado',
+                'areas' => [
+                    ['icon' => 'ph-user-plus', 'title' => 'Admisiones', 'copy' => 'Preadmisión, revisión y formalización del ingreso.'],
+                    ['icon' => 'ph-bed', 'title' => 'Alojamiento', 'copy' => 'Disponibilidad, ocupación y asignación segura.'],
+                    ['icon' => 'ph-calendar-check', 'title' => 'Jornadas', 'copy' => 'Apertura, cobertura y asignaciones del día.'],
+                    ['icon' => 'ph-bell-ringing', 'title' => 'Control operativo', 'copy' => 'Alertas, incidentes y pendientes administrativos.'],
+                ],
+                'accesos' => [
+                    ['route' => 'admin.admisiones.preadmisiones', 'permission' => 'admisiones.ver_dashboard', 'icon' => 'ph-user-plus', 'label' => 'Preadmisiones'],
+                    ['route' => 'admin.habitaciones.index', 'permission' => 'habitaciones.ver', 'icon' => 'ph-bed', 'label' => 'Alojamiento'],
+                    ['route' => 'admin.alertas-clinicas.index', 'permission' => 'alertas.ver', 'icon' => 'ph-bell-ringing', 'label' => 'Alertas'],
+                ],
+            ],
+            'MEDICO GENERAL/GERIATRA' => [
+                'title' => 'Atención médica,',
+                'highlight' => 'con contexto clínico integral',
+                'description' => 'Consulta pacientes, valoraciones, estudios, prescripciones e interconsultas según las competencias profesionales autorizadas.',
+                'quote' => 'Decisiones clínicas con identidad y trazabilidad',
+                'areas' => [
+                    ['icon' => 'ph-stethoscope', 'title' => 'Consulta y evolución', 'copy' => 'Atención médica longitudinal.'],
+                    ['icon' => 'ph-pill', 'title' => 'Prescripciones', 'copy' => 'Tratamiento farmacológico autorizado.'],
+                    ['icon' => 'ph-flask', 'title' => 'Estudios', 'copy' => 'Solicitudes, resultados e informes.'],
+                    ['icon' => 'ph-warning', 'title' => 'Alertas clínicas', 'copy' => 'Riesgos que requieren evaluación.'],
+                ],
+                'accesos' => [
+                    ['route' => 'admin.medico.pacientes.observacion', 'permission' => 'residentes.ver', 'icon' => 'ph-users-three', 'label' => 'Pacientes'],
+                    ['route' => 'admin.salud-seguimiento.medicacion.index', 'permission' => 'prescripciones.ver', 'icon' => 'ph-pill', 'label' => 'Medicación'],
+                    ['route' => 'admin.medico.alertas', 'permission' => 'alertas.ver', 'icon' => 'ph-warning', 'label' => 'Alertas'],
+                ],
+            ],
+            'ENFERMEROS' => [
+                'title' => 'Cuidado continuo,',
+                'highlight' => 'organizado por turno',
+                'description' => 'Consulta residentes asignados, cuidados, medicación administrable, pases e incidentes de enfermería.',
+                'quote' => 'La continuidad también cuida',
+                'areas' => [
+                    ['icon' => 'ph-users-three', 'title' => 'Residentes', 'copy' => 'Pacientes y ubicación durante el turno.'],
+                    ['icon' => 'ph-heartbeat', 'title' => 'Cuidados', 'copy' => 'Signos, seguimiento y planes.'],
+                    ['icon' => 'ph-pill', 'title' => 'Medicación', 'copy' => 'Administración según prescripción vigente.'],
+                    ['icon' => 'ph-arrows-clockwise', 'title' => 'Continuidad', 'copy' => 'Pases de turno, alertas e incidentes.'],
+                ],
+                'accesos' => [
+                    ['route' => 'admin.enfermeria.pacientes', 'permission' => 'enfermeria.ver_pacientes_asignados', 'icon' => 'ph-users-three', 'label' => 'Mis residentes'],
+                    ['route' => 'admin.enfermeria.tareas', 'permission' => 'ejecuciones_cuidado.ver', 'icon' => 'ph-heartbeat', 'label' => 'Cuidados'],
+                    ['route' => 'admin.enfermeria.alertas', 'permission' => 'alertas.ver', 'icon' => 'ph-warning', 'label' => 'Alertas'],
+                ],
+            ],
+            'PSICOLOGO/A' => [
+                'title' => 'Bienestar emocional,',
+                'highlight' => 'con seguimiento profesional',
+                'description' => 'Consulta evaluaciones cognitivas, afectivas, funcionales y del entorno social.',
+                'quote' => 'Escuchar también es cuidar',
+                'areas' => [
+                    ['icon' => 'ph-brain', 'title' => 'Cognición', 'copy' => 'Evaluación y seguimiento cognitivo.'],
+                    ['icon' => 'ph-heart', 'title' => 'Afectividad', 'copy' => 'Bienestar emocional y conducta.'],
+                    ['icon' => 'ph-person', 'title' => 'Funcionamiento', 'copy' => 'Autonomía y adaptación.'],
+                    ['icon' => 'ph-users', 'title' => 'Entorno', 'copy' => 'Red de apoyo y contexto social.'],
+                ],
+                'accesos' => [
+                    ['route' => 'admin.psicologia.evaluaciones', 'permission' => 'residentes.ver', 'icon' => 'ph-list-magnifying-glass', 'label' => 'Evaluaciones'],
+                ],
+            ],
             'NUTRICIONISTA' => [
                 'title' => 'Nutrir hoy,',
                 'highlight' => 'es fortalecer el mañana',
@@ -161,18 +255,51 @@ class DashboardService
 
         $perfil = array_replace($comun, $perfiles[$rol] ?? []);
         $perfil['rol'] = $rol;
-        $perfil['accesos'] = [
-            ['route' => 'admin.residentes.index', 'permission' => 'residentes.ver', 'icon' => 'ph-users-three', 'label' => $rol === 'FAMILIAR' ? 'Mi familiar' : 'Residentes'],
-            ['route' => 'admin.actividades.index', 'permission' => 'actividades.ver', 'icon' => 'ph-calendar-check', 'label' => 'Actividades'],
-            ['route' => 'profile.show', 'permission' => null, 'icon' => 'ph-user-circle', 'label' => 'Mi perfil'],
-        ];
+        if (empty($perfil['accesos'])) {
+            $perfil['accesos'] = [
+                ['route' => 'admin.residentes.index', 'permission' => 'residentes.ver', 'icon' => 'ph-users-three', 'label' => $rol === 'FAMILIAR' ? 'Mi familiar' : 'Residentes'],
+                ['route' => 'admin.actividades.index', 'permission' => 'actividades.ver', 'icon' => 'ph-calendar-check', 'label' => 'Actividades'],
+                ['route' => 'profile.show', 'permission' => null, 'icon' => 'ph-user-circle', 'label' => 'Mi perfil'],
+            ];
+        }
 
         return $perfil;
     }
 
+    private function obtenerIndicadoresPorRol(string $rol): array
+    {
+        return match ($rol) {
+            'SUPERADMINISTRADOR' => [
+                ['icon' => 'ph-users-three', 'label' => 'Usuarios activos', 'value' => DB::table('usuarios')->where('estado', 'ACTIVO')->count(), 'description' => 'Cuentas habilitadas', 'variant' => 'sky'],
+                ['icon' => 'ph-identification-badge', 'label' => 'Personal activo', 'value' => DB::table('personal')->where('estado', 'ACTIVO')->count(), 'description' => 'Equipo institucional', 'variant' => 'mint'],
+                ['icon' => 'ph-users-four', 'label' => 'Residentes activos', 'value' => DB::table('residentes')->whereIn('estado', ['ACTIVO', 'ADMITIDO'])->count(), 'description' => 'Personas residentes', 'variant' => 'sky'],
+                ['icon' => 'ph-door-open', 'label' => 'Ocupaciones activas', 'value' => DB::table('ocupaciones_cama')->whereIn('estado', ['ACTIVA', 'ACTIVO'])->count(), 'description' => 'Camas actualmente ocupadas', 'variant' => 'neutral'],
+                ['icon' => 'ph-bed', 'label' => 'Camas disponibles', 'value' => DB::table('camas')->where('estado', 'DISPONIBLE')->count(), 'description' => 'Capacidad inmediata', 'variant' => 'mint'],
+                ['icon' => 'ph-hourglass', 'label' => 'Preadmisiones pendientes', 'value' => DB::table('preadmisiones')->where('estado', 'PENDIENTE')->count(), 'description' => 'Solicitudes por revisar', 'variant' => 'coral'],
+                ['icon' => 'ph-warning', 'label' => 'Alertas abiertas', 'value' => DB::table('alertas')->whereNotIn('estado', ['CERRADA', 'ANULADA'])->count(), 'description' => 'Seguimiento requerido', 'variant' => 'critical'],
+                ['icon' => 'ph-first-aid-kit', 'label' => 'Incidentes relevantes', 'value' => DB::table('incidentes')->whereNotIn('estado', ['CERRADO', 'CERRADA', 'ANULADO', 'ANULADA'])->count(), 'description' => 'Eventos con seguimiento vigente', 'variant' => 'critical'],
+                ['icon' => 'ph-first-aid', 'label' => 'Atenciones recientes', 'value' => DB::table('atenciones')->where('fecha_hora', '>=', now()->subDays(7))->count(), 'description' => 'Últimos siete días', 'variant' => 'neutral'],
+                ['icon' => 'ph-pill', 'label' => 'Prescripciones activas', 'value' => DB::table('prescripciones')->where('estado', 'ACTIVA')->count(), 'description' => 'Supervisión de lectura', 'variant' => 'neutral'],
+            ],
+            'GERENTE' => [
+                ['icon' => 'ph-identification-badge', 'label' => 'Personal activo', 'value' => DB::table('personal')->where('estado', 'ACTIVO')->count(), 'description' => 'Equipo institucional', 'variant' => 'sky'],
+                ['icon' => 'ph-users-three', 'label' => 'Residentes activos', 'value' => DB::table('residentes')->whereIn('estado', ['ACTIVO', 'ADMITIDO'])->count(), 'description' => 'Ocupación institucional', 'variant' => 'mint'],
+                ['icon' => 'ph-bed', 'label' => 'Camas disponibles', 'value' => DB::table('camas')->where('estado', 'DISPONIBLE')->count(), 'description' => 'Capacidad inmediata', 'variant' => 'neutral'],
+                ['icon' => 'ph-warning', 'label' => 'Alertas críticas', 'value' => DB::table('alertas')->where('prioridad', 'CRITICO')->whereNotIn('estado', ['CERRADA', 'ANULADA'])->count(), 'description' => 'Requieren supervisión', 'variant' => 'critical'],
+            ],
+            'ADMINISTRADOR' => [
+                ['icon' => 'ph-hourglass', 'label' => 'Preadmisiones pendientes', 'value' => DB::table('preadmisiones')->where('estado', 'PENDIENTE')->count(), 'description' => 'Solicitudes por revisar', 'variant' => 'coral'],
+                ['icon' => 'ph-bed', 'label' => 'Camas disponibles', 'value' => DB::table('camas')->where('estado', 'DISPONIBLE')->count(), 'description' => 'Alojamiento habilitado', 'variant' => 'mint'],
+                ['icon' => 'ph-calendar-check', 'label' => 'Jornadas de hoy', 'value' => DB::table('jornadas')->whereDate('fecha_jornada', today())->whereIn('estado', ['ABIERTA', 'ACTIVA'])->count(), 'description' => 'Operación en curso', 'variant' => 'sky'],
+                ['icon' => 'ph-bell-ringing', 'label' => 'Alertas abiertas', 'value' => DB::table('alertas')->whereNotIn('estado', ['CERRADA', 'ANULADA'])->count(), 'description' => 'Seguimiento operativo', 'variant' => 'critical'],
+            ],
+            default => [],
+        };
+    }
+
     public function obtenerKpisInstitucionales(): array
     {
-        $adultosActivos      = $this->conteoAdultosConEstado('ACTIVO');
+        $adultosActivos = $this->conteoAdultosConEstado('ACTIVO');
         $seguimientoEspecial = $this->conteoAdultosConEstado('SEGUIMIENTO_ESPECIAL');
 
         $fichasActivas = DB::table('atenciones')
@@ -194,66 +321,66 @@ class DashboardService
 
         return [
             [
-                'clave'     => 'adultos_activos',
-                'titulo'    => 'Adultos mayores',
-                'valor'     => $adultosActivos,
+                'clave' => 'adultos_activos',
+                'titulo' => 'Adultos mayores',
+                'valor' => $adultosActivos,
                 'subtitulo' => 'Residentes activos',
-                'icono'     => 'ph-users-three',
-                'color'     => 'azul-profundo',
-                'badge'     => $adultosActivos > 0 ? 'Registrados' : 'Sin registros',
-                'nivel'     => 'normal',
+                'icono' => 'ph-users-three',
+                'color' => 'azul-profundo',
+                'badge' => $adultosActivos > 0 ? 'Registrados' : 'Sin registros',
+                'nivel' => 'normal',
             ],
             [
-                'clave'     => 'seguimiento_especial',
-                'titulo'    => 'Seguimiento especial',
-                'valor'     => $seguimientoEspecial,
+                'clave' => 'seguimiento_especial',
+                'titulo' => 'Seguimiento especial',
+                'valor' => $seguimientoEspecial,
                 'subtitulo' => 'Alerta orientativa',
-                'icono'     => 'ph-eye',
-                'color'     => 'naranja',
-                'badge'     => $seguimientoEspecial > 0 ? 'Requiere atención' : 'Sin novedades',
-                'nivel'     => $seguimientoEspecial > 0 ? 'alerta' : 'normal',
+                'icono' => 'ph-eye',
+                'color' => 'naranja',
+                'badge' => $seguimientoEspecial > 0 ? 'Requiere atención' : 'Sin novedades',
+                'nivel' => $seguimientoEspecial > 0 ? 'alerta' : 'normal',
             ],
             [
-                'clave'     => 'fichas_activas',
-                'titulo'    => 'Fichas clínicas',
-                'valor'     => $fichasActivas,
+                'clave' => 'fichas_activas',
+                'titulo' => 'Fichas clínicas',
+                'valor' => $fichasActivas,
                 'subtitulo' => 'Con atención activa',
-                'icono'     => 'ph-clipboard-text',
-                'color'     => 'verde-salud',
-                'badge'     => ($adultosActivos > 0 && $fichasActivas >= $adultosActivos)
+                'icono' => 'ph-clipboard-text',
+                'color' => 'verde-salud',
+                'badge' => ($adultosActivos > 0 && $fichasActivas >= $adultosActivos)
                     ? 'Al día' : 'Revisar',
-                'nivel'     => ($adultosActivos > 0 && $fichasActivas >= $adultosActivos)
+                'nivel' => ($adultosActivos > 0 && $fichasActivas >= $adultosActivos)
                     ? 'ok' : 'advertencia',
             ],
             [
-                'clave'     => 'personal_salud',
-                'titulo'    => 'Personal de salud',
-                'valor'     => $personalSalud,
+                'clave' => 'personal_salud',
+                'titulo' => 'Personal de salud',
+                'valor' => $personalSalud,
                 'subtitulo' => 'Registrados',
-                'icono'     => 'ph-stethoscope',
-                'color'     => 'morado-cog',
-                'badge'     => 'Equipo activo',
-                'nivel'     => 'normal',
+                'icono' => 'ph-stethoscope',
+                'color' => 'morado-cog',
+                'badge' => 'Equipo activo',
+                'nivel' => 'normal',
             ],
             [
-                'clave'     => 'personal_admin',
-                'titulo'    => 'Personal administrativo',
-                'valor'     => $personalAdmin,
+                'clave' => 'personal_admin',
+                'titulo' => 'Personal administrativo',
+                'valor' => $personalAdmin,
                 'subtitulo' => 'Registrados',
-                'icono'     => 'ph-briefcase',
-                'color'     => 'terracota',
-                'badge'     => 'Equipo activo',
-                'nivel'     => 'normal',
+                'icono' => 'ph-briefcase',
+                'color' => 'terracota',
+                'badge' => 'Equipo activo',
+                'nivel' => 'normal',
             ],
             [
-                'clave'     => 'prescripciones_activas',
-                'titulo'    => 'Prescripciones',
-                'valor'     => $prescripcionesActivas,
+                'clave' => 'prescripciones_activas',
+                'titulo' => 'Prescripciones',
+                'valor' => $prescripcionesActivas,
                 'subtitulo' => 'Órdenes médicas vigentes',
-                'icono'     => 'ph-pill',
-                'color'     => 'verde-olivo',
-                'badge'     => $prescripcionesActivas > 0 ? 'Vigentes' : 'Sin órdenes',
-                'nivel'     => 'normal',
+                'icono' => 'ph-pill',
+                'color' => 'verde-olivo',
+                'badge' => $prescripcionesActivas > 0 ? 'Vigentes' : 'Sin órdenes',
+                'nivel' => 'normal',
             ],
         ];
     }
@@ -295,7 +422,7 @@ class DashboardService
             ->count();
 
         $riesgoCaidaAlto = DB::table('registros_movilidad')
-            ->where('riesgo_caida', 'ALTO')
+            ->whereIn('riesgo_caida', ['ALTO', 'INTENTO_CAMINAR_SOLO'])
             ->count();
 
         $adminMedicacionHoy = DB::table('administraciones_medicacion')
@@ -328,11 +455,11 @@ class DashboardService
 
         foreach ($alertasDB as $a) {
             $alertas[] = [
-                'nivel'       => $a->nivel_gravedad ?? 'URGENTE',
+                'nivel' => $a->nivel_gravedad ?? 'URGENTE',
                 'descripcion' => $a->descripcion,
-                'icono'       => 'ph-warning-octagon',
-                'accion'      => 'Revisar en módulo de alertas',
-                'url'         => route('admin.alertas.index'),
+                'icono' => 'ph-warning-octagon',
+                'accion' => 'Revisar en módulo de alertas',
+                'url' => route('admin.alertas.index'),
             ];
         }
 
@@ -347,11 +474,11 @@ class DashboardService
                 ? '1 residente no tiene atención clínica activa'
                 : "{$sinFicha} residentes no tienen atención clínica activa";
             $alertas[] = [
-                'nivel'       => 'URGENTE',
+                'nivel' => 'URGENTE',
                 'descripcion' => "{$etiqueta} — requiere revisión.",
-                'icono'       => 'ph-warning-circle',
-                'accion'      => 'Ir a Residentes',
-                'url'         => route('admin.residentes.index'),
+                'icono' => 'ph-warning-circle',
+                'accion' => 'Ir a Residentes',
+                'url' => route('admin.residentes.index'),
             ];
         }
 
@@ -361,20 +488,20 @@ class DashboardService
                 ? '1 residente requiere'
                 : "{$seguimiento} residentes requieren";
             $alertas[] = [
-                'nivel'       => 'URGENTE',
+                'nivel' => 'URGENTE',
                 'descripcion' => "{$etiqueta} seguimiento especial — alerta orientativa.",
-                'icono'       => 'ph-eye',
-                'accion'      => 'Ver residentes',
-                'url'         => route('admin.residentes.index'),
+                'icono' => 'ph-eye',
+                'accion' => 'Ver residentes',
+                'url' => route('admin.residentes.index'),
             ];
         }
 
         if (empty($alertas)) {
             $alertas[] = [
-                'nivel'       => 'OK',
+                'nivel' => 'OK',
                 'descripcion' => 'El sistema no presenta alertas administrativas pendientes.',
-                'icono'       => 'ph-check-circle',
-                'accion'      => null,
+                'icono' => 'ph-check-circle',
+                'accion' => null,
             ];
         }
 
@@ -389,7 +516,7 @@ class DashboardService
             'PSICOLOGO/A',
             'PEDAGOGO',
             'NUTRICIONISTA',
-            'FISIOTERAPEUTA'
+            'FISIOTERAPEUTA',
         ];
 
         $psTotales = User::role($rolesSalud)->count();
@@ -405,15 +532,15 @@ class DashboardService
             ->groupBy('r.name')
             ->orderByDesc('total')
             ->get()
-            ->map(fn($e) => [
+            ->map(fn ($e) => [
                 'nombre' => $e->nombre,
-                'total'  => (int) $e->total,
+                'total' => (int) $e->total,
             ])
             ->toArray();
 
         $rolesAdmin = [
             'SUPERADMINISTRADOR',
-            'ADMINISTRADOR'
+            'ADMINISTRADOR',
         ];
 
         $paTotales = User::role($rolesAdmin)->count();
@@ -429,23 +556,23 @@ class DashboardService
             ->groupBy('r.name')
             ->orderByDesc('total')
             ->get()
-            ->map(fn($c) => [
+            ->map(fn ($c) => [
                 'nombre' => $c->cargo_nombre,
-                'total'  => (int) $c->total,
+                'total' => (int) $c->total,
             ])
             ->toArray();
 
         return [
             'personal_salud' => [
-                'total'           => $psTotales,
-                'activos'         => $psActivos,
+                'total' => $psTotales,
+                'activos' => $psActivos,
                 'sin_especialidad' => 0,
-                'especialidades'  => $especialidades,
+                'especialidades' => $especialidades,
             ],
             'personal_admin' => [
-                'total'   => $paTotales,
+                'total' => $paTotales,
                 'activos' => $paActivos,
-                'cargos'  => $cargos,
+                'cargos' => $cargos,
             ],
         ];
     }
@@ -457,14 +584,14 @@ class DashboardService
             ->groupBy('estado')
             ->orderByDesc('total')
             ->get()
-            ->map(fn($e) => [
+            ->map(fn ($e) => [
                 'estado' => $e->estado,
-                'total'  => (int) $e->total,
-                'color'  => match($e->estado) {
+                'total' => (int) $e->total,
+                'color' => match ($e->estado) {
                     'ACTIVO', 'ADMITIDO' => 'verde',
-                    'BAJA', 'FALLECIDO'  => 'rojo',
-                    'HOSPITALIZADO'      => 'naranja',
-                    default              => 'azul',
+                    'BAJA', 'FALLECIDO' => 'rojo',
+                    'HOSPITALIZADO' => 'naranja',
+                    default => 'azul',
                 },
             ])
             ->toArray();
@@ -509,11 +636,11 @@ class DashboardService
     private function obtenerEstadisticas($usuario): array
     {
         return [
-            'total_adultos'        => DB::table('residentes')->count(),
-            'total_usuarios'       => DB::table('usuarios')->count(),
-            'total_atenciones'     => DB::table('atenciones')->count(),
+            'total_adultos' => DB::table('residentes')->count(),
+            'total_usuarios' => DB::table('usuarios')->count(),
+            'total_atenciones' => DB::table('atenciones')->count(),
             'total_prescripciones' => DB::table('prescripciones')->count(),
-            'total_alertas'        => DB::table('alertas')->whereIn('estado', ['PENDIENTE', 'ABIERTA'])->count(),
+            'total_alertas' => DB::table('alertas')->whereIn('estado', ['PENDIENTE', 'ABIERTA'])->count(),
         ];
     }
 
@@ -525,8 +652,8 @@ class DashboardService
             ->groupBy('r.name')
             ->orderByDesc('total')
             ->get()
-            ->map(fn($item) => [
-                'rol'   => $item->rol,
+            ->map(fn ($item) => [
+                'rol' => $item->rol,
                 'total' => (int) $item->total,
             ])
             ->toArray();
@@ -535,6 +662,7 @@ class DashboardService
     private function obtenerActividadMensual(): array
     {
         $dateExpr = DB::connection()->getDriverName() === 'sqlite' ? "strftime('%Y-%m', fecha_hora)" : "TO_CHAR(fecha_hora, 'YYYY-MM')";
+
         return DB::table('atenciones')
             ->select(
                 DB::raw("{$dateExpr} as periodo"),
@@ -544,8 +672,8 @@ class DashboardService
             ->groupBy(DB::raw($dateExpr))
             ->orderBy('periodo')
             ->get()
-            ->map(fn($item) => [
-                'mes'   => $item->periodo,
+            ->map(fn ($item) => [
+                'mes' => $item->periodo,
                 'total' => (int) $item->total,
             ])
             ->toArray();
@@ -565,12 +693,12 @@ class DashboardService
             ->orderByDesc('u.cod_usuario')
             ->limit(10)
             ->get()
-            ->map(fn($u) => [
+            ->map(fn ($u) => [
                 'cod_usuario' => $u->cod_usuario,
-                'nombre'  => trim(($u->nombres ?? '') . ' ' . ($u->ap_paterno ?? '')) ?: $u->correo,
-                'correo'  => $u->correo,
-                'estado'  => $u->estado ?? 'ACTIVO',
-                'rol'     => $this->obtenerRolPrimario($u->cod_usuario),
+                'nombre' => trim(($u->nombres ?? '').' '.($u->ap_paterno ?? '')) ?: $u->correo,
+                'correo' => $u->correo,
+                'estado' => $u->estado ?? 'ACTIVO',
+                'rol' => $this->obtenerRolPrimario($u->cod_usuario),
             ])
             ->toArray();
     }
@@ -581,10 +709,10 @@ class DashboardService
             ->orderByDesc('fecha_hora')
             ->limit(5)
             ->get()
-            ->map(fn($a) => [
-                'titulo'  => 'Actividad: ' . ($a->tipo ?? 'General'),
-                'detalle' => ($a->nombre ?? 'Sin título') . ' - ' . ($a->fecha_hora ? Carbon::parse($a->fecha_hora)->format('d/m/Y') : 'Hoy'),
-                'icono'   => 'ph-calendar-check',
+            ->map(fn ($a) => [
+                'titulo' => 'Actividad: '.($a->tipo ?? 'General'),
+                'detalle' => ($a->nombre ?? 'Sin título').' - '.($a->fecha_hora ? Carbon::parse($a->fecha_hora)->format('d/m/Y') : 'Hoy'),
+                'icono' => 'ph-calendar-check',
             ])
             ->toArray();
     }
@@ -597,7 +725,7 @@ class DashboardService
             ->pluck('descripcion')
             ->toArray();
 
-        return count($alertas) > 0 ? $alertas : ["El sistema no presenta alertas administrativas pendientes."];
+        return count($alertas) > 0 ? $alertas : ['El sistema no presenta alertas administrativas pendientes.'];
     }
 
     private function obtenerModulosInstitucionales(): array
@@ -625,10 +753,10 @@ class DashboardService
             ->get()
             ->map(function ($log) {
                 return [
-                    'fecha'   => isset($log->created_at) ? Carbon::parse($log->created_at)->diffForHumans() : '-',
+                    'fecha' => isset($log->created_at) ? Carbon::parse($log->created_at)->diffForHumans() : '-',
                     'usuario' => $log->usuario_nombre ?? 'Sistema',
-                    'accion'  => $this->traducirEvento($log->event),
-                    'modulo'  => $this->traducirModulo($log->log_name),
+                    'accion' => $this->traducirEvento($log->event),
+                    'modulo' => $this->traducirModulo($log->log_name),
                     'detalle' => $this->limpiarDescripcion($log->description ?? ''),
                 ];
             })
@@ -637,38 +765,38 @@ class DashboardService
 
     private function traducirEvento(?string $evento): string
     {
-        return match($evento) {
+        return match ($evento) {
             'created', 'registro' => 'Registro creado',
-            'updated', 'edicion'  => 'Registro actualizado',
-            'deleted', 'borrado'  => 'Registro eliminado',
-            'restored'            => 'Registro restaurado',
-            'accessed', 'acceso'  => 'Acceso al sistema',
-            'login'               => 'Inicio de sesión',
-            'logout'              => 'Cierre de sesión',
-            'assigned'            => 'Asignación realizada',
-            default               => 'Acción registrada',
+            'updated', 'edicion' => 'Registro actualizado',
+            'deleted', 'borrado' => 'Registro eliminado',
+            'restored' => 'Registro restaurado',
+            'accessed', 'acceso' => 'Acceso al sistema',
+            'login' => 'Inicio de sesión',
+            'logout' => 'Cierre de sesión',
+            'assigned' => 'Asignación realizada',
+            default => 'Acción registrada',
         };
     }
 
     private function traducirModulo(?string $modulo): string
     {
-        return match($modulo) {
+        return match ($modulo) {
             'dashboard', 'Panel principal' => 'Panel principal',
-            'users', 'usuarios'            => 'Usuarios',
-            'roles'                        => 'Roles',
-            'evaluaciones'                 => 'Evaluaciones',
-            'actividades'                  => 'Actividades',
-            'asignaciones'                 => 'Asignaciones',
-            'default'                      => 'General',
-            default                        => $modulo ?? 'General',
+            'users', 'usuarios' => 'Usuarios',
+            'roles' => 'Roles',
+            'evaluaciones' => 'Evaluaciones',
+            'actividades' => 'Actividades',
+            'asignaciones' => 'Asignaciones',
+            'default' => 'General',
+            default => $modulo ?? 'General',
         };
     }
 
     private function limpiarDescripcion(string $descripcion): string
     {
         $traducciones = [
-            'User updated'                      => 'Usuario actualizado',
-            'Accessed dashboard'                => 'Acceso al panel principal',
+            'User updated' => 'Usuario actualizado',
+            'Accessed dashboard' => 'Acceso al panel principal',
             'Access to institutional dashboard' => 'Acceso al dashboard institucional',
             'Acceso al dashboard institucional' => 'Acceso al panel institucional',
         ];
@@ -686,6 +814,10 @@ class DashboardService
 
     public function limpiarCache($idUsuario): void
     {
-        Cache::forget('dashboard_' . $idUsuario);
+        $usuario = User::query()->find($idUsuario);
+        if ($usuario) {
+            $perfil = $usuario->getRoleNames()->sort()->implode('|');
+            Cache::forget('dashboard_roles_v2_'.$idUsuario.'_'.md5($perfil));
+        }
     }
 }

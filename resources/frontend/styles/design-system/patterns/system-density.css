@@ -44,6 +44,12 @@
     line-height: var(--rm-line-height-tight) !important;
 }
 
+.rm-depth-canvas :is(h1, h2)[class~="text-4xl"],
+.rm-depth-canvas :is(h1, h2)[class~="sm:text-4xl"] {
+    font-size: var(--rm-font-size-page) !important;
+    line-height: var(--rm-line-height-title) !important;
+}
+
 .rm-depth-canvas .rm-role-hero [class~="text-5xl"],
 .rm-depth-canvas .rm-role-hero [class~="text-6xl"] {
     font-size: var(--rm-font-size-dashboard) !important;
@@ -53,11 +59,27 @@
     padding: var(--rm-card-padding) !important;
 }
 
+.rm-depth-canvas [class~="p-8"] {
+    padding: var(--rm-space-5) !important;
+}
+
+.rm-depth-canvas [class~="gap-8"] {
+    gap: var(--rm-space-4) !important;
+}
+
+.rm-depth-canvas [class~="space-y-8"] > :not([hidden]) ~ :not([hidden]) {
+    margin-top: var(--rm-space-4) !important;
+}
+
 .rm-depth-canvas [class~="py-10"] {
     padding-block: var(--rm-card-padding) !important;
 }
 
 .rm-depth-canvas [class~="min-h-[400px]"] {
+    min-height: 0 !important;
+}
+
+.rm-depth-canvas [class~="min-h-screen"] {
     min-height: 0 !important;
 }
 
@@ -86,13 +108,14 @@
     }
 
     .rm-role-hero {
-        height: var(--rm-dashboard-hero-height, 260px);
-        min-height: 240px;
-        max-height: 270px;
+        min-height: 220px;
+        height: auto;
+        max-height: none;
         grid-template-columns: minmax(0, 1fr);
     }
 
     .rm-role-hero__content { z-index: 2; padding: 1rem; }
+    .rm-role-hero__title { font-size: clamp(29px, 6vw, 36px); }
     .rm-role-hero__description,
     .rm-role-hero__meta { display: none; }
     .rm-role-hero__actions { flex-wrap: nowrap; overflow-x: auto; padding-bottom: .2rem; scrollbar-width: none; }

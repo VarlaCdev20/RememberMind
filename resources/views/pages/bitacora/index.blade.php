@@ -167,7 +167,7 @@
  {{-- VISTA: TABLA DETALLADA --}}
  <div x-show="vista === 'table'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0" class="overflow-hidden rounded-3xl border border-borde-suave bg-fondo-card/80 shadow-xl backdrop-blur-md">
  <div class="overflow-x-auto">
- <table class="w-full text-left text-sm">
+ <table class="rm-data-table rm-data-table--actions w-full text-left text-sm">
  <thead>
  <tr class="border-b border-borde-suave bg-fondo-panel">
  <th class="px-5 py-4 text-[10px] font-bold uppercase tracking-widest text-titulo/60">Fecha y Hora</th>

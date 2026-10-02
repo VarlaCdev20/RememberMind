@@ -44,7 +44,7 @@ Fases pueden organizar trabajo interno, pero la dependencia de datos permanece. 
 
 ## Estrategia de pruebas de BD
 
-Suite rápida aislada SQLite para casos compatibles y suite Integration PostgreSQL para FKs, indices parciales, triggers, SQL nativo, bloqueo concurrente y migración. Semillas de pruebas ficticias, sin ejecutar DatabaseSeeder de demo nominal en entorno real. Guardia de conexión antes de cualquier reset de BD de pruebas. No ejecutar migrate:fresh sobre entorno actual. Construir bases efímeras y destruirlas solo con autorización y verificación del destino durante implementación futura.
+Suite rápida aislada SQLite para casos compatibles y suite Integration PostgreSQL para FKs, indices parciales, triggers, SQL nativo, bloqueo concurrente y migración. Semillas ficticias exclusivas de local/testing, sin ejecutarlas en entorno real. Guardia de conexión antes de cualquier reset de BD de pruebas. No ejecutar migrate:fresh sobre entorno actual. Construir bases efímeras y destruirlas solo con autorización y verificación del destino durante implementación futura.
 
 En esta tarea no se ejecuta php artisan test ni route:list como sustituto del diseño. El resultado 37 passed/8 skipped/0 failed corresponde al trabajo previo de rutas, no certifica este plan ni los módulos clínicos. No confundir skips de funciones Jetstream deshabilitadas con pruebas de funcionalidad clínica.
 
@@ -59,4 +59,3 @@ Criterios de no apertura: discrepancia de paciente/dosis, camas solapadas, pérd
 ## Definición de terminado global
 
 Los 14 módulos satisfacen 05/06; toda funcionalidad existente útil tiene prueba; todas las tablas de 04 están conciliadas; navegación no anuncia páginas vacías; formularios comparten reglas; PostgreSQL consistente y privado; roles efectivos aprobados; reportes comparados; usuarios operativos validan escenarios; soporte y restauración documentados. Commit/push/despliegue siguen fuera de esta tarea y de esta entrega documental.
-

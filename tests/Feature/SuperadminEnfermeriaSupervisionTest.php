@@ -189,22 +189,16 @@ class SuperadminEnfermeriaSupervisionTest extends TestCase
         }
     }
 
-    public function test_sidebar_superadmin_expone_la_supervision_clinica_completa(): void
+    public function test_sidebar_superadmin_no_expone_operacion_clinica(): void
     {
         $this->actingAs($this->superadmin);
         $sidebar = app(SidebarService::class)->getSidebar();
         $seccion = collect($sidebar)->firstWhere('title', 'Supervisión de Enfermería');
 
-        $this->assertNotNull($seccion);
-        $rutas = collect($seccion['items'])->pluck('route');
+        $this->assertNull($seccion);
         $todasLasRutas = collect($sidebar)->flatMap(fn (array $item) => collect($item['items'] ?? [])->pluck('route'));
-        $this->assertSame(1, $todasLasRutas->filter(fn ($ruta) => $ruta === 'admin.enfermeria.dashboard')->count());
-        $this->assertContains('admin.enfermeria.agenda', $rutas);
-        $this->assertContains('admin.salud-seguimiento.medicacion.index', $rutas);
-        $this->assertContains('admin.salud-seguimiento.administracion.index', $rutas);
-        $this->assertContains('admin.enfermeria.registros', $rutas);
-        $this->assertContains('admin.enfermeria.alertas', $rutas);
-        $this->assertContains('admin.enfermeria.reportes', $rutas);
+        $this->assertNotContains('admin.enfermeria.dashboard', $todasLasRutas);
+        $this->assertNotContains('admin.enfermeria.agenda', $todasLasRutas);
     }
 
     public function test_superadmin_puede_ver_administraciones_pero_no_crear_administracion_solo_por_su_rol(): void

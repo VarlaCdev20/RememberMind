@@ -254,7 +254,12 @@ class CampanaNotificaciones extends Component
         $user = auth()->user();
         abort_unless($user, 401);
 
-        abort_unless($user->can($accion === 'ver' ? 'alertas.ver' : 'alertas.gestionar'), 403);
+        $permiso = match ($accion) {
+            'ver' => 'alertas.ver',
+            'cerrar' => 'alertas.cerrar',
+            default => 'alertas.seguimiento',
+        };
+        abort_unless($user->canAny([$permiso, 'alertas.gestionar']), 403);
     }
 
     public function render()
@@ -269,8 +274,8 @@ class CampanaNotificaciones extends Component
             ->get();
 
         $user = auth()->user();
-        $puedeAtender = (bool) $user?->can('alertas.gestionar');
-        $puedeCerrar = (bool) $user?->can('alertas.gestionar');
+        $puedeAtender = (bool) $user?->canAny(['alertas.gestionar', 'alertas.seguimiento']);
+        $puedeCerrar = (bool) $user?->canAny(['alertas.gestionar', 'alertas.cerrar']);
 
         return view('livewire.alertas.campana-notificaciones', [
             'alertas' => $alertas,
@@ -285,7 +290,7 @@ class CampanaNotificaciones extends Component
         $query = Alerta::query()->whereIn('estado', ['ABIERTA', 'EN_ATENCION']);
         $user = auth()->user();
 
-        if (!$user?->canAny(['alertas.ver', 'alertas.gestionar'])) {
+        if (!$user?->canAny(['alertas.ver', 'alertas.gestionar', 'alertas.seguimiento', 'alertas.cerrar'])) {
             return $query->whereRaw('1 = 0');
         }
 

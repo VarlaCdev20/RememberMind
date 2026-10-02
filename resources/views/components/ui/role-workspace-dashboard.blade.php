@@ -1,20 +1,35 @@
 @props(['perfil' => [], 'saludo' => []])
+@inject('visibilidadNavegacion', 'App\Backend\Modulos\Identidad\Servicios\VisibilidadNavegacion')
 
 @php
     $areas = $perfil['areas'] ?? [];
-    $accesos = collect($perfil['accesos'] ?? [])->filter(function ($acceso) {
-        $permiso = $acceso['permission'] ?? null;
-        return Route::has($acceso['route']) && (!$permiso || auth()->user()?->can($permiso));
-    });
+    $indicadores = $perfil['indicadores'] ?? [];
+    $accesos = collect($perfil['accesos'] ?? [])->filter(
+        fn ($acceso) => $visibilidadNavegacion->puedeVerRuta($acceso['route'], $acceso['permission'] ?? null)
+    );
+    $contextoFoto = match ($perfil['rol'] ?? '') {
+        'SUPERADMINISTRADOR' => 'superadmin',
+        'ADMINISTRADOR' => 'administracion',
+        'MEDICO GENERAL/GERIATRA' => 'medico',
+        'PSICOLOGO/A' => 'psicologia',
+        'NUTRICIONISTA' => 'nutricionista',
+        'FISIOTERAPEUTA' => 'fisioterapeuta',
+        'PEDAGOGO' => 'pedagogo',
+        'FAMILIAR' => 'familiar',
+        'ENFERMEROS' => 'enfermeria',
+        default => 'perfil-general',
+    };
 @endphp
 
 <div class="rm-dashboard-composition">
     <x-ui.role-dashboard-hero
+        personal-greeting
         :eyebrow="$perfil['eyebrow'] ?? 'CENTRO GERIÁTRICO LOS ALMENDROS'"
         :title="($saludo['saludo'] ?? 'Bienvenido') . ', ' . ($saludo['nombre'] ?? 'Usuario')"
         :highlight="$perfil['highlight'] ?? 'Tu espacio de trabajo'"
         :description="$perfil['description'] ?? ''"
         :image="asset($perfil['image'] ?? 'images/FOTOS CENTRO DE ADULTOS MAYORES/489963938_1158744422930145_8442506970304201426_n.jpg')"
+        :rotation-context="$contextoFoto"
         :quote="$perfil['quote'] ?? 'Cuidado con propósito'"
         :meta="[
             ['icon' => 'ph-calendar-blank', 'label' => $saludo['fecha'] ?? now()->format('d/m/Y')],
@@ -28,6 +43,19 @@
             </a>
         @endforeach
     </x-ui.role-dashboard-hero>
+
+    @if(!empty($indicadores))
+        <section class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4" aria-label="Indicadores del perfil">
+            @foreach($indicadores as $indicador)
+                <x-ui.metric-card
+                    :icon="$indicador['icon'] ?? 'ph-chart-bar'"
+                    :value="$indicador['value'] ?? null"
+                    :label="$indicador['label'] ?? 'Indicador'"
+                    :description="$indicador['description'] ?? null"
+                    :variant="$indicador['variant'] ?? 'neutral'" />
+            @endforeach
+        </section>
+    @endif
 
     <section class="rm-role-focus" aria-labelledby="role-focus-title">
         <div class="rm-role-focus__heading">

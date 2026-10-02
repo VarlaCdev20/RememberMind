@@ -4,13 +4,13 @@
  @endif
  {{-- 1. CABECERA Y ACCIONES DEL MÓDULO --}}
  <x-ui.page-header
-  title="Gestión y prescripción de medicación"
+  title="Gestión y Prescripción de Medicación"
   :subtitle="$adulto
    ? 'Tratamientos y tomas activas para ' . $adulto->nombres . ' ' . $adulto->ap_paterno . ' ' . $adulto->ap_materno
    : 'Control integral de fármacos, horarios y recetas para todos los residentes del centro.'"
   overline="Módulo clínico farmacológico"
   icon="ph-pill">
- @if(auth()->user()?->hasAnyRole(['SUPERADMINISTRADOR', 'MEDICO GENERAL/GERIATRA']))
+ @if(auth()->user()?->hasRole('MEDICO GENERAL/GERIATRA') && auth()->user()?->can('prescripciones.crear'))
   <x-ui.action-button
    variant="primary"
    size="sm"
@@ -70,7 +70,7 @@
    @endforeach
    </select>
    </div>
-   @error('nuevo_cod_am') <span class="mt-1 block text-[10px] font-bold text-[var(--rm-danger)]">{{ $message }}</span> @enderror
+   @error('nuevo_cod_residente') <span class="mt-1 block text-[10px] font-bold text-[var(--rm-danger)]">{{ $message }}</span> @enderror
    </div>
 
    {{-- NOMBRE DEL FÁRMACO --}}
@@ -332,7 +332,7 @@
   <span class="font-black text-[var(--rm-success)]">{{ $stats['activas'] }}</span>
   </div>
 
-  @if(auth()->user()?->hasAnyRole(['SUPERADMINISTRADOR', 'MEDICO GENERAL/GERIATRA']))
+  @if(auth()->user()?->hasRole('MEDICO GENERAL/GERIATRA') && auth()->user()?->can('prescripciones.crear'))
   <button type="button" wire:click="abrirFormularioPara('{{ $adulto->cod_residente }}')" class="w-full inline-flex items-center justify-center gap-2 rounded-xl border border-[var(--rm-primary)] bg-[var(--rm-primary)] px-3 py-2 text-xs font-bold text-inverso shadow-sm transition hover:bg-[var(--rm-primary)]Hover active:scale-95">
   <i class="ph-bold ph-plus-circle text-sm"></i>
   <span>Prescribir para {{ strtok($adulto->nombres, ' ') }}</span>
@@ -381,57 +381,93 @@
  </aside>
  {{-- COLUMNA PRINCIPAL (FILTROS Y TABLA) --}}
  <div class="lg:col-span-2 space-y-6">
- {{-- FILTROS DE BÚSQUEDA --}}
- <section class="rm-filter-bar">
- <div class="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-  <div>
-  <h3 class="text-xs font-black uppercase tracking-wider text-[var(--rm-text-body)]">Filtros de Búsqueda</h3>
+ {{-- FILTROS DE BÚSQUEDA FORMATO ALERTAS --}}
+ <x-ui.filter-bar class="mb-4">
+  <div class="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-2 items-center">
+   {{-- Búsqueda textual --}}
+   <div class="lg:col-span-6 relative flex items-center">
+    <span class="rm-filter-search-icon absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-[var(--rm-text-secondary)]">
+     <i class="ph-bold ph-magnifying-glass text-base"></i>
+    </span>
+    <input type="text"
+     wire:model.live.debounce.300ms="search"
+     placeholder="Buscar medicamento..."
+     class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-input-bg)] py-2 pl-9 pr-8 text-xs font-medium text-[var(--rm-text-primary)] placeholder-[var(--rm-text-secondary)] focus:border-[var(--rm-primary)] focus:ring-1 focus:ring-[var(--rm-primary)] focus:outline-none h-[38px]" />
+    @if($search !== '')
+     <button type="button"
+      wire:click="$set('search', '')"
+      class="rm-filter-clear absolute inset-y-0 right-0 flex items-center pr-2.5 text-[var(--rm-text-secondary)] hover:text-[var(--rm-danger)] cursor-pointer"
+      title="Limpiar búsqueda">
+      <i class="ph-bold ph-x-circle text-base"></i>
+     </button>
+    @endif
+   </div>
+
+   {{-- Filtro Estado --}}
+   <div class="lg:col-span-3">
+    <select wire:model.live="filtroEstado"
+     class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-input-bg)] py-2 px-3 text-xs font-medium text-[var(--rm-text-primary)] focus:border-[var(--rm-primary)] focus:ring-1 focus:ring-[var(--rm-primary)] focus:outline-none h-[38px] cursor-pointer">
+     <option value="">Todos los estados</option>
+     <option value="ACTIVO">Activos</option>
+     <option value="SUSPENDIDO">Suspendidos</option>
+     <option value="FINALIZADO">Finalizados</option>
+     <option value="ARCHIVADO">Archivados (Histórico)</option>
+    </select>
+   </div>
+
+   {{-- Filtro Vía --}}
+   <div class="lg:col-span-3">
+    <select wire:model.live="filtroVia"
+     class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-input-bg)] py-2 px-3 text-xs font-medium text-[var(--rm-text-primary)] focus:border-[var(--rm-primary)] focus:ring-1 focus:ring-[var(--rm-primary)] focus:outline-none h-[38px] cursor-pointer">
+     <option value="">Todas las vías</option>
+     @foreach($viasDisponibles as $via)
+      <option value="{{ $via }}">{{ $via }}</option>
+     @endforeach
+    </select>
+   </div>
   </div>
-  @if($search !== '' || $filtroEstado !== '' || $filtroVia !== '')
-  <button wire:click="limpiarFiltros" type="button" class="rm-filter-reset">
-  <i class="ph-bold ph-x-circle"></i>
-  Limpiar filtros
-  </button>
+
+  {{-- Fila de chips de filtros activos formato alertas con scroll horizontal y colorcitos --}}
+  @php
+   $hasFiltrosMed = !empty($search) || !empty($filtroEstado) || !empty($filtroVia);
+  @endphp
+  @if($hasFiltrosMed)
+   <div class="rm-filter-bar__active">
+    <div class="rm-filter-scroll">
+     <span class="rm-filter-bar__active-label">
+      <i class="ph-bold ph-funnel text-xs"></i> Filtros activos:
+     </span>
+     @if(!empty($search))
+      <span class="rm-filter-chip rm-filter-chip--search">
+       <i class="ph-bold ph-magnifying-glass text-xs"></i>
+       <span>B?squeda: "{{ Str::limit($search, 16) }}"</span>
+       <button type="button" wire:click="$set('search', '')" title="Quitar filtro"><i class="ph-bold ph-x text-xs"></i></button>
+      </span>
+     @endif
+     @if(!empty($filtroEstado))
+      <span class="rm-filter-chip {{ $filtroEstado === 'ACTIVO' ? 'rm-filter-chip--success' : ($filtroEstado === 'SUSPENDIDO' ? 'rm-filter-chip--danger' : 'rm-filter-chip--warning') }}">
+       <span class="w-1.5 h-1.5 rounded-full {{ $filtroEstado === 'ACTIVO' ? 'bg-[var(--rm-action-primary)]' : ($filtroEstado === 'SUSPENDIDO' ? 'bg-[var(--rm-danger)] animate-pulse' : 'bg-[var(--rm-status-high)]') }}"></span>
+       <span>Estado: {{ $filtroEstado }}</span>
+       <button type="button" wire:click="$set('filtroEstado', '')" title="Quitar filtro"><i class="ph-bold ph-x text-xs"></i></button>
+      </span>
+     @endif
+     @if(!empty($filtroVia))
+      <span class="rm-filter-chip rm-filter-chip--clinical">
+       <i class="ph-bold ph-pill text-xs"></i>
+       <span>V?a: {{ $filtroVia }}</span>
+       <button type="button" wire:click="$set('filtroVia', '')" title="Quitar filtro"><i class="ph-bold ph-x text-xs"></i></button>
+      </span>
+     @endif
+     <button type="button"
+      wire:click="limpiarFiltros"
+      class="rm-filter-bar__clear-btn">
+      <i class="ph-bold ph-arrow-counter-clockwise text-xs"></i>
+      <span>Limpiar filtros</span>
+     </button>
+    </div>
+   </div>
   @endif
- </div>
-
- <div class="grid gap-4 sm:grid-cols-3">
-  <div>
-  <label class="mb-1.5 block text-[9px] font-bold uppercase tracking-widest text-[var(--rm-text-body)]/60">Medicamento</label>
-  <div class="relative">
-  <i class="ph-bold ph-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--rm-text-muted)]"></i>
-  <input type="text" wire:model.live.debounce.300ms="search" placeholder="Buscar medicamento..." class="w-full rounded-xl border border-[var(--rm-border)]/70 bg-[var(--rm-bg-app)] py-2.5 pl-10 pr-4 text-xs font-bold text-[var(--rm-text-body)] outline-none transition placeholder:text-[var(--rm-text-muted)] focus:border-[var(--rm-primary)] focus:ring-2 focus:ring-boton-principal/20">
-  </div>
-  </div>
-
-  <div>
-  <label class="mb-1.5 block text-[9px] font-bold uppercase tracking-widest text-[var(--rm-text-body)]/60">Estado</label>
-  <div class="relative">
-  <i class="ph-bold ph-funnel absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--rm-text-muted)]"></i>
-  <select wire:model.live="filtroEstado" class="w-full rounded-xl border border-[var(--rm-border)]/70 bg-[var(--rm-bg-app)] py-2.5 pl-10 pr-4 text-xs font-bold text-[var(--rm-text-body)] outline-none transition appearance-none focus:border-[var(--rm-primary)] focus:ring-2 focus:ring-boton-principal/20">
-  <option value="">Todos los estados</option>
-  <option value="ACTIVO">Activos</option>
-  <option value="SUSPENDIDO">Suspendidos</option>
-  <option value="FINALIZADO">Finalizados</option>
-  <option value="ARCHIVADO">Archivados (Histórico)</option>
-  </select>
-  </div>
-  </div>
-
-  <div>
-  <label class="mb-1.5 block text-[9px] font-bold uppercase tracking-widest text-[var(--rm-text-body)]/60">Vía</label>
-  <div class="relative">
-  <i class="ph-bold ph-flask absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--rm-text-muted)]"></i>
-  <select wire:model.live="filtroVia" class="w-full rounded-xl border border-[var(--rm-border)]/70 bg-[var(--rm-bg-app)] py-2.5 pl-10 pr-4 text-xs font-bold text-[var(--rm-text-body)] outline-none transition appearance-none focus:border-[var(--rm-primary)] focus:ring-2 focus:ring-boton-principal/20">
-  <option value="">Todas las vías</option>
-  @foreach($viasDisponibles as $via)
-   <option value="{{ $via }}">{{ $via }}</option>
-  @endforeach
-  </select>
-  </div>
-  </div>
- </div>
- </section>
+ </x-ui.filter-bar>
 
  {{-- TABLA DE MEDICACIONES --}}
  <section class="rounded-[1.6rem] border border-[var(--rm-border)]/65 bg-[var(--rm-surface)] shadow-sm backdrop-blur-xl overflow-hidden relative">
@@ -466,7 +502,7 @@
   @endif
   </p>
   </div>
-  @if(auth()->user()?->hasAnyRole(['SUPERADMINISTRADOR', 'MEDICO GENERAL/GERIATRA']))
+  @if(auth()->user()?->hasRole('MEDICO GENERAL/GERIATRA') && auth()->user()?->can('prescripciones.crear'))
   <button type="button" wire:click="toggleFormularioCrear" class="inline-flex items-center gap-2 rounded-xl border border-[var(--rm-primary)] bg-[var(--rm-primary)] px-4 py-2.5 text-xs font-bold text-inverso shadow-sm transition hover:bg-[var(--rm-primary)]Hover active:scale-95">
   <i class="ph-bold ph-plus-circle text-base"></i>
   <span>Prescribir Primer Medicamento</span>
@@ -475,7 +511,7 @@
   </div>
  @else
   <div class="overflow-x-auto">
-  <table class="w-full text-left text-sm text-[var(--rm-text-body)]">
+  <table class="rm-data-table rm-data-table--actions w-full text-left text-sm text-[var(--rm-text-body)]">
   <thead class="bg-[var(--rm-bg-app)] text-[9px] font-black uppercase tracking-widest text-[var(--rm-text-muted)] border-b border-[var(--rm-border)]-suave">
   <tr>
    @if(!$adulto)
@@ -553,13 +589,13 @@
     </button>
    @endif
 
-   @if(auth()->user()?->hasAnyRole(['SUPERADMINISTRADOR', 'MEDICO GENERAL/GERIATRA']))
+   @if(auth()->user()?->hasRole('MEDICO GENERAL/GERIATRA') && auth()->user()?->can('prescripciones.editar'))
     <button type="button" @click="$dispatch('abrirModalMedicacion', { cod_residente: '{{ $med->cod_residente }}', id_med: '{{ $med->cod_prescripcion }}' })" class="inline-flex items-center justify-center rounded-lg border border-[var(--rm-border)] bg-[var(--rm-surface)] p-1.5 text-[var(--rm-text-muted)] transition hover:bg-[var(--rm-bg-app)] hover:text-[var(--rm-text-body)] active:scale-95" title="Editar prescripción">
     <i class="ph-bold ph-pencil-simple"></i>
     </button>
    @endif
 
-   @if(in_array($estado, ['ACTIVO', 'ACTIVA']) && auth()->user()?->hasAnyRole(['SUPERADMINISTRADOR', 'MEDICO GENERAL/GERIATRA']))
+   @if(in_array($estado, ['ACTIVO', 'ACTIVA']) && auth()->user()?->hasRole('MEDICO GENERAL/GERIATRA') && auth()->user()?->can('prescripciones.suspender'))
     <button type="button"
     wire:click="suspenderMedicamento('{{ $med->cod_prescripcion }}')"
     wire:confirm="¿Seguro que desea suspender la medicación '{{ $med->nombre_medicamento }}'?"

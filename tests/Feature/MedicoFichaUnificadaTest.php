@@ -3,11 +3,12 @@
 namespace Tests\Feature;
 
 use App\Frontend\Livewire\Compartido\Clinica\FichaPaciente;
+use App\Frontend\Livewire\Enfermeria\Cuidados\MisPacientes;
 use App\Models\AdultoMayor;
 use App\Models\Area;
 use App\Models\Atencion;
-use App\Models\Personal;
 use App\Models\Medicamento;
+use App\Models\Personal;
 use App\Models\Prescripcion;
 use App\Models\SignoVital;
 use App\Models\User;
@@ -22,13 +23,14 @@ class MedicoFichaUnificadaTest extends TestCase
     use RefreshDatabase;
 
     private User $medico;
+
     private AdultoMayor $residente;
 
     protected function setUp(): void
     {
         parent::setUp();
         Carbon::setTestNow('2026-09-12 10:00:00');
-        $this->seed([ RolesAndPermissionsSeeder::class]);
+        $this->seed([RolesAndPermissionsSeeder::class]);
 
         $this->medico = User::factory()->create(['estado' => 'ACTIVO']);
         $this->medico->assignRole('MEDICO GENERAL/GERIATRA');
@@ -49,9 +51,9 @@ class MedicoFichaUnificadaTest extends TestCase
 
         $this->residente = AdultoMayor::factory()->create([
             'cod_est_adul' => 'EST_001',
-            'nombres'      => 'Aurelio',
-            'ap_paterno'   => 'Valdivia',
-            'ap_materno'   => 'Paredes',
+            'nombres' => 'Aurelio',
+            'ap_paterno' => 'Valdivia',
+            'ap_materno' => 'Paredes',
         ]);
 
         $atencion = Atencion::create([
@@ -77,25 +79,25 @@ class MedicoFichaUnificadaTest extends TestCase
             ])->cod_medicamento,
             'cod_personal' => $personal->cod_personal,
             'nombre_medicamento' => 'Enalapril 10mg',
-            'dosis'              => '1 comprimido',
-            'frecuencia'         => 'DIARIA',
+            'dosis' => '1 comprimido',
+            'frecuencia' => 'DIARIA',
             'via_administracion' => 'ORAL',
-            'hora_programada'    => '08:00',
-            'fecha_inicio'       => today(),
-            'estado'             => 'ACTIVA',
+            'hora_programada' => '08:00',
+            'fecha_inicio' => today(),
+            'estado' => 'ACTIVA',
         ]);
 
         SignoVital::create([
             'cod_residente' => $this->residente->cod_residente,
             'cod_personal' => $this->medico->personal()->firstOrFail()->cod_personal,
-            'fecha'              => today(),
-            'hora'               => '08:00',
-            'presion_sistolica'  => 120,
+            'fecha' => today(),
+            'hora' => '08:00',
+            'presion_sistolica' => 120,
             'presion_diastolica' => 80,
-            'frecuencia_cardiaca'=> 72,
-            'saturacion'         => 97,
-            'temperatura'        => 36.5,
-            'registrado_por'     => $this->medico->cod_usuario,
+            'frecuencia_cardiaca' => 72,
+            'saturacion' => 97,
+            'temperatura' => 36.5,
+            'registrado_por' => $this->medico->cod_usuario,
         ]);
     }
 
@@ -123,7 +125,7 @@ class MedicoFichaUnificadaTest extends TestCase
             ->assertOk()
             ->assertSee('Aurelio')
             ->assertSee('Valdivia')
-            ->assertSee('ÁREA MÉDICA Y CLÍNICA');
+            ->assertSee('Área médica y clínica');
 
         $ficha->call('cambiarTab', 'medicacion')
             ->assertSee('Enalapril 10mg')
@@ -137,8 +139,8 @@ class MedicoFichaUnificadaTest extends TestCase
         // Residente sin asignación de turno de enfermería
         $otroResidente = AdultoMayor::factory()->create([
             'cod_est_adul' => 'EST_001',
-            'nombres'      => 'Beatriz',
-            'ap_paterno'   => 'Sarmiento',
+            'nombres' => 'Beatriz',
+            'ap_paterno' => 'Sarmiento',
         ]);
 
         $this->get(route('admin.medico.residente.ficha', $otroResidente->cod_residente))
@@ -152,11 +154,11 @@ class MedicoFichaUnificadaTest extends TestCase
 
         $otroResidente = AdultoMayor::factory()->create([
             'cod_est_adul' => 'EST_001',
-            'nombres'      => 'Beatriz',
-            'ap_paterno'   => 'Sarmiento',
+            'nombres' => 'Beatriz',
+            'ap_paterno' => 'Sarmiento',
         ]);
 
-        Livewire::test(\App\Frontend\Livewire\Enfermeria\Cuidados\MisPacientes::class)
+        Livewire::test(MisPacientes::class)
             ->assertOk()
             ->assertSee('Aurelio')
             ->assertSee('Beatriz');

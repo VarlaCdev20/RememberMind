@@ -7,19 +7,22 @@
     /* ------------------------------------------------------------
        DURACIONES NORMALIZADAS V2
        ------------------------------------------------------------ */
-    --rm-duration-fast: 150ms;
+    --rm-duration-fast: 120ms;
     --rm-duration-normal: 200ms;
-    --rm-duration-slow: 300ms;
+    --rm-duration-slow: 280ms;
+    --rm-duration-enter: 400ms;
 
     /* ------------------------------------------------------------
        TIMING FUNCTIONS NORMALIZADAS V2
        ------------------------------------------------------------ */
     --rm-ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+    --rm-ease-enter: cubic-bezier(0, 0, 0.2, 1);
+    --rm-ease-exit: cubic-bezier(0.4, 0, 1, 1);
 
     /* Curvas complementarias y de retrocompatibilidad */
     --rm-ease-default: var(--rm-ease-standard);
-    --rm-ease-in: cubic-bezier(0.4, 0, 1, 1);
-    --rm-ease-out: cubic-bezier(0, 0, 0.2, 1);
+    --rm-ease-in: var(--rm-ease-exit);
+    --rm-ease-out: var(--rm-ease-enter);
 
     /* Transiciones preensambladas */
     --rm-transition-color: color var(--rm-duration-fast) var(--rm-ease-standard),
@@ -42,6 +45,7 @@
         --rm-duration-fast: 0.01ms;
         --rm-duration-normal: 0.01ms;
         --rm-duration-slow: 0.01ms;
+        --rm-duration-enter: 0.01ms;
     }
 
     *,

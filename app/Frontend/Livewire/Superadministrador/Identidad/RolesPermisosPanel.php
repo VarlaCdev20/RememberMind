@@ -194,14 +194,15 @@ class RolesPermisosPanel extends Component
     // Helpers Visuales
     public function obtenerNombreVisualRol($roleName)
     {
-        return strtoupper($roleName); // Todos los roles ya están en mayúsculas y nombrados correctamente
+        return $roleName === 'ADMINISTRADOR' ? 'ADMINISTRACIÓN' : strtoupper($roleName);
     }
 
     public function obtenerDescripcionRol($roleName)
     {
         return match ($roleName) {
-            'SUPERADMINISTRADOR' => 'Acceso total absoluto al sistema y configuraciones críticas.',
-            'ADMINISTRADOR' => 'Gestión institucional, administrativa, financiera y de reportes.',
+            'SUPERADMINISTRADOR' => 'Administración técnica de usuarios, accesos, seguridad, auditoría y configuración.',
+            'GERENTE' => 'Dirección institucional, gestión de personal, áreas, turnos, planificación y cobertura.',
+            'ADMINISTRADOR' => 'Operación diaria: admisiones, alojamiento, jornadas, asignaciones, documentos, visitas y alertas.',
             'ENFERMEROS' => 'Control de pacientes, administración de medicación, signos vitales y pase de turno.',
             'MEDICO GENERAL/GERIATRA' => 'Fichas clínicas completas, prescripciones, diagnósticos y altas médicas.',
             'PSICOLOGO/A' => 'Evaluaciones cognitivas, historial conductual y apoyo emocional.',
@@ -217,6 +218,7 @@ class RolesPermisosPanel extends Component
     {
         return match ($roleName) {
             'SUPERADMINISTRADOR' => 'bg-[#2F3E5C] text-white border border-[#2F3E5C]',
+            'GERENTE' => 'bg-[#3F6B5B] text-white border border-[#3F6B5B]',
             'ADMINISTRADOR' => 'bg-[#E27D60] text-white border border-[#E27D60]',
             'ENFERMEROS' => 'bg-boton-acento text-white border border-boton-acento',
             'MEDICO GENERAL/GERIATRA' => 'bg-[#6A8CAF] text-white border border-[#6A8CAF]',

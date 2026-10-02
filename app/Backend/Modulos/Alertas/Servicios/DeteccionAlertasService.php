@@ -1,7 +1,7 @@
 <?php
 namespace App\Backend\Modulos\Alertas\Servicios;
 
-use App\Frontend\Livewire\Compartido\Clinica\SignosVitalesPanel;
+use App\Backend\Modulos\Clinica\Servicios\ClasificacionSignosVitalesService;
 use App\Models\{AdultoMayor, Alerta, SignoVital, AdministracionMedicacion, Atencion, EjecucionCuidado};
 use Illuminate\Support\Facades\DB;
 
@@ -12,16 +12,8 @@ class DeteccionAlertasService
         $creadas = 0;
         SignoVital::vigentes()->when($codResidente, fn ($q) => $q->where('cod_residente', $codResidente))->orderBy('cod_signo')->chunk(100, function ($registros) use (&$creadas) {
             foreach ($registros as $s) {
-                $nivel = SignosVitalesPanel::nivelGlobal(
-                    $s->presion_sistolica,
-                    $s->presion_diastolica,
-                    $s->frecuencia_cardiaca,
-                    $s->frecuencia_respiratoria,
-                    $s->temperatura !== null ? (float) $s->temperatura : null,
-                    $s->saturacion,
-                    $s->glucosa !== null ? (float) $s->glucosa : null
-                );
-                if ($nivel !== 'normal') {
+                $nivel = ClasificacionSignosVitalesService::evaluarRegistro($s)['global'];
+                if (in_array($nivel, ['critico', 'advertencia'], true)) {
                     $creadas += $this->registrar(
                         $s,
                         'SIGNOS',
@@ -88,7 +80,7 @@ class DeteccionAlertasService
             'fichasMedicas' => fn ($q) => $q->whereIn('estado', ['ACTIVA', 'ACTIVO', 'VIGENTE'])->latest()->limit(1),
             'medicaciones' => fn ($q) => $q->whereIn('estado', ['ACTIVA', 'ACTIVO']),
             'administracionesMedicacion' => fn ($q) => $q->latest('fecha_hora_programada')->limit(3),
-            'signosVitales' => fn ($q) => $q->where('estado', 'ACTIVO')->latest('fecha_hora')->limit(1),
+            'signosVitales' => fn ($q) => $q->vigentes()->latest('fecha_hora')->limit(1),
             'valoracionesFuncionales' => fn ($q) => $q->latest('fecha_hora')->limit(1),
         ])
             ->when($codResidente, fn ($q) => $q->where('cod_residente', $codResidente))
@@ -101,7 +93,7 @@ class DeteccionAlertasService
             $fichaMedica = $adulto->fichasMedicas->whereIn('estado', ['ACTIVA', 'ACTIVO', 'VIGENTE'])->first();
             $medicacionesActivas = $adulto->medicaciones->whereIn('estado', ['ACTIVA', 'ACTIVO']);
             $valFuncional = $adulto->valoracionesFuncionales->sortByDesc('fecha_hora')->first();
-            $ultimosSignos = $adulto->signosVitales->where('estado', 'VIGENTE')->sortByDesc('fecha')->first();
+            $ultimosSignos = $adulto->signosVitales->sortByDesc('fecha_hora')->first();
 
             // 1. Falta de Ficha Médica activa
             if (!$fichaMedica) {
@@ -134,7 +126,7 @@ class DeteccionAlertasService
 
             // 3. Signos vitales desregulados en último control
             if ($ultimosSignos) {
-                if ($ultimosSignos->temperatura > 37.8 || ($ultimosSignos->saturacion !== null && $ultimosSignos->saturacion < 92)) {
+                if (ClasificacionSignosVitalesService::requiereAlertaPreventiva($ultimosSignos)) {
                     $alerta = $this->registrarPreventivaSiNoExiste(
                         $adulto->cod_residente,
                         'SIGNOS',

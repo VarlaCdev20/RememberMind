@@ -27,27 +27,39 @@
  </div>
  </section>
 
- <section class="rm-filter-bar">
- <div class="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
- <div>
- <h3 class="text-sm font-bold uppercase tracking-wider text-parrafo">Filtro clínico</h3>
- <p class="mt-1 text-xs font-bold text-parrafo/55">Seleccione un tipo de alerta para depurar el seguimiento.</p>
- </div>
- <label class="block w-full sm:max-w-xs">
- <span class="mb-1.5 block text-[9px] font-bold uppercase tracking-widestá text-parrafo/55">Tipo de alerta</span>
- <div class="relative">
- <i class="ph-bold ph-funnel absolute left-3.5 top-1/2 -translate-y-1/2 text-meta"></i>
- <select wire:model.live="filtroTipo" class="w-full rounded-xl border border-borde/70 bg-fondo-panel py-2.5 pl-10 pr-4 text-xs font-bold text-parrafo outline-none transition focus:border-borde-focus focus:ring-2 focus:ring-[#E27D60]/15">
- <option value="">Todos los tipos</option>
- <option value="Ficha Médica">Ficha médica</option>
- <option value="Medicación">Medicación</option>
- <option value="Signos Vitales">Signos vitales</option>
- <option value="Valoración">Valoración funcional</option>
- </select>
- </div>
- </label>
- </div>
- </section>
+     <x-ui.filter-bar class="mb-4">
+        <div class="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-2 items-center">
+            {{-- Filtro Tipo de alerta --}}
+            <div class="lg:col-span-6">
+                <select wire:model.live="filtroTipo"
+                    class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-input-bg)] py-2 px-3 text-xs font-medium text-[var(--rm-text-primary)] focus:border-[var(--rm-primary)] focus:ring-1 focus:ring-[var(--rm-primary)] focus:outline-none h-[38px]">
+                    <option value="">Todos los tipos de alerta</option>
+                    <option value="Ficha Médica">Ficha médica</option>
+                    <option value="Medicación">Medicación</option>
+                    <option value="Signos Vitales">Signos vitales</option>
+                    <option value="Valoración">Valoración funcional</option>
+                </select>
+            </div>
+        </div>
+
+        @if(!empty($filtroTipo))
+            <div class="rm-filter-bar__active">
+                <div class="flex flex-wrap items-center gap-1.5">
+                    <span class="rm-filter-bar__active-label">
+                        <i class="ph-bold ph-funnel text-xs"></i> Filtros activos:
+                    </span>
+                    <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[var(--rm-surface-alt)] border border-[var(--rm-border)] text-[11px] font-semibold text-[var(--rm-text-primary)]">
+                        <span>Tipo: {{ $filtroTipo }}</span>
+                        <button type="button" wire:click="$set('filtroTipo', '')" class="hover:text-[var(--rm-primary)] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
+                    </span>
+                </div>
+                <button type="button" wire:click="$set('filtroTipo', '')" class="rm-filter-bar__clear-btn">
+                    <i class="ph-bold ph-arrow-counter-clockwise text-xs"></i>
+                    Limpiar filtros
+                </button>
+            </div>
+        @endif
+    </x-ui.filter-bar>
 
  <section class="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
  @forelse($alertas as $alerta)

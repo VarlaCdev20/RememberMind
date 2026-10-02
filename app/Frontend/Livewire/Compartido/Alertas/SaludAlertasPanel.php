@@ -2,6 +2,7 @@
 
 namespace App\Frontend\Livewire\Compartido\Alertas;
 
+use App\Backend\Modulos\Clinica\Servicios\ClasificacionSignosVitalesService;
 use Livewire\Component;
 use App\Models\AdultoMayor;
 
@@ -58,7 +59,7 @@ class SaludAlertasPanel extends Component
             }
 
             if ($ultimosSignos) {
-                if ($ultimosSignos->temperatura > 37.8 || ($ultimosSignos->saturacion !== null && $ultimosSignos->saturacion < 92)) {
+                if (ClasificacionSignosVitalesService::requiereAlertaPreventiva($ultimosSignos)) {
                     $alertas->push([
                         'adulto' => $adulto,
                         'tipo' => 'Signos Vitales',

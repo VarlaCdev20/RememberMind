@@ -75,6 +75,7 @@ class EvaluacionesAreaPanel extends Component
 
     public function nuevaEvaluacion(?string $codResidente = null): void
     {
+        abort_unless(auth()->user()?->estado === 'ACTIVO' && auth()->user()->can('aplicaciones_instrumento.crear'), 403);
         $this->dispatch('evaluacion-geriatrica-area-abrir', [
             'cod_residente' => $codResidente,
             'cod_residente' => $codResidente,

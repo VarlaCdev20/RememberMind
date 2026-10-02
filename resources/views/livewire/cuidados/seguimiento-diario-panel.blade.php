@@ -12,22 +12,90 @@
         @endcan
     </x-ui.page-header>
 
-    <div class="rm-filter-bar">
-        <div class="grid gap-3 md:grid-cols-3">
-            <input type="search" wire:model.live.debounce.400ms="search" placeholder="Buscar adulto mayor" class="rounded-xl border border-borde bg-fondo-panel px-4 py-2 text-sm text-parrafo">
-            <select wire:model.live="filtroTurno" class="rounded-xl border border-borde bg-fondo-panel px-4 py-2 text-sm text-parrafo">
-                <option value="">Todos los turnos</option>
-                @foreach($turnos as $turno)
-                    <option value="{{ $turno->cod_turno }}">{{ $turno->nombre }} ({{ substr($turno->hora_inicio, 0, 5) }})</option>
-                @endforeach
-            </select>
-            <input type="date" wire:model.live="filtroFecha" class="rounded-xl border border-borde bg-fondo-panel px-4 py-2 text-sm text-parrafo">
+    <x-ui.filter-bar class="mb-4">
+        <div class="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-2 items-center">
+            {{-- Buscador Principal formato alertas --}}
+            <div class="lg:col-span-6 relative flex items-center">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-[var(--rm-text-secondary)]">
+                    <i class="ph-bold ph-magnifying-glass text-base"></i>
+                </span>
+                <input type="text"
+                    wire:model.live.debounce.400ms="search"
+                    placeholder="Buscar adulto mayor..."
+                    class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-input-bg)] py-2 pl-9 pr-8 text-xs font-medium text-[var(--rm-text-primary)] placeholder-[var(--rm-text-secondary)] focus:border-[var(--rm-primary)] focus:ring-1 focus:ring-[var(--rm-primary)] focus:outline-none h-[38px]" />
+                @if(!empty($search))
+                    <button type="button"
+                        wire:click="$set('search', '')"
+                        class="absolute inset-y-0 right-0 flex items-center pr-2.5 text-[var(--rm-text-secondary)] hover:text-[var(--rm-primary)] cursor-pointer"
+                        title="Limpiar búsqueda">
+                        <i class="ph-bold ph-x-circle text-base"></i>
+                    </button>
+                @endif
+            </div>
+
+            {{-- Turno --}}
+            <div class="lg:col-span-3">
+                <select wire:model.live="filtroTurno"
+                    class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-input-bg)] py-2 px-3 text-xs font-medium text-[var(--rm-text-primary)] focus:border-[var(--rm-primary)] focus:ring-1 focus:ring-[var(--rm-primary)] focus:outline-none h-[38px] cursor-pointer">
+                    <option value="">Todos los turnos</option>
+                    @foreach($turnos as $turno)
+                        <option value="{{ $turno->cod_turno }}">{{ $turno->nombre }} ({{ substr($turno->hora_inicio, 0, 5) }})</option>
+                    @endforeach
+                </select>
+            </div>
+
+            {{-- Fecha --}}
+            <div class="lg:col-span-3">
+                <input type="date" wire:model.live="filtroFecha" title="Filtrar por fecha"
+                    class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-input-bg)] py-2 px-3 text-xs font-medium text-[var(--rm-text-primary)] focus:border-[var(--rm-primary)] focus:ring-1 focus:ring-[var(--rm-primary)] focus:outline-none h-[38px] cursor-pointer">
+            </div>
         </div>
-    </div>
+
+        {{-- Chips de filtros activos formato alertas --}}
+        @php
+            $hasFiltrosSeg = !empty($search) || !empty($filtroTurno) || !empty($filtroFecha);
+        @endphp
+        @if($hasFiltrosSeg)
+            <div class="rm-filter-bar__active">
+                <div class="flex flex-wrap items-center gap-1.5">
+                    <span class="rm-filter-bar__active-label">
+                        <i class="ph-bold ph-funnel text-xs"></i> Filtros activos:
+                    </span>
+                    @if(!empty($search))
+                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[var(--rm-surface-alt)] border border-[var(--rm-border)] text-[11px] font-semibold text-[var(--rm-text-primary)]">
+                            <span>Búsqueda: "{{ Str::limit($search, 16) }}"</span>
+                            <button type="button" wire:click="$set('search', '')" class="hover:text-[var(--rm-primary)] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
+                        </span>
+                    @endif
+                    @if(!empty($filtroTurno))
+                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[var(--rm-warning-soft)] border border-[var(--rm-warning)] text-[11px] font-bold text-[var(--rm-warning)]">
+                            <span>Turno filtrado</span>
+                            <button type="button" wire:click="$set('filtroTurno', '')" class="hover:text-[var(--rm-primary)] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
+                        </span>
+                    @endif
+                    @if(!empty($filtroFecha))
+                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[var(--rm-surface-alt)] border border-[var(--rm-border)] text-[11px] font-semibold text-[var(--rm-text-primary)]">
+                            <span>Fecha: {{ $filtroFecha }}</span>
+                            <button type="button" wire:click="$set('filtroFecha', null)" class="hover:text-[var(--rm-primary)] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
+                        </span>
+                    @endif
+                </div>
+
+                <div class="flex items-center gap-2.5">
+                    <button type="button"
+                        wire:click="$set('search', ''); $set('filtroTurno', ''); $set('filtroFecha', null);"
+                        class="inline-flex items-center gap-1 rounded-xl bg-[var(--rm-primary-soft)] hover:bg-[var(--rm-primary)] hover:text-white text-[var(--rm-primary)] border border-[var(--rm-primary)]/30 py-1 px-2.5 text-xs font-bold transition cursor-pointer">
+                        <i class="ph-bold ph-arrow-counter-clockwise"></i>
+                        <span>Limpiar filtros</span>
+                    </button>
+                </div>
+            </div>
+        @endif
+    </x-ui.filter-bar>
 
     <div class="rm-table-container overflow-x-auto">
-        <table class="rm-table min-w-[900px]">
-            <thead class="bg-fondo-panel text-xs font-black uppercase tracking-wider text-meta">
+        <table class="rm-data-table rm-data-table--actions rm-table min-w-[900px]">
+            <thead class="bg-fondo-panel text-xs font-bold uppercase tracking-wider text-meta">
                 <tr>
                     <th class="px-4 py-3">Fecha</th>
                     <th class="px-4 py-3">Adulto mayor</th>
@@ -42,7 +110,7 @@
                 @forelse($seguimientos as $seg)
                     <tr class="hover:bg-fondo-hover/60">
                         <td class="px-4 py-3 font-bold text-parrafo">{{ $seg->fecha_hora?->format('d/m/Y') }}<br><span class="text-xs text-apoyo">{{ $seg->fecha_hora?->format('H:i') }}</span></td>
-                        <td class="px-4 py-3 font-black text-titulo">{{ $seg->adultoMayor?->nombres }} {{ $seg->adultoMayor?->apellido_paterno }}</td>
+                        <td class="px-4 py-3 font-bold text-titulo">{{ $seg->adultoMayor?->nombres }} {{ $seg->adultoMayor?->apellido_paterno }}</td>
                         <td class="px-4 py-3 text-parrafo">{{ $seg->personal?->nombres }} {{ $seg->personal?->apellido_paterno }}</td>
                         <td class="px-4 py-3 text-parrafo">{{ \Illuminate\Support\Str::after((string) $seg->motivo, 'SEGUIMIENTO_DIARIO:') ?: 'No registrado' }}</td>
                         <td class="px-4 py-3 text-parrafo">Seguimiento V2.1</td>
@@ -215,7 +283,7 @@
                 </label>
                 <div class="rm-form-actions">
                     <button type="button" wire:click="cerrarModales" class="rm-btn-secondary px-4 py-2 text-xs font-bold">Cancelar</button>
-                    <button type="submit" wire:loading.attr="disabled" wire:target="guardar" class="rm-btn-primary px-4 py-2 text-xs font-black disabled:opacity-50">
+                    <button type="submit" wire:loading.attr="disabled" wire:target="guardar" class="rm-btn-primary px-4 py-2 text-xs font-bold disabled:opacity-50">
                         <span wire:loading.remove wire:target="guardar">{{ $editandoId ? 'Guardar corrección' : 'Registrar seguimiento' }}</span>
                         <span wire:loading wire:target="guardar" class="rm-clinical-loading">Guardando…</span>
                     </button>

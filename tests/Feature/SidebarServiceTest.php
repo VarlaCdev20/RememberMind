@@ -6,7 +6,6 @@ use App\Models\User;
 use App\Backend\Modulos\Identidad\Servicios\SidebarService;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Http\Request;
 use Tests\TestCase;
 
 class SidebarServiceTest extends TestCase
@@ -53,81 +52,26 @@ class SidebarServiceTest extends TestCase
         $this->assertContains('dashboard', $routes);
         $this->assertContains('admin.usuarios.index', $routes);
         $this->assertContains('admin.roles-permisos.index', $routes);
-        $this->assertContains('admin.adultos-mayores.index', $routes);
-        $this->assertContains('admin.admisiones.preadmisiones', $routes);
-        $this->assertContains('admin.habitaciones.index', $routes);
-        $this->assertContains('admin.familia-social.resumen', $routes);
-        $this->assertContains('admin.personal-institucional', $routes);
-        $this->assertContains('admin.turnos-asignaciones.index', $routes);
-        $this->assertContains('admin.turnos-enfermeria.index', $routes);
-        $this->assertContains('admin.asignacion-turno.index', $routes);
-        $this->assertContains('admin.administracion.dashboard', $routes);
-        $this->assertContains('admin.medico.dashboard', $routes);
-        $this->assertContains('admin.enfermeria.dashboard', $routes);
-        $this->assertContains('admin.psicologia.dashboard', $routes);
-        $this->assertContains('admin.alertas-clinicas.index', $routes);
-        $this->assertContains('admin.reportes.institucional.preview', $routes);
-        $this->assertContains('admin.reportes.adultos.preview', $routes);
-        $this->assertContains('admin.reportes.salud.preview', $routes);
-        $this->assertContains('admin.reportes.equipo.preview', $routes);
         $this->assertContains('admin.bitacora.index', $routes);
-        $this->assertContains('admin.vistas-extra', $routes);
-
-        // "Actividades" retirada de reportes en Superadmin
-        $this->assertNotContains('admin.reportes.actividades.preview', $routes);
-
-        // Fisioterapia y Nutrición ocultas en Áreas de atención
-        $this->assertNotContains('admin.fisioterapia.dashboard', $routes);
-        $this->assertNotContains('admin.nutricion.dashboard', $routes);
+        $this->assertContains('admin.areas-institucionales.index', $routes);
+        $this->assertNotContains('admin.enfermeria.dashboard', $routes);
+        $this->assertNotContains('admin.medico.dashboard', $routes);
+        $this->assertNotContains('admin.administracion.dashboard', $routes);
     }
 
-    public function test_superadmin_supervision_modulos_profesionales(): void
+    public function test_superadmin_conserva_sidebar_global_en_cualquier_contexto(): void
     {
         $user = User::factory()->create(['estado' => 'ACTIVO']);
         $user->assignRole('SUPERADMINISTRADOR');
         $this->actingAs($user);
 
-        // Simular navegación en enfermería
-        $requestEnfermeria = Request::create('/admin/enfermeria/pacientes', 'GET');
-        app()->instance('request', $requestEnfermeria);
-
         $sidebar = app(SidebarService::class)->getSidebar();
         $titles = array_column($sidebar, 'title');
-        $this->assertContains('Volver a Áreas de Atención', $titles);
-        $this->assertContains('Atención de Enfermería', $titles);
-
-        // Simular navegación en médico
-        $requestMedico = Request::create('/admin/medico/dashboard', 'GET');
-        app()->instance('request', $requestMedico);
-
-        $sidebarMedico = app(SidebarService::class)->getSidebar();
-        $titlesMedico = array_column($sidebarMedico, 'title');
-        $this->assertContains('Volver a Administración', $titlesMedico);
-        $this->assertContains('Pacientes', $titlesMedico);
-
-        // Simular navegación en psicología
-        $requestPsico = Request::create('/admin/psicologia/dashboard', 'GET');
-        app()->instance('request', $requestPsico);
-
-        $sidebarPsico = app(SidebarService::class)->getSidebar();
-        $titlesPsico = array_column($sidebarPsico, 'title');
-        $this->assertContains('Volver a Administración', $titlesPsico);
-        $this->assertContains('Valoraciones', $titlesPsico);
-
-        // Simular navegación en administración (panel completo del administrador)
-        $requestAdmin = Request::create('/admin/administracion/dashboard', 'GET');
-        app()->instance('request', $requestAdmin);
-
-        $sidebarAdmin = app(SidebarService::class)->getSidebar();
-        $titlesAdmin = array_column($sidebarAdmin, 'title');
-        $this->assertContains('Volver a Superadministrador', $titlesAdmin);
-        $this->assertContains('Residentes', $titlesAdmin);
-        $this->assertContains('Admisiones', $titlesAdmin);
-        $this->assertContains('Personal y turnos', $titlesAdmin);
-        $this->assertContains('Usuarios', $titlesAdmin);
-        $this->assertContains('Alertas', $titlesAdmin);
-        $this->assertContains('Actividades y comunidad', $titlesAdmin);
-        $this->assertContains('Reportes', $titlesAdmin);
+        $this->assertContains('Dashboard', $titles);
+        $this->assertContains('Gestión del sistema', $titles);
+        $this->assertContains('Gestión institucional', $titles);
+        $this->assertContains('Gestión residencial', $titles);
+        $this->assertContains('Expediente clínico', $titles);
     }
 
     public function test_administrador_sidebar_estructura_y_sin_duplicados(): void
@@ -139,27 +83,40 @@ class SidebarServiceTest extends TestCase
         $sidebar = app(SidebarService::class)->getSidebar();
         $routes = $this->extractAllRoutes($sidebar);
 
+        $this->assertSame([
+            'Inicio',
+            'Admisión',
+            'Residentes',
+            'Operación diaria',
+            'Documentación',
+            'Seguimiento',
+            'Reportes',
+        ], array_column($sidebar, 'title'));
+        $this->assertSame(['Preadmisiones', 'Admisiones'], array_column($sidebar[1]['items'], 'label'));
+        $this->assertSame(['Residentes', 'Habitaciones y camas', 'Ocupación'], array_column($sidebar[2]['items'], 'label'));
+        $this->assertSame(['Jornadas', 'Asignaciones', 'Actividades', 'Visitas'], array_column($sidebar[3]['items'], 'label'));
+        $this->assertSame(['Contactos y responsables', 'Documentos', 'Consentimientos', 'Seguros'], array_column($sidebar[4]['items'], 'label'));
+        $this->assertSame(['Alertas', 'Incidentes'], array_column($sidebar[5]['items'], 'label'));
         $this->assertSame(count($routes), count(array_unique($routes)));
-        $this->assertContains('dashboard', $routes);
-        $this->assertContains('admin.adultos-mayores.index', $routes);
-        $this->assertContains('admin.familia-social.resumen', $routes);
+        $this->assertContains('admin.administracion.dashboard', $routes);
+        $this->assertContains('admin.administracion.residentes', $routes);
+        $this->assertContains('admin.administracion.contactos', $routes);
         $this->assertContains('admin.admisiones.preadmisiones', $routes);
-        $this->assertContains('admin.personal-institucional', $routes);
-        $this->assertContains('admin.turnos-asignaciones.index', $routes);
-        $this->assertContains('admin.usuarios.index', $routes);
-        $this->assertContains('admin.reportes.institucional.preview', $routes);
-        $this->assertContains('admin.reportes.adultos.preview', $routes);
-        $this->assertContains('admin.reportes.equipo.preview', $routes);
+        $this->assertContains('admin.administracion.admisiones', $routes);
+        $this->assertContains('admin.administracion.jornadas', $routes);
+        $this->assertContains('admin.administracion.asignaciones', $routes);
+        $this->assertContains('admin.administracion.reportes', $routes);
+        $this->assertNotContains('admin.personal-institucional', $routes);
+        $this->assertNotContains('admin.turnos-asignaciones.index', $routes);
+        $this->assertNotContains('admin.usuarios.index', $routes);
 
         // No debe tener roles-permisos ni bitacora
         $this->assertNotContains('admin.roles-permisos.index', $routes);
         $this->assertNotContains('admin.bitacora.index', $routes);
 
-        // Si se le otorga permiso de habitaciones, aparece dinámicamente
-        $user->givePermissionTo('habitaciones.ver');
-        $sidebarConHabitaciones = app(SidebarService::class)->getSidebar();
-        $routesConHabitaciones = $this->extractAllRoutes($sidebarConHabitaciones);
-        $this->assertContains('admin.habitaciones.index', $routesConHabitaciones);
+        $this->assertContains('admin.administracion.habitaciones', $routes);
+        $this->assertNotContains('admin.adultos-mayores.index', $routes);
+        $this->assertNotContains('admin.turnos-enfermeria.index', $routes);
     }
 
     public function test_medico_sidebar_estructura(): void
@@ -256,7 +213,6 @@ class SidebarServiceTest extends TestCase
         $this->assertSame([
             'dashboard',
             'admin.adultos-mayores.index',
-            'admin.reportes.adultos.preview',
         ], $routes);
     }
 
@@ -280,18 +236,17 @@ class SidebarServiceTest extends TestCase
         $response = $this->actingAs($user)->get(route('admin.usuarios.index'));
         $response->assertOk();
 
-        // El sidebar debe ser fixed left-0 top-0 (no empuja verticalmente el contenido)
-        $response->assertSee('sidebar-institucional fixed left-0 top-0 z-50 flex h-screen w-[280px]', false);
-
-        // El navbar y main deben tener el margen desktop correcto para alinearse al lado
-        $response->assertSee('lg:ml-[280px]', false);
+        // El ancho y la posición ahora pertenecen a los tokens CSS del shell.
+        $response->assertSee('id="sidebar"', false);
+        $response->assertSee('class="rm-sidebar"', false);
+        $response->assertSee('data-rm-main', false);
 
         // El accordion tiene abierta la sección Usuarios y accesos (índice 1)
         $response->assertSee('openSection: 1', false);
-        $response->assertSee('border-[var(--rm-nav-selected-border)]', false);
+        $response->assertSee('aria-current="page"', false);
     }
 
-    public function test_layout_desktop_y_accordion_en_superadmin_residentes(): void
+    public function test_layout_superadmin_en_consulta_de_residentes_conserva_sidebar_tecnico(): void
     {
         $user = User::factory()->create(['estado' => 'ACTIVO']);
         $user->assignRole('SUPERADMINISTRADOR');
@@ -299,9 +254,10 @@ class SidebarServiceTest extends TestCase
         $response = $this->actingAs($user)->get(route('admin.adultos-mayores.index'));
         $response->assertOk();
 
-        $response->assertSee('sidebar-institucional fixed left-0 top-0 z-50 flex h-screen w-[280px]', false);
-        // Sección Residentes es índice 2
-        $response->assertSee('openSection: 2', false);
+        $response->assertSee('class="rm-sidebar"', false);
+        $response->assertSee('Gestión del sistema', false);
+        $response->assertSee('Gestión residencial', false);
+        $response->assertDontSee('Atención de Enfermería', false);
     }
 
     public function test_layout_desktop_en_administrador(): void
@@ -309,11 +265,11 @@ class SidebarServiceTest extends TestCase
         $user = User::factory()->create(['estado' => 'ACTIVO']);
         $user->assignRole('ADMINISTRADOR');
 
-        $response = $this->actingAs($user)->get(route('dashboard'));
+        $response = $this->actingAs($user)->get(route('admin.administracion.dashboard'));
         $response->assertOk();
 
-        $response->assertSee('sidebar-institucional fixed left-0 top-0 z-50 flex h-screen w-[280px]', false);
-        $response->assertSee('lg:ml-[280px]', false);
+        $response->assertSee('class="rm-sidebar"', false);
+        $response->assertSee('data-rm-main', false);
     }
 
     public function test_layout_desktop_en_enfermero(): void
@@ -323,11 +279,12 @@ class SidebarServiceTest extends TestCase
 
         $response = $this->actingAs($user)->get(route('admin.enfermeria.dashboard'));
         $response->assertOk();
-        $response->assertSee('w-[260px]', false);
-        $response->assertSee('lg:pl-[260px]', false);
+        $response->assertSee('id="sidebar-enfermeria"', false);
+        $response->assertSee('class="rm-sidebar"', false);
+        $response->assertSee('data-rm-main', false);
     }
 
-    public function test_superadmin_accede_a_admin_dashboard_y_sidebar_muestra_administracion_en_areas_de_atencion(): void
+    public function test_superadmin_puede_consultar_dashboard_operativo_de_administracion(): void
     {
         $user = User::factory()->create(['estado' => 'ACTIVO']);
         $user->assignRole('SUPERADMINISTRADOR');
@@ -335,14 +292,7 @@ class SidebarServiceTest extends TestCase
         $response = $this->actingAs($user)->get(route('dashboard'));
         $response->assertOk();
 
-        $response->assertSee('Áreas de atención', false);
-        $response->assertSee('Administración', false);
-        $response->assertSee(route('admin.administracion.dashboard'), false);
-
-        // Al acceder a administración, se despliega el panel completo del administrador
         $responseAdmin = $this->actingAs($user)->get(route('admin.administracion.dashboard'));
         $responseAdmin->assertOk();
-        $responseAdmin->assertSee('Volver a Superadministrador', false);
-        $responseAdmin->assertSee('Personal y turnos', false);
     }
 }

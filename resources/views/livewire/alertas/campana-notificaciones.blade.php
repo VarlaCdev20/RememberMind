@@ -89,14 +89,14 @@
  type="button"
  @click="abierto = !abierto"
  class="rm-btn-icon relative transition-all duration-200"
- :class="{ 'bg-fondo-hover ring-2 ring-boton-acento/40': abierto }"
+ :class="{ 'bg-[var(--rm-surface-soft)] ring-2 ring-boton-acento/40': abierto }"
  aria-label="Notificaciones y Alertas"
  title="Alertas y Notificaciones Clínicas"
  >
  <i class="ph-bold ph-bell text-lg transition-transform" :class="{ 'rotate-12': {{ $conteoAbiertas > 0 ? 'true' : 'false' }} }"></i>
 
  @if($conteoAbiertas > 0)
-  <span class="absolute -top-1 -right-1 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-red-600 px-1 text-[9px] font-black text-white shadow-sm ring-2 ring-fondo-card {{ $alertas->where('prioridad', 'CRITICO')->isNotEmpty() ? 'animate-bounce' : 'animate-pulse' }}">
+  <span class="absolute -top-1 -right-1 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-red-600 px-1 text-[9px] font-black text-white shadow-sm ring-2 ring-[var(--rm-surface)] {{ $alertas->where('prioridad', 'CRITICO')->isNotEmpty() ? 'animate-bounce' : 'animate-pulse' }}">
   {{ $conteoAbiertas > 99 ? '99+' : $conteoAbiertas }}
   </span>
  @endif
@@ -112,17 +112,17 @@
  x-transition:leave-start="opacity-100 translate-y-0 scale-100"
  x-transition:leave-end="opacity-0 translate-y-2 scale-95"
  style="display: none;"
- class="dropdown-institucional absolute right-0 mt-3 w-88 sm:w-[460px] rounded-2xl border border-borde bg-fondo-card/95 backdrop-blur-xl shadow-2xl z-50 overflow-hidden"
+ class="dropdown-institucional absolute right-0 mt-3 w-88 sm:w-[460px] rounded-2xl border border-[var(--rm-border)] bg-[var(--rm-surface)] backdrop-blur-xl shadow-2xl z-50 overflow-hidden"
  >
  {{-- Encabezado del Panel --}}
- <div class="flex items-center justify-between border-b border-borde/70 px-4 py-3 bg-fondo-panel/80">
+ <div class="flex items-center justify-between border-b border-[var(--rm-border-soft)] px-4 py-3 bg-[var(--rm-surface-soft)]">
   <div class="flex items-center gap-2.5">
   <span class="flex h-8 w-8 items-center justify-center rounded-xl bg-red-500/10 text-red-600 dark:bg-red-950/60 dark:text-red-400">
    <i class="ph-bold ph-bell-ringing text-base"></i>
   </span>
   <div>
-   <h3 class="text-xs font-bold uppercase tracking-wider text-titulo">Notificaciones Clínicas</h3>
-   <p class="text-[10px] text-apoyo font-semibold">Ubicación, diagnóstico y seguimiento</p>
+   <h3 class="text-xs font-bold uppercase tracking-wider text-[var(--rm-text-primary)]">Notificaciones Clínicas</h3>
+   <p class="text-[10px] text-[var(--rm-text-secondary)] font-semibold">Ubicación, diagnóstico y seguimiento</p>
   </div>
   </div>
   <div class="flex items-center gap-2">
@@ -147,7 +147,7 @@
    $habNombre = $adultoRec?->habitacion?->nombre ?? ($adultoRec?->habitacion?->codigo ?? ($adultoRec?->cod_habitacion ? 'Hab. '.$adultoRec?->cod_habitacion : 'Sin habitación'));
    $camaCodigo = $adultoRec?->cama?->codigo ?? ($adultoRec?->cod_cama ? 'Cama '.$adultoRec?->cod_cama : 'Sin cama');
   @endphp
-  <div class="flex flex-col gap-2 p-3.5 transition hover:bg-fondo-hover/60 border-l-4 {{ $vencida ? 'border-l-red-500 bg-red-500/[0.03]' : 'border-l-[var(--rm-warning)] bg-[var(--rm-warning)]/[0.02]' }}">
+  <div class="flex flex-col gap-2 p-3.5 transition hover:bg-[var(--rm-surface-soft)]/60 border-l-4 {{ $vencida ? 'border-l-red-500 bg-red-500/[0.03]' : 'border-l-[var(--rm-warning)] bg-[var(--rm-warning)]/[0.02]' }}">
    {{-- Cabecera con Paciente y Estado --}}
    <div class="flex items-start justify-between gap-2">
    <div class="min-w-0 flex-1">
@@ -155,7 +155,7 @@
     <span class="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-900/60 font-black text-[10px] text-[var(--rm-action-primary-hover)] dark:text-blue-300">
      {{ substr($adultoRec?->nombres ?? 'A', 0, 1) }}{{ substr($adultoRec?->ap_paterno ?? 'M', 0, 1) }}
     </span>
-    <p class="truncate text-xs font-bold text-titulo">
+    <p class="truncate text-xs font-bold text-[var(--rm-text-primary)]">
      {{ $adultoRec?->nombres }} {{ $adultoRec?->ap_paterno }}
     </p>
     </div>
@@ -175,8 +175,8 @@
    </div>
 
    {{-- Cuál es su problema --}}
-   <div class="rounded-lg bg-fondo-panel/70 p-2 text-xs border border-borde/50 space-y-0.5">
-   <p class="font-bold text-titulo truncate">
+   <div class="rounded-lg bg-[var(--rm-surface-soft)] p-2 text-xs border border-[var(--rm-border)]/50 space-y-0.5">
+   <p class="font-bold text-[var(--rm-text-primary)] truncate">
     <i class="ph-bold ph-prescription mr-1 text-boton-principal"></i>
     {{ $recordatorio['medicacion']->nombre_medicamento }} · {{ $recordatorio['medicacion']->dosis }}
    </p>
@@ -184,9 +184,9 @@
    $horaAmPm = \Carbon\Carbon::parse("2000-01-01 {$recordatorio['hora']}")->format('h:i A');
    @endphp
    <div class="flex items-center justify-between text-[10px] pt-0.5">
-   <p class="text-apoyo font-semibold flex items-center gap-1">
+   <p class="text-[var(--rm-text-secondary)] font-semibold flex items-center gap-1">
     <i class="ph-bold ph-clock text-[10px]"></i>
-    Programada: {{ $recordatorio['hora'] }} <span class="font-mono font-bold text-titulo">({{ $horaAmPm }})</span>
+    Programada: {{ $recordatorio['hora'] }} <span class="font-mono font-bold text-[var(--rm-text-primary)]">({{ $horaAmPm }})</span>
    </p>
    <div class="shrink-0">
     <template x-if="relojPC.sePaso('{{ $recordatorio['hora'] }}') || {{ $vencida ? 'true' : 'false' }}">
@@ -206,19 +206,19 @@
    </div>
 
    {{-- Botones de Acción --}}
-   <div class="flex items-center justify-between gap-1.5 pt-1 border-t border-borde/30">
+   <div class="flex items-center justify-between gap-1.5 pt-1 border-t border-[var(--rm-border)]/30">
    <div class="flex items-center gap-1.5">
     @if($codResidenteRec)
     <button type="button"
      wire:click="verGraficos('{{ $codResidenteRec }}')"
-     class="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-[10px] font-bold bg-boton-principal hover:bg-boton-principalHover text-inverso shadow-sm transition active:scale-95 cursor-pointer"
+     class="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-[10px] font-bold bg-[var(--rm-action-primary)] hover:bg-[var(--rm-action-primary-hover)] text-inverso shadow-sm transition active:scale-95 cursor-pointer"
      title="Ver gráficos clínicos en barra lateral">
      <i class="ph-bold ph-chart-line-up"></i>
      <span>Gráficos</span>
     </button>
     <button type="button"
      wire:click="verUbicacion('{{ $codResidenteRec }}')"
-     class="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-[10px] font-bold bg-fondo-card hover:bg-fondo-hover text-titulo border border-borde shadow-sm transition active:scale-95 cursor-pointer"
+     class="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-[10px] font-bold bg-[var(--rm-surface)] hover:bg-[var(--rm-surface-soft)] text-[var(--rm-text-primary)] border border-[var(--rm-border)] shadow-sm transition active:scale-95 cursor-pointer"
      title="Ver ubicación y ficha en barra lateral">
      <i class="ph-bold ph-bed text-boton-acento"></i>
      <span>Ubicación</span>
@@ -226,7 +226,7 @@
     @endif
    </div>
    <a href="{{ route('admin.salud-seguimiento.administracion', ['adulto' => $recordatorio['medicacion']->cod_residente]) }}"
-    class="inline-flex items-center gap-1 rounded-lg bg-boton-principal px-2.5 py-1 text-[10px] font-bold text-white shadow-sm transition hover:opacity-90 active:scale-95">
+    class="inline-flex items-center gap-1 rounded-lg bg-[var(--rm-action-primary)] px-2.5 py-1 text-[10px] font-bold text-white shadow-sm transition hover:opacity-90 active:scale-95">
     <i class="ph-bold ph-check-circle"></i>
     <span>Registrar</span>
    </a>
@@ -243,7 +243,7 @@
    $badgeNivel = match($alerta->prioridad) {
    'CRITICO' => 'bg-red-600 text-white border-red-700 shadow-sm',
    'ALTO' => 'bg-[var(--rm-warning)] text-white border-[var(--rm-warning)] shadow-sm',
-   'MEDIO' => 'bg-boton-principal text-inverso border-boton-principal',
+   'MEDIO' => 'bg-[var(--rm-action-primary)] text-inverso border-boton-principal',
    default => 'bg-slate-600 text-white border-slate-700',
    };
 
@@ -263,7 +263,7 @@
    $habUbicacion = $alerta->adultoMayor?->habitacion?->ubicacion;
   @endphp
 
-  <div class="p-3.5 transition hover:bg-fondo-hover/60 flex flex-col gap-2.5 {{ $bordeIzquierdo }}">
+  <div class="p-3.5 transition hover:bg-[var(--rm-surface-soft)]/60 flex flex-col gap-2.5 {{ $bordeIzquierdo }}">
    {{-- 1. Encabezado: Paciente y Estado/Severidad --}}
    <div class="flex items-start justify-between gap-2">
    <div class="min-w-0 flex-1">
@@ -272,10 +272,10 @@
      {{ substr($alerta->adultoMayor?->nombres ?? 'A', 0, 1) }}{{ substr($alerta->adultoMayor?->ap_paterno ?? 'M', 0, 1) }}
     </div>
     <div class="min-w-0">
-     <p class="text-xs font-bold text-titulo truncate">
+     <p class="text-xs font-bold text-[var(--rm-text-primary)] truncate">
      {{ $alerta->adultoMayor?->nombres }} {{ $alerta->adultoMayor?->ap_paterno }} {{ $alerta->adultoMayor?->ap_materno }}
      </p>
-     <p class="text-[10px] text-apoyo font-semibold">
+     <p class="text-[10px] text-[var(--rm-text-secondary)] font-semibold">
      {{ $alerta->adultoMayor?->habitacion?->nombre ?? ($alerta->adultoMayor?->habitacion?->codigo ? 'Habitación '.$alerta->adultoMayor->habitacion->codigo : 'Ubicación sin asignar') }}
      </p>
     </div>
@@ -292,33 +292,33 @@
    </div>
 
    {{-- 2. DÓNDE ESTÁ EL PACIENTE (Ubicación física precisa) --}}
-   <div class="flex items-center flex-wrap gap-1.5 text-[11px] font-bold text-parrafo bg-fondo-panel px-2.5 py-1.5 rounded-lg border border-borde shadow-sm">
-   <i class="ph-bold ph-door text-xs text-apoyo"></i>
+   <div class="flex items-center flex-wrap gap-1.5 text-[11px] font-bold text-[var(--rm-text-secondary)] bg-[var(--rm-surface-soft)] px-2.5 py-1.5 rounded-lg border border-[var(--rm-border)] shadow-sm">
+   <i class="ph-bold ph-door text-xs text-[var(--rm-text-secondary)]"></i>
    <span>{{ $habNombre }}</span>
    <span class="text-blue-400">·</span>
    <i class="ph-bold ph-bed text-xs text-boton-acento"></i>
    <span>{{ $camaCodigo }}</span>
    @if($habUbicacion)
-    <span class="text-[10px] text-apoyo font-normal">({{ $habUbicacion }})</span>
+    <span class="text-[10px] text-[var(--rm-text-secondary)] font-normal">({{ $habUbicacion }})</span>
    @endif
    </div>
 
    {{-- 3. CUÁL ES SU PROBLEMA (Diagnóstico y Motivo Clínico) --}}
    <div class="space-y-1">
-   <div class="flex items-center gap-1.5 text-xs font-black {{ $esCritica ? 'text-red-600 dark:text-red-400' : 'text-titulo' }}">
+   <div class="flex items-center gap-1.5 text-xs font-black {{ $esCritica ? 'text-red-600 dark:text-red-400' : 'text-[var(--rm-text-primary)]' }}">
     <i class="ph-bold ph-warning-octagon text-sm {{ $esCritica ? 'text-red-600' : 'text-[var(--rm-warning)]' }}"></i>
     <span>{{ $alerta->tipo }}</span>
-    <span class="text-[10px] text-apoyo font-semibold ml-auto">{{ $alerta->modulo }}</span>
+    <span class="text-[10px] text-[var(--rm-text-secondary)] font-semibold ml-auto">{{ $alerta->modulo }}</span>
    </div>
 
-   <div class="rounded-lg bg-fondo-panel/80 p-2.5 border border-borde/60 text-xs text-parrafo leading-relaxed font-medium">
+   <div class="rounded-lg bg-[var(--rm-surface-soft)] p-2.5 border border-[var(--rm-border-soft)] text-xs text-[var(--rm-text-secondary)] leading-relaxed font-medium">
     {{ $alerta->descripcion }}
    </div>
    </div>
 
    {{-- 4. TIEMPO Y BOTONES DE ACCIÓN MEJORADOS --}}
-   <div class="flex items-center justify-between gap-1.5 pt-1.5 border-t border-borde/40 text-[10px]">
-   <span class="text-meta font-medium flex items-center gap-1">
+   <div class="flex items-center justify-between gap-1.5 pt-1.5 border-t border-[var(--rm-border)]/40 text-[10px]">
+   <span class="text-[var(--rm-text-muted)] font-medium flex items-center gap-1">
     <i class="ph-bold ph-clock text-xs"></i>
     {{ $alerta->fecha_hora?->diffForHumans() }}
    </span>
@@ -328,7 +328,7 @@
     <button
     type="button"
     wire:click="verGraficos('{{ $alerta->cod_residente }}')"
-    class="inline-flex items-center gap-1 rounded-lg px-2.5 py-1 font-bold bg-boton-principal hover:bg-boton-principalHover text-inverso shadow-sm transition active:scale-95 text-[10px] cursor-pointer"
+    class="inline-flex items-center gap-1 rounded-lg px-2.5 py-1 font-bold bg-[var(--rm-action-primary)] hover:bg-[var(--rm-action-primary-hover)] text-inverso shadow-sm transition active:scale-95 text-[10px] cursor-pointer"
     title="Ver gráficos clínicos en barra lateral"
     >
     <i class="ph-bold ph-chart-line-up text-xs"></i>
@@ -339,7 +339,7 @@
     <button
     type="button"
     wire:click="verUbicacion('{{ $alerta->cod_residente }}')"
-    class="inline-flex items-center gap-1 rounded-lg px-2.5 py-1 font-bold text-titulo bg-fondo-panel hover:bg-fondo-hover border border-borde shadow-sm transition active:scale-95 text-[10px] cursor-pointer"
+    class="inline-flex items-center gap-1 rounded-lg px-2.5 py-1 font-bold text-[var(--rm-text-primary)] bg-[var(--rm-surface-soft)] hover:bg-[var(--rm-surface-soft)] border border-[var(--rm-border)] shadow-sm transition active:scale-95 text-[10px] cursor-pointer"
     title="Ver ubicación y ficha en barra lateral"
     >
     <i class="ph-bold ph-bed text-xs text-boton-acento"></i>
@@ -351,7 +351,7 @@
     <button
      type="button"
      wire:click="abrirAtender('{{ $alerta->cod_alerta }}')"
-     class="inline-flex items-center gap-1 rounded-lg bg-boton-principal hover:bg-boton-principalHover px-2.5 py-1 font-bold text-inverso shadow-sm transition active:scale-95 text-[10px]"
+     class="inline-flex items-center gap-1 rounded-lg bg-[var(--rm-action-primary)] hover:bg-[var(--rm-action-primary-hover)] px-2.5 py-1 font-bold text-inverso shadow-sm transition active:scale-95 text-[10px]"
      title="Iniciar atención de la alerta"
     >
      <i class="ph-bold ph-stethoscope text-xs"></i>
@@ -376,22 +376,22 @@
   </div>
   @empty
   @if($recordatoriosMedicacion->isEmpty())
-   <div class="p-8 text-center text-apoyo">
+   <div class="p-8 text-center text-[var(--rm-text-secondary)]">
    <div class="mx-auto mb-2.5 flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-500/10 text-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-400">
     <i class="ph-bold ph-check-circle text-2xl"></i>
    </div>
-   <p class="text-xs font-bold text-titulo">Todo en orden</p>
-   <p class="text-[11px] text-apoyo mt-0.5">No hay alertas clínicas activas ni tomas de medicación pendientes.</p>
+   <p class="text-xs font-bold text-[var(--rm-text-primary)]">Todo en orden</p>
+   <p class="text-[11px] text-[var(--rm-text-secondary)] mt-0.5">No hay alertas clínicas activas ni tomas de medicación pendientes.</p>
    </div>
   @endif
   @endforelse
  </div>
 
  {{-- Pie del Panel --}}
- <div class="border-t border-borde/70 p-3 bg-fondo-panel/70 flex items-center justify-between gap-2">
+ <div class="border-t border-[var(--rm-border-soft)] p-3 bg-[var(--rm-surface-soft)] flex items-center justify-between gap-2">
   <a
   href="{{ route('admin.alertas-clinicas.index') }}"
-  class="inline-flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-fondo-card px-3 py-2 text-xs font-bold text-titulo shadow-sm border border-borde transition hover:bg-fondo-hover hover:border-borde-focus active:scale-95"
+  class="inline-flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-[var(--rm-surface)] px-3 py-2 text-xs font-bold text-[var(--rm-text-primary)] shadow-sm border border-[var(--rm-border)] transition hover:bg-[var(--rm-surface-soft)] hover:border-[var(--rm-border)]-focus active:scale-95"
   >
   <i class="ph-bold ph-list-bullets text-xs"></i>
   <span>Ver Panel General de Alertas</span>
@@ -406,26 +406,26 @@
   $alertaAct = $alertas->firstWhere('cod_alerta', $alertaIdAccion);
  @endphp
  <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
-  <div class="w-full max-w-md rounded-2xl border border-borde bg-fondo-card p-5 shadow-2xl space-y-4">
-  <div class="flex items-center justify-between pb-3 border-b border-borde">
+  <div class="w-full max-w-md rounded-2xl border border-[var(--rm-border)] bg-[var(--rm-surface)] p-5 shadow-2xl space-y-4">
+  <div class="flex items-center justify-between pb-3 border-b border-[var(--rm-border)]">
    <div class="flex items-center gap-2">
-   <span class="flex h-8 w-8 items-center justify-center rounded-xl bg-fondo-app text-boton-principal border border-borde">
+   <span class="flex h-8 w-8 items-center justify-center rounded-xl bg-[var(--rm-bg-app)] text-boton-principal border border-[var(--rm-border)]">
     <i class="ph-bold ph-stethoscope text-base"></i>
    </span>
    <div>
-    <h3 class="text-sm font-bold uppercase tracking-wider text-titulo">Atender Alerta</h3>
-    <span class="text-[10px] font-mono text-apoyo">#{{ $alertaIdAccion }}</span>
+    <h3 class="text-sm font-bold uppercase tracking-wider text-[var(--rm-text-primary)]">Atender Alerta</h3>
+    <span class="text-[10px] font-mono text-[var(--rm-text-secondary)]">#{{ $alertaIdAccion }}</span>
    </div>
    </div>
-   <button type="button" wire:click="cerrarModales" class="text-meta hover:text-titulo p-1">
+   <button type="button" wire:click="cerrarModales" class="text-[var(--rm-text-muted)] hover:text-[var(--rm-text-primary)] p-1">
    <i class="ph-bold ph-x text-base"></i>
    </button>
   </div>
 
   @if($alertaAct)
-   <div class="rounded-xl bg-fondo-panel/80 p-3 border border-borde/60 space-y-2 text-xs">
+   <div class="rounded-xl bg-[var(--rm-surface-soft)] p-3 border border-[var(--rm-border-soft)] space-y-2 text-xs">
    <div class="flex items-center justify-between">
-    <span class="font-bold text-titulo">{{ $alertaAct->adultoMayor?->nombres }} {{ $alertaAct->adultoMayor?->ap_paterno }}</span>
+    <span class="font-bold text-[var(--rm-text-primary)]">{{ $alertaAct->adultoMayor?->nombres }} {{ $alertaAct->adultoMayor?->ap_paterno }}</span>
     <span class="text-[10px] font-black uppercase px-2 py-0.5 rounded {{ $alertaAct->nivel === 'CRITICO' ? 'bg-red-600 text-white' : 'bg-[var(--rm-warning)] text-white' }}">{{ $alertaAct->nivel }}</span>
    </div>
    <div class="flex items-center gap-1.5 text-[10px] font-bold text-[var(--rm-action-primary-hover)] dark:text-blue-300">
@@ -435,7 +435,7 @@
     <i class="ph-bold ph-bed"></i>
     <span>{{ $alertaAct->adultoMayor?->cama?->codigo ?? 'Cama' }}</span>
    </div>
-   <p class="text-[11px] text-parrafo leading-relaxed font-medium">
+   <p class="text-[11px] text-[var(--rm-text-secondary)] leading-relaxed font-medium">
     <span class="font-bold">{{ $alertaAct->tipo_alerta }}:</span> {{ $alertaAct->motivo }}
    </p>
    <div class="pt-1 flex items-center gap-2">
@@ -452,28 +452,28 @@
 
   <div class="space-y-2">
    <label class="block">
-   <span class="text-xs font-bold uppercase tracking-wider text-apoyo">Acción o Intervención Inicial *</span>
+   <span class="text-xs font-bold uppercase tracking-wider text-[var(--rm-text-secondary)]">Acción o Intervención Inicial *</span>
    <textarea
     wire:model="accionTomada"
     placeholder="Describa la atención inmediata realizada al paciente..."
     rows="3"
-    class="rm-input mt-1.5 w-full rounded-xl p-2.5 text-xs bg-fondo-app border border-borde text-titulo placeholder-apoyo focus:border-boton-principal outline-none"
+    class="rm-input mt-1.5 w-full rounded-xl p-2.5 text-xs bg-[var(--rm-bg-app)] border border-[var(--rm-border)] text-[var(--rm-text-primary)] placeholder-apoyo focus:border-boton-principal outline-none"
    ></textarea>
    </label>
   </div>
 
-  <div class="flex justify-end gap-2 border-t border-borde pt-3">
+  <div class="flex justify-end gap-2 border-t border-[var(--rm-border)] pt-3">
    <button
    type="button"
    wire:click="cerrarModales"
-   class="rounded-xl border border-borde px-3.5 py-2 text-xs font-bold text-titulo hover:bg-fondo-hover transition cursor-pointer"
+   class="rounded-xl border border-[var(--rm-border)] px-3.5 py-2 text-xs font-bold text-[var(--rm-text-primary)] hover:bg-[var(--rm-surface-soft)] transition cursor-pointer"
    >
    Cancelar
    </button>
    <button
    type="button"
    wire:click="atenderAlerta('{{ $alertaIdAccion }}')"
-   class="rounded-xl bg-boton-principal px-4 py-2 text-xs font-bold text-white hover:opacity-90 shadow-sm transition cursor-pointer"
+   class="rounded-xl bg-[var(--rm-action-primary)] px-4 py-2 text-xs font-bold text-white hover:opacity-90 shadow-sm transition cursor-pointer"
    >
    Confirmar Atención
    </button>
@@ -488,31 +488,31 @@
   $alertaAct = $alertas->firstWhere('cod_alerta', $alertaIdAccion);
  @endphp
  <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
-  <div class="w-full max-w-md rounded-2xl border border-borde bg-fondo-card p-5 shadow-2xl space-y-4">
-  <div class="flex items-center justify-between pb-3 border-b border-borde">
+  <div class="w-full max-w-md rounded-2xl border border-[var(--rm-border)] bg-[var(--rm-surface)] p-5 shadow-2xl space-y-4">
+  <div class="flex items-center justify-between pb-3 border-b border-[var(--rm-border)]">
    <div class="flex items-center gap-2">
    <span class="flex h-8 w-8 items-center justify-center rounded-xl bg-emerald-500/15 text-emerald-600">
     <i class="ph-bold ph-check-circle text-base"></i>
    </span>
    <div>
-    <h3 class="text-sm font-bold uppercase tracking-wider text-titulo">Cerrar y Archivar Alerta</h3>
-    <span class="text-[10px] font-mono text-apoyo">#{{ $alertaIdAccion }}</span>
+    <h3 class="text-sm font-bold uppercase tracking-wider text-[var(--rm-text-primary)]">Cerrar y Archivar Alerta</h3>
+    <span class="text-[10px] font-mono text-[var(--rm-text-secondary)]">#{{ $alertaIdAccion }}</span>
    </div>
    </div>
-   <button type="button" wire:click="cerrarModales" class="text-meta hover:text-titulo p-1">
+   <button type="button" wire:click="cerrarModales" class="text-[var(--rm-text-muted)] hover:text-[var(--rm-text-primary)] p-1">
    <i class="ph-bold ph-x text-base"></i>
    </button>
   </div>
 
   @if($alertaAct)
-   <div class="rounded-xl bg-fondo-panel/80 p-3 border border-borde/60 space-y-1.5 text-xs">
+   <div class="rounded-xl bg-[var(--rm-surface-soft)] p-3 border border-[var(--rm-border-soft)] space-y-1.5 text-xs">
    <div class="flex items-center justify-between">
-    <span class="font-bold text-titulo">{{ $alertaAct->adultoMayor?->nombres }} {{ $alertaAct->adultoMayor?->ap_paterno }}</span>
+    <span class="font-bold text-[var(--rm-text-primary)]">{{ $alertaAct->adultoMayor?->nombres }} {{ $alertaAct->adultoMayor?->ap_paterno }}</span>
     <span class="text-[10px] font-bold text-[var(--rm-action-primary-hover)] dark:text-blue-300">
     {{ $alertaAct->adultoMayor?->habitacion?->nombre ?? 'Habitación' }} · {{ $alertaAct->adultoMayor?->cama?->codigo ?? 'Cama' }}
     </span>
    </div>
-   <p class="text-[11px] text-parrafo leading-relaxed font-medium">
+   <p class="text-[11px] text-[var(--rm-text-secondary)] leading-relaxed font-medium">
     <span class="font-bold">{{ $alertaAct->tipo_alerta }}:</span> {{ $alertaAct->motivo }}
    </p>
    </div>
@@ -520,21 +520,21 @@
 
   <div class="space-y-2">
    <label class="block">
-   <span class="text-xs font-bold uppercase tracking-wider text-apoyo">Observación de Cierre / Resolución *</span>
+   <span class="text-xs font-bold uppercase tracking-wider text-[var(--rm-text-secondary)]">Observación de Cierre / Resolución *</span>
    <textarea
     wire:model="observacionCierre"
     placeholder="Describa cómo se resolvió la alerta clínica..."
     rows="3"
-    class="rm-input mt-1.5 w-full rounded-xl p-2.5 text-xs bg-fondo-app border border-borde text-titulo placeholder-apoyo focus:border-boton-acento outline-none"
+    class="rm-input mt-1.5 w-full rounded-xl p-2.5 text-xs bg-[var(--rm-bg-app)] border border-[var(--rm-border)] text-[var(--rm-text-primary)] placeholder-apoyo focus:border-boton-acento outline-none"
    ></textarea>
    </label>
   </div>
 
-  <div class="flex justify-end gap-2 border-t border-borde pt-3">
+  <div class="flex justify-end gap-2 border-t border-[var(--rm-border)] pt-3">
    <button
    type="button"
    wire:click="cerrarModales"
-   class="rounded-xl border border-borde px-3.5 py-2 text-xs font-bold text-titulo hover:bg-fondo-hover transition cursor-pointer"
+   class="rounded-xl border border-[var(--rm-border)] px-3.5 py-2 text-xs font-bold text-[var(--rm-text-primary)] hover:bg-[var(--rm-surface-soft)] transition cursor-pointer"
    >
    Cancelar
    </button>

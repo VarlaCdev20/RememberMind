@@ -87,11 +87,9 @@
         @keyframes rm-fade-in-up {
             from {
                 opacity: 0;
-                transform: translateY(6px);
             }
             to {
                 opacity: 1;
-                transform: none;
             }
         }
 
@@ -102,7 +100,6 @@
         @media (prefers-reduced-motion: reduce) {
             .animate-fade-in-up {
                 animation: none !important;
-                transform: none !important;
             }
             * {
                 transition-duration: 0.01ms !important;
@@ -112,10 +109,10 @@
     </style>
 </head>
 
-<body class="rm-nursing-shell h-full bg-[var(--rm-bg-app)] text-[var(--rm-text-primary)] antialiased selection:bg-[var(--rm-action-primary)] selection:text-[var(--rm-text-on-primary)] transition-colors duration-200"
+<body class="rm-shell rm-nursing-shell h-full bg-[var(--rm-bg-app)] text-[var(--rm-text-primary)] antialiased selection:bg-[var(--rm-action-primary)] selection:text-[var(--rm-text-on-primary)] transition-colors duration-200"
       x-data="{
           sidebarOpen: false,
-          sidebarCollapsed: localStorage.getItem('remembermind-sidebar-collapsed') === 'true',
+          sidebarCollapsed: (() => { const saved = localStorage.getItem('remembermind-sidebar-collapsed'); return saved === null ? window.matchMedia('(min-width: 1024px) and (max-width: 1199px)').matches : saved === 'true'; })(),
           toggleSidebarCollapse() {
               this.sidebarCollapsed = !this.sidebarCollapsed;
               localStorage.setItem('remembermind-sidebar-collapsed', this.sidebarCollapsed);
@@ -142,9 +139,13 @@
               );
           }
       }"
-      @remembermind:theme-changed.window="darkMode = $event.detail.isDark">
+      @remembermind:theme-changed.window="darkMode = $event.detail.isDark"
+      :class="{ 'is-sidebar-collapsed': sidebarCollapsed }">
 
-    <div class="min-h-screen bg-[var(--rm-bg-app)] transition-colors duration-200">
+    <div class="relative min-h-screen overflow-x-hidden bg-transparent transition-colors duration-200">
+        {{-- Fondos estéticos canónicos unificados con el sistema --}}
+        <div class="rm-texture-dots pointer-events-none fixed inset-0 z-0"></div>
+        <div class="rm-mouse-light pointer-events-none fixed inset-0 z-40"></div>
 
         {{-- Backdrop para móviles / tablets --}}
         <div x-show="sidebarOpen"
@@ -155,7 +156,7 @@
              x-transition:leave-start="opacity-100"
              x-transition:leave-end="opacity-0"
              @click="sidebarOpen = false"
-             class="fixed inset-0 z-40 bg-[var(--rm-modal-overlay,rgba(64,42,32,0.45))] backdrop-blur-xs lg:hidden"
+             class="rm-sidebar-overlay lg:hidden"
              style="display: none;"
              aria-hidden="true"></div>
 
@@ -169,12 +170,16 @@
         {{-- ========================================================= --}}
         <x-layout.topbar-enfermeria />
 
+        <x-layout.role-preview-banner />
+
+        @inject('rolePreview', 'App\Backend\Modulos\Identidad\Servicios\RolePreviewService')
+        @php($rolePreviewActive = $rolePreview->isActive(auth()->user()))
+
         {{-- ========================================================= --}}
         {{-- CONTENIDO PRINCIPAL: ANCHO EXACTO Y ESPACIADO             --}}
         {{-- ========================================================= --}}
-        <main class="rm-depth-canvas min-h-[calc(100vh-64px)] pb-6 transition-all duration-300 ease-in-out"
-              :class="sidebarCollapsed ? 'lg:pl-[76px]' : 'lg:pl-[248px]'">
-            <div class="mx-auto max-w-[1440px] px-4 sm:px-6 pt-6 animate-fade-in-up">
+        <main data-rm-main @if($rolePreviewActive) data-preview-readonly @endif class="rm-depth-canvas min-h-[calc(100vh-60px)] pb-4">
+            <div class="mx-auto max-w-[1360px] px-4 sm:px-5 pt-4 @unless(request()->routeIs('admin.enfermeria.pacientes')) animate-fade-in-up @endunless">
                 {{ $slot }}
             </div>
         </main>
@@ -184,6 +189,25 @@
 
     @stack('modals')
     @livewireScripts
+    @if($rolePreviewActive)
+        <style>
+            [data-preview-readonly] button,
+            [data-preview-readonly] input:not([type="search"]),
+            [data-preview-readonly] textarea,
+            [data-preview-readonly] select { cursor: not-allowed !important; opacity: .58; }
+        </style>
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                const root = document.querySelector('[data-preview-readonly]');
+                if (!root) return;
+                root.querySelectorAll('button, input:not([type="search"]), textarea, select').forEach((element) => {
+                    element.disabled = true;
+                    element.setAttribute('title', 'Disponible únicamente fuera del modo de previsualización.');
+                });
+                root.addEventListener('submit', (event) => event.preventDefault(), true);
+            });
+        </script>
+    @endif
     @stack('scripts')
 </body>
 

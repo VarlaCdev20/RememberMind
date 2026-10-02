@@ -13,6 +13,7 @@
   highlight="es decidir con humanidad"
   description="Revisa el estado clínico, prioriza valoraciones y toma decisiones con una visión longitudinal de cada residente."
   :image="asset('images/FOTOS CENTRO DE ADULTOS MAYORES/593542266_1360929526044966_7396297662771591420_n.jpg')"
+  rotation-context="medico"
   image-alt="Profesional de salud acompañando a residentes durante una actividad"
   quote="La atención clínica también empieza por escuchar"
   :meta="[
@@ -380,7 +381,7 @@
  </div>
 
  <div class="overflow-x-auto rounded-xl border border-estado-advertencia/30 bg-fondo-card">
-  <table class="w-full text-left text-sm whitespace-nowrap">
+  <table class="rm-data-table rm-data-table--actions w-full text-left text-sm whitespace-nowrap">
   <thead class="bg-fondo-panel text-[10px] font-bold uppercase tracking-wider text-apoyo">
    <tr>
    <th class="px-5 py-3">Paciente</th>

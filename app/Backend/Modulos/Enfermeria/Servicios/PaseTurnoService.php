@@ -526,7 +526,7 @@ class PaseTurnoService
             ->whereIn('estado', ['ACTIVO', 'ACTIVA'])
             ->exists();
 
-        if (!$asignadoSaliente && !$usuario->hasRole('SUPERADMINISTRADOR')) {
+        if (! $asignadoSaliente) {
             throw new \Symfony\Component\HttpKernel\Exception\HttpException(403, 'El residente no está asignado a su guardia actual.', null, [], 403);
         }
 
@@ -624,9 +624,7 @@ class PaseTurnoService
             ->exists();
 
         $esReceptorDesignado = $pase->cod_personal_entrante === $personal->cod_personal;
-        $esSuperAdmin = method_exists($usuario, 'hasRole') && $usuario->hasRole('SUPERADMINISTRADOR');
-
-        if (!$asignadoEntrante && !$esReceptorDesignado && !$esSuperAdmin) {
+        if (! $asignadoEntrante && ! $esReceptorDesignado) {
             throw new \Symfony\Component\HttpKernel\Exception\HttpException(403, 'No está autorizado para recibir este residente en la jornada entrante.', null, [], 403);
         }
 

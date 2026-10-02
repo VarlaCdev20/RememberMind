@@ -51,7 +51,7 @@ Cobertura: 60 archivos de migraciones, 29 seeders, 46 modelos, 71 archivos Livew
 
 ## Seeders: contenido y uso
 
-DatabaseSeeder ordena infraestructura/estados/permisos → turnos/tipos/VGI → cuentas/personal → habitaciones/residentes → preadmisiones → clínica/enfermería → actividades/voluntariado/demo. Hay seeders con personas nominales y escenarios demostrativos: no ejecutarlos en producción ni usar sus datos para completar acreditaciones reales. Durante refactor separar catálogos mínimos idempotentes de fixtures de prueba/demo. Los seeders RolesAndPermissions, SaludSeguimientoPermissions y FlujoClinicoPermissions requieren un catálogo canónico único. Las áreas se insertan también en una migración, aspecto a retirar de la futura evolución estructural.
+DatabaseSeeder carga el catálogo canónico de roles y permisos. La carga ficticia de las 70 tablas operativas está separada en LocalSampleDataSeeder y requiere ejecución explícita en local/testing. Sus registros no deben utilizarse para atención ni acreditaciones reales. Las áreas se insertan también en una migración, aspecto a revisar en una futura evolución estructural.
 
 GeriatricSuiteSeeder contiene FVS, Mini-Cog, MMSE, MoCA, GDS-15, CESD-7, Katz, Lawton, SPPB, FRAIL, TUG, Susurro, revisión medicación, velocidad marcha, Peek, Snellen, cartilla bolsillo, Braden, Norton, MNA-SF, MUST, SARC-F, barreras, maltrato, OARS y Díaz-Veiga. Cada versión prospectiva exige formulario, reglas, prueba de puntuación y aprobación clínica; no inventar licencias ni equivalencia clínica.
 
@@ -532,4 +532,3 @@ Las familias anteriores explican su funcionalidad. Este índice permite revisar 
 ## Hallazgo adicional: datos clínicos almacenados solo en bitácora
 
 App/Livewire/Admin/Medico/ValoracionMedicaModal::guardar actualiza estado y registra parte de la valoración en activity_log.properties (condición, cognición, dependencia, signos y observación), sin insertar ficha/nota clínica. Otros campos capturados por ese modal no figuran en la escritura: no pueden recuperarse del formulario después del hecho. DecisionAdmisionModal::guardar intenta usar estado_anterior='DECISION_ADMISION' donde el esquema espera cod_est_adul y envía usuario_id en lugar de cambiado_por; requiere regresión transaccional. No considerar estas vías como valoración/decisión fiable y completa solo porque exista pantalla.
-

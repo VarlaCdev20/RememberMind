@@ -3,12 +3,14 @@
 namespace App\Backend\Modulos\Clinica\Servicios;
 
 use App\Models\Personal;
+use App\Models\AsignacionResidenteJornada;
 use App\Models\SignoVital;
 use App\Models\User;
 use App\Backend\Modulos\Clinica\Servicios\ValidacionSignosVitalesService;
 use App\Backend\Modulos\Enfermeria\Servicios\TurnoEnfermeriaService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
@@ -16,6 +18,87 @@ use Illuminate\Validation\ValidationException;
 class SignosVitalesService
 {
     public function __construct(private readonly TurnoEnfermeriaService $turnos) {}
+
+    /** Captura estricta del formulario Nuevo registro de Enfermería (BDD V2.1). */
+    public function registrarDesdeNuevoRegistro(string $codResidente, array $entrada, User $usuario): SignoVital
+    {
+        abort_unless(Auth::user()?->cod_usuario === $usuario->cod_usuario, 403, 'La autoría del registro no corresponde al usuario autenticado.');
+        $turno = $this->turnos->autorizarMutacionEnfermeria($codResidente, 'signos_vitales.crear', $usuario);
+        $codPersonal = $this->resolverPersonalActivo($usuario);
+        $entrada = array_map(fn ($valor) => $valor === '' ? null : $valor, $entrada);
+        $entrada['observacion'] = isset($entrada['observacion']) ? trim($entrada['observacion']) : null;
+
+        $reglas = [
+            'presion_sistolica' => ['nullable', 'integer', 'min:0', 'max:999'],
+            'presion_diastolica' => ['nullable', 'integer', 'min:0', 'max:999'],
+            'frecuencia_cardiaca' => ['nullable', 'integer', 'min:0', 'max:9999'],
+            'frecuencia_respiratoria' => ['nullable', 'integer', 'min:0', 'max:9999'],
+            'temperatura' => ['nullable', 'numeric', 'decimal:0,1', 'between:-99.9,999.9'],
+            'saturacion_oxigeno' => ['nullable', 'numeric', 'decimal:0,2', 'min:0', 'max:100'],
+            'glucemia' => ['nullable', 'numeric', 'decimal:0,2', 'between:0,999999.99'],
+            'observacion' => ['nullable', 'string', 'max:5000'],
+        ];
+        $mensajes = [
+            'required' => 'Ingresa :attribute.',
+            'date_format' => 'Ingresa una fecha u hora válida.',
+            'integer' => 'Ingresa un número entero válido.',
+            'numeric' => 'Ingresa un valor numérico válido.',
+            'decimal' => 'El valor excede los decimales permitidos por la base de datos.',
+            'min' => 'El valor no puede ser negativo.',
+            'max' => 'El valor supera la capacidad permitida.',
+            'between' => 'El valor está fuera de la capacidad permitida.',
+            'saturacion_oxigeno.min' => 'La saturación no puede ser menor a 0 %.',
+            'saturacion_oxigeno.max' => 'La saturación no puede superar el 100 %.',
+            'glucemia.min' => 'La glucemia no puede ser negativa.',
+            'frecuencia_cardiaca.min' => 'El pulso no puede ser negativo.',
+            'frecuencia_respiratoria.min' => 'La frecuencia respiratoria no puede ser negativa.',
+            'observacion.max' => 'Las observaciones no pueden superar 5000 caracteres.',
+        ];
+        $atributos = [
+            'presion_sistolica' => 'la presión sistólica', 'presion_diastolica' => 'la presión diastólica',
+        ];
+        $validator = Validator::make($entrada, $reglas, $mensajes, $atributos);
+        $validator->after(function ($validator) use ($entrada): void {
+            $sis = $entrada['presion_sistolica'] ?? null;
+            $dia = $entrada['presion_diastolica'] ?? null;
+            if ($sis !== null && $dia === null) {
+                $validator->errors()->add('presion_diastolica', 'Completa también la presión diastólica.');
+            } elseif ($dia !== null && $sis === null) {
+                $validator->errors()->add('presion_sistolica', 'Completa también la presión sistólica.');
+            }
+            if (! collect(['presion_sistolica', 'presion_diastolica', 'frecuencia_cardiaca', 'frecuencia_respiratoria', 'temperatura', 'saturacion_oxigeno', 'glucemia'])
+                ->contains(fn (string $campo) => ($entrada[$campo] ?? null) !== null)) {
+                $validator->errors()->add('mediciones', 'Ingresa al menos una medición.');
+            }
+        });
+        $datos = $validator->validate();
+
+        $codJornada = AsignacionResidenteJornada::query()
+            ->where('cod_residente', $codResidente)
+            ->where('cod_personal', $codPersonal)
+            ->whereIn('estado', ['ACTIVA', 'ACTIVO', 'ASIGNADO'])
+            ->whereHas('jornada', fn ($q) => $q->where('cod_turno', $turno->cod_turno)
+                ->whereDate('fecha_jornada', now()->toDateString())
+                ->whereIn('estado', ['ABIERTA', 'ACTIVA', 'EN_CURSO']))
+            ->value('cod_jornada');
+        abort_unless($codJornada, 403, 'No existe una jornada activa para este residente.');
+
+        return SignoVital::create([
+            'cod_residente' => $codResidente,
+            'cod_personal' => $codPersonal,
+            'cod_jornada' => $codJornada,
+            'fecha_hora' => now(),
+            'presion_sistolica' => $datos['presion_sistolica'] ?? null,
+            'presion_diastolica' => $datos['presion_diastolica'] ?? null,
+            'frecuencia_cardiaca' => $datos['frecuencia_cardiaca'] ?? null,
+            'frecuencia_respiratoria' => $datos['frecuencia_respiratoria'] ?? null,
+            'temperatura' => $datos['temperatura'] ?? null,
+            'saturacion_oxigeno' => $datos['saturacion_oxigeno'] ?? null,
+            'glucemia' => $datos['glucemia'] ?? null,
+            'observacion' => $datos['observacion'] ?: null,
+            'estado' => 'ACTIVO',
+        ]);
+    }
 
     public function registrar(string $codResidente, array $entrada, User $usuario, string $permiso = 'signos_vitales.crear'): SignoVital
     {

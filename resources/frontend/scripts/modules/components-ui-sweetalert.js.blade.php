@@ -4,11 +4,20 @@
  toast: true,
  position: 'top-end',
  showConfirmButton: false,
+ showCloseButton: true,
+ closeButtonAriaLabel: 'Cerrar notificación',
+ customClass: { popup: 'rm-toast' },
+ showClass: { popup: 'rm-toast-show' },
+ hideClass: { popup: 'rm-toast-hide' },
  timer: 4000,
- timerProgressBar: true,
+ timerProgressBar: false,
  didOpen: (toast) => {
+ toast.setAttribute('role', 'status');
+ toast.setAttribute('aria-live', toast.querySelector('.swal2-icon.swal2-error') ? 'assertive' : 'polite');
  toast.addEventListener('mouseenter', Swal.stopTimer)
  toast.addEventListener('mouseleave', Swal.resumeTimer)
+ toast.addEventListener('focusin', Swal.stopTimer)
+ toast.addEventListener('focusout', Swal.resumeTimer)
  }
  });
 
@@ -20,45 +29,58 @@
  focusConfirm: false,
  });
 
- window.SwalToast = Toast;
+ window.SwalToast = {
+ fire(options) {
+ const icon = options?.icon || 'info';
+ const duration = { success: 4000, info: 4000, warning: 5500, error: 6000 };
+ return Toast.fire({ ...options, timer: options?.timer ?? duration[icon] ?? 4000 });
+ }
+ };
  window.SwalAmandita = swalAmandita;
 
  @if(session('success'))
- Toast.fire({
+ window.SwalToast.fire({
  icon: 'success',
- title:"{{ session('success') }}"
+ title: @js(session('success'))
  });
  @endif
 
  @if(session('error'))
- Toast.fire({
+ window.SwalToast.fire({
  icon: 'error',
- title:"{{ session('error') }}"
+ title: @js(session('error')),
+ timer: 6000
  });
  @endif
 
  @if(session('warning'))
- Toast.fire({
+ window.SwalToast.fire({
  icon: 'warning',
- title:"{{ session('warning') }}"
+ title: @js(session('warning')),
+ timer: 5500
  });
  @endif
 
  @if(session('info'))
- Toast.fire({
+ window.SwalToast.fire({
  icon: 'info',
- title:"{{ session('info') }}"
+ title: @js(session('info'))
  });
  @endif
 
  @if(session('status'))
- Toast.fire({
+ window.SwalToast.fire({
  icon: 'success',
- title:"{{ session('status') }}"
+ title: @js(session('status'))
  });
  @endif
 
  // Escuchar eventos de Livewire 3
+ window.addEventListener('rm-toast', function(event) {
+ const data = event.detail?.[0] || event.detail || {};
+ window.SwalToast.fire({ icon: data.icon || 'info', title: data.title || data.message || '' });
+ });
+
  window.addEventListener('swal', function(event) {
  const data = event.detail[0] || event.detail; // Livewire 3 a veces pasa los datos como el primer elemento del array
  window.SwalAmandita.fire({

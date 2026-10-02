@@ -1,4 +1,4 @@
-<!-- rm-filter-bar -->
+﻿<!-- rm-filter-bar -->
 <div class="rm-pilot-enfermeria rm-page-layout font-sans space-y-3 max-w-7xl mx-auto"
      x-data="{
          menuRegistrar: false,
@@ -36,7 +36,7 @@
                 </div>
                 <div>
                     <div class="flex items-center gap-2 flex-wrap">
-                        <h1 class="text-base sm:text-xl font-black text-[var(--rm-clinical)] dark:text-[var(--rm-surface)] tracking-tight leading-tight">
+                        <h1 class="text-base sm:text-xl font-bold text-[var(--rm-text-primary)] dark:text-[var(--rm-surface)] tracking-tight leading-tight">
                             {{ ($esSuperAdmin ?? false) ? 'Supervisión de residentes' : 'Mis residentes' }}
                         </h1>
                         <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-[var(--rm-action-primary)]/20 text-[var(--rm-action-primary)] dark:text-[var(--rm-action-primary)] border border-[var(--rm-action-primary)]/40">
@@ -62,7 +62,7 @@
             <div class="flex items-center gap-2 self-start md:self-auto text-xs text-[var(--rm-text-secondary)] dark:text-[var(--rm-text-muted)]">
                 <div class="px-3.5 py-1.5 rounded-xl bg-[var(--rm-surface)] dark:bg-[var(--rm-surface)] border border-[var(--rm-border)]/60 dark:border-[var(--rm-border)] flex items-center gap-2">
                     <i class="ph-bold ph-calendar text-[var(--rm-action-primary)] text-sm"></i>
-                    <span class="font-bold text-[var(--rm-clinical)] dark:text-[var(--rm-surface)]">{{ \Carbon\Carbon::now()->isoFormat('D [de] MMMM') }}</span>
+                    <span class="font-bold text-[var(--rm-text-primary)] dark:text-[var(--rm-surface)]">{{ \Carbon\Carbon::now()->isoFormat('D [de] MMMM') }}</span>
                     <span class="text-[var(--rm-text-primary)]">·</span>
                     <span class="font-semibold text-[11px]">Turno en curso</span>
                 </div>
@@ -71,7 +71,7 @@
     </header>
 
     {{-- BARRA DE FILTROS UNIFICADA FORMATO ALERTAS --}}
-    <section class="rounded-2xl bg-[var(--rm-surface-soft)] dark:bg-[var(--rm-surface)] border border-[var(--rm-border)] dark:border-[var(--rm-text-body)] p-3 text-xs shadow-sm flex flex-col gap-2.5">
+    <x-ui.filter-bar class="mb-4">
         <div class="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-2">
             {{-- Buscador Principal --}}
             <div class="lg:col-span-5 relative flex items-center">
@@ -81,7 +81,7 @@
                 <input type="text"
                     wire:model.live.debounce.300ms="search"
                     placeholder="Buscar por nombre, CI o habitación..."
-                    class="w-full rounded-xl border border-[var(--rm-border)] dark:border-[var(--rm-text-body)] bg-[var(--rm-surface)] dark:bg-[var(--rm-surface)] py-2 pl-9 pr-8 text-xs font-medium text-[var(--rm-clinical)] dark:text-[var(--rm-surface)] placeholder-[var(--rm-text-secondary)] dark:placeholder-[var(--rm-text-muted)] focus:border-[var(--rm-warning)] focus:outline-none h-[38px]">
+                    class="w-full rounded-xl border border-[var(--rm-border)] dark:border-[var(--rm-text-body)] bg-[var(--rm-surface)] dark:bg-[var(--rm-surface)] py-2 pl-9 pr-8 text-xs font-medium text-[var(--rm-text-primary)] dark:text-[var(--rm-surface)] placeholder-[var(--rm-text-secondary)] dark:placeholder-[var(--rm-text-muted)] focus:border-[var(--rm-warning)] focus:outline-none h-[38px]">
                 @if($search)
                     <button type="button" wire:click="$set('search', '')" class="absolute inset-y-0 right-0 flex items-center pr-2.5 text-[var(--rm-text-secondary)] hover:text-[var(--rm-warning)] cursor-pointer" title="Limpiar búsqueda">
                         <i class="ph-bold ph-x-circle text-base"></i>
@@ -92,7 +92,7 @@
             {{-- Selector Estado de Atención --}}
             <div class="lg:col-span-4">
                 <select wire:model.live="filtroEstado"
-                    class="w-full rounded-xl border border-[var(--rm-border)] dark:border-[var(--rm-border)] bg-[var(--rm-surface)] dark:bg-[var(--rm-text-primary)] py-2 px-3 text-xs font-medium text-[var(--rm-clinical)] dark:text-[var(--rm-surface-soft)] focus:border-[var(--rm-warning)] focus:outline-none h-[38px]">
+                    class="w-full rounded-xl border border-[var(--rm-border)] dark:border-[var(--rm-border)] bg-[var(--rm-surface)] dark:bg-[var(--rm-text-primary)] py-2 px-3 text-xs font-medium text-[var(--rm-text-primary)] dark:text-[var(--rm-surface-soft)] focus:border-[var(--rm-warning)] focus:outline-none h-[38px]">
                     <option value="TODOS">Todos los estados ({{ $stats['total'] ?? $pacientes->count() }})</option>
                     <option value="REQUIERE_ATENCION">Requiere atención ({{ $stats['criticos'] ?? 0 }})</option>
                     <option value="OBSERVACION">En observación ({{ $stats['observacion'] ?? 0 }})</option>
@@ -105,13 +105,13 @@
                 <div class="flex items-center p-0.5 rounded-xl bg-[var(--rm-surface)] dark:bg-[var(--rm-text-primary)] border border-[var(--rm-border)] dark:border-[var(--rm-border)] w-full h-[38px]">
                     <button type="button"
                             wire:click="$set('vistaModo', 'tabla')"
-                            class="flex-1 h-full rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 transition cursor-pointer {{ $vistaModo === 'tabla' ? 'bg-[var(--rm-clinical)] text-white shadow-xs' : 'text-[var(--rm-text-secondary)] hover:text-[var(--rm-clinical)] dark:text-[var(--rm-text-muted)]' }}">
+                            class="flex-1 h-full rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 transition cursor-pointer {{ $vistaModo === 'tabla' ? 'bg-[var(--rm-action-primary)] text-white shadow-xs' : 'text-[var(--rm-text-secondary)] hover:text-[var(--rm-text-primary)] dark:text-[var(--rm-text-muted)]' }}">
                         <i class="ph-bold ph-list-dashes text-sm"></i>
                         <span>Listado</span>
                     </button>
                     <button type="button"
                             wire:click="$set('vistaModo', 'tarjetas')"
-                            class="flex-1 h-full rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 transition cursor-pointer {{ $vistaModo === 'tarjetas' ? 'bg-[var(--rm-clinical)] text-white shadow-xs' : 'text-[var(--rm-text-secondary)] hover:text-[var(--rm-clinical)] dark:text-[var(--rm-text-muted)]' }}">
+                            class="flex-1 h-full rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 transition cursor-pointer {{ $vistaModo === 'tarjetas' ? 'bg-[var(--rm-action-primary)] text-white shadow-xs' : 'text-[var(--rm-text-secondary)] hover:text-[var(--rm-text-primary)] dark:text-[var(--rm-text-muted)]' }}">
                         <i class="ph-bold ph-squares-four text-sm"></i>
                         <span>Tarjetas</span>
                     </button>
@@ -119,43 +119,45 @@
             </div>
         </div>
 
-        {{-- Fila de chips de filtros activos --}}
+        {{-- Fila de chips de filtros activos (desplazable con colorcitos) --}}
         @php
             $hasFiltrosActivos = !empty($search) || ($filtroEstado !== 'TODOS');
         @endphp
         @if($hasFiltrosActivos)
-            <div class="w-full flex flex-wrap items-center justify-between gap-2 pt-2.5 border-t border-[var(--rm-border)]/60 dark:border-[var(--rm-text-body)] text-xs">
-                <div class="flex flex-wrap items-center gap-1.5">
-                    <span class="text-[11px] font-bold text-[var(--rm-text-secondary)] dark:text-[var(--rm-text-muted)] flex items-center gap-1 mr-1">
+            <div class="rm-filter-bar__active">
+                <div class="rm-filter-scroll">
+                    <span class="rm-filter-bar__active-label">
                         <i class="ph-bold ph-funnel text-xs"></i> Filtros activos:
                     </span>
                     @if(!empty($search))
-                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[var(--rm-surface)] dark:bg-[var(--rm-text-primary)] border border-[var(--rm-border)] dark:border-[var(--rm-border)] text-[11px] font-semibold text-[var(--rm-clinical)] dark:text-[var(--rm-surface)]">
+                        <span class="rm-filter-chip rm-filter-chip--search">
+                            <i class="ph-bold ph-magnifying-glass text-xs"></i>
                             <span>Búsqueda: "{{ Str::limit($search, 18) }}"</span>
-                            <button type="button" wire:click="$set('search', '')" class="hover:text-[var(--rm-warning)] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
+                            <button type="button" wire:click="$set('search', '')" title="Quitar filtro"><i class="ph-bold ph-x text-xs"></i></button>
                         </span>
                     @endif
                     @if($filtroEstado !== 'TODOS')
-                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg {{ $filtroEstado === 'REQUIERE_ATENCION' ? 'bg-[var(--rm-danger-soft)] border border-[var(--rm-danger)]/30 text-[var(--rm-danger)] dark:text-[var(--rm-danger)]' : ($filtroEstado === 'OBSERVACION' ? 'bg-[var(--rm-warning-soft)] border border-[var(--rm-warning)]/30 text-[var(--rm-warning)] dark:text-[var(--rm-warning)]' : 'bg-[var(--rm-action-primary-soft)] border border-[var(--rm-action-primary)]/30 text-[var(--rm-success)] dark:text-[var(--rm-success)]') }} text-[11px] font-bold">
+                        <span class="rm-filter-chip {{ $filtroEstado === 'REQUIERE_ATENCION' ? 'rm-filter-chip--danger' : ($filtroEstado === 'OBSERVACION' ? 'rm-filter-chip--warning' : 'rm-filter-chip--success') }}">
+                            <span class="w-1.5 h-1.5 rounded-full {{ $filtroEstado === 'REQUIERE_ATENCION' ? 'bg-[var(--rm-danger)] animate-pulse' : ($filtroEstado === 'OBSERVACION' ? 'bg-[var(--rm-status-high)]' : 'bg-[var(--rm-action-primary)]') }}"></span>
                             <span>Estado: {{ $filtroEstado === 'REQUIERE_ATENCION' ? 'Requiere atención' : ($filtroEstado === 'OBSERVACION' ? 'En observación' : 'Estable') }}</span>
-                            <button type="button" wire:click="$set('filtroEstado', 'TODOS')" class="hover:text-[var(--rm-warning)] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
+                            <button type="button" wire:click="$set('filtroEstado', 'TODOS')" title="Quitar filtro"><i class="ph-bold ph-x text-xs"></i></button>
                         </span>
                     @endif
                 </div>
-                <div class="flex items-center gap-2.5">
-                    <span class="text-[11px] px-2.5 py-0.5 rounded-full font-bold bg-[var(--rm-clinical-soft)] dark:bg-[var(--rm-surface)]/10 text-[var(--rm-clinical)] dark:text-[var(--rm-surface)]">
-                        {{ $pacientes->total() ?? $pacientes->count() }} residentes coincidentes
+                <div class="flex items-center gap-2 shrink-0">
+                    <span class="text-[11px] px-2.5 py-0.5 rounded-full font-bold bg-[var(--rm-surface-alt)] text-[var(--rm-text-secondary)] border border-[var(--rm-border-soft)]">
+                        {{ $pacientes->total() ?? $pacientes->count() }} residentes
                     </span>
                     <button type="button"
                             wire:click="$set('search', ''); $set('filtroEstado', 'TODOS')"
-                            class="inline-flex items-center gap-1 rounded-xl bg-[var(--rm-warning-soft)] hover:bg-[var(--rm-warning)]/25 text-[var(--rm-warning)] dark:text-[var(--rm-warning)] py-1 px-2.5 text-xs font-bold transition cursor-pointer">
-                        <i class="ph-bold ph-arrow-counter-clockwise"></i>
+                            class="rm-filter-bar__clear-btn">
+                        <i class="ph-bold ph-arrow-counter-clockwise text-xs"></i>
                         <span>Limpiar filtros</span>
                     </button>
                 </div>
             </div>
         @endif
-    </section>
+    </x-ui.filter-bar>
 
     {{-- ============================================================= --}}
     {{-- 3. CONTENIDO PRINCIPAL                                        --}}
@@ -203,12 +205,12 @@
                                 @if(!empty($paciente->foto))
                                     <img src="{{ asset('storage/' . $paciente->foto) }}" alt="{{ $paciente->nombre_completo }}" class="h-13 w-13 sm:h-14 sm:w-14 rounded-2xl object-cover border-2 border-[var(--rm-border)]/70 shrink-0 shadow-2xs">
                                 @else
-                                    <div class="h-13 w-13 sm:h-14 sm:w-14 rounded-2xl bg-gradient-to-br from-[var(--rm-clinical)]/15 to-[var(--rm-action-primary)]/20 flex items-center justify-center font-black text-base text-[var(--rm-clinical)] dark:text-[var(--rm-surface)] border-2 border-[var(--rm-clinical)]/20 shrink-0 shadow-2xs">
+                                    <div class="h-13 w-13 sm:h-14 sm:w-14 rounded-2xl bg-[var(--rm-action-primary-soft)] text-[var(--rm-action-primary-ink)] flex items-center justify-center font-bold text-base text-[var(--rm-text-primary)] dark:text-[var(--rm-surface)] border-2 border-[var(--rm-border)] shrink-0 shadow-2xs">
                                         {{ $inicsP }}
                                     </div>
                                 @endif
                                 <div class="min-w-0 flex-1">
-                                    <h3 class="text-base sm:text-[17px] font-black text-[var(--rm-clinical)] dark:text-[var(--rm-surface)] leading-snug truncate">
+                                    <h3 class="text-base sm:text-[17px] font-bold text-[var(--rm-text-primary)] dark:text-[var(--rm-surface)] leading-snug truncate">
                                         {{ $paciente->nombre_completo ?? ($paciente->nombres . ' ' . $paciente->apellido_paterno) }}
                                     </h3>
                                     <p class="text-xs sm:text-[13px] text-[var(--rm-text-secondary)] dark:text-[var(--rm-text-muted)] truncate mt-1 font-semibold flex items-center gap-1.5 flex-wrap">
@@ -234,7 +236,7 @@
 
                             {{-- Bloque Próxima atención y alertas --}}
                             <div class="p-3 sm:p-3.5 rounded-xl sm:rounded-2xl bg-[var(--rm-surface)] dark:bg-[var(--rm-surface)] border border-[var(--rm-border)]/60 flex items-center justify-between gap-2 text-xs">
-                                <span class="truncate flex items-center gap-2 font-bold text-[var(--rm-clinical)] dark:text-[var(--rm-surface)]">
+                                <span class="truncate flex items-center gap-2 font-bold text-[var(--rm-text-primary)] dark:text-[var(--rm-surface)]">
                                     <i class="ph-bold ph-clock text-[var(--rm-action-primary)] text-base"></i>
                                     <strong class="truncate">{{ $paciente->proxima_atencion_texto ?? 'Control de signos' }}</strong>
                                     <span class="text-[var(--rm-text-secondary)] font-normal">· {{ $paciente->proxima_atencion_hora ?? '10:00' }}</span>
@@ -264,7 +266,7 @@
                 {{-- VISTA LISTADO AMPLIO Y CONFORTABLE --}}
                 <div class="rounded-2xl border border-[var(--rm-border)]/60 dark:border-[var(--rm-border)] bg-[var(--rm-surface)] dark:bg-[var(--rm-text-primary)] overflow-hidden shadow-2xs">
                     <div class="px-4 py-2.5 border-b border-[var(--rm-border)]/50 dark:border-[var(--rm-border)] flex items-center justify-between text-xs text-[var(--rm-text-secondary)] dark:text-[var(--rm-text-muted)]">
-                        <span class="font-bold text-[var(--rm-clinical)] dark:text-[var(--rm-surface)]">
+                        <span class="font-bold text-[var(--rm-text-primary)] dark:text-[var(--rm-surface)]">
                             {{ $pacientes->total() ?? $pacientes->count() }} residentes en tu turno
                         </span>
                         <span class="font-medium text-[11px]">
@@ -290,19 +292,19 @@
                                     @if(!empty($paciente->foto))
                                         <img src="{{ asset('storage/' . $paciente->foto) }}" alt="{{ $paciente->nombre_completo }}" class="h-11 w-11 rounded-xl object-cover border border-[var(--rm-border)]/60 shrink-0">
                                     @else
-                                        <div class="h-11 w-11 rounded-xl bg-gradient-to-br from-[var(--rm-clinical)]/15 to-[var(--rm-action-primary)]/20 flex items-center justify-center font-black text-xs text-[var(--rm-clinical)] dark:text-[var(--rm-surface)] border border-[var(--rm-clinical)]/20 shrink-0">
+                                        <div class="h-11 w-11 rounded-xl bg-[var(--rm-action-primary-soft)] text-[var(--rm-action-primary-ink)] flex items-center justify-center font-black text-xs text-[var(--rm-text-primary)] dark:text-[var(--rm-surface)] border border-[var(--rm-border)] shrink-0">
                                             {{ $inicsP }}
                                         </div>
                                     @endif
                                     <div class="min-w-0">
-                                        <h3 class="text-xs sm:text-[14px] font-bold text-[var(--rm-clinical)] dark:text-[var(--rm-surface)] leading-snug truncate">
+                                        <h3 class="text-xs sm:text-[14px] font-bold text-[var(--rm-text-primary)] dark:text-[var(--rm-surface)] leading-snug truncate">
                                             {{ $paciente->nombre_completo ?? ($paciente->nombres . ' ' . $paciente->apellido_paterno) }}
                                         </h3>
                                         <p class="text-xs text-[var(--rm-text-secondary)] dark:text-[var(--rm-text-muted)] truncate mt-0.5">
                                             {{ $edadP }} | Hab. {{ $habP }} · Cama {{ $camP }}
                                         </p>
                                         <div class="mt-1 flex items-center gap-2">
-                                            <span class="px-2 py-0.2 rounded text-[8px] font-black uppercase tracking-wider {{ $paciente->estado_color === 'red' ? 'bg-red-100 text-red-700' : ($paciente->estado_color === 'amber' ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800') }}">
+                                            <span class="px-2 py-0.2 rounded text-[10px] font-black uppercase tracking-wider {{ $paciente->estado_color === 'red' ? 'bg-red-100 text-red-700' : ($paciente->estado_color === 'amber' ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800') }}">
                                                 {{ $paciente->estado_label }}
                                             </span>
                                         </div>
@@ -311,8 +313,8 @@
 
                                 <div class="flex items-center gap-3 shrink-0 text-right">
                                     <div class="hidden sm:block text-right">
-                                        <span class="text-[9.5px] text-[var(--rm-text-secondary)] dark:text-[var(--rm-text-muted)] uppercase font-bold block leading-none">Próxima atención</span>
-                                        <span class="text-xs font-bold text-[var(--rm-clinical)] dark:text-[var(--rm-surface)] block mt-0.5 leading-tight truncate max-w-[150px]">{{ $paciente->proxima_atencion_texto ?? 'Control de signos' }}</span>
+                                        <span class="text-[11px] text-[var(--rm-text-secondary)] dark:text-[var(--rm-text-muted)] uppercase font-bold block leading-none">Próxima atención</span>
+                                        <span class="text-xs font-bold text-[var(--rm-text-primary)] dark:text-[var(--rm-surface)] block mt-0.5 leading-tight truncate max-w-[150px]">{{ $paciente->proxima_atencion_texto ?? 'Control de signos' }}</span>
                                         <span class="text-[11px] font-semibold text-[var(--rm-action-primary)] block leading-tight">{{ $paciente->proxima_atencion_hora ?? '10:00' }}</span>
                                     </div>
                                     <i class="ph-bold ph-caret-right text-sm text-[var(--rm-text-secondary)] dark:text-[var(--rm-text-muted)]"></i>
@@ -347,7 +349,7 @@
                     <div class="p-3.5 sm:p-4 rounded-2xl border border-[var(--rm-border)]/70 dark:border-[var(--rm-border)] bg-[var(--rm-surface)] dark:bg-[var(--rm-surface)] shadow-2xs relative">
                         <button type="button"
                                 wire:click="cerrarPanelDetalle"
-                                class="absolute right-3 top-3 h-7 w-7 rounded-xl bg-[var(--rm-surface)] hover:bg-[var(--rm-surface-muted)] text-[var(--rm-text-secondary)] hover:text-[var(--rm-clinical)] flex items-center justify-center transition cursor-pointer"
+                                class="absolute right-3 top-3 h-7 w-7 rounded-xl bg-[var(--rm-surface)] hover:bg-[var(--rm-surface-muted)] text-[var(--rm-text-secondary)] hover:text-[var(--rm-text-primary)] flex items-center justify-center transition cursor-pointer"
                                 title="Cerrar resumen">
                             <i class="ph-bold ph-x text-sm"></i>
                         </button>
@@ -357,7 +359,7 @@
                                 @if(!empty($detalleResidente['foto']))
                                     <img src="{{ $detalleResidente['foto'] }}" alt="{{ $detalleResidente['nombre_completo'] }}" class="h-13 w-13 rounded-2xl object-cover border-2 border-white dark:border-[var(--rm-border)] shadow-xs">
                                 @else
-                                    <div class="flex h-13 w-13 items-center justify-center rounded-2xl bg-gradient-to-br from-[var(--rm-clinical)]/15 to-[var(--rm-action-primary)]/20 text-[var(--rm-clinical)] dark:text-[var(--rm-text-muted)] font-black text-base border-2 border-[var(--rm-clinical)]/20 shadow-xs">
+                                    <div class="flex h-13 w-13 items-center justify-center rounded-2xl bg-[var(--rm-action-primary-soft)] text-[var(--rm-action-primary-ink)] dark:text-[var(--rm-text-muted)] font-bold text-base border-2 border-[var(--rm-border)] shadow-xs">
                                         {{ $detalleResidente['iniciales'] }}
                                     </div>
                                 @endif
@@ -365,14 +367,14 @@
                             </div>
                             
                             <div class="min-w-0 flex-1">
-                                <span class="text-[9.5px] font-black uppercase tracking-wider text-[var(--rm-action-primary)] block leading-none mb-1">Ficha Rápida del Turno</span>
-                                <h2 class="text-base sm:text-lg font-black text-[var(--rm-clinical)] dark:text-[var(--rm-surface)] leading-tight truncate">
+                                <span class="text-[11px] font-black uppercase tracking-wider text-[var(--rm-action-primary)] block leading-none mb-1">Ficha Rápida del Turno</span>
+                                <h2 class="text-base sm:text-lg font-bold text-[var(--rm-text-primary)] dark:text-[var(--rm-surface)] leading-tight truncate">
                                     {{ $detalleResidente['nombre_completo'] }}
                                 </h2>
                                 <div class="text-xs text-[var(--rm-text-secondary)] dark:text-[var(--rm-text-muted)] mt-1 flex items-center gap-2 flex-wrap font-semibold">
-                                    <span class="font-bold text-[var(--rm-clinical)] dark:text-[var(--rm-surface)]">{{ $detalleResidente['edad_texto'] }}</span>
+                                    <span class="font-bold text-[var(--rm-text-primary)] dark:text-[var(--rm-surface)]">{{ $detalleResidente['edad_texto'] }}</span>
                                     <span class="text-[var(--rm-text-primary)]">·</span>
-                                    <span class="font-bold text-[var(--rm-clinical)] dark:text-[var(--rm-surface)] flex items-center gap-1">
+                                    <span class="font-bold text-[var(--rm-text-primary)] dark:text-[var(--rm-surface)] flex items-center gap-1">
                                         <i class="ph-bold ph-map-pin text-[var(--rm-action-primary)]"></i>
                                         {{ $detalleResidente['ubicacion_formateada'] }}
                                     </span>
@@ -382,7 +384,7 @@
 
                         {{-- Fila de Estado y Turno --}}
                         <div class="mt-3 pt-2.5 border-t border-[var(--rm-border)]/40 dark:border-[var(--rm-border)] flex items-center justify-between text-xs">
-                            <span class="px-2.5 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider {{ $detalleResidente['estado_color'] === 'red' ? 'bg-red-100 text-red-700' : ($detalleResidente['estado_color'] === 'amber' ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800') }}">
+                            <span class="px-2.5 py-0.5 rounded-md text-[10px] font-black uppercase tracking-wider {{ $detalleResidente['estado_color'] === 'red' ? 'bg-red-100 text-red-700' : ($detalleResidente['estado_color'] === 'amber' ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800') }}">
                                 {{ $detalleResidente['estado_humano'] }}
                             </span>
                             <span class="text-xs font-semibold text-[var(--rm-text-secondary)] dark:text-[var(--rm-text-muted)]">
@@ -395,7 +397,7 @@
                     @if(!empty($detalleResidente['alertas']) && count($detalleResidente['alertas']) > 0)
                         <div class="p-3.5 rounded-2xl border-2 border-[var(--rm-danger)]/40 bg-red-50/90 dark:bg-red-950/40 shadow-xs space-y-2.5">
                             <div class="flex items-center justify-between">
-                                <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-[9.5px] font-black uppercase tracking-wider bg-[var(--rm-danger)] text-white">
+                                <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-[11px] font-black uppercase tracking-wider bg-[var(--rm-danger)] text-white">
                                     <i class="ph-bold ph-warning-circle text-xs"></i>
                                     URGENCIA CLÍNICA DEFINIDA
                                 </span>
@@ -413,9 +415,9 @@
                                         <div class="min-w-0 flex-1">
                                             <div class="flex items-center justify-between gap-1">
                                                 <span class="text-[10px] font-black uppercase tracking-wide text-[var(--rm-danger)]">{{ $alerta['tipo'] }}</span>
-                                                <span class="text-[9.5px] font-semibold text-[var(--rm-text-secondary)]">{{ $alerta['tiempo'] }}</span>
+                                                <span class="text-[11px] font-semibold text-[var(--rm-text-secondary)]">{{ $alerta['tiempo'] }}</span>
                                             </div>
-                                            <p class="text-xs font-bold text-[var(--rm-clinical)] dark:text-[var(--rm-surface)] leading-tight mt-0.5">
+                                            <p class="text-xs font-bold text-[var(--rm-text-primary)] dark:text-[var(--rm-surface)] leading-tight mt-0.5">
                                                 {{ $alerta['motivo'] }}
                                             </p>
                                         </div>
@@ -433,7 +435,7 @@
                                     <span class="text-[10px] font-black uppercase tracking-wider text-[var(--rm-action-primary)] dark:text-[var(--rm-action-primary)] block leading-none">
                                         ESTADO COMPENSADO · SIN URGENCIA
                                     </span>
-                                    <p class="text-xs font-semibold text-[var(--rm-clinical)] dark:text-[var(--rm-surface)] truncate mt-1">
+                                    <p class="text-xs font-semibold text-[var(--rm-text-primary)] dark:text-[var(--rm-surface)] truncate mt-1">
                                         Constantes en rango esperado. Plan estándar.
                                     </p>
                                 </div>
@@ -447,7 +449,7 @@
                     {{-- 3. ÚLTIMOS SIGNOS VITALES: TIRA CLARA Y BIEN ESPACIADA --}}
                     <div class="p-3 sm:p-3.5 rounded-2xl border border-[var(--rm-border)]/70 dark:border-[var(--rm-border)] bg-[var(--rm-surface)] dark:bg-[var(--rm-surface)] shadow-2xs space-y-2">
                         <div class="flex items-center justify-between pb-1.5 border-b border-[var(--rm-border)]/40 dark:border-[var(--rm-border)]">
-                            <span class="text-[10px] font-black uppercase tracking-wider text-[var(--rm-clinical)] dark:text-[var(--rm-surface)] flex items-center gap-1.5">
+                            <span class="text-[10px] font-black uppercase tracking-wider text-[var(--rm-text-primary)] dark:text-[var(--rm-surface)] flex items-center gap-1.5">
                                 <i class="ph-bold ph-heartbeat text-rose-500 text-sm"></i>
                                 Últimos signos vitales
                             </span>
@@ -462,52 +464,52 @@
                             <div class="grid grid-cols-5 gap-2 text-center">
                                 {{-- PA: Presión Arterial (Rose / Coral) --}}
                                 <div class="p-2 sm:p-2.5 rounded-xl bg-rose-50/80 dark:bg-rose-950/25 border border-rose-200/90 dark:border-rose-900/50 text-center flex flex-col justify-between shadow-2xs">
-                                    <div class="flex items-center justify-center gap-1 text-[9px] font-black uppercase tracking-wider text-rose-700 dark:text-rose-400">
+                                    <div class="flex items-center justify-center gap-1 text-[10px] font-black uppercase tracking-wider text-rose-700 dark:text-rose-400">
                                         <i class="ph-bold ph-activity text-xs text-rose-500"></i>
                                         <span>PA</span>
                                     </div>
-                                    <span class="text-xs sm:text-[13.5px] font-black text-[var(--rm-clinical)] dark:text-[var(--rm-surface)] block leading-tight mt-1">{{ $detalleResidente['ultimos_signos']['pa'] ?? '120/80' }}</span>
-                                    <span class="text-[8px] font-bold text-rose-600/80 dark:text-rose-400/80 block mt-0.5">mmHg</span>
+                                    <span class="text-xs sm:text-[13.5px] font-bold text-[var(--rm-text-primary)] dark:text-[var(--rm-surface)] block leading-tight mt-1">{{ $detalleResidente['ultimos_signos']['pa'] ?? '120/80' }}</span>
+                                    <span class="text-[10px] font-bold text-rose-600/80 dark:text-rose-400/80 block mt-0.5">mmHg</span>
                                 </div>
 
                                 {{-- FC: Frecuencia Cardíaca (Rojo / Terracota) --}}
                                 <div class="p-2 sm:p-2.5 rounded-xl bg-red-50/80 dark:bg-red-950/25 border border-red-200/90 dark:border-red-900/50 text-center flex flex-col justify-between shadow-2xs">
-                                    <div class="flex items-center justify-center gap-1 text-[9px] font-black uppercase tracking-wider text-[var(--rm-warning)] dark:text-[var(--rm-danger)]">
+                                    <div class="flex items-center justify-center gap-1 text-[10px] font-black uppercase tracking-wider text-[var(--rm-warning)] dark:text-[var(--rm-danger)]">
                                         <i class="ph-bold ph-heartbeat text-xs text-[var(--rm-warning)]"></i>
                                         <span>FC</span>
                                     </div>
-                                    <span class="text-xs sm:text-[13.5px] font-black text-[var(--rm-clinical)] dark:text-[var(--rm-surface)] block leading-tight mt-1">{{ $detalleResidente['ultimos_signos']['fc'] ?? '72' }}</span>
-                                    <span class="text-[8px] font-bold text-[var(--rm-warning)]/80 dark:text-[var(--rm-danger)]/80 block mt-0.5">lpm</span>
+                                    <span class="text-xs sm:text-[13.5px] font-bold text-[var(--rm-text-primary)] dark:text-[var(--rm-surface)] block leading-tight mt-1">{{ $detalleResidente['ultimos_signos']['fc'] ?? '72' }}</span>
+                                    <span class="text-[10px] font-bold text-[var(--rm-warning)]/80 dark:text-[var(--rm-danger)]/80 block mt-0.5">lpm</span>
                                 </div>
 
                                 {{-- FR: Frecuencia Respiratoria (Sky Blue / Aire) --}}
                                 <div class="p-2 sm:p-2.5 rounded-xl bg-sky-50/80 dark:bg-sky-950/25 border border-sky-200/90 dark:border-sky-900/50 text-center flex flex-col justify-between shadow-2xs">
-                                    <div class="flex items-center justify-center gap-1 text-[9px] font-black uppercase tracking-wider text-sky-700 dark:text-sky-400">
+                                    <div class="flex items-center justify-center gap-1 text-[10px] font-black uppercase tracking-wider text-sky-700 dark:text-sky-400">
                                         <i class="ph-bold ph-wind text-xs text-sky-500"></i>
                                         <span>FR</span>
                                     </div>
-                                    <span class="text-xs sm:text-[13.5px] font-black text-[var(--rm-clinical)] dark:text-[var(--rm-surface)] block leading-tight mt-1">{{ $detalleResidente['ultimos_signos']['fr'] ?? '18' }}</span>
-                                    <span class="text-[8px] font-bold text-sky-600/80 dark:text-sky-400/80 block mt-0.5">rpm</span>
+                                    <span class="text-xs sm:text-[13.5px] font-bold text-[var(--rm-text-primary)] dark:text-[var(--rm-surface)] block leading-tight mt-1">{{ $detalleResidente['ultimos_signos']['fr'] ?? '18' }}</span>
+                                    <span class="text-[10px] font-bold text-sky-600/80 dark:text-sky-400/80 block mt-0.5">rpm</span>
                                 </div>
 
                                 {{-- T°: Temperatura (Amber / Termómetro) --}}
                                 <div class="p-2 sm:p-2.5 rounded-xl bg-amber-50/80 dark:bg-amber-950/25 border border-amber-200/90 dark:border-amber-900/50 text-center flex flex-col justify-between shadow-2xs">
-                                    <div class="flex items-center justify-center gap-1 text-[9px] font-black uppercase tracking-wider text-amber-800 dark:text-amber-400">
+                                    <div class="flex items-center justify-center gap-1 text-[10px] font-black uppercase tracking-wider text-amber-800 dark:text-amber-400">
                                         <i class="ph-bold ph-thermometer-simple text-xs text-amber-500"></i>
                                         <span>T°</span>
                                     </div>
-                                    <span class="text-xs sm:text-[13.5px] font-black text-[var(--rm-clinical)] dark:text-[var(--rm-surface)] block leading-tight mt-1">{{ $detalleResidente['ultimos_signos']['temp'] ?? '36.4' }}</span>
-                                    <span class="text-[8px] font-bold text-amber-700/80 dark:text-amber-400/80 block mt-0.5">°C</span>
+                                    <span class="text-xs sm:text-[13.5px] font-bold text-[var(--rm-text-primary)] dark:text-[var(--rm-surface)] block leading-tight mt-1">{{ $detalleResidente['ultimos_signos']['temp'] ?? '36.4' }}</span>
+                                    <span class="text-[10px] font-bold text-amber-700/80 dark:text-amber-400/80 block mt-0.5">°C</span>
                                 </div>
 
                                 {{-- Sat: Saturación O₂ (Sage / Emerald) --}}
                                 <div class="p-2 sm:p-2.5 rounded-xl bg-emerald-50/80 dark:bg-emerald-950/25 border border-emerald-200/90 dark:border-emerald-900/50 text-center flex flex-col justify-between shadow-2xs">
-                                    <div class="flex items-center justify-center gap-1 text-[9px] font-black uppercase tracking-wider text-[var(--rm-action-primary)] dark:text-[var(--rm-action-primary)]">
+                                    <div class="flex items-center justify-center gap-1 text-[10px] font-black uppercase tracking-wider text-[var(--rm-action-primary)] dark:text-[var(--rm-action-primary)]">
                                         <i class="ph-bold ph-drop text-xs text-[var(--rm-action-primary)]"></i>
                                         <span>Sat</span>
                                     </div>
-                                    <span class="text-xs sm:text-[13.5px] font-black text-[var(--rm-clinical)] dark:text-[var(--rm-surface)] block leading-tight mt-1">{{ $detalleResidente['ultimos_signos']['sat'] ?? '96%' }}</span>
-                                    <span class="text-[8px] font-bold text-[var(--rm-action-primary)]/80 dark:text-[var(--rm-action-primary)]/80 block mt-0.5">%</span>
+                                    <span class="text-xs sm:text-[13.5px] font-bold text-[var(--rm-text-primary)] dark:text-[var(--rm-surface)] block leading-tight mt-1">{{ $detalleResidente['ultimos_signos']['sat'] ?? '96%' }}</span>
+                                    <span class="text-[10px] font-bold text-[var(--rm-action-primary)]/80 dark:text-[var(--rm-action-primary)]/80 block mt-0.5">%</span>
                                 </div>
                             </div>
                         @else
@@ -527,9 +529,9 @@
                                 </div>
                                 <div class="min-w-0">
                                     <div class="flex items-center gap-1.5">
-                                        <span class="text-[9.5px] font-black uppercase text-[var(--rm-text-secondary)]">Próxima Medicación</span>
+                                        <span class="text-[11px] font-black uppercase text-[var(--rm-text-secondary)]">Próxima Medicación</span>
                                     </div>
-                                    <h4 class="text-xs sm:text-[13px] font-bold text-[var(--rm-clinical)] dark:text-[var(--rm-surface)] truncate">
+                                    <h4 class="text-xs sm:text-[13px] font-bold text-[var(--rm-text-primary)] dark:text-[var(--rm-surface)] truncate">
                                         {{ $detalleResidente['proxima_medicacion']['nombre'] ?? 'Sin medicación programada' }}
                                     </h4>
                                     <p class="text-xs text-[var(--rm-text-secondary)] dark:text-[var(--rm-text-muted)] truncate mt-0.5">
@@ -547,14 +549,14 @@
                         {{-- Atención / Cuidado de Enfermería --}}
                         <div class="p-3 sm:p-3.5 rounded-2xl border border-[var(--rm-border)]/70 dark:border-[var(--rm-border)] bg-[var(--rm-surface)] dark:bg-[var(--rm-surface)] flex items-center justify-between gap-3 shadow-2xs">
                             <div class="flex items-center gap-3 min-w-0">
-                                <div class="h-9 w-9 rounded-xl bg-[var(--rm-clinical-soft)] text-[var(--rm-clinical)] flex items-center justify-center shrink-0">
+                                <div class="h-9 w-9 rounded-xl bg-[var(--rm-action-primary-soft)] text-[var(--rm-action-primary-ink)] flex items-center justify-center shrink-0">
                                     <i class="ph-bold ph-calendar-check text-lg"></i>
                                 </div>
                                 <div class="min-w-0">
                                     <div class="flex items-center gap-1.5">
-                                        <span class="text-[9.5px] font-black uppercase text-[var(--rm-text-secondary)]">Próxima Atención</span>
+                                        <span class="text-[11px] font-black uppercase text-[var(--rm-text-secondary)]">Próxima Atención</span>
                                     </div>
-                                    <h4 class="text-xs sm:text-[13px] font-bold text-[var(--rm-clinical)] dark:text-[var(--rm-surface)] truncate">
+                                    <h4 class="text-xs sm:text-[13px] font-bold text-[var(--rm-text-primary)] dark:text-[var(--rm-surface)] truncate">
                                         {{ $detalleResidente['proxima_atencion_texto'] ?? 'Control de signos' }}
                                     </h4>
                                     <p class="text-xs text-[var(--rm-text-secondary)] dark:text-[var(--rm-text-muted)] truncate mt-0.5">
@@ -575,7 +577,7 @@
                         {{-- Botón 1: Ver Ficha Clínica (Prominente, Alto Contraste) --}}
                         <a href="{{ route('admin.enfermeria.pacientes.ficha', ['adulto' => $detalleResidente['cod_residente']]) }}"
                            id="btn-ver-ficha-clinica"
-                           class="flex-1 h-11 sm:h-11.5 rounded-xl border-2 border-[var(--rm-clinical)]/30 hover:border-[var(--rm-clinical)] bg-[var(--rm-surface)] dark:bg-[var(--rm-surface)] hover:bg-[var(--rm-surface)] text-[var(--rm-clinical)] dark:text-[var(--rm-surface)] text-xs sm:text-[13.5px] font-black tracking-wide shadow-sm hover:shadow transition-all duration-150 flex items-center justify-center gap-2 cursor-pointer active:scale-[0.99]">
+                           class="flex-1 h-11 sm:h-11.5 rounded-xl border-2 border-[var(--rm-clinical)]/30 hover:border-[var(--rm-clinical)] bg-[var(--rm-surface)] dark:bg-[var(--rm-surface)] hover:bg-[var(--rm-surface)] text-[var(--rm-text-primary)] dark:text-[var(--rm-surface)] text-xs sm:text-[13.5px] font-black tracking-wide shadow-sm hover:shadow transition-all duration-150 flex items-center justify-center gap-2 cursor-pointer active:scale-[0.99]">
                             <i class="ph-bold ph-identification-card text-xl text-[var(--rm-warning)]"></i>
                             <span>Ver ficha clínica</span>
                         </a>
@@ -586,7 +588,7 @@
                                 <button type="button"
                                         id="btn-registrar-accion"
                                         @click="modalSelectorRegistro = true"
-                                        class="w-full h-11 sm:h-11.5 rounded-xl bg-[var(--rm-warning)] hover:bg-[var(--rm-danger)] text-white text-xs sm:text-[13.5px] font-black tracking-wide shadow-md hover:shadow-lg transition-all duration-150 ring-2 ring-[var(--rm-warning)]/25 flex items-center justify-center gap-2 cursor-pointer active:scale-[0.99]">
+                                        class="w-full h-11 sm:h-11.5 rounded-xl bg-[var(--rm-action-primary)] hover:bg-[var(--rm-action-primary-hover)] text-white font-bold text-xs sm:text-[13.5px] font-black tracking-wide shadow-md hover:shadow-lg transition-all duration-150 ring-2 ring-[var(--rm-warning)]/25 flex items-center justify-center gap-2 cursor-pointer active:scale-[0.99]">
                                     <i class="ph-bold ph-plus-circle text-xl"></i>
                                     <span>+ Registrar</span>
                                 </button>
@@ -599,25 +601,25 @@
                                      x-transition:leave-end="opacity-0 scale-95"
                                      class="absolute bottom-full mb-2 right-0 w-64 rounded-2xl border-2 border-[var(--rm-border)] dark:border-[var(--rm-border)] bg-[var(--rm-surface)] dark:bg-[var(--rm-surface)] shadow-2xl z-30 p-2 space-y-1"
                                      style="display:none;">
-                                    <button type="button" @click="openMenu = false; $wire.abrirRegistrarSignos('{{ $detalleResidente['cod_residente'] }}')" class="w-full text-left px-3 py-2 rounded-xl text-xs font-bold text-[var(--rm-clinical)] dark:text-[var(--rm-surface)] hover:bg-[var(--rm-surface)] dark:hover:bg-[var(--rm-surface)] flex items-center gap-2.5 transition cursor-pointer">
+                                    <button type="button" @click="openMenu = false; $wire.abrirRegistrarSignos('{{ $detalleResidente['cod_residente'] }}')" class="w-full text-left px-3 py-2 rounded-xl text-xs font-bold text-[var(--rm-text-primary)] dark:text-[var(--rm-surface)] hover:bg-[var(--rm-surface)] dark:hover:bg-[var(--rm-surface)] flex items-center gap-2.5 transition cursor-pointer">
                                         <i class="ph-bold ph-heartbeat text-rose-500 text-base w-5"></i><span>Signos vitales</span>
                                     </button>
-                                    <button type="button" @click="openMenu = false; $wire.abrirAdministrarMed('{{ $detalleResidente['cod_residente'] }}')" class="w-full text-left px-3 py-2 rounded-xl text-xs font-bold text-[var(--rm-clinical)] dark:text-[var(--rm-surface)] hover:bg-[var(--rm-surface)] dark:hover:bg-[var(--rm-surface)] flex items-center gap-2.5 transition cursor-pointer">
+                                    <button type="button" @click="openMenu = false; $wire.abrirAdministrarMed('{{ $detalleResidente['cod_residente'] }}')" class="w-full text-left px-3 py-2 rounded-xl text-xs font-bold text-[var(--rm-text-primary)] dark:text-[var(--rm-surface)] hover:bg-[var(--rm-surface)] dark:hover:bg-[var(--rm-surface)] flex items-center gap-2.5 transition cursor-pointer">
                                         <i class="ph-bold ph-pill text-[var(--rm-action-primary)] text-base w-5"></i><span>Medicación programada</span>
                                     </button>
-                                    <button type="button" @click="openMenu = false; $wire.abrirRegistrarDolor('{{ $detalleResidente['cod_residente'] }}')" class="w-full text-left px-3 py-2 rounded-xl text-xs font-bold text-[var(--rm-clinical)] dark:text-[var(--rm-surface)] hover:bg-[var(--rm-surface)] dark:hover:bg-[var(--rm-surface)] flex items-center gap-2.5 transition cursor-pointer">
+                                    <button type="button" @click="openMenu = false; $wire.abrirRegistrarDolor('{{ $detalleResidente['cod_residente'] }}')" class="w-full text-left px-3 py-2 rounded-xl text-xs font-bold text-[var(--rm-text-primary)] dark:text-[var(--rm-surface)] hover:bg-[var(--rm-surface)] dark:hover:bg-[var(--rm-surface)] flex items-center gap-2.5 transition cursor-pointer">
                                         <i class="ph-bold ph-smiley-sad text-amber-500 text-base w-5"></i><span>Dolor</span>
                                     </button>
-                                    <button type="button" @click="openMenu = false; $wire.abrirRegistrarCuidado('{{ $detalleResidente['cod_residente'] }}', 'ALIMENTACION')" class="w-full text-left px-3 py-2 rounded-xl text-xs font-bold text-[var(--rm-clinical)] dark:text-[var(--rm-surface)] hover:bg-[var(--rm-surface)] dark:hover:bg-[var(--rm-surface)] flex items-center gap-2.5 transition cursor-pointer">
+                                    <button type="button" @click="openMenu = false; $wire.abrirRegistrarCuidado('{{ $detalleResidente['cod_residente'] }}', 'ALIMENTACION')" class="w-full text-left px-3 py-2 rounded-xl text-xs font-bold text-[var(--rm-text-primary)] dark:text-[var(--rm-surface)] hover:bg-[var(--rm-surface)] dark:hover:bg-[var(--rm-surface)] flex items-center gap-2.5 transition cursor-pointer">
                                         <i class="ph-bold ph-drop text-sky-500 text-base w-5"></i><span>Ingesta / hidratación</span>
                                     </button>
-                                    <button type="button" @click="openMenu = false; $wire.abrirRegistrarCuidado('{{ $detalleResidente['cod_residente'] }}', 'ELIMINACION')" class="w-full text-left px-3 py-2 rounded-xl text-xs font-bold text-[var(--rm-clinical)] dark:text-[var(--rm-surface)] hover:bg-[var(--rm-surface)] dark:hover:bg-[var(--rm-surface)] flex items-center gap-2.5 transition cursor-pointer">
+                                    <button type="button" @click="openMenu = false; $wire.abrirRegistrarCuidado('{{ $detalleResidente['cod_residente'] }}', 'ELIMINACION')" class="w-full text-left px-3 py-2 rounded-xl text-xs font-bold text-[var(--rm-text-primary)] dark:text-[var(--rm-surface)] hover:bg-[var(--rm-surface)] dark:hover:bg-[var(--rm-surface)] flex items-center gap-2.5 transition cursor-pointer">
                                         <i class="ph-bold ph-toilet text-indigo-500 text-base w-5"></i><span>Eliminación</span>
                                     </button>
-                                    <button type="button" @click="openMenu = false; $wire.abrirRegistrarCuidado('{{ $detalleResidente['cod_residente'] }}', 'MOVILIDAD')" class="w-full text-left px-3 py-2 rounded-xl text-xs font-bold text-[var(--rm-clinical)] dark:text-[var(--rm-surface)] hover:bg-[var(--rm-surface)] dark:hover:bg-[var(--rm-surface)] flex items-center gap-2.5 transition cursor-pointer">
+                                    <button type="button" @click="openMenu = false; $wire.abrirRegistrarCuidado('{{ $detalleResidente['cod_residente'] }}', 'MOVILIDAD')" class="w-full text-left px-3 py-2 rounded-xl text-xs font-bold text-[var(--rm-text-primary)] dark:text-[var(--rm-surface)] hover:bg-[var(--rm-surface)] dark:hover:bg-[var(--rm-surface)] flex items-center gap-2.5 transition cursor-pointer">
                                         <i class="ph-bold ph-person-simple-walk text-emerald-500 text-base w-5"></i><span>Movilidad</span>
                                     </button>
-                                    <button type="button" @click="openMenu = false; $wire.abrirRegistrarSeguimiento('{{ $detalleResidente['cod_residente'] }}')" class="w-full text-left px-3 py-2 rounded-xl text-xs font-bold text-[var(--rm-clinical)] dark:text-[var(--rm-surface)] hover:bg-[var(--rm-surface)] dark:hover:bg-[var(--rm-surface)] flex items-center gap-2.5 transition cursor-pointer">
+                                    <button type="button" @click="openMenu = false; $wire.abrirRegistrarSeguimiento('{{ $detalleResidente['cod_residente'] }}')" class="w-full text-left px-3 py-2 rounded-xl text-xs font-bold text-[var(--rm-text-primary)] dark:text-[var(--rm-surface)] hover:bg-[var(--rm-surface)] dark:hover:bg-[var(--rm-surface)] flex items-center gap-2.5 transition cursor-pointer">
                                         <i class="ph-bold ph-clipboard-text text-amber-600 text-base w-5"></i><span>Seguimiento / Conducta</span>
                                     </button>
                                     <button type="button" @click="openMenu = false; $wire.abrirReportarAlerta('{{ $detalleResidente['cod_residente'] }}')" class="w-full text-left px-3 py-2 rounded-xl text-xs font-bold text-[var(--rm-danger)] hover:bg-red-50 dark:hover:bg-red-950/30 flex items-center gap-2.5 transition cursor-pointer">
@@ -642,37 +644,37 @@
             <div class="w-full max-w-md bg-[var(--rm-surface)] dark:bg-[var(--rm-surface)] border border-[var(--rm-border)] dark:border-[var(--rm-border)] rounded-2xl p-4 shadow-xl space-y-3">
                 <div class="flex items-center justify-between border-b border-[var(--rm-border)]/50 pb-2">
                     <div>
-                        <h3 class="text-sm font-black text-[var(--rm-clinical)] dark:text-[var(--rm-surface)]">Registrar Signos Vitales</h3>
+                        <h3 class="text-sm font-bold text-[var(--rm-text-primary)] dark:text-[var(--rm-surface)]">Registrar Signos Vitales</h3>
                         <p class="text-[11px] text-[var(--rm-text-secondary)] dark:text-[var(--rm-text-muted)]">Control de signos vitales para el residente seleccionado.</p>
                     </div>
-                    <button wire:click="$set('modalSignos', false)" class="text-[var(--rm-text-secondary)] hover:text-[var(--rm-clinical)] p-1 cursor-pointer">
+                    <button wire:click="$set('modalSignos', false)" class="text-[var(--rm-text-secondary)] hover:text-[var(--rm-text-primary)] p-1 cursor-pointer">
                         <i class="ph-bold ph-x text-base"></i>
                     </button>
                 </div>
                 <div class="grid grid-cols-2 gap-2 text-xs">
                     <div>
-                        <label class="font-bold text-[var(--rm-clinical)] dark:text-[var(--rm-surface)] block mb-0.5">PA (Sistólica/Diastólica)</label>
+                        <label class="font-bold text-[var(--rm-text-primary)] dark:text-[var(--rm-surface)] block mb-0.5">PA (Sistólica/Diastólica)</label>
                         <input type="text" wire:model="signoPA" placeholder="120/80" class="w-full h-8.5 rounded-xl border border-[var(--rm-border)] px-2.5 bg-[var(--rm-surface)] dark:bg-[var(--rm-text-primary)]">
                     </div>
                     <div>
-                        <label class="font-bold text-[var(--rm-clinical)] dark:text-[var(--rm-surface)] block mb-0.5">FC (lpm)</label>
+                        <label class="font-bold text-[var(--rm-text-primary)] dark:text-[var(--rm-surface)] block mb-0.5">FC (lpm)</label>
                         <input type="number" wire:model="signoFC" placeholder="72" class="w-full h-8.5 rounded-xl border border-[var(--rm-border)] px-2.5 bg-[var(--rm-surface)] dark:bg-[var(--rm-text-primary)]">
                     </div>
                     <div>
-                        <label class="font-bold text-[var(--rm-clinical)] dark:text-[var(--rm-surface)] block mb-0.5">FR (rpm)</label>
+                        <label class="font-bold text-[var(--rm-text-primary)] dark:text-[var(--rm-surface)] block mb-0.5">FR (rpm)</label>
                         <input type="number" wire:model="signoFR" placeholder="18" class="w-full h-8.5 rounded-xl border border-[var(--rm-border)] px-2.5 bg-[var(--rm-surface)] dark:bg-[var(--rm-text-primary)]">
                     </div>
                     <div>
-                        <label class="font-bold text-[var(--rm-clinical)] dark:text-[var(--rm-surface)] block mb-0.5">Temperatura (°C)</label>
+                        <label class="font-bold text-[var(--rm-text-primary)] dark:text-[var(--rm-surface)] block mb-0.5">Temperatura (°C)</label>
                         <input type="text" wire:model="signoTemp" placeholder="36.5" class="w-full h-8.5 rounded-xl border border-[var(--rm-border)] px-2.5 bg-[var(--rm-surface)] dark:bg-[var(--rm-text-primary)]">
                     </div>
                     <div class="col-span-2">
-                        <label class="font-bold text-[var(--rm-clinical)] dark:text-[var(--rm-surface)] block mb-0.5">SatO₂ (%)</label>
+                        <label class="font-bold text-[var(--rm-text-primary)] dark:text-[var(--rm-surface)] block mb-0.5">SatO₂ (%)</label>
                         <input type="number" wire:model="signoSat" placeholder="98" class="w-full h-8.5 rounded-xl border border-[var(--rm-border)] px-2.5 bg-[var(--rm-surface)] dark:bg-[var(--rm-text-primary)]">
                     </div>
                 </div>
                 <div>
-                    <label class="font-bold text-xs text-[var(--rm-clinical)] dark:text-[var(--rm-surface)] block mb-0.5">Observación clínica</label>
+                    <label class="font-bold text-xs text-[var(--rm-text-primary)] dark:text-[var(--rm-surface)] block mb-0.5">Observación clínica</label>
                     <textarea wire:model="signoObs" rows="2" placeholder="Notas sobre el estado general..." class="w-full rounded-xl border border-[var(--rm-border)] p-2 text-xs bg-[var(--rm-surface)] dark:bg-[var(--rm-text-primary)]"></textarea>
                 </div>
                 @if($signoConfirmarAtipico)
@@ -684,7 +686,7 @@
                     </div>
                 @endif
                 <div class="flex items-center justify-end gap-2 pt-2 border-t border-[var(--rm-border)]/50">
-                    <button wire:click="$set('modalSignos', false)" class="px-3.5 py-1.5 text-xs font-bold rounded-xl border border-[var(--rm-border)] bg-[var(--rm-surface)] dark:bg-[var(--rm-text-primary)] text-[var(--rm-clinical)] dark:text-[var(--rm-surface)] cursor-pointer">Cancelar</button>
+                    <button wire:click="$set('modalSignos', false)" class="px-3.5 py-1.5 text-xs font-bold rounded-xl border border-[var(--rm-border)] bg-[var(--rm-surface)] dark:bg-[var(--rm-text-primary)] text-[var(--rm-text-primary)] dark:text-[var(--rm-surface)] cursor-pointer">Cancelar</button>
                     <button wire:click="guardarSignos" class="px-3.5 py-1.5 text-xs font-black rounded-xl bg-[var(--rm-action-primary)] text-white hover:bg-[var(--rm-success)] cursor-pointer">Guardar Signos</button>
                 </div>
             </div>
@@ -697,16 +699,16 @@
             <div class="w-full max-w-md bg-[var(--rm-surface)] dark:bg-[var(--rm-surface)] border border-[var(--rm-border)] dark:border-[var(--rm-border)] rounded-2xl p-4 shadow-xl space-y-3">
                 <div class="flex items-center justify-between border-b border-[var(--rm-border)]/50 pb-2">
                     <div>
-                        <h3 class="text-sm font-black text-[var(--rm-clinical)] dark:text-[var(--rm-surface)]">Evolución / Seguimiento Rápido</h3>
+                        <h3 class="text-sm font-bold text-[var(--rm-text-primary)] dark:text-[var(--rm-surface)]">Evolución / Seguimiento Rápido</h3>
                         <p class="text-[11px] text-[var(--rm-text-secondary)] dark:text-[var(--rm-text-muted)]">Registrar estado general y continuidad de turno.</p>
                     </div>
-                    <button wire:click="$set('modalSeguimiento', false)" class="text-[var(--rm-text-secondary)] hover:text-[var(--rm-clinical)] p-1 cursor-pointer">
+                    <button wire:click="$set('modalSeguimiento', false)" class="text-[var(--rm-text-secondary)] hover:text-[var(--rm-text-primary)] p-1 cursor-pointer">
                         <i class="ph-bold ph-x text-base"></i>
                     </button>
                 </div>
                 <div class="space-y-2 text-xs">
                     <div>
-                        <label class="font-bold text-[var(--rm-clinical)] dark:text-[var(--rm-surface)] block mb-0.5">Estado general</label>
+                        <label class="font-bold text-[var(--rm-text-primary)] dark:text-[var(--rm-surface)] block mb-0.5">Estado general</label>
                         <select wire:model="segEstado" class="w-full h-8.5 rounded-xl border border-[var(--rm-border)] px-2 bg-[var(--rm-surface)] dark:bg-[var(--rm-text-primary)]">
                             <option value="ESTABLE">Estable / Compensado</option>
                             <option value="OBSERVACION">En Observación</option>
@@ -714,7 +716,7 @@
                         </select>
                     </div>
                     <div>
-                        <label class="font-bold text-[var(--rm-clinical)] dark:text-[var(--rm-surface)] block mb-0.5">Alimentación / Apetito</label>
+                        <label class="font-bold text-[var(--rm-text-primary)] dark:text-[var(--rm-surface)] block mb-0.5">Alimentación / Apetito</label>
                         <select wire:model="segAlimentacion" class="w-full h-8.5 rounded-xl border border-[var(--rm-border)] px-2 bg-[var(--rm-surface)] dark:bg-[var(--rm-text-primary)]">
                             <option value="COMPLETA">Completa / Buena</option>
                             <option value="PARCIAL">Parcial</option>
@@ -722,7 +724,7 @@
                         </select>
                     </div>
                     <div>
-                        <label class="font-bold text-[var(--rm-clinical)] dark:text-[var(--rm-surface)] block mb-0.5">Movilidad / Actividad</label>
+                        <label class="font-bold text-[var(--rm-text-primary)] dark:text-[var(--rm-surface)] block mb-0.5">Movilidad / Actividad</label>
                         <select wire:model="segMovilidad" class="w-full h-8.5 rounded-xl border border-[var(--rm-border)] px-2 bg-[var(--rm-surface)] dark:bg-[var(--rm-text-primary)]">
                             <option value="INDEPENDIENTE">Independiente</option>
                             <option value="ASISTIDA">Asistida con apoyo</option>
@@ -730,13 +732,13 @@
                         </select>
                     </div>
                     <div>
-                        <label class="font-bold text-[var(--rm-clinical)] dark:text-[var(--rm-surface)] block mb-0.5">Notas de evolución</label>
+                        <label class="font-bold text-[var(--rm-text-primary)] dark:text-[var(--rm-surface)] block mb-0.5">Notas de evolución</label>
                         <textarea wire:model="segObs" rows="2" placeholder="Observaciones clínicas relevantes..." class="w-full rounded-xl border border-[var(--rm-border)] p-2 text-xs bg-[var(--rm-surface)] dark:bg-[var(--rm-text-primary)]"></textarea>
                     </div>
                 </div>
                 <div class="flex items-center justify-end gap-2 pt-2 border-t border-[var(--rm-border)]/50">
-                    <button wire:click="$set('modalSeguimiento', false)" class="px-3.5 py-1.5 text-xs font-bold rounded-xl border border-[var(--rm-border)] bg-[var(--rm-surface)] dark:bg-[var(--rm-text-primary)] text-[var(--rm-clinical)] dark:text-[var(--rm-surface)] cursor-pointer">Cancelar</button>
-                    <button wire:click="guardarSeguimiento" class="px-3.5 py-1.5 text-xs font-black rounded-xl bg-[var(--rm-clinical)] text-white hover:bg-[var(--rm-clinical)] cursor-pointer">Guardar Seguimiento</button>
+                    <button wire:click="$set('modalSeguimiento', false)" class="px-3.5 py-1.5 text-xs font-bold rounded-xl border border-[var(--rm-border)] bg-[var(--rm-surface)] dark:bg-[var(--rm-text-primary)] text-[var(--rm-text-primary)] dark:text-[var(--rm-surface)] cursor-pointer">Cancelar</button>
+                    <button wire:click="guardarSeguimiento" class="px-3.5 py-1.5 text-xs font-black rounded-xl bg-[var(--rm-action-primary)] text-white hover:bg-[var(--rm-clinical)] cursor-pointer">Guardar Seguimiento</button>
                 </div>
             </div>
         </div>
@@ -748,16 +750,16 @@
             <div class="w-full max-w-md bg-[var(--rm-surface)] dark:bg-[var(--rm-surface)] border border-[var(--rm-border)] dark:border-[var(--rm-border)] rounded-2xl p-4 shadow-xl space-y-3">
                 <div class="flex items-center justify-between border-b border-[var(--rm-border)]/50 pb-2">
                     <div>
-                        <h3 class="text-sm font-black text-[var(--rm-clinical)] dark:text-[var(--rm-surface)]">Administrar Medicación</h3>
+                        <h3 class="text-sm font-bold text-[var(--rm-text-primary)] dark:text-[var(--rm-surface)]">Administrar Medicación</h3>
                         <p class="text-[11px] text-[var(--rm-text-secondary)] dark:text-[var(--rm-text-muted)]">Registrar dosis y estado de administración.</p>
                     </div>
-                    <button wire:click="$set('modalMed', false)" class="text-[var(--rm-text-secondary)] hover:text-[var(--rm-clinical)] p-1 cursor-pointer">
+                    <button wire:click="$set('modalMed', false)" class="text-[var(--rm-text-secondary)] hover:text-[var(--rm-text-primary)] p-1 cursor-pointer">
                         <i class="ph-bold ph-x text-base"></i>
                     </button>
                 </div>
                 <div class="space-y-2 text-xs">
                     <div>
-                        <label class="font-bold text-[var(--rm-clinical)] dark:text-[var(--rm-surface)] block mb-0.5">Medicamento / Fármaco</label>
+                        <label class="font-bold text-[var(--rm-text-primary)] dark:text-[var(--rm-surface)] block mb-0.5">Medicamento / Fármaco</label>
                         <select wire:model="medCodMed" class="w-full h-8.5 rounded-xl border border-[var(--rm-border)] px-2.5 bg-[var(--rm-surface)] dark:bg-[var(--rm-text-primary)]">
                             <option value="">Seleccione una prescripción activa</option>
                             @foreach($medicacionesPaciente as $prescripcion)
@@ -769,20 +771,20 @@
                         @error('medCodMed') <p class="mt-1 text-[11px] font-bold text-estado-peligro">{{ $message }}</p> @enderror
                     </div>
                     <div>
-                        <label class="font-bold text-[var(--rm-clinical)] dark:text-[var(--rm-surface)] block mb-0.5">Estado de administración</label>
+                        <label class="font-bold text-[var(--rm-text-primary)] dark:text-[var(--rm-surface)] block mb-0.5">Estado de administración</label>
                         <select wire:model.live="medAdministrado" class="w-full h-8.5 rounded-xl border border-[var(--rm-border)] px-2 bg-[var(--rm-surface)] dark:bg-[var(--rm-text-primary)]">
                             <option value="1">Administrada según indicación</option>
                             <option value="0">Omitida o rechazada</option>
                         </select>
                     </div>
                     <div>
-                        <label class="font-bold text-[var(--rm-clinical)] dark:text-[var(--rm-surface)] block mb-0.5">Observación / Justificación {{ $medAdministrado ? '(opcional)' : '(obligatoria)' }}</label>
+                        <label class="font-bold text-[var(--rm-text-primary)] dark:text-[var(--rm-surface)] block mb-0.5">Observación / Justificación {{ $medAdministrado ? '(opcional)' : '(obligatoria)' }}</label>
                         <textarea wire:model="medMotivoOmision" rows="2" placeholder="Notas sobre tolerancia o motivo de omisión..." class="w-full rounded-xl border border-[var(--rm-border)] p-2 text-xs bg-[var(--rm-surface)] dark:bg-[var(--rm-text-primary)]"></textarea>
                         @error('medMotivoOmision') <p class="mt-1 text-[11px] font-bold text-estado-peligro">{{ $message }}</p> @enderror
                     </div>
                 </div>
                 <div class="flex items-center justify-end gap-2 pt-2 border-t border-[var(--rm-border)]/50">
-                    <button wire:click="$set('modalMed', false)" class="px-3.5 py-1.5 text-xs font-bold rounded-xl border border-[var(--rm-border)] bg-[var(--rm-surface)] dark:bg-[var(--rm-text-primary)] text-[var(--rm-clinical)] dark:text-[var(--rm-surface)] cursor-pointer">Cancelar</button>
+                    <button wire:click="$set('modalMed', false)" class="px-3.5 py-1.5 text-xs font-bold rounded-xl border border-[var(--rm-border)] bg-[var(--rm-surface)] dark:bg-[var(--rm-text-primary)] text-[var(--rm-text-primary)] dark:text-[var(--rm-surface)] cursor-pointer">Cancelar</button>
                     <button wire:click="guardarMed" class="px-3.5 py-1.5 text-xs font-black rounded-xl bg-[var(--rm-action-primary)] text-white hover:bg-[var(--rm-success)] cursor-pointer">Confirmar Registro</button>
                 </div>
             </div>
@@ -798,13 +800,13 @@
                         <h3 class="text-sm font-black text-[var(--rm-danger)]">Reportar Alerta Clínica o Incidente</h3>
                         <p class="text-[11px] text-[var(--rm-text-secondary)] dark:text-[var(--rm-text-muted)]">Notificación inmediata al equipo médico y de guardia.</p>
                     </div>
-                    <button wire:click="$set('modalAlerta', false)" class="text-[var(--rm-text-secondary)] hover:text-[var(--rm-clinical)] p-1 cursor-pointer">
+                    <button wire:click="$set('modalAlerta', false)" class="text-[var(--rm-text-secondary)] hover:text-[var(--rm-text-primary)] p-1 cursor-pointer">
                         <i class="ph-bold ph-x text-base"></i>
                     </button>
                 </div>
                 <div class="space-y-2 text-xs">
                     <div>
-                        <label class="font-bold text-[var(--rm-clinical)] dark:text-[var(--rm-surface)] block mb-0.5">Tipo de alerta</label>
+                        <label class="font-bold text-[var(--rm-text-primary)] dark:text-[var(--rm-surface)] block mb-0.5">Tipo de alerta</label>
                         <select wire:model="alertaTipo" class="w-full h-8.5 rounded-xl border border-[var(--rm-border)] px-2 bg-[var(--rm-surface)] dark:bg-[var(--rm-text-primary)]">
                             <option value="CLINICA">Descompensación Clínica / Signos</option>
                             <option value="CAIDA">Caída o Accidente Físico</option>
@@ -814,7 +816,7 @@
                         </select>
                     </div>
                     <div>
-                        <label class="font-bold text-[var(--rm-clinical)] dark:text-[var(--rm-surface)] block mb-0.5">Nivel de prioridad</label>
+                        <label class="font-bold text-[var(--rm-text-primary)] dark:text-[var(--rm-surface)] block mb-0.5">Nivel de prioridad</label>
                         <select wire:model="alertaNivel" class="w-full h-8.5 rounded-xl border border-[var(--rm-border)] px-2 bg-[var(--rm-surface)] dark:bg-[var(--rm-text-primary)]">
                             <option value="ALTO">Prioridad Alta</option>
                             <option value="CRITICO">Prioridad Crítica / Inmediata</option>
@@ -822,12 +824,12 @@
                         </select>
                     </div>
                     <div>
-                        <label class="font-bold text-[var(--rm-clinical)] dark:text-[var(--rm-surface)] block mb-0.5">Motivo y medidas inmediatas tomadas</label>
+                        <label class="font-bold text-[var(--rm-text-primary)] dark:text-[var(--rm-surface)] block mb-0.5">Motivo y medidas inmediatas tomadas</label>
                         <textarea wire:model="alertaMotivo" rows="3" placeholder="Describa el incidente, hora aproximada, estado actual y acciones..." class="w-full rounded-xl border border-[var(--rm-border)] p-2 text-xs bg-[var(--rm-surface)] dark:bg-[var(--rm-text-primary)]"></textarea>
                     </div>
                 </div>
                 <div class="flex items-center justify-end gap-2 pt-2 border-t border-[var(--rm-border)]/50">
-                    <button wire:click="$set('modalAlerta', false)" class="px-3.5 py-1.5 text-xs font-bold rounded-xl border border-[var(--rm-border)] bg-[var(--rm-surface)] dark:bg-[var(--rm-text-primary)] text-[var(--rm-clinical)] dark:text-[var(--rm-surface)] cursor-pointer">Cancelar</button>
+                    <button wire:click="$set('modalAlerta', false)" class="px-3.5 py-1.5 text-xs font-bold rounded-xl border border-[var(--rm-border)] bg-[var(--rm-surface)] dark:bg-[var(--rm-text-primary)] text-[var(--rm-text-primary)] dark:text-[var(--rm-surface)] cursor-pointer">Cancelar</button>
                     <button wire:click="guardarAlerta" class="px-3.5 py-1.5 text-xs font-black rounded-xl bg-[var(--rm-danger)] text-white hover:bg-red-700 cursor-pointer">Emitir Alerta</button>
                 </div>
             </div>
@@ -900,7 +902,7 @@
                         <i class="ph-bold ph-note-pencil text-xl"></i>
                     </div>
                     <div>
-                        <h3 id="modal-title-nuevo-registro-mp" class="text-base sm:text-lg font-bold tracking-tight text-[var(--rm-clinical)] dark:text-[var(--rm-surface)] uppercase">
+                        <h3 id="modal-title-nuevo-registro-mp" class="text-base sm:text-lg font-bold tracking-tight text-[var(--rm-text-primary)] dark:text-[var(--rm-surface)] uppercase">
                             NUEVO REGISTRO DE ENFERMERÍA
                         </h3>
                         <p class="text-xs text-[var(--rm-text-secondary)] dark:text-[var(--rm-text-muted)] mt-0.5">
@@ -911,7 +913,7 @@
 
                 <button type="button"
                         @click="modalSelectorRegistro = false"
-                        class="h-9 w-9 rounded-xl border border-[var(--rm-border)] dark:border-[var(--rm-border)] bg-[var(--rm-surface)] dark:bg-[var(--rm-surface)] text-[var(--rm-text-secondary)] hover:text-[var(--rm-clinical)] dark:hover:text-[var(--rm-surface)] hover:border-[var(--rm-warning)]/50 flex items-center justify-center transition cursor-pointer"
+                        class="h-9 w-9 rounded-xl border border-[var(--rm-border)] dark:border-[var(--rm-border)] bg-[var(--rm-surface)] dark:bg-[var(--rm-surface)] text-[var(--rm-text-secondary)] hover:text-[var(--rm-text-primary)] dark:hover:text-[var(--rm-surface)] hover:border-[var(--rm-warning)]/50 flex items-center justify-center transition cursor-pointer"
                         aria-label="Cerrar">
                     <i class="ph-bold ph-x text-base"></i>
                 </button>
@@ -930,7 +932,7 @@
                         </div>
                     @endif
                     <div class="min-w-0">
-                        <h4 class="text-sm font-bold text-[var(--rm-clinical)] dark:text-[var(--rm-surface)] truncate">
+                        <h4 class="text-sm font-bold text-[var(--rm-text-primary)] dark:text-[var(--rm-surface)] truncate">
                             {{ $detalleResidente['nombre_completo'] }}
                         </h4>
                         <div class="text-xs text-[var(--rm-text-secondary)] dark:text-[var(--rm-text-muted)] flex flex-wrap items-center gap-x-2 gap-y-0.5 mt-0.5">
@@ -960,7 +962,7 @@
                                 <i class="ph-bold ph-heartbeat text-xl"></i>
                             </div>
                             <div class="min-w-0">
-                                <h4 class="text-xs sm:text-[13px] font-bold text-[var(--rm-clinical)] dark:text-[var(--rm-surface)] group-hover:text-[var(--rm-warning)] dark:group-hover:text-[var(--rm-warning-soft)] transition-colors leading-tight">
+                                <h4 class="text-xs sm:text-[13px] font-bold text-[var(--rm-text-primary)] dark:text-[var(--rm-surface)] group-hover:text-[var(--rm-warning)] dark:group-hover:text-[var(--rm-warning-soft)] transition-colors leading-tight">
                                     Signos vitales
                                 </h4>
                                 <p class="text-[11px] text-[var(--rm-text-secondary)] dark:text-[var(--rm-text-muted)] mt-0.5 line-clamp-2 leading-relaxed">
@@ -980,7 +982,7 @@
                                 <i class="ph-bold ph-pill text-xl"></i>
                             </div>
                             <div class="min-w-0">
-                                <h4 class="text-xs sm:text-[13px] font-bold text-[var(--rm-clinical)] dark:text-[var(--rm-surface)] group-hover:text-[var(--rm-warning)] dark:group-hover:text-[var(--rm-warning-soft)] transition-colors leading-tight">
+                                <h4 class="text-xs sm:text-[13px] font-bold text-[var(--rm-text-primary)] dark:text-[var(--rm-surface)] group-hover:text-[var(--rm-warning)] dark:group-hover:text-[var(--rm-warning-soft)] transition-colors leading-tight">
                                     Medicación programada
                                 </h4>
                                 <p class="text-[11px] text-[var(--rm-text-secondary)] dark:text-[var(--rm-text-muted)] mt-0.5 line-clamp-2 leading-relaxed">
@@ -1000,7 +1002,7 @@
                                 <i class="ph-bold ph-smiley-sad text-xl"></i>
                             </div>
                             <div class="min-w-0">
-                                <h4 class="text-xs sm:text-[13px] font-bold text-[var(--rm-clinical)] dark:text-[var(--rm-surface)] group-hover:text-[var(--rm-warning)] dark:group-hover:text-[var(--rm-warning-soft)] transition-colors leading-tight">
+                                <h4 class="text-xs sm:text-[13px] font-bold text-[var(--rm-text-primary)] dark:text-[var(--rm-surface)] group-hover:text-[var(--rm-warning)] dark:group-hover:text-[var(--rm-warning-soft)] transition-colors leading-tight">
                                     Valoración de dolor
                                 </h4>
                                 <p class="text-[11px] text-[var(--rm-text-secondary)] dark:text-[var(--rm-text-muted)] mt-0.5 line-clamp-2 leading-relaxed">
@@ -1016,11 +1018,11 @@
                             @click="modalSelectorRegistro = false; $wire.abrirRegistrarCuidado('{{ $detalleResidente['cod_residente'] }}', 'ALIMENTACION')"
                             class="group w-full text-left p-3.5 rounded-xl border border-[var(--rm-border)] dark:border-[var(--rm-border)] bg-[var(--rm-surface)] dark:bg-[var(--rm-surface)] hover:bg-[var(--rm-surface)] dark:hover:bg-[var(--rm-surface)] hover:border-[var(--rm-warning)]/60 dark:hover:border-[var(--rm-warning)] hover:shadow-xs transition-all duration-150 flex items-center justify-between gap-3 cursor-pointer">
                         <div class="flex items-center gap-3 min-w-0">
-                            <div class="h-10 w-10 rounded-xl bg-[var(--rm-clinical-soft)] dark:bg-[var(--rm-clinical)] text-[var(--rm-clinical)] dark:text-[var(--rm-clinical)] flex items-center justify-center shrink-0">
+                            <div class="h-10 w-10 rounded-xl bg-[var(--rm-surface-soft)] dark:bg-[var(--rm-clinical)] text-[var(--rm-clinical)] dark:text-[var(--rm-clinical)] flex items-center justify-center shrink-0">
                                 <i class="ph-bold ph-drop text-xl"></i>
                             </div>
                             <div class="min-w-0">
-                                <h4 class="text-xs sm:text-[13px] font-bold text-[var(--rm-clinical)] dark:text-[var(--rm-surface)] group-hover:text-[var(--rm-warning)] dark:group-hover:text-[var(--rm-warning-soft)] transition-colors leading-tight">
+                                <h4 class="text-xs sm:text-[13px] font-bold text-[var(--rm-text-primary)] dark:text-[var(--rm-surface)] group-hover:text-[var(--rm-warning)] dark:group-hover:text-[var(--rm-warning-soft)] transition-colors leading-tight">
                                     Ingesta / Hidratación
                                 </h4>
                                 <p class="text-[11px] text-[var(--rm-text-secondary)] dark:text-[var(--rm-text-muted)] mt-0.5 line-clamp-2 leading-relaxed">
@@ -1040,7 +1042,7 @@
                                 <i class="ph-bold ph-toilet text-xl"></i>
                             </div>
                             <div class="min-w-0">
-                                <h4 class="text-xs sm:text-[13px] font-bold text-[var(--rm-clinical)] dark:text-[var(--rm-surface)] group-hover:text-[var(--rm-warning)] dark:group-hover:text-[var(--rm-warning-soft)] transition-colors leading-tight">
+                                <h4 class="text-xs sm:text-[13px] font-bold text-[var(--rm-text-primary)] dark:text-[var(--rm-surface)] group-hover:text-[var(--rm-warning)] dark:group-hover:text-[var(--rm-warning-soft)] transition-colors leading-tight">
                                     Eliminación
                                 </h4>
                                 <p class="text-[11px] text-[var(--rm-text-secondary)] dark:text-[var(--rm-text-muted)] mt-0.5 line-clamp-2 leading-relaxed">
@@ -1060,7 +1062,7 @@
                                 <i class="ph-bold ph-person-simple-walk text-xl"></i>
                             </div>
                             <div class="min-w-0">
-                                <h4 class="text-xs sm:text-[13px] font-bold text-[var(--rm-clinical)] dark:text-[var(--rm-surface)] group-hover:text-[var(--rm-warning)] dark:group-hover:text-[var(--rm-warning-soft)] transition-colors leading-tight">
+                                <h4 class="text-xs sm:text-[13px] font-bold text-[var(--rm-text-primary)] dark:text-[var(--rm-surface)] group-hover:text-[var(--rm-warning)] dark:group-hover:text-[var(--rm-warning-soft)] transition-colors leading-tight">
                                     Movilidad
                                 </h4>
                                 <p class="text-[11px] text-[var(--rm-text-secondary)] dark:text-[var(--rm-text-muted)] mt-0.5 line-clamp-2 leading-relaxed">
@@ -1076,11 +1078,11 @@
                             @click="modalSelectorRegistro = false; $wire.abrirRegistrarSeguimiento('{{ $detalleResidente['cod_residente'] }}')"
                             class="group w-full text-left p-3.5 rounded-xl border border-[var(--rm-border)] dark:border-[var(--rm-border)] bg-[var(--rm-surface)] dark:bg-[var(--rm-surface)] hover:bg-[var(--rm-surface)] dark:hover:bg-[var(--rm-surface)] hover:border-[var(--rm-warning)]/60 dark:hover:border-[var(--rm-warning)] hover:shadow-xs transition-all duration-150 flex items-center justify-between gap-3 cursor-pointer">
                         <div class="flex items-center gap-3 min-w-0">
-                            <div class="h-10 w-10 rounded-xl bg-[var(--rm-clinical-soft)] dark:bg-[var(--rm-clinical)] text-[var(--rm-clinical)] dark:text-[var(--rm-clinical)] flex items-center justify-center shrink-0">
+                            <div class="h-10 w-10 rounded-xl bg-[var(--rm-surface-soft)] dark:bg-[var(--rm-clinical)] text-[var(--rm-clinical)] dark:text-[var(--rm-clinical)] flex items-center justify-center shrink-0">
                                 <i class="ph-bold ph-brain text-xl"></i>
                             </div>
                             <div class="min-w-0">
-                                <h4 class="text-xs sm:text-[13px] font-bold text-[var(--rm-clinical)] dark:text-[var(--rm-surface)] group-hover:text-[var(--rm-warning)] dark:group-hover:text-[var(--rm-warning-soft)] transition-colors leading-tight">
+                                <h4 class="text-xs sm:text-[13px] font-bold text-[var(--rm-text-primary)] dark:text-[var(--rm-surface)] group-hover:text-[var(--rm-warning)] dark:group-hover:text-[var(--rm-warning-soft)] transition-colors leading-tight">
                                     Cognición
                                 </h4>
                                 <p class="text-[11px] text-[var(--rm-text-secondary)] dark:text-[var(--rm-text-muted)] mt-0.5 line-clamp-2 leading-relaxed">
@@ -1100,7 +1102,7 @@
                                 <i class="ph-bold ph-clipboard-text text-xl"></i>
                             </div>
                             <div class="min-w-0">
-                                <h4 class="text-xs sm:text-[13px] font-bold text-[var(--rm-clinical)] dark:text-[var(--rm-surface)] group-hover:text-[var(--rm-warning)] dark:group-hover:text-[var(--rm-warning-soft)] transition-colors leading-tight">
+                                <h4 class="text-xs sm:text-[13px] font-bold text-[var(--rm-text-primary)] dark:text-[var(--rm-surface)] group-hover:text-[var(--rm-warning)] dark:group-hover:text-[var(--rm-warning-soft)] transition-colors leading-tight">
                                     Conducta / Seguimiento
                                 </h4>
                                 <p class="text-[11px] text-[var(--rm-text-secondary)] dark:text-[var(--rm-text-muted)] mt-0.5 line-clamp-2 leading-relaxed">
@@ -1120,7 +1122,7 @@
                                 <i class="ph-bold ph-moon text-xl"></i>
                             </div>
                             <div class="min-w-0">
-                                <h4 class="text-xs sm:text-[13px] font-bold text-[var(--rm-clinical)] dark:text-[var(--rm-surface)] group-hover:text-[var(--rm-warning)] dark:group-hover:text-[var(--rm-warning-soft)] transition-colors leading-tight">
+                                <h4 class="text-xs sm:text-[13px] font-bold text-[var(--rm-text-primary)] dark:text-[var(--rm-surface)] group-hover:text-[var(--rm-warning)] dark:group-hover:text-[var(--rm-warning-soft)] transition-colors leading-tight">
                                     Sueño
                                 </h4>
                                 <p class="text-[11px] text-[var(--rm-text-secondary)] dark:text-[var(--rm-text-muted)] mt-0.5 line-clamp-2 leading-relaxed">
@@ -1140,7 +1142,7 @@
                                 <i class="ph-bold ph-first-aid text-xl"></i>
                             </div>
                             <div class="min-w-0">
-                                <h4 class="text-xs sm:text-[13px] font-bold text-[var(--rm-clinical)] dark:text-[var(--rm-surface)] group-hover:text-[var(--rm-warning)] dark:group-hover:text-[var(--rm-warning-soft)] transition-colors leading-tight">
+                                <h4 class="text-xs sm:text-[13px] font-bold text-[var(--rm-text-primary)] dark:text-[var(--rm-surface)] group-hover:text-[var(--rm-warning)] dark:group-hover:text-[var(--rm-warning-soft)] transition-colors leading-tight">
                                     Heridas / Curaciones
                                 </h4>
                                 <p class="text-[11px] text-[var(--rm-text-secondary)] dark:text-[var(--rm-text-muted)] mt-0.5 line-clamp-2 leading-relaxed">
@@ -1178,7 +1180,7 @@
             <div class="p-4 sm:p-5 border-t border-[var(--rm-border)]/70 dark:border-[var(--rm-border)] bg-[var(--rm-surface)]/60 dark:bg-[var(--rm-surface-soft)]/60 flex items-center justify-end">
                 <button type="button"
                         @click="modalSelectorRegistro = false"
-                        class="px-5 py-2.5 rounded-xl border border-[var(--rm-border)] dark:border-[var(--rm-border)] bg-[var(--rm-surface)] dark:bg-[var(--rm-surface)] hover:bg-[var(--rm-surface)] dark:hover:bg-[var(--rm-surface)] text-xs font-bold text-[var(--rm-clinical)] dark:text-[var(--rm-surface)] transition cursor-pointer shadow-2xs">
+                        class="px-5 py-2.5 rounded-xl border border-[var(--rm-border)] dark:border-[var(--rm-border)] bg-[var(--rm-surface)] dark:bg-[var(--rm-surface)] hover:bg-[var(--rm-surface)] dark:hover:bg-[var(--rm-surface)] text-xs font-bold text-[var(--rm-text-primary)] dark:text-[var(--rm-surface)] transition cursor-pointer shadow-2xs">
                     Cancelar
                 </button>
             </div>
@@ -1212,28 +1214,28 @@
             <div class="w-full max-w-md bg-[var(--rm-surface)] dark:bg-[var(--rm-surface)] border border-[var(--rm-border)] dark:border-[var(--rm-border)] rounded-2xl p-4 sm:p-5 shadow-xl space-y-3 font-sans">
                 <div class="flex items-center justify-between border-b border-[var(--rm-border)]/50 pb-2.5">
                     <div>
-                        <h3 class="text-sm font-bold text-[var(--rm-clinical)] dark:text-[var(--rm-surface)]">Registrar Cuidado Asistencial</h3>
+                        <h3 class="text-sm font-bold text-[var(--rm-text-primary)] dark:text-[var(--rm-surface)]">Registrar Cuidado Asistencial</h3>
                         <p class="text-[11px] text-[var(--rm-text-secondary)] dark:text-[var(--rm-text-muted)]">Tipo: {{ $cuidadoTipo }}</p>
                     </div>
-                    <button wire:click="$set('modalCuidado', false)" class="text-[var(--rm-text-secondary)] hover:text-[var(--rm-clinical)] p-1 cursor-pointer">
+                    <button wire:click="$set('modalCuidado', false)" class="text-[var(--rm-text-secondary)] hover:text-[var(--rm-text-primary)] p-1 cursor-pointer">
                         <i class="ph-bold ph-x text-base"></i>
                     </button>
                 </div>
                 <div class="space-y-2.5 text-xs">
                     <div>
-                        <label class="font-bold text-[var(--rm-clinical)] dark:text-[var(--rm-surface)] block mb-1">Subtipo / Acción específica</label>
+                        <label class="font-bold text-[var(--rm-text-primary)] dark:text-[var(--rm-surface)] block mb-1">Subtipo / Acción específica</label>
                         <input type="text" wire:model="cuidadoSubtipo" class="w-full h-9 rounded-xl border border-[var(--rm-border)] px-3 bg-[var(--rm-surface)] dark:bg-[var(--rm-text-primary)] text-xs" />
                         @error('cuidadoSubtipo') <span class="text-rose-600 text-[10px] font-bold">{{ $message }}</span> @enderror
                     </div>
                     <div>
-                        <label class="font-bold text-[var(--rm-clinical)] dark:text-[var(--rm-surface)] block mb-1">Observaciones</label>
+                        <label class="font-bold text-[var(--rm-text-primary)] dark:text-[var(--rm-surface)] block mb-1">Observaciones</label>
                         <textarea wire:model="cuidadoObs" rows="3" placeholder="Detalles de la asistencia realizada..." class="w-full rounded-xl border border-[var(--rm-border)] p-2 text-xs bg-[var(--rm-surface)] dark:bg-[var(--rm-text-primary)]"></textarea>
                         @error('cuidadoObs') <span class="text-rose-600 text-[10px] font-bold">{{ $message }}</span> @enderror
                     </div>
                 </div>
                 <div class="flex items-center justify-end gap-2 pt-2 border-t border-[var(--rm-border)]/50">
-                    <button wire:click="$set('modalCuidado', false)" class="px-3.5 py-1.5 text-xs font-bold rounded-xl border border-[var(--rm-border)] bg-[var(--rm-surface)] dark:bg-[var(--rm-text-primary)] text-[var(--rm-clinical)] dark:text-[var(--rm-surface)] cursor-pointer">Cancelar</button>
-                    <button wire:click="guardarCuidado" class="px-3.5 py-1.5 text-xs font-bold rounded-xl bg-[var(--rm-warning)] hover:bg-[var(--rm-danger)] text-white cursor-pointer">Confirmar Registro</button>
+                    <button wire:click="$set('modalCuidado', false)" class="px-3.5 py-1.5 text-xs font-bold rounded-xl border border-[var(--rm-border)] bg-[var(--rm-surface)] dark:bg-[var(--rm-text-primary)] text-[var(--rm-text-primary)] dark:text-[var(--rm-surface)] cursor-pointer">Cancelar</button>
+                    <button wire:click="guardarCuidado" class="px-3.5 py-1.5 text-xs font-bold rounded-xl bg-[var(--rm-action-primary)] hover:bg-[var(--rm-action-primary-hover)] text-white font-bold cursor-pointer">Confirmar Registro</button>
                 </div>
             </div>
         </div>
@@ -1245,17 +1247,17 @@
             <div class="w-full max-w-md bg-[var(--rm-surface)] dark:bg-[var(--rm-surface)] border border-[var(--rm-border)] dark:border-[var(--rm-border)] rounded-2xl p-4 sm:p-5 shadow-xl space-y-3 font-sans">
                 <div class="flex items-center justify-between border-b border-[var(--rm-border)]/50 pb-2.5">
                     <div>
-                        <h3 class="text-sm font-bold text-[var(--rm-clinical)] dark:text-[var(--rm-surface)]">Valoración de Dolor (EVA)</h3>
+                        <h3 class="text-sm font-bold text-[var(--rm-text-primary)] dark:text-[var(--rm-surface)]">Valoración de Dolor (EVA)</h3>
                         <p class="text-[11px] text-[var(--rm-text-secondary)] dark:text-[var(--rm-text-muted)]">Escala visual analógica de 0 a 10</p>
                     </div>
-                    <button wire:click="$set('modalDolor', false)" class="text-[var(--rm-text-secondary)] hover:text-[var(--rm-clinical)] p-1 cursor-pointer">
+                    <button wire:click="$set('modalDolor', false)" class="text-[var(--rm-text-secondary)] hover:text-[var(--rm-text-primary)] p-1 cursor-pointer">
                         <i class="ph-bold ph-x text-base"></i>
                     </button>
                 </div>
                 <div class="space-y-3 text-xs">
                     <div>
                         <div class="flex justify-between items-center mb-1">
-                            <label class="font-bold text-[var(--rm-clinical)] dark:text-[var(--rm-surface)]">Intensidad EVA ({{ $dolorIntensidad }}/10)</label>
+                            <label class="font-bold text-[var(--rm-text-primary)] dark:text-[var(--rm-surface)]">Intensidad EVA ({{ $dolorIntensidad }}/10)</label>
                             <span class="text-xs font-bold {{ $dolorIntensidad >= 7 ? 'text-rose-600' : ($dolorIntensidad >= 4 ? 'text-amber-600' : 'text-emerald-600') }}">
                                 {{ $dolorIntensidad === 0 ? 'Sin dolor' : ($dolorIntensidad < 4 ? 'Leve' : ($dolorIntensidad < 7 ? 'Moderado' : 'Severo')) }}
                             </span>
@@ -1264,14 +1266,14 @@
                         @error('dolorIntensidad') <span class="text-rose-600 text-[10px] font-bold">{{ $message }}</span> @enderror
                     </div>
                     <div>
-                        <label class="font-bold text-[var(--rm-clinical)] dark:text-[var(--rm-surface)] block mb-1">Localización, características e intervención *</label>
+                        <label class="font-bold text-[var(--rm-text-primary)] dark:text-[var(--rm-surface)] block mb-1">Localización, características e intervención *</label>
                         <textarea wire:model="dolorDetalle" rows="3" placeholder="Ubicación del dolor, tipo (punzante, sordo, cólico), medidas..." class="w-full rounded-xl border border-[var(--rm-border)] p-2 text-xs bg-[var(--rm-surface)] dark:bg-[var(--rm-text-primary)]"></textarea>
                         @error('dolorDetalle') <span class="text-rose-600 text-[10px] font-bold">{{ $message }}</span> @enderror
                     </div>
                 </div>
                 <div class="flex items-center justify-end gap-2 pt-2 border-t border-[var(--rm-border)]/50">
-                    <button wire:click="$set('modalDolor', false)" class="px-3.5 py-1.5 text-xs font-bold rounded-xl border border-[var(--rm-border)] bg-[var(--rm-surface)] dark:bg-[var(--rm-text-primary)] text-[var(--rm-clinical)] dark:text-[var(--rm-surface)] cursor-pointer">Cancelar</button>
-                    <button wire:click="guardarDolor" class="px-3.5 py-1.5 text-xs font-bold rounded-xl bg-[var(--rm-warning)] hover:bg-[var(--rm-danger)] text-white cursor-pointer">Guardar Valoración</button>
+                    <button wire:click="$set('modalDolor', false)" class="px-3.5 py-1.5 text-xs font-bold rounded-xl border border-[var(--rm-border)] bg-[var(--rm-surface)] dark:bg-[var(--rm-text-primary)] text-[var(--rm-text-primary)] dark:text-[var(--rm-surface)] cursor-pointer">Cancelar</button>
+                    <button wire:click="guardarDolor" class="px-3.5 py-1.5 text-xs font-bold rounded-xl bg-[var(--rm-action-primary)] hover:bg-[var(--rm-action-primary-hover)] text-white font-bold cursor-pointer">Guardar Valoración</button>
                 </div>
             </div>
         </div>
@@ -1283,16 +1285,16 @@
             <div class="w-full max-w-md bg-[var(--rm-surface)] dark:bg-[var(--rm-surface)] border border-[var(--rm-border)] dark:border-[var(--rm-border)] rounded-2xl p-4 sm:p-5 shadow-xl space-y-3 font-sans">
                 <div class="flex items-center justify-between border-b border-[var(--rm-border)]/50 pb-2.5">
                     <div>
-                        <h3 class="text-sm font-bold text-[var(--rm-clinical)] dark:text-[var(--rm-surface)]">Registro de Curación / Procedimiento</h3>
+                        <h3 class="text-sm font-bold text-[var(--rm-text-primary)] dark:text-[var(--rm-surface)]">Registro de Curación / Procedimiento</h3>
                         <p class="text-[11px] text-[var(--rm-text-secondary)] dark:text-[var(--rm-text-muted)]">Heridas, apósitos, sondas, catéteres</p>
                     </div>
-                    <button wire:click="$set('modalProcedimiento', false)" class="text-[var(--rm-text-secondary)] hover:text-[var(--rm-clinical)] p-1 cursor-pointer">
+                    <button wire:click="$set('modalProcedimiento', false)" class="text-[var(--rm-text-secondary)] hover:text-[var(--rm-text-primary)] p-1 cursor-pointer">
                         <i class="ph-bold ph-x text-base"></i>
                     </button>
                 </div>
                 <div class="space-y-2.5 text-xs">
                     <div>
-                        <label class="font-bold text-[var(--rm-clinical)] dark:text-[var(--rm-surface)] block mb-1">Tipo de procedimiento</label>
+                        <label class="font-bold text-[var(--rm-text-primary)] dark:text-[var(--rm-surface)] block mb-1">Tipo de procedimiento</label>
                         <select wire:model="procTipo" class="w-full h-9 rounded-xl border border-[var(--rm-border)] px-3 bg-[var(--rm-surface)] dark:bg-[var(--rm-text-primary)] text-xs">
                             <option value="CURACION">Curación de herida / úlcera</option>
                             <option value="SONDA">Manejo de sonda vesical/nasogástrica</option>
@@ -1303,14 +1305,14 @@
                         @error('procTipo') <span class="text-rose-600 text-[10px] font-bold">{{ $message }}</span> @enderror
                     </div>
                     <div>
-                        <label class="font-bold text-[var(--rm-clinical)] dark:text-[var(--rm-surface)] block mb-1">Detalle del procedimiento y evolución *</label>
+                        <label class="font-bold text-[var(--rm-text-primary)] dark:text-[var(--rm-surface)] block mb-1">Detalle del procedimiento y evolución *</label>
                         <textarea wire:model="procDetalle" rows="3" placeholder="Estado del lecho, apósito aplicado, tolerancia del residente..." class="w-full rounded-xl border border-[var(--rm-border)] p-2 text-xs bg-[var(--rm-surface)] dark:bg-[var(--rm-text-primary)]"></textarea>
                         @error('procDetalle') <span class="text-rose-600 text-[10px] font-bold">{{ $message }}</span> @enderror
                     </div>
                 </div>
                 <div class="flex items-center justify-end gap-2 pt-2 border-t border-[var(--rm-border)]/50">
-                    <button wire:click="$set('modalProcedimiento', false)" class="px-3.5 py-1.5 text-xs font-bold rounded-xl border border-[var(--rm-border)] bg-[var(--rm-surface)] dark:bg-[var(--rm-text-primary)] text-[var(--rm-clinical)] dark:text-[var(--rm-surface)] cursor-pointer">Cancelar</button>
-                    <button wire:click="guardarProcedimiento" class="px-3.5 py-1.5 text-xs font-bold rounded-xl bg-[var(--rm-warning)] hover:bg-[var(--rm-danger)] text-white cursor-pointer">Registrar Procedimiento</button>
+                    <button wire:click="$set('modalProcedimiento', false)" class="px-3.5 py-1.5 text-xs font-bold rounded-xl border border-[var(--rm-border)] bg-[var(--rm-surface)] dark:bg-[var(--rm-text-primary)] text-[var(--rm-text-primary)] dark:text-[var(--rm-surface)] cursor-pointer">Cancelar</button>
+                    <button wire:click="guardarProcedimiento" class="px-3.5 py-1.5 text-xs font-bold rounded-xl bg-[var(--rm-action-primary)] hover:bg-[var(--rm-action-primary-hover)] text-white font-bold cursor-pointer">Registrar Procedimiento</button>
                 </div>
             </div>
         </div>

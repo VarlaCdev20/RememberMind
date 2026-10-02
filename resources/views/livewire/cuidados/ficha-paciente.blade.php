@@ -23,74 +23,68 @@
 
     $alergiasTexto = $alergiasConocidas->isNotEmpty()
         ? $alergiasConocidas->join(', ')
-        : 'Sin alergias conocidas';
+        : 'Sin alergias activas registradas';
+
+    $seguroActivo = $adultoMayor->seguros->first();
+    $familiaresActivos = $adultoMayor->familiares
+        ->filter(fn ($contacto) => in_array(data_get($contacto, 'pivot.estado'), ['ACTIVO', 'ACTIVA'], true));
+    $contactoEmergencia = $familiaresActivos
+        ->first(fn ($contacto) => (bool) data_get($contacto, 'pivot.contacto_emergencia'))
+        ?? $familiaresActivos->first(fn ($contacto) => (bool) data_get($contacto, 'pivot.responsable_principal'));
+    $admisionInicial = $adultoMayor->admisiones->sortBy('fecha_hora_admision')->first();
+    $ultimoPaseTurno = $adultoMayor->pasesTurno->sortByDesc('fecha_hora')->first();
+    $asignacionJornadaActiva = $adultoMayor->asignacionesJornada
+        ->first(fn ($asignacion) => in_array($asignacion->estado, ['ACTIVA', 'ACTIVO'], true));
+    $grupoSanguineo = trim(implode(' ', array_filter([
+        $adultoMayor->grupo_sanguineo,
+        $adultoMayor->factor_rh,
+    ])));
 @endphp
 
 <div class="rm-clinical-workspace rm-ficha-detalles" x-data="{ activeTab: @entangle('tabActivo'), modalSelectorAtencion: false, modalExportar: false, drawerExpediente: false, drawerFamilia: false }" @keydown.escape.window="modalSelectorAtencion = false; modalExportar = false; drawerExpediente = false; drawerFamilia = false">
-    <x-ui.toast />
 
     {{-- CABECERA INSTITUCIONAL CLÍNICA (Encabezado + Card Residente + Tabs) --}}
     @include('livewire.cuidados.ficha.cabecera')
 
-    {{-- PANELES MODULARES SEGÚN PESTAÑA ACTIVA --}}
-    {{-- 1. Resumen Clínico --}}
-    <div x-show="activeTab === 'resumen'">
-        @include('livewire.cuidados.ficha.tab-resumen')
-    </div>
-
-    {{-- 2. Signos Vitales --}}
-    <div x-show="activeTab === 'signos'" x-cloak x-effect="if (activeTab === 'signos') { window.dispatchEvent(new CustomEvent('render-graficos-signos')); }">
-        @include('livewire.cuidados.ficha.tab-signos')
-    </div>
-
-    {{-- 3. Medicación --}}
-    <div x-show="activeTab === 'medicacion'" x-cloak>
-        @include('livewire.cuidados.ficha.tab-medicacion')
-    </div>
-
-    {{-- 4. Cuidados --}}
-    <div x-show="activeTab === 'cuidados' || activeTab === 'cuidado'" x-cloak>
-        @include('livewire.cuidados.ficha.tab-cuidados')
-    </div>
-
-    {{-- 5. Seguimiento --}}
-    <div x-show="activeTab === 'seguimiento'" x-cloak x-effect="if (activeTab === 'seguimiento') { window.dispatchEvent(new CustomEvent('render-graficos-seguimiento')); }">
-        @include('livewire.cuidados.ficha.tab-seguimiento')
-    </div>
-
-    {{-- 6. Eventos clínicos (Golden Reference) / Alertas --}}
-    <div x-show="activeTab === 'eventos' || activeTab === 'alertas'" x-cloak x-effect="if (activeTab === 'eventos' || activeTab === 'alertas') { window.dispatchEvent(new CustomEvent('render-graficos-eventos')); }">
-        @include('livewire.cuidados.ficha.tab-eventos')
-    </div>
-
-    {{-- 7. Resultados y Estudios Clínicos (Reemplaza Valoración Integral) --}}
-    <div x-show="activeTab === 'estudios' || activeTab === 'historial' || activeTab === 'resultados'" x-cloak x-effect="if (activeTab === 'estudios' || activeTab === 'historial' || activeTab === 'resultados') { window.dispatchEvent(new CustomEvent('render-graficos-estudios')); }">
-        @include('livewire.cuidados.ficha.tab-estudios')
-    </div>
-
-    {{-- 8. Documentación (Golden Reference) --}}
-    <div x-show="activeTab === 'documentos'" x-cloak>
-        @include('livewire.cuidados.ficha.tab-documentos')
-    </div>
+    {{-- Solo se renderiza la pestaña activa: evita consultas, formularios y datos
+         clínicos duplicados u ocultos pertenecientes a otras áreas. --}}
+    @switch($tabActivo)
+        @case('signos')
+            @include('livewire.cuidados.ficha.tab-signos')
+            @break
+        @case('medicacion')
+            @include('livewire.cuidados.ficha.tab-medicacion')
+            @break
+        @case('cuidados')
+        @case('cuidado')
+            @include('livewire.cuidados.ficha.tab-cuidados')
+            @break
+        @case('seguimiento')
+            @include('livewire.cuidados.ficha.tab-seguimiento')
+            @break
+        @case('eventos')
+            @include('livewire.cuidados.ficha.tab-eventos')
+            @break
+        @case('alertas')
+            @include('livewire.cuidados.ficha.tab-alertas')
+            @break
+        @case('estudios')
+        @case('resultados')
+            @include('livewire.cuidados.ficha.tab-estudios')
+            @break
+        @case('historial')
+            @include('livewire.cuidados.ficha.tab-historial')
+            @break
+        @case('documentos')
+            @include('livewire.cuidados.ficha.tab-documentos')
+            @break
+        @default
+            @include('livewire.cuidados.ficha.tab-resumen')
+    @endswitch
 
     {{-- MODALES CLÍNICOS OPERATIVOS --}}
     {{-- MODAL DE PRESCRIPCIÓN MÉDICA --}}
     @livewire('medicacion.medicacion-adulto-modal')
-
-    {{-- MODALES CLÍNICOS OPERATIVOS --}}
-        {{-- TAB ALERTAS --}}
-    @if($tabActivo === 'alertas')
-        <div x-show="activeTab === 'alertas'">
-            @include('livewire.cuidados.ficha.tab-alertas')
-        </div>
-    @endif
-
-    {{-- TAB HISTORIAL --}}
-    @if($tabActivo === 'historial')
-        <div x-show="activeTab === 'historial'">
-            @include('livewire.cuidados.ficha.tab-historial')
-        </div>
-    @endif
 
     @include('livewire.cuidados.ficha.modales')
 </div>

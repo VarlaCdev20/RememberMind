@@ -1,7 +1,10 @@
 <div class="relative mx-auto max-w-7xl space-y-5">
+ @inject('visibilidadNavegacion', 'App\Backend\Modulos\Identidad\Servicios\VisibilidadNavegacion')
 
  {{-- MODAL DE FORMULARIO DE REGISTRO / EDICIÓN --}}
+ @can('residentes.gestionar')
  @livewire('residentes.adulto-mayor-form-modal')
+ @endcan
 
  {{-- ENCABEZADO CON ESTILO PREMIUM --}}
  <section class="rounded-2xl border border-borde-suave bg-fondo-panel p-6 shadow-[0_18px_45px_rgba(47,62,92,0.1)] backdrop-blur-xl relative overflow-hidden">
@@ -22,13 +25,17 @@
  <i class="ph-bold ph-arrow-left text-sm"></i> Panel de Inicio
  </a>
 
+ @if($visibilidadNavegacion->puedeVerRuta('admin.admisiones.preadmision'))
  <a wire:navigate href="{{ route('admin.admisiones.preadmision') }}" class="inline-flex items-center justify-center gap-2 rounded-xl bg-boton-acento px-4 py-2.5 text-xs font-bold text-inverso shadow-[0_8px_20px_rgba(233,122,95,0.22)] transition hover:-translate-y-0.5 hover:bg-fondo-panel active:scale-95">
  <i class="ph-bold ph-plus-circle text-sm"></i> Nueva preadmisión
  </a>
+ @endif
 
+ @if($visibilidadNavegacion->puedeVerRuta('admin.adultos-mayores.reporte-general'))
  <a href="{{ route('admin.adultos-mayores.reporte-general') }}" target="_blank" class="inline-flex items-center justify-center gap-2 rounded-xl bg-boton-principal px-4 py-2.5 text-xs font-bold text-inverso shadow-[0_8px_20px_rgba(47,62,92,0.12)] transition hover:-translate-y-0.5 hover:bg-fondo-panel active:scale-95">
  <i class="ph-bold ph-file-pdf text-sm"></i> Censo en PDF
  </a>
+ @endif
  </div>
  </div>
  </section>
@@ -91,7 +98,7 @@
 
  {{-- SECCIÓN DE FILTROS AVANZADOS --}}
  {{-- SECCIÓN DE FILTROS AVANZADOS UNIFICADA FORMATO ALERTAS --}}
- <section class="rm-filter-bar" x-show="tab !== 'alertas'">
+ <x-ui.filter-bar class="mb-4" x-show="tab !== 'alertas'">
  <div class="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-2 items-center">
   {{-- Buscador Principal --}}
   <div class="lg:col-span-3 relative flex items-center">
@@ -157,61 +164,73 @@
   </div>
  </div>
 
- {{-- Fila de chips de filtros activos --}}
+ {{-- Fila de chips de filtros activos (desplazable con colorcitos) --}}
  @php
   $hasFiltrosActivos = !empty($buscar) || !empty($estado) || !empty($genero) || !empty($rango_edad) || !empty($permanencia) || !empty($ciudad_municipio) || !empty($fecha_desde);
  @endphp
  @if($hasFiltrosActivos)
   <div class="rm-filter-bar__active">
-  <div class="flex flex-wrap items-center gap-1.5">
+  <div class="rm-filter-scroll">
    <span class="rm-filter-bar__active-label">
    <i class="ph-bold ph-funnel text-xs"></i> Filtros activos:
    </span>
    @if(!empty($buscar))
-   <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[var(--rm-surface-soft)] border border-[var(--rm-border-soft)] text-[11px] font-semibold text-[var(--rm-text-primary)]">
+   <span class="rm-filter-chip rm-filter-chip--search">
+    <i class="ph-bold ph-magnifying-glass text-xs"></i>
     <span>Búsqueda: "{{ Str::limit($buscar, 16) }}"</span>
-    <button type="button" wire:click="$set('buscar', '')" class="hover:text-[var(--rm-action-primary)] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
+    <button type="button" wire:click="$set('buscar', '')" title="Quitar filtro"><i class="ph-bold ph-x text-xs"></i></button>
    </span>
    @endif
    @if(!empty($estado))
-   <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[var(--rm-warning)]/15 border border-[var(--rm-warning)]/30 text-[11px] font-bold text-[var(--rm-warning-strong)] dark:text-[var(--rm-warning-soft)]">
+   <span class="rm-filter-chip rm-filter-chip--warning">
+    <span class="w-1.5 h-1.5 rounded-full bg-[var(--rm-status-high)]"></span>
     <span>Estado: {{ $estado }}</span>
-    <button type="button" wire:click="$set('estado', '')" class="hover:text-[var(--rm-action-primary)] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
+    <button type="button" wire:click="$set('estado', '')" title="Quitar filtro"><i class="ph-bold ph-x text-xs"></i></button>
    </span>
    @endif
    @if(!empty($genero))
-   <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[var(--rm-text-primary)]/10 border border-[var(--rm-border-soft)] text-[11px] font-bold text-[var(--rm-text-primary)]">
+   <span class="rm-filter-chip rm-filter-chip--info">
+    <i class="ph-bold ph-gender-intersex text-xs"></i>
     <span>{{ $genero === 'MASCULINO' ? 'Masc.' : 'Fem.' }}</span>
-    <button type="button" wire:click="$set('genero', '')" class="hover:text-[var(--rm-action-primary)] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
+    <button type="button" wire:click="$set('genero', '')" title="Quitar filtro"><i class="ph-bold ph-x text-xs"></i></button>
    </span>
    @endif
    @if(!empty($rango_edad))
-   <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[var(--rm-action-primary)]/15 border border-[var(--rm-action-primary)]/30 text-[11px] font-bold text-[var(--rm-action-primary-active)] dark:text-[var(--rm-action-primary-soft)]">
+   <span class="rm-filter-chip rm-filter-chip--success">
+    <i class="ph-bold ph-calendar text-xs"></i>
     <span>Edad: {{ $rango_edad }}</span>
-    <button type="button" wire:click="$set('rango_edad', '')" class="hover:text-[var(--rm-action-primary)] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
+    <button type="button" wire:click="$set('rango_edad', '')" title="Quitar filtro"><i class="ph-bold ph-x text-xs"></i></button>
    </span>
    @endif
    @if(!empty($permanencia))
-   <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[var(--rm-text-primary)]/10 border border-[var(--rm-border-soft)] text-[11px] font-bold text-[var(--rm-text-primary)]">
+   <span class="rm-filter-chip rm-filter-chip--clinical">
+    <i class="ph-bold ph-clock text-xs"></i>
     <span>Perm.: {{ $permanencia }}</span>
-    <button type="button" wire:click="$set('permanencia', '')" class="hover:text-[var(--rm-action-primary)] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
+    <button type="button" wire:click="$set('permanencia', '')" title="Quitar filtro"><i class="ph-bold ph-x text-xs"></i></button>
+   </span>
+   @endif
+   @if(!empty($ciudad_municipio))
+   <span class="rm-filter-chip rm-filter-chip--search">
+    <i class="ph-bold ph-map-pin text-xs"></i>
+    <span>Muni: {{ $ciudad_municipio }}</span>
+    <button type="button" wire:click="$set('ciudad_municipio', '')" title="Quitar filtro"><i class="ph-bold ph-x text-xs"></i></button>
    </span>
    @endif
   </div>
-  <div class="flex items-center gap-2.5">
-   <span class="text-[11px] px-2.5 py-0.5 rounded-full font-bold bg-[var(--rm-text-primary)]/10 text-[var(--rm-text-primary)]">
+  <div class="flex items-center gap-2 shrink-0">
+   <span class="text-[11px] px-2.5 py-0.5 rounded-full font-bold bg-[var(--rm-surface-alt)] text-[var(--rm-text-secondary)] border border-[var(--rm-border-soft)]">
    {{ $adultos->total() ?? count($adultos) }} coincidentes
    </span>
    <button type="button"
    wire:click="$set('buscar', ''); $set('estado', ''); $set('genero', ''); $set('permanencia', ''); $set('ciudad_municipio', ''); $set('rango_edad', ''); $set('fecha_desde', ''); $set('fecha_hasta', '');"
-   class="inline-flex items-center gap-1 rounded-xl bg-[var(--rm-action-primary-soft)] hover:bg-[var(--rm-action-primary-soft)] text-[var(--rm-action-primary)] py-1 px-2.5 text-xs font-bold transition cursor-pointer">
-   <i class="ph-bold ph-arrow-counter-clockwise"></i>
+   class="rm-filter-bar__clear-btn">
+   <i class="ph-bold ph-arrow-counter-clockwise text-xs"></i>
    <span>Limpiar filtros</span>
    </button>
   </div>
   </div>
  @endif
- </section>
+ </x-ui.filter-bar>
 
  {{-- VISTA TARJETAS (CARDS RESPONSIVAS PREMIUM) --}}
  <section x-show="tab === 'tarjetas'">
@@ -305,6 +324,7 @@
  <a href="{{ route('admin.adultos-mayores.show', $adulto->cod_residente) }}" class="flex-1 flex justify-center items-center rounded-xl bg-boton-principal py-2 text-inverso hover:bg-fondo-panel transition shadow-sm" title="Ver Ficha Integral">
  <i class="ph-bold ph-eye text-sm mr-1"></i> <span class="text-[9px] font-bold uppercase tracking-wider">Ficha Integral</span>
  </a>
+ @can('residentes.gestionar')
  <button type="button" wire:click="editarAdultoMayor('{{ $adulto->cod_residente }}')" class="flex h-9 w-9 justify-center items-center rounded-xl bg-estado-peligroBg border border-borde-focus text-boton-acento hover:bg-boton-acento hover:text-inverso transition" title="Editar Ficha">
  <i class="ph-bold ph-pencil-simple text-base"></i>
  </button>
@@ -325,6 +345,7 @@
  @endforeach
  </div>
  </div>
+ @endcan
  </div>
  </div>
  </div>
@@ -342,7 +363,7 @@
  {{-- TABLA GENERAL (HÍBRIDA DESKTOP / RESPONSIVA) --}}
  <section x-show="tab === 'tabla'" class="rounded-2xl border border-borde-suave bg-fondo-card shadow-sm overflow-hidden" style="display: none;">
  <div class="overflow-x-auto">
- <table class="w-full text-left text-sm text-titulo">
+ <table class="rm-data-table rm-data-table--actions w-full text-left text-sm text-titulo">
  <thead class="bg-fondo-panel text-[9px] font-bold uppercase tracking-widest text-apoyo border-b border-borde-suave">
  <tr>
  <th class="px-5 py-4">Nombre Completo</th>
@@ -384,6 +405,7 @@
  <a href="{{ route('admin.adultos-mayores.show', $adulto->cod_residente) }}" class="rounded-xl bg-boton-principal p-2 text-inverso hover:bg-fondo-panel transition" title="Ver Ficha Integral">
  <i class="ph-bold ph-eye text-sm"></i>
  </a>
+ @can('residentes.gestionar')
  @if(strtoupper($adulto->estado_adulto) !== 'ARCHIVADO' && strtoupper($adulto->estado_adulto) !== 'INACTIVO')
  <button type="button" wire:click="editarAdultoMayor('{{ $adulto->cod_residente }}')" class="rounded-xl bg-boton-acento p-2 text-inverso hover:bg-fondo-panel transition" title="Editar">
  <i class="ph-bold ph-pencil-simple text-sm"></i>
@@ -401,6 +423,7 @@
  <button type="submit" class="rounded-xl bg-estado-exitoBg p-2 text-inverso hover:bg-fondo-panel transition" title="Restaurar expediente"><i class="ph-bold ph-arrow-counter-clockwise text-sm"></i></button>
  </form>
  @endif
+ @endcan
  </div>
  </td>
  </tr>
@@ -442,6 +465,7 @@
  <a href="{{ route('admin.adultos-mayores.show', $adulto->cod_residente) }}" class="flex-1 flex justify-center items-center rounded-xl bg-fondo-panel py-2 text-inverso hover:bg-boton-principal transition text-xs font-bold shadow-sm" title="Ver Expediente Completo">
  <i class="ph-bold ph-eye mr-1 text-sm"></i> Ver Ficha
  </a>
+ @can('residentes.gestionar')
  <div x-data="{ open: false }" class="relative flex-1">
  <button @click="open = !open" @click.away="open = false" type="button" class="flex w-full justify-center items-center rounded-xl bg-estado-exitoBg py-2 text-inverso hover:bg-fondo-panel transition text-xs font-bold" title="Restaurar / Cambiar Estado">
  <i class="ph-bold ph-arrow-counter-clockwise mr-1 text-sm"></i> Restaurar
@@ -459,6 +483,7 @@
  @endforeach
  </div>
  </div>
+ @endcan
  </div>
  </div>
  @endif

@@ -156,9 +156,7 @@ class SaludAdministracionMedicacionPanel extends Component
         }
 
         // Si es enfermero sin turno o sin asignación, entra en modo consulta
-        if ($user->hasRole('SUPERADMINISTRADOR')) {
-            $this->esModoConsulta = false;
-        } elseif ($user->hasRole('ENFERMEROS') && ! $turnoActivo) {
+        if ($user->hasRole('ENFERMEROS') && ! $turnoActivo) {
             $this->esModoConsulta = true;
         } elseif (! $user->can('administraciones_medicacion.crear')) {
             $this->esModoConsulta = true;

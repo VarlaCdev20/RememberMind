@@ -722,12 +722,13 @@
 }
 
 .rm-skeleton {
+    display: block;
     background:
         linear-gradient(
             90deg,
-            rgba(199, 181, 163, 0.16) 25%,
-            rgba(255, 255, 255, 0.45) 37%,
-            rgba(199, 181, 163, 0.16) 63%
+            var(--rm-surface-soft) 25%,
+            var(--rm-surface-raised) 37%,
+            var(--rm-surface-soft) 63%
         );
     background-size: 400% 100%;
     animation: rmSkeleton 1.4s var(--rm-ease-standard) infinite;
@@ -735,12 +736,19 @@
 
 .rm-skeleton-text {
     height: 0.75rem;
-    border-radius: 9999px;
+    border-radius: var(--rm-radius-pill);
 }
+
+.rm-skeleton-circle { aspect-ratio: 1; border-radius: 50%; }
+.rm-skeleton-card { min-height: 108px; border-radius: var(--rm-radius-lg); border: 1px solid var(--rm-border-soft); }
 
 .rm-skeleton-title {
     height: 1.1rem;
-    border-radius: 9999px;
+    border-radius: var(--rm-radius-pill);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .rm-skeleton { animation: none; background: var(--rm-surface-soft); }
 }
 
 
