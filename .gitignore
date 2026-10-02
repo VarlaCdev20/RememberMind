@@ -27,4 +27,5 @@ Homestead.json
 Homestead.yaml
 Thumbs.db
 SKILL.md
+!/.agents/skills/*/SKILL.md
 /public/vendor
