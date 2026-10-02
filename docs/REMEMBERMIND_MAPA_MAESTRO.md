@@ -2,7 +2,27 @@
 
 ## 1. Propósito de este documento
 
-Este documento explica **qué es RememberMind, qué debe resolver, cómo se conectan sus módulos, cuál es el ciclo institucional y clínico del residente y hacia qué producto debe evolucionar**.
+Este documento explica **qué es RememberMind, qué debe resolver, cómo se conectan sus módulos y cómo debe funcionar el cuidado institucional, clínico y diario del residente**.
+
+Su objetivo principal es dar a desarrolladores y Codex una visión global del producto antes de trabajar una vista, formulario o módulo aislado.
+
+Este documento se enfoca en:
+
+- administración institucional;
+- ingreso y permanencia del residente;
+- cuidado diario;
+- seguimiento continuo de salud;
+- atención interdisciplinaria;
+- evolución clínica y funcional;
+- medicación;
+- planes de cuidado;
+- alertas;
+- coordinación entre profesionales;
+- comunicación operativa;
+- trazabilidad;
+- experiencia de usuario para registrar y comprender cambios del residente.
+
+Este documento **no define el sistema experto ni sus algoritmos, inferencias, predicciones o representación del conocimiento**. Esa funcionalidad debe documentarse en un archivo independiente.
 
 No reemplaza:
 
@@ -11,44 +31,61 @@ No reemplaza:
 - `REMEMBERMIND_BDD_69_TABLAS.md`: define entidades, atributos, PK, FK y relaciones;
 - documentación funcional específica de cada módulo.
 
-Este archivo sirve como **mapa mental y funcional global** para que desarrolladores y Codex comprendan el sistema antes de trabajar en una vista, módulo o flujo aislado.
-
 ---
 
 # 2. Qué es RememberMind
 
-RememberMind es un sistema web institucional para una residencia geriátrica que integra:
+RememberMind es un sistema web institucional para una residencia geriátrica cuya función principal es **organizar el cuidado integral de las personas residentes y permitir que el personal comprenda su estado, su evolución y lo que necesita atención en cada momento**.
+
+No debe entenderse como una colección de CRUD ni como una simple ficha médica digital.
+
+Debe integrar, alrededor del residente:
 
 - gestión institucional;
+- personal, áreas, turnos y jornadas;
 - preadmisión y admisión;
 - residentes;
 - habitaciones, camas y ocupaciones;
 - contactos y familiares;
 - documentación y consentimientos;
+- antecedentes, diagnósticos, alergias y restricciones;
 - expediente clínico interdisciplinario;
-- seguimiento longitudinal;
+- signos vitales;
+- dolor;
+- antropometría;
+- cognición;
+- conducta;
+- sueño;
+- ingesta;
+- hidratación;
+- eliminación;
+- movilidad;
+- heridas y curaciones;
 - medicación;
-- planes de cuidado;
 - estudios clínicos;
-- instrumentos de evaluación;
-- actividades y visitas;
-- alertas e incidentes;
-- asignaciones de personal y jornadas;
-- auditoría y trazabilidad;
-- una futura capa inteligente de apoyo para detección temprana de deterioro cognitivo.
+- valoraciones profesionales;
+- planes e intervenciones de cuidado;
+- actividades;
+- visitas;
+- incidentes;
+- pases de turno;
+- alertas;
+- auditoría y trazabilidad.
 
-La entidad central del sistema operativo es `residentes`. Toda información asistencial, clínica, cognitiva, funcional, de cuidado, medicación, actividades, visitas y alertas debe poder relacionarse directa o indirectamente con `cod_residente`.
-
-RememberMind no debe entenderse como una colección de CRUD. Debe representar **procesos reales conectados**.
+La entidad central del sistema operativo es `residentes`. Toda información de salud, cuidado, seguimiento, funcionalidad, medicación, actividades, visitas y alertas debe poder relacionarse directa o indirectamente con `cod_residente`.
 
 ---
 
 # 3. Idea central del producto
 
-La idea funcional global es:
+La idea global de RememberMind es:
 
 ```text
-PERSONA INTERESADA / POSTULANTE
+INSTITUCIÓN CONFIGURADA
+        ↓
+PERSONAL + ÁREAS + TURNOS + JORNADAS
+        ↓
+POSTULANTE
         ↓
 PREADMISIÓN
         ↓
@@ -60,30 +97,53 @@ ADMISIÓN FORMAL + CAMA + CONTACTOS + CONSENTIMIENTOS
         ↓
 RESIDENTE ADMITIDO
         ↓
-EXPEDIENTE + CONTEXTO INSTITUCIONAL
+VALORACIÓN Y CONTEXTO INICIAL
         ↓
-ATENCIÓN INTERDISCIPLINARIA
+PLAN DE CUIDADO Y SEGUIMIENTO
         ↓
-SEGUIMIENTO DIARIO Y LONGITUDINAL
+TRABAJO DIARIO POR TURNOS
         ↓
-MEDICACIÓN + PLANES DE CUIDADO + ESTUDIOS + INSTRUMENTOS
+REGISTROS DE SALUD + CUIDADO + MEDICACIÓN + EVOLUCIÓN
         ↓
-ACTIVIDADES + VISITAS + RELACIÓN FAMILIAR
+COMPARACIÓN CON HISTORIAL Y LÍNEA BASAL
         ↓
-ALERTAS + TRAZABILIDAD + REPORTES
+DETECCIÓN DE CAMBIOS
         ↓
-FUTURA CAPA EXPERTA DE APOYO COGNITIVO
+ALERTAS + RESPONSABLE + RESPUESTA
+        ↓
+REEVALUACIÓN / INTERVENCIÓN
+        ↓
+NUEVOS REGISTROS
+        ↓
+HISTORIA LONGITUDINAL DEL RESIDENTE
 ```
 
-La información debe acumular historia. RememberMind no debe comportarse como una ficha que únicamente muestra el “estado actual”; debe permitir comprender **qué pasó, cuándo, quién lo registró y cómo evolucionó el residente**.
+RememberMind debe permitir responder en cualquier momento:
+
+- ¿cómo está este residente hoy?;
+- ¿qué cambió respecto a ayer, la semana pasada o su estado habitual?;
+- ¿qué cuidados tiene programados?;
+- ¿qué ya se realizó?;
+- ¿qué falta?;
+- ¿qué medicamentos corresponden?;
+- ¿qué alertas están activas?;
+- ¿qué ocurrió antes de una alerta?;
+- ¿quién registró cada dato?;
+- ¿qué profesional intervino?;
+- ¿qué resultado tuvo la intervención?;
+- ¿existe una tendencia que requiere revisión?;
+- ¿hay información que debería escalarse al médico u otro profesional?;
+- ¿qué debe entregarse al siguiente turno?
+
+El sistema debe trabajar con **historia y evolución**, no únicamente con el último valor disponible.
 
 ---
 
-# 4. Diferencia de conceptos fundamentales
+# 4. Conceptos fundamentales
 
 ## Postulante / adulto mayor
 
-Persona que todavía está en proceso de preadmisión y **aún no es residente**.
+Persona que se encuentra en proceso de preadmisión y todavía **no es residente**.
 
 ## Residente
 
@@ -95,19 +155,151 @@ Cuenta de acceso al sistema.
 
 ## Personal
 
-Trabajador o profesional de la residencia, vinculado cuando corresponde a una cuenta de usuario.
+Trabajador o profesional de la residencia.
 
 ## Contacto
 
-Familiar, responsable o persona vinculada al residente.
+Familiar, responsable o persona relacionada con un residente.
 
-Estos conceptos no deben mezclarse en código, vistas, permisos o documentación.
+No deben utilizarse estos conceptos como sinónimos en código, permisos, formularios o documentación.
 
 ---
 
-# 5. Flujo institucional V2 congelado
+# 5. Roles institucionales
 
-El flujo obligatorio de ingreso es:
+RememberMind debe trabajar con **10 roles funcionales**:
+
+1. `SUPERADMINISTRADOR`
+2. `GERENTE`
+3. `ADMINISTRADOR`
+4. `ENFERMEROS`
+5. `MEDICO GENERAL/GERIATRA`
+6. `PSICOLOGO/A`
+7. `PEDAGOGO`
+8. `NUTRICIONISTA`
+9. `FISIOTERAPEUTA`
+10. `FAMILIAR`
+
+`VOLUNTARIO` permanece fuera del alcance actual.
+
+## 5.1. Superadministrador
+
+Tiene supervisión global y lectura del sistema, administración de seguridad, usuarios, permisos y configuración técnica/institucional autorizada.
+
+La lectura global no significa competencia clínica automática para modificar registros profesionales.
+
+## 5.2. Gerente
+
+El Gerente representa la gestión del personal y la administración laboral de alto nivel de la residencia.
+
+Su ámbito funcional debe incluir principalmente:
+
+- gestión del personal;
+- altas y bajas administrativas del personal;
+- información laboral disponible dentro de la estructura aprobada;
+- organización general de recursos humanos;
+- profesiones y especialidades registradas;
+- seguimiento de disponibilidad del personal;
+- planificación general de horarios y cobertura;
+- revisión de distribución de personal;
+- supervisión de áreas y necesidades de dotación;
+- proceso institucional de contratación en aquello que pueda representarse con la estructura vigente.
+
+Si en el futuro se requieren contratos laborales, expedientes de RR. HH., salarios u otra estructura que no exista en la BDD congelada, deberá diseñarse y aprobarse antes de modificar la BDD.
+
+El Gerente no obtiene competencias clínicas por su cargo.
+
+## 5.3. Administrador
+
+El Administrador se enfoca en la **operación diaria de la residencia**.
+
+Debe trabajar principalmente con:
+
+- preadmisiones;
+- admisiones;
+- residentes;
+- contactos;
+- documentación administrativa;
+- consentimientos;
+- habitaciones;
+- camas;
+- ocupaciones;
+- jornadas;
+- asignaciones operativas;
+- horarios operativos del personal dentro del modelo autorizado;
+- actividades;
+- visitas;
+- coordinación administrativa de incidentes y alertas;
+- seguros;
+- seguimiento operativo de la residencia.
+
+No debe tener escritura clínica únicamente por ser Administrador.
+
+## 5.4. Médico general / geriatra
+
+Debe disponer del expediente clínico interdisciplinario necesario y es el rol ordinario responsable de:
+
+- evaluación médica;
+- diagnósticos;
+- indicaciones;
+- prescripciones;
+- interpretación clínica;
+- revisión de cambios relevantes;
+- establecimiento o ajuste de parámetros clínicos personalizados cuando corresponda;
+- respuesta clínica a alertas;
+- seguimiento médico.
+
+## 5.5. Enfermería
+
+Enfermería representa una de las funciones centrales del seguimiento diario.
+
+Debe poder consultar lo necesario para el cuidado continuo y registrar, según competencia:
+
+- signos vitales;
+- dolor;
+- administración de medicación;
+- conducta;
+- sueño;
+- ingesta;
+- hidratación;
+- eliminación;
+- movilidad;
+- heridas;
+- curaciones;
+- incidentes;
+- pases de turno;
+- ejecuciones de cuidado;
+- otros controles autorizados.
+
+Enfermería **no prescribe ni modifica la orden médica**.
+
+## 5.6. Psicología
+
+Trabaja con contexto pertinente y registra valoraciones, notas, intervenciones, seguimiento e instrumentos autorizados dentro de su ámbito.
+
+## 5.7. Nutrición
+
+Trabaja con antropometría, ingesta, hidratación, información clínica pertinente, valoración nutricional e intervenciones nutricionales.
+
+## 5.8. Fisioterapia
+
+Trabaja con movilidad, dolor relacionado con su intervención, funcionalidad, dispositivos, restricciones, valoraciones funcionales y planes de su ámbito.
+
+## 5.9. Pedagogía
+
+Trabaja con actividades, participación, seguimiento pedagógico, conducta y aspectos cognitivos permitidos dentro de su competencia. No diagnostica.
+
+## 5.10. Familiar
+
+Accede únicamente a residentes vinculados y a información expresamente autorizada.
+
+El portal familiar no debe ser una copia reducida del expediente clínico interno.
+
+---
+
+# 6. Flujo institucional V2 de ingreso
+
+El flujo obligatorio es:
 
 ```text
 Preadmisión PENDIENTE
@@ -126,12 +318,12 @@ ASIGNACIÓN DE CAMA
 RESIDENTE ADMITIDO
 ```
 
-Reglas obligatorias:
+Reglas:
 
 1. Aprobar una preadmisión **no crea un residente**.
 2. El residente se crea únicamente al formalizar la admisión.
 3. La admisión formal debe ser transaccional.
-4. La formalización crea o relaciona, según corresponda:
+4. La operación crea o relaciona, según corresponda:
    - `residentes`;
    - `admisiones`;
    - `residentes_contactos`;
@@ -145,168 +337,732 @@ Reglas obligatorias:
 
 ---
 
-# 6. Antes del ingreso: preadmisión
+# 7. Ingreso y valoración inicial del residente
 
-La preadmisión representa la evaluación institucional previa.
+La admisión no debe terminar simplemente con “residente creado”.
 
-El sistema debe permitir como mínimo que personal autorizado pueda:
+Después del ingreso, el sistema debe facilitar la construcción del **contexto inicial del residente**, utilizando las entidades existentes y las competencias profesionales correspondientes.
 
-- registrar al postulante;
-- registrar la información requerida para evaluación;
-- adjuntar/relacionar documentación administrativa pertinente;
-- revisar la solicitud;
-- identificar información pendiente;
-- aprobar o rechazar conforme al proceso institucional definido;
-- conservar la trazabilidad de la decisión.
+El contexto inicial puede comprender:
 
-Una preadmisión aprobada significa:
+- antecedentes;
+- diagnósticos;
+- alergias;
+- medicamentos prescritos;
+- dispositivos clínicos;
+- documentación;
+- seguro;
+- signos vitales iniciales;
+- dolor;
+- antropometría;
+- movilidad;
+- estado nutricional;
+- estado cognitivo registrado mediante mecanismos autorizados;
+- conducta;
+- sueño;
+- restricciones;
+- necesidades de cuidado;
+- contactos;
+- consentimientos.
 
-> “La persona puede continuar al proceso de admisión”.
+El objetivo es obtener una **línea basal** que después permita comparar la evolución real del residente.
 
-No significa:
-
-> “La persona ya vive en la residencia”.
-
----
-
-# 7. Admisión formal
-
-La admisión es la frontera entre postulante y residente.
-
-Debe reunir en una sola operación institucional coherente:
-
-```text
-Preadmisión aprobada
-        +
-Datos de ingreso
-        +
-Contacto(s)
-        +
-Consentimiento(s)
-        +
-Cama disponible
-        +
-Documentación inicial
-        ↓
-RESIDENTE ADMITIDO
-```
-
-La operación debe fallar de forma segura si una condición crítica no puede completarse.
-
-Ejemplo:
-
-```text
-se crea residente
-pero la cama ya fue ocupada por otro proceso
-        ↓
-ROLLBACK
-        ↓
-no queda un residente parcial/huérfano
-```
+No todos los datos se registran por la misma persona: cada profesional debe registrar únicamente lo que corresponde a su competencia.
 
 ---
 
-# 8. Habitaciones, camas y ocupación
+# 8. El expediente del residente
 
-La ubicación física se modela mediante:
+La pantalla del residente debe funcionar como un **centro de contexto, seguimiento y navegación**, no como un formulario gigante.
 
-```text
-habitaciones
-    ↓
-camas
-    ↓
-ocupaciones_cama
-    ↓
-residentes
-```
-
-La cama actual de un residente se determina por su ocupación activa; no debe duplicarse como una segunda fuente de verdad arbitraria en `residentes`.
-
-El sistema debe permitir comprender rápidamente:
-
-- qué habitaciones existen;
-- qué camas existen;
-- qué camas están libres;
-- qué camas están ocupadas;
-- qué residente ocupa cada cama;
-- desde cuándo;
-- historial de ocupaciones cuando corresponda.
-
-Las vistas de admisión deben impedir seleccionar una cama no disponible, pero la validación definitiva debe realizarse también en backend.
-
----
-
-# 9. El residente como centro del sistema
-
-Una vez admitido, el residente se convierte en el punto de unión de los demás procesos.
-
-Conceptualmente su contexto puede verse así:
+Conceptualmente:
 
 ```text
-                         ┌─ contactos / familia
+                         ┌─ ubicación / cama
+                         ├─ contactos / familia
                          ├─ documentos / consentimientos
-                         ├─ cama / ubicación
                          ├─ antecedentes / diagnósticos / alergias
-                         ├─ atenciones / notas
-                         ├─ signos / dolor / antropometría
-RESIDENTE ───────────────┼─ estudios clínicos
+                         ├─ signos vitales / dolor / antropometría
+                         ├─ estudios clínicos
                          ├─ indicaciones
-                         ├─ prescripciones / administraciones
+RESIDENTE ───────────────┼─ prescripciones / administraciones
                          ├─ cognición / conducta / sueño
                          ├─ ingesta / hidratación / eliminación
                          ├─ movilidad / heridas / curaciones
                          ├─ valoraciones profesionales
                          ├─ planes de cuidado
-                         ├─ instrumentos
                          ├─ actividades / visitas
-                         └─ alertas / incidentes
+                         ├─ incidentes
+                         └─ alertas / historial
 ```
 
-La pantalla del residente no debería ser un formulario gigante. Debe funcionar como **expediente y punto de navegación contextual**.
+La vista principal debe permitir identificar rápidamente:
+
+- residente;
+- habitación/cama;
+- estado;
+- alergias/restricciones críticas autorizadas;
+- alertas activas;
+- últimos registros importantes;
+- tendencias recientes;
+- plan de cuidado activo;
+- medicación pendiente;
+- tareas/intervenciones programadas;
+- profesionales involucrados;
+- accesos a cada dimensión del expediente.
 
 ---
 
-# 10. Jornadas, turnos y organización del trabajo
+# 9. Flujo diario de cuidado
 
-RememberMind también representa la operación diaria de la residencia.
+El seguimiento diario debe ser uno de los núcleos funcionales de RememberMind.
 
-Conceptualmente:
+## 9.1. Inicio de turno
+
+Al iniciar una jornada o turno, el personal autorizado debe poder conocer:
+
+- residentes asignados;
+- ubicación de cada residente;
+- alertas abiertas;
+- incidencias del turno anterior;
+- pases de turno;
+- medicación pendiente/próxima;
+- intervenciones de cuidado programadas;
+- controles requeridos;
+- cambios recientes;
+- pendientes críticos.
+
+## 9.2. Durante el turno
+
+El sistema debe facilitar registros rápidos pero completos de:
+
+- signos vitales;
+- dolor;
+- administración de medicación;
+- ingesta;
+- hidratación;
+- eliminación;
+- sueño;
+- conducta;
+- movilidad;
+- heridas/curaciones;
+- ejecuciones de cuidado;
+- incidentes;
+- observaciones pertinentes.
+
+Cada registro debe actualizar inmediatamente el contexto histórico del residente y evaluar las reglas de validación y alerta aplicables.
+
+## 9.3. Fin de turno
+
+Antes de cerrar/entregar el turno debe facilitarse:
+
+- revisión de pendientes;
+- alertas no resueltas;
+- medicación pendiente u omitida según el modelo;
+- cambios observados durante el turno;
+- incidentes;
+- cuidados realizados;
+- cuidados no realizados y motivo cuando corresponda;
+- pase de turno estructurado;
+- información que requiere seguimiento posterior.
+
+El siguiente equipo debe recibir continuidad, no empezar “desde cero”.
+
+---
+
+# 10. Seguimiento longitudinal y comparación temporal
+
+RememberMind debe preservar la evolución del residente.
+
+Las entidades longitudinales incluyen, entre otras:
+
+- `signos_vitales`;
+- `valoraciones_dolor`;
+- `mediciones_antropometricas`;
+- `controles_cognitivos`;
+- `registros_conductuales`;
+- `registros_sueno`;
+- `registros_ingesta`;
+- `registros_hidratacion`;
+- `registros_eliminacion`;
+- `registros_movilidad`;
+- `heridas` y `curaciones_herida`;
+- `aplicaciones_instrumento`;
+- valoraciones profesionales.
+
+Nunca deben reducirse a un único valor sobrescribible.
+
+La experiencia debe permitir comparar:
 
 ```text
-usuarios
-   ↓
-personal
-   ↓
-turnos / áreas / jornadas
-   ↓
-asignaciones_personal
-   ↓
-asignaciones_residente_jornada
-   ↓
-trabajo efectivo sobre residentes
+ANTES
+↓
+INTERVENCIÓN / CAMBIO / PERIODO
+↓
+DESPUÉS
 ```
 
-Esto permite que la información clínica y de cuidado tenga contexto institucional: quién estaba asignado, en qué jornada y qué profesional registró una acción.
+Ejemplos:
 
-No toda información necesita una jornada obligatoriamente; se aplica según la estructura congelada de cada tabla.
+- presión arterial antes y después de un periodo de seguimiento;
+- dolor antes y después de una intervención;
+- movilidad antes y después de fisioterapia;
+- peso/antropometría antes y después de un plan nutricional;
+- evolución de una herida entre curaciones;
+- cambios de conducta en diferentes periodos;
+- calidad/cantidad de sueño por días;
+- ingesta e hidratación por turno/día;
+- evolución de resultados de instrumentos cuando sea metodológicamente válida su comparación.
 
 ---
 
-# 11. Atención clínica interdisciplinaria
+# 11. Formularios clínicos y de cuidado
 
-`atenciones` funciona como uno de los puntos principales de contexto clínico.
+Los formularios de salud y seguimiento **no deben ser formularios mínimos de dos campos cuando el proceso requiere contexto clínico**.
 
-Desde una atención pueden originarse, según corresponda:
+Cada formulario debe utilizar de manera completa los campos aprobados que realmente aportan al proceso.
 
-- notas clínicas;
-- diagnósticos;
-- estudios clínicos;
-- indicaciones clínicas;
-- prescripciones;
-- aplicaciones de instrumentos;
-- valoraciones psicológicas;
-- valoraciones nutricionales;
-- valoraciones funcionales.
+Debe presentar:
+
+- labels visibles;
+- unidades de medida;
+- formato esperado;
+- campos obligatorios claramente identificados;
+- ayuda contextual;
+- validaciones inline;
+- fecha/hora de negocio;
+- responsable derivado del usuario/profesional cuando corresponda;
+- contexto del residente;
+- últimos valores relevantes;
+- comparación con valores anteriores;
+- advertencias de cambio;
+- observación cuando el modelo la permita;
+- resultado de la validación.
+
+Si una variable clínicamente necesaria **no existe estructuralmente en la BDD congelada**, no debe agregarse silenciosamente ni ocultarse en JSON/EAV. Debe documentarse como necesidad y solicitar aprobación de cambio estructural.
+
+---
+
+# 12. Formularios con contexto visual y gráficas
+
+Las pantallas que registran datos longitudinales deben combinar:
+
+```text
+FORMULARIO ACTUAL
+        +
+ÚLTIMO REGISTRO
+        +
+GRÁFICA DE EVOLUCIÓN
+        +
+COMPARACIÓN
+        +
+RANGO / OBJETIVO AUTORIZADO
+        +
+ALERTAS RELACIONADAS
+```
+
+No es necesario colocar una gráfica decorativa en formularios administrativos estáticos.
+
+Las gráficas son especialmente importantes para:
+
+- presión arterial;
+- frecuencia cardiaca;
+- frecuencia respiratoria;
+- temperatura;
+- saturación de oxígeno;
+- glucemia cuando sea registrada;
+- dolor;
+- peso y otras medidas antropométricas;
+- movilidad;
+- ingesta/hidratación cuando puedan representarse cuantitativamente;
+- sueño cuando los datos registrados permitan comparación;
+- instrumentos y valoraciones repetidas cuando sea metodológicamente válido.
+
+Las visualizaciones deben poder mostrar, según el caso:
+
+- últimas 24 horas;
+- 7 días;
+- 30 días;
+- periodo personalizado;
+- línea basal;
+- objetivo/rango personalizado;
+- máximo/mínimo;
+- cambio absoluto;
+- cambio porcentual cuando tenga sentido clínico;
+- marcadores de alertas;
+- marcadores de intervenciones o cambios relevantes.
+
+Si existe un único registro, la interfaz debe indicarlo claramente en vez de inventar una tendencia.
+
+---
+
+# 13. Modelo de validación clínica de datos
+
+Las validaciones clínicas no deben reducirse a:
+
+```text
+required | numeric
+```
+
+RememberMind debe diferenciar varios niveles.
+
+## 13.1. Validación de formato
+
+Ejemplos:
+
+- campo requerido;
+- numérico;
+- fecha válida;
+- unidad correcta;
+- longitud;
+- escala permitida.
+
+## 13.2. Validación de plausibilidad
+
+Debe detectar valores imposibles o probablemente producto de error de digitación/medición.
+
+Un valor físicamente imposible puede bloquear el registro.
+
+Un valor clínicamente inusual pero posible **no debería bloquearse automáticamente**: debe advertirse, solicitar confirmación o generar alerta según severidad.
+
+## 13.3. Validación basada en evidencia
+
+Cuando un dato tenga interpretación clínica, sus referencias generales deben provenir de fuentes clínicas verificables y vigentes.
+
+No se debe inventar un rango por intuición del desarrollador.
+
+## 13.4. Rango personalizado del residente
+
+La edad por sí sola no basta para determinar qué es “normal”.
+
+Cuando corresponda, el sistema debe permitir que el médico establezca o confirme objetivos/rangos individualizados considerando factores como:
+
+- edad;
+- fragilidad;
+- multimorbilidad;
+- diagnóstico;
+- tratamiento;
+- antecedentes;
+- tolerancia;
+- riesgo de caída;
+- situación basal;
+- otras condiciones clínicamente relevantes.
+
+## 13.5. Línea basal personal
+
+Además del rango clínico general, RememberMind debe comparar el dato con el comportamiento habitual del propio residente.
+
+Ejemplo:
+
+```text
+valor actual
+vs
+últimos registros
+vs
+promedio/tendencia reciente
+vs
+línea basal
+vs
+objetivo personalizado
+```
+
+## 13.6. Cambio brusco
+
+Aunque un valor todavía se encuentre en un rango aceptable, un cambio rápido respecto al estado habitual puede ser relevante.
+
+La lógica de alerta debe poder considerar **delta y tendencia**, no solo límites absolutos.
+
+## 13.7. Validación contextual
+
+Cuando sea clínicamente pertinente, la interpretación puede necesitar contexto como:
+
+- síntomas;
+- postura;
+- momento del día;
+- intervención reciente;
+- medicación;
+- enfermedad actual;
+- hidratación;
+- contexto de la medición.
+
+Si ese contexto requiere nuevos campos estructurados no presentes en la BDD, deberá evaluarse como cambio de modelo antes de implementarlo.
+
+---
+
+# 14. Ejemplo: presión arterial
+
+La presión arterial ilustra por qué RememberMind no debe usar una única regla como:
+
+```text
+si edad = 82 → normal = X
+```
+
+Las guías clínicas muestran que los objetivos en adultos mayores requieren individualización, especialmente ante fragilidad y multimorbilidad.
+
+Como referencia de diseño clínico:
+
+- NICE NG136 mantiene para adultos con hipertensión de 80 años o más un objetivo de presión clínica inferior a 150/90 mmHg, usando juicio clínico ante fragilidad o multimorbilidad;
+- las guías ESC 2024 disponen recomendaciones específicas para pacientes muy mayores o frágiles y enfatizan un enfoque individualizado;
+- la hipotensión ortostática se define habitualmente por una caída sostenida de al menos 20 mmHg de presión sistólica o 10 mmHg de presión diastólica dentro de los 3 minutos de ponerse de pie, según la declaración científica de la American Heart Association de 2024.
+
+Por tanto, el sistema debe poder representar conceptualmente:
+
+```text
+PRESIÓN REGISTRADA
+      ↓
+VALIDACIÓN DE DIGITACIÓN / PLAUSIBILIDAD
+      ↓
+COMPARACIÓN CON OBJETIVO PERSONALIZADO
+      ↓
+COMPARACIÓN CON LÍNEA BASAL
+      ↓
+ANÁLISIS DE CAMBIO / TENDENCIA
+      ↓
+¿HAY DESVIACIÓN RELEVANTE?
+      ↓
+NO → guardar y graficar
+SÍ → guardar + advertir/generar alerta según regla autorizada
+```
+
+Una alerta automática no debe afirmar un diagnóstico.
+
+Debe utilizar lenguaje de apoyo, por ejemplo:
+
+> “Se detectó una variación de presión arterial fuera del rango configurado para este residente. Requiere revisión clínica.”
+
+O:
+
+> “Se detectó un descenso relevante respecto a los registros recientes. Verificar medición, síntomas y condición del residente.”
+
+La decisión clínica continúa correspondiendo al personal competente.
+
+---
+
+# 15. Registro de reglas clínicas y fuentes
+
+Toda regla automática que interprete un dato de salud debe tener trazabilidad documental.
+
+Antes de activarse debería conocerse:
+
+- variable;
+- población aplicable;
+- fuente clínica;
+- organización/autores;
+- versión/año;
+- rango o criterio;
+- excepciones;
+- severidad asociada;
+- acción esperada;
+- responsable clínico que aprobó su uso institucional;
+- fecha de revisión de la regla.
+
+Ejemplo conceptual:
+
+```text
+Regla: variación de presión arterial
+Fuente: guía clínica identificada
+Versión: YYYY
+Población: adultos mayores / condición específica
+Criterio general: ...
+Personalizable por médico: SÍ
+Genera alerta: según severidad
+Aprobada institucionalmente por: ...
+Revisar: ...
+```
+
+Las fuentes clínicas deben revisarse periódicamente porque las guías cambian.
+
+---
+
+# 16. Clasificación de validaciones y respuesta
+
+Una validación puede producir:
+
+## Normal
+
+El dato se registra y actualiza la gráfica/historial.
+
+## Observación
+
+Existe un cambio menor que conviene mostrar, pero no necesariamente requiere una alerta.
+
+## Advertencia
+
+El valor o tendencia requiere verificación del profesional.
+
+La interfaz utiliza semántica warning.
+
+## Alerta
+
+Existe una situación definida institucionalmente que requiere atención o seguimiento activo.
+
+## Crítica
+
+Existe un criterio autorizado que requiere atención prioritaria/escalamiento inmediato según protocolo institucional.
+
+Los niveles clínicos exactos no deben ser inventados por desarrollo: deben definirse con fuentes y aprobación profesional.
+
+---
+
+# 17. Motor operativo de alertas
+
+Las alertas deben ser una capacidad transversal del sistema.
+
+No deben limitarse a “poner una tarjeta roja”.
+
+Flujo conceptual:
+
+```text
+DATO / EVENTO / TENDENCIA
+          ↓
+REGLAS AUTORIZADAS
+          ↓
+DETECCIÓN
+          ↓
+CREAR ALERTA
+          ↓
+CLASIFICAR SEVERIDAD
+          ↓
+ASIGNAR / DEFINIR RESPONSABLE
+          ↓
+NOTIFICAR
+          ↓
+RECONOCER
+          ↓
+ATENDER
+          ↓
+REGISTRAR ACCIÓN / RESULTADO
+          ↓
+CERRAR O ANULAR
+```
+
+`alertas` representa la alerta y `eventos_alerta` preserva su ciclo de vida.
+
+El historial nunca debe sobrescribirse.
+
+---
+
+# 18. Qué puede originar una alerta
+
+La generación automática debe implementarse solo después de definir/validar la regla correspondiente.
+
+Posibles familias de alertas:
+
+## 18.1. Umbral clínico
+
+Un valor sale del rango autorizado para el residente.
+
+## 18.2. Cambio brusco
+
+Un valor cambia significativamente respecto a su registro anterior o línea basal.
+
+## 18.3. Tendencia sostenida
+
+Varios registros muestran deterioro progresivo aunque ninguno de manera aislada parezca extremo.
+
+## 18.4. Combinación de señales
+
+Varias dimensiones cambian de manera coincidente y la combinación ha sido definida como clínicamente relevante.
+
+No debe inventarse una combinación sin respaldo y aprobación.
+
+## 18.5. Medicación
+
+Situaciones operativas como administraciones pendientes, omitidas o incidencias deben generar los avisos permitidos por el flujo de medicación.
+
+## 18.6. Incidente
+
+Caídas, lesiones u otros incidentes registrados pueden originar alertas según severidad/protocolo.
+
+## 18.7. Heridas
+
+Cambios registrados en una herida pueden requerir seguimiento según criterios profesionales autorizados.
+
+## 18.8. Nutrición / hidratación
+
+Patrones sostenidos de cambios en ingesta, hidratación o antropometría pueden generar advertencias cuando existan reglas clínicas aprobadas.
+
+## 18.9. Conducta, sueño, movilidad o cognición
+
+Cambios persistentes pueden generar solicitudes de revisión profesional cuando las reglas estén formalmente definidas.
+
+---
+
+# 19. Calidad de alertas
+
+El sistema debe evitar dos extremos:
+
+```text
+demasiadas alertas → fatiga de alertas
+muy pocas alertas → cambios importantes pasan desapercibidos
+```
+
+Por ello debe contemplarse:
+
+- deduplicación;
+- agrupación cuando varias mediciones representan el mismo problema;
+- evitar crear una alerta nueva en cada refresh;
+- reglas de repetición/cooldown cuando corresponda;
+- severidad;
+- responsable;
+- reconocimiento;
+- escalamiento;
+- cierre con motivo/resultado;
+- trazabilidad completa.
+
+Una alerta activa debe ser visible hasta resolverse; no puede depender únicamente de un toast temporal.
+
+---
+
+# 20. Escalamiento de alertas
+
+Las alertas deben poder seguir una matriz institucional.
+
+Ejemplo conceptual:
+
+```text
+ALERTA
+ ↓
+PROFESIONAL / EQUIPO RESPONSABLE
+ ↓
+NO RECONOCIDA EN TIEMPO DEFINIDO
+ ↓
+ESCALAR A RESPONSABLE SUPERIOR / MÉDICO / ADMINISTRACIÓN
+ ↓
+REGISTRAR CADA ESCALAMIENTO EN eventos_alerta
+```
+
+Los tiempos y destinatarios concretos deben ser definidos institucionalmente según tipo y severidad.
+
+---
+
+# 21. Notificaciones de alertas
+
+RememberMind debe poder notificar alertas mediante varios canales.
+
+## 21.1. Dentro del sistema
+
+Es el canal principal y debe mostrar:
+
+- residente;
+- tipo;
+- severidad;
+- hora;
+- responsable;
+- estado;
+- contexto necesario;
+- acción para abrir el detalle.
+
+## 21.2. Correo electrónico
+
+Puede utilizarse para alertas configuradas que requieren notificación fuera de la aplicación.
+
+No debe enviar información clínica excesiva en el correo.
+
+Preferir mensajes como:
+
+> “RememberMind registró una alerta que requiere revisión. Ingrese al sistema para consultar el detalle.”
+
+con contexto mínimo y enlace seguro autenticado.
+
+## 21.3. WhatsApp
+
+Puede integrarse mediante WhatsApp Business Platform para notificaciones autorizadas.
+
+Debe contemplar:
+
+- consentimiento/expectativa adecuada del destinatario;
+- configuración del número institucional;
+- plantillas aprobadas cuando correspondan;
+- destinatarios autorizados;
+- mínimos datos sensibles;
+- registro de envío;
+- estado de entrega cuando la integración lo permita;
+- enlace hacia RememberMind para consultar detalles bajo autenticación.
+
+Nunca se debe convertir WhatsApp en un expediente clínico paralelo.
+
+## 21.4. Falla de canal externo
+
+Si falla correo o WhatsApp:
+
+- la alerta interna sigue existiendo;
+- no se pierde el evento;
+- se registra el fallo técnico;
+- puede reintentarse de manera segura;
+- no se duplica la alerta de negocio.
+
+---
+
+# 22. Gráficas, tendencias y panel clínico
+
+Las gráficas deben ayudar a interpretar el seguimiento, no decorar.
+
+Cada módulo longitudinal debe evaluar cuál es la visualización más útil.
+
+Ejemplos:
+
+## Signos vitales
+
+Series temporales por variable con rango/objetivo autorizado y marcadores de alertas.
+
+## Dolor
+
+Evolución de intensidad + intervenciones registradas + respuesta.
+
+## Antropometría
+
+Peso y otras medidas en periodos útiles, comparando evolución.
+
+## Movilidad
+
+Evolución de registros/valoraciones que permitan comparación válida.
+
+## Heridas
+
+Timeline de curaciones y cambios registrados.
+
+## Sueño / conducta / ingesta / hidratación / eliminación
+
+Tendencias de registros según el tipo de dato almacenado y su semántica real.
+
+Las visualizaciones nunca deben afirmar causalidad únicamente porque dos eventos aparezcan próximos en el tiempo.
+
+---
+
+# 23. Vista “antes y después”
+
+Cuando exista una intervención relevante, la interfaz debe facilitar una comparación contextual.
+
+Ejemplo:
+
+```text
+ANTES
+Presión: ...
+Dolor: ...
+Movilidad: ...
+Fecha/hora: ...
+
+INTERVENCIÓN / PERIODO
+...
+
+DESPUÉS
+Presión: ...
+Dolor: ...
+Movilidad: ...
+Fecha/hora: ...
+
+CAMBIO
+...
+```
+
+La comparación solo debe incluir variables realmente disponibles y clínicamente comparables.
+
+---
+
+# 24. Atención clínica interdisciplinaria
+
+`atenciones` funciona como uno de los contextos principales de atención profesional.
 
 Conceptualmente:
 
@@ -323,44 +1079,15 @@ ATENCIÓN
    └─ valoración profesional
 ```
 
-El expediente es interdisciplinario, pero cada profesión trabaja dentro de su competencia y permisos.
+El expediente puede ser interdisciplinario, pero cada profesional registra solo dentro de su competencia y permisos.
+
+La información importante debe poder ser consultada transversalmente por quienes realmente la necesiten para cuidar al residente.
 
 ---
 
-# 12. Seguimiento longitudinal
+# 25. Medicación
 
-RememberMind debe registrar evolución temporal, no sobrescribir observaciones anteriores.
-
-El seguimiento incluye estructuras como:
-
-- signos vitales;
-- dolor;
-- antropometría;
-- controles cognitivos;
-- conducta;
-- sueño;
-- ingesta;
-- hidratación;
-- eliminación;
-- movilidad;
-- heridas y curaciones;
-- instrumentos;
-- valoraciones profesionales.
-
-La experiencia ideal debe permitir responder preguntas como:
-
-- ¿cómo evolucionó este residente durante la última semana?
-- ¿hubo cambios de conducta?
-- ¿cómo cambió la movilidad?
-- ¿existe una tendencia en peso o antropometría?
-- ¿qué ocurrió antes de una alerta?
-- ¿qué profesional registró cada observación?
-
----
-
-# 13. Flujo de medicación
-
-La medicación tiene cuatro conceptos diferentes:
+La cadena es:
 
 ```text
 MEDICAMENTO
@@ -372,39 +1099,31 @@ HORARIOS
 ADMINISTRACIÓN REAL
 ```
 
-## Medicamento
+## Médico
 
-Catálogo de qué medicamento existe.
+Prescribe y modifica/suspende la prescripción según el flujo autorizado.
 
-## Prescripción
+## Enfermería
 
-Orden indicada por el médico.
+Consulta la prescripción y horarios, administra/documenta y registra lo ocurrido.
 
-## Horario de prescripción
+Enfermería no altera la orden médica.
 
-Cuándo corresponde administrar.
+La pantalla de trabajo diario debe permitir conocer rápidamente:
 
-## Administración
-
-Qué ocurrió realmente: administrado, omitido o el estado que corresponda al modelo aprobado.
-
-Regla profesional fundamental:
-
-```text
-MÉDICO
-→ prescribe
-
-ENFERMERÍA
-→ consulta la orden
-→ administra/documenta
-→ NO modifica la prescripción
-```
-
-La interfaz de Enfermería debe estar orientada al trabajo del turno: qué medicamento corresponde, a quién, cuándo y qué queda pendiente, manteniendo siempre el contexto del residente.
+- qué residente;
+- qué medicamento;
+- dosis/orden vigente según estructura aprobada;
+- horario;
+- estado;
+- qué está pendiente;
+- qué ya fue administrado;
+- qué fue omitido/no administrado y el contexto permitido;
+- alertas relacionadas.
 
 ---
 
-# 14. Planes de cuidado
+# 26. Planes de cuidado
 
 La estructura es:
 
@@ -416,20 +1135,158 @@ INTERVENCIONES
 PROGRAMACIÓN  EJECUCIÓN
 ```
 
-- plan: define el objetivo;
-- intervención: define qué debe hacerse;
-- programación: define cuándo debe hacerse;
-- ejecución: registra qué ocurrió realmente.
+- plan: objetivo;
+- intervención: qué debe hacerse;
+- programación: cuándo;
+- ejecución: qué ocurrió realmente.
 
-No existe una entidad V2 `tareas_cuidado`.
+No existe `tareas_cuidado` en V2.
 
-El sistema debe separar claramente “lo programado” de “lo realizado”.
+La interfaz debe diferenciar claramente:
+
+```text
+PROGRAMADO
+vs
+REALIZADO
+vs
+NO REALIZADO / PENDIENTE
+```
+
+según los estados realmente definidos.
 
 ---
 
-# 15. Estudios clínicos
+# 27. Dolor
 
-Los estudios se modelan de forma genérica y normalizada:
+La valoración de dolor no debe reducirse a un número cuando la estructura permite mayor detalle.
+
+Puede registrar, según la BDD aprobada:
+
+- intensidad;
+- ubicación;
+- tipo;
+- duración;
+- desencadenante;
+- intervención;
+- respuesta;
+- fecha/hora;
+- estado.
+
+La interfaz debe permitir comparar el dolor antes/después y mostrar evolución.
+
+La escala usada y sus validaciones deben estar metodológicamente definidas.
+
+---
+
+# 28. Nutrición, antropometría, ingesta e hidratación
+
+El seguimiento nutricional debe conectar:
+
+```text
+antropometría
++
+ingesta
++
+hidratación
++
+eliminación
++
+valoración nutricional
++
+intervenciones
++
+información clínica pertinente
+```
+
+La interfaz debe facilitar tendencias y cambios, evitando analizar cada registro aisladamente.
+
+Las reglas automáticas deben ser validadas por Nutrición/Médico según corresponda antes de generar alertas clínicas.
+
+---
+
+# 29. Movilidad y fisioterapia
+
+Debe facilitarse el seguimiento de:
+
+- movilidad;
+- dolor relacionado con la intervención;
+- dispositivos;
+- restricciones pertinentes;
+- valoración funcional;
+- planes/intervenciones;
+- evolución en el tiempo.
+
+Las comparaciones deben permitir comprender si existe mejora, estabilidad o deterioro según los datos registrados, sin convertir una variación aislada en diagnóstico automático.
+
+---
+
+# 30. Conducta, sueño y seguimiento psicológico
+
+Los registros de conducta y sueño deben formar parte de la historia longitudinal.
+
+Psicología debe poder contextualizar cambios con la información permitida y registrar valoraciones/intervenciones dentro de su ámbito.
+
+El sistema debe facilitar la identificación visual de patrones, pero las conclusiones clínicas deben pertenecer al profesional competente.
+
+---
+
+# 31. Heridas y curaciones
+
+El seguimiento de una herida debe conservar historia.
+
+```text
+HERIDA
+ ↓
+CURACIÓN 1
+ ↓
+CURACIÓN 2
+ ↓
+CURACIÓN 3
+ ↓
+EVOLUCIÓN
+```
+
+No debe sobrescribirse la valoración anterior.
+
+La interfaz debe facilitar comparar registros sucesivos y destacar cambios relevantes cuando existan criterios clínicos aprobados.
+
+---
+
+# 32. Incidentes
+
+Los incidentes deben registrarse con trazabilidad y conectarse al residente y al personal/contexto correspondiente según la BDD.
+
+Según severidad y reglas institucionales pueden:
+
+- crear una alerta;
+- requerir atención profesional;
+- requerir seguimiento;
+- aparecer en el pase de turno;
+- exigir cierre/documentación posterior.
+
+---
+
+# 33. Pases de turno
+
+El pase de turno debe resumir información útil para continuidad del cuidado.
+
+No debe convertirse en una copia automática de todo el expediente.
+
+Debe ayudar a comunicar:
+
+- cambios relevantes;
+- alertas activas;
+- incidencias;
+- cuidados pendientes;
+- situación de medicación;
+- evolución que requiere observación;
+- instrucciones/indicaciones pertinentes y autorizadas.
+
+---
+
+# 34. Estudios clínicos
+
+La estructura es genérica:
 
 ```text
 tipo_estudio_clinico
@@ -444,28 +1301,24 @@ estudio_clinico
    └─ documentos clínicos
 ```
 
-Ejemplos:
+Ejemplo:
 
 ```text
 Hemograma
 → componente: hemoglobina
-→ resultado: valor medido
-→ documento: PDF del laboratorio
+→ resultado: valor
+→ documento: PDF
 ```
 
-```text
-Tomografía
-→ informe: hallazgos/conclusión
-→ documento: imagen/PDF/DICOM
-```
+No se crea una tabla nueva por estudio sin aprobación estructural.
 
-No se debe crear una tabla nueva por cada estudio sin una futura decisión estructural aprobada.
+Los resultados repetidos comparables pueden presentarse en tendencia cuando resulte clínicamente apropiado.
 
 ---
 
-# 16. Instrumentos y evaluaciones
+# 35. Instrumentos
 
-La infraestructura V2 permite:
+La infraestructura contempla:
 
 ```text
 instrumento
@@ -476,196 +1329,103 @@ opciones
 
 residente
   ↓
-aplicación del instrumento
+aplicación
   ↓
 respuestas
 ```
 
-Puede soportar instrumentos cognitivos o funcionales cuando su uso sea metodológica y legalmente autorizado.
+Los instrumentos deben utilizarse únicamente cuando su metodología y derechos de uso estén autorizados.
 
-No deben incorporarse preguntas, baremos, algoritmos o contenido protegido sin comprobar metodología y derechos.
-
----
-
-# 17. Actividades
-
-RememberMind contempla actividades y participación de residentes.
-
-Conceptualmente:
-
-```text
-ÁREA / PERSONAL
-      ↓
-ACTIVIDAD
-      ↓
-PARTICIPANTES
-      ↓
-RESIDENTES
-```
-
-La actividad no es solamente una agenda. Puede formar parte del seguimiento institucional y, cuando sea pertinente, del contexto funcional/cognitivo del residente.
-
-No debe duplicarse al mismo residente dentro de una actividad cuando la regla de integridad lo impide.
+No se deben inventar puntuaciones, preguntas, baremos o interpretación.
 
 ---
 
-# 18. Familia, contactos y visitas
+# 36. Familia, contactos y visitas
 
-Los residentes pueden tener múltiples contactos y un contacto puede relacionarse según el modelo aprobado.
+El familiar accede exclusivamente a residentes vinculados mediante `residentes_contactos` y a información expresamente autorizada.
 
-El vínculo se establece mediante `residentes_contactos`.
-
-El familiar con acceso al sistema no es un profesional interno y no recibe acceso al expediente completo.
-
-Puede acceder únicamente a información autorizada, por ejemplo:
+Puede acceder a elementos permitidos como:
 
 - perfil básico autorizado;
-- su relación de contacto;
+- relación de contacto;
 - documentos/consentimientos autorizados;
 - actividades autorizadas;
 - visitas.
 
-Por defecto no tiene acceso directo a información clínica sensible como:
+Por defecto no tiene acceso directo a:
 
 - notas clínicas;
 - valoraciones psicológicas;
 - controles cognitivos;
-- pases de turno;
+- pases de turno internos;
 - prescripciones detalladas;
 - administraciones;
 - resultados médicos;
 - documentos clínicos sensibles.
 
-El portal familiar debe sentirse como un espacio propio y seguro, no como una versión recortada del panel clínico interno.
+---
+
+# 37. Actividades
+
+RememberMind contempla actividades y participación.
+
+Las actividades pueden apoyar bienestar y seguimiento institucional, pero no deben confundirse automáticamente con tratamiento clínico.
+
+Debe conservarse participación e historial cuando corresponda.
 
 ---
 
-# 19. Alertas e incidentes
+# 38. Documentación administrativa y clínica
 
-Una alerta no debe ser solo un badge rojo.
+Los documentos administrativos y los documentos clínicos son dominios distintos.
 
-El dominio distingue:
+Los archivos clínicos sensibles deben permanecer en almacenamiento privado con acceso autorizado.
+
+Los correos, WhatsApp u otros canales externos no deben utilizarse como almacenamiento paralelo de documentos sensibles.
+
+---
+
+# 39. Auditoría y trazabilidad
+
+Debe poder determinarse:
 
 ```text
-alerta
-   ↓
-eventos_alerta
+QUIÉN
+HIZO QUÉ
+SOBRE QUÉ RESIDENTE/RECURSO
+CUÁNDO
+EN QUÉ CONTEXTO
+CON QUÉ RESULTADO
 ```
 
-El ciclo puede registrar:
+La auditoría técnica se apoya en Spatie Activitylog según las reglas del proyecto.
 
-```text
-creada
-→ reconocida
-→ asignada
-→ atendida
-→ cerrada/anulada
-```
+La trazabilidad clínica también vive en las propias entidades mediante residente, profesional, atención, jornada, fecha/hora y estado cuando corresponda.
 
-El historial no debe sobrescribirse.
-
-La experiencia de usuario debe permitir responder:
-
-- qué ocurrió;
-- a qué residente afecta;
-- qué gravedad/semántica aprobada tiene;
-- quién debe atenderla;
-- si alguien ya la reconoció;
-- qué acciones se realizaron;
-- cuándo fue cerrada.
-
-Las alertas reales de riesgo/error deben utilizar semántica visual `danger`/rojo, pero la severidad debe venir del dominio y no inventarse en Blade/JavaScript.
+No se debe duplicar el expediente completo dentro del log técnico.
 
 ---
 
-# 20. Roles y experiencia por usuario
+# 40. Corrección de registros
 
-Roles vigentes:
+La información clínica es longitudinal.
 
-1. SUPERADMINISTRADOR
-2. ADMINISTRADOR
-3. ENFERMEROS
-4. MEDICO GENERAL/GERIATRA
-5. PSICOLOGO/A
-6. PEDAGOGO
-7. NUTRICIONISTA
-8. FISIOTERAPEUTA
-9. FAMILIAR
+No debe borrarse físicamente ni sobrescribirse para ocultar errores.
 
-`VOLUNTARIO` está fuera del alcance actual.
+Deben utilizarse los mecanismos definidos por el dominio:
 
-La experiencia no debe ser la misma para todos.
-
-## Superadministrador
-
-Debe poder supervisar globalmente el sistema, seguridad, usuarios, personal y configuración institucional. Tiene lectura total, pero no adquiere automáticamente competencia clínica para escribir.
-
-## Administrador
-
-Debe operar principalmente:
-
-- personal/usuarios;
-- áreas/turnos/jornadas;
-- preadmisión/admisión;
-- residentes;
-- contactos;
-- habitaciones/camas;
-- documentos;
-- consentimientos;
-- operación institucional;
-- actividades/visitas;
-- alertas necesarias para operar.
-
-No obtiene escritura clínica por ser administrador.
-
-## Médico
-
-Debe trabajar sobre expediente interdisciplinario, diagnósticos, indicaciones, estudios, prescripciones y seguimiento clínico pertinente.
-
-Es el rol ordinario autorizado a prescribir.
-
-## Enfermería
-
-Debe tener una vista muy operativa del turno:
-
-- residentes y ubicación;
-- prescripciones/horarios;
-- medicación pendiente;
-- signos y dolor;
-- planes;
-- alertas;
-- seguimiento diario;
-- heridas/curaciones;
-- pases de turno;
-- ejecuciones de cuidado.
-
-No prescribe.
-
-## Psicología
-
-Trabaja con contexto pertinente, cognición, conducta, sueño, instrumentos autorizados, valoraciones psicológicas e intervenciones de su ámbito.
-
-## Nutrición
-
-Trabaja con antropometría, ingesta, hidratación, eliminación, información clínica pertinente y planes/intervenciones nutricionales.
-
-## Fisioterapia
-
-Trabaja con función, movilidad, dolor pertinente, dispositivos, valoraciones funcionales y planes/intervenciones.
-
-## Pedagogía
-
-Trabaja con seguimiento pedagógico, cognición permitida, conducta, actividades y planes de su ámbito. No diagnostica.
-
-## Familiar
-
-Solo accede al residente vinculado y a la información expresamente autorizada.
+- estado;
+- anulación;
+- suspensión;
+- cierre;
+- corrección enlazada;
+- registro compensatorio.
 
 ---
 
-# 21. Autorización global
+# 41. Principio de seguridad
 
-Toda operación sensible debe evaluarse como:
+Toda operación sensible debe considerar:
 
 ```text
 sesión autenticada
@@ -676,406 +1436,276 @@ permiso explícito
 +
 Policy contextual
 +
-regla de negocio válida
+regla de negocio
 +
-alcance / relación / competencia profesional
+alcance/relación/competencia
 ```
 
-Ejemplos:
-
-- conocer un `cod_residente` no autoriza a verlo;
-- un familiar no puede abrir otro residente cambiando la URL;
-- una enfermera no modifica una prescripción;
-- un administrador no crea diagnósticos por su rol;
-- un profesional no atribuye registros a otro profesional;
-- Superadmin no adquiere competencia clínica automática.
+Que una opción esté oculta en la interfaz no significa que esté protegida.
 
 ---
 
-# 22. Documentación
+# 42. Principio de experiencia de usuario
 
-RememberMind distingue:
+RememberMind debe reducir carga cognitiva del personal.
 
-## Documentación administrativa
+La interfaz debe priorizar:
 
-Ejemplos:
+- contexto del residente;
+- alertas;
+- cambios recientes;
+- pendientes;
+- acción principal;
+- historial relevante;
+- comparación;
+- validaciones claras;
+- confirmación del resultado.
 
-- identificación;
-- documentación de ingreso;
-- autorizaciones;
-- documentos del contacto;
-- otros documentos institucionales.
+Los formularios deben ser completos sin convertirse en formularios interminables.
 
-## Documentación clínica
-
-Ejemplos:
-
-- informes médicos;
-- laboratorios;
-- radiografías;
-- tomografías;
-- resonancias;
-- DICOM;
-- documentos clínicos externos.
-
-Los archivos clínicos grandes deben estar en almacenamiento privado con metadatos/ruta en la BDD, no como BLOB por defecto.
+Puede utilizarse progressive disclosure, secciones, tabs o pasos cuando realmente ayuden.
 
 ---
 
-# 23. Auditoría y trazabilidad
+# 43. Dashboard por rol
 
-RememberMind debe poder contestar:
+No todos los roles deben ver el mismo dashboard.
+
+## Gerente
+
+Prioriza personal, cobertura, organización de recursos humanos, distribución y necesidades de personal.
+
+## Administrador
+
+Prioriza operación institucional, preadmisiones, admisiones, camas, ocupaciones, jornadas, asignaciones, documentación, visitas y pendientes administrativos.
+
+## Enfermería
+
+Prioriza residentes del turno, alertas, cambios recientes, medicación, controles, cuidados programados y pendientes.
+
+## Médico
+
+Prioriza alertas clínicas que requieren revisión, evolución, residentes que requieren atención, estudios, indicaciones y medicación.
+
+## Otros profesionales
+
+Priorizan residentes/intervenciones de su ámbito, cambios relevantes y pendientes.
+
+## Familiar
+
+Prioriza información autorizada de su residente vinculado, actividades/visitas y comunicaciones permitidas.
+
+---
+
+# 44. Panel de seguimiento del residente
+
+Debe existir una experiencia capaz de resumir, en una sola lectura autorizada:
 
 ```text
-¿quién hizo qué?
-¿cuándo?
-¿sobre qué residente/recurso?
-¿qué estado tenía antes?
-¿qué estado quedó después?
+HOY
+- últimas mediciones
+- medicación
+- cuidados
+- alertas
+- incidentes
+- ingesta/hidratación
+- movilidad
+- dolor
+
+TENDENCIAS
+- 24 h
+- 7 días
+- 30 días
+
+PENDIENTES
+- controles
+- medicación
+- cuidados
+- revisiones
+
+HISTORIAL
+- eventos clínicos
+- intervenciones
+- alertas
+- cambios de estado
 ```
 
-La auditoría técnica utiliza Spatie Activitylog según las reglas del proyecto.
-
-La trazabilidad clínica también vive en las propias tablas del dominio mediante residente, profesional, atención/jornada cuando corresponda, fecha/hora y estado.
-
-No se debe duplicar el texto clínico completo en una bitácora técnica.
+El detalle visible depende del rol y permisos.
 
 ---
 
-# 24. Correcciones y conservación de historia
+# 45. Mejoras recomendadas para el producto
 
-La historia clínica no debe “editarse hasta que parezca correcta”.
+## 45.1. Línea basal personalizada
 
-Los hechos históricos deben preservarse.
+Calcular y visualizar el comportamiento habitual del residente utilizando registros históricos válidos, sin convertirlo automáticamente en criterio médico.
 
-Según el dominio se utilizan:
+## 45.2. Rango clínico personalizado
 
-- estado;
-- anulación;
-- suspensión;
-- cierre;
-- corrección enlazada;
-- registro compensatorio.
+Permitir que el profesional competente configure/confirme objetivos cuando el proceso lo requiera.
 
-El borrado físico ordinario de información clínica está prohibido.
+## 45.3. Marcadores de eventos en gráficas
+
+Mostrar visualmente eventos relevantes como alertas, cambios de tratamiento o intervenciones cuando puedan relacionarse correctamente.
+
+## 45.4. Detección de tendencias
+
+Distinguir un dato aislado de un patrón persistente.
+
+La lógica concreta debe validarse clínicamente.
+
+## 45.5. Alertas deduplicadas
+
+Evitar notificaciones repetidas del mismo evento sin información nueva.
+
+## 45.6. Escalamiento
+
+Permitir que una alerta no atendida avance al siguiente responsable conforme a protocolo.
+
+## 45.7. Centro de notificaciones
+
+Unificar alertas y notificaciones con filtros por estado, severidad, residente, fecha y responsable.
+
+## 45.8. Alertas externas seguras
+
+Correo y WhatsApp como canales complementarios, enviando información mínima y llevando al usuario autenticado a RememberMind.
+
+## 45.9. Resumen de turno
+
+Generar un resumen operativo basado en registros reales del periodo, sin sustituir el juicio del profesional.
+
+## 45.10. Comparación contextual
+
+Antes/después y tendencias alrededor de intervenciones cuando los datos permitan una comparación válida.
 
 ---
 
-# 25. Dashboards: qué deben responder
+# 46. Gobernanza de reglas clínicas
 
-Un dashboard no debe responder “¿cuántas filas existen en mis tablas?”.
+Ninguna regla clínica automática debe llegar a producción únicamente porque “parece correcta”.
 
-Debe responder al usuario:
+Proceso recomendado:
 
 ```text
-¿Qué tengo que saber ahora?
-¿Qué necesita atención?
-¿Qué debo hacer después?
-¿Qué está pendiente?
-¿Qué cambió?
+NECESIDAD
+↓
+INVESTIGACIÓN CLÍNICA
+↓
+FUENTE VERIFICABLE
+↓
+DEFINICIÓN DE POBLACIÓN Y EXCEPCIONES
+↓
+REVISIÓN POR PROFESIONAL COMPETENTE
+↓
+APROBACIÓN INSTITUCIONAL
+↓
+IMPLEMENTACIÓN
+↓
+TESTS
+↓
+MONITOREO
+↓
+REVISIÓN PERIÓDICA
 ```
 
-Ejemplos según rol:
+RememberMind puede detectar y avisar.
 
-### Administración
-
-- preadmisiones pendientes;
-- admisiones por completar;
-- disponibilidad de camas;
-- documentos/consentimientos pendientes;
-- ocupación;
-- alertas operativas.
-
-### Enfermería
-
-- residentes asignados;
-- medicación próxima/pendiente;
-- controles pendientes;
-- alertas activas;
-- planes/intervenciones programadas;
-- información del turno.
-
-### Médico
-
-- residentes que requieren revisión;
-- estudios/resultados pertinentes;
-- alertas clínicas;
-- prescripciones/indicaciones relevantes;
-- evolución clínica.
-
-### Profesional interdisciplinario
-
-- residentes asignados o relevantes;
-- atenciones pendientes;
-- valoraciones;
-- intervenciones/planes;
-- alertas pertinentes.
-
-### Familiar
-
-- información autorizada del residente;
-- actividades/visitas;
-- documentos o acciones autorizadas;
-- comunicaciones que el proyecto defina formalmente.
-
-No deben inventarse KPI sin dato real o regla funcional aprobada.
+El sistema no debe sustituir al profesional ni presentar una alerta automática como diagnóstico definitivo.
 
 ---
 
-# 26. UX global esperada
+# 47. Referencias clínicas iniciales para diseño de validaciones
 
-RememberMind debe ser usable por personal que trabaja diariamente en una residencia geriátrica.
+Estas fuentes sirven como **punto de partida para diseñar reglas**, no como autorización automática para hardcodear todos sus valores.
 
-La experiencia debe priorizar:
+## Presión arterial
 
-1. claridad;
-2. seguridad;
-3. rapidez operativa;
-4. prevención de errores;
-5. accesibilidad;
-6. consistencia;
-7. estética.
+- National Institute for Health and Care Excellence (NICE). *Hypertension in adults: diagnosis and management (NG136)*. La guía mantiene objetivos específicos para adultos de 80 años o más y exige juicio clínico ante fragilidad/multimorbilidad.
+  - https://www.nice.org.uk/guidance/ng136
 
-Principios:
+- European Society of Cardiology (ESC). *2024 ESC Guidelines for the Management of Elevated Blood Pressure and Hypertension*. Incluye manejo específico de personas muy mayores o frágiles y atención centrada en el paciente.
+  - https://www.escardio.org/guidelines/clinical-practice-guidelines/all-esc-practice-guidelines/elevated-blood-pressure-and-hypertension/
 
-- cada input tiene label visible;
-- validaciones inline claras;
-- feedback de loading;
-- prevención de doble submit;
-- success/info/warning/danger consistentes;
-- rojo para error/riesgo/alerta real;
-- toasts para resultados transitorios;
-- alertas críticas persistentes en la pantalla;
-- modales para decisiones/focos breves, no para procesos gigantes;
-- responsive desktop/tablet/mobile;
-- glassmorphism cálido y moderado como acento visual;
-- contexto del residente visible cuando reduce el riesgo de registrar información en la persona equivocada.
+- American Heart Association. *Orthostatic Hypotension in Adults With Hypertension: A Scientific Statement* (2024). Define hipotensión ortostática y aborda monitoreo en adultos con hipertensión.
+  - https://www.ahajournals.org/doi/10.1161/HYP.0000000000000236
+
+Cada nueva familia de reglas —saturación, temperatura, glucemia, dolor, nutrición, movilidad, sueño, etc.— debe tener su propia revisión documental antes de activar umbrales automáticos.
 
 ---
 
-# 27. Qué NO es RememberMind
+# 48. Comunicación por WhatsApp
 
-RememberMind no debe convertirse en:
+La integración futura de WhatsApp debe utilizar la plataforma oficial de WhatsApp Business y respetar sus políticas vigentes.
 
-- un ERP financiero;
-- un sistema de facturación;
-- un sistema de pagos;
-- una plataforma de voluntariado;
-- un multitenant de instituciones/sedes sin decisión futura;
-- una tabla universal de observaciones clínicas;
-- un sistema que permita al sistema experto sustituir decisiones profesionales.
+Como criterio de diseño:
 
-El baseline actual excluye expresamente economía, facturación, pagos, cuentas/movimientos financieros, voluntariado, instituciones, sedes y tablas universales genéricas.
+- el destinatario debe esperar/aceptar la comunicación según la política aplicable;
+- mensajes iniciados por la institución pueden requerir plantillas aprobadas;
+- las plantillas deben tener propósito claro;
+- debe existir mecanismo de baja/gestión de preferencias cuando corresponda;
+- no enviar historia clínica completa ni detalles innecesarios;
+- el detalle sensible se consulta dentro de RememberMind bajo autenticación.
 
----
+Referencia inicial:
 
-# 28. Hacia dónde debe llegar el sistema
-
-La meta funcional de la V2 operativa es disponer de una plataforma coherente donde:
-
-1. la institución gestione el ingreso correctamente;
-2. cada residente tenga un expediente longitudinal completo;
-3. cada profesional vea y registre solo lo que corresponde a su competencia;
-4. Enfermería pueda ejecutar el cuidado diario de forma eficiente;
-5. la medicación sea trazable desde prescripción hasta administración;
-6. planes e intervenciones puedan programarse y registrar su ejecución;
-7. cambios clínicos/cognitivos/funcionales puedan observarse en el tiempo;
-8. estudios y documentos queden integrados al expediente;
-9. familia tenga acceso seguro y limitado;
-10. alertas tengan ciclo de vida y responsables;
-11. toda operación crítica sea auditable;
-12. la información operativa sirva como base confiable para la futura capa inteligente.
+- WhatsApp Business Messaging/Commerce Policy y material oficial de Meta sobre message templates.
+  - https://business.whatsapp.com/policy
 
 ---
 
-# 29. Futuro: sistema experto para deterioro cognitivo
+# 49. Fuera de alcance de este documento
 
-## Estado
+Este mapa maestro **no define**:
 
-La BDD operativa congelada declara que las tablas futuras del sistema experto están **fuera del baseline actual de 69 tablas**.
-
-La documentación académica del proyecto plantea como dirección un:
-
-> sistema experto para la detección temprana del deterioro cognitivo en adultos mayores, basado en modelado multicriterio.
-
-La documentación también contempla conceptos como:
-
-- inteligencia artificial simbólica;
-- ingeniería del conocimiento;
+- arquitectura ni reglas de un sistema experto;
 - base de conocimiento;
-- hechos, criterios y reglas;
+- red semántica;
 - motor de inferencia;
-- modelado multicriterio;
-- ponderaciones/umbrales;
-- clasificación de riesgo cognitivo;
-- alertas preventivas;
-- explicabilidad;
-- trazabilidad del razonamiento;
-- validación con experto humano.
-
-## Principio funcional
-
-La futura capa inteligente debería **consumir información confiable del sistema operativo** y generar apoyo a la decisión, no reemplazar al profesional.
-
-Conceptualmente:
-
-```text
-HISTORIAL DEL RESIDENTE
-   ├─ controles cognitivos
-   ├─ instrumentos autorizados
-   ├─ conducta
-   ├─ movilidad
-   ├─ valoraciones profesionales
-   ├─ otros criterios validados
-   ↓
-BASE DE CONOCIMIENTO
-   ↓
-MOTOR DE INFERENCIA / MODELO MULTICRITERIO
-   ↓
-CLASIFICACIÓN / SEÑAL PREVENTIVA
-   ↓
-EXPLICACIÓN DEL PORQUÉ
-   ↓
-REVISIÓN POR PROFESIONAL
-   ↓
-ACCIÓN HUMANA / SEGUIMIENTO
-```
-
-## Lo que todavía NO debe inventarse
-
-Hasta que exista una definición metodológica validada, Codex no debe inventar:
-
+- reglas de producción;
 - pesos;
-- reglas clínicas;
-- umbrales;
-- scores;
-- sensibilidad/especificidad objetivo;
-- clasificación exacta de riesgo;
-- preguntas o baremos de instrumentos protegidos;
-- nuevas tablas del sistema experto.
+- criterios multicriterio;
+- predicciones;
+- clasificación automatizada de riesgo cognitivo;
+- explicabilidad de inferencias.
 
-Esos elementos requieren documentación científica/metodológica, validación y decisiones explícitas del proyecto.
+Esos elementos deben existir en un documento independiente dedicado exclusivamente a esa parte del proyecto.
 
 ---
 
-# 30. Flujo global resumido por etapas
+# 50. Resultado final esperado
+
+RememberMind debe llegar a comportarse como un sistema que acompaña el funcionamiento real de una residencia geriátrica:
 
 ```text
-┌─────────────────────────────────────────────┐
-│ 0. CONFIGURACIÓN INSTITUCIONAL              │
-│ usuarios • personal • roles • permisos      │
-│ áreas • turnos • habitaciones • camas       │
-└──────────────────────┬──────────────────────┘
-                       ↓
-┌─────────────────────────────────────────────┐
-│ 1. PREADMISIÓN                              │
-│ postulante • datos • documentos • revisión  │
-└──────────────────────┬──────────────────────┘
-                       ↓
-              APROBADA / RECHAZADA
-                       ↓
-┌─────────────────────────────────────────────┐
-│ 2. ADMISIÓN FORMAL                          │
-│ residente • contacto • consentimiento       │
-│ cama • ocupación • historial • documentos   │
-└──────────────────────┬──────────────────────┘
-                       ↓
-┌─────────────────────────────────────────────┐
-│ 3. CONTEXTO DEL RESIDENTE                   │
-│ perfil • ubicación • expediente • familia   │
-└──────────────────────┬──────────────────────┘
-                       ↓
-┌─────────────────────────────────────────────┐
-│ 4. ATENCIÓN INTERDISCIPLINARIA              │
-│ médico • enfermería • psicología • nutrición│
-│ fisioterapia • pedagogía                    │
-└──────────────────────┬──────────────────────┘
-                       ↓
-┌─────────────────────────────────────────────┐
-│ 5. CUIDADO DIARIO Y SEGUIMIENTO             │
-│ signos • dolor • cognición • conducta       │
-│ sueño • ingesta • hidratación • movilidad   │
-│ heridas • jornadas • pases                  │
-└──────────────────────┬──────────────────────┘
-                       ↓
-┌─────────────────────────────────────────────┐
-│ 6. TRATAMIENTO / CUIDADO PLANIFICADO        │
-│ prescripciones • horarios • administraciones│
-│ planes • intervenciones • programaciones    │
-│ ejecuciones                                 │
-└──────────────────────┬──────────────────────┘
-                       ↓
-┌─────────────────────────────────────────────┐
-│ 7. EVALUACIÓN Y EVIDENCIA                    │
-│ estudios • informes • documentos clínicos   │
-│ instrumentos • valoraciones profesionales   │
-└──────────────────────┬──────────────────────┘
-                       ↓
-┌─────────────────────────────────────────────┐
-│ 8. VIDA INSTITUCIONAL                       │
-│ actividades • participación • visitas       │
-│ familia                                     │
-└──────────────────────┬──────────────────────┘
-                       ↓
-┌─────────────────────────────────────────────┐
-│ 9. ALERTAS + AUDITORÍA + TRAZABILIDAD       │
-│ detectar • reconocer • asignar • atender    │
-│ cerrar • conservar historia                 │
-└──────────────────────┬──────────────────────┘
-                       ↓
-┌─────────────────────────────────────────────┐
-│ 10. FUTURA CAPA EXPERTA                     │
-│ apoyo cognitivo • riesgo • explicación      │
-│ alerta preventiva • revisión profesional    │
-└─────────────────────────────────────────────┘
+ADMINISTRA LA INSTITUCIÓN
+        +
+ORGANIZA AL PERSONAL
+        +
+ADMITE CORRECTAMENTE AL RESIDENTE
+        +
+ORGANIZA SU CUIDADO
+        +
+REGISTRA SU SALUD DIARIAMENTE
+        +
+PRESERVA SU HISTORIA
+        +
+COMPARA SU EVOLUCIÓN
+        +
+VISUALIZA TENDENCIAS
+        +
+DETECTA CAMBIOS SEGÚN REGLAS AUTORIZADAS
+        +
+GENERA ALERTAS ÚTILES
+        +
+NOTIFICA A QUIEN CORRESPONDA
+        +
+PERMITE INTERVENIR
+        +
+REGISTRA EL RESULTADO
+        +
+ENTREGA CONTINUIDAD ENTRE TURNOS Y PROFESIONALES
 ```
 
----
+El objetivo no es acumular información.
 
-# 31. Regla para desarrollar cualquier módulo
-
-Antes de implementar una funcionalidad, Codex debería poder responder:
-
-1. ¿En qué etapa del mapa maestro estoy?
-2. ¿Quién utiliza esta función?
-3. ¿Sobre qué residente/postulante/recurso trabaja?
-4. ¿Qué información necesita ver?
-5. ¿Qué puede registrar o modificar?
-6. ¿Qué no debe poder hacer?
-7. ¿Qué estado previo requiere?
-8. ¿Qué estado/resultados produce?
-9. ¿Qué otros módulos consume?
-10. ¿Qué otros módulos dependen de este resultado?
-11. ¿Qué debe quedar auditado?
-12. ¿Qué historia debe conservarse?
-13. ¿Qué errores deben impedirse?
-14. ¿Qué pruebas demuestran que el flujo está completo?
-
-Si Codex no puede responder estas preguntas, todavía no comprende suficientemente el módulo.
-
----
-
-# 32. Aspectos no definidos por las fuentes actuales
-
-Las fuentes consultadas no permiten cerrar todavía, sin inventar requisitos, algunos procesos globales como:
-
-- flujo institucional completo de egreso/baja/fallecimiento/traslado del residente;
-- reglas exactas de comunicación institucional con familiares;
-- política definitiva de notificaciones externas;
-- reglas clínicas exactas y umbrales del futuro sistema experto;
-- nuevas estructuras persistentes para la capa experta.
-
-Cuando estos procesos sean necesarios deben documentarse y aprobarse explícitamente antes de convertirlos en reglas de producto o estructura de BDD.
-
----
-
-# 33. Fuentes internas principales
-
-Este mapa deriva principalmente de:
-
-- `REMEMBERMIND_BDD_BASELINE_CONGELADO.md`;
-- `REMEMBERMIND_BDD_69_TABLAS.md`;
-- documentación académica vigente del proyecto sobre sistema experto y deterioro cognitivo;
-- reglas vigentes de los `AGENTS.md` del repositorio.
-
-Cuando este documento contradiga una fuente superior, prevalece la fuente superior y este mapa debe actualizarse.
+El objetivo es que la información registrada ayude a **cuidar mejor, detectar cambios oportunamente, coordinar al equipo y comprender la evolución real del residente**, manteniendo siempre la responsabilidad clínica en los profesionales competentes.
