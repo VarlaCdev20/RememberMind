@@ -4,27 +4,55 @@
 
 RememberMind is an institutional system for a real geriatric residence. Treat it as an operational, clinical and administrative system, not as a demo, CRUD collection or academic prototype.
 
+The operational product must be useful and complete **without depending on the future expert system**. Its core mission is to organize the institution, resident admission, daily care, clinical follow-up, medication, interdisciplinary work, longitudinal history, alerts, communication and traceability.
+
 A feature is complete only when the applicable process, actors, states, business rules, authorization, validation, persistence, integration, traceability, error handling, UX and tests work together.
 
 ## Sources of truth
 
-Use project sources contextually. Do not design RememberMind from memory when the repository already defines the behavior.
+Use project sources contextually. Do not design RememberMind from memory when the project already defines the behavior.
 
 Priority when sources conflict:
 
 1. Current explicit instruction from the project owner.
-2. `REMEMBERMIND_BDD_BASELINE_CONGELADO.md` and `REMEMBERMIND_BDD_69_TABLAS.md` for DB structure, persistence terminology, PK/FK, relationships and structural invariants.
-3. Current functional documentation for the module.
-4. Current V2 code as implementation evidence, not automatic functional truth.
-5. Tests as executable evidence; they may be outdated.
-6. README and auxiliary technical documentation.
-7. Legacy/history only to understand migration intent; never to reintroduce V1.
+2. `docs/REMEMBERMIND_MAPA_MAESTRO.md` for the current functional vision of the normal operational system.
+3. `REMEMBERMIND_BDD_BASELINE_CONGELADO.md` and `REMEMBERMIND_BDD_69_TABLAS.md` for frozen DB structure, persistence terminology, PK/FK, relationships and structural invariants.
+4. Current functional documentation for the module.
+5. Current V2 code as implementation evidence, not automatic functional truth.
+6. Tests as executable evidence; they may be outdated.
+7. README and auxiliary technical documentation.
+8. Legacy/history only to understand migration intent; never to reintroduce V1.
 
-Never silently blend contradictory sources. Follow the higher-authority source and correct the lower implementation. Ask only when higher-authority sources do not resolve a material institutional decision.
+For DB structure, the frozen baseline remains authoritative even when another document describes desired behavior.
+
+Never silently blend contradictory sources. Follow the higher-authority source for the concern being changed and correct lower implementation. Ask only when authoritative sources do not resolve a material institutional/clinical decision.
+
+## Separation: operational system vs expert system
+
+Do not mix the normal operational system with the future expert system.
+
+The operational system includes, among other things:
+- institution and staff management;
+- preadmission/admission;
+- residents and beds;
+- clinical record;
+- daily care and shift continuity;
+- medication;
+- longitudinal monitoring;
+- charts/comparisons;
+- direct rule-based operational/clinical alerts when rules have been explicitly approved;
+- email/WhatsApp notification integrations when authorized;
+- audit and traceability.
+
+The expert system will be documented separately and may later include semantic networks, decision trees, inference, multicriteria models, predictive reasoning, expert recommendations or intelligent risk classification.
+
+Unless the task explicitly targets the expert-system document/module, **do not introduce expert inference, semantic-network logic, learned decision trees, prediction or autonomous treatment recommendations into ordinary operational features**.
+
+The normal system may generate an alert from an explicit approved rule; that does not by itself make it an expert-system function.
 
 ## Frozen DB governance
 
-The Operational DB V2 is frozen and contains exactly 69 operational tables. `residentes` is the central entity.
+The Operational DB V2 is frozen and contains exactly 69 operational tables. `residentes` is the central entity. Technical Laravel/Jetstream/Sanctum/Spatie tables and future expert-system persistence are outside that operational count.
 
 Without explicit owner approval, do not add/delete/merge/split/rename/modify:
 - tables or columns;
@@ -57,6 +85,29 @@ Use these terms consistently:
 
 Do not use them as synonyms. Do not create new dependencies on `AdultoMayor`, `adultos_mayores`, `adulto_mayor`, `cod_am`, `cod_usu` or other V1 names.
 
+## Active functional roles
+
+Current owner-approved functional roles are **10**:
+
+1. `SUPERADMINISTRADOR`
+2. `GERENTE`
+3. `ADMINISTRADOR`
+4. `ENFERMEROS`
+5. `MEDICO GENERAL/GERIATRA`
+6. `PSICOLOGO/A`
+7. `PEDAGOGO`
+8. `NUTRICIONISTA`
+9. `FISIOTERAPEUTA`
+10. `FAMILIAR`
+
+`VOLUNTARIO` remains outside current scope.
+
+Important distinction:
+- `GERENTE`: higher-level personnel/HR organization, staffing, coverage and institutional personnel management supported by the current model; no automatic clinical competence.
+- `ADMINISTRADOR`: daily institutional operation, preadmissions/admissions, beds, residents, contacts, documentation, journeys/operational assignments, activities/visits and administrative follow-up; no clinical write merely by role.
+
+Roles/permissions remain in Spatie technical tables; do not add business columns/tables merely to represent `GERENTE`.
+
 ## Mandatory institutional flow
 
 Preserve:
@@ -70,6 +121,65 @@ Rules:
 - occupied beds are unavailable;
 - a resident cannot have two active bed occupancies;
 - atomic institutional operations must use transactions when required.
+
+## Daily-care and longitudinal principle
+
+RememberMind must preserve the resident's evolution rather than only the latest value.
+
+When relevant, flows should support:
+- current record;
+- previous values;
+- baseline/history;
+- trend data;
+- before/after comparison when clinically meaningful;
+- active alerts;
+- professional authorship and business date/time;
+- continuity between shifts and professionals.
+
+Do not overwrite longitudinal health/care history to maintain a single "current state".
+
+## Clinical forms and validation
+
+Clinical/care forms must represent the approved process, not be artificially reduced to two generic fields.
+
+Use all relevant approved DB fields and present appropriate context. If a clinically necessary structured field is missing from the frozen schema, document the gap instead of silently adding a column or hiding the data in JSON/EAV.
+
+Separate:
+- input/format validation;
+- plausible-value validation;
+- business/domain validation;
+- approved clinical-rule evaluation;
+- personalized resident objectives when explicitly configured by an authorized professional;
+- longitudinal change/trend analysis.
+
+Do not hardcode clinical thresholds from intuition, age alone or developer assumptions. Clinical thresholds/rules require an identified source, applicable population/context and professional/institutional approval before they drive alerts.
+
+An unusual but plausible value should not automatically be rejected simply because it is clinically concerning; preserve the real measurement and apply confirmation/alert workflow according to the approved rule.
+
+## Alerts
+
+Operational alerts are a first-class system feature.
+
+Preserve the distinction:
+- `alertas`: the alert;
+- `eventos_alerta`: lifecycle/history.
+
+A normal operational alert may be created from an explicit approved rule, incident, pending/omitted process or other defined event. Do not require the expert system for this.
+
+When applicable, alert behavior should support:
+- creation;
+- severity/category defined by approved rules;
+- assignment/responsible context;
+- recognition;
+- attention;
+- escalation when institutionally defined;
+- closure/annulment;
+- deduplication/idempotency;
+- full event history.
+
+Do not overwrite alert history. Do not create a new alert on every refresh/retry for the same unresolved business event.
+
+External notification (email/WhatsApp) is secondary to the internal alert. Channel failure must not remove or invalidate the internal alert.
 
 ## Autonomy
 
@@ -93,10 +203,12 @@ Ask before decisions that create or change:
 - sensitive permission boundaries;
 - critical institutional flow;
 - legal obligations;
+- expert-system clinical reasoning;
+- autonomous treatment recommendation behavior;
 - irreversible/high-impact actions;
 - real-data destruction or exposure.
 
-Technical autonomy means Codex decides **how** to implement. It does not mean Codex invents **what** the institution should require.
+Technical autonomy means Codex decides **how** to implement. It does not mean Codex invents **what** the institution or clinical practice should require.
 
 ## Responsible scope
 
@@ -154,9 +266,11 @@ Sensitive operations must enforce the applicable combination of:
 
 Important boundaries:
 - SUPERADMINISTRADOR: read all, not automatic clinical write.
+- GERENTE: personnel/HR and staffing management only as authorized; no clinical write by role.
 - ADMINISTRADOR: institutional/operational management, not clinical write merely by role.
 - MEDICO GENERAL/GERIATRA: ordinary prescribing role.
 - ENFERMEROS: may administer/document care; do not prescribe or modify the medical order.
+- PSICOLOGO/A, NUTRICIONISTA, FISIOTERAPEUTA and PEDAGOGO: write only within professional scope.
 - FAMILIAR: only authorized information for linked residents.
 - A professional may not attribute a clinical record to another professional through manipulated input.
 
@@ -177,6 +291,19 @@ Use the domain mechanism where applicable:
 
 Use `spatie/laravel-activitylog` for approved technical/business audit. Do not create a second corporate audit table. Clinical provenance remains in domain records.
 
+## External notifications and integrations
+
+Email and WhatsApp may be used only as complementary notification channels when explicitly configured/authorized.
+
+Rules:
+- internal RememberMind state remains the source of truth;
+- send the minimum sensitive information necessary;
+- do not turn email/WhatsApp into a parallel clinical record;
+- re-authorize detailed access inside RememberMind;
+- model retries/failures safely;
+- avoid duplicate business alerts because a delivery retry occurs;
+- paid/external services, privacy-impacting integrations or clinical-data processing require owner approval.
+
 ## Errors
 
 Never swallow failures or fake success.
@@ -195,7 +322,7 @@ Always consult project sources first.
 
 When requirements are missing, external research is allowed to understand real geriatric, clinical, legal or technical practice. Prefer official regulation, public-health bodies, standards, official framework/package docs and high-quality scientific sources.
 
-External evidence is not automatically a RememberMind rule. New clinical rules, responsibilities, sensitive permissions, legal obligations or DB changes require owner decision.
+External evidence is not automatically a RememberMind rule. New clinical rules, responsibilities, sensitive permissions, legal obligations, alert thresholds or DB changes require owner/professional decision as appropriate.
 
 For Laravel/packages, verify the actual installed version and current official documentation before relying on an uncertain API.
 
@@ -205,7 +332,7 @@ Use `resources/AGENTS.md` for visual work.
 
 RememberMind should be professional, warm, clear, accessible and role/process-oriented. Respect the canonical Design System and use UI/UX Pro Max when relevant.
 
-A UI must not invent clinical severity; the domain determines meaning and the UI represents it.
+A UI must not invent clinical severity; the approved domain rule determines meaning and the UI represents it.
 
 ## Testing
 
@@ -302,8 +429,9 @@ A task is finished only when, proportionally to scope:
 - backend authorization is correct;
 - validation is correct;
 - persistence/relationships are consistent;
+- longitudinal history/traceability are preserved where applicable;
 - atomic operations use transactions where needed;
-- audit/traceability are preserved;
+- operational alerts preserve lifecycle/history when applicable;
 - UI states are complete when applicable;
 - integration/navigation/routes are connected;
 - related legacy is removed;
@@ -334,4 +462,4 @@ Additional rules apply under:
 - `resources/AGENTS.md`
 - `tests/AGENTS.md`
 
-Scoped files may strengthen these rules but must not weaken frozen DB governance, backend authorization, traceability, V2 migration, data protection or Git safety.
+Scoped files may strengthen these rules but must not weaken frozen DB governance, backend authorization, traceability, V2 migration, data protection, separation from expert-system logic or Git safety.
