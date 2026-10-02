@@ -29,7 +29,7 @@
 
             isSubmitting: false,
 
-            correo: @js(old('correo')),
+            correo: @js(old('correo') ?? ''),
 
             password: '',
 
@@ -44,7 +44,7 @@
             |--------------------------------------------------------------------------
             */
 
-            recoverCorreo: @js(old('correo')),
+            recoverCorreo: @js(old('correo') ?? ''),
 
             recoverTouched: false,
 
@@ -115,7 +115,7 @@
                         '1'
                     );
                 } catch (error) {
-                    //
+                    console.warn('No se pudo guardar el estado temporal de recuperación de contraseña.', error);
                 }
             },
 
@@ -139,7 +139,7 @@
                         'rm-password-recovery-pending'
                     );
                 } catch (error) {
-                    //
+                    console.warn('No se pudo limpiar el estado de recuperación de contraseña.', error);
                 }
             },
 
@@ -817,7 +817,7 @@
     )
                             }}" alt="
                                 Centro Geriátrico
-                                Jardín de los Recuerdos
+                                Los Almendros, centro de día y residencia geriátrica
                             " class="
                                 h-12
                                 w-auto
@@ -835,9 +835,7 @@
                                     leading-tight
                                     text-titulo
                                 ">
-                                CENTRO GERIÁTRICO
-                                <br>
-                                JARDÍN DE LOS RECUERDOS
+                                LOS ALMENDROS
                             </h1>
 
 

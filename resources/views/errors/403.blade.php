@@ -3,15 +3,14 @@
 <head>
  <meta charset="utf-8">
  <meta name="viewport" content="width=device-width, initial-scale=1">
- <title>Acceso Restringido - CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS</title>
+ <title>Acceso restringido | Los Almendros — RememberMind</title>
  
  <!-- Fonts -->
  <link rel="preconnect" href="https://fonts.googleapis.com">
  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;900&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
  
- <!-- Tailwind CSS (Direct CDN for the static error page) -->
- <script src="https://cdn.tailwindcss.com"></script>
+ @vite('resources/frontend/styles/app.css')
  
  <!-- Phosphor Icons -->
  <script src="https://unpkg.com/@phosphor-icons/web"></script>
@@ -32,7 +31,7 @@
  {{-- LOGO DE LA CASA --}}
  <div class="flex justify-center mb-6">
  <div class="flex h-14 w-14 items-center justify-center rounded-2xl bg-boton-acento text-inverso font-black shadow-lg shadow-[#E27D60]/20">
- <span class="text-2xl font-outfit">C</span>
+ <span class="text-2xl font-outfit">L</span>
  </div>
  </div>
 
@@ -61,7 +60,7 @@
 
  {{-- PIE DE PÁGINA --}}
  <div class="mt-12 pt-6 border-t border-borde-suave text-[10px] font-bold uppercase tracking-widest text-apoyo">
- CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS - RememberMind
+ LOS ALMENDROS · RememberMind
  </div>
 
  </div>

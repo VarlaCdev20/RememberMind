@@ -15,11 +15,11 @@
        2. SUPERFICIES (Jerarquía cálida de alto contraste)
        Evita el blanco plano; utiliza beige clarito canónico.
        ============================================================ */
-    --rm-surface-beige: #F5EBE1;    /* Beige clarito canónico RememberMind */
-    --rm-surface: #F5EBE1;          /* Cards y contenedores base (Beige clarito) */
-    --rm-surface-soft: #EFE5D9;     /* Paneles intermedios y toolbars (Beige suave) */
-    --rm-surface-alt: #EAE0D4;      /* Bloques internos y celdas agrupadas (Beige cálido) */
-    --rm-surface-strong: #E2D6C8;   /* Fondos activos y cabeceras contrastadas */
+    --rm-surface-beige: #FBF7F2;
+    --rm-surface: #FBF7F2;
+    --rm-surface-soft: #F7F0E9;
+    --rm-surface-alt: #F2E8DD;
+    --rm-surface-strong: #EEE2D4;
 
     /* ============================================================
        3. BORDES (Delimitación sutil y definida)
@@ -43,7 +43,7 @@
        ============================================================ */
     --rm-primary: #344D7A;           /* Botón primario: 8.44:1 vs #FFFFFF */
     --rm-primary-hover: #2D4268;
-    --rm-primary-soft: #E8EEF8;
+    --rm-primary-soft: #F7E1D9;
 
     /* ============================================================
        6. ACENTO (Coral cálido)
@@ -79,12 +79,12 @@
     --rm-danger-action: #A7443B;
     --rm-danger-action-hover: #913931;
 
-    /* Info: Identidad (#778EAD) vs Acción con texto blanco (#5F7899: 4.53:1) */
-    --rm-info: #778EAD;
-    --rm-info-hover: #637A99;
-    --rm-info-soft: #E9EEF6;
-    --rm-info-action: #5F7899;
-    --rm-info-action-hover: #4F6582;
+    /* Información: azul marino del panel de enfermería, sin celeste. */
+    --rm-info: #435F7A;
+    --rm-info-hover: #344D67;
+    --rm-info-soft: #EEEAE5;
+    --rm-info-action: #344D7A;
+    --rm-info-action-hover: #2D4268;
     /* ============================================================
        8. PALETA CATEGÓRICA DE GRÁFICOS (10 Colores Diferenciables)
        Distingue categorías asistenciales sin implicar severidad.
@@ -94,7 +94,7 @@
     --rm-chart-3: #5F9271;   /* Verde salvia */
     --rm-chart-4: #C9913E;   /* Ocre / Ámbar dorado */
     --rm-chart-5: #7565A8;   /* Lavanda / Amatista */
-    --rm-chart-6: #4E8CA6;   /* Azul cerúleo */
+    --rm-chart-6: #806B9C;   /* Ciruela */
     --rm-chart-7: #A85C73;   /* Rosa viejo / Berenjena */
     --rm-chart-8: #7B879A;   /* Pizarra / Gris acero */
     --rm-chart-9: #9A744E;   /* Siena / Madera cálida */
@@ -108,8 +108,8 @@
 .dark,
 [data-theme="dark"] {
     /* 1. APP & LAYOUT */
-    --rm-bg-app: #0F172A;
-    --rm-bg-layout: #131D24;
+    --rm-bg-app: #1C2431;
+    --rm-bg-layout: #202A35;
 
     /* 2. SUPERFICIES (Capas oscuras traslúcidas cálidas) */
     --rm-surface-beige: #18222A;
@@ -129,19 +129,19 @@
     --rm-text-body: #E2E8F0;
     --rm-text-muted: #94A3B8;
     --rm-text-soft: #CBD5E1;
-    --rm-text-inverse: #0F172A;
+    --rm-text-inverse: #1C2431;
 
     /* 5. ACCIONES PRIMARIAS */
-    --rm-primary: #3B82F6;
-    --rm-primary-hover: #2563EB;
-    --rm-primary-soft: rgba(59, 130, 246, 0.15);
+    --rm-primary: #EAA082;
+    --rm-primary-hover: #F0B197;
+    --rm-primary-soft: rgba(234, 160, 130, 0.18);
 
     /* 6. ACENTO */
-    --rm-accent: #F97316;
-    --rm-accent-hover: #EA580C;
-    --rm-accent-soft: rgba(249, 115, 22, 0.15);
-    --rm-accent-action: #F97316;
-    --rm-accent-action-hover: #EA580C;
+    --rm-accent: #EAA082;
+    --rm-accent-hover: #F0B197;
+    --rm-accent-soft: rgba(234, 160, 130, 0.18);
+    --rm-accent-action: #EAA082;
+    --rm-accent-action-hover: #F0B197;
 
     /* 7. ESTADOS SEMÁNTICOS */
     --rm-success: #10B981;
@@ -160,21 +160,21 @@
     --rm-danger-action: #EF4444;
     --rm-danger-action-hover: #DC2626;
 
-    --rm-info: #38BDF8;
-    --rm-info-hover: #0284C7;
-    --rm-info-soft: rgba(56, 189, 248, 0.15);
-    --rm-info-action: #38BDF8;
-    --rm-info-action-hover: #0284C7;
+    --rm-info: #B9C4D3;
+    --rm-info-hover: #D1D9E2;
+    --rm-info-soft: rgba(185, 196, 211, 0.16);
+    --rm-info-action: #B9C4D3;
+    --rm-info-action-hover: #D1D9E2;
 
     /* 8. PALETA GRÁFICOS OSCURA */
-    --rm-chart-1: #60A5FA;
+    --rm-chart-1: #EAA082;
     --rm-chart-2: #FB923C;
     --rm-chart-3: #34D399;
     --rm-chart-4: #FBBF24;
     --rm-chart-5: #A78BFA;
-    --rm-chart-6: #38BDF8;
+    --rm-chart-6: #B9A1CF;
     --rm-chart-7: #F472B6;
     --rm-chart-8: #94A3B8;
     --rm-chart-9: #D97706;
-    --rm-chart-10: #2DD4BF;
+    --rm-chart-10: #91B99D;
 }

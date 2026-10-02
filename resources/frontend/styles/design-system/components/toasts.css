@@ -1,0 +1,12 @@
+.rm-toast-region { position: fixed; z-index: 90; right: var(--rm-space-4); bottom: var(--rm-space-4); width: min(380px, calc(100vw - 32px)); }
+.rm-toast { display: flex; align-items: flex-start; gap: var(--rm-space-3); padding: var(--rm-space-4); border-radius: var(--rm-radius-card); border: 1px solid var(--rm-border); background: var(--rm-surface); color: var(--rm-text-title); box-shadow: var(--rm-shadow-lg); }
+.rm-toast > i { flex: none; font-size: 20px; }
+.rm-toast p { flex: 1; margin: 0; line-height: 1.4; }
+.rm-toast-success { border-left: 4px solid var(--rm-success-action); }
+.rm-toast-info { border-left: 4px solid var(--rm-info-action); }
+.rm-toast-warning { border-left: 4px solid var(--rm-warning); }
+.rm-toast-danger { border-left: 4px solid var(--rm-danger-action); }
+.rm-toast-success > i { color: var(--rm-success-action); }
+.rm-toast-info > i { color: var(--rm-info-action); }
+.rm-toast-warning > i { color: var(--rm-state-warning-text); }
+.rm-toast-danger > i { color: var(--rm-danger-action); }

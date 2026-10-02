@@ -1,8 +1,14 @@
 # RememberMind Design System — Fuente Única de Verdad
 
-Bienvenido a la documentación oficial del **Design System canónico, versionado y gobernado de RememberMind** (Centro Geriátrico Jardín de los Recuerdos / Casa Amandita).
+Bienvenido a la documentación oficial del **Design System canónico, versionado y gobernado de RememberMind** para Los Almendros.
 
 Este sistema define la fuente única de verdad para interfaces, componentes, tokens, patrones y reglas de accesibilidad, asegurando una experiencia homogénea, acogedora, cálida y profesional en toda la plataforma.
+
+## Dirección visual vigente
+
+La referencia aprobada para la unificación es el diseño cálido del panel de enfermería: fondo crema, superficies marfil, coral para identidad y foco, verde salvia para éxito y azul marino para texto y acciones principales. La marca visible es **Los Almendros**. No se usan celestes. El estado informativo conserva semántica azul mediante un tono marino de alto contraste.
+
+Los diez roles comparten estos tokens y componentes. La vista operativa carga `resources/frontend/styles/sistema.css`, que utiliza este Design System sin la cascada histórica. El acceso y las pantallas de cuenta todavía cargan `resources/frontend/styles/app.css`; sus clases anteriores se conectan temporalmente a los tokens canónicos mediante `resources/frontend/styles/tokens/legacy-bridge.css`.
 
 ---
 

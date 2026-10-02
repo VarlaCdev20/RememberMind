@@ -167,3 +167,8 @@
     border-color: var(--rm-border-hover);
     transform: translateY(-1px);
 }
+
+@media (max-width: 640px) {
+    .rm-btn { min-height: 44px; }
+    .rm-btn-icon { width: 44px; height: 44px; min-width: 44px; min-height: 44px; }
+}

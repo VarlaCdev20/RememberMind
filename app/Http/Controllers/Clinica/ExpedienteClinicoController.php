@@ -24,17 +24,22 @@ class ExpedienteClinicoController extends Controller
     public function index(Request $request, Residente $residente): JsonResponse
     {
         $this->authorize('view', $residente);
+        $usuario = $request->user();
+        $permitido = fn (string $permiso, callable $consulta) => $usuario->can($permiso) ? $consulta() : collect();
+
         return response()->json([
             'residente' => $residente,
-            'atenciones' => Atencion::query()->whereBelongsTo($residente, 'residente')->with(['area', 'personal', 'notas'])->latest('fecha_hora')->get(),
-            'antecedentes' => AntecedenteClinico::query()->where('cod_residente', $residente->cod_residente)->latest('fecha_referencia')->get(),
-            'diagnosticos' => Diagnostico::query()->where('cod_residente', $residente->cod_residente)->latest('fecha_hora')->get(),
-            'alergias' => Alergia::query()->where('cod_residente', $residente->cod_residente)->latest('fecha_hora')->get(),
-            'signos_vitales' => SignoVital::query()->where('cod_residente', $residente->cod_residente)->latest('fecha_hora')->limit(50)->get(),
-            'dolor' => ValoracionDolor::query()->where('cod_residente', $residente->cod_residente)->latest('fecha_hora')->limit(50)->get(),
-            'antropometria' => MedicionAntropometrica::query()->where('cod_residente', $residente->cod_residente)->latest('fecha_hora')->limit(50)->get(),
-            'incidentes' => Incidente::query()->where('cod_residente', $residente->cod_residente)->latest('fecha_hora')->get(),
-            'indicaciones' => IndicacionClinica::query()->where('cod_residente', $residente->cod_residente)->latest('fecha_hora')->get(),
+            'atenciones' => Atencion::query()->whereBelongsTo($residente, 'residente')
+                ->with(['area', 'personal', ...($usuario->can('notas_clinicas.ver') ? ['notas'] : [])])
+                ->latest('fecha_hora')->get(),
+            'antecedentes' => $permitido('antecedentes_clinicos.ver', fn () => AntecedenteClinico::query()->where('cod_residente', $residente->cod_residente)->latest('fecha_referencia')->get()),
+            'diagnosticos' => $permitido('diagnosticos.ver', fn () => Diagnostico::query()->where('cod_residente', $residente->cod_residente)->latest('fecha_hora')->get()),
+            'alergias' => $permitido('alergias.ver', fn () => Alergia::query()->where('cod_residente', $residente->cod_residente)->latest('fecha_hora')->get()),
+            'signos_vitales' => $permitido('signos_vitales.ver', fn () => SignoVital::query()->where('cod_residente', $residente->cod_residente)->latest('fecha_hora')->limit(50)->get()),
+            'dolor' => $permitido('valoraciones_dolor.ver', fn () => ValoracionDolor::query()->where('cod_residente', $residente->cod_residente)->latest('fecha_hora')->limit(50)->get()),
+            'antropometria' => $permitido('mediciones_antropometricas.ver', fn () => MedicionAntropometrica::query()->where('cod_residente', $residente->cod_residente)->latest('fecha_hora')->limit(50)->get()),
+            'incidentes' => $permitido('incidentes.ver', fn () => Incidente::query()->where('cod_residente', $residente->cod_residente)->latest('fecha_hora')->get()),
+            'indicaciones' => $permitido('indicaciones_clinicas.ver', fn () => IndicacionClinica::query()->where('cod_residente', $residente->cod_residente)->latest('fecha_hora')->get()),
         ]);
     }
 

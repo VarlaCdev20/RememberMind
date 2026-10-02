@@ -1,0 +1,10 @@
+:root {
+    --rm-glass-background: color-mix(in srgb, var(--rm-surface) 90%, transparent);
+    --rm-glass-border: var(--rm-border-soft);
+    --rm-glass-shadow: var(--rm-shadow-sm);
+    --rm-glass-blur: 10px;
+}
+
+@supports not (backdrop-filter: blur(1px)) {
+    :root { --rm-glass-background: var(--rm-surface); }
+}

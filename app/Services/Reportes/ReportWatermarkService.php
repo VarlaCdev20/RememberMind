@@ -11,7 +11,7 @@ class ReportWatermarkService
      */
     public function getText(): string
     {
-        return 'CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS';
+        return 'LOS ALMENDROS';
     }
 
     /**

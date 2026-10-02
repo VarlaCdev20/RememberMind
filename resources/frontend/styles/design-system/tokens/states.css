@@ -43,3 +43,15 @@
     --rm-row-danger-bg: rgba(167, 68, 59, 0.05);
     --rm-row-warning-bg: rgba(201, 154, 75, 0.05);
 }
+
+.dark,
+[data-theme="dark"] {
+    --rm-state-success-text: #A9D8B3;
+    --rm-state-success-border: rgba(169, 216, 179, 0.45);
+    --rm-state-warning-text: #F2CA86;
+    --rm-state-warning-border: rgba(242, 202, 134, 0.45);
+    --rm-state-danger-text: #F2A8A2;
+    --rm-state-danger-border: rgba(242, 168, 162, 0.45);
+    --rm-state-info-text: #B9C4D3;
+    --rm-state-info-border: rgba(185, 196, 211, 0.45);
+}

@@ -3,7 +3,7 @@
 <head>
  <meta charset="UTF-8">
  <meta name="viewport" content="width=device-width, initial-scale=1.0">
- <title>@yield('titulo', 'Reporte Institucional — CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS')</title>
+ <title>@yield('titulo', 'Reporte institucional — Los Almendros')</title>
  <style>
  * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -180,8 +180,8 @@
  font-size: 9pt;
  }
  .rm-alerta.info {
- border-left-color: #3b82f6;
- background: #EFF6FF;
+ border-left-color: #435F7A;
+ background: #EEEAE5;
  }
  .rm-alerta.ok {
  border-left-color: #10b981;

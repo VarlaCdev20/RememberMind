@@ -1,32 +1,21 @@
-{{--
- Componente: ui/page-header
- Uso: <x-ui.page-header titulo="Título" subtitulo="Descripción" icono="ph-users">
- Slot opcional con botones de acción
- </x-ui.page-header>
---}}
-@props([
- 'titulo' => '',
- 'subtitulo' => '',
- 'icono' => 'ph-squares-four',
- 'color' => 'bg-boton-principal', // clase bg para el ícono
-])
+@props(['titulo', 'subtitulo' => null, 'breadcrumb' => []])
 
-<div class="rm-page-header">
- <div class="flex items-center gap-3">
- <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full {{ $color }} shadow-sm">
- <i class="ph-bold {{ $icono }} text-lg text-inverso"></i>
- </div>
- <div>
- <h1 class="rm-section-title">{{ $titulo }}</h1>
- @if($subtitulo)
- <p class="rm-section-subtitle">{{ $subtitulo }}</p>
- @endif
- </div>
- </div>
-
- @if($slot->isNotEmpty())
- <div class="flex shrink-0 flex-wrap items-center gap-2">
- {{ $slot }}
- </div>
- @endif
-</div>
+<header class="rm-page-header">
+    <div class="rm-page-title-group">
+        @if(count($breadcrumb))
+            <nav aria-label="Ruta de navegación" class="rm-breadcrumb">
+                <ol>
+                    @foreach($breadcrumb as $paso)
+                        <li>
+                            @if(isset($paso['url']))<a href="{{ $paso['url'] }}">{{ $paso['label'] }}</a>
+                            @else<span aria-current="page">{{ $paso['label'] }}</span>@endif
+                        </li>
+                    @endforeach
+                </ol>
+            </nav>
+        @endif
+        <h1 class="rm-page-title">{{ $titulo }}</h1>
+        @if($subtitulo)<p class="rm-page-subtitle">{{ $subtitulo }}</p>@endif
+    </div>
+    @if($slot->isNotEmpty())<div class="rm-page-actions">{{ $slot }}</div>@endif
+</header>

@@ -12,7 +12,7 @@
  }
  });
 
- // Tema de CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS para alertas (botones color #BC6C25)
+ // Tema de LOS ALMENDROS para alertas (botones color #BC6C25)
  const swalAmandita = Swal.mixin({
  confirmButtonColor: '#BC6C25',
  cancelButtonColor: '#6B7280',

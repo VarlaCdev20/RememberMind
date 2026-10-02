@@ -1,0 +1,79 @@
+/* Alias temporales de las clases Tailwind históricas hacia el Design System canónico.
+   Permiten conservar las vistas de acceso y perfil mientras se migran sus clases. */
+:root {
+    --color-fondo-app: var(--rm-bg-app);
+    --color-fondo-layout: var(--rm-bg-layout);
+    --color-fondo-panel: var(--rm-surface-soft);
+    --color-fondo-panel-alt: var(--rm-surface-alt);
+    --color-fondo-panel-fuerte: var(--rm-surface-strong);
+    --color-fondo-card: var(--rm-surface);
+    --color-fondo-card-suave: var(--rm-surface-soft);
+    --color-fondo-card-calido: var(--rm-surface-alt);
+    --color-fondo-input: var(--rm-surface);
+    --color-fondo-tabla: var(--rm-surface);
+    --color-fondo-hover: var(--rm-surface-alt);
+    --color-fondo-empty: var(--rm-surface-soft);
+    --surface-card: var(--rm-surface);
+    --surface-card-soft: var(--rm-surface-soft);
+    --surface-card-warm: var(--rm-surface-alt);
+
+    --color-titulo: var(--rm-text-title);
+    --color-subtitulo: var(--rm-text-title);
+    --color-parrafo: var(--rm-text-body);
+    --color-texto-apoyo: var(--rm-text-muted);
+    --color-texto-suave: var(--rm-text-soft);
+    --color-texto-muted: var(--rm-text-muted);
+    --color-texto-inverso: var(--rm-text-inverse);
+    --color-label: var(--rm-text-title);
+    --color-meta: var(--rm-text-muted);
+    --color-placeholder: var(--rm-text-muted);
+
+    --color-borde-general: var(--rm-border);
+    --color-borde-suave: var(--rm-border-soft);
+    --color-borde-medio: var(--rm-border);
+    --color-borde-fuerte: var(--rm-border-strong);
+    --color-borde-focus: var(--rm-accent-action);
+    --color-borde-dashed: var(--rm-border);
+    --color-borde-error: var(--rm-danger);
+    --color-borde-success: var(--rm-success);
+    --color-borde-warning: var(--rm-warning);
+    --color-borde-info: var(--rm-info);
+
+    --color-boton-principal: var(--rm-primary);
+    --color-boton-principal-hover: var(--rm-primary-hover);
+    --color-boton-principal-texto: var(--rm-text-inverse);
+    --color-boton-acento: var(--rm-accent-action);
+    --color-boton-acento-hover: var(--rm-accent-action-hover);
+    --color-boton-acento-texto: var(--rm-text-inverse);
+    --color-boton-secundario: var(--rm-surface-alt);
+    --color-boton-secundario-hover: var(--rm-surface-strong);
+    --color-boton-secundario-texto: var(--rm-text-title);
+    --color-boton-fantasma-bg: transparent;
+    --color-boton-fantasma-hover: var(--rm-surface-alt);
+    --color-boton-fantasma-texto: var(--rm-text-title);
+    --color-boton-fantasma-borde: var(--rm-border);
+
+    --color-estado-exito-bg: var(--rm-success-soft);
+    --color-estado-exito-borde: var(--rm-success);
+    --color-estado-exito-texto: var(--rm-state-success-text);
+    --color-estado-peligro-bg: var(--rm-danger-soft);
+    --color-estado-peligro-borde: var(--rm-danger);
+    --color-estado-peligro-texto: var(--rm-state-danger-text);
+    --color-estado-advertencia-bg: var(--rm-warning-soft);
+    --color-estado-advertencia-borde: var(--rm-warning);
+    --color-estado-advertencia-texto: var(--rm-state-warning-text);
+    --color-estado-info-bg: var(--rm-info-soft);
+    --color-estado-info-borde: var(--rm-info);
+    --color-estado-info-texto: var(--rm-state-info-text);
+
+    --color-modulo-salud: var(--rm-success-action);
+    --color-modulo-cognitivo: var(--rm-chart-5);
+    --color-input-ring-focus: var(--rm-accent-soft);
+    --color-scrollbar-track: var(--rm-surface-soft);
+    --color-scrollbar-thumb: var(--rm-border-strong);
+    --color-scrollbar-thumb-hover: var(--rm-text-muted);
+    --sombra-card: var(--rm-shadow-sm);
+    --sombra-card-hover: var(--rm-shadow-md);
+    --sombra-panel: var(--rm-shadow-md);
+    --sombra-modal: var(--rm-shadow-lg);
+}

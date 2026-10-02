@@ -13,7 +13,8 @@ class ReporteV2Controller extends Controller
     public function residentePdf(Request $request, Residente $residente)
     {
         $this->authorize('view', $residente);
-        $residente->load(['admisiones', 'vinculosContacto.contacto', 'ocupacionActiva.cama.habitacion', 'atenciones.notas', 'prescripciones.medicamento']);
+        abort_unless($request->user()->can('atenciones.ver') && $request->user()->can('prescripciones.ver'), 403);
+        $residente->load(['atenciones', 'prescripciones.medicamento']);
         activity('Reportes')->causedBy($request->user())->performedOn($residente)->log('Expediente PDF generado.');
         return Pdf::loadView('reportes.residente', compact('residente'))->download('expediente-'.$residente->cod_residente.'.pdf');
     }

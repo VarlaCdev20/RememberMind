@@ -87,9 +87,9 @@
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    background: #EFF6FF;
-    color: #1E3A8A;
-    border: 1px solid #BFDBFE;
+    background: var(--rm-accent-soft);
+    color: var(--rm-accent-action);
+    border: 1px solid var(--rm-border);
     width: fit-content;
 }
 
@@ -179,19 +179,19 @@
 }
 
 .rm-drawer-metric-card.metric-danger {
-    border-bottom: 2.5px solid #EF4444;
+    border-bottom: 2.5px solid var(--rm-danger);
 }
 
 .rm-drawer-metric-card.metric-warning {
-    border-bottom: 2.5px solid #F97316;
+    border-bottom: 2.5px solid var(--rm-warning);
 }
 
 .rm-drawer-metric-card.metric-success {
-    border-bottom: 2.5px solid #10B981;
+    border-bottom: 2.5px solid var(--rm-success);
 }
 
 .rm-drawer-metric-card.metric-info {
-    border-bottom: 2.5px solid #0EA5E9;
+    border-bottom: 2.5px solid var(--rm-info);
 }
 
 /* 8. Tarjetas y Bloques Internos */
@@ -288,7 +288,7 @@
     width: 8px;
     height: 8px;
     border-radius: 9999px;
-    background: #1E3A8A;
+    background: var(--rm-accent);
     border: 2px solid var(--rm-surface-soft, #EFE5D9);
 }
 
@@ -360,9 +360,9 @@
 }
 
 .dark .rm-drawer-badge {
-    background: rgba(30, 58, 138, 0.35);
-    color: #93C5FD;
-    border-color: rgba(147, 197, 253, 0.3);
+    background: var(--rm-accent-soft);
+    color: var(--rm-accent);
+    border-color: var(--rm-accent);
 }
 
 .dark .rm-drawer-title {

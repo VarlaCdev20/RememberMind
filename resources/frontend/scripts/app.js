@@ -116,5 +116,5 @@ window.RMCharts = {
 import { iniciarEfectosAmbientales } from './components/efectos-ambientales.js';
 iniciarEfectosAmbientales(AOS);
 
-// Tema institucional — Geriátrico Jardín de los Recuerdos
+// Tema institucional — Los Almendros
 import './utilities/modo-oscuro.js';

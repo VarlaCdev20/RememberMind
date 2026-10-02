@@ -64,12 +64,10 @@
 /* Variante Métrica / KPI Compacta (100–110px de altura) */
 .rm-card-metric {
     padding: 10px 14px;
-    background-color: rgba(254, 251, 246, 0.55);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(228, 214, 199, 0.55);
+    background-color: var(--rm-surface);
+    border: 1px solid var(--rm-border);
     border-radius: 14px;
-    box-shadow: 0 4px 20px rgba(60, 45, 30, 0.04);
+    box-shadow: var(--rm-shadow-sm);
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -78,11 +76,9 @@
 }
 
 .dark .rm-card-metric {
-    background-color: rgba(20, 28, 36, 0.50);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border-color: rgba(255, 255, 255, 0.08);
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+    background-color: var(--rm-surface);
+    border-color: var(--rm-border);
+    box-shadow: var(--rm-shadow-sm);
 }
 
 .rm-card-metric .rm-metric-label {

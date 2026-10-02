@@ -391,7 +391,7 @@ export function rmGaugeConfig(value, max = 100, color = null, customOptions = {}
 // --- Preset: Micrográfico / Sparkline Clínico con Movimiento Suave Translúcido ---
 export function rmSparklineChartConfig(labels, data, color = null, customOptions = {}) {
     const isDark = rmIsDark();
-    const mainColor = color || rmGetCss('--rm-chart-1') || (isDark ? '#60A5FA' : '#344D7A');
+    const mainColor = color || rmGetCss('--rm-chart-1') || (isDark ? '#EAA082' : '#344D7A');
 
     // Gradiente vertical translúcido para el área
     const fillGradient = (context) => {

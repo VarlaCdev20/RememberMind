@@ -36,7 +36,8 @@
     margin: 0 0 var(--rm-space-1) 0;
 }
 
-.rm-empty-state-desc {
+.rm-empty-state-desc,
+.rm-empty-state-text {
     font-size: var(--rm-font-body);
     color: var(--rm-text-muted);
     max-width: 420px;

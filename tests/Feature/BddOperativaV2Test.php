@@ -21,6 +21,7 @@ use App\Models\Preadmision;
 use App\Models\PreguntaInstrumento;
 use App\Models\Prescripcion;
 use App\Models\Residente;
+use App\Models\SignoVital;
 use App\Models\RespuestaInstrumento;
 use App\Models\Turno;
 use App\Models\TipoEstudioClinico;
@@ -187,7 +188,7 @@ class BddOperativaV2Test extends TestCase
         $ajeno = $this->usuarioRol('familiar.ajeno@test.local','FAMILIAR');
         $this->assertFalse(Gate::forUser($ajeno)->allows('view', $residente));
         $this->assertFalse(Role::query()->where('name','VOLUNTARIO')->exists());
-        $this->assertCount(9, Role::all());
+        $this->assertCount(10, Role::all());
     }
 
     public function test_superadministrador_puede_ver_todas_las_tablas_operativas(): void
@@ -206,7 +207,7 @@ class BddOperativaV2Test extends TestCase
         $residente = app(FormalizarAdmision::class)->ejecutar($datos['preadmision'], ['cod_cama'=>$datos['cama']->cod_cama,'cod_contacto'=>$datos['contacto']->cod_contacto], $datos['usuario']);
         $super = User::query()->where('correo', 'admincasaamandita@gmail.com')->firstOrFail();
 
-        $this->actingAs($super)->get('/dashboard')->assertOk()->assertSee('Panel institucional');
+        $this->actingAs($super)->get('/dashboard')->assertOk()->assertSee('Panel institucional')->assertSee('Los Almendros')->assertDontSee('Jardín de los Recuerdos');
         $this->actingAs($super)->get(route('admin.residentes.show', $residente))->assertOk()->assertSee($residente->cod_residente);
     }
 
@@ -232,6 +233,73 @@ class BddOperativaV2Test extends TestCase
 
         $this->actingAs($datos['familiar'])->get(route('admin.residentes.show', $propio))->assertOk();
         $this->actingAs($datos['familiar'])->get(route('admin.residentes.show', $ajeno))->assertForbidden();
+        $this->actingAs($datos['familiar'])->get('/dashboard')
+            ->assertOk()->assertSee('Rosa Flores')->assertDontSee('José Rojas');
+    }
+
+    public function test_panel_y_expediente_familiar_no_exponen_indicadores_ni_registros_clinicos(): void
+    {
+        $datos = $this->escenarioAdmision(true);
+        $residente = app(FormalizarAdmision::class)->ejecutar($datos['preadmision'], ['cod_cama'=>$datos['cama']->cod_cama,'cod_contacto'=>$datos['contacto']->cod_contacto], $datos['usuario']);
+        $area = Area::query()->create(['cod_area'=>'ARE_F','nombre'=>'Clínica','estado'=>'ACTIVA']);
+        $personal = Personal::query()->create(['cod_personal'=>'PER_F','cod_usuario'=>$datos['usuario']->cod_usuario,'nombres'=>'Mario','apellido_paterno'=>'Médico','numero_documento'=>'DOC-F','profesion'=>'MÉDICO','estado'=>'ACTIVO']);
+        $this->crearPrescripcion([...$datos, 'area'=>$area, 'personal'=>$personal], $residente);
+
+        $this->actingAs($datos['familiar'])->get('/dashboard')
+            ->assertOk()->assertSee('Residentes admitidos')->assertSee('Residentes vinculados')->assertSee(route('admin.residentes.show', $residente))->assertDontSee('Preadmisiones pendientes');
+        $this->actingAs($datos['familiar'])->get(route('admin.residentes.show', $residente))
+            ->assertOk()->assertDontSee('Prescripciones recientes')->assertDontSee('Paracetamol')->assertDontSee('Signos vitales recientes');
+        $this->actingAs($datos['familiar'])->get(route('admin.reportes.residente', $residente))->assertForbidden();
+    }
+
+    public function test_expediente_json_respeta_el_permiso_de_cada_registro_clinico(): void
+    {
+        [$datos, $residente] = $this->escenarioClinico();
+        SignoVital::query()->create(['cod_signo'=>'SIG_PRIV','cod_residente'=>$residente->cod_residente,
+            'cod_personal'=>$datos['personal']->cod_personal,'fecha_hora'=>now(),
+            'temperatura'=>36.7,'estado'=>'REGISTRADO']);
+        $psicologa = $this->usuarioRol('psicologia.visual@test.local', 'PSICOLOGO/A');
+
+        $this->actingAs($psicologa)->getJson(route('admin.expediente.index', $residente))
+            ->assertOk()->assertJsonCount(0, 'signos_vitales');
+    }
+
+    public function test_expediente_json_incluye_signos_vitales_para_enfermeria(): void
+    {
+        [$datos, $residente] = $this->escenarioClinico();
+        SignoVital::query()->create(['cod_signo'=>'SIG_ENF','cod_residente'=>$residente->cod_residente,
+            'cod_personal'=>$datos['personal']->cod_personal,'fecha_hora'=>now(),
+            'temperatura'=>36.7,'estado'=>'REGISTRADO']);
+        $enfermera = $this->usuarioRol('enfermeria.visual@test.local', 'ENFERMEROS');
+
+        $this->actingAs($enfermera)->getJson(route('admin.expediente.index', $residente))
+            ->assertOk()->assertJsonCount(1, 'signos_vitales');
+    }
+
+    public function test_vista_clinica_muestra_medicion_actual_y_anterior_sin_asignar_severidad(): void
+    {
+        [$datos, $residente] = $this->escenarioClinico();
+        foreach ([['SIG_1', 125, 82, now()->subHour()], ['SIG_2', 120, 80, now()]] as [$codigo, $sistolica, $diastolica, $fecha]) {
+            SignoVital::query()->create(['cod_signo'=>$codigo,'cod_residente'=>$residente->cod_residente,
+                'cod_personal'=>$datos['personal']->cod_personal,'fecha_hora'=>$fecha,
+                'presion_sistolica'=>$sistolica,'presion_diastolica'=>$diastolica,'estado'=>'REGISTRADO']);
+        }
+        $medico = $this->usuarioRol('medico.visual@test.local', 'MEDICO GENERAL/GERIATRA');
+
+        $this->actingAs($medico)->get(route('admin.residentes.show', $residente))
+            ->assertOk()->assertSee('Presión arterial')->assertSee('120 / 80')
+            ->assertSee('125 / 82')->assertDontSee('Crítico');
+    }
+
+    public function test_filtro_preadmisiones_conserva_estado_y_paginacion(): void
+    {
+        $this->escenarioAdmision();
+        $super = User::query()->where('correo', 'admincasaamandita@gmail.com')->firstOrFail();
+
+        $this->actingAs($super)->get(route('admin.preadmisiones.index', ['estado'=>'PENDIENTE']))
+            ->assertOk()->assertSee('No hay solicitudes con ese estado');
+        $this->actingAs($super)->get(route('admin.preadmisiones.index', ['estado'=>'APROBADA']))
+            ->assertOk()->assertSee('Rosa Flores');
     }
 
     public function test_alerta_conserva_historial_de_eventos(): void

@@ -18,7 +18,7 @@
 .rm-label {
     display: block;
     font-family: var(--rm-font-ui, system-ui, sans-serif);
-    font-size: 11.5px;
+    font-size: 12px;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.035em;
@@ -36,7 +36,7 @@
 .rm-textarea {
     width: 100%;
     font-family: var(--rm-font-ui, system-ui, sans-serif);
-    font-size: 12.5px;
+    font-size: 14px;
     color: var(--rm-text-title);
     background-color: color-mix(in srgb, var(--rm-surface) 96%, transparent);
     border: 1px solid var(--rm-border);
@@ -60,7 +60,7 @@
 .rm-select:focus,
 .rm-textarea:focus {
     border-color: var(--rm-accent) !important;
-    box-shadow: 0 0 0 3px rgba(226, 125, 96, 0.22) !important;
+    box-shadow: 0 0 0 3px var(--rm-accent-soft) !important;
     background-color: var(--rm-surface);
 }
 
@@ -76,6 +76,17 @@
 /* Select flecha cálida */
 .rm-select {
     cursor: pointer;
+}
+
+@media (max-width: 640px) {
+    .rm-input,
+    .rm-select {
+        height: 44px;
+        line-height: 44px;
+        font-size: 16px;
+    }
+
+    .rm-textarea { font-size: 16px; }
 }
 
 /* Estado de Error */
@@ -96,15 +107,15 @@
 
 /* Mensajes de Ayuda y Error */
 .rm-help {
-    font-size: 11px;
+    font-size: 12px;
     color: var(--rm-text-muted);
     margin-top: 2px;
 }
 
 .rm-error {
-    font-size: 11px;
+    font-size: 12px;
     font-weight: 600;
-    color: var(--rm-danger, #E0564C);
+    color: var(--rm-state-danger-text);
     margin-top: 2px;
     display: flex;
     align-items: center;

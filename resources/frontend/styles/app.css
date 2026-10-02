@@ -1,5 +1,5 @@
 /* ============================================================
-   RememberMind / CENTRO GERIATRICO JARDIN DE LOS RECUERDOS
+   RememberMind / LOS ALMENDROS
    Entrada principal de estilos.
    ============================================================ */
 
@@ -10,10 +10,10 @@
 @import './components/animaciones-transiciones.css';
 @import './components/componentes-ui.css';
 @import './design-system/index.css';
+@import './tokens/legacy-bridge.css';
 
 @import './base/documento.css';
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-

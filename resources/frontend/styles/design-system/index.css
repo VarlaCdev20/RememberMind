@@ -1,7 +1,7 @@
 ﻿/* ============================================================
-   REMEMBERMIND DESIGN SYSTEM â€” ÃNDICE CANÃ“NICO
-   Fuente Ãºnica de verdad de estilos y componentes.
-   Orden de cascada: Tokens â†’ Componentes â†’ Patrones.
+   REMEMBERMIND DESIGN SYSTEM — ÍNDICE CANÓNICO
+   Fuente única de verdad de estilos y componentes.
+   Orden de cascada: Tokens → Componentes → Patrones.
    ============================================================ */
 
 /* 1. TOKENS */
@@ -14,6 +14,7 @@
 @import './tokens/motion.css';
 @import './tokens/accessibility.css';
 @import './tokens/chart-colors.css';
+@import './tokens/glass.css';
 
 /* 2. COMPONENTES */
 @import './components/buttons.css';
@@ -26,6 +27,7 @@
 @import './components/modals.css';
 @import './components/drawers.css';
 @import './components/alerts.css';
+@import './components/toasts.css';
 @import './components/charts.css';
 @import './components/empty-states.css';
 
@@ -35,4 +37,4 @@
 @import './patterns/resident-summary.css';
 @import './patterns/clinical-table.css';
 @import './patterns/clinical-detail.css';
-
+@import './patterns/app-shell.css';

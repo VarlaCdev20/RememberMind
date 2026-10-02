@@ -1,0 +1,6 @@
+@import '../assets/fuentes.css';
+@import './design-system/index.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;

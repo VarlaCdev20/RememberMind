@@ -24,11 +24,9 @@ class ResidentePolicy
             return $user->can('residentes.ver');
         }
 
-        $contacto = $user->contactos()->value('cod_contacto');
-
-        return $contacto && ResidenteContacto::query()
+        return ResidenteContacto::query()
             ->where('cod_residente', $residente->cod_residente)
-            ->where('cod_contacto', $contacto)
+            ->whereIn('cod_contacto', $user->contactos()->select('cod_contacto'))
             ->where('autoriza_informacion', true)
             ->where('estado', 'ACTIVO')
             ->exists();

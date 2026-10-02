@@ -18,23 +18,30 @@ class DashboardController extends Controller
         $usuario = request()->user();
         if ($usuario->hasRole('FAMILIAR')) {
             $codigos = \App\Models\ResidenteContacto::query()
-                ->whereIn('cod_contacto', $usuario->contactos()->pluck('cod_contacto'))
+                ->whereIn('cod_contacto', $usuario->contactos()->select('cod_contacto'))
                 ->where('autoriza_informacion', true)->where('estado', 'ACTIVO')
                 ->pluck('cod_residente');
-            $resumen = [
-                'residentes_admitidos' => Residente::query()->whereIn('cod_residente', $codigos)->where('estado', 'ADMITIDO')->count(),
-                'preadmisiones_pendientes' => 0, 'admisiones_activas' => 0,
-                'camas_ocupadas' => 0, 'alertas_abiertas' => 0,
-            ];
-            return request()->expectsJson() ? response()->json($resumen) : view('pages.dashboard', compact('resumen'));
+            $residentesVinculados = Residente::query()->whereIn('cod_residente', $codigos)
+                ->where('estado', 'ADMITIDO')->orderBy('apellido_paterno')->get();
+            $resumen = ['residentes_admitidos' => $residentesVinculados->count()];
+            return request()->expectsJson() ? response()->json($resumen) : view('pages.dashboard', compact('resumen', 'residentesVinculados'));
         }
-        $resumen = [
-            'residentes_admitidos' => Residente::query()->where('estado', 'ADMITIDO')->count(),
-            'preadmisiones_pendientes' => Preadmision::query()->where('estado', 'PENDIENTE')->count(),
-            'admisiones_activas' => Admision::query()->where('estado', 'ACTIVA')->count(),
-            'camas_ocupadas' => OcupacionCama::query()->where('estado', 'ACTIVA')->count(),
-            'alertas_abiertas' => Alerta::query()->whereNotIn('estado', ['CERRADA', 'ANULADA'])->count(),
-        ];
+        $resumen = [];
+        if ($usuario->can('viewAny', Residente::class)) {
+            $resumen['residentes_admitidos'] = Residente::query()->where('estado', 'ADMITIDO')->count();
+        }
+        if ($usuario->can('preadmisiones.ver')) {
+            $resumen['preadmisiones_pendientes'] = Preadmision::query()->where('estado', 'PENDIENTE')->count();
+        }
+        if ($usuario->can('admisiones.ver')) {
+            $resumen['admisiones_activas'] = Admision::query()->where('estado', 'ACTIVA')->count();
+        }
+        if ($usuario->can('ocupaciones_cama.ver')) {
+            $resumen['camas_ocupadas'] = OcupacionCama::query()->where('estado', 'ACTIVA')->count();
+        }
+        if ($usuario->can('alertas.ver')) {
+            $resumen['alertas_abiertas'] = Alerta::query()->whereNotIn('estado', ['CERRADA', 'ANULADA'])->count();
+        }
 
         return request()->expectsJson() ? response()->json($resumen) : view('pages.dashboard', compact('resumen'));
     }

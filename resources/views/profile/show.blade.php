@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Mi perfil · {{ config('app.name', 'RememberMind') }}</title>
+    <title>Mi perfil · RememberMind · Los Almendros</title>
     @vite(['resources/frontend/styles/app.css', 'resources/frontend/scripts/app.js'])
     @livewireStyles
 </head>

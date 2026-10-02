@@ -122,7 +122,7 @@ class ResetPasswordNotification extends Notification
             )
 
             ->salutation(
-                'Centro Geriátrico Jardín de los Recuerdos'
+                'Los Almendros'
             );
     }
 

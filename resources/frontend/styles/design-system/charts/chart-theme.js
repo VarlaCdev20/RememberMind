@@ -42,7 +42,7 @@ export function rmChartPalette() {
         if (val) return val;
         const fallbacks = [
             '#344D7A', '#D9745B', '#5F9271', '#C9913E', '#7565A8',
-            '#4E8CA6', '#A85C73', '#7B879A', '#9A744E', '#568A80'
+            '#806B9C', '#A85C73', '#7B879A', '#9A744E', '#568A80'
         ];
         return fallbacks[i] || '#344D7A';
     });
@@ -63,31 +63,31 @@ export function rmChartSemanticColors() {
         warningSoft: rmGetCss('--rm-chart-warning-soft')  || (isDark ? 'rgba(251,191,36,0.18)' : '#FEF3E2'),
         success:     rmGetCss('--rm-chart-success')      || (isDark ? '#34D399' : '#2D8A6E'),
         successSoft: rmGetCss('--rm-chart-success-soft')  || (isDark ? 'rgba(52,211,153,0.18)' : '#E6F5EE'),
-        info:        rmGetCss('--rm-chart-info')         || (isDark ? '#60A5FA' : '#2563EB'),
-        infoSoft:    rmGetCss('--rm-chart-info-soft')    || (isDark ? 'rgba(96,165,250,0.18)' : '#EFF6FF'),
+        info:        rmGetCss('--rm-chart-info')         || (isDark ? '#B9C4D3' : '#435F7A'),
+        infoSoft:    rmGetCss('--rm-chart-info-soft')    || (isDark ? 'rgba(185,196,211,0.16)' : '#EEEAE5'),
         neutral:     rmGetCss('--rm-chart-neutral')      || (isDark ? '#94A3B8' : '#64748B'),
     };
 }
 
 // --- Mapeo ESTABLE: Origen Clínico -> Token Permanente ---
 export const CLINICAL_ORIGINS_MAP = {
-    SIGNOS:           { name: 'Signos Vitales',   token: '--rm-chart-6', fallback: '#F43F5E' }, // Vivid Rose
-    MEDICACION:       { name: 'Medicación',       token: '--rm-chart-2', fallback: '#8B5CF6' }, // Vivid Purple
-    INCIDENTE:        { name: 'Incidentes',       token: '--rm-chart-7', fallback: '#F97316' }, // Vivid Orange
-    SOLICITUD_MEDICA: { name: 'Solicitud Médica', token: '--rm-chart-5', fallback: '#06B6D4' }, // Vivid Cyan
-    PLAN:             { name: 'Plan Cuidados',    token: '--rm-chart-1', fallback: '#0EA5E9' }, // Sky Blue
-    SEGUIMIENTO:      { name: 'Seguimiento',      token: '--rm-chart-3', fallback: '#14B8A6' }, // Teal
-    VALORACION:       { name: 'Valoración',       token: '--rm-chart-4', fallback: '#10B981' }, // Emerald
-    FICHA:            { name: 'Ficha Clínica',    token: '--rm-chart-10',fallback: '#F59E0B' }, // Amber
-    MANUAL:           { name: 'Manual',           token: '--rm-chart-8', fallback: '#6366F1' }, // Indigo
-    SISTEMA:          { name: 'Sistema',          token: '--rm-chart-9', fallback: '#64748B' }, // Slate
-    USUARIO:          { name: 'Usuario',          token: '--rm-chart-5', fallback: '#8B5CF6' }, // Purple
+    SIGNOS:           { name: 'Signos Vitales',   token: '--rm-chart-6', fallback: '#806B9C' },
+    MEDICACION:       { name: 'Medicación',       token: '--rm-chart-2', fallback: '#D9745B' },
+    INCIDENTE:        { name: 'Incidentes',       token: '--rm-chart-7', fallback: '#A85C73' },
+    SOLICITUD_MEDICA: { name: 'Solicitud Médica', token: '--rm-chart-5', fallback: '#7565A8' },
+    PLAN:             { name: 'Plan Cuidados',    token: '--rm-chart-1', fallback: '#344D7A' },
+    SEGUIMIENTO:      { name: 'Seguimiento',      token: '--rm-chart-3', fallback: '#5F9271' },
+    VALORACION:       { name: 'Valoración',       token: '--rm-chart-4', fallback: '#C9913E' },
+    FICHA:            { name: 'Ficha Clínica',    token: '--rm-chart-10',fallback: '#568A80' },
+    MANUAL:           { name: 'Manual',           token: '--rm-chart-8', fallback: '#7B879A' },
+    SISTEMA:          { name: 'Sistema',          token: '--rm-chart-9', fallback: '#9A744E' },
+    USUARIO:          { name: 'Usuario',          token: '--rm-chart-5', fallback: '#7565A8' },
 };
 
 export function rmGetOriginColor(origenKey) {
     const meta = CLINICAL_ORIGINS_MAP[origenKey];
     if (meta) {
-        return meta.fallback || rmGetCss(meta.token) || '#344D7A';
+        return rmGetCss(meta.token) || meta.fallback || '#344D7A';
     }
     return '#344D7A';
 }

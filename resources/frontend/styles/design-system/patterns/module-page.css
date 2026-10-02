@@ -56,6 +56,11 @@
     line-height: 1.35;
 }
 
+.rm-page-actions { display: flex; flex-wrap: wrap; gap: var(--rm-space-2); align-items: center; }
+.rm-breadcrumb ol { display: flex; flex-wrap: wrap; gap: var(--rm-space-2); margin: 0 0 var(--rm-space-2); padding: 0; list-style: none; color: var(--rm-text-muted); font-size: 12px; }
+.rm-breadcrumb li + li::before { content: '/'; margin-right: var(--rm-space-2); color: var(--rm-border-strong); }
+.rm-breadcrumb a { color: var(--rm-primary); text-underline-offset: 3px; }
+
 /* 2. Cuadrícula de KPIs */
 .rm-kpi-grid {
     display: grid;

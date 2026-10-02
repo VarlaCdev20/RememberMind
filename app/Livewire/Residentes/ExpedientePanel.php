@@ -21,8 +21,12 @@ class ExpedientePanel extends Component
     public function render()
     {
         return view('livewire.residentes.expediente-panel', [
-            'atenciones' => $this->residente->atenciones()->with(['area', 'personal', 'notas'])->latest('fecha_hora')->limit(20)->get(),
-            'prescripciones' => $this->residente->prescripciones()->with(['medicamento', 'horarios'])->latest('fecha_hora_prescripcion')->limit(20)->get(),
+            'atenciones' => auth()->user()->can('atenciones.ver')
+                ? $this->residente->atenciones()->with(['area', 'personal'])->latest('fecha_hora')->limit(20)->get()
+                : collect(),
+            'prescripciones' => auth()->user()->can('prescripciones.ver')
+                ? $this->residente->prescripciones()->with('medicamento')->latest('fecha_hora_prescripcion')->limit(20)->get()
+                : collect(),
         ]);
     }
 }
