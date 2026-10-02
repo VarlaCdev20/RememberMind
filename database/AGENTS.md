@@ -12,6 +12,16 @@ These define the frozen Operational DB V2.
 
 The current code is not authority over the frozen baseline.
 
+## Operational DB vs expert-system persistence
+
+The frozen DB contains exactly **69 operational tables**.
+
+These tables support the normal institutional, clinical, care, medication, longitudinal-follow-up and alert system.
+
+Future expert-system persistence is explicitly outside this 69-table operational baseline. Do not add semantic-network, decision-tree, inference, prediction, knowledge-base or expert-rule tables to the operational baseline without a separate approved design/change process.
+
+Likewise, ordinary alert tables (`alertas`, `eventos_alerta`) belong to the normal operational system and do not by themselves imply expert-system persistence.
+
 ## Frozen schema
 
 There are exactly **69 operational tables**. Laravel/Jetstream/Sanctum/Spatie technical tables are outside that count.
@@ -43,7 +53,7 @@ FK must preserve the referenced PK name and type/length.
 Do not introduce V1 names such as:
 `AdultoMayor`, `adultos_mayores`, `adulto_mayor`, `cod_am`, `cod_usu`.
 
-## User/person separation
+## User/person/role separation
 
 `usuarios` is an access-account table, not personal identity.
 
@@ -53,6 +63,10 @@ Do not duplicate personal/professional/family identity into `usuarios`. Respect:
 - family/responsible → `contactos`.
 
 Do not invent role/permission tables; Spatie owns technical role/permission tables.
+
+The current functional role decision includes `GERENTE` in addition to the previously documented roles. This is a Spatie/permission concern and does **not** authorize modification of the 69 operational business tables.
+
+If personnel/HR requirements for Gerente need structured data absent from the frozen schema (contracts, salary, recruitment files, etc.), report the gap and request structural approval instead of adding columns/tables by convenience.
 
 ## Nullability and types
 
@@ -77,6 +91,33 @@ Do not create:
 Do not merge prescription and medication administration.
 
 Do not reduce longitudinal history to one overwritable "current value".
+
+## Longitudinal data
+
+The frozen schema intentionally preserves temporal evolution through entities such as:
+- `signos_vitales`;
+- `valoraciones_dolor`;
+- `mediciones_antropometricas`;
+- `controles_cognitivos`;
+- `registros_conductuales`;
+- `registros_sueno`;
+- `registros_ingesta`;
+- `registros_hidratacion`;
+- `registros_eliminacion`;
+- `registros_movilidad`;
+- `heridas` / `curaciones_herida`;
+- `aplicaciones_instrumento`;
+- professional evaluations.
+
+Charts, before/after comparison and trends should be computed/read from this history. Do not add duplicate "current" columns/tables or aggregate snapshots unless separately approved.
+
+## Clinical validation and thresholds
+
+Do not add DB columns or catalogs just to store ad-hoc clinical thresholds without approval.
+
+Clinical rules/ranges may be implemented at application/configuration level only when compatible with the frozen model and formally approved. If the desired personalized range requires new persistent structured fields absent from V2, document the need and request schema approval.
+
+Do not encode developer-invented clinical thresholds into CHECK constraints or migrations.
 
 ## FK and delete policy
 
@@ -125,6 +166,26 @@ Preserve:
 
 Do not merge these concepts.
 
+## Care structure
+
+Preserve:
+`planes_cuidado → intervenciones_cuidado → programaciones_cuidado / ejecuciones_cuidado`
+
+Do not invent `tareas_cuidado`.
+
+## Alerts structure
+
+Preserve:
+`residentes 1:N alertas`
+and
+`alertas 1:N eventos_alerta`.
+
+`alertas` represents the active/business alert; `eventos_alerta` preserves lifecycle history.
+
+Do not create duplicate alert-history tables or overwrite events to store only latest state.
+
+Do not add expert-system inference fields/tables into these entities by convenience.
+
 ## Instruments
 
 Preserve:
@@ -154,6 +215,8 @@ Use `cod_documento_anterior` when the approved schema models document succession
 ## Priority indexes
 
 Besides PK/UNIQUE/FK, preserve the baseline priority indexes, including the approved resident/date, preadmission/state, occupancy/state, prescription/state, medication-administration/date, instrument/date, alert/state/date and study/date indexes.
+
+These indexes support longitudinal and operational queries, including charts and alert dashboards.
 
 Do not add indexes indiscriminately. If a new structural index is outside the frozen baseline and is needed, treat it as a structural proposal.
 
@@ -185,8 +248,10 @@ Seeders/factories must respect:
 - V2 FK;
 - valid state combinations;
 - dependency order;
-- active role/permission model;
+- current active role/permission model;
 - institutional flow.
+
+Role/permission seeders should represent the owner-approved 10-role functional model, including `GERENTE` and excluding `VOLUNTARIO`, without modifying business schema.
 
 Factories should create valid objects by default. Invalid states belong in tests that intentionally construct them.
 
@@ -214,17 +279,21 @@ Fix Models to match the approved DB, not the DB to match incorrect Models.
 ## DB Definition of Done
 
 For relevant DB work verify:
-- exact approved tables/columns;
+- exact approved 69 operational tables/columns;
+- expert-system persistence has not leaked into operational schema;
 - PK/FK names/types;
 - nullability;
 - UNIQUE;
 - indexes;
 - relationships;
+- longitudinal-history structures preserved;
+- alert/event structures preserved;
 - invariants;
 - seeders/factories;
+- current role seed model includes Gerente where appropriate;
 - Models;
 - absence of directly related V1 structures;
 - safe `migrate:fresh --seed` when applicable;
 - related tests.
 
-When validating the whole V2 baseline, distinguish the 69 operational tables from technical package/framework tables.
+When validating the whole V2 baseline, distinguish the 69 operational tables from technical package/framework tables and future separately approved expert-system structures.
