@@ -13,6 +13,12 @@ Avoid:
 - unrelated styles per module;
 - decorative dashboards with low operational value.
 
+## Operational system first
+
+The normal UI must fully support institution, resident care, health follow-up, medication, longitudinal history, charts, alerts, shift continuity and administration **without depending on the future expert system**.
+
+Unless the task explicitly targets the expert-system module, do not add expert predictions, semantic-network explanations, learned decision-tree outputs or autonomous treatment suggestions to ordinary operational screens.
+
 ## Canonical Design System
 
 Before substantial UI work inspect:
@@ -71,7 +77,7 @@ Provide readable fallback when backdrop filtering is unavailable.
 
 ## Shared semantics, not role palettes
 
-Do not create new `--rm-enf-*`, `--rm-medico-*`, `--rm-psico-*`, etc.
+Do not create new `--rm-enf-*`, `--rm-medico-*`, `--rm-gerente-*`, etc.
 
 Roles share one visual system. Roles differ through content, priorities, permissions and actions.
 
@@ -91,7 +97,7 @@ Do not use red decoratively or for normal neutral actions. If everything is red,
 
 Never communicate state with color alone; combine color with text/icon/context where relevant.
 
-Clinical severity must come from domain/backend. Blade/JS must not invent medical thresholds.
+Clinical severity must come from approved backend/domain rules. Blade/JS must not invent medical thresholds.
 
 ## Forms: labels are mandatory
 
@@ -105,10 +111,32 @@ Prefer reusable form components that support:
 - label;
 - required marker;
 - helper text;
+- units where applicable;
 - error text;
 - disabled/read-only state;
 - `aria-invalid`;
 - `aria-describedby`.
+
+## Clinical/care forms
+
+Do not reduce a real clinical/care process to two generic inputs when the approved schema supports meaningful detail.
+
+Use the relevant approved fields and group them into a usable workflow.
+
+A longitudinal health/care form should show, when applicable:
+- resident identity/context;
+- current date/time of the event;
+- visible units;
+- last relevant value;
+- recent trend/chart;
+- approved personalized objective/range when available;
+- relevant active alerts;
+- field-specific validation;
+- observation/context fields present in the approved model.
+
+If a clinically needed structured field is missing from the frozen schema, do not invent a hidden JSON field. Report the structural need.
+
+Use progressive disclosure/sections/steps when a detailed form would otherwise become overwhelming. Complete does not mean visually exhausting.
 
 ## Validation UX
 
@@ -117,7 +145,9 @@ Validation is a first-class UX requirement.
 Every meaningful form should handle:
 - initial state;
 - valid input;
-- invalid input;
+- invalid format;
+- implausible/error input where an approved rule exists;
+- clinically unusual but possible input;
 - processing;
 - success;
 - failure.
@@ -131,6 +161,55 @@ Preserve correctly entered data after validation failure where technically possi
 For dynamic errors, use accessible announcement (`aria-live`, `role="alert"` or appropriate equivalent).
 
 In long forms, move focus/attention to the first relevant error when helpful.
+
+Do not visually treat every unusual clinical value as a data-entry error. Distinguish:
+- impossible/invalid input;
+- valid measurement requiring warning/confirmation;
+- actual alert created by an approved rule.
+
+## Longitudinal charts and comparison
+
+Charts are part of the clinical follow-up UX when the underlying data is longitudinal and comparison adds meaning.
+
+For relevant measurements support useful windows such as:
+- 24 hours;
+- 7 days;
+- 30 days;
+- custom period when appropriate.
+
+Where data/rules support it, visualize:
+- previous value;
+- baseline/history;
+- authorized target/range;
+- min/max;
+- trend;
+- meaningful before/after comparison;
+- markers for alerts/interventions/events.
+
+Potential domains include:
+- blood pressure;
+- heart rate;
+- respiratory rate;
+- temperature;
+- oxygen saturation;
+- glucose if recorded;
+- pain;
+- anthropometry;
+- mobility/functional measures;
+- wounds over time;
+- sleep/intake/hydration and other quantitative/structured tracking when the stored data supports valid visualization.
+
+Do not invent trends when only one observation exists. Do not imply causation simply because an intervention and a change appear near each other on a chart.
+
+## Before/after UX
+
+When the workflow has a meaningful intervention/period, make comparison understandable:
+
+```text
+ANTES → INTERVENCIÓN/PERIODO → DESPUÉS → CAMBIO
+```
+
+Show only variables that are genuinely comparable and authorized for the viewer.
 
 ## Notifications / pop-ups
 
@@ -149,6 +228,29 @@ A generic toast such as "There were errors" may supplement but never replace fie
 Transient toasts are for interaction feedback. Persistent institutional/clinical alerts must also remain visible in the relevant page/banner/card/panel and must not depend on a disappearing toast.
 
 Do not let notification stacks cover critical resident information or primary actions.
+
+## Alert center and alert UX
+
+Normal operational alerts do not require the expert system.
+
+An alert view should make clear:
+- resident/resource;
+- type/category;
+- severity if defined;
+- created time;
+- current state;
+- responsible/assignment when applicable;
+- short reason/context;
+- next action;
+- event history.
+
+Do not create a wall of identical red cards. Prioritize by severity/state/recency and provide filters.
+
+Active alerts must remain visible until resolved according to the real workflow.
+
+Alert actions should support the actual lifecycle: recognize, assign, attend, close/annul or other approved transition.
+
+If an alert was also sent by email/WhatsApp, external delivery status may be shown when useful, but the internal alert remains primary.
 
 ## Modals
 
@@ -222,13 +324,15 @@ Avoid hardcoded hex/font sizes/radii/shadows when semantic tokens exist.
 
 Organize navigation by institutional meaning and role responsibility, not table order.
 
-Examples of conceptual groups:
+Conceptual groups can include:
 - Inicio;
 - Gestión institucional;
+- Personal;
 - Residentes;
 - Atención clínica;
 - Cuidados;
 - Actividades;
+- Alertas;
 - Reportes;
 - Administración/Seguridad.
 
@@ -243,11 +347,35 @@ The active location must be obvious. On mobile use an appropriate drawer/collaps
 Dashboard question:
 **What does this role need to know or do now?**
 
-Prefer actionable information such as pending work, active alerts, bed availability, medication due, resident assignments, incidents or expiring documents when these are real and authorized.
+Prefer actionable information such as pending work, active alerts, bed availability, medication due, resident assignments, incidents, expiring documents or staffing coverage when these are real and authorized.
 
 Do not invent/hardcode metrics to fill space.
 
 Use charts only when trend/distribution/comparison adds understanding. Do not use a chart as decoration. Include labels/legend/tooltips as appropriate and never rely on color alone.
+
+## Role-oriented views
+
+Do not make every role's dashboard/content identical.
+
+- **Gerente:** personnel, staffing/coverage, organization and HR-oriented institutional information supported by the current model.
+- **Administrador:** preadmission/admission/residents/beds/documents/contacts/occupancy/journeys/operational assignments/visits.
+- **Nursing:** assigned residents/location, active orders, medication schedules, alerts, shift controls, care executions and continuity.
+- **Medical:** clinical record, trends, alerts requiring medical review, studies, indications and prescribing workflows.
+- **Psychology/Nutrition/Physiotherapy/Pedagogy:** resident follow-up and interventions within professional scope.
+- **Family:** only authorized linked-resident information.
+- **Superadmin:** broad supervision without automatic clinical-write UI.
+
+## Daily-shift UX
+
+For Nursing/operational care views, make the shift understandable:
+
+**Start:** assigned residents, active alerts, previous shift handoff, medication/care/control due.
+
+**During:** quick access to detailed but usable clinical/care forms and resident context.
+
+**End:** unresolved alerts, pending/omitted care, important changes, incidents and structured handoff.
+
+Do not force users to rediscover the same resident/context on every registration screen.
 
 ## Tables
 
@@ -269,16 +397,12 @@ Do not expose sensitive data merely because it is already loaded.
 
 Persistent clinical alerts and authorized restrictions must have sufficient hierarchy and danger semantics when appropriate.
 
-## Role-oriented views
-
-Do not make every role's dashboard/content identical.
-
-Examples:
-- Administration: preadmission/admission/residents/beds/documents/contacts/occupancy.
-- Nursing: resident/location, active orders, medication schedules, alerts, shift tasks and care records.
-- Medical: deeper clinical record and prescribing workflows.
-- Family: only authorized linked-resident information.
-- Superadmin: broad supervision without automatic clinical-write UI.
+A resident summary should favor:
+- today/current status;
+- trends;
+- pending work;
+- active alerts;
+- history/navigation.
 
 ## Accessibility
 
@@ -305,9 +429,9 @@ Blade is presentation. No Eloquent/SQL queries in views.
 
 `@can` may hide an action but is not backend security.
 
-Client-side calculations do not own permissions, clinical scoring, state or critical rules.
+Client-side calculations do not own permissions, clinical scoring, alert severity or critical rules.
 
-JavaScript/Alpine should manage interaction, not become the domain source of truth.
+JavaScript/Alpine should manage interaction, chart rendering and UX, not become the domain source of truth.
 
 ## Components
 
@@ -316,7 +440,7 @@ Before repeating UI, inspect:
 - Design System components/patterns.
 
 Prefer reusable canonical components for:
-buttons, inputs, selects, textareas, badges, alerts, toasts, modals, drawers, cards, tables, empty/loading states.
+buttons, inputs, selects, textareas, badges, alerts, toasts, modals, drawers, cards, tables, charts/legends, empty/loading states.
 
 Do not over-componentize trivial spans/divs.
 
@@ -331,7 +455,8 @@ Do not assume:
 - one alert;
 - one contact;
 - present photo;
-- tiny descriptions.
+- tiny descriptions;
+- only a few chart points.
 
 Handle long content and optional/missing data.
 
@@ -340,6 +465,8 @@ Operational desktop/tablet may be primary for dense clinical work, but mobile sh
 ## Performance
 
 Glass/blur/animation must not cause obvious jank. Avoid applying expensive blur/shadow effects to hundreds of rows/elements.
+
+Charts must request/render bounded data instead of loading unlimited lifetime history by default.
 
 Use lazy loading/reserved media space when appropriate. Do not sacrifice clarity for animation.
 
@@ -356,20 +483,25 @@ and relevant tests.
 Before completion verify, as applicable:
 - user knows where they are and what to do;
 - primary action is clear;
-- all inputs have labels;
-- validation is visible and accessible;
+- all inputs have labels/units where relevant;
+- detailed clinical forms use approved fields without needless minimalism;
+- validation distinguishes invalid input from clinical warning;
+- longitudinal data exposes useful history/chart/comparison when appropriate;
 - loading/double-submit state exists;
 - success/warning/danger feedback is correct;
 - critical alert persists beyond toast;
+- alert lifecycle/action is understandable;
 - modals are appropriate and accessible;
 - canonical Design System is reused;
 - glassmorphism is controlled;
+- Gerente and Administrador views are not conflated;
 - role visibility is correct;
 - backend is actually connected;
 - empty/error/no-permission states are present;
 - responsive behavior is reasonable;
 - no mock metrics/actions/`href="#"`;
 - no obsolete V1 terminology;
+- no accidental expert-system behavior in normal operational UI;
 - build passes.
 
 A screen is not done merely because it looks attractive.
