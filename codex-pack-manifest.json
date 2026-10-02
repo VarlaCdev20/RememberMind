@@ -1,0 +1,27 @@
+{
+  "branch_basis": "REFAC_BDD",
+  "agents": [
+    "AGENTS.md",
+    "app/AGENTS.md",
+    "database/AGENTS.md",
+    "resources/AGENTS.md",
+    "tests/AGENTS.md"
+  ],
+  "skills": [
+    "remembermind-module-delivery",
+    "remembermind-ui-review",
+    "remembermind-database-audit",
+    "remembermind-security-review",
+    "remembermind-release-check"
+  ],
+  "external_skill": {
+    "name": "ui-ux-pro-max",
+    "upstream": "nextlevelbuilder/ui-ux-pro-max-skill",
+    "install": "npm install -g ui-ux-pro-max-cli@latest; uipro init --ai codex"
+  },
+  "safety": {
+    "remote_push": false,
+    "frozen_db_change_without_approval": false,
+    "destructive_db_reset_on_unknown_data": false
+  }
+}
