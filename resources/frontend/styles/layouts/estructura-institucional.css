@@ -123,10 +123,10 @@
         .rm-shell.is-sidebar-collapsed .rm-sidebar__badge { display: none; }
         .rm-shell.is-sidebar-collapsed .rm-sidebar__item { justify-content: center; padding-inline: 0; }
         .rm-shell.is-sidebar-collapsed .rm-sidebar__submenu { display: none !important; }
-        .rm-shell [data-rm-main], .rm-shell [data-rm-topbar] { margin-left: var(--rm-sidebar-width); transition: margin-left var(--rm-duration-slow) var(--rm-ease-standard), width var(--rm-duration-slow) var(--rm-ease-standard); }
-        .rm-shell [data-rm-topbar] { width: calc(100% - var(--rm-sidebar-width)); }
-        .rm-shell.is-sidebar-collapsed [data-rm-main], .rm-shell.is-sidebar-collapsed [data-rm-topbar] { margin-left: var(--rm-sidebar-collapsed); }
-        .rm-shell.is-sidebar-collapsed [data-rm-topbar] { width: calc(100% - var(--rm-sidebar-collapsed)); }
+        .rm-shell [data-rm-main], .rm-shell [data-rm-topbar], .rm-shell [data-role-preview-banner] { margin-left: var(--rm-sidebar-width); transition: margin-left var(--rm-duration-slow) var(--rm-ease-standard), width var(--rm-duration-slow) var(--rm-ease-standard); }
+        .rm-shell [data-rm-topbar], .rm-shell [data-role-preview-banner] { width: calc(100% - var(--rm-sidebar-width)); }
+        .rm-shell.is-sidebar-collapsed [data-rm-main], .rm-shell.is-sidebar-collapsed [data-rm-topbar], .rm-shell.is-sidebar-collapsed [data-role-preview-banner] { margin-left: var(--rm-sidebar-collapsed); }
+        .rm-shell.is-sidebar-collapsed [data-rm-topbar], .rm-shell.is-sidebar-collapsed [data-role-preview-banner] { width: calc(100% - var(--rm-sidebar-collapsed)); }
     }
 
     @media (max-width: 1023px) {
@@ -135,7 +135,7 @@
         .rm-sidebar__header-toggle { display: none; }
         .rm-sidebar__mobile-close { display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; flex: 0 0 44px; border: 0; border-radius: var(--rm-radius-md); background: transparent; color: var(--rm-sidebar-text); font-size: 20px; }
         .rm-sidebar__flyout, .rm-sidebar__tooltip { display: none !important; }
-        .rm-shell [data-rm-main], .rm-shell [data-rm-topbar] { margin-left: 0; width: 100%; }
+        .rm-shell [data-rm-main], .rm-shell [data-rm-topbar], .rm-shell [data-role-preview-banner] { margin-left: 0; width: 100%; }
     }
 
     .rm-sidebar-overlay { position: fixed; inset: 0; z-index: calc(var(--rm-z-topbar) + 50); background: color-mix(in srgb, var(--rm-sidebar-bg) 38%, transparent); }

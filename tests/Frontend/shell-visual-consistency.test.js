@@ -30,6 +30,7 @@ test('los shells por rol conservan fondo y controles completos en claro, oscuro 
                         <div><button class="rm-topbar__profile">Perfil</button></div>
                       </div>
                     </header>
+                    <section data-role-preview-banner>Modo previsualización</section>
                     <main data-rm-main><div class="${variant === 'superadmin' ? 'rm-dashboard-composition--superadmin' : ''}">Contenido</div></main>
                     </div></body></html>`);
                     const result = await page.evaluate(() => {
@@ -38,11 +39,15 @@ test('los shells por rol conservan fondo y controles completos en claro, oscuro 
                             const rect = button.getBoundingClientRect();
                             return { width: rect.width, height: rect.height, left: rect.left, right: rect.right };
                         });
-                        return { main: background('main'), sidebar: background('.rm-sidebar'), topbar: background('.rm-topbar'), buttons };
+                        const topbar = document.querySelector('.rm-topbar').getBoundingClientRect();
+                        const banner = document.querySelector('[data-role-preview-banner]').getBoundingClientRect();
+                        return { main: background('main'), sidebar: background('.rm-sidebar'), topbar: background('.rm-topbar'), buttons, topbarBounds: { left: topbar.left, right: topbar.right }, bannerBounds: { left: banner.left, right: banner.right } };
                     });
                     const context = `${variant || 'sistema'} ${theme} ${width}px`;
                     assert.equal(result.main, result.sidebar, context);
                     assert.equal(result.main, result.topbar, context);
+                    assert.ok(Math.abs(result.bannerBounds.left - result.topbarBounds.left) <= 1, `${context}: aviso alineado con topbar`);
+                    assert.ok(Math.abs(result.bannerBounds.right - result.topbarBounds.right) <= 1, `${context}: ancho del aviso alineado con topbar`);
                     for (const button of result.buttons) {
                         assert.ok(button.width >= 44 && button.height >= 44, `${context}: target visible`);
                         assert.ok(button.left >= 0 && button.right <= width + 1, `${context}: botón dentro de pantalla`);
@@ -60,14 +65,17 @@ test('Enfermería conserva la misma jerarquía de encabezado y superficie de car
         for (const theme of ['light', 'dark']) {
             const styles = [];
             for (const shellClass of ['rm-shell', 'rm-shell rm-nursing-shell']) {
-                await page.setContent(`<html class="${theme === 'dark' ? 'dark' : ''}" data-theme="${theme}"><head><style>${css}</style></head><body class="${shellClass}"><main><section class="rm-dashboard-composition rm-nursing-dashboard"><header class="rm-dashboard-header"><div class="rm-dashboard-header__content"><h1 class="rm-dashboard-header__title">Bienvenido</h1></div></header><section class="rm-card"><h2>Tareas del turno</h2></section></section></main></body></html>`);
+                await page.setContent(`<html class="${theme === 'dark' ? 'dark' : ''}" data-theme="${theme}"><head><style>${css}</style></head><body class="${shellClass}"><main><section class="rm-dashboard-composition rm-nursing-dashboard"><header class="rm-dashboard-header rm-nursing-dashboard__welcome"><div class="rm-dashboard-header__content"><h1 class="rm-dashboard-header__title">Bienvenido</h1></div></header><section class="rm-card rm-nursing-dashboard__kpi"><h2>Tareas del turno</h2></section></section></main></body></html>`);
                 styles.push(await page.evaluate(() => {
                     const heading = getComputedStyle(document.querySelector('.rm-dashboard-header__title'));
                     const card = getComputedStyle(document.querySelector('.rm-card'));
-                    return { headingFamily: heading.fontFamily, headingSize: heading.fontSize, headingColor: heading.color, cardBg: card.backgroundColor, cardRadius: card.borderRadius, cardShadow: card.boxShadow };
+                    const grid = document.querySelector('.rm-nursing-dashboard').getBoundingClientRect();
+                    const header = document.querySelector('.rm-dashboard-header').getBoundingClientRect();
+                    return { headingFamily: heading.fontFamily, headingSize: heading.fontSize, headingColor: heading.color, cardBg: card.backgroundColor, cardRadius: card.borderRadius, cardShadow: card.boxShadow, headerWidth: header.width, gridWidth: grid.width };
                 }));
             }
             assert.deepEqual(styles[1], styles[0], theme);
+            assert.ok(styles[1].headerWidth >= styles[1].gridWidth - 1, `${theme}: encabezado ocupa toda la cuadrícula`);
         }
     } finally { await browser.close(); }
 });

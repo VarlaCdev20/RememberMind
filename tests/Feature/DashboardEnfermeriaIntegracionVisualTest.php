@@ -24,6 +24,7 @@ class DashboardEnfermeriaIntegracionVisualTest extends TestCase
             ->assertOk()->getContent();
 
         $this->assertSame(1, substr_count($html, '<h1'));
+        $this->assertMatchesRegularExpression('~<header[^>]*class="[^"]*rm-nursing-dashboard__welcome[^\"]*"~', $html);
         $this->assertMatchesRegularExpression('~class="rm-dashboard-header__visual">\s*<img src="[^"]*/images/FOTOS CENTRO DE ADULTOS MAYORES/[^"]+"~', $html);
         $this->assertSame(1, substr_count($html, 'ph-bell text-lg'));
         $this->assertStringNotContainsString('nursing-welcome-search', $html);

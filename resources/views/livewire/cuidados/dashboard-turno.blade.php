@@ -1,6 +1,7 @@
 {{-- Dashboard operativo de Enfermería: jerarquía de lectura y teclado alineadas. --}}
 <section class="rm-nursing-dashboard rm-dashboard-composition font-sans" wire:poll.60s="refrescarTurno" aria-label="Dashboard de Enfermería">
 <x-ui.dashboard-welcome-header
+            class="rm-nursing-dashboard__welcome"
             :usuario="Auth::user()"
             :estado="$dashboard['estado'] ?? null"
             :modo="$dashboard['modo'] ?? null"
