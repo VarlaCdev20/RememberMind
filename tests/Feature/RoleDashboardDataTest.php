@@ -23,8 +23,59 @@ class RoleDashboardDataTest extends TestCase
             'Residentes activos', 'Camas disponibles', 'Alertas prioritarias', 'Personal de hoy',
         ], array_column($data['metrics'], 'label'));
         $this->assertSame([0, 0, 0, 0], array_column($data['metrics'], 'value'));
+        $this->assertNull($data['activeShift']);
         $this->assertContains('Preadmisiones por estado', array_column($data['panels'], 'title'));
         $this->assertContains('Cobertura por área hoy', array_column($data['panels'], 'title'));
+    }
+
+    public function test_kpi_institucional_deriva_capacidad_cobertura_y_jornada_de_registros_reales(): void
+    {
+        $usuario = User::factory()->create();
+        $residente = Residente::factory()->create();
+
+        DB::table('habitaciones')->insert(['cod_habitacion' => 'HAB_KPI', 'codigo' => 'H-KPI', 'capacidad' => 2, 'estado' => 'ACTIVA']);
+        DB::table('camas')->insert([
+            ['cod_cama' => 'CAM_KPI_1', 'cod_habitacion' => 'HAB_KPI', 'codigo' => 'C-KPI-1', 'estado' => 'ACTIVA'],
+            ['cod_cama' => 'CAM_KPI_2', 'cod_habitacion' => 'HAB_KPI', 'codigo' => 'C-KPI-2', 'estado' => 'ACTIVA'],
+        ]);
+        DB::table('admisiones')->insert([
+            'cod_admision' => 'ADM_KPI', 'cod_residente' => $residente->cod_residente,
+            'cod_usuario_registro' => $usuario->cod_usuario, 'fecha_hora_admision' => now()->subHour(),
+            'motivo_ingreso' => 'Ingreso de prueba', 'estado' => 'ACTIVA',
+        ]);
+        DB::table('ocupaciones_cama')->insert([
+            'cod_ocupacion' => 'OCU_KPI', 'cod_residente' => $residente->cod_residente,
+            'cod_cama' => 'CAM_KPI_1', 'cod_admision' => 'ADM_KPI',
+            'cod_usuario_registro' => $usuario->cod_usuario,
+            'fecha_hora_asignacion' => now()->subHour(), 'estado' => 'ACTIVO',
+        ]);
+
+        $trabajador = User::factory()->create();
+        Personal::create([
+            'cod_personal' => 'PER_KPI', 'cod_usuario' => $trabajador->cod_usuario,
+            'nombres' => 'Ana', 'apellido_paterno' => 'Prueba',
+            'numero_documento' => 'CI-KPI', 'profesion' => 'ENFERMERIA', 'estado' => 'ACTIVO',
+        ]);
+        DB::table('areas')->insert(['cod_area' => 'ARE_KPI', 'nombre' => 'Cuidados de prueba', 'estado' => 'ACTIVA']);
+        DB::table('turnos')->insert(['cod_turno' => 'TUR_KPI', 'nombre' => 'Mañana', 'hora_inicio' => '07:00', 'hora_cierre' => '15:00', 'orden' => 1, 'estado' => 'ACTIVO']);
+        DB::table('jornadas')->insert(['cod_jornada' => 'JOR_KPI', 'cod_turno' => 'TUR_KPI', 'fecha_jornada' => today(), 'estado' => 'ABIERTA']);
+        DB::table('asignaciones_personal')->insert([
+            'cod_asignacion_personal' => 'ASP_KPI', 'cod_jornada' => 'JOR_KPI',
+            'cod_personal' => 'PER_KPI', 'cod_area' => 'ARE_KPI', 'tipo_asignacion' => 'REGULAR',
+            'fecha_asignacion' => now(), 'estado' => 'ACTIVA',
+        ]);
+
+        $data = app(RoleDashboardDataService::class)->forRole($usuario, 'SUPERADMINISTRADOR');
+
+        $this->assertSame(1, $data['metrics'][0]['value']);
+        $this->assertSame(1, array_sum($data['metrics'][0]['sparkbars']));
+        $this->assertSame(['value' => 1, 'capacity' => 2, 'occupied' => 1], array_intersect_key(
+            $data['metrics'][1], array_flip(['value', 'capacity', 'occupied'])
+        ));
+        $this->assertSame(1, $data['metrics'][3]['value']);
+        $this->assertSame(1, $data['metrics'][3]['capacity']);
+        $this->assertSame([['label' => 'Cuidados de prueba', 'value' => 1]], $data['metrics'][3]['areas']);
+        $this->assertSame('Mañana', $data['activeShift']);
     }
 
     public function test_familiar_solo_recibe_residentes_autorizados_y_sus_propias_visitas(): void

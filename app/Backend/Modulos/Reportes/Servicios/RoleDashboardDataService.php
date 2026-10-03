@@ -96,6 +96,31 @@ final class RoleDashboardDataService
             ->join('areas as a', 'a.cod_area', '=', 'ap.cod_area')
             ->select('a.nombre as label')->selectRaw('COUNT(DISTINCT ap.cod_personal) as total')
             ->groupBy('a.cod_area', 'a.nombre')->orderByDesc('total')->limit(6)->get();
+        $eligibleBeds = DB::table('camas as c')
+            ->join('habitaciones as h', 'h.cod_habitacion', '=', 'c.cod_habitacion')
+            ->whereIn('c.estado', ['ACTIVA', 'ACTIVO', 'DISPONIBLE'])
+            ->whereIn('h.estado', ['ACTIVA', 'ACTIVO', 'DISPONIBLE']);
+        $bedCapacity = (clone $eligibleBeds)->count();
+        $availableBeds = (clone $eligibleBeds)
+            ->whereNotExists(fn ($query) => $query->selectRaw('1')->from('ocupaciones_cama as o')
+                ->whereColumn('o.cod_cama', 'c.cod_cama')->whereIn('o.estado', ['ACTIVA', 'ACTIVO'])
+                ->whereNull('o.fecha_hora_liberacion')->where('o.fecha_hora_asignacion', '<=', now()))
+            ->count();
+        $assignedStaff = (clone $staffToday)->distinct('ap.cod_personal')->count('ap.cod_personal');
+        $activeStaff = DB::table('personal')->where('estado', 'ACTIVO')->count();
+        $activeShiftNames = DB::table('jornadas as j')
+            ->join('turnos as t', 't.cod_turno', '=', 'j.cod_turno')
+            ->whereDate('j.fecha_jornada', $today)->whereIn('j.estado', ['ABIERTA', 'ACTIVA'])
+            ->pluck('t.nombre')->unique()->values();
+        $weekStart = $today->copy()->subDays(6);
+        $recentAdmissions = DB::table('admisiones as a')
+            ->join('residentes as r', 'r.cod_residente', '=', 'a.cod_residente')
+            ->whereIn('r.estado', ['ACTIVO', 'ADMITIDO'])
+            ->whereDate('a.fecha_hora_admision', '>=', $weekStart)
+            ->where('a.fecha_hora_admision', '<=', now())
+            ->pluck('a.fecha_hora_admision');
+        $recentAlerts = (clone $alerts)->where('fecha_hora', '>=', $weekStart)
+            ->pluck('fecha_hora');
         $clinicalActivity = DB::table('atenciones')->where('fecha_hora', '>=', now()->subDays(30))
             ->select('tipo_atencion as label')->selectRaw('COUNT(*) as total')
             ->groupBy('tipo_atencion')->orderByDesc('total')->limit(6)->get();
@@ -107,18 +132,16 @@ final class RoleDashboardDataService
 
         return [
             'metrics' => [
-                $this->metric('Residentes activos', DB::table('residentes')->whereIn('estado', ['ACTIVO', 'ADMITIDO'])->count(), 'Actualmente admitidos', 'ph-users-three', 'mint'),
-                $this->metric('Camas disponibles', DB::table('camas as c')
-                    ->join('habitaciones as h', 'h.cod_habitacion', '=', 'c.cod_habitacion')
-                    ->whereIn('c.estado', ['ACTIVA', 'ACTIVO', 'DISPONIBLE'])
-                    ->whereIn('h.estado', ['ACTIVA', 'ACTIVO', 'DISPONIBLE'])
-                    ->whereNotExists(fn ($query) => $query->selectRaw('1')->from('ocupaciones_cama as o')
-                        ->whereColumn('o.cod_cama', 'c.cod_cama')->where('o.estado', 'ACTIVA')
-                        ->whereNull('o.fecha_hora_liberacion')->where('o.fecha_hora_asignacion', '<=', now()))
-                    ->count(), 'Sin ocupación activa', 'ph-bed', 'sky'),
-                $this->metric('Alertas prioritarias', (clone $alerts)->count(), 'Críticas o altas abiertas', 'ph-warning-circle', 'critical'),
-                $this->metric('Personal de hoy', (clone $staffToday)->distinct('ap.cod_personal')->count('ap.cod_personal'), 'Asignado a jornada activa', 'ph-identification-badge', 'neutral'),
+                [...$this->metric('Residentes activos', DB::table('residentes')->whereIn('estado', ['ACTIVO', 'ADMITIDO'])->count(), 'Actualmente admitidos', 'ph-users-three', 'mint'),
+                    'sparkbars' => $this->dailyCounts($recentAdmissions, $weekStart), 'sparkbarLabel' => 'Ingresos de residentes activos · 7 días'],
+                [...$this->metric('Camas disponibles', $availableBeds, 'Disponibilidad actual', 'ph-bed', 'sky'),
+                    'capacity' => $bedCapacity, 'occupied' => $bedCapacity - $availableBeds],
+                [...$this->metric('Alertas prioritarias', (clone $alerts)->count(), 'Críticas o altas abiertas', 'ph-warning-circle', 'critical'),
+                    'sparkbars' => $this->dailyCounts($recentAlerts, $weekStart), 'sparkbarLabel' => 'Alertas prioritarias aún abiertas · 7 días'],
+                [...$this->metric('Personal de hoy', $assignedStaff, 'Asignado a jornada activa', 'ph-identification-badge', 'neutral'),
+                    'capacity' => $activeStaff, 'areas' => $this->countItems($coverage)],
             ],
+            'activeShift' => $activeShiftNames->count() === 1 ? $activeShiftNames->first() : null,
             'panels' => [
                 $this->panel('Alertas prioritarias', 'list', (clone $alerts)->orderByDesc('fecha_hora')->limit(5)->get(['titulo', 'prioridad', 'fecha_hora'])->map(fn ($row) => [
                     'label' => $row->titulo, 'detail' => $row->prioridad.' · '.date('d/m H:i', strtotime($row->fecha_hora)),
@@ -331,6 +354,23 @@ final class RoleDashboardDataService
             'label' => (string) ($row->label ?? $row->estado ?? 'Sin clasificar'),
             'value' => (int) $row->total,
         ])->all();
+    }
+
+    private function dailyCounts(iterable $dates, \Illuminate\Support\Carbon $start): array
+    {
+        $counts = [];
+        for ($day = 0; $day < 7; $day++) {
+            $counts[$start->copy()->addDays($day)->toDateString()] = 0;
+        }
+
+        foreach ($dates as $date) {
+            $key = substr((string) $date, 0, 10);
+            if (isset($counts[$key])) {
+                $counts[$key]++;
+            }
+        }
+
+        return array_values($counts);
     }
 
     private function metric(string $label, int $value, string $description, string $icon, string $variant): array

@@ -139,7 +139,7 @@ class RolesBaselineCongeladoTest extends TestCase
     public function test_dashboards_tienen_contenido_diferente_por_rol(): void
     {
         $this->actingAs($this->usuarioConRol('SUPERADMINISTRADOR'))->get(route('dashboard'))
-            ->assertOk()->assertSee('bajo supervisión global')->assertSee('Residentes activos');
+            ->assertOk()->assertSee('Superadministración')->assertSee('Residentes activos');
 
         $this->actingAs($this->usuarioConRol('GERENTE'))->get(route('dashboard'))
             ->assertOk()->assertSee('con visión de cobertura')->assertSee('Personal activo');

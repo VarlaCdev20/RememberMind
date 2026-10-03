@@ -30,6 +30,9 @@ class DashboardService
             $datosPorRol = $this->roleDashboardData->forRole($usuario, $rol ?? 'USUARIO');
             $perfil['indicadores'] = $datosPorRol['metrics'];
             $perfil['panels'] = $datosPorRol['panels'];
+            if ($rol === 'SUPERADMINISTRADOR') {
+                $perfil['jornada'] = $datosPorRol['activeShift'] ?? null;
+            }
 
             return [
                 'saludo' => $this->obtenerSaludoUsuario($usuario, $rol),

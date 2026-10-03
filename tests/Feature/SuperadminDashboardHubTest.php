@@ -36,7 +36,12 @@ class SuperadminDashboardHubTest extends TestCase
         $response = $this->actingAs($superadmin)->get(route('dashboard'));
         $response->assertOk();
 
-        $response->assertSee('bajo supervisión global');
+        $response->assertSee('Superadministración');
+        $response->assertDontSee('bajo supervisión global');
+        $response->assertSee('rm-superadmin-kpi--residents');
+        $response->assertSee('rm-superadmin-kpi--beds');
+        $response->assertSee('rm-superadmin-kpi--alerts');
+        $response->assertSee('rm-superadmin-kpi--staff');
         $response->assertSee('Residentes activos');
         $response->assertSee('Camas disponibles');
         $response->assertSee('Preadmisiones por estado');
