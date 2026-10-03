@@ -533,12 +533,6 @@ a.rm-turn-task__title:hover { text-decoration: underline; }
     background: linear-gradient(110deg, color-mix(in srgb, var(--rm-surface-raised) 65%, var(--rm-action-primary-soft)), var(--rm-surface-main) 72%);
     box-shadow: var(--rm-shadow-sm);
 }
-:root:not(.dark):not([data-theme="dark"]) .rm-nursing-dashboard .rm-nursing-module:not(.rm-chart-card) {
-    background:
-        radial-gradient(190px circle at var(--rm-nursing-glint-x, 85%) var(--rm-nursing-glint-y, 10%), color-mix(in srgb, var(--rm-chart-3) 12%, transparent), transparent 85%),
-        linear-gradient(160deg, var(--rm-surface-raised), var(--rm-surface-main));
-    border-color: color-mix(in srgb, var(--rm-border) 82%, transparent);
-}
 :root:not(.dark):not([data-theme="dark"]) .rm-nursing-dashboard .rm-chart-card {
     background: linear-gradient(180deg, var(--rm-chart-card-glass), var(--rm-chart-card-bg));
     border-color: var(--rm-chart-card-border);
@@ -548,12 +542,6 @@ a.rm-turn-task__title:hover { text-decoration: underline; }
 :root:not(.dark):not([data-theme="dark"]) .rm-nursing-dashboard__kpi--beds { --rm-nursing-accent: var(--rm-chart-2); }
 :root:not(.dark):not([data-theme="dark"]) .rm-nursing-dashboard__kpi--risk { --rm-nursing-accent: var(--rm-chart-coral); }
 :root:not(.dark):not([data-theme="dark"]) .rm-nursing-dashboard__kpi--medication { --rm-nursing-accent: var(--rm-chart-sand); }
-:root:not(.dark):not([data-theme="dark"]) .rm-nursing-dashboard .rm-nursing-dashboard__kpi {
-    background:
-        radial-gradient(circle at 92% 18%, color-mix(in srgb, var(--rm-nursing-accent) 14%, transparent), transparent 52%),
-        var(--rm-surface-main);
-    border-color: color-mix(in srgb, var(--rm-nursing-accent) 20%, var(--rm-border));
-}
 :root:not(.dark):not([data-theme="dark"]) .rm-nursing-dashboard .rm-nursing-module:where(:hover, :focus-within),
 :root:not(.dark):not([data-theme="dark"]) .rm-nursing-dashboard .rm-chart-card:where(:hover, :focus-within) {
     border-color: color-mix(in srgb, var(--rm-chart-1) 42%, var(--rm-border));

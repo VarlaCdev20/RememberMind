@@ -62,24 +62,37 @@ test('los shells por rol conservan fondo y controles completos en claro, oscuro 
     } finally { await browser.close(); }
 });
 
-test('Enfermería conserva la misma jerarquía de encabezado y superficie de card que otros roles', { skip: !executablePath }, async () => {
+test('los dashboards por rol comparten tamaño de cabecera y superficie de cards', { skip: !executablePath }, async () => {
     const browser = await puppeteer.launch({ headless: true, executablePath });
     try {
         const page = await browser.newPage();
-        for (const theme of ['light', 'dark']) {
-            const styles = [];
-            for (const shellClass of ['rm-shell', 'rm-shell rm-nursing-shell']) {
-                await page.setContent(`<html class="${theme === 'dark' ? 'dark' : ''}" data-theme="${theme}"><head><style>${css}</style></head><body class="${shellClass}"><main><section class="rm-dashboard-composition rm-nursing-dashboard"><header class="rm-dashboard-header rm-nursing-dashboard__welcome"><div class="rm-dashboard-header__content"><h1 class="rm-dashboard-header__title">Bienvenido</h1></div></header><section class="rm-card rm-nursing-dashboard__kpi"><h2>Tareas del turno</h2></section></section></main></body></html>`);
-                styles.push(await page.evaluate(() => {
-                    const heading = getComputedStyle(document.querySelector('.rm-dashboard-header__title'));
-                    const card = getComputedStyle(document.querySelector('.rm-card'));
-                    const grid = document.querySelector('.rm-nursing-dashboard').getBoundingClientRect();
-                    const header = document.querySelector('.rm-dashboard-header').getBoundingClientRect();
-                    return { headingFamily: heading.fontFamily, headingSize: heading.fontSize, headingColor: heading.color, cardBg: card.backgroundColor, cardRadius: card.borderRadius, cardShadow: card.boxShadow, headerWidth: header.width, gridWidth: grid.width };
-                }));
+        for (const width of [390, 768, 1440]) {
+            await page.setViewport({ width, height: 900 });
+            for (const theme of ['light', 'dark']) {
+                const styles = [];
+                for (const variant of [
+                { shell: '', dashboard: 'rm-dashboard-composition--superadmin', cards: 'rm-superadmin-metrics', card: '', panel: 'rm-dashboard-data-panel' },
+                { shell: 'rm-shell--administracion', dashboard: 'rm-admin-dashboard', cards: 'rm-admin-dashboard__state-strip', card: '', panel: 'rm-admin-dashboard__attention-body' },
+                { shell: 'rm-nursing-shell', dashboard: 'rm-nursing-dashboard', cards: '', card: 'rm-nursing-dashboard__kpi', panel: 'rm-card rm-nursing-module' },
+                { shell: '', dashboard: '', cards: '', card: '', panel: 'rm-dashboard-data-panel' },
+                ]) {
+                    await page.setContent(`<html class="${theme === 'dark' ? 'dark' : ''}" data-theme="${theme}"><head><style>${css}</style></head><body class="rm-shell ${variant.shell}"><main><section class="rm-dashboard-composition ${variant.dashboard}"><header class="rm-dashboard-header rm-nursing-dashboard__welcome"><div class="rm-dashboard-header__content"><h1 class="rm-dashboard-header__title">Bienvenido</h1></div></header><div class="${variant.cards}"><article class="rm-card rm-metric-card ${variant.card}"><h2>Tareas del turno</h2></article></div><article class="${variant.panel}" data-panel>Información</article></section></main></body></html>`);
+                    styles.push(await page.evaluate(() => {
+                        const heading = getComputedStyle(document.querySelector('.rm-dashboard-header__title'));
+                        const card = getComputedStyle(document.querySelector('.rm-metric-card'));
+                        const panel = getComputedStyle(document.querySelector('[data-panel]'));
+                        const welcome = getComputedStyle(document.querySelector('.rm-dashboard-header'));
+                        const header = document.querySelector('.rm-dashboard-header').getBoundingClientRect();
+                        return { headingFamily: heading.fontFamily, headingSize: heading.fontSize, headingColor: heading.color, headerBg: welcome.backgroundColor, headerMinHeight: welcome.minHeight, cardBg: card.backgroundColor, cardMinHeight: card.minHeight, cardRadius: card.borderRadius, cardShadow: card.boxShadow, panelBg: panel.backgroundColor, panelRadius: panel.borderRadius, headerWidth: header.width };
+                    }));
+                }
+                for (const [index, style] of styles.entries()) {
+                    const { headerWidth, ...sharedStyle } = style;
+                    const { headerWidth: baseWidth, ...baseStyle } = styles[0];
+                    assert.deepEqual(sharedStyle, baseStyle, `${theme} ${width}px: variante ${index}`);
+                    assert.ok(style.headerWidth >= Math.min(width - 16, 500) - 1, `${theme} ${width}px: encabezado ocupa el espacio disponible`);
+                }
             }
-            assert.deepEqual(styles[1], styles[0], theme);
-            assert.ok(styles[1].headerWidth >= styles[1].gridWidth - 1, `${theme}: encabezado ocupa toda la cuadrícula`);
         }
     } finally { await browser.close(); }
 });

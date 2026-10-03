@@ -29,7 +29,6 @@
 <div @class(['rm-dashboard-composition', 'rm-dashboard-composition--superadmin' => $esSuperadministracion])>
     <x-ui.role-dashboard-hero
         personal-greeting
-        class="{{ $esSuperadministracion ? 'rm-dashboard-header--superadmin' : '' }}"
         :eyebrow="$perfil['eyebrow'] ?? 'CENTRO GERIÁTRICO LOS ALMENDROS'"
         :title="($saludo['saludo'] ?? 'Bienvenido') . ', ' . $nombreSaludo"
         :highlight="$esSuperadministracion ? null : ($perfil['highlight'] ?? 'Tu espacio de trabajo')"
