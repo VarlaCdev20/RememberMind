@@ -86,34 +86,17 @@ class RolesAndPermissionsSeeder extends Seeder
         ], $permisosCompatibilidadLectura, $permisosCompatibilidadInstitucional);
 
         $permisos = array_values(array_unique($permisos));
-        Permission::query()->where('guard_name', 'web')->whereNotIn('name', $permisos)->delete();
-
         foreach ($permisos as $permiso) {
             Permission::findOrCreate($permiso, 'web');
         }
 
         $roles = collect($rolesActivos)->mapWithKeys(fn (string $nombre) => [$nombre => Role::findOrCreate($nombre, 'web')]);
 
-        // Autoridad técnica global: lectura transversal y administración de
-        // sistema, institución, residencia y operación. Se excluye de forma
-        // deliberada toda escritura clínica, que exige competencia profesional.
-        $roles['SUPERADMINISTRADOR']->syncPermissions(array_values(array_unique(array_merge(
-            $this->permitir($permisos, [
-                '.ver', 'usuarios.gestionar', 'usuarios.crear', 'usuarios.editar',
-                'usuarios.cambiar_estado', 'usuarios.reportes', 'roles', 'auditoria.ver', 'bitacora.ver',
-                'personal.gestionar', 'areas.gestionar', 'turnos.gestionar',
-                'jornadas.gestionar', 'asignaciones_personal.gestionar',
-                'preadmisiones.crear', 'preadmisiones.revisar', 'admisiones.formalizar',
-                'residentes.actualizar_administrativo', 'residentes_contactos.gestionar',
-                'habitaciones.gestionar', 'camas.gestionar', 'ocupaciones_cama.gestionar',
-                'contactos.gestionar', 'documentos.gestionar', 'documentos.validar',
-                'consentimientos.gestionar', 'actividades.gestionar', 'visitas.gestionar',
-                'alertas.gestionar', 'alertas.reconocer', 'alertas.asignar',
-                'alertas.seguimiento', 'alertas.cerrar',
-            ]),
-            $permisosCompatibilidadLectura,
-            $permisosCompatibilidadInstitucional
-        ))));
+        // Durante la construcción del sistema recibe todos los permisos web,
+        // incluidos los que se hayan creado fuera de este seeder.
+        $roles['SUPERADMINISTRADOR']->syncPermissions(
+            Permission::query()->where('guard_name', 'web')->get()
+        );
 
         // Dirección institucional: personal, organización, planificación maestra
         // y lectura de los indicadores necesarios para conducir la residencia.

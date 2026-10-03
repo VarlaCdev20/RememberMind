@@ -206,10 +206,10 @@ class BddOperativaV2Test extends TestCase
         foreach ($this->tablasOperativas() as $tabla) {
             $this->assertTrue($super->can($tabla.'.ver'), "Falta lectura de {$tabla}");
         }
-        $this->assertFalse($super->can('prescripciones.crear'));
-        $this->assertFalse($super->can('diagnosticos.crear'));
+        $this->assertTrue($super->can('prescripciones.crear'));
+        $this->assertTrue($super->can('diagnosticos.crear'));
         $this->assertTrue($super->can('administraciones_medicacion.ver'));
-        $this->assertFalse(app(AdministracionMedicacionPolicy::class)->create($super));
+        $this->assertTrue(app(AdministracionMedicacionPolicy::class)->create($super));
     }
 
     public function test_dashboard_y_expediente_web_funcionan_con_modelos_v2(): void

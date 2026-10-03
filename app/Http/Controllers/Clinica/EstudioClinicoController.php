@@ -176,7 +176,7 @@ class EstudioClinicoController extends Controller
             'motivo' => ['required', 'string'], 'prioridad' => ['nullable', 'string', 'max:20'],
         ]);
         $this->validarAtencion($datos['cod_atencion'] ?? null, $residente);
-        abort_unless($datos['cod_area_solicitante'] === $this->autorizacion->areaActiva($personal)->cod_area, 422,
+        abort_unless($datos['cod_area_solicitante'] === $this->autorizacion->areaActiva($personal, $datos['cod_area_solicitante'])->cod_area, 422,
             'El área solicitante no corresponde a la asignación clínica vigente del profesional.');
         return response()->json(Derivacion::query()->create([
             'cod_derivacion' => $this->codigo('DER'), 'cod_residente' => $residente->cod_residente,

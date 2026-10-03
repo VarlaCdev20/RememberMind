@@ -17,7 +17,28 @@ use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, HasProfilePhoto, HasRoles, LogsActivity, Notifiable;
+    use HasApiTokens, HasFactory, HasProfilePhoto, LogsActivity, Notifiable;
+    use HasRoles {
+        checkPermissionTo as private spatieCheckPermissionTo;
+    }
+
+    public function checkPermissionTo($permission, ?string $guardName = null): bool
+    {
+        if (is_string($permission)) {
+            $accesoTemporal = app(\App\Backend\Modulos\Clinica\Servicios\AccesoClinicoTemporalService::class);
+            if ($accesoTemporal->esPermisoDeEscrituraClinica($permission)
+                && $this->hasRole('SUPERADMINISTRADOR')
+                && ! $this->hasAnyRole([
+                    'MEDICO GENERAL/GERIATRA', 'ENFERMEROS', 'PSICOLOGO/A',
+                    'NUTRICIONISTA', 'FISIOTERAPEUTA', 'PEDAGOGO',
+                ])
+                && ! $accesoTemporal->sustituyeRol($this)) {
+                return false;
+            }
+        }
+
+        return $this->spatieCheckPermissionTo($permission, $guardName);
+    }
 
         protected static function booted(): void
     {

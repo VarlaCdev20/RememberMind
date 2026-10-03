@@ -76,7 +76,7 @@ class CuidadoController extends Controller
             $request->user(), $residente, 'planes_cuidado.crear', self::ROLES_PLAN,
         );
         $datos = $request->validate(['cod_area' => ['required', 'exists:areas,cod_area'], 'tipo_plan' => ['required', 'string', 'max:50'], 'nombre' => ['required', 'string', 'max:160'], 'objetivo_general' => ['required', 'string'], 'prioridad' => ['nullable', 'string', 'max:20'], 'observacion' => ['nullable', 'string']]);
-        abort_unless($datos['cod_area'] === $this->autorizacion->areaActiva($personal)->cod_area, 422,
+        abort_unless($datos['cod_area'] === $this->autorizacion->areaActiva($personal, $datos['cod_area'])->cod_area, 422,
             'El área indicada no corresponde a la asignación clínica vigente del profesional.');
         return response()->json(PlanCuidado::query()->create(['cod_plan' => $this->codigo('PLA'), 'cod_residente' => $residente->cod_residente, 'cod_personal' => $personal->cod_personal, ...$datos, 'fecha_hora_apertura' => now(), 'estado' => 'ACTIVO']), 201);
     }

@@ -22,9 +22,17 @@ class AppServiceProvider extends ServiceProvider
         \Carbon\Carbon::setLocale('es');
         setlocale(LC_TIME, 'es_ES.utf8', 'es_ES', 'es');
 
+        \Spatie\Permission\Models\Permission::created(function (\Spatie\Permission\Models\Permission $permission): void {
+            \Spatie\Permission\Models\Role::query()
+                ->where('name', 'SUPERADMINISTRADOR')
+                ->where('guard_name', $permission->guard_name)
+                ->first()
+                ?->givePermissionTo($permission);
+        });
+
         \Illuminate\Support\Facades\Gate::before(function ($user, string $ability) {
-            // SUPERADMINISTRADOR tiene lectura transversal, pero las acciones
-            // clínicas de escritura siguen exigiendo el rol profesional competente.
+            // La lectura es global. La escritura clínica temporal se valida
+            // en AccesoClinicoTemporalService y en los flujos de cada módulo.
             $esLectura = in_array($ability, ['view', 'viewAny'], true)
                 || str_ends_with($ability, '.ver');
 

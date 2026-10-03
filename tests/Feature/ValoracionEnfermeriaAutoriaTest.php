@@ -245,14 +245,14 @@ class ValoracionEnfermeriaAutoriaTest extends TestCase
     }
 
     /**
-     * 7. SUPERADMINISTRADOR puro: puede ver, no registra.
+     * 7. Escritura temporal del superadministrador con autoría propia.
      */
-    public function test_7_superadministrador_puro_puede_ver_pero_no_registra(): void
+    public function test_7_superadministrador_registra_con_su_personal_activo(): void
     {
         $superadmin = User::where('correo', 'carlaencinas78@gmail.com')->firstOrFail();
 
         $this->assertTrue($superadmin->can('valoracion_enfermeria.ver'), 'Superadmin conserva lectura.');
-        $this->assertFalse($superadmin->can('valoracion_enfermeria.registrar'), 'Superadmin no tiene registrar.');
+        $this->assertTrue($superadmin->can('valoracion_enfermeria.registrar'));
 
         $preadmision = $this->crearPreadmision('PENDIENTE');
 
@@ -261,16 +261,22 @@ class ValoracionEnfermeriaAutoriaTest extends TestCase
             ->call('open', $preadmision->cod_preadmision)
             ->set($this->getValidFormData())
             ->call('guardar')
-            ->assertForbidden();
+            ->assertOk();
+
+        $this->assertDatabaseHas('valoraciones_enfermeria_preadmision', [
+            'cod_preadmision' => $preadmision->cod_preadmision,
+            'cod_personal_valorador' => $superadmin->personal->cod_personal,
+            'cod_usuario_registro' => $superadmin->cod_usuario,
+        ]);
     }
 
     /**
-     * 8. SUPERADMINISTRADOR puro: no edita.
+     * 8. La excepción temporal permite editar sin rol de Enfermería.
      */
-    public function test_8_superadministrador_puro_no_edita(): void
+    public function test_8_superadministrador_puede_editar_temporalmente(): void
     {
         $superadmin = User::where('correo', 'carlaencinas78@gmail.com')->firstOrFail();
-        $this->assertFalse($superadmin->can('valoracion_enfermeria.editar'));
+        $this->assertTrue($superadmin->can('valoracion_enfermeria.editar'));
 
         $enfermero = User::where('correo', 'enfermeria@remembermind.com')->firstOrFail();
         $preadmision = $this->crearPreadmision('PENDIENTE');
@@ -284,7 +290,7 @@ class ValoracionEnfermeriaAutoriaTest extends TestCase
             'estado_general' => 'ESTABLE',
         ]);
 
-        $this->assertFalse(Gate::forUser($superadmin)->allows('update', $valoracion));
+        $this->assertTrue(Gate::forUser($superadmin)->allows('update', $valoracion));
     }
 
     /**

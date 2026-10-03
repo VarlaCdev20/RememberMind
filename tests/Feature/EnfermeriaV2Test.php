@@ -60,15 +60,15 @@ class EnfermeriaV2Test extends TestCase
             ->autorizarMutacionPaciente($ajeno, 'signos_vitales.crear', $enfermera);
     }
 
-    public function test_superadministrador_conserva_lectura_pero_no_escribe_como_enfermeria(): void
+    public function test_superadministrador_puede_escribir_en_jornada_real_del_residente(): void
     {
-        [, $residente] = $this->escenarioAsignado();
+        [, $residente, $turno] = $this->escenarioAsignado();
         $super = User::query()->where('correo', 'carlaencinas78@gmail.com')->firstOrFail();
         $service = app(TurnoEnfermeriaService::class);
 
         $this->assertTrue($service->esPacienteAsignado($residente, $super));
-        $this->expectException(HttpException::class);
-        $service->autorizarMutacionPaciente($residente, 'signos_vitales.crear', $super);
+        $this->assertSame($turno->cod_turno,
+            $service->autorizarMutacionPaciente($residente, 'signos_vitales.crear', $super)->cod_turno);
     }
 
     public function test_panel_restaurado_gestiona_turnos_en_la_tabla_v2(): void

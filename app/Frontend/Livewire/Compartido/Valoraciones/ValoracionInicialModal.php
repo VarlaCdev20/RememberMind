@@ -262,7 +262,8 @@ class ValoracionInicialModal extends Component
             abort(403, 'Usuario no autenticado o inactivo.');
         }
 
-        if (! $user->hasRole('ENFERMEROS')) {
+        if (! app(\App\Backend\Modulos\Clinica\Servicios\AccesoClinicoTemporalService::class)
+            ->tieneRol($user, ['ENFERMEROS'])) {
             abort(403, 'El usuario no posee el rol institucional de ENFERMEROS.');
         }
 

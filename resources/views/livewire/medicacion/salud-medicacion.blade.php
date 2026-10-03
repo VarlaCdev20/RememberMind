@@ -1,4 +1,8 @@
 <div class="rm-pilot-enfermeria rm-page-layout font-sans space-y-5">
+ @php
+ $puedeActuarComoMedico = app(\App\Backend\Modulos\Clinica\Servicios\AccesoClinicoTemporalService::class)
+     ->tieneRol(auth()->user(), ['MEDICO GENERAL/GERIATRA']);
+ @endphp
  @if($adulto)
  <x-residentes.navegacion-ficha :adulto="$adulto" />
  @endif
@@ -10,7 +14,7 @@
    : 'Control integral de fármacos, horarios y recetas para todos los residentes del centro.'"
   overline="Módulo clínico farmacológico"
   icon="ph-pill">
- @if(auth()->user()?->hasRole('MEDICO GENERAL/GERIATRA') && auth()->user()?->can('prescripciones.crear'))
+ @if($puedeActuarComoMedico && auth()->user()?->can('prescripciones.crear'))
   <x-ui.action-button
    variant="primary"
    size="sm"
@@ -332,7 +336,7 @@
   <span class="font-black text-[var(--rm-success)]">{{ $stats['activas'] }}</span>
   </div>
 
-  @if(auth()->user()?->hasRole('MEDICO GENERAL/GERIATRA') && auth()->user()?->can('prescripciones.crear'))
+  @if($puedeActuarComoMedico && auth()->user()?->can('prescripciones.crear'))
   <button type="button" wire:click="abrirFormularioPara('{{ $adulto->cod_residente }}')" class="w-full inline-flex items-center justify-center gap-2 rounded-xl border border-[var(--rm-primary)] bg-[var(--rm-primary)] px-3 py-2 text-xs font-bold text-inverso shadow-sm transition hover:bg-[var(--rm-primary)]Hover active:scale-95">
   <i class="ph-bold ph-plus-circle text-sm"></i>
   <span>Prescribir para {{ strtok($adulto->nombres, ' ') }}</span>
@@ -502,7 +506,7 @@
   @endif
   </p>
   </div>
-  @if(auth()->user()?->hasRole('MEDICO GENERAL/GERIATRA') && auth()->user()?->can('prescripciones.crear'))
+  @if($puedeActuarComoMedico && auth()->user()?->can('prescripciones.crear'))
   <button type="button" wire:click="toggleFormularioCrear" class="inline-flex items-center gap-2 rounded-xl border border-[var(--rm-primary)] bg-[var(--rm-primary)] px-4 py-2.5 text-xs font-bold text-inverso shadow-sm transition hover:bg-[var(--rm-primary)]Hover active:scale-95">
   <i class="ph-bold ph-plus-circle text-base"></i>
   <span>Prescribir Primer Medicamento</span>
@@ -589,13 +593,13 @@
     </button>
    @endif
 
-   @if(auth()->user()?->hasRole('MEDICO GENERAL/GERIATRA') && auth()->user()?->can('prescripciones.editar'))
+   @if($puedeActuarComoMedico && auth()->user()?->can('prescripciones.editar'))
     <button type="button" @click="$dispatch('abrirModalMedicacion', { cod_residente: '{{ $med->cod_residente }}', id_med: '{{ $med->cod_prescripcion }}' })" class="inline-flex items-center justify-center rounded-lg border border-[var(--rm-border)] bg-[var(--rm-surface)] p-1.5 text-[var(--rm-text-muted)] transition hover:bg-[var(--rm-bg-app)] hover:text-[var(--rm-text-body)] active:scale-95" title="Editar prescripción">
     <i class="ph-bold ph-pencil-simple"></i>
     </button>
    @endif
 
-   @if(in_array($estado, ['ACTIVO', 'ACTIVA']) && auth()->user()?->hasRole('MEDICO GENERAL/GERIATRA') && auth()->user()?->can('prescripciones.suspender'))
+   @if(in_array($estado, ['ACTIVO', 'ACTIVA']) && $puedeActuarComoMedico && auth()->user()?->can('prescripciones.suspender'))
     <button type="button"
     wire:click="suspenderMedicamento('{{ $med->cod_prescripcion }}')"
     wire:confirm="¿Seguro que desea suspender la medicación '{{ $med->nombre_medicamento }}'?"

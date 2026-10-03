@@ -24,7 +24,8 @@ class DecisionAdmisionModal extends Component
 
     public function open($cod_residente)
     {
-        abort_unless(auth()->user()?->hasRole('MEDICO GENERAL/GERIATRA'), 403);
+        abort_unless(app(\App\Backend\Modulos\Clinica\Servicios\AccesoClinicoTemporalService::class)
+            ->tieneRol(auth()->user(), ['MEDICO GENERAL/GERIATRA']), 403);
         $this->resetForm();
         $this->adulto = AdultoMayor::find($cod_residente);
         if($this->adulto && $this->adulto->estado === 'DECISION_ADMISION') {
@@ -62,7 +63,8 @@ class DecisionAdmisionModal extends Component
 
     public function guardar()
     {
-        abort_unless(auth()->user()?->hasRole('MEDICO GENERAL/GERIATRA'), 403);
+        abort_unless(app(\App\Backend\Modulos\Clinica\Servicios\AccesoClinicoTemporalService::class)
+            ->tieneRol(auth()->user(), ['MEDICO GENERAL/GERIATRA']), 403);
         $rules = [
             'decision' => 'required|in:ADMITIDO_NORMAL,ADMITIDO_CON_SEGUIMIENTO,ADMITIDO_CON_CUIDADO_ESPECIAL,DERIVADO',
             'recomendacion_final' => 'nullable|string'

@@ -60,7 +60,7 @@ class ExpedienteClinicoController extends Controller
             self::ROLES_CLINICOS,
         );
         $datos = $request->validate(['cod_area' => ['required', 'exists:areas,cod_area'], 'tipo_atencion' => ['required', 'string', 'max:60'], 'motivo' => ['nullable', 'string'], 'observacion' => ['nullable', 'string']]);
-        $area = $this->autorizacion->areaActiva($personal);
+        $area = $this->autorizacion->areaActiva($personal, $datos['cod_area']);
         abort_unless($datos['cod_area'] === $area->cod_area, 422,
             'El área indicada no corresponde a la asignación clínica vigente del profesional.');
         $atencion = Atencion::query()->create(['cod_atencion' => $this->codigo('ATE'), 'cod_residente' => $residente->cod_residente, 'cod_personal' => $personal->cod_personal, ...$datos, 'fecha_hora' => now(), 'estado' => 'ABIERTA']);

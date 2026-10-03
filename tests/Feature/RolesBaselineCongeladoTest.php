@@ -3,10 +3,13 @@
 namespace Tests\Feature;
 
 use App\Backend\Modulos\Identidad\Servicios\SidebarService;
+use App\Frontend\Livewire\Superadministrador\Identidad\RolesPermisosPanel;
 use App\Models\User;
 use App\Policies\PrescripcionPolicy;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Livewire\Livewire;
+use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 use Tests\TestCase;
 
@@ -30,21 +33,55 @@ class RolesBaselineCongeladoTest extends TestCase
         $this->assertFalse(Role::query()->where('name', 'VOLUNTARIO')->exists());
     }
 
-    public function test_superadmin_tiene_lectura_global_y_administracion_no_clinica(): void
+    public function test_superadmin_recibe_todos_los_permisos_sin_sustituir_autoria_clinica(): void
     {
-        $user = $this->usuarioConRol('SUPERADMINISTRADOR');
+        $user = User::factory()->create(['nombres' => 'Elena', 'ap_paterno' => 'Prueba']);
+        $user->assignRole('SUPERADMINISTRADOR');
 
         $this->assertTrue($user->can('usuarios.gestionar'));
         $this->assertTrue($user->can('roles.editar_permisos'));
         $this->assertTrue($user->can('auditoria.ver'));
         $this->assertTrue($user->can('diagnosticos.ver'));
-        $this->assertFalse($user->can('diagnosticos.crear'));
-        $this->assertFalse($user->can('prescripciones.crear'));
-        $this->assertFalse($user->can('notas_clinicas.crear'));
+        $this->assertTrue($user->can('diagnosticos.crear'));
+        $this->assertTrue($user->can('prescripciones.crear'));
+        $this->assertTrue($user->can('notas_clinicas.crear'));
         $this->assertTrue($user->can('jornadas.gestionar'));
         $this->assertTrue($user->can('personal.gestionar'));
         $this->assertTrue($user->can('admisiones.formalizar'));
-        $this->assertFalse(app(PrescripcionPolicy::class)->create($user));
+        $this->assertTrue(app(PrescripcionPolicy::class)->create($user));
+        $this->assertEqualsCanonicalizing(
+            Permission::query()->where('guard_name', 'web')->pluck('name')->all(),
+            $user->getAllPermissions()->pluck('name')->all()
+        );
+    }
+
+    public function test_permiso_nuevo_se_asigna_al_superadmin_y_sobrevive_al_resembrado(): void
+    {
+        $user = $this->usuarioConRol('SUPERADMINISTRADOR');
+        $permission = Permission::create(['name' => 'modulo_nuevo.gestionar', 'guard_name' => 'web']);
+
+        $this->assertTrue($user->fresh()->can($permission->name));
+        $this->seed(RolesAndPermissionsSeeder::class);
+
+        $this->assertTrue(Permission::query()->whereKey($permission->id)->exists());
+        $this->assertTrue($user->fresh()->can($permission->name));
+    }
+
+    public function test_panel_no_puede_quitar_permisos_del_superadmin_con_estado_manipulado(): void
+    {
+        $user = $this->usuarioConRol('SUPERADMINISTRADOR');
+        $rol = Role::findByName('SUPERADMINISTRADOR', 'web');
+
+        Livewire::actingAs($user)
+            ->test(RolesPermisosPanel::class)
+            ->set('rolSeleccionadoId', $rol->id)
+            ->set('permisosSeleccionados', [])
+            ->call('guardarPermisos');
+
+        $this->assertSame(
+            Permission::query()->where('guard_name', 'web')->count(),
+            $rol->fresh()->permissions()->count()
+        );
     }
 
     public function test_gerente_dirige_personal_y_planificacion_sin_competencia_clinica(): void

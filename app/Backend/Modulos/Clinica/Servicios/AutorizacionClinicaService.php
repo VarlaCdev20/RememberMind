@@ -14,6 +14,7 @@ class AutorizacionClinicaService
     public function __construct(
         private readonly ContextoClinicoService $contexto,
         private readonly TurnoEnfermeriaService $turnos,
+        private readonly AccesoClinicoTemporalService $accesoTemporal,
     ) {}
 
     /** @param array<int, string> $rolesPermitidos */
@@ -25,20 +26,23 @@ class AutorizacionClinicaService
     ): Personal {
         abort_unless($usuario && strtoupper(trim((string) $usuario->estado)) === 'ACTIVO', 403,
             'La operación clínica requiere una cuenta de usuario activa.');
-        abort_unless($usuario->hasAnyRole($rolesPermitidos), 403,
+        abort_unless($this->accesoTemporal->tieneRol($usuario, $rolesPermitidos), 403,
             'La profesión del usuario no está autorizada para esta operación clínica.');
         abort_unless($usuario->can($permiso), 403,
             'No cuenta con el permiso requerido para esta operación clínica.');
         abort_unless(in_array(strtoupper((string) $residente->estado), ['ACTIVO', 'ADMITIDO', 'EST_001'], true), 403,
             'El residente no se encuentra admitido.');
 
-        if ($usuario->hasRole('ENFERMEROS')) {
+        if ($usuario->hasRole('ENFERMEROS')
+            || ($this->accesoTemporal->sustituyeRol($usuario) && $rolesPermitidos === ['ENFERMEROS'])) {
             $this->turnos->autorizarMutacionEnfermeria($residente, $permiso, $usuario);
         }
 
         try {
             $personal = $this->contexto->personalActivo($usuario);
-            $this->contexto->areaAtencion($personal);
+            if (! $this->accesoTemporal->sustituyeRol($usuario)) {
+                $this->contexto->areaAtencion($personal);
+            }
         } catch (LogicException $excepcion) {
             abort(403, $excepcion->getMessage());
         }
@@ -46,8 +50,16 @@ class AutorizacionClinicaService
         return $personal;
     }
 
-    public function areaActiva(Personal $personal): Area
+    public function areaActiva(Personal $personal, ?string $codArea = null): Area
     {
+        if ($codArea !== null
+            && $this->accesoTemporal->sustituyeRol($personal->usuario)) {
+            $area = Area::query()->whereKey($codArea)->whereIn('estado', ['ACTIVA', 'ACTIVO'])->first();
+            abort_unless($area, 422, 'Seleccione un área activa para el acto clínico.');
+
+            return $area;
+        }
+
         try {
             return $this->contexto->areaAtencion($personal);
         } catch (LogicException $excepcion) {

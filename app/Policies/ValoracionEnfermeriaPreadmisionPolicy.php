@@ -2,6 +2,7 @@
 
 namespace App\Policies;
 
+use App\Backend\Modulos\Clinica\Servicios\AccesoClinicoTemporalService;
 use App\Models\Preadmision;
 use App\Models\User;
 use App\Models\ValoracionEnfermeriaPreadmision;
@@ -24,7 +25,7 @@ class ValoracionEnfermeriaPreadmisionPolicy
             return false;
         }
 
-        if (! $user->hasRole('ENFERMEROS')) {
+        if (! app(AccesoClinicoTemporalService::class)->tieneRol($user, ['ENFERMEROS'])) {
             return false;
         }
 
@@ -50,7 +51,7 @@ class ValoracionEnfermeriaPreadmisionPolicy
             return false;
         }
 
-        if (! $user->hasRole('ENFERMEROS')) {
+        if (! app(AccesoClinicoTemporalService::class)->tieneRol($user, ['ENFERMEROS'])) {
             return false;
         }
 

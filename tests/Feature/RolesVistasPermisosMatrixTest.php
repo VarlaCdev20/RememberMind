@@ -159,9 +159,11 @@ class RolesVistasPermisosMatrixTest extends TestCase
         $this->assertFalse($admin->can('atenciones.ver'), 'Administrador no consulta atenciones clínicas');
         $this->assertFalse($admin->can('diagnosticos.crear'));
 
-        $this->assertFalse($superadmin->can('atenciones.crear'), 'Superadmin puro no debe tener atenciones.crear');
+        $this->assertFalse($superadmin->can('atenciones.crear'), 'Sin personal propio no puede escribir actos clínicos');
+        $this->assertTrue($superadmin->hasPermissionTo('atenciones.crear'));
         $this->assertTrue($superadmin->can('atenciones.ver'), 'Superadmin puede ver atenciones');
         $this->assertFalse($superadmin->can('prescripciones.crear'));
+        $this->assertTrue($superadmin->hasPermissionTo('prescripciones.crear'));
 
         $this->assertFalse($familiar->can('atenciones.crear'), 'Familiar no debe tener atenciones.crear');
         $this->assertFalse($familiar->can('atenciones.ver'), 'Familiar no debe ver atenciones');

@@ -2,6 +2,7 @@
 
 namespace App\Policies;
 
+use App\Backend\Modulos\Clinica\Servicios\AccesoClinicoTemporalService;
 use App\Models\AdministracionMedicacion;
 use App\Models\AsignacionPersonal;
 use App\Models\Jornada;
@@ -33,7 +34,8 @@ class AdministracionMedicacionPolicy
             }
         }
 
-        $tieneRol = method_exists($user, 'hasAnyRole') && $user->hasAnyRole(['ENFERMEROS', 'MEDICO GENERAL/GERIATRA']);
+        $tieneRol = app(AccesoClinicoTemporalService::class)
+            ->tieneRol($user, ['ENFERMEROS', 'MEDICO GENERAL/GERIATRA']);
         $tienePermiso = $user->can('administraciones_medicacion.crear');
 
         return $tieneRol && $tienePermiso;

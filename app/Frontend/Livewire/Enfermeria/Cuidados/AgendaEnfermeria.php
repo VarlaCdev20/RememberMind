@@ -236,7 +236,9 @@ class AgendaEnfermeria extends Component
     public function recibirTurno(): void
     {
         $turnos = app(TurnoEnfermeriaService::class);
-        abort_unless(Auth::user()?->hasRole('ENFERMEROS') && Auth::user()?->can('enfermeria.ver_dashboard'), 403, 'La recepción corresponde al personal operativo de Enfermería.');
+        abort_unless(app(\App\Backend\Modulos\Clinica\Servicios\AccesoClinicoTemporalService::class)
+            ->tieneRol(Auth::user(), ['ENFERMEROS']) && Auth::user()?->can('enfermeria.ver_dashboard'), 403,
+            'La recepción corresponde al personal operativo de Enfermería.');
         $turno = $turnos->obtenerTurnoActivo(Auth::user(), today()->toDateString());
         abort_unless($turno, 409, 'No tiene un turno activo asignado para recibir.');
 

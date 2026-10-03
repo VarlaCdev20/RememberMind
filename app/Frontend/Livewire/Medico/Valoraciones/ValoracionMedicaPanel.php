@@ -223,7 +223,8 @@ class ValoracionMedicaPanel extends Component
         $usuario = Auth::user();
 
         return $usuario?->estado === 'ACTIVO'
-            && $usuario->hasRole('MEDICO GENERAL/GERIATRA')
+            && app(\App\Backend\Modulos\Clinica\Servicios\AccesoClinicoTemporalService::class)
+                ->tieneRol($usuario, ['MEDICO GENERAL/GERIATRA'])
             && $usuario->can('atenciones.crear')
             && $usuario->can('notas_clinicas.crear')
             && ! app(RolePreviewService::class)->isActive($usuario);

@@ -2,6 +2,7 @@
 
 namespace App\Policies;
 
+use App\Backend\Modulos\Clinica\Servicios\AccesoClinicoTemporalService;
 use App\Models\Prescripcion;
 use App\Models\User;
 
@@ -14,7 +15,8 @@ class PrescripcionPolicy
 
     public function create(User $user): bool
     {
-        return $user->hasRole('MEDICO GENERAL/GERIATRA') && $user->can('prescripciones.crear');
+        return app(AccesoClinicoTemporalService::class)->tieneRol($user, ['MEDICO GENERAL/GERIATRA'])
+            && $user->can('prescripciones.crear');
     }
 
     public function update(User $user, Prescripcion $prescripcion): bool

@@ -149,7 +149,7 @@
  
  <button type="button" 
  wire:click="togglePermiso('{{ $permiso }}')"
- @if(!auth()->user()->can('roles.editar_permisos')) disabled @endif
+ @if(!auth()->user()->can('roles.editar_permisos') || $rolSeleccionado?->name === 'SUPERADMINISTRADOR') disabled @endif
  class="relative inline-flex h-5 w-9 shrink-0 cursor-pointer items-center rounded-full transition-colors duration-200 ease-in-out focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed {{ $tienePermiso ? ($esCritico ? 'bg-boton-acento' : 'bg-estado-exitoBg') : 'bg-fondo-panel' }}">
  <span class="inline-block h-3.5 w-3.5 transform rounded-full bg-fondo-card shadow ring-0 transition duration-200 ease-in-out {{ $tienePermiso ? 'translate-x-4' : 'translate-x-1' }}"></span>
  </button>

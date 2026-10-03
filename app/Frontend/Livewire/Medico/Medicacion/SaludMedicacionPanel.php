@@ -331,7 +331,8 @@ class SaludMedicacionPanel extends Component
 
     private function autorizarGestionOrden(): void
     {
-        abort_unless(auth()->user()?->hasRole('MEDICO GENERAL/GERIATRA')
+        abort_unless(app(\App\Backend\Modulos\Clinica\Servicios\AccesoClinicoTemporalService::class)
+                ->tieneRol(auth()->user(), ['MEDICO GENERAL/GERIATRA'])
             && auth()->user()?->can('prescripciones.crear'), 403,
             'Las prescripciones solo pueden ser creadas o modificadas por personal médico autorizado.');
     }

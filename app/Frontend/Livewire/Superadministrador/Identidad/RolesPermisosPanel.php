@@ -124,15 +124,13 @@ class RolesPermisosPanel extends Component
         }
 
         $rol = Role::find($this->rolSeleccionadoId);
-        if ($rol && $rol->name === 'SUPERADMINISTRADOR' && $permissionName === 'roles.editar_permisos') {
-            if (in_array($permissionName, $this->permisosSeleccionados)) {
-                $this->dispatch('swal', [
-                    'icon' => 'warning',
-                    'title' => 'Acción bloqueada',
-                    'text' => 'No puedes quitar este permiso crítico al rol de superadministrador.'
-                ]);
-                return;
-            }
+        if ($rol && $rol->name === 'SUPERADMINISTRADOR') {
+            $this->dispatch('swal', [
+                'icon' => 'warning',
+                'title' => 'Acción bloqueada',
+                'text' => 'El superadministrador conserva todos los permisos durante esta etapa.'
+            ]);
+            return;
         }
 
         if (in_array($permissionName, $this->permisosSeleccionados)) {
@@ -152,9 +150,12 @@ class RolesPermisosPanel extends Component
 
         $rol = Role::find($this->rolSeleccionadoId);
         if ($rol) {
-            $rol->syncPermissions($this->permisosSeleccionados);
+            $rol->syncPermissions($rol->name === 'SUPERADMINISTRADOR'
+                ? Permission::query()->where('guard_name', $rol->guard_name)->get()
+                : $this->permisosSeleccionados);
             app(PermissionRegistrar::class)->forgetCachedPermissions();
 
+            $this->permisosSeleccionados = $rol->fresh('permissions')->permissions->pluck('name')->all();
             $this->hayCambios = false;
             unset($this->roles); // force refresh
 

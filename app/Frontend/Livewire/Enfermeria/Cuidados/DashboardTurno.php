@@ -138,6 +138,18 @@ class DashboardTurno extends Component
         $personal = $user->personal;
         abort_unless($personal, 403, 'Acción no permitida: Personal no vinculado al usuario.');
 
+        $accesoTemporal = app(\App\Backend\Modulos\Clinica\Servicios\AccesoClinicoTemporalService::class);
+        if ($accesoTemporal->sustituyeRol($user)) {
+            if ($permiso) {
+                abort_unless($user->can($permiso), 403);
+            }
+            if ($codResidente && $permiso) {
+                app(TurnoEnfermeriaService::class)->autorizarMutacionPaciente($codResidente, $permiso, $user);
+            }
+
+            return;
+        }
+
         // 3. Jornada activa actual en tiempo real
         // Si la jornada terminó mientras la pantalla estaba abierta, resolverJornadaActual retornará null
         $miTurnoService = app(MiTurnoService::class);
@@ -150,11 +162,10 @@ class DashboardTurno extends Component
             abort_unless($user->can($permiso), 403, "Acción no permitida: Carece del permiso [{$permiso}].");
         }
 
-        // 1.1 Competencia clinica: Las mutaciones clinicas en Mi Turno requieren rol ENFERMEROS
-        // (SUPERADMINISTRADOR tiene lectura global, pero NO puede registrar mutaciones clinicas solo por su rol)
-        abort_unless($user->hasRole('ENFERMEROS'), 403, 'Acción clínica no permitida: Rol ENFERMEROS requerido.');
+        abort_unless(app(\App\Backend\Modulos\Clinica\Servicios\AccesoClinicoTemporalService::class)
+            ->tieneRol($user, ['ENFERMEROS']), 403, 'Acción clínica no permitida: Rol ENFERMEROS requerido.');
 
-        // 5. Residente asignado en la jornada activa (SIN bypass de Superadministrador para mutaciones clinicas)
+        // 5. Residente asignado en la jornada activa
         if ($codResidente) {
             $esAsignado = AsignacionResidenteJornada::query()
                 ->where('cod_jornada', $jornadaActual->cod_jornada)

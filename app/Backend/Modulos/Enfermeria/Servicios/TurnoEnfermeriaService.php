@@ -2,6 +2,7 @@
 
 namespace App\Backend\Modulos\Enfermeria\Servicios;
 
+use App\Backend\Modulos\Clinica\Servicios\AccesoClinicoTemporalService;
 use App\Models\AsignacionResidenteJornada;
 use App\Models\Residente;
 use App\Models\TurnoEnfermeria;
@@ -202,10 +203,34 @@ class TurnoEnfermeriaService
         $user ??= Auth::user();
         abort_unless($user && strtoupper((string) $user->estado) === 'ACTIVO', 403,
             'La cuenta de usuario no se encuentra activa.');
-        abort_unless($user?->hasRole('ENFERMEROS'), 403,
+        abort_unless(app(AccesoClinicoTemporalService::class)->tieneRol($user, ['ENFERMEROS']), 403,
             'La acción está reservada al personal de Enfermería.');
         $permisoValido = $user->can($permiso);
         abort_unless($permisoValido, 403, 'No cuenta con el permiso requerido para esta acción.');
+
+        $accesoTemporal = app(AccesoClinicoTemporalService::class);
+        if ($accesoTemporal->sustituyeRol($user)) {
+            $residente = $adulto instanceof Residente ? $adulto->fresh() : Residente::query()->findOrFail($adulto);
+            abort_unless(in_array($residente?->estado, ['ADMITIDO', 'ACTIVO', 'EST_001']), 403,
+                'El residente no se encuentra admitido.');
+
+            $jornadas = AsignacionResidenteJornada::query()
+                ->where('cod_residente', $residente->cod_residente)
+                ->whereIn('estado', ['ACTIVA', 'ACTIVO', 'ASIGNADO'])
+                ->whereHas('jornada', fn (Builder $query) => $query
+                    ->whereDate('fecha_jornada', today())
+                    ->whereIn('estado', ['ABIERTA', 'ACTIVA', 'EN_CURSO']))
+                ->with('jornada.turno')
+                ->get()
+                ->pluck('jornada')
+                ->filter()
+                ->unique('cod_jornada');
+
+            abort_unless($jornadas->count() === 1 && $jornadas->first()->turno, 403,
+                'La acción requiere una jornada activa inequívoca para el residente.');
+
+            return TurnoEnfermeria::query()->findOrFail($jornadas->first()->cod_turno);
+        }
 
         if (! $user->relationLoaded('personal')) {
             $user->load('personal');
@@ -226,8 +251,8 @@ class TurnoEnfermeriaService
     public function autorizarMutacionEnfermeria(string|Residente $adulto, string $permiso, ?User $user = null): ?TurnoEnfermeria
     {
         $user ??= Auth::user();
-        // Las mutaciones clinicas requieren competencia profesional y rol ENFERMEROS (sin bypass de Superadministrador)
-        abort_unless($user?->hasRole('ENFERMEROS'), 403, 'Acción clínica no permitida: Rol ENFERMEROS requerido.');
+        abort_unless(app(AccesoClinicoTemporalService::class)->tieneRol($user, ['ENFERMEROS']), 403,
+            'Acción clínica no permitida: Rol ENFERMEROS requerido.');
         return $this->autorizarMutacionPaciente($adulto, $permiso, $user);
     }
 
