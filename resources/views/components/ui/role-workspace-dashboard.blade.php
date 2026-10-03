@@ -75,22 +75,24 @@
         </div>
     @endif
 
-    <section class="rm-role-access" aria-labelledby="role-access-title">
-        <div>
-            <p class="rm-dashboard-kicker">NAVEGACIÓN SEGURA</p>
-            <h2 id="role-access-title">Accesos disponibles</h2>
-            <p>Las opciones se muestran de acuerdo con las competencias y permisos asignados a tu rol.</p>
-        </div>
-        <div class="rm-role-access__links">
-            @forelse($accesos as $acceso)
-                <a href="{{ route($acceso['route']) }}" wire:navigate>
-                    <i class="ph-bold {{ $acceso['icon'] }}"></i>
-                    <span>{{ $acceso['label'] }}</span>
-                    <i class="ph-bold ph-arrow-up-right"></i>
-                </a>
-            @empty
-                <span class="rm-role-access__empty">No hay accesos adicionales habilitados para este perfil.</span>
-            @endforelse
-        </div>
-    </section>
+    @unless($esSuperadministracion)
+        <section class="rm-role-access" aria-labelledby="role-access-title">
+            <div>
+                <p class="rm-dashboard-kicker">NAVEGACIÓN SEGURA</p>
+                <h2 id="role-access-title">Accesos disponibles</h2>
+                <p>Las opciones se muestran de acuerdo con las competencias y permisos asignados a tu rol.</p>
+            </div>
+            <div class="rm-role-access__links">
+                @forelse($accesos as $acceso)
+                    <a href="{{ route($acceso['route']) }}" wire:navigate>
+                        <i class="ph-bold {{ $acceso['icon'] }}"></i>
+                        <span>{{ $acceso['label'] }}</span>
+                        <i class="ph-bold ph-arrow-up-right"></i>
+                    </a>
+                @empty
+                    <span class="rm-role-access__empty">No hay accesos adicionales habilitados para este perfil.</span>
+                @endforelse
+            </div>
+        </section>
+    @endunless
 </div>
