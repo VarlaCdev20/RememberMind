@@ -17,6 +17,14 @@ class AuthenticationTest extends TestCase
         $response = $this->get('/login');
 
         $response->assertStatus(200);
+        $response->assertSee('Entrar al Portal');
+        $response->assertSee("correo: ''", false);
+        $response->assertSee("recoverCorreo: ''", false);
+    }
+
+    public function test_route_source_does_not_prefix_script_responses_with_a_bom(): void
+    {
+        $this->assertStringStartsWith('<?php', file_get_contents(base_path('routes/web.php')));
     }
 
     public function test_users_can_authenticate_using_the_login_screen(): void

@@ -29,7 +29,7 @@
 
             isSubmitting: false,
 
-            correo: @js(old('correo')),
+            correo: @js(old('correo') ?? ''),
 
             password: '',
 
@@ -44,7 +44,7 @@
             |--------------------------------------------------------------------------
             */
 
-            recoverCorreo: @js(old('correo')),
+            recoverCorreo: @js(old('correo') ?? ''),
 
             recoverTouched: false,
 

@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 
 use App\Frontend\Livewire\Administracion\Actividades\ActividadesPanel;
 use App\Frontend\Livewire\Administracion\Actividades\AsistenciaPanel;
