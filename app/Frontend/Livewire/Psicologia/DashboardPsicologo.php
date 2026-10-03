@@ -2,9 +2,8 @@
 
 namespace App\Frontend\Livewire\Psicologia;
 
+use Illuminate\Support\Facades\DB;
 use Livewire\Component;
-use App\Models\AdultoMayor;
-use App\Models\AplicacionInstrumento;
 
 class DashboardPsicologo extends Component
 {
@@ -12,73 +11,62 @@ class DashboardPsicologo extends Component
 
     public function mount(): void
     {
-        if (!auth()->user()->hasAnyRole(['SUPERADMINISTRADOR', 'PSICOLOGO/A'])) {
+        if (! auth()->user()->hasAnyRole(['SUPERADMINISTRADOR', 'PSICOLOGO/A'])) {
             abort(403, 'Acceso denegado. Solo personal de psicología autorizado.');
         }
     }
 
     public function render()
     {
-        $totalPacientes = AdultoMayor::whereNotIn('estado', ['ARCHIVADO', 'INACTIVO'])->count();
-        $totalEvaluaciones = AplicacionInstrumento::count();
-        $alertasCriticas = 0;
+        $personal = auth()->user()->personal;
+        $metrics = [];
+        $panels = [];
 
-        $areasConfig = [
-            'ARE_COG' => [
-                'nombre'    => 'Cognitivo',
-                'icono'     => 'ph-brain',
-                'color_bg'  => 'bg-boton-acento/10',
-                'color_txt' => 'text-boton-acento',
-                'ruta'      => 'admin.psicologia.evaluacion.cognitiva',
-            ],
-            'ARE_AFE' => [
-                'nombre'    => 'Afectivo',
-                'icono'     => 'ph-heart',
-                'color_bg'  => 'bg-estado-peligroBg',
-                'color_txt' => 'text-estado-peligro',
-                'ruta'      => 'admin.psicologia.evaluacion.afectiva',
-            ],
-            'ARE_FUN' => [
-                'nombre'    => 'Funcionamiento',
-                'icono'     => 'ph-person-simple-walk',
-                'color_bg'  => 'bg-estado-exitoBg',
-                'color_txt' => 'text-estado-exito',
-                'ruta'      => 'admin.psicologia.evaluacion.funcionamiento',
-            ],
-            'ARE_NUT' => [
-                'nombre'    => 'Nutricional',
-                'icono'     => 'ph-apple-logo',
-                'color_bg'  => 'bg-estado-advertenciaBg',
-                'color_txt' => 'text-estado-advertencia',
-                'ruta'      => 'admin.psicologia.evaluacion.nutricional',
-            ],
-            'ARE_SOC' => [
-                'nombre'    => 'Entorno',
-                'icono'     => 'ph-users-four',
-                'color_bg'  => 'bg-estado-infoBg',
-                'color_txt' => 'text-estado-info',
-                'ruta'      => 'admin.psicologia.evaluacion.entorno',
-            ],
-        ];
+        if ($personal && $personal->estado === 'ACTIVO') {
+            $code = $personal->cod_personal;
+            $care = DB::table('atenciones')->where('cod_personal', $code);
+            $applications = DB::table('aplicaciones_instrumento')->where('cod_personal', $code);
+            $alerts = DB::table('alertas')->where('cod_personal_responsable', $code)
+                ->whereIn('estado', ['ABIERTA', 'EN_ATENCION']);
 
-        $statsPorArea = [];
-        foreach ($areasConfig as $codArea => $config) {
-            $total = 0;
-            $criticas = 0;
-            $statsPorArea[$codArea] = array_merge($config, [
-                'total'   => $total,
-                'criticas'=> $criticas,
-            ]);
+            $metrics = [
+                ['label' => 'Residentes atendidos', 'value' => (clone $care)->where('fecha_hora', '>=', now()->subDays(90))->distinct('cod_residente')->count('cod_residente'), 'description' => 'Atenciones propias · 90 días', 'icon' => 'ph-users-three', 'variant' => 'mint'],
+                ['label' => 'Instrumentos aplicados', 'value' => (clone $applications)->where('fecha_hora', '>=', now()->subDays(30))->count(), 'description' => 'Registros propios · 30 días', 'icon' => 'ph-clipboard-text', 'variant' => 'sky'],
+                ['label' => 'Atenciones de hoy', 'value' => (clone $care)->whereDate('fecha_hora', today())->count(), 'description' => 'Registradas a tu nombre', 'icon' => 'ph-calendar-check', 'variant' => 'neutral'],
+                ['label' => 'Alertas a tu cargo', 'value' => (clone $alerts)->count(), 'description' => 'Abiertas o en atención', 'icon' => 'ph-warning-circle', 'variant' => 'critical'],
+            ];
+
+            $recent = (clone $applications)->join('residentes as r', 'r.cod_residente', '=', 'aplicaciones_instrumento.cod_residente')
+                ->join('instrumentos as i', 'i.cod_instrumento', '=', 'aplicaciones_instrumento.cod_instrumento')
+                ->orderByDesc('aplicaciones_instrumento.fecha_hora')->limit(6)
+                ->get(['r.nombres', 'r.apellido_paterno', 'i.nombre as instrumento', 'aplicaciones_instrumento.fecha_hora'])
+                ->map(fn ($row) => ['label' => trim($row->nombres.' '.$row->apellido_paterno), 'detail' => $row->instrumento.' · '.date('d/m/Y H:i', strtotime($row->fecha_hora))])->all();
+            $upcoming = (clone $care)->join('residentes as r', 'r.cod_residente', '=', 'atenciones.cod_residente')
+                ->where('atenciones.fecha_hora', '>=', now())
+                ->whereNotIn('atenciones.estado', ['CANCELADA', 'ANULADA'])
+                ->orderBy('atenciones.fecha_hora')->limit(6)
+                ->get(['r.nombres', 'r.apellido_paterno', 'atenciones.tipo_atencion', 'atenciones.fecha_hora'])
+                ->map(fn ($row) => ['label' => trim($row->nombres.' '.$row->apellido_paterno), 'detail' => $row->tipo_atencion.' · '.date('d/m H:i', strtotime($row->fecha_hora))])->all();
+            $priority = (clone $alerts)->whereIn('prioridad', ['CRITICO', 'CRITICA', 'ALTA'])
+                ->orderByDesc('fecha_hora')->limit(6)->get(['titulo', 'prioridad', 'fecha_hora'])
+                ->map(fn ($row) => ['label' => $row->titulo, 'detail' => $row->prioridad.' · '.date('d/m H:i', strtotime($row->fecha_hora))])->all();
+            $instruments = (clone $applications)->join('instrumentos as i', 'i.cod_instrumento', '=', 'aplicaciones_instrumento.cod_instrumento')
+                ->where('aplicaciones_instrumento.fecha_hora', '>=', now()->subDays(90))
+                ->select('i.nombre as label')->selectRaw('COUNT(*) as total')
+                ->groupBy('i.cod_instrumento', 'i.nombre')->orderByDesc('total')->limit(6)->get()
+                ->map(fn ($row) => ['label' => $row->label, 'value' => (int) $row->total])->all();
+
+            $panels = [
+                ['title' => 'Próximas atenciones', 'type' => 'timeline', 'items' => $upcoming, 'empty' => 'No hay atenciones futuras registradas a tu nombre.', 'icon' => 'ph-calendar-check', 'span' => 'wide'],
+                ['title' => 'Alertas prioritarias a tu cargo', 'type' => 'list', 'items' => $priority, 'empty' => 'No hay alertas prioritarias abiertas a tu cargo.', 'icon' => 'ph-warning-circle'],
+                ['title' => 'Instrumentos recientes', 'type' => 'list', 'items' => $recent, 'empty' => 'Aún no hay instrumentos aplicados a tu nombre.', 'icon' => 'ph-clipboard-text', 'span' => 'wide'],
+                ['title' => 'Instrumentos aplicados · 90 días', 'type' => 'bars', 'items' => $instruments, 'empty' => 'Sin aplicaciones registradas en el período.', 'icon' => 'ph-chart-bar'],
+            ];
+        } else {
+            $panels[] = ['title' => 'Contexto profesional', 'type' => 'list', 'items' => [], 'empty' => 'No hay una vinculación de personal activo para consultar registros propios.', 'icon' => 'ph-identification-badge', 'span' => 'wide'];
         }
 
-        $evaluacionesRecientes = collect();
-
-        return view('livewire.valoraciones.dashboard-psicologo', compact(
-            'totalPacientes',
-            'totalEvaluaciones',
-            'alertasCriticas',
-            'evaluacionesRecientes',
-            'statsPorArea'
-        ))->layout('layouts.sistema');
+        return view('livewire.valoraciones.dashboard-psicologo', compact('metrics', 'panels'))
+            ->layout('layouts.sistema');
     }
 }

@@ -1,5 +1,5 @@
 {{-- Dashboard operativo de Enfermería: jerarquía de lectura y teclado alineadas. --}}
-<section class="rm-nursing-dashboard font-sans" wire:poll.60s="refrescarTurno" aria-label="Dashboard de Enfermería">
+<section class="rm-nursing-dashboard rm-dashboard-composition font-sans" wire:poll.60s="refrescarTurno" aria-label="Dashboard de Enfermería">
 <x-ui.dashboard-welcome-header
             :usuario="Auth::user()"
             :estado="$dashboard['estado'] ?? null"
@@ -11,45 +11,28 @@
 @php
         $enTurno = ($dashboard['modo'] ?? '') === 'EN_TURNO';
         $pacientesKpi = $enTurno ? ($stats['pacientes'] ?? null) : null;
-        $camasPorcentaje = $camasTurno && $camasTurno['total'] > 0
-            ? round($camasTurno['ocupadas'] / $camasTurno['total'] * 100)
-            : null;
         $medicacionTurno = $enTurno ? ($dashboard['medicacion_turno'] ?? null) : null;
         $medicacionPendiente = $medicacionTurno['pendientes'] ?? null;
         $medicacionVariante = ($medicacionTurno['retrasadas'] ?? 0) > 0
             ? 'critical'
             : ($medicacionPendiente > 0 ? 'coral' : 'mint');
         $totalSeguimiento = array_sum($distribucionPacientes);
-        $camasDisponibles = $camasTurno ? max(0, $camasTurno['total'] - $camasTurno['ocupadas']) : null;
         $accionesTurno = $dashboard['estado_tareas'] ?? [];
         $accionesRealizadas = (int) ($accionesTurno['realizadas'] ?? 0);
         $accionesPendientes = (int) ($accionesTurno['pendientes'] ?? 0);
         $accionesRetrasadas = (int) ($accionesTurno['retrasadas'] ?? 0);
-        $diasOcupacion = $tendenciaOcupacion['dias'] ?? [];
-        $resumenOcupacion = implode('; ', array_map(
-            fn ($dia) => $dia['etiqueta'].': '.$dia['ocupadas'].' camas',
-            $diasOcupacion
-        ));
-        $incidentesPorCategoria = ($incidentesTendencia['total_periodo'] ?? 0) > 0
-            ? array_map(fn ($serie) => [
-                'label' => $serie['label'],
-                'total' => array_sum($serie['data']),
-            ], $incidentesTendencia['datasets'])
-            : [];
     @endphp
     <x-ui.metric-card class="rm-nursing-dashboard__kpi rm-nursing-dashboard__kpi--patients"
         icon="ph-users-three" variant="mint" :value="$pacientesKpi" label="Pacientes"
         :description="$enTurno ? 'Asignados a mi turno' : 'Sin turno activo'"
         :href="$enTurno && Route::has('admin.enfermeria.pacientes') && auth()->user()?->can('enfermeria.ver_pacientes_asignados') ? route('admin.enfermeria.pacientes') : null" />
     <x-ui.metric-card class="rm-nursing-dashboard__kpi rm-nursing-dashboard__kpi--beds"
-        icon="ph-bed" variant="sky"
-        :value="$camasTurno ? $camasTurno['ocupadas'].'/'.$camasTurno['total'] : null"
-        label="Camas ocupadas"
-        :description="$camasPorcentaje !== null ? $camasPorcentaje.'% de ocupación' : 'Sin datos disponibles'"
-        :progress="$camasPorcentaje" />
+        icon="ph-list-checks" variant="sky" :value="$enTurno ? $accionesPendientes : null"
+        label="Cuidados pendientes"
+        :description="$enTurno ? 'Acciones programadas del turno' : 'Sin turno activo'" />
     <x-ui.metric-card class="rm-nursing-dashboard__kpi rm-nursing-dashboard__kpi--risk"
-        icon="ph-shield-warning" variant="neutral" :value="null" label="Alto riesgo"
-        description="Sin métrica disponible" />
+        icon="ph-shield-warning" variant="neutral" :value="$enTurno ? $stats['alertas_activas'] : null" label="Alertas del turno"
+        :description="$enTurno ? 'Abiertas o en atención' : 'Sin turno activo'" />
     <x-ui.metric-card class="rm-nursing-dashboard__kpi rm-nursing-dashboard__kpi--medication"
         icon="ph-pill" :variant="$medicacionVariante" :value="$medicacionPendiente"
         label="Medicamentos pendientes"
@@ -171,22 +154,6 @@
             </div>
         </x-ui.card>
 
-        <x-ui.card class="rm-nursing-dashboard__incident-bars rm-nursing-module rm-chart-card rm-chart-glass"
-            aria-labelledby="nursing-incident-bars-title"
-            data-nursing-incidents-by-type="{{ $incidentesPorCategoria ? json_encode(['labels' => array_column($incidentesPorCategoria, 'label'), 'values' => array_column($incidentesPorCategoria, 'total')], JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT | JSON_HEX_TAG) : '' }}">
-            <x-ui.section-header title="Incidentes por categoría" subtitle="Registros de los últimos 7 días" icon="ph-chart-bar" level="2" id="nursing-incident-bars-title" />
-            @if(!$incidentesPorCategoria)
-                <x-ui.empty-state compact icono="ph-chart-bar" titulo="Sin incidentes para comparar" texto="La distribución por categoría aparecerá cuando existan incidentes del periodo." />
-            @else
-                <div class="rm-nursing-analytics-canvas rm-nursing-analytics-canvas--incident" wire:ignore>
-                    <canvas id="nursingIncidentsByTypeCanvas-{{ $this->getId() }}" role="img"
-                        aria-label="Incidentes de los últimos siete días por categoría: {{ implode(', ', array_map(fn ($fila) => $fila['label'].': '.$fila['total'], $incidentesPorCategoria)) }}">Incidentes por categoría.</canvas>
-                </div>
-                <ul class="sr-only" aria-label="Totales de incidentes por categoría">@foreach($incidentesPorCategoria as $fila)<li>{{ $fila['label'] }}: {{ $fila['total'] }}</li>@endforeach</ul>
-                <p class="rm-nursing-chart-note">{{ $incidentesTendencia['total_periodo'] }} incidentes registrados en el periodo. Datos de residentes del turno.</p>
-            @endif
-        </x-ui.card>
-
 <x-ui.card class="rm-nursing-dashboard__distribution rm-nursing-module rm-nursing-distribution rm-chart-card rm-chart-glass" aria-labelledby="nursing-distribution-title"
     data-nursing-followup="{{ json_encode(['labels' => ['Sin alertas activas', 'Vigilancia', 'Alerta crítica'], 'values' => array_values($distribucionPacientes)], JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT | JSON_HEX_TAG) }}">
         <x-ui.section-header title="Estado de seguimiento" :subtitle="($dashboard['estado'] ?? '') === 'SIN_JORNADA_ACTIVA' ? 'Sin jornada activa' : (($dashboard['modo'] ?? '') === 'FUERA_DE_TURNO' ? 'Residentes del equipo en turno' : 'Residentes asignados a tu turno')" icon="ph-chart-donut" level="2" id="nursing-distribution-title" />
@@ -208,30 +175,6 @@
                 </ul>
             </div>
             <p class="rm-nursing-chart-note">Basado en alertas activas; no equivale a una valoración clínica.</p>
-        @endif
-    </x-ui.card>
-
-<x-ui.card class="rm-nursing-dashboard__occupancy rm-nursing-module rm-nursing-distribution rm-chart-card rm-chart-glass" aria-labelledby="nursing-occupancy-title"
-    data-nursing-beds="{{ $camasTurno ? json_encode(['labels' => ['Ocupadas', 'Disponibles'], 'values' => [$camasTurno['ocupadas'], $camasDisponibles]], JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT | JSON_HEX_TAG) : '' }}">
-        <x-ui.section-header title="Ocupación de camas" subtitle="Disponibilidad actual del centro" icon="ph-bed" level="2" id="nursing-occupancy-title" />
-        @if($camasTurno === null)
-            <x-ui.empty-state compact icono="ph-bed" titulo="Sin camas registradas" texto="La ocupación aparecerá cuando existan camas activas verificables." />
-        @else
-            <div class="rm-nursing-donut-layout">
-                <div class="rm-nursing-donut-stage">
-                    <div class="rm-nursing-donut-canvas" wire:ignore>
-                        <canvas id="nursingBedsCanvas-{{ $this->getId() }}" role="img"
-                            aria-label="{{ $camasTurno['ocupadas'] }} de {{ $camasTurno['total'] }} camas ocupadas; {{ $camasDisponibles }} disponibles">Ocupación actual de camas.</canvas>
-                    </div>
-                    <span class="rm-nursing-donut__center"><strong>{{ $camasPorcentaje }}%</strong><small>ocupación</small></span>
-                </div>
-                <ul class="rm-nursing-donut-legend" aria-label="Detalle de camas">
-                    <li><span class="rm-nursing-donut-legend__label"><i class="rm-nursing-donut-legend__dot rm-nursing-donut-legend__dot--mint" aria-hidden="true"></i>Ocupadas</span><strong>{{ $camasTurno['ocupadas'] }}</strong></li>
-                    <li><span class="rm-nursing-donut-legend__label"><i class="rm-nursing-donut-legend__dot rm-nursing-donut-legend__dot--neutral" aria-hidden="true"></i>Disponibles</span><strong>{{ $camasDisponibles }}</strong></li>
-                    <li class="rm-nursing-donut-legend__total"><span>Total de camas</span><strong>{{ $camasTurno['total'] }}</strong></li>
-                </ul>
-            </div>
-            <p class="rm-nursing-chart-note">Camas activas y ocupaciones vigentes verificadas.</p>
         @endif
     </x-ui.card>
 
@@ -297,20 +240,6 @@
         </div>
         <p class="rm-nursing-analytics-summary">{{ $accionesRealizadas }} realizadas <span aria-hidden="true">·</span> {{ $accionesPendientes }} pendientes <span aria-hidden="true">·</span> {{ $accionesRetrasadas }} retrasadas</p>
         <p class="rm-nursing-chart-note">{{ $accionesTurno['total'] }} acciones en la agenda del turno. Las retrasadas se muestran por separado.</p>
-    @endif
-</x-ui.card>
-
-<x-ui.card class="rm-nursing-dashboard__occupancy-trend rm-nursing-module rm-chart-card rm-chart-glass" aria-labelledby="nursing-occupancy-trend-title"
-    data-nursing-occupancy="{{ $tendenciaOcupacion ? json_encode($tendenciaOcupacion, JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT | JSON_HEX_TAG) : '' }}">
-    <x-ui.section-header title="Tendencia de ocupación" subtitle="Camas activas ocupadas al cierre de cada día · últimos 7 días" icon="ph-chart-line-up" level="2" id="nursing-occupancy-trend-title" />
-    @if($tendenciaOcupacion === null)
-        <x-ui.empty-state compact icono="ph-chart-line-up" titulo="Sin historial de ocupación" texto="La tendencia aparecerá cuando existan camas activas registradas." />
-    @else
-        <div class="rm-nursing-analytics-canvas rm-nursing-analytics-canvas--line" wire:ignore>
-            <canvas id="nursingOccupancyCanvas-{{ $this->getId() }}" role="img" aria-label="Tendencia de ocupación: {{ $resumenOcupacion }}">Ocupación de camas de los últimos siete días.</canvas>
-        </div>
-        <ol class="sr-only" aria-label="Ocupación por día">@foreach($diasOcupacion as $dia)<li>{{ $dia['etiqueta'] }}: {{ $dia['ocupadas'] }} camas ocupadas</li>@endforeach</ol>
-        <div class="rm-nursing-line-chart__summary"><span>Hoy <strong>{{ $diasOcupacion[6]['ocupadas'] }} ocupadas</strong></span><span>Capacidad <strong>{{ $tendenciaOcupacion['total_camas'] }} camas</strong></span></div>
     @endif
 </x-ui.card>
 
@@ -482,10 +411,7 @@
         const reducedMotion = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
         const specs = {
             followup: { selector: '[data-nursing-followup]', attribute: 'nursingFollowup', key: 'nursing-dashboard-followup' },
-            beds: { selector: '[data-nursing-beds]', attribute: 'nursingBeds', key: 'nursing-dashboard-beds' },
             activity: { selector: '[data-nursing-activity]', attribute: 'nursingActivity', key: 'nursing-dashboard-activity' },
-            incidentsByType: { selector: '[data-nursing-incidents-by-type]', attribute: 'nursingIncidentsByType', key: 'nursing-dashboard-incidents-by-type' },
-            occupancy: { selector: '[data-nursing-occupancy]', attribute: 'nursingOccupancy', key: 'nursing-dashboard-occupancy' },
         };
 
         controller.renderOne = (type) => {
@@ -507,44 +433,16 @@
             try { data = JSON.parse(raw); } catch (_) { return; }
 
             let config;
-            if (type === 'followup' || type === 'beds') {
-                const colors = type === 'followup'
-                    ? [token('--rm-chart-1'), token('--rm-chart-2'), token('--rm-chart-10')]
-                    : [token('--rm-chart-1'), token('--rm-chart-9')];
+            if (type === 'followup') {
+                const colors = [token('--rm-chart-1'), token('--rm-chart-2'), token('--rm-chart-10')];
                 config = window.RMCharts.presets.doughnut(data.labels, data.values, colors);
                 config.options.animation = reducedMotion() ? false : {
                     duration: 700, easing: 'easeOutQuart', animateRotate: true, animateScale: true,
                 };
-            } else if (type === 'activity' || type === 'incidentsByType') {
-                config = window.RMCharts.presets.barHorizontal(data.labels, data.values, [
-                    ...(type === 'activity'
-                        ? [token('--rm-chart-1'), token('--rm-chart-2'), token('--rm-chart-10')]
-                        : [token('--rm-chart-10'), token('--rm-chart-2'), token('--rm-chart-1')]),
-                ]);
-                config.options.plugins.tooltip.callbacks.label = (item) => ` ${item.raw} ${type === 'activity' ? 'acciones' : 'incidentes'}`;
+            } else if (type === 'activity') {
+                config = window.RMCharts.presets.barHorizontal(data.labels, data.values, [token('--rm-chart-1'), token('--rm-chart-2'), token('--rm-chart-10')]);
+                config.options.plugins.tooltip.callbacks.label = (item) => ` ${item.raw} acciones`;
                 config.options.animation = reducedMotion() ? false : { duration: 650, easing: 'easeOutQuart' };
-            } else {
-                const color = token('--rm-chart-1');
-                config = window.RMCharts.presets.area(
-                    data.dias.map((dia) => dia.etiqueta),
-                    [{
-                        label: 'Camas ocupadas',
-                        data: data.dias.map((dia) => dia.ocupadas),
-                        borderColor: color,
-                        backgroundColor: window.RMCharts.hexToRgba(color, .16),
-                        pointBackgroundColor: color,
-                        pointBorderColor: token('--rm-surface-raised'),
-                    }]
-                );
-                config.options.scales.x.grid.display = false;
-                config.options.scales.y.beginAtZero = true;
-                config.options.scales.y.suggestedMax = Math.max(1, data.total_camas);
-                config.options.scales.y.ticks.precision = 0;
-                config.options.plugins.tooltip.callbacks = {
-                    title: (items) => data.dias[items[0]?.dataIndex]?.fecha || '',
-                    label: (item) => ` ${item.parsed.y} camas ocupadas`,
-                };
-                config.options.animation = reducedMotion() ? false : { duration: 800, easing: 'easeOutQuart' };
             }
 
             if (window.RMCharts.init(spec.key, canvas, config)) {

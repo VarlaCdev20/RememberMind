@@ -11,7 +11,10 @@ use Illuminate\Support\Facades\DB;
 
 class DashboardService
 {
-    public function __construct(private readonly RolePreviewService $rolePreview) {}
+    public function __construct(
+        private readonly RolePreviewService $rolePreview,
+        private readonly RoleDashboardDataService $roleDashboardData,
+    ) {}
 
     public function obtenerDatosDashboard($usuario): array
     {
@@ -23,9 +26,14 @@ class DashboardService
             $rol = $rolEfectivo ?? $usuario->getRoleNames()->first();
             $esSalud = in_array($rol, ['ENFERMEROS', 'MEDICO GENERAL/GERIATRA'], true);
 
+            $perfil = $this->obtenerPerfilDashboardRol($usuario, $rol);
+            $datosPorRol = $this->roleDashboardData->forRole($usuario, $rol ?? 'USUARIO');
+            $perfil['indicadores'] = $datosPorRol['metrics'];
+            $perfil['panels'] = $datosPorRol['panels'];
+
             return [
                 'saludo' => $this->obtenerSaludoUsuario($usuario, $rol),
-                'perfilDashboardRol' => $this->obtenerPerfilDashboardRol($usuario, $rol),
+                'perfilDashboardRol' => $perfil,
                 'infoRol' => [
                     'es_salud' => $esSalud,
                     'nombre_rol' => $rol ?? 'Usuario',
@@ -92,7 +100,7 @@ class DashboardService
             'quote' => 'Cada especialidad aporta bienestar',
             'areas' => [],
             'accesos' => [],
-            'indicadores' => $this->obtenerIndicadoresPorRol($rol),
+            'indicadores' => [],
         ];
 
         $perfiles = [
@@ -256,45 +264,16 @@ class DashboardService
         $perfil = array_replace($comun, $perfiles[$rol] ?? []);
         $perfil['rol'] = $rol;
         if (empty($perfil['accesos'])) {
-            $perfil['accesos'] = [
-                ['route' => 'admin.residentes.index', 'permission' => 'residentes.ver', 'icon' => 'ph-users-three', 'label' => $rol === 'FAMILIAR' ? 'Mi familiar' : 'Residentes'],
-                ['route' => 'admin.actividades.index', 'permission' => 'actividades.ver', 'icon' => 'ph-calendar-check', 'label' => 'Actividades'],
-                ['route' => 'profile.show', 'permission' => null, 'icon' => 'ph-user-circle', 'label' => 'Mi perfil'],
-            ];
+            $perfil['accesos'] = $rol === 'FAMILIAR'
+                ? [['route' => 'profile.show', 'permission' => null, 'icon' => 'ph-user-circle', 'label' => 'Mi perfil']]
+                : [
+                    ['route' => 'admin.residentes.index', 'permission' => 'residentes.ver', 'icon' => 'ph-users-three', 'label' => 'Residentes'],
+                    ['route' => 'admin.actividades.index', 'permission' => 'actividades.ver', 'icon' => 'ph-calendar-check', 'label' => 'Actividades'],
+                    ['route' => 'profile.show', 'permission' => null, 'icon' => 'ph-user-circle', 'label' => 'Mi perfil'],
+                ];
         }
 
         return $perfil;
-    }
-
-    private function obtenerIndicadoresPorRol(string $rol): array
-    {
-        return match ($rol) {
-            'SUPERADMINISTRADOR' => [
-                ['icon' => 'ph-users-three', 'label' => 'Usuarios activos', 'value' => DB::table('usuarios')->where('estado', 'ACTIVO')->count(), 'description' => 'Cuentas habilitadas', 'variant' => 'sky'],
-                ['icon' => 'ph-identification-badge', 'label' => 'Personal activo', 'value' => DB::table('personal')->where('estado', 'ACTIVO')->count(), 'description' => 'Equipo institucional', 'variant' => 'mint'],
-                ['icon' => 'ph-users-four', 'label' => 'Residentes activos', 'value' => DB::table('residentes')->whereIn('estado', ['ACTIVO', 'ADMITIDO'])->count(), 'description' => 'Personas residentes', 'variant' => 'sky'],
-                ['icon' => 'ph-door-open', 'label' => 'Ocupaciones activas', 'value' => DB::table('ocupaciones_cama')->whereIn('estado', ['ACTIVA', 'ACTIVO'])->count(), 'description' => 'Camas actualmente ocupadas', 'variant' => 'neutral'],
-                ['icon' => 'ph-bed', 'label' => 'Camas disponibles', 'value' => DB::table('camas')->where('estado', 'DISPONIBLE')->count(), 'description' => 'Capacidad inmediata', 'variant' => 'mint'],
-                ['icon' => 'ph-hourglass', 'label' => 'Preadmisiones pendientes', 'value' => DB::table('preadmisiones')->where('estado', 'PENDIENTE')->count(), 'description' => 'Solicitudes por revisar', 'variant' => 'coral'],
-                ['icon' => 'ph-warning', 'label' => 'Alertas abiertas', 'value' => DB::table('alertas')->whereNotIn('estado', ['CERRADA', 'ANULADA'])->count(), 'description' => 'Seguimiento requerido', 'variant' => 'critical'],
-                ['icon' => 'ph-first-aid-kit', 'label' => 'Incidentes relevantes', 'value' => DB::table('incidentes')->whereNotIn('estado', ['CERRADO', 'CERRADA', 'ANULADO', 'ANULADA'])->count(), 'description' => 'Eventos con seguimiento vigente', 'variant' => 'critical'],
-                ['icon' => 'ph-first-aid', 'label' => 'Atenciones recientes', 'value' => DB::table('atenciones')->where('fecha_hora', '>=', now()->subDays(7))->count(), 'description' => 'Últimos siete días', 'variant' => 'neutral'],
-                ['icon' => 'ph-pill', 'label' => 'Prescripciones activas', 'value' => DB::table('prescripciones')->where('estado', 'ACTIVA')->count(), 'description' => 'Supervisión de lectura', 'variant' => 'neutral'],
-            ],
-            'GERENTE' => [
-                ['icon' => 'ph-identification-badge', 'label' => 'Personal activo', 'value' => DB::table('personal')->where('estado', 'ACTIVO')->count(), 'description' => 'Equipo institucional', 'variant' => 'sky'],
-                ['icon' => 'ph-users-three', 'label' => 'Residentes activos', 'value' => DB::table('residentes')->whereIn('estado', ['ACTIVO', 'ADMITIDO'])->count(), 'description' => 'Ocupación institucional', 'variant' => 'mint'],
-                ['icon' => 'ph-bed', 'label' => 'Camas disponibles', 'value' => DB::table('camas')->where('estado', 'DISPONIBLE')->count(), 'description' => 'Capacidad inmediata', 'variant' => 'neutral'],
-                ['icon' => 'ph-warning', 'label' => 'Alertas críticas', 'value' => DB::table('alertas')->where('prioridad', 'CRITICO')->whereNotIn('estado', ['CERRADA', 'ANULADA'])->count(), 'description' => 'Requieren supervisión', 'variant' => 'critical'],
-            ],
-            'ADMINISTRADOR' => [
-                ['icon' => 'ph-hourglass', 'label' => 'Preadmisiones pendientes', 'value' => DB::table('preadmisiones')->where('estado', 'PENDIENTE')->count(), 'description' => 'Solicitudes por revisar', 'variant' => 'coral'],
-                ['icon' => 'ph-bed', 'label' => 'Camas disponibles', 'value' => DB::table('camas')->where('estado', 'DISPONIBLE')->count(), 'description' => 'Alojamiento habilitado', 'variant' => 'mint'],
-                ['icon' => 'ph-calendar-check', 'label' => 'Jornadas de hoy', 'value' => DB::table('jornadas')->whereDate('fecha_jornada', today())->whereIn('estado', ['ABIERTA', 'ACTIVA'])->count(), 'description' => 'Operación en curso', 'variant' => 'sky'],
-                ['icon' => 'ph-bell-ringing', 'label' => 'Alertas abiertas', 'value' => DB::table('alertas')->whereNotIn('estado', ['CERRADA', 'ANULADA'])->count(), 'description' => 'Seguimiento operativo', 'variant' => 'critical'],
-            ],
-            default => [],
-        };
     }
 
     public function obtenerKpisInstitucionales(): array

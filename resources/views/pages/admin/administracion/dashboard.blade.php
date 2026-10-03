@@ -3,15 +3,13 @@
 @php
     $puedePreadmisiones = $visibilidadNavegacion->puedeVerRuta('admin.admisiones.preadmisiones');
     $puedeAdmisiones = $visibilidadNavegacion->puedeVerRuta('admin.administracion.admisiones');
-    $puedeResidentes = $visibilidadNavegacion->puedeVerRuta('admin.administracion.residentes');
     $puedeOcupacion = $visibilidadNavegacion->puedeVerRuta('admin.administracion.ocupacion');
     $puedeJornadas = $visibilidadNavegacion->puedeVerRuta('admin.administracion.jornadas');
     $puedeActividades = $visibilidadNavegacion->puedeVerRuta('admin.administracion.actividades');
     $puedeVisitas = $visibilidadNavegacion->puedeVerRuta('admin.administracion.visitas');
     $puedeAlertas = $visibilidadNavegacion->puedeVerRuta('admin.administracion.alertas');
-    $ocupadas = $datos['ocupacion']['ocupadas'];
+    $puedeDocumentacion = $visibilidadNavegacion->puedeVerRuta('admin.administracion.documentacion');
     $totalCamas = $datos['ocupacion']['total'];
-    $porcentaje = $totalCamas > 0 ? round($ocupadas * 100 / $totalCamas) : null;
     $historia = $datos['historia'];
     $maxHistoria = max(1, collect($historia)->max(fn ($dia) => max($dia['ocupadas'], $dia['admisiones'])));
     $maxDinamica = max(1, collect($datos['dinamica'])->max(fn ($dia) => max($dia['visitas'], $dia['actividades'])));
@@ -33,7 +31,7 @@
     }
     if ($avanceAlerta < 100) $segmentosAlerta[] = "var(--rm-surface-muted) {$avanceAlerta}% 100%";
 @endphp
-<div class="rm-admin-dashboard" aria-label="Centro de Coordinación Residencial">
+<div class="rm-admin-dashboard rm-dashboard-composition" aria-label="Centro de Coordinación Residencial">
     <x-ui.dashboard-header
         eyebrow="CENTRO GERIÁTRICO LOS ALMENDROS"
         :title="$saludo['saludo'] . ', ' . $saludo['nombre']"
@@ -65,25 +63,21 @@
     </section>
     @endif
 
-    @if($puedeResidentes || $puedeOcupacion || $puedePreadmisiones || $puedeAdmisiones)
     <section class="rm-admin-dashboard__section" aria-labelledby="admin-residence-title">
-        <div class="rm-admin-dashboard__section-heading rm-section-header"><div class="rm-section-header__main"><span class="rm-section-header__icon" aria-hidden="true"><i class="ph-bold ph-users-three"></i></span><h2 id="admin-residence-title" class="rm-section-header__title">Estado actual de la residencia</h2></div>@if($puedeOcupacion)<a href="{{ route('admin.administracion.ocupacion') }}">Ver ocupación <i class="ph-bold ph-arrow-right" aria-hidden="true"></i></a>@endif</div>
+        <div class="rm-admin-dashboard__section-heading rm-section-header"><div class="rm-section-header__main"><span class="rm-section-header__icon" aria-hidden="true"><i class="ph-bold ph-users-three"></i></span><h2 id="admin-residence-title" class="rm-section-header__title">Indicadores de coordinación</h2></div>@if($puedeOcupacion)<a href="{{ route('admin.administracion.ocupacion') }}">Ver ocupación <i class="ph-bold ph-arrow-right" aria-hidden="true"></i></a>@endif</div>
         <div class="rm-admin-dashboard__state-strip">
-            @if($puedeResidentes)
-            <x-ui.metric-card icon="ph-users-three" variant="mint" :value="$datos['residentes']" label="Residentes activos" description="Actualmente admitidos" :href="route('admin.administracion.residentes')" />
+            @if($puedePreadmisiones)
+            <x-ui.metric-card icon="ph-user-plus" variant="coral" :value="$datos['preadmisiones_pendientes']" label="Preadmisiones pendientes" description="Solicitudes por revisar" :href="route('admin.admisiones.preadmisiones')" />
             @endif
             @if($puedeOcupacion)
-            <x-ui.metric-card icon="ph-bed" variant="sky" :value="$ocupadas.' / '.$totalCamas" label="Ocupación residencial" :description="$porcentaje !== null ? $porcentaje.' % de ocupación' : 'Sin capacidad registrada'" :progress="$porcentaje" :href="route('admin.administracion.ocupacion')" />
+            <x-ui.metric-card icon="ph-bed" variant="sky" :value="$datos['camas_disponibles']" label="Camas disponibles" description="Capacidad inmediata" :href="route('admin.administracion.ocupacion')" />
             @endif
-            @if($puedePreadmisiones)
-            <x-ui.metric-card icon="ph-user-plus" variant="coral" :value="$datos['preadmisiones_pendientes']" label="Preadmisiones en revisión" description="Pendientes de revisión" :href="route('admin.admisiones.preadmisiones')" />
-            @endif
-            @if($puedeAdmisiones)
-            <x-ui.metric-card icon="ph-clipboard-text" variant="neutral" :value="$datos['admisiones_pendientes']" label="Admisiones por formalizar" description="Ingreso aún no formalizado" :href="route('admin.administracion.admisiones')" />
+            <x-ui.metric-card icon="ph-identification-badge" variant="mint" :value="$datos['personal_activo']" label="Personal activo" description="Equipo institucional vigente" />
+            @if($puedeDocumentacion)
+            <x-ui.metric-card icon="ph-file-text" variant="neutral" :value="$datos['documentos_revision']" label="Documentos por revisar" description="Pendientes de validación" :href="route('admin.administracion.documentacion')" />
             @endif
         </div>
     </section>
-    @endif
 
     @if($puedePreadmisiones)
     <section class="rm-admin-dashboard__section" aria-labelledby="admin-admissions-title">

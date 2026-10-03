@@ -36,9 +36,11 @@ class DashboardEnfermeriaIntegracionVisualTest extends TestCase
         $this->assertStringNotContainsString('No hay situaciones que requieran atención inmediata.', $html);
 
         foreach (['Pacientes del turno', 'Alertas prioritarias', 'Evolución de incidentes',
-            'Estado de seguimiento', 'Ocupación de camas', 'Agenda de medicación y cuidados',
+            'Estado de seguimiento', 'Cuidados pendientes', 'Agenda de medicación y cuidados',
             'Tareas del turno', 'Ubicación de pacientes', 'Conducta y estado emocional'] as $titulo) {
             $this->assertStringContainsString($titulo, $html);
         }
+        $this->assertStringNotContainsString('Ocupación de camas', $html);
+        $this->assertStringNotContainsString('Tendencia de ocupación', $html);
     }
 }

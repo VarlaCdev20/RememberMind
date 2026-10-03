@@ -74,19 +74,16 @@ class NursingDashboardAgendaTest extends TestCase
         $this->assertStringContainsString('nursingFollowupCanvas-', $card);
         $this->assertStringContainsString('aria-label="Detalle del seguimiento"', $card);
         $this->assertStringNotContainsString('Atención alta', $card);
-        $this->assertStringContainsString('Camas activas y ocupaciones vigentes verificadas.', $vista);
+        $this->assertStringContainsString('Cuidados pendientes', $vista);
         $this->assertStringContainsString('Actividad del turno', $vista);
-        $this->assertStringContainsString('Tendencia de ocupación', $vista);
+        $this->assertStringNotContainsString('Tendencia de ocupación', $vista);
         $this->assertStringContainsString('Sin acciones para graficar', $vista);
-        $this->assertStringContainsString('aria-label="Tendencia de ocupación:', $vista);
         $this->assertStringContainsString('rm-chart-card rm-chart-glass', $vista);
         $this->assertStringContainsString('window.RMCharts.presets.doughnut', $vista);
         $this->assertStringContainsString('window.RMCharts.presets.barHorizontal', $vista);
-        $this->assertStringContainsString('window.RMCharts.presets.area', $vista);
         $this->assertStringContainsString('prefers-reduced-motion: reduce', $vista);
-        $this->assertStringContainsString('Incidentes por categoría', $vista);
-        $this->assertStringContainsString('data-nursing-incidents-by-type', $vista);
-        $this->assertStringContainsString('Sin incidentes para comparar', $vista);
+        $this->assertStringContainsString('Evolución de incidentes', $vista);
+        $this->assertStringNotContainsString('data-nursing-incidents-by-type', $vista);
     }
 
     private function evento(string $titulo, string $estado, int $momento): array

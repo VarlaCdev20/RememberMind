@@ -34,6 +34,10 @@
 .rm-nursing-dashboard__occupancy-trend { grid-column: span 8; min-height: 230px; }
 .rm-nursing-dashboard__location,
 .rm-nursing-dashboard__notes { grid-column: span 6; min-height: 230px; }
+.rm-nursing-dashboard__distribution,
+.rm-nursing-dashboard__schedule,
+.rm-nursing-dashboard__tasks { grid-column: span 6; }
+.rm-nursing-dashboard__activity-bars { grid-column: 1 / -1; }
 
 .rm-nursing-dashboard__schedule,
 .rm-nursing-dashboard__patients,

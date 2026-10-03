@@ -116,7 +116,10 @@ class CentroCoordinacionService
             'periodo' => $periodo,
             'residentes' => DB::table('residentes')->whereIn('estado', ['ACTIVO', 'ADMITIDO'])->count(),
             'ocupacion' => ['ocupadas' => $ocupadas, 'total' => $camas->count()],
+            'camas_disponibles' => max(0, $camas->count() - $ocupadas),
             'preadmisiones_pendientes' => DB::table('preadmisiones')->where('estado', 'PENDIENTE')->count(),
+            'personal_activo' => DB::table('personal')->where('estado', 'ACTIVO')->count(),
+            'documentos_revision' => DB::table('documentos')->where('estado', 'PENDIENTE')->whereNull('fecha_validacion')->count(),
             'admisiones_pendientes' => DB::table('preadmisiones as pre')->where('pre.estado', 'APROBADA')
                 ->whereNotExists(fn ($query) => $query->selectRaw('1')->from('admisiones as ad')
                     ->whereColumn('ad.cod_preadmision', 'pre.cod_preadmision'))->count(),

@@ -139,7 +139,7 @@ class RolesBaselineCongeladoTest extends TestCase
     public function test_dashboards_tienen_contenido_diferente_por_rol(): void
     {
         $this->actingAs($this->usuarioConRol('SUPERADMINISTRADOR'))->get(route('dashboard'))
-            ->assertOk()->assertSee('bajo supervisión global')->assertSee('Usuarios activos');
+            ->assertOk()->assertSee('bajo supervisión global')->assertSee('Residentes activos');
 
         $this->actingAs($this->usuarioConRol('GERENTE'))->get(route('dashboard'))
             ->assertOk()->assertSee('con visión de cobertura')->assertSee('Personal activo');
@@ -147,7 +147,7 @@ class RolesBaselineCongeladoTest extends TestCase
         $this->actingAs($this->usuarioConRol('ADMINISTRADOR'))->get(route('dashboard'))
             ->assertRedirect(route('admin.administracion.dashboard'));
         $this->get(route('admin.administracion.dashboard'))
-            ->assertOk()->assertSee('Centro de Coordinación Residencial')->assertSee('Preadmisiones en revisión');
+            ->assertOk()->assertSee('Centro de Coordinación Residencial')->assertSee('Preadmisiones pendientes');
     }
 
     public function test_rutas_backend_separan_sistema_institucion_y_operacion(): void

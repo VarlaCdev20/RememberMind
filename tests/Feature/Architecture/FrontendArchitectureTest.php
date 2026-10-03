@@ -203,7 +203,7 @@ class FrontendArchitectureTest extends TestCase
             '--rm-page-padding-y: 16px',
             '--rm-grid-gap: 12px',
             '--rm-page-header-height: 76px',
-            '--rm-dashboard-hero-height: 204px',
+            '--rm-dashboard-hero-height: 172px',
             '--rm-panel-max-height: 300px',
         ] as $token) {
             $this->assertStringContainsString($token, $layout);
@@ -373,7 +373,7 @@ class FrontendArchitectureTest extends TestCase
         $this->assertStringContainsString('<x-ui.role-dashboard-hero', $workspaceRol);
         $this->assertStringContainsString('<x-ui.dashboard-header', File::get(resource_path('views/components/ui/dashboard-welcome-header.blade.php')));
         $this->assertStringContainsString('<x-ui.dashboard-header', File::get(resource_path('views/pages/admin/administracion/dashboard.blade.php')));
-        $this->assertStringContainsString('rm-role-focus', $workspaceRol);
+        $this->assertStringContainsString('<x-ui.dashboard-data-panel', $workspaceRol);
 
         foreach ([$encabezadoAdmin, $medicina, $psicologia] as $dashboard) {
             $this->assertStringContainsString('images/FOTOS CENTRO DE ADULTOS MAYORES/', $dashboard);
@@ -385,8 +385,8 @@ class FrontendArchitectureTest extends TestCase
         $this->assertStringContainsString('rotation-context=', $workspaceRol);
         $this->assertStringContainsString('images/FOTOS CENTRO DE ADULTOS MAYORES/', File::get(app_path('Backend/Modulos/Reportes/Servicios/DashboardPhotoRotation.php')));
 
-        $this->assertStringContainsString('rm-role-kpi', $medicina);
-        $this->assertStringContainsString('rm-role-kpi', $psicologia);
+        $this->assertStringContainsString('<x-ui.metric-card', $medicina);
+        $this->assertStringContainsString('<x-ui.metric-card', $psicologia);
 
         $servicio = File::get(app_path('Backend/Modulos/Reportes/Servicios/DashboardService.php'));
         foreach (['NUTRICIONISTA', 'FISIOTERAPEUTA', 'PEDAGOGO', 'FAMILIAR'] as $rol) {
@@ -416,7 +416,6 @@ class FrontendArchitectureTest extends TestCase
         $vistasConGraficas = [
             'livewire/alertas/alertas-panel.blade.php',
             'livewire/alertas/modales/drawer-graficos.blade.php',
-            'livewire/clinica/dashboard-medico.blade.php',
             'livewire/clinica/salud-signos-panel.blade.php',
             'livewire/clinica/signos-vitales-panel.blade.php',
             'livewire/cuidados/dashboard-turno.blade.php',

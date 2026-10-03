@@ -7,7 +7,6 @@ use App\Backend\Modulos\Clinica\Servicios\SignosVitalesService;
 use App\Backend\Modulos\Enfermeria\Servicios\MiTurnoService;
 use App\Backend\Modulos\Enfermeria\Servicios\DashboardComplementosService;
 use App\Backend\Modulos\Enfermeria\Servicios\TendenciaIncidentesService;
-use App\Backend\Modulos\Enfermeria\Servicios\TendenciaOcupacionService;
 use App\Backend\Modulos\Enfermeria\Servicios\TurnoEnfermeriaService;
 use App\Backend\Modulos\Medicacion\Servicios\AgendaMedicacionService;
 use App\Backend\Modulos\Medicacion\Servicios\RegistrarAdministracionMedicacionService;
@@ -527,62 +526,15 @@ class DashboardTurno extends Component
             )->count(),
         ];
 
-        $camas = DB::table('camas')
-            ->leftJoin('ocupaciones_cama', function ($join) {
-                $join->on('ocupaciones_cama.cod_cama', '=', 'camas.cod_cama')
-                    ->where('ocupaciones_cama.estado', '=', 'ACTIVA')
-                    ->whereNull('ocupaciones_cama.fecha_hora_liberacion');
-            })
-            ->where('camas.estado', 'ACTIVA')
-            ->selectRaw('COUNT(DISTINCT camas.cod_cama) AS total, COUNT(DISTINCT ocupaciones_cama.cod_cama) AS ocupadas')
-            ->first();
-        $camasTurno = ($camas?->total ?? 0) > 0
-            ? ['ocupadas' => (int) $camas->ocupadas, 'total' => (int) $camas->total]
-            : null;
-
         return view('livewire.cuidados.dashboard-turno', [
             'dashboard' => $dashboard,
             'complementos' => app(DashboardComplementosService::class)->resumir($dashboard, Auth::user()),
             'incidentesTendencia' => $incidentesTendencia,
-            'tendenciaOcupacion' => app(TendenciaOcupacionService::class)->ultimosSieteDias(),
-            'camasTurno' => $camasTurno,
             'stats' => [
                 'pacientes' => count($dashboard['residentes']),
                 'alertas_activas' => ($dashboard['kpis']['por_atender']['numero'] ?? 0) + ($dashboard['kpis']['en_atencion']['numero'] ?? 0),
-                'alertas_criticas' => $dashboard['kpis']['criticas_altas']['numero'] ?? 0,
-                'medicacion_pendiente' => $dashboard['medicacion_turno']['pendientes'] ?? null,
-                'tareas_pendientes' => $dashboard['estado_tareas']['pendientes'] ?? 0,
-                'tareas_vencidas' => $dashboard['estado_tareas']['retrasadas'] ?? 0,
-                'signos_pendientes' => 0,
-                'seguimientos_faltantes' => 0,
-                'valoraciones_pendientes' => 0,
-                'pase_estado' => 'NO INICIADO',
-                'cuidados_registrados' => $dashboard['estado_tareas']['realizadas'] ?? 0,
-                'incidentes_abiertos' => 0,
-                'lesiones_activas' => 0,
-                'dispositivos_activos' => 0,
-            ],
-            'alertas' => $dashboard['alertas'] ?? [],
-            'medicacionPendiente' => collect(),
-            'tareasPendientes' => collect(),
-            'controlesSignos' => collect(),
-            'seguimientosFaltantes' => collect(),
-            'pacientesAsignados' => collect($dashboard['residentes'] ?? []),
-            'valoracionesPendientes' => collect(),
-            'paseTurnoHoy' => null,
-            'esSuperAdmin' => Auth::user()?->hasRole('SUPERADMINISTRADOR') ?? false,
-            'cumplimientoTurno' => [
-                'total_acciones' => $dashboard['estado_tareas']['total'] ?? 0,
-                'completadas' => $dashboard['estado_tareas']['realizadas'] ?? 0,
-                'porcentaje' => $dashboard['estado_tareas']['porcentaje'] ?? null,
-                'tareas_completadas' => $dashboard['estado_tareas']['realizadas'] ?? 0,
-                'tareas_pendientes' => $dashboard['estado_tareas']['pendientes'] ?? 0,
-                'seguimientos_completados' => 0,
-                'seguimientos_pendientes' => 0,
             ],
             'distribucionPacientes' => $distribucionPacientes,
-            'pacientesPrioritarios' => collect(),
-            'proximasAcciones' => collect(),
         ])->layout('layouts.enfermeria');
     }
 }

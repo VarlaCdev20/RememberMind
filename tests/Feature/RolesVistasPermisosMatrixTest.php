@@ -75,8 +75,7 @@ class RolesVistasPermisosMatrixTest extends TestCase
 
         $response = $this->actingAs($nutricionista)->get(route('dashboard'));
         $response->assertOk()
-            ->assertSee('Valoración nutricional')
-            ->assertSee('Antropometría')
+            ->assertSee('No hay una vinculación de personal activo para consultar registros propios.')
             ->assertDontSee('Centro de Mando Institucional');
     }
 

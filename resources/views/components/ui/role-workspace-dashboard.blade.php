@@ -2,8 +2,8 @@
 @inject('visibilidadNavegacion', 'App\Backend\Modulos\Identidad\Servicios\VisibilidadNavegacion')
 
 @php
-    $areas = $perfil['areas'] ?? [];
     $indicadores = $perfil['indicadores'] ?? [];
+    $panels = $perfil['panels'] ?? [];
     $accesos = collect($perfil['accesos'] ?? [])->filter(
         fn ($acceso) => $visibilidadNavegacion->puedeVerRuta($acceso['route'], $acceso['permission'] ?? null)
     );
@@ -38,7 +38,7 @@
         ]"
     >
         @foreach($accesos->take(3) as $acceso)
-            <a href="{{ route($acceso['route']) }}" class="{{ $loop->first ? 'rm-btn-primary' : 'rm-btn-secondary' }} min-h-9 px-3.5 text-xs">
+            <a href="{{ route($acceso['route']) }}" wire:navigate class="{{ $loop->first ? 'rm-btn-primary' : 'rm-btn-secondary' }} min-h-9 px-3.5 text-xs">
                 <i class="ph-bold {{ $acceso['icon'] }}"></i><span>{{ $acceso['label'] }}</span>
             </a>
         @endforeach
@@ -57,23 +57,13 @@
         </section>
     @endif
 
-    <section class="rm-role-focus" aria-labelledby="role-focus-title">
-        <div class="rm-role-focus__heading">
-            <div>
-                <p class="rm-dashboard-kicker">TU ÁREA PROFESIONAL</p>
-                <h2 id="role-focus-title">Ámbitos de trabajo</h2>
-            </div>
-            <span>{{ count($areas) }} áreas principales</span>
-        </div>
-        <div class="rm-role-focus__grid">
-            @foreach($areas as $area)
-                <article class="rm-role-focus__card">
-                    <span><i class="ph-bold {{ $area['icon'] ?? 'ph-check-circle' }}"></i></span>
-                    <div><h3>{{ $area['title'] ?? '' }}</h3><p>{{ $area['copy'] ?? '' }}</p></div>
-                </article>
+    @if($panels)
+        <div class="rm-dashboard-data-grid" aria-label="Información de tu panel">
+            @foreach($panels as $panel)
+                <x-ui.dashboard-data-panel :panel="$panel" />
             @endforeach
         </div>
-    </section>
+    @endif
 
     <section class="rm-role-access" aria-labelledby="role-access-title">
         <div>
@@ -83,7 +73,7 @@
         </div>
         <div class="rm-role-access__links">
             @forelse($accesos as $acceso)
-                <a href="{{ route($acceso['route']) }}">
+                <a href="{{ route($acceso['route']) }}" wire:navigate>
                     <i class="ph-bold {{ $acceso['icon'] }}"></i>
                     <span>{{ $acceso['label'] }}</span>
                     <i class="ph-bold ph-arrow-up-right"></i>

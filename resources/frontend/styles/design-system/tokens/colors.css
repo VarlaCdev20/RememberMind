@@ -177,6 +177,7 @@
    --rm-input-focus-border: var(--rm-primary);
    --rm-input-focus-ring: var(--rm-focus-ring);
    --rm-card-bg: var(--rm-surface);
+   --rm-dashboard-card-bg: #F7F3EF;
    --rm-card-border: var(--rm-border);
    --rm-card-selected-bg: var(--rm-selected-bg);
    --rm-filter-bar-bg: var(--rm-surface-soft);

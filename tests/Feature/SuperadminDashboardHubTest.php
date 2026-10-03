@@ -37,12 +37,12 @@ class SuperadminDashboardHubTest extends TestCase
         $response->assertOk();
 
         $response->assertSee('bajo supervisión global');
-        $response->assertSee('Sistema');
-        $response->assertSee('Institución');
-        $response->assertSee('Residencia y operación');
+        $response->assertSee('Residentes activos');
+        $response->assertSee('Camas disponibles');
+        $response->assertSee('Preadmisiones por estado');
         $response->assertSee('Auditoría');
-        $response->assertSee('Ocupaciones activas');
-        $response->assertSee('Incidentes relevantes');
+        $response->assertSee('Alertas prioritarias');
+        $response->assertSee('Incidentes por tipo');
         $response->assertDontSee('Agenda de Cuidados');
         $response->assertDontSee('Valoraciones Médicas');
     }

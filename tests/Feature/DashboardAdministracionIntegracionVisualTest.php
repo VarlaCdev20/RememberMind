@@ -36,7 +36,8 @@ class DashboardAdministracionIntegracionVisualTest extends TestCase
         $this->assertSame(1, substr_count($html, '<h1'));
         foreach ([
             'Centro de Coordinación Residencial', 'Requiere atención ahora',
-            'Estado actual de la residencia', 'Residentes activos', 'Ocupación residencial',
+            'Indicadores de coordinación', 'Preadmisiones pendientes', 'Camas disponibles',
+            'Personal activo', 'Documentos por revisar',
             'Ingresos en proceso', 'Lo que ocurre hoy', 'Visitas de hoy',
             'Cómo funciona la operación', 'Evolución de ocupación y admisiones', 'Dinámica residencial',
             'Preadmisiones recientes', 'Agenda residencial de hoy',
@@ -45,7 +46,7 @@ class DashboardAdministracionIntegracionVisualTest extends TestCase
         ] as $texto) {
             $this->assertStringContainsString($texto, $html);
         }
-        $this->assertLessThan(strpos($html, 'Estado actual de la residencia'), strpos($html, 'Requiere atención ahora'));
+        $this->assertLessThan(strpos($html, 'Indicadores de coordinación'), strpos($html, 'Requiere atención ahora'));
         $this->assertLessThan(strpos($html, 'Cómo funciona la operación'), strpos($html, 'Lo que ocurre hoy'));
         $this->assertStringNotContainsString('Crear residente', $html);
         $this->assertStringNotContainsString('Voluntarios', $html);
@@ -112,8 +113,8 @@ class DashboardAdministracionIntegracionVisualTest extends TestCase
         ], $usuario);
 
         $dashboard = $this->actingAs($usuario)->get(route('admin.administracion.dashboard'))->assertOk()->getContent();
-        $this->assertStringContainsString('1 / 1', $dashboard);
-        $this->assertStringContainsString('100 % de ocupación', $dashboard);
+        $this->assertMatchesRegularExpression('/>0<\/strong>\s*<h2[^>]*>Camas disponibles<\/h2>/', $dashboard);
+        $this->assertSame(1, app(\App\Backend\Modulos\Administracion\Servicios\CentroCoordinacionService::class)->resumen()['ocupacion']['ocupadas']);
         $admisiones = $this->get(route('admin.administracion.admisiones'))->assertOk()->getContent();
         $this->assertStringContainsString('Rosa Flores', $admisiones);
         $this->assertStringContainsString('H-1', $admisiones);
