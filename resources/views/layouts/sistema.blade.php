@@ -108,9 +108,12 @@
     $shellPreviewRole = app(\App\Backend\Modulos\Identidad\Servicios\RolePreviewService::class)->activeRole(auth()->user());
     $shellAdministracion = $shellPreviewRole === 'ADMINISTRADOR'
         || ($shellPreviewRole === null && auth()->user()?->hasRole('ADMINISTRADOR') && ! auth()->user()?->hasRole('SUPERADMINISTRADOR'));
+    $shellVisualRole = $shellPreviewRole ?? auth()->user()?->getRoleNames()->first();
+    $shellRoleAccent = config('dashboard-header.variants.'.($shellVisualRole ?? '').'.tone', 'superadmin');
 @endphp
 
 <body class="rm-shell {{ $shellAdministracion ? 'rm-shell--administracion' : '' }} h-full bg-[var(--rm-bg-app)] text-[var(--rm-text-primary)] antialiased selection:bg-[var(--rm-action-primary)] selection:text-[var(--rm-text-on-primary)] transition-colors duration-200"
+      data-role="{{ $shellRoleAccent }}"
       x-data="{
           @include('components.layout.sidebar-shell-state')
           userDropdown: false,

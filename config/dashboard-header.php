@@ -4,25 +4,25 @@
 return [
     'variants' => [
         'SUPERADMINISTRADOR' => [
-            'tone' => 'sage', 'label' => 'Superadministración',
+            'tone' => 'superadmin', 'label' => 'Superadministración',
             'subtitle' => 'Supervisión general del centro y sus áreas operativas.',
             'scope' => 'Sistema · Institución · Residencia · Operación · Clínica',
             'image_label' => 'Supervisión institucional',
         ],
         'GERENTE' => [
-            'tone' => 'earth', 'label' => 'Gerencia',
+            'tone' => 'manager', 'label' => 'Gerencia',
             'subtitle' => 'Dirección y planificación institucional.',
             'scope' => 'Personal · Áreas · Turnos · Cobertura',
             'image_label' => 'Dirección institucional',
         ],
         'ADMINISTRADOR' => [
-            'tone' => 'earth', 'label' => 'Administración',
+            'tone' => 'admin', 'label' => 'Administración',
             'subtitle' => 'Coordinación institucional, residencial y administrativa.',
             'scope' => 'Personal · Admisiones · Residentes · Camas · Documentos',
             'image_label' => 'Gestión institucional',
         ],
         'MEDICO GENERAL/GERIATRA' => [
-            'tone' => 'medical', 'label' => 'Medicina geriátrica',
+            'tone' => 'doctor', 'label' => 'Medicina geriátrica',
             'subtitle' => 'Seguimiento clínico y valoración integral de residentes.',
             'scope' => 'Diagnósticos · Estudios · Prescripciones · Planes · Alertas',
             'image_label' => 'Atención geriátrica integral',
@@ -46,7 +46,7 @@ return [
             'image_label' => 'Cuidado nutricional',
         ],
         'FISIOTERAPEUTA' => [
-            'tone' => 'physiotherapy', 'label' => 'Fisioterapia',
+            'tone' => 'physio', 'label' => 'Fisioterapia',
             'subtitle' => 'Movilidad, funcionalidad y rehabilitación del residente.',
             'scope' => 'Movilidad · Dolor · Dispositivos · Valoraciones funcionales',
             'image_label' => 'Rehabilitación funcional y movilidad',

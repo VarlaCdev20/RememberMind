@@ -101,13 +101,14 @@ class RolePreviewTest extends TestCase
         $this->actingAs($superadmin);
 
         foreach ([
-            'GERENTE' => ['earth', 'Gerencia'],
+            'GERENTE' => ['manager', 'Gerencia'],
             'PSICOLOGO/A' => ['psychology', 'Psicología'],
         ] as $rol => [$acento, $etiqueta]) {
             $response = $this->withSession([RolePreviewService::SESSION_KEY => $rol])
                 ->followingRedirects()->get(route('dashboard'))->assertOk();
 
-            $response->assertSee('data-accent="'.$acento.'"', false)
+            $response->assertSee('data-role="'.$acento.'"', false)
+                ->assertSee('data-accent="'.$acento.'"', false)
                 ->assertSee('class="rm-dashboard-header__role"><span aria-hidden="true"></span>'.$etiqueta, false);
         }
     }

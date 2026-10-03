@@ -1,0 +1,58 @@
+/* Identidad contextual: las superficies y los colores semánticos siguen siendo globales. */
+:root {
+    --rm-role-superadmin: #6F8A72;
+    --rm-role-superadmin-soft: #DCE6DD;
+    --rm-role-manager: #756F87;
+    --rm-role-manager-soft: #E6E2EB;
+    --rm-role-admin: #82786E;
+    --rm-role-admin-soft: #E8E0D8;
+    --rm-role-doctor: #6687A0;
+    --rm-role-doctor-soft: #DCE6EB;
+    --rm-role-nursing: #3F8F76;
+    --rm-role-nursing-soft: #D9ECE4;
+    --rm-role-nursing-alpha: rgba(63, 143, 118, .14);
+    --rm-role-nursing-hover: rgba(63, 143, 118, .10);
+    --rm-role-nursing-focus: rgba(63, 143, 118, .24);
+    --rm-role-psychology: #B98585;
+    --rm-role-psychology-soft: #F0DFDF;
+    --rm-role-nutrition: #C9974C;
+    --rm-role-nutrition-soft: #F3E6CE;
+    --rm-role-physio: #6E8F88;
+    --rm-role-physio-soft: #DDE9E6;
+    --rm-role-pedagogy: #7B8797;
+    --rm-role-pedagogy-soft: #E1E5EA;
+    --rm-role-family: #B47A62;
+    --rm-role-family-soft: #EFDED6;
+}
+
+[data-role] {
+    --rm-role-primary: var(--rm-role-superadmin);
+    --rm-role-primary-soft: var(--rm-role-superadmin-soft);
+    --rm-role-primary-alpha: color-mix(in srgb, var(--rm-role-primary) 14%, transparent);
+    --rm-role-hover: color-mix(in srgb, var(--rm-role-primary) 10%, transparent);
+    --rm-role-focus: color-mix(in srgb, var(--rm-role-primary) 24%, transparent);
+    --rm-role-ink: color-mix(in srgb, var(--rm-role-primary) 67%, var(--rm-text-primary));
+    --rm-role-on-primary: var(--rm-palette-petroleum-950);
+}
+
+[data-role="manager"] { --rm-role-primary: var(--rm-role-manager); --rm-role-primary-soft: var(--rm-role-manager-soft); --rm-role-on-primary: var(--rm-palette-petroleum-text); }
+[data-role="admin"] { --rm-role-primary: var(--rm-role-admin); --rm-role-primary-soft: var(--rm-role-admin-soft); --rm-role-on-primary: var(--rm-palette-petroleum-text); }
+[data-role="doctor"] { --rm-role-primary: var(--rm-role-doctor); --rm-role-primary-soft: var(--rm-role-doctor-soft); }
+[data-role="nursing"] {
+    --rm-role-primary: var(--rm-role-nursing);
+    --rm-role-primary-soft: var(--rm-role-nursing-soft);
+    --rm-role-primary-alpha: var(--rm-role-nursing-alpha);
+    --rm-role-hover: var(--rm-role-nursing-hover);
+    --rm-role-focus: var(--rm-role-nursing-focus);
+}
+[data-role="psychology"] { --rm-role-primary: var(--rm-role-psychology); --rm-role-primary-soft: var(--rm-role-psychology-soft); }
+[data-role="nutrition"] { --rm-role-primary: var(--rm-role-nutrition); --rm-role-primary-soft: var(--rm-role-nutrition-soft); }
+[data-role="physio"] { --rm-role-primary: var(--rm-role-physio); --rm-role-primary-soft: var(--rm-role-physio-soft); }
+[data-role="pedagogy"] { --rm-role-primary: var(--rm-role-pedagogy); --rm-role-primary-soft: var(--rm-role-pedagogy-soft); }
+[data-role="family"] { --rm-role-primary: var(--rm-role-family); --rm-role-primary-soft: var(--rm-role-family-soft); }
+
+:is(.dark, [data-theme="dark"]) [data-role] {
+    --rm-role-ink: color-mix(in srgb, var(--rm-role-primary) 52%, var(--rm-palette-petroleum-text));
+    --rm-role-on-primary: var(--rm-palette-petroleum-950);
+    --rm-role-primary-soft: color-mix(in srgb, var(--rm-role-primary) 18%, var(--rm-palette-petroleum-800));
+}

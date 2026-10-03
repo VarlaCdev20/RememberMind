@@ -9,10 +9,10 @@
     $assignedRole = app(\App\Backend\Modulos\Identidad\Servicios\RolePreviewService::class)->activeRole(auth()->user())
         ?? auth()->user()?->getRoleNames()->first();
     $variant = config('dashboard-header.variants.' . $assignedRole, []);
-    $allowedTones = ['sage', 'earth', 'medical', 'nursing', 'psychology', 'nutrition', 'physiotherapy', 'pedagogy', 'family'];
+    $allowedTones = ['superadmin', 'manager', 'admin', 'doctor', 'nursing', 'psychology', 'nutrition', 'physio', 'pedagogy', 'family'];
     $accentToken = in_array($variant['tone'] ?? null, $allowedTones, true)
         ? $variant['tone']
-        : (in_array($accent, $allowedTones, true) ? $accent : 'sage');
+        : (in_array($accent, $allowedTones, true) ? $accent : 'superadmin');
     $roleLabel = $variant['label'] ?? $role;
     $subtitle = $subtitle ?? ($variant['subtitle'] ?? null);
     $scope = $scope ?? ($variant['scope'] ?? null);

@@ -8,6 +8,39 @@ const manifest = JSON.parse(readFileSync(new URL('public/build/manifest.json', r
 const css = readFileSync(new URL(`public/build/${manifest['resources/frontend/styles/app.css'].file}`, root), 'utf8');
 const executablePath = [process.env.PUPPETEER_EXECUTABLE_PATH, await puppeteer.executablePath(), 'C:/Program Files/Google/Chrome/Application/chrome.exe'].find(path => path && existsSync(path));
 
+test('el acento del rol cambia la navegación y los controles sin teñir superficies ni alertas', { skip: !executablePath }, async () => {
+    const browser = await puppeteer.launch({ headless: true, executablePath });
+    try {
+        const page = await browser.newPage();
+        const appearances = [];
+        for (const role of ['superadmin', 'nursing', 'doctor', 'psychology']) {
+            await page.setContent(`<html data-theme="light"><head><style>${css}</style></head><body class="rm-shell" data-role="${role}"><div class="rm-app-frame"><aside class="rm-sidebar"><nav class="rm-sidebar__nav"><a class="rm-sidebar__item is-active"><span class="rm-sidebar__indicator"></span><i class="rm-sidebar__icon"></i>Inicio</a></nav></aside><header class="rm-topbar"></header><main data-rm-main><section class="rm-dashboard-composition"><header class="rm-dashboard-header"><div class="rm-dashboard-header__content"><span class="rm-dashboard-header__role"><span></span>Rol</span></div></header><div class="rm-card rm-metric-card">Métrica</div><span class="rm-filter-chip rm-filter-chip--danger">Crítico</span><button class="rm-btn rm-btn-primary">Acción</button><div class="rm-tabs-line"><button class="rm-tab-line-item is-active">Resumen</button></div></section></main></div></body></html>`);
+            appearances.push(await page.evaluate(() => {
+                const color = (selector, property) => getComputedStyle(document.querySelector(selector))[property];
+                return {
+                    role: getComputedStyle(document.body).getPropertyValue('--rm-role-primary').trim(),
+                    sidebar: color('.rm-sidebar', 'backgroundColor'),
+                    active: color('.rm-sidebar__item', 'backgroundColor'),
+                    activeIcon: color('.rm-sidebar__icon', 'color'),
+                    header: color('.rm-dashboard-header', 'backgroundColor'),
+                    badge: color('.rm-dashboard-header__role', 'backgroundColor'),
+                    card: color('.rm-metric-card', 'backgroundColor'),
+                    button: color('.rm-btn-primary', 'backgroundColor'),
+                    tab: color('.rm-tab-line-item', 'borderBottomColor'),
+                    alert: color('.rm-filter-chip--danger', 'backgroundColor'),
+                };
+            }));
+        }
+        assert.equal(new Set(appearances.map(item => item.role)).size, appearances.length);
+        for (const key of ['sidebar', 'header', 'card', 'alert']) {
+            assert.equal(new Set(appearances.map(item => item[key])).size, 1, `${key} mantiene su semántica global`);
+        }
+        for (const key of ['active', 'activeIcon', 'badge', 'button', 'tab']) {
+            assert.equal(new Set(appearances.map(item => item[key])).size, appearances.length, `${key} refleja el rol`);
+        }
+    } finally { await browser.close(); }
+});
+
 test('los shells por rol conservan fondo y controles completos en claro, oscuro y móvil', { skip: !executablePath }, async () => {
     const browser = await puppeteer.launch({ headless: true, executablePath });
     try {

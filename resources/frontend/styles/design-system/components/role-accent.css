@@ -1,0 +1,113 @@
+/* Sólo acentos de interacción. El shell, las cards y los estados de datos no cambian por rol. */
+.rm-shell[data-role] .rm-sidebar__nav {
+    --rm-sage-accent: var(--rm-role-primary);
+    --rm-sage-border: var(--rm-role-primary-alpha);
+    --rm-sage-glass-hover: var(--rm-role-hover);
+    --rm-sage-glass-shadow: 0 1px 4px var(--rm-role-hover);
+    --rm-sidebar-hover: var(--rm-role-hover);
+    --rm-item-hover: var(--rm-role-hover);
+    --rm-item-active-bg: var(--rm-role-primary-soft);
+    --rm-item-active-text: var(--rm-role-ink);
+    --rm-item-active-accent: var(--rm-role-primary);
+    --rm-selected-bg: var(--rm-role-primary-soft);
+    --rm-selected-text: var(--rm-role-ink);
+    --rm-selected-icon: var(--rm-role-primary);
+    --rm-selected-border: var(--rm-role-primary-alpha);
+    --rm-sidebar-indicator: var(--rm-role-primary);
+    --rm-focus-ring-color: var(--rm-role-primary);
+}
+
+.rm-shell[data-role] .rm-sidebar__nav :is(.rm-sidebar__item, .rm-sidebar__subitem) {
+    transition: background-color 160ms var(--rm-ease-standard),
+        color 160ms var(--rm-ease-standard),
+        border-color 160ms var(--rm-ease-standard),
+        box-shadow 160ms var(--rm-ease-standard),
+        transform 160ms var(--rm-ease-standard);
+}
+
+.rm-shell[data-role] .rm-sidebar__nav :is(.rm-sidebar__item, .rm-sidebar__subitem):focus-visible {
+    outline: 2px solid var(--rm-role-primary);
+    outline-offset: 2px;
+}
+
+.rm-shell[data-role] .rm-sidebar__nav .rm-sidebar__subitem.is-active {
+    background: var(--rm-role-primary-soft);
+    border-color: var(--rm-role-primary-alpha);
+    color: var(--rm-role-ink);
+}
+
+.rm-shell[data-role] .rm-dashboard-header,
+.rm-shell[data-role] .rm-dashboard-composition > .rm-dashboard-header {
+    --rm-header-role-accent: var(--rm-role-primary);
+    --rm-header-accent: var(--rm-role-primary);
+}
+
+.rm-shell[data-role] .rm-dashboard-composition .rm-dashboard-header__eyebrow {
+    color: var(--rm-role-ink);
+}
+
+.rm-shell[data-role] .rm-dashboard-composition .rm-dashboard-header__role {
+    border-color: var(--rm-role-primary-alpha);
+    background: var(--rm-role-primary-soft);
+    color: var(--rm-role-ink);
+}
+
+.rm-shell[data-role] .rm-dashboard-composition .rm-dashboard-header__role > span {
+    background: var(--rm-role-primary);
+}
+
+.rm-shell[data-role] .rm-dashboard-divider {
+    color: var(--rm-role-primary);
+}
+
+.rm-shell[data-role] [data-rm-main] {
+    --rm-tab-active-text: var(--rm-role-ink);
+    --rm-tab-active-border: var(--rm-role-primary);
+    --rm-filter-active-bg: var(--rm-role-primary-soft);
+    --rm-filter-focus: var(--rm-role-primary);
+    --rm-button-primary-bg: var(--rm-role-primary);
+    --rm-button-primary-hover: color-mix(in srgb, var(--rm-role-primary) 86%, var(--rm-palette-petroleum-950));
+    --rm-button-primary-active: color-mix(in srgb, var(--rm-role-primary) 76%, var(--rm-palette-petroleum-950));
+    --rm-button-primary-text: var(--rm-role-on-primary);
+}
+
+.rm-shell[data-role] [data-rm-main] .rm-btn-primary {
+    background: var(--rm-role-primary);
+    color: var(--rm-role-on-primary);
+}
+
+.rm-shell[data-role] [data-rm-main] .rm-btn-primary:hover:not(:disabled) {
+    background: var(--rm-button-primary-hover);
+    color: var(--rm-role-on-primary);
+}
+
+.rm-shell[data-role] [data-rm-main] .rm-btn-primary:active:not(:disabled) {
+    background: var(--rm-button-primary-active);
+}
+
+.rm-shell[data-role] [data-rm-main] .rm-tab-line-item:is(.is-active, [aria-selected="true"]) {
+    color: var(--rm-role-ink) !important;
+    border-bottom-color: var(--rm-role-primary) !important;
+}
+
+.rm-shell[data-role] [data-rm-main] .rm-filter-bar.rm-filter-bar:focus-within {
+    border-color: var(--rm-role-primary-alpha);
+    box-shadow: 0 0 0 3px var(--rm-role-focus);
+}
+
+.rm-shell[data-role] [data-rm-main] .rm-filter-bar :is(input, select):focus:not([aria-invalid="true"]),
+.rm-shell[data-role] [data-rm-main] .rm-filter-control:focus:not([aria-invalid="true"]) {
+    border-color: var(--rm-role-primary) !important;
+    box-shadow: 0 0 0 3px var(--rm-role-focus) !important;
+}
+
+.rm-shell[data-role] [data-rm-main] :is(.rm-btn-primary, .rm-tab-item, .rm-tab-line-item):focus-visible {
+    outline: 2px solid var(--rm-role-primary);
+    outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .rm-shell[data-role] .rm-sidebar__nav :is(.rm-sidebar__item, .rm-sidebar__subitem) {
+        transition: none;
+    }
+}

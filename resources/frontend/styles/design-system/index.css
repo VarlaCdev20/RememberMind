@@ -7,6 +7,7 @@
 /* 1. TOKENS */
 @import './tokens/primitives.css';
 @import './tokens/colors.css';
+@import './tokens/role-accents.css';
 @import './tokens/typography.css';
 @import './tokens/spacing.css';
 @import './tokens/sizing.css';
@@ -58,3 +59,4 @@
 @import './components/dashboard-header.css';
 @import './components/dashboard-data.css';
 @import './components/dashboard-workspace.css';
+@import './components/role-accent.css';

@@ -3,7 +3,7 @@
     --rm-header-text: #4B443F;
     --rm-header-secondary: #5C554F;
     --rm-header-muted: #746D67;
-    --rm-header-role-accent: var(--rm-palette-sage-900);
+    --rm-header-role-accent: var(--rm-role-primary, var(--rm-palette-sage-900));
     --rm-header-accent: var(--rm-header-role-accent);
     --rm-header-surface: color-mix(in srgb, var(--rm-header-bg) 55%, var(--rm-palette-page));
     display: grid; grid-template-columns: 68% 32%; min-height: var(--rm-dashboard-hero-height);
@@ -17,14 +17,6 @@
     border: 1px solid color-mix(in srgb, var(--rm-header-text) 10%, transparent);
     box-shadow: 0 3px 8px color-mix(in srgb, var(--rm-header-text) 3.5%, transparent), 0 12px 30px color-mix(in srgb, var(--rm-header-text) 4.5%, transparent);
 }
-.rm-dashboard-header[data-accent="earth"] { --rm-header-role-accent: var(--rm-earth-600); }
-.rm-dashboard-header[data-accent="medical"] { --rm-header-role-accent: #6687A0; }
-.rm-dashboard-header[data-accent="nursing"] { --rm-header-role-accent: #4E8B63; }
-.rm-dashboard-header[data-accent="psychology"] { --rm-header-role-accent: #B98585; }
-.rm-dashboard-header[data-accent="nutrition"] { --rm-header-role-accent: #C9974C; }
-.rm-dashboard-header[data-accent="physiotherapy"] { --rm-header-role-accent: #6E8F88; }
-.rm-dashboard-header[data-accent="pedagogy"] { --rm-header-role-accent: #7B8797; }
-.rm-dashboard-header[data-accent="family"] { --rm-header-role-accent: #B47A62; }
 .rm-dashboard-header .rm-dashboard-header__content { padding: 18px 28px; display: flex; flex-direction: column; justify-content: center; gap: 6px; min-width: 0; }
 .rm-dashboard-header .rm-dashboard-header__eyebrow { font: 600 11px/1.25 var(--rm-font-friendly); letter-spacing: .11em; text-transform: uppercase; color: var(--rm-header-muted); margin: 0; }
 .rm-dashboard-header__heading { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 12px; }
