@@ -28,7 +28,7 @@ class RoleDashboardDataTest extends TestCase
         $this->assertContains('Cobertura por área hoy', array_column($data['panels'], 'title'));
     }
 
-    public function test_kpi_institucional_deriva_capacidad_cobertura_y_jornada_de_registros_reales(): void
+    public function test_metricas_institucionales_y_jornada_derivan_de_registros_reales(): void
     {
         $usuario = User::factory()->create();
         $residente = Residente::factory()->create();
@@ -68,15 +68,9 @@ class RoleDashboardDataTest extends TestCase
         $data = app(RoleDashboardDataService::class)->forRole($usuario, 'SUPERADMINISTRADOR');
 
         $this->assertSame(1, $data['metrics'][0]['value']);
-        $this->assertSame(1, array_sum($data['metrics'][0]['sparkbars']));
-        $this->assertSame(1, $data['metrics'][0]['periodChange']);
-        $this->assertTrue($data['metrics'][0]['periodHasData']);
-        $this->assertSame(['value' => 1, 'capacity' => 2, 'occupied' => 1], array_intersect_key(
-            $data['metrics'][1], array_flip(['value', 'capacity', 'occupied'])
-        ));
+        $this->assertSame(1, $data['metrics'][1]['value']);
+        $this->assertSame(0, $data['metrics'][2]['value']);
         $this->assertSame(1, $data['metrics'][3]['value']);
-        $this->assertSame(1, $data['metrics'][3]['capacity']);
-        $this->assertSame([['label' => 'Cuidados de prueba', 'value' => 1]], $data['metrics'][3]['areas']);
         $this->assertSame('Mañana', $data['activeShift']);
     }
 

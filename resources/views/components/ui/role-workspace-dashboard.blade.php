@@ -55,16 +55,14 @@
     @if(!empty($indicadores))
         <section @class(['grid gap-4 sm:grid-cols-2 xl:grid-cols-4', 'rm-superadmin-metrics' => $esSuperadministracion]) aria-label="Indicadores del perfil">
             @foreach($indicadores as $indicador)
-                @if($esSuperadministracion)
-                    <x-ui.dashboard-kpi :metric="$indicador" :kind="['residents', 'beds', 'alerts', 'staff'][$loop->index]" />
-                @else
-                    <x-ui.metric-card
-                        :icon="$indicador['icon'] ?? 'ph-chart-bar'"
-                        :value="$indicador['value'] ?? null"
-                        :label="$indicador['label'] ?? 'Indicador'"
-                        :description="$indicador['description'] ?? null"
-                        :variant="$indicador['variant'] ?? 'neutral'" />
-                @endif
+                @php($sinAlertas = $esSuperadministracion && ($indicador['label'] ?? '') === 'Alertas prioritarias' && (int) ($indicador['value'] ?? 0) === 0)
+                <x-ui.metric-card
+                    :icon="$indicador['icon'] ?? 'ph-chart-bar'"
+                    :value="$indicador['value'] ?? null"
+                    :label="$indicador['label'] ?? 'Indicador'"
+                    :description="$sinAlertas ? 'Sin alertas críticas o altas abiertas.' : ($indicador['description'] ?? null)"
+                    :variant="$sinAlertas ? 'mint' : ($indicador['variant'] ?? 'neutral')"
+                    class="{{ $sinAlertas ? 'rm-superadmin-metric--quiet' : '' }}" />
             @endforeach
         </section>
     @endif

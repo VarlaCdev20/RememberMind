@@ -38,10 +38,10 @@ class SuperadminDashboardHubTest extends TestCase
 
         $response->assertSee('Superadministración');
         $response->assertDontSee('bajo supervisión global');
-        $response->assertSee('rm-superadmin-kpi--residents');
-        $response->assertSee('rm-superadmin-kpi--beds');
-        $response->assertSee('rm-superadmin-kpi--alerts');
-        $response->assertSee('rm-superadmin-kpi--staff');
+        $response->assertSee('rm-superadmin-metrics');
+        $response->assertSee('rm-metric-card');
+        $response->assertSee('rm-superadmin-metric--quiet');
+        $response->assertDontSee('rm-superadmin-kpi--residents');
         $response->assertSee('Residentes activos');
         $response->assertSee('Camas disponibles');
         $response->assertSee('Preadmisiones por estado');
