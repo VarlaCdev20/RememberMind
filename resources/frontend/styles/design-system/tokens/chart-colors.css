@@ -4,18 +4,29 @@
    ============================================================ */
 
 :root {
-    --rm-chart-1: var(--rm-primary);
-    --rm-chart-2: var(--rm-info);
-    --rm-chart-3: var(--rm-sage);
-    --rm-chart-4: var(--rm-psychology);
-    --rm-chart-5: var(--rm-nutrition);
-    --rm-chart-6: var(--rm-text-secondary);
-    --rm-chart-7: var(--rm-primary-soft);
-    --rm-chart-8: var(--rm-info-strong);
-    --rm-chart-9: var(--rm-surface-muted);
-    --rm-chart-10: var(--rm-sage-soft);
+    --rm-chart-sage: #7FA883;
+    --rm-chart-sage-soft: #D8E9D8;
+    --rm-chart-blue: #7FAFD8;
+    --rm-chart-blue-soft: #DDEBF8;
+    --rm-chart-coral: #E28B79;
+    --rm-chart-coral-soft: #F6DFD8;
+    --rm-chart-sand: #D6C2A8;
+    --rm-chart-sand-soft: #F1E8DC;
+    --rm-chart-lavender: #AFA9D8;
+    --rm-chart-lavender-soft: #EAE8F8;
 
-    --rm-chart-danger:       var(--rm-danger);
+    --rm-chart-1: var(--rm-chart-sage);
+    --rm-chart-2: var(--rm-chart-blue);
+    --rm-chart-3: var(--rm-chart-sand);
+    --rm-chart-4: var(--rm-chart-lavender);
+    --rm-chart-5: color-mix(in srgb, var(--rm-chart-sage) 72%, var(--rm-chart-sand));
+    --rm-chart-6: color-mix(in srgb, var(--rm-chart-blue) 72%, var(--rm-chart-sand));
+    --rm-chart-7: color-mix(in srgb, var(--rm-chart-sage) 72%, var(--rm-chart-blue));
+    --rm-chart-8: color-mix(in srgb, var(--rm-chart-lavender) 72%, var(--rm-chart-blue));
+    --rm-chart-9: var(--rm-chart-sand);
+    --rm-chart-10: var(--rm-chart-coral);
+
+    --rm-chart-danger:       var(--rm-chart-coral);
     --rm-chart-danger-soft:  var(--rm-danger-soft);
     --rm-chart-warning:      var(--rm-warning);
     --rm-chart-warning-soft: var(--rm-warning-soft);
@@ -33,23 +44,35 @@
     --rm-chart-fill-donut:   0.88;
     --rm-chart-fill-radar:   0.17;
 
-    --rm-chart-grid: var(--rm-border); /* cuadrícula */
+    --rm-chart-card-bg: rgba(247, 243, 239, .78);
+    --rm-chart-card-glass: rgba(255, 252, 248, .52);
+    --rm-chart-card-border: rgba(74, 70, 66, .08);
+    --rm-chart-card-shadow: 0 4px 12px rgba(74, 70, 66, .035), 0 12px 32px rgba(74, 70, 66, .05);
+    --rm-chart-title: #4A4642;
+    --rm-chart-subtitle: #6E6862;
+    --rm-chart-grid: rgba(74, 70, 66, .08);
     --rm-chart-grid-strong:    var(--rm-border-strong);
-    --rm-chart-axis-text:      var(--rm-text-secondary);
-    --rm-chart-axis-title:     var(--rm-text-primary);
-    --rm-chart-label: var(--rm-text-secondary); /* etiquetas */
+    --rm-chart-axis-text: #7F7871;
+    --rm-chart-axis-title: var(--rm-chart-title);
+    --rm-chart-label: #625D58;
 
-    --rm-chart-tooltip-bg: var(--rm-surface-raised); /* tooltip */
-    --rm-chart-tooltip-text:   var(--rm-text-primary);
-    --rm-chart-tooltip-border: var(--rm-border-soft);
+    --rm-chart-tooltip-bg: rgba(255, 252, 248, .92);
+    --rm-chart-tooltip-text: var(--rm-chart-title);
+    --rm-chart-tooltip-border: var(--rm-chart-card-border);
 
-    /* El resplandor se activa exclusivamente en modo oscuro. */
-    --rm-chart-neon-mint: transparent;
-    --rm-chart-neon-blue: transparent;
-    --rm-chart-neon-coral: transparent;
-    --rm-chart-neon-surface: transparent;
 }
 
-
-/* La paleta de series también sigue los tokens en modo oscuro.
-   El rojo y el ámbar se reservan para chart-danger y chart-warning. */
+:is(.dark, [data-theme="dark"]) {
+    --rm-chart-card-bg: color-mix(in srgb, var(--rm-palette-petroleum-800) 92%, transparent);
+    --rm-chart-card-glass: color-mix(in srgb, var(--rm-palette-petroleum-raised) 52%, transparent);
+    --rm-chart-card-border: var(--rm-palette-petroleum-border);
+    --rm-chart-card-shadow: 0 8px 24px color-mix(in srgb, var(--rm-palette-petroleum-950) 16%, transparent);
+    --rm-chart-title: var(--rm-palette-petroleum-text);
+    --rm-chart-subtitle: var(--rm-palette-petroleum-secondary);
+    --rm-chart-grid: color-mix(in srgb, var(--rm-palette-petroleum-text) 9%, transparent);
+    --rm-chart-axis-text: var(--rm-palette-petroleum-secondary);
+    --rm-chart-label: var(--rm-palette-petroleum-text);
+    --rm-chart-tooltip-bg: var(--rm-palette-petroleum-raised);
+    --rm-chart-tooltip-text: var(--rm-palette-petroleum-text);
+    --rm-chart-tooltip-border: var(--rm-palette-petroleum-border);
+}

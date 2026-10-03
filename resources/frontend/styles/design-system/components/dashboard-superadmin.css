@@ -251,6 +251,12 @@
     background: var(--rm-dashboard-card-bg);
     box-shadow: var(--rm-dashboard-card-shadow);
 }
+.rm-dashboard-composition--superadmin .rm-dashboard-data-panel--chart {
+    border-color: var(--rm-chart-card-border);
+    border-radius: 20px;
+    background: linear-gradient(180deg, var(--rm-chart-card-glass), var(--rm-chart-card-bg));
+    box-shadow: var(--rm-chart-card-shadow);
+}
 .rm-dashboard-composition--superadmin .rm-dashboard-data-grid { gap: 12px; }
 .rm-dashboard-composition--superadmin .rm-dashboard-data-panel { padding: 14px; }
 .rm-dashboard-composition--superadmin .rm-dashboard-data-panel__heading { margin-bottom: 8px; }
@@ -258,9 +264,9 @@
 .rm-dashboard-composition--superadmin .rm-dashboard-data-panel__icon { width: 28px; height: 28px; flex-basis: 28px; }
 .rm-dashboard-composition--superadmin .rm-dashboard-data-panel__list li { min-height: 40px; padding-block: 6px; }
 .rm-dashboard-composition--superadmin .rm-dashboard-data-panel__bars li { margin-top: 8px; }
-.rm-dashboard-composition--superadmin .rm-dashboard-data-panel__donut { width: 92px; height: 92px; flex-basis: 92px; }
-.rm-dashboard-composition--superadmin .rm-dashboard-data-panel__donut::before { inset: 19px; }
-.rm-dashboard-composition--superadmin .rm-dashboard-data-panel__donut span { font-size: 22px; }
+.rm-dashboard-composition--superadmin .rm-dashboard-data-panel__donut { width: 124px; height: 124px; flex-basis: 124px; }
+.rm-dashboard-composition--superadmin .rm-dashboard-data-panel__donut::before { inset: 27px; }
+.rm-dashboard-composition--superadmin .rm-dashboard-data-panel__donut strong { font-size: 26px; }
 .rm-dashboard-composition--superadmin .rm-dashboard-data-panel .rm-empty-state { min-height: 96px; }
 /* La última fila del panel institucional contiene únicamente documentos. */
 .rm-dashboard-composition--superadmin .rm-dashboard-data-grid > .rm-dashboard-data-panel:last-child {

@@ -182,7 +182,7 @@ a.rm-turn-task__title:hover { text-decoration: underline; }
 .rm-nursing-donut-legend__dot { flex: 0 0 9px; width: 9px; height: 9px; border-radius: 50%; background: var(--rm-chart-9); }
 .rm-nursing-donut-legend__dot--mint { background: var(--rm-chart-1); }
 .rm-nursing-donut-legend__dot--sky { background: var(--rm-chart-2); }
-.rm-nursing-donut-legend__dot--coral { background: var(--rm-chart-10); }
+.rm-nursing-donut-legend__dot--coral { background: var(--rm-chart-coral); }
 .rm-nursing-donut-legend__dot--neutral { background: var(--rm-chart-9); }
 .rm-nursing-donut-legend__total { padding-top: var(--rm-space-2); border-top: 1px solid var(--rm-border-soft); }
 .rm-nursing-chart-note { margin: 0; color: var(--rm-text-muted); font-size: var(--rm-text-xs); line-height: 1.35; }
@@ -534,16 +534,14 @@ a.rm-turn-task__title:hover { text-decoration: underline; }
     border-color: color-mix(in srgb, var(--rm-border) 82%, transparent);
 }
 :root:not(.dark):not([data-theme="dark"]) .rm-nursing-dashboard .rm-chart-card {
-    background:
-        radial-gradient(205px circle at var(--rm-nursing-glint-x, 84%) var(--rm-nursing-glint-y, 12%), color-mix(in srgb, var(--rm-chart-3) 18%, transparent), transparent 82%),
-        linear-gradient(155deg, color-mix(in srgb, var(--rm-surface-raised) 91%, transparent), color-mix(in srgb, var(--rm-surface-main) 88%, var(--rm-action-primary-soft)));
-    border-color: color-mix(in srgb, var(--rm-border) 86%, transparent);
-    box-shadow: inset 0 1px color-mix(in srgb, var(--rm-surface-raised) 68%, transparent), var(--rm-shadow-sm);
+    background: linear-gradient(180deg, var(--rm-chart-card-glass), var(--rm-chart-card-bg));
+    border-color: var(--rm-chart-card-border);
+    box-shadow: var(--rm-chart-card-shadow);
 }
 :root:not(.dark):not([data-theme="dark"]) .rm-nursing-dashboard__kpi--patients { --rm-nursing-accent: var(--rm-chart-1); }
 :root:not(.dark):not([data-theme="dark"]) .rm-nursing-dashboard__kpi--beds { --rm-nursing-accent: var(--rm-chart-2); }
-:root:not(.dark):not([data-theme="dark"]) .rm-nursing-dashboard__kpi--risk { --rm-nursing-accent: var(--rm-chart-9); }
-:root:not(.dark):not([data-theme="dark"]) .rm-nursing-dashboard__kpi--medication { --rm-nursing-accent: var(--rm-chart-10); }
+:root:not(.dark):not([data-theme="dark"]) .rm-nursing-dashboard__kpi--risk { --rm-nursing-accent: var(--rm-chart-coral); }
+:root:not(.dark):not([data-theme="dark"]) .rm-nursing-dashboard__kpi--medication { --rm-nursing-accent: var(--rm-chart-sand); }
 :root:not(.dark):not([data-theme="dark"]) .rm-nursing-dashboard .rm-nursing-dashboard__kpi {
     background:
         radial-gradient(circle at 92% 18%, color-mix(in srgb, var(--rm-nursing-accent) 14%, transparent), transparent 52%),
@@ -553,7 +551,7 @@ a.rm-turn-task__title:hover { text-decoration: underline; }
 :root:not(.dark):not([data-theme="dark"]) .rm-nursing-dashboard .rm-nursing-module:where(:hover, :focus-within),
 :root:not(.dark):not([data-theme="dark"]) .rm-nursing-dashboard .rm-chart-card:where(:hover, :focus-within) {
     border-color: color-mix(in srgb, var(--rm-chart-1) 42%, var(--rm-border));
-    box-shadow: inset 0 1px color-mix(in srgb, var(--rm-surface-raised) 75%, transparent), var(--rm-shadow-md);
+    box-shadow: var(--rm-chart-card-shadow);
 }
 :root:not(.dark):not([data-theme="dark"]) .rm-nursing-dashboard a.rm-nursing-dashboard__kpi:where(:hover, :focus-visible) {
     border-color: color-mix(in srgb, var(--rm-nursing-accent) 48%, var(--rm-border));
@@ -569,5 +567,5 @@ a.rm-turn-task__title:hover { text-decoration: underline; }
     :root:not(.dark):not([data-theme="dark"]) .rm-nursing-dashboard .rm-section-header__icon,
     :root:not(.dark):not([data-theme="dark"]) .rm-nursing-dashboard .rm-metric-card__icon { transition: transform .28s ease, background-color .28s ease; }
     :root:not(.dark):not([data-theme="dark"]) .rm-nursing-dashboard :is(.rm-nursing-module, .rm-chart-card, a.rm-nursing-dashboard__kpi):hover :is(.rm-section-header__icon, .rm-metric-card__icon) { transform: translateY(-2px) rotate(-4deg); }
-    :root:not(.dark):not([data-theme="dark"]) .rm-nursing-dashboard .rm-chart-card:hover canvas { filter: saturate(1.09) contrast(1.03) drop-shadow(0 2px 5px color-mix(in srgb, var(--rm-chart-1) 15%, transparent)); }
+    :root:not(.dark):not([data-theme="dark"]) .rm-nursing-dashboard .rm-chart-card:hover canvas { filter: none; }
 }

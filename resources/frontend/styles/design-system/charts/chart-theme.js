@@ -129,29 +129,29 @@ function rmResolveDatasetGlowColor(dataset, datasetIndex) {
     return rmGetCss(`--rm-chart-${paletteIndex}`) || rmGetCss('--rm-chart-2') || 'transparent';
 }
 
-const rmDarkNeonGlowPlugin = {
-    id: 'rmDarkNeonGlow',
+const rmSoftChartGlowPlugin = {
+    id: 'rmSoftChartGlow',
 
     beforeDatasetDraw(chart, args, pluginOptions) {
-        if (!rmIsDark() || pluginOptions?.enabled === false || !chart?.ctx) return;
+        if (pluginOptions?.enabled === false || !chart?.ctx) return;
 
         const dataset = chart.data?.datasets?.[args.index];
         const color = rmResolveDatasetGlowColor(dataset, args.index);
         const isSparkline = chart.canvas?.closest?.('.rm-sparkline, .is-sparkline');
 
         chart.ctx.save();
-        chart.ctx.shadowColor = rmHexToRgba(color, .16);
-        chart.ctx.shadowBlur = isSparkline ? 2 : 4;
+        chart.ctx.shadowColor = rmHexToRgba(color, rmIsDark() ? .11 : .08);
+        chart.ctx.shadowBlur = isSparkline ? 2 : 3;
         chart.ctx.shadowOffsetX = 0;
         chart.ctx.shadowOffsetY = 0;
-        args.meta.$rmNeonGlowActive = true;
+        args.meta.$rmSoftGlowActive = true;
     },
 
     afterDatasetDraw(chart, args) {
-        if (!args.meta?.$rmNeonGlowActive || !chart?.ctx) return;
+        if (!args.meta?.$rmSoftGlowActive || !chart?.ctx) return;
 
         chart.ctx.restore();
-        args.meta.$rmNeonGlowActive = false;
+        args.meta.$rmSoftGlowActive = false;
     },
 };
 
@@ -162,7 +162,7 @@ const rmDarkNeonGlowPlugin = {
 export function rmInstallGlobalChartTheme(Chart) {
     if (!Chart || Chart.__rmClinicalThemeInstalled) return;
 
-    Chart.register(rmDarkNeonGlowPlugin);
+    Chart.register(rmSoftChartGlowPlugin);
 
     const applyDefaults = () => {
         const axisText = rmGetCss('--rm-chart-axis-text');
@@ -173,22 +173,22 @@ export function rmInstallGlobalChartTheme(Chart) {
 
         Chart.defaults.color = axisText;
         Chart.defaults.borderColor = grid;
-        Chart.defaults.font.family = "Outfit, 'Nunito Sans', Inter, system-ui, sans-serif";
+        Chart.defaults.font.family = "'Nunito Sans', Inter, system-ui, sans-serif";
         Chart.defaults.font.size = 11;
         Chart.defaults.responsive = true;
         Chart.defaults.maintainAspectRatio = false;
         const reduceMotion = rmPrefersReducedMotion();
-        Chart.defaults.animation.duration = reduceMotion ? 0 : 800;
+        Chart.defaults.animation.duration = reduceMotion ? 0 : 560;
         Chart.defaults.animation.easing = 'easeOutQuart';
         Chart.defaults.interaction.mode = 'index';
         Chart.defaults.interaction.intersect = false;
 
-        Chart.defaults.elements.line.borderWidth = 2.4;
+        Chart.defaults.elements.line.borderWidth = 3;
         Chart.defaults.elements.line.tension = .38;
-        Chart.defaults.elements.point.radius = 3.5;
-        Chart.defaults.elements.point.hoverRadius = 6.5;
+        Chart.defaults.elements.point.radius = 3;
+        Chart.defaults.elements.point.hoverRadius = 5.5;
         Chart.defaults.elements.point.borderWidth = 2;
-        Chart.defaults.elements.bar.borderRadius = 8;
+        Chart.defaults.elements.bar.borderRadius = 10;
         Chart.defaults.elements.bar.borderSkipped = false;
         Chart.defaults.elements.arc.borderWidth = 2;
         Chart.defaults.elements.arc.borderRadius = 6;
@@ -199,7 +199,7 @@ export function rmInstallGlobalChartTheme(Chart) {
         Chart.defaults.plugins.legend.labels.pointStyle = 'circle';
         Chart.defaults.plugins.legend.labels.padding = 14;
         Chart.defaults.plugins.legend.labels.font = {
-            family: "Outfit, 'Nunito Sans', Inter, system-ui, sans-serif",
+            family: "'Nunito Sans', Inter, system-ui, sans-serif",
             size: 11,
             weight: '600',
         };
@@ -210,12 +210,12 @@ export function rmInstallGlobalChartTheme(Chart) {
             bodyColor: tooltipText,
             borderColor: tooltipBorder,
             borderWidth: 1,
-            cornerRadius: 12,
+            cornerRadius: 14,
             padding: 11,
             boxPadding: 5,
             usePointStyle: true,
-            titleFont: { family: "Outfit, 'Nunito Sans', sans-serif", size: 12, weight: '700' },
-            bodyFont: { family: "Outfit, 'Nunito Sans', sans-serif", size: 11, weight: '500' },
+            titleFont: { family: "'Nunito Sans', sans-serif", size: 12, weight: '700' },
+            bodyFont: { family: "'Nunito Sans', sans-serif", size: 11, weight: '500' },
         });
 
         if (Chart.defaults.plugins.datalabels) {
@@ -279,13 +279,13 @@ export function rmBaseChartOptions(overrides = {}) {
         responsive: true,
         maintainAspectRatio: false,
         animation: {
-            duration: rmPrefersReducedMotion() ? 0 : 700,
+            duration: rmPrefersReducedMotion() ? 0 : 560,
             easing: 'easeOutQuart',
         },
         transitions: {
             active: {
                 animation: {
-                    duration: 350,
+                    duration: 220,
                     easing: 'easeOutCubic'
                 }
             }
@@ -297,7 +297,7 @@ export function rmBaseChartOptions(overrides = {}) {
             legend: {
                 display: false,
                 labels: {
-                    font: { family: "Outfit, 'Nunito Sans', Inter, system-ui, sans-serif", size: 11, weight: '600' },
+                    font: { family: "'Nunito Sans', Inter, system-ui, sans-serif", size: 11, weight: '600' },
                     color: axisTextColor,
                     usePointStyle: true,
                     pointStyle: 'circle',
@@ -310,10 +310,10 @@ export function rmBaseChartOptions(overrides = {}) {
                 bodyColor: tooltipText,
                 borderColor: tooltipBorder,
                 borderWidth: 1,
-                cornerRadius: 12,
+                cornerRadius: 14,
                 padding: { top: 10, right: 12, bottom: 10, left: 12 },
-                titleFont: { family: "Outfit, 'Nunito Sans', sans-serif", size: 12, weight: '700' },
-                bodyFont: { family: "Outfit, 'Nunito Sans', sans-serif", size: 11, weight: '500' },
+                titleFont: { family: "'Nunito Sans', sans-serif", size: 12, weight: '700' },
+                bodyFont: { family: "'Nunito Sans', sans-serif", size: 11, weight: '500' },
                 boxPadding: 4,
                 displayColors: true,
             },
@@ -326,14 +326,14 @@ export function rmBaseChartOptions(overrides = {}) {
                 grid: { color: gridColor, drawBorder: false },
                 ticks: {
                     color: axisTextColor,
-                    font: { family: "Outfit, 'Nunito Sans', sans-serif", size: 10, weight: '600' },
+                    font: { family: "'Nunito Sans', sans-serif", size: 10, weight: '500' },
                 },
             },
             y: {
                 grid: { color: gridColor, drawBorder: false },
                 ticks: {
                     color: axisTextColor,
-                    font: { family: "Outfit, 'Nunito Sans', sans-serif", size: 10, weight: '600' },
+                    font: { family: "'Nunito Sans', sans-serif", size: 10, weight: '500' },
                 },
             },
         },
@@ -346,12 +346,12 @@ export function rmDoughnutDefaults() {
     delete base.scales;
     return {
         ...base,
-        cutout: '64%',
+        cutout: '58%',
         animation: {
-            duration: 950,
+            duration: rmPrefersReducedMotion() ? 0 : 650,
             easing: 'easeOutQuart',
             animateRotate: true,
-            animateScale: true,
+            animateScale: false,
         },
         plugins: {
             ...base.plugins,

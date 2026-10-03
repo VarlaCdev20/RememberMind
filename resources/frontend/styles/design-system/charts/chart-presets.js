@@ -13,6 +13,7 @@ import {
     rmHexToRgba,
     rmGetCss,
     rmIsDark,
+    rmPrefersReducedMotion,
     rmCreateGradient,
     rmCreateBarGradient,
 } from './chart-theme.js';
@@ -22,8 +23,8 @@ export function rmDoughnutChartConfig(labels, data, colors, customOptions = {}) 
     const defaults = rmDoughnutDefaults();
     
     // Convertir colores a translúcidos con bordes nítidos para efecto vidrio/luz
-    const translucentBg = colors.map(c => rmHexToRgba(c, 0.80));
-    const borderColors = colors.map(c => rmHexToRgba(c, 0.98));
+    const translucentBg = colors.map(c => rmHexToRgba(c, 0.86));
+    const segmentBorder = rmGetCss('--rm-chart-card-bg') || rmGetCss('--rm-surface-raised');
 
     return {
         type: 'doughnut',
@@ -32,18 +33,18 @@ export function rmDoughnutChartConfig(labels, data, colors, customOptions = {}) 
             datasets: [{
                 data: data,
                 backgroundColor: translucentBg,
-                borderColor: borderColors,
+                borderColor: segmentBorder,
                 borderWidth: 2,
-                borderRadius: 6,
-                spacing: 3,
-                hoverOffset: 6,
+                borderRadius: 5,
+                spacing: 2,
+                hoverOffset: 4,
                 hoverBorderColor: rmGetCss('--rm-surface-raised') || rmGetCss('--rm-surface') || '#F4EFE8',
                 hoverBorderWidth: 2.5,
             }]
         },
         options: {
             ...defaults,
-            cutout: '64%', // Anillo grueso y armonioso con presencia cl?nica
+            cutout: '58%',
             plugins: {
                 ...defaults.plugins,
                 tooltip: {
@@ -74,7 +75,7 @@ export function rmBarHorizontalChartConfig(labels, data, colors, customOptions =
     const suggestedMax = maxVal + Math.ceil(maxVal * 0.28) + 1;
 
     // Colores intensos con acabado traslúcido elegante
-    const translucentBg = colors.map(c => rmHexToRgba(c, 0.88));
+    const translucentBg = colors.map(c => rmHexToRgba(c, 0.86));
     const borderColors  = colors.map(c => rmHexToRgba(c, 0.98));
 
     const base = rmBaseChartOptions();
@@ -90,7 +91,7 @@ export function rmBarHorizontalChartConfig(labels, data, colors, customOptions =
             },
             ticks: {
                 color: axisTextColor,
-                font: { family: 'Outfit, Nunito, system-ui, sans-serif', size: 10.5, weight: '600' },
+                font: { family: "'Nunito Sans', system-ui, sans-serif", size: 11, weight: '500' },
                 precision: 0,
                 stepSize: 1,
             },
@@ -103,7 +104,7 @@ export function rmBarHorizontalChartConfig(labels, data, colors, customOptions =
             },
             ticks: {
                 color: axisTitleColor,
-                font: { family: 'Outfit, Nunito, system-ui, sans-serif', size: 11.5, weight: '700' },
+                font: { family: "'Nunito Sans', system-ui, sans-serif", size: 11.5, weight: '600' },
                 padding: 8,
             },
             ...(customOptions.scales?.y || {}),
@@ -121,7 +122,7 @@ export function rmBarHorizontalChartConfig(labels, data, colors, customOptions =
             align: 'right',
             offset: 8,
             color: axisTitleColor,
-            font: { family: 'Outfit, Nunito, system-ui, sans-serif', size: 11.5, weight: '800' },
+            font: { family: "'Nunito Sans', system-ui, sans-serif", size: 11.5, weight: '700' },
             formatter: function(value) {
                 return value;
             },
@@ -131,9 +132,9 @@ export function rmBarHorizontalChartConfig(labels, data, colors, customOptions =
         tooltip: {
             ...base.plugins.tooltip,
             padding: 10,
-            cornerRadius: 8,
-            titleFont: { family: 'Outfit, Nunito, system-ui, sans-serif', size: 12, weight: '700' },
-            bodyFont: { family: 'Outfit, Nunito, system-ui, sans-serif', size: 11.5, weight: '500' },
+            cornerRadius: 14,
+            titleFont: { family: "'Nunito Sans', system-ui, sans-serif", size: 12, weight: '700' },
+            bodyFont: { family: "'Nunito Sans', system-ui, sans-serif", size: 11.5, weight: '500' },
             callbacks: {
                 label: function(context) {
                     const raw = context.raw || 0;
@@ -156,10 +157,10 @@ export function rmBarHorizontalChartConfig(labels, data, colors, customOptions =
                 backgroundColor: translucentBg,
                 borderColor: borderColors,
                 borderWidth: 1.5,
-                borderRadius: 6,
+                borderRadius: 10,
                 borderSkipped: false,
-                barThickness: 18,
-                maxBarThickness: 20,
+                barThickness: 24,
+                maxBarThickness: 28,
             }]
         },
         options: {
@@ -186,11 +187,11 @@ export function rmAreaChartConfig(labels, datasets, customOptions = {}) {
             datasets: datasets.map(ds => ({
                 fill: true,
                 tension: 0.38,
-                pointRadius: 4,
-                pointHoverRadius: 6.5,
+                pointRadius: 3,
+                pointHoverRadius: 5.5,
                 pointBorderWidth: 2,
                 pointBackgroundColor: rmGetCss('--rm-surface-raised') || rmGetCss('--rm-surface') || '#F4EFE8',
-                borderWidth: 2.5,
+                borderWidth: 3,
                 ...ds,
             }))
         },
@@ -209,10 +210,10 @@ export function rmLineChartConfig(labels, datasets, customOptions = {}) {
         data: {
             labels: labels,
             datasets: datasets.map(ds => ({
-                tension: 0.28,
-                pointRadius: 4,
-                pointHoverRadius: 6.5,
-                borderWidth: 2.5,
+                tension: 0.38,
+                pointRadius: 3,
+                pointHoverRadius: 5.5,
+                borderWidth: 3,
                 ...ds,
             }))
         },
@@ -238,10 +239,11 @@ export function rmBarChartConfig(labels, datasets, customOptions = {}) {
                     ? ds.borderColor.map(c => rmHexToRgba(c, 0.95))
                     : (ds.borderColor ? rmHexToRgba(ds.borderColor, 0.95) : undefined);
                 return {
-                    borderRadius: 8,
-                    borderSkipped: 'bottom',
-                    barPercentage: 0.85,
-                    categoryPercentage: 0.90,
+                    borderRadius: 10,
+                    borderSkipped: false,
+                    barPercentage: 0.86,
+                    categoryPercentage: 0.78,
+                    maxBarThickness: 32,
                     borderWidth: 1.5,
                     backgroundColor: bg || ds.backgroundColor,
                     borderColor: border || ds.borderColor,
@@ -264,9 +266,9 @@ export function rmStackedBarChartConfig(labels, datasets, customOptions = {}) {
         data: {
             labels: labels,
             datasets: datasets.map(ds => ({
-                borderRadius: 6,
-                barPercentage: 0.85,
-                categoryPercentage: 0.90,
+                borderRadius: 9,
+                barPercentage: 0.86,
+                categoryPercentage: 0.78,
                 borderWidth: 1.5,
                 ...ds,
             }))
@@ -321,8 +323,9 @@ export function rmRadarChartConfig(labels, datasets, customOptions = {}) {
             labels: labels,
             datasets: datasets.map(ds => ({
                 fill: true,
-                pointRadius: 4,
-                borderWidth: 2,
+                pointRadius: 3,
+                pointHoverRadius: 5,
+                borderWidth: 2.5,
                 ...ds,
             }))
         },
@@ -334,7 +337,7 @@ export function rmRadarChartConfig(labels, datasets, customOptions = {}) {
                     angleLines: { color: gridColor },
                     pointLabels: {
                         color: axisTextColor,
-                        font: { family: 'Inter, system-ui, sans-serif', size: 10, weight: '600' }
+                        font: { family: "'Nunito Sans', system-ui, sans-serif", size: 11, weight: '500' }
                     },
                     ticks: {
                         display: false,
@@ -364,7 +367,7 @@ export function rmScatterChartConfig(datasets, customOptions = {}) {
 export function rmGaugeConfig(value, max = 100, color = null, customOptions = {}) {
     const isDark = rmIsDark();
     const fillColor = color ? rmHexToRgba(color, 0.85) : (rmGetCss('--rm-chart-1') || '#344D7A');
-    const trackColor = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(224,212,198,0.30)';
+    const trackColor = rmGetCss('--rm-chart-sage-soft') || (isDark ? 'rgba(255,255,255,0.09)' : 'rgba(216,233,216,0.70)');
 
     return {
         type: 'doughnut',
@@ -380,7 +383,7 @@ export function rmGaugeConfig(value, max = 100, color = null, customOptions = {}
             maintainAspectRatio: false,
             circumference: 180,
             rotation: -90,
-            cutout: '68%', // Más grueso que el 80% previo
+            cutout: '58%',
             plugins: {
                 legend: { display: false },
                 tooltip: { enabled: false },
@@ -392,19 +395,19 @@ export function rmGaugeConfig(value, max = 100, color = null, customOptions = {}
 }
 // --- Preset: Micrográfico / Sparkline Clínico con Movimiento Suave Translúcido ---
 export function rmSparklineChartConfig(labels, data, color = null, customOptions = {}) {
-    const isDark = rmIsDark();
-    const mainColor = color || rmGetCss('--rm-chart-1') || (isDark ? '#60A5FA' : '#344D7A');
+    const mainColor = color || rmGetCss('--rm-chart-1') || '#7FA883';
+    const pointSurface = rmGetCss('--rm-chart-card-bg') || rmGetCss('--rm-surface-raised');
 
     // Gradiente vertical translúcido para el área
     const fillGradient = (context) => {
         const chart = context.chart;
         const { ctx, chartArea } = chart;
         if (!chartArea) {
-            return rmHexToRgba(mainColor, isDark ? 0.28 : 0.20);
+            return rmHexToRgba(mainColor, .16);
         }
         const gradient = ctx.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
-        gradient.addColorStop(0, rmHexToRgba(mainColor, isDark ? 0.38 : 0.26));
-        gradient.addColorStop(0.65, rmHexToRgba(mainColor, isDark ? 0.14 : 0.08));
+        gradient.addColorStop(0, rmHexToRgba(mainColor, .18));
+        gradient.addColorStop(0.65, rmHexToRgba(mainColor, .06));
         gradient.addColorStop(1, rmHexToRgba(mainColor, 0.01));
         return gradient;
     };
@@ -421,23 +424,23 @@ export function rmSparklineChartConfig(labels, data, color = null, customOptions
                 backgroundColor: ds.backgroundColor || ((ctx) => {
                     const chart = ctx.chart;
                     const { ctx: cCtx, chartArea } = chart;
-                    if (!chartArea) return rmHexToRgba(dsColor, 0.20);
+                    if (!chartArea) return rmHexToRgba(dsColor, .16);
                     const grad = cCtx.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
-                    grad.addColorStop(0, rmHexToRgba(dsColor, isDark ? 0.36 : 0.24));
-                    grad.addColorStop(0.7, rmHexToRgba(dsColor, isDark ? 0.12 : 0.06));
+                    grad.addColorStop(0, rmHexToRgba(dsColor, .18));
+                    grad.addColorStop(0.7, rmHexToRgba(dsColor, .06));
                     grad.addColorStop(1, rmHexToRgba(dsColor, 0.01));
                     return grad;
                 }),
-                borderWidth: 2,
+                borderWidth: 2.75,
                 tension: 0.40,
                 fill: true,
                 pointRadius: customOptions._showPoints ? 2.5 : 0,
                 pointHoverRadius: 5.5,
-                pointBackgroundColor: isDark ? '#0F172A' : '#FFFFFF',
+                pointBackgroundColor: pointSurface,
                 pointBorderColor: dsColor,
                 pointBorderWidth: 1.5,
                 pointHoverBackgroundColor: dsColor,
-                pointHoverBorderColor: '#FFFFFF',
+                pointHoverBorderColor: pointSurface,
                 pointHoverBorderWidth: 2,
                 ...ds,
             };
@@ -447,16 +450,16 @@ export function rmSparklineChartConfig(labels, data, color = null, customOptions
             data: Array.isArray(data) ? data : [],
             borderColor: mainColor,
             backgroundColor: fillGradient,
-            borderWidth: 2,
+            borderWidth: 2.75,
             tension: 0.40,
             fill: true,
             pointRadius: customOptions._showPoints !== false ? 2.5 : 0,
             pointHoverRadius: 5.5,
-            pointBackgroundColor: isDark ? '#0F172A' : '#FFFFFF',
+            pointBackgroundColor: pointSurface,
             pointBorderColor: mainColor,
             pointBorderWidth: 1.5,
             pointHoverBackgroundColor: mainColor,
-            pointHoverBorderColor: '#FFFFFF',
+            pointHoverBorderColor: pointSurface,
             pointHoverBorderWidth: 2,
             ...(customOptions.dataset || {}),
         }];
@@ -472,16 +475,16 @@ export function rmSparklineChartConfig(labels, data, color = null, customOptions
             maintainAspectRatio: false,
             // Animación sutil progresiva (600–900ms, easeOutQuart)
             animation: {
-                duration: 800,
+                duration: rmPrefersReducedMotion() ? 0 : 560,
                 easing: 'easeOutQuart',
             },
             animations: {
                 y: {
-                    duration: 750,
+                    duration: rmPrefersReducedMotion() ? 0 : 520,
                     easing: 'easeOutQuart',
                 },
                 x: {
-                    duration: 800,
+                    duration: rmPrefersReducedMotion() ? 0 : 560,
                     easing: 'easeOutQuart',
                 }
             },
@@ -513,15 +516,15 @@ export function rmSparklineChartConfig(labels, data, color = null, customOptions
                     enabled: true,
                     mode: 'index',
                     intersect: false,
-                    backgroundColor: isDark ? 'rgba(15, 23, 42, 0.92)' : 'rgba(30, 41, 59, 0.90)',
-                    titleColor: '#FFFFFF',
-                    bodyColor: '#F8FAFC',
-                    borderColor: isDark ? 'rgba(255, 255, 255, 0.12)' : 'rgba(0, 0, 0, 0.08)',
+                    backgroundColor: rmGetCss('--rm-chart-tooltip-bg'),
+                    titleColor: rmGetCss('--rm-chart-tooltip-text'),
+                    bodyColor: rmGetCss('--rm-chart-tooltip-text'),
+                    borderColor: rmGetCss('--rm-chart-tooltip-border'),
                     borderWidth: 1,
-                    cornerRadius: 6,
+                    cornerRadius: 14,
                     padding: { top: 5, right: 8, bottom: 5, left: 8 },
-                    titleFont: { family: 'Inter, system-ui, sans-serif', size: 10, weight: '600' },
-                    bodyFont: { family: 'Inter, system-ui, sans-serif', size: 10.5, weight: '500' },
+                    titleFont: { family: "'Nunito Sans', system-ui, sans-serif", size: 10, weight: '700' },
+                    bodyFont: { family: "'Nunito Sans', system-ui, sans-serif", size: 10.5, weight: '500' },
                     displayColors: false,
                     boxPadding: 3,
                     callbacks: {

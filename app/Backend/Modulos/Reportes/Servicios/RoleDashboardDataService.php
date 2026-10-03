@@ -129,14 +129,14 @@ final class RoleDashboardDataService
                     'label' => $row->titulo, 'detail' => $row->prioridad.' · '.date('d/m H:i', strtotime($row->fecha_hora)),
                 ])->all(), 'No hay alertas prioritarias abiertas.', 'ph-warning-circle', 'wide'),
                 $this->panel('Próximas actividades', 'timeline', $this->upcomingActivities(), 'No hay actividades programadas.', 'ph-calendar-check'),
-                $this->panel('Residentes por estado', 'donut', $this->countItems($residentStates), 'No hay residentes registrados.', 'ph-users-three'),
-                $this->panel('Preadmisiones por estado', 'segments', $this->countItems($preadmissions), 'No hay preadmisiones registradas.', 'ph-user-plus'),
-                $this->panel('Cobertura por área hoy', 'bars', $this->countItems($coverage), 'No hay personal asignado a una jornada activa hoy.', 'ph-buildings'),
-                $this->panel('Seguimiento clínico · 30 días', 'bars', $this->countItems($clinicalActivity), 'No hay atenciones registradas en el período.', 'ph-first-aid-kit'),
+                $this->panel('Residentes por estado', 'donut', $this->countItems($residentStates), 'No hay residentes registrados.', 'ph-users-three', subtitle: 'Distribución de residentes', period: 'Actual'),
+                $this->panel('Preadmisiones por estado', 'segments', $this->countItems($preadmissions), 'No hay preadmisiones registradas.', 'ph-user-plus', subtitle: 'Etapas de revisión', period: 'Actual'),
+                $this->panel('Cobertura por área hoy', 'bars', $this->countItems($coverage), 'No hay personal asignado a una jornada activa hoy.', 'ph-buildings', subtitle: 'Personal asignado por área', period: 'Hoy'),
+                $this->panel('Seguimiento clínico · 30 días', 'bars', $this->countItems($clinicalActivity), 'No hay atenciones registradas en el período.', 'ph-first-aid-kit', subtitle: 'Atenciones por tipo', period: '30 días'),
                 $this->panel('Administraciones · 7 días', 'list', $administrations > 0 ? [[
                     'label' => 'Administraciones registradas', 'detail' => 'Últimos siete días', 'value' => $administrations,
                 ]] : [], 'No hay administraciones registradas en el período.', 'ph-pill'),
-                $this->panel('Incidentes por tipo · 30 días', 'bars', $this->countItems($incidents), 'No hay incidentes registrados en el período.', 'ph-warning'),
+                $this->panel('Incidentes por tipo · 30 días', 'bars', $this->countItems($incidents), 'No hay incidentes registrados en el período.', 'ph-warning', subtitle: 'Incidentes registrados por tipo', period: '30 días'),
                 $this->panel('Documentos validados recientes', 'list', DB::table('documentos')->whereNotNull('fecha_validacion')
                     ->orderByDesc('fecha_validacion')->limit(5)->get(['nombre', 'tipo_documento', 'fecha_validacion'])
                     ->map(fn ($row) => ['label' => $row->nombre, 'detail' => $row->tipo_documento.' · '.date('d/m/Y', strtotime($row->fecha_validacion))])->all(),
@@ -167,8 +167,8 @@ final class RoleDashboardDataService
                 $this->metric('Actividades próximas', DB::table('actividades')->where('estado', 'PROGRAMADA')->whereBetween('fecha_hora', [now(), now()->addDays(7)])->count(), 'Próximos siete días', 'ph-calendar-blank', 'coral'),
             ],
             'panels' => [
-                $this->panel('Cobertura por área hoy', 'bars', $this->countItems($coverage), 'No hay asignaciones activas hoy.', 'ph-buildings', 'wide'),
-                $this->panel('Equipo por profesión', 'bars', $this->countItems($professions), 'No hay personal activo registrado.', 'ph-users-three'),
+                $this->panel('Cobertura por área hoy', 'bars', $this->countItems($coverage), 'No hay asignaciones activas hoy.', 'ph-buildings', 'wide', 'Personal asignado por área', 'Hoy'),
+                $this->panel('Equipo por profesión', 'bars', $this->countItems($professions), 'No hay personal activo registrado.', 'ph-users-three', subtitle: 'Distribución del personal activo', period: 'Actual'),
                 $this->panel('Próximas actividades', 'timeline', $this->upcomingActivities(), 'No hay actividades programadas.', 'ph-calendar-check'),
             ],
         ];
@@ -343,8 +343,8 @@ final class RoleDashboardDataService
         return compact('label', 'value', 'description', 'icon', 'variant');
     }
 
-    private function panel(string $title, string $type, array $items, string $empty, string $icon, string $span = 'normal'): array
+    private function panel(string $title, string $type, array $items, string $empty, string $icon, string $span = 'normal', ?string $subtitle = null, ?string $period = null): array
     {
-        return compact('title', 'type', 'items', 'empty', 'icon', 'span');
+        return compact('title', 'type', 'items', 'empty', 'icon', 'span', 'subtitle', 'period');
     }
 }

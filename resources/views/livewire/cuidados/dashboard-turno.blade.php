@@ -322,17 +322,20 @@
 
             let summary;
             try { summary = JSON.parse(raw); } catch (_) { return; }
-            const datasets = summary.datasets.map((series) => ({
-                label: series.label,
-                data: series.data,
-                borderColor: resolveColor(series.color),
-                backgroundColor: resolveColor(series.color),
-                fill: false,
-                tension: 0.35,
-                borderWidth: 2.5,
-                pointRadius: 3,
-                pointHoverRadius: 6,
-            }));
+            const datasets = summary.datasets.map((series) => {
+                const color = resolveColor(series.color);
+                return {
+                    label: series.label,
+                    data: series.data,
+                    borderColor: color,
+                    backgroundColor: window.RMCharts?.hexToRgba(color, .16) || color,
+                    fill: summary.datasets.length <= 2,
+                    tension: .38,
+                    borderWidth: 3,
+                    pointRadius: 3,
+                    pointHoverRadius: 5.5,
+                };
+            });
             const chartData = { labels: summary.labels, datasets };
             const options = {
                 responsive: true,
@@ -342,12 +345,12 @@
                 plugins: {
                     legend: { display: false },
                     tooltip: {
-                        backgroundColor: token('--rm-chart-tooltip-bg', '#4C403A'),
-                        titleColor: token('--rm-chart-tooltip-text', '#EEE8E2'),
-                        bodyColor: token('--rm-chart-tooltip-text', '#EEE8E2'),
-                        borderColor: token('--rm-chart-tooltip-border', '#6D625D'),
+                        backgroundColor: token('--rm-chart-tooltip-bg', 'rgba(255,252,248,.92)'),
+                        titleColor: token('--rm-chart-tooltip-text', '#4A4642'),
+                        bodyColor: token('--rm-chart-tooltip-text', '#4A4642'),
+                        borderColor: token('--rm-chart-tooltip-border', 'rgba(74,70,66,.08)'),
                         borderWidth: 1,
-                        cornerRadius: 12,
+                        cornerRadius: 14,
                         callbacks: { title: (items) => summary.labels_completas[items[0]?.dataIndex] || '' },
                     },
                 },
@@ -434,13 +437,13 @@
 
             let config;
             if (type === 'followup') {
-                const colors = [token('--rm-chart-1'), token('--rm-chart-2'), token('--rm-chart-10')];
+                const colors = [token('--rm-chart-sage'), token('--rm-chart-blue'), token('--rm-chart-coral')];
                 config = window.RMCharts.presets.doughnut(data.labels, data.values, colors);
                 config.options.animation = reducedMotion() ? false : {
-                    duration: 700, easing: 'easeOutQuart', animateRotate: true, animateScale: true,
+                    duration: 650, easing: 'easeOutQuart', animateRotate: true, animateScale: false,
                 };
             } else if (type === 'activity') {
-                config = window.RMCharts.presets.barHorizontal(data.labels, data.values, [token('--rm-chart-1'), token('--rm-chart-2'), token('--rm-chart-10')]);
+                config = window.RMCharts.presets.barHorizontal(data.labels, data.values, [token('--rm-chart-sage'), token('--rm-chart-blue'), token('--rm-chart-coral')]);
                 config.options.plugins.tooltip.callbacks.label = (item) => ` ${item.raw} acciones`;
                 config.options.animation = reducedMotion() ? false : { duration: 650, easing: 'easeOutQuart' };
             }

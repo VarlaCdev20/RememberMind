@@ -174,8 +174,10 @@ class FrontendArchitectureTest extends TestCase
             $this->assertStringContainsString($token, $colores);
         }
 
-        $this->assertStringContainsString('--rm-chart-1: var(--rm-primary)', $graficas);
-        $this->assertStringContainsString('--rm-chart-danger:       var(--rm-danger)', $graficas);
+        $this->assertStringContainsString('--rm-chart-sage: #7FA883', $graficas);
+        $this->assertStringContainsString('--rm-chart-blue: #7FAFD8', $graficas);
+        $this->assertStringContainsString('--rm-chart-1: var(--rm-chart-sage)', $graficas);
+        $this->assertStringContainsString('--rm-chart-danger:       var(--rm-chart-coral)', $graficas);
         $this->assertDoesNotMatchRegularExpression('/--rm-chart-\\d+:.*var\\(--rm-(danger|warning)\\)/', $graficas);
         $this->assertStringContainsString("'primary-action': token('primary')", $tailwind);
         $this->assertDoesNotMatchRegularExpression('/#[a-fA-F0-9]{3,8}\\b/', $tailwind, 'La configuración debe consumir la paleta CSS, sin repetir HEX.');
@@ -408,9 +410,11 @@ class FrontendArchitectureTest extends TestCase
         $this->assertStringContainsString('.rm-chart-header', $estilos);
         $this->assertStringContainsString('.rm-chart-kpi-badge', $estilos);
         $this->assertStringContainsString('.rm-chart-empty', $estilos);
-        $this->assertStringContainsString("id: 'rmDarkNeonGlow'", $tema);
-        $this->assertStringContainsString('Chart.register(rmDarkNeonGlowPlugin)', $tema);
-        $this->assertStringContainsString('--rm-chart-neon-mint', $colores);
+        $this->assertStringContainsString("id: 'rmSoftChartGlow'", $tema);
+        $this->assertStringContainsString('Chart.register(rmSoftChartGlowPlugin)', $tema);
+        $this->assertStringContainsString('--rm-chart-card-bg', $colores);
+        $this->assertStringContainsString('--rm-chart-tooltip-bg', $colores);
+        $this->assertStringContainsString('background: linear-gradient(180deg, var(--rm-chart-card-glass), var(--rm-chart-card-bg))', $estilos);
         $this->assertStringContainsString('[data-theme="dark"]', $estilos);
 
         $vistasConGraficas = [
