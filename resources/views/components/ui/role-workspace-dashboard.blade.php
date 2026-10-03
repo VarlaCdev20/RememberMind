@@ -45,12 +45,24 @@
             ['icon' => 'ph-shield-check', 'label' => $esSuperadministracion ? '' : 'Acceso según permisos'],
         ]"
     >
-        @foreach($accesos->take(3) as $acceso)
-            <a href="{{ route($acceso['route']) }}" wire:navigate class="{{ $loop->first ? 'rm-btn-primary' : 'rm-btn-secondary' }} min-h-9 px-3.5 text-xs">
-                <i class="ph-bold {{ $acceso['icon'] }}"></i><span>{{ $acceso['label'] }}</span>
-            </a>
-        @endforeach
+        @unless($esSuperadministracion)
+            @foreach($accesos->take(3) as $acceso)
+                <a href="{{ route($acceso['route']) }}" wire:navigate class="{{ $loop->first ? 'rm-btn-primary' : 'rm-btn-secondary' }} min-h-9 px-3.5 text-xs">
+                    <i class="ph-bold {{ $acceso['icon'] }}"></i><span>{{ $acceso['label'] }}</span>
+                </a>
+            @endforeach
+        @endunless
     </x-ui.role-dashboard-hero>
+
+    @if($esSuperadministracion)
+        <div class="rm-superadmin-divider" aria-hidden="true">
+            <span class="rm-superadmin-divider__line"></span>
+            <span class="rm-superadmin-divider__dots"></span>
+            <span class="rm-superadmin-divider__spark"></span>
+            <span class="rm-superadmin-divider__dots"></span>
+            <span class="rm-superadmin-divider__line"></span>
+        </div>
+    @endif
 
     @if(!empty($indicadores))
         <section @class(['grid gap-4 sm:grid-cols-2 xl:grid-cols-4', 'rm-superadmin-metrics' => $esSuperadministracion]) aria-label="Indicadores del perfil">

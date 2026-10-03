@@ -3,7 +3,6 @@
     --rm-dashboard-app-bg: #F3EEE8;
     --rm-dashboard-shell-bg: #DDD6CF;
     --rm-dashboard-header-bg: #E6E0D9;
-    --rm-dashboard-kpi-bg: #F7F3EF;
     --rm-dashboard-card-surface: var(--rm-dashboard-surface-soft);
     --rm-dashboard-inset-surface: #F7F3EF;
     --rm-dashboard-surface-soft: #EFEAE4;
@@ -15,7 +14,6 @@
     --rm-dashboard-sage-600: #6F8A72;
     --rm-dashboard-sage-100: #DCE6DD;
     --rm-dashboard-sage-ink: var(--rm-palette-forest-ink);
-    --rm-dashboard-sage-action: color-mix(in srgb, var(--rm-dashboard-sage-700) 75%, var(--rm-dashboard-text));
     --rm-dashboard-staff-soft: #E2E9DF;
     --rm-dashboard-clinical-700: #617A8A;
     --rm-dashboard-clinical-600: #7894A6;
@@ -102,7 +100,13 @@
 }
 .rm-dashboard-composition--superadmin .rm-dashboard-header__content {
     padding: 24px 32px;
-    gap: 12px;
+    align-items: center;
+    gap: 14px;
+    text-align: center;
+}
+.rm-dashboard-composition--superadmin .rm-dashboard-header__heading {
+    justify-content: center;
+    max-width: 100%;
 }
 .rm-dashboard-composition--superadmin .rm-dashboard-header__eyebrow {
     color: var(--rm-dashboard-sage-700);
@@ -121,6 +125,8 @@
     background: var(--rm-dashboard-sage-600);
 }
 .rm-dashboard-composition--superadmin .rm-dashboard-header__metadata {
+    align-self: center;
+    justify-content: center;
     gap: 8px;
     padding: 0;
     border: 0;
@@ -160,49 +166,36 @@
         color-mix(in srgb, var(--rm-dashboard-header-bg) 25%, transparent) 42%,
         transparent 64%);
 }
-.rm-dashboard-composition--superadmin .rm-dashboard-header-actions :is(.rm-btn-primary, .rm-btn-secondary) {
-    min-height: 48px;
-    padding-inline: 16px;
-    border: 1px solid var(--rm-dashboard-card-outline);
-    background: var(--rm-dashboard-surface-soft);
-    color: var(--rm-dashboard-text);
-    box-shadow: 0 2px 6px color-mix(in srgb, var(--rm-dashboard-elevation-ink) 5%, transparent);
-    transition: background-color 160ms ease, color 160ms ease, transform 160ms ease;
+.rm-superadmin-divider {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    width: min(100%, 760px);
+    height: 26px;
+    margin: -4px auto;
+    color: var(--rm-dashboard-sage-700);
 }
-.rm-dashboard-composition--superadmin .rm-dashboard-header-actions :is(.rm-btn-primary, .rm-btn-secondary) i {
-    color: var(--rm-dashboard-sage-ink);
+.rm-superadmin-divider__line {
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, color-mix(in srgb, currentColor 34%, transparent));
 }
-.rm-dashboard-composition--superadmin .rm-dashboard-header-actions :is(.rm-btn-primary, .rm-btn-secondary):is(:hover, :focus-visible) {
-    background: var(--rm-dashboard-sage-100);
-    color: var(--rm-dashboard-sage-ink);
+.rm-superadmin-divider__line:last-child {
+    transform: rotate(180deg);
 }
-.rm-dashboard-composition--superadmin .rm-dashboard-header-actions :is(.rm-btn-primary, .rm-btn-secondary):focus-visible {
-    outline: 2px solid var(--rm-dashboard-sage-600);
-    outline-offset: 2px;
+.rm-superadmin-divider__dots {
+    width: 34px;
+    height: 5px;
+    flex: 0 0 34px;
+    background: radial-gradient(circle, color-mix(in srgb, currentColor 48%, transparent) 1.5px, transparent 2px) left center / 11px 5px repeat-x;
 }
-.rm-dashboard-composition--superadmin .rm-dashboard-header-actions :is(.rm-btn-primary, .rm-btn-secondary):active {
-    background: var(--rm-dashboard-sage-ink);
-    color: var(--rm-dashboard-inset-surface);
-    transform: translateY(0);
-}
-.rm-dashboard-composition--superadmin .rm-dashboard-header-actions :is(.rm-btn-primary, .rm-btn-secondary):active i {
-    color: currentColor;
-}
-.rm-dashboard-composition--superadmin .rm-dashboard-header-context { justify-content: flex-end; }
-.rm-dashboard-composition--superadmin .rm-dashboard-header-actions { gap: 10px; }
-.rm-dashboard-composition--superadmin .rm-dashboard-header-actions .rm-btn-primary {
-    background: var(--rm-dashboard-sage-action);
-    color: var(--rm-dashboard-kpi-bg);
-}
-.rm-dashboard-composition--superadmin .rm-dashboard-header-actions .rm-btn-primary i { color: currentColor; }
-.rm-dashboard-composition--superadmin .rm-dashboard-header-actions .rm-btn-primary:is(:hover, :focus-visible) {
-    background: var(--rm-dashboard-sage-action);
-    color: var(--rm-dashboard-kpi-bg);
-}
-@media (hover: hover) and (pointer: fine) {
-    .rm-dashboard-composition--superadmin .rm-dashboard-header-actions :is(.rm-btn-primary, .rm-btn-secondary):hover {
-        transform: translateY(-1px);
-    }
+.rm-superadmin-divider__spark {
+    width: 20px;
+    height: 20px;
+    flex: 0 0 20px;
+    background: color-mix(in srgb, currentColor 72%, transparent);
+    clip-path: polygon(50% 0, 58% 40%, 100% 50%, 58% 60%, 50% 100%, 42% 60%, 0 50%, 42% 40%);
 }
 
 .rm-dashboard-composition--superadmin .rm-superadmin-metrics { gap: 14px; }
@@ -285,7 +278,6 @@
     --rm-dashboard-app-bg: var(--rm-palette-petroleum-900);
     --rm-dashboard-shell-bg: var(--rm-palette-petroleum-900);
     --rm-dashboard-header-bg: var(--rm-palette-petroleum-800);
-    --rm-dashboard-kpi-bg: var(--rm-palette-petroleum-800);
     --rm-dashboard-card-surface: var(--rm-palette-petroleum-800);
     --rm-dashboard-inset-surface: var(--rm-palette-petroleum-raised);
     --rm-dashboard-surface-soft: var(--rm-palette-petroleum-700);
@@ -317,8 +309,8 @@
     .rm-dashboard-composition--superadmin .rm-dashboard-header__title { font-size: clamp(26px, 8vw, 34px); }
     .rm-dashboard-composition--superadmin .rm-superadmin-metrics .rm-metric-card { min-height: 110px; }
     .rm-dashboard-composition--superadmin .rm-superadmin-metrics .rm-metric-card__value { font-size: 28px; }
-    .rm-dashboard-composition--superadmin .rm-dashboard-header-actions { width: 100%; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
-    .rm-dashboard-composition--superadmin .rm-dashboard-header-actions a { justify-content: center; padding-inline: 6px; }
+    .rm-superadmin-divider { width: 88%; gap: 8px; }
+    .rm-superadmin-divider__dots { width: 22px; flex-basis: 22px; }
 }
 @media (min-width: 640px) and (max-width: 1279px) {
     .rm-dashboard-composition--superadmin > .rm-dashboard-header--superadmin { --rm-dashboard-hero-height: 210px; grid-template-columns: 65% 35%; }
@@ -339,7 +331,4 @@
 }
 @media (max-width: 767px) {
     .rm-shell:has(.rm-dashboard-composition--superadmin) { --rm-shell-bar-height: 64px; }
-}
-@media (prefers-reduced-motion: reduce) {
-    .rm-dashboard-composition--superadmin .rm-dashboard-header-actions :is(.rm-btn-primary, .rm-btn-secondary) { transition: none; }
 }

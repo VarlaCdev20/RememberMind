@@ -38,6 +38,8 @@ class SuperadminDashboardHubTest extends TestCase
 
         $response->assertSee('Superadministración');
         $response->assertDontSee('bajo supervisión global');
+        $response->assertSee('rm-superadmin-divider');
+        $response->assertDontSee('rm-dashboard-header-actions');
         $response->assertSee('rm-superadmin-metrics');
         $response->assertSee('rm-metric-card');
         $response->assertSee('rm-superadmin-metric--quiet');
