@@ -24,7 +24,7 @@ test('los shells por rol conservan fondo y controles completos en claro, oscuro 
                       <div class="rm-topbar__search-slot"><div class="rm-topbar-search"><button class="rm-topbar-search__toggle">Buscar</button><form class="rm-topbar-search__form"><input aria-label="Buscar"></form></div></div>
                       <div class="rm-topbar__actions">
                         <div><button class="rm-topbar__action">Calendario</button></div>
-                        <button class="rm-topbar__action rm-topbar__theme-toggle">Tema</button>
+                        <button class="rm-topbar__action rm-topbar__theme-toggle" aria-label="Cambiar tema"><i class="ph-bold ph-moon rm-topbar__theme-icon--moon"></i><i class="ph-bold ph-sun rm-topbar__theme-icon--sun"></i></button>
                         <div><button class="rm-btn-icon">Alertas</button></div>
                         <div><button class="rm-topbar__action">Ajustes</button></div>
                         <div><button class="rm-topbar__profile">Perfil</button></div>
@@ -41,11 +41,15 @@ test('los shells por rol conservan fondo y controles completos en claro, oscuro 
                         });
                         const topbar = document.querySelector('.rm-topbar').getBoundingClientRect();
                         const banner = document.querySelector('[data-role-preview-banner]').getBoundingClientRect();
-                        return { main: background('main'), sidebar: background('.rm-sidebar'), topbar: background('.rm-topbar'), buttons, topbarBounds: { left: topbar.left, right: topbar.right }, bannerBounds: { left: banner.left, right: banner.right } };
+                        const moon = getComputedStyle(document.querySelector('.rm-topbar__theme-icon--moon')).display;
+                        const sun = getComputedStyle(document.querySelector('.rm-topbar__theme-icon--sun')).display;
+                        return { main: background('main'), sidebar: background('.rm-sidebar'), topbar: background('.rm-topbar'), buttons, moon, sun, topbarBounds: { left: topbar.left, right: topbar.right }, bannerBounds: { left: banner.left, right: banner.right } };
                     });
                     const context = `${variant || 'sistema'} ${theme} ${width}px`;
                     assert.equal(result.main, result.sidebar, context);
                     assert.equal(result.main, result.topbar, context);
+                    assert.equal(result.moon !== 'none', theme === 'light', `${context}: icono luna`);
+                    assert.equal(result.sun !== 'none', theme === 'dark', `${context}: icono sol`);
                     assert.ok(Math.abs(result.bannerBounds.left - result.topbarBounds.left) <= 1, `${context}: aviso alineado con topbar`);
                     assert.ok(Math.abs(result.bannerBounds.right - result.topbarBounds.right) <= 1, `${context}: ancho del aviso alineado con topbar`);
                     for (const button of result.buttons) {

@@ -66,6 +66,8 @@ class UnificacionShellEnfermeriaTest extends TestCase
             $response->assertSee('name="buscar"', false);
             $response->assertSee('action="'.route('admin.enfermeria.pacientes').'"', false);
             $response->assertSee('toggleDarkMode()', false);
+            $response->assertSee('ph-moon text-lg rm-topbar__theme-icon--moon', false);
+            $response->assertSee('ph-sun text-lg rm-topbar__theme-icon--sun', false);
             $response->assertSee('remembermind-theme', false);
         }
     }
