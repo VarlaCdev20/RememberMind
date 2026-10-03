@@ -60,15 +60,7 @@
     <div class="rm-topbar__actions">
         <x-layout.topbar-calendar />
         {{-- Botón Modo Claro / Oscuro --}}
-        <button type="button"
-                data-theme-toggle
-                @click.stop="toggleDarkMode()"
-                :aria-pressed="darkMode.toString()"
-                :title="darkMode ? 'Activar modo claro' : 'Activar modo oscuro'"
-                :aria-label="darkMode ? 'Activar modo claro' : 'Activar modo oscuro'"
-                class="rm-topbar__action rm-topbar__theme-toggle">
-            <i class="ph-bold text-lg transition-transform duration-200" :class="darkMode ? 'ph-sun text-[var(--rm-action-primary)]' : 'ph-moon text-[var(--rm-text-primary)]'"></i>
-        </button>
+        <x-layout.theme-toggle />
 
 
         {{-- Campana de Notificaciones / Alertas --}}
@@ -76,25 +68,7 @@
             <livewire:alertas.campana-notificaciones />
         @endif
 
-        <div class="rm-topbar__settings" x-data="{ settingsOpen: false }" @click.outside="settingsOpen = false" @keydown.escape.stop="settingsOpen = false; $refs.settingsToggle.focus()" x-on:livewire:navigating.window="settingsOpen = false">
-            <button type="button" class="rm-topbar__action" x-ref="settingsToggle" @click="settingsOpen = !settingsOpen" :aria-expanded="settingsOpen.toString()" aria-label="Configuración de apariencia" aria-controls="topbar-settings-navbar-sistema">
-                <i class="ph-bold ph-gear text-xl" aria-hidden="true"></i>
-            </button>
-            <div id="topbar-settings-navbar-sistema" class="rm-topbar__settings-panel" x-show="settingsOpen" x-transition.opacity.duration.180ms x-cloak>
-                <span class="rm-label">Apariencia</span>
-        {{-- Botón Modo Claro / Oscuro --}}
-        <button type="button"
-                data-theme-toggle
-                @click.stop="toggleDarkMode()"
-                :aria-pressed="darkMode.toString()"
-                :title="darkMode ? 'Activar modo claro' : 'Activar modo oscuro'"
-                :aria-label="darkMode ? 'Activar modo claro' : 'Activar modo oscuro'"
-                class="rm-topbar__action">
-            <i class="ph-bold text-lg transition-transform duration-200" :class="darkMode ? 'ph-sun text-[var(--rm-action-primary)]' : 'ph-moon text-[var(--rm-text-primary)]'"></i>
-        </button>
-
-            </div>
-        </div>
+        <x-layout.topbar-settings />
 
         {{-- Perfil de Usuario con Avatar, Nombre, Rol y Dropdown --}}
         <div x-data="{ abierto: false }" @click.outside="abierto = false" @keydown.escape.window="if (abierto) { abierto = false; $refs.perfil.focus() }" x-on:livewire:navigating.window="abierto = false" class="relative">

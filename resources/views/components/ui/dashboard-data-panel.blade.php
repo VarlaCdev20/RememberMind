@@ -18,7 +18,7 @@
     $gradient = implode(', ', $stops);
 @endphp
 
-<section @class(['rm-dashboard-data-panel', 'rm-dashboard-data-panel--'.$span, 'rm-dashboard-data-panel--chart' => $isChart, 'rm-dashboard-data-panel--incident' => ($panel['icon'] ?? '') === 'ph-warning']) aria-label="{{ $panel['title'] }}">
+<section @class(['rm-dashboard-data-panel', 'rm-dashboard-data-panel--'.$span, 'rm-chart-card' => $isChart, 'rm-dashboard-data-panel--chart' => $isChart, 'rm-dashboard-data-panel--incident' => ($panel['icon'] ?? '') === 'ph-warning']) aria-label="{{ $panel['title'] }}">
     <div class="rm-dashboard-data-panel__heading">
         <span class="rm-dashboard-data-panel__icon" aria-hidden="true"><i class="ph-bold {{ $panel['icon'] ?? 'ph-chart-bar' }}"></i></span>
         <div class="rm-dashboard-data-panel__heading-copy">

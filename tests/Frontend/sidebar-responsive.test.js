@@ -101,7 +101,13 @@ test('sidebar adaptativo: preferencia desktop, laptop temporal, drawer y persist
                 });
             });
             for(const contrast of contrasts)assert.ok(contrast.ratio>=4.5,`${contrast.selector}: contraste mínimo 4.5:1 en modo oscuro`);
-            const publicSurfaces=await page.evaluate(()=>['#theme-public-hero','#theme-public-services','#theme-public-footer'].map(selector=>getComputedStyle(document.querySelector(selector)).backgroundColor));
+            const publicSurfaces=await page.evaluate(()=>{
+                // La landing real no hereda los tokens del shell autenticado.
+                document.body.classList.remove('rm-shell');
+                try {
+                    return ['#theme-public-hero','#theme-public-services','#theme-public-footer'].map(selector=>getComputedStyle(document.querySelector(selector)).backgroundColor);
+                } finally { document.body.classList.add('rm-shell'); }
+            });
             assert.deepEqual(publicSurfaces,['rgb(10, 24, 33)','rgb(16, 33, 43)','rgb(7, 20, 28)'],'La landing también comparte el tema petróleo');
             assert.deepEqual(darkPalette,{bg:'rgb(10, 24, 33)',text:'rgb(237, 245, 247)',selected:'rgb(237, 245, 247)'},'El sidebar usa petróleo con ambos selectores del tema oscuro');
         }
