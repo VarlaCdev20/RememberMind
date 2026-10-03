@@ -2,7 +2,7 @@
 .rm-shell:has(.rm-dashboard-composition--superadmin) {
     --rm-dashboard-app-bg: var(--rm-shell-chrome-bg);
     --rm-dashboard-shell-bg: var(--rm-shell-chrome-bg);
-    --rm-dashboard-header-bg: #E6E0D9;
+    --rm-dashboard-header-bg: var(--rm-dashboard-surface-soft);
     --rm-dashboard-card-surface: #F7F3EF;
     --rm-dashboard-surface-soft: #EFEAE4;
     --rm-dashboard-topbar-control: #EAE4DE;
@@ -79,7 +79,9 @@
     --rm-header-surface: var(--rm-dashboard-surface-soft);
     --rm-header-accent: var(--rm-dashboard-sage-600);
     background-image: none;
-    box-shadow: 0 3px 8px color-mix(in srgb, var(--rm-dashboard-text) 3%, transparent);
+    border-color: var(--rm-dashboard-card-outline);
+    box-shadow: 0 2px 6px color-mix(in srgb, var(--rm-dashboard-elevation-ink) 4%, transparent),
+        0 12px 26px color-mix(in srgb, var(--rm-dashboard-elevation-ink) 6%, transparent);
 }
 .rm-dashboard-composition--superadmin .rm-dashboard-header__eyebrow {
     color: var(--rm-dashboard-sage-ink);
@@ -90,8 +92,8 @@
     font: 700 clamp(28px, 2.2vw, 34px)/1.08 var(--rm-font-brand);
 }
 .rm-dashboard-composition--superadmin .rm-dashboard-header__role {
-    border-color: color-mix(in srgb, var(--rm-dashboard-sage-600) 22%, transparent);
-    background: var(--rm-dashboard-sage-100);
+    border-color: color-mix(in srgb, var(--rm-dashboard-sage-600) 32%, transparent);
+    background: color-mix(in srgb, var(--rm-dashboard-sage-100) 84%, var(--rm-dashboard-sage-600));
     color: var(--rm-dashboard-sage-ink);
 }
 .rm-dashboard-composition--superadmin .rm-dashboard-header__role > span {
@@ -109,10 +111,10 @@
     align-items: center;
     min-height: 32px;
     padding: 6px 11px;
-    border: 1px solid var(--rm-dashboard-divider);
+    border: 1px solid var(--rm-dashboard-card-outline);
     border-radius: 10px;
-    background: var(--rm-dashboard-surface-soft);
-    color: var(--rm-dashboard-text-secondary);
+    background: var(--rm-dashboard-card-surface);
+    color: var(--rm-dashboard-text);
 }
 .rm-dashboard-composition--superadmin .rm-dashboard-header__metadata > .rm-dashboard-header__clock {
     border-color: color-mix(in srgb, var(--rm-dashboard-clinical-700) 14%, transparent);
@@ -123,7 +125,7 @@
     color: currentColor;
 }
 .rm-dashboard-composition--superadmin .rm-dashboard-header__visual img {
-    filter: saturate(.84) contrast(.96) brightness(.98);
+    filter: saturate(.78) contrast(.98) brightness(.96);
 }
 .rm-dashboard-composition--superadmin .rm-dashboard-header__visual::after {
     background: linear-gradient(90deg,
@@ -134,11 +136,14 @@
 }
 .rm-dashboard-composition--superadmin .rm-dashboard-header-actions :is(.rm-btn-primary, .rm-btn-secondary) {
     min-height: 44px;
-    border: 1px solid var(--rm-dashboard-divider);
-    background: var(--rm-dashboard-surface-soft);
-    color: var(--rm-dashboard-text-secondary);
-    box-shadow: none;
+    border: 1px solid var(--rm-dashboard-card-outline);
+    background: var(--rm-dashboard-card-surface);
+    color: var(--rm-dashboard-text);
+    box-shadow: 0 2px 6px color-mix(in srgb, var(--rm-dashboard-elevation-ink) 5%, transparent);
     transition: background-color 160ms ease, color 160ms ease, transform 160ms ease;
+}
+.rm-dashboard-composition--superadmin .rm-dashboard-header-actions :is(.rm-btn-primary, .rm-btn-secondary) i {
+    color: var(--rm-dashboard-sage-ink);
 }
 .rm-dashboard-composition--superadmin .rm-dashboard-header-actions :is(.rm-btn-primary, .rm-btn-secondary):is(:hover, :focus-visible) {
     background: var(--rm-dashboard-sage-100);
@@ -152,6 +157,9 @@
     background: var(--rm-dashboard-sage-ink);
     color: var(--rm-dashboard-card-surface);
     transform: translateY(0);
+}
+.rm-dashboard-composition--superadmin .rm-dashboard-header-actions :is(.rm-btn-primary, .rm-btn-secondary):active i {
+    color: currentColor;
 }
 @media (hover: hover) and (pointer: fine) {
     .rm-dashboard-composition--superadmin .rm-dashboard-header-actions :is(.rm-btn-primary, .rm-btn-secondary):hover {
