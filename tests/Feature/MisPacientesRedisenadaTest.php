@@ -502,7 +502,7 @@ class MisPacientesRedisenadaTest extends TestCase
             ->assertSet('mostrarSelectorModal', true)
             ->assertSet('mostrarPanelDetalle', false)
             ->assertSee('Presión arterial')
-            ->assertSee('Guardar registro')
+            ->assertSee('Confirmar y registrar')
             ->assertSee('Volver al selector de registros')
             ->call('volverPanelDetalle')
             ->assertSet('drawerPaso', 'register-selector')
@@ -744,6 +744,8 @@ class MisPacientesRedisenadaTest extends TestCase
 
         $this->assertStringContainsString('aria-describedby="signos-sat-error signos-sat-server-error"', $formulario->html());
         $this->assertStringNotContainsString('Revisa algunos datos', $formulario->html());
+        $this->assertStringNotContainsString('Rango objetivo 92', $formulario->html());
+        $this->assertStringContainsString('rmSignosRegistro(', $formulario->html());
 
         $formulario->set('signoSat', '101')->call('guardarSignos')
             ->assertHasErrors('saturacion_oxigeno')

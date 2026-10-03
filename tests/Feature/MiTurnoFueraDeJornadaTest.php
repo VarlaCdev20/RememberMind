@@ -774,11 +774,8 @@ class MiTurnoFueraDeJornadaTest extends TestCase
             ->assertSee('Sin clasificar');
     }
 
-    /**
-     * 13. Superadministrador sin competencia clinica puede leer,
-     * pero no puede ejecutar una mutacion clinica solo por su rol.
-     */
-    public function test_superadministrador_sin_competencia_clinica_puede_leer_pero_no_mutar(): void
+    /** El acceso temporal conserva la autoría y exige una jornada real del residente. */
+    public function test_superadministrador_registra_signos_con_autoria_y_rechaza_residente_sin_jornada(): void
     {
         Role::firstOrCreate(['name' => 'SUPERADMINISTRADOR', 'guard_name' => 'web']);
 
@@ -800,21 +797,34 @@ class MiTurnoFueraDeJornadaTest extends TestCase
         Livewire::test(DashboardTurno::class)
             ->assertSuccessful();
 
-        // 2. Mutaciones clinicas BLOQUEADAS con 403 (sin bypass de Superadministrador)
+        // El superadministrador usa su personal activo sin turno propio.
         Livewire::test(DashboardTurno::class)
             ->call('abrirRegistrarSignos', $this->residenteCarlos->cod_residente)
-            ->assertForbidden();
+            ->assertSuccessful()
+            ->assertSet('modalSignos', true)
+            ->set('signoPresion', '120/80')
+            ->call('guardarSignos')
+            ->assertSuccessful();
+
+        $this->assertDatabaseHas('signos_vitales', [
+            'cod_residente' => $this->residenteCarlos->cod_residente,
+            'cod_personal' => $superUser->personal->cod_personal,
+            'presion_sistolica' => 120,
+            'presion_diastolica' => 80,
+        ]);
+
+        $sinJornada = Residente::crearDesdeAdmision([
+            'cod_residente' => 'RES_SIN_JORNADA',
+            'nombres' => 'Sin',
+            'apellido_paterno' => 'Jornada',
+            'fecha_nacimiento' => '1948-02-10',
+            'genero' => 'F',
+            'estado' => 'ACTIVO',
+        ]);
 
         Livewire::test(DashboardTurno::class)
-            ->call('administrarMed', 'PRE_FAKE', $this->residenteCarlos->cod_residente, '08:00')
+            ->call('abrirRegistrarSignos', $sinJornada->cod_residente)
             ->assertForbidden();
-
-        Livewire::test(DashboardTurno::class)
-            ->call('completarTarea', 'EJE_FAKE')
-            ->assertForbidden();
-
-        Livewire::test(DashboardTurno::class)
-            ->call('abrirAtenderAlerta', 'ALE_FAKE')
-            ->assertForbidden();
+        $this->assertDatabaseMissing('signos_vitales', ['cod_residente' => $sinJornada->cod_residente]);
     }
 }

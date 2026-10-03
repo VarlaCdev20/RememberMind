@@ -123,9 +123,9 @@ class DashboardAdministracionIntegracionVisualTest extends TestCase
         $this->assertStringContainsString('Rosa', $tarjetas);
         $this->assertStringContainsString('rm-admin-residents-cards', $tarjetas);
         $this->assertStringContainsString('Ver resumen', $tarjetas);
-        $this->assertStringNotContainsString('<table class="rm-table">', $tarjetas);
+        $this->assertDoesNotMatchRegularExpression('/<table class="[^"]*\brm-table\b[^"]*">/', $tarjetas);
         $tabla = $this->get(route('admin.administracion.residentes', ['vista' => 'tabla']))->assertOk()->getContent();
-        $this->assertStringContainsString('<table class="rm-table">', $tabla);
+        $this->assertMatchesRegularExpression('/<table class="[^"]*\brm-table\b[^"]*">/', $tabla);
         $this->assertStringNotContainsString('class="rm-admin-residents-cards"', $tabla);
         $panel = $this->get(route('admin.administracion.residentes', ['residente' => $residente->cod_residente]))
             ->assertOk()->getContent();
