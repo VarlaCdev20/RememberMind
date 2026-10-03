@@ -73,6 +73,7 @@ import {
     rmOnThemeChange,
 } from '../styles/design-system/charts/chart-livewire.js';
 import { rmObserveChartCards } from '../styles/design-system/charts/chart-motion.js';
+import { rmInstallChartInteractions } from '../styles/design-system/charts/chart-interactions.js';
 
 // Namespace único oficial: window.RMCharts
 window.RMCharts = {
@@ -125,8 +126,10 @@ window.RMCharts = {
 };
 
 if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', rmInstallChartInteractions, { once: true });
     document.addEventListener('DOMContentLoaded', rmObserveChartCards, { once: true });
 } else {
+    rmInstallChartInteractions();
     rmObserveChartCards();
 }
 

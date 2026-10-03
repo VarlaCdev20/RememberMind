@@ -1,3 +1,28 @@
+.rm-chart-inspect-tooltip {
+    position: fixed; z-index: 9999; pointer-events: none;
+    max-width: min(280px, calc(100vw - 16px)); padding: 10px 14px;
+    background: var(--rm-chart-tooltip-bg); color: var(--rm-chart-tooltip-text);
+    border: 1px solid var(--rm-chart-tooltip-border); border-radius: var(--rm-tooltip-radius);
+    box-shadow: var(--rm-tooltip-shadow); font: 600 13px/1.5 var(--rm-chart-font-family);
+}
+.rm-chart-inspect-ring {
+    position: absolute; inset: -6px; width: calc(100% + 12px); height: calc(100% + 12px);
+    overflow: visible; pointer-events: none; z-index: 2;
+    animation: rmInspectReveal 160ms ease-out;
+}
+@keyframes rmInspectReveal { from { opacity: 0; transform: scale(.96); } to { opacity: 1; transform: scale(1); } }
+:is(.rm-dashboard-data-panel__legend > li, .rm-admin-dashboard__donut-legend > *, .rm-nursing-donut-legend > li, .rm-dashboard-data-panel__bars > li, .rm-admin-dashboard__bar-group) {
+    transition: background-color var(--rm-motion-fast), transform var(--rm-motion-fast), filter var(--rm-motion-fast);
+}
+.is-chart-inspected { background-color: var(--rm-chart-surface-hover); border-radius: var(--rm-radius-sm); }
+:is(.rm-dashboard-data-panel__legend, .rm-admin-dashboard__donut-legend, .rm-nursing-donut-legend) > .is-chart-inspected { transform: translateX(3px); }
+.rm-admin-dashboard__bar-group.is-chart-inspected { transform: translateY(-3px); filter: saturate(1.15); }
+.rm-dashboard-data-panel__bars > .is-chart-inspected { transform: translateX(3px); }
+:is(.rm-dashboard-data-panel__legend > li, .rm-admin-dashboard__donut-legend > *, .rm-nursing-donut-legend > li, .rm-dashboard-data-panel__bars > li, .rm-admin-dashboard__bar-group):focus-visible { outline: 2px solid var(--rm-chart-sage); outline-offset: 3px; }
+@media (prefers-reduced-motion: reduce) {
+    .rm-chart-inspect-ring { animation: none; }
+    .is-chart-inspected { transform: none !important; transition: none !important; }
+}
 /* ============================================================
    REMEMBERMIND DESIGN SYSTEM — COMPONENTS / CHARTS
    ChartCard clínico institucional integrado con Drawers y Cards:

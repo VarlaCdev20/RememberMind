@@ -269,6 +269,20 @@ export function rmInstallGlobalChartTheme(Chart) {
         Chart.defaults.elements.arc.borderWidth = 2;
         Chart.defaults.elements.arc.borderRadius = 6;
         Chart.defaults.elements.arc.spacing = 3;
+        Chart.defaults.elements.arc.hoverOffset = 7;
+        Chart.defaults.plugins.legend.onHover = (event, item, legend) => {
+            const chart = legend.chart;
+            const circular = ['doughnut', 'pie', 'polarArea'].includes(chart.config.type);
+            const active = circular
+                ? [{ datasetIndex: 0, index: item.index }]
+                : chart.data.datasets[item.datasetIndex].data.map((_, index) => ({ datasetIndex: item.datasetIndex, index }));
+            chart.setActiveElements(active);
+            chart.update('active');
+        };
+        Chart.defaults.plugins.legend.onLeave = (event, item, legend) => {
+            legend.chart.setActiveElements([]);
+            legend.chart.update('active');
+        };
 
         Chart.defaults.plugins.legend.labels.color = axisText;
         Chart.defaults.plugins.legend.labels.usePointStyle = true;
