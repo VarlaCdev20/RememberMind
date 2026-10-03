@@ -10,9 +10,6 @@
     $sparkbars = $metric['sparkbars'] ?? [];
     $sparkbarMaximum = max([1, ...$sparkbars]);
     $quiet = $kind === 'alerts' && $value === 0;
-    $description = $kind === 'staff' && $value === 0
-        ? 'Sin asignaciones activas hoy'
-        : ($quiet ? null : ($metric['description'] ?? null));
     $periodChange = (int) ($metric['periodChange'] ?? 0);
     $label = $metric['label'] ?? 'Indicador';
     $labelId = 'superadmin-kpi-'.\Illuminate\Support\Str::slug($label);
@@ -33,7 +30,7 @@
             {{ $value }}@if(in_array($kind, ['beds', 'staff'], true) && $capacity > 0)<small> de {{ $capacity }}</small>@endif
         </p>
         <h2 id="{{ $labelId }}" class="rm-superadmin-kpi__label">{{ $quiet ? 'Sin alertas prioritarias' : $label }}</h2>
-        @if($description)<p class="rm-superadmin-kpi__description">{{ $description }}</p>@endif
+        <p class="rm-superadmin-kpi__description">{{ $quiet ? 'No hay críticas o altas abiertas' : ($metric['description'] ?? '') }}</p>
         @if(in_array($kind, ['residents', 'alerts'], true) && ($metric['periodHasData'] ?? false))
             <p @class(['rm-superadmin-kpi__comparison', 'is-up' => $periodChange > 0, 'is-down' => $periodChange < 0])>
                 <i class="ph-bold {{ $periodChange > 0 ? 'ph-arrow-up' : ($periodChange < 0 ? 'ph-arrow-down' : 'ph-equals') }}" aria-hidden="true"></i>
@@ -48,15 +45,17 @@
             <div class="rm-superadmin-kpi__track" role="progressbar" aria-label="Camas ocupadas" aria-valuemin="0" aria-valuemax="{{ $capacity }}" aria-valuenow="{{ $occupied }}"><span style="width: {{ 100 - $percentage }}%"></span></div>
             <p>{{ $occupied }} ocupadas · {{ $value }} disponibles</p>
         </div>
-    @elseif($kind === 'staff' && $capacity > 0 && count($areas) > 0)
+    @elseif($kind === 'staff' && $capacity > 0)
         <div class="rm-superadmin-kpi__detail">
             <p class="rm-superadmin-kpi__detail-title">Cobertura por área</p>
-            @foreach(array_slice($areas, 0, 3) as $area)
+            @forelse(array_slice($areas, 0, 3) as $area)
                 <div class="rm-superadmin-kpi__area">
                     <span title="{{ $area['label'] }}">{{ $area['label'] }}</span><strong>{{ $area['value'] }}</strong>
                     <span class="rm-superadmin-kpi__area-track" aria-hidden="true"><span style="width: {{ round($area['value'] / $areaMaximum * 100) }}%"></span></span>
                 </div>
-            @endforeach
+            @empty
+                <p>Sin cobertura por área registrada.</p>
+            @endforelse
         </div>
     @elseif(in_array($kind, ['residents', 'alerts'], true) && array_sum($sparkbars) > 0)
         <div class="rm-superadmin-kpi__detail">
