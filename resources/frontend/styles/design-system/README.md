@@ -73,7 +73,7 @@ Se conservan marca, grupos, jerarquía, iconografía, submenús, badges,
 colapsado desktop, flyouts y drawer móvil.
 En el shell autenticado, sidebar, barra superior y lienzo comparten el fondo
 tierra-ceniza `#D8D2CC` (petróleo en modo oscuro). El sidebar abierto mide
-`240px` y el colapsado `80px`. El hover de los iconos superiores consume la
+`224px` y el colapsado `80px`. El hover de los iconos superiores consume la
 misma superficie salvia translúcida que la selección del sidebar.
 
 | Estado | Tratamiento |

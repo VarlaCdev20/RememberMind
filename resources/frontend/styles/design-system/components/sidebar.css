@@ -2,7 +2,7 @@
    Los tokens de otros componentes mantienen sus valores globales. */
 .rm-shell {
     /* Ancho compartido: el contenido conserva su margen institucional. */
-    --rm-sidebar-width: 240px;
+    --rm-sidebar-width: 224px;
     --rm-sidebar-collapsed: 80px;
     --rm-sidebar-section-font: var(--rm-font-friendly);
     --rm-sidebar-section-size: 11px;
@@ -86,14 +86,14 @@
 }
 
 .rm-shell .rm-sidebar__logo {
-    width: 34px;
-    height: 34px;
-    flex-basis: 34px;
+    width: 30px;
+    height: 30px;
+    flex-basis: 30px;
 }
 
 .rm-shell .rm-sidebar__brand-copy strong {
     color: var(--rm-sidebar-text);
-    font-size: 17px;
+    font-size: 16px;
     font-weight: var(--rm-weight-semibold);
     line-height: var(--rm-line-height-tight);
 }
@@ -108,9 +108,9 @@
 }
 
 .rm-shell .rm-sidebar__header-toggle {
-    width: 34px;
-    height: 34px;
-    flex-basis: 34px;
+    width: 32px;
+    height: 32px;
+    flex-basis: 32px;
     background: color-mix(in srgb, var(--rm-sidebar-hover) 72%, transparent);
     border: 1px solid var(--rm-sidebar-border);
     color: var(--rm-sidebar-text);

@@ -48,7 +48,7 @@ test('sidebar adaptativo: preferencia desktop, laptop temporal, drawer y persist
         const page=await browser.newPage();page.setDefaultTimeout(6000);const errors=[];page.on('pageerror',error=>errors.push(error.message));
         await page.setViewport({width:1440,height:900});await page.goto(origin+'/first');await settle(page);
         await page.waitForFunction(()=>document.body.hasAttribute('data-rm-sidebar-ready'));
-        assert.equal((await state(page)).width,240);
+        assert.equal((await state(page)).width,224);
         const navigationType=await page.evaluate(()=>['.rm-nav-section','#group','.rm-sidebar__subitem'].map(selector=>{const style=getComputedStyle(document.querySelector(selector));return {family:style.fontFamily,size:style.fontSize,weight:style.fontWeight,tracking:style.letterSpacing,case:style.textTransform};}));
         assert.match(navigationType[0].family,/Nunito Sans/);assert.equal(navigationType[0].size,'11px');assert.equal(navigationType[0].weight,'600');assert.equal(navigationType[0].tracking,'1.1px');assert.equal(navigationType[0].case,'lowercase');
         assert.match(navigationType[1].family,/Plus Jakarta Sans/);assert.equal(navigationType[1].size,'14px');assert.equal(navigationType[1].weight,'600');assert.equal(navigationType[1].case,'uppercase');
@@ -57,7 +57,7 @@ test('sidebar adaptativo: preferencia desktop, laptop temporal, drawer y persist
         assert.equal((await state(page)).preference,'true');
         await page.reload();await settle(page);await page.waitForFunction(()=>document.querySelector('aside').getBoundingClientRect().width===80);
         await page.setViewport({width:1100,height:900});await page.waitForFunction(()=>Alpine.$data(document.body).sidebarRange==='laptop');
-        await page.click('#collapse');await page.waitForFunction(()=>document.querySelector('aside').getBoundingClientRect().width===240);
+        await page.click('#collapse');await page.waitForFunction(()=>document.querySelector('aside').getBoundingClientRect().width===224);
         assert.equal((await state(page)).preference,'true','La expansión laptop no cambia la preferencia desktop');
         await page.evaluate(()=>Alpine.$data(document.body).closeSidebarForNavigation());
         await page.waitForFunction(()=>document.querySelector('aside').getBoundingClientRect().width===80);

@@ -99,10 +99,10 @@
 .rm-form-section :is(.rm-input, .rm-select, .rm-textarea) { font-family: var(--rm-font-body); font-size: var(--rm-text-md); font-weight: var(--rm-weight-regular); }
 .rm-table .rm-table-head { font: var(--rm-weight-semibold) var(--rm-text-xs)/var(--rm-leading-normal) var(--rm-font-body); }
 .rm-table .rm-table-cell { font: var(--rm-weight-regular) var(--rm-text-sm)/var(--rm-leading-normal) var(--rm-font-body); }
-.rm-shell .rm-sidebar__brand-copy .rm-brand { font: var(--rm-weight-bold) var(--rm-text-xl)/var(--rm-leading-tight) var(--rm-font-brand); }
+.rm-shell .rm-sidebar__brand-copy .rm-brand { font: var(--rm-weight-bold) var(--rm-text-base)/var(--rm-leading-tight) var(--rm-font-brand); }
 .rm-shell .rm-sidebar__group.rm-nav-section { font: var(--rm-weight-bold) var(--rm-text-xs)/var(--rm-leading-heading) var(--rm-font-heading); }
 .rm-shell .rm-sidebar__item, .rm-shell .rm-sidebar__flyout-title { font-family: var(--rm-font-heading); }
 .rm-shell .rm-sidebar__subitem, .rm-shell .rm-sidebar__flyout-link { font: var(--rm-weight-medium) var(--rm-text-sm)/var(--rm-leading-normal) var(--rm-font-body); }
 .rm-shell .rm-sidebar__subitem.is-active, .rm-shell .rm-sidebar__flyout-link.is-active { font-weight: var(--rm-weight-semibold); }
-.rm-shell .rm-sidebar__logo { width: 32px; height: 32px; flex-basis: 32px; }
+.rm-shell .rm-sidebar__logo { width: 30px; height: 30px; flex-basis: 30px; }
 .rm-shell .rm-sidebar__header { padding-inline: var(--rm-space-3); gap: var(--rm-space-1); }
