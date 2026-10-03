@@ -233,6 +233,11 @@
 .rm-superadmin-kpi__value small { font-size: .54em; font-weight: 700; letter-spacing: 0; color: var(--rm-dashboard-text-secondary); }
 .rm-superadmin-kpi__label { margin: 7px 0 0; font: 700 15px/1.3 var(--rm-font-friendly); color: var(--rm-dashboard-text); }
 .rm-superadmin-kpi__description { margin: 3px 0 0; font: 500 12px/1.4 var(--rm-font-body); color: var(--rm-dashboard-text-secondary); }
+.rm-superadmin-kpi__comparison { display: flex; align-items: flex-start; gap: 5px; margin: 9px 0 0; font: 700 11px/1.35 var(--rm-font-friendly); color: var(--rm-dashboard-text-secondary); }
+.rm-superadmin-kpi__comparison i { flex: 0 0 auto; margin-top: 1px; }
+.rm-superadmin-kpi--residents .rm-superadmin-kpi__comparison.is-up,
+.rm-superadmin-kpi--alerts .rm-superadmin-kpi__comparison.is-down { color: var(--rm-dashboard-sage-700); }
+.rm-superadmin-kpi--alerts .rm-superadmin-kpi__comparison.is-up { color: var(--rm-dashboard-coral-700); }
 .rm-superadmin-kpi__detail { margin-top: auto; padding-top: 14px; font: 600 11px/1.35 var(--rm-font-friendly); color: var(--rm-dashboard-text-secondary); }
 .rm-superadmin-kpi__detail p { margin: 0; }
 .rm-superadmin-kpi__detail-row { display: flex; justify-content: space-between; gap: 8px; margin-bottom: 7px; }

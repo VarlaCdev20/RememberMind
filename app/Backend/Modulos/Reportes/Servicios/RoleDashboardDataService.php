@@ -113,14 +113,19 @@ final class RoleDashboardDataService
             ->whereDate('j.fecha_jornada', $today)->whereIn('j.estado', ['ABIERTA', 'ACTIVA'])
             ->pluck('t.nombre')->unique()->values();
         $weekStart = $today->copy()->subDays(6);
+        $previousWeekStart = $weekStart->copy()->subDays(7);
         $recentAdmissions = DB::table('admisiones as a')
             ->join('residentes as r', 'r.cod_residente', '=', 'a.cod_residente')
             ->whereIn('r.estado', ['ACTIVO', 'ADMITIDO'])
-            ->whereDate('a.fecha_hora_admision', '>=', $weekStart)
+            ->whereDate('a.fecha_hora_admision', '>=', $previousWeekStart)
             ->where('a.fecha_hora_admision', '<=', now())
             ->pluck('a.fecha_hora_admision');
-        $recentAlerts = (clone $alerts)->where('fecha_hora', '>=', $weekStart)
+        $recentAlerts = (clone $alerts)->where('fecha_hora', '>=', $previousWeekStart)
             ->pluck('fecha_hora');
+        $admissionsThisWeek = $this->dailyCounts($recentAdmissions, $weekStart);
+        $admissionsLastWeek = $this->dailyCounts($recentAdmissions, $previousWeekStart);
+        $alertsThisWeek = $this->dailyCounts($recentAlerts, $weekStart);
+        $alertsLastWeek = $this->dailyCounts($recentAlerts, $previousWeekStart);
         $clinicalActivity = DB::table('atenciones')->where('fecha_hora', '>=', now()->subDays(30))
             ->select('tipo_atencion as label')->selectRaw('COUNT(*) as total')
             ->groupBy('tipo_atencion')->orderByDesc('total')->limit(6)->get();
@@ -133,11 +138,15 @@ final class RoleDashboardDataService
         return [
             'metrics' => [
                 [...$this->metric('Residentes activos', DB::table('residentes')->whereIn('estado', ['ACTIVO', 'ADMITIDO'])->count(), 'Actualmente admitidos', 'ph-users-three', 'mint'),
-                    'sparkbars' => $this->dailyCounts($recentAdmissions, $weekStart), 'sparkbarLabel' => 'Ingresos de residentes activos · 7 días'],
+                    'sparkbars' => $admissionsThisWeek, 'sparkbarLabel' => 'Ingresos de residentes activos · 7 días',
+                    'periodChange' => array_sum($admissionsThisWeek) - array_sum($admissionsLastWeek),
+                    'periodHasData' => array_sum($admissionsThisWeek) + array_sum($admissionsLastWeek) > 0],
                 [...$this->metric('Camas disponibles', $availableBeds, 'Disponibilidad actual', 'ph-bed', 'sky'),
                     'capacity' => $bedCapacity, 'occupied' => $bedCapacity - $availableBeds],
                 [...$this->metric('Alertas prioritarias', (clone $alerts)->count(), 'Críticas o altas abiertas', 'ph-warning-circle', 'critical'),
-                    'sparkbars' => $this->dailyCounts($recentAlerts, $weekStart), 'sparkbarLabel' => 'Alertas prioritarias aún abiertas · 7 días'],
+                    'sparkbars' => $alertsThisWeek, 'sparkbarLabel' => 'Alertas prioritarias aún abiertas · 7 días',
+                    'periodChange' => array_sum($alertsThisWeek) - array_sum($alertsLastWeek),
+                    'periodHasData' => array_sum($alertsThisWeek) + array_sum($alertsLastWeek) > 0],
                 [...$this->metric('Personal de hoy', $assignedStaff, 'Asignado a jornada activa', 'ph-identification-badge', 'neutral'),
                     'capacity' => $activeStaff, 'areas' => $this->countItems($coverage)],
             ],

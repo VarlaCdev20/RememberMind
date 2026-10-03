@@ -69,6 +69,8 @@ class RoleDashboardDataTest extends TestCase
 
         $this->assertSame(1, $data['metrics'][0]['value']);
         $this->assertSame(1, array_sum($data['metrics'][0]['sparkbars']));
+        $this->assertSame(1, $data['metrics'][0]['periodChange']);
+        $this->assertTrue($data['metrics'][0]['periodHasData']);
         $this->assertSame(['value' => 1, 'capacity' => 2, 'occupied' => 1], array_intersect_key(
             $data['metrics'][1], array_flip(['value', 'capacity', 'occupied'])
         ));

@@ -10,6 +10,7 @@
     $sparkbars = $metric['sparkbars'] ?? [];
     $sparkbarMaximum = max([1, ...$sparkbars]);
     $quiet = $kind === 'alerts' && $value === 0;
+    $periodChange = (int) ($metric['periodChange'] ?? 0);
     $label = $metric['label'] ?? 'Indicador';
     $labelId = 'superadmin-kpi-'.\Illuminate\Support\Str::slug($label);
 @endphp
@@ -30,6 +31,12 @@
         </p>
         <h2 id="{{ $labelId }}" class="rm-superadmin-kpi__label">{{ $quiet ? 'Sin alertas prioritarias' : $label }}</h2>
         <p class="rm-superadmin-kpi__description">{{ $quiet ? 'No hay críticas o altas abiertas' : ($metric['description'] ?? '') }}</p>
+        @if(in_array($kind, ['residents', 'alerts'], true) && ($metric['periodHasData'] ?? false))
+            <p @class(['rm-superadmin-kpi__comparison', 'is-up' => $periodChange > 0, 'is-down' => $periodChange < 0])>
+                <i class="ph-bold {{ $periodChange > 0 ? 'ph-arrow-up' : ($periodChange < 0 ? 'ph-arrow-down' : 'ph-equals') }}" aria-hidden="true"></i>
+                <span>{{ $periodChange > 0 ? '+' : '' }}{{ $periodChange }} {{ $kind === 'residents' ? 'ingresos' : 'alertas abiertas creadas' }} vs 7 días previos</span>
+            </p>
+        @endif
     </div>
 
     @if($kind === 'beds' && $capacity > 0)
