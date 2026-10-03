@@ -52,6 +52,7 @@
     --rm-sidebar-subtext: var(--rm-text-secondary);
     --rm-sidebar-submenu-bg: transparent;
     --rm-sidebar-border: color-mix(in srgb, var(--rm-border) 30%, transparent);
+    --rm-sidebar-divider: color-mix(in srgb, var(--rm-border) 55%, transparent);
     --rm-sidebar-hover: var(--rm-item-hover);
     --rm-sidebar-open: var(--rm-item-open);
     --rm-sidebar-indicator: var(--rm-sage-selected-accent);
@@ -692,7 +693,7 @@
     display: block;
     height: 1px;
     margin: var(--rm-space-1) var(--rm-space-3);
-    background: var(--rm-sidebar-border);
+    background: var(--rm-sidebar-divider);
 }
 .rm-shell .rm-sidebar .rm-sidebar__nav { padding-block: var(--rm-space-4); }
 .rm-shell .rm-sidebar .rm-sidebar__group:first-child { margin-top: var(--rm-space-1); }

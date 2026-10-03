@@ -181,7 +181,7 @@
     <x-ui.sweetalert />
 
     @stack('modals')
-    @livewireScripts
+    <x-layout.livewire-runtime />
     @if($rolePreviewActive)
         <style>
             [data-preview-readonly] button,

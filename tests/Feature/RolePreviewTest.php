@@ -59,11 +59,28 @@ class RolePreviewTest extends TestCase
 
         $this->followingRedirects()->get(route('dashboard'))->assertOk()
             ->assertSee('Modo previsualización')
+            ->assertSee('livewire.js?rm_ui=20261003&id=', false)
             ->assertSee('Enfermería')
             ->assertSee('Este modo es solo lectura')
             ->assertSee('data-accent="nursing"', false)
             ->assertSee('class="rm-dashboard-header__role"><span aria-hidden="true"></span>Enfermería', false)
             ->assertSee('id="topbar-enfermeria"', false);
+    }
+
+    public function test_enlaces_visibles_de_enfermeria_abren_en_previsualizacion(): void
+    {
+        $superadmin = $this->usuarioConRol('SUPERADMINISTRADOR');
+        $this->actingAs($superadmin)->withSession([RolePreviewService::SESSION_KEY => 'ENFERMEROS']);
+
+        $routes = collect(app(SidebarService::class)->getSidebar())
+            ->flatMap(fn (array $section) => array_filter([
+                $section['route'] ?? null,
+                ...array_column($section['items'] ?? [], 'route'),
+            ]))->unique();
+
+        foreach ($routes as $routeName) {
+            $this->get(route($routeName))->assertOk();
+        }
     }
 
     public function test_preview_bloquea_escrituras_backend_y_permite_salir(): void

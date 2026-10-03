@@ -29,6 +29,6 @@
         </div>
 
  <x-ui.sweetalert />
- @livewireScripts
+ <x-layout.livewire-runtime />
  </body>
 </html>

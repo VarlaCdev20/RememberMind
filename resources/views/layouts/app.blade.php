@@ -31,6 +31,6 @@
 
  @stack('modals')
 
- @livewireScripts
+ <x-layout.livewire-runtime />
 </body>
 </html>
