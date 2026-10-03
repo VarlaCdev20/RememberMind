@@ -4,6 +4,11 @@
 @php
     $indicadores = $perfil['indicadores'] ?? [];
     $panels = $perfil['panels'] ?? [];
+    $esSuperadministracion = ($perfil['rol'] ?? '') === 'SUPERADMINISTRADOR';
+    $nombreSaludo = $saludo['nombre'] ?? 'Usuario';
+    if ($esSuperadministracion) {
+        $nombreSaludo = mb_convert_case(mb_strtolower($nombreSaludo, 'UTF-8'), MB_CASE_TITLE, 'UTF-8');
+    }
     $accesos = collect($perfil['accesos'] ?? [])->filter(
         fn ($acceso) => $visibilidadNavegacion->puedeVerRuta($acceso['route'], $acceso['permission'] ?? null)
     );
@@ -21,20 +26,23 @@
     };
 @endphp
 
-<div class="rm-dashboard-composition">
+<div @class(['rm-dashboard-composition', 'rm-dashboard-composition--superadmin' => $esSuperadministracion])>
     <x-ui.role-dashboard-hero
         personal-greeting
+        class="{{ $esSuperadministracion ? 'rm-dashboard-header--superadmin' : '' }}"
         :eyebrow="$perfil['eyebrow'] ?? 'CENTRO GERIÁTRICO LOS ALMENDROS'"
-        :title="($saludo['saludo'] ?? 'Bienvenido') . ', ' . ($saludo['nombre'] ?? 'Usuario')"
-        :highlight="$perfil['highlight'] ?? 'Tu espacio de trabajo'"
-        :description="$perfil['description'] ?? ''"
+        :title="($saludo['saludo'] ?? 'Bienvenido') . ', ' . $nombreSaludo"
+        :highlight="$esSuperadministracion ? null : ($perfil['highlight'] ?? 'Tu espacio de trabajo')"
+        :description="$esSuperadministracion ? '' : ($perfil['description'] ?? '')"
+        :scope="$esSuperadministracion ? '' : null"
+        :image-label="$esSuperadministracion ? false : null"
         :image="asset($perfil['image'] ?? 'images/FOTOS CENTRO DE ADULTOS MAYORES/489963938_1158744422930145_8442506970304201426_n.jpg')"
         :rotation-context="$contextoFoto"
         :quote="$perfil['quote'] ?? 'Cuidado con propósito'"
         :meta="[
             ['icon' => 'ph-calendar-blank', 'label' => $saludo['fecha'] ?? now()->format('d/m/Y')],
             ['icon' => 'ph-identification-badge', 'label' => $saludo['rolLegible'] ?? 'Perfil institucional'],
-            ['icon' => 'ph-shield-check', 'label' => 'Acceso según permisos'],
+            ['icon' => 'ph-shield-check', 'label' => $esSuperadministracion ? '' : 'Acceso según permisos'],
         ]"
     >
         @foreach($accesos->take(3) as $acceso)
@@ -45,14 +53,16 @@
     </x-ui.role-dashboard-hero>
 
     @if(!empty($indicadores))
-        <section class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4" aria-label="Indicadores del perfil">
+        <section @class(['grid gap-4 sm:grid-cols-2 xl:grid-cols-4', 'rm-superadmin-metrics' => $esSuperadministracion]) aria-label="Indicadores del perfil">
             @foreach($indicadores as $indicador)
+                @php($sinAlertas = $esSuperadministracion && ($indicador['label'] ?? '') === 'Alertas prioritarias' && (int) ($indicador['value'] ?? 0) === 0)
                 <x-ui.metric-card
                     :icon="$indicador['icon'] ?? 'ph-chart-bar'"
                     :value="$indicador['value'] ?? null"
                     :label="$indicador['label'] ?? 'Indicador'"
-                    :description="$indicador['description'] ?? null"
-                    :variant="$indicador['variant'] ?? 'neutral'" />
+                    :description="$sinAlertas ? 'Sin alertas críticas o altas abiertas.' : ($indicador['description'] ?? null)"
+                    :variant="$sinAlertas ? 'mint' : ($indicador['variant'] ?? 'neutral')"
+                    class="{{ $sinAlertas ? 'rm-superadmin-metric--quiet' : '' }}" />
             @endforeach
         </section>
     @endif

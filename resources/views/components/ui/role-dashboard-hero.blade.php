@@ -12,6 +12,7 @@
     'imageAlt' => 'Acompañamiento a residentes del centro geriátrico',
     'quote' => 'Historias que siguen floreciendo',
     'meta' => [],
+    'imageLabel' => null,
 ])
 
 @php
@@ -29,6 +30,7 @@
     :scope="$scope ?? ($meta[2]['label'] ?? '')"
     :image="$heroImage"
     :image-alt="$rotationContext ? 'Actividades y acompañamiento de residentes en Los Almendros' : $imageAlt"
+    :image-label="$imageLabel"
     {{ $attributes }}
 />
 @if($highlight || trim((string) $slot) !== '')

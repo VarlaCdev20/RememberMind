@@ -1,0 +1,234 @@
+/* Presentación del dashboard de Superadministración. No altera el shell de otras rutas. */
+.rm-shell:has(.rm-dashboard-composition--superadmin) {
+    --rm-dashboard-app-bg: #F3EEE8;
+    --rm-dashboard-shell-bg: #DDD6CF;
+    --rm-dashboard-header-bg: #E6E0D9;
+    --rm-dashboard-card-surface: #F7F3EF;
+    --rm-dashboard-surface-soft: #EFEAE4;
+    --rm-dashboard-topbar-control: #EAE4DE;
+    --rm-dashboard-text: #4A4642;
+    --rm-dashboard-text-secondary: #67615B;
+    --rm-dashboard-text-muted: #847D76;
+    --rm-dashboard-sage-700: #5F7D67;
+    --rm-dashboard-sage-600: #6F8A72;
+    --rm-dashboard-sage-100: #DCE6DD;
+    --rm-dashboard-sage-ink: var(--rm-palette-forest-ink);
+    --rm-dashboard-staff-soft: #E2E9DF;
+    --rm-dashboard-clinical-700: #617A8A;
+    --rm-dashboard-clinical-100: #DCE6EB;
+    --rm-dashboard-clinical-ink: var(--rm-blue-clinical-700);
+    --rm-dashboard-coral-700: #B96D61;
+    --rm-dashboard-coral-600: #C97D6D;
+    --rm-dashboard-coral-100: #F1DEDA;
+    --rm-dashboard-divider: color-mix(in srgb, var(--rm-dashboard-text) 10%, transparent);
+    --rm-app-bg: var(--rm-dashboard-app-bg);
+}
+
+.rm-shell:has(.rm-dashboard-composition--superadmin) [data-rm-main] {
+    background: var(--rm-dashboard-app-bg);
+}
+.rm-shell:has(.rm-dashboard-composition--superadmin) [data-rm-main].rm-depth-canvas::before,
+.rm-shell:has(.rm-dashboard-composition--superadmin) [data-rm-main].rm-depth-canvas::after {
+    display: none;
+}
+
+.rm-shell:has(.rm-dashboard-composition--superadmin) .rm-topbar {
+    --rm-topbar-bg: var(--rm-dashboard-shell-bg);
+    --rm-topbar-surface: var(--rm-dashboard-surface-soft);
+    --rm-topbar-control-bg: var(--rm-dashboard-topbar-control);
+    --rm-topbar-control-hover: var(--rm-dashboard-sage-100);
+    --rm-topbar-control-active: var(--rm-dashboard-sage-100);
+    --rm-text-primary: var(--rm-dashboard-text);
+    --rm-text-secondary: var(--rm-dashboard-text-secondary);
+    --rm-text-muted: var(--rm-dashboard-text-secondary);
+    --rm-sage: var(--rm-dashboard-sage-600);
+    --rm-sage-text: var(--rm-dashboard-sage-ink);
+    --rm-coral: var(--rm-dashboard-coral-600);
+    border-bottom-color: var(--rm-dashboard-divider);
+}
+.rm-shell:has(.rm-dashboard-composition--superadmin) .rm-topbar .rm-topbar-search__form {
+    border-color: var(--rm-dashboard-divider);
+    background: var(--rm-dashboard-surface-soft);
+}
+.rm-shell:has(.rm-dashboard-composition--superadmin) .rm-topbar .rm-topbar-search__form:focus-within {
+    border-color: var(--rm-dashboard-sage-600);
+    background: var(--rm-dashboard-surface-soft);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--rm-dashboard-sage-600) 14%, transparent);
+}
+.rm-shell:has(.rm-dashboard-composition--superadmin) .rm-topbar :is(.rm-topbar__action, .rm-btn-icon) > span {
+    background: var(--rm-dashboard-coral-600);
+}
+
+.rm-dashboard-composition--superadmin .rm-superadmin-metrics {
+    --rm-dashboard-card-bg: var(--rm-dashboard-card-surface);
+    --rm-dashboard-card-border: color-mix(in srgb, var(--rm-dashboard-text) 8%, transparent);
+    --rm-dashboard-card-shadow: 0 2px 6px color-mix(in srgb, var(--rm-dashboard-text) 3%, transparent),
+        0 10px 24px color-mix(in srgb, var(--rm-dashboard-text) 5.5%, transparent);
+    --rm-text-primary: var(--rm-dashboard-text);
+    --rm-text-secondary: var(--rm-dashboard-text-secondary);
+}
+.rm-dashboard-composition--superadmin > .rm-dashboard-header--superadmin {
+    --rm-header-bg: var(--rm-dashboard-header-bg);
+    --rm-header-text: var(--rm-dashboard-text);
+    --rm-header-secondary: var(--rm-dashboard-text-secondary);
+    --rm-header-muted: var(--rm-dashboard-text-secondary);
+    --rm-header-surface: var(--rm-dashboard-surface-soft);
+    --rm-header-accent: var(--rm-dashboard-sage-600);
+    background-image: none;
+    box-shadow: 0 3px 8px color-mix(in srgb, var(--rm-dashboard-text) 3%, transparent);
+}
+.rm-dashboard-composition--superadmin .rm-dashboard-header__eyebrow {
+    color: var(--rm-dashboard-sage-ink);
+    font: 700 11px/1.3 var(--rm-font-friendly);
+    letter-spacing: .13em;
+}
+.rm-dashboard-composition--superadmin .rm-dashboard-header__title {
+    font: 700 clamp(28px, 2.2vw, 34px)/1.08 var(--rm-font-brand);
+}
+.rm-dashboard-composition--superadmin .rm-dashboard-header__role {
+    border-color: color-mix(in srgb, var(--rm-dashboard-sage-600) 22%, transparent);
+    background: var(--rm-dashboard-sage-100);
+    color: var(--rm-dashboard-sage-ink);
+}
+.rm-dashboard-composition--superadmin .rm-dashboard-header__role > span {
+    background: var(--rm-dashboard-sage-600);
+}
+.rm-dashboard-composition--superadmin .rm-dashboard-header__metadata {
+    gap: 8px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+}
+.rm-dashboard-composition--superadmin .rm-dashboard-header__metadata > span {
+    display: inline-flex;
+    align-items: center;
+    min-height: 32px;
+    padding: 6px 11px;
+    border: 1px solid var(--rm-dashboard-divider);
+    border-radius: 10px;
+    background: var(--rm-dashboard-surface-soft);
+    color: var(--rm-dashboard-text-secondary);
+}
+.rm-dashboard-composition--superadmin .rm-dashboard-header__metadata > .rm-dashboard-header__clock {
+    border-color: color-mix(in srgb, var(--rm-dashboard-clinical-700) 14%, transparent);
+    background: var(--rm-dashboard-clinical-100);
+    color: var(--rm-dashboard-clinical-ink);
+}
+.rm-dashboard-composition--superadmin .rm-dashboard-header__clock i {
+    color: currentColor;
+}
+.rm-dashboard-composition--superadmin .rm-dashboard-header__visual img {
+    filter: saturate(.84) contrast(.96) brightness(.98);
+}
+.rm-dashboard-composition--superadmin .rm-dashboard-header__visual::after {
+    background: linear-gradient(90deg,
+        var(--rm-dashboard-header-bg) 0%,
+        color-mix(in srgb, var(--rm-dashboard-header-bg) 80%, transparent) 18%,
+        color-mix(in srgb, var(--rm-dashboard-header-bg) 25%, transparent) 42%,
+        transparent 64%);
+}
+.rm-dashboard-composition--superadmin .rm-dashboard-header-actions :is(.rm-btn-primary, .rm-btn-secondary) {
+    min-height: 44px;
+    border: 1px solid var(--rm-dashboard-divider);
+    background: var(--rm-dashboard-surface-soft);
+    color: var(--rm-dashboard-text-secondary);
+    box-shadow: none;
+    transition: background-color 160ms ease, color 160ms ease, transform 160ms ease;
+}
+.rm-dashboard-composition--superadmin .rm-dashboard-header-actions :is(.rm-btn-primary, .rm-btn-secondary):is(:hover, :focus-visible) {
+    background: var(--rm-dashboard-sage-100);
+    color: var(--rm-dashboard-sage-ink);
+}
+.rm-dashboard-composition--superadmin .rm-dashboard-header-actions :is(.rm-btn-primary, .rm-btn-secondary):focus-visible {
+    outline: 2px solid var(--rm-dashboard-sage-600);
+    outline-offset: 2px;
+}
+.rm-dashboard-composition--superadmin .rm-dashboard-header-actions :is(.rm-btn-primary, .rm-btn-secondary):active {
+    background: var(--rm-dashboard-sage-ink);
+    color: var(--rm-dashboard-card-surface);
+    transform: translateY(0);
+}
+@media (hover: hover) and (pointer: fine) {
+    .rm-dashboard-composition--superadmin .rm-dashboard-header-actions :is(.rm-btn-primary, .rm-btn-secondary):hover {
+        transform: translateY(-1px);
+    }
+}
+
+.rm-dashboard-composition--superadmin .rm-superadmin-metrics .rm-metric-card {
+    min-height: 142px;
+    border-radius: 18px;
+    background-color: var(--rm-dashboard-card-surface);
+    background-image: none;
+}
+.rm-dashboard-composition--superadmin .rm-superadmin-metrics .rm-metric-card__value {
+    font: 800 36px/1.05 var(--rm-font-friendly);
+}
+.rm-dashboard-composition--superadmin .rm-superadmin-metrics .rm-metric-card__label {
+    font: 700 15px/1.25 var(--rm-font-friendly);
+}
+.rm-dashboard-composition--superadmin .rm-superadmin-metrics .rm-metric-card__description {
+    font: 500 13px/1.35 var(--rm-font-body);
+}
+.rm-dashboard-composition--superadmin .rm-superadmin-metrics .rm-metric-card:nth-child(1) .rm-metric-card__icon,
+.rm-dashboard-composition--superadmin .rm-superadmin-metrics .rm-superadmin-metric--quiet .rm-metric-card__icon {
+    background: var(--rm-dashboard-sage-100);
+    color: var(--rm-dashboard-sage-700);
+}
+.rm-dashboard-composition--superadmin .rm-superadmin-metrics .rm-metric-card:nth-child(4) .rm-metric-card__icon {
+    background: var(--rm-dashboard-staff-soft);
+    color: var(--rm-dashboard-sage-700);
+}
+.rm-dashboard-composition--superadmin .rm-superadmin-metrics .rm-metric-card:nth-child(2) .rm-metric-card__icon {
+    background: var(--rm-dashboard-clinical-100);
+    color: var(--rm-dashboard-clinical-700);
+}
+.rm-dashboard-composition--superadmin .rm-superadmin-metrics .rm-metric-card:nth-child(3):not(.rm-superadmin-metric--quiet) .rm-metric-card__icon {
+    background: var(--rm-dashboard-coral-100);
+    color: var(--rm-dashboard-coral-700);
+}
+.rm-dashboard-composition--superadmin .rm-superadmin-metrics .rm-card--interactive:hover {
+    border-color: color-mix(in srgb, var(--rm-dashboard-sage-600) 20%, transparent);
+    box-shadow: 0 4px 10px color-mix(in srgb, var(--rm-dashboard-text) 4%, transparent),
+        0 16px 32px color-mix(in srgb, var(--rm-dashboard-text) 7%, transparent);
+}
+.rm-dashboard-composition--superadmin .rm-superadmin-metrics .rm-metric-card:not(a):hover {
+    transform: none;
+    border-color: var(--rm-dashboard-card-border);
+    box-shadow: var(--rm-dashboard-card-shadow);
+}
+.rm-dashboard-composition--superadmin .rm-superadmin-metrics .rm-card--interactive:focus-visible {
+    outline: 2px solid var(--rm-dashboard-sage-600);
+    outline-offset: 2px;
+}
+
+:is(.dark, [data-theme="dark"]) .rm-shell:has(.rm-dashboard-composition--superadmin) {
+    --rm-dashboard-app-bg: var(--rm-palette-petroleum-950);
+    --rm-dashboard-shell-bg: var(--rm-palette-petroleum-900);
+    --rm-dashboard-header-bg: var(--rm-palette-petroleum-800);
+    --rm-dashboard-card-surface: var(--rm-palette-petroleum-800);
+    --rm-dashboard-surface-soft: var(--rm-palette-petroleum-700);
+    --rm-dashboard-topbar-control: var(--rm-palette-petroleum-800);
+    --rm-dashboard-text: var(--rm-palette-petroleum-text);
+    --rm-dashboard-text-secondary: var(--rm-palette-petroleum-secondary);
+    --rm-dashboard-text-muted: var(--rm-palette-petroleum-secondary);
+    --rm-dashboard-sage-700: var(--rm-palette-petroleum-mint);
+    --rm-dashboard-sage-600: var(--rm-palette-petroleum-mint);
+    --rm-dashboard-sage-100: color-mix(in srgb, var(--rm-palette-petroleum-mint) 18%, var(--rm-palette-petroleum-800));
+    --rm-dashboard-sage-ink: var(--rm-palette-petroleum-mint);
+    --rm-dashboard-staff-soft: var(--rm-dashboard-sage-100);
+    --rm-dashboard-clinical-700: var(--rm-palette-petroleum-text);
+    --rm-dashboard-clinical-100: color-mix(in srgb, var(--rm-info) 22%, var(--rm-palette-petroleum-800));
+    --rm-dashboard-clinical-ink: var(--rm-palette-petroleum-text);
+    --rm-dashboard-coral-700: var(--rm-palette-petroleum-text);
+    --rm-dashboard-coral-600: var(--rm-palette-danger);
+    --rm-dashboard-coral-100: color-mix(in srgb, var(--rm-palette-danger) 22%, var(--rm-palette-petroleum-800));
+}
+
+@media (max-width: 639px) {
+    .rm-dashboard-composition--superadmin .rm-superadmin-metrics .rm-metric-card { min-height: 128px; }
+    .rm-dashboard-composition--superadmin .rm-superadmin-metrics .rm-metric-card__value { font-size: 32px; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .rm-dashboard-composition--superadmin .rm-dashboard-header-actions :is(.rm-btn-primary, .rm-btn-secondary) { transition: none; }
+}
