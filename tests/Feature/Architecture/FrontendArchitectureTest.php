@@ -174,10 +174,14 @@ class FrontendArchitectureTest extends TestCase
             $this->assertStringContainsString($token, $colores);
         }
 
-        $this->assertStringContainsString('--rm-chart-sage: #7FA883', $graficas);
-        $this->assertStringContainsString('--rm-chart-blue: #7FAFD8', $graficas);
+        $this->assertStringContainsString('--rm-chart-care-500: #7FA883', $graficas);
+        $this->assertStringContainsString('--rm-chart-clinical-500: #7FAFD8', $graficas);
+        $this->assertStringContainsString('--rm-chart-alert-500: #E28B79', $graficas);
         $this->assertStringContainsString('--rm-chart-1: var(--rm-chart-sage)', $graficas);
-        $this->assertStringContainsString('--rm-chart-danger:       var(--rm-chart-coral)', $graficas);
+        $this->assertStringContainsString('--rm-chart-danger:       var(--rm-chart-alert-500)', $graficas);
+        $this->assertStringContainsString('--rm-chart-token-medication-primary: var(--rm-chart-care-500)', $graficas);
+        $this->assertStringContainsString('--rm-line-stroke-width: 3px', $graficas);
+        $this->assertStringContainsString('--rm-donut-ring-width: 22px', $graficas);
         $this->assertDoesNotMatchRegularExpression('/--rm-chart-\\d+:.*var\\(--rm-(danger|warning)\\)/', $graficas);
         $this->assertStringContainsString("'primary-action': token('primary')", $tailwind);
         $this->assertDoesNotMatchRegularExpression('/#[a-fA-F0-9]{3,8}\\b/', $tailwind, 'La configuración debe consumir la paleta CSS, sin repetir HEX.');
@@ -411,7 +415,9 @@ class FrontendArchitectureTest extends TestCase
         $this->assertStringContainsString('.rm-chart-kpi-badge', $estilos);
         $this->assertStringContainsString('.rm-chart-empty', $estilos);
         $this->assertStringContainsString("id: 'rmSoftChartGlow'", $tema);
-        $this->assertStringContainsString('Chart.register(rmSoftChartGlowPlugin)', $tema);
+        $this->assertStringContainsString('Chart.register(rmSoftChartGlowPlugin, rmReducedMotionChartPlugin, rmSemanticMotionPlugin)', $tema);
+        $this->assertStringContainsString('export function rmChartColor', $tema);
+        $this->assertStringContainsString('export function rmChartNumber', $tema);
         $this->assertStringContainsString('--rm-chart-card-bg', $colores);
         $this->assertStringContainsString('--rm-chart-tooltip-bg', $colores);
         $this->assertStringContainsString('background: linear-gradient(180deg, var(--rm-chart-card-glass), var(--rm-chart-card-bg))', $estilos);

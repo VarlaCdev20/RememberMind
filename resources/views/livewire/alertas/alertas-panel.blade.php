@@ -197,7 +197,7 @@
                     this.renderGraficoNivel();
                     this.renderGraficoOrigen();
                     this.renderGraficoEstado();
-                });
+                }, 'alertas-panel');
             },
 
             // --- Gráfico 1: Nivel de Severidad (Doughnut semántico) ---

@@ -78,7 +78,7 @@
   });
   window.RMCharts?.onThemeChange(() => {
   this.renderCurrentChart();
-  });
+  }, 'alertas-drawer');
  },
  renderCurrentChart() {
   if (typeof Chart === 'undefined') {
@@ -88,12 +88,13 @@
   const canvas = document.getElementById('chart-drawer-evolucion');
   if (!canvas) return;
 
-  const rootStyles = getComputedStyle(document.documentElement);
-  const css = (token, fallback) => rootStyles.getPropertyValue(token).trim() || fallback;
-  const gridColor = css('--rm-chart-grid', 'rgba(80,71,65,.12)');
-  const axisTextColor = css('--rm-chart-axis-text', '#665C55');
-  const surfaceRaised = css('--rm-chart-tooltip-bg', '#F0E7DE');
-  const tooltipText = css('--rm-chart-tooltip-text', '#342E2A');
+  const api = window.RMCharts;
+  const css = (token) => api.getCss(token);
+  const fill = (tone, opacity = '--rm-line-area-opacity') => api.hexToRgba(api.color(tone), api.number(opacity, .12));
+  const gridColor = css('--rm-chart-grid');
+  const axisTextColor = css('--rm-chart-axis-text');
+  const surfaceRaised = css('--rm-chart-tooltip-bg');
+  const tooltipText = css('--rm-chart-tooltip-text');
 
   let datasets = [];
   let yMin = undefined;
@@ -107,23 +108,15 @@
    {
    label: 'Sistólica',
    data: this.sisData,
-   borderColor: css('--rm-chart-2', '#527DAA'),
-   backgroundColor: 'rgba(82, 125, 170, 0.12)',
-   borderWidth: 2.2,
-   pointRadius: 4,
-   pointHoverRadius: 6,
-   tension: 0.35,
+   borderColor: api.color('clinical'),
+   backgroundColor: fill('clinical'),
    fill: true,
    },
    {
    label: 'Diastólica',
    data: this.diaData,
-   borderColor: css('--rm-chart-4', '#6F92BC'),
-   backgroundColor: 'rgba(162, 194, 236, 0.10)',
-   borderWidth: 2.2,
-   pointRadius: 4,
-   pointHoverRadius: 6,
-   tension: 0.35,
+   borderColor: api.color('reference'),
+   backgroundColor: fill('reference', '--rm-line-area-secondary-opacity'),
    fill: true,
    }
   ];
@@ -135,12 +128,8 @@
   datasets = [{
    label: 'Frecuencia Cardíaca',
    data: this.fcData,
-   borderColor: css('--rm-chart-5', '#8A7A70'),
-   backgroundColor: 'rgba(138, 122, 112, 0.11)',
-   borderWidth: 2.2,
-   pointRadius: 4,
-   pointHoverRadius: 6,
-   tension: 0.35,
+   borderColor: api.color('clinical'),
+   backgroundColor: fill('clinical'),
    fill: true,
   }];
   yMin = 40;
@@ -151,12 +140,8 @@
   datasets = [{
    label: 'Saturación SpO₂',
    data: this.spo2Data,
-   borderColor: css('--rm-chart-1', '#4F895E'),
-   backgroundColor: 'rgba(173, 235, 178, 0.14)',
-   borderWidth: 2.2,
-   pointRadius: 4,
-   pointHoverRadius: 6,
-   tension: 0.35,
+   borderColor: api.color('clinical'),
+   backgroundColor: fill('clinical'),
    fill: true,
   }];
   yMin = 80;
@@ -167,12 +152,8 @@
   datasets = [{
    label: 'Temperatura',
    data: this.tempData,
-   borderColor: css('--rm-chart-6', '#A89789'),
-   backgroundColor: 'rgba(168, 151, 137, 0.12)',
-   borderWidth: 2.2,
-   pointRadius: 4,
-   pointHoverRadius: 6,
-   tension: 0.35,
+   borderColor: api.color('clinical'),
+   backgroundColor: fill('clinical'),
    fill: true,
   }];
   yMin = 34.5;
@@ -180,12 +161,15 @@
   yStep = 1;
   }
 
-  const existing = Chart.getChart(canvas);
-  if (existing) {
-  try { existing.destroy(); } catch (e) {}
-  }
+  datasets = datasets.map(dataset => ({
+   ...dataset,
+   borderWidth: api.number('--rm-line-stroke-width', 3),
+   pointRadius: api.number('--rm-line-dot-size', 5) / 2,
+   pointHoverRadius: api.number('--rm-line-dot-size', 5),
+   tension: .38,
+  }));
 
-  new Chart(canvas, {
+  api.init('alertas-drawer-evolucion', canvas, {
   type: 'line',
   data: {
    labels: this.labels,
@@ -194,7 +178,7 @@
   options: {
    responsive: true,
    maintainAspectRatio: false,
-   animation: { duration: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 600, easing: 'easeOutQuart' },
+   animation: { duration: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : api.number('--rm-chart-line-enter-duration', 650), easing: api.getCss('--rm-chart-js-easing') },
    interaction: { mode: 'index', intersect: false },
    scales: {
    x: {

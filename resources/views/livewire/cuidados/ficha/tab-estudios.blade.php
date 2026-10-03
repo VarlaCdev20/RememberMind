@@ -20,7 +20,6 @@
          labels: {{ json_encode($graficoData['labels']) }},
          data: {{ json_encode($graficoData['data']) }},
          fechas: {{ json_encode($graficoData['fechas']) }},
-         color: '{{ $graficoData['color'] }}',
          unidad: '{{ $graficoData['unidad'] }}',
          nombre: '{{ $graficoData['nombre'] }}',
          rangoMin: {{ (float)$graficoData['rango_min'] }},
@@ -315,12 +314,12 @@
 
                     {{-- Canvas del Gráfico Line/Area --}}
                     <div class="rm-chart-body h-48 sm:h-52 w-full relative" style="height: 13rem; min-height: 12rem; max-height: 13rem;" wire:ignore>
-                        <canvas id="chartEvolucionEstudiosCanvas"></canvas>
+                        <canvas id="chartEvolucionEstudiosCanvas" role="img" aria-label="Evolución de resultados de estudios clínicos"></canvas>
                     </div>
 
                     <div class="flex items-center justify-between text-[11px] text-[var(--rm-text-muted)] pt-1 border-t border-[var(--rm-border)]/50">
                         <span class="flex items-center gap-1.5">
-                            <span class="h-2.5 w-2.5 rounded-full inline-block" style="background-color: {{ $graficoData['color'] }};"></span>
+                            <span class="h-2.5 w-2.5 rounded-full inline-block bg-[var(--rm-chart-clinical-500)]"></span>
                             <span class="font-bold text-[var(--rm-text-title)]">{{ $graficoData['nombre'] }}:</span>
                             <span>Último {{ $graficoData['ultimo_valor'] }} {{ $graficoData['unidad'] }}</span>
                         </span>
@@ -670,7 +669,6 @@ function moduloResultadosEstudios(config) {
         labels: config.labels || [],
         data: config.data || [],
         fechas: config.fechas || [],
-        color: config.color || '#634A35',
         unidad: config.unidad || '',
         nombre: config.nombre || '',
         rangoMin: config.rangoMin || 0,
@@ -735,7 +733,6 @@ function moduloResultadosEstudios(config) {
                         if (payload.labels) this.labels = payload.labels;
                         if (payload.data) this.data = payload.data;
                         if (payload.fechas) this.fechas = payload.fechas;
-                        if (payload.color) this.color = payload.color;
                         if (payload.unidad) this.unidad = payload.unidad;
                         if (payload.nombre) this.nombre = payload.nombre;
                         if (payload.rango_min !== undefined) this.rangoMin = Number(payload.rango_min);
@@ -754,104 +751,23 @@ function moduloResultadosEstudios(config) {
             const ctx = document.getElementById('chartEvolucionEstudiosCanvas');
             if (!ctx || ctx.offsetParent === null) return;
 
-            const prev = Chart.getChart(ctx);
-            if (prev) {
-                try { prev.destroy(); } catch (e) {}
-            }
-            if (this.chartInstance) {
-                try { this.chartInstance.destroy(); } catch (e) {}
-            }
-
-            const isDark = document.documentElement.classList.contains('dark');
-            const chartToken = (name, fallback) => window.RMCharts?.getCss(name) || fallback;
-            const mainColor = chartToken('--rm-chart-2', '#527DAA');
-            const pointSurface = chartToken('--rm-surface-raised', '#F0E7DE');
-            const translucent = (color, alpha) => window.RMCharts?.hexToRgba(color, alpha) || color;
-
-            // Gradiente vertical translúcido elegante
-            const fillGrad = (context) => {
-                const chart = context.chart;
-                const { ctx: cCtx, chartArea } = chart;
-                if (!chartArea) return translucent(mainColor, 0.15);
-                const grad = cCtx.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
-                grad.addColorStop(0, translucent(mainColor, isDark ? 0.35 : 0.25));
-                grad.addColorStop(0.7, translucent(mainColor, isDark ? 0.08 : 0.05));
-                grad.addColorStop(1, translucent(mainColor, 0));
-                return grad;
-            };
-
-            this.chartInstance = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: this.labels,
-                    datasets: [{
-                        label: this.nombre,
-                        data: this.data,
-                        borderColor: mainColor,
-                        backgroundColor: fillGrad,
-                        borderWidth: 2.5,
-                        tension: 0.38,
-                        fill: true,
-                        pointRadius: 4,
-                        pointHoverRadius: 6.5,
-                        pointBackgroundColor: pointSurface,
-                        pointBorderColor: mainColor,
-                        pointBorderWidth: 2,
-                        pointHoverBackgroundColor: mainColor,
-                        pointHoverBorderColor: pointSurface,
-                        pointHoverBorderWidth: 2,
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    animation: { duration: 650, easing: 'easeOutQuart' },
-                    interaction: { mode: 'index', intersect: false },
-                    plugins: {
-                        legend: { display: false },
-                        datalabels: { display: false },
-                        tooltip: {
-                            backgroundColor: chartToken('--rm-chart-tooltip-bg', '#F0E7DE'),
-                            titleColor: chartToken('--rm-chart-tooltip-text', '#342E2A'),
-                            bodyColor: chartToken('--rm-chart-tooltip-text', '#342E2A'),
-                            borderColor: chartToken('--rm-chart-tooltip-border', '#C9BAAC'),
-                            borderWidth: 1,
-                            padding: { top: 6, right: 10, bottom: 6, left: 10 },
-                            cornerRadius: 8,
-                            titleFont: { family: 'Outfit, Inter, sans-serif', size: 11, weight: 'bold' },
-                            bodyFont: { family: 'Outfit, Inter, sans-serif', size: 11 },
-                            callbacks: {
-                                label: (context) => {
-                                    const val = context.parsed.y;
-                                    const fecha = this.fechas[context.dataIndex] || '';
-                                    return ` ${this.nombre}: ${val} ${this.unidad} (${fecha})`;
-                                }
-                            }
-                        }
-                    },
-                    scales: {
-                        x: {
-                            grid: { display: false },
-                            ticks: {
-                                font: { family: 'Outfit, Inter, sans-serif', size: 10.5, weight: '600' },
-                                color: chartToken('--rm-chart-axis-text', '#6B5F57')
-                            }
-                        },
-                        y: {
-                            beginAtZero: false,
-                            grid: {
-                                color: chartToken('--rm-chart-grid', 'rgba(80, 71, 65, 0.12)'),
-                                drawBorder: false
-                            },
-                            ticks: {
-                                font: { family: 'Outfit, Inter, sans-serif', size: 10.5 },
-                                color: chartToken('--rm-chart-axis-text', '#6B5F57'),
-                                callback: (v) => `${v}`
-                            }
-                        }
-                    }
+            const api = window.RMCharts;
+            if (!api) return;
+            const config = api.presets.area(this.labels, [{
+                label: this.nombre,
+                data: this.data,
+                borderColor: api.color('clinical'),
+                backgroundColor: api.hexToRgba(api.color('clinical'), api.number('--rm-line-area-opacity', .12)),
+            }]);
+            config.options.scales.x.grid.display = false;
+            config.options.scales.y.beginAtZero = false;
+            config.options.plugins.tooltip.callbacks = {
+                label: (context) => {
+                    const fecha = this.fechas[context.dataIndex] || '';
+                    return ` ${this.nombre}: ${context.parsed.y} ${this.unidad} (${fecha})`;
                 }
-            });
+            };
+            this.chartInstance = api.init('evolucion-estudios', ctx, config);
         }
     };
 }

@@ -54,7 +54,7 @@
 
             window.RMCharts?.onThemeChange(() => {
                 render();
-            });
+            }, '{{ $canvasId }}', this.$el);
         }
      }"
      class="rm-sparkline {{ $class }}"

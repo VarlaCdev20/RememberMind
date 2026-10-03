@@ -299,17 +299,17 @@
         }
 
         const controller = { chart: null, lastPayload: null, lastTheme: null, scheduled: false };
-        const token = (name, fallback) => getComputedStyle(document.documentElement).getPropertyValue(name).trim() || fallback;
+        const token = (name) => window.RMCharts?.getCss(name) || getComputedStyle(document.documentElement).getPropertyValue(name).trim();
         const resolveColor = (value) => {
             const match = /^var\((--[a-z0-9-]+)\)$/.exec(value || '');
-            return match ? token(match[1], token('--rm-sky-500', '#5397B8')) : token('--rm-sky-500', '#5397B8');
+            return match ? token(match[1]) : token('--rm-chart-clinical-500');
         };
 
         controller.render = () => {
             const root = document.querySelector('[data-incident-trend]');
             const canvas = root?.querySelector('canvas');
             if (!canvas || !root.dataset.trend) {
-                controller.chart?.destroy();
+                window.RMCharts?.destroy('nursing-dashboard-incident-trend');
                 controller.chart = null;
                 controller.lastPayload = null;
                 return;
@@ -328,11 +328,11 @@
                     label: series.label,
                     data: series.data,
                     borderColor: color,
-                    backgroundColor: window.RMCharts?.hexToRgba(color, .16) || color,
+                    backgroundColor: window.RMCharts?.hexToRgba(color, window.RMCharts.number('--rm-line-area-opacity', .12)) || color,
                     fill: summary.datasets.length <= 2,
                     tension: .38,
-                    borderWidth: 3,
-                    pointRadius: 3,
+                    borderWidth: window.RMCharts?.number('--rm-line-stroke-width', 3) || 3,
+                    pointRadius: (window.RMCharts?.number('--rm-line-dot-size', 5) || 5) / 2,
                     pointHoverRadius: 5.5,
                 };
             });
@@ -340,47 +340,40 @@
             const options = {
                 responsive: true,
                 maintainAspectRatio: false,
-                animation: matchMedia('(prefers-reduced-motion: reduce)').matches ? false : { duration: 650, easing: 'easeOutQuart' },
+                animation: matchMedia('(prefers-reduced-motion: reduce)').matches ? false : { duration: window.RMCharts.number('--rm-chart-line-enter-duration', 650), easing: window.RMCharts.getCss('--rm-chart-js-easing') },
                 interaction: { mode: 'index', intersect: false },
                 plugins: {
                     legend: { display: false },
                     tooltip: {
-                        backgroundColor: token('--rm-chart-tooltip-bg', 'rgba(255,252,248,.92)'),
-                        titleColor: token('--rm-chart-tooltip-text', '#4A4642'),
-                        bodyColor: token('--rm-chart-tooltip-text', '#4A4642'),
-                        borderColor: token('--rm-chart-tooltip-border', 'rgba(74,70,66,.08)'),
+                        backgroundColor: token('--rm-chart-tooltip-bg'),
+                        titleColor: token('--rm-chart-tooltip-text'),
+                        bodyColor: token('--rm-chart-tooltip-text'),
+                        borderColor: token('--rm-chart-tooltip-border'),
                         borderWidth: 1,
-                        cornerRadius: 14,
+                        cornerRadius: window.RMCharts?.number('--rm-tooltip-radius', 14) || 14,
                         callbacks: { title: (items) => summary.labels_completas[items[0]?.dataIndex] || '' },
                     },
                 },
                 scales: {
                     x: {
                         grid: { display: false },
-                        ticks: { color: token('--rm-text-secondary', '#6D625D'), maxRotation: 0, font: { size: 11 } },
+                        ticks: { color: token('--rm-chart-axis'), maxRotation: 0, font: { family: token('--rm-chart-font-family'), size: 11 } },
                     },
                     y: {
                         beginAtZero: true,
-                        grid: { color: token('--rm-border-soft', 'rgba(120,101,91,.10)') },
+                        grid: { color: token('--rm-chart-grid') },
                         ticks: {
-                            color: token('--rm-text-secondary', '#6D625D'),
+                            color: token('--rm-chart-axis'),
                             precision: 0,
                             callback: (value) => Number.isInteger(value) ? value : '',
-                            font: { size: 11 },
+                            font: { family: token('--rm-chart-font-family'), size: 11 },
                         },
                     },
                 },
             };
 
-            if (controller.chart?.canvas !== canvas) {
-                controller.chart?.destroy();
-                Chart.getChart(canvas)?.destroy();
-                controller.chart = new Chart(canvas, { type: 'line', data: chartData, options });
-            } else {
-                controller.chart.data = chartData;
-                controller.chart.options = options;
-                controller.chart.update('none');
-            }
+            controller.chart = window.RMCharts.init('nursing-dashboard-incident-trend', canvas,
+                { type: 'line', data: chartData, options });
             controller.lastPayload = raw;
             controller.lastTheme = theme;
         };
@@ -459,7 +452,7 @@
             }
             controller.attempts = 0;
             if (!controller.themeBound) {
-                window.RMCharts.onThemeChange(controller.schedule);
+                window.RMCharts.onThemeChange(controller.schedule, 'nursing-dashboard-analytics');
                 controller.themeBound = true;
             }
             Object.keys(specs).forEach(controller.renderOne);

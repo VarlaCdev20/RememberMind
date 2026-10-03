@@ -177,7 +177,7 @@
                 </span>
             </div>
             <div class="rm-chart-body h-32 w-full relative wire:ignore" style="height: 8rem; min-height: 8rem; max-height: 8rem;">
-                <canvas id="chartEventosPorMesCanvas"></canvas>
+                <canvas id="chartEventosPorMesCanvas" role="img" aria-label="Eventos clínicos registrados por mes"></canvas>
             </div>
         </div>
 
@@ -197,7 +197,7 @@
                 {{-- Donut canvas con centro numérico --}}
                 <div class="relative flex items-center justify-center shrink-0 w-28 h-28">
                     <div class="absolute inset-0" wire:ignore>
-                        <canvas id="chartEventosPorTipoCanvas"></canvas>
+                        <canvas id="chartEventosPorTipoCanvas" role="img" aria-label="Distribución de eventos clínicos por tipo"></canvas>
                     </div>
                     <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none text-center">
                         <span class="text-base font-bold text-[var(--rm-text-title)] leading-none font-mono">{{ $porTipo['total'] }}</span>
@@ -949,136 +949,31 @@ function moduloEventosClinicos(config) {
             // 1. Gráfico Eventos por Mes (Bar Chart)
             const ctxMeses = document.getElementById('chartEventosPorMesCanvas');
             if (ctxMeses && ctxMeses.offsetParent !== null) {
-                const prev1 = Chart.getChart(ctxMeses);
-                if (prev1) {
-                    try { prev1.destroy(); } catch (e) {}
-                }
-                if (this.chartMesesInstance) {
-                    try { this.chartMesesInstance.destroy(); } catch (e) {}
-                }
-
-                const isDark = document.documentElement.classList.contains('dark') || document.documentElement.getAttribute('data-theme') === 'dark';
-                const chartToken = (name, fallback) => window.RMCharts?.getCss(name) || fallback;
-                const textColor = chartToken('--rm-chart-axis-text', '#6B5F57');
-                const gridColor = chartToken('--rm-chart-grid', 'rgba(80, 71, 65, 0.12)');
-                const blue = chartToken('--rm-chart-2', '#527DAA');
-                const blueHover = chartToken('--rm-chart-7', '#355D86');
-
-                this.chartMesesInstance = new Chart(ctxMeses, {
-                    type: 'bar',
-                    data: {
-                        labels: this.mesesLabels,
-                        datasets: [{
-                            label: 'Eventos',
-                            data: this.mesesData,
-                            backgroundColor: window.RMCharts?.hexToRgba(blue, 0.72) || blue,
-                            hoverBackgroundColor: window.RMCharts?.hexToRgba(blueHover, 0.92) || blueHover,
-                            borderColor: blue,
-                            borderWidth: 1.5,
-                            borderRadius: 6,
-                            maxBarThickness: 24,
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        animation: { duration: 600 },
-                        plugins: {
-                            legend: { display: false },
-                            datalabels: { display: false },
-                            tooltip: {
-                                backgroundColor: chartToken('--rm-chart-tooltip-bg', '#F0E7DE'),
-                                titleColor: chartToken('--rm-chart-tooltip-text', '#342E2A'),
-                                bodyColor: chartToken('--rm-chart-tooltip-text', '#342E2A'),
-                                borderColor: chartToken('--rm-chart-tooltip-border', '#C9BAAC'),
-                                borderWidth: 1,
-                                titleFont: { family: 'Outfit', size: 11, weight: 'bold' },
-                                bodyFont: { family: 'Outfit', size: 11 },
-                                padding: 8,
-                                cornerRadius: 8,
-                            }
-                        },
-                        scales: {
-                            x: {
-                                grid: { display: false },
-                                ticks: { font: { family: 'Outfit', size: 10, weight: '600' }, color: textColor }
-                            },
-                            y: {
-                                beginAtZero: true,
-                                border: { display: false },
-                                grid: { color: gridColor },
-                                ticks: {
-                                    stepSize: 1,
-                                    font: { family: 'Outfit', size: 10 },
-                                    color: textColor,
-                                    precision: 0
-                                }
-                            }
-                        }
-                    }
-                });
+                const api = window.RMCharts;
+                if (!api) return;
+                const config = api.presets.semantic('bar', 'clinical', this.mesesLabels, this.mesesData);
+                config.data.datasets[0].label = 'Eventos';
+                config.options.scales.x.grid.display = false;
+                config.options.scales.y.beginAtZero = true;
+                config.options.scales.y.ticks.precision = 0;
+                this.chartMesesInstance = api.init('eventos-por-mes', ctxMeses, config);
             }
 
             // 2. Gráfico Eventos por Tipo (Donut Chart)
             const ctxTipo = document.getElementById('chartEventosPorTipoCanvas');
             if (ctxTipo && ctxTipo.offsetParent !== null) {
-                const prev2 = Chart.getChart(ctxTipo);
-                if (prev2) {
-                    try { prev2.destroy(); } catch (e) {}
-                }
-                if (this.chartTipoInstance) {
-                    try { this.chartTipoInstance.destroy(); } catch (e) {}
-                }
-
-                const chartToken = (name, fallback) => window.RMCharts?.getCss(name) || fallback;
-                const eventPalette = [
-                    chartToken('--rm-chart-2', '#527DAA'),
-                    chartToken('--rm-chart-6', '#A89789'),
-                    chartToken('--rm-chart-3', '#78B985'),
-                    chartToken('--rm-chart-10', '#C94F45'),
-                    chartToken('--rm-chart-9', '#BDAFA2'),
-                ];
-
-                this.chartTipoInstance = new Chart(ctxTipo, {
-                    type: 'doughnut',
-                    data: {
-                        labels: this.tipoLabels,
-                        datasets: [{
-                            data: this.tipoData,
-                            backgroundColor: eventPalette,
-                            borderWidth: 2,
-                            borderColor: chartToken('--rm-surface-raised', '#F0E7DE'),
-                            hoverOffset: 4,
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        cutout: '68%',
-                        animation: { duration: 600 },
-                        plugins: {
-                            legend: { display: false },
-                            datalabels: { display: false },
-                            tooltip: {
-                                backgroundColor: chartToken('--rm-chart-tooltip-bg', '#F0E7DE'),
-                                titleColor: chartToken('--rm-chart-tooltip-text', '#342E2A'),
-                                bodyColor: chartToken('--rm-chart-tooltip-text', '#342E2A'),
-                                borderColor: chartToken('--rm-chart-tooltip-border', '#C9BAAC'),
-                                borderWidth: 1,
-                                titleFont: { family: 'Outfit', size: 11, weight: 'bold' },
-                                bodyFont: { family: 'Outfit', size: 11 },
-                                callbacks: {
-                                    label: (ctx) => {
-                                        const label = ctx.label || '';
-                                        const val = ctx.raw || 0;
-                                        const pct = this.tipoPercentages[label] || Math.round((val / (this.tipoTotal || 1)) * 100);
-                                        return ` ${label}: ${val} (${pct}%)`;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                });
+                const api = window.RMCharts;
+                if (!api) return;
+                const eventPalette = ['clinical', 'neutral', 'care', 'cognitive', 'reference'].map(tone => api.color(tone));
+                const config = api.presets.doughnut(this.tipoLabels, this.tipoData,
+                    this.tipoLabels.map((_, index) => eventPalette[index % eventPalette.length]));
+                config.options.plugins.tooltip.callbacks.label = (ctx) => {
+                    const label = ctx.label || '';
+                    const val = ctx.raw || 0;
+                    const pct = this.tipoPercentages[label] || Math.round((val / (this.tipoTotal || 1)) * 100);
+                    return ` ${label}: ${val} (${pct}%)`;
+                };
+                this.chartTipoInstance = api.init('eventos-por-tipo', ctxTipo, config);
             }
         }
     };

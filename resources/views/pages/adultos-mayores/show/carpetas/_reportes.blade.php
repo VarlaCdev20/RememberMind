@@ -13,14 +13,6 @@
  $medGrupos = ($medicaciones ?? collect())->groupBy('estado');
  $medLabels = $medGrupos->keys()->values()->toArray();
  $medCounts = $medGrupos->map(fn($group) => $group->count())->values()->toArray();
- $medColors = collect($medLabels)->map(fn($l) => match(strtoupper((string)$l)) {
- 'ACTIVO' => 'var(--rm-success)',
- 'PAUSADO' => 'var(--rm-warning)',
- 'EN REVISION' => 'var(--rm-violet)',
- 'SUSPENDIDO' => 'var(--rm-danger)',
- 'FINALIZADO' => 'var(--rm-surface-muted)',
- default => 'var(--rm-text-muted)',
- })->toArray();
 
  // Valoración funcional: índice Barthel histórico
  $valOrdenadas = ($valoracionesFuncionales ?? collect())
@@ -145,7 +137,7 @@
  </div>
  @if($svVigentes->isNotEmpty())
  <div style="position:relative; height:200px;">
- <canvas id="chartSignos{{ $idAdulto }}"></canvas>
+ <canvas id="chartSignos{{ $idAdulto }}" role="img" aria-label="Evolución de signos vitales del residente"></canvas>
  </div>
  @else
  <div class="flex flex-col items-center justify-center h-40 text-apoyo">
@@ -168,7 +160,7 @@
  </div>
  @if(($medicaciones ?? collect())->isNotEmpty())
  <div style="position:relative; height:200px;" class="flex items-center justify-center">
- <canvas id="chartMed{{ $idAdulto }}"></canvas>
+ <canvas id="chartMed{{ $idAdulto }}" role="img" aria-label="Distribución de medicación por estado"></canvas>
  </div>
  @else
  <div class="flex flex-col items-center justify-center h-40 text-apoyo">
@@ -191,7 +183,7 @@
  </div>
  @if($valOrdenadas->isNotEmpty())
  <div style="position:relative; height:200px;">
- <canvas id="chartBarthel{{ $idAdulto }}"></canvas>
+ <canvas id="chartBarthel{{ $idAdulto }}" role="img" aria-label="Evolución del índice Barthel"></canvas>
  </div>
  @else
  <div class="flex flex-col items-center justify-center h-40 text-apoyo">
@@ -214,7 +206,7 @@
  </div>
  @if($evalOrdenadas->isNotEmpty())
  <div style="position:relative; height:200px;">
- <canvas id="chartEval{{ $idAdulto }}"></canvas>
+ <canvas id="chartEval{{ $idAdulto }}" role="img" aria-label="Puntajes de evaluaciones cognitivas"></canvas>
  </div>
  @else
  <div class="flex flex-col items-center justify-center h-40 text-apoyo">

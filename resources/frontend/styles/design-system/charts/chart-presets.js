@@ -12,7 +12,8 @@ import {
     rmDoughnutDefaults,
     rmHexToRgba,
     rmGetCss,
-    rmIsDark,
+    rmChartNumber,
+    rmChartColor,
     rmPrefersReducedMotion,
     rmCreateGradient,
     rmCreateBarGradient,
@@ -23,7 +24,7 @@ export function rmDoughnutChartConfig(labels, data, colors, customOptions = {}) 
     const defaults = rmDoughnutDefaults();
     
     // Convertir colores a translúcidos con bordes nítidos para efecto vidrio/luz
-    const translucentBg = colors.map(c => rmHexToRgba(c, 0.86));
+    const translucentBg = colors.map(c => rmHexToRgba(c, rmChartNumber('--rm-donut-ring-opacity', .86)));
     const segmentBorder = rmGetCss('--rm-chart-card-bg') || rmGetCss('--rm-surface-raised');
 
     return {
@@ -34,17 +35,17 @@ export function rmDoughnutChartConfig(labels, data, colors, customOptions = {}) 
                 data: data,
                 backgroundColor: translucentBg,
                 borderColor: segmentBorder,
-                borderWidth: 2,
+                borderWidth: rmChartNumber('--rm-donut-gap', 2),
                 borderRadius: 5,
-                spacing: 2,
+                spacing: rmChartNumber('--rm-donut-gap', 2),
                 hoverOffset: 4,
-                hoverBorderColor: rmGetCss('--rm-surface-raised') || rmGetCss('--rm-surface') || '#F4EFE8',
+                hoverBorderColor: rmGetCss('--rm-chart-surface-hover'),
                 hoverBorderWidth: 2.5,
             }]
         },
         options: {
             ...defaults,
-            cutout: '58%',
+            cutout: rmGetCss('--rm-donut-cutout'),
             plugins: {
                 ...defaults.plugins,
                 tooltip: {
@@ -66,17 +67,16 @@ export function rmDoughnutChartConfig(labels, data, colors, customOptions = {}) 
 
 // --- Preset: Barras Horizontales Clínicas Gruesas y Notorias ---
 export function rmBarHorizontalChartConfig(labels, data, colors, customOptions = {}) {
-    const isDark = rmIsDark();
-    const axisTextColor  = rmGetCss('--rm-chart-axis-text')  || (isDark ? '#94A3B8' : '#64748B');
-    const axisTitleColor = rmGetCss('--rm-chart-axis-title') || (isDark ? '#F8FAFC' : '#1E293B');
-    const gridColor      = rmGetCss('--rm-chart-grid')       || (isDark ? 'rgba(255,255,255,0.06)' : 'rgba(224,212,198,0.35)');
+    const axisTextColor  = rmGetCss('--rm-chart-axis-text');
+    const axisTitleColor = rmGetCss('--rm-chart-axis-title');
+    const gridColor      = rmGetCss('--rm-chart-grid');
 
     const maxVal = Math.max(...(data.length ? data : [0]), 1);
     const suggestedMax = maxVal + Math.ceil(maxVal * 0.28) + 1;
 
     // Colores intensos con acabado traslúcido elegante
-    const translucentBg = colors.map(c => rmHexToRgba(c, 0.86));
-    const borderColors  = colors.map(c => rmHexToRgba(c, 0.98));
+    const translucentBg = colors.map(c => rmHexToRgba(c, rmChartNumber('--rm-hbar-fill-opacity', .84)));
+    const borderColors  = colors.map(c => rmHexToRgba(c, rmChartNumber('--rm-hbar-fill-hover-opacity', .96)));
 
     const base = rmBaseChartOptions();
 
@@ -157,10 +157,10 @@ export function rmBarHorizontalChartConfig(labels, data, colors, customOptions =
                 backgroundColor: translucentBg,
                 borderColor: borderColors,
                 borderWidth: 1.5,
-                borderRadius: 10,
+                borderRadius: rmChartNumber('--rm-hbar-radius', 999),
                 borderSkipped: false,
-                barThickness: 24,
-                maxBarThickness: 28,
+                barThickness: rmChartNumber('--rm-hbar-height', 14),
+                maxBarThickness: rmChartNumber('--rm-hbar-height', 14),
             }]
         },
         options: {
@@ -187,11 +187,11 @@ export function rmAreaChartConfig(labels, datasets, customOptions = {}) {
             datasets: datasets.map(ds => ({
                 fill: true,
                 tension: 0.38,
-                pointRadius: 3,
+                pointRadius: rmChartNumber('--rm-line-dot-size', 5) / 2,
                 pointHoverRadius: 5.5,
                 pointBorderWidth: 2,
-                pointBackgroundColor: rmGetCss('--rm-surface-raised') || rmGetCss('--rm-surface') || '#F4EFE8',
-                borderWidth: 3,
+                pointBackgroundColor: rmGetCss('--rm-chart-surface-bg'),
+                borderWidth: rmChartNumber('--rm-line-stroke-width', 3),
                 ...ds,
             }))
         },
@@ -211,9 +211,9 @@ export function rmLineChartConfig(labels, datasets, customOptions = {}) {
             labels: labels,
             datasets: datasets.map(ds => ({
                 tension: 0.38,
-                pointRadius: 3,
+                pointRadius: rmChartNumber('--rm-line-dot-size', 5) / 2,
                 pointHoverRadius: 5.5,
-                borderWidth: 3,
+                borderWidth: rmChartNumber('--rm-line-stroke-width', 3),
                 ...ds,
             }))
         },
@@ -233,21 +233,21 @@ export function rmBarChartConfig(labels, datasets, customOptions = {}) {
             labels: labels,
             datasets: datasets.map(ds => {
                 const bg = Array.isArray(ds.backgroundColor)
-                    ? ds.backgroundColor.map(c => rmHexToRgba(c, 0.78))
-                    : (ds.backgroundColor ? rmHexToRgba(ds.backgroundColor, 0.78) : undefined);
+                    ? ds.backgroundColor.map(c => rmHexToRgba(c, rmChartNumber('--rm-bar-fill-opacity', .84)))
+                    : (ds.backgroundColor ? rmHexToRgba(ds.backgroundColor, rmChartNumber('--rm-bar-fill-opacity', .84)) : undefined);
                 const border = Array.isArray(ds.borderColor)
-                    ? ds.borderColor.map(c => rmHexToRgba(c, 0.95))
-                    : (ds.borderColor ? rmHexToRgba(ds.borderColor, 0.95) : undefined);
+                    ? ds.borderColor.map(c => rmHexToRgba(c, rmChartNumber('--rm-bar-fill-hover-opacity', .96)))
+                    : (ds.borderColor ? rmHexToRgba(ds.borderColor, rmChartNumber('--rm-bar-fill-hover-opacity', .96)) : undefined);
                 return {
-                    borderRadius: 10,
+                    ...ds,
+                    borderRadius: rmChartNumber('--rm-bar-radius', 10),
                     borderSkipped: false,
                     barPercentage: 0.86,
                     categoryPercentage: 0.78,
-                    maxBarThickness: 32,
+                    maxBarThickness: rmChartNumber('--rm-bar-width', 18),
                     borderWidth: 1.5,
                     backgroundColor: bg || ds.backgroundColor,
                     borderColor: border || ds.borderColor,
-                    ...ds,
                 };
             })
         },
@@ -266,7 +266,7 @@ export function rmStackedBarChartConfig(labels, datasets, customOptions = {}) {
         data: {
             labels: labels,
             datasets: datasets.map(ds => ({
-                borderRadius: 9,
+                borderRadius: rmChartNumber('--rm-bar-radius', 10),
                 barPercentage: 0.86,
                 categoryPercentage: 0.78,
                 borderWidth: 1.5,
@@ -288,7 +288,7 @@ export function rmStackedBarChartConfig(labels, datasets, customOptions = {}) {
 export function rmPieChartConfig(labels, data, colors, customOptions = {}) {
     const defaults = rmDoughnutDefaults();
     delete defaults.cutout;
-    const translucentBg = colors.map(c => rmHexToRgba(c, 0.80));
+    const translucentBg = colors.map(c => rmHexToRgba(c, rmChartNumber('--rm-donut-ring-opacity', .86)));
     const borderColors = colors.map(c => rmHexToRgba(c, 0.98));
 
     return {
@@ -311,9 +311,11 @@ export function rmPieChartConfig(labels, data, colors, customOptions = {}) {
 
 // --- Preset: Radar Geriátrico ---
 export function rmRadarChartConfig(labels, datasets, customOptions = {}) {
-    const isDark = rmIsDark();
-    const axisTextColor = rmGetCss('--rm-chart-axis-text') || (isDark ? '#94A3B8' : '#64748B');
-    const gridColor     = rmGetCss('--rm-chart-grid')      || (isDark ? 'rgba(255,255,255,0.08)' : 'rgba(224,212,198,0.40)');
+    if (datasets.length > 2) {
+        throw new Error('RememberMind radar charts support at most two series');
+    }
+    const axisTextColor = rmGetCss('--rm-chart-axis-text');
+    const gridColor     = rmGetCss('--rm-chart-grid-soft');
     const base = rmBaseChartOptions();
     delete base.scales;
 
@@ -323,9 +325,9 @@ export function rmRadarChartConfig(labels, datasets, customOptions = {}) {
             labels: labels,
             datasets: datasets.map(ds => ({
                 fill: true,
-                pointRadius: 3,
+                pointRadius: rmChartNumber('--rm-radar-node-size', 4) / 2,
                 pointHoverRadius: 5,
-                borderWidth: 2.5,
+                borderWidth: rmChartNumber('--rm-radar-stroke-width', 2),
                 ...ds,
             }))
         },
@@ -365,9 +367,8 @@ export function rmScatterChartConfig(datasets, customOptions = {}) {
 
 // --- Preset: Gauge / Semicírculo ---
 export function rmGaugeConfig(value, max = 100, color = null, customOptions = {}) {
-    const isDark = rmIsDark();
-    const fillColor = color ? rmHexToRgba(color, 0.85) : (rmGetCss('--rm-chart-1') || '#344D7A');
-    const trackColor = rmGetCss('--rm-chart-sage-soft') || (isDark ? 'rgba(255,255,255,0.09)' : 'rgba(216,233,216,0.70)');
+    const fillColor = rmHexToRgba(color || rmChartColor('care'), rmChartNumber('--rm-radial-ring-opacity', .88));
+    const trackColor = rmHexToRgba(rmChartColor('care', 'soft'), rmChartNumber('--rm-radial-track-opacity', .16));
 
     return {
         type: 'doughnut',
@@ -383,7 +384,7 @@ export function rmGaugeConfig(value, max = 100, color = null, customOptions = {}
             maintainAspectRatio: false,
             circumference: 180,
             rotation: -90,
-            cutout: '58%',
+            cutout: rmGetCss('--rm-radial-cutout'),
             plugins: {
                 legend: { display: false },
                 tooltip: { enabled: false },
@@ -395,19 +396,21 @@ export function rmGaugeConfig(value, max = 100, color = null, customOptions = {}
 }
 // --- Preset: Micrográfico / Sparkline Clínico con Movimiento Suave Translúcido ---
 export function rmSparklineChartConfig(labels, data, color = null, customOptions = {}) {
-    const mainColor = color || rmGetCss('--rm-chart-1') || '#7FA883';
-    const pointSurface = rmGetCss('--rm-chart-card-bg') || rmGetCss('--rm-surface-raised');
+    const mainColor = color || rmChartColor('care');
+    const pointSurface = rmGetCss('--rm-chart-surface-bg');
+    const sparklineWidth = rmChartNumber('--rm-sparkline-stroke-width', 2.5);
+    const sparklineFill = rmChartNumber('--rm-sparkline-fill-opacity', .10);
 
     // Gradiente vertical translúcido para el área
     const fillGradient = (context) => {
         const chart = context.chart;
         const { ctx, chartArea } = chart;
         if (!chartArea) {
-            return rmHexToRgba(mainColor, .16);
+            return rmHexToRgba(mainColor, sparklineFill);
         }
         const gradient = ctx.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
-        gradient.addColorStop(0, rmHexToRgba(mainColor, .18));
-        gradient.addColorStop(0.65, rmHexToRgba(mainColor, .06));
+        gradient.addColorStop(0, rmHexToRgba(mainColor, sparklineFill));
+        gradient.addColorStop(0.65, rmHexToRgba(mainColor, sparklineFill / 2));
         gradient.addColorStop(1, rmHexToRgba(mainColor, 0.01));
         return gradient;
     };
@@ -424,14 +427,14 @@ export function rmSparklineChartConfig(labels, data, color = null, customOptions
                 backgroundColor: ds.backgroundColor || ((ctx) => {
                     const chart = ctx.chart;
                     const { ctx: cCtx, chartArea } = chart;
-                    if (!chartArea) return rmHexToRgba(dsColor, .16);
+                    if (!chartArea) return rmHexToRgba(dsColor, sparklineFill);
                     const grad = cCtx.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
-                    grad.addColorStop(0, rmHexToRgba(dsColor, .18));
-                    grad.addColorStop(0.7, rmHexToRgba(dsColor, .06));
+                    grad.addColorStop(0, rmHexToRgba(dsColor, sparklineFill));
+                    grad.addColorStop(0.7, rmHexToRgba(dsColor, sparklineFill / 2));
                     grad.addColorStop(1, rmHexToRgba(dsColor, 0.01));
                     return grad;
                 }),
-                borderWidth: 2.75,
+                borderWidth: sparklineWidth,
                 tension: 0.40,
                 fill: true,
                 pointRadius: customOptions._showPoints ? 2.5 : 0,
@@ -450,7 +453,7 @@ export function rmSparklineChartConfig(labels, data, color = null, customOptions
             data: Array.isArray(data) ? data : [],
             borderColor: mainColor,
             backgroundColor: fillGradient,
-            borderWidth: 2.75,
+            borderWidth: sparklineWidth,
             tension: 0.40,
             fill: true,
             pointRadius: customOptions._showPoints !== false ? 2.5 : 0,
@@ -491,7 +494,7 @@ export function rmSparklineChartConfig(labels, data, color = null, customOptions
             transitions: {
                 active: {
                     animation: {
-                        duration: 250,
+                        duration: rmPrefersReducedMotion() ? 0 : 250,
                         easing: 'easeOutCubic'
                     }
                 }
@@ -560,3 +563,43 @@ export function rmSparklineChartConfig(labels, data, color = null, customOptions
 }
 
 export const rmMiniLineChartConfig = rmSparklineChartConfig;
+
+/**
+ * Entrada semántica para nuevas gráficas. `tone` describe el dato, no la página.
+ * Los gráficos de gravedad clínica deben recibir colores explícitos del dominio.
+ */
+export function rmSemanticChartConfig(type, tone, labels, data, customOptions = {}) {
+    const primary = rmChartColor(tone);
+    const secondary = ['residents', 'beds', 'alerts', 'medication', 'staff', 'activities', 'cognitive', 'rehab'].includes(tone)
+        ? rmChartColor(tone, 'secondary')
+        : rmChartColor('reference');
+    if (type === 'donut' && labels.length > 2 && !customOptions.colors) {
+        throw new Error('Multi-category donuts require explicit semantic colors in customOptions.colors');
+    }
+    const series = (Array.isArray(data) && data.length && typeof data[0] === 'object' && 'data' in data[0])
+        ? data.map((item, index) => {
+            const color = index === 0 ? primary : secondary;
+            return {
+                ...item,
+                borderColor: item.borderColor || color,
+                backgroundColor: item.backgroundColor || (type === 'line' || type === 'area'
+                    ? rmHexToRgba(color, rmChartNumber('--rm-line-area-opacity', .12))
+                    : color),
+            };
+        })
+        : [{ label: tone, data, borderColor: primary,
+            backgroundColor: type === 'line' || type === 'area'
+                ? rmHexToRgba(primary, rmChartNumber('--rm-line-area-opacity', .12)) : primary }];
+
+    switch (type) {
+        case 'line': return rmLineChartConfig(labels, series, customOptions);
+        case 'area': return rmAreaChartConfig(labels, series, customOptions);
+        case 'bar': return rmBarChartConfig(labels, series, customOptions);
+        case 'stackedBar': return rmStackedBarChartConfig(labels, series, customOptions);
+        case 'radar': return rmRadarChartConfig(labels, series, customOptions);
+        case 'sparkline': return rmSparklineChartConfig(labels, data, primary, customOptions);
+        case 'barHorizontal': return rmBarHorizontalChartConfig(labels, data, labels.map((_, index) => index ? secondary : primary), customOptions);
+        case 'donut': return rmDoughnutChartConfig(labels, data, customOptions.colors || labels.map((_, index) => index ? secondary : primary), customOptions);
+        default: throw new Error(`Unknown RememberMind chart type: ${type}`);
+    }
+}

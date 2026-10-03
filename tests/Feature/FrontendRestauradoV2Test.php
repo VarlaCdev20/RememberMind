@@ -37,7 +37,8 @@ class FrontendRestauradoV2Test extends TestCase
         $this->actingAs($usuario)
             ->get('/dashboard')
             ->assertOk()
-            ->assertSee('bajo supervisión global');
+            ->assertSee('Superadministración')
+            ->assertDontSee('bajo supervisión global');
     }
 
     public function test_modulos_visuales_principales_no_responden_con_error_de_servidor(): void

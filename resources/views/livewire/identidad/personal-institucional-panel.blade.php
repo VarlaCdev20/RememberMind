@@ -918,7 +918,7 @@
 
   <div class="grid grid-cols-1 gap-4 xl:grid-cols-2">
    <div class="rm-chart-card rm-chart-glass flex h-[300px] flex-col">
-   <h4 class="mb-2 flex items-center gap-2 text-sm font-black text-titulo">
+   <h4 class="rm-chart-title mb-2 flex items-center gap-2">
     <i class="ph-fill ph-chart-pie-slice text-boton-acento"></i>
     Distribución por áreas
    </h4>
@@ -933,44 +933,12 @@
      this.$nextTick(() => {
      if (!this.hasData || !this.$refs.chart || typeof Chart === 'undefined') return;
      const canvas = this.$refs.chart;
-     const previous = Chart.getChart(canvas);
-     if (previous) previous.destroy();
 
-     const root = document.documentElement;
-     const textColor = getComputedStyle(root).getPropertyValue('--color-texto').trim() || '#6B7280';
-
-     new Chart(canvas, {
-      type: 'doughnut',
-      data: {
-      labels: @js($chartData['area_labels'] ?? []),
-      datasets: [{
-       data: @js($chartData['area_data'] ?? []),
-       backgroundColor: [
-       getComputedStyle(root).getPropertyValue('--color-grafico-1').trim() || '#3F7D5A',
-       getComputedStyle(root).getPropertyValue('--color-grafico-2').trim() || '#D9795F',
-       getComputedStyle(root).getPropertyValue('--color-grafico-3').trim() || '#293A59'
-       ],
-       borderWidth: 0,
-       hoverOffset: 4
-      }]
-      },
-      options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      cutout: '62%',
-      plugins: {
-       legend: {
-       position: 'bottom',
-       labels: {
-        color: textColor,
-        usePointStyle: true,
-        boxWidth: 8,
-        font: { family: 'Outfit', size: 10, weight: '600' }
-       }
-       }
-      }
-      }
-     });
+     const api = window.RMCharts;
+     const labels = @js($chartData['area_labels'] ?? []);
+     const config = api.presets.doughnut(labels, @js($chartData['area_data'] ?? []), labels.map((_, index) => api.palette()[index % 6]));
+     config.options.plugins.legend = { display: true, position: 'bottom', labels: { color: api.getCss('--rm-chart-label'), usePointStyle: true, font: { family: api.getCss('--rm-chart-font-family'), size: api.number('--rm-chart-legend-size', 12), weight: '600' } } };
+     api.init('personal-area', canvas, config);
      });
     }
     }"
@@ -984,7 +952,7 @@
    </div>
 
    <div class="rm-chart-card rm-chart-glass flex h-[300px] flex-col">
-   <h4 class="mb-2 flex items-center gap-2 text-sm font-black text-titulo">
+   <h4 class="rm-chart-title mb-2 flex items-center gap-2">
     <i class="ph-fill ph-chart-bar text-estado-info"></i>
     Estado laboral
    </h4>
@@ -999,48 +967,16 @@
      this.$nextTick(() => {
      if (!this.hasData || !this.$refs.chart || typeof Chart === 'undefined') return;
      const canvas = this.$refs.chart;
-     const previous = Chart.getChart(canvas);
-     if (previous) previous.destroy();
 
-     const root = document.documentElement;
-     const textColor = getComputedStyle(root).getPropertyValue('--color-texto').trim() || '#6B7280';
-     const gridColor = getComputedStyle(root).getPropertyValue('--color-borde').trim() || '#E5E7EB';
-
-     new Chart(canvas, {
-      type: 'bar',
-      data: {
-      labels: @js($chartData['estado_labels'] ?? []),
-      datasets: [{
-       label: 'Personal',
-       data: @js($chartData['estado_data'] ?? []),
-       backgroundColor: [
-       getComputedStyle(root).getPropertyValue('--color-grafico-1').trim() || '#3F7D5A',
-       getComputedStyle(root).getPropertyValue('--color-grafico-4').trim() || '#94A3B8',
-       getComputedStyle(root).getPropertyValue('--color-grafico-3').trim() || '#E9A05F',
-       getComputedStyle(root).getPropertyValue('--color-grafico-2').trim() || '#D9795F'
-       ],
-       borderRadius: 8,
-       maxBarThickness: 46
-      }]
-      },
-      options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: { legend: { display: false } },
-      scales: {
-       y: {
-       beginAtZero: true,
-       border: { display: false },
-       grid: { color: gridColor },
-       ticks: { precision: 0, color: textColor, font: { family: 'Outfit', size: 10 } }
-       },
-       x: {
-       grid: { display: false },
-       ticks: { color: textColor, font: { family: 'Outfit', size: 10, weight: '600' } }
-       }
-      }
-      }
-     });
+     const api = window.RMCharts;
+     const config = api.presets.bar(@js($chartData['estado_labels'] ?? []), [{
+      label: 'Personal', data: @js($chartData['estado_data'] ?? []),
+      backgroundColor: [api.color('care'), api.color('reference'), api.color('neutral'), api.color('reference')]
+     }]);
+     config.options.scales.x.grid.display = false;
+     config.options.scales.y.beginAtZero = true;
+     config.options.scales.y.ticks.precision = 0;
+     api.init('personal-estado', canvas, config);
      });
     }
     }"
@@ -1054,7 +990,7 @@
    </div>
 
    <div class="rm-chart-card rm-chart-glass flex h-[300px] flex-col">
-   <h4 class="mb-2 flex items-center gap-2 text-sm font-black text-titulo">
+   <h4 class="rm-chart-title mb-2 flex items-center gap-2">
     <i class="ph-fill ph-clock text-modulo-salud"></i>
     Personal asignado por turno
    </h4>
@@ -1069,44 +1005,11 @@
      this.$nextTick(() => {
      if (!this.hasData || !this.$refs.chart || typeof Chart === 'undefined') return;
      const canvas = this.$refs.chart;
-     const previous = Chart.getChart(canvas);
-     if (previous) previous.destroy();
 
-     const root = document.documentElement;
-     const textColor = getComputedStyle(root).getPropertyValue('--color-texto').trim() || '#6B7280';
-     const gridColor = getComputedStyle(root).getPropertyValue('--color-borde').trim() || '#E5E7EB';
-
-     new Chart(canvas, {
-      type: 'bar',
-      data: {
-      labels: @js($chartData['turno_labels'] ?? []),
-      datasets: [{
-       label: 'Personal',
-       data: @js($chartData['turno_data'] ?? []),
-       backgroundColor: getComputedStyle(root).getPropertyValue('--color-grafico-1').trim() || '#3F7D5A',
-       borderRadius: 8,
-       maxBarThickness: 36
-      }]
-      },
-      options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      indexAxis: 'y',
-      plugins: { legend: { display: false } },
-      scales: {
-       x: {
-       beginAtZero: true,
-       border: { display: false },
-       grid: { color: gridColor },
-       ticks: { precision: 0, color: textColor, font: { family: 'Outfit', size: 10 } }
-       },
-       y: {
-       grid: { display: false },
-       ticks: { color: textColor, font: { family: 'Outfit', size: 10, weight: '600' } }
-       }
-      }
-      }
-     });
+     const api = window.RMCharts;
+     const labels = @js($chartData['turno_labels'] ?? []);
+     const config = api.presets.barHorizontal(labels, @js($chartData['turno_data'] ?? []), labels.map(() => api.color('staff')));
+     api.init('personal-turno', canvas, config);
      });
     }
     }"
@@ -1120,7 +1023,7 @@
    </div>
 
    <div class="rm-chart-card rm-chart-glass flex h-[300px] flex-col">
-   <h4 class="mb-2 flex items-center gap-2 text-sm font-black text-titulo">
+   <h4 class="rm-chart-title mb-2 flex items-center gap-2">
     <i class="ph-fill ph-first-aid text-estado-exito"></i>
     Distribución del personal de salud
    </h4>
@@ -1135,46 +1038,12 @@
      this.$nextTick(() => {
      if (!this.hasData || !this.$refs.chart || typeof Chart === 'undefined') return;
      const canvas = this.$refs.chart;
-     const previous = Chart.getChart(canvas);
-     if (previous) previous.destroy();
 
-     const root = document.documentElement;
-     const textColor = getComputedStyle(root).getPropertyValue('--color-texto').trim() || '#6B7280';
-
-     new Chart(canvas, {
-      type: 'doughnut',
-      data: {
-      labels: @js($chartData['salud_labels'] ?? []),
-      datasets: [{
-       data: @js($chartData['salud_data'] ?? []),
-       backgroundColor: [
-       getComputedStyle(root).getPropertyValue('--color-grafico-1').trim() || '#3F7D5A',
-       getComputedStyle(root).getPropertyValue('--color-grafico-2').trim() || '#D9795F',
-       getComputedStyle(root).getPropertyValue('--color-grafico-3').trim() || '#E9A05F',
-       getComputedStyle(root).getPropertyValue('--color-grafico-4').trim() || '#293A59',
-       '#7FA587'
-       ],
-       borderWidth: 0,
-       hoverOffset: 4
-      }]
-      },
-      options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      cutout: '62%',
-      plugins: {
-       legend: {
-       position: 'bottom',
-       labels: {
-        color: textColor,
-        usePointStyle: true,
-        boxWidth: 8,
-        font: { family: 'Outfit', size: 10, weight: '600' }
-       }
-       }
-      }
-      }
-     });
+     const api = window.RMCharts;
+     const labels = @js($chartData['salud_labels'] ?? []);
+     const config = api.presets.doughnut(labels, @js($chartData['salud_data'] ?? []), labels.map((_, index) => api.palette()[index % 6]));
+     config.options.plugins.legend = { display: true, position: 'bottom', labels: { color: api.getCss('--rm-chart-label'), usePointStyle: true, font: { family: api.getCss('--rm-chart-font-family'), size: api.number('--rm-chart-legend-size', 12), weight: '600' } } };
+     api.init('personal-salud', canvas, config);
      });
     }
     }"

@@ -296,8 +296,8 @@
                     </template>
                     <template x-if="metricaActiva !== 'PA'">
                         <span class="inline-flex items-center gap-1.5 font-bold"
-                              :style="`color: ${metricasInfo[metricaActiva]?.color || '#634A35'}`">
-                            <span class="h-2 w-2 rounded-full" :style="`background-color: ${metricasInfo[metricaActiva]?.color || '#634A35'}`"></span>
+                              class="text-[var(--rm-chart-clinical-500)]">
+                            <span class="h-2 w-2 rounded-full bg-[var(--rm-chart-clinical-500)]"></span>
                             <span x-text="`${metricasInfo[metricaActiva]?.nombre} (${metricasInfo[metricaActiva]?.unidad})`"></span>
                         </span>
                     </template>
@@ -1483,16 +1483,11 @@ document.addEventListener('alpine:init', () => {
 
             if (canvas.offsetParent === null) return;
 
-            const existing = Chart.getChart(canvas);
-            if (existing) {
-                try { existing.destroy(); } catch (e) {}
-            }
-
             const self = this;
             const isDark = document.documentElement.classList.contains('dark');
-            const chartToken = (name, fallback) => window.RMCharts?.getCss(name) || fallback;
-            const chartGrid = chartToken('--rm-chart-grid-strong', 'rgba(80, 71, 65, 0.22)');
-            const chartSuccess = chartToken('--rm-chart-3', '#78B985');
+            const chartToken = (name) => window.RMCharts?.getCss(name);
+            const chartGrid = chartToken('--rm-chart-grid-strong');
+            const chartSuccess = window.RMCharts.color('care');
             const datasets = this.getDatasetsForMetrica(this.metricaActiva, isDark);
             const scalesConfig = this.getScalesForMetrica(this.metricaActiva, isDark);
 
@@ -1535,11 +1530,11 @@ document.addEventListener('alpine:init', () => {
 
                     ctx.save();
                     // Franja verde suave de normalidad
-                    ctx.fillStyle = window.RMCharts?.hexToRgba(chartSuccess, isDark ? 0.06 : 0.08) || chartSuccess;
+                    ctx.fillStyle = window.RMCharts.hexToRgba(chartSuccess, window.RMCharts.number('--rm-radar-grid-opacity', .07));
                     ctx.fillRect(chartArea.left, yHigh, chartArea.width, yLow - yHigh);
 
                     // Límites punteados
-                    ctx.strokeStyle = window.RMCharts?.hexToRgba(chartSuccess, isDark ? 0.30 : 0.35) || chartSuccess;
+                    ctx.strokeStyle = window.RMCharts.hexToRgba(chartSuccess, window.RMCharts.number('--rm-radar-axis-opacity', .16));
                     ctx.lineWidth = 1;
                     ctx.setLineDash([4, 4]);
 
@@ -1592,15 +1587,15 @@ document.addEventListener('alpine:init', () => {
                             return 'end';
                         },
                         offset: 5,
-                        backgroundColor: chartToken('--rm-chart-tooltip-bg', '#F0E7DE'),
+                        backgroundColor: chartToken('--rm-chart-tooltip-bg'),
                         borderColor: (context) => {
-                            return context.dataset.borderColor || chartToken('--rm-chart-2', '#527DAA');
+                            return context.dataset.borderColor || chartToken('--rm-chart-2');
                         },
                         borderWidth: 1.2,
                         borderRadius: 5,
                         padding: { top: 2, bottom: 2, left: 5, right: 5 },
                         color: (context) => {
-                            return chartToken('--rm-chart-tooltip-text', '#342E2A');
+                            return chartToken('--rm-chart-tooltip-text');
                         },
                         font: {
                             size: 10,
@@ -1621,10 +1616,10 @@ document.addEventListener('alpine:init', () => {
 
                     tooltip: {
                         enabled: true,
-                        backgroundColor: chartToken('--rm-chart-tooltip-bg', '#F0E7DE'),
-                        titleColor: chartToken('--rm-chart-tooltip-text', '#342E2A'),
-                        bodyColor: chartToken('--rm-chart-tooltip-text', '#342E2A'),
-                        borderColor: chartToken('--rm-chart-tooltip-border', '#C9BAAC'),
+                        backgroundColor: chartToken('--rm-chart-tooltip-bg'),
+                        titleColor: chartToken('--rm-chart-tooltip-text'),
+                        bodyColor: chartToken('--rm-chart-tooltip-text'),
+                        borderColor: chartToken('--rm-chart-tooltip-border'),
                         borderWidth: 1,
                         padding: 12,
                         cornerRadius: 10,
@@ -1668,7 +1663,7 @@ document.addEventListener('alpine:init', () => {
                 });
             }
 
-            this.mainChart = new Chart(canvas, {
+            this.mainChart = window.RMCharts.init('signos-vitales-principal', canvas, {
                 type: 'line',
                 data: {
                     labels: plotLabels,
@@ -1748,17 +1743,17 @@ document.addEventListener('alpine:init', () => {
         },
 
         getDatasetsForMetrica(metrica, isDark) {
-            const chartToken = (name, fallback) => window.RMCharts?.getCss(name) || fallback;
+            const chartToken = (name) => window.RMCharts?.getCss(name);
             const colors = {
-                mint: chartToken('--rm-chart-1', '#4F895E'),
-                blue: chartToken('--rm-chart-2', '#527DAA'),
-                mintSoft: chartToken('--rm-chart-3', '#78B985'),
-                blueSoft: chartToken('--rm-chart-4', '#6F92BC'),
-                mocha: chartToken('--rm-chart-5', '#8A7A70'),
-                warm: chartToken('--rm-chart-6', '#A89789'),
-                blueDeep: chartToken('--rm-chart-7', '#355D86'),
-                coral: chartToken('--rm-chart-10', '#C94F45'),
-                pointBorder: chartToken('--rm-surface-raised', '#F0E7DE'),
+                mint: window.RMCharts.color('care'),
+                blue: window.RMCharts.color('clinical'),
+                mintSoft: window.RMCharts.color('rehab'),
+                blueSoft: window.RMCharts.color('reference'),
+                mocha: window.RMCharts.color('neutral'),
+                warm: window.RMCharts.color('neutral'),
+                blueDeep: window.RMCharts.color('clinical'),
+                coral: window.RMCharts.color('clinical'),
+                pointBorder: chartToken('--rm-chart-surface-bg'),
             };
             const makeGradient = (ctx, colorHex, alphaTop = 0.22, alphaBottom = 0.0) => {
                 const chart = ctx.chart;
@@ -1838,15 +1833,15 @@ document.addEventListener('alpine:init', () => {
         renderSparklines() {
             const isDark = document.documentElement.classList.contains('dark');
             const self = this;
-            const chartToken = (name, fallback) => window.RMCharts?.getCss(name) || fallback;
+            const chartToken = (name) => window.RMCharts?.getCss(name);
             const colors = {
-                mint: chartToken('--rm-chart-1', '#4F895E'),
-                blue: chartToken('--rm-chart-2', '#527DAA'),
-                mintSoft: chartToken('--rm-chart-3', '#78B985'),
-                blueSoft: chartToken('--rm-chart-4', '#6F92BC'),
-                warm: chartToken('--rm-chart-6', '#A89789'),
-                blueDeep: chartToken('--rm-chart-7', '#355D86'),
-                coral: chartToken('--rm-chart-10', '#C94F45'),
+                mint: window.RMCharts.color('care'),
+                blue: window.RMCharts.color('clinical'),
+                mintSoft: window.RMCharts.color('rehab'),
+                blueSoft: window.RMCharts.color('reference'),
+                warm: window.RMCharts.color('neutral'),
+                blueDeep: window.RMCharts.color('clinical'),
+                coral: window.RMCharts.color('clinical'),
             };
 
             const cards = [
@@ -1896,11 +1891,6 @@ document.addEventListener('alpine:init', () => {
                 if (!canvas) return;
 
                 if (canvas.offsetParent === null) return;
-
-                const existing = Chart.getChart(canvas);
-                if (existing) {
-                    try { existing.destroy(); } catch (e) {}
-                }
 
                 let plotA = [...(item.dataA || [])];
                 let plotB = item.dataB ? [...item.dataB] : [];
@@ -1957,7 +1947,7 @@ document.addEventListener('alpine:init', () => {
                     }];
                 }
 
-                new Chart(canvas, {
+                window.RMCharts.init(`signos-mini-${item.id}`, canvas, {
                     type: 'line',
                     data: {
                         labels: sLabels,
@@ -1985,11 +1975,7 @@ document.addEventListener('alpine:init', () => {
         },
 
         hexToRgba(hex, alpha = 1) {
-            const cleanHex = hex.replace('#', '');
-            const r = parseInt(cleanHex.substring(0, 2), 16) || 0;
-            const g = parseInt(cleanHex.substring(2, 4), 16) || 0;
-            const b = parseInt(cleanHex.substring(4, 6), 16) || 0;
-            return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+            return window.RMCharts.hexToRgba(hex, alpha);
         }
     }));
 });

@@ -29,6 +29,8 @@ import {
     rmHexToRgba,
     rmChartPalette,
     rmChartPaletteAlpha,
+    rmChartNumber,
+    rmChartColor,
     rmChartSemanticColors,
     rmGetOriginColor,
     rmGetOriginLabel,
@@ -55,6 +57,7 @@ import {
     rmGaugeConfig,
     rmSparklineChartConfig,
     rmMiniLineChartConfig,
+    rmSemanticChartConfig,
 } from '../styles/design-system/charts/chart-presets.js';
 
 import {
@@ -69,6 +72,7 @@ import {
     rmWatchLivewireData,
     rmOnThemeChange,
 } from '../styles/design-system/charts/chart-livewire.js';
+import { rmObserveChartCards } from '../styles/design-system/charts/chart-motion.js';
 
 // Namespace único oficial: window.RMCharts
 window.RMCharts = {
@@ -90,6 +94,8 @@ window.RMCharts = {
     hexToRgba: rmHexToRgba,
     palette: rmChartPalette,
     paletteAlpha: rmChartPaletteAlpha,
+    number: rmChartNumber,
+    color: rmChartColor,
     semanticColors: rmChartSemanticColors,
     getOriginColor: rmGetOriginColor,
     getOriginLabel: rmGetOriginLabel,
@@ -102,6 +108,7 @@ window.RMCharts = {
 
     // Presets canónicos
     presets: {
+        semantic: rmSemanticChartConfig,
         doughnut: rmDoughnutChartConfig,
         barHorizontal: rmBarHorizontalChartConfig,
         area: rmAreaChartConfig,
@@ -116,6 +123,12 @@ window.RMCharts = {
         miniLine: rmMiniLineChartConfig,
     },
 };
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', rmObserveChartCards, { once: true });
+} else {
+    rmObserveChartCards();
+}
 
 import { iniciarEfectosAmbientales } from './components/efectos-ambientales.js';
 iniciarEfectosAmbientales(AOS);

@@ -172,13 +172,13 @@
         <div class="rm-chart-card rm-chart-glass p-5 rounded-2xl">
             <div class="rm-seccion-titulo-verde font-bold text-xs uppercase tracking-wider mb-3">Por Estado</div>
             <div style="position:relative; height:240px;">
-                <canvas id="rm-chart-estado"></canvas>
+                <canvas id="rm-chart-estado" role="img" aria-label="Distribución de residentes por estado"></canvas>
             </div>
         </div>
         <div class="rm-chart-card rm-chart-glass p-5 rounded-2xl">
             <div class="rm-seccion-titulo-naranja font-bold text-xs uppercase tracking-wider mb-3">Por Género</div>
             <div style="position:relative; height:240px;">
-                <canvas id="rm-chart-genero"></canvas>
+                <canvas id="rm-chart-genero" role="img" aria-label="Distribución de residentes por género"></canvas>
             </div>
         </div>
     </div>
@@ -187,7 +187,7 @@
     <div class="rm-chart-card rm-chart-glass p-5 rounded-2xl">
         <div class="rm-seccion-titulo-morado font-bold text-xs uppercase tracking-wider mb-3">Por Rango de Edad</div>
         <div style="position:relative; height:210px;">
-            <canvas id="rm-chart-edad"></canvas>
+            <canvas id="rm-chart-edad" role="img" aria-label="Residentes por rango de edad"></canvas>
         </div>
     </div>
 </div>
@@ -339,234 +339,69 @@
 @unless($esPdf)
 @push('scripts')
 <script>
-(function () {
-    var RM = {
+(() => {
+    const reports = {
         estado: @json($graficas['estado']),
         genero: @json($graficas['genero']),
-        edad:   @json($graficas['edad']),
+        edad: @json($graficas['edad']),
     };
 
-    function hexToRgba(hex, alpha) {
-        if (window.RMCharts && window.RMCharts.helpers && window.RMCharts.helpers.hexToRgba) {
-            return window.RMCharts.helpers.hexToRgba(hex, alpha);
-        }
-        if (!hex || typeof hex !== 'string') return hex;
-        let c = hex.replace('#', '');
-        if (c.length === 3) c = c.split('').map(x => x + x).join('');
-        if (c.length === 6) {
-            const num = parseInt(c, 16);
-            return `rgba(${(num >> 16) & 255}, ${(num >> 8) & 255}, ${num & 255}, ${alpha})`;
-        }
-        return hex;
-    }
+    const render = () => {
+        const api = window.RMCharts;
+        if (!api || !window.Chart) return;
 
-    function inicializarGraficas() {
-        if (typeof window.Chart === 'undefined') {
-            setTimeout(inicializarGraficas, 60);
-            return;
-        }
-
-        var Chart = window.Chart;
-        window.__rmReportesAdultosCharts = window.__rmReportesAdultosCharts || new Map();
-        function setChart(key, chart) {
-            if (window.__rmReportesAdultosCharts.has(key)) {
-                try { window.__rmReportesAdultosCharts.get(key).destroy(); } catch (e) {}
-            }
-            window.__rmReportesAdultosCharts.set(key, chart);
-            return chart;
+        const statusColors = {
+            ADMITIDO: api.color('care'),
+            ACTIVO: api.color('care'),
+            HOSPITALIZADO: api.color('clinical'),
+            BAJA: api.color('neutral'),
+            FALLECIDO: api.color('reference'),
+            INACTIVO: api.color('reference'),
+        };
+        const estado = document.getElementById('rm-chart-estado');
+        if (estado && reports.estado.labels.length) {
+            const colors = reports.estado.labels.map(label =>
+                statusColors[String(label).toUpperCase()] || api.color('neutral'));
+            const config = api.presets.doughnut(reports.estado.labels, reports.estado.data, colors);
+            config.options.plugins.legend = {
+                display: true,
+                position: 'bottom',
+                labels: api.baseOptions().plugins.legend.labels,
+            };
+            api.init('reporte-residentes-estado', estado, config);
         }
 
-        // ── 1. Doughnut: Por Estado ──
-        var ctxEstado = document.getElementById('rm-chart-estado');
-        if (ctxEstado && RM.estado.labels.length > 0) {
-            var bgColoresEstado = (RM.estado.colores || []).map(function(c) { return hexToRgba(c, 0.78); });
-            var borderColoresEstado = (RM.estado.colores || []).map(function(c) { return hexToRgba(c, 0.95); });
-
-            setChart('estado', new Chart(ctxEstado, {
-                type: 'doughnut',
-                data: {
-                    labels: RM.estado.labels,
-                    datasets: [{
-                        data: RM.estado.data,
-                        backgroundColor: bgColoresEstado,
-                        borderWidth: 2.5,
-                        borderColor: '#ffffff',
-                        hoverOffset: 8,
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    cutout: '58%',
-                    animation: {
-                        duration: 950,
-                        easing: 'easeOutQuart',
-                        animateRotate: true,
-                        animateScale: true,
-                    },
-                    plugins: {
-                        datalabels: { display: false },
-                        legend: {
-                            position: 'bottom',
-                            labels: {
-                                font: { size: 11, weight: 'bold' },
-                                color: 'var(--rm-clinical)',
-                                padding: 12,
-                                usePointStyle: true,
-                                pointStyle: 'circle',
-                            }
-                        },
-                        tooltip: {
-                            backgroundColor: 'rgba(47, 62, 92, 0.92)',
-                            titleColor: 'var(--rm-text-primary)',
-                            bodyColor: 'var(--rm-text-primary)',
-                            padding: 10,
-                            cornerRadius: 10,
-                            callbacks: {
-                                label: function(ctx) {
-                                    var total = ctx.dataset.data.reduce(function(a,b){return a+b;}, 0);
-                                    var pct = total > 0 ? Math.round(ctx.raw / total * 100) : 0;
-                                    return ' ' + ctx.raw + ' (' + pct + '%)';
-                                }
-                            }
-                        }
-                    }
-                }
-            }));
+        const genero = document.getElementById('rm-chart-genero');
+        if (genero && reports.genero.labels.length) {
+            const palette = [api.color('clinical'), api.color('rehab'), api.color('cognitive')];
+            const config = api.presets.doughnut(reports.genero.labels, reports.genero.data,
+                reports.genero.labels.map((_, index) => palette[index % palette.length]));
+            config.options.plugins.legend = {
+                display: true,
+                position: 'bottom',
+                labels: api.baseOptions().plugins.legend.labels,
+            };
+            api.init('reporte-residentes-genero', genero, config);
         }
 
-        // ── 2. Doughnut: Por Género ──
-        var ctxGenero = document.getElementById('rm-chart-genero');
-        if (ctxGenero && RM.genero.labels.length > 0) {
-            var bgColoresGenero = (RM.genero.colores || []).map(function(c) { return hexToRgba(c, 0.78); });
-
-            setChart('genero', new Chart(ctxGenero, {
-                type: 'doughnut',
-                data: {
-                    labels: RM.genero.labels,
-                    datasets: [{
-                        data: RM.genero.data,
-                        backgroundColor: bgColoresGenero,
-                        borderWidth: 2.5,
-                        borderColor: '#ffffff',
-                        hoverOffset: 8,
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    cutout: '58%',
-                    animation: {
-                        duration: 950,
-                        easing: 'easeOutQuart',
-                        animateRotate: true,
-                        animateScale: true,
-                    },
-                    plugins: {
-                        datalabels: { display: false },
-                        legend: {
-                            position: 'bottom',
-                            labels: {
-                                font: { size: 11, weight: 'bold' },
-                                color: 'var(--rm-clinical)',
-                                padding: 12,
-                                usePointStyle: true,
-                                pointStyle: 'circle',
-                            }
-                        },
-                        tooltip: {
-                            backgroundColor: 'rgba(47, 62, 92, 0.92)',
-                            titleColor: 'var(--rm-text-primary)',
-                            bodyColor: 'var(--rm-text-primary)',
-                            padding: 10,
-                            cornerRadius: 10,
-                            callbacks: {
-                                label: function(ctx) {
-                                    var total = ctx.dataset.data.reduce(function(a,b){return a+b;}, 0);
-                                    var pct = total > 0 ? Math.round(ctx.raw / total * 100) : 0;
-                                    return ' ' + ctx.raw + ' (' + pct + '%)';
-                                }
-                            }
-                        }
-                    }
-                }
-            }));
+        const edad = document.getElementById('rm-chart-edad');
+        if (edad && reports.edad.labels.length) {
+            const palette = [api.color('clinical'), api.color('care'), api.color('rehab'), api.color('cognitive')];
+            const config = api.presets.barHorizontal(reports.edad.labels, reports.edad.data,
+                reports.edad.labels.map((_, index) => palette[index % palette.length]));
+            config.options.plugins.tooltip.callbacks = {
+                label: context => ' ' + context.raw + ' residentes',
+            };
+            api.init('reporte-residentes-edad', edad, config);
         }
-
-        // ── 3. Barras Horizontales: Por Rango de Edad ──
-        var ctxEdad = document.getElementById('rm-chart-edad');
-        if (ctxEdad && RM.edad.labels.length > 0) {
-            var bgColoresEdad = (RM.edad.colores || []).map(function(c) { return hexToRgba(c, 0.80); });
-            var borderColoresEdad = (RM.edad.colores || []).map(function(c) { return hexToRgba(c, 0.98); });
-
-            setChart('edad', new Chart(ctxEdad, {
-                type: 'bar',
-                data: {
-                    labels: RM.edad.labels,
-                    datasets: [{
-                        label: 'Adultos Mayores',
-                        data: RM.edad.data,
-                        backgroundColor: bgColoresEdad,
-                        borderColor: borderColoresEdad,
-                        borderWidth: 2,
-                        borderRadius: 8,
-                        borderSkipped: false,
-                        barPercentage: 0.86,
-                        categoryPercentage: 0.92,
-                    }]
-                },
-                options: {
-                    indexAxis: 'y',
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    animation: {
-                        duration: 950,
-                        easing: 'easeOutQuart',
-                    },
-                    plugins: {
-                        datalabels: { display: false },
-                        legend: { display: false },
-                        tooltip: {
-                            backgroundColor: 'rgba(47, 62, 92, 0.92)',
-                            titleColor: 'var(--rm-text-primary)',
-                            bodyColor: 'var(--rm-text-primary)',
-                            padding: 10,
-                            cornerRadius: 10,
-                            callbacks: {
-                                label: function(ctx) {
-                                    return ' ' + ctx.raw + ' adultos';
-                                }
-                            }
-                        }
-                    },
-                    scales: {
-                        x: {
-                            beginAtZero: true,
-                            ticks: {
-                                precision: 0,
-                                color: 'var(--rm-clinical)',
-                                font: { size: 11, weight: 'bold' },
-                            },
-                            grid: { color: 'rgba(47, 62, 92, 0.08)' }
-                        },
-                        y: {
-                            ticks: {
-                                color: 'var(--rm-clinical)',
-                                font: { size: 11, weight: 'bold' },
-                            },
-                            grid: { display: false }
-                        }
-                    }
-                }
-            }));
-        }
-    }
+    };
 
     if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', inicializarGraficas);
+        document.addEventListener('DOMContentLoaded', render, { once: true });
     } else {
-        inicializarGraficas();
+        render();
     }
+    window.RMCharts?.onThemeChange(render, 'reportes-adultos-index');
 })();
 </script>
 @endpush

@@ -218,7 +218,7 @@ class BddOperativaV2Test extends TestCase
         $residente = app(FormalizarAdmision::class)->ejecutar($datos['preadmision'], ['cod_cama'=>$datos['cama']->cod_cama,'cod_contacto'=>$datos['contacto']->cod_contacto], $datos['usuario']);
         $super = User::query()->where('correo', 'carlaencinas78@gmail.com')->firstOrFail();
 
-        $this->actingAs($super)->get('/dashboard')->assertOk()->assertSee('bajo supervisión global');
+        $this->actingAs($super)->get('/dashboard')->assertOk()->assertSee('Superadministración')->assertDontSee('bajo supervisión global');
         $this->actingAs($super)->get(route('admin.residentes.show', $residente))->assertOk()->assertSee($residente->cod_residente);
     }
 

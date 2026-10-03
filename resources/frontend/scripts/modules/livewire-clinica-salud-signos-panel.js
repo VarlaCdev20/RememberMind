@@ -1,58 +1,28 @@
 
  window.rmSignosVitalesMainChart = function(root, payload) {
- if (!root || typeof Chart === 'undefined') return;
-
- if (root.__rmChart && typeof root.__rmChart.destroy === 'function') {
- root.__rmChart.destroy();
- }
-
+ if (!root || typeof Chart === 'undefined' || !window.RMCharts?.presets || !payload.main) return;
  const canvas = root.querySelector('[data-chart="main"]');
- if (!canvas || !payload.main) return;
-
- root.__rmChart = new Chart(canvas, {
- type: 'line',
- data: {
- labels: payload.main.labels || [],
- datasets: (payload.main.datasets || []).map((dataset) => ({
- label: dataset.label,
- data: dataset.data || [],
- borderColor: dataset.color,
- backgroundColor: dataset.fill ? dataset.color + '22' : 'transparent',
- tension: 0.32,
- borderWidth: 2.5,
- pointRadius: 3,
- fill: !!dataset.fill,
- spanGaps: true
- }))
- },
- options: {
- responsive: true,
- maintainAspectRatio: false,
- interaction: { mode: 'index', intersect: false },
- plugins: {
- datalabels: { display: false },
- legend: {
- position: 'bottom',
- labels: { color: '#2F3E5C', boxWidth: 10, font: { size: 11, weight: 'bold' } }
- },
- tooltip: {
- backgroundColor: 'rgba(47, 62, 92, 0.92)',
- titleColor: '#F3ECE4',
- bodyColor: '#F3ECE4',
- padding: 12,
- cornerRadius: 12
- }
- },
- scales: {
- x: { grid: { display: false }, ticks: { color: '#2F3E5C', font: { size: 10, weight: 'bold' } } },
- y: {
- grid: { color: 'rgba(47, 62, 92, 0.08)' },
- ticks: { color: '#2F3E5C', font: { size: 10, weight: 'bold' } },
- title: { display: true, text: payload.main.unit || '', color: '#2F3E5C', font: { weight: 'bold' } }
- }
- }
- }
+ if (!canvas) return;
+ const api = window.RMCharts;
+ const datasets = (payload.main.datasets || []).map((dataset, index) => {
+     const color = api.color(dataset.tone || 'clinical');
+     return {
+         label: dataset.label,
+         data: dataset.data || [],
+         borderColor: color,
+         backgroundColor: api.hexToRgba(color, api.number('--rm-line-area-opacity', .12)),
+         fill: !!dataset.fill,
+         borderDash: index > 0 ? [6, 4] : [],
+         spanGaps: true,
+     };
  });
+ const options = api.baseOptions();
+ options.plugins.legend = { display: true, position: 'bottom', labels: { color: api.getCss('--rm-chart-label'), usePointStyle: true } };
+ options.scales.x.grid.display = false;
+ options.scales.y.title = { display: true, text: payload.main.unit || '', color: api.getCss('--rm-chart-axis') };
+ const componentId = root.closest('[wire\\:id]')?.getAttribute('wire:id') || 'salud-signos';
+ root.__rmChart = api.init(`salud-signos-${componentId}`, canvas,
+     api.presets.line(payload.main.labels || [], datasets, options));
  };
 
  (() => {

@@ -1,141 +1,82 @@
-# RememberMind Chart Design System
+# Chart Design System de RememberMind
 
-## Arquitectura
+## Fuente de verdad
 
-```
-resources/frontend/styles/design-system/
-+-- tokens/
-|   +-- chart-colors.css          <- Variables CSS para charts
-+-- components/
-|   +-- charts.css                <- Estilos de cards y contenedores
-+-- charts/
-|   +-- chart-theme.js            <- Motor central (paleta, gradientes, opciones)
-|   +-- chart-presets.js          <- Presets por tipo de grafico
-|   +-- chart-livewire.js         <- Helpers para Livewire (destroy/create)
-|   +-- README.md                 <- Este archivo
-+-- examples/
-    +-- example-chart-card.blade.php
-```
+- `tokens/chart-colors.css`: colores semánticos, superficies, tipografía, opacidades, grosor, radios y estados. Sus variables sirven tanto a CSS como a Chart.js.
+- `components/charts.css`: card, encabezado, área de dibujo, leyenda y filtro.
+- `charts/chart-theme.js`: lectura de tokens, colores, defaults de Chart.js y modo oscuro.
+- `charts/chart-presets.js`: configuraciones reutilizables por tipo de gráfica.
+- `charts/chart-livewire.js`: ciclo de vida de instancias y refresco de tema.
+- `charts/chart-motion.js`: entrada única en viewport de las cards, también después de un morph de Livewire.
+- `tokens/motion.css`: duraciones y curvas compartidas; `chart-colors.css` contiene los aliases de movimiento para gráficas.
 
-## Uso Rapido
+El entrypoint es `resources/frontend/scripts/app.js`, que expone `window.RMCharts`. No hace falta instalar otra librería ni cargar una CDN.
 
-### 1. Doughnut con colores semanticos
+## Semántica
+
+| Tono | Uso |
+| --- | --- |
+| `care` | cuidado, estabilidad, cumplimiento |
+| `clinical` | información clínica, operación, disponibilidad |
+| `alert` | riesgo, alerta o incidencia real |
+| `neutral` | comparación o categoría neutra |
+| `cognitive` | cognición y ámbito psicosocial |
+| `rehab` | movilidad y rehabilitación |
+| `reference` | histórico, meta o línea base |
+
+Los aliases de dominio `residents`, `beds`, `alerts`, `medication`, `cognitive`, `rehab`, `staff` y `activities` tienen variantes `primary` y `secondary`. Un tono no determina la gravedad clínica; esta procede del dato autorizado. Para donuts con más de dos categorías, se deben pasar colores semánticos explícitos en `customOptions.colors`.
+
+## Uso
 
 ```js
-const sem = rmChartSemanticColors();
-const config = rmDoughnutChartConfig(
-    ['Critico', 'Alto', 'Medio', 'Bajo'],
-    [critico, alto, medio, bajo],
-    [sem.danger, sem.warningHigh, sem.warning, sem.info]
+const api = window.RMCharts;
+const config = api.presets.semantic('line', 'clinical', fechas, valores);
+api.init('residente-presion', canvas, config);
+```
+
+Para dos series, pasar datasets etiquetados:
+
+```js
+api.presets.semantic('area', 'residents', fechas, [
+    { label: 'Admisiones', data: admisiones },
+    { label: 'Altas', data: altas },
+]);
+```
+
+Para categorías con significado propio:
+
+```js
+api.presets.doughnut(
+    ['Activos', 'Disponibles'],
+    [activos, disponibles],
+    [api.color('care'), api.color('clinical')],
 );
-rmInitChart('canvas-id', config, this.charts, 'nivel');
 ```
 
-### 2. Barra horizontal con paleta categorica
+Los presets disponibles son `line`, `area`, `bar`, `stackedBar`, `barHorizontal`, `doughnut`, `pie`, `radar`, `scatter`, `gauge` y `sparkline`. El factory semántico admite `line`, `area`, `bar`, `stackedBar`, `barHorizontal`, `donut`, `radar` y `sparkline`.
 
-```js
-const palette = rmChartPalette();
-const config = rmBarHorizontalChartConfig(
-    labels,
-    values,
-    labels.map((_, i) => palette[i % 10])
-);
-rmInitChart('canvas-id', config, this.charts, 'origen');
-```
+`api.color(tone)`, `api.getCss('--rm-chart-*')` y `api.number('--rm-*-width', fallback)` resuelven los tokens. Evitar HEX, opacidades, tipografías y radios locales.
 
-### 3. Grafico de area
-
-```js
-const config = rmAreaChartConfig(
-    fechas,
-    [{ label: 'Presion Sistolica', data: sistolica, color: '#DC2626' }]
-);
-rmInitChart('canvas-id', config, this.charts, 'presion');
-```
-
-## Colores
-
-### Categoricos (10 colores)
-Para categorias clinicas, NO representan gravedad:
-- `--rm-chart-1` a `--rm-chart-10`
-- Acceso JS: `rmChartPalette()`
-
-### Semanticos
-Solo cuando el backend ya determino un estado:
-- `danger` -> Critico
-- `warningHigh` -> Alto
-- `warning` -> Medio/Pendiente
-- `success` -> Resuelto
-- `info` -> En atencion / Bajo
-- Acceso JS: `rmChartSemanticColors()`
-
-## Dark Mode
-
-Los graficos se actualizan automaticamente al cambiar tema:
-
-```js
-rmObserveThemeChanges(this.charts, () => this.initAllCharts());
-```
-
-Detecta `html.dark` o `data-theme="dark"` via el evento
-`remembermind:theme-changed` del sistema.
-
-## Livewire
-
-**IMPORTANTE:** Siempre destruir antes de crear:
-
-```js
-rmInitChart(canvasId, config, store, key);
-// Internamente: if (store[key]) store[key].destroy();
-```
-
-Observar cambios reactivos:
-
-```js
-rmWatchLivewireData(this.$wire, 'chartData', (newData) => {
-    this.chartData = newData;
-    this.updateCharts();
-});
-```
-
-## Reglas de Transparencia
-
-| Tipo | Fill Alpha |
-|------|-----------|
-| Area (arriba) | ~38% |
-| Area (centro) | ~18% |
-| Area (abajo) | ~2% |
-| Doughnut/Pie | ~85-90% |
-| Radar | ~15-20% |
-| Barras | ~72-92% gradiente |
-
-## Alturas Estandar
-
-| Clase | Altura |
-|-------|--------|
-| `.is-sm` | 210px |
-| `.is-md` | 250px |
-| `.is-lg` | 300px |
-
-## Cards
+## Componente visual
 
 ```html
-<section class="rm-chart-card rm-chart-glass">
+<section class="rm-chart-card">
     <header class="rm-chart-header">
         <div class="rm-chart-heading">
-            <h3 class="rm-chart-title">Titulo</h3>
-            <p class="rm-chart-subtitle">Subtitulo</p>
+            <h3 class="rm-chart-title">Evolución clínica</h3>
+            <p class="rm-chart-subtitle">Últimos 30 días</p>
         </div>
     </header>
     <div class="rm-chart-body is-md">
-        <canvas id="chart-id"></canvas>
+        <canvas aria-label="Evolución clínica de los últimos 30 días" role="img"></canvas>
     </div>
 </section>
 ```
 
-## NO Hacer
+Las gráficas deben acompañarse de etiquetas y valores legibles. Un canvas por sí solo no debe ser la única forma de acceder a un dato operativo esencial. El sistema respeta movimiento reducido y tokens de modo oscuro. Si una pantalla crea configuraciones al cambiar de tema, registrar su renderizador con `api.onThemeChange(render)`.
 
-- NO hardcodear `backgroundColor: '#...'` en vistas
-- NO crear charts-v2.js o similares
-- NO instalar plugins sin auditar package.json
-- NO decidir umbrales medicos desde el design system
+`api.init(key, canvas, config)` conserva la instancia y la visibilidad de series cuando coinciden la clave, el canvas y el tipo. Actualiza los valores con interpolación de `--rm-chart-motion-update-duration`; solo reemplaza la instancia cuando cambia el canvas o el tipo. La primera entrada de cada card se observa una vez con `IntersectionObserver`; los gráficos fuera de pantalla no reciben efectos repetidos al volver a hacer scroll. En cambios de datos de Livewire se debe llamar otra vez a `api.init` con la misma clave.
+
+## Datos
+
+Los tokens solo cambian la presentación. Reutilizar Models/Services/queries existentes y documentar para cada gráfica fuente, período, denominador y estados incluidos. No inventar métricas, gravedad ni columnas para completar una visualización.

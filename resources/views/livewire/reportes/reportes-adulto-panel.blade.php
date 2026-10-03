@@ -151,10 +151,7 @@
  <div class="grid gap-6 lg:grid-cols-2">
  {{-- Gráfico Signos Vitales --}}
  <div class="rm-chart-card rm-chart-glass flex flex-col justify-between">
- <h4 class="text-xs font-bold text-titulo mb-3 flex items-center gap-1.5">
- <span class="h-2 w-2 rounded-full bg-fondo-panel"></span>
- Evolución de Signos Vitales
- </h4>
+ <div class="rm-chart-header"><i class="ph-bold ph-heartbeat" aria-hidden="true"></i><div class="rm-chart-heading"><h4 class="rm-chart-title">Evolución de Signos Vitales</h4><p class="rm-chart-subtitle">Controles del período seleccionado</p></div></div>
 
  @if(empty($chartSignos['fc'] ?? []))
  <div class="flex flex-col items-center justify-center py-16 text-center border-2 border-dashed border-borde-suave rounded-xl bg-fondo-panel min-h-[260px]">
@@ -171,9 +168,9 @@
      data: {
      labels: @js($chartSignos['labels']),
      datasets: [
-      { label: 'Frecuencia Cardíaca', data: @js($chartSignos['fc']), borderColor: 'var(--rm-danger)', backgroundColor: 'rgba(217,116,91,0.14)', tension: 0.38, fill: true, pointRadius: 4, pointHoverRadius: 6, borderWidth: 2.5 },
-      { label: 'Saturación O2', data: @js($chartSignos['sat']), borderColor: 'var(--rm-clinical)', backgroundColor: 'rgba(78,140,166,0.10)', tension: 0.38, fill: true, pointRadius: 3.5, borderWidth: 2 },
-      { label: 'Temperatura', data: @js($chartSignos['temp']), borderColor: 'var(--rm-success)', backgroundColor: 'transparent', tension: 0.38, pointRadius: 3.5, borderWidth: 2 }
+      { label: 'Frecuencia Cardíaca', data: @js($chartSignos['fc']), borderColor: window.RMCharts.color('clinical'), backgroundColor: window.RMCharts.hexToRgba(window.RMCharts.color('clinical'), window.RMCharts.number('--rm-line-area-opacity', .12)), tension: 0.38, fill: true, borderWidth: window.RMCharts.number('--rm-line-stroke-width', 3) },
+      { label: 'Saturación O2', data: @js($chartSignos['sat']), borderColor: window.RMCharts.color('care'), backgroundColor: window.RMCharts.hexToRgba(window.RMCharts.color('care'), window.RMCharts.number('--rm-line-area-secondary-opacity', .09)), tension: 0.38, fill: true, borderWidth: window.RMCharts.number('--rm-line-stroke-width', 3) },
+      { label: 'Temperatura', data: @js($chartSignos['temp']), borderColor: window.RMCharts.color('reference'), backgroundColor: 'transparent', tension: 0.38, borderWidth: window.RMCharts.number('--rm-line-stroke-width', 3), borderDash: [6,4] }
      ]
      },
      options: {
@@ -181,10 +178,10 @@
      maintainAspectRatio: false,
      animation: { duration: 950, easing: 'easeOutQuart' },
      plugins: {
-      legend: { position: 'bottom', labels: { boxWidth: 10, font: { family: 'Inter', size: 10, weight: 'bold' } } }
+      legend: { position: 'bottom', labels: { boxWidth: 10, font: { family: window.RMCharts.getCss('--rm-chart-font-family'), size: window.RMCharts.number('--rm-chart-legend-size', 12), weight: '600' } } }
      },
      scales: {
-      y: { beginAtZero: false, grid: { color: 'rgba(224,212,198,0.35)' }, ticks: { font: { size: 9 } } },
+      y: { beginAtZero: false, grid: { color: window.RMCharts.getCss('--rm-chart-grid') }, ticks: { font: { size: 9 } } },
       x: { grid: { display: false }, ticks: { font: { size: 9 } } }
      }
      }
@@ -207,10 +204,7 @@
 
  {{-- Gráfico Evaluaciones --}}
  <div class="rm-chart-card rm-chart-glass flex flex-col justify-between">
- <h4 class="text-xs font-bold text-titulo mb-3 flex items-center gap-1.5">
- <span class="h-2 w-2 rounded-full bg-fondo-panel"></span>
- Evolución de Evaluaciones Cognitivas
- </h4>
+ <div class="rm-chart-header"><i class="ph-bold ph-brain" aria-hidden="true"></i><div class="rm-chart-heading"><h4 class="rm-chart-title">Evolución de Evaluaciones Cognitivas</h4><p class="rm-chart-subtitle">Valoraciones del período seleccionado</p></div></div>
 
  @if(empty($chartCognitivo['puntajes'] ?? []))
  <div class="flex flex-col items-center justify-center py-16 text-center border-2 border-dashed border-borde-suave rounded-xl bg-fondo-panel min-h-[260px]">
@@ -230,10 +224,10 @@
       {
       label: 'Puntaje Obtenido',
       data: @js($chartCognitivo['puntajes']),
-      backgroundColor: 'rgba(117,101,168,0.78)',
-      borderColor: 'var(--rm-violet)',
+      backgroundColor: window.RMCharts.hexToRgba(window.RMCharts.color('cognitive'), window.RMCharts.number('--rm-bar-fill-opacity', .84)),
+      borderColor: window.RMCharts.color('cognitive'),
       borderWidth: 1.5,
-      borderRadius: 8,
+      borderRadius: window.RMCharts.number('--rm-bar-radius', 10),
       barPercentage: 0.86,
       categoryPercentage: 0.90
       }
@@ -244,10 +238,10 @@
      maintainAspectRatio: false,
      animation: { duration: 950, easing: 'easeOutQuart' },
      plugins: {
-      legend: { position: 'bottom', labels: { boxWidth: 10, font: { family: 'Inter', size: 10, weight: 'bold' } } }
+      legend: { position: 'bottom', labels: { boxWidth: 10, font: { family: window.RMCharts.getCss('--rm-chart-font-family'), size: window.RMCharts.number('--rm-chart-legend-size', 12), weight: '600' } } }
      },
      scales: {
-      y: { beginAtZero: true, grid: { color: 'rgba(224,212,198,0.35)' }, ticks: { precision: 0, font: { size: 9 } } },
+      y: { beginAtZero: true, grid: { color: window.RMCharts.getCss('--rm-chart-grid') }, ticks: { precision: 0, font: { size: 9 } } },
       x: { grid: { display: false }, ticks: { font: { size: 9 } } }
      }
      }

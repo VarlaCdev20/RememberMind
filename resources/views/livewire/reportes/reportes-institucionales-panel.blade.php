@@ -652,30 +652,26 @@
  const seguimiento = JSON.parse(container.getAttribute('data-seguimiento') || '{}');
  const tipoReporte = container.getAttribute('data-tipo-reporte');
 
- // Destruir gráficos anteriores para evitar fugas de memoria y solapamientos
- Object.values(this.charts).forEach(chart => {
- if (chart && typeof chart.destroy === 'function') {
- chart.destroy();
- }
- });
+ const previousCharts = this.charts;
  this.charts = {};
 
-                    // Paleta institucional translúcida
-                    const palette = window.RMCharts?.palette() || ['#344D7A', '#D9745B', '#5F9271', '#C9913E', '#7565A8', '#4E8CA6'];
-                    const toTranslucent = (hex, a = 0.80) => window.RMCharts?.hexToRgba ? window.RMCharts.hexToRgba(hex, a) : hex;
+                    const chartDesign = window.RMCharts;
+                    const palette = chartDesign.palette();
+                    const toTranslucent = (color, token) => chartDesign.hexToRgba(color, chartDesign.number(token, .84));
+                    const legend = { display: true, position: 'bottom', labels: { usePointStyle: true, font: { family: chartDesign.getCss('--rm-chart-font-family'), size: chartDesign.number('--rm-chart-legend-size', 12), weight: '600' } } };
 
                     // 1. Dona: Adultos por Estado (Anillo grueso y translúcido con giro)
                     const ctxEstados = document.getElementById('chartEstados');
                     if (ctxEstados && Object.keys(estados).length > 0) {
                         const rawColors = [palette[0], palette[2], palette[1], palette[3], palette[4]];
-                        this.charts.estados = new Chart(ctxEstados, {
+                        this.charts.estados = chartDesign.init('reporte-institucional-estados', ctxEstados, {
                             type: 'doughnut',
                             data: {
                                 labels: Object.keys(estados),
                                 datasets: [{
                                     data: Object.values(estados),
-                                    backgroundColor: rawColors.map(c => toTranslucent(c, 0.80)),
-                                    borderColor: rawColors.map(c => toTranslucent(c, 0.98)),
+                                    backgroundColor: rawColors.map(c => toTranslucent(c, '--rm-donut-ring-opacity')),
+                                    borderColor: rawColors.map(c => toTranslucent(c, '--rm-chart-state-hover')),
                                     borderWidth: 2,
                                     hoverOffset: 8,
                                 }]
@@ -683,21 +679,21 @@
                             options: {
                                 responsive: true,
                                 maintainAspectRatio: false,
-                                cutout: '64%',
-                        borderRadius: 6,
-                        spacing: 3,
+                                cutout: chartDesign.getCss('--rm-donut-cutout'),
+                        borderRadius: chartDesign.number('--rm-donut-gap', 2),
+                        spacing: chartDesign.number('--rm-donut-gap', 2),
                                 animation: {
-                                    duration: 1000,
-                                    easing: 'easeOutQuart',
+                                    duration: matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : chartDesign.number('--rm-chart-donut-enter-duration', 750),
+                                    easing: chartDesign.getCss('--rm-chart-js-easing'),
                                     animateRotate: true,
-                                    animateScale: true,
+                                    animateScale: false,
                                 },
                                 plugins: {
                                     legend: {
                                         position: 'bottom',
                                         labels: {
                                             boxWidth: 10,
-                                            font: { family: 'Inter', size: 10, weight: 'bold' },
+                                            font: legend.labels.font,
                                             padding: 10
                                         }
                                     }
@@ -709,16 +705,16 @@
                     // 2. Barras: Adultos por Rango de Edad (Barras gruesas translúcidas)
                     const ctxEdades = document.getElementById('chartEdades');
                     if (ctxEdades && Object.values(edades).some(v => v > 0)) {
-                        this.charts.edades = new Chart(ctxEdades, {
+                        this.charts.edades = chartDesign.init('reporte-institucional-edades', ctxEdades, {
                             type: 'bar',
                             data: {
                                 labels: Object.keys(edades),
                                 datasets: [{
                                     data: Object.values(edades),
-                                    backgroundColor: toTranslucent(palette[4], 0.80),
-                                    borderColor: palette[4],
+                                    backgroundColor: toTranslucent(chartDesign.color('neutral'), '--rm-bar-fill-opacity'),
+                                    borderColor: chartDesign.color('neutral'),
                                     borderWidth: 1.5,
-                                    borderRadius: 8,
+                                    borderRadius: chartDesign.number('--rm-bar-radius', 10),
                                     barPercentage: 0.86,
                                     categoryPercentage: 0.90,
                                 }]
@@ -726,7 +722,7 @@
                             options: {
                                 responsive: true,
                                 maintainAspectRatio: false,
-                                animation: { duration: 950, easing: 'easeOutQuart' },
+                                animation: { duration: matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : chartDesign.number('--rm-chart-bar-enter-duration', 600), easing: chartDesign.getCss('--rm-chart-js-easing') },
                                 plugins: { legend: { display: false } },
                                 scales: {
                                     x: { grid: { display: false } },
@@ -739,16 +735,16 @@
                     // 3. Dona: Evaluaciones por Nivel de Alerta (Anillo grueso semántico)
                     const ctxNiveles = document.getElementById('chartNiveles');
                     if (ctxNiveles && tipoReporte === 'evaluaciones' && Object.values(niveles).some(v => v > 0)) {
-                        const sem = window.RMCharts?.semanticColors() || { danger: '#E5534B', warning: '#D9822B', success: '#2D8A6E', info: '#2563EB' };
+                        const sem = chartDesign.semanticColors();
                         const rawNivelColors = [sem.danger, sem.warning, sem.success, sem.info];
-                        this.charts.niveles = new Chart(ctxNiveles, {
+                        this.charts.niveles = chartDesign.init('reporte-institucional-niveles', ctxNiveles, {
                             type: 'doughnut',
                             data: {
                                 labels: Object.keys(niveles),
                                 datasets: [{
                                     data: Object.values(niveles),
-                                    backgroundColor: rawNivelColors.map(c => toTranslucent(c, 0.80)),
-                                    borderColor: rawNivelColors.map(c => toTranslucent(c, 0.98)),
+                                    backgroundColor: rawNivelColors.map(c => toTranslucent(c, '--rm-donut-ring-opacity')),
+                                    borderColor: rawNivelColors.map(c => toTranslucent(c, '--rm-chart-state-hover')),
                                     borderWidth: 2,
                                     hoverOffset: 8,
                                 }]
@@ -756,19 +752,19 @@
                             options: {
                                 responsive: true,
                                 maintainAspectRatio: false,
-                                cutout: '64%',
-                        borderRadius: 6,
-                        spacing: 3,
+                                cutout: chartDesign.getCss('--rm-donut-cutout'),
+                        borderRadius: chartDesign.number('--rm-donut-gap', 2),
+                        spacing: chartDesign.number('--rm-donut-gap', 2),
                                 animation: {
-                                    duration: 1000,
-                                    easing: 'easeOutQuart',
+                                    duration: matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : chartDesign.number('--rm-chart-donut-enter-duration', 750),
+                                    easing: chartDesign.getCss('--rm-chart-js-easing'),
                                     animateRotate: true,
-                                    animateScale: true,
+                                    animateScale: false,
                                 },
                                 plugins: {
                                     legend: {
                                         position: 'bottom',
-                                        labels: { boxWidth: 10, font: { family: 'Inter', size: 10, weight: 'bold' } }
+                                        labels: { boxWidth: 10, font: legend.labels.font }
                                     }
                                 }
                             }
@@ -778,8 +774,8 @@
                     // 4. PolarArea: Evaluaciones por Área
                     const ctxAreas = document.getElementById('chartAreas');
                     if (ctxAreas && tipoReporte === 'evaluaciones' && Object.keys(areas).length > 0) {
-                        const areaPalette = palette.map(c => toTranslucent(c, 0.75));
-                        this.charts.areas = new Chart(ctxAreas, {
+                        const areaPalette = palette.map(c => toTranslucent(c, '--rm-chart-state-secondary'));
+                        this.charts.areas = chartDesign.init('reporte-institucional-areas', ctxAreas, {
                             type: 'polarArea',
                             data: {
                                 labels: Object.keys(areas),
@@ -793,11 +789,11 @@
                             options: {
                                 responsive: true,
                                 maintainAspectRatio: false,
-                                animation: { duration: 950, easing: 'easeOutQuart', animateScale: true, animateRotate: true },
+                                animation: { duration: matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : chartDesign.number('--rm-chart-donut-enter-duration', 750), easing: chartDesign.getCss('--rm-chart-js-easing'), animateScale: false, animateRotate: true },
                                 plugins: {
                                     legend: {
                                         position: 'bottom',
-                                        labels: { boxWidth: 10, font: { family: 'Inter', size: 10, weight: 'bold' } }
+                                        labels: { boxWidth: 10, font: legend.labels.font }
                                     }
                                 }
                             }
@@ -808,14 +804,14 @@
                     const ctxDocumentos = document.getElementById('chartDocumentos');
                     if (ctxDocumentos && tipoReporte === 'documental' && Object.values(documentos).some(v => v > 0)) {
                         const docColors = [palette[2], palette[1], palette[3]];
-                        this.charts.documentos = new Chart(ctxDocumentos, {
+                        this.charts.documentos = chartDesign.init('reporte-institucional-documentos', ctxDocumentos, {
                             type: 'pie',
                             data: {
                                 labels: Object.keys(documentos),
                                 datasets: [{
                                     data: Object.values(documentos),
-                                    backgroundColor: docColors.map(c => toTranslucent(c, 0.80)),
-                                    borderColor: docColors.map(c => toTranslucent(c, 0.98)),
+                                    backgroundColor: docColors.map(c => toTranslucent(c, '--rm-donut-ring-opacity')),
+                                    borderColor: docColors.map(c => toTranslucent(c, '--rm-chart-state-hover')),
                                     borderWidth: 2,
                                     hoverOffset: 8,
                                 }]
@@ -823,11 +819,11 @@
                             options: {
                                 responsive: true,
                                 maintainAspectRatio: false,
-                                animation: { duration: 950, easing: 'easeOutQuart', animateRotate: true, animateScale: true },
+                                animation: { duration: matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : chartDesign.number('--rm-chart-donut-enter-duration', 750), easing: chartDesign.getCss('--rm-chart-js-easing'), animateRotate: true, animateScale: false },
                                 plugins: {
                                     legend: {
                                         position: 'bottom',
-                                        labels: { boxWidth: 10, font: { family: 'Inter', size: 10, weight: 'bold' } }
+                                        labels: { boxWidth: 10, font: legend.labels.font }
                                     }
                                 }
                             }
@@ -837,16 +833,16 @@
                     // 6. Barras: Seguimiento por Tipo (Barras gruesas translúcidas)
                     const ctxSeguimiento = document.getElementById('chartSeguimiento');
                     if (ctxSeguimiento && tipoReporte === 'seguimiento' && Object.values(seguimiento).some(v => v > 0)) {
-                        this.charts.seguimiento = new Chart(ctxSeguimiento, {
+                        this.charts.seguimiento = chartDesign.init('reporte-institucional-seguimiento', ctxSeguimiento, {
                             type: 'bar',
                             data: {
                                 labels: Object.keys(seguimiento),
                                 datasets: [{
                                     data: Object.values(seguimiento),
-                                    backgroundColor: toTranslucent(palette[1], 0.80),
+                                    backgroundColor: toTranslucent(chartDesign.color('clinical'), '--rm-bar-fill-opacity'),
                                     borderColor: palette[1],
                                     borderWidth: 1.5,
-                                    borderRadius: 8,
+                                    borderRadius: chartDesign.number('--rm-bar-radius', 10),
                                     barPercentage: 0.86,
                                     categoryPercentage: 0.90,
                                 }]
@@ -854,7 +850,7 @@
                             options: {
                                 responsive: true,
                                 maintainAspectRatio: false,
-                                animation: { duration: 950, easing: 'easeOutQuart' },
+                                animation: { duration: matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : chartDesign.number('--rm-chart-bar-enter-duration', 600), easing: chartDesign.getCss('--rm-chart-js-easing') },
                                 plugins: { legend: { display: false } },
                                 scales: {
                                     x: { grid: { display: false } },
@@ -863,6 +859,9 @@
                             }
                         });
                     }
+                    Object.keys(previousCharts || {}).forEach(key => {
+                        if (!this.charts[key]) chartDesign.destroy(`reporte-institucional-${key}`);
+                    });
 
  }
  }

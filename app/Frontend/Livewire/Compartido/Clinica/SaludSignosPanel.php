@@ -914,8 +914,8 @@ class SaludSignosPanel extends Component
                 'unit' => 'mmHg',
                 'hasEnough' => $serie->whereNotNull('presion_sistolica')->count() >= 2 && $serie->whereNotNull('presion_diastolica')->count() >= 2,
                 'datasets' => [
-                    ['label' => 'Sistólica', 'data' => $serie->map(fn ($signo) => $signo->presion_sistolica)->all(), 'color' => '#E27D60', 'fill' => true],
-                    ['label' => 'Diastólica', 'data' => $serie->map(fn ($signo) => $signo->presion_diastolica)->all(), 'color' => '#5B5F97', 'fill' => false],
+                    ['label' => 'Sistólica', 'data' => $serie->map(fn ($signo) => $signo->presion_sistolica)->all(), 'tone' => 'clinical', 'fill' => true],
+                    ['label' => 'Diastólica', 'data' => $serie->map(fn ($signo) => $signo->presion_diastolica)->all(), 'tone' => 'reference', 'fill' => false],
                 ],
             ],
             'frecuencia_cardiaca' => [
@@ -924,7 +924,7 @@ class SaludSignosPanel extends Component
                 'unit' => 'lpm',
                 'hasEnough' => $serie->whereNotNull('frecuencia_cardiaca')->count() >= 2,
                 'datasets' => [
-                    ['label' => 'Frecuencia cardíaca', 'data' => $serie->map(fn ($signo) => $signo->frecuencia_cardiaca)->all(), 'color' => '#C45F4B', 'fill' => true],
+                    ['label' => 'Frecuencia cardíaca', 'data' => $serie->map(fn ($signo) => $signo->frecuencia_cardiaca)->all(), 'tone' => 'clinical', 'fill' => true],
                 ],
             ],
             'saturacion' => [
@@ -933,7 +933,7 @@ class SaludSignosPanel extends Component
                 'unit' => '%',
                 'hasEnough' => $serie->whereNotNull('saturacion')->count() >= 2,
                 'datasets' => [
-                    ['label' => 'Saturación O2', 'data' => $serie->map(fn ($signo) => $signo->saturacion)->all(), 'color' => '#63775B', 'fill' => true],
+                    ['label' => 'Saturación O2', 'data' => $serie->map(fn ($signo) => $signo->saturacion)->all(), 'tone' => 'clinical', 'fill' => true],
                 ],
             ],
             'temperatura' => [
@@ -942,7 +942,7 @@ class SaludSignosPanel extends Component
                 'unit' => '°C',
                 'hasEnough' => $serie->whereNotNull('temperatura')->count() >= 2,
                 'datasets' => [
-                    ['label' => 'Temperatura', 'data' => $serie->map(fn ($signo) => $signo->temperatura ? (float) $signo->temperatura : null)->all(), 'color' => '#D9A05B', 'fill' => true],
+                    ['label' => 'Temperatura', 'data' => $serie->map(fn ($signo) => $signo->temperatura ? (float) $signo->temperatura : null)->all(), 'tone' => 'clinical', 'fill' => true],
                 ],
             ],
             'frecuencia_respiratoria' => [
@@ -951,7 +951,7 @@ class SaludSignosPanel extends Component
                 'unit' => 'rpm',
                 'hasEnough' => $serie->whereNotNull('frecuencia_respiratoria')->count() >= 2,
                 'datasets' => [
-                    ['label' => 'Frecuencia respiratoria', 'data' => $serie->map(fn ($signo) => $signo->frecuencia_respiratoria)->all(), 'color' => '#5B5F97', 'fill' => true],
+                    ['label' => 'Frecuencia respiratoria', 'data' => $serie->map(fn ($signo) => $signo->frecuencia_respiratoria)->all(), 'tone' => 'clinical', 'fill' => true],
                 ],
             ],
             'peso' => [
@@ -960,8 +960,8 @@ class SaludSignosPanel extends Component
                 'unit' => 'kg / kg/m²',
                 'hasEnough' => $serie->whereNotNull('peso')->count() >= 2,
                 'datasets' => [
-                    ['label' => 'Peso', 'data' => $serie->map(fn ($signo) => $signo->peso ? (float) $signo->peso : null)->all(), 'color' => '#8DA280', 'fill' => true],
-                    ['label' => 'IMC', 'data' => $serie->map(fn ($signo) => $signo->imc ? (float) $signo->imc : null)->all(), 'color' => '#2F3E5C', 'fill' => false],
+                    ['label' => 'Peso', 'data' => $serie->map(fn ($signo) => $signo->peso ? (float) $signo->peso : null)->all(), 'tone' => 'care', 'fill' => true],
+                    ['label' => 'IMC', 'data' => $serie->map(fn ($signo) => $signo->imc ? (float) $signo->imc : null)->all(), 'tone' => 'reference', 'fill' => false],
                 ],
             ],
         ];

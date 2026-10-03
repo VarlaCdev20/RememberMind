@@ -15,20 +15,19 @@
             window.RMCharts?.onThemeChange(() => {
                 this.initTendencia();
                 this.initDistPA();
-            });
+            }, 'clinica-signos-vitales-panel');
         },
         initTendencia() {
             const data = rmDatosa9b5f3c2c94b;
             const canvas = document.getElementById('chartTendenciaSV');
             if (!canvas || typeof Chart === 'undefined') return;
 
-            const isDark = window.RMCharts?.isDark() || false;
-            const axisTextColor = window.RMCharts ? window.RMCharts.getCss('--rm-chart-axis-text') : '#64748B';
-            const gridColor = window.RMCharts ? window.RMCharts.getCss('--rm-chart-grid') : 'rgba(224,212,198,0.35)';
-            const blue = window.RMCharts?.getCss('--rm-chart-2') || '#527DAA';
-            const blueSoft = window.RMCharts?.getCss('--rm-chart-4') || '#6F92BC';
-            const mint = window.RMCharts?.getCss('--rm-chart-1') || '#4F895E';
-            const pointSurface = window.RMCharts?.getCss('--rm-surface-raised') || '#F0E7DE';
+            const axisTextColor = window.RMCharts.getCss('--rm-chart-axis-text');
+            const gridColor = window.RMCharts.getCss('--rm-chart-grid');
+            const blue = window.RMCharts.color('clinical');
+            const blueSoft = window.RMCharts.color('care');
+            const mint = window.RMCharts.color('reference');
+            const pointSurface = window.RMCharts.getCss('--rm-chart-surface-bg');
             const translucent = (color, alpha) => window.RMCharts?.hexToRgba(color, alpha) || color;
 
             const config = {
@@ -40,9 +39,9 @@
                             label: 'PA Sistólica (mmHg)',
                             data: data.pa,
                             borderColor: blue,
-                            backgroundColor: translucent(blue, 0.16),
-                            borderWidth: 2.5,
-                            pointRadius: 4,
+                            backgroundColor: translucent(blue, window.RMCharts.number('--rm-line-area-opacity', .12)),
+                            borderWidth: window.RMCharts.number('--rm-line-stroke-width', 3),
+                            pointRadius: window.RMCharts.number('--rm-line-dot-size', 5) / 2,
                             pointHoverRadius: 6,
                             pointBackgroundColor: pointSurface,
                             pointBorderColor: blue,
@@ -54,9 +53,9 @@
                             label: 'FC (bpm)',
                             data: data.fc,
                             borderColor: mint,
-                            backgroundColor: translucent(mint, 0.12),
-                            borderWidth: 2,
-                            pointRadius: 3.5,
+                            backgroundColor: translucent(mint, window.RMCharts.number('--rm-line-area-secondary-opacity', .09)),
+                            borderWidth: window.RMCharts.number('--rm-line-stroke-width', 3),
+                            pointRadius: window.RMCharts.number('--rm-line-dot-size', 5) / 2,
                             pointBackgroundColor: pointSurface,
                             pointBorderColor: mint,
                             tension: 0.38,
@@ -67,9 +66,9 @@
                             label: 'SpO₂ (%)',
                             data: data.sat,
                             borderColor: blueSoft,
-                            backgroundColor: translucent(blueSoft, 0.14),
-                            borderWidth: 2.5,
-                            pointRadius: 3.5,
+                            backgroundColor: translucent(blueSoft, window.RMCharts.number('--rm-line-area-secondary-opacity', .09)),
+                            borderWidth: window.RMCharts.number('--rm-line-stroke-width', 3),
+                            pointRadius: window.RMCharts.number('--rm-line-dot-size', 5) / 2,
                             pointBackgroundColor: pointSurface,
                             pointBorderColor: blueSoft,
                             tension: 0.38,
@@ -88,7 +87,7 @@
                             position: 'bottom',
                             labels: {
                                 boxWidth: 10,
-                                font: { family: 'Inter', size: 10, weight: 'bold' },
+                                font: { family: window.RMCharts.getCss('--rm-chart-font-family'), size: window.RMCharts.number('--rm-chart-legend-size', 12), weight: '600' },
                                 color: axisTextColor,
                                 padding: 10,
                                 usePointStyle: true
@@ -97,12 +96,12 @@
                         tooltip: {
                             mode: 'index',
                             intersect: false,
-                            cornerRadius: 8,
+                            cornerRadius: window.RMCharts.number('--rm-tooltip-radius', 14),
                             padding: 10,
-                            backgroundColor: window.RMCharts?.getCss('--rm-chart-tooltip-bg') || '#F0E7DE',
-                            titleColor: window.RMCharts?.getCss('--rm-chart-tooltip-text') || '#342E2A',
-                            bodyColor: window.RMCharts?.getCss('--rm-chart-tooltip-text') || '#342E2A',
-                            borderColor: window.RMCharts?.getCss('--rm-chart-tooltip-border') || '#C9BAAC',
+                            backgroundColor: window.RMCharts.getCss('--rm-chart-tooltip-bg'),
+                            titleColor: window.RMCharts.getCss('--rm-chart-tooltip-text'),
+                            bodyColor: window.RMCharts.getCss('--rm-chart-tooltip-text'),
+                            borderColor: window.RMCharts.getCss('--rm-chart-tooltip-border'),
                             borderWidth: 1,
                         },
                         datalabels: { display: false },
@@ -147,8 +146,7 @@
             const canvas = document.getElementById('chartDistPA');
             if (!canvas || typeof Chart === 'undefined') return;
 
-            const palette = window.RMCharts ? window.RMCharts.palette() : ['#4E8CA6', '#5F9271', '#C9913E', '#D9745B', '#A85C73'];
-            const colors = [palette[5], palette[2], palette[3], palette[1], palette[6]];
+            const colors = [window.RMCharts.color('clinical'), window.RMCharts.color('care'), window.RMCharts.color('neutral'), window.RMCharts.color('alert'), window.RMCharts.color('alert')];
 
             const config = window.RMCharts && window.RMCharts.presets
                 ? window.RMCharts.presets.doughnut(
@@ -160,7 +158,7 @@
                             legend: {
                                 display: true,
                                 position: 'bottom',
-                                labels: { boxWidth: 10, font: { family: 'Inter', size: 10, weight: '600' }, padding: 8 }
+                                labels: { boxWidth: 10, font: { family: window.RMCharts.getCss('--rm-chart-font-family'), size: window.RMCharts.number('--rm-chart-legend-size', 12), weight: '600' }, padding: 8 }
                             },
                             tooltip: {
                                 callbacks: {

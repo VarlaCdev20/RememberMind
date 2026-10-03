@@ -13,12 +13,31 @@
     --rm-duration-slow: 280ms;
     --rm-duration-enter: 400ms;
 
+    /* Movimiento discreto de gráficas y métricas. */
+    --rm-motion-instant: 100ms;
+    --rm-motion-fast: 160ms;
+    --rm-motion-base: 240ms;
+    --rm-motion-medium: 380ms;
+    --rm-motion-slow: 620ms;
+    --rm-motion-chart-enter: 720ms;
+
     /* ------------------------------------------------------------
        TIMING FUNCTIONS NORMALIZADAS V2
        ------------------------------------------------------------ */
-    --rm-ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
-    --rm-ease-enter: cubic-bezier(0, 0, 0.2, 1);
+    --rm-ease-standard: cubic-bezier(.2, .8, .2, 1);
+    --rm-ease-enter: cubic-bezier(.16, 1, .3, 1);
     --rm-ease-exit: cubic-bezier(0.4, 0, 1, 1);
+    --rm-ease-emphasized: cubic-bezier(.22, 1, .36, 1);
+
+    --rm-motion-lift-sm: -1px;
+    --rm-motion-lift-md: -2px;
+    --rm-motion-scale-hover: 1.015;
+    --rm-motion-scale-active: .985;
+
+    --rm-chart-update-duration: 420ms;
+    --rm-chart-update-easing: var(--rm-ease-standard);
+    --rm-chart-stagger-fast: 35ms;
+    --rm-chart-stagger-default: 55ms;
 
     /* Curvas complementarias y de retrocompatibilidad */
     --rm-ease-default: var(--rm-ease-standard);

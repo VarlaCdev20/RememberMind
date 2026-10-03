@@ -139,7 +139,7 @@
  </div>
  @if($hasRedChart)
  <div class="h-56">
- <canvas id="familiaRedChart" class="max-h-56"></canvas>
+ <canvas id="familiaRedChart" class="max-h-56" role="img" aria-label="Distribución de la red de apoyo familiar"></canvas>
  </div>
  @else
  <div class="flex h-56 items-center justify-center rounded-xl border border-dashed border-borde-suave bg-fondo-panel text-center">
@@ -163,7 +163,7 @@
  </div>
  @if($hasVisitasChart)
  <div class="h-56">
- <canvas id="familiaVisitasChart" class="max-h-56"></canvas>
+ <canvas id="familiaVisitasChart" class="max-h-56" role="img" aria-label="Visitas familiares registradas"></canvas>
  </div>
  @else
  <div class="flex h-56 items-center justify-center rounded-xl border border-dashed border-borde-suave bg-fondo-panel text-center">
@@ -186,7 +186,7 @@
  </div>
  @if($hasFichaChart)
  <div class="h-56">
- <canvas id="familiaFichaChart" class="max-h-56"></canvas>
+ <canvas id="familiaFichaChart" class="max-h-56" role="img" aria-label="Distribución de fichas de contactos familiares"></canvas>
  </div>
  @else
  <div class="flex h-56 items-center justify-center rounded-xl border border-dashed border-borde-suave bg-fondo-panel text-center">

@@ -406,14 +406,14 @@
  labels: ['Activos', 'Inactivos'],
  datasets: [{
  data: [activos, inactivos],
- backgroundColor: ['#8DA280', '#E27D60'],
+ backgroundColor: [window.RMCharts.color('care'), window.RMCharts.color('reference')],
  borderWidth: 0
  }]
  },
  options: {
  responsive: true,
  maintainAspectRatio: false,
- cutout: '58%',
+ cutout: window.RMCharts.getCss('--rm-donut-cutout'),
  plugins: {
  legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10, weight: 'bold' } } }
  }
@@ -431,8 +431,8 @@
  labels: rolesLabels,
  datasets: [{
  data: rolesValues,
- backgroundColor: '#2F3E5C',
- borderRadius: 6
+ backgroundColor: window.RMCharts.color('staff'),
+ borderRadius: window.RMCharts.number('--rm-bar-radius', 10)
  }]
  },
  options: {
@@ -440,7 +440,7 @@
  maintainAspectRatio: false,
  plugins: { legend: { display: false } },
  scales: {
- y: { beginAtZero: true, grid: { color: 'rgba(47,62,92,0.05)' } },
+ y: { beginAtZero: true, grid: { color: window.RMCharts.getCss('--rm-chart-grid-soft') } },
  x: { grid: { display: false } }
  }
  }
@@ -458,9 +458,9 @@
  labels: evLabels,
  datasets: [{
  data: evValues,
- borderColor: '#E27D60',
- backgroundColor: 'rgba(226,125,96,0.1)',
- borderWidth: 3,
+ borderColor: window.RMCharts.color('clinical'),
+ backgroundColor: window.RMCharts.hexToRgba(window.RMCharts.color('clinical'), window.RMCharts.number('--rm-line-area-opacity', .12)),
+ borderWidth: window.RMCharts.number('--rm-line-stroke-width', 3),
  fill: true,
  tension: 0.3
  }]
@@ -470,7 +470,7 @@
  maintainAspectRatio: false,
  plugins: { legend: { display: false } },
  scales: {
- y: { beginAtZero: true, grid: { color: 'rgba(47,62,92,0.05)' } },
+ y: { beginAtZero: true, grid: { color: window.RMCharts.getCss('--rm-chart-grid-soft') } },
  x: { grid: { display: false } }
  }
  }
@@ -1010,8 +1010,8 @@
  labels: usrLabels,
  datasets: [{
  data: usrValues,
- backgroundColor: '#2F3E5C',
- borderRadius: 6
+ backgroundColor: window.RMCharts.color('staff'),
+ borderRadius: window.RMCharts.number('--rm-bar-radius', 10)
  }]
  },
  options: {
@@ -1019,7 +1019,7 @@
  maintainAspectRatio: false,
  plugins: { legend: { display: false } },
  scales: {
- y: { beginAtZero: true, grid: { color: 'rgba(47,62,92,0.05)' } },
+ y: { beginAtZero: true, grid: { color: window.RMCharts.getCss('--rm-chart-grid-soft') } },
  x: { grid: { display: false } }
  }
  }
@@ -1037,7 +1037,7 @@
  labels: typeLabels,
  datasets: [{
  data: typeValues,
- backgroundColor: ['#2F3E5C', '#E27D60', '#8DA280', '#967B66', '#5E6599'],
+ backgroundColor: typeLabels.map((_, index) => window.RMCharts.palette()[index % 6]),
  borderWidth: 0
  }]
  },
@@ -1060,8 +1060,8 @@
  data: {
  labels: actInact.labels,
  datasets: [
- { label: 'Activos', data: actInact.activos, backgroundColor: '#8DA280' },
- { label: 'Inactivos', data: actInact.inactivos, backgroundColor: '#E27D60' }
+ { label: 'Activos', data: actInact.activos, backgroundColor: window.RMCharts.color('care') },
+ { label: 'Inactivos', data: actInact.inactivos, backgroundColor: window.RMCharts.color('reference') }
  ]
  },
  options: {
@@ -1085,9 +1085,9 @@
  labels: ev.labels,
  datasets: [{
  data: ev.data,
- borderColor: '#E27D60',
- backgroundColor: 'rgba(226,125,96,0.1)',
- borderWidth: 3,
+ borderColor: window.RMCharts.color('clinical'),
+ backgroundColor: window.RMCharts.hexToRgba(window.RMCharts.color('clinical'), window.RMCharts.number('--rm-line-area-opacity', .12)),
+ borderWidth: window.RMCharts.number('--rm-line-stroke-width', 3),
  fill: true,
  tension: 0.3
  }]
@@ -1109,8 +1109,8 @@
  labels: rankData.labels,
  datasets: [{
  data: rankData.data,
- backgroundColor: '#E27D60',
- borderRadius: 6
+ backgroundColor: window.RMCharts.color('staff'),
+ borderRadius: window.RMCharts.number('--rm-hbar-radius', 999)
  }]
  },
  options: {
@@ -1119,7 +1119,7 @@
  maintainAspectRatio: false,
  plugins: { legend: { display: false } },
  scales: {
- x: { beginAtZero: true, grid: { color: 'rgba(47,62,92,0.05)' } },
+ x: { beginAtZero: true, grid: { color: window.RMCharts.getCss('--rm-chart-grid-soft') } },
  y: { grid: { display: false } }
  }
  }
@@ -1140,14 +1140,14 @@
  labels: ['Activos', 'Inactivos'],
  datasets: [{
  data: [activos, inactivos],
- backgroundColor: ['#8DA280', '#E27D60'],
+ backgroundColor: [window.RMCharts.color('care'), window.RMCharts.color('reference')],
  borderWidth: 0
  }]
  },
  options: {
  responsive: true,
  maintainAspectRatio: false,
- cutout: '58%',
+ cutout: window.RMCharts.getCss('--rm-donut-cutout'),
  plugins: { legend: { position: 'bottom', labels: { boxWidth: 10 } } }
  }
  });
@@ -1163,8 +1163,8 @@
  labels: rolesLabels,
  datasets: [{
  data: rolesValues,
- backgroundColor: '#2F3E5C',
- borderRadius: 6
+ backgroundColor: window.RMCharts.color('staff'),
+ borderRadius: window.RMCharts.number('--rm-bar-radius', 10)
  }]
  },
  options: {
@@ -1186,9 +1186,9 @@
  labels: evAreaLabels,
  datasets: [{
  data: evAreaValues,
- borderColor: '#E27D60',
- backgroundColor: 'rgba(226,125,96,0.1)',
- borderWidth: 3,
+ borderColor: window.RMCharts.color('clinical'),
+ backgroundColor: window.RMCharts.hexToRgba(window.RMCharts.color('clinical'), window.RMCharts.number('--rm-line-area-opacity', .12)),
+ borderWidth: window.RMCharts.number('--rm-line-stroke-width', 3),
  fill: true,
  tension: 0.3
  }]
