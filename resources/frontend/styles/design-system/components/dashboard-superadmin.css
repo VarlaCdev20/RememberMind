@@ -205,15 +205,15 @@
     }
 }
 
-.rm-dashboard-composition--superadmin .rm-superadmin-metrics { gap: 16px; }
+.rm-dashboard-composition--superadmin .rm-superadmin-metrics { gap: 12px; }
 .rm-superadmin-kpi {
     --rm-kpi-accent: var(--rm-dashboard-sage-700);
     --rm-kpi-soft: var(--rm-dashboard-sage-100);
     display: flex;
     flex-direction: column;
     min-width: 0;
-    min-height: 220px;
-    padding: 20px;
+    min-height: 170px;
+    padding: 16px;
     border: 1px solid color-mix(in srgb, var(--rm-dashboard-text) 8%, transparent);
     border-radius: 18px;
     background: var(--rm-dashboard-kpi-bg);
@@ -224,29 +224,30 @@
 .rm-superadmin-kpi--beds { --rm-kpi-accent: var(--rm-dashboard-clinical-700); --rm-kpi-soft: var(--rm-dashboard-clinical-100); }
 .rm-superadmin-kpi--alerts { --rm-kpi-accent: var(--rm-dashboard-coral-700); --rm-kpi-soft: var(--rm-dashboard-coral-100); }
 .rm-superadmin-kpi--quiet { --rm-kpi-accent: var(--rm-dashboard-sage-700); --rm-kpi-soft: var(--rm-dashboard-sage-100); }
-.rm-superadmin-kpi__top { display: flex; align-items: flex-start; justify-content: space-between; min-height: 38px; }
-.rm-superadmin-kpi__icon { display: inline-flex; align-items: center; justify-content: center; width: 38px; height: 38px; border-radius: 12px; background: var(--rm-kpi-soft); color: var(--rm-kpi-accent); font-size: 19px; }
-.rm-superadmin-kpi__radial { display: grid; place-items: center; width: 48px; height: 48px; border-radius: 50%; background: conic-gradient(var(--rm-kpi-accent) var(--rm-kpi-progress), var(--rm-kpi-soft) 0); color: var(--rm-dashboard-text); font: 700 11px/1 var(--rm-font-friendly); }
-.rm-superadmin-kpi__radial > span { display: grid; place-items: center; width: 37px; height: 37px; border-radius: 50%; background: var(--rm-dashboard-kpi-bg); }
-.rm-superadmin-kpi__main { margin-top: 12px; }
-.rm-superadmin-kpi__value { margin: 0; font: 800 clamp(29px, 2.4vw, 35px)/1.05 var(--rm-font-friendly); font-variant-numeric: tabular-nums; letter-spacing: -.03em; color: var(--rm-kpi-accent); }
+.rm-superadmin-kpi__top { display: flex; align-items: flex-start; justify-content: space-between; min-height: 32px; }
+.rm-superadmin-kpi__icon { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 10px; background: var(--rm-kpi-soft); color: var(--rm-kpi-accent); font-size: 17px; }
+.rm-superadmin-kpi__radial { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; background: conic-gradient(var(--rm-kpi-accent) var(--rm-kpi-progress), var(--rm-kpi-soft) 0); color: var(--rm-dashboard-text); font: 700 10px/1 var(--rm-font-friendly); }
+.rm-superadmin-kpi__radial > span { display: grid; place-items: center; width: 31px; height: 31px; border-radius: 50%; background: var(--rm-dashboard-kpi-bg); }
+.rm-superadmin-kpi__main { margin-top: 8px; }
+.rm-superadmin-kpi:not(:has(.rm-superadmin-kpi__detail)) .rm-superadmin-kpi__main { margin-block: auto; }
+.rm-superadmin-kpi__value { margin: 0; font: 800 clamp(27px, 2.2vw, 32px)/1.05 var(--rm-font-friendly); font-variant-numeric: tabular-nums; letter-spacing: -.03em; color: var(--rm-kpi-accent); }
 .rm-superadmin-kpi__value small { font-size: .54em; font-weight: 700; letter-spacing: 0; color: var(--rm-dashboard-text-secondary); }
-.rm-superadmin-kpi__label { margin: 7px 0 0; font: 700 15px/1.3 var(--rm-font-friendly); color: var(--rm-dashboard-text); }
-.rm-superadmin-kpi__description { margin: 3px 0 0; font: 500 12px/1.4 var(--rm-font-body); color: var(--rm-dashboard-text-secondary); }
-.rm-superadmin-kpi__comparison { display: flex; align-items: flex-start; gap: 5px; margin: 9px 0 0; font: 700 11px/1.35 var(--rm-font-friendly); color: var(--rm-dashboard-text-secondary); }
+.rm-superadmin-kpi__label { margin: 4px 0 0; font: 700 14px/1.3 var(--rm-font-friendly); color: var(--rm-dashboard-text); }
+.rm-superadmin-kpi__description { margin: 2px 0 0; font: 500 12px/1.35 var(--rm-font-body); color: var(--rm-dashboard-text-secondary); }
+.rm-superadmin-kpi__comparison { display: flex; align-items: flex-start; gap: 5px; margin: 6px 0 0; font: 700 11px/1.3 var(--rm-font-friendly); color: var(--rm-dashboard-text-secondary); }
 .rm-superadmin-kpi__comparison i { flex: 0 0 auto; margin-top: 1px; }
 .rm-superadmin-kpi--residents .rm-superadmin-kpi__comparison.is-up,
 .rm-superadmin-kpi--alerts .rm-superadmin-kpi__comparison.is-down { color: var(--rm-dashboard-sage-700); }
 .rm-superadmin-kpi--alerts .rm-superadmin-kpi__comparison.is-up { color: var(--rm-dashboard-coral-700); }
-.rm-superadmin-kpi__detail { margin-top: auto; padding-top: 14px; font: 600 11px/1.35 var(--rm-font-friendly); color: var(--rm-dashboard-text-secondary); }
+.rm-superadmin-kpi__detail { margin-top: auto; padding-top: 8px; font: 600 11px/1.3 var(--rm-font-friendly); color: var(--rm-dashboard-text-secondary); }
 .rm-superadmin-kpi__detail p { margin: 0; }
-.rm-superadmin-kpi__detail-row { display: flex; justify-content: space-between; gap: 8px; margin-bottom: 7px; }
+.rm-superadmin-kpi__detail-row { display: flex; justify-content: space-between; gap: 8px; margin-bottom: 5px; }
 .rm-superadmin-kpi__detail-row strong { color: var(--rm-kpi-accent); }
 .rm-superadmin-kpi__track, .rm-superadmin-kpi__area-track { display: block; height: 6px; overflow: hidden; border-radius: 100px; background: var(--rm-kpi-soft); }
 .rm-superadmin-kpi__track > span, .rm-superadmin-kpi__area-track > span { display: block; height: 100%; border-radius: inherit; background: var(--rm-kpi-accent); }
-.rm-superadmin-kpi__track + p { margin-top: 7px; }
-.rm-superadmin-kpi__detail-title { margin-bottom: 8px !important; }
-.rm-superadmin-kpi__sparkbars { display: flex; align-items: end; gap: 5px; height: 34px; }
+.rm-superadmin-kpi__track + p { margin-top: 5px; }
+.rm-superadmin-kpi__detail-title { margin-bottom: 5px !important; }
+.rm-superadmin-kpi__sparkbars { display: flex; align-items: end; gap: 5px; height: 24px; }
 .rm-superadmin-kpi__sparkbars > span { flex: 1; max-width: 22px; border-radius: 4px 4px 2px 2px; background: var(--rm-kpi-accent); opacity: .78; }
 .rm-superadmin-kpi__area { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 3px 8px; margin-top: 5px; }
 .rm-superadmin-kpi__area > span:first-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
