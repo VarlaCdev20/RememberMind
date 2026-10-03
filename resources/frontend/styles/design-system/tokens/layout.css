@@ -20,7 +20,7 @@
     --rm-content-gap: 16px;             /* Separación entre secciones operativas */
     --rm-grid-gap: 12px;                /* Separación interna de grids */
     --rm-page-header-height: 76px;      /* Cabecera de vistas internas */
-    --rm-dashboard-hero-height: 204px;  /* Hero exclusivo de dashboards */
+    --rm-dashboard-hero-height: 172px;  /* Encabezado compacto de dashboards */
     --rm-panel-max-height: 300px;       /* Panel visual de lectura rápida */
 
     /* ------------------------------------------------------------
