@@ -36,7 +36,7 @@ $acciones = array_slice($acciones, 0, 3);
 
 <x-ui.role-dashboard-hero
     personal-greeting
-    :eyebrow="$rolLegible . ' · visión institucional'"
+    eyebrow="CENTRO GERIÁTRICO LOS ALMENDROS"
     :title="$saludoTexto . ', ' . $nombre"
     highlight="Gestionar bien también es cuidar"
     description="Supervisa la operación del centro, prioriza lo importante y acompaña al equipo desde una lectura clara y humana."

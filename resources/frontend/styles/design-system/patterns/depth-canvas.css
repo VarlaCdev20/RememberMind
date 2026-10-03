@@ -48,17 +48,17 @@
     aspect-ratio: 1;
     bottom: -14vh;
     left: 16vw;
-    background: radial-gradient(circle, color-mix(in srgb, var(--rm-warning) 8%, transparent), transparent 70%);
+    background: radial-gradient(circle, color-mix(in srgb, var(--rm-sage) 8%, transparent), transparent 70%);
     transform: translate3d(calc(var(--rm-depth-x) * -0.6), calc((var(--rm-depth-y) + var(--rm-depth-scroll)) * -0.55), 0);
 }
 
 :is(.dark, [data-theme="dark"]) .rm-depth-canvas::before {
-    background: radial-gradient(circle, rgba(53, 189, 242, .075), transparent 69%);
+    background: radial-gradient(circle, color-mix(in srgb, var(--rm-info) 7.5%, transparent), transparent 69%);
     filter: blur(10px);
 }
 
 :is(.dark, [data-theme="dark"]) .rm-depth-canvas::after {
-    background: radial-gradient(circle, rgba(32, 201, 151, .055), transparent 71%);
+    background: radial-gradient(circle, color-mix(in srgb, var(--rm-sage) 5.5%, transparent), transparent 71%);
     filter: blur(12px);
 }
 

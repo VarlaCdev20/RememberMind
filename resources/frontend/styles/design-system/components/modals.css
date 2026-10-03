@@ -55,7 +55,7 @@
 .rm-modal-shell__overlay {
     position: fixed;
     inset: 0;
-    background: radial-gradient(ellipse at center, rgba(48, 44, 42, 0.42) 0%, rgba(24, 22, 21, 0.68) 100%);
+    background: var(--rm-modal-overlay);
     backdrop-filter: blur(8px) saturate(125%);
     -webkit-backdrop-filter: blur(8px) saturate(125%);
     transition: opacity 220ms cubic-bezier(0.16, 1, 0.3, 1);
@@ -63,7 +63,7 @@
 
 .dark .rm-modal-shell__overlay,
 [data-theme= dark] .rm-modal-shell__overlay {
-    background: radial-gradient(ellipse at center, rgba(8, 18, 24, 0.70) 0%, rgba(3, 8, 12, 0.88) 100%);
+    background: var(--rm-modal-overlay);
     backdrop-filter: blur(10px) saturate(135%);
     -webkit-backdrop-filter: blur(10px) saturate(135%);
 }
@@ -73,16 +73,13 @@
     overflow: hidden;
     background-color: var(--rm-modal-bg);
     background-image:
-        radial-gradient(circle at 100% 0%, rgba(217, 121, 95, 0.035), transparent 45%),
-        radial-gradient(circle at center, rgba(48, 44, 42, 0.05) 1px, transparent 1px);
+        radial-gradient(circle at 100% 0%, color-mix(in srgb, var(--rm-sage) 3.5%, transparent), transparent 45%),
+        radial-gradient(circle at center, color-mix(in srgb, var(--rm-text-primary) 5%, transparent) 1px, transparent 1px);
     background-size: 100% 100%, 20px 20px;
     border: 1px solid var(--rm-modal-border);
-    border-top: 1px solid rgba(255, 255, 255, 0.85);
+    border-top: 1px solid var(--rm-border);
     border-radius: var(--rm-modal-radius);
-    box-shadow:
-        0 4px 6px -1px rgba(32, 28, 26, 0.08),
-        0 18px 42px -6px rgba(32, 28, 26, 0.22),
-        0 36px 72px -12px rgba(32, 28, 26, 0.16);
+    box-shadow: var(--rm-modal-shadow);
     isolation: isolate;
     transform-origin: center center;
     transition: transform 240ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 240ms ease;
@@ -91,14 +88,11 @@
 .dark .rm-modal-panel,
 [data-theme=dark] .rm-modal-panel {
     background-image:
-        radial-gradient(circle at 100% 0%, rgba(56, 189, 248, 0.04), transparent 45%),
-        radial-gradient(circle at center, rgba(226, 232, 240, 0.065) 1px, transparent 1px);
+        radial-gradient(circle at 100% 0%, color-mix(in srgb, var(--rm-info) 4%, transparent), transparent 45%),
+        radial-gradient(circle at center, color-mix(in srgb, var(--rm-text-primary) 6.5%, transparent) 1px, transparent 1px);
     background-size: 100% 100%, 20px 20px;
-    border-top: 1px solid rgba(255, 255, 255, 0.14);
-    box-shadow:
-        0 4px 6px -1px rgba(0, 0, 0, 0.4),
-        0 24px 56px -8px rgba(0, 0, 0, 0.7),
-        0 40px 80px -12px rgba(0, 0, 0, 0.5);
+    border-top: 1px solid var(--rm-border);
+    box-shadow: var(--rm-modal-shadow);
 }
 
 /* Atmosfera luminosa interactiva en la cabecera */
@@ -117,7 +111,7 @@
 .rm-modal-panel__title {
  color: var(--rm-text-primary);
  font-size: clamp(16px, 1.7vw, 18px);
- font-weight: 800;
+ font-weight: var(--rm-weight-bold);
  font-family: var(--rm-font-display);
  letter-spacing: -0.015em;
  position: relative;
@@ -237,7 +231,7 @@
 
 .rm-modal-panel__drag-handle span {
  font-size: 11px;
- font-weight: 750;
+ font-weight: 650;
  font-family: var(--rm-font-display);
 }
 
@@ -297,7 +291,7 @@
  display: flex;
  align-items: center;
  justify-content: center;
- background: radial-gradient(ellipse at center, rgba(48, 44, 42, 0.42) 0%, rgba(24, 22, 21, 0.68) 100%);
+ background: var(--rm-modal-overlay);
  backdrop-filter: blur(8px) saturate(125%);
  -webkit-backdrop-filter: blur(8px) saturate(125%);
  padding: var(--rm-space-4);
@@ -318,7 +312,7 @@
  margin: auto 0;
  background-color: var(--rm-modal-bg);
  border: 1px solid var(--rm-modal-border);
- border-top: 1px solid rgba(255, 255, 255, 0.85);
+ border-top: 1px solid var(--rm-border);
  border-radius: var(--rm-modal-radius);
  box-shadow: var(--rm-modal-shadow);
  display: flex;
@@ -358,7 +352,7 @@
 .rm-modal-title {
  font-family: var(--rm-font-display);
  font-size: 15px;
- font-weight: 750;
+ font-weight: 650;
  color: var(--rm-text-primary);
  letter-spacing: -0.015em;
 }
@@ -435,7 +429,7 @@
 .dark .rm-modal {
  background-color: var(--rm-surface-raised);
  border-color: var(--rm-border-soft);
- border-top-color: rgba(255, 255, 255, 0.12);
+ border-top-color: var(--rm-border);
  box-shadow: var(--rm-modal-shadow);
  color: var(--rm-text-primary);
 }

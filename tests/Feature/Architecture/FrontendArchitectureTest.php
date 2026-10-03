@@ -111,7 +111,8 @@ class FrontendArchitectureTest extends TestCase
         $this->assertFileExists($dsIndex, 'El entrypoint canónico design-system/index.css debe existir.');
         $this->assertFileExists($appCss, 'El archivo app.css debe existir.');
 
-        $appCssContent = File::get($appCss);
+        $this->assertStringContainsString("@import '../../css/app.css'", File::get($appCss));
+        $appCssContent = File::get(resource_path('css/app.css'));
         $this->assertStringContainsString(
             'design-system/index.css',
             $appCssContent,
@@ -136,17 +137,48 @@ class FrontendArchitectureTest extends TestCase
         }
     }
 
-    public function test_paleta_institucional_usa_menta_azul_arena_y_coral_controlado(): void
+    public function test_paleta_oficial_se_centraliza_y_las_series_no_inventan_alertas(): void
     {
-        $primitivas = File::get(resource_path('frontend/styles/design-system/tokens/primitives.css'));
         $graficas = File::get(resource_path('frontend/styles/design-system/tokens/chart-colors.css'));
         $colores = File::get(resource_path('frontend/styles/design-system/tokens/colors.css'));
+        $tailwind = File::get(base_path('tailwind.config.js'));
 
-        $this->assertStringContainsString('#A9C1AA', $primitivas, 'La salvia del landing debe existir como primitiva institucional.');
-        $this->assertStringContainsString('#A2C2EC', $primitivas, 'La familia azul clínico debe derivar de la muestra aprobada.');
-        $this->assertStringContainsString('#CFC5BA', $colores, 'Los neutros cálidos deben usar el taupe grisáceo del landing.');
-        $this->assertStringContainsString('--rm-chart-10: #C77969', $graficas, 'El coral debe quedar al final de la paleta categórica.');
-        $this->assertStringContainsString('--rm-action-primary: #A9C1AA', $colores, 'Las acciones deben usar la salvia clara del landing.');
+        foreach ([
+            '--rm-palette-page: #F1EAE4',
+            '--rm-earth-900: #59524B',
+            '--rm-earth-800: #665F57',
+            '--rm-earth-700: #746B62',
+            '--rm-earth-600: #82786E',
+            '--rm-earth-500: #8F857B',
+            '--rm-earth-400: #9B9288',
+            '--rm-earth-300: #A69E96',
+            '--rm-palette-capuchino: #D6C6B9',
+            '--rm-selected-bg: var(--rm-palette-sage-200)',
+            '--rm-icon-default: var(--rm-earth-600)',
+            '--rm-palette-sidebar: var(--rm-palette-capuchino)',
+            '--rm-palette-surface: color-mix(in srgb, var(--rm-palette-brown-300) 20%, var(--rm-palette-page))',
+            '--rm-palette-ink: var(--rm-palette-brown-900)',
+            '--rm-palette-ink-secondary: var(--rm-palette-brown-800)',
+            '--rm-palette-primary: #78826E',
+            '--rm-palette-primary-ink: var(--rm-palette-forest-ink)',
+            '--rm-palette-primary-soft: color-mix(in srgb, var(--rm-palette-mint) 50%, var(--rm-palette-page))',
+            '--rm-palette-info: #8699AC',
+            '--rm-palette-psychology: #CEB0B0',
+            '--rm-palette-nutrition: #C4C4A0',
+            '--rm-palette-warning: #C69245',
+            '--rm-palette-danger: #B85C58',
+            '--rm-action-primary: var(--rm-primary)',
+            '--rm-sidebar-open: var(--rm-sage-soft)',
+            '--rm-selected-text: var(--rm-primary-ink)',
+        ] as $token) {
+            $this->assertStringContainsString($token, $colores);
+        }
+
+        $this->assertStringContainsString('--rm-chart-1: var(--rm-primary)', $graficas);
+        $this->assertStringContainsString('--rm-chart-danger:       var(--rm-danger)', $graficas);
+        $this->assertDoesNotMatchRegularExpression('/--rm-chart-\\d+:.*var\\(--rm-(danger|warning)\\)/', $graficas);
+        $this->assertStringContainsString("'primary-action': token('primary')", $tailwind);
+        $this->assertDoesNotMatchRegularExpression('/#[a-fA-F0-9]{3,8}\\b/', $tailwind, 'La configuración debe consumir la paleta CSS, sin repetir HEX.');
 
         $puente = File::get(resource_path('frontend/styles/design-system/components/legacy-palette-bridge.css'));
         $this->assertStringContainsString('var(--rm-clinical-strong)', $puente);
@@ -332,14 +364,15 @@ class FrontendArchitectureTest extends TestCase
         $psicologia = File::get(resource_path('views/livewire/valoraciones/dashboard-psicologo.blade.php'));
         $workspaceRol = File::get(resource_path('views/components/ui/role-workspace-dashboard.blade.php'));
 
-        $this->assertStringContainsString('rm-role-hero', $componente);
+        $this->assertStringContainsString('<x-ui.dashboard-header', $componente);
         $this->assertStringContainsString('<x-ui.role-dashboard-hero', $encabezadoAdmin);
         $this->assertStringContainsString('<x-ui.dashboard-welcome-header', $enfermeria);
         $this->assertStringNotContainsString('rm-role-hero', $enfermeria);
         $this->assertStringContainsString('<x-ui.role-dashboard-hero', $medicina);
         $this->assertStringContainsString('<x-ui.role-dashboard-hero', $psicologia);
         $this->assertStringContainsString('<x-ui.role-dashboard-hero', $workspaceRol);
-        $this->assertStringContainsString('storage/imagenes/LOGO.png', $componente);
+        $this->assertStringContainsString('<x-ui.dashboard-header', File::get(resource_path('views/components/ui/dashboard-welcome-header.blade.php')));
+        $this->assertStringContainsString('<x-ui.dashboard-header', File::get(resource_path('views/pages/admin/administracion/dashboard.blade.php')));
         $this->assertStringContainsString('rm-role-focus', $workspaceRol);
 
         foreach ([$encabezadoAdmin, $medicina, $psicologia] as $dashboard) {
@@ -370,7 +403,7 @@ class FrontendArchitectureTest extends TestCase
 
         $this->assertStringContainsString('rmInstallGlobalChartTheme(Chart)', $app);
         $this->assertStringContainsString('export function rmInstallGlobalChartTheme', $tema);
-        $this->assertStringContainsString("rmGetCss(meta.token) || meta.fallback", $tema);
+        $this->assertStringContainsString("rmGetCss(meta.token) || rmGetCss('--rm-info')", $tema);
         $this->assertStringContainsString('.rm-chart-card', $estilos);
         $this->assertStringContainsString('.rm-chart-header', $estilos);
         $this->assertStringContainsString('.rm-chart-kpi-badge', $estilos);

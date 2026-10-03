@@ -241,9 +241,13 @@ class SidebarServiceTest extends TestCase
         $response->assertSee('class="rm-sidebar"', false);
         $response->assertSee('data-rm-main', false);
 
-        // El accordion tiene abierta la sección Usuarios y accesos (índice 1)
+        // El acordeón abre Gestión del sistema y destaca sólo la página actual.
         $response->assertSee('openSection: 1', false);
         $response->assertSee('aria-current="page"', false);
+        $response->assertSee('id="rm-sidebar-trigger-1" class="rm-sidebar__item is-current-section"', false);
+        $response->assertDontSee('class="rm-sidebar__item is-active"', false);
+        $response->assertSee('x-collapse.duration.200ms', false);
+        $this->assertSame(1, preg_match_all('/class="rm-sidebar__subitem\s+rm-nav-item\s+is-active"/', $response->getContent()));
     }
 
     public function test_layout_superadmin_en_consulta_de_residentes_conserva_sidebar_tecnico(): void

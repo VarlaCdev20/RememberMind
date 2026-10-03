@@ -37,7 +37,7 @@
 .rm-shell--administracion .rm-metric-card--mint { --rm-admin-metric-accent: var(--rm-chart-1); }
 .rm-shell--administracion .rm-metric-card--sky { --rm-admin-metric-accent: var(--rm-chart-2); }
 .rm-shell--administracion .rm-metric-card--coral { --rm-admin-metric-accent: var(--rm-chart-9); }
-.rm-shell--administracion .rm-metric-card--critical { --rm-admin-metric-accent: var(--rm-chart-10); }
+.rm-shell--administracion .rm-metric-card--critical { --rm-admin-metric-accent: var(--rm-chart-danger); }
 .rm-shell--administracion .rm-metric-card--neutral { --rm-admin-metric-accent: var(--rm-action-primary); }
 
 /* Dashboard: doce columnas como Enfermería y paneles con tamaños comparables. */
@@ -128,7 +128,7 @@
 .rm-admin-dashboard__timeline-item--preadmisiones, .rm-admin-dashboard__timeline-item--admisiones { --rm-timeline-accent: var(--rm-chart-1); }
 .rm-admin-dashboard__timeline-item--visitas { --rm-timeline-accent: var(--rm-chart-2); }
 .rm-admin-dashboard__timeline-item--documentos { --rm-timeline-accent: var(--rm-chart-3); }
-.rm-admin-dashboard__timeline-item--alertas { --rm-timeline-accent: var(--rm-chart-10); }
+.rm-admin-dashboard__timeline-item--alertas { --rm-timeline-accent: var(--rm-chart-danger); }
 .rm-admin-dashboard__timeline-item--jornadas { --rm-timeline-accent: var(--rm-chart-9); }
 .rm-admin-dashboard__timeline-item--ocupaciones, .rm-admin-dashboard__timeline-item--ocupaciones_cama { --rm-timeline-accent: var(--rm-chart-4); }
 .rm-admin-dashboard__timeline-dot { display: grid; place-items: center; width: 30px; height: 30px; margin: 0; border: 1px solid color-mix(in srgb, var(--rm-timeline-accent) 35%, var(--rm-border)); border-radius: 50%; background: color-mix(in srgb, var(--rm-timeline-accent) 14%, var(--rm-surface)); color: var(--rm-timeline-accent); font-size: 15px; }

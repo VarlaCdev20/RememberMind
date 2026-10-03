@@ -51,3 +51,8 @@
 @import './patterns/admin-preadmissions.css';
 @import './patterns/admin-resident-panel.css';
 @import './patterns/unified-data-tables.css';
+
+/* Navegación lateral compartida: después de los ajustes históricos por módulo. */
+@import './components/sidebar.css';
+@import './components/topbar.css';
+@import './components/dashboard-header.css';

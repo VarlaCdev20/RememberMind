@@ -36,10 +36,10 @@ function getSystemTheme() {
 
 /**
  * Obtiene el tema guardado.
- * Si no existe, por defecto usa modo claro para evitar cambios bruscos.
+ * Si no existe, respeta el tema del sistema igual que el arranque del layout.
  */
 function getSavedTheme() {
-    return localStorage.getItem(THEME_STORAGE_KEY) || THEME_LIGHT;
+    return localStorage.getItem(THEME_STORAGE_KEY) || THEME_SYSTEM;
 }
 
 /**

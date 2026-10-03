@@ -1,25 +1,25 @@
+/* Elevaciones suaves: todas comparten la tinta cálida de la paleta oficial. */
 :root {
    --rm-shadow-none: none;
-
-   --rm-shadow-2xs: 0 1px 2px rgba(24, 24, 27, 0.03);
-
-   --rm-shadow-xs: 0 1px 3px rgba(24, 24, 27, 0.04), 0 1px 2px rgba(24, 24, 27, 0.02);
-
-   --rm-shadow-sm: 0 2px 6px rgba(24, 24, 27, 0.04), 0 8px 16px -2px rgba(24, 24, 27, 0.04);
-
-   --rm-shadow-md: 0 4px 10px rgba(24, 24, 27, 0.04), 0 16px 28px -4px rgba(24, 24, 27, 0.07);
-
-   --rm-shadow-lg: 0 8px 20px rgba(24, 24, 27, 0.05), 0 24px 44px -6px rgba(24, 24, 27, 0.10);
-
+   --rm-shadow-2xs: 0 1px 2px color-mix(in srgb, var(--rm-shadow-ink) 3%, transparent);
+   --rm-shadow-xs: 0 1px 2px color-mix(in srgb, var(--rm-shadow-ink) 4%, transparent);
+   --rm-shadow-sm:
+      0 1px 2px color-mix(in srgb, var(--rm-shadow-ink) 4%, transparent),
+      0 8px 24px color-mix(in srgb, var(--rm-shadow-ink) 6%, transparent);
+   --rm-shadow-md:
+      0 2px 6px color-mix(in srgb, var(--rm-shadow-ink) 5%, transparent),
+      0 12px 28px color-mix(in srgb, var(--rm-shadow-ink) 8%, transparent);
+   --rm-shadow-lg:
+      0 4px 12px color-mix(in srgb, var(--rm-shadow-ink) 6%, transparent),
+      0 20px 40px color-mix(in srgb, var(--rm-shadow-ink) 10%, transparent);
    --rm-shadow-overlay:
-      0 4px 6px -1px rgba(32, 28, 26, 0.08), 0 20px 48px -8px rgba(32, 28, 26, 0.22), 0 36px 72px -16px rgba(32, 28, 26, 0.26);
-
-   /* Component-level aliases */
-   --rm-shadow-input: 0 1px 2px rgba(24, 24, 27, 0.03);
-   --rm-shadow-card: 0 1px 3px rgba(24, 24, 27, 0.03), 0 6px 18px -2px rgba(24, 24, 27, 0.05);
-   --rm-shadow-raised: 0 4px 12px rgba(24, 24, 27, 0.05), 0 16px 30px -4px rgba(24, 24, 27, 0.08);
-   --rm-shadow-floating: 0 8px 24px rgba(24, 24, 27, 0.06), 0 28px 48px -6px rgba(24, 24, 27, 0.12);
-   --rm-shadow-card-hover: 0 6px 16px rgba(24, 24, 27, 0.06), 0 20px 36px -4px rgba(24, 24, 27, 0.09);
+      0 4px 12px color-mix(in srgb, var(--rm-shadow-ink) 8%, transparent),
+      0 24px 56px color-mix(in srgb, var(--rm-shadow-ink) 18%, transparent);
+   --rm-shadow-input: var(--rm-shadow-2xs);
+   --rm-shadow-card: var(--rm-shadow-sm);
+   --rm-shadow-raised: var(--rm-shadow-md);
+   --rm-shadow-floating: var(--rm-shadow-lg);
+   --rm-shadow-card-hover: var(--rm-shadow-md);
    --rm-shadow-dropdown: var(--rm-shadow-md);
    --rm-shadow-drawer: var(--rm-shadow-lg);
    --rm-shadow-modal: var(--rm-shadow-overlay);

@@ -458,3 +458,17 @@ html { overflow-x: hidden; }
     .welcome-cursor-light { display: none; }
     .welcome-page *, .welcome-page *::before, .welcome-page *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
 }
+
+/* Superficies públicas: el modo oscuro comparte el petróleo institucional. */
+:is(.dark, [data-theme="dark"]) .welcome-page {
+    --garden-green-dark: var(--rm-primary-ink);
+    --garden-line: var(--rm-border);
+    --garden-sand: var(--rm-surface-muted);
+    --garden-clay: var(--rm-surface-soft);
+}
+:is(.dark, [data-theme="dark"]) .welcome-hero { background-color: var(--rm-bg-sidebar); }
+:is(.dark, [data-theme="dark"]) .welcome-pillars { background: linear-gradient(180deg, var(--rm-surface-soft), var(--rm-bg-app)); }
+:is(.dark, [data-theme="dark"]) .welcome-services-detail { background: var(--rm-surface); color: var(--rm-text-primary); }
+:is(.dark, [data-theme="dark"]) .welcome-gallery-card { background-color: var(--rm-surface-soft); }
+:is(.dark, [data-theme="dark"]) .welcome-contact { background: linear-gradient(128deg, var(--rm-bg-sidebar), var(--rm-surface)); }
+:is(.dark, [data-theme="dark"]) .welcome-footer { background: var(--rm-bg-app); color: var(--rm-text-secondary); border-color: var(--rm-border); }

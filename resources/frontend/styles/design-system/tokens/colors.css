@@ -1,266 +1,312 @@
-/* ============================================================
-   REMEMBERMIND DESIGN SYSTEM — TOKENS SEMÁNTICOS
-   Jerarquía: arena/café grisáceo + menta clínica + azul sereno
-   ============================================================ */
-
+/* RememberMind Design System: paleta oficial y contratos semánticos.
+   Las áreas funcionales usan acentos; todas las superficies siguen siendo neutras. */
 :root {
+   /* Familia petróleo histórica para el modo oscuro global. */
+   --rm-palette-petroleum-950: #07141C;
+   --rm-palette-petroleum-900: #0A1821;
+   --rm-palette-petroleum-800: #10212B;
+   --rm-palette-petroleum-700: #142832;
+   --rm-palette-petroleum-raised: #192E39;
+   --rm-palette-petroleum-border: #29424E;
+   --rm-palette-petroleum-text: #EDF5F7;
+   --rm-palette-petroleum-secondary: #A8BAC2;
+   --rm-palette-petroleum-mint: #A9C792;
+   /* Familia tierra oficial. Una única definición de cada tono. */
+   --rm-earth-900: #59524B;
+   --rm-earth-800: #665F57;
+   --rm-earth-700: #746B62;
+   --rm-earth-600: #82786E;
+   --rm-earth-500: #8F857B;
+   --rm-earth-400: #9B9288;
+   --rm-earth-300: #A69E96;
+   /* Alias conservados para componentes que ya consumen la familia café. */
+   --rm-palette-brown-900: var(--rm-earth-900);
+   --rm-palette-brown-800: var(--rm-earth-800);
+   --rm-palette-brown-700: var(--rm-earth-700);
+   --rm-palette-brown-600: var(--rm-earth-600);
+   --rm-palette-brown-500: var(--rm-earth-500);
+   --rm-palette-brown-400: var(--rm-earth-400);
+   --rm-palette-brown-300: var(--rm-earth-300);
 
-   /* ============================================================
-      1. FONDOS ESTRUCTURALES — Jerarquía descendente
-      sidebar (#AE9C8F) → bg-app → surface-soft → surface → raised
-      ============================================================ */
-   --rm-bg-app: #CFC5BA;           /* taupe cálido del landing */
-   --rm-bg-shell: #C9C2BB;         /* café grisáceo estructurado */
+   /* Las superficies aclaran esta escala para conservar contraste. */
+   --rm-palette-page: #F1EAE4;
+   --rm-palette-capuchino: #D6C6B9;
+   --rm-palette-sidebar: var(--rm-palette-capuchino);
+   --rm-palette-surface: color-mix(in srgb, var(--rm-palette-brown-300) 20%, var(--rm-palette-page));
+   --rm-palette-surface-soft: color-mix(in srgb, var(--rm-palette-brown-300) 30%, var(--rm-palette-page));
+   --rm-palette-surface-muted: color-mix(in srgb, var(--rm-palette-brown-300) 50%, var(--rm-palette-page));
+   --rm-palette-ink: var(--rm-palette-brown-900);
+   --rm-palette-ink-secondary: var(--rm-palette-brown-800);
+   /* Salvia complementaria: se conservan los mentas existentes. */
+   --rm-palette-sage-900: #78826E;
+   --rm-palette-sage-800: #858E7C;
+   --rm-palette-sage-700: #939B8B;
+   --rm-palette-sage-600: #A0A799;
+   --rm-palette-sage-500: #AEB4A8;
+   --rm-palette-sage-400: #BBC0B6;
+   --rm-palette-sage-300: #C9CDC5;
+   --rm-palette-sage-200: #D6D9D3;
+   --rm-palette-sage-100: #E4E6E2;
+   --rm-palette-forest-ink: #56604F;
+   --rm-contrast-ink: color-mix(in srgb, var(--rm-palette-brown-900) 85%, black);
+   --rm-sage-deep: var(--rm-palette-sage-900);
+   --rm-palette-mint: #C4C6B4;
+   --rm-palette-primary: #78826E;
+   --rm-palette-primary-ink: var(--rm-palette-forest-ink);
+   --rm-palette-primary-soft: color-mix(in srgb, var(--rm-palette-mint) 50%, var(--rm-palette-page));
+   --rm-palette-sage: #A8BAA3;
+   --rm-palette-sage-soft: #C2CEBE;
+   --rm-palette-info: #8699AC;
+   --rm-palette-info-soft: #C2CCD5;
+   --rm-palette-psychology: #CEB0B0;
+   --rm-palette-nutrition: #C4C4A0;
+   --rm-palette-warning: #C69245;
+   --rm-palette-danger: #B85C58;
+
+   /* Tokens de uso: los componentes consumen esta capa. */
+   --rm-bg-app: var(--rm-palette-page);
+   --rm-bg-sidebar: var(--rm-palette-sidebar);
+   --rm-surface: var(--rm-palette-surface);
+   --rm-surface-soft: var(--rm-palette-surface-soft);
+   --rm-surface-muted: var(--rm-palette-surface-muted);
+   --rm-text-primary: var(--rm-earth-900);
+   --rm-text-secondary: var(--rm-earth-800);
+   --rm-primary: var(--rm-palette-primary);
+   --rm-primary-ink: var(--rm-palette-primary-ink);
+   --rm-primary-soft: var(--rm-palette-sage-300);
+   --rm-sage: var(--rm-palette-sage);
+   --rm-sage-soft: color-mix(in srgb, var(--rm-palette-sage-soft) 65%, var(--rm-palette-page));
+   --rm-info: var(--rm-palette-info);
+   --rm-info-soft: var(--rm-palette-info-soft);
+   --rm-psychology: var(--rm-palette-psychology);
+   --rm-nutrition: var(--rm-palette-nutrition);
+   --rm-warning: var(--rm-palette-warning);
+   --rm-danger: var(--rm-palette-danger);
+   --rm-border: rgba(89, 82, 75, .14);
+   --rm-border-strong: rgba(89, 82, 75, .24);
+
+   /* Superficies y texto: una sola jerarquía compartida. */
+   --rm-bg-shell: var(--rm-bg-sidebar);
    --rm-bg-layout: var(--rm-bg-app);
-
-   /* Topbar */
-   --rm-topbar-bg: #D2C6BC;        /* neutro cálido — topbar */
-   --rm-topbar-search-bg: #DDD4CC; /* pergamino grisáceo — search */
-
-   /* ============================================================
-      2. SUPERFICIES — Escala con ΔL ≈ 7-8 entre niveles
-      ============================================================ */
-   --rm-surface-main: #EBE3DD;
-   --rm-surface: var(--rm-surface-main);
-   --rm-surface-soft: #E4DAD4;
-   --rm-surface-muted: #DDD3CC;
-   --rm-surface-raised: #EEE8E2;   /* elevado, nunca blanco */
-
+   --rm-surface-main: var(--rm-surface);
    --rm-surface-alt: var(--rm-surface-soft);
-   --rm-surface-strong: #AAA09A;   /* arcilla grisácea del landing */
+   --rm-surface-strong: var(--rm-surface-muted);
    --rm-surface-beige: var(--rm-surface);
-
-   /* ============================================================
-      3. TEXTO — Contraste real entre niveles
-      ============================================================ */
-   --rm-text-primary: #302C2A;
+   --rm-surface-raised: var(--rm-surface);
    --rm-text-title: var(--rm-text-primary);
-   --rm-text-body: #625B57;
-   --rm-text-secondary: #625B57;
-   --rm-text-muted: #817873;
-   --rm-text-soft: #7A736E;
-   --rm-text-on-dark: #EEE5DF;
-   --rm-text-on-dark-soft: #DCCFC7;
-   --rm-text-on-primary: #34453A;
-   --rm-text-inverse: #F4EEE8;
+   --rm-text-body: var(--rm-text-primary);
+   --rm-text-muted: var(--rm-earth-700);
+   --rm-icon-default: var(--rm-earth-600);
+   --rm-text-soft: var(--rm-text-secondary);
+   --rm-text-inverse: var(--rm-palette-page);
+   --rm-text-on-primary: color-mix(in srgb, var(--rm-palette-brown-900) 25%, black);
+   --rm-text-on-dark: var(--rm-text-inverse);
+   --rm-text-on-dark-soft: color-mix(in srgb, var(--rm-text-inverse) 85%, transparent);
+   --rm-border-soft: var(--rm-border);
+   --rm-border-medium: var(--rm-border-strong);
+   --rm-border-hover: color-mix(in srgb, var(--rm-text-primary) 40%, transparent);
+   --rm-divider: var(--rm-border);
+   --rm-shadow-ink: var(--rm-contrast-ink);
 
-   /* ============================================================
-      4. BORDES — Sutiles, apoyo de sombra
-      ============================================================ */
-   --rm-border: #B9AFA7;
-   --rm-border-soft: rgba(120, 101, 91, .10);
-   --rm-border-medium: rgba(120, 101, 91, .18);
-   --rm-border-hover: #8D837C;
-   --rm-border-strong: #A49A92;
+   /* Acción institucional y selección. */
+   --rm-primary-hover: var(--rm-palette-sage-800);
+   --rm-primary-active: color-mix(in srgb, var(--rm-primary) 76%, var(--rm-shadow-ink));
+   --rm-action-primary: var(--rm-primary);
+   --rm-action-primary-hover: var(--rm-primary-hover);
+   --rm-action-primary-active: var(--rm-primary-active);
+   --rm-action-primary-ink: var(--rm-primary-ink);
+   --rm-action-primary-soft: var(--rm-selected-bg);
+   --rm-accent: var(--rm-primary);
+   --rm-accent-hover: var(--rm-primary-hover);
+   --rm-accent-soft: var(--rm-primary-soft);
+   --rm-accent-action: var(--rm-primary);
+   --rm-accent-action-hover: var(--rm-primary-hover);
+   --rm-focus: var(--rm-primary-ink);
+   --rm-focus-tint: color-mix(in srgb, var(--rm-primary) 24%, transparent);
+   --rm-focus-ring: 0 0 0 3px var(--rm-focus-tint);
+   --rm-disabled-opacity: .55;
+   --rm-selected-bg: var(--rm-palette-sage-200);
+   --rm-selected-hover: color-mix(in srgb, var(--rm-selected-bg) 85%, var(--rm-palette-page));
+   --rm-selected-text: var(--rm-primary-ink);
+   --rm-selected-text-soft: var(--rm-primary-ink);
+   --rm-selected-icon: var(--rm-primary-ink);
+   --rm-selected-border: color-mix(in srgb, var(--rm-primary) 24%, transparent);
+   --rm-selected-soft: var(--rm-selected-bg);
 
-   --rm-divider: rgba(47, 40, 36, .10);
-
-   /* ============================================================
-      5. ACCIÓN PRIMARY — Eucalipto
-      ============================================================ */
-   --rm-action-primary: #A9C1AA;
-   --rm-action-primary-hover: #9AB69D;
-   --rm-action-primary-active: #88A68C;
-   --rm-action-primary-ink: #536B5A;
-   --rm-action-primary-soft: #E2EBE3;
-
-   --rm-primary: var(--rm-action-primary);
-   --rm-primary-hover: var(--rm-action-primary-hover);
-   --rm-primary-active: var(--rm-action-primary-active);
-   --rm-primary-soft: var(--rm-action-primary-soft);
-
-   --rm-accent: var(--rm-action-primary);
-   --rm-accent-hover: var(--rm-action-primary-hover);
-   --rm-accent-soft: var(--rm-action-primary-soft);
-   --rm-accent-action: var(--rm-action-primary);
-   --rm-accent-action-hover: var(--rm-action-primary-hover);
-
-   /* ============================================================
-      6. FOCUS & SELECTED
-      ============================================================ */
-   --rm-focus: var(--rm-sky-500);
-   --rm-focus-ring: 0 0 0 3px rgba(83, 151, 184, .28);
-   --rm-disabled-opacity: 0.55;
-
-   --rm-selected-bg: #A9C1AA;
-   --rm-selected-hover: #9AB69D;
-   --rm-selected-text: #34453A;
-   --rm-selected-text-soft: var(--rm-text-primary);
-   --rm-selected-icon: #34453A;
-   --rm-selected-border: #88A68C;
-   --rm-selected-soft: #E2EBE3;
-
-   /* ============================================================
-      7. SIDEBAR — Taupe/capuchino
-      ============================================================ */
-   --rm-sidebar-bg: var(--rm-mocha-300);
-   --rm-sidebar-hover: var(--rm-mocha-200);
-   --rm-sidebar-active: var(--rm-taupe-200);
-   --rm-sidebar-border: var(--rm-taupe-500);
-   --rm-sidebar-text: var(--rm-coffee-950);
-   --rm-sidebar-text-soft: var(--rm-coffee-700);
-   --rm-sidebar-indicator: var(--rm-mint-700);
-
+   /* Sidebar: grupo abierto y destino seleccionado son estados distintos. */
+   --rm-sidebar-bg: var(--rm-bg-sidebar);
+   --rm-sidebar-hover: var(--rm-surface);
+   --rm-sidebar-open: var(--rm-sage-soft);
+   --rm-sidebar-active: var(--rm-selected-bg);
+   --rm-sidebar-border: var(--rm-border);
+   --rm-sidebar-text: var(--rm-text-primary);
+   --rm-sidebar-text-soft: var(--rm-text-primary);
+   --rm-sidebar-indicator: var(--rm-primary);
+   --rm-sidebar-subtext: var(--rm-text-secondary);
+   --rm-sidebar-submenu-bg: var(--rm-surface);
    --rm-nav-bg: transparent;
-   --rm-nav-text: #4C403A;
-   --rm-nav-hover: rgba(255, 255, 255, .28);
-   --rm-nav-text-hover: #2F2824;
-   --rm-nav-border: var(--rm-border-soft);
+   --rm-nav-text: var(--rm-text-primary);
+   --rm-nav-hover: var(--rm-surface-soft);
+   --rm-nav-text-hover: var(--rm-text-primary);
+   --rm-nav-border: var(--rm-border);
+   --rm-nav-selected: var(--rm-selected-bg);
+   --rm-nav-selected-hover: var(--rm-selected-hover);
+   --rm-nav-selected-text: var(--rm-selected-text);
+   --rm-nav-selected-icon: var(--rm-selected-icon);
+   --rm-nav-selected-border: var(--rm-selected-border);
 
-   --rm-nav-selected: #A9C1AA;
-   --rm-nav-selected-hover: #9AB69D;
-   --rm-nav-selected-text: #34453A;
-   --rm-nav-selected-icon: #34453A;
-   --rm-nav-selected-border: #88A68C;
-
-   /* ============================================================
-      8. TOPBAR
-      ============================================================ */
-   --rm-topbar-border: var(--rm-border-soft);
+   /* Contratos de componentes existentes. */
+   --rm-topbar-bg: var(--rm-bg-sidebar);
+   --rm-topbar-search-bg: var(--rm-surface);
+   --rm-topbar-border: var(--rm-border);
    --rm-topbar-text: var(--rm-text-primary);
    --rm-topbar-focus: var(--rm-focus);
-
-   /* ============================================================
-      9. BOTONES
-      ============================================================ */
-   --rm-button-primary-bg: #A9C1AA;
-   --rm-button-primary-text: #34453A;
-   --rm-button-primary-hover: #9AB69D;
-   --rm-button-primary-active: #88A68C;
-
-   --rm-button-secondary-bg: var(--rm-surface-raised);
-   --rm-button-secondary-text: #3B312C;
-   --rm-button-secondary-border: var(--rm-border-soft);
-   --rm-button-secondary-hover-bg: var(--rm-surface);
-
-   --rm-button-ghost-text: var(--rm-text-secondary);
-
-   /* ============================================================
-      10. INPUTS
-      ============================================================ */
-   --rm-input-bg: var(--rm-earth-150); /* #DDD1C6 primitive dedicada — no autorreferencia */
-   --rm-input-border: #B2A397;     /* border directo para inputs */
-   --rm-input-text: #3B312C;
-   --rm-input-placeholder: #665C55;
-   --rm-input-focus-border: #527DAA;
-   --rm-input-focus-ring: rgba(82, 125, 170, .20); /* foco azul reconocible */
-
-   /* ============================================================
-      11. CARDS
-      ============================================================ */
+   --rm-button-primary-bg: var(--rm-primary);
+   --rm-button-primary-text: var(--rm-text-on-primary);
+   --rm-button-primary-hover: var(--rm-primary-hover);
+   --rm-button-primary-active: var(--rm-primary-active);
+   --rm-button-secondary-bg: var(--rm-surface);
+   --rm-button-secondary-text: var(--rm-text-primary);
+   --rm-button-secondary-border: var(--rm-border);
+   --rm-button-secondary-hover-bg: var(--rm-surface-soft);
+   --rm-button-ghost-text: var(--rm-text-primary);
+   --rm-input-bg: var(--rm-surface);
+   --rm-input-border: var(--rm-border-strong);
+   --rm-input-text: var(--rm-text-primary);
+   --rm-input-placeholder: var(--rm-text-secondary);
+   --rm-input-focus-border: var(--rm-primary);
+   --rm-input-focus-ring: var(--rm-focus-ring);
    --rm-card-bg: var(--rm-surface);
-   --rm-card-border: rgba(76, 64, 58, .15);
-   --rm-card-selected-bg: #E2EBE3;
-
-   /* ============================================================
-      12. FILTROS
-      ============================================================ */
+   --rm-card-border: var(--rm-border);
+   --rm-card-selected-bg: var(--rm-selected-bg);
    --rm-filter-bar-bg: var(--rm-surface-soft);
-   --rm-chip-active-bg: var(--rm-action-primary-soft);
-   --rm-chip-active-text: var(--rm-text-primary);
-
-   /* ============================================================
-      13. TABLAS
-      ============================================================ */
+   --rm-chip-active-bg: var(--rm-selected-bg);
+   --rm-chip-active-text: var(--rm-primary-ink);
    --rm-table-container-bg: var(--rm-surface);
    --rm-table-header-bg: var(--rm-surface-soft);
    --rm-table-row-bg: var(--rm-surface);
    --rm-table-row-hover: var(--rm-surface-soft);
-   --rm-table-row-selected: #E2EBE3;
-   --rm-table-border: var(--rm-border-soft);
-   --rm-table-text: #3B312C;
-   --rm-table-metadata: #7A695D;
-
-   /* ============================================================
-      14. MODAL
-      ============================================================ */
-   --rm-modal-bg: var(--rm-surface-raised);
-   --rm-modal-border: var(--rm-border-soft);
-   --rm-modal-overlay: rgba(47, 40, 36, .48);
-
-   /* ============================================================
-      15. TABS
-      ============================================================ */
+   --rm-table-row-selected: var(--rm-selected-bg);
+   --rm-table-border: var(--rm-border);
+   --rm-table-text: var(--rm-text-primary);
+   --rm-table-metadata: var(--rm-text-secondary);
+   --rm-modal-bg: var(--rm-surface);
+   --rm-modal-border: var(--rm-border);
+   --rm-modal-overlay: color-mix(in srgb, var(--rm-shadow-ink) 48%, transparent);
    --rm-tab-text-default: var(--rm-text-secondary);
-   --rm-tab-text-selected: var(--rm-action-primary-active);
-   --rm-tab-underline-selected: var(--rm-action-primary);
-   --rm-tab-soft-selected-bg: var(--rm-action-primary-soft);
+   --rm-tab-text-selected: var(--rm-primary-ink);
+   --rm-tab-underline-selected: var(--rm-primary);
+   --rm-tab-soft-selected-bg: var(--rm-selected-bg);
+   --rm-botanical-1: var(--rm-sage);
+   --rm-botanical-2: var(--rm-sage-soft);
+   --rm-botanical-3: var(--rm-primary-soft);
+   --rm-leaf-decoration: var(--rm-sage);
+   --rm-leaf-decoration-soft: var(--rm-sage-soft);
 
-   /* ============================================================
-      16. DECORACIÓN BOTÁNICA
-      ============================================================ */
-   --rm-botanical-1: var(--rm-action-primary);
-   --rm-botanical-2: #B8C4B0;
-   --rm-botanical-3: var(--rm-action-primary-soft);
-   --rm-leaf-decoration: var(--rm-action-primary);
-   --rm-leaf-decoration-soft: var(--rm-action-primary-soft);
-
-
-   /* ============================================================
-      17.1 AZUL CLÍNICO (Contrato Canónico Oficial)
-      ============================================================ */
-   --rm-clinical: var(--rm-blue-clinical-600);        /* #4F7390 */
-   --rm-clinical-strong: var(--rm-blue-clinical-700); /* #365F78 */
-   --rm-clinical-soft: var(--rm-blue-clinical-100);   /* #D8E6EF */
-   --rm-clinical-hover: var(--rm-blue-clinical-700);
-   --rm-clinical-legacy: var(--rm-blue-clinical-legacy); /* #1E3A8A valor auditado Ficha Clínica */
-
-   /* Monitoreo y Especialidades Médicas */
-   --rm-cyan: var(--rm-cyan-600);                     /* #3D8B93 */
-   --rm-cyan-strong: var(--rm-cyan-700);
-   --rm-cyan-soft: var(--rm-cyan-200);
-
-   --rm-violet: var(--rm-violet-600);                 /* #9276A2 */
-   --rm-violet-strong: var(--rm-violet-700);
-   --rm-violet-soft: var(--rm-violet-200);
-
-   /* ============================================================
-      17. ESTADOS SEMÁNTICOS (WCAG AA)
-      ============================================================ */
-   --rm-danger: var(--rm-danger-500);
-   --rm-danger-hover: var(--rm-danger-700);
-   --rm-danger-strong: var(--rm-danger-700);
-   --rm-danger-soft: var(--rm-danger-50);
-   --rm-danger-action: var(--rm-danger-700);
-   --rm-danger-action-hover: var(--rm-danger-500);
-
-   --rm-status-high: #D47A4D;
-   --rm-status-high-soft: #F0C6AE;
-
-   --rm-warning: var(--rm-coral-500);
-   --rm-warning-hover: var(--rm-coral-700);
-   --rm-warning-strong: var(--rm-coral-700);
-   --rm-warning-soft: var(--rm-coral-50);
-
-   --rm-status-stable: #536B5A;
-   --rm-status-stable-soft: #E2EBE3;
-
-   --rm-status-attention: var(--rm-info);
-   --rm-status-attention-soft: #DCE8F7;
-
-   --rm-success: var(--rm-mint-500);
-   --rm-success-hover: var(--rm-mint-700);
-   --rm-success-soft: var(--rm-mint-50);
-   --rm-success-strong: var(--rm-mint-700);
-   --rm-success-action: var(--rm-mint-700);
-   --rm-success-action-hover: var(--rm-mint-500);
-
-   --rm-info: var(--rm-sky-500);
-   --rm-info-secondary: #496F9A;
-   --rm-info-hover: #294C70;
-   --rm-info-strong: var(--rm-sky-700);
-   --rm-info-soft: var(--rm-sky-50);
-   --rm-info-secondary-soft: #E7EFF9;
-   --rm-info-action: var(--rm-sky-700);
+   /* Acentos suaves; variantes strong para texto y action para botones.
+      No se deduce ninguna severidad clínica en esta capa. */
+   --rm-success: var(--rm-sage);
+   --rm-success-strong: var(--rm-primary-ink);
+   --rm-success-soft: var(--rm-sage-soft);
+   --rm-success-hover: var(--rm-primary-hover);
+   --rm-success-action: var(--rm-primary);
+   --rm-success-action-hover: var(--rm-primary-hover);
+   --rm-info-strong: color-mix(in srgb, var(--rm-info) 15%, var(--rm-contrast-ink));
+   --rm-info-hover: color-mix(in srgb, var(--rm-info) 20%, var(--rm-text-primary));
+   --rm-info-action: var(--rm-info-strong);
    --rm-info-action-hover: var(--rm-info-hover);
+   --rm-info-secondary: var(--rm-info-strong);
+   --rm-info-secondary-soft: var(--rm-info-soft);
+   --rm-psychology-strong: color-mix(in srgb, var(--rm-psychology) 15%, var(--rm-contrast-ink));
+   --rm-psychology-soft: color-mix(in srgb, var(--rm-psychology) 35%, var(--rm-bg-app));
+   --rm-nutrition-strong: color-mix(in srgb, var(--rm-nutrition) 15%, var(--rm-contrast-ink));
+   --rm-nutrition-soft: color-mix(in srgb, var(--rm-nutrition) 35%, var(--rm-bg-app));
+   --rm-warning-strong: color-mix(in srgb, var(--rm-warning) 20%, var(--rm-contrast-ink));
+   --rm-warning-soft: color-mix(in srgb, var(--rm-warning) 16%, var(--rm-bg-app));
+   --rm-warning-hover: color-mix(in srgb, var(--rm-warning) 25%, var(--rm-text-primary));
+   --rm-warning-action: var(--rm-warning-strong);
+   --rm-warning-action-hover: var(--rm-warning-hover);
+   --rm-danger-strong: color-mix(in srgb, var(--rm-danger) 30%, var(--rm-contrast-ink));
+   --rm-danger-soft: color-mix(in srgb, var(--rm-danger) 14%, var(--rm-bg-app));
+   --rm-danger-action: color-mix(in srgb, var(--rm-danger) 70%, var(--rm-shadow-ink));
+   --rm-danger-hover: color-mix(in srgb, var(--rm-danger) 60%, var(--rm-text-primary));
+   --rm-danger-action-hover: var(--rm-danger-hover);
+   --rm-critical: var(--rm-danger-strong);
+   --rm-success-bg: var(--rm-success-soft);
+   --rm-info-bg: var(--rm-info-soft);
+   --rm-warning-bg: var(--rm-warning-soft);
+   --rm-critical-bg: var(--rm-danger-soft);
+   --rm-status-high: var(--rm-warning-strong);
+   --rm-status-high-soft: var(--rm-warning-soft);
+   --rm-status-stable: var(--rm-success-strong);
+   --rm-status-stable-soft: var(--rm-success-soft);
+   --rm-status-attention: var(--rm-info-strong);
+   --rm-status-attention-soft: var(--rm-info-soft);
+   --rm-clinical: var(--rm-info);
+   --rm-clinical-strong: var(--rm-info-strong);
+   --rm-clinical-soft: var(--rm-info-soft);
+   --rm-clinical-hover: var(--rm-info-hover);
+   --rm-clinical-legacy: var(--rm-info-strong);
+   --rm-cyan: var(--rm-info);
+   --rm-cyan-strong: var(--rm-info-strong);
+   --rm-cyan-soft: var(--rm-info-soft);
+   --rm-violet: var(--rm-psychology);
+   --rm-violet-strong: var(--rm-psychology-strong);
+   --rm-violet-soft: var(--rm-psychology-soft);
 
-   /* Semántica estable para los componentes de las siguientes fases. */
-   --rm-success-bg: var(--rm-mint-50);
-   --rm-info-bg: var(--rm-sky-50);
-   --rm-warning-bg: var(--rm-coral-50);
-   --rm-critical-bg: var(--rm-danger-50);
-   --rm-critical: var(--rm-danger-500);
 
+}
+
+/* Modo oscuro petróleo global. Los componentes mantienen sus contratos semánticos. */
+.dark,
+[data-theme="dark"] {
+   --rm-bg-app: var(--rm-palette-petroleum-950);
+   --rm-bg-sidebar: var(--rm-palette-petroleum-900);
+   --rm-surface: var(--rm-palette-petroleum-800);
+   --rm-surface-soft: var(--rm-palette-petroleum-700);
+   --rm-surface-muted: var(--rm-palette-petroleum-900);
+   --rm-surface-raised: var(--rm-palette-petroleum-raised);
+   --rm-shadow-ink: var(--rm-palette-petroleum-950);
+   --rm-text-inverse: var(--rm-palette-petroleum-text);
+   --rm-text-on-primary: var(--rm-palette-petroleum-950);
+   --rm-text-primary: var(--rm-text-inverse);
+   --rm-text-secondary: var(--rm-palette-petroleum-secondary);
+   --rm-text-muted: var(--rm-text-secondary);
+   --rm-icon-default: var(--rm-palette-sage-400);
+   --rm-selected-bg: color-mix(in srgb, var(--rm-palette-sage-200) 18%, var(--rm-surface));
+   --rm-primary: var(--rm-palette-petroleum-mint);
+   --rm-primary-hover: color-mix(in srgb, var(--rm-primary) 85%, var(--rm-text-primary));
+   --rm-primary-active: color-mix(in srgb, var(--rm-primary) 85%, var(--rm-bg-app));
+   --rm-primary-ink: var(--rm-palette-petroleum-mint);
+   --rm-selected-hover: color-mix(in srgb, var(--rm-primary) 25%, var(--rm-surface));
+   --rm-primary-soft: color-mix(in srgb, var(--rm-primary) 18%, var(--rm-surface));
+   --rm-border: var(--rm-palette-petroleum-border);
+   --rm-border-strong: color-mix(in srgb, var(--rm-text-primary) 24%, transparent);
+   --rm-sage-soft: color-mix(in srgb, var(--rm-sage) 18%, var(--rm-surface));
+   --rm-info-soft: color-mix(in srgb, var(--rm-info) 18%, var(--rm-surface));
+   --rm-psychology-soft: color-mix(in srgb, var(--rm-psychology) 18%, var(--rm-surface));
+   --rm-nutrition-soft: color-mix(in srgb, var(--rm-nutrition) 18%, var(--rm-surface));
+   --rm-warning-soft: color-mix(in srgb, var(--rm-warning) 18%, var(--rm-surface));
+   --rm-danger-soft: color-mix(in srgb, var(--rm-danger) 18%, var(--rm-surface));
+   --rm-danger-strong: color-mix(in srgb, var(--rm-danger) 35%, var(--rm-text-primary));
+   --rm-info-strong: color-mix(in srgb, var(--rm-info) 25%, var(--rm-text-primary));
+   --rm-warning-strong: color-mix(in srgb, var(--rm-warning) 30%, var(--rm-text-primary));
+   --rm-psychology-strong: color-mix(in srgb, var(--rm-psychology) 25%, var(--rm-text-primary));
+   --rm-nutrition-strong: color-mix(in srgb, var(--rm-nutrition) 25%, var(--rm-text-primary));
+   --rm-danger-action: color-mix(in srgb, var(--rm-danger) 70%, var(--rm-shadow-ink));
+   --rm-danger-hover: color-mix(in srgb, var(--rm-danger) 60%, var(--rm-shadow-ink));
+   --rm-info-action: color-mix(in srgb, var(--rm-info) 30%, var(--rm-shadow-ink));
+   --rm-info-action-hover: color-mix(in srgb, var(--rm-info) 20%, var(--rm-shadow-ink));
+   --rm-warning-action: color-mix(in srgb, var(--rm-warning) 30%, var(--rm-shadow-ink));
+   --rm-warning-action-hover: color-mix(in srgb, var(--rm-warning) 25%, var(--rm-shadow-ink));
+   --rm-modal-overlay: color-mix(in srgb, var(--rm-shadow-ink) 72%, transparent);
+}
+
+/* Las clases históricas también consumen el contrato canónico.
+   La especificidad del modo oscuro coincide con el antiguo archivo de tema. */
+:root,
+.dark,
+[data-theme="dark"] {
    /* ============================================================
       18. LEGACY BRIDGE (compatibilidad V1)
       ============================================================ */
@@ -274,14 +320,14 @@
    --color-fondo-input: var(--rm-input-bg);
    --color-fondo-hover: var(--rm-surface-soft);
 
-   --color-sidebar-bg: var(--rm-bg-shell);
+   --color-sidebar-bg: var(--rm-bg-sidebar);
    --color-sidebar-texto: var(--rm-nav-text);
    --color-sidebar-header-bg: var(--rm-surface);
    --color-sidebar-texto-hover: var(--rm-nav-text-hover);
-   --color-sidebar-item-activo: var(--rm-action-primary);
+   --color-sidebar-item-activo: var(--rm-selected-bg);
    --color-sidebar-item-activo-borde: var(--rm-action-primary);
    --color-sidebar-seccion-hover-bg: var(--rm-nav-hover);
-   --color-sidebar-seccion-activa-bg: var(--rm-action-primary-soft);
+   --color-sidebar-seccion-activa-bg: var(--rm-sage-soft);
    --color-sidebar-seccion-activa-texto: var(--rm-text-primary);
    --color-sidebar-seccion-texto: var(--rm-text-secondary);
 
@@ -293,7 +339,7 @@
    --color-input-borde: var(--rm-input-border);
    --color-input-borde-hover: var(--rm-border-hover);
    --color-input-borde-focus: var(--rm-focus);
-   --color-input-ring-focus: rgba(119, 134, 109, 0.30);
+   --color-input-ring-focus: var(--rm-focus-tint);
    --color-input-texto: var(--rm-input-text);
    --color-input-placeholder: var(--rm-input-placeholder);
    --color-input-bg-disabled: var(--rm-surface-soft);
@@ -301,6 +347,7 @@
    --color-titulo: var(--rm-text-title);
    --color-subtitulo: var(--rm-text-secondary);
    --color-parrafo: var(--rm-text-body);
+   --color-texto-inverso: var(--rm-text-on-primary);
    --color-texto-principal: var(--rm-text-primary);
    --color-texto-secundario: var(--rm-text-secondary);
    --color-texto-apoyo: var(--rm-text-secondary);
@@ -312,9 +359,11 @@
    --color-boton-principal-texto: var(--rm-button-primary-text);
    --color-boton-acento: var(--rm-action-primary);
    --color-boton-acento-hover: var(--rm-action-primary-hover);
+   --color-boton-acento-texto: var(--rm-text-on-primary);
    --color-boton-secundario: var(--rm-button-secondary-bg);
    --color-boton-secundario-texto: var(--rm-button-secondary-text);
    --color-boton-secundario-borde: var(--rm-button-secondary-border);
+   --color-boton-secundario-hover: var(--rm-button-secondary-hover-bg);
    --color-boton-fantasma-bg: transparent;
    --color-boton-fantasma-texto: var(--rm-text-secondary);
    --color-boton-fantasma-borde: transparent;
@@ -342,32 +391,32 @@
    --color-tabla-cell-label: var(--rm-text-body);
    --color-tabla-cell-meta: var(--rm-text-muted);
 
-   --color-estado-exito-texto: var(--rm-success);
+   --color-estado-exito-texto: var(--rm-success-strong);
    --color-estado-exito-bg: var(--rm-success-soft);
    --color-estado-exito-borde: var(--rm-success);
-   --color-estado-advertencia-texto: var(--rm-warning);
+   --color-estado-advertencia-texto: var(--rm-warning-strong);
    --color-estado-advertencia-bg: var(--rm-warning-soft);
    --color-estado-advertencia-borde: var(--rm-warning);
-   --color-estado-peligro-texto: var(--rm-danger);
+   --color-estado-peligro-texto: var(--rm-danger-strong);
    --color-estado-peligro-bg: var(--rm-danger-soft);
    --color-estado-peligro-borde: var(--rm-danger);
-   --color-estado-info-texto: var(--rm-info);
+   --color-estado-info-texto: var(--rm-info-strong);
    --color-estado-info-bg: var(--rm-info-soft);
    --color-estado-info-borde: var(--rm-info);
-   --color-estado-neutral-texto: var(--rm-text-secondary);
+   --color-estado-neutral-texto: var(--rm-text-primary);
    --color-estado-neutral-bg: var(--rm-surface-soft);
    --color-estado-neutral-borde: var(--rm-border-soft);
-   --color-estado-restaurado-texto: var(--rm-success);
+   --color-estado-restaurado-texto: var(--rm-success-strong);
    --color-estado-restaurado-bg: var(--rm-success-soft);
    --color-estado-restaurado-borde: var(--rm-success);
 
-   --color-signo-normal-texto: var(--rm-success);
+   --color-signo-normal-texto: var(--rm-success-strong);
    --color-signo-normal-bg: var(--rm-success-soft);
    --color-signo-normal-borde: var(--rm-success);
-   --color-signo-observacion-texto: var(--rm-warning);
+   --color-signo-observacion-texto: var(--rm-warning-strong);
    --color-signo-observacion-bg: var(--rm-warning-soft);
    --color-signo-observacion-borde: var(--rm-warning);
-   --color-signo-critico-texto: var(--rm-danger);
+   --color-signo-critico-texto: var(--rm-danger-strong);
    --color-signo-critico-bg: var(--rm-danger-soft);
    --color-signo-critico-borde: var(--rm-danger);
    --color-signo-sin-datos-texto: var(--rm-text-muted);
@@ -378,8 +427,8 @@
    --color-kpi-residentes-bg: var(--rm-info-soft);
    --color-kpi-salud-texto: var(--rm-success);
    --color-kpi-salud-bg: var(--rm-success-soft);
-   --color-kpi-cognitivo-texto: #7B6FB3;
-   --color-kpi-cognitivo-bg: #E7E0F0;
+   --color-kpi-cognitivo-texto: var(--rm-success-strong);
+   --color-kpi-cognitivo-bg: var(--rm-sage-soft);
    --color-kpi-alertas-texto: var(--rm-danger);
    --color-kpi-alertas-bg: var(--rm-danger-soft);
    --color-kpi-actividades-texto: var(--rm-action-primary);
@@ -393,10 +442,10 @@
    --color-modulo-salud: var(--rm-success);
    --color-modulo-salud-suave: var(--rm-success-soft);
    --color-modulo-salud-fondo: var(--rm-success-soft);
-   --color-modulo-cognitivo: #7B6FB3;
-   --color-modulo-cognitivo-hover: #6A5FA0;
-   --color-modulo-cognitivo-texto: #7B6FB3;
-   --color-modulo-cognitivo-fondo: #E7E0F0;
+   --color-modulo-cognitivo: var(--rm-success-strong);
+   --color-modulo-cognitivo-hover: var(--rm-primary-hover);
+   --color-modulo-cognitivo-texto: var(--rm-success-strong);
+   --color-modulo-cognitivo-fondo: var(--rm-sage-soft);
    --color-modulo-reportes: var(--rm-info-secondary);
    --color-modulo-reportes-fondo: var(--rm-info-secondary-soft);
    --color-modulo-alertas: var(--rm-danger);
@@ -414,7 +463,7 @@
    --sombra-card: var(--rm-shadow-sm);
    --sombra-card-hover: var(--rm-shadow-md);
    --sombra-panel: var(--rm-shadow-md);
-   --sombra-sidebar: 6px 0 24px rgba(47, 40, 36, 0.06);
+   --sombra-sidebar: var(--rm-shadow-md);
    --sombra-modal: var(--rm-shadow-overlay);
 
    --glow-acento: 0 0 0 transparent;
@@ -423,249 +472,9 @@
    /* Gradientes legacy */
    --gradiente-progreso: linear-gradient(90deg, var(--rm-action-primary), var(--rm-action-primary-hover));
    --gradiente-salud: linear-gradient(135deg, var(--rm-success), var(--rm-success-hover));
-   --gradiente-cognitivo: linear-gradient(135deg, #7B6FB3, #6A5FA0);
+   --gradiente-cognitivo: linear-gradient(135deg, var(--rm-success-strong), var(--rm-primary-hover));
    --gradiente-acento: linear-gradient(135deg, var(--rm-action-primary), var(--rm-action-primary-active));
    --gradiente-panel: linear-gradient(180deg, var(--rm-surface), var(--rm-surface-soft));
    --gradiente-card: none;
    --gradiente-input: none;
-}
-
-
-/* ============================================================
-   DARK MODE — Variables --rm-* para modo oscuro
-   Activado por: .dark o [data-theme="dark"] en <html>
-   Fuente canónica: este bloque redefine todos los --rm-* semánticos.
-   modo-oscuro.css consume --rm-* y define --color-* bridge.
-   ============================================================ */
-
-.dark,
-[data-theme="dark"] {
-
-   /* ============================================================
-      1. FONDOS ESTRUCTURALES
-      ============================================================ */
-   --rm-bg-app: #07141C;
-   --rm-bg-shell: #0A1821;
-   --rm-bg-layout: #081720;
-
-   --rm-topbar-bg: #0C1B24;
-   --rm-topbar-search-bg: #10232D;
-   --rm-topbar-border: #203844;
-   --rm-topbar-text: #EDF5F7;
-
-   /* ============================================================
-      2. SUPERFICIES
-      ============================================================ */
-   --rm-surface: #10212B;
-   --rm-surface-main: var(--rm-surface);
-   --rm-surface-soft: #142832;
-   --rm-surface-muted: #0D1C25;
-   --rm-surface-raised: #192E39;
-
-   --rm-surface-alt: var(--rm-surface-soft);
-   --rm-surface-strong: #061117;
-   --rm-surface-beige: var(--rm-surface);
-
-   /* ============================================================
-      3. TEXTO — Café cálido, nunca blanco puro
-      ============================================================ */
-   --rm-text-primary: #EDF5F7;
-   --rm-text-title: #F3F8FA;
-   --rm-text-body: #C9D6DB;
-   --rm-text-secondary: #A8BAC2;
-   --rm-text-muted: #7F959F;
-   --rm-text-soft: #6D828C;
-   --rm-text-on-primary: #07141C;
-   --rm-text-inverse: #F3F8FA;
-
-   /* ============================================================
-      4. BORDES
-      ============================================================ */
-   --rm-border: #29424E;
-   --rm-border-soft: #203844;
-   --rm-border-hover: #3D6070;
-   --rm-border-strong: #527483;
-
-   --rm-divider: rgba(179, 212, 224, .11);
-
-   /* ============================================================
-      5. ACCIÓN PRIMARY — Menta clínica luminosa en modo oscuro
-      ============================================================ */
-   --rm-action-primary: #A9C792;
-   --rm-action-primary-hover: #BEDAA7;
-   --rm-action-primary-active: #8EAF78;
-   --rm-action-primary-ink: #CDE5B9;
-   --rm-action-primary-soft: rgba(169, 199, 146, .14);
-
-   --rm-primary: var(--rm-action-primary);
-   --rm-primary-hover: var(--rm-action-primary-hover);
-   --rm-primary-active: var(--rm-action-primary-active);
-   --rm-primary-soft: var(--rm-action-primary-soft);
-
-   --rm-accent: #F28A32;
-   --rm-accent-hover: #FFA34F;
-   --rm-accent-soft: rgba(242, 138, 50, .16);
-   --rm-accent-action: #F28A32;
-   --rm-accent-action-hover: #FFA34F;
-
-   /* ============================================================
-      6. FOCUS & SELECTED
-      ============================================================ */
-   --rm-focus: #35BDF2;
-   --rm-focus-ring: 0 0 0 3px rgba(53, 189, 242, .28);
-   --rm-disabled-opacity: 0.45;
-
-   /* Selected: café oscuro sobre eucalipto (fondo dark) */
-   --rm-selected-bg: #17271F;
-   --rm-selected-hover: #203429;
-   --rm-selected-text: #D2E8B8;
-   --rm-selected-text-soft: #C4DDA9;
-   --rm-selected-icon: #B9D590;
-   --rm-selected-border: #7FA45E;
-   --rm-selected-soft: rgba(146, 181, 103, .13);
-
-   /* ============================================================
-      7. SIDEBAR DARK
-      ============================================================ */
-   --rm-sidebar-bg: var(--rm-bg-shell);
-   --rm-sidebar-hover: var(--rm-surface-soft);
-   --rm-sidebar-active: var(--rm-surface-raised);
-   --rm-sidebar-border: var(--rm-border-soft);
-   --rm-sidebar-text: var(--rm-text-primary);
-   --rm-sidebar-text-soft: var(--rm-text-secondary);
-   --rm-sidebar-indicator: var(--rm-action-primary);
-
-   --rm-nav-bg: transparent;
-   --rm-nav-text: #AFC0C7;
-   --rm-nav-hover: #122630;
-   --rm-nav-text-hover: #F0F7F9;
-   --rm-nav-border: #1E3540;
-
-   --rm-nav-selected: #A9C792;
-   --rm-nav-selected-hover: #BEDAA7;
-   --rm-nav-selected-text: #D8EBBF;
-   --rm-nav-selected-icon: #B9D590;
-   --rm-nav-selected-border: #7FA45E;
-
-   /* ============================================================
-      8. BOTONES DARK
-      ============================================================ */
-   --rm-button-primary-bg: #A9C792;
-   --rm-button-primary-text: #07141C;
-   --rm-button-primary-hover: #BEDAA7;
-   --rm-button-primary-active: #8EAF78;
-
-   --rm-button-secondary-bg: #172A34;
-   --rm-button-secondary-text: #D5E1E5;
-   --rm-button-secondary-border: #29424E;
-   --rm-button-secondary-hover-bg: #1D3540;
-
-   --rm-button-ghost-text: #A8BAC2;
-
-   /* ============================================================
-      9. INPUTS DARK
-      ============================================================ */
-   --rm-input-bg: #0F2029;
-   --rm-input-border: #29424E;
-   --rm-input-text: #EDF5F7;
-   --rm-input-placeholder: #718892;
-   --rm-input-focus-border: #35BDF2;
-   --rm-input-focus-ring: rgba(53, 189, 242, .22);
-
-   /* ============================================================
-      10. CARDS DARK
-      ============================================================ */
-   --rm-card-bg: #10212B;
-   --rm-card-border: rgba(130, 178, 196, .15);
-   --rm-card-selected-bg: rgba(169, 199, 146, .13);
-
-   /* ============================================================
-      11. FILTROS DARK
-      ============================================================ */
-   --rm-filter-bar-bg: #0D1C25;
-   --rm-chip-active-bg: rgba(53, 189, 242, .13);
-   --rm-chip-active-text: #8DDCFA;
-
-   /* ============================================================
-      12. TABLAS DARK
-      ============================================================ */
-   --rm-table-container-bg: #0E1E27;
-   --rm-table-header-bg: #142832;
-   --rm-table-row-bg: #10212B;
-   --rm-table-row-hover: #162D38;
-   --rm-table-row-selected: rgba(53, 189, 242, .10);
-   --rm-table-border: #1E3540;
-   --rm-table-text: #D7E3E7;
-   --rm-table-metadata: #8096A0;
-
-   /* ============================================================
-      13. MODAL DARK
-      ============================================================ */
-   --rm-modal-bg: #10212B;
-   --rm-modal-border: #29424E;
-   --rm-modal-overlay: rgba(2, 9, 13, .78);
-
-   /* ============================================================
-      14. TABS DARK
-      ============================================================ */
-   --rm-tab-text-default: #98ACB5;
-   --rm-tab-text-selected: #8DDCFA;
-   --rm-tab-underline-selected: #35BDF2;
-   --rm-tab-soft-selected-bg: rgba(53, 189, 242, .12);
-
-   /* ============================================================
-      15. ESTADOS SEMÁNTICOS DARK — mantener colores clínicos
-      ============================================================ */
-   --rm-danger: #FF4D67;
-   --rm-danger-hover: #FF6B80;
-   --rm-danger-soft: rgba(255, 77, 103, .15);
-   --rm-warning: #EB9186;
-   --rm-warning-hover: #F2CAC4;
-   --rm-warning-soft: rgba(235, 145, 134, .16);
-   --rm-success: #20C997;
-   --rm-success-hover: #43D9AC;
-   --rm-success-soft: rgba(32, 201, 151, .14);
-   --rm-info: #35BDF2;
-   --rm-info-hover: #63D0F7;
-   --rm-info-soft: rgba(53, 189, 242, .14);
-   --rm-success-bg: var(--rm-success-soft);
-   --rm-info-bg: var(--rm-info-soft);
-   --rm-warning-bg: var(--rm-warning-soft);
-   --rm-critical-bg: var(--rm-danger-soft);
-   --rm-critical: var(--rm-danger);
-
-   --rm-clinical: #4EA8FF;
-   --rm-clinical-strong: #79BEFF;
-   --rm-clinical-soft: rgba(78, 168, 255, .16);
-   --rm-cyan: #2CC7D3;
-   --rm-cyan-soft: rgba(44, 199, 211, .15);
-   --rm-violet: #A78BFA;
-   --rm-violet-soft: rgba(167, 139, 250, .16);
-
-
-   /* ============================================================
-      16. GRÁFICOS DARK — solo grid/labels/tooltip
-      ============================================================ */
-   --rm-chart-grid: rgba(111, 157, 175, .13);
-   --rm-chart-label: #9DB2BB;
-   --rm-chart-tooltip-bg: #172C37;
-
-   /* ============================================================
-      17. SOMBRAS DARK — más opacas
-      ============================================================ */
-   --rm-shadow-xs:
-      0 1px 2px rgba(0, 0, 0, .24);
-   --rm-shadow-sm:
-      0 4px 12px rgba(0, 0, 0, .30);
-   --rm-shadow-md:
-      0 10px 28px rgba(0, 0, 0, .40);
-   --rm-shadow-lg:
-      0 16px 38px rgba(0, 0, 0, .42);
-   --rm-shadow-overlay:
-      0 28px 70px rgba(0, 0, 0, .60);
-   --rm-shadow-card: var(--rm-shadow-sm);
-   --rm-shadow-card-hover: var(--rm-shadow-md);
-   --rm-shadow-dropdown: var(--rm-shadow-md);
-   --rm-shadow-drawer: var(--rm-shadow-lg);
-   --rm-shadow-modal: var(--rm-shadow-overlay);
 }

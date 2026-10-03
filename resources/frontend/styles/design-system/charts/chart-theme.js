@@ -7,9 +7,32 @@
  * ============================================================
  */
 
+// Resolve CSS color functions before passing them to Chart.js' RGB/HEX parser.
+let rmColorContext;
+const rmResolvedColors = new Map();
+
+function rmResolveCssColor(value) {
+    if (!value || /^#|^rgba?\(/i.test(value)) return value;
+    if (typeof document === 'undefined' || !globalThis.CSS?.supports('color', value)) return value;
+    if (rmResolvedColors.has(value)) return rmResolvedColors.get(value);
+    if (!rmColorContext) {
+        const canvas = document.createElement('canvas');
+        canvas.width = canvas.height = 1;
+        rmColorContext = canvas.getContext('2d', { willReadFrequently: true });
+    }
+    if (!rmColorContext) return value;
+    rmColorContext.clearRect(0, 0, 1, 1);
+    rmColorContext.fillStyle = value;
+    rmColorContext.fillRect(0, 0, 1, 1);
+    const [r, g, b, a] = rmColorContext.getImageData(0, 0, 1, 1).data;
+    const resolved = `rgba(${r}, ${g}, ${b}, ${a / 255})`;
+    rmResolvedColors.set(value, resolved);
+    return resolved;
+}
+
 export function rmGetCss(prop) {
     if (typeof window === 'undefined' || typeof document === 'undefined') return '';
-    return getComputedStyle(document.documentElement).getPropertyValue(prop).trim();
+    return rmResolveCssColor(getComputedStyle(document.documentElement).getPropertyValue(prop).trim());
 }
 
 export function rmIsDark() {
@@ -25,7 +48,8 @@ export function rmPrefersReducedMotion() {
 }
 
 export function rmHexToRgba(hex, alpha = 1) {
-    if (!hex) return `rgba(100, 116, 139, ${alpha})`;
+    if (!hex) return 'transparent';
+    hex = rmResolveCssColor(hex);
     if (hex.startsWith('rgba') || hex.startsWith('rgb')) {
         const matches = hex.match(/[\d.]+/g);
         if (matches && matches.length >= 3) {
@@ -33,6 +57,7 @@ export function rmHexToRgba(hex, alpha = 1) {
         }
         return hex;
     }
+    if (!/^#(?:[a-f0-9]{3}|[a-f0-9]{6})$/i.test(hex)) return 'transparent';
     let cleanHex = hex.replace('#', '');
     if (cleanHex.length === 3) cleanHex = cleanHex.split('').map(c => c + c).join('');
     const r = parseInt(cleanHex.substring(0, 2), 16) || 0;
@@ -46,11 +71,7 @@ export function rmChartPalette() {
     return Array.from({ length: 10 }, (_, i) => {
         const val = rmGetCss(`--rm-chart-${i + 1}`);
         if (val) return val;
-        const fallbacks = [
-            '#4F895E', '#527DAA', '#78B985', '#6F92BC', '#8A7A70',
-            '#A89789', '#355D86', '#6A7562', '#AAA09A', '#C77969'
-        ];
-        return fallbacks[i] || '#527DAA';
+        return rmGetCss('--rm-primary') || 'transparent';
     });
 }
 
@@ -60,42 +81,41 @@ export function rmChartPaletteAlpha(alpha = 0.85) {
 
 // --- Colores Semánticos Clínicos ---
 export function rmChartSemanticColors() {
-    const isDark = rmIsDark();
     return {
-        danger:      rmGetCss('--rm-chart-danger')      || (isDark ? '#D59A8D' : '#98594F'),
-        dangerSoft:  rmGetCss('--rm-chart-danger-soft')  || (isDark ? 'rgba(243,111,99,0.18)' : '#F7D5D1'),
-        warningHigh: rmGetCss('--rm-chart-warning-high') || (isDark ? '#FB923C' : '#E67A22'),
-        warning:     rmGetCss('--rm-chart-warning')      || (isDark ? '#FBBF24' : '#D9822B'),
-        warningSoft: rmGetCss('--rm-chart-warning-soft')  || (isDark ? 'rgba(251,191,36,0.18)' : '#FEF3E2'),
-        success:     rmGetCss('--rm-chart-success')      || (isDark ? '#C8D8C7' : '#6F8B74'),
-        successSoft: rmGetCss('--rm-chart-success-soft')  || (isDark ? 'rgba(173,235,178,0.18)' : '#CBEFD0'),
-        info:        rmGetCss('--rm-chart-info')         || (isDark ? '#A2C2EC' : '#527DAA'),
-        infoSoft:    rmGetCss('--rm-chart-info-soft')    || (isDark ? 'rgba(162,194,236,0.18)' : '#DCE8F7'),
-        neutral:     rmGetCss('--rm-chart-neutral')      || (isDark ? '#94A3B8' : '#64748B'),
+        danger:      rmGetCss('--rm-chart-danger'),
+        dangerSoft:  rmGetCss('--rm-chart-danger-soft'),
+        warningHigh: rmGetCss('--rm-chart-warning-high'),
+        warning:     rmGetCss('--rm-chart-warning'),
+        warningSoft: rmGetCss('--rm-chart-warning-soft'),
+        success:     rmGetCss('--rm-chart-success'),
+        successSoft: rmGetCss('--rm-chart-success-soft'),
+        info:        rmGetCss('--rm-chart-info'),
+        infoSoft:    rmGetCss('--rm-chart-info-soft'),
+        neutral:     rmGetCss('--rm-chart-neutral'),
     };
 }
 
 // --- Mapeo ESTABLE: Origen Clínico -> Token Permanente ---
 export const CLINICAL_ORIGINS_MAP = {
-    SIGNOS:           { name: 'Signos Vitales',   token: '--rm-chart-2', fallback: '#527DAA' },
-    MEDICACION:       { name: 'Medicación',       token: '--rm-chart-1', fallback: '#4F895E' },
-    INCIDENTE:        { name: 'Incidentes',       token: '--rm-chart-10', fallback: '#C77969' },
-    SOLICITUD_MEDICA: { name: 'Solicitud Médica', token: '--rm-chart-7', fallback: '#355D86' },
-    PLAN:             { name: 'Plan Cuidados',    token: '--rm-chart-3', fallback: '#78B985' },
-    SEGUIMIENTO:      { name: 'Seguimiento',      token: '--rm-chart-4', fallback: '#6F92BC' },
-    VALORACION:       { name: 'Valoración',       token: '--rm-chart-8', fallback: '#6A7562' },
-    FICHA:            { name: 'Ficha Clínica',    token: '--rm-chart-5', fallback: '#8A7A70' },
-    MANUAL:           { name: 'Manual',           token: '--rm-chart-6', fallback: '#A89789' },
-    SISTEMA:          { name: 'Sistema',          token: '--rm-chart-9', fallback: '#BDAFA2' },
-    USUARIO:          { name: 'Usuario',          token: '--rm-chart-4', fallback: '#6F92BC' },
+    SIGNOS:           { name: 'Signos Vitales',   token: '--rm-chart-2' },
+    MEDICACION:       { name: 'Medicación',       token: '--rm-chart-1' },
+    INCIDENTE:        { name: 'Incidentes',       token: '--rm-chart-danger' },
+    SOLICITUD_MEDICA: { name: 'Solicitud Médica', token: '--rm-chart-7' },
+    PLAN:             { name: 'Plan Cuidados',    token: '--rm-chart-3' },
+    SEGUIMIENTO:      { name: 'Seguimiento',      token: '--rm-chart-4' },
+    VALORACION:       { name: 'Valoración',       token: '--rm-chart-8' },
+    FICHA:            { name: 'Ficha Clínica',    token: '--rm-chart-5' },
+    MANUAL:           { name: 'Manual',           token: '--rm-chart-6' },
+    SISTEMA:          { name: 'Sistema',          token: '--rm-chart-9' },
+    USUARIO:          { name: 'Usuario',          token: '--rm-chart-4' },
 };
 
 export function rmGetOriginColor(origenKey) {
     const meta = CLINICAL_ORIGINS_MAP[origenKey];
     if (meta) {
-        return rmGetCss(meta.token) || meta.fallback || '#527DAA';
+        return rmGetCss(meta.token) || rmGetCss('--rm-info');
     }
-    return '#527DAA';
+    return rmGetCss('--rm-info');
 }
 
 function rmResolveDatasetGlowColor(dataset, datasetIndex) {
@@ -106,7 +126,7 @@ function rmResolveDatasetGlowColor(dataset, datasetIndex) {
     if (explicit) return explicit;
 
     const paletteIndex = (datasetIndex % 10) + 1;
-    return rmGetCss(`--rm-chart-${paletteIndex}`) || rmGetCss('--rm-chart-2') || '#A2C2EC';
+    return rmGetCss(`--rm-chart-${paletteIndex}`) || rmGetCss('--rm-chart-2') || 'transparent';
 }
 
 const rmDarkNeonGlowPlugin = {
@@ -145,11 +165,10 @@ export function rmInstallGlobalChartTheme(Chart) {
     Chart.register(rmDarkNeonGlowPlugin);
 
     const applyDefaults = () => {
-        const isDark = rmIsDark();
-        const axisText = rmGetCss('--rm-chart-axis-text') || (isDark ? '#C5B8AF' : '#695F59');
-        const grid = rmGetCss('--rm-chart-grid') || (isDark ? 'rgba(255,255,255,.08)' : 'rgba(64,42,32,.12)');
-        const tooltipBg = rmGetCss('--rm-chart-tooltip-bg') || (isDark ? '#403732' : '#F4EEE8');
-        const tooltipText = rmGetCss('--rm-chart-tooltip-text') || (isDark ? '#F8F4EF' : '#302923');
+        const axisText = rmGetCss('--rm-chart-axis-text');
+        const grid = rmGetCss('--rm-chart-grid');
+        const tooltipBg = rmGetCss('--rm-chart-tooltip-bg');
+        const tooltipText = rmGetCss('--rm-chart-tooltip-text');
         const tooltipBorder = rmGetCss('--rm-chart-tooltip-border') || grid;
 
         Chart.defaults.color = axisText;
@@ -249,13 +268,12 @@ export function rmCreateBarGradient(ctx, hex, height = 240) {
 
 // --- Opciones Base Compartidas ---
 export function rmBaseChartOptions(overrides = {}) {
-    const isDark = rmIsDark();
-    const axisTextColor   = rmGetCss('--rm-chart-axis-text')    || (isDark ? '#94A3B8' : '#64748B');
-    const axisTitleColor  = rmGetCss('--rm-chart-axis-title')   || (isDark ? '#F8FAFC' : '#1E293B');
-    const gridColor       = rmGetCss('--rm-chart-grid')         || (isDark ? 'rgba(255,255,255,0.06)' : 'rgba(224,212,198,0.35)');
-    const tooltipBg       = rmGetCss('--rm-chart-tooltip-bg')   || (isDark ? '#0F172A' : '#1E293B');
-    const tooltipText     = rmGetCss('--rm-chart-tooltip-text') || '#F8FAFC';
-    const tooltipBorder   = rmGetCss('--rm-chart-tooltip-border') || (isDark ? 'rgba(255,255,255,0.12)' : 'rgba(226,232,240,0.20)');
+    const axisTextColor   = rmGetCss('--rm-chart-axis-text');
+    const axisTitleColor  = rmGetCss('--rm-chart-axis-title');
+    const gridColor       = rmGetCss('--rm-chart-grid');
+    const tooltipBg       = rmGetCss('--rm-chart-tooltip-bg');
+    const tooltipText     = rmGetCss('--rm-chart-tooltip-text');
+    const tooltipBorder   = rmGetCss('--rm-chart-tooltip-border');
 
     return {
         responsive: true,

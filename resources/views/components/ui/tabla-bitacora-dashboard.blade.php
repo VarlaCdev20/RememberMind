@@ -3,11 +3,11 @@
 <section class="rm-card p-5">
  <div class="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
  <div>
- <span class="text-[11px] font-bold uppercase tracking-widest text-boton-acento">
+ <span class="rm-caption text-boton-acento">
  Auditoría
  </span>
- <h2 class="text-xl font-extrabold text-titulo">Bitácora del sistema</h2>
- <p class="text-xs font-bold text-meta">Últimas acciones registradas mediante trazabilidad institucional.</p>
+ <h2 class="rm-section-title">Bitácora del sistema</h2>
+ <p class="rm-caption">Últimas acciones registradas mediante trazabilidad institucional.</p>
  </div>
 
  @can('bitacora.ver')
@@ -22,25 +22,25 @@
  <table class="rm-data-table min-w-full text-left text-sm rm-table">
  <thead class="rm-table-header">
  <tr>
- <th class="px-4 py-3 font-black">Fecha</th>
- <th class="px-4 py-3 font-black">Usuario</th>
- <th class="px-4 py-3 font-black">Acción</th>
- <th class="px-4 py-3 font-black">Módulo</th>
+ <th class="px-4 py-3 rm-table-head">Fecha</th>
+ <th class="px-4 py-3 rm-table-head">Usuario</th>
+ <th class="px-4 py-3 rm-table-head">Acción</th>
+ <th class="px-4 py-3 rm-table-head">Módulo</th>
  </tr>
  </thead>
 
  <tbody class="divide-y divide-borde-suave bg-fondo-tabla">
  @forelse(array_slice($registros, 0, 5) as $log)
  <tr class="rm-table-row">
- <td class="px-4 py-3 text-xs font-bold text-meta">
+ <td class="px-4 py-3 rm-caption">
  {{ $log['fecha'] ?? '-' }}
  </td>
 
- <td class="px-4 py-3 font-bold text-sm text-titulo">
+ <td class="px-4 py-3 rm-table-cell">
  {{ $log['usuario'] ?? 'Sistema' }}
  </td>
 
- <td class="px-4 py-3">
+ <td class="px-4 py-3 rm-table-cell">
  @php
  $color = match($log['accion'] ?? '') {
  'Registro creado' => 'rm-badge-success',
@@ -53,13 +53,13 @@
  <span class="rm-badge {{ $color }}">{{ $log['accion'] ?? 'Acción' }}</span>
  </td>
 
- <td class="px-4 py-3 text-xs font-bold text-apoyo">
+ <td class="px-4 py-3 rm-table-cell">
  {{ $log['modulo'] ?? 'General' }}
  </td>
  </tr>
  @empty
  <tr>
- <td colspan="4" class="px-4 py-6 text-center text-sm font-bold text-meta">
+ <td colspan="4" class="px-4 py-6 text-center rm-table-cell">
  No hay registros recientes en la bitácora.
  </td>
  </tr>

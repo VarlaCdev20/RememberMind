@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="h-full">
 
 <head>
@@ -13,7 +13,7 @@
         (function() {
             const saved = localStorage.getItem('remembermind-theme');
             const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-            const isDark = saved === 'dark' || (!saved && prefersDark);
+            const isDark = saved === 'dark' || ((!saved || saved === 'system') && prefersDark);
             if (isDark) {
                 document.documentElement.classList.add('dark');
                 document.documentElement.setAttribute('data-theme', 'dark');
@@ -27,9 +27,6 @@
     </script>
 
     {{-- Tipografía Oficial Google Fonts (Nunito Sans) --}}
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wght@0,6..12,200..1000;1,6..12,200..1000&display=swap" rel="stylesheet">
 
     {{-- Phosphor Icons Oficial --}}
     <script defer src="https://unpkg.com/@phosphor-icons/web"></script>
@@ -115,15 +112,11 @@
 
 <body class="rm-shell {{ $shellAdministracion ? 'rm-shell--administracion' : '' }} h-full bg-[var(--rm-bg-app)] text-[var(--rm-text-primary)] antialiased selection:bg-[var(--rm-action-primary)] selection:text-[var(--rm-text-on-primary)] transition-colors duration-200"
       x-data="{
-          sidebarOpen: false,
-          sidebarCollapsed: (() => { const saved = localStorage.getItem('remembermind-sidebar-collapsed'); return saved === null ? window.matchMedia('(min-width: 1024px) and (max-width: 1199px)').matches : saved === 'true'; })(),
-          toggleSidebarCollapse() {
-              this.sidebarCollapsed = !this.sidebarCollapsed;
-              localStorage.setItem('remembermind-sidebar-collapsed', String(this.sidebarCollapsed));
-          },
+          @include('components.layout.sidebar-shell-state')
           userDropdown: false,
           darkMode: document.documentElement.classList.contains('dark'),
           toggleDarkMode() {
+              if (window.RememberMindTheme) { window.RememberMindTheme.toggle(); return; }
               const nextDark = !this.darkMode;
               this.darkMode = nextDark;
               document.documentElement.classList.toggle('dark', nextDark);
@@ -142,22 +135,22 @@
               );
           }
       }"
+      x-init="initSidebar()"
+      @resize.window.debounce.150ms="syncSidebarViewport()"
       @remembermind:theme-changed.window="darkMode = $event.detail.isDark"
       :class="{ 'is-sidebar-collapsed': sidebarCollapsed }">
 
     <x-banner />
 
-    <div class="relative min-h-screen overflow-x-hidden bg-transparent transition-colors duration-200">
+    <div class="rm-app-frame relative min-h-screen bg-transparent transition-colors duration-200">
         {{-- Fondos estéticos canónicos --}}
-        <div class="rm-texture-dots pointer-events-none fixed inset-0 z-0"></div>
-        <div class="rm-mouse-light pointer-events-none fixed inset-0 z-40"></div>
 
         {{-- Overlay para móvil --}}
         <div x-show="sidebarOpen"
-             x-transition:enter="transition-opacity ease-linear duration-300"
+             x-transition:enter="transition-opacity ease-out duration-200"
              x-transition:enter-start="opacity-0"
              x-transition:enter-end="opacity-100"
-             x-transition:leave="transition-opacity ease-linear duration-300"
+             x-transition:leave="transition-opacity ease-out duration-200"
              x-transition:leave-start="opacity-100"
              x-transition:leave-end="opacity-0"
              @click="sidebarOpen = false"

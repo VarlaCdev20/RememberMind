@@ -7,7 +7,7 @@
 ])
 
 <fieldset {{ $attributes->class(['rm-form-section']) }}>
-    <legend class="rm-form-section-title">
+    <legend class="rm-section-title rm-form-section-title">
         @if($step)
             <span class="rm-form-section-step">{{ $step }}</span>
         @endif
@@ -17,7 +17,7 @@
         <span>{{ $title }}</span>
     </legend>
     @if($description)
-        <p class="rm-form-section-description">
+        <p class="rm-body rm-form-section-description">
             {{ $description }}
         </p>
     @endif

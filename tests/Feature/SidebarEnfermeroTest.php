@@ -229,7 +229,8 @@ class SidebarEnfermeroTest extends TestCase
         $response->assertStatus(200);
 
         // Textos del sidebar de Enfermería
-        $response->assertSee('ENFERMERÍA');
+        $response->assertSee('id="sidebar-enfermeria"', false);
+        $response->assertSee('Enfermeros');
         $response->assertSee('Mi turno');
         $response->assertSee('Mis residentes');
         $response->assertSee('Cuidados');

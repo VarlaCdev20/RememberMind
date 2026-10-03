@@ -60,7 +60,7 @@
     font-family: var(--rm-font-family);
     font-family: var(--rm-font-display);
     font-size: 11px;
-    font-weight: 750;
+    font-weight: var(--rm-weight-bold);
     text-transform: uppercase;
     letter-spacing: var(--rm-letter-spacing-wide);
     color: var(--rm-text-primary);
@@ -87,7 +87,7 @@
 /* Hover de fila */
 .rm-table tbody tr:hover,
 .rm-table-row:hover {
-    background-color: color-mix(in srgb, var(--rm-primary) 5%, var(--rm-table-row-hover));
+    background-color: var(--rm-table-row-hover);
 }
 
 /* Fila seleccionada */

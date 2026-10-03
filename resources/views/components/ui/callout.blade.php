@@ -28,6 +28,6 @@
         @if($title)
             <p class="rm-alert-title">{{ $title }}</p>
         @endif
-        <div class="rm-alert-desc">{{ $slot }}</div>
+        <div class="rm-alert-desc rm-alert-description">{{ $slot }}</div>
     </div>
 </div>

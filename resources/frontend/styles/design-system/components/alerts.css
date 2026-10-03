@@ -10,9 +10,9 @@
     padding: var(--rm-space-3) var(--rm-space-4);
     border-radius: var(--rm-radius-input);
     border: 1px solid transparent;
-    font-family: var(--rm-font-ui);
-    font-size: var(--rm-font-table);
-    line-height: var(--rm-line-height-normal);
+    font-family: var(--rm-font-family);
+    font-size: var(--rm-font-size-table);
+    line-height: var(--rm-line-height-body);
 }
 
 .rm-alert-icon {
@@ -30,14 +30,14 @@
 
 .rm-alert-title {
     font-weight: var(--rm-font-weight-bold);
-    font-size: var(--rm-font-table);
+    font-size: var(--rm-font-size-table);
     text-transform: uppercase;
     letter-spacing: var(--rm-letter-spacing-wide);
 }
 
 .rm-alert-desc {
     color: inherit;
-    opacity: 0.92;
+    opacity: 1;
 }
 
 .rm-alert-action {

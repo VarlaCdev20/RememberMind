@@ -14,11 +14,11 @@
        CONTRATO DE FORMULARIOS E INPUTS
        ------------------------------------------------------------ */
     --rm-input-height: var(--rm-control-md); /* altura */
-    --rm-input-border: var(--rm-border); /* borde */
-    --rm-input-text: var(--rm-text-body); /* texto */
-    --rm-input-placeholder: var(--rm-text-muted); /* placeholder */
+    --rm-input-border: var(--rm-border-strong); /* borde */
+    --rm-input-text: var(--rm-text-primary); /* texto */
+    --rm-input-placeholder: var(--rm-text-secondary); /* placeholder */
     --rm-input-focus-border: var(--rm-action-primary); /* foco */
-    --rm-input-error-border: var(--rm-danger); /* error */
+    --rm-input-error-border: var(--rm-danger-strong); /* error */
     --rm-input-radius: var(--rm-radius-md); /* radio */
 
     /* Tokens auxiliares de control */
@@ -53,7 +53,7 @@
 
 .rm-label-required::after {
     content: " *";
-    color: var(--rm-danger);
+    color: var(--rm-danger-strong);
     font-weight: var(--rm-font-weight-extrabold);
 }
 
@@ -82,7 +82,7 @@
 .rm-input::placeholder,
 .rm-textarea::placeholder {
     color: var(--rm-input-placeholder);
-    opacity: 0.80;
+    opacity: 1;
     font-size: var(--rm-font-size-table);
 }
 
@@ -176,7 +176,7 @@
 .rm-error {
     font-size: var(--rm-font-size-meta);
     font-weight: var(--rm-font-weight-semibold);
-    color: var(--rm-danger);
+    color: var(--rm-danger-strong);
     margin-top: var(--rm-space-1);
     display: flex;
     align-items: center;
@@ -337,19 +337,19 @@
 .rm-choice-card input:checked + .rm-choice-card-success {
     border-color: var(--rm-success);
     background: var(--rm-success-soft);
-    color: var(--rm-success);
+    color: var(--rm-success-strong);
 }
 
 .rm-choice-card input:checked + .rm-choice-card-warning {
     border-color: var(--rm-warning);
     background: var(--rm-warning-soft);
-    color: var(--rm-warning);
+    color: var(--rm-warning-strong);
 }
 
 .rm-choice-card input:checked + .rm-choice-card-danger {
     border-color: var(--rm-danger);
     background: var(--rm-danger-soft);
-    color: var(--rm-danger);
+    color: var(--rm-danger-strong);
 }
 
 .rm-choice-card-icon {

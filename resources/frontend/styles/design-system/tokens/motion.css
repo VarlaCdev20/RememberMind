@@ -8,6 +8,7 @@
        DURACIONES NORMALIZADAS V2
        ------------------------------------------------------------ */
     --rm-duration-fast: 120ms;
+    --rm-duration-hover: 160ms;
     --rm-duration-normal: 200ms;
     --rm-duration-slow: 280ms;
     --rm-duration-enter: 400ms;
@@ -43,6 +44,7 @@
 @media (prefers-reduced-motion: reduce) {
     :root {
         --rm-duration-fast: 0.01ms;
+        --rm-duration-hover: 0.01ms;
         --rm-duration-normal: 0.01ms;
         --rm-duration-slow: 0.01ms;
         --rm-duration-enter: 0.01ms;

@@ -11,13 +11,13 @@
     /* ------------------------------------------------------------
        1. ESTADOS DE INTERACCIÓN Y SELECCIÓN
        ------------------------------------------------------------ */
-    --rm-state-hover-bg: #EFE6DB; /* fondo hover */
+    --rm-state-hover-bg: var(--rm-surface-soft); /* fondo hover */
     --rm-state-selected-bg: var(--rm-action-primary-soft); /* seleccionado */
     --rm-state-selected-border: var(--rm-action-primary); /* borde seleccionado */
     --rm-state-disabled-opacity: .55; /* deshabilitado */
 
-    --rm-focus-color: var(--rm-action-primary); /* color de foco */
-    --rm-focus-ring: 0 0 0 3px rgba(143,161,127,.28); /* anillo de foco */
+    --rm-focus-color: var(--rm-primary-ink); /* foco contrastado sobre crema */
+    --rm-focus-ring: 0 0 0 3px var(--rm-focus-tint); /* anillo de foco */
 
     /* Alias para compatibilidad */
     --rm-focus: var(--rm-focus-color);
@@ -28,24 +28,24 @@
        2. ESTADOS SEMÁNTICOS DE RETROALIMENTACIÓN
        ------------------------------------------------------------ */
     /* Estado Success / Normal */
-    --rm-state-success-text: #2F593B;
+    --rm-state-success-text: var(--rm-success-strong);
     --rm-state-success-bg: var(--rm-success-soft);
-    --rm-state-success-border: rgba(111, 157, 123, 0.40);
+    --rm-state-success-border: color-mix(in srgb, var(--rm-success) 40%, transparent);
 
     /* Estado Warning / Observación */
-    --rm-state-warning-text: #7B571F;
+    --rm-state-warning-text: var(--rm-warning-strong);
     --rm-state-warning-bg: var(--rm-warning-soft);
-    --rm-state-warning-border: rgba(201, 154, 75, 0.40);
+    --rm-state-warning-border: color-mix(in srgb, var(--rm-warning) 40%, transparent);
 
     /* Estado Danger / Riesgo */
-    --rm-state-danger-text: #8C3229;
+    --rm-state-danger-text: var(--rm-danger-strong);
     --rm-state-danger-bg: var(--rm-danger-soft);
-    --rm-state-danger-border: rgba(200, 100, 90, 0.40);
+    --rm-state-danger-border: color-mix(in srgb, var(--rm-danger) 40%, transparent);
 
     /* Estado Info / Informativo */
-    --rm-state-info-text: #2E4562;
+    --rm-state-info-text: var(--rm-info-strong);
     --rm-state-info-bg: var(--rm-info-soft);
-    --rm-state-info-border: rgba(119, 142, 173, 0.40);
+    --rm-state-info-border: color-mix(in srgb, var(--rm-info) 40%, transparent);
 
     /* Estado Neutral */
     --rm-state-neutral-text: var(--rm-text-muted);
@@ -53,6 +53,6 @@
     --rm-state-neutral-border: var(--rm-border);
 
     /* Fondos de Fila para Tablas Clínicas */
-    --rm-row-danger-bg: rgba(167, 68, 59, 0.05);
-    --rm-row-warning-bg: rgba(201, 154, 75, 0.05);
+    --rm-row-danger-bg: color-mix(in srgb, var(--rm-danger) 5%, var(--rm-surface));
+    --rm-row-warning-bg: color-mix(in srgb, var(--rm-warning) 5%, var(--rm-surface));
 }

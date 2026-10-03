@@ -5,29 +5,16 @@
 
 :root {
 
-   --rm-font-display: "Outfit", "Nunito Sans", system-ui, sans-serif;
-   --rm-font-body: "Nunito Sans", "Inter", system-ui, sans-serif;
+   --rm-font-display: var(--rm-font-brand);
    --rm-font-title: var(--rm-font-display);
-   --rm-font-emphasis: "Outfit", "Nunito Sans", system-ui, sans-serif;
+   --rm-font-emphasis: var(--rm-font-brand);
    --rm-font-handwritten: "Caveat Brush", "Segoe Print", cursive;
 
    --rm-font-family: var(--rm-font-body);
 
-   /* Escala de uso futuro; los componentes existentes conservan sus tamaños. */
-   --rm-text-xs: 12px;
-   --rm-text-sm: 13px;
-   --rm-text-base: 14px;
-   --rm-text-md: 15px;
-   --rm-text-lg: 17px;
-   --rm-text-xl: 20px;
-   --rm-text-2xl: 26px;
-   --rm-text-3xl: 32px;
+   /* Alias de compatibilidad para vistas pendientes de migración. */
    --rm-text-kpi: 30px;
 
-   --rm-weight-regular: 400;
-   --rm-weight-medium: 500;
-   --rm-weight-semibold: 600;
-   --rm-weight-bold: 700;
 
    /* Escala Tipográfica Estándar */
    --rm-font-size-page: 27px;
@@ -47,18 +34,18 @@
    --rm-font-size-kpi: 27px;
 
    /* Pesos */
-   --rm-font-weight-regular: 400;
-   --rm-font-weight-medium: 500;
-   --rm-font-weight-semibold: 600;
-   --rm-font-weight-bold: 700;
-   --rm-font-weight-extrabold: 800;
+   --rm-font-weight-regular: var(--rm-weight-regular);
+   --rm-font-weight-medium: var(--rm-weight-medium);
+   --rm-font-weight-semibold: var(--rm-weight-semibold);
+   --rm-font-weight-bold: var(--rm-weight-bold);
+   --rm-font-weight-extrabold: var(--rm-weight-extrabold);
    --rm-font-weight-black: 900;
 
    /* Alturas de línea */
-   --rm-line-height-tight: 1.15;
-   --rm-line-height-title: 1.22;
-   --rm-line-height-body: 1.5;
-   --rm-line-height-relaxed: 1.65;
+   --rm-line-height-tight: var(--rm-leading-tight);
+   --rm-line-height-title: var(--rm-leading-heading);
+   --rm-line-height-body: var(--rm-leading-normal);
+   --rm-line-height-relaxed: var(--rm-leading-relaxed);
 
    /* Espaciado de letras */
    --rm-letter-spacing-tight: -0.018em;
@@ -66,12 +53,3 @@
    --rm-letter-spacing-wide: .035em;
    --rm-letter-spacing-wider: .05em;
 }
-
-/* Jerarquía semántica opt-in para componentes de la fase 2. */
-.rm-heading-page { font: 800 clamp(21px, 2vw, 25px)/1.2 var(--rm-font-display); color: var(--rm-text-primary); letter-spacing: -0.02em; }
-.rm-heading-section { font: 750 17px/1.25 var(--rm-font-display); color: var(--rm-text-primary); letter-spacing: -0.015em; }
-.rm-heading-card { font: 700 14.5px/1.3 var(--rm-font-display); color: var(--rm-text-primary); }
-.rm-body { font: 450 13px/1.45 var(--rm-font-body); color: var(--rm-text-primary); }
-.rm-body-sm { font: 450 12px/1.4 var(--rm-font-body); color: var(--rm-text-secondary); }
-.rm-caption { font: 450 11px/1.35 var(--rm-font-body); color: var(--rm-text-secondary); }
-.rm-kpi-value { font: 800 25px/1.1 var(--rm-font-display); color: var(--rm-text-primary); letter-spacing: -0.025em; }

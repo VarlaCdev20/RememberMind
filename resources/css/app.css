@@ -1,0 +1,108 @@
+/* Fuentes locales y contrato tipográfico global. */
+@import '@fontsource/nunito-sans/latin-400.css';
+@import '@fontsource/nunito-sans/latin-500.css';
+@import '@fontsource/nunito-sans/latin-600.css';
+@import '@fontsource/nunito-sans/latin-700.css';
+@import '@fontsource/nunito-sans/latin-800.css';
+@import '@fontsource/nunito-sans/latin-900.css';
+@import '@fontsource/inter/latin-300.css';
+@import '@fontsource/inter/latin-400.css';
+@import '@fontsource/inter/latin-500.css';
+@import '@fontsource/inter/latin-600.css';
+@import '@fontsource/inter/latin-700.css';
+@import '@fontsource/inter/latin-800.css';
+@import '@fontsource/inter/latin-900.css';
+@import '@fontsource/outfit/latin-300.css';
+@import '@fontsource/outfit/latin-400.css';
+@import '@fontsource/outfit/latin-500.css';
+@import '@fontsource/outfit/latin-600.css';
+@import '@fontsource/outfit/latin-700.css';
+@import '@fontsource/outfit/latin-800.css';
+@import '@fontsource/outfit/latin-900.css';
+@import '@fontsource/caveat-brush/latin-400.css';
+
+@import '@fontsource/plus-jakarta-sans/latin-600.css';
+@import '@fontsource/plus-jakarta-sans/latin-700.css';
+
+/* ============================================================
+   RememberMind / CENTRO GERIÁTRICO LOS ALMENDROS
+   Entrada principal de estilos.
+   ============================================================ */
+
+@import '../frontend/styles/tokens/tipografia.css';
+@import '../frontend/styles/tokens/paleta-colores.css';
+@import '../frontend/styles/tokens/variables-semanticas.css';
+@import '../frontend/styles/tokens/escala-visual.css';
+@import '../frontend/styles/base/texturas-tramas.css';
+@import '../frontend/styles/tokens/modo-oscuro.css';
+@import '../frontend/styles/components/animaciones-transiciones.css';
+@import '../frontend/styles/components/componentes-ui.css';
+@import '../frontend/styles/design-system/index.css';
+
+@import '../frontend/styles/components/enfermeria.css';
+@import '../frontend/styles/base/documento.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Única escala oficial. Los tamaños históricos se migran por componente. */
+:root {
+    --rm-font-brand: 'Outfit', sans-serif;
+    --rm-font-heading: 'Plus Jakarta Sans', sans-serif;
+    --rm-font-friendly: 'Nunito Sans', sans-serif;
+    --rm-font-body: 'Inter', sans-serif;
+    --rm-weight-regular: 400;
+    --rm-weight-medium: 500;
+    --rm-weight-semibold: 600;
+    --rm-weight-bold: 700;
+    --rm-weight-extrabold: 800;
+    --rm-text-xs: 12px;
+    --rm-text-sm: 14px;
+    --rm-text-base: 16px;
+    --rm-text-md: 15px;
+    --rm-text-lg: 18px;
+    --rm-text-xl: 20px;
+    --rm-text-2xl: 24px;
+    --rm-text-3xl: 30px;
+    --rm-text-4xl: 34px;
+    --rm-leading-tight: 1.15;
+    --rm-leading-heading: 1.25;
+    --rm-leading-normal: 1.5;
+    --rm-leading-relaxed: 1.65;
+}
+
+/* Los roles tipográficos no cambian los colores de estados o navegación. */
+.rm-brand { font: var(--rm-weight-bold) var(--rm-text-xl)/var(--rm-leading-tight) var(--rm-font-brand); }
+.rm-page-title, .rm-heading-page { font: var(--rm-weight-bold) var(--rm-text-3xl)/var(--rm-leading-heading) var(--rm-font-brand); color: var(--rm-text-primary); letter-spacing: var(--rm-letter-spacing-tight); }
+.rm-section-title, .rm-heading-section { font: var(--rm-weight-bold) var(--rm-text-xl)/var(--rm-leading-heading) var(--rm-font-heading); color: var(--rm-text-primary); }
+.rm-card-title, .rm-heading-card { font: var(--rm-weight-bold) var(--rm-text-lg)/var(--rm-leading-heading) var(--rm-font-friendly); color: var(--rm-text-primary); }
+.rm-body { font: var(--rm-weight-regular) var(--rm-text-base)/var(--rm-leading-normal) var(--rm-font-body); }
+.rm-label { text-transform: none; font: var(--rm-weight-semibold) var(--rm-text-sm)/var(--rm-leading-normal) var(--rm-font-body); letter-spacing: var(--rm-letter-spacing-normal); }
+.rm-caption, .rm-body-sm { font: var(--rm-weight-medium) var(--rm-text-xs)/var(--rm-leading-normal) var(--rm-font-body); color: var(--rm-text-secondary); }
+.rm-metric, .rm-kpi-value { font: var(--rm-weight-extrabold) var(--rm-text-4xl)/var(--rm-leading-tight) var(--rm-font-brand); font-variant-numeric: tabular-nums; letter-spacing: var(--rm-letter-spacing-tight); }
+.rm-nav-section { font: var(--rm-weight-bold) var(--rm-text-xs)/var(--rm-leading-heading) var(--rm-font-heading); letter-spacing: var(--rm-letter-spacing-wide); }
+.rm-nav-group { font: var(--rm-weight-semibold) var(--rm-text-md)/var(--rm-leading-heading) var(--rm-font-heading); }
+.rm-nav-item { font: var(--rm-weight-medium) var(--rm-text-sm)/var(--rm-leading-normal) var(--rm-font-body); }
+.rm-table-head { font: var(--rm-weight-semibold) var(--rm-text-xs)/var(--rm-leading-normal) var(--rm-font-body); }
+.rm-table-cell { font: var(--rm-weight-regular) var(--rm-text-sm)/var(--rm-leading-normal) var(--rm-font-body); }
+.rm-badge { font: var(--rm-weight-bold) var(--rm-text-xs)/var(--rm-leading-heading) var(--rm-font-friendly); text-transform: none; letter-spacing: var(--rm-letter-spacing-normal); }
+.rm-alert-title { font: var(--rm-weight-bold) var(--rm-text-sm)/var(--rm-leading-heading) var(--rm-font-friendly); text-transform: none; letter-spacing: var(--rm-letter-spacing-normal); }
+.rm-alert-description { font: var(--rm-weight-regular) var(--rm-text-sm)/var(--rm-leading-normal) var(--rm-font-body); }
+
+/* Referencias: solo tipografía, conservando layout, estados y comportamiento. */
+.rm-metric-card .rm-metric { font: var(--rm-weight-extrabold) var(--rm-text-4xl)/var(--rm-leading-tight) var(--rm-font-brand); }
+.rm-metric-card .rm-card-title { font: var(--rm-weight-bold) var(--rm-text-lg)/var(--rm-leading-heading) var(--rm-font-friendly); text-transform: none; letter-spacing: normal; }
+.rm-metric-card .rm-body { font: var(--rm-weight-regular) var(--rm-text-sm)/var(--rm-leading-normal) var(--rm-font-body); }
+.rm-form-section .rm-section-title { font: var(--rm-weight-bold) var(--rm-text-xl)/var(--rm-leading-heading) var(--rm-font-heading); text-transform: none; letter-spacing: normal; }
+.rm-form-section .rm-body { font: var(--rm-weight-regular) var(--rm-text-base)/var(--rm-leading-normal) var(--rm-font-body); }
+.rm-form-section :is(.rm-input, .rm-select, .rm-textarea) { font-family: var(--rm-font-body); font-size: var(--rm-text-md); font-weight: var(--rm-weight-regular); }
+.rm-table .rm-table-head { font: var(--rm-weight-semibold) var(--rm-text-xs)/var(--rm-leading-normal) var(--rm-font-body); }
+.rm-table .rm-table-cell { font: var(--rm-weight-regular) var(--rm-text-sm)/var(--rm-leading-normal) var(--rm-font-body); }
+.rm-shell .rm-sidebar__brand-copy .rm-brand { font: var(--rm-weight-bold) var(--rm-text-xl)/var(--rm-leading-tight) var(--rm-font-brand); }
+.rm-shell .rm-sidebar__group.rm-nav-section { font: var(--rm-weight-bold) var(--rm-text-xs)/var(--rm-leading-heading) var(--rm-font-heading); }
+.rm-shell .rm-sidebar__item, .rm-shell .rm-sidebar__flyout-title { font-family: var(--rm-font-heading); }
+.rm-shell .rm-sidebar__subitem, .rm-shell .rm-sidebar__flyout-link { font: var(--rm-weight-medium) var(--rm-text-sm)/var(--rm-leading-normal) var(--rm-font-body); }
+.rm-shell .rm-sidebar__subitem.is-active, .rm-shell .rm-sidebar__flyout-link.is-active { font-weight: var(--rm-weight-semibold); }
+.rm-shell .rm-sidebar__logo { width: 32px; height: 32px; flex-basis: 32px; }
+.rm-shell .rm-sidebar__header { padding-inline: var(--rm-space-3); gap: var(--rm-space-1); }

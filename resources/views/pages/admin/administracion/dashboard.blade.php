@@ -19,7 +19,7 @@
     $pendientes = ($puedeAlertas ? $datos['alertas_activas'] : 0)
         + ($puedePreadmisiones ? $datos['preadmisiones_pendientes'] : 0)
         + ($puedeAdmisiones ? $datos['admisiones_pendientes'] : 0);
-    $prioridadesAlerta = ['CRITICA' => ['Críticas', '--rm-danger'], 'ALTA' => ['Altas', '--rm-chart-10'], 'MEDIA' => ['Medias', '--rm-warning'], 'BAJA' => ['Bajas', '--rm-action-primary']];
+    $prioridadesAlerta = ['CRITICA' => ['Críticas', '--rm-danger'], 'ALTA' => ['Altas', '--rm-chart-danger'], 'MEDIA' => ['Medias', '--rm-warning'], 'BAJA' => ['Bajas', '--rm-action-primary']];
     $otrasPrioridades = max(0, $datos['alertas_activas'] - collect(array_keys($prioridadesAlerta))->sum(fn ($clave) => (int) ($datos['alertas_prioridad'][$clave] ?? 0)));
     $segmentosAlerta = [];
     $avanceAlerta = 0;
@@ -34,28 +34,18 @@
     if ($avanceAlerta < 100) $segmentosAlerta[] = "var(--rm-surface-muted) {$avanceAlerta}% 100%";
 @endphp
 <div class="rm-admin-dashboard" aria-label="Centro de Coordinación Residencial">
-    <header class="rm-admin-dashboard__intro" aria-labelledby="admin-welcome-title">
-        <span class="rm-admin-dashboard__intro-symbol" aria-hidden="true"><i class="ph-bold ph-hand-heart"></i></span>
-        <div class="rm-admin-dashboard__intro-copy">
-            <span class="rm-admin-dashboard__intro-role"><i class="ph-bold ph-users-three" aria-hidden="true"></i> Administración · Centro de Coordinación Residencial</span>
-            <p class="rm-admin-dashboard__intro-greeting">{{ $saludo['saludo'] }},</p>
-            <h1 id="admin-welcome-title">{{ $saludo['nombre'] }}</h1>
-            <p class="rm-admin-dashboard__intro-context"><i class="ph-bold ph-heartbeat" aria-hidden="true"></i> Acompañamos cada ingreso y el bienestar de quienes viven en Los Almendros.</p>
-            <div class="rm-admin-dashboard__intro-footer">
-                <span class="rm-admin-dashboard__intro-date"><i class="ph-bold ph-calendar-blank" aria-hidden="true"></i> {{ $saludo['fecha'] }}</span>
-                @if($puedePreadmisiones)<a class="rm-admin-dashboard__primary-action" href="{{ route('admin.admisiones.preadmisiones') }}"><i class="ph-bold ph-user-plus" aria-hidden="true"></i> Revisar preadmisiones</a>@endif
-            </div>
-        </div>
-        <div class="rm-admin-dashboard__intro-visual">
-            <div class="rm-admin-dashboard__intro-photo">
-                <img src="{{ asset($fotosBienvenida[0]) }}" alt="Actividad y acompañamiento en Los Almendros" loading="eager" decoding="async" fetchpriority="high">
-            </div>
-            <div class="rm-admin-dashboard__intro-photo-detail">
-                <img src="{{ asset($fotosBienvenida[1]) }}" alt="Momentos de cuidado y convivencia en Los Almendros" loading="lazy" decoding="async">
-            </div>
-            <span class="rm-admin-dashboard__intro-photo-icon" aria-hidden="true"><i class="ph-bold ph-heartbeat"></i></span>
-        </div>
-    </header>
+    <x-ui.dashboard-header
+        eyebrow="CENTRO GERIÁTRICO LOS ALMENDROS"
+        :title="$saludo['saludo'] . ', ' . $saludo['nombre']"
+        subtitle="Acompañamos cada ingreso y el bienestar de quienes viven en Los Almendros."
+        role="Administración"
+        :date="$saludo['fecha']"
+        scope="Centro de Coordinación Residencial"
+        :image="asset($fotosBienvenida[0])"
+    />
+    @if($puedePreadmisiones)
+        <div class="rm-dashboard-header-actions"><a class="rm-admin-dashboard__primary-action" href="{{ route('admin.admisiones.preadmisiones') }}"><i class="ph-bold ph-user-plus" aria-hidden="true"></i> Revisar preadmisiones</a></div>
+    @endif
 
     @if($puedeAlertas || $puedePreadmisiones || $puedeAdmisiones)
     <section class="rm-admin-dashboard__section rm-admin-dashboard__attention" aria-labelledby="admin-attention-title">

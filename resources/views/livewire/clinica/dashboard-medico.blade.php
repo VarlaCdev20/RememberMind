@@ -8,7 +8,10 @@
   };
  @endphp
  <x-ui.role-dashboard-hero
-  eyebrow="MEDICINA Y SEGUIMIENTO CLÍNICO"
+  role="Medicina"
+  :date="now()->locale('es')->translatedFormat('D d M Y')"
+  :scope="$totalResidentes . ' residentes activos · ' . $pendientesValoracion . ' valoraciones pendientes · ' . $alertasCriticas . ' alertas prioritarias'"
+  eyebrow="CENTRO GERIÁTRICO LOS ALMENDROS"
   :title="$tituloMedico"
   highlight="es decidir con humanidad"
   description="Revisa el estado clínico, prioriza valoraciones y toma decisiones con una visión longitudinal de cada residente."

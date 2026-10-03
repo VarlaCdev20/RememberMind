@@ -1,4 +1,4 @@
-﻿@php
+@php
     $topbarPreviewRole = app(\App\Backend\Modulos\Identidad\Servicios\RolePreviewService::class)->activeRole(auth()->user());
     $isAdministracionTopbar = $topbarPreviewRole === 'ADMINISTRADOR'
         || ($topbarPreviewRole === null && auth()->user()?->hasRole('ADMINISTRADOR') && ! auth()->user()?->hasRole('SUPERADMINISTRADOR'));
@@ -18,43 +18,26 @@
 
 <header
     id="topbar-sistema" data-rm-topbar="system"
-    class="sticky top-0 z-30 flex h-[60px] min-h-[60px] max-h-[60px] box-border w-full items-center justify-between gap-2 border-b border-[var(--rm-border)] bg-[var(--rm-topbar-bg)] px-3 sm:px-5 shadow-xs backdrop-blur-md transition-all duration-300 ease-in-out" style="height: 60px; min-height: 60px; max-height: 60px; box-sizing: border-box;"
+    class="rm-topbar"
 >
     {{-- LADO IZQUIERDO: LOGO INSTITUCIONAL + REMEMBERMIND + CENTRO GERIÁTRICO --}}
-    <div class="flex min-w-0 items-center gap-2 sm:gap-3.5 shrink-0">
+    <div class="rm-topbar__identity">
         {{-- Botón Móvil para abrir sidebar --}}
         <button type="button" id="sidebar-mobile-trigger"
                 @click="sidebarOpen = true"
-                class="p-2 rounded-xl text-[var(--rm-text-primary)] hover:bg-[var(--rm-surface-soft)] lg:hidden transition-colors cursor-pointer"
+                class="rm-topbar__action rm-topbar__hamburger"
                 aria-label="Abrir menú lateral" aria-controls="{{ request()->routeIs('admin.enfermeria.*') ? 'sidebar-enfermeria' : 'sidebar' }}" :aria-expanded="sidebarOpen.toString()">
             <i class="ph-bold ph-list text-xl"></i>
         </button>
 
-        {{-- Logo Oficial Institucional --}}
-        <a href="{{ route($brandRoute) }}"
-           class="flex items-center gap-3 transition-opacity duration-200 hover:opacity-90 min-w-0"
-           title="Centro Geriátrico Los Almendros">
-            <img src="{{ asset('storage/imagenes/LOGO.png') }}"
-                 alt="CENTRO GERIÁTRICO LOS ALMENDROS"
-                 class="h-9 w-auto object-contain shrink-0 sm:h-9" style="max-height: 36px; width: auto;"
-                 onerror="this.onerror=null; this.src='{{ asset('images/logo.png') }}';">
 
-            <div class="hidden sm:block min-w-0">
-                <p class="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--rm-action-primary)] font-sans">
-                    CENTRO GERIÁTRICO LOS ALMENDROS
-                </p>
-                <p class="text-xs sm:text-sm font-black tracking-tight text-[var(--rm-text-primary)]">
-                    RememberMind <span class="text-[11px] font-bold text-[var(--rm-text-secondary)] font-normal">· {{ $subtituloModulo }}</span>
-                </p>
-            </div>
-        </a>
     </div>
 
     {{-- CENTRO: BARRA DE BÚSQUEDA PILL CON DISEÑO EXACTO DE ENFERMERÍA --}}
     @if($puedeBuscarAdministracion)
-    <div class="hidden flex-1 max-w-md mx-2 md:block">
-        <div class="rm-topbar-search" x-data="{ searchOpen: false }" @click.outside="searchOpen = false" @keydown.escape.window="searchOpen = false">
-            <button type="button" class="rm-topbar-search__toggle" @click="searchOpen = !searchOpen; if (searchOpen) $nextTick(() => $refs.topbarSearch.focus())"
+    <div class="rm-topbar__search-slot">
+        <div class="rm-topbar-search" x-data="{ searchOpen: false }" @click.outside="searchOpen = false" @keydown.escape.window="if (searchOpen) { searchOpen = false; $refs.searchToggle.focus() }" x-on:livewire:navigating.window="searchOpen = false">
+            <button type="button" class="rm-topbar-search__toggle" x-ref="searchToggle" @click="searchOpen = !searchOpen; if (searchOpen) $nextTick(() => $refs.topbarSearch.focus())"
                     :aria-expanded="searchOpen.toString()" aria-controls="topbar-admin-search-form" aria-label="Buscar en Administración">
                 <i class="ph-bold ph-magnifying-glass" aria-hidden="true"></i>
             </button>
@@ -74,57 +57,63 @@
     @endif
 
     {{-- LADO DERECHO: MODO OSCURO + NOTIFICACIONES + PERFIL --}}
-    <div class="flex items-center gap-1 sm:gap-3 shrink-0">
-        @if(auth()->user()?->hasRole('SUPERADMINISTRADOR'))
-            @inject('rolePreview', 'App\Backend\Modulos\Identidad\Servicios\RolePreviewService')
-            <form method="POST" action="{{ route('role-preview.store') }}" class="hidden items-center gap-2 xl:flex">
-                @csrf
-                <label for="role-preview-selector" class="sr-only">Ver como rol</label>
-                <i class="ph-bold ph-eye text-[var(--rm-action-primary)]" aria-hidden="true"></i>
-                <select id="role-preview-selector" name="role" onchange="this.form.submit()"
-                        class="rm-input min-h-9 max-w-44 rounded-full py-1.5 pl-3 pr-8 text-xs font-bold"
-                        aria-label="Ver como rol">
-                    @foreach($rolePreview->availableRoles() as $roleKey => $roleLabel)
-                        <option value="{{ $roleKey }}" @selected(($rolePreview->activeRole(auth()->user()) ?? 'SUPERADMINISTRADOR') === $roleKey)>{{ $roleLabel }}</option>
-                    @endforeach
-                </select>
-            </form>
-        @endif
-
+    <div class="rm-topbar__actions">
+        <x-layout.topbar-calendar />
         {{-- Botón Modo Claro / Oscuro --}}
         <button type="button"
                 data-theme-toggle
                 @click.stop="toggleDarkMode()"
+                :aria-pressed="darkMode.toString()"
                 :title="darkMode ? 'Activar modo claro' : 'Activar modo oscuro'"
                 :aria-label="darkMode ? 'Activar modo claro' : 'Activar modo oscuro'"
-                class="h-10 w-10 flex items-center justify-center rounded-full bg-[var(--rm-surface)] hover:bg-[var(--rm-surface-soft)] text-[var(--rm-text-primary)] border border-[var(--rm-border)] transition-all duration-200 active:scale-95 shadow-xs cursor-pointer">
-            <i class="ph-bold text-lg transition-transform duration-200" data-theme-icon data-icon-dark="ph-bold ph-sun text-[var(--rm-action-primary)]" data-icon-light="ph-bold ph-moon text-[var(--rm-text-primary)]" :class="darkMode ? 'ph-sun text-[var(--rm-action-primary)]' : 'ph-moon text-[var(--rm-text-primary)]'"></i>
+                class="rm-topbar__action rm-topbar__theme-toggle">
+            <i class="ph-bold text-lg transition-transform duration-200" :class="darkMode ? 'ph-sun text-[var(--rm-action-primary)]' : 'ph-moon text-[var(--rm-text-primary)]'"></i>
         </button>
+
 
         {{-- Campana de Notificaciones / Alertas --}}
         @if(auth()->user()?->canAny(['alertas.ver', 'alertas.gestionar', 'prescripciones.ver', 'administraciones_medicacion.ver']))
             <livewire:alertas.campana-notificaciones />
         @endif
 
+        <div class="rm-topbar__settings" x-data="{ settingsOpen: false }" @click.outside="settingsOpen = false" @keydown.escape.stop="settingsOpen = false; $refs.settingsToggle.focus()" x-on:livewire:navigating.window="settingsOpen = false">
+            <button type="button" class="rm-topbar__action" x-ref="settingsToggle" @click="settingsOpen = !settingsOpen" :aria-expanded="settingsOpen.toString()" aria-label="Configuración de apariencia" aria-controls="topbar-settings-navbar-sistema">
+                <i class="ph-bold ph-gear text-xl" aria-hidden="true"></i>
+            </button>
+            <div id="topbar-settings-navbar-sistema" class="rm-topbar__settings-panel" x-show="settingsOpen" x-transition.opacity.duration.180ms x-cloak>
+                <span class="rm-label">Apariencia</span>
+        {{-- Botón Modo Claro / Oscuro --}}
+        <button type="button"
+                data-theme-toggle
+                @click.stop="toggleDarkMode()"
+                :aria-pressed="darkMode.toString()"
+                :title="darkMode ? 'Activar modo claro' : 'Activar modo oscuro'"
+                :aria-label="darkMode ? 'Activar modo claro' : 'Activar modo oscuro'"
+                class="rm-topbar__action">
+            <i class="ph-bold text-lg transition-transform duration-200" :class="darkMode ? 'ph-sun text-[var(--rm-action-primary)]' : 'ph-moon text-[var(--rm-text-primary)]'"></i>
+        </button>
+
+            </div>
+        </div>
+
         {{-- Perfil de Usuario con Avatar, Nombre, Rol y Dropdown --}}
-        <div x-data="{ abierto: false }" @keydown.escape.window="if (abierto) { abierto = false; $refs.perfil.focus() }" class="relative">
+        <div x-data="{ abierto: false }" @click.outside="abierto = false" @keydown.escape.window="if (abierto) { abierto = false; $refs.perfil.focus() }" x-on:livewire:navigating.window="abierto = false" class="relative">
             <button
                 type="button"
                 x-ref="perfil"
                 @click="abierto = !abierto"
-                @click.outside="abierto = false"
                 :aria-expanded="abierto.toString()"
                 aria-controls="menu-perfil-sistema"
-                class="flex items-center gap-1 rounded-full border border-[var(--rm-border)] bg-[var(--rm-surface)] py-1 pl-1 pr-1.5 shadow-xs transition-all hover:bg-[var(--rm-surface-soft)] active:scale-95 cursor-pointer sm:gap-2.5 sm:pl-1.5 sm:pr-3"
+                class="rm-topbar__profile"
                 aria-label="Abrir menú de usuario">
 
                 {{-- Avatar Circular --}}
-                <div class="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--rm-surface-soft)] text-[var(--rm-text-primary)] border border-[var(--rm-border)] text-xs font-[700] shadow-xs shrink-0">
+                <div class="rm-topbar__avatar">
                     {{ $inicialesUsuario }}
                 </div>
 
                 {{-- Nombre y Rol --}}
-                <div class="hidden text-left leading-tight lg:block">
+                <div class="rm-topbar__profile-copy">
                     <p class="rm-topbar-user-name max-w-[140px] truncate text-[12px] font-bold text-[var(--rm-text-primary)]">
                         {{ $nombreUsuario }}
                     </p>
@@ -142,13 +131,29 @@
                 id="menu-perfil-sistema"
                 x-show="abierto"
                 x-transition:enter="transition ease-out duration-150"
-                x-transition:enter-start="opacity-0 scale-95 -translate-y-1"
-                x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+                x-transition:enter-start="opacity-0 -translate-y-1"
+                x-transition:enter-end="opacity-100 translate-y-0"
                 x-transition:leave="transition ease-in duration-100"
-                x-transition:leave-start="opacity-100 scale-100 translate-y-0"
-                x-transition:leave-end="opacity-0 scale-95 -translate-y-1"
+                x-transition:leave-start="opacity-100 translate-y-0"
+                x-transition:leave-end="opacity-0 -translate-y-1"
                 x-cloak
                 class="absolute right-0 mt-2 w-56 rounded-[var(--rm-radius-lg)] border border-[var(--rm-border-soft)] bg-[var(--rm-surface-main)] p-2 shadow-[var(--rm-shadow-floating)] z-50">
+
+        @if(auth()->user()?->hasRole('SUPERADMINISTRADOR'))
+            @inject('rolePreview', 'App\Backend\Modulos\Identidad\Servicios\RolePreviewService')
+            <form method="POST" action="{{ route('role-preview.store') }}" class="rm-topbar__role-preview">
+                @csrf
+                <label for="role-preview-selector" class="sr-only">Ver como rol</label>
+                <i class="ph-bold ph-eye text-[var(--rm-action-primary)]" aria-hidden="true"></i>
+                <select id="role-preview-selector" name="role" onchange="this.form.submit()"
+                        class="rm-input min-h-9 max-w-44 rounded-full py-1.5 pl-3 pr-8 text-xs font-bold"
+                        aria-label="Ver como rol">
+                    @foreach($rolePreview->availableRoles() as $roleKey => $roleLabel)
+                        <option value="{{ $roleKey }}" @selected(($rolePreview->activeRole(auth()->user()) ?? 'SUPERADMINISTRADOR') === $roleKey)>{{ $roleLabel }}</option>
+                    @endforeach
+                </select>
+            </form>
+        @endif
 
                 @if(Route::has('profile.show'))
                     <a href="{{ route('profile.show') }}"

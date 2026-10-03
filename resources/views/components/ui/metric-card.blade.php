@@ -41,9 +41,9 @@
         @if($loading)
             <x-ui.skeleton class="rm-metric-card__skeleton" label="Cargando {{ $resolvedLabel }}" />
         @else
-            <strong @class(['rm-kpi-value rm-metric-card__value', $colorValor])>{{ $hasValue ? $resolvedValue : '—' }}</strong>
-            <h2 id="{{ $labelId }}" class="rm-metric-card__label">{{ $resolvedLabel }}</h2>
-            <p class="rm-metric-card__description">{{ $description ?? ($hasValue ? '' : 'Sin datos disponibles') }}</p>
+            <strong @class(['rm-metric rm-metric-card__value', $colorValor])>{{ $hasValue ? $resolvedValue : '—' }}</strong>
+            <h2 id="{{ $labelId }}" class="rm-card-title rm-metric-card__label">{{ $resolvedLabel }}</h2>
+            <p class="rm-body rm-metric-card__description">{{ $description ?? ($hasValue ? '' : 'Sin datos disponibles') }}</p>
             @if($hasProgress)
                 <div class="rm-metric-card__progress" role="progressbar" aria-label="{{ $resolvedLabel }}" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ round($progressValue) }}">
                     <span style="width: {{ $progressValue }}%"></span>

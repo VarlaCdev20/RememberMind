@@ -178,7 +178,7 @@
             color-mix(in srgb, var(--rm-surface-alt) 96%, var(--rm-chart-neon-surface)),
             color-mix(in srgb, var(--rm-surface-soft) 94%, var(--rm-chart-neon-surface)));
     border-color: color-mix(in srgb, var(--rm-chart-2) 14%, var(--rm-border));
-    box-shadow: 0 14px 34px -10px rgba(0, 0, 0, .52);
+    box-shadow: var(--rm-shadow-card);
 }
 
 :is(.dark, [data-theme="dark"]) .rm-chart-card::before {
@@ -210,7 +210,7 @@
 
 :is(.dark, [data-theme="dark"]) .rm-chart-card:hover {
     border-color: color-mix(in srgb, var(--rm-chart-2) 30%, var(--rm-border));
-    box-shadow: 0 18px 42px -10px rgba(0, 0, 0, .62);
+    box-shadow: var(--rm-shadow-card-hover);
 }
 
 :is(.dark, [data-theme="dark"]) .rm-chart-card:hover canvas {
@@ -222,9 +222,9 @@
 
 :is(.dark, [data-theme="dark"]) .rm-chart-badge,
 :is(.dark, [data-theme="dark"]) .rm-chart-kpi-badge {
-    background: rgba(35, 48, 62, 0.85);
-    border-color: rgba(255, 255, 255, 0.10);
-    color: var(--rm-surface-raised);
+    background: var(--rm-surface-soft);
+    border-color: var(--rm-border);
+    color: var(--rm-text-primary);
 }
 
 .rm-chart-empty {
@@ -323,16 +323,16 @@
 .rm-kpi-card-sparkline:hover {
     transform: translateY(-2px);
     border-color: var(--rm-border-hover, var(--rm-border-soft));
-    box-shadow: 0 8px 24px -4px rgba(47, 62, 92, 0.08);
+    box-shadow: var(--rm-shadow-card-hover);
 }
 
 :is(.dark, [data-theme="dark"]) .rm-kpi-card-sparkline {
     background: color-mix(in srgb, var(--rm-surface-soft) 84%, transparent);
     border-color: var(--rm-border);
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+    box-shadow: var(--rm-shadow-card);
 }
 
 :is(.dark, [data-theme="dark"]) .rm-kpi-card-sparkline:hover {
-    border-color: rgba(255, 255, 255, 0.20);
-    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.55);
+    border-color: var(--rm-border-strong);
+    box-shadow: var(--rm-shadow-card-hover);
 }

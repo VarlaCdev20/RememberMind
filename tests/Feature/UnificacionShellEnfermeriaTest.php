@@ -46,7 +46,7 @@ class UnificacionShellEnfermeriaTest extends TestCase
             // 1. Sidebar institucional oficial unificado
             $response->assertSee('id="sidebar-enfermeria"', false);
             $response->assertSee('RememberMind');
-            $response->assertSee('ENFERMERÍA');
+            $response->assertSee('Enfermeros');
             $response->assertDontSee('BUSCAR MÓDULO...');
 
             // 2. Navegación en mayúsculas estandarizada

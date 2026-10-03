@@ -27,7 +27,7 @@
    2. VARIABLES TIPOGRÁFICAS
    ============================================================ */
 
-@import '../../assets/fuentes.css';
+
 
 :root {
     /* Familias tipográficas */
@@ -79,8 +79,8 @@
 
     /* Jerarquía tipográfica institucional */
     --font-page-title: var(--font-titulos);
-    --font-section-title: var(--font-titulos);
-    --font-card-title: var(--font-titulos);
+    --font-section-title: var(--rm-font-heading);
+    --font-card-title: var(--rm-font-friendly);
     --font-body: var(--font-principal);
     --font-ui: var(--font-principal);
 }

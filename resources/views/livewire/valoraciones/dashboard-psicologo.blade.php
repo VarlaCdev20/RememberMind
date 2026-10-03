@@ -1,7 +1,10 @@
 <div class="space-y-6">
 
  <x-ui.role-dashboard-hero
-  eyebrow="PSICOLOGÍA Y BIENESTAR EMOCIONAL"
+  role="Psicología"
+  :date="now()->locale('es')->translatedFormat('D d M Y')"
+  :scope="$totalPacientes . ' residentes · ' . $totalEvaluaciones . ' evaluaciones · 5 áreas de valoración'"
+  eyebrow="CENTRO GERIÁTRICO LOS ALMENDROS"
   title="Comprender hoy"
   highlight="es acompañar mejor mañana"
   description="Organiza las evaluaciones cognitivas, afectivas y sociales para acompañar la historia, capacidades y bienestar de cada residente."

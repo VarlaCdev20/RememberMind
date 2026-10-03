@@ -38,10 +38,12 @@ class DashboardWelcomeHeaderTest extends TestCase
         $this->assertStringNotContainsString('<input', $html);
         $this->assertStringNotContainsString('rm-nursing-welcome__profile', $html);
         $this->assertStringContainsString('data-time-zone="'.config('app.timezone').'"', $html);
-        $this->assertStringContainsString('setInterval(() => this.actualizar(), 60000)', $html);
-        $this->assertSame(2, substr_count($html, '<img'));
+        $this->assertStringContainsString('60000 - Date.now() % 60000', $html);
+        $this->assertStringNotContainsString("second: '2-digit'", $html);
+        $this->assertMatchesRegularExpression('/<time x-text="time">\d{2}:\d{2}<\/time>/', $html);
+        $this->assertSame(1, substr_count($html, '<img'));
         $this->assertStringContainsString('621786801_1404497435021508_7880315777607437580_n.jpg', $html);
-        $this->assertStringContainsString('558487013_1337134818424437_2282337776297854403_n.jpg', $html);
+        $this->assertStringContainsString('rm-dashboard-header__visual', $html);
     }
 
     public function test_usa_fotos_institucionales_y_soporta_nombre_largo(): void
@@ -58,7 +60,22 @@ class DashboardWelcomeHeaderTest extends TestCase
 
         $this->assertStringContainsString('Bienvenido, María Fernanda de los Ángeles Gutiérrez Quispe', $html);
         $this->assertStringNotContainsString('usuarios/fotos/ana.jpg', $html);
-        $this->assertSame(2, substr_count($html, '<img'));
+        $this->assertSame(1, substr_count($html, '<img'));
+    }
+
+    public function test_el_encabezado_toma_solo_la_variante_visual_del_rol_asignado(): void
+    {
+        $usuario = User::factory()->create();
+        $usuario->assignRole('ENFERMEROS');
+        $this->actingAs($usuario);
+
+        $html = Blade::render('<x-ui.dashboard-header title="Buenos días, Ana" image="/foto-institucional.jpg" />');
+
+        $this->assertStringContainsString('data-accent="nursing"', $html);
+        $this->assertStringContainsString('Enfermería', $html);
+        $this->assertStringContainsString('Cuidados continuos y seguimiento asistencial del turno.', $html);
+        $this->assertStringContainsString('Cuidado continuo', $html);
+        $this->assertStringContainsString('Signos · Medicación · Cuidados · Incidentes · Pases', $html);
     }
 
     public function test_sin_personal_usa_fallback_neutro(): void

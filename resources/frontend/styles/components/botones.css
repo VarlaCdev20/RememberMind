@@ -20,9 +20,9 @@
         padding: 0.5rem 0.75rem;
         font-family: var(--font-ui);
         font-size: var(--text-button);
-        font-weight: var(--font-extrabold);
-        letter-spacing: var(--tracking-wider);
-        text-transform: uppercase;
+        font-weight: var(--rm-button-font-weight);
+        letter-spacing: var(--rm-letter-spacing-normal);
+        text-transform: none;
         text-decoration: none;
         transition:
             transform 180ms ease,
@@ -73,7 +73,7 @@
     }
 
     .rm-btn-secondary:hover {
-        border-color: rgba(217, 121, 95, 0.24);
+        border-color: var(--rm-button-secondary-hover-border);
         background: var(--color-boton-secundario-hover);
         color: var(--color-titulo);
         box-shadow: var(--sombra-card-hover);
@@ -99,41 +99,41 @@
 
     .rm-btn-success,
     .rm-btn-excel {
-        background: var(--color-modulo-salud);
-        color: var(--color-texto-inverso);
+        background: var(--rm-button-success-bg);
+        color: var(--rm-button-success-text);
         box-shadow: var(--sombra-card);
     }
 
     .rm-btn-success:hover,
     .rm-btn-excel:hover {
-        background: var(--rm-verde-salud-hover, var(--color-modulo-salud));
-        color: var(--color-texto-inverso);
+        background: var(--rm-button-success-hover);
+        color: var(--rm-button-success-text);
         box-shadow: var(--sombra-card-hover);
         transform: translateY(-1px);
     }
 
     .rm-btn-warning {
-        background: var(--color-estado-advertencia-texto);
-        color: var(--color-texto-inverso);
+        background: var(--rm-button-warning-bg);
+        color: var(--rm-button-warning-text);
         box-shadow: var(--sombra-card);
     }
 
     .rm-btn-warning:hover {
-        background: var(--rm-naranja-dark);
-        color: var(--color-texto-inverso);
+        background: var(--rm-button-warning-hover);
+        color: var(--rm-button-warning-text);
         box-shadow: var(--sombra-card-hover);
         transform: translateY(-1px);
     }
 
     .rm-btn-danger {
-        background: var(--color-estado-peligro-texto);
-        color: var(--color-texto-inverso);
+        background: var(--rm-button-danger-bg);
+        color: var(--rm-button-danger-text);
         box-shadow: var(--sombra-card);
     }
 
     .rm-btn-danger:hover {
-        background: var(--rm-terracota-hover, var(--color-estado-peligro-texto));
-        color: var(--color-texto-inverso);
+        background: var(--rm-button-danger-hover);
+        color: var(--rm-button-danger-text);
         box-shadow: var(--sombra-card-hover);
         transform: translateY(-1px);
     }

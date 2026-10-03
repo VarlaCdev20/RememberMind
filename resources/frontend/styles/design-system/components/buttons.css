@@ -24,7 +24,7 @@
     --rm-button-font-size: var(--rm-font-size-button);
     --rm-button-font-weight: var(--rm-weight-semibold);
 
-    /* Primary: Verde oliva claro institucional */
+    /* Primary: Verde institucional */
     --rm-button-primary-bg: var(--rm-action-primary); /* fondo principal */
     --rm-button-primary-hover: var(--rm-action-primary-hover); /* hover */
     --rm-button-primary-active: var(--rm-action-primary-active); /* activo */
@@ -51,27 +51,27 @@
     --rm-button-success-border: transparent;
 
     /* Danger: Coral / Rojo Tierra */
-    --rm-button-danger-bg: var(--rm-critical);
+    --rm-button-danger-bg: var(--rm-danger-action);
     --rm-button-danger-text: var(--rm-text-inverse);
     --rm-button-danger-hover: var(--rm-danger-hover);
     --rm-button-danger-border: transparent;
 
     /* Warning: Cobre Institucional */
-    --rm-button-warning-bg: var(--rm-warning);
-    --rm-button-warning-text: var(--rm-text-primary);
-    --rm-button-warning-hover: var(--rm-warning-hover);
+    --rm-button-warning-bg: var(--rm-warning-action);
+    --rm-button-warning-text: var(--rm-text-inverse);
+    --rm-button-warning-hover: var(--rm-warning-action-hover);
     --rm-button-warning-border: transparent;
 
     /* Info: Azul Informativo */
-    --rm-button-info-bg: var(--rm-info);
+    --rm-button-info-bg: var(--rm-info-action);
     --rm-button-info-text: var(--rm-text-inverse);
-    --rm-button-info-hover: var(--rm-info-hover);
+    --rm-button-info-hover: var(--rm-info-action-hover);
     --rm-button-info-border: transparent;
 
     /* Clinical: Azul Clínico Oficial */
-    --rm-button-clinical-bg: var(--rm-clinical);
-    --rm-button-clinical-text: var(--rm-text-inverse, rgb(255 255 255));
-    --rm-button-clinical-hover: var(--rm-clinical-strong);
+    --rm-button-clinical-bg: var(--rm-info-action);
+    --rm-button-clinical-text: var(--rm-text-inverse);
+    --rm-button-clinical-hover: var(--rm-info-action-hover);
     --rm-button-clinical-border: transparent;
 
     /* Icon button */
@@ -93,7 +93,7 @@
     padding: 0 var(--rm-button-padding-x);
     height: var(--rm-button-height);
     min-height: var(--rm-button-height);
-    transition: var(--rm-transition-all);
+    transition: color var(--rm-duration-hover) ease-out, background-color var(--rm-duration-hover) ease-out, border-color var(--rm-duration-hover) ease-out, box-shadow var(--rm-duration-hover) ease-out, transform var(--rm-duration-hover) ease-out;
     cursor: pointer;
     outline: none;
     text-decoration: none;
@@ -142,7 +142,7 @@
     font-size: var(--rm-font-size-body);
 }
 
-/* 1. Primario (Verde Oliva Claro) */
+/* 1. Primario (Verde institucional) */
 .rm-btn-primary {
     background-color: var(--rm-button-primary-bg);
     color: var(--rm-button-primary-text);
@@ -344,11 +344,11 @@
 }
 
 .rm-action-btn:focus-visible {
-    outline: 3px solid var(--rm-focus-ring);
+    outline: var(--rm-focus-ring-width) solid var(--rm-focus-ring-color);
     outline-offset: 2px;
 }
 
-.rm-action-btn-atender { color: var(--rm-info); }
-.rm-action-btn-drawer { color: var(--rm-clinical); }
-.rm-action-btn-ubicacion { color: var(--rm-success); }
+.rm-action-btn-atender { color: var(--rm-info-strong); }
+.rm-action-btn-drawer { color: var(--rm-clinical-strong); }
+.rm-action-btn-ubicacion { color: var(--rm-success-strong); }
 .rm-action-btn-more { color: var(--rm-text-muted); }

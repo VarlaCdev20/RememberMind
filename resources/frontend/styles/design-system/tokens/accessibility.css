@@ -4,7 +4,7 @@
    ============================================================ */
 
 :root {
-    --rm-focus-ring-color: var(--rm-sky-500);
+    --rm-focus-ring-color: var(--rm-primary-ink);
     --rm-focus-ring-offset: 2px;
     --rm-focus-ring-width: 2px;
 }
