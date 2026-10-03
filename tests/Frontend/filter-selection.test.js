@@ -42,6 +42,12 @@ test('los filtros elegidos destacan y vuelven al estado neutral al limpiarlos', 
             </section></main></div>`);
         await page.addStyleTag({ content: css + nursingCss });
         await page.addScriptTag({ content: script, type: 'module' });
+        const settleStyles = async () => {
+            // Allow the filter's scheduled DOM update and style calculation first.
+            await page.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))));
+            await page.waitForFunction(() => document.getAnimations().every(animation =>
+                animation.playState === 'finished' || animation.playState === 'idle'));
+        };
         const inspect = () => page.evaluate(() => Object.fromEntries(['search', 'state', 'date'].map(id => {
             const element = document.getElementById(id);
             const style = getComputedStyle(element);
@@ -54,7 +60,7 @@ test('los filtros elegidos destacan y vuelven al estado neutral al limpiarlos', 
             }];
         })));
         await page.waitForFunction(() => document.getElementById('date').getAttribute('data-rm-filter-active') === 'false');
-        await new Promise(resolve => setTimeout(resolve, 200));
+        await settleStyles();
         const neutral = await inspect();
 
         await page.evaluate(() => {
@@ -64,7 +70,7 @@ test('los filtros elegidos destacan y vuelven al estado neutral al limpiarlos', 
                 element.dispatchEvent(new Event(id === 'search' ? 'input' : 'change', { bubbles: true }));
             }
         });
-        await new Promise(resolve => setTimeout(resolve, 200));
+        await settleStyles();
         const selected = await inspect();
         for (const id of ['search', 'state', 'date']) {
             assert.equal(selected[id].active, 'true');
@@ -82,7 +88,7 @@ test('los filtros elegidos destacan y vuelven al estado neutral al limpiarlos', 
         assert.equal(new Set(chips.map(chip => chip.background)).size, 3);
 
         await page.focus('#state');
-        await new Promise(resolve => setTimeout(resolve, 200));
+        await settleStyles();
         const focused = await page.$eval('#state', element => ({
             background: getComputedStyle(element).backgroundColor,
             shadow: getComputedStyle(element).boxShadow,
@@ -94,6 +100,7 @@ test('los filtros elegidos destacan y vuelven al estado neutral al limpiarlos', 
         assert.equal((await inspect()).state.background, selected.state.background);
 
         await page.$eval('#search', element => element.setAttribute('aria-invalid', 'true'));
+        await settleStyles();
         assert.notEqual((await inspect()).search.background, selected.search.background);
         await page.$eval('#search', element => element.removeAttribute('aria-invalid'));
 
@@ -114,7 +121,7 @@ test('los filtros elegidos destacan y vuelven al estado neutral al limpiarlos', 
                 element.dispatchEvent(new Event('change', { bubbles: true }));
             }
         });
-        await new Promise(resolve => setTimeout(resolve, 200));
+        await settleStyles();
         const cleared = await inspect();
         for (const id of ['search', 'state', 'date']) {
             assert.equal(cleared[id].active, 'false');

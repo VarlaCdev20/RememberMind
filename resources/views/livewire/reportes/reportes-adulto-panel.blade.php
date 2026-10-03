@@ -161,41 +161,30 @@
  </div>
  @else
  <div class="rm-chart-body is-md relative w-full" wire:ignore
- x-data="{ chart: null }"
+ x-data="{
+     chart: null,
+     render(value) {
+         if (!value?.labels?.length) return;
+         const api = window.RMCharts;
+         const config = api.presets.area(value.labels, [
+             { label: 'Frecuencia Cardíaca', data: value.fc, borderColor: api.color('clinical'), backgroundColor: api.hexToRgba(api.color('clinical'), api.number('--rm-line-area-opacity', .12)) },
+             { label: 'Saturación O2', data: value.sat, borderColor: api.color('care'), backgroundColor: api.hexToRgba(api.color('care'), api.number('--rm-line-area-secondary-opacity', .09)) },
+             { label: 'Temperatura', data: value.temp, borderColor: api.color('reference'), borderDash: [6, 4], fill: false },
+         ]);
+         config.options.plugins.legend = { display: true, position: 'bottom', labels: api.baseOptions().plugins.legend.labels };
+         config.options.scales.y.beginAtZero = false;
+         config.options.scales.x.grid.display = false;
+         this.chart = api.init('reporte-adulto-signos-{{ $adultoMayor->cod_residente }}', this.$refs.canvasSignos, config);
+     },
+     destroy() {
+         const key = 'reporte-adulto-signos-{{ $adultoMayor->cod_residente }}';
+         if (window.RMCharts?.get(key)?.canvas === this.$refs.canvasSignos) window.RMCharts.destroy(key);
+     },
+ }"
  x-init="
- chart = new Chart($refs.canvasSignos, {
-     type: 'line',
-     data: {
-     labels: @js($chartSignos['labels']),
-     datasets: [
-      { label: 'Frecuencia Cardíaca', data: @js($chartSignos['fc']), borderColor: window.RMCharts.color('clinical'), backgroundColor: window.RMCharts.hexToRgba(window.RMCharts.color('clinical'), window.RMCharts.number('--rm-line-area-opacity', .12)), tension: 0.38, fill: true, borderWidth: window.RMCharts.number('--rm-line-stroke-width', 3) },
-      { label: 'Saturación O2', data: @js($chartSignos['sat']), borderColor: window.RMCharts.color('care'), backgroundColor: window.RMCharts.hexToRgba(window.RMCharts.color('care'), window.RMCharts.number('--rm-line-area-secondary-opacity', .09)), tension: 0.38, fill: true, borderWidth: window.RMCharts.number('--rm-line-stroke-width', 3) },
-      { label: 'Temperatura', data: @js($chartSignos['temp']), borderColor: window.RMCharts.color('reference'), backgroundColor: 'transparent', tension: 0.38, borderWidth: window.RMCharts.number('--rm-line-stroke-width', 3), borderDash: [6,4] }
-     ]
-     },
-     options: {
-     responsive: true,
-     maintainAspectRatio: false,
-     animation: { duration: 950, easing: 'easeOutQuart' },
-     plugins: {
-      legend: { position: 'bottom', labels: { boxWidth: 10, font: { family: window.RMCharts.getCss('--rm-chart-font-family'), size: window.RMCharts.number('--rm-chart-legend-size', 12), weight: '600' } } }
-     },
-     scales: {
-      y: { beginAtZero: false, grid: { color: window.RMCharts.getCss('--rm-chart-grid') }, ticks: { font: { size: 9 } } },
-      x: { grid: { display: false }, ticks: { font: { size: 9 } } }
-     }
-     }
-    });
-
- $watch('$wire.chartSignos', value => {
- if (value && value.labels && value.labels.length > 0) {
- chart.data.labels = value.labels;
- chart.data.datasets[0].data = value.fc;
- chart.data.datasets[1].data = value.sat;
- chart.data.datasets[2].data = value.temp;
- chart.update();
- }
- });"
+ render(@js($chartSignos));
+ $watch('$wire.chartSignos', value => render(value));
+ window.RMCharts.onThemeChange(() => render($wire.chartSignos), 'reporte-adulto-signos-{{ $adultoMayor->cod_residente }}', $el);"
  >
  <canvas x-ref="canvasSignos"></canvas>
  </div>
@@ -214,46 +203,28 @@
  </div>
  @else
  <div class="rm-chart-body is-md relative w-full" wire:ignore
- x-data="{ chart: null }"
+ x-data="{
+     chart: null,
+     render(value) {
+         if (!value?.labels?.length) return;
+         const api = window.RMCharts;
+         const config = api.presets.semantic('bar', 'cognitive', value.labels, value.puntajes);
+         config.data.datasets[0].label = 'Puntaje Obtenido';
+         config.options.plugins.legend = { display: false };
+         config.options.scales.y.ticks.precision = 0;
+         config.options.scales.y.beginAtZero = true;
+         config.options.scales.x.grid.display = false;
+         this.chart = api.init('reporte-adulto-cognitivo-{{ $adultoMayor->cod_residente }}', this.$refs.canvasCognitivo, config);
+     },
+     destroy() {
+         const key = 'reporte-adulto-cognitivo-{{ $adultoMayor->cod_residente }}';
+         if (window.RMCharts?.get(key)?.canvas === this.$refs.canvasCognitivo) window.RMCharts.destroy(key);
+     },
+ }"
  x-init="
- chart = new Chart($refs.canvasCognitivo, {
-     type: 'bar',
-     data: {
-     labels: @js($chartCognitivo['labels']),
-     datasets: [
-      {
-      label: 'Puntaje Obtenido',
-      data: @js($chartCognitivo['puntajes']),
-      backgroundColor: window.RMCharts.hexToRgba(window.RMCharts.color('cognitive'), window.RMCharts.number('--rm-bar-fill-opacity', .84)),
-      borderColor: window.RMCharts.color('cognitive'),
-      borderWidth: 1.5,
-      borderRadius: window.RMCharts.number('--rm-bar-radius', 10),
-      barPercentage: 0.86,
-      categoryPercentage: 0.90
-      }
-     ]
-     },
-     options: {
-     responsive: true,
-     maintainAspectRatio: false,
-     animation: { duration: 950, easing: 'easeOutQuart' },
-     plugins: {
-      legend: { position: 'bottom', labels: { boxWidth: 10, font: { family: window.RMCharts.getCss('--rm-chart-font-family'), size: window.RMCharts.number('--rm-chart-legend-size', 12), weight: '600' } } }
-     },
-     scales: {
-      y: { beginAtZero: true, grid: { color: window.RMCharts.getCss('--rm-chart-grid') }, ticks: { precision: 0, font: { size: 9 } } },
-      x: { grid: { display: false }, ticks: { font: { size: 9 } } }
-     }
-     }
-    });
-
- $watch('$wire.chartCognitivo', value => {
- if (value && value.labels && value.labels.length > 0) {
- chart.data.labels = value.labels;
- chart.data.datasets[0].data = value.puntajes;
- chart.update();
- }
- });"
+ render(@js($chartCognitivo));
+ $watch('$wire.chartCognitivo', value => render(value));
+ window.RMCharts.onThemeChange(() => render($wire.chartCognitivo), 'reporte-adulto-cognitivo-{{ $adultoMayor->cod_residente }}', $el);"
  >
  <canvas x-ref="canvasCognitivo"></canvas>
  </div>

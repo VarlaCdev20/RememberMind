@@ -80,7 +80,6 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    animation: { duration: 400 },
                     plugins: {
                         legend: {
                             display: true,
@@ -135,11 +134,7 @@
                 }
             };
 
-            if (window.RMCharts) {
-                window.RMCharts.init('sv_tendencia', canvas, config, () => this.initTendencia());
-            } else {
-                new Chart(canvas, config);
-            }
+            window.RMCharts.init('sv_tendencia', canvas, config, () => this.initTendencia());
         },
         initDistPA() {
             const data = rmDatos2e40af881bbb;
@@ -176,10 +171,6 @@
                     }
                 };
 
-            if (window.RMCharts) {
-                window.RMCharts.init('sv_dist_pa', canvas, config, () => this.initDistPA());
-            } else {
-                new Chart(canvas, config);
-            }
+            window.RMCharts.init('sv_dist_pa', canvas, config, () => this.initDistPA());
         },
     }));

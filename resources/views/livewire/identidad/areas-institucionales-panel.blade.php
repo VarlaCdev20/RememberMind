@@ -389,10 +389,6 @@
  rolChart: null,
  lineChart: null,
  initAreaCharts() {
- if (this.activeChart) this.activeChart.destroy();
- if (this.rolChart) this.rolChart.destroy();
- if (this.lineChart) this.lineChart.destroy();
-
  const total = {{ $totalUsuarios }};
  const activos = {{ $activosUsuarios }};
  const inactivos = {{ $inactivosUsuarios }};
@@ -400,51 +396,23 @@
  if (total > 0) {
  const ctxActive = this.$refs.canvasActive;
  if (ctxActive) {
- this.activeChart = new Chart(ctxActive, {
- type: 'doughnut',
- data: {
- labels: ['Activos', 'Inactivos'],
- datasets: [{
- data: [activos, inactivos],
- backgroundColor: [window.RMCharts.color('care'), window.RMCharts.color('reference')],
- borderWidth: 0
- }]
- },
- options: {
- responsive: true,
- maintainAspectRatio: false,
- cutout: window.RMCharts.getCss('--rm-donut-cutout'),
- plugins: {
- legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10, weight: 'bold' } } }
- }
- }
- });
+ const config = window.RMCharts.presets.doughnut(
+  ['Activos', 'Inactivos'], [activos, inactivos],
+  [window.RMCharts.color('care'), window.RMCharts.color('reference')]
+ );
+ config.options.plugins.legend = { display: true, position: 'bottom', labels: window.RMCharts.baseOptions().plugins.legend.labels };
+ this.activeChart = window.RMCharts.init('area-ficha-activos', ctxActive, config);
  }
 
  const rolesLabels = @js(array_keys($this->obtenerDatosGraficoUsuariosPorRolArea($areaSeleccionada->cod_area)));
  const rolesValues = @js(array_values($this->obtenerDatosGraficoUsuariosPorRolArea($areaSeleccionada->cod_area)));
  const ctxRol = this.$refs.canvasRol;
  if (ctxRol && rolesLabels.length > 0) {
- this.rolChart = new Chart(ctxRol, {
- type: 'bar',
- data: {
- labels: rolesLabels,
- datasets: [{
- data: rolesValues,
- backgroundColor: window.RMCharts.color('staff'),
- borderRadius: window.RMCharts.number('--rm-bar-radius', 10)
- }]
- },
- options: {
- responsive: true,
- maintainAspectRatio: false,
- plugins: { legend: { display: false } },
- scales: {
- y: { beginAtZero: true, grid: { color: window.RMCharts.getCss('--rm-chart-grid-soft') } },
- x: { grid: { display: false } }
- }
- }
- });
+ const config = window.RMCharts.presets.semantic('bar', 'staff', rolesLabels, rolesValues);
+ config.data.datasets[0].label = 'Usuarios por rol';
+ config.options.scales.y.beginAtZero = true;
+ config.options.scales.x.grid.display = false;
+ this.rolChart = window.RMCharts.init('area-ficha-roles', ctxRol, config);
  }
  }
 
@@ -452,33 +420,21 @@
  const evValues = @js(array_values($this->obtenerDatosGraficoEvolucionArea($areaSeleccionada->cod_area)));
  const ctxLine = this.$refs.canvasLine;
  if (ctxLine && evLabels.length >= 2) {
- this.lineChart = new Chart(ctxLine, {
- type: 'line',
- data: {
- labels: evLabels,
- datasets: [{
- data: evValues,
- borderColor: window.RMCharts.color('clinical'),
- backgroundColor: window.RMCharts.hexToRgba(window.RMCharts.color('clinical'), window.RMCharts.number('--rm-line-area-opacity', .12)),
- borderWidth: window.RMCharts.number('--rm-line-stroke-width', 3),
- fill: true,
- tension: 0.3
- }]
+ const config = window.RMCharts.presets.semantic('area', 'clinical', evLabels, evValues);
+ config.data.datasets[0].label = 'Evolución del área';
+ config.options.scales.x.grid.display = false;
+ config.options.scales.y.beginAtZero = true;
+ this.lineChart = window.RMCharts.init('area-ficha-evolucion', ctxLine, config);
+ }
  },
- options: {
- responsive: true,
- maintainAspectRatio: false,
- plugins: { legend: { display: false } },
- scales: {
- y: { beginAtZero: true, grid: { color: window.RMCharts.getCss('--rm-chart-grid-soft') } },
- x: { grid: { display: false } }
- }
- }
- });
- }
+ destroy() {
+ [['area-ficha-activos', this.activeChart], ['area-ficha-roles', this.rolChart],
+  ['area-ficha-evolucion', this.lineChart]].forEach(([key, chart]) => {
+     if (chart && window.RMCharts?.get(key)?.canvas === chart.canvas) window.RMCharts.destroy(key);
+  });
  }
  }"
- x-init="$nextTick(() => initAreaCharts())">
+ x-init="$nextTick(() => initAreaCharts()); window.RMCharts.onThemeChange(() => initAreaCharts(), 'area-ficha-charts', $el)">
 
  <div class="grid grid-cols-1 lg:grid-cols-[1.1fr_0.9fr] gap-8">
 
@@ -988,42 +944,17 @@
  initReportCharts() {
  const type = '{{ $reporteTipo }}';
 
- // Destroy everything first
- if (this.generalChartUsr) this.generalChartUsr.destroy();
- if (this.generalChartType) this.generalChartType.destroy();
- if (this.generalChartActInact) this.generalChartActInact.destroy();
- if (this.generalChartEv) this.generalChartEv.destroy();
- if (this.generalChartRanking) this.generalChartRanking.destroy();
- if (this.areaActiveChart) this.areaActiveChart.destroy();
- if (this.areaRolChart) this.areaRolChart.destroy();
- if (this.areaLineChart) this.areaLineChart.destroy();
-
  if (type === 'general') {
  // Chart: Usuarios por area
  const usrLabels = @js(array_keys($this->obtenerDatosGraficoUsuariosPorArea()));
  const usrValues = @js(array_values($this->obtenerDatosGraficoUsuariosPorArea()));
  const ctxUsr = this.$refs.canvasUsr;
  if (ctxUsr && usrLabels.length > 0) {
- this.generalChartUsr = new Chart(ctxUsr, {
- type: 'bar',
- data: {
- labels: usrLabels,
- datasets: [{
- data: usrValues,
- backgroundColor: window.RMCharts.color('staff'),
- borderRadius: window.RMCharts.number('--rm-bar-radius', 10)
- }]
- },
- options: {
- responsive: true,
- maintainAspectRatio: false,
- plugins: { legend: { display: false } },
- scales: {
- y: { beginAtZero: true, grid: { color: window.RMCharts.getCss('--rm-chart-grid-soft') } },
- x: { grid: { display: false } }
- }
- }
- });
+ const config = window.RMCharts.presets.semantic('bar', 'staff', usrLabels, usrValues);
+ config.data.datasets[0].label = 'Usuarios por área';
+ config.options.scales.y.beginAtZero = true;
+ config.options.scales.x.grid.display = false;
+ this.generalChartUsr = window.RMCharts.init('area-reporte-usuarios', ctxUsr, config);
  }
 
  // Chart: Areas por tipo
@@ -1031,99 +962,43 @@
  const typeValues = @js(array_values($this->obtenerDatosGraficoAreasPorTipo()));
  const ctxType = this.$refs.canvasType;
  if (ctxType && typeLabels.length > 0) {
- this.generalChartType = new Chart(ctxType, {
- type: 'doughnut',
- data: {
- labels: typeLabels,
- datasets: [{
- data: typeValues,
- backgroundColor: typeLabels.map((_, index) => window.RMCharts.palette()[index % 6]),
- borderWidth: 0
- }]
- },
- options: {
- responsive: true,
- maintainAspectRatio: false,
- plugins: {
- legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10, weight: 'bold' } } }
- }
- }
- });
+ const typeTones = { Administrativa: 'neutral', Salud: 'clinical', Social: 'cognitive', Soporte: 'reference' };
+ const typeColors = typeLabels.map(label => window.RMCharts.color(typeTones[label] || 'neutral'));
+ const config = window.RMCharts.presets.doughnut(typeLabels, typeValues, typeColors);
+ config.options.plugins.legend = { display: true, position: 'bottom', labels: window.RMCharts.baseOptions().plugins.legend.labels };
+ this.generalChartType = window.RMCharts.init('area-reporte-tipos', ctxType, config);
  }
 
  // Chart: Activos vs Inactivos stacked
  const actInact = @js($this->obtenerDatosGraficoActivosInactivosPorArea());
  const ctxActInact = this.$refs.canvasActInact;
  if (ctxActInact && actInact.labels && actInact.labels.length > 0) {
- this.generalChartActInact = new Chart(ctxActInact, {
- type: 'bar',
- data: {
- labels: actInact.labels,
- datasets: [
- { label: 'Activos', data: actInact.activos, backgroundColor: window.RMCharts.color('care') },
- { label: 'Inactivos', data: actInact.inactivos, backgroundColor: window.RMCharts.color('reference') }
- ]
- },
- options: {
- responsive: true,
- maintainAspectRatio: false,
- scales: {
- x: { stacked: true, grid: { display: false } },
- y: { stacked: true }
- }
- }
- });
+ const config = window.RMCharts.presets.stackedBar(actInact.labels, [
+  { label: 'Activos', data: actInact.activos, backgroundColor: window.RMCharts.color('care') },
+  { label: 'Inactivos', data: actInact.inactivos, backgroundColor: window.RMCharts.color('reference') },
+ ]);
+ config.options.scales.x.grid.display = false;
+ config.options.plugins.legend = { display: true, position: 'bottom', labels: window.RMCharts.baseOptions().plugins.legend.labels };
+ this.generalChartActInact = window.RMCharts.init('area-reporte-estados', ctxActInact, config);
  }
 
  // Chart: Evolucion mensual global
  const ev = @js($this->obtenerDatosGraficoEvolucionMensual());
  const ctxEv = this.$refs.canvasEv;
  if (ctxEv && ev.labels && ev.labels.length >= 2) {
- this.generalChartEv = new Chart(ctxEv, {
- type: 'line',
- data: {
- labels: ev.labels,
- datasets: [{
- data: ev.data,
- borderColor: window.RMCharts.color('clinical'),
- backgroundColor: window.RMCharts.hexToRgba(window.RMCharts.color('clinical'), window.RMCharts.number('--rm-line-area-opacity', .12)),
- borderWidth: window.RMCharts.number('--rm-line-stroke-width', 3),
- fill: true,
- tension: 0.3
- }]
- },
- options: {
- responsive: true,
- maintainAspectRatio: false,
- plugins: { legend: { display: false } }
- }
- });
+ const config = window.RMCharts.presets.semantic('area', 'clinical', ev.labels, ev.data);
+ config.data.datasets[0].label = 'Evolución mensual';
+ this.generalChartEv = window.RMCharts.init('area-reporte-evolucion', ctxEv, config);
  }
  // Chart: Ranking Top 5
  const rankData = @js($this->obtenerDatosGraficoRankingAreas());
  const ctxRank = this.$refs.canvasRank;
  if (ctxRank && rankData.labels && rankData.labels.length > 0) {
- this.generalChartRanking = new Chart(ctxRank, {
- type: 'bar',
- data: {
- labels: rankData.labels,
- datasets: [{
- data: rankData.data,
- backgroundColor: window.RMCharts.color('staff'),
- borderRadius: window.RMCharts.number('--rm-hbar-radius', 999)
- }]
- },
- options: {
- indexAxis: 'y',
- responsive: true,
- maintainAspectRatio: false,
- plugins: { legend: { display: false } },
- scales: {
- x: { beginAtZero: true, grid: { color: window.RMCharts.getCss('--rm-chart-grid-soft') } },
- y: { grid: { display: false } }
- }
- }
- });
+ const config = window.RMCharts.presets.barHorizontal(
+  rankData.labels, rankData.data, rankData.labels.map(() => window.RMCharts.color('staff'))
+ );
+ config.options.plugins.tooltip.callbacks.label = context => ` ${context.raw} usuarios`;
+ this.generalChartRanking = window.RMCharts.init('area-reporte-ranking', ctxRank, config);
  }
  } else if (type === 'especifico') {
  const total = {{ $reporteData['totalUsuarios'] ?? 0 }};
@@ -1134,45 +1009,21 @@
  if (total > 0) {
  const ctxAreaActive = this.$refs.canvasAreaActive;
  if (ctxAreaActive) {
- this.areaActiveChart = new Chart(ctxAreaActive, {
- type: 'doughnut',
- data: {
- labels: ['Activos', 'Inactivos'],
- datasets: [{
- data: [activos, inactivos],
- backgroundColor: [window.RMCharts.color('care'), window.RMCharts.color('reference')],
- borderWidth: 0
- }]
- },
- options: {
- responsive: true,
- maintainAspectRatio: false,
- cutout: window.RMCharts.getCss('--rm-donut-cutout'),
- plugins: { legend: { position: 'bottom', labels: { boxWidth: 10 } } }
- }
- });
+ const config = window.RMCharts.presets.doughnut(
+  ['Activos', 'Inactivos'], [activos, inactivos],
+  [window.RMCharts.color('care'), window.RMCharts.color('reference')]
+ );
+ config.options.plugins.legend = { display: true, position: 'bottom', labels: window.RMCharts.baseOptions().plugins.legend.labels };
+ this.areaActiveChart = window.RMCharts.init('area-reporte-activos', ctxAreaActive, config);
  }
 
  const rolesLabels = @js(isset($reporteData['roles']) ? array_keys($reporteData['roles']) : []);
  const rolesValues = @js(isset($reporteData['roles']) ? array_values($reporteData['roles']) : []);
  const ctxAreaRol = this.$refs.canvasAreaRol;
  if (ctxAreaRol && rolesLabels.length > 0) {
- this.areaRolChart = new Chart(ctxAreaRol, {
- type: 'bar',
- data: {
- labels: rolesLabels,
- datasets: [{
- data: rolesValues,
- backgroundColor: window.RMCharts.color('staff'),
- borderRadius: window.RMCharts.number('--rm-bar-radius', 10)
- }]
- },
- options: {
- responsive: true,
- maintainAspectRatio: false,
- plugins: { legend: { display: false } }
- }
- });
+ const config = window.RMCharts.presets.semantic('bar', 'staff', rolesLabels, rolesValues);
+ config.data.datasets[0].label = 'Usuarios por rol';
+ this.areaRolChart = window.RMCharts.init('area-reporte-roles', ctxAreaRol, config);
  }
  }
 
@@ -1180,30 +1031,23 @@
  const evAreaValues = @js(isset($reporteData['area']['cod_area']) ? array_values($this->obtenerDatosGraficoEvolucionArea($reporteData['area']['cod_area'])) : []);
  const ctxAreaLine = this.$refs.canvasAreaLine;
  if (ctxAreaLine && evAreaLabels.length >= 2) {
- this.areaLineChart = new Chart(ctxAreaLine, {
- type: 'line',
- data: {
- labels: evAreaLabels,
- datasets: [{
- data: evAreaValues,
- borderColor: window.RMCharts.color('clinical'),
- backgroundColor: window.RMCharts.hexToRgba(window.RMCharts.color('clinical'), window.RMCharts.number('--rm-line-area-opacity', .12)),
- borderWidth: window.RMCharts.number('--rm-line-stroke-width', 3),
- fill: true,
- tension: 0.3
- }]
+ const config = window.RMCharts.presets.semantic('area', 'clinical', evAreaLabels, evAreaValues);
+ config.data.datasets[0].label = 'Evolución del área';
+ this.areaLineChart = window.RMCharts.init('area-reporte-area-evolucion', ctxAreaLine, config);
+ }
+ }
  },
- options: {
- responsive: true,
- maintainAspectRatio: false,
- plugins: { legend: { display: false } }
- }
- });
- }
- }
+ destroy() {
+ [['area-reporte-usuarios', this.generalChartUsr], ['area-reporte-tipos', this.generalChartType],
+  ['area-reporte-estados', this.generalChartActInact], ['area-reporte-evolucion', this.generalChartEv],
+  ['area-reporte-ranking', this.generalChartRanking], ['area-reporte-activos', this.areaActiveChart],
+  ['area-reporte-roles', this.areaRolChart], ['area-reporte-area-evolucion', this.areaLineChart]]
+  .forEach(([key, chart]) => {
+     if (chart && window.RMCharts?.get(key)?.canvas === chart.canvas) window.RMCharts.destroy(key);
+  });
  }
  }"
- x-init="$nextTick(() => initReportCharts())">
+ x-init="$nextTick(() => initReportCharts()); window.RMCharts.onThemeChange(() => initReportCharts(), 'area-reporte-charts', $el)">
 
  {{-- Marca de Agua --}}
  <div class="watermark-bg">CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS</div>
