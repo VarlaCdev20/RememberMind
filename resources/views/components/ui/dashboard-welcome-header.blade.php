@@ -26,7 +26,9 @@
     }
     $nombreLargo = mb_strlen($nombreCompleto, 'UTF-8') > 32;
     $rol = app(\App\Backend\Modulos\Identidad\Servicios\RolePreviewService::class)->activeRole($usuario)
-        ?? $usuario?->getRoleNames()->first();
+        ?? (request()->routeIs('admin.enfermeria.*') && $usuario?->hasRole('ENFERMEROS')
+            ? 'ENFERMEROS'
+            : $usuario?->getRoleNames()->first());
     $rolVisible = $rol ? mb_convert_case(str_replace('_', ' ', $rol), MB_CASE_TITLE, 'UTF-8') : 'Personal';
     $zonaHoraria = config('app.timezone');
     $contextoTurno = $estado === 'SIN_JORNADA_ACTIVA'

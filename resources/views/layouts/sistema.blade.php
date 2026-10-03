@@ -108,7 +108,10 @@
     $shellPreviewRole = app(\App\Backend\Modulos\Identidad\Servicios\RolePreviewService::class)->activeRole(auth()->user());
     $shellAdministracion = $shellPreviewRole === 'ADMINISTRADOR'
         || ($shellPreviewRole === null && auth()->user()?->hasRole('ADMINISTRADOR') && ! auth()->user()?->hasRole('SUPERADMINISTRADOR'));
-    $shellVisualRole = $shellPreviewRole ?? auth()->user()?->getRoleNames()->first();
+    $shellVisualRole = $shellPreviewRole
+        ?? (request()->routeIs('admin.enfermeria.*') && auth()->user()?->hasRole('ENFERMEROS')
+            ? 'ENFERMEROS'
+            : auth()->user()?->getRoleNames()->first());
     $shellRoleAccent = config('dashboard-header.variants.'.($shellVisualRole ?? '').'.tone', 'superadmin');
 @endphp
 

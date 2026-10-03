@@ -108,7 +108,7 @@
 
 @php
     $shellVisualRole = app(\App\Backend\Modulos\Identidad\Servicios\RolePreviewService::class)->activeRole(auth()->user())
-        ?? auth()->user()?->getRoleNames()->first();
+        ?? (auth()->user()?->hasRole('ENFERMEROS') ? 'ENFERMEROS' : auth()->user()?->getRoleNames()->first());
     $shellRoleAccent = config('dashboard-header.variants.'.($shellVisualRole ?? '').'.tone', 'nursing');
 @endphp
 <body class="rm-shell rm-nursing-shell h-full bg-[var(--rm-bg-app)] text-[var(--rm-text-primary)] antialiased selection:bg-[var(--rm-action-primary)] selection:text-[var(--rm-text-on-primary)] transition-colors duration-200"

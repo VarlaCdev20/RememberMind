@@ -6,7 +6,10 @@
     $sidebarNameParts = preg_split('/\s+/u', $sidebarName, -1, PREG_SPLIT_NO_EMPTY) ?: [];
     $sidebarInitials = mb_strtoupper(mb_substr($sidebarNameParts[0] ?? 'U', 0, 1).mb_substr($sidebarNameParts[1] ?? '', 0, 1));
     $previewRole = app(\App\Backend\Modulos\Identidad\Servicios\RolePreviewService::class)->activeRole(auth()->user());
-    $sidebarRole = $previewRole ?? ($sidebarUser?->getRoleNames()->first() ?? 'Usuario');
+    $sidebarRole = $previewRole
+        ?? (request()->routeIs('admin.enfermeria.*') && $sidebarUser?->hasRole('ENFERMEROS')
+            ? 'ENFERMEROS'
+            : ($sidebarUser?->getRoleNames()->first() ?? 'Usuario'));
     $sidebarRoleLabel = mb_convert_case(str_replace('_', ' ', $sidebarRole), MB_CASE_TITLE, 'UTF-8');
     $isAdministracion = $previewRole === 'ADMINISTRADOR' || ($previewRole === null && auth()->user()?->hasRole('ADMINISTRADOR') && ! auth()->user()?->hasRole('SUPERADMINISTRADOR'));
     $sidebarStorageKey = 'remembermind-sidebar-view-'.hash('sha256', (string) $sidebarUser?->getAuthIdentifier().'|'.$sidebarRole);

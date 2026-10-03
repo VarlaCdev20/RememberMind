@@ -14,6 +14,18 @@ class DashboardEnfermeriaIntegracionVisualTest extends TestCase
 {
     use RefreshDatabase;
 
+    public function test_dashboard_de_enfermeria_conserva_su_acento_en_usuarios_con_varios_roles(): void
+    {
+        $this->seed(RolesAndPermissionsSeeder::class);
+        $usuario = User::factory()->create(['estado' => 'ACTIVO']);
+        $usuario->assignRole('MEDICO GENERAL/GERIATRA', 'ENFERMEROS');
+
+        $this->actingAs($usuario)->get(route('admin.enfermeria.dashboard'))
+            ->assertOk()
+            ->assertSee('data-role="nursing"', false)
+            ->assertSee('data-accent="nursing"', false);
+    }
+
     public function test_dashboard_tiene_jerarquia_unica_sin_utilidades_ficticias(): void
     {
         $this->seed(RolesAndPermissionsSeeder::class);

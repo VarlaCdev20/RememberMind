@@ -7,7 +7,9 @@
 ])
 @php
     $assignedRole = app(\App\Backend\Modulos\Identidad\Servicios\RolePreviewService::class)->activeRole(auth()->user())
-        ?? auth()->user()?->getRoleNames()->first();
+        ?? (request()->routeIs('admin.enfermeria.*') && auth()->user()?->hasRole('ENFERMEROS')
+            ? 'ENFERMEROS'
+            : auth()->user()?->getRoleNames()->first());
     $variant = config('dashboard-header.variants.' . $assignedRole, []);
     $allowedTones = ['superadmin', 'manager', 'admin', 'doctor', 'nursing', 'psychology', 'nutrition', 'physio', 'pedagogy', 'family'];
     $accentToken = in_array($variant['tone'] ?? null, $allowedTones, true)
