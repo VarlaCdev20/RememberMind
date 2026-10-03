@@ -161,7 +161,6 @@
 @media (min-width: 1280px) and (max-width: 1439px) { .rm-shell .rm-topbar { --rm-topbar-search-width: 352px; } }
 @media (min-width: 1440px) {
     .rm-shell .rm-topbar { --rm-topbar-search-width: 420px; }
-    .rm-shell .rm-topbar__profile-copy { display: block; }
 }
 @media (min-width: 1700px) { .rm-shell .rm-topbar { --rm-topbar-search-width: 560px; } }
 @media (min-width: 768px) and (max-width: 1279px) {
