@@ -61,6 +61,8 @@ class RolePreviewTest extends TestCase
             ->assertSee('Modo previsualización')
             ->assertSee('Enfermería')
             ->assertSee('Este modo es solo lectura')
+            ->assertSee('data-accent="nursing"', false)
+            ->assertSee('class="rm-dashboard-header__role"><span aria-hidden="true"></span>Enfermería', false)
             ->assertSee('id="topbar-enfermeria"', false);
     }
 
@@ -74,6 +76,23 @@ class RolePreviewTest extends TestCase
         $this->delete(route('role-preview.destroy'))
             ->assertRedirect(route('dashboard'))
             ->assertSessionMissing(RolePreviewService::SESSION_KEY);
+    }
+
+    public function test_cabecera_usa_el_rol_previsualizado_en_dashboard_generico_y_especializado(): void
+    {
+        $superadmin = $this->usuarioConRol('SUPERADMINISTRADOR');
+        $this->actingAs($superadmin);
+
+        foreach ([
+            'GERENTE' => ['earth', 'Gerencia'],
+            'PSICOLOGO/A' => ['psychology', 'Psicología'],
+        ] as $rol => [$acento, $etiqueta]) {
+            $response = $this->withSession([RolePreviewService::SESSION_KEY => $rol])
+                ->followingRedirects()->get(route('dashboard'))->assertOk();
+
+            $response->assertSee('data-accent="'.$acento.'"', false)
+                ->assertSee('class="rm-dashboard-header__role"><span aria-hidden="true"></span>'.$etiqueta, false);
+        }
     }
 
     public function test_manipular_sesion_no_concede_preview_a_otro_rol(): void

@@ -14,6 +14,12 @@
 }
 
 .rm-nursing-dashboard__contents { display: contents; }
+.rm-nursing-dashboard .rm-card:not(.rm-chart-card) {
+    border-color: var(--rm-dashboard-card-border);
+    border-radius: 17px;
+    background: var(--rm-dashboard-card-bg);
+    box-shadow: var(--rm-dashboard-card-shadow);
+}
 .rm-nursing-dashboard > :not(.rm-nursing-dashboard__contents),
 .rm-nursing-dashboard__contents > * { min-width: 0; }
 

@@ -3,8 +3,11 @@
 namespace Tests\Feature;
 
 use App\Models\User;
+use App\Frontend\Livewire\Enfermeria\Cuidados\DashboardTurno;
 use Database\Seeders\RolesAndPermissionsSeeder;
+use Illuminate\Support\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Livewire\Livewire;
 use Tests\TestCase;
 
 class DashboardEnfermeriaIntegracionVisualTest extends TestCase
@@ -42,5 +45,19 @@ class DashboardEnfermeriaIntegracionVisualTest extends TestCase
         }
         $this->assertStringNotContainsString('Ocupación de camas', $html);
         $this->assertStringNotContainsString('Tendencia de ocupación', $html);
+    }
+
+    public function test_actualizacion_del_turno_cambia_la_fecha_al_iniciar_un_nuevo_dia(): void
+    {
+        $this->seed(RolesAndPermissionsSeeder::class);
+        $usuario = User::factory()->create(['estado' => 'ACTIVO']);
+        $usuario->assignRole('ENFERMEROS');
+
+        $this->travelTo(Carbon::parse('2026-10-03 23:59:00'));
+        $dashboard = Livewire::actingAs($usuario)->test(DashboardTurno::class)
+            ->assertSet('filtroFecha', '2026-10-03');
+
+        $this->travelTo(Carbon::parse('2026-10-04 00:01:00'));
+        $dashboard->call('refrescarTurno')->assertSet('filtroFecha', '2026-10-04');
     }
 }

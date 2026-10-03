@@ -6,7 +6,8 @@
     'imageLabel' => null,
 ])
 @php
-    $assignedRole = auth()->user()?->getRoleNames()->first();
+    $assignedRole = app(\App\Backend\Modulos\Identidad\Servicios\RolePreviewService::class)->activeRole(auth()->user())
+        ?? auth()->user()?->getRoleNames()->first();
     $variant = config('dashboard-header.variants.' . $assignedRole, []);
     $allowedTones = ['sage', 'earth', 'medical', 'nursing', 'psychology', 'nutrition', 'physiotherapy', 'pedagogy', 'family'];
     $accentToken = in_array($variant['tone'] ?? null, $allowedTones, true)

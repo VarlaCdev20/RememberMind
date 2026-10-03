@@ -178,6 +178,7 @@ class DashboardTurno extends Component
 
     public function refrescarTurno(): void
     {
+        $this->filtroFecha = Carbon::now()->toDateString();
         $this->loadTurnoActual();
     }
 

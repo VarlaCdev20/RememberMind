@@ -55,8 +55,8 @@
 }
 
 /* Superficies consistentes incluso en pantallas heredadas. */
-.rm-nursing-shell main :is(.rounded-2xl, .rounded-3xl).border:not(.rm-ficha-detalles *):not(.rm-chart-card),
-.rm-nursing-shell main :is(.enf-card, .rm-card, .rm-panel, .rm-section-card):not(.rm-ficha-detalles *):not(.rm-chart-card) {
+.rm-nursing-shell main :is(.rounded-2xl, .rounded-3xl).border:not(.rm-ficha-detalles *):not(.rm-nursing-dashboard *):not(.rm-chart-card),
+.rm-nursing-shell main :is(.enf-card, .rm-card, .rm-panel, .rm-section-card):not(.rm-ficha-detalles *):not(.rm-nursing-dashboard *):not(.rm-chart-card) {
     border-radius: var(--rm-radius-card) !important;
     border-color: var(--rm-border) !important;
     background-color: var(--rm-surface) !important;
@@ -67,15 +67,15 @@
     border-radius: var(--rm-radius-panel) !important;
 }
 
-.rm-nursing-shell main :is(h1, h2, h3, h4):not(.rm-ficha-detalles *) {
+.rm-nursing-shell main :is(h1, h2, h3, h4):not(.rm-ficha-detalles *):not(.rm-nursing-dashboard *) {
     font-family: var(--rm-font-title);
     color: var(--rm-text-title);
     text-wrap: balance;
 }
 
-.rm-nursing-shell main h1:not(.rm-ficha-detalles *) { font-size: min(28px, var(--rm-font-page-title)); }
-.rm-nursing-shell main h2:not(.rm-ficha-detalles *) { font-size: var(--rm-font-section-title); }
-.rm-nursing-shell main h3:not(.rm-ficha-detalles *) { font-size: var(--rm-font-card-title); }
+.rm-nursing-shell main h1:not(.rm-ficha-detalles *):not(.rm-nursing-dashboard *) { font-size: min(28px, var(--rm-font-page-title)); }
+.rm-nursing-shell main h2:not(.rm-ficha-detalles *):not(.rm-nursing-dashboard *) { font-size: var(--rm-font-section-title); }
+.rm-nursing-shell main h3:not(.rm-ficha-detalles *):not(.rm-nursing-dashboard *) { font-size: var(--rm-font-card-title); }
 
 /* Controles: mismo alto, foco y lectura en todos los CRUD clínicos. */
 .rm-nursing-shell main :is(input, select, textarea):not([type="checkbox"]):not([type="radio"]):not([type="range"]):not(.rm-ficha-detalles *) {
