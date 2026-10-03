@@ -20,6 +20,7 @@ class AuthenticationTest extends TestCase
         $response->assertSee('Entrar al Portal');
         $response->assertSee("correo: ''", false);
         $response->assertSee("recoverCorreo: ''", false);
+        $this->assertMatchesRegularExpression('/<div x-show="\s*panel === \'login\'/u', $response->getContent());
     }
 
     public function test_route_source_does_not_prefix_script_responses_with_a_bom(): void
