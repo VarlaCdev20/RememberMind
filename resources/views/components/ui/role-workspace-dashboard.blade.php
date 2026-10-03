@@ -54,15 +54,7 @@
         @endunless
     </x-ui.role-dashboard-hero>
 
-    @if($esSuperadministracion)
-        <div class="rm-superadmin-divider" aria-hidden="true">
-            <span class="rm-superadmin-divider__line"></span>
-            <span class="rm-superadmin-divider__dots"></span>
-            <span class="rm-superadmin-divider__spark"></span>
-            <span class="rm-superadmin-divider__dots"></span>
-            <span class="rm-superadmin-divider__line"></span>
-        </div>
-    @endif
+    <x-ui.dashboard-divider />
 
     @if(!empty($indicadores))
         <section @class(['grid gap-4 sm:grid-cols-2 xl:grid-cols-4', 'rm-superadmin-metrics' => $esSuperadministracion]) aria-label="Indicadores del perfil">

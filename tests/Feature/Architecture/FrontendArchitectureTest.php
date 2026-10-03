@@ -344,7 +344,8 @@ class FrontendArchitectureTest extends TestCase
 
         $layoutEnfermeria = File::get(resource_path('views/layouts/enfermeria.blade.php'));
         $this->assertSame(1, substr_count($layoutEnfermeria, '@livewireStyles'), 'El layout de Enfermería debe cargar los estilos Livewire una sola vez.');
-        $this->assertSame(1, substr_count($layoutEnfermeria, '@livewireScripts'), 'El layout de Enfermería debe cargar los scripts Livewire una sola vez.');
+        $this->assertSame(1, substr_count($layoutEnfermeria, '<x-layout.livewire-runtime />'), 'El layout de Enfermería debe cargar el runtime Livewire una sola vez.');
+        $this->assertSame(1, substr_count(File::get(resource_path('views/components/layout/livewire-runtime.blade.php')), '@livewireScripts'), 'El runtime compartido debe cargar los scripts Livewire una sola vez.');
 
         $modal = File::get(resource_path('views/components/ui/modal-livewire.blade.php'));
         $drawer = File::get(resource_path('views/components/ui/drawer-livewire.blade.php'));
@@ -380,6 +381,10 @@ class FrontendArchitectureTest extends TestCase
         $this->assertStringContainsString('<x-ui.dashboard-header', File::get(resource_path('views/components/ui/dashboard-welcome-header.blade.php')));
         $this->assertStringContainsString('<x-ui.dashboard-header', File::get(resource_path('views/pages/admin/administracion/dashboard.blade.php')));
         $this->assertStringContainsString('<x-ui.dashboard-data-panel', $workspaceRol);
+
+        foreach ([$workspaceRol, $enfermeria, $medicina, $psicologia, File::get(resource_path('views/pages/admin/administracion/dashboard.blade.php'))] as $dashboard) {
+            $this->assertStringContainsString('<x-ui.dashboard-divider />', $dashboard);
+        }
 
         foreach ([$encabezadoAdmin, $medicina, $psicologia] as $dashboard) {
             $this->assertStringContainsString('images/FOTOS CENTRO DE ADULTOS MAYORES/', $dashboard);

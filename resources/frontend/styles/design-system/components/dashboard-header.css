@@ -58,3 +58,41 @@
 @media (max-width: 1023px) { .rm-dashboard-header .rm-dashboard-header__content { padding: 18px 22px; } .rm-dashboard-header .rm-dashboard-header__title { font-size: 28px; } }
 @media (max-width: 639px) { .rm-dashboard-header { grid-template-columns: 1fr; min-height: 0; } .rm-dashboard-header__visual { display: none; } .rm-dashboard-header .rm-dashboard-header__content { padding: 18px; } .rm-dashboard-header .rm-dashboard-header__title { font-size: 26px; } }
 @media (max-width: 479px) { .rm-dashboard-header__metadata { width: 100%; gap: 5px 10px; } .rm-dashboard-header__metadata > span + span { padding-left: 10px; } .rm-dashboard-header__metadata .rm-dashboard-header__scope { flex-basis: 100%; border-left: 0; padding-left: 0; } }
+
+.rm-dashboard-divider {
+    display: flex;
+    grid-column: 1 / -1;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    width: min(100%, 760px);
+    height: 26px;
+    min-width: 0;
+    margin: -4px auto;
+    color: var(--rm-dashboard-sage-700, var(--rm-sage));
+    pointer-events: none;
+}
+.rm-dashboard-divider__line {
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, color-mix(in srgb, currentColor 34%, transparent));
+}
+.rm-dashboard-divider__line:last-child { transform: rotate(180deg); }
+.rm-dashboard-divider__dots {
+    width: 34px;
+    height: 5px;
+    flex: 0 0 34px;
+    background: radial-gradient(circle, color-mix(in srgb, currentColor 48%, transparent) 1.5px, transparent 2px) left center / 11px 5px repeat-x;
+}
+.rm-dashboard-divider__spark {
+    width: 20px;
+    height: 20px;
+    flex: 0 0 20px;
+    background: color-mix(in srgb, currentColor 72%, transparent);
+    clip-path: polygon(50% 0, 58% 40%, 100% 50%, 58% 60%, 50% 100%, 42% 60%, 0 50%, 42% 40%);
+}
+:is(.dark, [data-theme="dark"]) .rm-dashboard-divider { color: var(--rm-palette-petroleum-mint); }
+@media (max-width: 639px) {
+    .rm-dashboard-divider { width: 88%; gap: 8px; }
+    .rm-dashboard-divider__dots { width: 22px; flex-basis: 22px; }
+}

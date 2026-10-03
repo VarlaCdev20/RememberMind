@@ -120,38 +120,6 @@
         color-mix(in srgb, var(--rm-dashboard-header-bg) 25%, transparent) 42%,
         transparent 64%);
 }
-.rm-superadmin-divider {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 12px;
-    width: min(100%, 760px);
-    height: 26px;
-    margin: -4px auto;
-    color: var(--rm-dashboard-sage-700);
-}
-.rm-superadmin-divider__line {
-    flex: 1;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, color-mix(in srgb, currentColor 34%, transparent));
-}
-.rm-superadmin-divider__line:last-child {
-    transform: rotate(180deg);
-}
-.rm-superadmin-divider__dots {
-    width: 34px;
-    height: 5px;
-    flex: 0 0 34px;
-    background: radial-gradient(circle, color-mix(in srgb, currentColor 48%, transparent) 1.5px, transparent 2px) left center / 11px 5px repeat-x;
-}
-.rm-superadmin-divider__spark {
-    width: 20px;
-    height: 20px;
-    flex: 0 0 20px;
-    background: color-mix(in srgb, currentColor 72%, transparent);
-    clip-path: polygon(50% 0, 58% 40%, 100% 50%, 58% 60%, 50% 100%, 42% 60%, 0 50%, 42% 40%);
-}
-
 .rm-dashboard-composition--superadmin .rm-superadmin-metrics { gap: 14px; }
 .rm-dashboard-composition--superadmin .rm-superadmin-metrics .rm-metric-card {
     min-height: 116px;
@@ -269,8 +237,6 @@
     .rm-dashboard-composition--superadmin .rm-dashboard-header__title { font-size: clamp(26px, 8vw, 34px); }
     .rm-dashboard-composition--superadmin .rm-superadmin-metrics .rm-metric-card { min-height: 110px; }
     .rm-dashboard-composition--superadmin .rm-superadmin-metrics .rm-metric-card__value { font-size: 28px; }
-    .rm-superadmin-divider { width: 88%; gap: 8px; }
-    .rm-superadmin-divider__dots { width: 22px; flex-basis: 22px; }
 }
 @media (min-width: 640px) and (max-width: 1279px) {
     .rm-dashboard-composition--superadmin > .rm-dashboard-header--superadmin { --rm-dashboard-hero-height: 210px; grid-template-columns: 65% 35%; }

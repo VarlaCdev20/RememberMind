@@ -9,6 +9,8 @@
             :secondary-image="$welcomeSecondaryImage"
         />
 
+    <x-ui.dashboard-divider />
+
 @php
         $enTurno = ($dashboard['modo'] ?? '') === 'EN_TURNO';
         $pacientesKpi = $enTurno ? ($stats['pacientes'] ?? null) : null;

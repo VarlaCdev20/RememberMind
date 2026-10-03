@@ -18,6 +18,8 @@
         </button>
     </x-ui.role-dashboard-hero>
 
+    <x-ui.dashboard-divider />
+
     @if($metrics)
         <section class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4" aria-label="Indicadores de psicología">
             @foreach($metrics as $metric)

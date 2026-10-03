@@ -45,6 +45,8 @@
         <div class="rm-dashboard-header-actions"><a class="rm-admin-dashboard__primary-action" href="{{ route('admin.admisiones.preadmisiones') }}"><i class="ph-bold ph-user-plus" aria-hidden="true"></i> Revisar preadmisiones</a></div>
     @endif
 
+    <x-ui.dashboard-divider />
+
     @if($puedeAlertas || $puedePreadmisiones || $puedeAdmisiones)
     <section class="rm-admin-dashboard__section rm-admin-dashboard__attention" aria-labelledby="admin-attention-title">
         <div class="rm-admin-dashboard__section-heading rm-section-header"><div class="rm-section-header__main"><span class="rm-section-header__icon" aria-hidden="true"><i class="ph-bold ph-warning-circle"></i></span><h2 id="admin-attention-title" class="rm-section-header__title">Requiere atención ahora</h2></div><span class="rm-section-header__count">{{ $pendientes }} {{ $pendientes === 1 ? 'pendiente' : 'pendientes' }}</span></div>
