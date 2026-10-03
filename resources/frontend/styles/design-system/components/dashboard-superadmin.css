@@ -1,7 +1,7 @@
 /* Presentación del dashboard de Superadministración. No altera el shell de otras rutas. */
 .rm-shell:has(.rm-dashboard-composition--superadmin) {
-    --rm-dashboard-app-bg: #F3EEE8;
-    --rm-dashboard-shell-bg: #DDD6CF;
+    --rm-dashboard-app-bg: var(--rm-shell-chrome-bg);
+    --rm-dashboard-shell-bg: var(--rm-shell-chrome-bg);
     --rm-dashboard-header-bg: #E6E0D9;
     --rm-dashboard-card-surface: #F7F3EF;
     --rm-dashboard-surface-soft: #EFEAE4;
@@ -21,6 +21,8 @@
     --rm-dashboard-coral-600: #C97D6D;
     --rm-dashboard-coral-100: #F1DEDA;
     --rm-dashboard-divider: color-mix(in srgb, var(--rm-dashboard-text) 10%, transparent);
+    --rm-dashboard-card-outline: color-mix(in srgb, var(--rm-dashboard-text) 16%, transparent);
+    --rm-dashboard-elevation-ink: var(--rm-dashboard-text);
     --rm-app-bg: var(--rm-dashboard-app-bg);
 }
 
@@ -59,11 +61,13 @@
     background: var(--rm-dashboard-coral-600);
 }
 
-.rm-dashboard-composition--superadmin .rm-superadmin-metrics {
+.rm-dashboard-composition--superadmin {
     --rm-dashboard-card-bg: var(--rm-dashboard-card-surface);
-    --rm-dashboard-card-border: color-mix(in srgb, var(--rm-dashboard-text) 8%, transparent);
-    --rm-dashboard-card-shadow: 0 2px 6px color-mix(in srgb, var(--rm-dashboard-text) 3%, transparent),
-        0 10px 24px color-mix(in srgb, var(--rm-dashboard-text) 5.5%, transparent);
+    --rm-dashboard-card-border: var(--rm-dashboard-card-outline);
+    --rm-dashboard-card-shadow: 0 3px 8px color-mix(in srgb, var(--rm-dashboard-elevation-ink) 7%, transparent),
+        0 14px 30px color-mix(in srgb, var(--rm-dashboard-elevation-ink) 9%, transparent);
+}
+.rm-dashboard-composition--superadmin .rm-superadmin-metrics {
     --rm-text-primary: var(--rm-dashboard-text);
     --rm-text-secondary: var(--rm-dashboard-text-secondary);
 }
@@ -161,6 +165,12 @@
     background-color: var(--rm-dashboard-card-surface);
     background-image: none;
 }
+.rm-dashboard-composition--superadmin .rm-dashboard-data-panel,
+.rm-dashboard-composition--superadmin .rm-role-access {
+    border-color: var(--rm-dashboard-card-border);
+    background: var(--rm-dashboard-card-bg);
+    box-shadow: var(--rm-dashboard-card-shadow);
+}
 .rm-dashboard-composition--superadmin .rm-superadmin-metrics .rm-metric-card__value {
     font: 800 36px/1.05 var(--rm-font-friendly);
 }
@@ -203,10 +213,10 @@
 }
 
 :is(.dark, [data-theme="dark"]) .rm-shell:has(.rm-dashboard-composition--superadmin) {
-    --rm-dashboard-app-bg: var(--rm-palette-petroleum-950);
-    --rm-dashboard-shell-bg: var(--rm-palette-petroleum-900);
+    --rm-dashboard-app-bg: var(--rm-shell-chrome-bg);
+    --rm-dashboard-shell-bg: var(--rm-shell-chrome-bg);
     --rm-dashboard-header-bg: var(--rm-palette-petroleum-800);
-    --rm-dashboard-card-surface: var(--rm-palette-petroleum-800);
+    --rm-dashboard-card-surface: var(--rm-palette-petroleum-raised);
     --rm-dashboard-surface-soft: var(--rm-palette-petroleum-700);
     --rm-dashboard-topbar-control: var(--rm-palette-petroleum-800);
     --rm-dashboard-text: var(--rm-palette-petroleum-text);
@@ -223,6 +233,11 @@
     --rm-dashboard-coral-700: var(--rm-palette-petroleum-text);
     --rm-dashboard-coral-600: var(--rm-palette-danger);
     --rm-dashboard-coral-100: color-mix(in srgb, var(--rm-palette-danger) 22%, var(--rm-palette-petroleum-800));
+    --rm-dashboard-card-outline: var(--rm-palette-petroleum-border);
+    --rm-dashboard-elevation-ink: var(--rm-palette-petroleum-950);
+}
+:is(.dark, [data-theme="dark"]) .rm-dashboard-composition--superadmin {
+    --rm-dashboard-card-bg: var(--rm-dashboard-card-surface);
 }
 
 @media (max-width: 639px) {
