@@ -39,7 +39,7 @@ final class RoleDashboardDataService
         $pendingStudies = (clone $studies)->whereNull('fecha_realizacion')
             ->whereNotIn('estado', ['CANCELADO', 'CANCELADA', 'ANULADO', 'ANULADA']);
         $upcoming = (clone $care)->join('residentes as r', 'r.cod_residente', '=', 'atenciones.cod_residente')
-            ->where('atenciones.fecha_hora', '>=', now())->whereNotIn('atenciones.estado', ['CANCELADA', 'ANULADA'])
+            ->where('atenciones.fecha_hora', '>=', now())->whereIn('atenciones.estado', ['PROGRAMADA', 'PENDIENTE'])
             ->orderBy('atenciones.fecha_hora')->limit(6)
             ->get(['r.nombres', 'r.apellido_paterno', 'atenciones.tipo_atencion', 'atenciones.fecha_hora'])
             ->map(fn ($row) => ['label' => trim($row->nombres.' '.$row->apellido_paterno), 'detail' => $row->tipo_atencion.' · '.date('d/m H:i', strtotime($row->fecha_hora))])->all();
@@ -58,7 +58,7 @@ final class RoleDashboardDataService
         return [
             'metrics' => [
                 $this->metric('Residentes atendidos', (clone $care)->where('fecha_hora', '>=', now()->subDays(90))->distinct('cod_residente')->count('cod_residente'), 'Por ti · últimos 90 días', 'ph-users-three', 'sky'),
-                $this->metric('Atenciones próximas', (clone $care)->where('fecha_hora', '>=', now())->whereNotIn('estado', ['CANCELADA', 'ANULADA'])->count(), 'Registradas a tu nombre', 'ph-calendar-check', 'mint'),
+                $this->metric('Atenciones próximas', (clone $care)->where('fecha_hora', '>=', now())->whereIn('estado', ['PROGRAMADA', 'PENDIENTE'])->count(), 'Registradas a tu nombre', 'ph-calendar-check', 'mint'),
                 $this->metric('Alertas prioritarias', (clone $alerts)->count(), 'Abiertas de prioridad alta o crítica', 'ph-warning-circle', 'critical'),
                 $this->metric('Estudios pendientes', (clone $pendingStudies)->count(), 'Solicitados por ti sin realización', 'ph-flask', 'neutral'),
             ],
@@ -204,6 +204,12 @@ final class RoleDashboardDataService
             ->orderByDesc($relatedTable.'.fecha_hora')->limit(5)
             ->get(['r.nombres', 'r.apellido_paterno', $relatedTable.'.fecha_hora'])
             ->map(fn ($row) => ['label' => trim($row->nombres.' '.$row->apellido_paterno), 'detail' => date('d/m/Y H:i', strtotime($row->fecha_hora))])->all();
+        $upcoming = DB::table('atenciones as a')->join('residentes as r', 'r.cod_residente', '=', 'a.cod_residente')
+            ->where('a.cod_personal', $code)->where('a.fecha_hora', '>=', now())
+            ->whereIn('a.estado', ['PROGRAMADA', 'PENDIENTE'])
+            ->orderBy('a.fecha_hora')->limit(6)
+            ->get(['r.nombres', 'r.apellido_paterno', 'a.tipo_atencion', 'a.fecha_hora'])
+            ->map(fn ($row) => ['label' => trim($row->nombres.' '.$row->apellido_paterno), 'detail' => $row->tipo_atencion.' · '.date('d/m H:i', strtotime($row->fecha_hora))])->all();
 
         return [
             'metrics' => [
@@ -216,7 +222,7 @@ final class RoleDashboardDataService
                 $this->panel($title.' recientes', 'list', $recent, 'Aún no hay valoraciones registradas a tu nombre.', $icon, 'wide'),
                 $this->panel('Evolución de valoraciones · 30 días', 'bars', $this->countItems($trend), 'Sin registros en los últimos 30 días.', 'ph-chart-bar'),
                 $this->panel($relatedTitle, 'list', $related, 'No hay registros propios en los últimos 30 días.', $icon),
-                $this->panel('Agenda de atenciones', 'timeline', [], 'No hay una agenda futura de esta especialidad en los datos actuales.', 'ph-calendar-check'),
+                $this->panel('Agenda de atenciones', 'timeline', $upcoming, 'No hay atenciones programadas a tu nombre.', 'ph-calendar-check'),
             ],
         ];
     }

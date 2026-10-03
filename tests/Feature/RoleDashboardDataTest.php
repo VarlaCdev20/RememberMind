@@ -81,6 +81,15 @@ class RoleDashboardDataTest extends TestCase
         $data = app(RoleDashboardDataService::class)->forRole($usuario, 'MEDICO GENERAL/GERIATRA');
         $this->assertSame(['Residentes atendidos', 'Atenciones próximas', 'Alertas prioritarias', 'Estudios pendientes'], array_column($data['metrics'], 'label'));
         $this->assertSame([0, 0, 0, 0], array_column($data['metrics'], 'value'));
+        $residente = Residente::factory()->create(['nombres' => 'Rosa', 'apellido_paterno' => 'Programada']);
+        DB::table('areas')->insert(['cod_area' => 'ARE_MED_DASH', 'nombre' => 'Medicina de prueba', 'estado' => 'ACTIVA']);
+        DB::table('atenciones')->insert([
+            ['cod_atencion' => 'ATE_MED_PLAN', 'cod_residente' => $residente->cod_residente, 'cod_area' => 'ARE_MED_DASH', 'cod_personal' => 'PER_MED_DASH', 'tipo_atencion' => 'CONTROL', 'fecha_hora' => now()->addDay(), 'estado' => 'PROGRAMADA'],
+            ['cod_atencion' => 'ATE_MED_DONE', 'cod_residente' => $residente->cod_residente, 'cod_area' => 'ARE_MED_DASH', 'cod_personal' => 'PER_MED_DASH', 'tipo_atencion' => 'CONTROL', 'fecha_hora' => now()->addDays(2), 'estado' => 'COMPLETADA'],
+        ]);
+        $planned = app(RoleDashboardDataService::class)->forRole($usuario, 'MEDICO GENERAL/GERIATRA');
+        $this->assertSame(1, $planned['metrics'][1]['value']);
+        $this->assertCount(1, $planned['panels'][0]['items']);
         $this->actingAs($usuario)->get(route('admin.medico.dashboard'))
             ->assertOk()->assertSee('Estudios pendientes')->assertDontSee('Distribución IMC');
     }

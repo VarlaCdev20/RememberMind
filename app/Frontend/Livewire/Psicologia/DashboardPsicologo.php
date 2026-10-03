@@ -43,7 +43,7 @@ class DashboardPsicologo extends Component
                 ->map(fn ($row) => ['label' => trim($row->nombres.' '.$row->apellido_paterno), 'detail' => $row->instrumento.' · '.date('d/m/Y H:i', strtotime($row->fecha_hora))])->all();
             $upcoming = (clone $care)->join('residentes as r', 'r.cod_residente', '=', 'atenciones.cod_residente')
                 ->where('atenciones.fecha_hora', '>=', now())
-                ->whereNotIn('atenciones.estado', ['CANCELADA', 'ANULADA'])
+                ->whereIn('atenciones.estado', ['PROGRAMADA', 'PENDIENTE'])
                 ->orderBy('atenciones.fecha_hora')->limit(6)
                 ->get(['r.nombres', 'r.apellido_paterno', 'atenciones.tipo_atencion', 'atenciones.fecha_hora'])
                 ->map(fn ($row) => ['label' => trim($row->nombres.' '.$row->apellido_paterno), 'detail' => $row->tipo_atencion.' · '.date('d/m H:i', strtotime($row->fecha_hora))])->all();
