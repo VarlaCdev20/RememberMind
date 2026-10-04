@@ -12,7 +12,14 @@
     foreach ($items as $index => $item) {
         $next = $total > 0 ? $cursor + max(0, (int) ($item['value'] ?? 0)) * 100 / $total : $cursor;
         $token = '--rm-chart-'.(($index % 6) + 1);
-        $stops[] = "var({$token}) {$cursor}% {$next}%";
+        if ($next > $cursor) {
+            $edge = min(0.45, ($next - $cursor) / 4);
+            $fillStart = $cursor + $edge;
+            $fillEnd = $next - $edge;
+            $outline = "color-mix(in srgb, var({$token}) var(--rm-chart-mark-outline), transparent)";
+            $fill = "color-mix(in srgb, var({$token}) var(--rm-chart-mark-fill), transparent)";
+            $stops[] = "{$outline} {$cursor}% {$fillStart}%, {$fill} {$fillStart}% {$fillEnd}%, {$outline} {$fillEnd}% {$next}%";
+        }
         $cursor = $next;
     }
     $gradient = implode(', ', $stops);

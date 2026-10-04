@@ -25,7 +25,12 @@
         $cantidad = (int) ($datos['alertas_prioridad'][$clave] ?? 0);
         if ($cantidad > 0 && $datos['alertas_activas'] > 0) {
             $siguiente = $avanceAlerta + $cantidad * 100 / $datos['alertas_activas'];
-            $segmentosAlerta[] = "var({$color}) {$avanceAlerta}% {$siguiente}%";
+            $borde = min(0.45, ($siguiente - $avanceAlerta) / 4);
+            $inicioRelleno = $avanceAlerta + $borde;
+            $finRelleno = $siguiente - $borde;
+            $contorno = "color-mix(in srgb, var({$color}) var(--rm-chart-mark-outline), transparent)";
+            $relleno = "color-mix(in srgb, var({$color}) var(--rm-chart-mark-fill), transparent)";
+            $segmentosAlerta[] = "{$contorno} {$avanceAlerta}% {$inicioRelleno}%, {$relleno} {$inicioRelleno}% {$finRelleno}%, {$contorno} {$finRelleno}% {$siguiente}%";
             $avanceAlerta = $siguiente;
         }
     }
