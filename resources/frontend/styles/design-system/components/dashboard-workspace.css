@@ -8,6 +8,7 @@
     --rm-dashboard-surface-soft: #EFEAE4;
     --rm-dashboard-topbar-control: #EAE4DE;
     --rm-dashboard-text: #4A4642;
+    --rm-dashboard-heading-ink: #365F53;
     --rm-dashboard-text-secondary: #67615B;
     --rm-dashboard-text-muted: #847D76;
     --rm-dashboard-sage-700: #5F7D67;
@@ -66,7 +67,8 @@
     letter-spacing: .13em;
 }
 .rm-dashboard-composition .rm-dashboard-header__title {
-    font: 700 clamp(30px, 2.6vw, 40px)/1.1 var(--rm-font-brand);
+    font: 800 clamp(30px, 2.6vw, 40px)/1.1 var(--rm-font-brand);
+    color: var(--rm-dashboard-heading-ink);
 }
 .rm-dashboard-composition .rm-dashboard-header__role {
     border-color: color-mix(in srgb, var(--rm-dashboard-sage-600) 32%, transparent);
@@ -235,6 +237,7 @@
     --rm-dashboard-surface-soft: var(--rm-palette-petroleum-700);
     --rm-dashboard-topbar-control: var(--rm-palette-petroleum-800);
     --rm-dashboard-text: var(--rm-palette-petroleum-text);
+    --rm-dashboard-heading-ink: var(--rm-palette-petroleum-mint);
     --rm-dashboard-text-secondary: var(--rm-palette-petroleum-secondary);
     --rm-dashboard-text-muted: var(--rm-palette-petroleum-secondary);
     --rm-dashboard-sage-700: var(--rm-palette-petroleum-mint);

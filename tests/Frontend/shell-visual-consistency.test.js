@@ -116,13 +116,14 @@ test('los dashboards por rol comparten tamaño de cabecera y superficie de cards
                         const panel = getComputedStyle(document.querySelector('[data-panel]'));
                         const welcome = getComputedStyle(document.querySelector('.rm-dashboard-header'));
                         const header = document.querySelector('.rm-dashboard-header').getBoundingClientRect();
-                        return { headingFamily: heading.fontFamily, headingSize: heading.fontSize, headingColor: heading.color, headerBg: welcome.backgroundColor, headerMinHeight: welcome.minHeight, cardBg: card.backgroundColor, cardMinHeight: card.minHeight, cardRadius: card.borderRadius, cardShadow: card.boxShadow, panelBg: panel.backgroundColor, panelRadius: panel.borderRadius, headerWidth: header.width };
+                        return { headingFamily: heading.fontFamily, headingSize: heading.fontSize, headingWeight: heading.fontWeight, headingColor: heading.color, headerBg: welcome.backgroundColor, headerMinHeight: welcome.minHeight, cardBg: card.backgroundColor, cardMinHeight: card.minHeight, cardRadius: card.borderRadius, cardShadow: card.boxShadow, panelBg: panel.backgroundColor, panelRadius: panel.borderRadius, headerWidth: header.width };
                     }));
                 }
                 for (const [index, style] of styles.entries()) {
                     const { headerWidth, ...sharedStyle } = style;
                     const { headerWidth: baseWidth, ...baseStyle } = styles[0];
                     assert.deepEqual(sharedStyle, baseStyle, `${theme} ${width}px: variante ${index}`);
+                    assert.equal(style.headingWeight, '800', `${theme} ${width}px: saludo destacado`);
                     assert.ok(style.headerWidth >= Math.min(width - 16, 500) - 1, `${theme} ${width}px: encabezado ocupa el espacio disponible`);
                 }
             }
