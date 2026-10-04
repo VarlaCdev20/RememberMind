@@ -1,28 +1,11 @@
-<div class="min-h-screen bg-fondo-panel px-4 py-5 text-titulo sm:px-6 lg:px-8">
+<div class="min-h-screen bg-transparent px-4 py-5 text-titulo sm:px-6 lg:px-8">
  <div class="mx-auto max-w-7xl space-y-5">
 
  {{-- ══════════════════════════════════════════════════════════════════ --}}
  {{-- CABECERA --}}
  {{-- ══════════════════════════════════════════════════════════════════ --}}
- <section class="overflow-hidden rounded-[1.65rem] border border-borde-suave bg-fondo-panel shadow-[0_20px_58px_rgba(47,62,92,0.13)] backdrop-blur-xl">
- <div class="h-1.5 bg-gradient-to-r from-[var(--rm-accent-terracotta)] via-[var(--rm-warning)] to-[var(--rm-action-primary)]"></div>
- <div class="p-5 sm:p-7">
- <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-
- <div class="min-w-0">
- <span class="inline-flex items-center gap-2 rounded-full border border-borde-focus bg-estado-peligroBg px-3 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-boton-acento">
- <i class="ph-bold ph-chart-bar text-sm"></i>
- CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS — Reportes
- </span>
- <h1 class="mt-3 text-3xl font-black tracking-tight text-titulo sm:text-4xl">
- Reportes de actividades
- </h1>
- <p class="mt-1.5 max-w-2xl text-sm font-bold leading-relaxed text-apoyo">
- Generación de evidencia institucional sobre actividades, participación y cumplimiento.
- </p>
- </div>
-
- <div class="flex shrink-0 flex-wrap items-center gap-2">
+ <x-ui.collection-header title="Reportes de actividades" subtitle="Evidencia institucional sobre actividades, participación y cumplimiento." icon="ph-chart-bar" eyebrow="Área de actividades">
+ <x-slot:actions>
 
  {{-- Vista previa --}}
  <a
@@ -89,10 +72,8 @@
  </button>
  @endif
 
- </div>
- </div>
- </div>
- </section>
+ </x-slot:actions>
+ </x-ui.collection-header>
 
      {{-- ══════════════════════════════════════════════════════════════════ --}}
     {{-- FILTROS DE REPORTE FORMATO ALERTAS                                 --}}
@@ -100,11 +81,13 @@
     <x-ui.filter-bar class="mb-4">
         <div class="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-2 items-center">
             {{-- Buscar adulto --}}
-            <div class="lg:col-span-3 relative flex items-center">
+            <div class="lg:col-span-3">
+                <label for="reporte-actividades-buscar" class="rm-collection-filter-label">Buscar residente</label>
+                <div class="relative flex items-center">
                 <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-[var(--rm-text-secondary)]">
                     <i class="ph-bold ph-magnifying-glass text-base"></i>
                 </span>
-                <input type="text"
+                <input id="reporte-actividades-buscar" type="text"
                     wire:model.live.debounce.400ms="buscar"
                     placeholder="Buscar por nombre o apellido..."
                     class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-input-bg)] py-2 pl-9 pr-8 text-xs font-medium text-[var(--rm-text-primary)] placeholder-[var(--rm-text-secondary)] focus:border-[var(--rm-primary)] focus:ring-1 focus:ring-[var(--rm-primary)] focus:outline-none h-[38px]" />
@@ -116,11 +99,13 @@
                         <i class="ph-bold ph-x-circle text-base"></i>
                     </button>
                 @endif
+                </div>
             </div>
 
             {{-- Tipo --}}
             <div class="lg:col-span-3">
-                <select wire:model.live="filtroTipo"
+                <label for="reporte-actividades-tipo" class="rm-collection-filter-label">Tipo de actividad</label>
+                <select id="reporte-actividades-tipo" wire:model.live="filtroTipo"
                     class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-input-bg)] py-2 px-3 text-xs font-medium text-[var(--rm-text-primary)] focus:border-[var(--rm-primary)] focus:ring-1 focus:ring-[var(--rm-primary)] focus:outline-none h-[38px]">
                     <option value="">Todos los tipos</option>
                     @foreach($tipos as $t)
@@ -131,7 +116,8 @@
 
             {{-- Estado --}}
             <div class="lg:col-span-2">
-                <select wire:model.live="filtroEstado"
+                <label for="reporte-actividades-estado" class="rm-collection-filter-label">Estado</label>
+                <select id="reporte-actividades-estado" wire:model.live="filtroEstado"
                     class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-input-bg)] py-2 px-3 text-xs font-medium text-[var(--rm-text-primary)] focus:border-[var(--rm-primary)] focus:ring-1 focus:ring-[var(--rm-primary)] focus:outline-none h-[38px]">
                     <option value="">Todos los estados</option>
                     <option value="PROGRAMADA">Programada / Pendiente</option>
@@ -143,14 +129,16 @@
 
             {{-- Fecha desde --}}
             <div class="lg:col-span-2">
-                <input type="date"
+                <label for="reporte-actividades-desde" class="rm-collection-filter-label">Desde</label>
+                <input id="reporte-actividades-desde" type="date"
                     wire:model.live="fechaDesde"
                     class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-input-bg)] py-2 px-3 text-xs font-medium text-[var(--rm-text-primary)] focus:border-[var(--rm-primary)] focus:ring-1 focus:ring-[var(--rm-primary)] focus:outline-none h-[38px]" />
             </div>
 
             {{-- Fecha hasta --}}
             <div class="lg:col-span-2">
-                <input type="date"
+                <label for="reporte-actividades-hasta" class="rm-collection-filter-label">Hasta</label>
+                <input id="reporte-actividades-hasta" type="date"
                     wire:model.live="fechaHasta"
                     class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-input-bg)] py-2 px-3 text-xs font-medium text-[var(--rm-text-primary)] focus:border-[var(--rm-primary)] focus:ring-1 focus:ring-[var(--rm-primary)] focus:outline-none h-[38px]" />
             </div>
@@ -202,105 +190,18 @@
     </x-ui.filter-bar>
 
  {{-- ══════════════════════════════════════════════════════════════════ --}}
- {{-- MÉTRICAS (8 cards) --}}
+ {{-- Indicadores del período --}}
  {{-- ══════════════════════════════════════════════════════════════════ --}}
  <div class="grid gap-3.5 sm:grid-cols-2 lg:grid-cols-4" wire:loading.class="opacity-60">
 
- {{-- Total --}}
- <div class="flex flex-col justify-between overflow-hidden rounded-2xl border border-borde-fuerte bg-fondo-panel p-4 shadow-sm">
- <div class="flex items-start justify-between gap-2">
- <p class="text-[10px] font-bold uppercase tracking-[0.12em] text-apoyo">Total actividades</p>
- <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-xl bg-fondo-panel">
- <i class="ph-bold ph-calendar-blank text-xs text-titulo"></i>
- </span>
- </div>
- <p class="mt-2 text-3xl font-black tracking-tight text-titulo">{{ number_format($stats['total']) }}</p>
- <p class="mt-0.5 text-[10px] font-bold text-apoyo">Registradas en el sistema</p>
- </div>
-
- {{-- Programadas --}}
- <div class="flex flex-col justify-between overflow-hidden rounded-2xl border border-estado-advertenciaBorde bg-estado-advertenciaBg p-4 shadow-sm">
- <div class="flex items-start justify-between gap-2">
- <p class="text-[10px] font-bold uppercase tracking-[0.12em] text-estado-advertencia">Programadas</p>
- <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-xl bg-estado-advertenciaBg">
- <i class="ph-bold ph-clock text-xs text-estado-advertencia"></i>
- </span>
- </div>
- <p class="mt-2 text-3xl font-black tracking-tight text-estado-advertencia">{{ number_format($stats['programadas']) }}</p>
- <p class="mt-0.5 text-[10px] font-bold text-estado-advertencia">Pendientes de realizarse</p>
- </div>
-
- {{-- Realizadas --}}
- <div class="flex flex-col justify-between overflow-hidden rounded-2xl border border-estado-exitoBorde bg-estado-exitoBg p-4 shadow-sm">
- <div class="flex items-start justify-between gap-2">
- <p class="text-[10px] font-bold uppercase tracking-[0.12em] text-estado-exito">Realizadas</p>
- <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-xl bg-estado-exitoBg">
- <i class="ph-bold ph-check-circle text-xs text-estado-exito"></i>
- </span>
- </div>
- <p class="mt-2 text-3xl font-black tracking-tight text-estado-exito">{{ number_format($stats['realizadas']) }}</p>
- <p class="mt-0.5 text-[10px] font-bold text-estado-exito">Completadas / cumplidas</p>
- </div>
-
- {{-- Canceladas --}}
- <div class="flex flex-col justify-between overflow-hidden rounded-2xl border border-borde-focus bg-estado-peligroBg p-4 shadow-sm">
- <div class="flex items-start justify-between gap-2">
- <p class="text-[10px] font-bold uppercase tracking-[0.12em] text-boton-acento">Canceladas</p>
- <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-xl bg-estado-peligroBg">
- <i class="ph-bold ph-x-circle text-xs text-boton-acento"></i>
- </span>
- </div>
- <p class="mt-2 text-3xl font-black tracking-tight text-boton-acento">{{ number_format($stats['canceladas']) }}</p>
- <p class="mt-0.5 text-[10px] font-bold text-boton-acento">No realizadas / anuladas</p>
- </div>
-
- {{-- Reprogramadas --}}
- <div class="flex flex-col justify-between overflow-hidden rounded-2xl border border-borde bg-fondo-panel p-4 shadow-sm">
- <div class="flex items-start justify-between gap-2">
- <p class="text-[10px] font-bold uppercase tracking-[0.12em] text-apoyo">Reprogramadas</p>
- <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-xl bg-fondo-panel">
- <i class="ph-bold ph-arrows-clockwise text-xs text-parrafo"></i>
- </span>
- </div>
- <p class="mt-2 text-3xl font-black tracking-tight text-parrafo">{{ number_format($stats['reprogramadas']) }}</p>
- <p class="mt-0.5 text-[10px] font-bold text-apoyo">Pendientes de nueva fecha</p>
- </div>
-
- {{-- Adultos --}}
- <div class="flex flex-col justify-between overflow-hidden rounded-2xl border border-estado-exitoBorde bg-estado-exitoBg p-4 shadow-sm">
- <div class="flex items-start justify-between gap-2">
- <p class="text-[10px] font-bold uppercase tracking-[0.12em] text-estado-exito">Adultos vinculados</p>
- <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-xl bg-estado-exitoBg">
- <i class="ph-bold ph-users text-xs text-estado-exito"></i>
- </span>
- </div>
- <p class="mt-2 text-3xl font-black tracking-tight text-estado-exito">{{ number_format($stats['adultos']) }}</p>
- <p class="mt-0.5 text-[10px] font-bold text-estado-exito">Con actividades en el período</p>
- </div>
-
- {{-- Tipos --}}
- <div class="flex flex-col justify-between overflow-hidden rounded-2xl border border-borde-fuerte bg-fondo-panel p-4 shadow-sm">
- <div class="flex items-start justify-between gap-2">
- <p class="text-[10px] font-bold uppercase tracking-[0.12em] text-apoyo">Tipos utilizados</p>
- <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-xl bg-fondo-panel">
- <i class="ph-bold ph-tag text-xs text-titulo"></i>
- </span>
- </div>
- <p class="mt-2 text-3xl font-black tracking-tight text-titulo">{{ number_format($stats['tipos']) }}</p>
- <p class="mt-0.5 text-[10px] font-bold text-apoyo">Tipos de actividad distintos</p>
- </div>
-
- {{-- Periodo --}}
- <div class="flex flex-col justify-between overflow-hidden rounded-2xl border border-estado-advertenciaBorde bg-estado-advertenciaBg p-4 shadow-sm">
- <div class="flex items-start justify-between gap-2">
- <p class="text-[10px] font-bold uppercase tracking-[0.12em] text-estado-advertencia">Período</p>
- <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-xl bg-estado-advertenciaBg">
- <i class="ph-bold ph-calendar-dots text-xs text-estado-advertencia"></i>
- </span>
- </div>
- <p class="mt-2 text-sm font-bold leading-tight text-estado-advertencia">{{ $stats['periodo'] }}</p>
- <p class="mt-0.5 text-[10px] font-bold text-estado-advertencia">Rango de fechas seleccionado</p>
- </div>
+ <x-ui.metric-card icon="ph-calendar-blank" :value="number_format($stats['total'])" label="Total actividades" description="Registradas en el sistema" variant="neutral" />
+ <x-ui.metric-card icon="ph-clock" :value="number_format($stats['programadas'])" label="Programadas" description="Pendientes de realizarse" variant="sky" />
+ <x-ui.metric-card icon="ph-check-circle" :value="number_format($stats['realizadas'])" label="Realizadas" description="Completadas o cumplidas" variant="mint" />
+ <x-ui.metric-card icon="ph-x-circle" :value="number_format($stats['canceladas'])" label="Canceladas" description="No realizadas o anuladas" variant="coral" />
+ <x-ui.metric-card icon="ph-arrows-clockwise" :value="number_format($stats['reprogramadas'])" label="Reprogramadas" description="Pendientes de nueva fecha" variant="neutral" />
+ <x-ui.metric-card icon="ph-users" :value="number_format($stats['adultos'])" label="Residentes vinculados" description="Con actividades en el período" variant="mint" />
+ <x-ui.metric-card icon="ph-tag" :value="number_format($stats['tipos'])" label="Tipos utilizados" description="Tipos de actividad distintos" variant="neutral" />
+ <x-ui.metric-card icon="ph-calendar-dots" :value="$fechaDesde || $fechaHasta ? 'Filtrado' : 'Completo'" label="Período" :description="$stats['periodo']" variant="neutral" />
 
  </div>
 
@@ -325,13 +226,19 @@
  $pct = $chartEstado['maximo'] > 0
  ? round($item['total'] / $chartEstado['maximo'] * 100)
  : 0;
+ $barColor = match ($item['estado']) {
+ 'REALIZADA', 'COMPLETADA', 'FINALIZADA' => 'var(--rm-chart-care-500)',
+ 'CANCELADA', 'ANULADA' => 'var(--rm-chart-alert-500)',
+ 'REPROGRAMADA' => 'var(--rm-chart-neutral-500)',
+ default => 'var(--rm-chart-clinical-500)',
+ };
  @endphp
  <div class="flex items-center gap-3">
  <span class="w-24 shrink-0 text-right text-[11px] font-bold text-apoyo">{{ $item['label'] }}</span>
  <div class="min-w-0 flex-1 overflow-hidden rounded-full bg-fondo-panel h-2.5">
  <div
  class="h-full rounded-full transition-all duration-500"
- style="width: {{ $pct }}%; background-color: {{ $item['color'] }};"
+ style="width: {{ $pct }}%; background-color: {{ $barColor }};"
  ></div>
  </div>
  <span class="w-8 shrink-0 text-right text-xs font-bold text-titulo">{{ $item['total'] }}</span>
@@ -420,13 +327,8 @@
  {{-- ══════════════════════════════════════════════════════════════════ --}}
  {{-- VISTA PREVIA --}}
  {{-- ══════════════════════════════════════════════════════════════════ --}}
- <section class="overflow-hidden rounded-[1.45rem] border border-borde-suave bg-fondo-panel shadow-md">
- <div class="flex items-center justify-between border-b border-borde-suave bg-fondo-panel px-5 py-3.5">
- <div class="flex items-center gap-2">
- <i class="ph-bold ph-table text-apoyo text-sm"></i>
- <h2 class="text-xs font-bold uppercase tracking-[0.15em] text-titulo">Vista previa</h2>
- <span class="ml-1 rounded-full bg-fondo-panel px-2 py-0.5 text-[9px] font-bold text-apoyo">Últimos 15 registros</span>
- </div>
+ <x-ui.collection-results title="Vista previa" :count="$preview->count()" label="registros recientes">
+ <x-slot:actions>
  <a
  href="{{ $urlPreview }}"
  class="inline-flex items-center gap-1.5 text-[11px] font-bold text-estado-advertencia hover:underline"
@@ -434,13 +336,13 @@
  <i class="ph-bold ph-arrow-square-out text-xs"></i>
  Ver completo
  </a>
- </div>
+ </x-slot:actions>
 
  <div class="w-full overflow-x-auto" wire:loading.class="opacity-50">
- <table class="rm-data-table min-w-[700px] w-full border-collapse text-sm">
+ <table class="rm-data-table rm-table min-w-[700px] w-full border-collapse text-sm">
  <thead>
  <tr class="border-b border-borde-suave bg-fondo-panel">
- <th class="px-4 py-3 text-left text-[10px] font-bold uppercase tracking-[0.1em] text-apoyo">Adulto mayor</th>
+ <th class="px-4 py-3 text-left text-[10px] font-bold uppercase tracking-[0.1em] text-apoyo">Residente</th>
  <th class="px-4 py-3 text-left text-[10px] font-bold uppercase tracking-[0.1em] text-apoyo">Tipo de actividad</th>
  <th class="px-4 py-3 text-left text-[10px] font-bold uppercase tracking-[0.1em] text-apoyo">Fecha</th>
  <th class="px-4 py-3 text-left text-[10px] font-bold uppercase tracking-[0.1em] text-apoyo">Hora</th>
@@ -501,7 +403,7 @@
  </tbody>
  </table>
  </div>
- </section>
+ </x-ui.collection-results>
 
  {{-- ══════════════════════════════════════════════════════════════════ --}}
  {{-- REPORTES DISPONIBLES --}}
@@ -546,7 +448,7 @@
  </div>
  <div class="min-w-0">
  <p class="text-xs font-bold text-titulo">Participación</p>
- <p class="mt-0.5 text-[10px] font-bold leading-relaxed text-apoyo">Adultos mayores vinculados a actividades registradas.</p>
+ <p class="mt-0.5 text-[10px] font-bold leading-relaxed text-apoyo">Residentes vinculados a actividades registradas.</p>
  </div>
  <div class="mt-auto flex flex-wrap gap-1.5">
  @php

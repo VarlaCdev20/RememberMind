@@ -4,28 +4,14 @@
  $errCls = 'mt-1 text-[10px] font-bold text-boton-acento';
 @endphp
 
-<div class="min-h-screen bg-fondo-panel px-4 py-5 text-titulo sm:px-6 lg:px-8"
+<div class="min-h-screen bg-transparent px-4 py-5 text-titulo sm:px-6 lg:px-8"
  x-data
  @keydown.window.escape="$wire.cerrarModales()">
  <div class="mx-auto max-w-7xl space-y-6">
 
  {{-- ── CABECERA ─────────────────────────────────────────────────────── --}}
- <section class="overflow-hidden rounded-[1.65rem] border border-borde-suave bg-fondo-panel shadow-[0_20px_58px_rgba(47,62,92,0.13)] backdrop-blur-xl">
- <div class="h-1.5 bg-gradient-to-r from-[var(--rm-accent-terracotta)] via-[var(--rm-warning)] to-[var(--rm-action-primary)]"></div>
- <div class="flex flex-col gap-4 p-5 sm:p-7 lg:flex-row lg:items-center lg:justify-between">
- <div class="max-w-3xl">
- <span class="inline-flex items-center gap-2 rounded-full border border-borde-focus bg-estado-peligroBg px-3 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-boton-acento">
- <i class="ph-bold ph-users-four text-sm"></i>
- CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS — Participación
- </span>
- <h1 class="mt-3 text-3xl font-black tracking-tight text-titulo sm:text-4xl">
- Participación en actividades
- </h1>
- <p class="mt-2 max-w-2xl text-sm font-bold leading-relaxed text-apoyo">
- Consulta y gestión institucional de adultos mayores vinculados a actividades programadas.
- </p>
- </div>
- <div class="flex shrink-0 flex-col gap-2 sm:flex-row sm:items-center">
+ <x-ui.collection-header title="Participación en actividades" subtitle="Consulta y gestión de residentes vinculados a actividades programadas." icon="ph-users-four" eyebrow="Área de actividades">
+ <x-slot:actions>
  <a href="{{ route('admin.actividades.index') }}"
  class="inline-flex items-center justify-center gap-2 rounded-xl border border-borde-suave bg-fondo-app px-4 py-2.5 text-xs font-bold text-apoyo transition hover:border-borde-fuerte hover:text-titulo">
  <i class="ph-bold ph-calendar-check text-sm"></i>
@@ -43,15 +29,14 @@
  Registrar participación
  </button>
  @endcan
- </div>
- </div>
- </section>
+ </x-slot:actions>
+ </x-ui.collection-header>
 
  {{-- ── 8 MÉTRICAS ──────────────────────────────────────────────────── --}}
  @php
  $metricas = [
  ['label' => 'Participaciones', 'valor' => $stats['total'], 'icono' => 'ph-clipboard-text', 'tono' => 'azul'],
- ['label' => 'Adultos participantes', 'valor' => $stats['adultos_distintos'],'icono' => 'ph-user-check', 'tono' => 'verde'],
+ ['label' => 'Residentes participantes', 'valor' => $stats['adultos_distintos'],'icono' => 'ph-user-check', 'tono' => 'verde'],
  ['label' => 'Tipos utilizados', 'valor' => $stats['tipos_distintos'], 'icono' => 'ph-tag', 'tono' => 'dorado'],
  ['label' => 'Programadas', 'valor' => $stats['programadas'], 'icono' => 'ph-clock', 'tono' => 'dorado'],
  ['label' => 'Realizadas', 'valor' => $stats['realizadas'], 'icono' => 'ph-check-circle', 'tono' => 'verde'],
@@ -59,29 +44,11 @@
  ['label' => 'Hoy', 'valor' => $stats['hoy'], 'icono' => 'ph-sun', 'tono' => 'dorado'],
  ['label' => 'Próximas programadas', 'valor' => $stats['proximas'], 'icono' => 'ph-calendar-dots', 'tono' => 'violeta'],
  ];
- $tonoClases = [
- 'azul' => ['icono' => 'bg-fondo-panel text-titulo', 'valor' => 'text-titulo', 'linea' => 'bg-boton-principal'],
- 'verde' => ['icono' => 'bg-estado-exitoBg text-estado-exito', 'valor' => 'text-estado-exito', 'linea' => 'bg-estado-exitoBg'],
- 'terracota'=> ['icono' => 'bg-estado-peligroBg text-boton-acento', 'valor' => 'text-boton-acento', 'linea' => 'bg-boton-acento'],
- 'dorado' => ['icono' => 'bg-estado-advertenciaBg text-estado-advertencia', 'valor' => 'text-estado-advertencia', 'linea' => 'bg-estado-advertenciaBg'],
- 'violeta' => ['icono' => 'bg-fondo-panel text-parrafo', 'valor' => 'text-parrafo', 'linea' => 'bg-fondo-panel'],
- ];
+ $tonoVariantes = ['azul' => 'sky', 'verde' => 'mint', 'terracota' => 'coral', 'dorado' => 'neutral', 'violeta' => 'neutral'];
  @endphp
  <section class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
  @foreach($metricas as $m)
- @php
- $tono = $tonoClases[$m['tono']];
- @endphp
- <article class="relative min-h-[110px] overflow-hidden rounded-2xl border border-borde-suave bg-fondo-panel p-4 shadow-sm backdrop-blur-xl transition duration-300 hover:-translate-y-0.5 hover:shadow-[0_16px_34px_rgba(47,62,92,0.11)]">
- <div class="absolute inset-x-0 top-0 h-1 {{ $tono['linea'] }}"></div>
- <div class="flex items-start justify-between gap-3">
- <p class="max-w-[11rem] text-[10px] font-bold uppercase leading-snug tracking-[0.13em] text-apoyo">{{ $m['label'] }}</p>
- <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl {{ $tono['icono'] }}">
- <i class="ph-bold {{ $m['icono'] }} text-lg"></i>
- </span>
- </div>
- <p class="mt-4 text-3xl font-black leading-none {{ $tono['valor'] }}">{{ number_format($m['valor']) }}</p>
- </article>
+ <x-ui.metric-card :icon="$m['icono']" :value="number_format($m['valor'])" :label="$m['label']" :variant="$tonoVariantes[$m['tono']]" />
  @endforeach
  </section>
 
@@ -89,13 +56,15 @@
     <x-ui.filter-bar class="mb-4">
         <div class="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-2 items-center">
             {{-- Búsqueda textual --}}
-            <div class="lg:col-span-3 relative flex items-center">
+            <div class="lg:col-span-3">
+                <label for="participacion-buscar" class="rm-collection-filter-label">Buscar residente</label>
+                <div class="relative flex items-center">
                 <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-[var(--rm-text-secondary)]">
                     <i class="ph-bold ph-magnifying-glass text-base"></i>
                 </span>
-                <input wire:model.live.debounce.300ms="search"
+                <input id="participacion-buscar" wire:model.live.debounce.300ms="search"
                     type="text"
-                    placeholder="Buscar adulto mayor..."
+                    placeholder="Nombre del residente"
                     class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-input-bg)] py-2 pl-9 pr-8 text-xs font-medium text-[var(--rm-text-primary)] placeholder-[var(--rm-text-secondary)] focus:border-[var(--rm-primary)] focus:ring-1 focus:ring-[var(--rm-primary)] focus:outline-none h-[38px]" />
                 @if(!empty($search))
                     <button type="button"
@@ -105,11 +74,13 @@
                         <i class="ph-bold ph-x-circle text-base"></i>
                     </button>
                 @endif
+                </div>
             </div>
 
             {{-- Tipo de actividad --}}
             <div class="lg:col-span-3">
-                <select wire:model.live="filtroTipo"
+                <label for="participacion-tipo" class="rm-collection-filter-label">Tipo de actividad</label>
+                <select id="participacion-tipo" wire:model.live="filtroTipo"
                     class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-input-bg)] py-2 px-3 text-xs font-medium text-[var(--rm-text-primary)] focus:border-[var(--rm-primary)] focus:ring-1 focus:ring-[var(--rm-primary)] focus:outline-none h-[38px]">
                     <option value="">Todos los tipos</option>
                     @foreach($tipos as $tipo)
@@ -120,7 +91,8 @@
 
             {{-- Estado --}}
             <div class="lg:col-span-2">
-                <select wire:model.live="filtroEstado"
+                <label for="participacion-estado" class="rm-collection-filter-label">Estado</label>
+                <select id="participacion-estado" wire:model.live="filtroEstado"
                     class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-input-bg)] py-2 px-3 text-xs font-medium text-[var(--rm-text-primary)] focus:border-[var(--rm-primary)] focus:ring-1 focus:ring-[var(--rm-primary)] focus:outline-none h-[38px]">
                     <option value="">Todos los estados</option>
                     <option value="PROGRAMADA">Programada</option>
@@ -133,14 +105,16 @@
 
             {{-- Fecha Desde --}}
             <div class="lg:col-span-2">
-                <input wire:model.live="filtroFechaDesde"
+                <label for="participacion-desde" class="rm-collection-filter-label">Desde</label>
+                <input id="participacion-desde" wire:model.live="filtroFechaDesde"
                     type="date"
                     class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-input-bg)] py-2 px-3 text-xs font-medium text-[var(--rm-text-primary)] focus:border-[var(--rm-primary)] focus:ring-1 focus:ring-[var(--rm-primary)] focus:outline-none h-[38px]" />
             </div>
 
             {{-- Fecha Hasta --}}
             <div class="lg:col-span-2">
-                <input wire:model.live="filtroFechaHasta"
+                <label for="participacion-hasta" class="rm-collection-filter-label">Hasta</label>
+                <input id="participacion-hasta" wire:model.live="filtroFechaHasta"
                     type="date"
                     class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-input-bg)] py-2 px-3 text-xs font-medium text-[var(--rm-text-primary)] focus:border-[var(--rm-primary)] focus:ring-1 focus:ring-[var(--rm-primary)] focus:outline-none h-[38px]" />
             </div>
@@ -195,18 +169,7 @@
     </x-ui.filter-bar>
 
  {{-- ── TABLA PRINCIPAL ──────────────────────────────────────────────── --}}
- <section class="overflow-hidden rounded-[1.45rem] border border-borde-suave bg-fondo-panel shadow-sm backdrop-blur-xl">
- <div class="border-b border-borde-suave bg-fondo-panel px-5 py-3.5">
- <div class="flex items-center justify-between gap-3">
- <div class="flex items-center gap-2.5">
- <i class="ph-bold ph-users-four text-apoyo text-lg"></i>
- <h2 class="text-sm font-bold uppercase tracking-[0.15em] text-titulo">Registro de participaciones</h2>
- </div>
- <span class="text-[10px] font-bold text-apoyo">
- {{ $participaciones->total() }} registro(s)
- </span>
- </div>
- </div>
+ <x-ui.collection-results title="Registro de participaciones" :count="$participaciones->total()" label="registros">
  <div class="p-5">
  @if($participaciones->isEmpty())
  <div class="flex flex-col items-center gap-3 py-10 text-center">
@@ -224,10 +187,10 @@
  <div class="overflow-x-auto"
  wire:loading.class="opacity-50 transition-opacity"
  wire:target="search,filtroTipo,filtroEstado,filtroFechaDesde,filtroFechaHasta">
- <table class="rm-data-table rm-data-table--actions w-full min-w-[800px] text-xs">
+ <table class="rm-data-table rm-data-table--actions rm-table w-full min-w-[800px] text-xs">
  <thead>
  <tr class="border-b border-borde-suave">
- <th class="pb-2.5 text-left font-black uppercase tracking-[0.12em] text-apoyo">Adulto mayor</th>
+ <th class="pb-2.5 text-left font-black uppercase tracking-[0.12em] text-apoyo">Residente</th>
  <th class="pb-2.5 text-left font-black uppercase tracking-[0.12em] text-apoyo">Tipo actividad</th>
  <th class="pb-2.5 text-left font-black uppercase tracking-[0.12em] text-apoyo">Fecha</th>
  <th class="pb-2.5 text-left font-black uppercase tracking-[0.12em] text-apoyo">Hora</th>
@@ -315,7 +278,7 @@
  {{-- Ir a ficha --}}
  @if($p->adultoMayor)
  <a href="{{ route('admin.adultos-mayores.show', ['adulto_mayor' => $p->adultoMayor->cod_residente]) }}"
- title="Ver ficha del adulto mayor"
+ title="Ver ficha del residente"
  class="flex h-7 w-7 items-center justify-center rounded-lg border border-estado-exitoBorde bg-estado-exitoBg text-estado-exito transition hover:border-estado-exitoBorde hover:bg-estado-exitoBg">
  <i class="ph-bold ph-arrow-square-out text-xs"></i>
  </a>
@@ -334,7 +297,7 @@
  @endif
  @endif
  </div>
- </section>
+ </x-ui.collection-results>
 
  {{-- ── PARTICIPACIÓN POR TIPO (ANALÍTICA) ──────────────────────────── --}}
  @if($participacionPorTipo->isNotEmpty())
@@ -401,9 +364,9 @@
  </div>
  <form wire:submit.prevent="guardarActividad" class="p-5 space-y-4">
  <div>
- <label class="{{ $labelCls }}">Adulto mayor <span class="text-boton-acento">*</span></label>
+ <label class="{{ $labelCls }}">Residente <span class="text-boton-acento">*</span></label>
  <select wire:model="codResidente" class="{{ $inputCls }}">
- <option value="">Seleccione un adulto mayor...</option>
+ <option value="">Seleccione un residente...</option>
  @foreach($adultos as $adulto)
  <option value="{{ $adulto->cod_residente }}">
  {{ $adulto->ap_paterno }} {{ $adulto->ap_materno ?? '' }}, {{ $adulto->nombres }}
@@ -453,7 +416,7 @@
  @error('obs') <p class="{{ $errCls }}">{{ $message }}</p> @enderror
  </div>
  <p class="text-[10px] font-bold text-apoyo leading-relaxed">
- El sistema validará que no exista una participación duplicada del mismo adulto mayor, tipo, fecha y hora.
+ El sistema validará que no exista una participación duplicada del mismo residente, tipo, fecha y hora.
  </p>
  <div class="flex justify-end gap-2.5 border-t border-borde-suave pt-4">
  <button type="button" wire:click="cerrarModales"
@@ -496,9 +459,9 @@
  </div>
  <form wire:submit.prevent="actualizarActividad" class="p-5 space-y-4">
  <div>
- <label class="{{ $labelCls }}">Adulto mayor <span class="text-boton-acento">*</span></label>
+ <label class="{{ $labelCls }}">Residente <span class="text-boton-acento">*</span></label>
  <select wire:model="codResidente" class="{{ $inputCls }}">
- <option value="">Seleccione un adulto mayor...</option>
+ <option value="">Seleccione un residente...</option>
  @foreach($adultos as $adulto)
  <option value="{{ $adulto->cod_residente }}">
  {{ $adulto->ap_paterno }} {{ $adulto->ap_materno ?? '' }}, {{ $adulto->nombres }}
@@ -598,7 +561,7 @@
  <div class="p-5 space-y-4">
  {{-- Adulto Mayor --}}
  <div class="rounded-xl border border-borde-suave bg-fondo-panel px-4 py-3">
- <p class="text-[10px] font-bold uppercase tracking-[0.13em] text-apoyo">Adulto mayor</p>
+ <p class="text-[10px] font-bold uppercase tracking-[0.13em] text-apoyo">Residente</p>
  <p class="mt-1 text-sm font-bold text-titulo">
  {{ $am?->ap_paterno ?? '—' }}
  {{ $am?->ap_materno ?? '' }}

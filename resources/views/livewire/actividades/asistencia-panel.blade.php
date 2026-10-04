@@ -35,7 +35,7 @@
 @endphp
 
 <div
- class="min-h-screen bg-fondo-panel px-4 py-5 text-titulo sm:px-6 lg:px-8"
+ class="min-h-screen bg-transparent px-4 py-5 text-titulo sm:px-6 lg:px-8"
  x-data
  @keydown.window.escape="$wire.cerrarModales()"
 >
@@ -44,29 +44,8 @@
  {{-- ══════════════════════════════════════════════════════════════════ --}}
  {{-- CABECERA --}}
  {{-- ══════════════════════════════════════════════════════════════════ --}}
- <section class="overflow-hidden rounded-[1.65rem] border border-borde-suave bg-fondo-panel shadow-[0_20px_58px_rgba(47,62,92,0.13)] backdrop-blur-xl">
- <div class="h-1.5 bg-gradient-to-r from-[var(--rm-accent-terracotta)] via-[var(--rm-warning)] to-[var(--rm-action-primary)]"></div>
- <div class="p-5 sm:p-7">
- <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-
- <div class="min-w-0">
- <span class="inline-flex items-center gap-2 rounded-full border border-borde-focus bg-estado-peligroBg px-3 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-boton-acento">
- <i class="ph-bold ph-clipboard-text text-sm"></i>
- CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS — Asistencia
- </span>
- <h1 class="mt-3 text-3xl font-black tracking-tight text-titulo sm:text-4xl">
- Asistencia a actividades
- </h1>
- <p class="mt-1.5 max-w-2xl text-sm font-bold leading-relaxed text-apoyo">
- Control institucional del cumplimiento de actividades programadas para adultos mayores.
- </p>
- <p class="mt-1.5 inline-flex items-center gap-1.5 text-[11px] font-bold text-apoyo">
- <i class="ph-bold ph-info text-xs"></i>
- La asistencia se consolida actualmente desde el estado de cada actividad registrada.
- </p>
- </div>
-
- <div class="flex shrink-0 flex-wrap items-center gap-2 sm:flex-nowrap">
+ <x-ui.collection-header title="Asistencia a actividades" subtitle="Control del cumplimiento de actividades programadas para residentes." icon="ph-clipboard-text" eyebrow="Área de actividades">
+ <x-slot:actions>
  <button
  type="button"
  wire:click="$refresh"
@@ -89,114 +68,23 @@
  <i class="ph-bold ph-chart-bar text-sm"></i>
  Ver reportes
  </a>
- </div>
-
- </div>
- </div>
- </section>
+ </x-slot:actions>
+ </x-ui.collection-header>
+ <p class="rm-body-sm"><i class="ph-bold ph-info" aria-hidden="true"></i> La asistencia se consolida desde el estado de cada actividad registrada.</p>
 
  {{-- ══════════════════════════════════════════════════════════════════ --}}
  {{-- MÉTRICAS (8 cards) --}}
  {{-- ══════════════════════════════════════════════════════════════════ --}}
- <div class="grid gap-3.5 sm:grid-cols-2 lg:grid-cols-4">
-
- {{-- Total --}}
- <div class="flex flex-col justify-between overflow-hidden rounded-2xl border border-borde-fuerte bg-fondo-panel p-4 shadow-sm backdrop-blur-sm">
- <div class="flex items-start justify-between gap-2">
- <p class="text-[10px] font-bold uppercase tracking-[0.12em] text-apoyo">Total registros</p>
- <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-xl bg-fondo-panel">
- <i class="ph-bold ph-clipboard-text text-xs text-titulo"></i>
- </span>
- </div>
- <p class="mt-2 text-3xl font-black tracking-tight text-titulo">{{ number_format($stats['total']) }}</p>
- <p class="mt-0.5 text-[10px] font-bold text-apoyo">Actividades en el sistema</p>
- </div>
-
- {{-- Pendientes --}}
- <div class="flex flex-col justify-between overflow-hidden rounded-2xl border border-estado-advertenciaBorde bg-estado-advertenciaBg p-4 shadow-sm">
- <div class="flex items-start justify-between gap-2">
- <p class="text-[10px] font-bold uppercase tracking-[0.12em] text-estado-advertencia">Pendientes</p>
- <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-xl bg-estado-advertenciaBg">
- <i class="ph-bold ph-clock text-xs text-estado-advertencia"></i>
- </span>
- </div>
- <p class="mt-2 text-3xl font-black tracking-tight text-estado-advertencia">{{ number_format($stats['pendientes']) }}</p>
- <p class="mt-0.5 text-[10px] font-bold text-estado-advertencia">Programadas / sin resultado</p>
- </div>
-
- {{-- Realizadas --}}
- <div class="flex flex-col justify-between overflow-hidden rounded-2xl border border-estado-exitoBorde bg-estado-exitoBg p-4 shadow-sm">
- <div class="flex items-start justify-between gap-2">
- <p class="text-[10px] font-bold uppercase tracking-[0.12em] text-estado-exito">Realizadas</p>
- <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-xl bg-estado-exitoBg">
- <i class="ph-bold ph-check-circle text-xs text-estado-exito"></i>
- </span>
- </div>
- <p class="mt-2 text-3xl font-black tracking-tight text-estado-exito">{{ number_format($stats['realizadas']) }}</p>
- <p class="mt-0.5 text-[10px] font-bold text-estado-exito">Completadas / cumplidas</p>
- </div>
-
- {{-- Canceladas --}}
- <div class="flex flex-col justify-between overflow-hidden rounded-2xl border border-borde-focus bg-estado-peligroBg p-4 shadow-sm">
- <div class="flex items-start justify-between gap-2">
- <p class="text-[10px] font-bold uppercase tracking-[0.12em] text-boton-acento">Canceladas</p>
- <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-xl bg-estado-peligroBg">
- <i class="ph-bold ph-x-circle text-xs text-boton-acento"></i>
- </span>
- </div>
- <p class="mt-2 text-3xl font-black tracking-tight text-boton-acento">{{ number_format($stats['canceladas']) }}</p>
- <p class="mt-0.5 text-[10px] font-bold text-boton-acento">No realizadas / anuladas</p>
- </div>
-
- {{-- Reprogramadas --}}
- <div class="flex flex-col justify-between overflow-hidden rounded-2xl border border-borde bg-fondo-panel p-4 shadow-sm">
- <div class="flex items-start justify-between gap-2">
- <p class="text-[10px] font-bold uppercase tracking-[0.12em] text-apoyo">Reprogramadas</p>
- <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-xl bg-fondo-panel">
- <i class="ph-bold ph-arrows-clockwise text-xs text-parrafo"></i>
- </span>
- </div>
- <p class="mt-2 text-3xl font-black tracking-tight text-parrafo">{{ number_format($stats['reprogramadas']) }}</p>
- <p class="mt-0.5 text-[10px] font-bold text-apoyo">Pendientes de nueva fecha</p>
- </div>
-
- {{-- Hoy --}}
- <div class="flex flex-col justify-between overflow-hidden rounded-2xl border border-estado-advertenciaBorde bg-estado-advertenciaBg p-4 shadow-sm">
- <div class="flex items-start justify-between gap-2">
- <p class="text-[10px] font-bold uppercase tracking-[0.12em] text-estado-advertencia">Actividades hoy</p>
- <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-xl bg-estado-advertenciaBg">
- <i class="ph-bold ph-calendar-check text-xs text-estado-advertencia"></i>
- </span>
- </div>
- <p class="mt-2 text-3xl font-black tracking-tight text-estado-advertencia">{{ number_format($stats['hoy']) }}</p>
- <p class="mt-0.5 text-[10px] font-bold text-estado-advertencia">Programadas para hoy</p>
- </div>
-
- {{-- Adultos con realizadas --}}
- <div class="flex flex-col justify-between overflow-hidden rounded-2xl border border-estado-exitoBorde bg-estado-exitoBg p-4 shadow-sm">
- <div class="flex items-start justify-between gap-2">
- <p class="text-[10px] font-bold uppercase tracking-[0.12em] text-estado-exito">Adultos activos</p>
- <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-xl bg-estado-exitoBg">
- <i class="ph-bold ph-users text-xs text-estado-exito"></i>
- </span>
- </div>
- <p class="mt-2 text-3xl font-black tracking-tight text-estado-exito">{{ number_format($stats['adultos_realizados']) }}</p>
- <p class="mt-0.5 text-[10px] font-bold text-estado-exito">Con actividades realizadas</p>
- </div>
-
- {{-- Tipos con cumplimiento --}}
- <div class="flex flex-col justify-between overflow-hidden rounded-2xl border border-borde bg-fondo-panel p-4 shadow-sm">
- <div class="flex items-start justify-between gap-2">
- <p class="text-[10px] font-bold uppercase tracking-[0.12em] text-apoyo">Tipos cumplidos</p>
- <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-xl bg-fondo-panel">
- <i class="ph-bold ph-star text-xs text-parrafo"></i>
- </span>
- </div>
- <p class="mt-2 text-3xl font-black tracking-tight text-parrafo">{{ number_format($stats['tipos_cumplidos']) }}</p>
- <p class="mt-0.5 text-[10px] font-bold text-apoyo">Tipos con al menos una realizada</p>
- </div>
-
- </div>
+ <section class="grid gap-3.5 sm:grid-cols-2 lg:grid-cols-4" aria-label="Indicadores de asistencia">
+ <x-ui.metric-card icon="ph-clipboard-text" :value="number_format($stats['total'])" label="Total registros" description="Actividades en el sistema" variant="neutral" />
+ <x-ui.metric-card icon="ph-clock" :value="number_format($stats['pendientes'])" label="Pendientes" description="Programadas sin resultado" variant="neutral" />
+ <x-ui.metric-card icon="ph-check-circle" :value="number_format($stats['realizadas'])" label="Realizadas" description="Completadas o cumplidas" variant="mint" />
+ <x-ui.metric-card icon="ph-x-circle" :value="number_format($stats['canceladas'])" label="Canceladas" description="No realizadas o anuladas" variant="coral" />
+ <x-ui.metric-card icon="ph-arrows-clockwise" :value="number_format($stats['reprogramadas'])" label="Reprogramadas" description="Pendientes de nueva fecha" variant="neutral" />
+ <x-ui.metric-card icon="ph-calendar-check" :value="number_format($stats['hoy'])" label="Actividades hoy" description="Programadas para hoy" variant="sky" />
+ <x-ui.metric-card icon="ph-users" :value="number_format($stats['adultos_realizados'])" label="Residentes participantes" description="Con actividades realizadas" variant="mint" />
+ <x-ui.metric-card icon="ph-star" :value="number_format($stats['tipos_cumplidos'])" label="Tipos cumplidos" description="Con al menos una actividad realizada" variant="neutral" />
+ </section>
 
      {{-- ══════════════════════════════════════════════════════════════════ --}}
     {{-- FILTROS DE ASISTENCIA FORMATO ALERTAS                              --}}
@@ -204,11 +92,13 @@
     <x-ui.filter-bar class="mb-4">
         <div class="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-2 items-center">
             {{-- Buscar adulto --}}
-            <div class="lg:col-span-3 relative flex items-center">
+            <div class="lg:col-span-3">
+                <label for="asistencia-buscar" class="rm-collection-filter-label">Buscar residente</label>
+                <div class="relative flex items-center">
                 <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-[var(--rm-text-secondary)]">
                     <i class="ph-bold ph-magnifying-glass text-base"></i>
                 </span>
-                <input type="text"
+                <input id="asistencia-buscar" type="text"
                     wire:model.live.debounce.300ms="search"
                     placeholder="Buscar por nombre..."
                     class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-input-bg)] py-2 pl-9 pr-8 text-xs font-medium text-[var(--rm-text-primary)] placeholder-[var(--rm-text-secondary)] focus:border-[var(--rm-primary)] focus:ring-1 focus:ring-[var(--rm-primary)] focus:outline-none h-[38px]" />
@@ -220,11 +110,13 @@
                         <i class="ph-bold ph-x-circle text-base"></i>
                     </button>
                 @endif
+                </div>
             </div>
 
             {{-- Tipo --}}
             <div class="lg:col-span-3">
-                <select wire:model.live="filtroTipo"
+                <label for="asistencia-tipo" class="rm-collection-filter-label">Tipo de actividad</label>
+                <select id="asistencia-tipo" wire:model.live="filtroTipo"
                     class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-input-bg)] py-2 px-3 text-xs font-medium text-[var(--rm-text-primary)] focus:border-[var(--rm-primary)] focus:ring-1 focus:ring-[var(--rm-primary)] focus:outline-none h-[38px]">
                     <option value="">Todos los tipos</option>
                     @foreach($tipos as $t)
@@ -235,7 +127,8 @@
 
             {{-- Estado --}}
             <div class="lg:col-span-2">
-                <select wire:model.live="filtroEstado"
+                <label for="asistencia-estado" class="rm-collection-filter-label">Estado</label>
+                <select id="asistencia-estado" wire:model.live="filtroEstado"
                     class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-input-bg)] py-2 px-3 text-xs font-medium text-[var(--rm-text-primary)] focus:border-[var(--rm-primary)] focus:ring-1 focus:ring-[var(--rm-primary)] focus:outline-none h-[38px]">
                     <option value="">Todos los estados</option>
                     <option value="PROGRAMADA">Programada / Pendiente</option>
@@ -247,14 +140,16 @@
 
             {{-- Fecha desde --}}
             <div class="lg:col-span-2">
-                <input type="date"
+                <label for="asistencia-desde" class="rm-collection-filter-label">Desde</label>
+                <input id="asistencia-desde" type="date"
                     wire:model.live="filtroFechaDesde"
                     class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-input-bg)] py-2 px-3 text-xs font-medium text-[var(--rm-text-primary)] focus:border-[var(--rm-primary)] focus:ring-1 focus:ring-[var(--rm-primary)] focus:outline-none h-[38px]" />
             </div>
 
             {{-- Fecha hasta --}}
             <div class="lg:col-span-2">
-                <input type="date"
+                <label for="asistencia-hasta" class="rm-collection-filter-label">Hasta</label>
+                <input id="asistencia-hasta" type="date"
                     wire:model.live="filtroFechaHasta"
                     class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-input-bg)] py-2 px-3 text-xs font-medium text-[var(--rm-text-primary)] focus:border-[var(--rm-primary)] focus:ring-1 focus:ring-[var(--rm-primary)] focus:outline-none h-[38px]" />
             </div>
@@ -308,14 +203,14 @@
         @endif
     </x-ui.filter-bar>
 
-    <section class="overflow-hidden rounded-[1.45rem] border border-borde-suave bg-fondo-panel shadow-md backdrop-blur-xl">
+    <x-ui.collection-results title="Registros de asistencia" :count="$registros->total()" label="registros">
 
  {{-- Tabla --}}
  <div class="w-full overflow-x-auto" wire:loading.class="opacity-50">
- <table class="rm-data-table rm-data-table--actions min-w-[900px] w-full border-collapse text-sm">
+ <table class="rm-data-table rm-data-table--actions rm-table min-w-[900px] w-full border-collapse text-sm">
  <thead>
  <tr class="border-b border-borde-suave bg-fondo-panel">
- <th class="px-4 py-3 text-left text-[10px] font-bold uppercase tracking-[0.12em] text-apoyo">Adulto mayor</th>
+ <th class="px-4 py-3 text-left text-[10px] font-bold uppercase tracking-[0.12em] text-apoyo">Residente</th>
  <th class="px-4 py-3 text-left text-[10px] font-bold uppercase tracking-[0.12em] text-apoyo">Tipo de actividad</th>
  <th class="px-4 py-3 text-left text-[10px] font-bold uppercase tracking-[0.12em] text-apoyo">Fecha</th>
  <th class="px-4 py-3 text-left text-[10px] font-bold uppercase tracking-[0.12em] text-apoyo">Hora</th>
@@ -491,7 +386,7 @@
  </div>
  @endif
 
- </section>
+ </x-ui.collection-results>
 
  {{-- ══════════════════════════════════════════════════════════════════ --}}
  {{-- BLOQUE INFORMATIVO — ALCANCE DE ASISTENCIA --}}
