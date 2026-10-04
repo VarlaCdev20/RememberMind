@@ -1,24 +1,15 @@
 ﻿<div class="rm-page-layout font-sans space-y-6">
-    <header class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between rounded-2xl bg-[var(--rm-surface)] border border-[var(--rm-border)] p-5 sm:p-6 shadow-sm">
-        <div class="space-y-1">
-            <div class="flex items-center gap-2">
-                <span class="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--rm-action-primary-soft)] text-[var(--rm-action-primary-ink)]">
-                    <i class="ph-bold ph-chart-donut text-lg"></i>
-                </span>
-                <p class="text-xs font-bold uppercase tracking-[0.18em] text-[var(--rm-action-primary-ink)]">Continuidad asistencial</p>
-            </div>
-            <h1 class="text-2xl font-bold tracking-tight text-[var(--rm-text-primary)]">Reportes de Enfermería</h1>
-            <p class="text-xs text-[var(--rm-text-secondary)]">{{ $esSuperAdmin ? 'Actividad institucional y evolución individual por periodo.' : 'Actividad real del turno y evolución individual por periodo.' }}</p>
-        </div>
-        <div>
+    <x-ui.collection-header title="Reportes de Enfermería" :subtitle="$esSuperAdmin ? 'Actividad institucional y evolución individual por período.' : 'Actividad real del turno y evolución individual por período.'" icon="ph-chart-donut" eyebrow="Continuidad asistencial">
+        <x-slot:actions>
             <a href="{{ route('admin.enfermeria.dashboard') }}" class="rm-btn-secondary inline-flex items-center gap-2 px-4 py-2.5 text-xs font-bold">
                 <i class="ph-bold ph-arrow-left text-sm"></i>
                 <span>{{ $esSuperAdmin ? 'Volver al resumen global' : 'Volver a Mi turno' }}</span>
             </a>
-        </div>
-    </header>
+        </x-slot:actions>
+    </x-ui.collection-header>
 
-    <section class="rounded-2xl border border-[var(--rm-border)] bg-[var(--rm-surface)] p-4 shadow-sm grid gap-3 md:grid-cols-3">
+    <x-ui.filter-bar class="mb-4">
+      <div class="grid w-full gap-3 md:grid-cols-3">
         <label class="text-xs font-bold text-[var(--rm-text-secondary)]">Desde
             <input wire:model.live="desde" type="date" class="mt-1 rm-input w-full text-xs">
         </label>
@@ -33,14 +24,12 @@
                 @endforeach
             </select>
         </label>
-    </section>
+      </div>
+    </x-ui.filter-bar>
 
     <section class="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-6">
         @foreach(['cuidados'=>'Cuidados','signos'=>'Controles','dosis'=>'Dosis administradas','omisiones'=>'Omisiones','incidentes'=>'Incidentes','alertas_abiertas'=>'Alertas abiertas'] as $k=>$e)
-            <div class="rounded-2xl border border-[var(--rm-border)] bg-[var(--rm-surface)] p-4 shadow-sm">
-                <p class="text-2xl font-bold text-[var(--rm-text-primary)]">{{ $indicadores[$k] }}</p>
-                <p class="mt-1 text-xs font-bold text-[var(--rm-text-secondary)]">{{ $e }}</p>
-            </div>
+            <x-ui.metric-card :value="$indicadores[$k]" :label="$e" :icon="match ($k) { 'cuidados' => 'ph-heartbeat', 'signos' => 'ph-pulse', 'dosis' => 'ph-pill', 'omisiones' => 'ph-warning-circle', 'incidentes' => 'ph-first-aid', default => 'ph-bell-ringing' }" :variant="in_array($k, ['omisiones', 'incidentes', 'alertas_abiertas'], true) && $indicadores[$k] > 0 ? 'coral' : 'neutral'" />
         @endforeach
     </section>
 
