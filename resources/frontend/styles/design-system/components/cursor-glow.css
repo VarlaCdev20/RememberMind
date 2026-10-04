@@ -4,15 +4,15 @@
     top: var(--mouse-y, -500px);
     left: var(--mouse-x, -500px);
     z-index: 10;
-    width: clamp(180px, 21vw, 280px);
+    width: clamp(140px, 16vw, 210px);
     aspect-ratio: 1;
     border-radius: 50%;
     pointer-events: none;
     background: radial-gradient(circle,
-        color-mix(in srgb, var(--rm-role-primary, var(--rm-palette-sage-300)) 20%, transparent) 0%,
-        color-mix(in srgb, var(--rm-role-primary, var(--rm-palette-sage-300)) 9%, transparent) 35%,
-        transparent 72%);
-    filter: blur(14px);
+        color-mix(in srgb, var(--rm-role-primary, var(--rm-palette-sage-300)) 17%, transparent) 0%,
+        color-mix(in srgb, var(--rm-role-primary, var(--rm-palette-sage-300)) 7%, transparent) 32%,
+        transparent 78%);
+    filter: blur(22px);
     opacity: var(--rm-cursor-visible, 0);
     transform: translate(-50%, -50%);
     transition: top 130ms ease-out, left 130ms ease-out, opacity 180ms ease-out;
@@ -20,9 +20,9 @@
 
 :is(.dark, [data-theme="dark"]) .rm-shell .rm-cursor-glow {
     background: radial-gradient(circle,
-        color-mix(in srgb, var(--rm-palette-petroleum-mint) 15%, transparent) 0%,
-        color-mix(in srgb, var(--rm-palette-petroleum-mint) 6%, transparent) 38%,
-        transparent 72%);
+        color-mix(in srgb, var(--rm-palette-petroleum-mint) 12%, transparent) 0%,
+        color-mix(in srgb, var(--rm-palette-petroleum-mint) 5%, transparent) 35%,
+        transparent 78%);
 }
 
 @media (hover: none), (pointer: coarse), (prefers-reduced-motion: reduce) {
