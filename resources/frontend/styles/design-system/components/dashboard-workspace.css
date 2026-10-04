@@ -8,7 +8,9 @@
     --rm-dashboard-surface-soft: #EFEAE4;
     --rm-dashboard-topbar-control: #EAE4DE;
     --rm-dashboard-text: #4A4642;
-    --rm-dashboard-heading-ink: #4D6B54;
+    --rm-dashboard-heading-coffee: var(--rm-dashboard-text-secondary);
+    --rm-dashboard-heading-mint: #62836B;
+    --rm-dashboard-heading-ink: color-mix(in srgb, var(--rm-dashboard-heading-coffee) 50%, var(--rm-dashboard-heading-mint));
     --rm-dashboard-text-secondary: #67615B;
     --rm-dashboard-text-muted: #847D76;
     --rm-dashboard-sage-700: #5F7D67;
@@ -101,6 +103,15 @@
 .rm-dashboard-composition .rm-dashboard-header__title {
     font: 800 clamp(30px, 2.6vw, 40px)/1.1 var(--rm-font-brand);
     color: var(--rm-dashboard-heading-ink);
+}
+@supports (background-clip: text) {
+    .rm-dashboard-composition .rm-dashboard-header__title {
+        background-image: linear-gradient(100deg,
+            var(--rm-dashboard-heading-coffee) 0% 35%,
+            var(--rm-dashboard-heading-mint) 65% 100%);
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
 }
 .rm-dashboard-composition .rm-dashboard-header__role {
     border-color: color-mix(in srgb, var(--rm-dashboard-sage-600) 32%, transparent);
@@ -269,7 +280,8 @@
     --rm-dashboard-surface-soft: var(--rm-palette-petroleum-700);
     --rm-dashboard-topbar-control: var(--rm-palette-petroleum-800);
     --rm-dashboard-text: var(--rm-palette-petroleum-text);
-    --rm-dashboard-heading-ink: color-mix(in srgb, var(--rm-palette-petroleum-mint) 78%, var(--rm-palette-petroleum-text));
+    --rm-dashboard-heading-coffee: var(--rm-earth-300);
+    --rm-dashboard-heading-mint: var(--rm-palette-petroleum-mint);
     --rm-dashboard-text-secondary: var(--rm-palette-petroleum-secondary);
     --rm-dashboard-text-muted: var(--rm-palette-petroleum-secondary);
     --rm-dashboard-sage-700: var(--rm-palette-petroleum-mint);
