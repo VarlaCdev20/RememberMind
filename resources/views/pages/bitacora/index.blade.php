@@ -1,48 +1,29 @@
 <x-sistema-layout>
  <div class="space-y-6" x-data="{ vista: 'timeline' }">
- {{-- ENCABEZADO --}}
- <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
- <div>
- <h1 class="text-2xl font-black text-titulo">
- <i class="ph-bold ph-activity mr-2 text-[var(--rm-action-primary)]"></i>
- Centro de Auditoría
- </h1>
- <p class="mt-1 text-sm font-medium text-titulo/60">
- Trazabilidad institucional y registro de eventos críticos — CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS
- </p>
- </div>
- <div class="flex items-center gap-2 p-1 bg-fondo-panel rounded-xl">
- <button @click="vista = 'timeline'"
- :class="vista === 'timeline' ? 'bg-fondo-card text-titulo shadow-sm' : 'text-titulo/50 hover:text-titulo'"
- class="flex items-center gap-2 px-4 py-1.5 rounded-lg text-xs font-bold transition-all">
- <i class="ph-bold ph-clock-counter-clockwise"></i> Línea de Tiempo
- </button>
- <button @click="vista = 'table'"
- :class="vista === 'table' ? 'bg-fondo-card text-titulo shadow-sm' : 'text-titulo/50 hover:text-titulo'"
- class="flex items-center gap-2 px-4 py-1.5 rounded-lg text-xs font-bold transition-all">
- <i class="ph-bold ph-table"></i> Tabla Detallada
- </button>
- </div>
- </div>
+ <x-ui.collection-header title="Centro de Auditoría" subtitle="Trazabilidad institucional y registro de eventos críticos." icon="ph-activity" eyebrow="Gestión institucional" />
+ <x-ui.collection-view-switch model="vista" label="Presentación de la bitácora" :options="[
+  ['value' => 'timeline', 'label' => 'Línea de tiempo', 'icon' => 'ph-clock-counter-clockwise'],
+  ['value' => 'table', 'label' => 'Lista', 'icon' => 'ph-list-dashes'],
+ ]" />
 
  {{-- FILTROS AVANZADOS --}}
- <div class="rm-filter-bar">
+ <x-ui.filter-bar>
  <form method="GET" action="{{ route('admin.bitacora.index') }}" class="space-y-4">
  <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-6">
  {{-- Búsqueda --}}
  <div class="lg:col-span-2 space-y-1">
- <label class="text-[10px] font-bold uppercase tracking-widest text-titulo/50 ml-1">Buscar en bitácora</label>
+ <label for="bitacora-buscar" class="rm-collection-filter-label">Buscar en bitácora</label>
  <div class="relative">
  <i class="ph-bold ph-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-titulo/40"></i>
- <input type="text" name="buscar" value="{{ request('buscar') }}" placeholder="Ej. Eulogio Condori o Inició sesión..."
+ <input id="bitacora-buscar" type="text" name="buscar" value="{{ request('buscar') }}" placeholder="Nombre o evento"
  class="w-full rounded-xl border-borde-suave bg-fondo-card/80 pl-10 pr-4 py-2 text-sm font-bold text-titulo placeholder:text-titulo/30 focus:border-borde-focus focus:ring-4 focus:ring-borde-focus/10">
  </div>
  </div>
 
  {{-- Usuario --}}
  <div class="space-y-1">
- <label class="text-[10px] font-bold uppercase tracking-widest text-titulo/50 ml-1">Causante</label>
- <select name="usuario" class="w-full rounded-xl border-borde-suave bg-fondo-card/80 px-3 py-2 text-sm font-bold text-titulo focus:border-borde-focus focus:ring-4 focus:ring-borde-focus/10">
+ <label for="bitacora-usuario" class="rm-collection-filter-label">Causante</label>
+ <select id="bitacora-usuario" name="usuario" class="w-full rounded-xl border-borde-suave bg-fondo-card/80 px-3 py-2 text-sm font-bold text-titulo focus:border-borde-focus focus:ring-4 focus:ring-borde-focus/10">
  <option value="">Todos</option>
  @foreach($usuarios as $u)
  <option value="{{ $u->cod_usuario }}" @selected(request('usuario') == ($u->cod_usuario))>{{ $u->nombres }} {{ $u->ap_paterno }}</option>
@@ -52,8 +33,8 @@
 
  {{-- Módulo --}}
  <div class="space-y-1">
- <label class="text-[10px] font-bold uppercase tracking-widest text-titulo/50 ml-1">Módulo</label>
- <select name="modulo" class="w-full rounded-xl border-borde-suave bg-fondo-card/80 px-3 py-2 text-sm font-bold text-titulo focus:border-borde-focus focus:ring-4 focus:ring-borde-focus/10">
+ <label for="bitacora-modulo" class="rm-collection-filter-label">Módulo</label>
+ <select id="bitacora-modulo" name="modulo" class="w-full rounded-xl border-borde-suave bg-fondo-card/80 px-3 py-2 text-sm font-bold text-titulo focus:border-borde-focus focus:ring-4 focus:ring-borde-focus/10">
  <option value="">Todos</option>
  @foreach($modulos as $m)
  <option value="{{ $m }}" @selected(request('modulo') == $m)>{{ $m }}</option>
@@ -63,15 +44,15 @@
 
  {{-- Fecha Desde --}}
  <div class="space-y-1">
- <label class="text-[10px] font-bold uppercase tracking-widest text-titulo/50 ml-1">Fecha Desde</label>
- <input type="date" name="fecha_desde" value="{{ request('fecha_desde') }}"
+ <label for="bitacora-fecha-desde" class="rm-collection-filter-label">Fecha desde</label>
+ <input id="bitacora-fecha-desde" type="date" name="fecha_desde" value="{{ request('fecha_desde') }}"
  class="w-full rounded-xl border-borde-suave bg-fondo-card/80 px-3 py-2 text-sm font-bold text-titulo focus:border-borde-focus focus:ring-4 focus:ring-borde-focus/10">
  </div>
 
  {{-- Fecha Hasta --}}
  <div class="space-y-1">
- <label class="text-[10px] font-bold uppercase tracking-widest text-titulo/50 ml-1">Fecha Hasta</label>
- <input type="date" name="fecha_hasta" value="{{ request('fecha_hasta') }}"
+ <label for="bitacora-fecha-hasta" class="rm-collection-filter-label">Fecha hasta</label>
+ <input id="bitacora-fecha-hasta" type="date" name="fecha_hasta" value="{{ request('fecha_hasta') }}"
  class="w-full rounded-xl border-borde-suave bg-fondo-card/80 px-3 py-2 text-sm font-bold text-titulo focus:border-borde-focus focus:ring-4 focus:ring-borde-focus/10">
  </div>
  </div>
@@ -90,7 +71,7 @@
  </div>
  </div>
  </form>
- </div>
+ </x-ui.filter-bar>
 
  {{-- CONTENIDO DINÁMICO --}}
 
@@ -165,7 +146,7 @@
  </div>
 
  {{-- VISTA: TABLA DETALLADA --}}
- <div x-show="vista === 'table'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0" class="overflow-hidden rounded-3xl border border-borde-suave bg-fondo-card/80 shadow-xl backdrop-blur-md">
+ <div x-show="vista === 'table'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0" class="rm-collection-results overflow-x-auto">
  <div class="overflow-x-auto">
  <table class="rm-data-table rm-data-table--actions w-full text-left text-sm">
  <thead>

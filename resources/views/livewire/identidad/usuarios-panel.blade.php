@@ -726,36 +726,16 @@
 
  @else
 
- {{-- ENCABEZADO INSTITUCIONAL CANÓNICO --}}
- <header class="rm-page-header mb-5 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
- <div class="flex items-center gap-4">
-  <span class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[var(--rm-primary)] text-[var(--rm-text-on-primary)] shadow-md">
-  <i class="ph-bold ph-users-three text-2xl"></i>
-  </span>
-  <div class="rm-page-title-group min-w-0">
-  <p class="text-xs font-bold uppercase tracking-[0.2em] text-[var(--rm-primary)]">
-   Gestión institucional
-  </p>
-  <h1 class="rm-page-title text-[var(--rm-text-primary)] font-black text-2xl sm:text-3xl leading-tight tracking-tight">
-   Usuarios del <span class="text-[var(--rm-primary)]">sistema</span>
-  </h1>
-  <p class="rm-page-subtitle text-[var(--rm-text-secondary)] font-semibold text-xs sm:text-sm mt-0.5 leading-snug">
-   Administra cuentas, accesos y perfiles autorizados dentro del Centro Geriátrico Jardín de los Recuerdos.
-  </p>
-  </div>
- </div>
-
- @can('usuarios.crear')
-  <div class="flex shrink-0 items-center gap-2.5">
-  <button type="button"
-   wire:click="crearUsuario"
-   class="rm-btn rm-btn-accent cursor-pointer shadow-md">
-   <i class="ph-bold ph-plus-circle text-lg"></i>
-   <span>Nuevo usuario</span>
-  </button>
-  </div>
- @endcan
- </header>
+ {{-- Cabecera compartida para pantallas de colección. --}}
+ <x-ui.collection-header class="mb-5" title="Usuarios del sistema" subtitle="Administra cuentas, accesos y perfiles autorizados dentro del Centro Geriátrico Jardín de los Recuerdos." icon="ph-users-three" eyebrow="Gestión institucional">
+  @can('usuarios.crear')
+   <x-slot:actions>
+    <button type="button" wire:click="crearUsuario" class="rm-btn rm-btn-accent">
+     <i class="ph-bold ph-plus-circle text-lg" aria-hidden="true"></i><span>Nuevo usuario</span>
+    </button>
+   </x-slot:actions>
+  @endcan
+ </x-ui.collection-header>
 
  {{-- MÉTRICAS PRINCIPALES (KPIS) --}}
  <section class="mb-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
@@ -807,27 +787,10 @@
 
  {{-- SELECTOR DE VISTAS --}}
  <section class="mb-4">
- <div class="inline-flex max-w-full flex-wrap items-center gap-1.5 rounded-2xl bg-[var(--rm-surface-soft)] border border-[var(--rm-border-soft)] p-1.5 shadow-xs">
-  <button type="button"
-  @click="vista = 'cards'"
-  :class="vista === 'cards'
-   ? 'bg-[var(--rm-primary)] text-[var(--rm-text-on-primary)] shadow-xs'
-   : 'text-[var(--rm-text-secondary)] hover:bg-[var(--rm-surface)] hover:text-[var(--rm-text-primary)]'"
-  class="inline-flex h-9 items-center gap-2 rounded-xl px-4 text-xs font-bold transition cursor-pointer">
-  <i class="ph-bold ph-identification-card text-base"></i>
-  Vista tarjetas
-  </button>
-
-  <button type="button"
-  @click="vista = 'table'"
-  :class="vista === 'table'
-   ? 'bg-[var(--rm-primary)] text-[var(--rm-text-on-primary)] shadow-xs'
-   : 'text-[var(--rm-text-secondary)] hover:bg-[var(--rm-surface)] hover:text-[var(--rm-text-primary)]'"
-  class="inline-flex h-9 items-center gap-2 rounded-xl px-4 text-xs font-bold transition cursor-pointer">
-  <i class="ph-bold ph-table text-base"></i>
-  Tabla compacta
-  </button>
- </div>
+ <x-ui.collection-view-switch model="vista" label="Modo de vista de usuarios" :options="[
+  ['value' => 'cards', 'label' => 'Grid', 'icon' => 'ph-squares-four'],
+  ['value' => 'table', 'label' => 'Lista', 'icon' => 'ph-list-dashes'],
+ ]" />
  </section>
 
  {{-- BARRA DE FILTROS CANÓNICA FORMATO ALERTAS --}}
@@ -964,7 +927,7 @@
 </x-ui.filter-bar>
 
  {{-- CONTENIDO PRINCIPAL --}}
- <section class="relative">
+ <x-ui.collection-results class="relative" title="Usuarios encontrados" :count="method_exists($usuarios, 'total') ? $usuarios->total() : $usuarios->count()" label="cuentas">
  <div wire:loading.delay wire:target="aplicarFiltros,limpiarFiltros,toggleEstado,abrirFichaRapida,abrirVistaCompleta,editarUsuario" class="absolute inset-0 z-[60] flex items-center justify-center rounded-[2rem] bg-[var(--rm-surface)]/60 backdrop-blur-sm">
   <div class="flex items-center gap-3 rounded-full bg-[var(--rm-surface)] border border-[var(--rm-border)] px-5 py-3 shadow-lg">
   <i class="ph-bold ph-spinner animate-spin text-2xl text-[var(--rm-primary)]"></i>
@@ -976,7 +939,7 @@
 
  {{-- VISTA TARJETAS: REUTILIZANDO <x-patterns.entity-card> --}}
  <div x-show="vista === 'cards'" x-transition.opacity.duration.200ms>
-  <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+  <div class="rm-collection-grid p-4">
   @forelse($usuarios as $u)
    @php
    $roleName = $u->getRoleNames()->first() ?? 'sin_rol';
@@ -1151,7 +1114,7 @@
  {{-- VISTA TABLA COMPACTA ACCESIBLE --}}
  <div x-show="vista === 'table'" x-transition.opacity.duration.200ms>
   <div class="overflow-hidden rounded-[1.4rem] bg-[var(--rm-surface)] border border-[var(--rm-border)] shadow-xs">
-  <table class="rm-data-table rm-data-table--actions w-full table-fixed text-left text-sm">
+  <table class="rm-data-table rm-data-table--actions rm-table w-full table-fixed text-left text-sm">
    <thead class="bg-[var(--rm-surface-soft)] text-xs uppercase tracking-wider text-[var(--rm-text-secondary)] border-b border-[var(--rm-border)]">
    <tr>
     <th class="w-[32%] px-5 py-3.5 font-bold">Usuario</th>
@@ -1315,7 +1278,7 @@
   </div>
   </div>
  @endif
- </section>
+ </x-ui.collection-results>
 
  @endif
 

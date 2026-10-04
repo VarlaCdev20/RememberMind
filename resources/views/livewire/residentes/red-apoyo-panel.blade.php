@@ -374,25 +374,32 @@
  <p class="mt-1 text-xs font-bold text-apoyo">Consulta, filtros y acciones seguras sobre la red seleccionada.</p>
  </div>
 
- <div class="rm-filter-bar">
+ <x-ui.filter-bar>
  <div class="grid gap-2 sm:grid-cols-3">
+ <div>
+ <label for="red-apoyo-buscar-persona" class="rm-collection-filter-label">Buscar persona</label>
  <div class="relative">
  <i class="ph-bold ph-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-apoyo"></i>
- <input type="search" wire:model.live.debounce.300ms="buscarPersona" class="h-10 w-full rounded-xl border border-borde-suave bg-fondo-panel pl-9 pr-3 text-xs font-bold outline-none focus:border-borde-focus" placeholder="Buscar persona">
+ <input id="red-apoyo-buscar-persona" type="search" wire:model.live.debounce.300ms="buscarPersona" class="h-10 w-full rounded-xl border border-borde-suave bg-fondo-panel pl-9 pr-3 text-xs font-bold outline-none focus:border-borde-focus" placeholder="Nombre de la persona">
  </div>
- <select wire:model.live="filtroTipo" class="h-10 rounded-xl border border-borde-suave bg-fondo-panel px-3 text-xs font-bold outline-none focus:border-borde-focus">
+ </div>
+ <div><label for="red-apoyo-tipo" class="rm-collection-filter-label">Tipo de vínculo</label>
+ <select id="red-apoyo-tipo" wire:model.live="filtroTipo" class="h-10 w-full rounded-xl border border-borde-suave bg-fondo-panel px-3 text-xs font-bold outline-none focus:border-borde-focus">
  <option value="">Todos los vínculos</option>
  <option value='FAMILIAR'>Familiares</option>
  <option value="responsable">Responsables</option>
  <option value="emergencia">Emergencia</option>
  <option value="incompleto">Incompletos</option>
  </select>
- <select wire:model.live="filtroEstado" class="h-10 rounded-xl border border-borde-suave bg-fondo-panel px-3 text-xs font-bold outline-none focus:border-borde-focus">
+ </div>
+ <div><label for="red-apoyo-estado" class="rm-collection-filter-label">Estado</label>
+ <select id="red-apoyo-estado" wire:model.live="filtroEstado" class="h-10 w-full rounded-xl border border-borde-suave bg-fondo-panel px-3 text-xs font-bold outline-none focus:border-borde-focus">
  <option value="">Todos los estados</option>
  <option value="ACTIVO">Activos</option>
  <option value="INACTIVO">Inactivos</option>
  </select>
  </div>
+ </x-ui.filter-bar>
  </div>
  </div>
 

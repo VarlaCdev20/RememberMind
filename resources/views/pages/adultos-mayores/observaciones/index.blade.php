@@ -11,7 +11,7 @@
             </p>
         @endif
 
-        <form method="GET" class="rm-filter-bar">
+        <x-ui.filter-bar as="form" method="GET">
             <div class="grid items-end gap-3 sm:grid-cols-[1fr_auto]">
                 <label class="text-sm text-parrafo">
                     Buscar en notas y evolución
@@ -19,7 +19,7 @@
                 </label>
                 <x-button>Buscar</x-button>
             </div>
-        </form>
+        </x-ui.filter-bar>
 
         @include('pages.adultos-mayores.observaciones.partials.crear')
 

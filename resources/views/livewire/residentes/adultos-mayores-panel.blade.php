@@ -6,21 +6,8 @@
  @livewire('residentes.adulto-mayor-form-modal')
  @endcan
 
- {{-- ENCABEZADO CON ESTILO PREMIUM --}}
- <section class="rounded-2xl border border-borde-suave bg-fondo-panel p-6 shadow-[0_18px_45px_rgba(47,62,92,0.1)] backdrop-blur-xl relative overflow-hidden">
- <div class="absolute -right-16 -top-16 h-36 w-36 rounded-full bg-gradient-to-br from-[var(--rm-accent-terracotta)]/10 to-transparent blur-2xl"></div>
- <div class="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between relative z-10">
- <div>
- <span class="text-[10px] font-bold uppercase tracking-[0.2em] text-boton-acento">
- CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS • Gestión Operativa
- </span>
- <h1 class="mt-1.5 text-3xl font-black text-titulo tracking-tight">Centro de Adultos Mayores</h1>
- <p class="mt-2 max-w-3xl text-sm font-semibold leading-relaxed text-apoyo">
- Gestión integral, seguimiento y consulta de adultos mayores registrados en CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS.
- </p>
- </div>
-
- <div class="flex flex-wrap items-center gap-2">
+ <x-ui.collection-header title="Residentes" subtitle="Consulta y seguimiento institucional de residentes formalmente admitidos." icon="ph-users-three" eyebrow="Gestión operativa">
+ <x-slot:actions>
  <a href="{{ route('dashboard') }}" class="inline-flex items-center justify-center gap-2 rounded-xl bg-fondo-panel border border-borde-suave px-4 py-2.5 text-xs font-bold text-titulo transition hover:bg-fondo-panel active:scale-95">
  <i class="ph-bold ph-arrow-left text-sm"></i> Panel de Inicio
  </a>
@@ -36,65 +23,27 @@
  <i class="ph-bold ph-file-pdf text-sm"></i> Censo en PDF
  </a>
  @endif
- </div>
- </div>
- </section>
+ </x-slot:actions>
+ </x-ui.collection-header>
 
  {{-- 6 INDICADORES SUPERIORES CON DATOS REALES --}}
  <section class="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
- <div class="rounded-2xl border border-borde-suave bg-fondo-panel p-4 shadow-sm relative overflow-hidden transition hover:shadow-md">
- <span class="absolute right-3 top-3 text-apoyo text-3xl"><i class="ph-bold ph-users-four"></i></span>
- <p class="text-[9px] font-bold uppercase tracking-widest text-apoyo leading-none">Total registrados</p>
- <h3 class="mt-2 text-2xl font-black text-titulo leading-none">{{ $totales['total'] ?? 0 }}</h3>
- </div>
-
- <div class="rounded-2xl border border-borde-suave bg-fondo-panel p-4 shadow-sm relative overflow-hidden transition hover:shadow-md">
- <span class="absolute right-3 top-3 text-estado-exito text-3xl"><i class="ph-bold ph-user-circle-gear"></i></span>
- <p class="text-[9px] font-bold uppercase tracking-widest text-apoyo leading-none">Activos</p>
- <h3 class="mt-2 text-2xl font-black text-estado-exito leading-none">{{ $totales['activos'] ?? 0 }}</h3>
- </div>
-
- <div class="rounded-2xl border border-borde-suave bg-fondo-panel p-4 shadow-sm relative overflow-hidden transition hover:shadow-md">
- <span class="absolute right-3 top-3 text-boton-acento text-3xl"><i class="ph-bold ph-heartbeat"></i></span>
- <p class="text-[9px] font-bold uppercase tracking-widest text-apoyo leading-none">En seguimiento</p>
- <h3 class="mt-2 text-2xl font-black text-boton-acento leading-none">{{ $totales['seguimiento'] ?? 0 }}</h3>
- </div>
-
- <div class="rounded-2xl border border-borde-suave bg-fondo-panel p-4 shadow-sm relative overflow-hidden transition hover:shadow-md">
- <span class="absolute right-3 top-3 text-apoyo text-3xl"><i class="ph-bold ph-archive"></i></span>
- <p class="text-[9px] font-bold uppercase tracking-widest text-apoyo leading-none">Archivados</p>
- <h3 class="mt-2 text-2xl font-black text-parrafo leading-none">{{ $totales['archivados'] ?? 0 }}</h3>
- </div>
-
- <div class="rounded-2xl border border-borde-suave bg-estado-peligroBg p-4 shadow-sm relative overflow-hidden transition hover:shadow-md">
- <span class="absolute right-3 top-3 text-boton-acento text-3xl"><i class="ph-bold ph-brain"></i></span>
- <p class="text-[9px] font-bold uppercase tracking-widest text-boton-acento leading-none">Sin eval. cognitiva</p>
- <h3 class="mt-2 text-2xl font-black text-boton-acento leading-none">{{ $totales['sin_evaluacion'] ?? 0 }}</h3>
- </div>
-
- <div class="rounded-2xl border border-borde-suave bg-fondo-panel p-4 shadow-sm relative overflow-hidden transition hover:shadow-md">
- <span class="absolute right-3 top-3 text-apoyo text-3xl"><i class="ph-bold ph-files"></i></span>
- <p class="text-[9px] font-bold uppercase tracking-widest text-apoyo leading-none">Docs pendientes</p>
- <h3 class="mt-2 text-2xl font-black text-titulo leading-none">{{ $totales['docs_pendientes'] ?? 0 }}</h3>
- </div>
+ <x-ui.metric-card icon="ph-users-four" :value="$totales['total'] ?? 0" label="Total registrados" variant="neutral" />
+ <x-ui.metric-card icon="ph-user-circle-gear" :value="$totales['activos'] ?? 0" label="Activos" variant="mint" />
+ <x-ui.metric-card icon="ph-heartbeat" :value="$totales['seguimiento'] ?? 0" label="En seguimiento" variant="sky" />
+ <x-ui.metric-card icon="ph-archive" :value="$totales['archivados'] ?? 0" label="Archivados" variant="neutral" />
+ <x-ui.metric-card icon="ph-brain" :value="$totales['sin_evaluacion'] ?? 0" label="Sin eval. cognitiva" variant="neutral" />
+ <x-ui.metric-card icon="ph-files" :value="$totales['docs_pendientes'] ?? 0" label="Docs pendientes" variant="neutral" />
  </section>
 
  <div x-data="{ tab: 'tarjetas' }" class="space-y-4">
  {{-- TABS NAVEGATIVOS DEL PANEL --}}
- <nav class="flex space-x-2 rounded-2xl border border-borde-suave bg-fondo-panel p-2 shadow-sm overflow-x-auto">
- <button @click="tab = 'tarjetas'" :class="tab === 'tarjetas' ? 'bg-boton-principal text-inverso shadow-sm' : 'text-titulo hover:bg-fondo-app'" class="rounded-xl px-4 py-2.5 text-xs font-bold transition whitespace-nowrap">
- <i class="ph-bold ph-cards mr-1 text-sm"></i> Vista Tarjetas
- </button>
- <button @click="tab = 'tabla'" :class="tab === 'tabla' ? 'bg-boton-principal text-inverso shadow-sm' : 'text-titulo hover:bg-fondo-app'" class="rounded-xl px-4 py-2.5 text-xs font-bold transition whitespace-nowrap">
- <i class="ph-bold ph-table mr-1 text-sm"></i> Tabla General
- </button>
- <button @click="tab = 'archivados'" :class="tab === 'archivados' ? 'bg-boton-principal text-inverso shadow-sm' : 'text-titulo hover:bg-fondo-app'" class="rounded-xl px-4 py-2.5 text-xs font-bold transition whitespace-nowrap">
- <i class="ph-bold ph-archive mr-1 text-sm"></i> Expedientes Archivados
- </button>
- <button @click="tab = 'alertas'" :class="tab === 'alertas' ? 'bg-boton-principal text-inverso shadow-sm' : 'text-titulo hover:bg-fondo-app'" class="rounded-xl px-4 py-2.5 text-xs font-bold transition whitespace-nowrap">
- <i class="ph-bold ph-warning mr-1 text-sm"></i> Alertas y Pendientes Básicos
- </button>
- </nav>
+ <x-ui.collection-view-switch class="max-w-full overflow-x-auto" model="tab" label="Vistas de residentes" :options="[
+  ['value' => 'tarjetas', 'label' => 'Grid', 'icon' => 'ph-squares-four'],
+  ['value' => 'tabla', 'label' => 'Lista', 'icon' => 'ph-list-dashes'],
+  ['value' => 'archivados', 'label' => 'Archivados', 'icon' => 'ph-archive'],
+  ['value' => 'alertas', 'label' => 'Pendientes', 'icon' => 'ph-warning'],
+ ]" />
 
  {{-- SECCIÓN DE FILTROS AVANZADOS --}}
  {{-- SECCIÓN DE FILTROS AVANZADOS UNIFICADA FORMATO ALERTAS --}}
@@ -233,8 +182,8 @@
  </x-ui.filter-bar>
 
  {{-- VISTA TARJETAS (CARDS RESPONSIVAS PREMIUM) --}}
- <section x-show="tab === 'tarjetas'">
- <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+ <section x-show="tab === 'tarjetas'" class="rm-collection-results rm-collection-results--padded" aria-label="Tarjetas de residentes">
+ <div class="rm-collection-grid">
  @php $hayTarjetasActivas = false; @endphp
  @foreach($adultos as $adulto)
  @php
@@ -264,9 +213,9 @@
  </section>
 
  {{-- TABLA GENERAL (HÍBRIDA DESKTOP / RESPONSIVA) --}}
- <section x-show="tab === 'tabla'" class="rounded-2xl border border-borde-suave bg-fondo-card shadow-sm overflow-hidden" style="display: none;">
+ <section x-show="tab === 'tabla'" class="rm-collection-results" aria-label="Tabla de residentes" style="display: none;">
  <div class="overflow-x-auto">
- <table class="rm-data-table rm-data-table--actions w-full text-left text-sm text-titulo">
+ <table class="rm-data-table rm-data-table--actions rm-table w-full text-left text-sm text-titulo">
  <thead class="bg-fondo-panel text-[9px] font-bold uppercase tracking-widest text-apoyo border-b border-borde-suave">
  <tr>
  <th class="px-5 py-4">Nombre Completo</th>
@@ -342,8 +291,8 @@
  </section>
 
  {{-- EXPEDIENTES ARCHIVADOS (INACTIVOS / HISTÓRICOS) --}}
- <section x-show="tab === 'archivados'" style="display: none;">
- <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+ <section x-show="tab === 'archivados'" class="rm-collection-results rm-collection-results--padded" aria-label="Expedientes archivados" style="display: none;">
+ <div class="rm-collection-grid">
  @php $hayArchivados = false; @endphp
  @foreach($adultos as $adulto)
  @if(strtoupper($adulto->estado_adulto) === 'ARCHIVADO' || strtoupper($adulto->estado_adulto) === 'INACTIVO')
@@ -381,8 +330,8 @@
  </section>
 
  {{-- ALERTAS Y PENDIENTES BÁSICOS --}}
- <section x-show="tab === 'alertas'" style="display: none;">
- <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+ <section x-show="tab === 'alertas'" class="rm-collection-results rm-collection-results--padded" aria-label="Pendientes de expediente" style="display: none;">
+ <div class="rm-collection-grid">
  @php $hayAlertas = false; @endphp
  @foreach($adultos as $adulto)
  @php

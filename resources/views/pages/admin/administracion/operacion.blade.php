@@ -14,21 +14,19 @@
 @endphp
 @if($modulo === 'residentes')<div class="rm-admin-residents-workspace {{ $panelResidente ? 'is-open' : '' }}">@endif
 <div class="rm-admin-page">
-    <x-ui.card class="rm-admin-page__heading">
-        <p class="rm-caption">Administración / {{ $definicion['titulo'] }}</p>
-        <h1 class="rm-heading-page">{{ $definicion['titulo'] }}</h1>
-        <p class="rm-body-sm">{{ $definicion['descripcion'] }}</p>
-        @if($modulo === 'residentes')
-            <p class="rm-caption">Los residentes se crean exclusivamente mediante admisión formal.</p>
-        @endif
-    </x-ui.card>
+    <x-ui.collection-header
+        :title="$definicion['titulo']"
+        :subtitle="$definicion['descripcion'].($modulo === 'residentes' ? ' Los residentes se crean exclusivamente mediante admisión formal.' : '')"
+        :icon="$definicion['icono']"
+        eyebrow="Administración"
+    />
 
     @if($modulo === 'reportes')
-        <form method="GET" class="rm-filter-bar rm-admin-page__filters" aria-label="Periodo de reportes">
+        <x-ui.filter-bar as="form" method="GET" class="rm-admin-page__filters" aria-label="Periodo de reportes">
             <div class="rm-admin-page__filter-field"><label for="reporte-desde">Desde</label><input id="reporte-desde" class="rm-input" type="date" name="desde" value="{{ $filtros['desde'] ?? now()->startOfMonth()->toDateString() }}"></div>
             <div class="rm-admin-page__filter-field"><label for="reporte-hasta">Hasta</label><input id="reporte-hasta" class="rm-input" type="date" name="hasta" value="{{ $filtros['hasta'] ?? now()->toDateString() }}"></div>
             <div class="rm-admin-page__filter-actions"><button type="submit" class="rm-btn-primary">Aplicar periodo</button></div>
-        </form>
+        </x-ui.filter-bar>
         <section class="rm-admin-page__reports" aria-label="Resumen administrativo del periodo">
             @foreach($reportes as $reporte)
                 @if($visibilidadNavegacion->puedeVerRuta($reporte['ruta'], $reporte['permiso'] ?? null))
@@ -70,7 +68,7 @@
             <p class="rm-body-sm">Las preadmisiones aprobadas se formalizan con un contacto responsable y una cama disponible.</p>
             <a class="rm-btn-primary rm-admin-page__action" href="{{ route('admin.admisiones.preadmisiones', ['estado' => 'APROBADA']) }}">Revisar preadmisiones aprobadas</a>
         @endif
-        <form method="GET" class="rm-filter-bar rm-admin-page__filters" role="search" aria-label="Filtrar {{ mb_strtolower($definicion['titulo']) }}">
+        <x-ui.filter-bar as="form" method="GET" class="rm-admin-page__filters" role="search" aria-label="Filtrar {{ mb_strtolower($definicion['titulo']) }}">
             @if($tabs)
                 <div class="rm-admin-page__filter-field rm-admin-page__filter-field--view">
                     <label for="admin-vista-{{ $modulo }}">Vista</label>
@@ -99,15 +97,15 @@
                 <div class="rm-admin-page__filter-field"><label for="admin-fecha">Fecha</label><input id="admin-fecha" class="rm-input" type="date" name="fecha" value="{{ $filtros['fecha'] ?? '' }}"></div>
             @endif
             <div class="rm-admin-page__filter-actions"><button type="submit" class="rm-btn-primary">Aplicar filtros</button><a href="{{ route('admin.administracion.'.$modulo) }}" class="rm-btn-secondary">Limpiar</a></div>
-        </form>
-        <x-ui.card class="rm-admin-page__table-card">
+        </x-ui.filter-bar>
+        <x-ui.collection-results class="rm-admin-page__results">
             @if($modulo === 'residentes')
                 <div class="rm-admin-residents-toolbar">
                     <x-ui.section-header :title="$definicion['titulo']" :icon="$definicion['icono']" :count="$registros->total()" level="2" />
-                    <nav class="rm-admin-residents-view-switch" aria-label="Tipo de vista de residentes">
-                        <a href="{{ route('admin.administracion.residentes', array_replace($parametrosVistaResidentes, ['vista' => 'tarjetas'])) }}" @if($vistaResidentes === 'tarjetas') aria-current="page" @endif><i class="ph-bold ph-squares-four" aria-hidden="true"></i> Tarjetas</a>
-                        <a href="{{ route('admin.administracion.residentes', array_replace($parametrosVistaResidentes, ['vista' => 'tabla'])) }}" @if($vistaResidentes === 'tabla') aria-current="page" @endif><i class="ph-bold ph-list-dashes" aria-hidden="true"></i> Tabla</a>
-                    </nav>
+                    <x-ui.collection-view-switch mode="url" :value="$vistaResidentes" label="Tipo de vista de residentes" :options="[
+                        ['value' => 'tarjetas', 'label' => 'Grid', 'icon' => 'ph-squares-four', 'href' => route('admin.administracion.residentes', array_replace($parametrosVistaResidentes, ['vista' => 'tarjetas']))],
+                        ['value' => 'tabla', 'label' => 'Lista', 'icon' => 'ph-list-dashes', 'href' => route('admin.administracion.residentes', array_replace($parametrosVistaResidentes, ['vista' => 'tabla']))],
+                    ]" />
                 </div>
             @else
                 <x-ui.section-header :title="$definicion['titulo']" :icon="$definicion['icono']" :count="$registros->total()" level="2" />
@@ -208,7 +206,7 @@
                     <a class="rm-admin-page__link" href="{{ route($rutaVacia) }}">{{ $accionVacia }} <i class="ph-bold ph-arrow-up-right" aria-hidden="true"></i></a>
                 @endif
             @endif
-        </x-ui.card>
+        </x-ui.collection-results>
     @endif
 </div>
 @if($modulo === 'residentes')

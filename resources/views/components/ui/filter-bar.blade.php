@@ -3,6 +3,6 @@
     'as' => 'section',
 ])
 
-<{{ $as }} {{ $attributes->class(['rm-filter-bar']) }}>
+<{{ $as }} {{ $attributes->class(['rm-filter-bar', 'rm-collection-toolbar']) }}>
     {{ $slot }}
 </{{ $as }}>

@@ -170,28 +170,8 @@
 @endphp
 
 <div class="space-y-4">
- <div class="rm-page-header gap-4 lg:flex-row lg:items-center lg:justify-between">
- <div class="flex items-center gap-3">
-  <div class="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl bg-boton-acento/10 text-boton-acento shadow-inner">
-  <i class="ph-fill ph-users-three text-2xl"></i>
-  </div>
-
-  <div class="min-w-0">
-  <div class="mb-0.5 flex items-center gap-2">
-   <span class="rm-badge-info border-estado-info/20 bg-estado-info/10 px-2 py-0.5 text-[10px] text-estado-info">
-   Gestión del Sistema
-   </span>
-  </div>
-
-  <h2 class="rm-section-title">Personal Institucional</h2>
-
-  <p class="rm-section-subtitle max-w-2xl">
-   Gestión centralizada del equipo médico, administrativo, disponibilidad y horarios institucionales.
-  </p>
-  </div>
- </div>
-
- <div class="flex w-full flex-wrap items-center gap-2 lg:w-auto lg:justify-end">
+ <x-ui.collection-header title="Personal institucional" subtitle="Equipo médico y administrativo, disponibilidad y horarios institucionales." icon="ph-users-three" eyebrow="Gestión del sistema">
+ <x-slot:actions>
   <button
   type="button"
   wire:click="$refresh"
@@ -228,8 +208,8 @@
    Registrar personal
   </button>
   @endcan
- </div>
- </div>
+ </x-slot:actions>
+ </x-ui.collection-header>
 
  <div class="flex overflow-x-auto border-b border-borde scrollbar-hide">
  <div class="flex min-w-max items-center gap-1 px-1">
@@ -285,23 +265,7 @@
   <div class="space-y-4" wire:key="contenido-resumen-{{ $tabVersion ?? 0 }}">
   <div class="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-4">
    @foreach($metricasResumen as $metrica)
-   <div class="rm-card flex items-center justify-between border border-borde bg-fondo-card px-4 py-3 shadow-sm transition-all hover:-translate-y-0.5 hover:border-borde-hover hover:shadow-md">
-    <div class="min-w-0">
-    <div class="text-[10px] font-black uppercase tracking-[0.22em] text-apoyo">
-     {{ $metrica['titulo'] }}
-    </div>
-    <div class="mt-2 text-2xl font-black leading-none text-titulo">
-     {{ $metrica['valor'] }}
-    </div>
-    <div class="mt-1 truncate text-[11px] font-semibold text-apoyo">
-     {{ $metrica['descripcion'] }}
-    </div>
-    </div>
-
-    <div class="ml-3 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl {{ $metrica['fondo'] }} {{ $metrica['texto'] }}">
-    <i class="ph-fill {{ $metrica['icono'] }} text-xl"></i>
-    </div>
-   </div>
+   <x-ui.metric-card :icon="$metrica['icono']" :value="$metrica['valor']" :label="$metrica['titulo']" :description="$metrica['descripcion']" variant="neutral" />
    @endforeach
   </div>
 
@@ -318,28 +282,13 @@
    </p>
    </div>
 
-   <div class="flex w-full rounded-xl border border-borde bg-fondo p-1 shadow-inner sm:w-auto">
-   <button
-    type="button"
-    wire:click="cambiarVistaListadoResumen('tarjetas')"
-    class="flex flex-1 items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-xs font-black transition-all sm:flex-none {{ $vistaListadoResumen === 'tarjetas' ? 'bg-boton-acento text-white shadow-sm' : 'text-apoyo hover:bg-fondo-card hover:text-titulo' }}"
-   >
-    <i class="ph-bold ph-cards-three"></i>
-    Vista tarjetas
-   </button>
-
-   <button
-    type="button"
-    wire:click="cambiarVistaListadoResumen('tabla')"
-    class="flex flex-1 items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-xs font-black transition-all sm:flex-none {{ $vistaListadoResumen === 'tabla' ? 'bg-boton-acento text-white shadow-sm' : 'text-apoyo hover:bg-fondo-card hover:text-titulo' }}"
-   >
-    <i class="ph-bold ph-table"></i>
-    Tabla compacta
-   </button>
-   </div>
+   <x-ui.collection-view-switch mode="livewire" change-method="cambiarVistaListadoResumen" :value="$vistaListadoResumen" label="Modo de vista de personal" :options="[
+    ['value' => 'tarjetas', 'label' => 'Grid', 'icon' => 'ph-squares-four'],
+    ['value' => 'tabla', 'label' => 'Lista', 'icon' => 'ph-list-dashes'],
+   ]" />
   </div>
 
-  <div class="rm-card border border-borde bg-fondo-card !p-0 shadow-sm">
+  <div class="rm-collection-results">
    <div class="p-3">
    <x-ui.filter-bar class="mb-4">
     <div class="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-2 items-center">
@@ -489,7 +438,7 @@
    </div>
 
    @if($vistaListadoResumen === 'tarjetas')
-   <div class="grid grid-cols-1 gap-3 p-4 md:grid-cols-2 xl:grid-cols-3">
+   <div class="rm-collection-grid p-4">
     @forelse($personalResumen as $usuario)
     @php
      $nombreUsuario = $usuario->name
@@ -631,7 +580,7 @@
    </div>
    @else
    <div class="overflow-x-auto">
-    <table class="rm-data-table rm-data-table--actions w-full min-w-[900px] text-left">
+    <table class="rm-data-table rm-data-table--actions rm-table w-full min-w-[900px] text-left">
     <thead class="border-b border-borde bg-fondo text-[10px] font-black uppercase tracking-wider text-apoyo">
      <tr>
      <th class="px-4 py-3">Personal</th>
@@ -1068,7 +1017,7 @@
    </div>
 
    <div class="overflow-x-auto">
-   <table class="rm-data-table rm-data-table--actions w-full min-w-[880px] text-left">
+   <table class="rm-data-table rm-data-table--actions rm-table w-full min-w-[880px] text-left">
     <thead class="border-b border-borde bg-fondo text-[10px] font-black uppercase tracking-wider text-apoyo">
     <tr>
      <th class="px-4 py-3">Indicador</th>
