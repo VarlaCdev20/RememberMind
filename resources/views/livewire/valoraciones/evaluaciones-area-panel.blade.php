@@ -1,9 +1,7 @@
 <div class="space-y-6">
 
  {{-- Breadcrumb + Encabezado --}}
- <div class="flex flex-col gap-4 border-b border-borde pb-5 md:flex-row md:items-start md:justify-between">
- <div>
-  <nav class="mb-2 flex text-[10px] font-bold uppercase tracking-widest text-meta" aria-label="Breadcrumb">
+ <nav class="flex text-[10px] font-bold uppercase tracking-widest text-meta" aria-label="Breadcrumb">
   <ol class="inline-flex items-center space-x-1">
    <li>
    <a href="{{ route('admin.psicologia.dashboard') }}" class="hover:text-parrafo">
@@ -15,22 +13,9 @@
    <span class="text-apoyo">{{ $nombreArea }}</span>
    </li>
   </ol>
-  </nav>
-  <div class="flex items-center gap-3">
-  <div class="flex h-12 w-12 items-center justify-center rounded-2xl {{ $areaConfig['color_bg'] }} {{ $areaConfig['color_txt'] }}">
-   <i class="ph-bold {{ $areaConfig['icono'] }} text-2xl"></i>
-  </div>
-  <div>
-   <h2 class="text-2xl font-black tracking-tight text-titulo">
-   Evaluación {{ $nombreArea }}
-   </h2>
-   @if($descripcionArea)
-   <p class="text-sm font-semibold text-apoyo">{{ $descripcionArea }}</p>
-   @endif
-  </div>
-  </div>
- </div>
- <div class="flex items-center gap-2 shrink-0">
+ </nav>
+ <x-ui.collection-header :title="$nombreArea" :subtitle="$descripcionArea" :icon="$areaConfig['icono']" eyebrow="Psicología">
+ <x-slot:actions>
   <a href="{{ route('admin.psicologia.dashboard') }}"
   class="inline-flex items-center gap-2 rounded-xl border border-borde bg-fondo-card px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-parrafo transition hover:bg-fondo-panel">
   <i class="ph-bold ph-arrow-left"></i> Volver
@@ -41,38 +26,14 @@
   <i class="ph-bold ph-plus-circle text-sm"></i> Nueva Evaluación
   </button>
   @endcan
- </div>
- </div>
+ </x-slot:actions>
+ </x-ui.collection-header>
 
  {{-- Stats del área --}}
  <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
- <div class="flex items-center gap-4 rounded-2xl border border-borde bg-fondo-card p-4 shadow-sm">
-  <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl {{ $areaConfig['color_bg'] }} {{ $areaConfig['color_txt'] }}">
-  <i class="ph-bold ph-list-checks text-xl"></i>
-  </div>
-  <div>
-  <p class="text-[10px] font-bold uppercase tracking-widest text-apoyo">Evaluaciones</p>
-  <p class="text-2xl font-black text-titulo">{{ $totalEvaluaciones }}</p>
-  </div>
- </div>
- <div class="flex items-center gap-4 rounded-2xl border border-borde bg-fondo-card p-4 shadow-sm">
-  <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-estado-infoBg text-estado-info">
-  <i class="ph-bold ph-user-check text-xl"></i>
-  </div>
-  <div>
-  <p class="text-[10px] font-bold uppercase tracking-widest text-apoyo">Pacientes cubiertos</p>
-  <p class="text-2xl font-black text-titulo">{{ $pacientesCubiertos }}</p>
-  </div>
- </div>
- <div class="flex items-center gap-4 rounded-2xl border border-borde bg-fondo-card p-4 shadow-sm">
-  <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-estado-peligroBg text-estado-peligro">
-  <i class="ph-bold ph-warning-circle text-xl"></i>
-  </div>
-  <div>
-  <p class="text-[10px] font-bold uppercase tracking-widest text-apoyo">Alertas críticas</p>
-  <p class="text-2xl font-black text-titulo">{{ $alertasCriticas }}</p>
-  </div>
- </div>
+ <x-ui.metric-card icon="ph-list-checks" :value="$totalEvaluaciones" label="Evaluaciones" variant="neutral" />
+ <x-ui.metric-card icon="ph-user-check" :value="$pacientesCubiertos" label="Residentes cubiertos" variant="mint" />
+ <x-ui.metric-card icon="ph-warning-circle" :value="$alertasCriticas" label="Alertas críticas" :variant="$alertasCriticas > 0 ? 'coral' : 'neutral'" />
  </div>
 
  {{-- Instrumentos disponibles --}}
@@ -97,13 +58,15 @@
     <x-ui.filter-bar class="mb-4">
         <div class="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-2 items-center">
             {{-- Búsqueda textual --}}
-            <div class="lg:col-span-6 relative flex items-center">
+            <div class="lg:col-span-6">
+                <label for="evaluaciones-buscar" class="rm-collection-filter-label">Buscar residente</label>
+                <div class="relative flex items-center">
                 <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-[var(--rm-text-secondary)]">
                     <i class="ph-bold ph-magnifying-glass text-base"></i>
                 </span>
-                <input wire:model.live.debounce.300ms="busqueda"
+                <input id="evaluaciones-buscar" wire:model.live.debounce.300ms="busqueda"
                     type="text"
-                    placeholder="Buscar por nombre del paciente o CI..."
+                    placeholder="Buscar por nombre del residente o CI..."
                     class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-input-bg)] py-2 pl-9 pr-8 text-xs font-medium text-[var(--rm-text-primary)] placeholder-[var(--rm-text-secondary)] focus:border-[var(--rm-primary)] focus:ring-1 focus:ring-[var(--rm-primary)] focus:outline-none h-[38px]" />
                 @if(!empty($busqueda))
                     <button type="button"
@@ -113,11 +76,13 @@
                         <i class="ph-bold ph-x-circle text-base"></i>
                     </button>
                 @endif
+                </div>
             </div>
 
             {{-- Filtro Alerta --}}
             <div class="lg:col-span-3">
-                <select wire:model.live="filtroAlerta"
+                <label for="evaluaciones-alerta" class="rm-collection-filter-label">Nivel de alerta</label>
+                <select id="evaluaciones-alerta" wire:model.live="filtroAlerta"
                     class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-input-bg)] py-2 px-3 text-xs font-medium text-[var(--rm-text-primary)] focus:border-[var(--rm-primary)] focus:ring-1 focus:ring-[var(--rm-primary)] focus:outline-none h-[38px]">
                     <option value="">Todos los niveles</option>
                     <option value="NORMAL">Normal</option>
@@ -128,7 +93,8 @@
 
             {{-- Filtro Instrumento --}}
             <div class="lg:col-span-3">
-                <select wire:model.live="filtroInstrumento"
+                <label for="evaluaciones-instrumento" class="rm-collection-filter-label">Instrumento</label>
+                <select id="evaluaciones-instrumento" wire:model.live="filtroInstrumento"
                     class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-input-bg)] py-2 px-3 text-xs font-medium text-[var(--rm-text-primary)] focus:border-[var(--rm-primary)] focus:ring-1 focus:ring-[var(--rm-primary)] focus:outline-none h-[38px]">
                     <option value="">Todos los instrumentos</option>
                     @foreach($instrumentos as $inst)
@@ -175,13 +141,13 @@
     </x-ui.filter-bar>
 
  {{-- Tabla de evaluaciones --}}
- <div class="rounded-3xl border border-borde bg-fondo-card shadow-sm overflow-hidden">
+ <div class="rm-table-container rounded-3xl border border-borde bg-fondo-card shadow-sm overflow-hidden">
  @if($evaluaciones->count() > 0)
  <div class="overflow-x-auto">
-  <table class="rm-data-table rm-data-table--actions w-full text-left text-sm whitespace-nowrap">
+  <table class="rm-data-table rm-data-table--actions rm-table w-full text-left text-sm whitespace-nowrap">
   <thead class="bg-fondo-panel text-[10px] font-bold uppercase tracking-wider text-apoyo">
    <tr>
-   <th class="px-5 py-3">Paciente</th>
+   <th class="px-5 py-3">Residente</th>
    <th class="px-5 py-3">Instrumento</th>
    <th class="px-5 py-3">Puntaje</th>
    <th class="px-5 py-3">Resultado / Categoría</th>
@@ -242,7 +208,7 @@
    @can('aplicaciones_instrumento.crear')
    <td class="px-5 py-3 text-center">
     <button wire:click="nuevaEvaluacion('{{ $eval->adulto?->cod_residente }}')"
-     title="Nueva evaluación para este paciente"
+     title="Nueva evaluación para este residente"
      class="h-8 w-8 rounded-lg bg-fondo-panel text-parrafo hover:bg-boton-acento hover:text-white transition-colors flex items-center justify-center mx-auto">
     <i class="ph-bold ph-plus text-sm"></i>
     </button>
