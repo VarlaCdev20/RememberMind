@@ -9,13 +9,8 @@
 </style>
 
  {{-- ENCABEZADO PREMIUM --}}
- <header class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between no-print">
- <div>
- <h1 class="text-3xl font-black tracking-tight text-titulo">Áreas Institucionales</h1>
- <p class="text-sm font-semibold text-parrafo">Estructura y organigrama funcional operativo de CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS</p>
- </div>
-
- <div class="flex items-center gap-3">
+ <x-ui.collection-header class="no-print" title="Áreas institucionales" subtitle="Estructura y organigrama funcional del centro." icon="ph-buildings" eyebrow="Gestión institucional">
+ <x-slot:actions>
  @can('areas.reportes')
  <button type="button"
  wire:click="abrirReportes"
@@ -33,8 +28,8 @@
  Nueva área
  </button>
  @endcan
- </div>
- </header>
+ </x-slot:actions>
+ </x-ui.collection-header>
 
  {{-- AVISO TEMPORAL DE PERMISOS --}}
  @if(!auth()->user()->can('areas.reportes'))
@@ -48,82 +43,25 @@
 
  {{-- MÉTRICAS E INDICADORES ORGANIZACIONALES --}}
  <section class="grid grid-cols-2 md:grid-cols-6 gap-4 no-print">
- {{-- Total Áreas --}}
- <div class="rm-card p-4">
- <div class="flex items-center justify-between">
- <span class="text-[10px] font-bold uppercase tracking-wider text-parrafo">Total Áreas</span>
- <span class="flex h-8 w-8 items-center justify-center rounded-xl bg-fondo-panel text-titulo">
- <i class="ph-bold ph-layout text-lg"></i>
- </span>
- </div>
- <p class="mt-2 text-2xl font-black text-titulo">{{ $totalAreas }}</p>
- </div>
-
- {{-- Áreas Activas --}}
- <div class="rm-card p-4">
- <div class="flex items-center justify-between">
- <span class="text-[10px] font-bold uppercase tracking-wider text-parrafo">Activas</span>
- <span class="flex h-8 w-8 items-center justify-center rounded-xl bg-estado-exitoBg text-estado-exito">
- <i class="ph-bold ph-check-circle text-lg"></i>
- </span>
- </div>
- <p class="mt-2 text-2xl font-black text-estado-exito">{{ $areasActivas }}</p>
- </div>
-
- {{-- Áreas Inactivas --}}
- <div class="rm-card p-4">
- <div class="flex items-center justify-between">
- <span class="text-[10px] font-bold uppercase tracking-wider text-parrafo">Inactivas</span>
- <span class="flex h-8 w-8 items-center justify-center rounded-xl bg-estado-peligroBg text-boton-acento">
- <i class="ph-bold ph-eye-slash text-lg"></i>
- </span>
- </div>
- <p class="mt-2 text-2xl font-black text-boton-acento">{{ $areasInactivas }}</p>
- </div>
-
- {{-- Usuarios Vinculados --}}
- <div class="rm-card p-4">
- <div class="flex items-center justify-between">
- <span class="text-[10px] font-bold uppercase tracking-wider text-parrafo">Personal</span>
- <span class="flex h-8 w-8 items-center justify-center rounded-xl bg-estado-peligroBg text-boton-acento">
- <i class="ph-bold ph-users-three text-lg"></i>
- </span>
- </div>
- <p class="mt-2 text-2xl font-black text-boton-acento">{{ $usuariosVinculados }}</p>
- </div>
-
- {{-- Áreas Sin Responsable --}}
- <div class="rm-card p-4">
- <div class="flex items-center justify-between">
- <span class="text-[10px] font-bold uppercase tracking-wider text-parrafo">Sin Responsable</span>
- <span class="flex h-8 w-8 items-center justify-center rounded-xl bg-red-50 text-red-700">
- <i class="ph-bold ph-warning-circle text-lg"></i>
- </span>
- </div>
- <p class="mt-2 text-2xl font-black text-red-600">{{ $areasSinResponsable }}</p>
- </div>
-
- {{-- Áreas Sin Usuarios --}}
- <div class="rm-card p-4">
- <div class="flex items-center justify-between">
- <span class="text-[10px] font-bold uppercase tracking-wider text-parrafo">Sin Personal</span>
- <span class="flex h-8 w-8 items-center justify-center rounded-xl bg-fondo-panel text-apoyo">
- <i class="ph-bold ph-user-minus text-lg"></i>
- </span>
- </div>
- <p class="mt-2 text-2xl font-black text-apoyo">{{ $areasSinUsuarios }}</p>
- </div>
+ <x-ui.metric-card icon="ph-layout" :value="$totalAreas" label="Total áreas" variant="neutral" />
+ <x-ui.metric-card icon="ph-check-circle" :value="$areasActivas" label="Activas" variant="mint" />
+ <x-ui.metric-card icon="ph-eye-slash" :value="$areasInactivas" label="Inactivas" variant="neutral" />
+ <x-ui.metric-card icon="ph-users-three" :value="$usuariosVinculados" label="Personal" variant="sky" />
+ <x-ui.metric-card icon="ph-warning-circle" :value="$areasSinResponsable" label="Sin responsable" :variant="$areasSinResponsable > 0 ? 'coral' : 'neutral'" />
+ <x-ui.metric-card icon="ph-user-minus" :value="$areasSinUsuarios" label="Sin personal" variant="neutral" />
  </section>
 
  {{-- FILTROS DE BÚSQUEDA Y VISTA FORMATO ALERTAS --}}
  <x-ui.filter-bar class="mb-4 no-print">
   <div class="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-2 items-center">
    {{-- Búsqueda textual --}}
-   <div class="lg:col-span-6 relative flex items-center">
+   <div class="lg:col-span-6">
+    <label for="areas-buscar" class="rm-collection-filter-label">Buscar área</label>
+    <div class="relative flex items-center">
     <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-[var(--rm-text-secondary)]">
      <i class="ph-bold ph-magnifying-glass text-base"></i>
     </span>
-    <input type="text"
+    <input id="areas-buscar" type="text"
      wire:model.live.debounce.300ms="search"
      placeholder="Buscar por nombre o tipo..."
      class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-input-bg)] py-2 pl-9 pr-8 text-xs font-medium text-[var(--rm-text-primary)] placeholder-[var(--rm-text-secondary)] focus:border-[var(--rm-primary)] focus:ring-1 focus:ring-[var(--rm-primary)] focus:outline-none h-[38px]" />
@@ -135,11 +73,13 @@
       <i class="ph-bold ph-x-circle text-base"></i>
      </button>
     @endif
+    </div>
    </div>
 
    {{-- Tipo de Área --}}
    <div class="lg:col-span-3">
-    <select wire:model.live="filtroTipo"
+    <label for="areas-tipo" class="rm-collection-filter-label">Tipo de área</label>
+    <select id="areas-tipo" wire:model.live="filtroTipo"
      class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-input-bg)] py-2 px-3 text-xs font-medium text-[var(--rm-text-primary)] focus:border-[var(--rm-primary)] focus:ring-1 focus:ring-[var(--rm-primary)] focus:outline-none h-[38px] cursor-pointer">
      <option value="">Todos los tipos</option>
      <option value="Administrativa">Administrativa</option>
@@ -151,7 +91,8 @@
 
    {{-- Estado --}}
    <div class="lg:col-span-3">
-    <select wire:model.live="filtroEstado"
+    <label for="areas-estado" class="rm-collection-filter-label">Estado</label>
+    <select id="areas-estado" wire:model.live="filtroEstado"
      class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-input-bg)] py-2 px-3 text-xs font-medium text-[var(--rm-text-primary)] focus:border-[var(--rm-primary)] focus:ring-1 focus:ring-[var(--rm-primary)] focus:outline-none h-[38px] cursor-pointer">
      <option value="">Todos los estados</option>
      <option value="ACTIVA">Áreas Activas</option>
