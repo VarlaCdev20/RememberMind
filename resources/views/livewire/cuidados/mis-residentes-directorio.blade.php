@@ -1,147 +1,16 @@
 <div class="rm-resident-directory" x-data="{ section: 'salud' }" @resident-directory-opened.window="section = 'salud'; $nextTick(() => $el.querySelector('.rm-drawer-header h2')?.focus())" @resident-directory-step-changed.window="$nextTick(() => $el.querySelector('.rm-resident-directory__register-modal .rm-modal-panel')?.focus())" @resident-directory-selector-opened.window="$nextTick(() => requestAnimationFrame(() => $el.querySelector('.rm-resident-directory__register-modal .rm-modal-panel')?.focus()))" @resident-directory-selector-closed.window="$nextTick(() => requestAnimationFrame(() => $el.querySelector('#resident-register-trigger')?.focus()))">
-    <header class="rm-resident-directory__header animate-fade-in-up">
-        <span class="rm-resident-directory__header-leaves" aria-hidden="true"><i class="ph ph-leaf"></i><i class="ph ph-leaf"></i><i class="ph ph-leaf"></i></span>
-        <div class="rm-resident-directory__heading">
-            <span class="rm-resident-directory__heading-icon" aria-hidden="true"><i class="ph-bold ph-users-three"></i></span>
-            <div>
-                <h1>{{ $esSuperAdmin ? 'Supervisión de residentes' : 'Mis residentes' }}</h1>
-                <p>Personas asignadas a tu cuidado en esta jornada.</p>
-            </div>
-        </div>
-        @if($esModoConsulta || $turnoActual)
-        <div class="rm-resident-directory__context">
-            <i class="ph-bold ph-calendar-check" aria-hidden="true"></i>
-            <span>
-                @if($esModoConsulta)
-                    <strong>MODO CONSULTA / SOLO LECTURA</strong><small>Sin acciones de registro</small>
-                @elseif($turnoActual)
-                    <strong>Mi turno activo</strong><small>{{ $turnoActual->nombre ?: 'Turno en curso' }}</small>
-                @endif
-            </span>
-        </div>
-        @endif
-    </header>
+    <x-ui.residents-page-header :title="$esSuperAdmin ? 'Supervisión de residentes' : 'Mis residentes'" subtitle="Personas asignadas a tu cuidado en esta jornada." :turno="$turnoActual" :modo-consulta="$esModoConsulta" />
 
-    <x-ui.filter-bar class="mb-4 animate-fade-in-up" aria-label="Buscar y filtrar residentes">
-        <div class="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-2 items-center">
-            {{-- Buscador Principal formato alertas --}}
-            <div class="lg:col-span-4 relative flex items-center">
-                <span class="rm-filter-search-icon absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-[var(--rm-text-secondary)]">
-                    <i class="ph-bold ph-magnifying-glass text-base"></i>
-                </span>
-                <input type="text"
-                    wire:model.live.debounce.300ms="search"
-                    placeholder="Buscar por nombre, CI o habitación..."
-                    class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-input-bg)] py-2 pl-9 pr-8 text-xs font-medium text-[var(--rm-text-primary)] placeholder-[var(--rm-text-secondary)] focus:border-[var(--rm-primary)] focus:ring-1 focus:ring-[var(--rm-primary)] focus:outline-none h-[38px]" />
-                @if($search !== '')
-                    <button type="button"
-                        wire:click="$set('search', '')"
-                        class="absolute inset-y-0 right-0 flex items-center pr-2.5 text-[var(--rm-text-secondary)] hover:text-[var(--rm-primary)] cursor-pointer"
-                        title="Limpiar búsqueda">
-                        <i class="ph-bold ph-x-circle text-base"></i>
-                    </button>
-                @endif
-            </div>
+    <x-ui.resident-filter-toolbar :search="$search" :filtro-rapido="$filtroRapido" :filtro-habitacion="$filtroHabitacion" :orden="$orden" :vista-modo="$vistaModo" :stats="$stats" :habitaciones="$habitaciones" />
 
-            {{-- Filtro Estado --}}
-            <div class="lg:col-span-3">
-                <select wire:model.live="filtroEstado"
-                    class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-input-bg)] py-2 px-3 text-xs font-medium text-[var(--rm-text-primary)] focus:border-[var(--rm-primary)] focus:ring-1 focus:ring-[var(--rm-primary)] focus:outline-none h-[38px] cursor-pointer"
-                    aria-label="Filtrar por estado">
-                    <option value="TODOS">Todos los estados</option>
-                    <option value="ESTABLE">Sin alertas activas</option>
-                    <option value="VIGILANCIA">En vigilancia</option>
-                    <option value="REQUIERE_ATENCION">Requiere atención</option>
-                </select>
-            </div>
-
-            {{-- Filtro Habitación --}}
-            <div class="lg:col-span-2">
-                <select wire:model.live="filtroHabitacion"
-                    class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-input-bg)] py-2 px-3 text-xs font-medium text-[var(--rm-text-primary)] focus:border-[var(--rm-primary)] focus:ring-1 focus:ring-[var(--rm-primary)] focus:outline-none h-[38px] cursor-pointer"
-                    aria-label="Filtrar por habitación">
-                    <option value="">Todas las habitaciones</option>
-                    @foreach($habitaciones as $habitacion)
-                        <option value="{{ $habitacion }}">{{ str_starts_with(mb_strtolower($habitacion), 'hab') ? $habitacion : 'Hab. '.$habitacion }}</option>
-                    @endforeach
-                </select>
-            </div>
-
-            {{-- Orden --}}
-            <div class="lg:col-span-2">
-                <select wire:model.live="orden"
-                    class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-input-bg)] py-2 px-3 text-xs font-medium text-[var(--rm-text-primary)] focus:border-[var(--rm-primary)] focus:ring-1 focus:ring-[var(--rm-primary)] focus:outline-none h-[38px] cursor-pointer"
-                    aria-label="Ordenar residentes">
-                    <option value="NOMBRE_ASC">Nombre A–Z</option>
-                    <option value="NOMBRE_DESC">Nombre Z–A</option>
-                    <option value="HAB_ASC">Habitación asc.</option>
-                    <option value="HAB_DESC">Habitación desc.</option>
-                </select>
-            </div>
-
-            {{-- Switch Vista (Tarjetas / Listado) --}}
-            <div class="lg:col-span-1 flex items-center justify-end">
-                <div class="flex items-center p-0.5 rounded-xl bg-[var(--rm-surface)] border border-[var(--rm-border)] w-full h-[38px]">
-                    <button type="button" wire:click="$set('vistaModo', 'tarjetas')" aria-pressed="{{ $vistaModo === 'tarjetas' ? 'true' : 'false' }}" aria-label="Ver tarjetas" class="flex-1 h-full rounded-lg text-xs font-bold flex items-center justify-center transition cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--rm-role-primary)] {{ $vistaModo === 'tarjetas' ? 'bg-[var(--rm-role-primary)] text-[var(--rm-role-on-primary)] shadow-xs' : 'text-[var(--rm-text-secondary)] hover:text-[var(--rm-role-primary)]' }}" title="Ver tarjetas">
-                        <i class="ph-bold ph-squares-four text-base"></i>
-                    </button>
-                    <button type="button" wire:click="$set('vistaModo', 'tabla')" aria-pressed="{{ $vistaModo === 'tabla' ? 'true' : 'false' }}" aria-label="Ver listado" class="flex-1 h-full rounded-lg text-xs font-bold flex items-center justify-center transition cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--rm-role-primary)] {{ $vistaModo === 'tabla' ? 'bg-[var(--rm-role-primary)] text-[var(--rm-role-on-primary)] shadow-xs' : 'text-[var(--rm-text-secondary)] hover:text-[var(--rm-role-primary)]' }}" title="Ver listado">
-                        <i class="ph-bold ph-list-dashes text-base"></i>
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        {{-- Fila de chips de filtros activos formato alertas --}}
-        @php
-            $hasFiltrosActivos = !empty($search) || ($filtroEstado !== 'TODOS') || !empty($filtroHabitacion);
-        @endphp
-        @if($hasFiltrosActivos)
-            <div class="rm-filter-bar__active">
-                <div class="rm-filter-scroll">
-                    <span class="rm-filter-bar__active-label">
-                        <i class="ph-bold ph-funnel text-xs"></i> Filtros activos:
-                    </span>
-                    @if(!empty($search))
-                        <span class="rm-filter-chip rm-filter-chip--search">
-                            <i class="ph-bold ph-magnifying-glass text-xs"></i>
-                            <span>B?squeda: "{{ Str::limit($search, 16) }}"</span>
-                            <button type="button" wire:click="$set('search', '')" title="Quitar filtro"><i class="ph-bold ph-x text-xs"></i></button>
-                        </span>
-                    @endif
-                    @if($filtroEstado !== 'TODOS')
-                        <span class="rm-filter-chip {{ $filtroEstado === 'REQUIERE_ATENCION' ? 'rm-filter-chip--danger' : ($filtroEstado === 'VIGILANCIA' ? 'rm-filter-chip--warning' : 'rm-filter-chip--success') }}">
-                            <span class="w-1.5 h-1.5 rounded-full {{ $filtroEstado === 'REQUIERE_ATENCION' ? 'bg-[var(--rm-danger)] animate-pulse' : ($filtroEstado === 'VIGILANCIA' ? 'bg-[var(--rm-status-high)]' : 'bg-[var(--rm-action-primary)]') }}"></span>
-                            <span>Estado: {{ $filtroEstado }}</span>
-                            <button type="button" wire:click="$set('filtroEstado', 'TODOS')" title="Quitar filtro"><i class="ph-bold ph-x text-xs"></i></button>
-                        </span>
-                    @endif
-                    @if(!empty($filtroHabitacion))
-                        <span class="rm-filter-chip rm-filter-chip--clinical">
-                            <i class="ph-bold ph-bed text-xs"></i>
-                            <span>Habitaci?n: {{ $filtroHabitacion }}</span>
-                            <button type="button" wire:click="$set('filtroHabitacion', '')" title="Quitar filtro"><i class="ph-bold ph-x text-xs"></i></button>
-                        </span>
-                    @endif
-                    <button type="button"
-                        wire:click="$set('search', ''); $set('filtroEstado', 'TODOS'); $set('filtroHabitacion', '');"
-                        class="rm-filter-bar__clear-btn">
-                        <i class="ph-bold ph-arrow-counter-clockwise text-xs"></i>
-                        <span>Limpiar filtros</span>
-                    </button>
-                </div>
-            </div>
-        @endif
-    </x-ui.filter-bar>
-
-    <section class="rm-resident-directory__results animate-fade-in-up" aria-labelledby="residents-results-title" wire:loading.class="is-loading" wire:target="search,filtroEstado,filtroHabitacion,orden,vistaModo">
+    <section class="rm-resident-directory__results animate-fade-in-up" aria-labelledby="residents-results-title" wire:loading.class="is-loading" wire:target="search,filtroEstado,filtroRapido,filtroHabitacion,orden,vistaModo">
         <div class="rm-resident-directory__results-header">
             <div>
                 <h2 id="residents-results-title">{{ $stats['total'] }} {{ $stats['total'] === 1 ? 'residente' : 'residentes' }} {{ ($esSuperAdmin || $esModoConsulta) ? ($stats['total'] === 1 ? 'disponible' : 'disponibles') : ($stats['total'] === 1 ? 'asignado' : 'asignados') }}</h2>
             </div>
-            <span class="rm-resident-directory__shown" aria-live="polite">{{ $pacientes->total() }} {{ $pacientes->total() === 1 ? 'resultado' : 'resultados' }}</span>
+            <span class="rm-resident-directory__shown" aria-live="polite">@if($search !== '' || $filtroRapido !== 'TODOS' || $filtroHabitacion !== '' || $filtroEstado !== 'TODOS') Mostrando {{ $pacientes->total() }} de {{ $stats['total'] }} @endif</span>
         </div>
-        <div wire:loading wire:target="search,filtroEstado,filtroHabitacion,orden,vistaModo" class="rm-resident-directory__loading" role="status" aria-label="Actualizando residentes">
+        <div wire:loading wire:target="search,filtroEstado,filtroRapido,filtroHabitacion,orden,vistaModo" class="rm-resident-directory__loading" role="status" aria-label="Actualizando residentes">
             @if($vistaModo === 'tarjetas')
                 <div class="rm-resident-directory__cards rm-resident-directory__skeletons" aria-hidden="true">
                     @for($i = 0; $i < 3; $i++)
@@ -157,33 +26,33 @@
         </div>
 
         @if($errorCarga)
-            <div class="rm-resident-directory__empty" role="alert" wire:loading.remove wire:target="search,filtroEstado,filtroHabitacion,orden,vistaModo">
+            <div class="rm-resident-directory__empty" role="alert" wire:loading.remove wire:target="search,filtroEstado,filtroRapido,filtroHabitacion,orden,vistaModo">
                 <span class="rm-resident-directory__empty-icon" aria-hidden="true"><i class="ph-bold ph-warning-circle"></i></span>
                 <h3>No pudimos cargar los residentes</h3>
                 <p>Intenta nuevamente en unos momentos.</p>
                 <button type="button" wire:click="$refresh" class="rm-btn-secondary">Reintentar</button>
             </div>
         @elseif($pacientes->isEmpty())
-            <div class="rm-resident-directory__empty" wire:loading.remove wire:target="search,filtroEstado,filtroHabitacion,orden,vistaModo">
+            <div class="rm-resident-directory__empty" wire:loading.remove wire:target="search,filtroEstado,filtroRapido,filtroHabitacion,orden,vistaModo">
                 <span class="rm-resident-directory__empty-icon" aria-hidden="true"><i class="ph-bold ph-users-three"></i></span>
                 @if($stats['total'] === 0)
-                    <h3>{{ $esSuperAdmin ? 'No hay residentes disponibles' : 'No tienes residentes asignados' }}</h3>
+                    <h3>{{ $esSuperAdmin ? 'No hay residentes disponibles' : 'No tienes residentes asignados en esta jornada.' }}</h3>
                     <p>{{ $esSuperAdmin ? 'No se encontraron residentes en el alcance de esta consulta.' : 'No hay residentes asociados a tu turno actual.' }}</p>
                     @unless($esSuperAdmin)<a href="{{ route('admin.enfermeria.dashboard') }}" class="rm-btn-secondary">Consultar información de mi turno <i class="ph-bold ph-arrow-right" aria-hidden="true"></i></a>@endunless
                 @else
-                    <h3>No encontramos residentes con esos criterios</h3>
+                    <h3>No encontramos residentes con estos filtros.</h3>
                     <p>Prueba con otro nombre, habitación o estado.</p>
                     <button type="button" wire:click="limpiarFiltros" class="rm-btn-secondary">Limpiar filtros</button>
                 @endif
             </div>
         @elseif($vistaModo === 'tarjetas')
-            <div class="rm-resident-directory__cards" role="list" wire:loading.remove wire:target="search,filtroEstado,filtroHabitacion,orden,vistaModo">
+            <div class="rm-resident-directory__cards" role="list" wire:loading.remove wire:target="search,filtroEstado,filtroRapido,filtroHabitacion,orden,vistaModo">
                 @foreach($pacientes as $paciente)
-                    <x-ui.resident-directory-item :paciente="$paciente" mode="card" :key="'card-'.$paciente->cod_residente" />
+                    <x-ui.resident-compact-card :paciente="$paciente" :modo-consulta="$esModoConsulta || $esSuperAdmin || app(\App\Backend\Modulos\Identidad\Servicios\RolePreviewService::class)->isActive(auth()->user())" :key="'card-'.$paciente->cod_residente" />
                 @endforeach
             </div>
         @else
-            <div class="rm-resident-directory__list" role="list" wire:loading.remove wire:target="search,filtroEstado,filtroHabitacion,orden,vistaModo">
+            <div class="rm-resident-directory__list" role="list" wire:loading.remove wire:target="search,filtroEstado,filtroRapido,filtroHabitacion,orden,vistaModo">
                 <div class="rm-resident-directory__list-heading" aria-hidden="true"><span>Residente</span><span>Ubicación</span><span>Estado</span><span>Próximo cuidado</span><span></span></div>
                 @foreach($pacientes as $paciente)
                     <x-ui.resident-directory-item :paciente="$paciente" mode="row" :key="'row-'.$paciente->cod_residente" />

@@ -264,10 +264,9 @@ class MisPacientesRedisenadaTest extends TestCase
             ->assertSet('vistaModo', 'tarjetas');
 
         $this->assertStringContainsString('Ver resumen de Pedro Gomez Paredes', $vista->html());
-        $this->assertStringNotContainsString(
-            route('admin.enfermeria.pacientes.ficha', ['adulto' => $this->residenteEstable->cod_residente]),
-            $vista->html()
-        );
+        $this->assertStringContainsString('Buscar entre mis residentes...', $vista->html());
+        $this->assertStringContainsString('Con alertas (1)', $vista->html());
+        $this->assertStringContainsString('1 alerta prioritaria', $vista->html());
     }
 
     public function test_filtro_por_estado_clinico(): void
@@ -285,6 +284,22 @@ class MisPacientesRedisenadaTest extends TestCase
             ->set('filtroEstado', 'ESTABLE')
             ->assertSee('Pedro Gomez')
             ->assertDontSee('Luisa Morales');
+    }
+
+    public function test_chips_de_alertas_filtran_residentes_asignados_y_reflejan_el_total(): void
+    {
+        $this->actingAs($this->enfermero);
+
+        Livewire::test(MisPacientes::class)
+            ->assertSee('Todos (2)')
+            ->assertSee('Con alertas (1)')
+            ->set('filtroRapido', 'CON_ALERTAS')
+            ->assertSee('Luisa Morales')
+            ->assertDontSee('Pedro Gomez')
+            ->assertSee('Mostrando 1 de 2')
+            ->call('limpiarFiltros')
+            ->assertSet('filtroRapido', 'TODOS')
+            ->assertSee('Pedro Gomez');
     }
 
     public function test_busqueda_por_nombre_o_habitacion(): void
@@ -350,7 +365,7 @@ class MisPacientesRedisenadaTest extends TestCase
             ->set('vistaModo', 'tarjetas')
             ->assertSee('Luisa Morales')
             ->set('search', 'sin coincidencias')
-            ->assertSee('No encontramos residentes con esos criterios')
+            ->assertSee('No encontramos residentes con estos filtros.')
             ->call('limpiarFiltros')
             ->assertSet('search', '')
             ->assertSet('filtroHabitacion', '')
@@ -591,7 +606,7 @@ class MisPacientesRedisenadaTest extends TestCase
             'via_administracion' => 'ORAL',
             'frecuencia' => 'Cada 24 horas',
             'segun_necesidad' => false,
-            'fecha_hora_prescripcion' => now()->subMinute(),
+            'fecha_hora_prescripcion' => today()->subDay()->setTime(7, 0),
             'estado' => 'ACTIVA',
         ]);
         HorarioPrescripcion::create([
@@ -602,6 +617,13 @@ class MisPacientesRedisenadaTest extends TestCase
             'estado' => 'ACTIVO',
         ]);
         $this->actingAs($this->enfermero);
+
+        Carbon::setTestNow(today()->setTime(7, 0));
+        try {
+            Livewire::test(MisPacientes::class)->assertSee('Medicamento · Medicamento de prueba');
+        } finally {
+            Carbon::setTestNow();
+        }
 
         Livewire::test(MisPacientes::class)
             ->call('seleccionarResidente', $this->residenteEstable->cod_residente)

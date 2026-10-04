@@ -314,6 +314,7 @@ class MisPacientes extends Component
     {
         $this->search = '';
         $this->filtroEstado = 'TODOS';
+        $this->filtroRapido = 'TODOS';
         $this->filtroHabitacion = '';
         $this->orden = 'NOMBRE_ASC';
         $this->resetPage();
@@ -1675,8 +1676,14 @@ class MisPacientes extends Component
         $seguimientosHoy = collect();
         $proximasAtenciones = collect();
         $proximosCuidados = collect();
+        $proximasMedicaciones = collect();
 
         if ($codResidentes->isNotEmpty()) {
+            $proximasMedicaciones = app(AgendaMedicacionService::class)
+                ->paraAdultos($codResidentes->all())
+                ->filter(fn (array $item) => in_array($item['estado'], ['PROXIMA', 'PENDIENTE'], true))
+                ->groupBy(fn (array $item) => $item['medicacion']->cod_residente)
+                ->map(fn ($items) => $items->first());
             $proximasAtenciones = Atencion::query()
                 ->whereIn('cod_residente', $codResidentes)
                 ->where('fecha_hora', '>=', now())
@@ -1776,12 +1783,24 @@ class MisPacientes extends Component
             // Próxima atención en la fila de lista
             $proxAten = $proximasAtenciones->get($p->cod_residente);
             $proxCuidado = $proximosCuidados->get($p->cod_residente);
-            if ($proxCuidado && (! $proxAten || $proxCuidado->fecha_hora_programada <= $proxAten->fecha_hora)) {
+            $proxMed = $proximasMedicaciones->get($p->cod_residente);
+            $opciones = collect([
+                $proxCuidado ? ['fecha' => $proxCuidado->fecha_hora_programada, 'tipo' => 'cuidado'] : null,
+                $proxAten ? ['fecha' => Carbon::parse($proxAten->fecha_hora), 'tipo' => 'atencion'] : null,
+                $proxMed ? ['fecha' => $proxMed['programada'], 'tipo' => 'medicacion'] : null,
+            ])->filter()->sortBy('fecha')->values();
+            $tipoProximo = $opciones->first()['tipo'] ?? null;
+            if ($tipoProximo === 'cuidado') {
                 $p->proxima_atencion_texto = $proxCuidado->intervencion?->nombre ?: 'Cuidado programado';
-                $p->proxima_atencion_hora = $proxCuidado->fecha_hora_programada?->format('d/m H:i');
-            } elseif ($proxAten) {
+                $p->proxima_atencion_hora = $proxCuidado->fecha_hora_programada?->format('H:i');
+            } elseif ($tipoProximo === 'atencion') {
                 $p->proxima_atencion_texto = $proxAten->motivo ?: ($proxAten->tipo_atencion ?: 'Atención programada');
                 $p->proxima_atencion_hora = Carbon::parse($proxAten->fecha_hora)->format('H:i');
+            } elseif ($tipoProximo === 'medicacion') {
+                $medicacion = $proxMed['medicacion'];
+                $p->proxima_atencion_texto = 'Medicamento · '.$medicacion->nombre_medicamento
+                    .($medicacion->dosis ? ' '.rtrim(rtrim((string) $medicacion->dosis, '0'), '.').' '.$medicacion->unidad_dosis : '');
+                $p->proxima_atencion_hora = $proxMed['hora'];
             } else {
                 $p->proxima_atencion_texto = null;
                 $p->proxima_atencion_hora = null;
@@ -1812,6 +1831,7 @@ class MisPacientes extends Component
 
         $stats = [
             'total' => $baseParaStats->count(),
+            'con_alertas' => $baseParaStats->filter(fn ($p) => $p->alertas_activas_count > 0)->count(),
             'requiere_atencion' => 0,
             'vigilancia' => 0,
             'estable' => 0,
@@ -1842,7 +1862,7 @@ class MisPacientes extends Component
             report($exception);
             $errorCarga = true;
             $pacientes = new LengthAwarePaginator([], 0, 12);
-            $stats = ['total' => 0, 'requiere_atencion' => 0, 'vigilancia' => 0, 'estable' => 0];
+            $stats = ['total' => 0, 'con_alertas' => 0, 'requiere_atencion' => 0, 'vigilancia' => 0, 'estable' => 0];
             $habitaciones = collect();
         }
 
