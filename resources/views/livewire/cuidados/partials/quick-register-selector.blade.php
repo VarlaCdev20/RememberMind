@@ -17,25 +17,7 @@
         ['tipo' => 'incidente', 'label' => 'Registrar incidente', 'icon' => 'ph-warning-circle', 'tone' => 'danger', 'permiso' => 'incidentes.crear', 'disponible' => false],
     ];
 @endphp
-<div class="rm-quick-register">
-    <section aria-labelledby="quick-register-controls">
-        <h4 id="quick-register-controls">Controles</h4>
-        <div class="rm-quick-register__grid">
-            @foreach($controles as $opcion)
-                @can($opcion['permiso'])
-                    <x-ui.register-action-card :icon="$opcion['icon']" :label="$opcion['label']" :tone="$opcion['tone']" :disabled="!$opcion['disponible']" :hint="$opcion['disponible'] ? null : 'Sin formulario directo aquí'" wire:click="abrirFormularioRegistro('{{ $opcion['tipo'] }}')" />
-                @endcan
-            @endforeach
-        </div>
-    </section>
-    <section aria-labelledby="quick-register-care">
-        <h4 id="quick-register-care">Acciones del cuidado</h4>
-        <div class="rm-quick-register__grid rm-quick-register__grid--care">
-            @foreach($acciones as $opcion)
-                @can($opcion['permiso'])
-                    <x-ui.register-action-card :icon="$opcion['icon']" :label="$opcion['label']" :tone="$opcion['tone']" :disabled="!$opcion['disponible']" :hint="$opcion['disponible'] ? null : ($opcion['hint'] ?? 'Sin formulario directo aquí')" wire:click="abrirFormularioRegistro('{{ $opcion['tipo'] }}')" />
-                @endcan
-            @endforeach
-        </div>
-    </section>
-</div>
+<x-ui.quick-register-grid :sections="[
+    ['title' => 'Controles', 'actions' => $controles],
+    ['title' => 'Acciones del cuidado', 'columns' => 2, 'actions' => $acciones],
+]" on-select="abrirFormularioRegistro" />

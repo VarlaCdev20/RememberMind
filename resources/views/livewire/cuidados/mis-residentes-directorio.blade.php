@@ -48,14 +48,16 @@
         @elseif($vistaModo === 'tarjetas')
             <div class="rm-resident-directory__cards" role="list" wire:loading.remove wire:target="search,filtroEstado,filtroRapido,filtroHabitacion,orden,vistaModo">
                 @foreach($pacientes as $paciente)
-                    <x-ui.resident-compact-card :paciente="$paciente" :modo-consulta="$esModoConsulta || $esSuperAdmin || app(\App\Backend\Modulos\Identidad\Servicios\RolePreviewService::class)->isActive(auth()->user())" :key="'card-'.$paciente->cod_residente" />
+                    <x-ui.resident-card :resident="$paciente" mode="card" variant="nursing" :selected="$this->residente === $paciente->cod_residente" select-method="seleccionarResidente" context-label="Próximo cuidado" :context-value="$paciente->proxima_atencion_texto" :context-time="$paciente->proxima_atencion_hora" :alert-count="$paciente->alertas_criticas_count" :key="'card-'.$paciente->cod_residente">
+                        <x-slot:menu>@include('livewire.cuidados.partials.nursing-resident-menu', ['paciente' => $paciente, 'modoConsulta' => $esModoConsulta || $esSuperAdmin || app(\App\Backend\Modulos\Identidad\Servicios\RolePreviewService::class)->isActive(auth()->user())])</x-slot:menu>
+                    </x-ui.resident-card>
                 @endforeach
             </div>
         @else
             <div class="rm-resident-directory__list" role="list" wire:loading.remove wire:target="search,filtroEstado,filtroRapido,filtroHabitacion,orden,vistaModo">
                 <div class="rm-resident-directory__list-heading" aria-hidden="true"><span>Residente</span><span>Ubicación</span><span>Estado</span><span>Próximo cuidado</span><span></span></div>
                 @foreach($pacientes as $paciente)
-                    <x-ui.resident-directory-item :paciente="$paciente" mode="row" :key="'row-'.$paciente->cod_residente" />
+                    <x-ui.resident-card :resident="$paciente" mode="row" variant="nursing" :selected="$this->residente === $paciente->cod_residente" select-method="seleccionarResidente" context-label="Próximo cuidado" :context-value="$paciente->proxima_atencion_texto" :context-time="$paciente->proxima_atencion_hora" :status-label="$paciente->estado_label" :status-tone="$paciente->estado_color" :key="'row-'.$paciente->cod_residente" />
                 @endforeach
             </div>
         @endif
@@ -75,7 +77,7 @@
             'alerta' => 'guardarAlerta', default => null,
         };
     @endphp
-    <x-ui.drawer-livewire wire:model="mostrarPanelDetalle" title="Resumen del residente" subtitle="Resumen de enfermería" badge="" icon="ph-identification-card" size="lg" closeMethod="cerrarPanelDetalle" :dismissOnBackdrop="true">
+    <x-ui.resident-summary-drawer model="mostrarPanelDetalle" title="Resumen del residente" subtitle="Resumen de enfermería" close-method="cerrarPanelDetalle">
         @if($detalleResidente)
             @if($drawerPaso === 'resident-summary')
             @include('livewire.cuidados.partials.resident-summary')
@@ -95,9 +97,9 @@
                 @endif
             @endif
         </x-slot:footer>
-    </x-ui.drawer-livewire>
+    </x-ui.resident-summary-drawer>
 
-    <x-ui.modal-livewire id="resident-register" wire:model="mostrarSelectorModal" class="rm-resident-directory__register-modal {{ $esSelectorRegistro ? 'rm-resident-directory__register-modal--selector' : ($registroTipo === 'signos' ? 'rm-resident-directory__register-modal--signos' : 'rm-resident-directory__register-modal--form') }}" :title="$esSelectorRegistro && $detalleResidente ? 'Registrar para '.\Illuminate\Support\Str::title(mb_strtolower($detalleResidente['nombre_completo'])) : ($registroTipo === 'signos' ? 'Signos vitales' : 'Nuevo registro')" :subtitle="$esSelectorRegistro ? 'Selecciona qué deseas registrar' : ($registroTipo === 'signos' ? 'Registro clínico del residente' : 'Registro del residente seleccionado')" max-width="lg" close-method="cerrarSelectorRegistro" :back-method="$volverRegistro" back-label="Volver al selector de registros" :show-validation="false" :dismiss-on-backdrop="true" :draggable="true">
+    <x-ui.quick-register-modal id="resident-register" model="mostrarSelectorModal" class="rm-resident-directory__register-modal {{ $esSelectorRegistro ? 'rm-resident-directory__register-modal--selector' : ($registroTipo === 'signos' ? 'rm-resident-directory__register-modal--signos' : 'rm-resident-directory__register-modal--form') }}" :title="$esSelectorRegistro && $detalleResidente ? 'Registrar para '.\Illuminate\Support\Str::title(mb_strtolower($detalleResidente['nombre_completo'])) : ($registroTipo === 'signos' ? 'Signos vitales' : 'Nuevo registro')" :subtitle="$esSelectorRegistro ? 'Selecciona qué deseas registrar' : ($registroTipo === 'signos' ? 'Registro clínico del residente' : 'Registro del residente seleccionado')" close-method="cerrarSelectorRegistro" :back-method="$volverRegistro" back-label="Volver al selector de registros">
         <x-slot:icon>
             @if($esSelectorRegistro)
                 <span class="rm-quick-register__header-icon" aria-hidden="true"><i class="ph-bold ph-plus-circle"></i></span>
@@ -191,5 +193,5 @@
             @endif
         </x-slot:footer>
         @endif
-    </x-ui.modal-livewire>
+    </x-ui.quick-register-modal>
 </div>

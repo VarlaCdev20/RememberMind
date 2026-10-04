@@ -1,0 +1,11 @@
+/* Base visual compartida por residentes, personal y cuentas de usuario. */
+.rm-person-entity-card {
+    --rm-person-card-radius: var(--rm-radius-card);
+    min-width: 0;
+    border-radius: var(--rm-person-card-radius);
+}
+
+.rm-person-entity-card :is(a, button):focus-visible {
+    outline: 2px solid var(--rm-role-primary);
+    outline-offset: 2px;
+}

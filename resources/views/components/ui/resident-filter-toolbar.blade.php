@@ -1,5 +1,5 @@
 @props(['search', 'filtroRapido', 'filtroHabitacion', 'orden', 'vistaModo', 'stats', 'habitaciones'])
-<div class="rm-resident-directory__filters" aria-label="Buscar y filtrar residentes">
+<x-ui.filter-bar as="div" class="rm-resident-directory__filters" aria-label="Buscar y filtrar residentes">
     <div class="rm-resident-directory__filter-search">
         <label for="resident-directory-search">Buscar residentes</label>
         <div class="rm-resident-directory__filter-search-control">
@@ -9,8 +9,8 @@
     </div>
     <div class="rm-resident-directory__filter-bottom">
         <div class="rm-resident-directory__filter-chips" role="group" aria-label="Estado de alertas">
-            <button type="button" wire:click="$set('filtroRapido', 'TODOS')" aria-pressed="{{ $filtroRapido === 'TODOS' ? 'true' : 'false' }}" class="rm-resident-directory__filter-chip {{ $filtroRapido === 'TODOS' ? 'is-active' : '' }}">Todos ({{ $stats['total'] }})</button>
-            <button type="button" wire:click="$set('filtroRapido', 'CON_ALERTAS')" aria-pressed="{{ $filtroRapido === 'CON_ALERTAS' ? 'true' : 'false' }}" class="rm-resident-directory__filter-chip {{ $filtroRapido === 'CON_ALERTAS' ? 'is-active' : '' }}">Con alertas ({{ $stats['con_alertas'] }})</button>
+            <x-ui.filter-chip label="Todos" :count="$stats['total']" :active="$filtroRapido === 'TODOS'" action="$set('filtroRapido', 'TODOS')" />
+            <x-ui.filter-chip label="Con alertas" :count="$stats['con_alertas']" :active="$filtroRapido === 'CON_ALERTAS'" action="$set('filtroRapido', 'CON_ALERTAS')" />
         </div>
         <div class="rm-resident-directory__filter-selects">
             <label for="resident-directory-room">Habitación</label>
@@ -26,9 +26,9 @@
                 <option value="HAB_DESC">Habitación desc.</option>
             </select>
         </div>
-        <div class="rm-resident-directory__filter-view" role="group" aria-label="Vista de residentes">
-            <button type="button" wire:click="$set('vistaModo', 'tarjetas')" aria-label="Ver tarjetas" aria-pressed="{{ $vistaModo === 'tarjetas' ? 'true' : 'false' }}" class="{{ $vistaModo === 'tarjetas' ? 'is-active' : '' }}"><i class="ph-bold ph-squares-four" aria-hidden="true"></i></button>
-            <button type="button" wire:click="$set('vistaModo', 'tabla')" aria-label="Ver listado" aria-pressed="{{ $vistaModo === 'tabla' ? 'true' : 'false' }}" class="{{ $vistaModo === 'tabla' ? 'is-active' : '' }}"><i class="ph-bold ph-list-dashes" aria-hidden="true"></i></button>
-        </div>
+        <x-ui.view-toggle model="vistaModo" :value="$vistaModo" label="Vista de residentes" :options="[
+            ['value' => 'tarjetas', 'label' => 'Ver tarjetas', 'icon' => 'ph-squares-four'],
+            ['value' => 'tabla', 'label' => 'Ver listado', 'icon' => 'ph-list-dashes'],
+        ]" />
     </div>
-</div>
+</x-ui.filter-bar>

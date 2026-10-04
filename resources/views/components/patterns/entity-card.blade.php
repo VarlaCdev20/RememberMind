@@ -11,7 +11,7 @@
 
 @php
     $accentBorder = match($accent) {
-        'terracota', 'primary' => 'border-l-4 border-l-[var(--rm-primary)]',
+        'terracota', 'primary' => 'border-l-4 border-l-[var(--rm-role-primary)]',
         'danger' => 'border-l-4 border-l-[var(--rm-danger)]',
         'warning' => 'border-l-4 border-l-[var(--rm-warning)]',
         'success' => 'border-l-4 border-l-[var(--rm-success)]',
@@ -20,18 +20,18 @@
     };
 
     $activeClasses = $active
-        ? 'ring-2 ring-[var(--rm-primary)] border-[var(--rm-primary)] bg-[var(--rm-surface-soft)]'
+        ? 'ring-2 ring-[var(--rm-role-primary)] border-[var(--rm-role-primary)] bg-[var(--rm-surface-soft)]'
         : 'border-[var(--rm-border)] bg-[var(--rm-surface)]';
 
     $interactiveClasses = $interactive
-        ? 'cursor-pointer transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md hover:border-[var(--rm-primary)]'
+        ? 'cursor-pointer transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md hover:border-[var(--rm-role-primary)]'
         : 'shadow-2xs';
 @endphp
 
-<article {{ $attributes->merge(['class' => "rm-entity-card rounded-2xl border p-4 sm:p-5 flex flex-col justify-between gap-3 relative font-sans {$accentBorder} {$activeClasses} {$interactiveClasses}"]) }}>
+<article {{ $attributes->merge(['class' => "rm-person-entity-card rm-entity-card border p-4 sm:p-5 flex flex-col justify-between gap-3 relative font-sans {$accentBorder} {$activeClasses} {$interactiveClasses}"]) }} data-entity="user">
     {{-- Indicador lateral activo si corresponde --}}
     @if($active)
-        <span class="absolute left-0 top-4 bottom-4 w-1.5 rounded-r-full bg-[var(--rm-primary)]"></span>
+        <span class="absolute left-0 top-4 bottom-4 w-1.5 rounded-r-full bg-[var(--rm-role-primary)]"></span>
     @endif
 
     {{-- Cabecera: Avatar/Icono + Títulos + Estado --}}

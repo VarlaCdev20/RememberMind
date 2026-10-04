@@ -520,7 +520,7 @@
      $estadoLabel = $estadoActivo ? 'Activo' : ($usuario->estado ?? 'Inactivo');
     @endphp
 
-    <article class="rm-card group relative overflow-hidden border border-borde bg-fondo-card p-4 shadow-sm transition-all hover:-translate-y-0.5 hover:border-borde-hover hover:shadow-md">
+    <article data-entity="staff" class="rm-person-entity-card rm-card group relative overflow-hidden border border-borde bg-fondo-card p-4 shadow-sm transition-all hover:-translate-y-0.5 hover:border-[var(--rm-role-primary)] hover:shadow-md">
      <div class="absolute right-0 top-0 h-16 w-16 rounded-bl-[2rem] bg-boton-acento/10 opacity-80 transition-transform group-hover:scale-110"></div>
 
      <div class="relative z-10 flex items-start justify-between gap-3">
