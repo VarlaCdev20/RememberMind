@@ -123,11 +123,19 @@ class DashboardAdministracionIntegracionVisualTest extends TestCase
         $tarjetas = $this->get(route('admin.administracion.residentes'))->assertOk()->getContent();
         $this->assertStringContainsString('Rosa', $tarjetas);
         $this->assertStringContainsString('rm-admin-residents-cards', $tarjetas);
+        $this->assertStringContainsString('rm-resident-compact-card', $tarjetas);
+        $this->assertStringContainsString('data-variant="administrative"', $tarjetas);
         $this->assertStringContainsString('Ver resumen', $tarjetas);
         $this->assertDoesNotMatchRegularExpression('/<table class="[^"]*\brm-table\b[^"]*">/', $tarjetas);
         $tabla = $this->get(route('admin.administracion.residentes', ['vista' => 'tabla']))->assertOk()->getContent();
         $this->assertMatchesRegularExpression('/<table class="[^"]*\brm-table\b[^"]*">/', $tabla);
         $this->assertStringNotContainsString('class="rm-admin-residents-cards"', $tabla);
+        $directorioInstitucional = $this->get(route('admin.adultos-mayores.index'))->assertOk()->getContent();
+        $this->assertStringContainsString('data-variant="inherit"', $directorioInstitucional);
+        $this->assertStringContainsString('rm-resident-compact-card', $directorioInstitucional);
+        $this->assertStringContainsString('Rosa Flores', $directorioInstitucional);
+        $this->assertStringContainsString('Hab. H-1 · Cama C-1', $directorioInstitucional);
+        $this->assertStringContainsString('Pendientes del expediente', $directorioInstitucional);
         $panel = $this->get(route('admin.administracion.residentes', ['residente' => $residente->cod_residente]))
             ->assertOk()->getContent();
         $this->assertStringContainsString('Rosa Flores', $panel);

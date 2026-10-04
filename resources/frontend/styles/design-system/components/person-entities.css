@@ -2,10 +2,36 @@
 .rm-person-entity-card {
     --rm-person-card-radius: var(--rm-radius-card);
     min-width: 0;
+    border-color: var(--rm-border);
     border-radius: var(--rm-person-card-radius);
+    background-color: var(--rm-surface-raised);
+    box-shadow: var(--rm-shadow-card);
+    transition: border-color var(--rm-duration-normal) var(--rm-ease-standard),
+        box-shadow var(--rm-duration-normal) var(--rm-ease-standard),
+        transform var(--rm-duration-normal) var(--rm-ease-standard);
+}
+
+.rm-person-entity-card:hover {
+    border-color: var(--rm-role-primary-alpha);
+    box-shadow: var(--rm-shadow-raised);
 }
 
 .rm-person-entity-card :is(a, button):focus-visible {
     outline: 2px solid var(--rm-role-primary);
     outline-offset: 2px;
+}
+
+.rm-resident-card__status { display: flex; justify-content: center; }
+.rm-resident-card__footer-note {
+    color: var(--rm-text-secondary);
+    font: 600 12px/1.35 var(--rm-font-body);
+    text-align: center;
+}
+.rm-resident-compact-card__menu { max-height: min(360px, 70vh); overflow-y: auto; }
+.rm-resident-card__pending-list { display: grid; gap: 7px; margin: 0; padding: 0; list-style: none; }
+.rm-resident-card__pending-list li { display: flex; align-items: flex-start; gap: 7px; color: var(--rm-text-secondary); font: 600 12px/1.35 var(--rm-font-body); }
+.rm-resident-card__pending-list i { flex: none; color: var(--rm-warning); font-size: 15px; }
+
+@media (prefers-reduced-motion: reduce) {
+    .rm-person-entity-card { transition: none; }
 }

@@ -7,33 +7,6 @@
 .rm-admin-residents-view-switch a[aria-current="page"] { background: var(--rm-surface-raised); color: var(--rm-action-primary-ink); box-shadow: var(--rm-shadow-sm); }
 .rm-admin-residents-view-switch a:focus-visible { outline: 2px solid var(--rm-focus); outline-offset: 2px; }
 .rm-admin-residents-cards { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; }
-.rm-admin-resident-card { display: flex; flex-direction: column; min-width: 0; overflow: hidden; border: 1px solid var(--rm-border-medium); border-radius: var(--rm-radius-card); background: var(--rm-surface-raised); box-shadow: var(--rm-shadow-sm); transition: border-color .16s ease, box-shadow .16s ease, transform .16s ease; }
-.rm-admin-resident-card:hover { border-color: var(--rm-border-hover); box-shadow: var(--rm-shadow-card); transform: translateY(-2px); }
-.rm-admin-resident-card.is-selected { border-color: var(--rm-action-primary-ink); background: color-mix(in srgb, var(--rm-action-primary-soft) 24%, var(--rm-surface-raised)); }
-.rm-admin-resident-card__head { display: flex; align-items: center; gap: 10px; min-width: 0; padding: 15px 15px 10px; }
-.rm-admin-resident-card__head > img, .rm-admin-resident-card__avatar { display: grid; place-items: center; flex: 0 0 52px; width: 52px; height: 52px; border-radius: var(--rm-radius-md); object-fit: cover; background: var(--rm-action-primary-soft); color: var(--rm-action-primary-ink); font-size: 18px; font-weight: 800; }
-.rm-admin-resident-card__identity { flex: 1 1 auto; min-width: 0; }
-.rm-admin-resident-card__identity h3 { margin: 0; overflow-wrap: anywhere; font-family: var(--rm-font-title); font-size: 15px; font-weight: 800; line-height: 1.25; }
-.rm-admin-resident-card__identity h3 a { color: var(--rm-text-primary); text-decoration: none; }
-.rm-admin-resident-card__identity h3 a:hover { color: var(--rm-action-primary-ink); text-decoration: underline; text-underline-offset: 3px; }
-.rm-admin-resident-card__identity p { margin: 4px 0 0; overflow-wrap: anywhere; color: var(--rm-text-secondary); font-size: 10px; }
-.rm-admin-resident-card__head > .rm-badge { flex: 0 0 auto; align-self: flex-start; }
-.rm-admin-resident-card__meta { margin: 0 15px; padding: 0 0 12px 62px; color: var(--rm-text-secondary); font-size: 11px; line-height: 1.35; }
-.rm-admin-resident-card__meta span { margin: 0 4px; }
-.rm-admin-resident-card__facts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0; margin: 0 15px; padding: 12px 0; border-top: 1px solid var(--rm-border-soft); }
-.rm-admin-resident-card__facts > div { min-width: 0; padding: 0 10px; }
-.rm-admin-resident-card__facts > div:first-child { padding-left: 0; border-right: 1px solid var(--rm-border-soft); }
-.rm-admin-resident-card__facts dt { display: flex; align-items: center; gap: 5px; margin: 0 0 6px; color: var(--rm-text-secondary); font-size: 10px; font-weight: 750; }
-.rm-admin-resident-card__facts dt i { color: var(--rm-action-primary-ink); font-size: 14px; }
-.rm-admin-resident-card__facts dd { margin: 0; overflow-wrap: anywhere; color: var(--rm-text-primary); font-size: 12px; line-height: 1.35; }
-.rm-admin-resident-card__facts dd strong { display: block; font-weight: 750; }
-.rm-admin-resident-card__facts dd small { display: block; margin-top: 3px; color: var(--rm-text-secondary); font-size: 10px; }
-.rm-admin-resident-card__foot { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 52px; margin-top: auto; padding: 9px 15px; border-top: 1px solid var(--rm-border-soft); }
-.rm-admin-resident-card__foot > span { display: inline-flex; align-items: center; gap: 5px; color: var(--rm-text-secondary); font-size: 10px; }
-.rm-admin-resident-card__foot > span i { color: var(--rm-action-primary-ink); font-size: 14px; }
-.rm-admin-resident-card__foot a { display: inline-flex; align-items: center; justify-content: center; gap: 6px; flex: 0 0 auto; min-height: 32px; padding: 0 10px; border: 1px solid var(--rm-border-medium); border-radius: var(--rm-radius-sm); background: var(--rm-surface); color: var(--rm-action-primary-ink); font-size: 11px; font-weight: 800; text-decoration: none; }
-.rm-admin-resident-card__foot a:hover { border-color: var(--rm-action-primary-ink); background: var(--rm-action-primary-soft); }
-.rm-admin-resident-card :is(a):focus-visible { outline: 2px solid var(--rm-focus); outline-offset: 2px; }
 .rm-admin-resident-panel__backdrop { position: fixed; z-index: calc(var(--rm-z-drawer) - 1); inset: 0; background: rgb(31 28 24 / 30%); }
 
 .rm-admin-resident-panel {

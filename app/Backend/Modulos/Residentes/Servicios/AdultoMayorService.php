@@ -20,7 +20,7 @@ class AdultoMayorService
      */
     public function obtenerListado(array $filtros = [])
     {
-        $query = Residente::with(['contactos', 'atenciones', 'evaluacionesGeriatricas'])
+        $query = Residente::with(['contactos', 'familiares.usuario', 'atenciones', 'evaluacionesGeriatricas', 'ocupacionActiva.cama.habitacion'])
             ->withCount([
                 'contactos as fam_total',
                 'observaciones as obs_total',

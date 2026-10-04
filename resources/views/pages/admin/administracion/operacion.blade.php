@@ -117,31 +117,21 @@
                     <section class="rm-admin-residents-cards" role="list" aria-label="Residentes encontrados">
                         @foreach($registros as $registro)
                             @php
-                                $partesNombre = preg_split('/\s+/u', trim($registro->titulo)) ?: [];
-                                $iniciales = mb_strtoupper(mb_substr($partesNombre[0] ?? 'R', 0, 1).mb_substr($partesNombre[1] ?? '', 0, 1));
                                 $edad = $registro->fecha ? \Carbon\Carbon::parse($registro->fecha)->age : null;
                                 $urlResumen = route('admin.administracion.residentes', $parametrosListadoResidentes + ['residente' => $registro->codigo]);
+                                $ubicacion = $registro->habitacion
+                                    ? $registro->habitacion.($registro->cama ? ' · '.$registro->cama : '')
+                                    : 'Sin ubicación asignada';
                             @endphp
-                            <article class="rm-admin-resident-card {{ $panelResidente?->cod_residente === $registro->codigo ? 'is-selected' : '' }}" role="listitem">
-                                <div class="rm-admin-resident-card__head">
-                                    @if($registro->foto)
-                                        <img src="{{ asset('storage/'.$registro->foto) }}" alt="Foto de {{ $registro->titulo }}" loading="lazy" decoding="async">
-                                    @else
-                                        <span class="rm-admin-resident-card__avatar" aria-hidden="true">{{ $iniciales }}</span>
-                                    @endif
-                                    <div class="rm-admin-resident-card__identity">
-                                        <h3><a href="{{ $urlResumen }}">{{ $registro->titulo }}</a></h3>
-                                        <p>{{ $registro->codigo }}</p>
-                                    </div>
-                                    <x-ui.status-badge :estado="$registro->estado" />
-                                </div>
-                                <p class="rm-admin-resident-card__meta">{{ $registro->documento ? 'CI '.$registro->documento : 'CI no registrado' }} <span aria-hidden="true">·</span> {{ $edad !== null ? $edad.' años' : 'Edad no registrada' }}</p>
-                                <dl class="rm-admin-resident-card__facts">
-                                    <div><dt><i class="ph-bold ph-bed" aria-hidden="true"></i> Habitación</dt><dd><strong>{{ $registro->habitacion ?: 'Sin asignar' }}</strong>@if($registro->sector)<small>{{ $registro->sector }}</small>@elseif($registro->cama)<small>{{ $registro->cama }}</small>@endif</dd></div>
-                                    <div><dt><i class="ph-bold ph-user-circle" aria-hidden="true"></i> Responsable</dt><dd><strong>{{ $registro->responsable ?: 'No registrado' }}</strong>@if($registro->responsable && $registro->parentesco)<small>{{ $registro->parentesco }}</small>@endif</dd></div>
-                                </dl>
-                                <div class="rm-admin-resident-card__foot"><span><i class="ph-bold ph-clipboard-text" aria-hidden="true"></i> {{ $registro->admision === 'Registrada' ? 'Admisión registrada' : 'Sin admisión vinculada' }}</span><a href="{{ $urlResumen }}">Ver resumen <i class="ph-bold ph-arrow-right" aria-hidden="true"></i></a></div>
-                            </article>
+                            <x-ui.resident-card :code="$registro->codigo" :name="$registro->titulo" :photo="$registro->foto" :age="$edad" :location="$ubicacion" variant="administrative" :selected="$panelResidente?->cod_residente === $registro->codigo" :primary-href="$urlResumen" context-label="Responsable" :context-value="$registro->responsable ?: 'No registrado'">
+                                <x-slot:status><x-ui.status-badge :estado="$registro->estado" /></x-slot:status>
+                                <x-slot:details>
+                                    <p><i class="ph-bold ph-identification-card" aria-hidden="true"></i><span>{{ $registro->documento ? 'CI '.$registro->documento : 'CI no registrado' }}</span></p>
+                                    @if($registro->sector)<p><i class="ph-bold ph-map-pin" aria-hidden="true"></i><span>{{ $registro->sector }}</span></p>@endif
+                                    @if($registro->responsable && $registro->parentesco)<p><i class="ph-bold ph-users" aria-hidden="true"></i><span>{{ $registro->parentesco }}</span></p>@endif
+                                </x-slot:details>
+                                <x-slot:footerNote>{{ $registro->admision === 'Registrada' ? 'Admisión registrada' : 'Sin admisión vinculada' }}</x-slot:footerNote>
+                            </x-ui.resident-card>
                         @endforeach
                     </section>
                 @else

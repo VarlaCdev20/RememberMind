@@ -1,10 +1,8 @@
-@props(['resident', 'mode' => 'card', 'selectMethod' => null, 'primaryHref' => null])
+@props(['name', 'photo' => null, 'age' => null, 'code', 'initials' => null, 'mode' => 'card', 'selectMethod' => null, 'primaryHref' => null])
 @php
-    $name = $resident->nombre_completo;
     $visibleName = \Illuminate\Support\Str::title(mb_strtolower($name));
-    $initials = mb_strtoupper(mb_substr((string) $resident->nombres, 0, 1).mb_substr((string) $resident->apellido_paterno, 0, 1));
-    $age = $resident->fecha_nacimiento?->age;
-    $code = $resident->cod_residente;
+    $nameParts = preg_split('/\s+/u', trim($visibleName)) ?: [];
+    $initials ??= mb_strtoupper(mb_substr($nameParts[0] ?? '', 0, 1).mb_substr($nameParts[1] ?? '', 0, 1));
 @endphp
 <div class="{{ $mode === 'card' ? 'rm-resident-compact-card__identity' : 'rm-resident-directory__identity' }}">
     @if($selectMethod || $primaryHref)
@@ -14,8 +12,8 @@
         <span class="rm-resident-directory__avatar-button">
     @endif
         @if($mode !== 'card')<span class="rm-resident-directory__avatar-ornament" aria-hidden="true"><i class="ph ph-leaf"></i><i class="ph ph-leaf"></i></span>@endif
-        @if($resident->foto)
-            <img src="{{ asset('storage/'.$resident->foto) }}" alt="Foto de {{ $name }}" loading="lazy" decoding="async" class="rm-resident-directory__avatar">
+        @if($photo)
+            <img src="{{ asset('storage/'.$photo) }}" alt="Foto de {{ $name }}" loading="lazy" decoding="async" class="rm-resident-directory__avatar">
         @else
             <span class="rm-resident-directory__avatar rm-resident-directory__avatar--initials" aria-hidden="true">{{ $initials ?: 'R' }}</span>
         @endif

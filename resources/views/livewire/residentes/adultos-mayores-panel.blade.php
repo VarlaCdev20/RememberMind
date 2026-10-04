@@ -240,12 +240,8 @@
  @php
  $estado = strtoupper($adulto->estado_adulto);
  $esArchivado = $estado === 'ARCHIVADO' || $estado === 'INACTIVO';
- $colorBg = $esArchivado ? 'bg-fondo-panel border-borde-suave' : 'bg-fondo-card border-borde-suave';
- $colorEstado = $esArchivado ? 'bg-fondo-panel text-parrafo' : 'bg-estado-exitoBg text-parrafo';
- $fotoUrl = $adulto->foto ? Storage::url($adulto->foto) : null;
-
  // CÁLCULOS DINÁMICOS DE RELACIONES EAGER-LOADED
- $famPrincipal = $adulto->familiares->first(fn($f) => $f->pivot->es_responsable);
+ $famPrincipal = $adulto->familiares->first(fn($f) => (bool) $f->pivot?->responsable_principal);
  if (!$famPrincipal) {
  $famPrincipal = $adulto->familiares->first();
  }
@@ -255,100 +251,7 @@
  @endphp
  @if(!$esArchivado)
  @php $hayTarjetasActivas = true; @endphp
- <div class="rounded-2xl border {{ $colorBg }} p-0 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg flex flex-col justify-between overflow-hidden relative">
- {{-- Línea superior de acento --}}
- <div class="h-1.5 w-full bg-boton-acento"></div>
-
- {{-- FOTO Y ENCABEZADO TARJETA --}}
- <div class="p-5 flex flex-col items-center border-b border-borde-suave bg-gradient-to-b from-[#E6DDD3]/10 to-transparent">
- <span class="absolute top-4 right-4 rounded-lg {{ $colorEstado }} px-2 py-1 text-[9px] font-bold uppercase tracking-wider">{{ $estado }}</span>
- <span class="absolute top-4 left-4 text-[9px] font-bold uppercase tracking-widest text-apoyo bg-fondo-panel px-2 py-1 rounded-md border border-borde-suave shadow-sm">{{ $adulto->edad ?? 'Edad no registrada' }}{{ $adulto->edad ? ' años' : '' }}</span>
-
- @if($fotoUrl)
- <img src="{{ $fotoUrl }}" class="mt-4 mb-3 h-24 w-24 rounded-2xl object-cover border-4 border-white shadow-sm">
- @else
- <div class="mt-4 mb-3 h-24 w-24 rounded-2xl bg-gradient-to-br from-[var(--rm-clinical)] to-[var(--rm-violet)] flex items-center justify-center text-inverso font-black text-2xl shadow-sm border-4 border-white">
- {{ substr($adulto->nombres, 0, 1) }}{{ substr($adulto->ap_paterno, 0, 1) }}
- </div>
- @endif
-
- <h3 class="text-base font-extrabold text-titulo text-center leading-tight">
- {{ $adulto->nombres }}<br>
- <span class="text-xs text-apoyo font-bold">{{ $adulto->ap_paterno }} {{ $adulto->ap_materno }}</span>
- </h3>
- </div>
-
- {{-- DATOS RÁPIDOS Y RELACIONES --}}
- <div class="p-4 px-5 space-y-2.5">
- <div class="flex justify-between items-center text-xs border-b border-borde-suave pb-2">
- <span class="font-bold text-apoyo flex items-center"><i class="ph-bold ph-identification-card mr-1.5 text-sm"></i> C.I.</span>
- <span class="font-black text-titulo">{{ $adulto->ci }}</span>
- </div>
- <div class="flex justify-between items-center text-xs border-b border-borde-suave pb-2">
- <span class="font-bold text-apoyo flex items-center"><i class="ph-bold ph-calendar-blank mr-1.5 text-sm"></i> Edad</span>
- <span class="font-black text-titulo">{{ $adulto->edad }} años</span>
- </div>
-
- {{-- Familiar Principal --}}
- <div class="flex justify-between items-start text-xs border-b border-borde-suave pb-2">
- <span class="font-bold text-apoyo flex items-center"><i class="ph-bold ph-user mr-1.5 text-sm"></i> Familiar resp.</span>
- <span class="font-black text-titulo text-right truncate max-w-[120px]">
- @if($famPrincipal)
- {{ $famPrincipal->usuario->name ?? $famPrincipal->usuario->nombres ?? 'Familiar' }}
- @else
- <span class="text-boton-acento uppercase text-[9px] font-bold"><i class="ph-bold ph-warning mr-0.5"></i>Sin registrar</span>
- @endif
- </span>
- </div>
-
- {{-- Última Atención --}}
- <div class="flex justify-between items-center text-xs border-b border-borde-suave pb-2">
- <span class="font-bold text-apoyo flex items-center"><i class="ph-bold ph-clock-counter-clockwise mr-1.5 text-sm"></i> Últ. Atención</span>
- <span class="font-black text-titulo">
- {{ $ultAtencion ? \Carbon\Carbon::parse($ultAtencion->fecha)->format('d/m/Y') : 'Ninguna' }}
- </span>
- </div>
-
- {{-- Última Evaluación Cognitiva --}}
- <div class="flex justify-between items-center text-xs pb-1">
- <span class="font-bold text-apoyo flex items-center"><i class="ph-bold ph-brain mr-1.5 text-sm"></i> Últ. Eval. Cog.</span>
- <span class="font-black text-titulo">
- {{ $ultEval ? \Carbon\Carbon::parse($ultEval->fecha_eval)->format('d/m/Y') : 'Sin evaluar' }}
- </span>
- </div>
- </div>
-
- {{-- ACCIONES DE FICHA Y CAJÓN RÁPIDO --}}
- <div class="p-4 pt-1 mt-auto">
- <div class="flex gap-2">
- <a href="{{ route('admin.adultos-mayores.show', $adulto->cod_residente) }}" class="flex-1 flex justify-center items-center rounded-xl bg-boton-principal py-2 text-inverso hover:bg-fondo-panel transition shadow-sm" title="Ver Ficha Integral">
- <i class="ph-bold ph-eye text-sm mr-1"></i> <span class="text-[9px] font-bold uppercase tracking-wider">Ficha Integral</span>
- </a>
- @can('residentes.gestionar')
- <button type="button" wire:click="editarAdultoMayor('{{ $adulto->cod_residente }}')" class="flex h-9 w-9 justify-center items-center rounded-xl bg-estado-peligroBg border border-borde-focus text-boton-acento hover:bg-boton-acento hover:text-inverso transition" title="Editar Ficha">
- <i class="ph-bold ph-pencil-simple text-base"></i>
- </button>
- <div x-data="{ open: false }" class="relative">
- <button @click="open = !open" @click.away="open = false" type="button" class="flex h-9 w-9 justify-center items-center rounded-xl bg-fondo-app text-titulo hover:bg-fondo-panel transition" title="Cambiar Estado Rápido">
- <i class="ph-bold ph-arrows-left-right text-base"></i>
- </button>
- <div x-cloak x-show="open" class="absolute bottom-full mb-2 right-0 bg-fondo-card rounded-xl shadow-lg border border-borde-suave p-1.5 min-w-[130px] z-50">
- <p class="text-[9px] font-bold uppercase text-apoyo px-2 py-1 border-b border-borde-suave mb-1">Cambiar Estado:</p>
- @foreach($estadosAdulto as $est)
- @if(strtoupper($est->estado) !== $estado)
- <form method="POST" action="{{ route('admin.adultos-mayores.estado', $adulto->cod_residente) }}" onsubmit="confirmarAccion(event, '¿Cambiar estado a {{ $est->estado }}?', 'Se registrará en el historial de estados de forma automática.')">
- @csrf @method('PATCH')
- <input type="hidden" name="cod_est_adul" value="{{ $est->cod_est_adul }}">
- <button type="submit" class="w-full text-left px-2.5 py-1.5 text-[10px] font-bold text-titulo hover:bg-fondo-panel rounded-lg transition">{{ $est->estado }}</button>
- </form>
- @endif
- @endforeach
- </div>
- </div>
- @endcan
- </div>
- </div>
- </div>
+ @include('livewire.residentes.partials.resident-list-card')
  @endif
  @endforeach
  @if(!$hayTarjetasActivas)
@@ -378,7 +281,7 @@
  <tbody class="divide-y divide-[var(--rm-border)]/25">
  @foreach($adultos as $adulto)
  @php
- $famPrincipal = $adulto->familiares->first(fn($f) => $f->pivot->es_responsable);
+ $famPrincipal = $adulto->familiares->first(fn($f) => (bool) $f->pivot?->responsable_principal);
  if (!$famPrincipal) {
  $famPrincipal = $adulto->familiares->first();
  }
@@ -445,47 +348,27 @@
  @foreach($adultos as $adulto)
  @if(strtoupper($adulto->estado_adulto) === 'ARCHIVADO' || strtoupper($adulto->estado_adulto) === 'INACTIVO')
  @php $hayArchivados = true; @endphp
- <div class="rounded-2xl border border-borde-suave bg-fondo-panel p-5 shadow-sm flex flex-col justify-between transition hover:shadow-md">
- <div>
- <div class="mb-3 flex items-center justify-between">
- <span class="rounded-lg bg-fondo-panel px-2.5 py-1 text-[9px] font-bold uppercase text-parrafo tracking-wider border border-borde shadow-sm">{{ $adulto->estado_adulto }}</span>
- <span class="text-[10px] font-bold text-apoyo">{{ $adulto->ci ? 'CI '.$adulto->ci : 'Documento no registrado' }}</span>
- </div>
- <h3 class="text-base font-extrabold text-apoyo leading-tight">{{ $adulto->nombres }} {{ $adulto->ap_paterno }}</h3>
- <p class="text-xs text-apoyo font-bold mt-1">{{ $adulto->ap_materno }}</p>
-
- <div class="mt-4 space-y-2 border-t border-borde-suave pt-3 text-xs">
- <div class="flex justify-between"><span class="text-apoyo font-bold">Carnet:</span><span class="font-bold">{{ $adulto->ci }}</span></div>
- <div class="flex justify-between"><span class="text-apoyo font-bold">Archivado en:</span><span class="font-bold">{{ $adulto->archivado_en ? \Carbon\Carbon::parse($adulto->archivado_en)->format('d/m/Y') : 'No registrada' }}</span></div>
- <div class="flex flex-col mt-2 gap-1 bg-fondo-card/40 p-2 rounded-xl border border-borde-suave"><span class="text-apoyo text-[10px] font-bold uppercase leading-none">Motivo:</span><span class="font-semibold text-[11px] text-apoyo mt-1">{{ $adulto->motivo_archivado ?: 'Archivado administrativamente.' }}</span></div>
- </div>
- </div>
-
- <div class="mt-5 pt-3 border-t border-borde-suave flex gap-2">
- <a href="{{ route('admin.adultos-mayores.show', $adulto->cod_residente) }}" class="flex-1 flex justify-center items-center rounded-xl bg-fondo-panel py-2 text-inverso hover:bg-boton-principal transition text-xs font-bold shadow-sm" title="Ver Expediente Completo">
- <i class="ph-bold ph-eye mr-1 text-sm"></i> Ver Ficha
- </a>
- @can('residentes.gestionar')
- <div x-data="{ open: false }" class="relative flex-1">
- <button @click="open = !open" @click.away="open = false" type="button" class="flex w-full justify-center items-center rounded-xl bg-estado-exitoBg py-2 text-inverso hover:bg-fondo-panel transition text-xs font-bold" title="Restaurar / Cambiar Estado">
- <i class="ph-bold ph-arrow-counter-clockwise mr-1 text-sm"></i> Restaurar
- </button>
- <div x-cloak x-show="open" class="absolute bottom-full mb-2 right-0 bg-fondo-card rounded-xl shadow-lg border border-borde-suave p-1.5 min-w-[130px] z-50">
- <p class="text-[9px] font-bold uppercase text-apoyo px-2 py-1 border-b border-borde-suave mb-1">Cambiar Estado:</p>
- @foreach($estadosAdulto as $est)
- @if(strtoupper($est->estado) !== strtoupper($adulto->estado_adulto))
- <form method="POST" action="{{ route('admin.adultos-mayores.estado', $adulto->cod_residente) }}" onsubmit="confirmarAccion(event, '¿Restaurar y cambiar estado a {{ $est->estado }}?', 'El expediente pasará nuevamente al censo activo.')">
- @csrf @method('PATCH')
- <input type="hidden" name="cod_est_adul" value="{{ $est->cod_est_adul }}">
- <button type="submit" class="w-full text-left px-2.5 py-1.5 text-[10px] font-bold text-titulo hover:bg-fondo-panel rounded-lg transition">{{ $est->estado }}</button>
- </form>
- @endif
- @endforeach
- </div>
- </div>
- @endcan
- </div>
- </div>
+ <x-ui.resident-card :resident="$adulto" variant="inherit" :show-location="false" :primary-href="route('admin.adultos-mayores.show', $adulto->cod_residente)" primary-label="Ver ficha" context-label="Archivado en" :context-value="$adulto->archivado_en ? \Carbon\Carbon::parse($adulto->archivado_en)->format('d/m/Y') : 'Fecha no registrada'">
+     <x-slot:status><x-ui.status-badge :estado="$adulto->estado_adulto" /></x-slot:status>
+     <x-slot:details>
+         <p><i class="ph-bold ph-identification-card" aria-hidden="true"></i><span>{{ $adulto->ci ? 'CI '.$adulto->ci : 'Documento no registrado' }}</span></p>
+         <p><i class="ph-bold ph-archive" aria-hidden="true"></i><span>{{ $adulto->motivo_archivado ?: 'Archivado administrativamente.' }}</span></p>
+     </x-slot:details>
+     @can('residentes.gestionar')
+         <x-slot:menu>
+             <div class="rm-resident-compact-card__menu-heading">Restaurar o cambiar estado</div>
+             @foreach($estadosAdulto as $est)
+                 @if(strtoupper($est->estado) !== strtoupper($adulto->estado_adulto))
+                     <form method="POST" action="{{ route('admin.adultos-mayores.estado', $adulto->cod_residente) }}" onsubmit="confirmarAccion(event, '¿Restaurar y cambiar estado a {{ $est->estado }}?', 'El expediente pasará nuevamente al censo activo.')">
+                         @csrf @method('PATCH')
+                         <input type="hidden" name="cod_est_adul" value="{{ $est->cod_est_adul }}">
+                         <button type="submit"><span class="rm-resident-compact-card__menu-icon"><i class="ph-bold ph-arrow-counter-clockwise" aria-hidden="true"></i></span>{{ $est->estado }}</button>
+                     </form>
+                 @endif
+             @endforeach
+         </x-slot:menu>
+     @endcan
+ </x-ui.resident-card>
  @endif
  @endforeach
  @if(!$hayArchivados)
@@ -514,28 +397,15 @@
  @endphp
  @if(count($alertas) > 0 && strtoupper($adulto->estado_adulto) !== 'ARCHIVADO')
  @php $hayAlertas = true; @endphp
- <div class="rounded-2xl border border-borde-focus bg-fondo-card p-5 shadow-sm flex flex-col justify-between transition hover:-translate-y-0.5 hover:shadow-md relative overflow-hidden">
- <div class="absolute right-0 top-0 h-1.5 w-full bg-boton-acento"></div>
- <div>
- <div class="flex justify-between items-start mb-3">
- <div>
- <span class="text-[9px] font-bold text-boton-acento bg-estado-peligroBg px-2 py-0.5 rounded-full border border-borde-focus tracking-widest uppercase">{{ $adulto->ci ? 'CI '.$adulto->ci : 'Documento pendiente' }}</span>
- <h3 class="text-base font-extrabold text-titulo leading-tight mt-1">{{ $adulto->nombres }} {{ $adulto->ap_paterno }}</h3>
- </div>
- <span class="rounded-full bg-estado-peligroBg p-2 text-boton-acento border border-borde-focus shadow-inner"><i class="ph-bold ph-warning text-base"></i></span>
- </div>
-
- <ul class="mt-4 space-y-2.5">
- @foreach($alertas as $alerta)
- <li class="text-[11px] font-bold text-boton-acento flex items-start"><span class="h-1.5 w-1.5 rounded-full bg-boton-acento mt-1.5 mr-2 shrink-0 shadow-[0_0_6px_rgba(226,125,96,0.6)]"></span> {{ $alerta }}</li>
- @endforeach
- </ul>
- </div>
-
- <a href="{{ route('admin.adultos-mayores.show', $adulto->cod_residente) }}" class="mt-5 flex justify-center items-center rounded-xl bg-boton-principal py-2 text-inverso hover:bg-fondo-panel transition text-xs font-bold w-full shadow-sm">
- <i class="ph-bold ph-folder-open text-base mr-1.5"></i> Completar Expediente
- </a>
- </div>
+ <x-ui.resident-card :resident="$adulto" variant="inherit" :primary-href="route('admin.adultos-mayores.show', $adulto->cod_residente)" primary-label="Completar expediente" context-label="Pendientes del expediente" :context-value="count($alertas).' por revisar'">
+     <x-slot:details>
+         <ul class="rm-resident-card__pending-list">
+             @foreach($alertas as $alerta)
+                 <li><i class="ph-bold ph-warning-circle" aria-hidden="true"></i>{{ $alerta }}</li>
+             @endforeach
+         </ul>
+     </x-slot:details>
+ </x-ui.resident-card>
  @endif
  @endforeach
  @if(!$hayAlertas)

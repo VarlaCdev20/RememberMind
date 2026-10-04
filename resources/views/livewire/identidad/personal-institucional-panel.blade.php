@@ -520,7 +520,7 @@
      $estadoLabel = $estadoActivo ? 'Activo' : ($usuario->estado ?? 'Inactivo');
     @endphp
 
-    <article data-entity="staff" class="rm-person-entity-card rm-card group relative overflow-hidden border border-borde bg-fondo-card p-4 shadow-sm transition-all hover:-translate-y-0.5 hover:border-[var(--rm-role-primary)] hover:shadow-md">
+    <x-ui.person-entity-card entity="staff" class="rm-card group relative overflow-hidden border border-borde bg-fondo-card p-4 shadow-sm transition-all hover:-translate-y-0.5 hover:border-[var(--rm-role-primary)] hover:shadow-md">
      <div class="absolute right-0 top-0 h-16 w-16 rounded-bl-[2rem] bg-boton-acento/10 opacity-80 transition-transform group-hover:scale-110"></div>
 
      <div class="relative z-10 flex items-start justify-between gap-3">
@@ -616,7 +616,7 @@
       </button>
      @endcan
      </div>
-    </article>
+    </x-ui.person-entity-card>
     @empty
     <div class="col-span-full flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-borde bg-fondo-card/60 px-4 py-12 text-center">
      <div class="mb-3 flex h-12 w-12 items-center justify-center rounded-xl border border-borde bg-fondo-card">
