@@ -1,7 +1,7 @@
 /* Identidad contextual: las superficies y los colores semánticos siguen siendo globales. */
 :root {
-    --rm-role-superadmin: #6F8A72;
-    --rm-role-superadmin-soft: #DCE6DD;
+    --rm-role-superadmin: #849F87;
+    --rm-role-superadmin-soft: #E6EEE7;
     --rm-role-manager: #756F87;
     --rm-role-manager-soft: #E6E2EB;
     --rm-role-admin: #82786E;
