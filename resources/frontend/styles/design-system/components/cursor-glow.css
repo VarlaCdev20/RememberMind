@@ -4,7 +4,7 @@
     top: var(--mouse-y, -500px);
     left: var(--mouse-x, -500px);
     z-index: 10;
-    width: clamp(220px, 25vw, 340px);
+    width: clamp(180px, 21vw, 280px);
     aspect-ratio: 1;
     border-radius: 50%;
     pointer-events: none;
@@ -12,7 +12,7 @@
         color-mix(in srgb, var(--rm-role-primary, var(--rm-palette-sage-300)) 20%, transparent) 0%,
         color-mix(in srgb, var(--rm-role-primary, var(--rm-palette-sage-300)) 9%, transparent) 35%,
         transparent 72%);
-    filter: blur(16px);
+    filter: blur(14px);
     opacity: var(--rm-cursor-visible, 0);
     transform: translate(-50%, -50%);
     transition: top 130ms ease-out, left 130ms ease-out, opacity 180ms ease-out;
