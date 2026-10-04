@@ -7,10 +7,10 @@
     --rm-sidebar-hover: var(--rm-role-hover);
     --rm-item-hover: var(--rm-role-hover);
     --rm-item-active-bg: var(--rm-role-primary-soft);
-    --rm-item-active-text: var(--rm-role-ink);
+    --rm-item-active-text: var(--rm-sidebar-ink);
     --rm-item-active-accent: var(--rm-role-primary);
     --rm-selected-bg: var(--rm-role-primary-soft);
-    --rm-selected-text: var(--rm-role-ink);
+    --rm-selected-text: var(--rm-sidebar-ink);
     --rm-selected-icon: var(--rm-role-primary);
     --rm-selected-border: var(--rm-role-primary-alpha);
     --rm-sidebar-indicator: var(--rm-role-primary);
@@ -33,7 +33,7 @@
 .rm-shell[data-role] .rm-sidebar__nav .rm-sidebar__subitem.is-active {
     background: var(--rm-role-primary-soft);
     border-color: var(--rm-role-primary-alpha);
-    color: var(--rm-role-ink);
+    color: var(--rm-sidebar-ink);
 }
 
 .rm-shell[data-role] .rm-dashboard-header,

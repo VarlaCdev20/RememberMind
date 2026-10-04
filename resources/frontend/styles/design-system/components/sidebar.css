@@ -17,6 +17,9 @@
 }
 
 .rm-shell .rm-sidebar {
+    --rm-sidebar-ink: #374B50;
+    --rm-sidebar-ink-soft: #3F5358;
+    --rm-sidebar-ink-section: #3D5759;
     --rm-sage-glass-tint: var(--rm-shell-sage-tint);
     --rm-sage-glass: color-mix(in srgb, var(--rm-sage-glass-tint) 28%, transparent);
     --rm-sage-glass-hover: color-mix(in srgb, var(--rm-sage-glass-tint) 34%, transparent);
@@ -24,7 +27,7 @@
     --rm-sage-border: color-mix(in srgb, var(--rm-sage-accent) 22%, transparent);
     --rm-sage-accent: #78826E;
     --rm-sage-text: #56604F;
-    --rm-sage-selected-text: #5A6252;
+    --rm-sage-selected-text: var(--rm-sidebar-ink);
     --rm-sage-selected-accent: var(--rm-sage-accent);
     /* Película clara sutil para el contraste del texto seleccionado. */
     --rm-sage-selected-surface: var(--rm-shell-sage-selection);
@@ -32,9 +35,9 @@
     --rm-sidebar-radius-module: 12px;
     --rm-sidebar-bg: color-mix(in srgb, #D8D2CC 20%, var(--rm-palette-capuchino));
     --rm-sidebar-surface: var(--rm-shell-sage-surface);
-    --rm-text-primary: #4B443F;
-    --rm-text-secondary: #5C554F;
-    --rm-text-muted: #746D67;
+    --rm-text-primary: var(--rm-sidebar-ink);
+    --rm-text-secondary: var(--rm-sidebar-ink-soft);
+    --rm-text-muted: var(--rm-sidebar-ink-soft);
     --rm-icon-default: #746D67;
     --rm-border: #A59E97;
     --rm-item-hover: var(--rm-sage-glass-hover);
@@ -126,7 +129,7 @@
 .rm-shell .rm-sidebar__group {
     margin-top: var(--rm-space-6);
     margin-bottom: var(--rm-space-1);
-    color: var(--rm-sidebar-text-soft);
+    color: var(--rm-sidebar-ink-section);
     font-size: var(--rm-text-xs);
     font-weight: var(--rm-weight-bold);
     letter-spacing: var(--rm-letter-spacing-wide);
@@ -645,6 +648,9 @@
 }
 :is(.dark, [data-theme="dark"]) .rm-shell .rm-sidebar,
 .rm-shell:is(.dark, [data-theme="dark"]) .rm-sidebar {
+    --rm-sidebar-ink: var(--rm-palette-petroleum-text);
+    --rm-sidebar-ink-soft: var(--rm-palette-petroleum-secondary);
+    --rm-sidebar-ink-section: var(--rm-palette-petroleum-secondary);
     --rm-sidebar-bg: var(--rm-palette-petroleum-900);
     --rm-sidebar-surface: var(--rm-palette-petroleum-800);
     --rm-text-primary: var(--rm-palette-petroleum-text);
