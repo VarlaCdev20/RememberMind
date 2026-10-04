@@ -1,31 +1,26 @@
 <div class="space-y-6">
- <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between rounded-[1.5rem] border border-borde/70 bg-fondo-panel p-5 shadow-sm">
- <div>
-  <span class="text-[10px] font-bold uppercase tracking-[0.2em] text-boton-acento">Enfermeria</span>
-  <h2 class="mt-1 text-xl font-extrabold text-parrafo">Valoraciones Iniciales de Enfermeria</h2>
-  <p class="mt-1 text-xs font-bold leading-relaxed text-parrafo/60">
-  Historial de valoraciones iniciales registradas en el flujo de preadmision.
-  </p>
- </div>
- <div class="flex items-center gap-3">
+ <x-ui.collection-header title="Valoraciones iniciales de Enfermería" subtitle="Historial de valoraciones registradas en el flujo de preadmisión." icon="ph-clipboard-text" eyebrow="Enfermería">
+ <x-slot:actions>
   <a href="{{ route('admin.enfermeria.dashboard') }}" class="inline-flex items-center justify-center gap-2 rounded-xl bg-boton-acento px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-inverso shadow-sm transition hover:bg-fondo-panel active:scale-95">
   <i class="ph-bold ph-arrow-left"></i>
   Ir al Dashboard
   </a>
- </div>
- </div>
+ </x-slot:actions>
+ </x-ui.collection-header>
 
  {{-- BARRA DE FILTROS UNIFICADA FORMATO ALERTAS --}}
  <x-ui.filter-bar class="mb-4">
  <div class="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-2">
   {{-- Buscador Principal --}}
-  <div class="lg:col-span-8 relative flex items-center">
+  <div class="lg:col-span-8">
+  <label for="valoracion-enfermeria-buscar" class="rm-collection-filter-label">Buscar persona</label>
+  <div class="relative flex items-center">
   <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-[var(--rm-text-muted)]">
    <i class="ph-bold ph-magnifying-glass text-base"></i>
   </span>
-  <input type="text"
+  <input id="valoracion-enfermeria-buscar" type="text"
    wire:model.live.debounce.300ms="search"
-   placeholder="Buscar por nombre o apellido del residente..."
+   placeholder="Buscar por nombre o apellido..."
    class="w-full rounded-xl border border-[var(--rm-border-soft)] bg-[var(--rm-input-bg)] py-2 pl-9 pr-8 text-xs font-medium text-[var(--rm-text-primary)] placeholder-[var(--rm-input-placeholder)] focus:border-[var(--rm-focus)] focus:outline-none h-[38px]">
   @if($search !== '')
    <button type="button"
@@ -36,10 +31,12 @@
    </button>
   @endif
   </div>
+  </div>
 
   {{-- Filtro Estado --}}
   <div class="lg:col-span-4">
-  <select wire:model.live="filtroEstado"
+  <label for="valoracion-enfermeria-estado" class="rm-collection-filter-label">Estado</label>
+  <select id="valoracion-enfermeria-estado" wire:model.live="filtroEstado"
    class="w-full rounded-xl border border-[var(--rm-border-soft)] bg-[var(--rm-input-bg)] py-2 px-3 text-xs font-medium text-[var(--rm-text-primary)] focus:border-[var(--rm-focus)] focus:outline-none h-[38px]">
    <option value="">Todos los estados</option>
    <option value="BORRADOR">Borrador</option>
@@ -84,9 +81,9 @@
  @endif
 </x-ui.filter-bar>
 
- <div class="overflow-hidden rounded-[1.5rem] border border-borde/70 bg-fondo-panel shadow-sm">
+ <div class="rm-table-container overflow-hidden rounded-[1.5rem] border border-borde/70 bg-fondo-panel shadow-sm">
  <div class="overflow-x-auto">
-  <table class="rm-data-table rm-data-table--actions w-full text-left text-sm text-parrafo">
+  <table class="rm-data-table rm-data-table--actions rm-table w-full text-left text-sm text-parrafo">
   <thead class="bg-fondo-app text-[10px] font-bold uppercase tracking-widest text-parrafo/60">
    <tr>
    <th class="px-5 py-4">Adulto Mayor</th>

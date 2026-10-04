@@ -1,29 +1,28 @@
 <div class="space-y-6">
- <div class="flex flex-col gap-4 rounded-[1.5rem] border border-borde/70 bg-fondo-panel p-5 shadow-sm sm:flex-row sm:items-center sm:justify-between">
- <div>
-  <span class="text-[10px] font-bold uppercase tracking-[0.2em] text-boton-acento">Medicina</span>
-  <h2 class="mt-1 text-xl font-extrabold text-parrafo">Valoraciones Médicas de Admisión</h2>
-  <p class="mt-1 text-xs font-bold leading-relaxed text-parrafo/60">Valoraciones y evaluaciones médicas operativas V2.</p>
- </div>
+ <x-ui.collection-header title="Valoraciones médicas de admisión" subtitle="Valoraciones y evaluaciones médicas operativas V2." icon="ph-stethoscope" eyebrow="Medicina">
+ <x-slot:actions>
  @if($this->puedeRegistrar())
  <button wire:click="abrirCrear" type="button" class="inline-flex items-center justify-center gap-2 rounded-xl bg-boton-acento px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-inverso shadow-sm transition active:scale-95">
   <i class="ph-bold ph-plus"></i>
   Nueva valoración
  </button>
  @endif
- </div>
+ </x-slot:actions>
+ </x-ui.collection-header>
 
  {{-- BARRA DE FILTROS UNIFICADA FORMATO ALERTAS --}}
  <x-ui.filter-bar class="mb-4">
  <div class="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-2">
   {{-- Buscador Principal --}}
-  <div class="lg:col-span-6 relative flex items-center">
+  <div class="lg:col-span-6">
+  <label for="valoracion-medica-buscar" class="rm-collection-filter-label">Buscar persona</label>
+  <div class="relative flex items-center">
   <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-[var(--rm-text-muted)]">
    <i class="ph-bold ph-magnifying-glass text-base"></i>
   </span>
-  <input wire:model.live.debounce.300ms="search"
+  <input id="valoracion-medica-buscar" wire:model.live.debounce.300ms="search"
    type="text"
-   placeholder="Buscar por nombre, apellido o CI del residente..."
+   placeholder="Buscar por nombre, apellido o CI..."
    class="w-full rounded-xl border border-[var(--rm-border-soft)] bg-[var(--rm-input-bg)] py-2 pl-9 pr-8 text-xs font-medium text-[var(--rm-text-primary)] placeholder-[var(--rm-input-placeholder)] focus:border-[var(--rm-focus)] focus:outline-none h-[38px]">
   @if(!empty($search))
    <button type="button"
@@ -34,10 +33,12 @@
    </button>
   @endif
   </div>
+  </div>
 
   {{-- Filtro Estado de la Valoración --}}
   <div class="lg:col-span-3">
-  <select wire:model.live="filtroEstado"
+  <label for="valoracion-medica-estado" class="rm-collection-filter-label">Estado</label>
+  <select id="valoracion-medica-estado" wire:model.live="filtroEstado"
    class="w-full rounded-xl border border-[var(--rm-border-soft)] bg-[var(--rm-input-bg)] py-2 px-3 text-xs font-medium text-[var(--rm-text-primary)] focus:border-[var(--rm-focus)] focus:outline-none h-[38px]">
    <option value="">Todos los estados</option>
    <option value="COMPLETADA">Completada</option>
@@ -48,7 +49,8 @@
 
   {{-- Filtro Resultado de Admisión --}}
   <div class="lg:col-span-3">
-  <select wire:model.live="filtroResult"
+  <label for="valoracion-medica-resultado" class="rm-collection-filter-label">Resultado</label>
+  <select id="valoracion-medica-resultado" wire:model.live="filtroResult"
    class="w-full rounded-xl border border-[var(--rm-border-soft)] bg-[var(--rm-input-bg)] py-2 px-3 text-xs font-medium text-[var(--rm-text-primary)] focus:border-[var(--rm-focus)] focus:outline-none h-[38px]">
    <option value="">Todos los resultados</option>
    <option value="ADMITIDO">Admitido</option>
@@ -101,9 +103,9 @@
  @endif
 </x-ui.filter-bar>
 
- <div class="overflow-hidden rounded-[1.5rem] border border-borde/70 bg-fondo-panel shadow-sm">
+ <div class="rm-table-container overflow-hidden rounded-[1.5rem] border border-borde/70 bg-fondo-panel shadow-sm">
  <div class="overflow-x-auto">
-  <table class="rm-data-table w-full text-left text-sm text-parrafo">
+  <table class="rm-data-table rm-table w-full text-left text-sm text-parrafo">
   <thead class="bg-fondo-app text-[10px] font-bold uppercase tracking-widest text-parrafo/60">
    <tr>
    <th class="px-5 py-4">Adulto Mayor</th>
