@@ -118,7 +118,7 @@
 .rm-admin-dashboard__bar { flex: 0 0 var(--rm-bar-width); min-width: var(--rm-bar-width); max-width: var(--rm-bar-width); border-radius: var(--rm-bar-radius) var(--rm-bar-radius) 3px 3px; background: color-mix(in srgb, var(--rm-admin-bar-color) var(--rm-chart-mark-fill), transparent); box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--rm-admin-bar-color) var(--rm-chart-mark-outline), transparent); transition: background-color var(--rm-chart-motion-hover-duration) var(--rm-chart-motion-ease); transform-origin: center bottom; }
 .rm-admin-dashboard__analysis.rm-chart-entered .rm-admin-dashboard__bar { animation: rmChartAdminBarEnter var(--rm-chart-bar-enter-duration) var(--rm-chart-motion-ease-enter) both; animation-delay: calc(var(--rm-chart-bar-index, 0) * var(--rm-chart-stagger-fast)); }
 @keyframes rmChartAdminBarEnter { from { transform: scaleY(0); } to { transform: scaleY(1); } }
-.rm-admin-dashboard__bar-group:hover .rm-admin-dashboard__bar { background: color-mix(in srgb, var(--rm-admin-bar-color) 42%, transparent); }
+.rm-admin-dashboard__bar-group:hover .rm-admin-dashboard__bar { background: color-mix(in srgb, var(--rm-admin-bar-color) 68%, transparent); }
 .rm-admin-dashboard__bar--mint { --rm-admin-bar-color: var(--rm-chart-1); }
 .rm-admin-dashboard__bar--taupe { --rm-admin-bar-color: var(--rm-chart-2); }
 .rm-admin-dashboard__bar-group small { color: var(--rm-chart-axis-text); font: 500 11px/1.2 var(--rm-font-friendly); font-variant-numeric: tabular-nums; }

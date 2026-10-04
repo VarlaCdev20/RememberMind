@@ -18,9 +18,9 @@ const values = {
     '--rm-line-area-opacity': '.12',
     '--rm-bar-width': '18px',
     '--rm-bar-radius': '10px',
-    '--rm-bar-fill-opacity': '.24',
-    '--rm-bar-fill-hover-opacity': '.42',
-    '--rm-donut-ring-opacity': '.24',
+    '--rm-bar-fill-opacity': '.52',
+    '--rm-bar-fill-hover-opacity': '.68',
+    '--rm-donut-ring-opacity': '.52',
     '--rm-chart-mark-border-opacity': '.88',
     '--rm-donut-cutout': '76%',
     '--rm-chart-bar-enter-duration': '600ms',
@@ -68,7 +68,7 @@ test('factory produce línea, barras y donut coherentes sin inventar categorías
     assert.equal(bars.type, 'bar');
     assert.equal(bars.data.datasets[0].borderRadius, 10);
     assert.equal(bars.data.datasets[0].maxBarThickness, 18);
-    assert.equal(bars.data.datasets[0].backgroundColor, 'rgba(127, 175, 216, 0.24)');
+    assert.equal(bars.data.datasets[0].backgroundColor, 'rgba(127, 175, 216, 0.52)');
     assert.equal(bars.data.datasets[0].borderColor, 'rgba(127, 175, 216, 0.88)');
     assert.equal(bars.data.datasets[0].borderWidth, 2);
 
@@ -77,10 +77,10 @@ test('factory produce línea, barras y donut coherentes sin inventar categorías
     const donut = rmSemanticChartConfig('donut', 'alerts', ['Abiertas', 'Cerradas'], [1, 2]);
     assert.equal(donut.data.datasets[0].data[0], 1);
     assert.equal(donut.options.cutout, '76%');
-    assert.equal(donut.data.datasets[0].backgroundColor[0], 'rgba(226, 139, 121, 0.24)');
+    assert.equal(donut.data.datasets[0].backgroundColor[0], 'rgba(226, 139, 121, 0.52)');
     assert.equal(donut.data.datasets[0].borderColor[0], 'rgba(226, 139, 121, 0.88)');
     const pie = rmPieChartConfig(['A', 'B'], [1, 2], ['#7FA883', '#7FAFD8']);
-    assert.equal(pie.data.datasets[0].backgroundColor[0], 'rgba(127, 168, 131, 0.24)');
+    assert.equal(pie.data.datasets[0].backgroundColor[0], 'rgba(127, 168, 131, 0.52)');
     assert.equal(pie.data.datasets[0].borderColor[0], 'rgba(127, 168, 131, 0.88)');
     assert.throws(() => rmSemanticChartConfig('radar', 'rehab', ['A'], [
         { data: [1] }, { data: [2] }, { data: [3] },

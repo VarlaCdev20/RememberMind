@@ -24,7 +24,7 @@ export function rmDoughnutChartConfig(labels, data, colors, customOptions = {}) 
     const defaults = rmDoughnutDefaults();
     
     // Convertir colores a translúcidos con bordes nítidos para efecto vidrio/luz
-    const translucentBg = colors.map(c => rmHexToRgba(c, rmChartNumber('--rm-donut-ring-opacity', .24)));
+    const translucentBg = colors.map(c => rmHexToRgba(c, rmChartNumber('--rm-donut-ring-opacity', .52)));
     const segmentBorder = colors.map(c => rmHexToRgba(c, rmChartNumber('--rm-chart-mark-border-opacity', .88)));
 
     return {
@@ -75,7 +75,7 @@ export function rmBarHorizontalChartConfig(labels, data, colors, customOptions =
     const suggestedMax = maxVal + Math.ceil(maxVal * 0.28) + 1;
 
     // Colores intensos con acabado traslúcido elegante
-    const translucentBg = colors.map(c => rmHexToRgba(c, rmChartNumber('--rm-hbar-fill-opacity', .24)));
+    const translucentBg = colors.map(c => rmHexToRgba(c, rmChartNumber('--rm-hbar-fill-opacity', .52)));
     const borderColors  = colors.map(c => rmHexToRgba(c, rmChartNumber('--rm-chart-mark-border-opacity', .88)));
 
     const base = rmBaseChartOptions();
@@ -235,8 +235,8 @@ export function rmBarChartConfig(labels, datasets, customOptions = {}) {
                 const fillSource = ds.backgroundColor || ds.borderColor;
                 const edgeSource = ds.borderColor || ds.backgroundColor;
                 const bg = Array.isArray(fillSource)
-                    ? fillSource.map(c => rmHexToRgba(c, rmChartNumber('--rm-bar-fill-opacity', .24)))
-                    : (fillSource ? rmHexToRgba(fillSource, rmChartNumber('--rm-bar-fill-opacity', .24)) : undefined);
+                    ? fillSource.map(c => rmHexToRgba(c, rmChartNumber('--rm-bar-fill-opacity', .52)))
+                    : (fillSource ? rmHexToRgba(fillSource, rmChartNumber('--rm-bar-fill-opacity', .52)) : undefined);
                 const border = Array.isArray(edgeSource)
                     ? edgeSource.map(c => rmHexToRgba(c, rmChartNumber('--rm-chart-mark-border-opacity', .88)))
                     : (edgeSource ? rmHexToRgba(edgeSource, rmChartNumber('--rm-chart-mark-border-opacity', .88)) : undefined);
@@ -279,7 +279,7 @@ export function rmStackedBarChartConfig(labels, datasets, customOptions = {}) {
                     barPercentage: 0.86,
                     categoryPercentage: 0.78,
                     borderWidth: 2,
-                    backgroundColor: fillSource ? toColor(fillSource, rmChartNumber('--rm-bar-fill-opacity', .24)) : ds.backgroundColor,
+                    backgroundColor: fillSource ? toColor(fillSource, rmChartNumber('--rm-bar-fill-opacity', .52)) : ds.backgroundColor,
                     borderColor: edgeSource ? toColor(edgeSource, rmChartNumber('--rm-chart-mark-border-opacity', .88)) : ds.borderColor,
                 };
             })
@@ -299,7 +299,7 @@ export function rmStackedBarChartConfig(labels, datasets, customOptions = {}) {
 export function rmPieChartConfig(labels, data, colors, customOptions = {}) {
     const defaults = rmDoughnutDefaults();
     delete defaults.cutout;
-    const translucentBg = colors.map(c => rmHexToRgba(c, rmChartNumber('--rm-donut-ring-opacity', .24)));
+    const translucentBg = colors.map(c => rmHexToRgba(c, rmChartNumber('--rm-donut-ring-opacity', .52)));
     const borderColors = colors.map(c => rmHexToRgba(c, rmChartNumber('--rm-chart-mark-border-opacity', .88)));
 
     return {
