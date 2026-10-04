@@ -9,8 +9,8 @@
     border-radius: 50%;
     pointer-events: none;
     background: radial-gradient(circle,
-        color-mix(in srgb, var(--rm-role-primary, var(--rm-palette-sage-300)) 17%, transparent) 0%,
-        color-mix(in srgb, var(--rm-role-primary, var(--rm-palette-sage-300)) 7%, transparent) 32%,
+        color-mix(in srgb, var(--rm-role-psychology) 17%, transparent) 0%,
+        color-mix(in srgb, var(--rm-role-psychology) 7%, transparent) 32%,
         transparent 78%);
     filter: blur(22px);
     opacity: var(--rm-cursor-visible, 0);
@@ -20,8 +20,8 @@
 
 :is(.dark, [data-theme="dark"]) .rm-shell .rm-cursor-glow {
     background: radial-gradient(circle,
-        color-mix(in srgb, var(--rm-palette-petroleum-mint) 12%, transparent) 0%,
-        color-mix(in srgb, var(--rm-palette-petroleum-mint) 5%, transparent) 35%,
+        color-mix(in srgb, var(--rm-role-psychology) 12%, transparent) 0%,
+        color-mix(in srgb, var(--rm-role-psychology) 5%, transparent) 35%,
         transparent 78%);
 }
 
