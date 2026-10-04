@@ -1,0 +1,30 @@
+/* Halo ambiental del puntero; no altera el cursor ni recibe interacciones. */
+.rm-shell .rm-cursor-glow {
+    position: fixed;
+    top: var(--mouse-y, -500px);
+    left: var(--mouse-x, -500px);
+    z-index: 10;
+    width: clamp(220px, 25vw, 340px);
+    aspect-ratio: 1;
+    border-radius: 50%;
+    pointer-events: none;
+    background: radial-gradient(circle,
+        color-mix(in srgb, var(--rm-role-primary, var(--rm-palette-sage-300)) 20%, transparent) 0%,
+        color-mix(in srgb, var(--rm-role-primary, var(--rm-palette-sage-300)) 9%, transparent) 35%,
+        transparent 72%);
+    filter: blur(16px);
+    opacity: var(--rm-cursor-visible, 0);
+    transform: translate(-50%, -50%);
+    transition: top 130ms ease-out, left 130ms ease-out, opacity 180ms ease-out;
+}
+
+:is(.dark, [data-theme="dark"]) .rm-shell .rm-cursor-glow {
+    background: radial-gradient(circle,
+        color-mix(in srgb, var(--rm-palette-petroleum-mint) 15%, transparent) 0%,
+        color-mix(in srgb, var(--rm-palette-petroleum-mint) 6%, transparent) 38%,
+        transparent 72%);
+}
+
+@media (hover: none), (pointer: coarse), (prefers-reduced-motion: reduce) {
+    .rm-shell .rm-cursor-glow { display: none; }
+}

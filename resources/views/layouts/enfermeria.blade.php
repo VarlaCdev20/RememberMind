@@ -184,6 +184,7 @@
         </main>
     </div>
 
+    <x-layout.cursor-glow />
     <x-ui.sweetalert />
 
     @stack('modals')
