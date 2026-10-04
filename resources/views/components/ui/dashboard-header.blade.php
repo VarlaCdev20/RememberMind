@@ -22,6 +22,20 @@
 @endphp
 <header {{ $attributes->class('rm-dashboard-header') }} data-accent="{{ $accentToken }}">
     <div class="rm-dashboard-header__content">
+        <div class="rm-dashboard-header__ornaments" aria-hidden="true">
+            <span class="rm-dashboard-header__ornament rm-dashboard-header__ornament--care">
+                <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="6" r="2.5" />
+                    <path d="m12 10-2 8 6 3 3 7M11 14l7 2 4-3M10 18l-4 9M24 17v11m0-11 3-2" />
+                </svg>
+            </span>
+            <span class="rm-dashboard-header__ornament rm-dashboard-header__ornament--medical">
+                <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M7 5v10a7 7 0 0 0 14 0V5M5 5h4m10 0h4M14 22v1a5 5 0 0 0 10 0v-3" />
+                    <circle cx="25" cy="17" r="2" />
+                </svg>
+            </span>
+        </div>
         <p class="rm-dashboard-header__eyebrow">{{ $eyebrow }}</p>
         <div class="rm-dashboard-header__heading">
             <h1 class="rm-dashboard-header__title">{{ $title }}</h1>
