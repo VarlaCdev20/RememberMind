@@ -8,8 +8,14 @@
     $ubicacion = $habitacion ? (str_starts_with(mb_strtolower($habitacion), 'hab') ? $habitacion : 'Hab. '.$habitacion).($cama ? ' · '.(str_starts_with(mb_strtolower($cama), 'cama') ? $cama : 'Cama '.$cama) : '') : 'Sin ubicación asignada';
     $alertas = (int) $paciente->alertas_criticas_count;
     $codigo = $paciente->cod_residente;
+    $usuario = auth()->user();
+    $puedeRegistrarControl = !$modoConsulta && $usuario?->can('signos_vitales.crear');
+    $puedeVerCuidados = $usuario?->can('enfermeria.ver_ficha_paciente') && $usuario?->can('planes_cuidado.ver');
+    $puedeVerMedicacion = $usuario?->can('enfermeria.ver_ficha_paciente') && ($usuario?->can('prescripciones.ver') || $usuario?->can('administraciones_medicacion.ver'));
+    $puedeVerAlertas = $usuario?->can('alertas.ver');
+    $tieneAcciones = $puedeRegistrarControl || $puedeVerCuidados || $puedeVerMedicacion || $puedeVerAlertas;
 @endphp
-<article wire:key="resident-card-{{ $codigo }}" class="rm-resident-directory__item rm-resident-directory__item--card rm-resident-compact-card {{ $this->residente === $codigo ? 'is-selected' : '' }}" role="listitem">
+<article wire:key="resident-card-{{ $codigo }}" class="rm-resident-directory__item rm-resident-directory__item--card rm-resident-compact-card {{ $this->residente === $codigo ? 'is-selected' : '' }}" role="listitem" x-data="{ open: false }" :class="{ 'has-open-menu': open }">
     <div class="rm-resident-compact-card__identity">
         <button type="button" wire:click="seleccionarResidente('{{ $codigo }}')" class="rm-resident-directory__avatar-button" aria-label="Ver resumen de {{ $nombre }}">
             @if($paciente->foto)
@@ -30,14 +36,17 @@
         </div>
         <p class="rm-resident-compact-card__alert {{ $alertas > 0 ? 'has-alerts' : '' }}"><i class="ph-bold {{ $alertas > 0 ? 'ph-warning-circle' : 'ph-check-circle' }}" aria-hidden="true"></i><span>{{ $alertas > 0 ? $alertas.' '.($alertas === 1 ? 'alerta prioritaria' : 'alertas prioritarias') : 'Sin alertas prioritarias' }}</span></p>
     </div>
-    <div class="rm-resident-compact-card__footer" x-data="{ open: false }" @keydown.escape.window="open = false">
+    <div class="rm-resident-compact-card__footer" @keydown.escape.stop="if (open) { open = false; $refs.more.focus() }">
         <button type="button" wire:click="seleccionarResidente('{{ $codigo }}')" class="rm-resident-directory__open" aria-label="Ver resumen de {{ $nombre }}">Ver resumen <i class="ph-bold ph-arrow-right" aria-hidden="true"></i></button>
-        <button type="button" class="rm-resident-compact-card__more" @click="open = !open" :aria-expanded="open.toString()" aria-label="Más acciones para {{ $nombre }}" aria-haspopup="menu"><i class="ph-bold ph-dots-three" aria-hidden="true"></i></button>
-        <div class="rm-resident-compact-card__menu" x-show="open" x-cloak @click.outside="open = false" role="menu">
-            @if(!$modoConsulta && auth()->user()?->can('signos_vitales.crear'))<button type="button" role="menuitem" wire:click="abrirRegistrarSignos('{{ $codigo }}')" @click="open = false">Registrar control</button>@endif
-            @if(auth()->user()?->can('enfermeria.ver_ficha_paciente') && auth()->user()?->can('planes_cuidado.ver'))<a role="menuitem" href="{{ route('admin.enfermeria.pacientes.ficha', ['adulto' => $codigo, 'tab' => 'cuidados']) }}">Ver cuidados</a>@endif
-            @if(auth()->user()?->can('enfermeria.ver_ficha_paciente') && (auth()->user()?->can('prescripciones.ver') || auth()->user()?->can('administraciones_medicacion.ver')))<a role="menuitem" href="{{ route('admin.enfermeria.pacientes.ficha', ['adulto' => $codigo, 'tab' => 'medicacion']) }}">Ver medicación</a>@endif
-            @can('alertas.ver')<div class="rm-resident-compact-card__menu-divider"></div><a role="menuitem" href="{{ route('admin.enfermeria.alertas', ['adulto' => $codigo]) }}">Ver alertas</a>@endcan
-        </div>
+        @if($tieneAcciones)
+            <button type="button" x-ref="more" class="rm-resident-compact-card__more" :class="{ 'is-open': open }" @click="open = !open; if (open) $nextTick(() => $refs.menu.querySelector('a, button')?.focus())" :aria-expanded="open.toString()" aria-controls="resident-actions-{{ $codigo }}" aria-label="Más acciones para {{ $nombre }}" aria-haspopup="true"><i class="ph-bold ph-dots-three" aria-hidden="true"></i></button>
+            <div id="resident-actions-{{ $codigo }}" x-ref="menu" class="rm-resident-compact-card__menu" x-show="open" x-cloak x-transition.opacity.duration.150ms @click.outside="open = false" role="group" aria-label="Acciones para {{ $nombre }}">
+                <div class="rm-resident-compact-card__menu-heading">Acciones del residente</div>
+                @if($puedeRegistrarControl)<button type="button" wire:click="abrirRegistrarSignos('{{ $codigo }}')" @click="open = false"><span class="rm-resident-compact-card__menu-icon"><i class="ph-bold ph-heartbeat" aria-hidden="true"></i></span><span>Registrar control</span></button>@endif
+                @if($puedeVerCuidados)<a href="{{ route('admin.enfermeria.pacientes.ficha', ['adulto' => $codigo, 'tab' => 'cuidados']) }}"><span class="rm-resident-compact-card__menu-icon"><i class="ph-bold ph-heart" aria-hidden="true"></i></span><span>Ver cuidados</span></a>@endif
+                @if($puedeVerMedicacion)<a href="{{ route('admin.enfermeria.pacientes.ficha', ['adulto' => $codigo, 'tab' => 'medicacion']) }}"><span class="rm-resident-compact-card__menu-icon"><i class="ph-bold ph-pill" aria-hidden="true"></i></span><span>Ver medicación</span></a>@endif
+                @if($puedeVerAlertas)<div class="rm-resident-compact-card__menu-divider" aria-hidden="true"></div><a href="{{ route('admin.enfermeria.alertas', ['adulto' => $codigo]) }}"><span class="rm-resident-compact-card__menu-icon"><i class="ph-bold ph-warning-circle" aria-hidden="true"></i></span><span>Ver alertas</span>@if($alertas > 0)<span class="rm-resident-compact-card__menu-count" aria-label="{{ $alertas }} prioritarias">{{ $alertas }}</span>@endif</a>@endif
+            </div>
+        @endif
     </div>
 </article>
