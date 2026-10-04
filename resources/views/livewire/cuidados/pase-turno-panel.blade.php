@@ -2,23 +2,8 @@
 <div class="space-y-6 font-sans text-[var(--rm-text-primary)]" >
 
     {{-- CABECERA INSTITUCIONAL --}}
-    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between rounded-2xl bg-[var(--rm-surface)] dark:bg-[var(--rm-surface)] border border-[var(--rm-border)] dark:border-[var(--rm-border)] p-5 sm:p-6 shadow-sm">
-        <div class="space-y-1">
-            <div class="flex items-center gap-3">
-                <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-[var(--rm-action-primary-soft)] text-[var(--rm-action-primary)] dark:bg-[var(--rm-action-primary-soft)]">
-                    <i class="ph-bold ph-arrows-left-right text-2xl"></i>
-                </div>
-                <div>
-                    <h1 class="text-2xl font-black tracking-tight text-[var(--rm-text-primary)] dark:text-[var(--rm-surface)]">
-                        Pases de turno <span class="sr-only">Pase de Turno</span>
-                    </h1>
-                    <p class="text-xs font-medium text-[var(--rm-text-secondary)] dark:text-[var(--rm-text-primary)]">
-                        Continuidad de cuidados y comunicación entre jornadas
-                    </p>
-                </div>
-            </div>
-        </div>
-
+    <x-ui.collection-header title="Pases de turno" subtitle="Continuidad de cuidados y comunicación entre jornadas." icon="ph-arrows-left-right" eyebrow="Continuidad asistencial">
+      <x-slot:actions>
         {{-- Selector de Pestañas Principales --}}
         <div class="inline-flex rounded-xl bg-[var(--rm-surface-soft)] dark:bg-[var(--rm-surface)] p-1 border border-[var(--rm-border)] dark:border-[var(--rm-border)]">
             <button wire:click="cambiarTab('entrega')"
@@ -32,7 +17,8 @@
                 <span>Historial de pases</span>
             </button>
         </div>
-    </div>
+      </x-slot:actions>
+    </x-ui.collection-header>
 
     {{-- MENSAJES FLASH --}}
     @if(session()->has('mensaje'))

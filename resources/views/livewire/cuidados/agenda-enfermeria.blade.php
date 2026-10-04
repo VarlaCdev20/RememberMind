@@ -1,27 +1,10 @@
 ﻿<!-- rm-filter-bar -->
-<div class="space-y-4 font-sans bg-[var(--rm-surface)] dark:bg-[var(--rm-surface-soft)] p-3 sm:p-5 rounded-2xl">
+<div class="space-y-4 font-sans bg-transparent p-3 sm:p-5">
     {{-- ==================================================
          1. CABECERA INSTITUCIONAL Y NAVEGACIÓN DE TURNO
          ================================================== --}}
-    <header class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 pb-2 border-b border-[var(--rm-border)]/70 dark:border-[var(--rm-border)]">
-        <div>
-            <span class="text-[11px] font-bold uppercase tracking-wider text-[var(--rm-action-primary-ink)] dark:text-[var(--rm-action-primary)] block">
-                CENTRO GERIÁTRICO LOS ALMENDROS · ENFERMERÍA
-            </span>
-            <div class="flex items-center gap-2 mt-0.5">
-                <h1 class="text-xl sm:text-2xl font-bold text-[var(--rm-text-primary)] dark:text-[var(--rm-text-inverse)] tracking-tight">
-                    {{ $esSuperAdmin ? 'Agenda institucional de Enfermería' : 'Agenda Operativa de Cuidados' }}
-                </h1>
-                <span class="text-[11px] font-mono text-[var(--rm-text-secondary)] dark:text-[var(--rm-text-muted)] bg-[var(--rm-surface)] dark:bg-[var(--rm-surface)] px-2 py-0.5 rounded-lg border border-[var(--rm-border)] dark:border-[var(--rm-border)]">
-                    Hoy, {{ today()->translatedFormat('d \d\e F') }}
-                </span>
-            </div>
-            <p class="text-xs text-[var(--rm-text-secondary)] dark:text-[var(--rm-text-muted)] mt-0.5">
-                {{ $esSuperAdmin ? 'Supervisión integral de alertas, medicación y cuidados de todos los residentes.' : 'Programación asistencial del turno basada en planes clínicos individuales.' }}
-            </p>
-        </div>
-
-        <div class="flex flex-wrap items-center gap-2 self-start lg:self-center">
+    <x-ui.collection-header :title="$esSuperAdmin ? 'Agenda institucional de Enfermería' : 'Agenda operativa de cuidados'" :subtitle="$esSuperAdmin ? 'Supervisión de alertas, medicación y cuidados de los residentes.' : 'Programación asistencial del turno basada en planes clínicos individuales.'" icon="ph-calendar-check" eyebrow="Enfermería" :date="today()">
+      <x-slot:actions>
             <a href="{{ route('admin.enfermeria.dashboard') }}" 
                class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-[var(--rm-surface)] dark:bg-[var(--rm-surface)] text-[var(--rm-text-primary)] dark:text-[var(--rm-text-inverse)] border border-[var(--rm-border)] dark:border-[var(--rm-border)] hover:bg-[var(--rm-surface-soft)] transition">
                 <i class="ph ph-squares-four text-sm text-[var(--rm-action-primary-ink)]"></i>
@@ -47,8 +30,8 @@
                     <span>Recibido</span>
                 </span>
             @endif
-        </div>
-    </header>
+      </x-slot:actions>
+    </x-ui.collection-header>
 
     {{-- ==================================================
          2. PESTAÑAS PRINCIPALES: AGENDA | HISTORIAL
@@ -85,11 +68,13 @@
         <x-ui.filter-bar class="mb-4">
             <div class="w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-12 gap-2 items-center">
                 {{-- Búsqueda textual --}}
-                <div class="lg:col-span-4 relative flex items-center">
+                <div class="lg:col-span-4">
+                    <label for="agenda-buscar" class="rm-collection-filter-label">Buscar en la agenda</label>
+                    <div class="relative flex items-center">
                     <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-[var(--rm-text-secondary)]">
                         <i class="ph-bold ph-magnifying-glass text-base"></i>
                     </span>
-                    <input type="text"
+                    <input id="agenda-buscar" type="text"
                         wire:model.live.debounce.300ms="buscar"
                         placeholder="Buscar residente, intervención o plan..."
                         class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-input-bg)] py-2 pl-9 pr-8 text-xs font-medium text-[var(--rm-text-primary)] placeholder-[var(--rm-text-secondary)] focus:border-[var(--rm-primary)] focus:ring-1 focus:ring-[var(--rm-primary)] focus:outline-none h-[38px]" />
@@ -98,11 +83,13 @@
                             <i class="ph-bold ph-x-circle text-base"></i>
                         </button>
                     @endif
+                    </div>
                 </div>
 
                 {{-- Prioridad --}}
                 <div class="lg:col-span-3">
-                    <select wire:model.live="filtroPrioridad" class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-input-bg)] py-2 px-3 text-xs font-medium text-[var(--rm-text-primary)] focus:border-[var(--rm-primary)] focus:ring-1 focus:ring-[var(--rm-primary)] focus:outline-none h-[38px] cursor-pointer">
+                    <label for="agenda-prioridad" class="rm-collection-filter-label">Prioridad</label>
+                    <select id="agenda-prioridad" wire:model.live="filtroPrioridad" class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-input-bg)] py-2 px-3 text-xs font-medium text-[var(--rm-text-primary)] focus:border-[var(--rm-primary)] focus:ring-1 focus:ring-[var(--rm-primary)] focus:outline-none h-[38px] cursor-pointer">
                         <option value="">Prioridad (Todas)</option>
                         <option value="ALTA">Alta</option>
                         <option value="MEDIA">Media</option>
@@ -112,7 +99,8 @@
 
                 {{-- Estado --}}
                 <div class="lg:col-span-2">
-                    <select wire:model.live="filtroEstado" class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-input-bg)] py-2 px-3 text-xs font-medium text-[var(--rm-text-primary)] focus:border-[var(--rm-primary)] focus:ring-1 focus:ring-[var(--rm-primary)] focus:outline-none h-[38px] cursor-pointer">
+                    <label for="agenda-estado" class="rm-collection-filter-label">Estado</label>
+                    <select id="agenda-estado" wire:model.live="filtroEstado" class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-input-bg)] py-2 px-3 text-xs font-medium text-[var(--rm-text-primary)] focus:border-[var(--rm-primary)] focus:ring-1 focus:ring-[var(--rm-primary)] focus:outline-none h-[38px] cursor-pointer">
                         <option value="">Estado (Todos)</option>
                         <option value="ALERTA">Con alerta activa</option>
                         <option value="VENCIDA">Vencidas</option>
@@ -123,7 +111,8 @@
 
                 {{-- Residente --}}
                 <div class="lg:col-span-3">
-                    <select wire:model.live="filtroResidente" class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-input-bg)] py-2 px-3 text-xs font-medium text-[var(--rm-text-primary)] focus:border-[var(--rm-primary)] focus:ring-1 focus:ring-[var(--rm-primary)] focus:outline-none h-[38px] cursor-pointer">
+                    <label for="agenda-residente" class="rm-collection-filter-label">Residente</label>
+                    <select id="agenda-residente" wire:model.live="filtroResidente" class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-input-bg)] py-2 px-3 text-xs font-medium text-[var(--rm-text-primary)] focus:border-[var(--rm-primary)] focus:ring-1 focus:ring-[var(--rm-primary)] focus:outline-none h-[38px] cursor-pointer">
                         <option value="">Todos los residentes</option>
                         @foreach($residentes as $res)
                             <option value="{{ $res->cod_residente }}">
