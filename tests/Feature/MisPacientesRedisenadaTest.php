@@ -6,12 +6,14 @@ use App\Frontend\Livewire\Enfermeria\Cuidados\MisPacientes;
 use App\Models\Admision;
 use App\Models\AdultoMayor;
 use App\Models\Alerta;
+use App\Models\Alergia;
 use App\Models\Area;
 use App\Models\AsignacionResidenteJornada;
 use App\Models\Atencion;
 use App\Models\Cama;
 use App\Models\Habitacion;
 use App\Models\HorarioPrescripcion;
+use App\Models\IndicacionClinica;
 use App\Models\Jornada;
 use App\Models\Medicamento;
 use App\Models\OcupacionCama;
@@ -432,12 +434,18 @@ class MisPacientesRedisenadaTest extends TestCase
             ->assertSet('mostrarPanelDetalle', true)
             ->assertSet('drawerPaso', 'resident-summary')
             ->assertSee('Resumen del residente')
-            ->assertSee('Resumen clínico')
+            ->assertSee('Estado actual')
+            ->assertSee('Información importante')
+            ->assertSee('Seguimiento reciente')
+            ->assertDontSee('Estado de salud')
             ->assertSee('Registrar')
             ->assertSee('Ver ficha');
 
         $html = $vista->html();
         $this->assertSame(1, substr_count($html, 'class="rm-drawer-backdrop"'));
+        preg_match('/<header class="rm-resident-summary__identity">(.*?)<\/header>/s', $html, $identidad);
+        $this->assertNotEmpty($identidad);
+        $this->assertStringNotContainsString('<img', $identidad[1]);
         $this->assertSame(1, substr_count($html, 'class="rm-drawer-footer'));
         $this->assertSame(1, substr_count($html, 'class="rm-modal-shell fixed inset-0'));
         $this->assertStringContainsString(route('admin.enfermeria.pacientes.ficha', ['adulto' => $this->residenteEstable->cod_residente]), $html);
@@ -447,45 +455,70 @@ class MisPacientesRedisenadaTest extends TestCase
             ->assertSet('mostrarPanelDetalle', false)
             ->assertSet('mostrarSelectorModal', true)
             ->assertSet('drawerPaso', 'register-selector')
-            ->assertSee('Nuevo registro')
-            ->assertSee('Volver a la vista rápida')
-            ->assertSee('Registro del residente seleccionado')
+            ->assertSee('Registrar para Pedro Gomez Paredes')
+            ->assertSee('Selecciona qué deseas registrar')
             ->assertSee('Signos vitales')
-            ->assertSee('Medicación programada')
-            ->assertSee('Valoración de dolor')
-            ->assertSee('Cuidado de alimentación')
-            ->assertSee('Cuidado de eliminación')
-            ->assertSee('Cuidado de movilidad')
-            ->assertSee('Seguimiento diario')
-            ->assertSee('Curación o procedimiento')
+            ->assertSee('Dolor')
+            ->assertSee('Ingesta')
+            ->assertSee('Eliminación')
+            ->assertSee('Movilidad')
+            ->assertSee('Administración de medicación')
+            ->assertSee('Curación')
             ->assertSet('tieneMedicacionProgramadaPendiente', false)
-            ->assertSee('No hay prescripciones vigentes.');
+            ->assertSee('Sin dosis pendiente');
 
-        $this->assertStringNotContainsString('class="rm-modal-panel__drag-handle"', $vista->html());
+        $this->assertStringContainsString('class="rm-modal-panel__drag-handle"', $vista->html());
         $this->assertStringContainsString('role="dialog" aria-modal="true" aria-labelledby="resident-register-titulo"', $vista->html());
         $this->assertStringContainsString('x-trap.noscroll="show"', $vista->html());
         $this->assertStringContainsString('x-on:keydown.escape.window="if (show', $vista->html());
         $this->assertStringContainsString('$nextTick(() => requestAnimationFrame', $vista->html());
-        preg_match('/<div class="rm-resident-directory__register-options">(.*?)<\/div>/s', $vista->html(), $opciones);
-        $this->assertNotEmpty($opciones);
-        $this->assertSame(8, substr_count($opciones[1], 'class="rm-resident-directory__register-option '));
-        $this->assertTrue(strpos($opciones[1], "abrirFormularioRegistro('signos')") < strpos($opciones[1], "abrirFormularioRegistro('medicacion')"));
-        $this->assertTrue(strpos($opciones[1], "abrirFormularioRegistro('medicacion')") < strpos($opciones[1], "abrirFormularioRegistro('dolor')"));
-        $this->assertTrue(strpos($opciones[1], "abrirFormularioRegistro('dolor')") < strpos($opciones[1], "abrirFormularioRegistro('alimentacion')"));
-        $this->assertTrue(strpos($opciones[1], "abrirFormularioRegistro('alimentacion')") < strpos($opciones[1], "abrirFormularioRegistro('eliminacion')"));
-        $this->assertTrue(strpos($opciones[1], "abrirFormularioRegistro('eliminacion')") < strpos($opciones[1], "abrirFormularioRegistro('movilidad')"));
-        $this->assertTrue(strpos($opciones[1], "abrirFormularioRegistro('movilidad')") < strpos($opciones[1], "abrirFormularioRegistro('seguimiento')"));
-        $this->assertTrue(strpos($opciones[1], "abrirFormularioRegistro('seguimiento')") < strpos($opciones[1], "abrirFormularioRegistro('procedimiento')"));
-        $this->assertStringNotContainsString('Alerta clínica', $opciones[1]);
-        $this->assertMatchesRegularExpression('/wire:click="abrirFormularioRegistro\(\x27medicacion\x27\)"[^>]*disabled/', $opciones[1]);
-        $this->assertStringNotContainsString('href="#"', $opciones[1]);
-        $this->assertStringNotContainsString('type="submit"', $opciones[1]);
+        $this->assertSame(2, substr_count($vista->html(), 'class="rm-quick-register__grid'));
+        $this->assertTrue(strpos($vista->html(), "abrirFormularioRegistro('signos')") < strpos($vista->html(), "abrirFormularioRegistro('dolor')"));
+        $this->assertStringContainsString('Sin formulario directo aquí', $vista->html());
+        $this->assertStringNotContainsString('href="#"', $vista->html());
         $this->assertSame(0, substr_count($vista->html(), 'class="rm-modal-footer'));
 
         $vista->call('cerrarSelectorRegistro')
             ->assertSet('mostrarSelectorModal', false)
             ->assertSet('mostrarPanelDetalle', true)
             ->assertSet('drawerPaso', 'resident-summary');
+    }
+
+    public function test_resumen_usa_alergias_indicaciones_y_seguimiento_reales_con_sus_permisos(): void
+    {
+        $atencion = Atencion::where('cod_residente', $this->residenteEstable->cod_residente)->firstOrFail();
+        Alergia::create([
+            'cod_alergia' => 'ALE_RESUMEN_01',
+            'cod_residente' => $this->residenteEstable->cod_residente,
+            'cod_personal' => $this->personal->cod_personal,
+            'sustancia' => 'Penicilina',
+            'fecha_hora' => now(),
+            'estado' => 'ACTIVA',
+        ]);
+        IndicacionClinica::create([
+            'cod_indicacion' => 'IND_RESUMEN_01',
+            'cod_residente' => $this->residenteEstable->cod_residente,
+            'cod_atencion' => $atencion->cod_atencion,
+            'cod_personal' => $this->personal->cod_personal,
+            'tipo_indicacion' => 'CUIDADO',
+            'descripcion' => 'Registrar tolerancia alimentaria durante el turno.',
+            'fecha_hora' => now(),
+            'estado' => 'ACTIVA',
+        ]);
+        $this->actingAs($this->enfermero);
+
+        Livewire::test(MisPacientes::class)
+            ->call('seleccionarResidente', $this->residenteEstable->cod_residente)
+            ->assertSee('Penicilina')
+            ->assertSee('Registrar tolerancia alimentaria durante el turno.')
+            ->assertSee('Control de signos vitales');
+
+        \Spatie\Permission\Models\Role::findByName('ENFERMEROS')->revokePermissionTo('alergias.ver', 'indicaciones_clinicas.ver');
+        app(\Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
+        $this->actingAs($this->enfermero->fresh());
+        Livewire::test(MisPacientes::class)
+            ->call('seleccionarResidente', $this->residenteEstable->cod_residente)
+            ->assertDontSee('Penicilina');
     }
 
     public function test_ruta_de_mis_residentes_no_atrapa_el_drawer_en_un_ancestro_transformado(): void
@@ -510,7 +543,7 @@ class MisPacientesRedisenadaTest extends TestCase
             ->assertSet('drawerPaso', 'register-selector')
             ->assertSet('mostrarSelectorModal', true)
             ->assertSet('mostrarPanelDetalle', false)
-            ->assertSee('Selecciona el tipo de registro que deseas realizar:')
+            ->assertSee('Selecciona qué deseas registrar')
             ->assertDontSee('Resumen clínico')
             ->call('abrirFormularioRegistro', 'signos')
             ->assertSet('drawerPaso', 'register-form')
@@ -551,13 +584,10 @@ class MisPacientesRedisenadaTest extends TestCase
             ->call('seleccionarResidente', $this->residenteCritico->cod_residente)
             ->call('mostrarSelectorRegistro')
             ->assertSet('residente', $this->residenteCritico->cod_residente)
-            ->assertSee('Luisa Morales Rios')
-            ->assertSee('HAB-102')
-            ->assertSee('CAMA-102B')
-            ->assertSee('Presión arterial descompensada severa.');
+            ->assertSee('Registrar para Luisa Morales Rios');
 
-        $this->assertStringContainsString(asset('storage/residentes/fotos/luisa.jpg'), $vista->html());
-        $this->assertStringNotContainsString('Pedro Gomez Paredes</strong>', $vista->html());
+        $this->assertStringNotContainsString('rm-resident-directory__register-avatar', $vista->html());
+        $this->assertStringNotContainsString('Registrar para Pedro Gomez Paredes', $vista->html());
 
         $vista->call('cerrarSelectorRegistro')->assertSet('mostrarPanelDetalle', true);
     }
@@ -630,7 +660,7 @@ class MisPacientesRedisenadaTest extends TestCase
             ->call('mostrarSelectorRegistro')
             ->assertSet('tieneMedicacionProgramadaPendiente', true)
             ->assertSet('cantidadMedicacionProgramadaPendiente', 1)
-            ->assertSee('1 pendiente')
+            ->assertSee('Administración de medicación')
             ->call('abrirFormularioRegistro', 'medicacion')
             ->assertSet('drawerPaso', 'register-form')
             ->assertSet('mostrarSelectorModal', true)
@@ -680,14 +710,13 @@ class MisPacientesRedisenadaTest extends TestCase
         $css = file_get_contents(resource_path('frontend/styles/design-system/patterns/resident-directory.css'));
 
         $this->assertStringContainsString('.rm-resident-directory__register-modal--selector .rm-modal-panel', $css);
-        $this->assertStringContainsString('max-width: 520px', $css);
-        $this->assertStringContainsString('width: calc(100vw - 32px)', $css);
-        $this->assertStringContainsString('max-height: calc(100dvh - 32px)', $css);
-        $this->assertStringContainsString('grid-template-columns: repeat(2, minmax(0, 1fr))', $css);
+        $this->assertStringContainsString('width: min(560px, calc(100vw - 32px))', $css);
+        $this->assertStringContainsString('max-height: 82dvh', $css);
+        $this->assertStringContainsString('grid-template-columns: repeat(3, minmax(0, 1fr))', $css);
         $this->assertStringContainsString('@media (max-width: 480px)', $css);
         $this->assertStringContainsString('width: calc(100vw - 16px)', $css);
-        $this->assertStringContainsString('grid-template-columns: 1fr', $css);
-        $this->assertStringContainsString('height: 54px', $css);
+        $this->assertStringContainsString('grid-template-columns: repeat(2, minmax(0, 1fr))', $css);
+        $this->assertStringContainsString('min-height: 93px', $css);
         $this->assertStringContainsString('outline: 2px solid var(--rm-focus)', $css);
 
         $this->actingAs($this->enfermero);

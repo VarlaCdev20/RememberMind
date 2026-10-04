@@ -1753,3 +1753,63 @@
         transition: none;
     }
 }
+
+/* Resumen operativo de Enfermería y selector contextual de registros. */
+.rm-resident-summary { display: grid; gap: 22px; color: var(--rm-text-primary); }
+.rm-resident-summary__identity { display: grid; justify-items: center; gap: 9px; padding: 20px 14px 18px; border: 1px solid var(--rm-border-soft); border-radius: var(--rm-radius-card); background: var(--rm-surface-raised); text-align: center; }
+.rm-resident-summary__identity h3 { max-width: 100%; margin: 0; font: 800 clamp(25px, 3vw, 32px)/1.1 var(--rm-font-body); overflow-wrap: anywhere; }
+.rm-resident-summary__identity p { margin: 0; color: var(--rm-text-secondary); font: 600 14px/1.4 var(--rm-font-body); }
+.rm-resident-summary__alert { display: inline-flex; align-items: center; gap: 6px; padding: 6px 11px; border-radius: 999px; background: var(--rm-success-soft); color: var(--rm-success); font-size: 12px; font-weight: 700; }
+.rm-resident-summary__alert.has-alerts { background: var(--rm-danger-soft); color: var(--rm-danger); }
+.rm-resident-summary__section-title { margin: 0 0 10px; font: 800 15px/1.25 var(--rm-font-body); color: var(--rm-text-primary); }
+.rm-resident-summary__grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.rm-resident-summary__current-card, .rm-resident-summary__info-card { display: grid; align-content: start; gap: 8px; min-width: 0; min-height: 103px; padding: 14px; border: 1px solid var(--rm-border-soft); border-radius: 15px; background: var(--rm-surface-raised); }
+.rm-resident-summary__current-card { background: color-mix(in srgb, var(--rm-surface-raised) 82%, var(--rm-info-soft)); }
+.rm-resident-summary__current-card--calm { background: color-mix(in srgb, var(--rm-surface-raised) 80%, var(--rm-success-soft)); }
+.rm-resident-summary__current-card--danger { background: color-mix(in srgb, var(--rm-surface-raised) 82%, var(--rm-danger-soft)); }
+.rm-resident-summary__card-label { display: flex; align-items: center; gap: 7px; color: var(--rm-text-secondary); font-size: 12px; font-weight: 700; }
+.rm-resident-summary__card-label i { color: var(--rm-action-primary); font-size: 17px; }
+.rm-resident-summary__current-card--danger .rm-resident-summary__card-label i { color: var(--rm-danger); }
+.rm-resident-summary__grid strong { color: var(--rm-text-primary); font-size: 14px; line-height: 1.35; overflow-wrap: anywhere; }
+.rm-resident-summary__grid p { margin: 0; color: var(--rm-text-secondary); font-size: 12px; line-height: 1.4; overflow-wrap: anywhere; }
+.rm-resident-summary__timeline { display: grid; gap: 0; margin: 0; padding: 0; list-style: none; }
+.rm-resident-summary__timeline-item { position: relative; display: grid; grid-template-columns: 78px minmax(0, 1fr); gap: 13px; padding: 0 0 17px; }
+.rm-resident-summary__timeline-item::before { content: ''; position: absolute; top: 7px; bottom: 0; left: 83px; width: 1px; background: var(--rm-border-soft); }
+.rm-resident-summary__timeline-item:last-child::before { display: none; }
+.rm-resident-summary__timeline-item::after { content: ''; position: absolute; top: 4px; left: 79px; width: 9px; height: 9px; border-radius: 50%; background: var(--rm-action-primary); }
+.rm-resident-summary__timeline-item time { color: var(--rm-text-muted); font-size: 11px; font-weight: 700; }
+.rm-resident-summary__timeline-item div { padding-left: 5px; }
+.rm-resident-summary__timeline-item strong { font-size: 12px; }
+.rm-resident-summary__timeline-item p, .rm-resident-summary__empty { margin: 3px 0 0; color: var(--rm-text-secondary); font-size: 12px; line-height: 1.45; }
+.rm-resident-directory__footer-actions :is(button,a) { min-height: 44px; }
+
+.rm-resident-directory__register-modal--selector .rm-modal-panel { width: min(560px, calc(100vw - 32px)); max-width: 560px; max-height: 82vh; max-height: 82dvh; }
+.rm-resident-directory__register-modal--selector .rm-modal-header { position: relative; justify-content: center; padding: 29px 54px 15px; text-align: center; }
+.rm-resident-directory__register-modal--selector .rm-modal-header__heading { width: 100%; justify-content: center; }
+.rm-resident-directory__register-modal--selector .rm-modal-header__heading > div { width: 100%; }
+.rm-resident-directory__register-modal--selector .rm-modal-panel__title { display: grid; justify-items: center; gap: 6px; font: 800 21px/1.2 var(--rm-font-body); }
+.rm-resident-directory__register-modal--selector .rm-modal-header__heading p { margin-top: 5px; font: 500 13px/1.35 var(--rm-font-body); }
+.rm-quick-register__header-icon { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 10px; background: var(--rm-action-primary-soft); color: var(--rm-action-primary); font-size: 20px; }
+.rm-resident-directory__register-modal--selector .rm-modal-header__actions { position: absolute; inset: 0 0 auto; height: 0; }
+.rm-resident-directory__register-modal--selector .rm-modal-panel__close { position: absolute; top: 12px; right: 12px; width: 44px; height: 44px; min-width: 44px; border-radius: 12px; }
+.rm-resident-directory__register-modal--selector .rm-modal-panel__drag-handle { position: absolute; top: 5px; left: 50%; width: 72px; height: 20px; min-width: 72px; padding: 0; border: 0; background: transparent; transform: translateX(-50%); }
+.rm-resident-directory__register-modal--selector .rm-modal-panel__drag-handle::before { content: ''; width: 44px; height: 4px; border-radius: 999px; background: var(--rm-border-medium); }
+.rm-resident-directory__register-modal--selector .rm-modal-panel__drag-handle :is(i,span) { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.rm-resident-directory__register-modal--selector .rm-modal-panel__drag-handle:hover { background: transparent; transform: translateX(-50%); }
+.rm-resident-directory__register-modal--selector .rm-modal-body { padding: 15px 20px 20px; }
+.rm-quick-register { display: grid; gap: 18px; }
+.rm-quick-register h4 { margin: 0 0 9px; color: var(--rm-text-secondary); font: 800 12px/1.25 var(--rm-font-body); }
+.rm-quick-register__grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); grid-auto-rows: 1fr; gap: 9px; }
+.rm-quick-register__grid--care { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.rm-quick-register__action { display: grid; align-content: center; justify-items: center; gap: 6px; width: 100%; min-height: 93px; padding: 10px 7px; border: 1px solid var(--rm-border-soft); border-radius: 16px; background: var(--rm-surface-raised); color: var(--rm-text-primary); font: 700 12px/1.2 var(--rm-font-body); text-align: center; cursor: pointer; transition: background-color .16s ease, border-color .16s ease, transform .16s ease; }
+.rm-quick-register__action > i { color: var(--rm-action-primary); font-size: 24px; }
+.rm-quick-register__action--clinical > i { color: var(--rm-clinical); }
+.rm-quick-register__action--lavender > i { color: var(--rm-violet); }
+.rm-quick-register__action--sand > i { color: var(--rm-warning); }
+.rm-quick-register__action--danger > i { color: var(--rm-danger); }
+.rm-quick-register__action:not(:disabled):hover { transform: translateY(-2px); border-color: var(--rm-selected-border); background: var(--rm-action-primary-soft); }
+.rm-quick-register__action:focus-visible { outline: 2px solid var(--rm-focus); outline-offset: 2px; }
+.rm-quick-register__action:disabled { cursor: not-allowed; opacity: .65; }
+.rm-quick-register__action small { color: var(--rm-text-secondary); font-size: 10px; font-weight: 500; }
+@media (max-width: 480px) { .rm-resident-summary__grid { grid-template-columns: 1fr; } .rm-resident-directory__register-modal--selector .rm-modal-panel { width: calc(100vw - 16px); max-width: calc(100vw - 16px); max-height: calc(100dvh - 16px); } .rm-resident-directory__register-modal--selector .rm-modal-body { padding: 12px; } .rm-quick-register__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .rm-resident-directory__register-modal--selector .rm-modal-header { padding-inline: 42px; } }
+@media (prefers-reduced-motion: reduce) { .rm-quick-register__action { transition: none; } .rm-quick-register__action:not(:disabled):hover { transform: none; } }

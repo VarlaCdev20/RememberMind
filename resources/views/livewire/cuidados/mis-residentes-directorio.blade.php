@@ -1,4 +1,4 @@
-<div class="rm-resident-directory" x-data="{ section: 'salud' }" @resident-directory-opened.window="section = 'salud'; $nextTick(() => $el.querySelector('.rm-drawer-header h2')?.focus())" @resident-directory-step-changed.window="$nextTick(() => $el.querySelector('.rm-resident-directory__register-modal .rm-modal-panel')?.focus())" @resident-directory-selector-opened.window="$nextTick(() => requestAnimationFrame(() => $el.querySelector('.rm-resident-directory__register-modal .rm-modal-panel')?.focus()))" @resident-directory-selector-closed.window="$nextTick(() => requestAnimationFrame(() => $el.querySelector('#resident-register-trigger')?.focus()))">
+<div class="rm-resident-directory" x-data="{}" @resident-directory-opened.window="$nextTick(() => $el.querySelector('.rm-drawer-header h2')?.focus())" @resident-directory-step-changed.window="$nextTick(() => $el.querySelector('.rm-resident-directory__register-modal .rm-modal-panel')?.focus())" @resident-directory-selector-opened.window="$nextTick(() => requestAnimationFrame(() => $el.querySelector('.rm-resident-directory__register-modal .rm-modal-panel')?.focus()))" @resident-directory-selector-closed.window="$nextTick(() => requestAnimationFrame(() => $el.querySelector('#resident-register-trigger')?.focus()))">
     <x-ui.residents-page-header :title="$esSuperAdmin ? 'Supervisión de residentes' : 'Mis residentes'" subtitle="Personas asignadas a tu cuidado en esta jornada." :turno="$turnoActual" :modo-consulta="$esModoConsulta" />
 
     <x-ui.resident-filter-toolbar :search="$search" :filtro-rapido="$filtroRapido" :filtro-habitacion="$filtroHabitacion" :orden="$orden" :vista-modo="$vistaModo" :stats="$stats" :habitaciones="$habitaciones" />
@@ -67,7 +67,7 @@
 
     @php
         $esSelectorRegistro = $drawerPaso === 'register-selector';
-        $volverRegistro = $confirmarDescarte ? null : ($esSelectorRegistro ? 'cerrarSelectorRegistro' : ($drawerPaso === 'register-form' ? 'volverPanelDetalle' : null));
+        $volverRegistro = $confirmarDescarte ? null : ($drawerPaso === 'register-form' ? 'volverPanelDetalle' : null);
         $guardarMetodo = match ($registroTipo) {
             'signos' => 'guardarSignos', 'medicacion' => 'guardarMed', 'dolor' => 'guardarDolor',
             'alimentacion', 'eliminacion', 'movilidad' => 'guardarCuidado',
@@ -78,115 +78,7 @@
     <x-ui.drawer-livewire wire:model="mostrarPanelDetalle" title="Resumen del residente" subtitle="Resumen de enfermería" badge="" icon="ph-identification-card" size="lg" closeMethod="cerrarPanelDetalle" :dismissOnBackdrop="true">
         @if($detalleResidente)
             @if($drawerPaso === 'resident-summary')
-            <div class="rm-resident-directory__drawer">
-                <div class="rm-resident-directory__profile">
-                    @if($detalleResidente['foto'])
-                        <img src="{{ $detalleResidente['foto'] }}" alt="" class="rm-resident-directory__portrait">
-                    @else
-                        <span class="rm-resident-directory__portrait rm-resident-directory__portrait--initials" aria-hidden="true">{{ $detalleResidente['iniciales'] }}</span>
-                    @endif
-                    <div class="rm-resident-directory__profile-copy">
-                        <span class="rm-resident-directory__eyebrow">RESIDENTE</span>
-                        <h3>{{ $detalleResidente['nombre_completo'] }}</h3>
-                        <p><i class="ph-bold ph-calendar-blank" aria-hidden="true"></i> {{ $detalleResidente['edad_texto'] ?: 'Edad no registrada' }}</p>
-                        <p><i class="ph-bold ph-bed" aria-hidden="true"></i> {{ $detalleResidente['ubicacion_formateada'] }}</p>
-                        <span class="rm-resident-directory__status rm-resident-directory__status--{{ $detalleResidente['estado_color'] }}">{{ $detalleResidente['estado_humano'] }}</span>
-                    </div>
-                </div>
-                <dl class="rm-resident-directory__facts">
-                    <div><dt><i class="ph-bold ph-calendar-check" aria-hidden="true"></i> Fecha de ingreso</dt><dd>{{ $detalleResidente['fecha_ingreso'] ? \Carbon\Carbon::parse($detalleResidente['fecha_ingreso'])->format('d/m/Y') : 'No registrada' }}</dd></div>
-                    <div><dt><i class="ph-bold ph-clipboard-text" aria-hidden="true"></i> Plan de cuidados</dt><dd>{{ $detalleResidente['plan_prioridad'] ?: 'Sin prioridad registrada' }}</dd></div>
-                </dl>
-
-                <div class="rm-resident-directory__snapshot" aria-label="Datos destacados del residente">
-                    @can('signos_vitales.ver')
-                        <article class="rm-resident-directory__snapshot-card rm-resident-directory__snapshot-card--clinical">
-                            <span class="rm-resident-directory__snapshot-icon" aria-hidden="true"><i class="ph-bold ph-heartbeat"></i></span>
-                            <h4>Último control</h4>
-                            @if($detalleResidente['ultimos_signos'])
-                                <strong>PA {{ $detalleResidente['ultimos_signos']['pa'] ?: '—' }}</strong>
-                                <p>FC {{ $detalleResidente['ultimos_signos']['fc'] }} · SpO₂ {{ $detalleResidente['ultimos_signos']['sat'] }}</p>
-                                <small>{{ $detalleResidente['ultimos_signos']['fecha_hora'] }}</small>
-                            @else
-                                <p>Sin signos vitales registrados.</p>
-                            @endif
-                        </article>
-                    @endcan
-                    @can('alertas.ver')
-                        <article class="rm-resident-directory__snapshot-card {{ $detalleResidente['alertas_count'] > 0 ? 'rm-resident-directory__snapshot-card--alert' : 'rm-resident-directory__snapshot-card--calm' }}">
-                            <span class="rm-resident-directory__snapshot-icon" aria-hidden="true"><i class="ph-bold ph-warning-circle"></i></span>
-                            <h4>Alertas activas</h4>
-                            <strong>{{ $detalleResidente['alertas_count'] }}</strong>
-                            <p>{{ $detalleResidente['alertas_count'] === 0 ? 'Sin alertas activas' : ($detalleResidente['alertas_count'] === 1 ? 'Alerta activa registrada' : 'Alertas activas registradas') }}</p>
-                        </article>
-                    @endcan
-                    @can('planes_cuidado.ver')
-                        <article class="rm-resident-directory__snapshot-card rm-resident-directory__snapshot-card--care">
-                            <span class="rm-resident-directory__snapshot-icon" aria-hidden="true"><i class="ph-bold ph-clipboard-text"></i></span>
-                            <h4>Plan de cuidados</h4>
-                            <strong>{{ $detalleResidente['plan_nombre'] ?: 'Sin plan activo' }}</strong>
-                            <p>{{ $detalleResidente['plan_prioridad'] ?: 'Sin prioridad registrada' }}</p>
-                        </article>
-                    @endcan
-                </div>
-
-                <div class="rm-resident-directory__section-heading">
-                    <h4>Resumen clínico</h4>
-                    <p>Información registrada para consultar antes de atender.</p>
-                </div>
-                <div class="rm-resident-directory__sections">
-                    @if(auth()->user()->can('signos_vitales.ver') || auth()->user()->can('alertas.ver'))
-                        <button type="button" @click="section = section === 'salud' ? '' : 'salud'" :aria-expanded="section === 'salud'" aria-controls="resident-health"><i class="ph-bold ph-heartbeat" aria-hidden="true"></i><span>Estado de salud <small>Últimos controles y alertas registradas</small></span><i class="ph-bold ph-caret-down" aria-hidden="true"></i></button>
-                        <div id="resident-health" x-show="section === 'salud'" x-cloak>
-                            @can('signos_vitales.ver')
-                                @if($detalleResidente['ultimos_signos'])
-                                    <p><strong>Último control</strong> · {{ $detalleResidente['ultimos_signos']['fecha_hora'] }}</p>
-                                    <p>PA {{ $detalleResidente['ultimos_signos']['pa'] }} · FC {{ $detalleResidente['ultimos_signos']['fc'] }} · SpO₂ {{ $detalleResidente['ultimos_signos']['sat'] }}</p>
-                                @else
-                                    <p class="rm-resident-directory__section-empty">Aún no hay signos vitales registrados.</p>
-                                @endif
-                            @endcan
-                            @can('alertas.ver')
-                                @if($detalleResidente['alertas_count'])
-                                    <p>{{ $detalleResidente['alertas_count'] }} {{ $detalleResidente['alertas_count'] === 1 ? 'alerta activa' : 'alertas activas' }}.</p>
-                                @endif
-                            @endcan
-                        </div>
-                    @endif
-                    @can('prescripciones.ver')
-                        <button type="button" @click="section = section === 'medicacion' ? '' : 'medicacion'" :aria-expanded="section === 'medicacion'" aria-controls="resident-medication"><i class="ph-bold ph-pill" aria-hidden="true"></i><span>Medicación <small>Prescripciones vigentes, solo lectura</small></span><i class="ph-bold ph-caret-down" aria-hidden="true"></i></button>
-                        <div id="resident-medication" x-show="section === 'medicacion'" x-cloak>
-                            @forelse($detalleResidente['medicacion'] as $med)
-                                <p><strong>{{ $med['nombre'] }}</strong> · {{ $med['dosis'] ?: 'Dosis no registrada' }} · {{ $med['via'] ?: 'Vía no registrada' }} · {{ $med['frecuencia'] ?: 'Frecuencia no registrada' }}@if($med['horarios']) · Horarios: {{ $med['horarios'] }}@endif @if($med['ultima_administracion']) · Última administración: {{ $med['ultima_administracion'] }}@endif</p>
-                            @empty<p class="rm-resident-directory__section-empty">No hay prescripciones activas registradas.</p>@endforelse
-                        </div>
-                    @endcan
-                    @can('planes_cuidado.ver')
-                        <button type="button" @click="section = section === 'cuidados' ? '' : 'cuidados'" :aria-expanded="section === 'cuidados'" aria-controls="resident-care"><i class="ph-bold ph-clipboard-text" aria-hidden="true"></i><span>Plan de cuidados <small>{{ $detalleResidente['plan_nombre'] ?: 'Actividades registradas' }}</small></span><i class="ph-bold ph-caret-down" aria-hidden="true"></i></button>
-                        <div id="resident-care" x-show="section === 'cuidados'" x-cloak>
-                            @forelse($detalleResidente['cuidados'] as $cuidado)
-                                <p><strong>{{ $cuidado['nombre'] }}</strong> · {{ $cuidado['estado'] }} {{ $cuidado['fecha'] ? '· '.$cuidado['fecha'] : '' }}</p>
-                            @empty<p class="rm-resident-directory__section-empty">No hay cuidados pendientes registrados.</p>@endforelse
-                        </div>
-                    @endcan
-                    @can('notas_clinicas.ver')
-                        <button type="button" @click="section = section === 'observaciones' ? '' : 'observaciones'" :aria-expanded="section === 'observaciones'" aria-controls="resident-notes"><i class="ph-bold ph-note-pencil" aria-hidden="true"></i><span>Observaciones <small>Notas clínicas disponibles</small></span><i class="ph-bold ph-caret-down" aria-hidden="true"></i></button>
-                        <div id="resident-notes" x-show="section === 'observaciones'" x-cloak>
-                            @forelse($detalleResidente['observaciones'] as $nota)
-                                <p><strong>{{ $nota['fecha'] ?: 'Sin fecha' }}</strong> · {{ $nota['contenido'] }}</p>
-                            @empty<p class="rm-resident-directory__section-empty">No hay observaciones registradas.</p>@endforelse
-                        </div>
-                    @endcan
-                    @can('atenciones.ver')
-                        <button type="button" @click="section = section === 'historial' ? '' : 'historial'" :aria-expanded="section === 'historial'" aria-controls="resident-history"><i class="ph-bold ph-clock-counter-clockwise" aria-hidden="true"></i><span>Historial de atención <small>Registros cronológicos disponibles</small></span><i class="ph-bold ph-caret-down" aria-hidden="true"></i></button>
-                        <div id="resident-history" x-show="section === 'historial'" x-cloak>
-                            @forelse($detalleResidente['historial'] as $registro)
-                                <p><strong>{{ $registro['fecha'] ?: 'Sin fecha' }}</strong> · {{ $registro['tipo'] }}</p>
-                            @empty<p class="rm-resident-directory__section-empty">No hay atenciones registradas.</p>@endforelse
-                        </div>
-                    @endcan
-                </div>
-            </div>
+            @include('livewire.cuidados.partials.resident-summary')
             @endif
         @endif
         <x-slot:footer>
@@ -205,16 +97,18 @@
         </x-slot:footer>
     </x-ui.drawer-livewire>
 
-    <x-ui.modal-livewire id="resident-register" wire:model="mostrarSelectorModal" class="rm-resident-directory__register-modal {{ $esSelectorRegistro ? 'rm-resident-directory__register-modal--selector' : ($registroTipo === 'signos' ? 'rm-resident-directory__register-modal--signos' : 'rm-resident-directory__register-modal--form') }}" :title="$registroTipo === 'signos' ? 'Signos vitales' : 'Nuevo registro'" :subtitle="$registroTipo === 'signos' ? 'Registro clínico del residente' : 'Registro del residente seleccionado'" max-width="lg" close-method="cerrarSelectorRegistro" :back-method="$volverRegistro" :back-label="$esSelectorRegistro ? 'Volver a la vista rápida' : 'Volver al selector de registros'" :show-validation="false" :dismiss-on-backdrop="true" :draggable="!$esSelectorRegistro && $registroTipo !== 'signos'">
+    <x-ui.modal-livewire id="resident-register" wire:model="mostrarSelectorModal" class="rm-resident-directory__register-modal {{ $esSelectorRegistro ? 'rm-resident-directory__register-modal--selector' : ($registroTipo === 'signos' ? 'rm-resident-directory__register-modal--signos' : 'rm-resident-directory__register-modal--form') }}" :title="$esSelectorRegistro && $detalleResidente ? 'Registrar para '.\Illuminate\Support\Str::title(mb_strtolower($detalleResidente['nombre_completo'])) : ($registroTipo === 'signos' ? 'Signos vitales' : 'Nuevo registro')" :subtitle="$esSelectorRegistro ? 'Selecciona qué deseas registrar' : ($registroTipo === 'signos' ? 'Registro clínico del residente' : 'Registro del residente seleccionado')" max-width="lg" close-method="cerrarSelectorRegistro" :back-method="$volverRegistro" back-label="Volver al selector de registros" :show-validation="false" :dismiss-on-backdrop="true" :draggable="true">
         <x-slot:icon>
-            @if($registroTipo === 'signos')
+            @if($esSelectorRegistro)
+                <span class="rm-quick-register__header-icon" aria-hidden="true"><i class="ph-bold ph-plus-circle"></i></span>
+            @elseif($registroTipo === 'signos')
                 <span class="rm-signos__header-icon-box" aria-hidden="true">
                     <i class="ph-bold ph-heartbeat rm-signos__header-icon"></i>
                 </span>
             @endif
         </x-slot:icon>
         <x-slot:context>
-            @if($detalleResidente)
+            @if($detalleResidente && !$esSelectorRegistro)
                 <div class="rm-resident-directory__register-context">
                     @if($detalleResidente['foto'])
                         <img src="{{ $detalleResidente['foto'] }}" alt="Foto de {{ $detalleResidente['nombre_completo'] }}" class="rm-resident-directory__register-avatar">

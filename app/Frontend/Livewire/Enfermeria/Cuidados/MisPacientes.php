@@ -12,6 +12,7 @@ use App\Backend\Modulos\Medicacion\Servicios\RegistrarAdministracionMedicacionSe
 use App\Backend\Modulos\Identidad\Servicios\RolePreviewService;
 use App\Models\AdministracionMedicacion;
 use App\Models\Alerta;
+use App\Models\IndicacionClinica;
 use App\Models\AsignacionResidenteJornada;
 use App\Models\Atencion;
 use App\Models\EjecucionCuidado;
@@ -24,6 +25,7 @@ use Carbon\Carbon;
 use Illuminate\Database\QueryException;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 use Livewire\Attributes\Url;
 use Livewire\Attributes\Locked;
 use Livewire\Component;
@@ -796,25 +798,14 @@ class MisPacientes extends Component
             }
         }
 
-        // 4. PRÓXIMA ATENCIÓN
-        $proximaAtencion = Atencion::query()
-            ->where(function ($q) use ($codResidente, $codRes) {
-                $q->where('cod_residente', $codResidente)->orWhere('cod_residente', $codRes);
-            })
-            ->where('fecha_hora', '>=', now())
-            ->orderBy('fecha_hora')
-            ->first();
-
-        $proximaAtencionTexto = null;
-        $proximaAtencionHora = null;
-
-        if ($proximaAtencion) {
-            $proximaAtencionTexto = $proximaAtencion->motivo ?: ($proximaAtencion->tipo_atencion ?: 'Atención programada');
-            $proximaAtencionHora = Carbon::parse($proximaAtencion->fecha_hora)->format('H:i').' · Hoy';
-        } elseif ($proximaMed && $proximaMed['hora']) {
-            $proximaAtencionTexto = 'Administración de '.$proximaMed['nombre'];
-            $proximaAtencionHora = $proximaMed['hora'].' · Hoy';
-        }
+        // Próximo cuidado pendiente del plan; la medicación tiene su propia card.
+        $proximoCuidado = $usuario?->can('ejecuciones_cuidado.ver')
+            ? $adulto->ejecucionesCuidado()->whereIn('estado', ['PENDIENTE', 'EN_PROCESO'])
+                ->where('fecha_hora_programada', '>=', now())
+                ->with('intervencion')->orderBy('fecha_hora_programada')->first()
+            : null;
+        $proximaAtencionTexto = $proximoCuidado ? ($proximoCuidado->intervencion?->nombre ?: 'Cuidado programado') : null;
+        $proximaAtencionHora = $proximoCuidado?->fecha_hora_programada?->format('d/m H:i');
 
         // 5. ALERTAS ACTIVAS
         $alertasList = ($usuario?->can('alertas.ver') ? $alertasActivas : collect())->map(function ($al) {
@@ -884,6 +875,47 @@ class MisPacientes extends Component
                 ])->all()
             : [];
 
+        $alergiasResumen = $usuario?->can('alergias.ver')
+            ? $adulto->alergias()->whereIn('estado', ['ACTIVA', 'ACTIVO'])->orderByDesc('fecha_hora')->limit(3)->pluck('sustancia')->filter()->implode(', ')
+            : null;
+        $indicacionesResumen = $usuario?->can('indicaciones_clinicas.ver')
+            ? IndicacionClinica::query()->where('cod_residente', $codResidente)->whereIn('estado', ['ACTIVA', 'ACTIVO', 'VIGENTE'])->orderByDesc('fecha_hora')->limit(2)->pluck('descripcion')->filter()->map(fn ($texto) => Str::limit(trim((string) $texto), 90))->implode(' · ')
+            : null;
+
+        $seguimientoReciente = collect();
+        if ($ultimoSignoModel) {
+            $seguimientoReciente->push([
+                'fecha_hora' => Carbon::parse($ultimoSignoModel->fecha_hora),
+                'tipo' => 'Control de signos vitales',
+                'dato' => 'PA '.$ultimosSignos['pa'].' · FC '.$ultimosSignos['fc'].' · SpO₂ '.$ultimosSignos['sat'],
+            ]);
+        }
+        if ($usuario?->can('atenciones.ver')) {
+            $adulto->atenciones()->whereIn('tipo_atencion', ['SEGUIMIENTO_DIARIO', 'PROCEDIMIENTO', 'CUIDADO_ENFERMERIA'])
+                ->orderByDesc('fecha_hora')->limit(5)->get()
+                ->each(fn ($item) => $seguimientoReciente->push([
+                    'fecha_hora' => Carbon::parse($item->fecha_hora),
+                    'tipo' => Str::headline((string) $item->getRawOriginal('tipo_atencion')),
+                    'dato' => Str::limit(trim((string) ($item->observacion ?: $item->motivo)), 110),
+                ]));
+        }
+        if ($usuario?->can('ejecuciones_cuidado.ver')) {
+            $adulto->ejecucionesCuidado()->whereNotNull('fecha_hora_ejecucion')
+                ->orderByDesc('fecha_hora_ejecucion')->limit(4)->get()
+                ->each(fn ($item) => $seguimientoReciente->push([
+                    'fecha_hora' => Carbon::parse($item->fecha_hora_ejecucion),
+                    'tipo' => 'Cuidado realizado',
+                    'dato' => Str::limit(trim((string) ($item->observacion ?: $item->resultado)), 110),
+                ]));
+        }
+        $seguimientoReciente = $seguimientoReciente->sortByDesc('fecha_hora')->take(4)
+            ->map(fn ($item) => [
+                'fecha' => $item['fecha_hora']->isToday() ? 'Hoy' : $item['fecha_hora']->format('d/m'),
+                'hora' => $item['fecha_hora']->format('H:i'),
+                'tipo' => $item['tipo'],
+                'dato' => $item['dato'],
+            ])->values()->all();
+
         return [
             'cod_residente' => $codRes,
             'cod_residente' => $codRes,
@@ -913,6 +945,9 @@ class MisPacientes extends Component
             'cuidados' => $cuidados,
             'observaciones' => $observaciones,
             'historial' => $historial,
+            'alergias_resumen' => $alergiasResumen,
+            'indicaciones_resumen' => $indicacionesResumen,
+            'seguimiento_reciente' => $seguimientoReciente,
         ];
     }
 

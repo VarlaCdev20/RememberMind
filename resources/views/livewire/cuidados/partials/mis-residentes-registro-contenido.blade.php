@@ -14,30 +14,7 @@
 
 <div class="rm-resident-directory__register">
     @if($drawerPaso === 'register-selector')
-        <p class="rm-resident-directory__register-intro">Selecciona el tipo de registro que deseas realizar:</p>
-        @if($esModoConsulta || !$esResidenteAsignado)
-            <p class="rm-resident-directory__register-warning" role="status">Para registrar necesitas un turno activo y tener a este residente asignado. Puedes revisar las opciones disponibles.</p>
-        @endif
-        <div class="rm-resident-directory__register-options">
-            @foreach($opcionesRegistro as $opcion)
-                @can($opcion['permiso'])
-                    @php($sinMedicacion = $opcion['tipo'] === 'medicacion' && !$tieneMedicacionProgramadaPendiente)
-                    @php($deshabilitada = $esModoConsulta || !$esResidenteAsignado || $sinMedicacion)
-                    @php($descripcionVisible = $sinMedicacion ? 'No hay prescripciones vigentes.' : $opcion['descripcion'])
-                    <button type="button" class="rm-resident-directory__register-option rm-resident-directory__register-option--{{ $opcion['tipo'] }}" wire:click="abrirFormularioRegistro('{{ $opcion['tipo'] }}')" @disabled($deshabilitada) aria-disabled="{{ $deshabilitada ? 'true' : 'false' }}" aria-label="{{ $opcion['titulo'] }}. {{ $descripcionVisible }}{{ $opcion['tipo'] === 'medicacion' && !$sinMedicacion ? ' '.$cantidadMedicacionProgramadaPendiente.' pendientes.' : '' }}">
-                        <span class="rm-resident-directory__register-option-icon" aria-hidden="true"><i class="ph-bold {{ $opcion['icono'] }}"></i></span>
-                        <span class="rm-resident-directory__register-option-copy">
-                            <strong>{{ $opcion['titulo'] }}</strong>
-                            <small>{{ $descripcionVisible }}</small>
-                        </span>
-                        <i class="ph-bold ph-caret-right" aria-hidden="true"></i>
-                        @if($opcion['tipo'] === 'medicacion' && !$sinMedicacion)
-                            <span class="rm-resident-directory__register-pending" aria-hidden="true">{{ $cantidadMedicacionProgramadaPendiente }} {{ $cantidadMedicacionProgramadaPendiente === 1 ? 'pendiente' : 'pendientes' }}</span>
-                        @endif
-                    </button>
-                @endcan
-            @endforeach
-        </div>
+        @include('livewire.cuidados.partials.quick-register-selector')
     @elseif($drawerPaso === 'register-form')
         <h4 class="rm-resident-directory__form-title">{{ $tituloFormulario }}</h4>
         <p class="rm-resident-directory__register-intro">Completa los datos del registro. Se guardarán en el expediente de este residente.</p>
