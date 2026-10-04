@@ -2,31 +2,15 @@
 <div class="space-y-6 font-sans text-[var(--rm-text-primary)]" >
 
     {{-- CABECERA CLÍNICA INSTITUCIONAL --}}
-    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between rounded-2xl bg-[var(--rm-surface)] dark:bg-[var(--rm-surface)] border border-[var(--rm-border)] dark:border-[var(--rm-text-body)] p-5 sm:p-6 shadow-sm">
-        <div class="space-y-1">
-            <div class="flex items-center gap-3">
-                <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-[var(--rm-warning-soft)] text-[var(--rm-warning)] dark:bg-[var(--rm-warning)]/25">
-                    <i class="ph-bold ph-warning-octagon text-2xl"></i>
-                </div>
-                <div>
-                    <h1 class="text-2xl font-bold tracking-tight text-[var(--rm-text-primary)]">
-                        Incidentes
-                    </h1>
-                    <p class="text-xs font-medium text-[var(--rm-text-secondary)] dark:text-[var(--rm-text-primary)]">
-                        Registro y seguimiento de eventos relacionados con la atención del residente
-                    </p>
-                </div>
-            </div>
-        </div>
-
-        <div class="flex items-center gap-3">
+    <x-ui.collection-header title="Incidentes" subtitle="Registro y seguimiento de eventos relacionados con la atención de residentes." icon="ph-warning-octagon" eyebrow="Continuidad asistencial" tone="danger">
+        <x-slot:actions>
             <button wire:click="abrirModalRegistro"
                 class="inline-flex items-center gap-2 rounded-xl bg-[var(--rm-action-primary)] hover:bg-[var(--rm-action-primary-hover)] px-4 py-2.5 text-xs font-bold text-white shadow-sm transition active:scale-[0.98]">
                 <i class="ph-bold ph-plus-circle text-base"></i>
                 <span>+ Registrar incidencia</span>
             </button>
-        </div>
-    </div>
+        </x-slot:actions>
+    </x-ui.collection-header>
 
     {{-- NOTIFICACIONES Y MENSAJES FLASH --}}
     @if(session()->has('mensaje'))
@@ -87,11 +71,13 @@
         <x-ui.filter-bar class="mb-4">
             <div class="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-2">
                 {{-- Búsqueda textual --}}
-                <div class="lg:col-span-3 relative flex items-center">
+                <div class="lg:col-span-3">
+                    <label for="incidentes-buscar" class="rm-collection-filter-label">Buscar incidente</label>
+                    <div class="relative flex items-center">
                     <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-[var(--rm-text-secondary)] dark:text-[var(--rm-text-muted)]">
                         <i class="ph-bold ph-magnifying-glass text-base"></i>
                     </span>
-                    <input type="text"
+                    <input id="incidentes-buscar" type="text"
                         wire:model.live.debounce.300ms="search"
                         placeholder="Buscar residente, tipo o descripción..."
                         class="w-full rounded-xl border border-[var(--rm-border)] dark:border-[var(--rm-text-body)] bg-[var(--rm-surface)] dark:bg-[var(--rm-surface)] py-2 pl-9 pr-8 text-xs font-medium text-[var(--rm-text-primary)] placeholder-[var(--rm-text-secondary)] dark:placeholder-[var(--rm-text-muted)] focus:border-[var(--rm-action-primary)] focus:ring-1 focus:ring-[var(--rm-action-primary)] focus:outline-none h-[38px]" />
@@ -103,11 +89,13 @@
                             <i class="ph-bold ph-x-circle text-base"></i>
                         </button>
                     @endif
+                    </div>
                 </div>
 
                 {{-- Filtro Tipo --}}
                 <div class="lg:col-span-2">
-                    <select wire:model.live="filtro_tipo" class="w-full rounded-xl border border-[var(--rm-border)] dark:border-[var(--rm-border)] bg-[var(--rm-surface)] dark:bg-[var(--rm-text-primary)] py-2 px-3 text-xs font-medium text-[var(--rm-text-primary)] dark:text-[var(--rm-surface-soft)] focus:border-[var(--rm-action-primary)] focus:ring-1 focus:ring-[var(--rm-action-primary)] focus:outline-none h-[38px]">
+                    <label for="incidentes-tipo" class="rm-collection-filter-label">Tipo</label>
+                    <select id="incidentes-tipo" wire:model.live="filtro_tipo" class="w-full rounded-xl border border-[var(--rm-border)] dark:border-[var(--rm-border)] bg-[var(--rm-surface)] dark:bg-[var(--rm-text-primary)] py-2 px-3 text-xs font-medium text-[var(--rm-text-primary)] dark:text-[var(--rm-surface-soft)] focus:border-[var(--rm-action-primary)] focus:ring-1 focus:ring-[var(--rm-action-primary)] focus:outline-none h-[38px]">
                         <option value="">Todos los tipos</option>
                         @foreach($tiposFrecuentes as $tf)
                             @if($tf !== 'OTRO')
@@ -119,7 +107,8 @@
 
                 {{-- Filtro Gravedad --}}
                 <div class="lg:col-span-2">
-                    <select wire:model.live="filtro_gravedad" class="w-full rounded-xl border border-[var(--rm-border)] dark:border-[var(--rm-border)] bg-[var(--rm-surface)] dark:bg-[var(--rm-text-primary)] py-2 px-3 text-xs font-medium text-[var(--rm-text-primary)] dark:text-[var(--rm-surface-soft)] focus:border-[var(--rm-action-primary)] focus:ring-1 focus:ring-[var(--rm-action-primary)] focus:outline-none h-[38px]">
+                    <label for="incidentes-gravedad" class="rm-collection-filter-label">Gravedad</label>
+                    <select id="incidentes-gravedad" wire:model.live="filtro_gravedad" class="w-full rounded-xl border border-[var(--rm-border)] dark:border-[var(--rm-border)] bg-[var(--rm-surface)] dark:bg-[var(--rm-text-primary)] py-2 px-3 text-xs font-medium text-[var(--rm-text-primary)] dark:text-[var(--rm-surface-soft)] focus:border-[var(--rm-action-primary)] focus:ring-1 focus:ring-[var(--rm-action-primary)] focus:outline-none h-[38px]">
                         <option value="">Todas las gravedades</option>
                         <option value="BAJA">🟢 Baja</option>
                         <option value="MEDIA">Media</option>
@@ -130,7 +119,8 @@
 
                 {{-- Filtro Estado --}}
                 <div class="lg:col-span-2">
-                    <select wire:model.live="filtro_estado" class="w-full rounded-xl border border-[var(--rm-border)] dark:border-[var(--rm-border)] bg-[var(--rm-surface)] dark:bg-[var(--rm-text-primary)] py-2 px-3 text-xs font-medium text-[var(--rm-text-primary)] dark:text-[var(--rm-surface-soft)] focus:border-[var(--rm-action-primary)] focus:ring-1 focus:ring-[var(--rm-action-primary)] focus:outline-none h-[38px]">
+                    <label for="incidentes-estado" class="rm-collection-filter-label">Estado</label>
+                    <select id="incidentes-estado" wire:model.live="filtro_estado" class="w-full rounded-xl border border-[var(--rm-border)] dark:border-[var(--rm-border)] bg-[var(--rm-surface)] dark:bg-[var(--rm-text-primary)] py-2 px-3 text-xs font-medium text-[var(--rm-text-primary)] dark:text-[var(--rm-surface-soft)] focus:border-[var(--rm-action-primary)] focus:ring-1 focus:ring-[var(--rm-action-primary)] focus:outline-none h-[38px]">
                         <option value="">Todos los estados</option>
                         <option value="ABIERTO">Abierto</option>
                         <option value="EN_SEGUIMIENTO">En seguimiento</option>
@@ -141,14 +131,16 @@
 
                 {{-- Fechas Desde / Hasta agrupadas --}}
                 <div class="lg:col-span-3 grid grid-cols-2 gap-1.5">
-                    <input type="date"
+                    <div><label for="incidentes-desde" class="rm-collection-filter-label">Desde</label>
+                    <input id="incidentes-desde" type="date"
                         wire:model.live="fecha_desde"
                         title="Fecha desde"
-                        class="w-full rounded-xl border border-[var(--rm-border)] dark:border-[var(--rm-border)] bg-[var(--rm-surface)] dark:bg-[var(--rm-text-primary)] py-2 px-2 text-xs font-medium text-[var(--rm-text-primary)] dark:text-[var(--rm-surface-soft)] focus:border-[var(--rm-action-primary)] focus:ring-1 focus:ring-[var(--rm-action-primary)] focus:outline-none h-[38px]" />
-                    <input type="date"
+                        class="w-full rounded-xl border border-[var(--rm-border)] dark:border-[var(--rm-border)] bg-[var(--rm-surface)] dark:bg-[var(--rm-text-primary)] py-2 px-2 text-xs font-medium text-[var(--rm-text-primary)] dark:text-[var(--rm-surface-soft)] focus:border-[var(--rm-action-primary)] focus:ring-1 focus:ring-[var(--rm-action-primary)] focus:outline-none h-[38px]" /></div>
+                    <div><label for="incidentes-hasta" class="rm-collection-filter-label">Hasta</label>
+                    <input id="incidentes-hasta" type="date"
                         wire:model.live="fecha_hasta"
                         title="Fecha hasta"
-                        class="w-full rounded-xl border border-[var(--rm-border)] dark:border-[var(--rm-border)] bg-[var(--rm-surface)] dark:bg-[var(--rm-text-primary)] py-2 px-2 text-xs font-medium text-[var(--rm-text-primary)] dark:text-[var(--rm-surface-soft)] focus:border-[var(--rm-action-primary)] focus:ring-1 focus:ring-[var(--rm-action-primary)] focus:outline-none h-[38px]" />
+                        class="w-full rounded-xl border border-[var(--rm-border)] dark:border-[var(--rm-border)] bg-[var(--rm-surface)] dark:bg-[var(--rm-text-primary)] py-2 px-2 text-xs font-medium text-[var(--rm-text-primary)] dark:text-[var(--rm-surface-soft)] focus:border-[var(--rm-action-primary)] focus:ring-1 focus:ring-[var(--rm-action-primary)] focus:outline-none h-[38px]" /></div>
                 </div>
             </div>
 
@@ -227,9 +219,9 @@
     {{-- VISTA 1: TAB LISTADO                                     --}}
     {{-- ======================================================== --}}
     @if($tabActiva === 'listado')
-        <div class="rounded-2xl bg-[var(--rm-surface)] dark:bg-[var(--rm-surface)] border border-[var(--rm-border)] dark:border-[var(--rm-text-body)] shadow-sm overflow-hidden">
+        <div class="rm-table-container rounded-2xl bg-[var(--rm-surface)] border border-[var(--rm-border)] shadow-sm overflow-hidden">
             <div class="overflow-x-auto">
-                <table class="rm-data-table rm-data-table--actions w-full text-left text-xs border-collapse">
+                <table class="rm-data-table rm-data-table--actions rm-table w-full text-left text-xs border-collapse">
                     <thead>
                         <tr class="bg-[var(--rm-surface-soft)] dark:bg-[var(--rm-surface)] text-[var(--rm-text-secondary)] dark:text-[var(--rm-text-muted)] font-bold border-b border-[var(--rm-border)] dark:border-[var(--rm-text-body)]">
                             <th class="py-3 px-4">FECHA / HORA</th>
