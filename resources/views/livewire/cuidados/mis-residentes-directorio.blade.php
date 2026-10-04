@@ -82,10 +82,10 @@
             {{-- Switch Vista (Tarjetas / Listado) --}}
             <div class="lg:col-span-1 flex items-center justify-end">
                 <div class="flex items-center p-0.5 rounded-xl bg-[var(--rm-surface)] border border-[var(--rm-border)] w-full h-[38px]">
-                    <button type="button" wire:click="$set('vistaModo', 'tarjetas')" aria-pressed="{{ $vistaModo === 'tarjetas' ? 'true' : 'false' }}" class="flex-1 h-full rounded-lg text-xs font-bold flex items-center justify-center transition cursor-pointer {{ $vistaModo === 'tarjetas' ? 'bg-[var(--rm-action-primary)] text-white shadow-xs' : 'text-[var(--rm-text-secondary)] hover:text-[var(--rm-text-primary)]' }}" title="Ver tarjetas">
+                    <button type="button" wire:click="$set('vistaModo', 'tarjetas')" aria-pressed="{{ $vistaModo === 'tarjetas' ? 'true' : 'false' }}" aria-label="Ver tarjetas" class="flex-1 h-full rounded-lg text-xs font-bold flex items-center justify-center transition cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--rm-role-primary)] {{ $vistaModo === 'tarjetas' ? 'bg-[var(--rm-role-primary)] text-[var(--rm-role-on-primary)] shadow-xs' : 'text-[var(--rm-text-secondary)] hover:text-[var(--rm-role-primary)]' }}" title="Ver tarjetas">
                         <i class="ph-bold ph-squares-four text-base"></i>
                     </button>
-                    <button type="button" wire:click="$set('vistaModo', 'tabla')" aria-pressed="{{ $vistaModo === 'tabla' ? 'true' : 'false' }}" class="flex-1 h-full rounded-lg text-xs font-bold flex items-center justify-center transition cursor-pointer {{ $vistaModo === 'tabla' ? 'bg-[var(--rm-action-primary)] text-white shadow-xs' : 'text-[var(--rm-text-secondary)] hover:text-[var(--rm-text-primary)]' }}" title="Ver listado">
+                    <button type="button" wire:click="$set('vistaModo', 'tabla')" aria-pressed="{{ $vistaModo === 'tabla' ? 'true' : 'false' }}" aria-label="Ver listado" class="flex-1 h-full rounded-lg text-xs font-bold flex items-center justify-center transition cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--rm-role-primary)] {{ $vistaModo === 'tabla' ? 'bg-[var(--rm-role-primary)] text-[var(--rm-role-on-primary)] shadow-xs' : 'text-[var(--rm-text-secondary)] hover:text-[var(--rm-role-primary)]' }}" title="Ver listado">
                         <i class="ph-bold ph-list-dashes text-base"></i>
                     </button>
                 </div>
