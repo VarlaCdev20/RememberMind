@@ -277,10 +277,12 @@ class SidebarService
         $sections[] = $this->buildSection('Cuidado', 'ph-heartbeat', null, [
             $this->buildItem('Cuidados', 'admin.enfermeria.tareas', 'ejecuciones_cuidado.ver'),
             $this->buildItem('Medicación', 'admin.enfermeria.medicacion', 'enfermeria.ver_dashboard'),
+            $this->buildPendingItem('Controles', 'signos_vitales.ver'),
+            $this->buildPendingItem('Heridas y curaciones', 'heridas.ver'),
         ], true);
         $sections[] = $this->buildSection('Continuidad', 'ph-arrows-clockwise', null, [
             $this->buildItem('Pase de turno', 'admin.enfermeria.pase-turno', 'pases_turno.ver'),
-            $this->buildItem('Incidentes', 'admin.enfermeria.registros', 'atenciones.ver'),
+            $this->buildItem('Incidentes', 'admin.enfermeria.incidentes', 'atenciones.ver'),
             $this->buildItem('Alertas', 'admin.enfermeria.alertas', 'alertas.ver', $alertasBadge),
         ], true);
 
@@ -473,6 +475,22 @@ class SidebarService
             'active' => $active,
             'badge' => $badge,
             'disabled' => ! $routeExists,
+        ];
+    }
+
+    private function buildPendingItem(string $label, string $permission): ?array
+    {
+        $user = auth()->user();
+        if (! $user || $user->estado !== 'ACTIVO' || ! $user->can($permission)) {
+            return null;
+        }
+
+        return [
+            'label' => $label,
+            'route' => null,
+            'active' => false,
+            'badge' => null,
+            'disabled' => true,
         ];
     }
 

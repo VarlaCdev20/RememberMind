@@ -17,6 +17,31 @@
     --rm-focus-ring-color: var(--rm-role-primary);
 }
 
+.rm-shell[data-role="nursing"] .rm-sidebar__nav {
+    --rm-green-primary: var(--rm-role-nursing);
+}
+
+.rm-shell[data-role="nursing"] .rm-sidebar__account-copy small,
+.rm-shell[data-role="nursing"] .rm-sidebar__account-role {
+    width: fit-content;
+    max-width: 100%;
+    padding: 2px 8px;
+    border-radius: var(--rm-radius-pill);
+    background: var(--rm-role-nursing-soft);
+    color: var(--rm-role-nursing);
+    font-weight: var(--rm-weight-semibold);
+}
+
+.rm-shell[data-role="nursing"] .rm-sidebar__nav .rm-sidebar__subitem--pending:hover,
+.rm-shell[data-role="nursing"] .rm-sidebar__flyout-link--pending:hover {
+    background: transparent;
+    border-color: transparent;
+    box-shadow: none;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    transform: none;
+}
+
 .rm-shell[data-role] .rm-sidebar__nav :is(.rm-sidebar__item, .rm-sidebar__subitem) {
     transition: background-color 160ms var(--rm-ease-standard),
         color 160ms var(--rm-ease-standard),

@@ -36,6 +36,7 @@
         }
     }
     $initialOpen = $activeLocation !== null && $activeLocation['item'] !== null ? $activeLocation['section'] : null;
+    $activeNursingSection = $sidebarRole === 'ENFERMEROS' && $initialOpen !== null ? $sections[$initialOpen]['title'] : null;
     $inicioAdministracion = $isAdministracion && app(\App\Backend\Modulos\Identidad\Servicios\VisibilidadNavegacion::class)->puedeVerRuta('admin.administracion.dashboard');
     $brandRoute = request()->routeIs('admin.enfermeria.*') ? 'admin.enfermeria.dashboard' : ($inicioAdministracion ? 'admin.administracion.dashboard' : 'dashboard');
 @endphp
@@ -46,6 +47,7 @@
     x-data="{
         storageKey: @js($sidebarStorageKey),
         sectionKeys: @js(array_map(static fn ($section) => $section['title'], $sections)),
+        activeSectionKey: @js($activeNursingSection),
         saveSidebarView() {
             const view = { path: window.location.pathname, open: this.openSection === null ? null : this.sectionKeys[this.openSection], scroll: this.$refs.navigation.scrollTop };
             try { sessionStorage.setItem(this.storageKey, JSON.stringify(view)); }
@@ -56,7 +58,9 @@
             try { view = JSON.parse(sessionStorage.getItem(this.storageKey) || 'null'); }
             catch (error) { view = null; }
             if (view) {
-                if (view.path === window.location.pathname || this.openSection === null) {
+                if (this.activeSectionKey) {
+                    this.openSection = this.sectionKeys.indexOf(this.activeSectionKey);
+                } else if (view.path === window.location.pathname || this.openSection === null) {
                     const index = this.sectionKeys.indexOf(view.open);
                     this.openSection = index >= 0 ? index : null;
                 }
@@ -146,13 +150,20 @@
                         <div class="rm-sidebar__submenu-content" :class="{ 'is-visible': openSection === {{ $index }} }">
                         @foreach($items as $itemIndex => $item)
                             @php $childActive = $currentSection && $activeLocation['item'] === $itemIndex; @endphp
-                            <a href="{{ route($item['route']) }}" wire:navigate @click="sidebarOpen = false"
-                                class="rm-sidebar__subitem rm-nav-item {{ $childActive ? 'is-active' : '' }}" data-label="{{ mb_strtoupper($item['label']) }}"
-                                @if($childActive) aria-current="page" @endif>
-                                <span class="rm-sidebar__subindicator" aria-hidden="true"></span>
-                                <span>{{ $item['label'] }}</span>
-                                @if(!empty($item['badge']))<span @class(['rm-sidebar__badge', 'rm-sidebar__badge--alert' => str_contains($item['route'], '.alertas')])>{{ $item['badge'] }}</span>@endif
-                            </a>
+                            @if($item['disabled'] ?? false)
+                                <span class="rm-sidebar__subitem rm-sidebar__subitem--pending rm-nav-item" aria-disabled="true" title="Vista todavía no disponible">
+                                    <span class="rm-sidebar__subindicator" aria-hidden="true"></span>
+                                    <span>{{ $item['label'] }}</span>
+                                </span>
+                            @else
+                                <a href="{{ route($item['route']) }}" wire:navigate @click="sidebarOpen = false"
+                                    class="rm-sidebar__subitem rm-nav-item {{ $childActive ? 'is-active' : '' }}" data-label="{{ mb_strtoupper($item['label']) }}"
+                                    @if($childActive) aria-current="page" @endif>
+                                    <span class="rm-sidebar__subindicator" aria-hidden="true"></span>
+                                    <span>{{ $item['label'] }}</span>
+                                    @if(!empty($item['badge']))<span @class(['rm-sidebar__badge', 'rm-sidebar__badge--alert' => str_contains($item['route'], '.alertas')])>{{ $item['badge'] }}</span>@endif
+                                </a>
+                            @endif
                         @endforeach
                         </div>
                     </div>
@@ -184,9 +195,13 @@
                 <strong class="rm-sidebar__flyout-title rm-nav-group">{{ $section['title'] }}</strong>
                 @foreach($section['items'] as $itemIndex => $item)
                     @php $flyoutActive = $activeLocation !== null && $activeLocation['section'] === $index && $activeLocation['item'] === $itemIndex; @endphp
-                    <a href="{{ route($item['route']) }}" wire:navigate @click="flyoutIndex = null; sidebarOpen = false"
-                        class="rm-sidebar__flyout-link rm-nav-item {{ $flyoutActive ? 'is-active' : '' }}"
-                        @if($flyoutActive) aria-current="page" @endif>{{ $item['label'] }}</a>
+                    @if($item['disabled'] ?? false)
+                        <span class="rm-sidebar__flyout-link rm-sidebar__flyout-link--pending rm-nav-item" aria-disabled="true" title="Vista todavía no disponible">{{ $item['label'] }}</span>
+                    @else
+                        <a href="{{ route($item['route']) }}" wire:navigate @click="flyoutIndex = null; sidebarOpen = false"
+                            class="rm-sidebar__flyout-link rm-nav-item {{ $flyoutActive ? 'is-active' : '' }}"
+                            @if($flyoutActive) aria-current="page" @endif>{{ $item['label'] }}</a>
+                    @endif
                 @endforeach
             </div>
         @endif

@@ -38,7 +38,7 @@ class SidebarEnfermeroTest extends TestCase
         $sidebarService = app(SidebarService::class);
         $sidebar = $sidebarService->getSidebar();
 
-        // Estructura: Mi turno, Mis residentes, Cuidado (Cuidados, Medicación), Continuidad (Pase de turno, Incidentes, Alertas)
+        // Las vistas pendientes se muestran sin enlace hasta que exista una ruta propia.
         $this->assertCount(4, $sidebar);
 
         $this->assertSame('Mi turno', $sidebar[0]['title']);
@@ -50,12 +50,17 @@ class SidebarEnfermeroTest extends TestCase
         // Grupo Cuidado
         $this->assertSame('Cuidado', $sidebar[2]['title']);
         $labelsCuidado = array_column($sidebar[2]['items'], 'label');
-        $this->assertSame(['Cuidados', 'Medicación'], $labelsCuidado);
+        $this->assertSame(['Cuidados', 'Medicación', 'Controles', 'Heridas y curaciones'], $labelsCuidado);
+        $this->assertNull($sidebar[2]['items'][2]['route']);
+        $this->assertTrue($sidebar[2]['items'][2]['disabled']);
+        $this->assertNull($sidebar[2]['items'][3]['route']);
+        $this->assertTrue($sidebar[2]['items'][3]['disabled']);
 
         // Grupo Continuidad
         $this->assertSame('Continuidad', $sidebar[3]['title']);
         $labelsContinuidad = array_column($sidebar[3]['items'], 'label');
         $this->assertSame(['Pase de turno', 'Incidentes', 'Alertas'], $labelsContinuidad);
+        $this->assertSame('admin.enfermeria.incidentes', $sidebar[3]['items'][1]['route']);
 
         // Verificar que elementos prohibidos NO están presentes
         $allTitles = array_column($sidebar, 'title');
@@ -169,6 +174,18 @@ class SidebarEnfermeroTest extends TestCase
         $this->assertSame('2', $itemAlertas['badge']);
     }
 
+    public function test_opcion_pendiente_no_se_muestra_sin_su_permiso_actual(): void
+    {
+        $enfermero = User::factory()->create(['estado' => 'ACTIVO']);
+        $enfermero->assignRole('ENFERMEROS');
+        $enfermero->roles->first()->revokePermissionTo('heridas.ver');
+
+        $this->actingAs($enfermero);
+        $cuidado = collect(app(SidebarService::class)->getSidebar())->firstWhere('title', 'Cuidado');
+
+        $this->assertSame(['Cuidados', 'Medicación', 'Controles'], array_column($cuidado['items'], 'label'));
+    }
+
     public function test_usuario_enfermero_sin_personal_no_provoca_creacion_automatica_de_personal(): void
     {
         $enfermero = User::factory()->create(['estado' => 'ACTIVO']);
@@ -235,6 +252,10 @@ class SidebarEnfermeroTest extends TestCase
         $response->assertSee('Mis residentes');
         $response->assertSee('Cuidados');
         $response->assertSee('Medicación');
+        $response->assertSee('Controles');
+        $response->assertSee('Heridas y curaciones');
+        $response->assertSee('rm-sidebar__subitem--pending');
+        $response->assertDontSee('href=""', false);
         $response->assertSee('Continuidad');
         $response->assertSee('Pase de turno');
         $response->assertSee('Incidentes');
@@ -242,5 +263,18 @@ class SidebarEnfermeroTest extends TestCase
 
         // No debe aparecer la sección redundante
         $response->assertDontSee('Salud y Evaluación Geriátrica');
+    }
+
+    public function test_incidentes_abre_su_vista_y_mantiene_continuidad_como_grupo_activo(): void
+    {
+        $enfermero = User::factory()->create(['estado' => 'ACTIVO']);
+        $enfermero->assignRole('ENFERMEROS');
+
+        $response = $this->actingAs($enfermero)->get(route('admin.enfermeria.incidentes'));
+
+        $response->assertOk();
+        $response->assertSee('activeSectionKey:', false);
+        $response->assertSee('openSection: 3', false);
+        $response->assertSee('rm-sidebar__subitem rm-nav-item is-active', false);
     }
 }

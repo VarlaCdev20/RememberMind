@@ -276,6 +276,14 @@
     transform: translateX(2px); }
 }
 
+.rm-shell .rm-sidebar__subitem--pending,
+.rm-shell .rm-sidebar__flyout-link--pending {
+    display: flex;
+    align-items: center;
+    opacity: var(--rm-state-disabled-opacity);
+    cursor: not-allowed;
+}
+
 .rm-shell .rm-sidebar__subitem.is-active {
     box-shadow: var(--rm-sage-glass-shadow);
     -webkit-backdrop-filter: blur(10px);
