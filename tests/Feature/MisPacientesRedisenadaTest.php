@@ -756,6 +756,39 @@ class MisPacientesRedisenadaTest extends TestCase
             ->assertSee('Evolución y validación');
     }
 
+    public function test_entrada_anterior_de_signos_tambien_genera_alerta_critica_atomica(): void
+    {
+        $this->travelTo(today()->setTime(10, 0));
+        $this->actingAs($this->enfermero);
+
+        $signo = app(\App\Backend\Modulos\Clinica\Servicios\SignosVitalesService::class)
+            ->registrar($this->residenteEstable->cod_residente, ['frecuencia_cardiaca' => 135], $this->enfermero);
+
+        $this->assertDatabaseHas('alertas', [
+            'cod_residente' => $this->residenteEstable->cod_residente,
+            'cod_registro' => $signo->cod_signo,
+            'modulo' => 'SIGNOS',
+            'estado' => 'ABIERTA',
+        ]);
+    }
+
+    public function test_servicio_de_signos_rechaza_atribuir_registro_a_otro_usuario(): void
+    {
+        $this->actingAs($this->enfermero);
+        $otroUsuario = User::factory()->create(['estado' => 'ACTIVO']);
+        $antes = SignoVital::query()->count();
+
+        try {
+            app(\App\Backend\Modulos\Clinica\Servicios\SignosVitalesService::class)
+                ->registrar($this->residenteEstable->cod_residente, ['frecuencia_cardiaca' => 72], $otroUsuario);
+            $this->fail('Se permitió atribuir el registro a otro usuario.');
+        } catch (\Symfony\Component\HttpKernel\Exception\HttpException $exception) {
+            $this->assertSame(403, $exception->getStatusCode());
+        }
+
+        $this->assertSame($antes, SignoVital::query()->count());
+    }
+
     public function test_guardar_signos_desde_el_modal_actualiza_el_resumen_sin_abrir_otro_panel(): void
     {
         // El registro inicial del fixture es de las 08:30; el nuevo debe ser posterior

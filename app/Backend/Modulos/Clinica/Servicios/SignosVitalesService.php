@@ -10,6 +10,7 @@ use App\Backend\Modulos\Clinica\Servicios\ValidacionSignosVitalesService;
 use App\Backend\Modulos\Enfermeria\Servicios\TurnoEnfermeriaService;
 use App\Backend\Modulos\Clinica\Acciones\RegistrarSignosVitalesAction;
 use App\Backend\Modulos\Clinica\SignosVitales\EvaluadorSignosVitales;
+use App\Backend\Modulos\Clinica\SignosVitales\ServicioDecisionAlertaClinica;
 use App\Backend\Modulos\Clinica\SignosVitales\Resultados\EvaluacionSignosVitales;
 use App\Backend\Modulos\Clinica\SignosVitales\Resultados\RegistroSignosVitales;
 use Carbon\Carbon;
@@ -25,6 +26,7 @@ class SignosVitalesService
         private readonly TurnoEnfermeriaService $turnos,
         private readonly RegistrarSignosVitalesAction $registrarSignos,
         private readonly EvaluadorSignosVitales $evaluadorSignos,
+        private readonly ServicioDecisionAlertaClinica $alertasClinicas,
     ) {}
 
     /** Captura estricta del formulario Nuevo registro de Enfermería (BDD V2.1). */
@@ -92,6 +94,7 @@ class SignosVitalesService
 
     public function registrar(string $codResidente, array $entrada, User $usuario, string $permiso = 'signos_vitales.crear'): SignoVital
     {
+        abort_unless(Auth::user()?->cod_usuario === $usuario->cod_usuario, 403, 'La autoría del registro no corresponde al usuario autenticado.');
         $this->turnos->autorizarMutacionEnfermeria($codResidente, $permiso, $usuario);
         $datos = $this->validarYNormalizar($entrada);
 
@@ -101,25 +104,40 @@ class SignosVitalesService
 
         $fechaHora = Carbon::parse($datos['fecha'] . ' ' . $datos['hora']);
 
-        return SignoVital::create([
-            'cod_signo'               => 'SGN_' . strtoupper(Str::random(10)),
-            'cod_residente'           => $codResidente,
-            'cod_personal'            => $codPersonal,
-            'fecha_hora'              => $fechaHora,
-            'presion_sistolica'       => $datos['presion_sistolica'],
-            'presion_diastolica'      => $datos['presion_diastolica'],
-            'frecuencia_cardiaca'     => $datos['frecuencia_cardiaca'],
-            'frecuencia_respiratoria' => $datos['frecuencia_respiratoria'],
-            'temperatura'             => $datos['temperatura'],
-            'saturacion_oxigeno'      => $datos['saturacion'],
-            'glucemia'                => $datos['glucosa'],
-            'estado'                  => 'ACTIVO',
-            'observacion'             => $datos['observacion'] ?? null,
-        ]);
+        return DB::transaction(function () use ($codResidente, $codPersonal, $datos, $fechaHora, $usuario): SignoVital {
+            $evaluacion = $this->evaluadorSignos->evaluar([
+                'presion_sistolica' => $datos['presion_sistolica'],
+                'presion_diastolica' => $datos['presion_diastolica'],
+                'frecuencia_cardiaca' => $datos['frecuencia_cardiaca'],
+                'frecuencia_respiratoria' => $datos['frecuencia_respiratoria'],
+                'temperatura' => $datos['temperatura'],
+                'saturacion_oxigeno' => $datos['saturacion'],
+                'glucemia' => $datos['glucosa'],
+            ], $codResidente);
+            $signo = SignoVital::create([
+                'cod_signo'               => 'SGN_' . strtoupper(Str::random(10)),
+                'cod_residente'           => $codResidente,
+                'cod_personal'            => $codPersonal,
+                'fecha_hora'              => $fechaHora,
+                'presion_sistolica'       => $datos['presion_sistolica'],
+                'presion_diastolica'      => $datos['presion_diastolica'],
+                'frecuencia_cardiaca'     => $datos['frecuencia_cardiaca'],
+                'frecuencia_respiratoria' => $datos['frecuencia_respiratoria'],
+                'temperatura'             => $datos['temperatura'],
+                'saturacion_oxigeno'      => $datos['saturacion'],
+                'glucemia'                => $datos['glucosa'],
+                'estado'                  => 'ACTIVO',
+                'observacion'             => $datos['observacion'] ?? null,
+            ]);
+            $this->alertasClinicas->crearSiCorresponde($signo, $evaluacion, $usuario);
+
+            return $signo;
+        });
     }
 
     public function rectificar(SignoVital $original, array $entrada, string $motivo, User $usuario, string $permiso = 'signos_vitales.crear'): SignoVital
     {
+        abort_unless(Auth::user()?->cod_usuario === $usuario->cod_usuario, 403, 'La autoría del registro no corresponde al usuario autenticado.');
         $this->turnos->autorizarMutacionEnfermeria($original->cod_residente, $permiso, $usuario);
         Validator::make(['motivo' => $motivo], ['motivo' => 'required|string|min:10|max:2000'], [
             'motivo.required' => 'Debe indicar el motivo de la rectificación.',
