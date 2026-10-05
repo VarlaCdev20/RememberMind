@@ -974,7 +974,7 @@ class MisPacientesRedisenadaTest extends TestCase
 
         $formulario = $this->formularioSignos()->set('signoFC', '135')
             ->assertSee('data-tone="danger"', false)
-            ->assertSee('1 crítico')
+            ->assertSee('1 MEDICIÓN CRÍTICA')
             ->call('guardarSignos')
             ->assertSet('signosConfirmacionPendiente', true)
             ->assertSee('Revisión de medición crítica')
@@ -2056,11 +2056,11 @@ class MisPacientesRedisenadaTest extends TestCase
             ->assertSee('wire:model.live.debounce.350ms="signoFC"', false)
             ->assertSee('wire:loading.class="rm-signos__card--evaluating"', false)
             ->assertSee('Crítico')
-            ->assertSee('Al confirmar el registro se generará la alerta correspondiente.');
+            ->assertSee('Al confirmar se generará una alerta y su evento inicial.');
         $formulario->set('signoGlucosa', '68')->set('signoSat', '90')
             ->assertSee('data-tone="warning"', false)
             ->assertSee('Advertencia')
-            ->assertSee('Sin clasificación definida');
+            ->assertSee('Sin clasificación adicional aplicable');
         $this->assertSame($signosAntes, SignoVital::query()->count());
         $this->assertSame($alertasAntes, Alerta::query()->count());
     }

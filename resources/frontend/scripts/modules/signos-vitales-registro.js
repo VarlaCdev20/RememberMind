@@ -1,6 +1,6 @@
 // Vista local de las mediciones del formulario. La validación y autoría definitivas
 // siguen en SignosVitalesService; aquí no se definen umbrales clínicos.
-window.rmSignosRegistro = function (history, initial, limits, objectiveBands = {}) {
+window.rmSignosRegistro = function (history, initial, limits, objectiveBands = {}, clinicalTones = {}) {
     const metadata = {
         pa: { label: 'presión arterial', unit: 'mmHg', fields: ['sis', 'dia'] },
         fc: { label: 'pulso', unit: 'lpm', fields: ['fc'] },
@@ -20,6 +20,7 @@ window.rmSignosRegistro = function (history, initial, limits, objectiveBands = {
         initialValues: { ...initial },
         limits,
         objectiveBands,
+        clinicalTones,
         touched: {},
         errors: {},
         history: Array.isArray(history) ? history : [],
@@ -82,6 +83,14 @@ window.rmSignosRegistro = function (history, initial, limits, objectiveBands = {
         },
         hasError(key) { return Boolean(this.errors[key]); },
         hasAnyError() { return Object.values(this.errors).some(Boolean); },
+        hasCardError(key) { return (metadata[key]?.fields ?? []).some(field => this.hasError(field) || Boolean(this.technicalError(field))); },
+        hasEntered(key) {
+            return (metadata[key]?.fields ?? []).some(field => String(this.values[field] ?? '').trim() !== '');
+        },
+        toneOf(key) { return this.clinicalTones?.[key] ?? 'neutral'; },
+        toneLabel(key) {
+            return ({ success: 'Normal', target: 'En objetivo', warning: 'Advertencia', high: 'Alto', danger: 'Crítico' })[this.toneOf(key)] ?? 'Sin clasificación adicional';
+        },
         validPreview(key) {
             const fields = metadata[key]?.fields ?? [];
             if (!fields.length || fields.some(field => this.hasError(field))) return false;
@@ -103,6 +112,11 @@ window.rmSignosRegistro = function (history, initial, limits, objectiveBands = {
         },
         records(key) {
             return this.history.filter(row => this.valueOf(row, key) !== null).slice(0, 5);
+        },
+        emptyHistoryMessage(key) {
+            const records = this.records(key);
+            if (records.length === 1) return `Última medición: ${records[0].fecha || 'registro previo'} · ${this.labelOf(records[0], key)} ${metadata[key]?.unit ?? ''}.`;
+            return `No hay mediciones anteriores de ${metadata[key]?.label ?? 'este parámetro'}.`;
         },
         previous(key) { return this.records(key)[0] ?? null; },
         change(key) {
@@ -167,7 +181,7 @@ window.rmSignosRegistro = function (history, initial, limits, objectiveBands = {
             return rows.map((row, i) => ({
                 ...row, x: rows.length === 1 ? 150 : 18 + i * (264 / (rows.length - 1)),
                 y: 116 - ((row[series] - min) / spread) * 84,
-                markerLabel: key === 'pa' ? `${series === 'dia' ? 'Diastólica' : 'Sistólica'} ${row[series]} mmHg` : `${row.label} ${metadata[key].unit}`,
+                markerLabel: `${key === 'pa' ? `${series === 'dia' ? 'Diastólica' : 'Sistólica'} ${row[series]} mmHg` : `${row.label} ${metadata[key].unit}`}${row.preview && this.toneOf(key) !== 'neutral' ? ` · ${this.toneLabel(key)}` : ''}`,
             }));
         },
         review() {

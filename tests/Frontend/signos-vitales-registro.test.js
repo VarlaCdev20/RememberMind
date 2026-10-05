@@ -10,9 +10,9 @@ const limits = {
     temp: { min: 25, max: 45, decimales: 1 }, sat: { min: 1, max: 100, decimales: 2 },
     glucosa: { min: 1, max: 999999.99, decimales: 2 },
 };
-const crear = (history = [], initial = {}, bands = {}) => window.rmSignosRegistro(history, {
+const crear = (history = [], initial = {}, bands = {}, tones = {}) => window.rmSignosRegistro(history, {
     sis: '', dia: '', fc: '', fr: '', temp: '', sat: '', glucosa: '', ...initial,
-}, limits, bands);
+}, limits, bands, tones);
 
 test('un panel cambia al signo activo y utiliza historial real en orden cronológico', () => {
     const estado = crear([
@@ -106,4 +106,18 @@ test('la gráfica no supera cinco puntos aunque el historial tenga más lecturas
     assert.equal(estado.records('fc').length, 5);
     assert.equal(estado.chartRows('fc').length, 5);
     assert.equal(estado.chartRows('fc').at(-1).preview, true);
+});
+
+test('una sola medición histórica muestra el valor y la vista previa lleva el estado evaluado por el servidor', () => {
+    const estado = crear([{ fecha: '01/10 13:34', glucosa: 105 }], {}, {}, { glucosa: 'danger' });
+    assert.match(estado.emptyHistoryMessage('glucosa'), /Última medición: 01\/10 13:34 · 105 mg\/dL/);
+    assert.equal(estado.chartPoints('glucosa'), '');
+    estado.values.glucosa = '48';
+    assert.equal(estado.chartRows('glucosa').length, 2);
+    assert.match(estado.chartMarkers('glucosa')[1].markerLabel, /Crítico/);
+    assert.equal(estado.toneOf('glucosa'), 'danger');
+    estado.values.glucosa = 'Infinity';
+    assert.equal(estado.hasCardError('glucosa'), true);
+    assert.equal(estado.validPreview('glucosa'), false);
+    assert.equal(estado.chartRows('glucosa').length, 1);
 });
