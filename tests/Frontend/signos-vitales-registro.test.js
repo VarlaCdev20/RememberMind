@@ -10,9 +10,9 @@ const limits = {
     temp: { min: 25, max: 45, decimales: 1 }, sat: { min: 1, max: 100, decimales: 2 },
     glucosa: { min: 1, max: 999999.99, decimales: 2 },
 };
-const crear = (history = [], initial = {}) => window.rmSignosRegistro(history, {
+const crear = (history = [], initial = {}, bands = {}) => window.rmSignosRegistro(history, {
     sis: '', dia: '', fc: '', fr: '', temp: '', sat: '', glucosa: '', ...initial,
-}, limits);
+}, limits, bands);
 
 test('un panel cambia al signo activo y utiliza historial real en orden cronológico', () => {
     const estado = crear([
@@ -67,7 +67,26 @@ test('historial parcial descarta null, vacíos y valores no finitos sin dibujar 
     assert.equal(estado.previous('fc').fc, 72);
     assert.equal(estado.change('fc'), '+24 lpm');
     assert.deepEqual(estado.chartRows('fc').map(row => row.value), [72, 96]);
-    assert.equal(estado.chartPoints('fc'), '');
+    assert.match(estado.chartPoints('fc'), /^18,\d+ 282,\d+$/);
+});
+
+test('presión arterial dibuja sistólica y diastólica con dos lecturas', () => {
+    const estado = crear([{ fecha: '04/10 08:00', sis: 120, dia: 80 }], { sis: '182', dia: '122' });
+    assert.equal(estado.chartRows('pa').length, 2);
+    assert.equal(estado.chartPoints('pa').split(' ').length, 2);
+    assert.equal(estado.chartPoints('pa', 'dia').split(' ').length, 2);
+    assert.notEqual(estado.chartPoints('pa'), estado.chartPoints('pa', 'dia'));
+    assert.equal(estado.chartMarkers('pa', 'dia')[1].markerLabel, 'Diastólica 122 mmHg');
+});
+
+test('la banda de objetivo médico usa límites estructurados y no interpreta texto libre', () => {
+    const estado = crear([{ fecha: '04/10 08:00', sat: 89 }], { sat: '90' }, {
+        sat: { min: 88, max: 92 }, fc: { min: null, max: 90 },
+    });
+    assert.equal(estado.chartBands('sat').length, 1);
+    assert.equal(estado.chartBands('sat')[0].label, 'Objetivo médico 88–92 %');
+    assert.ok(estado.chartBands('sat')[0].height > 0);
+    assert.deepEqual(estado.chartBands('fc'), []);
 });
 
 test('límites técnicos vienen del servidor y una temperatura de 6 se trata como error de captura', () => {

@@ -2,7 +2,7 @@
 namespace Tests\Feature;
 
 use App\Frontend\Livewire\Compartido\Alertas\AlertasPanel;
-use App\Models\{AdultoMayor, Alerta, User, SignoVital, Atencion};
+use App\Models\{Residente, Alerta, User, SignoVital, Atencion};
 use App\Backend\Modulos\Alertas\Servicios\DeteccionAlertasService;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -18,9 +18,11 @@ class AlertasFlujoTest extends TestCase
     {
         $this->seed(RolesAndPermissionsSeeder::class);
         $user = User::factory()->create(['nombres' => 'Ana', 'ap_paterno' => 'Profesional']);
+        $user->assignRole('ADMINISTRADOR');
+        $user->roles->each(fn ($role) => $role->syncPermissions([]));
         foreach ($permisos as $p) $user->givePermissionTo(Permission::findOrCreate($p, 'web'));
         $this->actingAs($user);
-        return [$user, AdultoMayor::factory()->create(['cod_est_adul' => 'EST_001'])];
+        return [$user, Residente::factory()->create(['cod_est_adul' => 'EST_001'])];
     }
 
     public function test_registrar_asignar_atender_agregar_accion_cerrar_y_consultar_historial(): void
@@ -31,6 +33,8 @@ class AlertasFlujoTest extends TestCase
             ->set('codResidente', $adulto->cod_residente)->set('tipoAlerta', 'Revisión requerida')
             ->set('motivo', 'Se solicita seguimiento del residente.')->call('guardarAlerta')->assertHasNoErrors();
         $alerta = Alerta::sole();
+        $this->get(route('admin.enfermeria.alertas', ['adulto' => $adulto->cod_residente, 'alerta' => $alerta->cod_alerta]))
+            ->assertOk()->assertSee('Detalle de la alerta');
         $panel->call('verDetalle', $alerta->cod_alerta)->set('responsableId', $user->cod_usuario)
             ->call('asignarResponsable')->assertHasNoErrors()
             ->call('atenderAlerta', $alerta->cod_alerta)->set('accionTomada', 'Se inicia revisión presencial.')
@@ -39,10 +43,16 @@ class AlertasFlujoTest extends TestCase
         $panel->call('verDetalle', $alerta->cod_alerta)->set('accion', 'Se informa al equipo responsable.')
             ->call('guardarAccion')->assertHasNoErrors()
             ->call('cerrarAlerta', $alerta->cod_alerta)->set('observacionCierre', 'Seguimiento concluido por el equipo.')
-            ->call('confirmarCierre')->assertHasNoErrors()->set('filtroEstado', 'CERRADA')
+            ->call('confirmarCierre')->assertHasNoErrors()
+            ->assertSet('modalResultadoCierre', true)->assertSee('Alerta cerrada')
+            ->set('filtroEstado', 'CERRADA')
             ->call('verDetalle', $alerta->cod_alerta)->assertSee('Se informa al equipo responsable.');
         $this->assertSame('CERRADA', $alerta->fresh()->estado);
         $this->assertSame(4, $alerta->eventos()->count());
+        $this->assertEqualsCanonicalizing(
+            ['ASIGNACION', 'INTERVENCION', 'SEGUIMIENTO', 'CIERRE'],
+            $alerta->eventos()->pluck('tipo_evento')->all(),
+        );
         $this->assertSame($user->cod_usuario, $alerta->eventos()->latest('fecha_hora')->value('cod_usuario'));
         $panel->set('accion', 'Intento de cambiar el historial.')->call('guardarAccion')->assertStatus(409);
         $this->assertSame(4, $alerta->eventos()->count());
@@ -54,6 +64,52 @@ class AlertasFlujoTest extends TestCase
         Alerta::create(['cod_residente' => $adulto->cod_residente, 'modulo' => 'MANUAL', 'tipo' => 'CERRADA ESPECIAL', 'descripcion' => 'Seguimiento concluido', 'estado' => 'CERRADA']);
         Livewire::test(AlertasPanel::class)->set('search', $adulto->nombres)->assertDontSee('CERRADA ESPECIAL')
             ->call('abrirCrear')->assertForbidden();
+    }
+
+    public function test_primera_nota_abierta_registra_intervencion_y_el_cierre_exige_resultado(): void
+    {
+        [, $residente] = $this->preparar(['alertas.ver', 'alertas.seguimiento', 'alertas.cerrar']);
+        $alerta = Alerta::create([
+            'cod_residente' => $residente->cod_residente,
+            'modulo' => 'SIGNOS',
+            'tipo' => 'SIGNOS VITALES CRITICOS',
+            'descripcion' => 'Lectura crítica registrada para seguimiento.',
+            'estado' => 'ABIERTA',
+        ]);
+
+        $panel = Livewire::test(AlertasPanel::class)->call('verDetalle', $alerta->cod_alerta)
+            ->assertSee('La alerta todavía no tiene una intervención registrada.')
+            ->set('accion', 'Se realizó revisión presencial y nueva toma.')
+            ->call('guardarAccion')->assertHasNoErrors();
+        $this->assertSame('EN_ATENCION', $alerta->fresh()->estado);
+        $this->assertDatabaseHas('eventos_alerta', [
+            'cod_alerta' => $alerta->cod_alerta,
+            'tipo_evento' => 'INTERVENCION',
+        ]);
+
+        $panel->call('cerrarAlerta', $alerta->cod_alerta)
+            ->call('confirmarCierre')->assertHasErrors('observacionCierre');
+        $this->assertSame('EN_ATENCION', $alerta->fresh()->estado);
+    }
+
+    public function test_no_se_puede_asignar_una_alerta_a_usuario_inactivo(): void
+    {
+        [, $residente] = $this->preparar(['alertas.ver', 'alertas.asignar']);
+        $alerta = Alerta::create([
+            'cod_residente' => $residente->cod_residente,
+            'modulo' => 'MANUAL',
+            'tipo' => 'SEGUIMIENTO',
+            'descripcion' => 'Se requiere revisión asistencial.',
+            'estado' => 'ABIERTA',
+        ]);
+        $inactivo = User::factory()->create(['estado' => 'INACTIVO']);
+
+        Livewire::test(AlertasPanel::class)->call('verDetalle', $alerta->cod_alerta)
+            ->set('responsableId', $inactivo->cod_usuario)
+            ->call('asignarResponsable')->assertStatus(422);
+
+        $this->assertNull($alerta->fresh()->cod_personal_responsable);
+        $this->assertSame(0, $alerta->eventos()->count());
     }
 
     public function test_detector_general_no_reclasifica_signos_historicos_sin_contexto(): void

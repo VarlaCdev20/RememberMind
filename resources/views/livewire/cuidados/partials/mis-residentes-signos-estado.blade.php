@@ -3,7 +3,8 @@
         $nivel = $resultado['severidad'] ?? null;
         $tono = match ($nivel) {
             'CRITICO' => 'danger',
-            'ALTO', 'ADVERTENCIA' => 'warning',
+            'ALTO' => 'high',
+            'ADVERTENCIA' => 'warning',
             'NORMAL', 'OBJETIVO_PERSONALIZADO' => 'success',
             default => ($resultado['comportamiento_alerta'] ?? '') === 'SUGERIR' ? 'warning' : 'neutral',
         };

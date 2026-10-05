@@ -24,11 +24,22 @@
     });
     $tonosPorTarjeta = $evaluacionesPorTarjeta->map(function ($resultados) {
         if ($resultados->contains(fn (array $resultado) => $resultado['severidad'] === 'CRITICO')) return 'danger';
-        if ($resultados->contains(fn (array $resultado) => in_array($resultado['severidad'], ['ALTO', 'ADVERTENCIA'], true))) return 'warning';
+        if ($resultados->contains(fn (array $resultado) => $resultado['severidad'] === 'ALTO')) return 'high';
+        if ($resultados->contains(fn (array $resultado) => $resultado['severidad'] === 'ADVERTENCIA')) return 'warning';
         if ($resultados->contains(fn (array $resultado) => $resultado['comportamiento_alerta'] === 'SUGERIR')) return 'warning';
         if ($resultados->contains(fn (array $resultado) => in_array($resultado['severidad'], ['NORMAL', 'OBJETIVO_PERSONALIZADO'], true))) return 'success';
         return 'neutral';
     });
+    $resumenAlteraciones = collect($signosEvaluacion['resultados'] ?? [])->filter(
+        fn (array $resultado) => in_array($resultado['severidad'] ?? null, ['ADVERTENCIA', 'ALTO', 'CRITICO'], true)
+    );
+    $resumenEtiquetas = collect(['CRITICO' => 'crítico', 'ALTO' => 'alto', 'ADVERTENCIA' => 'advertencia'])
+        ->map(fn (string $etiqueta, string $severidad) => $resumenAlteraciones->where('severidad', $severidad)->count()
+            ? $resumenAlteraciones->where('severidad', $severidad)->count().' '.$etiqueta : null)
+        ->filter()->implode(' · ');
+    $primerParametroAlterado = $evaluacionesPorTarjeta->keys()->first(
+        fn (string $clave) => in_array($tonosPorTarjeta->get($clave), ['warning', 'high', 'danger'], true)
+    );
 @endphp
 
 <div class="rm-signos"
@@ -41,7 +52,7 @@
              sat: @js($signoSat),
              glucosa: @js($signoGlucosa),
              obs: @js($signoObs),
-     }, @js($limitesTecnicos))"
+     }, @js($limitesTecnicos), @js($signosBandasObjetivo))"
      x-on:signos-validacion-fallida.window="$nextTick(() => review())"
      role="region"
      aria-label="Formulario de signos vitales">
@@ -67,7 +78,7 @@
     </section>
 
     <!-- ERROR GENERAL -->
-    @if($signosIntentoGuardar && $errors->any())
+    @if($signosIntentoGuardar && $errors->any() && ! $errors->has('signos_guardado'))
         <div class="rm-signos__global-error" role="alert">
             <i class="ph-bold ph-warning-circle" aria-hidden="true"></i>
             <span>No se puede continuar. Revisa las mediciones señaladas.</span>
@@ -82,8 +93,20 @@
 
     <!-- WORKSPACE PRINCIPAL -->
     @error('signos_guardado')
-        <div class="rm-signos__global-error" role="alert"><i class="ph-bold ph-warning-circle" aria-hidden="true"></i><span>{{ $message }}</span></div>
+        <x-ui.resultado-operacion-clinica class="rm-signos__error-result" variant="error" :resident="$detalleResidente['nombre_completo']" :message="$message" />
     @enderror
+    @if($resumenAlteraciones->isNotEmpty())
+        <div class="rm-signos__evaluation-summary" data-tone="{{ $resumenAlteraciones->contains('severidad', 'CRITICO') ? 'danger' : ($resumenAlteraciones->contains('severidad', 'ALTO') ? 'high' : 'warning') }}" role="status" aria-live="polite">
+            <i class="ph-bold ph-warning-circle" aria-hidden="true"></i>
+            <span>
+                <strong>{{ $resumenEtiquetas }}</strong>
+                <small>Revisa las mediciones señaladas antes de registrar.</small>
+            </span>
+            @if($primerParametroAlterado)
+                <button type="button" x-on:click="active = @js($primerParametroAlterado); $nextTick(() => document.getElementById('signos-' + active + '-title')?.scrollIntoView({ behavior: 'smooth', block: 'center' }))">Ver medición</button>
+            @endif
+        </div>
+    @endif
     <div class="rm-signos__workspace">
         <div class="rm-signos__main-col">
             <div class="rm-signos__section-heading"><h4>Mediciones</h4><span wire:loading.delay wire:target="signoSis,signoDia,signoFC,signoFR,signoTemp,signoSat,signoGlucosa" role="status">Evaluando lectura…</span></div>
@@ -194,19 +217,28 @@
                 <template x-if="active">
                     <div>
                         <div class="rm-signos__trend-section-title"><h6>Evolución</h6></div>
-                        <template x-if="chartRows(active).length >= 3">
+                        <template x-if="chartRows(active).length > 0">
                             <div class="rm-signos__chart">
                                 <div class="rm-signos__chart-canvas-wrap">
                                     <svg class="rm-signos__chart-svg" viewBox="0 0 300 140" role="img" aria-label="Tendencia de las mediciones del residente y vista previa sin guardar">
+                                        <template x-for="(band, index) in chartBands(active)" :key="'band-' + index">
+                                            <rect class="rm-signos__chart-band" :class="band.field === 'dia' ? 'rm-signos__chart-band--dia' : ''" x="18" width="264" x-bind:y="band.y" x-bind:height="band.height" x-bind:aria-label="band.label"><title x-text="band.label"></title></rect>
+                                        </template>
                                         <polyline class="rm-signos__chart-path" fill="none" x-bind:points="chartPoints(active)"></polyline>
+                                        <polyline x-show="active === 'pa'" class="rm-signos__chart-path rm-signos__chart-path--dia" fill="none" x-bind:points="chartPoints(active, 'dia')"></polyline>
                                         <template x-for="(row, index) in chartMarkers(active)" :key="index">
-                                            <circle class="rm-signos__chart-dot" :class="row.preview ? 'rm-signos__chart-dot--current' : 'rm-signos__chart-dot--history'" x-bind:cx="row.x" x-bind:cy="row.y" r="5" tabindex="0" x-bind:aria-label="row.date + ': ' + row.label + ' ' + meta[active].unit"><title x-text="row.date + ': ' + row.label + ' ' + meta[active].unit"></title></circle>
+                                            <circle class="rm-signos__chart-dot" :class="row.preview ? 'rm-signos__chart-dot--current' : 'rm-signos__chart-dot--history'" x-bind:cx="row.x" x-bind:cy="row.y" r="5" tabindex="0" x-bind:aria-label="row.date + ': ' + row.markerLabel"><title x-text="row.date + ': ' + row.markerLabel"></title></circle>
+                                        </template>
+                                        <template x-for="(row, index) in active === 'pa' ? chartMarkers(active, 'dia') : []" :key="'dia-' + index">
+                                            <circle class="rm-signos__chart-dot rm-signos__chart-dot--dia" :class="row.preview ? 'rm-signos__chart-dot--current' : 'rm-signos__chart-dot--history'" x-bind:cx="row.x" x-bind:cy="row.y" r="5" tabindex="0" x-bind:aria-label="row.date + ': ' + row.markerLabel"><title x-text="row.date + ': ' + row.markerLabel"></title></circle>
                                         </template>
                                     </svg>
                                 </div>
+                                <p class="rm-signos__chart-legend" x-show="active === 'pa'"><span>Sistólica</span><span>Diastólica</span></p>
+                                <p class="rm-signos__chart-legend"><span>Histórico</span><span>Lectura actual sin guardar</span></p>
                             </div>
                         </template>
-                        <p x-show="chartRows(active).length < 3">No hay suficientes registros anteriores para mostrar una tendencia.</p>
+                        <p x-show="chartRows(active).length === 0">Sin mediciones previas ni lectura actual válida para este parámetro.</p>
                         <div class="rm-signos__current-block" x-show="validPreview(active)">
                             <div class="rm-signos__current-left">
                                 <span class="rm-signos__current-label">Valor actual · Sin guardar</span>

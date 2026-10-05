@@ -2,11 +2,12 @@
 
 namespace App\Frontend\Livewire\Compartido\Alertas;
 
-use App\Models\{AdultoMayor, Alerta, TurnoEnfermeria, User};
+use App\Models\{Residente, Alerta, SignoVital, Turno, User};
 use App\Backend\Modulos\Alertas\Servicios\DeteccionAlertasService;
 use App\Backend\Modulos\Alertas\Servicios\AlertasService;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
+use Livewire\Attributes\Locked;
 use Livewire\WithPagination;
 
 class AlertasPanel extends Component
@@ -18,11 +19,16 @@ class AlertasPanel extends Component
     public int $perPage = 15;
     public string $search = '', $filtroEstado = 'ABIERTA', $filtroNivel = '', $filtroOrigen = '';
     public bool $modalCrear = false, $modalAtender = false, $modalCerrar = false, $modalDetalle = false;
+    public bool $modalResultadoCierre = false;
+
+    #[Locked]
+    public array $resultadoCierre = [];
     public bool $drawerGrafico = false;
     public bool $drawerUbicacion = false;
     public ?string $adultoDrawerId = null;
-    public ?AdultoMayor $adultoDrawer = null;
+    public ?Residente $adultoDrawer = null;
     public $signosDrawer = [];
+    #[Locked]
     public ?string $alertaId = null;
         public string $codResidente = '', $codTurno = '', $origen = 'MANUAL', $tipoAlerta = '', $nivel = 'MEDIO', $motivo = '';
     public string $accionTomada = '', $observacionCierre = '', $accion = '', $responsableId = '';
@@ -32,6 +38,10 @@ class AlertasPanel extends Component
     public function mount(): void
     {
         $this->comprobarPermiso('ver');
+        $alerta = request()->query('alerta');
+        if (is_string($alerta) && $alerta !== '') {
+            $this->verDetalle($alerta);
+        }
     }
 
     private function comprobarPermiso(string $accion): void
@@ -157,11 +167,7 @@ class AlertasPanel extends Component
     public function verDetalle(string $id): void
     {
         $this->comprobarPermiso('ver');
-        $alerta = Alerta::findOrFail($id);
-        if (auth()->user()?->hasRole('ENFERMEROS')) {
-            app(\App\Backend\Modulos\Enfermeria\Servicios\TurnoEnfermeriaService::class)
-                ->autorizarAccionPaciente($alerta->cod_residente, auth()->user());
-        }
+        $alerta = $this->obtenerAlertaAutorizada($id);
         $this->cerrarModales();
         $this->alertaId = $id;
         $this->responsableId = $alerta->responsable?->cod_usuario ?? '';
@@ -177,12 +183,13 @@ class AlertasPanel extends Component
             'responsableId.exists' => 'El profesional seleccionado no es válido.',
         ]);
         $this->modificarAbierta(function ($alerta) {
-            $codPersonal = User::findOrFail($this->responsableId)->personal?->cod_personal;
+            $responsable = User::findOrFail($this->responsableId);
+            abort_unless($responsable->estado === 'ACTIVO', 422, 'El responsable seleccionado debe estar activo.');
+            $codPersonal = $responsable->personal?->cod_personal;
             abort_unless($codPersonal, 422, 'El responsable seleccionado no tiene un registro de personal.');
             $alerta->update(['cod_personal_responsable' => $codPersonal]);
-            $responsable = User::find($this->responsableId);
             $nombre = $responsable ? $responsable->nombres . ' ' . $responsable->ap_paterno : $this->responsableId;
-            $this->registrarAccion($alerta, 'Asignación de responsable: ' . $nombre);
+            $this->registrarAccion($alerta, 'Asignación de responsable: ' . $nombre, 'ASIGNACION');
         });
         session()->flash('mensaje', 'Responsable asignado.');
     }
@@ -196,16 +203,21 @@ class AlertasPanel extends Component
             'accion.max' => 'La nota de intervención no puede superar los 10.000 caracteres.',
         ]);
         $this->modificarAbierta(function ($alerta) {
-            $this->registrarAccion($alerta, $this->accion);
+            $estadoAnterior = $alerta->estado;
+            $tipo = $alerta->estado === 'ABIERTA' ? 'INTERVENCION' : 'SEGUIMIENTO';
+            if ($tipo === 'INTERVENCION') {
+                $alerta->update(['estado' => 'EN_ATENCION']);
+            }
+            $this->registrarAccion($alerta, $this->accion, $tipo, $estadoAnterior);
         });
         $this->accion = '';
-        session()->flash('mensaje', 'Acción registrada.');
+        session()->flash('mensaje', 'Registro de la alerta añadido.');
     }
 
     public function atenderAlerta(string $id): void
     {
         $this->comprobarPermiso('atender');
-        Alerta::findOrFail($id);
+        $this->obtenerAlertaAutorizada($id);
         $this->cerrarModales();
         $this->alertaId = $id;
         $this->accionTomada = '';
@@ -225,12 +237,13 @@ class AlertasPanel extends Component
         ]);
 
         $this->modificarAbierta(function ($alerta) {
+            $estadoAnterior = $alerta->estado;
             $alerta->update([
                 'estado' => 'EN_ATENCION',
                 'cod_personal_responsable' => $alerta->cod_personal_responsable
                     ?? auth()->user()?->personal?->cod_personal,
             ]);
-            $this->registrarAccion($alerta, 'Atención: ' . $this->accionTomada);
+            $this->registrarAccion($alerta, 'Atención: ' . $this->accionTomada, 'INTERVENCION', $estadoAnterior);
         });
 
         $this->dispatch('alerta-atendida', alertaId: $this->alertaId);
@@ -241,7 +254,7 @@ class AlertasPanel extends Component
     public function cerrarAlerta(string $id): void
     {
         $this->comprobarPermiso('cerrar');
-        Alerta::findOrFail($id);
+        $this->obtenerAlertaAutorizada($id);
         $this->cerrarModales();
         $this->alertaId = $id;
         $this->observacionCierre = '';
@@ -261,15 +274,28 @@ class AlertasPanel extends Component
         ]);
 
         $this->modificarAbierta(function ($alerta) {
+            $estadoAnterior = $alerta->estado;
             $alerta->update([
                 'estado' => 'CERRADA',
             ]);
-            $this->registrarAccion($alerta, 'Cierre: ' . $this->observacionCierre);
+            $this->registrarAccion($alerta, 'Cierre: ' . $this->observacionCierre, 'CIERRE', $estadoAnterior);
         });
 
+        $alertaCerrada = Alerta::with('adultoMayor')->findOrFail($this->alertaId);
         $this->dispatch('alerta-cerrada', alertaId: $this->alertaId);
         $this->cerrarModales();
-        session()->flash('mensaje', 'Alerta resuelta y archivada conservando el historial clínico íntegro.');
+        $this->resultadoCierre = [
+            'residente' => trim(($alertaCerrada->adultoMayor?->nombres ?? '').' '.($alertaCerrada->adultoMayor?->ap_paterno ?? '')),
+            'cod_residente' => $alertaCerrada->cod_residente,
+            'fecha_hora' => now()->format('d/m/Y H:i'),
+        ];
+        $this->modalResultadoCierre = true;
+    }
+
+    public function cerrarResultadoCierre(): void
+    {
+        $this->modalResultadoCierre = false;
+        $this->resultadoCierre = [];
     }
 
     private function modificarAbierta(callable $operacion): void
@@ -277,21 +303,41 @@ class AlertasPanel extends Component
         DB::transaction(function () use ($operacion) {
             $alerta = Alerta::lockForUpdate()->findOrFail($this->alertaId);
             abort_unless($alerta->puedeCerrarse(), 409, 'La alerta está cerrada.');
-            $user = auth()->user();
-            if ($user && !$user->hasRole('SUPERADMINISTRADOR') && !$user->hasRole('ADMINISTRADOR') && $user->hasRole('ENFERMEROS')) {
-                app(\App\Backend\Modulos\Enfermeria\Servicios\TurnoEnfermeriaService::class)->autorizarAccionPaciente($alerta->cod_residente, $user);
-            }
+            $this->autorizarLecturaResidente($alerta->cod_residente);
             $operacion($alerta);
         });
     }
 
-    private function registrarAccion(Alerta $alerta, string $texto): void
+    private function obtenerAlertaAutorizada(string $id): Alerta
+    {
+        $alerta = Alerta::findOrFail($id);
+        $this->autorizarLecturaResidente($alerta->cod_residente);
+
+        return $alerta;
+    }
+
+    private function autorizarLecturaResidente(string $codResidente): void
+    {
+        $usuario = auth()->user();
+        $turnos = app(\App\Backend\Modulos\Enfermeria\Servicios\TurnoEnfermeriaService::class);
+        if ($usuario?->hasRole('ENFERMEROS')) {
+            $turnos->autorizarAccionPaciente($codResidente, $usuario);
+
+            return;
+        }
+        if (! $usuario?->hasAnyRole(['SUPERADMINISTRADOR', 'GERENTE', 'ADMINISTRADOR'])) {
+            abort_unless($turnos->obtenerPacientesAsignadosQuery($usuario)
+                ->whereKey($codResidente)->exists(), 403);
+        }
+    }
+
+    private function registrarAccion(Alerta $alerta, string $texto, string $tipo = 'SEGUIMIENTO', ?string $estadoAnterior = null): void
     {
         $alerta->eventos()->create([
             'cod_evento_alerta' => 'EVA_' . strtoupper(\Illuminate\Support\Str::random(10)),
             'cod_usuario' => auth()->user()->cod_usuario,
-            'tipo_evento' => 'SEGUIMIENTO',
-            'estado_anterior' => $alerta->getOriginal('estado'),
+            'tipo_evento' => $tipo,
+            'estado_anterior' => $estadoAnterior ?? $alerta->estado,
             'estado_nuevo' => $alerta->estado,
             'fecha_hora' => now(),
             'descripcion' => $texto,
@@ -300,8 +346,10 @@ class AlertasPanel extends Component
 
     public function verGraficos(string $codResidente): void
     {
+        $this->comprobarPermiso('ver');
+        $this->autorizarLecturaResidente($codResidente);
         $this->adultoDrawerId = $codResidente;
-        $this->adultoDrawer = AdultoMayor::with([
+        $this->adultoDrawer = Residente::with([
             'cama.habitacion',
             'alergias' => fn ($q) => $q->whereIn('estado', ['ACTIVA', 'ACTIVO']),
             'diagnosticos' => fn ($q) => $q->whereIn('estado', ['ACTIVO', 'CONFIRMADO']),
@@ -316,8 +364,10 @@ class AlertasPanel extends Component
 
     public function verUbicacion(string $codResidente): void
     {
+        $this->comprobarPermiso('ver');
+        $this->autorizarLecturaResidente($codResidente);
         $this->adultoDrawerId = $codResidente;
-        $this->adultoDrawer = AdultoMayor::with([
+        $this->adultoDrawer = Residente::with([
             'cama.habitacion',
             'alertas' => fn ($q) => $q->orderByDesc('fecha_hora')->take(5),
         ])->find($codResidente);
@@ -341,6 +391,8 @@ class AlertasPanel extends Component
         $this->modalAtender = false;
         $this->modalCerrar = false;
         $this->modalDetalle = false;
+        $this->modalResultadoCierre = false;
+        $this->resultadoCierre = [];
         $this->alertaId = null;
         $this->accionTomada = '';
         $this->observacionCierre = '';
@@ -442,22 +494,45 @@ class AlertasPanel extends Component
         $this->conteos = $conteos;
         $this->chartData = $chartData;
 
+        $detalle = $this->alertaId ? Alerta::with([
+            'adultoMayor.cama.habitacion',
+            'responsable.usuario',
+            'eventos' => fn ($q) => $q->with('usuario')->orderByDesc('fecha_hora'),
+        ])->find($this->alertaId) : null;
+        if ($detalle) {
+            $this->autorizarLecturaResidente($detalle->cod_residente);
+        }
+        $signoOrigen = $detalle?->modulo === 'SIGNOS' && filled($detalle->cod_registro)
+            ? SignoVital::query()->where('cod_residente', $detalle->cod_residente)->find($detalle->cod_registro)
+            : null;
+        $evolucionSignos = $signoOrigen ? SignoVital::query()
+            ->where('cod_residente', $detalle->cod_residente)
+            ->whereIn('estado', ['VIGENTE', 'ACTIVO'])
+            ->where('fecha_hora', '>=', $signoOrigen->fecha_hora)
+            ->orderBy('fecha_hora')
+            ->orderBy('cod_signo')
+            ->limit(6)
+            ->get() : collect();
+        $usuario = auth()->user();
+        $turnoActivo = $detalle && $usuario?->hasRole('ENFERMEROS')
+            ? $turnoService->obtenerTurnoActivo($usuario) : null;
+        $puedeRegistrarNuevaMedicion = $detalle?->estado === 'EN_ATENCION'
+            && $turnoActivo !== null
+            && $usuario?->can('signos_vitales.crear')
+            && $usuario?->can('enfermeria.ver_pacientes_asignados')
+            && $turnoService->esPacienteAsignado($detalle->cod_residente, $usuario, $turnoActivo->cod_turno);
+
         return view('livewire.alertas.alertas-panel', [
             'alertas' => $alertas,
             'conteos' => $conteos,
             'chartData' => $chartData,
-            'alertaActiva' => $this->alertaId ? Alerta::with([
-                'adultoMayor.cama.habitacion',
-                'responsable.usuario',
-                'eventos' => fn ($q) => $q->with('usuario')->orderByDesc('fecha_hora'),
-            ])->find($this->alertaId) : null,
-            'detalle' => $this->alertaId ? Alerta::with([
-                'adultoMayor.cama.habitacion',
-                'responsable.usuario',
-                'eventos' => fn ($q) => $q->with('usuario')->orderByDesc('fecha_hora'),
-            ])->find($this->alertaId) : null,
+            'alertaActiva' => $detalle,
+            'detalle' => $detalle,
+            'signoOrigen' => $signoOrigen,
+            'evolucionSignos' => $evolucionSignos,
+            'puedeRegistrarNuevaMedicion' => $puedeRegistrarNuevaMedicion,
             'adultos' => $adultosQuery->get(),
-            'turnos' => TurnoEnfermeria::activos()->get(),
+            'turnos' => Turno::activos()->orderBy('orden')->get(),
             'usuarios' => User::query()->leftJoin('personal', 'usuarios.cod_usuario', '=', 'personal.cod_usuario')->where('usuarios.estado', 'ACTIVO')->orderBy('personal.apellido_paterno')->select('usuarios.*')->with('personal')->get(),
         ])->layout(request()->routeIs('admin.enfermeria.*') ? 'layouts.enfermeria' : 'layouts.sistema');
     }

@@ -1,6 +1,6 @@
 // Vista local de las mediciones del formulario. La validación y autoría definitivas
 // siguen en SignosVitalesService; aquí no se definen umbrales clínicos.
-window.rmSignosRegistro = function (history, initial, limits) {
+window.rmSignosRegistro = function (history, initial, limits, objectiveBands = {}) {
     const metadata = {
         pa: { label: 'presión arterial', unit: 'mmHg', fields: ['sis', 'dia'] },
         fc: { label: 'pulso', unit: 'lpm', fields: ['fc'] },
@@ -19,6 +19,7 @@ window.rmSignosRegistro = function (history, initial, limits) {
         values: { ...initial },
         initialValues: { ...initial },
         limits,
+        objectiveBands,
         touched: {},
         errors: {},
         history: Array.isArray(history) ? history : [],
@@ -91,6 +92,7 @@ window.rmSignosRegistro = function (history, initial, limits) {
             if (key === 'pa') return finite(row?.sis) !== null && finite(row?.dia) !== null ? finite(row.sis) : null;
             return finite(row?.[key]);
         },
+        diastolicOf(row) { return finite(row?.dia); },
         labelOf(row, key) {
             if (this.valueOf(row, key) === null) return '';
             return key === 'pa' ? `${row.sis}/${row.dia}` : String(row[key]);
@@ -117,25 +119,56 @@ window.rmSignosRegistro = function (history, initial, limits) {
         },
         chartRows(key) {
             const preview = this.validPreview(key);
-            const rows = this.records(key).slice(0, preview ? 4 : 5).reverse().map(row => ({ value: this.valueOf(row, key), label: this.labelOf(row, key), date: row.fecha || 'Registro previo', preview: false }));
-            if (preview) rows.push({ value: key === 'pa' ? Number(this.values.sis) : Number(this.values[key]), label: this.previewLabel(key), date: 'Sin guardar', preview: true });
-            return rows.filter(row => Number.isFinite(row.value));
+            const rows = this.records(key).slice(0, preview ? 4 : 5).reverse().map(row => ({
+                value: this.valueOf(row, key), dia: key === 'pa' ? this.diastolicOf(row) : null,
+                label: this.labelOf(row, key), date: row.fecha || 'Registro previo', preview: false,
+            }));
+            if (preview) rows.push({
+                value: key === 'pa' ? finite(this.values.sis) : finite(this.values[key]),
+                dia: key === 'pa' ? finite(this.values.dia) : null,
+                label: this.previewLabel(key), date: 'Ahora · sin guardar', preview: true,
+            });
+            return rows.filter(row => Number.isFinite(row.value) && (key !== 'pa' || Number.isFinite(row.dia)));
         },
-        chartPoints(key) {
+        chartRange(key) {
             const rows = this.chartRows(key);
-            if (rows.length < 3) return '';
-            const values = rows.map(row => row.value);
+            const values = rows.flatMap(row => key === 'pa' ? [row.value, row.dia] : [row.value]);
+            this.availableBands(key).forEach(band => values.push(band.min, band.max));
             const min = Math.min(...values), max = Math.max(...values);
-            const spread = max - min || 1;
-            return rows.map((row, i) => `${18 + i * (264 / (rows.length - 1))},${116 - ((row.value - min) / spread) * 84}`).join(' ');
+            return { min, spread: max - min || 1 };
         },
-        chartMarkers(key) {
+        availableBands(key) {
+            return (key === 'pa' ? ['sis', 'dia'] : [key]).flatMap(field => {
+                const band = this.objectiveBands?.[field];
+                const min = finite(band?.min), max = finite(band?.max);
+                return min !== null && max !== null && max > min ? [{ field, min, max }] : [];
+            });
+        },
+        chartBands(key) {
+            if (!this.chartRows(key).length) return [];
+            const { min, spread } = this.chartRange(key);
+            return this.availableBands(key).map(band => ({
+                ...band,
+                y: 116 - ((band.max - min) / spread) * 84,
+                height: ((band.max - band.min) / spread) * 84,
+                label: `Objetivo médico ${band.min}–${band.max} ${metadata[key].unit}`,
+            }));
+        },
+        chartPoints(key, series = 'value') {
             const rows = this.chartRows(key);
-            if (rows.length < 3) return [];
-            const values = rows.map(row => row.value);
-            const min = Math.min(...values), max = Math.max(...values);
-            const spread = max - min || 1;
-            return rows.map((row, i) => ({ ...row, x: 18 + i * (264 / (rows.length - 1)), y: 116 - ((row.value - min) / spread) * 84 }));
+            if (rows.length < 2) return '';
+            const { min, spread } = this.chartRange(key);
+            return rows.map((row, i) => `${18 + i * (264 / (rows.length - 1))},${116 - ((row[series] - min) / spread) * 84}`).join(' ');
+        },
+        chartMarkers(key, series = 'value') {
+            const rows = this.chartRows(key);
+            if (!rows.length) return [];
+            const { min, spread } = this.chartRange(key);
+            return rows.map((row, i) => ({
+                ...row, x: rows.length === 1 ? 150 : 18 + i * (264 / (rows.length - 1)),
+                y: 116 - ((row[series] - min) / spread) * 84,
+                markerLabel: key === 'pa' ? `${series === 'dia' ? 'Diastólica' : 'Sistólica'} ${row[series]} mmHg` : `${row.label} ${metadata[key].unit}`,
+            }));
         },
         review() {
             const invalid = this.$el.querySelector('[aria-invalid="true"]');

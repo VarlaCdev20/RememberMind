@@ -26,7 +26,15 @@ final class ServicioDecisionAlertaClinica
             return $existente;
         }
 
-        $detalle = implode(' ', array_map(fn ($resultado) => $resultado->explicacion, $criticos));
+        $detalle = implode("\n", array_map(function ($resultado): string {
+            return implode(' ', array_filter([
+                str_replace('_', ' ', ucfirst($resultado->variable)).': '.$resultado->valor.' '.$resultado->unidad.'.',
+                $resultado->rangoOUmbral ? 'Umbral utilizado: '.$resultado->rangoOUmbral.'.' : null,
+                $resultado->referenciaUtilizada ? 'Referencia: '.$resultado->referenciaUtilizada.'.' : null,
+                $resultado->explicacion,
+                $resultado->recomendacion ? 'Recomendación: '.$resultado->recomendacion : null,
+            ]));
+        }, $criticos));
         $alerta = Alerta::create([
             'cod_residente' => $signo->cod_residente,
             'cod_personal_responsable' => $signo->cod_personal,
@@ -35,7 +43,7 @@ final class ServicioDecisionAlertaClinica
             'modulo' => 'SIGNOS',
             'cod_registro' => $signo->cod_signo,
             'titulo' => 'Signos vitales: valor crítico registrado',
-            'descripcion' => $detalle.' Repetir la medición y seguir el protocolo institucional.',
+            'descripcion' => $detalle,
             'fecha_hora' => $signo->fecha_hora,
             'generacion' => 'AUTOMATICA',
             'estado' => 'ABIERTA',

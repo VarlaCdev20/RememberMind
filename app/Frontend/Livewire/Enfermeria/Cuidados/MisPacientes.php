@@ -13,6 +13,7 @@ use App\Backend\Modulos\Identidad\Servicios\RolePreviewService;
 use App\Models\AdministracionMedicacion;
 use App\Models\Alerta;
 use App\Models\IndicacionClinica;
+use App\Models\ObjetivoSignoVital;
 use App\Models\AsignacionResidenteJornada;
 use App\Models\Atencion;
 use App\Models\EjecucionCuidado;
@@ -80,6 +81,9 @@ class MisPacientes extends Component
 
     public bool $confirmarDescarte = false;
 
+    #[Locked]
+    public bool $descarteCriticoConfirmado = false;
+
     public ?string $accionDescarte = null;
 
     public bool $esModoConsulta = false;
@@ -103,6 +107,9 @@ class MisPacientes extends Component
     public array $signosHistorial = [];
 
     #[Locked]
+    public array $signosBandasObjetivo = [];
+
+    #[Locked]
     public array $signosContextoTurno = [];
 
     #[Locked]
@@ -110,7 +117,14 @@ class MisPacientes extends Component
 
     public bool $signosIntentoGuardar = false;
 
+    #[Locked]
     public bool $signosConfirmacionPendiente = false;
+
+    #[Locked]
+    public string $signosPasoConfirmacion = 'revision';
+
+    #[Locked]
+    public array $signosResultadoRegistro = [];
 
     #[Locked]
     public ?string $signosConfirmacionHuella = null;
@@ -281,7 +295,14 @@ class MisPacientes extends Component
             }
         }
 
-        if (! empty($this->residente)) {
+        $residenteSolicitado = request()->query('residente');
+        if (is_string($residenteSolicitado) && $residenteSolicitado !== '') {
+            $this->seleccionarResidente($residenteSolicitado);
+            if (request()->query('registrar') === 'signos') {
+                $this->mostrarSelectorRegistro();
+                $this->abrirFormularioRegistro('signos');
+            }
+        } elseif (! empty($this->residente)) {
             $this->seleccionarResidente($this->residente);
         }
     }
@@ -597,10 +618,13 @@ class MisPacientes extends Component
         $this->registroTipo = null;
         $this->registroInicial = [];
         $this->signosHistorial = [];
+        $this->signosBandasObjetivo = [];
         $this->signosContextoTurno = [];
         $this->signosEvaluacion = [];
         $this->signosIntentoGuardar = false;
         $this->signosConfirmacionPendiente = false;
+        $this->signosPasoConfirmacion = 'revision';
+        $this->signosResultadoRegistro = [];
         $this->signosConfirmacionHuella = null;
         $this->confirmarDescarte = false;
         $this->accionDescarte = null;
@@ -742,11 +766,17 @@ class MisPacientes extends Component
     {
         $this->confirmarDescarte = false;
         $this->accionDescarte = null;
+        $this->descarteCriticoConfirmado = false;
     }
 
     public function descartarCambios(): void
     {
         abort_unless($this->confirmarDescarte, 409);
+        if ($this->lecturaCriticaSinGuardar() && ! $this->descarteCriticoConfirmado) {
+            $this->descarteCriticoConfirmado = true;
+
+            return;
+        }
         $accion = $this->accionDescarte;
         $this->limpiarRegistroEnPanel();
 
@@ -774,7 +804,16 @@ class MisPacientes extends Component
     {
         $this->confirmarDescarte = true;
         $this->accionDescarte = $accion;
+        $this->descarteCriticoConfirmado = false;
         $this->dispatch('resident-directory-step-changed');
+    }
+
+    public function lecturaCriticaSinGuardar(): bool
+    {
+        return $this->registroTipo === 'signos' && $this->signosResultadoRegistro === []
+            && collect($this->signosEvaluacion['resultados'] ?? [])->contains(
+                fn (array $resultado) => ($resultado['severidad'] ?? null) === 'CRITICO'
+            );
     }
 
     private function formularioModificado(): bool
@@ -809,10 +848,13 @@ class MisPacientes extends Component
         $this->registroTipo = null;
         $this->registroInicial = [];
         $this->signosHistorial = [];
+        $this->signosBandasObjetivo = [];
         $this->signosContextoTurno = [];
         $this->signosEvaluacion = [];
         $this->signosIntentoGuardar = false;
         $this->signosConfirmacionPendiente = false;
+        $this->signosPasoConfirmacion = 'revision';
+        $this->signosResultadoRegistro = [];
         $this->signosConfirmacionHuella = null;
         $this->confirmarDescarte = false;
         $this->accionDescarte = null;
@@ -1157,8 +1199,22 @@ class MisPacientes extends Component
         $this->reset(['signoPA', 'signoFC', 'signoFR', 'signoTemp', 'signoSat', 'signoGlucosa', 'signoObs', 'signoConfirmarAtipico']);
         $this->reset(['signoSis', 'signoDia']);
         $this->signosEvaluacion = [];
+        $camposObjetivo = [
+            'presion_sistolica' => 'sis', 'presion_diastolica' => 'dia',
+            'frecuencia_cardiaca' => 'fc', 'frecuencia_respiratoria' => 'fr',
+            'temperatura' => 'temp', 'saturacion_oxigeno' => 'sat', 'glucemia' => 'glucosa',
+        ];
+        $this->signosBandasObjetivo = ObjetivoSignoVital::query()->where('cod_residente', $codResidente)
+            ->where('estado', 'VIGENTE')->where('vigente_desde', '<=', now())->whereNull('vigente_hasta')
+            ->whereNotNull('min_objetivo')->whereNotNull('max_objetivo')
+            ->get(['parametro', 'min_objetivo', 'max_objetivo'])
+            ->mapWithKeys(fn (ObjetivoSignoVital $objetivo) => isset($camposObjetivo[$objetivo->parametro])
+                ? [$camposObjetivo[$objetivo->parametro] => ['min' => (float) $objetivo->min_objetivo, 'max' => (float) $objetivo->max_objetivo]] : [])
+            ->all();
         $this->signosIntentoGuardar = false;
         $this->signosConfirmacionPendiente = false;
+        $this->signosPasoConfirmacion = 'revision';
+        $this->signosResultadoRegistro = [];
         $this->signosConfirmacionHuella = null;
         $turnoSignos = $this->getTurnoService()->obtenerTurnoActivo(auth()->user());
         $finTurnoSignos = $turnoSignos?->hora_cierre ?: $turnoSignos?->hora_fin;
@@ -1195,7 +1251,9 @@ class MisPacientes extends Component
         }
 
         $this->signoConfirmarAtipico = false;
+        $this->descarteCriticoConfirmado = false;
         $this->signosConfirmacionPendiente = false;
+        $this->signosPasoConfirmacion = 'revision';
         $this->signosConfirmacionHuella = null;
         $campoError = match ($propiedad) {
             'signoSis' => 'presion_sistolica',
@@ -1229,6 +1287,7 @@ class MisPacientes extends Component
     public function guardarSignos(): void
     {
         abort_if($this->esModoConsulta, 403, 'Operación no permitida en modo consulta / fuera de turno.');
+        abort_if($this->signosResultadoRegistro !== [], 409, 'Este registro ya fue confirmado.');
         abort_if($this->mostrarSelectorModal && $this->drawerPaso !== 'register-form', 403);
         if ($this->drawerPaso === 'register-form') {
             abort_unless($this->mostrarSelectorModal && $this->registroTipo === 'signos'
@@ -1260,17 +1319,23 @@ class MisPacientes extends Component
                     && (float) $this->signoSis <= (float) $this->signoDia;
                 $huella = hash('sha256', json_encode([
                     $this->modalCodResidente, $this->signoSis, $this->signoDia, $this->signoFC,
-                    $this->signoFR, $this->signoTemp, $this->signoSat, $this->signoGlucosa,
+                    $this->signoFR, $this->signoTemp, $this->signoSat, $this->signoGlucosa, $this->signoObs,
                 ]));
                 if (($requiereConfirmacion || $presionAtipica)
                     && (! $this->signosConfirmacionPendiente || $this->signosConfirmacionHuella !== $huella)) {
                     $this->signosEvaluacion = $evaluacionPrevia->toArray();
                     $this->signosConfirmacionPendiente = true;
+                    $this->signosPasoConfirmacion = 'revision';
                     $this->signosConfirmacionHuella = $huella;
                     $this->dispatch('resident-directory-step-changed');
                     return;
                 }
-                app(SignosVitalesService::class)->registrarDesdeNuevoRegistro($this->modalCodResidente, [
+                if ($requiereConfirmacion && $this->signosPasoConfirmacion !== 'final') {
+                    $this->signosPasoConfirmacion = 'final';
+                    $this->dispatch('resident-directory-step-changed');
+                    return;
+                }
+                $registro = app(SignosVitalesService::class)->registrarConEvaluacion($this->modalCodResidente, [
                     'presion_sistolica' => $this->signoSis,
                     'presion_diastolica' => $this->signoDia,
                     'frecuencia_cardiaca' => $this->signoFC,
@@ -1292,12 +1357,33 @@ class MisPacientes extends Component
                 return;
             }
 
-            $this->cerrarFlujoRegistro();
-            if ($this->residente) {
-                $this->seleccionarResidente($this->residente);
-            }
+            $this->signosResultadoRegistro = [
+                'cod_signo' => $registro->signo->cod_signo,
+                'cod_alerta' => $registro->alerta?->cod_alerta,
+                'hay_critico' => collect($registro->evaluacion->resultados)->contains(
+                    fn ($resultado) => $resultado->severidad?->value === 'CRITICO'
+                ),
+                'fecha_hora' => $registro->signo->fecha_hora?->timezone(config('app.timezone'))->format('d/m/Y H:i'),
+                'profesional' => Auth::user()?->name,
+                'mediciones' => array_values(array_filter([
+                    ['nombre' => 'Presión arterial', 'valor' => $registro->signo->presion_sistolica !== null && $registro->signo->presion_diastolica !== null
+                        ? $registro->signo->presion_sistolica.'/'.$registro->signo->presion_diastolica.' mmHg' : null],
+                    ['nombre' => 'Pulso', 'valor' => $registro->signo->frecuencia_cardiaca !== null ? $registro->signo->frecuencia_cardiaca.' lpm' : null],
+                    ['nombre' => 'Respiración', 'valor' => $registro->signo->frecuencia_respiratoria !== null ? $registro->signo->frecuencia_respiratoria.' rpm' : null],
+                    ['nombre' => 'Temperatura', 'valor' => $registro->signo->temperatura !== null ? $registro->signo->temperatura.' °C' : null],
+                    ['nombre' => 'Saturación', 'valor' => $registro->signo->saturacion_oxigeno !== null ? $registro->signo->saturacion_oxigeno.' %' : null],
+                    ['nombre' => 'Glucemia', 'valor' => $registro->signo->glucemia !== null ? $registro->signo->glucemia.' mg/dL' : null],
+                ], fn (array $medicion) => $medicion['valor'] !== null)),
+                'advertencias' => collect($registro->evaluacion->resultados)
+                    ->filter(fn ($resultado) => in_array($resultado->severidad?->value, ['ADVERTENCIA', 'ALTO'], true))
+                    ->map(fn ($resultado) => ['variable' => str_replace('_', ' ', $resultado->variable), 'valor' => $resultado->valor, 'unidad' => $resultado->unidad])
+                    ->values()->all(),
+            ];
+            $this->signosConfirmacionPendiente = false;
+            $this->signosPasoConfirmacion = 'revision';
+            $this->drawerPaso = 'register-result';
             $this->dispatch('signos-actualizados');
-            $this->dispatch('rm-toast', ['icon' => 'success', 'title' => 'Signos registrados correctamente.']);
+            $this->dispatch('resident-directory-step-changed');
 
             return;
         }
@@ -1325,7 +1411,19 @@ class MisPacientes extends Component
     public function cancelarConfirmacionSignos(): void
     {
         $this->signosConfirmacionPendiente = false;
+        $this->signosPasoConfirmacion = 'revision';
         $this->signosConfirmacionHuella = null;
+    }
+
+    public function volverResidenteDesdeSignos(): void
+    {
+        abort_unless($this->mostrarSelectorModal && $this->drawerPaso === 'register-result'
+            && $this->signosResultadoRegistro !== [], 409);
+        $codResidente = $this->modalCodResidente;
+        $this->cerrarFlujoRegistro();
+        if ($codResidente) {
+            $this->seleccionarResidente($codResidente);
+        }
     }
 
     public function abrirRegistrarSeguimiento(string $codResidente): void

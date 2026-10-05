@@ -775,4 +775,5 @@
     @include('livewire.alertas.modales.atender')
     @include('livewire.alertas.modales.cerrar')
     @include('livewire.alertas.modales.detalle')
+    @include('livewire.alertas.modales.resultado-cierre')
 </div>
